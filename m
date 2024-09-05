@@ -1,179 +1,117 @@
-Return-Path: <netdev+bounces-125475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9378196D35B
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:33:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD5EA96D37B
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D7711F29CD6
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:33:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77D9F1F212E8
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EDB419538A;
-	Thu,  5 Sep 2024 09:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9F2197A92;
+	Thu,  5 Sep 2024 09:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="tnwRddru"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W8toSrnn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B43919415D
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 09:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA549194AD9
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 09:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725528731; cv=none; b=DSLKkXna2Se0nzeVIl8qPfDI5xCaHF+57j42SM+ilaVL5ilokCeMOFx4Sr5UxM5OLSpxW6vaBYDGoIi4NxR+ngMJK6K4kEjFWciBAZp7hU5yzIW02in/3Il3T5V6xFJXsZj877Vt0n3LXv5OYQSGzCo8qthrFwgtgRtHXuRSNBk=
+	t=1725529254; cv=none; b=bmZmIFnQ7qmxINE/UrpSo6hHo0RFseq9nQO+YqYr/0lgcLJeFzU4n9MYI3GAz4i8yuuvIm1pAmMhLR+yRmQi5qQEFzJKvCcxhrmpMNbehCGsjJFbukzfIQDN3P/H+BbNt4nYq1Yp5aub7hTot43/S6KFtzYwyRxC5mP7COQf9hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725528731; c=relaxed/simple;
-	bh=LQ5PvTcHlXGD/hkNFOkC5JReMWoYpmLiurPZY9rQkbs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HtBtagd6SU+PRfZew66Cl6h9y/vksyzCr/TN+6gmmhcPAkd6I6icWWnbvg1+qkd6q8Bn94qRl9JBXnp49sNw4PnaKbIuYKlCUvJyWyJhmQ1LayUowK9avrSBSqCUC1OlRAoeftbkq2vEJO+giIGSCBCAbEb9q/ThYQNCpHnVMmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=tnwRddru; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3787f30d892so308828f8f.0
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 02:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1725528728; x=1726133528; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EYvR2W7jIGeeSA8kiFQ7IQfHxoQoKGRP/A4d6og6D5c=;
-        b=tnwRddru5evt6kv6LiJrqsUHyrqRwL41fYkag8/lFruPP+3DgRx56RgZKUX0ddOVxJ
-         hnWKDe6AuaFwBbj7BtzwyXUAx/yIkjeeucknxG5HtIOhl+Hj234BsdLp/O9om88q5q/W
-         rBbEw3q0z99OHVhtnL6QTFYuJzGFxbrzXd4hQ=
+	s=arc-20240116; t=1725529254; c=relaxed/simple;
+	bh=HkMksoJkam39qtRwxGPncit4t3aPPxXN22Lh0dQW1hc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=leBNJHXWiyGaRVvhEkyj7hqQioQpZMP0kBX/h1D8ZhWa7LLdb7c6xSyOVIkycFohNSyK5EhR88Fo+dNBRiIwZx8qmBXR5Zb/A/KEwBLGwXKkOK7fDHRETPI6nvQEfm2JGYDRpII+6BlMUl8CpCB9RxhjuZ6Tuy7QpcLUj5QsNlc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W8toSrnn; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725529250;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/d5hdFRsgesb2Y7IkvZL3YR9p71W/+q8gl8me4oUcJQ=;
+	b=W8toSrnno0cEHBWUM8lMbZNjVUcEc9AHTrDG8Vf/P6P2cEBzv/SraQFIBPm3S6vlbyMvzt
+	A8P+UQ299zHGeo6Mz+f1cWEU3SOh/wMcCcRovDtQ12s6N7JDArrYJtccxm1MNNrKEKq9wR
+	FaAdApJJycoUMmLmtN2bj4bbtPRTKdg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-614-8H7dqGWqMt-u6vetTzk8Cw-1; Thu, 05 Sep 2024 05:40:49 -0400
+X-MC-Unique: 8H7dqGWqMt-u6vetTzk8Cw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-374c434b952so333621f8f.1
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 02:40:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725528728; x=1726133528;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1725529248; x=1726134048;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EYvR2W7jIGeeSA8kiFQ7IQfHxoQoKGRP/A4d6og6D5c=;
-        b=ViOYERjEhRxSJGtdNPTnbeBu5Kh9az7Ig6MjJQkLPyMwhWnIw/6Ue7IfTdi1finudR
-         5AtMeG0/KWrjm9SIkL4awE3Ca97B4bfhyfNiJhteWsu8SO306cvALKAQIdHCZs5jZq6r
-         e7jMalYf2IYIr/89kZXg2es+HSzETL1Fxwd4JOm37ahsBL+p++fuwGtNrV9+5zzZ0rOx
-         5hApHQIMfvxTo9D73hvxx83SjPSBzLGlP/T2yYc12jk7DqPS9htjdEl7iJH/MYD0XtB0
-         MK2RfenSzkckjyyD0q+rbaehzKMVyowhak/RgKyzRVOrmUAFrjGa84Uo6NN6IPhEEQ6z
-         ei9g==
-X-Forwarded-Encrypted: i=1; AJvYcCXa0B7DZrAJFA2OnDMnVQZsPNaJX/HPBaj5Ef67D/dhtmSCnwq7rmEF22SKYH+ULMoaJnixie8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yytj70IeVOZVowwrqJBg7OLJ9DIjQhGbLA22n0O9r3PHebBm5o6
-	IfGBSCMG9u1wrGPyquqPwKBW4R450zw2RWmZVuDk9nz79DDAi6ajP6EHjUvFiw8=
-X-Google-Smtp-Source: AGHT+IFllECApaNAIcoK8oWhKRk18ZBq0kn6XAZqAdlvY0zydI7UVq0JZx8/ZTiSJkGJqBngRd8J0Q==
-X-Received: by 2002:a5d:62d0:0:b0:374:be0f:45c1 with SMTP id ffacd0b85a97d-374bf1e46ffmr9823673f8f.53.1725528727546;
-        Thu, 05 Sep 2024 02:32:07 -0700 (PDT)
-Received: from LQ3V64L9R2 (net-2-42-195-208.cust.vodafonedsl.it. [2.42.195.208])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42bb6e274b6sm228268835e9.33.2024.09.05.02.32.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 02:32:07 -0700 (PDT)
-Date: Thu, 5 Sep 2024 11:32:04 +0200
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	edumazet@google.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, bjorn@rivosinc.com, hch@infradead.org,
-	willy@infradead.org, willemdebruijn.kernel@gmail.com,
-	skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 5/5] netdev-genl: Support setting per-NAPI
- config values
-Message-ID: <Ztl6lATqzndc2-hK@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	edumazet@google.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, bjorn@rivosinc.com, hch@infradead.org,
-	willy@infradead.org, willemdebruijn.kernel@gmail.com,
-	skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240829131214.169977-1-jdamato@fastly.com>
- <20240829131214.169977-6-jdamato@fastly.com>
- <20240829153105.6b813c98@kernel.org>
- <ZtGiNF0wsCRhTtOF@LQ3V64L9R2>
- <20240830142235.352dbad5@kernel.org>
- <ZtXuJ3TMp9cN5e9h@LQ3V64L9R2.station>
- <Ztjv-dgNFwFBnXwd@mini-arch>
- <20240904165417.015c647f@kernel.org>
+        bh=/d5hdFRsgesb2Y7IkvZL3YR9p71W/+q8gl8me4oUcJQ=;
+        b=VCo9hVBYYeApTizgdcFfysJ8EX1TpWHP+13vUv8DF23XY5qrJUktvT6alLHhklzYDJ
+         Yg3YngmpFkQiJmR8snAvapbNPHu9kZF7Lea8OYWL7+YJ54sPwTSpZ/0VLKU0aHTlqY9H
+         BnuERb51d3ad1cJH/rnrXRboluRlvfcuJkMD0EO8b1VTVZZYP/KUOq1UQM87hKgnHI62
+         wvFi75Z4xFnPlvkKbY20lD3Fw1YcItDXBlMnjZzgpY+SnfEYURryL+BgjeQm1U8GiuwV
+         sF/fTBooVKQLx40MRjoBoMEt3o4YMGWP4aq6SMpFrF3aTURbZzavLlwhh2iHNlmI7Apo
+         bu+A==
+X-Gm-Message-State: AOJu0YyYOzsSvls8lUlPpPpV0DqLMLRMIHErfvJKHAolSyfexg1XFsa7
+	d04vkDrBMPgGjuwWDO3xRH7V6/VEFmx4FS5EC83ichVEPdr5bCR5XXHkFvjnK1hX3DH5aOqlvVu
+	8FcERw1bmz36O1+WGBYEXXsyROvYsrWrmGDV69e/bnlcVshxNVCJhFA==
+X-Received: by 2002:adf:b35c:0:b0:374:ba70:5527 with SMTP id ffacd0b85a97d-374bef38a14mr10487176f8f.13.1725529248263;
+        Thu, 05 Sep 2024 02:40:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFc1L2IubIloELAc/ui/TQRrGJJubc4ZHHBYU3N6zCj8tc/ichdm6z4YhezmjVfkXYNgOCQ4A==
+X-Received: by 2002:adf:b35c:0:b0:374:ba70:5527 with SMTP id ffacd0b85a97d-374bef38a14mr10487145f8f.13.1725529247727;
+        Thu, 05 Sep 2024 02:40:47 -0700 (PDT)
+Received: from [192.168.88.27] (146-241-55-250.dyn.eolo.it. [146.241.55.250])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374c4059811sm12775152f8f.4.2024.09.05.02.40.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Sep 2024 02:40:47 -0700 (PDT)
+Message-ID: <daae082f-f526-4673-9ab5-43cf1d4d8b59@redhat.com>
+Date: Thu, 5 Sep 2024 11:40:45 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240904165417.015c647f@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 2/2] net: phy: Add driver for Motorcomm yt8821
+ 2.5G ethernet phy
+To: Frank Sae <Frank.Sae@motor-comm.com>, andrew@lunn.ch,
+ hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux@armlinux.org.uk
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ yuanlai.cui@motor-comm.com, hua.sun@motor-comm.com,
+ xiaoyong.li@motor-comm.com, suting.hu@motor-comm.com, jie.han@motor-comm.com
+References: <20240901083526.163784-1-Frank.Sae@motor-comm.com>
+ <20240901083526.163784-3-Frank.Sae@motor-comm.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240901083526.163784-3-Frank.Sae@motor-comm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 04, 2024 at 04:54:17PM -0700, Jakub Kicinski wrote:
-> On Wed, 4 Sep 2024 16:40:41 -0700 Stanislav Fomichev wrote:
-> > > I think what you are proposing seems fine; I'm just working out the
-> > > implementation details and making sure I understand before sending
-> > > another revision.  
-> > 
-> > What if instead of an extra storage index in UAPI, we make napi_id persistent?
-> > Then we can keep using napi_id as a user-facing number for the configuration.
-> > 
-> > Having a stable napi_id would also be super useful for the epoll setup so you
-> > don't have to match old/invalid ids to the new ones on device reset.
+On 9/1/24 10:35, Frank Sae wrote:
+> Add a driver for the motorcomm yt8821 2.5G ethernet phy. Verified the
+> driver on BPI-R3(with MediaTek MT7986(Filogic 830) SoC) development board,
+> which is developed by Guangdong Bipai Technology Co., Ltd..
 > 
-> that'd be nice, initially I thought that we have some drivers that have
-> multiple instances of NAPI enabled for a single "index", but I don't
-> see such drivers now.
+> yt8821 2.5G ethernet phy works in AUTO_BX2500_SGMII or FORCE_BX2500
+> interface, supports 2.5G/1000M/100M/10M speeds, and wol(magic package).
 > 
-> > In the code, we can keep the same idea with napi_storage in netdev and
-> > ask drivers to provide storage id, but keep that id internal.
-> > 
-> > The only complication with that is napi_hash_add/napi_hash_del that
-> > happen in netif_napi_add_weight. So for the devices that allocate
-> > new napi before removing the old ones (most devices?), we'd have to add
-> > some new netif_napi_takeover(old_napi, new_napi) to remove the
-> > old napi_id from the hash and reuse it in the new one.
-> > 
-> > So for mlx5, the flow would look like the following:
-> > 
-> > - mlx5e_safe_switch_params
-> >   - mlx5e_open_channels
-> >     - netif_napi_add(new_napi)
-> >       - adds napi with 'ephemeral' napi id
-> >   - mlx5e_switch_priv_channels
-> >     - mlx5e_deactivate_priv_channels
-> >       - napi_disable(old_napi)
-> >       - netif_napi_del(old_napi) - this frees the old napi_id
-> >   - mlx5e_activate_priv_channels
-> >     - mlx5e_activate_channels
-> >       - mlx5e_activate_channel
-> >         - netif_napi_takeover(old_napi is gone, so probably take id from napi_storage?)
-> > 	  - if napi is not hashed - safe to reuse?
-> > 	- napi_enable
-> > 
-> > This is a bit ugly because we still have random napi ids during reset, but
-> > is not super complicated implementation-wise. We can eventually improve
-> > the above by splitting netif_napi_add_weight into two steps: allocate and
-> > activate (to do the napi_id allocation & hashing). Thoughts?
-> 
-> The "takeover" would be problematic for drivers which free old NAPI
-> before allocating new one (bnxt?). But splitting the two steps sounds
-> pretty clean. We can add a helper to mark NAPI as "driver will
-> explicitly list/hash later", and have the driver call a new helper
-> which takes storage ID and lists the NAPI in the hash.
+> Signed-off-by: Frank Sae <Frank.Sae@motor-comm.com>
 
-Hm... I thought I had an idea of how to write this up, but I think
-maybe I've been thinking about it wrong.
+The patch LGTM, but waiting a little longer before merging to let Andrew 
+have a proper look.
 
-Whatever I land on, I'll send first as an RFC to make sure I'm
-following all the feedback that has come in. I definitely want to
-get this right.
+Thanks,
 
-Sorry for the slow responses; I am technically on PTO for a bit
-before LPC :)
+Paolo
+
 
