@@ -1,92 +1,99 @@
-Return-Path: <netdev+bounces-125502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A271996D682
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:57:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AF6F96D687
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:58:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E0761F25602
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:57:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CFC91C250E1
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF861990BC;
-	Thu,  5 Sep 2024 10:57:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9320F1991D6;
+	Thu,  5 Sep 2024 10:58:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M3Guya4C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bi05vV5m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AD78198E77
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 10:57:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BB01991D3
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 10:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725533856; cv=none; b=I4umeBLnD0nFZqfInpwFmJrCdyDhd23yIfaI/hgWTODLvfh3dFg8AhwrfoUcywJwXcWhmcU3DnBiZmUUOKPbry8b5z39VKhe2nOrr+FB1OJMvyoj781LSiqtIHXxOPjqfOIqlbG/7EtUEwt88APFYNLN1Tik06Pv3Wiz0Xcg+d4=
+	t=1725533884; cv=none; b=dr4s4fAAN3YOJK5NK1f5yS0a/Zk7OcbOJnnSfJ0Loqn19eUuQwvK6vB3Ljg2NuVMAf/OT9aAvFjgFyrBTH2+ev3enM+gU6NH1s7kf26KVpPjOiE8v1X3uCSazay5V+KsZcYlKT9Hujow06Gp8wCVDZTtoEG8S1moO7la1O02jUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725533856; c=relaxed/simple;
-	bh=7D3pIFtwFn9h95Lvx10kvglUmb8s4vRpiEtjRAPeVvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JahcmbSxWdJgzVRwzeMgNBUwmR+1ae8GPNLg3fI9bPpAJZKnJRt7lafyoFbfjKaqsJwC5LNWl4SGxSo6y7F5aiAel232RrSk1vyejPcgfQfRjw1kG+t12q0RNaC1MaT6dwAh7M6j58I2o1xXolxDmyA8eX5zQSlSG0Ie2NoOKtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M3Guya4C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CEA6C4CEC3;
-	Thu,  5 Sep 2024 10:57:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725533855;
-	bh=7D3pIFtwFn9h95Lvx10kvglUmb8s4vRpiEtjRAPeVvg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M3Guya4CdlZurT15BChf1qC4UoTOQOGB1X5IQgOb70WOivK4zwq6CHYqVVRC9Vsen
-	 NFkeZQU1YZl65WCC5ozwMlM0KNe8oAZ33NemH7odgk4ZzYewx9PVur1hJPQyWWkM3A
-	 zpLM730Vt7mn0Z+wYBZo06Rb4xmesoGS3Wh2aMFXjx5P1jJYl+uls+Rv8xonYSslK8
-	 K8GLtvwTNZBlZE1Ck+zDwZPy92WNzso6SqYhdgmNyto6irP/S/GHr4/sh7v1EaLNBy
-	 NIHLR7ej8A2gi7FRaxRYzVWhKSDhtterbyr6GW/gUZpg+IgTT5QKp4uPViTWfp0F/K
-	 BjI/093SZkX9A==
-Date: Thu, 5 Sep 2024 11:57:32 +0100
-From: Simon Horman <horms@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net] MAINTAINERS: fix ptp ocp driver maintainers address
-Message-ID: <20240905105732.GH1722938@kernel.org>
-References: <20240904131855.559078-1-vadim.fedorenko@linux.dev>
- <20240904201724.GE1722938@kernel.org>
- <e76530ba-b191-4d64-8692-70a319e57f99@linux.dev>
+	s=arc-20240116; t=1725533884; c=relaxed/simple;
+	bh=vbhSjlahF+YbtKx5np12W8znIMdw9X52H2/MWGJ/1wM=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=EzhpMiQgYUxJLRsb/aNpwWinIABsbpLAj9FsMOs4wqOMdAgrThLm1I9vO9weeB91LC0kdCTgtlgfPG54Dq6q7wgcSXsK3sdfjUzHRBftzw8RJkpeso95oCGZCm2BhM17W+vpumEcBG37lEzwOZLw9llsIvyuiKYhQzjD7QoYKHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bi05vV5m; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a8a1acb51a7so72994266b.2
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 03:58:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725533881; x=1726138681; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vbhSjlahF+YbtKx5np12W8znIMdw9X52H2/MWGJ/1wM=;
+        b=bi05vV5mxKSRHfIhV+6mt+4K7ZxfqUtmitKQH0gMu7SZ1ZW95FlTOGV5kKRgUVXYaq
+         zRoYrISgafXcf/Q6O5gPoFP+WVccUXOQGRZ9S/7f+mOFXQeuZT3YvL3XTMlkzXAnpYGE
+         gvdBPm9keQIN9Ip05YAP84tKCs17pRHNUEeUEYCvgCL9aV+sNzNX6RskjnwuQ0z4snf6
+         iPmro1+44upbeOdKAYW6NR21Bjsjsi0fEoSm30tH11h678o48HTQYHeKmUk60uQ+pECF
+         tl0V55PW20Cf6/cloClaS3BOsGATfhBm96swui6fQjy1oicif+eghDhNFwiQLFkQ24I2
+         Yswg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725533881; x=1726138681;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vbhSjlahF+YbtKx5np12W8znIMdw9X52H2/MWGJ/1wM=;
+        b=bt0/2CTmYLZNwltnItPhbLFWfVYunusmaKlu1fe/N6H3ZYYXIVh6GZVDEJcZa4P2VD
+         dz3fhJmAkc+FA2XkcxzZKCLzUmQD+BKjbkjZ3ZB8NPePk+kVvTUglpdl5ssaJs64WKD1
+         X6iU62gN+zVhCfd8AQpDl/CvsBmkIz9JQpI4TG4DeriABIRFVeDTB8Jdsq3SqBthPJdG
+         xgHbmjNeByHmm6at60nFMTXL7jTTYNiqLRaqZ+BQ8uVLNhWR3pIXph1vzWYfi8IgpbK2
+         yRlY0myd8UE7U5n6kUqo8trlvPkKJqU3RZW3sciS9hnt79zBnvNfFIn+Gevs6Ap6Sy3f
+         Qq/A==
+X-Forwarded-Encrypted: i=1; AJvYcCW4togFNOTsKsvg4d2lwkz6AMz9wcYEUN519iI8z9YPfHZUtrxqEsoKg92jwjzap6LD9cUzxP4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbdohNUQS4UP1ZtL88GrExpj4bVGCUY9fZKk9WXEVLoDYdsiyH
+	yxt5bClgKN8kMQLeJDTr9uInXpzx7l4/qOtq+0Vfejp6TfVtOg1s
+X-Google-Smtp-Source: AGHT+IG+s2k5A6qHYs4dq/rGUfEL55V/PaHQRef68n6uRu65SJXtEJoToQlrHA4kC3bGyjWP2YkNYQ==
+X-Received: by 2002:a17:907:918c:b0:a8a:7501:de21 with SMTP id a640c23a62f3a-a8a7501e0f3mr70135666b.12.1725533881133;
+        Thu, 05 Sep 2024 03:58:01 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a61fc350asm122770766b.19.2024.09.05.03.58.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 05 Sep 2024 03:58:00 -0700 (PDT)
+Subject: Re: [PATCH net-next 2/6] sfc: implement basic per-queue stats
+To: Jakub Kicinski <kuba@kernel.org>, edward.cree@amd.com
+Cc: linux-net-drivers@amd.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+References: <cover.1724852597.git.ecree.xilinx@gmail.com>
+ <54cf35ea0d5c0ec46e0717a6181daaa2419ca91e.1724852597.git.ecree.xilinx@gmail.com>
+ <20240828174114.412e4126@kernel.org>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <f7da4b25-234b-8393-66c8-6adb66ebaaf8@gmail.com>
+Date: Thu, 5 Sep 2024 11:57:59 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e76530ba-b191-4d64-8692-70a319e57f99@linux.dev>
+In-Reply-To: <20240828174114.412e4126@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 04, 2024 at 11:47:07PM +0100, Vadim Fedorenko wrote:
-> On 04/09/2024 21:17, Simon Horman wrote:
-> > On Wed, Sep 04, 2024 at 01:18:55PM +0000, Vadim Fedorenko wrote:
-> > > While checking the latest series for ptp_ocp driver I realised that
-> > > MAINTAINERS file has wrong item about email on linux.dev domain.
-> > > 
-> > > Fixes: 795fd9342c62 ("ptp_ocp: adjust MAINTAINERS and mailmap")
-> > > Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> > 
-> > Hi Vadim,
-> > 
-> > Should an entry also be added to .mailmap ?
-> > 
-> > ...
-> 
-> I don't think so. The vadfed@linux.dev items has never been a real address,
-> I haven't seen any one complaining about bouncing emails from this address.
-> It's just a mistake done within the patch mentioned in
-> Fixes tag.
+On 29/08/2024 01:41, Jakub Kicinski wrote:
+> IOW let's not count dedicated XDP queues here at all, if we can.
 
-Thanks Vadim,
-
-that sounds reasonable to me.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+But they should still go in base_stats, like other not-core
+ queues, right?
 
