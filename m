@@ -1,129 +1,107 @@
-Return-Path: <netdev+bounces-125661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2CF996E2BE
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:09:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A02E596E340
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:33:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E41F1F215DD
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:09:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A100B2168B
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FD318BC04;
-	Thu,  5 Sep 2024 19:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE67417BEC2;
+	Thu,  5 Sep 2024 19:33:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BNgLQUUg"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YyFalRPL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE37D188017;
-	Thu,  5 Sep 2024 19:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395174400
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 19:33:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725563337; cv=none; b=RKM3AB4sfDjfvY8vB0f+nJPQJMpkFGFR6iIhTeqTV5+xaY0xSk+HVp+ywJhThWb268O/zel5+PH+bHdq1Es6lQjXWdGoGKZAIn8cKWILe1UC0PVngpHW5tZDfY9fFfNsegGFJZ8R9ClGTaoWAiWpCWef5JebhQpXO03UdocpERA=
+	t=1725564785; cv=none; b=cWb8rK8yqIHmjuCX5gmAWV4e8qPvOTIV16QRK6CvX8YMSXVNSi2idml2TnKnURZJh5p4L+IUYaCGMJamCMK1Ud02TlnnQshZ5oXut5CKu+7GEAixkkaGDIqjLkDXvr7BefzrXjaNr8P6hkYvQIG77tucKPSbuqHF+NVjcG0/LJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725563337; c=relaxed/simple;
-	bh=q1Fy017CFb6Bbpx7ghXm1lRoJCLBeFToPzSL430Hgh4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EmHUEV2c6IkMQB+ks3lkbC/GAntVcd0L95N6LbbDgj+8GpmtS02QV5Qks0FzUVGnfl8MrfPjQH6iDpL5LDD046ggmPxcQ5XReXF1nIi85B2V1RXxclxCcUhC9Rkd43/Q6vKcSGu1Df7p08e2A1nU/VrrZ5aOq2v7V+3M0w0goDo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BNgLQUUg; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71798a15ce5so433411b3a.0;
-        Thu, 05 Sep 2024 12:08:55 -0700 (PDT)
+	s=arc-20240116; t=1725564785; c=relaxed/simple;
+	bh=2vmUpg2nF4PsLOpmmAoEdy4GMTVD0/gc/0tUatEt49c=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YsRC/L87A8EB2SclgWfEzY5LmrXDdXcYehPzHrkGu4ErPdTmQpaA6m5LjSDiSUtxQejmLDe8HLI1vghd3r4jL0wLuydarww2zI5Td0F9GZIs587KjMqVWYmmadTxHWCmBCefYQA1Q4tQoCYAXUPL0g9yIcfaF1m78/lw3BQOaqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=YyFalRPL; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725563335; x=1726168135; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ktRJzR4qJmV7Uc7ETcluo4W/n/wNjkmgtnZv3eXOJQY=;
-        b=BNgLQUUgMykdAH+yHdY22gyRgVRhpHvZzsCpd33J3ktZGne5H+tqkN1wlCBfCzlyyj
-         +BGzx2Ed6waxNLa+wYAUiqlElX8pc48V6c7xsjbdVe/C6KHhQY3jQDGcy3vrZUq63bEq
-         MfIwnSMDwejeGHXS/rqMqo97R2ldAlBpBsaBDeXG+UaoVpP/ISu0F5qGNJiwBw3jS2gO
-         nOatRncG96Kkt8iB93JsMMqWHpAfZ2a+w0RDD96uYUgJslPE6Q+b1fJCaxZ+BGT5BzGv
-         bYwSRDFG6VxLbz5e8YFbXKuG9vyTtP161NaFQrQrMuOL52c5v6ISefSz37kpK/7bts6F
-         wcSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725563335; x=1726168135;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ktRJzR4qJmV7Uc7ETcluo4W/n/wNjkmgtnZv3eXOJQY=;
-        b=oua8XunWQlN1FOgvtdcvUjuSEDmctK1WgyU7hrDftD6U7eP86AjEVdZOEknims1YhJ
-         vdWcSTD+IwMvdTT/JG5x98qxS1mlDG8nTBE8Q3NEwLnM3hsjeZrBflk/PMgz6QTyoVzy
-         R3wL7lBrN+mSu7MD6F/4Ac/bT5L7iIs3oThIMgJ6c3Dv0babFSEYekvzJvDMMbERMHxq
-         CtSrebc2Cb1Zoop2ANTQQ7gsrHALaF5lIfmm8kENXfEu6t9nXbdKUeACFE51L/HQahgR
-         yMKDhoMI6pxMDMBHqCLcJkGu0gAqmp0qKhV/EB+1lYGTUmssmfozS40PYhQ8YAq3UeLe
-         P8KA==
-X-Forwarded-Encrypted: i=1; AJvYcCUiw7vM/Lh5XZ84/BONuQmrybM1UO5eml6r9EyCrE+IM9D9K1lPegEv8jZpXqE/c3G+0Q4ShIYL+ZNGfDDf@vger.kernel.org, AJvYcCUpvil8UdS1IWJXvNUCt3cSc6OlkRbt2gUlBNB1gtIc2KqSXEERLnr/mIAAqu7cfBa3HQM=@vger.kernel.org, AJvYcCVjNARCdcNAQCojYYsSwqbuqy28d0U8B12vXQ2TlSnoH8Ys8R7wJesc3ep9V7mHBr+7xpHUETJN@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVt7HS0NAbMoUXbPEjZjkOUqpIyDBIYcEt4eLxjVXwHwEE+5Mm
-	+y19ls+nYkL2ohEg4cEFZ/297G/n0b9rc4734exyTgWbveAqGw+5
-X-Google-Smtp-Source: AGHT+IEK2QM0fU2Xp+jErQWrjhElHAJPMpe2WJ+fM2XLXEzFeC3RWFMokRzrCOQpIrJAmH10hvhRcQ==
-X-Received: by 2002:a05:6a20:b096:b0:1c0:f114:100c with SMTP id adf61e73a8af0-1cf1c1090d2mr404005637.17.1725563334805;
-        Thu, 05 Sep 2024 12:08:54 -0700 (PDT)
-Received: from [192.168.0.235] ([38.34.87.7])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71797f6f668sm584658b3a.47.2024.09.05.12.08.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 12:08:54 -0700 (PDT)
-Message-ID: <2911a33d8c9f408cc8d5863c54ea0ad1eba5de38.camel@gmail.com>
-Subject: Re: [PATCH bpf-next] bpf: use type_may_be_null() helper for
- nullable-param check
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Shung-Hsi Yu <shung-hsi.yu@suse.com>, bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,  Yonghong Song
- <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Vernet
- <void@manifault.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-  kernel test robot <lkp@intel.com>
-Date: Thu, 05 Sep 2024 12:08:49 -0700
-In-Reply-To: <20240905055233.70203-1-shung-hsi.yu@suse.com>
-References: <20240905055233.70203-1-shung-hsi.yu@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1725564785; x=1757100785;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=7Xu0mfcb2Jf1oidlRbaswSLZy2ssikqlWsS46GSSplI=;
+  b=YyFalRPLTL6l8vzpiPZtI3ocJ0Du+jOYBuPpIT1E0nv4mDoYwDvuUIKI
+   PX7vIJ30uFsPVRD3dhs4KVGxNkbVZmNUzFAt5Hpn87XO9ctKYuYkvpHuN
+   iW8hVLUjojMys7ambs2RAQ6HPuXUoxZvz787EYBW9wF6bup4ViTXtPpNc
+   8=;
+X-IronPort-AV: E=Sophos;i="6.10,205,1719878400"; 
+   d="scan'208";a="451065443"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 19:32:57 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:2045]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.41.110:2525] with esmtp (Farcaster)
+ id 27601f2c-8a7a-4349-85e6-5e1acc533773; Thu, 5 Sep 2024 19:32:56 +0000 (UTC)
+X-Farcaster-Flow-ID: 27601f2c-8a7a-4349-85e6-5e1acc533773
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 5 Sep 2024 19:32:56 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.51) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Thu, 5 Sep 2024 19:32:53 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next 0/4] af_unix: Correct manage_oob() when OOB follows a consumed OOB.
+Date: Thu, 5 Sep 2024 12:32:36 -0700
+Message-ID: <20240905193240.17565-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, 2024-09-05 at 13:52 +0800, Shung-Hsi Yu wrote:
-> Commit 980ca8ceeae6 ("bpf: check bpf_dummy_struct_ops program params for
-> test runs") does bitwise AND between reg_type and PTR_MAYBE_NULL, which
-> is correct, but due to type difference the compiler complains:
->=20
->   net/bpf/bpf_dummy_struct_ops.c:118:31: warning: bitwise operation betwe=
-en different enumeration types ('const enum bpf_reg_type' and 'enum bpf_typ=
-e_flag') [-Wenum-enum-conversion]
->     118 |                 if (info && (info->reg_type & PTR_MAYBE_NULL))
->         |                              ~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~~~~
->=20
-> Workaround the warning by moving the type_may_be_null() helper from
-> verifier.c into bpf_verifier.h, and reuse it here to check whether param
-> is nullable.
->=20
-> Fixes: 980ca8ceeae6 ("bpf: check bpf_dummy_struct_ops program params for =
-test runs")
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202404241956.HEiRYwWq-lkp@i=
-ntel.com/
-> Signed-off-by: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-> ---
+Recently syzkaller reported UAF of OOB skb.
 
-Thank you for this fix.
-Replacing other uses of PTR_MAYBE_NULL suggested by Matt seems like a
-good idea, but it does not preclude merge for this patch.
+The bug was introduced by commit 93c99f21db36 ("af_unix: Don't stop
+recv(MSG_DONTWAIT) if consumed OOB skb is at the head.") but uncovered
+by another recent commit 8594d9b85c07 ("af_unix: Don't call skb_get()
+for OOB skb.").
 
-Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+This should be targeted for net.git, but it will introduce conflicts.
+Given it's now rc6, I'll target this for net-next and later send
+8594d9b85c07 and this series for stable.
 
-[...]
+[0]: https://lore.kernel.org/netdev/00000000000083b05a06214c9ddc@google.com/
+
+
+Kuniyuki Iwashima (4):
+  af_unix: Remove single nest in manage_oob().
+  af_unix: Rename unlinked_skb in manage_oob().
+  af_unix: Move spin_lock() in manage_oob().
+  af_unix: Don't return OOB skb in manage_oob().
+
+ net/unix/af_unix.c                            | 61 ++++++++++---------
+ tools/testing/selftests/net/af_unix/msg_oob.c | 23 +++++++
+ 2 files changed, 56 insertions(+), 28 deletions(-)
+
+-- 
+2.30.2
 
 
