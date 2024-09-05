@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-125668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7808696E376
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:49:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E6AF96E378
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:50:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4DD61C24494
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:49:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29CAB1F2734A
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:50:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E549C18F2C5;
-	Thu,  5 Sep 2024 19:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3E5199E9D;
+	Thu,  5 Sep 2024 19:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JyvfALoz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HqvUs6+2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846B1189523;
-	Thu,  5 Sep 2024 19:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D263D18E772;
+	Thu,  5 Sep 2024 19:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725565782; cv=none; b=ZOEIMbZ7Z+7Ej5Tw3pG+8kLoGoCVh9l/SjeglfZ7U16qZlRMcQEzmzYkSrTjpjSyclJEoVsOK6MWJuCiDRgIWwWpLvUyVz4kuMlth8gic+GdmE1MfnWX1DYzSFpmHOxziRCg505fytHRPhCcgru/EQH9yXPl35Rqaw73vbYRe9Q=
+	t=1725565784; cv=none; b=UZCCfE6STyg0zLNuUQGjYzSOiNdcDGu39h3rGPgbgIy+MImSr5SygPLjSdtvpBgCmTGPGXU16431UCe5EYhwD0olyypKkZdK+HgkBKhXlHhP9XciCkAI403jn9lm6LJuPyBqs/c16xRibSL/39jACNLyPVaZxdlej2v+5J/x8WM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725565782; c=relaxed/simple;
-	bh=wYNOonS+zkGTdeNzxFS0VTHR2V1SVj6W1xJozXLgYTI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u6uA9T5+H0pwrxfzqhrYC7QMHd0gEN7g7Ukqvy7hFjx9EHu5jNycN+GLzcYyZlN8JTxIkewJuT8cTZok/07FHk6Zt/Sh2/DXq6Kz0MO9XSdQGTi3f1lB0V9Bp1xt/C4P6gAQP+ahmSuPr/GITac8KaCowBaA41Z10u2iL0y2pPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JyvfALoz; arc=none smtp.client-ip=209.85.210.171
+	s=arc-20240116; t=1725565784; c=relaxed/simple;
+	bh=hAk9pXqkbo2o+5MhqRTmqI9f/rGaqlCpmFo3+Ai3ipQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=UK5L2bpyJ5FX74309g9Sepyg4IFCTaw5qxmKyXlKr2wYfCaPoZwkwP1c6/VgsF4EDKEx6kQiLAeJqoiu94rEjJ15OcO4wAM3X0Wh1e6X5IRVFs4pC4jjyFVb5dzzOTaTMtkju5VwyIOVRZ8Ej0RI8sgG1Q3FNImdA2DVLB2nAEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HqvUs6+2; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-715cc93694fso1080156b3a.2;
-        Thu, 05 Sep 2024 12:49:41 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-71767ef16b3so800883b3a.0;
+        Thu, 05 Sep 2024 12:49:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725565780; x=1726170580; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=doPbw8XA56nExWDq4i20kV0QJuWHUF5mkzAijSj8Kb0=;
-        b=JyvfALozL7nfUtmWRgORZLooZE6b7jOjgCEExcS2Qy0tqejHIMty9pdQZh6CYESpji
-         6F6vhhnAx3I20PrASlztza4DWlICQUgJUiqfY0vyjC7+yfE92r24Ny2Ni3T5uylGwXTQ
-         Roax2mq2CqYusH6i+z2M1ycHwjdstBjaZEX6flVVFwwNLxH4L6QfeKC6qZzhC2beZ7H5
-         Vs6kFhjnWGa+8xmCKshAI/MofZhCzjCh3eiyEz9W5n+nD7tnVJZLibZILRjX2+pwsCxI
-         WC4Hk+xMieEVT3N/qf8V5sut1fntS4GALLW5jMiey25opmSyVm9XQ5fFWb2d2cwe/fRp
-         hyEg==
+        d=gmail.com; s=20230601; t=1725565782; x=1726170582; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LUmhuELtVNs0Uu50P1tyTkvo5EER/vEBydF2CtAxSf4=;
+        b=HqvUs6+24zJl65ciacOBoob9dVu425kwnZVSY7Gd3kyzAS2Etp235ikCGhr0TVwuLD
+         zOSLIzWyf4QS4BLk8IDS+oaQEzboNHBABa2q8jELiKTziM21yEUwhOlN3MT82kVIp/go
+         1DAFbS1eI9JJD60pDr3dBeUeXYBlwAvFjEQy7IBSr/v1F3KOpVJADP24DI9mgpvmhBU5
+         2n4wI8ltsBaqvafTguvuHkIeqNpBIsPYc6SuAVyP4ybpHDMDEuuf8F9lCjpg0UFeaJ4T
+         Nyhqs28r46oMgibY1Ai+f/LPnWP1QH5t0M4wjvYkHFz56RuBojjPWhiX1ufFAW2Kpq1j
+         OBMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725565780; x=1726170580;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=doPbw8XA56nExWDq4i20kV0QJuWHUF5mkzAijSj8Kb0=;
-        b=ovj8o+eDr1i+0NzNVAB6+py5IA3GBySCbvoSr5u/aaODy+kbG4aM2Yn/epLvSzzXAT
-         xIu+ZKpfm3JW542hrzM9i5A5zI3n5ETYMIhmeo7Gu4024bTU0Qge0DJhZobfWFkWzdQL
-         oZ9eDIxQC1NMUEJt9Wgqc+CPgYLrj98MMW4siZu042puSqbu2F8dUHyaY3MYTPLGxvQ0
-         mwTA5eeySIZ2zJkFrpRiWXpYtiMY+5qSUfyFcyvOwXE6NRHCQZsFZxp6Hukns8RVuQuA
-         zstMBEHyvJSfX0aBagexRxvC6ns3mVNoFnm8m5iqYxecOvVVcvlGeHuj1Az/79sYzuCF
-         NnKg==
-X-Forwarded-Encrypted: i=1; AJvYcCXwxweSs7gGGQAsGp6wAj3iGxkh62O/qR7D6CBSFUkFxK9HRtAtf6y5RQju3+CWAzAq0D8qjCxCYno4ozE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/tAvpXBTTu1jPJ4V2hs1JN25oWykyL5fHnLjWPoDW0oUoEzCA
-	bLyEQInwTxtadz+nqKfcT5kkc0bejnpZk28DT8OqPuKJidzrVre7Xz3V6Jql
-X-Google-Smtp-Source: AGHT+IGC2naycAt97O5kweYDEyujVx08lnVFnF/97SmZ9mLTUqykwEvxiZLd9SvAw+CV8DLP4eCNuw==
-X-Received: by 2002:a05:6a00:94a2:b0:714:1e36:3bcb with SMTP id d2e1a72fcca58-718d5e0f288mr324122b3a.9.1725565780406;
-        Thu, 05 Sep 2024 12:49:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725565782; x=1726170582;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LUmhuELtVNs0Uu50P1tyTkvo5EER/vEBydF2CtAxSf4=;
+        b=htNLLYLsyaW5XS68mfJKfJj8Z8vdeJvpbBSi9iokXUB7RIoV4l2yazpONO8B993sBQ
+         gi8EKJyhtlE1fpESi4I3OjDUDzENPFlSIfayGWOxGqnEUi4ZoB6r0mGBXcvkQJcRjSvC
+         QqFjN+XhZp6kdhQImz3FHizWAclD9QRp8+CmpQDJd473J99NRFPGQH/EjKXFeDN4R+YB
+         QcjZG7M12jaHvkx3c3X+vkC05kbZWpKMa38ueM7/uoxH2QVuoD0eE+XEvxxIk9cOFRI9
+         gFeSVVIRAiDjiAdbfqeXruYoSUfqMMMPtEW8krJ2ohlS2tPxv5Q26llq9uxo1mQ4i72K
+         WtuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8xfdExe1T4iI2PfA6Boz4cvzJYTr3NCBTl30K+sHJpuisR3ZAlkYjisIYLmWxXT+0f3uGW/zWpQFOTRs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJoNnCBcaceZ4OqC8arNmDk93PMBGizRZJHkVJu79ZJBUydOkd
+	cx4+uK0TP0yFD+ZR4dP199X0L584+vzJXogN3txx4S70MAN5cH+haP0vE0ip
+X-Google-Smtp-Source: AGHT+IGU9F9j0MLcMSEyQw55on9GjRQS3pue9/pZJ9yl4bX73p7jFnMkyVCLZ0R3hVuYIJe1C65Sag==
+X-Received: by 2002:a05:6a00:1896:b0:706:284f:6a68 with SMTP id d2e1a72fcca58-718d5f0d28dmr288555b3a.23.1725565781839;
+        Thu, 05 Sep 2024 12:49:41 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71791e54585sm1248410b3a.182.2024.09.05.12.49.39
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71791e54585sm1248410b3a.182.2024.09.05.12.49.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 12:49:40 -0700 (PDT)
+        Thu, 05 Sep 2024 12:49:41 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -75,10 +77,12 @@ Cc: davem@davemloft.net,
 	linux-kernel@vger.kernel.org,
 	o.rempel@pengutronix.de,
 	p.zabel@pengutronix.de
-Subject: [PATCHv2 net-next 0/7] various cleanups
-Date: Thu,  5 Sep 2024 12:49:31 -0700
-Message-ID: <20240905194938.8453-1-rosenp@gmail.com>
+Subject: [PATCHv2 net-next 1/7] net: ag71xx: add COMPILE_TEST to test compilation
+Date: Thu,  5 Sep 2024 12:49:32 -0700
+Message-ID: <20240905194938.8453-2-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.0
+In-Reply-To: <20240905194938.8453-1-rosenp@gmail.com>
+References: <20240905194938.8453-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,25 +91,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow CI to build. Also a bugfix for dual GMAC devices.
+While this driver is meant for MIPS only, it can be compiled on x86 just
+fine. Remove pointless parentheses while at it.
 
-v2: add MODULE_DESCRIPTION and move variable for mdio_reset.
+Enables CI building of this driver.
 
-Rosen Penev (6):
-  net: ag71xx: add COMPILE_TEST to test compilation
-  net: ag71xx: add MODULE_DESCRIPTION
-  net: ag71xx: update FIFO bits and descriptions
-  net: ag71xx: use ethtool_puts
-  net: ag71xx: get reset control using devm api
-  net: ag71xx: remove always true branch
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/atheros/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Sven Eckelmann (1):
-  net: ag71xx: disable napi interrupts during probe
-
- drivers/net/ethernet/atheros/Kconfig  |  4 +-
- drivers/net/ethernet/atheros/ag71xx.c | 76 ++++++++++++++-------------
- 2 files changed, 42 insertions(+), 38 deletions(-)
-
+diff --git a/drivers/net/ethernet/atheros/Kconfig b/drivers/net/ethernet/atheros/Kconfig
+index 482c58c4c584..bec5cdf8d1da 100644
+--- a/drivers/net/ethernet/atheros/Kconfig
++++ b/drivers/net/ethernet/atheros/Kconfig
+@@ -6,7 +6,7 @@
+ config NET_VENDOR_ATHEROS
+ 	bool "Atheros devices"
+ 	default y
+-	depends on (PCI || ATH79)
++	depends on PCI || ATH79 || COMPILE_TEST
+ 	help
+ 	  If you have a network (Ethernet) card belonging to this class, say Y.
+ 
+@@ -19,7 +19,7 @@ if NET_VENDOR_ATHEROS
+ 
+ config AG71XX
+ 	tristate "Atheros AR7XXX/AR9XXX built-in ethernet mac support"
+-	depends on ATH79
++	depends on ATH79 || COMPILE_TEST
+ 	select PHYLINK
+ 	imply NET_SELFTESTS
+ 	help
 -- 
 2.46.0
 
