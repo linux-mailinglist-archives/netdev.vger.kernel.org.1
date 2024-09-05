@@ -1,205 +1,117 @@
-Return-Path: <netdev+bounces-125677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2230796E3BA
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 22:10:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA5D696E3C5
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 22:15:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5F95281811
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB70E287A4C
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B2B1917DA;
-	Thu,  5 Sep 2024 20:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32AC5192D8F;
+	Thu,  5 Sep 2024 20:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G9Qh+5Er"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190993D6D
-	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 20:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF549443;
+	Thu,  5 Sep 2024 20:15:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725567030; cv=none; b=LFKiUDlo485+RvHViXhxbQaWz3+EeBPP9T3zkCKq5FbLknmsmRH2B47huYeZ+xci8SWNVhFUj+tttHEnJiudmovlOAoJu8Gr6araaPuYeKXz6YN/wJGh2qP8gUjtqBMbrceMR/ipA0Z4zgV+So25d/z5CtZGQs08XBIflkdba1c=
+	t=1725567311; cv=none; b=r70gcWQf0Koe58Bh8eNKnPrZlKhQje4l3ksIwVEpOoP4Dhw0b9F4DXpVr3AcSRjnMMpBol5Wh6KJWSUNO+qIfdnEah/EHIJkUu41RSk9XY8ddTVaf0DQgosYbMlxAuKGfKrHJdL2ct5BuIvkL2/NFMTdZBldLgGLOcZh/n4inow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725567030; c=relaxed/simple;
-	bh=pivsRGJp8NKBwxppttHmzAWJCGdoSIRe71JGCEgDemI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BYqsC6hCS/GG3qvfnu1uhmT5KQvYGlpJurXA1bs+ZkC0cRnakb+dD8AEo57I3GsGptSn+PwCqfwcNzqzVzXuDuYxE4xtHKdS3H2p9xjwoM1y7CYzylHEBGmynRkZ0A1mntZNcGpP95Ee+dyFQPf9vHfh5fgGvYRPq49xMO8ZOGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a04a91237dso29506105ab.0
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 13:10:28 -0700 (PDT)
+	s=arc-20240116; t=1725567311; c=relaxed/simple;
+	bh=EGKGdxnnQ3tg7C6rXuKMXOxf0GC7RukIwe5gmgsaB+s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RlA9ojbEeG0lB7wWBz3NRDbdKm48ChNi8eBEVaYiCe6n9LWF1RxH8TN+s5OX18UzRISOYuPhoDv0tZo7kT8F5Cm1LjvFxIUGg/9Os1Jta+4bm9/UOJD2qWsHSFPBlP/5BETbqZBmxH6jqgu05h5r7mpS4iuVUxYNof7vS6VgIAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G9Qh+5Er; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-7163489149eso993228a12.1;
+        Thu, 05 Sep 2024 13:15:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725567309; x=1726172109; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=q1I8VdvALN0321tmy95wm8V7Thns3UaIkgyaiWhp22w=;
+        b=G9Qh+5Er6nc4PAbAKqQn2nRf1QgGZFxBKSlrl+HiZpFPXl+p+YxdKHn3wxd/wkBROK
+         aoc0wSMq/DmnuMUWRHyxBFQdpbDqREmsBGq5c1g8ZIIe6iaLsZehDU3AvHEHBRf6Z1uL
+         WV9g+9QqjEM0krjO3cSDUaL1rGfJCH5YuA9nmAecuvKGdMPJbNDcb7jHQXzQq1VK0ytO
+         yIzFmpmjH+PZuwQE0N0KPhzHU6JiWo6ndO1c6297+poaCA0Rhq+hYTZzMffZBXjCKMq2
+         F9UBkzTOecxeiLd56ak+SJ8PyOlTSp/IoyitObgyk+ZFTbq8FQEyj03oZXpMaEfv15jU
+         jr5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725567028; x=1726171828;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XiCTBlmXz66mBJxcne8N9WTdQpBfvB23eK91fk59/Tg=;
-        b=RhUUBAe3bg4WNbB2N0px8lzsISRb6yVCpvQHuR9DZFvRmhPpE/4Z3Z4MhG/hBWMtB0
-         Vt0sZS9ny+TiJ+ZAP32mK7dT5F6/bgnEjVIlUXAfN5OTPSpfY5CuMqYCM+9Jh13AkYCv
-         wAWqbjFkVvovcb5pZdOJnQmjFCHdfPC6sNqAfbjr9q9FEUyrv4w+nD6fz//eYhoByeif
-         /7ZQvZnAcBiIkdDZf1ioCJ/M3jdf1Q15iLqOz8gzNXDAKX9svdqVTTrC/Z98ZJ2jJNH7
-         cGau1cHIXh29TIpadi1lkqObLnR+TMCpPfVz0tqrd7xuCzZ7ReyKaK5zRA6xI4Fjmawp
-         HZtA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTCmyyyB0aBe6GQbhx9MUA8dLC+yxkHrSBMK/DG6VWxxGXnNUPlIhD2UlVGFGs2xOVVkjddOw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyoyBq1vdSsfAEwghLqZoPw5e846U8m5cL3HrGKYpTzLgBnnGLn
-	YC5pAODAsJTeY2VlF5yGtVX+wZlECuB3x24wiawfzYqpccBn5C5rrUmy5yu8o9eLW37JxzLtoM0
-	WagUR679hTo4nYehMVcu0esCsLqxlv6faXeN1eZeIkv0PShX1JDdYJDA=
-X-Google-Smtp-Source: AGHT+IGfch4QU4MPs73g55BhStEJMfxAbGwRgv9k7ov46PkNs5HaMGp/B40y2AJ6GYdRdXbU1SEWR9EAfA1f3IG2+Q0kmKa4q3b2
+        d=1e100.net; s=20230601; t=1725567309; x=1726172109;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q1I8VdvALN0321tmy95wm8V7Thns3UaIkgyaiWhp22w=;
+        b=Q+5wHGyJMqiCksVf8Tallc6r0rhHT8iVNym7UetqTRD2rNrjIxzGDXnWK689b4f+Cz
+         QsmZN98jbvKZRvBGcEN3F0gQRaJpbKHjtFX7V+7pBnX/dmFOV6n89xjP67fXywHIn1bS
+         0Xk/QCXOP8ua6iGyrWze/NzSPx74iChRW1lk8iwC30Rz6WqYaRLoonBSDWqkguEOqm+M
+         oX5LZF5yNsqS6IvJ1zQQXY63T6n+rJdb4HdtgjGkGUAi/bZFTOu5B134uZvdVIVm7o1i
+         Tblc0n6bRRKb66gx/hJUasLxgSU9XBL7jsuFf1SYF6mYaeOQujweNZ6bRDyK1foxtvIy
+         T/OA==
+X-Forwarded-Encrypted: i=1; AJvYcCVGDd2bC2G/vpwD+ogd52vU9mXx/h0YEdcvadqMTV9ekTwYREhzSF8lUPN2DiTnoippDzcAN3y7tMpgNVM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZyjYT2vkrjYnd6M7ec/UcUg2nw8nVoFfAOnQCEzEb6/kTETP+
+	3fg8EIbh11ACDoSmtxbALUCsYSuzZa/G4fyPLIOS3YusbNyqyXzZS5vE6DUD
+X-Google-Smtp-Source: AGHT+IGYYZbBmLva2e2YHp9YJm6aVlsbBk0XBLDjmjES/voq72Cas3iw5JS/Wday30OgejAfxbJWqg==
+X-Received: by 2002:a17:902:ec83:b0:1fd:5fa0:e98f with SMTP id d9443c01a7336-206f05afd8fmr2580655ad.44.1725567308967;
+        Thu, 05 Sep 2024 13:15:08 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea68565sm32327075ad.294.2024.09.05.13.15.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 13:15:08 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	jacob.e.keller@intel.com,
+	horms@kernel.org,
+	sd@queasysnail.net,
+	chunkeey@gmail.com
+Subject: [PATCHv3 net-next 0/9] net: ibm: emac: modernize a bit
+Date: Thu,  5 Sep 2024 13:14:57 -0700
+Message-ID: <20240905201506.12679-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1ca8:b0:39f:bac6:c31c with SMTP id
- e9e14a558f8ab-3a04f068709mr36355ab.1.1725567028271; Thu, 05 Sep 2024 13:10:28
- -0700 (PDT)
-Date: Thu, 05 Sep 2024 13:10:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c1ae9e062164e101@google.com>
-Subject: [syzbot] [wireless?] possible deadlock in ieee80211_remove_interfaces
-From: syzbot <syzbot+5b9196ecf74447172a9a@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+It's a very old driver with a lot of potential for cleaning up code to
+modern standards. This was a simple one dealing with mostly the probe
+function and adding some devm to it.
 
-syzbot found the following issue on:
+v2: removed the waiting code in favor of EPROBE_DEFER.
+v3: reverse xmas order fix, unnecessary assignment fix, wrong usage of
+EPROBE_DEFER fix.
 
-HEAD commit:    431c1646e1f8 Linux 6.11-rc6
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=144a43db980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=931962fa28089080
-dashboard link: https://syzkaller.appspot.com/bug?extid=5b9196ecf74447172a9a
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+Rosen Penev (9):
+  net: ibm: emac: use devm for alloc_etherdev
+  net: ibm: emac: manage emac_irq with devm
+  net: ibm: emac: use devm for of_iomap
+  net: ibm: emac: remove mii_bus with devm
+  net: ibm: emac: use devm for register_netdev
+  net: ibm: emac: use netdev's phydev directly
+  net: ibm: emac: replace of_get_property
+  net: ibm: emac: remove all waiting code
+  net: ibm: emac: get rid of wol_irq
 
-Unfortunately, I don't have any reproducer for this issue yet.
+ drivers/net/ethernet/ibm/emac/core.c | 214 +++++++++------------------
+ drivers/net/ethernet/ibm/emac/core.h |   4 -
+ 2 files changed, 67 insertions(+), 151 deletions(-)
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-431c1646.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/01c0dadd39ff/vmlinux-431c1646.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9e2259e440f7/bzImage-431c1646.xz
+-- 
+2.46.0
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5b9196ecf74447172a9a@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.11.0-rc6-syzkaller #0 Not tainted
-------------------------------------------------------
-kworker/u32:7/1108 is trying to acquire lock:
-but task is already holding lock:
-ffff888055278768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: wiphy_lock include/net/cfg80211.h:6014 [inline]
-ffff888055278768 (&rdev->wiphy.mtx){+.+.}-{3:3}, at: ieee80211_remove_interfaces+0xfe/0x760 net/mac80211/iface.c:2262
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
--> #1 (&rdev->wiphy.mtx){+.+.}-{3:3}:
-       dev_open net/core/dev.c:1510 [inline]
-       dev_open+0xf4/0x160 net/core/dev.c:1503
-       do_setlink+0xd24/0x4190 net/core/rtnetlink.c:2907
-       __rtnl_newlink+0xc35/0x1920 net/core/rtnetlink.c:3696
-       rtnl_newlink+0x67/0xa0 net/core/rtnetlink.c:3743
-       rtnetlink_rcv_msg+0x3c7/0xea0 net/core/rtnetlink.c:6647
-       netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2550
-       netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
-       netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1357
-       netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1901
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (team->team_lock_key#10){+.+.}-{3:3}:
-       check_prev_add kernel/locking/lockdep.c:3133 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3252 [inline]
-       validate_chain kernel/locking/lockdep.c:3868 [inline]
-       __lock_acquire+0x24ed/0x3cb0 kernel/locking/lockdep.c:5142
-       lock_acquire kernel/locking/lockdep.c:5759 [inline]
-       lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5724
-       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
-       __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
-       team_del_slave+0x31/0x1b0 drivers/net/team/team_core.c:1990
-       team_device_event+0xd0/0x770 drivers/net/team/team_core.c:2984
-       notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
-       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1994
-       call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
-       call_netdevice_notifiers net/core/dev.c:2046 [inline]
-       unregister_netdevice_many_notify+0x8bb/0x1e40 net/core/dev.c:11352
-       mac80211_hwsim_del_radio drivers/net/wireless/virtual/mac80211_hwsim.c:5625 [inline]
-       hwsim_exit_net+0x3ad/0x7d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6505
-       ops_exit_list+0xb0/0x180 net/core/net_namespace.c:173
-       cleanup_net+0x5b7/0xbb0 net/core/net_namespace.c:640
-       process_one_work+0x9c5/0x1b40 kernel/workqueue.c:3231
-       process_scheduled_works kernel/workqueue.c:3312 [inline]
-       worker_thread+0x6c8/0xed0 kernel/workqueue.c:3389
-       kthread+0x2c1/0x3a0 kernel/kthread.c:389
-       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-other info that might help us debug this:
-
-
-       ----                    ----
-                               lock(&rdev->wiphy.mtx);
-  lock(team->team_lock_key#10);
-
- *** DEADLOCK ***
-
-5 locks held by kworker/u32:7/1108:
- #0: ffff88801baf4948 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work+0x1277/0x1b40 kernel/workqueue.c:3206
-stack backtrace:
-CPU: 2 UID: 0 PID: 1108 Comm: kworker/u32:7 Not tainted 6.11.0-rc6-syzkaller #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: netns cleanup_net
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:119
- check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2186
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
- notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
- call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1994
- call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
- call_netdevice_notifiers net/core/dev.c:2046 [inline]
- unregister_netdevice_many_notify+0x8bb/0x1e40 net/core/dev.c:11352
- unregister_netdevice_many net/core/dev.c:11414 [inline]
- unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11289
- unregister_netdevice include/linux/netdevice.h:3129 [inline]
- _cfg80211_unregister_wdev+0x624/0x7f0 net/wireless/core.c:1211
- ieee80211_remove_interfaces+0x36d/0x760 net/mac80211/iface.c:2287
- ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1669
- mac80211_hwsim_del_radio drivers/net/wireless/virtual/mac80211_hwsim.c:5625 [inline]
- hwsim_exit_net+0x3ad/0x7d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6505
- process_scheduled_works kernel/workqueue.c:3312 [inline]
- worker_thread+0x6c8/0xed0 kernel/workqueue.c:3389
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
