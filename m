@@ -1,516 +1,223 @@
-Return-Path: <netdev+bounces-125368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A239996CEF9
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:16:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2A5696CF01
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:19:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55FF9287B90
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 06:16:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1455D1C21678
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 06:19:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611AB185941;
-	Thu,  5 Sep 2024 06:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B1DD188CB0;
+	Thu,  5 Sep 2024 06:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jInSCDHJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out198-25.us.a.mail.aliyun.com (out198-25.us.a.mail.aliyun.com [47.90.198.25])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C52014A4F5;
-	Thu,  5 Sep 2024 06:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.198.25
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725516978; cv=none; b=GqTbCVSUbzRhJ3dt/DJfZht7+dBXZ0cEMK0oRVV5fkTCYkuTdz2m5HX+IuI/9LkC/pQLtPtdbHdbB496OhXrXG/NAljKu6XhuAhTaZvU/NIQFOTZ5TMs14j5qEnOJ6yqYOA0s1U6Oelx2jxOg2Rjci3CTeeqokCWQ3gvMpzB7Nw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725516978; c=relaxed/simple;
-	bh=gfMtjPwjTjyRydQwVV0HApg+Urd9OeQk2HGwtZrKqHQ=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jAcrxpfKeDZszIv8m99qrUtXa3RBIU2RevcMctAMGQAKkxNYcq8aaSsMHbxJCoyCO86PRp6jK2+F2kX5fUnLJ4AEI+OlJJcPZund5aGZuws+FPb/unc0kLFQovs8fq/B/2A9dqF0xDNzlOLiw8THOpVH8x2FHXabHzSw9a8mBQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inceptio.ai; spf=pass smtp.mailfrom=inceptio.ai; arc=none smtp.client-ip=47.90.198.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inceptio.ai
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inceptio.ai
-Received: from JunjieWan(mailfrom:junjie.wan@inceptio.ai fp:SMTPD_---.ZBatxYi_1725516953)
-          by smtp.aliyun-inc.com;
-          Thu, 05 Sep 2024 14:15:53 +0800
-From: <junjie.wan@inceptio.ai>
-To: "'Ioana Ciornei'" <ioana.ciornei@nxp.com>
-Cc: "'David S. Miller'" <davem@davemloft.net>,
-	"'Eric Dumazet'" <edumazet@google.com>,
-	"'Jakub Kicinski'" <kuba@kernel.org>,
-	"'Paolo Abeni'" <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20240902015051.11159-1-junjie.wan@inceptio.ai> <kywc7aqhfrk6rdgop73koeoi5hnufgjabluoa5lv4znla3o32p@uwl6vmnigbfk>
-In-Reply-To: <kywc7aqhfrk6rdgop73koeoi5hnufgjabluoa5lv4znla3o32p@uwl6vmnigbfk>
-Subject: RE: [PATCH v2] dpaa2-switch: fix flooding domain among multiple vlans
-Date: Thu, 5 Sep 2024 14:15:53 +0800
-Message-ID: <000201daff5b$101e77f0$305b67d0$@inceptio.ai>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5696014A4F5;
+	Thu,  5 Sep 2024 06:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725517136; cv=fail; b=OScB+UAU3qpO4jdk7qbn4/KmUzgfG6I5K7IRmLQrIhw2TQ8GpDiTWuey+NP+xm3vXoDcMU7g5ANIjmr3/uCHZ5I8BHl1FDm7FwbD0RCvyKqEmUYJ/046m9I8WqA5GiawPWzm3q0qxSYzrId0Dbam908BF1R4TMYQQOtUa+lpXSI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725517136; c=relaxed/simple;
+	bh=DW3WTcATpwq0g8wQgWuR4fz8M8EO/blijenUYDxyvyA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=DNQi3ZWRliE59Urn3LlkwEdGxwgP7dHLEeRsveIRRz93+4G4fX7nD3XHy/AXtkCNAjhm8gvLcOUZDa6+sYvUFlqWDsN/Zoxg0LxhP2eO3hG1StPSEU3VWNFyk8eQ/RkGR1IkU2697uPM3ZQqnFMdg9PYuVBVm8F1hSFMpCk+RGU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jInSCDHJ; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725517135; x=1757053135;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=DW3WTcATpwq0g8wQgWuR4fz8M8EO/blijenUYDxyvyA=;
+  b=jInSCDHJ14tW2nAh4W5WogZMYRJzsoNqTOThO1qLgHCpREuv+h63JDxu
+   AJBycQ5bS3MxmaqVgAClpnidzGiuvrogP6znStVre6k7a/dILnUghJlxz
+   OqunDAzlSK/57zPVLIScj/C1qZ+jED0e2RJ205vzK3UdMc9cydAK5F9hI
+   OXGzOqPLWegQRTLtXOGTs/41dedRBz9zGm+ytwVKUausqttY42Kp/++JO
+   zJrz26GTCznN3+Lo5QaCDXmSXpAkcgnCmsM1Kc83z284zC/4OnV3Xu7Kp
+   pysqzQzZoh+xTlNAKN9CZCn32gq0AvFvdKbAvknxbbdJ+wXtGq8EuMDjL
+   w==;
+X-CSE-ConnectionGUID: /So8xuzrSBiFcHDbFITiuw==
+X-CSE-MsgGUID: 4W2DM+R8Qc2jbztODHlQnA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11185"; a="34782796"
+X-IronPort-AV: E=Sophos;i="6.10,203,1719903600"; 
+   d="scan'208";a="34782796"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2024 23:16:18 -0700
+X-CSE-ConnectionGUID: IqWzMkhtTriAQqy9lyk7Ow==
+X-CSE-MsgGUID: 2765AdGoSSWH8lGv/V92dw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,203,1719903600"; 
+   d="scan'208";a="65351804"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Sep 2024 23:16:15 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 4 Sep 2024 23:16:13 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 4 Sep 2024 23:16:13 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.48) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 4 Sep 2024 23:16:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ANvbV1qkwToWwkTUx9V9hzSoy0NPfJpGu1G2NHr1bMVaIei1G9CFNtl8RCkC06mh7fKT5di/LLXE0OzXX+C9I++u51PzD8Smg7I6o4tdhLRJdeA4Sf/v6uZSZLMdQPTLXsKdXEPPEvVCGUEdzAQT06lXtS59oz/WR862SObYpT0mU54WiFA8k44uP/K7q6hWjLNp2g/IiYHnIKxyVRuErzAc7banPx1qAPFtV0ZbfSjAClmveoNPToF0mzNZQXnaRtN66hLumWzicxlux5bdPY7QwpYCHUrtquABoKp9qARtXKFtVFHaKzM/BPq3F/gylYbvXKsXY2rx6ljVfps3mw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tMkELBPri8jzsRybHFFR3gb1A3/WwBQlGL2JfSJVzaE=;
+ b=v2PRRTH1xevnYkgkw4Zm1v+twU2KdtYlGHYoTDaYK84gutOMg7qO6apPH1oAUosRyX+a7CVv0IcR/M5yD/MtEl4yRrq1Rc90v7p/4c9RS99OfbK4jg4hxcbQa0GnnnE+V7YbkVjUbw6FDs7owBR5Hnso7yBir98Q7Uiu1vxpOEb3AZo1mjs9c6nXgOnUqGAjw5XNUmmGJRlRsWDnk2MSgx1G/6v9E+AbM9FwprG+pnU9ObgAqrPr3YqqBPspOx0upOVB8odWf73Ly5zXkNdj4/Ve9EFmt6cCpAfXIkbXMgTtcimSOCW2U0k5/l4oaPPBuAcW79aUe2sShva44GidxQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN0PR11MB6280.namprd11.prod.outlook.com (2603:10b6:208:3c0::15)
+ by PH8PR11MB7070.namprd11.prod.outlook.com (2603:10b6:510:216::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.25; Thu, 5 Sep
+ 2024 06:16:10 +0000
+Received: from MN0PR11MB6280.namprd11.prod.outlook.com
+ ([fe80::3f63:c727:6606:c089]) by MN0PR11MB6280.namprd11.prod.outlook.com
+ ([fe80::3f63:c727:6606:c089%4]) with mapi id 15.20.7918.024; Thu, 5 Sep 2024
+ 06:16:10 +0000
+Message-ID: <b5120c1e-4312-40da-8c11-c0af035dbbb5@intel.com>
+Date: Thu, 5 Sep 2024 09:16:01 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/6] igc: Get rid of spurious interrupts
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<netdev@vger.kernel.org>
+CC: Kurt Kanzenbach <kurt@linutronix.de>, <sasha.neftin@intel.com>,
+	<vitaly.lifshits@intel.com>, <maciej.fijalkowski@intel.com>,
+	<magnus.karlsson@intel.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<hawk@kernel.org>, <john.fastabend@gmail.com>, <bpf@vger.kernel.org>,
+	<bigeasy@linutronix.de>, Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Simon Horman <horms@kernel.org>, Mor Bar-Gabay <morx.bar.gabay@intel.com>
+References: <20240830210451.2375215-1-anthony.l.nguyen@intel.com>
+ <20240830210451.2375215-3-anthony.l.nguyen@intel.com>
+Content-Language: en-US
+From: "Ruinskiy, Dima" <dima.ruinskiy@intel.com>
+In-Reply-To: <20240830210451.2375215-3-anthony.l.nguyen@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI1P293CA0016.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:3::8)
+ To MN0PR11MB6280.namprd11.prod.outlook.com (2603:10b6:208:3c0::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQJnHAQGh1btYvjGEtAQYjLpzrvB4wIoUD5JsR867nA=
-Content-Language: zh-cn
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR11MB6280:EE_|PH8PR11MB7070:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74f85f37-160f-423b-76f8-08dccd723c1a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?UU1FVFV3M2t5ZEF3MFdXRENPc2M3SUFSNE5MZnhUb0JzZlVTaHZXMElOQ05M?=
+ =?utf-8?B?VVA4SE8rM2owR2xoclhhTDUwa2dqanlLVUpsaStwamsxU3FlUkJUNk9yTnBY?=
+ =?utf-8?B?QWQ3S2FETzVtSkcxNWZTUGVqWXZSbkFXM1B5QlFlU0FjVnI4RktlMmVrc0ps?=
+ =?utf-8?B?WEhmTnExa2EybWVwQlJJUnJhVEYzK3R6ZjByZHRTYmhZTGVpOGNRdm8yY2d6?=
+ =?utf-8?B?VE1PbEVsM3NtYlFJVkxxWDZmWVNCdzdUS2JkemNibnFUU0NWZ3Y5S1pzMXNh?=
+ =?utf-8?B?UXBRekxXRnQwYXVVZFpEOWNiY0tiZnFkWXl5YlVsbFRCNDdmTjlHdzFFeEpp?=
+ =?utf-8?B?TVdaWWQ5Ti8xWWJ4elYwWXNGTDR4VTlyeFF0ZktHWkJTY2NZL1NQSXhIVFJW?=
+ =?utf-8?B?QzBmVGsxaUZHMzFpMktGOCtZU0gzRGZDVHlRTVNoNVpEOTRmR3R3UWhOREk3?=
+ =?utf-8?B?MzhhQ0xsT2FoMmxnbVZjTmZLc1hOR2RSVmtNTE9MYXZISzhwSUtmc0h1Rkkz?=
+ =?utf-8?B?aEVQckhwUmlCMG1ySGFCak1uQjZUdGNqQVBTN3Vib1B1TkoxaDZ5TFBXeVBE?=
+ =?utf-8?B?VDBxTzRVaDdDOXNYeThXeFJjOHUyRHZNdndjR3k1dGU5NnhMcDl5M3dzWmlK?=
+ =?utf-8?B?M2N0blpXU3kzYVpGMTM5K2c5VVVNdXZheWhtVlZIeG5Kb3Bod09rK0tzYjMr?=
+ =?utf-8?B?WUdnS2QreUROTHA5VlBVMlF0cnR3VG1HL25BS3kydDJHbWxYN1IwNGZzK08z?=
+ =?utf-8?B?cjYxWXB5cVB1dlZDeS9DWUhUc2ZxY3gyM2E0eEZib2ZVTmYyUWtPbW05MHdy?=
+ =?utf-8?B?VnQ3NmxIbFBMTlZlQXdXWlBJdlJWZEVkdjliUk16Mk1uWG9XckNId29NbW5t?=
+ =?utf-8?B?RlVwYno2K2JBMCtwN0tNS0lXdjlMcThnWTVQMElWd1dhbm84R2wveFJ0TkdX?=
+ =?utf-8?B?ZkZNVW9ZZG1jT0xsWmdmOHFHTE5SUEpEZFpJK2tpUzdUNXFaMC9uUS9RVXIz?=
+ =?utf-8?B?c3RXcno2V0czZHQ2R3FZY3ViVlJmNUgrMFM4eU9GNTVIdFk0UXdhS29UNExE?=
+ =?utf-8?B?WGw5MXhyODArd1NRU0svWUhWODZKcUd6Y2xZNmZTLzk5NW1OL0Y0Zi9tcGpt?=
+ =?utf-8?B?YW9uK0JCaHovR21WWm9kd3grYXIrQWpLR05uY3V4UG5RZmY1cnRvemJEYlVV?=
+ =?utf-8?B?MUhNUTFRaENGdmlBTHpLaTlUMitLcHhiODNDSnBSYWtXZWRzUDJKWWpUd3ZW?=
+ =?utf-8?B?MjdXR29IWk9iR21EWXVIdGZkU0JRTUdrRkcvMWx3ZEcyeHc1UVBXQUtXZTc5?=
+ =?utf-8?B?Yi8yY3dzakNIcm9valYwaFpSalVtaGZUTXQrMElqak5CbloyUlRFYjJpY05S?=
+ =?utf-8?B?QmxPRnRHNnFVdlhFb0FLeXluTkxQRUZkbjlvY3k4cTVJTXkramhtRzg0UzRi?=
+ =?utf-8?B?NU5QQ3FEN1VQTEdXSTVNYjBISXRUNVhlbGRXeUQ1TG5jdVBVTEw2cllDVjk2?=
+ =?utf-8?B?Z2ZiTEtBR3lVYThkVkNrRDZlMk1HSXVTN2ZZd1dzbEt2cEV4ZlBIS0lraXBU?=
+ =?utf-8?B?aFByOVFsNTVocG1lb2JIcnh4RWdMK3d6aGlqMngzVkszeWxmZXBySlZPN3F6?=
+ =?utf-8?B?OXgrd25FVnZZYllmeXNzYjN6WXZXQlpzTFdRbXlyVERRaVZSRVp6NTRJb0FB?=
+ =?utf-8?B?NmRybU42OHRXRysweTd2ZllWV04yemE5Uk0zdjVhRjUxeVVFaGE1MG4wTkFL?=
+ =?utf-8?B?R3BzaVJIc0h5OWNVUjRtMWhkSElFN1BTUTljOUg1aXVWZlpjMWdZZWJlR2JG?=
+ =?utf-8?B?VlhUMGtQRzZuengzcE53Zz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB6280.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NVREL28vVE0wbE5GNlhHNFhIV0FsWGs5WXRSMmtDUmdGeElUaDRHclpyKzZ4?=
+ =?utf-8?B?c2xoeTdCRkpyODEwdGQxbWhnU282SWo0M1FCNGZWMVVXcERvNmpHWStObHB0?=
+ =?utf-8?B?L1RnN0lqdXRhelpTKzhrbTFxT1VWN2VUcERaaktoMWQvbHQvenMxUVZzMjEy?=
+ =?utf-8?B?d1VhRmJReHZ6U29LcCtSV3VWWXhjbkZtMTBxRGZTbmhpanM5ODdaZUJ2NytB?=
+ =?utf-8?B?YmJFeU0vcHU1a3MyTjB3NHRtKy9KYU9LdkkzcFpySmNrUkc4b0FhSmF2SDdR?=
+ =?utf-8?B?blBpakgrV24yN0YwNnQ4YlpCQ0wrNDdWYnNUQm5hYlB2TVUranIvQ0I5V1pV?=
+ =?utf-8?B?c0Mvb3FuNExvZ2JxVEd2SnphZk45SlNWMEN4R2k2azFYcm1MdmJ1Q1RSTXZM?=
+ =?utf-8?B?VXNFSnR0ZVBDdjAvMkpiK3ZzTXRKcUExa2ZIblZDT1A1alQ5bmdxVWFSRk84?=
+ =?utf-8?B?bi9nbXF5ZE0wbkJQU2JZQVhLQ3lLRkVhYWVVekRCOUJGWkIxL0tYSzBiajNO?=
+ =?utf-8?B?dWZMd3pXMFNvdDN1emVaR0t3MjhIQXcrWVpTL1lRVWpMWU91QyswTW96QWNm?=
+ =?utf-8?B?dmhZYTdiaWxWQ0pTcElzUFhMTnIraXlZMTV4MkNaUFNITStnZHR6QXc1bGRK?=
+ =?utf-8?B?aHJsd3MzYzg0dm53Lzdrby9zUnFPcW8yV2ZMdU5WaVpCTlFCWHJPR04wc1Vw?=
+ =?utf-8?B?NmdzL1hXVHkxUmZzTFZGTjQ0bksyUHYxajBjekVPbUY0aVAzYVlYYTZRQUpI?=
+ =?utf-8?B?VSt3OG9NQVNRTGJwaURJWVlkNTgvdUxmTzB2M0ZJbFQ3Z0N2OER2MVNGZ2Nz?=
+ =?utf-8?B?TmtwMFlNeGRKQXg4N0RrbUhCZXBGMGF4MzNKcVhGY0VvMkNoTEJjek5aV3Nt?=
+ =?utf-8?B?dHhFaGFlaFBqSmFKRDAvMTlUQ3B4eUU3UGREZXBUVEVSYk1xd0doT3hzbVY1?=
+ =?utf-8?B?Uk8ranBLQ05xTk45Y3FDeGVHQkdtUThmeWZrUHNsY2F5U1dSVFdKN0ZDcGpE?=
+ =?utf-8?B?eUd1YmZTRzBna3ZLYnlqRkQ4aTU1UG44dnBnOERZQ0h6NkFhTVp6OExxV0Zy?=
+ =?utf-8?B?cE5ESUNJc3krcGJCL0RhWXVDckFxU2FUMENiWmk0bE1EQWFIQm9JQ0RFamEx?=
+ =?utf-8?B?dE12WUJTdkRhV3Jjd2hSVElVUG5WUkZwNDZJVHRwVCtDR1hCa1dJWWtSRjlj?=
+ =?utf-8?B?OWwyVnVITUZ2SUxzYXBFSnEyNFFkNm1mVGFxbnFPK1ZhY2FWTFhOb3RheC8r?=
+ =?utf-8?B?ZEU5UW9Sd1pWMUlQUDdiSzQ3T1FDS3lLWEVYWnhoZnhBZ0dRZm03WEdoVTNM?=
+ =?utf-8?B?TFcrTDE5bDNpaUxuOGFsNUVyWjR4SFhISmVLZi94Um0xQ1NXb0oyS0t4T0NP?=
+ =?utf-8?B?Y1dwZnNRWlRaZ25mRGN6MjkzTy9kM08vd0dyby9Zc2wyTE9aejAwNU43TnVu?=
+ =?utf-8?B?R2FabWFVQjZkdjhWcTlSb3pkV3pqdWE5U1lxWmxQUVNDV2tLdFpnUDBaL3RQ?=
+ =?utf-8?B?Mkt5RktiNzN3aHQyMGwrK3gyaUM3RElHQk5GTGZJUVA3ZURIUzc1N1ZQYmQz?=
+ =?utf-8?B?Nm93R3VHeGVHcDRPS0VtbDRudDVIdW5pQjVkSThKUGs0UmxCSDJZRHJ1SGVV?=
+ =?utf-8?B?ellJVVdyRzhvWFArMW8vT0Mxdk8zZTVTWDdMMmZHK1NBR1A3eGVUVW1EV0JY?=
+ =?utf-8?B?RGkxbjlreHpUQkVNZllNT3MrL040S2tPYzNyNWg3R0tmelNWVklEOVBUU0xX?=
+ =?utf-8?B?U3lvbkcxSGNIY0E2Ukp0OFdSckN0NWNSOVNsTnZDcXZFRy9TOXBteHEvRjQ3?=
+ =?utf-8?B?OWRPQWdEUlJUc1pzblhDMktRdlFHbEtJaEIxZ2ZkU2UxY1V5TkdVTDAzb3dN?=
+ =?utf-8?B?S3poTm5xRHRMakFKWlJvRWtUV3hONG8wM3VIeU5kZWg1d0FBNEt3TDBpc2xV?=
+ =?utf-8?B?bjc1Z1U4Mnl0c0tWZVA4N0lKZU5MMUY1SVRxWGx3ZmNFb0ZLUFBTdzU5MG16?=
+ =?utf-8?B?MHJGbmtkancvUDlVSVk2YUh4OG5EYU1Jb1RnTGlFN1VLVXpVeWFadFF3MWJv?=
+ =?utf-8?B?QnlWV1BnbDNHbkU2MFpJS01ZaHNYVEpoSVBUMjZkcC9UYW1FampaVVAyR1dz?=
+ =?utf-8?B?VUYvdWV3Y0U1VEJZVGVTVGs0dTZxSi9sYVkvZXpXM00zdEdvaWl2Q2RwWjVE?=
+ =?utf-8?B?K1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74f85f37-160f-423b-76f8-08dccd723c1a
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB6280.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Sep 2024 06:16:10.0033
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: m/jGXbRPB0U2JubnckJxI9Wba/3nQWU9ALwPvD9q6lDgtH+dzQk49BIDXehJHpsXUFYPQVUzmYipFoT1znPOMA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7070
+X-OriginatorOrg: intel.com
 
-Hi Ioana,
-
-Thank you for your comments.
-
-> > Currently, dpaa2 switch only cares dst mac and egress interface
-> > in FDB. And all ports with different vlans share the same FDB.
-> > 
->
-> Indeed, the DPAA2 switch driver was written in such a way that learning
-> is shared between VLANs. The concern at that time was the limited amount
-> of resources which are allocated at DPSW creation time and which need to
-> be managed by the driver in the best way possible.
->
-> That being said, I would suggest actually changing the title of the
-> commit to something like "dpaa2-switch: add support for per-VLAN
-> learning" so that it's clear that the driver did not support this prior.
-
-LGTM.
-
-> > This will make things messed up when one device connected to
-> > dpaa2 switch via two interfaces. Ports get two different vlans
-> > assigned. These two ports will race for a same dst mac entry
-> > since multiple vlans share one FDB.
-> > 
-> > FDB below may not show up at the same time.
-> > 02:00:77:88:99:aa dev swp0 self
-> > 02:00:77:88:99:aa dev swp1 self
-> > But in fact, for rules on the bridge, they should be:
-> > 02:00:77:88:99:aa dev swp0 vlan 10 master br0
-> > 02:00:77:88:99:aa dev swp1 vlan 20 master br0
-> > 
-> > This patch address this by borrowing unused form ports' FDB
-> > when ports join bridge. And append offload flag to hardware
-> > offloaded rules so we can tell them from those on bridges.
->
-> Borrowing from the unused FDBs is fine as long as no switch port wants
-> to leave the bridge. In case all available FDBs are used for the
-> per-VLAN FDBs, any port that wants to leave the bridge will silently
-> fail to reserve a private FDB for itself and will just continue to use
-> the bridge's one.
->
-> This will break behavior which previously worked and it's not something
-> that we want.
->
-> The following commands demonstrate this unwanted behavior:
->
->	$ ls-addsw --flooding-cfg=DPSW_FLOODING_PER_FDB --broadcast-cfg=DPSW_BROADCAST_PER_FDB
-dpni.2 dpni.3 dpmac.3 dpmac.4
->	Created ETHSW object dpsw.0 with the following 4 ports: eth2,eth3,eth4,eth5
->
->	$ ip link add br0 type bridge vlan_filtering 1
->	$ ip link set dev eth2 master br0
->	[  496.653013] fsl_dpaa2_switch dpsw.0 eth2: Joining a bridge, got FDB #1
->	$ ip link set dev eth3 master br0
->	[  544.891083] fsl_dpaa2_switch dpsw.0 eth3: Joining a bridge, got FDB #1
->	$ ip link set dev eth4 master br0
->	[  547.807707] fsl_dpaa2_switch dpsw.0 eth4: Joining a bridge, got FDB #1
->	$ ip link set dev eth5 master br0
->	[  556.491085] fsl_dpaa2_switch dpsw.0 eth5: Joining a bridge, got FDB #1
->
->	$ bridge vlan add vid 10 dev eth2
->	[  667.742585] br0: Using FDB#2 for VLAN 10
->	$ bridge vlan add vid 15 dev eth2
->	[  672.296365] br0: Using FDB#3 for VLAN 15
->	$ bridge vlan add vid 30 dev eth3
->	[  679.156295] br0: Using FDB#4 for VLAN 30
->	$ bridge vlan add vid 35 dev eth3
->	[  682.220775] fsl_dpaa2_switch dpsw.0 eth3: dpsw_fdb_add err -6
->	RTNETLINK answers: No such device or address
->
->	# At this point, there are no more unused FDBs that could be
->	# used for VLAN 35 so the last command fails.
->
->	# We now try to instruct eth5 to leave the bridge. As we can see
->	# below, the driver will continue to use the bridge's FDB for
->	# PVID instead of finding and using a private FDB.
->	$ ip link set dev eth5 nomaster
->	[  841.427875] fsl_dpaa2_switch dpsw.0 eth5: Leaving a bridge, continue to use FDB #1 since
-we assume we are the last port to become  standalone
->
-
-I want to check one thing first with you. For dpsw, a 'standalone' interface is not usable, right?
-It is just in a state 'standalone' and needs more configurations before we use it for forwarding.
-If this is the case, can we just assign all standalone interfaces to a single FDB. Or even no FDB
-before they join a bridge. And if there are no VLANs assigned to any port, bridge should
-create a shared FDB for them.  So num of FDB is associated with VLAN rather than interfaces.
-
-I'm not sure about this, so I'm trying to make it work in the previous way. But as you see
-in your test, it doesn't when you make them leave the bridge. 
-If it is, I suggest we follow the new way above. In this way, the max_fdbs could only count
-how many VLANs we are going to have. Of source plus 1 extra default FDB for bridge.
-Now in this patch I did not take care of VLAN 0. It will create a new FDB. But later, it could
-reuse default FDB as well.
-
->
-> The debug prints were added on top of your patch and the diff is below:
->
-> diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-b/drivers/net/ethernet/freescale/dpaa2/dpaa2- switch.c
-> index 217c68bb0faa..8d922a70e154 100644
-> --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> @@ -81,12 +81,17 @@ static u16 dpaa2_switch_port_set_fdb(struct ethsw_port_priv *port_priv,
->  
->                 if (!fdb) {
->                         port_priv->fdb->bridge_dev = NULL;
+On 31/08/2024 0:04, Tony Nguyen wrote:
+> - wr32(IGC_ICS, IGC_ICS_RXDMT0);
+> + struct igc_ring *rx_ring = adapter->rx_ring[0];
 > +
-> +                       netdev_err(port_priv->netdev, "Leaving a bridge, continue to use FDB #%d
-since we assume we are the last port to become standalone\n",
-> +                                  port_priv->fdb->fdb_id);
->                         return 0;
->                 }
->  
->                 port_priv->fdb = fdb;
->                 port_priv->fdb->in_use = true;
->                 port_priv->fdb->bridge_dev = NULL;
-> +
-> +               netdev_err(port_priv->netdev, "Leaving a bridge, got FDB #%d\n",
-port_priv->fdb->fdb_id);
->                 return 0;
->         }
->  
-> @@ -127,6 +132,8 @@ static u16 dpaa2_switch_port_set_fdb(struct ethsw_port_priv *port_priv,
->         /* Keep track of the new upper bridge device */
->         port_priv->fdb->bridge_dev = bridge_dev;
->  
-> +       netdev_err(port_priv->netdev, "Joining a bridge, got FDB #%d\n", port_priv->fdb->fdb_id);
-> +
->         return 0;
->  }
->  
-> @@ -240,6 +247,8 @@ static int dpaa2_switch_add_vlan(struct ethsw_port_priv *port_priv, u16 vid)
->                 fdb->in_use = true;
->                 fdb->bridge_dev = NULL;
->                 vcfg.fdb_id = fdb->fdb_id;
-> +
-> +               netdev_err(port_priv->fdb->bridge_dev, "Using FDB#%d for VLAN %d\n", fdb->fdb_id,
-vid);
->         } else {
->                 /* Standalone, port's private fdb shared */
->                 vcfg.fdb_id = dpaa2_switch_port_get_fdb_id(port_priv, vid);
-> @@ -444,8 +453,10 @@ static int dpaa2_switch_dellink(struct ethsw_core *ethsw, u16 vid)
->         /* mark fdb as unsued for this vlan */
->         for (i = 0; i < ethsw->sw_attr.max_fdbs; i++) {
->                 fdb = ethsw->fdbs;
-> -               if (fdb[i].vid == vid)
-> +               if (fdb[i].vid == vid) {
->                         fdb[i].in_use = false;
-> +                       dev_err(ethsw->dev, "VLAN %d was removed, FDB #%d no longer in use\n",
-vid, fdb[i].fdb_id);
-> +               }
->         }
->  
->         for (i = 0; i < ethsw->sw_attr.num_ifs; i++) {
-> @@ -475,6 +486,8 @@ static int dpaa2_switch_port_fdb_add_uc(struct ethsw_port_priv *port_priv,
->         if (err)
->                 netdev_err(port_priv->netdev,
->                            "dpsw_fdb_add_unicast err %d\n", err);
-> +
-> +       netdev_err(port_priv->netdev, "Added unicast address in FDB #%d\n", fdb_id);
->         return err;
->  }
->
->
-> What I would suggest as a possible way to avoid the issue above is to
-> set aside at probe time the FDBs which are required for the usecase in
-> which all the ports are standalone. If there are more FDBs than the
-> number of switch ports, then independent VLAN learning is possible, if
-> not the driver should just go ahead and revert to shared VLAN learning.
-> In case VLAN learning is shared, the driver could print a warning and
-> let the user know why is that and what could be done.
->
-Please comment on my question and suggest above.
-
-> > 
-> > Signed-off-by: Wan Junjie <junjie.wan@inceptio.ai>
-> > ---
-> > v2: fix coding style issues
-> > ---
-> >  .../ethernet/freescale/dpaa2/dpaa2-switch.c   | 216 +++++++++++++-----
-> >  .../ethernet/freescale/dpaa2/dpaa2-switch.h   |   3 +-
-> >  2 files changed, 167 insertions(+), 52 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> > index a293b08f36d4..217c68bb0faa 100644
-> > --- a/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> > +++ b/drivers/net/ethernet/freescale/dpaa2/dpaa2-switch.c
-> > @@ -25,8 +25,17 @@
-> >  
-> >  #define DEFAULT_VLAN_ID			1
-> >  
-> > -static u16 dpaa2_switch_port_get_fdb_id(struct ethsw_port_priv *port_priv)
-> > +static u16 dpaa2_switch_port_get_fdb_id(struct ethsw_port_priv *port_priv, u16 vid)
-> >  {
-> > +	struct ethsw_core *ethsw = port_priv->ethsw_data;
-> > +	int i;
-> > +
-> > +	if (port_priv->fdb->bridge_dev) {
-> > +		for (i = 0; i < ethsw->sw_attr.max_fdbs; i++)
-> > +			if (ethsw->fdbs[i].vid == vid)
-> > +				return ethsw->fdbs[i].fdb_id;
-> > +	}
-> > +	/* Default vlan, use port's fdb id directly */
-> >  	return port_priv->fdb->fdb_id;
-> >  }
-> >  
-> > @@ -34,7 +43,7 @@ static struct dpaa2_switch_fdb *dpaa2_switch_fdb_get_unused(struct ethsw_core
-*e
-> >  {
-> >  	int i;
-> >  
-> > -	for (i = 0; i < ethsw->sw_attr.num_ifs; i++)
-> > +	for (i = 0; i < ethsw->sw_attr.max_fdbs; i++)
-> >  		if (!ethsw->fdbs[i].in_use)
-> >  			return &ethsw->fdbs[i];
-> >  	return NULL;
-> > @@ -125,17 +134,29 @@ static void dpaa2_switch_fdb_get_flood_cfg(struct ethsw_core *ethsw, u16
-fdb_id,
-> >  					   enum dpsw_flood_type type,
-> >  					   struct dpsw_egress_flood_cfg *cfg)
-> >  {
-> > -	int i = 0, j;
-> > +	u16 vid = 4096;
-> > +	int i, j;
-> >  
-> >  	memset(cfg, 0, sizeof(*cfg));
-> >  
-> > +	for (i = 0; i < ethsw->sw_attr.max_fdbs; i++) {
-> > +		if (ethsw->fdbs[i].fdb_id == fdb_id) {
-> > +			vid = ethsw->fdbs[i].vid;
-> > +			break;
-> > +		}
-> > +	}
-> > +
-> > +	i = 0;
-> >  	/* Add all the DPAA2 switch ports found in the same bridging domain to
-> >  	 * the egress flooding domain
-> >  	 */
-> >  	for (j = 0; j < ethsw->sw_attr.num_ifs; j++) {
-> >  		if (!ethsw->ports[j])
-> >  			continue;
-> > -		if (ethsw->ports[j]->fdb->fdb_id != fdb_id)
-> > +
-> > +		if (vid == 4096 && ethsw->ports[j]->fdb->fdb_id != fdb_id)
-> > +			continue;
-> > +		if (vid < 4096 && !(ethsw->ports[j]->vlans[vid] & ETHSW_VLAN_MEMBER))
-> >  			continue;
-> >  
-> >  		if (type == DPSW_BROADCAST && ethsw->ports[j]->bcast_flood)
-> > @@ -191,10 +212,38 @@ static void *dpaa2_iova_to_virt(struct iommu_domain *domain,
-> >  static int dpaa2_switch_add_vlan(struct ethsw_port_priv *port_priv, u16 vid)
-> >  {
-> >  	struct ethsw_core *ethsw = port_priv->ethsw_data;
-> > +	struct net_device *netdev = port_priv->netdev;
-> > +	struct dpsw_fdb_cfg fdb_cfg = {0};
-> >  	struct dpsw_vlan_cfg vcfg = {0};
-> > +	struct dpaa2_switch_fdb *fdb;
-> > +	u16 fdb_id;
-> >  	int err;
-> >  
-> > -	vcfg.fdb_id = dpaa2_switch_port_get_fdb_id(port_priv);
-> > +	/* If ports are under a bridge, then
-> > +	 * every VLAN domain should use a different fdb.
-> > +	 * If ports are standalone, and
-> > +	 * vid is 1 this should reuse the allocated port fdb.
-> > +	 */
-> > +	if (port_priv->fdb->bridge_dev) {
-> > +		fdb = dpaa2_switch_fdb_get_unused(ethsw);
-> > +		if (!fdb) {
-> > +			/* if not available, create a new fdb */
-> > +			err = dpsw_fdb_add(ethsw->mc_io, 0, ethsw->dpsw_handle,
-> > +					   &fdb_id, &fdb_cfg);
-> > +			if (err) {
-> > +				netdev_err(netdev, "dpsw_fdb_add err %d\n", err);
-> > +				return err;
-> > +			}
-> > +			fdb->fdb_id = fdb_id;
->
->			This leads to a NULL pointer dereference.
->			Variable 'fdb' is NULL in this case and you are
->			trying to assign its fdb_id field.
->
->			What I would suggest is to actually create all
->			the possible FDBs at probe time, initialize them
->			as unused and then just grab them when needed.
->			When there are no more unused FDBs, no more
->			VLANs can be created and an error is returned
->			directly.
-Exactly, Simon has noticed this in a previous email. And I have proposed the same as you suggest
-here.
-
-> > +		}
-> > +		fdb->vid = vid;
-> > +		fdb->in_use = true;
-> > +		fdb->bridge_dev = NULL;
-> > +		vcfg.fdb_id = fdb->fdb_id;
-> > +	} else {
-> > +		/* Standalone, port's private fdb shared */
-> > +		vcfg.fdb_id = dpaa2_switch_port_get_fdb_id(port_priv, vid);
-> > +	}
-> >  	err = dpsw_vlan_add(ethsw->mc_io, 0,
-> >  			    ethsw->dpsw_handle, vid, &vcfg);
-> >  	if (err) {
-> > @@ -298,7 +347,7 @@ static int dpaa2_switch_port_add_vlan(struct ethsw_port_priv *port_priv,
-> >  	 */
-> >  	vcfg.num_ifs = 1;
-> >  	vcfg.if_id[0] = port_priv->idx;
-> > -	vcfg.fdb_id = dpaa2_switch_port_get_fdb_id(port_priv);
-> > +	vcfg.fdb_id = dpaa2_switch_port_get_fdb_id(port_priv, vid);
-> >  	vcfg.options |= DPSW_VLAN_ADD_IF_OPT_FDB_ID;
-> >  	err = dpsw_vlan_add_if(ethsw->mc_io, 0, ethsw->dpsw_handle, vid, &vcfg);
-> >  	if (err) {
-> > @@ -326,7 +375,7 @@ static int dpaa2_switch_port_add_vlan(struct ethsw_port_priv *port_priv,
-> >  			return err;
-> >  	}
-> >  
-> > -	return 0;
-> > +	return dpaa2_switch_fdb_set_egress_flood(ethsw, vcfg.fdb_id);
-> >  }
-> >  
-> >  static enum dpsw_stp_state br_stp_state_to_dpsw(u8 state)
-> > @@ -379,6 +428,7 @@ static int dpaa2_switch_port_set_stp_state(struct ethsw_port_priv
-*port_priv, u8
-> >  static int dpaa2_switch_dellink(struct ethsw_core *ethsw, u16 vid)
-> >  {
-> >  	struct ethsw_port_priv *ppriv_local = NULL;
-> > +	struct dpaa2_switch_fdb *fdb = NULL;
-> >  	int i, err;
-> >  
-> >  	if (!ethsw->vlans[vid])
-> > @@ -391,6 +441,13 @@ static int dpaa2_switch_dellink(struct ethsw_core *ethsw, u16 vid)
-> >  	}
-> >  	ethsw->vlans[vid] = 0;
-> >  
-> > +	/* mark fdb as unsued for this vlan */
->
->	s/unsued/unused/
-Oops
-> > +	for (i = 0; i < ethsw->sw_attr.max_fdbs; i++) {
-> > +		fdb = ethsw->fdbs;
-> > +		if (fdb[i].vid == vid)
-> > +			fdb[i].in_use = false;
-> > +	}
-> > +
-> >  	for (i = 0; i < ethsw->sw_attr.num_ifs; i++) {
-> >  		ppriv_local = ethsw->ports[i];
-> >  		if (ppriv_local)
-> > @@ -401,7 +458,7 @@ static int dpaa2_switch_dellink(struct ethsw_core *ethsw, u16 vid)
-> >  }
-> >  
-> >  static int dpaa2_switch_port_fdb_add_uc(struct ethsw_port_priv *port_priv,
-> > -					const unsigned char *addr)
-> > +					const unsigned char *addr, u16 vid)
-> >  {
-> >  	struct dpsw_fdb_unicast_cfg entry = {0};
-> >  	u16 fdb_id;
-> > @@ -411,7 +468,7 @@ static int dpaa2_switch_port_fdb_add_uc(struct ethsw_port_priv *port_priv,
-> >  	entry.type = DPSW_FDB_ENTRY_STATIC;
-> >  	ether_addr_copy(entry.mac_addr, addr);
-> >  
-> > -	fdb_id = dpaa2_switch_port_get_fdb_id(port_priv);
-> > +	fdb_id = dpaa2_switch_port_get_fdb_id(port_priv, vid);
-> >  	err = dpsw_fdb_add_unicast(port_priv->ethsw_data->mc_io, 0,
-> >  				   port_priv->ethsw_data->dpsw_handle,
-> >  				   fdb_id, &entry);
-> > @@ -422,7 +479,7 @@ static int dpaa2_switch_port_fdb_add_uc(struct ethsw_port_priv *port_priv,
-> >  }
-> >  
-> >  static int dpaa2_switch_port_fdb_del_uc(struct ethsw_port_priv *port_priv,
-> > -					const unsigned char *addr)
-> > +					const unsigned char *addr, u16 vid)
-> >  {
-> >  	struct dpsw_fdb_unicast_cfg entry = {0};
-> >  	u16 fdb_id;
-> > @@ -432,10 +489,11 @@ static int dpaa2_switch_port_fdb_del_uc(struct ethsw_port_priv *port_priv,
-> >  	entry.type = DPSW_FDB_ENTRY_STATIC;
-> >  	ether_addr_copy(entry.mac_addr, addr);
-> >  
-> > -	fdb_id = dpaa2_switch_port_get_fdb_id(port_priv);
-> > +	fdb_id = dpaa2_switch_port_get_fdb_id(port_priv, vid);
-> >  	err = dpsw_fdb_remove_unicast(port_priv->ethsw_data->mc_io, 0,
-> >  				      port_priv->ethsw_data->dpsw_handle,
-> >  				      fdb_id, &entry);
-> > +
-> >  	/* Silently discard error for calling multiple times the del command */
-> >  	if (err && err != -ENXIO)
-> >  		netdev_err(port_priv->netdev,
-> > @@ -444,7 +502,7 @@ static int dpaa2_switch_port_fdb_del_uc(struct ethsw_port_priv *port_priv,
-> >  }
-> >  
-> >  static int dpaa2_switch_port_fdb_add_mc(struct ethsw_port_priv *port_priv,
-> > -					const unsigned char *addr)
-> > +					const unsigned char *addr, u16 vid)
-> >  {
-> >  	struct dpsw_fdb_multicast_cfg entry = {0};
-> >  	u16 fdb_id;
-> > @@ -455,7 +513,7 @@ static int dpaa2_switch_port_fdb_add_mc(struct ethsw_port_priv *port_priv,
-> >  	entry.num_ifs = 1;
-> >  	entry.if_id[0] = port_priv->idx;
-> >  
-> > -	fdb_id = dpaa2_switch_port_get_fdb_id(port_priv);
-> > +	fdb_id = dpaa2_switch_port_get_fdb_id(port_priv, vid);
-> >  	err = dpsw_fdb_add_multicast(port_priv->ethsw_data->mc_io, 0,
-> >  				     port_priv->ethsw_data->dpsw_handle,
-> >  				     fdb_id, &entry);
-> > @@ -467,7 +525,7 @@ static int dpaa2_switch_port_fdb_add_mc(struct ethsw_port_priv *port_priv,
-> >  }
-> >  
-> >  static int dpaa2_switch_port_fdb_del_mc(struct ethsw_port_priv *port_priv,
-> > -					const unsigned char *addr)
-> > +					const unsigned char *addr, u16 vid)
-> >  {
-> >  	struct dpsw_fdb_multicast_cfg entry = {0};
-> >  	u16 fdb_id;
-> > @@ -478,7 +536,7 @@ static int dpaa2_switch_port_fdb_del_mc(struct ethsw_port_priv *port_priv,
-> >  	entry.num_ifs = 1;
-> >  	entry.if_id[0] = port_priv->idx;
-> >  
-> > -	fdb_id = dpaa2_switch_port_get_fdb_id(port_priv);
-> > +	fdb_id = dpaa2_switch_port_get_fdb_id(port_priv, vid);
-> >  	err = dpsw_fdb_remove_multicast(port_priv->ethsw_data->mc_io, 0,
-> >  					port_priv->ethsw_data->dpsw_handle,
-> >  					fdb_id, &entry);
-> > @@ -778,11 +836,12 @@ struct ethsw_dump_ctx {
-> >  };
-> >  
-> >  static int dpaa2_switch_fdb_dump_nl(struct fdb_dump_entry *entry,
-> > -				    struct ethsw_dump_ctx *dump)
-> > +				    struct ethsw_dump_ctx *dump, u16 vid)
-> >  {
-> >  	int is_dynamic = entry->type & DPSW_FDB_ENTRY_DINAMIC;
-> >  	u32 portid = NETLINK_CB(dump->cb->skb).portid;
-> >  	u32 seq = dump->cb->nlh->nlmsg_seq;
-> > +	struct ethsw_port_priv *port_priv;
-> >  	struct nlmsghdr *nlh;
-> >  	struct ndmsg *ndm;
-> >  
-> > @@ -798,7 +857,7 @@ static int dpaa2_switch_fdb_dump_nl(struct fdb_dump_entry *entry,
-> >  	ndm->ndm_family  = AF_BRIDGE;
-> >  	ndm->ndm_pad1    = 0;
-> >  	ndm->ndm_pad2    = 0;
-> > -	ndm->ndm_flags   = NTF_SELF;
-> > +	ndm->ndm_flags   = NTF_SELF | NTF_OFFLOADED;
->
-> Maybe the changes around the FDB dump could be in a different patch?
->
-> Ioana
-
-Sure, Let me split it. But I'm going to have a two-week vacation from tomorrow. 
-During this period, I can't work on the patch. You will have to wait a bit long before I return
-back to the office. Or if you like, please send a new patch for this as you wish. 
-
-Wan Junjie
+> + if (test_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags)) {
+> + clear_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &rx_ring->flags);
+> + wr32(IGC_ICS, IGC_ICS_RXDMT0);
+> + }
+I have some concerns specifically about this code (Legacy/MSI interrupt 
+case). The code only checks the IGC_RING_FLAG_RX_ALLOC_FAILED flag of 
+ring 0. What if the failure was on another ring? It seems proper to 
+iterate over all Rx rings in the adapter (I believe igc can have up to 4).
 
 
