@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-125481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 042FC96D444
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:51:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80BF696D446
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36A901C2446F
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:51:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3059128126D
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 09:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803BD199243;
-	Thu,  5 Sep 2024 09:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C427F19993E;
+	Thu,  5 Sep 2024 09:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="BuY2kPpX"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hkDgCWS8"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC669198E90;
-	Thu,  5 Sep 2024 09:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06580198E90;
+	Thu,  5 Sep 2024 09:50:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725529802; cv=none; b=FJWsMXn5Zs1m2rsfZMBX9wYa5SwD5aTQ8kAOsMOvOqFaXJgmmq5gXtGMUqClSTHwzUdcB3iY+uaZEeZjC4y4MZhtpoa7P+UmOquUzScIQd1FbkCn9B0Ym+E3Mqi4RU4w0GPHNJ1LuOKVC0yFQ+Zih1p1bpSVmTKdsW7zP/uvu7o=
+	t=1725529807; cv=none; b=ujGGwRCMLwBK90y1c51MGDWqqIo+bEKQrcbZW03/52iXharzmt+BOol8Cmyi2wOmSwZofFnN7gJi4lNFMyQcJZv7NG1rzKxHo/K0S3UcfozCjrnF7USj4FLQXPn0plgkL7XXKfoyghGjSQFEIdDss+/F+jxw45R4joOclB3HTOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725529802; c=relaxed/simple;
-	bh=cE+2shhYK4mu4rP8rgRrMIW2ilfVvdrL/wqbOPQQwwI=;
+	s=arc-20240116; t=1725529807; c=relaxed/simple;
+	bh=eFltO8ALLwKPvZfxeUMN0tIVoPplnY2rshUIO4tfLO4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QzhRwfPcAaEL6JdMZBJ76zdkMf1as7IYjQiR9kzEi/LIzDhESlqIL6kvU+FnKYQ0oTsqpeb4+rWLQeoojwcm7uBW3hKgJDCF+kK4SqDBFquAa85YKJKqK1lsecdLTWVLcYwNj+7K3ROS7WFKefgtvMm7Wr5hJRboclmhw4jzfcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=BuY2kPpX; arc=none smtp.client-ip=67.231.156.173
+	 MIME-Version:Content-Type; b=s/cVt+48NK4Fvmm3Fu7U6m5YshA3lynVyJCPXtcAlJQzd/mGsCm3TIUNdA5q0FRd0nLoYh+l8TyZzQ2644YMRAZPz4mr4VXXGva0W1PPQv443gf1UMLI6JddqzPsjNmFCsl36k9W51QQXvo4xuhEKwqNF4GIpRh5VFCJvs+cClQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=hkDgCWS8; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48586iUK015126;
-	Thu, 5 Sep 2024 02:49:53 -0700
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48586iUQ015126;
+	Thu, 5 Sep 2024 02:49:58 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=G3BdA2z79z6SgXxxTVQ7eHXIh
-	SPL8rwg1thgXDr3J88=; b=BuY2kPpX6da7zLD+PlrlhrslNkpAM4uck+95yyMgn
-	V5nKqhDnuVaBKhR/ZkYEzt6YH8jpsbNmzkTArIKXGWcgK+/Pt/XeSiFkwu8buIqr
-	Mo4U96TzOiJ6j1VlXhI3glik+FEnufPHwXp4gvQREogZZ39Q3x7QJZQHDQuEVb1q
-	SDJOpp9dNBJXHojh+1wmTDRkh1h08ycNqnXf1I0GRhPH1WgsuB8lcCNNyYV9SIDX
-	HR8TfKcRI9AP9ffPrmp+rO8Z1ZJEvatDqZFJqfllY4SgiGHP+3aRx9UNF12IQLqP
-	uG6FN9ivUKiieQIXzExAo4VKx9ojvUJSqHQjOEDAgN7ww==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 41f8u48bj7-1
+	:references:subject:to; s=pfpt0220; bh=AlqtUJIcYAei7slUqqsN7mcIN
+	UcPdvItezvTsSZ6YqY=; b=hkDgCWS8rKFJmHgYPOnR50bB10aKGxjMHib3b4R/B
+	blU1ux3+Qfhj/vpl9EFdLD2YJ6CpojLg7NXYJtn1K1MEcgLQNCu0G8T32Kf2khyo
+	6KSqkiUbnHmSUfByiD36mhox9UfZDaM+/Owe1pY+cZmd6vMM7vSluQzCC8yskbik
+	sz9jdxgcLk/MF67DCGT568JBJF1KNc9v6SZ7xzE1V5anied75NZP5AMJxWlTUZ5N
+	XXLFYGwjqiLhX+UcsS/VTEEiXLIjNT2YZ0zn8LcgxJM0Zk1/oSZ4l32i9jcO8B1/
+	I9Q913O8jFXCzPHYj1+nxmWWG3iQwMf6upVbrHxJgUjtQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 41f8u48bkb-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 05 Sep 2024 02:49:53 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+	Thu, 05 Sep 2024 02:49:58 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 5 Sep 2024 02:49:52 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 5 Sep 2024 02:49:52 -0700
+ 15.2.1544.4; Thu, 5 Sep 2024 02:49:56 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 5 Sep 2024 02:49:56 -0700
 Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id DA0B15B6927;
-	Thu,  5 Sep 2024 02:49:48 -0700 (PDT)
+	by maili.marvell.com (Postfix) with ESMTP id 014875B6927;
+	Thu,  5 Sep 2024 02:49:52 -0700 (PDT)
 From: Geetha sowjanya <gakula@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
         <jiri@resnulli.us>, <edumazet@google.com>, <sgoutham@marvell.com>,
         <gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next PATCH v2 3/4] octeontx2-pf: Reuse PF max mtu value
-Date: Thu, 5 Sep 2024 15:19:34 +0530
-Message-ID: <20240905094935.26271-4-gakula@marvell.com>
+Subject: [net-next PATCH v2 4/4] octeontx2-pf: Export common APIs
+Date: Thu, 5 Sep 2024 15:19:35 +0530
+Message-ID: <20240905094935.26271-5-gakula@marvell.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240905094935.26271-1-gakula@marvell.com>
 References: <20240905094935.26271-1-gakula@marvell.com>
@@ -75,82 +75,243 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: B20fzdXXQkblQWCU3nxMzPNnODWKu1Ue
-X-Proofpoint-GUID: B20fzdXXQkblQWCU3nxMzPNnODWKu1Ue
+X-Proofpoint-ORIG-GUID: lQLLz_ADQhakeFhSAHUBSo-vNE5Mh4UF
+X-Proofpoint-GUID: lQLLz_ADQhakeFhSAHUBSo-vNE5Mh4UF
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-05_05,2024-09-04_01,2024-09-02_01
 
-Reuse the maximum support HW MTU value that is fetch during probe.
-Instead of fetching through mbox each time mtu is changed as the
-value is fixed for interface.
+Export mbox, hw resources and interrupt configuration functions.
+So, that they can be used later by the RVU representor driver.
 
 Signed-off-by: Geetha sowjanya <gakula@marvell.com>
 ---
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 4 ++--
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h | 1 +
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c     | 1 +
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c     | 1 +
- 4 files changed, 5 insertions(+), 2 deletions(-)
+ .../marvell/octeontx2/nic/otx2_common.c       |  2 +
+ .../marvell/octeontx2/nic/otx2_common.h       | 11 ++++++
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 37 +++++++++++++------
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  4 +-
+ 4 files changed, 40 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 87d5776e3b88..34e76cfd941b 100644
+index 34e76cfd941b..e38b3eea11f3 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -227,7 +227,7 @@ int otx2_hw_set_mtu(struct otx2_nic *pfvf, int mtu)
- 	u16 maxlen;
- 	int err;
+@@ -246,6 +246,7 @@ int otx2_hw_set_mtu(struct otx2_nic *pfvf, int mtu)
+ 	mutex_unlock(&pfvf->mbox.lock);
+ 	return err;
+ }
++EXPORT_SYMBOL(otx2_hw_set_mtu);
  
--	maxlen = otx2_get_max_mtu(pfvf) + OTX2_ETH_HLEN + OTX2_HW_TIMESTAMP_LEN;
-+	maxlen = pfvf->hw.max_mtu + OTX2_ETH_HLEN + OTX2_HW_TIMESTAMP_LEN;
- 
- 	mutex_lock(&pfvf->mbox.lock);
- 	req = otx2_mbox_alloc_msg_nix_set_hw_frs(&pfvf->mbox);
-@@ -236,7 +236,7 @@ int otx2_hw_set_mtu(struct otx2_nic *pfvf, int mtu)
- 		return -ENOMEM;
+ int otx2_config_pause_frm(struct otx2_nic *pfvf)
+ {
+@@ -1782,6 +1783,7 @@ void otx2_free_cints(struct otx2_nic *pfvf, int n)
+ 		free_irq(vector, &qset->napi[qidx]);
  	}
+ }
++EXPORT_SYMBOL(otx2_free_cints);
  
--	req->maxlen = pfvf->netdev->mtu + OTX2_ETH_HLEN + OTX2_HW_TIMESTAMP_LEN;
-+	req->maxlen = mtu + OTX2_ETH_HLEN + OTX2_HW_TIMESTAMP_LEN;
- 
- 	/* Use max receive length supported by hardware for loopback devices */
- 	if (is_otx2_lbkvf(pfvf->pdev))
+ void otx2_set_cints_affinity(struct otx2_nic *pfvf)
+ {
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index df548aeffecf..b36b87dae2cb 100644
+index b36b87dae2cb..327254e578d5 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -228,6 +228,7 @@ struct otx2_hw {
- 	u16			txschq_list[NIX_TXSCH_LVL_CNT][MAX_TXSCHQ_PER_FUNC];
- 	u16			matchall_ipolicer;
- 	u32			dwrr_mtu;
-+	u32			max_mtu;
- 	u8			smq_link_type;
+@@ -1000,6 +1000,17 @@ int otx2_aura_init(struct otx2_nic *pfvf, int aura_id,
+ int otx2_init_rsrc(struct pci_dev *pdev, struct otx2_nic *pf);
+ void otx2_free_queue_mem(struct otx2_qset *qset);
+ int otx2_alloc_queue_mem(struct otx2_nic *pf);
++int otx2_init_hw_resources(struct otx2_nic *pfvf);
++void otx2_free_hw_resources(struct otx2_nic *pf);
++int otx2_wq_init(struct otx2_nic *pf);
++int otx2_check_pf_usable(struct otx2_nic *pf);
++int otx2_pfaf_mbox_init(struct otx2_nic *pf);
++int otx2_register_mbox_intr(struct otx2_nic *pf, bool probe_af);
++int otx2_realloc_msix_vectors(struct otx2_nic *pf);
++void otx2_pfaf_mbox_destroy(struct otx2_nic *pf);
++void otx2_disable_mbox_intr(struct otx2_nic *pf);
++void otx2_disable_napi(struct otx2_nic *pf);
++irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq);
  
- 	/* HW settings, coalescing etc */
+ /* RSS configuration APIs*/
+ int otx2_rss_init(struct otx2_nic *pfvf);
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index 6dfd6d1064ad..2460913fc510 100644
+index 2460913fc510..fa7480f05e33 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -3103,6 +3103,7 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+@@ -1008,7 +1008,7 @@ static irqreturn_t otx2_pfaf_mbox_intr_handler(int irq, void *pf_irq)
+ 	return IRQ_HANDLED;
+ }
  
- 	netdev->min_mtu = OTX2_MIN_MTU;
- 	netdev->max_mtu = otx2_get_max_mtu(pf);
-+	hw->max_mtu = netdev->max_mtu;
+-static void otx2_disable_mbox_intr(struct otx2_nic *pf)
++void otx2_disable_mbox_intr(struct otx2_nic *pf)
+ {
+ 	int vector = pci_irq_vector(pf->pdev, RVU_PF_INT_VEC_AFPF_MBOX);
  
- 	/* reset CGX/RPM MAC stats */
- 	otx2_reset_mac_stats(pf);
+@@ -1016,8 +1016,9 @@ static void otx2_disable_mbox_intr(struct otx2_nic *pf)
+ 	otx2_write64(pf, RVU_PF_INT_ENA_W1C, BIT_ULL(0));
+ 	free_irq(vector, pf);
+ }
++EXPORT_SYMBOL(otx2_disable_mbox_intr);
+ 
+-static int otx2_register_mbox_intr(struct otx2_nic *pf, bool probe_af)
++int otx2_register_mbox_intr(struct otx2_nic *pf, bool probe_af)
+ {
+ 	struct otx2_hw *hw = &pf->hw;
+ 	struct msg_req *req;
+@@ -1060,8 +1061,9 @@ static int otx2_register_mbox_intr(struct otx2_nic *pf, bool probe_af)
+ 
+ 	return 0;
+ }
++EXPORT_SYMBOL(otx2_register_mbox_intr);
+ 
+-static void otx2_pfaf_mbox_destroy(struct otx2_nic *pf)
++void otx2_pfaf_mbox_destroy(struct otx2_nic *pf)
+ {
+ 	struct mbox *mbox = &pf->mbox;
+ 
+@@ -1076,8 +1078,9 @@ static void otx2_pfaf_mbox_destroy(struct otx2_nic *pf)
+ 	otx2_mbox_destroy(&mbox->mbox);
+ 	otx2_mbox_destroy(&mbox->mbox_up);
+ }
++EXPORT_SYMBOL(otx2_pfaf_mbox_destroy);
+ 
+-static int otx2_pfaf_mbox_init(struct otx2_nic *pf)
++int otx2_pfaf_mbox_init(struct otx2_nic *pf)
+ {
+ 	struct mbox *mbox = &pf->mbox;
+ 	void __iomem *hwbase;
+@@ -1124,6 +1127,7 @@ static int otx2_pfaf_mbox_init(struct otx2_nic *pf)
+ 	otx2_pfaf_mbox_destroy(pf);
+ 	return err;
+ }
++EXPORT_SYMBOL(otx2_pfaf_mbox_init);
+ 
+ static int otx2_cgx_config_linkevents(struct otx2_nic *pf, bool enable)
+ {
+@@ -1379,7 +1383,7 @@ static irqreturn_t otx2_q_intr_handler(int irq, void *data)
+ 	return IRQ_HANDLED;
+ }
+ 
+-static irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq)
++irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq)
+ {
+ 	struct otx2_cq_poll *cq_poll = (struct otx2_cq_poll *)cq_irq;
+ 	struct otx2_nic *pf = (struct otx2_nic *)cq_poll->dev;
+@@ -1398,20 +1402,25 @@ static irqreturn_t otx2_cq_intr_handler(int irq, void *cq_irq)
+ 
+ 	return IRQ_HANDLED;
+ }
++EXPORT_SYMBOL(otx2_cq_intr_handler);
+ 
+-static void otx2_disable_napi(struct otx2_nic *pf)
++void otx2_disable_napi(struct otx2_nic *pf)
+ {
+ 	struct otx2_qset *qset = &pf->qset;
+ 	struct otx2_cq_poll *cq_poll;
++	struct work_struct *work;
+ 	int qidx;
+ 
+ 	for (qidx = 0; qidx < pf->hw.cint_cnt; qidx++) {
+ 		cq_poll = &qset->napi[qidx];
+-		cancel_work_sync(&cq_poll->dim.work);
++		work = &cq_poll->dim.work;
++		if (work->func)
++			cancel_work_sync(work);
+ 		napi_disable(&cq_poll->napi);
+ 		netif_napi_del(&cq_poll->napi);
+ 	}
+ }
++EXPORT_SYMBOL(otx2_disable_napi);
+ 
+ static void otx2_free_cq_res(struct otx2_nic *pf)
+ {
+@@ -1477,7 +1486,7 @@ static int otx2_get_rbuf_size(struct otx2_nic *pf, int mtu)
+ 	return ALIGN(rbuf_size, 2048);
+ }
+ 
+-static int otx2_init_hw_resources(struct otx2_nic *pf)
++int otx2_init_hw_resources(struct otx2_nic *pf)
+ {
+ 	struct nix_lf_free_req *free_req;
+ 	struct mbox *mbox = &pf->mbox;
+@@ -1601,8 +1610,9 @@ static int otx2_init_hw_resources(struct otx2_nic *pf)
+ 	mutex_unlock(&mbox->lock);
+ 	return err;
+ }
++EXPORT_SYMBOL(otx2_init_hw_resources);
+ 
+-static void otx2_free_hw_resources(struct otx2_nic *pf)
++void otx2_free_hw_resources(struct otx2_nic *pf)
+ {
+ 	struct otx2_qset *qset = &pf->qset;
+ 	struct nix_lf_free_req *free_req;
+@@ -1688,6 +1698,7 @@ static void otx2_free_hw_resources(struct otx2_nic *pf)
+ 	}
+ 	mutex_unlock(&mbox->lock);
+ }
++EXPORT_SYMBOL(otx2_free_hw_resources);
+ 
+ static bool otx2_promisc_use_mce_list(struct otx2_nic *pfvf)
+ {
+@@ -2808,7 +2819,7 @@ static const struct net_device_ops otx2_netdev_ops = {
+ 	.ndo_set_vf_trust	= otx2_ndo_set_vf_trust,
+ };
+ 
+-static int otx2_wq_init(struct otx2_nic *pf)
++int otx2_wq_init(struct otx2_nic *pf)
+ {
+ 	pf->otx2_wq = create_singlethread_workqueue("otx2_wq");
+ 	if (!pf->otx2_wq)
+@@ -2819,7 +2830,7 @@ static int otx2_wq_init(struct otx2_nic *pf)
+ 	return 0;
+ }
+ 
+-static int otx2_check_pf_usable(struct otx2_nic *nic)
++int otx2_check_pf_usable(struct otx2_nic *nic)
+ {
+ 	u64 rev;
+ 
+@@ -2836,8 +2847,9 @@ static int otx2_check_pf_usable(struct otx2_nic *nic)
+ 	}
+ 	return 0;
+ }
++EXPORT_SYMBOL(otx2_check_pf_usable);
+ 
+-static int otx2_realloc_msix_vectors(struct otx2_nic *pf)
++int otx2_realloc_msix_vectors(struct otx2_nic *pf)
+ {
+ 	struct otx2_hw *hw = &pf->hw;
+ 	int num_vec, err;
+@@ -2859,6 +2871,7 @@ static int otx2_realloc_msix_vectors(struct otx2_nic *pf)
+ 
+ 	return otx2_register_mbox_intr(pf, false);
+ }
++EXPORT_SYMBOL(otx2_realloc_msix_vectors);
+ 
+ static int otx2_sriov_vfcfg_init(struct otx2_nic *pf)
+ {
 diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-index 99fcc5661674..79a8acac6283 100644
+index 79a8acac6283..c4e6c78a8deb 100644
 --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
 +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-@@ -671,6 +671,7 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+@@ -500,7 +500,7 @@ static const struct net_device_ops otx2vf_netdev_ops = {
+ 	.ndo_setup_tc = otx2_setup_tc,
+ };
  
- 	netdev->min_mtu = OTX2_MIN_MTU;
- 	netdev->max_mtu = otx2_get_max_mtu(vf);
-+	hw->max_mtu = netdev->max_mtu;
+-static int otx2_wq_init(struct otx2_nic *vf)
++static int otx2_vf_wq_init(struct otx2_nic *vf)
+ {
+ 	vf->otx2_wq = create_singlethread_workqueue("otx2vf_wq");
+ 	if (!vf->otx2_wq)
+@@ -689,7 +689,7 @@ static int otx2vf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 		goto err_ptp_destroy;
+ 	}
  
- 	/* To distinguish, for LBK VFs set netdev name explicitly */
- 	if (is_otx2_lbkvf(vf->pdev)) {
+-	err = otx2_wq_init(vf);
++	err = otx2_vf_wq_init(vf);
+ 	if (err)
+ 		goto err_unreg_netdev;
+ 
 -- 
 2.25.1
 
