@@ -1,231 +1,188 @@
-Return-Path: <netdev+bounces-125454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DBF096D1D8
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:20:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E403596D20C
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 10:26:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31FF61C24954
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:20:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13F671C2503D
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 08:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1938D194C61;
-	Thu,  5 Sep 2024 08:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A868194A6F;
+	Thu,  5 Sep 2024 08:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sakamocchi.jp header.i=@sakamocchi.jp header.b="dll2UKhe";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Z8BONe1t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FqKNVD2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh4-smtp.messagingengine.com (fhigh4-smtp.messagingengine.com [103.168.172.155])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE71190075;
-	Thu,  5 Sep 2024 08:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1156189518
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 08:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725524304; cv=none; b=mZCXh30MN+9oZaxvDGKGEyIqlYX8MHHSqBInK73TIxKXBXweYBoTK5+i6u0KeFK+OMH2nkY50fmhuG/KoZn3Iy2UyUcU9PBV6quUjLlxfLUdSlZr1PKlKzQwcZ8v+/9usS8KoWEvWTtri/vup58g56Z4hcKG9v7ew1Plw7kbGpo=
+	t=1725524680; cv=none; b=BJPgmvuh78cq6jyuco5+xX/GCGpyHttIz2Kv4TsS9Ia2SHN9c0n25c38wH4el2A9WtBscUUq4Xx4jQt8Dew4yITggQTPBqHd8N4xXE+8Js70DaXPbgr+u6xMtJO5und2GVmUpCoYLXEe3hh6Kig+cQrBTDVsSWfViAYFWqGZGV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725524304; c=relaxed/simple;
-	bh=6P78TQmNI+aVVBGBKjdR/+c5NzOBNGUrUiJlcUZx/mU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AgYSuriMM/9LCga+0yIeaiao0Zxo+3bWOkN2OsbSb4jueV8Tbj1RCbAIlHTWFuJaxwOeazhm4lhSsnjaI4525zNQCbvmJlmCZ73tMZ5QUNq5TRj34bMujFGQk3L/VLHa59vlAfIMXHdtdbDqwKWp+WoZaYQv2iEh5v4IMbC9Txk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sakamocchi.jp; spf=pass smtp.mailfrom=sakamocchi.jp; dkim=pass (2048-bit key) header.d=sakamocchi.jp header.i=@sakamocchi.jp header.b=dll2UKhe; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Z8BONe1t; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sakamocchi.jp
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sakamocchi.jp
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 3847D1140148;
-	Thu,  5 Sep 2024 04:18:21 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Thu, 05 Sep 2024 04:18:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sakamocchi.jp;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1725524301; x=
-	1725610701; bh=WtwEAKrZrYNRLzgPZ4AVqDwICtzLdQID0hX5HloQEWA=; b=d
-	ll2UKheBld8xZn7xfP5XDo30Ak91d0zncH6xgyS6EcJk1sWZBUHh4DokZRcR/Igy
-	7tylCoEN3JzM9CWEyHLRW/CuQt3aSApMXci47yLYkSEOyZsT7RUxU/MEdyvXnkMw
-	MKQvMmd0ZeikRz7UOqJmx3HcrMzPN2dzyCnAqPjn0LAqAxqrgUdjqyB9bOLQWHDB
-	2dXYZKOq6QmdG/IJn3sjK7cd03jRbruV5my85FKV4aKzrjPW3GYG6FGL+RZyB/y+
-	t9TLS2P2t6B+RSP/htVqcn4gEqDMqhUSBvmImjb2X35VO1m8MPt58dfn2vH3ds61
-	nyWWH8/88j88gR7iD4jvA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1725524301; x=1725610701; bh=WtwEAKrZrYNRLzgPZ4AVqDwICtzL
-	dQID0hX5HloQEWA=; b=Z8BONe1tT4yBkhN2aUY2c4mI2fQdAPdHb/xDOne4EMGD
-	SBOs6ZhitVGIlTM/p67+hYIhws9v55oW0uZ9/1e9R1GexCSa5POKBmn5OIcrlDfi
-	kKUOrB4HE/MEgZmBcuWR2qMFU39UX+hTs9wanEmp68c3Brsf54cp7Tm10iT1+7vJ
-	irjZpbTJDybY6d2CABgTofum8KUPdTdnZhcJ5tgaNjaLHZUIqCa+e1rMqXMQvdto
-	4AjqZefMOgQkcW4T3GNW6+T4afYLbKIJofF+//UMrNla3rUNCZ7vZch9zY1HaFNB
-	W1EwRa0yVN1T2f4+W+5Yxvl98OZbKQ7+fJRKqN1CTQ==
-X-ME-Sender: <xms:TWnZZumR37ykvPpir5EHJJmOk126_GJQg5GyWeX0LRLBdXRAm94vVg>
-    <xme:TWnZZl2SCiHw1PoHuL44iOElqGFmcr7-otr01jImQKwZpaOgR7KGJSM3hG5ABy20k
-    EpV2mfnvZcOcAWOR48>
-X-ME-Received: <xmr:TWnZZso3HByT3ORO2aWsPehBW1_ZZSq3E4szd5o4MjZ5s9yg8oWzjOySIxjQJ9zWZNnOMJhL4_ZONOdnobjQdhUgtjl291g2MBo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudehledgtddvucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepvfgrkhgrshhhihcuufgrkhgrmhhothhouceoohdqthgrkhgrshhhihessh
-    grkhgrmhhotggthhhirdhjpheqnecuggftrfgrthhtvghrnhepueeiueevleefvedttefg
-    vdeutdekveduheevffdvhfeluefhgfdtgeeutedtudejnecuffhomhgrihhnpehkvghrnh
-    gvlhdrohhrghdpghhithhhuhgsrdgtohhmnecuvehluhhsthgvrhfuihiivgeptdenucfr
-    rghrrghmpehmrghilhhfrhhomhepohdqthgrkhgrshhhihesshgrkhgrmhhotggthhhird
-    hjphdpnhgspghrtghpthhtohepjedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
-    vggumhhunhgurdhrrghilhgvsehprhhothhonhhmrghilhdrtghomhdprhgtphhtthhope
-    grphgrihhssehlihhnuhigrdhmihgtrhhoshhofhhtrdgtohhmpdhrtghpthhtoheplhhi
-    nhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
-    hinhhugidqmhgvughirgesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehl
-    ihhnuhigqdhsohhunhgusehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
-    hinhhugidufeelgedquggvvhgvlheslhhishhtshdrshhouhhrtggvfhhorhhgvgdrnhgv
-    thdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:TWnZZimpPjErUb-PX7e37cNm4G2_5vHHy5fvyCWjHbx4NXjmHP6nrQ>
-    <xmx:TWnZZs2guP9gekben1zbRpXN8leD9-48kUsmzENVuKM66e-RnSa1WQ>
-    <xmx:TWnZZptB90Wh407iaVDtp_tzH9BKaPdf_7pPo-4VgEgMD-DgfNOp9w>
-    <xmx:TWnZZoXCuUbGB3vrG6SrQ9rvXqUNT6PZ1O1EbsKfYvhgQSMIejTV3Q>
-    <xmx:TWnZZtltYZ3GNZzUZFZINzsr1jCQaeYMYXPSK8ALWPnmJXpkuPtz9fTh>
-Feedback-ID: ie8e14432:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 5 Sep 2024 04:18:19 -0400 (EDT)
-Date: Thu, 5 Sep 2024 17:18:17 +0900
-From: Takashi Sakamoto <o-takashi@sakamocchi.jp>
-To: Edmund Raile <edmund.raile@protonmail.com>
-Cc: apais@linux.microsoft.com, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-sound@vger.kernel.org,
-	linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org
-Subject: Re: firewire: use sleepable workqueue to handle 1394 OHCI IT/IR
- context events: test 1
-Message-ID: <20240905081817.GC486563@workstation.local>
-Mail-Followup-To: Edmund Raile <edmund.raile@protonmail.com>,
-	apais@linux.microsoft.com, linux-kernel@vger.kernel.org,
-	linux-media@vger.kernel.org, linux-sound@vger.kernel.org,
-	linux1394-devel@lists.sourceforge.net, netdev@vger.kernel.org
-References: <20240901110642.154523-1-o-takashi@sakamocchi.jp>
- <20240904204531.154290-1-edmund.raile@protonmail.com>
+	s=arc-20240116; t=1725524680; c=relaxed/simple;
+	bh=pJ7zntbRM1090fR7dXCuDEpa5qFUSBCsMd/I8FGZ30c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YMIt5e+b+nzYmXp+MLSpCTnSPvT5KIbGisOwd9RTHvRBcfsnop1IRp7VvBvZtMx26LcA16EB3Hg4V2OhW0G9Urnjz2b6VeRHUCBqYrq7hlGWGVKNzCqPRkE4dAjKxQHh9CzYeK3VC8EbyR9yPKJAd4lJfzrIEc/LpQPykNEFubA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FqKNVD2H; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-39f37a5a091so1678395ab.1
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 01:24:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725524678; x=1726129478; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5qg7kz0a77rJ9FvMBXLFQO20FfWRgn3QuCYyGE6IIMI=;
+        b=FqKNVD2H6tElZW+LuIZlyuv4BKPHX73jsGxCb3HSd6Awqfv1GzPX8QG3BxaOckPiFj
+         9of4tOZ40+qJixkCp0Ugml9xXHE3MgVQuOglPnLxLVbIZLbBhBhOg7rxjsQSVNbd8hyI
+         7xSpMSuuctJDcvdT8tOkYjgPROP2fZ/nZ1KKqGgjpawo6Ex6XtSg4l/yNb+9k0stpUxR
+         PtsaYAuvhlcugYNr7TBFNfl5isUAqZ5+6KB/qJVqHJyEWBDGvlzlyDinljqCM5K1BnS7
+         bMLbyJ3WLIDQi6WlPIaF4+VNkCnvbXuI1sYZYOZlVAcJbDE7NLxcw3JNiYDnkCHTrE0e
+         Rq6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725524678; x=1726129478;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5qg7kz0a77rJ9FvMBXLFQO20FfWRgn3QuCYyGE6IIMI=;
+        b=Z3pmK0cFZM4Xi/r4uZM+bo+UBzgolm6oNVG4EERPw0rkk8sJ4m2iojME+JKG0fqiAr
+         KvF9V7ymsk2pucJx3SCHmD611NrwZcJPFzyKOmkcz15C9K4+66WNLK7h4Lg+36cLrXZP
+         XjR8EmUkzTUm65ZNEi5DgwpLex30c6w5463oJb3JiVY3Wi7P4Kw5Z3IOMDO6l37chptz
+         gGcEgbGcboKc7m+HSuXwMSWVeJqqGlRJ8Ydw3GK7zTobrJ0CMURIZpTFcs++YPvYcEQP
+         zQFKHx+vNpoBtzBf3n1nob6iWNUO7+vdDiGdU0RhM+ts0sXO91eS4MHA2B07InaaPXTG
+         3Cpg==
+X-Forwarded-Encrypted: i=1; AJvYcCWhgd1PBDdQ6DsAiK72QsCWzsC5x7zJ4BhwWM0bPV15Nn8xwVis2+xYUU5Ar+I78YJ6MI45dHQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSYzr+rAmQ0J/gtjx+QMTVJU+plqL9kPU2rIzfcNXeoueTCs8E
+	R5lcMoaHRDj+8t0UjgT0Zy3BDbdrJX7EUhHytq851f1DyHu7Mk3xMAsNMQIp+6+zZwZHOqAHm3G
+	1BCI0u64JMXa8N3Q0BOQ90nKUejk=
+X-Google-Smtp-Source: AGHT+IGDZqnfACQBYiLv+hh057I0u0I4Qr7/Bhz2Jk4ueQ8Xv+SZ58FNZyb5ayYoXsGcF3k1fsJZN8GwcxF55F6ZxhA=
+X-Received: by 2002:a92:c56d:0:b0:3a0:43b1:4c32 with SMTP id
+ e9e14a558f8ab-3a043b14d46mr36307255ab.25.1725524677746; Thu, 05 Sep 2024
+ 01:24:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240904204531.154290-1-edmund.raile@protonmail.com>
+References: <20240904113153.2196238-1-vadfed@meta.com> <20240904113153.2196238-2-vadfed@meta.com>
+In-Reply-To: <20240904113153.2196238-2-vadfed@meta.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 5 Sep 2024 16:24:01 +0800
+Message-ID: <CAL+tcoAO=0g0mkmgODzNWLJZgRxNvJiXM7=DgoCgdbFsJ0cJEg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/4] net_tstamp: add SCM_TS_OPT_ID to provide
+ OPT_ID in control message
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Willem de Bruijn <willemb@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+Hello Vadim,
 
-Thanks for your test.
+On Wed, Sep 4, 2024 at 7:32=E2=80=AFPM Vadim Fedorenko <vadfed@meta.com> wr=
+ote:
+[...]
+> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tst=
+amp.h
+> index a2c66b3d7f0f..1c38536350e7 100644
+> --- a/include/uapi/linux/net_tstamp.h
+> +++ b/include/uapi/linux/net_tstamp.h
+> @@ -38,6 +38,13 @@ enum {
+>                                  SOF_TIMESTAMPING_LAST
+>  };
+>
+> +/*
+> + * The highest bit of sk_tsflags is reserved for kernel-internal
+> + * SOCKCM_FLAG_TS_OPT_ID. This check is to control that SOF_TIMESTAMPING=
+*
+> + * values do not reach this reserved area
 
-On Wed, Sep 04, 2024 at 08:45:51PM +0000, Edmund Raile wrote:
-> Hello Sakamoto-San, I very much appreciate the idea and effort to take on the tasklet conversion in small steps instead of all-at-once!
-> 
-> I also thank you for the CC, I'd like to be the testing canary for the coal mine of firewire ALSA with RME FireFace!
-> The ALSA mailing list is a bit overwhelming and I'll likely unsubscribe so a direct CC for anything I can test is a good idea.
-> 
-> Trying to apply patch 1 of 5 to mainline, your kernel tree appears to be out of sync with mainline!
-> It was missing b171e20 from 2009 and a7ecbe9 from 2022!
-> I hope nothing else important is missing!
- 
-Yes. The series of changes is prepared for the next merge window to
-v6.12 kernel. It is on the top of for-next branch in linux1394 tree.
-You can see some patches on v6.12-rc2 tag.
+I wonder if we can add the above description which is quite useful in
+enum{} like this:
 
-https://git.kernel.org/pub/scm/linux/kernel/git/ieee1394/linux1394.git/log/?h=for-next
+diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstam=
+p.h
+index a2c66b3d7f0f..2314fccaf51d 100644
+--- a/include/uapi/linux/net_tstamp.h
++++ b/include/uapi/linux/net_tstamp.h
+@@ -13,7 +13,12 @@
+ #include <linux/types.h>
+ #include <linux/socket.h>   /* for SO_TIMESTAMPING */
 
-> Since in fw_card_initialize, ret is tested to be 0 we'd need an else instead, is this correct?
-> 
-> I edited these functions of patch 1, now everything applies just fine:
-> 
-> @@ -571,11 +571,28 @@ void fw_card_initialize(struct fw_card *card,
->  }
->  EXPORT_SYMBOL(fw_card_initialize);
->  
-> -int fw_card_add(struct fw_card *card,
-> -		u32 max_receive, u32 link_speed, u64 guid)
-> +int fw_card_add(struct fw_card *card, u32 max_receive, u32 link_speed, u64 guid,
-> +		unsigned int supported_isoc_contexts)
->  {
-> +	struct workqueue_struct *isoc_wq;
->  	int ret;
->  
-> +	// This workqueue should be:
-> +	//  * != WQ_BH			Sleepable.
-> +	//  * == WQ_UNBOUND		Any core can process data for isoc context. The
-> +	//				implementation of unit protocol could consumes the core
-> +	//				longer somehow.
-> +	//  * != WQ_MEM_RECLAIM		Not used for any backend of block device.
-> +	//  * == WQ_HIGHPRI		High priority to process semi-realtime timestamped data.
-> +	//  * == WQ_SYSFS		Parameters are available via sysfs.
-> +	//  * max_active == n_it + n_ir	A hardIRQ could notify events for multiple isochronous
-> +	//				contexts if they are scheduled to the same cycle.
-> +	isoc_wq = alloc_workqueue("firewire-isoc-card%u",
-> +				  WQ_UNBOUND | WQ_HIGHPRI | WQ_SYSFS,
-> +				  supported_isoc_contexts, card->index);
-> +	if (!isoc_wq)
-> +		return -ENOMEM;
-> +
->  	card->max_receive = max_receive;
->  	card->link_speed = link_speed;
->  	card->guid = guid;
-> @@ -584,9 +601,13 @@ int fw_card_add(struct fw_card *card,
->  
->  	generate_config_rom(card, tmp_config_rom);
->  	ret = card->driver->enable(card, tmp_config_rom, config_rom_length);
->  	if (ret == 0)
->  		list_add_tail(&card->link, &card_list);
-> +	else
-> +		destroy_workqueue(isoc_wq);
-> +
-> +	card->isoc_wq = isoc_wq;
-> 
->  	mutex_unlock(&card_mutex);
-> 
->  	return ret;
-> @@ -709,7 +729,9 @@ void fw_core_remove_card(struct fw_card *card)
->  {
->  	struct fw_card_driver dummy_driver = dummy_driver_template;
->  	unsigned long flags;
->  
-> +	might_sleep();
-> +
->  	card->driver->update_phy_reg(card, 4,
->  				     PHY_LINK_ACTIVE | PHY_CONTENDER, 0);
->  	fw_schedule_bus_reset(card, false, true);
-> @@ -719,6 +741,7 @@ void fw_core_remove_card(struct fw_card *card)
->  	dummy_driver.free_iso_context	= card->driver->free_iso_context;
->  	dummy_driver.stop_iso		= card->driver->stop_iso;
->  	card->driver = &dummy_driver;
-> +	drain_workqueue(card->isoc_wq);
->  
->  	spin_lock_irqsave(&card->lock, flags);
->  	fw_destroy_nodes(card);
-> 
-> Building a kernel with the patch produced 6.11.0-rc6-1-mainline-00019-g67784a74e258-dirty.
-> Testing it with TI XIO2213B and RME Fireface 800 so far > 1 hour reveals no issues at all.
-> ALSA streaming works fine:
->   mpv --audio-device=alsa/sysdefault:CARD=Fireface800 Spor-Ignition.flac
-> 
-> Though I haven't the faintest clue how to measure CPU usage impact of the patch, it looks like it would be neglible.
-> 
-> As of finishing this, I noticed you released [2] https://lore.kernel.org/lkml/20240904125155.461886-1-o-takashi@sakamocchi.jp/T/
-> I'll get around to testing that one too, but tomorrow at the earliest.
-> 
-> Kind regards,
-> Edmund Raile.
-> 
-> Signed-off-by: Edmund Raile <edmund.raile@protonmail.com>
-> Tested-by: Edmund Raile <edmund.raile@protonmail.com>
+-/* SO_TIMESTAMPING flags */
++/* SO_TIMESTAMPING flags
++ *
++ * The highest bit of sk_tsflags is reserved for kernel-internal
++ * SOCKCM_FLAG_TS_OPT_ID.
++ * SOCKCM_FLAG_TS_OPT_ID =3D (1 << 31),
++ */
+ enum {
+        SOF_TIMESTAMPING_TX_HARDWARE =3D (1<<0),
+        SOF_TIMESTAMPING_TX_SOFTWARE =3D (1<<1),
 
-If using v6.11 kernel, it is convenient to use my remote repository to
-backport changes for v6.12. But let you be careful to the history of
-changes anyway.
+to explicitly remind the developers not to touch 1<<31 field. Or else,
+it can be very hard to trace who occupied the highest field in the
+future at the first glance, I think.
 
-* https://github.com/takaswie/linux-firewire-dkms/
+[...]
+> diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> index f26841f1490f..9b87d23314e8 100644
+> --- a/net/ipv6/ip6_output.c
+> +++ b/net/ipv6/ip6_output.c
+> @@ -1401,7 +1401,10 @@ static int ip6_setup_cork(struct sock *sk, struct =
+inet_cork_full *cork,
+>         cork->base.gso_size =3D ipc6->gso_size;
+>         cork->base.tx_flags =3D 0;
+>         cork->base.mark =3D ipc6->sockc.mark;
+> +       cork->base.ts_opt_id =3D ipc6->sockc.ts_opt_id;
+>         sock_tx_timestamp(sk, ipc6->sockc.tsflags, &cork->base.tx_flags);
+> +       if (ipc6->sockc.tsflags & SOCKCM_FLAG_TS_OPT_ID)
+> +               cork->base.flags |=3D IPCORK_TS_OPT_ID;
+>
+>         cork->base.length =3D 0;
+>         cork->base.transmit_time =3D ipc6->sockc.transmit_time;
+> @@ -1433,7 +1436,7 @@ static int __ip6_append_data(struct sock *sk,
+>         bool zc =3D false;
+>         u32 tskey =3D 0;
+>         struct rt6_info *rt =3D dst_rt6_info(cork->dst);
+> -       bool paged, hold_tskey, extra_uref =3D false;
+> +       bool paged, hold_tskey =3D false, extra_uref =3D false;
+>         struct ipv6_txoptions *opt =3D v6_cork->opt;
+>         int csummode =3D CHECKSUM_NONE;
+>         unsigned int maxnonfragsize, headersize;
+> @@ -1543,10 +1546,15 @@ static int __ip6_append_data(struct sock *sk,
+>                         flags &=3D ~MSG_SPLICE_PAGES;
+>         }
+>
+> -       hold_tskey =3D cork->tx_flags & SKBTX_ANY_TSTAMP &&
+> -                    READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID;
+> -       if (hold_tskey)
+> -               tskey =3D atomic_inc_return(&sk->sk_tskey) - 1;
+> +       if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
+> +           READ_ONCE(sk->sk_tsflags) & SOCKCM_FLAG_TS_OPT_ID) {
 
+s/SOCKCM_FLAG_TS_OPT_ID/SOF_TIMESTAMPING_OPT_ID/
+In case you forget to change here :)
 
-Thanks
-
-Takashi Sakamoto
+> +               if (cork->flags & IPCORK_TS_OPT_ID) {
+> +                       tskey =3D cork->ts_opt_id;
+> +               } else {
+> +                       tskey =3D atomic_inc_return(&sk->sk_tskey) - 1;
+> +                       hold_tskey =3D true;
+> +               }
+> +       }
+>
+>         /*
+>          * Let's try using as much space as possible.
+> --
+> 2.43.5
+>
 
