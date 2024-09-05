@@ -1,95 +1,89 @@
-Return-Path: <netdev+bounces-125510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05D9496D716
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:30:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F26596D757
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:39:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9E1428751C
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:30:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A7CD1F23FB2
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 11:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F012E199EB4;
-	Thu,  5 Sep 2024 11:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B411199E92;
+	Thu,  5 Sep 2024 11:39:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="icvAo9sz"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="aMuExzC2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4465199EA7;
-	Thu,  5 Sep 2024 11:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6C4199E80;
+	Thu,  5 Sep 2024 11:39:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725535831; cv=none; b=bYmZTgprVYdqylo9l1ZkC7RfllBE6BU5dijuGPOSEZznx6GDFrlPh4NqBrJmaSRmk/kGiAXaKdSOUHq+NSO9Xz0BN5MFZD//VhDkJW7je5A4yAW7Uug2lLFnfI0jd/o9LzDph8pLARjR+ygA4l7fGco8LJDmDPhBieemCUIMI6Y=
+	t=1725536366; cv=none; b=auKz9P7DhGbl0P5KxnoNoy/dazpi2QcjbLMt1HOzaXp985aXj+JaYZOdY/oeYWgWF4M5SutemCqxGwi19oTwHbHQUlgJkpR8vh/HPEnvRCkP4P5FZ9ELDy9D1SXKXK+n4eU3K8cOWAv05M7mGNBChb1sfMloJfngPCfz0iZrTVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725535831; c=relaxed/simple;
-	bh=3KBDMRhKBiKoS2oBNaYjWMKIz+MDkWgGXsEUMwFCMTo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=c5JYFsx6Hl0u2jBNnbu74XcFGbNW+8LCogpHeowkXNFHDFOG5P8wfJXMXxHfBFEPE95PuotJi5w7SdLfze4Ea/BFssLzdPlzqD4S30CxQT6MUoEd5HdMpOZO59W+eA1kRaX/GWukY1ThLBaQMoGkqH1+HYywd2t4ilPga5yrMC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=icvAo9sz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D75BC4CECA;
-	Thu,  5 Sep 2024 11:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725535830;
-	bh=3KBDMRhKBiKoS2oBNaYjWMKIz+MDkWgGXsEUMwFCMTo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=icvAo9szxLR+tQeYWaIIvlZWotha7L5EP+5EXBoMuUkSEvlzkh3qpKBrEMx+fehCQ
-	 h2z6GMTU1zcmQImoioMGZ5CZtdgSaDSswm2lVKso3x06Wq5+UMHNrsC38fxmSlSpRu
-	 W7gc/xbJX4sE92k0j9gaWA4nyIXsNppWzldPTrHarISSePFHAtoQxv/pcfMMNnhmi3
-	 mooQGthV6Pw/4y2xRVnPc3IZfdA2IUWurhDZYl8r3qF+/Fr8vWlCzFQU5FwHnEgtIy
-	 NpzO1Drv5vO2+Xog4SCgpBBDAM6/Nto+Hn6D8rNDlTuKqWZzw52hTZf7T/eln6VsWt
-	 C5YvlxKR/kUiA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C883806644;
-	Thu,  5 Sep 2024 11:30:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725536366; c=relaxed/simple;
+	bh=NaZHXiNtSs2ZlpSQWGN+YxPdz+YASnDe7DLJQj8SC7s=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=YHxWXtwWx3fqzsm+hk/XwEMleqRFbJMAL9L17pRgeHN6ZiNDoPz5WPQiFP2WB9kVvxn453M6CCVlZVJS/RweS/14moAeRGLTJ1Ub2sW0l0QBvZw6Iojidyihj0Fr2Awz3AJ3a+Cs5cwqmZLsxFAPsJm8kdEJvlaXiVaFMcTSSpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=aMuExzC2; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1725536360; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
+	bh=/hhEMKtprsVbArv+yauOmIjjQBRgsz4rpXSeuzHNeQ0=;
+	b=aMuExzC2CtUPOAeBwGr+vrLB0te5yT4S/RtLmO8b6PDfdgaN+505fnroLKPR9kQY6CsGbZ2hzclm/jRB+E8HgKSPuSb/X/AGSTNZFwXJFmRZnAW8v1qVJE6pEO/I/tNnYca+0+UXsfc0FuOo4ZfNnRei+vQlcJi9W6fjDNR/tw8=
+Received: from 30.221.149.174(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WELXxjm_1725536358)
+          by smtp.aliyun-inc.com;
+          Thu, 05 Sep 2024 19:39:19 +0800
+Message-ID: <0ccd6ef0-f642-45c3-a914-a54b50e11544@linux.alibaba.com>
+Date: Thu, 5 Sep 2024 19:39:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH -next] net: dsa: felix: Annotate struct action_gate_entry with
- __counted_by
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172553583075.1653140.16718879512076834238.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Sep 2024 11:30:30 +0000
-References: <20240904014956.2035117-1-lihongbo22@huawei.com>
-In-Reply-To: <20240904014956.2035117-1-lihongbo22@huawei.com>
-To: Hongbo Li <lihongbo22@huawei.com>
-Cc: vladimir.oltean@nxp.com, claudiu.manoil@nxp.com,
- alexandre.belloni@bootlin.com, andrew@lunn.ch, f.fainelli@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kees@kernel.org, gustavoars@kernel.org, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org
-
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 4 Sep 2024 09:49:56 +0800 you wrote:
-> Add the __counted_by compiler attribute to the flexible array member
-> entries to improve access bounds-checking via CONFIG_UBSAN_BOUNDS and
-> CONFIG_FORTIFY_SOURCE.
-> 
-> Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
-> ---
->  drivers/net/dsa/ocelot/felix_vsc9959.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Here is the summary with links:
-  - [-next] net: dsa: felix: Annotate struct action_gate_entry with __counted_by
-    https://git.kernel.org/netdev/net-next/c/50ddaedeae75
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net/smc: add sysctl for smc_limit_hs
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ wintera@linux.ibm.com, guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+ tonylu@linux.alibaba.com, pabeni@redhat.com, edumazet@google.com
+References: <1724207797-79030-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Language: en-US
+In-Reply-To: <1724207797-79030-1-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
+
+
+On 8/21/24 10:36 AM, D. Wythe wrote:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>
+> In commit 48b6190a0042 ("net/smc: Limit SMC visits when handshake workqueue congested"),
+> we introduce a mechanism to put constraint on SMC connections visit
+> according to the pressure of SMC handshake process.
+>
+> At that time, we believed that controlling the feature through netlink
+> was sufficient. However, most people have realized now that netlink is
+> not convenient in container scenarios, and sysctl is a more suitable
+> approach.
+>
+
+Hi everyone,
+
+Just a quick reminder regarding the patch that seems to have been 
+overlooked, possibly dues to its status was
+mistakenly updated to change request ? It seems that no further 
+modifications are needed.
+
+Best wishes,
+D. Wythe
 
