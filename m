@@ -1,166 +1,123 @@
-Return-Path: <netdev+bounces-125530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A6C296D8B4
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:35:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7398F96D8CB
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 14:39:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0458EB24171
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:35:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29A161F28093
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 12:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3454919B3C1;
-	Thu,  5 Sep 2024 12:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 480A819995A;
+	Thu,  5 Sep 2024 12:39:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="swrOoSqv"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1a+VgIF1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-58-211.mail.qq.com (out162-62-58-211.mail.qq.com [162.62.58.211])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E43176AD7;
-	Thu,  5 Sep 2024 12:35:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909FB19B3E4;
+	Thu,  5 Sep 2024 12:39:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725539730; cv=none; b=FMTKYpJLQmqBqhHKLHV+hLrVEWOMUdpE9txqZ5Hhh7ard7Hz8Vc0oUDu3gMzOmGvXxl6JAwRbL6EVj2h5GrZ0NRWrmqUjpv8AaHR2A9vsfJB9ss2WpjZ5zPk0UcfCnPSrfDnvhVipPq1LhYypW/g5+WEFul5yfZPQ2Mm4W0Z83w=
+	t=1725539945; cv=none; b=QiEw6LgLZEINYgv8pgBfxH6DlkMI5jsAKUzuWuAEMAtC2jk1cY3m1QBH6x/itEJFNkpMFfCl876AOD1krv4m6uCiwrFS9334u1GKY8/SrOk5yIaJNsvmy7EeF3mFAlhdh47PyEKFujP6B6wHJ1jYpc68g9GNHTcXCDNR0xstGvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725539730; c=relaxed/simple;
-	bh=eWXnFcXSlzMYQpZW8Hy8qFqCdpL0PX9kvItTRaNmrFg=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=lsVW9mLAVd8sIo9E7X+rc6r7A2ICQArbJJ/96Q3uIZqwm8RZRuggWTUqrWwfLWJbb1lCTvBKHOtA9alYrdkaDWMaPfgOYLRBUg2fZOfIeGz5j9Jh1Hzl/tls3kaVeky4qOsIXk2WfMnlVI6F1xxnEZ72UzwgMj3lGSTai40PTX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=swrOoSqv; arc=none smtp.client-ip=162.62.58.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1725539723; bh=FYqDZVG9wIGuqWD1evRlumoDPPlBGI6xaAt0w2ApOKI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=swrOoSqvVYYpveRg3nka4qO3brIdY+TbrR7AiG6ozWQv2E08f34fIaPCbzzJL7Hol
-	 CIXMM9IYm9VlcSLfABEZPHnBmOMX/bdMY0hTmjqIA5hMmhQoZ0L0aODfUmmRwN14VA
-	 1VMJ+ZxfBOawcBI/w7kiIkuL7HQ6neXlQe9oTCfQ=
-Received: from pek-lxu-l1.wrs.com ([111.198.224.50])
-	by newxmesmtplogicsvrsza29-0.qq.com (NewEsmtp) with SMTP
-	id 8D2B8AF4; Thu, 05 Sep 2024 20:35:18 +0800
-X-QQ-mid: xmsmtpt1725539718tebrv7rw3
-Message-ID: <tencent_3FBF36AE969036864BB0748977C9669E3D09@qq.com>
-X-QQ-XMAILINFO: NDgMZBR9sMmaj0aSd45lpCIQQB/+lGDZ2eDgjriY7MWap0RDnHx+QehVevXjl0
-	 Of8aphvnf6o3YDhbDoc3p4yEsgL0Z2fDmlexQYXrx7gLLdpTLHK52vn/uFiKsphh59ce7iD4b2ws
-	 O7XxZXV1Jho2F9pteCXHH8+vHog5l0ioy7tk7QXSPiIIYU5bE9BKYDXUVS1a5RFZKCBCyc4OZbJK
-	 dnNX7mLstjyuVyxNP5qI3POAXUbkYO7knr4BUeJRWbFY65lPloWqFGH7M7w6fFrwvBRCE/oLxUqX
-	 Lulo0fR4DiGbU5R0cQBdvVqGvzPuyDC8smoUBn4gAQEitZbFCtXIJF7h7iQYnASXJHBTTXPmUY+8
-	 wDhfQjNc1TzQh5N4RwXfOdtDxvj7lwGNlAnpRHLvjMlN2uGTDMzK0mxElsjcr5wWEKA5PP/0j3rw
-	 VzIUn52zfBWZdxY3POeaymJ55M+KW/QAOHCoR+bDwo030/gbv3MHYkjBYREA8pyy9Udy4tA1HJA7
-	 wnZMtQKcY4SdjFs7mNlxnN8p7uz+2lhh5VO+dLkzgoWLFY83WEuxL4hUyUEOrQCstnKz+4y3ZDCG
-	 7S0mCNaHPG68pFZp3a6p3D3PzOhJVenaJteANLLSgId7uoqqeKxtPhR40izo1L7xWljQMZ9mMtXs
-	 mCI5T++YYroviruLcH8sz9tCtqz1Tvn7b1sFRGOmZHnaTzvOvDdqoIOGVz7GMjmvM7yTKm/yE1GG
-	 X94gRs2O0f8uDoEKxZ+2voMTYAib9j6nAAiYAp0J3PLKmCRlFlX1a8SDIjMdDLixMV1jxhTAt8Pk
-	 Mwj4lUuM3aSeJ+amOEiQDYLcofNKrPJhVH+3QKsUHRHTv1yFGklVXGL2zJyUYf4DNZTUemcqzc24
-	 dAShELWjMHpQKON/+zChxkrCV1G1kctvoiIN6m4Se7b9+DhrNmOf9Zg3UZ5FPBDWwKFeMR3rIzvF
-	 mHn6FrkFBFI3pYiro21+LAD3o7vhmjtO7kuVghG4k=
-X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
-From: Edward Adam Davis <eadavis@qq.com>
-To: matttbe@kernel.org
-Cc: davem@davemloft.net,
-	eadavis@qq.com,
-	edumazet@google.com,
-	geliang@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	martineau@kernel.org,
-	mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH V2] mptcp: pm: Fix uaf in __timer_delete_sync
-Date: Thu,  5 Sep 2024 20:35:19 +0800
-X-OQ-MSGID: <20240905123518.101921-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <e4a13002-f471-4951-9180-14f0f8b30bd2@kernel.org>
-References: <e4a13002-f471-4951-9180-14f0f8b30bd2@kernel.org>
+	s=arc-20240116; t=1725539945; c=relaxed/simple;
+	bh=HIGsIXeugJQTCWAVm8XzbJYQEWiE/wuX3YHavCWJfXs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C5EnaDoTgzVUWnDqsC8ktXwSnSC0+JOSxqfDwZbu0Ri52W1mYwn0dYITC050BAjKybJeEdhtJjvKYlpk6YBLxuKrwuUC7Mj/wrJBVnembncjc49KNdPFmzNR3bl3aZBxU2k0xJWaGUOLYmBtmKaFD/jWbrrAPLdUQTIvvVPVnzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1a+VgIF1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Nbszc8u1ehabZGC5jnFsbhiRNH6rI1/BMSG1Fv5VDc8=; b=1a+VgIF1rva6uLAA0BUgoKxB1V
+	8usNVlYzuZ1eTqiFuG6aMnQx62LA0WjIZv8sSOSV2XtFC6ub3bPPlyC4J54+o2PcTPEp/G3Q0T0Uz
+	5OGj2GGz23FSJoHe1D4ZuKM/PvLvaK6rCH8f36eU8YUmzTp/0aIqsuSBVdmjV+kmJD1U=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1smBlE-006fzA-UR; Thu, 05 Sep 2024 14:38:52 +0200
+Date: Thu, 5 Sep 2024 14:38:52 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tarun Alle <tarun.alle@microchip.com>
+Cc: arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: phy: microchip_t1: SQI support for LAN887x
+Message-ID: <dba796b1-bb59-4d90-b592-1d56e3fba758@lunn.ch>
+References: <20240904102606.136874-1-tarun.alle@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240904102606.136874-1-tarun.alle@microchip.com>
 
-On Wed, 4 Sep 2024 22:39:10 +0200, Matthieu Baerts wrote:
->On 04/09/2024 03:01, Edward Adam Davis wrote:
->> There are two paths to access mptcp_pm_del_add_timer, result in a race
->> condition:
->>
->>      CPU1				CPU2
->>      ====                               ====
->>      net_rx_action
->>      napi_poll                          netlink_sendmsg
->>      __napi_poll                        netlink_unicast
->>      process_backlog                    netlink_unicast_kernel
->>      __netif_receive_skb                genl_rcv
->>      __netif_receive_skb_one_core       netlink_rcv_skb
->>      NF_HOOK                            genl_rcv_msg
->>      ip_local_deliver_finish            genl_family_rcv_msg
->>      ip_protocol_deliver_rcu            genl_family_rcv_msg_doit
->>      tcp_v4_rcv                         mptcp_pm_nl_flush_addrs_doit
->>      tcp_v4_do_rcv                      mptcp_nl_remove_addrs_list
->>      tcp_rcv_established                mptcp_pm_remove_addrs_and_subflows
->>      tcp_data_queue                     remove_anno_list_by_saddr
->>      mptcp_incoming_options             mptcp_pm_del_add_timer
->>      mptcp_pm_del_add_timer             kfree(entry)
->>
->> In remove_anno_list_by_saddr(running on CPU2), after leaving the critical
->> zone protected by "pm.lock", the entry will be released, which leads to the
->> occurrence of uaf in the mptcp_pm_del_add_timer(running on CPU1).
->>
->> Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
->> Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
->
->Please add a Fixes tag and Cc stable.
->
->And add 'net' after PATCH in the subject:
-Got it, I have added them in V3 patch.
->
->  [PATCH net v3]
->
->> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
->> ---
->>  net/mptcp/pm_netlink.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
->> index 3e4ad801786f..d4cbf7dcf983 100644
->> --- a/net/mptcp/pm_netlink.c
->> +++ b/net/mptcp/pm_netlink.c
->> @@ -1430,8 +1430,10 @@ static bool remove_anno_list_by_saddr(struct mptcp_sock *msk,
->>
->>  	entry = mptcp_pm_del_add_timer(msk, addr, false);
->>  	if (entry) {
->> +		spin_lock_bh(&msk->pm.lock);
->>  		list_del(&entry->list);
->>  		kfree(entry);
->> +		spin_unlock_bh(&msk->pm.lock);
->
->Mmh, I can understand it would help to reduce issues here, but I don't
->think that's enough: in mptcp_pm_del_add_timer(), CPU1 can get the entry
->from the list under the lock, then immediately after, the free can
->happen on CPU2, while CPU1 is trying to access entry->add_timer outside
->the lock, no? Something like this:
->
->  CPU1              CPU2
->  ====              ====
->  entry = (...)
->                    kfree(entry)
->  entry->add_timer
->
->
->What about keeping a reference to add_timer inside the lock, and calling
->sk_stop_timer_sync() with this reference, instead of "entry->add_timer"?
->I'm thinking about something like that to be applied *on top* of your
->patch, WDYT?
-I strongly agree. This can avoid accessing the entry outside the lock.
-I have integrated your code to my patch.
+> +	/* Get 200 SQI raw readings */
+> +	for (int i = 0; i < 200; i++) {
 
-BR,
-Edward
+Please replace all the hard coded 200 with ARRAY_SIZE(rawtable). That
+makes it easier to tune the size of the table without causing buffer
+overrun bugs.
 
+> +		rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> +				   LAN887X_POKE_PEEK_100,
+> +				   LAN887X_POKE_PEEK_100_EN);
+> +		if (rc < 0)
+> +			return rc;
+> +
+> +		rc = phy_read_mmd(phydev, MDIO_MMD_VEND1,
+> +				  LAN887X_SQI_MSE_100);
+> +		if (rc < 0)
+> +			return rc;
+> +
+> +		rawtable[i] = rc;
+> +		rc = genphy_c45_read_link(phydev);
+> +		if (rc < 0)
+> +			return rc;
+> +
+> +		if (!phydev->link)
+> +			return -ENETDOWN;
+> +	}
+
+How long does this take?
+
+genphy_c45_read_link() takes a few MDIO transaction, plus the two you
+see here. So maybe 1000 MDIO bus transactions? Which could be
+3000-4000 if it needs to use C45 over C22.
+
+Do you have any data on the accuracy, with say 10, 20, 40, 80, 160
+samples?
+
+Can the genphy_c45_read_link() be moved out of the loop? If the link
+is lost, is the sample totally random, or does it have a well defined
+value? Looking at the link status every iteration, rather than before
+and after collecting the samples, you are trying to protect against
+the link going down and back up again. If it is taking a couple of
+seconds to collect all the samples, i suppose that is possible, but if
+its 50ms, do you really have to worry?
+
+> +static int lan887x_get_sqi(struct phy_device *phydev)
+> +{
+> +	int rc, val;
+> +
+> +	if (phydev->speed != SPEED_1000 &&
+> +	    phydev->speed != SPEED_100) {
+> +		return -EINVAL;
+> +	}
+
+Can that happen? Does the PHY support SPEED_10? Or are you trying to
+protect against SPEED_UNKOWN because the link is down? ENETDOWN might
+be more appropriate that EINVAL.
+
+	Andrew
 
