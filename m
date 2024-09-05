@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-125682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125683-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FAA196E3CD
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 22:16:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A1996E3CF
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 22:16:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DC971C22DF9
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:16:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 015EDB256B8
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 174D41AB514;
-	Thu,  5 Sep 2024 20:15:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3253B1AED21;
+	Thu,  5 Sep 2024 20:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YNVZg409"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LorUjlkg"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950361A705C;
-	Thu,  5 Sep 2024 20:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52441A76B0;
+	Thu,  5 Sep 2024 20:15:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725567318; cv=none; b=OLatSV2Vcqf/QYYNo+tQBkncBm034ZlHtjoHRVcAIrfukxtm6kIb4fLrYU+djMaqlF8baq+FJ/eIpBjJfcqUGyjH45P2M5M+xE2X//H9e+edqWiSXhfhp3nS1EanGcYcMJzfazvSApFa7LiXppKGKQO2u/VnV+k6dlXbf9wXb1M=
+	t=1725567319; cv=none; b=D4FnGUkpFkxCChNslkU7aVENBfgYyMuguC0nax2XHFpLweSAInqLiGH9iDauJ2b1J95rW2XkwsDeFkSb0krCyuc+dFWQ5Fra4eJGjJlXcnH/ISVKrCkRiH1wUp2pdIbpnlLwRnmdDDFnLuZlA+RluM3+Y7+NyUVdTm6LLEcPqGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725567318; c=relaxed/simple;
-	bh=bSRHX1yZKX1Frj3AlhJcHG5pMJsG9aGMAJKiYvacp/U=;
+	s=arc-20240116; t=1725567319; c=relaxed/simple;
+	bh=GkYv+8kiWtz4hwfxKF8OeLtk5p6hspiOWUildlsVxtg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hDsuzhh/zn/Zo5Fjbx2CJ144SldcagUGArquoZSY55+6f+GwCOctXb3CYc9T2/0IaXbXVeWUP3D9ieyJ+8sfoxX0SSjFVX3Ta9gXiWc4wWV6/9+B9OynM1lEm0Ia5fR0IBlf3I8GZ3z1aihxJP7rtKRwbUBHgcjxrjSXIa0y2wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YNVZg409; arc=none smtp.client-ip=209.85.214.180
+	 MIME-Version; b=VLijRvC8XYKeJeIFLXa9ZHgr6PJrtLosSAnQIaDO+RbnWL/oXvVy0zZqfUy96x0x71CS4+2qya9aQxUvX/M+7fA3B7nV+njI+/QqGncn8/edZx+GrqqQOXlHYaz+UnvfJjYNSj7gu5R8AZLocSvEgN+tHc117zhzLkVpLuNeMQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LorUjlkg; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2057835395aso12189995ad.3;
-        Thu, 05 Sep 2024 13:15:16 -0700 (PDT)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2055a3f80a4so10282045ad.2;
+        Thu, 05 Sep 2024 13:15:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725567316; x=1726172116; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725567317; x=1726172117; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T3chJ1T19SwdPfSH8SDlP3tp4ORmuKyqtDERErOcPO0=;
-        b=YNVZg4098L9Eey0lBfqyyBJxy3o6mpno9zcEksHqqMECwvo6xnG9s8UuvswIESTz+d
-         8N5dLfDEV4OSlzAqX5zEahYN9ApniHJD6WJxgk6G0rqU3lBBUf6QmVNkoP/oUzpJXngg
-         qxg61JrWn8eUSmeIN0FyDkkKUGhJtk7pMgjevDtP/+XAVxKMM1O+r2jaK/7OrvRmn0/7
-         jsBV1s0yV2S+tiCYIUqUJ2zAuU4XnE+ZmJ4mqGrE/LX2M4+SDJUFVAuDBVTdsn2hqgh2
-         toRa9vCcc7XJncj6xcTk6AgqMVNk1AbyrjzINXfuAJ4Q79KzM50Rzeh17y3hdxC10F1F
-         HWRQ==
+        bh=TPUULAONt1B1RbSQ7p1WxcMQIgouuFPwD4mGeO5shkE=;
+        b=LorUjlkgVGFM4gu/6aCC2MuUX4arggVySPpR56KTKaGd2mzTUJy8mAjx0YgAma9s3Q
+         rwnDPT8DUes3PrYXknv9sMbBbLpH9ug+5YswTuGFrhQF+lqggYV/fGqLwr0aaUuGblI2
+         FW0L8BItZanEHkgfADDT7i90Dl1Vr18rLgTHR3Rre5GUzNDBJz7dnCW9954iYvXAFon1
+         7eNG7jyWu9xIEoLq6AA6TNL8Q5rH1l480qyTPOaGw++uBirvJBGBb9gE+d5uU/dXIeZZ
+         1O0Yh5/X6l6VFLLUOrbBew1X5NiXaY+4ypeDbBTaV+zNAaN9RVvpyz/PeUJpRsXaXr5c
+         XCOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725567316; x=1726172116;
+        d=1e100.net; s=20230601; t=1725567317; x=1726172117;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=T3chJ1T19SwdPfSH8SDlP3tp4ORmuKyqtDERErOcPO0=;
-        b=KAwpTv9KGPLSSZ1951cX6DOVgjiZmUG5OauyPVq85mhrEtSMNoEmfBdsfCtosr8thk
-         Sln3B4woJgzbwI72o948e+MFiSYjcdah7EtOVh6d3RnAQ1vLoNUW6oDOVB37GRZpQOdS
-         Z5PylOGUP5ZytPFH05Jtks/0v/JzhZ1zxH8SnDr8lfgCf0zfZsqEk7zM9L5STtaIKqm1
-         B7WpcOzDNHOCHD1dQERygwhTdd868Xu78/PQibuyXoJvsqipdz2hoqAfsZQ1L/920j79
-         IKzst30xeTp6DE6dbTVQWy39ZwsqEP84tIuazRaL7lKU+tGEZEz9Nwq5cfsLhNotWxXP
-         fsFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXXEdLba0O2TOfPjGUWQaGkcyvZbWPKSF08bwHPXh5ZzsLejrTWAAScnqzXkRE1JwruzgDethMhmF8LuHI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNhKdK00q3VcyajG8ZcpgC5RtGkxvToITt1e2ctr7GaFT/4Di5
-	17OeeUUJ5vQ7iSgsu8Df8F5U0p/dEI34S0GSOuQ0BEcxUsHgPFW0FCgYnAgD
-X-Google-Smtp-Source: AGHT+IGJl+Qz+lHLDCHKPe3TKyeEXSQxX/l87XQswQctAW/TH3pYCn3NXMantg917U1RmkuX9eHhwg==
-X-Received: by 2002:a17:902:cecc:b0:205:7863:2dec with SMTP id d9443c01a7336-20578633103mr180415005ad.27.1725567315706;
-        Thu, 05 Sep 2024 13:15:15 -0700 (PDT)
+        bh=TPUULAONt1B1RbSQ7p1WxcMQIgouuFPwD4mGeO5shkE=;
+        b=PvxNyWov0oLHhZOTRK0+GywgpKFU6LtvuDpl02NvUxFwwLdCVN9jjvEvYa4ph5/NeU
+         40l1f3ugFrUUCn6p19dCoieKldRCSaZNFW71Oonmpa7NJkHVTx8VUz8IjbdDkoJpnLMV
+         sDPm938YXUb5c5w/IO8TesjMC4ZM8vPqLT9zps3oeJDwHSP70jahVN7hXXQ+mr+16HxD
+         PwhJJaYJoz5Pqao9W88Vg6AHo3WjWDH68sM0069LkhiXfQ9W3D+Caao+zOK0oeLkEq1t
+         sInPLWnqhKKvAuueb9I3LUi/Zy2JDugtgQPOyxWmRBzXhc9tJgVJ28/YwCv4Ro0QQeBi
+         X8fw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+y4x/Zg15hB5sgA1fe2RW06ZlWqrUUSWm7PJT9mAcLIw8YctCv0JxiJcKmyf/Jmiu/6K6bxQbOsiosxg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHvJlUi0acj9ZVbbVHiBt6D85DLChjjP6VTXn0ZilKfrY4N5F3
+	TwzkYrF4lHNJEQsE4XhsdAi2V1PTDSfLMkPMff0+WH2DuflkRq9QS27xRub4
+X-Google-Smtp-Source: AGHT+IEc5FimREygWoBU81L3wvd9dFLgOOYGMDyFc67p1PK+yN7KgP9RKw1M2Thdxcwe9Ihgv+eTfQ==
+X-Received: by 2002:a17:903:1c5:b0:205:8b9e:964b with SMTP id d9443c01a7336-206f0612c09mr2265135ad.39.1725567317022;
+        Thu, 05 Sep 2024 13:15:17 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea68565sm32327075ad.294.2024.09.05.13.15.14
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea68565sm32327075ad.294.2024.09.05.13.15.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 13:15:15 -0700 (PDT)
+        Thu, 05 Sep 2024 13:15:16 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -78,9 +78,9 @@ Cc: davem@davemloft.net,
 	horms@kernel.org,
 	sd@queasysnail.net,
 	chunkeey@gmail.com
-Subject: [PATCHv3 net-next 4/9] net: ibm: emac: remove mii_bus with devm
-Date: Thu,  5 Sep 2024 13:15:01 -0700
-Message-ID: <20240905201506.12679-5-rosenp@gmail.com>
+Subject: [PATCHv3 net-next 5/9] net: ibm: emac: use devm for register_netdev
+Date: Thu,  5 Sep 2024 13:15:02 -0700
+Message-ID: <20240905201506.12679-6-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240905201506.12679-1-rosenp@gmail.com>
 References: <20240905201506.12679-1-rosenp@gmail.com>
@@ -92,106 +92,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Switching to devm management of mii_bus allows to remove
-mdiobus_unregister calls and thus avoids needing a mii_bus global struct
-member.
+Cleans it up automatically. No need to handle manually.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/core.c | 32 +++++++++++-----------------
- drivers/net/ethernet/ibm/emac/core.h |  1 -
- 2 files changed, 13 insertions(+), 20 deletions(-)
+ drivers/net/ethernet/ibm/emac/core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index 459f893a0a56..66e8be73e09b 100644
+index 66e8be73e09b..e2abda947a51 100644
 --- a/drivers/net/ethernet/ibm/emac/core.c
 +++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -2581,6 +2581,7 @@ static const struct mii_phy_ops emac_dt_mdio_phy_ops = {
- static int emac_dt_mdio_probe(struct emac_instance *dev)
- {
- 	struct device_node *mii_np;
-+	struct mii_bus *bus;
- 	int res;
+@@ -3179,7 +3179,7 @@ static int emac_probe(struct platform_device *ofdev)
  
- 	mii_np = of_get_child_by_name(dev->ofdev->dev.of_node, "mdio");
-@@ -2594,23 +2595,23 @@ static int emac_dt_mdio_probe(struct emac_instance *dev)
- 		goto put_node;
- 	}
+ 	netif_carrier_off(ndev);
  
--	dev->mii_bus = devm_mdiobus_alloc(&dev->ofdev->dev);
--	if (!dev->mii_bus) {
-+	bus = devm_mdiobus_alloc(&dev->ofdev->dev);
-+	if (!bus) {
- 		res = -ENOMEM;
- 		goto put_node;
- 	}
+-	err = register_netdev(ndev);
++	err = devm_register_netdev(&ofdev->dev, ndev);
+ 	if (err) {
+ 		printk(KERN_ERR "%pOF: failed to register net device (%d)!\n",
+ 		       np, err);
+@@ -3245,8 +3245,6 @@ static void emac_remove(struct platform_device *ofdev)
  
--	dev->mii_bus->priv = dev->ndev;
--	dev->mii_bus->parent = dev->ndev->dev.parent;
--	dev->mii_bus->name = "emac_mdio";
--	dev->mii_bus->read = &emac_mii_bus_read;
--	dev->mii_bus->write = &emac_mii_bus_write;
--	dev->mii_bus->reset = &emac_mii_bus_reset;
--	snprintf(dev->mii_bus->id, MII_BUS_ID_SIZE, "%s", dev->ofdev->name);
--	res = of_mdiobus_register(dev->mii_bus, mii_np);
-+	bus->priv = dev->ndev;
-+	bus->parent = dev->ndev->dev.parent;
-+	bus->name = "emac_mdio";
-+	bus->read = &emac_mii_bus_read;
-+	bus->write = &emac_mii_bus_write;
-+	bus->reset = &emac_mii_bus_reset;
-+	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev->ofdev->name);
-+	res = devm_of_mdiobus_register(&dev->ofdev->dev, bus, mii_np);
- 	if (res) {
- 		dev_err(&dev->ofdev->dev, "cannot register MDIO bus %s (%d)",
--			dev->mii_bus->name, res);
-+			bus->name, res);
- 	}
+ 	DBG(dev, "remove" NL);
  
-  put_node:
-@@ -2656,8 +2657,6 @@ static int emac_dt_phy_probe(struct emac_instance *dev)
- 		res = emac_dt_mdio_probe(dev);
- 		if (!res) {
- 			res = emac_dt_phy_connect(dev, phy_handle);
--			if (res)
--				mdiobus_unregister(dev->mii_bus);
- 		}
- 	}
- 
-@@ -2697,10 +2696,8 @@ static int emac_init_phy(struct emac_instance *dev)
- 
- 			res = of_phy_register_fixed_link(np);
- 			dev->phy_dev = of_phy_find_device(np);
--			if (res || !dev->phy_dev) {
--				mdiobus_unregister(dev->mii_bus);
-+			if (res || !dev->phy_dev)
- 				return res ? res : -EINVAL;
--			}
- 			emac_adjust_link(dev->ndev);
- 			put_device(&dev->phy_dev->mdio.dev);
- 		}
-@@ -3262,9 +3259,6 @@ static void emac_remove(struct platform_device *ofdev)
- 	if (dev->phy_dev)
- 		phy_disconnect(dev->phy_dev);
- 
--	if (dev->mii_bus)
--		mdiobus_unregister(dev->mii_bus);
+-	unregister_netdev(dev->ndev);
 -
- 	busy_phy_map &= ~(1 << dev->phy.address);
- 	DBG(dev, "busy_phy_map now %#x" NL, busy_phy_map);
+ 	cancel_work_sync(&dev->reset_work);
  
-diff --git a/drivers/net/ethernet/ibm/emac/core.h b/drivers/net/ethernet/ibm/emac/core.h
-index 295516b07662..f4bd4cd8ac4a 100644
---- a/drivers/net/ethernet/ibm/emac/core.h
-+++ b/drivers/net/ethernet/ibm/emac/core.h
-@@ -189,7 +189,6 @@ struct emac_instance {
- 	struct mutex			mdio_lock;
- 
- 	/* Device-tree based phy configuration */
--	struct mii_bus			*mii_bus;
- 	struct phy_device		*phy_dev;
- 
- 	/* ZMII infos if any */
+ 	if (emac_has_feature(dev, EMAC_FTR_HAS_TAH))
 -- 
 2.46.0
 
