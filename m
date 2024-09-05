@@ -1,50 +1,75 @@
-Return-Path: <netdev+bounces-125690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7E596E3F1
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 22:20:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3DCC96E42B
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 22:35:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAC0D1F21FDA
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 754501F237DD
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 20:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1E818A6B0;
-	Thu,  5 Sep 2024 20:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7E9193434;
+	Thu,  5 Sep 2024 20:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WXtwAExf"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="fXiZzQEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92C63D6D;
-	Thu,  5 Sep 2024 20:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548F617741;
+	Thu,  5 Sep 2024 20:35:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725567633; cv=none; b=IOo8rQvJGuJMPL5JvR+8m1rEtlmP1HgaWNJGqKwKhx6P8UX9xGVXuG8NSXhelUnbEtFnn5/UQwb7nM5EjphcxeX1ncF1OFMc5LDiPOVyN37KB22kJkNt0HlrJPV5JyFhg0bQyqQs5oZ/N5rHC4VwL4IBjhSd8UM8DWPkmDcjVw4=
+	t=1725568544; cv=none; b=f3ik9cFH78Y2JNHFyZdXF7rtehwVxKV1Eo0sUheJcvZW4SC+GTzrAH0ACtELqU2zLOpXJHVkLX/YBBXbXg1OqiaViNboyaxXB5XbPwCId9lMyBoy5E5jTDuJHgyKGOmNUHJ/A18ufpYSh5XYxGf0lxMqcKbTuX937/nfQLQAcrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725567633; c=relaxed/simple;
-	bh=WNTKcbBoP3yzp4k548lRNhojlPboqlXEMOGGTo3NcgQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DiXxtofrNhZL4dPRbnHSC6LzwSDHrAoUii0s5aA9x3MG7iCDaQNR8AjA3cWCPB6DNQrRAtbJO8kLdVqFCiYxVJv15c7bnQb3sPShtTmq+qhyOA0qilVVPGT/BAqJjup+KNjR0slImyTcVYGbZs/i5sZ4apYWdQzBN9I/hQDtL6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WXtwAExf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 674DDC4CEC3;
-	Thu,  5 Sep 2024 20:20:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725567632;
-	bh=WNTKcbBoP3yzp4k548lRNhojlPboqlXEMOGGTo3NcgQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WXtwAExfJEeJNm1MsUalbDl2XLmIPmnUcG4E5rZok3mplUU8MpDwZBrC1kr+7fQ+1
-	 lo1CwP0DJE/qJy3AiwsE+qlusFQ+kBZxjRAqTpD3smQEYs5iy+XH9zxuiFKPqJ69m/
-	 f3eMqoq9QmnAYg0hD/v1BT2t31YYDKZkLWI6jbyHAM4ydwVp4gDolxFtgRN/ms/hag
-	 XnTn+o2TXtv3023EBMTElGS2uZ4ioQsU2+1rRRMj6huHJtE4/qSS6bxeThmXNFrBk0
-	 PEz96UduTGJ26munzXiQr7pZfS0vPkvWcIjvpJ4l8hqJZfVNwU2lZUHX+rW+A9H2yF
-	 31K9oTivEiD7A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71E883806654;
-	Thu,  5 Sep 2024 20:20:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725568544; c=relaxed/simple;
+	bh=V9zzLGI0CJoWL/TyWGq3XKvRDTDaJlt9oN84ZvdjKdU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AH2DtP+yjfgiOSqcHI0HFJCIjnyz/ixZSsK211iHiDDGg0AmzVpo5zJNTNKBLix7GSeLqs02kdZ5w3J0Ja7mJKxp2x+8xEkMWqUuV+MI8nVSoT4be5dwz5TlKj6rxrM1CxEhgDDgjg7g0aViYVrEsr1MihYf6knHlMhN6boiudc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=fXiZzQEy; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1725568544; x=1757104544;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9iUGMUA7J3qICfhohJxC0ebd8fD9piK6yrYaWXX289k=;
+  b=fXiZzQEyDn7s/WG6Bus4+Yf5lHgCST+84Vwjcdqdx1n6heQy8BrDRwbf
+   A42kIpyw1OFQK5V8rQGzV9QXYHyMAjdXnHfQz8APuolJPfOiYUiizE6c+
+   i1mNfLzWHhlDHmC+R+27+hlyE/n6T4dCNRAbdaa+wd8Yxh2hlFWANiebZ
+   M=;
+X-IronPort-AV: E=Sophos;i="6.10,205,1719878400"; 
+   d="scan'208";a="757063664"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Sep 2024 20:35:38 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:14282]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.11.90:2525] with esmtp (Farcaster)
+ id c55b94cc-da0e-4245-9cb1-625bfa867e0e; Thu, 5 Sep 2024 20:35:37 +0000 (UTC)
+X-Farcaster-Flow-ID: c55b94cc-da0e-4245-9cb1-625bfa867e0e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 5 Sep 2024 20:35:37 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.51) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Thu, 5 Sep 2024 20:35:34 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <rao.shoaib@oracle.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in unix_stream_read_actor (2)
+Date: Thu, 5 Sep 2024 13:35:25 -0700
+Message-ID: <20240905203525.26121-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <e500b808-d0a6-4517-a4ae-c5c31f466115@oracle.com>
+References: <e500b808-d0a6-4517-a4ae-c5c31f466115@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,62 +77,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v3 00/10] Local vmtest enhancement and RV64 enabled
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172556763330.1833779.11043836271169244932.git-patchwork-notify@kernel.org>
-Date: Thu, 05 Sep 2024 20:20:33 +0000
-References: <20240905081401.1894789-1-pulehui@huaweicloud.com>
-In-Reply-To: <20240905081401.1894789-1-pulehui@huaweicloud.com>
-To: Pu Lehui <pulehui@huaweicloud.com>
-Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
- netdev@vger.kernel.org, andrii@kernel.org, eddyz87@gmail.com, mykolal@fb.com,
- bjorn@kernel.org, puranjay@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, palmer@dabbelt.com, pulehui@huawei.com
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWA002.ant.amazon.com (10.13.139.81) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
-
-On Thu,  5 Sep 2024 08:13:51 +0000 you wrote:
-> Patch 1-3 fix some problem about bpf selftests. Patch 4 add local rootfs
-> image support for vmtest. Patch 5 enable cross-platform testing for
-> vmtest. Patch 6-10 enable vmtest on RV64.
+From: Shoaib Rao <rao.shoaib@oracle.com>
+Date: Thu, 5 Sep 2024 13:15:18 -0700
+> On 9/5/2024 12:46 PM, Kuniyuki Iwashima wrote:
+> > From: Shoaib Rao <rao.shoaib@oracle.com>
+> > Date: Thu, 5 Sep 2024 00:35:35 -0700
+> >> Hi All,
+> >>
+> >> I am not able to reproduce the issue. I have run the C program at least
+> >> 100 times in a loop. In the I do get an EFAULT, not sure if that is
+> >> intentional or not but no panic. Should I be doing something
+> >> differently? The kernel version I am using is
+> >> v6.11-rc6-70-gc763c4339688. Later I can try with the exact version.
+> > The -EFAULT is the bug meaning that we were trying to read an consumed skb.
+> >
+> > But the first bug is in recvfrom() that shouldn't be able to read OOB skb
+> > without MSG_OOB, which doesn't clear unix_sk(sk)->oob_skb, and later
+> > something bad happens.
+> >
+> >    socketpair(AF_UNIX, SOCK_STREAM, 0, [3, 4]) = 0
+> >    sendmsg(4, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\333", iov_len=1}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_OOB|MSG_DONTWAIT) = 1
+> >    recvmsg(3, {msg_name=NULL, msg_namelen=0, msg_iov=NULL, msg_iovlen=0, msg_controllen=0, msg_flags=MSG_OOB}, MSG_OOB|MSG_WAITFORONE) = 1
+> >    sendmsg(4, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\21", iov_len=1}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_OOB|MSG_NOSIGNAL|MSG_MORE) = 1
+> >> recvfrom(3, "\21", 125, MSG_DONTROUTE|MSG_TRUNC|MSG_DONTWAIT, NULL, NULL) = 1
+> >    recvmsg(3, {msg_namelen=0}, MSG_OOB|MSG_ERRQUEUE) = -1 EFAULT (Bad address)
+> >
+> > I posted a fix officially:
+> > https://urldefense.com/v3/__https://lore.kernel.org/netdev/20240905193240.17565-5-kuniyu@amazon.com/__;!!ACWV5N9M2RV99hQ!IJeFvLdaXIRN2ABsMFVaKOEjI3oZb2kUr6ld6ZRJCPAVum4vuyyYwUP6_5ZH9mGZiJDn6vrbxBAOqYI$
 > 
-> We can now perform cross platform testing for riscv64 bpf using the
-> following command:
-> 
-> [...]
+> Thanks that is great. Isn't EFAULT,  normally indicative of an issue 
+> with the user provided address of the buffer, not the kernel buffer.
 
-Here is the summary with links:
-  - [bpf-next,v3,01/10] selftests/bpf: Adapt OUTPUT appending logic to lower versions of Make
-    https://git.kernel.org/bpf/bpf-next/c/dc3a8804d790
-  - [bpf-next,v3,02/10] selftests/bpf: Rename fallback in bpf_dctcp to avoid naming conflict
-    https://git.kernel.org/bpf/bpf-next/c/a48a43884cdd
-  - [bpf-next,v3,03/10] selftests/bpf: Prefer static linking for LLVM libraries
-    https://git.kernel.org/bpf/bpf-next/c/67ab80a01886
-  - [bpf-next,v3,04/10] selftests/bpf: Limit URLS parsing logic to actual scope in vmtest
-    https://git.kernel.org/bpf/bpf-next/c/0c3fc330be6d
-  - [bpf-next,v3,05/10] selftests/bpf: Support local rootfs image for vmtest
-    https://git.kernel.org/bpf/bpf-next/c/2294073dce32
-  - [bpf-next,v3,06/10] selftests/bpf: Enable cross platform testing for vmtest
-    https://git.kernel.org/bpf/bpf-next/c/d95d56519026
-  - [bpf-next,v3,07/10] selftests/bpf: Add config.riscv64
-    https://git.kernel.org/bpf/bpf-next/c/897b3680484b
-  - [bpf-next,v3,08/10] selftests/bpf: Add DENYLIST.riscv64
-    https://git.kernel.org/bpf/bpf-next/c/c402cb85802f
-  - [bpf-next,v3,09/10] selftests/bpf: Add riscv64 configurations to local vmtest
-    https://git.kernel.org/bpf/bpf-next/c/b2bc9d505499
-  - [bpf-next,v3,10/10] selftests/bpf: Add description for running vmtest on RV64
-    https://git.kernel.org/bpf/bpf-next/c/95b1c5d17832
+Normally, it's used when copy_to_user() or copy_from_user() or
+something similar failed.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+But this time, if you turn KASAN off, you'll see the last recvmsg()
+returns 1-byte garbage instead of -EFAULT, so actually KASAN worked
+on your host, I guess.
 
