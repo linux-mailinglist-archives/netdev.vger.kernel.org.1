@@ -1,123 +1,109 @@
-Return-Path: <netdev+bounces-125548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71DF296DA84
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:38:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 950F996DA85
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 15:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5F95B207B1
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:38:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FC00287EF4
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 13:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A7B19925B;
-	Thu,  5 Sep 2024 13:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0F019D06A;
+	Thu,  5 Sep 2024 13:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lMHSmfyI"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="B25Swccq";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NfgLiQgF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF121E487;
-	Thu,  5 Sep 2024 13:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D981919CCEC
+	for <netdev@vger.kernel.org>; Thu,  5 Sep 2024 13:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725543531; cv=none; b=iGKsSTVMpbPDpn3QxXlbRpitucI1yku/7ciIuMOuglklJQFT0u2nZ7qeBpvSDRNHqFi63QkNa70XCHrRGFz3WSlVLlMvGFWYEebMtTf2voKspbAv2p3bxujS+xvCIMfwc3LxC9QnRPx4Hv3ABvzlFvtrOf79gQXFc6cZbfFcChg=
+	t=1725543613; cv=none; b=ovBxMwJuc7enVhptxd/cmiswx+TDU3qnzUv4U8n68Pw6TZ4YJDehZkFBo7dlDqdbTo2P+Y+/4z+iHlJ7RLVH6dXLixrlLsbn6glnGEvSf4VowbrBdSa2jdjIVIbPEmP/OT+nNgZqiaKlWjQO9JdQ4epugK2Db6BSGsz/WuEnQRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725543531; c=relaxed/simple;
-	bh=NLI4YXBOvKNdOh0CHIhsEHoTRJKK1WBg8REqep/zUvI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=sk4RbokZDoT+o760UjmlcG8FpUeDH84CJw6PZpFgcB9w2Kjw0vWf1aKOPuhQs3ZSPS1W6yTOSWYo9HTu0tz8+XFVF+qtboQqpd05yo4APApxnZOX+g6m/D77X3M0cT4xhnXdOM/zckJ5Sy4AE+GNYJ7D/ncyb+6qf05MlfpZBNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lMHSmfyI; arc=none smtp.client-ip=209.85.222.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7a7fef9a5fdso78176585a.1;
-        Thu, 05 Sep 2024 06:38:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725543529; x=1726148329; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xjhSxFYCkr8rnda0l2t/cT0nS4CMqkRkbRMVRHs+lTY=;
-        b=lMHSmfyID9mTKZLfBoTkugtgxK0UyQhuI8JD8l6oEqN71C3E+Okc0dONaGsPBrzS8P
-         mnh6vubY5QNwPiR40b3jsT+o9fh5gbA7J2owxyq+M/eRn0CJ/89IZOTlQSBjIe9uPILD
-         bNX5i2OGtuw28ZG5v4xVl3m1jzUO/XCg+l/POrQXzo+ukCsMvUj6ivZJewWY8eb/6F23
-         mBDN4NmLwElaYKrtTDr82BRkL0T9L/oKCOLDzEx0XTB/yhPaI04cw0bmmZmH2484wOHP
-         ExZe1l9uwQyrI7MuKYV516N+NtVuvrniljHHbMQAsIdApEfpGv2xEbWW9WaEcGKMGiQz
-         gY6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725543529; x=1726148329;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xjhSxFYCkr8rnda0l2t/cT0nS4CMqkRkbRMVRHs+lTY=;
-        b=LLJwZZSrbTco2OWcYLq57e0ykEEifmIVxe5ea9XNJGo2aRo+JOO0G3h0h1TMiVnpID
-         QjMaLjhf0ktnD+TX5soACCJN82hKm1BBiAvEMP0iHRS1gx+WnrcbWn8yqKDLs35e3r/V
-         8CMWShYQSPbD3alvnVVWL8hRaO2q4UW/iezDkaCyathGjDijmSNE9hv4NllaYRQpck4a
-         De6AoM1dCFDS2PBEadD+y0nKkSTxuj9rQ55USnsv/g59c+gn3d0u2J4CdAI1hNZeEftj
-         rA1U8YmFLt9+vqOcBRGPGyc5vbebEb/R+apDneOtpfRuuL61w0oWkbNG5JrRNRxXurSA
-         l5XQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWKwIk5Jgcg/LyD2+65ivdNrveqclM6Aeil49xoY+LfjS07k6v0siHN22OH2j4sn4U9ShnN+6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxdc72bccdcSAd2iNwarxYvLyV+ghwRhp/diLXHfnmbCL3aeRnf
-	x4qy2beALOUfnwxotKfpruEZPauJlrwYXAy3VrMYBzDUX4vw5SJm
-X-Google-Smtp-Source: AGHT+IErV/ynmOl+/W3l4qa0XC5MadoX05dBge7jLjTwMl/XLffZ+Pke9+NZaWhOWrQwr61lK0eLnw==
-X-Received: by 2002:a05:620a:190f:b0:79f:4c8:d873 with SMTP id af79cd13be357-7a9888e5bb8mr1046040285a.28.1725543528733;
-        Thu, 05 Sep 2024 06:38:48 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a98ef1e6efsm75907385a.23.2024.09.05.06.38.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 06:38:48 -0700 (PDT)
-Date: Thu, 05 Sep 2024 09:38:47 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- shuah@kernel.org, 
- willemb@google.com
-Cc: linux-kselftest@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <66d9b467d02d3_18ac2129427@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240905071738.3725-3-kerneljasonxing@gmail.com>
-References: <20240905071738.3725-1-kerneljasonxing@gmail.com>
- <20240905071738.3725-3-kerneljasonxing@gmail.com>
-Subject: Re: [PATCH net-next v4 2/4] net-timestamp: correct the use of
- SOF_TIMESTAMPING_RAW_HARDWARE
+	s=arc-20240116; t=1725543613; c=relaxed/simple;
+	bh=OmmJ9JFZiqta7WLJpB+r53jvf5wwJAknuwo9ggHK0ao=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X31Nwi7hO94JanMd3wGqAzAeSc/LGYUmQfkW5N5i1t3PJ8VKs4yG3MMMol5FEy0r5FeRZX/sjWiccFhDrjpqewrprLSOIpGH8S3UVu+eNGdZ9X47koBIwyekmwQqhMUMd2wq6NSpyaIIPE6/Fmr5OdSQgiV/LbXFT9iUSTn0XVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=B25Swccq; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NfgLiQgF; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 5 Sep 2024 15:40:08 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1725543610;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZNGQeWIGBmbvRbhDVFGOBUUnKfrBupC2AvgQtk4aaLo=;
+	b=B25SwccqwcpboeyvZPCVwxMP8XbKavk5MeVCiVNkdP8JlwDbFBEg6fojY466z3bRGJAeum
+	FooZ7W4XSGtYXJXYh+DSEaip0qDejRQC9gtK3eDfnmcX7JTk9VMn38eyDZwM+HAknc0f8e
+	8YMz4bH5UkDdm8ZWr85c/bC4eJXx9eFkoGvP850h2aOzOR5El1UxqItfwdQrawmvCOyyfG
+	FjGqDSlY2JWFROIdL7Fg4qMOQ18TXaPVC9rX3bN3jIxtKpIfvfnKzOlkl/9k1jKYgK4Nub
+	KHzSxZYvTDbuIiwsZYTp5tYmi8u9Nso/wJTej7MwBWZFZXdx2rv+XGtKhRyPUQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1725543610;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZNGQeWIGBmbvRbhDVFGOBUUnKfrBupC2AvgQtk4aaLo=;
+	b=NfgLiQgF1tLY0CLcuLGvhG2rn5rd73LI6scwBsgYjE782mKTgwtO3YfWW6/vP+nN4BYIXg
+	5BVWrf9FFc0JS6DA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net] net: hsr: remove seqnr_lock
+Message-ID: <20240905134008._e6BGgni@linutronix.de>
+References: <20240904133725.1073963-1-edumazet@google.com>
+ <20240905121701.mSxilT-9@linutronix.de>
+ <CANn89i+K8SSmsnzVQB8D_cKNk1p_WLwxipUjGT0C6YU+G+5mbw@mail.gmail.com>
+ <20240905131831.LI9rTYTd@linutronix.de>
+ <CANn89iLQxH0H_cPcZnxO9ni73ncmbbhx3knzRB2swTsx=J-Fmg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CANn89iLQxH0H_cPcZnxO9ni73ncmbbhx3knzRB2swTsx=J-Fmg@mail.gmail.com>
 
-Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On 2024-09-05 15:26:27 [+0200], Eric Dumazet wrote:
+> diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+> index af6cf64a00e081c777db5f7786e8a27ea6f62e14..3971dbc0644ab8d32c04c262dbba7b1c950ebea9
+> 100644
+> --- a/net/hsr/hsr_slave.c
+> +++ b/net/hsr/hsr_slave.c
+> @@ -67,7 +67,9 @@ static rx_handler_result_t hsr_handle_frame(struct
+> sk_buff **pskb)
+>                 skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
+>         skb_reset_mac_len(skb);
 > 
-> SOF_TIMESTAMPING_RAW_HARDWARE is a report flag which passes the
-> timestamps generated by either SOF_TIMESTAMPING_TX_HARDWARE or
-> SOF_TIMESTAMPING_RX_HARDWARE to the userspace all the time.
+> +       spin_lock_bh(&hsr->seqnr_lock);
+>         hsr_forward_skb(skb, port);
+> +       spin_unlock_bh(&hsr->seqnr_lock);
 > 
-> So let us revise the doc here.
+>  finish_consume:
+>         return RX_HANDLER_CONSUMED;
 > 
-> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> 
+> I am surprised we even have a discussion considering HSR has Orphan
+> status in MAINTAINERS...
+> 
+> I do not know how to test HSR, I am not sure the alternative patch is correct.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+I did submit something to tests somewhere. I will try to test this and
+let you know.
 
-As an exception to the rule, as a one word fix, can be squashed into
-the feature patch, I think.
+> Removing the seqnr_lock seems the safest to me.
+Consider this as ack if you don't hear back from me.
 
-> ---
-> Link: https://lore.kernel.org/all/66d8c21d3042a_163d93294cb@willemb.c.googlers.com.notmuch/
-
-Please put these at the top of the Suggested-by/Signed-off-by/..-by
-block. Their more useful to future readers than to current followers
-of the mailing list.
+Sebastian
 
