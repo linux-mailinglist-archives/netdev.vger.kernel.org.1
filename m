@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-125669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E6AF96E378
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:50:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E377596E37A
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 21:50:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29CAB1F2734A
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:50:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12DA01C2457B
+	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 19:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E3E5199E9D;
-	Thu,  5 Sep 2024 19:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 797871A255F;
+	Thu,  5 Sep 2024 19:49:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HqvUs6+2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpBqYwjC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D263D18E772;
-	Thu,  5 Sep 2024 19:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1737D193434;
+	Thu,  5 Sep 2024 19:49:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725565784; cv=none; b=UZCCfE6STyg0zLNuUQGjYzSOiNdcDGu39h3rGPgbgIy+MImSr5SygPLjSdtvpBgCmTGPGXU16431UCe5EYhwD0olyypKkZdK+HgkBKhXlHhP9XciCkAI403jn9lm6LJuPyBqs/c16xRibSL/39jACNLyPVaZxdlej2v+5J/x8WM=
+	t=1725565785; cv=none; b=SxxM9WYvlDTa7AqVXIH0zJSxvGEgsv+5Nr8Q08ooqnPYcgrZU0juFRTV+ofd+qGqCfqLGKm1qenW+k4Ka7wuRcEWgoUsLL0PxFHjU0simeL/kls9rYoVt1FycPJWgHTdmaGH+/OLCl6Fg8T4srdvnp/Ko0NSIqyv4ykddmx44Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725565784; c=relaxed/simple;
-	bh=hAk9pXqkbo2o+5MhqRTmqI9f/rGaqlCpmFo3+Ai3ipQ=;
+	s=arc-20240116; t=1725565785; c=relaxed/simple;
+	bh=2e+zqLJChzoEk17K7RQCNuO6avikar5qyyl/r+8hbIo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UK5L2bpyJ5FX74309g9Sepyg4IFCTaw5qxmKyXlKr2wYfCaPoZwkwP1c6/VgsF4EDKEx6kQiLAeJqoiu94rEjJ15OcO4wAM3X0Wh1e6X5IRVFs4pC4jjyFVb5dzzOTaTMtkju5VwyIOVRZ8Ej0RI8sgG1Q3FNImdA2DVLB2nAEg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HqvUs6+2; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=EK/eilEy/KxyN/zMUuaFzmUYWkN6FmGr/GAn/JHrWqskw9O6rHuyGmq+dmi8ZCUETav6GyvRNjSV5m0H5JQJYLPEQCjYTElZQkrtDVNu9hwHdTG9x0n8RPJ4ZRzgMYxA2WbNoCct9iJhhUSWjx2cFQfOFwplsKm6rboJhu3acNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IpBqYwjC; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-71767ef16b3so800883b3a.0;
-        Thu, 05 Sep 2024 12:49:42 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-715cc93694fso1080190b3a.2;
+        Thu, 05 Sep 2024 12:49:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725565782; x=1726170582; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725565783; x=1726170583; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=LUmhuELtVNs0Uu50P1tyTkvo5EER/vEBydF2CtAxSf4=;
-        b=HqvUs6+24zJl65ciacOBoob9dVu425kwnZVSY7Gd3kyzAS2Etp235ikCGhr0TVwuLD
-         zOSLIzWyf4QS4BLk8IDS+oaQEzboNHBABa2q8jELiKTziM21yEUwhOlN3MT82kVIp/go
-         1DAFbS1eI9JJD60pDr3dBeUeXYBlwAvFjEQy7IBSr/v1F3KOpVJADP24DI9mgpvmhBU5
-         2n4wI8ltsBaqvafTguvuHkIeqNpBIsPYc6SuAVyP4ybpHDMDEuuf8F9lCjpg0UFeaJ4T
-         Nyhqs28r46oMgibY1Ai+f/LPnWP1QH5t0M4wjvYkHFz56RuBojjPWhiX1ufFAW2Kpq1j
-         OBMw==
+        bh=HDORespKQdD6y18i2/lwUAe4YrBswe868gOWj16POCs=;
+        b=IpBqYwjCQWqLfcLS0SfNT/p2v8qKnE4o42szUlDaoYAucKI4R1l5kO2lxMcS/tTQwn
+         5w/hpK4U+N7cgMxDbvSoDuuGaby6/HK+BrTbsA9Jq1c6jmLpPqnP9Thq9vXtF1IAjaxF
+         GAi8F0iecU7aiEd5kur/NtkAYK7d7b58/tS2P0S3gmvFhBkrgRjToQY14/36FrTZawEt
+         RKN2wa9bcnmR93v+62MufTStAZMDc67MPGgmhbcLrLKcXGMEvT+oyMwU4BZbmypW84Pj
+         0LvhmZspfVw92NlT0jUpf0Y9P5wglKPvjOG2w98RteIW4/NUwV0l1BB5UR7Dq6DclLGR
+         JE1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725565782; x=1726170582;
+        d=1e100.net; s=20230601; t=1725565783; x=1726170583;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LUmhuELtVNs0Uu50P1tyTkvo5EER/vEBydF2CtAxSf4=;
-        b=htNLLYLsyaW5XS68mfJKfJj8Z8vdeJvpbBSi9iokXUB7RIoV4l2yazpONO8B993sBQ
-         gi8EKJyhtlE1fpESi4I3OjDUDzENPFlSIfayGWOxGqnEUi4ZoB6r0mGBXcvkQJcRjSvC
-         QqFjN+XhZp6kdhQImz3FHizWAclD9QRp8+CmpQDJd473J99NRFPGQH/EjKXFeDN4R+YB
-         QcjZG7M12jaHvkx3c3X+vkC05kbZWpKMa38ueM7/uoxH2QVuoD0eE+XEvxxIk9cOFRI9
-         gFeSVVIRAiDjiAdbfqeXruYoSUfqMMMPtEW8krJ2ohlS2tPxv5Q26llq9uxo1mQ4i72K
-         WtuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX8xfdExe1T4iI2PfA6Boz4cvzJYTr3NCBTl30K+sHJpuisR3ZAlkYjisIYLmWxXT+0f3uGW/zWpQFOTRs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJoNnCBcaceZ4OqC8arNmDk93PMBGizRZJHkVJu79ZJBUydOkd
-	cx4+uK0TP0yFD+ZR4dP199X0L584+vzJXogN3txx4S70MAN5cH+haP0vE0ip
-X-Google-Smtp-Source: AGHT+IGU9F9j0MLcMSEyQw55on9GjRQS3pue9/pZJ9yl4bX73p7jFnMkyVCLZ0R3hVuYIJe1C65Sag==
-X-Received: by 2002:a05:6a00:1896:b0:706:284f:6a68 with SMTP id d2e1a72fcca58-718d5f0d28dmr288555b3a.23.1725565781839;
-        Thu, 05 Sep 2024 12:49:41 -0700 (PDT)
+        bh=HDORespKQdD6y18i2/lwUAe4YrBswe868gOWj16POCs=;
+        b=heBwjeHATjBR5cEAJtJ63ZmoJWHB4kp2GZURinEEkuy8Ddt8HlyUUyj0gvpgoEsfdt
+         9f8nQ21smR4CBo0wfjdMH/PtMei86HY3YRwXs6llzIjNPwfM16B/dZrVgTouSj356j+a
+         AY2BalZ8+sahg4jQn+BWSKNE2K08ygrZzZNRl5SI8SlKjdTOp2Z3Ll/YS71QwWXjSS8T
+         mikdPf9eQcjG0RaEEe6p6Ow6kr2voxPD47Yqm2kG6E9foCYH/1FMiz80Q/OoIiHLA4pS
+         18DK3yLLWs6yGMexiQgGppaVo5hbQdDHFKBZaCS+pHNDxT7PFcC9l0CYog2+EHDaXqJG
+         KBlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV9L6FhDPoD+KdUvGCg0Lpylm8R5An7ShhmD4AkJpmqjNZuhUXNVJZBbjzquwr8dm23SZ81Fm7Zh5ZTcpo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBaRXMQC96b/568OAzjP/5PvsZ1HqmY5ZqRlCh/rH6t27MEvO8
+	t5N8WRwvznlkQcwbFo8SXvzV2H4xAP9zyfkDTxZbrP1nEnZFZ5yJtC+jUgkp
+X-Google-Smtp-Source: AGHT+IHWfs0ZKT4XrRqI/6tXkYn2zDzLsooHJtJMUNXqmuBZpj15Uw7z4zm1C2OyFVp6rEuQNQIBrw==
+X-Received: by 2002:a05:6a00:1a89:b0:714:157a:bfc7 with SMTP id d2e1a72fcca58-718d5e53d08mr284848b3a.15.1725565783055;
+        Thu, 05 Sep 2024 12:49:43 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71791e54585sm1248410b3a.182.2024.09.05.12.49.40
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71791e54585sm1248410b3a.182.2024.09.05.12.49.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 12:49:41 -0700 (PDT)
+        Thu, 05 Sep 2024 12:49:42 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -77,9 +77,9 @@ Cc: davem@davemloft.net,
 	linux-kernel@vger.kernel.org,
 	o.rempel@pengutronix.de,
 	p.zabel@pengutronix.de
-Subject: [PATCHv2 net-next 1/7] net: ag71xx: add COMPILE_TEST to test compilation
-Date: Thu,  5 Sep 2024 12:49:32 -0700
-Message-ID: <20240905194938.8453-2-rosenp@gmail.com>
+Subject: [PATCHv2 net-next 2/7] net: ag71xx: add MODULE_DESCRIPTION
+Date: Thu,  5 Sep 2024 12:49:33 -0700
+Message-ID: <20240905194938.8453-3-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240905194938.8453-1-rosenp@gmail.com>
 References: <20240905194938.8453-1-rosenp@gmail.com>
@@ -91,39 +91,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-While this driver is meant for MIPS only, it can be compiled on x86 just
-fine. Remove pointless parentheses while at it.
-
-Enables CI building of this driver.
+Now that COMPILE_TEST is enabled, it gets flagged when building with
+allmodconfig W=1 builds. Text taken from the beginning of the file.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/atheros/Kconfig | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/atheros/ag71xx.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/atheros/Kconfig b/drivers/net/ethernet/atheros/Kconfig
-index 482c58c4c584..bec5cdf8d1da 100644
---- a/drivers/net/ethernet/atheros/Kconfig
-+++ b/drivers/net/ethernet/atheros/Kconfig
-@@ -6,7 +6,7 @@
- config NET_VENDOR_ATHEROS
- 	bool "Atheros devices"
- 	default y
--	depends on (PCI || ATH79)
-+	depends on PCI || ATH79 || COMPILE_TEST
- 	help
- 	  If you have a network (Ethernet) card belonging to this class, say Y.
+diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+index db2a8ade6205..e7da70f14f06 100644
+--- a/drivers/net/ethernet/atheros/ag71xx.c
++++ b/drivers/net/ethernet/atheros/ag71xx.c
+@@ -2033,4 +2033,5 @@ static struct platform_driver ag71xx_driver = {
+ };
  
-@@ -19,7 +19,7 @@ if NET_VENDOR_ATHEROS
- 
- config AG71XX
- 	tristate "Atheros AR7XXX/AR9XXX built-in ethernet mac support"
--	depends on ATH79
-+	depends on ATH79 || COMPILE_TEST
- 	select PHYLINK
- 	imply NET_SELFTESTS
- 	help
+ module_platform_driver(ag71xx_driver);
++MODULE_DESCRIPTION("Atheros AR71xx built-in ethernet mac driver");
+ MODULE_LICENSE("GPL v2");
 -- 
 2.46.0
 
