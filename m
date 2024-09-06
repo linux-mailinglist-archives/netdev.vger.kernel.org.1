@@ -1,107 +1,109 @@
-Return-Path: <netdev+bounces-125876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1ED996F156
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:24:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BFE896F179
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:29:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9EBD1C21588
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:24:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 574071C21C7B
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3B81CCEDE;
-	Fri,  6 Sep 2024 10:21:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7331C9DEA;
+	Fri,  6 Sep 2024 10:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y4w1WPvn"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=usama.anjum@collabora.com header.b="BK5+1c+o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C481CB154;
-	Fri,  6 Sep 2024 10:21:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725618115; cv=none; b=j2QI8GKyDf2siKQntlg3puTFfsomM+mR5XnXrErPxOGeiI5zSdmaWY9iwXNfek3q4E+oWWtruEYdkJT/Tr4W+EDo/g2MXIKlucnbs22p/ew6rcuMM1LMCB64f/m77i1puwUhW40ntXaLpOq7BPH0cg39QInSgYlaqmpQjo+TYUQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725618115; c=relaxed/simple;
-	bh=13JETvl8tIjqOz1E2ioRYcW8dthjCRqOi/4ddlq18Mk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jvMpfbxHebjYja+ctrblgVbphcxaHKG8kM1ntx16Vwj/Dc8ttSer8wpqFEZObmxwKeL6PzuRhrpYrRG5O4Zfc/BAt6VLhJLCBdKhVudKDtmda/gglWAMOy4i1H+m+eKECPsA9TOvbQ+TJ72OOREywqKn9KmzU+CVprHhA7sUAFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y4w1WPvn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4E52C4CEC4;
-	Fri,  6 Sep 2024 10:21:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725618114;
-	bh=13JETvl8tIjqOz1E2ioRYcW8dthjCRqOi/4ddlq18Mk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y4w1WPvnqR/IZPh0Cu8bW7FUnzpjFPYrczgYYtdUX3icC5tyJMOlnY5+h7tl2JeeB
-	 SBoZevzCE2o9cmeK0oPaD+2r8EV7xlsIeZ46Ex2raUu8J9Rgwq3PRbBgW/dIDNnZC2
-	 feUV96xwU2d43upEVFE9zqsdCL9i2FQ1B+TUPony17h5dUY1IP8xNfmMMyZoqr0QkN
-	 3Yafk6glpjiNZAanzRYHXp8llqv0XCK37Ktmu3PrCQRF6FhSVn9X78h7wslp+qTf3a
-	 dCZmmE7CL4xvss7Q1jAltZOH8tPs8lt9Zk2hYTZUhmt3STxjkW81Y9+Uc6YeO9k6kT
-	 Q6jO6t1KUyprw==
-Date: Fri, 6 Sep 2024 11:21:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: Zijun Hu <zijun_hu@icloud.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89E6C2D600;
+	Fri,  6 Sep 2024 10:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725618564; cv=pass; b=XwawK7cKEfodTpbHm50iqCpjjHNWVwxQllShfog1D1f4qTjXw2aq9tx/np7PrVPKHrw1HzeFC8ghWM17Sujwuy5oRD8cVGLHMRJ8Y+xL266YeUeJWfGHiEbbem+/ibX8KjTFu4tN0Jpm5UmtZ1spv1KMDj/+h5iBjWZi8PEW3MQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725618564; c=relaxed/simple;
+	bh=F/BQcxFsESJqmAt5OFrJwYn+x8O/EmPn/9RUu+d2WDA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ITBxLrEDf0fpgZEAZ4ugq/LF5XGtHFRLrFFTcA25D6SDdcgAqoDN61mluvIYZNidTZkg5+b9yV10eps1rDx7rZOG6+2DkAmR4ICBgzR30sZmLDZ4c5lfocwzglW1P8Piz3OJzRnAqSSk17ws46KdCTnaqF4i0Ka0ryQZmxWNRk8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=usama.anjum@collabora.com header.b=BK5+1c+o; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Delivered-To: usama.anjum@collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1725618546; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=QKpgkFb1cGQtZVOiLg+NKbfabgaCTC9KR2F6dNy2WM3rGx2jW3peNeuW8nA0im6xjEnJxdqkA+rT+fz98MH/sbdIiP0F0GC5iAT2kxHqyQ3xT8HodhW2qiHk/BKmasDCl74c93HiiA+AmcTvbRFEZ5fdXWi07Ie1k0/zYNh1rcQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1725618546; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=2Gc38LrvxgbLYiaU/hFHkxF3fEAn8S+Hl2PRviV5ACE=; 
+	b=HTWePX5KNKbw3vMf3h3bJJy+dJW306u2RCr4BAhknHX+JQL576x5i5plzUZKt3EeL0l6XYqJQWnSbKZeKa+mjNuR0V+IwtbltyixYFv2sHKlgFEFifHA/NL+euLizoIbk6a9SlYGgiqZsYgYtWqFByXTVL32KaIIio3DvYN6/20=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=usama.anjum@collabora.com;
+	dmarc=pass header.from=<usama.anjum@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1725618546;
+	s=zohomail; d=collabora.com; i=usama.anjum@collabora.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-Id:Message-Id:MIME-Version:Content-Transfer-Encoding:Reply-To;
+	bh=2Gc38LrvxgbLYiaU/hFHkxF3fEAn8S+Hl2PRviV5ACE=;
+	b=BK5+1c+ovhZJFGI4ub2kVPEMEKDaJja7xt5AErrfZ009niKBTbsF0X5Q4jDG1Pkn
+	kk1XTe4PsDLxzsGkjAUztcQBKOmBMfsI0yicZp0ssoBqGxuAuhVHtGyY26ESVefxBa7
+	+4qFQUlplA/sS/KQ8Kq8iwf1mfqYraU/CW4nFBQs=
+Received: by mx.zohomail.com with SMTPS id 1725618544872621.9303265984904;
+	Fri, 6 Sep 2024 03:29:04 -0700 (PDT)
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH] net: sysfs: Fix weird usage of class's namespace
- relevant fields
-Message-ID: <20240906102150.GD2097826@kernel.org>
-References: <20240905-fix_class_ns-v1-1-88ecccc3517c@quicinc.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	kernel@collabora.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] fou: fix initialization of grc
+Date: Fri,  6 Sep 2024 15:28:39 +0500
+Message-Id: <20240906102839.202798-1-usama.anjum@collabora.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240905-fix_class_ns-v1-1-88ecccc3517c@quicinc.com>
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Thu, Sep 05, 2024 at 07:35:38AM +0800, Zijun Hu wrote:
-> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> Device class has two namespace relevant fields which are associated by
-> the following usage:
-> 
-> struct class {
-> 	...
-> 	const struct kobj_ns_type_operations *ns_type;
-> 	const void *(*namespace)(const struct device *dev);
-> 	...
-> }
-> if (dev->class && dev->class->ns_type)
-> 	dev->class->namespace(dev);
-> 
-> The usage looks weird since it checks @ns_type but calls namespace()
-> it is found for all existing class definitions that the other filed is
-> also assigned once one is assigned in current kernel tree, so fix this
-> weird usage by checking @namespace to call namespace().
-> 
-> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> ---
-> driver-core tree has similar fix as shown below:
-> https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/driver-core.git/commit/?h=driver-core-next&id=a169a663bfa8198f33a5c1002634cc89e5128025
+The grc must be initialize first. There can be a condition where if
+fou is NULL, goto out will be executed and grc would be used
+uninitialized.
 
-Thanks,
+Fixes: 7e4196935069 ("fou: Fix null-ptr-deref in GRO.")
+Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+---
+ net/ipv4/fou_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I agree that this change is consistent with the one at the link above.
-And that, given your explanation there and here, this change
-makes sense.
+diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
+index 78b869b314921..3e30745e2c09a 100644
+--- a/net/ipv4/fou_core.c
++++ b/net/ipv4/fou_core.c
+@@ -336,11 +336,11 @@ static struct sk_buff *gue_gro_receive(struct sock *sk,
+ 	struct gro_remcsum grc;
+ 	u8 proto;
+ 
++	skb_gro_remcsum_init(&grc);
++
+ 	if (!fou)
+ 		goto out;
+ 
+-	skb_gro_remcsum_init(&grc);
+-
+ 	off = skb_gro_offset(skb);
+ 	len = off + sizeof(*guehdr);
+ 
+-- 
+2.39.2
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-I don't think there is a need to repost because of this, but for future
-reference, please keep in mind that patches like this - non bug fixes for
-Networking code - should, in general, be targeted at net-next.
-
-Subject: [PATCH net-next] ...
-
-See: https://docs.kernel.org/process/maintainer-netdev.html
 
