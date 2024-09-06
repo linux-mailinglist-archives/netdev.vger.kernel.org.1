@@ -1,58 +1,71 @@
-Return-Path: <netdev+bounces-125833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C88A796EE17
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:30:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FDF896EE2C
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:33:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2C881C23CA2
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:30:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA8C11C23726
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:33:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DE2914A09C;
-	Fri,  6 Sep 2024 08:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SWv0+dmp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D60414B945;
+	Fri,  6 Sep 2024 08:33:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4215B45BE3;
-	Fri,  6 Sep 2024 08:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92EA45BE3;
+	Fri,  6 Sep 2024 08:33:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725611443; cv=none; b=DCmxxZlA3C8kO5+qEOY2yPLJQwNI52T+xN3O6vHI+Y70MKxWt7+P0WjCWoarlp0XZz7QtgwXfXOBWK0JsRblEsBOZUOSQbksgVNGtCg/oOmx0zY1m1UUG0+gQX1aeT4rv+nHgRwNxE9mLCL+MbBLNAG7CSdnl7zX+gnqx9dWF3k=
+	t=1725611618; cv=none; b=XZtKpIA5McfJxag4KNl1BFiPOpxfcflkreHamK0AaP4udu+MW9vbZtcRWAUSO2RmqwA44WQicPH87RsggQ/luBoQt4IF+DHGWba92ssN8EXdbTE3RqnldexVgpgE7W88yhl7eZu63SDGNACIsJT6e5/bRY8s7pIGLZ4DzYwujcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725611443; c=relaxed/simple;
-	bh=A5dq9VXSOyYLnbKAephiLb4/q2ZPRZWcqiBaCOExek4=;
+	s=arc-20240116; t=1725611618; c=relaxed/simple;
+	bh=cpiiP/a8WYagaZ5Xik48GIkl1auYNZ+kgnNZrgUnfwo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FVSXLKdkEmvibqVl4I/k2lI10WW5jlrpuioRs5TzIT0Bi1RI4v7jZcmkPi8D/TQ5iR3kC52ZtY/OE+9RTS6W4td4RmZDwLv6tN/q1nj4JP5wRtqiWdrKNnowyu6nVH73kuftEMYBROa6g82AVuzex9y2TSrJ+K1aBMtY9CEjzZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SWv0+dmp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 619BBC4CEC4;
-	Fri,  6 Sep 2024 08:30:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725611442;
-	bh=A5dq9VXSOyYLnbKAephiLb4/q2ZPRZWcqiBaCOExek4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SWv0+dmp0VjjpwgOjn/rgchbdug4Cxd8CeXi17mh1b0caKbFg21RCbpO1xdkdEA3+
-	 UymzcCa7gSnv4pDx4yzQTEuwr2Jz/z58ImXpGaDYfed7FPRb4CaAt1b/4gFuZP9Y8c
-	 9EZf8pTXk6Ycd3KP+Vi4IDTRUNB2QcuS8RU6dy8JBVho43tpxE0T3sRwSn67l1Actk
-	 6lIZoXB/cJJrtaigyAABRHFX9913ntCZJR2iHERmKaCl7C+mPy8r8izFNlYviDJpAZ
-	 q8aXYWL6HPNNRKB9ZtzJhIhYM3DmAfDbVAioCltQU9AwdksKpsW7nMfewX8PLvb+dH
-	 LZG4fbO9qdUzw==
-Date: Fri, 6 Sep 2024 09:30:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Gui-Dong Han <hanguidong02@outlook.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	baijiaju1990@gmail.com, stable@vger.kernel.org
-Subject: Re: [PATCH v2] ice: Fix improper handling of refcount in
- ice_sriov_set_msix_vec_count()
-Message-ID: <20240906083038.GC2097826@kernel.org>
-References: <SY8P300MB0460D0263B2105307C444520C0932@SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rg2DxDuLEpagW/pdCbbXmYWvwq6LyFxYfj/y42sxYD6DudA1jj6ZEffNjDZ1wKuqcnaRfU7KZASz9IZSjjz54fkI+C1koWAkFP5g0La4vF10F1+7m+kCSQ8JvWRKCS1vmzllUf6BHyl9/nuG1WrLercbGxB3ApcGbKz4G0gmcaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c26815e174so1917480a12.0;
+        Fri, 06 Sep 2024 01:33:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725611615; x=1726216415;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oDUzfZByll+vRnVYBIgUXxP9h/bQhb38hRxpuRtAknE=;
+        b=wEEjWOk5lom5pN2i6U3togs4MtjUglmLKFPLrS1QdWMKNtbe1IXz7qB6zxpBl7dY3j
+         DoOf0KpG6+owGs++cTf6KdyKSI9U24fhkFXhsJ3NBfgCKJ97qCSQ/icN6IgcebDYVPKj
+         RAsZ5IVnI9HeHbOQTFzSAGm7+Nfa/6pp2ivf74R9Mt+DrJ6scatbr9cOzorDNc4mE4BB
+         gjuom3pQbgnYbEhKqgzGJD38lvMdjEzTnhvJBFGVTK3vFCecDKOCVBMOuOTNXDSxUbSq
+         Cz1T1iNF2MoPHdBsmbaOU+dMKZMLb4KvgY0F/3K/SIiiphaFborXVtDn5bhbXpabxrpF
+         I07A==
+X-Forwarded-Encrypted: i=1; AJvYcCURU20r5wAslMPA1eZTacb5mySRsJMEZDtr6lDba3T2O0jZ60wjSVr0djNVNzR6DxuiBtbBOWiu@vger.kernel.org, AJvYcCXR55S+jOPIqh5NcuPdhrJvP+/pimtNUt8cuXHzIcut7qIRFRklAegPnR/RqJhEyY4HAChM1yvGeh9z7rU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwjBAMVw5FPwdRiCoj3Uugmn1gAUF8IE4Oyo1hA8lwsDhpImzU6
+	RUe0a/e9HywJwLXSJmeq2uuKVzMMDSIeBg++oxWr4K77Bbdb56Bf
+X-Google-Smtp-Source: AGHT+IFrtcbjg6efbNfcdOcAqRd8vCbzLMgRIkSQlU7LMsaRGRthrG3Zoa++0enR4NK56pJllMwIqA==
+X-Received: by 2002:a05:6402:3496:b0:5bf:279:ca09 with SMTP id 4fb4d7f45d1cf-5c21ed52c58mr19116084a12.17.1725611614182;
+        Fri, 06 Sep 2024 01:33:34 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc697fedsm2139508a12.64.2024.09.06.01.33.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 01:33:33 -0700 (PDT)
+Date: Fri, 6 Sep 2024 01:33:31 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Simon Horman <horms@kernel.org>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davej@codemonkey.org.uk,
+	thevlad@meta.com, max@kutsevol.com
+Subject: Re: [PATCH net-next 3/9] net: netconsole: separate fragmented
+ message handling in send_ext_msg
+Message-ID: <20240906-organic-prompt-jaguarundi-c37ffd@devvm32600>
+References: <20240903140757.2802765-1-leitao@debian.org>
+ <20240903140757.2802765-4-leitao@debian.org>
+ <20240904105920.GQ4792@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,49 +74,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SY8P300MB0460D0263B2105307C444520C0932@SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM>
+In-Reply-To: <20240904105920.GQ4792@kernel.org>
 
-On Tue, Sep 03, 2024 at 11:59:43AM +0000, Gui-Dong Han wrote:
-> This patch addresses an issue with improper reference count handling in the
-> ice_sriov_set_msix_vec_count() function.
+On Wed, Sep 04, 2024 at 11:59:20AM +0100, Simon Horman wrote:
+> On Tue, Sep 03, 2024 at 07:07:46AM -0700, Breno Leitao wrote:
+> > Following the previous change, where the non-fragmented case was moved
+> > to its own function, this update introduces a new function called
+> > send_msg_fragmented to specifically manage scenarios where message
+> > fragmentation is required.
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
 > 
-> First, the function calls ice_get_vf_by_id(), which increments the
-> reference count of the vf pointer. If the subsequent call to
-> ice_get_vf_vsi() fails, the function currently returns an error without
-> decrementing the reference count of the vf pointer, leading to a reference
-> count leak. The correct behavior, as implemented in this patch, is to
-> decrement the reference count using ice_put_vf(vf) before returning an
-> error when vsi is NULL.
+> Due to tooling the diff below seems to more verbose than the change
+> warrants. Perhaps some diff flags would alleviate this, but anyone viewing
+> the patch using git with default flags, would see what is below anyway.
 > 
-> Second, the function calls ice_sriov_get_irqs(), which sets
-> vf->first_vector_idx. If this call returns a negative value, indicating an
-> error, the function returns an error without decrementing the reference
-> count of the vf pointer, resulting in another reference count leak. The
-> patch addresses this by adding a call to ice_put_vf(vf) before returning
-> an error when vf->first_vector_idx < 0. 
-> 
-> This bug was identified by an experimental static analysis tool developed
-> by our team. The tool specializes in analyzing reference count operations
-> and identifying potential mismanagement of reference counts. In this case,
-> the tool flagged the missing decrement operation as a potential issue,
-> leading to this patch.
-> 
-> Fixes: 4035c72dc1ba ("ice: reconfig host after changing MSI-X on VF")
-> Fixes: 4d38cb44bd32 ("ice: manage VFs MSI-X using resource tracking")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Gui-Dong Han <hanguidong02@outlook.com>
-> ---
-> v2:
-> * In this patch v2, an additional resource leak was addressed when
-> vf->first_vector_idx < 0. The issue is now fixed by adding ice_put_vf(vf)
-> before returning an error.
->   Thanks to Simon Horman for identifying this additional leak scenario.
+> So I wonder if you could consider moving send_msg_fragmented()
+> to above send_msg_no_fragmentation(). Locally this lead to an entirely
+> more reasonable diff to review.
 
-Thanks for the update,
+I agree. Let me move the functions around aiming to generate an
+easy-to-review diff.
 
-I agree with the analysis and that the two instances of
-this problem were introduced by each of the cited commits.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+Thanks for the feedback.
 
