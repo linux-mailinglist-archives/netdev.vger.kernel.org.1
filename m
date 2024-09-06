@@ -1,289 +1,195 @@
-Return-Path: <netdev+bounces-125956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36EA096F681
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:17:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9487296F6A5
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D2A5B2526E
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 14:17:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B18621C23C84
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 14:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252FB1D1F43;
-	Fri,  6 Sep 2024 14:16:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71791D04B6;
+	Fri,  6 Sep 2024 14:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="De5c23xW";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="cDefjgfk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ug5voc+X"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B7D1EEF9;
-	Fri,  6 Sep 2024 14:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9891FAA
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 14:25:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725632207; cv=none; b=ZYBymUilvzhk0wnC/asr5LWP6Tqtkv/GhRAppiSLp6IWueJsJhwd54gl2PBfXbnYDRAwcsRhjev7BIlfVTa+hk4dbXvSAGkgJaTX4zdzOGDlz8F8qyGogKLZgLv5AkdMEklPIPu9hWasMijYEMC84RW6UT0FG3rtGhaspyObflw=
+	t=1725632733; cv=none; b=ZNk/OKhsboP1pRA2dAlsIG/e5yX2VKuw1QiYlGMvKLjofoaTEMGqRaNtdwN+hn5UhVM9gAtYUFJaRbRtmOkdTh+24lN/QgzNrdhB2mEvhg24I0yIdz/rngI7EggfiRI9TeldchyXRQzp/952CC8NCxjtlfpTahmWuYuLB0n35/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725632207; c=relaxed/simple;
-	bh=5DPoF+h1EijAJWiofVUgPO7pld2cGAEtC+ql8P6zBx0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DwhUfaU3T1J+oevq9D5iHm4+lTL+0j/0eeZNmZ728nVWjdJToftq5qMdWOm/RKRvFimIbM+6MvU4j0Jqm13XAWnTR0NN64X8UJXbzFT6XkahITsA2rE4AhMYKpgTx1mhobLzStNAf+pXjFdCM6ZI+4k24fjP4aMYN07ln0cF/i0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=De5c23xW; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=cDefjgfk; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Florian Kauer <florian.kauer@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1725632203;
+	s=arc-20240116; t=1725632733; c=relaxed/simple;
+	bh=GAs8iurpJ8qv5psVpVpp7NkCdyjJ7rDJRCia9N6KHQw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YgA4jYyu0jDMExHol4S/9RnfcdMTHoyJckga5APzRp2PgABWrxSljGgfJXoMvJe4gAonoiEQZgI8zZSEfPzwhM3v2SaI2WC1JCav4+ctSlbskGEli1ed8s90d0rwJfNSFxLp3Eb5LjsHOMNbQb9xvz+Xusn7zwEQEiJNFi2DXaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ug5voc+X; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725632730;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=F1z+D6rnTHlvixKu5XBWRY4qyLlh6HJytqd5jXsU3JM=;
-	b=De5c23xWRzCTr9Dn9RLVUV/L8G2F4jWkSQ8pVvDnIJXYouFqKRDAh1l8toNabEjqyeQ5YY
-	SiU0/Ikz7ECUr+E78qltK21CW4yh0aItVwijYDHpsfzSpXGn71MEIbNxcNaH4wfilEPF/Y
-	Sb+tH7MNw30JNLxty/Mbd7KwLnmEtxJpfCKZ40hvC/qbEZCfcbCSOu+NYnAdgk/NYv1XAH
-	6p+zZYZFPsyLG2sbW+/Y7QLeMnrrESpOfk3KKV96vWPloRY0Eyg9r0CbOTpVVTKaRimUPH
-	WsSzi98g2juXQ706gjkRnujB/TArZuepwLgtUlfEpNVO34S1GNwbbr2ZOA7nmg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1725632203;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=F1z+D6rnTHlvixKu5XBWRY4qyLlh6HJytqd5jXsU3JM=;
-	b=cDefjgfkis0YCljz1gwj7x9pWPErwqsrRTtCqN63yGLP2mfmzwGXLHcQs4C7fADRp6C9Cm
-	7kLlYZRZTg37rGCA==
-Date: Fri, 06 Sep 2024 16:16:26 +0200
-Subject: [PATCH net v2 2/2] bpf: selftests: send packet to devmap redirect
- XDP
+	bh=+awdkgcqXaMAPB7BpN1GvvWlqJvyzdLn+E4BenWut/k=;
+	b=Ug5voc+XaRKFHXEJmxqddsEcy70qSsb77AbuUJtls+cFyakYHMl9Rh64KU+J2s3S89InrL
+	GxNoFp0ByATNVkFLc459ZCeumU2NLYwm/TMc4Zd11Q1lUUz2kYHXFS8Y82L0DIbkl1DmQW
+	zsMy0pEvy5/Yytj9VYJdUUqfrpglx0Y=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-124-geAxTG9AOJmwKtQAg0Dkfg-1; Fri, 06 Sep 2024 10:25:29 -0400
+X-MC-Unique: geAxTG9AOJmwKtQAg0Dkfg-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42ac185e26cso16623355e9.3
+        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 07:25:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725632729; x=1726237529;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+awdkgcqXaMAPB7BpN1GvvWlqJvyzdLn+E4BenWut/k=;
+        b=ddBF+StYJLGapjQU3QrsmbD4nLxs4VBpLCwUQL7SyLkNGQMB+KSAalCaOQQfMl6Mfq
+         DHFALqyLpEjgqEsKJWpmOkjIgsrQGdKRpkdd7QxQcGe3YaBga7Zhvv4TgQQ8/CiWEYIX
+         b1QI+t0EBUBRseel362DNzrL+dppLO9VAf8pHMzGmLm2kO+DLch4wbSwoQAggp4HPk8q
+         VmuXYfxrtFGyuyyXchTXRcjUEwlrFfpxJ9c8Nwg4iyHuAGo5zFI+m5IurQpFoLWfqGoE
+         EKIZVRF1yj6W7vpHKl94fNlAV1ILzNuAogH+XZ7Xa1DY3VC7f6MjcMeYbo59AOiMMYTd
+         Vpew==
+X-Gm-Message-State: AOJu0Yw8vcbo8vfQvw4DSs4wXkpGkEpmLkSQ81LzlFmrQs7B/eUC1Jrr
+	n29WmnddlmA4zImm3xOxQISr5lz7g8AqaosKnB6rqVu5YBpsewQ0nMdDZFj2A8LCTrnD142QZHi
+	Y+EuXrBrW1yusLtFxE39w4UWv+WyYxKm0xC+ulq06ZobxiRniyHavGA==
+X-Received: by 2002:a05:600c:3b29:b0:427:ff7a:794 with SMTP id 5b1f17b1804b1-42c9f972fd0mr18240695e9.4.1725632728624;
+        Fri, 06 Sep 2024 07:25:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEWjALGFtsurtRTbvBx3AjYYILknCDM4oacHLdEQEnmM0Qm74uNXQuxRhlYs+vOKF88iRzxjw==
+X-Received: by 2002:a05:600c:3b29:b0:427:ff7a:794 with SMTP id 5b1f17b1804b1-42c9f972fd0mr18240495e9.4.1725632728056;
+        Fri, 06 Sep 2024 07:25:28 -0700 (PDT)
+Received: from [192.168.88.27] (146-241-55-250.dyn.eolo.it. [146.241.55.250])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ca05d3052sm21983555e9.25.2024.09.06.07.25.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 Sep 2024 07:25:27 -0700 (PDT)
+Message-ID: <8ba551da-3626-4505-bdf2-fa617d4ad66b@redhat.com>
+Date: Fri, 6 Sep 2024 16:25:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 net-next 07/15] net-shapers: implement shaper cleanup
+ on queue deletion
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
+ Madhu Chittim <madhu.chittim@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter
+ <donald.hunter@gmail.com>, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
+ edumazet@google.com
+References: <cover.1725457317.git.pabeni@redhat.com>
+ <160421ccd6deedfd4d531f0239e80077f19db1d0.1725457317.git.pabeni@redhat.com>
+ <20240904183329.5c186909@kernel.org>
+ <8fba5626-f4e0-47c3-b022-a7ca9ca1a93f@redhat.com>
+ <20240905182521.2f9f4c1c@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240905182521.2f9f4c1c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240906-devel-koalo-fix-ingress-ifindex-v2-2-4caa12c644b4@linutronix.de>
-References: <20240906-devel-koalo-fix-ingress-ifindex-v2-0-4caa12c644b4@linutronix.de>
-In-Reply-To: <20240906-devel-koalo-fix-ingress-ifindex-v2-0-4caa12c644b4@linutronix.de>
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
- David Ahern <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, 
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <brouer@redhat.com>, 
- linux-kselftest@vger.kernel.org, 
- Florian Kauer <florian.kauer@linutronix.de>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6413;
- i=florian.kauer@linutronix.de; h=from:subject:message-id;
- bh=5DPoF+h1EijAJWiofVUgPO7pld2cGAEtC+ql8P6zBx0=;
- b=owEBbQKS/ZANAwAKATKF5IolV+EkAcsmYgBm2w7GwtWu7yC2TKTi5Y09ZIrOptkC3OgftiJCS
- zH5CekIrE2JAjMEAAEKAB0WIQSG5cmCLvpm5t9g7UUyheSKJVfhJAUCZtsOxgAKCRAyheSKJVfh
- JFo8D/9nPIN101HZhRoUJRyaBRqc1Fg5WD2Dk26WuBVHcdS+Uhbi9ouuZdIc+mPvKcjSseKwz86
- CKXYK68MG8nLUjlMwSu/gSvMQkVKugBXOTAPJbFfIAzEgAWaEuPP/z6TBdNUN3O8KMJIkMC3czB
- ATFDWkWldsdl4+ek8kFY36yeEjQUXj3tHUGsMY8uMuadIFXZUdOBpX4IcCFUwi/XDW/FcdL6KKd
- 8S4NsJatzCVuRIR4ve6wSLdLnOMyslF6qYDAO4VxU18F5OOQbKM6lYgxFUv2TYeN8wrU5CUO4fL
- yG3NCgib87fXjY3heMNdBLRSz5lhG6j2zSMPMlI/41sltOmajYUQMPbrIRa+kZp5Zk2fAKlyT2r
- uX6eP/kBwhlDz+P7AEb5qIQTGAjwtm6w7FpaPxgFD/8I0kt9FbZ3Z+cLquKC+mUl6yQex48LIcr
- SlqFW86iybCnXMHyworkUN9xmsWF1fCwH0BQ/ns8LMRdz17rsy0zjCyFD/mfgfnADEvB65Y8txa
- dILUXE2zwVTQY5ULTuvYdFY83Xl8/p3otZk2CGTesurY7y6+oRiBco5OqN2wdTf2uXf7k9yhRnN
- vC6uKmQ+xLT2RHn0d0+Ng7lHJP3QiNhhPB2LGTBVqi1wRj2tNEoy+1+3s8kYNs/oKkoBORAAIIk
- DNSANF/ecc2BgcQ==
-X-Developer-Key: i=florian.kauer@linutronix.de; a=openpgp;
- fpr=F17D8B54133C2229493E64A0B5976DD65251944E
 
-The current xdp_devmap_attach test attaches a program
-that redirects to another program via devmap.
+On 9/6/24 03:25, Jakub Kicinski wrote:
+> For the driver -- let me flip the question around -- what do you expect
+> the locking scheme to be in case of channel count change? Alternatively
+> we could just expect the driver to take netdev->lock around the
+> appropriate section of code and we'd do:
+> 
+> void net_shaper_set_real_num_tx_queues(struct net_device *dev, ...)
+> {
+> 	...
+> 	if (!READ_ONCE(dev->net_shaper_hierarchy))
+> 		return;
+> 
+> 	lockdep_assert_held(dev->lock);
+> 	...
+> }
 
-It is, however, never executed, so do that to catch
-any bugs that might occur during execution.
+In the IAVF case that will be problematic, as AFAICS the channel reconf 
+is done by 2 consecutive async task, the first task - iavf_reset_task - 
+changes the actual number of channels freeing/allocating the driver 
+resources and the 2nd one - iavf_finish_config - notify the stack 
+issuing netif_set_real_num_tx_queues(). iavf_reset_task can't easily 
+wait for iavf_finish_config due to locking order.
 
-Also, execute the same for a veth pair so that we
-also cover the non-generic path.
+> I had a look at iavf, and there is no relevant locking around the queue
+> count check at all, so that doesn't help.
 
-Warning: Running this without the bugfix in this series
-will likely crash your system.
+Yep, that is racy.
 
-Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
----
- .../selftests/bpf/prog_tests/xdp_devmap_attach.c   | 114 +++++++++++++++++++--
- 1 file changed, 108 insertions(+), 6 deletions(-)
+>> Acquiring dev->lock around set_channel() will not be enough: some driver
+>> change the channels number i.e. when enabling XDP.
+> 
+> Indeed, trying to lock before calling the driver would be both a huge
+> job and destined to fail.
+> 
+>> I think/fear we need to replace the dev->lock with the rtnl lock to
+>> solve the race for good.
+> 
+> Maybe :( I think we need *an* answer for:
+>   - how we expect the driver to protect itself (assuming that the racy
+>     check in iavf_verify_handle() actually serves some purpose, which
+>     may not be true);
+>   - how we ensure consistency of core state (no shapers for queues which
+>     don't exist, assuming we agree having shapers for queues which
+>     don't exist is counter productive).
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c
-index ce6812558287..c9034f8ae63b 100644
---- a/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c
-+++ b/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c
-@@ -1,6 +1,9 @@
- // SPDX-License-Identifier: GPL-2.0
-+#include <arpa/inet.h>
- #include <uapi/linux/bpf.h>
- #include <linux/if_link.h>
-+#include <network_helpers.h>
-+#include <net/if.h>
- #include <test_progs.h>
- 
- #include "test_xdp_devmap_helpers.skel.h"
-@@ -17,7 +20,7 @@ static void test_xdp_with_devmap_helpers(void)
- 		.ifindex = IFINDEX_LO,
- 	};
- 	__u32 len = sizeof(info);
--	int err, dm_fd, map_fd;
-+	int err, dm_fd, dm_fd_redir, map_fd;
- 	__u32 idx = 0;
- 
- 
-@@ -25,14 +28,11 @@ static void test_xdp_with_devmap_helpers(void)
- 	if (!ASSERT_OK_PTR(skel, "test_xdp_with_devmap_helpers__open_and_load"))
- 		return;
- 
--	dm_fd = bpf_program__fd(skel->progs.xdp_redir_prog);
--	err = bpf_xdp_attach(IFINDEX_LO, dm_fd, XDP_FLAGS_SKB_MODE, NULL);
-+	dm_fd_redir = bpf_program__fd(skel->progs.xdp_redir_prog);
-+	err = bpf_xdp_attach(IFINDEX_LO, dm_fd_redir, XDP_FLAGS_SKB_MODE, NULL);
- 	if (!ASSERT_OK(err, "Generic attach of program with 8-byte devmap"))
- 		goto out_close;
- 
--	err = bpf_xdp_detach(IFINDEX_LO, XDP_FLAGS_SKB_MODE, NULL);
--	ASSERT_OK(err, "XDP program detach");
--
- 	dm_fd = bpf_program__fd(skel->progs.xdp_dummy_dm);
- 	map_fd = bpf_map__fd(skel->maps.dm_ports);
- 	err = bpf_prog_get_info_by_fd(dm_fd, &info, &len);
-@@ -47,6 +47,23 @@ static void test_xdp_with_devmap_helpers(void)
- 	ASSERT_OK(err, "Read devmap entry");
- 	ASSERT_EQ(info.id, val.bpf_prog.id, "Match program id to devmap entry prog_id");
- 
-+	/* send a packet to trigger any potential bugs in there */
-+	char data[10] = {};
-+	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
-+			    .data_in = &data,
-+			    .data_size_in = 10,
-+			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
-+			    .repeat = 1,
-+		);
-+	err = bpf_prog_test_run_opts(dm_fd_redir, &opts);
-+	ASSERT_OK(err, "XDP test run");
-+
-+	/* wait for the packets to be flushed */
-+	kern_sync_rcu();
-+
-+	err = bpf_xdp_detach(IFINDEX_LO, XDP_FLAGS_SKB_MODE, NULL);
-+	ASSERT_OK(err, "XDP program detach");
-+
- 	/* can not attach BPF_XDP_DEVMAP program to a device */
- 	err = bpf_xdp_attach(IFINDEX_LO, dm_fd, XDP_FLAGS_SKB_MODE, NULL);
- 	if (!ASSERT_NEQ(err, 0, "Attach of BPF_XDP_DEVMAP program"))
-@@ -124,6 +141,88 @@ static void test_xdp_with_devmap_frags_helpers(void)
- 	test_xdp_with_devmap_frags_helpers__destroy(skel);
- }
- 
-+static void test_xdp_with_devmap_helpers_veth(void)
-+{
-+	struct test_xdp_with_devmap_helpers *skel;
-+	struct bpf_prog_info info = {};
-+	struct bpf_devmap_val val = {};
-+	struct nstoken *nstoken = NULL;
-+	__u32 len = sizeof(info);
-+	int err, dm_fd, dm_fd_redir, map_fd, ifindex_dst;
-+	__u32 idx = 0;
-+
-+	SYS(out_close, "ip netns add testns");
-+	nstoken = open_netns("testns");
-+	if (!ASSERT_OK_PTR(nstoken, "setns"))
-+		goto out_close;
-+
-+	SYS(out_close, "ip link add veth_src type veth peer name veth_dst");
-+	SYS(out_close, "ip link set dev veth_src up");
-+	SYS(out_close, "ip link set dev veth_dst up");
-+
-+	val.ifindex = if_nametoindex("veth_src");
-+	ifindex_dst = if_nametoindex("veth_dst");
-+	if (!ASSERT_NEQ(val.ifindex, 0, "val.ifindex") ||
-+	    !ASSERT_NEQ(ifindex_dst, 0, "ifindex_dst"))
-+		goto out_close;
-+
-+	skel = test_xdp_with_devmap_helpers__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "test_xdp_with_devmap_helpers__open_and_load"))
-+		return;
-+
-+	dm_fd_redir = bpf_program__fd(skel->progs.xdp_redir_prog);
-+	err = bpf_xdp_attach(val.ifindex, dm_fd_redir, XDP_FLAGS_DRV_MODE, NULL);
-+	if (!ASSERT_OK(err, "Attach of program with 8-byte devmap"))
-+		goto out_close;
-+
-+	dm_fd = bpf_program__fd(skel->progs.xdp_dummy_dm);
-+	map_fd = bpf_map__fd(skel->maps.dm_ports);
-+	err = bpf_prog_get_info_by_fd(dm_fd, &info, &len);
-+	if (!ASSERT_OK(err, "bpf_prog_get_info_by_fd"))
-+		goto out_close;
-+
-+	val.bpf_prog.fd = dm_fd;
-+	err = bpf_map_update_elem(map_fd, &idx, &val, 0);
-+	ASSERT_OK(err, "Add program to devmap entry");
-+
-+	err = bpf_map_lookup_elem(map_fd, &idx, &val);
-+	ASSERT_OK(err, "Read devmap entry");
-+	ASSERT_EQ(info.id, val.bpf_prog.id, "Match program id to devmap entry prog_id");
-+
-+	/* attach dummy to other side to enable reception */
-+	dm_fd = bpf_program__fd(skel->progs.xdp_dummy_prog);
-+	err = bpf_xdp_attach(ifindex_dst, dm_fd, XDP_FLAGS_DRV_MODE, NULL);
-+	if (!ASSERT_OK(err, "Attach of dummy XDP"))
-+		goto out_close;
-+
-+	/* send a packet to trigger any potential bugs in there */
-+	char data[10] = {};
-+	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
-+			    .data_in = &data,
-+			    .data_size_in = 10,
-+			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
-+			    .repeat = 1,
-+		);
-+	err = bpf_prog_test_run_opts(dm_fd_redir, &opts);
-+	ASSERT_OK(err, "XDP test run");
-+
-+	/* wait for the packets to be flushed */
-+	kern_sync_rcu();
-+
-+	err = bpf_xdp_detach(val.ifindex, XDP_FLAGS_DRV_MODE, NULL);
-+	ASSERT_OK(err, "XDP program detach");
-+
-+	err = bpf_xdp_detach(ifindex_dst, XDP_FLAGS_DRV_MODE, NULL);
-+	ASSERT_OK(err, "XDP program detach");
-+
-+out_close:
-+	if (nstoken)
-+		close_netns(nstoken);
-+	SYS_NOFAIL("ip netns del testns");
-+
-+	test_xdp_with_devmap_helpers__destroy(skel);
-+}
-+
- void serial_test_xdp_devmap_attach(void)
- {
- 	if (test__start_subtest("DEVMAP with programs in entries"))
-@@ -134,4 +233,7 @@ void serial_test_xdp_devmap_attach(void)
- 
- 	if (test__start_subtest("Verifier check of DEVMAP programs"))
- 		test_neg_xdp_devmap_helpers();
-+
-+	if (test__start_subtest("DEVMAP with programs in entries on veth"))
-+		test_xdp_with_devmap_helpers_veth();
- }
+I agree we must delete shapers on removed/deleted queues. The 
+driver/firmware could reuse the same H/W resources for a different VF 
+and such queue must start in the new VF with a default (no shaping) config.
 
--- 
-2.39.2
+> Reverting back to rtnl_lock for all would be sad, the scheme of
+> expecting the driver to take netdev->lock could work?
+> It's the model we effectively settled on in devlink.
+> Core->driver callbacks are always locked by the core,
+> for driver->core calls driver should explicitly take the lock
+> (some wrappers for lock+op+unlock are provided).
+
+I think/guess/hope the following could work:
+
+- the driver wraps the h/w resources reconfiguration and 
+netif_set_real_num_tx_queues() with dev->lock. In the iavf case, that 
+means 2 separate critical sections: in iavf_reset_task() and in 
+iavf_finish_config().
+
+- the core, under dev->lock, checks vs real_num_tx_queues and call the 
+shaper ops
+
+- the iavf shaper callbacks would still need to check the queue id vs 
+the current allocated hw resource number as the shapers ops could run 
+in-between the 2 mentioned critical sections. The iavf driver could 
+still act consistently with the core:
+
+   - if real_num_tx_queues < qid < current_allocated_hw_resources
+     set the shaper,
+   - if current_allocated_hw_resources < qid < real_num_tx_queues do
+     nothing and return success
+
+In both the above scenarios, real_num_tx_queues will be set to 
+current_allocated_hw_resources soon by the upcoming 
+iavf_finish_config(), the core will update the hierarchy accordingly, 
+the status will be consistent.
+
+I think the code should be more clear, let me try to share it ASAP (or 
+please block me soon ;)
+
+Thanks,
+
+Paolo
 
 
