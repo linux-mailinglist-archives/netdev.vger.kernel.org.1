@@ -1,105 +1,272 @@
-Return-Path: <netdev+bounces-125893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 492DF96F287
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:15:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEC9D96F295
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:16:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 061F2285070
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:15:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E342B212E0
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:16:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F282C1CB157;
-	Fri,  6 Sep 2024 11:15:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206911CBEB0;
+	Fri,  6 Sep 2024 11:16:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="COUiHW8E"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="moliksS6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E5F1C9DD3
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 11:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EA31CBE8E;
+	Fri,  6 Sep 2024 11:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725621309; cv=none; b=B3uKNLOtm/bBq6zdzAQPxd3nQNxVH21OdIUu7CM5cPkUcleV/fdFaQoduRdipTXAE4FPpRx2I0GiVKyD7T6lkgbcXeagKHPGDc+/pSJJOqAxuAKaDHkEqmaxm578B178XJjvJ2gOHOrX8JsFHO9T3MptVz4KIVjUYPoLQDpPCNI=
+	t=1725621372; cv=none; b=OzVR7ic4WuCwMdXDINVLC/9gAd1/M2OQhBoaDNeaAMMQho1OBrDLRD9UkXv2rtemEJ9yv0wcwJtbZm3cYw1TpkWvyfyf+ya6USkVrB7bQdE7XEtXXjjibl5z493HFNC4s/L1zjx1aToODOcoJ6FW2BhaA5f6eHUTb05UcxU3OHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725621309; c=relaxed/simple;
-	bh=0NGiB9JCDYS9eHATqhHJptO0ZudgwqWhSFOBgZQcJOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sz5GcV5LhGR2IUYmoVxde3Wx4ORf+5V5KZDnbzku8sZPQMZJp8tlKEeudIWytrwXVWZ5Z9IhsryuQK0DjRJWmEqD/4+uSkQ2b+z4CZxiZBw+o5LT5oC2gjMWQ/c7T01LUMSa1Dq14hCyU+uTb8XlxmA1P7pm0gFSsvKp4qeefLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=COUiHW8E; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725621307;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0NGiB9JCDYS9eHATqhHJptO0ZudgwqWhSFOBgZQcJOI=;
-	b=COUiHW8EvBM6PoV4HjoARUgXVCG8XhghMBYGkt0r0nkt/WuKC5Q3CTlQyr+RCtHgcbjBgY
-	ZtfR4o1fq1mzsM8cOEusxr2Hnb07KxNSGoM/kMZ5zzcNRa8JSwMVvYdMWJKfNyAC/fDtDm
-	i0MaVoPHx7tkih33Xod+z8+RYIglaDc=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-NBdcr3u0N9ebMFGeCAmxdg-1; Fri, 06 Sep 2024 07:15:06 -0400
-X-MC-Unique: NBdcr3u0N9ebMFGeCAmxdg-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42bb5950d1aso19288065e9.2
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 04:15:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725621305; x=1726226105;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0NGiB9JCDYS9eHATqhHJptO0ZudgwqWhSFOBgZQcJOI=;
-        b=Clgq7AcVMhnaVyx5/xGAP3F/QWuROWLg0nqd6Tisle8yW+gKbRJbqpiEub2Zd3t79M
-         HwOgwjxK+FXm32Lf6T6T3OXRiYb/XpEsu1PGTFEMBXzcV2png/ULJWfzuN28qQFI386q
-         gFanVGhP97yojRG4tqIfQXRhl2LBceLmER9Rwd97N2jnWFnagXNJ1wYnrfBDcmDVm6AO
-         NkfUxXQw2hB82OJ5R48AvYxwgiEldsN8ewciFG9st0kuCzK6WlKgG46SdS6MrdYOn6tx
-         P+2vhQssqm2gL6L9QWH+0D5sBEny6ck24aV2hxqA8lJ5r9S2BlvBI0HYgG1aigqjYly9
-         iPcA==
-X-Gm-Message-State: AOJu0YwHoKPZV2HNKqvt3bM09KUNrK6IuKB2GGBo1UkGf2Av0lpp/J/+
-	j9I/jUDc0WJgOPN2uZtsnzziRKt7R5b6jMCJedMhLIsWD65I+64BVcpv+E3t+dZuTVaHU24bGCY
-	U2N8KRp9CuLlr8Q7O22O+rkzdthnPsOSnFOvftf2NaxGluqAZeS6/zg==
-X-Received: by 2002:a05:600c:310a:b0:42a:a6aa:4118 with SMTP id 5b1f17b1804b1-42c9f98b4aamr16075945e9.18.1725621304837;
-        Fri, 06 Sep 2024 04:15:04 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH7vCxT8H4VqHEs2N44xCaNM+DluDvFbOAReI6BECcPwvJ8SnS7DtqOd/aYseydN9zLNtq3KA==
-X-Received: by 2002:a05:600c:310a:b0:42a:a6aa:4118 with SMTP id 5b1f17b1804b1-42c9f98b4aamr16075695e9.18.1725621304232;
-        Fri, 06 Sep 2024 04:15:04 -0700 (PDT)
-Received: from debian (2a01cb058d23d6009996916de7ed7c62.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:9996:916d:e7ed:7c62])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ca8cebd35sm660405e9.0.2024.09.06.04.15.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 04:15:03 -0700 (PDT)
-Date: Fri, 6 Sep 2024 13:15:01 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
-	razor@blackwall.org, pablo@netfilter.org, kadlec@netfilter.org,
-	marcelo.leitner@gmail.com, lucien.xin@gmail.com,
-	bridge@lists.linux.dev, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-sctp@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH net-next 01/12] netfilter: br_netfilter: Unmask upper
- DSCP bits in br_nf_pre_routing_finish()
-Message-ID: <ZtrkNbZcjQrUmdcC@debian>
-References: <20240905165140.3105140-1-idosch@nvidia.com>
- <20240905165140.3105140-2-idosch@nvidia.com>
+	s=arc-20240116; t=1725621372; c=relaxed/simple;
+	bh=JvdsFwLbznT7wVvK45hTNkHsjNgvpeNcK46qoS/cHoI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aLfvSi9JAiCN6SPIfFTvRMNy/p0dKV2BvvODxIDDdds9ppWHngkpUVbMZZMvWSJO8M0Fw0HxCsjM6q2PlmU4AVlccHbEMrnGAiIrAYvXBsLjJeKRn2pA+Neo5b9/vtD9MHFHgA3NLrpRlYO/b8Y94ObHrDJK2Txt/RbROSkaM4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=moliksS6; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 486BFgHP072566;
+	Fri, 6 Sep 2024 06:15:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1725621342;
+	bh=8iZznSacehcwlWZOpuSXs6EqTnp27bLKT70plkEbinM=;
+	h=From:To:CC:Subject:Date;
+	b=moliksS6mp8jcxwsNz/9b/dFfY2pHiLaP8BcFzPQKDz8HUTRwMhKrErNcMHTiyKJA
+	 eJ/zHUrl0j7ClyIH+UNbK4K9h4EUkZ4ToRBjKpWnjYy/lPfu+q4LrQ4MaRzkU09za4
+	 fthOAhF98EijRSqQGXHDiAUh+hznBsOodikZGD9s=
+Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 486BFgPK078831
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 6 Sep 2024 06:15:42 -0500
+Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 6
+ Sep 2024 06:15:41 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 6 Sep 2024 06:15:41 -0500
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 486BFfLh045294;
+	Fri, 6 Sep 2024 06:15:41 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 486BFe2u000307;
+	Fri, 6 Sep 2024 06:15:40 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: <robh@kernel.org>, <jan.kiszka@siemens.com>, <dan.carpenter@linaro.org>,
+        <saikrishnag@marvell.com>, <andrew@lunn.ch>,
+        <javier.carrasco.cruz@gmail.com>, <jacob.e.keller@intel.com>,
+        <diogo.ivo@siemens.com>, <horms@kernel.org>,
+        <richardcochran@gmail.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net-next v5 0/5] Introduce HSR offload support for ICSSG
+Date: Fri, 6 Sep 2024 16:45:33 +0530
+Message-ID: <20240906111538.1259418-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240905165140.3105140-2-idosch@nvidia.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Thu, Sep 05, 2024 at 07:51:29PM +0300, Ido Schimmel wrote:
-> Unmask upper DSCP bits when calling ip_route_output() so that in the
-> future it could perform the FIB lookup according to the full DSCP value.
+Hi All,
+This series introduces HSR offload support for ICSSG driver. To support HSR
+offload to hardware, ICSSG HSR firmware is used.
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+This series introduces,
+1. HSR frame offload support for ICSSG driver.
+2. HSR Tx Packet duplication offload
+3. HSR Tx Tag and Rx Tag offload
+4. Multicast filtering support in HSR offload mode.
+5. Dependencies related to IEP.
+
+HSR Test Setup:
+--------------
+
+     ___________           ___________           ___________
+    |           | Link AB |           | Link BC |           |
+  __|   AM64*   |_________|   AM64    |_________|   AM64*   |___
+ |  | Station A |         | Station B |         | Station C |   |
+ |  |___________|         |___________|         |___________|   |
+ |                                                              |
+ |______________________________________________________________|
+                            Link CA
+ *Could be any device that supports two ethernet interfaces.
+
+Steps to switch to HSR frame forward offload mode:
+-------------------------------------------------
+Example assuming eth1, eth2 ports of ICSSG1 on AM64-EVM
+
+  1) Enable HSR offload for both interfaces
+      ethtool -K eth1 hsr-fwd-offload on
+      ethtool -K eth1 hsr-dup-offload on
+      ethtool -K eth1 hsr-tag-ins-offload on
+      ethtool -K eth1 hsr-tag-rm-offload on
+
+      ethtool -K eth2 hsr-fwd-offload on
+      ethtool -K eth2 hsr-dup-offload on
+      ethtool -K eth2 hsr-tag-ins-offload on
+      ethtool -K eth2 hsr-tag-rm-offload on
+
+  2) Create HSR interface and add slave interfaces to it
+      ip link add name hsr0 type hsr slave1 eth1 slave2 eth2 \
+    supervision 45 version 1
+
+  3) Add IP address to the HSR interface
+      ip addr add <IP_ADDR>/24 dev hsr0
+
+  4) Bring up the HSR interface
+      ip link set hsr0 up
+
+Switching back to previous mode:
+--------------------------------
+  1) Delete HSR interface
+      ip link delete hsr0
+
+  2) Disable HSR port-to-port offloading mode, packet duplication
+      ethtool -K eth1 hsr-fwd-offload off
+      ethtool -K eth1 hsr-dup-offload off
+      ethtool -K eth1 hsr-tag-ins-offload off
+      ethtool -K eth1 hsr-tag-rm-offload off
+
+      ethtool -K eth2 hsr-fwd-offload off
+      ethtool -K eth2 hsr-dup-offload off
+      ethtool -K eth2 hsr-tag-ins-offload off
+      ethtool -K eth2 hsr-tag-rm-offload off
+
+Testing the port-to-port frame forward offload feature:
+-----------------------------------------------------
+  1) Connect the LAN cables as shown in the test setup.
+  2) Configure Station A and Station C in HSR non-offload mode.
+  3) Configure Station B is HSR offload mode.
+  4) Since HSR is a redundancy protocol, disconnect cable "Link CA",
+     to ensure frames from Station A reach Station C only through
+     Station B.
+  5) Run iperf3 Server on Station C and client on station A.
+  7) Check the CPU usage on Station B.
+
+CPU usage report on Station B using mpstat when running UDP iperf3:
+-------------------------------------------------------------------
+
+  1) Non-Offload case
+  -------------------
+  CPU  %usr  %nice  %sys %iowait  %irq  %soft  %steal  %guest   %idle
+  all  0.00   0.00  0.50    0.00  3.52  29.15    0.00    0.00   66.83
+    0  0.00   0.00  0.00    0.00  7.00  58.00    0.00    0.00   35.00
+    1  0.00   0.00  0.99    0.00  0.99   0.00    0.00    0.00   98.02
+
+  2) Offload case
+  ---------------
+  CPU  %usr  %nice  %sys %iowait  %irq  %soft  %steal  %guest   %idle
+  all  0.00   0.00  0.00    0.00  0.50   0.00    0.00    0.00   99.50
+    0  0.00   0.00  0.99    0.00  0.00   0.00    0.00    0.00   99.01
+    1  0.00   0.00  0.00    0.00  0.00   0.00    0.00    0.00  100.00
+
+Note:
+1) At the very least, hsr-fwd-offload must be enabled.
+   Without offloading the port-to-port offload, other
+   HSR offloads cannot be enabled.
+
+2) Inorder to enable hsr-tag-ins-offload, hsr-dup-offload
+   must also be enabled as these are tightly coupled in
+   the firmware implementation.
+
+Changes from v4 to v5:
+*) Fixed warning reported by kernel test robot [0].
+
+Changes from v3 to v4:
+*) Simplified ndo_set_features() implementation as suggested by Roger Quadros
+<rogerq@kernel.org>
+*) Maintained 80 character limit per line wherever possible.
+*) Returning -EOPNOTSUPP whenever offloading is not possible.
+*) Changed dev_dbg() prints to netdev_dbg() as suggested by Alexander
+Lobakin <aleksander.lobakin@intel.com>
+*) Squashed patch [1] and [2] together as hsr tag ins is dependent on hsr
+tx duplication. Also didn't add Roger's RB tag from patch [2] as the patch
+is now merged with [1] in patch 4/5.
+*) Implemented emac_ndo_fix_features() to make sure NETIF_F_HW_HSR_DUP is
+enabled / disabled with NETIF_F_HW_HSR_TAG_INS as suggested by Roger
+Quadros <rogerq@kernel.org>
+*) Added Roger's RB tag to patch 5/5.
+*) Modified commit message of patch 3/5 to state that driver will be back
+to previously used mode once HSR is disabled.
+
+Changes from v2 to v3:
+*) Renamed APIs common to switch and hsr modes with suffix _fw_offload.
+*) Returning EOPNOTSUPP in prueth_hsr_port_link() as suggested by
+   Andrew Lunn <andrew@lunn.ch>
+*) Dropped unneccassary dev_err prints and changed dev_err to dev_dbg
+   where applicable.
+*) Renamed NETIF_PRUETH_HSR_OFFLOAD to NETIF_PRUETH_HSR_OFFLOAD_FEATURES
+   to make it clear it is a collection of features, not an alias for one
+   feature.
+*) Added Kernel doc entries for @hsr_members and @is_hsr_offload_mode as
+   suggested by Simon Horman <horms@kernel.org>
+*) Dropped patch [3] as it is no longer needed in this series. It is
+   already merged to net/main by commit [4].
+*) Collected Reviewed-by tag from Roger Quadros <rogerq@kernel.org> for
+   PATCH 1/6 and PATCH 2/6.
+*) Added if check for current mode before calling __dev_mc_unsync as
+   suggested by Roger Quadros <rogerq@kernel.org>
+*) Updated commit message of PATCH 6/6 to describe handling of duplicate
+   discard in the driver.
+
+Changes from v1 to v2:
+*) Modified patch 2/7 to only contain code movement as suggested by
+   Dan Carpenter <dan.carpenter@linaro.org>
+*) Added patch 3/7 by splitting it from 2/6 as the patch is not part of
+   code movement done in patch 2/7.
+*) Rebased on latest net-next/main.
+
+v1: https://lore.kernel.org/all/20240808110800.1281716-1-danishanwar@ti.com/
+v2: https://lore.kernel.org/all/20240813074233.2473876-1-danishanwar@ti.com
+v3: https://lore.kernel.org/all/20240828091901.3120935-1-danishanwar@ti.com/
+v4: https://lore.kernel.org/all/20240904100506.3665892-1-danishanwar@ti.com/
+
+[0] https://lore.kernel.org/all/202409061658.vSwcFJiK-lkp@intel.com/
+[1] https://lore.kernel.org/all/20240828091901.3120935-5-danishanwar@ti.com/
+[2] https://lore.kernel.org/all/20240828091901.3120935-7-danishanwar@ti.com/
+[3] https://lore.kernel.org/all/20240813074233.2473876-2-danishanwar@ti.com/
+[4] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=e846be0fba85
+
+MD Danish Anwar (4):
+  net: ti: icss-iep: Move icss_iep structure
+  net: ti: icssg-prueth: Stop hardcoding def_inc
+  net: ti: icssg-prueth: Add support for HSR frame forward offload
+  net: ti: icssg-prueth: Add multicast filtering support in HSR mode
+
+Ravi Gunasekaran (1):
+  net: ti: icssg-prueth: Enable HSR Tx duplication, Tx Tag and Rx Tag
+    offload
+
+ drivers/net/ethernet/ti/icssg/icss_iep.c      |  72 -------
+ drivers/net/ethernet/ti/icssg/icss_iep.h      |  73 ++++++-
+ .../net/ethernet/ti/icssg/icssg_classifier.c  |   1 +
+ drivers/net/ethernet/ti/icssg/icssg_common.c  |  18 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.c  |  22 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |   2 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 203 +++++++++++++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   9 +
+ 8 files changed, 308 insertions(+), 92 deletions(-)
+
+
+base-commit: 52fc70a32573707f70d6b1b5c5fe85cc91457393
+-- 
+2.34.1
 
 
