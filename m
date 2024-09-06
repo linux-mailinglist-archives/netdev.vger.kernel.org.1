@@ -1,148 +1,168 @@
-Return-Path: <netdev+bounces-126111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E03396FE64
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 01:22:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E595996FE6B
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 01:24:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A93A288D8A
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:22:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E5F31C21722
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:24:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D0915B11D;
-	Fri,  6 Sep 2024 23:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F0915B125;
+	Fri,  6 Sep 2024 23:24:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FCTTjGop"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9HWouLQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28F31B85DB;
-	Fri,  6 Sep 2024 23:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860C715990E;
+	Fri,  6 Sep 2024 23:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725664947; cv=none; b=RSqwnnQLxuxUnXGbOhUN+2ZoqnQc6uH14g9ZsFmeX/5NOg+C2BbBIRzUsnQy1R5Tfh4GuJ51qfzbWnBHoQV5V9/V94XkGGaF1AgrdoFKoPOrk6RtfjJx8c5lx8qAvjA1i3NFHZKHptsAF4FxKkiow7YK9I7jFJIypnmQn+7sgy0=
+	t=1725665069; cv=none; b=ID879FpmIMh8GQq8N0bb12+tYMav9M4e0BsTL/Xwh/MzK/wwdH32g5NEmA3b5HkW0dJ/X+/FC8j8nwvmVI9K/oAlfPWTj1DqdPnxTYLBGvCNlI9BpLXPdR/tL47A3l0gLZBKjVvVzLnDdrniXWpt535lBIlswXzXBSpAxwiP9Gw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725664947; c=relaxed/simple;
-	bh=4ifgj+aVAOh+9a5Oy9wqAahHvc3xrxq66py1pHBwu2k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DsLG9Sf5RG8EHpbYfSpQvfUPffE84XP41lqsi7XA5LY/7W8F+i22dE0Hh7DaF/k0r5RH/3DL3Hc/oLL/nYrWb9fz4DciC8z35OwovOK6b+y72YIuWFDaYP5fQFaJNgDc55Ofz7SIeggULdWm/NxLPoLZgV4eijpDI1uH/PS43DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FCTTjGop; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1725665069; c=relaxed/simple;
+	bh=8Lc4DxYvzjHZrefhAqr2ufn7iNlvPDBwf8zDZ89FKIM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=GmBTdzRu1c7UMZS0X8nMFHURfML+1axoJDloptERqKFxbuf4OUXjidxEq17FuJXJC17b1xdQfJE91K9DsjGKlM2AKp4Fj3aQzuTkNvGpEYgJ8J5x6OuM9Hf5pREfW1NnpFoRL2gj1JvOthtGGC2wqW7LWAOMkYmw1gWU9aN9ReE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9HWouLQ; arc=none smtp.client-ip=209.85.161.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-374c1963cb6so1394594f8f.3;
-        Fri, 06 Sep 2024 16:22:25 -0700 (PDT)
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5dcd8403656so1794809eaf.1;
+        Fri, 06 Sep 2024 16:24:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725664944; x=1726269744; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1725665066; x=1726269866; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iSvXewikvayzhAgejdKKNOWwhCZKcclsrYl2PMO2ODM=;
-        b=FCTTjGopo5Qu1Iiz2Y6AgrZSv9aLu08KQ5w2miTvJa0O2iby0//xAf3Hl886oAHZ82
-         azElQtVVWMu6usZ1LtDvsFVBMJzLbo6+JpOl7z+YpIcQFKs+u+sfcOgtl6HJSKQ27H1b
-         L/gYPo0E+Jwbz1jT9RdwBPC5YvYzuu3p3Xgfr3LsJrlSSQ2I4UhzZXkBJ1NZ8tlVgM2Z
-         3/Hrcn4FlK7BVU5osDU0N1v0zQpb0NasEZw4FuuKml3aLF3WetRmCMSw7r6WipAUq8Ln
-         18CpZ02mAgsp0ts80CNZ1umOeYHOO2RjmV9Kxzb11YCXrQlGi8S1e8ibYr+G/RYcGpsm
-         zJXA==
+        bh=tOgw/fVdI/07FyZVisdpVjY/HlaG684C/g5rUZ9OCmE=;
+        b=Q9HWouLQ88E1/7EHZGm0ZrhWDo/gZXNNYRX876U/dnJweLuohW1lMQjvJGsKj0VWyX
+         S1HPlCE26EyVD2tzK3+so3ctaSTtkqgxwOHXu4zHKBH2UwAwrUBsJDkyGkV5Vww8HYIk
+         VJPsksYSCiapXs17hRo5ZI+Wrkv28oOtbPZPD/u/YnpZ5JXiTP4jcqw7W4EJvipTCAB9
+         I9GKhFTtjt32Lat5b0VqRB1jJCjxrD2SgWUofZ3J/05uSqPV6p+XUk+F0lOavHrtt+4n
+         RE8MTWKh65D5sqI6uXJNcxHnysYeemkrXncRq7nwbBe3FmBEnwY3MXvIoAGL4bzR/0yv
+         zYIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725664944; x=1726269744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iSvXewikvayzhAgejdKKNOWwhCZKcclsrYl2PMO2ODM=;
-        b=m/5cZZB4Iiy9CdlQkMiB/t1+J8YjQmX0tpCGefUXyNEg1iI5TOd88/06W9KxcrQBB8
-         ddan2K2n6Bv2b+3mxWFPg900GM+PRPpvTqZJM+sHQa25VBoPwKqLWYp+YdS2VTZ3+BTd
-         86VcTFctsPxJ2Dc7agLVxmzjfS7clLQV+bt1gMl/x3qBLzH4gGxKLXO7k5eXkR3KkRle
-         hebs6Zcr7BbTmraihu9aV+7xsLNxVUpVBNTbTbDzsAiVjX22wgvZ5zbaSLpfx2U1RMz3
-         re0xzsvF+bs45RlE8fPfCxnKMsFOu7qmPDdo+OPDtURsEvmPbkwq3P8OD4/ANuyF77BC
-         ijvA==
-X-Forwarded-Encrypted: i=1; AJvYcCVCQTCAouVFrjgF6QkMfl7JE/ry8qWsk0JqlCJYQLeI3p6vss2TeAF61WJUlrLeRYsrZFS+teOy@vger.kernel.org, AJvYcCWklgPeZbMbTc52aEghbg1Lj+3W5Thr0Xo+bcMvWMhBxJkIQpGHgcYd6H1frXuwXQtiM9k=@vger.kernel.org, AJvYcCXMOCdiYSZVDGY1y+ZlB68jKdrLqyPul1ilsvx3/ui0cTMTa3WDZZ52X1/XYJKyBY3HyB7AiN6dKUBqUfK+jkSY+h8J@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkVLSq0RjqqqPZy5pBebf6p/cV3Hxerc0+wpv7xye5xtS+hodE
-	Gvl2vMkoLjbVunw/j/YMuCwCv5bY3XlUlHrhFiRaO8GrYu560NOzsPdnMTq4XFf4ZLr5pIqbZgL
-	O7mA/TgOnzyERfDsB9a7i7BvYGklUl/6E
-X-Google-Smtp-Source: AGHT+IFEzcUdF+SphkBccXrWQ7DN3tpOqvQj3byjfTquwPfVrG60kAqMzFX4viERfVLubpFz0O5jlN59xegcugO7XIo=
-X-Received: by 2002:adf:a11e:0:b0:374:c0a3:fbb1 with SMTP id
- ffacd0b85a97d-3788960336fmr2639589f8f.35.1725664943765; Fri, 06 Sep 2024
- 16:22:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725665066; x=1726269866;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tOgw/fVdI/07FyZVisdpVjY/HlaG684C/g5rUZ9OCmE=;
+        b=DqwQiEWD9X+kC3sX6uBVFephPojHzUBZ/Jn6vFHPPtd9ceI+OPtJA+lzVKa39g2foN
+         O5GHOnY/HdxSnI3ctWEtIiRsaqmI4/izoCGTJ87XgRJ5A3zYkqJoZsrrbeNwZRAJ2atk
+         gqSjJFlcenZcAcJOSUHXN8Az3sA/7oN67xJHYdbQ4Et+qfANAlrOLW0gMTXByupZWJC0
+         F7XDacTwHDS5LjlEs4H1s2L7GS+hohjaOCDFBjuJ0otT4V49iRS53oKmIbJQg21saaH5
+         p7gLJYFsJbLUAiRTwIkgwUJu8k8y2lfM70V78ctm4pv2cJlyVEdn8MkxMz2Z56do3JsN
+         arAA==
+X-Forwarded-Encrypted: i=1; AJvYcCX/I+14FNq1DMeaVrPVBfIjIcnV6rYGK9jRiT0K7MjR0vpe9FCSjCHkXTAOfNYMwUya1vpT/40=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKqDsWMNXQ7arV3UBFWjyab1IGpohGWiHWprSyeeOGywpSQ0AK
+	Oi3TTHyZGgCTGu8WPrNTX+DZxA/LWM8gbtaD9TiD7YIEl0eO+/P3
+X-Google-Smtp-Source: AGHT+IFs9VPaEshO98QUhC5RRDF0Mkoo6i7yhLz8vpCE9vFzUdt7U1dA3tk9cQz6by9TmYJONiDouA==
+X-Received: by 2002:a05:6870:e0c6:b0:277:d932:deb1 with SMTP id 586e51a60fabf-27b9d852322mr1010016fac.18.1725665066368;
+        Fri, 06 Sep 2024 16:24:26 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a9a7946ae4sm2263285a.26.2024.09.06.16.24.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 16:24:25 -0700 (PDT)
+Date: Fri, 06 Sep 2024 19:24:25 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ willemdebruijn.kernel@gmail.com, 
+ shuah@kernel.org, 
+ willemb@google.com
+Cc: linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <66db8f293dbd1_2a33ef294b3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240906095640.77533-2-kerneljasonxing@gmail.com>
+References: <20240906095640.77533-1-kerneljasonxing@gmail.com>
+ <20240906095640.77533-2-kerneljasonxing@gmail.com>
+Subject: Re: [PATCH net-next v5 1/2] net-timestamp: introduce
+ SOF_TIMESTAMPING_OPT_RX_FILTER flag
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240905075622.66819-1-lulie@linux.alibaba.com>
- <20240905075622.66819-4-lulie@linux.alibaba.com> <CAADnVQL1Z3LGc+7W1+NrffaGp7idefpbnKPQTeHS8xbQme5Paw@mail.gmail.com>
- <20240906152300.634e950b@kernel.org> <CAADnVQJWm_CJobz71_FRPTFeVojHLgmYmQA4tVhOg3MDP2V2Dw@mail.gmail.com>
- <20240906155742.0bd4d4e3@kernel.org>
-In-Reply-To: <20240906155742.0bd4d4e3@kernel.org>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 6 Sep 2024 16:22:12 -0700
-Message-ID: <CAADnVQ+nsUuQ+6rvEq7mYdE0vvqfZ-=hubcoGgUpprHA5P_mHA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 3/5] tcp: Use skb__nullable in trace_tcp_send_reset
-To: Jakub Kicinski <kuba@kernel.org>, Jiri Olsa <jolsa@kernel.org>
-Cc: Philo Lu <lulie@linux.alibaba.com>, bpf <bpf@vger.kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Eddy Z <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Mykola Lysenko <mykolal@fb.com>, 
-	Shuah Khan <shuah@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Kui-Feng Lee <thinker.li@gmail.com>, 
-	Juntong Deng <juntong.deng@outlook.com>, jrife@google.com, 
-	Alan Maguire <alan.maguire@oracle.com>, Dave Marchevsky <davemarchevsky@fb.com>, 
-	Daniel Xu <dxu@dxuuu.xyz>, Viktor Malik <vmalik@redhat.com>, 
-	Cupertino Miranda <cupertino.miranda@oracle.com>, Matt Bobrowski <mattbobrowski@google.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Network Development <netdev@vger.kernel.org>, 
-	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 6, 2024 at 3:57=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Fri, 6 Sep 2024 15:41:47 -0700 Alexei Starovoitov wrote:
-> > The urgency is now because the situation is dire.
-> > The verifier assumes that skb is not null and will remove
-> > if (!skb) check assuming that it's a dead code.
->
-> Meaning verifier currently isn't ready for patch 4?
-> Or we can crash 6.11-rc6 by attaching to a trace_tcp_send_reset()
-> and doing
->         printf("%d\n", skb->len);
-> ?
+Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> introduce a new flag SOF_TIMESTAMPING_OPT_RX_FILTER in the receive
+> path. User can set it with SOF_TIMESTAMPING_SOFTWARE to filter
+> out rx software timestamp report, especially after a process turns on
+> netstamp_needed_key which can time stamp every incoming skb.
+> 
+> Previously, we found out if an application starts first which turns on
+> netstamp_needed_key, then another one only passing SOF_TIMESTAMPING_SOFTWARE
+> could also get rx timestamp. Now we handle this case by introducing this
+> new flag without breaking users.
+> 
+> Quoting Willem to explain why we need the flag:
+> "why a process would want to request software timestamp reporting, but
+> not receive software timestamp generation. The only use I see is when
+> the application does request
+> SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_TX_SOFTWARE."
+> 
+> Similarly, this new flag could also be used for hardware case where we
+> can set it with SOF_TIMESTAMPING_RAW_HARDWARE, then we won't receive
+> hardware receive timestamp.
+> 
+> Another thing about errqueue in this patch I have a few words to say:
+> In this case, we need to handle the egress path carefully, or else
+> reporting the tx timestamp will fail. Egress path and ingress path will
+> finally call sock_recv_timestamp(). We have to distinguish them.
+> Errqueue is a good indicator to reflect the flow direction.
+> 
+> Suggested-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 
-depends on the prog type and how it's attached, but yes :(
-Without Philo's patches.
+High level: where is the harm in receiving unsolicited timestamps?
+A process can easily ignore them. I do wonder if the only use case is
+an overly strict testcase. Was reminded of this as I tried to write
+a more concise paragraph for the documentation.
 
-It was reported here:
-https://lore.kernel.org/bpf/ZrCZS6nisraEqehw@jlelli-thinkpadt14gen4.remote.=
-csb/
+Otherwise implementation looks fine, only the tiniest nit.
 
-Jiri did the analysis. These files would need to be annotated:
-include/trace/events/afs.h
-include/trace/events/cachefiles.h
-include/trace/events/ext4.h
-include/trace/events/fib.h
-include/trace/events/filelock.h
-include/trace/events/host1x.h
-include/trace/events/huge_memory.h
-include/trace/events/kmem.h
-include/trace/events/netfs.h
-include/trace/events/power.h
-include/trace/events/qdisc.h
-include/trace/events/rxrpc.h
-include/trace/events/sched.h
-include/trace/events/sunrpc.h
-include/trace/events/tcp.h
-include/trace/events/tegra_apb_dma.h
-include/trace/events/timer_migration.h
-include/trace/events/writeback.h
+> @@ -946,11 +946,17 @@ void __sock_recv_timestamp(struct msghdr *msg, struct sock *sk,
+>  
+>  	memset(&tss, 0, sizeof(tss));
+>  	tsflags = READ_ONCE(sk->sk_tsflags);
+> -	if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+> +	if ((tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+> +	     (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+> +	     skb_is_err_queue(skb) ||
+> +	     !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))) &&
 
-which is 18 out of 160.
+Nit: these statements should all align on the inner brace, so indent
+by one character.
 
-All other options are worse.
+>  	    ktime_to_timespec64_cond(skb->tstamp, tss.ts + 0))
+>  		empty = 0;
+>  	if (shhwtstamps &&
+> -	    (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) &&
+> +	    (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE &&
+> +	    (tsflags & SOF_TIMESTAMPING_RX_HARDWARE ||
+> +	    skb_is_err_queue(skb) ||
+> +	    !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))) &&
+>  	    !skb_is_swtx_tstamp(skb, false_tstamp)) {
+>  		if_index = 0;
+>  		if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NETDEV)
+> -- 
+> 2.37.3
+> 
+
+
 
