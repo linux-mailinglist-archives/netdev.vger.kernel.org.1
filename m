@@ -1,155 +1,291 @@
-Return-Path: <netdev+bounces-125841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A229F96EE84
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:48:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4978496EE91
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:52:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60A6128128B
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:48:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD0BC1F2180B
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2608A13A3F4;
-	Fri,  6 Sep 2024 08:48:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E344157A59;
+	Fri,  6 Sep 2024 08:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="JDppy8VF";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="6jG5vXZT";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="JDppy8VF";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="6jG5vXZT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BAD11FAA;
-	Fri,  6 Sep 2024 08:48:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A097155CBD;
+	Fri,  6 Sep 2024 08:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725612503; cv=none; b=oTjZqF7AzoYyBC4EEf1t2WJtOH8QxUe+pQlWC5OblMPSwn8hAHA7vY+GdU0nYLtfs6Sr6Ha9cx1wR1YH2DJTvvJE6XoBm6cMkQ/aJpg1NvV+Ezpi5ZSYbKZLzB9olu+Vn3FFwSAtdp8lH0/tstPnSZ21EzDL7BhW/4jSXW/00R8=
+	t=1725612728; cv=none; b=h1GkCI68or1AOdIcfI/bOFv+Z+wduw/RJ2gp90JiJWZYuFHyxjbrJv7/ipU9VOLvF9bmrLXnr+kh+8R8A938l2ALoofSwSqzwW+JQgrt1Ajd/B9z5TrhNRhCUeZ5r++/qaeAkS67GpsrZPyKl0zk05FLF313nwD4wmScQFglAmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725612503; c=relaxed/simple;
-	bh=wa+B/VX5ZH3+Qs1eU0YBOaeqkw6Kt+1kMu1rCCscQpg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Z2OI4MhmjMkbmxaiUIXIRN95LqFEkTNY7zPnexjeY8MSQ2g+C3FampgSgcAZxyIk3qyZMOGxGXSq2ndslIkU0kXvqqV9smwgVSrIWMz5EgdxR177DoE0jmUV2ysjQCMKY8QCOuaxCbPs7jbDdQ0N9EoV7dHE1U6cddpy/6BMlcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5c260b19f71so1934270a12.1;
-        Fri, 06 Sep 2024 01:48:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725612500; x=1726217300;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=87rBKScRz3ev/bfm5D1NGFd+7Kine22vuIY6M5kV5Lw=;
-        b=IrPa8Pnm+ng206k9RwY7LjjHaGdpmhjlKuAl2LehHZ8iAsn6psf1i5JbzLzE9tCoQw
-         7GIrS+QiMaQTUuA74dzb6C6Zgt67cC+6WX783sb2PqmOxsuJgbe7h3+P0TJJup1LxTsQ
-         kHpHLOhURXz9jaewsZ3KinPL+tbvSiyvrJVnIuOguaA3sMmPssHWqKC7cXbg6iUPJhv+
-         fEvOMuvMlvCr6DBI3lrtGIyrSHqeO1REG02NAgYEQqJWePi18zIxaySV31PHlSBNH28h
-         cKQa+1hPSTXawu3Mf2h+zIAj0ntAlkl3TPiWe6lOrHxzzH+HgiwyINLIeHwT4Ju6rmeR
-         fOFg==
-X-Forwarded-Encrypted: i=1; AJvYcCVz1fggcQH3evXyWL+JnikfXX48SjZVsa2JkA25KXJbwN/d8+jseM+Pul1p3eSD1ZgQUaISlhYP180yBZQ=@vger.kernel.org, AJvYcCWPjMkCoSpyW5IzYV/JGLsRk7UjzlsPIfRrnm/k+PrWfcSOo4A/hqUJ0YImppCTvaUUNOnjFFov@vger.kernel.org
-X-Gm-Message-State: AOJu0YwJCtUEFpkafseLCwOFROdA/AMFrMu+kLB4xyZOiG6JdGeRi7NW
-	EIuvf7xpjTE4KCMp3HGVAo2j2c8+FxDoXLagmzRVq8Kg9Fa0vBuW
-X-Google-Smtp-Source: AGHT+IGXKJGkXdghz404iaNV/EhyPOiJVH1hczaqYgw8PxZ1NSaq8x5JLDVIWhaaOX+IlCbNsIT31w==
-X-Received: by 2002:a05:6402:35cf:b0:5c2:7699:fb6f with SMTP id 4fb4d7f45d1cf-5c3dc79783amr1163066a12.15.1725612498771;
-        Fri, 06 Sep 2024 01:48:18 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc5425f6sm2173146a12.22.2024.09.06.01.48.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 01:48:18 -0700 (PDT)
-Date: Fri, 6 Sep 2024 01:48:15 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Simon Horman <horms@kernel.org>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, davej@codemonkey.org.uk,
-	thevlad@meta.com, max@kutsevol.com
-Subject: Re: [PATCH net-next 8/9] net: netconsole: split send_msg_fragmented
-Message-ID: <20240906-spirited-versatile-cougar-2babed@devvm32600>
-References: <20240903140757.2802765-1-leitao@debian.org>
- <20240903140757.2802765-9-leitao@debian.org>
- <20240904111636.GV4792@kernel.org>
+	s=arc-20240116; t=1725612728; c=relaxed/simple;
+	bh=Nrflb2H2yXn5hE4VXnOT1oOR62LDJ/jlfL4fLgasIHM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jTheysXPfDMfvEhm39/STCvlKZBQCLtuBX6YO+9OXRUjcxxg+wkM8eUbCX4poY3VLjnWJMAsmDsC4dZ0pWjxE4dL4M1dowF/YH+PmeQgg+3ChqV/3H8lVUgZ4xowb4wFcM7vtTbi/T0nzEsCbbOSC9KmmoT/U9R+fRgl+GRDZBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=JDppy8VF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=6jG5vXZT; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=JDppy8VF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=6jG5vXZT; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 70BD61F8A8;
+	Fri,  6 Sep 2024 08:52:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1725612724; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=IzogC8JuQRtj+kiGfSeOCXmpLa3gvh93o14fVFDPkWg=;
+	b=JDppy8VF9Irao39PPHgk/YTpy7wQbVJKMM/vshTpo3I5+o5BZvzJvOHhoF180EYK/mvLUR
+	DchdsGGC3rcaD1seufLf/g7uBwp3H0W01sSoe9hQ7C7DFFsdv/8inw7bjqsW8TD6K9fef/
+	Sma0AovEmjISO5qSNJSDYJHNN9Fcn9k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1725612724;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=IzogC8JuQRtj+kiGfSeOCXmpLa3gvh93o14fVFDPkWg=;
+	b=6jG5vXZT6yq3mZZyE0V2evrOPr1vy89l8hKTevfsKWau7UMtuyl+IMY6UHwk+sCGwF0t8v
+	zyfXHi6Yxh9OPCCg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1725612724; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=IzogC8JuQRtj+kiGfSeOCXmpLa3gvh93o14fVFDPkWg=;
+	b=JDppy8VF9Irao39PPHgk/YTpy7wQbVJKMM/vshTpo3I5+o5BZvzJvOHhoF180EYK/mvLUR
+	DchdsGGC3rcaD1seufLf/g7uBwp3H0W01sSoe9hQ7C7DFFsdv/8inw7bjqsW8TD6K9fef/
+	Sma0AovEmjISO5qSNJSDYJHNN9Fcn9k=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1725612724;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=IzogC8JuQRtj+kiGfSeOCXmpLa3gvh93o14fVFDPkWg=;
+	b=6jG5vXZT6yq3mZZyE0V2evrOPr1vy89l8hKTevfsKWau7UMtuyl+IMY6UHwk+sCGwF0t8v
+	zyfXHi6Yxh9OPCCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4C39A136A8;
+	Fri,  6 Sep 2024 08:52:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id vEI+ErTC2mYQTgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Fri, 06 Sep 2024 08:52:04 +0000
+Message-ID: <572688a7-8719-4f94-a5cd-e726486c757d@suse.cz>
+Date: Fri, 6 Sep 2024 10:52:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240904111636.GV4792@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] memcg: add charging of already allocated slab objects
+Content-Language: en-US
+To: Shakeel Butt <shakeel.butt@linux.dev>, Yosry Ahmed <yosryahmed@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, David Rientjes <rientjes@google.com>,
+ Hyeonggon Yoo <42.hyeyoo@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Meta kernel team <kernel-team@meta.com>,
+ cgroups@vger.kernel.org, netdev@vger.kernel.org
+References: <20240905173422.1565480-1-shakeel.butt@linux.dev>
+ <CAJD7tkbWLYG7-G9G7MNkcA98gmGDHd3DgS38uF6r5o60H293rQ@mail.gmail.com>
+ <qk3437v2as6pz2zxu4uaniqfhpxqd3qzop52zkbxwbnzgssi5v@br2hglnirrgx>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <qk3437v2as6pz2zxu4uaniqfhpxqd3qzop52zkbxwbnzgssi5v@br2hglnirrgx>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linux-foundation.org,cmpxchg.org,kernel.org,linux.dev,google.com,gmail.com,davemloft.net,redhat.com,kvack.org,vger.kernel.org,meta.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-On Wed, Sep 04, 2024 at 12:16:36PM +0100, Simon Horman wrote:
-> On Tue, Sep 03, 2024 at 07:07:51AM -0700, Breno Leitao wrote:
-> > Refactor the send_msg_fragmented() function by extracting the logic for
-> > sending the message body into a new function called
-> > send_fragmented_body().
-> > 
-> > Now, send_msg_fragmented() handles appending the release and header, and
-> > then delegates the task of sending the body to send_fragmented_body().
-> 
-> I think it would be good to expand a bit on why here.
-> 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  drivers/net/netconsole.c | 85 +++++++++++++++++++++++-----------------
-> >  1 file changed, 48 insertions(+), 37 deletions(-)
-> > 
-> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> > index be23def330e9..81d7d2b09988 100644
-> > --- a/drivers/net/netconsole.c
-> > +++ b/drivers/net/netconsole.c
-> > @@ -1066,45 +1066,21 @@ static void append_release(char *buf)
-> >  	scnprintf(buf, MAX_PRINT_CHUNK, "%s,", release);
-> >  }
-> >  
-> > -static void send_msg_fragmented(struct netconsole_target *nt,
-> > -				const char *msg,
-> > -				const char *userdata,
-> > -				int msg_len,
-> > -				int release_len)
-> > +static void send_fragmented_body(struct netconsole_target *nt, char *buf,
-> > +				 const char *msgbody, int header_len,
-> > +				 int msgbody_len)
-> >  {
-> > -	int header_len, msgbody_len, body_len;
-> > -	static char buf[MAX_PRINT_CHUNK]; /* protected by target_list_lock */
-> > -	int offset = 0, userdata_len = 0;
-> > -	const char *header, *msgbody;
-> > -
-> > -	if (userdata)
-> > -		userdata_len = nt->userdata_length;
-> > -
-> > -	/* need to insert extra header fields, detect header and msgbody */
-> > -	header = msg;
-> > -	msgbody = memchr(msg, ';', msg_len);
-> > -	if (WARN_ON_ONCE(!msgbody))
-> > -		return;
-> > -
-> > -	header_len = msgbody - header;
-> > -	msgbody_len = msg_len - header_len - 1;
-> > -	msgbody++;
-> > -
-> > -	/*
-> > -	 * Transfer multiple chunks with the following extra header.
-> > -	 * "ncfrag=<byte-offset>/<total-bytes>"
-> > -	 */
-> > -	if (release_len)
-> > -		append_release(buf);
-> > +	int body_len, offset = 0;
-> > +	const char *userdata = NULL;
-> > +	int userdata_len = 0;
-> >  
-> > -	/* Copy the header into the buffer */
-> > -	memcpy(buf + release_len, header, header_len);
-> > -	header_len += release_len;
-> > +#ifdef CONFIG_NETCONSOLE_DYNAMIC
-> > +	userdata = nt->userdata_complete;
-> > +	userdata_len = nt->userdata_length;
-> > +#endif
-> 
-> I think that dropping the userdata parameter of send_msg_fragmented() ought
-> to part of an earlier patch or separate patch. It doesn't seem strictly
-> related to this patch.
+On 9/5/24 20:48, Shakeel Butt wrote:
+>> > ---
+>> > v3: https://lore.kernel.org/all/20240829175339.2424521-1-shakeel.butt@linux.dev/
+>> > Changes since v3:
+>> > - Add kernel doc for kmem_cache_charge.
+>> >
+>> > v2: https://lore.kernel.org/all/20240827235228.1591842-1-shakeel.butt@linux.dev/
+>> > Change since v2:
+>> > - Add handling of already charged large kmalloc objects.
+>> > - Move the normal kmalloc cache check into a function.
+>> >
+>> > v1: https://lore.kernel.org/all/20240826232908.4076417-1-shakeel.butt@linux.dev/
+>> > Changes since v1:
+>> > - Correctly handle large allocations which bypass slab
+>> > - Rearrange code to avoid compilation errors for !CONFIG_MEMCG builds
+>> >
+>> > RFC: https://lore.kernel.org/all/20240824010139.1293051-1-shakeel.butt@linux.dev/
+>> > Changes since the RFC:
+>> > - Added check for already charged slab objects.
+>> > - Added performance results from neper's tcp_crr
+>> >
+>> >
+>> >  include/linux/slab.h            | 20 ++++++++++++++
+>> >  mm/slab.h                       |  7 +++++
+>> >  mm/slub.c                       | 49 +++++++++++++++++++++++++++++++++
+>> >  net/ipv4/inet_connection_sock.c |  5 ++--
+>> >  4 files changed, 79 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/include/linux/slab.h b/include/linux/slab.h
+>> > index eb2bf4629157..68789c79a530 100644
+>> > --- a/include/linux/slab.h
+>> > +++ b/include/linux/slab.h
+>> > @@ -547,6 +547,26 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
+>> >                             gfp_t gfpflags) __assume_slab_alignment __malloc;
+>> >  #define kmem_cache_alloc_lru(...)      alloc_hooks(kmem_cache_alloc_lru_noprof(__VA_ARGS__))
+>> >
+>> > +/**
+>> > + * kmem_cache_charge - memcg charge an already allocated slab memory
+>> > + * @objp: address of the slab object to memcg charge.
+>> > + * @gfpflags: describe the allocation context
+>> > + *
+>> > + * kmem_cache_charge is the normal method to charge a slab object to the current
 
-I agree with you. Let me separate it in a different patch, then.
+what is "normal method"? 
 
-Thanks for the review,
---breno
+>> > + * memcg. The objp should be pointer returned by the slab allocator functions
+>> > + * like kmalloc or kmem_cache_alloc. The memcg charge behavior can be controller
+>> 
+>> s/controller/controlled
+> 
+> Thanks. Vlastimil please fix this when you pick this up.
+
+I felt it could be improved more, so ended up with this. Thoughts?
+
+/**
+ * kmem_cache_charge - memcg charge an already allocated slab memory
+ * @objp: address of the slab object to memcg charge
+ * @gfpflags: describe the allocation context
+ *
+ * kmem_cache_charge allows charging a slab object to the current memcg,
+ * primarily in cases where charging at allocation time might not be possible
+ * because the target memcg is not known (i.e. softirq context)
+ *
+ * The objp should be pointer returned by the slab allocator functions like
+ * kmalloc (with __GFP_ACCOUNT in flags) or kmem_cache_alloc. The memcg charge
+ * behavior can be controlled through gfpflags parameter, which affects how the
+ * necessary internal metadata can be allocated. Including __GFP_NOFAIL denotes
+ * that overcharging is requested instead of failure, but is not applied for the
+ * internal metadata allocation.
+ *
+ * There are several cases where it will return true even if the charging was
+ * not done:
+ * More specifically:
+ *
+ * 1. For !CONFIG_MEMCG or cgroup_disable=memory systems.
+ * 2. Already charged slab objects.
+ * 3. For slab objects from KMALLOC_NORMAL caches - allocated by kmalloc()
+ *    without __GFP_ACCOUNT
+ * 4. Allocating internal metadata has failed
+ *
+ * Return: true if charge was successful otherwise false.
+ */
+ 
+>> > +
+>> > +       /* Ignore KMALLOC_NORMAL cache to avoid circular dependency. */
+>> 
+>> Is it possible to point to the commit that has the explanation here?
+>> The one you pointed me to before? Otherwise it's not really obvious
+>> where the circular dependency comes from (at least to me).
+>> 
+> 
+> Not sure about the commit reference. We can add more text here.
+> Vlastimil, how much detail do you prefer?
+
+What about:
+
+        /*
+         * Ignore KMALLOC_NORMAL cache to avoid possible circular dependency
+         * of slab_obj_exts being allocated from the same slab and thus the slab
+         * becoming effectively unfreeable.
+         */
+
+ 
+> thanks,
+> Shakeel
+
 
