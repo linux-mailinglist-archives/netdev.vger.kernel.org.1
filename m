@@ -1,167 +1,100 @@
-Return-Path: <netdev+bounces-125826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DE9196EC76
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:48:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87DF596EC89
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65763B25300
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 07:48:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E6E71F21E71
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 07:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1600E1547DC;
-	Fri,  6 Sep 2024 07:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B26871B3A;
+	Fri,  6 Sep 2024 07:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="FwzpELgo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AAOi32KH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786E114BF8F
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 07:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643FE1B59A;
+	Fri,  6 Sep 2024 07:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725608688; cv=none; b=ui304dEwge5+G72yXjhbDFcDhQbFpyjpEZjj+6EklldV8Xbp7BhoYc9DnrhZkigQl0/trb3O3OQZxKwCQDABGQHzLeSXm7fm7gaorXKiRwjZJOhzYDDe3I73BrXmE2sp0RZP3XAIKnhwLlUFA7u3va1znsDemVVLNARcNtKVG5s=
+	t=1725609026; cv=none; b=TKMEIZePnrrDu3lSLBRQ88yGKi8D+sy7zft++U4MO+ULeyzVsHMlw2KRWBPSAORp7inHJc16UjsVxpkNuOkzqz+/KdB5tHvb034hi7bjbdax+UT+bI/rsvMs2CX2ffTFHXZgzE9oGhyqNeqWgqtOMM7fF0Djrt5DpRQQBlp24h8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725608688; c=relaxed/simple;
-	bh=07b0IMeSMwgMzjCtM2DsBnr3riDLhDHjvKXOx8+lQuQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O8+3eQLdvGwDI0cBfhhUhVepoMXVXw4hDWq5RmKzU6Yzx/a37uKX97An4Lr8+EIpIHBTq0DCUhHkt7OwxUBUBXbrB+CbxLVGxdCP74jTOLJKPZvZme2CAkOvnaTUFrcNzWWHdM9lY0rQ/s0xAX9HRT8bGEAXM+7zk4cjkY30oG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=FwzpELgo; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2f74e468aa8so15944311fa.1
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 00:44:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1725608685; x=1726213485; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=g2iWgb97T7hXzF6zuXBGICV8UKLvinMfR+RbHOd+dQ4=;
-        b=FwzpELgoHJC9THi2bUeB2ndw3/6JOEDtdFAJALrB4oexXzw3rdvVi8LhcapOZ/Udvq
-         rqP9rF+tp8Lq6rR3C+EZ0xnYjAeiD90B/cqBpnABujIyYUQ/hnuJ3sb16LmNNKsjm37M
-         e93Iu6rnKhX6fH9KYD3f/rTs/uo8lTtrilq32E68dE2fwRN7T2PHNTrjbgt42aDlOntz
-         lP6prAedjWVPtCPIxwSFOYhHGH93+m6nDwSlFtPcxNCJVHVtSiNRL8y+s3NQAJySKAls
-         duYqvWFNMjoy5Bo21iVIPl/l9vEQFJzUg2aEReOh1DlGaES0i29XtimxmhLKte2lCZM8
-         J4Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725608685; x=1726213485;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g2iWgb97T7hXzF6zuXBGICV8UKLvinMfR+RbHOd+dQ4=;
-        b=eKDxwulsOHv7P6t+xLG/xioembU61/+TAZr6kQ+Ul1WpiQMect/netAsBddqyAQL/P
-         SOrPtRYhPnP0u8t4ZdNxiNTQTGLCWup1scQgKRVXw4AqwWUqIBJX701o+MhfY6QMdc4N
-         GruSeFR8TlevScLxpmo4mp1s/7ZwOp76/9qRqGFZCCvo5f/hsFgdO+31lZsDZ2Uy9TMb
-         yPGWBbDfsRy310fi1QPqvtALJhM7BbkDqbgruzbIXxWTNSAcPCmBWooNAsB3hxwInox4
-         iI7mK0/ivkWZymWu7GcsiZw41jEFWESRGiDuBhlyycPf9Cj3XukV+cr9X9bgsc/dngYz
-         WUTg==
-X-Forwarded-Encrypted: i=1; AJvYcCUO/9KWCc7NYQQb2HKIQmQ+t8oTob3JsR8spswyXOJdYDmPV1v7ym2qyWDiLTvaBuAgmOOIhnU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaOXkIuyUUFyeAuEOMjoJFc8iVPAC2oRlPTVaBfRqrk0Mer3U9
-	JR3x2gnFoo7s+rXCNKGpKxam3X8bjIoyk4SS/zk0I/ZGOjKfn3W4HDkqglIP7hlh6DghHOxajgu
-	Dbhu6BWdExEvB6oWJzuNjHZfGRUn3K+9eCgqyNg==
-X-Google-Smtp-Source: AGHT+IELjdXPrNR2ftHe5XllcZ3pyQfKCzq7O/b2xjHbW9q9Q4+MDzmZTA0vD6TNGPaxV5kp8/BSGDK9jb01VsONIG4=
-X-Received: by 2002:a2e:819:0:b0:2f7:4c9d:7a87 with SMTP id
- 38308e7fff4ca-2f75232641cmr10706661fa.21.1725608683728; Fri, 06 Sep 2024
- 00:44:43 -0700 (PDT)
+	s=arc-20240116; t=1725609026; c=relaxed/simple;
+	bh=/ZO+W4w3QSloFc2T0mo3E6tWzu7uRretG6nQRvJqnMo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=e3HHvwsC10MOYb8zNGvSDvM7tBT+MNUXM4kLconDZ9m3MmTp4ZsGJTj3ByWIKrZq6FP+awANv6yKPVsqSF637X8fo2EM6aLQw6C3uanSZFTlSTdnDQzD/Ejw1Y+b+exoTaA1YOuCfkkKn+vW9pM8euELvnKYbUnGMk7Ir9QrdSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AAOi32KH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCBAFC4CEC4;
+	Fri,  6 Sep 2024 07:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725609025;
+	bh=/ZO+W4w3QSloFc2T0mo3E6tWzu7uRretG6nQRvJqnMo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AAOi32KH7j5Y0dYSWtCT9mEv4NJ7aqHMp2lkML7GZc90vPHmw19Du2eIRSsQUcA0E
+	 NByGzqKhTC0S1AdEYFNE4kFIJm/KiBGXAHp3qsvRz/vQQc3YNtQWOhPJWjANSTS25q
+	 nwx05F7JKZWhhNdiUXvrj9eyy1E6Hd9aJ0fm8QvTLZdhWiinTnqrz+6h9aZbFCj77v
+	 kcGuxPuJHL3/y+WvIJ97VtfTpKFLT5wDB6gzGnV6Z/6kegGpKV2PMGUhK7CzzhIn1W
+	 srG6SEgToXbSgVkqhVdoGlF6xY0ULX6HbFL52w1+bh5cyKiAGIOGB0EERT2xEecIWL
+	 QFWQBv1hR4ftA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAECB3806654;
+	Fri,  6 Sep 2024 07:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240814082301.8091-1-brgl@bgdev.pl> <87a5hcyite.fsf@kernel.org>
- <CAMRc=Mcr7E0dxG09_gYPxg57gYAS4j2+-3x9GCS3wOcM46O=NQ@mail.gmail.com>
- <87y146ayrm.fsf@kernel.org> <CAMRc=Mfes+=59WP8dcMsiUApqjsFrY9iVFEdKU6FbTKAFP1k_A@mail.gmail.com>
- <878qw6hs4s.fsf@kernel.org>
-In-Reply-To: <878qw6hs4s.fsf@kernel.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 6 Sep 2024 09:44:32 +0200
-Message-ID: <CAMRc=Mc_Qy6-Rgsw_uOweUXtoiZGMR0D22Ou9nXUJDDdPCZqLw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
- of the ath11k on WCN6855
-To: Kalle Valo <kvalo@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 0/3] net: dsa: microchip: rename and clean ksz8
+ series files
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172560902675.2010941.14519744626903062150.git-patchwork-notify@kernel.org>
+Date: Fri, 06 Sep 2024 07:50:26 +0000
+References: <20240904062749.466124-1-vtpieter@gmail.com>
+In-Reply-To: <20240904062749.466124-1-vtpieter@gmail.com>
+To: Pieter <vtpieter@gmail.com>
+Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux@armlinux.org.uk, Arun.Ramadoss@microchip.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Tristram.Ha@microchip.com,
+ o.rempel@pengutronix.de, pieter.van.trappen@cern.ch
 
-On Thu, Sep 5, 2024 at 8:28=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrote:
->
-> Bartosz Golaszewski <brgl@bgdev.pl> writes:
->
-> > On Thu, Sep 5, 2024 at 5:47=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wr=
-ote:
-> >>
-> >> Bartosz Golaszewski <brgl@bgdev.pl> writes:
-> >>
-> >> >> > +  - if:
-> >> >> > +      properties:
-> >> >> > +        compatible:
-> >> >> > +          contains:
-> >> >> > +            const: pci17cb,1103
-> >> >> > +    then:
-> >> >> > +      required:
-> >> >> > +        - vddrfacmn-supply
-> >> >> > +        - vddaon-supply
-> >> >> > +        - vddwlcx-supply
-> >> >> > +        - vddwlmx-supply
-> >> >> > +        - vddrfa0p8-supply
-> >> >> > +        - vddrfa1p2-supply
-> >> >> > +        - vddrfa1p8-supply
-> >> >> > +        - vddpcie0p9-supply
-> >> >> > +        - vddpcie1p8-supply
-> >> >>
-> >> >> Like we discussed before, shouldn't these supplies be optional as n=
-ot
-> >> >> all modules need them?
-> >> >>
-> >> >
-> >> > The answer is still the same: the ATH11K inside a WCN6855 does - in
-> >> > fact - always need them. The fact that the X13s doesn't define them =
-is
-> >> > bad representation of HW and I'm fixing it in a subsequent DTS patch=
-.
-> >>
-> >> But, like we discussed earlier, M.2 boards don't need these so I think
-> >> this should be optional.
-> >>
-> >
-> > If they are truly dynamic, plug-and-play M.2 boards then they
-> > shouldn't need any description in device-tree. If they are M.2 sockets
-> > that use custom, vendor-specific pins (like what is the case on
-> > sc8280xp-crd and X13s) then the HW they carry needs to be described
-> > correctly. We've discussed that before.
->
-> Sigh. Please reread the previous discussion. In some cases we need to
-> set qcom,ath11k-calibration-variant even for M.2 boards.
->
+Hello:
 
-Maybe instead of posting patronizing comments and forcing me to
-reiterate all my previous points, you should reread the discussion as
-well?
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-DT describes hardware and the WNC6855 package is composed of several
-modules which we represent as separate DT nodes - currently: PMU,
-WLAN, Bluetooth. The WLAN module takes inputs from the PMU so it
-*DOES* need the supplies. The fact that you only want to specify the
-qcom,ath11k-calibration-variant property is irrelevant because the HW
-is what it is. Device-tree source is not a configuration file - it's a
-description of hardware.
+On Wed,  4 Sep 2024 08:27:39 +0200 you wrote:
+> From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+> 
+> The first KSZ8 series implementation was done for a KSZ8795 device but
+> since several other KSZ8 devices have been added. Rename these files
+> to adhere to the ksz8 naming convention as already used in most
+> functions and the existing ksz8.h; add an explanatory note.
+> 
+> [...]
 
-For upstream - if you're using the WCN6855, you must specify the
-inputs for the WLAN module so it's only fair they be described as
-"required". For out-of-tree DTS I couldn't care less.
+Here is the summary with links:
+  - [net-next,v4,1/3] net: dsa: microchip: rename ksz8 series files
+    https://git.kernel.org/netdev/net-next/c/6e65f5f55b7e
+  - [net-next,v4,2/3] net: dsa: microchip: clean up ksz8_reg definition macros
+    https://git.kernel.org/netdev/net-next/c/dcff1c05f283
+  - [net-next,v4,3/3] net: dsa: microchip: replace unclear KSZ8830 strings
+    https://git.kernel.org/netdev/net-next/c/23de126f9248
 
-You are not correct saying that "M.2 boards don't need these" because
-as a matter of fact: the WLAN module on your M.2 card takes these
-inputs from the PMU inside the WCN6855 package.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Bartosz
+
 
