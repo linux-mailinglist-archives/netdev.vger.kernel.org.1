@@ -1,252 +1,156 @@
-Return-Path: <netdev+bounces-125745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 350CC96E663
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 01:39:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E29696E6BB
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:20:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51CCE1C22F6E
-	for <lists+netdev@lfdr.de>; Thu,  5 Sep 2024 23:39:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AA4B1C2299D
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 00:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62EE01B4C56;
-	Thu,  5 Sep 2024 23:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C045C8F5C;
+	Fri,  6 Sep 2024 00:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fbqoG7Mm"
 X-Original-To: netdev@vger.kernel.org
-Received: from trager.us (trager.us [52.5.81.116])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720F65381B;
-	Thu,  5 Sep 2024 23:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.5.81.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0558C0B;
+	Fri,  6 Sep 2024 00:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725579551; cv=none; b=XaxDKm/Byf/W1bCt3B+WgjUq82+kgeNd8t70YtwkduLTGcQu9YegIlhhZGaILDq7kn9HiCRPMtRbpzOwGShTZ43R4SBmrCO4vGtt15J+eqH8LEPXzwZvRnRt20etBoap0hAyISKfNxcR5xUh+oLq/EnsrwjQvNcjf12mgZor/q4=
+	t=1725582009; cv=none; b=sQLzfMqvpI9soZOfIa+UA6h8a4dveE/xVEqNVYaoYWGt7taYoiFY1Wd1K+r7NoRZ2R1zL7qCTBcn1ito4aI1iM0hOy0qkHZjCLV2uffUhBVWTcxsqJtWJviPzUCnR27NhgI2uutd1DhYBOm/n2Lo9+zwgTbJVOEjWE72CTFn+SY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725579551; c=relaxed/simple;
-	bh=cQQmJ5AgekB3x6oTYMEqlDF58JG5FJt2/c46w/qfVsE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=stSRxcqex+VOUlv1GOIGfXUf4AwUR2twnxf/DLAMlBwTVL44Rogs4vx4sWphupVuOhPmHP4iZMd8an+wmBL4PYYDhJw6AHV+orgrDM1MWbJuLhYZgXSZArpe0q4m7ur6FlZ5tJbJUM6abrx0WNe0wrioL55gFEuo2kMpqMO5kTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us; spf=pass smtp.mailfrom=trager.us; arc=none smtp.client-ip=52.5.81.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trager.us
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trager.us
-Received: from c-76-104-255-50.hsd1.wa.comcast.net ([76.104.255.50] helo=localhost)
-	by trager.us with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92.3)
-	(envelope-from <lee@trager.us>)
-	id 1smM44-00024n-O4; Thu, 05 Sep 2024 23:39:01 +0000
-From: Lee Trager <lee@trager.us>
-To: netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	kernel-team@meta.com,
-	Shinas Rasheed <srasheed@marvell.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Phani Burra <phani.r.burra@intel.com>,
-	Lee Trager <lee@trager.us>,
-	Joshua Hay <joshua.a.hay@intel.com>,
-	Sanman Pradhan <sanmanpradhan@meta.com>
-Cc: Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Alan Brady <alan.brady@intel.com>,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] eth: fbnic: Add devlink firmware version info
-Date: Thu,  5 Sep 2024 16:37:51 -0700
-Message-ID: <20240905233820.1713043-1-lee@trager.us>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1725582009; c=relaxed/simple;
+	bh=k6HdsAxoeA8RN4oFUwCtYdv0OJumnCAJBq3cA5p2ouE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=laJO4GwA14dicdU9QRAJb0t9SUsnoQ0jm0KjMb8suRxtxvoQ8vMITehSEM2v8WXFz94EAvmi+tRJTi8zOFLxqlPpeHyEmQas5RZd41zD00w9IEdqd8ALbps9jDXCROZapRSOQBk2XdgRgKPiJn4l9cK/v/Nfx+iCZKd2MqqdCOM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fbqoG7Mm; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e1a9e4fa5aaso1527441276.2;
+        Thu, 05 Sep 2024 17:20:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725582007; x=1726186807; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bwUnGvgcdVUsv9NnxXJyKjm/Pvuz799SJrkUxeDj1qg=;
+        b=fbqoG7MmXlZrBscZsF7TJ1rxVH5H96Uz2iL491RyhiJVhLaP03JlOZqRd5lPnKbWd0
+         8pxQN5ixu2cn0wKgC0LHJPMOXRN6QYz0rubSsnr8+g6cCvwOGqVtzBJr6dZn903o0qex
+         DFva7QOjbsN1U5Etv+rXpcDGs9YXX+umWwrXIXIDK27zNVic/aQhQvaWLg7SqHamLR3v
+         hOOM4TqPQIKQ7RxtVbXogBkaqhy7c82PZiF5fMPIe6z4cKM5+7DWXfXVPuz/td3CbEWY
+         kBjCGZwdwjO0DCan15Gd0J4LONZvz8lZwH7WpChICkIvLscXrcpRVtu/01JaaKbc4SOz
+         f13w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725582007; x=1726186807;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=bwUnGvgcdVUsv9NnxXJyKjm/Pvuz799SJrkUxeDj1qg=;
+        b=gNo3Dyin7hBDvAA9RYu7tHrE2FCdJN31x/W+EuRn0lPgZ585CusgKz0XCq4SFh9tPB
+         3XKDveZNo64YgB+vtWP6KtPd//6cZKb7rf+uLYUZjCR9GTw3gJ/abP5bE1/9GUm5tcQT
+         LDfLOOpIFrM40UfeFOqY+HDUA2mFF1zGUdAwkbVKFt4ixYwMEmcL5YMRJOJ1e/qfU7UG
+         v1o1eEp6OWPd8f1S2/B3ebqkG1jSSWV1SsB91U+V6Oz1UntkWx8ZZk+qhI+1fFkhid8A
+         goK/yBrGqvwX7PZ3xsDe0JpMsUCY7eZaPU+4WBPz3ugwYZMgBL333LncyBjdaXhvMfxf
+         PKgw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpBYchrjPFdqiTQWhCszVNZghYurpH5DUxmVOmkpcB8VhN6mK0XsZAiUMGp74Y6DHea9P4VS+fhkqpLg6lvb0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyS7kRbnueiZG4ej77KTUIus9J5pdrO3qKyVeQocy+wfNiEvwom
+	rydqeNggarLTVNNNuSaJxqjy6UEQbzabamHhNbq+deC7CFUqrTGx
+X-Google-Smtp-Source: AGHT+IGumt+v8v+Ykj6JASAC76hryFaHwDPu7JeY3jkYr8idFoziDoH1COgIxvxze0w+9EeRF4ffhA==
+X-Received: by 2002:a05:6902:2846:b0:e1c:f239:4dd5 with SMTP id 3f1490d57ef6-e1d3489864amr1180872276.29.1725582007112;
+        Thu, 05 Sep 2024 17:20:07 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c5203152dasm12099046d6.95.2024.09.05.17.20.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 17:20:06 -0700 (PDT)
+Date: Thu, 05 Sep 2024 20:20:05 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ ncardwell@google.com, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ fw@strlen.de, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <66da4ab570989_269be02944d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66da3dabc3f71_25102d29476@willemb.c.googlers.com.notmuch>
+References: <20240905031233.1528830-1-willemdebruijn.kernel@gmail.com>
+ <20240905031233.1528830-3-willemdebruijn.kernel@gmail.com>
+ <20240905143128.0dde754f@kernel.org>
+ <66da3dabc3f71_25102d29476@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH net-next 2/2] selftests/net: integrate packetdrill with
+ ksft
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-This adds support to show firmware version information for both stored and
-running firmware versions. The version and commit is displayed separately
-to aid monitoring tools which only care about the version.
+Willem de Bruijn wrote:
+> Jakub Kicinski wrote:
+> > On Wed,  4 Sep 2024 23:07:03 -0400 Willem de Bruijn wrote:
+> > > +++ b/tools/testing/selftests/net/packetdrill/config
+> > > @@ -0,0 +1 @@
+> > > +CONFIG_TCP_MD5SIG=y
+> > 
+> > Looks like this is not enough:
+> > 
+> > # 1..2
+> > # open tun device: No such file or directory
+> > # not ok 1 ipv4
+> > # open tun device: No such file or directory
+> > 
+> > https://netdev-3.bots.linux.dev/vmksft-packetdrill/results/759141/1-tcp-inq-client-pkt/stdout
+> > 
+> > Resulting config in the build:
+> > 
+> > # CONFIG_TUN is not set
+> > 
+> > https://netdev-3.bots.linux.dev/vmksft-packetdrill/results/759141/config
+> > 
+> > Keep in mind the "Important" note here:
+> > 
+> > https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style#how-to-build
+> > 
+> > I recommend using a fresh tree or mrproper for testing vng configs.
+> > 
+> > Feel free to post v2 without the 24h wait, it's a bit tricky to handle
+> > new targets in CI, sooner we merge this the less manual work for me..
+> 
+> Oops sorry. Thanks for the pointer.
+> 
+> Sent a v2 with CONFIG_TUN and a few other CONFIGS from reviewing
+> the existing configs and defaults.sh. The above steps work for me now. 
 
-Example output:
-  # devlink dev info
-  pci/0000:01:00.0:
-    driver fbnic
-    serial_number 88-25-08-ff-ff-01-50-92
-    versions:
-        running:
-          fw 24.07.15-017
-          fw.commit h999784ae9df0
-          fw.bootloader 24.07.10-000
-          fw.bootloader.commit hfef3ac835ce7
-        stored:
-          fw 24.07.24-002
-          fw.commit hc9d14a68b3f2
-          fw.bootloader 24.07.22-000
-          fw.bootloader.commit h922f8493eb96
-          fw.undi 01.00.03-000
+Packetdrill scripts are sensitive to timing.
+On the dbg build, I just observe a flaky test.
 
-Signed-off-by: Lee Trager <lee@trager.us>
----
- .../device_drivers/ethernet/index.rst         |  1 +
- .../device_drivers/ethernet/meta/fbnic.rst    | 29 +++++++
- MAINTAINERS                                   |  1 +
- .../net/ethernet/meta/fbnic/fbnic_devlink.c   | 75 +++++++++++++++++++
- 4 files changed, 106 insertions(+)
- create mode 100644 Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+The tool takes --tolerance_usecs and --tolerance_percent arguments.
+I may have to update ksft_runner.sh to increase one if a dbg build is
+detected.
 
-diff --git a/Documentation/networking/device_drivers/ethernet/index.rst b/Documentation/networking/device_drivers/ethernet/index.rst
-index 6932d8c043c2..6fc1961492b7 100644
---- a/Documentation/networking/device_drivers/ethernet/index.rst
-+++ b/Documentation/networking/device_drivers/ethernet/index.rst
-@@ -44,6 +44,7 @@ Contents:
-    marvell/octeon_ep
-    marvell/octeon_ep_vf
-    mellanox/mlx5/index
-+   meta/fbnic
-    microsoft/netvsc
-    neterion/s2io
-    netronome/nfp
-diff --git a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-new file mode 100644
-index 000000000000..32ff114f5c26
---- /dev/null
-+++ b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
-@@ -0,0 +1,29 @@
-+.. SPDX-License-Identifier: GPL-2.0+
-+
-+=====================================
-+Meta Platforms Host Network Interface
-+=====================================
-+
-+Firmware Versions
-+-----------------
-+
-+fbnic has three components stored on the flash which are provided in one PLDM
-+image:
-+
-+1. fw - The control firmware used to view and modify firmware settings, request
-+   firmware actions, and retrieve firmware counters outside of the data path.
-+   This is the firmware which fbnic_fw.c interacts with.
-+2. bootloader - The firmware which validate firmware security and control basic
-+   operations including loading and updating the firmware. This is also known
-+   as the cmrt firmware.
-+3. undi - This is the UEFI driver which is based on the Linux driver.
-+
-+fbnic stores two copies of these three components on flash. This allows fbnic
-+to fall back to an older version of firmware automatically in case firmware
-+fails to boot. Version information for both is provided as running and stored.
-+The undi is only provided in stored as it is not actively running once the Linux
-+driver takes over.
-+
-+devlink dev info provides version information for all three components. In
-+addition to the version the hg commit hash of the build is included as a
-+separate entry.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index baf88e74c907..fae13f784226 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14819,6 +14819,7 @@ M:	Alexander Duyck <alexanderduyck@fb.com>
- M:	Jakub Kicinski <kuba@kernel.org>
- R:	kernel-team@meta.com
- S:	Supported
-+F:	Documentation/networking/device_drivers/ethernet/meta/
- F:	drivers/net/ethernet/meta/
+Let me know if I should respin now. Else I can also follow-up.
 
- METHODE UDPU SUPPORT
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-index e87049dfd223..ef05ae8f5039 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_devlink.c
-@@ -10,6 +10,56 @@
+Need to figure out how best to detect debug builds. It is not in
+uname, and no proc/config.gz. Existence of /sys/kernel/debug/kmemleak
+is a proxy for current kernel/configs/debug.config, if a bit crude.
 
- #define FBNIC_SN_STR_LEN	24
+Another config affecting timing may be CONFIG_HZ. I did not observe
+issues with these specific scripts with CONFIG_HZ=250. It may have to
+be tackled eventually. Or CONFIG_HZ=1000 hardcoded in config.
 
-+static int fbnic_version_running_put(struct devlink_info_req *req,
-+				     struct fbnic_fw_ver *fw_ver,
-+				     char *ver_name)
-+{
-+	char running_ver[FBNIC_FW_VER_MAX_SIZE];
-+	int err;
-+
-+	fbnic_mk_fw_ver_str(fw_ver->version, running_ver);
-+	err = devlink_info_version_running_put(req, ver_name, running_ver);
-+	if (err)
-+		return err;
-+
-+	if (strlen(fw_ver->commit) > 0) {
-+		char commit_name[FBNIC_SN_STR_LEN];
-+
-+		snprintf(commit_name, FBNIC_SN_STR_LEN, "%s.commit", ver_name);
-+		err = devlink_info_version_running_put(req, commit_name,
-+						       fw_ver->commit);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static int fbnic_version_stored_put(struct devlink_info_req *req,
-+				    struct fbnic_fw_ver *fw_ver,
-+				    char *ver_name)
-+{
-+	char stored_ver[FBNIC_FW_VER_MAX_SIZE];
-+	int err;
-+
-+	fbnic_mk_fw_ver_str(fw_ver->version, stored_ver);
-+	err = devlink_info_version_stored_put(req, ver_name, stored_ver);
-+	if (err)
-+		return err;
-+
-+	if (strlen(fw_ver->commit) > 0) {
-+		char commit_name[FBNIC_SN_STR_LEN];
-+
-+		snprintf(commit_name, FBNIC_SN_STR_LEN, "%s.commit", ver_name);
-+		err = devlink_info_version_stored_put(req, commit_name,
-+						      fw_ver->commit);
-+		if (err)
-+			return err;
-+	}
-+
-+	return 0;
-+}
-+
- static int fbnic_devlink_info_get(struct devlink *devlink,
- 				  struct devlink_info_req *req,
- 				  struct netlink_ext_ack *extack)
-@@ -17,6 +67,31 @@ static int fbnic_devlink_info_get(struct devlink *devlink,
- 	struct fbnic_dev *fbd = devlink_priv(devlink);
- 	int err;
 
-+	err = fbnic_version_running_put(req, &fbd->fw_cap.running.mgmt,
-+					DEVLINK_INFO_VERSION_GENERIC_FW);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_version_running_put(req, &fbd->fw_cap.running.bootloader,
-+					DEVLINK_INFO_VERSION_GENERIC_FW_BOOTLOADER);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_version_stored_put(req, &fbd->fw_cap.stored.mgmt,
-+				       DEVLINK_INFO_VERSION_GENERIC_FW);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_version_stored_put(req, &fbd->fw_cap.stored.bootloader,
-+				       DEVLINK_INFO_VERSION_GENERIC_FW_BOOTLOADER);
-+	if (err)
-+		return err;
-+
-+	err = fbnic_version_stored_put(req, &fbd->fw_cap.stored.undi,
-+				       DEVLINK_INFO_VERSION_GENERIC_FW_UNDI);
-+	if (err)
-+		return err;
-+
- 	if (fbd->dsn) {
- 		unsigned char serial[FBNIC_SN_STR_LEN];
- 		u8 dsn[8];
---
-2.43.5
 
