@@ -1,135 +1,161 @@
-Return-Path: <netdev+bounces-125763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F42796E7C9
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:35:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9C9096E7D7
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:46:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 569CE1F23C6C
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:35:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 028CF1C22C14
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFEA12556E;
-	Fri,  6 Sep 2024 02:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DA1431A60;
+	Fri,  6 Sep 2024 02:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FGWCiCHx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TcW+EeQi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2540F20309;
-	Fri,  6 Sep 2024 02:35:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFC71BC59;
+	Fri,  6 Sep 2024 02:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725590149; cv=none; b=q3lShJhrfB9bVn+RsiTIs+xm7zwPji6x+mmUfgQsDyX5FR20pyvfXYhulqRLaeoXn0fMhxA3sDx+8EFBcFus4BHWwwbe5SW/JIxgCa6VucqXeVEtGfmO1BDaAN7UYe1VnTKPtbN3WQvCmWPdLxS92oc5yG6nYc4elkVflgNU5IE=
+	t=1725590755; cv=none; b=r1oa0TCHEgUu18M/861KvZFKC52fdSG+WEU0BUt9WJUvojOmtxVG/nDRMbyGriR1Obpw7H3pp2D7lUEBQILjmpj0vfYdlRFr41JX/Sc2rEm8M2NQYHKLS6lXwhhsRu5JsyRkC/yRbjjsVS92zJoc4sUWxEh+2jTvi35ck2VzBE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725590149; c=relaxed/simple;
-	bh=Fzr6nr+kwIKI9j5BIdLiVRJ3OmBZ4n8WUcYcVRxtIGs=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=Et17vECAdkhTqQYhDZAdkKsKasqYVWf2URZYINZEjfaHKO+mm3PU7LczQhtYIIzxdzkXlwjHY8PihLKwqBM/bsU4RqkLn5biwJ5E1q3ZJNP4WoMBlWK1HL6fYo6GJ+IfkA46R2VcuMcuzJAAnAmzaiAPj0Cvx8QwCGa8ebyklPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FGWCiCHx; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1725590139; h=From:To:Subject:Date:Message-Id;
-	bh=DnyB99j6a2ROjkoQoX8a/uNCuS7pxEQfXsOLHA3wH0o=;
-	b=FGWCiCHxILs5KvtuPt+k95cr1aWhskJFYWpAYBahLVqOr/V9rMY3keg0qeDRywueByfr5zjEnCOvN9+/ZRQLMh+hEfzMMkqcY27uFPC60iB4Yckgb0SYLUNWORTAUHb++h2jgrA8jO/8LH/KW5OM4EUAStx14YiCooxOhAfbLt0=
-Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WENfFPd_1725590135)
-          by smtp.aliyun-inc.com;
-          Fri, 06 Sep 2024 10:35:39 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-To: kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	wintera@linux.ibm.com,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	tonylu@linux.alibaba.com,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net-next] net/smc: add sysctl for smc_limit_hs
-Date: Fri,  6 Sep 2024 10:35:35 +0800
-Message-Id: <1725590135-5631-1-git-send-email-alibuda@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1725590755; c=relaxed/simple;
+	bh=ixNLaOAtVMGoQC1gtQD3vczSbizq28Rh27a/PBzkGaI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=dskdHeynVl/McMonwAMmYI8hHv6duNirK9SoqxVrm9kJRHC15dM9ZEZbFJIXzIqbGCwy1JQVw/ouIsgYIVwIUNW64T0kS/Bgyngici0ONIJ2BBa0ymBzvNEprZ6ZUoNEsnE1nPAaU0FRID1rADR2aHVSXjfXRYwwte/NOZTnA98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TcW+EeQi; arc=none smtp.client-ip=209.85.222.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7a802deeb9aso100081985a.0;
+        Thu, 05 Sep 2024 19:45:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725590753; x=1726195553; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O+XQr8t+aPYsPo7Nk3RSgvzNeOgekiEJiS+0t7Ud70g=;
+        b=TcW+EeQiZ4GawQ95AIEMwZtlQz96NyHy9H7QF1gCM922z8MG4WDB7DcTaUqb0igAAR
+         9dv9ONIoHMqoflK4knV50m7pgDdifKvm/VTRbo/aQy5i5j+xiTgHWtglLlQQe9ILrImx
+         KkpnKAb4dIVJXMg7LHWQC14xW7Z1IgI6ZAs0Q8fCmRLOFPTs0onhD7SNtrhaU4BFwLPW
+         4/KppMHT0Rbhp2cdFgdYPFqniEwDSGECct3LD5QnATChgC1hjVXWNehIfIB/oACbIeGP
+         tapI7subuHG0zMsdXFR3PEzdCeMH02hsUdfeW2NRiDh6gRZfb94FnrPnRtZS7pzFyme0
+         YZng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725590753; x=1726195553;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=O+XQr8t+aPYsPo7Nk3RSgvzNeOgekiEJiS+0t7Ud70g=;
+        b=iOBC4nXv3lgnrQKiif/uxRlKMjD8xq9Oh4DkQGSXT7PE483JTUHyG/kXRwR2Nl2tnk
+         4YaU3mouaQAYhEVvLYE/AILSaPcTZ6wrVIZ06KKl+eaZd+mbf2xK7oWDauVgcZz2Xyrj
+         iHzqpws86c7PyhaC26SZY9emcLcfbX1TnHpGvtnbr8xiSJK8HCq2yLAZUroaIKQaEjx/
+         Q21WJewyf8vPRaI9oJNnerKabd9J9O4TDgJKw2JArwpVXnQlhqnaxiM7QMGhj1DyROAw
+         a70WOxJtaSHvcu7XCoBZ2Fr4Pq3JORejxV30f3NOP+Ihz0E+RvSs+bwnSfBdgu5NkIq3
+         yALg==
+X-Forwarded-Encrypted: i=1; AJvYcCU2vWCZOhQjjdlCtq/mtrpQnKT2cCL5c5Cva5y6wRX/gfodBNQXY+KLtI3Iqu7uzM+OKQda2z3nPLP0zhPITJY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxbh8hnxPH1tULded+miW1AfA6clsW1IbHPXotNirntVBqsY7W+
+	myTlxLX+cxDQglykEVa1epnGfJU6+689z1+DbhwHLDaf/AE+EeeO
+X-Google-Smtp-Source: AGHT+IEKnSw+TKSc+8yZkRq/O5vfEer6Po/gobR0i/TDnW6OKsztIOL/l0LbaaJpubdHfEZmAPciLg==
+X-Received: by 2002:a05:620a:4146:b0:79e:e302:7392 with SMTP id af79cd13be357-7a99733a677mr145515185a.32.1725590753231;
+        Thu, 05 Sep 2024 19:45:53 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a98efea9c1sm130024485a.75.2024.09.05.19.45.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 19:45:52 -0700 (PDT)
+Date: Thu, 05 Sep 2024 22:45:52 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ ncardwell@google.com, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ fw@strlen.de, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <66da6ce0f72e_27f00d29441@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240905184204.797a4c49@kernel.org>
+References: <20240905031233.1528830-1-willemdebruijn.kernel@gmail.com>
+ <20240905031233.1528830-3-willemdebruijn.kernel@gmail.com>
+ <20240905143128.0dde754f@kernel.org>
+ <66da3dabc3f71_25102d29476@willemb.c.googlers.com.notmuch>
+ <66da4ab570989_269be02944d@willemb.c.googlers.com.notmuch>
+ <66da5b8b27259_27bb41294c@willemb.c.googlers.com.notmuch>
+ <20240905184204.797a4c49@kernel.org>
+Subject: Re: [PATCH net-next 2/2] selftests/net: integrate packetdrill with
+ ksft
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: "D. Wythe" <alibuda@linux.alibaba.com>
+Jakub Kicinski wrote:
+> On Thu, 05 Sep 2024 21:31:55 -0400 Willem de Bruijn wrote:
+> > > Packetdrill scripts are sensitive to timing.
+> > > On the dbg build, I just observe a flaky test.
+> > > 
+> > > The tool takes --tolerance_usecs and --tolerance_percent arguments.
+> > > I may have to update ksft_runner.sh to increase one if a dbg build is
+> > > detected.
+> > > 
+> > > Let me know if I should respin now. Else I can also follow-up.
+> > > 
+> > > Need to figure out how best to detect debug builds. It is not in
+> > > uname, and no proc/config.gz. Existence of /sys/kernel/debug/kmemleak
+> > > is a proxy for current kernel/configs/debug.config, if a bit crude.  
+> > 
+> > Should have kept on reading. Will use KSFT_MACHINE_SLOW:
+> > 
+> > +declare -a optargs
+> > +if [[ "${KSFT_MACHINE_SLOW}" == "yes" ]]; then
+> > +       optargs+=('--tolerance_usecs=10000')
+> > +fi
+> > +
+> >  ktap_print_header
+> >  ktap_set_plan 2
+> > 
+> > -packetdrill ${ipv4_args[@]} $(basename $script) > /dev/null \
+> > +packetdrill ${ipv4_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
+> >         && ktap_test_pass "ipv4" || ktap_test_fail "ipv4"
+> > -packetdrill ${ipv6_args[@]} $(basename $script) > /dev/null \
+> > +packetdrill ${ipv6_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
+> >         && ktap_test_pass "ipv6" || ktap_test_fail "ipv6"
+> > 
+> > 
+> > > Another config affecting timing may be CONFIG_HZ. I did not observe
+> > > issues with these specific scripts with CONFIG_HZ=250. It may have to
+> > > be tackled eventually. Or CONFIG_HZ=1000 hardcoded in config.  
+> >  
+> > I will just add the CONFIG for now.
+> 
+> Not sure I follow the HZ idea, lowering the frequency helps stability?
+> 
+> We can see how well v2 does overnight, so far it's green:
+> https://netdev.bots.linux.dev/contest.html?executor=vmksft-packetdrill-dbg
+> (the net-next-2024-09-05--* branches had v1).
 
-In commit 48b6190a0042 ("net/smc: Limit SMC visits when handshake workqueue congested"),
-we introduce a mechanism to put constraint on SMC connections visit
-according to the pressure of SMC handshake process.
+Great!
 
-At that time, we believed that controlling the feature through netlink
-was sufficient. However, most people have realized now that netlink is
-not convenient in container scenarios, and sysctl is a more suitable
-approach.
+I saw one failure in manual runs and was unable to reproduce it with
+a few more iterations. Let's see how it goes.
 
-In addition, since commit 462791bbfa35 ("net/smc: add sysctl interface for SMC")
-had introcuded smc_sysctl_net_init(), it is reasonable for us to
-initialize limit_smc_hs in it instead of initializing it in
-smc_pnet_net_int().
+We do adjust these internally, to the same value for KASAN.
+ 
+> FWIW status page lists two sets of packetdrill runners, probably 
+> because I 'reused' an old team-driver runner instead of creating
+> a new one. It should straighten itself out by tomorrow.
 
-Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
-Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
-Reviewed-by: Jan Karcher <jaka@linux.ibm.com>
----
- net/smc/smc_pnet.c   |  3 ---
- net/smc/smc_sysctl.c | 11 +++++++++++
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-index 2adb92b..1dd3623 100644
---- a/net/smc/smc_pnet.c
-+++ b/net/smc/smc_pnet.c
-@@ -887,9 +887,6 @@ int smc_pnet_net_init(struct net *net)
- 
- 	smc_pnet_create_pnetids_list(net);
- 
--	/* disable handshake limitation by default */
--	net->smc.limit_smc_hs = 0;
--
- 	return 0;
- }
- 
-diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
-index 13f2bc0..2fab645 100644
---- a/net/smc/smc_sysctl.c
-+++ b/net/smc/smc_sysctl.c
-@@ -90,6 +90,15 @@
- 		.extra1		= &conns_per_lgr_min,
- 		.extra2		= &conns_per_lgr_max,
- 	},
-+	{
-+		.procname	= "limit_smc_hs",
-+		.data		= &init_net.smc.limit_smc_hs,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ZERO,
-+		.extra2		= SYSCTL_ONE,
-+	},
- };
- 
- int __net_init smc_sysctl_net_init(struct net *net)
-@@ -121,6 +130,8 @@ int __net_init smc_sysctl_net_init(struct net *net)
- 	WRITE_ONCE(net->smc.sysctl_rmem, net_smc_rmem_init);
- 	net->smc.sysctl_max_links_per_lgr = SMC_LINKS_PER_LGR_MAX_PREFER;
- 	net->smc.sysctl_max_conns_per_lgr = SMC_CONN_PER_LGR_PREFER;
-+	/* disable handshake limitation by default */
-+	net->smc.limit_smc_hs = 0;
- 
- 	return 0;
- 
--- 
-1.8.3.1
 
 
