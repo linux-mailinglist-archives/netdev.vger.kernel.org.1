@@ -1,115 +1,126 @@
-Return-Path: <netdev+bounces-126001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28BF396F88C
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:44:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5160796F89C
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:48:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D989F28681E
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:44:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE45A1F22E31
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1821D2F67;
-	Fri,  6 Sep 2024 15:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45091D3193;
+	Fri,  6 Sep 2024 15:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mZ8KjB+b"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Po2zFaQV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1831D1F60
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 15:44:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A971D2F65;
+	Fri,  6 Sep 2024 15:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725637495; cv=none; b=Mm75coqEukFiLJnH0iF0+jUg5K+O4kNhnfihXWehcc8/NYp5zuKSxvpzHQzLaPEiuJbAJ4fNPWBMzJbMEMMi1TGvJ/JKGEIPkL87llZABV47vQnnUoTbq7utyPPk7VIk4L9gOF5vvIGqdQlBT7HG6EWkNukUKVOgchqmBHDzOs0=
+	t=1725637702; cv=none; b=P6lGoaDXAAq+/khCcBsXTJQ6DoGNOZxk7LUOxrfJy6KbGhFVv6dkWXsAzzBTqQOdb4ch8RPMgWITEPfGqwOEYoZqwN4RuNaGvMKxSOilw52QWPuLNKfFaUxySJTXEwloMqbd1wnMuRgEJOKDudDN736Z9qFdNSOYD3TDcTLhAtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725637495; c=relaxed/simple;
-	bh=h0OZ4BVzGmMJB5EH5ZjRAevdZvga495/HrIhRKoR+mI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IWuQl9nczyjWKDwb+FIUAO2MQxulxva7iVYwjNHvkAcHtsK3aoeGrVRjEr0QHHOT0HDPS3wPFmvM+kITwCX367ag/edKaK/knlLGWBFugdtBx/DkNAED3B3w9JkdcA5NmnOuwRI94DrTBI/jJKlOLq4khEV2q8wgt9dAJ57aZvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mZ8KjB+b; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e1a8de19944so5264914276.1
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 08:44:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725637493; x=1726242293; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ka5B86ATyytf2qARVLJqT+nYwZxs8AhLMD/nslR8eNk=;
-        b=mZ8KjB+bIzpDW801Ysrrie1w6Z2d2naJ53U4voiBHDyQoz603y4y8yEnthxF70EppO
-         ofPcScfphTJ7AMJzXD4mpUY5FmVIwGemG7ZJt6r7RJ1c8pyuKkC9XLXL9F2jaT1wTydi
-         H7HhKxPTq0pk74sQdamtBLpKSmvoj5IW5yurIGGeaJ+xSXGB/v/6kHcO7q62Ga6zbDPL
-         CZ6wGY+ktIAiEa30rJtv4DWtHbs+Ox/6odG6De05mK2zybSwxJQE14VcCuGsaMZ5lI2k
-         80Ia7Hub3BPIo1WV7vc5B4XBm18XjJhIcVOPnyZWh4s/5EMI7fMZa9mde62snKaMQmxj
-         3b/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725637493; x=1726242293;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ka5B86ATyytf2qARVLJqT+nYwZxs8AhLMD/nslR8eNk=;
-        b=rSBSpUL1nlYe2UmGQALOPvcyp4qqwQHqDKgdNR9ZBtUH7HRzvtjFaXG8FuPb3Sl6Dg
-         /nwJraV9j1vVXpzNNhBbGNYb4c61xRN8uwbnh59KUq7OMMA0C9JI4HgyNgUnMIAEVcD8
-         WiZNjBE/OaBFlSMgEyKk12viKSrfWOvBjKTXwx9liB9G1mrnaWrK6cHNUF0r4beOX1qt
-         /HiN++Sc76xEv4K9YU1bjp8g+CGu3+EdAT+HsjM/1pEb0nsiD1dMEJ2S11W9AJ/OCGei
-         tsQSpAgyQ0/hKU7fDPvC6D47d2XEwOVVSb3/d+ezYqfGvBgMcBRI8BXydsJbWKpkxTs3
-         vtLA==
-X-Forwarded-Encrypted: i=1; AJvYcCWohtKw2j2PiEvxrutryp6uQU2Y8mvuBppMsF3MShIh/3lPvJuI86NImZ+j9AhEuo2HZvA7yhg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0zn5/ejIuf7Qe7I0GMQv7SqznZgt/gtSMrFoozeVhk8MvEBpG
-	w7u+SsNQnsE0Obt0M775/7gh68CX5jTbjRyUTI+vQWF+qSVpZYZZsNAjs1z5hgJHHYxps+OPkKv
-	xyiDclaX4dg==
-X-Google-Smtp-Source: AGHT+IFl8y59Vuvf4+P7wemx9BANG8LHKt8GkC5urpK9INHDJ48xP6+CXwbcXzG9v3Q/+2zqbdPyqOHH7k01dQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:9390:0:b0:e16:69e2:2028 with SMTP id
- 3f1490d57ef6-e1d34879f14mr5329276.3.1725637492825; Fri, 06 Sep 2024 08:44:52
- -0700 (PDT)
-Date: Fri,  6 Sep 2024 15:44:49 +0000
+	s=arc-20240116; t=1725637702; c=relaxed/simple;
+	bh=KmcM3UCxcc7R3t7reYXNQQgCkdkc8cBRJX7dLKQVRTk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QD5AjbdHUYGUAC7vCpin2w+VYH1+WYShotwDp/LH9SzdcJC3M3MLPAoQkeYh45cpqXtBxHVli7wCS4k1Qvk0Pr/kgvRN71YP6fqnx94oI0OFafp9zVJNyjAXbGK92UZhCWHd7OLM3hiNgWqqQWFYSz2tL9+bgxZRAzKXNH8y7DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Po2zFaQV; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QnV59Anz5y/x5uuidyf42ziLN+anSmW8b4PnB5tiUmg=; b=Po2zFaQVmZezwNAoU3m9YQ0bGD
+	WF8auzB1ZJ4+0AbVdTQqPDOVVLUoIYsdvX6qbYZlT2I9N2Af1azxdWZa8ZcFIqW2GwsSSxMvnGzjz
+	d4B+5hOL004jbS1d8FD3QYAepS1wOUAL2fwNf8HYQ/kvCOGmURF6PJqZRYV2s8OYqazY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1smbBw-006qC7-4j; Fri, 06 Sep 2024 17:48:08 +0200
+Date: Fri, 6 Sep 2024 17:48:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: ftgmac100: Fix potential NULL dereference
+ in error handling
+Message-ID: <6c60860b-dd3c-4d1c-945b-edb8ef6a8618@lunn.ch>
+References: <3f196da5-2c1a-4f94-9ced-35d302c1a2b9@stanley.mountain>
+ <SEYPR06MB51342F3EC5D457CC512937259D9E2@SEYPR06MB5134.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <20240906154449.3742932-1-edumazet@google.com>
-Subject: [PATCH bpf] sock_map: add a cond_resched() in sock_hash_free()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Alexei Starovoitov <ast@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Andrii Nakryiko <andrii@kernel.org>, netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>, 
-	syzbot <syzkaller@googlegroups.com>, John Fastabend <john.fastabend@gmail.com>, 
-	Jakub Sitnicki <jakub@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SEYPR06MB51342F3EC5D457CC512937259D9E2@SEYPR06MB5134.apcprd06.prod.outlook.com>
 
-Several syzbot soft lockup reports all have in common sock_hash_free()
+On Fri, Sep 06, 2024 at 06:06:14AM +0000, Jacky Chou wrote:
+> Hello,
+> 
+> > 
+> > We might not have a phy so we need to check for NULL before calling
+> > phy_stop(netdev->phydev) or it could lead to an Oops.
+> > 
+> > Fixes: e24a6c874601 ("net: ftgmac100: Get link speed and duplex for NC-SI")
+> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > ---
+> >  drivers/net/ethernet/faraday/ftgmac100.c | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/faraday/ftgmac100.c
+> > b/drivers/net/ethernet/faraday/ftgmac100.c
+> > index f3cc14cc757d..0e873e6f60d6 100644
+> > --- a/drivers/net/ethernet/faraday/ftgmac100.c
+> > +++ b/drivers/net/ethernet/faraday/ftgmac100.c
+> > @@ -1565,7 +1565,8 @@ static int ftgmac100_open(struct net_device
+> > *netdev)
+> >  	return 0;
+> > 
+> >  err_ncsi:
+> > -	phy_stop(netdev->phydev);
+> > +	if (netdev->phydev)
+> > +		phy_stop(netdev->phydev);
+> When using " use-ncsi" property, the driver will register a fixed-link phy device and 
+> bind to netdev at probe stage.
+> 
+> if (np && of_get_property(np, "use-ncsi", NULL)) {
+> 
+> 		......
+> 
+> 		phydev = fixed_phy_register(PHY_POLL, &ncsi_phy_status, NULL);
+> 		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
+> 					 PHY_INTERFACE_MODE_MII);
+> 		if (err) {
+> 			dev_err(&pdev->dev, "Connecting PHY failed\n");
+> 			goto err_phy_connect;
+> 		}
+> } else if (np && of_phy_is_fixed_link(np)) {
+> 
+> Therefore, it does not need to check if the point is NULL in this error handling.
+> Thanks.
 
-If a map with a large number of buckets is destroyed, we need to yield
-the cpu when needed.
+Are you actually saying:
 
-Fixes: 75e68e5bf2c7 ("bpf, sockhash: Synchronize delete from bucket list on map free")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: John Fastabend <john.fastabend@gmail.com>
-Cc: Jakub Sitnicki <jakub@cloudflare.com>
----
- net/core/sock_map.c | 1 +
- 1 file changed, 1 insertion(+)
+        if (netdev->phydev) {
+                /* If we have a PHY, start polling */
+                phy_start(netdev->phydev);
+        }
 
-diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-index d3dbb92153f2fe7f1ddc8e35b495533fbf60a8cb..724b6856fcc3e9fd51673d31927cfd52d5d7d0aa 100644
---- a/net/core/sock_map.c
-+++ b/net/core/sock_map.c
-@@ -1183,6 +1183,7 @@ static void sock_hash_free(struct bpf_map *map)
- 			sock_put(elem->sk);
- 			sock_hash_free_elem(htab, elem);
- 		}
-+		cond_resched();
- 	}
- 
- 	/* wait for psock readers accessing its map link */
--- 
-2.46.0.469.g59c65b2a67-goog
+is wrong, it is guaranteed there is always a phydev?
 
+	Andrew
 
