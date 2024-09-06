@@ -1,95 +1,93 @@
-Return-Path: <netdev+bounces-126121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA37796FE7A
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 01:28:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 17DD096FE99
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 01:48:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB57B289AD1
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:28:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4814285CAE
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:48:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAE9215B14D;
-	Fri,  6 Sep 2024 23:28:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BDC21581EA;
+	Fri,  6 Sep 2024 23:48:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q6IdksBt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bsxjw5BI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6A315AD83;
-	Fri,  6 Sep 2024 23:28:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DE615B0FA
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 23:48:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725665292; cv=none; b=jN5AWdelAOodSI689WkjpC5D4gfsH2O5Zi0Z9ePz4COvrqicsWjkK/8mO+dA9MYkpE8FdBWuAF8RLzGUo4S852oH2A/xhYsd4iCv7HIxhRjTeanVlD+Thq7b8K+vPMlqok76OEZAwRuL9NQDU92WnRQjKocFdRBYQNEit/5MKXU=
+	t=1725666498; cv=none; b=pDzp82hDNQBaWPvB+r3dWw/kzEO1xO3OLAhnBhgXY2SMkYW2j9fh+R9uCHbtpk1tbwrMwxo0DXJ1/DJR5zKEH1dgKDeOYZTMEnVJtmH8peWkTzf8WG+ETskCWpnfkg3Bnf6JBn7RYWeeO6Qfu0tbYcMliCjWiIM7MsdE7Lvb//U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725665292; c=relaxed/simple;
-	bh=qU46c5aFmpc7j9gyVhM9h46IdY44emYpEv/jit0N648=;
+	s=arc-20240116; t=1725666498; c=relaxed/simple;
+	bh=sUXfsViiF3VMVX52pmJEgZQwXsB/OQPPNdE313+AUks=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=iZKTePgESvN2wYETguWaFy8jF04YqsxyVU/qA0RzO/wpbu8WJCkp1jowiV8cVrocXuL/scby0NcDOgj2qe6BDTEIKfAIJOkO0w0X+utr/FQm2vdXSCNl666+TuH32OcEpGbIH6u/ri/I6MZFuzsdOUUYmwBEURRUshptWMA6XkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q6IdksBt; arc=none smtp.client-ip=209.85.219.43
+	 Mime-Version:Content-Type; b=l+ozS8S1jjb/8JK0HCweJ0TJVoMVWDAB2eW80cR7bcY5TJW4Rr73eGYWdvvjIuw5vwDCM/o4N3QGxujQksuugF5xZOjc5uHx407H9tHJhAOoB+sUBghq+QwigZCtRD6rA5iwO/d5g6Wc+r4XUaw01CraKvl5nD+pAtGKSGJrqKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bsxjw5BI; arc=none smtp.client-ip=209.85.219.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6c351809a80so14205256d6.1;
-        Fri, 06 Sep 2024 16:28:10 -0700 (PDT)
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e02b79c6f21so3076164276.2
+        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 16:48:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725665290; x=1726270090; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725666495; x=1726271295; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jqz8q2FUFpFlbCCDjXG+7PBcJcJE11GfFiHSwwdg/e4=;
-        b=Q6IdksBtWqvHGO9+yNB3bOS/i3/M6fzjqA8eXbvG/1dGJSFsZmvdB4HJFhx6a/wSTi
-         oqHlJiqAN8RgPEg1uVex2CWzIZICW2QEeOI3FtXPxReypFvXHUDsPf9VEbWZCGD6GQEq
-         MUu91wXL9+eg6wmyXvQdfA2+mmNGBdErqNiIKrdtp2zxPznArrGJp8cSoB9I8uHRU9Mm
-         aeIxRaCkdLtF1BdPkzTRBhMgM0VcdcHyXCVOs988C1ESGD9ib1NEL6nhYV8UQhie53Ib
-         yyH+uJRaU5OHkK1PJDDKdia4Au1/OwxE8eOvCbmfkfz0Bf9l834Zf4otyM/T39eUtX1y
-         fzow==
+        bh=w/Uc9cN2dABLo6AmQ4/JOt5D05Jl9EX//TdZ8d+KqJI=;
+        b=Bsxjw5BI5AwBdS8WTkm2RNMcWv4H2Nxvni4v/N0qxMQkzZWMqv/tXI/qFoTmhkjguc
+         vX2Mnt5+g1JDn6n5QKgu6RvI++NZDH/XCiv3wxPAPTmZDLLNPe/kla8SFj4Eo6I7VECh
+         wnQGHtJ+On+c1MZ+XkFKuJ3FqypqyjKnc9DVSV33HmZdma751lBGvWcuRSFB5/Pinpvl
+         /vT7bWU+W6dxE1JxyeB/UD7yJtSNU4MXM1N3dJ1WoyFVcPo2HwuL9JeqahubHw26eEfC
+         M59dIE8elpt46U+UH5A+0B6IV/lKjSPJ+cFq6V9QLJ35FqFwNMNrxdWDGX5fiD965bBc
+         MM1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725665290; x=1726270090;
+        d=1e100.net; s=20230601; t=1725666495; x=1726271295;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=jqz8q2FUFpFlbCCDjXG+7PBcJcJE11GfFiHSwwdg/e4=;
-        b=sWD2WxnRbTHfDIssONSN/iTaNKZIsSUcCHFjEvOuq3a0NZlR1E+hGvk80rBlcM/KTL
-         xAiW3qHb/6jFufUvOeheDe4+zr4thjqR4wFR0F3fKWtgGxHVItMLrbIM7m04NHw01ZZJ
-         5qw5sAKsPZJq8Al5ETcKBkndqK73jlRZdAHFzGtqpyHnzY6x0ECANlmVQQqb6EM6Hf4b
-         XsRoCQfkxi/ACjExgIxfJm/oez3dM56kii2AyPcyD9lo8hFLPXPE8tVqXtvvtq6Mk/YI
-         Jyiyv7Mu9ggBHN4zfgjJYBtwgdQHs2SZFEWzHE2kOgSyq7iJw8csMcHil6iU0UJOZjbC
-         PHdA==
-X-Forwarded-Encrypted: i=1; AJvYcCUtfdbXuM7E7ppzqHCRZoBqLEGW+/DgUR6kSTiYGxseW0LQMJDkVYV6nEeY5W9g4k+qUkD8CSIeuubXDL/I+iE=@vger.kernel.org, AJvYcCV9zJ6kM8LPRJKgEfCEAhczMxFF6MvTUWkIxr2JpT/V8A/e7Cgj2hrV1OmBy1ocLZ+vulOROLSU@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnhhD/k0hsdMDgdOAh3VDF+ouu4Hxl2B5oY5t7nJJJ+FngpDXA
-	x3AKBz28Pq6yPp+ib/BwGOZ2aNKc2JmBrEfN4nzeijg2uADipz/v
-X-Google-Smtp-Source: AGHT+IFdl0YUzpYfOEPf1j/1Kg3b3Nx+r4hut1xW63itkb4dHaYUmlX9+DmYwH7PT6a+b83EfkKg0w==
-X-Received: by 2002:a05:6214:5403:b0:6c5:1614:9c59 with SMTP id 6a1803df08f44-6c52850056emr48007046d6.31.1725665289736;
-        Fri, 06 Sep 2024 16:28:09 -0700 (PDT)
+        bh=w/Uc9cN2dABLo6AmQ4/JOt5D05Jl9EX//TdZ8d+KqJI=;
+        b=YIcVdESwSQsqbr8P/RVb3eZujpktrnRisbOcxX8uDCilCUDvRL0fUBQdSOQ6fVWkuS
+         X5/o25hpS1gflMHGlnygnHpZ8VNwmtYkkPTjGDA+AwVKeulr0r6YDD2RIQdukcxQySfA
+         sUDONGSqj/UFN3LC2dt+HYNp47z7LyY1zSJFPSixTkzjgY6bTOZr9GR6tPZpZ2TLHm7m
+         UPHiUzWhyHn7xarD255hfgU9sVGoDlGQ9sr/KyJHVpcyij5uVC4InJ7DJpjlphOgY2Lr
+         46sGIj5HwU5IqaE1VD9GMxpZDMeatTfdqev6WiGlFny9bTOrE3gusrgf3ztem4qRKESM
+         l3/g==
+X-Gm-Message-State: AOJu0YwXjf0+81BraaOvDPnep0ZtskMPBd28UhyB4J/Bo8vIynKFqk15
+	n6+zKH8xPoan43DrVhBM1mNuQEEhjfSfN5tZuUHwIw6dxpPikbJK
+X-Google-Smtp-Source: AGHT+IEeQVDWy1hA9pJcWoHUcsuxmd0rcJdWh0jCP3TVLYgW+naZIr+FdeaLWvDOGbxRtuVf8xjzgA==
+X-Received: by 2002:a05:6902:178e:b0:e1d:2917:b1f0 with SMTP id 3f1490d57ef6-e1d3488d6a8mr5626181276.21.1725666495337;
+        Fri, 06 Sep 2024 16:48:15 -0700 (PDT)
 Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c53474d632sm9846d6.89.2024.09.06.16.28.09
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c53474d957sm113136d6.81.2024.09.06.16.48.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 16:28:09 -0700 (PDT)
-Date: Fri, 06 Sep 2024 19:28:08 -0400
+        Fri, 06 Sep 2024 16:48:14 -0700 (PDT)
+Date: Fri, 06 Sep 2024 19:48:14 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Matthieu Baerts <matttbe@kernel.org>, 
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- kuba@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- ncardwell@google.com, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org, 
- fw@strlen.de, 
  Willem de Bruijn <willemb@google.com>
-Message-ID: <66db9008e0b4e_2a33ef29428@willemb.c.googlers.com.notmuch>
-In-Reply-To: <ad780c53-9538-4d3f-a02f-1063828fc035@kernel.org>
-References: <20240905231653.2427327-1-willemdebruijn.kernel@gmail.com>
- <20240905231653.2427327-3-willemdebruijn.kernel@gmail.com>
- <f63e7367-c4fb-4cdc-a44c-6accbc309c5a@kernel.org>
- <66db217a558c4_29a385294d3@willemb.c.googlers.com.notmuch>
- <ad780c53-9538-4d3f-a02f-1063828fc035@kernel.org>
-Subject: Re: [PATCH net-next v2 2/2] selftests/net: integrate packetdrill with
- ksft
+Cc: netdev@vger.kernel.org, 
+ David Ahern <dsahern@kernel.org>, 
+ Jason Xing <kerneljasonxing@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Simon Horman <horms@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Message-ID: <66db94be6e209_2a33ef294e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <1f17d828-5d0f-4050-be4b-8840feb8de76@linux.dev>
+References: <20240904113153.2196238-1-vadfed@meta.com>
+ <20240904113153.2196238-3-vadfed@meta.com>
+ <3e4add99-6b57-4fe1-9ee1-519c80cf7cf5@linux.dev>
+ <66d9debb2d2ea_1eae1a2943d@willemb.c.googlers.com.notmuch>
+ <bc6dcf94-bddb-4703-9451-21792378c45a@linux.dev>
+ <66db1f004a0c_29a3852944d@willemb.c.googlers.com.notmuch>
+ <1f17d828-5d0f-4050-be4b-8840feb8de76@linux.dev>
+Subject: Re: [PATCH net-next v3 2/4] net_tstamp: add SCM_TS_OPT_ID for TCP
+ sockets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,104 +98,191 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Matthieu Baerts wrote:
-> On 06/09/2024 17:36, Willem de Bruijn wrote:
-> > Matthieu Baerts wrote:
-> >> Hi Willem,
-> >>
-> >> On 06/09/2024 01:15, Willem de Bruijn wrote:
-> >>> From: Willem de Bruijn <willemb@google.com>
+Vadim Fedorenko wrote:
+> On 06/09/2024 16:25, Willem de Bruijn wrote:
+> > Vadim Fedorenko wrote:
+> >> On 05/09/2024 17:39, Willem de Bruijn wrote:
+> >>> Vadim Fedorenko wrote:
+> >>>> On 04/09/2024 12:31, Vadim Fedorenko wrote:
+> >>>>> TCP sockets have different flow for providing timestamp OPT_ID value.
+> >>>>> Adjust the code to support SCM_TS_OPT_ID option for TCP sockets.
+> >>>>>
+> >>>>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> >>>>> ---
+> >>>>>     net/ipv4/tcp.c | 13 +++++++++----
+> >>>>>     1 file changed, 9 insertions(+), 4 deletions(-)
+> >>>>>
+> >>>>> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> >>>>> index 8a5680b4e786..5553a8aeee80 100644
+> >>>>> --- a/net/ipv4/tcp.c
+> >>>>> +++ b/net/ipv4/tcp.c
+> >>>>> @@ -474,9 +474,10 @@ void tcp_init_sock(struct sock *sk)
+> >>>>>     }
+> >>>>>     EXPORT_SYMBOL(tcp_init_sock);
+> >>>>>     
+> >>>>> -static void tcp_tx_timestamp(struct sock *sk, u16 tsflags)
+> >>>>> +static void tcp_tx_timestamp(struct sock *sk, struct sockcm_cookie *sockc)
+> >>>>>     {
+> >>>>>     	struct sk_buff *skb = tcp_write_queue_tail(sk);
+> >>>>> +	u32 tsflags = sockc->tsflags;
+> >>>>>     
+> >>>>>     	if (tsflags && skb) {
+> >>>>>     		struct skb_shared_info *shinfo = skb_shinfo(skb);
+> >>>>> @@ -485,8 +486,12 @@ static void tcp_tx_timestamp(struct sock *sk, u16 tsflags)
+> >>>>>     		sock_tx_timestamp(sk, tsflags, &shinfo->tx_flags);
+> >>>>>     		if (tsflags & SOF_TIMESTAMPING_TX_ACK)
+> >>>>>     			tcb->txstamp_ack = 1;
+> >>>>> -		if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK)
+> >>>>> -			shinfo->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;
+> >>>>> +		if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK) {
+> >>>>> +			if (tsflags & SOCKCM_FLAG_TS_OPT_ID)
+> >>>>> +				shinfo->tskey = sockc->ts_opt_id;
+> >>>>> +			else
+> >>>>> +				shinfo->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;
+> >>>>> +		}
+> >>>>>     	}
+> >>>>>     }
+> >>>>>     
+> >>>>> @@ -1318,7 +1323,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+> >>>>>     
+> >>>>>     out:
+> >>>>>     	if (copied) {
+> >>>>> -		tcp_tx_timestamp(sk, sockc.tsflags);
+> >>>>> +		tcp_tx_timestamp(sk, &sockc);
+> >>>>>     		tcp_push(sk, flags, mss_now, tp->nonagle, size_goal);
+> >>>>>     	}
+> >>>>>     out_nopush:
+> >>>>
+> >>>> Hi Willem,
+> >>>>
+> >>>> Unfortunately, these changes are not enough to enable custom OPT_ID for
+> >>>> TCP sockets. There are some functions which rewrite shinfo->tskey in TCP
+> >>>> flow:
+> >>>>
+> >>>> tcp_skb_collapse_tstamp()
+> >>>> tcp_fragment_tstamp()
+> >>>> tcp_gso_tstamp()
+> >>>>
+> >>>> I believe the last one breaks tests, but the problem is that there is no
+> >>>> easy way to provide the flag of constant tskey to it. Only
+> >>>> shinfo::tx_flags are available at the caller side and we have already
+> >>>> discussed that we shouldn't use the last bit of this field.
+> >>>>
+> >>>> So, how should we deal with the problem? Or is it better to postpone
+> >>>> support for TCP sockets in this case?
 > >>>
-> >>> Lay the groundwork to import into kselftests the over 150 packetdrill
-> >>> TCP/IP conformance tests on github.com/google/packetdrill.
-> >>>
-> >>> Florian recently added support for packetdrill tests in nf_conntrack,
-> >>> in commit a8a388c2aae49 ("selftests: netfilter: add packetdrill based
-> >>> conntrack tests").
-> >>>
-> >>> This patch takes a slightly different approach. It relies on
-> >>> ksft_runner.sh to run every *.pkt file in the directory.
+> >>> Are you sure that this is a problem. These functions pass on the
+> >>> skb_shinfo(skb)->ts_key from one skb to another.
 > >>
-> >> Thank you for adding this support! I'm looking forward to seeing more
-> >> packetdrill tests being validated by the CI, and I hope that will
-> >> encourage people to add more tests, and increase the code coverage!
+> >> Yes, you are right, the problem is in a different place.
+> >>
+> >> __skb_complete_tx_timestamp receives skb with shinfo->tskey equal to
+> >> provided by cmsg. But for TCP sockets it unconditionally adjusts ee_data
+> >> value:
+> >>
+> >> 	if (sk_is_tcp(sk))
+> >> 		serr->ee.ee_data -= atomic_read(&sk->sk_tskey);
+> >>
+> >> It happens because of assumption that for TCP sockets shinfo::tskey will
+> >> have sequence number and the logic has to recalculate it back to the
+> >> bytes sent. The same logic exists in all TCP TX timestamping functions
+> >> (mentioned in the previous mail) and may trigger some unexpected
+> >> behavior. To fix the issue we have to provide some kind of signal that
+> >> tskey value is provided from user-space and shouldn't be changed. And we
+> >> have to have it somewhere in skb info. Again, tx_flags looks like the
+> >> best candidate, but it's impossible to use. I'm thinking of using
+> >> special flag in tcp_skb_cb - gonna test more, but open for other
+> >> suggestions.
 > > 
-> > Thanks for taking a look and your feedback.
-> 
-> You are welcome!
-> 
-> >> I have some questions about how the packetdrill should be executed:
-> >> should they be isolated in dedicated netns?
+> > Ai, that is tricky. tx_flags is full/scarce indeed.
 > > 
-> > Yes. The runner decides that, by passing -n 
-> 
-> But then it means that by default, the tests are not isolated. I think
-> many (most?) selftests are running in a dedicated netns by default, no?
-> 
-> To be honest, that's the first time I hear about:
-> 
->   ./run_kselftest.sh --netns
-> 
-> I don't know if it is common to use it, nor if we can enable this
-> feature when using 'make run_tests'. And I don't know if many CI runs
-> multiple selftests in parallel from the same VM.
-> 
-> >> There are some other comments, but feel free to ignore them if they are
-> >> not relevant, or if they can be fixed later.
-> >>
-> >>> Tested:
-> >>> 	make -C tools/testing/selftests \
-> >>> 	  TARGETS=net/packetdrill \
-> >>> 	  run_tests
-> >>
-> >> Please note that this will not run the packetdrill tests in a dedicated
-> >> netns. I don't think that's a good idea. Especially when sysctl knobs
-> >> are being changed during the tests, and more.
-> >>
-> >>> 	make -C tools/testing/selftests \
-> >>> 	  TARGETS=net/packetdrill \
-> >>> 	  install INSTALL_PATH=$KSFT_INSTALL_PATH
-> >>>
-> >>> 	# in virtme-ng
-> >>> 	./run_kselftest.sh -c net/packetdrill
-> >>> 	./run_kselftest.sh -t net/packetdrill:tcp_inq_client.pkt
-> >>
-> >> I see that ./run_kselftest.sh can be executed with the "-n | --netns"
-> >> option to run each test in a dedicated net namespace, but it doesn't
-> >> seem to work:
-> >>
-> >>> # ./run_kselftest.sh -n -c net/packetdrill
-> >>> [  411.087208] kselftest: Running tests in net/packetdrill
-> >>> TAP version 13
-> >>> 1..3
-> >>> Cannot open network namespace "tcp_inq_client.pkt-TaQ8iN": No such file or directory
-> >>> setting the network namespace "tcp_inq_server.pkt-sW8YCz" failed: Invalid argument
-> >>> Cannot open network namespace "tcp_md5_md5-only-on-client-ack.pkt-YzJal6": No such file or directory
+> > CB does not persist as the skb transitions between layers.
 > > 
-> > Ah, I guess this requires adding CONFIG_NET_NS=y to
-> > tools/testing/selftests/net/packetdrill/config
-> 
-> Good point. But I have CONFIG_NET_NS=y on my side. I didn't investigate
-> more, I was first wondering if other people tried this option.
-> 
-> >> But maybe it would be better to create the netns in ksft_runner.sh?
-> >> Please see below.
+> > The most obvious solution would be to set the flag in sk_tsflags
+> > itself. But then the cmsg would no long work on a per request basis:
+> > either the socket uses OPT_ID with counter or OPT_ID_CMSG.
 > > 
-> > No, we opted for this design exactly to use existing kselftest infra,
-> > rather than reimplementing that in our wrapper, as I did in the RFC.
+> > Good that we catch this now before the ABI is finalized.
+> > 
+> > If necessary TCP semantics can diverge from datagrams. So we could
+> > punt on this. But it's not ideal.
 > 
-> OK, I understood from the discussions from the RFC that by using the
-> kselftest infra, the tests would be automatically executed in dedicated
-> netns, and it could also help running tests in parallel. That sounded
-> great to me, but that's not the case by default from what I see.
+> I have done proof of concept code which uses hwtsamp as a storage for
+> custom tskey in case of TCP:
+> 
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index a52638363ea5..40ed49e61bf7 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -5414,8 +5414,6 @@ static void __skb_complete_tx_timestamp(struct 
+> sk_buff *skb,
+>          serr->header.h4.iif = skb->dev ? skb->dev->ifindex : 0;
+>          if (READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID) {
+>                  serr->ee.ee_data = skb_shinfo(skb)->tskey;
+> -               if (sk_is_tcp(sk))
+> -                       serr->ee.ee_data -= atomic_read(&sk->sk_tskey);
+>          }
+> 
+>          err = sock_queue_err_skb(sk, skb);
+> @@ -5450,6 +5448,8 @@ void skb_complete_tx_timestamp(struct sk_buff *skb,
+>           * but only if the socket refcount is not zero.
+>           */
+>          if (likely(refcount_inc_not_zero(&sk->sk_refcnt))) {
+> +               if (sk_is_tcp(sk) && (READ_ONCE(sk->sk_tsflags) & 
+> SOF_TIMESTAMPING_OPT_ID) && skb_hwtstamps(skb)->hwtstamp)
+> +                       skb_shinfo(skb)->tskey = 
+> (u32)skb_hwtstamps(skb)->hwtstamp;
+>                  *skb_hwtstamps(skb) = *hwtstamps;
+>                  __skb_complete_tx_timestamp(skb, sk, SCM_TSTAMP_SND, 
+> false);
+>                  sock_put(sk);
+> @@ -5509,6 +5509,12 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb,
+>                  skb_shinfo(skb)->tskey = skb_shinfo(orig_skb)->tskey;
+>          }
+> 
+> +       if (sk_is_tcp(sk) && (tsflags & SOF_TIMESTAMPING_OPT_ID)) {
+> +               if (skb_hwtstamps(orig_skb)->hwtstamp)
+> +                       skb_shinfo(skb)->tskey = 
+> (u32)skb_hwtstamps(orig_skb)->hwtstamp;
+> +               else
+> +                       skb_shinfo(skb)->tskey -= 
+> atomic_read(&sk->sk_tskey);
+> +       }
+>          if (hwtstamps)
+>                  *skb_hwtstamps(skb) = *hwtstamps;
+>          else
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 0d3decc13a99..1a161a2155b5 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -488,9 +488,8 @@ static void tcp_tx_timestamp(struct sock *sk, struct 
+> sockcm_cookie *sockc)
+>                          tcb->txstamp_ack = 1;
+>                  if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK) {
+>                          if (tsflags & SOCKCM_FLAG_TS_OPT_ID)
+> -                               shinfo->tskey = sockc->ts_opt_id;
+> -                       else
+> -                               shinfo->tskey = TCP_SKB_CB(skb)->seq + 
+> skb->len - 1;
+> +                               skb_hwtstamps(skb)->hwtstamp = 
+> sockc->ts_opt_id;
+> +                       shinfo->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;
+>                  }
+>          }
+>   }
+> 
+> 
+> Looks like we can add u32 tskey field in skb_shared_hwtstamps and reuse
+> it. netdev_data field is only used on RX timestamp side, so should be
+> fine to reuse. WDYT?
 
-Perhaps that's something to change in the defaults for run_tests.
+We cannot really extend the struct. skb_shared_info is scarce.
+hwtstamps is a union. But on tx the hw tstamp is queued using
+skb_tstamp_tx, not through this shinfo data at all.
 
-Since the infra exist, that is preferable over reimplementing it for
-one particular subset of tests.
+It just seems weird to have a shinfo->tskey, but then ignore it and
+find yet another 32b field. Easier would be to find 1b to toggle
+whether tskey is to be interpreted as counter based or OPT_ID_CMSG.
 
-Or if not all kselftests can run in netns (quite likely), this needs
-to be opt-in. Then a variable defined in the Makefile perhaps. To
-tell kselftest to enable the feature for this target.
-
+I don't immediate see a perfect solution either.
 
