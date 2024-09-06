@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-125862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E33396F048
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:53:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1650A96F04D
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 633EFB242C3
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:53:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89AF7B2108A
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:53:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24101C9EA3;
-	Fri,  6 Sep 2024 09:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90C21CA6AA;
+	Fri,  6 Sep 2024 09:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZ58DOvE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxysTji2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD7FB1C9EA1
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 09:52:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDCF1C8FAB
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 09:52:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725616357; cv=none; b=Q8z/gSIoSNtXVvJ/rvsUhkUKAw2lI81hU34tVQ8qHppXJ8HA+zawybjacbZsCgC9YWMvM8kjVM4xRYmV8PA6ABDWWVeUXP1getAXLXMALiEZCLiF7YzDB6BYYLVAKHY/+Jata5pWA7Ub919ezKiiRzoo0O40OIETLyS3jtNqQbo=
+	t=1725616362; cv=none; b=a5PKnLba2vVmR1CXJZcRboU/xQnnRsjzyfeqG2lZnKYBq0z+fZtMgShRc/7v9jL5cHXsT1+gxmzpljUYmhnob/puxNl+rtlCc21iFq2LCE92whD9STqTS2gmPVlZC71Nar/bPbYuFH10HN71wzMUsOtzeshSf3CfSUIdvvwF5Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725616357; c=relaxed/simple;
-	bh=dCHcn/1FgMWhuuHVvEWKLUbibFBqHz7uA0Xt+uzcciM=;
+	s=arc-20240116; t=1725616362; c=relaxed/simple;
+	bh=nWO4hB6PBG1t9aSNmguYJznkt6bwH8E+U9bsso6Id7c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FE3p9Ti5TTgSE/hrZSq8c8WEFxMhV2mU7Sitkpwg1RRbAe+HcvUAPx+pLOmEXeS3X1eZEPVqAW/gwgh2BmhhyDtYd0zGQC76im/wSS9maTDhJE3bhkfKyib7XFwrHJIPgzqLwTyl1hxKXknE4ez1GvVTJTN/fRIIf7mXaDms4H4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iZ58DOvE; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=KPpdk4moq1dr0FtI2bNnGZdhFc1E94n9aG/rRwfEBFqkZ7eNCuOIKcd3bfRST3Et5LTj/akIIsKJAbgzGqpfAb4kpcQ+tqKmJjjXTZCNhieI3Ns1Np5iXb6ulkBdjL5lVN9UP6lmDITp2fGWIHufb+rXlNOTtbsioxNyuqOMFCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UxysTji2; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725616354;
+	s=mimecast20190719; t=1725616359;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8H99B9KUPJW7l1/czX9Tp6t+iue87wNuoi4+eOXBhL0=;
-	b=iZ58DOvEYptrYhELD1PIhma+iZOsioKenGRMRNinI6ugMvp1/pZdNnpljCQTLbhB5JVTG7
-	5WFlvtKqINQMUXq3Xs9Ub0B+71pjMVBV28IVKXetA4fsWrzMaX0obBJ+lyjD5qnXo+kzWD
-	suTeJt5jJf7tHZx0nvbjqiW3UhHtch8=
+	bh=mrSfru2lWTmJ7ntOOD4Zd3IGqv+cr43dsZNB2qiF4RM=;
+	b=UxysTji2TEw4YbSqsQNn3o20c5ALCacKDjcum+cD7QaIGvtwt0hlBsX5Fbl1vNj08+HsbU
+	S9P4CJef3UKjZq4VHB8bDFb05M4A5Ed92OUAGyZnj5/eSCbWIkqjAULCROo9dfTgP2+gO6
+	DFXatWASxcJGj3awc0IQCh6TG03mN+0=
 Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
  [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-684-xkhbd_PSMzqCSwtNiVkKrA-1; Fri, 06 Sep 2024 05:52:33 -0400
-X-MC-Unique: xkhbd_PSMzqCSwtNiVkKrA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3771b6da3ceso1088718f8f.3
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 02:52:33 -0700 (PDT)
+ us-mta-425-6Gr5ubm3MDaRJxzG4TZRgQ-1; Fri, 06 Sep 2024 05:52:37 -0400
+X-MC-Unique: 6Gr5ubm3MDaRJxzG4TZRgQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-374beb23f35so1211042f8f.0
+        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 02:52:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725616352; x=1726221152;
+        d=1e100.net; s=20230601; t=1725616357; x=1726221157;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8H99B9KUPJW7l1/czX9Tp6t+iue87wNuoi4+eOXBhL0=;
-        b=qJK01xGWr+tFwq34qeulwDxC/jGno8rw6BQmU08EEgenqzJ/4bkymGKQVrKXnHp8w/
-         KUxQxsyjlx5E4Ni0EfZNg76UlJU9be12lDHZ4VTPHW2vQNCkz31S8MUBzOQYKpAVcjkI
-         BxJ1TpECHNeS1QHPpO29zSam/zbb6s7A2f7AWjYo0OwELQczIlf7oiR+S0As4xhGFmDZ
-         WdVnM61DcojHfotF/GEqVxy9MJQ+MaoaUu5B+tyEz9q14XZHxAX/YUpBCMBgJOmsnUMJ
-         cWJ3P7mk+UQ35BGR54ZVN3G2GwhcxlCOC7BcQG26ruhSKY24mOt3SgLfiornStbBYker
-         8wXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUnNXnN1r62VSAPDpkIhYYsZLIfDL6eViKpP9Obu/DHAC3wffTWVR2dSuaE9UnEcd15O0k3d+k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzafnb+WlLal5GeWs2T2+YnbYz4m86ijWDMZ3GN5z5QdKVCaw9Q
-	tDg/idSbwqYshQv7NP3eeV4SQiXAGKAhIjt3CnW5ACGiRfN6ogMHdDhyUSwIQ5rZ5m98fkXvAPM
-	hXiDLVxSsEgvKbI7oZqCfE7FsavFJj0TZitysp3V3Twf/yImbeI5xfIRmerKQF4Hi
-X-Received: by 2002:a05:6000:18a7:b0:376:7a68:bc42 with SMTP id ffacd0b85a97d-3767a68c23dmr9293261f8f.27.1725616352166;
-        Fri, 06 Sep 2024 02:52:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEFIF65gKfiZPFBH5iQEaBnXgeO1FhuaZdZ4FK0I9pUsn3NYiq1dGZhLD2zESCViTEQMrN15g==
-X-Received: by 2002:a05:6000:18a7:b0:376:7a68:bc42 with SMTP id ffacd0b85a97d-3767a68c23dmr9293241f8f.27.1725616351706;
-        Fri, 06 Sep 2024 02:52:31 -0700 (PDT)
+        bh=mrSfru2lWTmJ7ntOOD4Zd3IGqv+cr43dsZNB2qiF4RM=;
+        b=JcAgjXxQuEli7x7jLBSzxK+u+QrrbZpWfX28u9Fl5z6+zJcMO/KQmpqPiu9kQLKK3b
+         XIEcLBE3l4areCk6t5rigUgMgY2ByvE3yvFFjIaI0ukjzaOv3ZiZQ/bUj8Fd8Dvzxxmz
+         dmq+xTSHaA8jq3LPoIjq1PvlVGowZva6oZdz59zvsDF08S3s/1Wfe38Ltjtq6KHtiUNQ
+         aL3+CqZlAjzwuF0Ck3oFlKFzopzb0NxePHGL9HzZFXCPC7H8MLjwQJrbBjd8JbSilgzn
+         fUn2VourvPq/Uj4MljQqbVMeYrVkkZ/AOz+sVrASZa3Td6AqySN8+c+8JwaW7wMiI+Uj
+         FnpA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrF30TMnBm0EED/BGoNRiRaPC6IExlhTqrni35sOEB7UfXpg1PaalZzM2pU8FiWwaZyRCN0JA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM38mQSLRqCQnHm9UXNjPHYA53NgAZ6G5lelMeekLzlt8aE9FE
+	1Q6dqXuOr0g6lRBsnbJ7FYlJ3An7Ab5do85/zfdW5I/qfImSvnyPETvfHqQXlceeYJd7/1+xE27
+	U7vX4P53A6CYng9XcTDArz0jxWOvBQA7o1MclMm9pD/FAaRCUkrBcnA==
+X-Received: by 2002:a5d:5e12:0:b0:374:b685:672 with SMTP id ffacd0b85a97d-374b6850721mr12179537f8f.26.1725616356561;
+        Fri, 06 Sep 2024 02:52:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEy9H2fY+IdgasPGdCkAErAN464kou0VTksRkihXRxCSa5S0om1fP+DF92pWZQwo6psBMtuqw==
+X-Received: by 2002:a5d:5e12:0:b0:374:b685:672 with SMTP id ffacd0b85a97d-374b6850721mr12179503f8f.26.1725616355994;
+        Fri, 06 Sep 2024 02:52:35 -0700 (PDT)
 Received: from redhat.com ([155.133.17.165])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ca0606984sm14793275e9.40.2024.09.06.02.52.28
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee9c48csm21348537f8f.51.2024.09.06.02.52.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 02:52:31 -0700 (PDT)
-Date: Fri, 6 Sep 2024 05:52:26 -0400
+        Fri, 06 Sep 2024 02:52:35 -0700 (PDT)
+Date: Fri, 6 Sep 2024 05:52:31 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
@@ -88,9 +88,8 @@ Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	John Fastabend <john.fastabend@gmail.com>, bpf@vger.kernel.org
-Subject: [RFC PATCH v2 3/7] Revert "virtio_net: xsk: rx: support fill with
- xsk buffer"
-Message-ID: <9559b3ff39bbe94bb81caf2e6c1e464eea0e9de9.1725616135.git.mst@redhat.com>
+Subject: [RFC PATCH v2 4/7] Revert "virtio_net: xsk: bind/unbind xsk for rx"
+Message-ID: <3f9f2c4be3d84f38ab5878494bfd91be01d18432.1725616135.git.mst@redhat.com>
 References: <cover.1725616135.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -104,7 +103,7 @@ In-Reply-To: <cover.1725616135.git.mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 
-This reverts commit e9f3962441c0a4d6f16c656e6c8aa02a3ccdd568.
+This reverts commit 09d2b3182c8e3a215a9b2a1834f81dd07305989f.
 
 leads to crashes with no ACCESS_PLATFORM when
 sysctl net.core.high_order_alloc_disable=1
@@ -113,142 +112,175 @@ Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Reported-by: Si-Wei Liu <si-wei.liu@oracle.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- drivers/net/virtio_net.c | 70 +++-------------------------------------
- 1 file changed, 4 insertions(+), 66 deletions(-)
+ drivers/net/virtio_net.c | 134 ---------------------------------------
+ 1 file changed, 134 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 041c483a06c5..3cb0f8adf2e6 100644
+index 3cb0f8adf2e6..0944430dfb1f 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -354,8 +354,6 @@ struct receive_queue {
+@@ -25,7 +25,6 @@
+ #include <net/net_failover.h>
+ #include <net/netdev_rx_queue.h>
+ #include <net/netdev_queues.h>
+-#include <net/xdp_sock_drv.h>
  
- 	/* xdp rxq used by xsk */
- 	struct xdp_rxq_info xsk_rxq_info;
+ static int napi_weight = NAPI_POLL_WEIGHT;
+ module_param(napi_weight, int, 0444);
+@@ -349,11 +348,6 @@ struct receive_queue {
+ 
+ 	/* Record the last dma info to free after new pages is allocated. */
+ 	struct virtnet_rq_dma *last_dma;
 -
--	struct xdp_buff **xsk_buffs;
+-	struct xsk_buff_pool *xsk_pool;
+-
+-	/* xdp rxq used by xsk */
+-	struct xdp_rxq_info xsk_rxq_info;
  };
  
  /* This structure can contain rss message with maximum settings for indirection table and keysize
-@@ -1056,53 +1054,6 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
- 	}
+@@ -5065,132 +5059,6 @@ static int virtnet_restore_guest_offloads(struct virtnet_info *vi)
+ 	return virtnet_set_guest_offloads(vi, offloads);
  }
  
--static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len)
+-static int virtnet_rq_bind_xsk_pool(struct virtnet_info *vi, struct receive_queue *rq,
+-				    struct xsk_buff_pool *pool)
 -{
--	sg->dma_address = addr;
--	sg->length = len;
--}
+-	int err, qindex;
 -
--static int virtnet_add_recvbuf_xsk(struct virtnet_info *vi, struct receive_queue *rq,
--				   struct xsk_buff_pool *pool, gfp_t gfp)
--{
--	struct xdp_buff **xsk_buffs;
--	dma_addr_t addr;
--	int err = 0;
--	u32 len, i;
--	int num;
+-	qindex = rq - vi->rq;
 -
--	xsk_buffs = rq->xsk_buffs;
+-	if (pool) {
+-		err = xdp_rxq_info_reg(&rq->xsk_rxq_info, vi->dev, qindex, rq->napi.napi_id);
+-		if (err < 0)
+-			return err;
 -
--	num = xsk_buff_alloc_batch(pool, xsk_buffs, rq->vq->num_free);
--	if (!num)
--		return -ENOMEM;
+-		err = xdp_rxq_info_reg_mem_model(&rq->xsk_rxq_info,
+-						 MEM_TYPE_XSK_BUFF_POOL, NULL);
+-		if (err < 0)
+-			goto unreg;
 -
--	len = xsk_pool_get_rx_frame_size(pool) + vi->hdr_len;
--
--	for (i = 0; i < num; ++i) {
--		/* Use the part of XDP_PACKET_HEADROOM as the virtnet hdr space.
--		 * We assume XDP_PACKET_HEADROOM is larger than hdr->len.
--		 * (see function virtnet_xsk_pool_enable)
--		 */
--		addr = xsk_buff_xdp_get_dma(xsk_buffs[i]) - vi->hdr_len;
--
--		sg_init_table(rq->sg, 1);
--		sg_fill_dma(rq->sg, addr, len);
--
--		err = virtqueue_add_inbuf(rq->vq, rq->sg, 1, xsk_buffs[i], gfp);
--		if (err)
--			goto err;
+-		xsk_pool_set_rxq_info(pool, &rq->xsk_rxq_info);
 -	}
 -
--	return num;
+-	virtnet_rx_pause(vi, rq);
 -
--err:
--	for (; i < num; ++i)
--		xsk_buff_free(xsk_buffs[i]);
+-	err = virtqueue_reset(rq->vq, virtnet_rq_unmap_free_buf);
+-	if (err) {
+-		netdev_err(vi->dev, "reset rx fail: rx queue index: %d err: %d\n", qindex, err);
+-
+-		pool = NULL;
+-	}
+-
+-	rq->xsk_pool = pool;
+-
+-	virtnet_rx_resume(vi, rq);
+-
+-	if (pool)
+-		return 0;
+-
+-unreg:
+-	xdp_rxq_info_unreg(&rq->xsk_rxq_info);
+-	return err;
+-}
+-
+-static int virtnet_xsk_pool_enable(struct net_device *dev,
+-				   struct xsk_buff_pool *pool,
+-				   u16 qid)
+-{
+-	struct virtnet_info *vi = netdev_priv(dev);
+-	struct receive_queue *rq;
+-	struct device *dma_dev;
+-	struct send_queue *sq;
+-	int err;
+-
+-	if (vi->hdr_len > xsk_pool_get_headroom(pool))
+-		return -EINVAL;
+-
+-	/* In big_packets mode, xdp cannot work, so there is no need to
+-	 * initialize xsk of rq.
+-	 */
+-	if (vi->big_packets && !vi->mergeable_rx_bufs)
+-		return -ENOENT;
+-
+-	if (qid >= vi->curr_queue_pairs)
+-		return -EINVAL;
+-
+-	sq = &vi->sq[qid];
+-	rq = &vi->rq[qid];
+-
+-	/* xsk assumes that tx and rx must have the same dma device. The af-xdp
+-	 * may use one buffer to receive from the rx and reuse this buffer to
+-	 * send by the tx. So the dma dev of sq and rq must be the same one.
+-	 *
+-	 * But vq->dma_dev allows every vq has the respective dma dev. So I
+-	 * check the dma dev of vq and sq is the same dev.
+-	 */
+-	if (virtqueue_dma_dev(rq->vq) != virtqueue_dma_dev(sq->vq))
+-		return -EINVAL;
+-
+-	dma_dev = virtqueue_dma_dev(rq->vq);
+-	if (!dma_dev)
+-		return -EINVAL;
+-
+-	err = xsk_pool_dma_map(pool, dma_dev, 0);
+-	if (err)
+-		goto err_xsk_map;
+-
+-	err = virtnet_rq_bind_xsk_pool(vi, rq, pool);
+-	if (err)
+-		goto err_rq;
+-
+-	return 0;
+-
+-err_rq:
+-	xsk_pool_dma_unmap(pool, 0);
+-err_xsk_map:
+-	return err;
+-}
+-
+-static int virtnet_xsk_pool_disable(struct net_device *dev, u16 qid)
+-{
+-	struct virtnet_info *vi = netdev_priv(dev);
+-	struct xsk_buff_pool *pool;
+-	struct receive_queue *rq;
+-	int err;
+-
+-	if (qid >= vi->curr_queue_pairs)
+-		return -EINVAL;
+-
+-	rq = &vi->rq[qid];
+-
+-	pool = rq->xsk_pool;
+-
+-	err = virtnet_rq_bind_xsk_pool(vi, rq, NULL);
+-
+-	xsk_pool_dma_unmap(pool, 0);
 -
 -	return err;
 -}
 -
- static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 flag)
- {
- 	struct virtnet_info *vi = netdev_priv(dev);
-@@ -2294,11 +2245,7 @@ static bool try_fill_recv(struct virtnet_info *vi, struct receive_queue *rq,
- 			  gfp_t gfp)
- {
- 	int err;
+-static int virtnet_xsk_pool_setup(struct net_device *dev, struct netdev_bpf *xdp)
+-{
+-	if (xdp->xsk.pool)
+-		return virtnet_xsk_pool_enable(dev, xdp->xsk.pool,
+-					       xdp->xsk.queue_id);
+-	else
+-		return virtnet_xsk_pool_disable(dev, xdp->xsk.queue_id);
+-}
 -
--	if (rq->xsk_pool) {
--		err = virtnet_add_recvbuf_xsk(vi, rq, rq->xsk_pool, gfp);
--		goto kick;
--	}
-+	bool oom;
- 
- 	do {
- 		if (vi->mergeable_rx_bufs)
-@@ -2308,11 +2255,10 @@ static bool try_fill_recv(struct virtnet_info *vi, struct receive_queue *rq,
- 		else
- 			err = add_recvbuf_small(vi, rq, gfp);
- 
-+		oom = err == -ENOMEM;
- 		if (err)
- 			break;
- 	} while (rq->vq->num_free);
--
--kick:
- 	if (virtqueue_kick_prepare(rq->vq) && virtqueue_notify(rq->vq)) {
- 		unsigned long flags;
- 
-@@ -2321,7 +2267,7 @@ static bool try_fill_recv(struct virtnet_info *vi, struct receive_queue *rq,
- 		u64_stats_update_end_irqrestore(&rq->stats.syncp, flags);
+ static int virtnet_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 			   struct netlink_ext_ack *extack)
+ {
+@@ -5316,8 +5184,6 @@ static int virtnet_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ 	switch (xdp->command) {
+ 	case XDP_SETUP_PROG:
+ 		return virtnet_xdp_set(dev, xdp->prog, xdp->extack);
+-	case XDP_SETUP_XSK_POOL:
+-		return virtnet_xsk_pool_setup(dev, xdp);
+ 	default:
+ 		return -EINVAL;
  	}
- 
--	return err != -ENOMEM;
-+	return !oom;
- }
- 
- static void skb_recv_done(struct virtqueue *rvq)
-@@ -5168,7 +5114,7 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
- 	struct receive_queue *rq;
- 	struct device *dma_dev;
- 	struct send_queue *sq;
--	int err, size;
-+	int err;
- 
- 	if (vi->hdr_len > xsk_pool_get_headroom(pool))
- 		return -EINVAL;
-@@ -5199,12 +5145,6 @@ static int virtnet_xsk_pool_enable(struct net_device *dev,
- 	if (!dma_dev)
- 		return -EINVAL;
- 
--	size = virtqueue_get_vring_size(rq->vq);
--
--	rq->xsk_buffs = kvcalloc(size, sizeof(*rq->xsk_buffs), GFP_KERNEL);
--	if (!rq->xsk_buffs)
--		return -ENOMEM;
--
- 	err = xsk_pool_dma_map(pool, dma_dev, 0);
- 	if (err)
- 		goto err_xsk_map;
-@@ -5239,8 +5179,6 @@ static int virtnet_xsk_pool_disable(struct net_device *dev, u16 qid)
- 
- 	xsk_pool_dma_unmap(pool, 0);
- 
--	kvfree(rq->xsk_buffs);
--
- 	return err;
- }
- 
 -- 
 MST
 
