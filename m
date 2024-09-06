@@ -1,84 +1,115 @@
-Return-Path: <netdev+bounces-125761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D328396E7B2
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:26:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10A6E96E7C4
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:35:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39A4EB2370E
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:26:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB0121F242A5
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09682208A0;
-	Fri,  6 Sep 2024 02:26:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iTcVHOD8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C85522315;
+	Fri,  6 Sep 2024 02:35:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B992C1CA94;
-	Fri,  6 Sep 2024 02:26:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8886A182B3;
+	Fri,  6 Sep 2024 02:35:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725589571; cv=none; b=KF7NRGbtQH6gdY1bNd9Mj4V9ux4tvRlBNBbOrnam1IcA1O0P6gTr6uhiFrKODyhSkH4/T3JCgfzcN32O6Or1pTvhpz5zLMtr4P8wsxGomiazE1yPDv19N3Obv2IvQet2bcG7Grc+aUPjrP7eisJCm8FMMRranMK1mGTEOEulMu4=
+	t=1725590117; cv=none; b=mBdT4a9iojyV4aoTMLplwqnCKtk1ohE+R3gTr22gVSqryZQanJNlKo0ZzK6XTT636kY2Psw8N/6xEgptC9ArXrZRJVtM7IKd70kBPMi6lZLFgh6ca+uoMC2mAkVEYfslZzn1S5Bi1GWbRxdc1efuqmVCV4I7x6/TEExVpMnYOR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725589571; c=relaxed/simple;
-	bh=/rrNQ3DJ6lqgHmOf/PoBMk9RKW9jtGcIJb3qfz96IOk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dlFyk9aw3JyiHXEHB+9Hj115u2ok1UrCe2ODTbOvy4os/gTHkyB+4q53kIDRVTgouS/vmTaST9ZA9fgxQ5JHcVlB1tfJOSiFwZMBQrZnPJAwd+j4YX7bpMV+yGnf/JJVI7TUrCm1s7cu5UFQXY8miI8RzIBtiTjSHH691EDLcCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iTcVHOD8; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1725589566; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=rt0XPjVQz4cJF6ZEE2poXzj/CE9oleB0jw6s6iQ/pLw=;
-	b=iTcVHOD8t6GNzUqkX0G9PQlUk8/DiHahhs428AmJGX6O3+H9vytQ5qzRyKLgOmsD7dy8ZQypt38hDZgpkkokcGfuGIaZ/OfKdypwsllJLLddY9FQ0bzaoZL4ztl+o6gtL8sw4smsyYUsWxCw3i/FvmlEXoLTvOkT+LGVpGS4yog=
-Received: from 30.221.149.28(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WENfBWM_1725589564)
-          by smtp.aliyun-inc.com;
-          Fri, 06 Sep 2024 10:26:05 +0800
-Message-ID: <035c03ae-ad8b-4bf5-9a29-5fc04eeb4842@linux.alibaba.com>
-Date: Fri, 6 Sep 2024 10:26:03 +0800
+	s=arc-20240116; t=1725590117; c=relaxed/simple;
+	bh=WhQeqFtAGTX6XYbCEXQ9ZmWwEhxISb8ziXHJQ0oDfDI=;
+	h=Subject:References:CC:From:To:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Z23a5oZw5yw94Bs4ksokfXcDl8RFKaRdswhgnULjC7vXUppsggfeIRGO14vda3uV3P0+te43405sNxjH3pFs9N4XEta0zx5FB7V6EmBq8QsvsnuCnMPWq/REn7YUX7NPtXhq6thhzfL8gb278jyWpFMCIIuasifaVUXWfRYTDCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4X0KvS2Qykz69Wr;
+	Fri,  6 Sep 2024 10:30:12 +0800 (CST)
+Received: from kwepemh100016.china.huawei.com (unknown [7.202.181.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id A052E1800F2;
+	Fri,  6 Sep 2024 10:35:11 +0800 (CST)
+Received: from [10.174.178.75] (10.174.178.75) by
+ kwepemh100016.china.huawei.com (7.202.181.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 6 Sep 2024 10:35:09 +0800
+Subject: Re: [PATCH v2 -next 00/15] sysctl: move sysctls from vm_table into
+ its own files
+References: <CGME20240903033105eucas1p2b9d0b874da268fecb49905d90340de09@eucas1p2.samsung.com>
+ <20240903033011.2870608-1-yukaixiong@huawei.com>
+ <20240903203837.cbzs3ziuh6eq4kvo@joelS2.panther.com>
+CC: <guohanjun@huawei.com>, <ysato@users.osdn.me>, <dalias@libc.org>,
+	<glaubitz@physik.fu-berlin.de>, <luto@kernel.org>, <tglx@linutronix.de>,
+	<bp@alien8.de>, <dave.hansen@linux.intel.com>, <hpa@zytor.com>,
+	<viro@zeniv.linux.org.uk>, <brauner@kernel.org>, <jack@suse.cz>,
+	<kees@kernel.org>, <willy@infradead.org>, <Liam.Howlett@oracle.com>,
+	<vbabka@suse.cz>, <lorenzo.stoakes@oracle.com>, <trondmy@kernel.org>,
+	<anna@kernel.org>, <chuck.lever@oracle.com>, <jlayton@kernel.org>,
+	<neilb@suse.de>, <okorniev@redhat.com>, <Dai.Ngo@oracle.com>,
+	<tom@talpey.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <paul@paul-moore.com>,
+	<jmorris@namei.org>, <linux-sh@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <linux-nfs@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-security-module@vger.kernel.org>, <wangkefeng.wang@huawei.com>
+From: yukaixiong <yukaixiong@huawei.com>
+To:
+	<"wangkefeng.wang@huawei.com liushixin2@huawei.com liuyongqiang13@huawei.com tongtiangen@huawei.com sunnanyong@huawei.com mawupeng1@huawei.com zuoze1@huawei.com zhangpeng362@huawei.com tujinjiang@huawei.com yaolulu5"@huawei.com>
+Message-ID: <0a12953b-0d11-00d2-ef0e-454d0e3d98f3@huawei.com>
+Date: Fri, 6 Sep 2024 10:35:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net/smc: add sysctl for smc_limit_hs
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
- wintera@linux.ibm.com, guwen@linux.alibaba.com, kuba@kernel.org,
- davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org, tonylu@linux.alibaba.com, pabeni@redhat.com,
- edumazet@google.com
-References: <1724207797-79030-1-git-send-email-alibuda@linux.alibaba.com>
- <0ccd6ef0-f642-45c3-a914-a54b50e11544@linux.alibaba.com>
- <9a3aec30-37a6-4c62-b2b6-186468b6a68f@lunn.ch>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <9a3aec30-37a6-4c62-b2b6-186468b6a68f@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20240903203837.cbzs3ziuh6eq4kvo@joelS2.panther.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggpeml100009.china.huawei.com (7.185.36.95) To
+ kwepemh100016.china.huawei.com (7.202.181.102)
 
 
 
-On 9/6/24 5:12 AM, Andrew Lunn wrote:
->> Hi everyone,
+On 2024/9/4 4:38, Joel Granados wrote:
+> On Tue, Sep 03, 2024 at 11:29:56AM +0800, Kaixiong Yu wrote:
+>> This patch series moves sysctls of vm_table in kernel/sysctl.c to
+>> places where they actually belong, and do some related code clean-ups.
+>> After this patch series, all sysctls in vm_table have been moved into its
+>> own files, meanwhile, delete vm_table.
 >>
->> Just a quick reminder regarding the patch that seems to have been
->> overlooked, possibly dues to its status was
->> mistakenly updated to change request ?
-> Once it gets set to change request, it is effectively dead. Please
-> repost.
+>> All the modifications of this patch series base on
+>> linux-next(tags/next-20240902). To test this patch series, the code was
+>> compiled with both the CONFIG_SYSCTL enabled and disabled on arm64 and
+>> x86_64 architectures. After this patch series is applied, all files
+>> under /proc/sys/vm can be read or written normally.
+> This move make a lot of sense. The question with these multi-subsystem
+> patchsets is how do they go into mainline. For now I have added this to
+> sysctl-testing to see if it needs more work. I can push this through the
+> sysctl subsystem, but you need to get reviewed-by for all of the commits
+> in different subsystems. I'm also fine with this going in through some
+> other subsys if anyone wants to take it?
 >
-> 	Andrew
+> Best
+>
 
-Thanks for the reminder,  I will repost it later.
+Thx，Joel!:-)
 
-Best wishes,
-D. Wythe
+Hello，everyone!
+
+This patch series has been reviewed by Kees, Jan Kara, Christian 
+Brauner, and acked
+by Anna Schumaker, Paul Moore. As Joel said, this patch series need to 
+get reviewed-by
+for all of the commits in different subsystems. I would appreciate it if 
+you could review
+this patch series as soon as possible !:-)
 
