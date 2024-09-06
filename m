@@ -1,134 +1,81 @@
-Return-Path: <netdev+bounces-126056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37D0796FD0B
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:08:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D58A296FD32
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:16:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6391B1C227F4
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 21:08:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FCE61F226B5
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 21:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0C11D7980;
-	Fri,  6 Sep 2024 21:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E347A13E03E;
+	Fri,  6 Sep 2024 21:16:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o0x2qbGm"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LRgmsziq"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CED1D61BE
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 21:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17D913D251;
+	Fri,  6 Sep 2024 21:16:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725656879; cv=none; b=Dk3sAKw/vrQKo0xHluwkDUxTKpKEH7Ii6PeegBV/2LaQhoxQlLoQ4iDIy5FXU0g9APWvjxKIdhlz06mxfqs2tcIs1ft5Enx6RzuLM2IRBjfKKRGByZVh4GhT4a6qwZOOWvGnpHs2BB7t243cJvJlDVNVm4/+R48TXQgxtzyLFI4=
+	t=1725657407; cv=none; b=FTZMlR8XcMdF7FpSfA8zyYFRk45bwTkFttuV4VPhMxslh51l/cV9MwQQvaPkFuK5veSL/FK0skIfJEah4+zAK0LDNpvJC0TA0v0FlxNI7qlIugb7Tq9yOb/GWNRpUMuGeqgcQx/dV4FoBQy9KmvD2VC59ca9kS3P27m7LnLHn+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725656879; c=relaxed/simple;
-	bh=JJ1smVVv1hpPtnU9o9QoOlpsW1GluwEyiacWgsBBzpY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=prAg2L0Fh2TwqjlUBXgG/YZI6gvPhqAnq2WhIyWxsJA7avUvYD5T7MQDULHzqVWHeh89ROygZmFe1gQIOtNX0qEpZcgN0VYXR0dFExlU/J1m7zWqqlDWpf+10Z+1PB8Z9/uyNtKYzK58PalsCX8Jf8vQU/PS8MObmh38WcsJTJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o0x2qbGm; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1725656875;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Keefv1899VY9ObcYSkgFK6MVawN7CzaBeJBfIS+JVWY=;
-	b=o0x2qbGmjF7Uq/qzoqjo7KmwV0YF0oQHrSqZyjFFaPILkbOeBqJrryuQj/FXGwKlilxv77
-	0R2J1aVyfMmNksD0rCjLqr95uzzWfaRk7WzY7YKT/PJCzxnq0bEpWLQvFCPFuK4YS3K2KM
-	O8cT5CPthjkxtExe6hPhT2wKRU14CO4=
-From: Sean Anderson <sean.anderson@linux.dev>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemb@google.com>,
-	linux-kernel@vger.kernel.org,
-	Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org,
-	Sean Anderson <sean.anderson@linux.dev>
-Subject: [PATCH net] selftests: net: csum: Fix checksums for packets with non-zero padding
-Date: Fri,  6 Sep 2024 17:07:43 -0400
-Message-Id: <20240906210743.627413-1-sean.anderson@linux.dev>
+	s=arc-20240116; t=1725657407; c=relaxed/simple;
+	bh=YJoSs7rfpvyOmkdHjTVZWEY5+o9w4HmCrB3tnvXbIKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CTCRyeiivbtrxgFH3JyOEUbTbW04zmvPzJ0P23+VZAKVTb5YizZelZsz1z61yMHWvaoyl/GB8l0FGHO9kyY5EWze6DgnynrvhZbnTsokAHMtVQksRgnBMLH1q8XsH0UwERCvc5CohlVwRMfDu9sM1bf2xHL3leUjmOCpNWglqr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LRgmsziq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8nFQHo2ghyhvokHZ6+EGLSubemTGhRk/G+4dRIbMtbY=; b=LRgmsziqFqunwIT6m6FdlhMbpB
+	2Ta4V3S2iBQ+IuAW4S6p9MjpLJRdCSDTgZwCZitXANJQsDZEU7vXutCLCuWHP3eXrWqfEXuOAtr7l
+	p1Z1BwVC1cyrXSHLze5GQw1rO6qYCGfpMhf1AewYr4QHffDWJv5wHSjMkhu0SE7I9+ME=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1smgJk-006rO3-5P; Fri, 06 Sep 2024 23:16:32 +0200
+Date: Fri, 6 Sep 2024 23:16:32 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jeff Daly <jeffd@silicom-usa.com>
+Cc: "anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
+	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] ixgbe: Manual AN-37 for troublesome link partners for
+ X550 SFI
+Message-ID: <ac2faac2-a946-4052-9f61-b0c1c644ee59@lunn.ch>
+References: <20240906104145.9587-1-jeffd@silicom-usa.com>
+ <becaaeaf-e76a-43d2-b6e1-e7cc330d8cae@lunn.ch>
+ <VI1PR04MB5501C2A00D658115EF4E7845EA9E2@VI1PR04MB5501.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <VI1PR04MB5501C2A00D658115EF4E7845EA9E2@VI1PR04MB5501.eurprd04.prod.outlook.com>
 
-Padding is not included in UDP and TCP checksums. Therefore, reduce the
-length of the checksummed data to include only the data in the IP
-payload. This fixes spurious reported checksum failures like
+> It turns out that the patch works fine for the specific issue it's trying to address (Juniper switch), 
+> but for (seemingly all) other devices it breaks the autonegotiation.
 
-rx: pkt: sport=33000 len=26 csum=0xc850 verify=0xf9fe
-pkt: bad csum
+So it sounds like you need to figure out the nitty-gritty details of
+what is going on with the Juniper switch. Once you understand that,
+you might be able to find a workaround which works for all systems.
 
-Technically it is possible for there to be trailing bytes after the UDP
-data but before the Ethernet padding (e.g. if sizeof(ip) + sizeof(udp) +
-udp.len < ip.len). However, we don't generate such packets.
-
-Fixes: 91a7de85600d ("selftests/net: add csum offload test")
-Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
----
-Found while testing for this very bug in hardware checksum offloads.
-
- tools/testing/selftests/net/lib/csum.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/lib/csum.c b/tools/testing/selftests/net/lib/csum.c
-index b9f3fc3c3426..e0a34e5e8dd5 100644
---- a/tools/testing/selftests/net/lib/csum.c
-+++ b/tools/testing/selftests/net/lib/csum.c
-@@ -654,10 +654,16 @@ static int recv_verify_packet_ipv4(void *nh, int len)
- {
- 	struct iphdr *iph = nh;
- 	uint16_t proto = cfg_encap ? IPPROTO_UDP : cfg_proto;
-+	uint16_t ip_len;
- 
- 	if (len < sizeof(*iph) || iph->protocol != proto)
- 		return -1;
- 
-+	ip_len = ntohs(iph->tot_len);
-+	if (ip_len > len || ip_len < sizeof(*iph))
-+		return -1;
-+
-+	len = ip_len;
- 	iph_addr_p = &iph->saddr;
- 	if (proto == IPPROTO_TCP)
- 		return recv_verify_packet_tcp(iph + 1, len - sizeof(*iph));
-@@ -669,16 +675,22 @@ static int recv_verify_packet_ipv6(void *nh, int len)
- {
- 	struct ipv6hdr *ip6h = nh;
- 	uint16_t proto = cfg_encap ? IPPROTO_UDP : cfg_proto;
-+	uint16_t ip_len;
- 
- 	if (len < sizeof(*ip6h) || ip6h->nexthdr != proto)
- 		return -1;
- 
-+	ip_len = ntohs(ip6h->payload_len);
-+	if (ip_len > len - sizeof(*ip6h))
-+		return -1;
-+
-+	len = ip_len;
- 	iph_addr_p = &ip6h->saddr;
- 
- 	if (proto == IPPROTO_TCP)
--		return recv_verify_packet_tcp(ip6h + 1, len - sizeof(*ip6h));
-+		return recv_verify_packet_tcp(ip6h + 1, len);
- 	else
--		return recv_verify_packet_udp(ip6h + 1, len - sizeof(*ip6h));
-+		return recv_verify_packet_udp(ip6h + 1, len);
- }
- 
- /* return whether auxdata includes TP_STATUS_CSUM_VALID */
--- 
-2.35.1.1320.gc452695387.dirty
-
+    Andrew
 
