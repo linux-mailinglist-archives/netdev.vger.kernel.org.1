@@ -1,63 +1,64 @@
-Return-Path: <netdev+bounces-125897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEC9D96F295
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:16:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EDA096F290
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:16:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E342B212E0
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:16:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC5F4284DEA
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 206911CBEB0;
-	Fri,  6 Sep 2024 11:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7ACA1CB158;
+	Fri,  6 Sep 2024 11:16:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="moliksS6"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="XFeociXr"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EA31CBE8E;
-	Fri,  6 Sep 2024 11:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2E9A1C984F;
+	Fri,  6 Sep 2024 11:16:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725621372; cv=none; b=OzVR7ic4WuCwMdXDINVLC/9gAd1/M2OQhBoaDNeaAMMQho1OBrDLRD9UkXv2rtemEJ9yv0wcwJtbZm3cYw1TpkWvyfyf+ya6USkVrB7bQdE7XEtXXjjibl5z493HFNC4s/L1zjx1aToODOcoJ6FW2BhaA5f6eHUTb05UcxU3OHM=
+	t=1725621367; cv=none; b=Tt14o2YKUPOhgtbbqqE6CxGBiBkaAnkY2V1F+xfN7Gerd16IizapZxq31lRS2sCKvIlCBNrkDwZ7gZuOcCtdhnXz4G5MZmVfy6PKuu5JnV7zwzk0sK+YTw9MVC8xe3jcPqXHTmp8gtEgAKK4o0U524/D3WyiEb4YSON9Za6io2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725621372; c=relaxed/simple;
-	bh=JvdsFwLbznT7wVvK45hTNkHsjNgvpeNcK46qoS/cHoI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=aLfvSi9JAiCN6SPIfFTvRMNy/p0dKV2BvvODxIDDdds9ppWHngkpUVbMZZMvWSJO8M0Fw0HxCsjM6q2PlmU4AVlccHbEMrnGAiIrAYvXBsLjJeKRn2pA+Neo5b9/vtD9MHFHgA3NLrpRlYO/b8Y94ObHrDJK2Txt/RbROSkaM4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=moliksS6; arc=none smtp.client-ip=198.47.19.142
+	s=arc-20240116; t=1725621367; c=relaxed/simple;
+	bh=yKve1fsm/ychA9JwMB63iUzfIxVBd/T0mvAO7lupqys=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y+XysWBK7kMg74szasJswQFJq+on8cM4fOCFL93c3qcurbKwHG77RlNDRjDtxGS6Ed+7hlFMH7pdQNY5/zcPfNGSIlcTuqWTn4eUwwRT8tmYe/6P6QGwkpkuJORID4mvk0ssukY0i9p/XN/O3WMcjV/GiIC3e6KZVaty7SKERFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=XFeociXr; arc=none smtp.client-ip=198.47.19.141
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
 Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 486BFgHP072566;
-	Fri, 6 Sep 2024 06:15:42 -0500
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 486BFinu069124;
+	Fri, 6 Sep 2024 06:15:44 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1725621342;
-	bh=8iZznSacehcwlWZOpuSXs6EqTnp27bLKT70plkEbinM=;
-	h=From:To:CC:Subject:Date;
-	b=moliksS6mp8jcxwsNz/9b/dFfY2pHiLaP8BcFzPQKDz8HUTRwMhKrErNcMHTiyKJA
-	 eJ/zHUrl0j7ClyIH+UNbK4K9h4EUkZ4ToRBjKpWnjYy/lPfu+q4LrQ4MaRzkU09za4
-	 fthOAhF98EijRSqQGXHDiAUh+hznBsOodikZGD9s=
-Received: from DFLE112.ent.ti.com (dfle112.ent.ti.com [10.64.6.33])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 486BFgPK078831
+	s=ti-com-17Q1; t=1725621344;
+	bh=Bv86eq1d9mNTXWt3fmOkezHCxS58pQ3bRwVyETde2sI=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References;
+	b=XFeociXr9caOfEqXMHNdV/Jx49dDyKE8qINGgenjSBLL/Xj1RQYbxqROk6a8mtQyk
+	 ig6gYixuOx4IHNGcIMewyVGEw32LMLbswYu2HnAeliOSH6d9kIAkYaXyyOg8K2o8vS
+	 kyFevrrN3ONGys5otT72ses6ARsDLqbCe8oMRRB4=
+Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 486BFiL6078840
 	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 6 Sep 2024 06:15:42 -0500
-Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+	Fri, 6 Sep 2024 06:15:44 -0500
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE109.ent.ti.com
+ (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 6
- Sep 2024 06:15:41 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
+ Sep 2024 06:15:43 -0500
+Received: from fllvsmtp8.itg.ti.com (10.64.41.158) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 6 Sep 2024 06:15:41 -0500
+ Frontend Transport; Fri, 6 Sep 2024 06:15:43 -0500
 Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 486BFfLh045294;
-	Fri, 6 Sep 2024 06:15:41 -0500
+	by fllvsmtp8.itg.ti.com (8.15.2/8.15.2) with ESMTP id 486BFhM9059885;
+	Fri, 6 Sep 2024 06:15:43 -0500
 Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 486BFe2u000307;
-	Fri, 6 Sep 2024 06:15:40 -0500
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 486BFgUF000313;
+	Fri, 6 Sep 2024 06:15:43 -0500
 From: MD Danish Anwar <danishanwar@ti.com>
 To: <robh@kernel.org>, <jan.kiszka@siemens.com>, <dan.carpenter@linaro.org>,
         <saikrishnag@marvell.com>, <andrew@lunn.ch>,
@@ -70,10 +71,12 @@ CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
         Vignesh Raghavendra
 	<vigneshr@ti.com>,
         Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v5 0/5] Introduce HSR offload support for ICSSG
-Date: Fri, 6 Sep 2024 16:45:33 +0530
-Message-ID: <20240906111538.1259418-1-danishanwar@ti.com>
+Subject: [PATCH net-next v5 1/5] net: ti: icss-iep: Move icss_iep structure
+Date: Fri, 6 Sep 2024 16:45:34 +0530
+Message-ID: <20240906111538.1259418-2-danishanwar@ti.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240906111538.1259418-1-danishanwar@ti.com>
+References: <20240906111538.1259418-1-danishanwar@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,188 +87,185 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hi All,
-This series introduces HSR offload support for ICSSG driver. To support HSR
-offload to hardware, ICSSG HSR firmware is used.
+Move icss_iep structure definition and to icss_iep.h file so that the
+structure members can be used / accessed by all icssg driver files.
 
-This series introduces,
-1. HSR frame offload support for ICSSG driver.
-2. HSR Tx Packet duplication offload
-3. HSR Tx Tag and Rx Tag offload
-4. Multicast filtering support in HSR offload mode.
-5. Dependencies related to IEP.
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Roger Quadros <rogerq@kernel.org>
+Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+---
+ drivers/net/ethernet/ti/icssg/icss_iep.c | 72 -----------------------
+ drivers/net/ethernet/ti/icssg/icss_iep.h | 73 +++++++++++++++++++++++-
+ 2 files changed, 72 insertions(+), 73 deletions(-)
 
-HSR Test Setup:
---------------
-
-     ___________           ___________           ___________
-    |           | Link AB |           | Link BC |           |
-  __|   AM64*   |_________|   AM64    |_________|   AM64*   |___
- |  | Station A |         | Station B |         | Station C |   |
- |  |___________|         |___________|         |___________|   |
- |                                                              |
- |______________________________________________________________|
-                            Link CA
- *Could be any device that supports two ethernet interfaces.
-
-Steps to switch to HSR frame forward offload mode:
--------------------------------------------------
-Example assuming eth1, eth2 ports of ICSSG1 on AM64-EVM
-
-  1) Enable HSR offload for both interfaces
-      ethtool -K eth1 hsr-fwd-offload on
-      ethtool -K eth1 hsr-dup-offload on
-      ethtool -K eth1 hsr-tag-ins-offload on
-      ethtool -K eth1 hsr-tag-rm-offload on
-
-      ethtool -K eth2 hsr-fwd-offload on
-      ethtool -K eth2 hsr-dup-offload on
-      ethtool -K eth2 hsr-tag-ins-offload on
-      ethtool -K eth2 hsr-tag-rm-offload on
-
-  2) Create HSR interface and add slave interfaces to it
-      ip link add name hsr0 type hsr slave1 eth1 slave2 eth2 \
-    supervision 45 version 1
-
-  3) Add IP address to the HSR interface
-      ip addr add <IP_ADDR>/24 dev hsr0
-
-  4) Bring up the HSR interface
-      ip link set hsr0 up
-
-Switching back to previous mode:
---------------------------------
-  1) Delete HSR interface
-      ip link delete hsr0
-
-  2) Disable HSR port-to-port offloading mode, packet duplication
-      ethtool -K eth1 hsr-fwd-offload off
-      ethtool -K eth1 hsr-dup-offload off
-      ethtool -K eth1 hsr-tag-ins-offload off
-      ethtool -K eth1 hsr-tag-rm-offload off
-
-      ethtool -K eth2 hsr-fwd-offload off
-      ethtool -K eth2 hsr-dup-offload off
-      ethtool -K eth2 hsr-tag-ins-offload off
-      ethtool -K eth2 hsr-tag-rm-offload off
-
-Testing the port-to-port frame forward offload feature:
------------------------------------------------------
-  1) Connect the LAN cables as shown in the test setup.
-  2) Configure Station A and Station C in HSR non-offload mode.
-  3) Configure Station B is HSR offload mode.
-  4) Since HSR is a redundancy protocol, disconnect cable "Link CA",
-     to ensure frames from Station A reach Station C only through
-     Station B.
-  5) Run iperf3 Server on Station C and client on station A.
-  7) Check the CPU usage on Station B.
-
-CPU usage report on Station B using mpstat when running UDP iperf3:
--------------------------------------------------------------------
-
-  1) Non-Offload case
-  -------------------
-  CPU  %usr  %nice  %sys %iowait  %irq  %soft  %steal  %guest   %idle
-  all  0.00   0.00  0.50    0.00  3.52  29.15    0.00    0.00   66.83
-    0  0.00   0.00  0.00    0.00  7.00  58.00    0.00    0.00   35.00
-    1  0.00   0.00  0.99    0.00  0.99   0.00    0.00    0.00   98.02
-
-  2) Offload case
-  ---------------
-  CPU  %usr  %nice  %sys %iowait  %irq  %soft  %steal  %guest   %idle
-  all  0.00   0.00  0.00    0.00  0.50   0.00    0.00    0.00   99.50
-    0  0.00   0.00  0.99    0.00  0.00   0.00    0.00    0.00   99.01
-    1  0.00   0.00  0.00    0.00  0.00   0.00    0.00    0.00  100.00
-
-Note:
-1) At the very least, hsr-fwd-offload must be enabled.
-   Without offloading the port-to-port offload, other
-   HSR offloads cannot be enabled.
-
-2) Inorder to enable hsr-tag-ins-offload, hsr-dup-offload
-   must also be enabled as these are tightly coupled in
-   the firmware implementation.
-
-Changes from v4 to v5:
-*) Fixed warning reported by kernel test robot [0].
-
-Changes from v3 to v4:
-*) Simplified ndo_set_features() implementation as suggested by Roger Quadros
-<rogerq@kernel.org>
-*) Maintained 80 character limit per line wherever possible.
-*) Returning -EOPNOTSUPP whenever offloading is not possible.
-*) Changed dev_dbg() prints to netdev_dbg() as suggested by Alexander
-Lobakin <aleksander.lobakin@intel.com>
-*) Squashed patch [1] and [2] together as hsr tag ins is dependent on hsr
-tx duplication. Also didn't add Roger's RB tag from patch [2] as the patch
-is now merged with [1] in patch 4/5.
-*) Implemented emac_ndo_fix_features() to make sure NETIF_F_HW_HSR_DUP is
-enabled / disabled with NETIF_F_HW_HSR_TAG_INS as suggested by Roger
-Quadros <rogerq@kernel.org>
-*) Added Roger's RB tag to patch 5/5.
-*) Modified commit message of patch 3/5 to state that driver will be back
-to previously used mode once HSR is disabled.
-
-Changes from v2 to v3:
-*) Renamed APIs common to switch and hsr modes with suffix _fw_offload.
-*) Returning EOPNOTSUPP in prueth_hsr_port_link() as suggested by
-   Andrew Lunn <andrew@lunn.ch>
-*) Dropped unneccassary dev_err prints and changed dev_err to dev_dbg
-   where applicable.
-*) Renamed NETIF_PRUETH_HSR_OFFLOAD to NETIF_PRUETH_HSR_OFFLOAD_FEATURES
-   to make it clear it is a collection of features, not an alias for one
-   feature.
-*) Added Kernel doc entries for @hsr_members and @is_hsr_offload_mode as
-   suggested by Simon Horman <horms@kernel.org>
-*) Dropped patch [3] as it is no longer needed in this series. It is
-   already merged to net/main by commit [4].
-*) Collected Reviewed-by tag from Roger Quadros <rogerq@kernel.org> for
-   PATCH 1/6 and PATCH 2/6.
-*) Added if check for current mode before calling __dev_mc_unsync as
-   suggested by Roger Quadros <rogerq@kernel.org>
-*) Updated commit message of PATCH 6/6 to describe handling of duplicate
-   discard in the driver.
-
-Changes from v1 to v2:
-*) Modified patch 2/7 to only contain code movement as suggested by
-   Dan Carpenter <dan.carpenter@linaro.org>
-*) Added patch 3/7 by splitting it from 2/6 as the patch is not part of
-   code movement done in patch 2/7.
-*) Rebased on latest net-next/main.
-
-v1: https://lore.kernel.org/all/20240808110800.1281716-1-danishanwar@ti.com/
-v2: https://lore.kernel.org/all/20240813074233.2473876-1-danishanwar@ti.com
-v3: https://lore.kernel.org/all/20240828091901.3120935-1-danishanwar@ti.com/
-v4: https://lore.kernel.org/all/20240904100506.3665892-1-danishanwar@ti.com/
-
-[0] https://lore.kernel.org/all/202409061658.vSwcFJiK-lkp@intel.com/
-[1] https://lore.kernel.org/all/20240828091901.3120935-5-danishanwar@ti.com/
-[2] https://lore.kernel.org/all/20240828091901.3120935-7-danishanwar@ti.com/
-[3] https://lore.kernel.org/all/20240813074233.2473876-2-danishanwar@ti.com/
-[4] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=e846be0fba85
-
-MD Danish Anwar (4):
-  net: ti: icss-iep: Move icss_iep structure
-  net: ti: icssg-prueth: Stop hardcoding def_inc
-  net: ti: icssg-prueth: Add support for HSR frame forward offload
-  net: ti: icssg-prueth: Add multicast filtering support in HSR mode
-
-Ravi Gunasekaran (1):
-  net: ti: icssg-prueth: Enable HSR Tx duplication, Tx Tag and Rx Tag
-    offload
-
- drivers/net/ethernet/ti/icssg/icss_iep.c      |  72 -------
- drivers/net/ethernet/ti/icssg/icss_iep.h      |  73 ++++++-
- .../net/ethernet/ti/icssg/icssg_classifier.c  |   1 +
- drivers/net/ethernet/ti/icssg/icssg_common.c  |  18 +-
- drivers/net/ethernet/ti/icssg/icssg_config.c  |  22 +-
- drivers/net/ethernet/ti/icssg/icssg_config.h  |   2 +
- drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 203 +++++++++++++++++-
- drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   9 +
- 8 files changed, 308 insertions(+), 92 deletions(-)
-
-
-base-commit: 52fc70a32573707f70d6b1b5c5fe85cc91457393
+diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
+index 75c294ce6fb6..5d6d1cf78e93 100644
+--- a/drivers/net/ethernet/ti/icssg/icss_iep.c
++++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
+@@ -53,78 +53,6 @@
+ #define IEP_CAP_CFG_CAPNR_1ST_EVENT_EN(n)	BIT(LATCH_INDEX(n))
+ #define IEP_CAP_CFG_CAP_ASYNC_EN(n)		BIT(LATCH_INDEX(n) + 10)
+ 
+-enum {
+-	ICSS_IEP_GLOBAL_CFG_REG,
+-	ICSS_IEP_GLOBAL_STATUS_REG,
+-	ICSS_IEP_COMPEN_REG,
+-	ICSS_IEP_SLOW_COMPEN_REG,
+-	ICSS_IEP_COUNT_REG0,
+-	ICSS_IEP_COUNT_REG1,
+-	ICSS_IEP_CAPTURE_CFG_REG,
+-	ICSS_IEP_CAPTURE_STAT_REG,
+-
+-	ICSS_IEP_CAP6_RISE_REG0,
+-	ICSS_IEP_CAP6_RISE_REG1,
+-
+-	ICSS_IEP_CAP7_RISE_REG0,
+-	ICSS_IEP_CAP7_RISE_REG1,
+-
+-	ICSS_IEP_CMP_CFG_REG,
+-	ICSS_IEP_CMP_STAT_REG,
+-	ICSS_IEP_CMP0_REG0,
+-	ICSS_IEP_CMP0_REG1,
+-	ICSS_IEP_CMP1_REG0,
+-	ICSS_IEP_CMP1_REG1,
+-
+-	ICSS_IEP_CMP8_REG0,
+-	ICSS_IEP_CMP8_REG1,
+-	ICSS_IEP_SYNC_CTRL_REG,
+-	ICSS_IEP_SYNC0_STAT_REG,
+-	ICSS_IEP_SYNC1_STAT_REG,
+-	ICSS_IEP_SYNC_PWIDTH_REG,
+-	ICSS_IEP_SYNC0_PERIOD_REG,
+-	ICSS_IEP_SYNC1_DELAY_REG,
+-	ICSS_IEP_SYNC_START_REG,
+-	ICSS_IEP_MAX_REGS,
+-};
+-
+-/**
+- * struct icss_iep_plat_data - Plat data to handle SoC variants
+- * @config: Regmap configuration data
+- * @reg_offs: register offsets to capture offset differences across SoCs
+- * @flags: Flags to represent IEP properties
+- */
+-struct icss_iep_plat_data {
+-	const struct regmap_config *config;
+-	u32 reg_offs[ICSS_IEP_MAX_REGS];
+-	u32 flags;
+-};
+-
+-struct icss_iep {
+-	struct device *dev;
+-	void __iomem *base;
+-	const struct icss_iep_plat_data *plat_data;
+-	struct regmap *map;
+-	struct device_node *client_np;
+-	unsigned long refclk_freq;
+-	int clk_tick_time;	/* one refclk tick time in ns */
+-	struct ptp_clock_info ptp_info;
+-	struct ptp_clock *ptp_clock;
+-	struct mutex ptp_clk_mutex;	/* PHC access serializer */
+-	u32 def_inc;
+-	s16 slow_cmp_inc;
+-	u32 slow_cmp_count;
+-	const struct icss_iep_clockops *ops;
+-	void *clockops_data;
+-	u32 cycle_time_ns;
+-	u32 perout_enabled;
+-	bool pps_enabled;
+-	int cap_cmp_irq;
+-	u64 period;
+-	u32 latch_enable;
+-	struct work_struct work;
+-};
+-
+ /**
+  * icss_iep_get_count_hi() - Get the upper 32 bit IEP counter
+  * @iep: Pointer to structure representing IEP.
+diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.h b/drivers/net/ethernet/ti/icssg/icss_iep.h
+index 803a4b714893..0bdca0155abd 100644
+--- a/drivers/net/ethernet/ti/icssg/icss_iep.h
++++ b/drivers/net/ethernet/ti/icssg/icss_iep.h
+@@ -12,7 +12,78 @@
+ #include <linux/ptp_clock_kernel.h>
+ #include <linux/regmap.h>
+ 
+-struct icss_iep;
++enum {
++	ICSS_IEP_GLOBAL_CFG_REG,
++	ICSS_IEP_GLOBAL_STATUS_REG,
++	ICSS_IEP_COMPEN_REG,
++	ICSS_IEP_SLOW_COMPEN_REG,
++	ICSS_IEP_COUNT_REG0,
++	ICSS_IEP_COUNT_REG1,
++	ICSS_IEP_CAPTURE_CFG_REG,
++	ICSS_IEP_CAPTURE_STAT_REG,
++
++	ICSS_IEP_CAP6_RISE_REG0,
++	ICSS_IEP_CAP6_RISE_REG1,
++
++	ICSS_IEP_CAP7_RISE_REG0,
++	ICSS_IEP_CAP7_RISE_REG1,
++
++	ICSS_IEP_CMP_CFG_REG,
++	ICSS_IEP_CMP_STAT_REG,
++	ICSS_IEP_CMP0_REG0,
++	ICSS_IEP_CMP0_REG1,
++	ICSS_IEP_CMP1_REG0,
++	ICSS_IEP_CMP1_REG1,
++
++	ICSS_IEP_CMP8_REG0,
++	ICSS_IEP_CMP8_REG1,
++	ICSS_IEP_SYNC_CTRL_REG,
++	ICSS_IEP_SYNC0_STAT_REG,
++	ICSS_IEP_SYNC1_STAT_REG,
++	ICSS_IEP_SYNC_PWIDTH_REG,
++	ICSS_IEP_SYNC0_PERIOD_REG,
++	ICSS_IEP_SYNC1_DELAY_REG,
++	ICSS_IEP_SYNC_START_REG,
++	ICSS_IEP_MAX_REGS,
++};
++
++/**
++ * struct icss_iep_plat_data - Plat data to handle SoC variants
++ * @config: Regmap configuration data
++ * @reg_offs: register offsets to capture offset differences across SoCs
++ * @flags: Flags to represent IEP properties
++ */
++struct icss_iep_plat_data {
++	const struct regmap_config *config;
++	u32 reg_offs[ICSS_IEP_MAX_REGS];
++	u32 flags;
++};
++
++struct icss_iep {
++	struct device *dev;
++	void __iomem *base;
++	const struct icss_iep_plat_data *plat_data;
++	struct regmap *map;
++	struct device_node *client_np;
++	unsigned long refclk_freq;
++	int clk_tick_time;	/* one refclk tick time in ns */
++	struct ptp_clock_info ptp_info;
++	struct ptp_clock *ptp_clock;
++	struct mutex ptp_clk_mutex;	/* PHC access serializer */
++	u32 def_inc;
++	s16 slow_cmp_inc;
++	u32 slow_cmp_count;
++	const struct icss_iep_clockops *ops;
++	void *clockops_data;
++	u32 cycle_time_ns;
++	u32 perout_enabled;
++	bool pps_enabled;
++	int cap_cmp_irq;
++	u64 period;
++	u32 latch_enable;
++	struct work_struct work;
++};
++
+ extern const struct icss_iep_clockops prueth_iep_clockops;
+ 
+ /* Firmware specific clock operations */
 -- 
 2.34.1
 
