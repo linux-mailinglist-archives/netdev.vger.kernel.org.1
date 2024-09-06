@@ -1,120 +1,124 @@
-Return-Path: <netdev+bounces-126021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB0F296F9B8
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 19:07:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A97C96F9C5
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 19:13:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4ED2F1F24228
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:07:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1F88282B87
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078181D45F9;
-	Fri,  6 Sep 2024 17:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB691D47C1;
+	Fri,  6 Sep 2024 17:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jQDabZBM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HFog4E+D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2453F1D3620;
-	Fri,  6 Sep 2024 17:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D0C11CFEC9;
+	Fri,  6 Sep 2024 17:13:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725642418; cv=none; b=cOOluSmzXPLAUMFin1zQWJiabvvd4nXThR+I9KQ6AaXM7LFoZXJZam2AzbLr11+eknn5KzDpW5O+MX3ZuRq+IecTaccyepG7l/3WLjzoarpwnvU0SShpmJbeLwqhyw6L5wD6j9Aza47+1l7Z0bZUJKsXoRItTJ07nzadWoZljEY=
+	t=1725642809; cv=none; b=SMl6CXUH8QB/F0dAMA8U9BSpqhoJi5YDkz1jOtHuyI9zknLglRPznU9UPKErOn7CNbKJx0kgZ8mGH5ge7Iji4qmDx69zgX1z3tvhbeJFDppgEynwxhrPjlpu3DPEh10DpOSZNDE6lUu+AALkb/a6IfEy7xMXPB348+t7vmO6z8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725642418; c=relaxed/simple;
-	bh=NPeJ4OMHStfV9bh6sMyiOGOpK3bthEZ12GHhtsAwF70=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rfP66TJff00Bk+Y5dIVreSH6o+JWwFg1bI+ocFiSJRy/ooeEx/3wsxD7IV0F9IasJy0qrr4mS9iXNT3fQQbEluz72IQZ2HCsZ6KBhsYnRya259hSV635s+ckcorvvuy3shIWsqu07i+nd9TQktudSKf3jC6Se/h5nVdW0ntQxO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jQDabZBM; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1725642417; x=1757178417;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Jn42wqH671vFB3InLNKwvEuNGUf5C0VRcB5rM3aOr5A=;
-  b=jQDabZBMTVAAUUjlka9/tSwUlxtMu048+vRkHfYYgEVJ8Aa4wUiaRzqc
-   yLRQLwt0CJfp/syjXLkklA98jXYiwq18jE6T8hoNg0cYaoD4td9GmfdmZ
-   uCRQnYJpd165mJjLfzxohVk8pma/0hIj/Oc8EqmKq6mF1jBcc0jf+R+VE
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.10,208,1719878400"; 
-   d="scan'208";a="757373509"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2024 17:06:49 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:10174]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.30.196:2525] with esmtp (Farcaster)
- id ef379f21-421f-4fe3-8d76-bc7e5742ec5c; Fri, 6 Sep 2024 17:06:49 +0000 (UTC)
-X-Farcaster-Flow-ID: ef379f21-421f-4fe3-8d76-bc7e5742ec5c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 6 Sep 2024 17:06:49 +0000
-Received: from 88665a182662.ant.amazon.com (10.94.49.188) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 6 Sep 2024 17:06:46 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <usama.anjum@collabora.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kernel@collabora.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH] fou: fix initialization of grc
-Date: Fri, 6 Sep 2024 10:06:36 -0700
-Message-ID: <20240906170636.69739-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240906102839.202798-1-usama.anjum@collabora.com>
-References: <20240906102839.202798-1-usama.anjum@collabora.com>
+	s=arc-20240116; t=1725642809; c=relaxed/simple;
+	bh=za9hRWAJFue3qA2/8qfDjGdwgXq/W1BfL0Az38VY1kM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c6+eUSVwAsi9gmEkY8Dk/8OcqAeaQNlVaSeDtwEi943CrWTZt8hIzrYj2m+NtmoStOvXVUzkSztDBqeN/mM/+zOjdzEQpQzJGMra2Mk8IK0rOJmaGwHcfFRSK2nGqyNfeB8MfNLrYndPySaXsQXGDJJ4DHFGE5hbvJpBKW0/jl8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HFog4E+D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3692C4CEC4;
+	Fri,  6 Sep 2024 17:13:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725642808;
+	bh=za9hRWAJFue3qA2/8qfDjGdwgXq/W1BfL0Az38VY1kM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HFog4E+Ddyk1X/+lDS2YOD8HoYsrbiaXVWJMHDKK76Fj4BaEP3kzl/ig0ojYByIER
+	 NcQPadazN3d/t+eluRpnLIuWo/yHIXahwADGaZMRskL8z+GZKWDrGOmIfFr7+iv0EK
+	 rUaNZeOIXK5PT3mo25G0fNtbFmDY1v8bceg+7lz6S3bstEAyN9EYQ7NYsi920Bv0nn
+	 do67l2juJ/MulHR7CU9F9SvFAWj9kBc7csqzjWok+b8fsPIGrIk/iRguGUXpX6j8Jt
+	 4RkRTBPpCQsUzCjMcoBo5c/D+7B9ZffYeuI542pWftpxrmNHkI0CgUuB9sNkULkBWt
+	 bve0Tf9j1juNw==
+Message-ID: <a82d846d-ec87-4cb4-ab5f-86fee52e3124@kernel.org>
+Date: Fri, 6 Sep 2024 11:13:27 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA002.ant.amazon.com (10.13.139.113) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/12] Unmask upper DSCP bits - part 4 (last)
+Content-Language: en-US
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, gnault@redhat.com, razor@blackwall.org,
+ pablo@netfilter.org, kadlec@netfilter.org, marcelo.leitner@gmail.com,
+ lucien.xin@gmail.com, bridge@lists.linux.dev,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ linux-sctp@vger.kernel.org, bpf@vger.kernel.org
+References: <20240905165140.3105140-1-idosch@nvidia.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240905165140.3105140-1-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Muhammad Usama Anjum <usama.anjum@collabora.com>
-Date: Fri,  6 Sep 2024 15:28:39 +0500
-> The grc must be initialize first. There can be a condition where if
-> fou is NULL, goto out will be executed and grc would be used
-> uninitialized.
+On 9/5/24 10:51 AM, Ido Schimmel wrote:
+> tl;dr - This patchset finishes to unmask the upper DSCP bits in the IPv4
+> flow key in preparation for allowing IPv4 FIB rules to match on DSCP. No
+> functional changes are expected.
 > 
-> Fixes: 7e4196935069 ("fou: Fix null-ptr-deref in GRO.")
-> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-Thanks!
-
-
-> ---
->  net/ipv4/fou_core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> The TOS field in the IPv4 flow key ('flowi4_tos') is used during FIB
+> lookup to match against the TOS selector in FIB rules and routes.
 > 
-> diff --git a/net/ipv4/fou_core.c b/net/ipv4/fou_core.c
-> index 78b869b314921..3e30745e2c09a 100644
-> --- a/net/ipv4/fou_core.c
-> +++ b/net/ipv4/fou_core.c
-> @@ -336,11 +336,11 @@ static struct sk_buff *gue_gro_receive(struct sock *sk,
->  	struct gro_remcsum grc;
->  	u8 proto;
->  
-> +	skb_gro_remcsum_init(&grc);
-> +
->  	if (!fou)
->  		goto out;
->  
-> -	skb_gro_remcsum_init(&grc);
-> -
->  	off = skb_gro_offset(skb);
->  	len = off + sizeof(*guehdr);
->  
-> -- 
-> 2.39.2
+> It is currently impossible for user space to configure FIB rules that
+> match on the DSCP value as the upper DSCP bits are either masked in the
+> various call sites that initialize the IPv4 flow key or along the path
+> to the FIB core.
+> 
+> In preparation for adding a DSCP selector to IPv4 and IPv6 FIB rules, we
+> need to make sure the entire DSCP value is present in the IPv4 flow key.
+> This patchset finishes to unmask the upper DSCP bits by adjusting all
+> the callers of ip_route_output_key() to properly initialize the full
+> DSCP value in the IPv4 flow key.
+> 
+> No functional changes are expected as commit 1fa3314c14c6 ("ipv4:
+> Centralize TOS matching") moved the masking of the upper DSCP bits to
+> the core where 'flowi4_tos' is matched against the TOS selector.
+> 
+> Ido Schimmel (12):
+>   netfilter: br_netfilter: Unmask upper DSCP bits in
+>     br_nf_pre_routing_finish()
+>   ipv4: ip_gre: Unmask upper DSCP bits in ipgre_open()
+>   bpf: lwtunnel: Unmask upper DSCP bits in bpf_lwt_xmit_reroute()
+>   ipv4: icmp: Unmask upper DSCP bits in icmp_reply()
+>   ipv4: ip_tunnel: Unmask upper DSCP bits in ip_tunnel_bind_dev()
+>   ipv4: ip_tunnel: Unmask upper DSCP bits in ip_md_tunnel_xmit()
+>   ipv4: ip_tunnel: Unmask upper DSCP bits in ip_tunnel_xmit()
+>   ipv4: netfilter: Unmask upper DSCP bits in ip_route_me_harder()
+>   netfilter: nft_flow_offload: Unmask upper DSCP bits in
+>     nft_flow_route()
+>   netfilter: nf_dup4: Unmask upper DSCP bits in nf_dup_ipv4_route()
+>   ipv4: udp_tunnel: Unmask upper DSCP bits in udp_tunnel_dst_lookup()
+>   sctp: Unmask upper DSCP bits in sctp_v4_get_dst()
+> 
+>  net/bridge/br_netfilter_hooks.c  |  3 ++-
+>  net/core/lwt_bpf.c               |  3 ++-
+>  net/ipv4/icmp.c                  |  2 +-
+>  net/ipv4/ip_gre.c                |  3 ++-
+>  net/ipv4/ip_tunnel.c             | 11 ++++++-----
+>  net/ipv4/netfilter.c             |  3 ++-
+>  net/ipv4/netfilter/nf_dup_ipv4.c |  3 ++-
+>  net/ipv4/udp_tunnel_core.c       |  3 ++-
+>  net/netfilter/nft_flow_offload.c |  3 ++-
+>  net/sctp/protocol.c              |  3 ++-
+>  10 files changed, 23 insertions(+), 14 deletions(-)
+> 
+
+For the set:
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
+
 
