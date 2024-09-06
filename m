@@ -1,608 +1,338 @@
-Return-Path: <netdev+bounces-125936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E3CA96F50A
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:09:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5638596F512
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:12:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17801F2413E
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:09:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 742C61C219D7
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:12:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72471CDA3B;
-	Fri,  6 Sep 2024 13:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014241CDA20;
+	Fri,  6 Sep 2024 13:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YyyuXbRw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ENKtbvJG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f73.google.com (mail-ej1-f73.google.com [209.85.218.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929E41CBEA1
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 13:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.73
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725628162; cv=none; b=gP3rEiU/BbIlrNDoNLgfpPT3oESdCssmu9z9L5ln+fdiCX1ScSSb5l4trICUI82v1bTK+r4xP+K4e9OgkwWrIeK5R0HzP2E3i8hCIG0bHBKbSVCnWuEvYkwxv/OqoeDqC/ckW6tnvcqOeTVMkZ1LeD1Oi8CFm6N90sui29OaRSM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725628162; c=relaxed/simple;
-	bh=GrB2u+Nfw6Y/rjQUAhJ2z4JFVC3cFzFMvaemgrdkTgY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kSdKi0R9dF5bbkEYV4DULBcAykzhDbV330i3ZCLxEgLKMt9XmscT6YGMNjIBcobEbDh58eOcz4+NxkLl8n336RNTxp0lolt5UwsZVjuv6YLHdAKO1lCHIGwyesGjfR2VvAL0zdjUhV9qh01KccSdlGXF6f2RTcNvC2zejMPCcng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YyyuXbRw; arc=none smtp.client-ip=209.85.218.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-ej1-f73.google.com with SMTP id a640c23a62f3a-a8a8e19833cso53845466b.1
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 06:09:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725628159; x=1726232959; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DteTvmmqBcdv82Sl+0dp8Lh7J7Ip8qbxTBcqZs/0OB4=;
-        b=YyyuXbRwUBaoY0BwXMQRYQvRYVWWRjeBW643Rar7pjqOmm81QHdx6ogyu801BePRda
-         RPaKEif8CPFiATw86mohdl4RGjfZ81khkKwc85dqoDM/tW7U03AgXcZ0rubgP9dug0BR
-         vusUoRhjPLosH3Xn2Nsa8I23ttA2lFWIqJgPIUwydDG+T21DNRUQ2WJhW0GO8lEH8bZf
-         XeCROHMSIyYSUWvgHPqq76gITRqEpS7YajoE5VK4mEzjgvaMVdLRJ08Vlj17olpg5dyk
-         XeNbTYnNStzkEEWbReMPSlBbie+G03IjvHKSll9S1alN4mfiBlQiOgeuV5gIuFljP0z6
-         SCog==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725628159; x=1726232959;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DteTvmmqBcdv82Sl+0dp8Lh7J7Ip8qbxTBcqZs/0OB4=;
-        b=KSdNI5xh4N8+uzSQ9AIHnAgdm47ditGkDDmV4Mf6ChbGHKpwExbPNTAq0V29CGQWkq
-         SyzsML2iYsXBXz9CO16GGvvEcvaK1ciJpI4cMskls9I1hVuJLBANzhpu6Fgf1DmTJAkn
-         CFAxSjMiqdNI+0lpm4oMHOUeT36t6UV88AhvuRLLgu05fkdKmxG4pgs+6atNc4c09B13
-         J+86IAbpXEtAwIxURxjGqykglImxrxOVKfF3V82qtLrOwRIoIepxzLOT7IYeeROvYjsL
-         /Zh2+kU8+pNk76pfr8e+lgJXf3Hz+hs0VeRK4cSLIZaORpayZgcEB/P+HP2mo2tSpEjO
-         X29w==
-X-Forwarded-Encrypted: i=1; AJvYcCUHACWqljWZuJus0IIKNC5x0JtRlxShgpmJQTTCrv2rDYtA+kKahOr4Nbkzb0IEyKM8Hm3x0dA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeJncuk24rHk2R1m3nwWrwhxw07p3vv7C4mLzNTiTHDZhjMPD4
-	tP8/GOpWl6hJztZMp0MC2U7T7wsxM2ljHeRMW1ydukg1wyrSIr7CRa4q43hFxJxkUfarmh8UMf5
-	KfA==
-X-Google-Smtp-Source: AGHT+IEX60mOi9TOsBYKRfuKJ4yEbRXLSKElr4RrGcQPcc1SO03SbKOIjCbF6yKQeDS0ictQs4GAoBrksR0=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a17:906:5fc2:b0:a7a:ac81:7c72 with SMTP id
- a640c23a62f3a-a8a885de514mr174866b.5.1725628158644; Fri, 06 Sep 2024 06:09:18
- -0700 (PDT)
-Date: Fri, 6 Sep 2024 15:09:15 +0200
-In-Reply-To: <20240904104824.1844082-2-ivanov.mikhail1@huawei-partners.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16D11552FA
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 13:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725628327; cv=fail; b=nHWgcOEbR5vYQUXlEcTojEI/KzhEvOBrse88lextZJuxMOBZXFzu2LOXF+fslWCD/baXq7UY/odIqxLja5oQl9IJV82KwYAHAgyuMCpsnlzCfz2QrHJP7/3iSZplMKgf3HPIBFlE5XU2Rf/adjbrONLFqxqxh4fTXG5DfeK9rR0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725628327; c=relaxed/simple;
+	bh=VGSN210yuhg81kFuGuhfojEWHEDzKHqSvCs2+hrzzc8=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Ft6Ww3VPle5q5izJa+ptn9JvNJYqj4M4O0Pug1NouaqrDtVKrMlhT+nFOGp2P3MYBmb3dHfuDD+zbMFvlDinL33xFjL7CvGO07hryThE5oCw9BQg2nSkiC3Z1fGWYWpOFATadUmod7ZlxURz9eZapGeukSB4vahQKLEOp4YvwNY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ENKtbvJG; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725628326; x=1757164326;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=VGSN210yuhg81kFuGuhfojEWHEDzKHqSvCs2+hrzzc8=;
+  b=ENKtbvJGWwS1a1Ac18LqA1wFsh8rW+zQkRjNLeKo0HsRW6Xx8ryEFN4O
+   zISgepsusAfDfgDZlqOuvtrPz100KEVLEe29Q752DqMOOBpnm5Ob82vie
+   NmJOZFFGax+Bm0o09/jNVG84ByyE7wwUeBPe+LPsu5sazkP3Se3/1OQys
+   /QYjTP3MeWs2W7COApL3uKaORIYvXmBh0JuK7cNJ0Tb8Md7395agJ19Ks
+   vbifBlGaznsawnS1KAkwcQAuffu7UOmvj1AFTMIbwoQWNHoBUeOBIy8F7
+   OauqV0NSvVkdFRLKxfaVgJo4LlbHKhIVnafqrfju504KMD+I2b7x5or47
+   Q==;
+X-CSE-ConnectionGUID: cDLtr/HcQP2HxNMWaAwHXw==
+X-CSE-MsgGUID: fUt4n7ySTayzM7onZEGU1g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11187"; a="27312509"
+X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
+   d="scan'208";a="27312509"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2024 06:12:05 -0700
+X-CSE-ConnectionGUID: AATwgEyjRQ6VvF0RX7b9Tg==
+X-CSE-MsgGUID: BIuKxmTnQX2phu6ZrOllaA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
+   d="scan'208";a="70089687"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Sep 2024 06:12:05 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 6 Sep 2024 06:12:04 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 6 Sep 2024 06:12:04 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.46) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 6 Sep 2024 06:12:04 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VHhd7nnku4q+KCEo3qUEVkM0X3z3J1OFosBBJhD4FmqaS9AKr0U6MIedDbCfc4dEUoicdwYrSrUPGvRLxECrmWwpfiMxW1vdFhl0lCsKmuoZyd7Esg24iTF7dnvvEp9cFQcWLbyubBp2wijb7I8AatKMYBri2fcfUhww5pRAglmRxwh9DFWhZL7YLXYxVLWud5AQDDgRq05BYBYgPN/siNFl3G3GxHGg3pS0IpiDBMcPs0vn3FEnWxTxnp9JuFzPDjqNUOa/eWX4Isz3CwrE/wX5x+9y0O8NQtneRfGsRanRe/gbxat7ISvVbORjh06AU94EcZmNaqM+GznAswX1Hg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=X+B1nvPl0zjqqahG7Zi2C7yIWasN8Vk2xMNslN2Fqkc=;
+ b=cXpE17OzKUJFscoka3FOLG3qcoMF0UZN2fka1RkQsbc+0LuDbGsnuXar8daosnX4NwhCxeW4wfedsKj8xEBQmeD3AugmmJv39c21GEMlxp5WxOu4fwQ6Ixd+CPSG0GmP64t+dMdBPJDs/FX896p9Lz8uhVoYcu9yiRDGi+1c9HFPK2t6dnzhbgGiQ2AVSK4f3Ti2on1frTjbDkEYf66+sJdIfaxZ581lWPHz0MBzNbhbO6ZnwKsPpSnPNvbw5Oj+7+sqFzZxjKJ3kKStgjcdqg5kirsRoK0oqtcMQnU4J/TvYgyOwqKLhj2b+mv+i4+GVG7RoZZLK4Wb8irAq0g6kg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by IA1PR11MB6395.namprd11.prod.outlook.com (2603:10b6:208:3ac::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27; Fri, 6 Sep
+ 2024 13:12:01 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::4bea:b8f6:b86f:6942%6]) with mapi id 15.20.7897.021; Fri, 6 Sep 2024
+ 13:12:01 +0000
+Message-ID: <1ebe2e5d-3243-4fb6-8798-a331f1ce3539@intel.com>
+Date: Fri, 6 Sep 2024 15:11:55 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [iwl-net v1] ice: clear port vlan config during
+ reset
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	<intel-wired-lan@lists.osuosl.org>
+CC: <netdev@vger.kernel.org>
+References: <20240906125706.46965-1-michal.swiatkowski@linux.intel.com>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <20240906125706.46965-1-michal.swiatkowski@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BE1P281CA0492.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:7e::11) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com> <20240904104824.1844082-2-ivanov.mikhail1@huawei-partners.com>
-Message-ID: <Ztr--_Erq0-8xfYc@google.com>
-Subject: Re: [RFC PATCH v3 01/19] landlock: Support socket access-control
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|IA1PR11MB6395:EE_
+X-MS-Office365-Filtering-Correlation-Id: 55571a73-0f4f-412c-206b-08dcce757ebf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?MWU4Vm9HekxlbUgrd05WZTJJRkRtbGJOWVU3aEs2dkg3RXEraHV2NDBvT29r?=
+ =?utf-8?B?SkN0K04vZzJsMVd5dnJmMGRKTFB0WlpXUUhNcHhTckpidEpVWitNTFFtRHJn?=
+ =?utf-8?B?UXlzWlREMlE5L0EzcitSNWlwNjNsREZEbnZwWXErZE1LenlKdDY2S0crQTZU?=
+ =?utf-8?B?MGhqSU1jUkJid2V3c0lXdEJ1K2lobko1c3Iwb3FDblJpRlpCcDFNaVJuTWxL?=
+ =?utf-8?B?ZEs5VW1iVVAzVVd2MmYyM21NM2hlVFF3M0FRTThBZi9TYkZrNTlNOGhKTWtm?=
+ =?utf-8?B?eXJSRWZBaE04SFQyM1k1N3JQOFpSdlV5Mlc2K1Q3d3ZxOW9McjBQVjRhMy9K?=
+ =?utf-8?B?NXhXbU4xT1IxQXdwWWY5VWZaL052cUtuVnNHMUlySDd6KzF0c1R5R1ljZm9X?=
+ =?utf-8?B?Z0lYR0FIVFRJVnFsYVMrc3Ftc0wreUF4VE12alE4VlJ0YVBvZkJnYlJhVTNh?=
+ =?utf-8?B?WXgyU2lFZ2xNcDFXUU9rcFk4UUxIc1dQT25SK1d6bmwvMjg2RnQyNGJsT1h2?=
+ =?utf-8?B?OXE4RGFOZzNiUjBEbzVoUzNaRExiOTFURGJVS2hmNDdOM0xBdEphalRsSjA0?=
+ =?utf-8?B?RHNubTZXN3Q4ZDlDZ0toR29KNFZPMjZQdXBrdVJYY1VCN2wvbDlmL1h6ZjZu?=
+ =?utf-8?B?Z3hZMm85Vkx2a0NLU0tiR0lQRGVPRVJ2SzVkNFE5NkpKUWNORS9sOW9mQkV3?=
+ =?utf-8?B?ek1UZ1NlQWxiRGlYYzdPRW5kNEM2dWVIbUdmNDR5cWJyTml2SkFmdUFBWHlB?=
+ =?utf-8?B?RFRQOTVnM3NCd1JxU3NaS1dkVWtic0FGczd0aVVscmF6SlYySGI5VkxtcFpi?=
+ =?utf-8?B?MDFoWmxVYmRqbkJJN1p4aWsrbERrNnpjMjhRZTlOSkhwZSt3NFpES2J0N3Nn?=
+ =?utf-8?B?OFJLUk5DdGZpUTNNVWlHeUQrcEJyV2Q5bGRpNzB0Mlhtdi9oY3MzbFZpSjZU?=
+ =?utf-8?B?Rit4SCtxSVBORmdBRjVVKzZ3QlJzTDcxaXZjWGp1NVhya2NSTnJ0S20rRkFK?=
+ =?utf-8?B?bVg1UmhTY0NEcFI1N3FTRmZKeFZVemtVTUc4OFNSaEF6SXVJS0pPQnNVWmxM?=
+ =?utf-8?B?K3lDandVTDNQWnNXMG10QTVGS1hnbzBET1dsUmNNVnBWcW42enpUUnFreVYv?=
+ =?utf-8?B?by9Ob29QTE5mRkhxb001NWZXTmw5QUtXR1lHYmZLNk9pQlhmdDg3d3VTdEFX?=
+ =?utf-8?B?UTc2cjZydzY2OGkrck8vdkovTDFCSzVmaEQ1bmgrNm9LYmhwRlE1Mllvc0c3?=
+ =?utf-8?B?ekl6VmtPQW9pVjBFTEp6U2JvMWFsMll1TE5HRGpRcE94elNyZTVRWUZ2NURZ?=
+ =?utf-8?B?M1VOUnRuZVR4clQ1VUQ2L1I0ZjBMZnArSHcyMm93UGROdHFFMHhoMmkzcnF3?=
+ =?utf-8?B?RDJNVzNJT1RqK3NqT1RzNTlkQjV3eHVnQm42ZER3Q2k5ZzZOMGROaWhlNER3?=
+ =?utf-8?B?dnRSbFVKLzJYeWxTS1NkeHV4b2grbUdWeXlYN3lZVWdxZnVKcnNmWUZYRHZD?=
+ =?utf-8?B?TE80aWdlU213UlFETHQzVW1uR0VoZHoxMWJiWHB1M0llSkxCaVg1b2lSQmFQ?=
+ =?utf-8?B?NWY0TGpOTUlRNWppS1llZUNOM0pMdkxpc3hRdVJtRE1tN2QweTMxSXZEU3dj?=
+ =?utf-8?B?Sm5YN2d3cS94R2dZSVhRUENDeS9SUG1lcVkwT0UwMm1WS2RocmZwVk9ubEEw?=
+ =?utf-8?B?UVVmZmNtWC8wVTl5Q09aYTgveDZ4ZURhbnVLVlpVbko0S05IUS8xZldoNmE1?=
+ =?utf-8?B?S0FnUFlJTVUzdE9SZHRFMXFobTV6L1RISzdQZmVKOVpZaHZrd3ZIYlpRTUI0?=
+ =?utf-8?B?OGMzWkFrdVMvQVhQVSsrUT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S2Y3RXE5ZkRzQS9LT2QwR09lbjJYRkw2R05BaGFVZHhwcHovcW1oNGlsR21Z?=
+ =?utf-8?B?TlhZN0hwSVRlM3hnTEJsZHJtU1pqRFBJYkx2bURwSFk0bGU0Q0hudnRna2Mx?=
+ =?utf-8?B?YlFXQVEwWDRKbHRncG1LSWVnUHEzbTM5SVZ4QTE4ZGl1V1d4RTdxdUI0RDJK?=
+ =?utf-8?B?SHJ1Z21CMWpQZlVyZDFWZVdUUnRwSGMweWxpQXowMmI2TFNUbzFTRG9WN0s3?=
+ =?utf-8?B?dHRyVWVqWm9JaGJvMW5hNDJoYUw1Y1JYNjJtbGxVZy9rUlpDT29nSUVGSmZG?=
+ =?utf-8?B?MWNOZnU0MTA2a1pjVGRnWXVnN0NzNlZjY1Zha3NMM0FlVlEvL2RueEZ1ZXZx?=
+ =?utf-8?B?OXl6UHNUYTFiWGZZVWFMV0U4YmVBTCtFSUNkL3VSZnAza3htZkFHWFVLbHVC?=
+ =?utf-8?B?N0ZUYlFtV1ZYK2pUeGZ4QkR2WlBmTFZ0d3VqZHRHRTdCcjFzU1g5UVozN3Zx?=
+ =?utf-8?B?RHZGQ1VyN25wVjdFSC9mMGtabUNDQzRGbVlYbi85eDdpYUdlcStXM2VrUzJJ?=
+ =?utf-8?B?ZEVrUUVqaXFkcmxQa3JjMFBjZkFhNHBsZE41MmwvVHNqcnZyRE5wV1VxZE1r?=
+ =?utf-8?B?SHQwbXQ1UzQreENScVdwK1YvNFVMcVRjWmhqcUZqajJGcDVnc2JyODh4Ny90?=
+ =?utf-8?B?NmFTVGZxbWlaZlN4N1hEZ2NZNmIrTmVjbDdBQk91dFpyMDY5WGFmNFBSZG5B?=
+ =?utf-8?B?OWVkMExSdmJ1OWc1NTdBWEd2d1p1TG5TM1oxbUx0Tk5DcGJ2NnhEOGVrbnly?=
+ =?utf-8?B?M0UwNVRqR01ZK1NDRjM2NENnYXdrc1hLQjdxQzJSNDY5OU9vUEM1TFo4QWxw?=
+ =?utf-8?B?akZWUkxlNGpJR0xRSnIrN0dHSE0xZ0JuMUZ0NFFPUFhJaXFMVHdDbzFHWnIy?=
+ =?utf-8?B?ZHZxUUNSZlZ6MldnSUdFeTR3U2k3UkN4TTFyT3BKelZQMnFGZGd1UlhjSzZM?=
+ =?utf-8?B?eTVIeldaMG42Zm56emNIbG1YczkrNjg1VVM1SXdFMUZoeEozY2Q2Z0gvNXQ2?=
+ =?utf-8?B?aDZSTXQxWlFPWUx3d2VwdmFmeDlRNUJKZTIzTVo0V2thRVEvcDcxVFN6eXRP?=
+ =?utf-8?B?dHVscUtpVVI2RTVtWG4yVWR6Mnh2UnQ1bERFSUVRTlVhRnA2OFFiZGZZOG1K?=
+ =?utf-8?B?SFlDM2dOSmc4dFpmbllLdExIRnBHY2VubkcxOG53N2I0QXdiRTVSVEIyb0JV?=
+ =?utf-8?B?QlNMVFEvOTdrNzVXbXZJN3BwTi9wSHo1dFJkTHNHOEI3NVQ5QUF3Y2RQd2E3?=
+ =?utf-8?B?RzZoYXRzaEdCbmIySVRrdmE3aGIxZGZzYlJlSVpFSWVPVVdOZjU0M3oxSjJl?=
+ =?utf-8?B?T091dEhrWjdiT2hxbVNIQSt5TkdiTkdSaGlxUWVTbDVYQ1lvZ21RYm5uQzRN?=
+ =?utf-8?B?Mk84Z0I1SVlEaGlqQWlFMTBCblU0N0UrNDRDemRjRm5SZnFDQksyU0dHS3Yx?=
+ =?utf-8?B?cFh4TTNKQ2p2QVhBRzlOWVJRTWFtS0d6UW9GQ0QwaUhrcWVxZjhuZEJ3NExK?=
+ =?utf-8?B?cmVFTVQ0N1pZWXhJNE4veEZNNjJRL3o1S0ZkTzdYM3dxZTFUTitCODRlUWhp?=
+ =?utf-8?B?ZStpaTVnY09ORndTeEZ5VUhyeVJ5dGtlaTFxdVZEQnVLZnhBQXVaZDJuVGxP?=
+ =?utf-8?B?WWdYMXcrS21zcVpicFl2dTM0MGhYRzJpTUE4WUpYSDlTaVdXd3l4RVhhVkc0?=
+ =?utf-8?B?YnJMTFoyWGEzMTBCekp3SGF5cm84L3kxbEpSUlJwdmxMQ3ZzUy91eC96WXVy?=
+ =?utf-8?B?SjVmUHUyM1Zxa2Vtb2MwQ0swNmROU29pdE1tdFhjR3BQTmx4cG16MVY3MjMy?=
+ =?utf-8?B?aGpFNU4wTnF5blcxSzRicXZFWDJ4a2xwbEFKT0ZxZVAvK1NKaHVRWU5tVEhI?=
+ =?utf-8?B?dTMxWWcyYUNDK25LWXZrVWJTVlBVSGRuSFhpTXlmTWZ2N3hEUU5CY3d5Y3ZE?=
+ =?utf-8?B?SEg0bzQ5ZUJ6NXpWQVNQZ0lpRGc3ZlFoSWlNRm51WmdzVkE5REMrMUVBaUUw?=
+ =?utf-8?B?MnN0OXpaSE80bEVMeDlDYVJ6d0w4SXE1ZEFpdUJIOTFrNUVzekFFWGdpL1Bn?=
+ =?utf-8?B?SmQwd2VaYVYwNXVnQnV5UHRuY0JpTWVjYUpBVFZGdk1YNkUvNFhkeDZaMnZm?=
+ =?utf-8?B?bjRtM3ZJblZwelhPZzNjbUViNDhjN2FsTks2Sm9aZDRzT2ZZY254UVk3UWt5?=
+ =?utf-8?B?MHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 55571a73-0f4f-412c-206b-08dcce757ebf
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2024 13:12:01.5436
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: /zF98DfGd1tUQ2cNCQW4LfcLM2rdktvBl/xduB06tUlIjHSA+tl09JJRY9bv8BfKINqQBylhHf54XkWJAxkRMxb2Yc9kHuNgfR2/L8TpG1I=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6395
+X-OriginatorOrg: intel.com
 
-Hello!
 
-Just a few wording nits and a remark on using maybe u8, u16, u32.
 
-On Wed, Sep 04, 2024 at 06:48:06PM +0800, Mikhail Ivanov wrote:
-> Landlock implements the `LANDLOCK_RULE_NET_PORT` rule type, which provide=
-s
-> fine-grained control of actions for a specific protocol. Any action or
-> protocol that is not supported by this rule can not be controlled. As a
-> result, protocols for which fine-grained control is not supported can be
-> used in a sandboxed system and lead to vulnerabilities or unexpected
-> behavior.
->=20
-> Controlling the protocols used will allow to use only those that are
-> necessary for the system and/or which have fine-grained Landlock control
-> through others types of rules (e.g. TCP bind/connect control with
-> `LANDLOCK_RULE_NET_PORT`, UNIX bind control with
-> `LANDLOCK_RULE_PATH_BENEATH`). Consider following examples:
->=20
-> * Server may want to use only TCP sockets for which there is fine-grained
->   control of bind(2) and connect(2) actions [1].
-> * System that does not need a network or that may want to disable network
->   for security reasons (e.g. [2]) can achieve this by restricting the use
->   of all possible protocols.
->=20
-> This patch implements such control by restricting socket creation in a
-> sandboxed process.
->=20
-> Add `LANDLOCK_RULE_SOCKET` rule type that restricts actions on sockets.
-> This rule uses values of address family and socket type (Cf. socket(2))
-> to determine sockets that should be restricted. This is represented in a
-> landlock_socket_attr struct:
->=20
->   struct landlock_socket_attr {
->     __u64 allowed_access;
->     int family; /* same as domain in socket(2) */
->     int type; /* see socket(2) */
->   };
->=20
-> Support socket rule storage in landlock ruleset.
->=20
-> Add `LANDLOCK_ACCESS_SOCKET_CREATE` access right that corresponds to the
-> creation of user space sockets. In the case of connection-based socket
-> types, this does not restrict the actions that result in creation of
-> sockets used for messaging between already existing endpoints
-> (e.g. accept(2), SCTP_SOCKOPT_PEELOFF). Also, this does not restrict any
-> other socket-related actions such as bind(2) or send(2). All restricted
-> actions are enlisted in the documentation of this access right.
->=20
-> As with all other access rights, using `LANDLOCK_ACCESS_SOCKET_CREATE`
-> does not affect the actions on sockets which were created before
-> sandboxing.
->=20
-> Add socket.c file that will contain socket rules management and hooks.
->=20
-> Implement helper pack_socket_key() to convert 32-bit family and type
-> alues into uintptr_t. This is possible due to the fact that these
-  ^^^^^
-  values
-
-> values are limited to AF_MAX (=3D46), SOCK_MAX (=3D11) constants. Assumpt=
-ion
-> is checked in build-time by the helper.
->=20
-> Support socket rules in landlock syscalls. Change ABI version to 6.
->=20
-> [1] https://lore.kernel.org/all/ZJvy2SViorgc+cZI@google.com/
-> [2] https://cr.yp.to/unix/disablenetwork.html
->=20
-> Closes: https://github.com/landlock-lsm/linux/issues/6
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+On 06.09.2024 14:57, Michal Swiatkowski wrote:
+> Since commit 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with
+> ice_vf_reconfig_vsi()") VF VSI is only reconfigured instead of
+> recreated. The context configuration from previous setting is still the
+> same. If any of the config needs to be cleared it needs to be cleared
+> explicitly.
+> 
+> Previously there was assumption that port vlan will be cleared
+> automatically. Now, when VSI is only reconfigured we have to do it in the
+> code.
+> 
+> Not clearing port vlan configuration leads to situation when the driver
+> VSI config is different than the VSI config in HW. Traffic can't be
+> passed after setting and clearing port vlan, because of invalid VSI
+> config in HW.
+> 
+> Example reproduction:
+>> ip a a dev $(VF) $(VF_IP_ADDRESS)
+>> ip l s dev $(VF) up
+>> ping $(VF_IP_ADDRESS)
+> ping is working fine here
+>> ip link set eth5 vf 0 vlan 100
+>> ip link set eth5 vf 0 vlan 0
+>> ping $(VF_IP_ADDRESS)
+> ping isn't working
+> 
+> Fixes: 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with ice_vf_reconfig_vsi()")
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 > ---
-> Changes since v2:
-> * Refactors access_mask for `LANDLOCK_RULE_SOCKET`.
-> * Changes type of 'socket_key.packed' from 'uintptr_t' to 'unsigned int'
->   in order to fix UB in pack_socket_key().
-> * Accepts (AF_INET, SOCK_PACKET) as an alias for (AF_PACKET, SOCK_PACKET)
->   in landlock_append_socket_rule().
-> * Fixes documentation.
-> * Rewrites commit message.
-> * Fixes grammar.
-> * Minor fixes.
->=20
-> Changes since v1:
-> * Reverts landlock_key.data type from u64 to uinptr_t.
-> * Adds helper to pack domain and type values into uintptr_t.
-> * Denies inserting socket rule with invalid family and type.
-> * Renames 'domain' to 'family' in landlock_socket_attr.
-> * Updates ABI version to 6 since ioctl patches changed it to 5.
-> * Formats code with clang-format.
-> * Minor fixes.
-> ---
->  include/uapi/linux/landlock.h                | 61 ++++++++++++++++-
->  security/landlock/Makefile                   |  2 +-
->  security/landlock/limits.h                   |  4 ++
->  security/landlock/ruleset.c                  | 33 +++++++++-
->  security/landlock/ruleset.h                  | 45 ++++++++++++-
->  security/landlock/socket.c                   | 69 ++++++++++++++++++++
->  security/landlock/socket.h                   | 17 +++++
->  security/landlock/syscalls.c                 | 66 +++++++++++++++++--
->  tools/testing/selftests/landlock/base_test.c |  2 +-
->  9 files changed, 287 insertions(+), 12 deletions(-)
->  create mode 100644 security/landlock/socket.c
->  create mode 100644 security/landlock/socket.h
->=20
-> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.=
-h
-> index 2c8dbc74b955..d9da9f2c0640 100644
-> --- a/include/uapi/linux/landlock.h
-> +++ b/include/uapi/linux/landlock.h
-> @@ -44,6 +44,13 @@ struct landlock_ruleset_attr {
->  	 * flags`_).
->  	 */
->  	__u64 handled_access_net;
-> +
-> +	/**
-> +	 * @handled_access_socket: Bitmask of actions (cf. `Socket flags`_)
-> +	 * that is handled by this ruleset and should then be forbidden if no
-> +	 * rule explicitly allow them.
-> +	 */
-> +	__u64 handled_access_socket;
->  };
-> =20
->  /*
-> @@ -72,6 +79,11 @@ enum landlock_rule_type {
->  	 * landlock_net_port_attr .
->  	 */
->  	LANDLOCK_RULE_NET_PORT,
-> +	/**
-> +	 * @LANDLOCK_RULE_SOCKET: Type of a &struct
-> +	 * landlock_socket_attr .
-> +	 */
-> +	LANDLOCK_RULE_SOCKET,
->  };
-> =20
->  /**
-> @@ -123,6 +135,32 @@ struct landlock_net_port_attr {
->  	__u64 port;
->  };
-> =20
-> +/**
-> + * struct landlock_socket_attr - Socket definition
-> + *
-> + * Argument of sys_landlock_add_rule().
-> + */
-> +struct landlock_socket_attr {
-> +	/**
-> +	 * @allowed_access: Bitmask of allowed access for a socket
-> +	 * (cf. `Socket flags`_).
-> +	 */
-> +	__u64 allowed_access;
-> +	/**
-> +	 * @family: Protocol family used for communication
-> +	 * (same as domain in socket(2)).
-> +	 *
-> +	 * This argument is considered valid if it is in the range [0, AF_MAX).
-> +	 */
-> +	int family;
-> +	/**
-> +	 * @type: Socket type (see socket(2)).
-> +	 *
-> +	 * This argument is considered valid if it is in the range [0, SOCK_MAX=
-).
-> +	 */
-> +	int type;
-> +};
-> +
->  /**
->   * DOC: fs_access
->   *
-> @@ -259,7 +297,7 @@ struct landlock_net_port_attr {
->   * DOC: net_access
->   *
->   * Network flags
-> - * ~~~~~~~~~~~~~~~~
-> + * ~~~~~~~~~~~~~
->   *
->   * These flags enable to restrict a sandboxed process to a set of networ=
-k
->   * actions. This is supported since the Landlock ABI version 4.
-> @@ -274,4 +312,25 @@ struct landlock_net_port_attr {
->  #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
->  #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
->  /* clang-format on */
-> +
-> +/**
-> + * DOC: socket_access
-> + *
-> + * Socket flags
-> + * ~~~~~~~~~~~~
-> + *
-> + * These flags restrict actions on sockets for a sandboxed process (e.g.=
- socket
-> + * creation). Sockets opened before sandboxing are not subject to these
-> + * restrictions. This is supported since the Landlock ABI version 6.
-> + *
-> + * The following access right apply only to sockets:
-                                 ^^^^^
-				 applies
 
-> + *
-> + * - %LANDLOCK_ACCESS_SOCKET_CREATE: Create an user space socket. This a=
-ccess
-                                               ^^
-					       a
+Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
 
-> + *   right restricts following operations:
-                       ^ ...*the* following operations:
-
-> + *   * :manpage:`socket(2)`, :manpage:`socketpair(2)`,
-> + *   * ``IORING_OP_SOCKET`` io_uring operation (see :manpage:`io_uring_e=
-nter(2)`),
-> + */
-> +/* clang-format off */
-> +#define LANDLOCK_ACCESS_SOCKET_CREATE			(1ULL << 0)
-> +/* clang-format on */
->  #endif /* _UAPI_LINUX_LANDLOCK_H */
-> diff --git a/security/landlock/Makefile b/security/landlock/Makefile
-> index b4538b7cf7d2..ff1dd98f6a1b 100644
-> --- a/security/landlock/Makefile
-> +++ b/security/landlock/Makefile
-> @@ -1,6 +1,6 @@
->  obj-$(CONFIG_SECURITY_LANDLOCK) :=3D landlock.o
-> =20
->  landlock-y :=3D setup.o syscalls.o object.o ruleset.o \
-> -	cred.o task.o fs.o
-> +	cred.o task.o fs.o socket.o
-> =20
->  landlock-$(CONFIG_INET) +=3D net.o
-> diff --git a/security/landlock/limits.h b/security/landlock/limits.h
-> index 4eb643077a2a..2c04dca414c7 100644
-> --- a/security/landlock/limits.h
-> +++ b/security/landlock/limits.h
-> @@ -26,6 +26,10 @@
->  #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
->  #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_=
-NET)
-> =20
-> +#define LANDLOCK_LAST_ACCESS_SOCKET	    LANDLOCK_ACCESS_SOCKET_CREATE
-> +#define LANDLOCK_MASK_ACCESS_SOCKET	    ((LANDLOCK_LAST_ACCESS_SOCKET <<=
- 1) - 1)
-> +#define LANDLOCK_NUM_ACCESS_SOCKET		__const_hweight64(LANDLOCK_MASK_ACCE=
-SS_SOCKET)
-> +
->  /* clang-format on */
-> =20
->  #endif /* _SECURITY_LANDLOCK_LIMITS_H */
-> diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
-> index 6ff232f58618..9bf5e5e88544 100644
-> --- a/security/landlock/ruleset.c
-> +++ b/security/landlock/ruleset.c
-> @@ -40,6 +40,7 @@ static struct landlock_ruleset *create_ruleset(const u3=
-2 num_layers)
->  #if IS_ENABLED(CONFIG_INET)
->  	new_ruleset->root_net_port =3D RB_ROOT;
->  #endif /* IS_ENABLED(CONFIG_INET) */
-> +	new_ruleset->root_socket =3D RB_ROOT;
-> =20
->  	new_ruleset->num_layers =3D num_layers;
->  	/*
-> @@ -52,12 +53,13 @@ static struct landlock_ruleset *create_ruleset(const =
-u32 num_layers)
-> =20
->  struct landlock_ruleset *
->  landlock_create_ruleset(const access_mask_t fs_access_mask,
-> -			const access_mask_t net_access_mask)
-> +			const access_mask_t net_access_mask,
-> +			const access_mask_t socket_access_mask)
->  {
->  	struct landlock_ruleset *new_ruleset;
-> =20
->  	/* Informs about useless ruleset. */
-> -	if (!fs_access_mask && !net_access_mask)
-> +	if (!fs_access_mask && !net_access_mask && !socket_access_mask)
->  		return ERR_PTR(-ENOMSG);
->  	new_ruleset =3D create_ruleset(1);
->  	if (IS_ERR(new_ruleset))
-> @@ -66,6 +68,9 @@ landlock_create_ruleset(const access_mask_t fs_access_m=
-ask,
->  		landlock_add_fs_access_mask(new_ruleset, fs_access_mask, 0);
->  	if (net_access_mask)
->  		landlock_add_net_access_mask(new_ruleset, net_access_mask, 0);
-> +	if (socket_access_mask)
-> +		landlock_add_socket_access_mask(new_ruleset, socket_access_mask,
-> +						0);
->  	return new_ruleset;
+>  drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  7 +++
+>  .../net/ethernet/intel/ice/ice_vsi_vlan_lib.c | 57 +++++++++++++++++++
+>  .../net/ethernet/intel/ice/ice_vsi_vlan_lib.h |  1 +
+>  3 files changed, 65 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> index 5635e9da2212..9fe2a309c5ff 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+> @@ -335,6 +335,13 @@ static int ice_vf_rebuild_host_vlan_cfg(struct ice_vf *vf, struct ice_vsi *vsi)
+>  
+>  		err = vlan_ops->add_vlan(vsi, &vf->port_vlan_info);
+>  	} else {
+> +		/* clear possible previous port vlan config */
+> +		err = ice_vsi_clear_port_vlan(vsi);
+> +		if (err) {
+> +			dev_err(dev, "failed to clear port VLAN via VSI parameters for VF %u, error %d\n",
+> +				vf->vf_id, err);
+> +			return err;
+> +		}
+>  		err = ice_vsi_add_vlan_zero(vsi);
+>  	}
+>  
+> diff --git a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
+> index 6e8f2aab6080..5291f2888ef8 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
+> @@ -787,3 +787,60 @@ int ice_vsi_clear_outer_port_vlan(struct ice_vsi *vsi)
+>  	kfree(ctxt);
+>  	return err;
 >  }
-> =20
-> @@ -89,6 +94,9 @@ static bool is_object_pointer(const enum landlock_key_t=
-ype key_type)
->  		return false;
->  #endif /* IS_ENABLED(CONFIG_INET) */
-> =20
-> +	case LANDLOCK_KEY_SOCKET:
-> +		return false;
 > +
->  	default:
->  		WARN_ON_ONCE(1);
->  		return false;
-> @@ -146,6 +154,9 @@ static struct rb_root *get_root(struct landlock_rules=
-et *const ruleset,
->  		return &ruleset->root_net_port;
->  #endif /* IS_ENABLED(CONFIG_INET) */
-> =20
-> +	case LANDLOCK_KEY_SOCKET:
-> +		return &ruleset->root_socket;
-> +
->  	default:
->  		WARN_ON_ONCE(1);
->  		return ERR_PTR(-EINVAL);
-> @@ -395,6 +406,11 @@ static int merge_ruleset(struct landlock_ruleset *co=
-nst dst,
->  		goto out_unlock;
->  #endif /* IS_ENABLED(CONFIG_INET) */
-> =20
-> +	/* Merges the @src socket tree. */
-> +	err =3D merge_tree(dst, src, LANDLOCK_KEY_SOCKET);
-> +	if (err)
-> +		goto out_unlock;
-> +
->  out_unlock:
->  	mutex_unlock(&src->lock);
->  	mutex_unlock(&dst->lock);
-> @@ -458,6 +474,11 @@ static int inherit_ruleset(struct landlock_ruleset *=
-const parent,
->  		goto out_unlock;
->  #endif /* IS_ENABLED(CONFIG_INET) */
-> =20
-> +	/* Copies the @parent socket tree. */
-> +	err =3D inherit_tree(parent, child, LANDLOCK_KEY_SOCKET);
-> +	if (err)
-> +		goto out_unlock;
-> +
->  	if (WARN_ON_ONCE(child->num_layers <=3D parent->num_layers)) {
->  		err =3D -EINVAL;
->  		goto out_unlock;
-> @@ -494,6 +515,10 @@ static void free_ruleset(struct landlock_ruleset *co=
-nst ruleset)
->  		free_rule(freeme, LANDLOCK_KEY_NET_PORT);
->  #endif /* IS_ENABLED(CONFIG_INET) */
-> =20
-> +	rbtree_postorder_for_each_entry_safe(freeme, next,
-> +					     &ruleset->root_socket, node)
-> +		free_rule(freeme, LANDLOCK_KEY_SOCKET);
-> +
->  	put_hierarchy(ruleset->hierarchy);
->  	kfree(ruleset);
->  }
-> @@ -704,6 +729,10 @@ landlock_init_layer_masks(const struct landlock_rule=
-set *const domain,
->  		break;
->  #endif /* IS_ENABLED(CONFIG_INET) */
-> =20
-> +	case LANDLOCK_KEY_SOCKET:
-> +		get_access_mask =3D landlock_get_socket_access_mask;
-> +		num_access =3D LANDLOCK_NUM_ACCESS_SOCKET;
-> +		break;
->  	default:
->  		WARN_ON_ONCE(1);
->  		return 0;
-> diff --git a/security/landlock/ruleset.h b/security/landlock/ruleset.h
-> index 0f1b5b4c8f6b..5cf7251e11ca 100644
-> --- a/security/landlock/ruleset.h
-> +++ b/security/landlock/ruleset.h
-> @@ -42,6 +42,7 @@ static_assert(sizeof(unsigned long) >=3D sizeof(access_=
-mask_t));
->  struct access_masks {
->  	access_mask_t fs : LANDLOCK_NUM_ACCESS_FS;
->  	access_mask_t net : LANDLOCK_NUM_ACCESS_NET;
-> +	access_mask_t socket : LANDLOCK_NUM_ACCESS_SOCKET;
->  };
-> =20
->  typedef u16 layer_mask_t;
-> @@ -92,6 +93,12 @@ enum landlock_key_type {
->  	 * node keys.
->  	 */
->  	LANDLOCK_KEY_NET_PORT,
-> +
-> +	/**
-> +	 * @LANDLOCK_KEY_SOCKET: Type of &landlock_ruleset.root_socket's
-> +	 * node keys.
-> +	 */
-> +	LANDLOCK_KEY_SOCKET,
->  };
-> =20
->  /**
-> @@ -177,6 +184,15 @@ struct landlock_ruleset {
->  	struct rb_root root_net_port;
->  #endif /* IS_ENABLED(CONFIG_INET) */
-> =20
-> +	/**
-> +	 * @root_socket: Root of a red-black tree containing &struct
-> +	 * landlock_rule nodes with socket type, described by (family, type)
-> +	 * pair (see socket(2)). Once a ruleset is tied to a
-> +	 * process (i.e. as a domain), this tree is immutable until @usage
-> +	 * reaches zero.
-> +	 */
-> +	struct rb_root root_socket;
-> +
->  	/**
->  	 * @hierarchy: Enables hierarchy identification even when a parent
->  	 * domain vanishes.  This is needed for the ptrace protection.
-> @@ -215,8 +231,10 @@ struct landlock_ruleset {
->  			 */
->  			u32 num_layers;
->  			/**
-> -			 * @access_masks: Contains the subset of filesystem and
-> -			 * network actions that are restricted by a ruleset.
-> +			 * @access_masks: Contains the subset of filesystem,
-> +			 * network and socket actions that are restricted by
-> +			 * a ruleset.
-> +			 *
->  			 * A domain saves all layers of merged rulesets in a
->  			 * stack (FAM), starting from the first layer to the
->  			 * last one.  These layers are used when merging
-> @@ -233,7 +251,8 @@ struct landlock_ruleset {
-> =20
->  struct landlock_ruleset *
->  landlock_create_ruleset(const access_mask_t access_mask_fs,
-> -			const access_mask_t access_mask_net);
-> +			const access_mask_t access_mask_net,
-> +			const access_mask_t access_mask_socket);
-> =20
->  void landlock_put_ruleset(struct landlock_ruleset *const ruleset);
->  void landlock_put_ruleset_deferred(struct landlock_ruleset *const rulese=
-t);
-> @@ -280,6 +299,19 @@ landlock_add_net_access_mask(struct landlock_ruleset=
- *const ruleset,
->  	ruleset->access_masks[layer_level].net |=3D net_mask;
->  }
-> =20
-> +static inline void
-> +landlock_add_socket_access_mask(struct landlock_ruleset *const ruleset,
-> +				const access_mask_t socket_access_mask,
-> +				const u16 layer_level)
+> +int ice_vsi_clear_port_vlan(struct ice_vsi *vsi)
 > +{
-> +	access_mask_t socket_mask =3D socket_access_mask &
-> +				    LANDLOCK_MASK_ACCESS_SOCKET;
+> +	struct ice_hw *hw = &vsi->back->hw;
+> +	struct ice_vsi_ctx *ctxt;
+> +	int err;
 > +
-> +	/* Should already be checked in sys_landlock_create_ruleset(). */
-> +	WARN_ON_ONCE(socket_access_mask !=3D socket_mask);
-> +	ruleset->access_masks[layer_level].socket |=3D socket_mask;
+> +	ctxt = kzalloc(sizeof(*ctxt), GFP_KERNEL);
+> +	if (!ctxt)
+> +		return -ENOMEM;
+> +
+> +	ctxt->info = vsi->info;
+> +
+> +	ctxt->info.port_based_outer_vlan = 0;
+> +	ctxt->info.port_based_inner_vlan = 0;
+> +
+> +	ctxt->info.inner_vlan_flags =
+> +		FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_TX_MODE_M,
+> +			   ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL);
+> +	if (ice_is_dvm_ena(hw)) {
+> +		ctxt->info.inner_vlan_flags |=
+> +			FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_EMODE_M,
+> +				   ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING);
+> +		ctxt->info.outer_vlan_flags =
+> +			FIELD_PREP(ICE_AQ_VSI_OUTER_VLAN_TX_MODE_M,
+> +				   ICE_AQ_VSI_OUTER_VLAN_TX_MODE_ALL);
+> +		ctxt->info.outer_vlan_flags |=
+> +			FIELD_PREP(ICE_AQ_VSI_OUTER_TAG_TYPE_M,
+> +				   ICE_AQ_VSI_OUTER_TAG_VLAN_8100);
+> +		ctxt->info.outer_vlan_flags |=
+> +			ICE_AQ_VSI_OUTER_VLAN_EMODE_NOTHING <<
+> +			ICE_AQ_VSI_OUTER_VLAN_EMODE_S;
+> +	}
+> +
+> +	ctxt->info.sw_flags2 &= ~ICE_AQ_VSI_SW_FLAG_RX_VLAN_PRUNE_ENA;
+> +	ctxt->info.valid_sections =
+> +		cpu_to_le16(ICE_AQ_VSI_PROP_OUTER_TAG_VALID |
+> +			    ICE_AQ_VSI_PROP_VLAN_VALID |
+> +			    ICE_AQ_VSI_PROP_SW_VALID);
+> +
+> +	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
+> +	if (err) {
+> +		dev_err(ice_pf_to_dev(vsi->back), "update VSI for clearing port based VLAN failed, err %d aq_err %s\n",
+> +			err, ice_aq_str(hw->adminq.sq_last_status));
+> +	} else {
+> +		vsi->info.port_based_outer_vlan =
+> +			ctxt->info.port_based_outer_vlan;
+> +		vsi->info.port_based_inner_vlan =
+> +			ctxt->info.port_based_inner_vlan;
+> +		vsi->info.outer_vlan_flags = ctxt->info.outer_vlan_flags;
+> +		vsi->info.inner_vlan_flags = ctxt->info.inner_vlan_flags;
+> +		vsi->info.sw_flags2 = ctxt->info.sw_flags2;
+> +	}
+> +
+> +	kfree(ctxt);
+> +	return err;
 > +}
-> +
->  static inline access_mask_t
->  landlock_get_raw_fs_access_mask(const struct landlock_ruleset *const rul=
-eset,
->  				const u16 layer_level)
-> @@ -303,6 +335,13 @@ landlock_get_net_access_mask(const struct landlock_r=
-uleset *const ruleset,
->  	return ruleset->access_masks[layer_level].net;
->  }
-> =20
-> +static inline access_mask_t
-> +landlock_get_socket_access_mask(const struct landlock_ruleset *const rul=
-eset,
-> +				const u16 layer_level)
-> +{
-> +	return ruleset->access_masks[layer_level].socket;
-> +}
-> +
->  bool landlock_unmask_layers(const struct landlock_rule *const rule,
->  			    const access_mask_t access_request,
->  			    layer_mask_t (*const layer_masks)[],
-> diff --git a/security/landlock/socket.c b/security/landlock/socket.c
-> new file mode 100644
-> index 000000000000..cad89bb91678
-> --- /dev/null
-> +++ b/security/landlock/socket.c
-> @@ -0,0 +1,69 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * Landlock LSM - Socket management and hooks
-> + *
-> + * Copyright =C2=A9 2024 Huawei Tech. Co., Ltd.
-> + */
-> +
-> +#include <linux/net.h>
-> +#include <linux/socket.h>
-> +#include <linux/stddef.h>
-> +
-> +#include "limits.h"
-> +#include "ruleset.h"
-> +#include "socket.h"
-> +
-> +static uintptr_t pack_socket_key(const int family, const int type)
-> +{
-> +	union {
-> +		struct {
-> +			unsigned short family, type;
-> +		} __packed data;
-> +		unsigned int packed;
-> +	} socket_key;
-
-Maybe a slightly more obvious way would be to use the u8, u16 and u32 types
-here?  Then it would be more directly visible that we have considered this
-correctly and that not one of the variables has an odd size on an obscure
-platform somewhere.
-
-> +
-> +	/*
-> +	 * Checks that all supported socket families and types can be stored
-> +	 * in socket_key.
-> +	 */
-> +	BUILD_BUG_ON(AF_MAX >=3D (typeof(socket_key.data.family))~0);
-> +	BUILD_BUG_ON(SOCK_MAX >=3D (typeof(socket_key.data.type))~0);
-> +
-> +	/* Checks that socket_key can be stored in landlock_key. */
-> +	BUILD_BUG_ON(sizeof(socket_key.data) > sizeof(socket_key.packed));
-> +	BUILD_BUG_ON(sizeof(socket_key.packed) >
-> +		     sizeof_field(union landlock_key, data));
-> +
-> +	socket_key.data.family =3D (unsigned short)family;
-> +	socket_key.data.type =3D (unsigned short)type;
-> +
-> +	return socket_key.packed;
-> +}
-
-=E2=80=94G=C3=BCnther
+> diff --git a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.h b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.h
+> index f0d84d11bd5b..12b227621a7d 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.h
+> @@ -36,5 +36,6 @@ int ice_vsi_ena_outer_insertion(struct ice_vsi *vsi, u16 tpid);
+>  int ice_vsi_dis_outer_insertion(struct ice_vsi *vsi);
+>  int ice_vsi_set_outer_port_vlan(struct ice_vsi *vsi, struct ice_vlan *vlan);
+>  int ice_vsi_clear_outer_port_vlan(struct ice_vsi *vsi);
+> +int ice_vsi_clear_port_vlan(struct ice_vsi *vsi);
+>  
+>  #endif /* _ICE_VSI_VLAN_LIB_H_ */
 
