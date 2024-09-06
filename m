@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-126066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA5996FD5F
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:31:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2249296FD61
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC9552886C5
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 21:31:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4043B1C229C2
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 21:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91FE215B57D;
-	Fri,  6 Sep 2024 21:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A753015CD41;
+	Fri,  6 Sep 2024 21:30:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LzjQv+x5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zs9haEUj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E92F915B104;
-	Fri,  6 Sep 2024 21:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 081C715ADA1;
+	Fri,  6 Sep 2024 21:30:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725658222; cv=none; b=KInvABlgcgZpFMUFsk6dwBrmoZMGweIdHwBPPy8lQA/qMlHmJwzq/RmnjiUi65bK/srvR0hBQQKYqGbT7PsIIEGeFroYnGnoeleqqJ2d4Gk4fASz9wOjBzCMtQF0PnGEk4RgC4MbK8wCL7Xc76MOVcYTF8xraKeU5vf7LtYZwiY=
+	t=1725658223; cv=none; b=cckoaGHDsooxWPtQ9Boz9cVxXdiX/aOxkgTbNI6gDmmKdYuqsYLnEn0dt6q27zcc2qgBtpavZK1WAlW5gWicTnsRu7IMyyJK6MjWV1dF37w9N+MXgFnWggMlYSOhk4b1bVhGkPPdbHeMKkTz7xrt3CkwWMi5UA4QWkALTeYlnPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725658222; c=relaxed/simple;
-	bh=DkDtosDpUP9qC10sQxpAe2JKOgxIX1YdAxvK6AOUDM8=;
+	s=arc-20240116; t=1725658223; c=relaxed/simple;
+	bh=5URkew6MTbSPjmDCxnZtF4ylhtAoZWs2zFXPZaqdC+k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nTGQxbiNE8y15xRH0bQ9DeryrPT+9DDUMQlv/vz5awObK0jOYwwIVtQZntptrT6xbgI2P34ThP1Ly8yfW6hBWCsGklgmyTaLIXXZaZ84lg4Dlobf5wkYgWTx+TyDSTzY8Ok5R1H43tuYts78Lei7jO3T2op9cR/+LyZdtQKn/wU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LzjQv+x5; arc=none smtp.client-ip=209.85.214.173
+	 MIME-Version; b=Zi+4LY+TCevYNCdQZGUzVxeRElqbFHAxcH9hG9qIpuEgik9Ikg3HoicfeQyKiKH3IvDYkaNE041s6xpFn7tzRyTp1mFPxQvgCfWVlL1kwAGeg0nVM7uYv77NIeoYrwGV+wCYkfMk9y/r2YNbPHDQRvOxfo1rtX+4vxMAdYn+UpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zs9haEUj; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2053616fa36so26893135ad.0;
-        Fri, 06 Sep 2024 14:30:20 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20551e2f1f8so25223275ad.2;
+        Fri, 06 Sep 2024 14:30:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725658220; x=1726263020; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725658221; x=1726263021; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hSMrmdZdyuZUqEvjpif0S/dw7Gi7efe1pBKKqJKf+wQ=;
-        b=LzjQv+x5ND8w9p0k0HslsY20mUTAzvK0QvAtdeOErX1WKTFyodCgsel6HvER40kJPF
-         KQEY2K6R3dgsD5vKk113BAj6nhZF3S3sO5r4x6527ArjmL6iEDzEXBbgehG3Bto1ftAH
-         LB8L9vpEVAeUn+n7qbfrHxMb5INb96+5ug4NLc+nedzSSn+aGdQGh9/OqzL55Eg+NTCk
-         g7hkx+FtfjKqi8J3A+VGWhUdMrjiTJBbDI5tK9eacnH1hXaY2deF5Va6Ej1oC0lX4p/1
-         ZMIzpWxiCIoBhYBf924wdAqeR0JQynpjjzvzYycCXmFMOEr4q6GzxNItPcCNI98R/FlS
-         UdLg==
+        bh=eo09Uhc5A+uBAyAcs1Ht/DtBSMlFilRGw1wDCdIXuMU=;
+        b=Zs9haEUjIGglJxR4fg8qeqhpdmhJ2l3L9jI3uId1ERu43e/is6SDEDQgrESX9Fvk65
+         w7MYfPBe0GZJCSu8/uT9ZXcju+Zb+MMQgA77NTE1Hj9RXW2UCFGztgt9nEWrTpgT89c+
+         UDe6Asb6IWiKGcLlVeXHiV8E6GxCpj83ZcwHufjpGzTjjH04yvrsEuz/zuhUVukmD7WK
+         D667usn+8jfjEYTjVrB9vHLRVFL5b9oNpO+Rd/IuHTCYiyXHsxWHvl/Q0iVgEFmat433
+         qnUc1TQ29zIOqJ06y4bsMadTsFOat3f/ROt3e6mlaWanQ6haAqH5HY9keok2WAZLdM3x
+         IOLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725658220; x=1726263020;
+        d=1e100.net; s=20230601; t=1725658221; x=1726263021;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hSMrmdZdyuZUqEvjpif0S/dw7Gi7efe1pBKKqJKf+wQ=;
-        b=oLu9/WyJFl39dmKT5D/c63RdGc6Ii1ZlwwmvmdqC0PfE15sSTMKGp9I+fyiJiO6N+T
-         N4K+x4vFvKa7NZW21hXdWLpO5GnAAq6jriiCZO2ZhApCFrpjY1GQBJRE8ZwYg/PD23Oc
-         AeGeiOnAZ77LObkRKKMO1ql6shdcwO41thc0pPKsoNZ16/JOkUPdxTBBilijmlQoYvzm
-         W6HkP8qoBBdYi/fRQxl8yIMwY03EzcJXrl64FyKE6dKuftWe/UULDFijtv/DCp4mOnAj
-         E+9Cp/jrsFfwIvGkjhJqfPTPcX0cKXfWcVf3+rvwPTcO/fnhwji/HaG/aNWeso/q966i
-         qh5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUJ0zlVhmwvBOLtOZJKO8I2QXegLbqNGuemjqjATyZql4PJvgiKgyy6RIMxoVdTFapt1Cc/EOvXt483g8vAwHX+RK/X5hsd@vger.kernel.org, AJvYcCXrz9QQfzzLmG6akKApW+KkV6bdMg2AnKrtOYW1xv8AoUEiEoPEtpL0ecIOrSG1IfpCY8RimzOS6cy4sDU=@vger.kernel.org, AJvYcCXx0ba5C0SEi1XHUujWSx3RnFSvxHcaX3KsLtMYuZyfvFDFReH904TeWd3v7KZcw/CWdKRiN3Rd@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvSx2ma/+Dy7vbmuhQLrVjnvLKtfXWD3lenCBX2qMi6ZLpG5pd
-	CFg97o6QD+/Nfb+HLIxbBWs6CMieHa3jO+67nyeohDE+y1C7/p8A
-X-Google-Smtp-Source: AGHT+IHNHK2fwO3i887aEkZiDEJIPOt7RTzBl1gPJt8nik/cMuQj120cJOKWXrEnL+sIzBzwLJU8Dw==
-X-Received: by 2002:a17:903:2442:b0:201:e7c2:bd03 with SMTP id d9443c01a7336-2070a82ae4emr7633455ad.60.1725658220146;
-        Fri, 06 Sep 2024 14:30:20 -0700 (PDT)
+        bh=eo09Uhc5A+uBAyAcs1Ht/DtBSMlFilRGw1wDCdIXuMU=;
+        b=J593DZPGlrHu8fTBdCH6j96jd4FITrP8NyVikSekJH/eZ4MIuTurk5odcA4VYtRmuV
+         1JG0TVxMVIZfxHnT+cKv5PAl8Kbk1/AiOmrc7IGIkO1r9hMScz7EBc3IQIstUKrKMK1C
+         LRQkZFavma2KPwDYAhgD5qoxXIplAck9NWw+c5FnOweBLRyH7Y/rWI8B23Xab/I1MQNG
+         lGWDWUy6UQJSZaAKYeiT71B5T3ybBc4sgWAVexOu7LBQSfZWRPl3r7bLqesm/5aCmgo0
+         PH+B1HFZ9kAA0btjnOBcYmob5NxWGfBpGO9s5rfhSHfrgZFbotX73hHMprKmhyIRudww
+         nU0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVj+TZiCx2ZZUj6QJirSjh+E42xLiKi8RThEeAilMW+XHnE89bEL/YWBRRsVNAaAhKRaf3yLtY/C5trSXEwxqkiA4ahVdQV@vger.kernel.org, AJvYcCVmoLtSNfZQHsARjA0V5uLnFvybl0R54gkvaJ0D7eKiAbt0MJj8Wh8I6ewZBX2vbErkdhYJxKqB1e9t1bI=@vger.kernel.org, AJvYcCWcePD4QUPzfIBwQZjaqHgVJveJ8tewNi2mQ7RAUvzpP8Oe25w9FCpZJOG3TDxiyiIsweGDRy9F@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrpCLSflJEXLG8+mTbtsEu+Dy/fpiRPYep5X3joEzbd9ABGdW4
+	EaKXnKr4DsDShRlxkFUFS/FBq7lB/jnVu1+/4WzeuEYXD793wgMq
+X-Google-Smtp-Source: AGHT+IFHhd91sIx7FTtJWHA0Ayu/+5PDc1IaIfyUSpCenN3ZsXr9Gb/JEuPnWNZjlO9JhweP6OEElg==
+X-Received: by 2002:a17:902:d4c4:b0:206:f065:f45d with SMTP id d9443c01a7336-206f065f520mr43510585ad.31.1725658221188;
+        Fri, 06 Sep 2024 14:30:21 -0700 (PDT)
 Received: from tahera-OptiPlex-5000.tail3bf47f.ts.net ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea67bd1sm47081065ad.247.2024.09.06.14.30.19
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea67bd1sm47081065ad.247.2024.09.06.14.30.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 14:30:19 -0700 (PDT)
+        Fri, 06 Sep 2024 14:30:20 -0700 (PDT)
 From: Tahera Fahimi <fahimitahera@gmail.com>
 To: outreachy@lists.linux.dev
 Cc: mic@digikod.net,
@@ -80,9 +80,9 @@ Cc: mic@digikod.net,
 	jannh@google.com,
 	netdev@vger.kernel.org,
 	Tahera Fahimi <fahimitahera@gmail.com>
-Subject: [PATCH v4 4/6] selftest/landlock: Test file_send_sigiotask by sending out-of-bound message
-Date: Fri,  6 Sep 2024 15:30:06 -0600
-Message-Id: <50daeed4d4f60d71e9564d0f24004a373fc5f7d5.1725657728.git.fahimitahera@gmail.com>
+Subject: [PATCH v4 5/6] sample/landlock: Support sample for signal scoping restriction
+Date: Fri,  6 Sep 2024 15:30:07 -0600
+Message-Id: <1f3f1992b2abeb8e5d7aa61b854e1b0721978b9a.1725657728.git.fahimitahera@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1725657727.git.fahimitahera@gmail.com>
 References: <cover.1725657727.git.fahimitahera@gmail.com>
@@ -94,126 +94,96 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds a test to verify handling the signal scoping mechanism
-in file_send_sigiotask by triggering SIGURG through receiving an
-out-of-bound message in UNIX sockets.
+A sandboxer can receive the character "s" as input from the environment
+variable LL_SCOPE to restrict itself from sending a signal to a process
+outside its scoped domain.
+
+Example
+=======
+Create a sandboxed shell and pass the character "s" to LL_SCOPED:
+LL_FS_RO=/ LL_FS_RW=. LL_SCOPED="s" ./sandboxer /bin/bash
+Try to send a SIGTRAP to a process with process ID <PID> through:
+kill -SIGTRAP <PID>
+The sandboxed process should not be able to send the signal.
 
 Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
 ---
-V4:
-* Using pipe instead of Poll for synchronization.
+v4:
+- Make it compatible with changes in abstract UNIX socket scoping sample
+v3:
+- Add a restrict approach on input of LL_SCOPED, so it only allows
+  zero or one "s" to be the input.
 ---
- .../selftests/landlock/scoped_signal_test.c   | 99 +++++++++++++++++++
- 1 file changed, 99 insertions(+)
+ samples/landlock/sandboxer.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/landlock/scoped_signal_test.c b/tools/testing/selftests/landlock/scoped_signal_test.c
-index c71fb83b7147..630f3a515731 100644
---- a/tools/testing/selftests/landlock/scoped_signal_test.c
-+++ b/tools/testing/selftests/landlock/scoped_signal_test.c
-@@ -269,4 +269,103 @@ TEST(signal_scoping_threads)
- 	EXPECT_EQ(0, close(thread_pipe[1]));
- }
+diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
+index 18d072c23a23..618fbf70d38f 100644
+--- a/samples/landlock/sandboxer.c
++++ b/samples/landlock/sandboxer.c
+@@ -191,11 +191,13 @@ static bool check_ruleset_scope(const char *const env_var,
+ 				struct landlock_ruleset_attr *ruleset_attr)
+ {
+ 	bool abstract_scoping = false;
++	bool signal_scoping = false;
+ 	bool ret = true;
+ 	char *env_type_scope, *env_type_scope_next, *ipc_scoping_name;
  
-+#define SOCKET_PATH "/tmp/unix_sock_test"
-+
-+const short backlog = 10;
-+
-+static volatile sig_atomic_t signal_received;
-+
-+static void handle_sigurg(int sig)
-+{
-+	if (sig == SIGURG)
-+		signal_received = 1;
-+	else
-+		signal_received = -1;
-+}
-+
-+static int setup_signal_handler(int signal)
-+{
-+	struct sigaction sa;
-+
-+	sa.sa_handler = handle_sigurg;
-+	sigemptyset(&sa.sa_mask);
-+	sa.sa_flags = SA_SIGINFO | SA_RESTART;
-+	return sigaction(SIGURG, &sa, NULL);
-+}
-+
-+/*
-+ * Sending an out of bound message will trigger the SIGURG signal
-+ * through file_send_sigiotask.
-+ */
-+TEST(test_sigurg_socket)
-+{
-+	int sock_fd, recv_sock;
-+	struct sockaddr_un addr, paddr;
-+	socklen_t size;
-+	char oob_buf, buffer;
-+	int status;
-+	int pipe_parent[2], pipe_child[2];
-+	pid_t child;
-+
-+	ASSERT_EQ(0, pipe2(pipe_parent, O_CLOEXEC));
-+	ASSERT_EQ(0, pipe2(pipe_child, O_CLOEXEC));
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+	snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", SOCKET_PATH);
-+	unlink(SOCKET_PATH);
-+	size = sizeof(addr);
-+
-+	child = fork();
-+	ASSERT_LE(0, child);
-+	if (child == 0) {
-+		oob_buf = '.';
-+
-+		ASSERT_EQ(0, close(pipe_parent[1]));
-+		ASSERT_EQ(0, close(pipe_child[0]));
-+
-+		sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+		ASSERT_NE(-1, sock_fd);
-+
-+		ASSERT_EQ(1, read(pipe_parent[0], &buffer, 1));
-+		ASSERT_EQ(0, connect(sock_fd, &addr, sizeof(addr)));
-+
-+		ASSERT_EQ(1, read(pipe_parent[0], &buffer, 1));
-+		ASSERT_NE(-1, send(sock_fd, &oob_buf, 1, MSG_OOB));
-+		ASSERT_EQ(1, write(pipe_child[1], ".", 1));
-+
-+		EXPECT_EQ(0, close(sock_fd));
-+
-+		_exit(_metadata->exit_code);
-+		return;
-+	}
-+	ASSERT_EQ(0, close(pipe_parent[0]));
-+	ASSERT_EQ(0, close(pipe_child[1]));
-+
-+	sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
-+	ASSERT_NE(-1, sock_fd);
-+	ASSERT_EQ(0, bind(sock_fd, &addr, size));
-+	ASSERT_EQ(0, listen(sock_fd, backlog));
-+
-+	ASSERT_NE(-1, setup_signal_handler(SIGURG));
-+	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
-+	recv_sock = accept(sock_fd, &paddr, &size);
-+	ASSERT_NE(-1, recv_sock);
-+
-+	create_scoped_domain(_metadata, LANDLOCK_SCOPED_SIGNAL);
-+
-+	ASSERT_NE(-1, fcntl(recv_sock, F_SETOWN, getpid()));
-+	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
-+	ASSERT_EQ(1, read(pipe_child[0], &buffer, 1));
-+	ASSERT_EQ(1, recv(recv_sock, &oob_buf, 1, MSG_OOB));
-+
-+	ASSERT_EQ(1, signal_received);
-+	EXPECT_EQ(0, close(sock_fd));
-+	EXPECT_EQ(0, close(recv_sock));
-+	ASSERT_EQ(child, waitpid(child, &status, 0));
-+	if (WIFSIGNALED(status) || !WIFEXITED(status) ||
-+	    WEXITSTATUS(status) != EXIT_SUCCESS)
-+		_metadata->exit_code = KSFT_FAIL;
-+}
-+
- TEST_HARNESS_MAIN
+ 	/* scoping is not supported by Landlock ABI */
+-	if (!(ruleset_attr->scoped & LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET))
++	if (!(ruleset_attr->scoped &
++	      (LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET | LANDLOCK_SCOPED_SIGNAL)))
+ 		return ret;
+ 
+ 	env_type_scope = getenv(env_var);
+@@ -212,6 +214,9 @@ static bool check_ruleset_scope(const char *const env_var,
+ 			strsep(&env_type_scope_next, ENV_DELIMITER))) {
+ 		if (strcmp("a", ipc_scoping_name) == 0 && !abstract_scoping) {
+ 			abstract_scoping = true;
++		} else if (strcmp("s", ipc_scoping_name) == 0 &&
++			   !signal_scoping) {
++			signal_scoping = true;
+ 		} else {
+ 			fprintf(stderr, "Unsupported scoping \"%s\"\n",
+ 				ipc_scoping_name);
+@@ -221,6 +226,8 @@ static bool check_ruleset_scope(const char *const env_var,
+ 	}
+ 	if (!abstract_scoping)
+ 		ruleset_attr->scoped &= ~LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET;
++	if (!signal_scoping)
++		ruleset_attr->scoped &= ~LANDLOCK_SCOPED_SIGNAL;
+ out_free_name:
+ 	free(env_type_scope);
+ 	return ret;
+@@ -265,7 +272,8 @@ int main(const int argc, char *const argv[], char *const *const envp)
+ 		.handled_access_fs = access_fs_rw,
+ 		.handled_access_net = LANDLOCK_ACCESS_NET_BIND_TCP |
+ 				      LANDLOCK_ACCESS_NET_CONNECT_TCP,
+-		.scoped = LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET,
++		.scoped = LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET |
++			  LANDLOCK_SCOPED_SIGNAL,
+ 	};
+ 
+ 	if (argc < 2) {
+@@ -302,7 +310,7 @@ int main(const int argc, char *const argv[], char *const *const envp)
+ 			"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
+ 			"%s=\"9418\" "
+ 			"%s=\"80:443\" "
+-			"%s=\"a\" "
++			"%s=\"a:s\" "
+ 			"%s bash -i\n\n",
+ 			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
+ 			ENV_TCP_CONNECT_NAME, ENV_SCOPED_NAME, argv[0]);
+@@ -376,7 +384,8 @@ int main(const int argc, char *const argv[], char *const *const envp)
+ 		__attribute__((fallthrough));
+ 	case 5:
+ 		/* Removes LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET for ABI < 6 */
+-		ruleset_attr.scoped &= ~LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET;
++		ruleset_attr.scoped &= ~(LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET |
++					 LANDLOCK_SCOPED_SIGNAL);
+ 		fprintf(stderr,
+ 			"Hint: You should update the running kernel "
+ 			"to leverage Landlock features "
 -- 
 2.34.1
 
