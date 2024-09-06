@@ -1,125 +1,134 @@
-Return-Path: <netdev+bounces-126055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FC0396FD05
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:05:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37D0796FD0B
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:08:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A7F91F25A69
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 21:05:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6391B1C227F4
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 21:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6300D1D3630;
-	Fri,  6 Sep 2024 21:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0C11D7980;
+	Fri,  6 Sep 2024 21:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Vyrfvmzh"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o0x2qbGm"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580861D6788;
-	Fri,  6 Sep 2024 21:05:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CED1D61BE
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 21:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725656705; cv=none; b=iuIwvpSfGToGeE8w6T5XpcJjiYJubDyNIcLkpVSbwBcQb97IXqdhRRt8vgF3JbSjR+dq7tDnVIpx62XY4JTT1fxeXeUOs2HUyn/9xY5/8uW0XOWBBORfuqMwSCJLMhbHxTAhvLPo2pjyYISvs5fustdUavNVK5SKEl/MYy6VkKY=
+	t=1725656879; cv=none; b=Dk3sAKw/vrQKo0xHluwkDUxTKpKEH7Ii6PeegBV/2LaQhoxQlLoQ4iDIy5FXU0g9APWvjxKIdhlz06mxfqs2tcIs1ft5Enx6RzuLM2IRBjfKKRGByZVh4GhT4a6qwZOOWvGnpHs2BB7t243cJvJlDVNVm4/+R48TXQgxtzyLFI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725656705; c=relaxed/simple;
-	bh=TLxopGzag25S+H1ZVnJQ5L1cxCnGpauQXsFNj+zUutY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VJspmfs4RcV9S4CU2Y1ZRsJaGxjeMhL24nKMksMeRs0fa9iZSao66XK3Vs5Nx8HFkKcZr3F6H5NzZR8HiTaGJSC18wE8JiFrDz168WR59TiFSPOsug7U+YSEHjyizvNf/bnYtlk/2Fe0170vFOWvddf/5WhcsV6oFw6j08l7WCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Vyrfvmzh; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=HtDcdOKMyujft1+Go8bBiIv0elw+4jRDPCcjcmy0tqE=; b=Vy
-	rfvmzhZjVPnSvtUZJqhU2bwkwBUtjMpDw73d7NvGoc96vjQWhxOOhqn0Xr7wWTfYf2PAVarkzro0y
-	/4DynEdHfdcip6ugcJ543YzKPT11ljkcVUHQrFfVi99LoTwRoE9mW/ux2ge2cxyAwn1C1IfNYM+Di
-	ND4+x36f6AKU3xc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1smg8Q-006rLC-SH; Fri, 06 Sep 2024 23:04:50 +0200
-Date: Fri, 6 Sep 2024 23:04:50 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1725656879; c=relaxed/simple;
+	bh=JJ1smVVv1hpPtnU9o9QoOlpsW1GluwEyiacWgsBBzpY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=prAg2L0Fh2TwqjlUBXgG/YZI6gvPhqAnq2WhIyWxsJA7avUvYD5T7MQDULHzqVWHeh89ROygZmFe1gQIOtNX0qEpZcgN0VYXR0dFExlU/J1m7zWqqlDWpf+10Z+1PB8Z9/uyNtKYzK58PalsCX8Jf8vQU/PS8MObmh38WcsJTJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o0x2qbGm; arc=none smtp.client-ip=95.215.58.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725656875;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Keefv1899VY9ObcYSkgFK6MVawN7CzaBeJBfIS+JVWY=;
+	b=o0x2qbGmjF7Uq/qzoqjo7KmwV0YF0oQHrSqZyjFFaPILkbOeBqJrryuQj/FXGwKlilxv77
+	0R2J1aVyfMmNksD0rCjLqr95uzzWfaRk7WzY7YKT/PJCzxnq0bEpWLQvFCPFuK4YS3K2KM
+	O8cT5CPthjkxtExe6hPhT2wKRU14CO4=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next 2/2] net: phy: Fallback to C22 access if needed in
- phy_mii_ioctl()
-Message-ID: <365313cb-c767-414a-8b4b-97882854e9b6@lunn.ch>
-References: <20240906093955.3083245-1-niklas.soderlund+renesas@ragnatech.se>
- <20240906093955.3083245-3-niklas.soderlund+renesas@ragnatech.se>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemb@google.com>,
+	linux-kernel@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: [PATCH net] selftests: net: csum: Fix checksums for packets with non-zero padding
+Date: Fri,  6 Sep 2024 17:07:43 -0400
+Message-Id: <20240906210743.627413-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240906093955.3083245-3-niklas.soderlund+renesas@ragnatech.se>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Sep 06, 2024 at 11:39:55AM +0200, Niklas Söderlund wrote:
-> If a C45 only PHY is attached to a driver that only knows how to talk
-> C22 phylib will fallback and use indirect access. This frees the driver
-> from having to implement this themself.
-> 
-> The IOCTL implementation for SIOCGMIIREG and SIOCSMIIREG do not use
-> these convenience functions and instead fail if a C45 PHY is used
-> together with a driver that only knows how to speak C22.
-> 
-> Fix this by using the two convince functions that knows when to fallback
-> to indirect access to read/write to the MDIO bus when needed.
-> 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> ---
->  drivers/net/phy/phy.c | 18 ++++++++++++------
->  1 file changed, 12 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-> index 4f3e742907cb..89f52bb123aa 100644
-> --- a/drivers/net/phy/phy.c
-> +++ b/drivers/net/phy/phy.c
-> @@ -342,9 +342,12 @@ int phy_mii_ioctl(struct phy_device *phydev, struct ifreq *ifr, int cmd)
->  		if (mdio_phy_id_is_c45(mii_data->phy_id)) {
->  			prtad = mdio_phy_id_prtad(mii_data->phy_id);
->  			devad = mdio_phy_id_devad(mii_data->phy_id);
-> -			ret = mdiobus_c45_read(phydev->mdio.bus, prtad, devad,
-> -					       mii_data->reg_num);
->  
-> +			mutex_lock(&phydev->mdio.bus->mdio_lock);
-> +			ret = mmd_phy_read(phydev->mdio.bus, prtad,
-> +					   phydev->is_c45, devad,
+Padding is not included in UDP and TCP checksums. Therefore, reduce the
+length of the checksummed data to include only the data in the IP
+payload. This fixes spurious reported checksum failures like
 
-Using phydev->is_c45 is probably wrong.
+rx: pkt: sport=33000 len=26 csum=0xc850 verify=0xf9fe
+pkt: bad csum
 
-mii_data->phy_id is the device on the bus you want to access. It does
-not need to be the same device as the MAC is using. Just because the
-device the MAC is using is a c45 device does not mean the device you
-are trying to access is.
+Technically it is possible for there to be trailing bytes after the UDP
+data but before the Ethernet padding (e.g. if sizeof(ip) + sizeof(udp) +
+udp.len < ip.len). However, we don't generate such packets.
 
-Maybe i gave you some bad advice. Sorry.
+Fixes: 91a7de85600d ("selftests/net: add csum offload test")
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+---
+Found while testing for this very bug in hardware checksum offloads.
 
-This API is reasonably well known to be a foot gun. You should only be
-using it for debug, and actually using it, even only to read
-registers, can mess up a PHY/phylib.
+ tools/testing/selftests/net/lib/csum.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-The API gives you the ability to perform a C22 bus transaction, or a
-C45 bus transaction on any arbitrary device. That is all you need for
-debug, you can do C45 over C22 in user space. Yes, there are race
-conditions, but this API already has race conditions, which is part of
-why it is a foot gun.
-
-    Andrew
+diff --git a/tools/testing/selftests/net/lib/csum.c b/tools/testing/selftests/net/lib/csum.c
+index b9f3fc3c3426..e0a34e5e8dd5 100644
+--- a/tools/testing/selftests/net/lib/csum.c
++++ b/tools/testing/selftests/net/lib/csum.c
+@@ -654,10 +654,16 @@ static int recv_verify_packet_ipv4(void *nh, int len)
+ {
+ 	struct iphdr *iph = nh;
+ 	uint16_t proto = cfg_encap ? IPPROTO_UDP : cfg_proto;
++	uint16_t ip_len;
+ 
+ 	if (len < sizeof(*iph) || iph->protocol != proto)
+ 		return -1;
+ 
++	ip_len = ntohs(iph->tot_len);
++	if (ip_len > len || ip_len < sizeof(*iph))
++		return -1;
++
++	len = ip_len;
+ 	iph_addr_p = &iph->saddr;
+ 	if (proto == IPPROTO_TCP)
+ 		return recv_verify_packet_tcp(iph + 1, len - sizeof(*iph));
+@@ -669,16 +675,22 @@ static int recv_verify_packet_ipv6(void *nh, int len)
+ {
+ 	struct ipv6hdr *ip6h = nh;
+ 	uint16_t proto = cfg_encap ? IPPROTO_UDP : cfg_proto;
++	uint16_t ip_len;
+ 
+ 	if (len < sizeof(*ip6h) || ip6h->nexthdr != proto)
+ 		return -1;
+ 
++	ip_len = ntohs(ip6h->payload_len);
++	if (ip_len > len - sizeof(*ip6h))
++		return -1;
++
++	len = ip_len;
+ 	iph_addr_p = &ip6h->saddr;
+ 
+ 	if (proto == IPPROTO_TCP)
+-		return recv_verify_packet_tcp(ip6h + 1, len - sizeof(*ip6h));
++		return recv_verify_packet_tcp(ip6h + 1, len);
+ 	else
+-		return recv_verify_packet_udp(ip6h + 1, len - sizeof(*ip6h));
++		return recv_verify_packet_udp(ip6h + 1, len);
+ }
+ 
+ /* return whether auxdata includes TP_STATUS_CSUM_VALID */
+-- 
+2.35.1.1320.gc452695387.dirty
 
 
