@@ -1,116 +1,314 @@
-Return-Path: <netdev+bounces-125797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4EE096EA87
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:32:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6379196EACD
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:38:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEA2C1C21388
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 06:32:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B4BE281CC4
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 06:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0DB15AAD7;
-	Fri,  6 Sep 2024 06:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09AD813AD2A;
+	Fri,  6 Sep 2024 06:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="itOb+F/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067B4145FFF;
-	Fri,  6 Sep 2024 06:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61AF77316E;
+	Fri,  6 Sep 2024 06:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725604116; cv=none; b=ldTCWisSdvDzdoBU4uClKxQQaLKa2z1/NdyAIy3GJuPVRPFCtjbDYN0xUhs69FgUmuBHVZeAXQe1qhAWg9WKdoYqbTt+FYDVc7Y9u94CaRXM0RVeiXuGTOvfYcw/7vnBWZKsPrOespo5ZaiGyoBi1o+k6IXKYEPS+YyMlTAmeG0=
+	t=1725604706; cv=none; b=N1Nh71aGflSmEXxgLsF4KXbE7O1F0fuwrMODFeVzIYbi7t4eCG5dpsr9CFx271P/4Whwo3VrNk+ksTpm9T5cHaW47wIt8e2FoKb32I99IUUBqd/YG/jXZ6WptapbetDLodbdTQ2h5l9fzLFMDjBLKpgM9zmCOqnXsDMuv2butio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725604116; c=relaxed/simple;
-	bh=v+Xx8d/W1LlQdXd+b7eGF160MPSGUDp4SDQPsIvpRgE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=h3bepua2Yk8Nsql3hq5lhjbub7miNU+K5nx6A+cKGSXObTQf9Gl9Epfrw4g4K2yJSUri4+YDY84waI0JuIpeADqUlPpg+8ihCaGVNXz5RskTtWDL+Bpzl9h3A4TglmuhxYdPDpYq7s0/A6J4R9TuEPgRi9Tr5gf+t7jb8wLV/NQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
-Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Fri, 6 Sep
- 2024 14:28:31 +0800
-Received: from mail.aspeedtech.com (192.168.10.10) by TWMBX01.aspeed.com
- (192.168.0.62) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Fri, 6 Sep 2024 14:28:31 +0800
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <jacky_chou@aspeedtech.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <benh@kernel.crashing.org>
-Subject: [PATCH v2] net: ftgmac100: Enable TX interrupt to avoid TX timeout
-Date: Fri, 6 Sep 2024 14:28:31 +0800
-Message-ID: <20240906062831.2243399-1-jacky_chou@aspeedtech.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1725604706; c=relaxed/simple;
+	bh=qd/beez0wMtEPBIVJlKu9wSj3zolrl8ynt67URABGSg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uYMqpUtEMvO1nvGWz4GpVThfu0i0bH76wIdSPGLVmHljRz+5OdCsb8/b9MInPpHKkVRzUZdXJDDBLH3uOCdYGUb5XbNhq7NkJzV9/X6q7H+uUutLXSQf63viZUrBnyC+erf7PDLWVie9nYwB/PbA7sREgzFs0/l83NLjCYXhRhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=itOb+F/9; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1725604704; x=1757140704;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qd/beez0wMtEPBIVJlKu9wSj3zolrl8ynt67URABGSg=;
+  b=itOb+F/9u12UIb/cODGnSdK2lkJxMTm023rbUIv04HzSQB+/6uk1S/MT
+   2rEIagvCyMx32tNwbZY6/gDIOtfX5LKsfm/O/SVnR3iIgMlDODX7yM1Qs
+   2T45P8/Auem4t1sVHvH1WqY42o8Bb9YbDXj+zNEtxjNhEDHb5wTJH7KjU
+   GkKih10e5vkQPvUf978iw2/+vQ/37OJUugMN7POQynN/aadN8wvxmiYa6
+   wm6sebgtVHYbSCB39YICGo5kEKVMUm89LvayKURn/AwMJfP1cn97uaN4u
+   bSJ5HwTbf3sAPEKAc/LLy8FyHyGbl2ZA1Z+KBOCDERQqiq3fsEvGReNQc
+   g==;
+X-CSE-ConnectionGUID: HOkuecBUQRmphM/4lFZiaA==
+X-CSE-MsgGUID: 5fzohW5bST2FNgv4v/J4Ng==
+X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
+   d="scan'208";a="34521855"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Sep 2024 23:38:22 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 5 Sep 2024 23:37:47 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 5 Sep 2024 23:37:47 -0700
+Date: Fri, 6 Sep 2024 08:37:23 +0200
+From: Horatiu Vultur - M31836 <Horatiu.Vultur@microchip.com>
+To: Parthiban Veerasooran - I17164 <Parthiban.Veerasooran@microchip.com>
+CC: "andrew@lunn.ch" <andrew@lunn.ch>, "hkallweit1@gmail.com"
+	<hkallweit1@gmail.com>, "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "ramon.nordin.rodriguez@ferroamp.se"
+	<ramon.nordin.rodriguez@ferroamp.se>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, UNGLinuxDriver
+	<UNGLinuxDriver@microchip.com>, Thorsten Kummermehr - M21127
+	<Thorsten.Kummermehr@microchip.com>
+Subject: Re: [PATCH net-next v2 2/7] net: phy: microchip_t1s: update new
+ initial settings for LAN865X Rev.B0
+Message-ID: <20240906063723.uvegx4m4zb4dfs6m@DEN-DL-M31836.microchip.com>
+References: <20240902143458.601578-1-Parthiban.Veerasooran@microchip.com>
+ <20240902143458.601578-3-Parthiban.Veerasooran@microchip.com>
+ <20240903063311.4uyadgqxx5x7z5e7@DEN-DL-M31836.microchip.com>
+ <ceaf5895-edfa-4af1-9ab1-b228eb8f956d@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <ceaf5895-edfa-4af1-9ab1-b228eb8f956d@microchip.com>
 
-Currently, the driver only enables RX interrupt to handle RX
-packets and TX resources. Sometimes there is not RX traffic,
-so the TX resource needs to wait for RX interrupt to free.
-This situation will toggle the TX timeout watchdog when the MAC
-TX ring has no more resources to transmit packets.
-Therefore, enable TX interrupt to release TX resources at any time.
+The 09/04/2024 10:20, Parthiban Veerasooran - I17164 wrote:
+> Hi Horatiu,
+> 
+> Thanks for reviewing the patches.
+> 
+> On 03/09/24 12:03 pm, Horatiu Vultur wrote:
+> > The 09/02/2024 20:04, Parthiban Veerasooran wrote:
+> >> This patch configures the new/improved initial settings from the latest
+> >> configuration application note AN1760 released for LAN8650/1 Rev.B0
+> >> Revision F (DS60001760G - June 2024).
+> >> https://www.microchip.com/en-us/application-notes/an1760
+> >>
+> >> Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+> >> ---
+> >>   drivers/net/phy/microchip_t1s.c | 119 ++++++++++++++++++++++----------
+> >>   1 file changed, 83 insertions(+), 36 deletions(-)
+> >>
+> >> diff --git a/drivers/net/phy/microchip_t1s.c b/drivers/net/phy/microchip_t1s.c
+> >> index 0110f3357489..fb651cfa3ee0 100644
+> >> --- a/drivers/net/phy/microchip_t1s.c
+> >> +++ b/drivers/net/phy/microchip_t1s.c
+> >> @@ -59,29 +59,45 @@ static const u16 lan867x_revb1_fixup_masks[12] = {
+> >>   	0x0600, 0x7F00, 0x2000, 0xFFFF,
+> >>   };
+> >>   
+> >> -/* LAN865x Rev.B0 configuration parameters from AN1760 */
+> >> -static const u32 lan865x_revb0_fixup_registers[28] = {
+> >> -	0x0091, 0x0081, 0x0043, 0x0044,
+> >> -	0x0045, 0x0053, 0x0054, 0x0055,
+> >> -	0x0040, 0x0050, 0x00D0, 0x00E9,
+> >> -	0x00F5, 0x00F4, 0x00F8, 0x00F9,
+> >> +/* LAN865x Rev.B0 configuration parameters from AN1760
+> >> + * As per the Configuration Application Note AN1760 published in the below link,
+> >> + * https://www.microchip.com/en-us/application-notes/an1760
+> >> + * Revision F (DS60001760G - June 2024)
+> >> + */
+> >> +static const u32 lan865x_revb0_fixup_registers[17] = {
+> >> +	0x00D0, 0x00E0, 0x00E9, 0x00F5,
+> >> +	0x00F4, 0x00F8, 0x00F9, 0x0081,
+> >> +	0x0091, 0x0043, 0x0044, 0x0045,
+> >> +	0x0053, 0x0054, 0x0055, 0x0040,
+> >> +	0x0050,
+> >> +};
+> >> +
+> >> +static const u16 lan865x_revb0_fixup_values[17] = {
+> >> +	0x3F31, 0xC000, 0x9E50, 0x1CF8,
+> >> +	0xC020, 0xB900, 0x4E53, 0x0080,
+> >> +	0x9660, 0x00FF, 0xFFFF, 0x0000,
+> >> +	0x00FF, 0xFFFF, 0x0000, 0x0002,
+> >> +	0x0002,
+> >> +};
+> >> +
+> >> +static const u16 lan865x_revb0_fixup_cfg_regs[2] = {
+> >> +	0x0084, 0x008A,
+> >> +};
+> >> +
+> >> +static const u32 lan865x_revb0_sqi_fixup_regs[12] = {
+> >>   	0x00B0, 0x00B1, 0x00B2, 0x00B3,
+> >>   	0x00B4, 0x00B5, 0x00B6, 0x00B7,
+> >>   	0x00B8, 0x00B9, 0x00BA, 0x00BB,
+> >>   };
+> >>   
+> >> -static const u16 lan865x_revb0_fixup_values[28] = {
+> >> -	0x9660, 0x00C0, 0x00FF, 0xFFFF,
+> >> -	0x0000, 0x00FF, 0xFFFF, 0x0000,
+> >> -	0x0002, 0x0002, 0x5F21, 0x9E50,
+> >> -	0x1CF8, 0xC020, 0x9B00, 0x4E53,
+> >> +static const u16 lan865x_revb0_sqi_fixup_values[12] = {
+> >>   	0x0103, 0x0910, 0x1D26, 0x002A,
+> >>   	0x0103, 0x070D, 0x1720, 0x0027,
+> >>   	0x0509, 0x0E13, 0x1C25, 0x002B,
+> >>   };
+> >>   
+> >> -static const u16 lan865x_revb0_fixup_cfg_regs[5] = {
+> >> -	0x0084, 0x008A, 0x00AD, 0x00AE, 0x00AF
+> >> +static const u16 lan865x_revb0_sqi_fixup_cfg_regs[3] = {
+> >> +	0x00AD, 0x00AE, 0x00AF,
+> >>   };
+> >>   
+> >>   /* Pulled from AN1760 describing 'indirect read'
+> >> @@ -121,6 +137,8 @@ static int lan865x_generate_cfg_offsets(struct phy_device *phydev, s8 offsets[])
+> >>   		ret = lan865x_revb0_indirect_read(phydev, fixup_regs[i]);
+> >>   		if (ret < 0)
+> >>   			return ret;
+> >> +
+> >> +		ret &= 0x1F;
+> > 
+> > Is this diff supposed to be part of this patch?
+> Yes.
 
-When I am verifying iperf3 over UDP, the network hangs.
-Like the log below.
+Just for my understanding, why this is needed now and not before?
+Because I can see that now you always & the offset with 0x3f. Is it
+because you might get overflow because the value is signed?
 
-root# iperf3 -c 192.168.100.100 -i1 -t10 -u -b0
-Connecting to host 192.168.100.100, port 5201
-[  4] local 192.168.100.101 port 35773 connected to 192.168.100.100 port 5201
-[ ID] Interval           Transfer     Bandwidth       Total Datagrams
-[  4]   0.00-20.42  sec   160 KBytes  64.2 Kbits/sec  20
-[  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
-[  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
-[  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
-[  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
-[  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
-[  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
-[  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
-[  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
-[  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
-- - - - - - - - - - - - - - - - - - - - - - - - -
-[ ID] Interval          Transfer    Bandwidth      Jitter   Lost/Total Datagrams
-[  4]   0.00-20.42  sec  160 KBytes 64.2 Kbits/sec 0.000 ms 0/20 (0%)
-[  4] Sent 20 datagrams
-iperf3: error - the server has terminated
+> > Also you can use GENMASK here.
+> Ah ok, it is GENMASK(4, 0) then.
+> 
+> Best regards,
+> Parthiban V
+> > 
+> >>   		if (ret & BIT(4))
+> >>   			offsets[i] = ret | 0xE0;
+> >>   		else
+> >> @@ -163,59 +181,88 @@ static int lan865x_write_cfg_params(struct phy_device *phydev,
+> >>   	return 0;
+> >>   }
+> >>   
+> >> -static int lan865x_setup_cfgparam(struct phy_device *phydev)
+> >> +static int lan865x_setup_cfgparam(struct phy_device *phydev, s8 offsets[])
+> >>   {
+> >>   	u16 cfg_results[ARRAY_SIZE(lan865x_revb0_fixup_cfg_regs)];
+> >>   	u16 cfg_params[ARRAY_SIZE(lan865x_revb0_fixup_cfg_regs)];
+> >> -	s8 offsets[2];
+> >>   	int ret;
+> >>   
+> >> -	ret = lan865x_generate_cfg_offsets(phydev, offsets);
+> >> +	ret = lan865x_read_cfg_params(phydev, lan865x_revb0_fixup_cfg_regs,
+> >> +				      cfg_params, ARRAY_SIZE(cfg_params));
+> >>   	if (ret)
+> >>   		return ret;
+> >>   
+> >> -	ret = lan865x_read_cfg_params(phydev, lan865x_revb0_fixup_cfg_regs,
+> >> +	cfg_results[0] = FIELD_PREP(GENMASK(15, 10), (9 + offsets[0]) & 0x3F) |
+> >> +			 FIELD_PREP(GENMASK(15, 4), (14 + offsets[0]) & 0x3F) |
+> >> +			 0x03;
+> >> +	cfg_results[1] = FIELD_PREP(GENMASK(15, 10), (40 + offsets[1]) & 0x3F);
+> >> +
+> >> +	return lan865x_write_cfg_params(phydev, lan865x_revb0_fixup_cfg_regs,
+> >> +					cfg_results, ARRAY_SIZE(cfg_results));
+> >> +}
+> >> +
+> >> +static int lan865x_setup_sqi_cfgparam(struct phy_device *phydev, s8 offsets[])
+> >> +{
+> >> +	u16 cfg_results[ARRAY_SIZE(lan865x_revb0_sqi_fixup_cfg_regs)];
+> >> +	u16 cfg_params[ARRAY_SIZE(lan865x_revb0_sqi_fixup_cfg_regs)];
+> >> +	int ret;
+> >> +
+> >> +	ret = lan865x_read_cfg_params(phydev, lan865x_revb0_sqi_fixup_cfg_regs,
+> >>   				      cfg_params, ARRAY_SIZE(cfg_params));
+> >>   	if (ret)
+> >>   		return ret;
+> >>   
+> >> -	cfg_results[0] = (cfg_params[0] & 0x000F) |
+> >> -			  FIELD_PREP(GENMASK(15, 10), 9 + offsets[0]) |
+> >> -			  FIELD_PREP(GENMASK(15, 4), 14 + offsets[0]);
+> >> -	cfg_results[1] = (cfg_params[1] & 0x03FF) |
+> >> -			  FIELD_PREP(GENMASK(15, 10), 40 + offsets[1]);
+> >> -	cfg_results[2] = (cfg_params[2] & 0xC0C0) |
+> >> -			  FIELD_PREP(GENMASK(15, 8), 5 + offsets[0]) |
+> >> -			  (9 + offsets[0]);
+> >> -	cfg_results[3] = (cfg_params[3] & 0xC0C0) |
+> >> -			  FIELD_PREP(GENMASK(15, 8), 9 + offsets[0]) |
+> >> -			  (14 + offsets[0]);
+> >> -	cfg_results[4] = (cfg_params[4] & 0xC0C0) |
+> >> -			  FIELD_PREP(GENMASK(15, 8), 17 + offsets[0]) |
+> >> -			  (22 + offsets[0]);
+> >> +	cfg_results[0] = FIELD_PREP(GENMASK(15, 8), (5 + offsets[0]) & 0x3F) |
+> >> +			 ((9 + offsets[0]) & 0x3F);
+> >> +	cfg_results[1] = FIELD_PREP(GENMASK(15, 8), (9 + offsets[0]) & 0x3F) |
+> >> +			 ((14 + offsets[0]) & 0x3F);
+> >> +	cfg_results[2] = FIELD_PREP(GENMASK(15, 8), (17 + offsets[0]) & 0x3F) |
+> >> +			 ((22 + offsets[0]) & 0x3F);
+> >>   
+> >> -	return lan865x_write_cfg_params(phydev, lan865x_revb0_fixup_cfg_regs,
+> >> +	return lan865x_write_cfg_params(phydev,
+> >> +					lan865x_revb0_sqi_fixup_cfg_regs,
+> >>   					cfg_results, ARRAY_SIZE(cfg_results));
+> >>   }
+> >>   
+> >>   static int lan865x_revb0_config_init(struct phy_device *phydev)
+> >>   {
+> >> +	s8 offsets[2];
+> >>   	int ret;
+> >>   
+> >>   	/* Reference to AN1760
+> >>   	 * https://ww1.microchip.com/downloads/aemDocuments/documents/AIS/ProductDocuments/SupportingCollateral/AN-LAN8650-1-Configuration-60001760.pdf
+> >>   	 */
+> >> +	ret = lan865x_generate_cfg_offsets(phydev, offsets);
+> >> +	if (ret)
+> >> +		return ret;
+> >> +
+> >>   	for (int i = 0; i < ARRAY_SIZE(lan865x_revb0_fixup_registers); i++) {
+> >>   		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
+> >>   				    lan865x_revb0_fixup_registers[i],
+> >>   				    lan865x_revb0_fixup_values[i]);
+> >>   		if (ret)
+> >>   			return ret;
+> >> +
+> >> +		if (i == 1) {
+> >> +			ret = lan865x_setup_cfgparam(phydev, offsets);
+> >> +			if (ret)
+> >> +				return ret;
+> >> +		}
+> >>   	}
+> >> -	/* Function to calculate and write the configuration parameters in the
+> >> -	 * 0x0084, 0x008A, 0x00AD, 0x00AE and 0x00AF registers (from AN1760)
+> >> -	 */
+> >> -	return lan865x_setup_cfgparam(phydev);
+> >> +
+> >> +	ret = lan865x_setup_sqi_cfgparam(phydev, offsets);
+> >> +	if (ret)
+> >> +		return ret;
+> >> +
+> >> +	for (int i = 0; i < ARRAY_SIZE(lan865x_revb0_sqi_fixup_regs); i++) {
+> >> +		ret = phy_write_mmd(phydev, MDIO_MMD_VEND2,
+> >> +				    lan865x_revb0_sqi_fixup_regs[i],
+> >> +				    lan865x_revb0_sqi_fixup_values[i]);
+> >> +		if (ret)
+> >> +			return ret;
+> >> +	}
+> >> +
+> >> +	return 0;
+> >>   }
+> >>   
+> >>   static int lan867x_revb1_config_init(struct phy_device *phydev)
+> >> -- 
+> >> 2.34.1
+> >>
+> > 
+> 
 
-The network topology is FTGMAC connects directly to a PC.
-UDP does not need to wait for ACK, unlike TCP.
-Therefore, FTGMAC needs to enable TX interrupt to release TX resources instead
-of waiting for the RX interrupt.
-
-Fixes: 10cbd6407609 ("ftgmac100: Rework NAPI & interrupts handling")
-Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
----
-v2:
-  - Add more information to commit message.
----
- drivers/net/ethernet/faraday/ftgmac100.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.h b/drivers/net/ethernet/faraday/ftgmac100.h
-index 63b3e02fab16..4968f6f0bdbc 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.h
-+++ b/drivers/net/ethernet/faraday/ftgmac100.h
-@@ -84,7 +84,7 @@
- 			    FTGMAC100_INT_RPKT_BUF)
- 
- /* All the interrupts we care about */
--#define FTGMAC100_INT_ALL (FTGMAC100_INT_RPKT_BUF  |  \
-+#define FTGMAC100_INT_ALL (FTGMAC100_INT_RXTX  |  \
- 			   FTGMAC100_INT_BAD)
- 
- /*
 -- 
-2.25.1
-
+/Horatiu
 
