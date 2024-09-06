@@ -1,118 +1,182 @@
-Return-Path: <netdev+bounces-125774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D409896E89E
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 06:27:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED19696E8CD
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 06:56:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 777EF1F223E5
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:27:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83E481F24EFF
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:56:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 654763CF73;
-	Fri,  6 Sep 2024 04:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E5053370;
+	Fri,  6 Sep 2024 04:56:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FRxINl6z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W1TP/rjR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f48.google.com (mail-ot1-f48.google.com [209.85.210.48])
+Received: from mail-oo1-f51.google.com (mail-oo1-f51.google.com [209.85.161.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6A2487A5
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 04:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F6E4AEF2;
+	Fri,  6 Sep 2024 04:56:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725596858; cv=none; b=YvtIS+gS5SEApvMs/6RV43qOusPXb4hK+gise1h6Ub0HbeQJwZhQOsEQZcGCHifh7IwKEuYyjB6+N9NsTY+L3VDQuuGCloNSrGxWq0BlfYjR9CnGQC9V0zpbwiplM+xcWJ8j7iHPiotlA6FXxXyNApr05T8U2tkiOSl0f+Elm5Y=
+	t=1725598602; cv=none; b=UG5cRQeVPswMF71OuTSHlDr+neADkKz5GAC1APcFteHaxSLBnuBFaJd4hTnwYpHwa5YHFiPRD487M+vlgxP+xIeLH/cozQ2MKVxT7DiTqDGMwbQzC5su9+/Ww/4C93Uq//Hs6pXaFO7sJX+deZpYULOY+cVE7Qe88ZsZi6zPKIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725596858; c=relaxed/simple;
-	bh=SHpa3TaVX/PZNGXIZxW0jlQGT5N38KTUnvk2z/VZvh4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZVz0B5j06Mg/EP4CNu0CT/KMy0YNSR7HOnEbPtJbun6jV62xPsEeDIdgK2Rohp0XzGU3YSab0oD69W9GVdM6nLaeIELvwsyJmTuXjG272FitWkYhcvKWUYQPryQbPW/X6KtIyezYNxIMdu7I/DcPt22+xJiMvHOyy8CClmt0M6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FRxINl6z; arc=none smtp.client-ip=209.85.210.48
+	s=arc-20240116; t=1725598602; c=relaxed/simple;
+	bh=06NYwGV/b26HXwoNN3RC4u3U54HUhPzpWQfYgTicPjs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XLdItsNxpsGQaKh2j26eY5o4tF4A+IgvrS4uwD3S2Uifd/mG1zd2f6/fj3lbxvgFEjYcoD7b3p1LaUjrUL/QnMftIQs2gnRlr1uAs6X4qufLFWygQTaC6JSXgkKYPWUMON5TQQdRtOH0Ega8Wq5bDy2BX5CrNGq5ZKxgo6p2BB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W1TP/rjR; arc=none smtp.client-ip=209.85.161.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f48.google.com with SMTP id 46e09a7af769-70943713472so863590a34.2
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 21:27:36 -0700 (PDT)
+Received: by mail-oo1-f51.google.com with SMTP id 006d021491bc7-5e172cc6d66so944693eaf.2;
+        Thu, 05 Sep 2024 21:56:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725596856; x=1726201656; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9/5h485WplHgrAfrcpkaODV/RCb8oIGDtSJ1ysKMxYA=;
-        b=FRxINl6zX7Bhbl+j7Z/NaLdfepAqwj+5XB8Bq7sHZsMUwHbw9546/NNnfZNPG4Kbr9
-         Cfbj/eiVm1LgOw/gDlhA6NzFnCJAHFz+ZxzYwvkTR3IPxAz68nFQ3w3Ld9KzQdpOITYC
-         ebQ2PqJi52eOOLGn7IccFQDDMThDMaHKN+Cv3nrwdHBkP9qK4IijffAxFy040D6yGadp
-         cESVzHAZ/EWqLrakVyB+Tq6WCEh3HZ7u9aGsxvH5uk8M2CykKGBqkrpLQgvX945bCMb0
-         YHgbXWhJlrQperlQTW7lajMoG1O86ToTSgIy2NR2XscL69VX07sHQmO0sjIUEKjrCyy1
-         oHTg==
+        d=gmail.com; s=20230601; t=1725598600; x=1726203400; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ob3grukux8jAuJGDrQV1ST/lFWPUfHGs10KzV3SCsCg=;
+        b=W1TP/rjRtctScPxoABA57O92qtfzQO+TPirxFuJ5pWMTRlHw3qCotud/Zxhbs+bcrP
+         DqonB3CPx3LHQpAEdBh283asaN96UnN490lFMhvCJymN3B5kOE88eJlnPaPZKHxBQLQU
+         0LNZNHVHJiPPMMd9QNhCIVMgOJPlTisxmg7neU9x5L7ZRnlXlQALsQjiqMoNFREKIfIy
+         Tzp8SHcHZWX8AN2kxaSANtc1ZaSBBm6WzLKq2gXUjsLQAgptW2hbByLlgE5H/jBotxbL
+         RJkNueSowZmbQxvidFImTC1c36lfQkriJ7UawXDz/S5fddSKxasK8/ynE7Ck9iNZIzdH
+         MpVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725596856; x=1726201656;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9/5h485WplHgrAfrcpkaODV/RCb8oIGDtSJ1ysKMxYA=;
-        b=YMerce9mDB0Yu6DTvQ6iM3Il/YpwV0rhhoA1OiUNIiv1orzwXX9KmBF/L5WFarvl6f
-         hBzPy256z1MXfzrUUkbpIb9A9uooS4Tav4dVWTZozd6/LEmVjYthcQgxb9uAKsAeH5Mr
-         W9fdPQgLqP5sEwVIdgiFLwrEOSYAnWFKkBH6+bdWx0E2Z+ASHAJeo2nmi1bHfWs31LMG
-         RCc7chJYLuN4jDRunwJelGhXC4EK0sb+foK2IZOM9Zd/RUvz47ZP1jcoNvTVlF01vrpT
-         J8QrzO5z0XAXTpzFztky3T9lXE5ef9Mt0+ZQRhDMWPWFQPufVjC3qfIJibJBb6lvuJEY
-         UQhQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULDFg8/iMrRq77HoPZBRezjsJ65R80RzCnV/JZNDCRmNCK+7nSiKQ3/2cSSGYOfARZe/8Q1sQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzl2M7vyx5DWQ1vbdSNC2DTJFFiwNAhlFb2Lcfj0TvvuxAH+5x8
-	ibCtSIA7Koftqb9sPKt77JviAUfh0lOcNu6IBFYI5ie2rq7q3MYO
-X-Google-Smtp-Source: AGHT+IGNOY7nVppXfXNDF7IvFCuoSZ1gJeTvPQUv/FUPFi8fud0wPFrGHCTj6HkiCKluiyp44qZ7Jg==
-X-Received: by 2002:a05:6358:591f:b0:1b8:341d:36a1 with SMTP id e5c5f4694b2df-1b8385b2017mr151495255d.2.1725596855959;
-        Thu, 05 Sep 2024 21:27:35 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-718d8dc341dsm276962b3a.56.2024.09.05.21.27.34
+        d=1e100.net; s=20230601; t=1725598600; x=1726203400;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ob3grukux8jAuJGDrQV1ST/lFWPUfHGs10KzV3SCsCg=;
+        b=S4iy08JztFMyLAmAboffuAWjoBcnH57kZT5kNsMTMRFupP2b1xAiwNCcKiypgxLKAu
+         LgIDAbmS1+kzho2iFIG6//5xe7/znEJljmuiaBcl5IzQc9HIKyLjVRMud15rW5I8x4oE
+         3MeI8MJI6Y0j1eqbOA50CF/rNyZ1ThsNPL+Z6/oVufT9z2UXLMnseMIC0iLVXLiP437x
+         DLOB9p/9CXgG7sLdZVhvjD7q6RlRuDpzRW41gCQFe/aecgFt8tYZkql6qSCsxWR1Ipcy
+         YKOxDhA6SsoKe96UcJumcQjtoH+wWwsyk57UfZysZBS13+xH/HRLlx03SkqsVUVAODym
+         2GpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvUwzaK58ztum9XS9ZRGc/wG+4TDoG7n6zmTFycdMmTRgnJpVpXSnIUzx3/rzXSwQhUHfwYIpDUws275I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXMqCg5xQmsnhbcxE0TwQSgsz0B40CXJBbs0raG0Ibp5ubagX+
+	YaeKqlTsLaScqY2KwfHldRhubMXm8aFDX2cocRAwDyhBsBgxR4vt
+X-Google-Smtp-Source: AGHT+IHer/O4jKLDfgNK47fqGGGDsM3FDOhwLhyyoIVhUdPzGfkP+qXtM/YrAO9Wg+uMGV5Q3zd+5Q==
+X-Received: by 2002:a05:6870:330e:b0:277:f925:4f67 with SMTP id 586e51a60fabf-27b82db385fmr1794920fac.4.1725598599821;
+        Thu, 05 Sep 2024 21:56:39 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-71791e54585sm1704002b3a.182.2024.09.05.21.56.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 21:27:35 -0700 (PDT)
-Date: Thu, 5 Sep 2024 21:27:33 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, UNGLinuxDriver@microchip.com,
-	andrew@lunn.ch, netdev@vger.kernel.org
-Subject: Re: [PATCH -next v2 1/2] ptp: Check timespec64 before call
- settime64()
-Message-ID: <ZtqEtVBEQQEp5gPV@hoboy.vegasvil.org>
-References: <20240906034806.1161083-1-ruanjinjie@huawei.com>
- <20240906034806.1161083-2-ruanjinjie@huawei.com>
+        Thu, 05 Sep 2024 21:56:39 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk,
+	linux@armlinux.org.uk,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v9 0/7] net: stmmac: FPE via ethtool + tc
+Date: Fri,  6 Sep 2024 12:55:55 +0800
+Message-Id: <cover.1725597121.git.0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240906034806.1161083-2-ruanjinjie@huawei.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 06, 2024 at 11:48:05AM +0800, Jinjie Ruan wrote:
+Move the Frame Preemption(FPE) over to the new standard API which uses
+ethtool-mm/tc-mqprio/tc-taprio.
 
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index c56cd0f63909..cf75899a6681 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -100,6 +100,16 @@ static int ptp_clock_settime(struct posix_clock *pc, const struct timespec64 *tp
->  		return -EBUSY;
->  	}
->  
-> +	if (!tp) {
-> +		pr_warn("ptp: tp == NULL\n");
-> +		return -EINVAL;
-> +	}
+Changes in v9:
+  1. drop redundant netif_device_present() since ethnl_ops_begin()
+  has its own netif_device_present() call
+  2. open-code some variables of struct ethtool_mm_state directly
+  in struct stmmac_fpe_cfg
+  3. convert timer_delete_sync() to timer_shutdown_sync(), thus the
+  timer will not be rearmed again
+  4. fixed variable declarations in the middle of the scope
 
-This check is pointless because `tp` cannot be null.
+Changes in v8:
+  1. use timer_delete_sync() instead of deprecated del_timer_sync()
+  2. check netif_running() to guarantee synchronization rules between
+  mod_timer() and timer_delete_sync()
+  3. split up stmmac_tc_ops of dwmac4, dwmac4+ and dwxgmac to give user
+  more descriptive error message
+  4. fix wrong indentation about switch-case
+  5. delete more unbalanced logs
 
-See SYSCALL_DEFINE2(clock_settime, ...)
+Changes in v7:
+  1. code style fixes and clean up warnings reported by
+  patchwork netdev checks, no functional change intended
 
-> +	if (!timespec64_valid(tp)) {
-> +		pr_warn("ptp: tv_sec or tv_usec out of range\n");
-> +		return -ERANGE;
-> +	}
+Changes in v6:
+  1. new FPE verification process based on Vladimir Oltean's proposal
+  2. embed ethtool_mm_state into stmmac_fpe_cfg
+  3. convert some bit ops to u32_replace_bits
+  4. register name and function name update to be more descriptive
+  5. split up stmmac_tc_ops of dwmac4+ and dwxgmac, they have different
+  implementations about mqprio
+  6. some code style fixes
 
-Shouldn't this be done at the higher layer, in clock_settime() ?
+Changes in v5:
+  1. fix typo in commit message
+  2. drop FPE capability check in tc-mqprio/tc-taprio
 
-Thanks,
-Richard
+Changes in v4:
+  1. reorder FPE-related declarations and definitions into clean groups
+  2. move mm_lock to stmmac_fpe_cfg.lock
+  3. protect user configurations across NIC up/down
+  4. block stmmac_set_mm() when fpe_task is in progress to finish
+  5. convert to ethtool_dev_mm_supported() to check FPE capability in
+  tc-mqprio/tc-taprio
+  6. silence FPE workqueue start/stop logs
+
+Changes in v3:
+  1. avoid races among ISR, workqueue, link update and
+  register configuration.
+  2. update FPE verification retry logic, so it retries
+  and fails as expected.
+
+Changes in v2:
+  1. refactor FPE verification process
+  2. suspend/resume and kselftest-ethtool_mm, all test cases passed
+  3. handle TC:TXQ remapping for DWMAC CORE4+
+
+Furong Xu (7):
+  net: stmmac: move stmmac_fpe_cfg to stmmac_priv data
+  net: stmmac: drop stmmac_fpe_handshake
+  net: stmmac: refactor FPE verification process
+  net: stmmac: configure FPE via ethtool-mm
+  net: stmmac: support fp parameter of tc-mqprio
+  net: stmmac: support fp parameter of tc-taprio
+  net: stmmac: silence FPE kernel logs
+
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  10 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c  |  96 ++++++-
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  12 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |   9 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   6 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  22 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  35 ++-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  96 +++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 269 ++++++++----------
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 153 +++++++---
+ include/linux/stmmac.h                        |  28 --
+ 11 files changed, 494 insertions(+), 242 deletions(-)
+
+-- 
+2.34.1
+
 
