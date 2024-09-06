@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-126086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BBB996FD9B
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:55:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE6896FD9C
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 23:55:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9235285D9E
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 21:55:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A79641C22C4B
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 21:55:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDD515B97E;
-	Fri,  6 Sep 2024 21:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D87615C123;
+	Fri,  6 Sep 2024 21:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="il/ljvts"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JhFVh24B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0972F15A86B
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 21:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0908915B99F
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 21:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725659671; cv=none; b=Q5VXSuGd37jzkTjSQHIL7kwc3PWTcBLb0WI03FmdWwHxOeCb38gukQ3kizpfgCUPVx43IXRTdu5TEHMMiwxzVOt+I6e8xE1OVfO14v1ww2QTC3f86XqVEuCmV5nlpMXeFRwxY0OjAkmkQD+hEoWCjzUtCNME6dtYUm1ZtVbLa90=
+	t=1725659672; cv=none; b=cO83EeT88yxuVkO6HCsunfohkZ+hcxYWwY5yBSF5HzKlNv+zwh1BHkzufuXtHlJsOVJlLNDvPvy8X3796+uposICXhK6V3P8nRc3cRhTCgc3KZML0DNfAcVDnmEI+3rCxUpBIHlgP3n2QKCeK9T79K0d+s5e9mKIByyQeWoX92A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725659671; c=relaxed/simple;
-	bh=uZPJxeU2MSsN5ENeqj1fJ/X3shOLx5U9WQHfagSKsOo=;
+	s=arc-20240116; t=1725659672; c=relaxed/simple;
+	bh=D37zPteD0LwSV0wGM3Vqc36w0DjFI7Kktoa3F5LPK7Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nsfuuNU8nHCFAGkjQ+t0Kujczc5sng2+8ZQNciaECK6vzSaT/H39NLMuSPNgOtmMV+dxJ/cHfHvfBS7B0MfqxXNP3TOMN7sFN6AsH+aT78SQmYYeUlkwsPPH+caBuqtpqpabFHAg4v5/R/x94jox7hssgK2D7nakiqoRf0Y2cNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=il/ljvts; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DAEEC4CEC9;
-	Fri,  6 Sep 2024 21:54:30 +0000 (UTC)
+	 MIME-Version; b=dencc/AfRoG/WWYUrtgIcuxls6oErg6unLYMnkvALeeGLFrDNiUist54MJM17L71cZRJRw0X56nFTznoT8vRNn56xug4erCVLCAS0YRy2oT4JgMxofqCM17zpoeWrgmV2wdtXaAT6bx1X19JG38Yh1xEX/R8szNkQZayCrSgkRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JhFVh24B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC94FC4CEC4;
+	Fri,  6 Sep 2024 21:54:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725659670;
-	bh=uZPJxeU2MSsN5ENeqj1fJ/X3shOLx5U9WQHfagSKsOo=;
+	s=k20201202; t=1725659671;
+	bh=D37zPteD0LwSV0wGM3Vqc36w0DjFI7Kktoa3F5LPK7Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=il/ljvts6WFjk2c8QciecchVi1zBpyekTZ7T7y7GaIcVAuezC76IMI0HyxBxIsoj+
-	 G8Uy9JJNzKvDIpfPc6Go31o3aLD3hPc0barGH342REIcRqB8dQPNZZ4kTYx4KT5T4x
-	 /OopY9IqtdoDEKgWJLdX5xo5M0SZJf/kIzLYs3xjG1dhwGcW+8yLdVTGMfmnB5ZDW5
-	 JlVaJh4NpBUfqvrMOLQOEs+QATaFzdCMjvkiBcXgh2uhNgQ3dBECXsp4oyGF7q5JgS
-	 5puE68KxiO5p0xmx3Rrufk6Mq1971zfp3/Yc7RflkB2MMuPk2Tv2yRdfIVRMGH8IOb
-	 MH8esllztAA2w==
+	b=JhFVh24BJxMRR0H7J1qT6qtV2G1Ecq4Z9975pq2WWWysW/9FJtD1pLj4Z+9vVS9RZ
+	 n4u6981BZ1I/oPDnHGmC4HZiqkDUnNUtJ5nDTSb6fLVZc7hzVZtVz3E7ynHkvpwbPI
+	 yZtfysPcjzYLyOXpNslQokdCAYDwFWNiJC8rhSwWGY7lCsbGPU0EfV3w/7FLbtANcc
+	 V8AkJSGNdVdFdD7YxyHWyisDbpYWH4KrY+tA/ae+MtPAnV7QF4NaxtIq3rV7+y1hUs
+	 X4rn71xMnSCEjVssd509F4L6ljecaTSTJygII6i+nB43rRp7Y3Q4R5ubyOa+ogxfkC
+	 KCzRq/aVLuIdg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,10 +52,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Erez Shitrit <erezsh@nvidia.com>
-Subject: [net-next V3 12/15] net/mlx5: HWS, added backward-compatible API handling
-Date: Fri,  6 Sep 2024 14:54:07 -0700
-Message-ID: <20240906215411.18770-13-saeed@kernel.org>
+	Hamdan Agbariya <hamdani@nvidia.com>
+Subject: [net-next V3 13/15] net/mlx5: HWS, added debug dump and internal headers
+Date: Fri,  6 Sep 2024 14:54:08 -0700
+Message-ID: <20240906215411.18770-14-saeed@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240906215411.18770-1-saeed@kernel.org>
 References: <20240906215411.18770-1-saeed@kernel.org>
@@ -69,1254 +69,1144 @@ Content-Transfer-Encoding: 8bit
 
 From: Yevgeny Kliteynik <kliteyn@nvidia.com>
 
-Added implementation of backward-compatible (BWC) steering API.
-Native HWS API is very different from SWS API:
- - SWS is synchronous (rule creation/deletion API call returns when
-   the rule is created/deleted), while HWS is asynchronous (it
-   requires polling for completion in order to know when the rule
-   creation/deletion happened)
- - SWS manages its own memory (it allocates/frees all the needed
-   memory for steering rules, while HWS requires the rules memory
-   to be allocated/freed outside the API
+Added debug dump of the existing HWS state,
+and all the required internal definitions.
 
-In order to make HWS fit the existing fs-core steering API paradigm,
-this patch adds implementation of backward-compatible (BWC) steering
-API that has the bahaviour similar to SWS: among others, it encompasses
-all the rules' memory management and completion polling, presenting
-the usual synchronous API for the upper layer.
+To dump the HWS state, cat the following debugfs node:
 
-A user that wishes to utilize the full speed potential of HWS can
-call the HWS async API and have rule insertion/deletion batching,
-lower memory management overhead, and lower CPU utilization.
-Such approach will be taken by the future Connection Tracking.
+  cat /sys/kernel/debug/mlx5/<PCI>/steering/fdb/ctx_<ctx_id>
 
-Note that BWC steering doesn't support yet rules that require more
-than one match STE - complex rules.
-This support will be added later on.
-
-Reviewed-by: Erez Shitrit <erezsh@nvidia.com>
+Reviewed-by: Hamdan Agbariya <hamdani@nvidia.com>
 Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mlx5/core/steering/hws/mlx5hws_bwc.c      | 997 ++++++++++++++++++
- .../mlx5/core/steering/hws/mlx5hws_bwc.h      |  73 ++
- .../core/steering/hws/mlx5hws_bwc_complex.c   |  86 ++
- .../core/steering/hws/mlx5hws_bwc_complex.h   |  29 +
- 4 files changed, 1185 insertions(+)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.h
+ .../mlx5/core/steering/hws/mlx5hws_debug.c    | 480 ++++++++++++++++
+ .../mlx5/core/steering/hws/mlx5hws_debug.h    |  40 ++
+ .../mlx5/core/steering/hws/mlx5hws_internal.h |  59 ++
+ .../mlx5/core/steering/hws/mlx5hws_prm.h      | 514 ++++++++++++++++++
+ 4 files changed, 1093 insertions(+)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_internal.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_prm.h
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.c
 new file mode 100644
-index 000000000000..bd52b05db367
+index 000000000000..2b8c5a4e1c4c
 --- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c
-@@ -0,0 +1,997 @@
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.c
+@@ -0,0 +1,480 @@
 +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
 +/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
 +
++#include <linux/debugfs.h>
++#include <linux/kernel.h>
++#include <linux/seq_file.h>
++#include <linux/version.h>
 +#include "mlx5hws_internal.h"
 +
-+static u16 hws_bwc_gen_queue_idx(struct mlx5hws_context *ctx)
-+{
-+	/* assign random queue */
-+	return get_random_u8() % mlx5hws_bwc_queues(ctx);
-+}
-+
-+static u16
-+hws_bwc_get_burst_th(struct mlx5hws_context *ctx, u16 queue_id)
-+{
-+	return min(ctx->send_queue[queue_id].num_entries / 2,
-+		   MLX5HWS_BWC_MATCHER_REHASH_BURST_TH);
-+}
-+
-+static struct mutex *
-+hws_bwc_get_queue_lock(struct mlx5hws_context *ctx, u16 idx)
-+{
-+	return &ctx->bwc_send_queue_locks[idx];
-+}
-+
-+static void hws_bwc_lock_all_queues(struct mlx5hws_context *ctx)
-+{
-+	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
-+	struct mutex *queue_lock; /* Protect the queue */
-+	int i;
-+
-+	for (i = 0; i < bwc_queues; i++) {
-+		queue_lock = hws_bwc_get_queue_lock(ctx, i);
-+		mutex_lock(queue_lock);
-+	}
-+}
-+
-+static void hws_bwc_unlock_all_queues(struct mlx5hws_context *ctx)
-+{
-+	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
-+	struct mutex *queue_lock; /* Protect the queue */
-+	int i = bwc_queues;
-+
-+	while (i--) {
-+		queue_lock = hws_bwc_get_queue_lock(ctx, i);
-+		mutex_unlock(queue_lock);
-+	}
-+}
-+
-+static void hws_bwc_matcher_init_attr(struct mlx5hws_matcher_attr *attr,
-+				      u32 priority,
-+				      u8 size_log)
-+{
-+	memset(attr, 0, sizeof(*attr));
-+
-+	attr->priority = priority;
-+	attr->optimize_using_rule_idx = 0;
-+	attr->mode = MLX5HWS_MATCHER_RESOURCE_MODE_RULE;
-+	attr->optimize_flow_src = MLX5HWS_MATCHER_FLOW_SRC_ANY;
-+	attr->insert_mode = MLX5HWS_MATCHER_INSERT_BY_HASH;
-+	attr->distribute_mode = MLX5HWS_MATCHER_DISTRIBUTE_BY_HASH;
-+	attr->rule.num_log = size_log;
-+	attr->resizable = true;
-+	attr->max_num_of_at_attach = MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM;
-+}
-+
-+int mlx5hws_bwc_matcher_create_simple(struct mlx5hws_bwc_matcher *bwc_matcher,
-+				      struct mlx5hws_table *table,
-+				      u32 priority,
-+				      u8 match_criteria_enable,
-+				      struct mlx5hws_match_parameters *mask,
-+				      enum mlx5hws_action_type action_types[])
-+{
-+	enum mlx5hws_action_type init_action_types[1] = { MLX5HWS_ACTION_TYP_LAST };
-+	struct mlx5hws_context *ctx = table->ctx;
-+	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
-+	struct mlx5hws_matcher_attr attr = {0};
-+	int i;
-+
-+	bwc_matcher->rules = kcalloc(bwc_queues, sizeof(*bwc_matcher->rules), GFP_KERNEL);
-+	if (!bwc_matcher->rules)
-+		goto err;
-+
-+	for (i = 0; i < bwc_queues; i++)
-+		INIT_LIST_HEAD(&bwc_matcher->rules[i]);
-+
-+	hws_bwc_matcher_init_attr(&attr,
-+				  priority,
-+				  MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG);
-+
-+	bwc_matcher->priority = priority;
-+	bwc_matcher->size_log = MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG;
-+
-+	/* create dummy action template */
-+	bwc_matcher->at[0] =
-+		mlx5hws_action_template_create(action_types ?
-+					       action_types : init_action_types);
-+	if (!bwc_matcher->at[0]) {
-+		mlx5hws_err(table->ctx, "BWC matcher: failed creating action template\n");
-+		goto free_bwc_matcher_rules;
-+	}
-+
-+	bwc_matcher->num_of_at = 1;
-+
-+	bwc_matcher->mt = mlx5hws_match_template_create(ctx,
-+							mask->match_buf,
-+							mask->match_sz,
-+							match_criteria_enable);
-+	if (!bwc_matcher->mt) {
-+		mlx5hws_err(table->ctx, "BWC matcher: failed creating match template\n");
-+		goto free_at;
-+	}
-+
-+	bwc_matcher->matcher = mlx5hws_matcher_create(table,
-+						      &bwc_matcher->mt, 1,
-+						      &bwc_matcher->at[0],
-+						      bwc_matcher->num_of_at,
-+						      &attr);
-+	if (!bwc_matcher->matcher) {
-+		mlx5hws_err(table->ctx, "BWC matcher: failed creating HWS matcher\n");
-+		goto free_mt;
-+	}
-+
-+	return 0;
-+
-+free_mt:
-+	mlx5hws_match_template_destroy(bwc_matcher->mt);
-+free_at:
-+	mlx5hws_action_template_destroy(bwc_matcher->at[0]);
-+free_bwc_matcher_rules:
-+	kfree(bwc_matcher->rules);
-+err:
-+	return -EINVAL;
-+}
-+
-+struct mlx5hws_bwc_matcher *
-+mlx5hws_bwc_matcher_create(struct mlx5hws_table *table,
-+			   u32 priority,
-+			   u8 match_criteria_enable,
-+			   struct mlx5hws_match_parameters *mask)
-+{
-+	struct mlx5hws_bwc_matcher *bwc_matcher;
-+	bool is_complex;
-+	int ret;
-+
-+	if (!mlx5hws_context_bwc_supported(table->ctx)) {
-+		mlx5hws_err(table->ctx,
-+			    "BWC matcher: context created w/o BWC API compatibility\n");
-+		return NULL;
-+	}
-+
-+	bwc_matcher = kzalloc(sizeof(*bwc_matcher), GFP_KERNEL);
-+	if (!bwc_matcher)
-+		return NULL;
-+
-+	/* Check if the required match params can be all matched
-+	 * in single STE, otherwise complex matcher is needed.
-+	 */
-+
-+	is_complex = mlx5hws_bwc_match_params_is_complex(table->ctx, match_criteria_enable, mask);
-+	if (is_complex)
-+		ret = mlx5hws_bwc_matcher_create_complex(bwc_matcher,
-+							 table,
-+							 priority,
-+							 match_criteria_enable,
-+							 mask);
-+	else
-+		ret = mlx5hws_bwc_matcher_create_simple(bwc_matcher,
-+							table,
-+							priority,
-+							match_criteria_enable,
-+							mask,
-+							NULL);
-+	if (ret)
-+		goto free_bwc_matcher;
-+
-+	return bwc_matcher;
-+
-+free_bwc_matcher:
-+	kfree(bwc_matcher);
-+
-+	return NULL;
-+}
-+
-+int mlx5hws_bwc_matcher_destroy_simple(struct mlx5hws_bwc_matcher *bwc_matcher)
++static int
++hws_debug_dump_matcher_template_definer(struct seq_file *f,
++					void *parent_obj,
++					struct mlx5hws_definer *definer,
++					enum mlx5hws_debug_res_type type)
 +{
 +	int i;
 +
-+	mlx5hws_matcher_destroy(bwc_matcher->matcher);
-+	bwc_matcher->matcher = NULL;
-+
-+	for (i = 0; i < bwc_matcher->num_of_at; i++)
-+		mlx5hws_action_template_destroy(bwc_matcher->at[i]);
-+
-+	mlx5hws_match_template_destroy(bwc_matcher->mt);
-+	kfree(bwc_matcher->rules);
-+
-+	return 0;
-+}
-+
-+int mlx5hws_bwc_matcher_destroy(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	if (bwc_matcher->num_of_rules)
-+		mlx5hws_err(bwc_matcher->matcher->tbl->ctx,
-+			    "BWC matcher destroy: matcher still has %d rules\n",
-+			    bwc_matcher->num_of_rules);
-+
-+	mlx5hws_bwc_matcher_destroy_simple(bwc_matcher);
-+
-+	kfree(bwc_matcher);
-+	return 0;
-+}
-+
-+static int hws_bwc_queue_poll(struct mlx5hws_context *ctx,
-+			      u16 queue_id,
-+			      u32 *pending_rules,
-+			      bool drain)
-+{
-+	struct mlx5hws_flow_op_result comp[MLX5HWS_BWC_MATCHER_REHASH_BURST_TH];
-+	u16 burst_th = hws_bwc_get_burst_th(ctx, queue_id);
-+	bool got_comp = *pending_rules >= burst_th;
-+	bool queue_full;
-+	int err = 0;
-+	int ret;
-+	int i;
-+
-+	/* Check if there are any completions at all */
-+	if (!got_comp && !drain)
++	if (!definer)
 +		return 0;
 +
-+	queue_full = mlx5hws_send_engine_full(&ctx->send_queue[queue_id]);
-+	while (queue_full || ((got_comp || drain) && *pending_rules)) {
-+		ret = mlx5hws_send_queue_poll(ctx, queue_id, comp, burst_th);
-+		if (unlikely(ret < 0)) {
-+			mlx5hws_err(ctx, "BWC poll error: polling queue %d returned %d\n",
-+				    queue_id, ret);
-+			return -EINVAL;
-+		}
++	seq_printf(f, "%d,0x%llx,0x%llx,%d,%d,",
++		   type,
++		   HWS_PTR_TO_ID(definer),
++		   HWS_PTR_TO_ID(parent_obj),
++		   definer->obj_id,
++		   definer->type);
 +
-+		if (ret) {
-+			(*pending_rules) -= ret;
-+			for (i = 0; i < ret; i++) {
-+				if (unlikely(comp[i].status != MLX5HWS_FLOW_OP_SUCCESS)) {
-+					mlx5hws_err(ctx,
-+						    "BWC poll error: polling queue %d returned completion with error\n",
-+						    queue_id);
-+					err = -EINVAL;
-+				}
-+			}
-+			queue_full = false;
-+		}
++	for (i = 0; i < DW_SELECTORS; i++)
++		seq_printf(f, "0x%x%s", definer->dw_selector[i],
++			   (i == DW_SELECTORS - 1) ? "," : "-");
 +
-+		got_comp = !!ret;
-+	}
++	for (i = 0; i < BYTE_SELECTORS; i++)
++		seq_printf(f, "0x%x%s", definer->byte_selector[i],
++			   (i == BYTE_SELECTORS - 1) ? "," : "-");
 +
-+	return err;
-+}
++	for (i = 0; i < MLX5HWS_JUMBO_TAG_SZ; i++)
++		seq_printf(f, "%02x", definer->mask.jumbo[i]);
 +
-+void
-+mlx5hws_bwc_rule_fill_attr(struct mlx5hws_bwc_matcher *bwc_matcher,
-+			   u16 bwc_queue_idx,
-+			   u32 flow_source,
-+			   struct mlx5hws_rule_attr *rule_attr)
-+{
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+
-+	/* no use of INSERT_BY_INDEX in bwc rule */
-+	rule_attr->rule_idx = 0;
-+
-+	/* notify HW at each rule insertion/deletion */
-+	rule_attr->burst = 0;
-+
-+	/* We don't need user data, but the API requires it to exist */
-+	rule_attr->user_data = (void *)0xFACADE;
-+
-+	rule_attr->queue_id = mlx5hws_bwc_get_queue_id(ctx, bwc_queue_idx);
-+	rule_attr->flow_source = flow_source;
-+}
-+
-+struct mlx5hws_bwc_rule *
-+mlx5hws_bwc_rule_alloc(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	struct mlx5hws_bwc_rule *bwc_rule;
-+
-+	bwc_rule = kzalloc(sizeof(*bwc_rule), GFP_KERNEL);
-+	if (unlikely(!bwc_rule))
-+		goto out_err;
-+
-+	bwc_rule->rule = kzalloc(sizeof(*bwc_rule->rule), GFP_KERNEL);
-+	if (unlikely(!bwc_rule->rule))
-+		goto free_rule;
-+
-+	bwc_rule->bwc_matcher = bwc_matcher;
-+	return bwc_rule;
-+
-+free_rule:
-+	kfree(bwc_rule);
-+out_err:
-+	return NULL;
-+}
-+
-+void mlx5hws_bwc_rule_free(struct mlx5hws_bwc_rule *bwc_rule)
-+{
-+	if (likely(bwc_rule->rule))
-+		kfree(bwc_rule->rule);
-+	kfree(bwc_rule);
-+}
-+
-+static void hws_bwc_rule_list_add(struct mlx5hws_bwc_rule *bwc_rule, u16 idx)
-+{
-+	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
-+
-+	bwc_matcher->num_of_rules++;
-+	bwc_rule->bwc_queue_idx = idx;
-+	list_add(&bwc_rule->list_node, &bwc_matcher->rules[idx]);
-+}
-+
-+static void hws_bwc_rule_list_remove(struct mlx5hws_bwc_rule *bwc_rule)
-+{
-+	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
-+
-+	bwc_matcher->num_of_rules--;
-+	list_del_init(&bwc_rule->list_node);
-+}
-+
-+static int
-+hws_bwc_rule_destroy_hws_async(struct mlx5hws_bwc_rule *bwc_rule,
-+			       struct mlx5hws_rule_attr *attr)
-+{
-+	return mlx5hws_rule_destroy(bwc_rule->rule, attr);
-+}
-+
-+static int
-+hws_bwc_rule_destroy_hws_sync(struct mlx5hws_bwc_rule *bwc_rule,
-+			      struct mlx5hws_rule_attr *rule_attr)
-+{
-+	struct mlx5hws_context *ctx = bwc_rule->bwc_matcher->matcher->tbl->ctx;
-+	struct mlx5hws_flow_op_result completion;
-+	int ret;
-+
-+	ret = hws_bwc_rule_destroy_hws_async(bwc_rule, rule_attr);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	do {
-+		ret = mlx5hws_send_queue_poll(ctx, rule_attr->queue_id, &completion, 1);
-+	} while (ret != 1);
-+
-+	if (unlikely(completion.status != MLX5HWS_FLOW_OP_SUCCESS ||
-+		     (bwc_rule->rule->status != MLX5HWS_RULE_STATUS_DELETED &&
-+		      bwc_rule->rule->status != MLX5HWS_RULE_STATUS_DELETING))) {
-+		mlx5hws_err(ctx, "Failed destroying BWC rule: completion %d, rule status %d\n",
-+			    completion.status, bwc_rule->rule->status);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+int mlx5hws_bwc_rule_destroy_simple(struct mlx5hws_bwc_rule *bwc_rule)
-+{
-+	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+	u16 idx = bwc_rule->bwc_queue_idx;
-+	struct mlx5hws_rule_attr attr;
-+	struct mutex *queue_lock; /* Protect the queue */
-+	int ret;
-+
-+	mlx5hws_bwc_rule_fill_attr(bwc_matcher, idx, 0, &attr);
-+
-+	queue_lock = hws_bwc_get_queue_lock(ctx, idx);
-+
-+	mutex_lock(queue_lock);
-+
-+	ret = hws_bwc_rule_destroy_hws_sync(bwc_rule, &attr);
-+	hws_bwc_rule_list_remove(bwc_rule);
-+
-+	mutex_unlock(queue_lock);
-+
-+	return ret;
-+}
-+
-+int mlx5hws_bwc_rule_destroy(struct mlx5hws_bwc_rule *bwc_rule)
-+{
-+	int ret;
-+
-+	ret = mlx5hws_bwc_rule_destroy_simple(bwc_rule);
-+
-+	mlx5hws_bwc_rule_free(bwc_rule);
-+	return ret;
-+}
-+
-+static int
-+hws_bwc_rule_create_async(struct mlx5hws_bwc_rule *bwc_rule,
-+			  u32 *match_param,
-+			  u8 at_idx,
-+			  struct mlx5hws_rule_action rule_actions[],
-+			  struct mlx5hws_rule_attr *rule_attr)
-+{
-+	return mlx5hws_rule_create(bwc_rule->bwc_matcher->matcher,
-+				   0, /* only one match template supported */
-+				   match_param,
-+				   at_idx,
-+				   rule_actions,
-+				   rule_attr,
-+				   bwc_rule->rule);
-+}
-+
-+static int
-+hws_bwc_rule_create_sync(struct mlx5hws_bwc_rule *bwc_rule,
-+			 u32 *match_param,
-+			 u8 at_idx,
-+			 struct mlx5hws_rule_action rule_actions[],
-+			 struct mlx5hws_rule_attr *rule_attr)
-+
-+{
-+	struct mlx5hws_context *ctx = bwc_rule->bwc_matcher->matcher->tbl->ctx;
-+	u32 expected_completions = 1;
-+	int ret;
-+
-+	ret = hws_bwc_rule_create_async(bwc_rule, match_param,
-+					at_idx, rule_actions,
-+					rule_attr);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	ret = hws_bwc_queue_poll(ctx, rule_attr->queue_id, &expected_completions, true);
-+
-+	return ret;
-+}
-+
-+static int
-+hws_bwc_rule_update_sync(struct mlx5hws_bwc_rule *bwc_rule,
-+			 u8 at_idx,
-+			 struct mlx5hws_rule_action rule_actions[],
-+			 struct mlx5hws_rule_attr *rule_attr)
-+{
-+	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+	u32 expected_completions = 1;
-+	int ret;
-+
-+	ret = mlx5hws_rule_action_update(bwc_rule->rule,
-+					 at_idx,
-+					 rule_actions,
-+					 rule_attr);
-+	if (unlikely(ret))
-+		return ret;
-+
-+	ret = hws_bwc_queue_poll(ctx, rule_attr->queue_id, &expected_completions, true);
-+	if (unlikely(ret))
-+		mlx5hws_err(ctx, "Failed updating BWC rule (%d)\n", ret);
-+
-+	return ret;
-+}
-+
-+static bool
-+hws_bwc_matcher_size_maxed_out(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	struct mlx5hws_cmd_query_caps *caps = bwc_matcher->matcher->tbl->ctx->caps;
-+
-+	return bwc_matcher->size_log + MLX5HWS_MATCHER_ASSURED_MAIN_TBL_DEPTH >=
-+	       caps->ste_alloc_log_max - 1;
-+}
-+
-+static bool
-+hws_bwc_matcher_rehash_size_needed(struct mlx5hws_bwc_matcher *bwc_matcher,
-+				   u32 num_of_rules)
-+{
-+	if (unlikely(hws_bwc_matcher_size_maxed_out(bwc_matcher)))
-+		return false;
-+
-+	if (unlikely((num_of_rules * 100 / MLX5HWS_BWC_MATCHER_REHASH_PERCENT_TH) >=
-+		     (1UL << bwc_matcher->size_log)))
-+		return true;
-+
-+	return false;
-+}
-+
-+static void
-+hws_bwc_rule_actions_to_action_types(struct mlx5hws_rule_action rule_actions[],
-+				     enum mlx5hws_action_type action_types[])
-+{
-+	int i = 0;
-+
-+	for (i = 0;
-+	     rule_actions[i].action && (rule_actions[i].action->type != MLX5HWS_ACTION_TYP_LAST);
-+	     i++) {
-+		action_types[i] = (enum mlx5hws_action_type)rule_actions[i].action->type;
-+	}
-+
-+	action_types[i] = MLX5HWS_ACTION_TYP_LAST;
-+}
-+
-+static int
-+hws_bwc_matcher_extend_at(struct mlx5hws_bwc_matcher *bwc_matcher,
-+			  struct mlx5hws_rule_action rule_actions[])
-+{
-+	enum mlx5hws_action_type action_types[MLX5HWS_BWC_MAX_ACTS];
-+
-+	hws_bwc_rule_actions_to_action_types(rule_actions, action_types);
-+
-+	bwc_matcher->at[bwc_matcher->num_of_at] =
-+		mlx5hws_action_template_create(action_types);
-+
-+	if (unlikely(!bwc_matcher->at[bwc_matcher->num_of_at]))
-+		return -ENOMEM;
-+
-+	bwc_matcher->num_of_at++;
-+	return 0;
-+}
-+
-+static int
-+hws_bwc_matcher_extend_size(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+	struct mlx5hws_cmd_query_caps *caps = ctx->caps;
-+
-+	if (unlikely(hws_bwc_matcher_size_maxed_out(bwc_matcher))) {
-+		mlx5hws_err(ctx, "Can't resize matcher: depth exceeds limit %d\n",
-+			    caps->rtc_log_depth_max);
-+		return -ENOMEM;
-+	}
-+
-+	bwc_matcher->size_log =
-+		min(bwc_matcher->size_log + MLX5HWS_BWC_MATCHER_SIZE_LOG_STEP,
-+		    caps->ste_alloc_log_max - MLX5HWS_MATCHER_ASSURED_MAIN_TBL_DEPTH);
++	seq_puts(f, "\n");
 +
 +	return 0;
 +}
 +
 +static int
-+hws_bwc_matcher_find_at(struct mlx5hws_bwc_matcher *bwc_matcher,
-+			struct mlx5hws_rule_action rule_actions[])
++hws_debug_dump_matcher_match_template(struct seq_file *f, struct mlx5hws_matcher *matcher)
 +{
-+	enum mlx5hws_action_type *action_type_arr;
++	enum mlx5hws_debug_res_type type;
++	int i, ret;
++
++	for (i = 0; i < matcher->num_of_mt; i++) {
++		struct mlx5hws_match_template *mt = &matcher->mt[i];
++
++		seq_printf(f, "%d,0x%llx,0x%llx,%d,%d,%d\n",
++			   MLX5HWS_DEBUG_RES_TYPE_MATCHER_MATCH_TEMPLATE,
++			   HWS_PTR_TO_ID(mt),
++			   HWS_PTR_TO_ID(matcher),
++			   mt->fc_sz,
++			   0, 0);
++
++		type = MLX5HWS_DEBUG_RES_TYPE_MATCHER_TEMPLATE_MATCH_DEFINER;
++		ret = hws_debug_dump_matcher_template_definer(f, mt, mt->definer, type);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++static int
++hws_debug_dump_matcher_action_template(struct seq_file *f, struct mlx5hws_matcher *matcher)
++{
++	enum mlx5hws_action_type action_type;
 +	int i, j;
 +
-+	/* start from index 1 - first action template is a dummy */
-+	for (i = 1; i < bwc_matcher->num_of_at; i++) {
-+		j = 0;
-+		action_type_arr = bwc_matcher->at[i]->action_type_arr;
++	for (i = 0; i < matcher->num_of_at; i++) {
++		struct mlx5hws_action_template *at = &matcher->at[i];
 +
-+		while (rule_actions[j].action &&
-+		       rule_actions[j].action->type != MLX5HWS_ACTION_TYP_LAST) {
-+			if (action_type_arr[j] != rule_actions[j].action->type)
-+				break;
-+			j++;
++		seq_printf(f, "%d,0x%llx,0x%llx,%d,%d,%d",
++			   MLX5HWS_DEBUG_RES_TYPE_MATCHER_ACTION_TEMPLATE,
++			   HWS_PTR_TO_ID(at),
++			   HWS_PTR_TO_ID(matcher),
++			   at->only_term,
++			   at->num_of_action_stes,
++			   at->num_actions);
++
++		for (j = 0; j < at->num_actions; j++) {
++			action_type = at->action_type_arr[j];
++			seq_printf(f, ",%s", mlx5hws_action_type_to_str(action_type));
 +		}
 +
-+		if (action_type_arr[j] == MLX5HWS_ACTION_TYP_LAST &&
-+		    (!rule_actions[j].action ||
-+		     rule_actions[j].action->type == MLX5HWS_ACTION_TYP_LAST))
-+			return i;
++		seq_puts(f, "\n");
 +	}
-+
-+	return -1;
-+}
-+
-+static int hws_bwc_matcher_move_all_simple(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
-+	struct mlx5hws_bwc_rule **bwc_rules;
-+	struct mlx5hws_rule_attr rule_attr;
-+	u32 *pending_rules;
-+	int i, j, ret = 0;
-+	bool all_done;
-+	u16 burst_th;
-+
-+	mlx5hws_bwc_rule_fill_attr(bwc_matcher, 0, 0, &rule_attr);
-+
-+	pending_rules = kcalloc(bwc_queues, sizeof(*pending_rules), GFP_KERNEL);
-+	if (!pending_rules)
-+		return -ENOMEM;
-+
-+	bwc_rules = kcalloc(bwc_queues, sizeof(*bwc_rules), GFP_KERNEL);
-+	if (!bwc_rules) {
-+		ret = -ENOMEM;
-+		goto free_pending_rules;
-+	}
-+
-+	for (i = 0; i < bwc_queues; i++) {
-+		if (list_empty(&bwc_matcher->rules[i]))
-+			bwc_rules[i] = NULL;
-+		else
-+			bwc_rules[i] = list_first_entry(&bwc_matcher->rules[i],
-+							struct mlx5hws_bwc_rule,
-+							list_node);
-+	}
-+
-+	do {
-+		all_done = true;
-+
-+		for (i = 0; i < bwc_queues; i++) {
-+			rule_attr.queue_id = mlx5hws_bwc_get_queue_id(ctx, i);
-+			burst_th = hws_bwc_get_burst_th(ctx, rule_attr.queue_id);
-+
-+			for (j = 0; j < burst_th && bwc_rules[i]; j++) {
-+				rule_attr.burst = !!((j + 1) % burst_th);
-+				ret = mlx5hws_matcher_resize_rule_move(bwc_matcher->matcher,
-+								       bwc_rules[i]->rule,
-+								       &rule_attr);
-+				if (unlikely(ret)) {
-+					mlx5hws_err(ctx,
-+						    "Moving BWC rule failed during rehash (%d)\n",
-+						    ret);
-+					goto free_bwc_rules;
-+				}
-+
-+				all_done = false;
-+				pending_rules[i]++;
-+				bwc_rules[i] = list_is_last(&bwc_rules[i]->list_node,
-+							    &bwc_matcher->rules[i]) ?
-+					       NULL : list_next_entry(bwc_rules[i], list_node);
-+
-+				ret = hws_bwc_queue_poll(ctx, rule_attr.queue_id,
-+							 &pending_rules[i], false);
-+				if (unlikely(ret))
-+					goto free_bwc_rules;
-+			}
-+		}
-+	} while (!all_done);
-+
-+	/* drain all the bwc queues */
-+	for (i = 0; i < bwc_queues; i++) {
-+		if (pending_rules[i]) {
-+			u16 queue_id = mlx5hws_bwc_get_queue_id(ctx, i);
-+
-+			mlx5hws_send_engine_flush_queue(&ctx->send_queue[queue_id]);
-+			ret = hws_bwc_queue_poll(ctx, queue_id,
-+						 &pending_rules[i], true);
-+			if (unlikely(ret))
-+				goto free_bwc_rules;
-+		}
-+	}
-+
-+free_bwc_rules:
-+	kfree(bwc_rules);
-+free_pending_rules:
-+	kfree(pending_rules);
-+
-+	return ret;
-+}
-+
-+static int hws_bwc_matcher_move_all(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	return hws_bwc_matcher_move_all_simple(bwc_matcher);
-+}
-+
-+static int hws_bwc_matcher_move(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+	struct mlx5hws_matcher_attr matcher_attr = {0};
-+	struct mlx5hws_matcher *old_matcher;
-+	struct mlx5hws_matcher *new_matcher;
-+	int ret;
-+
-+	hws_bwc_matcher_init_attr(&matcher_attr,
-+				  bwc_matcher->priority,
-+				  bwc_matcher->size_log);
-+
-+	old_matcher = bwc_matcher->matcher;
-+	new_matcher = mlx5hws_matcher_create(old_matcher->tbl,
-+					     &bwc_matcher->mt, 1,
-+					     bwc_matcher->at,
-+					     bwc_matcher->num_of_at,
-+					     &matcher_attr);
-+	if (!new_matcher) {
-+		mlx5hws_err(ctx, "Rehash error: matcher creation failed\n");
-+		return -ENOMEM;
-+	}
-+
-+	ret = mlx5hws_matcher_resize_set_target(old_matcher, new_matcher);
-+	if (ret) {
-+		mlx5hws_err(ctx, "Rehash error: failed setting resize target\n");
-+		return ret;
-+	}
-+
-+	ret = hws_bwc_matcher_move_all(bwc_matcher);
-+	if (ret) {
-+		mlx5hws_err(ctx, "Rehash error: moving rules failed\n");
-+		return -ENOMEM;
-+	}
-+
-+	bwc_matcher->matcher = new_matcher;
-+	mlx5hws_matcher_destroy(old_matcher);
 +
 +	return 0;
 +}
 +
 +static int
-+hws_bwc_matcher_rehash_size(struct mlx5hws_bwc_matcher *bwc_matcher)
++hws_debug_dump_matcher_attr(struct seq_file *f, struct mlx5hws_matcher *matcher)
 +{
-+	u32 num_of_rules;
++	struct mlx5hws_matcher_attr *attr = &matcher->attr;
++
++	seq_printf(f, "%d,0x%llx,%d,%d,%d,%d,%d,%d,%d,%d\n",
++		   MLX5HWS_DEBUG_RES_TYPE_MATCHER_ATTR,
++		   HWS_PTR_TO_ID(matcher),
++		   attr->priority,
++		   attr->mode,
++		   attr->table.sz_row_log,
++		   attr->table.sz_col_log,
++		   attr->optimize_using_rule_idx,
++		   attr->optimize_flow_src,
++		   attr->insert_mode,
++		   attr->distribute_mode);
++
++	return 0;
++}
++
++static int hws_debug_dump_matcher(struct seq_file *f, struct mlx5hws_matcher *matcher)
++{
++	enum mlx5hws_table_type tbl_type = matcher->tbl->type;
++	struct mlx5hws_cmd_ft_query_attr ft_attr = {0};
++	struct mlx5hws_pool_chunk *ste;
++	struct mlx5hws_pool *ste_pool;
++	u64 icm_addr_0 = 0;
++	u64 icm_addr_1 = 0;
++	u32 ste_0_id = -1;
++	u32 ste_1_id = -1;
 +	int ret;
 +
-+	/* If the current matcher size is already at its max size, we can't
-+	 * do the rehash. Skip it and try adding the rule again - perhaps
-+	 * there was some change.
-+	 */
-+	if (hws_bwc_matcher_size_maxed_out(bwc_matcher))
-+		return 0;
++	seq_printf(f, "%d,0x%llx,0x%llx,%d,%d,0x%llx",
++		   MLX5HWS_DEBUG_RES_TYPE_MATCHER,
++		   HWS_PTR_TO_ID(matcher),
++		   HWS_PTR_TO_ID(matcher->tbl),
++		   matcher->num_of_mt,
++		   matcher->end_ft_id,
++		   matcher->col_matcher ? HWS_PTR_TO_ID(matcher->col_matcher) : 0);
 +
-+	/* It is possible that other rule has already performed rehash.
-+	 * Need to check again if we really need rehash.
-+	 * If the reason for rehash was size, but not any more - skip rehash.
-+	 */
-+	num_of_rules = __atomic_load_n(&bwc_matcher->num_of_rules, __ATOMIC_RELAXED);
-+	if (!hws_bwc_matcher_rehash_size_needed(bwc_matcher, num_of_rules))
-+		return 0;
++	ste = &matcher->match_ste.ste;
++	ste_pool = matcher->match_ste.pool;
++	if (ste_pool) {
++		ste_0_id = mlx5hws_pool_chunk_get_base_id(ste_pool, ste);
++		if (tbl_type == MLX5HWS_TABLE_TYPE_FDB)
++			ste_1_id = mlx5hws_pool_chunk_get_base_mirror_id(ste_pool, ste);
++	}
 +
-+	/* Now we're done all the checking - do the rehash:
-+	 *  - extend match RTC size
-+	 *  - create new matcher
-+	 *  - move all the rules to the new matcher
-+	 *  - destroy the old matcher
-+	 */
++	seq_printf(f, ",%d,%d,%d,%d",
++		   matcher->match_ste.rtc_0_id,
++		   (int)ste_0_id,
++		   matcher->match_ste.rtc_1_id,
++		   (int)ste_1_id);
 +
-+	ret = hws_bwc_matcher_extend_size(bwc_matcher);
++	ste = &matcher->action_ste[0].ste;
++	ste_pool = matcher->action_ste[0].pool;
++	if (ste_pool) {
++		ste_0_id = mlx5hws_pool_chunk_get_base_id(ste_pool, ste);
++		if (tbl_type == MLX5HWS_TABLE_TYPE_FDB)
++			ste_1_id = mlx5hws_pool_chunk_get_base_mirror_id(ste_pool, ste);
++		else
++			ste_1_id = -1;
++	} else {
++		ste_0_id = -1;
++		ste_1_id = -1;
++	}
++
++	ft_attr.type = matcher->tbl->fw_ft_type;
++	ret = mlx5hws_cmd_flow_table_query(matcher->tbl->ctx->mdev,
++					   matcher->end_ft_id,
++					   &ft_attr,
++					   &icm_addr_0,
++					   &icm_addr_1);
 +	if (ret)
 +		return ret;
 +
-+	return hws_bwc_matcher_move(bwc_matcher);
-+}
++	seq_printf(f, ",%d,%d,%d,%d,%d,0x%llx,0x%llx\n",
++		   matcher->action_ste[0].rtc_0_id,
++		   (int)ste_0_id,
++		   matcher->action_ste[0].rtc_1_id,
++		   (int)ste_1_id,
++		   0,
++		   mlx5hws_debug_icm_to_idx(icm_addr_0),
++		   mlx5hws_debug_icm_to_idx(icm_addr_1));
 +
-+static int
-+hws_bwc_matcher_rehash_at(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	/* Rehash by action template doesn't require any additional checking.
-+	 * The bwc_matcher already contains the new action template.
-+	 * Just do the usual rehash:
-+	 *  - create new matcher
-+	 *  - move all the rules to the new matcher
-+	 *  - destroy the old matcher
-+	 */
-+	return hws_bwc_matcher_move(bwc_matcher);
-+}
-+
-+int mlx5hws_bwc_rule_create_simple(struct mlx5hws_bwc_rule *bwc_rule,
-+				   u32 *match_param,
-+				   struct mlx5hws_rule_action rule_actions[],
-+				   u32 flow_source,
-+				   u16 bwc_queue_idx)
-+{
-+	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+	struct mlx5hws_rule_attr rule_attr;
-+	struct mutex *queue_lock; /* Protect the queue */
-+	u32 num_of_rules;
-+	int ret = 0;
-+	int at_idx;
-+
-+	mlx5hws_bwc_rule_fill_attr(bwc_matcher, bwc_queue_idx, flow_source, &rule_attr);
-+
-+	queue_lock = hws_bwc_get_queue_lock(ctx, bwc_queue_idx);
-+
-+	mutex_lock(queue_lock);
-+
-+	/* check if rehash needed due to missing action template */
-+	at_idx = hws_bwc_matcher_find_at(bwc_matcher, rule_actions);
-+	if (unlikely(at_idx < 0)) {
-+		/* we need to extend BWC matcher action templates array */
-+		mutex_unlock(queue_lock);
-+		hws_bwc_lock_all_queues(ctx);
-+
-+		ret = hws_bwc_matcher_extend_at(bwc_matcher, rule_actions);
-+		if (unlikely(ret)) {
-+			hws_bwc_unlock_all_queues(ctx);
-+			return ret;
-+		}
-+
-+		/* action templates array was extended, we need the last idx */
-+		at_idx = bwc_matcher->num_of_at - 1;
-+
-+		ret = mlx5hws_matcher_attach_at(bwc_matcher->matcher,
-+						bwc_matcher->at[at_idx]);
-+		if (unlikely(ret)) {
-+			/* Action template attach failed, possibly due to
-+			 * requiring more action STEs.
-+			 * Need to attempt creating new matcher with all
-+			 * the action templates, including the new one.
-+			 */
-+			ret = hws_bwc_matcher_rehash_at(bwc_matcher);
-+			if (unlikely(ret)) {
-+				mlx5hws_action_template_destroy(bwc_matcher->at[at_idx]);
-+				bwc_matcher->at[at_idx] = NULL;
-+				bwc_matcher->num_of_at--;
-+
-+				hws_bwc_unlock_all_queues(ctx);
-+
-+				mlx5hws_err(ctx,
-+					    "BWC rule insertion: rehash AT failed (%d)\n", ret);
-+				return ret;
-+			}
-+		}
-+
-+		hws_bwc_unlock_all_queues(ctx);
-+		mutex_lock(queue_lock);
-+	}
-+
-+	/* check if number of rules require rehash */
-+	num_of_rules = bwc_matcher->num_of_rules;
-+
-+	if (unlikely(hws_bwc_matcher_rehash_size_needed(bwc_matcher, num_of_rules))) {
-+		mutex_unlock(queue_lock);
-+
-+		hws_bwc_lock_all_queues(ctx);
-+		ret = hws_bwc_matcher_rehash_size(bwc_matcher);
-+		hws_bwc_unlock_all_queues(ctx);
-+
-+		if (ret) {
-+			mlx5hws_err(ctx, "BWC rule insertion: rehash size [%d -> %d] failed (%d)\n",
-+				    bwc_matcher->size_log - MLX5HWS_BWC_MATCHER_SIZE_LOG_STEP,
-+				    bwc_matcher->size_log,
-+				    ret);
-+			return ret;
-+		}
-+
-+		mutex_lock(queue_lock);
-+	}
-+
-+	ret = hws_bwc_rule_create_sync(bwc_rule,
-+				       match_param,
-+				       at_idx,
-+				       rule_actions,
-+				       &rule_attr);
-+	if (likely(!ret)) {
-+		hws_bwc_rule_list_add(bwc_rule, bwc_queue_idx);
-+		mutex_unlock(queue_lock);
-+		return 0; /* rule inserted successfully */
-+	}
-+
-+	/* At this point the rule wasn't added.
-+	 * It could be because there was collision, or some other problem.
-+	 * If we don't dive deeper than API, the only thing we know is that
-+	 * the status of completion is RTE_FLOW_OP_ERROR.
-+	 * Try rehash by size and insert rule again - last chance.
-+	 */
-+
-+	mutex_unlock(queue_lock);
-+
-+	hws_bwc_lock_all_queues(ctx);
-+	ret = hws_bwc_matcher_rehash_size(bwc_matcher);
-+	hws_bwc_unlock_all_queues(ctx);
-+
-+	if (ret) {
-+		mlx5hws_err(ctx, "BWC rule insertion: rehash failed (%d)\n", ret);
++	ret = hws_debug_dump_matcher_attr(f, matcher);
++	if (ret)
 +		return ret;
-+	}
 +
-+	/* Rehash done, but we still have that pesky rule to add */
-+	mutex_lock(queue_lock);
-+
-+	ret = hws_bwc_rule_create_sync(bwc_rule,
-+				       match_param,
-+				       at_idx,
-+				       rule_actions,
-+				       &rule_attr);
-+
-+	if (unlikely(ret)) {
-+		mutex_unlock(queue_lock);
-+		mlx5hws_err(ctx, "BWC rule insertion failed (%d)\n", ret);
++	ret = hws_debug_dump_matcher_match_template(f, matcher);
++	if (ret)
 +		return ret;
-+	}
 +
-+	hws_bwc_rule_list_add(bwc_rule, bwc_queue_idx);
-+	mutex_unlock(queue_lock);
++	ret = hws_debug_dump_matcher_action_template(f, matcher);
++	if (ret)
++		return ret;
 +
 +	return 0;
 +}
 +
-+struct mlx5hws_bwc_rule *
-+mlx5hws_bwc_rule_create(struct mlx5hws_bwc_matcher *bwc_matcher,
-+			struct mlx5hws_match_parameters *params,
-+			u32 flow_source,
-+			struct mlx5hws_rule_action rule_actions[])
++static int hws_debug_dump_table(struct seq_file *f, struct mlx5hws_table *tbl)
 +{
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+	struct mlx5hws_bwc_rule *bwc_rule;
-+	u16 bwc_queue_idx;
++	struct mlx5hws_cmd_ft_query_attr ft_attr = {0};
++	struct mlx5hws_matcher *matcher;
++	u64 local_icm_addr_0 = 0;
++	u64 local_icm_addr_1 = 0;
++	u64 icm_addr_0 = 0;
++	u64 icm_addr_1 = 0;
 +	int ret;
 +
-+	if (unlikely(!mlx5hws_context_bwc_supported(ctx))) {
-+		mlx5hws_err(ctx, "BWC rule: Context created w/o BWC API compatibility\n");
-+		return NULL;
++	seq_printf(f, "%d,0x%llx,0x%llx,%d,%d,%d,%d,%d",
++		   MLX5HWS_DEBUG_RES_TYPE_TABLE,
++		   HWS_PTR_TO_ID(tbl),
++		   HWS_PTR_TO_ID(tbl->ctx),
++		   tbl->ft_id,
++		   MLX5HWS_TABLE_TYPE_BASE + tbl->type,
++		   tbl->fw_ft_type,
++		   tbl->level,
++		   0);
++
++	ft_attr.type = tbl->fw_ft_type;
++	ret = mlx5hws_cmd_flow_table_query(tbl->ctx->mdev,
++					   tbl->ft_id,
++					   &ft_attr,
++					   &icm_addr_0,
++					   &icm_addr_1);
++	if (ret)
++		return ret;
++
++	seq_printf(f, ",0x%llx,0x%llx,0x%llx,0x%llx,0x%llx\n",
++		   mlx5hws_debug_icm_to_idx(icm_addr_0),
++		   mlx5hws_debug_icm_to_idx(icm_addr_1),
++		   mlx5hws_debug_icm_to_idx(local_icm_addr_0),
++		   mlx5hws_debug_icm_to_idx(local_icm_addr_1),
++		   HWS_PTR_TO_ID(tbl->default_miss.miss_tbl));
++
++	list_for_each_entry(matcher, &tbl->matchers_list, list_node) {
++		ret = hws_debug_dump_matcher(f, matcher);
++		if (ret)
++			return ret;
 +	}
 +
-+	bwc_rule = mlx5hws_bwc_rule_alloc(bwc_matcher);
-+	if (unlikely(!bwc_rule))
-+		return NULL;
-+
-+	bwc_queue_idx = hws_bwc_gen_queue_idx(ctx);
-+
-+	ret = mlx5hws_bwc_rule_create_simple(bwc_rule,
-+					     params->match_buf,
-+					     rule_actions,
-+					     flow_source,
-+					     bwc_queue_idx);
-+	if (unlikely(ret)) {
-+		mlx5hws_bwc_rule_free(bwc_rule);
-+		return NULL;
-+	}
-+
-+	return bwc_rule;
++	return 0;
 +}
 +
 +static int
-+hws_bwc_rule_action_update(struct mlx5hws_bwc_rule *bwc_rule,
-+			   struct mlx5hws_rule_action rule_actions[])
++hws_debug_dump_context_send_engine(struct seq_file *f, struct mlx5hws_context *ctx)
 +{
-+	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+	struct mlx5hws_rule_attr rule_attr;
-+	struct mutex *queue_lock; /* Protect the queue */
-+	int at_idx, ret;
-+	u16 idx;
++	struct mlx5hws_send_engine *send_queue;
++	struct mlx5hws_send_ring *send_ring;
++	struct mlx5hws_send_ring_cq *cq;
++	struct mlx5hws_send_ring_sq *sq;
++	int i;
 +
-+	idx = bwc_rule->bwc_queue_idx;
++	for (i = 0; i < (int)ctx->queues; i++) {
++		send_queue = &ctx->send_queue[i];
++		seq_printf(f, "%d,0x%llx,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
++			   MLX5HWS_DEBUG_RES_TYPE_CONTEXT_SEND_ENGINE,
++			   HWS_PTR_TO_ID(ctx),
++			   i,
++			   send_queue->used_entries,
++			   send_queue->num_entries,
++			   1, /* one send ring per queue */
++			   send_queue->num_entries,
++			   send_queue->err,
++			   send_queue->completed.ci,
++			   send_queue->completed.pi,
++			   send_queue->completed.mask);
 +
-+	mlx5hws_bwc_rule_fill_attr(bwc_matcher, idx, 0, &rule_attr);
-+	queue_lock = hws_bwc_get_queue_lock(ctx, idx);
++		send_ring = &send_queue->send_ring;
++		cq = &send_ring->send_cq;
++		sq = &send_ring->send_sq;
 +
-+	mutex_lock(queue_lock);
-+
-+	/* check if rehash needed due to missing action template */
-+	at_idx = hws_bwc_matcher_find_at(bwc_matcher, rule_actions);
-+	if (unlikely(at_idx < 0)) {
-+		/* we need to extend BWC matcher action templates array */
-+		mutex_unlock(queue_lock);
-+		hws_bwc_lock_all_queues(ctx);
-+
-+		/* check again - perhaps other thread already did extend_at */
-+		at_idx = hws_bwc_matcher_find_at(bwc_matcher, rule_actions);
-+		if (likely(at_idx < 0)) {
-+			ret = hws_bwc_matcher_extend_at(bwc_matcher, rule_actions);
-+			if (unlikely(ret)) {
-+				hws_bwc_unlock_all_queues(ctx);
-+				mlx5hws_err(ctx, "BWC rule update: failed extending AT (%d)", ret);
-+				return -EINVAL;
-+			}
-+
-+			/* action templates array was extended, we need the last idx */
-+			at_idx = bwc_matcher->num_of_at - 1;
-+
-+			ret = mlx5hws_matcher_attach_at(bwc_matcher->matcher,
-+							bwc_matcher->at[at_idx]);
-+			if (unlikely(ret)) {
-+				/* Action template attach failed, possibly due to
-+				 * requiring more action STEs.
-+				 * Need to attempt creating new matcher with all
-+				 * the action templates, including the new one.
-+				 */
-+				ret = hws_bwc_matcher_rehash_at(bwc_matcher);
-+				if (unlikely(ret)) {
-+					mlx5hws_action_template_destroy(bwc_matcher->at[at_idx]);
-+					bwc_matcher->at[at_idx] = NULL;
-+					bwc_matcher->num_of_at--;
-+
-+					hws_bwc_unlock_all_queues(ctx);
-+
-+					mlx5hws_err(ctx,
-+						    "BWC rule update: rehash AT failed (%d)\n",
-+						    ret);
-+					return ret;
-+				}
-+			}
-+		}
-+
-+		hws_bwc_unlock_all_queues(ctx);
-+		mutex_lock(queue_lock);
++		seq_printf(f, "%d,0x%llx,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d\n",
++			   MLX5HWS_DEBUG_RES_TYPE_CONTEXT_SEND_RING,
++			   HWS_PTR_TO_ID(ctx),
++			   0, /* one send ring per send queue */
++			   i,
++			   cq->mcq.cqn,
++			   0,
++			   0,
++			   0,
++			   0,
++			   0,
++			   0,
++			   cq->mcq.cqe_sz,
++			   sq->sqn,
++			   0,
++			   0,
++			   0);
 +	}
 +
-+	ret = hws_bwc_rule_update_sync(bwc_rule,
-+				       at_idx,
-+				       rule_actions,
-+				       &rule_attr);
-+	mutex_unlock(queue_lock);
++	return 0;
++}
 +
-+	if (unlikely(ret))
-+		mlx5hws_err(ctx, "BWC rule: update failed (%d)\n", ret);
++static int hws_debug_dump_context_caps(struct seq_file *f, struct mlx5hws_context *ctx)
++{
++	struct mlx5hws_cmd_query_caps *caps = ctx->caps;
++
++	seq_printf(f, "%d,0x%llx,%s,%d,%d,%d,%d,",
++		   MLX5HWS_DEBUG_RES_TYPE_CONTEXT_CAPS,
++		   HWS_PTR_TO_ID(ctx),
++		   caps->fw_ver,
++		   caps->wqe_based_update,
++		   caps->ste_format,
++		   caps->ste_alloc_log_max,
++		   caps->log_header_modify_argument_max_alloc);
++
++	seq_printf(f, "%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s\n",
++		   caps->flex_protocols,
++		   caps->rtc_reparse_mode,
++		   caps->rtc_index_mode,
++		   caps->ste_alloc_log_gran,
++		   caps->stc_alloc_log_max,
++		   caps->stc_alloc_log_gran,
++		   caps->rtc_log_depth_max,
++		   caps->format_select_gtpu_dw_0,
++		   caps->format_select_gtpu_dw_1,
++		   caps->format_select_gtpu_dw_2,
++		   caps->format_select_gtpu_ext_dw_0,
++		   caps->nic_ft.max_level,
++		   caps->nic_ft.reparse,
++		   caps->fdb_ft.max_level,
++		   caps->fdb_ft.reparse,
++		   caps->log_header_modify_argument_granularity,
++		   caps->linear_match_definer,
++		   "regc_3");
++
++	return 0;
++}
++
++static int hws_debug_dump_context_attr(struct seq_file *f, struct mlx5hws_context *ctx)
++{
++	seq_printf(f, "%u,0x%llx,%d,%zu,%d,%s,%d,%d\n",
++		   MLX5HWS_DEBUG_RES_TYPE_CONTEXT_ATTR,
++		   HWS_PTR_TO_ID(ctx),
++		   ctx->pd_num,
++		   ctx->queues,
++		   ctx->send_queue->num_entries,
++		   "None", /* no shared gvmi */
++		   ctx->caps->vhca_id,
++		   0xffff); /* no shared gvmi */
++
++	return 0;
++}
++
++static int hws_debug_dump_context_info(struct seq_file *f, struct mlx5hws_context *ctx)
++{
++	struct mlx5_core_dev *dev = ctx->mdev;
++	int ret;
++
++	seq_printf(f, "%d,0x%llx,%d,%s,%s.KERNEL_%u_%u_%u\n",
++		   MLX5HWS_DEBUG_RES_TYPE_CONTEXT,
++		   HWS_PTR_TO_ID(ctx),
++		   ctx->flags & MLX5HWS_CONTEXT_FLAG_HWS_SUPPORT,
++		   pci_name(dev->pdev),
++		   HWS_DEBUG_FORMAT_VERSION,
++		   LINUX_VERSION_MAJOR,
++		   LINUX_VERSION_PATCHLEVEL,
++		   LINUX_VERSION_SUBLEVEL);
++
++	ret = hws_debug_dump_context_attr(f, ctx);
++	if (ret)
++		return ret;
++
++	ret = hws_debug_dump_context_caps(f, ctx);
++	if (ret)
++		return ret;
++
++	return 0;
++}
++
++static int hws_debug_dump_context_stc_resource(struct seq_file *f,
++					       struct mlx5hws_context *ctx,
++					       u32 tbl_type,
++					       struct mlx5hws_pool_resource *resource)
++{
++	seq_printf(f, "%d,0x%llx,%u,%u\n",
++		   MLX5HWS_DEBUG_RES_TYPE_CONTEXT_STC,
++		   HWS_PTR_TO_ID(ctx),
++		   tbl_type,
++		   resource->base_id);
++
++	return 0;
++}
++
++static int hws_debug_dump_context_stc(struct seq_file *f, struct mlx5hws_context *ctx)
++{
++	struct mlx5hws_pool *stc_pool;
++	u32 table_type;
++	int ret;
++	int i;
++
++	for (i = 0; i < MLX5HWS_TABLE_TYPE_MAX; i++) {
++		stc_pool = ctx->stc_pool[i];
++		table_type = MLX5HWS_TABLE_TYPE_BASE + i;
++
++		if (!stc_pool)
++			continue;
++
++		if (stc_pool->resource[0]) {
++			ret = hws_debug_dump_context_stc_resource(f, ctx, table_type,
++								  stc_pool->resource[0]);
++			if (ret)
++				return ret;
++		}
++
++		if (i == MLX5HWS_TABLE_TYPE_FDB && stc_pool->mirror_resource[0]) {
++			ret = hws_debug_dump_context_stc_resource(f, ctx, table_type,
++								  stc_pool->mirror_resource[0]);
++			if (ret)
++				return ret;
++		}
++	}
++
++	return 0;
++}
++
++static int hws_debug_dump_context(struct seq_file *f, struct mlx5hws_context *ctx)
++{
++	struct mlx5hws_table *tbl;
++	int ret;
++
++	ret = hws_debug_dump_context_info(f, ctx);
++	if (ret)
++		return ret;
++
++	ret = hws_debug_dump_context_send_engine(f, ctx);
++	if (ret)
++		return ret;
++
++	ret = hws_debug_dump_context_stc(f, ctx);
++	if (ret)
++		return ret;
++
++	list_for_each_entry(tbl, &ctx->tbl_list, tbl_list_node) {
++		ret = hws_debug_dump_table(f, tbl);
++		if (ret)
++			return ret;
++	}
++
++	return 0;
++}
++
++static int
++hws_debug_dump(struct seq_file *f, struct mlx5hws_context *ctx)
++{
++	int ret;
++
++	if (!f || !ctx)
++		return -EINVAL;
++
++	mutex_lock(&ctx->ctrl_lock);
++	ret = hws_debug_dump_context(f, ctx);
++	mutex_unlock(&ctx->ctrl_lock);
 +
 +	return ret;
 +}
 +
-+int mlx5hws_bwc_rule_action_update(struct mlx5hws_bwc_rule *bwc_rule,
-+				   struct mlx5hws_rule_action rule_actions[])
++static int hws_dump_show(struct seq_file *file, void *priv)
 +{
-+	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
-+	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
-+
-+	if (unlikely(!mlx5hws_context_bwc_supported(ctx))) {
-+		mlx5hws_err(ctx, "BWC rule: Context created w/o BWC API compatibility\n");
-+		return -EINVAL;
-+	}
-+
-+	return hws_bwc_rule_action_update(bwc_rule, rule_actions);
++	return hws_debug_dump(file, file->private);
 +}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h
++DEFINE_SHOW_ATTRIBUTE(hws_dump);
++
++void mlx5hws_debug_init_dump(struct mlx5hws_context *ctx)
++{
++	struct mlx5_core_dev *dev = ctx->mdev;
++	char file_name[128];
++
++	ctx->debug_info.steering_debugfs =
++		debugfs_create_dir("steering", mlx5_debugfs_get_dev_root(dev));
++	ctx->debug_info.fdb_debugfs =
++		debugfs_create_dir("fdb", ctx->debug_info.steering_debugfs);
++
++	sprintf(file_name, "ctx_%p", ctx);
++	debugfs_create_file(file_name, 0444, ctx->debug_info.fdb_debugfs,
++			    ctx, &hws_dump_fops);
++}
++
++void mlx5hws_debug_uninit_dump(struct mlx5hws_context *ctx)
++{
++	debugfs_remove_recursive(ctx->debug_info.steering_debugfs);
++}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.h
 new file mode 100644
-index 000000000000..4fe8c32d8fbe
+index 000000000000..b93a536035d9
 --- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h
-@@ -0,0 +1,73 @@
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_debug.h
+@@ -0,0 +1,40 @@
 +/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
 +/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
 +
-+#ifndef MLX5HWS_BWC_H_
-+#define MLX5HWS_BWC_H_
++#ifndef MLX5HWS_DEBUG_H_
++#define MLX5HWS_DEBUG_H_
 +
-+#define MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG 1
-+#define MLX5HWS_BWC_MATCHER_SIZE_LOG_STEP 1
-+#define MLX5HWS_BWC_MATCHER_REHASH_PERCENT_TH 70
-+#define MLX5HWS_BWC_MATCHER_REHASH_BURST_TH 32
-+#define MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM 255
++#define HWS_DEBUG_FORMAT_VERSION "1.0"
 +
-+#define MLX5HWS_BWC_MAX_ACTS 16
++#define HWS_PTR_TO_ID(p) ((u64)(uintptr_t)(p) & 0xFFFFFFFFULL)
 +
-+struct mlx5hws_bwc_matcher {
-+	struct mlx5hws_matcher *matcher;
-+	struct mlx5hws_match_template *mt;
-+	struct mlx5hws_action_template *at[MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM];
-+	u8 num_of_at;
-+	u16 priority;
-+	u8 size_log;
-+	u32 num_of_rules; /* atomically accessed */
-+	struct list_head *rules;
++enum mlx5hws_debug_res_type {
++	MLX5HWS_DEBUG_RES_TYPE_CONTEXT = 4000,
++	MLX5HWS_DEBUG_RES_TYPE_CONTEXT_ATTR = 4001,
++	MLX5HWS_DEBUG_RES_TYPE_CONTEXT_CAPS = 4002,
++	MLX5HWS_DEBUG_RES_TYPE_CONTEXT_SEND_ENGINE = 4003,
++	MLX5HWS_DEBUG_RES_TYPE_CONTEXT_SEND_RING = 4004,
++	MLX5HWS_DEBUG_RES_TYPE_CONTEXT_STC = 4005,
++
++	MLX5HWS_DEBUG_RES_TYPE_TABLE = 4100,
++
++	MLX5HWS_DEBUG_RES_TYPE_MATCHER = 4200,
++	MLX5HWS_DEBUG_RES_TYPE_MATCHER_ATTR = 4201,
++	MLX5HWS_DEBUG_RES_TYPE_MATCHER_MATCH_TEMPLATE = 4202,
++	MLX5HWS_DEBUG_RES_TYPE_MATCHER_TEMPLATE_MATCH_DEFINER = 4203,
++	MLX5HWS_DEBUG_RES_TYPE_MATCHER_ACTION_TEMPLATE = 4204,
++	MLX5HWS_DEBUG_RES_TYPE_MATCHER_TEMPLATE_HASH_DEFINER = 4205,
++	MLX5HWS_DEBUG_RES_TYPE_MATCHER_TEMPLATE_RANGE_DEFINER = 4206,
++	MLX5HWS_DEBUG_RES_TYPE_MATCHER_TEMPLATE_COMPARE_MATCH_DEFINER = 4207,
 +};
 +
-+struct mlx5hws_bwc_rule {
-+	struct mlx5hws_bwc_matcher *bwc_matcher;
-+	struct mlx5hws_rule *rule;
-+	u16 bwc_queue_idx;
-+	struct list_head list_node;
-+};
-+
-+int
-+mlx5hws_bwc_matcher_create_simple(struct mlx5hws_bwc_matcher *bwc_matcher,
-+				  struct mlx5hws_table *table,
-+				  u32 priority,
-+				  u8 match_criteria_enable,
-+				  struct mlx5hws_match_parameters *mask,
-+				  enum mlx5hws_action_type action_types[]);
-+
-+int mlx5hws_bwc_matcher_destroy_simple(struct mlx5hws_bwc_matcher *bwc_matcher);
-+
-+struct mlx5hws_bwc_rule *mlx5hws_bwc_rule_alloc(struct mlx5hws_bwc_matcher *bwc_matcher);
-+
-+void mlx5hws_bwc_rule_free(struct mlx5hws_bwc_rule *bwc_rule);
-+
-+int mlx5hws_bwc_rule_create_simple(struct mlx5hws_bwc_rule *bwc_rule,
-+				   u32 *match_param,
-+				   struct mlx5hws_rule_action rule_actions[],
-+				   u32 flow_source,
-+				   u16 bwc_queue_idx);
-+
-+int mlx5hws_bwc_rule_destroy_simple(struct mlx5hws_bwc_rule *bwc_rule);
-+
-+void mlx5hws_bwc_rule_fill_attr(struct mlx5hws_bwc_matcher *bwc_matcher,
-+				u16 bwc_queue_idx,
-+				u32 flow_source,
-+				struct mlx5hws_rule_attr *rule_attr);
-+
-+static inline u16 mlx5hws_bwc_queues(struct mlx5hws_context *ctx)
++static inline u64
++mlx5hws_debug_icm_to_idx(u64 icm_addr)
 +{
-+	/* Besides the control queue, half of the queues are
-+	 * reguler HWS queues, and the other half are BWC queues.
-+	 */
-+	return (ctx->queues - 1) / 2;
++	return (icm_addr >> 6) & 0xffffffff;
 +}
 +
-+static inline u16 mlx5hws_bwc_get_queue_id(struct mlx5hws_context *ctx, u16 idx)
-+{
-+	return idx + mlx5hws_bwc_queues(ctx);
-+}
++void mlx5hws_debug_init_dump(struct mlx5hws_context *ctx);
++void mlx5hws_debug_uninit_dump(struct mlx5hws_context *ctx);
 +
-+#endif /* MLX5HWS_BWC_H_ */
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
++#endif /* MLX5HWS_DEBUG_H_ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_internal.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_internal.h
 new file mode 100644
-index 000000000000..bb563f50ef09
+index 000000000000..458bc31be6ac
 --- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
-@@ -0,0 +1,86 @@
-+// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
-+
-+#include "mlx5hws_internal.h"
-+
-+bool mlx5hws_bwc_match_params_is_complex(struct mlx5hws_context *ctx,
-+					 u8 match_criteria_enable,
-+					 struct mlx5hws_match_parameters *mask)
-+{
-+	struct mlx5hws_definer match_layout = {0};
-+	struct mlx5hws_match_template *mt;
-+	bool is_complex = false;
-+	int ret;
-+
-+	if (!match_criteria_enable)
-+		return false; /* empty matcher */
-+
-+	mt = mlx5hws_match_template_create(ctx,
-+					   mask->match_buf,
-+					   mask->match_sz,
-+					   match_criteria_enable);
-+	if (!mt) {
-+		mlx5hws_err(ctx, "BWC: failed creating match template\n");
-+		return false;
-+	}
-+
-+	ret = mlx5hws_definer_calc_layout(ctx, mt, &match_layout);
-+	if (ret) {
-+		/* The only case that we're interested in is E2BIG,
-+		 * which means that the match parameters need to be
-+		 * split into complex martcher.
-+		 * For all other cases (good or bad) - just return true
-+		 * and let the usual match creation path handle it,
-+		 * both for good and bad flows.
-+		 */
-+		if (ret == E2BIG) {
-+			is_complex = true;
-+			mlx5hws_dbg(ctx, "Matcher definer layout: need complex matcher\n");
-+		} else {
-+			mlx5hws_err(ctx, "Failed to calculate matcher definer layout\n");
-+		}
-+	}
-+
-+	mlx5hws_match_template_destroy(mt);
-+
-+	return is_complex;
-+}
-+
-+int mlx5hws_bwc_matcher_create_complex(struct mlx5hws_bwc_matcher *bwc_matcher,
-+				       struct mlx5hws_table *table,
-+				       u32 priority,
-+				       u8 match_criteria_enable,
-+				       struct mlx5hws_match_parameters *mask)
-+{
-+	mlx5hws_err(table->ctx, "Complex matcher is not supported yet\n");
-+	return -EOPNOTSUPP;
-+}
-+
-+void
-+mlx5hws_bwc_matcher_destroy_complex(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	/* nothing to do here */
-+}
-+
-+int mlx5hws_bwc_rule_create_complex(struct mlx5hws_bwc_rule *bwc_rule,
-+				    struct mlx5hws_match_parameters *params,
-+				    u32 flow_source,
-+				    struct mlx5hws_rule_action rule_actions[],
-+				    u16 bwc_queue_idx)
-+{
-+	mlx5hws_err(bwc_rule->bwc_matcher->matcher->tbl->ctx,
-+		    "Complex rule is not supported yet\n");
-+	return -EOPNOTSUPP;
-+}
-+
-+int mlx5hws_bwc_rule_destroy_complex(struct mlx5hws_bwc_rule *bwc_rule)
-+{
-+	return 0;
-+}
-+
-+int mlx5hws_bwc_matcher_move_all_complex(struct mlx5hws_bwc_matcher *bwc_matcher)
-+{
-+	mlx5hws_err(bwc_matcher->matcher->tbl->ctx,
-+		    "Moving complex rule is not supported yet\n");
-+	return -EOPNOTSUPP;
-+}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.h
-new file mode 100644
-index 000000000000..068ee8118609
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.h
-@@ -0,0 +1,29 @@
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_internal.h
+@@ -0,0 +1,59 @@
 +/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
 +/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
 +
-+#ifndef MLX5HWS_BWC_COMPLEX_H_
-+#define MLX5HWS_BWC_COMPLEX_H_
++#ifndef MLX5HWS_INTERNAL_H_
++#define MLX5HWS_INTERNAL_H_
 +
-+bool mlx5hws_bwc_match_params_is_complex(struct mlx5hws_context *ctx,
-+					 u8 match_criteria_enable,
-+					 struct mlx5hws_match_parameters *mask);
++#include <linux/mlx5/transobj.h>
 +
-+int mlx5hws_bwc_matcher_create_complex(struct mlx5hws_bwc_matcher *bwc_matcher,
-+				       struct mlx5hws_table *table,
-+				       u32 priority,
-+				       u8 match_criteria_enable,
-+				       struct mlx5hws_match_parameters *mask);
++#include "../dr_types.h"
 +
-+void mlx5hws_bwc_matcher_destroy_complex(struct mlx5hws_bwc_matcher *bwc_matcher);
++#include "mlx5hws_prm.h"
 +
-+int mlx5hws_bwc_matcher_move_all_complex(struct mlx5hws_bwc_matcher *bwc_matcher);
++#include "mlx5hws.h"
 +
-+int mlx5hws_bwc_rule_create_complex(struct mlx5hws_bwc_rule *bwc_rule,
-+				    struct mlx5hws_match_parameters *params,
-+				    u32 flow_source,
-+				    struct mlx5hws_rule_action rule_actions[],
-+				    u16 bwc_queue_idx);
++#include "mlx5hws_pool.h"
++#include "mlx5hws_vport.h"
++#include "mlx5hws_context.h"
++#include "mlx5hws_table.h"
++#include "mlx5hws_send.h"
++#include "mlx5hws_rule.h"
++#include "mlx5hws_cmd.h"
++#include "mlx5hws_action.h"
++#include "mlx5hws_definer.h"
++#include "mlx5hws_matcher.h"
++#include "mlx5hws_debug.h"
++#include "mlx5hws_pat_arg.h"
++#include "mlx5hws_bwc.h"
++#include "mlx5hws_bwc_complex.h"
 +
-+int mlx5hws_bwc_rule_destroy_complex(struct mlx5hws_bwc_rule *bwc_rule);
++#define W_SIZE		2
++#define DW_SIZE		4
++#define BITS_IN_BYTE	8
++#define BITS_IN_DW	(BITS_IN_BYTE * DW_SIZE)
 +
-+#endif /* MLX5HWS_BWC_COMPLEX_H_ */
++#define IS_BIT_SET(_value, _bit) ((_value) & (1ULL << (_bit)))
++
++#define mlx5hws_err(ctx, arg...) mlx5_core_err((ctx)->mdev, ##arg)
++#define mlx5hws_info(ctx, arg...) mlx5_core_info((ctx)->mdev, ##arg)
++#define mlx5hws_dbg(ctx, arg...) mlx5_core_dbg((ctx)->mdev, ##arg)
++
++#define MLX5HWS_TABLE_TYPE_BASE 2
++#define MLX5HWS_ACTION_STE_IDX_ANY 0
++
++static inline bool is_mem_zero(const u8 *mem, size_t size)
++{
++	if (unlikely(!size)) {
++		pr_warn("HWS: invalid buffer of size 0 in %s\n", __func__);
++		return true;
++	}
++
++	return (*mem == 0) && memcmp(mem, mem + 1, size - 1) == 0;
++}
++
++static inline unsigned long align(unsigned long val, unsigned long align)
++{
++	return (val + align - 1) & ~(align - 1);
++}
++
++#endif /* MLX5HWS_INTERNAL_H_ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_prm.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_prm.h
+new file mode 100644
+index 000000000000..de92cecbeb92
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_prm.h
+@@ -0,0 +1,514 @@
++/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
++/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
++
++#ifndef MLX5_PRM_H_
++#define MLX5_PRM_H_
++
++#define MLX5_MAX_ACTIONS_DATA_IN_HEADER_MODIFY 512
++
++/* Action type of header modification. */
++enum {
++	MLX5_MODIFICATION_TYPE_SET = 0x1,
++	MLX5_MODIFICATION_TYPE_ADD = 0x2,
++	MLX5_MODIFICATION_TYPE_COPY = 0x3,
++	MLX5_MODIFICATION_TYPE_INSERT = 0x4,
++	MLX5_MODIFICATION_TYPE_REMOVE = 0x5,
++	MLX5_MODIFICATION_TYPE_NOP = 0x6,
++	MLX5_MODIFICATION_TYPE_REMOVE_WORDS = 0x7,
++	MLX5_MODIFICATION_TYPE_ADD_FIELD = 0x8,
++	MLX5_MODIFICATION_TYPE_MAX,
++};
++
++/* The field of packet to be modified. */
++enum mlx5_modification_field {
++	MLX5_MODI_OUT_NONE = -1,
++	MLX5_MODI_OUT_SMAC_47_16 = 1,
++	MLX5_MODI_OUT_SMAC_15_0,
++	MLX5_MODI_OUT_ETHERTYPE,
++	MLX5_MODI_OUT_DMAC_47_16,
++	MLX5_MODI_OUT_DMAC_15_0,
++	MLX5_MODI_OUT_IP_DSCP,
++	MLX5_MODI_OUT_TCP_FLAGS,
++	MLX5_MODI_OUT_TCP_SPORT,
++	MLX5_MODI_OUT_TCP_DPORT,
++	MLX5_MODI_OUT_IPV4_TTL,
++	MLX5_MODI_OUT_UDP_SPORT,
++	MLX5_MODI_OUT_UDP_DPORT,
++	MLX5_MODI_OUT_SIPV6_127_96,
++	MLX5_MODI_OUT_SIPV6_95_64,
++	MLX5_MODI_OUT_SIPV6_63_32,
++	MLX5_MODI_OUT_SIPV6_31_0,
++	MLX5_MODI_OUT_DIPV6_127_96,
++	MLX5_MODI_OUT_DIPV6_95_64,
++	MLX5_MODI_OUT_DIPV6_63_32,
++	MLX5_MODI_OUT_DIPV6_31_0,
++	MLX5_MODI_OUT_SIPV4,
++	MLX5_MODI_OUT_DIPV4,
++	MLX5_MODI_OUT_FIRST_VID,
++	MLX5_MODI_IN_SMAC_47_16 = 0x31,
++	MLX5_MODI_IN_SMAC_15_0,
++	MLX5_MODI_IN_ETHERTYPE,
++	MLX5_MODI_IN_DMAC_47_16,
++	MLX5_MODI_IN_DMAC_15_0,
++	MLX5_MODI_IN_IP_DSCP,
++	MLX5_MODI_IN_TCP_FLAGS,
++	MLX5_MODI_IN_TCP_SPORT,
++	MLX5_MODI_IN_TCP_DPORT,
++	MLX5_MODI_IN_IPV4_TTL,
++	MLX5_MODI_IN_UDP_SPORT,
++	MLX5_MODI_IN_UDP_DPORT,
++	MLX5_MODI_IN_SIPV6_127_96,
++	MLX5_MODI_IN_SIPV6_95_64,
++	MLX5_MODI_IN_SIPV6_63_32,
++	MLX5_MODI_IN_SIPV6_31_0,
++	MLX5_MODI_IN_DIPV6_127_96,
++	MLX5_MODI_IN_DIPV6_95_64,
++	MLX5_MODI_IN_DIPV6_63_32,
++	MLX5_MODI_IN_DIPV6_31_0,
++	MLX5_MODI_IN_SIPV4,
++	MLX5_MODI_IN_DIPV4,
++	MLX5_MODI_OUT_IPV6_HOPLIMIT,
++	MLX5_MODI_IN_IPV6_HOPLIMIT,
++	MLX5_MODI_META_DATA_REG_A,
++	MLX5_MODI_META_DATA_REG_B = 0x50,
++	MLX5_MODI_META_REG_C_0,
++	MLX5_MODI_META_REG_C_1,
++	MLX5_MODI_META_REG_C_2,
++	MLX5_MODI_META_REG_C_3,
++	MLX5_MODI_META_REG_C_4,
++	MLX5_MODI_META_REG_C_5,
++	MLX5_MODI_META_REG_C_6,
++	MLX5_MODI_META_REG_C_7,
++	MLX5_MODI_OUT_TCP_SEQ_NUM,
++	MLX5_MODI_IN_TCP_SEQ_NUM,
++	MLX5_MODI_OUT_TCP_ACK_NUM,
++	MLX5_MODI_IN_TCP_ACK_NUM = 0x5C,
++	MLX5_MODI_GTP_TEID = 0x6E,
++	MLX5_MODI_OUT_IP_ECN = 0x73,
++	MLX5_MODI_TUNNEL_HDR_DW_1 = 0x75,
++	MLX5_MODI_GTPU_FIRST_EXT_DW_0 = 0x76,
++	MLX5_MODI_HASH_RESULT = 0x81,
++	MLX5_MODI_IN_MPLS_LABEL_0 = 0x8a,
++	MLX5_MODI_IN_MPLS_LABEL_1,
++	MLX5_MODI_IN_MPLS_LABEL_2,
++	MLX5_MODI_IN_MPLS_LABEL_3,
++	MLX5_MODI_IN_MPLS_LABEL_4,
++	MLX5_MODI_OUT_IP_PROTOCOL = 0x4A,
++	MLX5_MODI_OUT_IPV6_NEXT_HDR = 0x4A,
++	MLX5_MODI_META_REG_C_8 = 0x8F,
++	MLX5_MODI_META_REG_C_9 = 0x90,
++	MLX5_MODI_META_REG_C_10 = 0x91,
++	MLX5_MODI_META_REG_C_11 = 0x92,
++	MLX5_MODI_META_REG_C_12 = 0x93,
++	MLX5_MODI_META_REG_C_13 = 0x94,
++	MLX5_MODI_META_REG_C_14 = 0x95,
++	MLX5_MODI_META_REG_C_15 = 0x96,
++	MLX5_MODI_OUT_IPV4_TOTAL_LEN = 0x11D,
++	MLX5_MODI_OUT_IPV6_PAYLOAD_LEN = 0x11E,
++	MLX5_MODI_OUT_IPV4_IHL = 0x11F,
++	MLX5_MODI_OUT_TCP_DATA_OFFSET = 0x120,
++	MLX5_MODI_OUT_ESP_SPI = 0x5E,
++	MLX5_MODI_OUT_ESP_SEQ_NUM = 0x82,
++	MLX5_MODI_OUT_IPSEC_NEXT_HDR = 0x126,
++	MLX5_MODI_INVALID = INT_MAX,
++};
++
++enum {
++	MLX5_GET_HCA_CAP_OP_MOD_NIC_FLOW_TABLE = 0x7 << 1,
++	MLX5_GET_HCA_CAP_OP_MOD_ESW_FLOW_TABLE = 0x8 << 1,
++	MLX5_SET_HCA_CAP_OP_MOD_ESW = 0x9 << 1,
++	MLX5_GET_HCA_CAP_OP_MOD_WQE_BASED_FLOW_TABLE = 0x1B << 1,
++	MLX5_GET_HCA_CAP_OP_MOD_GENERAL_DEVICE_2 = 0x20 << 1,
++};
++
++enum mlx5_ifc_rtc_update_mode {
++	MLX5_IFC_RTC_STE_UPDATE_MODE_BY_HASH = 0x0,
++	MLX5_IFC_RTC_STE_UPDATE_MODE_BY_OFFSET = 0x1,
++};
++
++enum mlx5_ifc_rtc_access_mode {
++	MLX5_IFC_RTC_STE_ACCESS_MODE_BY_HASH = 0x0,
++	MLX5_IFC_RTC_STE_ACCESS_MODE_LINEAR = 0x1,
++};
++
++enum mlx5_ifc_rtc_ste_format {
++	MLX5_IFC_RTC_STE_FORMAT_8DW = 0x4,
++	MLX5_IFC_RTC_STE_FORMAT_11DW = 0x5,
++	MLX5_IFC_RTC_STE_FORMAT_RANGE = 0x7,
++};
++
++enum mlx5_ifc_rtc_reparse_mode {
++	MLX5_IFC_RTC_REPARSE_NEVER = 0x0,
++	MLX5_IFC_RTC_REPARSE_ALWAYS = 0x1,
++	MLX5_IFC_RTC_REPARSE_BY_STC = 0x2,
++};
++
++#define MLX5_IFC_RTC_LINEAR_LOOKUP_TBL_LOG_MAX 16
++
++struct mlx5_ifc_rtc_bits {
++	u8 modify_field_select[0x40];
++	u8 reserved_at_40[0x40];
++	u8 update_index_mode[0x2];
++	u8 reparse_mode[0x2];
++	u8 num_match_ste[0x4];
++	u8 pd[0x18];
++	u8 reserved_at_a0[0x9];
++	u8 access_index_mode[0x3];
++	u8 num_hash_definer[0x4];
++	u8 update_method[0x1];
++	u8 reserved_at_b1[0x2];
++	u8 log_depth[0x5];
++	u8 log_hash_size[0x8];
++	u8 ste_format_0[0x8];
++	u8 table_type[0x8];
++	u8 ste_format_1[0x8];
++	u8 reserved_at_d8[0x8];
++	u8 match_definer_0[0x20];
++	u8 stc_id[0x20];
++	u8 ste_table_base_id[0x20];
++	u8 ste_table_offset[0x20];
++	u8 reserved_at_160[0x8];
++	u8 miss_flow_table_id[0x18];
++	u8 match_definer_1[0x20];
++	u8 reserved_at_1a0[0x260];
++};
++
++enum mlx5_ifc_stc_action_type {
++	MLX5_IFC_STC_ACTION_TYPE_NOP = 0x00,
++	MLX5_IFC_STC_ACTION_TYPE_COPY = 0x05,
++	MLX5_IFC_STC_ACTION_TYPE_SET = 0x06,
++	MLX5_IFC_STC_ACTION_TYPE_ADD = 0x07,
++	MLX5_IFC_STC_ACTION_TYPE_REMOVE_WORDS = 0x08,
++	MLX5_IFC_STC_ACTION_TYPE_HEADER_REMOVE = 0x09,
++	MLX5_IFC_STC_ACTION_TYPE_HEADER_INSERT = 0x0b,
++	MLX5_IFC_STC_ACTION_TYPE_TAG = 0x0c,
++	MLX5_IFC_STC_ACTION_TYPE_ACC_MODIFY_LIST = 0x0e,
++	MLX5_IFC_STC_ACTION_TYPE_CRYPTO_IPSEC_ENCRYPTION = 0x10,
++	MLX5_IFC_STC_ACTION_TYPE_CRYPTO_IPSEC_DECRYPTION = 0x11,
++	MLX5_IFC_STC_ACTION_TYPE_ASO = 0x12,
++	MLX5_IFC_STC_ACTION_TYPE_TRAILER = 0x13,
++	MLX5_IFC_STC_ACTION_TYPE_COUNTER = 0x14,
++	MLX5_IFC_STC_ACTION_TYPE_ADD_FIELD = 0x1b,
++	MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_STE_TABLE = 0x80,
++	MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_TIR = 0x81,
++	MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_FT = 0x82,
++	MLX5_IFC_STC_ACTION_TYPE_DROP = 0x83,
++	MLX5_IFC_STC_ACTION_TYPE_ALLOW = 0x84,
++	MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_VPORT = 0x85,
++	MLX5_IFC_STC_ACTION_TYPE_JUMP_TO_UPLINK = 0x86,
++};
++
++enum mlx5_ifc_stc_reparse_mode {
++	MLX5_IFC_STC_REPARSE_IGNORE = 0x0,
++	MLX5_IFC_STC_REPARSE_NEVER = 0x1,
++	MLX5_IFC_STC_REPARSE_ALWAYS = 0x2,
++};
++
++struct mlx5_ifc_stc_ste_param_ste_table_bits {
++	u8 ste_obj_id[0x20];
++	u8 match_definer_id[0x20];
++	u8 reserved_at_40[0x3];
++	u8 log_hash_size[0x5];
++	u8 reserved_at_48[0x38];
++};
++
++struct mlx5_ifc_stc_ste_param_tir_bits {
++	u8 reserved_at_0[0x8];
++	u8 tirn[0x18];
++	u8 reserved_at_20[0x60];
++};
++
++struct mlx5_ifc_stc_ste_param_table_bits {
++	u8 reserved_at_0[0x8];
++	u8 table_id[0x18];
++	u8 reserved_at_20[0x60];
++};
++
++struct mlx5_ifc_stc_ste_param_flow_counter_bits {
++	u8 flow_counter_id[0x20];
++};
++
++enum {
++	MLX5_ASO_CT_NUM_PER_OBJ = 1,
++	MLX5_ASO_METER_NUM_PER_OBJ = 2,
++	MLX5_ASO_IPSEC_NUM_PER_OBJ = 1,
++	MLX5_ASO_FIRST_HIT_NUM_PER_OBJ = 512,
++};
++
++struct mlx5_ifc_stc_ste_param_execute_aso_bits {
++	u8 aso_object_id[0x20];
++	u8 return_reg_id[0x4];
++	u8 aso_type[0x4];
++	u8 reserved_at_28[0x18];
++};
++
++struct mlx5_ifc_stc_ste_param_ipsec_encrypt_bits {
++	u8 ipsec_object_id[0x20];
++};
++
++struct mlx5_ifc_stc_ste_param_ipsec_decrypt_bits {
++	u8 ipsec_object_id[0x20];
++};
++
++struct mlx5_ifc_stc_ste_param_trailer_bits {
++	u8 reserved_at_0[0x8];
++	u8 command[0x4];
++	u8 reserved_at_c[0x2];
++	u8 type[0x2];
++	u8 reserved_at_10[0xa];
++	u8 length[0x6];
++};
++
++struct mlx5_ifc_stc_ste_param_header_modify_list_bits {
++	u8 header_modify_pattern_id[0x20];
++	u8 header_modify_argument_id[0x20];
++};
++
++enum mlx5_ifc_header_anchors {
++	MLX5_HEADER_ANCHOR_PACKET_START = 0x0,
++	MLX5_HEADER_ANCHOR_MAC = 0x1,
++	MLX5_HEADER_ANCHOR_FIRST_VLAN_START = 0x2,
++	MLX5_HEADER_ANCHOR_IPV6_IPV4 = 0x07,
++	MLX5_HEADER_ANCHOR_ESP = 0x08,
++	MLX5_HEADER_ANCHOR_TCP_UDP = 0x09,
++	MLX5_HEADER_ANCHOR_TUNNEL_HEADER = 0x0a,
++	MLX5_HEADER_ANCHOR_INNER_MAC = 0x13,
++	MLX5_HEADER_ANCHOR_INNER_IPV6_IPV4 = 0x19,
++	MLX5_HEADER_ANCHOR_INNER_TCP_UDP = 0x1a,
++	MLX5_HEADER_ANCHOR_L4_PAYLOAD = 0x1b,
++	MLX5_HEADER_ANCHOR_INNER_L4_PAYLOAD = 0x1c
++};
++
++struct mlx5_ifc_stc_ste_param_remove_bits {
++	u8 action_type[0x4];
++	u8 decap[0x1];
++	u8 reserved_at_5[0x5];
++	u8 remove_start_anchor[0x6];
++	u8 reserved_at_10[0x2];
++	u8 remove_end_anchor[0x6];
++	u8 reserved_at_18[0x8];
++};
++
++struct mlx5_ifc_stc_ste_param_remove_words_bits {
++	u8 action_type[0x4];
++	u8 reserved_at_4[0x6];
++	u8 remove_start_anchor[0x6];
++	u8 reserved_at_10[0x1];
++	u8 remove_offset[0x7];
++	u8 reserved_at_18[0x2];
++	u8 remove_size[0x6];
++};
++
++struct mlx5_ifc_stc_ste_param_insert_bits {
++	u8 action_type[0x4];
++	u8 encap[0x1];
++	u8 inline_data[0x1];
++	u8 reserved_at_6[0x4];
++	u8 insert_anchor[0x6];
++	u8 reserved_at_10[0x1];
++	u8 insert_offset[0x7];
++	u8 reserved_at_18[0x1];
++	u8 insert_size[0x7];
++	u8 insert_argument[0x20];
++};
++
++struct mlx5_ifc_stc_ste_param_vport_bits {
++	u8 eswitch_owner_vhca_id[0x10];
++	u8 vport_number[0x10];
++	u8 eswitch_owner_vhca_id_valid[0x1];
++	u8 reserved_at_21[0x5f];
++};
++
++union mlx5_ifc_stc_param_bits {
++	struct mlx5_ifc_stc_ste_param_ste_table_bits ste_table;
++	struct mlx5_ifc_stc_ste_param_tir_bits tir;
++	struct mlx5_ifc_stc_ste_param_table_bits table;
++	struct mlx5_ifc_stc_ste_param_flow_counter_bits counter;
++	struct mlx5_ifc_stc_ste_param_header_modify_list_bits modify_header;
++	struct mlx5_ifc_stc_ste_param_execute_aso_bits aso;
++	struct mlx5_ifc_stc_ste_param_remove_bits remove_header;
++	struct mlx5_ifc_stc_ste_param_insert_bits insert_header;
++	struct mlx5_ifc_set_action_in_bits add;
++	struct mlx5_ifc_set_action_in_bits set;
++	struct mlx5_ifc_copy_action_in_bits copy;
++	struct mlx5_ifc_stc_ste_param_vport_bits vport;
++	struct mlx5_ifc_stc_ste_param_ipsec_encrypt_bits ipsec_encrypt;
++	struct mlx5_ifc_stc_ste_param_ipsec_decrypt_bits ipsec_decrypt;
++	struct mlx5_ifc_stc_ste_param_trailer_bits trailer;
++	u8 reserved_at_0[0x80];
++};
++
++enum {
++	MLX5_IFC_MODIFY_STC_FIELD_SELECT_NEW_STC = BIT(0),
++};
++
++struct mlx5_ifc_stc_bits {
++	u8 modify_field_select[0x40];
++	u8 reserved_at_40[0x46];
++	u8 reparse_mode[0x2];
++	u8 table_type[0x8];
++	u8 ste_action_offset[0x8];
++	u8 action_type[0x8];
++	u8 reserved_at_a0[0x60];
++	union mlx5_ifc_stc_param_bits stc_param;
++	u8 reserved_at_180[0x280];
++};
++
++struct mlx5_ifc_ste_bits {
++	u8 modify_field_select[0x40];
++	u8 reserved_at_40[0x48];
++	u8 table_type[0x8];
++	u8 reserved_at_90[0x370];
++};
++
++struct mlx5_ifc_definer_bits {
++	u8 modify_field_select[0x40];
++	u8 reserved_at_40[0x50];
++	u8 format_id[0x10];
++	u8 reserved_at_60[0x60];
++	u8 format_select_dw3[0x8];
++	u8 format_select_dw2[0x8];
++	u8 format_select_dw1[0x8];
++	u8 format_select_dw0[0x8];
++	u8 format_select_dw7[0x8];
++	u8 format_select_dw6[0x8];
++	u8 format_select_dw5[0x8];
++	u8 format_select_dw4[0x8];
++	u8 reserved_at_100[0x18];
++	u8 format_select_dw8[0x8];
++	u8 reserved_at_120[0x20];
++	u8 format_select_byte3[0x8];
++	u8 format_select_byte2[0x8];
++	u8 format_select_byte1[0x8];
++	u8 format_select_byte0[0x8];
++	u8 format_select_byte7[0x8];
++	u8 format_select_byte6[0x8];
++	u8 format_select_byte5[0x8];
++	u8 format_select_byte4[0x8];
++	u8 reserved_at_180[0x40];
++	u8 ctrl[0xa0];
++	u8 match_mask[0x160];
++};
++
++struct mlx5_ifc_arg_bits {
++	u8 rsvd0[0x88];
++	u8 access_pd[0x18];
++};
++
++struct mlx5_ifc_header_modify_pattern_in_bits {
++	u8 modify_field_select[0x40];
++
++	u8 reserved_at_40[0x40];
++
++	u8 pattern_length[0x8];
++	u8 reserved_at_88[0x18];
++
++	u8 reserved_at_a0[0x60];
++
++	u8 pattern_data[MLX5_MAX_ACTIONS_DATA_IN_HEADER_MODIFY * 8];
++};
++
++struct mlx5_ifc_create_rtc_in_bits {
++	struct mlx5_ifc_general_obj_in_cmd_hdr_bits hdr;
++	struct mlx5_ifc_rtc_bits rtc;
++};
++
++struct mlx5_ifc_create_stc_in_bits {
++	struct mlx5_ifc_general_obj_in_cmd_hdr_bits hdr;
++	struct mlx5_ifc_stc_bits stc;
++};
++
++struct mlx5_ifc_create_ste_in_bits {
++	struct mlx5_ifc_general_obj_in_cmd_hdr_bits hdr;
++	struct mlx5_ifc_ste_bits ste;
++};
++
++struct mlx5_ifc_create_definer_in_bits {
++	struct mlx5_ifc_general_obj_in_cmd_hdr_bits hdr;
++	struct mlx5_ifc_definer_bits definer;
++};
++
++struct mlx5_ifc_create_arg_in_bits {
++	struct mlx5_ifc_general_obj_in_cmd_hdr_bits hdr;
++	struct mlx5_ifc_arg_bits arg;
++};
++
++struct mlx5_ifc_create_header_modify_pattern_in_bits {
++	struct mlx5_ifc_general_obj_in_cmd_hdr_bits hdr;
++	struct mlx5_ifc_header_modify_pattern_in_bits pattern;
++};
++
++struct mlx5_ifc_generate_wqe_in_bits {
++	u8 opcode[0x10];
++	u8 uid[0x10];
++	u8 reserved_at_20[0x10];
++	u8 op_mode[0x10];
++	u8 reserved_at_40[0x40];
++	u8 reserved_at_80[0x8];
++	u8 pdn[0x18];
++	u8 reserved_at_a0[0x160];
++	u8 wqe_ctrl[0x80];
++	u8 wqe_gta_ctrl[0x180];
++	u8 wqe_gta_data_0[0x200];
++	u8 wqe_gta_data_1[0x200];
++};
++
++struct mlx5_ifc_generate_wqe_out_bits {
++	u8 status[0x8];
++	u8 reserved_at_8[0x18];
++	u8 syndrome[0x20];
++	u8 reserved_at_40[0x1c0];
++	u8 cqe_data[0x200];
++};
++
++enum mlx5_access_aso_opc_mod {
++	ASO_OPC_MOD_IPSEC = 0x0,
++	ASO_OPC_MOD_CONNECTION_TRACKING = 0x1,
++	ASO_OPC_MOD_POLICER = 0x2,
++	ASO_OPC_MOD_RACE_AVOIDANCE = 0x3,
++	ASO_OPC_MOD_FLOW_HIT = 0x4,
++};
++
++enum {
++	MLX5_IFC_MODIFY_FLOW_TABLE_MISS_ACTION = BIT(0),
++	MLX5_IFC_MODIFY_FLOW_TABLE_RTC_ID = BIT(1),
++};
++
++enum {
++	MLX5_IFC_MODIFY_FLOW_TABLE_MISS_ACTION_DEFAULT = 0,
++	MLX5_IFC_MODIFY_FLOW_TABLE_MISS_ACTION_GOTO_TBL = 1,
++};
++
++struct mlx5_ifc_alloc_packet_reformat_out_bits {
++	u8 status[0x8];
++	u8 reserved_at_8[0x18];
++
++	u8 syndrome[0x20];
++
++	u8 packet_reformat_id[0x20];
++
++	u8 reserved_at_60[0x20];
++};
++
++struct mlx5_ifc_dealloc_packet_reformat_in_bits {
++	u8 opcode[0x10];
++	u8 reserved_at_10[0x10];
++
++	u8 reserved_at_20[0x10];
++	u8 op_mod[0x10];
++
++	u8 packet_reformat_id[0x20];
++
++	u8 reserved_at_60[0x20];
++};
++
++struct mlx5_ifc_dealloc_packet_reformat_out_bits {
++	u8 status[0x8];
++	u8 reserved_at_8[0x18];
++
++	u8 syndrome[0x20];
++
++	u8 reserved_at_40[0x40];
++};
++
++#endif /* MLX5_PRM_H_ */
 -- 
 2.46.0
 
