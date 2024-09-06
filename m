@@ -1,118 +1,93 @@
-Return-Path: <netdev+bounces-125997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C614796F826
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:26:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE9496F863
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:36:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82C86286577
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:26:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34DB61F261AA
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615A91D2F49;
-	Fri,  6 Sep 2024 15:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F039C1D2F53;
+	Fri,  6 Sep 2024 15:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QeClO6xR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qfQYEv35"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4044D322A;
-	Fri,  6 Sep 2024 15:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B68381C2;
+	Fri,  6 Sep 2024 15:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725636398; cv=none; b=LnWofJZu8fJGT9riAr7VHLxCPxKvn1oEPawivYBzktelm1loBD6Y6j5rJccbfZlF2DzGQ5OvLhReFzBVcEYDTmKC4jKDvFN3PevzqVTygOm7Ctd+HFkM8xmI2qUQs6JlvhAkDL2Q1gVLuUv/OYwP8chWvBd1mbYEEHIAUMGICqk=
+	t=1725636977; cv=none; b=haPfjuTqhEMrCSK3z0WpAEge1tJXAR2iznwPqp6fGqhj5pOU2xn/yNOaAiI+AYdhYYv9yNSQBs4DzOJWQo7kVHzTRGpd2/WcvKoVOvelsTI1KbE6ZHbAyr8eB35mif2QKjywZgNJo4+aEDeHYK+SxF/gCrXdj1+fM0ATkZZrXak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725636398; c=relaxed/simple;
-	bh=3SqYXY+ttX9zVf2l5mvEVVWweoGMYIlR2Fv7fTMsMW0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Qgg7s8N4Sf8EFWITKFmn22j3zLeTqatHw9hVgWNEnomzdG87CYR56MMgNjPdMZHbOBLQ4qgIFhATqateK3Sft55lFEgJIsklzD3i0xLP6WZsfXUsFdq4tZdCA7+omBOrN1RKQBh74TJMEOwh+h8IKA2R6QqEfAu4VsAb6sKKNYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QeClO6xR; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-45677965a3cso8092801cf.0;
-        Fri, 06 Sep 2024 08:26:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725636395; x=1726241195; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5nzvaSWcAbtxqvKF0O7voRzmbalLmJD9rsb8jJ0QDK0=;
-        b=QeClO6xRJiXWg7zFWTmQQOV857Ufu8gMrc8VPZhgzTvELuySb/bUFuuYKXQw5mTIV3
-         hVhE/vlrYrjthWe86jFALyHXfCfgg+vw70DpLtM0oRXWLN0tcmFDNZzxoNXWc2yn2y/q
-         lezhGXg1bY/rpjF6vapKdxnR7Zt4asdoN7paSWhcIGT7pz7eVNJqH//HTW2I6vw7CFTK
-         fiHosBInAK254/EkraLxlGFlSEvXEzrr4rXf+2NG5JVCiwxW+ldz9EwpT8XDi9l4nLep
-         PR5PMAL9ZxpK21sr0k6CTTlYQU2omChIylme6qmUZtTKgLqe/kpRUFwimPndhd96H74K
-         Hebw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725636395; x=1726241195;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5nzvaSWcAbtxqvKF0O7voRzmbalLmJD9rsb8jJ0QDK0=;
-        b=LqPy4+QeOQqdFMrD3ZfIBtSdk0hiZx7kZqH+Qh9fnOo72fkqB97KzvI8SXsi1AwHqR
-         2F3qEMzUDbAxUHTV2jiBsd0w1PY8b668rEBC5LU263MyndXzjedGLAG57hwGcyUCdDVk
-         NXKVNCrgu7j0bUMydcILH+RfvA6DCQLmRDbvAeFdu0KrZSs/geDJFJ6OUgMb1SBrV8Nb
-         G08HwPK3e4DLUD6/Sss0UPkT2ZT34QqN5TCcPd7nYswjW5hRUS+uy8W68lF5GfY2znU1
-         tTVTXO/L3RV8E/0BoCCtKOf6IsnvTDbZFp/YSbflsGEaiF4g7FrgC+HwvqNHf36BVDhG
-         jH8g==
-X-Forwarded-Encrypted: i=1; AJvYcCVZsJlKhFb1j9OhpaqgEKNy/SZA6B0ABJNmywg3/Zk1fC1PKoAiwKl4raIm0jeH1PUsGTI0HdY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw387qvU5QBN43qRsED9UswQ4BwhiPmcA04pzT/rLbWzkUKFwDl
-	+XJGL+NIJX4TDbWUpjReUKYkBL8XRZe+/wwyj3Psn6ADXgB1bBwk
-X-Google-Smtp-Source: AGHT+IHVNLgTNOINZS7RppykF6OYjCvNw5LiyvtApGsvHtKz988FR6GHmBclChZ8wl/9ty2gQcu36A==
-X-Received: by 2002:ac8:465a:0:b0:456:7fb1:cc60 with SMTP id d75a77b69052e-4567fb1cc93mr276834641cf.0.1725636394966;
-        Fri, 06 Sep 2024 08:26:34 -0700 (PDT)
-Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45801a15441sm16970101cf.19.2024.09.06.08.26.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 08:26:34 -0700 (PDT)
-Date: Fri, 06 Sep 2024 11:26:34 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- shuah@kernel.org, 
- willemb@google.com
-Cc: linux-kselftest@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <66db1f2a40965_29a385294eb@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240906095706.77636-1-kerneljasonxing@gmail.com>
-References: <20240906095706.77636-1-kerneljasonxing@gmail.com>
-Subject: Re: [PATCH net-next] net-timestamp: correct the use of
- SOF_TIMESTAMPING_RAW_HARDWARE
+	s=arc-20240116; t=1725636977; c=relaxed/simple;
+	bh=vAhjjqS/0UsGP0/uvhAuky3LmJr6aC+upFMbT7xjyb4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MXCuf52LTwXemaVirjGUqUtkah0l3QWEe0Jl8FcuPZWaoi66/gCpWmSybADb5gOBEz1MYpoV5bRvfLbSJQ0MxuA//R4eB3EYssLEldJK+FRUB6LuqZ8mo/fJPcGYwDwGj7CIeJrMGCEnZTiaSA438xCBGRJby1PgM+0BxTmffVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qfQYEv35; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2+WKnimQsFK+zPHj0woFi2wVgy2O5JuFVOmn7XkTkkU=; b=qfQYEv35Z3VUkqaxdQnUv9wiPC
+	pKwPXc5k6BJ5VJebF1gCcOsEdBDQO8HTbfJrM2nErSS73/dyuBpisdSXMSussKD5pD8KcV+iPRNV5
+	NnnCtvGmdWaflNEw5pAZS5tOAghMvSvSNEAKoHfOdjJa5CrbYVZ67HkJlwyyrgxQ07hc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1smb0I-006q2q-3a; Fri, 06 Sep 2024 17:36:06 +0200
+Date: Fri, 6 Sep 2024 17:36:06 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, yuehaibing@huawei.com,
+	linux-kernel@vger.kernel.org, petrm@nvidia.com
+Subject: Re: [PATCH net-next 1/2] net: ethtool: Add new parameters and a
+ function to support EPL
+Message-ID: <970ef9b1-609b-4137-a76f-315c99fbf112@lunn.ch>
+References: <20240906055700.2645281-1-danieller@nvidia.com>
+ <20240906055700.2645281-2-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240906055700.2645281-2-danieller@nvidia.com>
 
-Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> SOF_TIMESTAMPING_RAW_HARDWARE is a report flag which passes the
-> timestamps generated by either SOF_TIMESTAMPING_TX_HARDWARE or
-> SOF_TIMESTAMPING_RX_HARDWARE to the userspace all the time.
-> 
-> So let us revise the doc here.
-> 
-> Link: Link: https://lore.kernel.org/all/66d8c21d3042a_163d93294cb@willemb.c.googlers.com.notmuch/
+> +/* For accessing the EPL field on page 9Fh, the allowable length extension is
+> + * min(i, 255) byte octets where i specifies the allowable additional number of
+> + * byte octets in a READ or a WRITE.
+> + */
+> +u32 ethtool_cmis_get_max_epl_size(u8 num_of_byte_octs)
+> +{
+> +	return 8 * (1 + min_t(u8, num_of_byte_octs, 255));
+> +}
 
-nit: duplicate keyword
+Does this get mapped to a 255 byte I2C bus transfer?
 
-> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
+https://elixir.bootlin.com/linux/v6.11-rc6/source/drivers/net/phy/sfp.c#L218
 
-indeed
+/* SFP_EEPROM_BLOCK_SIZE is the size of data chunk to read the EEPROM
+ * at a time. Some SFP modules and also some Linux I2C drivers do not like
+ * reads longer than 16 bytes.
+ */
+#define SFP_EEPROM_BLOCK_SIZE	16
 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+If an SMBUS is being used, rather than I2C, there is a hard limit of
+32 bytes in a message transfer.
+
+I've not looked in details at these patches, but maybe you need a
+mechanism to ask the hardware or I2C driver what it can actually do?
+Is it possible to say LPL is the only choice?
+
+	Andrew
 
