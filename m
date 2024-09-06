@@ -1,123 +1,141 @@
-Return-Path: <netdev+bounces-125758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A185B96E788
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:08:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74A9096E796
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:11:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F3262858A9
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:08:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E2141C22EA3
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E9E1EA87;
-	Fri,  6 Sep 2024 02:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C392209F;
+	Fri,  6 Sep 2024 02:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAyePER7"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="AL7SFQw/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3521FDD;
-	Fri,  6 Sep 2024 02:07:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A93208A4
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 02:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725588477; cv=none; b=eDFQZ7fL2e+lPYS3RksPvALcTXlkGco6Tm84LLnfv09HNa/VKdMMehbfyFOqZK6xYij+SAquG13oD+raTBcpQfPcKx2d8C3zLtAj4aZL1rU3rCxDMvsVGUUNYHDG4wFdfRTMTCW8KwCBdnAXv0fB70JnXHoSqhIBezoAcK1WbUU=
+	t=1725588657; cv=none; b=m0DwOHGvdnG2nIONZc5t7X2TBFn/+kCE1RBcIVH7dRRkGxqIhdi37gclZg3WrtQBWGFoLZpC0dd3km3tNfIrLeP8j2TJdvSakUNBFH/6AwR3En3Uh2yJOYBe2r7jMxXkZZ+j5x/HKgw42o9i0YiTBptEizfCWN9m4H1gQBm9pJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725588477; c=relaxed/simple;
-	bh=G3RD5XQamkVeBHQcYiQTep5rnKF4dLumAIVt+qMHUH0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OkNf1L7ArsMtxfCA6HwUxK8H8cOBzsa9h3HX6ohPCGW6YM8fKG+8PC/HpyBT7q47wkzMKcdKj02ob6QNpCJzbodCLdGjCNKA6c75F516xkXZDj8FZ2rI/imZ+RVXeAyRW24GxpUd5qBTLu9hYo27IJ1hpDqYJfamKRJcubOCwtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CAyePER7; arc=none smtp.client-ip=209.85.160.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-2780827dbafso831636fac.1;
-        Thu, 05 Sep 2024 19:07:55 -0700 (PDT)
+	s=arc-20240116; t=1725588657; c=relaxed/simple;
+	bh=2E7Umks8wXQUo5OoAJfXfZ/E5X7wq5YaMefduwHtqmc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M2EJvYKPibPWT0R8lbFK96aDf1xjVC3tllPKhNaEOqvy4oSp4fZE+7yRm74Ddv1Mtoo9nEXpOB3pS1AZVwgEtjm96F+/6LhOgDbpKH/Di1k9eob6rMPiLMqPFPFp8WUKCHlL6c+TdbaOfAt85xpxOQp4+5H38xGAaK5V0rYRB+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=AL7SFQw/; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso11023685e9.1
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 19:10:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725588475; x=1726193275; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=AeC92OzPOF04P7yDZQ2JHlD1fZIv0s85Rx86Vrq4KtI=;
-        b=CAyePER7weS138tnCpFjS+8skwcBKwHjdSA+tDHT8/4E+OmAlxOC17FNF+F+1Z3pb9
-         FZ7VKv2EApZR0CSdMETtapn5Vf+CVlQbg7pprwUQJOEZA/0rMvqURfcDauRhwnHe/PUu
-         VjbzLv2fUm1ZV9g2xWNi+dINJbQEt44cIBlQKTApBvMr2Uih/MA2H1BFvLtOWM0p2+5k
-         e763mRjo6qach4romktbYwsHJbqkhrFTTtqTr+xXygBQDY5Qu457GxJnoz6Gar8iyvdl
-         /skLBmoPIAFxICQFc/n0MaW7YOVCesLESOJp053tozmyky6g1+nIZl0umlxuw5OUySsC
-         FnJA==
+        d=suse.com; s=google; t=1725588653; x=1726193453; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=dAvARZINz4vJQ8c0Q/MMgM2aRtDQKyDIrx0VwPcsgnw=;
+        b=AL7SFQw/7xv1QvTBilP2BILhW6P1cFMTqQiNCvUwROUBMrj94QKiAjioPffvImQgJL
+         ZpxdVhJs+dWKSvXGuvun/9vocTgTlZm+SGD8fNOH1VjGHjwDuFrz4zwVSsyBtnvPLWB/
+         +bwNTe7aUX7eoz2k0Us9eEALQyAX2kgJyyZjGC2bI1EuKel7Qo+7Ws4I+qZrGDiC2/JT
+         Guhb5IR93bG7i6fBNf/zKMiOOVjzsV7NsgZbjALpjjSAI9MzyFtlAErE7eDAl8JYD6Cv
+         EMLAJaKE5NfB2Ze8TArZWuO5sGmIHT2k2xl98atPfSLcYWse5sPCiFOTOn0oOw5hY4f7
+         m+Og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725588475; x=1726193275;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AeC92OzPOF04P7yDZQ2JHlD1fZIv0s85Rx86Vrq4KtI=;
-        b=eczUWRyMlHFzcg935a/VfZWdPnfhm9h2SUE/UFUwDWvKlGRU+y7kkdrYlCGLJtKTnY
-         xjZoAx4Xl90h8IAvwy4smmIvqAiz5cMx8kDaH7nLwLEbDvh8DMmW+dwJ+QrFyhHX/XZw
-         hG92xeVSrFfLuc7c7ub3Pbb6cGnTjxWDlt3nDzENYVU9NAtKhytC4gse7i1ttOra1HSW
-         PGA1Q2DINwIUxPOtG7pJdS8c1HY1vtTGaqlStRUoafHtOhZhd58UO+9Y9Dn1CpgLkIfY
-         Y4QWkTnKPo24gie0k0HRkHQroUEwSU1QmLzfTu/Z4tNXMmTZ6cvEPsM8IAGLn7CKoZYv
-         4snQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXXw+i1IV9QixrNF7KDldpgFklhVAmOUdsX6uG5zvFS2ZlO6U3ey2OQPxIuPXw3iu8a7zhvB0I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykFn1bP/p9l9i/Xrxu1UpuD7oOIlxpuZjEkWAo/qdspdksgWKZ
-	wTeZNZ8wjxpG++QDrW2sRAz77WElnFUYhloDr0LvkV3StmyoEUYn
-X-Google-Smtp-Source: AGHT+IE5lL8vWanXpVdAqd5nAMCzSCNWoQXLQirWfj6KhOqzo5yDXYo3VsUUeJIHnFOD1bwYRJhiyA==
-X-Received: by 2002:a05:6870:6111:b0:260:e3fa:ab8d with SMTP id 586e51a60fabf-27b82fb7833mr1510068fac.37.1725588475088;
-        Thu, 05 Sep 2024 19:07:55 -0700 (PDT)
-Received: from macbook-pro-49.dhcp.thefacebook.com ([2620:10d:c090:400::5:959])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d4fbd85b36sm3936927a12.4.2024.09.05.19.07.53
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 05 Sep 2024 19:07:54 -0700 (PDT)
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@kernel.org
-Subject: [GIT PULL] bpf for v6.11-rc7
-Date: Thu,  5 Sep 2024 19:07:50 -0700
-Message-Id: <20240906020750.13732-1-alexei.starovoitov@gmail.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+        d=1e100.net; s=20230601; t=1725588653; x=1726193453;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dAvARZINz4vJQ8c0Q/MMgM2aRtDQKyDIrx0VwPcsgnw=;
+        b=daMpn7lPQ1DLkebRajRb4P3ZqIkB5qoWn3aGzze6BCcqRzppVXHDXOPfYyDSUrGMEw
+         8a325al2OrGJmhdyyZAEL7DxDkFpESaI8Svgqc7SVeJBF0Sew8tq9Cu3EWd80Rs0dBz9
+         Mq0KDtBXCPYrA97TBwhy9yPsfVr/Gypkp2Za11V/Alsh8hknyGai1Y+SxvgaRq6Rd/mP
+         b+xty568+9brsDWaUoV3r/p7R5v0sGr3SmPd+SIbr1Zg5GP6C1YB6nsvGBCxMhz2GuCP
+         b/Rj6UFfdTafg0MT1n0EdGCUVASyn+XsrJBPfVcKFA1ryZnM98l+zusRyYKw/03nXb3p
+         bYvg==
+X-Forwarded-Encrypted: i=1; AJvYcCWxR1OlnG/CODrpCMM31leHnJxp7n8501SXsmjjn9ST57iURxNBCrsXVvjl/kGfTTibfjQ9r5o=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxG68DLurmKcP7fos9j56n01vBuHLlQH1EjTCO0R5IRXSZclBnr
+	9gfxC6qjjTZ6W/zEahblz/gie0aIPqYXGT1RdOZrY2f2VyHJTF4NtOzjReDcD2w=
+X-Google-Smtp-Source: AGHT+IFjmciqCusWNY5Mnsq94uColtksFwX4WGKvTbnvpcRTzIUgwHdV7sDbQD63Er44q1qv/Z99rA==
+X-Received: by 2002:a05:6000:781:b0:374:c56c:fbc7 with SMTP id ffacd0b85a97d-378895ca924mr625193f8f.15.1725588653187;
+        Thu, 05 Sep 2024 19:10:53 -0700 (PDT)
+Received: from u94a (39-10-10-202.adsl.fetnet.net. [39.10.10.202])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ced2de5f52sm3891880173.44.2024.09.05.19.10.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 19:10:52 -0700 (PDT)
+Date: Fri, 6 Sep 2024 10:10:40 +0800
+From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
+To: Matt Bobrowski <mattbobrowski@google.com>
+Cc: Eduard Zingerman <eddyz87@gmail.com>, bpf@vger.kernel.org, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	David Vernet <void@manifault.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH bpf-next] bpf: use type_may_be_null() helper for
+ nullable-param check
+Message-ID: <u33xtqql46ppe2ebqj7u26so4b7my6ebsdeoxdb6kn57ygbniq@3vmbbct3hphm>
+References: <20240905055233.70203-1-shung-hsi.yu@suse.com>
+ <ZtllCZOrO9b-MDtE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZtllCZOrO9b-MDtE@google.com>
 
-Hi Linus,
+On Thu, Sep 05, 2024 at 08:00:09AM GMT, Matt Bobrowski wrote:
+> On Thu, Sep 05, 2024 at 01:52:32PM +0800, Shung-Hsi Yu wrote:
+[...]
+> > --- a/net/bpf/bpf_dummy_struct_ops.c
+> > +++ b/net/bpf/bpf_dummy_struct_ops.c
+> > @@ -115,7 +115,7 @@ static int check_test_run_args(struct bpf_prog *prog, struct bpf_dummy_ops_test_
+> >  
+> >  		offset = btf_ctx_arg_offset(bpf_dummy_ops_btf, func_proto, arg_no);
+> >  		info = find_ctx_arg_info(prog->aux, offset);
+> > -		if (info && (info->reg_type & PTR_MAYBE_NULL))
+> > +		if (info && type_may_be_null(info->reg_type))
+> 
+> Maybe as part of this clean up, we should also consider replacing all
+> the open-coded & PTR_MAYBE_NULL checks with type_may_be_null() which
+> we have sprinkled throughout kernel/bpf/verifier.c?
 
-The following changes since commit 872cf28b8df9c5c3a1e71a88ee750df7c2513971:
+Agree we should. Usage like this could be replaced
 
-  Merge tag 'platform-drivers-x86-v6.11-4' of git://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86 (2024-08-22 06:34:27 +0800)
+	if (ptr_reg->type & PTR_MAYBE_NULL) {
+		verbose(env, "R%d pointer arithmetic on %s prohibited, null-check it first\n",
+			dst, reg_type_str(env, ptr_reg->type));
+		return -EACCES;
+	}
 
-are available in the Git repository at:
+OTOH replacing & PTR_MAYBE_NULL here probably won't help improve
+clarity.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-6.11-rc7
+	if (base_type(arg->arg_type) == ARG_PTR_TO_BTF_ID) {
+		reg->type = PTR_TO_BTF_ID;
+		if (arg->arg_type & PTR_MAYBE_NULL)
+			reg->type |= PTR_MAYBE_NULL;
+		if (arg->arg_type & PTR_UNTRUSTED)
+			reg->type |= PTR_UNTRUSTED;
+		if (arg->arg_type & PTR_TRUSTED)
+			reg->type |= PTR_TRUSTED;
+		...
 
-for you to fetch changes up to 5390f315fc8c9b9f48105a0d88b56bc59fa2b3e0:
+For such case we might need to introduce another helper (bitwise-OR
+between enum bpf_type_flag should be free of compiler warning).
 
-  Merge branch 'bpf-fix-incorrect-name-check-pass-logic-in-btf_name_valid_section' (2024-09-04 12:35:04 -0700)
+	reg->type = type_flag_apply(PTR_TO_BTF_ID, arg->arg_type,
+								PTR_MAYBE_NULL | PTR_UNTRUSTED | PTR_TRUSTED);
 
-----------------------------------------------------------------
-- Fix crash when btf_parse_base() returns an error
-  from Martin Lau.
-
-- Fix out of bounds access in btf_name_valid_section()
-  from Jeongjun Park.
-
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'bpf-fix-incorrect-name-check-pass-logic-in-btf_name_valid_section'
-
-Jeongjun Park (2):
-      bpf: add check for invalid name in btf_name_valid_section()
-      selftests/bpf: Add a selftest to check for incorrect names
-
-Martin KaFai Lau (1):
-      bpf: Fix a crash when btf_parse_base() returns an error pointer
-
- kernel/bpf/btf.c                             |  6 +++--
- tools/testing/selftests/bpf/prog_tests/btf.c | 34 ++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+), 2 deletions(-)
+WDYT?
 
