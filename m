@@ -1,114 +1,112 @@
-Return-Path: <netdev+bounces-125906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F3F96F36A
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:45:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B17E296F384
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:48:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF74C1C2406E
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:45:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EC33281065
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:48:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407F31CBEA9;
-	Fri,  6 Sep 2024 11:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21CEA1CBE82;
+	Fri,  6 Sep 2024 11:48:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SA+ykTYL"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wmr+/n+O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6AB41CC8AC;
-	Fri,  6 Sep 2024 11:45:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E28D1C9EB7;
+	Fri,  6 Sep 2024 11:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725623121; cv=none; b=e5b8AkIsX/Zfr58hdt0pnDBG3r5v/O5OgrP1rWCu5j3uYjFPVvgmDkK7Q5YawGBeWS4dX8LrzMFsAjkaSkzeDZYdVG86/kQMzlXe7fkAKAZkPQ4ZygKtKQmHdQNKt9yo+N4nUA698GwWLDwl67Km5kTmjU5mdRWnP/D2bOyYCE8=
+	t=1725623318; cv=none; b=Q8aHLRrYn1LWyLyxUJESHO+Rus5YYwq5ecHanjD6ZSYDOSaVooiq/jg8f59x0a50ZNb9RplL2nSg/wA2TIkaWtNf48sMW16XUmQeTfmF82a+5ttemEI8+auf4DfXDabtxRZZ1J5hzHHS2SXcTsBTUBVCuxcvctwgdFxKWus/9Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725623121; c=relaxed/simple;
-	bh=YY4MtiQuuKv/dti/LA9N8tzXF134v6ZTEYYwdq+qm1o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lObBG+4QH0OZ7k3DSe8G+JwAOPRn6JTuueL4rDOu58AQwW4JRzA1RruDE4bdqXGL66EpfY5n76BhjB4G0NEzo5aNDn9SHqsLUqNUJVfEXZuhzQrPQzMMTgwTEcjog1whA4u9U075Z79uJy/SesiBMOMjoVWsNc+gR4szbraNhvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SA+ykTYL; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2d892997913so1344237a91.3;
-        Fri, 06 Sep 2024 04:45:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725623119; x=1726227919; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+Yzdn5+N47S5X8EdWk3yRUVLRKJefl6EeZW9B6Vfe9I=;
-        b=SA+ykTYLiENWBmtUdWLHVGO8GLXxqe88zLDIED9NQxtti+AAhbPQ473sLpJDKVK6mu
-         ovWgMK+EkYAN++DXidvY+Ga6tlw6IOMdGXjyBiP6xhQXJ7eDggZOZsjph0qdk0gYbmHp
-         MUzwAEHHtTSGgrb4FceD0q0GI0jGIHoG5+7evl/OJNf1/VT5d4WlFDvMqJIYDMydlR9X
-         CPB9LW4fQk6BkebvAigXzXZD7T4HZz1j4/UoH6vXPU2ioq29c/+IjvAYBS9oc/+THVi5
-         7+W+/irk46PAl3qY7idypIumvXEZf7TVdMWZCMKSTU2vVGV4q+n6J0Bt2UYD3luH8rZI
-         nSdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725623119; x=1726227919;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+Yzdn5+N47S5X8EdWk3yRUVLRKJefl6EeZW9B6Vfe9I=;
-        b=wZ5dH3WgycMB6DWLsulHShKLwD2YzmgYLDhDI8aLIrcj/kooB+SElnUYzYoaPzUqa1
-         eeJVW1PnDkbx/70Z4mT9cFl5uqZjCsp6gbHvGmjd0ave3B+l7zpGlrn4uq9v48exNreR
-         yUUDlt3HmqHlEQnsyjtt7P9L+c2Z3QdSkRbXR9363J5dI8fvoUHZurr6+87c7gXcVYpG
-         VXNz1p6jAiAGYfiWV/IZ745B47U6m1svrkkZOOFgP9lhVHarNCWoqZ4/m9+I6wuaz+5K
-         RqzSnNXHapwTGYi0wFgT6oyHYzrmppYLHDGg/b57iAKftF7SfZ5nDJwT9/RZmRIOSUQk
-         dYcA==
-X-Forwarded-Encrypted: i=1; AJvYcCU/MmqI6J9zP7ueM1TrJbSr/OplnItBOhJP5kE336K3O12ntxNqc4TKMcxUlQH3/wExag4q7w1J@vger.kernel.org, AJvYcCUSaQmzflEDDldv28vMng4y8k9VHBG7qos5ilT/hdvYVlpbQB08DJbTZFucDBSWK/1DKw6+KlnCuBSxhSY=@vger.kernel.org, AJvYcCVwIkktgld367JoAsafm5Qc/qqBrNoSvCDchcY7jpRIY/bFDFydq3GdIA1/NqZeHzVccg9XquxixnBAfJiWSpI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCs+h41M7+aZJ+4Hqr43FLVGJvNcir1KWNcKswYh/vQCg7l1s2
-	sOVkM3YwaApI4T00jVTFM1+v3fOKEohkIYIPxi7kMnWa1A+92qhM
-X-Google-Smtp-Source: AGHT+IHtiadvt77afRob9xTeuiDrcLZqDawkb4qmubVc0QiWBcneaNZ1k9gG4k+8aX1n+myXC+Plew==
-X-Received: by 2002:a17:90a:c702:b0:2cb:50fa:b01e with SMTP id 98e67ed59e1d1-2dad512cb05mr2397950a91.41.1725623119006;
-        Fri, 06 Sep 2024 04:45:19 -0700 (PDT)
-Received: from dev.. ([129.41.59.4])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dadc12bcd5sm1330297a91.53.2024.09.06.04.45.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 04:45:18 -0700 (PDT)
-From: Rohit Chavan <roheetchavan@gmail.com>
-To: Johannes Berg <johannes@sipsolutions.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Rohit Chavan <roheetchavan@gmail.com>
-Subject: [PATCH] lib80211: Use ERR_CAST() to return
-Date: Fri,  6 Sep 2024 17:14:55 +0530
-Message-Id: <20240906114455.730559-1-roheetchavan@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1725623318; c=relaxed/simple;
+	bh=boRqGurXA5pXpB6tT0GBMpD4KtA+S4FzluXv/sX46/o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VeHkf+zb/IGJ4QmAF8E2TLBzV38LGgX2aK/zZlNdmoNNJfDY9Ti7Vn6xFr/PPVn442ETzciHPtXPdwUS+lTG9M+ogiDT3QjtyBp1vszFrZZt9eLJYl2+XsK4PsBtqeSK8G6E+AWVK7w/f1NNgPe2jBTOy36hVauu6eWCuOudWCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wmr+/n+O; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2ivheLk9PpJPW/IdL7OqFA2vAw2jy/QidjUHNBBy73Q=; b=wmr+/n+Oyvf9at8tSA3CQ4BQKI
+	10sZjPHNbZam3Z4pYoZV2hSaGuwVAxOEPZ+ZAlqN2MTUk9RoRChlUZ1Ri+JN4Q+V00yCuwyGLe2Nm
+	tNayxKGlaPnxLp8izAs7qngg563X0M3MnDHgV1eT9FSFiIuPr9TotXcN5G67N0pbQ0t8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1smXRu-006ndk-LP; Fri, 06 Sep 2024 13:48:22 +0200
+Date: Fri, 6 Sep 2024 13:48:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: =?utf-8?B?5Zue6KaGOiBbUEFUQ0g=?= =?utf-8?Q?=5D?= net: ftgmac100:
+ Enable TX interrupt to avoid TX timeout
+Message-ID: <18cfef9e-2ae7-44b6-bfd6-2fe0bba7fbb5@lunn.ch>
+References: <20240904103116.4022152-1-jacky_chou@aspeedtech.com>
+ <80f1cd36-c806-4e09-9eac-a70891f50323@lunn.ch>
+ <SEYPR06MB51345FBC0146F1517B36584B9D9E2@SEYPR06MB5134.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SEYPR06MB51345FBC0146F1517B36584B9D9E2@SEYPR06MB5134.apcprd06.prod.outlook.com>
 
-Using ERR_CAST() is more reasonable and safer, When it is necessary
-to convert the type of an error pointer and return it.
+On Fri, Sep 06, 2024 at 01:57:56AM +0000, Jacky Chou wrote:
+> Hello,
+> 
+> When I am verifying iperf3 over UDP, the network hangs.
+> Like the log below.
+> 
+> root# iperf3 -c 192.168.100.100 -i1 -t10 -u -b0
+> Connecting to host 192.168.100.100, port 5201
+> [  4] local 192.168.100.101 port 35773 connected to 192.168.100.100 port 5201
+> [ ID] Interval           Transfer     Bandwidth       Total Datagrams
+> [  4]   0.00-20.42  sec   160 KBytes  64.2 Kbits/sec  20
+> [  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
+> [  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
+> [  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
+> [  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
+> [  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
+> [  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
+> [  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
+> [  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
+> [  4]  20.42-20.42  sec  0.00 Bytes  0.00 bits/sec  0
+> - - - - - - - - - - - - - - - - - - - - - - - - -
+> [ ID] Interval           Transfer     Bandwidth       Jitter    Lost/Total
+> Datagrams
+> [  4]   0.00-20.42  sec   160 KBytes  64.2 Kbits/sec  0.000 ms  0/20 (0%)
+> [  4] Sent 20 datagrams
+> iperf3: error - the server has terminated The network topology is FTGMAC
+> connects directly to a PC. UDP does not need to wait for ACK, unlike TCP.
+> Therefore, FTGMAC needs to enable TX interrupt to release TX resources instead
+> of waiting for the RX interrupt.
 
-Signed-off-by: Rohit Chavan <roheetchavan@gmail.com>
+Please don't top post.
+
+So this does seem like a fix. Please read through:
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+You need a Fixes: tag, CC: stable tag, use the correct tree, etc.
+
+    Andrew
+
 ---
- net/wireless/lib80211.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/wireless/lib80211.c b/net/wireless/lib80211.c
-index d66a913027e0..87c0e09aa676 100644
---- a/net/wireless/lib80211.c
-+++ b/net/wireless/lib80211.c
-@@ -227,7 +227,7 @@ EXPORT_SYMBOL(lib80211_get_crypto_ops);
- 
- static void *lib80211_crypt_null_init(int keyidx)
- {
--	return (void *)1;
-+	return ERR_CAST(1);
- }
- 
- static void lib80211_crypt_null_deinit(void *priv)
--- 
-2.34.1
-
+pw-bot: cr
 
