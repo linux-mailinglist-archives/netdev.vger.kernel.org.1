@@ -1,107 +1,91 @@
-Return-Path: <netdev+bounces-125750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7A1196E6E5
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:39:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C181796E725
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 03:14:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51AD4B23A27
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 00:39:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 777981F219DC
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 01:14:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88B3CDDC3;
-	Fri,  6 Sep 2024 00:38:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 364FD1799F;
+	Fri,  6 Sep 2024 01:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VSFgat6k"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v9pEJT8m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647551401B
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 00:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5535E17BA3
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 01:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725583139; cv=none; b=bBC/xzrIH7w8zRyvypbXO38cPPHx3e4JbvsIvxYn4MNP/SSZOF+kUx8WUZ+VkY63R8UWJTwJP0az/85UOUPNREzTkGYpgHoa+10Vumzhmv3C4nodf5E2gzs3daZ17Fv60e9vnHYmYvKnOUIeO4RW8BywHVep+mQ9uqA0i/GNCzk=
+	t=1725585239; cv=none; b=dkm2nnS/QbtTBMdtyLVR/e1CjLloIYDI2wdh6EPGgQpX5QTnwSehSNQUtbDu8AorvSLtaWPoPpKwDtlz8EsgYI7SMjnP9T93xPjG6SpQimUUPmosdRsksuIGd3KS9DSfh8cConoOLMnkEXLzNEH791C+dI1w5+9NeTkKE9HzC6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725583139; c=relaxed/simple;
-	bh=BH+49kMVLlx3IWeDXgymiFy41FRYwFsqSDTA91+J6GQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AaYRLoKogtBqbQAafEhLxJ4Ls8SAbU6BLYFAkuUCQSar3Yt2bA2CEWGftRwnYFd6wibfjxijV7TtXceEXEzdELCI1TY/W/b9ucKKYLR+/Ta49RT5xUQH0M7r6Z3vbXuufPP6LHAFoq/8LG5fVYvYxGt9kCz+zf68uy+zSk+Jnzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VSFgat6k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E7BAC4CEC5;
-	Fri,  6 Sep 2024 00:38:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725583138;
-	bh=BH+49kMVLlx3IWeDXgymiFy41FRYwFsqSDTA91+J6GQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VSFgat6kKmFqfFTVXg82SnYYPBxVM7Hs1Rt+FMIrZOF0KnDWvtlkCrjQb+OkykltZ
-	 XWh70txb/KkK8Cn4+/YvJmphR5ClhTb67UGjd56miR0+WB/74+N1JJ9Uldd55lY8r/
-	 uVUjek7N3bzc7cQDhzZVrISKnEG0EF9DZjFwAYW6eiUIyp8UyfPEf/XRDIqFLglRcR
-	 uSqUi3Z3YkMRU7oAt2oczMis68VHXyYK8IjVLRLG+Y9mNMt9IMPUv8RBQRz9cn+T8q
-	 g72eEAn+tpYWWu0o2NIajGvervfJkJs4e+kQkg5NN/xO3htDss0IQDqx/uIHfypugk
-	 FQhrtOsxe6A5Q==
-Date: Thu, 5 Sep 2024 17:38:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, edumazet@google.com
-Subject: Re: [PATCH v6 net-next 02/15] netlink: spec: add shaper YAML spec
-Message-ID: <20240905173857.588f2578@kernel.org>
-In-Reply-To: <46484afd-7b50-465d-b763-0ac60201bd3d@redhat.com>
-References: <cover.1725457317.git.pabeni@redhat.com>
-	<a0585e78f2da45b79e2220c98e4e478a5640798b.1725457317.git.pabeni@redhat.com>
-	<20240904180330.522b07c5@kernel.org>
-	<d4a8d497-7ec8-4e8b-835e-65cc8b8066b6@redhat.com>
-	<20240905080502.3246e040@kernel.org>
-	<46484afd-7b50-465d-b763-0ac60201bd3d@redhat.com>
+	s=arc-20240116; t=1725585239; c=relaxed/simple;
+	bh=+40/PKcAluOFhthFyit1izNfoYiHHdYw1abpmwwERqc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ErNoWlQNjcHHE6B+yzJqWbef5Q41nO0Gl3Z6LzrI9qsci50mr/iSpVlRG8Vba3ml9800kJIlk0xNggYOnWt1o9iFZcyFNrXFredTcxfzad0OO54KANVGeqsTXgo/q0mrkFDtooaW1sL/EExtUiqrH/4t3YKEqJxCOo0FTU0CZ90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v9pEJT8m; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8ee6b7d3-71b7-4b66-aa49-26421d9c5b78@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725585235;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LzUdF+fiRFn6RgwFUtIzdarKamkAFDCW16qaVIlXx38=;
+	b=v9pEJT8msZi7N912djrtrxNn4xWjlap344gkT8Wy055Hw6Pmv1X9rRH20/faNByHSOHyZT
+	s2YxQ00sm6vAKLY6OGuZ6zdpUysrVHKm72pllzrRu/IO128qNXTh+h9lOWK9n3LIlsBBgA
+	vM+/DVdzTsJ51xWR+JVSoKqn8xrWvFU=
+Date: Thu, 5 Sep 2024 18:13:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH bpf-next v2 4/5] bpf: Allow bpf_dynptr_from_skb() for
+ tp_btf
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: bpf@vger.kernel.org, edumazet@google.com, rostedt@goodmis.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, mykolal@fb.com, shuah@kernel.org,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ thinker.li@gmail.com, juntong.deng@outlook.com, jrife@google.com,
+ alan.maguire@oracle.com, davemarchevsky@fb.com, dxu@dxuuu.xyz,
+ vmalik@redhat.com, cupertino.miranda@oracle.com, mattbobrowski@google.com,
+ xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20240905075622.66819-1-lulie@linux.alibaba.com>
+ <20240905075622.66819-5-lulie@linux.alibaba.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240905075622.66819-5-lulie@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 5 Sep 2024 18:17:42 +0200 Paolo Abeni wrote:
-> > I don't see example uses in the cover letter or the test so there's
-> > a good chance I'm missing something, but... why node_parent?
-> > The only thing you need to know about the parent is its handle,
-> > so just "parent", right?
-> > 
-> > Also why node_handle? Just "handle", and other attrs of the node can
-> > live in the main scope.  
+On 9/5/24 12:56 AM, Philo Lu wrote:
+> Making tp_btf able to use bpf_dynptr_from_skb(), which is useful for skb
+> parsing, especially for non-linear paged skb data. This is achieved by
+> adding KF_TRUSTED_ARGS flag to bpf_dynptr_from_skb and registering it
+> for TRACING progs. With KF_TRUSTED_ARGS, args from fentry/fexit are
+> excluded, so that unsafe progs like fexit/__kfree_skb are not allowed.
 > 
-> I added the 'node_' prefix in the list to stress that such attributes 
-> belong to the node.
-> 
-> In the yaml/command line will be only 'handle', 'parent'.
+> We also need the skb dynptr to be read-only in tp_btf. Because
+> may_access_direct_pkt_data() returns false by default when checking
+> bpf_dynptr_from_skb, there is no need to add BPF_PROG_TYPE_TRACING to it
+> explicitly.
 
-And the scope inside parent is 'handle', not subset of 'net-shaper'?
-Just to be 100% sure :)
+Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
 
-> > Unless you have a strong reason to do this to simplify the code -
-> > "from netlink perspective" it looks like unnecessary nesting.
-> > The operation arguments describe the node, there's no need to nest
-> > things in another layer.  
-> 
-> Ok, the code complexity should not change much. Side question: currently 
-> the node() operation allows specifying all the b/w related attributes 
-> for the 'node' shaper, should I keep them? (and move them in the main 
-> yaml scope)
-
-Up to you, I was surprised they were there (I expected @group to
-be solely about creation of the RR node, and rate limit would have
-to be set via a separate @set). But I don't expect providing rate 
-limit params in @group to be problematic and user space may find it
-convenient. So I'm neutral.
-
-And yes, they should sit directly at the message level, not in any
-nest.
 
