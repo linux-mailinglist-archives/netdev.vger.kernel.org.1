@@ -1,126 +1,149 @@
-Return-Path: <netdev+bounces-126002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5160796F89C
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:48:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44BE996F8A7
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:51:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE45A1F22E31
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:48:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03044281D5C
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45091D3193;
-	Fri,  6 Sep 2024 15:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Po2zFaQV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B26B1D31B3;
+	Fri,  6 Sep 2024 15:51:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1A971D2F65;
-	Fri,  6 Sep 2024 15:48:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395061D1F60
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 15:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725637702; cv=none; b=P6lGoaDXAAq+/khCcBsXTJQ6DoGNOZxk7LUOxrfJy6KbGhFVv6dkWXsAzzBTqQOdb4ch8RPMgWITEPfGqwOEYoZqwN4RuNaGvMKxSOilw52QWPuLNKfFaUxySJTXEwloMqbd1wnMuRgEJOKDudDN736Z9qFdNSOYD3TDcTLhAtk=
+	t=1725637873; cv=none; b=fy0uourTlLzv2de2nlhb/zBGQIVMieCfaTUL044gnPOwtbgh2orFzNF9tw63n0iI1yHrnw+vMTnOKGIgdcE0mSzuw2PJVOnt1LfUR6dMfqIF+f3cXdYRgHH5xrjFZgAlDgPR95bac3L99Pw7vy1tGYLFVdByZk0Zcj5QBZP1JN0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725637702; c=relaxed/simple;
-	bh=KmcM3UCxcc7R3t7reYXNQQgCkdkc8cBRJX7dLKQVRTk=;
+	s=arc-20240116; t=1725637873; c=relaxed/simple;
+	bh=qo8O1h2lAqqv1CX/RzBNtMvvKqsJQzhgLJn7r2wlNX4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QD5AjbdHUYGUAC7vCpin2w+VYH1+WYShotwDp/LH9SzdcJC3M3MLPAoQkeYh45cpqXtBxHVli7wCS4k1Qvk0Pr/kgvRN71YP6fqnx94oI0OFafp9zVJNyjAXbGK92UZhCWHd7OLM3hiNgWqqQWFYSz2tL9+bgxZRAzKXNH8y7DY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Po2zFaQV; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=QnV59Anz5y/x5uuidyf42ziLN+anSmW8b4PnB5tiUmg=; b=Po2zFaQVmZezwNAoU3m9YQ0bGD
-	WF8auzB1ZJ4+0AbVdTQqPDOVVLUoIYsdvX6qbYZlT2I9N2Af1azxdWZa8ZcFIqW2GwsSSxMvnGzjz
-	d4B+5hOL004jbS1d8FD3QYAepS1wOUAL2fwNf8HYQ/kvCOGmURF6PJqZRYV2s8OYqazY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1smbBw-006qC7-4j; Fri, 06 Sep 2024 17:48:08 +0200
-Date: Fri, 6 Sep 2024 17:48:08 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZLOF/2sLl1veqqKvYtjJLYhc+36lcCvDgQmphqWhT+elQcfKsPimn7vw58+sfKXAsEuNe0qSRA/LxdA3kGvhars+WoMXA+xULc9NdynF38zNKMXy8iO+Hv+D/NdhmA2149Y1faiyAwrHasUQI9Gv9r65ulr2GkeZBV43eMzwajg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1smbEb-0007zn-CX; Fri, 06 Sep 2024 17:50:53 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1smbEZ-005ysl-Jh; Fri, 06 Sep 2024 17:50:51 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1smbEZ-00A9vb-1b;
+	Fri, 06 Sep 2024 17:50:51 +0200
+Date: Fri, 6 Sep 2024 17:50:51 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: ftgmac100: Fix potential NULL dereference
- in error handling
-Message-ID: <6c60860b-dd3c-4d1c-945b-edb8ef6a8618@lunn.ch>
-References: <3f196da5-2c1a-4f94-9ced-35d302c1a2b9@stanley.mountain>
- <SEYPR06MB51342F3EC5D457CC512937259D9E2@SEYPR06MB5134.apcprd06.prod.outlook.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org
+Subject: Re: [PATCH v1] dt-bindings: net: ethernet-phy: Add
+ forced-master/slave properties for SPE PHYs
+Message-ID: <Ztsk23X_0p57KGSS@pengutronix.de>
+References: <20240906144905.591508-1-o.rempel@pengutronix.de>
+ <c08ac9b7-08e1-4cde-979c-ed66d4a252f1@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <SEYPR06MB51342F3EC5D457CC512937259D9E2@SEYPR06MB5134.apcprd06.prod.outlook.com>
+In-Reply-To: <c08ac9b7-08e1-4cde-979c-ed66d4a252f1@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, Sep 06, 2024 at 06:06:14AM +0000, Jacky Chou wrote:
-> Hello,
-> 
+On Fri, Sep 06, 2024 at 05:11:54PM +0200, Andrew Lunn wrote:
+> On Fri, Sep 06, 2024 at 04:49:05PM +0200, Oleksij Rempel wrote:
+> > Add two new properties, `forced-master` and `forced-slave`, to the
+> > ethernet-phy binding. These properties are intended for Single Pair
+> > Ethernet (1000/100/10Base-T1) PHYs, where each PHY and product may have
+> > a predefined link role (master or slave). Typically, these roles are set
+> > by hardware strap pins, but in some cases, device tree configuration is
+> > necessary.
 > > 
-> > We might not have a phy so we need to check for NULL before calling
-> > phy_stop(netdev->phydev) or it could lead to an Oops.
-> > 
-> > Fixes: e24a6c874601 ("net: ftgmac100: Get link speed and duplex for NC-SI")
-> > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 > > ---
-> >  drivers/net/ethernet/faraday/ftgmac100.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >  .../devicetree/bindings/net/ethernet-phy.yaml | 22 +++++++++++++++++++
+> >  1 file changed, 22 insertions(+)
 > > 
-> > diff --git a/drivers/net/ethernet/faraday/ftgmac100.c
-> > b/drivers/net/ethernet/faraday/ftgmac100.c
-> > index f3cc14cc757d..0e873e6f60d6 100644
-> > --- a/drivers/net/ethernet/faraday/ftgmac100.c
-> > +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-> > @@ -1565,7 +1565,8 @@ static int ftgmac100_open(struct net_device
-> > *netdev)
-> >  	return 0;
+> > diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> > index d9b62741a2259..af7a1eb6ceff6 100644
+> > --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> > +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> > @@ -158,6 +158,28 @@ properties:
+> >        Mark the corresponding energy efficient ethernet mode as
+> >        broken and request the ethernet to stop advertising it.
 > > 
-> >  err_ncsi:
-> > -	phy_stop(netdev->phydev);
-> > +	if (netdev->phydev)
-> > +		phy_stop(netdev->phydev);
-> When using " use-ncsi" property, the driver will register a fixed-link phy device and 
-> bind to netdev at probe stage.
+> > +  forced-master:
+> > +    $ref: /schemas/types.yaml#/definitions/flag
+> > +    description:
+> > +      If set, forces the PHY to operate as a master. This is used in Single Pair
+> > +      Ethernet (1000/100/10Base-T1) where each PHY and product has a predefined
+> > +      link role (master or slave). This property is board-specific, as the role
+> > +      is usually configured by strap pins but can be set through the device tree
+> > +      if needed.
+> > +      This property is mutually exclusive with 'forced-slave'; only one of them
+> > +      should be used.
 > 
-> if (np && of_get_property(np, "use-ncsi", NULL)) {
+> DT reviewers tend to complain about such mutually exclusive
+> properties.
+
+Yes, at this point i was uncertain.
+
+> What you are effectively adding is support for the ethtool:
 > 
-> 		......
+> ethtool -s [master-slave preferred-master|preferred-slave|forced-master|forced-slave]
+
+ack
+
+> 10Base-T1 often does not have autoneg, so preferred-master &
+> preferred-slave make non sense in this context, but i wounder if
+> somebody will want these later. An Ethernet switch is generally
+> preferred-master for example, but the client is preferred-slave.
+
+Good point.
+
+> Maybe make the property a string with supported values 'forced-master'
+> and 'forced-slave', leaving it open for the other two to be added
+> later.
 > 
-> 		phydev = fixed_phy_register(PHY_POLL, &ncsi_phy_status, NULL);
-> 		err = phy_connect_direct(netdev, phydev, ftgmac100_adjust_link,
-> 					 PHY_INTERFACE_MODE_MII);
-> 		if (err) {
-> 			dev_err(&pdev->dev, "Connecting PHY failed\n");
-> 			goto err_phy_connect;
-> 		}
-> } else if (np && of_phy_is_fixed_link(np)) {
-> 
-> Therefore, it does not need to check if the point is NULL in this error handling.
-> Thanks.
+> I've not seen the implementation yet, but i don't think there is much
+> driver specific here. We already have phydev->master_slave_set, it
+> just needs to be set from this property. Can it be done in phylib core
+> somewhere?
 
-Are you actually saying:
+Yes, this is the idea.
 
-        if (netdev->phydev) {
-                /* If we have a PHY, start polling */
-                phy_start(netdev->phydev);
-        }
-
-is wrong, it is guaranteed there is always a phydev?
-
-	Andrew
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
