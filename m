@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-125880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B40B96F1B2
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:39:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0144996F1BC
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:40:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 778011C21D52
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:39:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABE171F24AF8
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DD01C9ED4;
-	Fri,  6 Sep 2024 10:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B621CB121;
+	Fri,  6 Sep 2024 10:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="s5Cldfab"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="dEWC+apO"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1CC1C9ED1;
-	Fri,  6 Sep 2024 10:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28911CBEAB;
+	Fri,  6 Sep 2024 10:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725619168; cv=none; b=ux8/MZC1dMQoXWMfEHsD8eqmvcSTcfQIFkryzBxOiM9geJuzzG87tmR1biuuw0/OTmV/Dxh+PptpYnqXmDCr2Sn5KQvrmv2k80I18GzJMwBbQ86JFgeJw1wHEVk21OTW7imGwdOvtNnIAm3nn2kz5HJSmMP7On/qbhvaooUYYqk=
+	t=1725619181; cv=none; b=EPtTa6PSIFGGkxyWxZDO52gKtDT+1XpuReFvYZgn5iM68+fCYsNhpcOD5D38P/cwk/Hp+KW6yxGfEkA7xBTA66BfNDfPhFJsnwmMg2adUuT4J7XDvDse8wy/j2jPfslfV/q4ngyjMelsciS4f5O7iNHE1AzSda8NDAKqb8H5exQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725619168; c=relaxed/simple;
-	bh=CpsXDjd9quxqlikAHrshQgUPiYPUj11GTeo+qM8OKaw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ayLaklfutxMge76FW83moRc5nIyJ3vicKcVEknIhnzmTCMjE6rooBLoOC7QdSULhr5fo090yzYX1w+NncfiRGhgWy4X7yuxUdlEhh7eC39/OL6PJ6i4+F1ytdRTJH7tEQJDg8vBTHMVGbXJOX06DJXMHX3UOXQoepaxjM1CTmYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=s5Cldfab; arc=none smtp.client-ip=68.232.153.233
+	s=arc-20240116; t=1725619181; c=relaxed/simple;
+	bh=taYEXEmMXhEpcZ0wPw8bKsi37NUkqSkhfYtR1M2BIj4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TsbmeWYEIGZr607Ig/SkW8p0Wb7bApIcb/FH3CMo3mqPOMpEgcKo6YAw0gYZdl5svZePNXZGNZ8FAbOzGl37BJNczjjGPnlPoTnnJdotLHfSeDTC6yIxAIjnLS0bSQ8gr8CTjqO/BUoZ8MXhsLqPjIZskGBl7zgoBDrijuLyfNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=dEWC+apO; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725619166; x=1757155166;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=CpsXDjd9quxqlikAHrshQgUPiYPUj11GTeo+qM8OKaw=;
-  b=s5CldfabUUeaJOkLDT/bBKfBBG424SD37tB6rDJgxgCc3O505WrO4ohD
-   Vod0ji+202086oGSUtP87W90myFJ2lTTc/GbMvJJaqPQBtz3QORH76r2E
-   8Wyj7hCn/IxJ3YPLZ+UeSzPhKfu3O0W5sFG1XgqI95jvJ5uNIDI8HDopF
-   BOCjEXnutmHY/EFqVpwir1w6NRq0qMwzG37rKjmmNpbsZIGp0li6DpKec
-   +NDta7aGsqZw84SNE+klyWMNvMavvJOF744iKGMQo50HDkKTmOJITst36
-   YXx71fJdY9H2nDl5yrxf0wL2ryGA76gz8V0w2eiHX6W5DU/rRUzttUvnx
+  t=1725619180; x=1757155180;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=taYEXEmMXhEpcZ0wPw8bKsi37NUkqSkhfYtR1M2BIj4=;
+  b=dEWC+apO0FYXY/SYAVZ2ZuiIb8vMzS0Z08G/HpWxzvXsW3Q+0isb/I2W
+   Xg6uX1E9XSm34YtpXrUh97AGCukD6mJDhg26+MAlafdlEvtzwh6eP2fHx
+   V27xn2hR2VATfadlIx2Yi4foyWYAYwOCicy854V+J17w1jJosw6oIuytW
+   20ReVLUdGzfLDgax9gcee11fVTdVyIxDevznqu4Db1srjQvGHTqS3f8nk
+   vA4TQwNuHkoj1+880U3ci2r7Je/olOfHoU07TxbWNljZR8DK+MyiHaZnf
+   8LN43NU+kybDhdQ5jCqrwRZLsBn7fGT+3RK8uTBHE9fPmL3nWuW84ZPDW
    w==;
-X-CSE-ConnectionGUID: ARynwNKwTMmFStNWNTzFxw==
-X-CSE-MsgGUID: RKsHlUQ1SCucATRvq26xkw==
+X-CSE-ConnectionGUID: /K0mQpD6RVy4pnXmZmtNIA==
+X-CSE-MsgGUID: loAAYLJRRruY6o0KWjRV9g==
 X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
-   d="scan'208";a="34530670"
+   d="scan'208";a="262382067"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Sep 2024 03:39:24 -0700
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Sep 2024 03:39:39 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 6 Sep 2024 03:39:03 -0700
+ 15.1.2507.35; Fri, 6 Sep 2024 03:39:08 -0700
 Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 6 Sep 2024 03:38:58 -0700
+ 15.1.2507.35 via Frontend Transport; Fri, 6 Sep 2024 03:39:04 -0700
 From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <linux@armlinux.org.uk>, <kuba@kernel.org>,
@@ -65,10 +66,12 @@ CC: <davem@davemloft.net>, <linux@armlinux.org.uk>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>, <maxime.chevallier@bootlin.com>,
 	<linux-kernel@vger.kernel.org>, <horms@kernel.org>,
 	<UNGLinuxDriver@microchip.com>
-Subject: [PATCH net-next V6 0/5] Add support to PHYLINK for LAN743x/PCI11x1x chips
-Date: Fri, 6 Sep 2024 16:05:06 +0530
-Message-ID: <20240906103511.28416-1-Raju.Lakkaraju@microchip.com>
+Subject: [PATCH net-next V6 1/5] net: phylink: Add phylink_set_fixed_link() to configure fixed link state in phylink
+Date: Fri, 6 Sep 2024 16:05:07 +0530
+Message-ID: <20240906103511.28416-2-Raju.Lakkaraju@microchip.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240906103511.28416-1-Raju.Lakkaraju@microchip.com>
+References: <20240906103511.28416-1-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,78 +81,105 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-This is the follow-up patch series of
-https://lkml.iu.edu/hypermail/linux/kernel/2310.2/02078.html
+From: Russell King <linux@armlinux.org.uk>
 
-Divide the PHYLINK adaptation and SFP modifications into two separate patch
-series.
+The function allows for the configuration of a fixed link state for a given
+phylink instance. This addition is particularly useful for network devices that
+operate with a fixed link configuration, where the link parameters do not change
+dynamically. By using `phylink_set_fixed_link()`, drivers can easily set up
+the fixed link state during initialization or configuration changes.
 
-The current patch series focuses on transitioning the LAN743x driver's PHY
-support from phylib to phylink.
-
-Tested on PCI11010 Rev-1 Evaluation board
-
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: Russell King <linux@armlinux.org.uk>
+Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+---
 Change List:
 ============
 V5 -> V6:
-  - Remove the lan743x_find_max_speed( ) function. Not require
-  - Add EEE enable check before calling lan743x_mac_eee_enable( ) function
+  - No change
 V4 -> V5:
-  - Remove the fixed_phy_unregister( ) function. Not require 
-  - Remove the "phydev->eee_enabled" check to update the MAC EEE
-    enable/disable
-  - Call lan743x_mac_eee_enable() with true after update tx_lpi_timer.
-  - Add phy_support_eee() to initialize the EEE flags 
-V3 -> V4:
-  - Add fixed-link patch along with this series. 
-    Note: Note: This code was developed by Mr.Russell King
-    Ref: 
-    https://lore.kernel.org/netdev/LV8PR11MB8700C786F5F1C274C73036CC9F8E2@LV8PR11MB8700.namprd11.prod.outlook.com/T/#me943adf54f1ea082edf294aba448fa003a116815
-  - Change phylink fixed-link function header's string from "Returns" to
-    "Returns:" 
-  - Remove the EEE private variable from LAN743x adapter strcture and fix the
-    EEE's set/get functions
-  - set the individual caps (i.e. _RGMII, _RGMII_ID, _RGMII_RXID and
-    __RGMII_TXID) replace with phy_interface_set_rgmii( ) function
-  - Change lan743x_set_eee( ) to lan743x_mac_eee_enable( )
-
-V2 -> V3:
-  - Remove the unwanted parens in each of these if() sub-blocks 
-  - Replace "to_net_dev(config->dev)" with "netdev".
-  - Add GMII_ID/RGMII_TXID/RGMII_RXID in supported_interfaces
-  - Fix the lan743x_phy_handle_exists( ) return type
-
-V1 -> V2:
-  - Fix the Russell King's comments i.e. remove the speed, duplex update in 
-    lan743x_phylink_mac_config( )
-  - pre-March 2020 legacy support has been removed
-
+  - No change
+V4 :
+  - Add this patch along with "Add support to PHYLINK for LAN743x/PCI11x1x
+    chips" patch series
 V0 -> V1:
-  - Integrate with Synopsys DesignWare XPCS drivers
-  - Based on external review comments,
-  - Changes made to SGMII interface support only 1G/100M/10M bps speed
-  - Changes made to 2500Base-X interface support only 2.5Gbps speed
-  - Add check for not is_sgmii_en with is_sfp_support_en support
-  - Change the "pci11x1x_strap_get_status" function return type from void to
-    int
-  - Add ethtool phylink wol, eee, pause get/set functions
+  - Change phylink fixed-link function header's string from "Returns" to        
+    "Returns:" 
+  - Add fixed-link patch along with this series.                                
+    Note: Note: This code was developed by Mr.Russell King                      
+    Ref:                                                                        
+    https://lore.kernel.org/netdev/LV8PR11MB8700C786F5F1C274C73036CC9F8E2@LV8PR11MB8700.namprd11.prod.outlook.com/T/#me943adf54f1ea082edf294aba448fa003a116815
 
-Raju Lakkaraju (5):
-  net: phylink: Add phylink_set_fixed_link() to configure fixed link
-    state in phylink
-  net: lan743x: Create separate PCS power reset function
-  net: lan743x: Create separate Link Speed Duplex state function
-  net: lan743x: Migrate phylib to phylink
-  net: lan743x: Add support to ethtool phylink get and set settings
+ drivers/net/phy/phylink.c | 42 +++++++++++++++++++++++++++++++++++++++
+ include/linux/phylink.h   |  2 ++
+ 2 files changed, 44 insertions(+)
 
- drivers/net/ethernet/microchip/Kconfig        |   5 +-
- .../net/ethernet/microchip/lan743x_ethtool.c  | 123 ++--
- drivers/net/ethernet/microchip/lan743x_main.c | 646 +++++++++++-------
- drivers/net/ethernet/microchip/lan743x_main.h |   4 +
- drivers/net/phy/phylink.c                     |  42 ++
- include/linux/phylink.h                       |   2 +
- 6 files changed, 498 insertions(+), 324 deletions(-)
-
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index ab4e9fc03017..4309317de3d1 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1635,6 +1635,48 @@ static int phylink_register_sfp(struct phylink *pl,
+ 	return ret;
+ }
+ 
++/**
++ * phylink_set_fixed_link() - set the fixed link
++ * @pl: a pointer to a &struct phylink returned from phylink_create()
++ * @state: a pointer to a struct phylink_link_state.
++ *
++ * This function is used when the link parameters are known and do not change,
++ * making it suitable for certain types of network connections.
++ *
++ * Returns: zero on success or negative error code.
++ */
++int phylink_set_fixed_link(struct phylink *pl,
++			   const struct phylink_link_state *state)
++{
++	const struct phy_setting *s;
++	unsigned long *adv;
++
++	if (pl->cfg_link_an_mode != MLO_AN_PHY || !state ||
++	    !test_bit(PHYLINK_DISABLE_STOPPED, &pl->phylink_disable_state))
++		return -EINVAL;
++
++	s = phy_lookup_setting(state->speed, state->duplex,
++			       pl->supported, true);
++	if (!s)
++		return -EINVAL;
++
++	adv = pl->link_config.advertising;
++	linkmode_zero(adv);
++	linkmode_set_bit(s->bit, adv);
++	linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, adv);
++
++	pl->link_config.speed = state->speed;
++	pl->link_config.duplex = state->duplex;
++	pl->link_config.link = 1;
++	pl->link_config.an_complete = 1;
++
++	pl->cfg_link_an_mode = MLO_AN_FIXED;
++	pl->cur_link_an_mode = pl->cfg_link_an_mode;
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(phylink_set_fixed_link);
++
+ /**
+  * phylink_create() - create a phylink instance
+  * @config: a pointer to the target &struct phylink_config
+diff --git a/include/linux/phylink.h b/include/linux/phylink.h
+index 2381e07429a2..5c01048860c4 100644
+--- a/include/linux/phylink.h
++++ b/include/linux/phylink.h
+@@ -598,6 +598,8 @@ int phylink_fwnode_phy_connect(struct phylink *pl,
+ 			       const struct fwnode_handle *fwnode,
+ 			       u32 flags);
+ void phylink_disconnect_phy(struct phylink *);
++int phylink_set_fixed_link(struct phylink *,
++			   const struct phylink_link_state *);
+ 
+ void phylink_mac_change(struct phylink *, bool up);
+ void phylink_pcs_change(struct phylink_pcs *, bool up);
 -- 
 2.34.1
 
