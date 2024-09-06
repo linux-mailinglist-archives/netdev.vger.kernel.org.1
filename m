@@ -1,186 +1,210 @@
-Return-Path: <netdev+bounces-125846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB18196EED1
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:09:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C77A496EEE7
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:14:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 116921C20A34
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:09:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E498F1C23272
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA99D158DA9;
-	Fri,  6 Sep 2024 09:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1681C86F9;
+	Fri,  6 Sep 2024 09:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YFZZr+zM"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="mm4H4JqY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from AS8PR04CU009.outbound.protection.outlook.com (mail-westeuropeazon11011024.outbound.protection.outlook.com [52.101.70.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B2B21C7B68
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 09:09:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725613750; cv=none; b=umQF2EjF00NOqbAGaSyFcFvoYF9YzcQ9k88WPyX0N/bISgPKZy9yBmh8Cj/M/k8NROSICC02D2yVZeT3BV+XKbOKgpW3UlXxX/CVgJAnj7vChy0d4g3I8M88iSslFgXIEX1Q8pNXK7fIhKhbWp+a0UGe3vwCLaCN8hHwnEyng3I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725613750; c=relaxed/simple;
-	bh=kQnCn6UuRSmObUj2sDmdYIc+ehx2G6t88GoNv0oYrKQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PJTpg/6Vgzqq3gMnbPN5geKgbNEzbBa7YkgeapGHXIu47StpNjAyW42zJiFpeqDOo/V5Uf6LZfwvgCw+/YJX0r49DwdnvcOJSkGoGv0oZt+kvZnFsuhmKI1QrG4YtxjatLAkQIRN9drzA8tE4Jf9+q2n34lxf+wgd12bMeUh9jQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YFZZr+zM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725613747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=D24mRm5LrUYTcb7xHC0WCD/VrAupd5O09gSa9Wcuxe8=;
-	b=YFZZr+zMejmTvN8qfMvNv5TalZkKkz6cE3kI/YeOy5crxJUa8qWHtsTY709SHFOSQSwRzR
-	boBhph/iyC4DkE3wVvEBx1rhn/Tv+CakcJggr9L0SXcFCWiVX+FyVQIINPrLBLWHBwsUOz
-	fVDnBBg5H2kG4/FLXB3HFdj6aJhXA/4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-592-moZOo5QOPi-2g4Tt9hLSLQ-1; Fri, 06 Sep 2024 05:09:06 -0400
-X-MC-Unique: moZOo5QOPi-2g4Tt9hLSLQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-374b69e65e8so1116429f8f.0
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 02:09:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725613745; x=1726218545;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D24mRm5LrUYTcb7xHC0WCD/VrAupd5O09gSa9Wcuxe8=;
-        b=LDytcu4dwlEcf7ldBqGtFU6iK616wXtDX8zw6A/DeDf26WRfQXvQomN4cHI/bKa6ur
-         538Wig3LOAW1TBAdDgLDaW7sFyg93E5iJJ3cmHHW2aedjuhscvbcwjtz5/B+gFkJvXW3
-         DobIRJv8fRFVIwrh0nV0IPr3nbu/l0yQ1C7dd49hueD9F8wCTZQFoxDUWODcFGF9bmeK
-         0WjYaMgTzPeEYPY6Pk/h9UDTZTzb725v1VJ7dZAkwcI2+OpOaR8U5RPXPthd8M+KMuOn
-         U5STaMNwKuopVhYhmtXYkQKIFQNDvEZ+mWS0jA6HeheXkbFfiV4AKmE2O2wnS10uGmZE
-         xGOw==
-X-Gm-Message-State: AOJu0YzWFKCXMxCpwoyrSJ2qUmz9qcdha7ebnbyw2+FOUxRPO11gGpcQ
-	FkVG8Eyt7uNUuFOqw2nVzSHcwZmwT7TZbHnvWQ+UCGp8JXSo1l+7hLUL1012f5JApfMhBf27Q3D
-	6C8arMMPKITORV7nZs8a8IpA8WzJfPbPt1/oMg9ApAXcNB6SrMAJwSA==
-X-Received: by 2002:adf:edd2:0:b0:375:c4c7:c7ac with SMTP id ffacd0b85a97d-378896c8082mr1231866f8f.49.1725613745472;
-        Fri, 06 Sep 2024 02:09:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGMD4aX16S9LZGKe4EPTwXGfS6x36Rfr8HE2zqgzih2SEOtsrLoz+17HThNjBLPwX/BHpiRNA==
-X-Received: by 2002:adf:edd2:0:b0:375:c4c7:c7ac with SMTP id ffacd0b85a97d-378896c8082mr1231823f8f.49.1725613744555;
-        Fri, 06 Sep 2024 02:09:04 -0700 (PDT)
-Received: from redhat.com ([155.133.17.165])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374cbbc8281sm12225923f8f.64.2024.09.06.02.08.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 02:09:03 -0700 (PDT)
-Date: Fri, 6 Sep 2024 05:08:56 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, Si-Wei Liu <si-wei.liu@oracle.com>,
-	Darren Kenny <darren.kenny@oracle.com>
-Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
-Message-ID: <20240906045904-mutt-send-email-mst@kernel.org>
-References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
- <20240906044143-mutt-send-email-mst@kernel.org>
- <1725612818.815039-1-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C143D1C7B8A;
+	Fri,  6 Sep 2024 09:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.70.24
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725614074; cv=fail; b=J2/wzpKKc4H7qjtxFzvIbu7lG+stFq5+/fx2EK+fXV1LMaqGvFsi44JleJoupPwNyRe5LpuOEZk/tjigkM7iCDNb8yYCprkB6K1bUnaWKScpfq5TtgACoLqtetZsgeHVuNFlGlp8ayBLme7iLtVLQDeVfbno4adVTAgmwU3a6HQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725614074; c=relaxed/simple;
+	bh=EnGCcPY7NKXuzahU47QNNW5q7uXAZjuP4ogQhUbpPFw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=dTMepVCHKoxsQtJavZ3DuqY/s3Wmh0LF63QQoqij3l1b8A5qcdQBt79hi+nQrmQ8QCcy6c3glqZh6Bh+N0cMjbQLjXzBWdIPipc6F/pG21cqYZwz358p46ox3wm5VJwtg1/Shv9nuPsqNzaLZcID9oGZYMg7bmmgL9v2VKdphIw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=mm4H4JqY; arc=fail smtp.client-ip=52.101.70.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=cxl5LFViQnOwDnW34SbS2ogUwaZbgCAMUfAOOAtIz+Bi0OYOGO2CsnclAJbxGR3MoVG3grOARYNtenaaheJ5tmoqjrdNFHjyVQm7Y7n243fL/2Sj+IhVqJSf+dPn5l2+ebAsIv1ebrK+NALT5oqd8+KQoavRCzyHFpDLv2121i0U7fBi0eWZazBxJyTAC8WhyDc2PxcnFwhqOcKBpM+7AcIItpUAxyK2ml0erfaVbDRwR3HBK8hivCQt/I+Sj2qE3nRK9jFrbrWimk/Wn4hzKLdaOrABYAZvzT6yCLQCFWIpzNFAUjYsAZ30LTYdXVZW8f3hskMNXx7KisSSGQ09/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EnGCcPY7NKXuzahU47QNNW5q7uXAZjuP4ogQhUbpPFw=;
+ b=S5nzoWfn4DvAYszfRsn3rc491ShmPBcULFx9CpFiPojazJYYoaWob3Edsl+G2bFRujbcuQ5CLBRlrxiw/F/Alec5GqPjciEXFi0K9MxbcCTWrkHlJ/0DRozuDZEeU8+6FdInHSJireCD7umhf4N5o5gdbvlFusAy3Z6GZwLUzh9eRIAnkqoMtg7DFZNr7XyB6it9gTKVnJwL5cJkHe1ttnD7qrul0i7QQEQYqsoTzLQxPh/wHgHJYhjAsiAxDGEzmxX8ShIiBuMjjQ4QhijTItWa2xBrfc0mPMAH2m+deC+0I+hAakPKSoHjK1uFKzt4YxZXdP1DlLung9lCfkWL0w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EnGCcPY7NKXuzahU47QNNW5q7uXAZjuP4ogQhUbpPFw=;
+ b=mm4H4JqYVsTfs1ONDxD3T7+M4RaaSivteRiwX+zeNgs7DfhOaOarSyYOgKO81082PD2crMYfp30THjSWVquu45/wE1NaEfpLSaumsqpSzfZZhACOtSyeWuR5Qy/L+4ejBcp/NGxUu7BsXBHINXQjlo/u0ZCo5J0lnd5hY96WG5siJFdx9yZFd9DJMEmszR/DiXJpZBWhzq2ZQhgJorpWzirX621dXuIJEKF60teg+zk6pIShP7B6Ra8yPpx+K3TQoiBUGnNFUb+m8gc09cNczyPwst73h+YXd2SXkWhBIE3hNr0SMONPt3T2IHhN0LeO5jov0Mp8v88w5shnQdGn8Q==
+Received: from DB9PR04MB9259.eurprd04.prod.outlook.com (2603:10a6:10:371::5)
+ by GVXPR04MB11018.eurprd04.prod.outlook.com (2603:10a6:150:224::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27; Fri, 6 Sep
+ 2024 09:14:28 +0000
+Received: from DB9PR04MB9259.eurprd04.prod.outlook.com
+ ([fe80::dd45:32bc:a31f:33a4]) by DB9PR04MB9259.eurprd04.prod.outlook.com
+ ([fe80::dd45:32bc:a31f:33a4%4]) with mapi id 15.20.7939.017; Fri, 6 Sep 2024
+ 09:14:28 +0000
+From: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, Claudiu Manoil
+	<claudiu.manoil@nxp.com>, "alexandre.belloni@bootlin.com"
+	<alexandre.belloni@bootlin.com>, "UNGLinuxDriver@microchip.com"
+	<UNGLinuxDriver@microchip.com>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>, "michael@walle.cc"
+	<michael@walle.cc>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net] net: dsa: felix: ignore pending status of TAS module
+ when it's disabled
+Thread-Topic: [PATCH net] net: dsa: felix: ignore pending status of TAS module
+ when it's disabled
+Thread-Index: AQHa/rJKlXY1TBKTTUmTMzuG8nTqs7JHaG2AgAMSYHA=
+Date: Fri, 6 Sep 2024 09:14:28 +0000
+Message-ID:
+ <DB9PR04MB9259A724BCA28FA199B94E57F09E2@DB9PR04MB9259.eurprd04.prod.outlook.com>
+References: <20240904102722.45427-1-xiaoliang.yang_1@nxp.com>
+ <20240904101213.oqdf3brqlzzmgln5@skbuf>
+In-Reply-To: <20240904101213.oqdf3brqlzzmgln5@skbuf>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DB9PR04MB9259:EE_|GVXPR04MB11018:EE_
+x-ms-office365-filtering-correlation-id: 6dfc8cb4-545e-4b1b-304a-08dcce544f34
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?z9C82zs0ogj+kzKwHXlACER4AV3Y5CrUkPOxpIYuE5K3wGUBV3JLTFkyB8pp?=
+ =?us-ascii?Q?Vwue4sbR59NoxKxYEDFEe7QLBIXfLgtIxC4GCqQIX2BtHgju84ZB9hZ/Hbcz?=
+ =?us-ascii?Q?7lHze7zcXL1Eeir7SXfDtg8vg3xoJX8ZcAZFqTTx0kwzihC00TQthUMqodtq?=
+ =?us-ascii?Q?XoBwZBnILiLVAKiEFDslheuNzNeUPeoCK1dndy1/ZrzPkG5YQHeiJ7/yJUYM?=
+ =?us-ascii?Q?xBgE1TenUbgaKU9T2MHWgYUPtNLTDDJ5u7iD4roXg0eSIPtRvWW7wZp0Np5n?=
+ =?us-ascii?Q?4ZgKzPBaVWG0HP1475LvRcnLcZv0+ipEz69FWkHkMoXlcPKFO6khhX3udUa0?=
+ =?us-ascii?Q?t3mq5sNucYY/GiVLrHijr13rDa103tCGSjPKLG4lJ8PPHmtPPCuCMfviG901?=
+ =?us-ascii?Q?AnVy8W3VQiw6hE4E4OgZ4sdSXyVA6PjLuk0v7i/7Un7j9BDGXoGyUXfrtpm7?=
+ =?us-ascii?Q?+hqaXbA+VeFjsuLbz84ZzwSvq6CdPmqsICNbaMfe10D36VZQmO3CZzJ49mvh?=
+ =?us-ascii?Q?DL0WsySuFOr/Z805GRcw9VVzJsZWe5UMdyB+PwLuowCD9q5IDI0MDZKUHsoc?=
+ =?us-ascii?Q?dBBNTaMyEvLizrrAv0hJ5qzvObZXEECVoiheR8IrwgOWN7xfN8prCJf1rfU8?=
+ =?us-ascii?Q?ugHnhJvqHv30/ABqGYFHwL8b6YBMNkCdpeEKiId2nKgsIZLNo90NQf2cx7Cw?=
+ =?us-ascii?Q?Nsyc2A1eqBQWvP5Uj4l5t4APPWn0OGgN2o3M6MJvFdCxu9Ikl+AanoHDMJ5v?=
+ =?us-ascii?Q?z0zBt5bnzMRGFToQgG01QFFxjmYLJd8DZFwjr1r2N065wJ3yl34U5s3OZKvJ?=
+ =?us-ascii?Q?xvqDdb0DiVvTz5fkMcj2mU59t2LCxHgtuaK/wMzVSIwDxzYK5sh9HCR254/Z?=
+ =?us-ascii?Q?otjDQtEFmLfj7bc/GbmS7DUwgdqBtuqjyRv2fJJyBcR+/YZYuE2C64vxLgRo?=
+ =?us-ascii?Q?Q7rJysSY2U1x8TQhKD9VlkADGMxbtFyqTasktwkntD/xRaYtEAimRuGphKKQ?=
+ =?us-ascii?Q?zprJSiud84yk6Go3XJVVbal8Ibafk8HswmFpfX2fSxU8djlpRiSz8WDPI2JX?=
+ =?us-ascii?Q?0BGr6ZLAoLfPU/aRW5405bWi4GCpU1HedsDJW2CUoI69hlyiyRZgCorLmy51?=
+ =?us-ascii?Q?RB9XrPdQm8Td7O13f0ksHx3HTWOlnMO4Oue0xbPDmPpRRrd3T1tIrWv9E2nQ?=
+ =?us-ascii?Q?f16Xzp2w2Iumahd932ttJRRHqIjiz59CaWazuzkCH+BJOKvJIBc6jKJP/pRG?=
+ =?us-ascii?Q?X/Q+KK1zYkz8n3q5YbvdcN8LtaV6wWd4ve0nN0vnkBWwLCQzAXPzT0FZXFhq?=
+ =?us-ascii?Q?qmMnPYYfmxjW5mUSyRD8eBIcvUTwM1n7XhrnaejThFO9Pmi40PO+x7Tt8hwy?=
+ =?us-ascii?Q?TJVTC6bTyGmh1H4vjsv1J18OZodsowWWBwOuWVUVLNc1Lx0Neg=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR04MB9259.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?lQBamnmlzwPizRKlq/qhMF8cjasNM4KEoQfXfZrY3i5WWSD+yRC9kZ2hEydr?=
+ =?us-ascii?Q?RKi1DTtCTtTfbjJ74w1ro+U5ILESo2LW/15x5r4tWb3hv3q3K1BQRT3iF/Qc?=
+ =?us-ascii?Q?3HjmCEOPp9SoYhTwNv9XiPxh1P4nM/BKTKkCtTGkPfQW8cs5r/Jx34vweTFK?=
+ =?us-ascii?Q?2jOrmCH4afwky76dl54YZqem9okeCOJ2vwMqiiC4l7thocqV5YuQxoKTyvbA?=
+ =?us-ascii?Q?WEakGSAvSuRAWpIBmVAqezPB9qs53/8ASWityVEJfFvQZtJw44EncETDdZe0?=
+ =?us-ascii?Q?i9lUjBMPcfh//QI469g97l5mJeH92SLmJr4nYAAxE1l6MKxM8HeO26UTXaQT?=
+ =?us-ascii?Q?79E6CPSRUJKP6gz+GrtIs+haRNu2OQDhzeo9ZPiNwn+ljvTh3eeP7l4L4VV1?=
+ =?us-ascii?Q?6THi9EndbAm//OCaWVg0CuqL1Z2DaMAR84sbatJQmKheD4RuxNdIelvHDipg?=
+ =?us-ascii?Q?IjrKW24brzycdu5d1Vm/raKMNnHXymI7Ons3ssJe2ai+sxo6TTTfJjizYpKi?=
+ =?us-ascii?Q?p1yCYFksZdMfqx0OwQ7sE1Y1wMFAThIgkDtvVF+4gcPXy6sPfpDP7I8GqEgx?=
+ =?us-ascii?Q?A2wOA76j+BSVy58RM0zdzstYnV7ZpJKUdSUhQhQAuaUeXfVjT0ST/Nb2EkDU?=
+ =?us-ascii?Q?3AL1wjjn6IA0SiiuhcJDgwfr70RB1e2zyqSJiyCMlqDjlz1RLhDZzUU775OM?=
+ =?us-ascii?Q?zedKkpKuZJsD6cL/LDVbb97df0uux9jHoW80J32fySfdldmMgfgRHl1dawvG?=
+ =?us-ascii?Q?W/FVK+IMYYR7yMCih2OvSZ59zAfrdk7WBjwjYaoiQOmX5cZ4x6I1iTnQ+FkF?=
+ =?us-ascii?Q?eDN95oC5RZw67hAahTnUpQh71aLwhO+QbOlPkOw2MPp7eD2+9jgAtDNKT4cO?=
+ =?us-ascii?Q?43fG+nlZuIWYeAz5fafR6wDhEbKuTP42NXZ7hz1+cO3OXyaTqGrWhvXb3Cfv?=
+ =?us-ascii?Q?Hq36wQ3zeIpumeZTRbV8lnvHHqtmDBtOQgs1b04UK/WqYjCQp1RwM3Cdclro?=
+ =?us-ascii?Q?58gaQYJ9O89w/Kgg0dCvAsPFPLwK18Op/mbBAYT0HGWWAp0N+MDr6SUVg0iz?=
+ =?us-ascii?Q?s9wHgoGFsnYCyCJIsr/3nKI0oR+4sr9x/sppP7Jgwkpgp9VDdURkXUK6WWch?=
+ =?us-ascii?Q?164TBvZ4/GwvGbsjnuQ+FBWzRiMCt60ZSqx5vlGKZexlPzigiJbaANQSl/Hu?=
+ =?us-ascii?Q?nTj5NdIGqeWYEJYv2KXUPGC6z4B0jJGKihEx7qJvpB3tC3F3H8jzmw8/krwF?=
+ =?us-ascii?Q?vXttNPyXSjIAxdBCl0wp3bv6J7ueQNw2smXU0d9VWcKvrUDxYg5qegvL3Xif?=
+ =?us-ascii?Q?Yw32Qh6gqtrq4YdtZUgBJx1vjih6/72tIRvSQrZwaDH+peMYZoFl/NFocc43?=
+ =?us-ascii?Q?3EI4/7aCz+WmomU/O5k+fgVaQTSKh45Fp7KHwxjkZn6Oa0OVQmAop2MiJRaE?=
+ =?us-ascii?Q?EAA1Hw4fIki6wv2+Jlua8cxvGr9aeEnzVC7n95mSmHD/x9xKy6lAydO4TSQ4?=
+ =?us-ascii?Q?ekqGuUpMzUrfaCVW4klX59aTGV7EnymNwvtNumvQ+C6oHJnQqnitXKHTW3zW?=
+ =?us-ascii?Q?/BcWcGkkpBVij7mL9GIUc+KUzIwbZwRcQiN1RSJe?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1725612818.815039-1-xuanzhuo@linux.alibaba.com>
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR04MB9259.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6dfc8cb4-545e-4b1b-304a-08dcce544f34
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Sep 2024 09:14:28.1116
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VHrnzNuGpEc3YKRxvm1ZWltZZ7yEh+CBRCah9btpvpDVyUPrGmVVkd0bk1mC2KW4rb9S+njSxk6d0xdVchgAFEuu8fMAOooM9q6PzKT+baE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GVXPR04MB11018
 
-On Fri, Sep 06, 2024 at 04:53:38PM +0800, Xuan Zhuo wrote:
-> On Fri, 6 Sep 2024 04:43:29 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
-> > > leads to regression on VM with the sysctl value of:
-> > >
-> > > - net.core.high_order_alloc_disable=1
-> > >
-> > > which could see reliable crashes or scp failure (scp a file 100M in size
-> > > to VM):
-> > >
-> > > The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
-> > > of a new frag. When the frag size is larger than PAGE_SIZE,
-> > > everything is fine. However, if the frag is only one page and the
-> > > total size of the buffer and virtnet_rq_dma is larger than one page, an
-> > > overflow may occur. In this case, if an overflow is possible, I adjust
-> > > the buffer size. If net.core.high_order_alloc_disable=1, the maximum
-> > > buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
-> > > the first buffer of the frag is affected.
-> > >
-> > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
-> > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-> > > Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
-> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> >
-> >
-> > Guys where are we going with this? We have a crasher right now,
-> > if this is not fixed ASAP I'd have to revert a ton of
-> > work Xuan Zhuo just did.
-> 
-> I think this patch can fix it and I tested it.
-> But Darren said this patch did not work.
-> I need more info about the crash that Darren encountered.
-> 
-> Thanks.
+Hi Vladimir,
 
-So what are we doing? Revert the whole pile for now?
-Seems to be a bit of a pity, but maybe that's the best we can do
-for this release.
+Yes, it's a user-visible problem. User can't reconfigured Qbv once the TAS =
+is=20
+in pending status(configured the Qbv basetime as a future time). The driver=
+=20
+always returns busy. Actually Qbv can be reconfigured after it's disabled.=
+=20
+I update the commit to descript it and send in a new patch.
 
+Thanks,
+Xiaoliang
 
+> -----Original Message-----
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Sent: Wednesday, September 4, 2024 6:12 PM
+> To: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+> Cc: netdev@vger.kernel.org; davem@davemloft.net; kuba@kernel.org;
+> pabeni@redhat.com; Claudiu Manoil <claudiu.manoil@nxp.com>;
+> alexandre.belloni@bootlin.com; UNGLinuxDriver@microchip.com;
+> andrew@lunn.ch; f.fainelli@gmail.com; michael@walle.cc;
+> linux-kernel@vger.kernel.org
+> Subject: Re: [PATCH net] net: dsa: felix: ignore pending status of TAS mo=
+dule
+> when it's disabled
+>=20
+> Hi Xiaoliang,
+>=20
+> On Wed, Sep 04, 2024 at 06:27:22PM +0800, Xiaoliang Yang wrote:
+> > The TAS module could not be configured when it's running in pending
+> > status. We need disable the module and configure it again. However,
+> > the pending status is not cleared after the module disabled. So we
+> > don't need to check the pending status if TAS module is disabled.
 > >
-> >
-> > > ---
-> > >  drivers/net/virtio_net.c | 12 +++++++++---
-> > >  1 file changed, 9 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > index c6af18948092..e5286a6da863 100644
-> > > --- a/drivers/net/virtio_net.c
-> > > +++ b/drivers/net/virtio_net.c
-> > > @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
-> > >  	void *buf, *head;
-> > >  	dma_addr_t addr;
-> > >
-> > > -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
-> > > -		return NULL;
-> > > -
-> > >  	head = page_address(alloc_frag->page);
-> > >
-> > >  	dma = head;
-> > > @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
-> > >  	len = SKB_DATA_ALIGN(len) +
-> > >  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> > >
-> > > +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
-> > > +		return -ENOMEM;
-> > > +
-> > >  	buf = virtnet_rq_alloc(rq, len, gfp);
-> > >  	if (unlikely(!buf))
-> > >  		return -ENOMEM;
-> > > @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
-> > >  	 */
-> > >  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
-> > >
-> > > +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
-> > > +		return -ENOMEM;
-> > > +
-> > > +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
-> > > +		len -= sizeof(struct virtnet_rq_dma);
-> > > +
-> > >  	buf = virtnet_rq_alloc(rq, len + room, gfp);
-> > >  	if (unlikely(!buf))
-> > >  		return -ENOMEM;
-> > > --
-> > > 2.32.0.3.g01195cf9f
-> >
-
+> > Signed-off-by: Xiaoliang Yang <xiaoliang.yang_1@nxp.com>
+> > ---
+>=20
+> Does this fix a functional, user-visible problem? If so, which problem is=
+ that?
+> Could you describe it in the commit message? And maybe add a Fixes: tag t=
+o
+> the patch where the problem was first visible?
 
