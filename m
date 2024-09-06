@@ -1,145 +1,164 @@
-Return-Path: <netdev+bounces-125850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5DAF96EF05
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:23:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DF2E96EF4B
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C4551C220B7
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:23:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E44928AA1D
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877EC1C7B9F;
-	Fri,  6 Sep 2024 09:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7E61C86E6;
+	Fri,  6 Sep 2024 09:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h9D6y35q"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="YhzcC0mz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FD31C7B7E;
-	Fri,  6 Sep 2024 09:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76DFA19AD4F
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 09:32:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725614584; cv=none; b=Jm/NfGn1BRJGrERoQw+iQm6rVSkJLgAnL/ST+2ej7OwDx7e6Mv4zSGFnP4WCLV0p7tL1B8ljc4xlIo8Q4pgvKNtIF6v6HWNwLCLtlwS61OAKqCzj2DbfJZWClA4ipjjc1LAdWfPbLqPieU5Ka8ui90ESKXakmQaIJXVy4WGs6xA=
+	t=1725615139; cv=none; b=dSwiR5RS/8haU2JvbLa4r0GaR8QLXa/PDhx19UW1Bro+FQhctEJVM6z4q7mqIeBZvUZJ+rMKlFloQkulJWRolW/tVZhj+h7YnHlzy6JuoFzkbvW71oRERnuyFHyGHZsZkKDLWXO+VQ6VkdftlQ0C1ABK6d0zCiZZplOS0YC1EZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725614584; c=relaxed/simple;
-	bh=x6shILPiw+s+HzuV5rd+G3Nn5q8gSaTLiklStUFDP+o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cjQJcvAY+cG1fpjKtph6cHDmo9jf7RM96J2pXPd2v2tz9/EtICNNQVQm7z4QsCN4lM+ZHcX0i1TH3/ZjUNznPTITEytTcM77u/R6ITxiJOa62XGBd6VqDrfCHmWRnqjPzxPKjB4i7xis5DkCxk8ATLHITuiYrc3lTDrBqumNwMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h9D6y35q; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725614583; x=1757150583;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=x6shILPiw+s+HzuV5rd+G3Nn5q8gSaTLiklStUFDP+o=;
-  b=h9D6y35qK7gXcLK6+HjwbwPY3e3Cy36KrOAy7aLYn98ynjRlG36VgkmT
-   HjqaMTDdpc4L7PCFhabCZtcC+1sa9jdslqQumPbiXHV+DA+Tke1ZEcUMq
-   Jb04u3HYjLDE68IzWVkSUiGKY4z+OV5rT/giWr1jVFUqKe3sk5V+XVeOO
-   vB5DxQXXd8GVTXZo+jeoiNjjTv9iWy/bpnhVhx5eR1kfG34qgebSmghn4
-   tqKJHfGJ1GLErKhBSOddpG81Z6TIaPOJUM1RKlVqzURkAwa6IH+0eayCz
-   3nKriX4SK7zQc8bTtc+xlFoGBqM4Xd7J8uIZt5DIPWjdZgZ0Ceb6UBw2K
-   Q==;
-X-CSE-ConnectionGUID: F9v4yg2UTWeQQcrjZfF+sg==
-X-CSE-MsgGUID: kMIVThQ2Rk6Dg6NtDSUPZg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11186"; a="35718900"
-X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
-   d="scan'208";a="35718900"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2024 02:23:02 -0700
-X-CSE-ConnectionGUID: 7AlpJc3iSsWv2kHlbJKHBg==
-X-CSE-MsgGUID: 0ycuWGMvT0yZfdj1UOXuLQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
-   d="scan'208";a="70483542"
-Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 06 Sep 2024 02:22:58 -0700
-Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1smVB9-000Aud-0i;
-	Fri, 06 Sep 2024 09:22:55 +0000
-Date: Fri, 6 Sep 2024 17:22:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: MD Danish Anwar <danishanwar@ti.com>,
-	Jan Kiszka <jan.kiszka@siemens.com>, Andrew Lunn <andrew@lunn.ch>,
-	Dan Carpenter <error27@gmail.com>,
-	Sai Krishna <saikrishnag@marvell.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Javier Carrasco <javier.carrasco.cruz@gmail.com>,
-	Diogo Ivo <diogo.ivo@siemens.com>, Simon Horman <horms@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-Subject: Re: [PATCH net-next v4 3/5] net: ti: icssg-prueth: Add support for
- HSR frame forward offload
-Message-ID: <202409061658.vSwcFJiK-lkp@intel.com>
-References: <20240904100506.3665892-4-danishanwar@ti.com>
+	s=arc-20240116; t=1725615139; c=relaxed/simple;
+	bh=z2Yzyw8JDN+qymY/nATNNe0gWLJZzezHqQJ6JVmrd9g=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=VwSzchBo/fZ4je+7/RHlCZJUZpFVn/1S5V7FPPKJForewIOpvOjBnwrdzt1128T0PHeW/gbKPKX/7RVzSPP3QJsS114yjZIfTmwQDO0ytQt/V8lXNnEWlBkenC2UOEFBRemsJ/V7Lgh5HWEpmW6x+mBmJv7QljthLz/vkMsIFXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=YhzcC0mz; arc=none smtp.client-ip=115.124.30.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1725615128; h=Message-ID:Subject:Date:From:To;
+	bh=hyipLRAYhwmHecGMrcY8Z5T/+Vr4gCtcXQitzDOXd0I=;
+	b=YhzcC0mzyVSXWQMoKMkyVtVll6bM3EXi3APBgwSe++5vwEYwNLJRyubSb7Yvp1GFvNogRKxwfDPHRFIy3gA3W3n1bjH3yDlEbJD4cFFfZAvMPiB83Mr6Zbpc6ASXiqZVUcKSjqRiRD/wVFAABGCgHVGa2up9yUNELnFTXTIADKc=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WEP4pRd_1725615127)
+          by smtp.aliyun-inc.com;
+          Fri, 06 Sep 2024 17:32:07 +0800
+Message-ID: <1725614736.9464588-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
+Date: Fri, 6 Sep 2024 17:25:36 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ virtualization@lists.linux.dev,
+ "Si-Wei Liu" <si-wei.liu@oracle.com>,
+ Darren Kenny <darren.kenny@oracle.com>
+References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
+ <20240906044143-mutt-send-email-mst@kernel.org>
+ <1725612818.815039-1-xuanzhuo@linux.alibaba.com>
+ <20240906045904-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240906045904-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240904100506.3665892-4-danishanwar@ti.com>
 
-Hi MD,
+On Fri, 6 Sep 2024 05:08:56 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Fri, Sep 06, 2024 at 04:53:38PM +0800, Xuan Zhuo wrote:
+> > On Fri, 6 Sep 2024 04:43:29 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
+> > > > leads to regression on VM with the sysctl value of:
+> > > >
+> > > > - net.core.high_order_alloc_disable=1
+> > > >
+> > > > which could see reliable crashes or scp failure (scp a file 100M in size
+> > > > to VM):
+> > > >
+> > > > The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
+> > > > of a new frag. When the frag size is larger than PAGE_SIZE,
+> > > > everything is fine. However, if the frag is only one page and the
+> > > > total size of the buffer and virtnet_rq_dma is larger than one page, an
+> > > > overflow may occur. In this case, if an overflow is possible, I adjust
+> > > > the buffer size. If net.core.high_order_alloc_disable=1, the maximum
+> > > > buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
+> > > > the first buffer of the frag is affected.
+> > > >
+> > > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
+> > > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> > > > Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
+> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > >
+> > >
+> > > Guys where are we going with this? We have a crasher right now,
+> > > if this is not fixed ASAP I'd have to revert a ton of
+> > > work Xuan Zhuo just did.
+> >
+> > I think this patch can fix it and I tested it.
+> > But Darren said this patch did not work.
+> > I need more info about the crash that Darren encountered.
+> >
+> > Thanks.
+>
+> So what are we doing? Revert the whole pile for now?
+> Seems to be a bit of a pity, but maybe that's the best we can do
+> for this release.
 
-kernel test robot noticed the following build warnings:
+@Jason Could you review this?
 
-[auto build test WARNING on 075e3d30e4a3da8eadd12f2f063dc8e2ea9e1f08]
+I think this problem is clear, though I do not know why it did not work
+for Darren.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/MD-Danish-Anwar/net-ti-icss-iep-Move-icss_iep-structure/20240904-180917
-base:   075e3d30e4a3da8eadd12f2f063dc8e2ea9e1f08
-patch link:    https://lore.kernel.org/r/20240904100506.3665892-4-danishanwar%40ti.com
-patch subject: [PATCH net-next v4 3/5] net: ti: icssg-prueth: Add support for HSR frame forward offload
-config: arm64-defconfig (https://download.01.org/0day-ci/archive/20240906/202409061658.vSwcFJiK-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240906/202409061658.vSwcFJiK-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409061658.vSwcFJiK-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/ti/icssg/icssg_prueth.c: In function 'emac_ndo_set_features':
->> drivers/net/ethernet/ti/icssg/icssg_prueth.c:765:24: warning: unused variable 'prueth' [-Wunused-variable]
-     765 |         struct prueth *prueth = emac->prueth;
-         |                        ^~~~~~
+Thanks.
 
 
-vim +/prueth +765 drivers/net/ethernet/ti/icssg/icssg_prueth.c
-
-   760	
-   761	static int emac_ndo_set_features(struct net_device *ndev,
-   762					 netdev_features_t features)
-   763	{
-   764		struct prueth_emac *emac = netdev_priv(ndev);
- > 765		struct prueth *prueth = emac->prueth;
-   766	
-   767		emac_change_hsr_feature(ndev, features, NETIF_F_HW_HSR_FWD);
-   768		emac_change_hsr_feature(ndev, features, NETIF_F_HW_HSR_DUP);
-   769		emac_change_hsr_feature(ndev, features, NETIF_F_HW_HSR_TAG_INS);
-   770		emac_change_hsr_feature(ndev, features, NETIF_F_HW_HSR_TAG_RM);
-   771	
-   772		return 0;
-   773	}
-   774	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>
+>
+> > >
+> > >
+> > > > ---
+> > > >  drivers/net/virtio_net.c | 12 +++++++++---
+> > > >  1 file changed, 9 insertions(+), 3 deletions(-)
+> > > >
+> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > index c6af18948092..e5286a6da863 100644
+> > > > --- a/drivers/net/virtio_net.c
+> > > > +++ b/drivers/net/virtio_net.c
+> > > > @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+> > > >  	void *buf, *head;
+> > > >  	dma_addr_t addr;
+> > > >
+> > > > -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> > > > -		return NULL;
+> > > > -
+> > > >  	head = page_address(alloc_frag->page);
+> > > >
+> > > >  	dma = head;
+> > > > @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+> > > >  	len = SKB_DATA_ALIGN(len) +
+> > > >  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> > > >
+> > > > +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+> > > > +		return -ENOMEM;
+> > > > +
+> > > >  	buf = virtnet_rq_alloc(rq, len, gfp);
+> > > >  	if (unlikely(!buf))
+> > > >  		return -ENOMEM;
+> > > > @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+> > > >  	 */
+> > > >  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+> > > >
+> > > > +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+> > > > +		return -ENOMEM;
+> > > > +
+> > > > +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
+> > > > +		len -= sizeof(struct virtnet_rq_dma);
+> > > > +
+> > > >  	buf = virtnet_rq_alloc(rq, len + room, gfp);
+> > > >  	if (unlikely(!buf))
+> > > >  		return -ENOMEM;
+> > > > --
+> > > > 2.32.0.3.g01195cf9f
+> > >
+>
 
