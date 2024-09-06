@@ -1,168 +1,106 @@
-Return-Path: <netdev+bounces-125896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 898D596F293
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:16:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AC9296F2A2
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16D25B20CF8
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:16:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B80C3284EB7
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 631F71CBE9F;
-	Fri,  6 Sep 2024 11:16:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148AF1CB332;
+	Fri,  6 Sep 2024 11:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="do7CVmkc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O1w0x/uQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA09F1CBE84;
-	Fri,  6 Sep 2024 11:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848411CB337
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 11:16:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725621371; cv=none; b=spUlO/nUCN3BdrMCzJ0SHXVMXVvu4AmTQb4KAa/atpJUofA1VVqsKXBNQb5piOhpWCTDfmUDeEA+cpdt7/+g0ANjsJ6Fi3T6ap1KjH4vvyUHjxxzzA0xIDl+uryk1VYn+kKuIy+YeitCq8w2tIgsEMSp09ppeGFwTe3K6L0/pUU=
+	t=1725621414; cv=none; b=dhjtzEovk6JzmD/legYOsShw9KgVawmjmoWCOb8U2wQUjOpLlCfUlZ3gpWpL55cQhTNGa1N1DsKHIsyxyRZ52zGSl3v0JfFW0yEivadCLXaUn2D8lqIwCnFkM9rYtwMUL/oXnKo+otyYn2BVWLG6bCv1h5iY5CVhiBuNEYf8rXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725621371; c=relaxed/simple;
-	bh=6aptd3NSunEtrKSEWFRzT8/8Z69iK4d+mAKKQUuJ2Kc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NNvKLsecjZpkkFA4qpdLXeTtcuoGw9Gk2ow7iIDjSRu2LvFadp8zUR9TLH9bXW+nFJQ28oB1CTU0h8B5eOzyX8QPsuA5b3phWRwCh+S2EO0573OM98qAtFjiX4wz3b+VBUZIrkU3tXB2qpRlWFYeWoqJWJoZTA3RSxwDnqBg2vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=do7CVmkc; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 486BFpRG069148;
-	Fri, 6 Sep 2024 06:15:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1725621351;
-	bh=F4n26HCPewH5Tbp604TeFPz7Neb+UpE9pxR8ZiIE8LY=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=do7CVmkcTfia9diXv/8X3kT9Q4m06Ey4w8zwDZ2zc0/0pmDfRBuAnJqNqAr9mF0JU
-	 WFJEw7Pu7CMypYJAfwE+rMfT6J6wr+cdKL2wjK+PbKLRBGMYLFtKNfGs5+BDiegKXD
-	 71b2E9OgogbVP6WMgjO3jIS50v1o2MCZcmosdi4o=
-Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 486BFpGM016857
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 6 Sep 2024 06:15:51 -0500
-Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 6
- Sep 2024 06:15:51 -0500
-Received: from fllvsmtp7.itg.ti.com (10.64.40.31) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 6 Sep 2024 06:15:51 -0500
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by fllvsmtp7.itg.ti.com (8.15.2/8.15.2) with ESMTP id 486BFptA042829;
-	Fri, 6 Sep 2024 06:15:51 -0500
-Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 486BFoco002333;
-	Fri, 6 Sep 2024 06:15:51 -0500
-From: MD Danish Anwar <danishanwar@ti.com>
-To: <robh@kernel.org>, <jan.kiszka@siemens.com>, <dan.carpenter@linaro.org>,
-        <saikrishnag@marvell.com>, <andrew@lunn.ch>,
-        <javier.carrasco.cruz@gmail.com>, <jacob.e.keller@intel.com>,
-        <diogo.ivo@siemens.com>, <horms@kernel.org>,
-        <richardcochran@gmail.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <davem@davemloft.net>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Vignesh Raghavendra
-	<vigneshr@ti.com>,
-        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net-next v5 5/5] net: ti: icssg-prueth: Add multicast filtering support in HSR mode
-Date: Fri, 6 Sep 2024 16:45:38 +0530
-Message-ID: <20240906111538.1259418-6-danishanwar@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240906111538.1259418-1-danishanwar@ti.com>
-References: <20240906111538.1259418-1-danishanwar@ti.com>
+	s=arc-20240116; t=1725621414; c=relaxed/simple;
+	bh=h7oWCjCNEzwxWkQ6zm+j3DwBqzjK9b+0icEOnxXwUl4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=knh/NpJKR50rqs9MZL2NGO/wf/kbqtokYqzNIekjyC9TpMM4b748ckMmaxBYosOf4EQg3vf+w2pNiRBxIc5YLmQNK/Gpv+yZRWTnYfrUl56LZQ7rlwtEwm6PcII19yl5icovGpf+yfXxbucs9SX8Bf8R80tp/vueL2IA7Kubqa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O1w0x/uQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725621412;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=h7oWCjCNEzwxWkQ6zm+j3DwBqzjK9b+0icEOnxXwUl4=;
+	b=O1w0x/uQJNK3dblmr+ObGyemkQigF3IC1AjNrBoKWG0mKap/3SRvEX7PxwS1BhCFcV6nGG
+	fWyvZzGz9bl+Xqh0Yxm4ATZ67I9LlVqs3LyNPMdqI6puKBZAhLuZ48grTKKyTQ1pDzKH2T
+	y7bUuAVd5gP83JMdYeeh1svtvih17hU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-19-vD2K_bzAOGWv_GOhFW7yWw-1; Fri, 06 Sep 2024 07:16:49 -0400
+X-MC-Unique: vD2K_bzAOGWv_GOhFW7yWw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-374beb23f35so1263362f8f.0
+        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 04:16:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725621408; x=1726226208;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h7oWCjCNEzwxWkQ6zm+j3DwBqzjK9b+0icEOnxXwUl4=;
+        b=AqPnWewO+Bn8y3RH6sOuQAoWh+RFfiYizcQHYZQcyzPJybS/oeSd90K7s9rzzwAAyG
+         FJkUQu7RT3GHbZlQyFUPDwpuFWcQxUXLBqClUalp+5bepyh1+a6BN87X8r284fHICz/b
+         XeKpw/H+LuryzGBhwi/dI3op1Qz0TICT43EzFGXvrRCICYNA7M04n1zQjmTtOgY3rli9
+         bK/Es1LWVnHakx0nLwFVKlvNN8lBverN+iv9p2EoqzzspnhaoDlGeCqulLJIOLtRfkl+
+         duwxCLyspwaqUDFD/yYD4r+PXzLmruBDvz076OAhl/FVKQX1jbeu2D+2h77y8UvaJn3k
+         okNA==
+X-Gm-Message-State: AOJu0Yy/ertPPoBU1WUUJHmIXqNi3fCO7PnS9dwOFka6nAUsaQtoaxaT
+	voAgOVkxURCEjPhSObsUIUaz8ii52t71D0S3ZDkE9d73B7R2avlJbbg/UK4gfuiep24SDxkTLLD
+	ERAq4MmYmoDSI5AUVazOLqMDYmc7iAq+T+0sUjeP3QI2EAisflIo0HA==
+X-Received: by 2002:a05:6000:50d:b0:371:a70d:107e with SMTP id ffacd0b85a97d-3749b53169bmr20678070f8f.6.1725621408235;
+        Fri, 06 Sep 2024 04:16:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFPw/OgFFvEdcRZzS4cx+Sw6c3PFJDCcVrZn3G7jew1sCdpWo1/ODYEzc7WVrWFytZcY3xxPQ==
+X-Received: by 2002:a05:6000:50d:b0:371:a70d:107e with SMTP id ffacd0b85a97d-3749b53169bmr20678030f8f.6.1725621407632;
+        Fri, 06 Sep 2024 04:16:47 -0700 (PDT)
+Received: from debian (2a01cb058d23d6009996916de7ed7c62.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:9996:916d:e7ed:7c62])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3749ee4981asm21687261f8f.24.2024.09.06.04.16.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 04:16:47 -0700 (PDT)
+Date: Fri, 6 Sep 2024 13:16:45 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
+	razor@blackwall.org, pablo@netfilter.org, kadlec@netfilter.org,
+	marcelo.leitner@gmail.com, lucien.xin@gmail.com,
+	bridge@lists.linux.dev, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-sctp@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 02/12] ipv4: ip_gre: Unmask upper DSCP bits in
+ ipgre_open()
+Message-ID: <ZtrknS7zKAKP6g6l@debian>
+References: <20240905165140.3105140-1-idosch@nvidia.com>
+ <20240905165140.3105140-3-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240905165140.3105140-3-idosch@nvidia.com>
 
-Add support for multicast filtering in HSR mode
+On Thu, Sep 05, 2024 at 07:51:30PM +0300, Ido Schimmel wrote:
+> Unmask the upper DSCP bits when calling ip_route_output_gre() so that in
+> the future it could perform the FIB lookup according to the full DSCP
+> value.
 
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
-Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
----
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 42 +++++++++++++++++++-
- 1 file changed, 40 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 9af06454ba64..a8200ee79a89 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -492,6 +492,36 @@ static int icssg_prueth_del_mcast(struct net_device *ndev, const u8 *addr)
- 	return 0;
- }
- 
-+static int icssg_prueth_hsr_add_mcast(struct net_device *ndev, const u8 *addr)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
-+
-+	icssg_fdb_add_del(emac, addr, prueth->default_vlan,
-+			  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
-+			  ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
-+			  ICSSG_FDB_ENTRY_P2_MEMBERSHIP |
-+			  ICSSG_FDB_ENTRY_BLOCK, true);
-+
-+	icssg_vtbl_modify(emac, emac->port_vlan, BIT(emac->port_id),
-+			  BIT(emac->port_id), true);
-+	return 0;
-+}
-+
-+static int icssg_prueth_hsr_del_mcast(struct net_device *ndev, const u8 *addr)
-+{
-+	struct prueth_emac *emac = netdev_priv(ndev);
-+	struct prueth *prueth = emac->prueth;
-+
-+	icssg_fdb_add_del(emac, addr, prueth->default_vlan,
-+			  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
-+			  ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
-+			  ICSSG_FDB_ENTRY_P2_MEMBERSHIP |
-+			  ICSSG_FDB_ENTRY_BLOCK, false);
-+
-+	return 0;
-+}
-+
- /**
-  * emac_ndo_open - EMAC device open
-  * @ndev: network adapter device
-@@ -652,7 +682,10 @@ static int emac_ndo_stop(struct net_device *ndev)
- 
- 	icssg_class_disable(prueth->miig_rt, prueth_emac_slice(emac));
- 
--	__dev_mc_unsync(ndev, icssg_prueth_del_mcast);
-+	if (emac->prueth->is_hsr_offload_mode)
-+		__dev_mc_unsync(ndev, icssg_prueth_hsr_del_mcast);
-+	else
-+		__dev_mc_unsync(ndev, icssg_prueth_del_mcast);
- 
- 	atomic_set(&emac->tdown_cnt, emac->tx_ch_num);
- 	/* ensure new tdown_cnt value is visible */
-@@ -730,7 +763,12 @@ static void emac_ndo_set_rx_mode_work(struct work_struct *work)
- 		return;
- 	}
- 
--	__dev_mc_sync(ndev, icssg_prueth_add_mcast, icssg_prueth_del_mcast);
-+	if (emac->prueth->is_hsr_offload_mode)
-+		__dev_mc_sync(ndev, icssg_prueth_hsr_add_mcast,
-+			      icssg_prueth_hsr_del_mcast);
-+	else
-+		__dev_mc_sync(ndev, icssg_prueth_add_mcast,
-+			      icssg_prueth_del_mcast);
- }
- 
- /**
--- 
-2.34.1
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
 
