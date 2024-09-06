@@ -1,297 +1,134 @@
-Return-Path: <netdev+bounces-126019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A05CD96F98B
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 18:49:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 002D096F991
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 18:51:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B29881C217F0
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:49:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C27C1C217F3
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:51:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850481CCB57;
-	Fri,  6 Sep 2024 16:49:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cmxkH+PA";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="bK/42YcX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34BCE1D27A6;
+	Fri,  6 Sep 2024 16:51:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6AF43AB7;
-	Fri,  6 Sep 2024 16:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725641377; cv=fail; b=lDZ8i9BwifY0QUpkxvTnmJqY+dEIZNyib5+pxf4HMmulqtvqslGDlImm6IwJREOktdYwj3Lzd3PGAamRbpcBD7nZbIJ7Nc5Zw6TKaZmcM666A2MiRcC1SsujJRstep1lnCV0r4klLb4POU7ls1662pOsoonJxKuqBMRfC+OOzf0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725641377; c=relaxed/simple;
-	bh=+xR9ZShxgI8zSBsciByeYnpL1sPz16w87ktV0Srh3Wc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FnBn4nGBAM+5j7SeKcQCP207ggo5oyFHy9RT7FxHoX+vLhaAjMSxfQlHFEbWdY0cRCQz5XITyT/HzU/mFNg6rJvIFHwGx+WSpim/1ed1nxZNR1TYRNEIX2aKeoZlxmw0fyOZwVZLR++69mwsdJlQk8Hf3v6vDfk/cwgM0dnIfiA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=cmxkH+PA; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=bK/42YcX; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 486FtqsW006613;
-	Fri, 6 Sep 2024 16:49:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	message-id:date:subject:to:cc:references:from:in-reply-to
-	:content-type:content-transfer-encoding:mime-version; s=
-	corp-2023-11-20; bh=M0pi+Wb5D/qBuR+ApxECYHr6l/z1AvHEBcjqbOdOVRk=; b=
-	cmxkH+PALberzJuZFNMSHNwmwISuicS7Abz8+CxDHsCNblMXYM/y3Att2yOALA41
-	UUf/nxP5JNoc0p6+jkwCoEhl2EhxiYKAYYtEkIYZJESXIpo7eYD92B0aC9QsvIrJ
-	/nvyI7GCljG9+iGgXLd1wC0XPjHslFAcqMixWWsb6DjE2y0RNp04okxiTaKGjU48
-	f5Z1U+Fylw5cehdgsejJxu46pKNkfFUqR5d0vcc/sX52hine6X/6GKpqUukaLJn4
-	IJOn8sNxcMAtXpknWOIMD32h3ppUQyItxMIHbazDBPrPxjv78MDvpVBcqQAleulb
-	pR+Nz3HpfF1EzKWvPItyCQ==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 41fhwqj1br-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 06 Sep 2024 16:49:10 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 486FFWbX017908;
-	Fri, 6 Sep 2024 16:49:09 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2041.outbound.protection.outlook.com [104.47.57.41])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 41fhyh6e12-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 06 Sep 2024 16:49:09 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yXHHtFaNp4SW8rMAIid3VTz02q7msjG+M0jskTYExA/fpyRu5MH3GQH+UUBOWYssI7otfQ5U/r/IyXq//sTYbdc15OWL1/JZ23d682M7PRBlI2dHk4v2Ev6SQiODo6KNpL/0IsVSQ03qbBcdg7oLzziLqSUPlCFp4SAsKkkD6PEAU/EIVJWtrdIg0vXG3TGiDq3W2PcX7plGo5l3GNEGjBWnUa0fnMVbvrstVQrnEjQWR6PR7tZhN9GpRPThpPBEZLUqjgU+SzL2aWnTJQIMdg6RDSGvd9iJ1Sv/1tGt0grAsj///hN5C4I21wX2vYW3zMIe/8gQBnqKKnlJJSDUsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M0pi+Wb5D/qBuR+ApxECYHr6l/z1AvHEBcjqbOdOVRk=;
- b=MfZ8tSDcgUsyQUrEjwWxKzgVEpklTGta1PylSWZEnDASXU7wHQpkVlav6uAAOYZrMbkjm76wPaO+w/jpuuRh0ZU3MTzIrkgQLtY1PBGwNjNcN8uqs+B2LhxXzU8erKMXZhIUyWoZr8cqloAKICioGHS4o5uPwPr8Bc3GO1ZS4ekwDr2o7iknaSEyNngxsj2c+fEZrX6rjy8ZTgxwjCGum3goV7ZmWXcS7io/P2vDw/L46qR4P5rl3UO9gX0BPbkAckfR1+ui9hrMZn4N2YsYTV2FaGtGEIUTvBI8KloEpDhat2bIT2gYYABEZHbS3bbMIJh14z4JHcFY6kzkIyyIAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=M0pi+Wb5D/qBuR+ApxECYHr6l/z1AvHEBcjqbOdOVRk=;
- b=bK/42YcXlN1d+QrPiaA+MinKuO8UfSk49UG9sjYejIDWEaHKJkVtJbSIA2jdlS3stYOoNg7gHgC5se/+mkUZSDHwjEeYn1xmmtyL9tEgVbQwJV+ebNBpIH8ZF7ruB/7HJ1FOX8fLISN/8WXVETZWQL4+4d2PaLOivmu1tu53uQg=
-Received: from CH3PR10MB6833.namprd10.prod.outlook.com (2603:10b6:610:150::8)
- by CY8PR10MB6467.namprd10.prod.outlook.com (2603:10b6:930:61::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.23; Fri, 6 Sep
- 2024 16:48:04 +0000
-Received: from CH3PR10MB6833.namprd10.prod.outlook.com
- ([fe80::8372:fd65:d1ad:2485]) by CH3PR10MB6833.namprd10.prod.outlook.com
- ([fe80::8372:fd65:d1ad:2485%6]) with mapi id 15.20.7939.016; Fri, 6 Sep 2024
- 16:48:04 +0000
-Message-ID: <c45d66d7-64fc-4fa8-8c38-ab2e9ca65635@oracle.com>
-Date: Fri, 6 Sep 2024 09:48:02 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in
- unix_stream_read_actor (2)
-To: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net,
-        kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        pabeni@redhat.com,
-        syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com,
-        syzkaller-bugs@googlegroups.com
-References: <e500b808-d0a6-4517-a4ae-c5c31f466115@oracle.com>
- <20240905203525.26121-1-kuniyu@amazon.com>
- <19ce4e18-f1e0-44c4-b006-83001eb6ae24@oracle.com>
- <CANn89iK0F6W2CGCAz5HWWSzpLzV_iMvJYz0=qp3ZyrpDhjws2Q@mail.gmail.com>
-Content-Language: en-US
-From: Shoaib Rao <rao.shoaib@oracle.com>
-In-Reply-To: <CANn89iK0F6W2CGCAz5HWWSzpLzV_iMvJYz0=qp3ZyrpDhjws2Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BYAPR01CA0019.prod.exchangelabs.com (2603:10b6:a02:80::32)
- To CH3PR10MB6833.namprd10.prod.outlook.com (2603:10b6:610:150::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98AC1C9DE7
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 16:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725641465; cv=none; b=r9UCYW/xYZjIjLa/kDa7z0qRD9k2PktR3YEk//5YRAgdC3rGRcmusYpN+Uf3ZkJEQWTHS8a28f+IEP95iinPR4TBJg0D9gfrLUCnedOHagYSGlVICI/SucInJZXHQXPoXpytYge1pubRlPIcvFe/oKfDMCpb8WajC4rrhs2jOew=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725641465; c=relaxed/simple;
+	bh=A8Z0qfVWb0znSgQeTBj9gT455DG5EkKDRGtOsUjFHO8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=UEgPqIbODBKFDHUMGCM1oM/REM/4qtuL/lnvRFQoq5lmBnna1igjuzxW3xHZx8Tk3mxMJkoWw7rdowtBRH/0j4/Diwk7iqwl01s1Saho0ZMBXiLxg1b86tTHweRnACnaiT8qrjQMipORmXls88qwlYuP1iTiKMgTFjWqMSm6vwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-82a22118ed8so543956839f.2
+        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 09:51:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725641463; x=1726246263;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LbJNQTkd85EzoH1ufp/G7n58VdYkLrkbtEjaB+pBaLY=;
+        b=ngyn7ghFRetdKvDthFpPmtKxNOY5NrGtmZSGQdKerdo3uoSm4iZ+QdwFhFZw2iwwap
+         YimPgScRKm0aoHMvYtTX4l4eb+TLI1u3QRl7m1ts/FD5i99+fct+mnNRJ6jUH1hH8C+6
+         oErV9cteZ3JHlgEOty2wDtRwLNemEsFlAqEwUl5rVtCNxjBwGssvvpgXTG2NSMJj80iV
+         Q8gSVefdCkXj9Epg83BxePJ4OgxXcIWjmBLCJjtfaTR7IG9WJYC9MWqrsrZLLR/1/5op
+         CHmeOqvZQslJKZ59Co7qiJCgL/0QejsMGCleXap+ppPVsqywoxNm0X3s1LwKYwbEXO8h
+         1jeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXVJ6kA1cf8Q/KjYQtPHpiYr/Pa+lUxjtwywVVZzd6gi1z2GpKUjAiGqet7qLaUSQZUNOuGeZw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBWV3PKWo3FZjh74MaJ74LGIEiNikgXVzx904IzMlWmF7wpEb3
+	ITQxwRTZKvV4VI9N/SHk2RNLBeTEH/hy2YkKXYJmrl7UebSvSXlxOH8j84zEtn+SM7ATF7Aa8AQ
+	0NFLYBDYB5DfTjUm/mFIIU74i+SdWtiQFwJRSGHPK8auTCEnPofL5XCg=
+X-Google-Smtp-Source: AGHT+IGvI75tGK8NM+J8gAZSXsx5j+HxxEMsBujJFI4YfAkOVJqsIUkqjXMeRwHpAhvtNmPS5KZ9gL4kusCQT8HGoZ63rAmZj1kG
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR10MB6833:EE_|CY8PR10MB6467:EE_
-X-MS-Office365-Filtering-Correlation-Id: fe0b5e68-cf32-4e15-fcf4-08dcce93ad87
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SzFZVzYrRmVtam1PU0lkRUdib3RwbStZNWJkY2cybUM5aDhMWjNuWjBBS0Zw?=
- =?utf-8?B?dVkvd3Q4L3R0WmNhdlI2aFlwcDk0R2Q3TVQvUXZiRUNkaGx6aUF0M1BOZ2Fo?=
- =?utf-8?B?NzZnTXo1K2M5d0d2TUZmSThkWTFrenVIS0U1SVlaRmFCUWFmUWFZR050cTdw?=
- =?utf-8?B?ZG5KcVNmcFBHTjJubXQxT2VEdFZoN09VQkNYYzB2TVA3dm5BdFdXazB3OG9O?=
- =?utf-8?B?c3g1YmRzeEJKaXZzSUF5WE5POFNWMVNialVNMVA5QXlaUzJyN2ZTZnUxMENs?=
- =?utf-8?B?dWViUU5nODZhUUYrVnprNTg0UEhPUkhTcnlLMWh1SG9UeGNSUkgvaHduZDYy?=
- =?utf-8?B?RnY3SzJQblVDbE4xMHZtWWdEMWp5R3JwSWIwdDZuRTRZaG95Yzljb2xCZFVu?=
- =?utf-8?B?OGVTME81MUNwVjhOWXVMUS9kR09OMmJFTkdhM0o5cWVTL2NPK0IzVXJicWoz?=
- =?utf-8?B?cytBdDFRZVhxTzQ5RFZwTFV4bWhJVGEybzVaSU1MczMwK3BCVi9GT2IzWktt?=
- =?utf-8?B?enU5WVhEUm9xenVPNUlyNHRwWG1pN2hsa0E4dHhmb1Ftc2U5cEtxakRvVGVB?=
- =?utf-8?B?OVZDb1phaUNXVWFHU2hQa1JQRk5oSjB0SHJ4TGkvVllYMXhHTEpnbWV0K2I1?=
- =?utf-8?B?d2E4RG83NE1nSzJnQytCaXBKVXFINExQRkdIa1BQUzJXRjBZejRvcG5ReTNW?=
- =?utf-8?B?eitaQnVnOTdhb1lNVnhPQ0ZJaTVObFhuN3NNSmVyWUVLZmtzSzBGZkhlT2M5?=
- =?utf-8?B?TW8yYkljR01LRkdCdk96VTFScG9zcHcvTzJxRVpwNUU3QUV1MjFXaXRMYys1?=
- =?utf-8?B?Q1Y5c2ZXQ0lNRUUzcWVNTElHUUNVUjd4M243V1J5WmpFVjl4SXN5ZGhmOUZ3?=
- =?utf-8?B?WWtnaG55Wm9qMytWejdBa3VkUXJwTi9ONFB3bTNkTGtNMzAxMjVCZTVQaVJV?=
- =?utf-8?B?aEhnVmVZcjlvWGc0VldoUnBHeUVpdWJHUVcwcFNsaVN4dElnd3lLMzVUQkVa?=
- =?utf-8?B?SE9DU0ZjYTlsUlJrMTE5Tjl0d0VtdUs3R0QxRHoxak10RzkwRStRanYvS1Nu?=
- =?utf-8?B?QWhOMUtQL21yWnRIT0pwdnMzOTZjb0lDd05YSU00VitRQnRVM1JMdVd6UXVZ?=
- =?utf-8?B?RUtvcjlRbElQM0xzdmp1a2piUnpUQ3p5ajBHRElnNlA3Rll5bW80S3ZmRHpY?=
- =?utf-8?B?UEF0aG9rUVZIN2VlZ0UwbXNSMDltWWpVaGVETThBV2tHMVd5UUlyeVFqeHM2?=
- =?utf-8?B?RFV5a3c3b0ZhbnhZaFlFdTYrZVNqcEpUQUR6UG1Ja2JSalR5MktoWmdFVUNE?=
- =?utf-8?B?RjVML2FvaDF2LzFtRmwvSUNQdG0wbUhlZEdEVTBNNzdHV0JrS1B6SkRxSXFu?=
- =?utf-8?B?azl2RjRIeW8xLzZkYmRwbEtDR29NN21NbXh6eW5QeDNEZ3pockJHNFIxZi9N?=
- =?utf-8?B?aEVHN005bnhjb2lMNnJMOWJ6RUtxV0JscDZNaXBWTGlEWEdtdHNXUXBiMWNM?=
- =?utf-8?B?Z1l3N0xLQStYR0hFVWJQcExwK0h0M0RnbmFxR0E3RnZPNllmeVhUaVBnMURL?=
- =?utf-8?B?a3VMZE5hd2xXQUNydkZpa1BnWFg0ZDlMWStucnNFemQzWlM5V1pZeW1ndUpS?=
- =?utf-8?B?Vjc1dGwrWXJRUkNHNzIwV3Q0UlFSc3p0aVNlU2YzK1JLdjcxVnpJUDVnNnNa?=
- =?utf-8?B?aDVaM2MwRGh3M29OalBxL0s0bWw1czQwNEpGV0tBR1doRGVGQVpVMUJGdFB6?=
- =?utf-8?B?VHpPODk0V054NmhQMEJoMFhQTEtTR1JxRk5kNFVzVWNGK2FwV1NiZ1ljNWNY?=
- =?utf-8?B?bllTdjFXbmowZ3VNdmlEdz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB6833.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aGIxMFZFdVJtSnc0M3JxelJ0bTJrTVYwUnVVYlExVXNBd3FSeEpJZXprRjIr?=
- =?utf-8?B?TWxGcXFrdXRsQUZ0ZjI0dTN1cGZSMTI4S0RsU1RMYjVYVFJTbUp3cDZnSm5S?=
- =?utf-8?B?b21DZVhPcnQ2dmRKMEV1bXhndE84SE0vYkxxQkRXbUdFY2VTc3U1My81a1BI?=
- =?utf-8?B?M1hnS2dLcEQxdVUxdmtyazJSdDBNWjc3VlpHdW43V0JpMDBnUWE4T1F6eTBK?=
- =?utf-8?B?by9keThpNGRBdzFrSUlOZ0hUYkpZZi9FbVVObEk4WjhwSERVeHpPUmxZVkpD?=
- =?utf-8?B?bTU3WFZLVlA2c2IwVHF6V1FncHhnZGtXZldKRERwZWErR05lcFlad2ZNUWRD?=
- =?utf-8?B?UENoK2ZmK1ZqeGZYd1BJTCs3Um43eGsrektiWDZXSlZDeEtsdHNML1FkZmdH?=
- =?utf-8?B?Wm44bVptK2kzeHBDd2JqUUMvK2Q4SThTTFFhYXVFcGhGWW9GaGwxam1zSG5I?=
- =?utf-8?B?b2F4bUdCSlgvWURibUljNmRjQW5tTDBvYWhsQTBnNllRcnc2eThIODFtd1F0?=
- =?utf-8?B?eXoxZUZyYUhrWWFXVHlNcnFyRHVxck9RZG9XbXBoZWRLaTdGQ052MWdkb3BM?=
- =?utf-8?B?aXlaVWV1MEcrdFZadGZEY3lOQzRNdXJWOEpSVFVjQXJyZTRVR29HZzdOWlF3?=
- =?utf-8?B?UDRLMllicEVOcXZqYThpU29OMmZrelRIZ1NrdzkzTTBQdnBMd2g3ODlFWDlp?=
- =?utf-8?B?ZjVpdHZxOVcvbTBWcEkyUUxxQVdKVFdWSnE4ZFNzTFpXNjVhejl3Z3RwaU5R?=
- =?utf-8?B?cDczNldkUjdJN1d3Uy9ESW5kQVFpVG5aZUlHNXBsQkRQc3BBOElSM2RhaGgy?=
- =?utf-8?B?LzNZeEpsUWZPM3hiVkJ2dTRReUJQN0tEdHJtMGkwSXc5MGE3U3pIdHptbVpx?=
- =?utf-8?B?eDNiSXFoNFhlWXR3ei8xdVBBOXVOQVNiY2lyYisrbDRTNkR4Y2ZFUFhXcDRR?=
- =?utf-8?B?dDl6WW9BM09XeWhqQ0toSW4rckFpcTZ0aDExanA0TEVJUFp0TUtVb1JVQW8w?=
- =?utf-8?B?UUlNck9RTXhPOG9nSVNFVnBad1ZZK0c5ck14M1BFMFJUb3ppV1FQbkh5UWNk?=
- =?utf-8?B?RGZWcWZSMThJcmd3bmRmdjlnSGRxR1lacTBvTEJ4ZWZDc2hrM2FwU2syemlF?=
- =?utf-8?B?TC95bXFGWTVVUlZIVHVlODJwdzRlaHUyYzQ2Q0tJeklHc3BheEVTTm5VVlhJ?=
- =?utf-8?B?cDdMR3h6ZkxmU0laM0F1aktmZzYvdTdXMzAzelQ2TkFGQzlWYWRYWG9oU25Z?=
- =?utf-8?B?b1oxcVF3aXo2cHgyNTNMZHdseUQ4ZisxVC9MUURJUG9ydzdNTjhTaXZQTkNx?=
- =?utf-8?B?algzTXpGRFo1ZWpWbFdqZHdaNFlhMm9PVXQxT080Mjltc2VTZlpkdWdId0ZN?=
- =?utf-8?B?dytXNHlKWTdGRkkvQnlRZXpPMmJLSHpSQ1YvdVVNSTdUclJBUCtTcFhKYkJW?=
- =?utf-8?B?SHdEOWh2UC80YjE4OG9Yb3FOZGdTTUZpQ2tyak1sUHEzZE4yNFpZNXExWnBK?=
- =?utf-8?B?a0c2RGJVSDN4UVhYT2hFWENSQ0cwV0k4T2hFY3oxNzlURk9UNkE5MzRLTk9U?=
- =?utf-8?B?Wnl4VlQ2eDdYUjNBRkE2aE5jR3Vub2ttV2doRExkd3l3MkJKV3dlK2U0WTha?=
- =?utf-8?B?UkJuUVBqamgwaE1tTmRnR3M4cW5NNExHZW5HK2FzL3dZRFlUMTEvb2x0d092?=
- =?utf-8?B?WW40MUNlOGRNcGVXcGdsemZ2d3VMWEQ0TmFOcjltS3BFRElXNjNVZXk2Qjlv?=
- =?utf-8?B?K1RucUp0TEs3bTJDUjlhcDVGczRLV2FLSTR3Z3VZRDZNRWs2enhUZFc2bXZl?=
- =?utf-8?B?QTlONm1uNWlFZHpXZW8xZElTNnJjVlN2MUZ2R0lab1M2Ull3UDJDRVlSWFAw?=
- =?utf-8?B?RytwSFlJZklVSVZ1ekNqSGlTdEQ2c09mVDVvUktRL2R1dTVwRU9KVHkrVWlk?=
- =?utf-8?B?bTRETG9iN3RmVVpWY3ZuanlTRGFZaHhicUc0ek1ZV3pEeWxQWjVjWCs3SWNO?=
- =?utf-8?B?N2JOU0pFSWZSTS9NMEEwTkljTVQxOU9oQ3VRQUMxc1g3ZTloVU0rVmtTYm5s?=
- =?utf-8?B?ZlZLZ1FhamVzT21vdURITlg4Mk5JWmhvMkNVQjJyWTRpUytBbGg3cmlQcFFr?=
- =?utf-8?B?RTZQUE04dk0ybjVSVGZpUkJMcXFGQVlXdGJWZVRrYkNPOGtjNnpkN0h6bnRZ?=
- =?utf-8?B?TEE9PQ==?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	4adMpoquTi7Y2YUawwheHbvVP15g2ydbkhLhnmgX+sXepSOiN8lwMSH+9o2I+4WvkT06xPdFXSToiaFkc+ymVvH+6fvmOLINgPoxan1fd+Wds2FiS2PVtzbzGRuYu32wUfvYXGTb/uf3M2X58ICiSgVFunnWWMtricgI8IsljzQj+1uWoLWJ41SIH5AKoAG2v8WhRWdDCRM2aN48X9bruqr56AguUdforw4Mz9yVDmzeLpPEvGRn0bCb2Gtwleez/CTZ6IXFwZE8Yi2Yh2gTKjyakEmw33jiPxb4Nf6jk2Mvnw+pqaF8cAARPILSimlCMUDfP555N+dPa22zrBDDhdkMOFTeCh/VU8qYg/69C5HyomQVweeFRGCiN1GFObyu4sJZlxQE/KmkulkAvFcEYmnj7Qi3q5IR8zxAgBLqs9bWC2GV7hU6cloIsfxwRhbvCOeoFO76j1Qgv3T8i+a7AzEcWNa48cWBOfkiwsDde6l6hG62k6pZYJHRTVCiNEwzldTB0msxNefIGfMnVunYPSVrNVuIS8ddn0W7BXRX9JPBoefLPFuXppqnih3QLukmaO7RnH5gq+bPckVgyr0hM4EFaBS2VjJsoCf+Ys+jRWw=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe0b5e68-cf32-4e15-fcf4-08dcce93ad87
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB6833.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Sep 2024 16:48:04.8403
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8ErqWIrwmkjdlXi5i1+sojFa5cyxhPEEOTkuDWx98DZkaBVvj4n2q9Z8neocTw/+l+ovHWyG2gZZJkPrsO9Zdg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR10MB6467
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_03,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0 mlxscore=0
- phishscore=0 spamscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2408220000
- definitions=main-2409060123
-X-Proofpoint-ORIG-GUID: NlquDNtB6LMtLhGbem8wmkBnVykjp0n7
-X-Proofpoint-GUID: NlquDNtB6LMtLhGbem8wmkBnVykjp0n7
+X-Received: by 2002:a05:6638:8707:b0:4ce:8f9d:30fb with SMTP id
+ 8926c6da1cb9f-4d085021f8dmr275533173.6.1725641462952; Fri, 06 Sep 2024
+ 09:51:02 -0700 (PDT)
+Date: Fri, 06 Sep 2024 09:51:02 -0700
+In-Reply-To: <f110db9e-16a5-4256-b0fd-980fda8a2cb0@gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000068ce8406217636c3@google.com>
+Subject: Re: [syzbot] [usb?] WARNING in rtl8150_open/usb_submit_urb
+From: syzbot <syzbot+d7e968426f644b567e31@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, petkan@nucleusys.com, 
+	srikarananta01@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+WARNING in rtl8150_open/usb_submit_urb
+
+------------[ cut here ]------------
+usb 1-1: BOGUS urb xfer, pipe 3 != type 1
+WARNING: CPU: 0 PID: 2582 at drivers/usb/core/urb.c:503 usb_submit_urb+0xe4b/0x1730 drivers/usb/core/urb.c:503
+Modules linked in:
+CPU: 0 UID: 0 PID: 2582 Comm: dhcpcd Not tainted 6.11.0-rc6-syzkaller-00183-gb831f83e40a2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+RIP: 0010:usb_submit_urb+0xe4b/0x1730 drivers/usb/core/urb.c:503
+Code: 84 3c 02 00 00 e8 45 c1 fc fc 4c 89 ef e8 fd 1e d7 fe 45 89 e0 89 e9 4c 89 f2 48 89 c6 48 c7 c7 e0 61 a0 87 e8 36 c2 c2 fc 90 <0f> 0b 90 90 e9 e9 f8 ff ff e8 17 c1 fc fc 49 81 c4 c0 05 00 00 e9
+RSP: 0018:ffffc9000185f740 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: ffff88810a710f00 RCX: ffffffff811a9639
+RDX: ffff88810f3157c0 RSI: ffffffff811a9646 RDI: 0000000000000001
+RBP: 0000000000000003 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000001
+R13: ffff88811d1ea0a8 R14: ffff888109f221e0 R15: ffff88810a710f7c
+FS:  00007f11f9604740(0000) GS:ffff8881f6200000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fef9e900870 CR3: 000000010dfa2000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ rtl8150_open+0x300/0xe30 drivers/net/usb/rtl8150.c:733
+ __dev_open+0x2d4/0x4e0 net/core/dev.c:1474
+ __dev_change_flags+0x561/0x720 net/core/dev.c:8838
+ dev_change_flags+0x8f/0x160 net/core/dev.c:8910
+ devinet_ioctl+0x127a/0x1f10 net/ipv4/devinet.c:1177
+ inet_ioctl+0x3aa/0x3f0 net/ipv4/af_inet.c:1003
+ sock_do_ioctl+0x116/0x280 net/socket.c:1222
+ sock_ioctl+0x22e/0x6c0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl fs/ioctl.c:893 [inline]
+ __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f11f96d2d49
+Code: 5c c3 48 8d 44 24 08 48 89 54 24 e0 48 89 44 24 c0 48 8d 44 24 d0 48 89 44 24 c8 b8 10 00 00 00 c7 44 24 b8 10 00 00 00 0f 05 <41> 89 c0 3d 00 f0 ff ff 76 10 48 8b 15 ae 60 0d 00 f7 d8 41 83 c8
+RSP: 002b:00007ffdef3c4138 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f11f96046c0 RCX: 00007f11f96d2d49
+RDX: 00007ffdef3d4328 RSI: 0000000000008914 RDI: 0000000000000005
+RBP: 00007ffdef3e44e8 R08: 00007ffdef3d42e8 R09: 00007ffdef3d4298
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffdef3d4328 R14: 0000000000000028 R15: 0000000000008914
+ </TASK>
 
 
-On 9/6/2024 5:37 AM, Eric Dumazet wrote:
-> On Thu, Sep 5, 2024 at 10:48 PM Shoaib Rao <rao.shoaib@oracle.com> wrote:
->>
->> On 9/5/2024 1:35 PM, Kuniyuki Iwashima wrote:
->>> From: Shoaib Rao <rao.shoaib@oracle.com>
->>> Date: Thu, 5 Sep 2024 13:15:18 -0700
->>>> On 9/5/2024 12:46 PM, Kuniyuki Iwashima wrote:
->>>>> From: Shoaib Rao <rao.shoaib@oracle.com>
->>>>> Date: Thu, 5 Sep 2024 00:35:35 -0700
->>>>>> Hi All,
->>>>>>
->>>>>> I am not able to reproduce the issue. I have run the C program at least
->>>>>> 100 times in a loop. In the I do get an EFAULT, not sure if that is
->>>>>> intentional or not but no panic. Should I be doing something
->>>>>> differently? The kernel version I am using is
->>>>>> v6.11-rc6-70-gc763c4339688. Later I can try with the exact version.
->>>>> The -EFAULT is the bug meaning that we were trying to read an consumed skb.
->>>>>
->>>>> But the first bug is in recvfrom() that shouldn't be able to read OOB skb
->>>>> without MSG_OOB, which doesn't clear unix_sk(sk)->oob_skb, and later
->>>>> something bad happens.
->>>>>
->>>>>      socketpair(AF_UNIX, SOCK_STREAM, 0, [3, 4]) = 0
->>>>>      sendmsg(4, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\333", iov_len=1}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_OOB|MSG_DONTWAIT) = 1
->>>>>      recvmsg(3, {msg_name=NULL, msg_namelen=0, msg_iov=NULL, msg_iovlen=0, msg_controllen=0, msg_flags=MSG_OOB}, MSG_OOB|MSG_WAITFORONE) = 1
->>>>>      sendmsg(4, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\21", iov_len=1}], msg_iovlen=1, msg_controllen=0, msg_flags=0}, MSG_OOB|MSG_NOSIGNAL|MSG_MORE) = 1
->>>>>> recvfrom(3, "\21", 125, MSG_DONTROUTE|MSG_TRUNC|MSG_DONTWAIT, NULL, NULL) = 1
->>>>>      recvmsg(3, {msg_namelen=0}, MSG_OOB|MSG_ERRQUEUE) = -1 EFAULT (Bad address)
->>>>>
->>>>> I posted a fix officially:
->>>>> https://urldefense.com/v3/__https://lore.kernel.org/netdev/20240905193240.17565-5-kuniyu@amazon.com/__;!!ACWV5N9M2RV99hQ!IJeFvLdaXIRN2ABsMFVaKOEjI3oZb2kUr6ld6ZRJCPAVum4vuyyYwUP6_5ZH9mGZiJDn6vrbxBAOqYI$
->>>> Thanks that is great. Isn't EFAULT,  normally indicative of an issue
->>>> with the user provided address of the buffer, not the kernel buffer.
->>> Normally, it's used when copy_to_user() or copy_from_user() or
->>> something similar failed.
->>>
->>> But this time, if you turn KASAN off, you'll see the last recvmsg()
->>> returns 1-byte garbage instead of -EFAULT, so actually KASAN worked
->>> on your host, I guess.
->> No it did not work. As soon as KASAN detected read after free it should
->> have paniced as it did in the report and I have been running the
->> syzbot's C program in a continuous loop. I would like to reproduce the
->> issue before we can accept the fix -- If that is alright with you. I
->> will try your new test case later and report back. Thanks for the patch
->> though.
-> KASAN does not panic unless you request it.
->
-> Documentation/dev-tools/kasan.rst
->
-> KASAN is affected by the generic ``panic_on_warn`` command line parameter.
-> When it is enabled, KASAN panics the kernel after printing a bug report.
->
-> By default, KASAN prints a bug report only for the first invalid memory access.
-> With ``kasan_multi_shot``, KASAN prints a report on every invalid access. This
-> effectively disables ``panic_on_warn`` for KASAN reports.
->
-> Alternatively, independent of ``panic_on_warn``, the ``kasan.fault=`` boot
-> parameter can be used to control panic and reporting behaviour:
->
-> - ``kasan.fault=report``, ``=panic``, or ``=panic_on_write`` controls whether
->    to only print a KASAN report, panic the kernel, or panic the kernel on
->    invalid writes only (default: ``report``). The panic happens even if
->    ``kasan_multi_shot`` is enabled. Note that when using asynchronous mode of
->    Hardware Tag-Based KASAN, ``kasan.fault=panic_on_write`` always panics on
->    asynchronously checked accesses (including reads).
+Tested on:
 
-Hi Eric,
+commit:         b831f83e Merge tag 'bpf-6.11-rc7' of git://git.kernel...
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=17f75c8b980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9e0217c0b2cf4322
+dashboard link: https://syzkaller.appspot.com/bug?extid=d7e968426f644b567e31
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Thanks for the update. I forgot to mention that I I did set 
-/proc/sys/kernel/panic_on_warn to 1. I ran the program over night in two 
-separate windows, there are no reports and no panic. I first try to 
-reproduce the issue, because if I can not, how can I be sure that I have 
-fixed that bug? I may find another issue and fix it but not the one that 
-I was trying to. Please be assured that I am not done, I continue to 
-investigate the issue.
-
-If someone has a way of reproducing the failure please kindly let me know.
-
-Kind regards,
-
-Shoaib
-
+Note: no patches were applied.
 
