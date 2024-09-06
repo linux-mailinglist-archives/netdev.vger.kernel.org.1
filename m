@@ -1,107 +1,116 @@
-Return-Path: <netdev+bounces-126009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB8E96F90C
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 18:11:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C2D196F928
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 18:19:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57798285921
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:11:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 553CDB23ABE
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5731B1D365D;
-	Fri,  6 Sep 2024 16:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CBA31CCB45;
+	Fri,  6 Sep 2024 16:19:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LxkFVC/c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EyrQrZ0u"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A2A1D0496;
-	Fri,  6 Sep 2024 16:11:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F19B02D045;
+	Fri,  6 Sep 2024 16:19:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725639082; cv=none; b=uJfOqeShAj8pe2xUQ8zMfgB25hzkeGbTQGv64z5HpaWpudD+kc7MYkB/UdqM75KIKFmFFha4tz5NHFBxlC5FxCBD6GTp5uZjsAQk0iRM01ob1urQkKGBUuPmoFhXtbHf53WH+3zNJZegelfy85m3t3CaCReRrts28KkdeiJ3Jfs=
+	t=1725639552; cv=none; b=oH2WxGfZzXj4/R668lVyBeiMWaeg7wozphyFv7Sm/wckYB0AnLJVF5Cqnii33mIAFfAf8lLL7V1MMrKPwz6hLxxot6ZxAWRNg0M4DnBThns/T3C6JpPMhJR9jhpKz0Qp02e7zHOlDZGDqQTOOqw684mFSZUgFZQb78HuxiuVR+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725639082; c=relaxed/simple;
-	bh=5vz75h1/GiMmeUcEyJMnBZgtNnvg5MEjTECmV0PW1Fk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fJbhYHAz3pfR8aMPT9I/SJRt7iPN8sT1iNUoBcf0ldDSAqi/vgxhXBTciYL0mVuPFQVBWA9IPnHJFgd8RiCnRwWY3IqAPId1okHAghvMNVlbChcDKp3oq8l3k4jtjhejU9BB1yrvCz/OVloPzBN2YICDRjDg8ynfRNK3R8Sstc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LxkFVC/c; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CMRPbNPaGuvjB3ufaJfCswX417vVrfg/cRPMziQD1og=; b=LxkFVC/cLRlsFJeSVOG6YPZIHH
-	QgZeTcU9ZI4KuWV9ULo1IQ/qLRB/iazdbbvh+ERpyRWuULqHsm8scVvOsf1GVku+jbDl8UHt5J2dZ
-	UVEDnGNqFsX3GnUKaSuu3bNEKaWYQ1xMddqXCXq+qMTJnDzuL1MS4QSRUmr6a7JiAtn4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1smbYF-006qLw-EG; Fri, 06 Sep 2024 18:11:11 +0200
-Date: Fri, 6 Sep 2024 18:11:11 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org
-Subject: Re: [PATCH v1] dt-bindings: net: ethernet-phy: Add
- forced-master/slave properties for SPE PHYs
-Message-ID: <fde0f28d-3147-4a69-8be5-98e1d578a133@lunn.ch>
-References: <20240906144905.591508-1-o.rempel@pengutronix.de>
- <c08ac9b7-08e1-4cde-979c-ed66d4a252f1@lunn.ch>
- <20240906175430.389cf208@device-28.home>
+	s=arc-20240116; t=1725639552; c=relaxed/simple;
+	bh=sUIjw6J5Zhl72OejvSGd4be+a3PR6uydCmrLtsi5OW0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KnFcaViJkP0Yylcnl60rTKnGJCJFMBaTCsrj0w+YwqYxJaHz80zbFd25e2WdCz5dIIai7Rw/QVIU6GjWSs9BickHcub5ajIEWKsj9KjHYWGuG6X7HY2dtijSWCHsEOSTwEW/leI/+eoKlZDOnn/s53dOFI4UIH+N6K9XJ7jkMos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EyrQrZ0u; arc=none smtp.client-ip=209.85.166.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-82a8f3e7a10so76594639f.2;
+        Fri, 06 Sep 2024 09:19:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725639550; x=1726244350; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sUIjw6J5Zhl72OejvSGd4be+a3PR6uydCmrLtsi5OW0=;
+        b=EyrQrZ0u7C57Ul2aTNHGnwgeF0lR0JWvc+BVyUalbMk5+OQbDdzubF7yjqHtKvd/S+
+         AuPp4Op8KBPOIcq3QHprhev7yKpqTx7r5NUEt2UC4CUDDUOZ5BnCiLqXOymvJd1nyXLO
+         zgs35Z5j/M1w17ixgio82cknsAbt006SgVMPxkROtydrgrSGy7zyp9citrKny6DbtO6m
+         Mk1t2xhLUshV6H51FrGiBqNcTFmGp9Xj3v/aJLRuiHf8uNKNqwMFXxWRAZyKVzYhYl2V
+         XGTzkGjEd+Jt/mIuHJZZ/oGWox9J38/TluLIJh4pSV0Q+v7zm/J+/nob3tB8iJzvbPX+
+         VsaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725639550; x=1726244350;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sUIjw6J5Zhl72OejvSGd4be+a3PR6uydCmrLtsi5OW0=;
+        b=AjlO7pyW3I0LaNMh09/GF5ZykUQSNIhTLmUUGUxxJXWiQsltrvNBXBfIq6z+3VXmO/
+         ND7jPop6/Qya2kW85Pbb+N369jsGvzPhUwerpKKy+ZqqIVZOnOJfpaoKJ76r+n+cytRm
+         Uutj+VFvkWbBCZ22O4XcScmQJgXJwwuHxbMPR+dlpxmgPMrOezLETaYpqBz3+LqMShhO
+         hTa/Q0se4WPSTcd+1I72uRyOBuOlgMwbfjpmx0S8gljB6WAaNj6ALX8NR/OoeTvPo5ha
+         fdSzQUq1TYIOxyx1UvzlbseJ9Ue+crkUJcW5wADuf25mVs8vcFFSi2OAaUHJiU7iPgL/
+         bg/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUs78sxGL1lXDAfAS3u0kXRjsZbGolUiuxmKFVU+eWHK/T50mloJZ6mX2HeBh78M0ZjpUY0/6i3@vger.kernel.org, AJvYcCXFnm45KEgdXx+NcA64ZLcfiQCA2Yh/IBG23wAztHP+4W+P+yhVYdZf12UvTWwtwEhAePNGpZJLqtUXW+UQuX0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/xHkpApoH+uKofTjXbLRG3f+wse+8g7eWGvuoCPIjNhpyQM7k
+	cK5bAL+ytV4DVaUrPe8Q2kMMHyyuyWGwiU3e+/Vt/DaDiV0AUE2vOT2321D7sJcJ9jIPGha7V60
+	KeA6/YIrtnEX6WqPKADrBgGF2Dj8=
+X-Google-Smtp-Source: AGHT+IEidF6ubeDWvg9DxQuFOBMuQ2ZFrgm3I2e7IKIlf7yuFVqXUY5h8M6mXUiWMphRPF7UsP14bB+JMAp9X5K/wwU=
+X-Received: by 2002:a05:6e02:1c09:b0:399:4535:b66e with SMTP id
+ e9e14a558f8ab-3a04f0792b0mr37602645ab.9.1725639549920; Fri, 06 Sep 2024
+ 09:19:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240906175430.389cf208@device-28.home>
+References: <20240906095706.77636-1-kerneljasonxing@gmail.com> <66db1f2a40965_29a385294eb@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66db1f2a40965_29a385294eb@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 7 Sep 2024 00:18:33 +0800
+Message-ID: <CAL+tcoCeB-bVanW49Sv=-BMc7SOHcq4m8S4WtaER2unzPs9aAQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net-timestamp: correct the use of SOF_TIMESTAMPING_RAW_HARDWARE
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, shuah@kernel.org, willemb@google.com, 
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > 10Base-T1 often does not have autoneg, so preferred-master &
-> > preferred-slave make non sense in this context, but i wounder if
-> > somebody will want these later. An Ethernet switch is generally
-> > preferred-master for example, but the client is preferred-slave.
-> > 
-> > Maybe make the property a string with supported values 'forced-master'
-> > and 'forced-slave', leaving it open for the other two to be added
-> > later.
-> 
-> My two cents, don't take it as a nack or any strong disagreement, my
-> experience with SPE is still limited. I agree that for SPE, it's
-> required that PHYs get their role assigned as early as possible,
-> otherwise the link can't establish. I don't see any other place but DT
-> to put that info, as this would be required for say, booting over the
-> network. This to me falls under 'HW representation', as we could do the
-> same with straps.
-> 
-> However for preferred-master / preferred-slave, wouldn't we be crossing
-> the blurry line of "HW description => system configuration in the DT" ?
+On Fri, Sep 6, 2024 at 11:26=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > SOF_TIMESTAMPING_RAW_HARDWARE is a report flag which passes the
+> > timestamps generated by either SOF_TIMESTAMPING_TX_HARDWARE or
+> > SOF_TIMESTAMPING_RX_HARDWARE to the userspace all the time.
+> >
+> > So let us revise the doc here.
+> >
+> > Link: Link: https://lore.kernel.org/all/66d8c21d3042a_163d93294cb@wille=
+mb.c.googlers.com.notmuch/
 
-Yes, we are somewhere near the blurry line. This is why i gave the
-example of an Ethernet switch, vs a client. Again, it could be done
-with straps, so following your argument, it could be considered HW
-representation. But if it is set wrong, it probably does not matter,
-auto-neg should still work. Except for a very small number of PHYs
-whos random numbers are not random...
+Something seems wrong with my macbook... Really strange
 
-But this is also something we don't actually need to resolve now. The
-design allows for it, but we don't really need to decided if it is
-acceptable until somebody actually posts a patch.
+Ah, sorry, I have to repost it...
 
-	Andrew
+>
+> nit: duplicate keyword
+>
+> > Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> > Reviewed-by: Willem de Bruijn <willemb@google.com>
+>
+> indeed
+
+Thanks.
 
