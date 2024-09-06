@@ -1,139 +1,139 @@
-Return-Path: <netdev+bounces-126032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6722496FB2E
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 20:24:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 974C696FB4F
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 20:38:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 234D8282FAC
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 18:24:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2E041C217A6
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 18:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85FE01B85C8;
-	Fri,  6 Sep 2024 18:24:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588DD13BAC3;
+	Fri,  6 Sep 2024 18:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jxwZVrMS"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nVDCSPOE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625191B85C0
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 18:24:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F723FB8B;
+	Fri,  6 Sep 2024 18:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725647042; cv=none; b=DuqMii8kT8qcK1/lRWuzEEAgdZl3LH4nABFsxUB3F9nhwwpOfLXRSi6MukgdnvJlWZZT4BTAegvykqFBHwWuJirYeCjAcEzwH09V9CVY1wkHMiu6D8geJjaUsjNZSaNpQB+8SzV70/9z1WSiGHhhleargjWYVFvzq/mjQ+GciLQ=
+	t=1725647905; cv=none; b=YoLLHdQvATp1rBD4+jZHW+/Ojb2Tx4PIYvFBCrPQ+pu1gh2+86shqKMpo+vN/soCKAHqkUZpZAgyVy/9j+o0nYx5cb7JFOtEJj7F16URX/rQiwgSRd6Dlijq5TScUqyUPuUFT7bc+U/3fdLlQE3fusU829kx68F2gp/YDLIApmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725647042; c=relaxed/simple;
-	bh=C/Xn+zCgvyQ8jubkOZokejE+4FYhDVkDKEzBRHorVrA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOJ4z/9+EnUYyVLQH1o+bWfbOzmJADVynn1Ry3oZtlB/p426C7pY5TExKqUynZBzRMTnLfH2gRttg9oChdcAlpU0LvxA009z3NkldpX8bBWrOcMusJverQBqj4fmsTigPifxWvl/aRyusF66jSHf2xCi7BlmJ7SHXk02aC2ldR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jxwZVrMS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 556F5C4CEC4;
-	Fri,  6 Sep 2024 18:23:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725647041;
-	bh=C/Xn+zCgvyQ8jubkOZokejE+4FYhDVkDKEzBRHorVrA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jxwZVrMSk0u4C15PopVGdmvBkIGMHOl3DxUfCtVg5CaUJ+GlMP9zF4O9yoGC4VcN7
-	 B5CeVtXu2dqT234FUFDVCBZdBDOGfzf9a/OBiTnXo2G93y0dwoJ+pVQM9x9NzZfVrz
-	 xW3KTdkO4gVyD47MYoaGWaQoxWLq22d0V8GfpJM1GTAE4kFcLrD6WcRSG5S1C8j1OO
-	 I++l4HkLMpEnTf0bEPgZglxSDy2HGqO7o9dwiUjmHWWdYbT5dxeQ6xAbkfaTLxpMBF
-	 9iTfa6SOc03FTXyIj0Q6mMmCZ/vVrEsKf4e9WaXgtiIg8R62Q0waHXYCV2x3UiFhEn
-	 4mVnHjYxkOh2g==
-Date: Fri, 6 Sep 2024 19:23:56 +0100
-From: Simon Horman <horms@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Itamar Gozlan <igozlan@nvidia.com>, Mark Bloch <mbloch@nvidia.com>
-Subject: Re: [net-next V2 11/15] net/mlx5: HWS, added memory management
- handling
-Message-ID: <20240906182356.GK2097826@kernel.org>
-References: <20240905062752.10883-1-saeed@kernel.org>
- <20240905062752.10883-12-saeed@kernel.org>
+	s=arc-20240116; t=1725647905; c=relaxed/simple;
+	bh=krEvvj6ryDG0HcWRnqPIFYM6AUVHodRtXa8xDOKknTw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=OenpBVlINDgfJVAKFpIZmOZQ4yltZr/oGfRmYe0SnHliJzVmPtAe38qvWtLhf6f2zR+MO3OTPTx8XJ0CUyGz0ZIHVxH0xCx8tvaNokhZMZdDTvojR2Gu59/kuwocsGLmpD29Qt58i+2G4YHnhh2fST4wBM7D3DZQE+TbiN8ApIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nVDCSPOE; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4868YIJM032629;
+	Fri, 6 Sep 2024 18:38:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	CIe/mcRmIOgwDEvWBcGTWDvnQ2KluYGPbNhonz0OWpU=; b=nVDCSPOEHs9oAW5u
+	URoeclmDMSEFchBuRrvrhePsBPh8IfAHbHsdpWv/8+YeyVDqlt88tdb8UVEEIPer
+	FyWeqwhFWSmmjNUDwKho3dbxkxLUTYJ+MAV9ox3Up8EgI3aJnRnow2IqYWr1kI7/
+	YGNDs2jIab3rzQU+XYykqzQHSZ+3/P81vnZue55thlFYpb7SdGWcwRW2GgU05mcm
+	iKVW1MvD7ytz4Pg6D1xS9ehovbpOHeDVF9/oUGLh+Qory0xF2bb9OA0G3qg4YsSV
+	3TfjwJ0TviwIkngqeA4dvnkZX7IZKD6xFWRLnSOiF4NotEtAOgibAXSWQ9qMsl1H
+	iknhmA==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41fhwtb87r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 06 Sep 2024 18:38:09 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 486Ic8OP008394
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 6 Sep 2024 18:38:08 GMT
+Received: from [10.111.181.108] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 6 Sep 2024
+ 11:38:07 -0700
+Message-ID: <1e77b503-36ff-4a97-993b-f87d658c9970@quicinc.com>
+Date: Fri, 6 Sep 2024 11:38:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240905062752.10883-12-saeed@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
+ of the ath11k on WCN6855
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>
+CC: "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Jeff Johnson
+	<jjohnson@kernel.org>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <ath11k@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        Bartosz
+ Golaszewski <bartosz.golaszewski@linaro.org>
+References: <20240814082301.8091-1-brgl@bgdev.pl> <87a5hcyite.fsf@kernel.org>
+ <CAMRc=Mcr7E0dxG09_gYPxg57gYAS4j2+-3x9GCS3wOcM46O=NQ@mail.gmail.com>
+ <87y146ayrm.fsf@kernel.org>
+ <CAMRc=Mfes+=59WP8dcMsiUApqjsFrY9iVFEdKU6FbTKAFP1k_A@mail.gmail.com>
+ <878qw6hs4s.fsf@kernel.org>
+ <CAMRc=Mc_Qy6-Rgsw_uOweUXtoiZGMR0D22Ou9nXUJDDdPCZqLw@mail.gmail.com>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <CAMRc=Mc_Qy6-Rgsw_uOweUXtoiZGMR0D22Ou9nXUJDDdPCZqLw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: nxSgVBbnrS-V-S73ijR707OYrT48BYGa
+X-Proofpoint-ORIG-GUID: nxSgVBbnrS-V-S73ijR707OYrT48BYGa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_04,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 clxscore=1011 priorityscore=1501 malwarescore=0
+ adultscore=0 mlxscore=0 spamscore=0 bulkscore=0 mlxlogscore=999
+ phishscore=0 lowpriorityscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2408220000 definitions=main-2409060137
 
-On Wed, Sep 04, 2024 at 11:27:46PM -0700, Saeed Mahameed wrote:
-> From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+On 9/6/2024 12:44 AM, Bartosz Golaszewski wrote:
+> For upstream - if you're using the WCN6855, you must specify the
+> inputs for the WLAN module so it's only fair they be described as
+> "required". For out-of-tree DTS I couldn't care less.
 > 
-> Added object pools and buddy allocator functionality.
-> 
-> Reviewed-by: Itamar Gozlan <igozlan@nvidia.com>
-> Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
-> Reviewed-by: Mark Bloch <mbloch@nvidia.com>
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+> You are not correct saying that "M.2 boards don't need these" because
+> as a matter of fact: the WLAN module on your M.2 card takes these
+> inputs from the PMU inside the WCN6855 package.
 
-...
+Let me start by saying that DT is one area where I'm a newbie, so I hope I can
+get some education.
 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.c
+I'd like to start with an observation: I've used both WCN6855 with ath11k and
+WCN7850 with ath12k on an x86 laptop without any device tree, so from that
+perspective none of the device tree stuff is "required" -- these modules "just
+work".
 
-...
+However I also realize that when these are installed on Qualcomm ARM platforms
+that there are GPIO pins that control things like XO clock, WLAN enable &
+Bluetooth enable, as well as voltage regulators, and the device is
+non-functional without those configured, so the device tree items are required
+in that environment.
 
-> +static struct mlx5hws_pool_resource *
-> +hws_pool_create_one_resource(struct mlx5hws_pool *pool, u32 log_range,
-> +			     u32 fw_ft_type)
-> +{
-> +	struct mlx5hws_cmd_ste_create_attr ste_attr;
-> +	struct mlx5hws_cmd_stc_create_attr stc_attr;
-> +	struct mlx5hws_pool_resource *resource;
-> +	u32 obj_id;
-> +	int ret;
-> +
-> +	resource = kzalloc(sizeof(*resource), GFP_KERNEL);
-> +	if (!resource)
-> +		return NULL;
-> +
-> +	switch (pool->type) {
-> +	case MLX5HWS_POOL_TYPE_STE:
-> +		ste_attr.log_obj_range = log_range;
-> +		ste_attr.table_type = fw_ft_type;
-> +		ret = mlx5hws_cmd_ste_create(pool->ctx->mdev, &ste_attr, &obj_id);
-> +		break;
-> +	case MLX5HWS_POOL_TYPE_STC:
-> +		stc_attr.log_obj_range = log_range;
-> +		stc_attr.table_type = fw_ft_type;
-> +		ret = mlx5hws_cmd_stc_create(pool->ctx->mdev, &stc_attr, &obj_id);
-> +		break;
-> +	default:
+So just from that perspective saying something is "required" is confusing when
+there are platforms where it isn't required. And perhaps that is what is
+confusing Kalle as well?
 
-Hi Saeed and Yevgeny,
-
-Another minor nit from my side (I think this is the last one).
-
-If we get here, then ret will be used uninitialised by the if condition below.
-
-Also flagged by Smatch.
-
-> +		break;
-> +	}
-> +
-> +	if (ret) {
-> +		mlx5hws_err(pool->ctx, "Failed to allocate resource objects\n");
-> +		goto free_resource;
-> +	}
-> +
-> +	resource->pool = pool;
-> +	resource->range = 1 << log_range;
-> +	resource->base_id = obj_id;
-> +
-> +	return resource;
-> +
-> +free_resource:
-> +	kfree(resource);
-> +	return NULL;
-> +}
+/jeff
 
