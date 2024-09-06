@@ -1,299 +1,140 @@
-Return-Path: <netdev+bounces-125838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08DB96EE5C
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:40:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED50E96EE60
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:40:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73A141F24838
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:40:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F6A71C222AE
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E271581EA;
-	Fri,  6 Sep 2024 08:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481091581EA;
+	Fri,  6 Sep 2024 08:40:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QAw3apM/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E91942C0B
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 08:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243A0156887
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 08:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725612026; cv=none; b=kesLiNIDM5TMO3aFCaSnJsSEPQ16f67kSSU+gA6uQaHGLHvktnfspw+qxscHzOoIxuDKATdEwJ+esGM1umC2kJPZszl2GHm4wQoRQwRPbnOL7GV0ef53HSyo1Skv4erdQ246BjLXI2wJ6qBnKXkfOzYWic5YOiQ5Z8CvSxyrMIM=
+	t=1725612032; cv=none; b=Hb34CPOeBqASH4ZoKNHzn6Jbktyhz2nG+KKmPu+ZUXZrxE2okOXE95JSOugPcTaqf/Nw8RAD3+RjMC3TDx/g7o7NtUvMmf0Z09HHrkZhuib7Mkva0S9g/fdX4s4SkUPZ3b4eK7w8wuUwkyUqdr7i84Z4qyfCrKFnyLzp2mRjKxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725612026; c=relaxed/simple;
-	bh=e8Q9CXP4EQ4aHDpjhvlYAJBy8g2VChIudliQKIE9Qww=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Sa50Nicdzokx0OFZ/Mif2pFoOJshk7ThxI8DDSXZMSVBjs6u1pxkMVdEo6/xDdRj7riXemiCYBwYwicr0P06104yKDl6/Fg1NkIvaImc8cUrPAyPjbLaHJgVKcpI2wpz30XKFYpCBNCL779255UnZCFee7iBt1cn7qHuqXBxK7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39f6f16ed00so46254495ab.0
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 01:40:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725612023; x=1726216823;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dxMtXmxbmIuI9BH9fl2KBtlQSH4poSJVQCqdbJyhlzA=;
-        b=XTdhSe/vSrY+s5iokGE1SQ03yorar7r//IlAUE9dvIQ4WtC3v9fWRjxZHFx6mZQUY3
-         yqMaO4uOmuwdFcFkGkACCjFi7msXM/sJVYKnYEHsPF1H+1/PSRX3/tlFLgVbKdYG7TB4
-         UUIj153a+Haj0Iz5xMjaNQ+tSLvXh0+zNir98FytnXyg2T19IXhWgoIqJ3kz876toJLK
-         KXChoWTUX3sYJaNcIM4P3iTZsSkzpEtT0kfGoxzfbZglan10L3vZoP9RJLEHgOuZZMOG
-         tj7CguE4DY/RW1P+7hThdrxH0GpyRb9WiBwLslgnYpJdbRaDQ3dCfXq5XWO9fxz3PqP6
-         FZeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWs/3QcelPogWY8E9Sut+vI6uKQ2rCbTcH4Ft20FW6kO6jA85DLZhsUCIu9eJ5Q3Ne4/wghoKM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNXlBeGjYCauupx1VbZ3+a8iLEh7y56/Rt521VpAABSuAWgWl/
-	9QTeWYP9/FtFrInrykUQkFciqmcTjiuG6RdaNuzSbVJcy28qGzhG69ZnHnwijdnk0K5Xt67b6W5
-	YbFKWs4PQa4H0J4vQS52q4QpQ9mb4miWLJLv3a5sjIUO6T3jN0UOPJFU=
-X-Google-Smtp-Source: AGHT+IGU/x+f6zi6jCEqPmhPkUEnJh9k4zt2qXJR1860FVwoYiqZo117bWs06xrpRKJ/Q6g0XA1Okt9C0Dv+9Dylrg62iw57nUiH
+	s=arc-20240116; t=1725612032; c=relaxed/simple;
+	bh=Uxm7PSBgH9OV8X2gb1b9mZtr6aINCyetZvyPN7lafB0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Aako8aTKPRzBssVK+haqq5DU1yWRU5bwH3d82MQtRMD2CtlTS+KMxAtaV//NjCZoZbnovK9ATscuxrVwz1Lbw45117ixJHyTCOAWOfycGHqNNTMnuFUJdzOBrY/HAgFwBPsqUSKSMK6+N/XnhbS3Xb1c9euC2tcUPaD597Mt6C0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QAw3apM/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7011C4CEC5;
+	Fri,  6 Sep 2024 08:40:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725612031;
+	bh=Uxm7PSBgH9OV8X2gb1b9mZtr6aINCyetZvyPN7lafB0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QAw3apM/9u2950Fo4LHQe+4o8yAyHeHTqqHjs8SZvEXviTvG15nmrDceqeHuo3Sx/
+	 56KzPM4KyfJ2XAFUOkL6sqrvdcqJjOsOH11TvdSZm3d63usygr+8xZtqwLdZAnIddk
+	 PThgKvWPf4mzGOY+96El/p3Yoc4TKEJBf8i4441SOB1zq9Kp/IqLLFQYjMpEG1Z3WY
+	 veV/tGDXYcmM13WFvmKFZXqYORxJK9fQUvAka9FtVdgoTbD9ZAllqEoac7vrfGFhUQ
+	 iuNcfv5MPFWRUOfeAt/gVysUQz9H63pPYWot29cMus30GYJBRX5y1VXpp9dHSxP5z9
+	 qrKWYpVjOKUuA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCBA3806654;
+	Fri,  6 Sep 2024 08:40:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1386:b0:39d:25b4:1528 with SMTP id
- e9e14a558f8ab-3a04f0e655dmr743625ab.3.1725612023557; Fri, 06 Sep 2024
- 01:40:23 -0700 (PDT)
-Date: Fri, 06 Sep 2024 01:40:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000af47d506216f5b6e@google.com>
-Subject: [syzbot] [fs?] KASAN: slab-use-after-free Read in lockref_get_not_dead
- (2)
-From: syzbot <syzbot+f82b36bffae7ef78b6a7@syzkaller.appspotmail.com>
-To: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/15] RX software timestamp for all - round 2
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172561203251.2028302.15757209227467883993.git-patchwork-notify@kernel.org>
+Date: Fri, 06 Sep 2024 08:40:32 +0000
+References: <20240904074922.256275-1-gal@nvidia.com>
+In-Reply-To: <20240904074922.256275-1-gal@nvidia.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+ jv@jvosburgh.net, andy@greyhouse.net, mkl@pengutronix.de,
+ mailhol.vincent@wanadoo.fr, Shyam-sundar.S-k@amd.com, skalluru@marvell.com,
+ manishc@marvell.com, michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
+ nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, sgoutham@marvell.com,
+ bharat@chelsio.com, benve@cisco.com, satishkh@cisco.com,
+ claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, wei.fang@nxp.com,
+ shenwei.wang@nxp.com, xiaoning.wang@nxp.com, dmichail@fungible.com,
+ yisen.zhuang@huawei.com, salil.mehta@huawei.com, shaojijie@huawei.com,
+ anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
+ marcin.s.wojtas@gmail.com, linux@armlinux.org.uk, gakula@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com, idosch@nvidia.com, petrm@nvidia.com,
+ bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
+ horatiu.vultur@microchip.com, lars.povlsen@microchip.com,
+ Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
+ alexandre.belloni@bootlin.com, shannon.nelson@amd.com, brett.creeley@amd.com,
+ s.shtylyov@omp.ru, yoshihiro.shimoda.uh@renesas.com,
+ niklas.soderlund@ragnatech.se, ecree.xilinx@gmail.com,
+ habetsm.xilinx@gmail.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, s-vadapalli@ti.com, rogerq@kernel.org,
+ danishanwar@ti.com, linusw@kernel.org, kaloz@openwrt.org,
+ richardcochran@gmail.com, willemdebruijn.kernel@gmail.com
 
-Hello,
+Hello:
 
-syzbot found the following issue on:
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-HEAD commit:    9b0874286768 Merge branch 'mctp-serial-tx-escapes'
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=11bb370b980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=996585887acdadb3
-dashboard link: https://syzkaller.appspot.com/bug?extid=f82b36bffae7ef78b6a7
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1627ab2b980000
+On Wed, 4 Sep 2024 10:49:07 +0300 you wrote:
+> Round 1 of drivers conversion was merged [1], this is round 2, more
+> drivers to follow.
+> 
+> [1] https://lore.kernel.org/netdev/20240901112803.212753-1-gal@nvidia.com/
+> 
+> Thanks,
+> Gal
+> 
+> [...]
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/dcf9f909bf9e/disk-9b087428.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/edebf1ed521a/vmlinux-9b087428.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/df22819dee6a/bzImage-9b087428.xz
+Here is the summary with links:
+  - [net-next,01/15] lan743x: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/b9c4d16e2a47
+  - [net-next,02/15] net: lan966x: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/f592435d132c
+  - [net-next,03/15] net: sparx5: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/35461b6d5802
+  - [net-next,04/15] mlxsw: spectrum: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/8a26d9471766
+  - [net-next,05/15] net: ethernet: ti: am65-cpsw-ethtool: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/f40a3712ef1b
+  - [net-next,06/15] net: ethernet: ti: cpsw_ethtool: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/c76e2f40b7d9
+  - [net-next,07/15] net: ti: icssg-prueth: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/c5dbb6aeefbd
+  - [net-next,08/15] net: netcp: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/f9b74d602ee3
+  - [net-next,09/15] i40e: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/5df20ce03ef4
+  - [net-next,10/15] ice: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/6aebd824f45a
+  - [net-next,11/15] igb: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/638effa35d68
+  - [net-next,12/15] igc: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/29d2e49a62c1
+  - [net-next,13/15] ixgbe: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/12283fad6d2e
+  - [net-next,14/15] cxgb4: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/4c6d910e0254
+  - [net-next,15/15] bnx2x: Remove setting of RX software timestamp
+    https://git.kernel.org/netdev/net-next/c/26f74155df44
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f82b36bffae7ef78b6a7@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KASAN: slab-use-after-free in __lock_acquire+0x77/0x2040 kernel/locking/lockdep.c:5007
-Read of size 8 at addr ffff88805c6ce248 by task syz.4.339/6895
-
-CPU: 0 UID: 0 PID: 6895 Comm: syz.4.339 Not tainted 6.11.0-rc5-syzkaller-00154-g9b0874286768 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- __lock_acquire+0x77/0x2040 kernel/locking/lockdep.c:5007
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
- spin_lock include/linux/spinlock.h:351 [inline]
- lockref_get_not_dead+0x26/0xc0 lib/lockref.c:184
- get_stashed_dentry fs/libfs.c:2128 [inline]
- path_from_stashed+0x218/0xb90 fs/libfs.c:2222
- proc_ns_get_link+0xf9/0x240 fs/proc/namespaces.c:61
- pick_link+0x631/0xd50
- step_into+0xca9/0x1080 fs/namei.c:1909
- open_last_lookups fs/namei.c:3674 [inline]
- path_openat+0x184b/0x3470 fs/namei.c:3883
- do_filp_open+0x235/0x490 fs/namei.c:3913
- do_sys_openat2+0x13e/0x1d0 fs/open.c:1416
- do_sys_open fs/open.c:1431 [inline]
- __do_sys_openat fs/open.c:1447 [inline]
- __se_sys_openat fs/open.c:1442 [inline]
- __x64_sys_openat+0x247/0x2a0 fs/open.c:1442
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fab18f78850
-Code: 48 89 44 24 20 75 93 44 89 54 24 0c e8 19 8f 02 00 44 8b 54 24 0c 89 da 48 89 ee 41 89 c0 bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 38 44 89 c7 89 44 24 0c e8 6c 8f 02 00 8b 44
-RSP: 002b:00007fab19c74f60 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fab18f78850
-RDX: 0000000000000000 RSI: 00007fab18fe7a56 RDI: 00000000ffffff9c
-RBP: 00007fab18fe7a56 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
-R13: 0000000000000001 R14: 00007fab19116130 R15: 00007ffe82b25778
- </TASK>
-
-Allocated by task 6889:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- unpoison_slab_object mm/kasan/common.c:312 [inline]
- __kasan_slab_alloc+0x66/0x80 mm/kasan/common.c:338
- kasan_slab_alloc include/linux/kasan.h:201 [inline]
- slab_post_alloc_hook mm/slub.c:3988 [inline]
- slab_alloc_node mm/slub.c:4037 [inline]
- kmem_cache_alloc_lru_noprof+0x139/0x2b0 mm/slub.c:4056
- __d_alloc+0x31/0x700 fs/dcache.c:1631
- prepare_anon_dentry fs/libfs.c:2162 [inline]
- path_from_stashed+0x63a/0xb90 fs/libfs.c:2229
- proc_ns_get_link+0xf9/0x240 fs/proc/namespaces.c:61
- pick_link+0x631/0xd50
- step_into+0xca9/0x1080 fs/namei.c:1909
- open_last_lookups fs/namei.c:3674 [inline]
- path_openat+0x184b/0x3470 fs/namei.c:3883
- do_filp_open+0x235/0x490 fs/namei.c:3913
- do_sys_openat2+0x13e/0x1d0 fs/open.c:1416
- do_sys_open fs/open.c:1431 [inline]
- __do_sys_openat fs/open.c:1447 [inline]
- __se_sys_openat fs/open.c:1442 [inline]
- __x64_sys_openat+0x247/0x2a0 fs/open.c:1442
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 16:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
- __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2252 [inline]
- slab_free mm/slub.c:4473 [inline]
- kmem_cache_free+0x145/0x350 mm/slub.c:4548
- rcu_do_batch kernel/rcu/tree.c:2569 [inline]
- rcu_core+0xafd/0x1830 kernel/rcu/tree.c:2843
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- run_ksoftirqd+0xca/0x130 kernel/softirq.c:928
- smpboot_thread_fn+0x544/0xa30 kernel/smpboot.c:164
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-Last potentially related work creation:
- kasan_save_stack+0x3f/0x60 mm/kasan/common.c:47
- __kasan_record_aux_stack+0xac/0xc0 mm/kasan/generic.c:541
- __call_rcu_common kernel/rcu/tree.c:3106 [inline]
- call_rcu+0x167/0xa70 kernel/rcu/tree.c:3210
- __dentry_kill+0x497/0x630 fs/dcache.c:629
- dput+0x19f/0x2b0 fs/dcache.c:852
- __fput+0x5f8/0x8a0 fs/file_table.c:430
- __do_sys_close fs/open.c:1566 [inline]
- __se_sys_close fs/open.c:1551 [inline]
- __x64_sys_close+0x7f/0x110 fs/open.c:1551
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-The buggy address belongs to the object at ffff88805c6ce178
- which belongs to the cache dentry of size 312
-The buggy address is located 208 bytes inside of
- freed 312-byte region [ffff88805c6ce178, ffff88805c6ce2b0)
-
-The buggy address belongs to the physical page:
-page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x5c6ce
-head: order:1 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-memcg:ffff8880279abf01
-flags: 0xfff00000000040(head|node=0|zone=1|lastcpupid=0x7ff)
-page_type: 0xfdffffff(slab)
-raw: 00fff00000000040 ffff88801bafe8c0 dead000000000100 dead000000000122
-raw: 0000000000000000 0000000000150015 00000001fdffffff ffff8880279abf01
-head: 00fff00000000040 ffff88801bafe8c0 dead000000000100 dead000000000122
-head: 0000000000000000 0000000000150015 00000001fdffffff ffff8880279abf01
-head: 00fff00000000001 ffffea000171b381 ffffffffffffffff 0000000000000000
-head: 0000000000000002 0000000000000000 00000000ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-page_owner tracks the page as allocated
-page last allocated via order 1, migratetype Reclaimable, gfp_mask 0x1d20d0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC|__GFP_HARDWALL|__GFP_RECLAIMABLE), pid 5646, tgid 5645 (syz.1.52), ts 379968019454, free_ts 379948285619
- set_page_owner include/linux/page_owner.h:32 [inline]
- post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1493
- prep_new_page mm/page_alloc.c:1501 [inline]
- get_page_from_freelist+0x2e4c/0x2f10 mm/page_alloc.c:3439
- __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4695
- __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
- alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
- alloc_slab_page+0x5f/0x120 mm/slub.c:2321
- allocate_slab+0x5a/0x2f0 mm/slub.c:2484
- new_slab mm/slub.c:2537 [inline]
- ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3723
- __slab_alloc+0x58/0xa0 mm/slub.c:3813
- __slab_alloc_node mm/slub.c:3866 [inline]
- slab_alloc_node mm/slub.c:4025 [inline]
- kmem_cache_alloc_lru_noprof+0x1c5/0x2b0 mm/slub.c:4056
- __d_alloc+0x31/0x700 fs/dcache.c:1631
- d_alloc_pseudo+0x1f/0xb0 fs/dcache.c:1763
- alloc_path_pseudo fs/file_table.c:330 [inline]
- alloc_file_pseudo+0x123/0x290 fs/file_table.c:346
- sock_alloc_file+0xb8/0x290 net/socket.c:469
- sock_map_fd net/socket.c:494 [inline]
- __sys_socket+0x1dd/0x3c0 net/socket.c:1715
- __do_sys_socket net/socket.c:1720 [inline]
- __se_sys_socket net/socket.c:1718 [inline]
- __x64_sys_socket+0x7a/0x90 net/socket.c:1718
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-page last free pid 5643 tgid 5642 stack trace:
- reset_page_owner include/linux/page_owner.h:25 [inline]
- free_pages_prepare mm/page_alloc.c:1094 [inline]
- free_unref_page+0xd22/0xea0 mm/page_alloc.c:2612
- __slab_free+0x31b/0x3d0 mm/slub.c:4384
- qlink_free mm/kasan/quarantine.c:163 [inline]
- qlist_free_all+0x9e/0x140 mm/kasan/quarantine.c:179
- kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
- __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:322
- kasan_slab_alloc include/linux/kasan.h:201 [inline]
- slab_post_alloc_hook mm/slub.c:3988 [inline]
- slab_alloc_node mm/slub.c:4037 [inline]
- kmem_cache_alloc_noprof+0x135/0x2a0 mm/slub.c:4044
- create_nsproxy kernel/nsproxy.c:56 [inline]
- create_new_namespaces+0x34/0x7b0 kernel/nsproxy.c:74
- prepare_nsset kernel/nsproxy.c:335 [inline]
- __do_sys_setns kernel/nsproxy.c:569 [inline]
- __se_sys_setns+0x2cb/0x1c10 kernel/nsproxy.c:546
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Memory state around the buggy address:
- ffff88805c6ce100: fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc fa
- ffff88805c6ce180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->ffff88805c6ce200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                                              ^
- ffff88805c6ce280: fb fb fb fb fb fb fc fc fc fc fc fc fc fc fa fb
- ffff88805c6ce300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
