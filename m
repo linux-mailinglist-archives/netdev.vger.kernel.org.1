@@ -1,142 +1,173 @@
-Return-Path: <netdev+bounces-125928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCF9D96F490
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 14:47:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC8A396F496
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 14:49:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF1421C215E3
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:47:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EF71B218C8
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:49:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADC7197A67;
-	Fri,  6 Sep 2024 12:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256521CCB45;
+	Fri,  6 Sep 2024 12:49:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a6eW7PVo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyJuVLWn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E37D1AB6F4
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 12:47:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D70E2745B;
+	Fri,  6 Sep 2024 12:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725626852; cv=none; b=WlXSTIFV59jT+QSa44hs+h0ejsUGP6OBR9VPvKgLKPU+KrwjczlbuOQAOiltPHmJXrnBgnhAZFTLULBROW06sPzcV1BQbj3kgqQGivxQaNmjbH5EHbHNocA8D/OVkwP/dTGUaYO5BBIEw6oLJBPvfBjwQtsZWmaCIrr0319kDnQ=
+	t=1725626975; cv=none; b=ZYDYBukidameaubRNdWrJED/nyrAzp5BEr2zg6nIv1F0b7G8ku8xoUZ6E62b2kV2QduknyGLM1QKHoy10KF0CyTNT4+Na5jvvMjKfGQTq+NOzG+XuOmr3/gQQTDZaib/Q9qgmpfwP+uRqkFnH9gLRcg3jarcOS0Cza2TqyBN2jk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725626852; c=relaxed/simple;
-	bh=nkVX8x5PTDfynA2qFeKebBwbI/vgSjg3+jZ2RTvSU5U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E0pvXwATPKb1C90GQ5bHB01uGlrzJEycwA5zznKiktbVBgDy8KAFN5y4yaAT9Ek2xqnYmjZzHZ1j3r/pEIedxmVpHR10TlJI7YfrBNFDlgCk/XavQkyfXPqHUgbMfbfXIz0G/s1E0WYrnyOfkfLZnuUjSenAEvMvpuFlia3UZNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a6eW7PVo; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53659867cbdso905598e87.3
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 05:47:30 -0700 (PDT)
+	s=arc-20240116; t=1725626975; c=relaxed/simple;
+	bh=/JQrWFue7O5d7XFf2sAp3z90GB4AIZ1wnBd1Tralu4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ILQpEOXkXyiMxDY/qQ80/rIeK+hvJz5nyTti0YiOIRF9i1/eprO2VnXvbsgZY7m6UOQveZOL6RI1iArs3rXjLvC3wztdwbN8m7gT3Ld915AcMakE7fzoCoquqOoU8fthHWXjV1XFImEsG4NjkWM9+in0cWYpI5RzdFxIrUL9Eic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kyJuVLWn; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53652d19553so288211e87.0;
+        Fri, 06 Sep 2024 05:49:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725626849; x=1726231649; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PR4pd9F/THco+SSFccpfdKHI0uD3Tvf9dpZhnwAEH+o=;
-        b=a6eW7PVorvORruKZvbJ6ysUdjdYslQmjyzGmzBrQMxPRgnElPuFgcbIstArOvwVoyX
-         6tF7Ei1ym2lSj/UoAH84zfTWS+eIcxe8IVVHrfx8cOTmqvElTawpfVIjBWEcji0ljHlO
-         aLqGfQyBEG9iZcTWZUcPsiR7m5zKNduqIAYw9FuW/k5qf8IlBdbrGL/OBEkmTYLWKbIM
-         9/G07Kz/fb3CLqwEeVuYiX4pD16vRhVRK/CsIuIzD8HpnWkuDc/sClNQLQhtQRw7TBqS
-         ZdDDA6/vsK8kULalQz+G2IQCzrcXgsHdGlO95CbixcDkE6OMMIFrud9DH/VWnu8oRs2N
-         KASg==
+        d=gmail.com; s=20230601; t=1725626969; x=1726231769; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CazLyKDyDWBGE+TrHohi5rRaTCuA6ZV2cOHXjRbJ6FA=;
+        b=kyJuVLWn/P4EGzW5wwWZtIjSfjc136+MeQuz49o3NfnLzQdVgDeo6+UpP59RoTlwLm
+         ywnKINp7ao6llO3dy1wq46Xv5kmLFqusnz3pV6Jhaat4ntzurHD4i4LPCVb9frlhIFMZ
+         Dy7799XlnMAXf84h0N6UVi283IaIMiFeMBRnW1Od7ZT6h/0umHGt7/cXm3fiNJozO/XQ
+         3g3TOuaLBIFjPivCxPv+CvU6J5cWXZcVOj/lAFWVyWCM8fvsriwxmWWC0nBWdTSK8o/I
+         6k2M7T8C7OLBxUCGUfu+AmGmmYn8tVzSAmKypU5eNcAoCR7Li8mgWJ2Npm33g7k+8DJ+
+         hjjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725626849; x=1726231649;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PR4pd9F/THco+SSFccpfdKHI0uD3Tvf9dpZhnwAEH+o=;
-        b=wWc/ui3L8hQ9COE/CxJN+GUhR4W4DHZMDK0E02J539WWsRa3alnWXfww1ju7XoNhHW
-         0+E3iY1Q8eEDLVInCDPZz7R1AuWS6kkndTxc4IvEpaHpD0oMvy/iEoul/WU/JJ53cmCe
-         Rt99Dxn15De58TW7xP45vlCH+c8Tmv7XYXnHbIQbxNor915GpsGaFUzDlyojA9ladzM4
-         Aj3BYhiyj6WV41It7mTUPXJ/no3REb1Dla/+sjiIOWQ0LAo3KIAvBLfPRNpedHZ1Gpmn
-         5FshU5vu0ezeZ1Ix97tVex+x2rEMrC9ALnttMIdgYYmU4KaLH8VGVw1BXlo3Zcda9npc
-         PhCA==
-X-Forwarded-Encrypted: i=1; AJvYcCXXeHuBzGCPmrudP5gFtM6N6UHMwcH2HolAN1lu783Zcf5nhWGHkMbIyCEpl88Jl1QPGYNdbhU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTCdPPiE5+O3qXraut/D8ZHdUEjrPjbK62Mp54oW8RHlZWy/5a
-	OnUCLBpTfxlszwthENFbiiER3qs2ClTjhUjyxIWZNOUjJwSnudmCEdTT3urJEMBhcqOm+w1Q3DQ
-	22lEo3GG/ofsFqRpZF63P1SQpY4ppIDDfoMHK
-X-Google-Smtp-Source: AGHT+IEe7dipQ5wyoY8KEUiQgwuNhZDJ1wkzxhdfCXfkWXl4wenzdCvTiDXbQt0zl73UVMTIQ6hsrmnRYklBs6JEOHA=
-X-Received: by 2002:a05:6512:b97:b0:535:ea75:e915 with SMTP id
- 2adb3069b0e04-53658816f23mr1951314e87.56.1725626847630; Fri, 06 Sep 2024
- 05:47:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725626969; x=1726231769;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CazLyKDyDWBGE+TrHohi5rRaTCuA6ZV2cOHXjRbJ6FA=;
+        b=quZn1vs3CdIIdb+NjMZpGDA7uDrtPWo8768qiBxndkIignV3HBa9bBXFaNrF+YP+Lx
+         gbY2OU7RoTR2TDUwuj464cItQft49u2l2LMOqoeNiPa7n5foNkRKDv9hyia5WfR6tHho
+         glDzy0w8MEthzFFk4xGUytXf4Qtcdfqv1l0pH4G4CnkgfVKB0pD4JeHlDTo+O877Zg2g
+         PGNakX2PSgrgfsWUw6iifWG9KssbHGXQpo6ILra+lwmLdUNmBU82gfEonmnNxLigZ+Pf
+         yLIvv2714THNIb9PbIrhfuAOv6VXhdpwJ7OU+dRbm5QLV8UdjUYLZI7JgNuWrq3rj8yN
+         0pcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXFyGAo4rxCozuRzXR7ug0M3BpOqB3c7dti7lFBKmmcHP2NUJ+fqRK9eB3Ol6gDwtNwNs4mVW9A@vger.kernel.org, AJvYcCXwF+erqLy1osmL0wAuUB8qS2MjXZF9St+NHOV1ep9G6hB5U50nDJ2eNwGmjIwv40OXF32OOkCC6zMlV/0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfDKffKMKTFjo5kC1DRh2nA3psZ2cNVYRBQPbLdHn1EWkn+MCi
+	+90yRCvf7R2LoQywG1+wSJ3qqflTu5Zgp8cXbimhQrt1rEOuoJoJ
+X-Google-Smtp-Source: AGHT+IGDs+OBqeonRw88x+u40y2cJauEoSXB0MFc/Um5YW0NdPJ9YSGIlAJ4uY+T1N91qq87eQ+3ww==
+X-Received: by 2002:a05:6512:3ba4:b0:535:4144:d785 with SMTP id 2adb3069b0e04-5365881cf56mr870682e87.11.1725626968213;
+        Fri, 06 Sep 2024 05:49:28 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8a77f8fefesm198420766b.182.2024.09.06.05.49.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 05:49:27 -0700 (PDT)
+Date: Fri, 6 Sep 2024 15:49:24 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v9 3/7] net: stmmac: refactor FPE verification
+ process
+Message-ID: <20240906124924.odfhsgiyg4jkrnqx@skbuf>
+References: <cover.1725597121.git.0x1207@gmail.com>
+ <cover.1725597121.git.0x1207@gmail.com>
+ <13f5833e52a47895864db726f090f323ec691c62.1725597121.git.0x1207@gmail.com>
+ <13f5833e52a47895864db726f090f323ec691c62.1725597121.git.0x1207@gmail.com>
+ <20240906124109.s4p7lgrycfgr62vp@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <04b7b9d0b480158eb3ab4366ec80aa2ab7e41fcb.1725031794.git.gnault@redhat.com>
- <20240903113402.41d19129@kernel.org> <ZthSuJWkCn+7na9k@debian>
- <20240904075732.697226a0@kernel.org> <Ztie4AoXc9PhLi5w@debian>
- <20240904144839.174fdd97@kernel.org> <ZtrcmacoHyQkqZ0h@debian>
-In-Reply-To: <ZtrcmacoHyQkqZ0h@debian>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 6 Sep 2024 14:47:15 +0200
-Message-ID: <CANn89iJ-K82U8mSNW_NGQtzKr70weHrWiFqnBEj-ehhWRHveFg@mail.gmail.com>
-Subject: Re: [PATCH net] bareudp: Fix device stats updates.
-To: Guillaume Nault <gnault@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Martin Varghese <martin.varghese@nokia.com>, Willem de Bruijn <willemb@google.com>, 
-	David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240906124109.s4p7lgrycfgr62vp@skbuf>
 
-On Fri, Sep 6, 2024 at 12:42=E2=80=AFPM Guillaume Nault <gnault@redhat.com>=
- wrote:
->
-> On Wed, Sep 04, 2024 at 02:48:39PM -0700, Jakub Kicinski wrote:
-> > On Wed, 4 Sep 2024 19:54:40 +0200 Guillaume Nault wrote:
-> > > In this context, I feel that dstats is now just a mix of tstats and
-> > > core_stats.
-> >
-> > I don't know the full background but:
-> >
-> >  *    @core_stats:    core networking counters,
-> >  *                    do not use this in drivers
->
-> Hum, I didn't realise that :/.
->
-> I'd really like to understand why drivers shouldn't use core_stats.
->
-> I mean, what makes driver and core networking counters so different
-> that they need to be handled in two different ways (but finally merged
-> together when exporting stats to user space)?
->
-> Does that prevent any contention on the counters or optimise cache line
-> access? I can't see how, so I'm probably missing something important
-> here.
+On Fri, Sep 06, 2024 at 03:41:09PM +0300, Vladimir Oltean wrote:
+> On Fri, Sep 06, 2024 at 12:55:58PM +0800, Furong Xu wrote:
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -969,17 +969,30 @@ static void stmmac_mac_config(struct phylink_config *config, unsigned int mode,
+> >  static void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
+> >  {
+> >  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+> > -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
+> > -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
+> > -	bool *hs_enable = &fpe_cfg->hs_enable;
+> > +	unsigned long flags;
+> >  
+> > -	if (is_up && *hs_enable) {
+> > -		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
+> > -					MPACKET_VERIFY);
+> > +	timer_shutdown_sync(&fpe_cfg->verify_timer);
+> >  }
+> >  
+> >  static void stmmac_mac_link_down(struct phylink_config *config,
+> > @@ -4091,10 +4068,10 @@ static int stmmac_release(struct net_device *dev)
+> >  
+> >  	stmmac_release_ptp(priv);
+> >  
+> > -	pm_runtime_put(priv->device);
+> > -
+> >  	if (priv->dma_cap.fpesel)
+> > -		stmmac_fpe_stop_wq(priv);
+> > +		timer_shutdown_sync(&priv->fpe_cfg.verify_timer);
+> > +
+> > +	pm_runtime_put(priv->device);
+> >  
+> >  	return 0;
+> >  }
+> > @@ -7372,53 +7334,88 @@ int stmmac_reinit_ringparam(struct net_device *dev, u32 rx_size, u32 tx_size)
+> > +static void stmmac_fpe_verify_timer_arm(struct stmmac_fpe_cfg *fpe_cfg)
+> > +{
+> > +	if (fpe_cfg->pmac_enabled && fpe_cfg->tx_enabled &&
+> > +	    fpe_cfg->verify_enabled &&
+> > +	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_FAILED &&
+> > +	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED) {
+> > +		timer_setup(&fpe_cfg->verify_timer, stmmac_fpe_verify_timer, 0);
+> > +		mod_timer(&fpe_cfg->verify_timer, jiffies);
+> > +	}
+> > +}
+> > @@ -7875,15 +7874,8 @@ int stmmac_suspend(struct device *dev)
+> >  	}
+> >  	rtnl_unlock();
+> >  
+> > -	if (priv->dma_cap.fpesel) {
+> > -		/* Disable FPE */
+> > -		stmmac_fpe_configure(priv, priv->ioaddr,
+> > -				     &priv->fpe_cfg,
+> > -				     priv->plat->tx_queues_to_use,
+> > -				     priv->plat->rx_queues_to_use, false);
+> > -
+> > -		stmmac_fpe_stop_wq(priv);
+> > -	}
+> > +	if (priv->dma_cap.fpesel)
+> > +		timer_shutdown_sync(&priv->fpe_cfg.verify_timer);
+> >  
+> >  	priv->speed = SPEED_UNKNOWN;
+> >  	return 0;
+> 
+> Calling timer_setup() after timer_shutdown_sync() is a bit unconventional,
+> but I don't see why it shouldn't work.
+> 
+> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
-Some archeology might help.
-
-Before we had tracing, having separate fields could help for diagnostics.
-
-commit caf586e5f23cebb2a68cbaf288d59dbbf2d74052
-Author: Eric Dumazet <eric.dumazet@gmail.com>
-Date:   Thu Sep 30 21:06:55 2010 +0000
-
-    net: add a core netdev->rx_dropped counter
-
-    In various situations, a device provides a packet to our stack and we
-    drop it before it enters protocol stack :
-    - softnet backlog full (accounted in /proc/net/softnet_stat)
-    - bad vlan tag (not accounted)
-    - unknown/unregistered protocol (not accounted)
-
-    We can handle a per-device counter of such dropped frames at core level=
-,
-    and automatically adds it to the device provided stats (rx_dropped), so
-    that standard tools can be used (ifconfig, ip link, cat /proc/net/dev)
-
-    This is a generalization of commit 8990f468a (net: rx_dropped
-    accounting), thus reverting it.
-
-    Signed-off-by: Eric Dumazet <eric.dumazet@gmail.com>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
+Actually, I'm really wondering. Is lockdep okay if you run timer_shutdown_sync()
+on a timer on which you've never called timer_setup()?
 
