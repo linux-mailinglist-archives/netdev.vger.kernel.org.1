@@ -1,195 +1,188 @@
-Return-Path: <netdev+bounces-125957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9487296F6A5
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:25:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B24296F6B2
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:30:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B18621C23C84
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 14:25:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A7E41F2468D
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 14:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71791D04B6;
-	Fri,  6 Sep 2024 14:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B789E1CCB27;
+	Fri,  6 Sep 2024 14:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ug5voc+X"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fs2vY1F3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9891FAA
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 14:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371F3158205;
+	Fri,  6 Sep 2024 14:30:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725632733; cv=none; b=ZNk/OKhsboP1pRA2dAlsIG/e5yX2VKuw1QiYlGMvKLjofoaTEMGqRaNtdwN+hn5UhVM9gAtYUFJaRbRtmOkdTh+24lN/QgzNrdhB2mEvhg24I0yIdz/rngI7EggfiRI9TeldchyXRQzp/952CC8NCxjtlfpTahmWuYuLB0n35/c=
+	t=1725633040; cv=none; b=awCcQK3IcL4cetyK9mLP65WXb2BWFgreiVYDoL0iSZLe2pS5BEcv0be123MSWnf2rt7jjcZkvL5kqmqokAkllkdZSgZKMvvjM9cKQF6T1sw8vI4H6v4jT8VXYYjq/4Mmb7UE/Gs2qF0l62asRQ+hqaMVbiti1ODffYcgG+yCl50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725632733; c=relaxed/simple;
-	bh=GAs8iurpJ8qv5psVpVpp7NkCdyjJ7rDJRCia9N6KHQw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YgA4jYyu0jDMExHol4S/9RnfcdMTHoyJckga5APzRp2PgABWrxSljGgfJXoMvJe4gAonoiEQZgI8zZSEfPzwhM3v2SaI2WC1JCav4+ctSlbskGEli1ed8s90d0rwJfNSFxLp3Eb5LjsHOMNbQb9xvz+Xusn7zwEQEiJNFi2DXaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ug5voc+X; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725632730;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+awdkgcqXaMAPB7BpN1GvvWlqJvyzdLn+E4BenWut/k=;
-	b=Ug5voc+XaRKFHXEJmxqddsEcy70qSsb77AbuUJtls+cFyakYHMl9Rh64KU+J2s3S89InrL
-	GxNoFp0ByATNVkFLc459ZCeumU2NLYwm/TMc4Zd11Q1lUUz2kYHXFS8Y82L0DIbkl1DmQW
-	zsMy0pEvy5/Yytj9VYJdUUqfrpglx0Y=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-124-geAxTG9AOJmwKtQAg0Dkfg-1; Fri, 06 Sep 2024 10:25:29 -0400
-X-MC-Unique: geAxTG9AOJmwKtQAg0Dkfg-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42ac185e26cso16623355e9.3
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 07:25:29 -0700 (PDT)
+	s=arc-20240116; t=1725633040; c=relaxed/simple;
+	bh=Uyzy0dVDftAmKGNv8/hmedP5+MhkU6woP3I6xQmsLiU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TrqNv7nSBETX2gn8Jw6e93cwLfUIhb592HfmojrG86GBa4V11iayiDpPo4+KPq5DmcFrN4kUQzG24XLjihNFMG3fBEXOn9iarNViKWmM2IpJPFsXTEU4WePwGei8mZn/88H+zf7TlXNKpL4nfv0+D7OnImU+Au5pIlFnLBMCRyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fs2vY1F3; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2059112f0a7so20489905ad.3;
+        Fri, 06 Sep 2024 07:30:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725633038; x=1726237838; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MmOkWe3bWYqlIPHasXuyjR6OTIRVg7CwkvkDyagLUMA=;
+        b=fs2vY1F3X6fsOo3xgUumCMdx1Azri8q9KUK4HHLZ3d8dPzbOlpDl6MqJ5abOpIyjWq
+         n4y/wMchqFEwOQ8QD4E5nDJJzzvL7m3cCWP1VRN/Lv2Zeee5jub7hyvNhvYoamicJpfk
+         6jCYzvesuKYXf6RiRDSaPMPsBHeTAqs0wztekh33krTlgXkg+uoc8RjvGPRPX0zbfxbU
+         QXcOeSbkSO//ORmIyP4pMG8eBPjznzNB8unjsXiC9HsOBbxqqYNtlTwFeDZ+69MYm9xl
+         bXUTl98VwWv1MEQTcIV7OCYHo3BMHTHxsOR1yL9CJfcVekEj4UV6C7QY35KOTqLr9TDj
+         Z59g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725632729; x=1726237529;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+awdkgcqXaMAPB7BpN1GvvWlqJvyzdLn+E4BenWut/k=;
-        b=ddBF+StYJLGapjQU3QrsmbD4nLxs4VBpLCwUQL7SyLkNGQMB+KSAalCaOQQfMl6Mfq
-         DHFALqyLpEjgqEsKJWpmOkjIgsrQGdKRpkdd7QxQcGe3YaBga7Zhvv4TgQQ8/CiWEYIX
-         b1QI+t0EBUBRseel362DNzrL+dppLO9VAf8pHMzGmLm2kO+DLch4wbSwoQAggp4HPk8q
-         VmuXYfxrtFGyuyyXchTXRcjUEwlrFfpxJ9c8Nwg4iyHuAGo5zFI+m5IurQpFoLWfqGoE
-         EKIZVRF1yj6W7vpHKl94fNlAV1ILzNuAogH+XZ7Xa1DY3VC7f6MjcMeYbo59AOiMMYTd
-         Vpew==
-X-Gm-Message-State: AOJu0Yw8vcbo8vfQvw4DSs4wXkpGkEpmLkSQ81LzlFmrQs7B/eUC1Jrr
-	n29WmnddlmA4zImm3xOxQISr5lz7g8AqaosKnB6rqVu5YBpsewQ0nMdDZFj2A8LCTrnD142QZHi
-	Y+EuXrBrW1yusLtFxE39w4UWv+WyYxKm0xC+ulq06ZobxiRniyHavGA==
-X-Received: by 2002:a05:600c:3b29:b0:427:ff7a:794 with SMTP id 5b1f17b1804b1-42c9f972fd0mr18240695e9.4.1725632728624;
-        Fri, 06 Sep 2024 07:25:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEWjALGFtsurtRTbvBx3AjYYILknCDM4oacHLdEQEnmM0Qm74uNXQuxRhlYs+vOKF88iRzxjw==
-X-Received: by 2002:a05:600c:3b29:b0:427:ff7a:794 with SMTP id 5b1f17b1804b1-42c9f972fd0mr18240495e9.4.1725632728056;
-        Fri, 06 Sep 2024 07:25:28 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-55-250.dyn.eolo.it. [146.241.55.250])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ca05d3052sm21983555e9.25.2024.09.06.07.25.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Sep 2024 07:25:27 -0700 (PDT)
-Message-ID: <8ba551da-3626-4505-bdf2-fa617d4ad66b@redhat.com>
-Date: Fri, 6 Sep 2024 16:25:25 +0200
+        d=1e100.net; s=20230601; t=1725633038; x=1726237838;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MmOkWe3bWYqlIPHasXuyjR6OTIRVg7CwkvkDyagLUMA=;
+        b=KOZtel4pmXOn//g0zYrkdUVzXtZiR7bSgw3a/tEv+iLMv9J5nPFJQKrOnoIUwKjyx9
+         fkwWYvD+8ImQjTPtFpXJpDL89mAElfzbro0n4QymBdqHNWzzJmNgD88adcLyrRSehI5w
+         IiJIA3uf/yn0UMtAYYKL5wIzDLprggT8DBQ0gAp/905EDtSaqvOzhIDqF7HU9HvwpnTi
+         /sd7I7mTMErlXT7/Ol1kPu2Bc/LORAN3FGs94DMPgA9wbrO4V+nwJHTejDQkbKqCoKVc
+         FFuaho9GzBxxzU2x46zWDs11FtLEQE9sxbLPMcXS7CSziuK+ImL8Z2FbsBhBiqtmUESW
+         J7kA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3xmNEpY0vEw7US8rbomQtz73Dj2IDXvWocNNsBVKb39bvl1wX6VZ26NiMi076N8ZdvZKIK7K3HzSLAxI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJxkm9YxU7eYZaBnPm6IWLSxM8zc2k+8Pxmq3UCY7NeVY7pzuF
+	DCwHvK5pJ6o1kbImCg+5OAP+3zczlKeNfV80Ri7PbHZ8DGSMHWv3
+X-Google-Smtp-Source: AGHT+IH6os/wJqKxaUijZ7r4QxSPQPk3BXwla9T3Qa9yn+zWQ8nBWAVCPpLlT6hUmihDvM4+R20QHQ==
+X-Received: by 2002:a17:902:f682:b0:206:a935:2f8 with SMTP id d9443c01a7336-20706f02a27mr681585ad.2.1725633037708;
+        Fri, 06 Sep 2024 07:30:37 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-206ae94dcf3sm43951975ad.80.2024.09.06.07.30.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 07:30:37 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>,
+	Serge Semin <fancer.lancer@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk,
+	linux@armlinux.org.uk,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v10 0/7] net: stmmac: FPE via ethtool + tc
+Date: Fri,  6 Sep 2024 22:30:05 +0800
+Message-Id: <cover.1725631883.git.0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 07/15] net-shapers: implement shaper cleanup
- on queue deletion
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
- Madhu Chittim <madhu.chittim@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter
- <donald.hunter@gmail.com>, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
- edumazet@google.com
-References: <cover.1725457317.git.pabeni@redhat.com>
- <160421ccd6deedfd4d531f0239e80077f19db1d0.1725457317.git.pabeni@redhat.com>
- <20240904183329.5c186909@kernel.org>
- <8fba5626-f4e0-47c3-b022-a7ca9ca1a93f@redhat.com>
- <20240905182521.2f9f4c1c@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240905182521.2f9f4c1c@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 9/6/24 03:25, Jakub Kicinski wrote:
-> For the driver -- let me flip the question around -- what do you expect
-> the locking scheme to be in case of channel count change? Alternatively
-> we could just expect the driver to take netdev->lock around the
-> appropriate section of code and we'd do:
-> 
-> void net_shaper_set_real_num_tx_queues(struct net_device *dev, ...)
-> {
-> 	...
-> 	if (!READ_ONCE(dev->net_shaper_hierarchy))
-> 		return;
-> 
-> 	lockdep_assert_held(dev->lock);
-> 	...
-> }
+Move the Frame Preemption(FPE) over to the new standard API which uses
+ethtool-mm/tc-mqprio/tc-taprio.
 
-In the IAVF case that will be problematic, as AFAICS the channel reconf 
-is done by 2 consecutive async task, the first task - iavf_reset_task - 
-changes the actual number of channels freeing/allocating the driver 
-resources and the 2nd one - iavf_finish_config - notify the stack 
-issuing netif_set_real_num_tx_queues(). iavf_reset_task can't easily 
-wait for iavf_finish_config due to locking order.
+Changes in v10:
+  1. fixed a stacktrace caused by timer_shutdown_sync()
+  on an uninitialized timer
+  2. ignore FPE_EVENT_RRSP events if we are not in the
+  ETHTOOL_MM_VERIFY_STATUS_VERIFYING state
 
-> I had a look at iavf, and there is no relevant locking around the queue
-> count check at all, so that doesn't help.
+Changes in v9:
+  1. drop redundant netif_device_present() since ethnl_ops_begin()
+  has its own netif_device_present() call
+  2. open-code some variables of struct ethtool_mm_state directly
+  in struct stmmac_fpe_cfg
+  3. convert timer_delete_sync() to timer_shutdown_sync(), thus the
+  timer will not be rearmed again
+  4. fixed variable declarations in the middle of the scope
 
-Yep, that is racy.
+Changes in v8:
+  1. use timer_delete_sync() instead of deprecated del_timer_sync()
+  2. check netif_running() to guarantee synchronization rules between
+  mod_timer() and timer_delete_sync()
+  3. split up stmmac_tc_ops of dwmac4, dwmac4+ and dwxgmac to give user
+  more descriptive error message
+  4. fix wrong indentation about switch-case
+  5. delete more unbalanced logs
 
->> Acquiring dev->lock around set_channel() will not be enough: some driver
->> change the channels number i.e. when enabling XDP.
-> 
-> Indeed, trying to lock before calling the driver would be both a huge
-> job and destined to fail.
-> 
->> I think/fear we need to replace the dev->lock with the rtnl lock to
->> solve the race for good.
-> 
-> Maybe :( I think we need *an* answer for:
->   - how we expect the driver to protect itself (assuming that the racy
->     check in iavf_verify_handle() actually serves some purpose, which
->     may not be true);
->   - how we ensure consistency of core state (no shapers for queues which
->     don't exist, assuming we agree having shapers for queues which
->     don't exist is counter productive).
+Changes in v7:
+  1. code style fixes and clean up warnings reported by
+  patchwork netdev checks, no functional change intended
 
-I agree we must delete shapers on removed/deleted queues. The 
-driver/firmware could reuse the same H/W resources for a different VF 
-and such queue must start in the new VF with a default (no shaping) config.
+Changes in v6:
+  1. new FPE verification process based on Vladimir Oltean's proposal
+  2. embed ethtool_mm_state into stmmac_fpe_cfg
+  3. convert some bit ops to u32_replace_bits
+  4. register name and function name update to be more descriptive
+  5. split up stmmac_tc_ops of dwmac4+ and dwxgmac, they have different
+  implementations about mqprio
+  6. some code style fixes
 
-> Reverting back to rtnl_lock for all would be sad, the scheme of
-> expecting the driver to take netdev->lock could work?
-> It's the model we effectively settled on in devlink.
-> Core->driver callbacks are always locked by the core,
-> for driver->core calls driver should explicitly take the lock
-> (some wrappers for lock+op+unlock are provided).
+Changes in v5:
+  1. fix typo in commit message
+  2. drop FPE capability check in tc-mqprio/tc-taprio
 
-I think/guess/hope the following could work:
+Changes in v4:
+  1. reorder FPE-related declarations and definitions into clean groups
+  2. move mm_lock to stmmac_fpe_cfg.lock
+  3. protect user configurations across NIC up/down
+  4. block stmmac_set_mm() when fpe_task is in progress to finish
+  5. convert to ethtool_dev_mm_supported() to check FPE capability in
+  tc-mqprio/tc-taprio
+  6. silence FPE workqueue start/stop logs
 
-- the driver wraps the h/w resources reconfiguration and 
-netif_set_real_num_tx_queues() with dev->lock. In the iavf case, that 
-means 2 separate critical sections: in iavf_reset_task() and in 
-iavf_finish_config().
+Changes in v3:
+  1. avoid races among ISR, workqueue, link update and
+  register configuration.
+  2. update FPE verification retry logic, so it retries
+  and fails as expected.
 
-- the core, under dev->lock, checks vs real_num_tx_queues and call the 
-shaper ops
+Changes in v2:
+  1. refactor FPE verification process
+  2. suspend/resume and kselftest-ethtool_mm, all test cases passed
+  3. handle TC:TXQ remapping for DWMAC CORE4+
 
-- the iavf shaper callbacks would still need to check the queue id vs 
-the current allocated hw resource number as the shapers ops could run 
-in-between the 2 mentioned critical sections. The iavf driver could 
-still act consistently with the core:
+Furong Xu (7):
+  net: stmmac: move stmmac_fpe_cfg to stmmac_priv data
+  net: stmmac: drop stmmac_fpe_handshake
+  net: stmmac: refactor FPE verification process
+  net: stmmac: configure FPE via ethtool-mm
+  net: stmmac: support fp parameter of tc-mqprio
+  net: stmmac: support fp parameter of tc-taprio
+  net: stmmac: silence FPE kernel logs
 
-   - if real_num_tx_queues < qid < current_allocated_hw_resources
-     set the shaper,
-   - if current_allocated_hw_resources < qid < real_num_tx_queues do
-     nothing and return success
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  10 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c  |  96 +++++-
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  12 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |   9 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   6 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  22 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  35 ++-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  96 ++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 273 ++++++++----------
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   | 153 +++++++---
+ include/linux/stmmac.h                        |  28 --
+ 11 files changed, 497 insertions(+), 243 deletions(-)
 
-In both the above scenarios, real_num_tx_queues will be set to 
-current_allocated_hw_resources soon by the upcoming 
-iavf_finish_config(), the core will update the hierarchy accordingly, 
-the status will be consistent.
-
-I think the code should be more clear, let me try to share it ASAP (or 
-please block me soon ;)
-
-Thanks,
-
-Paolo
+-- 
+2.34.1
 
 
