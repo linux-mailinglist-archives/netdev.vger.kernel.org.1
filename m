@@ -1,206 +1,98 @@
-Return-Path: <netdev+bounces-125772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9EB96E877
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 05:56:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3970C96E88D
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 06:15:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89C9D1C2281F
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 03:56:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C2891C228A2
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D249642AB5;
-	Fri,  6 Sep 2024 03:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D9A1282FE;
+	Fri,  6 Sep 2024 04:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AuUSqdNP"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311133B1A2;
-	Fri,  6 Sep 2024 03:56:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCD13CF73
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 04:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725595009; cv=none; b=bBPsOmbww0sO5hii/fw1p94w2HFrBD5JsA6fmbTu30bcgaA3eb76aoGAjYi8AQZKBd1oQQgS/ihn4zXeggPkW58w4VPSqcmpWUZyRwR8zzEyoU9xKdvEdKgoSwwPxiSsogDHgtTgV3jBpZfzPXSTMYFNOGs85YdBcDS5QymI3t4=
+	t=1725596113; cv=none; b=WUGL+ktuGHP/G9q3Q161ilBgJjcuwXSdZM23CeS4TkGQX432fMYMLCGh7uY02cWnZ3pHyEMshcG/pu+efRyQRI3djjL8GTsDa5xqMkZcJSbvtNXdkljHcxqYPggF728g0OUP1K41IMYJoFhIjrkkpNZngvDZPCsebA7t8ue65/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725595009; c=relaxed/simple;
-	bh=zYBGGDVe+JkLGVbsLnffLA+0HwJfDRiCsobm1vuByV4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZqtCAxMYunXE3p01z/VAE/h6aQSdKR1o0nFj2YAfM7flf7IrHFUt0AfRgMXnpm8CafOdLicJ5ezzoI0HrOEUXc7bF6wCv3rDTetXpJhk0lo1pOhDeoR+d3iGqEZXGYpzMd+JJZDTM6BPacvoHD22UZfx2TzwHkY5w5HF8/rkMUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4X0Mq52cf8z4f3jjw;
-	Fri,  6 Sep 2024 11:56:33 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id BA6331A0359;
-	Fri,  6 Sep 2024 11:56:43 +0800 (CST)
-Received: from [10.67.109.184] (unknown [10.67.109.184])
-	by APP4 (Coremail) with SMTP id gCh0CgD3ecZ3fdpmQm0bAg--.37609S2;
-	Fri, 06 Sep 2024 11:56:41 +0800 (CST)
-Message-ID: <540dd7eb-1099-4c38-8004-1cb556b0b9be@huaweicloud.com>
-Date: Fri, 6 Sep 2024 11:56:39 +0800
+	s=arc-20240116; t=1725596113; c=relaxed/simple;
+	bh=01Tk7ZBGJfPLVRWgGcq+8uS8reVOfMG6hmmJl95+gWE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OFPmmxY2B65Y6ohEZ3r1TmrRdHkTVQ9WBlE4Fh0IOtGjhccWeR/FF/RY0Lu6mJjAEsof8rbpSRscvl/1ugLkTIZa0GjcXjpfjgckgfHhGGApEePWkc6jC5KrDEEI9zOLW2zrc8YmXvWyolxoTOgxdMJF6Z7kQgFwenFJkcW6quk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AuUSqdNP; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3df0c1271c1so1015501b6e.1
+        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 21:15:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725596111; x=1726200911; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=01Tk7ZBGJfPLVRWgGcq+8uS8reVOfMG6hmmJl95+gWE=;
+        b=AuUSqdNPMrHLPrqFRZbsFejZc+ygjQnTjuIbg1mFOALF2hLZRVcXNrzvTAY3LcUXQ8
+         tpbOXizNTHGLSzw7bT3eX3x5vdzKmpkIeY8cj69xiArpTXe1MQJmG6qy2Vb/C1UTLl5/
+         huA+p6LTXB7AJ0QQiQkuCxJdULSU2Ym2unFmBz9liziqDesWaKPeqyI9resP+uxDblJ4
+         wcEh4lcdFQnFTaNAKP1wBcckwwYoCWUbKqVOPmIy0TGJGiv+IzZrag0SU7TrrmJDsnzB
+         q8Wwz4I6NK356VNXNp1IDgSd0QLXXJTP+tnenT1K+V78aLZGECkAMksng8UyLpitQxGl
+         gRhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725596111; x=1726200911;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=01Tk7ZBGJfPLVRWgGcq+8uS8reVOfMG6hmmJl95+gWE=;
+        b=jnuj2/RruL2H6WuVS3TkTKDW0/mXWM5U0QnkQzTridqXAaT8pRlSjL54L7iPMg6w9U
+         WFMjhER2YJRqrejOGX3HvS/Jec9QJa+Ks+SWENAQP+FR1fya84acjXUtR6YivBGLkXiG
+         jgwTcxR6XmFOm7x2rqytVxtTEPPLBJCGXJ89fjn6eqlLbcCIJW73yaJ9GyAB44gqVWPF
+         Sjdq8n4Jb6+xA7Thmt3DfjuwcZfV7FcRQsfxyqpYx+bh6+wUWL+etQDYIvB5OIxf2hLS
+         mFyPqNORKfBCdaSh41izo5YO/ZPuXCpi9M+jreLgjlOFuMdMMVO1JOuC9bLWJYM2UAIp
+         WjIA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8FKyiBSs5OAGZRSHQeYs5zAwiPcaAjlR6MbWcMryxUU9XgvpJiKUE8yqZ6EgIMreI0su7eBY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzUrJ+kmbIwiy1VnEzlx0alOQ8yE6srGonv/l7QdEc2Zabng6n6
+	McRdYO1s25XlwCan88VflFutujVcho/kLYe0o40nm3rF30w1R0/wyRvLldTB
+X-Google-Smtp-Source: AGHT+IGhExq8JdKsGny11i6Zdbdbwpc2gEnqW5NLKyHZ1qnJg8pMa003iAkCHFa7gSMj4dZ8TEhtWg==
+X-Received: by 2002:a05:6808:1693:b0:3d9:2b45:1585 with SMTP id 5614622812f47-3e029f066bcmr1733701b6e.22.1725596110641;
+        Thu, 05 Sep 2024 21:15:10 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d4fbd85382sm4084892a12.15.2024.09.05.21.15.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Sep 2024 21:15:10 -0700 (PDT)
+Date: Thu, 5 Sep 2024 21:15:08 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, UNGLinuxDriver@microchip.com,
+	andrew@lunn.ch, netdev@vger.kernel.org
+Subject: Re: [PATCH -next v2 1/2] ptp: Check timespec64 before call
+ settime64()
+Message-ID: <ZtqBzKJ0KjfTJtcs@hoboy.vegasvil.org>
+References: <20240906034806.1161083-1-ruanjinjie@huawei.com>
+ <20240906034806.1161083-2-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?Q?Re=3A_=5BPATCH_bpf-next_v3_00/10=5D_Local_vmtest_enhancem?=
- =?UTF-8?Q?ent_and_RV64_enabled=F0=9F=98=81?=
-Content-Language: en-US
-To: Daniel Borkmann <daniel@iogearbox.net>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
- <bjorn@kernel.org>, bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
- netdev@vger.kernel.org
-Cc: Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman
- <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- Puranjay Mohan <puranjay@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Pu Lehui <pulehui@huawei.com>
-References: <20240905081401.1894789-1-pulehui@huaweicloud.com>
- <e9816f7c-a603-c73e-5fcc-71bbcf6c6ca3@iogearbox.net>
-From: Pu Lehui <pulehui@huaweicloud.com>
-In-Reply-To: <e9816f7c-a603-c73e-5fcc-71bbcf6c6ca3@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgD3ecZ3fdpmQm0bAg--.37609S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxJFy5WrW8ZF47ZF47Kr47CFg_yoWrtFyfp3
-	y8Jr1jkryUGF18J3W8Gr4UXFy5tr4DXw1xGr15JFyUAr4UJF1jqr40qF4jgrn8WrW8Xw15
-	Aw12qF1UZw17Z3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26ryj6rWUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26r4a6rW5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWr
-	XwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
-	s2-5UUUUU==
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240906034806.1161083-2-ruanjinjie@huawei.com>
 
+On Fri, Sep 06, 2024 at 11:48:05AM +0800, Jinjie Ruan wrote:
+> As Andrew pointed out, it will make sence that the PTP core
 
+s/sence/sense/
 
-On 2024/9/6 2:52, Daniel Borkmann wrote:
-> On 9/5/24 10:13 AM, Pu Lehui wrote:
->> Patch 1-3 fix some problem about bpf selftests. Patch 4 add local rootfs
->> image support for vmtest. Patch 5 enable cross-platform testing for
->> vmtest. Patch 6-10 enable vmtest on RV64.
->>
->> We can now perform cross platform testing for riscv64 bpf using the
->> following command:
->>
->> PLATFORM=riscv64 CROSS_COMPILE=riscv64-linux-gnu- \
->>    tools/testing/selftests/bpf/vmtest.sh \
->>    -l <path of local rootfs image> -- \
->>    ./test_progs -d \
->>        \"$(cat tools/testing/selftests/bpf/DENYLIST.riscv64 \
->>            | cut -d'#' -f1 \
->>            | sed -e 's/^[[:space:]]*//' \
->>                  -e 's/[[:space:]]*$//' \
->>            | tr -s '\n' ',' \
->>        )\"
->>
->> For better regression, we rely on commit [0]. And since the work of riscv
->> ftrace to remove stop_machine atomic replacement is in progress, we also
->> need to revert commit [1] [2].
->>
->> The test platform is x86_64 architecture, and the versions of relevant
->> components are as follows:
->>      QEMU: 8.2.0
->>      CLANG: 17.0.6 (align to BPF CI)
->>      ROOTFS: ubuntu noble (generated by [3])
->>
->> Link: 
->> https://lore.kernel.org/all/20240831071520.1630360-1-pulehui@huaweicloud.com/ [0]
->> Link: 
->> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3308172276db [1]
->> Link: 
->> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7caa9765465f [2]
->> Link: https://github.com/libbpf/ci/blob/main/rootfs/mkrootfs_debian.sh 
->> [3]
-> 
-> Nice work! Next step is upstream BPF CI integration? :)
-
-CC Björn😁
-
-Yeah, that's what we're most looking forward to and we've been trying to 
-move forward with that. There are currently several options, but they 
-are not very suitable yet.
-
-1. Cross-platform testing with subset of tests (test_verifier + 
-test_progs), it will cost a bit more time.
-
-x86_64 host:
-Summary: 536/3594 PASSED, 68 SKIPPED, 0 FAILED
-real    30m 18.88s
-user    6m 52.97s
-sys     21m 3.03s
-
-2. Cross-platform testing will parallel mode, it will meet flaky 
-problems while the time consume looks good.
-
-x86_64 host:
-real    7m 45.42s
-user    6m 13.59s
-sys     15m 41.12s
-
-3. Real board testing, which relies on Hypervisor Extension to enable 
-kvm on qemu. We are still trying to find a suitable board.
-
-I believe we will be able to see the RV64 on the BPF CI soon.😄
-
-> 
-> Fwiw, all still works for me on x86-64 (*), so:
-> 
-> Acked-by: Daniel Borkmann <daniel@iogearbox.net>
-> Tested-by: Daniel Borkmann <daniel@iogearbox.net>
-> 
-> (*) fresh Equinix Ubuntu instance still requires this one for vmtest.sh, 
-> but
->      that is independent of this series (and for others it seems not 
-> required)
-> 
-> diff --git a/tools/testing/selftests/bpf/Makefile 
-> b/tools/testing/selftests/bpf/Makefile
-> index 04716a5e43f1..02dd161e5185 100644
-> --- a/tools/testing/selftests/bpf/Makefile
-> +++ b/tools/testing/selftests/bpf/Makefile
-> @@ -693,7 +693,7 @@ $(OUTPUT)/$(TRUNNER_BINARY): 
-> $(TRUNNER_TEST_OBJS)                   \
->                               $(TRUNNER_BPFTOOL)                         \
->                               | $(TRUNNER_BINARY)-extras
->          $$(call msg,BINARY,,$$@)
-> -       $(Q)$$(CC) $$(CFLAGS) $$(filter %.a %.o,$$^) $$(LDLIBS) 
-> $$(LDFLAGS) -o $$@
-> +       $(Q)$$(CC) $$(CFLAGS) $(TRUNNER_LDFLAGS) $$(filter %.a %.o,$$^) 
-> $$(LDLIBS) $$(LDFLAGS) -o $$@
->          $(Q)$(RESOLVE_BTFIDS) --btf $(TRUNNER_OUTPUT)/btf_data.bpf.o $$@
->          $(Q)ln -sf $(if 
-> $2,..,.)/tools/build/bpftool/$(USE_BOOTSTRAP)bpftool \
->                     $(OUTPUT)/$(if $2,$2/)bpftool
-> diff --git a/tools/testing/selftests/bpf/vmtest.sh 
-> b/tools/testing/selftests/bpf/vmtest.sh
-> index 79505d294c44..afbd6b785064 100755
-> --- a/tools/testing/selftests/bpf/vmtest.sh
-> +++ b/tools/testing/selftests/bpf/vmtest.sh
-> @@ -189,7 +189,7 @@ update_selftests()
->          local 
-> selftests_dir="${kernel_checkout}/tools/testing/selftests/bpf"
-> 
->          cd "${selftests_dir}"
-> -       ${make_command}
-> +       TRUNNER_LDFLAGS=-static ${make_command}
-> 
->          # Mount the image and copy the selftests to the image.
->          mount_image
+Thanks,
+Richard
 
 
