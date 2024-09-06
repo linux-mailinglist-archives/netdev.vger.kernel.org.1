@@ -1,222 +1,156 @@
-Return-Path: <netdev+bounces-125867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FE196F071
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:55:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5508896F0A1
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:58:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97CAA1C21957
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:55:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F5F71C23635
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 09:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF8A1C8FC8;
-	Fri,  6 Sep 2024 09:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C9C1C8FB3;
+	Fri,  6 Sep 2024 09:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S7eniZIF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WhsZJN1e"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 541A61C8FB6
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 09:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D7F158D81;
+	Fri,  6 Sep 2024 09:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725616455; cv=none; b=s7Mh1Y3NmTv8Yt+AZuKxNO0r2HpgygxdQPwBhgOh9cUHAHjL/0Qk0NOi0GX8m5JOlCO1MrVo3yF9yPk2oj5K4A/IEdsP3YclJ/2Ds1HEAOQb4qBfqAvmPIzCDNeICQWQZixqLZXPPjGzX3c1lceH0cmF8AwDil1j2Ldgz0mJYHA=
+	t=1725616611; cv=none; b=cRMLs2KqYOsAfrK342FyKlBhbe0uaUF/xvmD1GHiH4ck1AogaBEA6Zr5zxcMUA6bdxgCa/L3kyAvWYPAXm04mwUbcg2wDn3zMdgcGwFkbTXosKzE5AvmRvpSNgbtq2SlHjuOWcLVFzTHx7lZ/GgV9/Ehg0cye5yqUjNjIJnQfHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725616455; c=relaxed/simple;
-	bh=vzaOlZpLLkD75hlMSMPR8SY9c1CzSMqnZNX6RunHd40=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hkp/3RejzleK3qer0POosrYGGNfcTPFIFSZH9UVh9XzHrz544/0cVXU5wwj3bhASPnbQd/CbAXxuBcQEAnrv4AppyzEifvEUrIEwE3hChm+TNqMKzAXzsDy6RLXm4zHKKY635DOsI34qitzOO54sDbpXyRqgUMYo0Qvd3nChUxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S7eniZIF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725616452;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7aksakBHDE0/j8ahTBvKG/EiOnaQlZoL63vLFTpifaU=;
-	b=S7eniZIFzvj6BZOTq47SoPbPVWR0Cdy6fs8VAtRIsleQ8UtzeBEWoEKqSgQYhpRl8phC+y
-	L71p83t66tix841Bj8KuVSsI5cB2b6t4ZB6DouAAFAS7bQlwGRYGJoQNYLWpfyKaKiS9Gq
-	Rg2aukYKwmL/RJn9EeaQVCsqnoHw5uw=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-265-2k1P1da1MxOFHDttqnhVNw-1; Fri, 06 Sep 2024 05:54:11 -0400
-X-MC-Unique: 2k1P1da1MxOFHDttqnhVNw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-374c35b8e38so950472f8f.2
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 02:54:10 -0700 (PDT)
+	s=arc-20240116; t=1725616611; c=relaxed/simple;
+	bh=N2q7WPdX8pQ5BjKq2jHhPE9H//dF9Qujn9BuK4PUrNI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qrYsfR2M2QRlYAGy1Mvhvg0Nxc+Ho11oknv4dm6Amd+2lg7M4ousfyGmSKQXTF6cHWLlCVJXsuMc5dQayJKg5sTtQ5WS86UNJm5/DO9qSszVXXJ+22F2TMqeb133J7TIzCsm6x4SXjp3VZUtKmwaT6P3zDPdZR+S34cisxx3wJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WhsZJN1e; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2068acc8b98so16809005ad.3;
+        Fri, 06 Sep 2024 02:56:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725616609; x=1726221409; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sPfnhXw3E5N/TaNxdIPS8Z4PNN7kL/fcd+e+orfvG9U=;
+        b=WhsZJN1e2+VwqY8LGuthauCj6FH+X8NRKxhDp2XYCSuIF4+wyx/dsReznx8OUv/B45
+         ie+la0v309PtsswCgpjTvs2rMPb79iMl4VBNZ7sbxK6lBcJNw+u5h9pYDMYKISa6LrHd
+         RocZNsSTop8LagMi/wEitYHfSCFhBP0nZPDuGW29YFEVSCuNte4u57SI/LNVcPfZm62f
+         TEFv8jqGurQ41M06qEFX6EWRvvbg0Aqw8/3DNbEmjYkxLxBYSAyYv1Z1dX7AIJAy9UaS
+         nJl5R6lHRHcJ7sOFIU4dh66QL1UGvGzzfGCO1HjLSYIduBpuv+UpdleMVXTrHePryU8l
+         kBwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725616450; x=1726221250;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7aksakBHDE0/j8ahTBvKG/EiOnaQlZoL63vLFTpifaU=;
-        b=V94iUFXuDwjqv9XcFPIVak2NtfpzroGBj6LlU4yg8lVqhztCHv0jQdhqcXC2mpiZ1J
-         IjbiYU5HcTzi9FRFS+oN38kvO9IOXsJAnkd2Pfm+8MI+QKg0T93OHCrLFC3B0ZWfRvNi
-         5U/WRgAUtM84qkyEtsJ3G6T9Hl2pg36P2zhuLz5S7fO0Sg3H9PjIXtQBhxDOa9s23WCm
-         dApZvL+Ai3yQf1noxg8t+xykayv8vvRlSmMNswNp9wCWcn1mrshTmOlpc1h/Q8N2cHAB
-         MsMPxm2hN/mSTjjK+0bqTgKQfPk13MKmYYCwJxdx1wXvzZerYBqqOhKIYixEfrn5/NVL
-         XK+A==
-X-Gm-Message-State: AOJu0YwIedTQj3pWqKLv6UCQWzTdUArsQLKGKCHnRUgqhcYqtl9qAOJO
-	5JGFqHQ7VR9D0gezlnQ3kElcrgKc5VXZvwFnhSgt4cBG2yl3nBn7zQI6Dtlunf6JaAKFpMyZZB8
-	mSwc57DPwty0IzQlKzM4b8UE3ML81wsWSOMdJPpIEb6leIqqjrPBVWw==
-X-Received: by 2002:a05:6000:e07:b0:368:7fbc:4062 with SMTP id ffacd0b85a97d-378895e2f23mr1306361f8f.33.1725616449878;
-        Fri, 06 Sep 2024 02:54:09 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHBgDM7sxM/7ia1YEw96VEtGVk4zDjpQQBhV0XhFyisOAMnm+DvCVKo9/BPS+TEKK+xP5YFqA==
-X-Received: by 2002:a05:6000:e07:b0:368:7fbc:4062 with SMTP id ffacd0b85a97d-378895e2f23mr1306334f8f.33.1725616449296;
-        Fri, 06 Sep 2024 02:54:09 -0700 (PDT)
-Received: from redhat.com ([155.133.17.165])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-374c6db03afsm13987450f8f.16.2024.09.06.02.54.07
+        d=1e100.net; s=20230601; t=1725616609; x=1726221409;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sPfnhXw3E5N/TaNxdIPS8Z4PNN7kL/fcd+e+orfvG9U=;
+        b=RpSIED6ZOjPyBKVfKboLVFf4HBBxFmAMaHlSkebBTFgr4mtzN3W1k5MmHs6PShGIgS
+         Qu5sv065mbfrf/gjuz6Zc/P7SZlcibpVuNrfCEztjBAWvUUjh9C7Ave9y/pXC8zzdnIp
+         fSol+E94cl4Umz6/kPDf2tzEC1WcO9aUWEljSJf2e0B0DxEXrNvfQl0FoFn/k4C5OrW2
+         YlFlXOF5rOZhj4n+2rU0g6SSw3CdS1y8Sr0O0/HTgdozQoLyL/h4bCteq/lO5fTY2T5Q
+         /jG13GDOG5RF0QRxcjipCjrTqkNQjKom4cdAuBRgdFvhG0QgSZDDNS2AOK43N6citaAF
+         UggQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQQ5rfuOVgPgkiw02iAuKZqjbNzQJ4s/CJ2kKiiLjxxHKXu3+VoRPC9c245BRnTU5RzSmWS8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvhEH+IBD3SYj7yG/QtrORwwaqQ8sr+rpvsvjtaSReahdfSPXp
+	xQ5aD1G7s7j9EO106mAyUUIl4ff7oM2D3dAjzfK2EDkdeatTr9Wp
+X-Google-Smtp-Source: AGHT+IEqeGXWepsxYQ9O8AAHwVcIrms9vC0OggBpCF7lyXfOFQOQEZplvhjt9uC8KPKAHcR/GBWHrw==
+X-Received: by 2002:a17:902:e80f:b0:206:9ab3:2eaf with SMTP id d9443c01a7336-2069ab335demr143500935ad.46.1725616609307;
+        Fri, 06 Sep 2024 02:56:49 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-206aea5582csm39982595ad.221.2024.09.06.02.56.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 02:54:08 -0700 (PDT)
-Date: Fri, 6 Sep 2024 05:53:59 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, Si-Wei Liu <si-wei.liu@oracle.com>,
-	Darren Kenny <darren.kenny@oracle.com>
-Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
-Message-ID: <20240906055236-mutt-send-email-mst@kernel.org>
-References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
- <20240906044143-mutt-send-email-mst@kernel.org>
- <1725612818.815039-1-xuanzhuo@linux.alibaba.com>
- <20240906045904-mutt-send-email-mst@kernel.org>
- <1725614736.9464588-1-xuanzhuo@linux.alibaba.com>
- <20240906053922-mutt-send-email-mst@kernel.org>
- <1725615962.9178205-1-xuanzhuo@linux.alibaba.com>
+        Fri, 06 Sep 2024 02:56:49 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	shuah@kernel.org,
+	willemb@google.com
+Cc: linux-kselftest@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v5 0/2] net-timestamp: introduce a flag to filter out rx software and hardware report
+Date: Fri,  6 Sep 2024 17:56:38 +0800
+Message-Id: <20240906095640.77533-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1725615962.9178205-1-xuanzhuo@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 06, 2024 at 05:46:02PM +0800, Xuan Zhuo wrote:
-> On Fri, 6 Sep 2024 05:44:27 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > On Fri, Sep 06, 2024 at 05:25:36PM +0800, Xuan Zhuo wrote:
-> > > On Fri, 6 Sep 2024 05:08:56 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > On Fri, Sep 06, 2024 at 04:53:38PM +0800, Xuan Zhuo wrote:
-> > > > > On Fri, 6 Sep 2024 04:43:29 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > > > On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
-> > > > > > > leads to regression on VM with the sysctl value of:
-> > > > > > >
-> > > > > > > - net.core.high_order_alloc_disable=1
-> > > > > > >
-> > > > > > > which could see reliable crashes or scp failure (scp a file 100M in size
-> > > > > > > to VM):
-> > > > > > >
-> > > > > > > The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
-> > > > > > > of a new frag. When the frag size is larger than PAGE_SIZE,
-> > > > > > > everything is fine. However, if the frag is only one page and the
-> > > > > > > total size of the buffer and virtnet_rq_dma is larger than one page, an
-> > > > > > > overflow may occur. In this case, if an overflow is possible, I adjust
-> > > > > > > the buffer size. If net.core.high_order_alloc_disable=1, the maximum
-> > > > > > > buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
-> > > > > > > the first buffer of the frag is affected.
-> > > > > > >
-> > > > > > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
-> > > > > > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-> > > > > > > Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
-> > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > >
-> > > > > >
-> > > > > > Guys where are we going with this? We have a crasher right now,
-> > > > > > if this is not fixed ASAP I'd have to revert a ton of
-> > > > > > work Xuan Zhuo just did.
-> > > > >
-> > > > > I think this patch can fix it and I tested it.
-> > > > > But Darren said this patch did not work.
-> > > > > I need more info about the crash that Darren encountered.
-> > > > >
-> > > > > Thanks.
-> > > >
-> > > > So what are we doing? Revert the whole pile for now?
-> > > > Seems to be a bit of a pity, but maybe that's the best we can do
-> > > > for this release.
-> > >
-> > > @Jason Could you review this?
-> > >
-> > > I think this problem is clear, though I do not know why it did not work
-> > > for Darren.
-> > >
-> > > Thanks.
-> > >
-> >
-> > No regressions is a hard rule. If we can't figure out the regression
-> > now, we should revert and you can try again for the next release.
-> 
-> I see. I think I fixed it.
-> 
-> Hope Darren can reply before you post the revert patches.
-> 
-> Thanks.
-> 
+From: Jason Xing <kernelxing@tencent.com>
 
-It's very rushed anyway. I posted the reverts, but as RFC for now.
-You should post a debugging patch for Darren to help you figure
-out what is going on.
+When one socket is set SOF_TIMESTAMPING_RX_SOFTWARE which means the
+whole system turns on the netstamp_needed_key button, other sockets
+that only have SOF_TIMESTAMPING_SOFTWARE will be affected and then
+print the rx timestamp information even without setting
+SOF_TIMESTAMPING_RX_SOFTWARE generation flag.
 
+How to solve it without breaking users?
+We introduce a new flag named SOF_TIMESTAMPING_OPT_RX_FILTER. Using
+it together with SOF_TIMESTAMPING_SOFTWARE can stop reporting the
+rx software timestamp.
 
-> >
-> >
-> > > >
-> > > >
-> > > > > >
-> > > > > >
-> > > > > > > ---
-> > > > > > >  drivers/net/virtio_net.c | 12 +++++++++---
-> > > > > > >  1 file changed, 9 insertions(+), 3 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > > > > index c6af18948092..e5286a6da863 100644
-> > > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > > @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
-> > > > > > >  	void *buf, *head;
-> > > > > > >  	dma_addr_t addr;
-> > > > > > >
-> > > > > > > -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
-> > > > > > > -		return NULL;
-> > > > > > > -
-> > > > > > >  	head = page_address(alloc_frag->page);
-> > > > > > >
-> > > > > > >  	dma = head;
-> > > > > > > @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
-> > > > > > >  	len = SKB_DATA_ALIGN(len) +
-> > > > > > >  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> > > > > > >
-> > > > > > > +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
-> > > > > > > +		return -ENOMEM;
-> > > > > > > +
-> > > > > > >  	buf = virtnet_rq_alloc(rq, len, gfp);
-> > > > > > >  	if (unlikely(!buf))
-> > > > > > >  		return -ENOMEM;
-> > > > > > > @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
-> > > > > > >  	 */
-> > > > > > >  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
-> > > > > > >
-> > > > > > > +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
-> > > > > > > +		return -ENOMEM;
-> > > > > > > +
-> > > > > > > +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
-> > > > > > > +		len -= sizeof(struct virtnet_rq_dma);
-> > > > > > > +
-> > > > > > >  	buf = virtnet_rq_alloc(rq, len + room, gfp);
-> > > > > > >  	if (unlikely(!buf))
-> > > > > > >  		return -ENOMEM;
-> > > > > > > --
-> > > > > > > 2.32.0.3.g01195cf9f
-> > > > > >
-> > > >
-> >
+Similarly, we also filter out the hardware case where one process
+enables the rx hardware generation flag, then another process only
+passing SOF_TIMESTAMPING_RAW_HARDWARE gets the timestamp. So we can set
+both SOF_TIMESTAMPING_RAW_HARDWARE and SOF_TIMESTAMPING_OPT_RX_FILTER
+to stop reporting rx hardware timestamp after this patch applied.
+
+v5
+Link: https://lore.kernel.org/all/20240905071738.3725-1-kerneljasonxing@gmail.com/
+1. squash the hardware case patch into this one (Willem)
+2. update corresponding commit message and doc (Willem)
+3. remove the limitation in sock_set_timestamping() and restore the
+simplification branches. (Willem)
+4. add missing type and another test in selftests
+
+v4
+Link: https://lore.kernel.org/all/20240830153751.86895-1-kerneljasonxing@gmail.com/
+1. revise the doc and commit message (Willem)
+2. add patch [2/4] to make the doc right (Willem)
+3. add patch [3/4] to cover the hardware use (Willem)
+4. add testcase for hardware use.
+Note: the reason why I split into 4 patches is try to make each commit
+clean, atomic, easy to review.
+
+v3
+Link: https://lore.kernel.org/all/20240828160145.68805-1-kerneljasonxing@gmail.com/
+1. introduce a new flag to avoid application breakage, suggested by
+Willem.
+2. add it into the selftests.
+
+v2
+Link: https://lore.kernel.org/all/20240825152440.93054-1-kerneljasonxing@gmail.com/
+Discussed with Willem
+1. update the documentation accordingly
+2. add more comments in each patch
+3. remove the previous test statements in __sock_recv_timestamp()
+
+Jason Xing (2):
+  net-timestamp: introduce SOF_TIMESTAMPING_OPT_RX_FILTER flag
+  net-timestamp: add selftests for SOF_TIMESTAMPING_OPT_RX_FILTER
+
+ Documentation/networking/timestamping.rst | 27 +++++++++++++++++++++++
+ include/uapi/linux/net_tstamp.h           |  3 ++-
+ net/ethtool/common.c                      |  1 +
+ net/ipv4/tcp.c                            |  9 ++++++--
+ net/socket.c                              | 10 +++++++--
+ tools/testing/selftests/net/rxtimestamp.c | 18 +++++++++++++++
+ 6 files changed, 63 insertions(+), 5 deletions(-)
+
+-- 
+2.37.3
 
 
