@@ -1,140 +1,169 @@
-Return-Path: <netdev+bounces-125839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED50E96EE60
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:40:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DC9C96EE71
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:44:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F6A71C222AE
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:40:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B0801F2332D
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481091581EA;
-	Fri,  6 Sep 2024 08:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F8615854D;
+	Fri,  6 Sep 2024 08:43:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QAw3apM/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b9dPKSJe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243A0156887
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 08:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C7F15278E
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 08:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725612032; cv=none; b=Hb34CPOeBqASH4ZoKNHzn6Jbktyhz2nG+KKmPu+ZUXZrxE2okOXE95JSOugPcTaqf/Nw8RAD3+RjMC3TDx/g7o7NtUvMmf0Z09HHrkZhuib7Mkva0S9g/fdX4s4SkUPZ3b4eK7w8wuUwkyUqdr7i84Z4qyfCrKFnyLzp2mRjKxA=
+	t=1725612229; cv=none; b=mnnu2M56E93sSmPW6Ukp84jsjD+FK+kgEDr32HHdvGms63ao2yDG3Ls6upf4Qi2Ay0zYLuM2X2SycruHJUVWNvn+XhzLpTVgs/1egmM+Kp+iNky+U+CWVk6ByCA5SjMlDgSfZvherRTLL10hw/Np4V2MLEtL4Vcyokl7b1tte8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725612032; c=relaxed/simple;
-	bh=Uxm7PSBgH9OV8X2gb1b9mZtr6aINCyetZvyPN7lafB0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Aako8aTKPRzBssVK+haqq5DU1yWRU5bwH3d82MQtRMD2CtlTS+KMxAtaV//NjCZoZbnovK9ATscuxrVwz1Lbw45117ixJHyTCOAWOfycGHqNNTMnuFUJdzOBrY/HAgFwBPsqUSKSMK6+N/XnhbS3Xb1c9euC2tcUPaD597Mt6C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QAw3apM/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7011C4CEC5;
-	Fri,  6 Sep 2024 08:40:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725612031;
-	bh=Uxm7PSBgH9OV8X2gb1b9mZtr6aINCyetZvyPN7lafB0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QAw3apM/9u2950Fo4LHQe+4o8yAyHeHTqqHjs8SZvEXviTvG15nmrDceqeHuo3Sx/
-	 56KzPM4KyfJ2XAFUOkL6sqrvdcqJjOsOH11TvdSZm3d63usygr+8xZtqwLdZAnIddk
-	 PThgKvWPf4mzGOY+96El/p3Yoc4TKEJBf8i4441SOB1zq9Kp/IqLLFQYjMpEG1Z3WY
-	 veV/tGDXYcmM13WFvmKFZXqYORxJK9fQUvAka9FtVdgoTbD9ZAllqEoac7vrfGFhUQ
-	 iuNcfv5MPFWRUOfeAt/gVysUQz9H63pPYWot29cMus30GYJBRX5y1VXpp9dHSxP5z9
-	 qrKWYpVjOKUuA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCBA3806654;
-	Fri,  6 Sep 2024 08:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725612229; c=relaxed/simple;
+	bh=sYAOHM0OcG0NaZIXeSEYiH/+ryFpU5Tt0KGgp831Ug8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OLhamxShSvMSn9n5wvv1vN3yfHa752bNpItaRiVmcNJOxIwT3YQa8bO4jMDI60T1jbVRtit5hA3A2TTH6oFRWHzfxXPxsM8XyRUZn/PcFzkggHYuDzP0GLbf4SgMo93AXvahakfzXRwmKSBwzxOkQ8+PPOd26eAYi1F4pADiKcI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=b9dPKSJe; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725612226;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IO25rrrQNWDfL7Bn6AqoZkvugHO7UKf+pbprMwvZuwI=;
+	b=b9dPKSJegRQ7tV+YHCxyhm5l3mQgfR7+FZFr/xVHbhQSkyQlwhJRhVu1VZ2qAEvvsmv91y
+	fyP0Vx9hxZatSqlKSOaetLaM8aKmIvwbOlvkuWSxmzUxTmw1CfB8RMBI56+3BN9yE6rcFr
+	REIcefifV+Z0w0zXcudN2L4BrDCWuyY=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-621-fK3Ot58hNV-MsD9B3qvaXg-1; Fri, 06 Sep 2024 04:43:45 -0400
+X-MC-Unique: fK3Ot58hNV-MsD9B3qvaXg-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2f7564eda12so1082081fa.3
+        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 01:43:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725612224; x=1726217024;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IO25rrrQNWDfL7Bn6AqoZkvugHO7UKf+pbprMwvZuwI=;
+        b=ShzeaT9KfULmvkhncBzrZw0dRsQRkeAPS5Nkr3v2WF3JhuRnurqyKTJ7xXlJbg5vzN
+         TrCui5dUEKlxb/i2Mgejchv+Ii79Mwwnotj6Ik9ygqqHcRE7NRSjsJ2YjPm++QLqMNH4
+         uwHUH1P7lzpKHocIdRWbcnIjCq4uCLq7hFfnvI2GKSSjbYlcsmimJkCZefxAYhASxZwv
+         7Lu/DOiPkHRH1vhxDalAs5pei7nN5yAXxTPUFCcXpRq5xbTJRmH6n9HdN2Zjz2+CJ2Cj
+         QykXUi5eJnNFAN9LjvIVEUmA9qmjENkmBdjbMPwNeg/zGSbYDOFK2ORVUxlIq98YtuQl
+         IjNw==
+X-Gm-Message-State: AOJu0Yyf1062Pk6UT6Lvlsnw0kPpTpb16pQMAadILN++7FzNS8B1hPKD
+	mbc2nbXFJQsGNf5GbIFJBEk0syI7dfeZ8em/gSKPrwDDCgdK0iijqs+5SiEtA/8MneKKMezARJf
+	o+8MGRtl2i+1HR7Wm7jToAlqa/ADtp/dQ86q7Cr8/q2p8+6xu4h+C2w==
+X-Received: by 2002:a05:651c:1991:b0:2ec:568e:336e with SMTP id 38308e7fff4ca-2f751eaee1bmr12706901fa.1.1725612223734;
+        Fri, 06 Sep 2024 01:43:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGT+z1w/z6YN28OpYeQ2dCulE2Kp/kot3f3CSP7P9f6Mz64pmj479twCfW6YqxPhHrxWVHjkg==
+X-Received: by 2002:a05:651c:1991:b0:2ec:568e:336e with SMTP id 38308e7fff4ca-2f751eaee1bmr12706321fa.1.1725612222476;
+        Fri, 06 Sep 2024 01:43:42 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1f8:6afa:d56e:f70d:1d1b:3f10])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ca05c6340sm13175775e9.4.2024.09.06.01.43.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 01:43:41 -0700 (PDT)
+Date: Fri, 6 Sep 2024 04:43:29 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, Si-Wei Liu <si-wei.liu@oracle.com>,
+	Darren Kenny <darren.kenny@oracle.com>
+Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
+Message-ID: <20240906044143-mutt-send-email-mst@kernel.org>
+References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/15] RX software timestamp for all - round 2
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172561203251.2028302.15757209227467883993.git-patchwork-notify@kernel.org>
-Date: Fri, 06 Sep 2024 08:40:32 +0000
-References: <20240904074922.256275-1-gal@nvidia.com>
-In-Reply-To: <20240904074922.256275-1-gal@nvidia.com>
-To: Gal Pressman <gal@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
- jv@jvosburgh.net, andy@greyhouse.net, mkl@pengutronix.de,
- mailhol.vincent@wanadoo.fr, Shyam-sundar.S-k@amd.com, skalluru@marvell.com,
- manishc@marvell.com, michael.chan@broadcom.com, pavan.chebbi@broadcom.com,
- nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev, sgoutham@marvell.com,
- bharat@chelsio.com, benve@cisco.com, satishkh@cisco.com,
- claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, wei.fang@nxp.com,
- shenwei.wang@nxp.com, xiaoning.wang@nxp.com, dmichail@fungible.com,
- yisen.zhuang@huawei.com, salil.mehta@huawei.com, shaojijie@huawei.com,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- marcin.s.wojtas@gmail.com, linux@armlinux.org.uk, gakula@marvell.com,
- sbhatta@marvell.com, hkelam@marvell.com, idosch@nvidia.com, petrm@nvidia.com,
- bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com,
- horatiu.vultur@microchip.com, lars.povlsen@microchip.com,
- Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
- alexandre.belloni@bootlin.com, shannon.nelson@amd.com, brett.creeley@amd.com,
- s.shtylyov@omp.ru, yoshihiro.shimoda.uh@renesas.com,
- niklas.soderlund@ragnatech.se, ecree.xilinx@gmail.com,
- habetsm.xilinx@gmail.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com, s-vadapalli@ti.com, rogerq@kernel.org,
- danishanwar@ti.com, linusw@kernel.org, kaloz@openwrt.org,
- richardcochran@gmail.com, willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Wed, 4 Sep 2024 10:49:07 +0300 you wrote:
-> Round 1 of drivers conversion was merged [1], this is round 2, more
-> drivers to follow.
+On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
+> leads to regression on VM with the sysctl value of:
 > 
-> [1] https://lore.kernel.org/netdev/20240901112803.212753-1-gal@nvidia.com/
+> - net.core.high_order_alloc_disable=1
 > 
-> Thanks,
-> Gal
+> which could see reliable crashes or scp failure (scp a file 100M in size
+> to VM):
 > 
-> [...]
+> The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
+> of a new frag. When the frag size is larger than PAGE_SIZE,
+> everything is fine. However, if the frag is only one page and the
+> total size of the buffer and virtnet_rq_dma is larger than one page, an
+> overflow may occur. In this case, if an overflow is possible, I adjust
+> the buffer size. If net.core.high_order_alloc_disable=1, the maximum
+> buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
+> the first buffer of the frag is affected.
+> 
+> Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
+> Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-Here is the summary with links:
-  - [net-next,01/15] lan743x: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/b9c4d16e2a47
-  - [net-next,02/15] net: lan966x: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/f592435d132c
-  - [net-next,03/15] net: sparx5: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/35461b6d5802
-  - [net-next,04/15] mlxsw: spectrum: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/8a26d9471766
-  - [net-next,05/15] net: ethernet: ti: am65-cpsw-ethtool: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/f40a3712ef1b
-  - [net-next,06/15] net: ethernet: ti: cpsw_ethtool: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/c76e2f40b7d9
-  - [net-next,07/15] net: ti: icssg-prueth: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/c5dbb6aeefbd
-  - [net-next,08/15] net: netcp: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/f9b74d602ee3
-  - [net-next,09/15] i40e: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/5df20ce03ef4
-  - [net-next,10/15] ice: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/6aebd824f45a
-  - [net-next,11/15] igb: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/638effa35d68
-  - [net-next,12/15] igc: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/29d2e49a62c1
-  - [net-next,13/15] ixgbe: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/12283fad6d2e
-  - [net-next,14/15] cxgb4: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/4c6d910e0254
-  - [net-next,15/15] bnx2x: Remove setting of RX software timestamp
-    https://git.kernel.org/netdev/net-next/c/26f74155df44
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Guys where are we going with this? We have a crasher right now,
+if this is not fixed ASAP I'd have to revert a ton of
+work Xuan Zhuo just did.
 
+
+> ---
+>  drivers/net/virtio_net.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index c6af18948092..e5286a6da863 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+>  	void *buf, *head;
+>  	dma_addr_t addr;
+>  
+> -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> -		return NULL;
+> -
+>  	head = page_address(alloc_frag->page);
+>  
+>  	dma = head;
+> @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+>  	len = SKB_DATA_ALIGN(len) +
+>  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>  
+> +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+> +		return -ENOMEM;
+> +
+>  	buf = virtnet_rq_alloc(rq, len, gfp);
+>  	if (unlikely(!buf))
+>  		return -ENOMEM;
+> @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+>  	 */
+>  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+>  
+> +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+> +		return -ENOMEM;
+> +
+> +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
+> +		len -= sizeof(struct virtnet_rq_dma);
+> +
+>  	buf = virtnet_rq_alloc(rq, len + room, gfp);
+>  	if (unlikely(!buf))
+>  		return -ENOMEM;
+> -- 
+> 2.32.0.3.g01195cf9f
 
 
