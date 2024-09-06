@@ -1,117 +1,123 @@
-Return-Path: <netdev+bounces-125757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BB4996E759
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 03:42:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A185B96E788
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:08:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 487E31F25761
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 01:42:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F3262858A9
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574391BC23;
-	Fri,  6 Sep 2024 01:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E9E1EA87;
+	Fri,  6 Sep 2024 02:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LbjfkyH4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CAyePER7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f41.google.com (mail-oa1-f41.google.com [209.85.160.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A0F288B5;
-	Fri,  6 Sep 2024 01:42:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3521FDD;
+	Fri,  6 Sep 2024 02:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725586926; cv=none; b=n0NTusE5VPlC3Xx/xtvXAmlacmb8nZm3k8JmQLfYhW0cphCAPyMcyzeJniA4Yus+Sp7Xc4vzsepvUGQeFQRWuQmOsqGGcIDo2uE+NVlXnIhrwdpntHfXa2i25JzgIFuZwR1U0HYEuNy8aTSTFjd9nHq2fCk51xUV9fYsbkVrmZI=
+	t=1725588477; cv=none; b=eDFQZ7fL2e+lPYS3RksPvALcTXlkGco6Tm84LLnfv09HNa/VKdMMehbfyFOqZK6xYij+SAquG13oD+raTBcpQfPcKx2d8C3zLtAj4aZL1rU3rCxDMvsVGUUNYHDG4wFdfRTMTCW8KwCBdnAXv0fB70JnXHoSqhIBezoAcK1WbUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725586926; c=relaxed/simple;
-	bh=wzWJ2grsEBS1oOgFBCqpVg7HIZfDqD5DVDovKWkIM70=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nbg1iNKF1rCZ9cgMH3Up1wi/tLLyOU98Tq/QJEavhxKPEe4t9wymwrbJ77cj2S0+9u6IsRja1dB+GSqOvzlJLSDVmXT9/ENruLyLwD8tlM4xIBq1gAnL4kAUgPC6eQEY5XOHk0YnT4/+P0Ov3vgXvE8/Fa9Ie5qDNuhQkgC10HQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LbjfkyH4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 190AEC4CEC3;
-	Fri,  6 Sep 2024 01:42:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725586925;
-	bh=wzWJ2grsEBS1oOgFBCqpVg7HIZfDqD5DVDovKWkIM70=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LbjfkyH4RMHF3yE+hp6qcHD4naomEyO931mU51a3tWJKzqIW70v5HAcajUmHBNBrj
-	 wuE4g2FKEnCpQvs6/bg8i++dIMMusygWb34M3ZWVQ/pX8znMgcCk0qU8sYRHFjrYMS
-	 ufPp/Zy/n0Ov9oAx7KmHqyuxUyBh70js8IsQACZKnH7ZzRagX28pKVrm/zqKxi/H69
-	 TOThrXwMBvtcfXBkx5TNC4RuIlibs+QoqwbZn45FR/ykc3S3r22fa4jJ+c3UxBdY+Q
-	 +jEdVHbcQfNMEmy5Se8g0AsrMySHS9N2YSSFjGQo+i6ri3YqWKuwNXZyGrIbYbOTNe
-	 BmHS7GNLvS0AA==
-Date: Thu, 5 Sep 2024 18:42:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, ncardwell@google.com, shuah@kernel.org,
- linux-kselftest@vger.kernel.org, fw@strlen.de, Willem de Bruijn
- <willemb@google.com>
-Subject: Re: [PATCH net-next 2/2] selftests/net: integrate packetdrill with
- ksft
-Message-ID: <20240905184204.797a4c49@kernel.org>
-In-Reply-To: <66da5b8b27259_27bb41294c@willemb.c.googlers.com.notmuch>
-References: <20240905031233.1528830-1-willemdebruijn.kernel@gmail.com>
-	<20240905031233.1528830-3-willemdebruijn.kernel@gmail.com>
-	<20240905143128.0dde754f@kernel.org>
-	<66da3dabc3f71_25102d29476@willemb.c.googlers.com.notmuch>
-	<66da4ab570989_269be02944d@willemb.c.googlers.com.notmuch>
-	<66da5b8b27259_27bb41294c@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1725588477; c=relaxed/simple;
+	bh=G3RD5XQamkVeBHQcYiQTep5rnKF4dLumAIVt+qMHUH0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OkNf1L7ArsMtxfCA6HwUxK8H8cOBzsa9h3HX6ohPCGW6YM8fKG+8PC/HpyBT7q47wkzMKcdKj02ob6QNpCJzbodCLdGjCNKA6c75F516xkXZDj8FZ2rI/imZ+RVXeAyRW24GxpUd5qBTLu9hYo27IJ1hpDqYJfamKRJcubOCwtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CAyePER7; arc=none smtp.client-ip=209.85.160.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-2780827dbafso831636fac.1;
+        Thu, 05 Sep 2024 19:07:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725588475; x=1726193275; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AeC92OzPOF04P7yDZQ2JHlD1fZIv0s85Rx86Vrq4KtI=;
+        b=CAyePER7weS138tnCpFjS+8skwcBKwHjdSA+tDHT8/4E+OmAlxOC17FNF+F+1Z3pb9
+         FZ7VKv2EApZR0CSdMETtapn5Vf+CVlQbg7pprwUQJOEZA/0rMvqURfcDauRhwnHe/PUu
+         VjbzLv2fUm1ZV9g2xWNi+dINJbQEt44cIBlQKTApBvMr2Uih/MA2H1BFvLtOWM0p2+5k
+         e763mRjo6qach4romktbYwsHJbqkhrFTTtqTr+xXygBQDY5Qu457GxJnoz6Gar8iyvdl
+         /skLBmoPIAFxICQFc/n0MaW7YOVCesLESOJp053tozmyky6g1+nIZl0umlxuw5OUySsC
+         FnJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725588475; x=1726193275;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AeC92OzPOF04P7yDZQ2JHlD1fZIv0s85Rx86Vrq4KtI=;
+        b=eczUWRyMlHFzcg935a/VfZWdPnfhm9h2SUE/UFUwDWvKlGRU+y7kkdrYlCGLJtKTnY
+         xjZoAx4Xl90h8IAvwy4smmIvqAiz5cMx8kDaH7nLwLEbDvh8DMmW+dwJ+QrFyhHX/XZw
+         hG92xeVSrFfLuc7c7ub3Pbb6cGnTjxWDlt3nDzENYVU9NAtKhytC4gse7i1ttOra1HSW
+         PGA1Q2DINwIUxPOtG7pJdS8c1HY1vtTGaqlStRUoafHtOhZhd58UO+9Y9Dn1CpgLkIfY
+         Y4QWkTnKPo24gie0k0HRkHQroUEwSU1QmLzfTu/Z4tNXMmTZ6cvEPsM8IAGLn7CKoZYv
+         4snQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXXw+i1IV9QixrNF7KDldpgFklhVAmOUdsX6uG5zvFS2ZlO6U3ey2OQPxIuPXw3iu8a7zhvB0I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YykFn1bP/p9l9i/Xrxu1UpuD7oOIlxpuZjEkWAo/qdspdksgWKZ
+	wTeZNZ8wjxpG++QDrW2sRAz77WElnFUYhloDr0LvkV3StmyoEUYn
+X-Google-Smtp-Source: AGHT+IE5lL8vWanXpVdAqd5nAMCzSCNWoQXLQirWfj6KhOqzo5yDXYo3VsUUeJIHnFOD1bwYRJhiyA==
+X-Received: by 2002:a05:6870:6111:b0:260:e3fa:ab8d with SMTP id 586e51a60fabf-27b82fb7833mr1510068fac.37.1725588475088;
+        Thu, 05 Sep 2024 19:07:55 -0700 (PDT)
+Received: from macbook-pro-49.dhcp.thefacebook.com ([2620:10d:c090:400::5:959])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d4fbd85b36sm3936927a12.4.2024.09.05.19.07.53
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 05 Sep 2024 19:07:54 -0700 (PDT)
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@kernel.org
+Subject: [GIT PULL] bpf for v6.11-rc7
+Date: Thu,  5 Sep 2024 19:07:50 -0700
+Message-Id: <20240906020750.13732-1-alexei.starovoitov@gmail.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 05 Sep 2024 21:31:55 -0400 Willem de Bruijn wrote:
-> > Packetdrill scripts are sensitive to timing.
-> > On the dbg build, I just observe a flaky test.
-> > 
-> > The tool takes --tolerance_usecs and --tolerance_percent arguments.
-> > I may have to update ksft_runner.sh to increase one if a dbg build is
-> > detected.
-> > 
-> > Let me know if I should respin now. Else I can also follow-up.
-> > 
-> > Need to figure out how best to detect debug builds. It is not in
-> > uname, and no proc/config.gz. Existence of /sys/kernel/debug/kmemleak
-> > is a proxy for current kernel/configs/debug.config, if a bit crude.  
-> 
-> Should have kept on reading. Will use KSFT_MACHINE_SLOW:
-> 
-> +declare -a optargs
-> +if [[ "${KSFT_MACHINE_SLOW}" == "yes" ]]; then
-> +       optargs+=('--tolerance_usecs=10000')
-> +fi
-> +
->  ktap_print_header
->  ktap_set_plan 2
-> 
-> -packetdrill ${ipv4_args[@]} $(basename $script) > /dev/null \
-> +packetdrill ${ipv4_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
->         && ktap_test_pass "ipv4" || ktap_test_fail "ipv4"
-> -packetdrill ${ipv6_args[@]} $(basename $script) > /dev/null \
-> +packetdrill ${ipv6_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
->         && ktap_test_pass "ipv6" || ktap_test_fail "ipv6"
-> 
-> 
-> > Another config affecting timing may be CONFIG_HZ. I did not observe
-> > issues with these specific scripts with CONFIG_HZ=250. It may have to
-> > be tackled eventually. Or CONFIG_HZ=1000 hardcoded in config.  
->  
-> I will just add the CONFIG for now.
+Hi Linus,
 
-Not sure I follow the HZ idea, lowering the frequency helps stability?
+The following changes since commit 872cf28b8df9c5c3a1e71a88ee750df7c2513971:
 
-We can see how well v2 does overnight, so far it's green:
-https://netdev.bots.linux.dev/contest.html?executor=vmksft-packetdrill-dbg
-(the net-next-2024-09-05--* branches had v1).
+  Merge tag 'platform-drivers-x86-v6.11-4' of git://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86 (2024-08-22 06:34:27 +0800)
 
-FWIW status page lists two sets of packetdrill runners, probably 
-because I 'reused' an old team-driver runner instead of creating
-a new one. It should straighten itself out by tomorrow.
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/bpf-6.11-rc7
+
+for you to fetch changes up to 5390f315fc8c9b9f48105a0d88b56bc59fa2b3e0:
+
+  Merge branch 'bpf-fix-incorrect-name-check-pass-logic-in-btf_name_valid_section' (2024-09-04 12:35:04 -0700)
+
+----------------------------------------------------------------
+- Fix crash when btf_parse_base() returns an error
+  from Martin Lau.
+
+- Fix out of bounds access in btf_name_valid_section()
+  from Jeongjun Park.
+
+Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+----------------------------------------------------------------
+Alexei Starovoitov (1):
+      Merge branch 'bpf-fix-incorrect-name-check-pass-logic-in-btf_name_valid_section'
+
+Jeongjun Park (2):
+      bpf: add check for invalid name in btf_name_valid_section()
+      selftests/bpf: Add a selftest to check for incorrect names
+
+Martin KaFai Lau (1):
+      bpf: Fix a crash when btf_parse_base() returns an error pointer
+
+ kernel/bpf/btf.c                             |  6 +++--
+ tools/testing/selftests/bpf/prog_tests/btf.c | 34 ++++++++++++++++++++++++++++
+ 2 files changed, 38 insertions(+), 2 deletions(-)
 
