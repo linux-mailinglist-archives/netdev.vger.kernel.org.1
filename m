@@ -1,291 +1,189 @@
-Return-Path: <netdev+bounces-125842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4978496EE91
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:52:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A652196EE9F
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:57:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD0BC1F2180B
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:52:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE3DB286E7C
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 08:57:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E344157A59;
-	Fri,  6 Sep 2024 08:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF26157E61;
+	Fri,  6 Sep 2024 08:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="JDppy8VF";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="6jG5vXZT";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="JDppy8VF";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="6jG5vXZT"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Kh68HxSI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A097155CBD;
-	Fri,  6 Sep 2024 08:52:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E685C53376;
+	Fri,  6 Sep 2024 08:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725612728; cv=none; b=h1GkCI68or1AOdIcfI/bOFv+Z+wduw/RJ2gp90JiJWZYuFHyxjbrJv7/ipU9VOLvF9bmrLXnr+kh+8R8A938l2ALoofSwSqzwW+JQgrt1Ajd/B9z5TrhNRhCUeZ5r++/qaeAkS67GpsrZPyKl0zk05FLF313nwD4wmScQFglAmU=
+	t=1725613053; cv=none; b=mn412L860tUSyjgtYdiDb0vz55uyddvf4QzH7MDYsZHUmaTowHicXe6XD0iP9P156JnOTAUWzfKfUso15RlGGJJjMzAA0dO5ssuou0Y/wbzXG1e2/4UMEpMQOONU2sZZ+lkg3wur13Dlw2CwuZlOGPGlaJ16b3/DwE6dVQQhsVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725612728; c=relaxed/simple;
-	bh=Nrflb2H2yXn5hE4VXnOT1oOR62LDJ/jlfL4fLgasIHM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jTheysXPfDMfvEhm39/STCvlKZBQCLtuBX6YO+9OXRUjcxxg+wkM8eUbCX4poY3VLjnWJMAsmDsC4dZ0pWjxE4dL4M1dowF/YH+PmeQgg+3ChqV/3H8lVUgZ4xowb4wFcM7vtTbi/T0nzEsCbbOSC9KmmoT/U9R+fRgl+GRDZBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=JDppy8VF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=6jG5vXZT; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=JDppy8VF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=6jG5vXZT; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 70BD61F8A8;
-	Fri,  6 Sep 2024 08:52:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725612724; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=IzogC8JuQRtj+kiGfSeOCXmpLa3gvh93o14fVFDPkWg=;
-	b=JDppy8VF9Irao39PPHgk/YTpy7wQbVJKMM/vshTpo3I5+o5BZvzJvOHhoF180EYK/mvLUR
-	DchdsGGC3rcaD1seufLf/g7uBwp3H0W01sSoe9hQ7C7DFFsdv/8inw7bjqsW8TD6K9fef/
-	Sma0AovEmjISO5qSNJSDYJHNN9Fcn9k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725612724;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=IzogC8JuQRtj+kiGfSeOCXmpLa3gvh93o14fVFDPkWg=;
-	b=6jG5vXZT6yq3mZZyE0V2evrOPr1vy89l8hKTevfsKWau7UMtuyl+IMY6UHwk+sCGwF0t8v
-	zyfXHi6Yxh9OPCCg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725612724; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=IzogC8JuQRtj+kiGfSeOCXmpLa3gvh93o14fVFDPkWg=;
-	b=JDppy8VF9Irao39PPHgk/YTpy7wQbVJKMM/vshTpo3I5+o5BZvzJvOHhoF180EYK/mvLUR
-	DchdsGGC3rcaD1seufLf/g7uBwp3H0W01sSoe9hQ7C7DFFsdv/8inw7bjqsW8TD6K9fef/
-	Sma0AovEmjISO5qSNJSDYJHNN9Fcn9k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725612724;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=IzogC8JuQRtj+kiGfSeOCXmpLa3gvh93o14fVFDPkWg=;
-	b=6jG5vXZT6yq3mZZyE0V2evrOPr1vy89l8hKTevfsKWau7UMtuyl+IMY6UHwk+sCGwF0t8v
-	zyfXHi6Yxh9OPCCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 4C39A136A8;
-	Fri,  6 Sep 2024 08:52:04 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id vEI+ErTC2mYQTgAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Fri, 06 Sep 2024 08:52:04 +0000
-Message-ID: <572688a7-8719-4f94-a5cd-e726486c757d@suse.cz>
-Date: Fri, 6 Sep 2024 10:52:04 +0200
+	s=arc-20240116; t=1725613053; c=relaxed/simple;
+	bh=aFUeVODQjMQy+fAcAaN2UvE3fQPybs5hbHXpRE+xB8c=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NL7eBoDIRYzlgfqYHvJng9639iwOmw3nkDlO08cF9WChQh95zvWRGcpbUXLeQbuaOuBj2FaAl/w0A5/RL+vhj0QJz9XC8IarR70tDiHf7iPoPnZjjLW6yGsXuQRSohotwawRF37CBvh5Di20sy/AghXDU/NoR9BuOOKKJxuQdu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Kh68HxSI; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1725613051; x=1757149051;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aFUeVODQjMQy+fAcAaN2UvE3fQPybs5hbHXpRE+xB8c=;
+  b=Kh68HxSIaTz4j2J1Kg4Z8Ic6BmzcHyvNfqoryst2Tw2UWlbBoWk4pCAE
+   yklAgqJinS5p01LCwLctUpBBK0SzQXARgOEWff192EKekER7Zx1UIzzCP
+   xvCbSz5qteTFT8sng7rmbxIYLQ0msWMGMpFvUkcG7e/gb8tsJfgotiBUB
+   6EqcJOnJNV/Umz3d9Gm7IADSmVrBnpAJel8beuz3IP4elrPw0LNWTwIif
+   O/vw9KCL2PAccGgeGEL+nEughqDRftUik2uhE9lFG/XSQ8aaOyo40Mj3P
+   gqId60nSTUgvNQlI5Tdd9n23gpJJi4CFJJoehtsnd+NJSccTp8QANLwj0
+   w==;
+X-CSE-ConnectionGUID: G5wQRom0R4mVf5hBNXy5nQ==
+X-CSE-MsgGUID: EPETK67MRtOBdfO8H1hoLA==
+X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
+   d="scan'208";a="31411637"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Sep 2024 01:57:23 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 6 Sep 2024 01:57:02 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 6 Sep 2024 01:57:02 -0700
+Date: Fri, 6 Sep 2024 14:23:18 +0530
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <linux@armlinux.org.uk>, <kuba@kernel.org>,
+	<hkallweit1@gmail.com>, <richardcochran@gmail.com>, <rdunlap@infradead.org>,
+	<bryan.whitehead@microchip.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<maxime.chevallier@bootlin.com>, <linux-kernel@vger.kernel.org>,
+	<horms@kernel.org>, <UNGLinuxDriver@microchip.com>
+Subject: Re: [PATCH net-next V5 4/5] net: lan743x: Migrate phylib to phylink
+Message-ID: <ZtrC/sCeXN5IgjWd@HYD-DK-UNGSW21.microchip.com>
+References: <20240904090645.8742-1-Raju.Lakkaraju@microchip.com>
+ <20240904090645.8742-5-Raju.Lakkaraju@microchip.com>
+ <cad5b31d-7713-4a1d-88e4-58d6878e90c5@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] memcg: add charging of already allocated slab objects
-Content-Language: en-US
-To: Shakeel Butt <shakeel.butt@linux.dev>, Yosry Ahmed <yosryahmed@google.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Muchun Song <muchun.song@linux.dev>, David Rientjes <rientjes@google.com>,
- Hyeonggon Yoo <42.hyeyoo@gmail.com>, Eric Dumazet <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, Meta kernel team <kernel-team@meta.com>,
- cgroups@vger.kernel.org, netdev@vger.kernel.org
-References: <20240905173422.1565480-1-shakeel.butt@linux.dev>
- <CAJD7tkbWLYG7-G9G7MNkcA98gmGDHd3DgS38uF6r5o60H293rQ@mail.gmail.com>
- <qk3437v2as6pz2zxu4uaniqfhpxqd3qzop52zkbxwbnzgssi5v@br2hglnirrgx>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <qk3437v2as6pz2zxu4uaniqfhpxqd3qzop52zkbxwbnzgssi5v@br2hglnirrgx>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[linux-foundation.org,cmpxchg.org,kernel.org,linux.dev,google.com,gmail.com,davemloft.net,redhat.com,kvack.org,vger.kernel.org,meta.com];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -2.80
-X-Spam-Flag: NO
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <cad5b31d-7713-4a1d-88e4-58d6878e90c5@lunn.ch>
 
-On 9/5/24 20:48, Shakeel Butt wrote:
->> > ---
->> > v3: https://lore.kernel.org/all/20240829175339.2424521-1-shakeel.butt@linux.dev/
->> > Changes since v3:
->> > - Add kernel doc for kmem_cache_charge.
->> >
->> > v2: https://lore.kernel.org/all/20240827235228.1591842-1-shakeel.butt@linux.dev/
->> > Change since v2:
->> > - Add handling of already charged large kmalloc objects.
->> > - Move the normal kmalloc cache check into a function.
->> >
->> > v1: https://lore.kernel.org/all/20240826232908.4076417-1-shakeel.butt@linux.dev/
->> > Changes since v1:
->> > - Correctly handle large allocations which bypass slab
->> > - Rearrange code to avoid compilation errors for !CONFIG_MEMCG builds
->> >
->> > RFC: https://lore.kernel.org/all/20240824010139.1293051-1-shakeel.butt@linux.dev/
->> > Changes since the RFC:
->> > - Added check for already charged slab objects.
->> > - Added performance results from neper's tcp_crr
->> >
->> >
->> >  include/linux/slab.h            | 20 ++++++++++++++
->> >  mm/slab.h                       |  7 +++++
->> >  mm/slub.c                       | 49 +++++++++++++++++++++++++++++++++
->> >  net/ipv4/inet_connection_sock.c |  5 ++--
->> >  4 files changed, 79 insertions(+), 2 deletions(-)
->> >
->> > diff --git a/include/linux/slab.h b/include/linux/slab.h
->> > index eb2bf4629157..68789c79a530 100644
->> > --- a/include/linux/slab.h
->> > +++ b/include/linux/slab.h
->> > @@ -547,6 +547,26 @@ void *kmem_cache_alloc_lru_noprof(struct kmem_cache *s, struct list_lru *lru,
->> >                             gfp_t gfpflags) __assume_slab_alignment __malloc;
->> >  #define kmem_cache_alloc_lru(...)      alloc_hooks(kmem_cache_alloc_lru_noprof(__VA_ARGS__))
->> >
->> > +/**
->> > + * kmem_cache_charge - memcg charge an already allocated slab memory
->> > + * @objp: address of the slab object to memcg charge.
->> > + * @gfpflags: describe the allocation context
->> > + *
->> > + * kmem_cache_charge is the normal method to charge a slab object to the current
+Hi Andrew,
 
-what is "normal method"? 
+Thank you for review the patches.
 
->> > + * memcg. The objp should be pointer returned by the slab allocator functions
->> > + * like kmalloc or kmem_cache_alloc. The memcg charge behavior can be controller
->> 
->> s/controller/controlled
+The 09/05/2024 15:11, Andrew Lunn wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
 > 
-> Thanks. Vlastimil please fix this when you pick this up.
-
-I felt it could be improved more, so ended up with this. Thoughts?
-
-/**
- * kmem_cache_charge - memcg charge an already allocated slab memory
- * @objp: address of the slab object to memcg charge
- * @gfpflags: describe the allocation context
- *
- * kmem_cache_charge allows charging a slab object to the current memcg,
- * primarily in cases where charging at allocation time might not be possible
- * because the target memcg is not known (i.e. softirq context)
- *
- * The objp should be pointer returned by the slab allocator functions like
- * kmalloc (with __GFP_ACCOUNT in flags) or kmem_cache_alloc. The memcg charge
- * behavior can be controlled through gfpflags parameter, which affects how the
- * necessary internal metadata can be allocated. Including __GFP_NOFAIL denotes
- * that overcharging is requested instead of failure, but is not applied for the
- * internal metadata allocation.
- *
- * There are several cases where it will return true even if the charging was
- * not done:
- * More specifically:
- *
- * 1. For !CONFIG_MEMCG or cgroup_disable=memory systems.
- * 2. Already charged slab objects.
- * 3. For slab objects from KMALLOC_NORMAL caches - allocated by kmalloc()
- *    without __GFP_ACCOUNT
- * 4. Allocating internal metadata has failed
- *
- * Return: true if charge was successful otherwise false.
- */
- 
->> > +
->> > +       /* Ignore KMALLOC_NORMAL cache to avoid circular dependency. */
->> 
->> Is it possible to point to the commit that has the explanation here?
->> The one you pointed me to before? Otherwise it's not really obvious
->> where the circular dependency comes from (at least to me).
->> 
+> > +static struct {
+> > +     unsigned long mask;
+> > +     int speed;
+> > +     int duplex;
+> > +} lan743x_mac_caps_params[] = {
+> > +     { MAC_2500FD,   SPEED_2500,   DUPLEX_FULL },
+> > +     { MAC_1000FD,   SPEED_1000,   DUPLEX_FULL },
+> > +     { MAC_100FD,    SPEED_100,    DUPLEX_FULL },
+> > +     { MAC_10FD,     SPEED_10,     DUPLEX_FULL },
+> > +     { MAC_100HD,    SPEED_100,    DUPLEX_HALF },
+> > +     { MAC_10HD,     SPEED_10,     DUPLEX_HALF },
+> > +};
+> > +
+> > +static int lan743x_find_max_speed(unsigned long caps, int *speed, int *duplex)
+> > +{
+> > +     int i;
+> > +
+> > +     *speed = SPEED_UNKNOWN;
+> > +     *duplex = DUPLEX_UNKNOWN;
+> > +     for (i = 0; i < ARRAY_SIZE(lan743x_mac_caps_params); i++) {
+> > +             if (caps & lan743x_mac_caps_params[i].mask) {
+> > +                     *speed = lan743x_mac_caps_params[i].speed;
+> > +                     *duplex = lan743x_mac_caps_params[i].duplex;
+> > +                     break;
+> > +             }
+> > +     }
+> > +
+> > +     return *speed == SPEED_UNKNOWN ? -EINVAL : 0;
+> > +}
+> > +
+> > +static int lan743x_phylink_create(struct lan743x_adapter *adapter)
+> > +{
+> > +     struct net_device *netdev = adapter->netdev;
+> > +     struct phylink *pl;
+> > +
+> > +     adapter->phylink_config.dev = &netdev->dev;
+> > +     adapter->phylink_config.type = PHYLINK_NETDEV;
+> > +     adapter->phylink_config.mac_managed_pm = false;
+> > +
+> > +     adapter->phylink_config.mac_capabilities = MAC_ASYM_PAUSE |
+> > +             MAC_SYM_PAUSE | MAC_10 | MAC_100 | MAC_1000FD;
+> > +
 > 
-> Not sure about the commit reference. We can add more text here.
-> Vlastimil, how much detail do you prefer?
+> 
+> > +     case PHY_INTERFACE_MODE_SGMII:
+> > +             __set_bit(PHY_INTERFACE_MODE_SGMII,
+> > +                       adapter->phylink_config.supported_interfaces);
+> > +             __set_bit(PHY_INTERFACE_MODE_1000BASEX,
+> > +                       adapter->phylink_config.supported_interfaces);
+> > +             __set_bit(PHY_INTERFACE_MODE_2500BASEX,
+> > +                       adapter->phylink_config.supported_interfaces);
+> > +             adapter->phylink_config.mac_capabilities |= MAC_2500FD;
+> 
+> 
+> > +static int lan743x_phylink_connect(struct lan743x_adapter *adapter)
+> > +{
+> > +     struct device_node *dn = adapter->pdev->dev.of_node;
+> > +     struct net_device *dev = adapter->netdev;
+> > +     struct phy_device *phydev;
+> > +     int ret;
+> > +
+> > +     if (dn)
+> > +             ret = phylink_of_phy_connect(adapter->phylink, dn, 0);
+> > +
+> > +     if (!dn || (ret && !lan743x_phy_handle_exists(dn))) {
+> > +             phydev = phy_find_first(adapter->mdiobus);
+> > +             if (phydev) {
+> > +                     /* attach the mac to the phy */
+> > +                     ret = phylink_connect_phy(adapter->phylink, phydev);
+> > +             } else if (((adapter->csr.id_rev & ID_REV_ID_MASK_) ==
+> > +                           ID_REV_ID_LAN7431_) || adapter->is_pci11x1x) {
+> > +                     struct phylink_link_state state;
+> > +                     unsigned long caps;
+> > +
+> > +                     caps = adapter->phylink_config.mac_capabilities;
+> > +                     ret = lan743x_find_max_speed(caps, &state.speed,
+> > +                                                  &state.duplex);
+> 
+> This seems like an overly complicated way to determine the speed. If
+> MAC_2500FD is set, you know it is 2500. Otherwise it must by 1000. Why
+> not use a simple if?
 
-What about:
+Ok. I will fix
 
-        /*
-         * Ignore KMALLOC_NORMAL cache to avoid possible circular dependency
-         * of slab_obj_exts being allocated from the same slab and thus the slab
-         * becoming effectively unfreeable.
-         */
+> 
+> I'm not the best at reviewing phylink patches, but since Russell is
+> off-lime, i'm the best you have. So
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> 
+> but please do consider simplifying the code above.
+> 
+>     Andrew
 
- 
-> thanks,
-> Shakeel
-
+-- 
+Thanks,                                                                         
+Raju
 
