@@ -1,141 +1,157 @@
-Return-Path: <netdev+bounces-125759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74A9096E796
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:11:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E8996E79A
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 04:18:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E2141C22EA3
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:11:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36A0E1F23EA2
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 02:18:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C392209F;
-	Fri,  6 Sep 2024 02:10:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB671C69C;
+	Fri,  6 Sep 2024 02:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="AL7SFQw/"
+	dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b="BFfxdtMC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A93208A4
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 02:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129FD8F5C
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 02:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725588657; cv=none; b=m0DwOHGvdnG2nIONZc5t7X2TBFn/+kCE1RBcIVH7dRRkGxqIhdi37gclZg3WrtQBWGFoLZpC0dd3km3tNfIrLeP8j2TJdvSakUNBFH/6AwR3En3Uh2yJOYBe2r7jMxXkZZ+j5x/HKgw42o9i0YiTBptEizfCWN9m4H1gQBm9pJA=
+	t=1725589083; cv=none; b=tegvR1Ld29uJaTHmfMvI3p5aSjkF6ZV61kfNNtIoFRQvtmuYWZxHVlDIwY0ldwtm5gwFOaH6hBGl0xcVUR3pjG89RIZhrj+0bzZbeGDcB59MXCMFPWZnhkHoFo3pzmaUqI+GLbUMt8X6H0jCb2YyFJ8u8lpezlwBAeqtniZ7a14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725588657; c=relaxed/simple;
-	bh=2E7Umks8wXQUo5OoAJfXfZ/E5X7wq5YaMefduwHtqmc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M2EJvYKPibPWT0R8lbFK96aDf1xjVC3tllPKhNaEOqvy4oSp4fZE+7yRm74Ddv1Mtoo9nEXpOB3pS1AZVwgEtjm96F+/6LhOgDbpKH/Di1k9eob6rMPiLMqPFPFp8WUKCHlL6c+TdbaOfAt85xpxOQp4+5H38xGAaK5V0rYRB+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=AL7SFQw/; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4280ca0791bso11023685e9.1
-        for <netdev@vger.kernel.org>; Thu, 05 Sep 2024 19:10:54 -0700 (PDT)
+	s=arc-20240116; t=1725589083; c=relaxed/simple;
+	bh=ekpufTpfNAE5F6HT9OVpWZviHFbgx0oSysdS/T6IeQU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uNdzTbG5g9syp5LZ04QRjOO/Dw2uf6H0EO4M0nm7npidz3CVjq6LhG/hjiY+PT0c5Qg6oTqmKlgIX6uLqz+NvCkY3IsDfhbw/+6Si4UnWMWmtx19GfCJAYI1R0nK3s8bf6LU/AIBT4HHy/BZub3TypVutg2iLz4HuPbX789ntUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.co.jp header.i=@amazon.co.jp header.b=BFfxdtMC; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1725588653; x=1726193453; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dAvARZINz4vJQ8c0Q/MMgM2aRtDQKyDIrx0VwPcsgnw=;
-        b=AL7SFQw/7xv1QvTBilP2BILhW6P1cFMTqQiNCvUwROUBMrj94QKiAjioPffvImQgJL
-         ZpxdVhJs+dWKSvXGuvun/9vocTgTlZm+SGD8fNOH1VjGHjwDuFrz4zwVSsyBtnvPLWB/
-         +bwNTe7aUX7eoz2k0Us9eEALQyAX2kgJyyZjGC2bI1EuKel7Qo+7Ws4I+qZrGDiC2/JT
-         Guhb5IR93bG7i6fBNf/zKMiOOVjzsV7NsgZbjALpjjSAI9MzyFtlAErE7eDAl8JYD6Cv
-         EMLAJaKE5NfB2Ze8TArZWuO5sGmIHT2k2xl98atPfSLcYWse5sPCiFOTOn0oOw5hY4f7
-         m+Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725588653; x=1726193453;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dAvARZINz4vJQ8c0Q/MMgM2aRtDQKyDIrx0VwPcsgnw=;
-        b=daMpn7lPQ1DLkebRajRb4P3ZqIkB5qoWn3aGzze6BCcqRzppVXHDXOPfYyDSUrGMEw
-         8a325al2OrGJmhdyyZAEL7DxDkFpESaI8Svgqc7SVeJBF0Sew8tq9Cu3EWd80Rs0dBz9
-         Mq0KDtBXCPYrA97TBwhy9yPsfVr/Gypkp2Za11V/Alsh8hknyGai1Y+SxvgaRq6Rd/mP
-         b+xty568+9brsDWaUoV3r/p7R5v0sGr3SmPd+SIbr1Zg5GP6C1YB6nsvGBCxMhz2GuCP
-         b/Rj6UFfdTafg0MT1n0EdGCUVASyn+XsrJBPfVcKFA1ryZnM98l+zusRyYKw/03nXb3p
-         bYvg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxR1OlnG/CODrpCMM31leHnJxp7n8501SXsmjjn9ST57iURxNBCrsXVvjl/kGfTTibfjQ9r5o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxG68DLurmKcP7fos9j56n01vBuHLlQH1EjTCO0R5IRXSZclBnr
-	9gfxC6qjjTZ6W/zEahblz/gie0aIPqYXGT1RdOZrY2f2VyHJTF4NtOzjReDcD2w=
-X-Google-Smtp-Source: AGHT+IFjmciqCusWNY5Mnsq94uColtksFwX4WGKvTbnvpcRTzIUgwHdV7sDbQD63Er44q1qv/Z99rA==
-X-Received: by 2002:a05:6000:781:b0:374:c56c:fbc7 with SMTP id ffacd0b85a97d-378895ca924mr625193f8f.15.1725588653187;
-        Thu, 05 Sep 2024 19:10:53 -0700 (PDT)
-Received: from u94a (39-10-10-202.adsl.fetnet.net. [39.10.10.202])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ced2de5f52sm3891880173.44.2024.09.05.19.10.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2024 19:10:52 -0700 (PDT)
-Date: Fri, 6 Sep 2024 10:10:40 +0800
-From: Shung-Hsi Yu <shung-hsi.yu@suse.com>
-To: Matt Bobrowski <mattbobrowski@google.com>
-Cc: Eduard Zingerman <eddyz87@gmail.com>, bpf@vger.kernel.org, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	David Vernet <void@manifault.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel test robot <lkp@intel.com>
-Subject: Re: [PATCH bpf-next] bpf: use type_may_be_null() helper for
- nullable-param check
-Message-ID: <u33xtqql46ppe2ebqj7u26so4b7my6ebsdeoxdb6kn57ygbniq@3vmbbct3hphm>
-References: <20240905055233.70203-1-shung-hsi.yu@suse.com>
- <ZtllCZOrO9b-MDtE@google.com>
+  d=amazon.co.jp; i=@amazon.co.jp; q=dns/txt;
+  s=amazon201209; t=1725589082; x=1757125082;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5TT8xdsCmk+8IqEfUImoDN2/EEbxvgsTV+2khwPLNfo=;
+  b=BFfxdtMCiHXr/7XI4PhMfevayNV2tWWqrmoq/Hqj1Y+CB0R+YUPuDkol
+   oGS4jryLPr2i04rjZAirhvxFvrmFzTPhhAxxN8du21kKCfjxqctgeihdu
+   iRSlDrONU1e2K47c4MKFJs4Qmpy3sq3S8aEG4tpTnpHbQgRuS5IRwZoVy
+   Q=;
+X-IronPort-AV: E=Sophos;i="6.10,206,1719878400"; 
+   d="scan'208";a="366478080"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2024 02:18:00 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:37237]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.84:2525] with esmtp (Farcaster)
+ id 993dfbd4-fd5b-473d-beb9-0afd4cb6a4fb; Fri, 6 Sep 2024 02:17:58 +0000 (UTC)
+X-Farcaster-Flow-ID: 993dfbd4-fd5b-473d-beb9-0afd4cb6a4fb
+Received: from EX19D005ANA004.ant.amazon.com (10.37.240.178) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 6 Sep 2024 02:17:58 +0000
+Received: from 682f678c4465.ant.amazon.com (10.118.248.64) by
+ EX19D005ANA004.ant.amazon.com (10.37.240.178) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Fri, 6 Sep 2024 02:17:54 +0000
+From: Takamitsu Iwai <takamitz@amazon.co.jp>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, "Przemek
+ Kitszel" <przemyslaw.kitszel@intel.com>
+CC: Takamitsu Iwai <takamitz@amazon.co.jp>, <netdev@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, Kohei Enju <enjuk@amazon.com>
+Subject: [PATCH v2 net-next] e1000e: Remove duplicated writel() in e1000_configure_tx/rx()
+Date: Fri, 6 Sep 2024 11:17:19 +0900
+Message-ID: <20240906021719.37754-1-takamitz@amazon.co.jp>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZtllCZOrO9b-MDtE@google.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA002.ant.amazon.com (10.13.139.96) To
+ EX19D005ANA004.ant.amazon.com (10.37.240.178)
 
-On Thu, Sep 05, 2024 at 08:00:09AM GMT, Matt Bobrowski wrote:
-> On Thu, Sep 05, 2024 at 01:52:32PM +0800, Shung-Hsi Yu wrote:
-[...]
-> > --- a/net/bpf/bpf_dummy_struct_ops.c
-> > +++ b/net/bpf/bpf_dummy_struct_ops.c
-> > @@ -115,7 +115,7 @@ static int check_test_run_args(struct bpf_prog *prog, struct bpf_dummy_ops_test_
-> >  
-> >  		offset = btf_ctx_arg_offset(bpf_dummy_ops_btf, func_proto, arg_no);
-> >  		info = find_ctx_arg_info(prog->aux, offset);
-> > -		if (info && (info->reg_type & PTR_MAYBE_NULL))
-> > +		if (info && type_may_be_null(info->reg_type))
-> 
-> Maybe as part of this clean up, we should also consider replacing all
-> the open-coded & PTR_MAYBE_NULL checks with type_may_be_null() which
-> we have sprinkled throughout kernel/bpf/verifier.c?
+Duplicated register initialization codes exist in e1000_configure_tx()
+and e1000_configure_rx().
 
-Agree we should. Usage like this could be replaced
+For example, writel(0, tx_ring->head) writes 0 to tx_ring->head, which
+is adapter->hw.hw_addr + E1000_TDH(0).
 
-	if (ptr_reg->type & PTR_MAYBE_NULL) {
-		verbose(env, "R%d pointer arithmetic on %s prohibited, null-check it first\n",
-			dst, reg_type_str(env, ptr_reg->type));
-		return -EACCES;
-	}
+This initialization is already done in ew32(TDH(0), 0).
 
-OTOH replacing & PTR_MAYBE_NULL here probably won't help improve
-clarity.
+ew32(TDH(0), 0) is equivalent to __ew32(hw, E1000_TDH(0), 0). It
+executes writel(0, hw->hw_addr + E1000_TDH(0)). Since variable hw is
+set to &adapter->hw, it is equal to writel(0, tx_ring->head).
 
-	if (base_type(arg->arg_type) == ARG_PTR_TO_BTF_ID) {
-		reg->type = PTR_TO_BTF_ID;
-		if (arg->arg_type & PTR_MAYBE_NULL)
-			reg->type |= PTR_MAYBE_NULL;
-		if (arg->arg_type & PTR_UNTRUSTED)
-			reg->type |= PTR_UNTRUSTED;
-		if (arg->arg_type & PTR_TRUSTED)
-			reg->type |= PTR_TRUSTED;
-		...
+We can remove similar four writel() in e1000_configure_tx() and
+e1000_configure_rx().
 
-For such case we might need to introduce another helper (bitwise-OR
-between enum bpf_type_flag should be free of compiler warning).
+commit 0845d45e900c ("e1000e: Modify Tx/Rx configurations to avoid
+null pointer dereferences in e1000_open") has introduced these
+writel(). This commit moved register writing to
+e1000_configure_tx/rx(), and as result, it caused duplication in
+e1000_configure_tx/rx().
 
-	reg->type = type_flag_apply(PTR_TO_BTF_ID, arg->arg_type,
-								PTR_MAYBE_NULL | PTR_UNTRUSTED | PTR_TRUSTED);
+This patch modifies the sequence of register writing, but removing
+these writes is safe because the same writes were already there before
+the commit.
 
-WDYT?
+I also have checked the datasheets [0] [1] and have not found any
+description that we need to write RDH, RDT, TDH and TDT registers
+twice at initialization. Furthermore, we have tested this patch on an
+I219-V device physically.
+
+Link: https://www.intel.com/content/dam/www/public/us/en/documents/datasheets/82577-gbe-phy-datasheet.pdf [0]
+Link: https://www.intel.com/content/www/us/en/content-details/613460/intel-82583v-gbe-controller-datasheet.html [1]
+Tested-by: Kohei Enju <enjuk@amazon.com>
+Signed-off-by: Takamitsu Iwai <takamitz@amazon.co.jp>
+---
+
+v1->v2
+modify commit message to explain the reason why we can remove these writes safely.
+
+v1 link
+https://lore.kernel.org/netdev/20240902061454.85744-1-takamitz@amazon.co.jp/
+
+ drivers/net/ethernet/intel/e1000e/netdev.c | 6 ------
+ 1 file changed, 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index da5c59daf8ba..89c57be89c88 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -2928,11 +2928,8 @@ static void e1000_configure_tx(struct e1000_adapter *adapter)
+ 	tx_ring->head = adapter->hw.hw_addr + E1000_TDH(0);
+ 	tx_ring->tail = adapter->hw.hw_addr + E1000_TDT(0);
+ 
+-	writel(0, tx_ring->head);
+ 	if (adapter->flags2 & FLAG2_PCIM2PCI_ARBITER_WA)
+ 		e1000e_update_tdt_wa(tx_ring, 0);
+-	else
+-		writel(0, tx_ring->tail);
+ 
+ 	/* Set the Tx Interrupt Delay register */
+ 	ew32(TIDV, adapter->tx_int_delay);
+@@ -3253,11 +3250,8 @@ static void e1000_configure_rx(struct e1000_adapter *adapter)
+ 	rx_ring->head = adapter->hw.hw_addr + E1000_RDH(0);
+ 	rx_ring->tail = adapter->hw.hw_addr + E1000_RDT(0);
+ 
+-	writel(0, rx_ring->head);
+ 	if (adapter->flags2 & FLAG2_PCIM2PCI_ARBITER_WA)
+ 		e1000e_update_rdt_wa(rx_ring, 0);
+-	else
+-		writel(0, rx_ring->tail);
+ 
+ 	/* Enable Receive Checksum Offload for TCP and UDP */
+ 	rxcsum = er32(RXCSUM);
+-- 
+2.40.1
+
 
