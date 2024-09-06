@@ -1,174 +1,207 @@
-Return-Path: <netdev+bounces-125931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BD1E96F4A8
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 14:53:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A6196F4D7
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 14:57:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0BDBF1F277BD
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:53:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9998AB20BA1
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41B71CB338;
-	Fri,  6 Sep 2024 12:53:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218C31C9EBB;
+	Fri,  6 Sep 2024 12:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="elwx2U+B"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HiqQyfzA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4EB3C13C;
-	Fri,  6 Sep 2024 12:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606521552FA
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 12:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725627185; cv=none; b=hy821F2Hm4jVDcRZC5KPTNM6xKgQqcWyUL4/JqaHOx6qEOsA0KOIEH3YRw+USo7YBQ2ARzKVAIUksjevuc9DmPNtWZhVqbb72nUKevJ8PiovF2cwuE9UgZ2AdUdF1MW9mU1w0ccRwOvwyfdlcYW8RsGNLxwpZZW/0PJRdAhswEQ=
+	t=1725627432; cv=none; b=JxLg23dp7OYrUHDVlksOI97P+nJ31q5D8ZVKbLBhbWpPhxhMEB9xgoX07pFGvA95hiTCouSodMDOpFnHmJBRSUNN4anrDAZcog4s0P+gMhLwMn52E4QpXdZmRTN20CvCE7TDcUJizuPzPeb3k5Dmkv7o0gUEB72iyDLEAiK68IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725627185; c=relaxed/simple;
-	bh=q5VfbWltAcQLz/+81HbmpQS+9Anz1Ywt6H9742dG5kg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CsIJoTQsBqJdfoCHE1cH5Lv7i5vaB30rzHEAlFszbZpRyPCbtcp1rsA7y0xlRMes0evV3QHsIMCLr/1+81dpklMEHNn/LIQmBXf0prBqM/NW1aAkhlYs46pBk4XYt5v3GmuYFRzoC4Gpis/J1FNkBEoftPW0LWb6NEutNBwP1iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=elwx2U+B; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c24648e280so182050a12.0;
-        Fri, 06 Sep 2024 05:53:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725627182; x=1726231982; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=690hJkBK217OakU19EFY9fs/Kc2GYaKx8HXQ7unUhlQ=;
-        b=elwx2U+B9iAeebSjj7DgB+GOim0Ul1h8O6ESIpcfEU5ae3Qz6Ggms0S/fEVtHDMD/v
-         eqsiqytq0a0jH97i1PULbF+aLZa+DfDapdVSnVTsip2VfeNTUpci6f4TrASLgp5IJ7ez
-         doqu+x/FEU8Zs4iViJAYUBKfuCqecsc4/kLoCY5fcubMVlNCH92dLqbmIG/5accYVhkz
-         538kCL0UYmT7SMPWsoM5NCyz2U23zlyfD6UcvXyM0/1IB6Dz+Awvb2BHoBCpt8mVA7UK
-         SQogaqSoMI6NSjZBWoM3mg7WIZYeiaqqU1Iix4AjfZD7TLi5IkFAZpEjSrkE/ZeTN28b
-         Bfww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725627182; x=1726231982;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=690hJkBK217OakU19EFY9fs/Kc2GYaKx8HXQ7unUhlQ=;
-        b=SfeUTfvyqhm3WgmRdQxCAglaMLyvikgW5vHACZMbGYqXHsc2EMamzgt4qiSP/WfTTW
-         FPvXo4VTaVdKCmQD4fHWy1/OTxNz4wPKtL8KwXWxOVrnID1OXSWsHnrHpod9P3wuZiY6
-         EALfbnPLD20jwBirgmx57jzuEdT460CBNZI5EkP95uUogVE+mVAMxMrNOlI25uxEEN1g
-         dQ4VyyB3Q6nNY+N654sDMlKMS6EoXPO2flJSM6zbRViOeDzyvBY4MEPgmoTBGH+886HA
-         riDGEbPmuFm6H7eLoKXs1rRXlKO75BcpWKrrQcZ2+/Oo0J7AvnGbLaVR+zh4lpsxqC5b
-         5few==
-X-Forwarded-Encrypted: i=1; AJvYcCUVtU81wUQYFrLlo4wJ6VVWjvegycE7rwuyugwXmW3Im+I/snHHzaBlIOGqtVuKTtqSoBUrwQA3@vger.kernel.org, AJvYcCWfgdi7a4bhTMX6Fah7DbaS1SAV/a/G5dV5wDAcpaaoM3IytEK5Ah5DRnmLOtUr4oaEnn3S0YZuVO/pvdo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSdjJ7gLMUQuXTC7JQZP5p/NAZdXsUVQxDoii4k7RYhPqnyZpg
-	m4DbIg0lowp3rf2G57Jea+eqsWaY6ztm3+jsm12HERqBfOWpR0PY
-X-Google-Smtp-Source: AGHT+IFUUlXDd8a581aFfNhl9hEBR8Xj7Vj1SfC+dxLDEYbwn71uSH7PY1/UYC/o4JTGTrHDO3gv+Q==
-X-Received: by 2002:a05:6402:50c7:b0:5c2:6850:7b2 with SMTP id 4fb4d7f45d1cf-5c3dc7ef8cfmr1030364a12.6.1725627181456;
-        Fri, 06 Sep 2024 05:53:01 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3cc56a897sm2426757a12.47.2024.09.06.05.52.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Sep 2024 05:53:00 -0700 (PDT)
-Date: Fri, 6 Sep 2024 15:52:58 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Serge Semin <fancer.lancer@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	rmk+kernel@armlinux.org.uk, linux@armlinux.org.uk, xfr@outlook.com,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v9 3/7] net: stmmac: refactor FPE verification
- process
-Message-ID: <20240906125258.d7rhhcjdic3quqg2@skbuf>
-References: <cover.1725597121.git.0x1207@gmail.com>
- <13f5833e52a47895864db726f090f323ec691c62.1725597121.git.0x1207@gmail.com>
+	s=arc-20240116; t=1725627432; c=relaxed/simple;
+	bh=PgpUqTDJtGZIRloqGiVVcn/EalmCmqNfTkJNG23ep/w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DE/ygGXKSiLaFgvzgOp3SNOGYsns83XNh0T7myxLB1KvKS8sO+6uqZYnUtwRwMp1uLoGlCHNRwius40er8QEViTTR4jL4OqSQ3J/BIgvWT2cmirXZnDwTKPzWLh5k6VeaYO0dZ3GtpTXJ2QiHUWBoYjfG24frYnEX7XtLstXk1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HiqQyfzA; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725627431; x=1757163431;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PgpUqTDJtGZIRloqGiVVcn/EalmCmqNfTkJNG23ep/w=;
+  b=HiqQyfzAZmMhMLabNoVukyQjuz7WrUgr1Hbsk42FtBIigtQqeRNRHTPp
+   T2RC1w8enTRp8Xrt+jg+vUjCjfci6R9p8vGumuKTAEU8tklbEd/Z0AZAz
+   Ur6Xwt8O3Dq85Rwd9NwmNGKjHPJ/H3EPLNfgxzdi3hSv3mMTHfIfcp0Gu
+   sZTMNZlO1Tex7pHIY1d48KRlbtk8P2tJ5D35YwOOHmNrwvNFK1jf/jxLE
+   WZMSpavvTH4F3DlXBMeq2RVLUsfZVhxc4CHE3YjCqCO3VXGnfZ1qPGbn7
+   ZYjIEtskXWLSx7pj8NFPKFqUquj7DQPIUEGTcx+TmVGlJll4lLANVxWjx
+   A==;
+X-CSE-ConnectionGUID: bpeMT2TuQd295T6FHkIEGQ==
+X-CSE-MsgGUID: tiz6CaZpTru9limqauq5Gg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11187"; a="24546123"
+X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
+   d="scan'208";a="24546123"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Sep 2024 05:57:09 -0700
+X-CSE-ConnectionGUID: ZlYcbZKVTvCmau3AgYWjmA==
+X-CSE-MsgGUID: +dX9tKI4SjyxpMYZzzYqDg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,207,1719903600"; 
+   d="scan'208";a="96731526"
+Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
+  by fmviesa001.fm.intel.com with ESMTP; 06 Sep 2024 05:57:07 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	wojciech.drewek@intel.com,
+	mschmidt@redhat.com
+Subject: [iwl-net v1] ice: clear port vlan config during reset
+Date: Fri,  6 Sep 2024 14:57:06 +0200
+Message-ID: <20240906125706.46965-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <13f5833e52a47895864db726f090f323ec691c62.1725597121.git.0x1207@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 06, 2024 at 12:55:58PM +0800, Furong Xu wrote:
-> @@ -5979,44 +5956,29 @@ static int stmmac_set_features(struct net_device *netdev,
->  static void stmmac_fpe_event_status(struct stmmac_priv *priv, int status)
->  {
->  	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
-> -	enum stmmac_fpe_state *lo_state = &fpe_cfg->lo_fpe_state;
-> -	enum stmmac_fpe_state *lp_state = &fpe_cfg->lp_fpe_state;
-> -	bool *hs_enable = &fpe_cfg->hs_enable;
->  
-> -	if (status == FPE_EVENT_UNKNOWN || !*hs_enable)
-> -		return;
-> +	/* This is interrupt context, just spin_lock() */
-> +	spin_lock(&fpe_cfg->lock);
->  
-> -	/* If LP has sent verify mPacket, LP is FPE capable */
-> -	if ((status & FPE_EVENT_RVER) == FPE_EVENT_RVER) {
-> -		if (*lp_state < FPE_STATE_CAPABLE)
-> -			*lp_state = FPE_STATE_CAPABLE;
-> +	if (!fpe_cfg->pmac_enabled || status == FPE_EVENT_UNKNOWN)
-> +		goto unlock_out;
->  
-> -		/* If user has requested FPE enable, quickly response */
-> -		if (*hs_enable)
-> -			stmmac_fpe_send_mpacket(priv, priv->ioaddr,
-> -						fpe_cfg,
-> -						MPACKET_RESPONSE);
-> -	}
-> +	/* LP has sent verify mPacket */
-> +	if ((status & FPE_EVENT_RVER) == FPE_EVENT_RVER)
-> +		stmmac_fpe_send_mpacket(priv, priv->ioaddr, fpe_cfg,
-> +					MPACKET_RESPONSE);
->  
-> -	/* If Local has sent verify mPacket, Local is FPE capable */
-> -	if ((status & FPE_EVENT_TVER) == FPE_EVENT_TVER) {
-> -		if (*lo_state < FPE_STATE_CAPABLE)
-> -			*lo_state = FPE_STATE_CAPABLE;
-> -	}
-> +	/* Local has sent verify mPacket */
-> +	if ((status & FPE_EVENT_TVER) == FPE_EVENT_TVER &&
-> +	    fpe_cfg->status != ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED)
-> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_VERIFYING;
->  
-> -	/* If LP has sent response mPacket, LP is entering FPE ON */
-> +	/* LP has sent response mPacket */
->  	if ((status & FPE_EVENT_RRSP) == FPE_EVENT_RRSP)
-> -		*lp_state = FPE_STATE_ENTERING_ON;
-> +		fpe_cfg->status = ETHTOOL_MM_VERIFY_STATUS_SUCCEEDED;
+Since commit 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with
+ice_vf_reconfig_vsi()") VF VSI is only reconfigured instead of
+recreated. The context configuration from previous setting is still the
+same. If any of the config needs to be cleared it needs to be cleared
+explicitly.
 
-Nitpick, doesn't affect normal behavior.
-If the link partner crafts an unsolicited Response mPacket, and we have
-verify_enabled = false, what we should do is we should ignore it.
-But what the code does is to transition the state to SUCCEEDED, as if
-verify_enabled was true.
+Previously there was assumption that port vlan will be cleared
+automatically. Now, when VSI is only reconfigured we have to do it in the
+code.
 
-We should ignore FPE_EVENT_RRSP events if we are in the
-ETHTOOL_MM_VERIFY_STATUS_DISABLED state.
+Not clearing port vlan configuration leads to situation when the driver
+VSI config is different than the VSI config in HW. Traffic can't be
+passed after setting and clearing port vlan, because of invalid VSI
+config in HW.
 
-Depending on how the maintainers feel, this could also be handled in a
-subsequent patch.
+Example reproduction:
+> ip a a dev $(VF) $(VF_IP_ADDRESS)
+> ip l s dev $(VF) up
+> ping $(VF_IP_ADDRESS)
+ping is working fine here
+> ip link set eth5 vf 0 vlan 100
+> ip link set eth5 vf 0 vlan 0
+> ping $(VF_IP_ADDRESS)
+ping isn't working
 
->  
-> -	/* If Local has sent response mPacket, Local is entering FPE ON */
-> -	if ((status & FPE_EVENT_TRSP) == FPE_EVENT_TRSP)
-> -		*lo_state = FPE_STATE_ENTERING_ON;
-> -
-> -	if (!test_bit(__FPE_REMOVING, &priv->fpe_task_state) &&
-> -	    !test_and_set_bit(__FPE_TASK_SCHED, &priv->fpe_task_state) &&
-> -	    priv->fpe_wq) {
-> -		queue_work(priv->fpe_wq, &priv->fpe_task);
-> -	}
-> +unlock_out:
-> +	spin_unlock(&fpe_cfg->lock);
->  }
->  
->  static void stmmac_common_interrupt(struct stmmac_priv *priv)
+Fixes: 2a2cb4c6c181 ("ice: replace ice_vf_recreate_vsi() with ice_vf_reconfig_vsi()")
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  7 +++
+ .../net/ethernet/intel/ice/ice_vsi_vlan_lib.c | 57 +++++++++++++++++++
+ .../net/ethernet/intel/ice/ice_vsi_vlan_lib.h |  1 +
+ 3 files changed, 65 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+index 5635e9da2212..9fe2a309c5ff 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
+@@ -335,6 +335,13 @@ static int ice_vf_rebuild_host_vlan_cfg(struct ice_vf *vf, struct ice_vsi *vsi)
+ 
+ 		err = vlan_ops->add_vlan(vsi, &vf->port_vlan_info);
+ 	} else {
++		/* clear possible previous port vlan config */
++		err = ice_vsi_clear_port_vlan(vsi);
++		if (err) {
++			dev_err(dev, "failed to clear port VLAN via VSI parameters for VF %u, error %d\n",
++				vf->vf_id, err);
++			return err;
++		}
+ 		err = ice_vsi_add_vlan_zero(vsi);
+ 	}
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
+index 6e8f2aab6080..5291f2888ef8 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.c
+@@ -787,3 +787,60 @@ int ice_vsi_clear_outer_port_vlan(struct ice_vsi *vsi)
+ 	kfree(ctxt);
+ 	return err;
+ }
++
++int ice_vsi_clear_port_vlan(struct ice_vsi *vsi)
++{
++	struct ice_hw *hw = &vsi->back->hw;
++	struct ice_vsi_ctx *ctxt;
++	int err;
++
++	ctxt = kzalloc(sizeof(*ctxt), GFP_KERNEL);
++	if (!ctxt)
++		return -ENOMEM;
++
++	ctxt->info = vsi->info;
++
++	ctxt->info.port_based_outer_vlan = 0;
++	ctxt->info.port_based_inner_vlan = 0;
++
++	ctxt->info.inner_vlan_flags =
++		FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_TX_MODE_M,
++			   ICE_AQ_VSI_INNER_VLAN_TX_MODE_ALL);
++	if (ice_is_dvm_ena(hw)) {
++		ctxt->info.inner_vlan_flags |=
++			FIELD_PREP(ICE_AQ_VSI_INNER_VLAN_EMODE_M,
++				   ICE_AQ_VSI_INNER_VLAN_EMODE_NOTHING);
++		ctxt->info.outer_vlan_flags =
++			FIELD_PREP(ICE_AQ_VSI_OUTER_VLAN_TX_MODE_M,
++				   ICE_AQ_VSI_OUTER_VLAN_TX_MODE_ALL);
++		ctxt->info.outer_vlan_flags |=
++			FIELD_PREP(ICE_AQ_VSI_OUTER_TAG_TYPE_M,
++				   ICE_AQ_VSI_OUTER_TAG_VLAN_8100);
++		ctxt->info.outer_vlan_flags |=
++			ICE_AQ_VSI_OUTER_VLAN_EMODE_NOTHING <<
++			ICE_AQ_VSI_OUTER_VLAN_EMODE_S;
++	}
++
++	ctxt->info.sw_flags2 &= ~ICE_AQ_VSI_SW_FLAG_RX_VLAN_PRUNE_ENA;
++	ctxt->info.valid_sections =
++		cpu_to_le16(ICE_AQ_VSI_PROP_OUTER_TAG_VALID |
++			    ICE_AQ_VSI_PROP_VLAN_VALID |
++			    ICE_AQ_VSI_PROP_SW_VALID);
++
++	err = ice_update_vsi(hw, vsi->idx, ctxt, NULL);
++	if (err) {
++		dev_err(ice_pf_to_dev(vsi->back), "update VSI for clearing port based VLAN failed, err %d aq_err %s\n",
++			err, ice_aq_str(hw->adminq.sq_last_status));
++	} else {
++		vsi->info.port_based_outer_vlan =
++			ctxt->info.port_based_outer_vlan;
++		vsi->info.port_based_inner_vlan =
++			ctxt->info.port_based_inner_vlan;
++		vsi->info.outer_vlan_flags = ctxt->info.outer_vlan_flags;
++		vsi->info.inner_vlan_flags = ctxt->info.inner_vlan_flags;
++		vsi->info.sw_flags2 = ctxt->info.sw_flags2;
++	}
++
++	kfree(ctxt);
++	return err;
++}
+diff --git a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.h b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.h
+index f0d84d11bd5b..12b227621a7d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.h
++++ b/drivers/net/ethernet/intel/ice/ice_vsi_vlan_lib.h
+@@ -36,5 +36,6 @@ int ice_vsi_ena_outer_insertion(struct ice_vsi *vsi, u16 tpid);
+ int ice_vsi_dis_outer_insertion(struct ice_vsi *vsi);
+ int ice_vsi_set_outer_port_vlan(struct ice_vsi *vsi, struct ice_vlan *vlan);
+ int ice_vsi_clear_outer_port_vlan(struct ice_vsi *vsi);
++int ice_vsi_clear_port_vlan(struct ice_vsi *vsi);
+ 
+ #endif /* _ICE_VSI_VLAN_LIB_H_ */
+-- 
+2.42.0
+
 
