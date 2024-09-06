@@ -1,475 +1,393 @@
-Return-Path: <netdev+bounces-125999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04A1E96F865
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:36:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73FC196F868
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 17:37:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA1872867F3
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:36:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C139EB266F2
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 15:37:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3B421D2F7A;
-	Fri,  6 Sep 2024 15:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F11551D364F;
+	Fri,  6 Sep 2024 15:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GKVdcKMw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95303381C2
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 15:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C41D01D318F;
+	Fri,  6 Sep 2024 15:36:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725636986; cv=none; b=cr7kzkLwEIRXbLQd6h7wMUI2dB1m5Vdov4a8XRWVUcRdkf4tFfyRgSgySd9H9pOmmjau2IoWJ09ys/STmk6jYLJ8kvIadZcYd3pnxV9qd6DHrGYN47i8dLmjpAj5cuLn9VbE0EqWAF0cwFq04/ZHJq3Lc57kWmZG/noKLtqwAmI=
+	t=1725636990; cv=none; b=rYo2qsau66bQHaiibZLcum2d9CtrqQxpA4QECoYtS5jTFtE1fGjSOxUUO3t6ZiPCS3J5tR334klNJCZ9WGy1MW16A8wFj6CsnLT7Fnhmzg4mpk3YmXif06h4L9YY9BqtpZTPnJcKrMgoaRktve+f/+JDVKi0yp5dtH5zaW/bj0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725636986; c=relaxed/simple;
-	bh=OPS4iqFe5GeDdMC+ARtPuhitFOoVsPVpAtChQq2pA68=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Httb9nsP7U0tl4tfC0W+ISaULFpxnBLZuQVWLfFl4YLU9B+145nehPGQldtpL+YIyPAXemz5hZ8noWrGGly4jfoQol1b/XWOMYVUTNTnIiPycFGvKLI8lvtdSwWLta0MMS6xhLigQ9a9sosrojBBudJLtc1Eq1CoKdv0NQ69hEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-82a72792dacso500166639f.1
-        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 08:36:24 -0700 (PDT)
+	s=arc-20240116; t=1725636990; c=relaxed/simple;
+	bh=d3kF/aNmEm/24uRuAMCcYfvowrJWElTHCOLo3RSY09o=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=rM2feH4kyDZ+Qfpz50a9KeI4ImHMoe5aiPJUo/Kfv3zeR/srrzhh8a5TWq/y/9FZfZ1qvfu8jXRcl2SxBSXFQd0yEQbmBJItQ27IJh2UAPdWvmUFnLTD5NzlIwtkTesadusL10EQxLJoRhsVHgp116vzZf/oRRSyyLh7lT9ad9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GKVdcKMw; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6c359c1a2fdso11979056d6.2;
+        Fri, 06 Sep 2024 08:36:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725636987; x=1726241787; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M4s96N4/JMkBfFDDKCyQikDh6zmKZTsXXe4Z7qd5yv8=;
+        b=GKVdcKMwSlEkCVC9ky6qU5J+PtvqJ0Nezoy1SPJxDmpWBJjbaXa0MfJOaBp0RdEfa+
+         ifwhYWxHodzwJVH6DgwD7+4j2NmPjY07W8FM+UCPUl269K1UbUcmDUNvN47dc33CfAA5
+         jq3U0KHQgS5zcYskuBi2lfOghyU/HJKsVQJRB2TGsLJsWl/YqivE2tIri7jAVhzDCryZ
+         rbqOnOABlcj2HkNdHNrMhf1oFs3MLUsd+qoJjdr2AWB105597kbNklNeFb2XZw5THaJ3
+         7MY4t0zZiiHzdFFn3CqMreRjlJ4RiRP4ErfWJxh4GLVUGf5MOa/A/5kWV+YDKJOVaZyY
+         oQjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725636984; x=1726241784;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Qhsxrzk59M5RAnR+rkQ1MqCY64GC8DWn1ca0TgksBAE=;
-        b=r/mqfKM95UDFumq3f46b6nqp6SkKAVu3pwFle8cok4qWQx5K5/O2I/sPdsf8BAfgEm
-         3MzLaOHtF2VrOfeumKvswOadrDLY8e4vYgGIeCEzxhjxJPhFwpNb0HGHTD/+lNeFi7hh
-         b4CX49HyqUI+P2pyE7DpqbDw1Y0CLpF0dvYuoAcWkRA5GNRh/LpuZe6xs/luX06RIPTZ
-         qKhRXdM+GDD3qAzwTaAaQ+xivf3JLoJBKYnO26dELCOCrn9+Ny9n6c6OrnpJIGQWAhmh
-         TFLvXuNUDghpy4h/xmUdVixg9QBaC6CYVMveuVm3U7SrK9fkvfZhE05dclEehmBI2mTa
-         H5jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWAuQ8UsLCf3RL96CWTrBlzrKkpJ9DreYq7ybHT9Xg6Ja6fLmZ0in4t3vguv1kYOrCnoDgTJuo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXDQHoTpD14bcDWoJMmRFzuw82kaGb2+tdkXP3XM9ybHvRd76M
-	g720gWH5agQrFLuO8WBjnQdpxuNdfJxgRkQn360Ts8WT35uNWuex/vEZuJfTTRgnSi/ec1OP1V4
-	u47REM1+rVqIF3/XATsrTuB07xl7VSYlbsoNIMn75HrS1wHDM5Nlxhuk=
-X-Google-Smtp-Source: AGHT+IFsa7dSgy+gYYFbGqogO7QYYXiSIyCZHXGU3yVLz8vt/+QZ5/hVp/jHhj0LC1z4mlFw9vdh2JlULasCXWlRRNnW5D2F+xx1
+        d=1e100.net; s=20230601; t=1725636987; x=1726241787;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=M4s96N4/JMkBfFDDKCyQikDh6zmKZTsXXe4Z7qd5yv8=;
+        b=qoZSkUKesaeequ+cgcyRFmXEroJGDvv4sCHaYHMz7pwdlEgNQCs7KeiAlR10zJtr2c
+         /csZTRpyJ05LX/tZW4aR22EoJkqgd8jiqAlH+QepTABH4VI4TwG0IVMjPM6DCGsnolOH
+         RZSO7m4S9gGVgfpf+Lc00trd9x4vr88q3P2HRj4xIknj2ac/WaXdJ0M9T/XlwGTCXu6d
+         snYcowDPAOON4NkHX1G0uHgspBbN1Y/MppdJZYLmJpzueKcA0pvqf6Ky/A5xcSRBJbES
+         ntZb09d6ucx9dYsRy1NuJp3XJbPupXFqe8nvD/NIwABMen+s6dpXXfl5xsEBMmjIwhro
+         4qfg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8AFPTnppC2/KW9fct4dBmZ9nUvSCK66yZ4JP2uVGE7gn1s6fheXNARPwgRgT5t5zcpGwXK2zXMvFwGyovJkc=@vger.kernel.org, AJvYcCVxAt2Y039PYsReOZ7aZ1At2JOzY4Ov42bMHL/mDg4VqU+wcj86NThBKZupYimjkyoP63gVSaU1@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIq4sEcMv44ozUnRPPgZfgFSdJTpJPcBi6XIneRQBnFwXVv8KS
+	4RK5qvJX0BiC7AWLKc50uq+Zu09TOipRv/05dJuhTy83F3AYwI6S
+X-Google-Smtp-Source: AGHT+IFJ3Mrk7czsoZyAjicaKLg0CHPuXzikuTJsncVpLLbd5HtB0qxccp+m/z7CpNByDeARBUv9qw==
+X-Received: by 2002:a05:6214:54c9:b0:6c3:69e9:9a9a with SMTP id 6a1803df08f44-6c528509e17mr31503746d6.36.1725636987325;
+        Fri, 06 Sep 2024 08:36:27 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c5201e4141sm17575036d6.34.2024.09.06.08.36.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 08:36:26 -0700 (PDT)
+Date: Fri, 06 Sep 2024 11:36:26 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Matthieu Baerts <matttbe@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ ncardwell@google.com, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ fw@strlen.de, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <66db217a558c4_29a385294d3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <f63e7367-c4fb-4cdc-a44c-6accbc309c5a@kernel.org>
+References: <20240905231653.2427327-1-willemdebruijn.kernel@gmail.com>
+ <20240905231653.2427327-3-willemdebruijn.kernel@gmail.com>
+ <f63e7367-c4fb-4cdc-a44c-6accbc309c5a@kernel.org>
+Subject: Re: [PATCH net-next v2 2/2] selftests/net: integrate packetdrill with
+ ksft
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2710:b0:4ce:928f:adb1 with SMTP id
- 8926c6da1cb9f-4d084eafe28mr250282173.2.1725636983718; Fri, 06 Sep 2024
- 08:36:23 -0700 (PDT)
-Date: Fri, 06 Sep 2024 08:36:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006d27bb0621752b84@google.com>
-Subject: [syzbot] [kernel?] possible deadlock in __run_timer_base
-From: syzbot <syzbot+b3f9c9d700eadf2be3a9@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, luto@kernel.org, netdev@vger.kernel.org, 
-	peterz@infradead.org, syzkaller-bugs@googlegroups.com, tglx@linutronix.de
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+Matthieu Baerts wrote:
+> Hi Willem,
+> 
+> On 06/09/2024 01:15, Willem de Bruijn wrote:
+> > From: Willem de Bruijn <willemb@google.com>
+> > 
+> > Lay the groundwork to import into kselftests the over 150 packetdrill
+> > TCP/IP conformance tests on github.com/google/packetdrill.
+> > 
+> > Florian recently added support for packetdrill tests in nf_conntrack,
+> > in commit a8a388c2aae49 ("selftests: netfilter: add packetdrill based
+> > conntrack tests").
+> > 
+> > This patch takes a slightly different approach. It relies on
+> > ksft_runner.sh to run every *.pkt file in the directory.
+> 
+> Thank you for adding this support! I'm looking forward to seeing more
+> packetdrill tests being validated by the CI, and I hope that will
+> encourage people to add more tests, and increase the code coverage!
 
-syzbot found the following issue on:
+Thanks for taking a look and your feedback.
 
-HEAD commit:    b408473ea01b bpf: Fix a crash when btf_parse_base() return..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=10840739980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=eb19570bf3f0c14f
-dashboard link: https://syzkaller.appspot.com/bug?extid=b3f9c9d700eadf2be3a9
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> I have some questions about how the packetdrill should be executed:
+> should they be isolated in dedicated netns?
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Yes. The runner decides that, by passing -n 
+ 
+> There are some other comments, but feel free to ignore them if they are
+> not relevant, or if they can be fixed later.
+> 
+> > Tested:
+> > 	make -C tools/testing/selftests \
+> > 	  TARGETS=net/packetdrill \
+> > 	  run_tests
+> 
+> Please note that this will not run the packetdrill tests in a dedicated
+> netns. I don't think that's a good idea. Especially when sysctl knobs
+> are being changed during the tests, and more.
+> 
+> > 	make -C tools/testing/selftests \
+> > 	  TARGETS=net/packetdrill \
+> > 	  install INSTALL_PATH=$KSFT_INSTALL_PATH
+> > 
+> > 	# in virtme-ng
+> > 	./run_kselftest.sh -c net/packetdrill
+> > 	./run_kselftest.sh -t net/packetdrill:tcp_inq_client.pkt
+> 
+> I see that ./run_kselftest.sh can be executed with the "-n | --netns"
+> option to run each test in a dedicated net namespace, but it doesn't
+> seem to work:
+> 
+> > # ./run_kselftest.sh -n -c net/packetdrill
+> > [  411.087208] kselftest: Running tests in net/packetdrill
+> > TAP version 13
+> > 1..3
+> > Cannot open network namespace "tcp_inq_client.pkt-TaQ8iN": No such file or directory
+> > setting the network namespace "tcp_inq_server.pkt-sW8YCz" failed: Invalid argument
+> > Cannot open network namespace "tcp_md5_md5-only-on-client-ack.pkt-YzJal6": No such file or directory
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/64d6ccd089c0/disk-b408473e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/d1d0d9431630/vmlinux-b408473e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/fb7ddb3b7b95/bzImage-b408473e.xz
+Ah, I guess this requires adding CONFIG_NET_NS=y to
+tools/testing/selftests/net/packetdrill/config
+ 
+> But maybe it would be better to create the netns in ksft_runner.sh?
+> Please see below.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b3f9c9d700eadf2be3a9@syzkaller.appspotmail.com
+No, we opted for this design exactly to use existing kselftest infra,
+rather than reimplementing that in our wrapper, as I did in the RFC.
 
-------------[ cut here ]------------
-======================================================
-WARNING: possible circular locking dependency detected
-6.11.0-rc4-syzkaller-gb408473ea01b #0 Not tainted
-------------------------------------------------------
-syz.2.317/6997 is trying to acquire lock:
-ffffffff8e813cb8 ((console_sem).lock){-.-.}-{2:2}, at: down_trylock+0x20/0xa0 kernel/locking/semaphore.c:139
+> (...)
+> 
+> > diff --git a/tools/testing/selftests/net/packetdrill/defaults.sh b/tools/testing/selftests/net/packetdrill/defaults.sh
+> > new file mode 100755
+> > index 0000000000000..1095a7b22f44d
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/net/packetdrill/defaults.sh
+> > @@ -0,0 +1,63 @@
+> > +#!/bin/bash
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +#
+> > +# Set standard production config values that relate to TCP behavior.
+> > +
+> > +# Flush old cached data (fastopen cookies).
+> > +ip tcp_metrics flush all > /dev/null 2>&1
+> 
+> (Why ignoring errors if any?)
 
-but task is already holding lock:
-ffff8880b892a718 (&base->lock){-.-.}-{2:2}, at: expire_timers kernel/time/timer.c:1839 [inline]
-ffff8880b892a718 (&base->lock){-.-.}-{2:2}, at: __run_timers kernel/time/timer.c:2417 [inline]
-ffff8880b892a718 (&base->lock){-.-.}-{2:2}, at: __run_timer_base+0x69d/0x8e0 kernel/time/timer.c:2428
+I don't know. Just importing this verbatim from github.
+As that is debugged over a long time and proven to work.
 
-which lock already depends on the new lock.
+> 
+> > +# TCP min, default, and max receive and send buffer sizes.
+> > +sysctl -q net.ipv4.tcp_rmem="4096 540000 $((15*1024*1024))"
+> > +sysctl -q net.ipv4.tcp_wmem="4096 $((256*1024)) 4194304"
+> > +
+> > +# TCP timestamps.
+> > +sysctl -q net.ipv4.tcp_timestamps=1
+> > +
+> > +# TCP SYN(ACK) retry thresholds
+> > +sysctl -q net.ipv4.tcp_syn_retries=5
+> > +sysctl -q net.ipv4.tcp_synack_retries=5
+> > +
+> > +# TCP Forward RTO-Recovery, RFC 5682.
+> > +sysctl -q net.ipv4.tcp_frto=2
+> > +
+> > +# TCP Selective Acknowledgements (SACK)
+> > +sysctl -q net.ipv4.tcp_sack=1
+> > +
+> > +# TCP Duplicate Selective Acknowledgements (DSACK)
+> > +sysctl -q net.ipv4.tcp_dsack=1
+> > +
+> > +# TCP FACK (Forward Acknowldgement)
+> > +sysctl -q net.ipv4.tcp_fack=0
+> > +
+> > +# TCP reordering degree ("dupthresh" threshold for entering Fast Recovery).
+> > +sysctl -q net.ipv4.tcp_reordering=3
+> > +
+> > +# TCP congestion control.
+> > +sysctl -q net.ipv4.tcp_congestion_control=cubic
+> 
+> (maybe safer to add CONFIG_TCP_CONG_CUBIC=y?)
 
+Ack, thanks. Also below.
+ 
+> > +
+> > +# TCP slow start after idle.
+> > +sysctl -q net.ipv4.tcp_slow_start_after_idle=0
+> > +
+> > +# TCP RACK and TLP.
+> > +sysctl -q net.ipv4.tcp_early_retrans=4 net.ipv4.tcp_recovery=1
+> > +
+> > +# TCP method for deciding when to defer sending to accumulate big TSO packets.
+> > +sysctl -q net.ipv4.tcp_tso_win_divisor=3
+> > +
+> > +# TCP Explicit Congestion Notification (ECN)
+> > +sysctl -q net.ipv4.tcp_ecn=0
+> > +
+> > +sysctl -q net.ipv4.tcp_pacing_ss_ratio=200
+> > +sysctl -q net.ipv4.tcp_pacing_ca_ratio=120
+> > +sysctl -q net.ipv4.tcp_notsent_lowat=4294967295 > /dev/null 2>&1
+> > +
+> > +sysctl -q net.ipv4.tcp_fastopen=0x70403
+> > +sysctl -q net.ipv4.tcp_fastopen_key=a1a1a1a1-b2b2b2b2-c3c3c3c3-d4d4d4d4
+> > +
+> > +sysctl -q net.ipv4.tcp_syncookies=1
+> 
+> (maybe safer to add CONFIG_SYN_COOKIES=y?)
+> 
+> > +# Override the default qdisc on the tun device.
+> > +# Many tests fail with timing errors if the default
+> > +# is FQ and that paces their flows.
+> > +tc qdisc add dev tun0 root pfifo
+> > +
+> 
+> (when applying your patches with 'b4 shazam', I got the following error,
+> I guess it was due to this blank line at the end)
+> 
+>   Applying: selftests: support interpreted scripts with ksft_runner.sh
+>   Applying: selftests/net: integrate packetdrill with ksft
+>   .git/rebase-apply/patch:142: new blank line at EOF.
+> 
+> 
+> > diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+> > new file mode 100755
+> > index 0000000000000..2f62caccbbbc5
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+> > @@ -0,0 +1,41 @@
+> > +#!/bin/bash
+> > +# SPDX-License-Identifier: GPL-2.0
+> > +
+> > +source "$(dirname $(realpath $0))/../../kselftest/ktap_helpers.sh"
+> > +
+> > +readonly ipv4_args=('--ip_version=ipv4 '
+> > +		    '--local_ip=192.168.0.1 '
+> > +		    '--gateway_ip=192.168.0.1 '
+> > +		    '--netmask_ip=255.255.0.0 '
+> > +		    '--remote_ip=192.0.2.1 '
+> > +		    '-D CMSG_LEVEL_IP=SOL_IP '
+> > +		    '-D CMSG_TYPE_RECVERR=IP_RECVERR ')
+> > +
+> > +readonly ipv6_args=('--ip_version=ipv6 '
+> > +		    '--mtu=1520 '
+> > +		    '--local_ip=fd3d:0a0b:17d6::1 '
+> > +		    '--gateway_ip=fd3d:0a0b:17d6:8888::1 '
+> > +		    '--remote_ip=fd3d:fa7b:d17d::1 '
+> > +		    '-D CMSG_LEVEL_IP=SOL_IPV6 '
+> > +		    '-D CMSG_TYPE_RECVERR=IPV6_RECVERR ')
+> 
+> (nit: that's a strange Bash array with spaces in the strings :)
+> You can simply remove the quotes, then below, you can use the variable
+> with double quotes: "${ipv4_args[@]}" and shellcheck will stop reporting
+> an error for that)
 
-the existing dependency chain (in reverse order) is:
+Thanks!
+ 
+> > +
+> > +if [ $# -ne 1 ]; then
+> > +	ktap_exit_fail_msg "usage: $0 <script>"
+> > +	exit "$KSFT_FAIL"
+> > +fi
+> > +script="$1"
+> > +
+> > +if [ -z "$(which packetdrill)" ]; then
+> > +	ktap_skip_all "packetdrill not found in PATH"
+> > +	exit "$KSFT_SKIP"
+> > +fi
+> > +
+> > +ktap_print_header
+> > +ktap_set_plan 2
+> > +
+> > +packetdrill ${ipv4_args[@]} $(basename $script) > /dev/null \
+> 
+> (Why muting stdout? I see that the TCP MD5 test output lines from
+> /proc/net/tcp*, is it why? Is this info useful? Or should it be removed
+> from the test?)
 
--> #3 (&base->lock){-.-.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-       lock_timer_base+0x112/0x240 kernel/time/timer.c:1051
-       __mod_timer+0x1ca/0xeb0 kernel/time/timer.c:1132
-       queue_delayed_work_on+0x1ca/0x390 kernel/workqueue.c:2554
-       psi_task_change+0xfd/0x280 kernel/sched/psi.c:913
-       psi_enqueue kernel/sched/stats.h:143 [inline]
-       enqueue_task+0x2aa/0x300 kernel/sched/core.c:1975
-       activate_task kernel/sched/core.c:2009 [inline]
-       wake_up_new_task+0x563/0xc30 kernel/sched/core.c:4689
-       kernel_clone+0x4ee/0x8f0 kernel/fork.c:2831
-       user_mode_thread+0x132/0x1a0 kernel/fork.c:2878
-       rest_init+0x23/0x300 init/main.c:712
-       start_kernel+0x47a/0x500 init/main.c:1103
-       x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
-       x86_64_start_kernel+0x9f/0xa0 arch/x86/kernel/head64.c:488
-       common_startup_64+0x13e/0x147
+Indeed that's why. If a test fails in automated testing we can run
+manually to inspect such output.
+ 
+> 
+> > +	&& ktap_test_pass "ipv4" || ktap_test_fail "ipv4"
+> > +packetdrill ${ipv6_args[@]} $(basename $script) > /dev/null \
+> > +	&& ktap_test_pass "ipv6" || ktap_test_fail "ipv6"
+> 
+> Even if "run_kselftest.sh" creates dedicated netns before running this
+> script (RUN_IN_NETNS=1), it looks like the tests in v4 and in v6 will
+> share the same netns. Is it OK? It means that if a packetdrill test sets
+> something that is not reset by 'defaults.sh', it might break the
+> following v6 test.
 
--> #2 (&rq->__lock){-.-.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-       _raw_spin_lock_nested+0x31/0x40 kernel/locking/spinlock.c:378
-       raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:560
-       raw_spin_rq_lock kernel/sched/sched.h:1415 [inline]
-       rq_lock kernel/sched/sched.h:1714 [inline]
-       task_fork_fair+0x61/0x1e0 kernel/sched/fair.c:12710
-       sched_cgroup_fork+0x37c/0x410 kernel/sched/core.c:4633
-       copy_process+0x224f/0x3e10 kernel/fork.c:2502
-       kernel_clone+0x226/0x8f0 kernel/fork.c:2800
-       user_mode_thread+0x132/0x1a0 kernel/fork.c:2878
-       rest_init+0x23/0x300 init/main.c:712
-       start_kernel+0x47a/0x500 init/main.c:1103
-       x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
-       x86_64_start_kernel+0x9f/0xa0 arch/x86/kernel/head64.c:488
-       common_startup_64+0x13e/0x147
+That should be fine. If a test cares about a sysctl, then it needs to
+set it at the start. In this case, they both will set exactly the same
+anyway.
 
--> #1 (&p->pi_lock){-.-.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-       class_raw_spinlock_irqsave_constructor include/linux/spinlock.h:551 [inline]
-       try_to_wake_up+0xb0/0x1470 kernel/sched/core.c:4051
-       up+0x72/0x90 kernel/locking/semaphore.c:191
-       __up_console_sem kernel/printk/printk.c:340 [inline]
-       __console_unlock kernel/printk/printk.c:2801 [inline]
-       console_unlock+0x22f/0x4d0 kernel/printk/printk.c:3120
-       vprintk_emit+0x5dc/0x7c0 kernel/printk/printk.c:2348
-       dev_vprintk_emit+0x2ae/0x330 drivers/base/core.c:4912
-       dev_printk_emit+0xdd/0x120 drivers/base/core.c:4923
-       _dev_warn+0x122/0x170 drivers/base/core.c:4979
-       firmware_fallback_sysfs+0x4cf/0x9e0 drivers/base/firmware_loader/fallback.c:233
-       _request_firmware+0xcf5/0x12b0 drivers/base/firmware_loader/main.c:914
-       request_firmware_work_func+0x12a/0x280 drivers/base/firmware_loader/main.c:1165
-       process_one_work kernel/workqueue.c:3231 [inline]
-       process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
-       worker_thread+0x86d/0xd40 kernel/workqueue.c:3390
-       kthread+0x2f0/0x390 kernel/kthread.c:389
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> Why not having "ksft_runner.sh" creating the netns? It should be easy to
+> do so, using helpers from the "../lib.sh" file:
 
--> #0 ((console_sem).lock){-.-.}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3133 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3252 [inline]
-       validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3868
-       __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-       down_trylock+0x20/0xa0 kernel/locking/semaphore.c:139
-       __down_trylock_console_sem+0x109/0x250 kernel/printk/printk.c:323
-       console_trylock kernel/printk/printk.c:2754 [inline]
-       console_trylock_spinning kernel/printk/printk.c:1958 [inline]
-       vprintk_emit+0x2aa/0x7c0 kernel/printk/printk.c:2347
-       _printk+0xd5/0x120 kernel/printk/printk.c:2373
-       __report_bug lib/bug.c:195 [inline]
-       report_bug+0x346/0x500 lib/bug.c:219
-       handle_bug+0x3e/0x70 arch/x86/kernel/traps.c:239
-       exc_invalid_op+0x1a/0x50 arch/x86/kernel/traps.c:260
-       asm_exc_invalid_op+0x1a/0x20 arch/x86/include/asm/idtentry.h:621
-       expire_timers kernel/time/timer.c:1830 [inline]
-       __run_timers kernel/time/timer.c:2417 [inline]
-       __run_timer_base+0x6f4/0x8e0 kernel/time/timer.c:2428
-       run_timer_base kernel/time/timer.c:2437 [inline]
-       run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2447
-       handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
-       __do_softirq kernel/softirq.c:588 [inline]
-       invoke_softirq kernel/softirq.c:428 [inline]
-       __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
-       irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
-       instr_sysvec_irq_work arch/x86/kernel/irq_work.c:17 [inline]
-       sysvec_irq_work+0xa3/0xc0 arch/x86/kernel/irq_work.c:17
-       asm_sysvec_irq_work+0x1a/0x20 arch/x86/include/asm/idtentry.h:738
-       preempt_schedule_irq+0xf6/0x1c0 kernel/sched/core.c:6851
-       irqentry_exit+0x5e/0x90 kernel/entry/common.c:354
-       asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-       check_kcov_mode kernel/kcov.c:182 [inline]
-       write_comp_data kernel/kcov.c:245 [inline]
-       __sanitizer_cov_trace_const_cmp4+0x2f/0x90 kernel/kcov.c:313
-       number+0x134/0xf90 lib/vsprintf.c:473
-       vsnprintf+0x1542/0x1da0 lib/vsprintf.c:2890
-       vscnprintf+0x42/0x90 lib/vsprintf.c:2930
-       bpf_verifier_vlog+0x41/0x860 kernel/bpf/log.c:66
-       verbose+0x110/0x190 kernel/bpf/verifier.c:361
-       print_bpf_insn+0xd6a/0x2400 kernel/bpf/disasm.c:320
-       backtrack_insn kernel/bpf/verifier.c:3615 [inline]
-       __mark_chain_precision+0x1a9b/0x7520 kernel/bpf/verifier.c:4272
-       mark_chain_precision kernel/bpf/verifier.c:4375 [inline]
-       check_cond_jmp_op+0x26c6/0x3c50 kernel/bpf/verifier.c:15212
-       do_check+0x9a63/0x104f0 kernel/bpf/verifier.c:18110
-       do_check_common+0x14bd/0x1dd0 kernel/bpf/verifier.c:20916
-       do_check_main kernel/bpf/verifier.c:21007 [inline]
-       bpf_check+0x144e1/0x19630 kernel/bpf/verifier.c:21681
-       bpf_prog_load+0x1667/0x20f0 kernel/bpf/syscall.c:2908
-       __sys_bpf+0x4ee/0x810 kernel/bpf/syscall.c:5710
-       __do_sys_bpf kernel/bpf/syscall.c:5817 [inline]
-       __se_sys_bpf kernel/bpf/syscall.c:5815 [inline]
-       __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5815
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+See above.
 
-other info that might help us debug this:
+>   ns_v4=
+>   ns_v6=
+> 
+>   trap cleanup_all_ns EXIT
+>   if ! setup_ns ns_v4 ns_v6; then
+>       (...) # fail + exit
+>   fi
+> 
+>   ip netns exec "${ns_v4}" packetdrill "${ipv4_args[@]}" \
+>                                        "$(basename "${script}")"
+>   (...)
+> 
+> 
+> (Note that if these tests are isolated in dedicated netns, and if later
+> we want to accelerate their execution, it should be easy to run these
+> two tests in parallel, something like the following)
+> 
+>   ip netns exec "${ns_v4}" (...) &
+>   pid_v4=$!
+>   ip netns exec "${ns_v6}" (...) &
+>   pid_v6=$!
+> 
+>   wait ${pid_v4} && tap_test_pass "ipv4" || ktap_test_fail "ipv4"
+>   wait ${pid_v6} && tap_test_pass "ipv6" || ktap_test_fail "ipv6"
+> 
+> > +
+> > +ktap_finished
+> > diff --git a/tools/testing/selftests/net/packetdrill/tcp_inq_client.pkt b/tools/testing/selftests/net/packetdrill/tcp_inq_client.pkt
+> > new file mode 100644
+> > index 0000000000000..df49c67645ac8
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/net/packetdrill/tcp_inq_client.pkt
+> > @@ -0,0 +1,51 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +// Test TCP_INQ and TCP_CM_INQ on the client side.
+> > +`./defaults.sh
+> > +`
+> (I guess you prefer not to modify these tests, and keep them
+> self-contained, but just in case it is easier for you, this line could
+> be removed, and have ksft_runner.sh sourcing this file before executing
+> the packetdrill test.)
 
-Chain exists of:
-  (console_sem).lock --> &rq->__lock --> &base->lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&base->lock);
-                               lock(&rq->__lock);
-                               lock(&base->lock);
-  lock((console_sem).lock);
-
- *** DEADLOCK ***
-
-1 lock held by syz.2.317/6997:
- #0: ffff8880b892a718 (&base->lock){-.-.}-{2:2}, at: expire_timers kernel/time/timer.c:1839 [inline]
- #0: ffff8880b892a718 (&base->lock){-.-.}-{2:2}, at: __run_timers kernel/time/timer.c:2417 [inline]
- #0: ffff8880b892a718 (&base->lock){-.-.}-{2:2}, at: __run_timer_base+0x69d/0x8e0 kernel/time/timer.c:2428
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 6997 Comm: syz.2.317 Not tainted 6.11.0-rc4-syzkaller-gb408473ea01b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2186
- check_prev_add kernel/locking/lockdep.c:3133 [inline]
- check_prevs_add kernel/locking/lockdep.c:3252 [inline]
- validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3868
- __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
- down_trylock+0x20/0xa0 kernel/locking/semaphore.c:139
- __down_trylock_console_sem+0x109/0x250 kernel/printk/printk.c:323
- console_trylock kernel/printk/printk.c:2754 [inline]
- console_trylock_spinning kernel/printk/printk.c:1958 [inline]
- vprintk_emit+0x2aa/0x7c0 kernel/printk/printk.c:2347
- _printk+0xd5/0x120 kernel/printk/printk.c:2373
- __report_bug lib/bug.c:195 [inline]
- report_bug+0x346/0x500 lib/bug.c:219
- handle_bug+0x3e/0x70 arch/x86/kernel/traps.c:239
- exc_invalid_op+0x1a/0x50 arch/x86/kernel/traps.c:260
- asm_exc_invalid_op+0x1a/0x20 arch/x86/include/asm/idtentry.h:621
-RIP: 0010:expire_timers kernel/time/timer.c:1830 [inline]
-RIP: 0010:__run_timers kernel/time/timer.c:2417 [inline]
-RIP: 0010:__run_timer_base+0x6f4/0x8e0 kernel/time/timer.c:2428
-Code: 24 38 42 80 3c 30 00 74 08 4c 89 ef e8 85 90 7a 00 4d 8b 7d 00 4d 85 ff 74 33 e8 87 46 13 00 e9 dd fe ff ff e8 7d 46 13 00 90 <0f> 0b 90 eb ae 44 89 f1 80 e1 07 80 c1 03 38 c1 0f 8c 25 ff ff ff
-RSP: 0018:ffffc90000a18cc0 EFLAGS: 00010046
-RAX: ffffffff818044c3 RBX: ffff8880331e7c28 RCX: ffff888061e71e00
-RDX: 0000000000000100 RSI: ffffffff8c608aa0 RDI: ffffffff8c608a60
-RBP: ffffc90000a18e10 R08: ffffffff818080f4 R09: 1ffffffff2030c3d
-R10: dffffc0000000000 R11: fffffbfff2030c3e R12: 0000000000000000
-R13: ffffc90000a18d60 R14: dffffc0000000000 R15: ffff8880331e7c10
- run_timer_base kernel/time/timer.c:2437 [inline]
- run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2447
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
- instr_sysvec_irq_work arch/x86/kernel/irq_work.c:17 [inline]
- sysvec_irq_work+0xa3/0xc0 arch/x86/kernel/irq_work.c:17
- </IRQ>
- <TASK>
- asm_sysvec_irq_work+0x1a/0x20 arch/x86/include/asm/idtentry.h:738
-RIP: 0010:preempt_schedule_irq+0xf6/0x1c0 kernel/sched/core.c:6851
-Code: 89 f5 49 c1 ed 03 eb 0d 48 f7 03 08 00 00 00 0f 84 8b 00 00 00 bf 01 00 00 00 e8 a5 61 a1 f5 e8 30 50 d9 f5 fb bf 01 00 00 00 <e8> 55 ad ff ff 43 80 7c 3d 00 00 74 08 4c 89 f7 e8 85 36 39 f6 48
-RSP: 0018:ffffc900033c6340 EFLAGS: 00000286
-RAX: 4be1ae6c97110f00 RBX: 1ffff92000678c70 RCX: ffffffff9a337903
-RDX: dffffc0000000000 RSI: ffffffff8c0ad560 RDI: 0000000000000001
-RBP: ffffc900033c63f0 R08: ffffffff901861ef R09: 1ffffffff2030c3d
-R10: dffffc0000000000 R11: fffffbfff2030c3e R12: 1ffff92000678c68
-R13: 1ffff92000678c6c R14: ffffc900033c6360 R15: dffffc0000000000
- irqentry_exit+0x5e/0x90 kernel/entry/common.c:354
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:check_kcov_mode kernel/kcov.c:184 [inline]
-RIP: 0010:write_comp_data kernel/kcov.c:245 [inline]
-RIP: 0010:__sanitizer_cov_trace_const_cmp4+0x2f/0x90 kernel/kcov.c:313
-Code: 8b 04 24 65 48 8b 14 25 00 d7 03 00 65 8b 05 70 47 70 7e 25 00 01 ff 00 74 10 3d 00 01 00 00 75 5b 83 ba 1c 16 00 00 00 74 52 <8b> 82 f8 15 00 00 83 f8 03 75 47 48 8b 8a 00 16 00 00 44 8b 8a fc
-RSP: 0018:ffffc900033c64b8 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: ffff10300000020f RCX: ffff888061e71e00
-RDX: ffff888061e71e00 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc900033c65d0 R08: ffffffff8bb28764 R09: 0000000000000000
-R10: ffffc900033c6540 R11: fffff52000678cab R12: 00000000ffff1030
-R13: 0000000000000018 R14: ffff10300000020f R15: ffff8880686f869d
- number+0x134/0xf90 lib/vsprintf.c:473
- vsnprintf+0x1542/0x1da0 lib/vsprintf.c:2890
- vscnprintf+0x42/0x90 lib/vsprintf.c:2930
- bpf_verifier_vlog+0x41/0x860 kernel/bpf/log.c:66
- verbose+0x110/0x190 kernel/bpf/verifier.c:361
- print_bpf_insn+0xd6a/0x2400 kernel/bpf/disasm.c:320
- backtrack_insn kernel/bpf/verifier.c:3615 [inline]
- __mark_chain_precision+0x1a9b/0x7520 kernel/bpf/verifier.c:4272
- mark_chain_precision kernel/bpf/verifier.c:4375 [inline]
- check_cond_jmp_op+0x26c6/0x3c50 kernel/bpf/verifier.c:15212
- do_check+0x9a63/0x104f0 kernel/bpf/verifier.c:18110
- do_check_common+0x14bd/0x1dd0 kernel/bpf/verifier.c:20916
- do_check_main kernel/bpf/verifier.c:21007 [inline]
- bpf_check+0x144e1/0x19630 kernel/bpf/verifier.c:21681
- bpf_prog_load+0x1667/0x20f0 kernel/bpf/syscall.c:2908
- __sys_bpf+0x4ee/0x810 kernel/bpf/syscall.c:5710
- __do_sys_bpf kernel/bpf/syscall.c:5817 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5815 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5815
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8d12379eb9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8d130e8038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f8d12515f80 RCX: 00007f8d12379eb9
-RDX: 0000000000000023 RSI: 0000000020000300 RDI: 0000000000000005
-RBP: 00007f8d123e793e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f8d12515f80 R15: 00007fff44c41278
- </TASK>
-WARNING: CPU: 1 PID: 6997 at kernel/time/timer.c:1830 expire_timers kernel/time/timer.c:1830 [inline]
-WARNING: CPU: 1 PID: 6997 at kernel/time/timer.c:1830 __run_timers kernel/time/timer.c:2417 [inline]
-WARNING: CPU: 1 PID: 6997 at kernel/time/timer.c:1830 __run_timer_base+0x6f4/0x8e0 kernel/time/timer.c:2428
-Modules linked in:
-CPU: 1 UID: 0 PID: 6997 Comm: syz.2.317 Not tainted 6.11.0-rc4-syzkaller-gb408473ea01b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-RIP: 0010:expire_timers kernel/time/timer.c:1830 [inline]
-RIP: 0010:__run_timers kernel/time/timer.c:2417 [inline]
-RIP: 0010:__run_timer_base+0x6f4/0x8e0 kernel/time/timer.c:2428
-Code: 24 38 42 80 3c 30 00 74 08 4c 89 ef e8 85 90 7a 00 4d 8b 7d 00 4d 85 ff 74 33 e8 87 46 13 00 e9 dd fe ff ff e8 7d 46 13 00 90 <0f> 0b 90 eb ae 44 89 f1 80 e1 07 80 c1 03 38 c1 0f 8c 25 ff ff ff
-RSP: 0018:ffffc90000a18cc0 EFLAGS: 00010046
-RAX: ffffffff818044c3 RBX: ffff8880331e7c28 RCX: ffff888061e71e00
-RDX: 0000000000000100 RSI: ffffffff8c608aa0 RDI: ffffffff8c608a60
-RBP: ffffc90000a18e10 R08: ffffffff818080f4 R09: 1ffffffff2030c3d
-R10: dffffc0000000000 R11: fffffbfff2030c3e R12: 0000000000000000
-R13: ffffc90000a18d60 R14: dffffc0000000000 R15: ffff8880331e7c10
-FS:  00007f8d130e86c0(0000) GS:ffff8880b8900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000140 CR3: 00000000667c4000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000600
-Call Trace:
- <IRQ>
- run_timer_base kernel/time/timer.c:2437 [inline]
- run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2447
- handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
- instr_sysvec_irq_work arch/x86/kernel/irq_work.c:17 [inline]
- sysvec_irq_work+0xa3/0xc0 arch/x86/kernel/irq_work.c:17
- </IRQ>
- <TASK>
- asm_sysvec_irq_work+0x1a/0x20 arch/x86/include/asm/idtentry.h:738
-RIP: 0010:preempt_schedule_irq+0xf6/0x1c0 kernel/sched/core.c:6851
-Code: 89 f5 49 c1 ed 03 eb 0d 48 f7 03 08 00 00 00 0f 84 8b 00 00 00 bf 01 00 00 00 e8 a5 61 a1 f5 e8 30 50 d9 f5 fb bf 01 00 00 00 <e8> 55 ad ff ff 43 80 7c 3d 00 00 74 08 4c 89 f7 e8 85 36 39 f6 48
-RSP: 0018:ffffc900033c6340 EFLAGS: 00000286
-RAX: 4be1ae6c97110f00 RBX: 1ffff92000678c70 RCX: ffffffff9a337903
-RDX: dffffc0000000000 RSI: ffffffff8c0ad560 RDI: 0000000000000001
-RBP: ffffc900033c63f0 R08: ffffffff901861ef R09: 1ffffffff2030c3d
-R10: dffffc0000000000 R11: fffffbfff2030c3e R12: 1ffff92000678c68
-R13: 1ffff92000678c6c R14: ffffc900033c6360 R15: dffffc0000000000
- irqentry_exit+0x5e/0x90 kernel/entry/common.c:354
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:check_kcov_mode kernel/kcov.c:184 [inline]
-RIP: 0010:write_comp_data kernel/kcov.c:245 [inline]
-RIP: 0010:__sanitizer_cov_trace_const_cmp4+0x2f/0x90 kernel/kcov.c:313
-Code: 8b 04 24 65 48 8b 14 25 00 d7 03 00 65 8b 05 70 47 70 7e 25 00 01 ff 00 74 10 3d 00 01 00 00 75 5b 83 ba 1c 16 00 00 00 74 52 <8b> 82 f8 15 00 00 83 f8 03 75 47 48 8b 8a 00 16 00 00 44 8b 8a fc
-RSP: 0018:ffffc900033c64b8 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: ffff10300000020f RCX: ffff888061e71e00
-RDX: ffff888061e71e00 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: ffffc900033c65d0 R08: ffffffff8bb28764 R09: 0000000000000000
-R10: ffffc900033c6540 R11: fffff52000678cab R12: 00000000ffff1030
-R13: 0000000000000018 R14: ffff10300000020f R15: ffff8880686f869d
- number+0x134/0xf90 lib/vsprintf.c:473
- vsnprintf+0x1542/0x1da0 lib/vsprintf.c:2890
- vscnprintf+0x42/0x90 lib/vsprintf.c:2930
- bpf_verifier_vlog+0x41/0x860 kernel/bpf/log.c:66
- verbose+0x110/0x190 kernel/bpf/verifier.c:361
- print_bpf_insn+0xd6a/0x2400 kernel/bpf/disasm.c:320
- backtrack_insn kernel/bpf/verifier.c:3615 [inline]
- __mark_chain_precision+0x1a9b/0x7520 kernel/bpf/verifier.c:4272
- mark_chain_precision kernel/bpf/verifier.c:4375 [inline]
- check_cond_jmp_op+0x26c6/0x3c50 kernel/bpf/verifier.c:15212
- do_check+0x9a63/0x104f0 kernel/bpf/verifier.c:18110
- do_check_common+0x14bd/0x1dd0 kernel/bpf/verifier.c:20916
- do_check_main kernel/bpf/verifier.c:21007 [inline]
- bpf_check+0x144e1/0x19630 kernel/bpf/verifier.c:21681
- bpf_prog_load+0x1667/0x20f0 kernel/bpf/syscall.c:2908
- __sys_bpf+0x4ee/0x810 kernel/bpf/syscall.c:5710
- __do_sys_bpf kernel/bpf/syscall.c:5817 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5815 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5815
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8d12379eb9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8d130e8038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f8d12515f80 RCX: 00007f8d12379eb9
-RDX: 0000000000000023 RSI: 0000000020000300 RDI: 0000000000000005
-RBP: 00007f8d123e793e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007f8d12515f80 R15: 00007fff44c41278
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	89 f5                	mov    %esi,%ebp
-   2:	49 c1 ed 03          	shr    $0x3,%r13
-   6:	eb 0d                	jmp    0x15
-   8:	48 f7 03 08 00 00 00 	testq  $0x8,(%rbx)
-   f:	0f 84 8b 00 00 00    	je     0xa0
-  15:	bf 01 00 00 00       	mov    $0x1,%edi
-  1a:	e8 a5 61 a1 f5       	call   0xf5a161c4
-  1f:	e8 30 50 d9 f5       	call   0xf5d95054
-  24:	fb                   	sti
-  25:	bf 01 00 00 00       	mov    $0x1,%edi
-* 2a:	e8 55 ad ff ff       	call   0xffffad84 <-- trapping instruction
-  2f:	43 80 7c 3d 00 00    	cmpb   $0x0,0x0(%r13,%r15,1)
-  35:	74 08                	je     0x3f
-  37:	4c 89 f7             	mov    %r14,%rdi
-  3a:	e8 85 36 39 f6       	call   0xf63936c4
-  3f:	48                   	rex.W
+Future packetdrill tests can have different shell preambles. Let's
+indeed leave it to the tests themselves.
+ 
+> 
+> Cheers,
+> Matt
+> -- 
+> Sponsored by the NGI0 Core fund.
+> 
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
