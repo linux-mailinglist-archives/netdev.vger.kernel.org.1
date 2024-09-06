@@ -1,88 +1,79 @@
-Return-Path: <netdev+bounces-125908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E5CA96F3A2
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:54:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B29AD96F3B4
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 13:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ECE62868E5
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:54:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF5F21C244EE
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 11:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07451CBE87;
-	Fri,  6 Sep 2024 11:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371F71CBE88;
+	Fri,  6 Sep 2024 11:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="O2q+iIQq"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="RJVWJl1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F9F17C9B
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 11:51:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F4317C9B;
+	Fri,  6 Sep 2024 11:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725623502; cv=none; b=ugbHOhXjNj05OxPmBwCyheDGQe6xJDpUutfPYGorxrcXKv5z8AFIZ7D9csnpI/4SKi6auszSO3ST+dLwC43Xy0yXWvNuWJniFYE1SSQ9uiiQ0nJ61l437pNV0HuXyeoDyX0Vxxnvxt3fmgNfqp1FuFh0csQ1TBvZNwyVrkZHpgM=
+	t=1725623671; cv=none; b=Xr83EvDIC71BC6DQiTCfOkSWqsFlvx7sbdqr6G9JCZfmVK8tpZF99Zd6bVVq7UliwmoHjMFRJYJ8z+uIVnCeAUx2fbffqZZiyRgtKC2x5KteF32WtM9M+l4MNh2M/+vH8PPJYMslJND0pR+EvlIZAh4EEeD4viqcFI87N8LGt3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725623502; c=relaxed/simple;
-	bh=7m6ZexYICBs74zpH3sBxV5HsDBb1hY839vc48opHdRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JYql0lA3DJFsvEc4n9LzLhnwrXQ8NwTGYXIMR1W+IgDSYfi+eYfl0OY+Dr9oAUHgVCq9exbDW7nAdnIghUTdVJeZ7YZ28E4ase3J9jjGxgfDIc/p9o+/2iWB2lj8rmYNhKH35LnW3e/ZNxyqmnQ4Be6+pEYC/ybhrj8VWVwTruo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=O2q+iIQq; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xxGZKPaq4+1aEX3c05z8d8tgJ8nBeiPM2f5DmTQqAw0=; b=O2q+iIQqmPh8pZEqd6sNC5G5OK
-	I0Bqyvv9M4LzC4EJm3XiHGckkPwJ3dFsED4WmRzkrIq6uplrUXtXvM7rslQWZ6y8FXwARSluaqagt
-	fMjpP9nddAjG3GVBTEU6JFJyS/Y+dRkRqgZWJsm9l+rQI+wyVzOFYmNOaUW0WqHBYh20=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1smXUs-006ngB-W5; Fri, 06 Sep 2024 13:51:26 +0200
-Date: Fri, 6 Sep 2024 13:51:26 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org
-Subject: Re: [PATCH -next v2 1/2] ptp: Check timespec64 before call
- settime64()
-Message-ID: <e78f815a-9aba-4542-bfa7-3d73d1b684f3@lunn.ch>
-References: <20240906034806.1161083-1-ruanjinjie@huawei.com>
- <20240906034806.1161083-2-ruanjinjie@huawei.com>
+	s=arc-20240116; t=1725623671; c=relaxed/simple;
+	bh=DH9K55Kya4maLwmGGYmVVeSg1a2KAD998l95BnomRcM=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=CPrSUhOn23QsRQcASXONJ5fXAdABjNCQRR79DmZQw3HMh25AaQx+OFOAEhpPcDMpYRMDkzZcAVYgAe6cg9NZIzUiIUcBLSfTX9X14b43g7VI/jVeywq7YZwFGfhhlt5e2qzTSB6UElD1AIQ68Avg1K7onIU5Xxz2gjEkCqGvkzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=RJVWJl1n; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:To:From:Subject:Message-ID:Sender:
+	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=DH9K55Kya4maLwmGGYmVVeSg1a2KAD998l95BnomRcM=;
+	t=1725623669; x=1726833269; b=RJVWJl1nw3YmBCkzhCC+tCi5bN6gNtDqfkr30muArwXUhG6
+	e+rAMn7hB3lUETctfsdyqVNrd5VopnvCNbU57bRTBRkM5qH6+0uzlO/qq6J7m5oiMab0R4dpgLpku
+	LxEwGqsFgi5mR2zBRG0eyJInVQimqRxqupQtft7QO263ldrkVNomp4Jr+GObiyhZA+DYq5UMTEL8u
+	PLwldNWYUNFcPLNd/hk7PKs6SJCboth0SBqUTAgrPx1t2NeWUJJkyYxzjLXoc0A1r2Gl11Rt9AiZy
+	0TlmDGz2Y3TCBHp6EudyKC6/lH8+4d7rpIE4Zlw2sBkSbwwACv1mSHZve4rWUfoA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1smXXe-0000000A4Dh-0Dik;
+	Fri, 06 Sep 2024 13:54:18 +0200
+Message-ID: <3a907615d3c32c8af08a0c70b5bc008cfe910eda.camel@sipsolutions.net>
+Subject: Re: [PATCH] lib80211: Use ERR_CAST() to return
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Rohit Chavan <roheetchavan@gmail.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Date: Fri, 06 Sep 2024 13:54:17 +0200
+In-Reply-To: <20240906114455.730559-1-roheetchavan@gmail.com>
+References: <20240906114455.730559-1-roheetchavan@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240906034806.1161083-2-ruanjinjie@huawei.com>
+X-malware-bazaar: not-scanned
 
-On Fri, Sep 06, 2024 at 11:48:05AM +0800, Jinjie Ruan wrote:
-> As Andrew pointed out, it will make sence that the PTP core
-> checked timespec64 struct's tv_sec and tv_nsec range before calling
-> ptp->info->settime64(), so check it ahead.
-> 
-> There are some drivers that use tp->tv_sec and tp->tv_nsec directly to
-> write registers without validity checks and assume that the PTP core has
-> been checked, which is dangerous and will benefit from this, such as
-> hclge_ptp_settime(), igb_ptp_settime_i210(), _rcar_gen4_ptp_settime(),
-> and some drivers can remove the checks of itself.
-> 
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+On Fri, 2024-09-06 at 17:14 +0530, Rohit Chavan wrote:
+> Using ERR_CAST() is more reasonable and safer, When it is necessary
+> to convert the type of an error pointer and return it.
+>=20
 
-FYI: Your Signed-off-by: should be last. Please fix this when you
-respin as requested by Richard.
+What? Why? What's the point?
 
-
-    Andrew
-
----
-pw-bot: cr
+johannes
 
