@@ -1,101 +1,105 @@
-Return-Path: <netdev+bounces-126015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E169396F960
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 18:32:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B3D096F965
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 18:33:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9821E1F23335
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:32:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B70828600A
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 16:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 186FA1D4178;
-	Fri,  6 Sep 2024 16:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41B31D415A;
+	Fri,  6 Sep 2024 16:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IgXAKi3m"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FiDk3VB2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2D61D4152;
-	Fri,  6 Sep 2024 16:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDA271D3638
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 16:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725640285; cv=none; b=BncmLiSnVaqIdIImAn9vNX/Z4Plg76rMoxLbJuYiIcq0tq7DYpkffPE6wqPFwTA6mHVChNQ7kK9wFG2aYvlgXZX4zQ7AmiriCaXczp/jNal/XnD/P3cmWGOxMsrIu8ceWkOpXK4msoXyVWacNHM8pvCElcXpNiul9pno/J0cns8=
+	t=1725640350; cv=none; b=Np6FVGBgD1ED2Oich+a2qp88JsBGkSl7PPHoB8wREl19Qs896yffWatyoow4RhPWxSdssNaIm9KL+GiiO1dNCMLpB2uSyaBbTi0qT+XXb6QiaTDApFr0S44loAkOZoI/kqw6//K6RlCk2gkV5jalglBzsyujwSOcIRi2XRmznsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725640285; c=relaxed/simple;
-	bh=sC8UhjbTMx5mUtLsy+Qu/baWSi3okdi2YLVuh9ssZlE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cCk2AwrUT/V33bTNVK4yL8Q6KjHqYnOQge7DqqwndxcOX8X3uWsy1Dlkoxucb4EzRhbRYfusjIeex45twF8MRpdqRFMDVLpeFUN0QK5Xz8In1dKAgJrrWLtGYbagzAj6vNqsEi6+ktki8MD2NORU+x5ajEfc1u67g6ncd3KXtD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IgXAKi3m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39737C4CEC4;
-	Fri,  6 Sep 2024 16:31:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725640284;
-	bh=sC8UhjbTMx5mUtLsy+Qu/baWSi3okdi2YLVuh9ssZlE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IgXAKi3mUmPm5IjeRJs6mOzzfI32ZC0C55ovfAid6+OrGUj8BfGXVt6ecfDL5e8uA
-	 FUSwDNFfC73KFreghcJHXGoeWqoNQjbvK2w3FHmBse5hcBLlCRbooAFjcrm5P867oK
-	 fXWfwL/0+yoFvoLccJSZ/GOFndElBK7CWA8N1GnP52/RFLo7SysH3d81Mn3iIdDuBB
-	 /aI/VlQWEmoHaUoxUtQEejRUJcrV1z6wPvt23OS528T6MjneBkJsghESkFnGOqlKZC
-	 pjPmxDYj2ovprLp6YWtOC/ss39eLkmePU81pRmy74kZg9FpURQoaxzg2KVY5LAAQv3
-	 GXGUYwM9sGMzQ==
-Date: Fri, 6 Sep 2024 17:31:18 +0100
-From: Simon Horman <horms@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Felix Huettner <felix.huettner@mail.schwarz>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Subject: Re: [PATCH net v1 1/1] netfilter: conntrack: Guard possoble unused
- functions
-Message-ID: <20240906163118.GI2097826@kernel.org>
-References: <20240905203612.333421-1-andriy.shevchenko@linux.intel.com>
- <20240906162938.GH2097826@kernel.org>
+	s=arc-20240116; t=1725640350; c=relaxed/simple;
+	bh=HJdkqYLUpsnetdCVh6ay2CBlfyS0Lb8vV8W+ynlNlD0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ct6OtHDlprrfb+zibJG7gkwqNyNbvZ8e03DTX1HslINFk3CPK89Un5r4XVCkgyc9kIrlMfZDLzA5nDKVIBZRo8X3KD+UQt3Fvi5czfVNlugyJAhCRE2D3f/utjr7tTOMeCi1HDRLMPFkGcnhcwRHAhBlSNB+6CdpIixzjBLjj/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FiDk3VB2; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5365c060f47so493087e87.2
+        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 09:32:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1725640347; x=1726245147; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HJdkqYLUpsnetdCVh6ay2CBlfyS0Lb8vV8W+ynlNlD0=;
+        b=FiDk3VB27tz7+6nGmHO4THfNm407HD3vtYrIehcptmhBeCqohsEJI3RunoEBGlJCmi
+         WvispqPy8O+Xr10cTv9YcKfz7ZNJ1VK1gxCFc9egIhJh90ehQW1HhfLqWyEkxIujz1Z6
+         gmA9E3Yl8yMysry9IJ/4HmZ8UrUO15Nk+7Tc95Q0WJJJD7uGJb9WIgtfPR2SL5VDhrYz
+         MXTChTs1WKrwwHWfpnyYlCErm89IEL8uNyWXyuJQCYd2KPdm/XcY2n+npRj4/VeEy8JC
+         KkE169JjiLkiD46BMo4M4X2G5cF8ZilP/ZT8X9Eh6vt/4Fsh1n+3cJW0l7Sp6B086yCh
+         448Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725640347; x=1726245147;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HJdkqYLUpsnetdCVh6ay2CBlfyS0Lb8vV8W+ynlNlD0=;
+        b=wVRDV+FN74pfEyd0MVkrurkVy6bPC/bRFLgJs0dknvpqMMDNPkjcT6R4r2bYdF8wOf
+         AZ5G8PbtwcKrwUSYHcXuS70OKNiKkVZ5OM9cfuTh0UaZgzv4iipyZyPNWSnD+cp2dRJk
+         oaNWliirPS81HVBVylyCBysKyc7oNJNsdDGcaytcObe0wwMoeITXglyNVfTGGUw50IR9
+         4KHQal/+7aPGwCAPeAFsIic2ZOwdrNQPqFA4fpjp+4Mf5nNDeuSfEAiJbNxlDRwxT5sP
+         my+JcM4CXFXI+HpxIrS0qwuuSVGzMS8kXH/la7mTEqC7egPiQZithhhfi98G2+iVfx3o
+         huGw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxUA98T9cT5uvVM9CWPGOCXS73/aXxLJP4O+PfylYeEZdK22NLxC6HL7YIZFmxTXF6fmqnq1U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrwTn0b2RaNL+DnoM4bIgc5Ipj9yLXC9sfrvz8XMvgLrrKv/4X
+	Qhg3NgYewCp5/z3S6fqbp1Lr8w88G8OT6rFwnS9cMwgnVF7JfVNGKEV6CxhT0EmJF7LNTVidfkI
+	4XmsN+FVQHoYcben8jDr7etCeX6BidFm7pYNowCq4YMNHMpZGcA==
+X-Google-Smtp-Source: AGHT+IHdxaaUWgfp4Nt1hmpjWGICwWFVusjHm10LeoLwZcyvAKP/tGjc0mGTGzPWrEE00H2XEvP5WW2ZtycnH1sGo4A=
+X-Received: by 2002:a05:6512:3987:b0:52f:244:206f with SMTP id
+ 2adb3069b0e04-53658809f15mr1945031e87.53.1725640346550; Fri, 06 Sep 2024
+ 09:32:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240906162938.GH2097826@kernel.org>
+References: <20240906161059.715546-1-kuba@kernel.org>
+In-Reply-To: <20240906161059.715546-1-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 6 Sep 2024 18:32:13 +0200
+Message-ID: <CANn89iJToC3QymBvU=S_uyjwRMQkN1M6qtY6MX0DYPFpnd1fHA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: remove dev_pick_tx_cpu_id()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 06, 2024 at 05:29:38PM +0100, Simon Horman wrote:
-> On Thu, Sep 05, 2024 at 11:36:12PM +0300, Andy Shevchenko wrote:
+On Fri, Sep 6, 2024 at 6:11=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> dev_pick_tx_cpu_id() has been introduced with two users by
+> commit a4ea8a3dacc3 ("net: Add generic ndo_select_queue functions").
+> The use in AF_PACKET has been removed in 2019 by
+> commit b71b5837f871 ("packet: rework packet_pick_tx_queue() to use common=
+ code selection")
+> The other user was a Netlogic XLP driver, removed in 2021 by
+> commit 47ac6f567c28 ("staging: Remove Netlogic XLP network driver").
+>
+> It's relatively unlikely that any modern driver will need an
+> .ndo_select_queue implementation which picks purely based on CPU ID
+> and skips XPS, delete dev_pick_tx_cpu_id()
+>
+> Found by code inspection.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-...
-
-> Hi Andy,
-> 
-> Local testing seems to show that the warning is still emitted
-> for ctnetlink_label_size if CONFIG_NETFILTER_NETLINK_GLUE_CT is enabled
-> but CONFIG_NF_CONNTRACK_EVENTS is not.
-> 
-> > 
-> > Fix this by guarding possible unused functions with ifdeffery.
-> > 
-> > See also commit 6863f5643dd7 ("kbuild: allow Clang to find unused static
-> > inline functions for W=1 build").
-> > 
-> > Fixes: 4a96300cec88 ("netfilter: ctnetlink: restore inlining for netlink message size calculation")
-> 
-> I'm not sure that this qualifies as a fix, rather I think it should
-> be targeted at net-next without a Fixes tag.
-> 
-> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> 
-> ...
-
-Sorry, one more minor thing: possible is misspelt in the subject.
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
