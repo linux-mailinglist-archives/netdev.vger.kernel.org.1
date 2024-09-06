@@ -1,60 +1,77 @@
-Return-Path: <netdev+bounces-126090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCCF596FDC2
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 00:02:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B877D96FDEB
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 00:23:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3CC51C2156B
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 22:02:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 671401F26820
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 22:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87DD158A00;
-	Fri,  6 Sep 2024 22:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55D0158D63;
+	Fri,  6 Sep 2024 22:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e/rh9wNz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G3bIZrwM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8E11B85DB;
-	Fri,  6 Sep 2024 22:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9402E13D251;
+	Fri,  6 Sep 2024 22:23:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725660154; cv=none; b=bglzXqUZL55bS1EF005oz+Xe/kqZrWCOKy4Zx0M1b5MyGh1aHex+hbmkus2wg9QHOq+uAl003d7HBhWmoFjdSq3nJLUMXB9sd/Y2o7GZEEzw/8ItSftYtUqNpKdJJngj4neDFpCeD3xG13SyvrjeGkOVo4buEG5fWlNlR3if9z8=
+	t=1725661382; cv=none; b=TojlMoer+P0hZmrWv2M1Hp9F7nK+vUDMR/uWZulLyrwpmAy4QEFVTDdul7n/UK2g7xrHz3zTp/7p0nsfxWct0DtOQjn7DnU5UQhPcYB1OGhaDjR1pN/O2UYGlMZal7qjSAhlOkOqzoqgURnfAtKDamdkFWrujN8VHkAdkSzhY8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725660154; c=relaxed/simple;
-	bh=WGuwnNn1p6v9mY4G4k7o8PhCCfiaToFY4ymgit/+v1c=;
+	s=arc-20240116; t=1725661382; c=relaxed/simple;
+	bh=GKaXF1yioOTb9F5s7ndE5NHY1EH9yLQe0g4ySiSwE30=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NquRUKpu+DQmEaPvDXn7eOqD8n1BGO/idtQJT6vx3tbj8k4Nm5uXa5A4aVBq5/CYtXL7rl5JYpM5lEJKB5s91xj1TAgB4xLJHysc+F1Y1E7LmOWOei7SQqB5LeoddkCLUJ2mxL03cYo4638f92TKOG+aeOuJf0JA28S1WHjYy90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e/rh9wNz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 848B6C4CEC4;
-	Fri,  6 Sep 2024 22:02:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=pCRqDmobO0M+Q9U50CArydtlfBkS7T8iCAJPMPYWwVRlt9G/BXopgm7XzepFYRu9tMAD9MbD22Kt6n/S3ub67l0hA3BS3LQRj3KIq69IpvrTTgE7CbpV28mF3NAzyrhjrvzszJ2W0LEKs9SI9ZZqachcSiUkzzhSM4u4pjGWLaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G3bIZrwM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3E22C4CEC4;
+	Fri,  6 Sep 2024 22:23:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725660153;
-	bh=WGuwnNn1p6v9mY4G4k7o8PhCCfiaToFY4ymgit/+v1c=;
+	s=k20201202; t=1725661382;
+	bh=GKaXF1yioOTb9F5s7ndE5NHY1EH9yLQe0g4ySiSwE30=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=e/rh9wNz88GAK11h79VsQMcJb9paOgEoNmJsC2VkhXYWa0XCbXECxqrMuF4s8AGsB
-	 l67uND4qfkyoUjc/88dhBgf9xhArWyoYj0qV4alJ3BBXtAgVyb7qPeHe8eYFouYQzR
-	 eJFSOBRJwIyG+DO4/8RKScZkeII+GEo36Sra5zW75F4plgRwkbQuGYfY6dBWqr8gA+
-	 bbb173N4emVQ7f008wJPX27pZStC3uWOuexmyYa/EKgsRfNcxhVoY/T8OCbg1PN7Ax
-	 pBSgMVYS4tKI+ZP/pG0onPTz/kgJkUgJ0dsmm2GCNzLvLmesa0abAQXl70U+QXES+O
-	 LaCxtoVKAsEDQ==
-Date: Fri, 6 Sep 2024 15:02:32 -0700
+	b=G3bIZrwMKqqIeo9tZrmgmFG1n6C49TknaHmotoG0W/l825gogN2HJIUq2RGsK02YO
+	 yzNq7ugIdrhwUbGKs4ncrn332dEfMlNB14OlNPZarFYSsnBQBCTLsRXqoDhafXRYv3
+	 m26Ku/AQi+6Le7aiS8nLoceZD6QrbEx8yjM97dB8nN96Ts6/eF20ukCxUfBLYxoPcD
+	 KF+M/txfi4qwaCnEF6uVqyzr4PzpuCe965rUFuuGrxNtj28J2a9JSndsui71x6FRIF
+	 FmPtANWVnBkgYnwhIcn1Jf0KWOvUnOcsc2S2TsSzO67ldw3GiGo7F8D87HXsTsa7S8
+	 jEMZEFzUJNYXg==
+Date: Fri, 6 Sep 2024 15:23:00 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Edward Adam Davis <eadavis@qq.com>, davem@davemloft.net,
- edumazet@google.com, geliang@kernel.org, linux-kernel@vger.kernel.org,
- martineau@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
- pabeni@redhat.com, syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCH net v3] mptcp: pm: Fix uaf in __timer_delete_sync
-Message-ID: <20240906150232.31ba495c@kernel.org>
-In-Reply-To: <b2272b72-d207-4393-9245-31ad7628be09@kernel.org>
-References: <e4a13002-f471-4951-9180-14f0f8b30bd2@kernel.org>
-	<tencent_F85DEC5DED99554FB28DEF258F8DB8120D07@qq.com>
-	<b2272b72-d207-4393-9245-31ad7628be09@kernel.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Philo Lu <lulie@linux.alibaba.com>, bpf <bpf@vger.kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Steven Rostedt <rostedt@goodmis.org>, Masami
+ Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Eddy Z
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Mykola Lysenko
+ <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Kui-Feng Lee <thinker.li@gmail.com>,
+ Juntong Deng <juntong.deng@outlook.com>, jrife@google.com, Alan Maguire
+ <alan.maguire@oracle.com>, Dave Marchevsky <davemarchevsky@fb.com>, Daniel
+ Xu <dxu@dxuuu.xyz>, Viktor Malik <vmalik@redhat.com>, Cupertino Miranda
+ <cupertino.miranda@oracle.com>, Matt Bobrowski <mattbobrowski@google.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Network Development
+ <netdev@vger.kernel.org>, linux-trace-kernel
+ <linux-trace-kernel@vger.kernel.org>
+Subject: Re: [PATCH bpf-next v2 3/5] tcp: Use skb__nullable in
+ trace_tcp_send_reset
+Message-ID: <20240906152300.634e950b@kernel.org>
+In-Reply-To: <CAADnVQL1Z3LGc+7W1+NrffaGp7idefpbnKPQTeHS8xbQme5Paw@mail.gmail.com>
+References: <20240905075622.66819-1-lulie@linux.alibaba.com>
+	<20240905075622.66819-4-lulie@linux.alibaba.com>
+	<CAADnVQL1Z3LGc+7W1+NrffaGp7idefpbnKPQTeHS8xbQme5Paw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,20 +81,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 6 Sep 2024 20:55:20 +0200 Matthieu Baerts wrote:
-> > Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
-> > Cc: stable@vger.kernel.org
-> > Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
-> > Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>  
-> 
-> According to the doc [1], a 'Co-dev' tag is supposed to be added before
-> this SoB:
-> 
-> Co-developed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> 
-> But I'm sure that's fine without it.
+On Thu, 5 Sep 2024 17:26:42 -0700 Alexei Starovoitov wrote:
+> Yes, it's a bit of a whack a mole and eventually we can get rid of it
+> with a smarter verifier (likely) or smarter objtool (unlikely).
+> Long term we should be able to analyze body of TP_fast_assign
+> automatically and conclude whether it's handling NULL for pointer
+> arguments or not. bpf verifier can easily do it for bpf code.
+> We just need to compile TP_fast_assign() as a tiny bpf snippet.
+> This is work in progress.
 
-To be clear, would you like us to pick this up directly for net?
-Or you'll send it back to us with other MPTCP patches?
+Can we not wait for that work to conclude, then? AFAIU this whole
+patch set is just a minor quality of life improvement for BPF progs
+at the expense of carrying questionable changes upstream.
+I don't see the urgency.
 
