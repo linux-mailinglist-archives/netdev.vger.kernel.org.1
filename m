@@ -1,62 +1,92 @@
-Return-Path: <netdev+bounces-125877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-125879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE68B96F176
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:28:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0435996F17D
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 12:30:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76C3DB230B6
-	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:28:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A139B20DA1
+	for <lists+netdev@lfdr.de>; Fri,  6 Sep 2024 10:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90C4158862;
-	Fri,  6 Sep 2024 10:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6721482E8;
+	Fri,  6 Sep 2024 10:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VRY4rgFw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gzSejvdv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E491459FA
-	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 10:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11C613AD2F
+	for <netdev@vger.kernel.org>; Fri,  6 Sep 2024 10:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725618524; cv=none; b=I7fwve4ZvciQUEIFhdXXcFfh6Kjl6wPnvrctqGzMJEjEg4q4KrfI3lo77WUXgr5i0yj1h24bAUwQ5Ikr7AaE+THi1YYAd4UHe/lC9HolFAz20MfEEb/FGzPbD/X4dYu+znG/Y+I0qSrYEqW3xubc6FHCV6m+LNIcMQaE8aXzFA8=
+	t=1725618636; cv=none; b=QH71Ckl1JMlcC7IpiRWaSNiB3ZN4YTBKHvhFbaE+ydVrafQVp06eY0ueQGMO/7zOpdCKe7YnI7hAI37PcCLh2mITh1cly6eljRABYLcfcqP2X1nFn7dD/qrBXhY5saYUvcZoxE+oqf8iSMoTLQwBicxVKlX5BHNV7Dtyuuuwx38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725618524; c=relaxed/simple;
-	bh=5BaC5tCLM4cokqPfWLvVsqm1VrOzWOAlQptFMFimM6E=;
+	s=arc-20240116; t=1725618636; c=relaxed/simple;
+	bh=gpurG5DS/qY/4tckUDEul6HGlDkofHf40drk89kXyL0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kDmPhO1axx9jJkXcXCW/793mBbuNekLnu8kAcR86DgpLUGGtcLDVHsnCZhgu9ptczupYC1pRg5sf/UdZQX2FuG9c+pbbIsGJE1VYAvxuz2SlO3bUESrKgD6TkP0UbKoCAAN9t5bwvTSSZ8lCbhOj0ECvGf2/vebi9g1deudUOIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VRY4rgFw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6BC3C4CEC5;
-	Fri,  6 Sep 2024 10:28:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725618524;
-	bh=5BaC5tCLM4cokqPfWLvVsqm1VrOzWOAlQptFMFimM6E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VRY4rgFwAaGeU+O2i3eNekIjwHhEv82vc0hJpdLKTbZEKw2Py8dNtjYbd8m+i8rGt
-	 q+EcxuziyrxlyvXET2tCtFrn5aBY26Y6pS3oOHWk2xuPkVawRg/mnkuyaExxTvaJRB
-	 DHDBf93Jlqccz124foEm630PTwPncEAQZPvWpSYVoQgtSy6FRqdwfWy84seckqNQkd
-	 7c+eh3AftQqeVHOiCRH0iVGdH4CXSjz8X/QBBQihIO2hk19rCNgJE4YsNkXZkcWq+O
-	 w5Ewa8tROis3p6jmCCCfKP6uXBO9WJ15SjhL1O73iDiwXFi9Qyd9xFY969cSmjy+Z4
-	 UyPDAFTF5pg8Q==
-Date: Fri, 6 Sep 2024 11:28:39 +0100
-From: Simon Horman <horms@kernel.org>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	Andrew Halaney <ahalaney@redhat.com>, kernel@quicinc.com
-Subject: Re: [PATCH net-next v1] net: stmmac: Programming sequence for VLAN
- packets with split header
-Message-ID: <20240906102839.GE2097826@kernel.org>
-References: <20240904235456.2663335-1-quic_abchauha@quicinc.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JmmwNEkDy/cx/yEjvRmivPnZvgRUP+VquzHLFnAtGqEZncCIH9e668s+X+4e1alYLOR6zavXGUla7LQbYpMQ7+GIsEEnvnAhdj0xXGUz1VxRVT3kizqIPnzCaN8ZA/zhhu/yUOa5c+xjBPD37vInJaQcCjrcLw8/7+AVcgXFp8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gzSejvdv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725618633;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2nwSvcgAY7yqK6W5cuMH1Sl/JPzQHktUXAyhnBaZCMc=;
+	b=gzSejvdvU4/BspTgIAG8L1uEk5TDMa1cUvWVb1LlvK0t96dgzDJ7cJrYKqp8qYY3GZQYOQ
+	IXsj20Vzyn0rvJxWhlhHuRlughz7NiUTMii/nYaXvWgtz/dzozrJFJ1/RKFtjBXJavcMWH
+	StvWuKwxVjKFKfLw4p6ONst6vBUuN/c=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-553-_bXC79x3Ni6Hds371OFLow-1; Fri, 06 Sep 2024 06:30:32 -0400
+X-MC-Unique: _bXC79x3Ni6Hds371OFLow-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42bb7178d05so15056185e9.1
+        for <netdev@vger.kernel.org>; Fri, 06 Sep 2024 03:30:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725618631; x=1726223431;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2nwSvcgAY7yqK6W5cuMH1Sl/JPzQHktUXAyhnBaZCMc=;
+        b=FY42LrrLAe7wYnbj9Y8/uBR5Gl1iKDoABSJumeLcoxFYGLQ0AfATmtbocHPSinyv+D
+         CcwLccOyE/LBXeXa/zdcNoGyYesTp67JjznpgH6UuhAndC3slI1LS/jmuMBT6jNLbgFG
+         VMr9CPHfZIEKTkfFIbszSidpHF7IrEuPqsz6efYLCpqfcQhYL/uVe9DRGh0CoX2NrxQr
+         mNJCUyvc1WkD/zfiZAm4l+MmMMTo+J0HREEusgzNznX467ueoOLxnmk0SLLNQQ4ozFYe
+         mEmjpySOqbq4b97uGWROMvkWInW9xamhH0R8MIDGPZDErAkZ10A1jnINGIhrVI5/79C2
+         SDLA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIhVMxvZmrZpWcXSezNwRfiul5BcvwNMszBqBetNcd+rMWdk72L5Oblk7FOTwVIv1fDXIwvWU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGWVot0TMEOf/WxvZlZUK9X2HRq5dCl+uhrds+mE7Mx1ZJtxOD
+	36XlVJpSvKRpghDFff+qYh0Qw/DyS5DgXPYXL+PZLoYoyXlo7NdcsnICA9E6noRqE/kAJwiAMwb
+	xde38RfJIVGjxRFhH1DPfypClcSUdzor1m+8/z5vQjWxCJZV9PAz5hA==
+X-Received: by 2002:a05:600c:1385:b0:426:66a2:b200 with SMTP id 5b1f17b1804b1-42c9f8eeed8mr14682125e9.0.1725618631250;
+        Fri, 06 Sep 2024 03:30:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGXGEZfjZnC6w6eRgpQxrlAS3dz51FU3pvypFv/al4joSB4o0ZH9YrRpzEuARqVgR0dlKgIdw==
+X-Received: by 2002:a05:600c:1385:b0:426:66a2:b200 with SMTP id 5b1f17b1804b1-42c9f8eeed8mr14681595e9.0.1725618630057;
+        Fri, 06 Sep 2024 03:30:30 -0700 (PDT)
+Received: from debian (2a01cb058d23d6009996916de7ed7c62.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:9996:916d:e7ed:7c62])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ca05d86f1sm16063975e9.35.2024.09.06.03.30.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 03:30:29 -0700 (PDT)
+Date: Fri, 6 Sep 2024 12:30:27 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: David Ahern <dsahern@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, Martin Varghese <martin.varghese@nokia.com>,
+	Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net] bareudp: Fix device stats updates.
+Message-ID: <ZtrZw8UdMXAJT5GR@debian>
+References: <04b7b9d0b480158eb3ab4366ec80aa2ab7e41fcb.1725031794.git.gnault@redhat.com>
+ <20240903113402.41d19129@kernel.org>
+ <ZthSuJWkCn+7na9k@debian>
+ <20240904075732.697226a0@kernel.org>
+ <Ztie4AoXc9PhLi5w@debian>
+ <3aaa7117-ded8-4d3d-acdc-82a1e9fb73b8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,58 +95,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240904235456.2663335-1-quic_abchauha@quicinc.com>
+In-Reply-To: <3aaa7117-ded8-4d3d-acdc-82a1e9fb73b8@kernel.org>
 
-On Wed, Sep 04, 2024 at 04:54:56PM -0700, Abhishek Chauhan wrote:
-> Currently reset state configuration of split header works fine for
-> non-tagged packets and we see no corruption in payload of any size
+On Wed, Sep 04, 2024 at 07:50:55PM -0600, David Ahern wrote:
+> On 9/4/24 11:54 AM, Guillaume Nault wrote:
+> > [Adding David Ahern for the vrf/dstats discussion]
+> > 
+> > On Wed, Sep 04, 2024 at 07:57:32AM -0700, Jakub Kicinski wrote:
+> >> On Wed, 4 Sep 2024 14:29:44 +0200 Guillaume Nault wrote:
+> >>>> The driver already uses struct pcpu_sw_netstats, would it make sense to
+> >>>> bump it up to struct pcpu_dstats and have per CPU rx drops as well?
+> >>>
+> >>> Long term, I was considering moving bareudp to use dev->tstats for
+> >>> packets/bytes and dev->core_stats for drops. It looks like dev->dstats
+> >>> is only used for VRF, so I didn't consider it.
+> >>
+> >> Right, d stands for dummy so I guess they also were used by dummy
+> >> at some stage? Mostly I think it's a matter of the other stats being
+> >> less recent.
+> > 
+> > Looks like dummy had its own dstats, yes. But those dstats were really
+> > like the current lstats (packets and bytes counters, nothing for
+> > drops). Dummy was later converted to lstats by commit 4a43b1f96b1d
+> > ("net: dummy: use standard dev_lstats_add() and dev_lstats_read()").
+> > 
+> > The dstats we have now really come from vrf (different counters for tx
+> > and rx and counters for packet drops), which had its own implementation
+> > at that time.
+> > 
+> > My understanding is that vrf implemented its own dstats in order to
+> > have per-cpu counters for regular bytes/packets counters and also for
+> > packet drops.
 > 
-> We need additional programming sequence with reset configuration to
-> handle VLAN tagged packets to avoid corruption in payload for packets
-> of size greater than 256 bytes.
-> 
-> Without this change ping application complains about corruption
-> in payload when the size of the VLAN packet exceeds 256 bytes.
-> 
-> With this change tagged and non-tagged packets of any size works fine
-> and there is no corruption seen.
-> 
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+> VRF was following other per-cpu counters that existed in 2015-2016
+> timeframe.
 
-...
+Thanks. That was my impression as well.
 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> index e0165358c4ac..dbd1be4e4a92 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c
-> @@ -526,6 +526,17 @@ static void dwmac4_enable_sph(struct stmmac_priv *priv, void __iomem *ioaddr,
->  	value |= GMAC_CONFIG_HDSMS_256; /* Segment max 256 bytes */
->  	writel(value, ioaddr + GMAC_EXT_CONFIG);
->  
-> +	/* Additional configuration to handle VLAN tagged packets */
-> +	value = readl(ioaddr + GMAC_EXT_CFG1);
-> +	value &= ~GMAC_CONFIG1_SPLM;
-> +	/* Enable Split mode for header and payload at L2  */
-> +	value |= GMAC_CONFIG1_SPLM_L2OFST_EN << GMAC_CONFIG1_SPLM_SHIFT;
-> +	value &= ~GMAC_CONFIG1_SAVO;
-> +	/* Enables the MAC to distinguish between tagged vs untagged pkts */
-> +	value |= 4 << GMAC_CONFIG1_SAVO_SHIFT;
-> +	value |= GMAC_CONFIG1_SAVE_EN;
-> +	writel(value, ioaddr + GMAC_EXT_CFG1);
-
-Hi Abhishek,
-
-Perhaps it is inconsistent with the code elsewhere in this file,
-in which case I would suggest a follow-up clean-up, but I
-expect that using FIELD_PREP would both lead to cleaner code here
-and remove the need for *_SHIFT.
-
-> +
->  	value = readl(ioaddr + DMA_CHAN_CONTROL(dwmac4_addrs, chan));
->  	if (en)
->  		value |= DMA_CONTROL_SPH;
-> -- 
-> 2.25.1
+> I have no preference on the naming; just wanted per-cpu counters.
 > 
-> 
+
 
