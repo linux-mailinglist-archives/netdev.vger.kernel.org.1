@@ -1,129 +1,135 @@
-Return-Path: <netdev+bounces-126229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC70397022E
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 14:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CE8A97025E
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 15:22:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E0B61F22ACE
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 12:40:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E696A1F2279B
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 13:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84FA1158A18;
-	Sat,  7 Sep 2024 12:40:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483CC15C133;
+	Sat,  7 Sep 2024 13:22:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="PkdZ0cQo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V07Huikd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD97A1B85F2;
-	Sat,  7 Sep 2024 12:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154D915ADA7;
+	Sat,  7 Sep 2024 13:22:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725712841; cv=none; b=Wq0Z5gOXFFjk318Vrtjw6JWgAGtdI01zQslXo417unXHolm6kGrti90kueIXNLO26VZYxOzJcClLc/xMG61MfksvzkQSqThj6trRUIo1jSp6nZQQlGmd1XS6DrrBF47gLHvKmcYFryEGQFy/NgmlYVuXBMsFT3mM5nXdYuqteJM=
+	t=1725715372; cv=none; b=M4jm1WG0FLEjAz+6WYiWTjME7HhMaR828gblmP2T8wkh8rainNSVvmrJvjE5hxAoCR3rck+ZyGNTCQxVzkuvSFypPrAOKWqdOtCHbJB1yCMTltCMOQIhbYfrg1rGi4BIi29WVLdbSGD69tUndy1W3LQCvRajMHG89lrL/Ci6mXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725712841; c=relaxed/simple;
-	bh=z/is63FAkV1Z6IJEGfbxHiE0+onrQGBt2frnaRyYRYM=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=WY4gTQe5K826u8CErExI8JZ7xyy/+vYx5iDHyO3zdqt+6BII9ePK8eNPkMgpI3xSQ6ErJ9wAhy3IHGj5kv7Wsboh68fzEar/wWzgs56Bp8TRFKOgpxQirnaiipJ3MV3vGmTlKPYN01o+kj5asoRfFsn20UjNjX3XO62vb0eQftw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=PkdZ0cQo; arc=none smtp.client-ip=212.227.17.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1725712812; x=1726317612; i=markus.elfring@web.de;
-	bh=3mmhAlGB6MPd7mOF0eOntljHmXDlj+VRCWTezqQ+qHI=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
-	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=PkdZ0cQo9KKQMMR48et2oDjJFh5FL/FYqB/uMFbitc2iGCTwAaMgqdh9IfNlNvGR
-	 2Sff+4ABVPyoErJSNE/enhuc63clVgl9PZ3vExuTJ6brKIpAfgeyY/TPZrpty1+5P
-	 /fRG/X5YTlXwqA9rJnCMHy6cdCfZ714NVAa19WcJlGFFpdHZkcgzmFar5n/8pQAA7
-	 X22to4iPtVD5Z8D9Ho0IJiPG8Tzprqb3Mkjcr/uWYomAOO2pI5tgJT+kL5dEVPUCr
-	 ccA3cirwTE70q//afFoMV9WDMzufVaZs6ORrHVELD4nVIM7l1YtD3ZGrTtCoNAlm4
-	 sGYOUSSeQ06HsciKsQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.84.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1Mpl4x-1sFH4D05i1-00pS5P; Sat, 07
- Sep 2024 14:40:12 +0200
-Message-ID: <99a2d643-9004-41c8-8585-6c5c86fab599@web.de>
-Date: Sat, 7 Sep 2024 14:40:10 +0200
+	s=arc-20240116; t=1725715372; c=relaxed/simple;
+	bh=y6YKFlhPCQu78jAO0iC8jYVC1hWLcBjxxOdZP1rzmYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qi5oiPL34saFwaKRZ3GO6PVyyjne/lv5tcwidtqEo4ffafdGU50Ar7V417GCS/PgadoX8+Po6l8vXDtBjYfTYVTTAOv34YLNSp2m3vGqCMc1Pvre1yNgxETk28jfimSw1PJ43VIMqopw54SX8/avoW13hZrcZFtMq9MQoXlYMek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V07Huikd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B322C4CEC2;
+	Sat,  7 Sep 2024 13:22:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725715371;
+	bh=y6YKFlhPCQu78jAO0iC8jYVC1hWLcBjxxOdZP1rzmYM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=V07HuikdAcbrcGIzsucwlYA/+RGJuhvOlJngLr590qYs+K7Od4QTJSbzdbmFqaZ1u
+	 Hbu/Z0iFXjvhAa7suS3a6bXuUtI1RDpRHhVbaNXEgbD0rNbWoapbLHq6DwATbUbqkQ
+	 r4Sf4oz8uY8IuIlODGcRH0Qxqk9UFOBG+8oxdA5BIPM8D6+et/ojkXw9FVZJY633GY
+	 M7pOtT+qYVpibMb1d748GmL6WEs8THD8tc8wdHHZRsbQjVu8hHBlrszHSqCa6BkjgC
+	 +AkIEk/z39+7qjTmWdVkTt8bqZAQaIDb46qoaL3d0xO34fIrtDPhk6j1/bIwN46hSr
+	 nX/pUqZO9+r1A==
+Date: Sat, 7 Sep 2024 15:22:48 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next 0/9] bpf: cpumap: enable GRO for XDP_PASS frames
+Message-ID: <ZtxTqNLZ2kbb-esH@lore-desk>
+References: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
+ <20240903135158.7031a3ab@kernel.org>
+ <ZteAuB-QjYU6PIf7@lore-desk>
+ <Ztnj9ujDg4NLZFDm@lore-desk>
+ <20240905172029.5e9ca520@kernel.org>
+ <Ztq6KAWXwjBcGci0@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Gui-Dong Han <hanguidong02@outlook.com>, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Simon Horman <horms@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: stable@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
- Jia-Ju Bai <baijiaju1990@gmail.com>
-References: <SY8P300MB0460D0263B2105307C444520C0932@SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM>
-Subject: Re: [PATCH v2] ice: Fix improper handling of refcount in
- ice_sriov_set_msix_vec_count()
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <SY8P300MB0460D0263B2105307C444520C0932@SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="z8728SGFsNxd48Un"
+Content-Disposition: inline
+In-Reply-To: <Ztq6KAWXwjBcGci0@lore-desk>
+
+
+--z8728SGFsNxd48Un
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:InRZd7kFbSfK1e5eW5UUNybW5MJ0wGpHgP81H85hO47pdeGPzIF
- z1G7dIySGs8UknFg7da4mEiFyYD4Nt0GsevsLK+Yr7EeONNjivfdBcLthpCw1LQxotnA7AT
- 1Grr3PCRBT8fESdSxUFoBFP0GDz2j9ZAZiLPGuoNGJ6uv9Q/zISR4qHIannHJwq/d0Yi31N
- Jq3mXQ7mp4b/8D7GyvyPQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:obGP9V6cqNo=;uWs9GvcuVmU5ECvWaepANbII+up
- VZJIgc8lW0AOCH+QxaYAPX7NoKxkAVJ23NSc7RE/dphrDg4lZJf/KlEeJSrRtfuo4rVa7UrfM
- hwrkD7+EFqKWcF6FyT/Dn449c3XL61OV4h7tifAB5lBzzOv2ABPPJdMt9EbYWULc6lHmp2X/I
- PM5LJtITDX6aBOoTeaw4BjtYM6fhImuyPBRaqZx1CnABTxXpw9NLlj3677j9sBv9rjFB9Ff8E
- erB1pYg+TA0p1e3DGM1jy+Fv/79+YqV2VZHCQI0WzuYnniJYwzpnB+kdw/RW6c7nxEM4/h928
- zyUpYCVNbkaE2r/z/YLmLNg/9jH3xu4+BuN2SNBhzmaRyCwaf6gnfNLXPLoq5z2cUusmTDqD3
- bQV9RMs/qHsMIyCuFnRlcdtNyMIEpjfzchmXoEkLL1uRsftui1/Lj/amdhhoGUmv727r1qLxP
- 4qGE6cpzmpXyrZ9WdjLsTYe6iwke5cMGjeCeI7UTsI5sjIksioN6yqXueQ/xq6cLdPIBcdYEr
- jAoRqRNts7102ACfxRGmaynjZMBDJdXqdYTlNifjI6m/HZab/N7nnbmmJ7Dq/LvW76wS6iBkT
- YXw/mYDEzyJJqvNW5TOgVJDauh/rSafyHKMGZZB4Fo/ryoKVoEv5jc+HHQ16S5HhBZlGMRgOW
- zhcqjB7dKqpBGBl6B5eF7Kd7pWaCOHWuyGXNTRZWOj6mCSgDFyqqVgCqfs9yHYPcwd+oPhY3r
- 0MGZkxgUXEK8bcnfIAGNaWW3PpF/42LL6VxvRIEy4Wh1l9RIWF+MXifXkn++zOTR5pbFYQxDs
- kAkUPhmqveNLf/urrx0rcYkA==
 
-=E2=80=A6
-> +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-> @@ -1096,8 +1096,10 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *=
-vf_dev, int msix_vec_count)
->  		return -ENOENT;
->
->  	vsi =3D ice_get_vf_vsi(vf);
-> -	if (!vsi)
-> +	if (!vsi) {
-> +		ice_put_vf(vf);
->  		return -ENOENT;
-> +	}
->
->  	prev_msix =3D vf->num_msix;
->  	prev_queues =3D vf->num_vf_qs;
-> @@ -1142,8 +1144,10 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *=
-vf_dev, int msix_vec_count)
->  	vf->num_msix =3D prev_msix;
->  	vf->num_vf_qs =3D prev_queues;
->  	vf->first_vector_idx =3D ice_sriov_get_irqs(pf, vf->num_msix);
-> -	if (vf->first_vector_idx < 0)
-> +	if (vf->first_vector_idx < 0) {
-> +		ice_put_vf(vf);
->  		return -EINVAL;
-> +	}
->
->  	if (needs_rebuild) {
->  		ice_vf_reconfig_vsi(vf);
+> > On Thu, 5 Sep 2024 19:01:42 +0200 Lorenzo Bianconi wrote:
+> > > In particular, the cpumap kthread pinned on cpu 'n' can schedule the
+> > > backlog NAPI associated to cpu 'n'. However according to my understan=
+ding
+> > > it seems the backlog NAPI APIs (in process_backlog()) do not support =
+GRO,
+> > > right? Am I missing something?
+> >=20
+> > I meant to use the struct directly, not to schedule it. All you need
+> > is GRO - feed it packets, flush it.=20
+>=20
+> ack, thx for pointing this out.
+>=20
+> > But maybe you can avoid the netdev allocation and patch 3 in other ways.
+> > Using backlog NAPI was just the first thing that came to mind.
+>=20
+> ack, I will look into it.
+>=20
+> Regards,
+> Lorenzo
 
-Would you like to collaborate with any goto chains according to
-the desired completion of exception handling?
+Hi all,
+
+I reworked my previous implementation to add GRO support to cpumap codebase=
+, removing
+the dummy netdev dependency and keeping most of the other logic. You can fi=
+nd
+the codebase here:
+- https://github.com/LorenzoBianconi/bpf-next/commit/e152cf8c212196fccece0b=
+516190827430c0f5f8
+I added to the two patches below in order to reuse some NAPI generic code:
+- https://github.com/LorenzoBianconi/bpf-next/commit/3c73e9c2f07486590749e9=
+b3bfb8a4b3df4cb5e0
+- https://github.com/LorenzoBianconi/bpf-next/commit/d435ce2e1b6a991a6264a5=
+aad4a0374a3ca86a51
+I have not run any performance test yet, just functional one.
 
 Regards,
-Markus
+Lorenzo
+
+--z8728SGFsNxd48Un
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZtxTqAAKCRA6cBh0uS2t
+rA1HAQDexOv6I+cjqBzVYgUS+y0Xn1LJ6hmUxSvpTHYqX2R+DQD/R9oiZLSX4JOy
+XFYnQsY4J2O8rgDbMEquWg0l1Uq3qQ8=
+=poHJ
+-----END PGP SIGNATURE-----
+
+--z8728SGFsNxd48Un--
 
