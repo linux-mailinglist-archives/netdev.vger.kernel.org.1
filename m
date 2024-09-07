@@ -1,96 +1,159 @@
-Return-Path: <netdev+bounces-126237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5337497033E
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 18:57:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 969FB97034A
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 19:06:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7078F1C20FBF
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 16:57:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CDFA282FA3
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 17:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41D38161311;
-	Sat,  7 Sep 2024 16:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4071615F323;
+	Sat,  7 Sep 2024 17:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/MiQav0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D122E634
-	for <netdev@vger.kernel.org>; Sat,  7 Sep 2024 16:57:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85863134B1
+	for <netdev@vger.kernel.org>; Sat,  7 Sep 2024 17:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725728227; cv=none; b=Z/orYo6+GYfP+XjWWIMtuz0GBvzVq0kYLcodn45jGfENVhqRvGVF23z7Kxz9q70mg9d7EIWOIOeVL9Snx2WwZA0ZMTbgMU+4+IkpgF+jooki7f4dOlJSZNQactL43JpjF8g8d/udBo6UwqCIVKwCEHOnKrQkULfN9AC7am20A/M=
+	t=1725728814; cv=none; b=B/vwp3V9dP+nZlia5KQWOhXdyDHg5MmcRCAijaCYPTPQAN++Zg7+opFfY+klPPk++DHO37GQKX1WoiQBSYizuSLDQCPsEgqkLuLlzsv32l47OiC30/wGbCz2B3nYty2DBdZTLt2SiPTM4rv81P8mTZ49S119ubwGfSxzY0q0jZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725728227; c=relaxed/simple;
-	bh=ZtMU8w1tloWwxYw7AMQBvYsJJPEwFKU8fUMe+ZaWDOw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=qm7RE6HC6ILXzpqb1le6s8LL47AMHwLm3GoMJ1Nk8WeH4o94cMmsKMw0NGFrmNoelriI0AqMANkMG5s2cNtI+iHvBAzu/zDKCL8c7ZXnFpuxMHqcXTM5/ShwwjHQKVUf50ZpaLXl/TWymJE5kgIZ4xH2TfIs8UmBS+g/Rk0m/Fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-39d5537a659so57969905ab.1
-        for <netdev@vger.kernel.org>; Sat, 07 Sep 2024 09:57:05 -0700 (PDT)
+	s=arc-20240116; t=1725728814; c=relaxed/simple;
+	bh=HPcfkw41zQmCKqhT2VpMjzMr4leuLnJW971WDPwrmh0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=B5uwMNDbVGdwrdO35GNTjlvHs6Iku8FIImuhdeAHowS4mocy2wNZ/2XKXdcCcuqb/Jt7Zl+fsNcJJC5ITaY65lt0HAhoGzS7VH8cC1VVSTxLcwmPp88f6PHS3GLPUUf9/KUlQQE41I9H+cOZjcwUrvcCqYMKeKw++alIMX5Bp3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/MiQav0; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c251ba0d1cso3330419a12.3
+        for <netdev@vger.kernel.org>; Sat, 07 Sep 2024 10:06:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725728811; x=1726333611; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HpCSh0jY0+KH87F913XWGrunZ4XUHdfHztAJ08yvA2I=;
+        b=U/MiQav0ejW6y+YJfBA6BvqsFpyeEo9n5m4/cW9feDxdcUBD06nMA6S3QlisIhdzLK
+         4+jkupWmUZgLHx03LXlKmDCLblk8pUxOh/WG2m16OUqVJpzMNBdp9VtN1Zv4Q9loy4vd
+         e8DfY0T1c78hL4Mm4JW6TS2VRK5gGxpGjDDRl2der9m7DgJ3InQHP+/821vmcMAZZ3RM
+         lLr5KPNImrnKfS9zkoaoCdI31s8ejbR36z2ygDf+RVc7yAbDT3ZYu4YUKtVDLKdGijag
+         a7PyWoYpQrw3pPlIqW8e3Qm5pkJ4s+2jtj4wVRgRvx5B0GGPe1eVbw3cNFzfLTGYdgY7
+         wvDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725728225; x=1726333025;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pqioQfI0jRHJ+2HyBzWQTOPsbbuKbvskWBDUXI7NhPA=;
-        b=gtPuOIfLySK9IBBHRi1XIfpzPydwrV5W3O4Ww7IfHlmHfL5bFaxfar3BmcSLtJDHhV
-         On1OsUlU7nXXcdEeEclLGYaAx2w01VUJ4V+NszUvWil+JrAbzN+Xu2IId5KBd6LYchzG
-         WSlok7poH4q3DZajr9/VNDKcYFCJO6R5hytMqHe0bwLhVGCuQ2GQ38gULPr2XuVlk+oq
-         i5ymcG5NzldFIsEBptQBHj825cQmV6+s9U0xiChG4QD14+5zkacNrdkcCF5PF/B051AV
-         /sGPhnquhxHelB3n6xV5JpGd6Qr9EIcpnBpyt/2DfoIIvmcY5FTodvxZAZoZX9c1GcQW
-         nYHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVThYHgdl9f/UxT2yhJbgEnCpkN5FiN6ITE/ZvanPVPCA4S17f8lv8LjNH8I3Tjo5hJi7ci2BI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAQ80eSGl56bikMr/iClZiaKitfl3NlLUd6YyB/lwXY22xaiI3
-	D2GPHHIu1htkPexJbYKw51ogVpDgSv+FUg0gKPg7tOGOx2XUPLcdQt/kC+bQALZZTZD4DDKzJ9r
-	jI5ofItan4jx/DJrL3iq4JWSgGledhc4oPsdA0ny6qeqiEid0XVrfaUQ=
-X-Google-Smtp-Source: AGHT+IF8SgqIXPoeZdJvxIHF/R0WhiGyZdPrZBifF5WpHod7Lg5TLFK+P/zj4no5/G7TG7yVMkfnczv8rs8e36L7Y2XEMzVhfdtl
+        d=1e100.net; s=20230601; t=1725728811; x=1726333611;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HpCSh0jY0+KH87F913XWGrunZ4XUHdfHztAJ08yvA2I=;
+        b=JZHLppRifawBek+isbNZYCJLaDPuAMkLzuIfXx5kOAHq3fIBht++1MoPuDx/b9wo/G
+         RU6vr0tHESTakcyukNctZsf8gIQrAettARKGu7hs3AXIwITfmTop6TE0Kfql0q3+u69f
+         KTlChQ3Qy6UeOPUM82sX2AQEgdzPHMfEnoKTaNHsQjwvRan44+AXHbRLJkLCeBX/oR99
+         YjN33tKJ85IoSMjkP59WXPg167BV7gXf+hCyHVsBcZiL8SHwOSeooOrRHb1p6g/xRFuH
+         O3qDNNNurvYE+quFAAPfvrw0F/0po5rUUbr/dUZyd6odun5z4dyKtGdCif0k9cSAXkBa
+         8ZFg==
+X-Forwarded-Encrypted: i=1; AJvYcCX6iEQLSiFESHj7cc1OSf1eRg7eBu1Bi/SgyLNnCdv+2mbEGvPMSP4gpZxUvVayly9M7mnzW48=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxalcxIVBSY0/QV9Fu13tK8spbeotwsvcGDwhw4Ei+kscspTKdm
+	M6e6JWaLbh80N//wwnY5uMBXfnHMJHThShCiA3X8IdAOJxVvx9uELK5jxg/GsNgPYNdrh8N3bQ9
+	NymCEZ3wFRNNSYvCAJOK7LCWGTyc=
+X-Google-Smtp-Source: AGHT+IH3Mka82Wszk8CGt1PQBvI0Q9o7z9IhDdMZJlhgIVLulfSvewd5znE6hvwYpePQ3wqoJweiwrXszQxak5V4ecg=
+X-Received: by 2002:a05:6402:1d4c:b0:5c0:ad76:f70e with SMTP id
+ 4fb4d7f45d1cf-5c3dc779d65mr5058671a12.6.1725728810380; Sat, 07 Sep 2024
+ 10:06:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:19ce:b0:3a0:4646:8a7d with SMTP id
- e9e14a558f8ab-3a04f10e30fmr2545425ab.5.1725728224995; Sat, 07 Sep 2024
- 09:57:04 -0700 (PDT)
-Date: Sat, 07 Sep 2024 09:57:04 -0700
-In-Reply-To: <00000000000031c6c50610660f17@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d4819606218a69a2@google.com>
-Subject: Re: [syzbot] [net?] [s390?] possible deadlock in smc_release
-From: syzbot <syzbot+621fd56ba002faba6392@syzkaller.appspotmail.com>
-To: agordeev@linux.ibm.com, aha310510@gmail.com, alibuda@linux.alibaba.com, 
-	davem@davemloft.net, edumazet@google.com, guwen@linux.alibaba.com, 
-	jaka@linux.ibm.com, johannes.berg@intel.com, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	nico.escande@gmail.com, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
+References: <20240906080750.1068983-1-ap420073@gmail.com> <20240906183844.2e8226f3@kernel.org>
+In-Reply-To: <20240906183844.2e8226f3@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Sun, 8 Sep 2024 02:06:38 +0900
+Message-ID: <CAMArcTUiRJHj+u3DMjf+SGXgk57z-uDmXNycsfXku4=MKrngVA@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/2] bnxt_en: implement tcp-data-split ethtool command
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	michael.chan@broadcom.com, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot suspects this issue was fixed by commit:
+On Sat, Sep 7, 2024 at 10:38=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
 
-commit b7d7f11a291830fdf69d3301075dd0fb347ced84
-Author: Nicolas Escande <nico.escande@gmail.com>
-Date:   Tue May 28 14:26:05 2024 +0000
+Hi Jakub,
+Thanks a lot for your review!
 
-    wifi: mac80211: mesh: Fix leak of mesh_preq_queue objects
+> On Fri,  6 Sep 2024 08:07:48 +0000 Taehee Yoo wrote:
+> > The approach of this patch is to support the bnxt_en driver setting up
+> > enable/disable HDS explicitly, not rely on LRO/GRO, JUMBO.
+> > In addition, hds_threshold no longer follows rx-copybreak.
+> > By this patch, hds_threshold always be 0.
+>
+> That may make sense for zero-copy use cases, where you want to make
+> sure that all of the data lands in target page pool. But in general
+> using the data buffers  may waste quite a bit of memory, and PCIe bus
+> bandwidth (two small transfers instead of one medium size).
+>
+> I think we should add a user-controlled setting in ethtool -g for
+> hds-threshold.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1536189f980000
-start commit:   5f76499fb541 tsnep: Add link down PHY loopback support
-git tree:       net-next
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bc36d99546fe9035
-dashboard link: https://syzkaller.appspot.com/bug?extid=621fd56ba002faba6392
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17ad7bc3e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1461e9a7e80000
+Thanks, I understand your concern.
+So, I will implement the tcp-data-split-threshold option in the v2 patch.
 
-If the result looks correct, please mark the issue as fixed by replying with:
+>
+> Also please make sure you describe the level of testing you have done
+> in the commit message. I remember discussing this a few years back
+> and at that time HDS was tied to GRO for bnxt at the FW level.
+> A lot has changed since but please describe what you tested..
 
-#syz fix: wifi: mac80211: mesh: Fix leak of mesh_preq_queue objects
+Sorry about the lack of describing how I tested this patch.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+I'm using BCM57412 and the latest firmware(230.0.157.0/pkg 230.1.116.0).
+I tested if the HDS had any dependencies such as TPA (HW-GRO, LRO) or jumbo=
+.
+When I tested it I checked out skb->data size and skb->data_len size.
+And HDS and TPA were worked independently.
+
+HDS disabled + TPA disabled:
+It receives normal packets.
+`ethtool -S <interface name> | grep tpa` doesn't show an increment of
+tpa statistics.
+
+HDS disabled + TPA enabled:
+It receives gro packets.
+`ethtool -S <interface name> | grep tpa` shows an increment of tpa statisti=
+cs.
+
+HDS enabled + TPA disabled:
+It receives header-data split packets.
+`ethtool -S <interface name> | grep tpa` doesn't show an increment of
+tpa statistics.
+
+HDS enabled + TPA enabled:
+It receives header-data split gro packets.
+`ethtool -S <interface name> | grep tpa` shows an increment of tpa statisti=
+cs.
+
+I tested the above cases and they worked expectedly.
+But I tested again after your review, I found a bug that sometimes
+couldn't reset jumbo_thresh properly.
+I will fix that bug too in the v2 patch.
+
+So, the v2 patch will contain the following.
+1. fix jumbo_thresh reset logic.
+2. add a description of how I tested this patch.
+3. implement `ethtool -G <interface name> tcp-data-split-threshold
+<value> option.
+
+If you think the above description is still not enough, please let me know!
+
+Thanks a lot!
+Taehee Yoo
 
