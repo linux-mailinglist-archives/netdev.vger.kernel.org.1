@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-126265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6105A97045F
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 00:22:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23662970461
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 00:22:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13AA9283279
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 22:22:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0EC1283215
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 22:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB0416A920;
-	Sat,  7 Sep 2024 22:21:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E407E16B3B6;
+	Sat,  7 Sep 2024 22:21:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sgca2a6u"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IXj9qwVQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CF3157E9F;
-	Sat,  7 Sep 2024 22:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5402416A38B;
+	Sat,  7 Sep 2024 22:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725747713; cv=none; b=LY6gC5aiOK0TpF00SCISt7pNSYMxbKYMRZ4R4TxLDfYHOm3qJfibe49+hB8zOABUNTXRds7Y7L3ci9VTdVZ9ZmFRJn6n1/gS2LZLr1yNu85X3bpBNCFDdMASsHCgcoyI/Bmd355sG7el2ENBUltE+aYMyG93OluT3tIJZhYAXxE=
+	t=1725747714; cv=none; b=tn+GmYIVqS/3mkkun8TpeimZyjhPUSrAZ86lVYBSBwI0TItN6hreumTmvcVwoLtqZ2BEX2zP4bOiGNnPz8pKQ/sZfUcXkYPgVUzlfC5J1MClYLqadyRuWNT7bf2Nz4eeHgOL0OLRlXH4WFjOgN0v49LIBIOv1UxZG+SVD+/qyrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725747713; c=relaxed/simple;
-	bh=02yYXdvDx31Qs4Dj8pQC42UZW21KEG4h3gy4Rhlut7s=;
+	s=arc-20240116; t=1725747714; c=relaxed/simple;
+	bh=2zBigd//G5iO+BesE7TX1KWH9iAckaNRR4Wz2TbMkUA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U7scGVkaf5PLiD4/xvEPbwh7nExas/5VOwdIr7Dmz/bFXfA7nH9yAzkjFTUoQiPABi9i5X4B8IInYo2kQtVTyBUbH3SI1FNCy2aQbMT9JbSxSddJMX+g4+IVYG7dNlrNV0obUc9m1GQ9p4PTxaewWEzKNqM/8+HnvXMTghW41IU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sgca2a6u; arc=none smtp.client-ip=209.85.210.177
+	 MIME-Version; b=OFW/2RuznbEeSU5vyQV921RT405TXjP0kp6LkxU81+mGR9SmQotvBa4YDC9ZWABUmIwVb+rRY8NsVBav7iEHgkSm+Tkc3db3oC7fE1GbH9VgnTJhsItdZ6GiJiOx3y2x+0Rp+tgrqGxkcbB3PbMYzZm34HAVIzdhaTcIV0lBNV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IXj9qwVQ; arc=none smtp.client-ip=209.85.215.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-718d6ad6050so1435735b3a.0;
-        Sat, 07 Sep 2024 15:21:51 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7cb3db0932cso2491132a12.1;
+        Sat, 07 Sep 2024 15:21:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725747711; x=1726352511; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725747712; x=1726352512; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=i0E/gFh6bgM5JAxun4jikcDPrvGdw7HEaUT/qNC5C78=;
-        b=Sgca2a6uJVAQCgavBY1mGRjPBEZMj+ahq2on61yQXbn04mbEmH/PUfGxvtbnRYuWtO
-         1QiWs8szC01H3il4TcwfWiTS41Vs8WiWPKkWTM94SAYRNAzv0UdP6aKdKZGA2rkEc5Y7
-         P/wnupU3wbA+1GorxnK7RNqedUTuYq/a+XiHyTCq0SrR20wCsMZcJBCeRR5ZlZVW3Vez
-         zGNs2qA7/vkjC4HzH6eH9fSF52EM9Mnf+Xr5a8B+Nvqgh95ysfDrGW3JutDzWyzNfGny
-         3kz5npmXZlyvMf0QpQmACf9iu6NY3k3Lxlj5WbhFsLseXS79vtslqgCh2hkQphI09KHT
-         fsKA==
+        bh=f6aKpbMa8frBMXy12QNcNTsich8eKSzF/iMdpWXYNc4=;
+        b=IXj9qwVQ8ai/Adoo1nNhGMHBM0sVODXzx+xk8IQUchlh8gJccpz//eI1nF/K3yQ6we
+         iu5cDNeWp/gIQU5NariWKrmhSVou2KnstlNX6f2giKJM3YJcT8VwqfJ4vnlNwWLtPT5Z
+         ujSgU/mfELifHMM9O2oJA9jh3o9ZhVZEuckALq4501YIANVrLiYgmqN83/Cx7K+Oasua
+         llHYvsa+OyPWdMV0WCK7DnHYcNJ5GJN+Cpsn+yRNPhoKZmZjSJiTAMhCsLZq5J0YOyyC
+         erL7f6HOyaKhPyRb1Pqj7kfxschi2Um9w3WzQ/CfpbBY/F3u+GO+XZTMI80O2qs9Nx8g
+         3+Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725747711; x=1726352511;
+        d=1e100.net; s=20230601; t=1725747712; x=1726352512;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=i0E/gFh6bgM5JAxun4jikcDPrvGdw7HEaUT/qNC5C78=;
-        b=ZBUAkcy2fe4Dtrh5+EsnuHZBsXHEpS1tTihEqWeHeY1HkaZnucU0RkMrjoRx/+pbWp
-         Ti2tkI28A1ULtfEg8Y1l/KJ5ijghu8WBlky/bkHEEyEVKjR5pw+CV1+Har3IXokgy712
-         PXKHCpvVWBWFUHeaMvZwz/jSNaq/cQxNjqquuMJ8EpJCzcbc3biQCGLXckeaePd94pdw
-         tiDq164xmxk9dlG9PRWzg1i/mAv2YlP1qFPGlTop69h/mq5GJUB28G64GNmay1aFNHFS
-         ECR53esd8XZhUnMHdSz3hWfzE8MmQd9H1XfvxXYnQekQhMfZ8Bug5SkbJe/MrD58Z6H0
-         hgmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUxSGJEtRm2D2euCowHfmNvDcx/5zVRunZdDiznSGI5PPlM04SuU0pQsbQ88SSkClcNdEr45pftk4g0ZY0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3onpKec0ouJnqI+wK1qyCNQ/UoHFzk2KiGDHM2xnKHs6vPBxq
-	K24Gu+Xnm7OUe0zYxyyb0UuFbtHSj0Sfoi3qrDQC3bNvJ27oxuvwm8gxNeL7
-X-Google-Smtp-Source: AGHT+IFx/TqZURwFbSBWwIWPNoCcrr7MZdj4GmgQ1l4OgP/SKPpo0LUYxkZDv5TiVQcXAWOa6hwkgA==
-X-Received: by 2002:a05:6a20:c6ca:b0:1c0:e997:7081 with SMTP id adf61e73a8af0-1cf1d1396e7mr7671240637.29.1725747710802;
-        Sat, 07 Sep 2024 15:21:50 -0700 (PDT)
+        bh=f6aKpbMa8frBMXy12QNcNTsich8eKSzF/iMdpWXYNc4=;
+        b=rY3i0EHH3Ztqby6W1HMK0/eSW/aaF2P6WvYvePZ75lDfz3OGvNguCF7fDcisZw0Jcz
+         mISJDwqDYWr9CxWRvjqOdfZ470hvclhTwAuskr9eZvYGDGyRFXPAw1NlexK3VVHmSglQ
+         700PX/fBdgh2P5xxJfEsn4Cil4fVeqslUl2Ss0IQvCSij/1GkFioqMuV1rwG2UcR/PXi
+         ZOGxELva9OAMohbVXzpM/cCCm5NH/AD93SRXx0WO/6sNfyn+ZRRYZRC3bO3uB3rYCDV8
+         hJilUqGd0PNSja5XIQ6uIgAiR1wx1mD2PXizo3d5I7s6wgH6ni59NKLJFTYmdeiEIygV
+         6hZg==
+X-Forwarded-Encrypted: i=1; AJvYcCUaNewEM0gj+7Mlrez983DpZRq1OzQXnjJ8guQkxdJfY2AyCaWkxrNcGn/m7jVku0qkSuD8I/KTvezFzuc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4iTyhM4WBKd5Be7PTdqCPk+Af0iPQPJAgBo4YXiKjfzr1Ri8W
+	+SjKa0TkJ+ONq9r4zoGWI2cLse3V0DKUK2/8llJV1YMFeqku0Cc5E0omx6Df
+X-Google-Smtp-Source: AGHT+IFCeoo/WZzK9Sa6bTj4f44C1IwMZFEVD/gvOjmu+FlktDh/R/BOCJ4sym6MpTalk/xZNyZ7Bg==
+X-Received: by 2002:a17:903:230f:b0:205:9112:efea with SMTP id d9443c01a7336-2070a578bdemr31392565ad.35.1725747712312;
+        Sat, 07 Sep 2024 15:21:52 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d860a4d202sm1077198a12.85.2024.09.07.15.21.49
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d860a4d202sm1077198a12.85.2024.09.07.15.21.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Sep 2024 15:21:50 -0700 (PDT)
+        Sat, 07 Sep 2024 15:21:52 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -79,9 +79,9 @@ Cc: andrew@lunn.ch,
 	horms@kernel.org,
 	sd@queasysnail.net,
 	chunkeey@gmail.com
-Subject: [PATCH net-next 1/4] net: ibm: emac: tah: use devm and dev_err
-Date: Sat,  7 Sep 2024 15:21:44 -0700
-Message-ID: <20240907222147.21723-2-rosenp@gmail.com>
+Subject: [PATCH net-next 2/4] net: ibm: emac: rgmii: use devm and dev_err
+Date: Sat,  7 Sep 2024 15:21:45 -0700
+Message-ID: <20240907222147.21723-3-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240907222147.21723-1-rosenp@gmail.com>
 References: <20240907222147.21723-1-rosenp@gmail.com>
@@ -96,62 +96,74 @@ Content-Transfer-Encoding: 8bit
 Simplifies the driver by removing manual frees and using dev_err instead
 of printk. pdev->dev has the of_node name in it. eg.
 
-TAH /plb/opb/emac-tah@ef601350 initialized
+RGMII /plb/opb/emac-rgmii@ef601500 initialized with MDIO support
 
-vs
+vs.
 
-emac-tah 4ef601350.emac-tah: initialized
+emac-rgmii 4ef601500.emac-rgmii: initialized with MDIO support
 
-close enough.
+Close enough.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
 ---
- drivers/net/ethernet/ibm/emac/tah.c | 60 ++++++++++-------------------
- 1 file changed, 21 insertions(+), 39 deletions(-)
+ drivers/net/ethernet/ibm/emac/rgmii.c | 76 ++++++++++-----------------
+ 1 file changed, 27 insertions(+), 49 deletions(-)
 
-diff --git a/drivers/net/ethernet/ibm/emac/tah.c b/drivers/net/ethernet/ibm/emac/tah.c
-index fa3488258ca2..84e2091c193a 100644
---- a/drivers/net/ethernet/ibm/emac/tah.c
-+++ b/drivers/net/ethernet/ibm/emac/tah.c
-@@ -43,9 +43,9 @@ void tah_detach(struct platform_device *ofdev, int channel)
- 	mutex_unlock(&dev->lock);
+diff --git a/drivers/net/ethernet/ibm/emac/rgmii.c b/drivers/net/ethernet/ibm/emac/rgmii.c
+index e1712fdc3c31..bcf6b7d0dcf9 100644
+--- a/drivers/net/ethernet/ibm/emac/rgmii.c
++++ b/drivers/net/ethernet/ibm/emac/rgmii.c
+@@ -77,17 +77,16 @@ static inline u32 rgmii_mode_mask(int mode, int input)
+ 	}
  }
  
--void tah_reset(struct platform_device *ofdev)
-+void tah_reset(struct platform_device *pdev)
+-int rgmii_attach(struct platform_device *ofdev, int input, int mode)
++int rgmii_attach(struct platform_device *pdev, int input, int mode)
  {
--	struct tah_instance *dev = platform_get_drvdata(ofdev);
-+	struct tah_instance *dev = platform_get_drvdata(pdev);
- 	struct tah_regs __iomem *p = dev->base;
- 	int n;
+-	struct rgmii_instance *dev = platform_get_drvdata(ofdev);
++	struct rgmii_instance *dev = platform_get_drvdata(pdev);
+ 	struct rgmii_regs __iomem *p = dev->base;
  
-@@ -56,7 +56,7 @@ void tah_reset(struct platform_device *ofdev)
- 		--n;
+ 	RGMII_DBG(dev, "attach(%d)" NL, input);
  
- 	if (unlikely(!n))
--		printk(KERN_ERR "%pOF: reset timeout\n", ofdev->dev.of_node);
-+		dev_err(&pdev->dev, "reset timeout");
+ 	/* Check if we need to attach to a RGMII */
+ 	if (input < 0 || !rgmii_valid_mode(mode)) {
+-		printk(KERN_ERR "%pOF: unsupported settings !\n",
+-		       ofdev->dev.of_node);
++		dev_err(&pdev->dev, "unsupported settings");
+ 		return -ENODEV;
+ 	}
  
- 	/* 10KB TAH TX FIFO accommodates the max MTU of 9000 */
- 	out_be32(&p->mr,
-@@ -85,61 +85,44 @@ void *tah_dump_regs(struct platform_device *ofdev, void *buf)
+@@ -96,8 +95,7 @@ int rgmii_attach(struct platform_device *ofdev, int input, int mode)
+ 	/* Enable this input */
+ 	out_be32(&p->fer, in_be32(&p->fer) | rgmii_mode_mask(mode, input));
+ 
+-	printk(KERN_NOTICE "%pOF: input %d in %s mode\n",
+-	       ofdev->dev.of_node, input, phy_modes(mode));
++	dev_info(&pdev->dev, "input %d in %s mode", input, phy_modes(mode));
+ 
+ 	++dev->users;
+ 
+@@ -213,76 +211,57 @@ void *rgmii_dump_regs(struct platform_device *ofdev, void *buf)
  	return regs + 1;
  }
  
--static int tah_probe(struct platform_device *ofdev)
-+static int tah_probe(struct platform_device *pdev)
+-
+-static int rgmii_probe(struct platform_device *ofdev)
++static int rgmii_probe(struct platform_device *pdev)
  {
 -	struct device_node *np = ofdev->dev.of_node;
 +	struct device_node *np = pdev->dev.of_node;
- 	struct tah_instance *dev;
+ 	struct rgmii_instance *dev;
  	struct resource regs;
  	int rc;
  
 -	rc = -ENOMEM;
--	dev = kzalloc(sizeof(struct tah_instance), GFP_KERNEL);
+-	dev = kzalloc(sizeof(struct rgmii_instance), GFP_KERNEL);
 -	if (dev == NULL)
 -		goto err_gone;
-+	dev = devm_kzalloc(&pdev->dev, sizeof(struct tah_instance), GFP_KERNEL);
++	dev = devm_kzalloc(&pdev->dev, sizeof(struct rgmii_instance),
++			   GFP_KERNEL);
 +	if (!dev)
 +		return -ENOMEM;
  
@@ -170,28 +182,46 @@ index fa3488258ca2..84e2091c193a 100644
  	}
  
 -	rc = -ENOMEM;
--	dev->base = (struct tah_regs __iomem *)ioremap(regs.start,
--					       sizeof(struct tah_regs));
+-	dev->base = (struct rgmii_regs __iomem *)ioremap(regs.start,
+-						 sizeof(struct rgmii_regs));
 -	if (dev->base == NULL) {
 -		printk(KERN_ERR "%pOF: Can't map device registers!\n", np);
 -		goto err_free;
 +	dev->base =
-+		devm_ioremap(&pdev->dev, regs.start, sizeof(struct tah_regs));
++		devm_ioremap(&pdev->dev, regs.start, sizeof(struct rgmii_regs));
 +	if (!dev->base) {
 +		dev_err(&pdev->dev, "can't map device registers");
 +		return -ENOMEM;
  	}
  
+ 	/* Check for RGMII flags */
+-	if (of_property_read_bool(ofdev->dev.of_node, "has-mdio"))
++	if (of_property_read_bool(pdev->dev.of_node, "has-mdio"))
+ 		dev->flags |= EMAC_RGMII_FLAG_HAS_MDIO;
+ 
+ 	/* CAB lacks the right properties, fix this up */
+-	if (of_device_is_compatible(ofdev->dev.of_node, "ibm,rgmii-axon"))
++	if (of_device_is_compatible(pdev->dev.of_node, "ibm,rgmii-axon"))
+ 		dev->flags |= EMAC_RGMII_FLAG_HAS_MDIO;
+ 
+-	DBG2(dev, " Boot FER = 0x%08x, SSR = 0x%08x\n",
+-	     in_be32(&dev->base->fer), in_be32(&dev->base->ssr));
++	dev_dbg(&pdev->dev, "Boot FER = 0x%08x, SSR = 0x%08x",
++		in_be32(&dev->base->fer), in_be32(&dev->base->ssr));
+ 
+ 	/* Disable all inputs by default */
+ 	out_be32(&dev->base->fer, 0);
+ 
+-	printk(KERN_INFO
+-	       "RGMII %pOF initialized with%s MDIO support\n",
+-	       ofdev->dev.of_node,
+-	       (dev->flags & EMAC_RGMII_FLAG_HAS_MDIO) ? "" : "out");
++	dev_info(&pdev->dev, "initialized with%s MDIO support",
++		 (dev->flags & EMAC_RGMII_FLAG_HAS_MDIO) ? "" : "out");
+ 
+ 	wmb();
 -	platform_set_drvdata(ofdev, dev);
 +	platform_set_drvdata(pdev, dev);
- 
- 	/* Initialize TAH and enable IPv4 checksum verification, no TSO yet */
--	tah_reset(ofdev);
-+	tah_reset(pdev);
- 
--	printk(KERN_INFO "TAH %pOF initialized\n", ofdev->dev.of_node);
-+	dev_info(&pdev->dev, "initialized");
- 	wmb();
  
 -	return 0;
 -
@@ -201,9 +231,9 @@ index fa3488258ca2..84e2091c193a 100644
  	return rc;
  }
  
--static void tah_remove(struct platform_device *ofdev)
+-static void rgmii_remove(struct platform_device *ofdev)
 -{
--	struct tah_instance *dev = platform_get_drvdata(ofdev);
+-	struct rgmii_instance *dev = platform_get_drvdata(ofdev);
 -
 -	WARN_ON(dev->users != 0);
 -
@@ -211,17 +241,17 @@ index fa3488258ca2..84e2091c193a 100644
 -	kfree(dev);
 -}
 -
- static const struct of_device_id tah_match[] =
+ static const struct of_device_id rgmii_match[] =
  {
  	{
-@@ -158,7 +141,6 @@ static struct platform_driver tah_driver = {
- 		.of_match_table = tah_match,
+@@ -300,7 +279,6 @@ static struct platform_driver rgmii_driver = {
+ 		.of_match_table = rgmii_match,
  	},
- 	.probe = tah_probe,
--	.remove_new = tah_remove,
+ 	.probe = rgmii_probe,
+-	.remove_new = rgmii_remove,
  };
  
- int __init tah_init(void)
+ int __init rgmii_init(void)
 -- 
 2.46.0
 
