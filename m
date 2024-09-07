@@ -1,515 +1,272 @@
-Return-Path: <netdev+bounces-126170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F6D596FF3F
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 04:26:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 234AF96FF43
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 04:34:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2758F1F23B9F
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 02:26:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05A681C22374
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 02:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3259052F88;
-	Sat,  7 Sep 2024 02:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FF0EEDD;
+	Sat,  7 Sep 2024 02:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqQ0UPAi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EE1481CE
-	for <netdev@vger.kernel.org>; Sat,  7 Sep 2024 02:24:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A986D1CAAC;
+	Sat,  7 Sep 2024 02:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725675892; cv=none; b=FdIH2XYgznPzOId74Cckwq4A1wAnhl7/xI2zCFZrlzHq6ZqBQrKiGfQ/w7BHr/nj+G218i+wbZBMO7rCUHr07qr1QQvrYRXNDv13S89SxwXixKDGS3u54GL0Ot4aqy1/iiufS0VrJJvADktgU4A+5vj/kAoxZxGfHZurwofsCr4=
+	t=1725676464; cv=none; b=brubMpFgZyr4QcyEIciQzgRDCvRMlrBdwYfPEPA3jphZpS5sIjd0kuOqGzujrQkMRmdZDrwkqvjSGlC+nTIs3UhgwCgFkbFytN+jKOKOzuS9/DDiQkes6Az2JA97ZonJRqWQNCRWXk1zry9bNpHu51vK2GZvwl7iu/sSmIrwtas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725675892; c=relaxed/simple;
-	bh=ApkWf+VuXFsTHaD7weMbN2cDyxkt8dns48gLfu+wUC4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aSeN5ltls0E2neZVRL4m1lVrAJJ42vf5oeMLR0i9tdO17OTGoSLYaLH1pIIm9O31sm37ahzaKOeijQUofPV6Dt38lCFcCfyOWG0TB9z6WPmZNhSl9/RU0kj0esMTPVxeMuNCxVh4PjT+MmzlISzLyBO0pmzVhZtnsiIv0JDkQGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from labnh.int.chopps.org (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id BACA67D12E;
-	Sat,  7 Sep 2024 02:24:49 +0000 (UTC)
-From: Christian Hopps <chopps@chopps.org>
-To: devel@linux-ipsec.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org,
-	Florian Westphal <fw@strlen.de>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Simon Horman <horms@kernel.org>,
-	Antony Antony <antony@phenome.org>,
-	Christian Hopps <chopps@chopps.org>,
-	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v11 16/16] xfrm: iptfs: add tracepoint functionality
-Date: Fri,  6 Sep 2024 22:24:12 -0400
-Message-ID: <20240907022412.1032284-17-chopps@chopps.org>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240907022412.1032284-1-chopps@chopps.org>
-References: <20240907022412.1032284-1-chopps@chopps.org>
+	s=arc-20240116; t=1725676464; c=relaxed/simple;
+	bh=ffdA6a+g3V4pMBTMbEBpp2yeLzgZm3HSh4Yzd/8It48=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=XpP78oA6h7XERg38Y0DW9wzGhfhS4djeHztYojMr2FLwfBTOt4czWeNBHw3GZyYAIbuo7gkwfliqdC2yeP8+sXdbUYtmEtJ7HprkUUyUd75Tq470JOPXLLibWfWJR4AbZQyYEHZ3Lt7gVxPYUwzr5QVxBAmk5RFEM5u7V/9REWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jqQ0UPAi; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6bf7ad1ec3aso14516076d6.0;
+        Fri, 06 Sep 2024 19:34:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725676461; x=1726281261; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bJ3SXJRC2SMu/cfheyyghxFS01PqyNM2ierurXAADHY=;
+        b=jqQ0UPAizNhDaKcg+0EbRtgFMHgzZFtcfNqLZmEWdHmXfpH7RA6qVC3mEy+AW39Vcf
+         sSvivQJ+fmFW4ZKAGpW29rTABjaLZxijJGjNfDmy9vLyt946gZvKFYN73M1/GOEfYWc2
+         DZaUwVKqHBJ2Xn3i3pdc03dLdhbbem43BX5aPaTl3yHBQCHT677lKV0Ub7RmSuBE1G6j
+         Bw527KOy7ugKua1VuRCaKOgmji0ousODyvZbPUypOjvoHNOgZj7KSDk+9aJwyPVJMHX6
+         PD2rNawehSMfmfYLjJbMi7HuWVlvettdxd547PU6OvRcM0OsCoGJRPnfWGl8xmTYiVOU
+         1g3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725676461; x=1726281261;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=bJ3SXJRC2SMu/cfheyyghxFS01PqyNM2ierurXAADHY=;
+        b=kFM6bJU0k5Bk4f2xD0cobjCi93ZKx0ZcEJ9PHkF/CjMBp5f0pYSeu70+Hp80NfV7kd
+         BuGYSDGyuRwzwgjpZBYnOd8kVpYrXRCPsITWbNR64bocvBCnge1d9Hrtl6qM9CQ28IvD
+         w6tKf3Vfsq8tLV4Sx2f767owGQT4vq7rE63SWc9cVleRM+dip0dEzBXzZSNX0fQwOblh
+         4vpwtTwcO3lF0sLA45TdakNSBLONQnILUHnEA2WOV/z8Z9tTIh4n8viJFFK4ntUh+jhz
+         rXYLOhWdwBXJVoyHD8q9V7zQF26VCSJaYQdUz104+tfSAbQw9qYR6Y/NQjzWsLbmqkbI
+         jQpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU2IIM6VixBlys8LNN21QsRJF/i4RP3jy0vjm+DRvJssPJmaDRH3gF2zvWzAdp/DwzarY/aNh6h7rwdJZgrChk=@vger.kernel.org, AJvYcCUzNutt5fLFxbS/JsFygOYziiRuSm3UkZVzu2tZx5354/laVB8C1l4B+dTg7wdWbm7/btIIPBsB@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZc/r3Gw9bBx2DekJ/qVz/QDyWNkn/BjjHadLw6U1KWD/t2mRd
+	Ac1nbCHBL8u9aW33/bvvCcwMMp60kGqyMI6KLuCKnewSoWvfPMVD
+X-Google-Smtp-Source: AGHT+IE3Jg2Lm2rJxFSrhPlFKkQzTeWGDOc5DzpD/ksp2m6CYk1Vk1PcA3gnofdwugTPCm31chMtZg==
+X-Received: by 2002:a05:6214:4293:b0:6c5:20c2:f33d with SMTP id 6a1803df08f44-6c532411aa5mr13261996d6.27.1725676461249;
+        Fri, 06 Sep 2024 19:34:21 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c53474f8a2sm1062496d6.75.2024.09.06.19.34.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Sep 2024 19:34:20 -0700 (PDT)
+Date: Fri, 06 Sep 2024 22:34:20 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ shuah@kernel.org, 
+ willemb@google.com, 
+ linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <66dbbbac6a6df_2b0bd0294d3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoC9NoE3ws3nA-_ANAqD1cWpv9JDzFY11ACryZgg35dQrg@mail.gmail.com>
+References: <20240906095640.77533-1-kerneljasonxing@gmail.com>
+ <20240906095640.77533-2-kerneljasonxing@gmail.com>
+ <66db8f293dbd1_2a33ef294b3@willemb.c.googlers.com.notmuch>
+ <CAL+tcoC9NoE3ws3nA-_ANAqD1cWpv9JDzFY11ACryZgg35dQrg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 1/2] net-timestamp: introduce
+ SOF_TIMESTAMPING_OPT_RX_FILTER flag
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Christian Hopps <chopps@labn.net>
+Jason Xing wrote:
+> On Sat, Sep 7, 2024 at 7:24=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Jason Xing wrote:
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > introduce a new flag SOF_TIMESTAMPING_OPT_RX_FILTER in the receive
+> > > path. User can set it with SOF_TIMESTAMPING_SOFTWARE to filter
+> > > out rx software timestamp report, especially after a process turns =
+on
+> > > netstamp_needed_key which can time stamp every incoming skb.
+> > >
+> > > Previously, we found out if an application starts first which turns=
+ on
+> > > netstamp_needed_key, then another one only passing SOF_TIMESTAMPING=
+_SOFTWARE
+> > > could also get rx timestamp. Now we handle this case by introducing=
+ this
+> > > new flag without breaking users.
+> > >
+> > > Quoting Willem to explain why we need the flag:
+> > > "why a process would want to request software timestamp reporting, =
+but
+> > > not receive software timestamp generation. The only use I see is wh=
+en
+> > > the application does request
+> > > SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_TX_SOFTWARE."
+> > >
+> > > Similarly, this new flag could also be used for hardware case where=
+ we
+> > > can set it with SOF_TIMESTAMPING_RAW_HARDWARE, then we won't receiv=
+e
+> > > hardware receive timestamp.
+> > >
+> > > Another thing about errqueue in this patch I have a few words to sa=
+y:
+> > > In this case, we need to handle the egress path carefully, or else
+> > > reporting the tx timestamp will fail. Egress path and ingress path =
+will
+> > > finally call sock_recv_timestamp(). We have to distinguish them.
+> > > Errqueue is a good indicator to reflect the flow direction.
+> > >
+> > > Suggested-by: Willem de Bruijn <willemb@google.com>
+> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> >
+> > High level: where is the harm in receiving unsolicited timestamps?
+> > A process can easily ignore them. I do wonder if the only use case is=
 
-Add tracepoints to the IP-TFS code.
+> > an overly strict testcase. Was reminded of this as I tried to write
+> > a more concise paragraph for the documentation.
+> =
 
-Signed-off-by: Christian Hopps <chopps@labn.net>
----
- net/xfrm/trace_iptfs.h | 218 +++++++++++++++++++++++++++++++++++++++++
- net/xfrm/xfrm_iptfs.c  |  70 ++++++++++++-
- 2 files changed, 287 insertions(+), 1 deletion(-)
- create mode 100644 net/xfrm/trace_iptfs.h
+> You raised a good question.
+> =
 
-diff --git a/net/xfrm/trace_iptfs.h b/net/xfrm/trace_iptfs.h
-new file mode 100644
-index 000000000000..74391ba24445
---- /dev/null
-+++ b/net/xfrm/trace_iptfs.h
-@@ -0,0 +1,218 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* xfrm_trace_iptfs.h
-+ *
-+ * August 12 2023, Christian Hopps <chopps@labn.net>
-+ *
-+ * Copyright (c) 2023, LabN Consulting, L.L.C.
-+ */
-+
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM iptfs
-+
-+#if !defined(_TRACE_IPTFS_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_IPTFS_H
-+
-+#include <linux/kernel.h>
-+#include <linux/skbuff.h>
-+#include <linux/tracepoint.h>
-+#include <net/ip.h>
-+
-+struct xfrm_iptfs_data;
-+
-+TRACE_EVENT(iptfs_egress_recv,
-+	    TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u16 blkoff),
-+	    TP_ARGS(skb, xtfs, blkoff),
-+	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+			     __field(void *, head)
-+			     __field(void *, head_pg_addr)
-+			     __field(void *, pg0addr)
-+			     __field(u32, skb_len)
-+			     __field(u32, data_len)
-+			     __field(u32, headroom)
-+			     __field(u32, tailroom)
-+			     __field(u32, tail)
-+			     __field(u32, end)
-+			     __field(u32, pg0off)
-+			     __field(u8, head_frag)
-+			     __field(u8, frag_list)
-+			     __field(u8, nr_frags)
-+			     __field(u16, blkoff)),
-+	    TP_fast_assign(__entry->skb = skb;
-+			   __entry->head = skb->head;
-+			   __entry->skb_len = skb->len;
-+			   __entry->data_len = skb->data_len;
-+			   __entry->headroom = skb_headroom(skb);
-+			   __entry->tailroom = skb_tailroom(skb);
-+			   __entry->tail = (u32)skb->tail;
-+			   __entry->end = (u32)skb->end;
-+			   __entry->head_frag = skb->head_frag;
-+			   __entry->frag_list = (bool)skb_shinfo(skb)->frag_list;
-+			   __entry->nr_frags = skb_shinfo(skb)->nr_frags;
-+			   __entry->blkoff = blkoff;
-+			   __entry->head_pg_addr = page_address(virt_to_head_page(skb->head));
-+			   __entry->pg0addr = (__entry->nr_frags
-+					       ? page_address(netmem_to_page(skb_shinfo(skb)->frags[0].netmem))
-+					       : NULL);
-+			   __entry->pg0off = (__entry->nr_frags
-+					      ? skb_shinfo(skb)->frags[0].offset
-+					      : 0);
-+		    ),
-+	    TP_printk("EGRESS: skb=%p len=%u data_len=%u headroom=%u head_frag=%u frag_list=%u nr_frags=%u blkoff=%u\n\t\ttailroom=%u tail=%u end=%u head=%p hdpgaddr=%p pg0->addr=%p pg0->data=%p pg0->off=%u",
-+		      __entry->skb, __entry->skb_len, __entry->data_len, __entry->headroom,
-+		      __entry->head_frag, __entry->frag_list, __entry->nr_frags, __entry->blkoff,
-+		      __entry->tailroom, __entry->tail, __entry->end, __entry->head,
-+		      __entry->head_pg_addr, __entry->pg0addr, __entry->pg0addr + __entry->pg0off,
-+		      __entry->pg0off)
-+	)
-+
-+DECLARE_EVENT_CLASS(iptfs_ingress_preq_event,
-+		    TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs,
-+			     u32 pmtu, u8 was_gso),
-+		    TP_ARGS(skb, xtfs, pmtu, was_gso),
-+		    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+				     __field(u32, skb_len)
-+				     __field(u32, data_len)
-+				     __field(u32, pmtu)
-+				     __field(u32, queue_size)
-+				     __field(u32, proto_seq)
-+				     __field(u8, proto)
-+				     __field(u8, was_gso)
-+			    ),
-+		    TP_fast_assign(__entry->skb = skb;
-+				   __entry->skb_len = skb->len;
-+				   __entry->data_len = skb->data_len;
-+				   __entry->queue_size =
-+					xtfs->cfg.max_queue_size - xtfs->queue_size;
-+				   __entry->proto = __trace_ip_proto(ip_hdr(skb));
-+				   __entry->proto_seq = __trace_ip_proto_seq(ip_hdr(skb));
-+				   __entry->pmtu = pmtu;
-+				   __entry->was_gso = was_gso;
-+			    ),
-+		    TP_printk("INGRPREQ: skb=%p len=%u data_len=%u qsize=%u proto=%u proto_seq=%u pmtu=%u was_gso=%u",
-+			      __entry->skb, __entry->skb_len, __entry->data_len,
-+			      __entry->queue_size, __entry->proto, __entry->proto_seq,
-+			      __entry->pmtu, __entry->was_gso));
-+
-+DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_enqueue,
-+	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
-+	     TP_ARGS(skb, xtfs, pmtu, was_gso));
-+
-+DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_no_queue_space,
-+	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
-+	     TP_ARGS(skb, xtfs, pmtu, was_gso));
-+
-+DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_too_big,
-+	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
-+	     TP_ARGS(skb, xtfs, pmtu, was_gso));
-+
-+DECLARE_EVENT_CLASS(iptfs_ingress_postq_event,
-+		    TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff, struct iphdr *iph),
-+		    TP_ARGS(skb, mtu, blkoff, iph),
-+		    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+				     __field(u32, skb_len)
-+				     __field(u32, data_len)
-+				     __field(u32, mtu)
-+				     __field(u32, proto_seq)
-+				     __field(u16, blkoff)
-+				     __field(u8, proto)),
-+		    TP_fast_assign(__entry->skb = skb;
-+				   __entry->skb_len = skb->len;
-+				   __entry->data_len = skb->data_len;
-+				   __entry->mtu = mtu;
-+				   __entry->blkoff = blkoff;
-+				   __entry->proto = iph ? __trace_ip_proto(iph) : 0;
-+				   __entry->proto_seq = iph ? __trace_ip_proto_seq(iph) : 0;
-+			    ),
-+		    TP_printk("INGRPSTQ: skb=%p len=%u data_len=%u mtu=%u blkoff=%u proto=%u proto_seq=%u",
-+			      __entry->skb, __entry->skb_len, __entry->data_len, __entry->mtu,
-+			      __entry->blkoff, __entry->proto, __entry->proto_seq));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_dequeue,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_fragmenting,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_final_fragment,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_toobig,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+TRACE_EVENT(iptfs_ingress_nth_peek,
-+	    TP_PROTO(struct sk_buff *skb, u32 remaining),
-+	    TP_ARGS(skb, remaining),
-+	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+			     __field(u32, skb_len)
-+			     __field(u32, remaining)),
-+	    TP_fast_assign(__entry->skb = skb;
-+			   __entry->skb_len = skb->len;
-+			   __entry->remaining = remaining;
-+		    ),
-+	    TP_printk("INGRPSTQ: NTHPEEK: skb=%p len=%u remaining=%u",
-+		      __entry->skb, __entry->skb_len, __entry->remaining));
-+
-+TRACE_EVENT(iptfs_ingress_nth_add, TP_PROTO(struct sk_buff *skb, u8 share_ok),
-+	    TP_ARGS(skb, share_ok),
-+	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+			     __field(u32, skb_len)
-+			     __field(u32, data_len)
-+			     __field(u8, share_ok)
-+			     __field(u8, head_frag)
-+			     __field(u8, pp_recycle)
-+			     __field(u8, cloned)
-+			     __field(u8, shared)
-+			     __field(u8, nr_frags)
-+			     __field(u8, frag_list)
-+		    ),
-+	    TP_fast_assign(__entry->skb = skb;
-+			   __entry->skb_len = skb->len;
-+			   __entry->data_len = skb->data_len;
-+			   __entry->share_ok = share_ok;
-+			   __entry->head_frag = skb->head_frag;
-+			   __entry->pp_recycle = skb->pp_recycle;
-+			   __entry->cloned = skb_cloned(skb);
-+			   __entry->shared = skb_shared(skb);
-+			   __entry->nr_frags = skb_shinfo(skb)->nr_frags;
-+			   __entry->frag_list = (bool)skb_shinfo(skb)->frag_list;
-+		    ),
-+	    TP_printk("INGRPSTQ: NTHADD: skb=%p len=%u data_len=%u share_ok=%u head_frag=%u pp_recycle=%u cloned=%u shared=%u nr_frags=%u frag_list=%u",
-+		      __entry->skb, __entry->skb_len, __entry->data_len, __entry->share_ok,
-+		      __entry->head_frag, __entry->pp_recycle, __entry->cloned, __entry->shared,
-+		      __entry->nr_frags, __entry->frag_list));
-+
-+DECLARE_EVENT_CLASS(iptfs_timer_event,
-+		    TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
-+		    TP_ARGS(xtfs, time_val),
-+		    TP_STRUCT__entry(__field(u64, time_val)
-+				     __field(u64, set_time)),
-+		    TP_fast_assign(__entry->time_val = time_val;
-+				   __entry->set_time = xtfs->iptfs_settime;
-+			    ),
-+		    TP_printk("TIMER: set_time=%llu time_val=%llu",
-+			      __entry->set_time, __entry->time_val));
-+
-+DEFINE_EVENT(iptfs_timer_event, iptfs_timer_start,
-+	     TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
-+	     TP_ARGS(xtfs, time_val));
-+
-+DEFINE_EVENT(iptfs_timer_event, iptfs_timer_expire,
-+	     TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
-+	     TP_ARGS(xtfs, time_val));
-+
-+#endif /* _TRACE_IPTFS_H */
-+
-+/* This part must be outside protection */
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH ../../net/xfrm
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE trace_iptfs
-+#include <trace/define_trace.h>
-diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index 78abb2b9bf82..e66460d229fe 100644
---- a/net/xfrm/xfrm_iptfs.c
-+++ b/net/xfrm/xfrm_iptfs.c
-@@ -19,6 +19,7 @@
- #include <crypto/aead.h>
- 
- #include "xfrm_inout.h"
-+#include "trace_iptfs.h"
- 
- /* IPTFS encap (header) values. */
- #define IPTFS_SUBTYPE_BASIC 0
-@@ -131,6 +132,7 @@ struct skb_wseq {
-  * @ecn_queue_size: octets above with ECN mark.
-  * @init_delay_ns: nanoseconds to wait to send initial IPTFS packet.
-  * @iptfs_timer: output timer.
-+ * @iptfs_settime: time the output timer was set.
-  * @payload_mtu: max payload size.
-  * @w_seq_set: true after first seq received.
-  * @w_wantseq: waiting for this seq number as next to process (in order).
-@@ -155,6 +157,7 @@ struct xfrm_iptfs_data {
- 	u32 ecn_queue_size;	    /* octets above which ECN mark */
- 	u64 init_delay_ns;	    /* nanoseconds */
- 	struct hrtimer iptfs_timer; /* output timer */
-+	time64_t iptfs_settime;	    /* time timer was set */
- 	u32 payload_mtu;	    /* max payload size */
- 
- 	/* Tunnel input reordering */
-@@ -181,6 +184,39 @@ static enum hrtimer_restart iptfs_drop_timer(struct hrtimer *me);
- /* Utility Functions */
- /* ================= */
- 
-+static u32 __trace_ip_proto(struct iphdr *iph)
-+{
-+	if (iph->version == 4)
-+		return iph->protocol;
-+	return ((struct ipv6hdr *)iph)->nexthdr;
-+}
-+
-+static u32 __trace_ip_proto_seq(struct iphdr *iph)
-+{
-+	void *nexthdr;
-+	u32 protocol = 0;
-+
-+	if (iph->version == 4) {
-+		nexthdr = (void *)(iph + 1);
-+		protocol = iph->protocol;
-+	} else if (iph->version == 6) {
-+		nexthdr = (void *)(((struct ipv6hdr *)(iph)) + 1);
-+		protocol = ((struct ipv6hdr *)(iph))->nexthdr;
-+	}
-+	switch (protocol) {
-+	case IPPROTO_ICMP:
-+		return ntohs(((struct icmphdr *)nexthdr)->un.echo.sequence);
-+	case IPPROTO_ICMPV6:
-+		return ntohs(((struct icmp6hdr *)nexthdr)->icmp6_sequence);
-+	case IPPROTO_TCP:
-+		return ntohl(((struct tcphdr *)nexthdr)->seq);
-+	case IPPROTO_UDP:
-+		return ntohs(((struct udphdr *)nexthdr)->source);
-+	default:
-+		return 0;
-+	}
-+}
-+
- static u64 __esp_seq(struct sk_buff *skb)
- {
- 	u64 seq = ntohl(XFRM_SKB_CB(skb)->seq.input.low);
-@@ -470,6 +506,13 @@ static int iptfs_skb_add_frags(struct sk_buff *skb,
- 	return len;
- }
- 
-+/* ================================== */
-+/* IPTFS Trace Event Definitions      */
-+/* ================================== */
-+
-+#define CREATE_TRACE_POINTS
-+#include "trace_iptfs.h"
-+
- /* ================================== */
- /* IPTFS Receiving (egress) Functions */
- /* ================================== */
-@@ -965,6 +1008,8 @@ static void iptfs_input_ordered(struct xfrm_state *x, struct sk_buff *skb)
- 	}
- 	data = sizeof(*ipth);
- 
-+	trace_iptfs_egress_recv(skb, xtfs, be16_to_cpu(ipth->block_offset));
-+
- 	/* Set data past the basic header */
- 	if (ipth->subtype == IPTFS_SUBTYPE_CC) {
- 		/* Copy the rest of the CC header */
-@@ -1863,6 +1908,7 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
- 		 */
- 		if (!ok) {
- nospace:
-+			trace_iptfs_no_queue_space(skb, xtfs, pmtu, was_gso);
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTNOQSPACE);
- 			kfree_skb_reason(skb, SKB_DROP_REASON_FULL_RING);
- 			continue;
-@@ -1872,6 +1918,7 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
- 		 * enqueue.
- 		 */
- 		if (xtfs->cfg.dont_frag && iptfs_is_too_big(sk, skb, pmtu)) {
-+			trace_iptfs_too_big(skb, xtfs, pmtu, was_gso);
- 			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
- 			continue;
- 		}
-@@ -1880,12 +1927,17 @@ static int iptfs_output_collect(struct net *net, struct sock *sk,
- 		ok = iptfs_enqueue(xtfs, skb);
- 		if (!ok)
- 			goto nospace;
-+
-+		trace_iptfs_enqueue(skb, xtfs, pmtu, was_gso);
- 	}
- 
- 	/* Start a delay timer if we don't have one yet */
--	if (!hrtimer_is_queued(&xtfs->iptfs_timer))
-+	if (!hrtimer_is_queued(&xtfs->iptfs_timer)) {
- 		hrtimer_start(&xtfs->iptfs_timer, xtfs->init_delay_ns,
- 			      IPTFS_HRTIMER_MODE);
-+		xtfs->iptfs_settime = ktime_get_raw_fast_ns();
-+		trace_iptfs_timer_start(xtfs, xtfs->init_delay_ns);
-+	}
- 
- 	spin_unlock_bh(&x->lock);
- 	return 0;
-@@ -1970,6 +2022,7 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp,
- 	struct sk_buff *nskb = *skbp;
- 	u32 copy_len, offset;
- 	u32 to_copy = skb->len - mtu;
-+	u32 blkoff = 0;
- 	int err = 0;
- 
- 	INIT_LIST_HEAD(&sublist);
-@@ -1982,6 +2035,7 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp,
- 	to_copy = skb->len - offset;
- 	while (to_copy) {
- 		/* Send all but last fragment to allow agg. append */
-+		trace_iptfs_first_fragmenting(nskb, mtu, to_copy, NULL);
- 		list_add_tail(&nskb->list, &sublist);
- 
- 		/* FUTURE: if the packet has an odd/non-aligning length we could
-@@ -2000,11 +2054,14 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp,
- 		iptfs_output_prepare_skb(nskb, to_copy);
- 		offset += copy_len;
- 		to_copy -= copy_len;
-+		blkoff = to_copy;
- 	}
- 	skb_abort_seq_read(&skbseq);
- 
- 	/* return last fragment that will be unsent (or NULL) */
- 	*skbp = nskb;
-+	if (nskb)
-+		trace_iptfs_first_final_fragment(nskb, mtu, blkoff, NULL);
- 
- 	/* trim the original skb to MTU */
- 	if (!err)
-@@ -2081,6 +2138,8 @@ static int iptfs_first_skb(struct sk_buff **skbp, struct xfrm_iptfs_data *xtfs,
- 	/* We've split these up before queuing */
- 	WARN_ON_ONCE(skb_is_gso(skb));
- 
-+	trace_iptfs_first_dequeue(skb, mtu, 0, ip_hdr(skb));
-+
- 	/* Consider the buffer Tx'd and no longer owned */
- 	skb_orphan(skb);
- 
-@@ -2180,6 +2239,7 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 			 */
- 			XFRM_INC_STATS(xs_net(x), LINUX_MIB_XFRMOUTERROR);
- 
-+			trace_iptfs_first_toobig(skb, mtu, 0, ip_hdr(skb));
- 			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
- 			continue;
- 		}
-@@ -2227,6 +2287,7 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 		 * case.
- 		 */
- 		while ((skb2 = skb_peek(list))) {
-+			trace_iptfs_ingress_nth_peek(skb2, remaining);
- 			if (skb2->len > remaining)
- 				break;
- 
-@@ -2265,6 +2326,8 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 			skb->len += skb2->len;
- 			remaining -= skb2->len;
- 
-+			trace_iptfs_ingress_nth_add(skb2, share_ok);
-+
- 			if (share_ok) {
- 				iptfs_consume_frags(skb, skb2);
- 			} else {
-@@ -2288,6 +2351,7 @@ static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me)
- 	struct sk_buff_head list;
- 	struct xfrm_iptfs_data *xtfs;
- 	struct xfrm_state *x;
-+	time64_t settime;
- 
- 	xtfs = container_of(me, typeof(*xtfs), iptfs_timer);
- 	x = xtfs->x;
-@@ -2304,6 +2368,7 @@ static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me)
- 	__skb_queue_head_init(&list);
- 	skb_queue_splice_init(&xtfs->queue, &list);
- 	xtfs->queue_size = 0;
-+	settime = xtfs->iptfs_settime;
- 	spin_unlock(&x->lock);
- 
- 	/* After the above unlock, packets can begin queuing again, and the
-@@ -2312,6 +2377,9 @@ static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me)
- 	 * already).
- 	 */
- 
-+	trace_iptfs_timer_expire(
-+		xtfs, (unsigned long long)(ktime_get_raw_fast_ns() - settime));
-+
- 	iptfs_output_queued(x, &list);
- 
- 	return HRTIMER_NORESTART;
--- 
-2.46.0
+> I think It's more of a design consideration instead of a bugfix
+> actually. So it is not solving a bug which makes the apps wrong but
+> gives users a hint that we can explicitly and accurately do what we
+> want and we expect.
+> =
+
+> Let's assume: if we remove all the report flags design, what will
+> happen? It can work of course. I don't believe that people choose to
+> enable the generation flag but are not willing to report it. Of
+> course, It's another thing. I'm just saying.
+
+Let's not debate the existing API. Its design predates both of our
+contributions.
+
+> I wonder if it makes sense to you :) ?
+
+I don't see a strong use case. I know we're on v5 while I reopen that
+point, sorry.
+
+It seems simpler to me to not read spurious fields that are not
+requested, rather than to explicitly request them to be set to zero.
+
+Adding more flags is not free. An extra option adds mental load for
+casual users of this alread complex API. This may certainly sound
+hypocritical coming from me, as I added my fair share. But I hope
+their functionality outweighs that cost (well.. in at least one case
+it was an ugly fix for a bad first attempt.. OPT_ID). =
+
+
+I got to this point trying to condense the proposed documentation.
+We can add this if you feel strongly.
+
+But then my main feedback is that the doc has to be shorter and to
+the point. Why would a user user this? No background on how we got
+here, what they might already do accidentally.
+> >
+> > Otherwise implementation looks fine, only the tiniest nit.
+> >
+> > > @@ -946,11 +946,17 @@ void __sock_recv_timestamp(struct msghdr *msg=
+, struct sock *sk,
+> > >
+> > >       memset(&tss, 0, sizeof(tss));
+> > >       tsflags =3D READ_ONCE(sk->sk_tsflags);
+> > > -     if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+> > > +     if ((tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+> > > +          (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+> > > +          skb_is_err_queue(skb) ||
+> > > +          !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))) &&
+> >
+> > Nit: these statements should all align on the inner brace, so indent
+> > by one character.
+> =
+
+> I'm not that sure about the format, please help me to review here:
+> =
+
+> @@ -946,11 +946,17 @@ void __sock_recv_timestamp(struct msghdr *msg,
+> struct sock *sk,
+> =
+
+>         memset(&tss, 0, sizeof(tss));
+>         tsflags =3D READ_ONCE(sk->sk_tsflags);
+> -       if ((tsflags & SOF_TIMESTAMPING_SOFTWARE) &&
+> +       if ((tsflags & SOF_TIMESTAMPING_SOFTWARE &&
+> +            (tsflags & SOF_TIMESTAMPING_RX_SOFTWARE ||
+> +             skb_is_err_queue(skb) ||
+> +             !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))) &&
+>             ktime_to_timespec64_cond(skb->tstamp, tss.ts + 0))
+>                 empty =3D 0;
+>         if (shhwtstamps &&
+> -           (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) &&
+> +           (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE &&
+> +            (tsflags & SOF_TIMESTAMPING_RX_HARDWARE ||
+> +             skb_is_err_queue(skb) ||
+> +             !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))) &&
+>             !skb_is_swtx_tstamp(skb, false_tstamp)) {
+>                 if_index =3D 0;
+>                 if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NETDEV)=
+
+
+
+That's right
+
+  (A &&
+   (B ||
+    C))
+
+> >
+> > >           ktime_to_timespec64_cond(skb->tstamp, tss.ts + 0))
+> > >               empty =3D 0;
+> > >       if (shhwtstamps &&
+> > > -         (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE) &&
+> > > +         (tsflags & SOF_TIMESTAMPING_RAW_HARDWARE &&
+> > > +         (tsflags & SOF_TIMESTAMPING_RX_HARDWARE ||
+> =
+
+> same here and the following two statements? Should I also indent by
+> one char by the way?
+
+Same rule on all new code introduced in the patch.
+
+> > > +         skb_is_err_queue(skb) ||
+> > > +         !(tsflags & SOF_TIMESTAMPING_OPT_RX_FILTER))) &&
+> > >           !skb_is_swtx_tstamp(skb, false_tstamp)) {
+> > >               if_index =3D 0;
+> > >               if (skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP_NETDE=
+V)
+> > > --
+> > > 2.37.3
+> > >
+> >
+> >
+
 
 
