@@ -1,170 +1,107 @@
-Return-Path: <netdev+bounces-126231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A36D970282
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 15:48:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08E4D970288
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 15:52:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF00F283244
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 13:48:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67BC8283B4C
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 13:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A31115DBB6;
-	Sat,  7 Sep 2024 13:48:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F3415C14C;
+	Sat,  7 Sep 2024 13:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qt9F/x2y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bRshFzzi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CAC15D5C1;
-	Sat,  7 Sep 2024 13:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A35615C13C;
+	Sat,  7 Sep 2024 13:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725716924; cv=none; b=ZATqO722pvCikazB/6vuFZHmJy5hWPkVDohOwyfHlZ5JQKysUuB1Q64eMlbwv3YBWMe0X5BkFBMfN1GQK7On/71Hnt3jWBNAKtjHuGmOaUgHGRXKOjBY/1xM9mS6UIifWkwtgkDcghmPMKpWIPNZxMyEPnlg0nVfqBrRP/Jg4dY=
+	t=1725717128; cv=none; b=dWanJJJgOVmYtTcq2PAP/6gcsWx4suM5q/nPBUU2WU5DWTu1036MZv5dr2AIc7psSmzqAfdpfZu5k1ScYhIV1LIp3UuYf05UhfzWP3MZY3G1SSdPOZmSjppsWDmmEt31XCp7shBAf+oMC3Dirpq6V2NNitHEpM6dY11P1uKZDvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725716924; c=relaxed/simple;
-	bh=ey36fMdqyJSr9o7fg2f9nSLEmsq1vX3YG6kQS2WaUxc=;
+	s=arc-20240116; t=1725717128; c=relaxed/simple;
+	bh=MYrO/3eKljHyoKJjSw8BBububPsJc6vLPebzXA5ILLM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ryzz6B5gVL/XwH2ZPYmYb9vSLxOYcJLH+nVog8swZ2ZfGplzAx+fxTjG34wCNqxkTQAZLmMlnj+4KprTWmC5JR2CRaIl5Al48NOpM83j76IcQb3XIrCgCnGlDp4jyxOWfGDL+D4IoPI/Dse6WmkyLIhRwFRTqX3uz71tTKfbdVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qt9F/x2y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B6B0C4CEC6;
-	Sat,  7 Sep 2024 13:48:39 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=FfqT7rxb6xnsLZBYDVgyatDk/etsZHpegKy186HWYn/SRMJDq+iIMSyBB/k8iyZPZw8c6D5HcuXdkkuXNNBr1x1saU1RfCgyT8U4ACdxCktFNDi/j5dicz+dtRcg5mEAAU4k8UkkOHQh3aRiHiQnCAALTSg6QAPaYa6usF3T0so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bRshFzzi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9089AC4CEC2;
+	Sat,  7 Sep 2024 13:52:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725716923;
-	bh=ey36fMdqyJSr9o7fg2f9nSLEmsq1vX3YG6kQS2WaUxc=;
+	s=k20201202; t=1725717128;
+	bh=MYrO/3eKljHyoKJjSw8BBububPsJc6vLPebzXA5ILLM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Qt9F/x2yxCuHhMdqd2Yav13ruQezrjVb5lPNAuX8j07N8A5gPbjA0nLlW3eGfWdan
-	 umTmnZ1xo94apLseKzyfGyAYS4AP5MC3bEBduXKn2JPxv5q7nWBjZC85PFNl6kQZPT
-	 Xa8OCCB4aBJrgMvyBsuhm/Kg7B5ZHm2D5EiaW00bMwVfT8vpY2cgt/rczsbrneP3FU
-	 dtG356bj9zGn3jGdeoBgupgR5czALPm9d24edUQdEZ2atn5uIl+WeAf0rsZtE7mVmN
-	 IrDNe0L5bg2dbS5R6jnEmbgvIFrDnw4EGwRSpPm5dty6TvLKzEJZYrYxd6WZsuJ13p
-	 7DoSpd5LvKOSw==
-Date: Sat, 7 Sep 2024 14:48:37 +0100
+	b=bRshFzzihKz7KcoG149wshja98LfJ2ZGlpiI96+3s2DvdHyw6EeJiCLWqjhfJo8oq
+	 wjtkprMaMTouRtQTTTIMBSH3qnJeSK+PnANQat9T3C0FKPuAmLfX0snkJ+OcWwDYJa
+	 dxuV3baL39uwwsocxhbDXzN4z87U+h2KF6U8vCddICIx8CbZrzsT5Y9vC7mU5N+EeJ
+	 uYYeQZe4oMj1N976JWokknF7Rm0ilKPneEjWo8Y/4js0rqutlpFgHDPZ/Z11QnvTKr
+	 fpNgN43LC/H6Hn0hSDUxLX/IoSSCbev6FmrEnqXXlqwfVXJ4/Rv0nkUqJCfzr+fiy3
+	 RvVXgZSjMHN2Q==
+Date: Sat, 7 Sep 2024 14:52:03 +0100
 From: Simon Horman <horms@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: Gui-Dong Han <hanguidong02@outlook.com>, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Subject: Re: [PATCH net v1 1/1] netfilter: nf_reject: Fix build error when
- CONFIG_BRIDGE_NETFILTER=n
-Message-ID: <20240907134837.GP2097826@kernel.org>
-References: <20240906145513.567781-1-andriy.shevchenko@linux.intel.com>
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, stable@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	Jia-Ju Bai <baijiaju1990@gmail.com>
+Subject: Re: [PATCH v2] ice: Fix improper handling of refcount in
+ ice_sriov_set_msix_vec_count()
+Message-ID: <20240907135203.GQ2097826@kernel.org>
+References: <SY8P300MB0460D0263B2105307C444520C0932@SY8P300MB0460.AUSP300.PROD.OUTLOOK.COM>
+ <99a2d643-9004-41c8-8585-6c5c86fab599@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240906145513.567781-1-andriy.shevchenko@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <99a2d643-9004-41c8-8585-6c5c86fab599@web.de>
 
-On Fri, Sep 06, 2024 at 05:55:13PM +0300, Andy Shevchenko wrote:
-> In some cases (CONFIG_BRIDGE_NETFILTER=n) the pointer to IP header
-> is set but not used, it prevents kernel builds with clang, `make W=1`
-> and CONFIG_WERROR=y:
+On Sat, Sep 07, 2024 at 02:40:10PM +0200, Markus Elfring wrote:
+> …
+> > +++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
+> > @@ -1096,8 +1096,10 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
+> >  		return -ENOENT;
+> >
+> >  	vsi = ice_get_vf_vsi(vf);
+> > -	if (!vsi)
+> > +	if (!vsi) {
+> > +		ice_put_vf(vf);
+> >  		return -ENOENT;
+> > +	}
+> >
+> >  	prev_msix = vf->num_msix;
+> >  	prev_queues = vf->num_vf_qs;
+> > @@ -1142,8 +1144,10 @@ int ice_sriov_set_msix_vec_count(struct pci_dev *vf_dev, int msix_vec_count)
+> >  	vf->num_msix = prev_msix;
+> >  	vf->num_vf_qs = prev_queues;
+> >  	vf->first_vector_idx = ice_sriov_get_irqs(pf, vf->num_msix);
+> > -	if (vf->first_vector_idx < 0)
+> > +	if (vf->first_vector_idx < 0) {
+> > +		ice_put_vf(vf);
+> >  		return -EINVAL;
+> > +	}
+> >
+> >  	if (needs_rebuild) {
+> >  		ice_vf_reconfig_vsi(vf);
 > 
-> ipv6: split nf_send_reset6() in smaller functions
-> netfilter: nf_reject_ipv4: split nf_send_reset() in smaller functions
-> 
-> net/ipv4/netfilter/nf_reject_ipv4.c:243:16: error: variable 'niph' set but not used [-Werror,-Wunused-but-set-variable]
->   243 |         struct iphdr *niph;
->       |                       ^
-> net/ipv6/netfilter/nf_reject_ipv6.c:286:18: error: variable 'ip6h' set but not used [-Werror,-Wunused-but-set-variable]
->   286 |         struct ipv6hdr *ip6h;
->       |                         ^
-> 
-> Fix these by marking respective variables with __maybe_unused as it
-> seems more complicated to address that in a better way due to ifdeffery.
-> 
-> Fixes: 8bfcdf6671b1 ("netfilter: nf_reject_ipv6: split nf_send_reset6() in smaller functions")
-> Fixes: 052b9498eea5 ("netfilter: nf_reject_ipv4: split nf_send_reset() in smaller functions")
+> Would you like to collaborate with any goto chains according to
+> the desired completion of exception handling?
 
-Hi Andy,
-
-As mentioned in relation to another similar patch,
-I'm not sure that resolution of W=1 warnings are fixes.
-
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  net/ipv4/netfilter/nf_reject_ipv4.c | 2 +-
->  net/ipv6/netfilter/nf_reject_ipv6.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-
-> 
-> diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
-> index 04504b2b51df..0af42494ac66 100644
-> --- a/net/ipv4/netfilter/nf_reject_ipv4.c
-> +++ b/net/ipv4/netfilter/nf_reject_ipv4.c
-> @@ -240,7 +240,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
->  		   int hook)
->  {
->  	struct sk_buff *nskb;
-> -	struct iphdr *niph;
-> +	struct iphdr *niph __maybe_unused;
->  	const struct tcphdr *oth;
->  	struct tcphdr _oth;
->  
-
-Possibly it is broken for some reason - like reading nskb too late -
-but I wonder if rather than annotating niph it's scope can be reduced
-to the code that is only compiled if CONFIG_BRIDGE_NETFILTER is enabled.
-
-This also addreses what appears to be an assingment of niph without
-the value being used - the first assingment.
-
-E.g., for the ipv4 case (compile tested only!):
-
-diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
-index 04504b2b51df..87fd945a0d27 100644
---- a/net/ipv4/netfilter/nf_reject_ipv4.c
-+++ b/net/ipv4/netfilter/nf_reject_ipv4.c
-@@ -239,9 +239,8 @@ static int nf_reject_fill_skb_dst(struct sk_buff *skb_in)
- void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 		   int hook)
- {
--	struct sk_buff *nskb;
--	struct iphdr *niph;
- 	const struct tcphdr *oth;
-+	struct sk_buff *nskb;
- 	struct tcphdr _oth;
- 
- 	oth = nf_reject_ip_tcphdr_get(oldskb, &_oth, hook);
-@@ -266,14 +265,12 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	nskb->mark = IP4_REPLY_MARK(net, oldskb->mark);
- 
- 	skb_reserve(nskb, LL_MAX_HEADER);
--	niph = nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
--				   ip4_dst_hoplimit(skb_dst(nskb)));
-+	nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
-+			    ip4_dst_hoplimit(skb_dst(nskb)));
- 	nf_reject_ip_tcphdr_put(nskb, oldskb, oth);
- 	if (ip_route_me_harder(net, sk, nskb, RTN_UNSPEC))
- 		goto free_nskb;
- 
--	niph = ip_hdr(nskb);
--
- 	/* "Never happens" */
- 	if (nskb->len > dst_mtu(skb_dst(nskb)))
- 		goto free_nskb;
-@@ -290,6 +287,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	 */
- 	if (nf_bridge_info_exists(oldskb)) {
- 		struct ethhdr *oeth = eth_hdr(oldskb);
-+		struct iphdr *niph = ip_hdr(nskb);
- 		struct net_device *br_indev;
- 
- 		br_indev = nf_bridge_get_physindev(oldskb, net);
+Yes, I agree that might be nice. But the changes made by this patch are
+consistent with the exiting error handling in this function. And as a fix,
+this minimal approach seems appropriate to me. IOW, I believe clean-up
+should be separated from fixes in this case.
 
