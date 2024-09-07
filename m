@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-126217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255E99700D1
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 10:20:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73DA89700D3
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 10:20:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DB7B1F226D8
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 08:20:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C46C2841C4
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 08:20:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5282114D6E4;
-	Sat,  7 Sep 2024 08:19:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC0D14B96B;
+	Sat,  7 Sep 2024 08:19:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="sKSTkFmZ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="1Br27qmS"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2054.outbound.protection.outlook.com [40.107.220.54])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2065.outbound.protection.outlook.com [40.107.236.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE1814A605;
-	Sat,  7 Sep 2024 08:19:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B61111586C7;
+	Sat,  7 Sep 2024 08:19:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.65
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725697184; cv=fail; b=qmB/tELY9dn6BUWQwO9yKTv6QTUiVy6xLjA838H3V4KO6Pt1xiuUkF1lXUQ1fPaJeBwVPVPe8knEUkGdpD6K8i2Wako2kk+tWUxk/JHFm0z2fk1HtUL9I/3sDvWm2EFlgnMYc34XYbUEd2N+YK1CTLKIW2STAWjkS2p5U2kp1ec=
+	t=1725697188; cv=fail; b=kk9zr1Q6+AaTvFH6Ce3aM1PVGUX57yAVwtDcixkpQmP3TDfgIizxqEDf2Hexwa8Upy8oHQ3SsIwrQs3toG5xbfmTtjqWAYH4yDDYOYkIln0MGfmcark+I1RlZiNGLnbomlKj7pW1hTfJsDJlWdQfNYH68mQBZ71i2C4rhwZYeig=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725697184; c=relaxed/simple;
-	bh=fVN0fQTkBsu4Jovn/xn+BUwKJK5Hkdguvrz0FZno4NA=;
+	s=arc-20240116; t=1725697188; c=relaxed/simple;
+	bh=Ejm9PQ0n7YzoouzOj7j/GQBQJ1EcEZS9jgksBJj4MYc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u/K7WSG3bJy6/KW5Xrb7hvZvLygLmDPumIwu/uQlfJxqVpq5gxHrUuXkFU3uo3wH43VmuwIkODIkWlqNF/12dwaZy6WNlRocsA0XfNX4prc4+CcgRCJdGtIxA4nKx6Nme/h/3XIDyKtus6gWjM2u9uCPXYCX563JOXDCJ/pkkE4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=sKSTkFmZ; arc=fail smtp.client-ip=40.107.220.54
+	 MIME-Version:Content-Type; b=cfUBpdhfRuECcjnqOY8Hw4yANdGJIJHgR+eyAIm4ZOPEG1ElNdZHEPoGsTcOc4njU6NSlDxgeh5aRWZ8TVmvTU+x+WVWy7lBG30Og49BRJ6HzBGN1OmVEcl6CNYynWQyRqdbgQw3Hmb0u/UrEVFYD2ycQpuMVZNedEjPN2JzD7o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=1Br27qmS; arc=fail smtp.client-ip=40.107.236.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bh7CSzblKq+sI+dxAjktHkOoaNOB38wSaQ+hYARGOgiFOXW2OR32cYUWot7hyFTj3C1pkbz4aJLg0AhOtLxLp9Pmg2vFyp+3Whm+o/PJySUcfEgI/zbVkO1tB9l4QdFBkCvkoPB13kUr8bsjuYzdLgOzXc88wjQ4yOJFGx1yZMJpC1lYkSQPHLTuqgkM3NyxM/kmMwdPfdqJUKkemEbKNdGLzOjThajL+i1jlEV1wzFNA+BUQnQS3TFCMRfpMqrvmZhfh7qOs4SSwV+jwCHtnSUuLa3HvDKNlfLCTQUm+jZVdA2/zMv4TPMNGLaesmySjOUIA6NGiWkJuqTht74f6g==
+ b=JtCZWPASOnQoxWGz0/pmRAO6EpEy9I1IiRM5VTBOXt4muBi8RMYKV+twnMXWfGq0miXZ2KOKzuAh2MmLyR5cTKNtlXLik7vUc3vMgj7to7qyOI4PuQggVhhPlww6nqyFU2uk99RfsZL1wpmOffGohtoEzAhSB/A33rpLhwhlfEjJV9FJca8hQj8U3ZmqlvQlXyfBUCjxMY9rSjp6lXZjmtXzbknWbbnmAxu23J5/ppG1TQF7OZJ1r7qJMpHJyFVIDRsPV/1322y/1jOyQ4abiQMHtr18ioAO2FNKtjWgtpGDE9Po9Nv36ATrkS+AIYB7u8j1ut9oAfgsSrCuktAS+g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=y2HXGPedV7Cu3m6/JEOlxvXT70qSaWc2eyE9bfvH+Jc=;
- b=YVhxNCDDE+25O7JppK6AOg37YfT9tfOL5SFe1+NfL/FR7zibTWiV2CmwQyqGJU06SJddEpRQ9b3QXrTAsQrKEGTofPavTT43aPbFqHlz5vpky3Q5fY+/CQMcEq0YfeyFT5aFNMwXOE5ucCjmZHO0L+wn1IHoTvFPUh4aEqdTz8QLVMDjf0MMurkmPkEDMsQejwWkFeKnfwyynzTX2IFNMOGn8SDQcrO3CaP6IGgSUKpgEOk+KbXoNBa713JBqlSqp5k9GDKUEhomVbE4SeqHWLEz3v47gK+rOwPARIdJrZ7odbtOyepiqd87OB3d2bRY3U+9MRWHZDAVRGWU5DhFng==
+ bh=o0wcPiin7P3XCLhVL9i7ZYhk6urUVeP1QUBpBE5NR6U=;
+ b=rHiZCAEMWvwdxjsS6Q3vlZ3utpmAUCXhFDVlNaRjyEThnrtOabwE3EVzmA0HsU4nkSnEArGtBHOt3nD6jg9zVqetF3cTxoPfgHk/okF+8+9C34K2Fj1PLcuaiG4fupgRQjR3uMxvdSpGjCwnAP3Rcl/D9SWBphOYm0VIJkwnwnP7eMMD1OmztXnrPvylKxA5dr9MdCc+uw84YihFafSkCxf2CZsWyJ+Dvbe/VqdQZeRQd45d/2GqovrfwgURdzLVVRhwHc9pLxKJYs/WFgOuFMyGJ334Zk47N3Doi3dGrdH2Ky2jHVkkKzVYNd7DIFq4wnjKwVtjMmzoBUR+3epu4A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=y2HXGPedV7Cu3m6/JEOlxvXT70qSaWc2eyE9bfvH+Jc=;
- b=sKSTkFmZk8+f4OdcunLINiEWi4t+etPNBDO3YrnOWWchrjybmnNBXFjb+9QKXPzEmDAurusNGc9l88s2OjG2nqyft9QQ4ZRD3weDVfIEy2hIYRLSlon745VhjmXO++FOwYoebNYfZwZGoFscunDgew0bcXkEleWXhj6AF3IYNwo=
-Received: from DS7PR03CA0122.namprd03.prod.outlook.com (2603:10b6:5:3b4::7) by
- PH0PR12MB7486.namprd12.prod.outlook.com (2603:10b6:510:1e9::6) with Microsoft
+ bh=o0wcPiin7P3XCLhVL9i7ZYhk6urUVeP1QUBpBE5NR6U=;
+ b=1Br27qmS7EAk5AVqkrKhE4Bxj7fo8hWQnR2dD+FkF4LHb/UOuGbCUd1czJVCgoB0pzWBl9Xk8kOxmBxc1vmaUCmHrGYH7NpQM0EvrWhlQ0e2GkM1yZsxPm33BKG51q096aQlhrGsf4eaY60RAdpXeMyvhERLFgGh9A+enGosS0o=
+Received: from BYAPR01CA0024.prod.exchangelabs.com (2603:10b6:a02:80::37) by
+ CY5PR12MB9055.namprd12.prod.outlook.com (2603:10b6:930:35::13) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.28; Sat, 7 Sep 2024 08:19:38 +0000
-Received: from DS1PEPF00017099.namprd05.prod.outlook.com
- (2603:10b6:5:3b4:cafe::39) by DS7PR03CA0122.outlook.office365.com
- (2603:10b6:5:3b4::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.19 via Frontend
- Transport; Sat, 7 Sep 2024 08:19:38 +0000
+ 15.20.7918.28; Sat, 7 Sep 2024 08:19:41 +0000
+Received: from MWH0EPF000989EC.namprd02.prod.outlook.com
+ (2603:10b6:a02:80:cafe::98) by BYAPR01CA0024.outlook.office365.com
+ (2603:10b6:a02:80::37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.27 via Frontend
+ Transport; Sat, 7 Sep 2024 08:19:40 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- DS1PEPF00017099.mail.protection.outlook.com (10.167.18.103) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000989EC.mail.protection.outlook.com (10.167.241.139) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Sat, 7 Sep 2024 08:19:38 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.7918.13 via Frontend Transport; Sat, 7 Sep 2024 08:19:40 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sat, 7 Sep
- 2024 03:19:37 -0500
+ 2024 03:19:39 -0500
 Received: from SATLEXMB03.amd.com (10.181.40.144) by SATLEXMB06.amd.com
  (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sat, 7 Sep
- 2024 03:19:37 -0500
+ 2024 03:19:39 -0500
 Received: from xcbalucerop41x.xilinx.com (10.180.168.240) by
  SATLEXMB03.amd.com (10.181.40.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Sat, 7 Sep 2024 03:19:36 -0500
+ 15.1.2507.39 via Frontend Transport; Sat, 7 Sep 2024 03:19:38 -0500
 From: <alejandro.lucero-palau@amd.com>
 To: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
 	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
 	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<pabeni@redhat.com>, <edumazet@google.com>
 CC: Alejandro Lucero <alucerop@amd.com>
-Subject: [PATCH v3 10/20] cxl: indicate probe deferral
-Date: Sat, 7 Sep 2024 09:18:26 +0100
-Message-ID: <20240907081836.5801-11-alejandro.lucero-palau@amd.com>
+Subject: [PATCH v3 11/20] cxl: define a driver interface for HPA free space enumaration
+Date: Sat, 7 Sep 2024 09:18:27 +0100
+Message-ID: <20240907081836.5801-12-alejandro.lucero-palau@amd.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20240907081836.5801-1-alejandro.lucero-palau@amd.com>
 References: <20240907081836.5801-1-alejandro.lucero-palau@amd.com>
@@ -98,212 +98,278 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF00017099:EE_|PH0PR12MB7486:EE_
-X-MS-Office365-Filtering-Correlation-Id: 352ee910-a6ed-4a7e-1d39-08dccf15d0d8
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989EC:EE_|CY5PR12MB9055:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4678b9ea-fcf8-4635-bebd-08dccf15d23e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+	BCL:0;ARA:13230040|376014|36860700013|1800799024|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?y/TSLmHNHkWvc5qyM60GoZMK5KLA+QeqqeuC9rpo3gRn7NWvfG48EKYB9jjd?=
- =?us-ascii?Q?VqS+KHsOJkfX9ITgQ6T6gMoFjvJSicV29lQkIouFuu8+cGyHCTNFmF9YONwQ?=
- =?us-ascii?Q?Wzk07/XT4yHw8SzWDZaW7OdBlZxtO69PXlIHyt6/1gZ26/NnUtEqGj+djTT4?=
- =?us-ascii?Q?Bh6VuN9W6ze8WLFCkFEzxoEx60psnUogFidhbNS20NpvWFdOS9M7vadPQVjG?=
- =?us-ascii?Q?Z2MWfXTuns7yHd9IhDnQZwkL3f6XrD0tfclqYv7QVyEuT2SxdS1P0d/n1Y8M?=
- =?us-ascii?Q?bLTlyzWsPvRCGXXPjcdlqhcGTISl4l41BHkWuSV5bxbDq6ZLrmeDiSdo/cVo?=
- =?us-ascii?Q?aESf6j4lZstNbvfOFE+jzPfX0E85m6p6+Dow3LHqrhTWQM/eeszEZ72K5RDD?=
- =?us-ascii?Q?716G3WANqK5iSKrWxqq0FqTMakgJHTr09BN+So1erHrDFG3evwwC5avJxwKp?=
- =?us-ascii?Q?Ht/HtW+1pqaXGLexGYVTmij63U84EecuPA4YYhw4lvripVAVgGzfwBWqHa8/?=
- =?us-ascii?Q?ff7l+TmCR+OoIKSuWlS9hDTt9p2sK2CPd+2korks1Y89OLrgrOYI4UNnjfcY?=
- =?us-ascii?Q?RgGWHTCCb0lMVkNrluDb6wDVlZ4vNn2STVZQTZGwmfS4ZNd7Ml7aJlL2Fa4K?=
- =?us-ascii?Q?760JQLcNC0pipin1WEGcpRimytkqGPJLUOg3B6k4QFE5S4dOOMlNDN85V+/2?=
- =?us-ascii?Q?xU2N9qInpLS5K82egnjaRgvh6xbcBxTaMF7RgUMrvOmWPG0BUgrEjisf2Rqi?=
- =?us-ascii?Q?CVjGFmmbz+fRdDYCZ+zqqDCktrm2e90AU1vhxkkbtbB9N8mRXfG1/aQsSanF?=
- =?us-ascii?Q?0CxDzg5XaYRLEuWNSV6u2PGz6VRVDe0nc1TjkBxm/0QZ8pamDzkSWnBtOGee?=
- =?us-ascii?Q?btTKxCCyXc/bwPqNh3yiSuu+TryUpkoUjavSLj4VIH0kj4QX0QU+01O8Okri?=
- =?us-ascii?Q?QhJ1G8dnB53GoT5WwxnfxiT9LkgwJsgs4tkJC0QBdonT6j0rRixY79LXTkO4?=
- =?us-ascii?Q?DcFxGyUdTHiEh5ugkATfnM7bgZM7/c7Xv0X/LQiveahZbZIZs4Q97Fw+/Gp5?=
- =?us-ascii?Q?QwLwA3xHggR0J2cMxNxAU6MB1SPgPX/ZB62lnCQnfFDgPI1pUCgD0mZ1VGZo?=
- =?us-ascii?Q?G76oSQt5TIiPrHPup8McjTsXvmCg+bMeI9ag3qMCwB2mSpjJOhpS59QL6gmi?=
- =?us-ascii?Q?xkXr3E2DJ5PpFAsZdy2lwxZ44xThYJBab1iNxJTPLUc+1mp5gyEsqRM6FIFC?=
- =?us-ascii?Q?N9/LSnvS2Qey2X5GHkHzcm3uhpKfGaNDUCm07nndA7p2Qm6yPyCa46oAg17d?=
- =?us-ascii?Q?zw2sIvVeG91/puqqycZTefYGDiQ6SlnckEHppGrTxAAvJAPysgvFphtwKjm1?=
- =?us-ascii?Q?UXPM/C2nhKnpauplN63vNqU1BRuaQy2t5aMJdXlOmKz1MzN6/euWkENkjE67?=
- =?us-ascii?Q?8nATZXSSGiPCGa5fIHHjPnKTInIerjg0?=
+	=?us-ascii?Q?1A14LeCMWezqx44hlq/BvGwCc486tiDx2+g9vjmhJpwv7+IoimJNKMlsgDGi?=
+ =?us-ascii?Q?AUx29wHX25HxqrNiYtx2YqaCTNpHUo2Zi6LkgS8o0nQ3KAVKIX2tXNnhN0Ul?=
+ =?us-ascii?Q?P1JMWXqEtUxPMqjeiTW8v3epJs8ezJE64Z+Mb8nOAKkxF2tNSPSw/VZ2W0Af?=
+ =?us-ascii?Q?eSBOJDNLetiycILSA9H5M78vwGUHs/ZpZIANQ9WH0E2Xxmv76NJO2zPARPhB?=
+ =?us-ascii?Q?3h4QB1SZPUK0UsN0I1ssTxK5EjsjIr1FEQaNJafeZmurNO3pA6voRgnxzSaQ?=
+ =?us-ascii?Q?8Bpl3EKldEzvoO9lvhevGN3y7vsW2QLIxht7+lbINE7Z2th6p7pi9irupO8s?=
+ =?us-ascii?Q?/LK/9Kp+dHvijXSaeyznCirJgZi13n11XArUwFYWNZOvdLGBP2KbI+7vwgfj?=
+ =?us-ascii?Q?SKZDH+EdKSKVVcJRDGXAlyM3r7oGnviLBdAX4FutK9uPudcqBxv1Fq8lUJqo?=
+ =?us-ascii?Q?y3Bo9IkM0zzk6HTHMDsbGYdX+kEuDeBgvlAVHykIpjjvxUZrBTQaLLwG6f2/?=
+ =?us-ascii?Q?jVA3CGowUc4Z2I7+s41Bcqv/FCoUESY9W/LKM5O9/oMtn7PtUEGiLLHd3z/r?=
+ =?us-ascii?Q?eDteLVcCY8GsGYSq1jsOa+fhvnZkaNMx/7mpZgsMh1vcykKX1pNetA6WiC7V?=
+ =?us-ascii?Q?5bgTjbY56iOh+SkTYH+aFu2wRgQBjPzIw02M/CPwpxSPL5r86+j65QLpw81s?=
+ =?us-ascii?Q?JOZB2kxZQA621tk1Mr4zNakwFbCsxnWiHYTf0f+ArIz67RTsnn2F0+GhpSbM?=
+ =?us-ascii?Q?1q92XZYd9MuEf+RQgeuuHS/d6sLclpIARoO/stfIzOVMXWH/Y9jts8tsXT6H?=
+ =?us-ascii?Q?+ygv7+01e9GdaZ7bRfdsZ/fgN66apkxQ5zH7nCkDwUykJe8rwR46Jv1oWKHb?=
+ =?us-ascii?Q?OXG+sCS3ZlVwb+M+XZwZfjlHz9JK1NPRbIhoHneTm+kDjhkW3dnASRWAaF1z?=
+ =?us-ascii?Q?RDPOfF29Dl1/OLlnLNICyxVveLEok2F+CTwY0h99X8awYgONOJcOZkvuKWV3?=
+ =?us-ascii?Q?fQK57u7WUE0KQXBPlwN1v2/Opvh0cSq/2knWAOA6jyVjU0va+hV4Ttsxfque?=
+ =?us-ascii?Q?yXQKm86lZiB561PPKKjLgYhC1/ppZbnkAc8CRI8QOHYKYYh51Qgk86OEFKTx?=
+ =?us-ascii?Q?gF/MAJJdwFVcxglKhUZDTfCzykeZq+fVJ5rx9fKXoQSdsEFj7AzKXyxK/DX6?=
+ =?us-ascii?Q?DDwzNeqtR9Siv2td1dHQHmIgKNGMKtJax+Wu5tZw/MOP41nyRwY4KiFoJTNZ?=
+ =?us-ascii?Q?Sdof2+ayo7Ugt7QdR+CE1WtU407RClyV8xHctTef8KtA/M1xExsLqglYVo4z?=
+ =?us-ascii?Q?WcTlcy7Rw5zkZLjAwp2QatUXhcBdBjkhQlImowkDO0XFVFrg23MdBKA/26jW?=
+ =?us-ascii?Q?E1KJQOfOAuq8+uhFTE7lcDQ2tBsyKpCIkIQX+OSaF0sMHUZjiGBzw9g0rdMN?=
+ =?us-ascii?Q?R51oOfE691+64c6pOlWsgvp2EIOo9iB7?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(1800799024)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2024 08:19:38.3761
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2024 08:19:40.6639
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 352ee910-a6ed-4a7e-1d39-08dccf15d0d8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4678b9ea-fcf8-4635-bebd-08dccf15d23e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS1PEPF00017099.namprd05.prod.outlook.com
+	MWH0EPF000989EC.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7486
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB9055
 
 From: Alejandro Lucero <alucerop@amd.com>
 
-The first stop for a CXL accelerator driver that wants to establish new
-CXL.mem regions is to register a 'struct cxl_memdev. That kicks off
-cxl_mem_probe() to enumerate all 'struct cxl_port' instances in the
-topology up to the root.
+CXL region creation involves allocating capacity from device DPA
+(device-physical-address space) and assigning it to decode a given HPA
+(host-physical-address space). Before determining how much DPA to
+allocate the amount of available HPA must be determined. Also, not all
+HPA is create equal, some specifically targets RAM, some target PMEM,
+some is prepared for device-memory flows like HDM-D and HDM-DB, and some
+is host-only (HDM-H).
 
-If the root driver has not attached yet the expectation is that the
-driver waits until that link is established. The common cxl_pci_driver
-has reason to keep the 'struct cxl_memdev' device attached to the bus
-until the root driver attaches. An accelerator may want to instead defer
-probing until CXL resources can be acquired.
+Wrap all of those concerns into an API that retrieves a root decoder
+(platform CXL window) that fits the specified constraints and the
+capacity available for a new region.
 
-Use the @endpoint attribute of a 'struct cxl_memdev' to convey when
-accelerator driver probing should be deferred vs failed. Provide that
-indication via a new cxl_acquire_endpoint() API that can retrieve the
-probe status of the memdev.
-
-Based on https://lore.kernel.org/linux-cxl/168592155270.1948938.11536845108449547920.stgit@dwillia2-xfh.jf.intel.com/
+Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
 
 Signed-off-by: Alejandro Lucero <alucerop@amd.com>
 Co-developed-by: Dan Williams <dan.j.williams@intel.com>
 ---
- drivers/cxl/core/memdev.c | 67 +++++++++++++++++++++++++++++++++++++++
- drivers/cxl/core/port.c   |  2 +-
- drivers/cxl/mem.c         |  4 ++-
- include/linux/cxl/cxl.h   |  2 ++
- 4 files changed, 73 insertions(+), 2 deletions(-)
+ drivers/cxl/core/region.c | 141 ++++++++++++++++++++++++++++++++++++++
+ drivers/cxl/cxl.h         |   3 +
+ drivers/cxl/cxlmem.h      |   3 +
+ include/linux/cxl/cxl.h   |   8 +++
+ 4 files changed, 155 insertions(+)
 
-diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
-index 5f8418620b70..d4406cf3ed32 100644
---- a/drivers/cxl/core/memdev.c
-+++ b/drivers/cxl/core/memdev.c
-@@ -5,6 +5,7 @@
- #include <linux/io-64-nonatomic-lo-hi.h>
- #include <linux/firmware.h>
- #include <linux/device.h>
-+#include <linux/delay.h>
- #include <linux/slab.h>
- #include <linux/idr.h>
- #include <linux/pci.h>
-@@ -23,6 +24,8 @@ static DECLARE_RWSEM(cxl_memdev_rwsem);
- static int cxl_mem_major;
- static DEFINE_IDA(cxl_memdev_ida);
- 
-+static unsigned short endpoint_ready_timeout = HZ;
-+
- static void cxl_memdev_release(struct device *dev)
- {
- 	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
-@@ -1163,6 +1166,70 @@ struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+index 21ad5f242875..bb227bf894c4 100644
+--- a/drivers/cxl/core/region.c
++++ b/drivers/cxl/core/region.c
+@@ -703,6 +703,147 @@ static int free_hpa(struct cxl_region *cxlr)
+ 	return 0;
  }
- EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, CXL);
  
-+/*
-+ * Try to get a locked reference on a memdev's CXL port topology
-+ * connection. Be careful to observe when cxl_mem_probe() has deposited
-+ * a probe deferral awaiting the arrival of the CXL root driver.
-+ */
-+struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd)
++struct cxlrd_max_context {
++	struct device *host_bridge;
++	unsigned long flags;
++	resource_size_t max_hpa;
++	struct cxl_root_decoder *cxlrd;
++};
++
++static int find_max_hpa(struct device *dev, void *data)
 +{
-+	struct cxl_port *endpoint;
-+	unsigned long timeout;
-+	int rc = -ENXIO;
++	struct cxlrd_max_context *ctx = data;
++	struct cxl_switch_decoder *cxlsd;
++	struct cxl_root_decoder *cxlrd;
++	struct resource *res, *prev;
++	struct cxl_decoder *cxld;
++	resource_size_t max;
++
++	if (!is_root_decoder(dev))
++		return 0;
++
++	cxlrd = to_cxl_root_decoder(dev);
++	cxld = &cxlrd->cxlsd.cxld;
++	if ((cxld->flags & ctx->flags) != ctx->flags) {
++		dev_dbg(dev, "%s, flags not matching: %08lx vs %08lx\n",
++			__func__, cxld->flags, ctx->flags);
++		return 0;
++	}
++
++	/* An accelerator can not be part of an interleaved HPA range. */
++	if (cxld->interleave_ways != 1) {
++		dev_dbg(dev, "%s, interleave_ways not matching\n", __func__);
++		return 0;
++	}
++
++	cxlsd = &cxlrd->cxlsd;
++
++	guard(rwsem_read)(&cxl_region_rwsem);
++	if (ctx->host_bridge != cxlsd->target[0]->dport_dev) {
++		dev_dbg(dev, "%s, HOST BRIDGE DOES NOT MATCH\n", __func__);
++		return 0;
++	}
 +
 +	/*
-+	 * A memdev creation triggers ports creation through the kernel
-+	 * device object model. An endpoint port could not be created yet
-+	 * but coming. Wait here for a gentle space of time for ensuring
-+	 * and endpoint port not there is due to some error and not because
-+	 * the race described.
-+	 *
-+	 * Note this is a similar case this function is implemented for, but
-+	 * instead of the race with the root port, this is against its own
-+	 * endpoint port.
++	 * Walk the root decoder resource range relying on cxl_region_rwsem to
++	 * preclude sibling arrival/departure and find the largest free space
++	 * gap.
 +	 */
-+	timeout = jiffies + endpoint_ready_timeout;
-+	do {
-+		device_lock(&cxlmd->dev);
-+		endpoint = cxlmd->endpoint;
-+		if (endpoint)
-+			break;
-+		device_unlock(&cxlmd->dev);
-+		if (msleep_interruptible(100)) {
-+			device_lock(&cxlmd->dev);
-+			break;
++	lockdep_assert_held_read(&cxl_region_rwsem);
++	max = 0;
++	res = cxlrd->res->child;
++	if (!res)
++		max = resource_size(cxlrd->res);
++	else
++		max = 0;
++
++	for (prev = NULL; res; prev = res, res = res->sibling) {
++		struct resource *next = res->sibling;
++		resource_size_t free = 0;
++
++		if (!prev && res->start > cxlrd->res->start) {
++			free = res->start - cxlrd->res->start;
++			max = max(free, max);
 +		}
-+	} while (!time_after(jiffies, timeout));
-+
-+	if (!endpoint)
-+		goto err;
-+
-+	if (IS_ERR(endpoint)) {
-+		rc = PTR_ERR(endpoint);
-+		goto err;
++		if (prev && res->start > prev->end + 1) {
++			free = res->start - prev->end + 1;
++			max = max(free, max);
++		}
++		if (next && res->end + 1 < next->start) {
++			free = next->start - res->end + 1;
++			max = max(free, max);
++		}
++		if (!next && res->end + 1 < cxlrd->res->end + 1) {
++			free = cxlrd->res->end + 1 - res->end + 1;
++			max = max(free, max);
++		}
 +	}
 +
-+	device_lock(&endpoint->dev);
-+	if (!endpoint->dev.driver)
-+		goto err_endpoint;
-+
-+	return endpoint;
-+
-+err_endpoint:
-+	device_unlock(&endpoint->dev);
-+err:
-+	device_unlock(&cxlmd->dev);
-+	return ERR_PTR(rc);
++	dev_dbg(CXLRD_DEV(cxlrd), "%s, found %pa bytes of free space\n",
++		__func__, &max);
++	if (max > ctx->max_hpa) {
++		if (ctx->cxlrd)
++			put_device(CXLRD_DEV(ctx->cxlrd));
++		get_device(CXLRD_DEV(cxlrd));
++		ctx->cxlrd = cxlrd;
++		ctx->max_hpa = max;
++		dev_dbg(CXLRD_DEV(cxlrd), "%s, found %pa bytes of free space\n",
++			__func__, &max);
++	}
++	return 0;
 +}
-+EXPORT_SYMBOL_NS(cxl_acquire_endpoint, CXL);
 +
-+void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint)
++/**
++ * cxl_get_hpa_freespace - find a root decoder with free capacity per constraints
++ * @endpoint: an endpoint that is mapped by the returned decoder
++ * @flags: CXL_DECODER_F flags for selecting RAM vs PMEM, and HDM-H vs HDM-D[B]
++ * @max_avail_contig: output parameter of max contiguous bytes available in the
++ *		      returned decoder
++ *
++ * The return tuple of a 'struct cxl_root_decoder' and 'bytes available (@max)'
++ * is a point in time snapshot. If by the time the caller goes to use this root
++ * decoder's capacity the capacity is reduced then caller needs to loop and
++ * retry.
++ *
++ * The returned root decoder has an elevated reference count that needs to be
++ * put with put_device(cxlrd_dev(cxlrd)). Locking context is with
++ * cxl_{acquire,release}_endpoint(), that ensures removal of the root decoder
++ * does not race.
++ */
++struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_port *endpoint,
++					       unsigned long flags,
++					       resource_size_t *max_avail_contig)
 +{
-+	device_unlock(&endpoint->dev);
-+	device_unlock(&cxlmd->dev);
-+}
-+EXPORT_SYMBOL_NS(cxl_release_endpoint, CXL);
++	struct cxlrd_max_context ctx = {
++		.host_bridge = endpoint->host_bridge,
++		.flags = flags,
++	};
++	struct cxl_port *root_port;
++	struct cxl_root *root __free(put_cxl_root) = find_cxl_root(endpoint);
 +
- static void sanitize_teardown_notifier(void *data)
- {
- 	struct cxl_memdev_state *mds = data;
-diff --git a/drivers/cxl/core/port.c b/drivers/cxl/core/port.c
-index 39b20ddd0296..ca2c993faa9c 100644
---- a/drivers/cxl/core/port.c
-+++ b/drivers/cxl/core/port.c
-@@ -1554,7 +1554,7 @@ static int add_port_attach_ep(struct cxl_memdev *cxlmd,
- 		 */
- 		dev_dbg(&cxlmd->dev, "%s is a root dport\n",
- 			dev_name(dport_dev));
--		return -ENXIO;
-+		return -EPROBE_DEFER;
- 	}
- 
- 	parent_port = find_cxl_port(dparent, &parent_dport);
-diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
-index 5c7ad230bccb..56fd7a100c2f 100644
---- a/drivers/cxl/mem.c
-+++ b/drivers/cxl/mem.c
-@@ -145,8 +145,10 @@ static int cxl_mem_probe(struct device *dev)
- 		return rc;
- 
- 	rc = devm_cxl_enumerate_ports(cxlmd);
--	if (rc)
-+	if (rc) {
-+		cxlmd->endpoint = ERR_PTR(rc);
- 		return rc;
++	if (!is_cxl_endpoint(endpoint)) {
++		dev_dbg(&endpoint->dev, "hpa requestor is not an endpoint\n");
++		return ERR_PTR(-EINVAL);
 +	}
- 
- 	parent_port = cxl_mem_find_port(cxlmd, &dport);
- 	if (!parent_port) {
++
++	if (!root) {
++		dev_dbg(&endpoint->dev, "endpoint can not be related to a root port\n");
++		return ERR_PTR(-ENXIO);
++	}
++
++	root_port = &root->port;
++	down_read(&cxl_region_rwsem);
++	device_for_each_child(&root_port->dev, &ctx, find_max_hpa);
++	up_read(&cxl_region_rwsem);
++
++	if (!ctx.cxlrd)
++		return ERR_PTR(-ENOMEM);
++
++	*max_avail_contig = ctx.max_hpa;
++	return ctx.cxlrd;
++}
++EXPORT_SYMBOL_NS_GPL(cxl_get_hpa_freespace, CXL);
++
+ static ssize_t size_store(struct device *dev, struct device_attribute *attr,
+ 			  const char *buf, size_t len)
+ {
+diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
+index 07c153aa3d77..5d83e4a960ef 100644
+--- a/drivers/cxl/cxl.h
++++ b/drivers/cxl/cxl.h
+@@ -772,6 +772,9 @@ static inline void cxl_setup_parent_dport(struct device *host,
+ struct cxl_decoder *to_cxl_decoder(struct device *dev);
+ struct cxl_root_decoder *to_cxl_root_decoder(struct device *dev);
+ struct cxl_switch_decoder *to_cxl_switch_decoder(struct device *dev);
++
++#define CXLRD_DEV(cxlrd) (&(cxlrd)->cxlsd.cxld.dev)
++
+ struct cxl_endpoint_decoder *to_cxl_endpoint_decoder(struct device *dev);
+ bool is_root_decoder(struct device *dev);
+ bool is_switch_decoder(struct device *dev);
+diff --git a/drivers/cxl/cxlmem.h b/drivers/cxl/cxlmem.h
+index 37c043100300..07259840da8f 100644
+--- a/drivers/cxl/cxlmem.h
++++ b/drivers/cxl/cxlmem.h
+@@ -875,4 +875,7 @@ struct cxl_hdm {
+ struct seq_file;
+ struct dentry *cxl_debugfs_create_dir(const char *dir);
+ void cxl_dpa_debug(struct seq_file *file, struct cxl_dev_state *cxlds);
++struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_port *endpoint,
++					       unsigned long flags,
++					       resource_size_t *max);
+ #endif /* __CXL_MEM_H__ */
 diff --git a/include/linux/cxl/cxl.h b/include/linux/cxl/cxl.h
-index fc0859f841dc..7e4580fb8659 100644
+index 7e4580fb8659..60a32f60401f 100644
 --- a/include/linux/cxl/cxl.h
 +++ b/include/linux/cxl/cxl.h
-@@ -57,4 +57,6 @@ int cxl_release_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
- void cxl_set_media_ready(struct cxl_dev_state *cxlds);
- struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+@@ -7,6 +7,10 @@
+ #include <linux/device.h>
+ #include <linux/pci.h>
+ 
++#define CXL_DECODER_F_RAM   BIT(0)
++#define CXL_DECODER_F_PMEM  BIT(1)
++#define CXL_DECODER_F_TYPE2 BIT(2)
++
+ enum cxl_resource {
+ 	CXL_ACCEL_RES_DPA,
+ 	CXL_ACCEL_RES_RAM,
+@@ -59,4 +63,8 @@ struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
  				       struct cxl_dev_state *cxlds);
-+struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd);
-+void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint);
+ struct cxl_port *cxl_acquire_endpoint(struct cxl_memdev *cxlmd);
+ void cxl_release_endpoint(struct cxl_memdev *cxlmd, struct cxl_port *endpoint);
++
++struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_port *endpoint,
++					       unsigned long flags,
++					       resource_size_t *max);
  #endif
 -- 
 2.17.1
