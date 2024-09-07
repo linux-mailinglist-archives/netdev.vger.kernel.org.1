@@ -1,63 +1,80 @@
-Return-Path: <netdev+bounces-126126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5735B96FEA2
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 02:05:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9096296FEAD
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 02:17:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA241285337
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 00:05:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCF601C224B2
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 00:17:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30DED360;
-	Sat,  7 Sep 2024 00:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D02256D;
+	Sat,  7 Sep 2024 00:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G1Sl8s2T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g7Z/l1rh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FFD1849;
-	Sat,  7 Sep 2024 00:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A7C1870;
+	Sat,  7 Sep 2024 00:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725667498; cv=none; b=uhpwZ5kkrcD+mwCFqs2koiZ6svdeRMTsKQMI/YG5s3L830XLVNUcklnu4HYjKNxe9PYLkq/IkEp+zOnRs66xLklF7tGoqFA/GT1XpVMUb40XxBMZe3zmKr7uVAmwEMyEglnrqVZ9W+HXWgjAzLvrUKxcyA+HSO/3BF/4rrNqR9Y=
+	t=1725668255; cv=none; b=BDaR2JblIsa4sYXhHIjwjbO6FivWM3Qr0Rpyp8xJ6wNsYj4p6RCytcbhuLgYlMsqktc7P2UgtxED0ohnQAmOxqJs4F2lKMRgilfuspUDLG9cAPS2SB/9U9ckGg3by/u9Zs22V8YZVpyVCF+r4SVLq7UR4r8FjsvBvNvEpDXHKig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725667498; c=relaxed/simple;
-	bh=N3Qp7GYKSnKVy7AjygjC5ryaFvEImrqncE6zc0RiV+k=;
+	s=arc-20240116; t=1725668255; c=relaxed/simple;
+	bh=OWBN2OBgp5rzmby2r/KnPaH9LBqxwptwE64O7LP4KAA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=P/U4eGKUczI6Ip6xM+7ktt8jZ6ePBI30bdniMKPq+cH8rdEdcZtYJj8ZeEdPMml5x1TzRDY0d6t9P4OkLipbtn5b54c7N5yKQuH4gFdWbkD1IIMZeoTHP8xYhUIzg70h7jU95TQ7bsI64WSuvNilw9I4xhA/P9mBjqOfpN6BzaY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G1Sl8s2T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 163E7C4CEC4;
-	Sat,  7 Sep 2024 00:04:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BbMkhETAxZCGrtR5OUFUEBL2ehngnu/ObONptXdl2DxLBi4SEQJiGMDLOZbyeI7J5oP8X4T7h41ll80inj8kP9Q/D1wdcXfzJBg0IlEv37Gq3i9xG6cT/vX4JWGR96mCU1s8+bWmyF4i5ppsHS4GB+NtaSobLgdm3l003m80pHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g7Z/l1rh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D807AC4CEC4;
+	Sat,  7 Sep 2024 00:17:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725667497;
-	bh=N3Qp7GYKSnKVy7AjygjC5ryaFvEImrqncE6zc0RiV+k=;
+	s=k20201202; t=1725668255;
+	bh=OWBN2OBgp5rzmby2r/KnPaH9LBqxwptwE64O7LP4KAA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G1Sl8s2Tp2lMZrfSIGw7e3IhHdYJ2y1CUFi7BvF/v9uTD2NdXOdKfdlcVDJkUqhZZ
-	 gippSNSBxlxRpIiFXquf19LBB0TizRdE0W3ODH9vRWDgflFpa/MJVno0LWfIqeV/og
-	 JdqRegxss3PgybVq1tyh0ru0VDfAdWOSM4sxd6lvtmwaUg42dCtbaKaiE2HH+AnZBx
-	 4d5MZYq8uoQyx9EFfpB2jhQGGHhnWUsoUrW5UahAVLpntl4paZYTAADfQveFLYl8CI
-	 GSZYoJq7ahzrkMXHFHDTFwAkKchs21kaIW0eqxbt+VFK47rN5T+hPo9VzmLKcxw6NV
-	 cD2lKLYVGGj3A==
-Date: Fri, 6 Sep 2024 17:04:56 -0700
+	b=g7Z/l1rhIjWIyfX4kfpMlnJHkl2kn5u++CPY9eANiIx3i9Q6AjOhs7FhrU+CSK7id
+	 hef5tsaW5zKAxDDUXGoj3kEc4qHrKA1O6nShd4uw66tALDrk4maHB5nD2S2mkqFxxh
+	 4lJnGUCipUSe8UgPJ/r+4413Rd8tMyEwEi6k2M+W1tL3T8a0SIQE57h2e697sY/iSe
+	 ERaUaKxpP5DH0Kqj+cxEdESuafnA1EM9yZ5Wm6W9zNbDqnUOKM1qABtD4hvNYuz7mA
+	 uJeaitBKZKNlUv34QVzScGTdl2bcwZLvYpv4I3Qx0TZFSu4lBehkEc4EVB1QQpqhfW
+	 TgxV1XL8BvQ5A==
+Date: Fri, 6 Sep 2024 17:17:32 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- ncardwell@google.com, shuah@kernel.org, linux-kselftest@vger.kernel.org,
- fw@strlen.de, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next v2 2/2] selftests/net: integrate packetdrill
- with ksft
-Message-ID: <20240906170456.5a113628@kernel.org>
-In-Reply-To: <66db9008e0b4e_2a33ef29428@willemb.c.googlers.com.notmuch>
-References: <20240905231653.2427327-1-willemdebruijn.kernel@gmail.com>
-	<20240905231653.2427327-3-willemdebruijn.kernel@gmail.com>
-	<f63e7367-c4fb-4cdc-a44c-6accbc309c5a@kernel.org>
-	<66db217a558c4_29a385294d3@willemb.c.googlers.com.notmuch>
-	<ad780c53-9538-4d3f-a02f-1063828fc035@kernel.org>
-	<66db9008e0b4e_2a33ef29428@willemb.c.googlers.com.notmuch>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Jiri Olsa <jolsa@kernel.org>, Philo Lu <lulie@linux.alibaba.com>, bpf
+ <bpf@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Steven Rostedt
+ <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
+ Desnoyers <mathieu.desnoyers@efficios.com>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Eddy
+ Z <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, "David S. Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan
+ <shuah@kernel.org>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Kui-Feng Lee <thinker.li@gmail.com>,
+ Juntong Deng <juntong.deng@outlook.com>, jrife@google.com, Alan Maguire
+ <alan.maguire@oracle.com>, Dave Marchevsky <davemarchevsky@fb.com>, Daniel
+ Xu <dxu@dxuuu.xyz>, Viktor Malik <vmalik@redhat.com>, Cupertino Miranda
+ <cupertino.miranda@oracle.com>, Matt Bobrowski <mattbobrowski@google.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Network Development
+ <netdev@vger.kernel.org>, linux-trace-kernel
+ <linux-trace-kernel@vger.kernel.org>
+Subject: Re: [PATCH bpf-next v2 3/5] tcp: Use skb__nullable in
+ trace_tcp_send_reset
+Message-ID: <20240906171732.5382bf80@kernel.org>
+In-Reply-To: <CAADnVQ+nsUuQ+6rvEq7mYdE0vvqfZ-=hubcoGgUpprHA5P_mHA@mail.gmail.com>
+References: <20240905075622.66819-1-lulie@linux.alibaba.com>
+	<20240905075622.66819-4-lulie@linux.alibaba.com>
+	<CAADnVQL1Z3LGc+7W1+NrffaGp7idefpbnKPQTeHS8xbQme5Paw@mail.gmail.com>
+	<20240906152300.634e950b@kernel.org>
+	<CAADnVQJWm_CJobz71_FRPTFeVojHLgmYmQA4tVhOg3MDP2V2Dw@mail.gmail.com>
+	<20240906155742.0bd4d4e3@kernel.org>
+	<CAADnVQ+nsUuQ+6rvEq7mYdE0vvqfZ-=hubcoGgUpprHA5P_mHA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,70 +84,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 06 Sep 2024 19:28:08 -0400 Willem de Bruijn wrote:
-> > > No, we opted for this design exactly to use existing kselftest infra,
-> > > rather than reimplementing that in our wrapper, as I did in the RFC.  
-> > 
-> > OK, I understood from the discussions from the RFC that by using the
-> > kselftest infra, the tests would be automatically executed in dedicated
-> > netns, and it could also help running tests in parallel. That sounded
-> > great to me, but that's not the case by default from what I see.  
+On Fri, 6 Sep 2024 16:22:12 -0700 Alexei Starovoitov wrote:
+> > On Fri, 6 Sep 2024 15:41:47 -0700 Alexei Starovoitov wrote:  
+> > > The urgency is now because the situation is dire.
+> > > The verifier assumes that skb is not null and will remove
+> > > if (!skb) check assuming that it's a dead code.  
+> >
+> > Meaning verifier currently isn't ready for patch 4?
+> > Or we can crash 6.11-rc6 by attaching to a trace_tcp_send_reset()
+> > and doing
+> >         printf("%d\n", skb->len);
+> > ?  
 > 
-> Perhaps that's something to change in the defaults for run_tests.
-> 
-> Since the infra exist, that is preferable over reimplementing it for
-> one particular subset of tests.
-> 
-> Or if not all kselftests can run in netns (quite likely), this needs
-> to be opt-in. Then a variable defined in the Makefile perhaps. To
-> tell kselftest to enable the feature for this target.
+> depends on the prog type and how it's attached, but yes :(
 
-Indeed, I was thinking along the same lines.
+I see :( Thought this is just needed for patch 4.
+In this case no objections "from networking perspective":
 
-We're closing net-next in a week, it'd be great to have the baseline
-ksft interpreter mechanism in place in the next couple of days. 
-The exact implementation of packetdrill/ksft_runner.sh can be changed
-later as needed, and the current one works fine for NIPA.
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
-
-Hopefully we can also discuss at LPC/netconf what to do about libraries
-(where setup / cleanup code could live). Looking at MPTCP tests - do
-they work out of tree? I see mptcp_lib.sh does:
-
-. "$(dirname "${0}")/../lib.sh"
-. "$(dirname "${0}")/../net_helper.sh"
-
-but lib/sh and net_helper.sh are not listed in the Makefile. So they
-won't get packaged...
-
-We should make sure we support running the tests with make run_tests
-and in installed mode. 
-
-If we agree that the current situation with support for library code is
-far from ideal, I think we have three(ish) directions to explore:
-
- 1  build netns handling into runner.sh
-   + already mostly there
-   + simpler tests, no need to worry about netns, it just happens
-   - not all tests need netns (HW-adjacent tests especially)
-   - netns setup is the main thing we need but not the only thing,
-     wait helpers, python code, etc. also need to be handled
-
- 2a improve library bundling at the ksft level
-   + we already have a net/lib "meta-target", it kinda works
-   + hopefully in a way that lets us Python
-   - no idea how
-
- 2b put all the code in kselftest/, like ktap_helpers.sh ?
-   + easy to do
-   + helps other subsystems
-   - could cause git conflicts
-   - won't help Python?
-
- 3  give up on target proliferation; on a quick count we have 15 targets
-    in ksft for various bits of networking, faaar more than anyone else
-   + fewer targets limits the need for libraries, libraries local to
-     the target are trivial to handle
-   - ksft has no other form of "grouping" tests, if we collapse into 
-     a small number of targets it will be hard to run a group of tests
+although it feels more like a general tracing question.
 
