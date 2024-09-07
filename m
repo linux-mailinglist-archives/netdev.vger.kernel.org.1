@@ -1,75 +1,93 @@
-Return-Path: <netdev+bounces-126139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92A8196FEF7
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 03:29:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5BC196FEFB
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 03:30:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16264B225C1
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 01:29:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 956D2284475
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 01:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB79AA955;
-	Sat,  7 Sep 2024 01:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30B658836;
+	Sat,  7 Sep 2024 01:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCQ/TQKp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gd4vdpkE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B33EDDA0;
-	Sat,  7 Sep 2024 01:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF4B7483
+	for <netdev@vger.kernel.org>; Sat,  7 Sep 2024 01:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725672545; cv=none; b=juX6sFirzWk5CE5GIFqVgnZFej9lIGBFP8aWeDbniIbph9dlfBK+AWA2UmUdr0I2Ny7y7vgISqQrwsmQfFjr1J5oi1C/HaLnzNjy0p7P46gYpHSFn6x0MkDwEQ8GWUJ8nJ2+RCcJmDGCT2djTfQJ5yv1OF4lBz0WQRZt32125UA=
+	t=1725672632; cv=none; b=cBfhBwBqdlatw7qZX0yuw9sKROuLzXuSmhDjnrSFNsmKF71HLASut1+Iubn3CHjJP6uj/3lyA5aVc6iwybBXgHX5yxyG2Tfsl5hbCiDXzJig2ClgYEldVmzP86p8809r2oY+tKd8k6VV86R4wsxckyKFVjn2poHdsg5KSv15Cew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725672545; c=relaxed/simple;
-	bh=JAbDlUmnCm5RtGo2c4FkRbsaKSBfsmmuHbYiAOxdfkY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O5OsEcm1xyGP98CmAsKcT727uYh2VAGzY6TznKOaDO9V0H1i52iE3qnGddxbEvgHqHOBPBAQgs9lGpYGfyi5F/hKe8Gj6JTMuVmMHgE/ZjB0IiP290P8bCoO2IRhXq9ziTCiabelk7QIIbq4iowwER1Fq31PbVF5v55MHfsjJaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCQ/TQKp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70329C4CEC4;
-	Sat,  7 Sep 2024 01:29:04 +0000 (UTC)
+	s=arc-20240116; t=1725672632; c=relaxed/simple;
+	bh=JEVEsXWvTmVhhSdIIT6QAg4x10SZR9cuh+pS/Hqij88=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RDgfR4crFks4/xLrAEDK5nVrHpYrr+Uh+vXkYS91ITg+WMGGLPQ3A5JWx4e82j1xk0qvsZmsltTZFAv+mV9J5CU/nNoYhQxoJ2e00vvL1CheZSnRhpZbo8Qnzbu5rONd0u5+Kzces3eoQ6684STG0cWFNHI/Rgf4v2WgdkNmMWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gd4vdpkE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CB0EC4CEC4;
+	Sat,  7 Sep 2024 01:30:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725672545;
-	bh=JAbDlUmnCm5RtGo2c4FkRbsaKSBfsmmuHbYiAOxdfkY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eCQ/TQKpgeJJHzoMjiaCZ0Cl+ATS/UJ8B7IvsR/F0N/yY2oYcxhKee7qhViFky6lL
-	 Ql8y3wbcQLP83EL82toIrKesTujH9kiufMHJjn3hcaMNW1LWJMnMiuWPPX1WkHia0n
-	 /Jibn/UxbfRHXwBEp10h9QMfRKBVWBu8eC5Z8gX5o5DBq1QFGg5PtWB7U2lPlSSD5z
-	 9JuYNW7xmHnIXX2EyDsATm7QSx5UfSaXVwmMqr1pCnpJJpTik84JlxdPOeA0fFLF+Q
-	 Um3wvxOwT1rAbjTaj72TEVFZQyHES8XvlGc6gBhH90Oc0ygFl6Hd7A6HycRzb8O55L
-	 F7lMkzKX8/azw==
-Date: Fri, 6 Sep 2024 18:29:03 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lee Trager <lee@trager.us>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, Alexander Duyck <alexanderduyck@fb.com>,
- kernel-team@meta.com, Shinas Rasheed <srasheed@marvell.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Phani Burra <phani.r.burra@intel.com>, Joshua
- Hay <joshua.a.hay@intel.com>, Sanman Pradhan <sanmanpradhan@meta.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>, Alan Brady
- <alan.brady@intel.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] eth: fbnic: Add devlink firmware version info
-Message-ID: <20240906182903.55d0ccd1@kernel.org>
-In-Reply-To: <20240905233820.1713043-1-lee@trager.us>
-References: <20240905233820.1713043-1-lee@trager.us>
+	s=k20201202; t=1725672631;
+	bh=JEVEsXWvTmVhhSdIIT6QAg4x10SZR9cuh+pS/Hqij88=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=gd4vdpkE8xCXdYteMbyEa0Fmo038AtA0nmTe/zZPjfYq28IejTy7kdKd8X7pGq6Uq
+	 QfD1237N1rOjHAY91jteu4PgoQ016d8rlF9jzojQ62NJE3aML5rLAIg0L9YBrzUoOr
+	 qbtjNXd91SkicDVbuN56Vqywq/RWI2s2ssIpdBps+A8u4D+cfbD5oI3sLiihY7cY4d
+	 TYdTgcIgjbBc3V+yULALDhx4ocg8E3/ANSnT2Pfs1ROiYBpcEW+gIO9Mqte08Z2f/G
+	 KABtfDqYZZdTa/k/eacJDYGpfy9w3woxrqB9w2nm/PrLqmic1YB5ZYycjDb5Elw8+L
+	 NL+wGRjERVQsg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD4E3805D82;
+	Sat,  7 Sep 2024 01:30:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] netpoll: remove netpoll_srcu
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172567263251.2576623.13971300092615224613.git-patchwork-notify@kernel.org>
+Date: Sat, 07 Sep 2024 01:30:32 +0000
+References: <20240905084909.2082486-1-edumazet@google.com>
+In-Reply-To: <20240905084909.2082486-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, leitao@debian.org
 
-On Thu,  5 Sep 2024 16:37:51 -0700 Lee Trager wrote:
-> This adds support to show firmware version information for both stored and
-> running firmware versions. The version and commit is displayed separately
-> to aid monitoring tools which only care about the version.
+Hello:
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  5 Sep 2024 08:49:09 +0000 you wrote:
+> netpoll_srcu is currently used from netpoll_poll_disable() and
+> __netpoll_cleanup()
+> 
+> Both functions run under RTNL, using netpoll_srcu adds confusion
+> and no additional protection.
+> 
+> Moreover the synchronize_srcu() call in __netpoll_cleanup() is
+> performed before clearing np->dev->npinfo, which violates RCU rules.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] netpoll: remove netpoll_srcu
+    https://git.kernel.org/netdev/net-next/c/9a95eedc81de
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
