@@ -1,104 +1,80 @@
-Return-Path: <netdev+bounces-126135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57C8196FEEB
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 03:20:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3F4B96FEED
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 03:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 014E0285D34
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 01:20:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBEC41C220AB
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 01:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 473594689;
-	Sat,  7 Sep 2024 01:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 418D68BE0;
+	Sat,  7 Sep 2024 01:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IjPLGVe6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OkfBScG9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9F1A923;
-	Sat,  7 Sep 2024 01:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18315D512;
+	Sat,  7 Sep 2024 01:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725672028; cv=none; b=O+6RPs0Gpm0wzrcapJbyoquJLJmf0WLJxyrzmYLv2NAeiOBT5W/ILWrcB7Jo/4XIiG53OU8dfpL4/Y3ZDggH6JYPb+nYa576eKR4Vyno28mkPmAtYDJ5jG0NqQDb9eoUXkWimYpAWf0/DpiczNpYYGCK+dRk7cZrsJl+w6aAzRM=
+	t=1725672037; cv=none; b=I2UxQMW/jYdnr0b7g98j+Z7FX3cTFMNTZ0rCpfExBAA9KX6Z0H8cJnOyg1YNybQ9gSfHJlFWjCQr9Siw9OgEQMNetyZLktmeJaOMV1r3ZEMcL7tVkagypvnaMuhqXSB0NeDaGN+0TkpyKNV5TSBApYcFPHhiLnuKkPxc3GltBCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725672028; c=relaxed/simple;
-	bh=uUL+zGRZtnm04HNhLF8GSXUtW7Ukpc5lxFlmAkYLKHI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tBnCuy6WZ+WyL1pMP4JMLZxhYSssPFyR/MoDRGjX/OncvmaYXKUlUYCwYp2jjMkORURDZ93YidwETCJ45iAeLRBErpzbGuwfZLG1xMGgZhSO4h3JhJCO959TRaJrnaSmO0WKP40H1rV46A2BaHJGRVl6yzodf24HB6VYdw6bfjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IjPLGVe6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91FBEC4CEC4;
-	Sat,  7 Sep 2024 01:20:27 +0000 (UTC)
+	s=arc-20240116; t=1725672037; c=relaxed/simple;
+	bh=+Cuff5rKqy5TPadkKv9nzeCHPT3SjwAGmeFZkmlVRR4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ela2Ekq2k8lF0rT06vaUQ9gxJ78khBA1K+28xKwygAihkbfNE5CKRhH8GIudvS7X4x16HLHtuSWFfM2W5lyKVPoBq1TtA5oKj5fv4eZBGGEZ1cpQKf/rBQMKd/EhOX7hwAZIPA6jw5KvjDGGe2xBALhjEXWcpy1DFz9tgbNLems=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OkfBScG9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86873C4CEC4;
+	Sat,  7 Sep 2024 01:20:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725672027;
-	bh=uUL+zGRZtnm04HNhLF8GSXUtW7Ukpc5lxFlmAkYLKHI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IjPLGVe6ttiTlST1Ahvd65UYlYraPZ4Ulglul9yKGgkE4NygquE1kYr+dp/s+eV6a
-	 kBJiWoUcafrYJ6AgoiF77Dqutt28etk30pqPf1oSjJjellhFScZmTvKB0bvPaxnE9M
-	 LT1mcN10r2gu8PpJG1ULbKaKXdnA2BZVQ2cr+D3opcLD6h4/TLCDSPza8eRtZDmWZC
-	 r5r+1CIEewuJzjL4KVUwMuIAPF+xLkt3IHFIHgkbPlaY6ql2XLy9NZokb4uTPWQQYm
-	 ai5l2igv5NJb/QpRtGpMMKgYE/08m/c7svcJJUaZuI3w5TVWqJXuT8hnDHvmOQsXEI
-	 /lvAQtv7ojrpg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE4BC3805D82;
-	Sat,  7 Sep 2024 01:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1725672036;
+	bh=+Cuff5rKqy5TPadkKv9nzeCHPT3SjwAGmeFZkmlVRR4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OkfBScG9lf9iDg9Guvbs7ieA+CCvWyaydEfb3t3jZe0wNkaOeRzRUIyJIxR3FdwE7
+	 oyfT6uf1yW4gSSAfUZGPoj48qIirSkxJa2Ku0AVyrUWufUrZDvABAQd0IP7bcqq13W
+	 wRXn+81VmK1sKzJCks1y/4lZiq9N3AMka/Yl4Waab+Rr7R/MtV9jyozIpuyVbCx/JR
+	 o0inFpN3Co87LvoD7d52Yqur9HaInzJu+xCxLrzhCGU8IZYxRS20PJ8MMjdPRCC9z7
+	 dSdLnKcTdMm+mxsuqpZkiLw+vvPxljbYn0PMRt/9x3d2A268eFa3ow17t7JyguM+sW
+	 R+Ys/30QQJuEg==
+Date: Fri, 6 Sep 2024 18:20:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Martyn Welch <martyn.welch@collabora.com>
+Cc: Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
+ <vladimir.oltean@nxp.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ kernel@collabora.com, Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: enetc: Replace ifdef with IS_ENABLED
+Message-ID: <20240906182035.57c478bf@kernel.org>
+In-Reply-To: <20240904105143.2444106-1-martyn.welch@collabora.com>
+References: <20240904105143.2444106-1-martyn.welch@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/5] make use of the helper macro LIST_HEAD()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172567202850.2574896.10941650330610310039.git-patchwork-notify@kernel.org>
-Date: Sat, 07 Sep 2024 01:20:28 +0000
-References: <20240904093243.3345012-1-lihongbo22@huawei.com>
-In-Reply-To: <20240904093243.3345012-1-lihongbo22@huawei.com>
-To: Hongbo Li <lihongbo22@huawei.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jmaloy@redhat.com,
- ying.xue@windriver.com, pablo@netfilter.org, kadlec@netfilter.org,
- horms@kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed,  4 Sep 2024 11:51:41 +0100 Martyn Welch wrote:
+> -#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
+> -static void enetc_get_rx_tstamp(struct net_device *ndev,
+> -				union enetc_rx_bd *rxbd,
+> -				struct sk_buff *skb)
+> +static void __maybe_unused enetc_get_rx_tstamp(struct net_device *ndev,
+> +					       union enetc_rx_bd *rxbd,
+> +					       struct sk_buff *skb)
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 4 Sep 2024 17:32:38 +0800 you wrote:
-> The macro LIST_HEAD() declares a list variable and
-> initializes it, which can be used to simplify the steps
-> of list initialization, thereby simplifying the code.
-> These serials just do some equivalatent substitutions,
-> and with no functional modifications.
-> 
-> Changes in v2:
->   - Keep the reverse xmas tree order as Simon's and
->     Pablo's suggested.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/5] net/ipv4: make use of the helper macro LIST_HEAD()
-    https://git.kernel.org/netdev/net-next/c/cecbe5c8c803
-  - [net-next,v2,2/5] net/tipc: make use of the helper macro LIST_HEAD()
-    https://git.kernel.org/netdev/net-next/c/e636ba1a15e7
-  - [net-next,v2,3/5] net/netfilter: make use of the helper macro LIST_HEAD()
-    https://git.kernel.org/netdev/net-next/c/8b51455bbd45
-  - [net-next,v2,4/5] net/ipv6: make use of the helper macro LIST_HEAD()
-    https://git.kernel.org/netdev/net-next/c/2a7dd251b6fe
-  - [net-next,v2,5/5] net/core: make use of the helper macro LIST_HEAD()
-    https://git.kernel.org/netdev/net-next/c/17f01391903d
-
-You are awesome, thank you!
+Are you sure you need the __maybe_used's ?
+Nice thing about the IS_ENABLED() is that the code is still visible to
+the compiler, even if dead code elimination removes it the compiler
+shouldn't really warn about unused code.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
