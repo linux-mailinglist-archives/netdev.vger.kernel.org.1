@@ -1,133 +1,130 @@
-Return-Path: <netdev+bounces-126252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73699703CD
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 21:03:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72CFC9703E1
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 21:10:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2C591C2129F
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 19:03:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2231F1F225CA
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 19:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81E7943AA8;
-	Sat,  7 Sep 2024 19:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B4C148301;
+	Sat,  7 Sep 2024 19:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P1Biah8X"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aNqtBG91"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AA6165EE6;
-	Sat,  7 Sep 2024 19:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F79818030
+	for <netdev@vger.kernel.org>; Sat,  7 Sep 2024 19:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725735831; cv=none; b=FjRPe8oUKCtitpQ9uBwjsCdMl99G2EGCwEmill3vyfK3zHv5UB+k/lAhv3TJUKEdjuGPm4mn2GxVsC+eXaW58ksmdDVb8zH00d2kvZq6Rq20Ttt/mWG65ctFEVK05wCfy36DI1mRTYeaOdAIFpJA9FpJOtiqr9emDiwwOBF3Q3k=
+	t=1725736228; cv=none; b=uQfEfWcwe3ewyf5DhDmZqEDo66m4BV0D03SXsKqr6/ljzH3dY0ciqOrXU8DvxDflvvyD3wvtvtUpmMNADnjQcx9eXtyItxDRwPA1FAVYH2iUbD8Ge/5t9i5+10CrAa5aJyDCZh5KUzkrzBjYIrinG3o+lyHjE35QwdyTtKVidWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725735831; c=relaxed/simple;
-	bh=dfph/+nheQwDiPwg/rtS9N3WHLIN0TbhfZndd6ZvTvQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=f/KG79vP4LPhWAvjHS49IF95pmuEj9IO4LnYbxqj2aFBkXBDWG3iod5CtyCLVVusAmZ/AIdIJSxPoHWETWI2XlH9BMQA7athxCAAIRPhRslXFD9Ahoe8gOm0ANIYN+YdrKZLDyi3Fbgje/f3waBlDU9vWQNeb0tyanqPh2l/v1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P1Biah8X; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-718d79fb6f7so1613975b3a.3;
-        Sat, 07 Sep 2024 12:03:49 -0700 (PDT)
+	s=arc-20240116; t=1725736228; c=relaxed/simple;
+	bh=sydYssWUia+zZondaYByPACvLvo+snM8+y859gn1yqc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oXR5/syRy6XQOIvrLCWntBOJnPeXm9/lFoVjWWx9bP8dv3+bgr9L/MKzv14VsJXCVM5Ov09fQcmp6EKuzEfINAKshl8Skvcp8A4KAvRlyybH82KEljhJUedqKF7VF7zxTqeyKDfOGUGBs9y0Bcd78etIdyCOBOfTrLfK7KhqSTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aNqtBG91; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2f029e9c9cfso42184291fa.2
+        for <netdev@vger.kernel.org>; Sat, 07 Sep 2024 12:10:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725735829; x=1726340629; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=6Zx1VFN5ZHG/PELZ4zI7xuhOBSu9xApqGwfQ/VTlx3U=;
-        b=P1Biah8XNGMx/KQetgtR3HSvwAdgk52PHYHiHyYMfS0Tl1K68r1vMR3rGfqMfwFdAy
-         0B+bKBXOFbv5XdKCg4buzFharaVRX/zriZp5YgBpliASgSGT4v6/oCuCF2vVLnfOY2mw
-         dXyp4QKknhYZubBANhn6oaAJ+pqlO36kt46oV+P5yhP9D5/1Up8Jb1zcywSoFm7ts3E2
-         WjWKcD60OQg9B7WHDZec4Vrejng4zkbFfF00Um9gtrqxG0I+af5WHtYjto4XXd5yxTWm
-         Jl7jnffqlc0DwerIjS6dWOfwa7IPPNc4UUikge1e+6IVHED3mHTRzvQ1/ld6cwQAFv8M
-         kxzA==
+        d=linaro.org; s=google; t=1725736224; x=1726341024; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sydYssWUia+zZondaYByPACvLvo+snM8+y859gn1yqc=;
+        b=aNqtBG91Y1jgK6XuBYY0AEvBAkx9h+KgTMAS6DM16018Ay2oZ9olgGbKNd2Q3sP2Em
+         1wEwBM5GqLNblui9qrA1GbhZoRkuQ0Gx4qoad/VbUUlkRb9NwysxvQz314kBLf09sEee
+         fkThBbVjW8YZZX48OhQmdhLj25ba/UT2CANIMPmLvfBfAqZ+4LUsbCvN/SYndkO6xtf4
+         dxHisNYGo7jAiTYM6bv40XuL936aM+VKaoBkFP1TtNDWAWOYHMJf/kVy6my2QGc8mepQ
+         vuTL8k0RMRKCmi6xnrIu8t3/O7S+arpU06OfDosxfMlwrxGunCZ2DLvV2YIddCMQ3c4N
+         hiHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725735829; x=1726340629;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6Zx1VFN5ZHG/PELZ4zI7xuhOBSu9xApqGwfQ/VTlx3U=;
-        b=uJHrzfO5bwYbTOi20roDlpWOOXF10y7NzN4jq8NaTpB7Y4TC8LIaJVxx2Uuk+jkclQ
-         1ECKHaQoK/HkLnMol2RDR1LFCbMMPIYXFjfxE4nx9VdI6XmBCQvBR6EOE7hsX08Vjpkx
-         ruUncB/pV9voVYJexnoNhji7RA7oOuSSO8i/F9I3rX5rBwv0enRye3kb7P5gNeyn92Kz
-         Vf7E0b01PAoZjNJVHgiEYROL9MYCFS+j+VI1oWhFJqsSwCg3918KaA+JWr5WRf2YuOdv
-         cro+rJ+CaByhGxgtx8EweDlT8DOJq0Sn9151/suoE2N3Nz/t2MZAx4IX5BkzN7qERih+
-         xs0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUckzkouX6SuLzqy7o5qH10pBKnHxRMULYcvvKS2NBsZHom95y4k9tGfffqY8cGymIAMPlM06tc@vger.kernel.org, AJvYcCUoU4/HLTDPr5gycZgRerfArYXRih+NazmHh68bwE4v9YUgSFtynhGkSm1FERlanyYoQy70t0Q604tjoPA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTSMfAx89fSCxssYZ2eKGeRhUkwWh3plYT/2jQOJVcBfy/x5py
-	hVyJyWsaT12IP6iWcUAkjYJEuH+pYk9C90h568lecuuK/e9aGfyS
-X-Google-Smtp-Source: AGHT+IF2s6wWTR93OjwD/+aDtqpA+I1jBE57UiitafG1lKAb9FL9AHnURLl68bPKfCdojx/3px4j3g==
-X-Received: by 2002:a05:6a00:a0e:b0:717:85a4:c7a1 with SMTP id d2e1a72fcca58-718d5f2fca0mr6558673b3a.27.1725735829117;
-        Sat, 07 Sep 2024 12:03:49 -0700 (PDT)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-718e5896ba6sm1166097b3a.5.2024.09.07.12.03.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Sep 2024 12:03:48 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: horms@kernel.org,
-	lukma@denx.de,
-	ricardo@marliere.net,
-	m-karicheri2@ti.com,
-	n.zhandarovich@fintech.ru,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+02a42d9b1bd395cbcab4@syzkaller.appspotmail.com,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: [PATCH net] net: hsr: prevent NULL pointer dereference in hsr_proxy_announce()
-Date: Sun,  8 Sep 2024 04:03:41 +0900
-Message-Id: <20240907190341.162289-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1725736224; x=1726341024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sydYssWUia+zZondaYByPACvLvo+snM8+y859gn1yqc=;
+        b=skzXSU/lT+YVFTcmzRJDS0/Wb0Ia3MZcP3rQxGV4I7HbFRAf4gPDmuf2UGcjDXGREr
+         A89b/Pe+DmWTIYNIvGmhmq89XoFFHJBNlrehBFYJG2WQ/z5Ti+nF1wCF+UHqXpi4+Tiy
+         LO1qhp00y3j562cUNFY8bWfnoUDdc2H+e+6Impo/nU25LXdwuh89nLkbJhLfy0Wrqe1M
+         XpLFWqQm/5ejrHs4LvszbCVGhUQpt5RldHuYBpZHGpWK+k8+ct5ZLzgXM1sB84XT9Tsh
+         yT/+A7JRd7Gayg7xZDWDGMIiIvQzNuGwkcr5O8+UAtPsDpldS52SHZIHiQXKBJAlSNAa
+         Ymuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWKdSYY5p8gFgIcfBsKATWTbDanq9/sndSzwZj90H/mF/yY7hD4Cl1aMXA14Zbl8fL9iR6Xjlg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXgY5vzbTzRy8HuUo20oMT/k4gtXggwaTcJrnDA3lheXbGSfhe
+	iU/Yp+10NEClfOHYfyejY1xpNJ3IzTnIiuq9GU4MlS94lipRKVXxHCu8BQVphqAVcdVyXbqYv9W
+	iKEgV6CJ8MXBJGILIdBJWf8cz5OMoe9Q1DbN1wA==
+X-Google-Smtp-Source: AGHT+IHBS+HIv9yF2p68lLKGdfHAutk1QCeh9S+mS4oyZxefgJiDx1h4l2Ksu3QtKw2/V0i6JkTXszQ2BY3Xf5eqdao=
+X-Received: by 2002:a2e:4a01:0:b0:2f6:640c:aeda with SMTP id
+ 38308e7fff4ca-2f75a991c27mr19131391fa.23.1725736223266; Sat, 07 Sep 2024
+ 12:10:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240906144632.404651-1-gal@nvidia.com> <20240906144632.404651-16-gal@nvidia.com>
+In-Reply-To: <20240906144632.404651-16-gal@nvidia.com>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Sat, 7 Sep 2024 21:10:12 +0200
+Message-ID: <CACRpkdZru0SfuEmXEdvOp=L+N8inDH3E3o90eXoQmyzO80qsAw@mail.gmail.com>
+Subject: Re: [PATCH net-next 15/16] ixp4xx_eth: Remove setting of RX software timestamp
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Sudarsana Kalluru <skalluru@marvell.com>, 
+	Manish Chopra <manishc@marvell.com>, Michael Chan <michael.chan@broadcom.com>, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, 
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>, Sunil Goutham <sgoutham@marvell.com>, 
+	Potnuri Bharat Teja <bharat@chelsio.com>, Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>, 
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+	Clark Wang <xiaoning.wang@nxp.com>, Dimitris Michailidis <dmichail@fungible.com>, 
+	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Jijie Shao <shaojijie@huawei.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Geetha sowjanya <gakula@marvell.com>, 
+	Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, 
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
+	Bryan Whitehead <bryan.whitehead@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>, 
+	Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Shannon Nelson <shannon.nelson@amd.com>, 
+	Brett Creeley <brett.creeley@amd.com>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
+	Edward Cree <ecree.xilinx@gmail.com>, Martin Habets <habetsm.xilinx@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	Roger Quadros <rogerq@kernel.org>, MD Danish Anwar <danishanwar@ti.com>, 
+	Linus Walleij <linusw@kernel.org>, Imre Kaloz <kaloz@openwrt.org>, 
+	Richard Cochran <richardcochran@gmail.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Carolina Jubran <cjubran@nvidia.com>, 
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In the function hsr_proxy_annouance() added in the previous commit 
-5f703ce5c981 ("net: hsr: Send supervisory frames to HSR network 
-with ProxyNodeTable data"), the return value of the hsr_port_get_hsr() 
-function is not checked to be a NULL pointer, which causes a NULL 
-pointer dereference.
+On Fri, Sep 6, 2024 at 4:50=E2=80=AFPM Gal Pressman <gal@nvidia.com> wrote:
 
-To solve this, we need to add code to check whether the return value 
-of hsr_port_get_hsr() is NULL.
+> The responsibility for reporting of RX software timestamp has moved to
+> the core layer (see __ethtool_get_ts_info()), remove usage from the
+> device drivers.
+>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
 
-Reported-by: syzbot+02a42d9b1bd395cbcab4@syzkaller.appspotmail.com
-Fixes: 5f703ce5c981 ("net: hsr: Send supervisory frames to HSR network with ProxyNodeTable data")
-Signed-off-by: Jeongjun Park <aha310510@gmail.com>
----
- net/hsr/hsr_device.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
 
-diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-index e4cc6b78dcfc..b3191968e53a 100644
---- a/net/hsr/hsr_device.c
-+++ b/net/hsr/hsr_device.c
-@@ -427,6 +427,9 @@ static void hsr_proxy_announce(struct timer_list *t)
- 	 * of SAN nodes stored in ProxyNodeTable.
- 	 */
- 	interlink = hsr_port_get_hsr(hsr, HSR_PT_INTERLINK);
-+	if (!interlink)
-+		goto done;
-+
- 	list_for_each_entry_rcu(node, &hsr->proxy_node_db, mac_list) {
- 		if (hsr_addr_is_redbox(hsr, node->macaddress_A))
- 			continue;
-@@ -441,6 +444,7 @@ static void hsr_proxy_announce(struct timer_list *t)
- 		mod_timer(&hsr->announce_proxy_timer, jiffies + interval);
- 	}
- 
-+done:
- 	rcu_read_unlock();
- }
- 
---
+Yours,
+Linus Walleij
 
