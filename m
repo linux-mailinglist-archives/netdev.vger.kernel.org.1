@@ -1,135 +1,170 @@
-Return-Path: <netdev+bounces-126230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE8A97025E
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 15:22:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A36D970282
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 15:48:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E696A1F2279B
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 13:22:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF00F283244
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 13:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483CC15C133;
-	Sat,  7 Sep 2024 13:22:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A31115DBB6;
+	Sat,  7 Sep 2024 13:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V07Huikd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qt9F/x2y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154D915ADA7;
-	Sat,  7 Sep 2024 13:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08CAC15D5C1;
+	Sat,  7 Sep 2024 13:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725715372; cv=none; b=M4jm1WG0FLEjAz+6WYiWTjME7HhMaR828gblmP2T8wkh8rainNSVvmrJvjE5hxAoCR3rck+ZyGNTCQxVzkuvSFypPrAOKWqdOtCHbJB1yCMTltCMOQIhbYfrg1rGi4BIi29WVLdbSGD69tUndy1W3LQCvRajMHG89lrL/Ci6mXo=
+	t=1725716924; cv=none; b=ZATqO722pvCikazB/6vuFZHmJy5hWPkVDohOwyfHlZ5JQKysUuB1Q64eMlbwv3YBWMe0X5BkFBMfN1GQK7On/71Hnt3jWBNAKtjHuGmOaUgHGRXKOjBY/1xM9mS6UIifWkwtgkDcghmPMKpWIPNZxMyEPnlg0nVfqBrRP/Jg4dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725715372; c=relaxed/simple;
-	bh=y6YKFlhPCQu78jAO0iC8jYVC1hWLcBjxxOdZP1rzmYM=;
+	s=arc-20240116; t=1725716924; c=relaxed/simple;
+	bh=ey36fMdqyJSr9o7fg2f9nSLEmsq1vX3YG6kQS2WaUxc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qi5oiPL34saFwaKRZ3GO6PVyyjne/lv5tcwidtqEo4ffafdGU50Ar7V417GCS/PgadoX8+Po6l8vXDtBjYfTYVTTAOv34YLNSp2m3vGqCMc1Pvre1yNgxETk28jfimSw1PJ43VIMqopw54SX8/avoW13hZrcZFtMq9MQoXlYMek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V07Huikd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B322C4CEC2;
-	Sat,  7 Sep 2024 13:22:51 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ryzz6B5gVL/XwH2ZPYmYb9vSLxOYcJLH+nVog8swZ2ZfGplzAx+fxTjG34wCNqxkTQAZLmMlnj+4KprTWmC5JR2CRaIl5Al48NOpM83j76IcQb3XIrCgCnGlDp4jyxOWfGDL+D4IoPI/Dse6WmkyLIhRwFRTqX3uz71tTKfbdVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qt9F/x2y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B6B0C4CEC6;
+	Sat,  7 Sep 2024 13:48:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725715371;
-	bh=y6YKFlhPCQu78jAO0iC8jYVC1hWLcBjxxOdZP1rzmYM=;
+	s=k20201202; t=1725716923;
+	bh=ey36fMdqyJSr9o7fg2f9nSLEmsq1vX3YG6kQS2WaUxc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V07HuikdAcbrcGIzsucwlYA/+RGJuhvOlJngLr590qYs+K7Od4QTJSbzdbmFqaZ1u
-	 Hbu/Z0iFXjvhAa7suS3a6bXuUtI1RDpRHhVbaNXEgbD0rNbWoapbLHq6DwATbUbqkQ
-	 r4Sf4oz8uY8IuIlODGcRH0Qxqk9UFOBG+8oxdA5BIPM8D6+et/ojkXw9FVZJY633GY
-	 M7pOtT+qYVpibMb1d748GmL6WEs8THD8tc8wdHHZRsbQjVu8hHBlrszHSqCa6BkjgC
-	 +AkIEk/z39+7qjTmWdVkTt8bqZAQaIDb46qoaL3d0xO34fIrtDPhk6j1/bIwN46hSr
-	 nX/pUqZO9+r1A==
-Date: Sat, 7 Sep 2024 15:22:48 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
+	b=Qt9F/x2yxCuHhMdqd2Yav13ruQezrjVb5lPNAuX8j07N8A5gPbjA0nLlW3eGfWdan
+	 umTmnZ1xo94apLseKzyfGyAYS4AP5MC3bEBduXKn2JPxv5q7nWBjZC85PFNl6kQZPT
+	 Xa8OCCB4aBJrgMvyBsuhm/Kg7B5ZHm2D5EiaW00bMwVfT8vpY2cgt/rczsbrneP3FU
+	 dtG356bj9zGn3jGdeoBgupgR5czALPm9d24edUQdEZ2atn5uIl+WeAf0rsZtE7mVmN
+	 IrDNe0L5bg2dbS5R6jnEmbgvIFrDnw4EGwRSpPm5dty6TvLKzEJZYrYxd6WZsuJ13p
+	 7DoSpd5LvKOSw==
+Date: Sat, 7 Sep 2024 14:48:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next 0/9] bpf: cpumap: enable GRO for XDP_PASS frames
-Message-ID: <ZtxTqNLZ2kbb-esH@lore-desk>
-References: <20240830162508.1009458-1-aleksander.lobakin@intel.com>
- <20240903135158.7031a3ab@kernel.org>
- <ZteAuB-QjYU6PIf7@lore-desk>
- <Ztnj9ujDg4NLZFDm@lore-desk>
- <20240905172029.5e9ca520@kernel.org>
- <Ztq6KAWXwjBcGci0@lore-desk>
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH net v1 1/1] netfilter: nf_reject: Fix build error when
+ CONFIG_BRIDGE_NETFILTER=n
+Message-ID: <20240907134837.GP2097826@kernel.org>
+References: <20240906145513.567781-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="z8728SGFsNxd48Un"
-Content-Disposition: inline
-In-Reply-To: <Ztq6KAWXwjBcGci0@lore-desk>
-
-
---z8728SGFsNxd48Un
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240906145513.567781-1-andriy.shevchenko@linux.intel.com>
 
-> > On Thu, 5 Sep 2024 19:01:42 +0200 Lorenzo Bianconi wrote:
-> > > In particular, the cpumap kthread pinned on cpu 'n' can schedule the
-> > > backlog NAPI associated to cpu 'n'. However according to my understan=
-ding
-> > > it seems the backlog NAPI APIs (in process_backlog()) do not support =
-GRO,
-> > > right? Am I missing something?
-> >=20
-> > I meant to use the struct directly, not to schedule it. All you need
-> > is GRO - feed it packets, flush it.=20
->=20
-> ack, thx for pointing this out.
->=20
-> > But maybe you can avoid the netdev allocation and patch 3 in other ways.
-> > Using backlog NAPI was just the first thing that came to mind.
->=20
-> ack, I will look into it.
->=20
-> Regards,
-> Lorenzo
+On Fri, Sep 06, 2024 at 05:55:13PM +0300, Andy Shevchenko wrote:
+> In some cases (CONFIG_BRIDGE_NETFILTER=n) the pointer to IP header
+> is set but not used, it prevents kernel builds with clang, `make W=1`
+> and CONFIG_WERROR=y:
+> 
+> ipv6: split nf_send_reset6() in smaller functions
+> netfilter: nf_reject_ipv4: split nf_send_reset() in smaller functions
+> 
+> net/ipv4/netfilter/nf_reject_ipv4.c:243:16: error: variable 'niph' set but not used [-Werror,-Wunused-but-set-variable]
+>   243 |         struct iphdr *niph;
+>       |                       ^
+> net/ipv6/netfilter/nf_reject_ipv6.c:286:18: error: variable 'ip6h' set but not used [-Werror,-Wunused-but-set-variable]
+>   286 |         struct ipv6hdr *ip6h;
+>       |                         ^
+> 
+> Fix these by marking respective variables with __maybe_unused as it
+> seems more complicated to address that in a better way due to ifdeffery.
+> 
+> Fixes: 8bfcdf6671b1 ("netfilter: nf_reject_ipv6: split nf_send_reset6() in smaller functions")
+> Fixes: 052b9498eea5 ("netfilter: nf_reject_ipv4: split nf_send_reset() in smaller functions")
 
-Hi all,
+Hi Andy,
 
-I reworked my previous implementation to add GRO support to cpumap codebase=
-, removing
-the dummy netdev dependency and keeping most of the other logic. You can fi=
-nd
-the codebase here:
-- https://github.com/LorenzoBianconi/bpf-next/commit/e152cf8c212196fccece0b=
-516190827430c0f5f8
-I added to the two patches below in order to reuse some NAPI generic code:
-- https://github.com/LorenzoBianconi/bpf-next/commit/3c73e9c2f07486590749e9=
-b3bfb8a4b3df4cb5e0
-- https://github.com/LorenzoBianconi/bpf-next/commit/d435ce2e1b6a991a6264a5=
-aad4a0374a3ca86a51
-I have not run any performance test yet, just functional one.
+As mentioned in relation to another similar patch,
+I'm not sure that resolution of W=1 warnings are fixes.
 
-Regards,
-Lorenzo
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  net/ipv4/netfilter/nf_reject_ipv4.c | 2 +-
+>  net/ipv6/netfilter/nf_reject_ipv6.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
---z8728SGFsNxd48Un
-Content-Type: application/pgp-signature; name="signature.asc"
+> 
+> diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
+> index 04504b2b51df..0af42494ac66 100644
+> --- a/net/ipv4/netfilter/nf_reject_ipv4.c
+> +++ b/net/ipv4/netfilter/nf_reject_ipv4.c
+> @@ -240,7 +240,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+>  		   int hook)
+>  {
+>  	struct sk_buff *nskb;
+> -	struct iphdr *niph;
+> +	struct iphdr *niph __maybe_unused;
+>  	const struct tcphdr *oth;
+>  	struct tcphdr _oth;
+>  
 
------BEGIN PGP SIGNATURE-----
+Possibly it is broken for some reason - like reading nskb too late -
+but I wonder if rather than annotating niph it's scope can be reduced
+to the code that is only compiled if CONFIG_BRIDGE_NETFILTER is enabled.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZtxTqAAKCRA6cBh0uS2t
-rA1HAQDexOv6I+cjqBzVYgUS+y0Xn1LJ6hmUxSvpTHYqX2R+DQD/R9oiZLSX4JOy
-XFYnQsY4J2O8rgDbMEquWg0l1Uq3qQ8=
-=poHJ
------END PGP SIGNATURE-----
+This also addreses what appears to be an assingment of niph without
+the value being used - the first assingment.
 
---z8728SGFsNxd48Un--
+E.g., for the ipv4 case (compile tested only!):
+
+diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
+index 04504b2b51df..87fd945a0d27 100644
+--- a/net/ipv4/netfilter/nf_reject_ipv4.c
++++ b/net/ipv4/netfilter/nf_reject_ipv4.c
+@@ -239,9 +239,8 @@ static int nf_reject_fill_skb_dst(struct sk_buff *skb_in)
+ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 		   int hook)
+ {
+-	struct sk_buff *nskb;
+-	struct iphdr *niph;
+ 	const struct tcphdr *oth;
++	struct sk_buff *nskb;
+ 	struct tcphdr _oth;
+ 
+ 	oth = nf_reject_ip_tcphdr_get(oldskb, &_oth, hook);
+@@ -266,14 +265,12 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	nskb->mark = IP4_REPLY_MARK(net, oldskb->mark);
+ 
+ 	skb_reserve(nskb, LL_MAX_HEADER);
+-	niph = nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
+-				   ip4_dst_hoplimit(skb_dst(nskb)));
++	nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
++			    ip4_dst_hoplimit(skb_dst(nskb)));
+ 	nf_reject_ip_tcphdr_put(nskb, oldskb, oth);
+ 	if (ip_route_me_harder(net, sk, nskb, RTN_UNSPEC))
+ 		goto free_nskb;
+ 
+-	niph = ip_hdr(nskb);
+-
+ 	/* "Never happens" */
+ 	if (nskb->len > dst_mtu(skb_dst(nskb)))
+ 		goto free_nskb;
+@@ -290,6 +287,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	 */
+ 	if (nf_bridge_info_exists(oldskb)) {
+ 		struct ethhdr *oeth = eth_hdr(oldskb);
++		struct iphdr *niph = ip_hdr(nskb);
+ 		struct net_device *br_indev;
+ 
+ 		br_indev = nf_bridge_get_physindev(oldskb, net);
 
