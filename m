@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-126152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1FD96FF1F
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 04:10:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8226196FF21
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 04:10:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EE41284850
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 02:10:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B6F81F23B84
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 02:10:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17922E571;
-	Sat,  7 Sep 2024 02:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DAB1757D;
+	Sat,  7 Sep 2024 02:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kbzvLyyk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nkGkO0ZU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19BFD512;
-	Sat,  7 Sep 2024 02:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C445C17571
+	for <netdev@vger.kernel.org>; Sat,  7 Sep 2024 02:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725675037; cv=none; b=QOmnfYVOCThgQLYf6kwNOanhe17aEgBHOsYTnSK9W53ZhD4jxtLeiIBLm9yYhQ2ybl1cGWUQfahgHYBV9AI/yLUK1sPMK756jnB5EB5hyH13wwKOg6mUW4f2XB7B22fAJY9f8fTaYPjxYmaLKvaE/UbWuwiOsQTQbwgjS3Vz8/Q=
+	t=1725675038; cv=none; b=XNxX2yEo6NICCVFgSEuuzA6kH/NMPN/J8kFZMCtrINWLADgxIAa9e1snN+ZUwudApN6VY5QQQwdNbotk5qeiyWIfBp5H1eitTovLSqAnTFSkVyaSKDz3/SEQd14gS6mQ4OkZjezopK0hNAYGafF/dlO4/WyZu0t6HurVmjfEC4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725675037; c=relaxed/simple;
-	bh=Bvw0uTGaeVaD5TLnxxP5vTYTRvv6zuVKsP458cctXM0=;
+	s=arc-20240116; t=1725675038; c=relaxed/simple;
+	bh=+fJeH0KfaLz+6t0eeZcllm58N+azp6r6YqXlCY6u7Eo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ut/XJmrO1k7TFV0xy9WfqVyK2fN+38BsdHqp+ETUSW7iapwGM+hOrnr5BVAjWeNkPOVQiNGKZB/h8ycziZ+MXr69j9VOqXmA5Ok+p9OVAwRzb0vp/LILKI2/cfC4uIbqyOxJeS4ulqZlafcorrmT0JZvwaU3MMIVdzuPti01OQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kbzvLyyk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58605C4CEC4;
-	Sat,  7 Sep 2024 02:10:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725675036;
-	bh=Bvw0uTGaeVaD5TLnxxP5vTYTRvv6zuVKsP458cctXM0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kbzvLyykRv9+4+z0OSkpU1LhMA/M7tc6vQWMhKHVNos5BNM3W7221lS3l8oasu3X7
-	 3d4a+Hrsc8PlEbEMdDb9+P8qt8Z/wB7/q8WotxXTHQ33rb48GoCqHu43bbDDqpDDxu
-	 38Zfvi/qJo0+GkjNd2oESUvbWDP3Xgd2l0nW6G5FTL/SgSQQ1DyorImKY/wtTk6xkK
-	 1064uffPVaCmqD4QQM0irKPVMK/Lfoos9awv0CJZa5umrlbckjN5ucP/piE8g1vQ0R
-	 BrgidqjhvFksXK9280UisRhQvsXq6Rrw044ueH1S6y8TGJvodIhkezLvQNrkWZXFAl
-	 xh02qmQ6mFL5g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CAE3805D82;
+	 In-Reply-To:To:Cc; b=jtkao5fwiVlKlQqZdEA7Cpagx2k3tUJZ8ddySGC4URYwOMSCTXeU4Y7ib4RHPQ0wSHQ8oBxemDIcFSnh/GEBPjc8kLM3YjsiT1V3z+vuzJ4WmugqTnTu+RZsFbYX85lDBGA71Gp6e0y3ZM3QP1OXZ9QNL050sWnQqLGRARdG/zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkGkO0ZU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 566C2C4CEC4;
 	Sat,  7 Sep 2024 02:10:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725675038;
+	bh=+fJeH0KfaLz+6t0eeZcllm58N+azp6r6YqXlCY6u7Eo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nkGkO0ZUm4FXs2sIMzNGXTBFLOVhfYXIimnUEYjYUpmdLoeonrIG4FaQKXibQa7pX
+	 OGhrTGEWlv7HEumksqy304NaITomUu4XPxpRtKA6MF+fqPEzN4V6PxGd6gBvyFsssN
+	 GI9ikOlInyMAbS/QBs4D4PL/i+uoGJkH8sW4fl/DeXqjjtC91Oxn7bqfAhHie92t3u
+	 TAnewa81JKUDI1KSyQYu+lckFXuN9YAjf8eOk5qJHdxOTj7IzypVX+BpwFUIYB732m
+	 bouCYMyWDcnZGlbrnOTkMqc1kgR1Ty8S0TZTQ05O5+ru8uMobzz6PHTdPPrP64mxRg
+	 UXBDmfWesP6Jw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D813805D82;
+	Sat,  7 Sep 2024 02:10:40 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,67 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 01/16] netfilter: ctnetlink: support CTA_FILTER for
- flush
+Subject: Re: [PATCH net-next v2] ptp: ocp: Improve PCIe delay estimation
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172567503731.2582309.1861250019019937607.git-patchwork-notify@kernel.org>
-Date: Sat, 07 Sep 2024 02:10:37 +0000
-References: <20240905232920.5481-2-pablo@netfilter.org>
-In-Reply-To: <20240905232920.5481-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, fw@strlen.de
+ <172567503909.2582309.5936192905565257390.git-patchwork-notify@kernel.org>
+Date: Sat, 07 Sep 2024 02:10:39 +0000
+References: <20240905140028.560454-1-vadim.fedorenko@linux.dev>
+In-Reply-To: <20240905140028.560454-1-vadim.fedorenko@linux.dev>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: kuba@kernel.org, jonathan.lemon@gmail.com, pabeni@redhat.com,
+ dsahern@kernel.org, horms@kernel.org, netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  6 Sep 2024 01:29:05 +0200 you wrote:
-> From: Changliang Wu <changliang.wu@smartx.com>
+On Thu,  5 Sep 2024 14:00:28 +0000 you wrote:
+> The PCIe bus can be pretty busy during boot and probe function can
+> see excessive delays. Let's find the minimal value out of several
+> tests and use it as estimated value.
 > 
-> From cb8aa9a, we can use kernel side filtering for dump, but
-> this capability is not available for flush.
-> 
-> This Patch allows advanced filter with CTA_FILTER for flush
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> ---
+> v1 -> v2:
+> - init delay with the highest possible value
+> - use monotonic raw clock to calculate delay
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,01/16] netfilter: ctnetlink: support CTA_FILTER for flush
-    https://git.kernel.org/netdev/net-next/c/1ef7f50ccc6e
-  - [net-next,02/16] netfilter: nft_counter: Use u64_stats_t for statistic.
-    https://git.kernel.org/netdev/net-next/c/4a1d3acd6ea8
-  - [net-next,03/16] netfilter: Use kmemdup_array instead of kmemdup for multiple allocation
-    https://git.kernel.org/netdev/net-next/c/20eb5e7cb78c
-  - [net-next,04/16] netfilter: conntrack: Convert to use ERR_CAST()
-    https://git.kernel.org/netdev/net-next/c/09c0d0aef56b
-  - [net-next,05/16] netfilter: nf_tables: drop unused 3rd argument from validate callback ops
-    https://git.kernel.org/netdev/net-next/c/eaf9b2c875ec
-  - [net-next,06/16] netfilter: nf_tables: Correct spelling in nf_tables.h
-    https://git.kernel.org/netdev/net-next/c/85dfb34bb7d2
-  - [net-next,07/16] netfilter: nf_tables: Add missing Kernel doc
-    https://git.kernel.org/netdev/net-next/c/c362646b6fc1
-  - [net-next,08/16] netfilter: nf_tables: elements with timeout below CONFIG_HZ never expire
-    https://git.kernel.org/netdev/net-next/c/e0c47281723f
-  - [net-next,09/16] netfilter: nf_tables: reject element expiration with no timeout
-    https://git.kernel.org/netdev/net-next/c/d2dc429ecb4e
-  - [net-next,10/16] netfilter: nf_tables: reject expiration higher than timeout
-    https://git.kernel.org/netdev/net-next/c/c0f38a8c6017
-  - [net-next,11/16] netfilter: nf_tables: remove annotation to access set timeout while holding lock
-    https://git.kernel.org/netdev/net-next/c/15d8605c0cf4
-  - [net-next,12/16] netfilter: nft_dynset: annotate data-races around set timeout
-    https://git.kernel.org/netdev/net-next/c/c5ad8ed61fa8
-  - [net-next,13/16] netfilter: nf_tables: annotate data-races around element expiration
-    https://git.kernel.org/netdev/net-next/c/73d3c04b710f
-  - [net-next,14/16] netfilter: nf_tables: consolidate timeout extension for elements
-    https://git.kernel.org/netdev/net-next/c/4c5daea9af4f
-  - [net-next,15/16] netfilter: nf_tables: zero timeout means element never times out
-    https://git.kernel.org/netdev/net-next/c/8bfb74ae12fa
-  - [net-next,16/16] netfilter: nf_tables: set element timeout update support
-    https://git.kernel.org/netdev/net-next/c/4201f3938914
+  - [net-next,v2] ptp: ocp: Improve PCIe delay estimation
+    https://git.kernel.org/netdev/net-next/c/aa05fe67bcd6
 
 You are awesome, thank you!
 -- 
