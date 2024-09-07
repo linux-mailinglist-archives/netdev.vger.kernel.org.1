@@ -1,205 +1,204 @@
-Return-Path: <netdev+bounces-126261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E40F970410
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 22:32:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9395970433
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 23:49:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C481B20A91
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 20:32:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB7271C21046
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 21:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5AD15E5C8;
-	Sat,  7 Sep 2024 20:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00520167DB8;
+	Sat,  7 Sep 2024 21:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="N1uEk2vQ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lqm+HT4y"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2069.outbound.protection.outlook.com [40.107.92.69])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B38D3F9CC
-	for <netdev@vger.kernel.org>; Sat,  7 Sep 2024 20:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725741132; cv=fail; b=G+AXAtmLLAh2PrVQ2v3oU0CnkjQxyQtVrnmzj3+IFIKtNIoXzVpNncvaqrDsuKH2WuY+xsfzJynUL/1Neh12ZRXcFLjowWauPdzo0bZK3PaVGb6XQPw1qLMBIoec+rkQB5BF+csvK1lEhd3SQ1SUe1T/Qos8gGM/v9e2dZkkLxE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725741132; c=relaxed/simple;
-	bh=qIs5P9ZQEe0nvU72MStKYh2qcGSufcd5VS09nzwbW6U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Iauf/xOAoDN1nfZXWL3kpMasUG9FxzsFaGZ0NDhNd+CrwSthL3fV8rhpLRd/Y0R1tLud5T7qYD1ipIv6BjCXwCMgxS1oTLqN+NK4O78BmBE0zAtRzbzhXsPO9rY+5LQSHaRvneIqZN2U0s+JYFcU26gCB6EDe+O44qO/91awxr8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=N1uEk2vQ; arc=fail smtp.client-ip=40.107.92.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hqmPUnWIHu1dUKfYnJV3GuGJbsaNHZayWvBic7rjqgOCSoaYjIbyZFlSExMNdvWvPXFhmsnK6OmrzJP6IKnwLwLSJEY3ReULyxiaNfmLGfJ0b29FnaAKF8fyDix5YbbzzZZiEoAnX4sH+fV2/DK1hNUWVSUSIefXtvxSu2JVrAPscemlJpjdQkINJU1bo71hR2jRbdivMTPRXMpZ9wP908BfMiim8DaRrgSoiIl6mx0CuZ71bK4LAsoAci7OVkW1mqsSvTiihmoi+D+Z9KqN1L/D8BqQKosA6ucYr6/blo89KOVPSZM0BkZHapoPEAm7/INKDyo8fIg0PEbs1C86PQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0SeD/EdRV9h0DFkaumt+N4zXgpItcIv4BaOsoo23YLQ=;
- b=jf6u3bU/O2NaKW1YAexEdtKU2R5W6Pq1Y+ffoG5cM5TW4/7M4SIEGrxsdY0cXs87AKFPPuxdMz1a2Bxv5JJwesAO7uE3/uEz1nWZavqof1BqpaAYvddOuTHc2MrLmVvhMsGOqThlDrZZINTPFtkkOIIkNRKOJqQs7lJQU3l1UDCjwH8DVglZeb+tZGdIXx0TTm7DbJlK97Tjez2FfAKVdQCBCAiFTW72vItX/5jOGkmsw4Jifev2Dz1muWl7v/YHQeU6D4nrBvL6qLC5rNbo8n1ojx+dUyz9iBodQPFctRiopViAPdAa1wHFLlejXzKFYhNu5DiD6sMOQOOSzBt7rg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0SeD/EdRV9h0DFkaumt+N4zXgpItcIv4BaOsoo23YLQ=;
- b=N1uEk2vQ8tv6mhsN7yLoOhdjIV8s09juqryWF6uEKENVcum+3Kqf9kFa1K9M6CmwL2SicKFn3etlL0reh6h8aaCsWbs4bOu8pKwXaqzBAhGQqi18XnSRgyLNvtpfKrdHJzN9Ovk+3PMIDsWAsbNBYd4d4TBv65YC4ly7mvNQ6l724HIuF8lrnebiErMIPVfpHl7xiytYmWrs6TtzDxR5uxhdHZEs8nfHsGhTSITYw0UgUHvW63BKrgHiC/yaQKrjp9aQw7XGElPCa8tymH49NcSHNTQN3pPOBBQ6R2PciiqRPtgL1VEGU4d5EIpvbGGJjo6yFVvszJm70/QcQQtlPQ==
-Received: from PH7PR12MB5903.namprd12.prod.outlook.com (2603:10b6:510:1d7::14)
- by SA1PR12MB9246.namprd12.prod.outlook.com (2603:10b6:806:3ac::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.20; Sat, 7 Sep
- 2024 20:32:06 +0000
-Received: from PH7PR12MB5903.namprd12.prod.outlook.com
- ([fe80::2abe:232c:fb73:f2fe]) by PH7PR12MB5903.namprd12.prod.outlook.com
- ([fe80::2abe:232c:fb73:f2fe%4]) with mapi id 15.20.7939.017; Sat, 7 Sep 2024
- 20:32:06 +0000
-From: Yevgeny Kliteynik <kliteyn@nvidia.com>
-To: Simon Horman <horms@kernel.org>, Saeed Mahameed <saeed@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed
- Mahameed <saeedm@nvidia.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Itamar Gozlan
-	<igozlan@nvidia.com>
-Subject: RE: [net-next V3 11/15] net/mlx5: HWS, added memory management
- handling
-Thread-Topic: [net-next V3 11/15] net/mlx5: HWS, added memory management
- handling
-Thread-Index: AQHbAKdeksxVlpR7rESPoGzOv/ZSRLJMYwAAgABk7vA=
-Date: Sat, 7 Sep 2024 20:32:05 +0000
-Message-ID:
- <PH7PR12MB59032B0605978DA5D664A3B4C09F2@PH7PR12MB5903.namprd12.prod.outlook.com>
-References: <20240906215411.18770-1-saeed@kernel.org>
- <20240906215411.18770-12-saeed@kernel.org>
- <20240907142806.GS2097826@kernel.org>
-In-Reply-To: <20240907142806.GS2097826@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR12MB5903:EE_|SA1PR12MB9246:EE_
-x-ms-office365-filtering-correlation-id: 99ec968b-58d4-400a-6b88-08dccf7c239e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?BvwBMYNj+olG4ma6XBc9hRQk0hQKfIASIQ53/Bv6pU0eS48q7N0PvhSVte1X?=
- =?us-ascii?Q?Fv0Mb+GkDUCtcjeAbm1oA465KQV2I+LIcXhJyIm5RErmc3tPLqGEOF42Az/T?=
- =?us-ascii?Q?6iU8rSgS4NCv9YIUU6YyTCbQGoBQrelpJ0we/zySnksxThp+GfOM5L/jl5ir?=
- =?us-ascii?Q?rRFRmP0dF+5rgnozd9E/IjwwclPwUXuley3eCIeE+RpX1doUva6AsBWZAsWM?=
- =?us-ascii?Q?R5T3F5w4imCEWg9ktQ31VBU0XWQtl90QR1nzy2lS/ZnGGPE/XRW+hsZfRr80?=
- =?us-ascii?Q?ohWpP9aFIRHJkHHRLygR5nDvDgpNKg//ZkEK44a3Om1+Zm4tUrNTHsJ1l1MA?=
- =?us-ascii?Q?ghiSQQMLyq/QGAcjyPWPlwVFW5iE8u5rYkJBRYOLb/1kJcXC1Xo8KSoNhMYe?=
- =?us-ascii?Q?GwkWwdhPIVpBK2NRRSFjvwQFET2vDQ8agxlKj5B734FSM/s2zNOb1TfH65wr?=
- =?us-ascii?Q?S+L17ovqx1apRPJr63gKZPc3KiYKEoA9taoZnWYH/HZGN1D0kvNgfJv6gTTN?=
- =?us-ascii?Q?p0BPU7WHUCvrnJDE0aBOSlvdwupQu+hn+ZgMqim/bvA8h+BMWfgbcmqavDwN?=
- =?us-ascii?Q?I1+jxGrjdhgf3IncqqOb18oyYWFI7Q160g6ZNjgkAA1FdmTa4/SavERLDCqe?=
- =?us-ascii?Q?Dv7i3Z3F43QhIA8EH9Th5F/cS6oQQIUrKE4aMXCIs8ypCEVmv9DR5sZqZEOr?=
- =?us-ascii?Q?tyI+D13opmdPPlq2Je2ppo/l11fhyq+nRz6AxmDkRerGB2+M2uCdM1vec5bk?=
- =?us-ascii?Q?E8sApvaYMTHK0Zzs4Hnw3GjtDncXGTowOtO7lwIR0hefhKElCFYbNzP/ievV?=
- =?us-ascii?Q?Ros9yLVKSW9oO+L/7Ph/qn4S7GKdkLAB8hSdTCOoRoWGBTvWyC2Nd+RKPtoj?=
- =?us-ascii?Q?SWa13aAuiOQ2U7M9eYfXJWTxmXQjP2TwABSpoUBVUEHdfsyvvFaTZqkL5qYu?=
- =?us-ascii?Q?fTALlyZSPp2GvJWGDYmjXttAIEur4GwHs3rVeVGs/rpWGT8p0AGfar4xzo0D?=
- =?us-ascii?Q?CbSdG//keZOLtIFggLQ2ehyaw5VomBQ7sd6YjeezgI9V0x7RcfeW8yZwQpvL?=
- =?us-ascii?Q?BxwkaakxN4lT8zRcV1thaUceKcwYjxbIowVOAdLziF6YvBHq20Gr7glRHBKM?=
- =?us-ascii?Q?mQz9zKEyGTrK3/dI3M3R6//nmMZEe3DcSy1EEyt6OzZ9tI5H9eT1xMnmvMUK?=
- =?us-ascii?Q?zSAnNlvb5mE+KawbWsMAsQQ6zCX+AlQxGOVxxwe80u8ELu7OPvTDOo0y06j0?=
- =?us-ascii?Q?RUQF5RRUOo7spOXp8TB30b4rEJYjb8iRCRZUW4vK2o6Pyhyhh+uVX4uvvPBY?=
- =?us-ascii?Q?k2nhul8Wi8wDTVhSsh2o92+vnN4VJqadLfGBEk0O2702N4tLiQXuBMIngHje?=
- =?us-ascii?Q?d6lIl+GKV9vig7BTUAVdba8FmybRhLmaUevA0jVaUkg3/ZnN2w=3D=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5903.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Vbq+5M937h4mF4SkdsaxLHfaew4LLsSL06zuduK3LvutV2F0wo7RmuEBIY+D?=
- =?us-ascii?Q?8K9slHkIKW9RI+9XZMbB8inF0Gj8I5qrLGcUhWmrprruYDIY7g2ptCcvas+c?=
- =?us-ascii?Q?2sXpVW4k7Kec1DVWrq3MulJ3Rvc8UUJPGY3xalaBWNaBTUNKM7HeTbbRoi5i?=
- =?us-ascii?Q?OYSMuSV4ZpoqGsOoc9xoUcZR+fXCWuIDTrvL4LFAMMIEaqDjZ9UN25ybHlpp?=
- =?us-ascii?Q?3DjT/VLiwZqJjn2pv9eAGiSEY3bNPcnIIzlkQyaKQ7+KY8Fzb+cT9C8WB6O2?=
- =?us-ascii?Q?uwhTxbyigRYMRhsf6xsg+wcXiOm36wt3IVtpe6F8kQWPOXgGKxUJPtsFXFU2?=
- =?us-ascii?Q?g5EOkmmDYuZWtDRR4Vlx8nnAPFO2t4FQE6a8n1QN9aS+wRt5HhvmE7lXA/QL?=
- =?us-ascii?Q?wRdX4tvjWc98r+3DUgrX0NnPYlNAqqF18iPnqqXhWhDHsn/42ibOgqLsyr8/?=
- =?us-ascii?Q?+3spilxxlgnRTsWrBkgUhkbirvMauJ48Nd0pEEr7ZifAOQz4gCen/WFzAYPJ?=
- =?us-ascii?Q?47gRIMeKSEPR/5ebORPU7EPX4cwVm/rjU38KkUx+uMBGw7L3zN2Qco72fbaD?=
- =?us-ascii?Q?D+jrCCUIqmARJ+V3I4Kb//Tkgzo30jPADXwe1Lcj5YDvIIPXa2oiWoSdqqbv?=
- =?us-ascii?Q?VJCojLjb6yPmTGrFCl76eC3LNIvZ+c0kycw43eQkhOX6I0MAYIMpPCyg9aYj?=
- =?us-ascii?Q?oKn3AgtuFBcICBGzcGax/BzQWtqrr9VejKoDx/aUddt1ZdsznhY3P+WNBLKK?=
- =?us-ascii?Q?425R0hugQT+6pzkZj1PcMiJLNWA3Yw4ubLacSh/i+w7pD6qpBnAaBHEIDo6I?=
- =?us-ascii?Q?HILtEuPARdMXxTapXy7z8iIpn9/bKa2Fjim5KaolPXXFddtMA6zEs2+6ebNK?=
- =?us-ascii?Q?fE88L5cqS3WkHaOPqcw5nn77Qi/qNmAJWvknaBshqKfT0oDRbVECdyQ6T1IZ?=
- =?us-ascii?Q?bOMI3D890g+0JhZ2Lz/JkUqQZiOs3bUE4uuJ3pOfAXscjPOHfkHXFVnC2K0t?=
- =?us-ascii?Q?+lA/AV4tn6fufEBeuIbyI+YhifbcnHZGJievDwkmu3JOoXn4EVjKGl7e7cuJ?=
- =?us-ascii?Q?aWNqCEMaAbLLmSuaVRtLLKLMMn7u/5DZ6R3hjDlk4YHQsPbmRgayhN5WAk49?=
- =?us-ascii?Q?k2roO668RGi3lEIq9tYxHPT9k+fx5jOI8ywoG1XOXzTRL7Z2wcytH7BonVkX?=
- =?us-ascii?Q?sDOC4Xyic6G469qfCL9/Tf05gyIf/xRJnbnTo5UE2E0Xxh3YGlHWQfltpmKf?=
- =?us-ascii?Q?hyV54XBmj/bz8GlTgt7QxcxNvjJ5NHdotpAmj4v+epyf+6Z3xP01umVNY4KK?=
- =?us-ascii?Q?GzXwmi+10Z/mxm8BHWadqEARUp+erhtqr5idPM1119w6noH7dXcZC/Jsz0Vo?=
- =?us-ascii?Q?wtgM0GALim1r7sGo+My4SGtG1xz6i67PpF0FngUAUpk6jsGbtFiQ0BHy7i0L?=
- =?us-ascii?Q?311gsFrBWlXnWQLIOKKoru70OklscShEml4XRTnqc0LZKNVeZ0Gk+zJerPPk?=
- =?us-ascii?Q?pVUm/Jwo0iFpluM2l0xskU/23YKVb7w54vlZKOObcq8aeXqGB3edIkgkmQ9x?=
- =?us-ascii?Q?wTbfx0ps9nmnpFo3iME=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D07E15C137;
+	Sat,  7 Sep 2024 21:49:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725745772; cv=none; b=SWFGh74rLHYeM8HoYkrOqqaSnvXnTCdGpVEgvCT4mJ4TVdYFuHkyVoExETzYOEe6yHgugtVuKQNSIbvVSgC2M0HfzpOTWxsjvGDhh9bWRgBBouP7nT70CMaEZ1nEcXs7BFEmHWlAcMgwHQfzVarzeEKqRouYntSOG1xx7rjEkvY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725745772; c=relaxed/simple;
+	bh=kGaVm3ajfEzbqOzJXpCQSZ0xPnHjlIg/FyJWIUkrZgI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b3vEseJiJdByBCoTnSZTl18DH6pqVXiP40fDYPsnZKJVBJ29QxMCPW6NGGXYJtUYSxmse051RJ4jUOipe+cBD10fQzi2keqg/JXeIkn4u2x7OvkDqKvyGgUxk/wsJe3oTa1vVbO1GhAxxaAzPx8yhgcWjrDVSRW9uxmqnFnByf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lqm+HT4y; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725745771; x=1757281771;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kGaVm3ajfEzbqOzJXpCQSZ0xPnHjlIg/FyJWIUkrZgI=;
+  b=lqm+HT4yLseil/MVXz+aY4aW3odEhIFy8XHnn83fstH9FfOeaw9+/AKA
+   87BlS9xPNglOu7r8ED2v3WF/cmi627ZBhPI9EvjLYvYKgtMq8sk8Zr2TK
+   o/QTHzTdviWiBxGfPSKOSc0YBlBvW/Wx6Iq0LuTwMR+q5SZ3/jU3CfJnj
+   j0evnV5mXW//SnELBT9rjo65g8V3Z2gjzHsyvK3nfknb2vVYRXA5gdcKA
+   oSLI9302lD4P+PHKRnr21yD9n4raum34+b0+NF4dV+fihys/Hrmdbgo8j
+   Bl6nkuNP4TrzPgICXDOnYXOJfIsFbC9KSmyeFfkISttztGgFZqd6QLOkA
+   g==;
+X-CSE-ConnectionGUID: sbmqYL7nS9S0gWLtQPbi+g==
+X-CSE-MsgGUID: Na1iVRP3RI+aSvDU+ybvZw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11188"; a="49887699"
+X-IronPort-AV: E=Sophos;i="6.10,211,1719903600"; 
+   d="scan'208";a="49887699"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2024 14:49:31 -0700
+X-CSE-ConnectionGUID: owogG1gmQQqW1koiWTIJUQ==
+X-CSE-MsgGUID: h8xLWRGPTOqAG0/Losp03w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,211,1719903600"; 
+   d="scan'208";a="66276962"
+Received: from lkp-server01.sh.intel.com (HELO 9c6b1c7d3b50) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 07 Sep 2024 14:49:28 -0700
+Received: from kbuild by 9c6b1c7d3b50 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sn3J7-000D2G-2z;
+	Sat, 07 Sep 2024 21:49:25 +0000
+Date: Sun, 8 Sep 2024 05:49:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Rohit Chavan <roheetchavan@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Rohit Chavan <roheetchavan@gmail.com>
+Subject: Re: [PATCH] lib80211: Use ERR_CAST() to return
+Message-ID: <202409080536.stm6x1AU-lkp@intel.com>
+References: <20240906114455.730559-1-roheetchavan@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5903.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99ec968b-58d4-400a-6b88-08dccf7c239e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Sep 2024 20:32:05.9947
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 37NoWpI0EzpO4Go9jZY+RQLyYhjyT+m1+S2j7YMtaXFnbu4VWx8gTiPHhLwI/l1zh8LWlBw290MSvVA0T6LD8Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB9246
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240906114455.730559-1-roheetchavan@gmail.com>
 
-> From: Simon Horman <horms@kernel.org>
-> Sent: Saturday, September 7, 2024 17:28
-> To: Saeed Mahameed <saeed@kernel.org>
-> Cc: David S. Miller <davem@davemloft.net>; Jakub Kicinski
-> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Eric Dumazet
-> <edumazet@google.com>; Saeed Mahameed <saeedm@nvidia.com>;
-> netdev@vger.kernel.org; Tariq Toukan <tariqt@nvidia.com>; Gal Pressman
-> <gal@nvidia.com>; Leon Romanovsky <leonro@nvidia.com>; Yevgeny
-> Kliteynik <kliteyn@nvidia.com>; Itamar Gozlan <igozlan@nvidia.com>
-> Subject: Re: [net-next V3 11/15] net/mlx5: HWS, added memory management h=
-andling
->=20
-> > +     switch (pool->type) {
-> > +     case MLX5HWS_POOL_TYPE_STE:
-> > +             ste_attr.log_obj_range =3D log_range;
-> > +             ste_attr.table_type =3D fw_ft_type;
-> > +             ret =3D mlx5hws_cmd_ste_create(pool->ctx->mdev, &ste_attr=
-, &obj_id);
-> > +             break;
-> > +     case MLX5HWS_POOL_TYPE_STC:
-> > +             stc_attr.log_obj_range =3D log_range;
-> > +             stc_attr.table_type =3D fw_ft_type;
-> > +             ret =3D mlx5hws_cmd_stc_create(pool->ctx->mdev, &stc_attr=
-, &obj_id);
-> > +             break;
-> > +     default:
-> > +             return NULL;
->=20
-> Sorry, but this now appears to leak resource. Maybe:
->=20
->                 goto free_resource;
->=20
-> Or:
->                 ret =3D -EINVAL;
->=20
+Hi Rohit,
 
-Indeed. Thanks Simon.
+kernel test robot noticed the following build errors:
 
--- YK
+[auto build test ERROR on wireless-next/main]
+[also build test ERROR on wireless/main linus/master v6.11-rc6 next-20240906]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Rohit-Chavan/lib80211-Use-ERR_CAST-to-return/20240906-194721
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git main
+patch link:    https://lore.kernel.org/r/20240906114455.730559-1-roheetchavan%40gmail.com
+patch subject: [PATCH] lib80211: Use ERR_CAST() to return
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20240908/202409080536.stm6x1AU-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 05f5a91d00b02f4369f46d076411c700755ae041)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240908/202409080536.stm6x1AU-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409080536.stm6x1AU-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from net/wireless/lib80211.c:21:
+   In file included from include/linux/ieee80211.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:10:
+   In file included from include/linux/mm.h:2228:
+   include/linux/vmstat.h:517:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     517 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   In file included from net/wireless/lib80211.c:21:
+   In file included from include/linux/ieee80211.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     548 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from net/wireless/lib80211.c:21:
+   In file included from include/linux/ieee80211.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from net/wireless/lib80211.c:21:
+   In file included from include/linux/ieee80211.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     585 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+>> net/wireless/lib80211.c:230:18: error: incompatible integer to pointer conversion passing 'int' to parameter of type 'const void *' [-Wint-conversion]
+     230 |         return ERR_CAST(1);
+         |                         ^
+   include/linux/err.h:82:64: note: passing argument to parameter 'ptr' here
+      82 | static inline void * __must_check ERR_CAST(__force const void *ptr)
+         |                                                                ^
+   7 warnings and 1 error generated.
+
+
+vim +230 net/wireless/lib80211.c
+
+   227	
+   228	static void *lib80211_crypt_null_init(int keyidx)
+   229	{
+ > 230		return ERR_CAST(1);
+   231	}
+   232	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
