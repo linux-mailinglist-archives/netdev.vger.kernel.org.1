@@ -1,139 +1,135 @@
-Return-Path: <netdev+bounces-126198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D6ED96FFBA
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 05:14:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91D5696FFD0
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 05:27:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B324F1F2610C
-	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 03:14:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2322E1F2271B
+	for <lists+netdev@lfdr.de>; Sat,  7 Sep 2024 03:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A301C6B2;
-	Sat,  7 Sep 2024 03:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6418638DE4;
+	Sat,  7 Sep 2024 03:26:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="LmmIuOdT"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E57157488;
-	Sat,  7 Sep 2024 03:10:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D876E17BB4;
+	Sat,  7 Sep 2024 03:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725678652; cv=none; b=VZfagMJ9MitAfdd66D3zuz1E5f8seFX6InU01cyOR+glaZnQlET2WdbjOZ/EbZ0S1PvBSQoKwmLDo6WPQ0zKG9B3wJ08XuApvjS/8vc8I6A8ykvBJRdHTgsfkYq9IbLYzOEmjhF97DkDGC1keAGZP3eyImZKYNBPR2UeDOL7xU4=
+	t=1725679619; cv=none; b=cuPazRVmKeoOY8HeCxSMIx08ufTAuMe/e80JsHuNgjVzSu9WOUImzRLekWxkjwsCPFURD1iOKEKCXA4NkNkCpGtDHin4IMR0tWL4dDkpzr4rKxj+uhW+DczHJPtuBs4yWB3A8m1UpKUHU0PNuQy4N+qw3nY6I9Hpbidur1HaTao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725678652; c=relaxed/simple;
-	bh=QTU7fufNN1BaBlcJYY1qHswGUbgAx/DUxgQa8eGoits=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y4R74S3Usi7BlfYSr3/7gxCchPu0iWMY3SyToZALChEr29FNMZT+NhvOSQOWo4H06E3go4+gHTD3HwBKxP6BBxaBLfB3SXqd6kVr1wARh0Q9oTdjyzuzswRhtA8aUtDkDJZVGVmJVlBK2YGTCTCVxzKYQgnokEIpo07fNjzcS0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4X0yjT4WHVz1xwt7;
-	Sat,  7 Sep 2024 11:08:45 +0800 (CST)
-Received: from kwepemd500012.china.huawei.com (unknown [7.221.188.25])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9151D1A016C;
-	Sat,  7 Sep 2024 11:10:47 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemd500012.china.huawei.com
- (7.221.188.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.34; Sat, 7 Sep
- 2024 11:10:46 +0800
-From: Li Zetao <lizetao1@huawei.com>
-To: <mchehab@kernel.org>, <florian.fainelli@broadcom.com>, <andrew@lunn.ch>,
-	<olteanv@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <wens@csie.org>,
-	<jernej.skrabec@gmail.com>, <samuel@sholland.org>, <heiko@sntech.de>,
-	<yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>, <hauke@hauke-m.de>,
-	<alexandre.torgue@foss.st.com>, <joabreu@synopsys.com>,
-	<mcoquelin.stm32@gmail.com>, <wellslutw@gmail.com>,
-	<radhey.shyam.pandey@amd.com>, <michal.simek@amd.com>, <hdegoede@redhat.com>,
-	<ilpo.jarvinen@linux.intel.com>, <ruanjinjie@huawei.com>,
-	<lizetao1@huawei.com>, <hverkuil-cisco@xs4all.nl>,
-	<u.kleine-koenig@pengutronix.de>, <jacky_chou@aspeedtech.com>,
-	<jacob.e.keller@intel.com>
-CC: <linux-media@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-sunxi@lists.linux.dev>, <linux-rockchip@lists.infradead.org>,
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	<platform-driver-x86@vger.kernel.org>
-Subject: [PATCH net-next v2 10/10] net: xilinx: axienet: Convert using devm_clk_get_optional_enabled() in axienet_probe()
-Date: Sat, 7 Sep 2024 11:19:26 +0800
-Message-ID: <20240907031926.3591353-11-lizetao1@huawei.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240907031926.3591353-1-lizetao1@huawei.com>
-References: <20240907031926.3591353-1-lizetao1@huawei.com>
+	s=arc-20240116; t=1725679619; c=relaxed/simple;
+	bh=iLx+60992UKgTf7j5wreFIgwbCS5JWRm7aBPzVqJ0PM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u0K+evFiyyeNWRF7InX+QkRFWY4vltxj2JVjP3jdb1jqRuShHPPRQb09E/9Uu0WqOWLIiDc00nJR4P0qJoMLjLJUkYaJAgBhwZHQDJ2gqTpH7VYJqkDnmdP+HGWHHS+yc4vKUvPbqEOXZbR7Tz4Usf0uPZnJoXaiHy8z+r9Qo4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=LmmIuOdT; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1725679613; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=o6YIDB8+pEgPLL7mV5g7GEb+/wtfGn39UknKm3MtQNM=;
+	b=LmmIuOdT3kCm9fZ/w0KeT0Ac5Or+lN071p+3tbnt95pHmumhIooo6D92isrqHtTdizg/mB8qm8QdoC3SKcdqGIwM872MGVK3ctcmEuXsjtD28290l6YUUiOchSe8LAopJ9VG5Y+xGyl31Wq4h/dK0Js6ym2rsDirvUpc/0Yz+z4=
+Received: from 30.13.147.236(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WERGaMf_1725679610)
+          by smtp.aliyun-inc.com;
+          Sat, 07 Sep 2024 11:26:51 +0800
+Message-ID: <48d5c3df-8735-4aa9-afe3-bfcd32f7cfe8@linux.alibaba.com>
+Date: Sat, 7 Sep 2024 11:26:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2 1/5] bpf: Support __nullable argument suffix
+ for tp_btf
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: bpf@vger.kernel.org, edumazet@google.com, rostedt@goodmis.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, martin.lau@linux.dev,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com,
+ song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, mykolal@fb.com,
+ shuah@kernel.org, mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ thinker.li@gmail.com, juntong.deng@outlook.com, jrife@google.com,
+ alan.maguire@oracle.com, davemarchevsky@fb.com, dxu@dxuuu.xyz,
+ vmalik@redhat.com, cupertino.miranda@oracle.com, mattbobrowski@google.com,
+ xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20240905075622.66819-1-lulie@linux.alibaba.com>
+ <20240905075622.66819-2-lulie@linux.alibaba.com>
+ <CAEf4BzYjGaJGzw+dXCOhUwJS-QhyZ-_sWL6Oo8yUXOoeWWA1=w@mail.gmail.com>
+From: Philo Lu <lulie@linux.alibaba.com>
+In-Reply-To: <CAEf4BzYjGaJGzw+dXCOhUwJS-QhyZ-_sWL6Oo8yUXOoeWWA1=w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemd500012.china.huawei.com (7.221.188.25)
 
-Use devm_clk_get_optional_enabled() instead of devm_clk_get_optional() +
-clk_prepare_enable(), which can make the clk consistent with the device
-life cycle and reduce the risk of unreleased clk resources. Since the
-device framework has automatically released the clk resource, there is
-no need to execute clk_disable_unprepare(clk) on the error path.
 
-Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-Signed-off-by: Li Zetao <lizetao1@huawei.com>
----
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 15 ++++-----------
- 1 file changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 374dff70ef0d..87c5dcec2325 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -2592,22 +2592,17 @@ static int axienet_probe(struct platform_device *pdev)
- 	seqcount_mutex_init(&lp->hw_stats_seqcount, &lp->stats_lock);
- 	INIT_DEFERRABLE_WORK(&lp->stats_work, axienet_refresh_stats);
- 
--	lp->axi_clk = devm_clk_get_optional(&pdev->dev, "s_axi_lite_clk");
--	if (!lp->axi_clk) {
-+	lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev, "s_axi_lite_clk");
-+	if (!lp->axi_clk)
- 		/* For backward compatibility, if named AXI clock is not present,
- 		 * treat the first clock specified as the AXI clock.
- 		 */
--		lp->axi_clk = devm_clk_get_optional(&pdev->dev, NULL);
--	}
-+		lp->axi_clk = devm_clk_get_optional_enabled(&pdev->dev, NULL);
-+
- 	if (IS_ERR(lp->axi_clk)) {
- 		ret = PTR_ERR(lp->axi_clk);
- 		goto free_netdev;
- 	}
--	ret = clk_prepare_enable(lp->axi_clk);
--	if (ret) {
--		dev_err(&pdev->dev, "Unable to enable AXI clock: %d\n", ret);
--		goto free_netdev;
--	}
- 
- 	lp->misc_clks[0].id = "axis_clk";
- 	lp->misc_clks[1].id = "ref_clk";
-@@ -2923,7 +2918,6 @@ static int axienet_probe(struct platform_device *pdev)
- 		axienet_mdio_teardown(lp);
- cleanup_clk:
- 	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
--	clk_disable_unprepare(lp->axi_clk);
- 
- free_netdev:
- 	free_netdev(ndev);
-@@ -2947,7 +2941,6 @@ static void axienet_remove(struct platform_device *pdev)
- 	axienet_mdio_teardown(lp);
- 
- 	clk_bulk_disable_unprepare(XAE_NUM_MISC_CLOCKS, lp->misc_clks);
--	clk_disable_unprepare(lp->axi_clk);
- 
- 	free_netdev(ndev);
- }
+On 2024/9/7 05:25, Andrii Nakryiko wrote:
+> On Thu, Sep 5, 2024 at 12:56 AM Philo Lu <lulie@linux.alibaba.com> wrote:
+>>
+>> Pointers passed to tp_btf were trusted to be valid, but some tracepoints
+>> do take NULL pointer as input, such as trace_tcp_send_reset(). Then the
+>> invalid memory access cannot be detected by verifier.
+>>
+>> This patch fix it by add a suffix "__nullable" to the unreliable
+>> argument. The suffix is shown in btf, and PTR_MAYBE_NULL will be added
+>> to nullable arguments. Then users must check the pointer before use it.
+>>
+>> A problem here is that we use "btf_trace_##call" to search func_proto.
+>> As it is a typedef, argument names as well as the suffix are not
+>> recorded. To solve this, I use bpf_raw_event_map to find
+>> "__bpf_trace##template" from "btf_trace_##call", and then we can see the
+>> suffix.
+>>
+>> Suggested-by: Alexei Starovoitov <ast@kernel.org>
+>> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+>> ---
+>>   kernel/bpf/btf.c      | 13 +++++++++++++
+>>   kernel/bpf/verifier.c | 36 +++++++++++++++++++++++++++++++++---
+>>   2 files changed, 46 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+>> index 1e29281653c62..157f5e1247c81 100644
+>> --- a/kernel/bpf/btf.c
+>> +++ b/kernel/bpf/btf.c
+>> @@ -6385,6 +6385,16 @@ static bool prog_args_trusted(const struct bpf_prog *prog)
+>>          }
+>>   }
+>>
+>> +static bool prog_arg_maybe_null(const struct bpf_prog *prog, const struct btf *btf,
+>> +                               const struct btf_param *arg)
+>> +{
+>> +       if (prog->type != BPF_PROG_TYPE_TRACING ||
+>> +           prog->expected_attach_type != BPF_TRACE_RAW_TP)
+>> +               return false;
+>> +
+>> +       return btf_param_match_suffix(btf, arg, "__nullable");
+> 
+> why does this need to be BPF_TRACE_RAW_TP-specific logic? Are we
+> afraid that there might be "some_arg__nullable" argument name?..
+> 
+
+Yes. I don't think the check is necessary but I'm not quite sure if it 
+affects other prog/attach types. It's ok for me to remove the check. I 
+added it just because this __nullable suffix only serves tp_btf now.
+
+And thanks for your nice suggestions. I'll fix them in the next version.
+
+Also, thanks for the information about retsnoop. Our solutions seem to 
+be similar, and I'll look into it further. Honestly, it takes me some 
+time to get argument names from tp_btf, and I cannot find a better 
+solution but to use btp->bpf_func with kallsyms...
+
 -- 
-2.34.1
+Philo
 
 
