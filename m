@@ -1,166 +1,285 @@
-Return-Path: <netdev+bounces-126306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A574A97098F
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 21:40:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 290BF970990
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 21:41:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE700B21382
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 19:40:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 470131C214C0
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 19:41:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54D7176227;
-	Sun,  8 Sep 2024 19:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC7EC176FDB;
+	Sun,  8 Sep 2024 19:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GgvMWb99"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lYcLvKKS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8B438DDB
-	for <netdev@vger.kernel.org>; Sun,  8 Sep 2024 19:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A0B2206E;
+	Sun,  8 Sep 2024 19:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725824444; cv=none; b=b6yYuIj+ynqpd86gQHUyyt9ChFnRHUNWB5Ellyl7bllwF28YQxm18kQl9ewAqszIies+ODu5y88EojHa6papaFr2qvdRKX/rALcfzYHiVr1wSXnrGdyuMyQvxN1braVPWNafEA2veo9Icxgh2imzGOG9TvByc/HVXeJb1TWLGH0=
+	t=1725824496; cv=none; b=SLki9Gdc01attL1+w/PnmnXE9i4bb9HN2nnsZTiWQzGSyLMXVfxVhn4uH5GSxM7P15dy0ujIfZhbzAVqSh3NmTTaUjfaXhCAsBu/5Mdqi/ThsqdjMvUvRE4BnyTsDD8+8N16YG3BEsZvlFsQsq++9QQ7rQAW/2FjgP/pitjJQ/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725824444; c=relaxed/simple;
-	bh=U+nN3E1s6vUZvmNioTaYSXQCx1nQu47fLqE9xX6Xutg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oPc9n4Tzu70IuwcM2g64KQ3oj1tRanmCWHiZve/iZkn0hKZa/c0zu2MvFW4v2kYW7g3Z6w/7SXtunYTE9kN4WbaHxnXeOsQolEg3F+nvQ1ip/tFYQjTQSOdwwV7D8oy87CLOQHmHTjaLlgZTJJwsN4wM7VGq8nx3QeQ0tOFID2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GgvMWb99; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725824442;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xH+iRr4Jv3/HG+2A0joozYOEglclsfOIN30PzjLMvdI=;
-	b=GgvMWb992+FcDEzVu1tEaBPqum/5WCpvxmbLKm1YiMcbMXd2b68JBy2dUpcT46gZMg6zQP
-	QP+Y0sI0BN6zXDVaH9TTh5VbU75s6INEhGGUqrfbcPvqo4azUAKZu63BB8OMy3MXKBQnqn
-	ZCCtSDcCG0mEK0TXYBL3BaPi0shTWJM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-433-aZozZIUUNYiURefAK1hqwg-1; Sun, 08 Sep 2024 15:40:40 -0400
-X-MC-Unique: aZozZIUUNYiURefAK1hqwg-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42cb08ed3a6so4453735e9.0
-        for <netdev@vger.kernel.org>; Sun, 08 Sep 2024 12:40:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725824439; x=1726429239;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1725824496; c=relaxed/simple;
+	bh=xz5tWGZSEJ980kVQmcGgkGRs7fv4OtphlnEBZ6R6gRA=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=TAfw2zA6vgoF81fv4EivMH5P5pAfqH8nQ2HMCgJjah/WXi5+GDaZn2X68ZCIesvxSOr5awgcSdP7+pBA1cYRhSXRfPKuvuw/53PK/g5CxR4gU5C8x68BQv8KzxJK95aEsQH59ZxZuLdicbOOP+HIGR1Z7mePAQmADnQiCrn/fZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lYcLvKKS; arc=none smtp.client-ip=209.85.219.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-6c359c1a2fdso21586656d6.2;
+        Sun, 08 Sep 2024 12:41:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725824494; x=1726429294; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xH+iRr4Jv3/HG+2A0joozYOEglclsfOIN30PzjLMvdI=;
-        b=DdpB+kRDwbhN2a2MCk8y0SJ1G/njFkpGZMq7xd4nTfEYwXcF44a8GKYTCEBH0eTI7j
-         G6QIUqT1VbUCes3RBP5MYtU382CDdduCRrEINwUR4VJoItf50KVGU3Web+7tGImzLDMF
-         JAR6YUKdgNNv1/SkIF8q3Mw7ql8kQ2i/Z3eQ1ZU+QxjNXXjHvtDBQ10fEj+hcRI3cJD7
-         7Tk//7OQK/lJVyLzVagvyAm+Z3TvWQ9DXanKKviIExBmTVR4hr0OPx4x3MI4jO74NRaE
-         C61D/nQ71o7KTPfS9864sW6vihKurDSXY213xE0V3d6TGccBAX2YWpx/gy25HOdIpETy
-         7Hgg==
-X-Gm-Message-State: AOJu0Yz/kOaUYMw6oZZqE2O8Z4Hj9Tw+pWqL39qE/DpMdYhupvEPBv94
-	mEB+Hh+Re75cKg+2zAwnPrrb5sLFpdiPOA0m8gZuUnF+HBw5tx9udJ91ev8t12oxIMCuumW1SI0
-	7BRZHv8f9bHkeC0Tvgxa3oNw4RJZPWsRjKByG/nnMolF3nFUOd9OpkQ==
-X-Received: by 2002:a05:600c:1d15:b0:426:6eb6:1374 with SMTP id 5b1f17b1804b1-42c95a5f971mr93118875e9.0.1725824439552;
-        Sun, 08 Sep 2024 12:40:39 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHHOz7cQatdno19/cbSkBNtm4eTHBagKro7YBoMXi0+DetATEzfS2VZvuZtLxKjiCr8GSSkGg==
-X-Received: by 2002:a05:600c:1d15:b0:426:6eb6:1374 with SMTP id 5b1f17b1804b1-42c95a5f971mr93118765e9.0.1725824438134;
-        Sun, 08 Sep 2024 12:40:38 -0700 (PDT)
-Received: from redhat.com ([31.187.78.166])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42ca05c2845sm85328365e9.3.2024.09.08.12.40.35
+        bh=xz5tWGZSEJ980kVQmcGgkGRs7fv4OtphlnEBZ6R6gRA=;
+        b=lYcLvKKSxsvQz/bDOZvE8ePI9UnJmME06F34ezZZHty4NySx4sw/0taCUiQss2rMdl
+         pSf4qugCOqd+VWU6w5ri8wR4/NcAZLCZD962YJ5A9ITqRITC3hQB2qESrnMt7gRTTnlw
+         SIZ18HMT/ArB9tar3QbrsnPOeNQOOwOIryEu/JociUfvc5LFzU5f/3EKbKA7cwsHMNtD
+         mafmmDsdWSOkob6v6uhBmuwKt0LnjKqYr56RSIv7VqdjtPdWD5ROQdWjtBPjt7YoUvEW
+         skIbCxtQZ/8Jx2+Trvkd7tDiYnR0qlMgQFI4yNuk2GU/1XbU/uMYTIOPNVLDnYfQ3zok
+         +vsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725824494; x=1726429294;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xz5tWGZSEJ980kVQmcGgkGRs7fv4OtphlnEBZ6R6gRA=;
+        b=HHAZkVzwX/zwbJkT+WUNj9Q1CVu9SjV4i6aLOsu6Qzsh5pril/ZSGtMCo2tRKjI964
+         BlsR3BGX9kIQ8oSEuBw+PooyrXrHSc50+fivDKn0VH8Et1zVBn6Ffq9f+Vflg0ngjQIe
+         PFTGCu47Qe19vGv8W2hseiNJOqQ1MiNp34rivDIMDHFYmkZcXU2OzKlMohhDlXWEhMhf
+         WMiTbHlNfJiTLLFkDDs7qKTc8lIITIYKwvPSFgJFVaAAShJ1CQ6Lyb7L2G2Gz8uceSjo
+         CHV4eCKNK3257cARBevfUl6Svs7oCuB/Ucu2foLi7cPqq7zjwJ7xM1m7uWs9YMBy8eKu
+         9jHA==
+X-Forwarded-Encrypted: i=1; AJvYcCW0NTf8cZs7ATcQO1HKCXzX3uXVcKnrz1KyxelkjTuOWgzXaRCwngDjNRxu5283tMCG5JvbaFCt@vger.kernel.org, AJvYcCXG58ItLEW4HceQrrpZKgUDx/6S4AZINfVCG52tTuXay82rlDp9bCa9hZ5HWI8XnMCX3SaBadLQLcTIwLTWw7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxne2IIGPsRSwS0rEvwbhJIcgtaJB4KCfsdOb/c/wB/VaqT3pnG
+	p2+8uyYdJ3phc/kq3MOaK5FuQTIE+AYxtFJKp0WNFxjEtzqd5rL5
+X-Google-Smtp-Source: AGHT+IFmR/tPXNm79YOtLkdwhZ9f7b5XEqEXRuZ66d74lDKkcxHzcvxNks7RPUuBVbn7ChS3ZWaG8w==
+X-Received: by 2002:a05:6214:4607:b0:6c3:5926:a070 with SMTP id 6a1803df08f44-6c5284f4c8cmr128625486d6.30.1725824493757;
+        Sun, 08 Sep 2024 12:41:33 -0700 (PDT)
+Received: from localhost (193.132.150.34.bc.googleusercontent.com. [34.150.132.193])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c53474d8d7sm14816366d6.95.2024.09.08.12.41.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Sep 2024 12:40:37 -0700 (PDT)
-Date: Sun, 8 Sep 2024 15:40:32 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	virtualization@lists.linux.dev, Si-Wei Liu <si-wei.liu@oracle.com>,
-	Darren Kenny <darren.kenny@oracle.com>
-Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
-Message-ID: <20240908153930-mutt-send-email-mst@kernel.org>
-References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
+        Sun, 08 Sep 2024 12:41:33 -0700 (PDT)
+Date: Sun, 08 Sep 2024 15:41:32 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ shuah@kernel.org, 
+ willemb@google.com, 
+ linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <66ddfdece6d32_2fb98729447@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoC2TajcYLewWrhpF7KL75XyMiW_G0RV+58=fbMEH8rf=g@mail.gmail.com>
+References: <20240906095640.77533-1-kerneljasonxing@gmail.com>
+ <20240906095640.77533-2-kerneljasonxing@gmail.com>
+ <66db8f293dbd1_2a33ef294b3@willemb.c.googlers.com.notmuch>
+ <CAL+tcoC9NoE3ws3nA-_ANAqD1cWpv9JDzFY11ACryZgg35dQrg@mail.gmail.com>
+ <66dbbbac6a6df_2b0bd0294d3@willemb.c.googlers.com.notmuch>
+ <CAL+tcoC2TajcYLewWrhpF7KL75XyMiW_G0RV+58=fbMEH8rf=g@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 1/2] net-timestamp: introduce
+ SOF_TIMESTAMPING_OPT_RX_FILTER flag
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
-> leads to regression on VM with the sysctl value of:
-> 
-> - net.core.high_order_alloc_disable=1
-> 
-> which could see reliable crashes or scp failure (scp a file 100M in size
-> to VM):
-> 
-> The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
-> of a new frag. When the frag size is larger than PAGE_SIZE,
-> everything is fine. However, if the frag is only one page and the
-> total size of the buffer and virtnet_rq_dma is larger than one page, an
-> overflow may occur. In this case, if an overflow is possible, I adjust
-> the buffer size. If net.core.high_order_alloc_disable=1, the maximum
-> buffer size is 4096 - 16. If net.core.high_order_alloc_disable=0, only
-> the first buffer of the frag is affected.
-> 
-> Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever use_dma_api")
-> Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-> Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a540c0a@oracle.com
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Jason Xing wrote:
+> On Sat, Sep 7, 2024 at 10:34=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Jason Xing wrote:
+> > > On Sat, Sep 7, 2024 at 7:24=E2=80=AFAM Willem de Bruijn
+> > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > >
+> > > > Jason Xing wrote:
+> > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > >
+> > > > > introduce a new flag SOF_TIMESTAMPING_OPT_RX_FILTER in the rece=
+ive
+> > > > > path. User can set it with SOF_TIMESTAMPING_SOFTWARE to filter
+> > > > > out rx software timestamp report, especially after a process tu=
+rns on
+> > > > > netstamp_needed_key which can time stamp every incoming skb.
+> > > > >
+> > > > > Previously, we found out if an application starts first which t=
+urns on
+> > > > > netstamp_needed_key, then another one only passing SOF_TIMESTAM=
+PING_SOFTWARE
+> > > > > could also get rx timestamp. Now we handle this case by introdu=
+cing this
+> > > > > new flag without breaking users.
+> > > > >
+> > > > > Quoting Willem to explain why we need the flag:
+> > > > > "why a process would want to request software timestamp reporti=
+ng, but
+> > > > > not receive software timestamp generation. The only use I see i=
+s when
+> > > > > the application does request
+> > > > > SOF_TIMESTAMPING_SOFTWARE | SOF_TIMESTAMPING_TX_SOFTWARE."
+> > > > >
+> > > > > Similarly, this new flag could also be used for hardware case w=
+here we
+> > > > > can set it with SOF_TIMESTAMPING_RAW_HARDWARE, then we won't re=
+ceive
+> > > > > hardware receive timestamp.
+> > > > >
+> > > > > Another thing about errqueue in this patch I have a few words t=
+o say:
+> > > > > In this case, we need to handle the egress path carefully, or e=
+lse
+> > > > > reporting the tx timestamp will fail. Egress path and ingress p=
+ath will
+> > > > > finally call sock_recv_timestamp(). We have to distinguish them=
+.
+> > > > > Errqueue is a good indicator to reflect the flow direction.
+> > > > >
+> > > > > Suggested-by: Willem de Bruijn <willemb@google.com>
+> > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > High level: where is the harm in receiving unsolicited timestamps=
+?
+> > > > A process can easily ignore them. I do wonder if the only use cas=
+e is
+> > > > an overly strict testcase. Was reminded of this as I tried to wri=
+te
+> > > > a more concise paragraph for the documentation.
+> > >
+> > > You raised a good question.
+> > >
+> > > I think It's more of a design consideration instead of a bugfix
+> > > actually. So it is not solving a bug which makes the apps wrong but=
 
+> > > gives users a hint that we can explicitly and accurately do what we=
 
-BTW why isn't it needed if we revert f9dac92ba908?
+> > > want and we expect.
+> > >
+> > > Let's assume: if we remove all the report flags design, what will
+> > > happen? It can work of course. I don't believe that people choose t=
+o
+> > > enable the generation flag but are not willing to report it. Of
+> > > course, It's another thing. I'm just saying.
+> >
+> > Let's not debate the existing API. Its design predates both of our
+> > contributions.
+> =
 
-> ---
->  drivers/net/virtio_net.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c6af18948092..e5286a6da863 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
->  	void *buf, *head;
->  	dma_addr_t addr;
->  
-> -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
-> -		return NULL;
-> -
->  	head = page_address(alloc_frag->page);
->  
->  	dma = head;
-> @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
->  	len = SKB_DATA_ALIGN(len) +
->  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->  
-> +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
-> +		return -ENOMEM;
-> +
->  	buf = virtnet_rq_alloc(rq, len, gfp);
->  	if (unlikely(!buf))
->  		return -ENOMEM;
-> @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
->  	 */
->  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
->  
-> +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
-> +		return -ENOMEM;
-> +
-> +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
-> +		len -= sizeof(struct virtnet_rq_dma);
-> +
->  	buf = virtnet_rq_alloc(rq, len + room, gfp);
->  	if (unlikely(!buf))
->  		return -ENOMEM;
-> -- 
-> 2.32.0.3.g01195cf9f
+> Yep.
+> =
 
+> >
+> > > I wonder if it makes sense to you :) ?
+> >
+> > I don't see a strong use case. I know we're on v5 while I reopen that=
+
+> > point, sorry.
+> =
+
+> That's all right. No worries.
+> =
+
+> >
+> > It seems simpler to me to not read spurious fields that are not
+> > requested, rather than to explicitly request them to be set to zero.
+> >
+> > Adding more flags is not free. An extra option adds mental load for
+> > casual users of this alread complex API. This may certainly sound
+> > hypocritical coming from me, as I added my fair share. But I hope
+> > their functionality outweighs that cost (well.. in at least one case
+> > it was an ugly fix for a bad first attempt.. OPT_ID).
+> =
+
+> I understand what you meant here. But I'm lost...
+> =
+
+> For some users, they might use the tsflags in apps to test whether
+> they need to receive/report the rx timestamp or not, and someday they
+> will notice there are unexpected timestamps that come out. As we know,
+> it's more of a design consideration about whether the users can
+> control it by setsockopt...
+> =
+
+> In addition to the design itself, above is the only use case I know.
+
+Ok. I'm on the fence, but not a hard no. Evidently you see value, so
+others may too.
+
+A pendantic use case is if the caller expects other cmsg, but not
+these. Then the amount of cmsg space used will depend on a third
+process enabling receive timestamps. Again, can be worked around. But
+admittedly is surprising behavior.
+
+> >
+> > I got to this point trying to condense the proposed documentation.
+> > We can add this if you feel strongly.
+> =
+
+> If the new flag is not good for future development, we can stop it and
+> then _only_ document the special case, which we both agreed about a
+> week ago.
+> =
+
+> Personally, I don't want to let it go easily. But It's just me. You
+> are the maintainer, so you have to make the decision. I'm totally fine
+> with either way. Thanks.
+> =
+
+> I was only trying to make the feature better. At least, we both have
+> tried a lot.
+> =
+
+> >
+> > But then my main feedback is that the doc has to be shorter and to
+> =
+
+> It's truly very long, to be honest. I thought I needed to list the
+> possible combination use cases.
+> =
+
+> > the point. Why would a user user this? No background on how we got
+> > here, what they might already do accidentally.
+> =
+
+> It looks like I should remove those use cases? And then clarify the
+> reason is per socket control?
+> =
+
+> I have no idea if I should continue on this.
+
+My attempt to document, feel free to revise:
+
+SOF_TIMESTAMPING_OPT_RX_FILTER:
+
+Filter out spurious receive timestamps: report a receive timestamp
+only if the matching timestamp generation flag is enabled.
+
+Receive timestamps are generated early in the ingress path, before a
+packet's destination socket is known. If any socket enables receive
+timestamps, packets for all socket will receive timestamped packets.
+Including those that request timestamp reporting with
+SOF_TIMESTAMPING_SOFTWARE and/or SOF_TIMESTAMPING_RAW_HARDWARE, but
+do not request receive timestamp generation. This can happen when
+requesting transmit timestamps only.
+
+Receiving spurious timestamps is generally benign. A process can
+ignore the unexpected non-zero value. But it makes behavior subtly
+dependent on other sockets. This flag isolates the socket for more
+deterministic behavior.
 
