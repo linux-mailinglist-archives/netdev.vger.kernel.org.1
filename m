@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-126274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7E74970596
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 09:52:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91321970597
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 09:53:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BA0C1F21AB4
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 07:52:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E0E31F21A9E
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 07:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F6AF9F5;
-	Sun,  8 Sep 2024 07:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCBDD3B1A2;
+	Sun,  8 Sep 2024 07:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FIceLMel"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dgltruWK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A5B28DD0
-	for <netdev@vger.kernel.org>; Sun,  8 Sep 2024 07:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21ADC28DD0
+	for <netdev@vger.kernel.org>; Sun,  8 Sep 2024 07:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725781967; cv=none; b=AUMy/lGcINNHoy1JD1JNEBIufZVR4oIiQfKyNsFukQFAin2bt4QDFDZtWddhrWJgrrz4RxUz1wPf3R3dPq+69C5F7ZDhvWk/fcCW3ehObQb4OBIiwP3DmluiwClRWiNJppFhtlc1m/qc2OrkEkvH59WrW+Z7iLD7Psra95hnJFY=
+	t=1725782003; cv=none; b=ZZXInet6rtE4RXLkYbWMvAd6oGq+0tsvStNBfFe3rNf9dW1ng1i+q37FmE8QOfSFrAVgiZrHjUPV+0Fk5H0oER11p4pmtDTlBcK3sqKY3sv87LdZ9ePOCRDpgnDEmQHAhAkAMu73X5nQrEcsjEn9Db4qFuzTnlL+PKmaN6AwtSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725781967; c=relaxed/simple;
-	bh=h7a44M8q+fiw6BUzBMF5LanNoDrNcreWQRpXLDlxlDg=;
+	s=arc-20240116; t=1725782003; c=relaxed/simple;
+	bh=NWV5FTenQ+J8L9MtQ1q0NSo7bx80u12mFUDrgEGFA1U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dcAw8Smu2VjTkQx/P4zQP5MoBLAU2AgcjtU3iett0dSVGCaIld/IUNqShuQitvYWS8feuLT/lH4Q4T+RGgaOI4lvDLgffCSpM5+cKt4PTpZBtKC272DqFtfyJpdLNkfhN7g7XfkDvO6smS2z7C0iQPDankoRBiR7l+Akh1bw8M4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FIceLMel; arc=none smtp.client-ip=209.85.210.175
+	 To:Cc:Content-Type; b=k7UhFkkoqlGe6AblAdH09WlySre11V2n2XPQqDAVcU49OvZQny0Id4MRdrroZ4NHpyJQHGdoc5UIBAUK3yPbwvIk0QC22OyzEXcSyZTunx0MkS1I41DKjyBO4C4Mir6VKH2my2LKMnFX32KZAQDwdX+Tv6cLUBs470mujoZ/DsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dgltruWK; arc=none smtp.client-ip=209.85.210.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7178df70f28so2789351b3a.2
-        for <netdev@vger.kernel.org>; Sun, 08 Sep 2024 00:52:45 -0700 (PDT)
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-710da656c0bso556165a34.0
+        for <netdev@vger.kernel.org>; Sun, 08 Sep 2024 00:53:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1725781965; x=1726386765; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1725782001; x=1726386801; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XzKidlKKRHIXSlnA3Qw84mPsfEBxs+F5kKZJE9VgkKI=;
-        b=FIceLMel2+1xxeuQboEs8g1i0YUXHcDwnGY1rVJshcJjvQx0XLOnHWunhrv+ByhzAs
-         ePzTIQdmz0bObOCeQ/HJ24nPARw6rwKXtqB/hUontCIMTSR1OsD5eDxf12l5xoKpYI/Y
-         iExIUnmVQnHCPC6RTlPv3R+0jFZM2jciDsqqs=
+        bh=KMf8aWdMo0sr4gRBi4qonWq5yB75pDKOuBBQ4AydHZc=;
+        b=dgltruWK3b4g/XpRMGaFXQz1ovfBDh7GTcljW018bmYjkH3VdZDXW6dxlYgeyrVEha
+         0z7WWWOi9eBWgl3wfZv0FMiub1X0TvSatDbdlYbA+y85/t1c63vlvvU1FS1RhY6D6mIp
+         ky6Be7Uy56458BosKNrfBRRaOvbIF5+yCP2OA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725781965; x=1726386765;
+        d=1e100.net; s=20230601; t=1725782001; x=1726386801;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XzKidlKKRHIXSlnA3Qw84mPsfEBxs+F5kKZJE9VgkKI=;
-        b=se2OSlmBIn7JJVU9A49s2d+6yzcGxUMCre9PRfQz4rFq5H4R3PWCD33ksQw9WUGUTG
-         1iXJpEByX1xPlvR4B3qgn+qgZuer0Or6Zsqs1/bRtvjkcsUS0SNm1i6RVc13xU81ErdB
-         BaEGQVy43dw4CIZP8qvwiTKLNY0ljv7iJppu85E5MV5HDIquwFSEz5vnSD1Zh1r89J9z
-         /9wwz1ALqQRBduDcNzf2i5N8FpM4wTDUJa3AE0JXyFePKDFIaPvHLOqcexqAR6kCoGbl
-         BeUR5etQHSWhPw1RvDSxz/A5p9pmz+XYnMD7W4QQaXEQOkPYXFPywbDTumDnQ4cmrArX
-         fm6g==
-X-Forwarded-Encrypted: i=1; AJvYcCW033Nn7lpIYXCauTtyNFd1//h9WSZgmjgTe4UJxDtiO9yFuYVfjfgP9arT2gTx6J1DzvCtq6U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuCMwSM4ZRAWO84nqtZ0zrWVoz7eSDwkj+28nxTfalvFXHp/hg
-	AmLq2qia+0yWXJFH3KpYNEoYV5xFT6XYyro5DXwKVvZXKrLPt734Om5Mig7ddLtletyd46rnKJz
-	6W1J8oHeyqYwS6R8mFj30xs3kcaDk8di7a1cp
-X-Google-Smtp-Source: AGHT+IH5fYBGMDH7OoU1ZEkmM06/DYXq4qb4euGdfIeQIX1qByJpZatmMemTIMT3WcdttKjw0tO+VfRiC4T4ZHwkiQs=
-X-Received: by 2002:a05:6a21:6b0b:b0:1ce:d9a2:66ed with SMTP id
- adf61e73a8af0-1cf2a0ca75dmr3530365637.48.1725781965186; Sun, 08 Sep 2024
- 00:52:45 -0700 (PDT)
+        bh=KMf8aWdMo0sr4gRBi4qonWq5yB75pDKOuBBQ4AydHZc=;
+        b=M4iFs0hIZ20ng9LIjQjBfUiObZFLeGfYWJo+s4p/dgxYKACYzc/3ZtD3NYcQ3B647q
+         49lPHMfOB3V5xMwrDio7PCJnIHpg1oDHUNjuPqmioad0bToYOgmXQ68A0uVVTyq7zjPw
+         /RD2ZZEjcxkNsSKtuIn8B++7cDbaGaGSbTtDTfrX6npWTt6GY+OqK7hTHBgypyUcfnZJ
+         GzdbcY6r2/q4MTXhGKp4hNvsNg/UEmAXi9hB0ch4VL6Vl7u0k4+J155c/3jJjM+V+PvP
+         f2M0wy8tJ2xcwkhv0kuhpywsmucnaPfcWvu3lrzRElehJL4axLLT7rbRzD16Y2VYyD01
+         ny/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVZQYoiKANgpzLvN5+Rb/zh1t77Rld+hkbjw+291JIiRBFEuQIjcddcamUTSh5aSYW97RQrFPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1peBXMG6X48uUau+CAjM5BUqFUFiOTWWKTYYF4rGwdetTJNSv
+	m6jMv99EC2YofX4q6e8D2+7VIZMFvzq8lHMIPx0nzgR6jH5rLMspythfpU4vSLKdH/pH+R0slJB
+	IvkuLp8pzE8pU7jfLDUo0pGwZ0ihdSArMpsrH
+X-Google-Smtp-Source: AGHT+IFkcSEb3lX9IygP4k8NelkWKMV8A+Vs01YhEqum3NjD7qHsIO8RS7oO2ZTLFHIrJ5VtA6pud/4cfJv4Z4lQJrs=
+X-Received: by 2002:a05:6830:6d8a:b0:710:b19a:b999 with SMTP id
+ 46e09a7af769-710d5b89be4mr7602671a34.14.1725782000964; Sun, 08 Sep 2024
+ 00:53:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240906144632.404651-1-gal@nvidia.com> <20240906144632.404651-3-gal@nvidia.com>
-In-Reply-To: <20240906144632.404651-3-gal@nvidia.com>
+References: <20240906144632.404651-1-gal@nvidia.com> <20240906144632.404651-2-gal@nvidia.com>
+In-Reply-To: <20240906144632.404651-2-gal@nvidia.com>
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-Date: Sun, 8 Sep 2024 13:22:32 +0530
-Message-ID: <CALs4sv3b6vMSPchkCt8D6hz+dtQGZgjZP+2JQoGqEhMaDQpRPA@mail.gmail.com>
-Subject: Re: [PATCH net-next 02/16] tg3: Remove setting of RX software timestamp
+Date: Sun, 8 Sep 2024 13:23:08 +0530
+Message-ID: <CALs4sv1RbV-y63u6w6ZHYmJm9uDamxe7wmBV267wvOHttMF=Ww@mail.gmail.com>
+Subject: Re: [PATCH net-next 01/16] bnxt_en: Remove setting of RX software timestamp
 To: Gal Pressman <gal@nvidia.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
 	Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>, 
@@ -107,13 +107,13 @@ Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, n
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Carolina Jubran <cjubran@nvidia.com>, 
 	Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000007f0ae062196edc2"
+	boundary="00000000000026a1c8062196ef68"
 
---00000000000007f0ae062196edc2
+--00000000000026a1c8062196ef68
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 6, 2024 at 8:17=E2=80=AFPM Gal Pressman <gal@nvidia.com> wrote:
+On Fri, Sep 6, 2024 at 8:16=E2=80=AFPM Gal Pressman <gal@nvidia.com> wrote:
 >
 > The responsibility for reporting of RX software timestamp has moved to
 > the core layer (see __ethtool_get_ts_info()), remove usage from the
@@ -123,13 +123,36 @@ On Fri, Sep 6, 2024 at 8:17=E2=80=AFPM Gal Pressman <gal@nvidia.com> wrote:
 > Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 > Signed-off-by: Gal Pressman <gal@nvidia.com>
 > ---
->  drivers/net/ethernet/broadcom/tg3.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 >
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/=
+net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> index 9dadc89378f0..8fe680e691a3 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> @@ -5040,11 +5040,8 @@ static int bnxt_get_ts_info(struct net_device *dev=
+,
+>         struct bnxt_ptp_cfg *ptp;
+>
+>         ptp =3D bp->ptp_cfg;
+> -       info->so_timestamping =3D SOF_TIMESTAMPING_TX_SOFTWARE |
+> -                               SOF_TIMESTAMPING_RX_SOFTWARE |
+> -                               SOF_TIMESTAMPING_SOFTWARE;
+> +       info->so_timestamping =3D SOF_TIMESTAMPING_TX_SOFTWARE;
+>
+> -       info->phc_index =3D -1;
+>         if (!ptp)
+>                 return 0;
 
 Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
---00000000000007f0ae062196edc2
+>
+> --
+> 2.40.1
+>
+
+--00000000000026a1c8062196ef68
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -200,14 +223,14 @@ pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
 Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPN8YMO7txCXAemDi5QI60Hy2VwEmXZq
-0i2gbB9ITQMSMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkw
-ODA3NTI0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOGVTwk2iIQYTAmAHnTtrgbQjuEe+/3Z
+WkrNsGSQmdsIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkw
+ODA3NTMyMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBwvwDkk4B5ma1FJA6ZvuspbobHFxjypYwFHk1277jKYISm9E1o
-YWvdiLLhE5dHJMrWTa5sWJu7xwRGcmEq+1zmM9ACe+xDEtIjFgeYuRFid2z/yo1sSuuFKtfmnqNH
-HnAImJQnB6dROcON2Hdl7G+Q0lU51exg67EGioXnNBMUSY2bLoNJSuDnEpXj8CsUEFiHeK/qDp+8
-XGw3kkvKFqioFRKp7VMzYsDBAWvHz9KPYSktje9JAi3w4gP9KzNAYTP+7dKmxSEcvIehhkd7gk1A
-jRcCylG1mB4ksEifpHLE1EcvTv0+NTQfMFiKpeF/j5lIqxQ+sDpx6id3lKYdf9W+
---00000000000007f0ae062196edc2--
+ATANBgkqhkiG9w0BAQEFAASCAQCo87O0hFAFRA+HDrbLWHxU2xhUruKFfMHiaY+X6TnnF2wbktJY
+CEzeMDrTs+eXCTL6TdN5jJvd+i0fQTwZnZiZdLEpRV5shnuaYx0jd0HE9Id+sE+TQijYA4b+Au/+
+l/v8pt98aj8fsFV1VVz8L9ZgUfENs+xPcZiq5yFXvArdLR8r4HN9EZ/9OnP/ciTEwfanceghplir
+uqNkJ/ccRzudFIQxTsVhf9DyleTS0lbQQHP+A5NR1mACnAYykmG7yMToLQkRdebIHbwp/KWf7i5W
+PS70O+RrK1Q7eUsZRvl5x+Sa4KXJPEar6HzhD/3knJ/47BL2V22vcqsTUKJHAW2A
+--00000000000026a1c8062196ef68--
 
