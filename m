@@ -1,137 +1,213 @@
-Return-Path: <netdev+bounces-126273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 234AA9704F1
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 05:03:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E74970596
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 09:52:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA09F1F21F8E
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 03:03:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BA0C1F21AB4
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 07:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556211F942;
-	Sun,  8 Sep 2024 03:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F6AF9F5;
+	Sun,  8 Sep 2024 07:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nt6CFL28"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="FIceLMel"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5BD213FF5;
-	Sun,  8 Sep 2024 03:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A5B28DD0
+	for <netdev@vger.kernel.org>; Sun,  8 Sep 2024 07:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725764577; cv=none; b=Dtju6wb2L8SPNxPi6y60/pOkcHRUYEe/RK4BKUPhCNRBN2/omeYONXCN8Zf0FI30+kyxUI+C8LSaiyBVgoETc7iRE62iItqM3P6bYg4rLwZZUa4jp/LxwYCbgOvaJwBcUCSkNsNlwtSOls/M9MRTGSkLnwrhcCbiahQ4WKWJKng=
+	t=1725781967; cv=none; b=AUMy/lGcINNHoy1JD1JNEBIufZVR4oIiQfKyNsFukQFAin2bt4QDFDZtWddhrWJgrrz4RxUz1wPf3R3dPq+69C5F7ZDhvWk/fcCW3ehObQb4OBIiwP3DmluiwClRWiNJppFhtlc1m/qc2OrkEkvH59WrW+Z7iLD7Psra95hnJFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725764577; c=relaxed/simple;
-	bh=Sxq9PM8jagvF0YAkcMJoop+0MLO5K1oCoDLRRpVRVgg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IY1zVaWaN0stpt6RJ+eD+V5ZK1czcJan1KZyw/uXAL7FQM4hxG1SzYin9qRloHvs4np2Z166LXyyoWWkb3Rd3KKHAK0gfWj2n1ihC4pfYKyncbnP5TUO+5WL6cRQqQR7vCgYl/a5ut5AW0pqbYEOQjdrR1IDa7RLcg+6/ShuZCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nt6CFL28; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1725781967; c=relaxed/simple;
+	bh=h7a44M8q+fiw6BUzBMF5LanNoDrNcreWQRpXLDlxlDg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dcAw8Smu2VjTkQx/P4zQP5MoBLAU2AgcjtU3iett0dSVGCaIld/IUNqShuQitvYWS8feuLT/lH4Q4T+RGgaOI4lvDLgffCSpM5+cKt4PTpZBtKC272DqFtfyJpdLNkfhN7g7XfkDvO6smS2z7C0iQPDankoRBiR7l+Akh1bw8M4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=FIceLMel; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7178df70f28so2789351b3a.2
+        for <netdev@vger.kernel.org>; Sun, 08 Sep 2024 00:52:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1725764575; x=1757300575;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bNPoQe4JrQrAblmOh7D//em+NnZ2+gy/yYHqhuBd4u4=;
-  b=nt6CFL28Zc5jv8g64R+GiWSvq587svHitSdelgmhf6XoXVOpK9fU/X4A
-   2f0tYt++OjlKfauG82XbRBGD00VcRE9RyBRebXDA8W4NvLmF72CPDiC+O
-   ot7VvrXjGSpJG2oJZ9GFGmk9n9/CG6PYyDvIEHEMZl8LfvIuNc6eu7dhL
-   0=;
-X-IronPort-AV: E=Sophos;i="6.10,211,1719878400"; 
-   d="scan'208";a="123719259"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Sep 2024 03:02:53 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:15312]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.175:2525] with esmtp (Farcaster)
- id c20d6684-4524-48bc-948a-0341c94d8ee9; Sun, 8 Sep 2024 03:02:53 +0000 (UTC)
-X-Farcaster-Flow-ID: c20d6684-4524-48bc-948a-0341c94d8ee9
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Sun, 8 Sep 2024 03:02:53 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.21) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Sun, 8 Sep 2024 03:02:50 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <syzbot+1df6ffa7a6274ae264db@syzkaller.appspotmail.com>
-CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <miquel.raynal@bootlin.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <stefan@datenfreihafen.org>,
-	<syzkaller-bugs@googlegroups.com>, <kuniyu@amazon.com>
-Subject: Re: [syzbot] [wpan?] WARNING in __dev_change_net_namespace (2)
-Date: Sat, 7 Sep 2024 20:02:42 -0700
-Message-ID: <20240908030242.19836-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <000000000000a45a92061ce6cc7d@google.com>
-References: <000000000000a45a92061ce6cc7d@google.com>
+        d=broadcom.com; s=google; t=1725781965; x=1726386765; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XzKidlKKRHIXSlnA3Qw84mPsfEBxs+F5kKZJE9VgkKI=;
+        b=FIceLMel2+1xxeuQboEs8g1i0YUXHcDwnGY1rVJshcJjvQx0XLOnHWunhrv+ByhzAs
+         ePzTIQdmz0bObOCeQ/HJ24nPARw6rwKXtqB/hUontCIMTSR1OsD5eDxf12l5xoKpYI/Y
+         iExIUnmVQnHCPC6RTlPv3R+0jFZM2jciDsqqs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725781965; x=1726386765;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XzKidlKKRHIXSlnA3Qw84mPsfEBxs+F5kKZJE9VgkKI=;
+        b=se2OSlmBIn7JJVU9A49s2d+6yzcGxUMCre9PRfQz4rFq5H4R3PWCD33ksQw9WUGUTG
+         1iXJpEByX1xPlvR4B3qgn+qgZuer0Or6Zsqs1/bRtvjkcsUS0SNm1i6RVc13xU81ErdB
+         BaEGQVy43dw4CIZP8qvwiTKLNY0ljv7iJppu85E5MV5HDIquwFSEz5vnSD1Zh1r89J9z
+         /9wwz1ALqQRBduDcNzf2i5N8FpM4wTDUJa3AE0JXyFePKDFIaPvHLOqcexqAR6kCoGbl
+         BeUR5etQHSWhPw1RvDSxz/A5p9pmz+XYnMD7W4QQaXEQOkPYXFPywbDTumDnQ4cmrArX
+         fm6g==
+X-Forwarded-Encrypted: i=1; AJvYcCW033Nn7lpIYXCauTtyNFd1//h9WSZgmjgTe4UJxDtiO9yFuYVfjfgP9arT2gTx6J1DzvCtq6U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuCMwSM4ZRAWO84nqtZ0zrWVoz7eSDwkj+28nxTfalvFXHp/hg
+	AmLq2qia+0yWXJFH3KpYNEoYV5xFT6XYyro5DXwKVvZXKrLPt734Om5Mig7ddLtletyd46rnKJz
+	6W1J8oHeyqYwS6R8mFj30xs3kcaDk8di7a1cp
+X-Google-Smtp-Source: AGHT+IH5fYBGMDH7OoU1ZEkmM06/DYXq4qb4euGdfIeQIX1qByJpZatmMemTIMT3WcdttKjw0tO+VfRiC4T4ZHwkiQs=
+X-Received: by 2002:a05:6a21:6b0b:b0:1ce:d9a2:66ed with SMTP id
+ adf61e73a8af0-1cf2a0ca75dmr3530365637.48.1725781965186; Sun, 08 Sep 2024
+ 00:52:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWC003.ant.amazon.com (10.13.139.209) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <20240906144632.404651-1-gal@nvidia.com> <20240906144632.404651-3-gal@nvidia.com>
+In-Reply-To: <20240906144632.404651-3-gal@nvidia.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Sun, 8 Sep 2024 13:22:32 +0530
+Message-ID: <CALs4sv3b6vMSPchkCt8D6hz+dtQGZgjZP+2JQoGqEhMaDQpRPA@mail.gmail.com>
+Subject: Re: [PATCH net-next 02/16] tg3: Remove setting of RX software timestamp
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, Sudarsana Kalluru <skalluru@marvell.com>, 
+	Manish Chopra <manishc@marvell.com>, Michael Chan <michael.chan@broadcom.com>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+	Sunil Goutham <sgoutham@marvell.com>, Potnuri Bharat Teja <bharat@chelsio.com>, 
+	Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>, 
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+	Clark Wang <xiaoning.wang@nxp.com>, Dimitris Michailidis <dmichail@fungible.com>, 
+	Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, 
+	Jijie Shao <shaojijie@huawei.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, Geetha sowjanya <gakula@marvell.com>, 
+	Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, 
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, 
+	Bryan Whitehead <bryan.whitehead@microchip.com>, UNGLinuxDriver@microchip.com, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, Lars Povlsen <lars.povlsen@microchip.com>, 
+	Steen Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon <daniel.machon@microchip.com>, 
+	Alexandre Belloni <alexandre.belloni@bootlin.com>, Shannon Nelson <shannon.nelson@amd.com>, 
+	Brett Creeley <brett.creeley@amd.com>, Sergey Shtylyov <s.shtylyov@omp.ru>, 
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
+	Edward Cree <ecree.xilinx@gmail.com>, Martin Habets <habetsm.xilinx@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	Roger Quadros <rogerq@kernel.org>, MD Danish Anwar <danishanwar@ti.com>, 
+	Linus Walleij <linusw@kernel.org>, Imre Kaloz <kaloz@openwrt.org>, 
+	Richard Cochran <richardcochran@gmail.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Carolina Jubran <cjubran@nvidia.com>, 
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000007f0ae062196edc2"
 
-From: syzbot <syzbot+1df6ffa7a6274ae264db@syzkaller.appspotmail.com>
-Date: Wed, 10 Jul 2024 09:04:21 -0700
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    22f902dfc51e Merge tag 'i2c-for-6.10-rc7' of git://git.ker..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=166ba6e1980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=d29e97614bab40fc
-> dashboard link: https://syzkaller.appspot.com/bug?extid=1df6ffa7a6274ae264db
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> userspace arch: i386
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-22f902df.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/4c0526babe49/vmlinux-22f902df.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/a5ff57328e52/bzImage-22f902df.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+1df6ffa7a6274ae264db@syzkaller.appspotmail.com
-> 
-> R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
-> R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
->  </TASK>
-> ------------[ cut here ]------------
-> WARNING: CPU: 3 PID: 14392 at net/core/dev.c:11431 __dev_change_net_namespace+0x1048/0x1290 net/core/dev.c:11431
-> Modules linked in:
-> CPU: 3 PID: 14392 Comm: syz.3.2718 Not tainted 6.10.0-rc6-syzkaller-00215-g22f902dfc51e #0
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-> RIP: 0010:__dev_change_net_namespace+0x1048/0x1290 net/core/dev.c:11431
-> Code: 50 d2 f8 31 f6 4c 89 e7 e8 85 2b fe ff 89 44 24 28 e9 69 f3 ff ff e8 37 50 d2 f8 90 0f 0b 90 e9 5b fe ff ff e8 29 50 d2 f8 90 <0f> 0b 90 e9 bc fa ff ff bd ea ff ff ff e9 71 f2 ff ff e8 31 78 2f
-> RSP: 0018:ffffc90022ef7380 EFLAGS: 00010293
-> RAX: 0000000000000000 RBX: ffff888019c58000 RCX: ffffffff88bc3923
-> RDX: ffff88801f6c2440 RSI: ffffffff88bc3e67 RDI: 0000000000000005
-> RBP: ffff888019c58734 R08: 0000000000000005 R09: 0000000000000000
-> R10: 00000000fffffff4 R11: 0000000000000003 R12: ffff888047041cc0
-> R13: 00000000fffffff4 R14: ffff888019c58bf0 R15: 1ffff920045dee7e
-> FS:  0000000000000000(0000) GS:ffff88802c300000(0063) knlGS:00000000f5d5ab40
-> CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
-> CR2: 00000000f5d03da4 CR3: 000000002984a000 CR4: 0000000000350ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  dev_change_net_namespace include/linux/netdevice.h:3923 [inline]
->  cfg802154_switch_netns+0xbf/0x450 net/ieee802154/core.c:230
+--00000000000007f0ae062196edc2
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-#syz dup: [syzbot] [wpan?] WARNING in cfg802154_switch_netns (2)
+On Fri, Sep 6, 2024 at 8:17=E2=80=AFPM Gal Pressman <gal@nvidia.com> wrote:
+>
+> The responsibility for reporting of RX software timestamp has moved to
+> the core layer (see __ethtool_get_ts_info()), remove usage from the
+> device drivers.
+>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> ---
+>  drivers/net/ethernet/broadcom/tg3.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
+>
 
-https://lore.kernel.org/netdev/000000000000f4a1b7061f9421de@google.com/
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+
+--00000000000007f0ae062196edc2
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
+dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
+fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
+9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
+pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
+25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
+Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPN8YMO7txCXAemDi5QI60Hy2VwEmXZq
+0i2gbB9ITQMSMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkw
+ODA3NTI0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBwvwDkk4B5ma1FJA6ZvuspbobHFxjypYwFHk1277jKYISm9E1o
+YWvdiLLhE5dHJMrWTa5sWJu7xwRGcmEq+1zmM9ACe+xDEtIjFgeYuRFid2z/yo1sSuuFKtfmnqNH
+HnAImJQnB6dROcON2Hdl7G+Q0lU51exg67EGioXnNBMUSY2bLoNJSuDnEpXj8CsUEFiHeK/qDp+8
+XGw3kkvKFqioFRKp7VMzYsDBAWvHz9KPYSktje9JAi3w4gP9KzNAYTP+7dKmxSEcvIehhkd7gk1A
+jRcCylG1mB4ksEifpHLE1EcvTv0+NTQfMFiKpeF/j5lIqxQ+sDpx6id3lKYdf9W+
+--00000000000007f0ae062196edc2--
 
