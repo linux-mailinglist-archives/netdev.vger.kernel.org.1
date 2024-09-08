@@ -1,159 +1,115 @@
-Return-Path: <netdev+bounces-126313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6681D9709CB
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 22:49:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1F5970A25
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 23:36:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E0F3B21583
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 20:49:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97E3BB20A8F
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 21:36:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40162178CE4;
-	Sun,  8 Sep 2024 20:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E756617AE0C;
+	Sun,  8 Sep 2024 21:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="JS1trTKk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PtpiqaVj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f67.google.com (mail-ed1-f67.google.com [209.85.208.67])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840D54D8B1
-	for <netdev@vger.kernel.org>; Sun,  8 Sep 2024 20:49:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FFD917A58F;
+	Sun,  8 Sep 2024 21:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725828571; cv=none; b=Nj+gd8UX6mY2mLwxA2mi0aU/v54oig0U9JtUiMLTmcJQQY408EP4JwU8yMMlNVarpPZjmd0+H/Oa/XQXqEurbS4KtIg1Inwexe/VcnnfYVPfe0j0E37usszJ+T+9n+fBiLT1qgUMFgpUAosEwEwzXs+sEFZQbS87QU7LfW68QCc=
+	t=1725831358; cv=none; b=BpuY/a88YUdylf2Te45YokUl7jghN0sL6pTjD//AdKMiK2wTOHEp2EdgFS/E6pyn7Qoc/vCQUSp8VXwGUOarDNuF5GxpKxLiFKMfh6nWeYnwSlE14yjD/sbuYGMnPsp88pvABYk9M2L76INTDph51S14gdTaqhkEG9oTOv2tjcg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725828571; c=relaxed/simple;
-	bh=EoBKEDH3k4qBQyLBQhS51btl8ruh9qqZSDp7H6obE4Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DqOIntYWLdm5f0s8UEAruIQ+f014v7o/wUPFmyPE+4BOTZHM5w3tXcFa+xFyEGMFhRRrZE4rT6HMPG+zYMbF4XEDlgYtPvwqY9jR67J32uhpvPwSXsNld4SXwgHgbdrY9MQeWWP/tzRG6ZKy4Ydgubl6S9RG6tiCHhM1Z6ZW1IA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=JS1trTKk; arc=none smtp.client-ip=209.85.208.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ed1-f67.google.com with SMTP id 4fb4d7f45d1cf-5c26852aff1so4045974a12.3
-        for <netdev@vger.kernel.org>; Sun, 08 Sep 2024 13:49:29 -0700 (PDT)
+	s=arc-20240116; t=1725831358; c=relaxed/simple;
+	bh=fubqHbkHH4SF5tYIPWwsKVb2qi6cZSP4EmzHAKL2A2M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IZKtWC9Y/+aMbZ3C+2UQJU9YiPAijlmODrSlX2RKMZZ5eIi9b4iQH32beco16n4H+9Ywt5uvuYNaf3ruCbBKJfDbqsO7itTUSgzdvO5hV6BRe2H1KSRcgiZIFo1Ee0d1kjUsNvhnYEXdeXY33riRunSc3lUvUl4Iuzym9WNZtuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PtpiqaVj; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-718e1ce7e71so1226786b3a.3;
+        Sun, 08 Sep 2024 14:35:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1725828568; x=1726433368; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zEC4wQ1JIXOpeG5hhCNp2MQwBTDr5gpJ3bo6M3CBVtc=;
-        b=JS1trTKkvXAgqiYbC01zItEsJP92zihXrGJ7stWcGZ3jUEGyyZtoOHopzqAUj5KvCS
-         DdJnC/DOe8bPXtsWOLoR4q019OX0MhLdKMkKzBkowOI8zY9Z1kjoc6IR0DZNvJ2U5h/u
-         KFM4JXkK97/ceQNBDlKkUTifqg6kwt/y/ZuaM=
+        d=gmail.com; s=20230601; t=1725831356; x=1726436156; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=boc/hrUVj2BcleHfAR4XpgnsXco5z7XH6lSAfMq7toA=;
+        b=PtpiqaVjFfXmPBQAt0vTTV3Zc8Vl7Bc9WXikRxLFfP2ACkfZAVdtpoqRYllmkHH/ar
+         OtDNGHcRn1B+h94CiZKA3KRCsptEyJfkwJVTxeculQePh9/BIk93FsmK2CkhcTsJxE7e
+         jU6LvRGRqYeDneC8S8jQKg0rvH7eaVj0m+SPW64l9yEy/m8NWh9g9PAuKkg6F8ds9B0i
+         v7AdAt/apeSpcLzITsqAymSCjrFkuwSRqb5HgPaANGMj1yumZ3m0neXLwgWzZxUdfra5
+         as2VyP8oPkik94AYGhnMmgz//TP/bCAFpA2q2Cs5/MbsRMC5FSjUHUih8j3KvCD9Q806
+         wVdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725828568; x=1726433368;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zEC4wQ1JIXOpeG5hhCNp2MQwBTDr5gpJ3bo6M3CBVtc=;
-        b=hQhD+FAt6zyuTTSkTrsehPmVda86YgEvTgqHZ7dyw5lJ+JQ/EFnw+GOqks56VFW2g1
-         2+9d3neOROwobSNXazCd50xdEh4b2R6DzXV//v2HPpioGO0hmueqVR3jy2K6Lu1WZLwl
-         ZG2N3BQnuhJVwTOfO2VGmWji7k2Spav8B5KUSxez9iRcniWljB1LV7HdFYEP8ti10JGL
-         D2aRa0y0Mbg/oV0w+AuLt7t3SEvgthwiYPFQFVTCGQStQdREmYAxYJkbL/fY1VqhutfQ
-         17TR8x/Atdx4jobw9FgCVVag7leiMfiFz/RWI9lJPldGrAd9p3NHZK3sesQQmg/6ikrn
-         lSag==
-X-Gm-Message-State: AOJu0YxBWIDrjtTxMyX2ximJl83bCUs+ntxalNAmQOgYtO6tLtcQFJpm
-	MnrGOSyusqHpK/c5lFhv48c52+UbUS5HBrXKMjJl0ks/9Eee58vj8/MiM/ySAt3DCDbRlncVDcV
-	NoKOqMtkqL2Utjqo2tYKI0cojEHQG+i4vJ3kKSlwVCuSrOnY7H9STduQWLo46WZDtB5U5aAPR3Y
-	ldUO15wTpHtR1SrC3okcLs3GnEQw02ygcC83UCNG6tp5DRvg==
-X-Google-Smtp-Source: AGHT+IEpMGHYf5BD/zUKQTqTgiisAQ1anJ5u/AzUGtH+fTD6Vnd38+tGUnUUgp5rDSrfzmoVdpGKVA==
-X-Received: by 2002:a17:907:97d2:b0:a8d:5472:b56c with SMTP id a640c23a62f3a-a8d5472bbf6mr81751866b.22.1725828567442;
-        Sun, 08 Sep 2024 13:49:27 -0700 (PDT)
-Received: from LQ3V64L9R2.homenet.telecomitalia.it (host-79-23-194-51.retail.telecomitalia.it. [79.23.194.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25a2844fsm247389666b.88.2024.09.08.13.49.26
+        d=1e100.net; s=20230601; t=1725831356; x=1726436156;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=boc/hrUVj2BcleHfAR4XpgnsXco5z7XH6lSAfMq7toA=;
+        b=nLa1l61n84ecnwYupMve8MKp2S9iCesVGJtT16bZQJB33sg/Ym8pOjYlEQ8yCqnn2f
+         LE+FguXO7p8sXGv1SWVtEg6Aytes23TcqtS/8SDJEPf8HMpZVy1NfMCgrVqj4RbQipJg
+         razEb4Vqb7ec6cp6q53lftgHNVXyrPNVKdNDCQToqLqx/wkJX21qy53amhEa0l1U+Kr9
+         nXxchfen4nF4komYosOUKy6qtVEjLYfeO1WetjNNt1QpODB9VTV/EvN1+F9ncYYvrxdB
+         tOGuI5eu9aJDwj1XL3ZW41jRko9Uk2MfSKnGo5e0Efp/b59jbUhPz9V355a5NE/87YJ+
+         SAhA==
+X-Forwarded-Encrypted: i=1; AJvYcCVFsKPIf1nJYoBGcmwLDGoQEtjc6VUOGvf7BvEZ7F5ejIHH29g4Y05nwuii603IKSO9YBX14yDNGYl9N2w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyl06P8T3+xslVFLcbOl0wbiXlqxAcZ6743rloNu1DrbBZvR8TS
+	4bovXRGhCglFNzKP3RFt0YGm6oC1qf/AeacD3yuaSUHKKaLorgkNUokufHM/
+X-Google-Smtp-Source: AGHT+IHUyDHPNXlKTm78Q7ds40dBKEWFrRXE5j5/uzuCN1NYggxLCssa09n01jEIywSx8R+Eh8I/aA==
+X-Received: by 2002:a05:6a20:4389:b0:1ce:ce51:4405 with SMTP id adf61e73a8af0-1cf1d1ddf8emr7600631637.42.1725831356475;
+        Sun, 08 Sep 2024 14:35:56 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-718e5982fa2sm2398187b3a.153.2024.09.08.14.35.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 08 Sep 2024 13:49:27 -0700 (PDT)
-Date: Sun, 8 Sep 2024 22:49:25 +0200
-From: Joe Damato <jdamato@fastly.com>
+        Sun, 08 Sep 2024 14:35:56 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca, kuba@kernel.org, skhawaja@google.com,
-	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v2 1/9] net: napi: Add napi_storage
-Message-ID: <Zt4N1RoplScF2Dbw@LQ3V64L9R2.homenet.telecomitalia.it>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, kuba@kernel.org, skhawaja@google.com,
-	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240908160702.56618-1-jdamato@fastly.com>
- <20240908160702.56618-2-jdamato@fastly.com>
+Cc: andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	claudiu.manoil@nxp.com,
+	mail@david-bauer.net
+Subject: [PATCH net-next] net: gianfar: fix NVMEM mac address
+Date: Sun,  8 Sep 2024 14:35:54 -0700
+Message-ID: <20240908213554.11979-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240908160702.56618-2-jdamato@fastly.com>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Sep 08, 2024 at 04:06:35PM +0000, Joe Damato wrote:
-> Add a persistent NAPI storage area for NAPI configuration to the core.
-> Drivers opt-in to setting the storage for a NAPI by passing an index
-> when calling netif_napi_add_storage.
-> 
-> napi_storage is allocated in alloc_netdev_mqs, freed in free_netdev
-> (after the NAPIs are deleted), and set to 0 when napi_enable is called.
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  .../networking/net_cachelines/net_device.rst  |  1 +
->  include/linux/netdevice.h                     | 34 +++++++++++++++++++
->  net/core/dev.c                                | 18 +++++++++-
->  3 files changed, 52 insertions(+), 1 deletion(-)
-> 
+If nvmem loads after the ethernet driver, mac address assignments will
+not take effect. of_get_ethdev_address returns EPROBE_DEFER in such a
+case so we need to handle that to avoid eth_hw_addr_random.
 
-[...]
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/freescale/gianfar.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -6719,6 +6719,9 @@ void napi_enable(struct napi_struct *n)
->  		if (n->dev->threaded && n->thread)
->  			new |= NAPIF_STATE_THREADED;
->  	} while (!try_cmpxchg(&n->state, &val, new));
-> +
-> +	if (n->napi_storage)
-> +		memset(n->napi_storage, 0, sizeof(*n->napi_storage));
+diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
+index 634049c83ebe..9755ec947029 100644
+--- a/drivers/net/ethernet/freescale/gianfar.c
++++ b/drivers/net/ethernet/freescale/gianfar.c
+@@ -716,6 +716,8 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
+ 		priv->device_flags |= FSL_GIANFAR_DEV_HAS_BUF_STASHING;
+ 
+ 	err = of_get_ethdev_address(np, dev);
++	if (err == -EPROBE_DEFER)
++		return err;
+ 	if (err) {
+ 		eth_hw_addr_random(dev);
+ 		dev_info(&ofdev->dev, "Using random MAC address: %pM\n", dev->dev_addr);
+-- 
+2.46.0
 
-This part is very obviously wrong ;)
-
-I think when I was reading the other thread about resetting on
-channel change [1] I got a bit confused.
-
-Maybe what was intended was on napi_enable, do nothing / remove the
-above code (which I suppose would give the persistence desired?).
-
-But modify net/ethtool/channels.c to reset NAPIs to the global
-(sysfs) settings? Not sure how to balance both persistence with
-queue count changes in a way that makes sense for users of the API.
-
-And, I didn't quite follow the bits about:
-  1. The proposed ring to NAPI mapping
-  2. The two step "takeover" which seemed to imply that we might
-     pull napi_id into napi_storage? Or maybe I just read that part
-     wrong?
-
-I'll go back re-re-(re?)-read those emails to see if I can figure
-out what the desired implementation is.
-
-I'd welcome any/all feedback/clarifications on this part in
-particular.
-
-[1]: https://lore.kernel.org/netdev/20240903124008.4793c087@kernel.org/
 
