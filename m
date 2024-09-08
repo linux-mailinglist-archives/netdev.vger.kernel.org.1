@@ -1,376 +1,219 @@
-Return-Path: <netdev+bounces-126278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B40A9705D9
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 10:47:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 815E29705F0
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 11:07:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB24D1F21DDD
-	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 08:47:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4F611F21B3F
+	for <lists+netdev@lfdr.de>; Sun,  8 Sep 2024 09:07:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB8A8248D;
-	Sun,  8 Sep 2024 08:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KwzBsMCc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFE0136663;
+	Sun,  8 Sep 2024 09:07:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2068.outbound.protection.outlook.com [40.107.102.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B44C11366;
-	Sun,  8 Sep 2024 08:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725785246; cv=fail; b=Bo8IXT/WMBk3Ld3SKd+aXTB00929Thrx6Ctp9oZiFML9fGdZA25NmNLjLS2+KfNSn7xq4WPvRkOwU6rhUk/c67TBFY7Km/FUHeg3MqZIvwvVjI0stOGUllGqqWkjioTUZENmTvB4pTU8TdbiW19NQ8X936IZlFnfJl3Bz8l7uSE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725785246; c=relaxed/simple;
-	bh=k5bsvn6RcCA0qeBbrSjxF/aOLZePXv640rcDweYN2TU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ULSmXdmjgXjXx9A7nW5HVwVOF5hDa3oyrffrI9qJLTYGTu2hTMZJ/lSijIfXBuhjj9Bbdg0fsSd6xxuHP76q4F20VCNSVgVYVf2U8iiNDuJRDIQI2V0tnt3avHjyn7LNJcxqbHWz31FjWeAnjx1bjmQQ3zo19mV7T/5Y5EgFo+Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KwzBsMCc; arc=fail smtp.client-ip=40.107.102.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BDo+T/xzfY7Q0RlZsyDm5286ZiZgntqjRoooJct59kcylD6cEZoRjVjjmVtA41DsJ5L/hb6TmXYw5An20pUTaEOmyTsWmEwiM5Ukp9sv8mABRchdmsBPMBEaLa4TF+j0P0ALoPHuYXwfPfwiPLH7O4cqXvrFEPCIpOQg5OAeMXyA3vdWkeL8dbpRY1BASWQelXzHNG/YgcpFyU4fpZteKebHwQeWQWQrElQ3xT1OkiuNO8z7G++MVl0lj3TvgIo2CWsdbd++9m0Z0kUnS1U+Qco2h9kP5jaC/Bg+SU4gPLY2INpFtMxRgXkdP730xyQyqNt45pTZWv3mP1NVsMhEzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5yzeR5n0VHzg0V/kcIKAvzamW4AoicnRFeYJfVk5MNo=;
- b=g2K+IChIlOFcUodpwsJObFTruKGLt0k2d863lY6nnbwBBW0y+NBHAnzKOg3FcE7OJ6wvKkisnpiezjyXkMPSLQ8GxMH36Da5oBlMkto/O7f23aWAUeBOp7D2fpU0mtm/jNb3Qy54QkC1rDL8VXkw9E4vgyOb+6RkEv+5NpWId5HJ/LmfDt1LRBJqKRrCWPUVkVPVzAG2L2B2kAivIQHi94aNZBswtyD8b8NE4mpWpwVJ/Gvo7GDBgJV70uDH5Gv8L4oqRLLBZH0Korv5k0Xx60vqV9enWaN6HIG4zBZm+xDv9yceXbT4+hkwm4mHsmrsMxhu+UuQIEXueMivA0+/DQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5yzeR5n0VHzg0V/kcIKAvzamW4AoicnRFeYJfVk5MNo=;
- b=KwzBsMCctQRqDluCtBqxpl4RVbJQ8cuBlwePIlzlj0bt0TY5UsXdcQJxuxRnWqIqe5GVWhQhUm9W1YUlY0azZaZAkNn+CXxyf3MeCDPGrLFRXrFaCuPJSRh9ECzl+UFezU1fLQ3hPw5HobZ9Is0YAw9uueYg1UHOdY8s5gQ0LMuqTMcfSV5Jdn4URaxU3jaGVn7EXFb+iPcBTRAJb9wlqI8EPxZqkLSw65Nzy/pJdkcguD7bRdkh496+QPXlSaMZLlfEdUgB/WEATqeFZ3G2xTQQGQU8nPWT87J+9syLoGHSqvC3cIPc5h60QK3o51maCeKQH5tnJw0/zJ05681+TA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB6637.namprd12.prod.outlook.com (2603:10b6:8:bb::14) by
- LV2PR12MB5822.namprd12.prod.outlook.com (2603:10b6:408:179::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.28; Sun, 8 Sep 2024 08:47:22 +0000
-Received: from DM4PR12MB6637.namprd12.prod.outlook.com
- ([fe80::fd9f:1f31:c510:e73f]) by DM4PR12MB6637.namprd12.prod.outlook.com
- ([fe80::fd9f:1f31:c510:e73f%5]) with mapi id 15.20.7918.024; Sun, 8 Sep 2024
- 08:47:21 +0000
-Message-ID: <fd165e4e-b6cf-4050-8a1c-05e7217ea8f4@nvidia.com>
-Date: Sun, 8 Sep 2024 11:47:14 +0300
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH rdma-next 0/2] Introduce mlx5 data direct placement (DDP)
-To: Zhu Yanjun <yanjun.zhu@linux.dev>, Leon Romanovsky <leon@kernel.org>,
- Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
- Yishai Hadas <yishaih@nvidia.com>
-References: <cover.1725362773.git.leon@kernel.org>
- <829ac3ed-a338-4589-a76d-77bb165f0608@linux.dev>
- <f0e05a6d-6f9c-4351-af7a-7227fb3998be@nvidia.com>
- <aaf9263b-931e-4b1d-8aea-1218faec2802@linux.dev>
- <09db1552-db97-4e82-9517-3b67c4b33feb@nvidia.com>
- <99b11f32-387c-4501-bd60-efa37618c53d@linux.dev>
- <a50bd6bd-5cae-49d9-8bd8-172f88035d18@nvidia.com>
- <144bf42b-8b9e-48b6-81f7-07af79cb0a94@linux.dev>
-Content-Language: en-US
-From: Edward Srouji <edwards@nvidia.com>
-In-Reply-To: <144bf42b-8b9e-48b6-81f7-07af79cb0a94@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: FR2P281CA0144.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:98::18) To DM4PR12MB6637.namprd12.prod.outlook.com
- (2603:10b6:8:bb::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3EC4D8CE
+	for <netdev@vger.kernel.org>; Sun,  8 Sep 2024 09:07:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725786443; cv=none; b=WUN/BMqJRnamrEgzjF20Oqmtq08vEm4joDTp67pwBbhTl/G/ioOd49mBCOr8v54jfs4uJAiVY8toXHNktBM6Jy+q+RJzYD84Qn882U5JeddfRUSi8EVzjvcotNMtL2Uup53T8QmdMWRVs43+AgYs164ZGshj/icOzzEH/nhgtoA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725786443; c=relaxed/simple;
+	bh=dSZPabuk2Xw9JBNpJxD0E+Nnx6D+OjKimxJj4yQggf4=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=EYjwWuhnK76SnN56JaXohWAYa2NV30psS+qfxh+m+r7LVnn50lCI9YzBxcbSxxuVjOu0wcjVnkoSW8dPudlce5zpUAKRpsf6eQZMvDhff+QJZFHlVt/AYkiyWzcIImh0ojhVd45kvC7BU77/iW+AI1j3Z2chbXTo8AnDkExq3T4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a04c905651so49154335ab.2
+        for <netdev@vger.kernel.org>; Sun, 08 Sep 2024 02:07:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725786441; x=1726391241;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PB0M6FGbcM3nEADdSG1yQ0/pULQ4npq5ZFp90/FjKXo=;
+        b=v7Zq4P02com55enaxKXPpQ+RLNOBD9dj5m9hj8rkUeWAexuKJKYHjgry7JVzrRnjZo
+         lT0lPGGDNGlm3KlcEnqSRGBxAFhJq+kdI2y6YIPfZfjikbEqcEJGDAw2DNX0FuVwRhmz
+         BOI86rKxx+p6qgeEGsd0EdwDgSenikdK9JEyx3TQn7OtqtBeNGyV8DlHJZkW+oCd7ZRq
+         r4PZ0t2ku7RAR8wraPEkJ+Oz5r8U7P95MBWatK/BUJ6Th3r+6FuSx3QveQkOY9SVobPW
+         aksqkzNxYngwmBZYHp7kmRvqeNqs+G9NNytV1MJvRwC3GADwrpZlCBQcNEmiOwwEqU96
+         d6Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCVxXMEYxSzfO9qcjAIcRRgOsJyq9dO2Rmj6W+3z6hUGKTA2kQ94RRZqTMApXvZJU7IMdntiOLo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLP1zjx90XGBTNolFUw4J2EOTR3saySYr4YcUQc9WvUvFZLu5u
+	eoqA9l+SZ9XhjpZk6/NqVNt2zVrYGKC4uFiTds3jqUkfZw8+EofMukX4r3O8zeNGIx07vPEihxO
+	r94ev6LguZaSRwniz81uR3Kh6vR48GZD9ym+zEUve5zzXBrHqOucbak0=
+X-Google-Smtp-Source: AGHT+IHlidgohIFoZ7hFghlXrWnl5/UDEYRWLo9NWP6gaSXPiHepHaoW1o0VoZwjjoYha8evlpTR6/ii6vR3DECh5O7q5MYDV+SR
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB6637:EE_|LV2PR12MB5822:EE_
-X-MS-Office365-Filtering-Correlation-Id: 00269cdc-fc4e-4ff6-289e-08dccfe2da6c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aXlTODloQ21KaGNVVnlTV2ZyQzlMYmNBVXRTQUF4RmRVa2F1SmFxbmxHVnVH?=
- =?utf-8?B?cjQrV20wTzJKaUlIMWlxVHJzVUFqZHFzVXZ0WG4vRnZuMVNJakFkVHA5QUZ1?=
- =?utf-8?B?ajdiVEF6ZktFV0FBVy95dGZhZUFtNzZOSzFmaDJ5eW1CRmhuSmhuQlJHTWRt?=
- =?utf-8?B?UjZsTExrajdBd0pudXNKcjhIbEU1ZXlPUXNYeTRlUUFXUVlTQXB5YkcwY0xN?=
- =?utf-8?B?bUd3YWtzRDM0VUErUU9ZMW05b3YxZUJNTVJOSFArTzcwaGxteDlNWjNNekhm?=
- =?utf-8?B?NzV3RWo1VFVsSzl1MlNaSVNCNktTMVQ5SzJoUW1SN3BKZUhSV3p5VzFXS002?=
- =?utf-8?B?cy9LTDcvY0plM1ZRc21aa1R0M054M1o0ZTZxRmIzTzVFcWc1S1FKMzJHUFFp?=
- =?utf-8?B?N05PdlN1NkNSWVc2QUhicWZUM2J2SURmWjNXRU0yWjVOUFl3YnVnc2l4WnlK?=
- =?utf-8?B?RjNRWTdseFlESG4wQmsyczZtZ1hmS25HZXkrWGpkZzRFNHY3NEE0SFkvMk5m?=
- =?utf-8?B?cDdNSEIrWDFvcXluZ3lOK3p6M1FXT2FZQVV5cUNRTmc4THprc2hOL1BpeXY0?=
- =?utf-8?B?YjVZbmNJb2MyMFF5bVdZRDkveERBSVZKZzR5Z2I3UjV6U2dMNFRzUEl6bUZw?=
- =?utf-8?B?WHVaRVN6ZiszeVBnWXR6aGdTbm5uVjhteFpIK2pXZGY3bmppT3N3SHZoUTlr?=
- =?utf-8?B?Rjk2OEh4Q3A3c0dzdEhwNEZNR3V3cDMxS2FMRWhnUmUwODJsdW5pL1JqK2sr?=
- =?utf-8?B?azBqYkRjelMxTWxJeFlXUXdtWnZBZnV5SUF3QzlXeCtESUxOSzh2NitGVmxm?=
- =?utf-8?B?OU1PcTlRNk9qaDJDN0RieEVDYWpMREF3WTRROEhrTzdaVGtMRmVYdmo1TXZ2?=
- =?utf-8?B?V0ozRUVoTlpHUCtwbkdIY2d2N0FkTEVWeTFOZWNMSzM2dk5lNW1KZ2MrQTgy?=
- =?utf-8?B?eGNCSkp0VFZGSkZnZDI1NE9jdkNJRXZSYVFWc0g4K3huK0tWdnhWVGdSbmpX?=
- =?utf-8?B?RllFWWFDU1NDcWtSbTlDeityQUkycXZ2ODJSYlA5eWlrNG9UaEIrZVlvM2pK?=
- =?utf-8?B?SWxqSFh3VENPSGtvVWNjOXJKWEVzWUN5TkkzQzFVREtSNnVRYVVLWFY0MnM0?=
- =?utf-8?B?YjBiblp0T2ZKV3ZobDRVb1NIQWR4b1EwK2J5MUd1c3ljK28wQVBkMlNFWlJS?=
- =?utf-8?B?Y3I1c3VyaGZwdnl4QlIxUy9mS3FBdEVoRHN5bU9raVVqMUtjUDlEQi9yN1lM?=
- =?utf-8?B?SXhXQXRkSUE1Y08vRkNPSVhXdldVaGpHYmFIUk9yWC9NMmlzbkZtVkJPQ1Jp?=
- =?utf-8?B?ZW5rM1JEM2laZFNENEFlZzRWVVdobjY2cVd0d2dqZ1BEeGJjcThxNTVjUFE1?=
- =?utf-8?B?d1lsSlVRSzBwejRpR1l2V0tnRDlSRnY2Y2YxbXZTQ2t2MVhiREh6eW16Z1Uw?=
- =?utf-8?B?N1AvSk9hZVdLcUNqT0t2b3o2ME1QTnpuUTkrL0J3dVJsYWsyY1NZSzd6cVBT?=
- =?utf-8?B?aW9DR21yOVRDd0YrVXhxd0NkRzllSXdIb2FYT0x4QkZFd2I0SzdwSm0vV2hH?=
- =?utf-8?B?aE5kWjdzd21samdsQ2JsTFRJcVFHQklidDhvUThpbzQwTUgwd2JySzdtQUpP?=
- =?utf-8?B?SjdFeFpsTk55U0RMZFJaVWhBUk1tazM5azNSSXZoVnRzc0hDU3p5Ry9oOXJ4?=
- =?utf-8?B?NmZ4dU9BUHAxUk1pL21tdll3TDNiK0RZU29laGpyZi93NjFVOVMyOXYyUFk5?=
- =?utf-8?B?OXBHeUZsVG5JdkF4TElZTFdPWHhTdlhaUmxiclFEMUZnV3JMUm9yeHFsZEYv?=
- =?utf-8?B?eDZKdmZkT1dpWWt6aFREUT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB6637.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dUtybEJHeXh6cVZaK1pGSkQyc3FHd3ZsRmhjcHRmMEJhSFQvb3RocElhVjVZ?=
- =?utf-8?B?Q2ZkbWl6OVpBQ285NTVTTVhiQVNJN2xuR1hKT1VDRFZMWWJOZFQrMXRvYUpR?=
- =?utf-8?B?UHRwTHNkQ01QdHhibC9NS0FpME9qZ25hSFFkTWxnN08ySkpmdW1jcFVFaWFH?=
- =?utf-8?B?U0pMOUNFYzBBUDY5L1oyaEtBdURpaXhQUnlvUFdYK3IybUdtbWFFTmJUSUZM?=
- =?utf-8?B?VHhYVTNjU1VPSm9BZ3FFcFVDN2wyUUNOb2w5TGFYNEY5dlJ1VGNUamxOOFVk?=
- =?utf-8?B?MjNIZDVZckg0V2FPSm8rZWVqNHBaOTRwQ3RYeXRML2hYbkN0ZW92aU1OTjc4?=
- =?utf-8?B?TjFCQ3VOVUJmbUE1K1dJNnY4WlFBRW54VXNVVkJOaUlWQzdsb2JmbHV1VXo0?=
- =?utf-8?B?QmVvMjFqNTZ3bENYRnJOUGk1SHVLNUw3a0R6UkpGcHIxRm1OeC9JcUhJQy93?=
- =?utf-8?B?cFN6ZmpUbnRaQXhSUmUxd290MDVsVWdpQnZoTjV3RGFWQmxXditjZjRqL2Iz?=
- =?utf-8?B?dFcyWkF0ZjRnTHl0NHBBRS9OWWozUWZTL005TVh4Y2l4enR4WWVXU2ZPUkJz?=
- =?utf-8?B?alJxUmh0TWdOVVh0VFp2Rmd3dThmS1J5KzNOeFFYc2VLSjJQVURtTUJMeE1X?=
- =?utf-8?B?Y3JobFNNKzNTUW5RMVFtNGp4Rld0RGwrUGJ0d3BmZVpLemlubmNhRzFFMnpH?=
- =?utf-8?B?OURBYXJVTkwyRktJeEg5a0VzcUtuQzRURkF2aG5od0trQlB1TUlDdDZ4cytt?=
- =?utf-8?B?SzJPZS8vZ1Q0ek1WL2pLM2pJdFRkQi9Fb1NvcExHamI2ekt4bDFLYUl4Q3dL?=
- =?utf-8?B?Q2x1V1lOTU9hT0M3L2E4MjhibCsvQzVvQmR1ay9NMng5R1ZiN05FRndNWDlZ?=
- =?utf-8?B?a1M4cHBuTVlnTmREVC9PWUhBUVBUZ2hwUjRkZm1LNmxMQ05xclVnYU1PZ0xK?=
- =?utf-8?B?cmRVbVdEYkd0ekQzc2lpVlVNQ2libkxDMlNIblJWWTN3QlhKUGdBVVA5djF1?=
- =?utf-8?B?Yi9SUU9ib1U4NE8rWHdBVXhqNkFqbVJVSEVQODU3eGp3eE5RV0YzcHkvL05M?=
- =?utf-8?B?VDU3U0xBcUJNT1RSM3NZZithUURBRjFnbmYrMHo1QkkwYXM4SlB3UjRua3Ja?=
- =?utf-8?B?VDQrZXpGb0Jna2plVUN4enViN2M5QnlQTWFnY2NiVHVpWUduVUJaTFMzMnFi?=
- =?utf-8?B?NnU5Zm1QQ0RPRnBlbzBOVVlxRWU0MUMvajZBaFoweVd6Q21uMEhaSU5nT1Iw?=
- =?utf-8?B?WVdqYmdydmRxaDVkUzhndHhSdk9mbnRPL2FzUUg1cUh3MDJkdUMzK2p5Sllz?=
- =?utf-8?B?dmM4eUxWTFFqUjEvWE9TNWFzbmJlTmtFWDduMC9QY1RJa1ZMNkUxcmcyNjBI?=
- =?utf-8?B?ejY3V09FR1lRaFVrcVh5UFd1TlBNZkMzeGphNERIZnhWRUJMa1dhNnJvMmVB?=
- =?utf-8?B?dkoreFJRQ3VuR1hCZm9IdTZqenZuOXlzcW1ranNOSllOQ2ZUeEQ3M2JQK3hq?=
- =?utf-8?B?aktuVll3Tm1sWUFmcFZMY1U3RDYyUVVLMnloQys2bW1kSWhLSjRyNnFLVjEw?=
- =?utf-8?B?UmxPTEUrYlM2RlJ2MTFLQWFIaVNaQ1EyVm94eGZxeTlxNHhSaW8yRXl5WFBr?=
- =?utf-8?B?ck1ETXlVUUxOZUZBb2lJeFVYNzJQZ2E5SkdDUk40WnhHRVlBQVBsUHp0bjA3?=
- =?utf-8?B?T1o2TDF3TzhCdXlBdFZXRmt3WTZmKzhqRkhIVEVlRkllNXJnbmc2aXl2WExT?=
- =?utf-8?B?dXNHTkNwSUIxMURjWmxPeEVyTjBkNExwbmdyaTNHeEM2eTY3NW1oN3FBWFVs?=
- =?utf-8?B?YUpZWndBVVlTRlFWUXdRMXJnMjYrNEhXTVNvZXJyZE1hTVkrb3ZQVFo4dm9M?=
- =?utf-8?B?cEMwOVBKa0x1b3F5YmJ1aWY0M1pNbDBQeFZRY3Bpenh0NEp2MFVDcEIxaWY1?=
- =?utf-8?B?OVBOVnZ0dUtjVHVhOFg2SjNicU90cjJmVmpJVFZHOHMrRnpKQTM5dG1ENmtN?=
- =?utf-8?B?L1N5VG9MOGJkbWNqU3JyT2xiQWNoQVk0cVlDM1hJWnpBNDdadDFFcFdEU1Z4?=
- =?utf-8?B?amJYYk1FdDU5bjlhZ2gvaEszcWxyNzhMZHowMC9tREM0ODBSVytYY3ZMeklv?=
- =?utf-8?Q?ViP68mknRxUPwYu2dlubP9e0F?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00269cdc-fc4e-4ff6-289e-08dccfe2da6c
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB6637.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Sep 2024 08:47:21.6230
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TQrHNkMCFuNFFOvh6v6C+NE3y/aR+b9r0zv4F9Nm1TKU+SO3sx7EM9uCexRb13E6GXNyYXmTVCb7CN1Bx7G+Sg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5822
+X-Received: by 2002:a05:6e02:1685:b0:39f:5e18:239d with SMTP id
+ e9e14a558f8ab-3a04f08e03dmr96650525ab.15.1725786441281; Sun, 08 Sep 2024
+ 02:07:21 -0700 (PDT)
+Date: Sun, 08 Sep 2024 02:07:21 -0700
+In-Reply-To: <000000000000932e45061d45f6e8@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ca8574062197f744@google.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Read in set_powered_sync
+From: syzbot <syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    f723224742fc Merge tag 'nf-next-24-09-06' of git://git.ker..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=16678877980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=37742f4fda0d1b09
+dashboard link: https://syzkaller.appspot.com/bug?extid=03d6270b6425df1605bf
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=110c589f980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=139b0e00580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/e61c7f434312/disk-f7232247.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/70b00f168d68/vmlinux-f7232247.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4186da6223fd/bzImage-f7232247.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+03d6270b6425df1605bf@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in set_powered_sync+0x3a/0xc0 net/bluetooth/mgmt.c:1353
+Read of size 8 at addr ffff888029b4dd18 by task kworker/u9:0/54
+
+CPU: 1 UID: 0 PID: 54 Comm: kworker/u9:0 Not tainted 6.11.0-rc6-syzkaller-01155-gf723224742fc #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+Workqueue: hci0 hci_cmd_sync_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:93 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ set_powered_sync+0x3a/0xc0 net/bluetooth/mgmt.c:1353
+ hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:328
+ process_one_work kernel/workqueue.c:3231 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3312
+ worker_thread+0x86d/0xd10 kernel/workqueue.c:3389
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+Allocated by task 5247:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ __kmalloc_cache_noprof+0x19c/0x2c0 mm/slub.c:4193
+ kmalloc_noprof include/linux/slab.h:681 [inline]
+ kzalloc_noprof include/linux/slab.h:807 [inline]
+ mgmt_pending_new+0x65/0x250 net/bluetooth/mgmt_util.c:269
+ mgmt_pending_add+0x36/0x120 net/bluetooth/mgmt_util.c:296
+ set_powered+0x3cd/0x5e0 net/bluetooth/mgmt.c:1394
+ hci_mgmt_cmd+0xc47/0x11d0 net/bluetooth/hci_sock.c:1712
+ hci_sock_sendmsg+0x7b8/0x11c0 net/bluetooth/hci_sock.c:1832
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ sock_write_iter+0x2dd/0x400 net/socket.c:1160
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xa72/0xc90 fs/read_write.c:590
+ ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 5246:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
+ __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2256 [inline]
+ slab_free mm/slub.c:4477 [inline]
+ kfree+0x149/0x360 mm/slub.c:4598
+ settings_rsp+0x2bc/0x390 net/bluetooth/mgmt.c:1443
+ mgmt_pending_foreach+0xd1/0x130 net/bluetooth/mgmt_util.c:259
+ __mgmt_power_off+0x112/0x420 net/bluetooth/mgmt.c:9455
+ hci_dev_close_sync+0x665/0x11a0 net/bluetooth/hci_sync.c:5191
+ hci_dev_do_close net/bluetooth/hci_core.c:483 [inline]
+ hci_dev_close+0x112/0x210 net/bluetooth/hci_core.c:508
+ sock_do_ioctl+0x158/0x460 net/socket.c:1222
+ sock_ioctl+0x629/0x8e0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+The buggy address belongs to the object at ffff888029b4dd00
+ which belongs to the cache kmalloc-96 of size 96
+The buggy address is located 24 bytes inside of
+ freed 96-byte region [ffff888029b4dd00, ffff888029b4dd60)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x29b4d
+flags: 0xfff00000000000(node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xfdffffff(slab)
+raw: 00fff00000000000 ffff88801ac41280 dead000000000100 dead000000000122
+raw: 0000000000000000 0000000080200020 00000001fdffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x52cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP), pid 1, tgid 1 (swapper/0), ts 9062203522, free_ts 0
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1500
+ prep_new_page mm/page_alloc.c:1508 [inline]
+ get_page_from_freelist+0x2e4c/0x2f10 mm/page_alloc.c:3446
+ __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4702
+ __alloc_pages_node_noprof include/linux/gfp.h:269 [inline]
+ alloc_pages_node_noprof include/linux/gfp.h:296 [inline]
+ alloc_slab_page+0x5f/0x120 mm/slub.c:2325
+ allocate_slab+0x5a/0x2f0 mm/slub.c:2488
+ new_slab mm/slub.c:2541 [inline]
+ ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3727
+ __slab_alloc+0x58/0xa0 mm/slub.c:3817
+ __slab_alloc_node mm/slub.c:3870 [inline]
+ slab_alloc_node mm/slub.c:4029 [inline]
+ __kmalloc_cache_noprof+0x1d5/0x2c0 mm/slub.c:4188
+ kmalloc_noprof include/linux/slab.h:681 [inline]
+ kzalloc_noprof include/linux/slab.h:807 [inline]
+ usb_hub_create_port_device+0xc8/0xc10 drivers/usb/core/port.c:743
+ hub_configure drivers/usb/core/hub.c:1710 [inline]
+ hub_probe+0x2503/0x3640 drivers/usb/core/hub.c:1965
+ usb_probe_interface+0x645/0xbb0 drivers/usb/core/driver.c:399
+ really_probe+0x2b8/0xad0 drivers/base/dd.c:657
+ __driver_probe_device+0x1a2/0x390 drivers/base/dd.c:799
+ driver_probe_device+0x50/0x430 drivers/base/dd.c:829
+ __device_attach_driver+0x2d6/0x530 drivers/base/dd.c:957
+ bus_for_each_drv+0x24e/0x2e0 drivers/base/bus.c:457
+page_owner free stack trace missing
+
+Memory state around the buggy address:
+ ffff888029b4dc00: 00 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc
+ ffff888029b4dc80: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
+>ffff888029b4dd00: fa fb fb fb fb fb fb fb fb fb fb fb fc fc fc fc
+                            ^
+ ffff888029b4dd80: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
+ ffff888029b4de00: 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc
+==================================================================
 
 
-On 9/6/2024 6:17 PM, Zhu Yanjun wrote:
-> External email: Use caution opening links or attachments
->
->
-> 在 2024/9/6 20:17, Edward Srouji 写道:
->>
->> On 9/6/2024 8:02 AM, Zhu Yanjun wrote:
->>> External email: Use caution opening links or attachments
->>>
->>>
->>> 在 2024/9/5 20:23, Edward Srouji 写道:
->>>>
->>>> On 9/4/2024 2:53 PM, Zhu Yanjun wrote:
->>>>> External email: Use caution opening links or attachments
->>>>>
->>>>>
->>>>> 在 2024/9/4 16:27, Edward Srouji 写道:
->>>>>>
->>>>>> On 9/4/2024 9:02 AM, Zhu Yanjun wrote:
->>>>>>> External email: Use caution opening links or attachments
->>>>>>>
->>>>>>>
->>>>>>> 在 2024/9/3 19:37, Leon Romanovsky 写道:
->>>>>>>> From: Leon Romanovsky <leonro@nvidia.com>
->>>>>>>>
->>>>>>>> Hi,
->>>>>>>>
->>>>>>>> This series from Edward introduces mlx5 data direct placement 
->>>>>>>> (DDP)
->>>>>>>> feature.
->>>>>>>>
->>>>>>>> This feature allows WRs on the receiver side of the QP to be
->>>>>>>> consumed
->>>>>>>> out of order, permitting the sender side to transmit messages
->>>>>>>> without
->>>>>>>> guaranteeing arrival order on the receiver side.
->>>>>>>>
->>>>>>>> When enabled, the completion ordering of WRs remains in-order,
->>>>>>>> regardless of the Receive WRs consumption order.
->>>>>>>>
->>>>>>>> RDMA Read and RDMA Atomic operations on the responder side
->>>>>>>> continue to
->>>>>>>> be executed in-order, while the ordering of data placement for 
->>>>>>>> RDMA
->>>>>>>> Write and Send operations is not guaranteed.
->>>>>>>
->>>>>>> It is an interesting feature. If I got this feature correctly, this
->>>>>>> feature permits the user consumes the data out of order when RDMA
->>>>>>> Write
->>>>>>> and Send operations. But its completiong ordering is still in 
->>>>>>> order.
->>>>>>>
->>>>>> Correct.
->>>>>>> Any scenario that this feature can be applied and what benefits
->>>>>>> will be
->>>>>>> got from this feature?
->>>>>>>
->>>>>>> I am just curious about this. Normally the users will consume the
->>>>>>> data
->>>>>>> in order. In what scenario, the user will consume the data out of
->>>>>>> order?
->>>>>>>
->>>>>> One of the main benefits of this feature is achieving higher
->>>>>> bandwidth
->>>>>> (BW) by allowing
->>>>>> responders to receive packets out of order (OOO).
->>>>>>
->>>>>> For example, this can be utilized in devices that support 
->>>>>> multi-plane
->>>>>> functionality,
->>>>>> as introduced in the "Multi-plane support for mlx5" series [1]. When
->>>>>> mlx5 multi-plane
->>>>>> is supported, a single logical mlx5 port aggregates multiple 
->>>>>> physical
->>>>>> plane ports.
->>>>>> In this scenario, the requester can "spray" packets across the
->>>>>> multiple physical
->>>>>> plane ports without guaranteeing packet order, either on the wire or
->>>>>> on the receiver
->>>>>> (responder) side.
->>>>>>
->>>>>> With this approach, no barriers or fences are required to ensure
->>>>>> in-order packet
->>>>>> reception, which optimizes the data path for performance. This can
->>>>>> result in better
->>>>>> BW, theoretically achieving line-rate performance equivalent to the
->>>>>> sum of
->>>>>> the maximum BW of all physical plane ports, with only one QP.
->>>>>
->>>>> Thanks a lot for your quick reply. Without ensuring in-order packet
->>>>> reception, this does optimize the data path for performance.
->>>>>
->>>>> I agree with you.
->>>>>
->>>>> But how does the receiver get the correct packets from the
->>>>> out-of-order
->>>>> packets efficiently?
->>>>>
->>>>> The method is implemented in Software or Hardware?
->>>>
->>>>
->>>> The packets have new field that is used by the HW to understand the
->>>> correct message order (similar to PSN).
->>>>
->>>> Once the packets arrive OOO to the receiver side, the data is 
->>>> scattered
->>>> directly (hence the DDP - "Direct Data Placement" name) by the HW.
->>>>
->>>> So the efficiency is achieved by the HW, as it also saves the required
->>>> context and metadata so it can deliver the correct completion to the
->>>> user (in-order) once we have some WQEs that can be considered an
->>>> "in-order window" and be delivered to the user.
->>>>
->>>> The SW/Applications may receive OOO WR_IDs though (because the first
->>>> CQE
->>>> may have consumed Recv WQE of any index on the receiver side), and 
->>>> it's
->>>> their responsibility to handle it from this point, if it's required.
->>>
->>> Got it. It seems that all the functionalities are implemented in HW. 
->>> The
->>> SW only receives OOO WR_IDs. Thanks a lot. Perhaps it is helpful to 
->>> RDMA
->>> LAG devices. It should enhance the performance^_^
->>>
->>> BTW, do you have any performance data with this feature?
->>
->> Not yet. We tested it functionality wise for now.
->>
->> But we should be able to measure its performance soon :).
->
-> Thanks a lot. It is an interesting feature. If performance reports,
-> please share them with us.
-Sure, will do.
->
->
-> IMO, perhaps this feature can be used in random read/write devices, for
-> example, hard disk?
->
-> Just my idea. Not sure if you have applied this feature with hard disk
-> or not.
-You're right, it can be used with storage and we're planning to do this 
-integration and usage in the near future.
->
-> Best Regards,
->
-> Zhu Yanjun
->
->>
->>
->>>
->>> Best Regards,
->>> Zhu Yanjun
->>>
->>>>
->>>>>
->>>>> I am just interested in this feature and want to know more about 
->>>>> this.
->>>>>
->>>>> Thanks,
->>>>>
->>>>> Zhu Yanjun
->>>>>
->>>>>>
->>>>>> [1]
->>>>>> https://lore.kernel.org/lkml/cover.1718553901.git.leon@kernel.org/
->>>>>>> Thanks,
->>>>>>> Zhu Yanjun
->>>>>>>
->>>>>>>>
->>>>>>>> Thanks
->>>>>>>>
->>>>>>>> Edward Srouji (2):
->>>>>>>>    net/mlx5: Introduce data placement ordering bits
->>>>>>>>    RDMA/mlx5: Support OOO RX WQE consumption
->>>>>>>>
->>>>>>>>   drivers/infiniband/hw/mlx5/main.c    |  8 +++++
->>>>>>>>   drivers/infiniband/hw/mlx5/mlx5_ib.h |  1 +
->>>>>>>>   drivers/infiniband/hw/mlx5/qp.c      | 51
->>>>>>>> +++++++++++++++++++++++++---
->>>>>>>>   include/linux/mlx5/mlx5_ifc.h        | 24 +++++++++----
->>>>>>>>   include/uapi/rdma/mlx5-abi.h         |  5 +++
->>>>>>>>   5 files changed, 78 insertions(+), 11 deletions(-)
->>>>>>>>
->>>>>>>
->>>>> -- 
->>>>> Best Regards,
->>>>> Yanjun.Zhu
->>>>>
->>>
-> -- 
-> Best Regards,
-> Yanjun.Zhu
->
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
