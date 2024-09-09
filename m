@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-126720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A247C972505
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:11:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DDDE97250A
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:12:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 239921F24ADA
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:11:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD7021F24BF9
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4379218CBF0;
-	Mon,  9 Sep 2024 22:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA5918CBE2;
+	Mon,  9 Sep 2024 22:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/RiQW8s"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F/r2jklh"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BD7D18CC02
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 22:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA5E18CBFF
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 22:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725919882; cv=none; b=AMTifYqf0wKg3jKJyUod8pNxBaCOjNMubQ7JEDgJv1me5APAI4zRNqG7ZhG0sqMU1xMyazD6q7ZgjUg1b8f6Sns3r9ZxyF48h225RhQQTHN/egzN2tTvz9eUdB3zFEaIRf7kox1lyR3zOXoCClUNYSjvewfxORzjLxLlz8V7t/I=
+	t=1725919890; cv=none; b=ZD3OKdFEv+9EzwUFm0mee85vffTgymNMipF1K8kRXbwwv0VnkGBRDl+Jy6rFmRFlmvOApkyoJ6ObLvkB/+ePp5Jc3BR3O+oV77b9Fz9kjACI9So1RQTPM0Tnp27YEc4jT/ThJv9eh7x16qNHhGb4m/yWxZcv6zsNd4OP1m6Z/ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725919882; c=relaxed/simple;
-	bh=CW4m4hXoLu1L9EWu+kJxi8J8wKMxHkW3tt+3rq6Uvv8=;
+	s=arc-20240116; t=1725919890; c=relaxed/simple;
+	bh=rsP9Ll/uiVZ+HuTriAUJokmS6+iG2fbVRcpsqz0GD18=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=U3ogMulWTrdGMCt8rZnRiRUqSCAkeF/J0x06hVPhpXmxTVX8jdCbEzF92dHM0KRduVCrrdp1Nruq+6abhaDpbpqiMEwpxVTR3X9nWX6vBpVcan/jjkB6wJBHbbNK67WgrLqx09LRvYTZhhSQzHTAW7RL1hdxGIHKykT5T7xJIWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c/RiQW8s; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=ZoEaKfM+koGW9BoYW2jq5vSRkCQPLpo2RcNOnxRtW9SLN8foqxoDrzLBHiAXF1ap/yJFCCz34jNOM2w2wyoUR6IwI6rDTmvEJ9m5gnr8ygSg1TPFozrMRlrUPXYkbB9bdyn4SoHWVlDXlk16lD9hEvKxZ999f/PJ4KfyuvdQtaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=F/r2jklh; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725919879;
+	s=mimecast20190719; t=1725919888;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=NYodhEaouE1xEi5RBQbhMPAt08JpaIUtP+yHpD8vCyg=;
-	b=c/RiQW8sTRWDVzC58nLwOOl1i+XLv1DcTbZv8p4e5unMcd264DWnMf97psdOrIJe8QWnjY
-	Ae3PxCIMT6fzatRPr8AFtckNMp6PrFlvfzEbLf013hg55m81i48dBlGIEDksGGTX7erDsl
-	wwJz+hmhSCblQBnwtSxFXSuARxfnrRg=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+	bh=J01Bjsl7YWsZl9fOHpMh3iI7EGbOprCnGy3SY28REac=;
+	b=F/r2jklh0xoThkNur2LGjtendkhYpnAxEEb54kgAtUysUPT4FC2kbKfvWxlf07IL42HCsX
+	ryoeITafw3AvGjRhvi8BH9lY9+58yIin4oOXivrYewLjtbCjZLHuG5F4Fth39eaknaA8IT
+	Te8gQKcznb7/b2dPzzGZJ4J3vqFeXXU=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-154-HgtTpbQ3Mriz7CdChoLf4A-1; Mon,
- 09 Sep 2024 18:11:17 -0400
-X-MC-Unique: HgtTpbQ3Mriz7CdChoLf4A-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-a7mO6zluMuyHO_V-jiCNrQ-1; Mon,
+ 09 Sep 2024 18:11:23 -0400
+X-MC-Unique: a7mO6zluMuyHO_V-jiCNrQ-1
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A1D391954209;
-	Mon,  9 Sep 2024 22:11:15 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 023A119560B0;
+	Mon,  9 Sep 2024 22:11:21 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.224.56])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2FACF1956096;
-	Mon,  9 Sep 2024 22:11:09 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F01C11956086;
+	Mon,  9 Sep 2024 22:11:15 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -71,9 +71,9 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	przemyslaw.kitszel@intel.com,
 	intel-wired-lan@lists.osuosl.org,
 	edumazet@google.com
-Subject: [PATCH v7 net-next 05/15] net-shapers: implement NL group operation
-Date: Tue, 10 Sep 2024 00:09:59 +0200
-Message-ID: <aa7ffc1cfa0a7bb1a23d10eb355d62ba6796315c.1725919039.git.pabeni@redhat.com>
+Subject: [PATCH v7 net-next 06/15] net-shapers: implement delete support for NODE scope shaper
+Date: Tue, 10 Sep 2024 00:10:00 +0200
+Message-ID: <692d979b5f61e626f5ec078845d5557e85119375.1725919039.git.pabeni@redhat.com>
 In-Reply-To: <cover.1725919039.git.pabeni@redhat.com>
 References: <cover.1725919039.git.pabeni@redhat.com>
 Precedence: bulk
@@ -85,431 +85,151 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Allow grouping multiple leaves shaper under the given root.
-The node and the leaves shapers are created, if needed, otherwise
-the existing shapers are re-linked as requested.
-
-Try hard to pre-allocated the needed resources, to avoid non
-trivial H/W configuration rollbacks in case of any failure.
+Leverage the previously introduced group operation to implement
+the removal of NODE scope shaper, re-linking its leaves under the
+the parent node before actually deleting the specified NODE scope
+shaper.
 
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-v6 -> v7:
- - moved the parsing under the shaper lock, dropping the
-   net_shaper_group() helper.
- - rename net_shaper_parse_info_nest to net_shaper_parse_leaf()
- - updated node parsing to cope with not nested attrs
- - fix leaf accounting when updating existing nodes
-
-v5 -> v6:
- - pre-allocate msg in net_shaper_nl_group_doit()
- - factor out handle_cmp() and parent_from_leaves() helpers
- - driver group() implementation is optional
- - move the 0 leaves check earlier
- - net_shaper_cache_rollback ->net_shaper_rollback
- - report the failure on reply generation error (no rollback)
- - several net_shaper_group_send_reply() fixup
-
 v4 -> v5:
  - replace net_device* with binding* in most helpers
- - factor out net_shaper_fill_binding() helper for re-use in later patch
- - move most sanity check at parse time and use NL_SET_BAD_ATTR
- - reused net_shaper_fill_handle() in net_shaper_group_send_reply()
-   instead of open-coding it.
-
-v3 -> v4:
- - cleanup left-over scope node shaper after re-link, as needed
- - add locking
- - separate arguments for shaper handle
-
-RFC v2 -> RFC v3:
- - dev_put() -> netdev_put()
 ---
- net/shaper/shaper.c | 350 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 350 insertions(+)
+ net/shaper/shaper.c | 86 ++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 74 insertions(+), 12 deletions(-)
 
 diff --git a/net/shaper/shaper.c b/net/shaper/shaper.c
-index 30c5a2f9520b..3ffbd83b3e05 100644
+index 3ffbd83b3e05..b502918b0a76 100644
 --- a/net/shaper/shaper.c
 +++ b/net/shaper/shaper.c
-@@ -75,6 +75,24 @@ net_shaper_ops(struct net_shaper_binding *binding)
- 	return NULL;
+@@ -787,7 +787,8 @@ static int net_shaper_parent_from_leaves(int leaves_count,
  }
  
-+/* Count the number of [multi] attributes of the given type. */
-+static int net_shaper_list_len(struct genl_info *info, int type)
-+{
-+	struct nlattr *attr;
-+	int rem, cnt = 0;
-+
-+	nla_for_each_attr_type(attr, type, genlmsg_data(info->genlhdr),
-+			       genlmsg_len(info->genlhdr), rem)
-+		cnt++;
-+	return cnt;
-+}
-+
-+static int net_shaper_handle_size(void)
-+{
-+	return nla_total_size(nla_total_size(sizeof(u32)) +
-+			      nla_total_size(sizeof(u32)));
-+}
-+
- static int net_shaper_fill_binding(struct sk_buff *msg,
- 				   const struct net_shaper_binding *binding,
- 				   u32 type)
-@@ -474,6 +492,74 @@ static int net_shaper_parse_info(struct net_shaper_binding *binding,
- 	return 0;
- }
+ static int __net_shaper_group(struct net_shaper_binding *binding,
+-			      int leaves_count, struct net_shaper *leaves,
++			      bool update_node, int leaves_count,
++			      struct net_shaper *leaves,
+ 			      struct net_shaper *node,
+ 			      struct netlink_ext_ack *extack)
+ {
+@@ -833,12 +834,14 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
+ 		}
+ 	}
  
-+/* Fetch the existing leaf and update it with the user-provided
-+ * attributes.
-+ */
-+static int net_shaper_parse_leaf(struct net_shaper_binding *binding,
-+				 const struct nlattr *attr,
-+				 const struct genl_info *info,
-+				 const struct net_shaper *node,
-+				 struct net_shaper *shaper)
-+{
-+	struct nlattr *tb[NET_SHAPER_A_WEIGHT + 1];
-+	bool exists;
-+	int ret;
-+
-+	ret = nla_parse_nested(tb, NET_SHAPER_A_WEIGHT, attr,
-+			       net_shaper_leaf_info_nl_policy, info->extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = net_shaper_parse_info(binding, tb, info, shaper, &exists);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (shaper->handle.scope != NET_SHAPER_SCOPE_QUEUE) {
-+		NL_SET_BAD_ATTR(info->extack, tb[NET_SHAPER_A_HANDLE]);
-+		return -EINVAL;
-+	}
-+
-+	if (!exists)
-+		net_shaper_default_parent(&shaper->handle, &shaper->parent);
-+	return 0;
-+}
-+
-+/* Alike net_parse_shaper_info(), but additionally allow the user specifying
-+ * the shaper's parent handle.
-+ */
-+static int net_shaper_parse_node(struct net_shaper_binding *binding,
-+				 struct nlattr **tb,
-+				 const struct genl_info *info,
-+				 struct net_shaper *shaper)
-+{
-+	bool exists;
-+	int ret;
-+
-+	ret = net_shaper_parse_info(binding, tb, info, shaper, &exists);
-+	if (ret)
-+		return ret;
-+
-+	if (shaper->handle.scope != NET_SHAPER_SCOPE_NODE &&
-+	    shaper->handle.scope != NET_SHAPER_SCOPE_NETDEV) {
-+		NL_SET_BAD_ATTR(info->extack, tb[NET_SHAPER_A_HANDLE]);
-+		return -EINVAL;
-+	}
-+
-+	if (tb[NET_SHAPER_A_PARENT]) {
-+		ret = net_shaper_parse_handle(tb[NET_SHAPER_A_PARENT], info,
-+					      &shaper->parent);
+-	/* For newly created node scope shaper, the following will update
+-	 * the handle, due to id allocation.
+-	 */
+-	ret = net_shaper_pre_insert(binding, &node->handle, extack);
+-	if (ret)
+-		return ret;
++	if (update_node) {
++		/* For newly created node scope shaper, the following will
++		 * update the handle, due to id allocation.
++		 */
++		ret = net_shaper_pre_insert(binding, &node->handle, extack);
 +		if (ret)
 +			return ret;
-+
-+		if (shaper->parent.scope != NET_SHAPER_SCOPE_NODE &&
-+		    shaper->parent.scope != NET_SHAPER_SCOPE_NETDEV) {
-+			NL_SET_BAD_ATTR(info->extack, tb[NET_SHAPER_A_PARENT]);
-+			return -EINVAL;
-+		}
 +	}
-+	return 0;
-+}
-+
- static int net_shaper_generic_pre(struct genl_info *info, int type)
- {
- 	struct net_shaper_nl_ctx *ctx = (struct net_shaper_nl_ctx *)info->ctx;
-@@ -672,6 +758,123 @@ static int __net_shaper_delete(struct net_shaper_binding *binding,
+ 
+ 	for (i = 0; i < leaves_count; ++i) {
+ 		leaf_handle = leaves[i].handle;
+@@ -866,7 +869,8 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
+ 	 */
+ 	if (new_node && parent)
+ 		parent->leaves++;
+-	net_shaper_commit(binding, 1, node);
++	if (update_node)
++		net_shaper_commit(binding, 1, node);
+ 	net_shaper_commit(binding, leaves_count, leaves);
  	return 0;
+ 
+@@ -875,6 +879,64 @@ static int __net_shaper_group(struct net_shaper_binding *binding,
+ 	return ret;
  }
  
-+static int net_shaper_handle_cmp(const struct net_shaper_handle *a,
-+				 const struct net_shaper_handle *b)
++static int net_shaper_pre_del_node(struct net_shaper_binding *binding,
++				   const struct net_shaper *shaper,
++				   struct netlink_ext_ack *extack)
 +{
-+	/* Must avoid holes in struct net_shaper_handle. */
-+	BUILD_BUG_ON(sizeof(*a) != 8);
++	struct net_shaper_hierarchy *hierarchy = net_shaper_hierarchy(binding);
++	struct net_shaper *cur, *leaves, node = {};
++	int ret, leaves_count = 0;
++	unsigned long index;
++	bool update_node;
 +
-+	return memcmp(a, b, sizeof(*a));
-+}
++	if (!shaper->leaves)
++		return 0;
 +
-+static int net_shaper_parent_from_leaves(int leaves_count,
-+					 const struct net_shaper *leaves,
-+					 struct net_shaper *node,
-+					 struct netlink_ext_ack *extack)
-+{
-+	struct net_shaper_handle parent = leaves[0].parent;
-+	int i;
-+
-+	for (i = 1; i < leaves_count; ++i) {
-+		if (net_shaper_handle_cmp(&leaves[i].parent, &parent)) {
-+			NL_SET_ERR_MSG_FMT(extack, "All the leaves shapers must have the same old parent");
-+			return -EINVAL;
-+		}
-+	}
-+
-+	node->parent = parent;
-+	return 0;
-+}
-+
-+static int __net_shaper_group(struct net_shaper_binding *binding,
-+			      int leaves_count, struct net_shaper *leaves,
-+			      struct net_shaper *node,
-+			      struct netlink_ext_ack *extack)
-+{
-+	const struct net_shaper_ops *ops = net_shaper_ops(binding);
-+	struct net_shaper_handle leaf_handle;
-+	struct net_shaper *parent = NULL;
-+	bool new_node = false;
-+	int i, ret;
-+
-+	if (node->handle.scope == NET_SHAPER_SCOPE_NODE) {
-+		new_node = node->handle.id == NET_SHAPER_ID_UNSPEC;
-+
-+		if (!new_node && !net_shaper_lookup(binding, &node->handle)) {
-+			/* The related attribute is not available when
-+			 * reaching here from the delete() op.
-+			 */
-+			NL_SET_ERR_MSG_FMT(extack, "Node shaper %d:%d does not exists",
-+					   node->handle.scope, node->handle.id);
-+			return -ENOENT;
-+		}
-+
-+		/* When unspecified, the node parent scope is inherited from
-+		 * the leaves.
-+		 */
-+		if (node->parent.scope == NET_SHAPER_SCOPE_UNSPEC) {
-+			ret = net_shaper_parent_from_leaves(leaves_count,
-+							    leaves, node,
-+							    extack);
-+			if (ret)
-+				return ret;
-+		}
-+
++	/* Fetch the new node information. */
++	node.handle = shaper->parent;
++	cur = net_shaper_lookup(binding, &node.handle);
++	if (cur) {
++		node = *cur;
 +	} else {
-+		net_shaper_default_parent(&node->handle, &node->parent);
++		/* A scope NODE shaper can be nested only to the NETDEV scope
++		 * shaper without creating the latter, this check may fail only
++		 * if the data is in inconsistent status.
++		 */
++		if (WARN_ON_ONCE(node.handle.scope != NET_SHAPER_SCOPE_NETDEV))
++			return -EINVAL;
 +	}
 +
-+	if (node->parent.scope == NET_SHAPER_SCOPE_NODE) {
-+		parent = net_shaper_lookup(binding, &node->parent);
-+		if (!parent) {
-+			NL_SET_ERR_MSG_FMT(extack, "Node parent shaper %d:%d does not exists",
-+					   node->parent.scope, node->parent.id);
-+			return -ENOENT;
-+		}
-+	}
++	leaves = kcalloc(shaper->leaves, sizeof(struct net_shaper),
++			 GFP_KERNEL);
++	if (!leaves)
++		return -ENOMEM;
 +
-+	/* For newly created node scope shaper, the following will update
-+	 * the handle, due to id allocation.
-+	 */
-+	ret = net_shaper_pre_insert(binding, &node->handle, extack);
-+	if (ret)
-+		return ret;
-+
-+	for (i = 0; i < leaves_count; ++i) {
-+		leaf_handle = leaves[i].handle;
-+
-+		ret = net_shaper_pre_insert(binding, &leaf_handle, extack);
-+		if (ret)
-+			goto rollback;
-+
-+		if (!net_shaper_handle_cmp(&leaves[i].parent, &node->handle))
++	/* Build the leaves arrays. */
++	xa_for_each(&hierarchy->shapers, index, cur) {
++		if (net_shaper_handle_cmp(&cur->parent, &shaper->handle))
 +			continue;
 +
-+		/* The leaves shapers will be nested to the node, update the
-+		 * linking accordingly.
-+		 */
-+		leaves[i].parent = node->handle;
-+		node->leaves++;
++		if (WARN_ON_ONCE(leaves_count == shaper->leaves)) {
++			ret = -EINVAL;
++			goto free;
++		}
++
++		leaves[leaves_count++] = *cur;
 +	}
 +
-+	ret = ops->group(binding, leaves_count, leaves, node, extack);
-+	if (ret < 0)
-+		goto rollback;
-+
-+	/* The node's parent gains a new leaf only when the node itself
-+	 * is created by this group operation
++	/* When re-linking to the netdev shaper, avoid the eventual, implicit,
++	 * creation of the new node, would be surprising since the user is
++	 * doing a delete operation.
 +	 */
-+	if (new_node && parent)
-+		parent->leaves++;
-+	net_shaper_commit(binding, 1, node);
-+	net_shaper_commit(binding, leaves_count, leaves);
-+	return 0;
++	update_node = node.handle.scope != NET_SHAPER_SCOPE_NETDEV;
++	ret = __net_shaper_group(binding, update_node, leaves_count,
++				 leaves, &node, extack);
 +
-+rollback:
-+	net_shaper_rollback(binding);
++free:
++	kfree(leaves);
 +	return ret;
 +}
 +
  int net_shaper_nl_delete_doit(struct sk_buff *skb, struct genl_info *info)
  {
  	struct net_shaper_hierarchy *hierarchy;
-@@ -716,6 +919,153 @@ int net_shaper_nl_delete_doit(struct sk_buff *skb, struct genl_info *info)
- 	return ret;
- }
+@@ -907,9 +969,9 @@ int net_shaper_nl_delete_doit(struct sk_buff *skb, struct genl_info *info)
+ 	}
  
-+static int net_shaper_group_send_reply(struct net_shaper_binding *binding,
-+				       const struct net_shaper_handle *handle,
-+				       struct genl_info *info,
-+				       struct sk_buff *msg)
-+{
-+	void *hdr;
-+
-+	hdr = genlmsg_iput(msg, info);
-+	if (!hdr)
-+		goto free_msg;
-+
-+	if (net_shaper_fill_binding(msg, binding, NET_SHAPER_A_IFINDEX) ||
-+	    net_shaper_fill_handle(msg, handle, NET_SHAPER_A_HANDLE))
-+		goto free_msg;
-+
-+	genlmsg_end(msg, hdr);
-+
-+	return genlmsg_reply(msg, info);
-+
-+free_msg:
-+	/* Should never happen as msg is pre-allocated with enough space. */
-+	WARN_ONCE(true, "calculated message payload length (%d)",
-+		  net_shaper_handle_size());
-+	nlmsg_free(msg);
-+	return -EMSGSIZE;
-+}
-+
-+int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct net_shaper **old_nodes, *leaves, node;
-+	struct net_shaper_hierarchy *hierarchy;
-+	struct net_shaper_binding *binding;
-+	int i, ret, rem, leaves_count;
-+	int old_nodes_count = 0;
-+	struct sk_buff *msg;
-+	struct nlattr *attr;
-+
-+	if (GENL_REQ_ATTR_CHECK(info, NET_SHAPER_A_LEAVES))
-+		return -EINVAL;
-+
-+	binding = net_shaper_binding_from_ctx(info->ctx);
-+
-+	/* The group operation is optional. */
-+	if (!net_shaper_ops(binding)->group)
-+		return -EOPNOTSUPP;
-+
-+	net_shaper_lock(binding);
-+	leaves_count = net_shaper_list_len(info, NET_SHAPER_A_LEAVES);
-+	if (!leaves_count) {
-+		NL_SET_BAD_ATTR(info->extack,
-+				info->attrs[NET_SHAPER_A_LEAVES]);
-+		ret = -EINVAL;
-+		goto unlock;
-+	}
-+
-+	leaves = kcalloc(leaves_count, sizeof(struct net_shaper) +
-+			 sizeof(struct net_shaper *), GFP_KERNEL);
-+	if (!leaves) {
-+		ret = -ENOMEM;
-+		goto unlock;
-+	}
-+	old_nodes = (void *)&leaves[leaves_count];
-+
-+	ret = net_shaper_parse_node(binding, info->attrs, info, &node);
-+	if (ret)
-+		goto free_leaves;
-+
-+	i = 0;
-+	nla_for_each_attr_type(attr, NET_SHAPER_A_LEAVES,
-+			       genlmsg_data(info->genlhdr),
-+			       genlmsg_len(info->genlhdr), rem) {
-+		if (WARN_ON_ONCE(i >= leaves_count))
-+			goto free_leaves;
-+
-+		ret = net_shaper_parse_leaf(binding, attr, info,
-+					    &node, &leaves[i]);
+ 	if (handle.scope == NET_SHAPER_SCOPE_NODE) {
+-		/* TODO: implement support for scope NODE delete. */
+-		ret = -EINVAL;
+-		goto unlock;
++		ret = net_shaper_pre_del_node(binding, shaper, info->extack);
 +		if (ret)
-+			goto free_leaves;
-+		i++;
-+	}
-+
-+	/* Prepare the msg reply in advance, to avoid device operation
-+	 * rollback on allocation failure.
-+	 */
-+	msg = genlmsg_new(net_shaper_handle_size(), GFP_KERNEL);
-+	if (!msg)
-+		goto free_leaves;
-+
-+	hierarchy = net_shaper_hierarchy_setup(binding);
-+	if (!hierarchy) {
-+		ret = -ENOMEM;
-+		goto free_msg;
-+	}
-+
-+	/* Record the node shapers that this group() operation can make
-+	 * childless for later cleanup.
-+	 */
-+	for (i = 0; i < leaves_count; i++) {
-+		if (leaves[i].parent.scope == NET_SHAPER_SCOPE_NODE &&
-+		    net_shaper_handle_cmp(&leaves[i].parent, &node.handle)) {
-+			struct net_shaper *tmp;
-+
-+			tmp = net_shaper_lookup(binding, &leaves[i].parent);
-+			if (!tmp)
-+				continue;
-+
-+			old_nodes[old_nodes_count++] = tmp;
-+		}
-+	}
-+
-+	ret = __net_shaper_group(binding, leaves_count, leaves, &node,
-+				 info->extack);
-+	if (ret)
-+		goto free_msg;
-+
-+	/* Check if we need to delete any node left alone by the new leaves
-+	 * linkage.
-+	 */
-+	for (i = 0; i < old_nodes_count; ++i) {
-+		struct net_shaper *tmp = old_nodes[i];
-+
-+		if (--tmp->leaves > 0)
-+			continue;
-+
-+		/* Errors here are not fatal: the grouping operation is
-+		 * completed, and user-space can still explicitly clean-up
-+		 * left-over nodes.
-+		 */
-+		__net_shaper_delete(binding, tmp, info->extack);
-+	}
-+
-+	ret = net_shaper_group_send_reply(binding, &node.handle, info, msg);
-+	if (ret)
-+		GENL_SET_ERR_MSG_FMT(info, "Can't send reply");
-+
-+free_leaves:
-+	kfree(leaves);
-+
-+unlock:
-+	net_shaper_unlock(binding);
-+	return ret;
-+
-+free_msg:
-+	kfree_skb(msg);
-+	goto free_leaves;
-+}
-+
- static void net_shaper_flush(struct net_shaper_binding *binding)
- {
- 	struct net_shaper_hierarchy *hierarchy = net_shaper_hierarchy(binding);
++			goto unlock;
+ 	}
+ 
+ 	ret = __net_shaper_delete(binding, shaper, info->extack);
+@@ -1029,7 +1091,7 @@ int net_shaper_nl_group_doit(struct sk_buff *skb, struct genl_info *info)
+ 		}
+ 	}
+ 
+-	ret = __net_shaper_group(binding, leaves_count, leaves, &node,
++	ret = __net_shaper_group(binding, true, leaves_count, leaves, &node,
+ 				 info->extack);
+ 	if (ret)
+ 		goto free_msg;
 -- 
 2.45.2
 
