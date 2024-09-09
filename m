@@ -1,126 +1,113 @@
-Return-Path: <netdev+bounces-126616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2E7097211E
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 19:40:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9522972138
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 19:42:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 810641F231C2
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 17:40:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CE60282B0E
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 17:42:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0C7A189528;
-	Mon,  9 Sep 2024 17:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446B218A948;
+	Mon,  9 Sep 2024 17:38:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YKcxBhl7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9+JeKmi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C540E17B4E1;
-	Mon,  9 Sep 2024 17:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26D118A940;
+	Mon,  9 Sep 2024 17:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725903088; cv=none; b=FYkyV22bIHETcflDOztYRump4OOFJPAvdEQbXSJuDEUrVj+kME7hBI2V4i82BvLvDtLN917URO3Lx07pS9TFqRAJvBOG3RsCqWaVbodNMVZ2b17H7+zmLZ0Ad+VQNNg2EmPChQ6AhRlMAqPWAnjpk0NDMTnGXK8NDOm4n70BJdo=
+	t=1725903507; cv=none; b=Q2VX/MkSLxDgzL9RYK745fwlQUNqdDG2xhktOpbLOB5JO03FQ5f/BAIeg0qvvBzoB5p8QWyznw/+FuZx4f7mal/rDsb4K1jdOigPfq0F807bjKMCez4JsR2+tU16HcKbTDbWeGNNhWuZG2/zKFtTlwLIzohhqlh7Ujo0rWb+HPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725903088; c=relaxed/simple;
-	bh=s1JqYI7ujxyuN5CqiWW5tvRXDZUlN+szue4aqm6YliE=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Vpy/TwVxeIpzbt7W817ct8QODkUESsrZqHcetHNuKdD3vXCptIvAhtXFfQmGzR6ahcw9ao3atQOWkyPIY0R8K1qjtBGklD+e7eXqu2UZSLUSCqEx/YeinvXOeHImvljSlOCDaVUVXwZddLttGhMtaXOV9z4qreh3huWfqTtyhQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YKcxBhl7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 565BAC4CEC5;
-	Mon,  9 Sep 2024 17:31:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725903088;
-	bh=s1JqYI7ujxyuN5CqiWW5tvRXDZUlN+szue4aqm6YliE=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=YKcxBhl7ZWVX8vBS19EpypI/D/DyKDuXNZ/Ent6+SgcaXztQBBZMMlX8Y7nJ6Y36U
-	 tvqgOkObgChC4cMh7miTxOPqUj5SYlk/j6plYQZt++7zLLqmfKr0ePI+8n55Bgn7eE
-	 75NIUWSLW5L9IlUeaFHaU0GuWDRbin7LniT/I4bJUBNRHAc7E8GUFyLxdsNXm+mCDu
-	 Txork5k3+7PpALutZ9Kk5YlsIybv6A29TYs31Xno6ud7lzDCQp30FSXJ72ov/yH+Ob
-	 1CSdhbN618YprBjEAQw1W3RGpfDXFdREaB5d0EAaQBwk3w9NhZWdp8FmtGXMa/O9uM
-	 qn/HFsTpiKVew==
-From: Kalle Valo <kvalo@kernel.org>
-To: <Ajay.Kathat@microchip.com>
-Cc: <marex@denx.de>,  <linux-wireless@vger.kernel.org>,
-  <davem@davemloft.net>,  <alexis.lothore@bootlin.com>,
-  <claudiu.beznea@tuxon.dev>,  <conor+dt@kernel.org>,
-  <edumazet@google.com>,  <kuba@kernel.org>,  <krzk+dt@kernel.org>,
-  <pabeni@redhat.com>,  <robh@kernel.org>,  <devicetree@vger.kernel.org>,
-  <netdev@vger.kernel.org>
-Subject: Re: [PATCH v4 5/5] wifi: wilc1000: Add WILC3000 support
-References: <20240829004510.178016-1-marex@denx.de>
-	<20240829004510.178016-5-marex@denx.de> <87ed5tgofh.fsf@kernel.org>
-	<7205210d-8bf8-41ba-9462-38e619027a45@microchip.com>
-Date: Mon, 09 Sep 2024 20:31:23 +0300
-In-Reply-To: <7205210d-8bf8-41ba-9462-38e619027a45@microchip.com> (Ajay
-	Kathat's message of "Mon, 9 Sep 2024 16:51:35 +0000")
-Message-ID: <87le00g2dw.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1725903507; c=relaxed/simple;
+	bh=fMnYjZ7puk4RyEsIR/egM5RTuWKhQoMKRiFm4XTMEHI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=qph2huKDpRH7+8DEeQu/Jl7uMYj8blrSV8TffdENGjZazJQWt3Hs6+4N5ZfK3sWiLJbIl6QTxcOYF0esJHRQqon1+mgHovcoQ38EwNMnu1MBj8hsrLDarHl8JI+9r4efCi01+bvZqu57S0nKsCQGbu7iPpbXa3/bz2yKnX0hE/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q9+JeKmi; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7a9a3071c6bso186798985a.0;
+        Mon, 09 Sep 2024 10:38:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725903504; x=1726508304; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wWcguGccUwTR9BOegZpc2dDEqNjenCK0RnfNy3CIhcs=;
+        b=Q9+JeKmiVpHPXOtpq0jSN6SCB6aJkz2iDwliLZU536I64BmDMqT+d2qvNcK8GZ1gNl
+         QfBRu3G66b944VHpH/AS9xUhH5n8CReD8ze6qnExm+BIkbEHbcgx+A45LWIZgb9bF35N
+         5Wo8BwMqTv73g1vUfWF0BIcb+roJkiG30i0CDT+Xl6f0JASZTmf4cfgneE+lv0khgosS
+         LSucPKLqXOG+RHIbsUdyBwhsQs3v86QzlF4KCci36eWVFkzCt/oV/1aGY0TbMHlg4yCV
+         D2fM8LOZWvmPmG2is1NgjeD7pTXDB4VDvrlHm1kI434QQ4lJleHSauX/Xifs16iza0k7
+         flRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725903504; x=1726508304;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wWcguGccUwTR9BOegZpc2dDEqNjenCK0RnfNy3CIhcs=;
+        b=tzyMW8XRLzMRNRVwLNZ3adsz3n6oo1EYAaXcU8ZHlrgUGxT4BSSlwjjDFWr/vm4R+r
+         uyMK7UNJsOv2p92qfNljPeqZaTkoUeiYKoT7V5jAGX4YdynT7SvJrEyBEMEyOx1mR6LP
+         fpnlCjnmxq8OY6AsjWI08SwgBcj+Ur0/DRcr0Zu9z1LRyUeYqdgjLyfProB/+pSrt45L
+         MVvOsy/hcmH0A3hyYSskZ2L9RGTHuqRRbSMd5MSctSILo5wbm/5ia50GWxqwVTATBqUX
+         y/r4WA38rN69zr3DVbSZ60kq9xXgaWe0JiOLyAZTF9u2sHBEoh+nKu5/yO39r8cEYIGm
+         9pqw==
+X-Forwarded-Encrypted: i=1; AJvYcCViiYd/Wd6/dMoWf3NtT1glZSZjO2nQShA+RUJ7vRoO1cS5RCiqwQ104GUBzHK/eKVFd3Wcra3yVGeIophU7GU=@vger.kernel.org, AJvYcCWBlRjMOe+UQrxLT2yJeBv7R7jwWwX6UGDYll4tXvEkihAWHFBkha3swqYLDLUKT9iQ1l4Tt8Lh@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDDDE2B2owr0KAV3EZvVEmk2m+HM10qNSLrqELSnKd9fIU+lNa
+	MPVxFtorKHAk9Rp8D9SPRs6jKmybZjY9d09aRVE6XOR/YwH5zw5r
+X-Google-Smtp-Source: AGHT+IHB+K+FvjbBd74mem+IwvTs/UYXCR/CU1rh4z6I4/uki7FGMzFbiwmMuMjQkkr/kCMBvzPqvA==
+X-Received: by 2002:a05:620a:2946:b0:7a9:ba35:1869 with SMTP id af79cd13be357-7a9ba351bbemr349259085a.51.1725903503683;
+        Mon, 09 Sep 2024 10:38:23 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a9a7945734sm235949785a.5.2024.09.09.10.38.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 10:38:23 -0700 (PDT)
+Date: Mon, 09 Sep 2024 13:38:22 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ willemdebruijn.kernel@gmail.com
+Cc: Jason Xing <kerneljasonxing@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ shuah@kernel.org, 
+ willemb@google.com, 
+ linux-kselftest@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <66df328ee959f_3d03029484@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240909102309.3da82583@kernel.org>
+References: <20240905160035.62407-1-kerneljasonxing@gmail.com>
+ <20240909102309.3da82583@kernel.org>
+Subject: Re: [PATCH net-next v2] selftests: return failure when timestamps
+ can't be reported
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-<Ajay.Kathat@microchip.com> writes:
+Jakub Kicinski wrote:
+> On Fri,  6 Sep 2024 00:00:35 +0800 Jason Xing wrote:
+> > When I was trying to modify the tx timestamping feature, I found that
+> > running "./txtimestamp -4 -C -L 127.0.0.1" didn't reflect the error:
+> > I succeeded to generate timestamp stored in the skb but later failed
+> > to report it to the userspace (which means failed to put css into cmsg).
+> > It can happen when someone writes buggy codes in __sock_recv_timestamp(),
+> > for example.
+> 
+> Willem, thoughts?
 
-> On 9/9/24 02:35, Kalle Valo wrote:
->
->> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
->> 
->> Marek Vasut <marex@denx.de> writes:
->> 
->>> From: Ajay Singh <ajay.kathat@microchip.com>
->>>
->>> Add support for the WILC3000 chip. The chip is similar to WILC1000,
->>> except that the register layout is slightly different and it does
->>> not support WPA3/SAE.
->>>
->>> Signed-off-by: Ajay Singh <ajay.kathat@microchip.com>
->>> Signed-off-by: Marek Vasut <marex@denx.de>
->> 
->> [...]
->> 
->>> --- a/drivers/net/wireless/microchip/wilc1000/cfg80211.c
->>> +++ b/drivers/net/wireless/microchip/wilc1000/cfg80211.c
->>> @@ -313,6 +313,13 @@ static int connect(struct wiphy *wiphy, struct net_device *dev,
->>>
->>>       vif->connecting = true;
->>>
->>> +     if (sme->auth_type == NL80211_AUTHTYPE_SAE &&
->>> +         is_wilc3000(vif->wilc->chipid)) {
->>> +             netdev_err(dev, "WILC3000: WPA3 not supported\n");
->>> +             ret = -EOPNOTSUPP;
->>> +             goto out_error;
->>> +     }
->> 
->> This looks wrong. If wilc3000 doesn't support SAE you shouldn't
->> advertise NL80211_FEATURE_SAE to user space. I think the check for
->> wilc3000 should be in wilc_create_wiphy():
->> 
->
-> Actually, the chip ID is not available when wilc_create_wiphy() is called but
-> is set later in the device probe function. Therefore, adding the
-> 'is_wilc3000(vif->wilc->chipid)' condition may not work as expected.
-> Also, I think there is no API to change "wiphy->features" after wiphy is
-> registered to set it later when chip ID information is available.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-Sounds like the driver is doing something funky in the registration, the
-idea is that the device capabilities are probed before calling
-wiphy_register().
-
-> Does it make sense to add a module parameter for device type(wilc1000 or
-> wilc3000) to address device-specific featurization.
-
-We don't do hacks like that in upstream, it's expected that the driver
-does this all automatically.
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Sorry, lost track of this.
 
