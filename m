@@ -1,170 +1,163 @@
-Return-Path: <netdev+bounces-126601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BA84971F97
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:53:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2B8971F8B
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:51:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66CD41C2175B
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 16:53:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA84F1C208EB
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 16:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821BC165F05;
-	Mon,  9 Sep 2024 16:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8601E45014;
+	Mon,  9 Sep 2024 16:51:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t+59aztg"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="H5hYbi8u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B472E1BC40
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 16:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8AC91758F
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 16:51:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725900823; cv=none; b=jErZZ0VoG2+gGz29xE33TxilVK1VMTSwQrWo9M2bSjrqMdcZaSY47puaklLM2sF8t6eKzEWjsc3WkCEs/o9CTqO1oWsEZrOJVU/SUbXnplDuvRNf+7Pk7d5bmMAjj7CMxy08tkWNLINpcAIAhCrnMCd7D6/DfVWZiVUexEz4w9w=
+	t=1725900679; cv=none; b=aOnJCa6uQTBk0CtCAGCkwXyAmrXQlPHOQ8lr84EQDEalDYm6rjPrYQINuL6m00GCVi8yHnATuAakW6Kc8Y/Rb49pzhDL0Ahn99jo6rgMvTVGnw3pXCGisyqo1sH/wJ7jwliLb1A/p6LRk3+dC1ljuTwI5iX+w0SHJ78bDf6Muh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725900823; c=relaxed/simple;
-	bh=PtXgWEMdhBCfxrMV5M60xLjhB32Phc2QBpQlAcUGfP0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rVLZHOCZENlczrUF4Do9/ZwtIf3goCqKXGJ2i19BKRTVgTCsfh1N8OX4KZlokHau+bbfGWvRVf0bSEb4FclYg+RTQbarJqiWHLJDj3lx82wHha1cR6E2Cqi7TQbpybpt2E80wS6VXhx7SC4DOfNULv3kFvVpDL0obalhMs3QgaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=t+59aztg; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53659867cbdso5367131e87.3
-        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 09:53:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725900820; x=1726505620; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E9SiO6xUxnqXAw/LgFoH+/dHfvx+t44phKmxj197jCQ=;
-        b=t+59aztgClMSuP/dVqExsRLBygSoq3einCXVUOGXDdxOuKV+49iRrYP/NaFtumKKnL
-         RC5vX+pl8FuP67eI+Q5VrKlgRxC47HqhkSX4XbYSgsimb+BgLBMGjvvgbxW9D6Bo2d0U
-         QlxEhC6HxgvVHZiT6mgIuGC0lTpqJOiaSce+o89XL4Qm3j8zk691BwPPrUvx99/wVOoT
-         /XUK/QaXy7IJLd33DmQFROnEKt5XwqBeW6VqJBhnQxeqVuEO5juEGA6ujUPz63Fy1Mwx
-         jSco486wNusKGZqVlLjL+4TN1Oi1QoxnJJflRFeIo9Que+MQdZgc5zWKScD8yZG6nvjM
-         KtQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725900820; x=1726505620;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E9SiO6xUxnqXAw/LgFoH+/dHfvx+t44phKmxj197jCQ=;
-        b=qqz/ozZ4Hl0wQyywF6fxbUnTKUpNoo9xFfydezI2UaIx1fx2BJ4sn0E3k7YinOfAEA
-         YVavGKpNtiZ56hLqlo7/g2lUFrEIuXBR7cvkEZ/m3crbBwtwrypSnmuzp8jCyvOeV97p
-         Ld0+35IXT1KVz2ILLDN4OmAb/r0KZpBXUm/avdlUp3JreDk44mBqv9PJKYoeXHl0MA9s
-         A9KwKXjxm9txeClEpONrmkjY69JGVb65S7xPA8Or7N/vtdTeue2ECkejcT3JhMH6gYOm
-         prJ+4SMmw+8fVN6wlgd2NUtDrsCDfKWgYjmVpeAoIgCBL2NnuRtjEYL7jcYAk0H/ZqFh
-         nh+w==
-X-Forwarded-Encrypted: i=1; AJvYcCU/FtS9VMoDKtx55TVmGtLAWhqFW9biQdg5U7cD9wAr6cLBrGlqdyfSOwC3YBYyLpDnv2LPnxI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytWhaZ+abRph956IsiimYMv7bsey0cyi5rbE/x8mS1SsnIqNog
-	302zniShrAkjAS427opNswucZqhtP3piH/ZKdNQtp/lAY4vT8Msi0miecvv2TjXMA0dTLHf7AQJ
-	y6v0HyWDjPaUK0LWVHEkg7/Q6YBdyp7QhQYR0khjmfJmH70kQC+Po
-X-Google-Smtp-Source: AGHT+IHxMIgEPETdtRxitPOndtVl9VPFTYCRnwDB3ln3xDf0u1U9D0XTOVls54AhGFDHccAWSysMIxtaaiN4liuEd/U=
-X-Received: by 2002:adf:cc91:0:b0:374:c658:706e with SMTP id
- ffacd0b85a97d-3789243fb15mr7369793f8f.39.1725900376219; Mon, 09 Sep 2024
- 09:46:16 -0700 (PDT)
+	s=arc-20240116; t=1725900679; c=relaxed/simple;
+	bh=Ec3k502b/pBA3pfyE0JcoIRFFuPECVHmX+YxEkHUY7o=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Bnqmghupw16DcbxMcRKJI4zQtLF7Pwsfmv5zdjw6weFK7vADT20vw7o6LQKC+7V8KedPfi43iu2gohEkyg8GoVrSxXqzRalWV/9U0MK/Gvk+QvoOVKjM4dth1jOQ9TuKuN2eBnq0lfEQAMUKfablU5ez9B3OGWCgQrmIIhIkBN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=H5hYbi8u; arc=none smtp.client-ip=67.231.153.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 489Cq5pk001415;
+	Mon, 9 Sep 2024 09:51:08 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=eN9
+	29uDga2DEL9XMtywKNIsjOtXrdDKFh19D+8uU1wM=; b=H5hYbi8uYOYYrgnnvnm
+	tLTlcQg+153TY/nYZFQwzrDjq1WLwi7960PIUQdleBP1hpYdXATw/UrFPozboqUQ
+	YnFl6T6xqzPKTHN4dsBmqlySOiSENutQhBZN0zm65A13aFiJXw4s3mg6MFbfwmKv
+	ipGh6Ams4AXTFEXYkHs5Us4I4LAnW56G3zDIHWP6T9EjY92tlMQEcHuRpeb3jBii
+	sbKvByTEVWZRgaK379J4DoJGl5t5MhZQH18jwe/36FU/51wsiirr6CGNVJFT21Ij
+	EhOqXQg4O8FEbwAl1nD09oXnmk/96tUbwlTy9MJIQeoNis8RzQnYUQRPGdpH5zmj
+	z2w==
+Received: from mail.thefacebook.com ([163.114.134.16])
+	by m0001303.ppops.net (PPS) with ESMTPS id 41hssfkktf-10
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Mon, 09 Sep 2024 09:51:07 -0700 (PDT)
+Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::150d) by
+ mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server id
+ 15.2.1544.11; Mon, 9 Sep 2024 16:51:01 +0000
+From: Vadim Fedorenko <vadfed@meta.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+        Willem de Bruijn
+	<willemb@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>,
+        David Ahern <dsahern@kernel.org>,
+        Jason Xing
+	<kerneljasonxing@gmail.com>,
+        Simon Horman <horms@kernel.org>
+CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
+Subject: [PATCH net-next v4 0/3] Add option to provide OPT_ID value via cmsg
+Date: Mon, 9 Sep 2024 09:50:43 -0700
+Message-ID: <20240909165046.644417-1-vadfed@meta.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240909160604.1148178-1-sean.anderson@linux.dev>
-In-Reply-To: <20240909160604.1148178-1-sean.anderson@linux.dev>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 9 Sep 2024 18:46:01 +0200
-Message-ID: <CANn89i+UHJgx5cp6M=6PidC0rdPdr4hnsDaQ=7srijR3ArM1jw@mail.gmail.com>
-Subject: Re: [PATCH net] net: dpaa: Pad packets to ETH_ZLEN
-To: Sean Anderson <sean.anderson@linux.dev>
-Cc: Madalin Bucur <madalin.bucur@nxp.com>, netdev@vger.kernel.org, 
-	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org, 
-	"David S . Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: dNQ2iKH3DiL1UW8LBQM5i3owQspnh-oV
+X-Proofpoint-ORIG-GUID: dNQ2iKH3DiL1UW8LBQM5i3owQspnh-oV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-09_08,2024-09-09_01,2024-09-02_01
 
-On Mon, Sep 9, 2024 at 6:06=E2=80=AFPM Sean Anderson <sean.anderson@linux.d=
-ev> wrote:
->
-> When sending packets under 60 bytes, up to three bytes of the buffer foll=
-owing
-> the data may be leaked. Avoid this by extending all packets to ETH_ZLEN,
-> ensuring nothing is leaked in the padding. This bug can be reproduced by
-> running
->
->         $ ping -s 11 destination
->
-> Fixes: 9ad1a3749333 ("dpaa_eth: add support for DPAA Ethernet")
-> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-> ---
->
->  drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net=
-/ethernet/freescale/dpaa/dpaa_eth.c
-> index cfe6b57b1da0..e4e8ee8b7356 100644
-> --- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-> +++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-> @@ -2322,6 +2322,12 @@ dpaa_start_xmit(struct sk_buff *skb, struct net_de=
-vice *net_dev)
->         }
->  #endif
->
-> +       /* Packet data is always read as 32-bit words, so zero out any pa=
-rt of
-> +        * the skb which might be sent if we have to pad the packet
-> +        */
-> +       if (__skb_put_padto(skb, ETH_ZLEN, false))
-> +               goto enomem;
-> +
+SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
+timestamps and packets sent via socket. Unfortunately, there is no way
+to reliably predict socket timestamp ID value in case of error returned
+by sendmsg. For UDP sockets it's impossible because of lockless
+nature of UDP transmit, several threads may send packets in parallel. In
+case of RAW sockets MSG_MORE option makes things complicated. More
+details are in the conversation [1].
+This patch adds new control message type to give user-space
+software an opportunity to control the mapping between packets and
+values by providing ID with each sendmsg.
 
-This call might linearize the packet.
+The first patch in the series adds all needed definitions and implements
+the function for UDP sockets. The explicit check of socket's type is not
+added because subsequent patches in the series will add support for other
+types of sockets. The documentation is also included into the first
+patch.
 
-@nonlinear variable might be wrong after this point.
+Patch 2/3 adds support for RAW sockets. It's a bit tricky because
+sock_tx_timestamp functions has to be refactored to receive full socket
+cookie information to fill in ID. The commit b534dc46c8ae ("net_tstamp:
+add SOF_TIMESTAMPING_OPT_ID_TCP") did the conversion of sk_tsflags to
+u32 but sock_tx_timestamp functions were not converted and still receive
+16b flags. It wasn't a problem because SOF_TIMESTAMPING_OPT_ID_TCP was
+not checked in these functions, that's why no backporting is needed.
 
->         if (nonlinear) {
->                 /* Just create a S/G fd based on the skb */
->                 err =3D skb_to_sg_fd(priv, skb, &fd);
-> --
-> 2.35.1.1320.gc452695387.dirty
->
+Patch 3/3 adds selftests for new feature.
 
-Perhaps this instead ?
+Changelog:
+v3 -> v4:
+- remove static_assert from UAPI header
+- add BUILD_BUG_ON_MSG with some explanation
+- use SOF_TIMESTAMPING_OPT_ID flag in ipv4/ipv6 UDP case
+- remove implementation for TCP sockets because there is no easy way to
+  keep constant tskey in case of TCP packets
+- move ts_opt_id initialization under flag check to avoid extra
+  assignment in the hot path
+- adjust selftests to cover RAW sockets
+v2 -> v3:
+- remove SOF_TIMESTAMPING_OPT_ID_CMSG UAPI value and use kernel-internal
+  SOCKCM_FLAG_TS_OPT_ID which uses the highest bit of tsflags.
+- add support for TCP and RAW sockets
+v1 -> v2:
+- add more selftests
+- add documentation for the feature
+- refactor UDP send function
+RFC -> v1:
+- add selftests
+- add SOF_TIMESTAMPING_OPT_ID_CMSG to signal of custom ID provided by
+	user-space instead of reserving value of 0 for this.
 
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-index cfe6b57b1da0e45613ac1bbf32ddd6ace329f4fd..5763d2f1bf8dd31b80fda068136=
-1514dad1dc307
-100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-@@ -2272,12 +2272,12 @@ static netdev_tx_t
- dpaa_start_xmit(struct sk_buff *skb, struct net_device *net_dev)
- {
-        const int queue_mapping =3D skb_get_queue_mapping(skb);
--       bool nonlinear =3D skb_is_nonlinear(skb);
-        struct rtnl_link_stats64 *percpu_stats;
-        struct dpaa_percpu_priv *percpu_priv;
-        struct netdev_queue *txq;
-        struct dpaa_priv *priv;
-        struct qm_fd fd;
-+       bool nonlinear;
-        int offset =3D 0;
-        int err =3D 0;
+[1] https://lore.kernel.org/netdev/CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com/
 
-@@ -2287,6 +2287,10 @@ dpaa_start_xmit(struct sk_buff *skb, struct
-net_device *net_dev)
+Vadim Fedorenko (3):
+  net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in control message
+  net_tstamp: add SCM_TS_OPT_ID for RAW sockets
+  selftests: txtimestamp: add SCM_TS_OPT_ID test
 
-        qm_fd_clear_fd(&fd);
+ Documentation/networking/timestamping.rst  | 14 +++++++
+ arch/alpha/include/uapi/asm/socket.h       |  2 +
+ arch/mips/include/uapi/asm/socket.h        |  2 +
+ arch/parisc/include/uapi/asm/socket.h      |  2 +
+ arch/sparc/include/uapi/asm/socket.h       |  2 +
+ include/net/inet_sock.h                    |  4 +-
+ include/net/sock.h                         | 34 +++++++++++----
+ include/uapi/asm-generic/socket.h          |  2 +
+ net/can/raw.c                              |  2 +-
+ net/core/sock.c                            | 14 +++++++
+ net/ipv4/ip_output.c                       | 21 +++++++---
+ net/ipv4/raw.c                             |  2 +-
+ net/ipv4/tcp.c                             |  2 +-
+ net/ipv6/ip6_output.c                      | 22 ++++++----
+ net/ipv6/raw.c                             |  2 +-
+ net/packet/af_packet.c                     |  6 +--
+ net/socket.c                               |  2 +-
+ tools/include/uapi/asm-generic/socket.h    |  2 +
+ tools/testing/selftests/net/txtimestamp.c  | 48 +++++++++++++++++-----
+ tools/testing/selftests/net/txtimestamp.sh | 12 +++---
+ 20 files changed, 151 insertions(+), 46 deletions(-)
 
-+       if (__skb_put_padto(skb, ETH_ZLEN, false))
-+               goto enomem;
-+
-+       nonlinear =3D skb_is_nonlinear(skb);
-        if (!nonlinear) {
-                /* We're going to store the skb backpointer at the beginnin=
-g
-                 * of the data buffer, so we need a privately owned skb
+-- 
+2.43.5
 
