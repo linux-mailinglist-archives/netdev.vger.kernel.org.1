@@ -1,209 +1,186 @@
-Return-Path: <netdev+bounces-126455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D9B397131A
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:16:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE70971314
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:15:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A9BC1F24456
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:16:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24AB6283706
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C320854673;
-	Mon,  9 Sep 2024 09:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E8A91B3734;
+	Mon,  9 Sep 2024 09:15:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ajzMgjU6"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Iz7LJ3ng"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ED1C42AAB
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 09:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12E81B2EFA
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 09:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725873400; cv=none; b=u9O2COBo9XLpCqH/6OB7nAiKisMc1jiZYAIf9SnqPHmV7iSzJvT7p0CP4ICF5kNsj4L07UzWzp5gndpcAWdap/udecRIXZmFdWWcK+lVKcIkm3tzAwNuSrWpxx7dCBYdYQUK7WqVVYxt/3dnXW9yQ8yZaRZDrKVMobqt+qSV+04=
+	t=1725873313; cv=none; b=KGYpkQTOElH4BelpvINM2uKKt+KL8OTfcW9WV6y7HrVPKhGknMHdocg/V+gJp4DT3vmKaUZCN0Iito3fT9IqR3Z0+zPZ3Zwq+Xfy8gEfIeY7izkoW8rz+LlyMVANmZMo/TJslrRLqSAvXStKY8RGWlQ5Yfdl+WI7O138sbWQlcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725873400; c=relaxed/simple;
-	bh=v8zrigSSHrB095AOrTu4GkbqsrbmEffIV6J+7irWSug=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=t76Gpfo92OcLVxqUIDy/zun1rrPBcJa5TreHGobe5vx/tehnyLydiCxCA60kCts+IkXplWBctHb/56hcdtPX4BsbtI/y8lgb3lozzHqlH1vbrHDMtcsKtJhVQbIprntwTsSpLzNol802v8jY40FHmBTsFjZl0iW+tPz74oRx25w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ajzMgjU6; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725873397;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=hOgHx6oXUHCksOPdNO9GkwDeu+mkCXvvvLuR8v0qTU4=;
-	b=ajzMgjU6SSbu+DTJHkRpm6VaxU9uLwzvT3rAQcRaRXgbfGVzXgRzao5H+HI5IEV5wVGATv
-	vOaRJr2srxf186Jj5dynUnlZrkRfEWtquSEu25dgQCoovjqmRlF9b/mRrs3mtT8Ycc7n9h
-	WFt/PmiYWne5dZLu+zQtOUYQqAT1v4M=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-zpY5RcdiMJyfDuwD1BB8Kw-1; Mon, 09 Sep 2024 05:16:35 -0400
-X-MC-Unique: zpY5RcdiMJyfDuwD1BB8Kw-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a8a6fee3ab1so328614866b.3
-        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 02:16:35 -0700 (PDT)
+	s=arc-20240116; t=1725873313; c=relaxed/simple;
+	bh=17LTFi4By9NXlAGprw9zetGqQh7GYP6dRr9R/wDyQdo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=utX1cB/ITv6C6CpQREraGk6Y/2p2Jgdk6Kp7NbO9f7Xvaoo8+TMjVVMGXec3uFVlOAL2wFx9qAIoa0YlmOmxdkw2RAxjBqCnZ9FBhS8VYIEZwnSXl4+DOFSsJ4Etgn3fZZl6vKTaj1/0ObRzBPX1ZkTZ6BcVj0yqwUwHWYKIXdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Iz7LJ3ng; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a8a7cdfdd80so223854066b.0
+        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 02:15:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1725873310; x=1726478110; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7/eh0LVmSTxIH7dgCBqKajVm+tCHRte0OAG48K17inM=;
+        b=Iz7LJ3ngP44uNvuwf+HtxJiu0Kz62sUAAsALQo69jyS6dk4MNjjWyyhuZrs+AZBZAF
+         /Zs4yFQoBGw+95qQ32ViHi37wos8RIK3oO1t4QeD0HiWUO4rOVlAw/k8qtU2bg8U1CiV
+         SjRUjvQw4c75ZGZZbBAcIGAI/+vcRyz5GSZpK7die9umGfvc8BVhsJyF5baquBq4Ay01
+         TUOLmRYbsDf8ypL3h0O13tuzkLQK/VUIVQy8tLzxfe5i1HMwGU8aT29JdZiigOTyQ7rn
+         E9Y2hATWgBvQeeuNt+16jieC5TXbAY+cIBfvMIUO6NmSIZm7s1BabfXP226z4j4XHbkC
+         zFfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725873394; x=1726478194;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hOgHx6oXUHCksOPdNO9GkwDeu+mkCXvvvLuR8v0qTU4=;
-        b=JWHcEDWQRvM6j9/goyfqPdOTi1gOK3/9jL8t+UjOCkIWsXRKCcRQOSeLGqRtI+kDzT
-         DHfXVdESS5R5cVgc1p9K2iSzxG2WmQxWg4sRFOFOUwI1AepWE36Hz1uf6qMD6IO4V5BK
-         XhHxiBpoLSyxCd+UJ8bcwhtmqPsts3Z8usWh/90zkxzpzNNBwL8m22wXhs8oDyLxfkKi
-         9z9/B8xmFsMPzi96NIvYUdQUo/bS6XLVz43E7Fb9XQRbXCMyReVSGR4dMN70EhDsoNNW
-         pftdgFun1bGK7nsvXBQJ0bEdTrJd6x9O4eUgX3CmfogBPWE2nkqgDI2Gqbfe1KrDjXn4
-         WX9w==
-X-Forwarded-Encrypted: i=1; AJvYcCXx2+u2ns3ZYo++62XSskRon4mCiHxiWjPwp3RmVeyL1Ppl8dUf9sj++BGfLJk4P52t43EKTX8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD4hAj+q4vqJdoGKzTTEAikl4HhRn2WPY9QhpibhIb/PHW4tSL
-	vAU4qfq/n50Y1o9/pRIFXijapbZpPPcbMM141UnLN5/xIcVFm3BVCaMh4JHqygNg7TWeLF7MnLc
-	HWUXTzkbyK2zLGaLqKdZj6dFahUM617ESesqG0ZJCSTkwp4WLnqbKFg==
-X-Received: by 2002:a17:907:368a:b0:a86:8953:e1fe with SMTP id a640c23a62f3a-a8a8884be2cmr834442666b.47.1725873393564;
-        Mon, 09 Sep 2024 02:16:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHNi4CPHkWulQf8Un7wTFpsfY+PTRR0uA19tgeQRrcwdcay9z5l6W2TFxorq811BaKwya9DjA==
-X-Received: by 2002:a17:907:368a:b0:a86:8953:e1fe with SMTP id a640c23a62f3a-a8a8884be2cmr834438266b.47.1725873392705;
-        Mon, 09 Sep 2024 02:16:32 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25d65cf6sm310680766b.222.2024.09.09.02.16.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2024 02:16:32 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id E007714AEA8B; Mon, 09 Sep 2024 11:16:30 +0200 (CEST)
-From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>
-Cc: Dave Taht <dave.taht@gmail.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	cake@lists.bufferbloat.net,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2] sch_cake: constify inverse square root cache
-Date: Mon,  9 Sep 2024 11:16:28 +0200
-Message-ID: <20240909091630.22177-1-toke@redhat.com>
-X-Mailer: git-send-email 2.46.0
+        d=1e100.net; s=20230601; t=1725873310; x=1726478110;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7/eh0LVmSTxIH7dgCBqKajVm+tCHRte0OAG48K17inM=;
+        b=VdL4rP/1MT/yfTW0V5/PVmZtkuwNSzAZ7la/q62cljJoj0u1kFX68fd97LkEKfH1Au
+         /CfkyGs35+DLUOvgQCQO9V1AoPtDrAALyc9pmloJa2rOFbgzRcmKOW03ShoxS4G2okAq
+         ZS5/7ivc0jFKuV10fS8M2yDWmoDujSWWZhY7BywSzkMMacio7meD2TwUBvGmcLDeY/wR
+         qS1fgunrsX88UcvsbVvvInli10a21cvGwkave9sxjvoU7UAHeBtBXfSSFd2lxlYtl+fF
+         zW8vpYIu1zo8wiy8IeZE79H3p/PTypyHS3xUM3ZFE6LRu0QHt8ePcjVTIIvmsbrBaOhY
+         69xw==
+X-Gm-Message-State: AOJu0Yy4oGfmoFjvSye7kjSjiZSYG9wGlY8j/JgjBOA9gB0d+WmhQ2w0
+	iUl4iBzSNowHxEClfphvRX3RomFxAiNPMzuzNb0+QRhWuI/6pEP91DUoFmVV2a8=
+X-Google-Smtp-Source: AGHT+IELj43wIoOtme7B55yLBd5WjuNsuUI0mHgyU898oiPhc3PIyS3gm/e1stFevQXzOPB/wKVZOw==
+X-Received: by 2002:a17:907:7243:b0:a86:842a:104a with SMTP id a640c23a62f3a-a8a888dae61mr671530666b.57.1725873309922;
+        Mon, 09 Sep 2024 02:15:09 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:105f:6dd9:35c9:a9e8? ([2001:67c:2fbc:1:105f:6dd9:35c9:a9e8])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d2583c20bsm311480066b.22.2024.09.09.02.15.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Sep 2024 02:15:09 -0700 (PDT)
+Message-ID: <06406844-5d35-4e35-ae35-d34503d3549c@openvpn.net>
+Date: Mon, 9 Sep 2024 11:17:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 17/25] ovpn: implement keepalive mechanism
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ ryazanov.s.a@gmail.com, edumazet@google.com, andrew@lunn.ch
+References: <20240827120805.13681-1-antonio@openvpn.net>
+ <20240827120805.13681-18-antonio@openvpn.net> <ZtcoblYi68X8t3Bd@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <ZtcoblYi68X8t3Bd@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Dave Taht <dave.taht@gmail.com>
+Hi,
 
-sch_cake uses a cache of the first 16 values of the inverse square root
-calculation for the Cobalt AQM to save some cycles on the fast path.
-This cache is populated when the qdisc is first loaded, but there's
-really no reason why it can't just be pre-populated. So change it to be
-pre-populated with constants, which also makes it possible to constify
-it.
+On 03/09/2024 17:17, Sabrina Dubroca wrote:
+> 2024-08-27, 14:07:57 +0200, Antonio Quartulli wrote:
+>> +static time64_t ovpn_peer_keepalive_work_mp(struct ovpn_struct *ovpn,
+>> +					    time64_t now)
+>> +{
+>> +	time64_t tmp_next_run, next_run = 0;
+>> +	struct hlist_node *tmp;
+>> +	struct ovpn_peer *peer;
+>> +	int bkt;
+>> +
+>> +	spin_lock_bh(&ovpn->peers->lock_by_id);
+>> +	hash_for_each_safe(ovpn->peers->by_id, bkt, tmp, peer, hash_entry_id) {
+>> +		tmp_next_run = ovpn_peer_keepalive_work_single(peer, now);
+>> +
+>> +		/* the next worker run will be scheduled based on the shortest
+>> +		 * required interval across all peers
+>> +		 */
+>> +		if (!next_run || tmp_next_run < next_run)
+> 
+> I think this should exclude tmp_next_run == 0.
 
-This gives a modest space saving for the module (not counting debug data):
-.text:  -224 bytes
-.rodata: +80 bytes
-.bss:    -64 bytes
-Total:  -192 bytes
+or, for better clarity of the flow, I will add:
 
-Signed-off-by: Dave Taht <dave.taht@gmail.com>
-[ fixed up comment, rewrote commit message ]
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
-v2:
-- Fix indentation and line length issues
+if (!tmp_next_run)
+         continue;
 
- net/sched/sch_cake.c | 53 +++++++++++++++-----------------------------
- 1 file changed, 18 insertions(+), 35 deletions(-)
+since 0 explicitly means "keepalive disabled" or "no keepalive needed 
+for $reasons".
 
-diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
-index d2f49db70523..f2f9b75008bb 100644
---- a/net/sched/sch_cake.c
-+++ b/net/sched/sch_cake.c
-@@ -361,8 +361,24 @@ static const u8 besteffort[] = {
- static const u8 normal_order[] = {0, 1, 2, 3, 4, 5, 6, 7};
- static const u8 bulk_order[] = {1, 0, 2, 3};
- 
-+/* There is a big difference in timing between the accurate values placed in the
-+ * cache and the approximations given by a single Newton step for small count
-+ * values, particularly when stepping from count 1 to 2 or vice versa. Hence,
-+ * these values are calculated using eight Newton steps, using the
-+ * implementation below. Above 16, a single Newton step gives sufficient
-+ * accuracy in either direction, given the precision stored.
-+ *
-+ * The magnitude of the error when stepping up to count 2 is such as to give the
-+ * value that *should* have been produced at count 4.
-+ */
-+
- #define REC_INV_SQRT_CACHE (16)
--static u32 cobalt_rec_inv_sqrt_cache[REC_INV_SQRT_CACHE] = {0};
-+static const u32 inv_sqrt_cache[REC_INV_SQRT_CACHE] = {
-+		~0,         ~0, 3037000500, 2479700525,
-+	2147483647, 1920767767, 1753413056, 1623345051,
-+	1518500250, 1431655765, 1358187914, 1294981364,
-+	1239850263, 1191209601, 1147878294, 1108955788
-+};
- 
- /* http://en.wikipedia.org/wiki/Methods_of_computing_square_roots
-  * new_invsqrt = (invsqrt / 2) * (3 - count * invsqrt^2)
-@@ -388,47 +404,14 @@ static void cobalt_newton_step(struct cobalt_vars *vars)
- static void cobalt_invsqrt(struct cobalt_vars *vars)
- {
- 	if (vars->count < REC_INV_SQRT_CACHE)
--		vars->rec_inv_sqrt = cobalt_rec_inv_sqrt_cache[vars->count];
-+		vars->rec_inv_sqrt = inv_sqrt_cache[vars->count];
- 	else
- 		cobalt_newton_step(vars);
- }
- 
--/* There is a big difference in timing between the accurate values placed in
-- * the cache and the approximations given by a single Newton step for small
-- * count values, particularly when stepping from count 1 to 2 or vice versa.
-- * Above 16, a single Newton step gives sufficient accuracy in either
-- * direction, given the precision stored.
-- *
-- * The magnitude of the error when stepping up to count 2 is such as to give
-- * the value that *should* have been produced at count 4.
-- */
--
--static void cobalt_cache_init(void)
--{
--	struct cobalt_vars v;
--
--	memset(&v, 0, sizeof(v));
--	v.rec_inv_sqrt = ~0U;
--	cobalt_rec_inv_sqrt_cache[0] = v.rec_inv_sqrt;
--
--	for (v.count = 1; v.count < REC_INV_SQRT_CACHE; v.count++) {
--		cobalt_newton_step(&v);
--		cobalt_newton_step(&v);
--		cobalt_newton_step(&v);
--		cobalt_newton_step(&v);
--
--		cobalt_rec_inv_sqrt_cache[v.count] = v.rec_inv_sqrt;
--	}
--}
--
- static void cobalt_vars_init(struct cobalt_vars *vars)
- {
- 	memset(vars, 0, sizeof(*vars));
--
--	if (!cobalt_rec_inv_sqrt_cache[0]) {
--		cobalt_cache_init();
--		cobalt_rec_inv_sqrt_cache[0] = ~0;
--	}
- }
- 
- /* CoDel control_law is t + interval/sqrt(count)
+> 
+> If we have two peers, with the first getting a non-0 value and the 2nd
+> getting 0, we'll end up with next_run = 0 on return.
+> 
+> If we have three peers and ovpn_peer_keepalive_work_single returns
+> 12,0,42, we'll end up with 42 (after resetting to 0 on the 2nd peer),
+> and we could miss sending the needed keepalive for peer 1.
+> 
+
+Absolutely. Thanks for pointing this out!
+
+Cheers,
+
+>> +			next_run = tmp_next_run;
+>> +	}
+>> +	spin_unlock_bh(&ovpn->peers->lock_by_id);
+>> +
+>> +	return next_run;
+>> +}
+> 
+
 -- 
-2.46.0
-
+Antonio Quartulli
+OpenVPN Inc.
 
