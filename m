@@ -1,164 +1,130 @@
-Return-Path: <netdev+bounces-126505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30B789719BF
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 14:44:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAF53971A0A
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 14:54:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 593B11C23117
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 12:44:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 574E01F23877
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 12:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BAA1B9B22;
-	Mon,  9 Sep 2024 12:44:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7A51B81DD;
+	Mon,  9 Sep 2024 12:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ROJBAAHn"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94DF21B86F0
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 12:44:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1A81B4C4F;
+	Mon,  9 Sep 2024 12:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725885844; cv=none; b=ltVNoWcapSC7qHcijOZOOShXqFvXxwKuoVRt1OeTR9kUhu5tFbbWRf1pkHR/sPXdoT4n04oLvoAtgKLGx/SqaZtFYKHO2KHlVX+pb046tRXmCEOQnfLfvLJYEpXHACi+zTZ60CX+tQYUGUMfcbdr/JiKFY/LdYBvjuzyxdmxRcs=
+	t=1725886471; cv=none; b=bjFYKBkK3QpmjYV/rgq/2vSQsvomwyuot7hoh30xb59vOd3ZLyR+TRfv9WghIXZ90Nm/8mxptqsUQvD+dPe6GxpiwO7jaod8gGPTb8zEjRlEgQfnX0gnJFlKnWnzy/JUEPH03tKkaN482pHX6/XAwhQXWJr67ZeKL36YmLrfdWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725885844; c=relaxed/simple;
-	bh=6TIlMKWOEczN3Lsa1rteTXtZ5HxrJ9bSPNFperJGaCw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MPYoH5smvejf79D65HkdEbXce9f5oqhpVWcet/Dx+1uU7Y7z9/TLXKkRebOLpsaXWR/jGfS+doGoBJL8DBdx6ZJokQBd3N1igPTUH/IjJ2QTrK+0jRD4M3tXfF7jSF8ubfiAK3rltu43pXORqfMymRNnerDM8Lk2mls7TzIf1qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sndk8-0001rF-Jw; Mon, 09 Sep 2024 14:43:44 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sndk6-006elN-Qm; Mon, 09 Sep 2024 14:43:42 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1sndk6-00BuN8-2S;
-	Mon, 09 Sep 2024 14:43:42 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org
-Subject: [PATCH net-next v2 2/2] net: phy: Add support for master-slave role configuration via device tree
-Date: Mon,  9 Sep 2024 14:43:41 +0200
-Message-Id: <20240909124342.2838263-3-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240909124342.2838263-1-o.rempel@pengutronix.de>
-References: <20240909124342.2838263-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1725886471; c=relaxed/simple;
+	bh=CU5Gijyy9SeMr8QbvquxivfFb2hzLLScCNZeZXgXiPQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S8AnXbf0R8sF7WBzrvSnECSi/jFHZ8h+5tBj6SHx//ywemhgbBIVmiWeFV7A3yeS92NylV7mXru/wZ6cZog6+eNKrbry1y58rmnL4EwYjVkJdgNNlmhOKBvbtVwk0D4yyxf4li3856sPCuE0TL5LtvCdTPM4LS7J5pMr/0NPh40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ROJBAAHn; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=PKyLSZDe8JiVc1Q0LEh+EYs5+ax6iv61GuSgcN9/Iak=; b=ROJBAAHnhi1iHmJStmbGtAJGIm
+	iALpL9t6gsDGqBYFceoDSxJA9nKMX/mkmzw3IgwKo8z3Pith1S9BrviEE0tyj/rz7RG7P7TIS0FTP
+	TFRYKHr7wfenpcmS918anCU/XoeIM4NkFT0wbSHg24a2AYVGoDdhDaAi3hVpaHOYBzw8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1snduJ-0070NI-DJ; Mon, 09 Sep 2024 14:54:15 +0200
+Date: Mon, 9 Sep 2024 14:54:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: vz@mleia.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alexandre.belloni@bootlin.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: nxp: Fix a possible memory leak in
+ lpc_mii_probe()
+Message-ID: <0a53ab3c-2643-419d-9b5d-71561c3b50b9@lunn.ch>
+References: <20240909092948.1118381-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240909092948.1118381-1-ruanjinjie@huawei.com>
 
-Introduce support for configuring the master/slave role of PHYs based on
-the `master-slave` property in the device tree. While this functionality
-is necessary for Single Pair Ethernet (SPE) PHYs (1000/100/10Base-T1)
-where hardware strap pins may be unavailable or incorrectly set, it
-works for any PHY type. The property supports `forced-master` and
-`forced-slave` values, allowing for predefined link role assignment.
+On Mon, Sep 09, 2024 at 05:29:48PM +0800, Jinjie Ruan wrote:
+> of_phy_find_device() calls bus_find_device(), which calls get_device()
+> on the returned struct device * to increment the refcount. The current
+> implementation does not decrement the refcount, which causes memory leak.
+> 
+> So add the missing phy_device_free() call to decrement the
+> refcount via put_device() to balance the refcount.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Why is a device reference counted?
+
+To stop is disappearing.
+
+> @@ -768,6 +768,9 @@ static int lpc_mii_probe(struct net_device *ndev)
+>  		return -ENODEV;
+>  	}
+>  
+> +	if (pldat->phy_node)
+> +		phy_device_free(phydev);
+> +
+>  	phydev = phy_connect(ndev, phydev_name(phydev),
+>  			     &lpc_handle_link_change,
+>  			     lpc_phy_interface_mode(&pldat->pdev->dev));
+
+Think about this code. We use of_phy_find_device to get the device,
+taking a reference on it. While we hold that reference, we know it
+cannot disappear and we passed it to phy_connect(), passing it into
+the phylib layer. Deep down, phy_attach_direct() is called which does
+a get_device() taking a reference on the device. That is the phylib
+layer saying it is using it, it does not want it to disappear.
+
+Now think about your change. As soon as you new phy_device_free() is
+called, the device can disappear. phylib is then going to use
+something which has gone. Bad things will happen.
+
+So with changes like this, you need to think about lifetimes of things
+being protected by a reference count. When has lpc_mii_probe(), or the
+lpc driver as a whole finished with phydev? There are two obvious
+alternatives i can think of.
+
+1) It wants to keep hold of the reference until the driver remove() is
+called, so you should be releasing the reference in
+lpc_eth_drv_remove().
+
+2) Once the phydev is passed to the phylib layer for it to manage,
+this driver does not need to care about it any more. So it just needs
+to hold the reference until after phy_connect() returns.
+
+Memory leaks are an annoyance, but generally have little effect,
+especially in probe/remove code which gets called once. Accessing
+something which has gone is going to cause an Opps.
+
+So, you need to think about the lifetime of objects you are
+manipulating the reference counts on. You want to state in the commit
+message your understanding of these lifetimes so the reviewer can
+sanity check them.
+
+FYI: Ignore anything you have learned while fixing device tree
+reference counting bugs. Lifetimes of OF objects is probably very
+broken.
+
+	Andrew
+
 ---
- drivers/net/phy/phy-core.c   | 29 +++++++++++++++++++++++++++++
- drivers/net/phy/phy_device.c |  3 +++
- include/linux/phy.h          |  1 +
- 3 files changed, 33 insertions(+)
-
-diff --git a/drivers/net/phy/phy-core.c b/drivers/net/phy/phy-core.c
-index 1f98b6a96c153..296c446037144 100644
---- a/drivers/net/phy/phy-core.c
-+++ b/drivers/net/phy/phy-core.c
-@@ -412,6 +412,35 @@ void of_set_phy_eee_broken(struct phy_device *phydev)
- 	phydev->eee_broken_modes = broken;
- }
- 
-+/**
-+ * of_set_phy_master_slave - Set the master/slave mode of the PHY
-+ *
-+ * @phydev: The phy_device struct
-+ *
-+ * Set master/slave configuration of the PHY based on the device tree.
-+ */
-+void of_set_phy_master_slave(struct phy_device *phydev)
-+{
-+	struct device_node *node = phydev->mdio.dev.of_node;
-+	const char *master;
-+
-+	if (!IS_ENABLED(CONFIG_OF_MDIO))
-+		return;
-+
-+	if (!node)
-+		return;
-+
-+	if (of_property_read_string(node, "master-slave", &master))
-+		return;
-+
-+	if (strcmp(master, "forced-master") == 0)
-+		phydev->master_slave_set = MASTER_SLAVE_CFG_MASTER_FORCE;
-+	else if (strcmp(master, "forced-slave") == 0)
-+		phydev->master_slave_set = MASTER_SLAVE_CFG_SLAVE_FORCE;
-+	else
-+		phydev_warn(phydev, "Unknown master-slave mode %s\n", master);
-+}
-+
- /**
-  * phy_resolve_aneg_pause - Determine pause autoneg results
-  *
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 560e338b307a4..8304f2781d5ae 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3608,6 +3608,9 @@ static int phy_probe(struct device *dev)
- 	 */
- 	of_set_phy_eee_broken(phydev);
- 
-+	/* Get master/slave strap overrides */
-+	of_set_phy_master_slave(phydev);
-+
- 	/* The Pause Frame bits indicate that the PHY can support passing
- 	 * pause frames. During autonegotiation, the PHYs will determine if
- 	 * they should allow pause frames to pass.  The MAC driver should then
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 4a9a11749c554..81701bdac44c1 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1260,6 +1260,7 @@ size_t phy_speeds(unsigned int *speeds, size_t size,
- 		  unsigned long *mask);
- void of_set_phy_supported(struct phy_device *phydev);
- void of_set_phy_eee_broken(struct phy_device *phydev);
-+void of_set_phy_master_slave(struct phy_device *phydev);
- int phy_speed_down_core(struct phy_device *phydev);
- 
- /**
--- 
-2.39.2
-
+pw-bot: cr
 
