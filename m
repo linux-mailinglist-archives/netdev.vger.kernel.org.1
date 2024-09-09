@@ -1,105 +1,117 @@
-Return-Path: <netdev+bounces-126524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28843971AB4
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:20:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D49971AB7
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:20:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CD041C22479
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:20:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 105271F22AF1
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AA8E1B86DB;
-	Mon,  9 Sep 2024 13:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75F51B86ED;
+	Mon,  9 Sep 2024 13:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="naziB8M7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WrWusSRL"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CE31B86DD
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 13:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA47176259;
+	Mon,  9 Sep 2024 13:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725887994; cv=none; b=NPw/Fn9veYrlmwN+3g74gMSx6kobwlgCS57uOPok21sngKyO83xwBNVkDUI7ch6x/kGKgbP5zspzTU9g+swRMP5cZ481J+v0pZYg4aVc2RfowQBEh7uiVAFZ/nTtwWxo6pcVyW9tU/Dx4S66tFSFfN5YGDrpdcbWB54AOL9ZYMk=
+	t=1725888029; cv=none; b=XczQH3DjZli4NxClwAP8uD83t7EQi7wlyxZ49i0iMXytKB833CwBp+Xz36WyZrGTvo6I+s2IhNp+NTRb0pAjSt2cu9Ex86gbBJvd9ATbyYPei7K4ba3vR5pFTaQOFzVVpQQfe9W9aaHfmjpzXlYK//joqAqsyaa4vyo9J3SQuys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725887994; c=relaxed/simple;
-	bh=ZZN3+8MAx1lGmOGj2FoWKzy+1zPEf2Z/i8qwko9JIdY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Na6fNBiDtgSOsBzl4pjDQ3VN2hqq0e4DcbQEZl7opzYZk2h9yfYPH+omT1eDlGW2NarjVccazA9IV9lVNIOdfqEyUHMbu2Ymu9X5wcbNzI3IOCD25/4IUrHzbPOHwmfbqEhuTO+nfiVJ+jIXpQPk2o29Kr/hALRBX0yBy7UM5sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=naziB8M7; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 35F1F20754;
-	Mon,  9 Sep 2024 15:19:50 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id CYJSJ-XUqa1a; Mon,  9 Sep 2024 15:19:49 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 6CE662067F;
-	Mon,  9 Sep 2024 15:19:49 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 6CE662067F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1725887989;
-	bh=tKTjoG9/+RAMBHafTIrSU6FuQjl3MSmJpDEFESh2Mso=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=naziB8M7XeLJHIKmAc5Eq6jrnXgyHQPu+w3zKt7yfPlsQreiEl2j7KZ/RLx2idmta
-	 aa35LALRaXndc71WJRnsQ21L16QydnKsLcqCikc6tYxuR+HhatN3uu8Z16AXsQwgMT
-	 BIsuWMCbd6Eln+smESa/uYCX38eGSTHDl3NL/ZdhxhpAR7FlTUNrmzVie7UP3p7NkW
-	 uYmbfdRxc0Qw5WboQn9fybPEuaOwbfNSCtztmNMflcmvVfQdwtemnUFiwYgbsXVVqG
-	 cgTkoIs0YYPwW/oUMHGhRdZUt4AkLyNNvbRRgmenNXircwOfFAfxDq0jes2Hsk6TdI
-	 HjhW77S1WjBnQ==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 9 Sep 2024 15:19:49 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Sep
- 2024 15:19:49 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 1F3EF31842DE; Mon,  9 Sep 2024 15:19:46 +0200 (CEST)
-Date: Mon, 9 Sep 2024 15:19:46 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Florian Westphal <fw@strlen.de>
-CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH 09/11] xfrm: policy: use recently added helper in more
- places
-Message-ID: <Zt718gLRZfBKAiaE@gauss3.secunet.de>
-References: <20240909100328.1838963-1-steffen.klassert@secunet.com>
- <20240909100328.1838963-10-steffen.klassert@secunet.com>
- <20240909105954.GA19195@breakpoint.cc>
+	s=arc-20240116; t=1725888029; c=relaxed/simple;
+	bh=yNPCM00JF29Zlm/VXMGvWB+B7uLbHwPXGgxQaLUWfxo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mdIyZr7tHJTZDtjQGZlyrtbWHRCALxk9MVuRA+MnNQhIVln/gUHmAu2QLUsHYoy3lqO4K28OlQEgiayaSldUvhENlZDBkYLz0Hv3bjApIDfEc2+4n3vWd0e4BxzN3pNxRcge0JnYjPVYch+1bFNQjc/yTiJ+t9Jwux+QfLkrDN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WrWusSRL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01D65C4CEC5;
+	Mon,  9 Sep 2024 13:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725888029;
+	bh=yNPCM00JF29Zlm/VXMGvWB+B7uLbHwPXGgxQaLUWfxo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WrWusSRL41NxWgD/QPKhzXVU/rHrm6uulLcE+/kkalNDNIyCl+1HWVwhfwBsiSqQ1
+	 XV+E9AmuiXOlkD5JzeqoB4gf2rrvE8GEV3q2QkMd6jbIXTJoCGoiYxFnTvIgqHCapd
+	 OSbN6umV8Sb+z5khibqtBGqpyxbZ0qMQMnCV7LUcgrUuN3mGlBKt4QH11U+AmbG4Ej
+	 c4ienwQQlzkm/L4rvi3UbVgC1f52QOjc7YKyp3y8HV7F4HNhH32NqFw/1X1bNSFtUj
+	 BbtItzNAGqH8Kf9CLu7M7XASi40JTdS2wQyy+phRmWMR06JBfwDa5d+RldTZzO+qwS
+	 T5+vW9CRa76IQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E693806654;
+	Mon,  9 Sep 2024 13:20:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240909105954.GA19195@breakpoint.cc>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/12] Unmask upper DSCP bits - part 4 (last)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172588803001.3758847.17988621944991615601.git-patchwork-notify@kernel.org>
+Date: Mon, 09 Sep 2024 13:20:30 +0000
+References: <20240905165140.3105140-1-idosch@nvidia.com>
+In-Reply-To: <20240905165140.3105140-1-idosch@nvidia.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
+ gnault@redhat.com, razor@blackwall.org, pablo@netfilter.org,
+ kadlec@netfilter.org, marcelo.leitner@gmail.com, lucien.xin@gmail.com,
+ bridge@lists.linux.dev, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, linux-sctp@vger.kernel.org, bpf@vger.kernel.org
 
-On Mon, Sep 09, 2024 at 12:59:54PM +0200, Florian Westphal wrote:
-> Steffen Klassert <steffen.klassert@secunet.com> wrote:
-> > From: Florian Westphal <fw@strlen.de>
-> > 
-> > No logical change intended.
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 5 Sep 2024 19:51:28 +0300 you wrote:
+> tl;dr - This patchset finishes to unmask the upper DSCP bits in the IPv4
+> flow key in preparation for allowing IPv4 FIB rules to match on DSCP. No
+> functional changes are expected.
 > 
-> This patch is bogus and needs to be dropped/reverted or following
-> patch:
+> The TOS field in the IPv4 flow key ('flowi4_tos') is used during FIB
+> lookup to match against the TOS selector in FIB rules and routes.
 > 
-> https://patchwork.kernel.org/project/netdevbpf/patch/20240829-xfrm-restore-dir-assign-xfrm_hash_rebuild-v2-1-1cf8958f6e8e@kernel.org/
+> [...]
 
-I'll take both patches and resend the pull request.
+Here is the summary with links:
+  - [net-next,01/12] netfilter: br_netfilter: Unmask upper DSCP bits in br_nf_pre_routing_finish()
+    https://git.kernel.org/netdev/net-next/c/1f23a1909d7f
+  - [net-next,02/12] ipv4: ip_gre: Unmask upper DSCP bits in ipgre_open()
+    https://git.kernel.org/netdev/net-next/c/25376a890119
+  - [net-next,03/12] bpf: lwtunnel: Unmask upper DSCP bits in bpf_lwt_xmit_reroute()
+    https://git.kernel.org/netdev/net-next/c/b3899830aa47
+  - [net-next,04/12] ipv4: icmp: Unmask upper DSCP bits in icmp_reply()
+    https://git.kernel.org/netdev/net-next/c/848789d552bb
+  - [net-next,05/12] ipv4: ip_tunnel: Unmask upper DSCP bits in ip_tunnel_bind_dev()
+    https://git.kernel.org/netdev/net-next/c/e7191e517a03
+  - [net-next,06/12] ipv4: ip_tunnel: Unmask upper DSCP bits in ip_md_tunnel_xmit()
+    https://git.kernel.org/netdev/net-next/c/c34cfe72bb26
+  - [net-next,07/12] ipv4: ip_tunnel: Unmask upper DSCP bits in ip_tunnel_xmit()
+    https://git.kernel.org/netdev/net-next/c/c2b639f9f3b7
+  - [net-next,08/12] ipv4: netfilter: Unmask upper DSCP bits in ip_route_me_harder()
+    https://git.kernel.org/netdev/net-next/c/4f0880766a97
+  - [net-next,09/12] netfilter: nft_flow_offload: Unmask upper DSCP bits in nft_flow_route()
+    https://git.kernel.org/netdev/net-next/c/b7172768abfd
+  - [net-next,10/12] netfilter: nf_dup4: Unmask upper DSCP bits in nf_dup_ipv4_route()
+    https://git.kernel.org/netdev/net-next/c/345663e6a727
+  - [net-next,11/12] ipv4: udp_tunnel: Unmask upper DSCP bits in udp_tunnel_dst_lookup()
+    https://git.kernel.org/netdev/net-next/c/2c60fc9ca216
+  - [net-next,12/12] sctp: Unmask upper DSCP bits in sctp_v4_get_dst()
+    https://git.kernel.org/netdev/net-next/c/8b6d13cc8b38
 
-Thanks for the heads up!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
