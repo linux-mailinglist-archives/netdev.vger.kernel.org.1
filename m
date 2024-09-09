@@ -1,207 +1,134 @@
-Return-Path: <netdev+bounces-126422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF7197121F
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:32:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 449A5971222
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:32:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C65FA283341
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:32:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02BE928530A
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 954A51B3B01;
-	Mon,  9 Sep 2024 08:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="a1L81H8R"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315901B1506;
+	Mon,  9 Sep 2024 08:29:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08A01B375B;
-	Mon,  9 Sep 2024 08:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F19172BCE;
+	Mon,  9 Sep 2024 08:29:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725870514; cv=none; b=iGnu0zs1rwRMJORrNS70B4lvGkGrKxTTiMM/WxEFWIj2slgArYNGy8Gn1Ep1L+F0GxfoQmgjf5vwld0DewPBFt+XbjbN9qqzZjJHLY/OqbUo4DCOSPa0t+ZAbI+bOEVANmEfd189WbqBWlWrn9zjxwhNhQsbucFb3l7rAGVFOJM=
+	t=1725870591; cv=none; b=tujkwzs6IMpew1Dde7TjmqgnpH5orMcqL3UTaMZuASGu4J74LahzyKgty1+QzPBTjpANdMfpMVHWB6FE9rwp2nB+mk4+Rsuet0UU2gRE7Zxb048aGLM+Q8OKdvwCC9klLhMAy3oqNS1HHAHI2B6l33QQ7lCwtYzXZ2VfGaTvkQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725870514; c=relaxed/simple;
-	bh=sfvsNr5K/hiEOOk8WIX3Bn/QtJvcLwOU4UcxKthOj3c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OYVqyQqxcKd6KkkoIzR8MEXy74n5a80G3lF+N5lvO1gMElODsNLrvJoACG7G6xOLXHVfJQMaAZFXR9luFi2XWXd7kJq/uy73FniD2igFcjQpxo4t1ehCahSlBVM4v3BjqgcJDB1x3G8cWueKGaXASt4eKV3eeXRC/Pad02ZrJ5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=a1L81H8R; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725870512; x=1757406512;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=sfvsNr5K/hiEOOk8WIX3Bn/QtJvcLwOU4UcxKthOj3c=;
-  b=a1L81H8RKoARe32cd8Z5Fljkbai8RtsLuJDoGEs2QeXU8bXc7XvCgmOz
-   4rxPEcIrzC3UW7oIEM1e5SEzUEYd1EhfY5wSqRG1826frH0GPJ0z2rsVy
-   g7HNDY1kd47rA+GCJ23QiVEMTTm5aeqb917badgIpIZIXeh0C1ls+FwIx
-   tENdLdbq8bOk6pOG4HD+gJacpI7Wh17c6ARWTaghUKlz9+9qE6LG6vVqV
-   mn3CDIByPpAQZYqeMr+n8wrtIYv3xpoU15yBAOGdsgW+64ROx+HLdFY6U
-   WEl1EB+xxxjne1S6PRt0YJIdoNluajDNQxteWKFRy0CsfwEQTzPR6DfTT
-   A==;
-X-CSE-ConnectionGUID: ASzx8kNERhu8wJ4WimobFg==
-X-CSE-MsgGUID: oQQFZyUeT2esqUXJBqlJJg==
-X-IronPort-AV: E=Sophos;i="6.10,213,1719903600"; 
-   d="scan'208";a="198940031"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Sep 2024 01:28:30 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 9 Sep 2024 01:28:00 -0700
-Received: from che-ll-i17164.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 9 Sep 2024 01:27:50 -0700
-From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
-	<anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <andrew@lunn.ch>, <corbet@lwn.net>,
-	<linux-doc@vger.kernel.org>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<devicetree@vger.kernel.org>, <horatiu.vultur@microchip.com>,
-	<ruanjinjie@huawei.com>, <steen.hegelund@microchip.com>,
-	<vladimir.oltean@nxp.com>
-CC: <parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>,
-	<alexanderduyck@fb.com>, <krzk+dt@kernel.org>, <robh@kernel.org>,
-	<rdunlap@infradead.org>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
-	<Pier.Beruto@onsemi.com>, <Selvamani.Rajagopal@onsemi.com>,
-	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
-	<linux@bigler.io>, <markku.vorne@kempower.com>, Parthiban Veerasooran
-	<Parthiban.Veerasooran@microchip.com>, Conor Dooley
-	<conor.dooley@microchip.com>
-Subject: [PATCH net-next v8 14/14] dt-bindings: net: add Microchip's LAN865X 10BASE-T1S MACPHY
-Date: Mon, 9 Sep 2024 13:55:14 +0530
-Message-ID: <20240909082514.262942-15-Parthiban.Veerasooran@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240909082514.262942-1-Parthiban.Veerasooran@microchip.com>
-References: <20240909082514.262942-1-Parthiban.Veerasooran@microchip.com>
+	s=arc-20240116; t=1725870591; c=relaxed/simple;
+	bh=9iigcWNH9gaJKI9MZsjycWsvetp15GSPT7FV5IM/MZ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Hz0l5dQdx4Q4jT4+Y7wNpyKzscvd6zD8DzR86My432KxS6Hn3NMy0e4RZTYbEa8E9fuB6xEkf+xx5lkPMCsJlqWmHd5q2LEn2oqMTDRLghej5rdIOjdGuukyHVGSud1ZJgqdZjiWDnKrF/q78HFWojByxm2ZXpoyomiLKreZf9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f75428b9f8so22621521fa.3;
+        Mon, 09 Sep 2024 01:29:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725870587; x=1726475387;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=stcyakZ4StpZ9LKESQVGGE1UUqCBnyk68kBRqrRncz0=;
+        b=E76vGke4w3NnX72zW8zGDBOAMXMcA6hz6U6wuKQx+Rt8xdPZ/U+QLVAFGvVMTdohfC
+         nUgdFoTczdz5pAIXU6kuFrDHzyUULMb6J7AFW+helB5gq5J8+tHofOCThzAKqDYNiPPl
+         Iq9XvD4sUuFdVGPu7IqxazJh8xXipWrefP3rW8xZEUFrh07Bd4w0meSqEBaGSOf8bB02
+         CfYaWdkXBFjYkOxk5eRgeH5GX8f489hH2PoZ6naw6I/HJu9CEnBMHCV/7ux0xDW/SBQA
+         sHrlYB2ClvLx5/8rb8UGp2XyygyRbN2XPbXT3C3BsTCSJtOTo+vKcpor0PAgvt6e7zuX
+         vpYw==
+X-Forwarded-Encrypted: i=1; AJvYcCU7l+bCToBOSLMqN9uEeCMNRy+DdUrs4o2s1A8Ona2ZbvdUNumhWBylMh6A4+L4r8/Nui0qWj9T@vger.kernel.org, AJvYcCVmJYuJh3RO7CmfgtpPYS6eLhwh+XBZZyglNYt7r3hUKgzvSApbFRMn2wLLurtIer7PC+wb7D+QEy0QyKzfmggt@vger.kernel.org, AJvYcCVyn036F6Fw5EARw2leCrOyC4ZXV5dZkByt4hEZgXUGJE+F4DxUAhjc/PH4tQQAM2c9n3TFLU04GFLVBdw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyA6mIkrIT+ZKXGiRnl90HCPGdgFCEzYCZcj5OltncDuqpRfBxH
+	4EuRXZRaR0QjNnlOgl0zx20WtN/gbQ4e3KoT59f3AYM+gBSOwoBB
+X-Google-Smtp-Source: AGHT+IErn9w1GAPNrCT3D/10AYzxY/ljH5DGqmwTeoTRx5ggId14vjDT68YpOY6LfNTH7pX7Uv+GVQ==
+X-Received: by 2002:a05:651c:2126:b0:2f3:e2fd:aae0 with SMTP id 38308e7fff4ca-2f75a96ea93mr65251031fa.6.1725870586452;
+        Mon, 09 Sep 2024 01:29:46 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-113.fbsv.net. [2a03:2880:30ff:71::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25ce96d9sm304750066b.157.2024.09.09.01.29.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 01:29:45 -0700 (PDT)
+Date: Mon, 9 Sep 2024 01:29:43 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	David Ahern <dsahern@kernel.org>, rbc@meta.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	"open list:NETFILTER" <coreteam@netfilter.org>
+Subject: Re: [PATCH nf-next v4 1/2] netfilter: Make IP6_NF_IPTABLES_LEGACY
+ selectable
+Message-ID: <20240909-aloof-magnetic-bear-ecd5af@devvm32600>
+References: <20240829161656.832208-1-leitao@debian.org>
+ <20240829161656.832208-2-leitao@debian.org>
+ <Zto4WmXldf6KzeQO@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zto4WmXldf6KzeQO@calendula>
 
-The LAN8650/1 combines a Media Access Controller (MAC) and an Ethernet
-PHY to enable 10BASE-T1S networks. The Ethernet Media Access Controller
-(MAC) module implements a 10 Mbps half duplex Ethernet MAC, compatible
-with the IEEE 802.3 standard and a 10BASE-T1S physical layer transceiver
-integrated into the LAN8650/1. The communication between the Host and the
-MAC-PHY is specified in the OPEN Alliance 10BASE-T1x MACPHY Serial
-Interface (TC6).
+Hello Pablom
 
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
----
- .../bindings/net/microchip,lan8650.yaml       | 74 +++++++++++++++++++
- MAINTAINERS                                   |  1 +
- 2 files changed, 75 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/microchip,lan8650.yaml
+On Fri, Sep 06, 2024 at 01:01:46AM +0200, Pablo Neira Ayuso wrote:
+> On Thu, Aug 29, 2024 at 09:16:54AM -0700, Breno Leitao wrote:
+> > This option makes IP6_NF_IPTABLES_LEGACY user selectable, giving
+> > users the option to configure iptables without enabling any other
+> > config.
+> 
+> IUC this is to allow to compile iptables core built-in while allowing
+> extensions to be compiled as module? What is exactly the combination
+> you are trying to achieve which is not possible with the current
+> toggle?
 
-diff --git a/Documentation/devicetree/bindings/net/microchip,lan8650.yaml b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-new file mode 100644
-index 000000000000..61e11d4a07c4
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/microchip,lan8650.yaml
-@@ -0,0 +1,74 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/microchip,lan8650.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Microchip LAN8650/1 10BASE-T1S MACPHY Ethernet Controllers
-+
-+maintainers:
-+  - Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-+
-+description:
-+  The LAN8650/1 combines a Media Access Controller (MAC) and an Ethernet
-+  PHY to enable 10BASE‑T1S networks. The Ethernet Media Access Controller
-+  (MAC) module implements a 10 Mbps half duplex Ethernet MAC, compatible
-+  with the IEEE 802.3 standard and a 10BASE-T1S physical layer transceiver
-+  integrated into the LAN8650/1. The communication between the Host and
-+  the MAC-PHY is specified in the OPEN Alliance 10BASE-T1x MACPHY Serial
-+  Interface (TC6).
-+
-+allOf:
-+  - $ref: /schemas/net/ethernet-controller.yaml#
-+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - const: microchip,lan8650
-+      - items:
-+          - const: microchip,lan8651
-+          - const: microchip,lan8650
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    description:
-+      Interrupt from MAC-PHY asserted in the event of Receive Chunks
-+      Available, Transmit Chunk Credits Available and Extended Status
-+      Event.
-+    maxItems: 1
-+
-+  spi-max-frequency:
-+    minimum: 15000000
-+    maximum: 25000000
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - spi-max-frequency
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    #include <dt-bindings/gpio/gpio.h>
-+
-+    spi {
-+      #address-cells = <1>;
-+      #size-cells = <0>;
-+
-+      ethernet@0 {
-+        compatible = "microchip,lan8651", "microchip,lan8650";
-+        reg = <0>;
-+        pinctrl-names = "default";
-+        pinctrl-0 = <&eth0_pins>;
-+        interrupt-parent = <&gpio>;
-+        interrupts = <6 IRQ_TYPE_EDGE_FALLING>;
-+        local-mac-address = [04 05 06 01 02 03];
-+        spi-max-frequency = <15000000>;
-+      };
-+    };
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 89d038c2e94b..1dd3347d8f01 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -14983,6 +14983,7 @@ MICROCHIP LAN8650/1 10BASE-T1S MACPHY ETHERNET DRIVER
- M:	Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
-+F:	Documentation/devicetree/bindings/net/microchip,lan8650.yaml
- F:	drivers/net/ethernet/microchip/lan865x/lan865x.c
- 
- MICROCHIP LAN87xx/LAN937x T1 PHY DRIVER
--- 
-2.34.1
+Correct. iptable core is built-in, and any extension is a module.
 
+> Florian's motivation to add this knob is to allow to compile kernels
+> without iptables-legacy support.
+
+Correct, and this continue to be an option. This change only introduces
+you the option to set the core as built-in or module, independent of the
+extensions.
+
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  net/ipv6/netfilter/Kconfig | 8 +++++++-
+> >  1 file changed, 7 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/net/ipv6/netfilter/Kconfig b/net/ipv6/netfilter/Kconfig
+> > index f3c8e2d918e1..cbe88cc5b897 100644
+> > --- a/net/ipv6/netfilter/Kconfig
+> > +++ b/net/ipv6/netfilter/Kconfig
+> > @@ -8,7 +8,13 @@ menu "IPv6: Netfilter Configuration"
+> >  
+> >  # old sockopt interface and eval loop
+> >  config IP6_NF_IPTABLES_LEGACY
+> > -	tristate
+> > +	tristate "Legacy IP6 tables support"
+> > +	depends on INET && IPV6
+> > +	select NETFILTER_XTABLES
+> > +	default n
+> > +	help
+> > +	  ip6tables is a general, extensible packet identification legacy framework.
+> 
+> "packet classification" is generally the more appropriate and widely
+> used term for firewalls.
+> 
+> Maybe simply reword this description to ...
+> 
+> 	  ip6tables is a legacy packet classification.
+
+Sure, I will send an updated version with this change.
+
+Thanks!
 
