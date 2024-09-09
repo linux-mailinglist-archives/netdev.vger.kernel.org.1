@@ -1,142 +1,131 @@
-Return-Path: <netdev+bounces-126375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA881970EB9
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:01:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FA31970F59
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:12:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61A68282C2B
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:01:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC1D8280E37
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4882F1AC43C;
-	Mon,  9 Sep 2024 07:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1DF1AD9F9;
+	Mon,  9 Sep 2024 07:10:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ex3aGBMo"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="KOU2HQPH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward500a.mail.yandex.net (forward500a.mail.yandex.net [178.154.239.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3B82AD00;
-	Mon,  9 Sep 2024 07:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5E94428
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 07:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725865273; cv=none; b=Eq0SOiTTG/joDyWUtBTuJiO38BJPLvM8T+AOl4r1vNuCiKUIhp8evQc/LOdLymxD7fdLzEmp9Sljncd0O65gq/5ctMsBNqUSpEKySbK1OYw3OBHbmw4NC7uqvY9NWMyhkHv6wcMjok+c93I/lHCAD5jSPx0FzwR7xyaj2oz/ld8=
+	t=1725865803; cv=none; b=AXu0c4EXxjw6/AO4XXj/92r6PGgsx689fE/ReYGVFR65lnzqgf+3we8ncZNVB86kTO0sybhLpkvvUsgk0nxK9zmtD8zMXRjgJep7we7Df5X3q3fpI8uiGD28aDc8g3qHF3xN8iqzgVR/a7ZSvBP49ispj2RQctp6msu9O4t/YNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725865273; c=relaxed/simple;
-	bh=+byjLK2CSURk5W4gQECLaHmTCVObaZFNiP0EOfhgAQg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ELDxWXux5lTG6n2hJT90qx/n/z5OzMHR95dGiudtT7L4tB4AziXJroqxn/8V+ppnX5frWQNqtKGO7o6NOzcvudmLxXpSKlgTUxnMJ09NPjlpHUcZBbLhWfWOJpeoLXSYCqucAHsmnTr9xqkeVAEqvY76JJ4SQ4d/Yy72lMz40Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ex3aGBMo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B3F5C4CEC5;
-	Mon,  9 Sep 2024 07:01:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725865272;
-	bh=+byjLK2CSURk5W4gQECLaHmTCVObaZFNiP0EOfhgAQg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ex3aGBMo/Vxn2kxTS6ZwSQ7XD+jvj1vhEqtCuJCVRUdxK2HJLFgmcdOBuOvjfTfyK
-	 IhprP1EiyA/YrFWQfgjcjsVFseB5HJy8RUXb7AW+nhBvNJtlm920Omxpgo0ZOQUdpT
-	 A57bQRYt5Brmovgm1acWntMlQ2a/l8n4rTJRrJ6nIfv+ASN9dTjFCYGl/rA5dpP3vE
-	 pEwi8fQxGQsEnFRu3QxD1jIa2DVN8JBRkfo7YaaH+P53mTXvBG4mPLNSHUiduSxGKW
-	 RHneIPULdHICQOYjoPa8oMirqA99Ue+G2PspKQEMpf1NzpfELx9UuuNCmy88eQAEvE
-	 cU1LGc157LopQ==
-Message-ID: <54c6dc12-8f2d-463a-b0bc-45e5d8bd9e3e@kernel.org>
-Date: Mon, 9 Sep 2024 09:01:07 +0200
+	s=arc-20240116; t=1725865803; c=relaxed/simple;
+	bh=Gew2Wrg+3NMCnoAB55EoGgiHv6PG7L5LThHxdWpbmgM=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=Y3rAMat4wkSVAvby+eico6q1MG0DBavS9V8csunibcww3bH8tMWd1wan0xRJN6T2QU/j+bc4E/erHv/udjSoTXf3c78eowT8CmlZeK10yCiLF6Tlg7ztb63taxUCQl7+qNddfRXMr6LoqQmx4GI45VoYcObG76AkhQZDMq7JlxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=KOU2HQPH; arc=none smtp.client-ip=178.154.239.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net [IPv6:2a02:6b8:c0f:4c80:0:640:a0f:0])
+	by forward500a.mail.yandex.net (Yandex) with ESMTPS id 173B860F43;
+	Mon,  9 Sep 2024 10:04:23 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id M4bTEUwGUSw0-OQBTpCc2;
+	Mon, 09 Sep 2024 10:04:22 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1725865462; bh=mWUQjUOlyGsM/sY79+ndw+cK+CeJo3Z2RBySD/55bSk=;
+	h=In-Reply-To:Subject:To:From:Cc:Date:References:Message-ID;
+	b=KOU2HQPHZvWavHz3k7bQbTl1PWR//IjwbuNz1NQh1lAFtrHH3o0dcYRS78q3IcZOt
+	 r8WvpzaYrZc4A+h6PnEWTAeC/dtNyC7O0T02FgCKKg0tFWVKHmAUtB7IadF0meYaQZ
+	 +iI6No5csbmx6+ryLoP+txgOKNamKSsHe1wMmfQE=
+Authentication-Results: mail-nwsmtp-smtp-production-main-51.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <5d23bd86-150f-40a3-ab43-a468b3133bc4@yandex.ru>
+Date: Mon, 9 Sep 2024 10:04:21 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v3] mptcp: pm: Fix uaf in __timer_delete_sync
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Edward Adam Davis <eadavis@qq.com>, davem@davemloft.net,
- edumazet@google.com, geliang@kernel.org, linux-kernel@vger.kernel.org,
- martineau@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
- pabeni@redhat.com, syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com
-References: <e4a13002-f471-4951-9180-14f0f8b30bd2@kernel.org>
- <tencent_F85DEC5DED99554FB28DEF258F8DB8120D07@qq.com>
- <b2272b72-d207-4393-9245-31ad7628be09@kernel.org>
- <20240906150232.31ba495c@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240906150232.31ba495c@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <20240905064257.3870271-1-dmantipov@yandex.ru>
+ <Zt3up5aOcu5icAUr@pop-os.localdomain>
+Content-Language: en-US
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Autocrypt: addr=dmantipov@yandex.ru; keydata=
+ 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
+ A/UwwXBRuvydGV0=
+Subject: Re: [PATCH RFC net] net: sockmap: avoid race between
+ sock_map_destroy() and sk_psock_put()
+In-Reply-To: <Zt3up5aOcu5icAUr@pop-os.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On 9/8/24 9:36 PM, Cong Wang wrote:
 
-On 07/09/2024 00:02, Jakub Kicinski wrote:
-> On Fri, 6 Sep 2024 20:55:20 +0200 Matthieu Baerts wrote:
->>> Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
->>> Cc: stable@vger.kernel.org
->>> Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
->>> Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
->>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>  
->>
->> According to the doc [1], a 'Co-dev' tag is supposed to be added before
->> this SoB:
->>
->> Co-developed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
->>
->> But I'm sure that's fine without it.
+> Are you sure it is due to sockmap code?
+
+No, and that's why my patch has RFC tag in subject :-).
+
+> I see rds_tcp_accept_one() in the stack trace. This is why I highly
+> suspect that it is due to RDS code instead of sockmap code.
 > 
-> To be clear, would you like us to pick this up directly for net?
+> I have the following patch ready for testing, in case you are
+> interested.
 
-Sorry, I forgot that: yes, can you pick this up directly please?
+Does it work for you? Running current upstream with this patch applied,
+I'm still seeing the same warning at net/core/sock_map.c:1663.
 
-I think that's best to do that for fixes that are ready.
+Again, I'm suspecting the race just because 'sk_psock_drop()' issues
+'sk_psock_restore_proto()' with 'sk->sk_callback_lock' write locked,
+but 'sock_map_destroy()' just uses 'READ_ONCE()' to obtain a callback
+which may be changed underneath.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+BTW looking here and there again, I suppose that my patch is not correct
+too because it moves and/or shrinks the race window but doesn't eliminate
+it completely.
+
+Dmitry
 
 
