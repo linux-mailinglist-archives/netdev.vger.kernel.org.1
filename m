@@ -1,144 +1,197 @@
-Return-Path: <netdev+bounces-126443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 876F397129B
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:50:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E37B9712A2
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:52:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5BBC1C22A9A
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:50:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D423281E2C
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879831B29BB;
-	Mon,  9 Sep 2024 08:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B18B1B1515;
+	Mon,  9 Sep 2024 08:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+q5e+Mi"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="BObTbSuT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2B01B1515;
-	Mon,  9 Sep 2024 08:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63EF1B29BE
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 08:52:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725871835; cv=none; b=Mlp4mKVjn+pmtHpMd3XjHAwbRhBvSvJT2K6cdtHWnIkZvZnTkoCw0tfkj4WkeZuHxH0uwokE2oWGZARY5QuJkXVr0KxQZ2qoOxtKIipjDXTRpiK9+pei4r+Tjm+8sih7vpN6h5FktLfNVvxa/qaGXdFGPbZmHWQk4sr0wuPRjvI=
+	t=1725871935; cv=none; b=cq5RAi2sdsllvHhBn5aq3HOLRIyV8TufSwCs830KwGnvQPuhE+XCSAVNrXRAQT5l6hwsjK4qNXp9tTnyqOkReC25Gixfq51DnT3A8shSLF4h7JcgWvtJiV+8d3QBJsqaEkVWi9SDGWvZNBsnDTvMMUD/RU3eMyHa5e1gsGpGZdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725871835; c=relaxed/simple;
-	bh=UExkI6GiOyg9fq7gq7e9415xYQTdFebhf5cMaTDpOac=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=No9uvi03izYkHLV/KxNvTZw0uuY3csSCeRxaEHiy6/O0gQdH1yciw6LarJgMs94mRQyqn7u0QnawnzX/iQzYQ4HchBHyLBXSuzQrAGbFV1zl0miwKyxBojFUGE4NIcKveYbKp9Zs1NMjVeWFSQEsJnYTECW6UpRo/l0ebJKCbAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+q5e+Mi; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5365aa568ceso3341838e87.0;
-        Mon, 09 Sep 2024 01:50:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725871832; x=1726476632; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qMJgZ9pgfiljRe+M72ZqUEaho/KQ7dkzOtNSpn7FOBk=;
-        b=S+q5e+MipOaJkFm6hsiB6NN0IOHTbPaHgjv4/SN7yeuHg2SPP53T7v3DFVVdvE20xF
-         BTxGN3X/ho6TGWYEqEJVJmdIeh1LiiuU5WHYKIwSY7NmtaybwkscOZBhQNUY2HMnrRM5
-         ghJxt/nCCZ+9bQJZPmc6YsIx4t6OYE4CXTUbqFTN5CaWWJGClFa2LwnQbzHLNFlB6i0U
-         ejdW9JT3rfLnQoJClpWElwQqUksJlZRSaILE980xjGliZY8s2Ql/ftA29nnw6V8bJf5Q
-         gRG7CPg8jBsjAcVnhIRQxKn4faVC/MHOdFwD3iLQYL6jaRop5lTLbtYuu00/WKP45Q4E
-         +2TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725871832; x=1726476632;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qMJgZ9pgfiljRe+M72ZqUEaho/KQ7dkzOtNSpn7FOBk=;
-        b=mrKjzx+L+WrZJeIF/k4gE7/1rwHpke3KyEQtKvruYTv5qZxRm29V6LvNcbMw55dw7i
-         zyyY9lLLqENoiNQl17mS2F/CclP9h4hQ4GKGWB4j/TblFaNeQf4Au/t2OrvMwswT5EXP
-         Ms5cXsZQC1lnE1Nj29bCza26GQB3nV3Wn4U8Ly9h2R+a8zA54wzsHj+VK7AP2ZwbLbJz
-         SRsfSJc1O+avKpVYMFVZi9rEufT1eHfZAxgRdrCHaiC2J/XLBUCx2a9dOgddtwieSj+/
-         zJB7xiFij/o6diq/RYJXKhVL/k8IvdmmYTZOjzxQyjHDwh5JT+nbfHNIuqNapO9glGkk
-         VDCg==
-X-Forwarded-Encrypted: i=1; AJvYcCUtpZwjw4AliwUr2Ly4NtdWc1206fUbRSJALbr8fjg9HYXiiOm95tW1++2hiqZrhUMc+omo1eCrZFHf@vger.kernel.org, AJvYcCV2KOpkQW14fNqmzGbFCh/juqxBgqLb/F6njDNsfXTejsDU6SomLSbCJrZKkLfii2WVe+hoara5520Z@vger.kernel.org, AJvYcCVjqvKthfPfBDICcjuCzxVHI+fPaw2cEX1HRUOttRGG8mW7kver96a72S5Bx3Ur4LMDEnW2f3OE2RuWQas=@vger.kernel.org, AJvYcCVpRoHKD8wfsgQKJ74NNYcWsuZU9TeKU5cRD+cYgfdyZZuYo0CJt9jDrbTI81jzsTNHAxO0TxQny6P8ncA=@vger.kernel.org, AJvYcCVzX+utP2+R0gPNtKj4Q8jurtFGBYNqfJOHsAr04Y4V7F1RRHoILB5ySP8ghNAD95hxbXyyj3aZrZqH@vger.kernel.org, AJvYcCW1b3lU+DGSuffo/6kXRxDg8FhIxkcI9rCCqBoB1mowiOM6msqOeiCN2f/4YiIdYK6SxuFDbZLMaHJy@vger.kernel.org, AJvYcCWq1gU/rGWULCcafKjqSkHZzlW+pFp/tfbwYZZNdYXzKC8Un/Rweip4yUbp13euWZMDoTzzJ+0/Txxfq7arxkw=@vger.kernel.org, AJvYcCWzNpg8f2GG8jUBSkHTxa8VF/Lfv/ELcaOPB7LjsEAZOhMEe90qTAPw9ku0mxKfKmu1RgzLZ3Gl/QZd@vger.kernel.org, AJvYcCX8vm0bSWbzrhQfa85++rE3jvYsldvfvDQ1a+jPLGqbLAt58evuuA07e6RrjVYxqj/apsKJmfLu@vger.kernel.org, AJvYcCXMcBBmaCMYZ+0DpZk6ggtL3XRfiqh+SbT8
- gW531k2le02MItrDTLHyIMYiw7UokuNpMdf+hoN+8S8BKA==@vger.kernel.org, AJvYcCXTk9BJBaa3oBZtHvGUdaqGs+4RmKI9fvc2ix6Kvcjew+ZR36CWbTKDbdOZ9HFSeoVEA9IQ0qQXQNDL@vger.kernel.org, AJvYcCXfBYWIJc1lM042B4AalZjxAjbQaNLN0mihj8KnuAeMjLKBinty3YGfGjRBz1xA3K608Q7rmPN+xJM=@vger.kernel.org, AJvYcCXtClLhTwJsUUPPzV2zkTAPfr3Is4MEXT3xBcTT9JM1EabLFCcY9RpVAYGWF73g76lpAaVA+obSVStK/N5o@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2+u7EhnODfDQLmMij6gUzFEYdIqUF67gmtUhkoxW26B4KLj9S
-	e540vUH54PEbaDWHfjYkF1Lpbsc+QrO+mWjhwlAX9dm9Z8xRAWy/piGTwX5hY2DGTURCAYzlP+n
-	IOzGJOZl5Mbvhv/2yLlCzkyuqvgw=
-X-Google-Smtp-Source: AGHT+IFcTF6tcgjMw6D6S0XG2rYkA0vJft71zEud+Bt80oehc9COujaTfpbyb07ODKbKRYsDsEFhP0R5k4x+NMVw2vM=
-X-Received: by 2002:a05:6512:1395:b0:536:555d:11ed with SMTP id
- 2adb3069b0e04-536587a67d8mr8746687e87.12.1725871831380; Mon, 09 Sep 2024
- 01:50:31 -0700 (PDT)
+	s=arc-20240116; t=1725871935; c=relaxed/simple;
+	bh=DjHAg2+bausckHPAlpvZWEGzaeper5jnqf2sj1Giuuk=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=etFjyvVt3fTTMPj3XFS4wwDXL4ad5z1vN+Im1mthwi/KFIMOP8GwZhYaI1Jst9HQksgs9mFvoZG+eazXoGIuZGjvvC+Rszv3ZpmMZqajKK4G+JmhAKk1XQzuojTUZLk+ik2WIGDpjUbmoXgfQ+plT02w0wg3jNcVWrJIb77vAPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=BObTbSuT; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1725871930; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=xe2sqm968IHdlBstx+MvwUDF4EkMgoCjCnhxElaRWDI=;
+	b=BObTbSuTNnphUFsFPaO3Y5HF8OT5EzDDT8De8HljvXVyLSJ/DassR5oLOYGbA8iHex6WTjrd5npwtGRWHzHS9pH1ALgVYHNrjrtMSVwYeNTFuA2xMGSFNBVVItXXUCcceNDu5czLjf8G4sNFpmz2jHm+vPNZcKMhjWsECRUC+xA=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WEaFpYh_1725871929)
+          by smtp.aliyun-inc.com;
+          Mon, 09 Sep 2024 16:52:10 +0800
+Message-ID: <1725871860.6174653-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
+Date: Mon, 9 Sep 2024 16:51:00 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ netdev@vger.kernel.org,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ virtualization@lists.linux.dev,
+ "Si-Wei Liu" <si-wei.liu@oracle.com>,
+ Darren Kenny <darren.kenny@oracle.com>
+References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
+ <20240908153930-mutt-send-email-mst@kernel.org>
+ <1725851336.7999291-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvirXU9816r31UCUz8ne-URj-h-txG6Ozd8vwBp-=sbSQ@mail.gmail.com>
+In-Reply-To: <CACGkMEvirXU9816r31UCUz8ne-URj-h-txG6Ozd8vwBp-=sbSQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240909-ep93xx-v12-0-e86ab2423d4b@maquefel.me>
-In-Reply-To: <20240909-ep93xx-v12-0-e86ab2423d4b@maquefel.me>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Mon, 9 Sep 2024 11:49:54 +0300
-Message-ID: <CAHp75Veusv=f6Xf9-gL3ctoO5Njn7wiWMw-aMN45KbZ=YB=mQw@mail.gmail.com>
-Subject: Re: [PATCH v12 00/38] ep93xx device tree conversion
-To: nikita.shubin@maquefel.me
-Cc: Arnd Bergmann <arnd@arndb.de>, Hartley Sweeten <hsweeten@visionengravers.com>, 
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	Lukasz Majewski <lukma@denx.de>, Linus Walleij <linus.walleij@linaro.org>, 
-	Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, 
-	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
-	Sebastian Reichel <sre@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Vinod Koul <vkoul@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>, 
-	Guenter Roeck <linux@roeck-us.net>, Thierry Reding <thierry.reding@gmail.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
-	Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, Damien Le Moal <dlemoal@kernel.org>, 
-	Sergey Shtylyov <s.shtylyov@omp.ru>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
-	Ralf Baechle <ralf@linux-mips.org>, "Wu, Aaron" <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, 
-	Olof Johansson <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-clk@vger.kernel.org, linux-pm@vger.kernel.org, 
-	devicetree@vger.kernel.org, dmaengine@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-spi@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org, 
-	linux-input@vger.kernel.org, linux-sound@vger.kernel.org, 
-	20240904-devm_clk_hw_register_fixed_rate_parent_data-v1-1-7f14d6b456e5@maquefel.me, 
-	20240829-cs4271-yaml-v3-1-f1624cc838f6@maquefel.me, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 9, 2024 at 11:12=E2=80=AFAM Nikita Shubin via B4 Relay
-<devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
+On Mon, 9 Sep 2024 16:47:02 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Mon, Sep 9, 2024 at 11:16=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > On Sun, 8 Sep 2024 15:40:32 -0400, "Michael S. Tsirkin" <mst@redhat.com=
+> wrote:
+> > > On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
+> > > > leads to regression on VM with the sysctl value of:
+> > > >
+> > > > - net.core.high_order_alloc_disable=3D1
+> > > >
+> > > > which could see reliable crashes or scp failure (scp a file 100M in=
+ size
+> > > > to VM):
+> > > >
+> > > > The issue is that the virtnet_rq_dma takes up 16 bytes at the begin=
+ning
+> > > > of a new frag. When the frag size is larger than PAGE_SIZE,
+> > > > everything is fine. However, if the frag is only one page and the
+> > > > total size of the buffer and virtnet_rq_dma is larger than one page=
+, an
+> > > > overflow may occur. In this case, if an overflow is possible, I adj=
+ust
+> > > > the buffer size. If net.core.high_order_alloc_disable=3D1, the maxi=
+mum
+> > > > buffer size is 4096 - 16. If net.core.high_order_alloc_disable=3D0,=
+ only
+> > > > the first buffer of the frag is affected.
+> > > >
+> > > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever u=
+se_dma_api")
+> > > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> > > > Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a54=
+0c0a@oracle.com
+> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > >
+> > >
+> > > BTW why isn't it needed if we revert f9dac92ba908?
+> >
+> >
+> > This patch fixes the bug in premapped mode.
+> >
+> > The revert operation just disables premapped mode.
+> >
+> > So I think this patch is enough to fix the bug, and we can enable
+> > premapped by default.
+> >
+> > If you worry about the premapped mode, I advice you merge this patch an=
+d do
+> > the revert[1]. Then the bug is fixed, and the premapped mode is
+> > disabled by default, we can just enable it for af-xdp.
+> >
+> > [1]: http://lore.kernel.org/all/20240906123137.108741-1-xuanzhuo@linux.=
+alibaba.com
 >
-> The goal is to recieve ACKs for all patches in series to merge it via Arn=
-d branch.
+> Though I think this is a good balance but if we can't get more inputs
+> from Darren. It seems safer to merge what he had tested.
+
+So you mean just merge this:
+
+	http://lore.kernel.org/all/20240906123137.108741-1-xuanzhuo@linux.alibaba.=
+com
+
+Right?
+
+Thanks
+
+
 >
-> It was decided from the very beginning of these series, mostly because
-> it's a full conversion of platform code to DT and it seemed not
-> convenient to maintain compatibility with both platform and DT.
+> Thanks
 >
-> Following patches require attention from Stephen Boyd or clk subsystem:
-
-Does it mean you still have a few patches without tags?
-What are their respective numbers?
-
-> - clk: ep93xx: add DT support for Cirrus EP93xx:
->   - tristate
->   - drop MFD_SYSCON/REGMAP
->   - add AUXILIARY_BUS/REGMAP_MMIO
->   - prefixed all static with ep9xx_
->   - s/clk_hw_register_ddiv()/ep93xx_clk_register_ddiv()/
->   - s/clk_register_div()/ep93xx_clk_register_div()/
->   - dropped devm_ep93xx_clk_hw_register_fixed_rate_parent_data macro
->   - s/devm_ep93xx_clk_hw_register_fixed_rate_parent_data()/devm_clk_hw_re=
-gister_fixed_rate_parent_data()/
-
---=20
-With Best Regards,
-Andy Shevchenko
+> >
+> > Thanks.
+> >
+> >
+> > >
+> > > > ---
+> > > >  drivers/net/virtio_net.c | 12 +++++++++---
+> > > >  1 file changed, 9 insertions(+), 3 deletions(-)
+> > > >
+> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > index c6af18948092..e5286a6da863 100644
+> > > > --- a/drivers/net/virtio_net.c
+> > > > +++ b/drivers/net/virtio_net.c
+> > > > @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_qu=
+eue *rq, u32 size, gfp_t gfp)
+> > > >     void *buf, *head;
+> > > >     dma_addr_t addr;
+> > > >
+> > > > -   if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> > > > -           return NULL;
+> > > > -
+> > > >     head =3D page_address(alloc_frag->page);
+> > > >
+> > > >     dma =3D head;
+> > > > @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet_i=
+nfo *vi, struct receive_queue *rq,
+> > > >     len =3D SKB_DATA_ALIGN(len) +
+> > > >           SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> > > >
+> > > > +   if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+> > > > +           return -ENOMEM;
+> > > > +
+> > > >     buf =3D virtnet_rq_alloc(rq, len, gfp);
+> > > >     if (unlikely(!buf))
+> > > >             return -ENOMEM;
+> > > > @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct virt=
+net_info *vi,
+> > > >      */
+> > > >     len =3D get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+> > > >
+> > > > +   if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)=
+))
+> > > > +           return -ENOMEM;
+> > > > +
+> > > > +   if (!alloc_frag->offset && len + room + sizeof(struct virtnet_r=
+q_dma) > alloc_frag->size)
+> > > > +           len -=3D sizeof(struct virtnet_rq_dma);
+> > > > +
+> > > >     buf =3D virtnet_rq_alloc(rq, len + room, gfp);
+> > > >     if (unlikely(!buf))
+> > > >             return -ENOMEM;
+> > > > --
+> > > > 2.32.0.3.g01195cf9f
+> > >
+> >
+>
 
