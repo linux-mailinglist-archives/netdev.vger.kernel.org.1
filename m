@@ -1,162 +1,136 @@
-Return-Path: <netdev+bounces-126448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 774BE9712BB
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:58:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E1389712D5
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:03:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E7331F233CC
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:58:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D1942854C4
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016C01B2533;
-	Mon,  9 Sep 2024 08:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62D11B29D3;
+	Mon,  9 Sep 2024 09:02:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="qrwqWohr"
+	dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b="UCKyBw0t"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward501a.mail.yandex.net (forward501a.mail.yandex.net [178.154.239.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1171B150A;
-	Mon,  9 Sep 2024 08:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF90113635E;
+	Mon,  9 Sep 2024 09:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725872314; cv=none; b=AIAFg6BZMh1d2aIgKCpKB+TSvc1YnF5NrG3m9ILFVAvuGSD4Ul53Sj+yel0f0yExryK4CftIQ5+2gBOocbIzPdAph399/KeGitk78oF94CZzMG0yaDr04hjuYmG45nqo6Ha+jKNgiPiRCu0dWz4wkiW+XZdd+d1uFPRRyHGsAg4=
+	t=1725872578; cv=none; b=fJVTyCkrH6fYJ62XW84FrVUmYMZ6ULZAbuKimWs3DTqrLaAaHN2yigN8C5q98ro35Z6QEhGV/niB+vHBwF2J7ld7noABvguVcmje9ETtydI+bY4929K5AKMhwXwXq8VhmJxKc+CDMvzoWO837qVbQwtDLo9J0IrOhlgUfDeidbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725872314; c=relaxed/simple;
-	bh=BtIb6N/65OadEVbzYDIoljRr+q5odejFkgXYzE+ot9A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rscKeRmOl/xShiIqMS+KwVw4eJ4w4IG9uQnfTB0GCGBf3p6LwbUdkns6iDVXhpm21O2W+1YwegbsMa2kdkMSPU5NbNU0w4Ey0+7P709CmUisiZ3umTwNjisjpdErMaH3tm/hW1f21b07D6dhEqvvWkWsgSShrObeMsogyYts6q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=qrwqWohr; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 9273888D08;
-	Mon,  9 Sep 2024 10:58:23 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1725872304;
-	bh=m6dN1ufqowxfvuhPSE7wesgvmyXMXmsyT3a/MEsiJ9Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qrwqWohr1WXSwj3fE2907xEAa4lTMNBOOpaD3Z5d1XqWP49svEF3VDPq2SprPFqGA
-	 5uTW7JA4MWjcK2tORZwvcPAP3T0h78XLqrbPY4E5D9LYb/4XOI+xUcmjnLsD2bL/3y
-	 OdNskHviflAuF5n0j/RrqDhOLO40QezBmMezOU7D6JzdedNCZra6jYGCADFlcy43Qw
-	 zMZhPPkNwQigYsJvz7hICNqZAYcj5CQw7dRkhSaTegQipF260g6skrGvPdlRccdKtK
-	 31EXV22JFBPDQaG3Z/7inlTcUSGjPhHNSx8eZvLd41rsSPcuznlhPthFDXminaQ1rP
-	 R/an7xFzdd+kg==
-Date: Mon, 9 Sep 2024 10:58:22 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Jeongjun Park <aha310510@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, ricardo@marliere.net,
- m-karicheri2@ti.com, n.zhandarovich@fintech.ru, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- syzbot+02a42d9b1bd395cbcab4@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] net: hsr: prevent NULL pointer dereference in
- hsr_proxy_announce()
-Message-ID: <20240909105822.16362339@wsk>
-In-Reply-To: <20240907190341.162289-1-aha310510@gmail.com>
-References: <20240907190341.162289-1-aha310510@gmail.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1725872578; c=relaxed/simple;
+	bh=Qut1EyCSXF5XKk8lrf1jldw5ylJErkj1/nQaI3URoaw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=eoPfp7uIqQ6qTYo/9DP+LVLc75HHL+IXQ1bVe/76iO2k/R+8uI/cht9VYFVEOOtDni+JkNqsKmxi7rTlGKbBSkdI76+q6tSIaaCnuVmqUXlGxuNbJ6mh2A1HR5HRHHkkQtjoMrvWEw2JTZhw9htM2CCyWciwJdVn8x+SqS023Sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me; spf=pass smtp.mailfrom=maquefel.me; dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b=UCKyBw0t; arc=none smtp.client-ip=178.154.239.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maquefel.me
+Received: from mail-nwsmtp-smtp-production-main-49.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-49.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1f:5e9c:0:640:b3f4:0])
+	by forward501a.mail.yandex.net (Yandex) with ESMTPS id 36D27613B6;
+	Mon,  9 Sep 2024 12:02:44 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-49.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id a2dHS5JKaSw0-Uuowlycf;
+	Mon, 09 Sep 2024 12:02:42 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maquefel.me; s=mail;
+	t=1725872562; bh=Qut1EyCSXF5XKk8lrf1jldw5ylJErkj1/nQaI3URoaw=;
+	h=References:Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
+	b=UCKyBw0t6OLNpveKLHRyVdH4SZAFS1aM3i5JVQ8KQ5rIHiHlKcQKgkqrfFC6c8Kek
+	 R9zZ3ZAROjskp9kB0OrvKFjT8aa1lyzn42GuLR0RT8850GDMyebxN0ZKhcvu8dixES
+	 a/SqIJj456K3YYiyyxC8j7ouVj9XUUEG0040u5qg=
+Authentication-Results: mail-nwsmtp-smtp-production-main-49.vla.yp-c.yandex.net; dkim=pass header.i=@maquefel.me
+Message-ID: <0e3902c9a42b05b0227e767b227624c6fe8fd2bb.camel@maquefel.me>
+Subject: Re: [PATCH v12 00/38] ep93xx device tree conversion
+From: Nikita Shubin <nikita.shubin@maquefel.me>
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Hartley Sweeten
+ <hsweeten@visionengravers.com>, Alexander Sverdlin
+ <alexander.sverdlin@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Lukasz Majewski <lukma@denx.de>, Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Sebastian Reichel <sre@kernel.org>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+ Vinod Koul <vkoul@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>,
+ Guenter Roeck <linux@roeck-us.net>, Thierry Reding
+ <thierry.reding@gmail.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
+ <u.kleine-koenig@pengutronix.de>, Mark Brown <broonie@kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Miquel Raynal
+ <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, Vignesh
+ Raghavendra <vigneshr@ti.com>, Damien Le Moal <dlemoal@kernel.org>, Sergey
+ Shtylyov <s.shtylyov@omp.ru>, Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, Ralf Baechle <ralf@linux-mips.org>,  "Wu,
+ Aaron" <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, Olof Johansson
+ <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ linux-gpio@vger.kernel.org, linux-clk@vger.kernel.org,
+ linux-pm@vger.kernel.org,  devicetree@vger.kernel.org,
+ dmaengine@vger.kernel.org,  linux-watchdog@vger.kernel.org,
+ linux-pwm@vger.kernel.org,  linux-spi@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mtd@lists.infradead.org, 
+ linux-ide@vger.kernel.org, linux-input@vger.kernel.org, 
+ linux-sound@vger.kernel.org, Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>,  Krzysztof Kozlowski
+ <krzysztof.kozlowski@linaro.org>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>
+Date: Mon, 09 Sep 2024 12:02:37 +0300
+In-Reply-To: <CAHp75Veusv=f6Xf9-gL3ctoO5Njn7wiWMw-aMN45KbZ=YB=mQw@mail.gmail.com>
+References: <20240909-ep93xx-v12-0-e86ab2423d4b@maquefel.me>
+	 <CAHp75Veusv=f6Xf9-gL3ctoO5Njn7wiWMw-aMN45KbZ=YB=mQw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/g5vQTmOQi/JcuOEiHPFvrW5";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
 
---Sig_/g5vQTmOQi/JcuOEiHPFvrW5
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi Andy!
 
-Hi Jeongjun,
+On Mon, 2024-09-09 at 11:49 +0300, Andy Shevchenko wrote:
+> On Mon, Sep 9, 2024 at 11:12=E2=80=AFAM Nikita Shubin via B4 Relay
+> <devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
+> >=20
+> > The goal is to recieve ACKs for all patches in series to merge it
+> > via Arnd branch.
+> >=20
+> > It was decided from the very beginning of these series, mostly
+> > because
+> > it's a full conversion of platform code to DT and it seemed not
+> > convenient to maintain compatibility with both platform and DT.
+> >=20
+> > Following patches require attention from Stephen Boyd or clk
+> > subsystem:
+>=20
+> Does it mean you still have a few patches without tags?
+> What are their respective numbers?
 
-> In the function hsr_proxy_annouance() added in the previous commit=20
-> 5f703ce5c981 ("net: hsr: Send supervisory frames to HSR network=20
-> with ProxyNodeTable data"), the return value of the
-> hsr_port_get_hsr() function is not checked to be a NULL pointer,
-> which causes a NULL pointer dereference.
-
-Thank you for your patch.
-
-The code in hsr_proxy_announcement() is _only_ executed (the timer is
-configured to trigger this function) when hsr->redbox is set, which
-means that somebody has called earlier iproute2 command:
-
-ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 interlink lan3
-supervision 45 version 1
+The clk is the last one as i think, all others can be ACKed by
+Alexander or by Arnd himself.
 
 >=20
-> To solve this, we need to add code to check whether the return value=20
-> of hsr_port_get_hsr() is NULL.
+> > - clk: ep93xx: add DT support for Cirrus EP93xx:
+> > =C2=A0 - tristate
+> > =C2=A0 - drop MFD_SYSCON/REGMAP
+> > =C2=A0 - add AUXILIARY_BUS/REGMAP_MMIO
+> > =C2=A0 - prefixed all static with ep9xx_
+> > =C2=A0 - s/clk_hw_register_ddiv()/ep93xx_clk_register_ddiv()/
+> > =C2=A0 - s/clk_register_div()/ep93xx_clk_register_div()/
+> > =C2=A0 - dropped devm_ep93xx_clk_hw_register_fixed_rate_parent_data
+> > macro
+> > =C2=A0 -
+> > s/devm_ep93xx_clk_hw_register_fixed_rate_parent_data()/devm_clk_hw_
+> > register_fixed_rate_parent_data()/
 >=20
-> Reported-by: syzbot+02a42d9b1bd395cbcab4@syzkaller.appspotmail.com
-> Fixes: 5f703ce5c981 ("net: hsr: Send supervisory frames to HSR
-> network with ProxyNodeTable data") Signed-off-by: Jeongjun Park
-> <aha310510@gmail.com> ---
->  net/hsr/hsr_device.c | 4 ++++
->  1 file changed, 4 insertions(+)
->=20
-> diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-> index e4cc6b78dcfc..b3191968e53a 100644
-> --- a/net/hsr/hsr_device.c
-> +++ b/net/hsr/hsr_device.c
-> @@ -427,6 +427,9 @@ static void hsr_proxy_announce(struct timer_list
-> *t)
->  	 * of SAN nodes stored in ProxyNodeTable.
->  	 */
->  	interlink =3D hsr_port_get_hsr(hsr, HSR_PT_INTERLINK);
-> +	if (!interlink)
-> +		goto done;
-> +
->  	list_for_each_entry_rcu(node, &hsr->proxy_node_db, mac_list)
-> { if (hsr_addr_is_redbox(hsr, node->macaddress_A))
->  			continue;
-> @@ -441,6 +444,7 @@ static void hsr_proxy_announce(struct timer_list
-> *t) mod_timer(&hsr->announce_proxy_timer, jiffies + interval);
->  	}
-> =20
-> +done:
->  	rcu_read_unlock();
->  }
-> =20
-> --
 
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/g5vQTmOQi/JcuOEiHPFvrW5
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmbeuK4ACgkQAR8vZIA0
-zr3aWQf+LpYtx8KQQR5W5bNOlDJ7ql9rMWJUeO+uDIvvDuLJP8bf7uaJ5+i9RKZW
-HbKqOx7rYgVmqj5Aax91wIDdXY4NB7jqg0BOfCB67E45a/sVLaLqjnhqXgI6EPQ0
-yLHszr6Tte0VxjbjL66BE0jU5HUi5Xm4tyr9rHKywp4b8bz1iVBgStiQNuh2bNTI
-GTo6MBPaiDBHlYLp8Z+ZYGfaASzLxxam3Tw/bqe9o9vFxp50/cqyLdqqqH2z8IsF
-D03sUeqR/6Nshir1tKUWXLNHtY5295NgLQNKHlFNpdJ1+3JAERjXrbT3hrWiQ4SN
-/acWEqui6OstJunaMWX8YxW8xA7Fwg==
-=A/M4
------END PGP SIGNATURE-----
-
---Sig_/g5vQTmOQi/JcuOEiHPFvrW5--
 
