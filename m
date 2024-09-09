@@ -1,130 +1,132 @@
-Return-Path: <netdev+bounces-126469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ECFF971421
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:45:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8146797143C
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:47:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48289B2521A
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:44:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAA581C22E59
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E43A1B2EE8;
-	Mon,  9 Sep 2024 09:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PA6yz94n"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA751B6557;
+	Mon,  9 Sep 2024 09:45:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760191B2EDC;
-	Mon,  9 Sep 2024 09:44:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190E41B6528
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 09:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725875076; cv=none; b=d2pNfkJZo7m4NlRY2kPkJfQlxgn9YB9kfH+CWf5Qnl29TfxbKv46o3M/AUrG/TSuKLMdrG1BD6lqTaURt2bxbdXmYbYfW0XBO50uIj+Cw9U+sld5mHMu0ubS177YxZbtaadNlTPmvZP40+9l93W0l0nAqrrDR73SFyfjb61hJJg=
+	t=1725875120; cv=none; b=FUilmNBG4cTjz2vNxLmQNEBtepaF5vBB1mBoZjWUVdYs0jtxS5EWCLDR40rGWtnRJayQvXb2qhFVFI/QO0rND6hakER1PyKrOoiLeyyJ8/AT+yJxUsaF9TpPY8Yq6urxQP8FjA/tcdlc1kTEO4lMReOh6NU4nR04IrStG0UCuUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725875076; c=relaxed/simple;
-	bh=NwNF4gkNZxfITFKYRW3ZBe+PB8nJJ+vaL7edxlWc3ro=;
+	s=arc-20240116; t=1725875120; c=relaxed/simple;
+	bh=+4evIbnZzt4io1Sc2b1tEsI+If1tOXLMbFPYq8FUF9w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eWyWMoz/5A+c30Mj06qHNxnvTEDtkMfFLxg69LG9uNPOKkSJdH2UezjjS92ENWc99FfG0KtKpL4BqnQ6c/SS3dwLXxZYWqkwo9yabiBMb9HNIsclaR1xYJ+LOWiw+jfykZvysQ4JTApCl/WXjqak8LawnGT1F8g0KpgrO0ZcgwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PA6yz94n; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725875075; x=1757411075;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NwNF4gkNZxfITFKYRW3ZBe+PB8nJJ+vaL7edxlWc3ro=;
-  b=PA6yz94nIMp0FFoRFgUiQ1egfYQv7cgUZ15V9xuALmlAZ+2R/znraZD+
-   H/nM1h/VwD7lf/iE/RKcHoZbkz7ZFO3g8/34wmBDtNTFVxo61Vtang+cc
-   eD+nk4Sv+Q9Ml9ghWu2dtG5k3VehZCzJcHraVay2eTskRlQChGdt6i/HA
-   k17WogXHZ4rgbDhEkTJG1V/Yw5V9EdlDzKfpH6Y5uQUwJW0J1gWw0vhk/
-   Qi8IOp8eqqVrMMNr4MpE8sKmFQLmaLYoimWXd8Q1URNnkncJrt9qMCmgy
-   mGvZhv8vSUkEUzuONlTfmuVdpfz9k1Er+mobk6b9EUPQLnh0TFB06D6nl
-   g==;
-X-CSE-ConnectionGUID: O5KCdt01TGWHpZ7J/SKYwQ==
-X-CSE-MsgGUID: F5VQpHe9T3Kb78JWriunYw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11189"; a="27484047"
-X-IronPort-AV: E=Sophos;i="6.10,213,1719903600"; 
-   d="scan'208";a="27484047"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2024 02:44:33 -0700
-X-CSE-ConnectionGUID: bo4VfySFQ+m78PdHezdaew==
-X-CSE-MsgGUID: s4xQ+8WmQlCbXSHArVx/1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,213,1719903600"; 
-   d="scan'208";a="66250044"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2024 02:44:28 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1snawc-00000006jqy-0nMH;
-	Mon, 09 Sep 2024 12:44:26 +0300
-Date: Mon, 9 Sep 2024 12:44:25 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Subject: Re: [PATCH net v1 1/1] netfilter: nf_reject: Fix build error when
- CONFIG_BRIDGE_NETFILTER=n
-Message-ID: <Zt7DeR6ZgtA0MhXg@smile.fi.intel.com>
-References: <20240906145513.567781-1-andriy.shevchenko@linux.intel.com>
- <20240907134837.GP2097826@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tnrATzAM8Ao/Qs47I2xwE6Vw453VhFkmwAOrgm76hDfC9Ypu6sRaTfXV0iAZVfh0Hh6jxOcH9xNWyMkcYLKhZqve+Tj6PKo9qDNG8V1vziJOqfIbP7PPVu2k2P+xVc8JFbS2ixU00PxNNdaQ4l6oeHiDRrpjrZGpltC/ZL2ydHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1snax1-0002Uv-3i; Mon, 09 Sep 2024 11:44:51 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1snax0-006cVw-05; Mon, 09 Sep 2024 11:44:50 +0200
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 9FD24336781;
+	Mon, 09 Sep 2024 09:44:49 +0000 (UTC)
+Date: Mon, 9 Sep 2024 11:44:49 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Arnd Bergmann <arnd@arndb.de>, kernel@pengutronix.de, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Heiko Stuebner <heiko@sntech.de>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-rockchip@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] can: rockchip_canfd: avoids 64-bit division
+Message-ID: <20240909-dark-seahorse-of-support-b2206a-mkl@pengutronix.de>
+References: <20240909112119.249479-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vw4xxvfo7kzbvp2i"
 Content-Disposition: inline
-In-Reply-To: <20240907134837.GP2097826@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-
-On Sat, Sep 07, 2024 at 02:48:37PM +0100, Simon Horman wrote:
-> On Fri, Sep 06, 2024 at 05:55:13PM +0300, Andy Shevchenko wrote:
-
-> As mentioned in relation to another similar patch,
-> I'm not sure that resolution of W=1 warnings are fixes.
-
-Up to you, I consider they as fixes as I'm pretty much annoyed each release to
-have disable CONFIG_WERROR. But I got your point.
-
-...
-
-> Possibly it is broken for some reason - like reading nskb too late -
-> but I wonder if rather than annotating niph it's scope can be reduced
-> to the code that is only compiled if CONFIG_BRIDGE_NETFILTER is enabled.
-> 
-> This also addreses what appears to be an assingment of niph without
-> the value being used - the first assingment.
-> 
-> E.g., for the ipv4 case (compile tested only!):
-
-Please, submit a formal patch, I'm not so familiar with the guts of networking
-core to be able to produce anything better than I already did.
-
-Consider this as
-Reported-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-
-Thank you!
-
--- 
-With Best Regards,
-Andy Shevchenko
+In-Reply-To: <20240909112119.249479-1-arnd@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+--vw4xxvfo7kzbvp2i
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 09.09.2024 11:21:04, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+>=20
+> The new driver fails to build on some 32-bit configurations:
+>=20
+> arm-linux-gnueabi-ld: drivers/net/can/rockchip/rockchip_canfd-timestamp.o=
+: in function `rkcanfd_timestamp_init':
+> rockchip_canfd-timestamp.c:(.text+0x14a): undefined reference to `__aeabi=
+_ldivmod'
+>=20
+> Rework the delay calculation to only require a single 64-bit
+> division.
+>=20
+> Fixes: 4e1a18bab124 ("can: rockchip_canfd: add hardware timestamping supp=
+ort")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+
+I've already send a PR which replaces the division by div_u64(), so not
+as elaborate as yours:
+
+| https://lore.kernel.org/all/20240909-can-rockchip_canfd-fix-64-bit-divisi=
+on-v1-1-2748d9422b00@pengutronix.de/
+
+I'll port your patch on top of mine and include it in my next PR.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--vw4xxvfo7kzbvp2i
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbew44ACgkQKDiiPnot
+vG9qfAf8CTk2RmeHPrfJav3PuBHG1Q2oYZqWnA01UAaihzEzI66cuAwP2jpOtInE
+epFUOo/Lj3yG/Qpt5dpcs1coQmN1LrVengCjQlX0KCtZtRLOCv29UULyus8dPrqt
+5zYCXeAtAe6XL9ou90Wo3gkaVldVQ2xndwBmq0Cd4XI5hxpj88rHQcpHiNpQAE8J
+bEyNLPgchY7prDi3elH255rFWfRhIdXHztM/HqRj1d/P6Rp3O1gEnpAL6YjO1gf4
+bsV1Z64Hci2aZFCzuy5fMy1SHCwLu65LuBwvrHBMO8zMRW2eyuBvto2p22kriLTv
+gmjDucroH7Sd9tffjRJQeU5MmMeTKg==
+=93jr
+-----END PGP SIGNATURE-----
+
+--vw4xxvfo7kzbvp2i--
 
