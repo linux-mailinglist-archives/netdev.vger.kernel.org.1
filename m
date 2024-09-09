@@ -1,148 +1,213 @@
-Return-Path: <netdev+bounces-126401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA10497104D
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:52:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48810971118
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:05:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8329D1F22CF6
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:52:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D6E6B226FF
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75051B0129;
-	Mon,  9 Sep 2024 07:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3141B1415;
+	Mon,  9 Sep 2024 07:59:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Zq6JXZ//"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="iduwALTG";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="2Mc8dePn";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="iduwALTG";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="2Mc8dePn"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832DA1AF4D9;
-	Mon,  9 Sep 2024 07:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB76171E5A;
+	Mon,  9 Sep 2024 07:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725868337; cv=none; b=J86bvj4H6zq+UeUvbcoIsugXo7gJt3+CZeOwPkeML8ki+7PiE+SKBliKU4YrPfIMHEXeTO5KquJSbI2tYBBI52GCkCFX8b8DxAYgiDyKDzW+bl3idQMSwoB/DUfxsoUsYQUrPNTdz2PcTrR8GYUlJrk3J3UFx2b41mZDStzDF2o=
+	t=1725868762; cv=none; b=FbVhvT/OJMsJ2dCf5RrOkyvUzijZA00Ob2yMhO+RbSIFE46f3JXFwkHvqrEfgOiugltV5TIFQc0yPMIjqx+PSLamtEA5MKHb8XJgDTQckdWvs5RGso52q9Uy2EhKUxc3FAuHzW8GI97iBcW6jO0byOHnNhFVNZZguW8VPTuExRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725868337; c=relaxed/simple;
-	bh=tYpdgaZCN0lmhTqQidVM517rCDCWKPWudibqWnwydI8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hh1/prBYLk43uoaz2bmqoCV5Th/nDoO9kzinaCVpvh5usdH/kuBY8phJ1yignsZOpQktN4NL2exAVU3nUoBIXKA5PnWcgBPupZpFVa7opfUGpFuB8kDJYYNIPMoytyAqO3Mn0VpzEQbPSqDwAQ1kAvxbHYMhPwRK9uWp7Y/KLKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zq6JXZ//; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 26DFA40005;
-	Mon,  9 Sep 2024 07:52:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1725868327;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=arc-20240116; t=1725868762; c=relaxed/simple;
+	bh=2ON4+jsubtMNGaVISbhqTXNI/uDuvc7Jim8Xe1jMqqo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fNDzjtF1ieM+LV6AYZliklv6W+JeAvrcKe1TTwBq8TPc86skqR9BeFCeGFKUXHfuppLYum+uvM94qa4HKRXoKERN+8ueIv/nomDKhoRBBC80GdU083+gOJGIlZAWkm0ilNIb5V0FVR/o6QPuAN7VNqYy34ICW/TrD7lhB/bkK68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=iduwALTG; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=2Mc8dePn; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=iduwALTG; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=2Mc8dePn; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 77A271F79C;
+	Mon,  9 Sep 2024 07:59:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1725868758; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ryHecAjCKFHY5a39/P+GIvh5tYnxD8Fg8PfucobQxhs=;
-	b=Zq6JXZ//+adouwtwkw6boEPhyiUb2gfFl1RlA0RtXhCzJdYB5HfGK1TUuiPkVXECfEwRwo
-	5FksXPPXTfRR/GOVEhY+/BBte1UQQL25WwxYjwMs8hI6zh80c0qZ8lho8BBY9p/4i7aqGx
-	HVeByxhdV3V98xdhXabPHXeeVJJ+ojd/5b5xx4NhZ2xsZZaBgPbGmDkM7S5gBdiuQFAVn4
-	WF17yA5QBKYBiKqL8Q7+2YUgOIzQQwVr5fl42DKQM21/Muj8AIaUrastdmO0NdIpt/nGT+
-	dfkAHGEQdaTjvIEcerwNh6l4fmtvPPZrqc3P4P4ns6/jQPS79ay20fahDCDf3g==
-Date: Mon, 9 Sep 2024 09:52:03 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Lee Jones <lee@kernel.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Andy Shevchenko
- <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
- <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel
- <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
- Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
- <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
- <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
- <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- devicetree@vger.kernel.org, Allan Nielsen <allan.nielsen@microchip.com>,
- Luca Ceresoli <luca.ceresoli@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
- <clement.leger@bootlin.com>
-Subject: Re: [PATCH v5 3/8] mfd: syscon: Add reference counting and device
- managed support
-Message-ID: <20240909095203.3d6effdb@bootlin.com>
-In-Reply-To: <20240903180116.717a499b@bootlin.com>
-References: <20240808154658.247873-1-herve.codina@bootlin.com>
-	<20240808154658.247873-4-herve.codina@bootlin.com>
-	<20240903153839.GB6858@google.com>
-	<20240903180116.717a499b@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=cfj1nLjvrQb5cWeEo4SbrFcdjZ8L9z7qDs6osYAgawU=;
+	b=iduwALTGkw0Wle4ZA+Vp2VeBHgdcMsIQpH1dp+JJku0+5K29aC94lOcxc7hyPHWhnIRjpE
+	H4V1ZOSuUYMzT88cOjpzbC7r+SgbVHb9RiXtZoBuvUnXlNg/txFsM9fkSLZECOoCn0Laq7
+	cyEzd2jMhcy4FkenPL/4lvaBiql09yY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1725868758;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=cfj1nLjvrQb5cWeEo4SbrFcdjZ8L9z7qDs6osYAgawU=;
+	b=2Mc8dePnGTX9cR+AeAHfVsPiKzZKntFAD4pzh2jYjT804muHBH/AiB9Oi5YoNTANvBAbqo
+	DXtwcvyFaC7P3fDA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1725868758; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=cfj1nLjvrQb5cWeEo4SbrFcdjZ8L9z7qDs6osYAgawU=;
+	b=iduwALTGkw0Wle4ZA+Vp2VeBHgdcMsIQpH1dp+JJku0+5K29aC94lOcxc7hyPHWhnIRjpE
+	H4V1ZOSuUYMzT88cOjpzbC7r+SgbVHb9RiXtZoBuvUnXlNg/txFsM9fkSLZECOoCn0Laq7
+	cyEzd2jMhcy4FkenPL/4lvaBiql09yY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1725868758;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=cfj1nLjvrQb5cWeEo4SbrFcdjZ8L9z7qDs6osYAgawU=;
+	b=2Mc8dePnGTX9cR+AeAHfVsPiKzZKntFAD4pzh2jYjT804muHBH/AiB9Oi5YoNTANvBAbqo
+	DXtwcvyFaC7P3fDA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 43A2D13312;
+	Mon,  9 Sep 2024 07:59:18 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id WI/4D9aq3mZAZgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 09 Sep 2024 07:59:18 +0000
+Message-ID: <bda30291-ab04-4b72-89c1-b4cb4373cfce@suse.cz>
+Date: Mon, 9 Sep 2024 09:59:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4] memcg: add charging of already allocated slab objects
+Content-Language: en-US
+To: Yosry Ahmed <yosryahmed@google.com>
+Cc: Shakeel Butt <shakeel.butt@linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, David Rientjes <rientjes@google.com>,
+ Hyeonggon Yoo <42.hyeyoo@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Meta kernel team <kernel-team@meta.com>,
+ cgroups@vger.kernel.org, netdev@vger.kernel.org
+References: <20240905173422.1565480-1-shakeel.butt@linux.dev>
+ <CAJD7tkbWLYG7-G9G7MNkcA98gmGDHd3DgS38uF6r5o60H293rQ@mail.gmail.com>
+ <qk3437v2as6pz2zxu4uaniqfhpxqd3qzop52zkbxwbnzgssi5v@br2hglnirrgx>
+ <572688a7-8719-4f94-a5cd-e726486c757d@suse.cz>
+ <CAJD7tkZ+PYqvq6oUHtrtq1JE670A+kUBcOAbtRVudp1JBPkCwA@mail.gmail.com>
+ <e7ec0800-f551-4b32-ad26-f625f88962f1@suse.cz>
+ <CAJD7tkZNGETjvuA97=PGy-MfmF--n6GdSfOCHboScP+wN1gTag@mail.gmail.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <CAJD7tkZNGETjvuA97=PGy-MfmF--n6GdSfOCHboScP+wN1gTag@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[linux.dev,linux-foundation.org,cmpxchg.org,kernel.org,google.com,gmail.com,davemloft.net,redhat.com,kvack.org,vger.kernel.org,meta.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:mid]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
 
-Hi Lee, Arnd,
-
-On Tue, 3 Sep 2024 18:01:16 +0200
-Herve Codina <herve.codina@bootlin.com> wrote:
-
-> Hi Lee,
+On 9/6/24 19:38, Yosry Ahmed wrote:
+>> But in case of kmalloc() the allocation must have been still attempted with
+>> __GFP_ACCOUNT so a kmalloc-cg cache is used even if the charging fails.
 > 
-> On Tue, 3 Sep 2024 16:38:39 +0100
-> Lee Jones <lee@kernel.org> wrote:
-> 
-> > On Thu, 08 Aug 2024, Herve Codina wrote:
-> >   
-> > > From: Clément Léger <clement.leger@bootlin.com>
-> > > 
-> > > Syscon releasing is not supported.
-> > > Without release function, unbinding a driver that uses syscon whether
-> > > explicitly or due to a module removal left the used syscon in a in-use
-> > > state.
-> > > 
-> > > For instance a syscon_node_to_regmap() call from a consumer retrieves a
-> > > syscon regmap instance. Internally, syscon_node_to_regmap() can create
-> > > syscon instance and add it to the existing syscon list. No API is
-> > > available to release this syscon instance, remove it from the list and
-> > > free it when it is not used anymore.
-> > > 
-> > > Introduce reference counting in syscon in order to keep track of syscon
-> > > usage using syscon_{get,put}() and add a device managed version of
-> > > syscon_regmap_lookup_by_phandle(), to automatically release the syscon
-> > > instance on the consumer removal.
-> > > 
-> > > Signed-off-by: Clément Léger <clement.leger@bootlin.com>
-> > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > > ---
-> > >  drivers/mfd/syscon.c       | 138 ++++++++++++++++++++++++++++++++++---
-> > >  include/linux/mfd/syscon.h |  16 +++++
-> > >  2 files changed, 144 insertions(+), 10 deletions(-)    
-> > 
-> > This doesn't look very popular.
-> > 
-> > What are the potential ramifications for existing users?
-> >   
-> 
-> Existing user don't use devm_syscon_regmap_lookup_by_phandle() nor
-> syscon_put_regmap().
-> 
-> So refcount is incremented but never decremented. syscon is never
-> released. Exactly the same as current implementation.
-> Nothing change for existing users.
-> 
-> Best regards,
-> Hervé
+> It is still possible that the initial allocation did not have
+> __GFP_ACCOUNT, but not from a KMALLOC_NORMAL cache (e.g. KMALLOC_DMA
+> or KMALLOC_RECLAIM). In this case kmem_cache_charge() should still
+> work, right?
 
-I hope I answered to Lee's question related to possible impacts on
-existing drivers.
+Yeah it would work, but that's rather a corner case implementation detail so
+it's better to just require __GFP_ACCOUNT for kmalloc() in the comment.
 
-Is there anything else that blocks this patch from being applied ?
+>>
+>> If there's another usage for kmem_cache_charge() where the memcg is
+>> available but we don't want to charge immediately on purpose (such as the
+>> Linus' idea for struct file), we might need to find another way to tell
+>> kmalloc() to use the kmalloc-cg cache but not charge immediately...
+> 
+> Can we just use a dedicated kmem_cache for this instead?
 
-Best regards,
-Hervé
+Right, as Shakeel mentioned, that would be the case of struct file. If all
+such cases in the future are fine with dedicated cache (i.e. not variable
+sized allocations), it should be fine.
 
