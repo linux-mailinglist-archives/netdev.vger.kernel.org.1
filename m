@@ -1,115 +1,84 @@
-Return-Path: <netdev+bounces-126526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A916E971AC7
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:22:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E31B971AF1
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50B1E1F22A94
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:22:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD3F62894CF
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9AE31B9B43;
-	Mon,  9 Sep 2024 13:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA071BA299;
+	Mon,  9 Sep 2024 13:24:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="uVcSyN7L"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TVDOwMsS"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B414C1B9B29
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 13:21:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D80C21BA291;
+	Mon,  9 Sep 2024 13:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725888097; cv=none; b=kyE8T7kcH15eaeUqVsbQaFyfY9ErReN8XWK7wOcenFPZVv4jrYVf+U1wCXi0wBImjN29AIf466xCBHIcMpv0WywnRceK1tYiZq1A5/ZD+hDnqYxpJpn4TAdmayxU8tX2g/Lb9UDT/4zqB+e2+5Sbpz2ZaaFUZKyHQmo4ZAanDqc=
+	t=1725888298; cv=none; b=DWUmujdPFlj2GOsCTYaze/jyRlnFNxfjlu7BiATRVUWaszJa3sHhIf8xNZQ6H9VLGuqlXCkRx+lhaLrQh62sw3ks/unul7Zv+8IjtWq9Yn0LhZ4MMi45jetuS1KO9HU1RKZg1ZPEA1pBKEtKX2R8IuwEwC/tp8NypYhxHhBjXHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725888097; c=relaxed/simple;
-	bh=tIEMl8vEaa8GVtiPU5UuXiwjnQSLH7Z0LYhFSi/RVn4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I1srKgf0qKUfJpKP+8I0xz/foVvY1ANhZqvUs6BaIKn++6Ujy2WqBAnO+e3Kv0DFzUlvkUxO2kl495z0oXs8VdgjuRLpe7XqiJTuVMSTjKAC3yeBo5mD2AqUpNf/RxgJmpctloXnIOxu+aoPQXdleczBKCDSO4t7Atkg3wKPtnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=uVcSyN7L; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 195082074A;
-	Mon,  9 Sep 2024 15:21:34 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 7RkEb3MDlJnd; Mon,  9 Sep 2024 15:21:33 +0200 (CEST)
-Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 948DC2067F;
-	Mon,  9 Sep 2024 15:21:33 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 948DC2067F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1725888093;
-	bh=kkK7ITJ6d820xYAplnQqNtdeblJ+KPBShJj99x2AalY=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=uVcSyN7L/NfZdQqEOWdD0UksWiex6pAQ9HIpqJ030kAPaldlhrUphPw71wPgamWDq
-	 j8B7MGe9WXdACYM9TY16ueTEV+VHW0rxanYlDLvpiz1E7xfhjRfUx6nTDIaCSt4o9A
-	 bTE6AOSz7RcJKGaPyB9Sw8EUiIaKCMWxKYO42t+M336/6jMc4rvLOj9O4kTOCFP2Oe
-	 qMyNifvmrh64KYSNcDZ/ktD4uKJnzrcakjH0CHa6vV2p8kaKjs2HQNVjvvRYhQ15LH
-	 9QQA5oj7rjvpxCGce64yyTbSoEOWUQ3pEpGoxwPEAoYzCsJHBCGS15kmi1QHcyK7sh
-	 KpRA93QSnZtLw==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 9 Sep 2024 15:21:33 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Sep
- 2024 15:21:33 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 043A83181DDC; Mon,  9 Sep 2024 15:21:32 +0200 (CEST)
-Date: Mon, 9 Sep 2024 15:21:32 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-CC: Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH 0/11] pull request (net-next): ipsec-next 2024-09-09
-Message-ID: <Zt72XMBpASeOo96y@gauss3.secunet.de>
-References: <20240909100328.1838963-1-steffen.klassert@secunet.com>
+	s=arc-20240116; t=1725888298; c=relaxed/simple;
+	bh=cWASmPJKYo9KaxiPt7WZoXrEl6Mjti954nwaDZDr8Gw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i3XSyph98niVXwkUp05/QuBvqtZRW/wOO7/7C0xfCWZZ4KRTlB36/zEBUkXKPG4s3DjAwkuaidnEOXdUlpRgI4jPPZ1PrFRikKzkM59Iii4y9tcWVYgaMxvnMGhfLnD1Le/NkuXhZBrit6fnnxBVerWrxQDXLmRyvS0N2RblNiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TVDOwMsS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=GCr+2LselaK9VHQpuc9fzJDraSlRwYUwU9L2T2Mh7R0=; b=TVDOwMsSH9fRM7dEq4UYptFV8V
+	CQzf1MXTOXKpd5qcyTRRdY/7nttaiFTgQIU8w2qYPqUKZTDQIs3RkF0vGq33IzmGq27rrdbmxF9Ox
+	jlOLtQKrAEqjdOsip8jfvHTWoclt5rxnzTY9VGml2Ono7BoCoo/04pscMd8tRJNaILjg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sneNt-0070f0-MG; Mon, 09 Sep 2024 15:24:49 +0200
+Date: Mon, 9 Sep 2024 15:24:49 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mohan.Prasad@microchip.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	shuah@kernel.org, Bryan.Whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, edumazet@google.com,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, horms@kernel.org,
+	brett.creeley@amd.com, rosenp@gmail.com
+Subject: Re: [PATCH net-next 0/3] lan743x: This series of patches are for
+ lan743x driver testing
+Message-ID: <98fcb7db-4b9d-4ee9-9840-fef43825353d@lunn.ch>
+References: <20240903221549.1215842-1-mohan.prasad@microchip.com>
+ <7cbdcb2b-37d8-45b6-8b4e-2ab7e7850a38@lunn.ch>
+ <DM6PR11MB4236D1B92E9FDF1A4640DA68839E2@DM6PR11MB4236.namprd11.prod.outlook.com>
+ <96e017b8-3702-4b39-a44f-91c8b4ebec89@lunn.ch>
+ <DM6PR11MB4236A76EB9FF90303153A83083992@DM6PR11MB4236.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240909100328.1838963-1-steffen.klassert@secunet.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <DM6PR11MB4236A76EB9FF90303153A83083992@DM6PR11MB4236.namprd11.prod.outlook.com>
 
-On Mon, Sep 09, 2024 at 12:03:17PM +0200, Steffen Klassert wrote:
-> 1) Remove an unneeded WARN_ON on packet offload.
->    From Patrisious Haddad.
-> 
-> 2) Add a copy from skb_seq_state to buffer function.
->    This is needed for the upcomming IPTFS patchset.
->    From Christian Hopps.
-> 
-> 3) Spelling fix in xfrm.h.
->    From Simon Horman.
-> 
-> 4) Speed up xfrm policy insertions.
->    From Florian Westphal.
-> 
-> 5) Add and revert a patch to support xfrm interfaces
->    for packet offload. This patch was just half coocked.
-> 
-> 6) Extend usage of the new xfrm_policy_is_dead_or_sk helper.
->    From Florian Westphal.
-> 
-> 7) Update comments on sdb and xfrm_policy.
->    From Florian Westphal.
-> 
-> Please pull or let me know if there are problems.
+> I am currently working on this and would rework as soon as possible.
+> The feedback that you provided is highly helpful and I will remodel the implementation with these points in mind.
+> Hopefully you can see that in the next version.
 
-Please wait with pulling, I forgot to apply two fixes
-for the policy changes. Will send another pull request
-tomorrow.
+Great.
+
+Don't worry too much about link speeds you cannot test yourself. If
+your tests happen to fail on a 10G card, i would expect the Maintainer
+of the 10G card to debug if its the driver for the card or the test
+which is broken, and then help fix the test if its the test.
+
+	Andrew
 
