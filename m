@@ -1,192 +1,148 @@
-Return-Path: <netdev+bounces-126319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E117970AC0
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 02:21:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB56C970AC8
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 02:27:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B401A281CFC
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 00:21:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF0501C20BB3
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 00:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465E06FC5;
-	Mon,  9 Sep 2024 00:21:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39AE86FC5;
+	Mon,  9 Sep 2024 00:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L1Phm7wG"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="NT0ddJSR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [67.231.149.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E33EA749C
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 00:21:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AD2A4C74;
+	Mon,  9 Sep 2024 00:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725841299; cv=none; b=G0Tv5xFUtuUzxRfCZd8ZfUMg2Ia3zlkixKbpiP+tWnK/hWz8CLVb4Chcqe8FyNv5jGiXqdPDrJyNXmDes/wZd2JsFvIjqprlafCEI86hstVZmWDMXGstvEGVZVnCf1db4EG7L6hmTnXdEohEcz5MvaCDsPZMcuu+x8iTDpzpHnU=
+	t=1725841661; cv=none; b=KX/2I1p0JP+HRmKZUczBWd6K7jIjv3aD7xaep80iP3IgKyPY7xIPP12tX91qGgQNB+rKwzcEKm6MRpD/g0CrF3ck2f1xjWiejLk/RirzlDznfVVmNI3Og6zjP1okXDDfqEo2GiOWAyc2E22hYkPnOamRYBVf0RBvrynMeFFQiDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725841299; c=relaxed/simple;
-	bh=KVZMNnMYMnNRh9XEUd/AbAsrshEQNXgSkDB5lDD5qq8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jBTUzzWYrYwyMiHr55EhJgDCko5QYU4zOwRA5JlV507adoANcJouPS+RyP18xajYiAjmdy0KdVoK7MWt/NXepKH2ehWQfp20GZ5Wh2YMRXuMrNFRuuLoENjQAxCwIgBQr5so+xrtadzGvwNIeahdFruAl+vtW6d0/BLI3uSfMME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L1Phm7wG; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4582a5b495cso163491cf.1
-        for <netdev@vger.kernel.org>; Sun, 08 Sep 2024 17:21:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725841296; x=1726446096; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+M1qVooEyNPT1gAAftfRiR4Q5Ah3XuHi08JSkLTfyCg=;
-        b=L1Phm7wGMuZuJebhYKnd+JQyBUyE9C1zk1fQHdZNxb97P8m+M+PxEraXZjvXXUAMxN
-         YgeLRp+lFQS66t9ESCBstlYEggoxa0L1O/PC+UpZxl6L665n3Rv4OnKWpcbaTlaXpWf0
-         9c/7mIYxN3/DmAJu6trHAsXv8hyRFuuFoFHjV/iJGToGgpxTbH2z/J2T93C6Ekh9D9Xw
-         mKakVQhQm860axVGd1VHj7SIRv/pB5vXfMZqrzwpugZo5E1rbuACJ0d/qs9z36lc0gC4
-         v+H5OuBq9pX20rpRn3oES5ryQ4nnoL4jusdt9JjBhzBLJ3hxIViJUR2dmGv04meKCtBN
-         ye6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725841296; x=1726446096;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+M1qVooEyNPT1gAAftfRiR4Q5Ah3XuHi08JSkLTfyCg=;
-        b=p+ivArDULKWumFWCHrhCmoHyGFMBaiWZzMiQi5gcKu5w6zGTXoRGYe5AyxGkad7rSM
-         nRmZKsQIeRNSdxt03Z2471+k571f0ftYlJcsoWlIyidjLvaFssRYAzysRv3J54wSvRe4
-         Tf6rhm8422TizO+dPqWlGy6w9TwW7fdUQGROmARxCOkBqauxxH/W9pJ8qsOx2sTdQ/MN
-         6DcSvf+r23R5jyvqbgjCo42k0EI4kUCVh+ZQ8yAFP/WI+rbnNSQDC1IgHXs58L/qzmic
-         ckHl8M4Fh99bAaqMkC9EbtZrEjWDL18mdOCQ5P2aG6VetBAH5YOk3Vexa5ZqHwt9CbiO
-         cg6w==
-X-Gm-Message-State: AOJu0YwK+Si1KT9dwx06HykFdyn1uwgfQTjgMm+E1S/QfWQEDf0V3MDW
-	EXnolsm+TVbnki6pJB5VT4uKnraXxBrq7GsGkJsErxuCJrKj7ww9TV6kHLaUTsp8Mz1iFDoS6dz
-	sQYLvdu9jFxhp3Uw3giq2r/+kGpU+Tk5roZgp
-X-Google-Smtp-Source: AGHT+IHeebo47LrVuqQNlmWSroknDWyh0p2+ySnmSfFMd++vvWmH0RLig1T8xF/sYDtVArFYD/iKIyTthz+4Y2vdWxE=
-X-Received: by 2002:ac8:5714:0:b0:456:796b:2fe5 with SMTP id
- d75a77b69052e-4582147fdcamr3000151cf.9.1725841295262; Sun, 08 Sep 2024
- 17:21:35 -0700 (PDT)
+	s=arc-20240116; t=1725841661; c=relaxed/simple;
+	bh=Yoj6ce/vzbmlvzh0ggi2USWzX0BN0pIUtTJPSeil7/Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Dh8g4UTb4xaGiyOmbRJSVq7ugZEHeW3A4gEQNacvob+vOQ2JNJfFUKAYlGpcc6unbJg85Ns/gERl+tLQ9XF/nv/8dxnGW5vf4rflzRG2O9vmgaS62Xbox36XEops/nVp4HDuUZiSFC97EAx6zQKP6U3ziVolBNQhQYt63emUVDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=NT0ddJSR; arc=none smtp.client-ip=67.231.149.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0409409.ppops.net [127.0.0.1])
+	by m0409409.ppops.net-00190b01. (8.18.1.2/8.18.1.2) with ESMTP id 488NDe95002683;
+	Mon, 9 Sep 2024 01:27:19 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=jan2016.eng;
+	 bh=M3bThDj7YBFnnllltlV0H/TI0jClcdEzsz4SPKM3Qu4=; b=NT0ddJSRNyAx
+	wFemg4MaUdxdlRccRnW5yu4SKHvb9/ZenJQqCqIZtAx+5sC0pfPpz6IvO9yuDNws
+	H7uP4GPDC/5JC+g1OOOgRcqCHXrxaif4Nmsj90OHYzmpVT+xnWMn2b8amKg5MvSI
+	CV/044z0WzRd2sS8H1GmMt3o8R0zsWUiuQAf0y27hAiIjmb4VAf6CNzaSUbYJG7c
+	08LFTE1bKodq9vmawjXOv2CShKUUHHBPumiOUeUfrVqE4BW+brAOhFI+uUJs8f4u
+	VepMG9HOWuxjhI+7xRE6baO8jRJ+XeYAKQlrJDvZB/vSMZQPJtlodkydQM/XvPQO
+	PC0xFrQkCw==
+Received: from prod-mail-ppoint6 (prod-mail-ppoint6.akamai.com [184.51.33.61] (may be forged))
+	by m0409409.ppops.net-00190b01. (PPS) with ESMTPS id 41h05qn679-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 09 Sep 2024 01:27:18 +0100 (BST)
+Received: from pps.filterd (prod-mail-ppoint6.akamai.com [127.0.0.1])
+	by prod-mail-ppoint6.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 488Mhd0A027573;
+	Sun, 8 Sep 2024 20:27:16 -0400
+Received: from prod-mail-relay11.akamai.com ([172.27.118.250])
+	by prod-mail-ppoint6.akamai.com (PPS) with ESMTP id 41gj5yrr6s-1;
+	Sun, 08 Sep 2024 20:27:16 -0400
+Received: from [100.64.0.1] (prod-aoa-csiteclt14.bos01.corp.akamai.com [172.27.97.51])
+	by prod-mail-relay11.akamai.com (Postfix) with ESMTP id 24DAE3409B;
+	Mon,  9 Sep 2024 00:27:14 +0000 (GMT)
+Message-ID: <18b091c5-f86c-436b-9890-b755d09e3be6@akamai.com>
+Date: Sun, 8 Sep 2024 17:27:14 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240831004313.3713467-1-almasrymina@google.com>
- <20240831004313.3713467-7-almasrymina@google.com> <20240903141948.269e22bb@kernel.org>
-In-Reply-To: <20240903141948.269e22bb@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Sun, 8 Sep 2024 17:21:23 -0700
-Message-ID: <CAHS8izN_6_0VUWJzyXZ60kDjvGpdJv1a=-6mGOURapHdfHbcMQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v24 06/13] memory-provider: dmabuf devmem memory provider
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, Donald Hunter <donald.hunter@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Richard Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>, 
-	Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	Magnus Karlsson <magnus.karlsson@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, 
-	Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] tcp: check skb is non-NULL in tcp_rto_delta_us()
+To: Neal Cardwell <ncardwell@google.com>
+Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
+        pabeni@redhat.com, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20240906231700.2097588-1-johunt@akamai.com>
+ <CADVnQynX0yWQA1mqWCueo-yZ1WxTkRAJ9nLjkGAne0QbeM1iZg@mail.gmail.com>
+Content-Language: en-US
+From: Josh Hunt <johunt@akamai.com>
+In-Reply-To: <CADVnQynX0yWQA1mqWCueo-yZ1WxTkRAJ9nLjkGAne0QbeM1iZg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-08_10,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 adultscore=0
+ phishscore=0 mlxlogscore=938 suspectscore=0 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2408220000
+ definitions=main-2409090000
+X-Proofpoint-GUID: yT2xJ2KOAmFS2cO2FPsJdzVOXuxd87xV
+X-Proofpoint-ORIG-GUID: yT2xJ2KOAmFS2cO2FPsJdzVOXuxd87xV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0
+ lowpriorityscore=0 suspectscore=0 priorityscore=1501 adultscore=0
+ impostorscore=0 malwarescore=0 mlxlogscore=721 mlxscore=0 phishscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409090001
 
-On Tue, Sep 3, 2024 at 2:19=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Sat, 31 Aug 2024 00:43:06 +0000 Mina Almasry wrote:
-> > diff --git a/include/net/mp_dmabuf_devmem.h b/include/net/mp_dmabuf_dev=
-mem.h
-> > new file mode 100644
-> > index 000000000000..6d1cf2a77f6b
-> > --- /dev/null
-> > +++ b/include/net/mp_dmabuf_devmem.h
->
-> this header can live under net/core/ like netmem_priv.h right?
-> devmem internals should be of no interest outside of core networking.
->
+On 9/8/24 10:50 AM, Neal Cardwell wrote:
+> 
+> Since this is targeted to the net branch to fix crashes at least as
+> far back as 5.4, AFAICT it would be good to have a Fixes: footer, so
+> maintainers know how far back in stable release history to apply the
+> fix.
+> 
+> I'd suggest pointing to this linux/v4.13 commit:
+> 
+> Fixes: e1a10ef7fa87 ("tcp: introduce tcp_rto_delta_us() helper for
+> xmit timer fix")
+> 
+> The bug actually predates that commit (the code before that already
+> assumed tcp_write_queue_head() was non-NULL in tcp_rearm_rto() if
+> packets_out is non-zero). But that commit is the first point at which
+> tcp_rto_delta_us() exists as a function and so it's straightforward to
+> apply the patch (albeit with some conflicts in earlier kernels). And
+> that commit is far enough back to imply that the fix should be
+> backported to all "longterm" releases listed at
 
-Yes, those can be moved under net/core trivially. done.
+Thanks Neal. I'll add this fixes tag.
 
-> In fact the same is true for include/net/devmem.h ?
->
+> 
+> IMHO it would be nice to have the WARN_ONCE print more information, to
+> help debug these cases. This seems like some sort of packet counting
+> bug, so IMHO it would be nice to have more information about packet
+> counts and MTU/MSS (since MTU/MSS changes force recalculation of
+> packet counts for skbs and the scoreboard, and have thus been a
+> traditional source of packet-counting bugs). Perhaps something like
+> the following (compiled but not tested):
+> 
+> +               WARN_ONCE(1,
+> +                         "rtx queue empty: "
+> +                         "out:%u sacked:%u lost:%u retrans:%u "
+> +                         "tlp_high_seq:%u sk_state:%u ca_state:%u "
+> +                         "advmss:%u mss_cache:%u pmtu:%u\n",
+> +                         tcp_sk(sk)->packets_out, tcp_sk(sk)->sacked_out,
+> +                         tcp_sk(sk)->lost_out, tcp_sk(sk)->retrans_out,
+> +                         tcp_sk(sk)->tlp_high_seq, sk->sk_state,
+> +                         inet_csk(sk)->icsk_ca_state,
+> +                         tcp_sk(sk)->advmss, tcp_sk(sk)->mss_cache,
+> +                         inet_csk(sk)->icsk_pmtu_cookie);
+> 
 
-This turned out to be possible, but with a minor moving around of some
-helpers. Basically netmem.h included devmem.h to get access to some
-devmem internals for some of the net_iov helpers specific to devmem.
-Moving these helpers to devmem.h enabled me to keep
-include/net/netmem.h but put devmem.h under net/core. Now netmem.h
-doesn't need to include devmem.h. I think this is an improvement.
+Makes sense. I agree more info to help debug is better. I'll review the 
+suggested additions and spin a v3.
 
-> > +static inline netmem_ref mp_dmabuf_devmem_alloc_netmems(struct page_po=
-ol *pool,
-> > +                                                     gfp_t gfp)
->
-> Please break the lines after the return type if the line gets long:
->
-> static inline netmem_ref
-> mp_dmabuf_devmem_alloc_netmems(struct page_pool *pool, gfp_t gfp)
->
-> Please fix where you can (at least where it cases going over 80 chars)
->
-
-FWIW I use a formatting tool (clang-format) which seems to prefer
-breaking in between the args, but I'll fix this manually and wherever
-else I notice.
-
-> >       struct_group_tagged(page_pool_params_slow, slow,
-> >               struct net_device *netdev;
-> > +             struct netdev_rx_queue *queue;
->
-> Why set a pointer? It should work but drivers don't usually deal with
-> netdev_rx_queue struct directly. struct xdp_rxq_info takes an integer
-> queue id, and it serves a somewhat similar function.
->
-> Keep in mind that there will be more drivers than core code, so
-> convenience for them matters more.
->
-
-Makes sense.
-
-> > +bool mp_dmabuf_devmem_release_page(struct page_pool *pool, netmem_ref =
-netmem)
-> > +{
-> > +     if (WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
-> > +             return false;
-> > +
-> > +     if (WARN_ON_ONCE(atomic_long_read(netmem_get_pp_ref_count_ref(net=
-mem)) !=3D
-> > +                  1))
->
-> something needs factoring out here, to make this line shorter, please..
-> either netmem -> net_iov conversion or at least reading of the ref
-> count?
->
-
-Ah, sorry I think you pointed this out earlier and I missed applying
-it. Should be done in the next iteration.
-
---
-Thanks,
-Mina
+Thanks!
+Josh
 
