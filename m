@@ -1,130 +1,132 @@
-Return-Path: <netdev+bounces-126737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 579DF9725C7
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 01:39:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6006D9725C8
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 01:40:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BB80B2382E
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 23:39:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 014E31F246F8
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 23:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 037BF18E026;
-	Mon,  9 Sep 2024 23:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9855218E340;
+	Mon,  9 Sep 2024 23:40:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KdRgHC7s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1wAyl1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF8318DF84
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 23:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F2318E04D;
+	Mon,  9 Sep 2024 23:40:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725925173; cv=none; b=Bm6qFoDRs4ATCqHIUmV7pqpJ/MmU5vTu+4cVpYyNoV1vhTmt0JFUKlGiGDvXRHg9LYRCf3QSe8yA4xrdEEnbr3UECbN8PKxdm/X2h4vSGsXjNe2ZMJ0C4GQyOOJ1J+nQESIr6phWxV+q4pWHgq/4lzqndQcqtEMxy0UMWl3NQPU=
+	t=1725925241; cv=none; b=ahpCfajN23IiQOtXZpNaoGHxDqoJ0WWTBPSajDH0qDC4MWlmn0p5hzdvh/e94zJyTRnKtRPG7KEmKJ/pou3fsSj5oZsKZ9/5OzANVw4YznbR78QeYXJMEYx8gNdEvsOUx8blcOfB4m6kpyjxbYn8cE0pyZHibhLN/I6K4ytihaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725925173; c=relaxed/simple;
-	bh=PQLBfaJ6VfhqQVfivocwR49ZIcXL6vLfqHzKJFDT6Qs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Tqo/ZC22bMujAkWnbUc6kW+YHaHQXW7zaQ8piJsKtU5TZ6aNsuCCWnkGfUdUUlR1zx8dqzV6wxwQ0Y97QQ1AGaypiErERGK9E1K7Q0/X04TaN2L67rKRv3qne1cxBZdh1bCGaNlY6IABEt6WZlOXB4FT+FMGe7TMCwvPxl51Mh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KdRgHC7s; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--justinstitt.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e163641feb9so17311173276.0
-        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 16:39:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725925171; x=1726529971; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ms7NkphysWb1XqAgP2bRvWMv1On1IfYc/URB5THYi9Q=;
-        b=KdRgHC7sRzsSHHXYc0uOw1zm+6jIW71xFZva5PX+7RETONn69LfmXRlTclTVMLyRBJ
-         jmh2HGVJi1efhS5ElwyihX2NmiXBe9dqoxAaw6J9ZrzBuWTKqZ4+QecCiL/72jCLcL4P
-         /2+DhKCV0fT3LtUHP4+7/cy2KhAibaTu+tTQoQ9s3qPW11EsYeIxetWwW5p1eiYiCi2P
-         A7fuFvQRLn5EbzsXeM73r4/52ZRwoxoF25kkD1PGoCRWrDmz9d7BbWceuYXmMjXKcZ/N
-         sr6Q55cWvFTZZNm0vXMen4tKAEUggYo/iheM7XQUvKfw2mM8b8DYeGGuHyyIOJa8vqca
-         5eew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725925171; x=1726529971;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ms7NkphysWb1XqAgP2bRvWMv1On1IfYc/URB5THYi9Q=;
-        b=KPhoM2sNy7ffsFCJsGvDgDpmW0VVwtX0KKaUz7KjTw6Hv4QABVzJUfMLIurjZpbR3b
-         T2sHc28YccV3Nfqodl4edK8L+p80hdz8FMCqgwQKoq2uDhztK61dEDt4g9ZjC75pBc1Y
-         2K7lSTwSui5J4/OtlElKpC1/np8JfhEJDK+hzAi2las1R3u+3nD7VQ+ZSHSVqgALQlD0
-         FgwShmmmQ5OctzjlVNnS0FYq2s8skR0YdbPMbI8avOhHDg6pK0jZP/SMZDTaC4o4Oy4s
-         BpWNL0OXawrZfE4B2WcrrQhCArqqi/SHDqZiQWrl2u/8TcxRPlvFYRU6M5afycQh0npC
-         uTWw==
-X-Gm-Message-State: AOJu0YzBVJkv69thWokDD/vSu+i/NEtdZqD86qp4N5ISo/W1GPlm0AFJ
-	kqsh/C5QuMgAQIBeSmhnvhNSnGLPbrKpnD44GA7VMEvVMb7XW+UkkP2XJmqDVHMXt7XwZKLsh+W
-	kddOfKI17cq7qTTUND7xcjg==
-X-Google-Smtp-Source: AGHT+IFeJvFfGmEm3L6gG+UXB55ikrMM9paT8mMXAGtca+E8au4Qr3p8AYpiR9HeYmJmxEHX4AfoaN9wfDAzTDbEOQ==
-X-Received: from jstitt-linux1.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:23b5])
- (user=justinstitt job=sendgmr) by 2002:a25:d894:0:b0:e1a:a114:d35 with SMTP
- id 3f1490d57ef6-e1d7a2b7c4dmr14578276.5.1725925170783; Mon, 09 Sep 2024
- 16:39:30 -0700 (PDT)
-Date: Mon, 09 Sep 2024 16:39:28 -0700
+	s=arc-20240116; t=1725925241; c=relaxed/simple;
+	bh=2sTjUnFofjfZlvBUULpDgFPX9npiogf+j1pF5+840/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XLXpMYKL6OOU6BvRtx51eKvYnCND9QnpwCFdF5qU2MriRmhMcs5kYDnHs7/l8Ev0ifA6p67dX9PRYoZqYkQvzaiWRWYmLy2wuAfLoO1PWVZKZekP2JJ3Uvm7vyM1NQB7yPaqTt9k1iIEQIBXRk3MKCnufnm01362+ayfV0Z5wWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1wAyl1n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B6D5C4CEC6;
+	Mon,  9 Sep 2024 23:40:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725925241;
+	bh=2sTjUnFofjfZlvBUULpDgFPX9npiogf+j1pF5+840/I=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Y1wAyl1nGTQKf7ly0O4kiJmi20BO05XSRaSRlgITTzYiM0B8VOrSe4VbewqI9hghE
+	 nQD3fnpSK5twb0FlUlkNrD2jolC8WdEshelU8Wdmb+qPyvY5c5PP1hgVRLYJzPJIWL
+	 14UULXan6dLZnZqzCkYpNgVcf+uBj+UbhCWZ0bhYMqVUDu97CtOG0ry5ORmyORwQGT
+	 T0lf5B+OXOTba67BKXZS+L0w+dg+YFNLIlzveKIvMQfUWGy8jt/PB1WB5pzNm91O2u
+	 rd3xNXxxTfLbkhWEw1jy9BcBIWrQQru6g1SgMpYdrPoGLehkRQWhQTMmRGbOyo4ceL
+	 /wObdUydWU4uA==
+Date: Mon, 9 Sep 2024 16:40:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
+ sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
+ sridhar.samudrala@intel.com, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ linux-doc@vger.kernel.org (open list:DOCUMENTATION),
+ linux-kernel@vger.kernel.org (open list)
+Subject: Re: [RFC net-next v2 1/9] net: napi: Add napi_storage
+Message-ID: <20240909164039.501dd626@kernel.org>
+In-Reply-To: <20240908160702.56618-2-jdamato@fastly.com>
+References: <20240908160702.56618-1-jdamato@fastly.com>
+	<20240908160702.56618-2-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-B4-Tracking: v=1; b=H4sIAC+H32YC/x3M0QpAMBQA0F/RfXZrZDS/ImnNHbd0aZNo+XfL4
- 3k5CSIFpgh9kSDQxZF3yajKAtxqZSHkORtqVTfKKIPxDOKOB4VOdJY9ulW26RdarTQZrak1HeT hCOT5/vdhfN8PrrRT3G0AAAA=
-X-Developer-Key: i=justinstitt@google.com; a=ed25519; pk=tC3hNkJQTpNX/gLKxTNQKDmiQl6QjBNCGKJINqAdJsE=
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1725925169; l=1408;
- i=justinstitt@google.com; s=20230717; h=from:subject:message-id;
- bh=PQLBfaJ6VfhqQVfivocwR49ZIcXL6vLfqHzKJFDT6Qs=; b=vqJ9gCWlVHewr8Uf9LyHuMycjoC6BQjS2mmtSMhyxfPBVlpzc7s9GTyMPchFiosbexFwL4igw
- PQ9nXS/jyRSC4gREH5fZ8Mu8AISzJ4FvsVRvP4AnY2vcxo4/KmSX4qH
-X-Mailer: b4 0.12.3
-Message-ID: <20240909-strncpy-net-caif-chnl_net-c-v1-1-438eb870c155@google.com>
-Subject: [PATCH] caif: replace deprecated strncpy with strscpy_pad
-From: Justin Stitt <justinstitt@google.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>, 
-	Kees Cook <kees@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-strncpy() is deprecated for use on NUL-terminated destination strings [1] and
-as such we should prefer more robust and less ambiguous string interfaces.
+On Sun,  8 Sep 2024 16:06:35 +0000 Joe Damato wrote:
+> Add a persistent NAPI storage area for NAPI configuration to the core.
+> Drivers opt-in to setting the storage for a NAPI by passing an index
+> when calling netif_napi_add_storage.
+> 
+> napi_storage is allocated in alloc_netdev_mqs, freed in free_netdev
+> (after the NAPIs are deleted), and set to 0 when napi_enable is called.
 
-Towards the goal of [2], replace strncpy() with an alternative that
-guarantees NUL-termination and NUL-padding for the destination buffer.
+>  enum {
+> @@ -2009,6 +2019,9 @@ enum netdev_reg_state {
+>   *	@dpll_pin: Pointer to the SyncE source pin of a DPLL subsystem,
+>   *		   where the clock is recovered.
+>   *
+> + *	@napi_storage: An array of napi_storage structures containing per-NAPI
+> + *		       settings.
 
-Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-Link: https://github.com/KSPP/linux/issues/90 [2]
-Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en.html
-Cc: Kees Cook <keescook@chromium.org>
-Cc: linux-hardening@vger.kernel.org
-Signed-off-by: Justin Stitt <justinstitt@google.com>
----
-Note: build-tested only.
----
- net/caif/chnl_net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+FWIW you can use inline kdoc, with the size of the struct it's easier
+to find it. Also this doesn't need to be accessed from fastpath so you
+can move it down.
 
-diff --git a/net/caif/chnl_net.c b/net/caif/chnl_net.c
-index 47901bd4def1..ff37dceefa26 100644
---- a/net/caif/chnl_net.c
-+++ b/net/caif/chnl_net.c
-@@ -347,7 +347,7 @@ static int chnl_net_init(struct net_device *dev)
- 	struct chnl_net *priv;
- 	ASSERT_RTNL();
- 	priv = netdev_priv(dev);
--	strncpy(priv->name, dev->name, sizeof(priv->name));
-+	strscpy_pad(priv->name, dev->name);
- 	INIT_LIST_HEAD(&priv->list_field);
- 	return 0;
- }
+> +/**
+> + * netif_napi_add_storage - initialize a NAPI context and set storage area
+> + * @dev: network device
+> + * @napi: NAPI context
+> + * @poll: polling function
+> + * @weight: the poll weight of this NAPI
+> + * @index: the NAPI index
+> + */
+> +static inline void
+> +netif_napi_add_storage(struct net_device *dev, struct napi_struct *napi,
+> +		       int (*poll)(struct napi_struct *, int), int weight,
+> +		       int index)
+> +{
+> +	napi->index = index;
+> +	napi->napi_storage = &dev->napi_storage[index];
+> +	netif_napi_add_weight(dev, napi, poll, weight);
 
----
-base-commit: bc83b4d1f08695e85e85d36f7b803da58010161d
-change-id: 20240909-strncpy-net-caif-chnl_net-c-a505e955e697
+You can drop the weight param, just pass NAPI_POLL_WEIGHT.
 
-Best regards,
---
-Justin Stitt <justinstitt@google.com>
+Then -- change netif_napi_add_weight() to prevent if from
+calling napi_hash_add() if it has index >= 0
 
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 22c3f14d9287..ca90e8cab121 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -6719,6 +6719,9 @@ void napi_enable(struct napi_struct *n)
+>  		if (n->dev->threaded && n->thread)
+>  			new |= NAPIF_STATE_THREADED;
+>  	} while (!try_cmpxchg(&n->state, &val, new));
+> +
+> +	if (n->napi_storage)
+> +		memset(n->napi_storage, 0, sizeof(*n->napi_storage));
+
+And here inherit the settings and the NAPI ID from storage, then call
+napi_hash_add(). napi_hash_add() will need a minor diff to use the
+existing ID if already assigned.
+
+And the inverse of that has to happen in napi_disable() (unhash, save
+settings to storage), and __netif_napi_del() (don't unhash if it has
+index).
+
+I think that should work?
 
