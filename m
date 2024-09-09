@@ -1,136 +1,122 @@
-Return-Path: <netdev+bounces-126449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E1389712D5
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:03:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6936A9712E2
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D1942854C4
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:03:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26591281633
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62D11B29D3;
-	Mon,  9 Sep 2024 09:02:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F271B29C7;
+	Mon,  9 Sep 2024 09:04:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b="UCKyBw0t"
+	dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b="gaAmFmo0"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward501a.mail.yandex.net (forward501a.mail.yandex.net [178.154.239.81])
+Received: from ci74p00im-qukt09090102.me.com (ci74p00im-qukt09090102.me.com [17.57.156.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF90113635E;
-	Mon,  9 Sep 2024 09:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D380C1B141B
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 09:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.156.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725872578; cv=none; b=fJVTyCkrH6fYJ62XW84FrVUmYMZ6ULZAbuKimWs3DTqrLaAaHN2yigN8C5q98ro35Z6QEhGV/niB+vHBwF2J7ld7noABvguVcmje9ETtydI+bY4929K5AKMhwXwXq8VhmJxKc+CDMvzoWO837qVbQwtDLo9J0IrOhlgUfDeidbk=
+	t=1725872653; cv=none; b=X/Pn7dbwAoReIp3z4r5bZNKHdUw16PbKQzMCJpjywlzU8AUwiDpQmmPOUU91tU9Bl91WNiDL/EYaujGbyO0DacCpowQ87uWXGo1ipIx018hok+E1GS7w32IZkwBbvB5AU5qHGFl17MgZxzE8dlomkIf48ClQJMjxbQLeqbz1fV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725872578; c=relaxed/simple;
-	bh=Qut1EyCSXF5XKk8lrf1jldw5ylJErkj1/nQaI3URoaw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eoPfp7uIqQ6qTYo/9DP+LVLc75HHL+IXQ1bVe/76iO2k/R+8uI/cht9VYFVEOOtDni+JkNqsKmxi7rTlGKbBSkdI76+q6tSIaaCnuVmqUXlGxuNbJ6mh2A1HR5HRHHkkQtjoMrvWEw2JTZhw9htM2CCyWciwJdVn8x+SqS023Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me; spf=pass smtp.mailfrom=maquefel.me; dkim=pass (1024-bit key) header.d=maquefel.me header.i=@maquefel.me header.b=UCKyBw0t; arc=none smtp.client-ip=178.154.239.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=maquefel.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=maquefel.me
-Received: from mail-nwsmtp-smtp-production-main-49.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-49.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1f:5e9c:0:640:b3f4:0])
-	by forward501a.mail.yandex.net (Yandex) with ESMTPS id 36D27613B6;
-	Mon,  9 Sep 2024 12:02:44 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-49.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id a2dHS5JKaSw0-Uuowlycf;
-	Mon, 09 Sep 2024 12:02:42 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=maquefel.me; s=mail;
-	t=1725872562; bh=Qut1EyCSXF5XKk8lrf1jldw5ylJErkj1/nQaI3URoaw=;
-	h=References:Date:In-Reply-To:Cc:To:From:Subject:Message-ID;
-	b=UCKyBw0t6OLNpveKLHRyVdH4SZAFS1aM3i5JVQ8KQ5rIHiHlKcQKgkqrfFC6c8Kek
-	 R9zZ3ZAROjskp9kB0OrvKFjT8aa1lyzn42GuLR0RT8850GDMyebxN0ZKhcvu8dixES
-	 a/SqIJj456K3YYiyyxC8j7ouVj9XUUEG0040u5qg=
-Authentication-Results: mail-nwsmtp-smtp-production-main-49.vla.yp-c.yandex.net; dkim=pass header.i=@maquefel.me
-Message-ID: <0e3902c9a42b05b0227e767b227624c6fe8fd2bb.camel@maquefel.me>
-Subject: Re: [PATCH v12 00/38] ep93xx device tree conversion
-From: Nikita Shubin <nikita.shubin@maquefel.me>
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Hartley Sweeten
- <hsweeten@visionengravers.com>, Alexander Sverdlin
- <alexander.sverdlin@gmail.com>, Russell King <linux@armlinux.org.uk>,
- Lukasz Majewski <lukma@denx.de>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Sebastian Reichel <sre@kernel.org>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
- Vinod Koul <vkoul@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>,
- Guenter Roeck <linux@roeck-us.net>, Thierry Reding
- <thierry.reding@gmail.com>, Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
- <u.kleine-koenig@pengutronix.de>, Mark Brown <broonie@kernel.org>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Miquel Raynal
- <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, Vignesh
- Raghavendra <vigneshr@ti.com>, Damien Le Moal <dlemoal@kernel.org>, Sergey
- Shtylyov <s.shtylyov@omp.ru>, Dmitry Torokhov <dmitry.torokhov@gmail.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, Ralf Baechle <ralf@linux-mips.org>,  "Wu,
- Aaron" <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, Olof Johansson
- <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- linux-gpio@vger.kernel.org, linux-clk@vger.kernel.org,
- linux-pm@vger.kernel.org,  devicetree@vger.kernel.org,
- dmaengine@vger.kernel.org,  linux-watchdog@vger.kernel.org,
- linux-pwm@vger.kernel.org,  linux-spi@vger.kernel.org,
- netdev@vger.kernel.org, linux-mtd@lists.infradead.org, 
- linux-ide@vger.kernel.org, linux-input@vger.kernel.org, 
- linux-sound@vger.kernel.org, Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>,  Krzysztof Kozlowski
- <krzysztof.kozlowski@linaro.org>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>
-Date: Mon, 09 Sep 2024 12:02:37 +0300
-In-Reply-To: <CAHp75Veusv=f6Xf9-gL3ctoO5Njn7wiWMw-aMN45KbZ=YB=mQw@mail.gmail.com>
-References: <20240909-ep93xx-v12-0-e86ab2423d4b@maquefel.me>
-	 <CAHp75Veusv=f6Xf9-gL3ctoO5Njn7wiWMw-aMN45KbZ=YB=mQw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 
+	s=arc-20240116; t=1725872653; c=relaxed/simple;
+	bh=HuAzle0O7gPg0QJV7m8XVn3tTr3qju6NtHIJRuZAFHw=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=hfsD8nH2AFTExDKI9+/KmWziXZPcqOEjEwVL7o9HrqkpCK9Ely5KZIc11Ob6lTuJ50nuEVrF1gZbCUBIkJhizBJRIFs8uz313JWJAUF4uYy2megSmKxcMtRFbdTsfhfB8dgMjuj+3OGmkyOZ2t/biUOkKYJDZ2lEYDrb/6LyOsg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy; spf=pass smtp.mailfrom=pen.gy; dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b=gaAmFmo0; arc=none smtp.client-ip=17.57.156.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pen.gy
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pen.gy; s=sig1;
+	t=1725872650; bh=0N+YcGX5JKTj2RFBVjEnYi3cAnTw2iTZC8ytorLbQmY=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type;
+	b=gaAmFmo0PsERLGDN5hRdyGOw6SwzbNEMcf75EP2rgjpVBTKNMfnHHb1wye+tQozaN
+	 AtaqR7MQTb7LpzOHk91QmroYD6syooqtxZwByDlt6kprxR43p0DsVA0Jgm+cMzOSL9
+	 NDyTApyt6hDEMzy2WPPHSgADdxpGmBQk4czj7ttCfDspcM+1dhC0bplvhpEEgFsHlY
+	 pCj1SR+eg789+6FPDTctnzJQg1FhXlCcTRo7XwZ8gvummDW1XjSXodEIdJfpNdz5mm
+	 CuSrHO/3w6Prcd39gzmIsj6tmZPFTTnGNSRnmsQvYPNgmJzOzEcn0oEE8F5whgpgoO
+	 /XWKWxSoTIsRA==
+Received: from [192.168.40.3] (ci77p00im-dlb-asmtp-mailmevip.me.com [17.57.156.26])
+	by ci74p00im-qukt09090102.me.com (Postfix) with ESMTPSA id 638CA3C001C2;
+	Mon,  9 Sep 2024 09:04:08 +0000 (UTC)
+Message-ID: <4be673c9-b06a-4c2d-8b27-a1e91150df94@pen.gy>
+Date: Mon, 9 Sep 2024 11:04:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+To: Oliver Neukum <oneukum@suse.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Georgi Valkov <gvalkov@gmail.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org
+References: <20240907230108.978355-1-forst@pen.gy>
+ <mJ-iCj-W_ES_nck94l7PueyUQpXxmgDdxq78OHP889JitvF0zcid_IBg1HhgEDh-YKlYjtmXt-xwqrZRDACrJA==@protonmail.internalid>
+ <8510a98e-f950-4349-99bc-9d36febe94d3@suse.com>
+Content-Language: en-GB
+From: Foster Snowhill <forst@pen.gy>
+Autocrypt: addr=forst@pen.gy; keydata=
+ xjMEYB86GRYJKwYBBAHaRw8BAQdAx9dMHkOUP+X9nop8IPJ1RNiEzf20Tw4HQCV4bFSITB7N
+ G2ZvcnN0QHBlbi5neSA8Zm9yc3RAcGVuLmd5PsKPBBAWCgAgBQJgHzoZBgsJBwgDAgQVCAoC
+ BBYCAQACGQECGwMCHgEAIQkQfZTG0T8MQtgWIQTYzKaDAhzR7WvpGD59lMbRPwxC2EQWAP9M
+ XyO82yS1VO/DWKLlwOH4I87JE1wyUoNuYSLdATuWvwD8DRbeVIaCiSPZtnwDKmqMLC5sAddw
+ 1kDc4FtMJ5R88w7OOARgHzoZEgorBgEEAZdVAQUBAQdARX7DpC/YwQVQLTUGBaN0QuMwx9/W
+ 0WFYWmLGrrm6CioDAQgHwngEGBYIAAkFAmAfOhkCGwwAIQkQfZTG0T8MQtgWIQTYzKaDAhzR
+ 7WvpGD59lMbRPwxC2BqxAQDWMSnhYyJTji9Twic7n+vnady9mQIy3hdB8Dy1yDj0MgEA0DZf
+ OsjaMQ1hmGPmss4e3lOGsmfmJ49io6ornUzJTQ0=
+Subject: Re: [PATCH net-next] usbnet: ipheth: prevent OoB reads of NDP16
+In-Reply-To: <8510a98e-f950-4349-99bc-9d36febe94d3@suse.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: Umu5cJ4NhBlO-Xdz4YTs_es9mDh_faV8
+X-Proofpoint-GUID: Umu5cJ4NhBlO-Xdz4YTs_es9mDh_faV8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-09_02,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxlogscore=296
+ suspectscore=0 mlxscore=0 phishscore=0 malwarescore=0 adultscore=0
+ clxscore=1030 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2409090071
 
-Hi Andy!
+Hello Oliver,
 
-On Mon, 2024-09-09 at 11:49 +0300, Andy Shevchenko wrote:
-> On Mon, Sep 9, 2024 at 11:12=E2=80=AFAM Nikita Shubin via B4 Relay
-> <devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
-> >=20
-> > The goal is to recieve ACKs for all patches in series to merge it
-> > via Arnd branch.
-> >=20
-> > It was decided from the very beginning of these series, mostly
-> > because
-> > it's a full conversion of platform code to DT and it seemed not
-> > convenient to maintain compatibility with both platform and DT.
-> >=20
-> > Following patches require attention from Stephen Boyd or clk
-> > subsystem:
->=20
-> Does it mean you still have a few patches without tags?
-> What are their respective numbers?
+Thank you for the feedback.
 
-The clk is the last one as i think, all others can be ACKed by
-Alexander or by Arnd himself.
+>> To address the above issues without reimplementing more of CDC NCM,
+>> rely on and check for a specific fixed format of incoming URBs
+>> expected from an iOS device:
+>>
+>> * 12-byte NTH16
+>> * 96-byte NDP16, allowing up to 22 DPEs (up to 21 datagrams + trailer)
+> 
+> I am afraid this is an approach we must not take. We cannot rely on
+> a specific device's behavior in a class driver.
+> 
+> This is a NACK.
 
->=20
-> > - clk: ep93xx: add DT support for Cirrus EP93xx:
-> > =C2=A0 - tristate
-> > =C2=A0 - drop MFD_SYSCON/REGMAP
-> > =C2=A0 - add AUXILIARY_BUS/REGMAP_MMIO
-> > =C2=A0 - prefixed all static with ep9xx_
-> > =C2=A0 - s/clk_hw_register_ddiv()/ep93xx_clk_register_ddiv()/
-> > =C2=A0 - s/clk_register_div()/ep93xx_clk_register_div()/
-> > =C2=A0 - dropped devm_ep93xx_clk_hw_register_fixed_rate_parent_data
-> > macro
-> > =C2=A0 -
-> > s/devm_ep93xx_clk_hw_register_fixed_rate_parent_data()/devm_clk_hw_
-> > register_fixed_rate_parent_data()/
->=20
+The `ipheth` driver, that the patch is for, is designed specifically for
+interacting with iPhones. iPhones' "NCM" implementation for regular
+tethering (sharing mobile/cellular internet with an attached Linux system)
+is _not_ compliant with the CDC NCM spec:
+
+* Does not have the required CDC NCM descriptors
+* TX (computer->phone) is not NCM-encapsulated at all
+
+Thus the `ipheth` driver does not aim to be a CDC NCM-compliant
+implementation and, in fact, can't be one because of the points above.
+
+For a complete spec-compliant CDC NCM implementation, there is already
+the `cdc_ncm` driver. This driver is used for reverse tethering (sharing
+computer's internet connection with an attached phone) on iPhones. This
+patch does not in any way change `cdc_ncm`.
+
+With all of the above, does your NACK still stand? Thanks!
 
 
