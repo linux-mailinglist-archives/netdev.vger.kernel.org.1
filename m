@@ -1,82 +1,110 @@
-Return-Path: <netdev+bounces-126739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2CCE9725DB
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 01:51:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CC4E9725DF
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 01:52:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C3A61F247D3
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 23:51:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F4E91C21B08
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 23:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 810D618E744;
-	Mon,  9 Sep 2024 23:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F35318E756;
+	Mon,  9 Sep 2024 23:52:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FskxkQ0p"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dL5NKquB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3B573440;
-	Mon,  9 Sep 2024 23:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3B0818E36E
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 23:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725925878; cv=none; b=snWrTjy+0gSwU+k/E/Th7dwxi4hCBK9rqccLixmL2B4L+iOzXMYcPrzEIZFa3KuhLfrt7rw8f0eQWdil7XDkcKPtoGm433A3vsmgTxxRdbQ/UNXv1n+WQANE0FFmII7Pl5VnaRhqDHxmPyuHw3nYEkWEkEFuPJ2lcbauBCPWWqE=
+	t=1725925938; cv=none; b=g0Dry5uKQ1+piv96fZfzrC8oxkLQeqCq60L1SLO351rnA6HHIGwSMmO2tvohTH72vEXePCX8U2XTNLBCOlp12wef8pjDfe3AxluzNIpbTCz2kZoD0d6W2SHjvJG8YvHm4I+j4rcwLCNlk67DID6LCWkkb2+kmmMpP5Fd4HuV7Ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725925878; c=relaxed/simple;
-	bh=Bf57Tu0bB6pnr8ksPMVcE0ThIaQWCNuSAh6WfkJ6Y/Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OWkKW0Vc/Ojknzhy43PBA5rXDpSvLAjKcV9akvqivCC9GtlYHdkF7+2/FnEP5v2p9o2Iw8nUxprs+uqpu8KgccIDJErbR0oOs5OKSseyjErIUSOhNe8WmVvfhNCTGj5K0OsimHQehp5toIZMUy0OBXsfrzvmL4QGOXtDaNuJ11A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FskxkQ0p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70A19C4CEC5;
-	Mon,  9 Sep 2024 23:51:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725925877;
-	bh=Bf57Tu0bB6pnr8ksPMVcE0ThIaQWCNuSAh6WfkJ6Y/Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FskxkQ0p1S2V4tcdZlRxr5cvGMtaMJbnffRDpvxcFKvx73cW3Cb6BJBUbC21dvcmM
-	 hAH1azZpCXC9GKL9aFbgV1Hh0AML+cc8SsRL94LY36lWfjOwOyKMUXghhVjzG/Yb/P
-	 EtqSSWb4TmSqezEi2lrUJVMVKjTjta6JNriC3AYWfzcdOgB2ei8jVUj+OCa2zZKNan
-	 hhD3K6mA6y6d+PRt1xsStxzgDtgLT00s52OZ68OXpJLDBtZ1S7Xdc1myoPCibkOICH
-	 oS7BvU48iF8ADZrBWQzGQ7IT5qEVCXOeM5CJ8DA4vz/NHdGBclxfir2bs+KjbrKylc
-	 7stIeLFHf7pJQ==
-Date: Mon, 9 Sep 2024 16:51:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, Sean Anderson
- <sean.anderson@linux.dev>, "David S . Miller" <davem@davemloft.net>, Paolo
- Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, Willem de Bruijn
- <willemb@google.com>, linux-kernel@vger.kernel.org, Shuah Khan
- <shuah@kernel.org>, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: net: csum: Fix checksums for packets
- with non-zero padding
-Message-ID: <20240909165116.1bdb4757@kernel.org>
-In-Reply-To: <66df2fd2d6595_3bff929459@willemb.c.googlers.com.notmuch>
-References: <20240906210743.627413-1-sean.anderson@linux.dev>
-	<66dbb4fcbf560_2af86229423@willemb.c.googlers.com.notmuch>
-	<9d5bf385-2ef0-435d-b6f9-1de55533653b@linux.dev>
-	<CANn89iJaXgR6c+moGB5kX6ATbLX6fMP0mUBQN=SAsZfdz5ywNw@mail.gmail.com>
-	<66df2fd2d6595_3bff929459@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1725925938; c=relaxed/simple;
+	bh=1ls8W5dPlE0ywGOoL1WQCsY2c+ZafzfUJbikDbgkjaM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HeKwPQNPoXW57cIEwPjWKStAuhDuZLTlOWGs1xbK2CmEQRzIWyepMaJP6mpAQOKShA8Tk+k1isw5I6Pzz+T37IC9H7gT+BaLs+CTmX5qyulxLH7Qq2rUphdltm2xv10lccrcURKJqU4kMK25vZG4xE0igQb4glXqka31F8SQwDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dL5NKquB; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725925933;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XoY8HneQkhH5ZjxPqOoPttw1x0WMnLjBkxmjs118fsc=;
+	b=dL5NKquBh3unx+vlb2FBfSby+vLEx+lrcUjNjJ2sPnLnSsAZwdFVJPL03X/J/re7lJL+XK
+	LhrVWnZ02Xj4EuZgo6LwPvlIv9EkMkIJBIXKU3lcdiYxZpkUw/XA50Cw/hUHAZggVgqVh7
+	b7mR8eLnwBi81b///22l4KtDRjM/ufQ=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	netdev@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org,
+	Michal Simek <michal.simek@amd.com>,
+	linux-kernel@vger.kernel.org,
+	Sean Anderson <sean.anderson@linux.dev>,
+	Heng Qi <hengqi@linux.alibaba.com>
+Subject: [RFC PATCH net-next v2 0/6] net: xilinx: axienet: Enable adaptive IRQ coalescing with DIM
+Date: Mon,  9 Sep 2024 19:52:02 -0400
+Message-Id: <20240909235208.1331065-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 09 Sep 2024 13:26:42 -0400 Willem de Bruijn wrote:
-> > This seems to be a bug in the driver.
-> > 
-> > A call to skb_put_padto(skb, ETH_ZLEN) should be added.  
-> 
-> In which case this test detecting it may be nice to have, for lack of
-> a more targeted test.
+To improve performance without sacrificing latency under low load,
+enable DIM. While I appreciate not having to write the library myself, I
+do think there are many unusual aspects to DIM, as detailed in the last
+patch.
 
-IIUC we're basically saying that we don't need to trim because pad
-should be 0? In that case maybe let's keep the patch but add a check 
-on top which scans the pad for non-zero bytes, and print an informative
-warning?
+This series depends on [1-2] and is therefore marked RFC. This series is
+otherwise ready to merge.
+
+[1] https://lore.kernel.org/netdev/20240909230908.1319982-1-sean.anderson@linux.dev/
+[2] https://lore.kernel.org/netdev/20240909231904.1322387-1-sean.anderson@linux.dev/
+
+Changes in v2:
+- Add some symbolic constants for IRQ delay timer
+- Report an error for bad coalesce settings
+- Don't use spin_lock_irqsave when we know the context
+- Split the CR calculation refactor from runtime coalesce settings
+  adjustment support for easier review.
+- Have axienet_update_coalesce_rx/tx take the cr value/mask instead of
+  calculating it with axienet_calc_cr. This will make it easier to add
+  partial updates in the next few commits.
+- Get coalesce parameters from driver state
+- Don't take the RTNL in axienet_rx_dim_work to avoid deadlock. Instead,
+  calculate a partial cr update that axienet_update_coalesce_rx can
+  perform under a spin lock.
+- Use READ/WRITE_ONCE when accessing/modifying rx_irqs
+
+Sean Anderson (6):
+  net: xilinx: axienet: Add some symbolic constants for IRQ delay timer
+  net: xilinx: axienet: Report an error for bad coalesce settings
+  net: xilinx: axienet: Combine CR calculation
+  net: xilinx: axienet: Support adjusting coalesce settings while
+    running
+  net: xilinx: axienet: Get coalesce parameters from driver state
+  net: xilinx: axienet: Enable adaptive IRQ coalescing with DIM
+
+ drivers/net/ethernet/xilinx/Kconfig           |   1 +
+ drivers/net/ethernet/xilinx/xilinx_axienet.h  |  31 +-
+ .../net/ethernet/xilinx/xilinx_axienet_main.c | 320 ++++++++++++++----
+ 3 files changed, 273 insertions(+), 79 deletions(-)
+
+-- 
+2.35.1.1320.gc452695387.dirty
+
 
