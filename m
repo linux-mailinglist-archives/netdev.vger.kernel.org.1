@@ -1,134 +1,160 @@
-Return-Path: <netdev+bounces-126423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449A5971222
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:32:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D763C971233
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:35:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02BE928530A
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:32:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56E30B23E18
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:35:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 315901B1506;
-	Mon,  9 Sep 2024 08:29:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A261B0128;
+	Mon,  9 Sep 2024 08:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K2nKDU2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F19172BCE;
-	Mon,  9 Sep 2024 08:29:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F65515B995
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 08:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725870591; cv=none; b=tujkwzs6IMpew1Dde7TjmqgnpH5orMcqL3UTaMZuASGu4J74LahzyKgty1+QzPBTjpANdMfpMVHWB6FE9rwp2nB+mk4+Rsuet0UU2gRE7Zxb048aGLM+Q8OKdvwCC9klLhMAy3oqNS1HHAHI2B6l33QQ7lCwtYzXZ2VfGaTvkQ0=
+	t=1725870951; cv=none; b=WnyozH5eBCtIuWVHwdwsfeoAgpQIRbE1IYzZoC99v746k2qM8/7938UuINaPHrYvBymv3oi1vmib5SRBRuf366OdeFB9lACBYGPjRd3qnVSqEACq2dLXXGjxiAhADsts805Key/3Pe+dRjrOzXAi90mYPEYPX5L6TzGnZzABUdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725870591; c=relaxed/simple;
-	bh=9iigcWNH9gaJKI9MZsjycWsvetp15GSPT7FV5IM/MZ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Hz0l5dQdx4Q4jT4+Y7wNpyKzscvd6zD8DzR86My432KxS6Hn3NMy0e4RZTYbEa8E9fuB6xEkf+xx5lkPMCsJlqWmHd5q2LEn2oqMTDRLghej5rdIOjdGuukyHVGSud1ZJgqdZjiWDnKrF/q78HFWojByxm2ZXpoyomiLKreZf9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f75428b9f8so22621521fa.3;
-        Mon, 09 Sep 2024 01:29:49 -0700 (PDT)
+	s=arc-20240116; t=1725870951; c=relaxed/simple;
+	bh=i0XW1CrHRvbVasBiVHoRmWk3AE8nSjcz0tGXNmYZObs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G7yqxsyUeFqYezpvB1+jZ7/BIf1SbAL6fqs/JznN14ILJHA6mvbxY14QVnAGSOwsY5L2/ojW+fhCWe1Ig2OckUVL/5I5vPFXu68kG48YMnQepZkoY9rOnYAayKEabut/jqy0DL6tR8LK3YFTySolUv2EYISqfExfrfMCHpqpuA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K2nKDU2H; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725870949;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=r55frpya5Q9eSTrWeeMUpADF5rnli4WFTAfDBHmVzX8=;
+	b=K2nKDU2HZqQOuS7WrfJ8hlYQoOF4mmIfyJfjUh4PjYVucF/qGpxt6PbZiKU5TMzIo2HpLT
+	KErCW8CsBVEdbWeVO0lsA68SBgjL4JiUGv54nyakpQ77C23THK1MwPQ6Ug+/QxDNfKEDrP
+	quHBgzFZCR4cT9/48wZIZncBBVLRJ2Q=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-390-rREmaoHZOQuf0ClAjN7p_A-1; Mon, 09 Sep 2024 04:35:47 -0400
+X-MC-Unique: rREmaoHZOQuf0ClAjN7p_A-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42cb080ab53so11542635e9.0
+        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 01:35:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725870587; x=1726475387;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=stcyakZ4StpZ9LKESQVGGE1UUqCBnyk68kBRqrRncz0=;
-        b=E76vGke4w3NnX72zW8zGDBOAMXMcA6hz6U6wuKQx+Rt8xdPZ/U+QLVAFGvVMTdohfC
-         nUgdFoTczdz5pAIXU6kuFrDHzyUULMb6J7AFW+helB5gq5J8+tHofOCThzAKqDYNiPPl
-         Iq9XvD4sUuFdVGPu7IqxazJh8xXipWrefP3rW8xZEUFrh07Bd4w0meSqEBaGSOf8bB02
-         CfYaWdkXBFjYkOxk5eRgeH5GX8f489hH2PoZ6naw6I/HJu9CEnBMHCV/7ux0xDW/SBQA
-         sHrlYB2ClvLx5/8rb8UGp2XyygyRbN2XPbXT3C3BsTCSJtOTo+vKcpor0PAgvt6e7zuX
-         vpYw==
-X-Forwarded-Encrypted: i=1; AJvYcCU7l+bCToBOSLMqN9uEeCMNRy+DdUrs4o2s1A8Ona2ZbvdUNumhWBylMh6A4+L4r8/Nui0qWj9T@vger.kernel.org, AJvYcCVmJYuJh3RO7CmfgtpPYS6eLhwh+XBZZyglNYt7r3hUKgzvSApbFRMn2wLLurtIer7PC+wb7D+QEy0QyKzfmggt@vger.kernel.org, AJvYcCVyn036F6Fw5EARw2leCrOyC4ZXV5dZkByt4hEZgXUGJE+F4DxUAhjc/PH4tQQAM2c9n3TFLU04GFLVBdw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA6mIkrIT+ZKXGiRnl90HCPGdgFCEzYCZcj5OltncDuqpRfBxH
-	4EuRXZRaR0QjNnlOgl0zx20WtN/gbQ4e3KoT59f3AYM+gBSOwoBB
-X-Google-Smtp-Source: AGHT+IErn9w1GAPNrCT3D/10AYzxY/ljH5DGqmwTeoTRx5ggId14vjDT68YpOY6LfNTH7pX7Uv+GVQ==
-X-Received: by 2002:a05:651c:2126:b0:2f3:e2fd:aae0 with SMTP id 38308e7fff4ca-2f75a96ea93mr65251031fa.6.1725870586452;
-        Mon, 09 Sep 2024 01:29:46 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-113.fbsv.net. [2a03:2880:30ff:71::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25ce96d9sm304750066b.157.2024.09.09.01.29.45
+        d=1e100.net; s=20230601; t=1725870946; x=1726475746;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r55frpya5Q9eSTrWeeMUpADF5rnli4WFTAfDBHmVzX8=;
+        b=vkzXBnVSeaJT9ycrDCoH/zoPMJWfvbTyMX1NFjtExs7kIATYUDa3+BlXRNAqy8JQu/
+         AjskNpgpofee186LCUv+n7VDUCI/dYcX+CEFiZmmuBLmjz6H5NMBnE8HJ+iVAv2iG+pr
+         B3OkYjCEmLnXhPjaArZwx5nLVykjTVs1vwOQ+IYvo+zAbXmbCbPlV8I4u7Ppmsz+Q7Xq
+         aAG3jf+HzShLa2BVlnQPhjYaBr2j7zBb6j6Dc0+1KiH4365zHe0SSrtvUQoDLKwgdpGT
+         TZRQTK0BBHDh6tP0ZYL28yChdzVE2LbmVxq2TitzRizN9C5xzhqNVSXs/ht2qVZC5tI5
+         Cjcg==
+X-Gm-Message-State: AOJu0YyDLod+6oDyyXT3GEbWrKtHiyoief6Qfldi2qeiNEquD5ZZhXsw
+	eZvKs5jvO4/OkzzossG7Yx5TUlQYf48N9WTvr/tk+P6GeK6UFiGFcVFMyTTzotEQumE6WgoU839
+	hiSUsWR11an47cEJ8z6GjFEG7Mwia6itKxlBYduc1R9IwXEFIajeTgwH4jk9pM5roW0BKyhvn4J
+	jdLqQW8i2tTa8fMpTcYl0dhMsp+fIcZzl+EPyXFQ==
+X-Received: by 2002:a05:600c:4f89:b0:42c:b80e:5e50 with SMTP id 5b1f17b1804b1-42cb80e625dmr15718115e9.0.1725870946081;
+        Mon, 09 Sep 2024 01:35:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHdSTE20nhb7hhNFCPnQIYrqDD9HcQvmIL8/38vdFPXxEeqfhw0jEfTmLZ6+2w82+gQOh9rhw==
+X-Received: by 2002:a05:600c:4f89:b0:42c:b80e:5e50 with SMTP id 5b1f17b1804b1-42cb80e625dmr15717875e9.0.1725870945511;
+        Mon, 09 Sep 2024 01:35:45 -0700 (PDT)
+Received: from fedora.brq.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb33a92sm69297725e9.20.2024.09.09.01.35.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2024 01:29:45 -0700 (PDT)
-Date: Mon, 9 Sep 2024 01:29:43 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Jozsef Kadlecsik <kadlec@netfilter.org>,
-	David Ahern <dsahern@kernel.org>, rbc@meta.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	"open list:NETFILTER" <coreteam@netfilter.org>
-Subject: Re: [PATCH nf-next v4 1/2] netfilter: Make IP6_NF_IPTABLES_LEGACY
- selectable
-Message-ID: <20240909-aloof-magnetic-bear-ecd5af@devvm32600>
-References: <20240829161656.832208-1-leitao@debian.org>
- <20240829161656.832208-2-leitao@debian.org>
- <Zto4WmXldf6KzeQO@calendula>
+        Mon, 09 Sep 2024 01:35:45 -0700 (PDT)
+From: Ales Nezbeda <anezbeda@redhat.com>
+To: netdev@vger.kernel.org
+Cc: sdf@fomichev.me,
+	sd@queasysnail.net,
+	davem@davemloft.net,
+	Ales Nezbeda <anezbeda@redhat.com>
+Subject: [PATCH net v2] selftests: rtnetlink: add 'ethtool' as a dependency
+Date: Mon,  9 Sep 2024 10:34:10 +0200
+Message-ID: <20240909083410.60121-1-anezbeda@redhat.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zto4WmXldf6KzeQO@calendula>
+Content-Transfer-Encoding: 8bit
 
-Hello Pablom
+Introduction of `kci_test_macsec_offload()` in `rtnetlink.sh` created
+a new dependency `ethtool` for the test suite. This dependency is not
+reflected in checks that run before all the tests, so if the `ethtool`
+is not present, all tests will start, but `macsec_offload` test will
+fail with a misleading message. Message would say that MACsec offload is
+not supported, yet it never actually managed to check this, since it
+needs the `ethtool` to do so.
 
-On Fri, Sep 06, 2024 at 01:01:46AM +0200, Pablo Neira Ayuso wrote:
-> On Thu, Aug 29, 2024 at 09:16:54AM -0700, Breno Leitao wrote:
-> > This option makes IP6_NF_IPTABLES_LEGACY user selectable, giving
-> > users the option to configure iptables without enabling any other
-> > config.
-> 
-> IUC this is to allow to compile iptables core built-in while allowing
-> extensions to be compiled as module? What is exactly the combination
-> you are trying to achieve which is not possible with the current
-> toggle?
+Use `require_command` in `rtnetlink.sh` to allow single check command
+for all the dependencies. This also requires adding the `require_command`
+to the `lib.sh` used by the test.
 
-Correct. iptable core is built-in, and any extension is a module.
+Fixes: 3b5222e2ac57 ("selftests: rtnetlink: add MACsec offload tests")
+Signed-off-by: Ales Nezbeda <anezbeda@redhat.com>
+---
+v2
+  - Add `require_command` to the `lib.sh` and use that instead
+  - v1 ref: https://lore.kernel.org/netdev/20240903151524.586614-1-anezbeda@redhat.com
+---
+ tools/testing/selftests/net/lib.sh       | 13 +++++++++++++
+ tools/testing/selftests/net/rtnetlink.sh |  9 +++------
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
-> Florian's motivation to add this knob is to allow to compile kernels
-> without iptables-legacy support.
+diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
+index 8ee4489238ca..890c579674be 100644
+--- a/tools/testing/selftests/net/lib.sh
++++ b/tools/testing/selftests/net/lib.sh
+@@ -218,3 +218,16 @@ tc_rule_handle_stats_get()
+ 	    | jq ".[] | select(.options.handle == $handle) | \
+ 		  .options.actions[0].stats$selector"
+ }
++
++##############################################################################
++# Sanity checks
++
++require_command()
++{
++	local cmd=$1; shift
++
++	if [[ ! -x "$(command -v "$cmd")" ]]; then
++		echo "SKIP: $cmd not installed"
++		exit $ksft_skip
++	fi
++}
+\ No newline at end of file
+diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selftests/net/rtnetlink.sh
+index bdf6f10d0558..4a9ffd06990b 100755
+--- a/tools/testing/selftests/net/rtnetlink.sh
++++ b/tools/testing/selftests/net/rtnetlink.sh
+@@ -1306,12 +1306,9 @@ if [ "$(id -u)" -ne 0 ];then
+ 	exit $ksft_skip
+ fi
+ 
+-for x in ip tc;do
+-	$x -Version 2>/dev/null >/dev/null
+-	if [ $? -ne 0 ];then
+-		end_test "SKIP: Could not run test without the $x tool"
+-		exit $ksft_skip
+-	fi
++#check for dependencies
++for x in ip tc ethtool;do
++	require_command $x
+ done
+ 
+ while getopts t:hvpP o; do
+-- 
+2.46.0
 
-Correct, and this continue to be an option. This change only introduces
-you the option to set the core as built-in or module, independent of the
-extensions.
-
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > ---
-> >  net/ipv6/netfilter/Kconfig | 8 +++++++-
-> >  1 file changed, 7 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/ipv6/netfilter/Kconfig b/net/ipv6/netfilter/Kconfig
-> > index f3c8e2d918e1..cbe88cc5b897 100644
-> > --- a/net/ipv6/netfilter/Kconfig
-> > +++ b/net/ipv6/netfilter/Kconfig
-> > @@ -8,7 +8,13 @@ menu "IPv6: Netfilter Configuration"
-> >  
-> >  # old sockopt interface and eval loop
-> >  config IP6_NF_IPTABLES_LEGACY
-> > -	tristate
-> > +	tristate "Legacy IP6 tables support"
-> > +	depends on INET && IPV6
-> > +	select NETFILTER_XTABLES
-> > +	default n
-> > +	help
-> > +	  ip6tables is a general, extensible packet identification legacy framework.
-> 
-> "packet classification" is generally the more appropriate and widely
-> used term for firewalls.
-> 
-> Maybe simply reword this description to ...
-> 
-> 	  ip6tables is a legacy packet classification.
-
-Sure, I will send an updated version with this change.
-
-Thanks!
 
