@@ -1,166 +1,135 @@
-Return-Path: <netdev+bounces-126651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 622079721F8
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:39:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE26997220F
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:48:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1D401F24CC4
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:39:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88401283335
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2D61898F6;
-	Mon,  9 Sep 2024 18:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E0018951E;
+	Mon,  9 Sep 2024 18:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b="kcMuRO+E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NwXZX6QJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.theune.cc (mail.theune.cc [212.122.41.141])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70FAB1898F1;
-	Mon,  9 Sep 2024 18:38:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.122.41.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35B017A92E;
+	Mon,  9 Sep 2024 18:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725907123; cv=none; b=radkIBhZUroF6Pe4HfMGzmc9c8RZtjWjHQWOBfseAtK1+aI1girl50CedckAFkdmpTGTnuXsc/w40xms3CXvimb0ZLHwdZLqg1doRqS/8QBwpUfgdvmygFcqehDKwhqhuo2mCZ8Lb6CG269y2a2OhHnPuOzFE8AYQy6Eewmk3Nw=
+	t=1725907717; cv=none; b=oby6xep3kb4h3AkY6TJgL3OYkfALu7o4cKCzSZwiCQvq7vqVd8jfnf+nd17geS2ZBm/zygXKumdBfCCVCcH10qXDRt2fyX0ILP6qvGQ2zDSMrn77WqKdZaEPb0UwsjmMztRZtdpaaZoW1PYa4KjDnHjBtHBwaObCBlH402ZJvVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725907123; c=relaxed/simple;
-	bh=b0qFVgnkFadnBp83rb8wKhiucFe/QPV1vNclNvc/6nA=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=WA3JEmTST/vGYF1cYCWlZivBtSmFE4HoiNF28sdmlBdnJ8OMsYk+iZDO+3BV0oC4/ICb3F4kXslJsq3ZgxMpG5LRSwgj8M7rWA8ihkDRrIBHqeRyP4QQaSKaguFoIl+qBv+aMqu6GDKYNG2vZ6ed9cFwvDgVMMbyavrqEp9EiAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc; spf=pass smtp.mailfrom=theune.cc; dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b=kcMuRO+E; arc=none smtp.client-ip=212.122.41.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theune.cc
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=theune.cc; s=mail;
-	t=1725907110; bh=b0qFVgnkFadnBp83rb8wKhiucFe/QPV1vNclNvc/6nA=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To;
-	b=kcMuRO+EFkoZW4ZiKmnF95t4CB47QsKce0/StC8hEROdxLBVSAJ2DUfbnTUl41lPv
-	 HkLc0KzNfL6DTv5PqoiUyoaPu2ACD6B6f21SA4GIEXXZc4ob6LRCXTGSa7CGYdTo1o
-	 mSxvKDc0NKLyIQwIfzn+stA16gHuBiCrPFeLhTzQ=
+	s=arc-20240116; t=1725907717; c=relaxed/simple;
+	bh=opDvcsNzBPHx59DExhq/FmozYJ3scDPTECogRp+m2KU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MF2ru6qXw9pwzRY+moTwcnmZ7rFBWgheInRiGG2guzsWAQkilJrNpChgzWra6InOqL4Xlj6NMZqC4psPUtkAbqid2B7TpMnpD10o4mVKpt0ZA5NVlp71QPkpZ4ybOfd7O4mv/m6c718IoHue1CnQgxB7B1nPO6sIRko/HxwvWR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NwXZX6QJ; arc=none smtp.client-ip=209.85.160.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-27830bce86bso2623544fac.0;
+        Mon, 09 Sep 2024 11:48:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725907715; x=1726512515; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Evv02wRZtoNC+BDsMRqpz+3iRpxo+7R7AGdDISkteFg=;
+        b=NwXZX6QJ/9he/sBrFaU6bW5tR66qdu5gBZQOkYfGypwh6ut4rB18e7Kd4xMJea1LbQ
+         C5BrtUH50Ou6Rkzpt+qRPSMYY3rNB4GIHjoNevFt5g6c9XpuBhZihFjTE/KVO6igCl/m
+         merQ9dI3fQ+oI/YHYUdhEL6kGj3JaLMrEGEL8XnkjABeecUnYiTcNEHrkfBel32l0hSR
+         erZ12CPz4B1Q2I5wMD5Y/C5zwfCTXRgaEk/+9xHmovwxlpKswwCspUOhEbGJOzrVSmep
+         oj3ppwDs9mx56Rk8q9QXKaaRjPM2wkbw4XT5ZIYzYT3FAQVOdCAv9u/+DDCt9nMNMaSV
+         40Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725907715; x=1726512515;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Evv02wRZtoNC+BDsMRqpz+3iRpxo+7R7AGdDISkteFg=;
+        b=l64KCKnWuYHbsqFmTGbxbAoKa37IauBuaaXAMNKFJeqSLUzVkBf0Gn697E9IWxrvLG
+         TkiLiCzu4SxRDYVFZs/CnY95R98xyuhITv9XCdA50fokBO9vrseBcgJKcycBUGSuHwVE
+         3ourHzcH9c4wjBDH46JsBFDyT51qZxufZsTkZdOggAulivcYujcLJI5caQiQ6k9k+iSL
+         0kgG21nx7v2GnvRXovFM9DqygLHjLJwaucr6eFQmUIC1pccWQeDezROaz51/Oe6BDSBj
+         CIOsHEGsXqUqWHE6TraVzS1PzSOWlfe4w62o5iR+76Al4dlKqRrIbLbe9OzgvpwSc/16
+         /VuA==
+X-Forwarded-Encrypted: i=1; AJvYcCWOUFtD1+6PkRAqGTOBxiPmjrxVuSXyALLqQAtGwqA/f2oQAI1ck/i8doicVHh1RXWrQ1HVvvGc@vger.kernel.org, AJvYcCXetRJcQkVLLhtBI2oiMFimsNHR5zkHx7+/Aq5qodAHhbXf28jJCy4ZswQodpOmdCM8456FNqYnc6LMf2M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmCfprqcpmBHgvoUqU72dWS/Uz0sDj+kyCMkIVw9wth8ih8ofD
+	431hlBeSgSXyysJoItsrACH5A6r9PjInyZ3XwWEkT9ZlKoWMvf7w
+X-Google-Smtp-Source: AGHT+IEbSXmGXqSJ/Yl/Tle8iq8bB++evpdiqf0ZOMgr6sl80+BemZ0IXyPtw9UcrwpnoC7xl++uJg==
+X-Received: by 2002:a05:6871:3a24:b0:277:f826:edcc with SMTP id 586e51a60fabf-27b9d7c0c39mr10652504fac.5.1725907714881;
+        Mon, 09 Sep 2024 11:48:34 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d8255dc17esm3645998a12.62.2024.09.09.11.48.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 11:48:34 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: davem@davemloft.net,
+	dsahern@kernel.org
+Cc: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kafai@fb.com,
+	weiwan@google.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeongjun Park <aha310510@gmail.com>
+Subject: [PATCH net] net: prevent NULL pointer dereference in rt_fibinfo_free() and rt_fibinfo_free_cpus()
+Date: Tue, 10 Sep 2024 03:48:27 +0900
+Message-Id: <20240909184827.123071-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
-Subject: Re: Follow-up to "net: drop bad gso csum_start and offset in
- virtio_net_hdr" - backport for 5.15 needed
-From: Christian Theune <christian@theune.cc>
-In-Reply-To: <66df3fb5a228e_3d03029498@willemb.c.googlers.com.notmuch>
-Date: Mon, 9 Sep 2024 20:38:09 +0200
-Cc: Greg KH <gregkh@linuxfoundation.org>,
- Willem de Bruijn <willemb@google.com>,
- regressions@lists.linux.dev,
- stable@vger.kernel.org,
- netdev@vger.kernel.org,
- mathieu.tortuyaux@gmail.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <0B75F6BF-0E0E-4BCC-8557-95A5D8D80038@theune.cc>
-References: <89503333-86C5-4E1E-8CD8-3B882864334A@theune.cc>
- <2024090309-affair-smitten-1e62@gregkh>
- <CA+FuTSdqnNq1sPMOUZAtH+zZy+Fx-z3pL-DUBcVbhc0DZmRWGQ@mail.gmail.com>
- <2024090952-grope-carol-537b@gregkh>
- <66df3fb5a228e_3d03029498@willemb.c.googlers.com.notmuch>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-I can contribute live testing and can quickly reproduce the issue.
+rt_fibinfo_free() and rt_fibinfo_free_cpus() only check for rt and do not
+verify rt->dst and use it, which will result in NULL pointer dereference.
 
-If anything is there that should be tested for apart from verifying the =
-fix, I=E2=80=99d be happy to try.
+Therefore, to prevent this, we need to add a check for rt->dst.
 
-Christian
+Fixes: 0830106c5390 ("ipv4: take dst->__refcnt when caching dst in fib")
+Fixes: c5038a8327b9 ("ipv4: Cache routes in nexthop exception entries.")
+Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+---
+ net/ipv4/fib_semantics.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-> On 9. Sep 2024, at 20:34, Willem de Bruijn =
-<willemdebruijn.kernel@gmail.com> wrote:
->=20
-> Greg KH wrote:
->> On Mon, Sep 09, 2024 at 12:05:17AM -0400, Willem de Bruijn wrote:
->>> On Tue, Sep 3, 2024 at 4:03=E2=80=AFAM Greg KH =
-<gregkh@linuxfoundation.org> wrote:
->>>>=20
->>>> On Tue, Sep 03, 2024 at 09:37:30AM +0200, Christian Theune wrote:
->>>>> Hi,
->>>>>=20
->>>>> the issue was so far handled in =
-https://lore.kernel.org/regressions/ZsyMzW-4ee_U8NoX@eldamar.lan/T/#m390d6=
-ef7b733149949fb329ae1abffec5cefb99b and =
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219129
->>>>>=20
->>>>> I haven=E2=80=99t seen any communication whether a backport for =
-5.15 is already in progress, so I thought I=E2=80=99d follow up here.
->>>>=20
->>>> Someone needs to send a working set of patches to apply.
->>>=20
->>> The following stack of patches applies cleanly to 5.15.166
->>> (original SHA1s, git log order, so inverse of order to apply):
->>>=20
->>> 89add40066f9e net: drop bad gso csum_start and offset in =
-virtio_net_hdr
->>> 9840036786d9 gso: fix dodgy bit handling for GSO_UDP_L4
->>> fc8b2a619469 net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation
->>>=20
->>> All three are already present in 6.1.109
->>>=20
->>> Please let me know if I should send that stack using git send-email,
->>> or whether this is sufficient into to backport.
->>=20
->> I just tried it, they do not apply cleanly here for me at all :(
->>=20
->>> The third commit has one Fixes referencing them:
->>>=20
->>> 1382e3b6a350 net: change maximum number of UDP segments to 128
->>>=20
->>> This simple -2/+2 line patch unfortunately cannot be backported
->>> without conflicts without backporting non-stable feature changes.
->>> There is a backport to 6.1.y, but that also won't apply cleanly to
->>> 5.15.166 without backporting a feature (e2a4392b61f6 "udp: introduce
->>> udp->udp_flags"), which itself does not apply cleanly.
->>>=20
->>> So simplest is probably to fix up this commit and send it using git
->>> send-email. I can do that as part of the stack with the above 3
->>> patches, or stand-alone if the above can be cherry-picked by SHA1.
->>=20
->> Please send me a set of working, and tested, patches and we will be =
-glad
->> to consider it.
->=20
-> Done:
->=20
-> =
-https://lore.kernel.org/stable/20240909182506.270136-1-willemdebruijn.kern=
-el@gmail.com/T/#m0086f42d20bfc4d6226a8cf379590032edfbbe21
->=20
-> The following worked fine for me. I hope I did not overlook anything.
-> Compile tested only. But as said, the same patches have landed in
-> 6.1-stable.
->=20
-> git fetch linux-stable linux-5.15.y
-> git checkout linux-stable/linux-5.15.y
-> git cherry-pick fc8b2a619469
-> git cherry-pick 9840036786d9
-> git cherry-pick 89add40066f9e
-> make defconfig
-> make -j 64
->=20
-> Unfortunately, the key commit itself has a bug report against it. I am
-> working on that right now.
->=20
-> But as the existing patch that it refers to in its Fixes has landed in
-> all stable kernels and is causing reports, it is a backporting case of
-> damned if we do, damned if we don't.
->=20
-> I intend to have a fix ready ASAP for netdev-net/main. If all stable
-> branches have all backports, it should apply cleanly everywhere. Just
-> not ready to be included in this series from the start.
-
-
-Liebe Gr=C3=BC=C3=9Fe,
-Christian
-
--- =20
-Christian Theune - A97C62CE - 0179 7808366
-@theuni - christian@theune.cc
-
+diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
+index 2b57cd2b96e2..3a2a92599366 100644
+--- a/net/ipv4/fib_semantics.c
++++ b/net/ipv4/fib_semantics.c
+@@ -153,6 +153,8 @@ static void rt_fibinfo_free(struct rtable __rcu **rtp)
+ 
+ 	if (!rt)
+ 		return;
++	if (!&rt->dst)
++		return;
+ 
+ 	/* Not even needed : RCU_INIT_POINTER(*rtp, NULL);
+ 	 * because we waited an RCU grace period before calling
+@@ -202,10 +204,13 @@ static void rt_fibinfo_free_cpus(struct rtable __rcu * __percpu *rtp)
+ 		struct rtable *rt;
+ 
+ 		rt = rcu_dereference_protected(*per_cpu_ptr(rtp, cpu), 1);
+-		if (rt) {
+-			dst_dev_put(&rt->dst);
+-			dst_release_immediate(&rt->dst);
+-		}
++		if (!rt)
++			continue;
++		if (!&rt->dst)
++			continue;
++
++		dst_dev_put(&rt->dst);
++		dst_release_immediate(&rt->dst);
+ 	}
+ 	free_percpu(rtp);
+ }
+--
 
