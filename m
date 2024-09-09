@@ -1,396 +1,159 @@
-Return-Path: <netdev+bounces-126730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3C2F972519
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:12:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66157972561
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:37:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A823285858
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:12:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25E1B285892
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53F1918C930;
-	Mon,  9 Sep 2024 22:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614B118CC05;
+	Mon,  9 Sep 2024 22:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RvHeeV6x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="axnfaYo7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E67618A6B1
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 22:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB60D18C923;
+	Mon,  9 Sep 2024 22:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725919941; cv=none; b=k/5n2pbmiHlKmC1Tx9++t81NVg1QB6jev33t5NoMPC5aSIEUFZeqmHWFrndVNR6qd7J/PQB59wCFUAh37+tcgM6TXW8eEHCSL6/Ait9KT5NbS1D/eojFpUMacJbuWccZ8yNv1KFgpDjxxs8083CGfqUZs0J6q2UjKlI8jc4QXio=
+	t=1725921465; cv=none; b=d3DpqY0tI3GGoaZTJ8KtzOa9vJRTpuhOs1RtGZbAW0CTX9NFbylNguJG8JqwtJcJ2kvUFmsjP+lrhRdhLPVdo5Rhki89R34mLMYD5o77gFt252V3euzuYx4XC/hoUzcIsVqt2Xa+cHQd4SCqx6MY1ilEt4CnIbz9SVZbRbBceDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725919941; c=relaxed/simple;
-	bh=y335nIRqHcLEDBsh5VETLbNIx74GURiN8/rhiwtp1pE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mobDKJzX4oAvedBVNZAO64HHQCdd3sOy5uJQhAr8GIm92x8Dy8xsHVFJFuiCWymfv+4kgatAfpDAgByk1VvZPYE+hM5aEEXPqhPrbiVSi7jaAYgNpJP4aKzX77v8MrT31KEbCC4Y6xhdU5H9QJBrTsaVe9O8QK9zIoR/6Y0+F5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RvHeeV6x; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725919938;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Vg5bEFuIUtL300KerUKY/azbg8z8ui6KqL4ZjQA+RO0=;
-	b=RvHeeV6xVWge2V+cNLJGAVRNeDvRKWgCOaChz24hNNAXJsV56C+XAlLXqtXOGpnjl6+xCp
-	gOa1LW1uC1YLSCrK+25lh1D4ay6GFiz+BIwy+OlrVSRiDyRHsYgqxXxFAv+IZF+CJTMFVi
-	fXd21xyYQbWwnnOrb8Hj1wM2lD90Psw=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-591-ttKj_iN2NqqRkE7qgDv8CA-1; Mon,
- 09 Sep 2024 18:12:12 -0400
-X-MC-Unique: ttKj_iN2NqqRkE7qgDv8CA-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B96C71944AA9;
-	Mon,  9 Sep 2024 22:12:10 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.56])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8EF251956086;
-	Mon,  9 Sep 2024 22:12:05 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Madhu Chittim <madhu.chittim@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	intel-wired-lan@lists.osuosl.org,
-	edumazet@google.com
-Subject: [PATCH v7 net-next 15/15] iavf: add support to exchange qos capabilities
-Date: Tue, 10 Sep 2024 00:10:09 +0200
-Message-ID: <14e7b706878a168905751f4c3f71048b3b69d54b.1725919039.git.pabeni@redhat.com>
-In-Reply-To: <cover.1725919039.git.pabeni@redhat.com>
-References: <cover.1725919039.git.pabeni@redhat.com>
+	s=arc-20240116; t=1725921465; c=relaxed/simple;
+	bh=7Ew6PsNcPX2rKJ7dpgqoMSNWYZAhlAPSfAskQYuBNtg=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TOS3gkdDLthlUJqPtkrm3u9bl+tpA9l8XUxyqAYuPqzLGok76FpjkmXrKr3PKW8nUyrEAKJ7BnKlUjI/BR41hLP34g0PbNCp2l1DR3S6pGA5l/rUQyfScqn6hSEwRJMloimlwSQIw6BIWc3bTNZn4saA7a3zhjvgE5QmecgXSu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=axnfaYo7; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-718f4fd89e5so128253b3a.0;
+        Mon, 09 Sep 2024 15:37:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725921463; x=1726526263; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8n0OEd0ELgQaJV/osEYMishL8wH6c+Zm2nDCQ+FejVE=;
+        b=axnfaYo79BSl9FuSImXUFWJM0B3LuoJRoGx/QB1SYspxGDJ+h8AwVawpKr8LPPYd2S
+         NYDUJr2eESqlx5P61cVqB7EjwsLF8vec1uanBnQoMEVml/1DGYz1ZT2Kjdh9s9UDdfgG
+         1glfXGfsg3V7GEqcGAgvQ4pdQpFdj8eHdYrabgK/1cI7+KPPe6e3hwrIyBwSfwlYn7qd
+         BIYYVjNqI8zPPwbzya9m+o7GpwOqf8N/kWZQZzYuUvUmg86AOdmupDHZeDOeqnkG2U0O
+         EnaWjX//UCzx7MsgRehH7VtUkceeNZ9SVLPJiBIQ1IXe4duqnp4STbcRmDlyMe9NyEk8
+         nBQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725921463; x=1726526263;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8n0OEd0ELgQaJV/osEYMishL8wH6c+Zm2nDCQ+FejVE=;
+        b=DHELAfY/xMj62/0/HVXoybaEiHr7UiAeW/qRzyaAcKQIbd4d202dYYqSYKET3w1q9m
+         kAMJCbmt+2XiUbGF0P+cKL0X7X+Fu9CWsx8XCl58FAnQSxoEkDHlcXgpa4yugAk6wd7g
+         STG4YbJR0k0sQujTgVgOdMisio8VvXdhyQ6/ELRKaa6q5oz+spY9nM3HWdyXtDlzqZxi
+         ZTbLUd30FI2pPaS7I0Z2jZk2D9/KpEMGpFc+nXbOphCS2TIevbHKS4gCBgxeH5tk68rl
+         k9qLv32lIRT/L+pYjpwFNjuTjlzX/E4iLc37ASdPr5rn3vX+q1zRm5crXnQ35SWDtxZd
+         x1wg==
+X-Forwarded-Encrypted: i=1; AJvYcCUmlxwYmZ3u5/rQ6Jm6gU1yo39gaTRC9+3MQx9acFuOtDoxtKoDBYo5z11XVEpoEM0Tsg/OTCv5@vger.kernel.org, AJvYcCUwSRXuAyXegQcRWldvkXXseOgtafnUozlXwkTpDYd+ClpgmzHK5RdjcnnpcTvagPTyNomzBxICQh4HUtj/@vger.kernel.org, AJvYcCWs5XHrLuFzTVAvbVZOn7XL0Yldk3bTqqFVxyM8SQXwlOT9usIn+SIteXu7LC9131kdpFrF1yy6I/E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzygGxTZZWRYuvYvJrbnOTBk57kPqvRfdIGOlJErSahb9ttzfl3
+	W4ueBKVIzwJdQJXGaSNcMJgF8qQkELUhFMJJCMka+/3YVtZEpwM=
+X-Google-Smtp-Source: AGHT+IFDOMcPqsjTNu1lcgtoE5mW8GcxVPLNMZhPwUqti68SAGG6AS3vM0sC85+dIy4MOIYxHZSyNg==
+X-Received: by 2002:a05:6a21:4d8b:b0:1cf:1217:ce87 with SMTP id adf61e73a8af0-1cf2a065919mr10681268637.2.1725921463084;
+        Mon, 09 Sep 2024 15:37:43 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d8256d0750sm4518226a12.75.2024.09.09.15.37.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 15:37:42 -0700 (PDT)
+Date: Mon, 9 Sep 2024 15:37:41 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
+	mkarsten@uwaterloo.ca, kuba@kernel.org, skhawaja@google.com,
+	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next v2 1/9] net: napi: Add napi_storage
+Message-ID: <Zt94tXG_lzGLWo1w@mini-arch>
+References: <20240908160702.56618-1-jdamato@fastly.com>
+ <20240908160702.56618-2-jdamato@fastly.com>
+ <Zt4N1RoplScF2Dbw@LQ3V64L9R2.homenet.telecomitalia.it>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Zt4N1RoplScF2Dbw@LQ3V64L9R2.homenet.telecomitalia.it>
 
-From: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+On 09/08, Joe Damato wrote:
+> On Sun, Sep 08, 2024 at 04:06:35PM +0000, Joe Damato wrote:
+> > Add a persistent NAPI storage area for NAPI configuration to the core.
+> > Drivers opt-in to setting the storage for a NAPI by passing an index
+> > when calling netif_napi_add_storage.
+> > 
+> > napi_storage is allocated in alloc_netdev_mqs, freed in free_netdev
+> > (after the NAPIs are deleted), and set to 0 when napi_enable is called.
+> > 
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > ---
+> >  .../networking/net_cachelines/net_device.rst  |  1 +
+> >  include/linux/netdevice.h                     | 34 +++++++++++++++++++
+> >  net/core/dev.c                                | 18 +++++++++-
+> >  3 files changed, 52 insertions(+), 1 deletion(-)
+> > 
+> 
+> [...]
+> 
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -6719,6 +6719,9 @@ void napi_enable(struct napi_struct *n)
+> >  		if (n->dev->threaded && n->thread)
+> >  			new |= NAPIF_STATE_THREADED;
+> >  	} while (!try_cmpxchg(&n->state, &val, new));
+> > +
+> > +	if (n->napi_storage)
+> > +		memset(n->napi_storage, 0, sizeof(*n->napi_storage));
+> 
+> This part is very obviously wrong ;)
+> 
+> I think when I was reading the other thread about resetting on
+> channel change [1] I got a bit confused.
+> 
+> Maybe what was intended was on napi_enable, do nothing / remove the
+> above code (which I suppose would give the persistence desired?).
+> 
+> But modify net/ethtool/channels.c to reset NAPIs to the global
+> (sysfs) settings? Not sure how to balance both persistence with
+> queue count changes in a way that makes sense for users of the API.
+> 
+> And, I didn't quite follow the bits about:
+>   1. The proposed ring to NAPI mapping
 
-During driver initialization VF determines QOS capability is allowed
-by PF and receives QOS parameters. After which quanta size for queues
-is configured which is not configurable and is set to 1KB currently.
+[..]
 
-Signed-off-by: Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
----
-v5 -> v6:
- - error out on bad rate
----
- drivers/net/ethernet/intel/iavf/iavf.h        | 10 ++
- drivers/net/ethernet/intel/iavf/iavf_main.c   | 51 +++++++++-
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   | 92 ++++++++++++++++++-
- 3 files changed, 150 insertions(+), 3 deletions(-)
+>   2. The two step "takeover" which seemed to imply that we might
+>      pull napi_id into napi_storage? Or maybe I just read that part
+>      wrong?
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index a84bdbfbb0f7..75ac69670789 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -251,6 +251,9 @@ struct iavf_cloud_filter {
- #define IAVF_RESET_WAIT_DETECTED_COUNT 500
- #define IAVF_RESET_WAIT_COMPLETE_COUNT 2000
- 
-+#define IAVF_MAX_QOS_TC_NUM		8
-+#define IAVF_DEFAULT_QUANTA_SIZE	1024
-+
- /* board specific private data structure */
- struct iavf_adapter {
- 	struct workqueue_struct *wq;
-@@ -338,6 +341,8 @@ struct iavf_adapter {
- #define IAVF_FLAG_AQ_ENABLE_STAG_VLAN_INSERTION		BIT_ULL(37)
- #define IAVF_FLAG_AQ_DISABLE_STAG_VLAN_INSERTION	BIT_ULL(38)
- #define IAVF_FLAG_AQ_CONFIGURE_QUEUES_BW		BIT_ULL(39)
-+#define IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE		BIT_ULL(40)
-+#define IAVF_FLAG_AQ_GET_QOS_CAPS			BIT_ULL(41)
- 
- 	/* flags for processing extended capability messages during
- 	 * __IAVF_INIT_EXTENDED_CAPS. Each capability exchange requires
-@@ -410,6 +415,8 @@ struct iavf_adapter {
- 			       VIRTCHNL_VF_OFFLOAD_FDIR_PF)
- #define ADV_RSS_SUPPORT(_a) ((_a)->vf_res->vf_cap_flags & \
- 			     VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF)
-+#define QOS_ALLOWED(_a) ((_a)->vf_res->vf_cap_flags & \
-+			 VIRTCHNL_VF_OFFLOAD_QOS)
- 	struct virtchnl_vf_resource *vf_res; /* incl. all VSIs */
- 	struct virtchnl_vsi_resource *vsi_res; /* our LAN VSI */
- 	struct virtchnl_version_info pf_version;
-@@ -418,6 +425,7 @@ struct iavf_adapter {
- 	struct virtchnl_vlan_caps vlan_v2_caps;
- 	u16 msg_enable;
- 	struct iavf_eth_stats current_stats;
-+	struct virtchnl_qos_cap_list *qos_caps;
- 	struct iavf_vsi vsi;
- 	u32 aq_wait_count;
- 	/* RSS stuff */
-@@ -584,6 +592,8 @@ int iavf_config_rss(struct iavf_adapter *adapter);
- int iavf_lan_add_device(struct iavf_adapter *adapter);
- int iavf_lan_del_device(struct iavf_adapter *adapter);
- void iavf_cfg_queues_bw(struct iavf_adapter *adapter);
-+void iavf_cfg_queues_quanta_size(struct iavf_adapter *adapter);
-+void iavf_get_qos_caps(struct iavf_adapter *adapter);
- void iavf_enable_channels(struct iavf_adapter *adapter);
- void iavf_disable_channels(struct iavf_adapter *adapter);
- void iavf_add_cloud_filter(struct iavf_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 6e484bc2d7bb..f370e64ab2d1 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -2097,6 +2097,16 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
- 		return 0;
- 	}
- 
-+	if (adapter->aq_required & IAVF_FLAG_AQ_GET_QOS_CAPS) {
-+		iavf_get_qos_caps(adapter);
-+		return 0;
-+	}
-+
-+	if (adapter->aq_required & IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE) {
-+		iavf_cfg_queues_quanta_size(adapter);
-+		return 0;
-+	}
-+
- 	if (adapter->aq_required & IAVF_FLAG_AQ_CONFIGURE_QUEUES) {
- 		iavf_configure_queues(adapter);
- 		return 0;
-@@ -2682,6 +2692,9 @@ static void iavf_init_config_adapter(struct iavf_adapter *adapter)
- 		/* request initial VLAN offload settings */
- 		iavf_set_vlan_offload_features(adapter, 0, netdev->features);
- 
-+	if (QOS_ALLOWED(adapter))
-+		adapter->aq_required |= IAVF_FLAG_AQ_GET_QOS_CAPS;
-+
- 	iavf_schedule_finish_config(adapter);
- 	return;
- 
-@@ -4938,6 +4951,26 @@ static netdev_features_t iavf_fix_features(struct net_device *netdev,
- 	return iavf_fix_strip_features(adapter, features);
- }
- 
-+static int
-+iavf_verify_shaper(struct net_shaper_binding *binding,
-+		   const struct net_shaper *shaper,
-+		   struct netlink_ext_ack *extack)
-+{
-+	struct iavf_adapter *adapter = netdev_priv(binding->netdev);
-+	u64 vf_max;
-+
-+	if (shaper->handle.scope == NET_SHAPER_SCOPE_QUEUE) {
-+		vf_max = adapter->qos_caps->cap[0].shaper.peak;
-+		if (vf_max && shaper->bw_max > vf_max) {
-+			NL_SET_ERR_MSG_FMT(extack, "Max rate (%llu) of queue %d can't exceed max TX rate of VF (%llu kbps)",
-+					   shaper->bw_max, shaper->handle.id,
-+					   vf_max);
-+			return -EINVAL;
-+		}
-+	}
-+	return 0;
-+}
-+
- static int
- iavf_shaper_set(struct net_shaper_binding *binding,
- 		const struct net_shaper *shaper,
-@@ -4946,11 +4979,16 @@ iavf_shaper_set(struct net_shaper_binding *binding,
- 	struct iavf_adapter *adapter = netdev_priv(binding->netdev);
- 	const struct net_shaper_handle *handle = &shaper->handle;
- 	struct iavf_ring *tx_ring;
-+	int ret = 0;
- 
- 	mutex_lock(&adapter->crit_lock);
- 	if (handle->id >= adapter->num_active_queues)
- 		goto unlock;
- 
-+	ret = iavf_verify_shaper(binding, shaper, extack);
-+	if (ret)
-+		goto unlock;
-+
- 	tx_ring = &adapter->tx_rings[handle->id];
- 
- 	tx_ring->q_shaper.bw_min = div_u64(shaper->bw_min, 1000);
-@@ -4961,7 +4999,7 @@ iavf_shaper_set(struct net_shaper_binding *binding,
- 
- unlock:
- 	mutex_unlock(&adapter->crit_lock);
--	return 0;
-+	return ret;
- }
- 
- static int iavf_shaper_del(struct net_shaper_binding *binding,
-@@ -5167,7 +5205,7 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	struct net_device *netdev;
- 	struct iavf_adapter *adapter = NULL;
- 	struct iavf_hw *hw = NULL;
--	int err;
-+	int err, len;
- 
- 	err = pci_enable_device(pdev);
- 	if (err)
-@@ -5235,6 +5273,13 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	hw->bus.func = PCI_FUNC(pdev->devfn);
- 	hw->bus.bus_id = pdev->bus->number;
- 
-+	len = struct_size(adapter->qos_caps, cap, IAVF_MAX_QOS_TC_NUM);
-+	adapter->qos_caps = kzalloc(len, GFP_KERNEL);
-+	if (!adapter->qos_caps) {
-+		err = -ENOMEM;
-+		goto err_alloc_qos_cap;
-+	}
-+
- 	/* set up the locks for the AQ, do this only once in probe
- 	 * and destroy them only once in remove
- 	 */
-@@ -5273,6 +5318,8 @@ static int iavf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	/* Initialization goes on in the work. Do not add more of it below. */
- 	return 0;
- 
-+err_alloc_qos_cap:
-+	iounmap(hw->hw_addr);
- err_ioremap:
- 	destroy_workqueue(adapter->wq);
- err_alloc_wq:
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 64ddd0e66c0d..15d388b431c5 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -151,7 +151,8 @@ int iavf_send_vf_config_msg(struct iavf_adapter *adapter)
- 	       VIRTCHNL_VF_OFFLOAD_USO |
- 	       VIRTCHNL_VF_OFFLOAD_FDIR_PF |
- 	       VIRTCHNL_VF_OFFLOAD_ADV_RSS_PF |
--	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED;
-+	       VIRTCHNL_VF_CAP_ADV_LINK_SPEED |
-+	       VIRTCHNL_VF_OFFLOAD_QOS;
- 
- 	adapter->current_op = VIRTCHNL_OP_GET_VF_RESOURCES;
- 	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_CONFIG;
-@@ -1507,6 +1508,76 @@ iavf_set_adapter_link_speed_from_vpe(struct iavf_adapter *adapter,
- 		adapter->link_speed = vpe->event_data.link_event.link_speed;
- }
- 
-+/**
-+ * iavf_get_qos_caps - get qos caps support
-+ * @adapter: iavf adapter struct instance
-+ *
-+ * This function requests PF for Supported QoS Caps.
-+ */
-+void iavf_get_qos_caps(struct iavf_adapter *adapter)
-+{
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot get qos caps, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_GET_QOS_CAPS;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_GET_QOS_CAPS;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_GET_QOS_CAPS, NULL, 0);
-+}
-+
-+/**
-+ * iavf_set_quanta_size - set quanta size of queue chunk
-+ * @adapter: iavf adapter struct instance
-+ * @quanta_size: quanta size in bytes
-+ * @queue_index: starting index of queue chunk
-+ * @num_queues: number of queues in the queue chunk
-+ *
-+ * This function requests PF to set quanta size of queue chunk
-+ * starting at queue_index.
-+ */
-+static void
-+iavf_set_quanta_size(struct iavf_adapter *adapter, u16 quanta_size,
-+		     u16 queue_index, u16 num_queues)
-+{
-+	struct virtchnl_quanta_cfg quanta_cfg;
-+
-+	if (adapter->current_op != VIRTCHNL_OP_UNKNOWN) {
-+		/* bail because we already have a command pending */
-+		dev_err(&adapter->pdev->dev,
-+			"Cannot set queue quanta size, command %d pending\n",
-+			adapter->current_op);
-+		return;
-+	}
-+
-+	adapter->current_op = VIRTCHNL_OP_CONFIG_QUANTA;
-+	quanta_cfg.quanta_size = quanta_size;
-+	quanta_cfg.queue_select.type = VIRTCHNL_QUEUE_TYPE_TX;
-+	quanta_cfg.queue_select.start_queue_id = queue_index;
-+	quanta_cfg.queue_select.num_queues = num_queues;
-+	adapter->aq_required &= ~IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE;
-+	iavf_send_pf_msg(adapter, VIRTCHNL_OP_CONFIG_QUANTA,
-+			 (u8 *)&quanta_cfg, sizeof(quanta_cfg));
-+}
-+
-+/**
-+ * iavf_cfg_queues_quanta_size - configure quanta size of queues
-+ * @adapter: adapter structure
-+ *
-+ * Request that the PF configure quanta size of allocated queues.
-+ **/
-+void iavf_cfg_queues_quanta_size(struct iavf_adapter *adapter)
-+{
-+	int quanta_size = IAVF_DEFAULT_QUANTA_SIZE;
-+
-+	/* Set Queue Quanta Size to default */
-+	iavf_set_quanta_size(adapter, quanta_size, 0,
-+			     adapter->num_active_queues);
-+}
-+
- /**
-  * iavf_cfg_queues_bw - configure bandwidth of allocated queues
-  * @adapter: iavf adapter structure instance
-@@ -2281,6 +2352,14 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 					VIRTCHNL_RSS_ALG_TOEPLITZ_SYMMETRIC;
- 
- 			break;
-+		case VIRTCHNL_OP_GET_QOS_CAPS:
-+			dev_warn(&adapter->pdev->dev, "Failed to Get Qos CAPs, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
-+		case VIRTCHNL_OP_CONFIG_QUANTA:
-+			dev_warn(&adapter->pdev->dev, "Failed to Config Quanta, error %s\n",
-+				 iavf_stat_str(&adapter->hw, v_retval));
-+			break;
- 		case VIRTCHNL_OP_CONFIG_QUEUE_BW:
- 			dev_warn(&adapter->pdev->dev, "Failed to Config Queue BW, error %s\n",
- 				 iavf_stat_str(&adapter->hw, v_retval));
-@@ -2627,6 +2706,17 @@ void iavf_virtchnl_completion(struct iavf_adapter *adapter,
- 		if (!v_retval)
- 			iavf_netdev_features_vlan_strip_set(netdev, false);
- 		break;
-+	case VIRTCHNL_OP_GET_QOS_CAPS: {
-+		u16 len = struct_size(adapter->qos_caps, cap,
-+				      IAVF_MAX_QOS_TC_NUM);
-+
-+		memcpy(adapter->qos_caps, msg, min(msglen, len));
-+
-+		adapter->aq_required |= IAVF_FLAG_AQ_CFG_QUEUES_QUANTA_SIZE;
-+		}
-+		break;
-+	case VIRTCHNL_OP_CONFIG_QUANTA:
-+		break;
- 	case VIRTCHNL_OP_CONFIG_QUEUE_BW: {
- 		int i;
- 		/* shaper configuration is successful for all queues */
--- 
-2.45.2
+Yes, the suggestion here is to drop patch #2 from your series and
+keep napi_id as a user facing 'id' for the persistent storage. But,
+obviously, this requires persistent napi_id(s) that survive device
+resets.
 
+The function that allocates new napi_id is napi_hash_add
+from netif_napi_add_weight. So we can do either of the following:
+1. Keep everything as is, but add the napi_rehash somewhere
+   around napi_enable to 'takeover' previously allocated napi_id.
+2. (preferred) Separate napi_hash_add out of netif_napi_add_weight.
+   And have some new napi_hash_with_id(previous_napi_id) to expose it to the
+   userspace. Then convert mlx5 to this new interface.
 
