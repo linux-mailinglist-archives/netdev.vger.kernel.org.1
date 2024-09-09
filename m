@@ -1,248 +1,94 @@
-Return-Path: <netdev+bounces-126441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E64971290
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:50:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A2B971263
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:45:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EE141C224D6
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:50:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27C6FB24169
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6C31B150A;
-	Mon,  9 Sep 2024 08:50:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07E31B1501;
+	Mon,  9 Sep 2024 08:44:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Mbq1LeAj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="caX8MYpZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797411B1D4B
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 08:50:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BDBB17557C;
+	Mon,  9 Sep 2024 08:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725871816; cv=none; b=GXE9guUbT/WZj+yS5df4zDZEyoa+qEbeqSXt+QJPQRPYeMfS04RlxpEsysT7xKHtbyVlvbw+rU1cqaW7vB9fPJ9+s3wz/Odx68NfLL5dPVCeMQyLhk1YWuQq8UHM+ZXBoB2SCKKXgb7oOxoGDitGLxRGxwWZoJcnwSfGgMXm5G4=
+	t=1725871494; cv=none; b=VetptKry2nHjoP5RIHI6DM58jWApLmA4c+U+zKWQnu7KJ7NQvvVFCspvwWuODqzIZy5tk+gnKS6GcLxkzM77ZA3fFlQUHATxJ6ojRapLL2UkvEkNGzuW5Ym8h1IN8jB62UqTZjvxa9SC60lCLK3GcoicQF85covXhX6wdUYnK4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725871816; c=relaxed/simple;
-	bh=/BxnH036p14jeYvFejRXZU5HBmtnml4/SDXd0+18YQE=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=uhCqz6kDCv6tqZg0he+8YNGQNN2jIoUbDzbTFbdBCuAXYeWPHFoZaD+TbRP2gBijVW1APxGAA3z6x1aAm2GeTFLwojGEydbWJzofFAC7yhpjAQvXBsHIcmIdkvnanBE9SiWDJEDdAUeoHf4g7MEH5OxLZtNhi2KsLaQxJWC9DNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Mbq1LeAj; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1725871809; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=radQgQEQZqISbTcR0YgFXwJGJRj5BFltJWnzzAOoYMc=;
-	b=Mbq1LeAjuZSU+ulIhbVloJJOPXQavRB85uGEi1gDeJcVYTLwEM+gfbt+llNeXp3HDgRFYUylYYziIfHX3fX6b9JdFbaCtoqRB81bmNKCVAZbkDJcyPV5acZjJWZ4NNkqVczbBPZlQ0T9JwAdpCZTlBj5N59g4q8m/EQDFI0cbps=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WEalK1E_1725871808)
-          by smtp.aliyun-inc.com;
-          Mon, 09 Sep 2024 16:50:08 +0800
-Message-ID: <1725871401.4568927-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
-Date: Mon, 9 Sep 2024 16:43:21 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
- netdev@vger.kernel.org,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- virtualization@lists.linux.dev,
- "Si-Wei Liu" <si-wei.liu@oracle.com>,
- Darren Kenny <darren.kenny@oracle.com>
-References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
- <20240906044143-mutt-send-email-mst@kernel.org>
- <1725612818.815039-1-xuanzhuo@linux.alibaba.com>
- <20240906045904-mutt-send-email-mst@kernel.org>
- <1725614736.9464588-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEt4XmMnZWEK56npxiA_QB0x48AU9fWfA63y5PHuHpLdBQ@mail.gmail.com>
-In-Reply-To: <CACGkMEt4XmMnZWEK56npxiA_QB0x48AU9fWfA63y5PHuHpLdBQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1725871494; c=relaxed/simple;
+	bh=pxwM3hSVCglKIf6EY3IGEl3ujf1W94/lMRDKTRO7k1Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=d2/0k8wdaPzh//AjgzqZo+aSh0J6G/z0y0k2Q2BBqBjhvM5rnQP9SbPxjFZyE13FWwT/o9tXhPfVm6wa0KOnMBFCKzFwPxAGv45jHDTHRInhZpn9FBFPBkkMUn+60dwWk/elt7On3H/94EM5BMlvl0UpSUgGVgG5vwWSTLrIlQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=caX8MYpZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27DBDC4CEC5;
+	Mon,  9 Sep 2024 08:44:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725871494;
+	bh=pxwM3hSVCglKIf6EY3IGEl3ujf1W94/lMRDKTRO7k1Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=caX8MYpZb9kl5CtRpFChwjoo+mPfLkxCM4HtGqCmEm0QDaIhRoPIprkfXTtm+JAas
+	 LmNd9As91CDNi38gy9YLO++ILkd4S0cr7q1S424GVVGq4BoptWsrldGI3pGz+et2V8
+	 qo6Z2VLIUCbTW+fQcZWYx6Bu3vOXTXEdr0yUm33/HMZaallcrdBwEE5B/hyJedujsl
+	 vMXHkUd36/2BzPM2fi33MeyJ8MoHEXK4h5TjjhcOfKHjFSmw8K4xNPWLZnjf8nlVqi
+	 iHXTe9OQbM5STDecrBzkNQA2XIMM21gDE0b27c27+p4LPDr02+RpIyS3UbkTEVE+j+
+	 JFT7sSQOXZ2Sg==
+Date: Mon, 9 Sep 2024 09:44:48 +0100
+From: Simon Horman <horms@kernel.org>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, kernel@pengutronix.de,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heiko Stuebner <heiko@sntech.de>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-rockchip@lists.infradead.org, llvm@lists.linux.dev,
+	patches@lists.linux.dev
+Subject: Re: [PATCH] can: rockchip_canfd: fix return type of
+ rkcanfd_start_xmit()
+Message-ID: <20240909084448.GU2097826@kernel.org>
+References: <20240906-rockchip-canfd-wifpts-v1-1-b1398da865b7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240906-rockchip-canfd-wifpts-v1-1-b1398da865b7@kernel.org>
 
-On Mon, 9 Sep 2024 16:38:16 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Fri, Sep 6, 2024 at 5:32=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
-> >
-> > On Fri, 6 Sep 2024 05:08:56 -0400, "Michael S. Tsirkin" <mst@redhat.com=
-> wrote:
-> > > On Fri, Sep 06, 2024 at 04:53:38PM +0800, Xuan Zhuo wrote:
-> > > > On Fri, 6 Sep 2024 04:43:29 -0400, "Michael S. Tsirkin" <mst@redhat=
-.com> wrote:
-> > > > > On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
-> > > > > > leads to regression on VM with the sysctl value of:
-> > > > > >
-> > > > > > - net.core.high_order_alloc_disable=3D1
-> > > > > >
-> > > > > > which could see reliable crashes or scp failure (scp a file 100=
-M in size
-> > > > > > to VM):
-> > > > > >
-> > > > > > The issue is that the virtnet_rq_dma takes up 16 bytes at the b=
-eginning
-> > > > > > of a new frag. When the frag size is larger than PAGE_SIZE,
-> > > > > > everything is fine. However, if the frag is only one page and t=
-he
-> > > > > > total size of the buffer and virtnet_rq_dma is larger than one =
-page, an
-> > > > > > overflow may occur. In this case, if an overflow is possible, I=
- adjust
-> > > > > > the buffer size. If net.core.high_order_alloc_disable=3D1, the =
-maximum
-> > > > > > buffer size is 4096 - 16. If net.core.high_order_alloc_disable=
-=3D0, only
-> > > > > > the first buffer of the frag is affected.
-> > > > > >
-> > > > > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatev=
-er use_dma_api")
-> > > > > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-> > > > > > Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba16=
-4a540c0a@oracle.com
-> > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > >
-> > > > >
-> > > > > Guys where are we going with this? We have a crasher right now,
-> > > > > if this is not fixed ASAP I'd have to revert a ton of
-> > > > > work Xuan Zhuo just did.
-> > > >
-> > > > I think this patch can fix it and I tested it.
-> > > > But Darren said this patch did not work.
-> > > > I need more info about the crash that Darren encountered.
-> > > >
-> > > > Thanks.
-> > >
-> > > So what are we doing? Revert the whole pile for now?
-> > > Seems to be a bit of a pity, but maybe that's the best we can do
-> > > for this release.
-> >
-> > @Jason Could you review this?
->
-> I think we probably need some tweaks for this patch.
->
-> For example, the changelog is not easy to be understood especially
-> consider it starts something like:
->
-> "
->     leads to regression on VM with the sysctl value of:
->
->     - net.core.high_order_alloc_disable=3D1
->
->     which could see reliable crashes or scp failure (scp a file 100M in s=
-ize
->     to VM):
-> "
->
-> Need some context and actually sysctl is not a must to reproduce the
-> issue, it can also happen when memory is fragmented.
+On Fri, Sep 06, 2024 at 01:26:41PM -0700, Nathan Chancellor wrote:
+> With clang's kernel control flow integrity (kCFI, CONFIG_CFI_CLANG),
+> indirect call targets are validated against the expected function
+> pointer prototype to make sure the call target is valid to help mitigate
+> ROP attacks. If they are not identical, there is a failure at run time,
+> which manifests as either a kernel panic or thread getting killed. A
+> warning in clang aims to catch these at compile time, which reveals:
+> 
+>   drivers/net/can/rockchip/rockchip_canfd-core.c:770:20: error: incompatible function pointer types initializing 'netdev_tx_t (*)(struct sk_buff *, struct net_device *)' (aka 'enum netdev_tx (*)(struct sk_buff *, struct net_device *)') with an expression of type 'int (struct sk_buff *, struct net_device *)' [-Werror,-Wincompatible-function-pointer-types-strict]
+>     770 |         .ndo_start_xmit = rkcanfd_start_xmit,
+>         |                           ^~~~~~~~~~~~~~~~~~
+> 
+> ->ndo_start_xmit() in 'struct net_device_ops' expects a return type of
+> 'netdev_tx_t', not 'int' (although the types are ABI compatible). Adjust
+> the return type of rkcanfd_start_xmit() to match the prototype's to
+> resolve the warning.
+> 
+> Fixes: ff60bfbaf67f ("can: rockchip_canfd: add driver for Rockchip CAN-FD controller")
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 
-OK.
+Thanks, I was able to reproduce this problem at build time
+and that your patch addresses it.
 
-
->
-> Another issue is that, if we move the skb_page_frag_refill() out of
-> the virtnet_rq_alloc(). The function semantics turns out to be weird:
->
-> skb_page_frag_refill(len, &rq->alloc_frag, gfp);
-> ...
-> virtnet_rq_alloc(rq, len, gfp);
-
-YES.
-
->
-> I wonder instead of subtracting the dma->len, how about simply count
-> the dma->len in len if we call virtnet_rq_aloc() in
-> add_recvbuf_small()?
-
-1. For the small mode, it is safe. That just happens in the merge mode.
-2. In the merge mode, if we count the dma->len in len, we should know
-   if the frag->offset is zero or not. We can not do that before
-   skb_page_frag_refill(), because skb_page_frag_refill() may allocate
-   new page, the frag->offset is zero. So the judgment must is after
-   skb_page_frag_refill().
-
-Thanks.
-
-
->
-> >
-> > I think this problem is clear, though I do not know why it did not work
-> > for Darren.
->
-> I had a try. This issue could be reproduced easily and this patch
-> seems to fix the issue with a KASAN enabled kernel.
->
-> Thanks
->
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > >
-> > > > >
-> > > > >
-> > > > > > ---
-> > > > > >  drivers/net/virtio_net.c | 12 +++++++++---
-> > > > > >  1 file changed, 9 insertions(+), 3 deletions(-)
-> > > > > >
-> > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > > > index c6af18948092..e5286a6da863 100644
-> > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receiv=
-e_queue *rq, u32 size, gfp_t gfp)
-> > > > > >         void *buf, *head;
-> > > > > >         dma_addr_t addr;
-> > > > > >
-> > > > > > -       if (unlikely(!skb_page_frag_refill(size, alloc_frag, gf=
-p)))
-> > > > > > -               return NULL;
-> > > > > > -
-> > > > > >         head =3D page_address(alloc_frag->page);
-> > > > > >
-> > > > > >         dma =3D head;
-> > > > > > @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtn=
-et_info *vi, struct receive_queue *rq,
-> > > > > >         len =3D SKB_DATA_ALIGN(len) +
-> > > > > >               SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> > > > > >
-> > > > > > +       if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag=
-, gfp)))
-> > > > > > +               return -ENOMEM;
-> > > > > > +
-> > > > > >         buf =3D virtnet_rq_alloc(rq, len, gfp);
-> > > > > >         if (unlikely(!buf))
-> > > > > >                 return -ENOMEM;
-> > > > > > @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct =
-virtnet_info *vi,
-> > > > > >          */
-> > > > > >         len =3D get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len,=
- room);
-> > > > > >
-> > > > > > +       if (unlikely(!skb_page_frag_refill(len + room, alloc_fr=
-ag, gfp)))
-> > > > > > +               return -ENOMEM;
-> > > > > > +
-> > > > > > +       if (!alloc_frag->offset && len + room + sizeof(struct v=
-irtnet_rq_dma) > alloc_frag->size)
-> > > > > > +               len -=3D sizeof(struct virtnet_rq_dma);
-> > > > > > +
-> > > > > >         buf =3D virtnet_rq_alloc(rq, len + room, gfp);
-> > > > > >         if (unlikely(!buf))
-> > > > > >                 return -ENOMEM;
-> > > > > > --
-> > > > > > 2.32.0.3.g01195cf9f
-> > > > >
-> > >
-> >
->
+Reviewed-by: Simon Horman <horms@kernel.org>
 
