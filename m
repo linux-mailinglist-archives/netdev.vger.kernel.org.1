@@ -1,124 +1,201 @@
-Return-Path: <netdev+bounces-126488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 137A197152A
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 12:18:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D14F97155E
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 12:33:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA8AAB22655
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:18:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A41381C2216F
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:33:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C44BA1B3F32;
-	Mon,  9 Sep 2024 10:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D7D1B0104;
+	Mon,  9 Sep 2024 10:33:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="LBhzIK9r"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="0u6d7mzk"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532711B29D9;
-	Mon,  9 Sep 2024 10:18:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544195733A
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 10:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725877122; cv=none; b=VX/SHvhCcK8yKIBAxqE8c1lwTgiFSlP3WDpGPdPOENrK91J0aJKMUteEwhNEyBuE913Z1KYm3292w1zdDXlgzzBMUpQ28hWlka9pYzxoIv+q0bklc23Hyr92+gW1ElQcxlwNw3SxIPN3YPWNzP4buD2LTcTNvGeDKkkeOovBcvA=
+	t=1725877988; cv=none; b=NAr90BaF7VnGZk7EI82owPCSF6O6wC9xAa0SenlOO+pQ2zu++BlRhgOZ/ER5Od1zGmYkhmvspGwMhtlXF9XU4t15PNyZwVhaJtdEq0jPzuEk9M623oaslm+3tjXU+OXZtTunUwz1wB5PZur5mpDu61D1yH4h+eRgHvZ7THIOaOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725877122; c=relaxed/simple;
-	bh=tIl/YJLpYvs/TThG/hy945WRcGfsN7p0+d+XW5VLkZ8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qAq7BESL939CUX6tU7XxKrqJzlCjxKz7VIpDD8YRf4V3mTYhtguttLvfu4ftyfnkOkn4PXXXwSIO+WwUcarY627vYSOUvcdU8O74tij3VpgN1EW3xkvUt+5YQlg3qQco+e2IQ56+uIya2zHSGBgqRaOpRavbVcV1ZJfla94UxPk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=LBhzIK9r; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725877121; x=1757413121;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=tIl/YJLpYvs/TThG/hy945WRcGfsN7p0+d+XW5VLkZ8=;
-  b=LBhzIK9r1ARHRn3Nu4xjNpUY1LO+hq7NuCoWZzfFc/8OgsJ8CcSwzHUR
-   93+gvsODsYEtA0UOuxFQccrIki3fB2FhXkWxOxTsTf5hNpJJDpAWrf6Jv
-   W3fQ/pGGSB7xV3Ghfvj6gs0YcSo/SPfx4MunwFJrxRk1QuyER+DW/Dp5u
-   fJ2C9O1p3lIWiR5u2YXAAuTiRLFzJjkL9nSzuuBRyAT4rW+iV+zo/er8J
-   uhyx7u79azcD3CDEb2csGmnt4k3lex2yONaDd4/qeh1GqJ0oFIf88lvVW
-   PegFhf56xB51aJuV+TnPLbxtFn6xylhLCHpMEYxr/SyakU9BDuvY7g+zd
-   A==;
-X-CSE-ConnectionGUID: FaCcdkUXQ1iQi8THvrR/tA==
-X-CSE-MsgGUID: /bM7iPiJR8ultVWPqJQGxA==
-X-IronPort-AV: E=Sophos;i="6.10,214,1719903600"; 
-   d="asc'?scan'208";a="31498624"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Sep 2024 03:18:39 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 9 Sep 2024 03:18:34 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex04.mchp-main.com (10.10.85.152)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Mon, 9 Sep 2024 03:18:30 -0700
-Date: Mon, 9 Sep 2024 11:17:58 +0100
-From: Conor Dooley <conor.dooley@microchip.com>
-To: WangYuli <wangyuli@uniontech.com>
-CC: <stable@vger.kernel.org>, <gregkh@linuxfoundation.org>,
-	<sashal@kernel.org>, <william.qiu@starfivetech.com>,
-	<emil.renner.berthing@canonical.com>, <xingyu.wu@starfivetech.com>,
-	<walker.chen@starfivetech.com>, <robh@kernel.org>,
-	<hal.feng@starfivetech.com>, <kernel@esmil.dk>, <robh+dt@kernel.org>,
-	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-	<paul.walmsley@sifive.com>, <palmer@dabbelt.com>, <aou@eecs.berkeley.edu>,
-	<devicetree@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH 6.6 1/4] riscv: dts: starfive: add assigned-clock* to
- limit frquency
-Message-ID: <20240909-fidgeting-baggage-e9ef9fab9ca4@wendy>
-References: <D200DC520B462771+20240909074645.1161554-1-wangyuli@uniontech.com>
+	s=arc-20240116; t=1725877988; c=relaxed/simple;
+	bh=hw8yQ0VolwvnBmKSF3LNIg7oRvWDO7NrzgXIKv0VxmU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sJdH7Sfz41+PXG04zSF7HDPUhQyh9C47Y3Ly3j5Ts3FXHHLXLUyk2vC63DDTrcyKucY4Cukf7Yg1EIorTKaUStnjmsNbxTPGqZYOTolM1jUm6WvRbdaMLXyLm1rVE+J7wEQHHAOXIrp07oMO3NJeIQNH25cCzMln+4Yh4/jj5lE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=0u6d7mzk; arc=none smtp.client-ip=83.166.143.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4X2NT75smbz105G;
+	Mon,  9 Sep 2024 12:32:59 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1725877979;
+	bh=USLrcmWGFqTUBjA2tdW0YzQ39cdQX5h4S2o2tNzyS+0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=0u6d7mzkBO6aFeKEMuu2IYY0PL7osWBo2Z3PHskcQo/HMlMZmWYjCAGLF0I7wVc/j
+	 fdo33Rz5+78d5pFRDkYqx76o5FSEsDIH5jWr7nV4xkkfOnnLBWIemB41drtOyzw6+O
+	 QKHJF0tm4DVWbCLSWKgSOdo55lYImi8mC4rJtsZQ=
+Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4X2NT63tfBzxy;
+	Mon,  9 Sep 2024 12:32:58 +0200 (CEST)
+Date: Mon, 9 Sep 2024 12:32:52 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v4 4/6] selftest/landlock: Test file_send_sigiotask by
+ sending out-of-bound message
+Message-ID: <20240909.aekeexooNo8i@digikod.net>
+References: <cover.1725657727.git.fahimitahera@gmail.com>
+ <50daeed4d4f60d71e9564d0f24004a373fc5f7d5.1725657728.git.fahimitahera@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="rBzuFpmdaeKLjDQC"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <D200DC520B462771+20240909074645.1161554-1-wangyuli@uniontech.com>
+In-Reply-To: <50daeed4d4f60d71e9564d0f24004a373fc5f7d5.1725657728.git.fahimitahera@gmail.com>
+X-Infomaniak-Routing: alpha
 
---rBzuFpmdaeKLjDQC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This test does not cover hook_file_send_sigiotask(): the is_scoped
+variable is never set to true.
 
-On Mon, Sep 09, 2024 at 03:46:27PM +0800, WangYuli wrote:
-> From: William Qiu <william.qiu@starfivetech.com>
->=20
-> In JH7110 SoC, we need to go by-pass mode, so we need add the
-> assigned-clock* properties to limit clock frquency.
->=20
-> Signed-off-by: William Qiu <william.qiu@starfivetech.com>
-> Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
+On Fri, Sep 06, 2024 at 03:30:06PM -0600, Tahera Fahimi wrote:
+> This patch adds a test to verify handling the signal scoping mechanism
+> in file_send_sigiotask by triggering SIGURG through receiving an
+> out-of-bound message in UNIX sockets.
+> 
+> Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
+> ---
+> V4:
+> * Using pipe instead of Poll for synchronization.
+> ---
+>  .../selftests/landlock/scoped_signal_test.c   | 99 +++++++++++++++++++
+>  1 file changed, 99 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/landlock/scoped_signal_test.c b/tools/testing/selftests/landlock/scoped_signal_test.c
+> index c71fb83b7147..630f3a515731 100644
+> --- a/tools/testing/selftests/landlock/scoped_signal_test.c
+> +++ b/tools/testing/selftests/landlock/scoped_signal_test.c
+> @@ -269,4 +269,103 @@ TEST(signal_scoping_threads)
+>  	EXPECT_EQ(0, close(thread_pipe[1]));
+>  }
+>  
+> +#define SOCKET_PATH "/tmp/unix_sock_test"
 
-What makes any of the patches in this 4 patch series stable material?
+We must not create file on absolute paths because concurrent executions
+or previous ones could interfer with the tests.  Why not use an abstract
+unix socket created with set_unix_address()?
 
-Confused,
-Conor.
-
---rBzuFpmdaeKLjDQC
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZt7LVgAKCRB4tDGHoIJi
-0r3UAP9HR5mU/RutuFppy65U3q0D7i129EDL2Zh5HCsiIL48YwEAvSdcIMGjnuaH
-T/LYM7x+opdeozaYtb1S58WtiVokywE=
-=di5l
------END PGP SIGNATURE-----
-
---rBzuFpmdaeKLjDQC--
+> +
+> +const short backlog = 10;
+> +
+> +static volatile sig_atomic_t signal_received;
+> +
+> +static void handle_sigurg(int sig)
+> +{
+> +	if (sig == SIGURG)
+> +		signal_received = 1;
+> +	else
+> +		signal_received = -1;
+> +}
+> +
+> +static int setup_signal_handler(int signal)
+> +{
+> +	struct sigaction sa;
+> +
+> +	sa.sa_handler = handle_sigurg;
+> +	sigemptyset(&sa.sa_mask);
+> +	sa.sa_flags = SA_SIGINFO | SA_RESTART;
+> +	return sigaction(SIGURG, &sa, NULL);
+> +}
+> +
+> +/*
+> + * Sending an out of bound message will trigger the SIGURG signal
+> + * through file_send_sigiotask.
+> + */
+> +TEST(test_sigurg_socket)
+> +{
+> +	int sock_fd, recv_sock;
+> +	struct sockaddr_un addr, paddr;
+> +	socklen_t size;
+> +	char oob_buf, buffer;
+> +	int status;
+> +	int pipe_parent[2], pipe_child[2];
+> +	pid_t child;
+> +
+> +	ASSERT_EQ(0, pipe2(pipe_parent, O_CLOEXEC));
+> +	ASSERT_EQ(0, pipe2(pipe_child, O_CLOEXEC));
+> +
+> +	memset(&addr, 0, sizeof(addr));
+> +	addr.sun_family = AF_UNIX;
+> +	snprintf(addr.sun_path, sizeof(addr.sun_path), "%s", SOCKET_PATH);
+> +	unlink(SOCKET_PATH);
+> +	size = sizeof(addr);
+> +
+> +	child = fork();
+> +	ASSERT_LE(0, child);
+> +	if (child == 0) {
+> +		oob_buf = '.';
+> +
+> +		ASSERT_EQ(0, close(pipe_parent[1]));
+> +		ASSERT_EQ(0, close(pipe_child[0]));
+> +
+> +		sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+> +		ASSERT_NE(-1, sock_fd);
+> +
+> +		ASSERT_EQ(1, read(pipe_parent[0], &buffer, 1));
+> +		ASSERT_EQ(0, connect(sock_fd, &addr, sizeof(addr)));
+> +
+> +		ASSERT_EQ(1, read(pipe_parent[0], &buffer, 1));
+> +		ASSERT_NE(-1, send(sock_fd, &oob_buf, 1, MSG_OOB));
+> +		ASSERT_EQ(1, write(pipe_child[1], ".", 1));
+> +
+> +		EXPECT_EQ(0, close(sock_fd));
+> +
+> +		_exit(_metadata->exit_code);
+> +		return;
+> +	}
+> +	ASSERT_EQ(0, close(pipe_parent[0]));
+> +	ASSERT_EQ(0, close(pipe_child[1]));
+> +
+> +	sock_fd = socket(AF_UNIX, SOCK_STREAM, 0);
+> +	ASSERT_NE(-1, sock_fd);
+> +	ASSERT_EQ(0, bind(sock_fd, &addr, size));
+> +	ASSERT_EQ(0, listen(sock_fd, backlog));
+> +
+> +	ASSERT_NE(-1, setup_signal_handler(SIGURG));
+> +	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
+> +	recv_sock = accept(sock_fd, &paddr, &size);
+> +	ASSERT_NE(-1, recv_sock);
+> +
+> +	create_scoped_domain(_metadata, LANDLOCK_SCOPED_SIGNAL);
+> +
+> +	ASSERT_NE(-1, fcntl(recv_sock, F_SETOWN, getpid()));
+> +	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
+> +	ASSERT_EQ(1, read(pipe_child[0], &buffer, 1));
+> +	ASSERT_EQ(1, recv(recv_sock, &oob_buf, 1, MSG_OOB));
+> +
+> +	ASSERT_EQ(1, signal_received);
+> +	EXPECT_EQ(0, close(sock_fd));
+> +	EXPECT_EQ(0, close(recv_sock));
+> +	ASSERT_EQ(child, waitpid(child, &status, 0));
+> +	if (WIFSIGNALED(status) || !WIFEXITED(status) ||
+> +	    WEXITSTATUS(status) != EXIT_SUCCESS)
+> +		_metadata->exit_code = KSFT_FAIL;
+> +}
+> +
+>  TEST_HARNESS_MAIN
+> -- 
+> 2.34.1
+> 
 
