@@ -1,203 +1,148 @@
-Return-Path: <netdev+bounces-126400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E961971037
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:50:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA10497104D
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:52:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B32891C22151
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:50:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8329D1F22CF6
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12AEE1B1D5E;
-	Mon,  9 Sep 2024 07:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C75051B0129;
+	Mon,  9 Sep 2024 07:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="TVeBlZx8"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Zq6JXZ//"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75D6C1B143E
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 07:48:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832DA1AF4D9;
+	Mon,  9 Sep 2024 07:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725868105; cv=none; b=TBlRPQ9BQ8lVsH3O6+wDEZvqNo+zBxHpuP1Bu8V7xRIAMFXb8sMROGwCwlkuWuychNKVYTY0f2k8YEr+suPOaXpCJ3plQQWCGyblkjG0LkXniBQq0cGYjaDHFwzU1861iK7LFec+pTVYiBt9XbMMDtlnEsKgDp7y5i2u7acGKq0=
+	t=1725868337; cv=none; b=J86bvj4H6zq+UeUvbcoIsugXo7gJt3+CZeOwPkeML8ki+7PiE+SKBliKU4YrPfIMHEXeTO5KquJSbI2tYBBI52GCkCFX8b8DxAYgiDyKDzW+bl3idQMSwoB/DUfxsoUsYQUrPNTdz2PcTrR8GYUlJrk3J3UFx2b41mZDStzDF2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725868105; c=relaxed/simple;
-	bh=gHoIWe4DshAryM3sWTVzuIt+3nqqVmIKyTTPUBOz6MI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xx5VGekGmYrm2/MceKssmxpCLs7IKxKJD+as9orVyBMkBdUcYcNWv0gLGcCyYrpqC1TgXB7cR7nRwvbJ6TxuTBiaY2YeND8T4pKAB4mqMI52+Z6ECsdsNyMads5pCxWX+hTUMPGfAd2aLJO6f3B7uO3bIY6QCbYfbVkncdgQiT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=TVeBlZx8; arc=none smtp.client-ip=54.92.39.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1725868054;
-	bh=5FdF3iaUoY2lzZR+9NIbIdVYtZtH02F85kfv8IfYqbE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=TVeBlZx8CfUc7C706SJ07sbV3AgKtjDBdBJR+mLO24DeVhSVtD/yvifZQ6gYWPuIZ
-	 daYIkkJNR7K8RsLfCpHcHVZMWEugrferlCVq6+6lx4cVTQ3+9OF2GBjNV/AlmeuP41
-	 +xJ8Mx8gaaPm6Wk5AcEXuTxPfR/CHNPT9xWmxzAs=
-X-QQ-mid: bizesmtpsz13t1725868033tg17wn
-X-QQ-Originating-IP: TzYnNEJLZSXkcsiHg6P6agGU+dL18pXPSJ1Y7rEcoMk=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 09 Sep 2024 15:47:09 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 18407148698930502739
-From: WangYuli <wangyuli@uniontech.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org,
-	sashal@kernel.org,
-	william.qiu@starfivetech.com,
-	emil.renner.berthing@canonical.com,
-	conor.dooley@microchip.com,
-	wangyuli@uniontech.com,
-	xingyu.wu@starfivetech.com,
-	walker.chen@starfivetech.com,
-	robh@kernel.org,
-	hal.feng@starfivetech.com
-Cc: kernel@esmil.dk,
-	robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	paul.walmsley@sifive.com,
-	palmer@dabbelt.com,
-	aou@eecs.berkeley.edu,
-	devicetree@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	richardcochran@gmail.com,
-	netdev@vger.kernel.org
-Subject: [PATCH 6.6 4/4] riscv: dts: starfive: Add JH7110 PWM-DAC support
-Date: Mon,  9 Sep 2024 15:46:30 +0800
-Message-ID: <37CBC770FBB00E54+20240909074645.1161554-4-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.43.4
-In-Reply-To: <20240909074645.1161554-1-wangyuli@uniontech.com>
-References: <20240909074645.1161554-1-wangyuli@uniontech.com>
+	s=arc-20240116; t=1725868337; c=relaxed/simple;
+	bh=tYpdgaZCN0lmhTqQidVM517rCDCWKPWudibqWnwydI8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hh1/prBYLk43uoaz2bmqoCV5Th/nDoO9kzinaCVpvh5usdH/kuBY8phJ1yignsZOpQktN4NL2exAVU3nUoBIXKA5PnWcgBPupZpFVa7opfUGpFuB8kDJYYNIPMoytyAqO3Mn0VpzEQbPSqDwAQ1kAvxbHYMhPwRK9uWp7Y/KLKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Zq6JXZ//; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 26DFA40005;
+	Mon,  9 Sep 2024 07:52:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725868327;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ryHecAjCKFHY5a39/P+GIvh5tYnxD8Fg8PfucobQxhs=;
+	b=Zq6JXZ//+adouwtwkw6boEPhyiUb2gfFl1RlA0RtXhCzJdYB5HfGK1TUuiPkVXECfEwRwo
+	5FksXPPXTfRR/GOVEhY+/BBte1UQQL25WwxYjwMs8hI6zh80c0qZ8lho8BBY9p/4i7aqGx
+	HVeByxhdV3V98xdhXabPHXeeVJJ+ojd/5b5xx4NhZ2xsZZaBgPbGmDkM7S5gBdiuQFAVn4
+	WF17yA5QBKYBiKqL8Q7+2YUgOIzQQwVr5fl42DKQM21/Muj8AIaUrastdmO0NdIpt/nGT+
+	dfkAHGEQdaTjvIEcerwNh6l4fmtvPPZrqc3P4P4ns6/jQPS79ay20fahDCDf3g==
+Date: Mon, 9 Sep 2024 09:52:03 +0200
+From: Herve Codina <herve.codina@bootlin.com>
+To: Lee Jones <lee@kernel.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Andy Shevchenko
+ <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, Arnd Bergmann
+ <arnd@arndb.de>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic
+ <dragan.cvetic@amd.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Lars Povlsen <lars.povlsen@microchip.com>, Steen
+ Hegelund <Steen.Hegelund@microchip.com>, Daniel Machon
+ <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, Rob Herring
+ <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Horatiu Vultur
+ <horatiu.vultur@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ devicetree@vger.kernel.org, Allan Nielsen <allan.nielsen@microchip.com>,
+ Luca Ceresoli <luca.ceresoli@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
+ <clement.leger@bootlin.com>
+Subject: Re: [PATCH v5 3/8] mfd: syscon: Add reference counting and device
+ managed support
+Message-ID: <20240909095203.3d6effdb@bootlin.com>
+In-Reply-To: <20240903180116.717a499b@bootlin.com>
+References: <20240808154658.247873-1-herve.codina@bootlin.com>
+	<20240808154658.247873-4-herve.codina@bootlin.com>
+	<20240903153839.GB6858@google.com>
+	<20240903180116.717a499b@bootlin.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-GND-Sasl: herve.codina@bootlin.com
 
-From: Hal Feng <hal.feng@starfivetech.com>
+Hi Lee, Arnd,
 
-Add PWM-DAC support for StarFive JH7110 SoC.
+On Tue, 3 Sep 2024 18:01:16 +0200
+Herve Codina <herve.codina@bootlin.com> wrote:
 
-Reviewed-by: Walker Chen <walker.chen@starfivetech.com>
-Signed-off-by: Hal Feng <hal.feng@starfivetech.com>
-Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
----
- .../jh7110-starfive-visionfive-2.dtsi         | 49 +++++++++++++++++++
- arch/riscv/boot/dts/starfive/jh7110.dtsi      | 13 +++++
- 2 files changed, 62 insertions(+)
+> Hi Lee,
+> 
+> On Tue, 3 Sep 2024 16:38:39 +0100
+> Lee Jones <lee@kernel.org> wrote:
+> 
+> > On Thu, 08 Aug 2024, Herve Codina wrote:
+> >   
+> > > From: Clément Léger <clement.leger@bootlin.com>
+> > > 
+> > > Syscon releasing is not supported.
+> > > Without release function, unbinding a driver that uses syscon whether
+> > > explicitly or due to a module removal left the used syscon in a in-use
+> > > state.
+> > > 
+> > > For instance a syscon_node_to_regmap() call from a consumer retrieves a
+> > > syscon regmap instance. Internally, syscon_node_to_regmap() can create
+> > > syscon instance and add it to the existing syscon list. No API is
+> > > available to release this syscon instance, remove it from the list and
+> > > free it when it is not used anymore.
+> > > 
+> > > Introduce reference counting in syscon in order to keep track of syscon
+> > > usage using syscon_{get,put}() and add a device managed version of
+> > > syscon_regmap_lookup_by_phandle(), to automatically release the syscon
+> > > instance on the consumer removal.
+> > > 
+> > > Signed-off-by: Clément Léger <clement.leger@bootlin.com>
+> > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> > > ---
+> > >  drivers/mfd/syscon.c       | 138 ++++++++++++++++++++++++++++++++++---
+> > >  include/linux/mfd/syscon.h |  16 +++++
+> > >  2 files changed, 144 insertions(+), 10 deletions(-)    
+> > 
+> > This doesn't look very popular.
+> > 
+> > What are the potential ramifications for existing users?
+> >   
+> 
+> Existing user don't use devm_syscon_regmap_lookup_by_phandle() nor
+> syscon_put_regmap().
+> 
+> So refcount is incremented but never decremented. syscon is never
+> released. Exactly the same as current implementation.
+> Nothing change for existing users.
+> 
+> Best regards,
+> Hervé
 
-diff --git a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi
-index caa59b9b2f19..0e077f2f02d1 100644
---- a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi
-+++ b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi
-@@ -40,6 +40,33 @@ gpio-restart {
- 		gpios = <&sysgpio 35 GPIO_ACTIVE_HIGH>;
- 		priority = <224>;
- 	};
-+
-+	pwmdac_codec: pwmdac-codec {
-+		compatible = "linux,spdif-dit";
-+		#sound-dai-cells = <0>;
-+	};
-+
-+	sound-pwmdac {
-+		compatible = "simple-audio-card";
-+		simple-audio-card,name = "StarFive-PWMDAC-Sound-Card";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		simple-audio-card,dai-link@0 {
-+			reg = <0>;
-+			format = "left_j";
-+			bitclock-master = <&sndcpu0>;
-+			frame-master = <&sndcpu0>;
-+
-+			sndcpu0: cpu {
-+				sound-dai = <&pwmdac>;
-+			};
-+
-+			codec {
-+				sound-dai = <&pwmdac_codec>;
-+			};
-+		};
-+	};
- };
- 
- &dvp_clk {
-@@ -253,6 +280,12 @@ &mmc1 {
- 	status = "okay";
- };
- 
-+&pwmdac {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pwmdac_pins>;
-+	status = "okay";
-+};
-+
- &qspi {
- 	#address-cells = <1>;
- 	#size-cells = <0>;
-@@ -463,6 +496,22 @@ GPOEN_SYS_SDIO1_DATA3,
- 		};
- 	};
- 
-+	pwmdac_pins: pwmdac-0 {
-+		pwmdac-pins {
-+			pinmux = <GPIOMUX(33, GPOUT_SYS_PWMDAC_LEFT,
-+					      GPOEN_ENABLE,
-+					      GPI_NONE)>,
-+				 <GPIOMUX(34, GPOUT_SYS_PWMDAC_RIGHT,
-+					      GPOEN_ENABLE,
-+					      GPI_NONE)>;
-+			bias-disable;
-+			drive-strength = <2>;
-+			input-disable;
-+			input-schmitt-disable;
-+			slew-rate = <0>;
-+		};
-+	};
-+
- 	spi0_pins: spi0-0 {
- 		mosi-pins {
- 			pinmux = <GPIOMUX(52, GPOUT_SYS_SPI0_TXD,
-diff --git a/arch/riscv/boot/dts/starfive/jh7110.dtsi b/arch/riscv/boot/dts/starfive/jh7110.dtsi
-index 621b68c02ea8..9f31dec57c0d 100644
---- a/arch/riscv/boot/dts/starfive/jh7110.dtsi
-+++ b/arch/riscv/boot/dts/starfive/jh7110.dtsi
-@@ -536,6 +536,19 @@ i2srx: i2s@100e0000 {
- 			status = "disabled";
- 		};
- 
-+		pwmdac: pwmdac@100b0000 {
-+			compatible = "starfive,jh7110-pwmdac";
-+			reg = <0x0 0x100b0000 0x0 0x1000>;
-+			clocks = <&syscrg JH7110_SYSCLK_PWMDAC_APB>,
-+				 <&syscrg JH7110_SYSCLK_PWMDAC_CORE>;
-+			clock-names = "apb", "core";
-+			resets = <&syscrg JH7110_SYSRST_PWMDAC_APB>;
-+			dmas = <&dma 22>;
-+			dma-names = "tx";
-+			#sound-dai-cells = <0>;
-+			status = "disabled";
-+		};
-+
- 		usb0: usb@10100000 {
- 			compatible = "starfive,jh7110-usb";
- 			ranges = <0x0 0x0 0x10100000 0x100000>;
--- 
-2.43.4
+I hope I answered to Lee's question related to possible impacts on
+existing drivers.
 
+Is there anything else that blocks this patch from being applied ?
+
+Best regards,
+Hervé
 
