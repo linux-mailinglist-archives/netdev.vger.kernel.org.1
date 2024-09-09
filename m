@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-126481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0778F9714B4
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 12:04:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 790519714B7
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 12:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FFE61F2144E
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:04:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EF191C23109
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194911B4C32;
-	Mon,  9 Sep 2024 10:03:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301E41B530A;
+	Mon,  9 Sep 2024 10:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="BiWI6k6A"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="VcaFkBT/"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4575F1B3F1C
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 10:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600661B3F3F
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 10:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725876222; cv=none; b=rfUeNkYEevPrfkRc7avg6htQitiv6QzlDAvZOrywpBeDjWG67LcmQ5sLrV/cJDAQrNYo56ZlhZCu8UP6QVppLIRwX73pAm0/we41PtIjneXLGuL0pKt1e3tW7uENLt2EwwtTbtvougKcQjCp2TyBI3/aXXzBetXAZz5uWABhIik=
+	t=1725876223; cv=none; b=ICqjL30evk0sqJ73OcNkwFVqmFkY0SC4MnAzctGGvoWv+K1WhEU97T5BlBjv0Kn9qki8zczTG071HkI04/efci8jBXpllXPvajpwZJYb1uUCj/FUbE72Gmaz9/EosJJ3KUzYXusIrlaXCQe9e0AenB/Ej8kho1P0u06w9/YFkpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725876222; c=relaxed/simple;
-	bh=ujIP0vZmhqESPXmTbdk3/RgX+QUkces8LqEttPXUpKE=;
+	s=arc-20240116; t=1725876223; c=relaxed/simple;
+	bh=0TST6cxqOzGGpTqTkGXpBgzChHanW4rbJG1BD8aLbu8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Aeb9cq2fGk75XVskOlhx9j3JEFiZJa5cWEOwVOR44gbnLmNG/rdWI1ObF3bx/gOTn7uvs/V4xN3Ih96LZxRiMNU/zchTrLRBf4Hl2gF3myRSvMU+u2ONRbFh3giUVAgZ9nzSb3sTbPiXhmpdGKBREEDFhcsrPeD0sSUpxDxiXg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=BiWI6k6A; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=p2XzpobSb4xUxsviXewd93RwTBn8iirE3EU3fh5b0dPRKM8O6uiEtZtvg7PbLlDqt1/K5ghwJphXug9KS/XPBMhVJvxAazf90VAiCjZbyvhldiQtGVBfHmO06U62UFuJB+Wsk2xTTFzSB1Hcg9PHQ9ES/eWw1R+cu27yYryt2yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=VcaFkBT/; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id A3734206E9;
-	Mon,  9 Sep 2024 12:03:36 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 582CA2087B;
+	Mon,  9 Sep 2024 12:03:38 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jflAyDlZCSva; Mon,  9 Sep 2024 12:03:36 +0200 (CEST)
+	with ESMTP id nPtsb6fC-7_N; Mon,  9 Sep 2024 12:03:36 +0200 (CEST)
 Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 73650207F4;
+	by a.mx.secunet.com (Postfix) with ESMTPS id BC3012082B;
 	Mon,  9 Sep 2024 12:03:35 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 73650207F4
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com BC3012082B
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
 	s=202301; t=1725876215;
-	bh=0UdvoizZu0Eu3M9eTqpxPaAVMgJFwNH2IeCqh0vMK2U=;
+	bh=vorJ3V1CsURCiWLfS0xBx3s7lc9k2WC3MGLw4OwzGi0=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=BiWI6k6AQRDMHyol5klPBWalEMnrRHxcCR9U7p/8U7ED6AvzEjS3lnPv2ghOIplMI
-	 cL0HK2A2qz843GAoF9LoTN2bDOwxTfb9z8tLttX265q9ga/DWzo7IJMkkIONCJiCfD
-	 JeFXBB+TJdoFttLHp2jqjsemcopjXTGVHSJL1/rZ6CACTR4UwzH3M7h6TmGvcJMu5v
-	 SdH7hOXridB5vYUzi01IfR08cHs2N0ZXW1lMr4pjoX87B3/WJy9oxWJvUqzQR297yc
-	 H7OyRfRobDob/rdUlE29s2eUe/Sc9Zq9WkHksgUbP1UpRmA68rkBhyiEXDi2I6l9a3
-	 ybs7SNcNrMoeg==
+	b=VcaFkBT/cqa+ta63JIdtp593dlLZDgqRmE5dt82xVaCMmqWAUaO6pfHdWglcINIOk
+	 V0p8dIMQxZAkRN8+L0vMFisyIkleeuCkqUsr1UHCBoEzxrfkunjW+CMYzLTSQ+ZwrG
+	 zYDzDT3kll1mYw87j45dSxG5MYlKNgQpv5IDhgCYCg+o1gl4Sy86/5eNX3nJiAmFVx
+	 Dp7ocdMqBMo760JRfrP+DXSywMkub+4ndDaRdSP6kx9P4/FLO+hXeQLt9upIFhUpyi
+	 ze8F092TUr8qIgYF6f7GGXOd3f1oUwAKp10myFVAetCrekUBiC/aLCovoBtcWm+Hwt
+	 cT6vSGBds3/bA==
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -63,14 +63,14 @@ Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Sep
  2024 12:03:34 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 4161131843D6; Mon,  9 Sep 2024 12:03:34 +0200 (CEST)
+	id 4558131844C0; Mon,  9 Sep 2024 12:03:34 +0200 (CEST)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 06/11] xfrm: switch migrate to xfrm_policy_lookup_bytype
-Date: Mon, 9 Sep 2024 12:03:23 +0200
-Message-ID: <20240909100328.1838963-7-steffen.klassert@secunet.com>
+Subject: [PATCH 07/11] xfrm: policy: remove remaining use of inexact list
+Date: Mon, 9 Sep 2024 12:03:24 +0200
+Message-ID: <20240909100328.1838963-8-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240909100328.1838963-1-steffen.klassert@secunet.com>
 References: <20240909100328.1838963-1-steffen.klassert@secunet.com>
@@ -88,188 +88,129 @@ X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
 From: Florian Westphal <fw@strlen.de>
 
-XFRM_MIGRATE still uses the old lookup method:
-first check the bydst hash table, then search the list of all the other
-policies.
+No consumers anymore, remove it.  After this, insertion of policies
+no longer require list walk of all inexact policies but only those
+that are reachable via the candidate sets.
 
-Switch MIGRATE to use the same lookup function as the packetpath.
+This gives almost linear insertion speeds provided the inserted
+policies are for non-overlapping networks.
 
-This is done to remove the last remaining users of the pernet
-xfrm.policy_inexact lists with the intent of removing this list.
+Before:
+Inserted 1000   policies in 70 ms
+Inserted 10000  policies in 1155 ms
+Inserted 100000 policies in 216848 ms
 
-After this patch, policies are still added to the list on insertion
-and they are rehashed as-needed but no single API makes use of these
-anymore.
+After:
+Inserted 1000   policies in 56 ms
+Inserted 10000  policies in 478 ms
+Inserted 100000 policies in 4580 ms
 
-This change is compile tested only.
+Insertion of 1m entries takes about ~40s after this change
+on my test vm.
 
+Cc: Noel Kuntze <noel@familie-kuntze.de>
 Cc: Tobias Brunner <tobias@strongswan.org>
 Signed-off-by: Florian Westphal <fw@strlen.de>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_policy.c | 106 +++++++++++++++--------------------------
- 1 file changed, 39 insertions(+), 67 deletions(-)
+ include/net/xfrm.h     |  1 -
+ net/xfrm/xfrm_policy.c | 38 --------------------------------------
+ 2 files changed, 39 deletions(-)
 
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index f7244ac4fa08..1fa2da22a49e 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -555,7 +555,6 @@ struct xfrm_policy {
+ 	u16			family;
+ 	struct xfrm_sec_ctx	*security;
+ 	struct xfrm_tmpl       	xfrm_vec[XFRM_MAX_DEPTH];
+-	struct hlist_node	bydst_inexact_list;
+ 	struct rcu_head		rcu;
+ 
+ 	struct xfrm_dev_offload xdo;
 diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 423d1eb24f31..d2feee60bb62 100644
+index d2feee60bb62..b79ac453ea37 100644
 --- a/net/xfrm/xfrm_policy.c
 +++ b/net/xfrm/xfrm_policy.c
-@@ -1252,13 +1252,10 @@ static void xfrm_hash_rebuild(struct work_struct *work)
- {
- 	struct net *net = container_of(work, struct net,
- 				       xfrm.policy_hthresh.work);
--	unsigned int hmask;
- 	struct xfrm_policy *pol;
- 	struct xfrm_policy *policy;
- 	struct hlist_head *chain;
--	struct hlist_head *odst;
- 	struct hlist_node *newpos;
--	int i;
- 	int dir;
- 	unsigned seq;
- 	u8 lbits4, rbits4, lbits6, rbits6;
-@@ -1322,23 +1319,7 @@ static void xfrm_hash_rebuild(struct work_struct *work)
- 			goto out_unlock;
+@@ -196,8 +196,6 @@ xfrm_policy_inexact_lookup_rcu(struct net *net,
+ static struct xfrm_policy *
+ xfrm_policy_insert_list(struct hlist_head *chain, struct xfrm_policy *policy,
+ 			bool excl);
+-static void xfrm_policy_insert_inexact_list(struct hlist_head *chain,
+-					    struct xfrm_policy *policy);
+ 
+ static bool
+ xfrm_policy_find_inexact_candidates(struct xfrm_pol_inexact_candidates *cand,
+@@ -410,7 +408,6 @@ struct xfrm_policy *xfrm_policy_alloc(struct net *net, gfp_t gfp)
+ 	if (policy) {
+ 		write_pnet(&policy->xp_net, net);
+ 		INIT_LIST_HEAD(&policy->walk.all);
+-		INIT_HLIST_NODE(&policy->bydst_inexact_list);
+ 		INIT_HLIST_NODE(&policy->bydst);
+ 		INIT_HLIST_NODE(&policy->byidx);
+ 		rwlock_init(&policy->lock);
+@@ -1228,9 +1225,6 @@ xfrm_policy_inexact_insert(struct xfrm_policy *policy, u8 dir, int excl)
+ 		return ERR_PTR(-EEXIST);
  	}
  
--	/* reset the bydst and inexact table in all directions */
- 	for (dir = 0; dir < XFRM_POLICY_MAX; dir++) {
--		struct hlist_node *n;
+-	chain = &net->xfrm.policy_inexact[dir];
+-	xfrm_policy_insert_inexact_list(chain, policy);
 -
--		hlist_for_each_entry_safe(policy, n,
--					  &net->xfrm.policy_inexact[dir],
--					  bydst_inexact_list) {
--			hlist_del_rcu(&policy->bydst);
--			hlist_del_init(&policy->bydst_inexact_list);
--		}
--
--		hmask = net->xfrm.policy_bydst[dir].hmask;
--		odst = net->xfrm.policy_bydst[dir].table;
--		for (i = hmask; i >= 0; i--) {
--			hlist_for_each_entry_safe(policy, n, odst + i, bydst)
--				hlist_del_rcu(&policy->bydst);
--		}
- 		if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
- 			/* dir out => dst = remote, src = local */
- 			net->xfrm.policy_bydst[dir].dbits4 = rbits4;
-@@ -1363,6 +1344,10 @@ static void xfrm_hash_rebuild(struct work_struct *work)
- 			/* skip socket policies */
- 			continue;
+ 	if (delpol)
+ 		__xfrm_policy_inexact_prune_bin(bin, false);
+ 
+@@ -1346,7 +1340,6 @@ static void xfrm_hash_rebuild(struct work_struct *work)
  		}
-+
-+		hlist_del_rcu(&policy->bydst);
-+		hlist_del_init(&policy->bydst_inexact_list);
-+
+ 
+ 		hlist_del_rcu(&policy->bydst);
+-		hlist_del_init(&policy->bydst_inexact_list);
+ 
  		newpos = NULL;
  		chain = policy_hash_bysel(net, &policy->selector,
- 					  policy->family, dir);
-@@ -4484,63 +4469,50 @@ EXPORT_SYMBOL_GPL(xfrm_audit_policy_delete);
- #endif
+@@ -1515,36 +1508,6 @@ static const struct rhashtable_params xfrm_pol_inexact_params = {
+ 	.automatic_shrinking	= true,
+ };
  
- #ifdef CONFIG_XFRM_MIGRATE
--static bool xfrm_migrate_selector_match(const struct xfrm_selector *sel_cmp,
--					const struct xfrm_selector *sel_tgt)
+-static void xfrm_policy_insert_inexact_list(struct hlist_head *chain,
+-					    struct xfrm_policy *policy)
 -{
--	if (sel_cmp->proto == IPSEC_ULPROTO_ANY) {
--		if (sel_tgt->family == sel_cmp->family &&
--		    xfrm_addr_equal(&sel_tgt->daddr, &sel_cmp->daddr,
--				    sel_cmp->family) &&
--		    xfrm_addr_equal(&sel_tgt->saddr, &sel_cmp->saddr,
--				    sel_cmp->family) &&
--		    sel_tgt->prefixlen_d == sel_cmp->prefixlen_d &&
--		    sel_tgt->prefixlen_s == sel_cmp->prefixlen_s) {
--			return true;
+-	struct xfrm_policy *pol, *delpol = NULL;
+-	struct hlist_node *newpos = NULL;
+-
+-	hlist_for_each_entry(pol, chain, bydst_inexact_list) {
+-		if (pol->type == policy->type &&
+-		    pol->if_id == policy->if_id &&
+-		    !selector_cmp(&pol->selector, &policy->selector) &&
+-		    xfrm_policy_mark_match(&policy->mark, pol) &&
+-		    xfrm_sec_ctx_match(pol->security, policy->security) &&
+-		    !WARN_ON(delpol)) {
+-			delpol = pol;
+-			if (policy->priority > pol->priority)
+-				continue;
+-		} else if (policy->priority >= pol->priority) {
+-			newpos = &pol->bydst_inexact_list;
+-			continue;
 -		}
--	} else {
--		if (memcmp(sel_tgt, sel_cmp, sizeof(*sel_tgt)) == 0) {
--			return true;
--		}
+-		if (delpol)
+-			break;
 -	}
--	return false;
+-
+-	if (newpos && policy->xdo.type != XFRM_DEV_OFFLOAD_PACKET)
+-		hlist_add_behind_rcu(&policy->bydst_inexact_list, newpos);
+-	else
+-		hlist_add_head_rcu(&policy->bydst_inexact_list, chain);
 -}
 -
- static struct xfrm_policy *xfrm_migrate_policy_find(const struct xfrm_selector *sel,
- 						    u8 dir, u8 type, struct net *net, u32 if_id)
- {
- 	struct xfrm_policy *pol, *ret = NULL;
--	struct hlist_head *chain;
--	u32 priority = ~0U;
-+	struct flowi fl;
- 
--	spin_lock_bh(&net->xfrm.xfrm_policy_lock);
--	chain = policy_hash_direct(net, &sel->daddr, &sel->saddr, sel->family, dir);
--	hlist_for_each_entry(pol, chain, bydst) {
--		if ((if_id == 0 || pol->if_id == if_id) &&
--		    xfrm_migrate_selector_match(sel, &pol->selector) &&
--		    pol->type == type) {
--			ret = pol;
--			priority = ret->priority;
--			break;
--		}
--	}
--	chain = &net->xfrm.policy_inexact[dir];
--	hlist_for_each_entry(pol, chain, bydst_inexact_list) {
--		if ((pol->priority >= priority) && ret)
--			break;
-+	memset(&fl, 0, sizeof(fl));
- 
--		if ((if_id == 0 || pol->if_id == if_id) &&
--		    xfrm_migrate_selector_match(sel, &pol->selector) &&
--		    pol->type == type) {
--			ret = pol;
-+	fl.flowi_proto = sel->proto;
-+
-+	switch (sel->family) {
-+	case AF_INET:
-+		fl.u.ip4.saddr = sel->saddr.a4;
-+		fl.u.ip4.daddr = sel->daddr.a4;
-+		if (sel->proto == IPSEC_ULPROTO_ANY)
- 			break;
--		}
-+		fl.u.flowi4_oif = sel->ifindex;
-+		fl.u.ip4.fl4_sport = sel->sport;
-+		fl.u.ip4.fl4_dport = sel->dport;
-+		break;
-+	case AF_INET6:
-+		fl.u.ip6.saddr = sel->saddr.in6;
-+		fl.u.ip6.daddr = sel->daddr.in6;
-+		if (sel->proto == IPSEC_ULPROTO_ANY)
-+			break;
-+		fl.u.flowi6_oif = sel->ifindex;
-+		fl.u.ip6.fl4_sport = sel->sport;
-+		fl.u.ip6.fl4_dport = sel->dport;
-+		break;
-+	default:
-+		return ERR_PTR(-EAFNOSUPPORT);
- 	}
- 
--	xfrm_pol_hold(ret);
-+	rcu_read_lock();
- 
--	spin_unlock_bh(&net->xfrm.xfrm_policy_lock);
-+	pol = xfrm_policy_lookup_bytype(net, type, &fl, sel->family, dir, if_id);
-+	if (IS_ERR_OR_NULL(pol))
-+		goto out_unlock;
- 
--	return ret;
-+	if (!xfrm_pol_hold_rcu(ret))
-+		pol = NULL;
-+out_unlock:
-+	rcu_read_unlock();
-+	return pol;
- }
- 
- static int migrate_tmpl_match(const struct xfrm_migrate *m, const struct xfrm_tmpl *t)
-@@ -4677,9 +4649,9 @@ int xfrm_migrate(const struct xfrm_selector *sel, u8 dir, u8 type,
- 
- 	/* Stage 1 - find policy */
- 	pol = xfrm_migrate_policy_find(sel, dir, type, net, if_id);
--	if (!pol) {
-+	if (IS_ERR_OR_NULL(pol)) {
- 		NL_SET_ERR_MSG(extack, "Target policy not found");
--		err = -ENOENT;
-+		err = IS_ERR(pol) ? PTR_ERR(pol) : -ENOENT;
- 		goto out;
+ static struct xfrm_policy *xfrm_policy_insert_list(struct hlist_head *chain,
+ 						   struct xfrm_policy *policy,
+ 						   bool excl)
+@@ -2346,7 +2309,6 @@ static struct xfrm_policy *__xfrm_policy_unlink(struct xfrm_policy *pol,
+ 	/* Socket policies are not hashed. */
+ 	if (!hlist_unhashed(&pol->bydst)) {
+ 		hlist_del_rcu(&pol->bydst);
+-		hlist_del_init(&pol->bydst_inexact_list);
+ 		hlist_del(&pol->byidx);
  	}
  
 -- 
