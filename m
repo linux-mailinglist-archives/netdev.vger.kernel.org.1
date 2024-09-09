@@ -1,97 +1,380 @@
-Return-Path: <netdev+bounces-126714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C3C99724E1
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:02:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70CD79724F7
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:11:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47F291F24AD5
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:02:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 218DA2857AE
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78297189BB3;
-	Mon,  9 Sep 2024 22:02:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72D318C924;
+	Mon,  9 Sep 2024 22:10:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="T/EMmWsy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvyrVMYD"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7522120DC4;
-	Mon,  9 Sep 2024 22:02:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AEE18A920
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 22:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725919334; cv=none; b=l97mmg8dxpd8R431qnS7s3MViFHb5HmH6n09NZ+xHzxtzrhFbknFwNMNS9pd7bYTPYNtbmDNSU/MNTs/tJfV8tRKBMLoAjajvWjebvZriMlTBqpgu1Rocq7arGbf1ygqPdBDwN3fzfjGyLzSN+/dfpraidynffCrsx7fT3NMgyo=
+	t=1725919859; cv=none; b=MdeN2Kkf6XTqy2OaLmQcrWhiU6QSOVVZC6WXCwcU48kD8bTMgKqYDxkNqb9uOJQIvbQEXfJSAWcp4dFHKIQDScxGpiGswHp4/mAAjQj9mzTixI86OJWZLFiENRgraTVESGjEsyyuK1/6kUq+EXmou8nfexArla88ie3whC2CEu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725919334; c=relaxed/simple;
-	bh=lYe0rkgDtNI/jidOEoLsGYoSEBJ5bkP3iMRt2gTBbhg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jAHgeUq0ghnv2D09tbS/1TveM6JU8OKoh+qN8VG2KwJox1SaOE/olLXBlDG97Iauthlj4ZvhwMYPSHvxAQWjMS54PYk1To3JMnR00gsRZpVaakNocmjSBFI1k9gKayXYplBfCWqBhmH+puW7q8mJ3t22RxGnS2UKvQi0rntXEAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=T/EMmWsy; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	s=arc-20240116; t=1725919859; c=relaxed/simple;
+	bh=8DFDmzqL/q/Tguc55ykTQW5i/tuAf7IOEQGlCOplS2M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hQt6rluGH5ClHnrONmeTXigHrMvDjev1c9w/+zY855nxOaAKNwo2CTLOemNgjsgLOkxHGb+tDMyFG+JoirOH+xRg4ZmlQVVmSjHTV9SIMame58dIUeS8nqlflgVlHLXlJyfY0VVhgjt7Nf6TM9LG3JjewVKBB0bDRnJ446Ax934=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gvyrVMYD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725919856;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BYUhsCRGwNHmUM+ZHicQvxJThfJ0JHZMmaRxrruXrII=;
+	b=gvyrVMYDCFdjfAT+vo/IbdvoRQOTB9t/suWZdqOBh5YVmeqags0S2D5KGNmnKPYnGzXD1o
+	JIT/36kxXz5y4Qct0D30L60/4OQb39LYn2vz9K28ubFom3lkiWehu1DIH5X6mFQnxkHOhH
+	1E3GnvMoGCF4pxm2E2jPhBGfd6NdA8g=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-4TnaWzUbPfCE_73FEoJ4yA-1; Mon,
+ 09 Sep 2024 18:10:51 -0400
+X-MC-Unique: 4TnaWzUbPfCE_73FEoJ4yA-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 5804F889CD;
-	Tue, 10 Sep 2024 00:02:09 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1725919330;
-	bh=VkV/85NfsMuF4xAjgFPcrSD/zAtFj55s0fBB60UNJPk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=T/EMmWsynmIAniaAax3Ts4ckj3WGIo3W74CW+ygL4+jbdBbxF/5WCyajRoAXwsU0g
-	 4xBON9dsRX6hNfeaE9Q8pwJ2EzHv2R+rMtm9sBSIQmO5fASAK7e9VjGH7Ryk5pAAwA
-	 2lpKaWLJsrOirglnL+cguURyn3Dt9WuYSMJy51tKh4c+C8dYb84Qmp0ibnV2G5Lop9
-	 1h3nFmU5glRC33r/3FJi6VgNvuokCPxDmXGUzObxJa+1Kh6qrF+WZjXAvt+9XVpm+D
-	 0/lcOLALKjgr2huvXV9Y6PTjGQMGp9xRDdwV983d/RexK6KWDikaq1Sptr3RNLXyRy
-	 8jM+QbMVuRO3A==
-Message-ID: <29644c36-41ab-46b5-b758-b79f5d668912@denx.de>
-Date: Tue, 10 Sep 2024 00:02:08 +0200
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 92BEA1956089;
+	Mon,  9 Sep 2024 22:10:48 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.56])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5344F195608A;
+	Mon,  9 Sep 2024 22:10:43 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	edumazet@google.com
+Subject: [PATCH v7 net-next 00/15] net: introduce TX H/W shaping API
+Date: Tue, 10 Sep 2024 00:09:54 +0200
+Message-ID: <cover.1725919039.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] wifi: wilc1000: Add WILC3000 support
-To: Ajay.Kathat@microchip.com, kvalo@kernel.org
-Cc: linux-wireless@vger.kernel.org, davem@davemloft.net,
- alexis.lothore@bootlin.com, claudiu.beznea@tuxon.dev, conor+dt@kernel.org,
- edumazet@google.com, kuba@kernel.org, krzk+dt@kernel.org, pabeni@redhat.com,
- robh@kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org
-References: <20240829004510.178016-1-marex@denx.de>
- <20240829004510.178016-5-marex@denx.de> <87ed5tgofh.fsf@kernel.org>
- <7205210d-8bf8-41ba-9462-38e619027a45@microchip.com>
- <87le00g2dw.fsf@kernel.org>
- <898e5736-9d9f-46ae-ba56-952b0cce9183@microchip.com>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <898e5736-9d9f-46ae-ba56-952b0cce9183@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-On 9/9/24 11:11 PM, Ajay.Kathat@microchip.com wrote:
+We have a plurality of shaping-related drivers API, but none flexible
+enough to meet existing demand from vendors[1].
 
-[...]
+This series introduces new device APIs to configure in a flexible way
+TX H/W shaping. The new functionalities are exposed via a newly
+defined generic netlink interface and include introspection
+capabilities. Some self-tests are included, on top of a dummy
+netdevsim implementation. Finally a basic implementation for the iavf
+driver is provided.
 
->>> Does it make sense to add a module parameter for device type(wilc1000 or
->>> wilc3000) to address device-specific featurization.
->>
->> We don't do hacks like that in upstream, it's expected that the driver
->> does this all automatically.
-> 
-> Marek has already submitted the patch to delay calling wiphy_register() so it
-> should work at run time for both the devices.
-> I'm just curious to know for which scenario the module parameters should be
-> used. Can it be used for enabling or disabling any feature, configuring any
-> parameters, instead of complete device-specific featurization.
-Module parameters are applicable for tunables which cannot be otherwise 
-configured at runtime. Runtime configuration is always preferable. For 
-the wilc, I don't think there is anything which has to be a module 
-parameter, maybe firmware filename could be it.
+Some usage examples:
+
+* Configure shaping on a given queue:
+
+./tools/net/ynl/cli.py --spec Documentation/netlink/specs/shaper.yaml \
+	--do set --json '{"ifindex": '$IFINDEX',
+			  "shaper": {"handle":
+				     {"scope": "queue", "id":'$QUEUEID'},
+			  "bw-max": 2000000}}'
+
+* Container B/W sharing
+
+The orchestration infrastructure wants to group the 
+container-related queues under a RR scheduling and limit the aggregate
+bandwidth:
+
+./tools/net/ynl/cli.py --spec Documentation/netlink/specs/shaper.yaml \
+	--do group --json '{"ifindex": '$IFINDEX',
+			"leaves": [
+			  {"handle": {"scope": "queue", "id":'$QID1'},
+			   "weight": '$W1'}, 
+			  {"handle": {"scope": "queue", "id":'$QID2'},
+			   "weight": '$W2'}], 
+			  {"handle": {"scope": "queue", "id":'$QID3'},
+			   "weight": '$W3'}], 
+			"handle": {"scope":"node"},
+			"bw-max": 10000000}'
+{'ifindex': $IFINDEX, 'handle': {'scope': 'node', 'id': 0}}
+
+Q1 \
+    \
+Q2 -- node 0 -------  netdev
+    / (bw-max: 10M)
+Q3 / 
+
+* Delegation
+
+A containers wants to limit the aggregate B/W bandwidth of 2 of the 3
+queues it owns - the starting configuration is the one from the
+previous point:
+
+SPEC=Documentation/netlink/specs/net_shaper.yaml
+./tools/net/ynl/cli.py --spec $SPEC \
+	--do group --json '{"ifindex": '$IFINDEX',
+			"leaves": [ 
+			  {"handle": {"scope": "queue", "id":'$QID1'},
+			   "weight": '$W1'}, 
+			  {"handle": {"scope": "queue", "id":'$QID2'},
+			   "weight": '$W2'}], 
+			"handle": {"scope": "node"},
+			"bw-max": 5000000 }'
+{'ifindex': $IFINDEX, 'handle': {'scope': 'node', 'id': 1}}
+
+Q1 -- node 1 --------\
+    / (bw-max: 5M)    \
+Q2 /                   node 0 -------  netdev
+                      /(bw-max: 10M)
+Q3 ------------------/
+
+In a group operation, when prior to the op itself, the leaves have
+different parents, the user must specify the parent handle for the
+group. I.e., starting from the previous config:
+
+./tools/net/ynl/cli.py --spec $SPEC \
+	--do group --json '{"ifindex": '$IFINDEX',
+			"leaves": [ 
+			  {"handle": {"scope": "queue", "id":'$QID1'},
+			   "weight": '$W1'}, 
+			  {"handle": {"scope": "queue", "id":'$QID3'},
+			   "weight": '$W3'}], 
+			"handle": {"scope": "node"},
+			"bw-max": 3000000 }'
+Netlink error: Invalid argument
+nl_len = 96 (80) nl_flags = 0x300 nl_type = 2
+	error: -22
+	extack: {'msg': 'All the leaves shapers must have the same old parent'}
+
+./tools/net/ynl/cli.py --spec $SPEC \
+	--do group --json '{"ifindex": '$IFINDEX',
+			"leaves": [ 
+			  {"handle": {"scope": "queue", "id":'$QID1'},
+			   "weight": '$W1'}, 
+			  {"handle": {"scope": "queue", "id":'$QID3'},
+			   "weight": '$W3'}], 
+			"handle": {"scope": "node"},
+			"parent": {"scope": "node", "id": 1},
+			"bw-max": 3000000 }
+{'ifindex': $IFINDEX, 'handle': {'scope': 'node', 'id': 2}}
+
+Q1 -- node 2 ---
+    /(bw-max:3M)\
+Q3 /             \
+         ---- node 1 \
+        / (bw-max: 5M)\
+      Q2              node 0 -------  netdev
+                      (bw-max: 10M)
+
+* Cleanup:
+
+Still starting from config 1To delete a single queue shaper
+
+./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "queue", "id":'$QID3'}}'
+
+Q1 -- node 2 ---
+     (bw-max:3M)\
+                 \
+         ---- node 1 \
+        / (bw-max: 5M)\
+      Q2              node 0 -------  netdev
+                      (bw-max: 10M)
+
+Deleting a node shaper relinks all its leaves to the node's parent:
+
+./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "node", "id":2}}'
+
+Q1 ---\
+       \
+        node 1----- \
+       / (bw-max: 5M)\
+Q2----/              node 0 -------  netdev
+                     (bw-max: 10M)
+
+Deleting the last shaper under a node shaper deletes the node, too:
+
+./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "queue", "id":'$QID1'}}'
+./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "queue", "id":'$QID2'}}'
+./tools/net/ynl/cli.py --spec $SPEC --do get --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "node", "id": 1}}'
+Netlink error: No such file or directory
+nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
+	error: -2
+	extack: {'bad-attr': '.handle'}
+
+Such delete recurses on parents that are left over with no leaves:
+
+./tools/net/ynl/cli.py --spec $SPEC --do get --json \
+	'{"ifindex": '$IFINDEX',
+	  "handle": {"scope": "node", "id": 0}}'
+Netlink error: No such file or directory
+nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
+	error: -2
+	extack: {'bad-attr': '.handle'}
+
+[1] https://lore.kernel.org/netdev/20240405102313.GA310894@kernel.org/
+---
+Changes from v6:
+ - move node attributes in main NL scope for group() op
+ - driver must acquire dev->lock around channels update
+ - implemented queue id checking in the core
+
+v6: https://lore.kernel.org/netdev/cover.1725457317.git.pabeni@redhat.com/
+
+Changes from v5:
+ - handle/shaper unsplit
+ - removed 'binding' from NL api
+ - several helper renames
+ - added rcu protection to shaper pointer
+ - implemented value checking into the core
+ - handle device channels reconf
+ - consolidate NL ctx handling
+ - dropped idr allocator, leverage the existing xarray
+ - caps names shrinking
+ - group() op is optional
+ - cap callback can't fail
+ - more self-tests
+
+v5: https://lore.kernel.org/netdev/cover.1724944116.git.pabeni@redhat.com/
+
+Changes from v4:
+ - ops operate on struct binding
+ - 'root' -> 'node' rename
+ - most core function/helpers operate on 'binding'
+ - use NL_SET_BAD_ATTR where possible
+ - some code deduplication
+
+v4: https://lore.kernel.org/netdev/cover.1724165948.git.pabeni@redhat.com/
+
+Changes from v3:
+ - rename
+ - locking
+ - delete operates on node, too
+
+v3: https://lore.kernel.org/netdev/cover.1722357745.git.pabeni@redhat.com/
+
+Changes from RFC v2:
+ - added patch 1
+ - fixed deprecated API usage
+
+RFC v2: https://lore.kernel.org/netdev/cover.1721851988.git.pabeni@redhat.com/
+
+Changes from RFC v1:
+ - set() and delete() ops operate on a single shaper
+ - added group() op to allow grouping and nesting
+ - split the NL implementation into multiple patches to help reviewing
+
+RFC v1: https://lore.kernel.org/netdev/cover.1719518113.git.pabeni@redhat.com/
+
+Paolo Abeni (11):
+  genetlink: extend info user-storage to match NL cb ctx
+  netlink: spec: add shaper YAML spec
+  net-shapers: implement NL get operation
+  net-shapers: implement NL set and delete operations
+  net-shapers: implement NL group operation
+  net-shapers: implement delete support for NODE scope shaper
+  net-shapers: implement shaper cleanup on queue deletion
+  netlink: spec: add shaper introspection support
+  net: shaper: implement introspection support
+  net-shapers: implement cap validation in the core
+  testing: net-drv: add basic shaper test
+
+Sudheer Mogilappagari (2):
+  iavf: Add net_shaper_ops support
+  iavf: add support to exchange qos capabilities
+
+Wenjun Wu (2):
+  virtchnl: support queue rate limit and quanta size configuration
+  ice: Support VF queue rate limit and quanta size configuration
+
+ Documentation/netlink/specs/net_shaper.yaml   |  364 +++++
+ Documentation/networking/kapi.rst             |    3 +
+ MAINTAINERS                                   |    1 +
+ drivers/net/Kconfig                           |    1 +
+ drivers/net/ethernet/intel/Kconfig            |    1 +
+ drivers/net/ethernet/intel/iavf/iavf.h        |   13 +
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  162 +-
+ drivers/net/ethernet/intel/iavf/iavf_txrx.h   |    2 +
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  157 +-
+ drivers/net/ethernet/intel/ice/ice.h          |    2 +
+ drivers/net/ethernet/intel/ice/ice_base.c     |    2 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |   21 +
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |    8 +
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |    1 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |    1 +
+ drivers/net/ethernet/intel/ice/ice_vf_lib.h   |    8 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |  335 ++++
+ drivers/net/ethernet/intel/ice/ice_virtchnl.h |   11 +
+ .../intel/ice/ice_virtchnl_allowlist.c        |    6 +
+ drivers/net/netdevsim/ethtool.c               |    2 +
+ drivers/net/netdevsim/netdev.c                |   39 +
+ drivers/net/vxlan/vxlan_mdb.c                 |    2 +-
+ include/linux/avf/virtchnl.h                  |  119 ++
+ include/linux/netdevice.h                     |   21 +
+ include/linux/netlink.h                       |    5 +-
+ include/net/genetlink.h                       |    8 +-
+ include/net/net_shaper.h                      |  120 ++
+ include/uapi/linux/net_shaper.h               |   95 ++
+ net/Kconfig                                   |    3 +
+ net/Makefile                                  |    1 +
+ net/core/dev.c                                |    8 +
+ net/core/dev.h                                |   10 +
+ net/core/netdev-genl.c                        |    2 +-
+ net/core/rtnetlink.c                          |    2 +-
+ net/devlink/devl_internal.h                   |    2 +-
+ net/ethtool/rss.c                             |    2 +-
+ net/netfilter/nf_conntrack_netlink.c          |    2 +-
+ net/netlink/genetlink.c                       |    4 +-
+ net/shaper/Makefile                           |    8 +
+ net/shaper/shaper.c                           | 1440 +++++++++++++++++
+ net/shaper/shaper_nl_gen.c                    |  154 ++
+ net/shaper/shaper_nl_gen.h                    |   44 +
+ tools/testing/selftests/drivers/net/Makefile  |    1 +
+ tools/testing/selftests/drivers/net/shaper.py |  457 ++++++
+ .../testing/selftests/net/lib/py/__init__.py  |    1 +
+ tools/testing/selftests/net/lib/py/ynl.py     |    5 +
+ 46 files changed, 3642 insertions(+), 14 deletions(-)
+ create mode 100644 Documentation/netlink/specs/net_shaper.yaml
+ create mode 100644 include/net/net_shaper.h
+ create mode 100644 include/uapi/linux/net_shaper.h
+ create mode 100644 net/shaper/Makefile
+ create mode 100644 net/shaper/shaper.c
+ create mode 100644 net/shaper/shaper_nl_gen.c
+ create mode 100644 net/shaper/shaper_nl_gen.h
+ create mode 100755 tools/testing/selftests/drivers/net/shaper.py
+
+-- 
+2.45.2
+
 
