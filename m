@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-126510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8723971A5E
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:08:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55241971A60
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A41D92829E4
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:08:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C64DB1F2394A
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 453F81B9B55;
-	Mon,  9 Sep 2024 13:08:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC331BA274;
+	Mon,  9 Sep 2024 13:08:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79A231B81C7;
-	Mon,  9 Sep 2024 13:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07B7C1BA275;
+	Mon,  9 Sep 2024 13:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725887292; cv=none; b=nri87R3lRMSlhUyDaXzc6h0tYJsS5WcGFzy6lJU+YeWMb6BiD4S0uR0THOl2aHg6XNBVYtTK/o4F6nWDcg25VfMR0fV6TDysapuluLmfPgXYAhMO9mmRK+ULTG844ZZdLSvAhYSFlAfT5Vd+bcWVtKohgS2brlGXgT7/XXPJjm4=
+	t=1725887294; cv=none; b=FMFqIULTHYBu3SN1yYiyc0MpukCkyug99zGLobuhvwG1rK/punGTkjnAUsKXuK01YV5OCyigK2h0cye/WOC9RGnBY2QJSXtoxhpGiPipcor2KaKcSM8hiwB9SLKq65ZIC7ucbKkZCT74xrUFBVSJWJKFk4uB/x8WcgMwaNN+bWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725887292; c=relaxed/simple;
-	bh=KlWvtgP776H3SGAl7+pUSjAVYPwx6ASIe7XSiqsaNgo=;
+	s=arc-20240116; t=1725887294; c=relaxed/simple;
+	bh=b0aIxet0QXlwVUlrSckU71HVdA5OMCthBU4wm1Oj+xw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fyh7vKsidLxMudarowmejtXiR8mbxVu+fBhL5t0vtMfObmJqkoWXCdcXxB9h0+ROzx3R37BDjcgRS557HgOPe/dii3JHXM4ObdV8NiOXPjhnFMf4+/VU4GTgq9zC9aKHx5MskWzXcnzjrPn/qZ1wTFsAEmgh5kAth5DzCvwD93Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.43
+	 MIME-Version; b=fp10LS/eB/ipQclc5e+3dImaGkFcozg1bdfaGXrgWTSuoXXvO05iuaAGrt2ouGUrSV5FegHdEKhh3cYsKN2g4Qa5kzCwIeJ9gO660XKSpS3oYvGvKnWwfC+vHx5R8AxtxNko7IaIfCP3fHrU3er3G9Wqij0/4g5cEo/yHbrOtsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c24ebaa427so8169825a12.1;
-        Mon, 09 Sep 2024 06:08:10 -0700 (PDT)
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-53655b9bbcdso4025990e87.2;
+        Mon, 09 Sep 2024 06:08:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725887289; x=1726492089;
+        d=1e100.net; s=20230601; t=1725887291; x=1726492091;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/vjwlQJTs89Ef/RIHRnwfyBxPAxdJWhwqwNkCraTk7k=;
-        b=F1Va/vvk5K1kFIlIrZjX3Mwl8lfnRyNC/qSsdBJpVdifGbPbdAm0QYozr4cSqq4nmA
-         lmdw5/3F360P7O7ZvwsFB8ZODlrbLE8f+M3QKMpwdUH3BfxrDI12dtyMvrIjBxqdBNYv
-         GpQ2GBXoeviiDoD3+qptZJIZiSomqSHNUvJgsqAA3IATYMVT95MqgmUSE4R4RVw5Izbn
-         LgGNcfgbLkXwv2CJwpdGdUr+cwWkOt7JjYcFB7TXLwVgYE+YabxGHqjDO7OtvXQKc9KL
-         RnuQzC6FnHYFZlWiO59o0yvQOLptFvOb0m6EzNgu7GxGtme60CPQxBJz5gwVjvPvSRui
-         X83g==
-X-Forwarded-Encrypted: i=1; AJvYcCUuLbWyV09vWDAAmBmTQkfinixGgEwZam/BzKVELHObYyH3oh4zcUraZ2EavuhwvFE3y23Ltb3pWP4ytWw=@vger.kernel.org, AJvYcCW4tB7kWd/Sd9n2k0FSsZLLXs2Q8kp1hGs+AISojYZBgu60guBZZzAOTxwdOKyK+q/vBMVXTHBH@vger.kernel.org
-X-Gm-Message-State: AOJu0YypJfFNyo9k3wXM0dER/0hDn5JoyvTSdtHLKgCkZc8cpbr7SVOc
-	0+LrY3x2hmXfEh3mpo/N0NvG3whWdP8KDt3tq2LpPUQIxSH9AvCN
-X-Google-Smtp-Source: AGHT+IFCaadGLqYBIQE/R8KwNLQ77x3OmVtlvpH++8pGBvWnu3ylQjUVO+wzkwhoWzahiAGlGni1HQ==
-X-Received: by 2002:a17:907:c06:b0:a87:370:8dfc with SMTP id a640c23a62f3a-a8a8603e91fmr1225785466b.14.1725887288631;
-        Mon, 09 Sep 2024 06:08:08 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d2583392csm341059266b.40.2024.09.09.06.08.07
+        bh=m6YmRt0ZJ0d/twgod5Qz5nnBIxWY8JCvQ0B1lUv4E5Q=;
+        b=Z4ZSmg0Cl/jYk+bTI2nI4rfvoGAXNEjHmRneg63oapeG56pRR06e9n0sCdIz8y6yX9
+         u9dJsTfgpBsZ+OwxTYBTGOqqVbecePzLwgWyAwQmPfOOkQjwhd1X2YEF1+5DlNpw/k8V
+         lMgGj0HfVxCxpl1wGn1DVh0FKxMC0dCfeEkYjxDY0/7t6+MQKn1bex8p+/4UVvh41H5i
+         GAchheFKik54eEjXBdnza1FUCbuat0GuI6vUpzy+X15BJjzUd4Yd0G6bT0NknUNNT/RY
+         dfParut6VaA28L8NEih6qec6lRI1uT5JPyzpf8pJyj5MQAxQOUdMi3if4NUgOXVZmTpa
+         1CBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0owp2mnboJe6jj1Lmt0XtpuEqJ6/Z8vs2voX76kBEbgTVKi+4zfT4QiQaqHyu4GC8U61VIFJ4@vger.kernel.org, AJvYcCVyeV80BrByLTdZe4YG/gsTN2MZa/srD504RUTQup9Sh7/+rq6UZAtUBkiVTTgz9CjLMfHtL7fiPePia2w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCkve/YsEahEKJYnfxcykTCUoqedHznVJbofYQYU46LLLJQGfB
+	reCoRxHHrz8vL5SB+GDydvpYSxTNtUpNxe/7DQcMJcWMbTOFRa0+
+X-Google-Smtp-Source: AGHT+IExl/fv4Y3nhEX82xi4IAL0eKbKKENkaDQZmm2yCCuqZHcYv6CWlRE0a36E4y2s55tVOl2VlQ==
+X-Received: by 2002:a05:6512:1386:b0:52e:fd84:cec0 with SMTP id 2adb3069b0e04-5365881028bmr5805104e87.52.1725887290637;
+        Mon, 09 Sep 2024 06:08:10 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25c72815sm342825966b.140.2024.09.09.06.08.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2024 06:08:07 -0700 (PDT)
+        Mon, 09 Sep 2024 06:08:10 -0700 (PDT)
 From: Breno Leitao <leitao@debian.org>
 To: kuba@kernel.org,
 	davem@davemloft.net,
@@ -65,9 +65,9 @@ Cc: thepacketgeek@gmail.com,
 	davej@codemonkey.org.uk,
 	vlad.wing@gmail.com,
 	max@kutsevol.com
-Subject: [PATCH net-next v2 02/10] net: netconsole: split send_ext_msg_udp() function
-Date: Mon,  9 Sep 2024 06:07:43 -0700
-Message-ID: <20240909130756.2722126-3-leitao@debian.org>
+Subject: [PATCH net-next v2 03/10] net: netconsole: separate fragmented message handling in send_ext_msg
+Date: Mon,  9 Sep 2024 06:07:44 -0700
+Message-ID: <20240909130756.2722126-4-leitao@debian.org>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20240909130756.2722126-1-leitao@debian.org>
 References: <20240909130756.2722126-1-leitao@debian.org>
@@ -77,89 +77,132 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-The send_ext_msg_udp() function has become quite large, currently
-spanning 102 lines. Its complexity, along with extensive pointer and
-offset manipulation, makes it difficult to read and error-prone.
-
-The function has evolved over time, and it’s now due for a refactor.
-
-To improve readability and maintainability, isolate the case where no
-message fragmentation occurs into a separate function, into a new
-send_msg_no_fragmentation() function. This scenario covers about 95% of
-the messages.
+Following the previous change, where the non-fragmented case was moved
+to its own function, this update introduces a new function called
+send_msg_fragmented to specifically manage scenarios where message
+fragmentation is required.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/netconsole.c | 46 +++++++++++++++++++++++++---------------
- 1 file changed, 29 insertions(+), 17 deletions(-)
+ drivers/net/netconsole.c | 78 ++++++++++++++++++++++++----------------
+ 1 file changed, 48 insertions(+), 30 deletions(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 03150e513cb2..d31ac47b496a 100644
+index d31ac47b496a..8faea9422ea1 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -1058,6 +1058,32 @@ static struct notifier_block netconsole_netdev_notifier = {
- 	.notifier_call  = netconsole_netdev_event,
- };
+@@ -1084,41 +1084,20 @@ static void send_msg_no_fragmentation(struct netconsole_target *nt,
+ 	netpoll_send_udp(&nt->np, buf, msg_len);
+ }
  
-+static void send_msg_no_fragmentation(struct netconsole_target *nt,
-+				      const char *msg,
-+				      const char *userdata,
-+				      int msg_len,
-+				      int release_len)
-+{
-+	static char buf[MAX_PRINT_CHUNK]; /* protected by target_list_lock */
-+	const char *release;
-+
-+	if (release_len) {
-+		release = init_utsname()->release;
-+
-+		scnprintf(buf, MAX_PRINT_CHUNK, "%s,%s", release, msg);
-+		msg_len += release_len;
-+	} else {
-+		memcpy(buf, msg, msg_len);
-+	}
-+
-+	if (userdata)
-+		msg_len += scnprintf(&buf[msg_len],
-+				     MAX_PRINT_CHUNK - msg_len,
-+				     "%s", userdata);
-+
-+	netpoll_send_udp(&nt->np, buf, msg_len);
-+}
-+
- /**
-  * send_ext_msg_udp - send extended log message to target
-  * @nt: target to send message to
-@@ -1090,23 +1116,9 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
- 		release_len = strlen(release) + 1;
- 	}
+-/**
+- * send_ext_msg_udp - send extended log message to target
+- * @nt: target to send message to
+- * @msg: extended log message to send
+- * @msg_len: length of message
+- *
+- * Transfer extended log @msg to @nt.  If @msg is longer than
+- * MAX_PRINT_CHUNK, it'll be split and transmitted in multiple chunks with
+- * ncfrag header field added to identify them.
+- */
+-static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+-			     int msg_len)
++static void send_msg_fragmented(struct netconsole_target *nt,
++				const char *msg,
++				const char *userdata,
++				int msg_len,
++				int release_len)
+ {
+ 	static char buf[MAX_PRINT_CHUNK]; /* protected by target_list_lock */
++	int offset = 0, userdata_len = 0;
+ 	const char *header, *body;
+-	int offset = 0;
+ 	int header_len, body_len;
+ 	const char *release;
+-	int release_len = 0;
+-	int userdata_len = 0;
+-	char *userdata = NULL;
+-
+-#ifdef CONFIG_NETCONSOLE_DYNAMIC
+-	userdata = nt->userdata_complete;
+-	userdata_len = nt->userdata_length;
+-#endif
  
--	if (msg_len + release_len + userdata_len <= MAX_PRINT_CHUNK) {
--		/* No fragmentation needed */
--		if (nt->release) {
--			scnprintf(buf, MAX_PRINT_CHUNK, "%s,%s", release, msg);
--			msg_len += release_len;
--		} else {
--			memcpy(buf, msg, msg_len);
--		}
--
--		if (userdata)
--			msg_len += scnprintf(&buf[msg_len],
--					     MAX_PRINT_CHUNK - msg_len,
--					     "%s", userdata);
--
--		netpoll_send_udp(&nt->np, buf, msg_len);
--		return;
+-	if (nt->release) {
+-		release = init_utsname()->release;
+-		release_len = strlen(release) + 1;
 -	}
-+	if (msg_len + release_len + userdata_len <= MAX_PRINT_CHUNK)
-+		return send_msg_no_fragmentation(nt, msg, userdata, msg_len,
-+						 release_len);
+-
+-	if (msg_len + release_len + userdata_len <= MAX_PRINT_CHUNK)
+-		return send_msg_no_fragmentation(nt, msg, userdata, msg_len,
+-						 release_len);
++	if (userdata)
++		userdata_len = nt->userdata_length;
  
  	/* need to insert extra header fields, detect header and body */
  	header = msg;
+@@ -1134,11 +1113,18 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 	 * Transfer multiple chunks with the following extra header.
+ 	 * "ncfrag=<byte-offset>/<total-bytes>"
+ 	 */
+-	if (nt->release)
++	if (release_len) {
++		release = init_utsname()->release;
+ 		scnprintf(buf, MAX_PRINT_CHUNK, "%s,", release);
++	}
++
++	/* Copy the header into the buffer */
+ 	memcpy(buf + release_len, header, header_len);
+ 	header_len += release_len;
+ 
++	/* for now on, the header will be persisted, and the body
++	 * will be replaced
++	 */
+ 	while (offset < body_len + userdata_len) {
+ 		int this_header = header_len;
+ 		int this_offset = 0;
+@@ -1184,6 +1170,38 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 	}
+ }
+ 
++/**
++ * send_ext_msg_udp - send extended log message to target
++ * @nt: target to send message to
++ * @msg: extended log message to send
++ * @msg_len: length of message
++ *
++ * Transfer extended log @msg to @nt.  If @msg is longer than
++ * MAX_PRINT_CHUNK, it'll be split and transmitted in multiple chunks with
++ * ncfrag header field added to identify them.
++ */
++static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
++			     int msg_len)
++{
++	char *userdata = NULL;
++	int userdata_len = 0;
++	int release_len = 0;
++
++#ifdef CONFIG_NETCONSOLE_DYNAMIC
++	userdata = nt->userdata_complete;
++	userdata_len = nt->userdata_length;
++#endif
++
++	if (nt->release)
++		release_len = strlen(init_utsname()->release) + 1;
++
++	if (msg_len + release_len + userdata_len <= MAX_PRINT_CHUNK)
++		return send_msg_no_fragmentation(nt, msg, userdata, msg_len,
++						 release_len);
++
++	return send_msg_fragmented(nt, msg, userdata, msg_len, release_len);
++}
++
+ static void write_ext_msg(struct console *con, const char *msg,
+ 			  unsigned int len)
+ {
 -- 
 2.43.5
 
