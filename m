@@ -1,132 +1,126 @@
-Return-Path: <netdev+bounces-126537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F1B6971B52
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:43:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DED8971B7E
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:47:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1338281AAF
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:43:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E7B0B22292
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:47:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD041B9B2B;
-	Mon,  9 Sep 2024 13:43:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3701B9B55;
+	Mon,  9 Sep 2024 13:46:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DO5LvU4O"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q/Tppn1v"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207071B6549;
-	Mon,  9 Sep 2024 13:43:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785A61B1403;
+	Mon,  9 Sep 2024 13:46:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725889389; cv=none; b=HBx8BTeUWb6mycUXWpK4/3GbRrCGnORXE8FaPb3nqR0rNiykA/JYrzv2a4pViNlD4XbSnOMcR8OaHTCnXXQbh6zgNC+SXDsc9WJS0z2Gj8m9uQH5svKUADtgSLXbHjl0CuajAiL+OTwgB/KDKUeU+V9BCKcxPS7j3QJJz3wp1wg=
+	t=1725889577; cv=none; b=bRMwj6mlQs/OXhwYaEOADO1h8XPM3asZBQMImJCia2kf7PGwQ9WbXl1Kpl/W8kiwwL17dtOVuQ3ebEnVcKR9/Ms0wwgAxRKFUj7ar90NQdR8xsx1oM+N7PtO6ZTcUha7vCMw6W7NvBu/r+XQZFerNdmccTGMLiaZ7lft228kr+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725889389; c=relaxed/simple;
-	bh=D5Ia8muRiaPpQ8e+jgPg6Xe7yzcNblDs9TSsBY3XZEg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VRYurYXKkKItNH1N/gHmtzS3NYh5K/06ayX2N+cRNXcSGxPgVShWwoqLlF+WXoglO4DYUhV5psOa2khGOav2y36QDR1jC6FBMesJUsssnd2H4V2mWCSQ6nstsE4A+mXMwzQexwchb4Zf5Imqaoj9aQSSX6KvC/g0ntxeGBkV+qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DO5LvU4O; arc=none smtp.client-ip=209.85.208.52
+	s=arc-20240116; t=1725889577; c=relaxed/simple;
+	bh=iplRYtL2g0wea0iqy6D251Yydb/Pl3OdQS9g51XRlFg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=WsgBx2CjfILZJCJRDDrf4GU/+Wpi5fRn4eIzjPtV5bI2RY03bIlY5pPiyBaMb8i1B/ymk9/q/NKFhjknlJfHFzpEtr1QzkAatCJrCiughAoUz65Afr4bdKjVWF5SqFGZLlssz5/K6PRZwefkjIvbGwmv/KsIWhuBPvPg0aFRsYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q/Tppn1v; arc=none smtp.client-ip=209.85.221.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c2561e8041so4828990a12.2;
-        Mon, 09 Sep 2024 06:43:07 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-374bd059b12so2654780f8f.1;
+        Mon, 09 Sep 2024 06:46:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725889386; x=1726494186; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725889575; x=1726494375; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BKjE0CdLzK8yk1+IP8qL6qC4lR7g2z+JPjfGRhpRJso=;
-        b=DO5LvU4OPFySThy8X/baBJjMvVL8N/lhibLg+1lXhqElRVA/6PS44iSNLg2Jnu+BI3
-         fAWUnI2gIji04W5jqWv3LV1Rc32gj9dv1FGWNEpbZ+E1rzp9elIgwyo0qpGcDbK51GPD
-         YER8FWKJUkK4SAaS5BQHj9kd1iE7LbyrArHPAi+EGgWrsbvoVngfDXRaz411d74HoHk9
-         qRl2FwtUSXVsGcYZiT+wEU2HGEakMZSipxYfjxEgnNENzKYeIMN4IigNelGwoKmIMah+
-         G7T+LGeSsh3wKPhkksGotz6ei/ySmEMTV5onqolkyPPO4YWWwgs0Ee864IHmZkvr4ZpW
-         6T0Q==
+        bh=jsb1hW5HiIcqNhuIYoIU21k0XvWHTUUsVMgaYZ6WuUQ=;
+        b=Q/Tppn1v4Zf031qbiID8NTsyLP9iSatVbXgjbj9riPyNrRFRUitv8gAiYs7PYqoFZF
+         9VvddGu+mBSaMNQOM0DlxqvVPCx7KdCCwLpjU3bY4MQ3luLAPznWPtUx7CxYAQHNHJMV
+         JBVmHzR5llkUtaKyzIkxnXLenDnAo4CyRJLEBUuGtnnNTZ9+e9QTI45u7em3GyypT+17
+         ABUqKnAzJ0PhwpMNzKUDMJvCVi2KYIZunVCDhfPfnQH+c3IXJNbLQM9jLgkAzOp0/W6F
+         iNA/xxTtYhv8/oDxhVuobMaBShDuzqmdoPJHZfSprOpkKY07EN43ZyXs7/nook1+6val
+         NeNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725889386; x=1726494186;
+        d=1e100.net; s=20230601; t=1725889575; x=1726494375;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=BKjE0CdLzK8yk1+IP8qL6qC4lR7g2z+JPjfGRhpRJso=;
-        b=Kn8OLvpScRQM6bfrMVdmvzDxfcOP19Z9Sr7Xe6w2GA66f3zOLqm24BiDlvfCLUqHqc
-         AlGklhEFTsPeB2ID+zgBkHcrMM+wE2cTJieUib8YPriwqFdfwWuESUkGU0wLgY9F/XvU
-         t2feSOcQd8EJ8ykm6iWRa6iPoAl2b7zU31X6yTe42G1g6TzNM0lbkbdbLERuRxAH/dHM
-         iTcNktb7r4zJMrGmKwGwYFeEd1ZxtNkUs9e/ybB10XY3LJIOA6lJOZNkfIYkGEZUsnNS
-         AcSy0VYVh1ZsFH/sP9+v0ZQonr5QKTiKu1vSgiZXG1Aa/K85B4vTLT6smoR4EOvYtW1q
-         msOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWoe2BEA/4y4KJIMeizMyIt4O5NxPwGZXhxlD7MuZ0sv6Z5NVetsJrNlBvA837JF2xjDD6L3Cg2@vger.kernel.org, AJvYcCXarzv7+WnJYVH7SaDWfJINteHoHAWjwmPM+nyfSO6cquqbtdyAMCTAbNa8NnAzVYhUWmSRj8KsP+K0RUY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyS82lIMpuv/1jUu5el7Bv8DOP97ADOslCQbbCsKb7uq5kahP45
-	OsccyWXmw50Onm2KxWNFaawrX1mpKJnRObffClFN4pP1Kpp36apZ
-X-Google-Smtp-Source: AGHT+IGMdpPGcLri5B1KmNQ+zRZv5O3O0cmkAAzb+3/olAW9Q5c67MUoyUWN/NQf77L7kddEDuuASg==
-X-Received: by 2002:a17:907:970c:b0:a8c:d6a3:d02e with SMTP id a640c23a62f3a-a8cd6a3d364mr687143866b.63.1725889385520;
-        Mon, 09 Sep 2024 06:43:05 -0700 (PDT)
-Received: from lapsy144.cern.ch (lapsy144.ipv6.cern.ch. [2001:1458:202:99::100:4b])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25833c90sm344333166b.25.2024.09.09.06.43.04
+        bh=jsb1hW5HiIcqNhuIYoIU21k0XvWHTUUsVMgaYZ6WuUQ=;
+        b=j8FwiLWj4ND5Vk2ggYGj3nlQQBHMYIdufBywJS55S7RfZrABntF5E8NASbeTao0Rgt
+         1OoZAd7i/Yl8Ui+LcPeSfa0k1IAsfnnOZiKn/lOWbUTFvh7HugUvYxDL19yX8scN5CYo
+         pfpeQ5aANIEBJVrmiJEapxAyQ91Cml6ccyHHXfkB0PF6k3dHeSNGDUBDGf2swhpdcmLE
+         NhNX01O+Zvj1hRRwHmjJKdKbanjbMujaOf0RrdlFH3+OAxPWxQJFjFPtTCNF07CI48EZ
+         tIW38PKcQ6lmJ/NbRi7CcqnDyWc6wciioxOai3FHLDdvDxl+Sg0RHSiWUmx5dRVk12Wz
+         YZ4A==
+X-Forwarded-Encrypted: i=1; AJvYcCVCa6O8deJSj5BEJFmobqgcw5y+5Xfl4hLz0RA74Ct4qy0Z0EkImjZ6BMDkpCdfoEibc3OBOFrEVEhgkwY=@vger.kernel.org, AJvYcCWeUWL9QWO87QZOyQJ6Rrts3qADTYlNLLihL2aGGlJeY0+nTpOmhmfUZa/WKCu7BLsAHiiqqLgK@vger.kernel.org
+X-Gm-Message-State: AOJu0Yww/Jf5nzNdy9TmAFv1TyodIDIpOrKRb2mA05Qf5/SBADTRy5ik
+	ck6xRsWZ9ekFXTcDk7Zbb2G3m8DTuHnjn03uGz667rBFyeKtSepK
+X-Google-Smtp-Source: AGHT+IFQL7agCuie4HPQrXUIGOQjmrOE9UbJfjjzFxKEnCpDAmCZFKVP1sYMkgzhBgJ4uOWfFjOQoQ==
+X-Received: by 2002:a05:6000:1f0b:b0:374:c793:7bad with SMTP id ffacd0b85a97d-378949f7bfbmr4708962f8f.16.1725889574563;
+        Mon, 09 Sep 2024 06:46:14 -0700 (PDT)
+Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42cb73ab096sm39270425e9.22.2024.09.09.06.46.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2024 06:43:05 -0700 (PDT)
-From: vtpieter@gmail.com
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+        Mon, 09 Sep 2024 06:46:13 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Justin Lai <justinlai0215@realtek.com>,
+	Larry Chiu <larry.chiu@realtek.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Pieter Van Trappen <pieter.van.trappen@cern.ch>,
-	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 1/1] net: dsa: microchip: update tag_ksz masks for KSZ9477 family
-Date: Mon,  9 Sep 2024 15:42:59 +0200
-Message-ID: <20240909134301.75448-1-vtpieter@gmail.com>
-X-Mailer: git-send-email 2.43.0
+Subject: [PATCH][next] rtase: Fix spelling mistake: "tx_underun" -> "tx_underrun"
+Date: Mon,  9 Sep 2024 14:46:12 +0100
+Message-Id: <20240909134612.63912-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+There is a spelling mistake in the struct field tx_underun, rename
+it to tx_underrun.
 
-Remove magic number 7 by introducing a GENMASK macro instead.
-Remove magic number 0x80 by using the BIT macro instead.
-
-Signed-off-by: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 ---
- net/dsa/tag_ksz.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/realtek/rtase/rtase_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/dsa/tag_ksz.c b/net/dsa/tag_ksz.c
-index 1f46de394f2e..281bbac5539d 100644
---- a/net/dsa/tag_ksz.c
-+++ b/net/dsa/tag_ksz.c
-@@ -178,8 +178,9 @@ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_KSZ8795, KSZ8795_NAME);
+diff --git a/drivers/net/ethernet/realtek/rtase/rtase_main.c b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+index 7882f2c0e1a4..869183e1565e 100644
+--- a/drivers/net/ethernet/realtek/rtase/rtase_main.c
++++ b/drivers/net/ethernet/realtek/rtase/rtase_main.c
+@@ -98,7 +98,7 @@ struct rtase_counters {
+ 	__le64 rx_broadcast;
+ 	__le32 rx_multicast;
+ 	__le16 tx_aborted;
+-	__le16 tx_underun;
++	__le16 tx_underrun;
+ } __packed;
  
- #define KSZ9477_INGRESS_TAG_LEN		2
- #define KSZ9477_PTP_TAG_LEN		4
--#define KSZ9477_PTP_TAG_INDICATION	0x80
-+#define KSZ9477_PTP_TAG_INDICATION	BIT(7)
+ static void rtase_w8(const struct rtase_private *tp, u16 reg, u8 val8)
+@@ -1619,8 +1619,8 @@ static void rtase_dump_state(const struct net_device *dev)
+ 		   le32_to_cpu(counters->rx_multicast));
+ 	netdev_err(dev, "tx_aborted %d\n",
+ 		   le16_to_cpu(counters->tx_aborted));
+-	netdev_err(dev, "tx_underun %d\n",
+-		   le16_to_cpu(counters->tx_underun));
++	netdev_err(dev, "tx_underrun %d\n",
++		   le16_to_cpu(counters->tx_underrun));
+ }
  
-+#define KSZ9477_TAIL_TAG_EG_PORT_M	GENMASK(2, 0)
- #define KSZ9477_TAIL_TAG_PRIO		GENMASK(8, 7)
- #define KSZ9477_TAIL_TAG_OVERRIDE	BIT(9)
- #define KSZ9477_TAIL_TAG_LOOKUP		BIT(10)
-@@ -312,7 +313,7 @@ static struct sk_buff *ksz9477_rcv(struct sk_buff *skb, struct net_device *dev)
- {
- 	/* Tag decoding */
- 	u8 *tag = skb_tail_pointer(skb) - KSZ_EGRESS_TAG_LEN;
--	unsigned int port = tag[0] & 7;
-+	unsigned int port = tag[0] & KSZ9477_TAIL_TAG_EG_PORT_M;
- 	unsigned int len = KSZ_EGRESS_TAG_LEN;
- 
- 	/* Extra 4-bytes PTP timestamp */
-
-base-commit: 52fc70a32573707f70d6b1b5c5fe85cc91457393
+ static void rtase_tx_timeout(struct net_device *dev, unsigned int txqueue)
 -- 
-2.43.0
+2.39.2
 
 
