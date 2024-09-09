@@ -1,88 +1,152 @@
-Return-Path: <netdev+bounces-126605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 739C0971FF3
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 19:06:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5A3B971FFE
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 19:07:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3211F285EF0
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 17:06:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E21801C233A0
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 17:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D65C16EBED;
-	Mon,  9 Sep 2024 17:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E9B17332B;
+	Mon,  9 Sep 2024 17:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="mqbQoK1V"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JhKlOU9D"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 371DD16DED5;
-	Mon,  9 Sep 2024 17:04:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7FB172BAE
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 17:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725901484; cv=none; b=owZ+6u2OqTrpenQ5k697at7nGiRvhLJKSZ4xSXxSUaiKbWmW1RSKje1+EddiyZysiKCxBkXbpekWvH+342RjAYZleH2hGxzhineup7P9vtmj34WJ7eiWaNH12PyNeQrs0qosOG+zeOCEAGJQxBI42ewJDe0F4u3hqYTnosV1rs0=
+	t=1725901621; cv=none; b=kxRKRFaAUb4UmePT+grlpq4GeRc4kmMHq4Es6ZnPmnkaLECJeUW8+8sWQYzpbtT/RcRDqZ4VJCy3QcTHLsJelX1oF68ZqTushrwGlDb5at5xAt9cWrsHfPLIhyaPzEpeF9LQP3K3DAyGZkp3Qf3+v+UxKek+t3ZIflzU3+aeWB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725901484; c=relaxed/simple;
-	bh=OfHok9I0g2Q9pMsZai4NU4WsEMttyfpengP9eJGtiwQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RQ3wWkDg29v8QyGWnI/jlRNcq5c+Auk33xHF0rUk9p6XSwN+HwG/xgWHZ2mMpogx4PkHOV/0bYY/7aOfip8ZQwU5aW1vhwGH9xy3CG5ewSdMBV3/9Ce1/AMesmDSJmxHNLiExBT1lqKmSd6N8l3vWkUj63vhvlmFGiwQmbeyU/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=mqbQoK1V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E2BAC4CEC5;
-	Mon,  9 Sep 2024 17:04:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1725901483;
-	bh=OfHok9I0g2Q9pMsZai4NU4WsEMttyfpengP9eJGtiwQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mqbQoK1VDTk69prxzGdAo7gvxCiuQXmxKp+svunOCTKnsusNVX6sox3PDaIn1GQCB
-	 n+N6th6fIP9AOg5OwMjkJfqwVdIbvAcnCwAVX+bIBaqzQeogEQQhkVWkSJJ7Hj7bBD
-	 qFpRDbbd5lfowqBDHfZ3rYHYB8fXusr6RaVhSXH0=
-Date: Mon, 9 Sep 2024 19:04:41 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: WangYuli <wangyuli@uniontech.com>
-Cc: stable@vger.kernel.org, sashal@kernel.org, william.qiu@starfivetech.com,
-	emil.renner.berthing@canonical.com, conor.dooley@microchip.com,
-	xingyu.wu@starfivetech.com, walker.chen@starfivetech.com,
-	robh@kernel.org, hal.feng@starfivetech.com, kernel@esmil.dk,
-	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
-	aou@eecs.berkeley.edu, devicetree@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	richardcochran@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH 6.6 1/4] riscv: dts: starfive: add assigned-clock* to
- limit frquency
-Message-ID: <2024090915-footpath-agenda-5a55@gregkh>
-References: <D200DC520B462771+20240909074645.1161554-1-wangyuli@uniontech.com>
+	s=arc-20240116; t=1725901621; c=relaxed/simple;
+	bh=YvuTEo3gCuN+ih3Ot/4XzfbfkK6jZG1cQi1TwckdPJk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vga+U9JWk5X2Mpsafh8pU2CCXbaM8cR4RTJBsR9vqA6sz/O/upOE0oPJRpN+QIGqYWsJxJSwjImI8XW0bjt3n363nGuUdN0y6vv4q2kVZ1Lfh65yvi8w5/GGOqltVQ7bft2hyUddkH6jz+wdd61uYbRPu/vSJGZPzNpBGdMQrBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JhKlOU9D; arc=none smtp.client-ip=91.218.175.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c17ef59b-330f-404d-ab03-0c45447305b0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725901616;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dQw1oeHSCvpcH8bA67v30RdZskBj7xtZCGm6aq02Fgc=;
+	b=JhKlOU9DZD19VPD/qu8EGPv2Ho3jMI+5pmfMVbkSPwSOBChpu/1XXURKcNUIeCRLxiKRpN
+	QYxdfllaQ5Adr3+5GQAL3WOJYECof8CrbHSXuF4T7T2CirOhelz5n5jvUPS7FE4iWnJ0rE
+	oB6MR0PzzcFvL4+Z7bFHcY9DWnND1/8=
+Date: Mon, 9 Sep 2024 13:06:52 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <D200DC520B462771+20240909074645.1161554-1-wangyuli@uniontech.com>
+Subject: Re: [PATCH net] net: dpaa: Pad packets to ETH_ZLEN
+To: Eric Dumazet <edumazet@google.com>
+Cc: Madalin Bucur <madalin.bucur@nxp.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ linux-kernel@vger.kernel.org, "David S . Miller" <davem@davemloft.net>
+References: <20240909160604.1148178-1-sean.anderson@linux.dev>
+ <CANn89i+UHJgx5cp6M=6PidC0rdPdr4hnsDaQ=7srijR3ArM1jw@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <CANn89i+UHJgx5cp6M=6PidC0rdPdr4hnsDaQ=7srijR3ArM1jw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Sep 09, 2024 at 03:46:27PM +0800, WangYuli wrote:
-> From: William Qiu <william.qiu@starfivetech.com>
+On 9/9/24 12:46, Eric Dumazet wrote:
+> On Mon, Sep 9, 2024 at 6:06 PM Sean Anderson <sean.anderson@linux.dev> wrote:
+>>
+>> When sending packets under 60 bytes, up to three bytes of the buffer following
+>> the data may be leaked. Avoid this by extending all packets to ETH_ZLEN,
+>> ensuring nothing is leaked in the padding. This bug can be reproduced by
+>> running
+>>
+>>         $ ping -s 11 destination
+>>
+>> Fixes: 9ad1a3749333 ("dpaa_eth: add support for DPAA Ethernet")
+>> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+>> ---
+>>
+>>  drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+>> index cfe6b57b1da0..e4e8ee8b7356 100644
+>> --- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+>> +++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+>> @@ -2322,6 +2322,12 @@ dpaa_start_xmit(struct sk_buff *skb, struct net_device *net_dev)
+>>         }
+>>  #endif
+>>
+>> +       /* Packet data is always read as 32-bit words, so zero out any part of
+>> +        * the skb which might be sent if we have to pad the packet
+>> +        */
+>> +       if (__skb_put_padto(skb, ETH_ZLEN, false))
+>> +               goto enomem;
+>> +
 > 
-> In JH7110 SoC, we need to go by-pass mode, so we need add the
-> assigned-clock* properties to limit clock frquency.
+> This call might linearize the packet.
 > 
-> Signed-off-by: William Qiu <william.qiu@starfivetech.com>
-> Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-> Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
-> Signed-off-by: WangYuli <wangyuli@uniontech.com>
-> ---
->  .../riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi | 4 ++++
->  1 file changed, 4 insertions(+)
+> @nonlinear variable might be wrong after this point.
+> 
+>>         if (nonlinear) {
+>>                 /* Just create a S/G fd based on the skb */
+>>                 err = skb_to_sg_fd(priv, skb, &fd);
+>> --
+>> 2.35.1.1320.gc452695387.dirty
+>>
+> 
+> Perhaps this instead ?
+> 
+> diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+> b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+> index cfe6b57b1da0e45613ac1bbf32ddd6ace329f4fd..5763d2f1bf8dd31b80fda0681361514dad1dc307
+> 100644
+> --- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+> +++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+> @@ -2272,12 +2272,12 @@ static netdev_tx_t
+>  dpaa_start_xmit(struct sk_buff *skb, struct net_device *net_dev)
+>  {
+>         const int queue_mapping = skb_get_queue_mapping(skb);
+> -       bool nonlinear = skb_is_nonlinear(skb);
+>         struct rtnl_link_stats64 *percpu_stats;
+>         struct dpaa_percpu_priv *percpu_priv;
+>         struct netdev_queue *txq;
+>         struct dpaa_priv *priv;
+>         struct qm_fd fd;
+> +       bool nonlinear;
+>         int offset = 0;
+>         int err = 0;
+> 
+> @@ -2287,6 +2287,10 @@ dpaa_start_xmit(struct sk_buff *skb, struct
+> net_device *net_dev)
+> 
+>         qm_fd_clear_fd(&fd);
+> 
+> +       if (__skb_put_padto(skb, ETH_ZLEN, false))
+> +               goto enomem;
+> +
+> +       nonlinear = skb_is_nonlinear(skb);
+>         if (!nonlinear) {
+>                 /* We're going to store the skb backpointer at the beginning
+>                  * of the data buffer, so we need a privately owned skb
 
-What is the git id of this change in Linus's tree?
+Thanks for the suggestion; I was having a hard time figuring out where
+to call this.
 
-Please fix this up and resend all 4 patches with the needed information.
+Do you have any hints for how to test this for correctness? I'm not sure
+how to generate a non-linear packet under 60 bytes.
 
-thanks,
-
-greg k-h
+--Sean
 
