@@ -1,101 +1,110 @@
-Return-Path: <netdev+bounces-126687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7898397239D
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:26:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B5B59723A0
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:27:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D2AA1F243BD
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:26:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 454F41F241FE
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:27:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E5A9189F5A;
-	Mon,  9 Sep 2024 20:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560D9188CAF;
+	Mon,  9 Sep 2024 20:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="cCrsahxs"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GnqKLukI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234F918C31;
-	Mon,  9 Sep 2024 20:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BDC18C31
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 20:27:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725913612; cv=none; b=ZHcSRiJljibcnTRVCDHzEb2fNOAMjaxrzEtCgWeFrdbV50Eo4NooVcZIZpyWhuxEaa+Z4ksd0EQJ97bLh6TDZAZwVtjROKjoU8K/+X7VxvTLkpc+1II+BqQn449+fJpXWlJacajYS2bDaiQVAdUcDyEzCmcrGogktd0MasAvKZQ=
+	t=1725913673; cv=none; b=ZzOxhbA9LPPONM/Xt7UITcL+86Auj03VUQQNCcz1s0hlvQ8dyRrdPMrw/oCLpLAyoiI1C/qnRWAnc+VXZJxyoyZMoioQbDZ0lQc8mMofCa0ZOR8c1jLr8XPshhAVDrFpYFVWH3O6T7Qhz4Ra56QO0cfZqCPxJSHxSJXeT4ZAC8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725913612; c=relaxed/simple;
-	bh=hXtKTqdWWKPLqtm07H2cz2vpFpZqstjIAxUmUCHTUFg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q3XDTuLQwQM9zYJHhW7HAlGl+UQ3WRxqCZXjBazGqKpo88rgUILJbUwxYDnHeI+OWFOoAzYsGriCq+7UOkw0/PYCfQRCrrzi42hBs2LmAR8qdS8cYAZ9L62JvE/orsJpro+2YG7Ka1/CmUg3HCjV9csvvRROqH/InMyQuyNQU18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=cCrsahxs; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2053a0bd0a6so40415ad.3;
-        Mon, 09 Sep 2024 13:26:50 -0700 (PDT)
+	s=arc-20240116; t=1725913673; c=relaxed/simple;
+	bh=S5CGmFXKpLAa5z1RgZKOk0hXD9EVG+qSP9iISqRhGOI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jAcz+RipWpSZDzvEW56UYXMr6tcdXSb6XvO7UNKMcViO1yji6xuhqB50lr8RbjffzqZjFetnpebSmBOcPsKRwmcOaK6C8ZBnenIJO+AJVvS1xULwe3pvFJihNsEq2CrCYMEa9qV1txEMamBIWAv4tiwwrOS04fWDV50ZEt60J6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GnqKLukI; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-205909af9b5so37074295ad.3
+        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 13:27:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20230601; t=1725913610; x=1726518410; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hXtKTqdWWKPLqtm07H2cz2vpFpZqstjIAxUmUCHTUFg=;
-        b=cCrsahxsZQHt7TkJzOBDDe8q8JCPeBbS9XbM1Th4dw5vXCB6fpTpiBl3BITv4jli2c
-         SsU/uXG6dAOxzCcLU+gVvoJ88xMaDavSYr7pCAJ0TVCQSvdGZppazNe1rM1BhOL3mrGN
-         vb5YBDM/yHiJ89DZUxfqEi7WJKW49YYmDXDGFgiVcDAUUgDktXUrfcteoVITzJbLwNjz
-         U3SnXaMEitjX+Nwf+uNxbIz5gFNMFvUA2i/0GodyaY+GcewyurQjOiN7CiNUb7zWh+/j
-         pBTMScujRwk4Ko28ieuoHSyV2QAupw1GJXvoSMP5Q/dnXgQAcTDmLhxoEElfIYzoo8Ad
-         q2dA==
+        d=broadcom.com; s=google; t=1725913671; x=1726518471; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=D63WvmatL9CRXk+7k0HeQjWj60in9rk7cimZSEd+owY=;
+        b=GnqKLukIivMG9IlC8tLIK3H8Mb3CydFYJWoYyqOOvxUxF8dNUk+RwjREJeog21qgwv
+         ver8ZskkFq9Oe2B1ogvWPtaSDfAsEoPgy8KvwPdsKgBDuX0AjQ0WomZQ9mkbPCbAloF0
+         6AKqUXabQ4rP0QtLrvxGFFuVlxKAZcbb+B+0E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725913610; x=1726518410;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hXtKTqdWWKPLqtm07H2cz2vpFpZqstjIAxUmUCHTUFg=;
-        b=wLJZQAmQioYSjuv99IwrGEuTYofKNVhlSwc/EFtggj3JKREZtlc194waiqukBLtTKW
-         Xc7r2b5A9TeW9Uf2HP/Bdazc60Vc+U7ekWO5cg97MJM9CjAJpImCMYfOJctw+48GygBd
-         6VYJM9PsK9xD820xmwzfWoKZO9egDPhrXnoY1i6ACkpWvM46VBk3zEvGxq20uJJOQmEo
-         jy6+kKApKE9T325AXjkjpMfI/HCTNC18cXn8gsZ80d7NQiJ+Dvhzgs9DosCGmYI5Qmnu
-         tlQNMDUeeMJZtPTyOHSoRWt4sAUeltnE+I3N2d0TZtdNqshtxEkTwIt1Ze3nW4WMhdTx
-         D+DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUgCV8nwYm4duiyRD7GWNs0zBidh6U/e6RriOYi47f1S/mgSfNG9NfMmUelhrr1yD8+F0ED83ffAGh8@vger.kernel.org, AJvYcCW/GbdAwD3bwKNda/vsOEvXFZAapitlfleCSYjXiaOU0aW5OheukH7ZRlreeX4QumPSuW+Mr9+3@vger.kernel.org, AJvYcCWZBCGhbiGDf1PEEQf9BSdzUlmp07ndOkURb2No4AE8/G4NOGV/urpjpW8JSpS5Xhe5Exdwfo+u0OHM57ax@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3oFVGHntE6CLpyN1fi9G8t2fnSgylQJESTl889XbfkHgncOy+
-	lI/FFruV3BZ/NNohInz8GOec0m2ZFAnAyXr1xt+pEc+3RgeSldPdwRNBjrXsJsAN9IDpYP0Twmf
-	ALyEQw6Feq9b1K83Q55/8kXWXkl0=
-X-Google-Smtp-Source: AGHT+IE0yIiSNh7iLrnnnMSnuKkF/A5hQoR5M/1+7xbyC3kDdI8X1yQna/nY992WYvWyyRjnqrcI1fEZ9mQTOFlhE5Q=
-X-Received: by 2002:a17:902:ce10:b0:206:928c:bfda with SMTP id
- d9443c01a7336-206f065b8demr138144815ad.56.1725913610159; Mon, 09 Sep 2024
- 13:26:50 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725913671; x=1726518471;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D63WvmatL9CRXk+7k0HeQjWj60in9rk7cimZSEd+owY=;
+        b=cVsZ/aAntyr2W+swwp7ldlts4lgmnfBqdbFeVGHsUug6bbBefttZAcsyDPEWOjladv
+         +NB/5ZnqwwqLSbZEQ3D5CQxrRkKyBvZRN6QMhyp3Pm6Wi1BBn8gx7d2DlppgiCbyVzkg
+         5kHEAHGzrCG76NuvJ0HD4OCza7f1QhT5I5QXuH2d7ESsEr3GfZ+S2Qzgq0gwpDUP3hKt
+         8Paql89SSTbqFt7kRBxSanENGYQBjXjm1iUY+P35rJfHdxYnAIYcc/qbPye5E11dZpXe
+         P63Ywn3fJp9EATREFUlxI/WR3psU/oDg4mNOOQ+IUrLu4TciHt1HzeF0MDjH75uTTd5f
+         UIfw==
+X-Gm-Message-State: AOJu0Yxi1D8hQxSCbb2MnfVqh3cNcXgc28P8YO90UpLt5doj3fmShFGe
+	9AunRutoHfRhgolkhaoryaQIvuetwzrtQs1yWvO4BuOHbmLaKJ0gPWCZtDbPIl0KdLxFAkaaf98
+	=
+X-Google-Smtp-Source: AGHT+IHGXg9mz0MaAfxk6Wpc4fz8mnrFBOGncmniQ+bUlnSONz75Qb3lVW8NXk7kt54CHKqERfTVVA==
+X-Received: by 2002:a17:903:230a:b0:206:c486:4c33 with SMTP id d9443c01a7336-206f0522330mr162859085ad.30.1725913670782;
+        Mon, 09 Sep 2024 13:27:50 -0700 (PDT)
+Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d8259bccbcsm4427640a12.79.2024.09.09.13.27.49
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 09 Sep 2024 13:27:50 -0700 (PDT)
+From: Michael Chan <michael.chan@broadcom.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	gospo@broadcom.com,
+	selvin.xavier@broadcom.com,
+	pavan.chebbi@broadcom.com
+Subject: [PATCH net-next 0/3] bnxt_en: MSIX improvements
+Date: Mon,  9 Sep 2024 13:27:34 -0700
+Message-ID: <20240909202737.93852-1-michael.chan@broadcom.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240909172342.487675-2-robh@kernel.org>
-In-Reply-To: <20240909172342.487675-2-robh@kernel.org>
-From: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Date: Mon, 9 Sep 2024 22:26:39 +0200
-Message-ID: <CAFBinCDiV1yYHY6curqZ3xSEGSQok24=X6dz2PC91x5e88LRyQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: amlogic,meson-dwmac: Fix
- "amlogic,tx-delay-ns" schema
-To: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Kevin Hilman <khilman@baylibre.com>, 
-	Jerome Brunet <jbrunet@baylibre.com>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-amlogic@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Sep 9, 2024 at 7:24=E2=80=AFPM Rob Herring (Arm) <robh@kernel.org> =
-wrote:
->
-> The "amlogic,tx-delay-ns" property schema has unnecessary type reference
-> as it's a standard unit suffix, and the constraints are in freeform
-> text rather than schema.
->
-> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
-Reviewed-by: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+This patchset makes some improvements related to MSIX.  The first
+patch adjusts the default MSIX vectors assigned for RoCE.  On the
+PF, the number of MSIX is increased to 64 from the current 9.  The
+second patch allocates additional MSIX vectors ahead of time when
+changing ethtool channels if dynamic MSIX is supported.  The 3rd
+patch makes sure that the IRQ name is not truncated.
+
+Edwin Peer (1):
+  bnxt_en: resize bnxt_irq name field to fit format string
+
+Michael Chan (2):
+  bnxt_en: Increase the number of MSIX vectors for RoCE device
+  bnxt_en: Add MSIX check in bnxt_check_rings()
+
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 19 ++++++++++++++++++-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  5 ++++-
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 11 ++++++-----
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c | 14 ++++++++++----
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h |  6 ++++--
+ 5 files changed, 42 insertions(+), 13 deletions(-)
+
+-- 
+2.30.1
+
 
