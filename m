@@ -1,74 +1,117 @@
-Return-Path: <netdev+bounces-126610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A852D97205B
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 19:23:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28F0F972063
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 19:24:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5309E1F233E8
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 17:23:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A98AAB22915
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 17:24:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 777B816D4EF;
-	Mon,  9 Sep 2024 17:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAE917B401;
+	Mon,  9 Sep 2024 17:24:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXm+dTgt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B2+G+/XH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5CC1865C;
-	Mon,  9 Sep 2024 17:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F5F173328;
+	Mon,  9 Sep 2024 17:24:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725902590; cv=none; b=pEVh3j4v1nd24L3dS02WPkojiRbqwGobPXCdVbl/b3CUTcFnFLrSiaa9sL6VCpa8D2hq+lq52tlSToOAd2EZ66zyc689zfTQzfMatbiIfshe9aQ+mh7JNRKpPmI6Q7QEuv2WX/X5Q9WzIDicr1JIZ9ErPZ5WsQ8awa3vif5/6co=
+	t=1725902650; cv=none; b=QVrs8L3WOWO5Msg6TsO3/h1JAiIFOzT14AhOy3q7/6CmhyQc5bsMJitK0ZMoNXq/zlklh/wTOs5xHAjUFsaUFyJFx5UTX0sTyVdvKzhazWCvnixP+uPu+Qs38ShuiO8UbpheRbf1T3Wg6XKIKF1vhDbYVPkc64jn9AuLQqruI7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725902590; c=relaxed/simple;
-	bh=ARNE1GoRCaGtDrcWy2PA91FxDv3h5Zk21Xfzd0I6xyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NYuyDUFmxPrjXLO5FK3TcrJwLKgx9JCI2qX3TYJ8gsRY29YoTqNZwoQd7s2w+CesZZQdriJ+SkC8kTG63DIndnSeGwHZLRQuzbFOndfzRuUZj8zazQ8fA2GcNFs+tgx3UiwKkShqglX49yCKs424ZP3KxJPgeyx2KG6i76dcuG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXm+dTgt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB212C4CEC5;
-	Mon,  9 Sep 2024 17:23:09 +0000 (UTC)
+	s=arc-20240116; t=1725902650; c=relaxed/simple;
+	bh=RA3HARXHwHsFdKkowqZX2MlM4vFFTmpEgk6U7rVwfvA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UNfhVZUi87JWG5CF27G43h5HzQKHmeotSSYhWLa01ETBgIXYBXOPjXPwUfXkkcRjDigiz89RcMN0cHoEgS4Tq6MJein5vmeSroMfuNDYt+vbMtXR7bbdiM1BStq7KBfKt4ecofFQMGlXXbgDOeRlOmz1tTHD18C6xUkhh81h0G0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B2+G+/XH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C67EEC4CEC5;
+	Mon,  9 Sep 2024 17:24:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725902590;
-	bh=ARNE1GoRCaGtDrcWy2PA91FxDv3h5Zk21Xfzd0I6xyg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dXm+dTgtHsr3YlzpW2tEHgnowVws6yR3gLCxCBxNaJ2FCEXGlJL8STEKQtyRKnoxJ
-	 Rb1D5MUWwexUYx+nEGRikZRGtqDodBpXRVFEyEyM/M/iHS27FRQxJc0LBlTwzaFXlN
-	 beqYSd4KFNTjgLbAF5tHwUsKt5fdjW9uw4K6wo15XteUaK44eV6S4xPXoflcoYPEMJ
-	 AMUDnPN1VNOTpAWFGusA/U1PBze6HePvxAYLinDtrXqKx0rm2ybcyfTZryMIwVOJwY
-	 G3d8e2IkaEpaBTYPZb4ZRlZTQeAa4a4rIL85/ZLg73d27vpDprpxN2FRRcgRmOPPAz
-	 7aaAD+nN0A1jQ==
-Date: Mon, 9 Sep 2024 10:23:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: willemdebruijn.kernel@gmail.com
-Cc: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
- willemb@google.com, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v2] selftests: return failure when timestamps
- can't be reported
-Message-ID: <20240909102309.3da82583@kernel.org>
-In-Reply-To: <20240905160035.62407-1-kerneljasonxing@gmail.com>
-References: <20240905160035.62407-1-kerneljasonxing@gmail.com>
+	s=k20201202; t=1725902649;
+	bh=RA3HARXHwHsFdKkowqZX2MlM4vFFTmpEgk6U7rVwfvA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=B2+G+/XHBZUQnA4GoEUqhzdJtSoIn9iFniWw6bSrO83ULbPR+6DGn13YuxJuiV26k
+	 Xdz/85WtITZgwac+hBhrs23UBqrDkkUarfdaXFQhw6hDzIpmHYvr9934Lv2+YnWjWo
+	 KzxRYd10k8JhZ9xSj5wc/rSLmUCfR8iO7KOc/lcWrm5cjBH7Qk2F021/9nv1iwP3zU
+	 nSPC6ZwHElhYQMjeOcmyiklcMps7lz6hSA6vAgUReZbU2VdTviETXFeDs4s2Ar04Ns
+	 aTRKHe2gYG1pB4G6jsyfh5tLHNHs0OxhyZnzHrVtCSD8tdnHzcF/5Q3F5U9jRk9ogq
+	 9T2GVybY02J6g==
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-amlogic@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: amlogic,meson-dwmac: Fix "amlogic,tx-delay-ns" schema
+Date: Mon,  9 Sep 2024 12:23:42 -0500
+Message-ID: <20240909172342.487675-2-robh@kernel.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri,  6 Sep 2024 00:00:35 +0800 Jason Xing wrote:
-> When I was trying to modify the tx timestamping feature, I found that
-> running "./txtimestamp -4 -C -L 127.0.0.1" didn't reflect the error:
-> I succeeded to generate timestamp stored in the skb but later failed
-> to report it to the userspace (which means failed to put css into cmsg).
-> It can happen when someone writes buggy codes in __sock_recv_timestamp(),
-> for example.
+The "amlogic,tx-delay-ns" property schema has unnecessary type reference
+as it's a standard unit suffix, and the constraints are in freeform
+text rather than schema.
 
-Willem, thoughts?
+Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+---
+ .../bindings/net/amlogic,meson-dwmac.yaml     | 22 +++++++++----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
+index ee7a65b528cd..d1e2bca3c503 100644
+--- a/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/amlogic,meson-dwmac.yaml
+@@ -58,18 +58,18 @@ allOf:
+             - const: timing-adjustment
+ 
+         amlogic,tx-delay-ns:
+-          $ref: /schemas/types.yaml#/definitions/uint32
++          enum: [0, 2, 4, 6]
++          default: 2
+           description:
+-            The internal RGMII TX clock delay (provided by this driver) in
+-            nanoseconds. Allowed values are 0ns, 2ns, 4ns, 6ns.
+-            When phy-mode is set to "rgmii" then the TX delay should be
+-            explicitly configured. When not configured a fallback of 2ns is
+-            used. When the phy-mode is set to either "rgmii-id" or "rgmii-txid"
+-            the TX clock delay is already provided by the PHY. In that case
+-            this property should be set to 0ns (which disables the TX clock
+-            delay in the MAC to prevent the clock from going off because both
+-            PHY and MAC are adding a delay).
+-            Any configuration is ignored when the phy-mode is set to "rmii".
++            The internal RGMII TX clock delay (provided by this driver)
++            in nanoseconds. When phy-mode is set to "rgmii" then the TX
++            delay should be explicitly configured. When the phy-mode is
++            set to either "rgmii-id" or "rgmii-txid" the TX clock delay
++            is already provided by the PHY. In that case this property
++            should be set to 0ns (which disables the TX clock delay in
++            the MAC to prevent the clock from going off because both
++            PHY and MAC are adding a delay). Any configuration is
++            ignored when the phy-mode is set to "rmii".
+ 
+         amlogic,rx-delay-ns:
+           deprecated: true
+-- 
+2.45.2
+
 
