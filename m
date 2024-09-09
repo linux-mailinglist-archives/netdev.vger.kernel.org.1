@@ -1,1151 +1,140 @@
-Return-Path: <netdev+bounces-126641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D15C9721B4
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:14:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 985B49721C1
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8627F1F22F68
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:14:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6E03B22516
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91AC318A6AE;
-	Mon,  9 Sep 2024 18:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD42917AE19;
+	Mon,  9 Sep 2024 18:20:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AvLF3cu5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFmLKPRm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E17918A6AD
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 18:13:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516B316DEB4;
+	Mon,  9 Sep 2024 18:20:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725905593; cv=none; b=hAHfCOJiVUvVF/oBU6+Ip6RXLk5qqHDJm2Xcwn9iA8oN+RNA1vgjbNB1D28hnzYin3S2EwS8wWnIb3mKxPycXgdSKK0ODdM56ombDlGIEbKZ1qQql1Xe43CncVKggsbqcwRtiEedo4tGJ+n1ss23JAS2RHLct2AKJWPqYu0JdXg=
+	t=1725906034; cv=none; b=TLntXpuJlp5mCfQmYkBms/nAawyUBVs4vMO/YeZL6S/uCFhH6ip9A27F+ySHfIt0aImjY/Jc7HRiOW9DzXesHItVNzG9OII+Z2B1XeAI8jZnEAKqYuCurvHJ48LdYzSciQaIZWUow6LEtwboKm9/vLKb9CFqXDL3EYC/OGTmVXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725905593; c=relaxed/simple;
-	bh=Ai0+vWLZJDbAu1cAeFKRgelG4u/6UyKnk+dMur9nH/Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rQA9qk43La5mKPMz537/40IiN3qT7Q989YvoIqYQD1JikhYA2EIHVCkVsuEAMuBjE2xwUXwEdjvd4bITxXa+xxVxHxTe0R28/uD4/s90DHicESYR0PmC6LFaCFpKuJqtlBAYAjJPurtE8GYCfboLG6LhAu1VHDtNc2O8eump0XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AvLF3cu5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AE58C4CEC5;
-	Mon,  9 Sep 2024 18:13:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725905593;
-	bh=Ai0+vWLZJDbAu1cAeFKRgelG4u/6UyKnk+dMur9nH/Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=AvLF3cu57U51Wvbwqq1bYmEU9TrUbLFNtU36/liUlpoxM5Ajf8mFpI9gtQZ67PVRg
-	 MF7FAAgMChA6r8Kc5qVJGPDMSTE7motMdwPy4mEAX8+0X5frnoRuPBGD9LTdGcpaqn
-	 1HTO48jPULUzZ9cxdV0Z0u6oPk/2TyA49rgh2W/HxsBTj2ANsW5GCW89kq8YLGMHwU
-	 6bT7p7Dvi/CjDKbdE4COestR11tbwyvI1CVcpDzQbI+KUa/UFMD6HUv2mqg/Ucf8oX
-	 VxR6oMgjJ0qe3c4DQctICvqQeMB1jTpXFECWgsg2uuLYETmJmlargeDTrzNSoV+JVF
-	 uyt9V5NUViN+w==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Erez Shitrit <erezsh@nvidia.com>
-Subject: [net-next V4 15/15] net/mlx5: HWS, added API and enabled HWS support
-Date: Mon,  9 Sep 2024 11:12:48 -0700
-Message-ID: <20240909181250.41596-16-saeed@kernel.org>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240909181250.41596-1-saeed@kernel.org>
-References: <20240909181250.41596-1-saeed@kernel.org>
+	s=arc-20240116; t=1725906034; c=relaxed/simple;
+	bh=ijaoW8rdHDJMqkLnU1K/ZuLQ4A6Uzq5QAar3wN4Tt4E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZjT0dRH258+bZrROQdZyS8IfnyXtKPWKnXC0NO5V6UV6EY+3aKvv5EqngxjAzYv4QuZDuzlbsXOAyRgiq6wSG0vsRT41D20Uz9TCQ+YTXVwJLUZLLQo42pVPApRwaDHuf3PuzvPHOC+zMLTqQu2DZzrlPNrJdIp1mMND/cwnhuM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GFmLKPRm; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6db20e22c85so39789157b3.0;
+        Mon, 09 Sep 2024 11:20:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725906032; x=1726510832; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bHTORZOA/voUQKooKk4KrDwjO0B09zNlT3Nb/W5GV5E=;
+        b=GFmLKPRmDSz3BwVOihg36pi2aIlbyFqPlqWDuObrUqZSbYqmBRDEhSHIOlaHaZ0hyu
+         /w5m42fIKGYNiahmL5IodcJSc0dpt7dG9EdMSft2buQOQPpQ6Ajy2WamoQbupmYxe32N
+         5mmuuqdDHzLhtG9nmR38T/6S896okLXd5MCN+vVdwtNwinoAjW7xtTDefXBoQ8yIVRWO
+         Z0gUcOMgwaqIGWfL4IjOvG6sbT2L5DsSWOq8tjY5v7edDQ3eMPohfRwqSDEIXrLmhYb8
+         Mq7cOymm05juqqkFophCwPxHyjpWmcLYUzqPnmZdjMWinZlVpRAlgdw06RK+2GtSX6Nr
+         DzNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725906032; x=1726510832;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bHTORZOA/voUQKooKk4KrDwjO0B09zNlT3Nb/W5GV5E=;
+        b=P7K6uTJ7aKAzvreqftHrGV1eOSe+uZRSUqYl4brXMn9h2Suxh1Wv7wsJHRmYIlM/gQ
+         pSG6oOnjxlAwYbX8h4dv550iHCFhNZ7Nho7F1HMN8m5Y98pI2gUd8592i7wjzULBiW6m
+         VvVek7OKo7Y50ctU9GwaS917HvIwDeFDMbypr4ovWejDLlBH8cm1DckHNNRX8k2nQt0A
+         hGk5Vlv22YbUutKymHfRTfsJ4D49YQQhQxT5hiISujsky2SL3gNHXvcB1vcnISzmeZP3
+         TtuUV/3FEMkglUWek/rn1l0Kzjq0m/nkGo5xKgz9e22KOXbegV6NKw2pWkRupqKBuhKk
+         Lrog==
+X-Forwarded-Encrypted: i=1; AJvYcCXciPLlj73lnTMXZnZL5qirBGQqvUMNmpUyQKv5bB9FpbzQTvHq5iT5GSc4/QEfJTgXKtLyUKWaJ+9Hjbk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFjxXDniKLI8vaNusighwZrgNAimOhWi4BivtZTFWnutT6PUr8
+	/Vzhnbg35c1RTyM53xuabhtMvd6wkpRsiBpqNLcHWc+XgNDrHA0C+dSkiceGX183KIEtS8hVwZX
+	epB2q26QsZW4PkLcpKdk5KWMK88A=
+X-Google-Smtp-Source: AGHT+IHAz7Q98VrdVDQ6iVqnCpGEWbi+3X4/FbbVqZ/q/y6RNDr4poX9sj1LaJGZzXD7Gd7Kl9jTikAgusfPh+oKONI=
+X-Received: by 2002:a05:690c:3205:b0:63b:d055:6a7f with SMTP id
+ 00721157ae682-6db452d5328mr88831967b3.38.1725906032248; Mon, 09 Sep 2024
+ 11:20:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240908213554.11979-1-rosenp@gmail.com> <20240909085542.GV2097826@kernel.org>
+ <CAKxU2N_1t5osUc53p=G2tRLRctwbxQr3p3fScR-N1kgoNxc80Q@mail.gmail.com>
+In-Reply-To: <CAKxU2N_1t5osUc53p=G2tRLRctwbxQr3p3fScR-N1kgoNxc80Q@mail.gmail.com>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Mon, 9 Sep 2024 11:20:20 -0700
+Message-ID: <CAKxU2N9kgnqAgo2mHxExjgZos+MvhZw40LWCr4pYOL5DUcJJWg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: gianfar: fix NVMEM mac address
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-kernel@vger.kernel.org, claudiu.manoil@nxp.com, mail@david-bauer.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+On Mon, Sep 9, 2024 at 11:11=E2=80=AFAM Rosen Penev <rosenp@gmail.com> wrot=
+e:
+>
+> On Mon, Sep 9, 2024 at 1:55=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
+ote:
+> >
+> > On Sun, Sep 08, 2024 at 02:35:54PM -0700, Rosen Penev wrote:
+> > > If nvmem loads after the ethernet driver, mac address assignments wil=
+l
+> > > not take effect. of_get_ethdev_address returns EPROBE_DEFER in such a
+> > > case so we need to handle that to avoid eth_hw_addr_random.
+> > >
+> > > Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> > > ---
+> > >  drivers/net/ethernet/freescale/gianfar.c | 2 ++
+> > >  1 file changed, 2 insertions(+)
+> > >
+> > > diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/e=
+thernet/freescale/gianfar.c
+> > > index 634049c83ebe..9755ec947029 100644
+> > > --- a/drivers/net/ethernet/freescale/gianfar.c
+> > > +++ b/drivers/net/ethernet/freescale/gianfar.c
+> > > @@ -716,6 +716,8 @@ static int gfar_of_init(struct platform_device *o=
+fdev, struct net_device **pdev)
+> > >               priv->device_flags |=3D FSL_GIANFAR_DEV_HAS_BUF_STASHIN=
+G;
+> > >
+> > >       err =3D of_get_ethdev_address(np, dev);
+> > > +     if (err =3D=3D -EPROBE_DEFER)
+> > > +             return err;
+> >
+> > To avoid leaking resources, I think this should be:
+> >
+> >                 goto err_grp_init;
+> will do in v2. Unfortunately net-next closes today AFAIK.
+On second thought, where did you find this?
 
-Enabling HWS support in the mlx5 driver:
- - added HWS API header
- - added HWS files in the mlx5 driver makefile
- - added kconfig flag that enables HWS compilation
+git grep err_grp_init
 
-Reviewed-by: Erez Shitrit <erezsh@nvidia.com>
-Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- .../ethernet/mellanox/mlx5/kconfig.rst        |   3 +
- .../net/ethernet/mellanox/mlx5/core/Kconfig   |  10 +
- .../net/ethernet/mellanox/mlx5/core/Makefile  |  21 +
- .../mellanox/mlx5/core/steering/hws/Makefile  |   2 +
- .../mellanox/mlx5/core/steering/hws/mlx5hws.h | 954 ++++++++++++++++++
- .../mlx5/core/steering/hws/mlx5hws_internal.h |   8 +-
- 6 files changed, 994 insertions(+), 4 deletions(-)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/Makefile
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws.h
+returns nothing.
 
-diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-index 20d3b7e87049..34e911480108 100644
---- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-+++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/kconfig.rst
-@@ -130,6 +130,9 @@ Enabling the driver and kconfig options
- 
- |    Build support for software-managed steering in the NIC.
- 
-+**CONFIG_MLX5_HW_STEERING=(y/n)**
-+
-+|    Build support for hardware-managed steering in the NIC.
- 
- **CONFIG_MLX5_TC_CT=(y/n)**
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-index 685335832a93..ea6070180c96 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Kconfig
-@@ -172,6 +172,16 @@ config MLX5_SW_STEERING
- 	help
- 	Build support for software-managed steering in the NIC.
- 
-+config MLX5_HW_STEERING
-+	bool "Mellanox Technologies hardware-managed steering"
-+	depends on MLX5_CORE_EN && MLX5_ESWITCH
-+	default y
-+	help
-+	Build support for Hardware-Managed Flow Steering (HMFS) in the NIC.
-+	HMFS is a new approach to managing steering rules where STEs are
-+	written to ICM by HW (as opposed to SW in software-managed steering),
-+	which allows higher rate of rule insertion.
-+
- config MLX5_SF
- 	bool "Mellanox Technologies subfunction device support using auxiliary device"
- 	depends on MLX5_CORE && MLX5_CORE_EN
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-index 1289475e7be7..5912f7e614f9 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/Makefile
-@@ -119,6 +119,27 @@ mlx5_core-$(CONFIG_MLX5_SW_STEERING) += steering/dr_domain.o steering/dr_table.o
- 					steering/dr_action.o steering/fs_dr.o \
- 					steering/dr_definer.o steering/dr_ptrn.o \
- 					steering/dr_arg.o steering/dr_dbg.o lib/smfs.o
-+
-+#
-+# HW Steering
-+#
-+mlx5_core-$(CONFIG_MLX5_HW_STEERING) += steering/hws/mlx5hws_cmd.o \
-+					steering/hws/mlx5hws_context.o \
-+					steering/hws/mlx5hws_pat_arg.o \
-+					steering/hws/mlx5hws_buddy.o \
-+					steering/hws/mlx5hws_pool.o \
-+					steering/hws/mlx5hws_table.o \
-+					steering/hws/mlx5hws_action.o \
-+					steering/hws/mlx5hws_rule.o \
-+					steering/hws/mlx5hws_matcher.o \
-+					steering/hws/mlx5hws_send.o \
-+					steering/hws/mlx5hws_definer.o \
-+					steering/hws/mlx5hws_bwc.o \
-+					steering/hws/mlx5hws_debug.o \
-+					steering/hws/mlx5hws_vport.o \
-+					steering/hws/mlx5hws_bwc_complex.o
-+
-+
- #
- # SF device
- #
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/Makefile b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/Makefile
-new file mode 100644
-index 000000000000..c78512eed8d7
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/Makefile
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+subdir-ccflags-y += -I$(src)/..
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws.h
-new file mode 100644
-index 000000000000..9a85d4e12f77
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws.h
-@@ -0,0 +1,954 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
-+/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
-+
-+#ifndef MLX5HWS_H_
-+#define MLX5HWS_H_
-+
-+struct mlx5hws_context;
-+struct mlx5hws_table;
-+struct mlx5hws_matcher;
-+struct mlx5hws_rule;
-+
-+enum mlx5hws_table_type {
-+	MLX5HWS_TABLE_TYPE_FDB,
-+	MLX5HWS_TABLE_TYPE_MAX,
-+};
-+
-+enum mlx5hws_matcher_resource_mode {
-+	/* Allocate resources based on number of rules with minimal failure probability */
-+	MLX5HWS_MATCHER_RESOURCE_MODE_RULE,
-+	/* Allocate fixed size hash table based on given column and rows */
-+	MLX5HWS_MATCHER_RESOURCE_MODE_HTABLE,
-+};
-+
-+enum mlx5hws_action_type {
-+	MLX5HWS_ACTION_TYP_LAST,
-+	MLX5HWS_ACTION_TYP_REFORMAT_TNL_L2_TO_L2,
-+	MLX5HWS_ACTION_TYP_REFORMAT_L2_TO_TNL_L2,
-+	MLX5HWS_ACTION_TYP_REFORMAT_TNL_L3_TO_L2,
-+	MLX5HWS_ACTION_TYP_REFORMAT_L2_TO_TNL_L3,
-+	MLX5HWS_ACTION_TYP_DROP,
-+	MLX5HWS_ACTION_TYP_MISS,
-+	MLX5HWS_ACTION_TYP_TBL,
-+	MLX5HWS_ACTION_TYP_CTR,
-+	MLX5HWS_ACTION_TYP_TAG,
-+	MLX5HWS_ACTION_TYP_MODIFY_HDR,
-+	MLX5HWS_ACTION_TYP_VPORT,
-+	MLX5HWS_ACTION_TYP_POP_VLAN,
-+	MLX5HWS_ACTION_TYP_PUSH_VLAN,
-+	MLX5HWS_ACTION_TYP_ASO_METER,
-+	MLX5HWS_ACTION_TYP_INSERT_HEADER,
-+	MLX5HWS_ACTION_TYP_REMOVE_HEADER,
-+	MLX5HWS_ACTION_TYP_RANGE,
-+	MLX5HWS_ACTION_TYP_SAMPLER,
-+	MLX5HWS_ACTION_TYP_DEST_ARRAY,
-+	MLX5HWS_ACTION_TYP_MAX,
-+};
-+
-+enum mlx5hws_action_flags {
-+	MLX5HWS_ACTION_FLAG_HWS_FDB = 1 << 0,
-+	/* Shared action can be used over a few threads, since the
-+	 * data is written only once at the creation of the action.
-+	 */
-+	MLX5HWS_ACTION_FLAG_SHARED = 1 << 1,
-+};
-+
-+enum mlx5hws_action_aso_meter_color {
-+	MLX5HWS_ACTION_ASO_METER_COLOR_RED = 0x0,
-+	MLX5HWS_ACTION_ASO_METER_COLOR_YELLOW = 0x1,
-+	MLX5HWS_ACTION_ASO_METER_COLOR_GREEN = 0x2,
-+	MLX5HWS_ACTION_ASO_METER_COLOR_UNDEFINED = 0x3,
-+};
-+
-+enum mlx5hws_send_queue_actions {
-+	/* Start executing all pending queued rules */
-+	MLX5HWS_SEND_QUEUE_ACTION_DRAIN_ASYNC = 1 << 0,
-+	/* Start executing all pending queued rules wait till completion */
-+	MLX5HWS_SEND_QUEUE_ACTION_DRAIN_SYNC = 1 << 1,
-+};
-+
-+struct mlx5hws_context_attr {
-+	u16 queues;
-+	u16 queue_size;
-+	bool bwc; /* add support for backward compatible API*/
-+};
-+
-+struct mlx5hws_table_attr {
-+	enum mlx5hws_table_type type;
-+	u32 level;
-+};
-+
-+enum mlx5hws_matcher_flow_src {
-+	MLX5HWS_MATCHER_FLOW_SRC_ANY = 0x0,
-+	MLX5HWS_MATCHER_FLOW_SRC_WIRE = 0x1,
-+	MLX5HWS_MATCHER_FLOW_SRC_VPORT = 0x2,
-+};
-+
-+enum mlx5hws_matcher_insert_mode {
-+	MLX5HWS_MATCHER_INSERT_BY_HASH = 0x0,
-+	MLX5HWS_MATCHER_INSERT_BY_INDEX = 0x1,
-+};
-+
-+enum mlx5hws_matcher_distribute_mode {
-+	MLX5HWS_MATCHER_DISTRIBUTE_BY_HASH = 0x0,
-+	MLX5HWS_MATCHER_DISTRIBUTE_BY_LINEAR = 0x1,
-+};
-+
-+struct mlx5hws_matcher_attr {
-+	/* Processing priority inside table */
-+	u32 priority;
-+	/* Provide all rules with unique rule_idx in num_log range to reduce locking */
-+	bool optimize_using_rule_idx;
-+	/* Resource mode and corresponding size */
-+	enum mlx5hws_matcher_resource_mode mode;
-+	/* Optimize insertion in case packet origin is the same for all rules */
-+	enum mlx5hws_matcher_flow_src optimize_flow_src;
-+	/* Define the insertion and distribution modes for this matcher */
-+	enum mlx5hws_matcher_insert_mode insert_mode;
-+	enum mlx5hws_matcher_distribute_mode distribute_mode;
-+	/* Define whether the created matcher supports resizing into a bigger matcher */
-+	bool resizable;
-+	union {
-+		struct {
-+			u8 sz_row_log;
-+			u8 sz_col_log;
-+		} table;
-+
-+		struct {
-+			u8 num_log;
-+		} rule;
-+	};
-+	/* Optional AT attach configuration - Max number of additional AT */
-+	u8 max_num_of_at_attach;
-+};
-+
-+struct mlx5hws_rule_attr {
-+	void *user_data;
-+	/* Valid if matcher optimize_using_rule_idx is set or
-+	 * if matcher is configured to insert rules by index.
-+	 */
-+	u32 rule_idx;
-+	u32 flow_source;
-+	u16 queue_id;
-+	u32 burst:1;
-+};
-+
-+/* In actions that take offset, the offset is unique, pointing to a single
-+ * resource and the user should not reuse the same index because data changing
-+ * is not atomic.
-+ */
-+struct mlx5hws_rule_action {
-+	struct mlx5hws_action *action;
-+	union {
-+		struct {
-+			u32 value;
-+		} tag;
-+
-+		struct {
-+			u32 offset;
-+		} counter;
-+
-+		struct {
-+			u32 offset;
-+			u8 *data;
-+		} modify_header;
-+
-+		struct {
-+			u32 offset;
-+			u8 hdr_idx;
-+			u8 *data;
-+		} reformat;
-+
-+		struct {
-+			__be32 vlan_hdr;
-+		} push_vlan;
-+
-+		struct {
-+			u32 offset;
-+			enum mlx5hws_action_aso_meter_color init_color;
-+		} aso_meter;
-+	};
-+};
-+
-+struct mlx5hws_action_reformat_header {
-+	size_t sz;
-+	void *data;
-+};
-+
-+struct mlx5hws_action_insert_header {
-+	struct mlx5hws_action_reformat_header hdr;
-+	/* PRM start anchor to which header will be inserted */
-+	u8 anchor;
-+	/* Header insertion offset in bytes, from the start
-+	 * anchor to the location where new header will be inserted.
-+	 */
-+	u8 offset;
-+	/* Indicates this header insertion adds encapsulation header to the packet,
-+	 * requiring device to update offloaded fields (for example IPv4 total length).
-+	 */
-+	bool encap;
-+};
-+
-+struct mlx5hws_action_remove_header_attr {
-+	/* PRM start anchor from which header will be removed */
-+	u8 anchor;
-+	/* Header remove offset in bytes, from the start
-+	 * anchor to the location where remove header starts.
-+	 */
-+	u8 offset;
-+	/* Indicates the removed header size in bytes */
-+	size_t size;
-+};
-+
-+struct mlx5hws_action_mh_pattern {
-+	/* Byte size of modify actions provided by "data" */
-+	size_t sz;
-+	/* PRM format modify actions pattern */
-+	__be64 *data;
-+};
-+
-+struct mlx5hws_action_dest_attr {
-+	/* Required destination action to forward the packet */
-+	struct mlx5hws_action *dest;
-+	/* Optional reformat action */
-+	struct mlx5hws_action *reformat;
-+};
-+
-+/* Check whether HWS is supported
-+ *
-+ * @param[in] mdev
-+ *	The device to check.
-+ * @return true if supported, false otherwise.
-+ */
-+static inline bool mlx5hws_is_supported(struct mlx5_core_dev *mdev)
-+{
-+	u8 ignore_flow_level_rtc_valid;
-+	u8 wqe_based_flow_table_update;
-+
-+	wqe_based_flow_table_update =
-+		MLX5_CAP_GEN(mdev, wqe_based_flow_table_update_cap);
-+	ignore_flow_level_rtc_valid =
-+		MLX5_CAP_FLOWTABLE(mdev,
-+				   flow_table_properties_nic_receive.ignore_flow_level_rtc_valid);
-+
-+	return wqe_based_flow_table_update && ignore_flow_level_rtc_valid;
-+}
-+
-+/* Open a context used for direct rule insertion using hardware steering.
-+ * Each context can contain multiple tables of different types.
-+ *
-+ * @param[in] mdev
-+ *	The device to be used for HWS.
-+ * @param[in] attr
-+ *	Attributes used for context open.
-+ * @return pointer to mlx5hws_context on success NULL otherwise.
-+ */
-+struct mlx5hws_context *
-+mlx5hws_context_open(struct mlx5_core_dev *mdev,
-+		     struct mlx5hws_context_attr *attr);
-+
-+/* Close a context used for direct hardware steering.
-+ *
-+ * @param[in] ctx
-+ *	mlx5hws context to close.
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_context_close(struct mlx5hws_context *ctx);
-+
-+/* Set a peer context, each context can have multiple contexts as peers.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the peer_ctx will be peered to it.
-+ * @param[in] peer_ctx
-+ *	The peer context.
-+ * @param[in] peer_vhca_id
-+ *	The peer context vhca id.
-+ */
-+void mlx5hws_context_set_peer(struct mlx5hws_context *ctx,
-+			      struct mlx5hws_context *peer_ctx,
-+			      u16 peer_vhca_id);
-+
-+/* Create a new direct rule table. Each table can contain multiple matchers.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new table will be opened.
-+ * @param[in] attr
-+ *	Attributes used for table creation.
-+ * @return pointer to mlx5hws_table on success NULL otherwise.
-+ */
-+struct mlx5hws_table *
-+mlx5hws_table_create(struct mlx5hws_context *ctx,
-+		     struct mlx5hws_table_attr *attr);
-+
-+/* Destroy direct rule table.
-+ *
-+ * @param[in] tbl
-+ *	Table to destroy.
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_table_destroy(struct mlx5hws_table *tbl);
-+
-+/* Get ID of the flow table.
-+ *
-+ * @param[in] tbl
-+ *	Table to get ID of.
-+ * @return ID of the table.
-+ */
-+u32 mlx5hws_table_get_id(struct mlx5hws_table *tbl);
-+
-+/* Set default miss table for mlx5hws_table by using another mlx5hws_table
-+ * Traffic which all table matchers miss will be forwarded to miss table.
-+ *
-+ * @param[in] tbl
-+ *	Source table
-+ * @param[in] miss_tbl
-+ *	Target (miss) table, or NULL to remove current miss table
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_table_set_default_miss(struct mlx5hws_table *tbl,
-+				   struct mlx5hws_table *miss_tbl);
-+
-+/* Create new match template based on items mask, the match template
-+ * will be used for matcher creation.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new template will be created.
-+ * @param[in] match_param
-+ *	Describe the mask based on PRM match parameters
-+ * @param[in] match_param_sz
-+ *	Size of match param buffer
-+ * @param[in] match_criteria_enable
-+ *	Bitmap for each sub-set in match_criteria buffer
-+ * @return pointer to mlx5hws_match_template on success NULL otherwise
-+ */
-+struct mlx5hws_match_template *
-+mlx5hws_match_template_create(struct mlx5hws_context *ctx,
-+			      u32 *match_param,
-+			      u32 match_param_sz,
-+			      u8 match_criteria_enable);
-+
-+/* Destroy match template.
-+ *
-+ * @param[in] mt
-+ *	Match template to destroy.
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_match_template_destroy(struct mlx5hws_match_template *mt);
-+
-+/* Create new action template based on action_type array, the action template
-+ * will be used for matcher creation.
-+ *
-+ * @param[in] action_type
-+ *	An array of actions based on the order of actions which will be provided
-+ *	with rule_actions to mlx5hws_rule_create. The last action is marked
-+ *	using MLX5HWS_ACTION_TYP_LAST.
-+ * @return pointer to mlx5hws_action_template on success NULL otherwise
-+ */
-+struct mlx5hws_action_template *
-+mlx5hws_action_template_create(enum mlx5hws_action_type action_type[]);
-+
-+/* Destroy action template.
-+ *
-+ * @param[in] at
-+ *	Action template to destroy.
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_action_template_destroy(struct mlx5hws_action_template *at);
-+
-+/* Create a new direct rule matcher. Each matcher can contain multiple rules.
-+ * Matchers on the table will be processed by priority. Matching fields and
-+ * mask are described by the match template. In some cases multiple match
-+ * templates can be used on the same matcher.
-+ *
-+ * @param[in] table
-+ *	The table in which the new matcher will be opened.
-+ * @param[in] mt
-+ *	Array of match templates to be used on matcher.
-+ * @param[in] num_of_mt
-+ *	Number of match templates in mt array.
-+ * @param[in] at
-+ *	Array of action templates to be used on matcher.
-+ * @param[in] num_of_at
-+ *	Number of action templates in mt array.
-+ * @param[in] attr
-+ *	Attributes used for matcher creation.
-+ * @return pointer to mlx5hws_matcher on success NULL otherwise.
-+ */
-+struct mlx5hws_matcher *
-+mlx5hws_matcher_create(struct mlx5hws_table *table,
-+		       struct mlx5hws_match_template *mt[],
-+		       u8 num_of_mt,
-+		       struct mlx5hws_action_template *at[],
-+		       u8 num_of_at,
-+		       struct mlx5hws_matcher_attr *attr);
-+
-+/* Destroy direct rule matcher.
-+ *
-+ * @param[in] matcher
-+ *	Matcher to destroy.
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_matcher_destroy(struct mlx5hws_matcher *matcher);
-+
-+/* Attach new action template to direct rule matcher.
-+ *
-+ * @param[in] matcher
-+ *	Matcher to attach at to.
-+ * @param[in] at
-+ *	Action template to be attached to the matcher.
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_matcher_attach_at(struct mlx5hws_matcher *matcher,
-+			      struct mlx5hws_action_template *at);
-+
-+/* Link two matchers and enable moving rules from src matcher to dst matcher.
-+ * Both matchers must be in the same table type, must be created with 'resizable'
-+ * property, and should have the same characteristics (e.g. same mt, same at).
-+ *
-+ * It is the user's responsibility to make sure that the dst matcher
-+ * was allocated with the appropriate size.
-+ *
-+ * Once the function is completed, the user is:
-+ *  - allowed to move rules from src into dst matcher
-+ *  - no longer allowed to insert rules to the src matcher
-+ *
-+ * The user is always allowed to insert rules to the dst matcher and
-+ * to delete rules from any matcher.
-+ *
-+ * @param[in] src_matcher
-+ *	source matcher for moving rules from
-+ * @param[in] dst_matcher
-+ *	destination matcher for moving rules to
-+ * @return zero on successful move, non zero otherwise.
-+ */
-+int mlx5hws_matcher_resize_set_target(struct mlx5hws_matcher *src_matcher,
-+				      struct mlx5hws_matcher *dst_matcher);
-+
-+/* Enqueue moving rule operation: moving rule from src matcher to a dst matcher
-+ *
-+ * @param[in] src_matcher
-+ *	matcher that the rule belongs to
-+ * @param[in] rule
-+ *	the rule to move
-+ * @param[in] attr
-+ *	rule attributes
-+ * @return zero on success, non zero otherwise.
-+ */
-+int mlx5hws_matcher_resize_rule_move(struct mlx5hws_matcher *src_matcher,
-+				     struct mlx5hws_rule *rule,
-+				     struct mlx5hws_rule_attr *attr);
-+
-+/* Enqueue create rule operation.
-+ *
-+ * @param[in] matcher
-+ *	The matcher in which the new rule will be created.
-+ * @param[in] mt_idx
-+ *	Match template index to create the match with.
-+ * @param[in] match_param
-+ *	The match parameter PRM buffer used for the value matching.
-+ * @param[in] rule_actions
-+ *	Rule action to be executed on match.
-+ * @param[in] at_idx
-+ *	Action template index to apply the actions with.
-+ * @param[in] num_of_actions
-+ *	Number of rule actions.
-+ * @param[in] attr
-+ *	Rule creation attributes.
-+ * @param[in, out] rule_handle
-+ *	A valid rule handle. The handle doesn't require any initialization.
-+ * @return zero on successful enqueue non zero otherwise.
-+ */
-+int mlx5hws_rule_create(struct mlx5hws_matcher *matcher,
-+			u8 mt_idx,
-+			u32 *match_param,
-+			u8 at_idx,
-+			struct mlx5hws_rule_action rule_actions[],
-+			struct mlx5hws_rule_attr *attr,
-+			struct mlx5hws_rule *rule_handle);
-+
-+/* Enqueue destroy rule operation.
-+ *
-+ * @param[in] rule
-+ *	The rule destruction to enqueue.
-+ * @param[in] attr
-+ *	Rule destruction attributes.
-+ * @return zero on successful enqueue non zero otherwise.
-+ */
-+int mlx5hws_rule_destroy(struct mlx5hws_rule *rule,
-+			 struct mlx5hws_rule_attr *attr);
-+
-+/* Enqueue update actions on an existing rule.
-+ *
-+ * @param[in, out] rule_handle
-+ *	A valid rule handle to update.
-+ * @param[in] at_idx
-+ *	Action template index to update the actions with.
-+ *  @param[in] rule_actions
-+ *	Rule action to be executed on match.
-+ * @param[in] attr
-+ *	Rule update attributes.
-+ * @return zero on successful enqueue non zero otherwise.
-+ */
-+int mlx5hws_rule_action_update(struct mlx5hws_rule *rule,
-+			       u8 at_idx,
-+			       struct mlx5hws_rule_action rule_actions[],
-+			       struct mlx5hws_rule_attr *attr);
-+
-+/* Get action type.
-+ *
-+ * @param[in] action
-+ *	The action to get the type of.
-+ * @return action type.
-+ */
-+enum mlx5hws_action_type
-+mlx5hws_action_get_type(struct mlx5hws_action *action);
-+
-+/* Create direct rule drop action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_dest_drop(struct mlx5hws_context *ctx,
-+				u32 flags);
-+
-+/* Create direct rule default miss action.
-+ * Defaults are RX: Drop TX: Wire.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_default_miss(struct mlx5hws_context *ctx,
-+				   u32 flags);
-+
-+/* Create direct rule goto table action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] tbl
-+ *	Destination table.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_dest_table(struct mlx5hws_context *ctx,
-+				 struct mlx5hws_table *tbl,
-+				 u32 flags);
-+
-+/* Create direct rule goto table number action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] tbl_num
-+ *	Destination table number.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_dest_table_num(struct mlx5hws_context *ctx,
-+				     u32 table_num, u32 flags);
-+
-+/* Create direct rule range match action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] field
-+ *	Field to comapare the value.
-+ * @param[in] hit_ft
-+ *	Flow table to go to on hit.
-+ * @param[in] miss_ft
-+ *	Flow table to go to on miss.
-+ * @param[in] min
-+ *	Minimal value of the field to be considered as hit.
-+ * @param[in] max
-+ *	Maximal value of the field to be considered as hit.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_dest_match_range(struct mlx5hws_context *ctx,
-+				       u32 field,
-+				       struct mlx5_flow_table *hit_ft,
-+				       struct mlx5_flow_table *miss_ft,
-+				       u32 min, u32 max, u32 flags);
-+
-+/* Create direct rule flow sampler action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] sampler_id
-+ *	Flow sampler object ID.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_flow_sampler(struct mlx5hws_context *ctx,
-+				   u32 sampler_id, u32 flags);
-+
-+/* Create direct rule goto vport action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] vport_num
-+ *	Destination vport number.
-+ * @param[in] vhca_id_valid
-+ *	Tells if the vhca_id parameter is valid.
-+ * @param[in] vhca_id
-+ *	VHCA ID of the destination vport.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_dest_vport(struct mlx5hws_context *ctx,
-+				 u16 vport_num,
-+				 bool vhca_id_valid,
-+				 u16 vhca_id,
-+				 u32 flags);
-+
-+/* Create direct rule TAG action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_tag(struct mlx5hws_context *ctx,
-+			  u32 flags);
-+
-+/* Create direct rule counter action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] obj_id
-+ *	Direct rule counter object ID.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_counter(struct mlx5hws_context *ctx,
-+			      u32 obj_id,
-+			      u32 flags);
-+
-+/* Create direct rule reformat action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] reformat_type
-+ *	Type of reformat prefixed with MLX5HWS_ACTION_TYP_REFORMAT.
-+ * @param[in] num_of_hdrs
-+ *	Number of provided headers in "hdrs" array.
-+ * @param[in] hdrs
-+ *	Headers array containing header information.
-+ * @param[in] log_bulk_size
-+ *	Number of unique values used with this reformat.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_reformat(struct mlx5hws_context *ctx,
-+			       enum mlx5hws_action_type reformat_type,
-+			       u8 num_of_hdrs,
-+			       struct mlx5hws_action_reformat_header *hdrs,
-+			       u32 log_bulk_size,
-+			       u32 flags);
-+
-+/* Create direct rule modify header action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] num_of_patterns
-+ *	Number of provided patterns in "patterns" array.
-+ * @param[in] patterns
-+ *	Patterns array containing pattern information.
-+ * @param[in] log_bulk_size
-+ *	Number of unique values used with this pattern.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_modify_header(struct mlx5hws_context *ctx,
-+				    u8 num_of_patterns,
-+				    struct mlx5hws_action_mh_pattern *patterns,
-+				    u32 log_bulk_size,
-+				    u32 flags);
-+
-+/* Create direct rule ASO flow meter action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] obj_id
-+ *	ASO object ID.
-+ * @param[in] return_reg_c
-+ *	Copy the ASO object value into this reg_c, after a packet hits a rule with this ASO object.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_aso_meter(struct mlx5hws_context *ctx,
-+				u32 obj_id,
-+				u8 return_reg_c,
-+				u32 flags);
-+
-+/* Create direct rule pop vlan action.
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_pop_vlan(struct mlx5hws_context *ctx, u32 flags);
-+
-+/* Create direct rule push vlan action.
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_push_vlan(struct mlx5hws_context *ctx, u32 flags);
-+
-+/* Create a dest array action, this action can duplicate packets and forward to
-+ * multiple destinations in the destination list.
-+ * @param[in] ctx
-+ *     The context in which the new action will be created.
-+ * @param[in] num_dest
-+ *     The number of dests attributes.
-+ * @param[in] dests
-+ *     The destination array. Each contains a destination action and can have
-+ *     additional actions.
-+ * @param[in] ignore_flow_level
-+ *     Boolean that says whether to turn on 'ignore_flow_level' for this dest.
-+ * @param[in] flow_source
-+ *     Source port of the traffic for this actions.
-+ * @param[in] flags
-+ *     Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_dest_array(struct mlx5hws_context *ctx,
-+				 size_t num_dest,
-+				 struct mlx5hws_action_dest_attr *dests,
-+				 bool ignore_flow_level,
-+				 u32 flow_source,
-+				 u32 flags);
-+
-+/* Create insert header action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] num_of_hdrs
-+ *	Number of provided headers in "hdrs" array.
-+ * @param[in] hdrs
-+ *	Headers array containing header information.
-+ * @param[in] log_bulk_size
-+ *	Number of unique values used with this insert header.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_insert_header(struct mlx5hws_context *ctx,
-+				    u8 num_of_hdrs,
-+				    struct mlx5hws_action_insert_header *hdrs,
-+				    u32 log_bulk_size,
-+				    u32 flags);
-+
-+/* Create remove header action.
-+ *
-+ * @param[in] ctx
-+ *	The context in which the new action will be created.
-+ * @param[in] attr
-+ *	attributes: specifies the remove header type, PRM start anchor and
-+ *	the PRM end anchor or the PRM start anchor and remove size in bytes.
-+ * @param[in] flags
-+ *	Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_remove_header(struct mlx5hws_context *ctx,
-+				    struct mlx5hws_action_remove_header_attr *attr,
-+				    u32 flags);
-+
-+/* Create direct rule LAST action.
-+ *
-+ * @param[in] ctx
-+ *     The context in which the new action will be created.
-+ * @param[in] flags
-+ *     Action creation flags. (enum mlx5hws_action_flags)
-+ * @return pointer to mlx5hws_action on success NULL otherwise.
-+ */
-+struct mlx5hws_action *
-+mlx5hws_action_create_last(struct mlx5hws_context *ctx, u32 flags);
-+
-+/* Destroy direct rule action.
-+ *
-+ * @param[in] action
-+ *	The action to destroy.
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_action_destroy(struct mlx5hws_action *action);
-+
-+enum mlx5hws_flow_op_status {
-+	MLX5HWS_FLOW_OP_SUCCESS,
-+	MLX5HWS_FLOW_OP_ERROR,
-+};
-+
-+struct mlx5hws_flow_op_result {
-+	enum mlx5hws_flow_op_status status;
-+	void *user_data;
-+};
-+
-+/* Poll queue for rule creation and deletions completions.
-+ *
-+ * @param[in] ctx
-+ *	The context to which the queue belong to.
-+ * @param[in] queue_id
-+ *	The id of the queue to poll.
-+ * @param[in, out] res
-+ *	Completion array.
-+ * @param[in] res_nb
-+ *	Maximum number of results to return.
-+ * @return negative number on failure, the number of completions otherwise.
-+ */
-+int mlx5hws_send_queue_poll(struct mlx5hws_context *ctx,
-+			    u16 queue_id,
-+			    struct mlx5hws_flow_op_result res[],
-+			    u32 res_nb);
-+
-+/* Perform an action on the queue
-+ *
-+ * @param[in] ctx
-+ *	The context to which the queue belong to.
-+ * @param[in] queue_id
-+ *	The id of the queue to perform the action on.
-+ * @param[in] actions
-+ *	Actions to perform on the queue. (enum mlx5hws_send_queue_actions)
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_send_queue_action(struct mlx5hws_context *ctx,
-+			      u16 queue_id,
-+			      u32 actions);
-+
-+/* Dump HWS info
-+ *
-+ * @param[in] ctx
-+ *	The context which to dump the info from.
-+ * @return zero on success non zero otherwise.
-+ */
-+int mlx5hws_debug_dump(struct mlx5hws_context *ctx);
-+
-+struct mlx5hws_bwc_matcher;
-+struct mlx5hws_bwc_rule;
-+
-+struct mlx5hws_match_parameters {
-+	size_t match_sz;
-+	u32 *match_buf; /* Device spec format */
-+};
-+
-+/* Create a new BWC direct rule matcher.
-+ * This function does the following:
-+ *   - creates match template based on flow items
-+ *   - creates an empty action template
-+ *   - creates a usual mlx5hws_matcher with these mt and at, setting
-+ *     its size to minimal
-+ * Notes:
-+ *   - table->ctx must have BWC support
-+ *   - complex rules are not supported
-+ *
-+ * @param[in] table
-+ *	The table in which the new matcher will be opened
-+ * @param[in] priority
-+ *	Priority for this BWC matcher
-+ * @param[in] match_criteria_enable
-+ *	Bitmask that defines matching criteria
-+ * @param[in] mask
-+ *	Match parameters
-+ * @return pointer to mlx5hws_bwc_matcher on success or NULL otherwise.
-+ */
-+struct mlx5hws_bwc_matcher *
-+mlx5hws_bwc_matcher_create(struct mlx5hws_table *table,
-+			   u32 priority,
-+			   u8 match_criteria_enable,
-+			   struct mlx5hws_match_parameters *mask);
-+
-+/* Destroy BWC direct rule matcher.
-+ *
-+ * @param[in] bwc_matcher
-+ *	Matcher to destroy
-+ * @return zero on success, non zero otherwise
-+ */
-+int mlx5hws_bwc_matcher_destroy(struct mlx5hws_bwc_matcher *bwc_matcher);
-+
-+/* Create a new BWC rule.
-+ * Unlike the usual rule creation function, this one is blocking: when the
-+ * function returns, the rule is written to its place (no need to poll).
-+ * This function does the following:
-+ *   - finds matching action template based on the provided rule_actions, or
-+ *     creates new action template if matching action template doesn't exist
-+ *   - updates corresponding BWC matcher stats
-+ *   - if needed, the function performs rehash:
-+ *       - creates a new matcher based on mt, at, new_sz
-+ *       - moves all the existing matcher rules to the new matcher
-+ *       - removes the old matcher
-+ *   - inserts new rule
-+ *   - polls till completion is received
-+ * Notes:
-+ *   - matcher->tbl->ctx must have BWC support
-+ *   - separate BWC ctx queues are used
-+ *
-+ * @param[in] bwc_matcher
-+ *	The BWC matcher in which the new rule will be created.
-+ * @param[in] params
-+ *	Match perameters
-+ * @param[in] flow_source
-+ *	Flow source for this rule
-+ * @param[in] rule_actions
-+ *	Rule action to be executed on match
-+ * @return valid BWC rule handle on success, NULL otherwise
-+ */
-+struct mlx5hws_bwc_rule *
-+mlx5hws_bwc_rule_create(struct mlx5hws_bwc_matcher *bwc_matcher,
-+			struct mlx5hws_match_parameters *params,
-+			u32 flow_source,
-+			struct mlx5hws_rule_action rule_actions[]);
-+
-+/* Destroy BWC direct rule.
-+ *
-+ * @param[in] bwc_rule
-+ *	Rule to destroy
-+ * @return zero on success, non zero otherwise
-+ */
-+int mlx5hws_bwc_rule_destroy(struct mlx5hws_bwc_rule *bwc_rule);
-+
-+/* Update actions on an existing BWC rule.
-+ *
-+ * @param[in] bwc_rule
-+ *	Rule to update
-+ * @param[in] rule_actions
-+ *	Rule action to update with
-+ * @return zero on successful update, non zero otherwise.
-+ */
-+int mlx5hws_bwc_rule_action_update(struct mlx5hws_bwc_rule *bwc_rule,
-+				   struct mlx5hws_rule_action rule_actions[]);
-+
-+#endif
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_internal.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_internal.h
-index 458bc31be6ac..5643be1cd5bf 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_internal.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_internal.h
-@@ -5,13 +5,13 @@
- #define MLX5HWS_INTERNAL_H_
- 
- #include <linux/mlx5/transobj.h>
--
--#include "../dr_types.h"
-+#include <linux/mlx5/vport.h>
-+#include "fs_core.h"
-+#include "wq.h"
-+#include "lib/mlx5.h"
- 
- #include "mlx5hws_prm.h"
--
- #include "mlx5hws.h"
--
- #include "mlx5hws_pool.h"
- #include "mlx5hws_vport.h"
- #include "mlx5hws_context.h"
--- 
-2.46.0
-
+Not only that, this function has no goto.
+> >
+> > Flagged by Smatch.
+> >
+> > >       if (err) {
+> > >               eth_hw_addr_random(dev);
+> > >               dev_info(&ofdev->dev, "Using random MAC address: %pM\n"=
+, dev->dev_addr);
+> >
+> > --
+> > pw-bot: cr
 
