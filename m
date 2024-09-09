@@ -1,171 +1,102 @@
-Return-Path: <netdev+bounces-126472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17C7D97145A
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:49:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DBA29714A6
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 12:02:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 342C91C22F51
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:49:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 395751C21E6D
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:02:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1A71B29A3;
-	Mon,  9 Sep 2024 09:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3611B2EE8;
+	Mon,  9 Sep 2024 10:02:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="bEXS9Nw4"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="d62zX++U"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782FA171E5A
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 10:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725876138; cv=none; b=mDC0qBRVn2B1G/4ncGC3mmaAZLgIN10/fuLweSSo+EDcuncstaXr053wm+dhDdr+0WEg1KvtyJwyzPmcG2rjcYvJtnSYImKRlUJrCgb3iPMoPJbITHHp/Ae/DX5WW3/z9K/5vhh8kWHWB0NosSwiuXjyFqIIHUpo982oDy4FNbo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725876138; c=relaxed/simple;
+	bh=ieaS7jQF44W1bo28wkYhwQVDzOJZ+fk9FAyRyOqXxsQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dpUwGxI44GMDKv6tKlBrRjOHurGotl2FVnEzqWzqJplrbavKhmc4WZP4s4BAdX+Nxj2Qozq1gKUKiUTfmvf4ZRLmkJQFRNB99GCceWOJgulxJHbw0yDGP8DPFiLHl7DTPYRbeVjcfdgdHdcMoJtek4WvBMLvAs4euFeT327JPww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=d62zX++U; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 852912084C;
+	Mon,  9 Sep 2024 12:02:13 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id SXQf1FwO6nQq; Mon,  9 Sep 2024 12:02:13 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5FC1B14F3
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 09:49:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725875393; cv=none; b=NNK0p7+DfVjk9MT6PDRU91dGkRGb1974yVt1zz+CmLoDHhxUJ1nepbifrzkX0vizYZCyZ2JFJxMsvIuYUPwW5eErJYEv+sUtNWIwaB7WGQj2kGAOOWgefFfX5cZ0HF8JB/CNHcQRSCmF9s0sbGmm8oFBC1dUylnucBgjEt4IEuQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725875393; c=relaxed/simple;
-	bh=qJEcHtD3/lIxA6+g6I4vNkc35G+IepBUr6nL26HgJGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qqJWynDGBxX05eHkL83MODv/auT8Xdu+oABFtEXDfN7GfV7uSu8bxKWYEK+daZz14/l15GYi1dk9gfWPskx/JfiXzds/HrkW94Ef8HPLmn/lGwxfWbCNqPhn/Oyd5J6lkGzmbsNwIlt7SRMj7yOdK2JDCnFSrDGNZv3CGQTZsiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=bEXS9Nw4; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 4921E88B49;
-	Mon,  9 Sep 2024 11:49:49 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1725875389;
-	bh=MNx64q/9XNzdZpqnw7FvloVFMKbR2eLLJquLc3tmUrs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bEXS9Nw44jN7NYkH2x1rB7IoLdEsqXdEycpb8laHOv+dJuR9aCbPdSSULRCkSExSv
-	 r/1KF4X0gVQIjpnqaM7Yhw1Xf7+EjNgy8rKaikkO8VFNMKxT5bqepE0MsfKGRtyRJZ
-	 r9vCT6P7m+FuxOykASHYSEMGZ6Rrz0aQ0MnHiSP4MJMZKEtP3mAGr0klGroV779SSu
-	 tQsPC2BrccBDehAuaR7c3O9rURxoAypY6D2qCsYFO98Cr4P/eHB/W36UXK+kXtLsLZ
-	 19sj65uO1JV3QTsucAdeTqR7Fz7c1KSyv9zWDHLJVmupesEueoynWaHw1P5uMsI9vy
-	 xgvFiBs/ZAn0g==
-Date: Mon, 9 Sep 2024 11:49:48 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- syzbot+3d602af7549af539274e@syzkaller.appspotmail.com
-Subject: Re: [PATCH net 1/2] net: hsr: Use the seqnr lock for frames
- received via interlink port.
-Message-ID: <20240909114948.129735b9@wsk>
-In-Reply-To: <20240906132816.657485-2-bigeasy@linutronix.de>
-References: <20240906132816.657485-1-bigeasy@linutronix.de>
-	<20240906132816.657485-2-bigeasy@linutronix.de>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 0CF09207F4;
+	Mon,  9 Sep 2024 12:02:13 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 0CF09207F4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1725876133;
+	bh=zd4eEy8tI8318pxCs9WJlDDHpq3bsRSKtcQQu/0ivMw=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=d62zX++U9cJf+5tMbMBzA5y94vG7CzFFtDuswbkOuHJcSnPF6XnlShPA67cmzHXdw
+	 fcB7wGoUC9/gaGo3CFgY/gNnwLq0bY/ngnV1qUNYBYwNAWbENHWhA4SIVV5ASMnPY/
+	 SpcpQmFxJ+qJBeHJryAFa+poRTvT0sWGqpbNxNqtuNG0D/mhrl/aLXzLvUpPBsWBcr
+	 1uPn3+1Xju7Nav7U8Kur69igyFunUlV+S7fFBHuJtwyT84q2E7jkeeTisY7O34iVrq
+	 Sqt+/haE+ZT6mNfbCwuqfuGDRmkqVKO96oWlEBVIzL4yAKFsZ5FrNCFzOfy0ES/8fz
+	 pJftoZMLizecQ==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 9 Sep 2024 12:02:12 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Sep
+ 2024 12:02:12 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id A72CC31829F0; Mon,  9 Sep 2024 12:02:09 +0200 (CEST)
+Date: Mon, 9 Sep 2024 12:02:09 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Leon Romanovsky <leon@kernel.org>
+CC: Feng Wang <wangfe@google.com>, <netdev@vger.kernel.org>,
+	<antony.antony@secunet.com>
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+Message-ID: <Zt7HoePVT9N0W1zP@gauss3.secunet.de>
+References: <20240822200252.472298-1-wangfe@google.com>
+ <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
+ <20240831173934.GC4000@unreal>
+ <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
+ <20240902094452.GE4026@unreal>
+ <Zt67MfyiRQrYTLHC@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/s7I4owHF4ZGfP9IjmS+c.Mz";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <Zt67MfyiRQrYTLHC@gauss3.secunet.de>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
---Sig_/s7I4owHF4ZGfP9IjmS+c.Mz
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, Sep 09, 2024 at 11:09:06AM +0200, Steffen Klassert wrote:
+> On Mon, Sep 02, 2024 at 12:44:52PM +0300, Leon Romanovsky wrote:
+> > On Mon, Sep 02, 2024 at 09:44:24AM +0200, Steffen Klassert wrote:
+> 
+> Anyway, I'm thinking about reverting it for now and do it right
+> in the next development cycle.
 
-Hi Sebastian,
-
-> syzbot reported that the seqnr_lock is not acquire for frames received
-> over the interlink port. In the interlink case a new seqnr is
-> generated and assigned to the frame.
-
-Yes, correct.
-
-The seq number for frames incomming from HSR ring are extracted from
-the HSR header.
-
-For frames going from interlink (SAN) network to RedBox, the start seq
-number is assigned when node is created (and the creation node code is
-reused).
-
-> Frames, which are received over the slave port have already a sequence
-> number assigned so the lock is not required.
->=20
-> Acquire the hsr_priv::seqnr_lock during in the invocation of
-> hsr_forward_skb() if a packet has been received from the interlink
-> port.
->=20
-> Reported-by: syzbot+3d602af7549af539274e@syzkaller.appspotmail.com
-> Closes:
-> https://groups.google.com/g/syzkaller-bugs/c/KppVvGviGg4/m/EItSdCZdBAAJ
-> Fixes: 5055cccfc2d1c ("net: hsr: Provide RedBox support (HSR-SAN)")
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de> ---
->  net/hsr/hsr_slave.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
->=20
-> diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
-> index af6cf64a00e08..464f683e016db 100644
-> --- a/net/hsr/hsr_slave.c
-> +++ b/net/hsr/hsr_slave.c
-> @@ -67,7 +67,16 @@ static rx_handler_result_t hsr_handle_frame(struct
-> sk_buff **pskb) skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
->  	skb_reset_mac_len(skb);
-> =20
-> -	hsr_forward_skb(skb, port);
-> +	/* Only the frames received over the interlink port will
-> assign a
-> +	 * sequence number and require synchronisation vs other
-> sender.
-> +	 */
-> +	if (port->type =3D=3D HSR_PT_INTERLINK) {
-> +		spin_lock_bh(&hsr->seqnr_lock);
-
-I'm just wondering if this could have impact on offloaded HSR operation.
-
-I will try to run hsr_redbox.sh test on this patch (with QEMU) and
-share results.
-
-> +		hsr_forward_skb(skb, port);
-> +		spin_unlock_bh(&hsr->seqnr_lock);
-> +	} else {
-> +		hsr_forward_skb(skb, port);
-> +	}
-> =20
->  finish_consume:
->  	return RX_HANDLER_CONSUMED;
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/s7I4owHF4ZGfP9IjmS+c.Mz
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmbexLwACgkQAR8vZIA0
-zr0lFwgAp+PzpGyRfUz2Ji7ANR1zTWStDXoVMvLATtkJntN6QodFTFPf/w4XUZ+z
-clvptnn8hJbGVikHD54WZuLYFdq7LrXonuFJhrFRa2nuT9lzTNNfqiek0KSJw2w8
-SZ0+7lVKhkbVwd4Hr7z+0WuFrF5eV69xsnka7uGr31p0OqNe8Nd794CKboITdSFS
-tnuG21zZWXSm4jS76KcVKvNtjA5+RYrLdKQWz7D0TNdeTaBjPNiD0MHNliZz/HtV
-5w8NmZRlKYzJmhfmw8hGyjqLHAgtXhV4EVR2rwrfrTKI8Bg5KbHPv5RIpf5iKUIn
-vw9s70wCLRwRHpcc03pu49fgLdmHtQ==
-=OELS
------END PGP SIGNATURE-----
-
---Sig_/s7I4owHF4ZGfP9IjmS+c.Mz--
+I finally decided to revert it. Let's work on it after the next
+merge window.
 
