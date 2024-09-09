@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-126637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D7779721B0
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:14:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E61E9721B1
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:14:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A05471C225BE
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:14:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E00521F22F28
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E85189F33;
-	Mon,  9 Sep 2024 18:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32DAC189F42;
+	Mon,  9 Sep 2024 18:13:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kkncCnZM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ayueAjAv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3455A189B84
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 18:13:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F56E189F3B
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 18:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725905590; cv=none; b=drt+6B9v1aj9ubfJeCT0fKoBo2Qu3aRK5q9YFKqE7wnZIm+P/b5C8kgj863/Xrvep7eylbRl266aRLzX26RFuqlBmeuWH5EZuZPpgHUK8FAY8JHKJzQbeNCCfQKFF02SZyJEYKck85JDDzpFKTFk+D/q0QqV2mtSo8FOhmopiGU=
+	t=1725905591; cv=none; b=JDVvk/Xy24PrnM4tRGFeb339k0AQ9o74xR+zxznFwtSkcCNHnVlbXhfayLT1t63qAkjQ3cq62o9V1f0ckisKXxxY/EEAhSvUtvbKMV6w1FzT5wqs1fUWoL1KEzHyTriM6lpRhoicOZPSArX2Ym0ZbEkRO2illOfd++vuQ4iy/PQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725905590; c=relaxed/simple;
-	bh=33QZiW6F0cprIs66bWNVnHKKrf7fBy5YJg4K7Zp8MSM=;
+	s=arc-20240116; t=1725905591; c=relaxed/simple;
+	bh=uZPJxeU2MSsN5ENeqj1fJ/X3shOLx5U9WQHfagSKsOo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aTBTI5ieNagRDNb9invQ+zpd3Q+HmX2JT3Ok6wD7/kyxIuNOnnkwIz+oFuQWWpS4PKU8pQsbyfPzBmNM4tEIWCknKXaoWEhW0n9YnIRbCwxujkXYS4s/2QXI0w/FlDifzu7kSXYSfiweo0TTGGzGjJIC5S7igeKGMVUUVYIg8Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kkncCnZM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4C53C4CECE;
-	Mon,  9 Sep 2024 18:13:09 +0000 (UTC)
+	 MIME-Version; b=YDZLJcLjEAKdGbpuhg/qqe65LXUGQYJnhlbwv8ZilLnMYJMluYzgdYPw+gCx1aeXGAAxqNBmQq3tSmVjGaQ47VDvQy6P4hQEV6Rzxy/08PrQHd7vkUK/6tYPJIynS8dKRMvP3kXQuPNuCX1mqZKbwFzBkwDmDHxdRHnkD5gxqM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ayueAjAv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 96943C4CEC5;
+	Mon,  9 Sep 2024 18:13:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725905589;
-	bh=33QZiW6F0cprIs66bWNVnHKKrf7fBy5YJg4K7Zp8MSM=;
+	s=k20201202; t=1725905590;
+	bh=uZPJxeU2MSsN5ENeqj1fJ/X3shOLx5U9WQHfagSKsOo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kkncCnZMEUntS8GlFzaUsXGQpfa4IqsJZw+zLAaCs/vMa02LxntR8kCOElhllB9tN
-	 uCbbMNma6Ei+OKKHq1jYaEToHWHCr+jtm2rRLKWrJ2NBl78X5Hfh2SR9m3RRzSPCO/
-	 T5t+D8ZdkwuQH04CiCmvofKa5HRQxyS2wrb1OQ0ByEDKKyNojQzFJHvjq4Ijtipoea
-	 fo40Z37cDI6vBeqHgnrjY9xRJVRm5q6l3gi3C5TGaaezZQtnUUen0k0gFLtfdChgaN
-	 BWeWjpQdcO26GeFtTVKHC58wHyRyGbZbKRlEltVBqOwhMZPbQIliWXTNXpZ3gHewXX
-	 FPkl2dkcIRcBg==
+	b=ayueAjAvSx/9luYWfdLV01/RF/5te829QmVZJ15W1XTq5WbysjHf/dSzYVdUal7Nb
+	 /UoFvaZXy/O3Wi0LRmWhGkWaMgh4wWF9TML2ha+1gGWgA2e+4YRJZ/lDSO/t/m1IKh
+	 m0GjufnLlscuHR5tZGRSeiyghub3vsNNOPlVrj5Bce+3BtX6AYYCOqLyWT7Db1xdK1
+	 prDpPT9dq6bo3RGy1DnMLQu4uD0N6f1tmhZjE7NsVtLq5lbZPZk9i7hgR9lzspBgia
+	 XyVGR1wPHWrmrAeqsKtp2+JfsmJtaSCmuiycxdEmJOZxo27YDwZHki5VRzwdijoIUC
+	 ZQxI6iPp462uA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,10 +52,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Itamar Gozlan <igozlan@nvidia.com>
-Subject: [net-next V4 11/15] net/mlx5: HWS, added memory management handling
-Date: Mon,  9 Sep 2024 11:12:44 -0700
-Message-ID: <20240909181250.41596-12-saeed@kernel.org>
+	Erez Shitrit <erezsh@nvidia.com>
+Subject: [net-next V4 12/15] net/mlx5: HWS, added backward-compatible API handling
+Date: Mon,  9 Sep 2024 11:12:45 -0700
+Message-ID: <20240909181250.41596-13-saeed@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240909181250.41596-1-saeed@kernel.org>
 References: <20240909181250.41596-1-saeed@kernel.org>
@@ -69,1007 +69,1254 @@ Content-Transfer-Encoding: 8bit
 
 From: Yevgeny Kliteynik <kliteyn@nvidia.com>
 
-Added object pools and buddy allocator functionality.
+Added implementation of backward-compatible (BWC) steering API.
+Native HWS API is very different from SWS API:
+ - SWS is synchronous (rule creation/deletion API call returns when
+   the rule is created/deleted), while HWS is asynchronous (it
+   requires polling for completion in order to know when the rule
+   creation/deletion happened)
+ - SWS manages its own memory (it allocates/frees all the needed
+   memory for steering rules, while HWS requires the rules memory
+   to be allocated/freed outside the API
 
-Reviewed-by: Itamar Gozlan <igozlan@nvidia.com>
+In order to make HWS fit the existing fs-core steering API paradigm,
+this patch adds implementation of backward-compatible (BWC) steering
+API that has the bahaviour similar to SWS: among others, it encompasses
+all the rules' memory management and completion polling, presenting
+the usual synchronous API for the upper layer.
+
+A user that wishes to utilize the full speed potential of HWS can
+call the HWS async API and have rule insertion/deletion batching,
+lower memory management overhead, and lower CPU utilization.
+Such approach will be taken by the future Connection Tracking.
+
+Note that BWC steering doesn't support yet rules that require more
+than one match STE - complex rules.
+This support will be added later on.
+
+Reviewed-by: Erez Shitrit <erezsh@nvidia.com>
 Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mlx5/core/steering/hws/mlx5hws_buddy.c    | 149 ++++
- .../mlx5/core/steering/hws/mlx5hws_buddy.h    |  21 +
- .../mlx5/core/steering/hws/mlx5hws_pool.c     | 640 ++++++++++++++++++
- .../mlx5/core/steering/hws/mlx5hws_pool.h     | 151 +++++
- 4 files changed, 961 insertions(+)
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.h
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.h
+ .../mlx5/core/steering/hws/mlx5hws_bwc.c      | 997 ++++++++++++++++++
+ .../mlx5/core/steering/hws/mlx5hws_bwc.h      |  73 ++
+ .../core/steering/hws/mlx5hws_bwc_complex.c   |  86 ++
+ .../core/steering/hws/mlx5hws_bwc_complex.h   |  29 +
+ 4 files changed, 1185 insertions(+)
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
+ create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.h
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.c
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c
 new file mode 100644
-index 000000000000..e6ed66202a40
+index 000000000000..bd52b05db367
 --- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.c
-@@ -0,0 +1,149 @@
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.c
+@@ -0,0 +1,997 @@
 +// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
 +/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
 +
 +#include "mlx5hws_internal.h"
-+#include "mlx5hws_buddy.h"
 +
-+static int hws_buddy_init(struct mlx5hws_buddy_mem *buddy, u32 max_order)
++static u16 hws_bwc_gen_queue_idx(struct mlx5hws_context *ctx)
 +{
-+	int i, s, ret = 0;
++	/* assign random queue */
++	return get_random_u8() % mlx5hws_bwc_queues(ctx);
++}
 +
-+	buddy->max_order = max_order;
++static u16
++hws_bwc_get_burst_th(struct mlx5hws_context *ctx, u16 queue_id)
++{
++	return min(ctx->send_queue[queue_id].num_entries / 2,
++		   MLX5HWS_BWC_MATCHER_REHASH_BURST_TH);
++}
 +
-+	buddy->bitmap = kcalloc(buddy->max_order + 1,
-+				sizeof(*buddy->bitmap),
-+				GFP_KERNEL);
-+	if (!buddy->bitmap)
-+		return -ENOMEM;
++static struct mutex *
++hws_bwc_get_queue_lock(struct mlx5hws_context *ctx, u16 idx)
++{
++	return &ctx->bwc_send_queue_locks[idx];
++}
 +
-+	buddy->num_free = kcalloc(buddy->max_order + 1,
-+				  sizeof(*buddy->num_free),
-+				  GFP_KERNEL);
-+	if (!buddy->num_free) {
-+		ret = -ENOMEM;
-+		goto err_out_free_bits;
++static void hws_bwc_lock_all_queues(struct mlx5hws_context *ctx)
++{
++	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
++	struct mutex *queue_lock; /* Protect the queue */
++	int i;
++
++	for (i = 0; i < bwc_queues; i++) {
++		queue_lock = hws_bwc_get_queue_lock(ctx, i);
++		mutex_lock(queue_lock);
++	}
++}
++
++static void hws_bwc_unlock_all_queues(struct mlx5hws_context *ctx)
++{
++	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
++	struct mutex *queue_lock; /* Protect the queue */
++	int i = bwc_queues;
++
++	while (i--) {
++		queue_lock = hws_bwc_get_queue_lock(ctx, i);
++		mutex_unlock(queue_lock);
++	}
++}
++
++static void hws_bwc_matcher_init_attr(struct mlx5hws_matcher_attr *attr,
++				      u32 priority,
++				      u8 size_log)
++{
++	memset(attr, 0, sizeof(*attr));
++
++	attr->priority = priority;
++	attr->optimize_using_rule_idx = 0;
++	attr->mode = MLX5HWS_MATCHER_RESOURCE_MODE_RULE;
++	attr->optimize_flow_src = MLX5HWS_MATCHER_FLOW_SRC_ANY;
++	attr->insert_mode = MLX5HWS_MATCHER_INSERT_BY_HASH;
++	attr->distribute_mode = MLX5HWS_MATCHER_DISTRIBUTE_BY_HASH;
++	attr->rule.num_log = size_log;
++	attr->resizable = true;
++	attr->max_num_of_at_attach = MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM;
++}
++
++int mlx5hws_bwc_matcher_create_simple(struct mlx5hws_bwc_matcher *bwc_matcher,
++				      struct mlx5hws_table *table,
++				      u32 priority,
++				      u8 match_criteria_enable,
++				      struct mlx5hws_match_parameters *mask,
++				      enum mlx5hws_action_type action_types[])
++{
++	enum mlx5hws_action_type init_action_types[1] = { MLX5HWS_ACTION_TYP_LAST };
++	struct mlx5hws_context *ctx = table->ctx;
++	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
++	struct mlx5hws_matcher_attr attr = {0};
++	int i;
++
++	bwc_matcher->rules = kcalloc(bwc_queues, sizeof(*bwc_matcher->rules), GFP_KERNEL);
++	if (!bwc_matcher->rules)
++		goto err;
++
++	for (i = 0; i < bwc_queues; i++)
++		INIT_LIST_HEAD(&bwc_matcher->rules[i]);
++
++	hws_bwc_matcher_init_attr(&attr,
++				  priority,
++				  MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG);
++
++	bwc_matcher->priority = priority;
++	bwc_matcher->size_log = MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG;
++
++	/* create dummy action template */
++	bwc_matcher->at[0] =
++		mlx5hws_action_template_create(action_types ?
++					       action_types : init_action_types);
++	if (!bwc_matcher->at[0]) {
++		mlx5hws_err(table->ctx, "BWC matcher: failed creating action template\n");
++		goto free_bwc_matcher_rules;
 +	}
 +
-+	for (i = 0; i <= (int)buddy->max_order; ++i) {
-+		s = 1 << (buddy->max_order - i);
++	bwc_matcher->num_of_at = 1;
 +
-+		buddy->bitmap[i] = bitmap_zalloc(s, GFP_KERNEL);
-+		if (!buddy->bitmap[i]) {
-+			ret = -ENOMEM;
-+			goto err_out_free_num_free;
-+		}
++	bwc_matcher->mt = mlx5hws_match_template_create(ctx,
++							mask->match_buf,
++							mask->match_sz,
++							match_criteria_enable);
++	if (!bwc_matcher->mt) {
++		mlx5hws_err(table->ctx, "BWC matcher: failed creating match template\n");
++		goto free_at;
 +	}
 +
-+	bitmap_set(buddy->bitmap[buddy->max_order], 0, 1);
-+	buddy->num_free[buddy->max_order] = 1;
++	bwc_matcher->matcher = mlx5hws_matcher_create(table,
++						      &bwc_matcher->mt, 1,
++						      &bwc_matcher->at[0],
++						      bwc_matcher->num_of_at,
++						      &attr);
++	if (!bwc_matcher->matcher) {
++		mlx5hws_err(table->ctx, "BWC matcher: failed creating HWS matcher\n");
++		goto free_mt;
++	}
 +
 +	return 0;
 +
-+err_out_free_num_free:
-+	for (i = 0; i <= (int)buddy->max_order; ++i)
-+		bitmap_free(buddy->bitmap[i]);
-+
-+	kfree(buddy->num_free);
-+
-+err_out_free_bits:
-+	kfree(buddy->bitmap);
-+	return ret;
++free_mt:
++	mlx5hws_match_template_destroy(bwc_matcher->mt);
++free_at:
++	mlx5hws_action_template_destroy(bwc_matcher->at[0]);
++free_bwc_matcher_rules:
++	kfree(bwc_matcher->rules);
++err:
++	return -EINVAL;
 +}
 +
-+struct mlx5hws_buddy_mem *mlx5hws_buddy_create(u32 max_order)
++struct mlx5hws_bwc_matcher *
++mlx5hws_bwc_matcher_create(struct mlx5hws_table *table,
++			   u32 priority,
++			   u8 match_criteria_enable,
++			   struct mlx5hws_match_parameters *mask)
 +{
-+	struct mlx5hws_buddy_mem *buddy;
++	struct mlx5hws_bwc_matcher *bwc_matcher;
++	bool is_complex;
++	int ret;
 +
-+	buddy = kzalloc(sizeof(*buddy), GFP_KERNEL);
-+	if (!buddy)
++	if (!mlx5hws_context_bwc_supported(table->ctx)) {
++		mlx5hws_err(table->ctx,
++			    "BWC matcher: context created w/o BWC API compatibility\n");
++		return NULL;
++	}
++
++	bwc_matcher = kzalloc(sizeof(*bwc_matcher), GFP_KERNEL);
++	if (!bwc_matcher)
 +		return NULL;
 +
-+	if (hws_buddy_init(buddy, max_order))
-+		goto free_buddy;
++	/* Check if the required match params can be all matched
++	 * in single STE, otherwise complex matcher is needed.
++	 */
 +
-+	return buddy;
++	is_complex = mlx5hws_bwc_match_params_is_complex(table->ctx, match_criteria_enable, mask);
++	if (is_complex)
++		ret = mlx5hws_bwc_matcher_create_complex(bwc_matcher,
++							 table,
++							 priority,
++							 match_criteria_enable,
++							 mask);
++	else
++		ret = mlx5hws_bwc_matcher_create_simple(bwc_matcher,
++							table,
++							priority,
++							match_criteria_enable,
++							mask,
++							NULL);
++	if (ret)
++		goto free_bwc_matcher;
 +
-+free_buddy:
-+	kfree(buddy);
++	return bwc_matcher;
++
++free_bwc_matcher:
++	kfree(bwc_matcher);
++
 +	return NULL;
 +}
 +
-+void mlx5hws_buddy_cleanup(struct mlx5hws_buddy_mem *buddy)
++int mlx5hws_bwc_matcher_destroy_simple(struct mlx5hws_bwc_matcher *bwc_matcher)
 +{
 +	int i;
 +
-+	for (i = 0; i <= (int)buddy->max_order; ++i)
-+		bitmap_free(buddy->bitmap[i]);
++	mlx5hws_matcher_destroy(bwc_matcher->matcher);
++	bwc_matcher->matcher = NULL;
 +
-+	kfree(buddy->num_free);
-+	kfree(buddy->bitmap);
-+}
++	for (i = 0; i < bwc_matcher->num_of_at; i++)
++		mlx5hws_action_template_destroy(bwc_matcher->at[i]);
 +
-+static int hws_buddy_find_free_seg(struct mlx5hws_buddy_mem *buddy,
-+				   u32 start_order,
-+				   u32 *segment,
-+				   u32 *order)
-+{
-+	unsigned int seg, order_iter, m;
++	mlx5hws_match_template_destroy(bwc_matcher->mt);
++	kfree(bwc_matcher->rules);
 +
-+	for (order_iter = start_order;
-+	     order_iter <= buddy->max_order; ++order_iter) {
-+		if (!buddy->num_free[order_iter])
-+			continue;
-+
-+		m = 1 << (buddy->max_order - order_iter);
-+		seg = find_first_bit(buddy->bitmap[order_iter], m);
-+
-+		if (WARN(seg >= m,
-+			 "ICM Buddy: failed finding free mem for order %d\n",
-+			 order_iter))
-+			return -ENOMEM;
-+
-+		break;
-+	}
-+
-+	if (order_iter > buddy->max_order)
-+		return -ENOMEM;
-+
-+	*segment = seg;
-+	*order = order_iter;
 +	return 0;
 +}
 +
-+int mlx5hws_buddy_alloc_mem(struct mlx5hws_buddy_mem *buddy, u32 order)
++int mlx5hws_bwc_matcher_destroy(struct mlx5hws_bwc_matcher *bwc_matcher)
 +{
-+	u32 seg, order_iter, err;
++	if (bwc_matcher->num_of_rules)
++		mlx5hws_err(bwc_matcher->matcher->tbl->ctx,
++			    "BWC matcher destroy: matcher still has %d rules\n",
++			    bwc_matcher->num_of_rules);
 +
-+	err = hws_buddy_find_free_seg(buddy, order, &seg, &order_iter);
-+	if (err)
-+		return err;
++	mlx5hws_bwc_matcher_destroy_simple(bwc_matcher);
 +
-+	bitmap_clear(buddy->bitmap[order_iter], seg, 1);
-+	--buddy->num_free[order_iter];
-+
-+	while (order_iter > order) {
-+		--order_iter;
-+		seg <<= 1;
-+		bitmap_set(buddy->bitmap[order_iter], seg ^ 1, 1);
-+		++buddy->num_free[order_iter];
-+	}
-+
-+	seg <<= order;
-+
-+	return seg;
++	kfree(bwc_matcher);
++	return 0;
 +}
 +
-+void mlx5hws_buddy_free_mem(struct mlx5hws_buddy_mem *buddy, u32 seg, u32 order)
++static int hws_bwc_queue_poll(struct mlx5hws_context *ctx,
++			      u16 queue_id,
++			      u32 *pending_rules,
++			      bool drain)
 +{
-+	seg >>= order;
-+
-+	while (test_bit(seg ^ 1, buddy->bitmap[order])) {
-+		bitmap_clear(buddy->bitmap[order], seg ^ 1, 1);
-+		--buddy->num_free[order];
-+		seg >>= 1;
-+		++order;
-+	}
-+
-+	bitmap_set(buddy->bitmap[order], seg, 1);
-+	++buddy->num_free[order];
-+}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.h
-new file mode 100644
-index 000000000000..338c44bbedaf
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_buddy.h
-@@ -0,0 +1,21 @@
-+/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
-+/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
-+
-+#ifndef MLX5HWS_BUDDY_H_
-+#define MLX5HWS_BUDDY_H_
-+
-+struct mlx5hws_buddy_mem {
-+	unsigned long **bitmap;
-+	unsigned int *num_free;
-+	u32 max_order;
-+};
-+
-+struct mlx5hws_buddy_mem *mlx5hws_buddy_create(u32 max_order);
-+
-+void mlx5hws_buddy_cleanup(struct mlx5hws_buddy_mem *buddy);
-+
-+int mlx5hws_buddy_alloc_mem(struct mlx5hws_buddy_mem *buddy, u32 order);
-+
-+void mlx5hws_buddy_free_mem(struct mlx5hws_buddy_mem *buddy, u32 seg, u32 order);
-+
-+#endif /* MLX5HWS_BUDDY_H_ */
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.c
-new file mode 100644
-index 000000000000..a8a63e3278be
---- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.c
-@@ -0,0 +1,640 @@
-+// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
-+/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
-+
-+#include "mlx5hws_internal.h"
-+#include "mlx5hws_buddy.h"
-+
-+static void hws_pool_free_one_resource(struct mlx5hws_pool_resource *resource)
-+{
-+	switch (resource->pool->type) {
-+	case MLX5HWS_POOL_TYPE_STE:
-+		mlx5hws_cmd_ste_destroy(resource->pool->ctx->mdev, resource->base_id);
-+		break;
-+	case MLX5HWS_POOL_TYPE_STC:
-+		mlx5hws_cmd_stc_destroy(resource->pool->ctx->mdev, resource->base_id);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	kfree(resource);
-+}
-+
-+static void hws_pool_resource_free(struct mlx5hws_pool *pool,
-+				   int resource_idx)
-+{
-+	hws_pool_free_one_resource(pool->resource[resource_idx]);
-+	pool->resource[resource_idx] = NULL;
-+
-+	if (pool->tbl_type == MLX5HWS_TABLE_TYPE_FDB) {
-+		hws_pool_free_one_resource(pool->mirror_resource[resource_idx]);
-+		pool->mirror_resource[resource_idx] = NULL;
-+	}
-+}
-+
-+static struct mlx5hws_pool_resource *
-+hws_pool_create_one_resource(struct mlx5hws_pool *pool, u32 log_range,
-+			     u32 fw_ft_type)
-+{
-+	struct mlx5hws_cmd_ste_create_attr ste_attr;
-+	struct mlx5hws_cmd_stc_create_attr stc_attr;
-+	struct mlx5hws_pool_resource *resource;
-+	u32 obj_id = 0;
++	struct mlx5hws_flow_op_result comp[MLX5HWS_BWC_MATCHER_REHASH_BURST_TH];
++	u16 burst_th = hws_bwc_get_burst_th(ctx, queue_id);
++	bool got_comp = *pending_rules >= burst_th;
++	bool queue_full;
++	int err = 0;
 +	int ret;
++	int i;
 +
-+	resource = kzalloc(sizeof(*resource), GFP_KERNEL);
-+	if (!resource)
-+		return NULL;
++	/* Check if there are any completions at all */
++	if (!got_comp && !drain)
++		return 0;
 +
-+	switch (pool->type) {
-+	case MLX5HWS_POOL_TYPE_STE:
-+		ste_attr.log_obj_range = log_range;
-+		ste_attr.table_type = fw_ft_type;
-+		ret = mlx5hws_cmd_ste_create(pool->ctx->mdev, &ste_attr, &obj_id);
-+		break;
-+	case MLX5HWS_POOL_TYPE_STC:
-+		stc_attr.log_obj_range = log_range;
-+		stc_attr.table_type = fw_ft_type;
-+		ret = mlx5hws_cmd_stc_create(pool->ctx->mdev, &stc_attr, &obj_id);
-+		break;
-+	default:
-+		ret = -EINVAL;
++	queue_full = mlx5hws_send_engine_full(&ctx->send_queue[queue_id]);
++	while (queue_full || ((got_comp || drain) && *pending_rules)) {
++		ret = mlx5hws_send_queue_poll(ctx, queue_id, comp, burst_th);
++		if (unlikely(ret < 0)) {
++			mlx5hws_err(ctx, "BWC poll error: polling queue %d returned %d\n",
++				    queue_id, ret);
++			return -EINVAL;
++		}
++
++		if (ret) {
++			(*pending_rules) -= ret;
++			for (i = 0; i < ret; i++) {
++				if (unlikely(comp[i].status != MLX5HWS_FLOW_OP_SUCCESS)) {
++					mlx5hws_err(ctx,
++						    "BWC poll error: polling queue %d returned completion with error\n",
++						    queue_id);
++					err = -EINVAL;
++				}
++			}
++			queue_full = false;
++		}
++
++		got_comp = !!ret;
 +	}
 +
-+	if (ret) {
-+		mlx5hws_err(pool->ctx, "Failed to allocate resource objects\n");
-+		goto free_resource;
-+	}
++	return err;
++}
 +
-+	resource->pool = pool;
-+	resource->range = 1 << log_range;
-+	resource->base_id = obj_id;
++void
++mlx5hws_bwc_rule_fill_attr(struct mlx5hws_bwc_matcher *bwc_matcher,
++			   u16 bwc_queue_idx,
++			   u32 flow_source,
++			   struct mlx5hws_rule_attr *rule_attr)
++{
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
 +
-+	return resource;
++	/* no use of INSERT_BY_INDEX in bwc rule */
++	rule_attr->rule_idx = 0;
 +
-+free_resource:
-+	kfree(resource);
++	/* notify HW at each rule insertion/deletion */
++	rule_attr->burst = 0;
++
++	/* We don't need user data, but the API requires it to exist */
++	rule_attr->user_data = (void *)0xFACADE;
++
++	rule_attr->queue_id = mlx5hws_bwc_get_queue_id(ctx, bwc_queue_idx);
++	rule_attr->flow_source = flow_source;
++}
++
++struct mlx5hws_bwc_rule *
++mlx5hws_bwc_rule_alloc(struct mlx5hws_bwc_matcher *bwc_matcher)
++{
++	struct mlx5hws_bwc_rule *bwc_rule;
++
++	bwc_rule = kzalloc(sizeof(*bwc_rule), GFP_KERNEL);
++	if (unlikely(!bwc_rule))
++		goto out_err;
++
++	bwc_rule->rule = kzalloc(sizeof(*bwc_rule->rule), GFP_KERNEL);
++	if (unlikely(!bwc_rule->rule))
++		goto free_rule;
++
++	bwc_rule->bwc_matcher = bwc_matcher;
++	return bwc_rule;
++
++free_rule:
++	kfree(bwc_rule);
++out_err:
 +	return NULL;
 +}
 +
-+static int
-+hws_pool_resource_alloc(struct mlx5hws_pool *pool, u32 log_range, int idx)
++void mlx5hws_bwc_rule_free(struct mlx5hws_bwc_rule *bwc_rule)
 +{
-+	struct mlx5hws_pool_resource *resource;
-+	u32 fw_ft_type, opt_log_range;
++	if (likely(bwc_rule->rule))
++		kfree(bwc_rule->rule);
++	kfree(bwc_rule);
++}
 +
-+	fw_ft_type = mlx5hws_table_get_res_fw_ft_type(pool->tbl_type, false);
-+	opt_log_range = pool->opt_type == MLX5HWS_POOL_OPTIMIZE_ORIG ? 0 : log_range;
-+	resource = hws_pool_create_one_resource(pool, opt_log_range, fw_ft_type);
-+	if (!resource) {
-+		mlx5hws_err(pool->ctx, "Failed allocating resource\n");
++static void hws_bwc_rule_list_add(struct mlx5hws_bwc_rule *bwc_rule, u16 idx)
++{
++	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
++
++	bwc_matcher->num_of_rules++;
++	bwc_rule->bwc_queue_idx = idx;
++	list_add(&bwc_rule->list_node, &bwc_matcher->rules[idx]);
++}
++
++static void hws_bwc_rule_list_remove(struct mlx5hws_bwc_rule *bwc_rule)
++{
++	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
++
++	bwc_matcher->num_of_rules--;
++	list_del_init(&bwc_rule->list_node);
++}
++
++static int
++hws_bwc_rule_destroy_hws_async(struct mlx5hws_bwc_rule *bwc_rule,
++			       struct mlx5hws_rule_attr *attr)
++{
++	return mlx5hws_rule_destroy(bwc_rule->rule, attr);
++}
++
++static int
++hws_bwc_rule_destroy_hws_sync(struct mlx5hws_bwc_rule *bwc_rule,
++			      struct mlx5hws_rule_attr *rule_attr)
++{
++	struct mlx5hws_context *ctx = bwc_rule->bwc_matcher->matcher->tbl->ctx;
++	struct mlx5hws_flow_op_result completion;
++	int ret;
++
++	ret = hws_bwc_rule_destroy_hws_async(bwc_rule, rule_attr);
++	if (unlikely(ret))
++		return ret;
++
++	do {
++		ret = mlx5hws_send_queue_poll(ctx, rule_attr->queue_id, &completion, 1);
++	} while (ret != 1);
++
++	if (unlikely(completion.status != MLX5HWS_FLOW_OP_SUCCESS ||
++		     (bwc_rule->rule->status != MLX5HWS_RULE_STATUS_DELETED &&
++		      bwc_rule->rule->status != MLX5HWS_RULE_STATUS_DELETING))) {
++		mlx5hws_err(ctx, "Failed destroying BWC rule: completion %d, rule status %d\n",
++			    completion.status, bwc_rule->rule->status);
 +		return -EINVAL;
 +	}
 +
-+	pool->resource[idx] = resource;
-+
-+	if (pool->tbl_type == MLX5HWS_TABLE_TYPE_FDB) {
-+		struct mlx5hws_pool_resource *mirror_resource;
-+
-+		fw_ft_type = mlx5hws_table_get_res_fw_ft_type(pool->tbl_type, true);
-+		opt_log_range = pool->opt_type == MLX5HWS_POOL_OPTIMIZE_MIRROR ? 0 : log_range;
-+		mirror_resource = hws_pool_create_one_resource(pool, opt_log_range, fw_ft_type);
-+		if (!mirror_resource) {
-+			mlx5hws_err(pool->ctx, "Failed allocating mirrored resource\n");
-+			hws_pool_free_one_resource(resource);
-+			pool->resource[idx] = NULL;
-+			return -EINVAL;
-+		}
-+		pool->mirror_resource[idx] = mirror_resource;
-+	}
-+
 +	return 0;
 +}
 +
-+static unsigned long *hws_pool_create_and_init_bitmap(u32 log_range)
++int mlx5hws_bwc_rule_destroy_simple(struct mlx5hws_bwc_rule *bwc_rule)
 +{
-+	unsigned long *cur_bmp;
++	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
++	u16 idx = bwc_rule->bwc_queue_idx;
++	struct mlx5hws_rule_attr attr;
++	struct mutex *queue_lock; /* Protect the queue */
++	int ret;
 +
-+	cur_bmp = bitmap_zalloc(1 << log_range, GFP_KERNEL);
-+	if (!cur_bmp)
-+		return NULL;
++	mlx5hws_bwc_rule_fill_attr(bwc_matcher, idx, 0, &attr);
 +
-+	bitmap_fill(cur_bmp, 1 << log_range);
++	queue_lock = hws_bwc_get_queue_lock(ctx, idx);
 +
-+	return cur_bmp;
-+}
++	mutex_lock(queue_lock);
 +
-+static void hws_pool_buddy_db_put_chunk(struct mlx5hws_pool *pool,
-+					struct mlx5hws_pool_chunk *chunk)
-+{
-+	struct mlx5hws_buddy_mem *buddy;
++	ret = hws_bwc_rule_destroy_hws_sync(bwc_rule, &attr);
++	hws_bwc_rule_list_remove(bwc_rule);
 +
-+	buddy = pool->db.buddy_manager->buddies[chunk->resource_idx];
-+	if (!buddy) {
-+		mlx5hws_err(pool->ctx, "No such buddy (%d)\n", chunk->resource_idx);
-+		return;
-+	}
-+
-+	mlx5hws_buddy_free_mem(buddy, chunk->offset, chunk->order);
-+}
-+
-+static struct mlx5hws_buddy_mem *
-+hws_pool_buddy_get_next_buddy(struct mlx5hws_pool *pool, int idx,
-+			      u32 order, bool *is_new_buddy)
-+{
-+	static struct mlx5hws_buddy_mem *buddy;
-+	u32 new_buddy_size;
-+
-+	buddy = pool->db.buddy_manager->buddies[idx];
-+	if (buddy)
-+		return buddy;
-+
-+	new_buddy_size = max(pool->alloc_log_sz, order);
-+	*is_new_buddy = true;
-+	buddy = mlx5hws_buddy_create(new_buddy_size);
-+	if (!buddy) {
-+		mlx5hws_err(pool->ctx, "Failed to create buddy order: %d index: %d\n",
-+			    new_buddy_size, idx);
-+		return NULL;
-+	}
-+
-+	if (hws_pool_resource_alloc(pool, new_buddy_size, idx) != 0) {
-+		mlx5hws_err(pool->ctx, "Failed to create resource type: %d: size %d index: %d\n",
-+			    pool->type, new_buddy_size, idx);
-+		mlx5hws_buddy_cleanup(buddy);
-+		return NULL;
-+	}
-+
-+	pool->db.buddy_manager->buddies[idx] = buddy;
-+
-+	return buddy;
-+}
-+
-+static int hws_pool_buddy_get_mem_chunk(struct mlx5hws_pool *pool,
-+					int order,
-+					u32 *buddy_idx,
-+					int *seg)
-+{
-+	struct mlx5hws_buddy_mem *buddy;
-+	bool new_mem = false;
-+	int ret = 0;
-+	int i;
-+
-+	*seg = -1;
-+
-+	/* Find the next free place from the buddy array */
-+	while (*seg == -1) {
-+		for (i = 0; i < MLX5HWS_POOL_RESOURCE_ARR_SZ; i++) {
-+			buddy = hws_pool_buddy_get_next_buddy(pool, i,
-+							      order,
-+							      &new_mem);
-+			if (!buddy) {
-+				ret = -ENOMEM;
-+				goto out;
-+			}
-+
-+			*seg = mlx5hws_buddy_alloc_mem(buddy, order);
-+			if (*seg != -1)
-+				goto found;
-+
-+			if (pool->flags & MLX5HWS_POOL_FLAGS_ONE_RESOURCE) {
-+				mlx5hws_err(pool->ctx,
-+					    "Fail to allocate seg for one resource pool\n");
-+				ret = -ENOMEM;
-+				goto out;
-+			}
-+
-+			if (new_mem) {
-+				/* We have new memory pool, should be place for us */
-+				mlx5hws_err(pool->ctx,
-+					    "No memory for order: %d with buddy no: %d\n",
-+					    order, i);
-+				ret = -ENOMEM;
-+				goto out;
-+			}
-+		}
-+	}
-+
-+found:
-+	*buddy_idx = i;
-+out:
-+	return ret;
-+}
-+
-+static int hws_pool_buddy_db_get_chunk(struct mlx5hws_pool *pool,
-+				       struct mlx5hws_pool_chunk *chunk)
-+{
-+	int ret = 0;
-+
-+	/* Go over the buddies and find next free slot */
-+	ret = hws_pool_buddy_get_mem_chunk(pool, chunk->order,
-+					   &chunk->resource_idx,
-+					   &chunk->offset);
-+	if (ret)
-+		mlx5hws_err(pool->ctx, "Failed to get free slot for chunk with order: %d\n",
-+			    chunk->order);
++	mutex_unlock(queue_lock);
 +
 +	return ret;
 +}
 +
-+static void hws_pool_buddy_db_uninit(struct mlx5hws_pool *pool)
++int mlx5hws_bwc_rule_destroy(struct mlx5hws_bwc_rule *bwc_rule)
 +{
-+	struct mlx5hws_buddy_mem *buddy;
-+	int i;
++	int ret;
 +
-+	for (i = 0; i < MLX5HWS_POOL_RESOURCE_ARR_SZ; i++) {
-+		buddy = pool->db.buddy_manager->buddies[i];
-+		if (buddy) {
-+			mlx5hws_buddy_cleanup(buddy);
-+			kfree(buddy);
-+			pool->db.buddy_manager->buddies[i] = NULL;
-+		}
-+	}
++	ret = mlx5hws_bwc_rule_destroy_simple(bwc_rule);
 +
-+	kfree(pool->db.buddy_manager);
++	mlx5hws_bwc_rule_free(bwc_rule);
++	return ret;
 +}
 +
-+static int hws_pool_buddy_db_init(struct mlx5hws_pool *pool, u32 log_range)
++static int
++hws_bwc_rule_create_async(struct mlx5hws_bwc_rule *bwc_rule,
++			  u32 *match_param,
++			  u8 at_idx,
++			  struct mlx5hws_rule_action rule_actions[],
++			  struct mlx5hws_rule_attr *rule_attr)
 +{
-+	pool->db.buddy_manager = kzalloc(sizeof(*pool->db.buddy_manager), GFP_KERNEL);
-+	if (!pool->db.buddy_manager)
-+		return -ENOMEM;
-+
-+	if (pool->flags & MLX5HWS_POOL_FLAGS_ALLOC_MEM_ON_CREATE) {
-+		bool new_buddy;
-+
-+		if (!hws_pool_buddy_get_next_buddy(pool, 0, log_range, &new_buddy)) {
-+			mlx5hws_err(pool->ctx,
-+				    "Failed allocating memory on create log_sz: %d\n", log_range);
-+			kfree(pool->db.buddy_manager);
-+			return -ENOMEM;
-+		}
-+	}
-+
-+	pool->p_db_uninit = &hws_pool_buddy_db_uninit;
-+	pool->p_get_chunk = &hws_pool_buddy_db_get_chunk;
-+	pool->p_put_chunk = &hws_pool_buddy_db_put_chunk;
-+
-+	return 0;
++	return mlx5hws_rule_create(bwc_rule->bwc_matcher->matcher,
++				   0, /* only one match template supported */
++				   match_param,
++				   at_idx,
++				   rule_actions,
++				   rule_attr,
++				   bwc_rule->rule);
 +}
 +
-+static int hws_pool_create_resource_on_index(struct mlx5hws_pool *pool,
-+					     u32 alloc_size, int idx)
-+{
-+	int ret = hws_pool_resource_alloc(pool, alloc_size, idx);
++static int
++hws_bwc_rule_create_sync(struct mlx5hws_bwc_rule *bwc_rule,
++			 u32 *match_param,
++			 u8 at_idx,
++			 struct mlx5hws_rule_action rule_actions[],
++			 struct mlx5hws_rule_attr *rule_attr)
 +
-+	if (ret) {
-+		mlx5hws_err(pool->ctx, "Failed to create resource type: %d: size %d index: %d\n",
-+			    pool->type, alloc_size, idx);
++{
++	struct mlx5hws_context *ctx = bwc_rule->bwc_matcher->matcher->tbl->ctx;
++	u32 expected_completions = 1;
++	int ret;
++
++	ret = hws_bwc_rule_create_async(bwc_rule, match_param,
++					at_idx, rule_actions,
++					rule_attr);
++	if (unlikely(ret))
 +		return ret;
-+	}
 +
-+	return 0;
++	ret = hws_bwc_queue_poll(ctx, rule_attr->queue_id, &expected_completions, true);
++
++	return ret;
 +}
 +
-+static struct mlx5hws_pool_elements *
-+hws_pool_element_create_new_elem(struct mlx5hws_pool *pool, u32 order, int idx)
++static int
++hws_bwc_rule_update_sync(struct mlx5hws_bwc_rule *bwc_rule,
++			 u8 at_idx,
++			 struct mlx5hws_rule_action rule_actions[],
++			 struct mlx5hws_rule_attr *rule_attr)
 +{
-+	struct mlx5hws_pool_elements *elem;
-+	u32 alloc_size;
++	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
++	u32 expected_completions = 1;
++	int ret;
 +
-+	alloc_size = pool->alloc_log_sz;
++	ret = mlx5hws_rule_action_update(bwc_rule->rule,
++					 at_idx,
++					 rule_actions,
++					 rule_attr);
++	if (unlikely(ret))
++		return ret;
 +
-+	elem = kzalloc(sizeof(*elem), GFP_KERNEL);
-+	if (!elem)
-+		return NULL;
++	ret = hws_bwc_queue_poll(ctx, rule_attr->queue_id, &expected_completions, true);
++	if (unlikely(ret))
++		mlx5hws_err(ctx, "Failed updating BWC rule (%d)\n", ret);
 +
-+	/* Sharing the same resource, also means that all the elements are with size 1 */
-+	if ((pool->flags & MLX5HWS_POOL_FLAGS_FIXED_SIZE_OBJECTS) &&
-+	    !(pool->flags & MLX5HWS_POOL_FLAGS_RESOURCE_PER_CHUNK)) {
-+		 /* Currently all chunks in size 1 */
-+		elem->bitmap = hws_pool_create_and_init_bitmap(alloc_size - order);
-+		if (!elem->bitmap) {
-+			mlx5hws_err(pool->ctx,
-+				    "Failed to create bitmap type: %d: size %d index: %d\n",
-+				    pool->type, alloc_size, idx);
-+			goto free_elem;
-+		}
-+
-+		elem->log_size = alloc_size - order;
-+	}
-+
-+	if (hws_pool_create_resource_on_index(pool, alloc_size, idx)) {
-+		mlx5hws_err(pool->ctx, "Failed to create resource type: %d: size %d index: %d\n",
-+			    pool->type, alloc_size, idx);
-+		goto free_db;
-+	}
-+
-+	pool->db.element_manager->elements[idx] = elem;
-+
-+	return elem;
-+
-+free_db:
-+	bitmap_free(elem->bitmap);
-+free_elem:
-+	kfree(elem);
-+	return NULL;
++	return ret;
 +}
 +
-+static int hws_pool_element_find_seg(struct mlx5hws_pool_elements *elem, int *seg)
++static bool
++hws_bwc_matcher_size_maxed_out(struct mlx5hws_bwc_matcher *bwc_matcher)
 +{
-+	unsigned int segment, size;
++	struct mlx5hws_cmd_query_caps *caps = bwc_matcher->matcher->tbl->ctx->caps;
 +
-+	size = 1 << elem->log_size;
++	return bwc_matcher->size_log + MLX5HWS_MATCHER_ASSURED_MAIN_TBL_DEPTH >=
++	       caps->ste_alloc_log_max - 1;
++}
 +
-+	segment = find_first_bit(elem->bitmap, size);
-+	if (segment >= size) {
-+		elem->is_full = true;
++static bool
++hws_bwc_matcher_rehash_size_needed(struct mlx5hws_bwc_matcher *bwc_matcher,
++				   u32 num_of_rules)
++{
++	if (unlikely(hws_bwc_matcher_size_maxed_out(bwc_matcher)))
++		return false;
++
++	if (unlikely((num_of_rules * 100 / MLX5HWS_BWC_MATCHER_REHASH_PERCENT_TH) >=
++		     (1UL << bwc_matcher->size_log)))
++		return true;
++
++	return false;
++}
++
++static void
++hws_bwc_rule_actions_to_action_types(struct mlx5hws_rule_action rule_actions[],
++				     enum mlx5hws_action_type action_types[])
++{
++	int i = 0;
++
++	for (i = 0;
++	     rule_actions[i].action && (rule_actions[i].action->type != MLX5HWS_ACTION_TYP_LAST);
++	     i++) {
++		action_types[i] = (enum mlx5hws_action_type)rule_actions[i].action->type;
++	}
++
++	action_types[i] = MLX5HWS_ACTION_TYP_LAST;
++}
++
++static int
++hws_bwc_matcher_extend_at(struct mlx5hws_bwc_matcher *bwc_matcher,
++			  struct mlx5hws_rule_action rule_actions[])
++{
++	enum mlx5hws_action_type action_types[MLX5HWS_BWC_MAX_ACTS];
++
++	hws_bwc_rule_actions_to_action_types(rule_actions, action_types);
++
++	bwc_matcher->at[bwc_matcher->num_of_at] =
++		mlx5hws_action_template_create(action_types);
++
++	if (unlikely(!bwc_matcher->at[bwc_matcher->num_of_at]))
 +		return -ENOMEM;
-+	}
 +
-+	bitmap_clear(elem->bitmap, segment, 1);
-+	*seg = segment;
++	bwc_matcher->num_of_at++;
 +	return 0;
 +}
 +
 +static int
-+hws_pool_onesize_element_get_mem_chunk(struct mlx5hws_pool *pool, u32 order,
-+				       u32 *idx, int *seg)
++hws_bwc_matcher_extend_size(struct mlx5hws_bwc_matcher *bwc_matcher)
 +{
-+	struct mlx5hws_pool_elements *elem;
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
++	struct mlx5hws_cmd_query_caps *caps = ctx->caps;
 +
-+	elem = pool->db.element_manager->elements[0];
-+	if (!elem)
-+		elem = hws_pool_element_create_new_elem(pool, order, 0);
-+	if (!elem)
-+		goto err_no_elem;
-+
-+	if (hws_pool_element_find_seg(elem, seg) != 0) {
-+		mlx5hws_err(pool->ctx, "No more resources (last request order: %d)\n", order);
++	if (unlikely(hws_bwc_matcher_size_maxed_out(bwc_matcher))) {
++		mlx5hws_err(ctx, "Can't resize matcher: depth exceeds limit %d\n",
++			    caps->rtc_log_depth_max);
 +		return -ENOMEM;
 +	}
 +
-+	*idx = 0;
-+	elem->num_of_elements++;
-+	return 0;
++	bwc_matcher->size_log =
++		min(bwc_matcher->size_log + MLX5HWS_BWC_MATCHER_SIZE_LOG_STEP,
++		    caps->ste_alloc_log_max - MLX5HWS_MATCHER_ASSURED_MAIN_TBL_DEPTH);
 +
-+err_no_elem:
-+	mlx5hws_err(pool->ctx, "Failed to allocate element for order: %d\n", order);
-+	return -ENOMEM;
++	return 0;
 +}
 +
 +static int
-+hws_pool_general_element_get_mem_chunk(struct mlx5hws_pool *pool, u32 order,
-+				       u32 *idx, int *seg)
++hws_bwc_matcher_find_at(struct mlx5hws_bwc_matcher *bwc_matcher,
++			struct mlx5hws_rule_action rule_actions[])
 +{
-+	int ret, i;
++	enum mlx5hws_action_type *action_type_arr;
++	int i, j;
 +
-+	for (i = 0; i < MLX5HWS_POOL_RESOURCE_ARR_SZ; i++) {
-+		if (!pool->resource[i]) {
-+			ret = hws_pool_create_resource_on_index(pool, order, i);
-+			if (ret)
-+				goto err_no_res;
-+			*idx = i;
-+			*seg = 0; /* One memory slot in that element */
-+			return 0;
++	/* start from index 1 - first action template is a dummy */
++	for (i = 1; i < bwc_matcher->num_of_at; i++) {
++		j = 0;
++		action_type_arr = bwc_matcher->at[i]->action_type_arr;
++
++		while (rule_actions[j].action &&
++		       rule_actions[j].action->type != MLX5HWS_ACTION_TYP_LAST) {
++			if (action_type_arr[j] != rule_actions[j].action->type)
++				break;
++			j++;
 +		}
++
++		if (action_type_arr[j] == MLX5HWS_ACTION_TYP_LAST &&
++		    (!rule_actions[j].action ||
++		     rule_actions[j].action->type == MLX5HWS_ACTION_TYP_LAST))
++			return i;
 +	}
 +
-+	mlx5hws_err(pool->ctx, "No more resources (last request order: %d)\n", order);
-+	return -ENOMEM;
-+
-+err_no_res:
-+	mlx5hws_err(pool->ctx, "Failed to allocate element for order: %d\n", order);
-+	return -ENOMEM;
++	return -1;
 +}
 +
-+static int hws_pool_general_element_db_get_chunk(struct mlx5hws_pool *pool,
-+						 struct mlx5hws_pool_chunk *chunk)
++static int hws_bwc_matcher_move_all_simple(struct mlx5hws_bwc_matcher *bwc_matcher)
 +{
-+	int ret;
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
++	u16 bwc_queues = mlx5hws_bwc_queues(ctx);
++	struct mlx5hws_bwc_rule **bwc_rules;
++	struct mlx5hws_rule_attr rule_attr;
++	u32 *pending_rules;
++	int i, j, ret = 0;
++	bool all_done;
++	u16 burst_th;
 +
-+	/* Go over all memory elements and find/allocate free slot */
-+	ret = hws_pool_general_element_get_mem_chunk(pool, chunk->order,
-+						     &chunk->resource_idx,
-+						     &chunk->offset);
-+	if (ret)
-+		mlx5hws_err(pool->ctx, "Failed to get free slot for chunk with order: %d\n",
-+			    chunk->order);
++	mlx5hws_bwc_rule_fill_attr(bwc_matcher, 0, 0, &rule_attr);
 +
-+	return ret;
-+}
-+
-+static void hws_pool_general_element_db_put_chunk(struct mlx5hws_pool *pool,
-+						  struct mlx5hws_pool_chunk *chunk)
-+{
-+	if (unlikely(!pool->resource[chunk->resource_idx]))
-+		pr_warn("HWS: invalid resource with index %d\n", chunk->resource_idx);
-+
-+	if (pool->flags & MLX5HWS_POOL_FLAGS_RELEASE_FREE_RESOURCE)
-+		hws_pool_resource_free(pool, chunk->resource_idx);
-+}
-+
-+static void hws_pool_general_element_db_uninit(struct mlx5hws_pool *pool)
-+{
-+	(void)pool;
-+}
-+
-+/* This memory management works as the following:
-+ * - At start doesn't allocate no mem at all.
-+ * - When new request for chunk arrived:
-+ *	allocate resource and give it.
-+ * - When free that chunk:
-+ *	the resource is freed.
-+ */
-+static int hws_pool_general_element_db_init(struct mlx5hws_pool *pool)
-+{
-+	pool->p_db_uninit = &hws_pool_general_element_db_uninit;
-+	pool->p_get_chunk = &hws_pool_general_element_db_get_chunk;
-+	pool->p_put_chunk = &hws_pool_general_element_db_put_chunk;
-+
-+	return 0;
-+}
-+
-+static void hws_onesize_element_db_destroy_element(struct mlx5hws_pool *pool,
-+						   struct mlx5hws_pool_elements *elem,
-+						   struct mlx5hws_pool_chunk *chunk)
-+{
-+	if (unlikely(!pool->resource[chunk->resource_idx]))
-+		pr_warn("HWS: invalid resource with index %d\n", chunk->resource_idx);
-+
-+	hws_pool_resource_free(pool, chunk->resource_idx);
-+	kfree(elem);
-+	pool->db.element_manager->elements[chunk->resource_idx] = NULL;
-+}
-+
-+static void hws_onesize_element_db_put_chunk(struct mlx5hws_pool *pool,
-+					     struct mlx5hws_pool_chunk *chunk)
-+{
-+	struct mlx5hws_pool_elements *elem;
-+
-+	if (unlikely(chunk->resource_idx))
-+		pr_warn("HWS: invalid resource with index %d\n", chunk->resource_idx);
-+
-+	elem = pool->db.element_manager->elements[chunk->resource_idx];
-+	if (!elem) {
-+		mlx5hws_err(pool->ctx, "No such element (%d)\n", chunk->resource_idx);
-+		return;
-+	}
-+
-+	bitmap_set(elem->bitmap, chunk->offset, 1);
-+	elem->is_full = false;
-+	elem->num_of_elements--;
-+
-+	if (pool->flags & MLX5HWS_POOL_FLAGS_RELEASE_FREE_RESOURCE &&
-+	    !elem->num_of_elements)
-+		hws_onesize_element_db_destroy_element(pool, elem, chunk);
-+}
-+
-+static int hws_onesize_element_db_get_chunk(struct mlx5hws_pool *pool,
-+					    struct mlx5hws_pool_chunk *chunk)
-+{
-+	int ret = 0;
-+
-+	/* Go over all memory elements and find/allocate free slot */
-+	ret = hws_pool_onesize_element_get_mem_chunk(pool, chunk->order,
-+						     &chunk->resource_idx,
-+						     &chunk->offset);
-+	if (ret)
-+		mlx5hws_err(pool->ctx, "Failed to get free slot for chunk with order: %d\n",
-+			    chunk->order);
-+
-+	return ret;
-+}
-+
-+static void hws_onesize_element_db_uninit(struct mlx5hws_pool *pool)
-+{
-+	struct mlx5hws_pool_elements *elem;
-+	int i;
-+
-+	for (i = 0; i < MLX5HWS_POOL_RESOURCE_ARR_SZ; i++) {
-+		elem = pool->db.element_manager->elements[i];
-+		if (elem) {
-+			bitmap_free(elem->bitmap);
-+			kfree(elem);
-+			pool->db.element_manager->elements[i] = NULL;
-+		}
-+	}
-+	kfree(pool->db.element_manager);
-+}
-+
-+/* This memory management works as the following:
-+ * - At start doesn't allocate no mem at all.
-+ * - When new request for chunk arrived:
-+ *  aloocate the first and only slot of memory/resource
-+ *  when it ended return error.
-+ */
-+static int hws_pool_onesize_element_db_init(struct mlx5hws_pool *pool)
-+{
-+	pool->db.element_manager = kzalloc(sizeof(*pool->db.element_manager), GFP_KERNEL);
-+	if (!pool->db.element_manager)
++	pending_rules = kcalloc(bwc_queues, sizeof(*pending_rules), GFP_KERNEL);
++	if (!pending_rules)
 +		return -ENOMEM;
 +
-+	pool->p_db_uninit = &hws_onesize_element_db_uninit;
-+	pool->p_get_chunk = &hws_onesize_element_db_get_chunk;
-+	pool->p_put_chunk = &hws_onesize_element_db_put_chunk;
++	bwc_rules = kcalloc(bwc_queues, sizeof(*bwc_rules), GFP_KERNEL);
++	if (!bwc_rules) {
++		ret = -ENOMEM;
++		goto free_pending_rules;
++	}
 +
-+	return 0;
++	for (i = 0; i < bwc_queues; i++) {
++		if (list_empty(&bwc_matcher->rules[i]))
++			bwc_rules[i] = NULL;
++		else
++			bwc_rules[i] = list_first_entry(&bwc_matcher->rules[i],
++							struct mlx5hws_bwc_rule,
++							list_node);
++	}
++
++	do {
++		all_done = true;
++
++		for (i = 0; i < bwc_queues; i++) {
++			rule_attr.queue_id = mlx5hws_bwc_get_queue_id(ctx, i);
++			burst_th = hws_bwc_get_burst_th(ctx, rule_attr.queue_id);
++
++			for (j = 0; j < burst_th && bwc_rules[i]; j++) {
++				rule_attr.burst = !!((j + 1) % burst_th);
++				ret = mlx5hws_matcher_resize_rule_move(bwc_matcher->matcher,
++								       bwc_rules[i]->rule,
++								       &rule_attr);
++				if (unlikely(ret)) {
++					mlx5hws_err(ctx,
++						    "Moving BWC rule failed during rehash (%d)\n",
++						    ret);
++					goto free_bwc_rules;
++				}
++
++				all_done = false;
++				pending_rules[i]++;
++				bwc_rules[i] = list_is_last(&bwc_rules[i]->list_node,
++							    &bwc_matcher->rules[i]) ?
++					       NULL : list_next_entry(bwc_rules[i], list_node);
++
++				ret = hws_bwc_queue_poll(ctx, rule_attr.queue_id,
++							 &pending_rules[i], false);
++				if (unlikely(ret))
++					goto free_bwc_rules;
++			}
++		}
++	} while (!all_done);
++
++	/* drain all the bwc queues */
++	for (i = 0; i < bwc_queues; i++) {
++		if (pending_rules[i]) {
++			u16 queue_id = mlx5hws_bwc_get_queue_id(ctx, i);
++
++			mlx5hws_send_engine_flush_queue(&ctx->send_queue[queue_id]);
++			ret = hws_bwc_queue_poll(ctx, queue_id,
++						 &pending_rules[i], true);
++			if (unlikely(ret))
++				goto free_bwc_rules;
++		}
++	}
++
++free_bwc_rules:
++	kfree(bwc_rules);
++free_pending_rules:
++	kfree(pending_rules);
++
++	return ret;
 +}
 +
-+static int hws_pool_db_init(struct mlx5hws_pool *pool,
-+			    enum mlx5hws_db_type db_type)
++static int hws_bwc_matcher_move_all(struct mlx5hws_bwc_matcher *bwc_matcher)
 +{
++	return hws_bwc_matcher_move_all_simple(bwc_matcher);
++}
++
++static int hws_bwc_matcher_move(struct mlx5hws_bwc_matcher *bwc_matcher)
++{
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
++	struct mlx5hws_matcher_attr matcher_attr = {0};
++	struct mlx5hws_matcher *old_matcher;
++	struct mlx5hws_matcher *new_matcher;
 +	int ret;
 +
-+	if (db_type == MLX5HWS_POOL_DB_TYPE_GENERAL_SIZE)
-+		ret = hws_pool_general_element_db_init(pool);
-+	else if (db_type == MLX5HWS_POOL_DB_TYPE_ONE_SIZE_RESOURCE)
-+		ret = hws_pool_onesize_element_db_init(pool);
-+	else
-+		ret = hws_pool_buddy_db_init(pool, pool->alloc_log_sz);
++	hws_bwc_matcher_init_attr(&matcher_attr,
++				  bwc_matcher->priority,
++				  bwc_matcher->size_log);
 +
++	old_matcher = bwc_matcher->matcher;
++	new_matcher = mlx5hws_matcher_create(old_matcher->tbl,
++					     &bwc_matcher->mt, 1,
++					     bwc_matcher->at,
++					     bwc_matcher->num_of_at,
++					     &matcher_attr);
++	if (!new_matcher) {
++		mlx5hws_err(ctx, "Rehash error: matcher creation failed\n");
++		return -ENOMEM;
++	}
++
++	ret = mlx5hws_matcher_resize_set_target(old_matcher, new_matcher);
 +	if (ret) {
-+		mlx5hws_err(pool->ctx, "Failed to init general db : %d (ret: %d)\n", db_type, ret);
++		mlx5hws_err(ctx, "Rehash error: failed setting resize target\n");
 +		return ret;
 +	}
 +
++	ret = hws_bwc_matcher_move_all(bwc_matcher);
++	if (ret) {
++		mlx5hws_err(ctx, "Rehash error: moving rules failed\n");
++		return -ENOMEM;
++	}
++
++	bwc_matcher->matcher = new_matcher;
++	mlx5hws_matcher_destroy(old_matcher);
++
 +	return 0;
 +}
 +
-+static void hws_pool_db_unint(struct mlx5hws_pool *pool)
++static int
++hws_bwc_matcher_rehash_size(struct mlx5hws_bwc_matcher *bwc_matcher)
 +{
-+	pool->p_db_uninit(pool);
-+}
-+
-+int mlx5hws_pool_chunk_alloc(struct mlx5hws_pool *pool,
-+			     struct mlx5hws_pool_chunk *chunk)
-+{
++	u32 num_of_rules;
 +	int ret;
 +
-+	mutex_lock(&pool->lock);
-+	ret = pool->p_get_chunk(pool, chunk);
-+	mutex_unlock(&pool->lock);
++	/* If the current matcher size is already at its max size, we can't
++	 * do the rehash. Skip it and try adding the rule again - perhaps
++	 * there was some change.
++	 */
++	if (hws_bwc_matcher_size_maxed_out(bwc_matcher))
++		return 0;
++
++	/* It is possible that other rule has already performed rehash.
++	 * Need to check again if we really need rehash.
++	 * If the reason for rehash was size, but not any more - skip rehash.
++	 */
++	num_of_rules = __atomic_load_n(&bwc_matcher->num_of_rules, __ATOMIC_RELAXED);
++	if (!hws_bwc_matcher_rehash_size_needed(bwc_matcher, num_of_rules))
++		return 0;
++
++	/* Now we're done all the checking - do the rehash:
++	 *  - extend match RTC size
++	 *  - create new matcher
++	 *  - move all the rules to the new matcher
++	 *  - destroy the old matcher
++	 */
++
++	ret = hws_bwc_matcher_extend_size(bwc_matcher);
++	if (ret)
++		return ret;
++
++	return hws_bwc_matcher_move(bwc_matcher);
++}
++
++static int
++hws_bwc_matcher_rehash_at(struct mlx5hws_bwc_matcher *bwc_matcher)
++{
++	/* Rehash by action template doesn't require any additional checking.
++	 * The bwc_matcher already contains the new action template.
++	 * Just do the usual rehash:
++	 *  - create new matcher
++	 *  - move all the rules to the new matcher
++	 *  - destroy the old matcher
++	 */
++	return hws_bwc_matcher_move(bwc_matcher);
++}
++
++int mlx5hws_bwc_rule_create_simple(struct mlx5hws_bwc_rule *bwc_rule,
++				   u32 *match_param,
++				   struct mlx5hws_rule_action rule_actions[],
++				   u32 flow_source,
++				   u16 bwc_queue_idx)
++{
++	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
++	struct mlx5hws_rule_attr rule_attr;
++	struct mutex *queue_lock; /* Protect the queue */
++	u32 num_of_rules;
++	int ret = 0;
++	int at_idx;
++
++	mlx5hws_bwc_rule_fill_attr(bwc_matcher, bwc_queue_idx, flow_source, &rule_attr);
++
++	queue_lock = hws_bwc_get_queue_lock(ctx, bwc_queue_idx);
++
++	mutex_lock(queue_lock);
++
++	/* check if rehash needed due to missing action template */
++	at_idx = hws_bwc_matcher_find_at(bwc_matcher, rule_actions);
++	if (unlikely(at_idx < 0)) {
++		/* we need to extend BWC matcher action templates array */
++		mutex_unlock(queue_lock);
++		hws_bwc_lock_all_queues(ctx);
++
++		ret = hws_bwc_matcher_extend_at(bwc_matcher, rule_actions);
++		if (unlikely(ret)) {
++			hws_bwc_unlock_all_queues(ctx);
++			return ret;
++		}
++
++		/* action templates array was extended, we need the last idx */
++		at_idx = bwc_matcher->num_of_at - 1;
++
++		ret = mlx5hws_matcher_attach_at(bwc_matcher->matcher,
++						bwc_matcher->at[at_idx]);
++		if (unlikely(ret)) {
++			/* Action template attach failed, possibly due to
++			 * requiring more action STEs.
++			 * Need to attempt creating new matcher with all
++			 * the action templates, including the new one.
++			 */
++			ret = hws_bwc_matcher_rehash_at(bwc_matcher);
++			if (unlikely(ret)) {
++				mlx5hws_action_template_destroy(bwc_matcher->at[at_idx]);
++				bwc_matcher->at[at_idx] = NULL;
++				bwc_matcher->num_of_at--;
++
++				hws_bwc_unlock_all_queues(ctx);
++
++				mlx5hws_err(ctx,
++					    "BWC rule insertion: rehash AT failed (%d)\n", ret);
++				return ret;
++			}
++		}
++
++		hws_bwc_unlock_all_queues(ctx);
++		mutex_lock(queue_lock);
++	}
++
++	/* check if number of rules require rehash */
++	num_of_rules = bwc_matcher->num_of_rules;
++
++	if (unlikely(hws_bwc_matcher_rehash_size_needed(bwc_matcher, num_of_rules))) {
++		mutex_unlock(queue_lock);
++
++		hws_bwc_lock_all_queues(ctx);
++		ret = hws_bwc_matcher_rehash_size(bwc_matcher);
++		hws_bwc_unlock_all_queues(ctx);
++
++		if (ret) {
++			mlx5hws_err(ctx, "BWC rule insertion: rehash size [%d -> %d] failed (%d)\n",
++				    bwc_matcher->size_log - MLX5HWS_BWC_MATCHER_SIZE_LOG_STEP,
++				    bwc_matcher->size_log,
++				    ret);
++			return ret;
++		}
++
++		mutex_lock(queue_lock);
++	}
++
++	ret = hws_bwc_rule_create_sync(bwc_rule,
++				       match_param,
++				       at_idx,
++				       rule_actions,
++				       &rule_attr);
++	if (likely(!ret)) {
++		hws_bwc_rule_list_add(bwc_rule, bwc_queue_idx);
++		mutex_unlock(queue_lock);
++		return 0; /* rule inserted successfully */
++	}
++
++	/* At this point the rule wasn't added.
++	 * It could be because there was collision, or some other problem.
++	 * If we don't dive deeper than API, the only thing we know is that
++	 * the status of completion is RTE_FLOW_OP_ERROR.
++	 * Try rehash by size and insert rule again - last chance.
++	 */
++
++	mutex_unlock(queue_lock);
++
++	hws_bwc_lock_all_queues(ctx);
++	ret = hws_bwc_matcher_rehash_size(bwc_matcher);
++	hws_bwc_unlock_all_queues(ctx);
++
++	if (ret) {
++		mlx5hws_err(ctx, "BWC rule insertion: rehash failed (%d)\n", ret);
++		return ret;
++	}
++
++	/* Rehash done, but we still have that pesky rule to add */
++	mutex_lock(queue_lock);
++
++	ret = hws_bwc_rule_create_sync(bwc_rule,
++				       match_param,
++				       at_idx,
++				       rule_actions,
++				       &rule_attr);
++
++	if (unlikely(ret)) {
++		mutex_unlock(queue_lock);
++		mlx5hws_err(ctx, "BWC rule insertion failed (%d)\n", ret);
++		return ret;
++	}
++
++	hws_bwc_rule_list_add(bwc_rule, bwc_queue_idx);
++	mutex_unlock(queue_lock);
++
++	return 0;
++}
++
++struct mlx5hws_bwc_rule *
++mlx5hws_bwc_rule_create(struct mlx5hws_bwc_matcher *bwc_matcher,
++			struct mlx5hws_match_parameters *params,
++			u32 flow_source,
++			struct mlx5hws_rule_action rule_actions[])
++{
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
++	struct mlx5hws_bwc_rule *bwc_rule;
++	u16 bwc_queue_idx;
++	int ret;
++
++	if (unlikely(!mlx5hws_context_bwc_supported(ctx))) {
++		mlx5hws_err(ctx, "BWC rule: Context created w/o BWC API compatibility\n");
++		return NULL;
++	}
++
++	bwc_rule = mlx5hws_bwc_rule_alloc(bwc_matcher);
++	if (unlikely(!bwc_rule))
++		return NULL;
++
++	bwc_queue_idx = hws_bwc_gen_queue_idx(ctx);
++
++	ret = mlx5hws_bwc_rule_create_simple(bwc_rule,
++					     params->match_buf,
++					     rule_actions,
++					     flow_source,
++					     bwc_queue_idx);
++	if (unlikely(ret)) {
++		mlx5hws_bwc_rule_free(bwc_rule);
++		return NULL;
++	}
++
++	return bwc_rule;
++}
++
++static int
++hws_bwc_rule_action_update(struct mlx5hws_bwc_rule *bwc_rule,
++			   struct mlx5hws_rule_action rule_actions[])
++{
++	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
++	struct mlx5hws_rule_attr rule_attr;
++	struct mutex *queue_lock; /* Protect the queue */
++	int at_idx, ret;
++	u16 idx;
++
++	idx = bwc_rule->bwc_queue_idx;
++
++	mlx5hws_bwc_rule_fill_attr(bwc_matcher, idx, 0, &rule_attr);
++	queue_lock = hws_bwc_get_queue_lock(ctx, idx);
++
++	mutex_lock(queue_lock);
++
++	/* check if rehash needed due to missing action template */
++	at_idx = hws_bwc_matcher_find_at(bwc_matcher, rule_actions);
++	if (unlikely(at_idx < 0)) {
++		/* we need to extend BWC matcher action templates array */
++		mutex_unlock(queue_lock);
++		hws_bwc_lock_all_queues(ctx);
++
++		/* check again - perhaps other thread already did extend_at */
++		at_idx = hws_bwc_matcher_find_at(bwc_matcher, rule_actions);
++		if (likely(at_idx < 0)) {
++			ret = hws_bwc_matcher_extend_at(bwc_matcher, rule_actions);
++			if (unlikely(ret)) {
++				hws_bwc_unlock_all_queues(ctx);
++				mlx5hws_err(ctx, "BWC rule update: failed extending AT (%d)", ret);
++				return -EINVAL;
++			}
++
++			/* action templates array was extended, we need the last idx */
++			at_idx = bwc_matcher->num_of_at - 1;
++
++			ret = mlx5hws_matcher_attach_at(bwc_matcher->matcher,
++							bwc_matcher->at[at_idx]);
++			if (unlikely(ret)) {
++				/* Action template attach failed, possibly due to
++				 * requiring more action STEs.
++				 * Need to attempt creating new matcher with all
++				 * the action templates, including the new one.
++				 */
++				ret = hws_bwc_matcher_rehash_at(bwc_matcher);
++				if (unlikely(ret)) {
++					mlx5hws_action_template_destroy(bwc_matcher->at[at_idx]);
++					bwc_matcher->at[at_idx] = NULL;
++					bwc_matcher->num_of_at--;
++
++					hws_bwc_unlock_all_queues(ctx);
++
++					mlx5hws_err(ctx,
++						    "BWC rule update: rehash AT failed (%d)\n",
++						    ret);
++					return ret;
++				}
++			}
++		}
++
++		hws_bwc_unlock_all_queues(ctx);
++		mutex_lock(queue_lock);
++	}
++
++	ret = hws_bwc_rule_update_sync(bwc_rule,
++				       at_idx,
++				       rule_actions,
++				       &rule_attr);
++	mutex_unlock(queue_lock);
++
++	if (unlikely(ret))
++		mlx5hws_err(ctx, "BWC rule: update failed (%d)\n", ret);
 +
 +	return ret;
 +}
 +
-+void mlx5hws_pool_chunk_free(struct mlx5hws_pool *pool,
-+			     struct mlx5hws_pool_chunk *chunk)
++int mlx5hws_bwc_rule_action_update(struct mlx5hws_bwc_rule *bwc_rule,
++				   struct mlx5hws_rule_action rule_actions[])
 +{
-+	mutex_lock(&pool->lock);
-+	pool->p_put_chunk(pool, chunk);
-+	mutex_unlock(&pool->lock);
++	struct mlx5hws_bwc_matcher *bwc_matcher = bwc_rule->bwc_matcher;
++	struct mlx5hws_context *ctx = bwc_matcher->matcher->tbl->ctx;
++
++	if (unlikely(!mlx5hws_context_bwc_supported(ctx))) {
++		mlx5hws_err(ctx, "BWC rule: Context created w/o BWC API compatibility\n");
++		return -EINVAL;
++	}
++
++	return hws_bwc_rule_action_update(bwc_rule, rule_actions);
 +}
-+
-+struct mlx5hws_pool *
-+mlx5hws_pool_create(struct mlx5hws_context *ctx, struct mlx5hws_pool_attr *pool_attr)
-+{
-+	enum mlx5hws_db_type res_db_type;
-+	struct mlx5hws_pool *pool;
-+
-+	pool = kzalloc(sizeof(*pool), GFP_KERNEL);
-+	if (!pool)
-+		return NULL;
-+
-+	pool->ctx = ctx;
-+	pool->type = pool_attr->pool_type;
-+	pool->alloc_log_sz = pool_attr->alloc_log_sz;
-+	pool->flags = pool_attr->flags;
-+	pool->tbl_type = pool_attr->table_type;
-+	pool->opt_type = pool_attr->opt_type;
-+
-+	/* Support general db */
-+	if (pool->flags == (MLX5HWS_POOL_FLAGS_RELEASE_FREE_RESOURCE |
-+			    MLX5HWS_POOL_FLAGS_RESOURCE_PER_CHUNK))
-+		res_db_type = MLX5HWS_POOL_DB_TYPE_GENERAL_SIZE;
-+	else if (pool->flags == (MLX5HWS_POOL_FLAGS_ONE_RESOURCE |
-+				 MLX5HWS_POOL_FLAGS_FIXED_SIZE_OBJECTS))
-+		res_db_type = MLX5HWS_POOL_DB_TYPE_ONE_SIZE_RESOURCE;
-+	else
-+		res_db_type = MLX5HWS_POOL_DB_TYPE_BUDDY;
-+
-+	pool->alloc_log_sz = pool_attr->alloc_log_sz;
-+
-+	if (hws_pool_db_init(pool, res_db_type))
-+		goto free_pool;
-+
-+	mutex_init(&pool->lock);
-+
-+	return pool;
-+
-+free_pool:
-+	kfree(pool);
-+	return NULL;
-+}
-+
-+int mlx5hws_pool_destroy(struct mlx5hws_pool *pool)
-+{
-+	int i;
-+
-+	mutex_destroy(&pool->lock);
-+
-+	for (i = 0; i < MLX5HWS_POOL_RESOURCE_ARR_SZ; i++)
-+		if (pool->resource[i])
-+			hws_pool_resource_free(pool, i);
-+
-+	hws_pool_db_unint(pool);
-+
-+	kfree(pool);
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.h
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h
 new file mode 100644
-index 000000000000..621298b352b2
+index 000000000000..4fe8c32d8fbe
 --- /dev/null
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_pool.h
-@@ -0,0 +1,151 @@
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc.h
+@@ -0,0 +1,73 @@
 +/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
 +/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
 +
-+#ifndef MLX5HWS_POOL_H_
-+#define MLX5HWS_POOL_H_
++#ifndef MLX5HWS_BWC_H_
++#define MLX5HWS_BWC_H_
 +
-+#define MLX5HWS_POOL_STC_LOG_SZ 15
++#define MLX5HWS_BWC_MATCHER_INIT_SIZE_LOG 1
++#define MLX5HWS_BWC_MATCHER_SIZE_LOG_STEP 1
++#define MLX5HWS_BWC_MATCHER_REHASH_PERCENT_TH 70
++#define MLX5HWS_BWC_MATCHER_REHASH_BURST_TH 32
++#define MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM 255
 +
-+#define MLX5HWS_POOL_RESOURCE_ARR_SZ 100
++#define MLX5HWS_BWC_MAX_ACTS 16
 +
-+enum mlx5hws_pool_type {
-+	MLX5HWS_POOL_TYPE_STE,
-+	MLX5HWS_POOL_TYPE_STC,
++struct mlx5hws_bwc_matcher {
++	struct mlx5hws_matcher *matcher;
++	struct mlx5hws_match_template *mt;
++	struct mlx5hws_action_template *at[MLX5HWS_BWC_MATCHER_ATTACH_AT_NUM];
++	u8 num_of_at;
++	u16 priority;
++	u8 size_log;
++	u32 num_of_rules; /* atomically accessed */
++	struct list_head *rules;
 +};
 +
-+struct mlx5hws_pool_chunk {
-+	u32 resource_idx;
-+	/* Internal offset, relative to base index */
-+	int offset;
-+	int order;
++struct mlx5hws_bwc_rule {
++	struct mlx5hws_bwc_matcher *bwc_matcher;
++	struct mlx5hws_rule *rule;
++	u16 bwc_queue_idx;
++	struct list_head list_node;
 +};
 +
-+struct mlx5hws_pool_resource {
-+	struct mlx5hws_pool *pool;
-+	u32 base_id;
-+	u32 range;
-+};
++int
++mlx5hws_bwc_matcher_create_simple(struct mlx5hws_bwc_matcher *bwc_matcher,
++				  struct mlx5hws_table *table,
++				  u32 priority,
++				  u8 match_criteria_enable,
++				  struct mlx5hws_match_parameters *mask,
++				  enum mlx5hws_action_type action_types[]);
 +
-+enum mlx5hws_pool_flags {
-+	/* Only a one resource in that pool */
-+	MLX5HWS_POOL_FLAGS_ONE_RESOURCE = 1 << 0,
-+	MLX5HWS_POOL_FLAGS_RELEASE_FREE_RESOURCE = 1 << 1,
-+	/* No sharing resources between chunks */
-+	MLX5HWS_POOL_FLAGS_RESOURCE_PER_CHUNK = 1 << 2,
-+	/* All objects are in the same size */
-+	MLX5HWS_POOL_FLAGS_FIXED_SIZE_OBJECTS = 1 << 3,
-+	/* Managed by buddy allocator */
-+	MLX5HWS_POOL_FLAGS_BUDDY_MANAGED = 1 << 4,
-+	/* Allocate pool_type memory on pool creation */
-+	MLX5HWS_POOL_FLAGS_ALLOC_MEM_ON_CREATE = 1 << 5,
++int mlx5hws_bwc_matcher_destroy_simple(struct mlx5hws_bwc_matcher *bwc_matcher);
 +
-+	/* These values should be used by the caller */
-+	MLX5HWS_POOL_FLAGS_FOR_STC_POOL =
-+		MLX5HWS_POOL_FLAGS_ONE_RESOURCE |
-+		MLX5HWS_POOL_FLAGS_FIXED_SIZE_OBJECTS,
-+	MLX5HWS_POOL_FLAGS_FOR_MATCHER_STE_POOL =
-+		MLX5HWS_POOL_FLAGS_RELEASE_FREE_RESOURCE |
-+		MLX5HWS_POOL_FLAGS_RESOURCE_PER_CHUNK,
-+	MLX5HWS_POOL_FLAGS_FOR_STE_ACTION_POOL =
-+		MLX5HWS_POOL_FLAGS_ONE_RESOURCE |
-+		MLX5HWS_POOL_FLAGS_BUDDY_MANAGED |
-+		MLX5HWS_POOL_FLAGS_ALLOC_MEM_ON_CREATE,
-+};
++struct mlx5hws_bwc_rule *mlx5hws_bwc_rule_alloc(struct mlx5hws_bwc_matcher *bwc_matcher);
 +
-+enum mlx5hws_pool_optimize {
-+	MLX5HWS_POOL_OPTIMIZE_NONE = 0x0,
-+	MLX5HWS_POOL_OPTIMIZE_ORIG = 0x1,
-+	MLX5HWS_POOL_OPTIMIZE_MIRROR = 0x2,
-+};
++void mlx5hws_bwc_rule_free(struct mlx5hws_bwc_rule *bwc_rule);
 +
-+struct mlx5hws_pool_attr {
-+	enum mlx5hws_pool_type pool_type;
-+	enum mlx5hws_table_type table_type;
-+	enum mlx5hws_pool_flags flags;
-+	enum mlx5hws_pool_optimize opt_type;
-+	/* Allocation size once memory is depleted */
-+	size_t alloc_log_sz;
-+};
++int mlx5hws_bwc_rule_create_simple(struct mlx5hws_bwc_rule *bwc_rule,
++				   u32 *match_param,
++				   struct mlx5hws_rule_action rule_actions[],
++				   u32 flow_source,
++				   u16 bwc_queue_idx);
 +
-+enum mlx5hws_db_type {
-+	/* Uses for allocating chunk of big memory, each element has its own resource in the FW*/
-+	MLX5HWS_POOL_DB_TYPE_GENERAL_SIZE,
-+	/* One resource only, all the elements are with same one size */
-+	MLX5HWS_POOL_DB_TYPE_ONE_SIZE_RESOURCE,
-+	/* Many resources, the memory allocated with buddy mechanism */
-+	MLX5HWS_POOL_DB_TYPE_BUDDY,
-+};
++int mlx5hws_bwc_rule_destroy_simple(struct mlx5hws_bwc_rule *bwc_rule);
 +
-+struct mlx5hws_buddy_manager {
-+	struct mlx5hws_buddy_mem *buddies[MLX5HWS_POOL_RESOURCE_ARR_SZ];
-+};
++void mlx5hws_bwc_rule_fill_attr(struct mlx5hws_bwc_matcher *bwc_matcher,
++				u16 bwc_queue_idx,
++				u32 flow_source,
++				struct mlx5hws_rule_attr *rule_attr);
 +
-+struct mlx5hws_pool_elements {
-+	u32 num_of_elements;
-+	unsigned long *bitmap;
-+	u32 log_size;
-+	bool is_full;
-+};
-+
-+struct mlx5hws_element_manager {
-+	struct mlx5hws_pool_elements *elements[MLX5HWS_POOL_RESOURCE_ARR_SZ];
-+};
-+
-+struct mlx5hws_pool_db {
-+	enum mlx5hws_db_type type;
-+	union {
-+		struct mlx5hws_element_manager *element_manager;
-+		struct mlx5hws_buddy_manager *buddy_manager;
-+	};
-+};
-+
-+typedef int (*mlx5hws_pool_db_get_chunk)(struct mlx5hws_pool *pool,
-+					struct mlx5hws_pool_chunk *chunk);
-+typedef void (*mlx5hws_pool_db_put_chunk)(struct mlx5hws_pool *pool,
-+					 struct mlx5hws_pool_chunk *chunk);
-+typedef void (*mlx5hws_pool_unint_db)(struct mlx5hws_pool *pool);
-+
-+struct mlx5hws_pool {
-+	struct mlx5hws_context *ctx;
-+	enum mlx5hws_pool_type type;
-+	enum mlx5hws_pool_flags flags;
-+	struct mutex lock; /* protect the pool */
-+	size_t alloc_log_sz;
-+	enum mlx5hws_table_type tbl_type;
-+	enum mlx5hws_pool_optimize opt_type;
-+	struct mlx5hws_pool_resource *resource[MLX5HWS_POOL_RESOURCE_ARR_SZ];
-+	struct mlx5hws_pool_resource *mirror_resource[MLX5HWS_POOL_RESOURCE_ARR_SZ];
-+	/* DB */
-+	struct mlx5hws_pool_db db;
-+	/* Functions */
-+	mlx5hws_pool_unint_db p_db_uninit;
-+	mlx5hws_pool_db_get_chunk p_get_chunk;
-+	mlx5hws_pool_db_put_chunk p_put_chunk;
-+};
-+
-+struct mlx5hws_pool *
-+mlx5hws_pool_create(struct mlx5hws_context *ctx,
-+		    struct mlx5hws_pool_attr *pool_attr);
-+
-+int mlx5hws_pool_destroy(struct mlx5hws_pool *pool);
-+
-+int mlx5hws_pool_chunk_alloc(struct mlx5hws_pool *pool,
-+			     struct mlx5hws_pool_chunk *chunk);
-+
-+void mlx5hws_pool_chunk_free(struct mlx5hws_pool *pool,
-+			     struct mlx5hws_pool_chunk *chunk);
-+
-+static inline u32
-+mlx5hws_pool_chunk_get_base_id(struct mlx5hws_pool *pool,
-+			       struct mlx5hws_pool_chunk *chunk)
++static inline u16 mlx5hws_bwc_queues(struct mlx5hws_context *ctx)
 +{
-+	return pool->resource[chunk->resource_idx]->base_id;
++	/* Besides the control queue, half of the queues are
++	 * reguler HWS queues, and the other half are BWC queues.
++	 */
++	return (ctx->queues - 1) / 2;
 +}
 +
-+static inline u32
-+mlx5hws_pool_chunk_get_base_mirror_id(struct mlx5hws_pool *pool,
-+				      struct mlx5hws_pool_chunk *chunk)
++static inline u16 mlx5hws_bwc_get_queue_id(struct mlx5hws_context *ctx, u16 idx)
 +{
-+	return pool->mirror_resource[chunk->resource_idx]->base_id;
++	return idx + mlx5hws_bwc_queues(ctx);
 +}
-+#endif /* MLX5HWS_POOL_H_ */
++
++#endif /* MLX5HWS_BWC_H_ */
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
+new file mode 100644
+index 000000000000..bb563f50ef09
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
+@@ -0,0 +1,86 @@
++// SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB
++/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
++
++#include "mlx5hws_internal.h"
++
++bool mlx5hws_bwc_match_params_is_complex(struct mlx5hws_context *ctx,
++					 u8 match_criteria_enable,
++					 struct mlx5hws_match_parameters *mask)
++{
++	struct mlx5hws_definer match_layout = {0};
++	struct mlx5hws_match_template *mt;
++	bool is_complex = false;
++	int ret;
++
++	if (!match_criteria_enable)
++		return false; /* empty matcher */
++
++	mt = mlx5hws_match_template_create(ctx,
++					   mask->match_buf,
++					   mask->match_sz,
++					   match_criteria_enable);
++	if (!mt) {
++		mlx5hws_err(ctx, "BWC: failed creating match template\n");
++		return false;
++	}
++
++	ret = mlx5hws_definer_calc_layout(ctx, mt, &match_layout);
++	if (ret) {
++		/* The only case that we're interested in is E2BIG,
++		 * which means that the match parameters need to be
++		 * split into complex martcher.
++		 * For all other cases (good or bad) - just return true
++		 * and let the usual match creation path handle it,
++		 * both for good and bad flows.
++		 */
++		if (ret == E2BIG) {
++			is_complex = true;
++			mlx5hws_dbg(ctx, "Matcher definer layout: need complex matcher\n");
++		} else {
++			mlx5hws_err(ctx, "Failed to calculate matcher definer layout\n");
++		}
++	}
++
++	mlx5hws_match_template_destroy(mt);
++
++	return is_complex;
++}
++
++int mlx5hws_bwc_matcher_create_complex(struct mlx5hws_bwc_matcher *bwc_matcher,
++				       struct mlx5hws_table *table,
++				       u32 priority,
++				       u8 match_criteria_enable,
++				       struct mlx5hws_match_parameters *mask)
++{
++	mlx5hws_err(table->ctx, "Complex matcher is not supported yet\n");
++	return -EOPNOTSUPP;
++}
++
++void
++mlx5hws_bwc_matcher_destroy_complex(struct mlx5hws_bwc_matcher *bwc_matcher)
++{
++	/* nothing to do here */
++}
++
++int mlx5hws_bwc_rule_create_complex(struct mlx5hws_bwc_rule *bwc_rule,
++				    struct mlx5hws_match_parameters *params,
++				    u32 flow_source,
++				    struct mlx5hws_rule_action rule_actions[],
++				    u16 bwc_queue_idx)
++{
++	mlx5hws_err(bwc_rule->bwc_matcher->matcher->tbl->ctx,
++		    "Complex rule is not supported yet\n");
++	return -EOPNOTSUPP;
++}
++
++int mlx5hws_bwc_rule_destroy_complex(struct mlx5hws_bwc_rule *bwc_rule)
++{
++	return 0;
++}
++
++int mlx5hws_bwc_matcher_move_all_complex(struct mlx5hws_bwc_matcher *bwc_matcher)
++{
++	mlx5hws_err(bwc_matcher->matcher->tbl->ctx,
++		    "Moving complex rule is not supported yet\n");
++	return -EOPNOTSUPP;
++}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.h
+new file mode 100644
+index 000000000000..068ee8118609
+--- /dev/null
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.h
+@@ -0,0 +1,29 @@
++/* SPDX-License-Identifier: GPL-2.0 OR Linux-OpenIB */
++/* Copyright (c) 2024 NVIDIA Corporation & Affiliates */
++
++#ifndef MLX5HWS_BWC_COMPLEX_H_
++#define MLX5HWS_BWC_COMPLEX_H_
++
++bool mlx5hws_bwc_match_params_is_complex(struct mlx5hws_context *ctx,
++					 u8 match_criteria_enable,
++					 struct mlx5hws_match_parameters *mask);
++
++int mlx5hws_bwc_matcher_create_complex(struct mlx5hws_bwc_matcher *bwc_matcher,
++				       struct mlx5hws_table *table,
++				       u32 priority,
++				       u8 match_criteria_enable,
++				       struct mlx5hws_match_parameters *mask);
++
++void mlx5hws_bwc_matcher_destroy_complex(struct mlx5hws_bwc_matcher *bwc_matcher);
++
++int mlx5hws_bwc_matcher_move_all_complex(struct mlx5hws_bwc_matcher *bwc_matcher);
++
++int mlx5hws_bwc_rule_create_complex(struct mlx5hws_bwc_rule *bwc_rule,
++				    struct mlx5hws_match_parameters *params,
++				    u32 flow_source,
++				    struct mlx5hws_rule_action rule_actions[],
++				    u16 bwc_queue_idx);
++
++int mlx5hws_bwc_rule_destroy_complex(struct mlx5hws_bwc_rule *bwc_rule);
++
++#endif /* MLX5HWS_BWC_COMPLEX_H_ */
 -- 
 2.46.0
 
