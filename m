@@ -1,107 +1,115 @@
-Return-Path: <netdev+bounces-126554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77D0B971CB9
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 16:36:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64CD6971CD7
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 16:39:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF95B283AD7
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 14:35:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 902131C2325C
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 14:39:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9BB1BAEC1;
-	Mon,  9 Sep 2024 14:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC2F1BAECA;
+	Mon,  9 Sep 2024 14:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s1v7sjN3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcYK562c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B19591B253B;
-	Mon,  9 Sep 2024 14:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE181B5EB7;
+	Mon,  9 Sep 2024 14:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725892551; cv=none; b=RROIkZ7cPot5Ub0ZyAgtaeiNjt4Zzsa66UTJr8DE8dAqCem5LLDQutPbsRLO15+B23BmKwaJG99znSGEyZO7pYJ5PbKFCJe3zW+8d45X3AflwJMRzF8RK9O/dSBv6hGI7IuIF5nRlIVfZygDI9Y/26Er4PgmKX10i6x0Y+KmW70=
+	t=1725892772; cv=none; b=j30kFamDpIxlpwAu7pnyXuKyQta+FZqCbR/PvRwSQbpRd8tRNOHaIW4lI9MrEPnppuA10mK+YaaXlNzpUHO+GDdDesk8e4zOrQWZWhC+POLJFOTY7z4unYcwsgiCUmf2ppV1RXQ49j6cTlK1TzBjvnT9rU67I6hWlmplK09r5vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725892551; c=relaxed/simple;
-	bh=FZKxzFRyz9Op8EvuEP3cZ3bXtDG2HWdMHdwMe2g59vw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eI89YzlqKPco/tn6esbodzduIpvOGGaVRR+u7VsGS/kvjlHEtHOFGoLrfx28Xv1QTLHathTlGiO9ewI0q9XfnTeNdFeNgZxG8pNYLUoQuu4IGtsQiGjtDDLoYvSNOZ0N2Stv6hdtmucKOPNAKT4r/l/r3R+cIJ4gsxWqmNuyKKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s1v7sjN3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A70D5C4CEC5;
-	Mon,  9 Sep 2024 14:35:48 +0000 (UTC)
+	s=arc-20240116; t=1725892772; c=relaxed/simple;
+	bh=8FeXibhiPA67qxomm7l8x3gLeT2tSXAYWaxMb2sDIrg=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=UeHjNWMrBlAMbz9eFzX+XhdajcdR0XLerhLCgQyJtT7GE+QgdLJOn+0we+CQeWZlcV2jGEgh61uBSF4o4kOyb2YsL0mhEEg2hS9meBw0xJu/5dCX9pkuJ53Wn+6EKEueCyZRECn2EZz0+Ip6p30fu9Pqdbc/N+OH2vnDoWHTyUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BcYK562c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A643AC4CEC5;
+	Mon,  9 Sep 2024 14:39:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725892551;
-	bh=FZKxzFRyz9Op8EvuEP3cZ3bXtDG2HWdMHdwMe2g59vw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s1v7sjN3LNrEZl6o3gbfDHJL/srLbCjmQhFTT9iKdRjFei0qYil6a8RA/j709kphV
-	 5dt/5lLGlU4JUEf9HDqXDA13POjv3B1tsyQkm6HxD+ogSgqSlk2+fiDnRPWYcae0le
-	 E2/MgNhSOdJxBj5n/kowlKW1eAEzlfAhR66Qb+Qjalo8Nh1XuS01FvByl1Gv6CVO+b
-	 cBcNQMbEgp5Am40Xxh57lCui4kSPYtYgztxxydnF+MrtWp6rmQZM8HRjdAeoJKeyWz
-	 xkIwGRbL4dHCn0baIOZLiV4oILm1sVaSbi3zL6AqG79UPOnkNp2EDRKThVLbpQr2Bf
-	 I2TFUukUj/OqQ==
-Date: Mon, 9 Sep 2024 15:35:46 +0100
-From: Simon Horman <horms@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Nathan Chancellor <nathan@kernel.org>, kernel@pengutronix.de,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiko Stuebner <heiko@sntech.de>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, llvm@lists.linux.dev,
-	patches@lists.linux.dev
-Subject: Re: [PATCH] can: rockchip_canfd: fix return type of
- rkcanfd_start_xmit()
-Message-ID: <20240909143546.GX2097826@kernel.org>
-References: <20240906-rockchip-canfd-wifpts-v1-1-b1398da865b7@kernel.org>
- <20240909084448.GU2097826@kernel.org>
- <20240909-arcane-practical-petrel-015d24-mkl@pengutronix.de>
+	s=k20201202; t=1725892771;
+	bh=8FeXibhiPA67qxomm7l8x3gLeT2tSXAYWaxMb2sDIrg=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=BcYK562clRLjPjIL1TwE/GoqBY2kxlMSNzUj59e7A+yhPSZdwYKOGE+dpidRLGcl/
+	 px1TecD19E+oGfU/e7zMQYHdj6NHAJNDfjgyU7QlIx7iW+X1EdLROFqspdTfUvrdHJ
+	 0nxkYFvVw91g1gckgpj8b5QhOkfi5xzCHEhMpVxPxjwOJuWhmoxDzPorjvHDAGkdb9
+	 efFi1Fvb596hLzjOZmBYZljhXZllGM2Fct9oYgBCru/pz4f8cey0oSsz8pt7Irtjmd
+	 KyOabJkFUEY/o2SjQ1GNZfVeHjOnPXc7lypu4HX6isipZhy8uFCGTWH+T8GSOo2cCP
+	 V//AaIE2qOKRg==
+From: Kalle Valo <kvalo@kernel.org>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: <davem@davemloft.net>,  <edumazet@google.com>,  <kuba@kernel.org>,
+  <pabeni@redhat.com>,  <claudiu.manoil@nxp.com>,
+  <vladimir.oltean@nxp.com>,  <louis.peens@corigine.com>,
+  <stefan@datenfreihafen.org>,  <alex.aring@gmail.com>,
+  <miquel.raynal@bootlin.com>,  <chunkeey@googlemail.com>,
+  <briannorris@chromium.org>,  <francesco@dolcini.it>,
+  <set_pte_at@outlook.com>,  <damien.lemoal@opensource.wdc.com>,
+  <mpe@ellerman.id.au>,  <horms@kernel.org>,  <yinjun.zhang@corigine.com>,
+  <fei.qin@corigine.com>,  <johannes.berg@intel.com>,
+  <ryno.swart@corigine.com>,  <krzysztof.kozlowski@linaro.org>,
+  <leitao@debian.org>,  <liuxuenetmail@gmail.com>,
+  <netdev@vger.kernel.org>,  <linux-kernel@vger.kernel.org>,
+  <oss-drivers@corigine.com>,  <linux-wpan@vger.kernel.org>,
+  <linux-wireless@vger.kernel.org>
+Subject: Re: [PATCH 0/7] net: Use IRQF_NO_AUTOEN flag in request_irq()
+References: <20240909133034.1296930-1-ruanjinjie@huawei.com>
+Date: Mon, 09 Sep 2024 17:39:24 +0300
+In-Reply-To: <20240909133034.1296930-1-ruanjinjie@huawei.com> (Jinjie Ruan's
+	message of "Mon, 9 Sep 2024 21:30:27 +0800")
+Message-ID: <87seu8c2n7.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240909-arcane-practical-petrel-015d24-mkl@pengutronix.de>
+Content-Type: text/plain
 
-On Mon, Sep 09, 2024 at 10:57:06AM +0200, Marc Kleine-Budde wrote:
-> On 09.09.2024 09:44:48, Simon Horman wrote:
-> > On Fri, Sep 06, 2024 at 01:26:41PM -0700, Nathan Chancellor wrote:
-> > > With clang's kernel control flow integrity (kCFI, CONFIG_CFI_CLANG),
-> > > indirect call targets are validated against the expected function
-> > > pointer prototype to make sure the call target is valid to help mitigate
-> > > ROP attacks. If they are not identical, there is a failure at run time,
-> > > which manifests as either a kernel panic or thread getting killed. A
-> > > warning in clang aims to catch these at compile time, which reveals:
-> > > 
-> > >   drivers/net/can/rockchip/rockchip_canfd-core.c:770:20: error: incompatible function pointer types initializing 'netdev_tx_t (*)(struct sk_buff *, struct net_device *)' (aka 'enum netdev_tx (*)(struct sk_buff *, struct net_device *)') with an expression of type 'int (struct sk_buff *, struct net_device *)' [-Werror,-Wincompatible-function-pointer-types-strict]
-> > >     770 |         .ndo_start_xmit = rkcanfd_start_xmit,
-> > >         |                           ^~~~~~~~~~~~~~~~~~
-> > > 
-> > > ->ndo_start_xmit() in 'struct net_device_ops' expects a return type of
-> > > 'netdev_tx_t', not 'int' (although the types are ABI compatible). Adjust
-> > > the return type of rkcanfd_start_xmit() to match the prototype's to
-> > > resolve the warning.
-> > > 
-> > > Fixes: ff60bfbaf67f ("can: rockchip_canfd: add driver for Rockchip CAN-FD controller")
-> > > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> > 
-> > Thanks, I was able to reproduce this problem at build time
-> > and that your patch addresses it.
-> 
-> FTR: the default clang in Debian unstable, clang-16.0.6 doesn't support
-> this. With clang-20 from experimental it works, haven't checked older
-> versions, though.
+Jinjie Ruan <ruanjinjie@huawei.com> writes:
 
-FTR: I checked using 18.1.8 from here [1][2].
+> As commit cbe16f35bee6 ("genirq: Add IRQF_NO_AUTOEN for request_irq/nmi()")
+> said, reqeust_irq() and then disable_irq() is unsafe.
+>
+> And the code below is subobtimal:
+> 	 irq_set_status_flags(irq, IRQ_NOAUTOEN);
+> 	 request_irq(dev, irq...);
+>
+> IRQF_NO_AUTOEN flag can be used by drivers to request_irq(). It prevents
+> the automatic enabling of the requested interrupt in the same safe way.
+> With that the usage can be simplified and corrected.
+>
+> Only compile-tested.
+>
+> Jinjie Ruan (7):
+>   net: apple: bmac: Use IRQF_NO_AUTOEN flag in request_irq()
+>   net: enetc: Use IRQF_NO_AUTOEN flag in request_irq()
+>   nfp: Use IRQF_NO_AUTOEN flag in request_irq()
+>   net: ieee802154: mcr20a: Use IRQF_NO_AUTOEN flag in request_irq()
+>   wifi: p54: Use IRQF_NO_AUTOEN flag in request_irq()
+>   wifi: mwifiex: Use IRQF_NO_AUTOEN flag in request_irq()
+>   wifi: wl1251: Use IRQF_NO_AUTOEN flag in request_irq()
+>
+>  drivers/net/ethernet/apple/bmac.c                   | 3 +--
+>  drivers/net/ethernet/freescale/enetc/enetc.c        | 3 +--
+>  drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 ++---
+>  drivers/net/ieee802154/mcr20a.c                     | 5 +----
+>  drivers/net/wireless/intersil/p54/p54spi.c          | 4 +---
+>  drivers/net/wireless/marvell/mwifiex/main.c         | 4 ++--
+>  drivers/net/wireless/ti/wl1251/sdio.c               | 4 ++--
+>  7 files changed, 10 insertions(+), 18 deletions(-)
 
-[1] https://mirrors.edge.kernel.org/pub/tools/llvm/
-[2] https://mirrors.edge.kernel.org/pub/tools/llvm/files/
+Wireless patches go to wireless-next, please submit them in a separate
+patchset.
 
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
