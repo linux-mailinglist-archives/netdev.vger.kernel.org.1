@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-126397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB971971030
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:49:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AEC0971032
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:49:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2D961C221A1
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:49:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D9631F210E6
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:49:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5271B0136;
-	Mon,  9 Sep 2024 07:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148BE1B1409;
+	Mon,  9 Sep 2024 07:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="e0BtfpJT"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="MXdD/fHw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D631B012F
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 07:48:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3AF1B0139
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 07:48:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725868091; cv=none; b=Z0zkpsd8BTAqwuyt2sUm3dT1dvXZYPy4RAPg7xumKH1+P8+OZTTF1DtWVf6YbXTxxJDcCIfxFhGJd29UZArf6tlZF2L0boooGptrWCm0IIiBllqrcUHoDk0tG8pQ5HB1w5PppXBXUeIHrlmy+6btnGazYla0DtGV8k5zYwAGjW8=
+	t=1725868095; cv=none; b=Vqt23BEzCEC7YyWH/tU4RohmGJz/QuTHay+EDtpKsirK5RIlADeiCEWCTQb2HTh3k2tUQ9ehT81Uklp8At91T4ng/3RPXgftl0xsNFEbk+vQLXd5kWqSxxJDbZ+LDlo/yEuALk6wINUUiQLIHZu2r0SEE2pQRfwkN747RymIdTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725868091; c=relaxed/simple;
-	bh=PVu0AO3goLCjMmjEeFnjdb8rsuK1z5+HinRLmU09zvg=;
+	s=arc-20240116; t=1725868095; c=relaxed/simple;
+	bh=/ubFBH/TzywwVrG6J4jPyw0lOE4bu7ldXB9LN0nBUGI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=j+hBDkkeGkQ4fCi8riVFcWTEK3lQVaEBimNZ6CS6bWWqVgak6B3JHGXRIRzHSR0paqswO4k9/ZjRN+F3TyD6AJBWf/pFL/1KYwX7L82gnz4GP6N4ZoRU2MO3JdYkSnylrcd7XJwkC70e86RD48jLo13LKZqDApYN7cVQEoZMzRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=e0BtfpJT; arc=none smtp.client-ip=54.207.19.206
+	 MIME-Version; b=rxtobD7yGhq7AERPqNWXif4GgZ+Ev4rFczF+XQQ6jOMGiWC3a9WE/xfSNrwhqD7RRLkJMXGa4U3R35VoQ76e7iXB+Q4cPACb850uJ4b2IevDGL/dDCAMvIpvGq69fHKH3MtD5mU0DEd4hdr5aHDHtv5Ketr3wm2PvNCOjKdUWF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=MXdD/fHw; arc=none smtp.client-ip=54.207.22.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1725868039;
-	bh=HQ+u1pFtHvaYXeS206TMW008UyQVv1/1fvQ4x78GPS0=;
+	s=onoh2408; t=1725868044;
+	bh=7vOdINnTSRatM2cMtEpMAQYLZaZMiYvRQJNyLqLDmHw=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=e0BtfpJTzjNYuZ+e42YV401O5DW9uYj70sQ4SdUuEVBnESO12BGtsu1DNJqwB/myu
-	 nIGv+XlfO/axGBkEKbpOjsytoBeIhBz4lvhVQRI4/9TLgMGJEGL8gvH10Wgv+6FrAi
-	 ibzcKwgj2Xp6uZHNGLxUOd5ysKhhHV2KvzdS1Ul0=
-X-QQ-mid: bizesmtpsz13t1725868021tc81xv
-X-QQ-Originating-IP: xgxCbM7/VxtkaC6p5voMkjfWvVx83murpI+h4hb+tFM=
+	b=MXdD/fHwtBHT8tL9vUx/6dvK7hdPzJv2GLoxelErespk7G84sCvwwkXKDlbv9a2FK
+	 VrFA4VQ9tSx5FxTk2NUwDr8yeATft0ynJ2RCT5DtlOSfR72anaragr7KZj+ed6uIYd
+	 IHkJaGQrLeLAmhObbHT9DRj7YYRed5W6BnpdoXK8=
+X-QQ-mid: bizesmtpsz13t1725868027to2574
+X-QQ-Originating-IP: +9nSvPCA8zCNwxbCHdWw4WjU+BZl+qsicL9K2AcxSjQ=
 Received: from localhost.localdomain ( [113.57.152.160])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 09 Sep 2024 15:46:54 +0800 (CST)
+	id ; Mon, 09 Sep 2024 15:47:03 +0800 (CST)
 X-QQ-SSF: 0000000000000000000000000000000
 X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 8765951806881718135
+X-BIZMAIL-ID: 9641604844626086631
 From: WangYuli <wangyuli@uniontech.com>
 To: stable@vger.kernel.org,
 	gregkh@linuxfoundation.org,
@@ -70,9 +70,9 @@ Cc: kernel@esmil.dk,
 	linux-kernel@vger.kernel.org,
 	richardcochran@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH 6.6 2/4] riscv: dts: starfive: pinfunc: Fix the pins name of I2STX1
-Date: Mon,  9 Sep 2024 15:46:28 +0800
-Message-ID: <8830E9DA269F759D+20240909074645.1161554-2-wangyuli@uniontech.com>
+Subject: [PATCH 6.6 3/4] riscv: dts: starfive: Add the nodes and pins of I2Srx/I2Stx0/I2Stx1
+Date: Mon,  9 Sep 2024 15:46:29 +0800
+Message-ID: <51313A4EF4718E96+20240909074645.1161554-3-wangyuli@uniontech.com>
 X-Mailer: git-send-email 2.43.4
 In-Reply-To: <20240909074645.1161554-1-wangyuli@uniontech.com>
 References: <20240909074645.1161554-1-wangyuli@uniontech.com>
@@ -88,33 +88,177 @@ Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
 From: Xingyu Wu <xingyu.wu@starfivetech.com>
 
-These pins are actually I2STX1 clock input, not I2STX0,
-so their names should be changed.
+Add I2Srx/I2Stx0/I2Stx1 nodes and pins configuration for the
+StarFive JH7110 SoC.
 
 Signed-off-by: Xingyu Wu <xingyu.wu@starfivetech.com>
 Reviewed-by: Walker Chen <walker.chen@starfivetech.com>
-Acked-by: Rob Herring <robh@kernel.org>
 Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
 Signed-off-by: WangYuli <wangyuli@uniontech.com>
 ---
- arch/riscv/boot/dts/starfive/jh7110-pinfunc.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .../jh7110-starfive-visionfive-2.dtsi         | 58 +++++++++++++++++
+ arch/riscv/boot/dts/starfive/jh7110.dtsi      | 65 +++++++++++++++++++
+ 2 files changed, 123 insertions(+)
 
-diff --git a/arch/riscv/boot/dts/starfive/jh7110-pinfunc.h b/arch/riscv/boot/dts/starfive/jh7110-pinfunc.h
-index fb0139b56723..256de17f5261 100644
---- a/arch/riscv/boot/dts/starfive/jh7110-pinfunc.h
-+++ b/arch/riscv/boot/dts/starfive/jh7110-pinfunc.h
-@@ -240,8 +240,8 @@
- #define GPI_SYS_MCLK_EXT			30
- #define GPI_SYS_I2SRX_BCLK			31
- #define GPI_SYS_I2SRX_LRCK			32
--#define GPI_SYS_I2STX0_BCLK			33
--#define GPI_SYS_I2STX0_LRCK			34
-+#define GPI_SYS_I2STX1_BCLK			33
-+#define GPI_SYS_I2STX1_LRCK			34
- #define GPI_SYS_TDM_CLK				35
- #define GPI_SYS_TDM_RXD				36
- #define GPI_SYS_TDM_SYNC			37
+diff --git a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi
+index 4874e3bb42ab..caa59b9b2f19 100644
+--- a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi
++++ b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi
+@@ -202,6 +202,24 @@ &i2c6 {
+ 	status = "okay";
+ };
+ 
++&i2srx {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2srx_pins>;
++	status = "okay";
++};
++
++&i2stx0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&mclk_ext_pins>;
++	status = "okay";
++};
++
++&i2stx1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2stx1_pins>;
++	status = "okay";
++};
++
+ &mmc0 {
+ 	max-frequency = <100000000>;
+ 	assigned-clocks = <&syscrg JH7110_SYSCLK_SDIO0_SDCARD>;
+@@ -340,6 +358,46 @@ GPOEN_SYS_I2C6_DATA,
+ 		};
+ 	};
+ 
++	i2srx_pins: i2srx-0 {
++		clk-sd-pins {
++			pinmux = <GPIOMUX(38, GPOUT_LOW,
++					      GPOEN_DISABLE,
++					      GPI_SYS_I2SRX_BCLK)>,
++				 <GPIOMUX(63, GPOUT_LOW,
++					      GPOEN_DISABLE,
++					      GPI_SYS_I2SRX_LRCK)>,
++				 <GPIOMUX(38, GPOUT_LOW,
++					      GPOEN_DISABLE,
++					      GPI_SYS_I2STX1_BCLK)>,
++				 <GPIOMUX(63, GPOUT_LOW,
++					      GPOEN_DISABLE,
++					      GPI_SYS_I2STX1_LRCK)>,
++				 <GPIOMUX(61, GPOUT_LOW,
++					      GPOEN_DISABLE,
++					      GPI_SYS_I2SRX_SDIN0)>;
++			input-enable;
++		};
++	};
++
++	i2stx1_pins: i2stx1-0 {
++		sd-pins {
++			pinmux = <GPIOMUX(44, GPOUT_SYS_I2STX1_SDO0,
++					      GPOEN_ENABLE,
++					      GPI_NONE)>;
++			bias-disable;
++			input-disable;
++		};
++	};
++
++	mclk_ext_pins: mclk-ext-0 {
++		mclk-ext-pins {
++			pinmux = <GPIOMUX(4, GPOUT_LOW,
++					     GPOEN_DISABLE,
++					     GPI_SYS_MCLK_EXT)>;
++			input-enable;
++		};
++	};
++
+ 	mmc0_pins: mmc0-0 {
+ 		 rst-pins {
+ 			pinmux = <GPIOMUX(62, GPOUT_SYS_SDIO0_RST,
+diff --git a/arch/riscv/boot/dts/starfive/jh7110.dtsi b/arch/riscv/boot/dts/starfive/jh7110.dtsi
+index e85464c328d0..621b68c02ea8 100644
+--- a/arch/riscv/boot/dts/starfive/jh7110.dtsi
++++ b/arch/riscv/boot/dts/starfive/jh7110.dtsi
+@@ -512,6 +512,30 @@ tdm: tdm@10090000 {
+ 			status = "disabled";
+ 		};
+ 
++		i2srx: i2s@100e0000 {
++			compatible = "starfive,jh7110-i2srx";
++			reg = <0x0 0x100e0000 0x0 0x1000>;
++			clocks = <&syscrg JH7110_SYSCLK_I2SRX_BCLK_MST>,
++				 <&syscrg JH7110_SYSCLK_I2SRX_APB>,
++				 <&syscrg JH7110_SYSCLK_MCLK>,
++				 <&syscrg JH7110_SYSCLK_MCLK_INNER>,
++				 <&mclk_ext>,
++				 <&syscrg JH7110_SYSCLK_I2SRX_BCLK>,
++				 <&syscrg JH7110_SYSCLK_I2SRX_LRCK>,
++				 <&i2srx_bclk_ext>,
++				 <&i2srx_lrck_ext>;
++			clock-names = "i2sclk", "apb", "mclk",
++				      "mclk_inner", "mclk_ext", "bclk",
++				      "lrck", "bclk_ext", "lrck_ext";
++			resets = <&syscrg JH7110_SYSRST_I2SRX_APB>,
++				 <&syscrg JH7110_SYSRST_I2SRX_BCLK>;
++			dmas = <0>, <&dma 24>;
++			dma-names = "tx", "rx";
++			starfive,syscon = <&sys_syscon 0x18 0x2>;
++			#sound-dai-cells = <0>;
++			status = "disabled";
++		};
++
+ 		usb0: usb@10100000 {
+ 			compatible = "starfive,jh7110-usb";
+ 			ranges = <0x0 0x0 0x10100000 0x100000>;
+@@ -736,6 +760,47 @@ spi6: spi@120a0000 {
+ 			status = "disabled";
+ 		};
+ 
++		i2stx0: i2s@120b0000 {
++			compatible = "starfive,jh7110-i2stx0";
++			reg = <0x0 0x120b0000 0x0 0x1000>;
++			clocks = <&syscrg JH7110_SYSCLK_I2STX0_BCLK_MST>,
++				 <&syscrg JH7110_SYSCLK_I2STX0_APB>,
++				 <&syscrg JH7110_SYSCLK_MCLK>,
++				 <&syscrg JH7110_SYSCLK_MCLK_INNER>,
++				 <&mclk_ext>;
++			clock-names = "i2sclk", "apb", "mclk",
++				      "mclk_inner","mclk_ext";
++			resets = <&syscrg JH7110_SYSRST_I2STX0_APB>,
++				 <&syscrg JH7110_SYSRST_I2STX0_BCLK>;
++			dmas = <&dma 47>;
++			dma-names = "tx";
++			#sound-dai-cells = <0>;
++			status = "disabled";
++		};
++
++		i2stx1: i2s@120c0000 {
++			compatible = "starfive,jh7110-i2stx1";
++			reg = <0x0 0x120c0000 0x0 0x1000>;
++			clocks = <&syscrg JH7110_SYSCLK_I2STX1_BCLK_MST>,
++				 <&syscrg JH7110_SYSCLK_I2STX1_APB>,
++				 <&syscrg JH7110_SYSCLK_MCLK>,
++				 <&syscrg JH7110_SYSCLK_MCLK_INNER>,
++				 <&mclk_ext>,
++				 <&syscrg JH7110_SYSCLK_I2STX1_BCLK>,
++				 <&syscrg JH7110_SYSCLK_I2STX1_LRCK>,
++				 <&i2stx_bclk_ext>,
++				 <&i2stx_lrck_ext>;
++			clock-names = "i2sclk", "apb", "mclk",
++				      "mclk_inner", "mclk_ext", "bclk",
++				      "lrck", "bclk_ext", "lrck_ext";
++			resets = <&syscrg JH7110_SYSRST_I2STX1_APB>,
++				 <&syscrg JH7110_SYSRST_I2STX1_BCLK>;
++			dmas = <&dma 48>;
++			dma-names = "tx";
++			#sound-dai-cells = <0>;
++			status = "disabled";
++		};
++
+ 		sfctemp: temperature-sensor@120e0000 {
+ 			compatible = "starfive,jh7110-temp";
+ 			reg = <0x0 0x120e0000 0x0 0x10000>;
 -- 
 2.43.4
 
