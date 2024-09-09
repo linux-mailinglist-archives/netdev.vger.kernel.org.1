@@ -1,130 +1,200 @@
-Return-Path: <netdev+bounces-126506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF53971A0A
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 14:54:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A078F971A54
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:07:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 574E01F23877
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 12:54:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E135CB215B8
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7A51B81DD;
-	Mon,  9 Sep 2024 12:54:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED70D1B86CF;
+	Mon,  9 Sep 2024 13:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ROJBAAHn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UJ4WSlJF"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1A81B4C4F;
-	Mon,  9 Sep 2024 12:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C76C1B81DC
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 13:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725886471; cv=none; b=bjFYKBkK3QpmjYV/rgq/2vSQsvomwyuot7hoh30xb59vOd3ZLyR+TRfv9WghIXZ90Nm/8mxptqsUQvD+dPe6GxpiwO7jaod8gGPTb8zEjRlEgQfnX0gnJFlKnWnzy/JUEPH03tKkaN482pHX6/XAwhQXWJr67ZeKL36YmLrfdWQ=
+	t=1725887249; cv=none; b=XHRzhgHD8er3UH3Ruv5tSOVAsTMJ9gSU/fJZj5p3UjyYN28WvKLk3BajNsN9VgcMuBUunGAwzFA+tGCHrfVyBwiny7ZxCC50fxXVATmb22bZFkfDYW+XD2LK1wdddjTaT2GnnEIIk3mmxG2I01QU9FM3l6zk012h62vkCVpj4MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725886471; c=relaxed/simple;
-	bh=CU5Gijyy9SeMr8QbvquxivfFb2hzLLScCNZeZXgXiPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S8AnXbf0R8sF7WBzrvSnECSi/jFHZ8h+5tBj6SHx//ywemhgbBIVmiWeFV7A3yeS92NylV7mXru/wZ6cZog6+eNKrbry1y58rmnL4EwYjVkJdgNNlmhOKBvbtVwk0D4yyxf4li3856sPCuE0TL5LtvCdTPM4LS7J5pMr/0NPh40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ROJBAAHn; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=PKyLSZDe8JiVc1Q0LEh+EYs5+ax6iv61GuSgcN9/Iak=; b=ROJBAAHnhi1iHmJStmbGtAJGIm
-	iALpL9t6gsDGqBYFceoDSxJA9nKMX/mkmzw3IgwKo8z3Pith1S9BrviEE0tyj/rz7RG7P7TIS0FTP
-	TFRYKHr7wfenpcmS918anCU/XoeIM4NkFT0wbSHg24a2AYVGoDdhDaAi3hVpaHOYBzw8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1snduJ-0070NI-DJ; Mon, 09 Sep 2024 14:54:15 +0200
-Date: Mon, 9 Sep 2024 14:54:15 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: vz@mleia.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, alexandre.belloni@bootlin.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: nxp: Fix a possible memory leak in
- lpc_mii_probe()
-Message-ID: <0a53ab3c-2643-419d-9b5d-71561c3b50b9@lunn.ch>
-References: <20240909092948.1118381-1-ruanjinjie@huawei.com>
+	s=arc-20240116; t=1725887249; c=relaxed/simple;
+	bh=CHbpMMgrI2xFY2pHl/Kg9xkP9E8Jysrml3rFwxJwjB8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SnBH5z34e0+hy4LtQ0Z3On8cyvffWlC/j2TveoWrI1Rc96yezFzjxdqNVxIwZmLBQizXMWFgI8FN/HG52Q8aU5WNGbxZzJNrysSb2+izKzgsOXj5rKU0NDn+DkTD9oqE54pauUgfQI3G5u82Ci098IprIhqt4u6ULEmC3ONmgQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UJ4WSlJF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725887247;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JyZBj0EVD3PSNBPRSECSDTeknIIQ/mA6Gy6EUmKX6vY=;
+	b=UJ4WSlJFNEPGTLaF6/+SkEBEonvDmA8bz4cM9XgW94fogoLpfptayrDTK6KhAXOvA9/k/9
+	g0Q5K0m2oCnC87wpr+OFTCMEFL1k3Y/4JVsUHdOCs0bXbgsRCI8Rsb0DFqSDn7EJfFyC6A
+	iQa5jiaUXXCatqZ5bDpOgkqoeO09Ias=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-692-7cP6CeSUNeqZswEU1QZ11Q-1; Mon, 09 Sep 2024 09:07:25 -0400
+X-MC-Unique: 7cP6CeSUNeqZswEU1QZ11Q-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2f7538dc9d7so25509061fa.1
+        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 06:07:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725887244; x=1726492044;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JyZBj0EVD3PSNBPRSECSDTeknIIQ/mA6Gy6EUmKX6vY=;
+        b=C7lM0UIE6h4gFC8zfFJxFmvQr3HDZZ6UAB1iV0w2O6fLmbneJyz/qtonIjp2VozY12
+         dzYNUjcrXT9P/an0pnn6WCFo7cZpGcloy0sX3eYZfE34MXe5KBmZXCaU8NswMVSVioTx
+         gIStc67IEKSt7Qp6cRFWPOujannEQx3sP0WEgZm4okiGjj/d5tE4vJGifWf/H5H5L8Bw
+         7PSyPLwLuSP6sI5HJvVEHdA2YaApyuE0lJByl4OqXlMyWdhp12piMRCY8GRw5/nnFq+z
+         5JR6fuY41P7mphwI0fxggrNyTmeHbcf1isUbm+UBk/lUT1Gh9FP+CjLMz+9A2NI3W8Ul
+         oR9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX0Q8EP+uoJyMbeRX64w22BpNCntk94sVyxjFCpwRcVN2U23v2o6JdpYtl0Ksbkx2RwXN5T/ik=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxqr4+ZCm/c39BKp0Sbi9ayyEb9Q9Em7AR3IXEmPx4fDi9OegNf
+	j+AnVpbFfpWzHISfayraAWofGIE/ZER0vR6M9Y60m5I8JSp/9zYIdQERUyEvl/ueE20z0rd1AOI
+	qDNvH4PwA7/p4BFrUvj2uWE5uxHTsYO8EBGuoU5/Zfa6ljYTtizEPzg==
+X-Received: by 2002:a05:6512:3a85:b0:536:55b3:470e with SMTP id 2adb3069b0e04-536587ac230mr7673702e87.19.1725887244040;
+        Mon, 09 Sep 2024 06:07:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFrEiK+GlRfgFHvybT+tm+AdL0oMjLeOS3CiaqtMSqNP6YCmiedgWU9dh7LOXLTK74rlvza6Q==
+X-Received: by 2002:a05:6512:3a85:b0:536:55b3:470e with SMTP id 2adb3069b0e04-536587ac230mr7673667e87.19.1725887243418;
+        Mon, 09 Sep 2024 06:07:23 -0700 (PDT)
+Received: from [192.168.88.27] (146-241-69-130.dyn.eolo.it. [146.241.69.130])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb21d3asm77098165e9.5.2024.09.09.06.07.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Sep 2024 06:07:22 -0700 (PDT)
+Message-ID: <4e74f641-a4a0-4668-b77a-94082f0ea6f1@redhat.com>
+Date: Mon, 9 Sep 2024 15:07:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240909092948.1118381-1-ruanjinjie@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] mptcp: pm: Fix uaf in __timer_delete_sync
+To: Edward Adam Davis <eadavis@qq.com>, matttbe@kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, geliang@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, martineau@kernel.org,
+ mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com
+References: <e4a13002-f471-4951-9180-14f0f8b30bd2@kernel.org>
+ <tencent_F85DEC5DED99554FB28DEF258F8DB8120D07@qq.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <tencent_F85DEC5DED99554FB28DEF258F8DB8120D07@qq.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Sep 09, 2024 at 05:29:48PM +0800, Jinjie Ruan wrote:
-> of_phy_find_device() calls bus_find_device(), which calls get_device()
-> on the returned struct device * to increment the refcount. The current
-> implementation does not decrement the refcount, which causes memory leak.
+On 9/5/24 14:27, Edward Adam Davis wrote:
+> There are two paths to access mptcp_pm_del_add_timer, result in a race
+> condition:
 > 
-> So add the missing phy_device_free() call to decrement the
-> refcount via put_device() to balance the refcount.
+>       CPU1				CPU2
+>       ====                               ====
+>       net_rx_action
+>       napi_poll                          netlink_sendmsg
+>       __napi_poll                        netlink_unicast
+>       process_backlog                    netlink_unicast_kernel
+>       __netif_receive_skb                genl_rcv
+>       __netif_receive_skb_one_core       netlink_rcv_skb
+>       NF_HOOK                            genl_rcv_msg
+>       ip_local_deliver_finish            genl_family_rcv_msg
+>       ip_protocol_deliver_rcu            genl_family_rcv_msg_doit
+>       tcp_v4_rcv                         mptcp_pm_nl_flush_addrs_doit
+>       tcp_v4_do_rcv                      mptcp_nl_remove_addrs_list
+>       tcp_rcv_established                mptcp_pm_remove_addrs_and_subflows
+>       tcp_data_queue                     remove_anno_list_by_saddr
+>       mptcp_incoming_options             mptcp_pm_del_add_timer
+>       mptcp_pm_del_add_timer             kfree(entry)
+> 
+> In remove_anno_list_by_saddr(running on CPU2), after leaving the critical
+> zone protected by "pm.lock", the entry will be released, which leads to the
+> occurrence of uaf in the mptcp_pm_del_add_timer(running on CPU1).
+> 
+> Keeping a reference to add_timer inside the lock, and calling
+> sk_stop_timer_sync() with this reference, instead of "entry->add_timer".
+> 
+> Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
+> Cc: stable@vger.kernel.org
+> Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> ---
+>   net/mptcp/pm_netlink.c | 14 ++++++++++----
+>   1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
+> index 3e4ad801786f..7ddb373cc6ad 100644
+> --- a/net/mptcp/pm_netlink.c
+> +++ b/net/mptcp/pm_netlink.c
+> @@ -329,17 +329,21 @@ struct mptcp_pm_add_entry *
+>   mptcp_pm_del_add_timer(struct mptcp_sock *msk,
+>   		       const struct mptcp_addr_info *addr, bool check_id)
+>   {
+> -	struct mptcp_pm_add_entry *entry;
+>   	struct sock *sk = (struct sock *)msk;
+> +	struct timer_list *add_timer = NULL;
+> +	struct mptcp_pm_add_entry *entry;
+>   
+>   	spin_lock_bh(&msk->pm.lock);
+>   	entry = mptcp_lookup_anno_list_by_saddr(msk, addr);
+> -	if (entry && (!check_id || entry->addr.id == addr->id))
+> +	if (entry && (!check_id || entry->addr.id == addr->id)) {
+>   		entry->retrans_times = ADD_ADDR_RETRANS_MAX;
+> +		add_timer = &entry->add_timer;
+> +	}
+>   	spin_unlock_bh(&msk->pm.lock);
+>   
+> -	if (entry && (!check_id || entry->addr.id == addr->id))
+> -		sk_stop_timer_sync(sk, &entry->add_timer);
+> +	/* no lock, because sk_stop_timer_sync() is calling del_timer_sync() */
+> +	if (add_timer)
+> +		sk_stop_timer_sync(sk, add_timer);
+>   
+>   	return entry;
+>   }
+> @@ -1430,8 +1434,10 @@ static bool remove_anno_list_by_saddr(struct mptcp_sock *msk,
+>   
+>   	entry = mptcp_pm_del_add_timer(msk, addr, false);
+>   	if (entry) {
+> +		spin_lock_bh(&msk->pm.lock);
+>   		list_del(&entry->list);
+>   		kfree(entry);
+> +		spin_unlock_bh(&msk->pm.lock);
 
-Why is a device reference counted?
+I'm sorry for the late feedback.
 
-To stop is disappearing.
+I think this is not enough to fix races for good, i.e.
 
-> @@ -768,6 +768,9 @@ static int lpc_mii_probe(struct net_device *ndev)
->  		return -ENODEV;
->  	}
->  
-> +	if (pldat->phy_node)
-> +		phy_device_free(phydev);
-> +
->  	phydev = phy_connect(ndev, phydev_name(phydev),
->  			     &lpc_handle_link_change,
->  			     lpc_phy_interface_mode(&pldat->pdev->dev));
+mptcp_nl_remove_subflow_and_signal_addr() -> mptcp_pm_remove_anno_addr()
+-> remove_anno_list_by_saddr()
 
-Think about this code. We use of_phy_find_device to get the device,
-taking a reference on it. While we hold that reference, we know it
-cannot disappear and we passed it to phy_connect(), passing it into
-the phylib layer. Deep down, phy_attach_direct() is called which does
-a get_device() taking a reference on the device. That is the phylib
-layer saying it is using it, it does not want it to disappear.
+could race with:
 
-Now think about your change. As soon as you new phy_device_free() is
-called, the device can disappear. phylib is then going to use
-something which has gone. Bad things will happen.
+mptcp_pm_remove_addrs() -> remove_anno_list_by_saddr()
 
-So with changes like this, you need to think about lifetimes of things
-being protected by a reference count. When has lpc_mii_probe(), or the
-lpc driver as a whole finished with phydev? There are two obvious
-alternatives i can think of.
+and both CPUs could see the same 'entry' returned by
+mptcp_pm_del_add_timer().
 
-1) It wants to keep hold of the reference until the driver remove() is
-called, so you should be releasing the reference in
-lpc_eth_drv_remove().
+I think the list_del() in remove_anno_list_by_saddr() should moved under
+the pm lock protection inside mptcp_pm_del_add_timer(), and no need to 
+add spin_lock_bh() around the kfree call.
 
-2) Once the phydev is passed to the phylib layer for it to manage,
-this driver does not need to care about it any more. So it just needs
-to hold the reference until after phy_connect() returns.
+Thanks,
 
-Memory leaks are an annoyance, but generally have little effect,
-especially in probe/remove code which gets called once. Accessing
-something which has gone is going to cause an Opps.
+Paolo
 
-So, you need to think about the lifetime of objects you are
-manipulating the reference counts on. You want to state in the commit
-message your understanding of these lifetimes so the reviewer can
-sanity check them.
-
-FYI: Ignore anything you have learned while fixing device tree
-reference counting bugs. Lifetimes of OF objects is probably very
-broken.
-
-	Andrew
-
----
-pw-bot: cr
 
