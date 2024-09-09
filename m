@@ -1,91 +1,114 @@
-Return-Path: <netdev+bounces-126519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D90D971A76
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:11:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE064971AA7
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:19:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54BAF2880AE
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:11:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D92671C22A8C
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:19:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E53A1BA267;
-	Mon,  9 Sep 2024 13:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E381B7908;
+	Mon,  9 Sep 2024 13:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="L3iEfKY+"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7751B9B55;
-	Mon,  9 Sep 2024 13:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2F11B86D5
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 13:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725887329; cv=none; b=qZ3n6SJhkik6Qb9uZ54YTYHaJRbNKYixFkMCTd8ArZ4sqrpPQ+RxxO0/VzzgH8mIXpzkFhoCSpDKGhMVWno3DYhMCiv+yfXy7QiUDJBc4SDR0prLymoohqmVx9OZyxmTV6i3oyZ2075GLH3W1AsdlNZb/EGyFI1DQDcLJnL2S5s=
+	t=1725887942; cv=none; b=Crz8yK+/YQeP6+Ncgs3Afh/Vd7PSxqtcl1Gz2iMQfo4+WRJiDcZr2iStgXJcye+IqsR2g7aj0tsPmk53GP40dZPXO0QA+WDpTA8k7EPdi1290JQXx7AZfNdS5lJp4mpiuZ6AFbI9WhL2T+wFpQKO4YhcBWE1f1d2GfO549JsXts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725887329; c=relaxed/simple;
-	bh=85C1bydy0DG7tKrDUvpOlx6igAXsB2kGyHqDRrJR3ng=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=O5QKKsbJBGMectRyUiLE4EOeD8HmCbMVphsQfLr6Bs0sbxRg3KZ29ieGKy9U6D52zPPt4x7GLFIhYbFpJc0QirrtMUmY0DAUZrH2D85avzNdviVEqCuAUVngHczNRLhpGWb8yCrAJLsq9gdrd9VmiA2NqZ2ToVcEDB1bmEnTg74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4X2RwJ1V1cz1SB4D;
-	Mon,  9 Sep 2024 21:08:16 +0800 (CST)
-Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id A6F3A1A016C;
-	Mon,  9 Sep 2024 21:08:43 +0800 (CST)
-Received: from huawei.com (10.90.53.73) by kwepemh500013.china.huawei.com
- (7.202.181.146) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 9 Sep
- 2024 21:08:43 +0800
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-To: <alex.aring@gmail.com>, <stefan@datenfreihafen.org>,
-	<miquel.raynal@bootlin.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <liuxuenetmail@gmail.com>,
-	<linux-wpan@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <ruanjinjie@huawei.com>
-Subject: [PATCH] ieee802154: Fix build error
-Date: Mon, 9 Sep 2024 21:17:40 +0800
-Message-ID: <20240909131740.1296608-1-ruanjinjie@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1725887942; c=relaxed/simple;
+	bh=g2c7WxYBmtRM/VR9ATeeHC3MPf2vZdCwKmZgSBOMNd0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LnxEQvluls54pIyl7zgmfnjOB8Qbk0E+0sB9FmusBZMeApygEQsctdbY+hMcC5lJxT1m0OIXwV2P+NOSAbZRF7tJp+zcolhzIrr4oXhkOxvynHAPNFWRUiqWD05F2sTgIcgb16PWZyoDH9WinIB57AeG3syJ9fIXFQCm9wNFggk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=L3iEfKY+; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 0C630206BC;
+	Mon,  9 Sep 2024 15:18:58 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id LQl_MYspIVNX; Mon,  9 Sep 2024 15:18:56 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id BD4052067F;
+	Mon,  9 Sep 2024 15:18:56 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com BD4052067F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1725887936;
+	bh=Yw4Fts2wCAlgTwj4J/AtuU/+kEPjwA0VRzZYlc+9y0M=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=L3iEfKY+ALbWOUUC3uAS1UHM6CycdmfnPAxje57Jfyu6YB/xdnUq5db43Vk5zh7Tq
+	 iikaZl7j5RjN7ChHDuEn8ar3pzCBfLFy+VycJyNO7gTsfTPzIZYxRAaJ3L9TH79dD6
+	 PQfbgNd28Ha6DvunV9haIS3SSBsK6OOJApys1RMEuXQxvEiKWcNeL7f+3ZYhmpfurm
+	 y0JbObyDOxOYmEVUoidSTHRpNeh98cW2XjTXsUrOgxfZjkt0pP0J8dKE/RZOiwf6cM
+	 9sXg+LTSdlip+xE6soLSPkoC9z2pfXbT2NgfoMmhF7WjSFp3KkBd3YhiRJapIINKsy
+	 +f8iphzjlDw6Q==
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 9 Sep 2024 15:18:56 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Sep
+ 2024 15:18:56 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 22BDF3182BF6; Mon,  9 Sep 2024 15:18:56 +0200 (CEST)
+Date: Mon, 9 Sep 2024 15:18:56 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Florian Westphal <fw@strlen.de>
+CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH 06/11] xfrm: switch migrate to xfrm_policy_lookup_bytype
+Message-ID: <Zt71wBgRnVDJfpne@gauss3.secunet.de>
+References: <20240909100328.1838963-1-steffen.klassert@secunet.com>
+ <20240909100328.1838963-7-steffen.klassert@secunet.com>
+ <20240909110111.GB19195@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemh500013.china.huawei.com (7.202.181.146)
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240909110111.GB19195@breakpoint.cc>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-If REGMAP_SPI is m and IEEE802154_MCR20A is y,
+On Mon, Sep 09, 2024 at 01:01:11PM +0200, Florian Westphal wrote:
+> Steffen Klassert <steffen.klassert@secunet.com> wrote:
+> > From: Florian Westphal <fw@strlen.de>
+> > 
+> > XFRM_MIGRATE still uses the old lookup method:
+> > first check the bydst hash table, then search the list of all the other
+> > policies.
+> > 
+> > Switch MIGRATE to use the same lookup function as the packetpath.
+> > 
+> > This is done to remove the last remaining users of the pernet
+> > xfrm.policy_inexact lists with the intent of removing this list.
+> > 
+> > After this patch, policies are still added to the list on insertion
+> > and they are rehashed as-needed but no single API makes use of these
+> > anymore.
+> > 
+> > This change is compile tested only.
+> 
+> This needs following fixup:
+> 
+> https://patchwork.kernel.org/project/netdevbpf/patch/20240830143920.9478-1-fw@strlen.de/
 
-	mcr20a.c:(.text+0x3ed6c5b): undefined reference to `__devm_regmap_init_spi'
-	ld: mcr20a.c:(.text+0x3ed6cb5): undefined reference to `__devm_regmap_init_spi'
-
-Select REGMAP_SPI for IEEE802154_MCR20A to fix it.
-
-Fixes: 8c6ad9cc5157 ("ieee802154: Add NXP MCR20A IEEE 802.15.4 transceiver driver")
-Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
----
- drivers/net/ieee802154/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ieee802154/Kconfig b/drivers/net/ieee802154/Kconfig
-index 95da876c5613..1075e24b11de 100644
---- a/drivers/net/ieee802154/Kconfig
-+++ b/drivers/net/ieee802154/Kconfig
-@@ -101,6 +101,7 @@ config IEEE802154_CA8210_DEBUGFS
- 
- config IEEE802154_MCR20A
- 	tristate "MCR20A transceiver driver"
-+	select REGMAP_SPI
- 	depends on IEEE802154_DRIVERS && MAC802154
- 	depends on SPI
- 	help
--- 
-2.34.1
-
+Hm, looks like I've overlooked this and the other patch.
 
