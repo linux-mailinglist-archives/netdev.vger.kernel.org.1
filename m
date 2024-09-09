@@ -1,261 +1,216 @@
-Return-Path: <netdev+bounces-126599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02187971F8E
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:51:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2570C971F92
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 18:52:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 201D31C215A4
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 16:51:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21D09B20CAD
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 16:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A44016DEB4;
-	Mon,  9 Sep 2024 16:51:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 269771531E6;
+	Mon,  9 Sep 2024 16:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="jgYN/gTB"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="F6AmO6cO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2040.outbound.protection.outlook.com [40.107.92.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861441758F
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 16:51:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725900687; cv=none; b=qCjBsSljStV4urPHh+plcYgQJibCCQ0BD+OAMQrhBcm/vgj0/ZSRIZNfpyVxNFtgYMU29ZYTC3SkCrLKzAPtDhi3eaXuK+SmyU7Jq/sWt0NOz4/OnvMDkpURDFfEBz0WueDTz/XIXnNsap1sfZ6xvOpDfVICr77KeS67GrGRwDI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725900687; c=relaxed/simple;
-	bh=MC6W/carBRqwB8CRk/0zLmEob04R2hQcTELGW+EoQFs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ubeOiDwR+WaYb7hWE+fcYGpQqesdwJmYYqelg8vB0qh/q/8AUEFmw5h+PQjSuiNrMjy1JBSxTUxG6MqDNpUoMZ9dmLbPxnosp3ZkZovtMiJTB6gct17IPi79TonQnb5MECSG3fbRajpxpbNoL4XlE9QyFPD3qr2Fw1GWex0rEQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=jgYN/gTB; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 489Cq5po001415;
-	Mon, 9 Sep 2024 09:51:11 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=m4oJx5NV1YjHTTc6HbZQ6F8LpbCHnMovULqd9AReWRw=; b=
-	jgYN/gTBAlNB4iW3JKuTEZ/xsX179FiDUIlX0NOHZXJx0J9oXaY8jUaJDMRoCOCM
-	/43/bFbUJgYRaztjWuxfCcQIaW5LnyFcvo42CSW+mihhPQOPrUINJBw9DBCi9GDp
-	il1Hhxgr+FlTTpgPVT8y/eX2GH02nvAfseebnad1w9am6YYw3DTaW8pSsEDUde47
-	iTqGtvvlUt9KHlyT3EBOaeaDa1nm7zAH5a3F3mkjx4h6DvjmP3rLagqzV5b/AiV6
-	wS0D2dzvL+QOMbdGV1M5HzVitiaIsHdFEQWmrcA2C7RlzRm8o0Tnr2Pbmh/7W479
-	0B6t56eCWRD/4q6ycuTWuQ==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 41hssfkktf-14
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Mon, 09 Sep 2024 09:51:10 -0700 (PDT)
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::2ac9) with Microsoft SMTP Server id
- 15.2.1544.11; Mon, 9 Sep 2024 16:51:08 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Willem de Bruijn
-	<willemb@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        David Ahern <dsahern@kernel.org>,
-        Jason Xing
-	<kerneljasonxing@gmail.com>,
-        Simon Horman <horms@kernel.org>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next v4 3/3] selftests: txtimestamp: add SCM_TS_OPT_ID test
-Date: Mon, 9 Sep 2024 09:50:46 -0700
-Message-ID: <20240909165046.644417-4-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240909165046.644417-1-vadfed@meta.com>
-References: <20240909165046.644417-1-vadfed@meta.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9035C136E37;
+	Mon,  9 Sep 2024 16:51:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725900718; cv=fail; b=fDCJzRnkhREiRvGelrc0+Q9NGd/PLksglyNQM8Xs2FnttnAJgaKIyc0dSiUIFWNk7mxjLgOsb0ss5r1W1dOj67kUgGjz6ZpeadKdcjgnblnvjD+KVza8mnwNr/YkN5UigSOiygTCZBbf/Xnbs7yeh/sWo558vRCnaXz6/gze9g8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725900718; c=relaxed/simple;
+	bh=N5qAGSKfYju52e7U3K9buMS3buaNEmHkq9ibenDIPbg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=oJDmv8FaY9nGIDDKKj8IvVOj9nGX5AYKuaR8bFO0XpQU2vs9ksAthjIHBkFS7eRV9rwxlQU9pawLorzeSDFm/6ho4FPnc8CUh/Q6VN8HLt7Zk4mvejZK3yG5XaItaXOHkWt4whpPDbzQQtjVfzpSYvE5pexXzWXJ39D5/aZl324=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=F6AmO6cO; arc=fail smtp.client-ip=40.107.92.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=l9FvB8lE/MwkGiTujFDAwFgc4vVE8o6ACeXQs7kiYajSMgFJukgfCR257nETH0/mOt8TT50OtQHMhqrVY+0GCbrvRjO8nJackU24dhWDQsgfubhkaKnx6gJ5mxtdYXoPCZLoM63Qd/5T2jXU9Xofp2AZVJ5AEGutEaM7z49ZhC/pcH9Nn+bbKOUG5sZsZWlA6y8sGxS/uzQD+63Y6tQpETJzRkXLSUL/k11JDmU16f9oR5HIb7Uo0iSU1ssAeHEXfvz9dLDEqkVcHCs54jUSDMCkTmlxR4dQ+aX1RoVWJzK5M+pZNWs9ZZwJTo3jtKWm8ofWV3K9G0oujE2SakeT8A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=N5qAGSKfYju52e7U3K9buMS3buaNEmHkq9ibenDIPbg=;
+ b=QUiS9Ect4iMXxmMGrzsIZ/IjFSn0o0n7S8tmGCnicNVcT1CS/WPRLbWjj0W65IPeW/9YA6Lmx2yWbstmz+Yd5jP8o5WtZEfr0+oDfi1S4hZU//ifU3cYw2mVvS9Dh0CApAqHfVCEw374S651HHXoRTTDY29Bke8gD0VcbM5B7MgXJPSEoHoqahF7ZWDn5sAV4vJDx1bSSZcXaAFVpcJuSUilsXwxeYuxsjby3GfS5IAUAlf2Mvw9HIMC7YhhIhim9Yw9m4PdBE7lth5lFZVtaV56POGPwWCzAhVAn8IMYh8NhWfEojKrA9yaJjHdjnwWHiT6Ra+Hms11NvAyn53rDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=N5qAGSKfYju52e7U3K9buMS3buaNEmHkq9ibenDIPbg=;
+ b=F6AmO6cOGC5L4GZznmyNIaAXNLEPMHi9DjmA7ZdtmIPXGOvltb/Mx/QWv9ODDwIJKKswBqYXkdm1pMSrSyqBlcHf6mVAPKzQKr+Hliq77WY3hMrr4ODu/C9wIcE6mo/3WugM6jc2r3BsLVvF74JCR/HjNM+ibBOpnR2Np5ADmXk54a1pFamTmUqBLRAFWDsr1O3Mq9ks0sSwsjHYj7E6cmoKHo10jcfvGxYaSYovoqvTREiMGhrs56WglQVbAkosPNaP6zZMionSTOE+N0fyGSXiE3E/ZI9OVACTGhbDKDBqGHoEL83p03xcGqmd6Nk2vxKVLn03tcP0lmYsM3wleA==
+Received: from PH0PR11MB5176.namprd11.prod.outlook.com (2603:10b6:510:3f::5)
+ by DM4PR11MB7326.namprd11.prod.outlook.com (2603:10b6:8:106::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.25; Mon, 9 Sep
+ 2024 16:51:35 +0000
+Received: from PH0PR11MB5176.namprd11.prod.outlook.com
+ ([fe80::7625:e894:f3df:9ac9]) by PH0PR11MB5176.namprd11.prod.outlook.com
+ ([fe80::7625:e894:f3df:9ac9%3]) with mapi id 15.20.7939.017; Mon, 9 Sep 2024
+ 16:51:35 +0000
+From: <Ajay.Kathat@microchip.com>
+To: <kvalo@kernel.org>, <marex@denx.de>
+CC: <linux-wireless@vger.kernel.org>, <davem@davemloft.net>,
+	<alexis.lothore@bootlin.com>, <claudiu.beznea@tuxon.dev>,
+	<conor+dt@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
+	<krzk+dt@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
+	<devicetree@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v4 5/5] wifi: wilc1000: Add WILC3000 support
+Thread-Topic: [PATCH v4 5/5] wifi: wilc1000: Add WILC3000 support
+Thread-Index: AQHa+azJa5h7B/I79U613XwevJ3iqLJPQ+i/gAB5zAA=
+Date: Mon, 9 Sep 2024 16:51:35 +0000
+Message-ID: <7205210d-8bf8-41ba-9462-38e619027a45@microchip.com>
+References: <20240829004510.178016-1-marex@denx.de>
+ <20240829004510.178016-5-marex@denx.de> <87ed5tgofh.fsf@kernel.org>
+In-Reply-To: <87ed5tgofh.fsf@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5176:EE_|DM4PR11MB7326:EE_
+x-ms-office365-filtering-correlation-id: e42a3029-30ad-4548-b5ac-08dcd0efaa5e
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5176.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|7416014|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?VEpBN1Y3azVKWUoyM3BvT3hEdzNKODJNeDVHNTRlNjJvWGgrbEV3eldteHJE?=
+ =?utf-8?B?d2FWRkkwWkcrTkVoRzFaM2MzT1lsSXNwV2Yzbm9jdC92M2c3TitMNWZQUDRv?=
+ =?utf-8?B?bi9NUDdIWlFSTEF0d3J0SXlRK3E2bEZHZEZLVG8ybFNTZkpBbENONlNQeXFo?=
+ =?utf-8?B?RnZnMHpxNlo4RE5KMjJJci9adGo3aXdqZTIrYlZ4RWsxTHJXQWVzZSs2bjR6?=
+ =?utf-8?B?RGM0Y3hGeFl6a0oza0wxWDlpYTRCNDFZc3gyeXFHejdtL1pjODlkdWxZNmFr?=
+ =?utf-8?B?bUZKTUJpVWZ1aGhFNFg5R1ZmVmJVSmdYdURqeGRxdUliZGhEZFJ3UTUrTmNQ?=
+ =?utf-8?B?dmdaVXVUSmJSOHNDdW1jWDh4UjlYckF2R3hlQlRIMGVSZVd1RlIrVGJYR2lQ?=
+ =?utf-8?B?Ny9KTXQ1QnM3SHA3N3lWbFUwZ3J1RE5BM3N0cU1jT3Fxdmk3M1pTMzJVRmc4?=
+ =?utf-8?B?aGVUMWE0YW9nMFkrWThHNjlnT1hqTEZpSCtNU21hRlVMbVljNVcyWTk4V1dv?=
+ =?utf-8?B?TWJrMmllSHdoT21Tdmh4dHlPR29tSWJNTis2U1NCd2xEL0lBNE1WS2d4YThm?=
+ =?utf-8?B?bFRrMVRkTWNFRzBjMnUzS0lKRGUxWTkwU1B1R2FYMjMxVkwrQlZZVlpPZjVP?=
+ =?utf-8?B?dUt2b2l2TzhhdHJVbHJaa2k1MlNpZEdCMkM4UnByOTJyZWFvR0x3V3QveUFC?=
+ =?utf-8?B?Wnp1V05HZUxoemMyamdNbENBZDdkd3lJUnFubHJRVUEwL1FFOFBBT0V5ZVI0?=
+ =?utf-8?B?K1JEWk1sWHdxU2syWnVxVEtCUFJmcU1WYVV0cnIwcHQ4aUh4VERVOVVYc3pp?=
+ =?utf-8?B?OFJiTjZoRXhXb1AyQzdOS2pRTWpPSi90cXFRNjNGR0tGeGJMRU9tRmlqdEJz?=
+ =?utf-8?B?NURuS1lNZEdLQW81UWxPMVZ1dk5nS21PNm93cERuMUJIcHV4cjZzeHNydzV6?=
+ =?utf-8?B?L0EwaTJsbHVpQ096M1ZrR2gyTkdyQnR0OVNqZUVJV3VXQXJRTTZKaTJPVkVu?=
+ =?utf-8?B?MlNFMXJxbUhyc2EyOFBIOEJCUlJ2dTNsYjd1R3lKWjFmZ0s2U01OdWhkakJ5?=
+ =?utf-8?B?eHUvU3RYUkxuUnBYNmJQc2ZMZ2ZMSkZEc3ZCai9DUHZtU09RTkM4SHJOTWg1?=
+ =?utf-8?B?WVcwV1pHQmRYUHpzUE1vU1h2bWF5Tkd1cGNtQkVuTy9UeCtsR1pHdVRXQ1F5?=
+ =?utf-8?B?NnRyWnE5aXhwMWhPQ0xqT2dORlJJZXVKcWt4NkFqWG9abFVXVkNxd0tWZEhm?=
+ =?utf-8?B?bUxSTUhVdmZOL0x5cCsrQ3k2aDE0UFlyMFlWU0dGWnFMQ2pwY2RUcXd1QkUz?=
+ =?utf-8?B?dVlBTG9pdVJhVVVhMFA1MkhWNWJsZVhyZWcrMUlOdzFMTzBmNVdSUlhod1VK?=
+ =?utf-8?B?MTNSSktlYStqNVRwckw1L002WEowUHpvK2U1OS92RklaYUljSUMyYnpaY0pN?=
+ =?utf-8?B?Z0Zibjd1NnNMaHVDRXdyQnE5TWpOSU0ydisvbHEzQjk0UVc3eGpwK0lXSkVo?=
+ =?utf-8?B?UVEwbkxIZ3NtYW12dWNRVVBoa2xXaVFhZkQ5SnpRcmVJZmVqVU5Rc3l5ZGww?=
+ =?utf-8?B?ZUF1dmhYWUFsenpVWTk2a3d0Z2VvNm5aeG4xNDVmZnFuSE9ZQkRCSUJEQTVQ?=
+ =?utf-8?B?OW9pMHJlbjB3dmU0cFpSbXBvYWRDYS9qT0xidTZyQi84S1FlMHFkVThQU2o0?=
+ =?utf-8?B?ZTJhZ3ZkdHFUNWtNMnlndjRMTHpEc3R1ZGV2Z0RYYzZyT2Zwb2orcDhQTHNs?=
+ =?utf-8?B?SnFiRndzY2VWOSswbFhrN2JnZThqQVU4SDdqSjQwc3FmT1BLNnlDeDNVQzlJ?=
+ =?utf-8?B?QkNJZW5qQ0J5OG91eU5oUkpRZXRvL2VFQkVmcGNEVlk1L3NIMkg5Qm1ubjdk?=
+ =?utf-8?B?SUpFTXdMa1ZiNUVpYUNlMzl2eHdIeVVWMlByRTA1SkJvanc9PQ==?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?YlNiMEptb3h0M0JLaFhGY2R2MXpZRmgvS2dvbGI4L0owSmJGcmdTcmIyTlV3?=
+ =?utf-8?B?MDU4YllQWDBERWRycTltVlZWWWtJUGVkTW9RbCtlWDZ1UXZQeXFobjJ4aUpW?=
+ =?utf-8?B?ODFlYWl4Mk1wY1VJbEd2Y0FZc0czZGp5cnFObWRUN0xremY3UU5aQ2w2emkx?=
+ =?utf-8?B?N1FleEtRUEdLcmJJRExuVXoxbU5GUGJ0UzljNXVDVm9aSFdEY1g4emJEYkpp?=
+ =?utf-8?B?Sk0yWWNVMWoxYUprY0t5b05kVDFuaVFLZHdRZTNucThDUTBrMGRJZWMvZUNQ?=
+ =?utf-8?B?MGE5dzlkbHF6azRIbHczMDBXUmlTK3ozMnZlc0FIelgyc3RYblV6S2QvdnVx?=
+ =?utf-8?B?UVlKK3lWMjhCTm00aWs2dnl0Q3hHd1hZZ2F5QURvSnBDdGRoUXRHZWV2RzY5?=
+ =?utf-8?B?UjVzUGpac2J0dFErWDJWTGFGdDdxSDdMMHhNSzNTQlpyOUpESThJNnpYNkFS?=
+ =?utf-8?B?Z1F1YmJrbExUbWZXMklRMFlabmk4MWJWVm5jQ21TSGx3TkhoSDFaV0ZtRVNz?=
+ =?utf-8?B?Zm9jeUVhenN1aFk1VG9jOE4zK1BVTStZYUNRSlZaR1VMLzBMeXlveXFvQzQw?=
+ =?utf-8?B?TlhyaFlVbExCRGd5UVdxVS9RTEtpQm5DY3lzTFQrblFJZEt3NjkvanBYWUhD?=
+ =?utf-8?B?dnNYcHhVVkpiZU1RVndHMzhHWkNvNUdGN1NYYXNGMlJLVUhqNHFObG1EeWov?=
+ =?utf-8?B?OVVwUEIzUnpkYzVObE5VTktmWWZKU2RqSk1MbzNvQ2UxS0pYdERpSFkzbk4z?=
+ =?utf-8?B?M28rZThQaENVQzFhY3V1cU1KeG1Sb0xVQkJSY1ZEaHFoRFQ4elBhSTVta0Er?=
+ =?utf-8?B?UkdkZ1EvcURMR1gwdmJhOER5NnpjeWFScjdsTlRNVnM3TW9vWnArWks2U1FH?=
+ =?utf-8?B?bjhNZmU0UnV0dUh3RVduTmlmc2c3SFVJK2tTSXdvRHJZOVNEUDhPVlowN2Nv?=
+ =?utf-8?B?MCtCQ21jKzNpSlNucnpqc1Q2dUdzNENiVnY2dnZxZHpVL09nWGhheXpQQVpi?=
+ =?utf-8?B?QlZpdWZHSWdxTlhxbjBPQjgxWnhGUEVIN3dpSGs2M2lzMVRSY21aNEpiR2VN?=
+ =?utf-8?B?QW5HeUJlNVR0S21Cb3BDSEFHcmhCZzBYZmhpTmJsVUdlQ3lnZU1NTGZGcCty?=
+ =?utf-8?B?RlhQMnR6U3oyTzNyUE1WL2VsZGJqVHBzOC9uZElLMEtPYlV1UlVNYm9yMHFv?=
+ =?utf-8?B?K0tkc2dIR3FCWDZ6eUJUcDdzWStQWGczdU8wTzE5WHpqOHdxL2Q4T2JvZ2Rk?=
+ =?utf-8?B?U1lwSGdMMVlUYXljdHVrZXdqcjMvQ2xoZGVoNU1rTHNhTXBBSW52NmxLNmpn?=
+ =?utf-8?B?WVFKY1lHWFY4UEdXcjZUZWdNT054ZXZXdmxRR1A1RTQ3R3F3OU9oNVNwNHlG?=
+ =?utf-8?B?bTRxZnBQK2xlVkh2R2o4T0FrclIrd3h4Y25GN29TWkdJdVp4NVRiZTR4ZVZn?=
+ =?utf-8?B?THovemxCTlloaVVnUXlabHE0cFQ2cTNISGFhYWlvUkppVzhxVGZNeUwrTEli?=
+ =?utf-8?B?VzVKblNiNWxidjhHcklrajlmdlAyNmQ1akpPSlpaRFBpaEhra2tGV0V3MElt?=
+ =?utf-8?B?Z0hPNVd0bGQ2ZEowb1V3c1pVZTV3TmFyd1ZiQVp2ajNaRlNRTVBPUnBlVUZt?=
+ =?utf-8?B?Zkt1dml2Qnd3RHhmaFM4aEVwK1pqM2kxNGtEYWpCa0orMWRjT3hPSlhjRXBj?=
+ =?utf-8?B?YlJBK0h1L0l2c2I0ZFQ1blhIMEhHaDlvblp6RlliT1lLNlFoWkx2aSt2c05x?=
+ =?utf-8?B?eElPcGY5bkJhMmhFYnM5d2ZxT1J4Mm9uMHpVandTN1RvRUhXdmV3amhFRHI5?=
+ =?utf-8?B?R2FOTzM1TVRVVFJPK3FycHVQc0xRMmZXZ3FoVk94RUcyL3NkaWRVa2Uyb21W?=
+ =?utf-8?B?UXVFMlFOUnloK0tFamFWV3ZIQks0WWNUUHhDV2FvQmVTVGFJdUU0TlFpY0Iy?=
+ =?utf-8?B?YzFSeHlnbm5kTXlNVmRZRGtScjhXOXNsMld2SC9FbG5YZHFPYzNHeEtRTUpw?=
+ =?utf-8?B?KzUyQ3RaaFRJQXdMVkhGVzZBaHcyMjNGeE9IaGFWUTVUK3NtL1dPeUJoY1JY?=
+ =?utf-8?B?TzlSSEs2OEZTZnF3SnhPTXVCWVJSNlRVNVp3dnVqMWttMitENGl2V0pBeDJy?=
+ =?utf-8?Q?LDRXVSSEfZAMKIMMcMm0EGAka?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D8A2395CFF6F844EB680EA6A5118561A@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: FCLEb7lLQVHRmktnMjfcWw-YAc5_Ft-d
-X-Proofpoint-ORIG-GUID: FCLEb7lLQVHRmktnMjfcWw-YAc5_Ft-d
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-09_08,2024-09-09_01,2024-09-02_01
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5176.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e42a3029-30ad-4548-b5ac-08dcd0efaa5e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Sep 2024 16:51:35.3322
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: y77HfzfwdFmHczlUDWdkTKSwFrvy+Xu9C5d21sabU7gs0/OY8TjkaVLc5B2mBggjoko03fcLKnD0Ugo1MDSCyuVdYfmJnniwzfTAAxUDkJQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7326
 
-Extend txtimestamp test to run with fixed tskey using
-SCM_TS_OPT_ID control message for all types of sockets.
-
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- tools/include/uapi/asm-generic/socket.h    |  2 +
- tools/testing/selftests/net/txtimestamp.c  | 48 +++++++++++++++++-----
- tools/testing/selftests/net/txtimestamp.sh | 12 +++---
- 3 files changed, 47 insertions(+), 15 deletions(-)
-
-diff --git a/tools/include/uapi/asm-generic/socket.h b/tools/include/uapi/asm-generic/socket.h
-index 54d9c8bf7c55..281df9139d2b 100644
---- a/tools/include/uapi/asm-generic/socket.h
-+++ b/tools/include/uapi/asm-generic/socket.h
-@@ -124,6 +124,8 @@
- #define SO_PASSPIDFD		76
- #define SO_PEERPIDFD		77
- 
-+#define SCM_TS_OPT_ID		78
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
-diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-index ec60a16c9307..bdd0eb74326c 100644
---- a/tools/testing/selftests/net/txtimestamp.c
-+++ b/tools/testing/selftests/net/txtimestamp.c
-@@ -54,6 +54,10 @@
- #define USEC_PER_SEC	1000000L
- #define NSEC_PER_SEC	1000000000LL
- 
-+#ifndef SCM_TS_OPT_ID
-+# define SCM_TS_OPT_ID 78
-+#endif
-+
- /* command line parameters */
- static int cfg_proto = SOCK_STREAM;
- static int cfg_ipproto = IPPROTO_TCP;
-@@ -77,6 +81,8 @@ static bool cfg_epollet;
- static bool cfg_do_listen;
- static uint16_t dest_port = 9000;
- static bool cfg_print_nsec;
-+static uint32_t ts_opt_id;
-+static bool cfg_use_cmsg_opt_id;
- 
- static struct sockaddr_in daddr;
- static struct sockaddr_in6 daddr6;
-@@ -136,12 +142,13 @@ static void validate_key(int tskey, int tstype)
- 	/* compare key for each subsequent request
- 	 * must only test for one type, the first one requested
- 	 */
--	if (saved_tskey == -1)
-+	if (saved_tskey == -1 || cfg_use_cmsg_opt_id)
- 		saved_tskey_type = tstype;
- 	else if (saved_tskey_type != tstype)
- 		return;
- 
- 	stepsize = cfg_proto == SOCK_STREAM ? cfg_payload_len : 1;
-+	stepsize = cfg_use_cmsg_opt_id ? 0 : stepsize;
- 	if (tskey != saved_tskey + stepsize) {
- 		fprintf(stderr, "ERROR: key %d, expected %d\n",
- 				tskey, saved_tskey + stepsize);
-@@ -480,7 +487,7 @@ static void fill_header_udp(void *p, bool is_ipv4)
- 
- static void do_test(int family, unsigned int report_opt)
- {
--	char control[CMSG_SPACE(sizeof(uint32_t))];
-+	char control[2 * CMSG_SPACE(sizeof(uint32_t))];
- 	struct sockaddr_ll laddr;
- 	unsigned int sock_opt;
- 	struct cmsghdr *cmsg;
-@@ -620,18 +627,32 @@ static void do_test(int family, unsigned int report_opt)
- 		msg.msg_iov = &iov;
- 		msg.msg_iovlen = 1;
- 
--		if (cfg_use_cmsg) {
-+		if (cfg_use_cmsg || cfg_use_cmsg_opt_id) {
- 			memset(control, 0, sizeof(control));
- 
- 			msg.msg_control = control;
--			msg.msg_controllen = sizeof(control);
-+			msg.msg_controllen = cfg_use_cmsg * CMSG_SPACE(sizeof(uint32_t));
-+			msg.msg_controllen += cfg_use_cmsg_opt_id * CMSG_SPACE(sizeof(uint32_t));
- 
--			cmsg = CMSG_FIRSTHDR(&msg);
--			cmsg->cmsg_level = SOL_SOCKET;
--			cmsg->cmsg_type = SO_TIMESTAMPING;
--			cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+			cmsg = NULL;
-+			if (cfg_use_cmsg) {
-+				cmsg = CMSG_FIRSTHDR(&msg);
-+				cmsg->cmsg_level = SOL_SOCKET;
-+				cmsg->cmsg_type = SO_TIMESTAMPING;
-+				cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+
-+				*((uint32_t *)CMSG_DATA(cmsg)) = report_opt;
-+			}
-+			if (cfg_use_cmsg_opt_id) {
-+				cmsg = cmsg ? CMSG_NXTHDR(&msg, cmsg) : CMSG_FIRSTHDR(&msg);
-+				cmsg->cmsg_level = SOL_SOCKET;
-+				cmsg->cmsg_type = SCM_TS_OPT_ID;
-+				cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+
-+				*((uint32_t *)CMSG_DATA(cmsg)) = ts_opt_id;
-+				saved_tskey = ts_opt_id;
-+			}
- 
--			*((uint32_t *) CMSG_DATA(cmsg)) = report_opt;
- 		}
- 
- 		val = sendmsg(fd, &msg, 0);
-@@ -681,6 +702,7 @@ static void __attribute__((noreturn)) usage(const char *filepath)
- 			"  -L    listen on hostname and port\n"
- 			"  -n:   set no-payload option\n"
- 			"  -N:   print timestamps and durations in nsec (instead of usec)\n"
-+			"  -o N: use SCM_TS_OPT_ID control message to provide N as tskey\n"
- 			"  -p N: connect to port N\n"
- 			"  -P:   use PF_PACKET\n"
- 			"  -r:   use raw\n"
-@@ -701,7 +723,7 @@ static void parse_opt(int argc, char **argv)
- 	int c;
- 
- 	while ((c = getopt(argc, argv,
--				"46bc:CeEFhIl:LnNp:PrRS:t:uv:V:x")) != -1) {
-+				"46bc:CeEFhIl:LnNo:p:PrRS:t:uv:V:x")) != -1) {
- 		switch (c) {
- 		case '4':
- 			do_ipv6 = 0;
-@@ -742,6 +764,10 @@ static void parse_opt(int argc, char **argv)
- 		case 'N':
- 			cfg_print_nsec = true;
- 			break;
-+		case 'o':
-+			ts_opt_id = strtoul(optarg, NULL, 10);
-+			cfg_use_cmsg_opt_id = true;
-+			break;
- 		case 'p':
- 			dest_port = strtoul(optarg, NULL, 10);
- 			break;
-@@ -799,6 +825,8 @@ static void parse_opt(int argc, char **argv)
- 		error(1, 0, "cannot ask for pktinfo over pf_packet");
- 	if (cfg_busy_poll && cfg_use_epoll)
- 		error(1, 0, "pass epoll or busy_poll, not both");
-+	if (cfg_proto == SOCK_STREAM && cfg_use_cmsg_opt_id)
-+		error(1, 0, "TCP sockets don't support SCM_TS_OPT_ID");
- 
- 	if (optind != argc - 1)
- 		error(1, 0, "missing required hostname argument");
-diff --git a/tools/testing/selftests/net/txtimestamp.sh b/tools/testing/selftests/net/txtimestamp.sh
-index 25baca4b148e..fe4649bb8786 100755
---- a/tools/testing/selftests/net/txtimestamp.sh
-+++ b/tools/testing/selftests/net/txtimestamp.sh
-@@ -37,11 +37,13 @@ run_test_v4v6() {
- run_test_tcpudpraw() {
- 	local -r args=$@
- 
--	run_test_v4v6 ${args}		# tcp
--	run_test_v4v6 ${args} -u	# udp
--	run_test_v4v6 ${args} -r	# raw
--	run_test_v4v6 ${args} -R	# raw (IPPROTO_RAW)
--	run_test_v4v6 ${args} -P	# pf_packet
-+	run_test_v4v6 ${args}		  # tcp
-+	run_test_v4v6 ${args} -u	  # udp
-+	run_test_v4v6 ${args} -u -o 42	  # udp with fixed tskey
-+	run_test_v4v6 ${args} -r	  # raw
-+	run_test_v4v6 ${args} -r -o 42	  # raw
-+	run_test_v4v6 ${args} -R	  # raw (IPPROTO_RAW)
-+	run_test_v4v6 ${args} -P	  # pf_packet
- }
- 
- run_test_all() {
--- 
-2.43.5
-
+T24gOS85LzI0IDAyOjM1LCBLYWxsZSBWYWxvIHdyb3RlOg0KPiBFWFRFUk5BTCBFTUFJTDogRG8g
+bm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlvdSBrbm93IHRoZSBj
+b250ZW50IGlzIHNhZmUNCj4gDQo+IE1hcmVrIFZhc3V0IDxtYXJleEBkZW54LmRlPiB3cml0ZXM6
+DQo+IA0KPj4gRnJvbTogQWpheSBTaW5naCA8YWpheS5rYXRoYXRAbWljcm9jaGlwLmNvbT4NCj4+
+DQo+PiBBZGQgc3VwcG9ydCBmb3IgdGhlIFdJTEMzMDAwIGNoaXAuIFRoZSBjaGlwIGlzIHNpbWls
+YXIgdG8gV0lMQzEwMDAsDQo+PiBleGNlcHQgdGhhdCB0aGUgcmVnaXN0ZXIgbGF5b3V0IGlzIHNs
+aWdodGx5IGRpZmZlcmVudCBhbmQgaXQgZG9lcw0KPj4gbm90IHN1cHBvcnQgV1BBMy9TQUUuDQo+
+Pg0KPj4gU2lnbmVkLW9mZi1ieTogQWpheSBTaW5naCA8YWpheS5rYXRoYXRAbWljcm9jaGlwLmNv
+bT4NCj4+IFNpZ25lZC1vZmYtYnk6IE1hcmVrIFZhc3V0IDxtYXJleEBkZW54LmRlPg0KPiANCj4g
+Wy4uLl0NCj4gDQo+PiAtLS0gYS9kcml2ZXJzL25ldC93aXJlbGVzcy9taWNyb2NoaXAvd2lsYzEw
+MDAvY2ZnODAyMTEuYw0KPj4gKysrIGIvZHJpdmVycy9uZXQvd2lyZWxlc3MvbWljcm9jaGlwL3dp
+bGMxMDAwL2NmZzgwMjExLmMNCj4+IEBAIC0zMTMsNiArMzEzLDEzIEBAIHN0YXRpYyBpbnQgY29u
+bmVjdChzdHJ1Y3Qgd2lwaHkgKndpcGh5LCBzdHJ1Y3QgbmV0X2RldmljZSAqZGV2LA0KPj4NCj4+
+ICAgICAgIHZpZi0+Y29ubmVjdGluZyA9IHRydWU7DQo+Pg0KPj4gKyAgICAgaWYgKHNtZS0+YXV0
+aF90eXBlID09IE5MODAyMTFfQVVUSFRZUEVfU0FFICYmDQo+PiArICAgICAgICAgaXNfd2lsYzMw
+MDAodmlmLT53aWxjLT5jaGlwaWQpKSB7DQo+PiArICAgICAgICAgICAgIG5ldGRldl9lcnIoZGV2
+LCAiV0lMQzMwMDA6IFdQQTMgbm90IHN1cHBvcnRlZFxuIik7DQo+PiArICAgICAgICAgICAgIHJl
+dCA9IC1FT1BOT1RTVVBQOw0KPj4gKyAgICAgICAgICAgICBnb3RvIG91dF9lcnJvcjsNCj4+ICsg
+ICAgIH0NCj4gDQo+IFRoaXMgbG9va3Mgd3JvbmcuIElmIHdpbGMzMDAwIGRvZXNuJ3Qgc3VwcG9y
+dCBTQUUgeW91IHNob3VsZG4ndA0KPiBhZHZlcnRpc2UgTkw4MDIxMV9GRUFUVVJFX1NBRSB0byB1
+c2VyIHNwYWNlLiBJIHRoaW5rIHRoZSBjaGVjayBmb3INCj4gd2lsYzMwMDAgc2hvdWxkIGJlIGlu
+IHdpbGNfY3JlYXRlX3dpcGh5KCk6DQo+IA0KDQpBY3R1YWxseSwgdGhlIGNoaXAgSUQgaXMgbm90
+IGF2YWlsYWJsZSB3aGVuIHdpbGNfY3JlYXRlX3dpcGh5KCkgaXMgY2FsbGVkIGJ1dA0KaXMgc2V0
+IGxhdGVyIGluIHRoZSBkZXZpY2UgcHJvYmUgZnVuY3Rpb24uIFRoZXJlZm9yZSwgYWRkaW5nIHRo
+ZQ0KJ2lzX3dpbGMzMDAwKHZpZi0+d2lsYy0+Y2hpcGlkKScgY29uZGl0aW9uIG1heSBub3Qgd29y
+ayBhcyBleHBlY3RlZC4NCkFsc28sIEkgdGhpbmsgdGhlcmUgaXMgbm8gQVBJIHRvIGNoYW5nZSAi
+d2lwaHktPmZlYXR1cmVzIiBhZnRlciB3aXBoeSBpcw0KcmVnaXN0ZXJlZCB0byBzZXQgaXQgbGF0
+ZXIgd2hlbiBjaGlwIElEIGluZm9ybWF0aW9uIGlzIGF2YWlsYWJsZS4NCg0KRG9lcyBpdCBtYWtl
+IHNlbnNlIHRvIGFkZCBhIG1vZHVsZSBwYXJhbWV0ZXIgZm9yIGRldmljZSB0eXBlKHdpbGMxMDAw
+IG9yDQp3aWxjMzAwMCkgdG8gYWRkcmVzcyBkZXZpY2Utc3BlY2lmaWMgZmVhdHVyaXphdGlvbi4N
+Cg0KPiBpZiAoIWlzX3dpbGMzMDAwKHZpZi0+d2lsYy0+Y2hpcGlkKSkNCj4gICAgICAgICB3aXBo
+eS0+ZmVhdHVyZXMgfD0gTkw4MDIxMV9GRUFUVVJFX1NBRTsNCj4gDQo+IC0tDQo+IGh0dHBzOi8v
+cGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9saW51eC13aXJlbGVzcy9saXN0Lw0KPiANCj4g
+aHR0cHM6Ly93aXJlbGVzcy53aWtpLmtlcm5lbC5vcmcvZW4vZGV2ZWxvcGVycy9kb2N1bWVudGF0
+aW9uL3N1Ym1pdHRpbmdwYXRjaGVzDQoNCg==
 
