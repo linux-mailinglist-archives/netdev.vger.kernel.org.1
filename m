@@ -1,86 +1,112 @@
-Return-Path: <netdev+bounces-126670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB0B9722EC
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 21:41:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5BB69722F7
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 21:45:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C0E81C22A54
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 19:41:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0443C1C21797
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 19:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDCC17C9B8;
-	Mon,  9 Sep 2024 19:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4EE61531F2;
+	Mon,  9 Sep 2024 19:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BvuvlxfN"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675FE3BB47;
-	Mon,  9 Sep 2024 19:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED3818C31
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 19:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725910866; cv=none; b=N1tokSKW1LljzVqgodPrpra67hbvHcrsG5Aq0vCt4DMvGnWkvU/buTWlU7m4zcYOdqIxNL4FY7Apnswht4gQG0kyQtoz1CWuqRWOjOTDNxJ8btR16fkeu3yjqRlFI+uFxa+uEihJEyXZxb2ojjP8nW6VdYY2X88Xp5VXlEsa0vE=
+	t=1725911135; cv=none; b=UXSbkSMwFeEkvM+pnevAzTlLLWEZynuYMVwM82F1L45C/Ys8G1rhfeYwDJttadiKQJpSXwihOXittXxkDYu9M00HY+d6dqfbZQWc1shPeW2iYNQ8QDlc81pxLx1y4N4fc92IqOzG+Rx8Tw/oiEsC3iGYZHU7ftggpbLyFkMVzOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725910866; c=relaxed/simple;
-	bh=1i7y9HGuAGumMZJjH5rcHVo7M235u278917IPiUAFxo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QpT5/EtKz7+xILAz4LIcRWmdp7iC7z/57sgEiP9Xk1XIHJE+68gmtUUjx4RPUYYfUNNjmpNqiG8wGWaoYNQ9h0iUBAxBLuvAu2Ad8pRsExdCT8Xj5rB6qq8d6HAKZ178342SlcTIvOQWvcr08seWkGBBRpteoU7gS6kURwAlgJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from localhost.localdomain (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@sostec.de)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id 97B22C07D3;
-	Mon,  9 Sep 2024 21:40:52 +0200 (CEST)
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-To: alex.aring@gmail.com,
-	miquel.raynal@bootlin.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	liuxuenetmail@gmail.com,
-	linux-wpan@vger.kernel.org,
+	s=arc-20240116; t=1725911135; c=relaxed/simple;
+	bh=RVxr60bIMEmaIeWl/he9+8xlcootSPvL6nkav4Ei5bk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hlBzghV7WhMRSI8LKnKyg8jSEEgYX55v2XuLZIOr97hnStxUKylazTUWrYKDunqTiDhap2JyEesepmT+amsNNwrJfH6IoF1l6ZoFZ/Eubx7o8PlKWr4n7vUxjQ5aNASY9xYkRetZxRg8Ev1DiX81yOCiSVSQ1EArtj8g4YqwyJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BvuvlxfN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 044DEC4CEC5;
+	Mon,  9 Sep 2024 19:45:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725911135;
+	bh=RVxr60bIMEmaIeWl/he9+8xlcootSPvL6nkav4Ei5bk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=BvuvlxfNVDHLadLjmjjEvWyMXK4ndRVlhS9P//Y5qdN4Edkt0DlZ2mA+jntQxgk5a
+	 ws80aQsXpfnJenhYKJiCtm3Kj80Bvlru5aZHflzhAmkuGSYWMH/61W3d4Ffvv+HY8k
+	 rsY/VfX9D1XSSaIKdDmqj0LcVijKa0XbmN9WN5+H25RhCBh7h/zQZQiUMA/J4OMP1p
+	 3wIJ64DNvMe6ZRaHENtqkMrDRWODBGrxG8Kf7oii2RBBePxHafb3SOQidt8aGyUayg
+	 VaeTQ0reyGC4Lc6gn0+Fbm5ES6czCpKc3SUoXHHDQ/UbTWLVgusA7QP3NbJQ6CFCE4
+	 S0NQIDVcHmtfw==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: Stefan Schmidt <stefan@datenfreihafen.org>
-Subject: Re: [PATCH] ieee802154: Fix build error
-Date: Mon,  9 Sep 2024 21:40:04 +0200
-Message-ID: <172591052663.45799.15009721032954430797.b4-ty@datenfreihafen.org>
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [pull request][net 0/7] mlx5 fixes 2024-09-09
+Date: Mon,  9 Sep 2024 12:44:58 -0700
+Message-ID: <20240909194505.69715-1-saeed@kernel.org>
 X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240909131740.1296608-1-ruanjinjie@huawei.com>
-References: <20240909131740.1296608-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Hello Jinjie.
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-On Mon, 09 Sep 2024 21:17:40 +0800, Jinjie Ruan wrote:
-> If REGMAP_SPI is m and IEEE802154_MCR20A is y,
-> 
-> 	mcr20a.c:(.text+0x3ed6c5b): undefined reference to `__devm_regmap_init_spi'
-> 	ld: mcr20a.c:(.text+0x3ed6cb5): undefined reference to `__devm_regmap_init_spi'
-> 
-> Select REGMAP_SPI for IEEE802154_MCR20A to fix it.
-> 
-> [...]
+This series provides bug fixes to mlx5 driver.
+Please pull and let me know if there is any problem.
 
-Applied, thanks!
+Thanks,
+Saeed.
 
-[1/1] ieee802154: Fix build error
-      commit: addf89774e48c992316449ffab4f29c2309ebefb
 
-Best regards,
-Stefan Schmidt <stefan@datenfreihafen.org>
+The following changes since commit b3c9e65eb227269ed72a115ba22f4f51b4e62b4d:
+
+  net: hsr: remove seqnr_lock (2024-09-09 10:25:01 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-fixes-2024-09-09
+
+for you to fetch changes up to b1d305abef4640af1b4f1b4774d513cd81b10cfc:
+
+  net/mlx5: Fix bridge mode operations when there are no VFs (2024-09-09 12:39:57 -0700)
+
+----------------------------------------------------------------
+mlx5-fixes-2024-09-09
+
+----------------------------------------------------------------
+Benjamin Poirier (1):
+      net/mlx5: Fix bridge mode operations when there are no VFs
+
+Carolina Jubran (3):
+      net/mlx5: Explicitly set scheduling element and TSAR type
+      net/mlx5: Add missing masks and QoS bit masks for scheduling elements
+      net/mlx5: Verify support for scheduling element and TSAR type
+
+Maher Sanalla (1):
+      net/mlx5: Update the list of the PCI supported devices
+
+Shahar Shitrit (2):
+      net/mlx5e: Add missing link modes to ptys2ethtool_map
+      net/mlx5e: Add missing link mode to ptys2ext_ethtool_map
+
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   | 10 +++++
+ .../net/ethernet/mellanox/mlx5/core/esw/legacy.c   |  4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/esw/qos.c  | 51 +++++++++++++---------
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |  1 +
+ drivers/net/ethernet/mellanox/mlx5/core/qos.c      |  7 +++
+ include/linux/mlx5/mlx5_ifc.h                      | 10 ++++-
+ 6 files changed, 60 insertions(+), 23 deletions(-)
 
