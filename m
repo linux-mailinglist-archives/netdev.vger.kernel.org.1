@@ -1,60 +1,67 @@
-Return-Path: <netdev+bounces-126565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48358971DBE
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 17:15:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C84E5971DE1
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 17:19:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D495F2810DB
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:15:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3F8E1C233C6
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 15:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9441C69D;
-	Mon,  9 Sep 2024 15:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C03F913A894;
+	Mon,  9 Sep 2024 15:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i7YNXVJn"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1554B2263A;
-	Mon,  9 Sep 2024 15:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92487139CF6;
+	Mon,  9 Sep 2024 15:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725894895; cv=none; b=SQc7obz/aA8HDXi6k0eHDC7PGsti0se5WXkkuafI/PsUJkTGcQkmJrL0+wRp3JvhQwujkO61FKJL3a5EJ998mgcQapvZ4DsHqLo8SmXwwuxK0YISCB35NQMiHvROcbapmrpLyv1iL9VKKIhO7Ep1SE/0A8KkN78tN7eGvbqHiAk=
+	t=1725895038; cv=none; b=LdB3Nk88p6oYxHrXIveVhEQtpqG6S3A03/Jj7rdC6NWzOLE+35Vau/aO0l7nrnZsIHJ/N9e/SQJDO3hAgJ1hL4Drw4B2uVoGwVrB8yuEw0NTwVDSAQa7F0NEeRugc/nURwUPmgUQjOnvlF27grIaflrwWHm2KHFmVuza7ShqB50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725894895; c=relaxed/simple;
-	bh=J5GevXB0W5oGxhLcbHeweH1ds9xojIQf7AHzLkMawxM=;
+	s=arc-20240116; t=1725895038; c=relaxed/simple;
+	bh=4UnHiTSmesifrapU4hY+D7bZkm176mfI1MGT9K3EfJU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WOj5RboKeRY69m7SkWJxBLRvpMdqk1JgonDqc6ba9LN3G9y4UNv6w3fMHOO2S62WYyXB1mSpGFWDup1W0V3/CcG5VdEAfpMOjO9dtmFocRdVOGcYfXJdve2hrXFTd1XvS7ms2/1a6p9gq0MpFaVj0VzO1+YZQY5obyeaTOkcY9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0DACFFEC;
-	Mon,  9 Sep 2024 08:15:21 -0700 (PDT)
-Received: from bogus (e107155-lin.cambridge.arm.com [10.1.198.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B7B8E3F73B;
-	Mon,  9 Sep 2024 08:14:49 -0700 (PDT)
-Date: Mon, 9 Sep 2024 16:14:47 +0100
-From: Sudeep Holla <sudeep.holla@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Szabolcs Nagy <nsz@port70.net>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Szabolcs Nagy <szabolcs.nagy@arm.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, mst@redhat.com, jasowang@redhat.com,
-	arefev@swemel.ru, alexander.duyck@gmail.com,
-	Willem de Bruijn <willemb@google.com>, stable@vger.kernel.org,
-	Jakub Sitnicki <jakub@cloudflare.com>, Felix Fietkau <nbd@nbd.name>,
-	Yury Khrustalev <yury.khrustalev@arm.com>,
-	Sudeep Holla <sudeep.holla@arm.com>
-Subject: Re: [PATCH net v2] net: drop bad gso csum_start and offset in
- virtio_net_hdr
-Message-ID: <Zt8Q5wTHofvERY8p@bogus>
-References: <20240729201108.1615114-1-willemdebruijn.kernel@gmail.com>
- <ZtsTGp9FounnxZaN@arm.com>
- <66db2542cfeaa_29a385294b9@willemb.c.googlers.com.notmuch>
- <66de0487cfa91_30614529470@willemb.c.googlers.com.notmuch>
- <20240909094527.GA3048202@port70.net>
- <0b14a8a8-4d98-46a3-9441-254345faa5df@sirena.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BEUyG5iYKATHC3hAw4U11WKshi30whr0DpGdIRZ2yLmGrClktjGanttb4SjTrEJhKBJI5z6d6ayJZrUf6SLUMVe3pbGeWbbO8qH1uDlDluD0ucfx2qgXVX3PmYuZUyJl4slWlGOYMJdQocWLI9ROibbiaA/qCW+mjJmz/3CuaFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i7YNXVJn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAC3BC4CEC5;
+	Mon,  9 Sep 2024 15:17:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725895038;
+	bh=4UnHiTSmesifrapU4hY+D7bZkm176mfI1MGT9K3EfJU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=i7YNXVJn8mr9u3JIms5lk+k+0EzePN3dufNOrxgBDlOeiNGUgv9H1DPzP/hVyfXz3
+	 8GQPnUs7e7O/fgP9sikPQRa0V4ZunBXutjASuST+9zmflFiqLsb5OfsahR75KyybqP
+	 x8uV+TjA4dwXr19Kxsjl0VvRU8QNJZF2dLGZpUwOHJyE5hq1r/rrCHFbvyZjbW3ysj
+	 m069t3GrumzbDer2HEz31i/caWeK0y5bXNi2tlbSjo4HS350D7cwczQLl4YBkdATxA
+	 1cPvXLTpY++jkiCI5d1RrH0+VYI1ghZT0wNSlghgnuRFRAt7RozHimqJ8thKy2Mavk
+	 plHpgn0RD9iwg==
+Date: Mon, 9 Sep 2024 16:17:12 +0100
+From: Simon Horman <horms@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Felix Huettner <felix.huettner@mail.schwarz>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH net v1 1/1] netfilter: conntrack: Guard possoble unused
+ functions
+Message-ID: <20240909151712.GZ2097826@kernel.org>
+References: <20240905203612.333421-1-andriy.shevchenko@linux.intel.com>
+ <20240906162938.GH2097826@kernel.org>
+ <Zt7B79Q3O7mNqrOl@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,51 +70,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0b14a8a8-4d98-46a3-9441-254345faa5df@sirena.org.uk>
+In-Reply-To: <Zt7B79Q3O7mNqrOl@smile.fi.intel.com>
 
-On Mon, Sep 09, 2024 at 12:14:28PM +0100, Mark Brown wrote:
-> On Mon, Sep 09, 2024 at 11:45:27AM +0200, Szabolcs Nagy wrote:
+On Mon, Sep 09, 2024 at 12:37:51PM +0300, Andy Shevchenko wrote:
+> On Fri, Sep 06, 2024 at 05:29:38PM +0100, Simon Horman wrote:
+> > On Thu, Sep 05, 2024 at 11:36:12PM +0300, Andy Shevchenko wrote:
 > 
-> > fvp is closed source but has freely available binaries
-> > for x86_64 glibc based linux systems (behind registration
-> > and license agreements) so in principle the issue can be
-> > reproduced outside of arm but using fvp is not obvious.
+> > Local testing seems to show that the warning is still emitted
+> > for ctnetlink_label_size if CONFIG_NETFILTER_NETLINK_GLUE_CT is enabled
+> > but CONFIG_NF_CONNTRACK_EVENTS is not.
 > 
-> > hopefully somebody at arm can pick it up or at least
-> > report this thread to the fvp team internally.
-> 
-> FWIW there's a tool called shrinkwrap which makes it quite a lot easier
-> to get going:
-> 
->    https://gitlab.arm.com/tooling/shrinkwrap
-> 
-> though since the models are very flexibile valid configurations that
-> people see issues with aren't always covered by shrinkwrap.
+> Can you elaborate on this, please?
+> I can not reproduce.
 
-It is fairly trivial to change the default config and use virtio-net to
-reproduce this issue. If anyone tries the above tool, they can apply below
-diff and should be able to reproduce the issue.
-
---
-Regards,
-Sudeep
-
-diff --git i/config/FVP_Base_RevC-2xAEMvA-base.yaml w/config/FVP_Base_RevC-2xAEMvA-base.yaml
-index 86d8cf9cb0f8..9951c5a948bb 100644
---- i/config/FVP_Base_RevC-2xAEMvA-base.yaml
-+++ w/config/FVP_Base_RevC-2xAEMvA-base.yaml
-@@ -39,8 +39,10 @@ description: >-
-     # Networking. By default use user-space networking, mapping port 22 in the
-     # FVP to a user-specified port on the host (see rtvar:LOCAL_NET_PORT). This
-     # enables ssh.
--    -C bp.smsc_91c111.enabled: 1
--    -C bp.hostbridge.userNetworking: 1
-+    -C bp.smsc_91c111.enabled: 0
-+    -C bp.hostbridge.userNetworking: 0
-+    -C bp.virtio_net.enabled: 1
-+    -C bp.virtio_net.hostbridge.userNetworking: 1
-     -C bp.hostbridge.userNetPorts: ${rtvar:LOCAL_NET_PORT}=22
-
-     # FVP Performance tweaks.
-
+Sure, let me retest and get back to you.
 
