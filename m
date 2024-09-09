@@ -1,136 +1,186 @@
-Return-Path: <netdev+bounces-126552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14C2D971C91
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 16:30:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 997A6971C92
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 16:30:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE7271F23428
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 14:30:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFA96B21740
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 14:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72861BAEFF;
-	Mon,  9 Sep 2024 14:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A5F11B9B42;
+	Mon,  9 Sep 2024 14:30:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655C11BA291
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 14:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF70C1AF4EF;
+	Mon,  9 Sep 2024 14:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725892194; cv=none; b=prNMvtYwJaaqxZPTrW/8HlJV/TU7PEQUZQv+auodJTnNzuD2uMAhGPvFn8D4WunYJwlnmEgS281DbijhpF71hIzaGpwe0qk7hg2yp/qWOnSzDmZWvCp12QL+xuy/QXpKzDJN54UCEBq8W+rQyAgxQYub/9v/sV0S4fp7IMj707k=
+	t=1725892252; cv=none; b=WfY1z4FzavpeWfAFY0aP5FoQVo0490vYc8DOc36qSozrpvLB6SiQcLHGS24PZOwQzurWzD3gz5fA4/vu+Af9L9UFjXyx+DjM+dcj6/H8Tgt7TZvDXCWcsZtRj8GgQTqG68jfYkSXmI9TA6VT6kLfUoVeeE0m/uBHale2mYWj4l4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725892194; c=relaxed/simple;
-	bh=148obTx++Y3V8ypuU2N7MV5+sIrN7E4EKA3l8o4GR7I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=AlZDMfsbBRy+2IE6htKVL3P34v5UhMvPXF0Q5sAx4a0NcZ7NzlZNzqdQ6/V56uFw9UDwqa43lPOLvLSi/pVckzU39a/I9b9cIPjpA4i5L4aLi+qsStZSg7SGrNc3DWu1MDGMYZb4M/LULVJQIUrFJ0RG/ZEgPtRaykHzynCcvgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1snfOm-00027P-QA
-	for netdev@vger.kernel.org; Mon, 09 Sep 2024 16:29:48 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1snfOm-006g3b-Bz
-	for netdev@vger.kernel.org; Mon, 09 Sep 2024 16:29:48 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 10317336B35
-	for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 14:29:48 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 3227C336B12;
-	Mon, 09 Sep 2024 14:29:45 +0000 (UTC)
-Received: from [172.20.34.65] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id b502aa44;
-	Mon, 9 Sep 2024 14:29:44 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Mon, 09 Sep 2024 16:29:36 +0200
-Subject: [PATCH can v2 2/2] can: m_can: m_can_close(): stop clocks after
- device has been shut down
+	s=arc-20240116; t=1725892252; c=relaxed/simple;
+	bh=GhRvGtJUKZ/IPcyo/TIqW2UKjgDTaWcuNk9nbtEmIjc=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=rU89pbl67zfYNWjFPgMi5h5KpQXoODp8aLNNZBoh+Dq3Dn9PeIT8ubTCATH/Y3gEuH0vFtANQvj+DUOUOmT2quxUDXLwV5M4QIqV5v3Z2mO4JxjkDLMY06Me/hYxmGcCLOcYO5ZuxodLquMaAT2hgGBdZMlwkBNZlpBcuQMomeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4X2TkF006Bz1P9PD;
+	Mon,  9 Sep 2024 22:29:40 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2AB721400FD;
+	Mon,  9 Sep 2024 22:30:45 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 9 Sep 2024 22:30:43 +0800
+Message-ID: <1a7746a7-af17-43f9-805f-fd1cbd24e607@huawei.com>
+Date: Mon, 9 Sep 2024 22:30:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240909-can-m_can-fix-ifup-v2-2-2b35e624a089@pengutronix.de>
-References: <20240909-can-m_can-fix-ifup-v2-0-2b35e624a089@pengutronix.de>
-In-Reply-To: <20240909-can-m_can-fix-ifup-v2-0-2b35e624a089@pengutronix.de>
-To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Dong Aisheng <b29396@freescale.com>, Fengguang Wu <fengguang.wu@intel.com>, 
- Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.15-dev-7be4f
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1326; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=148obTx++Y3V8ypuU2N7MV5+sIrN7E4EKA3l8o4GR7I=;
- b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBm3wZVz0ZMV16OHcZFLF6AUqux4obsFEjdjJ5ip
- OzO/4D82n2JATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZt8GVQAKCRAoOKI+ei28
- b1UPCACXZlb+a6UZUK9oa6Djs9b0NCr/yHH2ee04hXM3eCzPMLzaDfNtF3c/w/tHDCs5qs98g4e
- LnbQX6ud4ev8uBYN1UJVeJRwNPXt9WmM3cd01mULGwvuWKMjraSzGrxTaSP7fWm1zZqiRZuIoED
- Atm/BuHiPX3bCvEszTqwlcRAs3SyD5FQzgkVHXUjc9mR5D2r4xrAe47JxTg9Jaxuv72YQUNFE0s
- dkFFwmGStSxq0criNZY4SBy8tjfeXDEyamp2PIJbnXJU8+jDWDXi5Ykim/360xj0yDhlliqwnK6
- 3H9j1xKjTIyAMinzxLT2EqEjBJlu/0x3wRu2PYwe6yjiAMVG
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, Kalesh Anakkur Purayil
+	<kalesh-anakkur.purayil@broadcom.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
+	<chenhao418@huawei.com>, <sudongming1@huawei.com>, <xujunsheng@huawei.com>,
+	<shiyongbang@huawei.com>, <libaihan@huawei.com>, <zhuyuan@huawei.com>,
+	<forest.zhouchang@huawei.com>, <jdamato@fastly.com>, <horms@kernel.org>,
+	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
+	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V8 net-next 05/11] net: hibmcge: Implement some .ndo
+ functions
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20240909023141.3234567-1-shaojijie@huawei.com>
+ <20240909023141.3234567-6-shaojijie@huawei.com>
+ <CAH-L+nOxj1_wHdSacC5R9WG5GeMswEQDXa4xgVFxyLHM7xjycg@mail.gmail.com>
+ <116bff77-f12f-43f0-8325-b513a6779a55@huawei.com>
+ <fec0a530-64d9-401c-bb43-4c5670587909@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <fec0a530-64d9-401c-bb43-4c5670587909@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: base64
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-After calling m_can_stop() an interrupt may be pending or NAPI might
-still be executed. This means the driver might still touch registers
-of the IP core after the clocks has been disabled. This is not good
-practice and might lead to aborts depending on the SoC integration.
-
-To avoid these potential problems, make m_can_close() symmetric to
-m_can_open(), i.e. stop the clocks at the end, right before shutting
-down the transceiver.
-
-Fixes: e0d1f4816f2a ("can: m_can: add Bosch M_CAN controller support")
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/m_can/m_can.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 7754dd2d4cb110eee5b83885f5381aed9c67ce03..7aeb56bcd1d660e592b527919d3708add62bfb75 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -1764,7 +1764,6 @@ static int m_can_close(struct net_device *dev)
- 	netif_stop_queue(dev);
- 
- 	m_can_stop(dev);
--	m_can_clk_stop(cdev);
- 	free_irq(dev->irq, dev);
- 
- 	/* disable NAPI after disabling interrupts */
-@@ -1781,6 +1780,7 @@ static int m_can_close(struct net_device *dev)
- 
- 	close_candev(dev);
- 
-+	m_can_clk_stop(cdev);
- 	phy_power_off(cdev->transceiver);
- 
- 	return 0;
-
--- 
-2.45.2
-
-
+DQpvbiAyMDI0LzkvOSAyMDoxOSwgQW5kcmV3IEx1bm4gd3JvdGU6DQo+IE9uIE1vbiwgU2Vw
+IDA5LCAyMDI0IGF0IDEyOjA0OjUzUE0gKzA4MDAsIEppamllIFNoYW8gd3JvdGU6DQo+PiBv
+biAyMDI0LzkvOSAxMTowNSwgS2FsZXNoIEFuYWtrdXIgUHVyYXlpbCB3cm90ZToNCj4+PiBP
+biBNb24sIFNlcCA5LCAyMDI0IGF0IDg6MTHigK9BTSBKaWppZSBTaGFvIDxzaGFvamlqaWVA
+aHVhd2VpLmNvbT4gd3JvdGU6DQo+Pj4+ICt9DQo+Pj4+ICsNCj4+Pj4gK3N0YXRpYyBpbnQg
+aGJnX25ldF9vcGVuKHN0cnVjdCBuZXRfZGV2aWNlICpuZXRkZXYpDQo+Pj4+ICt7DQo+Pj4+
+ICsgICAgICAgc3RydWN0IGhiZ19wcml2ICpwcml2ID0gbmV0ZGV2X3ByaXYobmV0ZGV2KTsN
+Cj4+Pj4gKw0KPj4+PiArICAgICAgIGlmICh0ZXN0X2FuZF9zZXRfYml0KEhCR19OSUNfU1RB
+VEVfT1BFTiwgJnByaXYtPnN0YXRlKSkNCj4+Pj4gKyAgICAgICAgICAgICAgIHJldHVybiAw
+Ow0KPj4+IFtLYWxlc2hdIElzIHRoZXJlIGEgcG9zc2liaWxpdHkgdGhhdCBkZXZfb3Blbigp
+IGNhbiBiZSBpbnZva2VkIHR3aWNlPw0KPj4gV2Ugd2FudCBzdG9wIE5JQyB3aGVuIGNoYW5n
+X210dSDjgIFzZWxmX3Rlc3Qgb3IgRkxSLg0KPj4gU28sIGRyaXZlciB3aWxsIGRpcmVjdGx5
+IGludm9rZSBoYmdfbmV0X3N0b3AoKSBub3QgZGV2X29wZW4oKSBpZiBuZWVkLg0KPj4gVGhl
+cmVmb3JlLCBkcml2ZXIgbXVzdCBlbnN1cmUgdGhhdCBoYmdfbmV0X29wZW4oKSBvciBoYmdf
+bmV0X3N0b3AoKSBjYW4gbm90IGJlIGludm9rZWQgdHdpY2UuDQo+IEdlbmVyYWxseSwgd2Ug
+ZG9uJ3Qgd2FudCBkZWZlbnNpdmUgcHJvZ3JhbW1pbmcuIFlvdSBzZWVtIHRvIHN1Z2dlc3QN
+Cj4gaGJnX25ldF9vcGVuIGFuZCBoYmdfbmV0X3N0b3AgYXJlIGNhbGxlZCBpbiBwYWlycy4g
+SWYgdGhpcyBpcyBub3QNCj4gdHJ1ZSwgeW91IGhhdmUgYSBidWc/IFJhdGhlciB0aGFuIHBh
+cGVyIG92ZXIgdGhlIGJ1ZyB3aXRoIGEgcmV0dXJuLA0KPiBsZXQgYmFkIHRoaW5ncyBoYXBw
+ZW4gc28gdGhlIGJ1ZyBpcyBvYnZpb3VzLg0KDQpObywgSEJHX05JQ19TVEFURV9PUEVOIGlz
+IG5vdCBpbnRlbmRlZCB0byBlbnN1cmUgdGhhdCBoYmdfbmV0X29wZW4oKSBhbmQNCmhiZ19u
+ZXRfc3RvcCgpIGFyZSBtdXR1YWxseSBleGNsdXNpdmUuDQoNCkFjdHVhbGx5LCB3aGVuIHRo
+ZSBkcml2ZXIgZG8gcmVzZXQgb3Igc2VsZi10ZXN0KGV0aHRvb2wgLXQgb3IgZXRodG9vbCAt
+LXJlc2V0IG9yIEZMUikuDQpXZSBob3BlIHRoYXQgbm8gb3RoZXIgZGF0YSBpcyB0cmFuc21p
+dHRlZCBvciByZWNlaXZlZCBhdCB0aGlzIHRpbWUuDQpUaGVyZWZvcmUsIHRoZSBkcml2ZXIg
+ZGlyZWN0bHkgdXNlcyBoYmdfbmV0X3N0b3AoKSB0byBzdG9wIHRoZSBOSUMuDQoNCkluIHRo
+aXMgY2FzZSwgSUZGX1VQIG1heSBiZSBzZXQuIFRoZXJlZm9yZSwgZGV2X2Nsb3NlKCkgY2Fu
+IGJlIGludm9rZWQuDQpBcyBhIHJlc3VsdCwgaGJnX25ldF9zdG9wIGlzIGludm9rZWQgdHdp
+Y2UuDQoNCkluIG15IG9waW5pb24sIGRyaXZlciBpcyBub3Qgc3VpdGFibGUgZm9yIGRpcmVj
+dGx5IHVzaW5nIGRldl9vcGVuKCksIGRldl9jbG9zZSgpLA0Kb3IgbW9kaWZ5aW5nIGRldi0+
+c3RhdGUuIFRoZXJlZm9yZSwgSEJHX05JQ19TVEFURV9PUEVOIGlzIGFkZGVkIHRvDQplbnN1
+cmUgdGhhdCBoYmdfbmV0X3N0b3AoKSBpcyBub3QgaW52b2tlZCB0d2ljZS4NCg0KaWYgSSBy
+ZW1vdmUgSEJHX05JQ19TVEFURV9PUEVOLCBJIG1heSBnZXQgbG9nKDEwcyBzbGVlcCB0aW1l
+IGlzIGFkZGVkIGR1cmluZyByZXNldCk6DQoNCiNpZmNvbmZpZyBlbnAxMzFzMGYxIHVwDQoj
+ZWNobyAxID4gL3N5cy9idXMvcGNpL2RldmljZXMvMDAwMFw6ODNcOjAwLjEvcmVzZXQgICYg
+c2xlZXAgMjsgaWZjb25maWcgZW5wMTMxczBmMSBkb3duDQpbICAyMTMuMzMyODU1XSBoaWJt
+Y2dlIDAwMDA6ODM6MDAuMTogRkxSIHByZXBhcmUNClsgIDIxMy4zMzc5MDVdIFtTVFVCXVto
+YmdfbmV0X3N0b3AgODFdIEhCR19OSUNfU1RBVEVfT1BFTiBhbHJlYWR5IGNsZWFyDQpbICAy
+MTMuMzQ1MDY0XSBoaWJtY2dlIDAwMDA6ODM6MDAuMSBlbnAxMzFzMGYxOiBMaW5rIGlzIERv
+d24NClsgIDIxMy4zNTE0MDhdIFtTVFVCXVtoYmdfcmVzZXRfcHJlcGFyZSAxMjZdIHJlc2V0
+IHNsZWVwIDEwcyBhZnRlciBoYmdfbmV0X3N0b3ANClsgIDIxNS4zNTk4MTJdIFtTVFVCXVto
+YmdfbmV0X3N0b3AgODFdIEhCR19OSUNfU1RBVEVfT1BFTiBhbHJlYWR5IGNsZWFyDQpbICAy
+MjMuOTkxOTU5XSBoaWJtY2dlIDAwMDA6ODM6MDAuMTogcmVidWlsZCBzdWNjZXNzDQpbICAy
+MjMuOTk4NjU2XSAtLS0tLS0tLS0tLS1bIGN1dCBoZXJlIF0tLS0tLS0tLS0tLS0NClsgIDIy
+My45OTg5ODddIGhpYm1jZ2UgMDAwMDo4MzowMC4xOiByZXNldCBkb25lDQpbICAyMjQuMDAz
+OTUwXSBjYWxsZWQgZnJvbSBzdGF0ZSBIQUxURUQNClsgIDIyNC4wMDg4OThdIGhpYm1jZ2Ug
+MDAwMDo4MzowMC4xOiBGTFIgZG9uZQ0KWyAgMjI0LjAwODkyNl0gV0FSTklORzogQ1BVOiA3
+IFBJRDogNDM4MSBhdCBkcml2ZXJzL25ldC9waHkvcGh5LmM6MTMzMCBwaHlfc3RvcCsweDEx
+OC8weDE2MA0KWyAgMjI0LjAyMjQxMl0gTW9kdWxlcyBsaW5rZWQgaW46IGhpYm1jZ2UoT0Up
+IG5mdF9maWJfaW5ldCBuZnRfZmliX2lwdjQgbmZ0X2ZpYl9pcHY2IG5mdF9maWIgbmZ0X3Jl
+amVjdF9pbmV0IG5mX3JlamVjdF9pcHY0IG5mX3JlamVjdF9pcHY2IG5mdF9yZWplY3QgbmZ0
+X2N0IG5mdF9jaGFpbl9uYXQgbmZfdGFibGVzIGVidGFibGVfbmF0IGVidGFibGVfYnJvdXRl
+IGlwNnRhYmxlX25hdCBpcDZ0YWJsZV9tYW5nbGUgaXA2dGFibGVfcmF3IGlwNnRhYmxlX3Nl
+Y3VyaXR5IGlwdGFibGVfbmF0IG5mX25hdCBuZl9jb25udHJhY2sgbmZfZGVmcmFnX2lwdjYg
+bmZfZGVmcmFnX2lwdjQgbGliY3JjMzJjIGlwdGFibGVfbWFuZ2xlIGlwdGFibGVfcmF3IGlw
+dGFibGVfc2VjdXJpdHkgaXBfc2V0IG5mbmV0bGluayByZmtpbGwgZWJ0YWJsZV9maWx0ZXIg
+ZWJ0YWJsZXMgaXA2dGFibGVfZmlsdGVyIGlwNl90YWJsZXMgaXB0YWJsZV9maWx0ZXIgaXBf
+dGFibGVzIHN1bnJwYyBubHNfY3A0MzcgdmZhdCBmYXQgaXBtaV9zc2lmIGhuc19yb2NlX2h3
+X3YyIHNnIGliX3V2ZXJicyBpYl9jb3JlIGFjcGlfaXBtaSBoaXNpX3VuY29yZV9kZHJjX3Bt
+dSBoaXNpX3VuY29yZV9sM2NfcG11IGhpc2lfdW5jb3JlX2hoYV9wbXUgaXBtaV9zaSBoaXNp
+X3VuY29yZV9wbXUgaXBtaV9kZXZpbnRmIGlwbWlfbXNnaGFuZGxlciBzY2hfZnFfY29kZWwg
+ZnVzZSBleHQ0IG1iY2FjaGUgamJkMiBzZF9tb2QgcmVhbHRlayB0MTBfcGkgY3JjNjRfcm9j
+a3NvZnRfZ2VuZXJpYyBjcmM2NF9yb2Nrc29mdCBjcmM2NCBoY2xnZSBoaXNpX3Nhc192M19o
+dyBjcmN0MTBkaWZfY2UgaGlzaV9zYXNfbWFpbiB1YXMgZ2hhc2hfY2UgbGlic2FzIHNoYTJf
+Y2UgYWhjaSBsaWJhaGNpIHNjc2lfdHJhbnNwb3J0X3NhcyBzaGEyNTZfYXJtNjQgc2hhMV9j
+ZSBzYnNhX2d3ZHQgdXNiX3N0b3JhZ2UgaG5zMyBuZml0IGxpYmF0YSBobmFlMyBsaWJudmRp
+bW0gaTJjX2Rlc2lnbndhcmVfcGxhdGZvcm0gaTJjX2Rlc2lnbndhcmVfY29yZSBkbV9taXJy
+b3IgZG1fcmVnaW9uX2hhc2gNClsgIDIyNC4wMjI1MDRdICBkbV9sb2cgZG1fbW9kIGFlc19u
+ZW9uX2JzIGFlc19uZW9uX2JsayBhZXNfY2VfYmxrIGFlc19jZV9jaXBoZXINClsgIDIyNC4w
+MjI1MTRdIENQVTogNyBQSUQ6IDQzODEgQ29tbTogaWZjb25maWcgS2R1bXA6IGxvYWRlZCBU
+YWludGVkOiBHICAgICAgICAgICBPRSAgICAgIDYuNC4wKyAjMQ0KWyAgMjI0LjAyMjUxN10g
+SGFyZHdhcmUgbmFtZTogSHVhd2VpIFRhaVNoYW4gMjAwIChNb2RlbCAyMjgwKS9CQzgyQU1E
+RCwgQklPUyAxLjkzIDEwLzEzLzIwMjINClsgIDIyNC4wMjI1MTldIHBzdGF0ZTogNjA0MDAw
+MDkgKG5aQ3YgZGFpZiArUEFOIC1VQU8gLVRDTyAtRElUIC1TU0JTIEJUWVBFPS0tKQ0KWyAg
+MjI0LjAyMjUyMV0gcGMgOiBwaHlfc3RvcCsweDExOC8weDE2MA0KWyAgMjI0LjAyMjUyNF0g
+bHIgOiBwaHlfc3RvcCsweDExOC8weDE2MA0KWyAgMjI0LjAyMjUyN10gc3AgOiBmZmZmODAw
+MDMzNzViYTgwDQpbICAyMjQuMDIyNTI4XSB4Mjk6IGZmZmY4MDAwMzM3NWJhODAgeDI4OiBm
+ZmZmMjAyMDBhN2YxYTAwIHgyNzogMDAwMDAwMDAwMDAwMDAwMA0KWyAgMjI0LjAyMjUzM10g
+eDI2OiAwMDAwMDAwMDAwMDAwMDAxIHgyNTogMDAwMDAwMDAwMDAwMDAwMCB4MjQ6IGZmZmYy
+MDIwMGMxZDIyNjANClsgIDIyNC4wMjI1MzddIHgyMzogZmZmZjIwMjAwYzFkMjA3MCB4MjI6
+IGZmZmYyMDIwMGMxZDIwMDAgeDIxOiBmZmZmYjk3NDdlMjFlNTE0DQpbICAyMjQuMDIyNTQx
+XSB4MjA6IGZmZmYyMDIwMGMxZDI5ODAgeDE5OiBmZmZmMDAyMDkyZDFkODAwIHgxODogMDAw
+MDAwMDAwMDAwMDAyMA0KWyAgMjI0LjAyMjU0NF0geDE3OiAwMDAwMDAwMDAwMDAwMDAwIHgx
+NjogZmZmZmI5NzQ3ZTA2OGYzMCB4MTU6IGZmZmZmZmZmZmZmZmZmZmYNClsgIDIyNC4wMjI1
+NDhdIHgxNDogMDAwMDAwMDAwMDAwMDAwMCB4MTM6IDQ0NDU1NDRjNDE0ODIwNjUgeDEyOiA3
+NDYxNzQ3MzIwNmQ2ZjcyDQpbICAyMjQuMDIyNTUyXSB4MTE6IDAwMDAwMDAwZmZmZjdmZmYg
+eDEwOiAwMDAwMDAwMGZmZmY3ZmZmIHg5IDogZmZmZmI5NzQ3ZDk3ODUwMA0KWyAgMjI0LjAy
+MjU1Nl0geDggOiAwMDAwMDAwMDAwMGJmZmU4IHg3IDogYzAwMDAwMDBmZmZmN2ZmZiB4NiA6
+IDAwMDAwMDAwMDAwNWZmZjQNClsgIDIyNC4wMjI1NjBdIHg1IDogMDAwMDAwMDAwMDJiZmZh
+OCB4NCA6IDAwMDAwMDAwMDAwMDAwMDAgeDMgOiAwMDAwMDAwMDAwMDAwMDAwDQpbICAyMjQu
+MDIyNTY0XSB4MiA6IDAwMDAwMDAwMDAwMDAwMDAgeDEgOiAwMDAwMDAwMDAwMDAwMDAwIHgw
+IDogZmZmZjAwMjEwOTljNDgwMA0KWyAgMjI0LjAyMjU2OF0gQ2FsbCB0cmFjZToNClsgIDIy
+NC4wMjI1NzFdICBwaHlfc3RvcCsweDExOC8weDE2MA0KWyAgMjI0LjAyMjU3NF0gIGhiZ19w
+aHlfc3RvcCsweDIwLzB4MzggW2hpYm1jZ2VdDQpbICAyMjQuMDIyNTgzXSAgaGJnX25ldF9z
+dG9wKzB4NzQvMHhkMCBbaGlibWNnZV0NClsgIDIyNC4wMjI1OTBdICBfX2Rldl9jbG9zZV9t
+YW55KzB4YmMvMHgxNzANClsgIDIyNC4wMjI1OTVdICBfX2Rldl9jaGFuZ2VfZmxhZ3MrMHgx
+MjAvMHgzMDANClsgIDIyNC4wMjI2MDBdICBkZXZfY2hhbmdlX2ZsYWdzKzB4MmMvMHg4MA0K
+WyAgMjI0LjAyMjYwMl0gIGRldmluZXRfaW9jdGwrMHg2M2MvMHg3MDANClsgIDIyNC4wMjI2
+MDldICBpbmV0X2lvY3RsKzB4MWU0LzB4MjAwDQpbICAyMjQuMDIyNjExXSAgc29ja19kb19p
+b2N0bCsweDUwLzB4MTA4DQpbICAyMjQuMDIyNjE2XSAgc29ja19pb2N0bCsweDEyMC8weDM4
+OA0KWyAgMjI0LjAyMjYxOF0gIF9fYXJtNjRfc3lzX2lvY3RsKzB4YjAvMHgxMDANClsgIDIy
+NC4wMjI2MjNdICBpbnZva2Vfc3lzY2FsbCsweDUwLzB4MTI4DQpbICAyMjQuMDIyNjI3XSAg
+ZWwwX3N2Y19jb21tb24uY29uc3Rwcm9wLjArMHgxNTgvMHgxODgNClsgIDIyNC4wMjI2Mjld
+ICBkb19lbDBfc3ZjKzB4MzQvMHg1MA0KWyAgMjI0LjAyMjYzMV0gIGVsMF9zdmMrMHgyOC8w
+eGUwDQpbICAyMjQuMDIyNjM3XSAgZWwwdF82NF9zeW5jX2hhbmRsZXIrMHhiOC8weGMwDQpb
+ICAyMjQuMDIyNjQwXSAgZWwwdF82NF9zeW5jKzB4MTg4LzB4MTkwDQpbICAyMjQuMDIyNjQz
+XSAtLS1bIGVuZCB0cmFjZSAwMDAwMDAwMDAwMDAwMDAwIF0tLS0NCg0KDQpJZiBpdCBpcyBz
+dWl0YWJsZSB0byBjYWxsIGRldl9jbG9zZSgpIGRpcmVjdGx5IGluIGRyaXZlciwNCkkgdGhp
+bmsgSEJHX05JQ19TVEFURV9PUEVOIGNhbiBiZSByZW1vdmVkLg0KDQpUaGFua3MNCglKaWpp
+ZSBTaGFvDQogIA0KDQo=
 
