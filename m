@@ -1,163 +1,142 @@
-Return-Path: <netdev+bounces-126374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A458B970EB8
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:01:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA881970EB9
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63259282A7A
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:01:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61A68282C2B
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CEDF171658;
-	Mon,  9 Sep 2024 07:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4882F1AC43C;
+	Mon,  9 Sep 2024 07:01:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="PsNOA7fw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ex3aGBMo"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ABCC2AD00
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 07:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3B82AD00;
+	Mon,  9 Sep 2024 07:01:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725865259; cv=none; b=DQ9MWe3YypZ7AAKGJZlQuEJSf+At9VnNVRs60YI8vf3aJe4gPhd3Q3jRnxR069s0OIzXBTrQRHTcGWPo4hpQRPMX22YNRotP5cULia79itXdEM6xKxytQloDvVAzzStlekF7yvY6pbAsJrVVvkU/NbNsqUCZVZN8LeLVtWXmBBs=
+	t=1725865273; cv=none; b=Eq0SOiTTG/joDyWUtBTuJiO38BJPLvM8T+AOl4r1vNuCiKUIhp8evQc/LOdLymxD7fdLzEmp9Sljncd0O65gq/5ctMsBNqUSpEKySbK1OYw3OBHbmw4NC7uqvY9NWMyhkHv6wcMjok+c93I/lHCAD5jSPx0FzwR7xyaj2oz/ld8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725865259; c=relaxed/simple;
-	bh=+cy4o+n8mY5SDlzIrkgP2bQeW/huoG8GAbmo8l6HPkg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=dB+a4N0Pl5KoPDjCHstbQaHKTFQeyURaqFswAte8EZChUWoFWS0mt0P4ibKXSx/zisJbdPQn6YTR/W3bKFo5r2zud+ZbkETwkouqMD/PElFTZez86HM2grTv4xu5+MOoVK5dzYgRG3AqLu7dL9Cz3cXuegZJvn4Y5exI+qYmo5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=PsNOA7fw; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725865257; x=1757401257;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+cy4o+n8mY5SDlzIrkgP2bQeW/huoG8GAbmo8l6HPkg=;
-  b=PsNOA7fwZa9nb/86QXV42MsUYWtv05bDiNtAgF8Ss6BB57shwozqrPJV
-   ZTOHF/TgIQGp7pT+36Ga2rVSb9yk4NKpSmNPEPLzPrOTOrhEHNZaFzth4
-   1DvbpTQtZk7wGo4eBy26fw6AipRHwtwAVDl8L4+gsGYVGjAhszBWPDmWg
-   0pxH1DRBQgMJAIXTVawGSlUFvXg2wbMUqux//YRFVL1yaA1ZarAYPMEHC
-   4T5X7pDTUKUMqj+8mP6T95Tcv8eu2M7/jx2DZli4VPWboy4spS34i5Ojq
-   xmgzAOhU3Wn446wDgAbAGE50QRF6AG/MQXatfdo9csVDPY0SVRrYwX+Gl
-   Q==;
-X-CSE-ConnectionGUID: wOzT8WlIQpikLS4OGOWp9Q==
-X-CSE-MsgGUID: 2dQzHHbiQ8CAPdCGNKXhww==
-X-IronPort-AV: E=Sophos;i="6.10,213,1719903600"; 
-   d="scan'208";a="262466743"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Sep 2024 00:00:55 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 9 Sep 2024 00:00:14 -0700
-Received: from [10.159.245.205] (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Mon, 9 Sep 2024 00:00:05 -0700
-Message-ID: <43c561ff-f7a0-4313-aaac-62a2c3992eb6@microchip.com>
-Date: Mon, 9 Sep 2024 09:00:22 +0200
+	s=arc-20240116; t=1725865273; c=relaxed/simple;
+	bh=+byjLK2CSURk5W4gQECLaHmTCVObaZFNiP0EOfhgAQg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ELDxWXux5lTG6n2hJT90qx/n/z5OzMHR95dGiudtT7L4tB4AziXJroqxn/8V+ppnX5frWQNqtKGO7o6NOzcvudmLxXpSKlgTUxnMJ09NPjlpHUcZBbLhWfWOJpeoLXSYCqucAHsmnTr9xqkeVAEqvY76JJ4SQ4d/Yy72lMz40Jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ex3aGBMo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B3F5C4CEC5;
+	Mon,  9 Sep 2024 07:01:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725865272;
+	bh=+byjLK2CSURk5W4gQECLaHmTCVObaZFNiP0EOfhgAQg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ex3aGBMo/Vxn2kxTS6ZwSQ7XD+jvj1vhEqtCuJCVRUdxK2HJLFgmcdOBuOvjfTfyK
+	 IhprP1EiyA/YrFWQfgjcjsVFseB5HJy8RUXb7AW+nhBvNJtlm920Omxpgo0ZOQUdpT
+	 A57bQRYt5Brmovgm1acWntMlQ2a/l8n4rTJRrJ6nIfv+ASN9dTjFCYGl/rA5dpP3vE
+	 pEwi8fQxGQsEnFRu3QxD1jIa2DVN8JBRkfo7YaaH+P53mTXvBG4mPLNSHUiduSxGKW
+	 RHneIPULdHICQOYjoPa8oMirqA99Ue+G2PspKQEMpf1NzpfELx9UuuNCmy88eQAEvE
+	 cU1LGc157LopQ==
+Message-ID: <54c6dc12-8f2d-463a-b0bc-45e5d8bd9e3e@kernel.org>
+Date: Mon, 9 Sep 2024 09:01:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 05/16] net: macb: Remove setting of RX software
- timestamp
-To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek
-	<andy@greyhouse.net>, Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol
-	<mailhol.vincent@wanadoo.fr>, Shyam Sundar S K <Shyam-sundar.S-k@amd.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
-	<manishc@marvell.com>, Michael Chan <michael.chan@broadcom.com>, Pavan Chebbi
-	<pavan.chebbi@broadcom.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"Sunil Goutham" <sgoutham@marvell.com>, Potnuri Bharat Teja
-	<bharat@chelsio.com>, Christian Benvenuti <benve@cisco.com>, Satish Kharat
-	<satishkh@cisco.com>, Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, "Dimitris
- Michailidis" <dmichail@fungible.com>, Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>,
-	"Tony Nguyen" <anthony.l.nguyen@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>,
-	"Ido Schimmel" <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Bryan
- Whitehead" <bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>, Lars Povlsen
-	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>, Alexandre Belloni
-	<alexandre.belloni@bootlin.com>, Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>, Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	=?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, "Edward
- Cree" <ecree.xilinx@gmail.com>, Martin Habets <habetsm.xilinx@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
-	MD Danish Anwar <danishanwar@ti.com>, Linus Walleij <linusw@kernel.org>,
-	"Imre Kaloz" <kaloz@openwrt.org>, Richard Cochran <richardcochran@gmail.com>,
-	"Willem de Bruijn" <willemdebruijn.kernel@gmail.com>, Carolina Jubran
-	<cjubran@nvidia.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>
-References: <20240906144632.404651-1-gal@nvidia.com>
- <20240906144632.404651-6-gal@nvidia.com>
-Content-Language: en-US, fr-FR
-From: Nicolas Ferre <nicolas.ferre@microchip.com>
-Organization: microchip
-In-Reply-To: <20240906144632.404651-6-gal@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net v3] mptcp: pm: Fix uaf in __timer_delete_sync
+Content-Language: en-GB
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Edward Adam Davis <eadavis@qq.com>, davem@davemloft.net,
+ edumazet@google.com, geliang@kernel.org, linux-kernel@vger.kernel.org,
+ martineau@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ pabeni@redhat.com, syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com
+References: <e4a13002-f471-4951-9180-14f0f8b30bd2@kernel.org>
+ <tencent_F85DEC5DED99554FB28DEF258F8DB8120D07@qq.com>
+ <b2272b72-d207-4393-9245-31ad7628be09@kernel.org>
+ <20240906150232.31ba495c@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240906150232.31ba495c@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 06/09/2024 at 16:46, Gal Pressman wrote:
-> The responsibility for reporting of RX software timestamp has moved to
-> the core layer (see __ethtool_get_ts_info()), remove usage from the
-> device drivers.
-> 
-> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
+Hi Jakub,
 
-Looks good to me:
-Acked-by: Nicolas Ferre <nicolas.ferre@microchip.com>
+On 07/09/2024 00:02, Jakub Kicinski wrote:
+> On Fri, 6 Sep 2024 20:55:20 +0200 Matthieu Baerts wrote:
+>>> Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
+>>> Cc: stable@vger.kernel.org
+>>> Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
+>>> Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
+>>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>  
+>>
+>> According to the doc [1], a 'Co-dev' tag is supposed to be added before
+>> this SoB:
+>>
+>> Co-developed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>>
+>> But I'm sure that's fine without it.
+> 
+> To be clear, would you like us to pick this up directly for net?
 
-Thanks, best regards,
-   Nicolas
+Sorry, I forgot that: yes, can you pick this up directly please?
 
-> ---
->   drivers/net/ethernet/cadence/macb_main.c | 5 ++---
->   1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 95e8742dce1d..e41929c61a04 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -3410,8 +3410,6 @@ static int gem_get_ts_info(struct net_device *dev,
-> 
->          info->so_timestamping =
->                  SOF_TIMESTAMPING_TX_SOFTWARE |
-> -               SOF_TIMESTAMPING_RX_SOFTWARE |
-> -               SOF_TIMESTAMPING_SOFTWARE |
->                  SOF_TIMESTAMPING_TX_HARDWARE |
->                  SOF_TIMESTAMPING_RX_HARDWARE |
->                  SOF_TIMESTAMPING_RAW_HARDWARE;
-> @@ -3423,7 +3421,8 @@ static int gem_get_ts_info(struct net_device *dev,
->                  (1 << HWTSTAMP_FILTER_NONE) |
->                  (1 << HWTSTAMP_FILTER_ALL);
-> 
-> -       info->phc_index = bp->ptp_clock ? ptp_clock_index(bp->ptp_clock) : -1;
-> +       if (bp->ptp_clock)
-> +               info->phc_index = ptp_clock_index(bp->ptp_clock);
-> 
->          return 0;
->   }
-> --
-> 2.40.1
-> 
+I think that's best to do that for fixes that are ready.
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
