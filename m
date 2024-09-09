@@ -1,194 +1,137 @@
-Return-Path: <netdev+bounces-126366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 556F8970DB1
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:50:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 447C2970DDB
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:27:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF0F0B21A61
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 05:50:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E23B31F2276A
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 06:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2B81AD402;
-	Mon,  9 Sep 2024 05:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="NqYy5R7r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E03E176FDF;
+	Mon,  9 Sep 2024 06:27:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E241AC8A5;
-	Mon,  9 Sep 2024 05:44:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641FE178376
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 06:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725860695; cv=none; b=bCQYg58t6UMpFnc7Aoa+EqLCAP5z6uGREsHO4yKijxkO63NHndm8p+16Uy1S67fCLWXkB7+Uw5kcI+m8f0BekvqEHwB+yLQ7UWUkHM/Cv7WnUS4Yd/Nu9b+g2hZzIscXclyXcROXp8PN7WZ9mTUX9BSBONggXvvCZraeTDnmMJg=
+	t=1725863223; cv=none; b=d+ic+cYNPyREXS1+SZhxcx/epyPXZ7yK4PPl8+VA1QbGZnCTo7p7tsfuvRVkBbb/MeJgFug+yzdP5yS9SiNC+jGLy4bSNIqVihQrLc374v8BvRN+7vG3Itg8dzQqt3OgKNKpMyyg4WKQ/A4Ti8LzEQ8SA80XWpApCYQ+ypfT3vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725860695; c=relaxed/simple;
-	bh=O1ycc38W3VldvShja86StoBI1PGMFy9V2eFhQuTFQxs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=laDW05Rc8JpR3H7UxJqP+eZIObpuUydOl2s+plwIOguIXb6Sg6Kzlxtcyma/iVSIAipzTU2RhRPYE7RYtvdT6pRalw9uvGAqTGnX2J8hsWf+c9k0wVUcoJsxFHu2CVk17A6A2T9oryLq48QfilTO+KdJATK0eLf6j3cIBisllcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au; spf=pass smtp.mailfrom=gmail.com; dkim=pass (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b=NqYy5R7r; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a80eab3945eso361362466b.1;
-        Sun, 08 Sep 2024 22:44:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jms.id.au; s=google; t=1725860687; x=1726465487; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7pxAZ1eVjHpYIL+4uC4a6YpmXbPdojL06PzoA4vC2/M=;
-        b=NqYy5R7r1soyOjQ60cz7AvFUF1GyGtv8VWArxrgKZ3UYniL2pRiFrr0VPBpQokh6C+
-         WOPv26JgD1IzcevFanbcRQXQZlg3DZDOYkC/Ks+2pDxqwXNmnFmAvAGYdFPoBpMa/cdC
-         R3wu8Ao5eWRTA5c2pCLW+QmBFmTOx3gJxy5oU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725860687; x=1726465487;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7pxAZ1eVjHpYIL+4uC4a6YpmXbPdojL06PzoA4vC2/M=;
-        b=iJEgHTDm9jASnM1q245YGlr9SM1qimXf4fVaKOqI8yArH3gHTZVkFOlcGRorxP3NVp
-         41yaHrK7rGG2LBXSPsBysanVzaBDWH+ioYapmdtKLKu5B+jKz8hfN4K3BgMsXy5eGQXW
-         UW24iPRMStf0cItOGUClwYpvsU1cVA9G4p+wxfJbKrEmidfNyHeHlrTjFSnsiM3GOiE0
-         K+0JzWEeH1L4ECOPE3F6c6ckTPImUFkjvN4xD0wW6YgVs7VucfoimLDCPA0LwLxhPyET
-         LDd146DJ/5+lI7fcI93E1edG38wCEkA7y/Niy4vUVeYKn2sqQPs6kOctP/Ac5rmYjvuc
-         aKdg==
-X-Forwarded-Encrypted: i=1; AJvYcCUqLUBKsDglPA+sVOkQxKZ9TPsGoXo8kcfPFraH1aqshb32KTxvxYibm1ByYsfPA1U7zOe6Kgzd@vger.kernel.org, AJvYcCXhRwG9gDzAllc3jSNG5W8EBpVmHb2eGAzNhslt1YBoWG+ohEr6PlVF4Pl5JYrvyLs30Vdd3KNKQ0+w/M8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpnbJJRgqJzcwIfOm7sYSRzp+UGmLr8Sd8TKf6g3seUqJ3qbKA
-	SG8M6obiIP/DYNyIAJmE8qJwWQoUbwLt50i923dJRxo+5cUTXUOvB7rgkjps/0a2SKOaMzNFMTJ
-	sK9Yvs5+LO73ut/YWwyIgamC19Z8=
-X-Google-Smtp-Source: AGHT+IGGCW7PztODXPKl6CWmPcAl2mDjthVbQgyNHUBRxCLRm6aJ9UQu58RWOsQEHFJuuvHZqvDIG++0o+uNCSo5MVE=
-X-Received: by 2002:a17:907:7f25:b0:a8d:6648:813f with SMTP id
- a640c23a62f3a-a8d6648846amr9112166b.3.1725860686300; Sun, 08 Sep 2024
- 22:44:46 -0700 (PDT)
+	s=arc-20240116; t=1725863223; c=relaxed/simple;
+	bh=jOLl/YUfN9Kib9erf2YkpEcSGJdS+XScDgfrk4H3TZw=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=VTWTdYvsgqjwj3evruWKZDdFoX1nUxOydvve45zhYWZ2VRTMeLjZjFG9bPpLzYqPHS6wnWy2C0d09AjDDfVmujB8qmguyQzeoAwb84Xk87IiiaaP+2zgnBGcGfRSinP3zWDH63298O/ZoiXULxLjQVrR9trkYwqNxnuljkOQ33c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1snXrV-0002Fr-UP
+	for netdev@vger.kernel.org; Mon, 09 Sep 2024 08:26:57 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1snXrV-006aO9-Gy
+	for netdev@vger.kernel.org; Mon, 09 Sep 2024 08:26:57 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 44E2F336173
+	for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 06:21:57 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 395B333615A;
+	Mon, 09 Sep 2024 06:21:54 +0000 (UTC)
+Received: from [172.20.34.65] (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id fcd9152b;
+	Mon, 9 Sep 2024 06:21:53 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+Date: Mon, 09 Sep 2024 08:21:49 +0200
+Subject: [PATCH] can: rockchip_canfd: rkcanfd_timestamp_init(): fix 64 bit
+ division on 32 bit platforms
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822073006.817173-1-jacky_chou@aspeedtech.com>
-In-Reply-To: <20240822073006.817173-1-jacky_chou@aspeedtech.com>
-From: Joel Stanley <joel@jms.id.au>
-Date: Mon, 9 Sep 2024 15:14:33 +0930
-Message-ID: <CACPK8XddKEgT9QeDkx2Shftj582rV8sfWwJGPxuv-2HOG0GxcA@mail.gmail.com>
-Subject: Re: [PATCH] net: ftgmac100: Ensure tx descriptor updates are visible
-To: Jacky Chou <jacky_chou@aspeedtech.com>, Ryan Chen <ryan_chen@aspeedtech.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, u.kleine-koenig@pengutronix.de, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240909-can-rockchip_canfd-fix-64-bit-division-v1-1-2748d9422b00@pengutronix.de>
+X-B4-Tracking: v=1; b=H4sIAPyT3mYC/yXN0QqDMAyF4VeRXBvoRB31VYaIJukMQpVWRBDff
+ WFefnD4zwVZkkqGrrggyaFZ12h4lQXQPMavoLIZKlfVzjuPNEZMKy006zYYAmPQE9saJ92R9Ul
+ gE5q3D8wykQeLbUls9j/69Pf9A3YqY8R4AAAA
+To: kernel@pengutronix.de, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Heiko Stuebner <heiko@sntech.de>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org, 
+ linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>, 
+ Marc Kleine-Budde <mkl@pengutronix.de>
+X-Mailer: b4 0.15-dev-99b12
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1680; i=mkl@pengutronix.de;
+ h=from:subject:message-id; bh=jOLl/YUfN9Kib9erf2YkpEcSGJdS+XScDgfrk4H3TZw=;
+ b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBm3pP+A1YrjAv0lzrha1Nz9rc4vPQQl58ocRltf
+ dWB5/nQhB6JATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZt6T/gAKCRAoOKI+ei28
+ b9sKB/wKSh1HQddIfxdzPaV1MxLN0kLc2tvUQTxavUh6omqbZfw2yaAVlBUj2NVOPcI/hHqO47Z
+ XDdE8vzNyHfdKYtbQb7ln4iNMxoHMiGlnZGcilapFzBQOPlQnbkGhum9fMpdnPHLodtasuwc2s6
+ cf6RDW0xEQ+ZVpG5nSOZWK8/wbYYUrZubzk+rs9rW7BM0VCWe4VNwsCz9o/LLLrfiU8ohC6Z8pd
+ VsunCw84awq9wjDRWReZH0h5/1QoRgjvGPDPBEYASO26WSQ4hAWc+K1wgkm9PPZsHZ6xtYh3ykE
+ KHMnTOeUz94vn6b6YvtZaCaHho8PjQgTD40zKPZ9JP8O98JR
+X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
+ fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, 22 Aug 2024 at 17:00, Jacky Chou <jacky_chou@aspeedtech.com> wrote:
->
-> The driver must ensure TX descriptor updates are visible
-> before updating TX pointer and TX clear pointer.
->
-> This resolves TX hangs observed on AST2600 when running
-> iperf3.
+On some 32-bit platforms (at least on parisc), the compiler generates
+a call to __divdi3() from the u32 by 3 division in
+rkcanfd_timestamp_init(), which results in the following linker
+error:
 
-Thanks for re-submitting my patch and getting it merged. In the
-future, it would be best if you left the authorship, and preserved my
-commit message.
+| ERROR: modpost: "__divdi3" [drivers/net/can/rockchip/rockchip_canfd.ko] undefined!
 
- https://lore.kernel.org/all/20201020220639.130696-1-joel@jms.id.au/
+As this code doesn't run in the hot path, a 64 bit by 32 bit division
+is OK, even on 32 bit platforms. Use an explicit call to div_u64() to
+fix linking.
 
-Cheers,
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202409072304.lCQWyNLU-lkp@intel.com/
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+ drivers/net/can/rockchip/rockchip_canfd-timestamp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Joel
+diff --git a/drivers/net/can/rockchip/rockchip_canfd-timestamp.c b/drivers/net/can/rockchip/rockchip_canfd-timestamp.c
+index 81cccc5fd838..fb1a8f4e6217 100644
+--- a/drivers/net/can/rockchip/rockchip_canfd-timestamp.c
++++ b/drivers/net/can/rockchip/rockchip_canfd-timestamp.c
+@@ -71,7 +71,7 @@ void rkcanfd_timestamp_init(struct rkcanfd_priv *priv)
+ 
+ 	max_cycles = div_u64(ULLONG_MAX, cc->mult);
+ 	max_cycles = min(max_cycles, cc->mask);
+-	work_delay_ns = clocksource_cyc2ns(max_cycles, cc->mult, cc->shift) / 3;
++	work_delay_ns = div_u64(clocksource_cyc2ns(max_cycles, cc->mult, cc->shift), 3);
+ 	priv->work_delay_jiffies = nsecs_to_jiffies(work_delay_ns);
+ 	INIT_DELAYED_WORK(&priv->timestamp, rkcanfd_timestamp_work);
+ 
 
->
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
->  drivers/net/ethernet/faraday/ftgmac100.c | 26 ++++++++++++++++--------
->  1 file changed, 18 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-> index 93862b027be0..9c521d0af7ac 100644
-> --- a/drivers/net/ethernet/faraday/ftgmac100.c
-> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
-> @@ -582,7 +582,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
->         (*processed)++;
->         return true;
->
-> - drop:
-> +drop:
->         /* Clean rxdes0 (which resets own bit) */
->         rxdes->rxdes0 = cpu_to_le32(status & priv->rxdes0_edorr_mask);
->         priv->rx_pointer = ftgmac100_next_rx_pointer(priv, pointer);
-> @@ -666,6 +666,11 @@ static bool ftgmac100_tx_complete_packet(struct ftgmac100 *priv)
->         ftgmac100_free_tx_packet(priv, pointer, skb, txdes, ctl_stat);
->         txdes->txdes0 = cpu_to_le32(ctl_stat & priv->txdes0_edotr_mask);
->
-> +       /* Ensure the descriptor config is visible before setting the tx
-> +        * pointer.
-> +        */
-> +       smp_wmb();
-> +
->         priv->tx_clean_pointer = ftgmac100_next_tx_pointer(priv, pointer);
->
->         return true;
-> @@ -819,6 +824,11 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
->         dma_wmb();
->         first->txdes0 = cpu_to_le32(f_ctl_stat);
->
-> +       /* Ensure the descriptor config is visible before setting the tx
-> +        * pointer.
-> +        */
-> +       smp_wmb();
-> +
->         /* Update next TX pointer */
->         priv->tx_pointer = pointer;
->
-> @@ -839,7 +849,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
->
->         return NETDEV_TX_OK;
->
-> - dma_err:
-> +dma_err:
->         if (net_ratelimit())
->                 netdev_err(netdev, "map tx fragment failed\n");
->
-> @@ -861,7 +871,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
->          * last fragment, so we know ftgmac100_free_tx_packet()
->          * hasn't freed the skb yet.
->          */
-> - drop:
-> +drop:
->         /* Drop the packet */
->         dev_kfree_skb_any(skb);
->         netdev->stats.tx_dropped++;
-> @@ -1354,7 +1364,7 @@ static void ftgmac100_reset(struct ftgmac100 *priv)
->         ftgmac100_init_all(priv, true);
->
->         netdev_dbg(netdev, "Reset done !\n");
-> - bail:
-> +bail:
->         if (priv->mii_bus)
->                 mutex_unlock(&priv->mii_bus->mdio_lock);
->         if (netdev->phydev)
-> @@ -1554,15 +1564,15 @@ static int ftgmac100_open(struct net_device *netdev)
->
->         return 0;
->
-> - err_ncsi:
-> +err_ncsi:
->         napi_disable(&priv->napi);
->         netif_stop_queue(netdev);
-> - err_alloc:
-> +err_alloc:
->         ftgmac100_free_buffers(priv);
->         free_irq(netdev->irq, netdev);
-> - err_irq:
-> +err_irq:
->         netif_napi_del(&priv->napi);
-> - err_hw:
-> +err_hw:
->         iowrite32(0, priv->base + FTGMAC100_OFFSET_IER);
->         ftgmac100_free_rings(priv);
->         return err;
-> --
-> 2.25.1
->
->
+---
+base-commit: c259acab839e57eab0318f32da4ae803a8d59397
+change-id: 20240909-can-rockchip_canfd-fix-64-bit-division-5f579fddebc9
+
+Best regards,
+-- 
+Marc Kleine-Budde <mkl@pengutronix.de>
+
+
 
