@@ -1,153 +1,301 @@
-Return-Path: <netdev+bounces-126407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16B429711C1
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:24:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36BD99711DC
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:26:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33ED81C22725
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:24:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFF7E1C2265C
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0E61B3728;
-	Mon,  9 Sep 2024 08:20:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32AE1B141E;
+	Mon,  9 Sep 2024 08:25:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="D8u633kz"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="c98UNajL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019CF1B2EE0
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 08:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D231B150D;
+	Mon,  9 Sep 2024 08:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725870001; cv=none; b=KP5wcEFEFsHg9+0NW2HupDFzL24jyQczGh27OUeNe59o8WSkeqYNlvHwa5cqCePh29SzOGRB3sbAJruBXs5dylc5IU4avgUVFABjAPPoI55pU7ikYiE0biXquiIm/aEPhjx0JPShmMVPCSqrC7Wpf0VnMxxIsViqsDZfCVDo9Qk=
+	t=1725870343; cv=none; b=Gbn6VPiryeIWuwIxBqDBKA7ORAGrEi2LKNzTYI4NY10sBeqOVOZ0IgiW7caX0m2sa5lo7DuSW88isuPAg3wtdJI4EaxBkUFbMGuM5blCZhTfFBd2d1OmYfT7XVcwP8O388sx6KL5CM/V+PLOWHp/DljXzrdXWfHNxezKGdtAq5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725870001; c=relaxed/simple;
-	bh=nK4KanhWlRZSYU1GucfWC16J4+koH/HjKOEGZSUcp98=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=brc7k25B2XsQUS+UnTu0lfzpxeh+plGT0k8HMoqyK7eeVyNwN5OuuQyhgvEyRbdYCAEB89vw8LwX1BJPUBTIA9yd+XznIha0HFJBGj1n41jO1Th57Q3H9vy+SOerQHXKu5fdGihTrKra8sHj30Pnxreb1owEEwl1Hjp4L75zFdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=D8u633kz; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-5365d3f9d34so2303197e87.3
-        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 01:19:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1725869997; x=1726474797; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nK4KanhWlRZSYU1GucfWC16J4+koH/HjKOEGZSUcp98=;
-        b=D8u633kzu1BPSXPo/61PD85CTLAP1HGKAfe5cnFXGpm7JjGJhoDPsFewAJCrz/hmDF
-         iL2JOEixPzvULMTJMoOsWEFIT6hQuWOpZ/SjwrnJoWzoKbKWZIlyT4YD+DmyNMqv8VzT
-         lWjW3acONuQk/w7CY7kzxJBAPqKM5Qi/mEiBvlHv0+YFlnlQDwMO/WnVLfYJ4egvvekA
-         KF5+ev9r7DuwKesgIdJUe9hXKRrNap13GK4r+HfygVITh44JCH42CqAu7Dp3nzoghqhE
-         EeWBaDmae7julUJoXqvgigVWHJBMHVQUy6XhBFXzqyc9VODHOfAjYOJtbRu2U0MryjMU
-         MKWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725869997; x=1726474797;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nK4KanhWlRZSYU1GucfWC16J4+koH/HjKOEGZSUcp98=;
-        b=LGzAU/MrzOr3PIwFYNvv7RnCxc2i5jF/+H9o42Fzc5GXLFgZoMR5pNO7HbuFnrMixj
-         T1/WbtCXfwtduJ6a9LnmRM3b23nKVB0YjEZ71kfacq1wKrPVH+nmse+FXz8o6MEnZ84o
-         DRqPmZ0TSG75hzqfU1YNQREe/ksN7tPNyRGgGb8APESnx53CmsNrL16xa3PNErNF1Kx4
-         I/83S4f/j8yxDSZYytJphWLng0bnjWxhI40QxBH72URdDlGseKEF5g/vramWDAc2HPbS
-         UR9SEkPCaVhtKOQNvbO5KxkErzbWgcAZjSu+W2PzHMsKM/0YouYpvt65UCTO4OOqGSyo
-         S79Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXlSad/glGxd1ILuqMRFVajN5ju26/fo+iqFTZTTGbz6YnyzNdRebQByph5Vdy5gFFtHtm+Cso=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvLN7Uv3xk/Y8iVj6l6cQT2+kZNREvjTOscfjGaM2JSHQRHEbz
-	9dgg2zwN9+4Wc4EOFngRa4HPtBN/1vwq5RbuA6aULl3z9j9ZXWopA6uhr9OYTLkr59uplhQaJlP
-	KToV8Lh7CXKqyiSS7J8N8GNPt1HG/4RmIZcn6eA==
-X-Google-Smtp-Source: AGHT+IHxT+bODhO8JSo/tiDz8IhrsZj4aQ7sUddKJwKAAWcGwi3uMKWPvMrXkLnRaBJd7bYB8HRQme7uZiCnsN4k1KI=
-X-Received: by 2002:a05:6512:4023:b0:535:6b9e:bcdd with SMTP id
- 2adb3069b0e04-536587c73f8mr7930705e87.33.1725869996139; Mon, 09 Sep 2024
- 01:19:56 -0700 (PDT)
+	s=arc-20240116; t=1725870343; c=relaxed/simple;
+	bh=uJMK6XsGRdyRUKW9Qg7+dj6NCSzFzCEyazzZgg3gOhg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YkwQ+EhJwqOcvbe8TZCjx/nuMixYaqJdcPOOjIiW3g27ucYO97mWo6UC96lpPwF/0KXyKShefh070rYcWxeqvxXAvaQ4FrD4bvoH2kwWIf7su6NwF13FrZz3bxtR1OhOF1ku9ywmzIeEHXsgIGem8PZAu4fhFMFz7ubFPGATjN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=c98UNajL; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1725870342; x=1757406342;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uJMK6XsGRdyRUKW9Qg7+dj6NCSzFzCEyazzZgg3gOhg=;
+  b=c98UNajLQgmWYDwuXRbUcaDNjs3rKGCZSfKNpZMi5aLS2d5LsCFAm8hp
+   j9eGNxS+sEYKhiwLp6Mg6WKqEx/CmzS1GEqX2yWqiiMwmwNfp7bXbzbxy
+   nkO6/qxMzVLyLsC0PudFcOVSxOWROrIQFHJsAcx0uVOB5xs+PtCHe+W3M
+   B2GOBSBQvt0Y57ALTsGlhtbNvDvIqbXo/4qGaRrdt+2euDMzOG1Ng5Xd0
+   eTl1msRJxjyAj5MCauvnMgQAeM7hVDILbrJ2MMT1ZFRG+7/0eDfQu4K/G
+   Be3jfEAeIGAMoUInJxXq4OZJ6XM31tEZg1yRULkHwicfpXZ8Y6KV76pv8
+   Q==;
+X-CSE-ConnectionGUID: wo5I27+uRra+nyW5j3G73A==
+X-CSE-MsgGUID: gsVJhhRJRUiuBKwXv0RMOQ==
+X-IronPort-AV: E=Sophos;i="6.10,213,1719903600"; 
+   d="scan'208";a="262470554"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 09 Sep 2024 01:25:40 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 9 Sep 2024 01:25:27 -0700
+Received: from che-ll-i17164.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Mon, 9 Sep 2024 01:25:17 -0700
+From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
+	<anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <andrew@lunn.ch>, <corbet@lwn.net>,
+	<linux-doc@vger.kernel.org>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<devicetree@vger.kernel.org>, <horatiu.vultur@microchip.com>,
+	<ruanjinjie@huawei.com>, <steen.hegelund@microchip.com>,
+	<vladimir.oltean@nxp.com>
+CC: <parthiban.veerasooran@microchip.com>, <masahiroy@kernel.org>,
+	<alexanderduyck@fb.com>, <krzk+dt@kernel.org>, <robh@kernel.org>,
+	<rdunlap@infradead.org>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
+	<Pier.Beruto@onsemi.com>, <Selvamani.Rajagopal@onsemi.com>,
+	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
+	<linux@bigler.io>, <markku.vorne@kempower.com>, Parthiban Veerasooran
+	<Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v8 00/14] Add support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface
+Date: Mon, 9 Sep 2024 13:55:00 +0530
+Message-ID: <20240909082514.262942-1-Parthiban.Veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240814082301.8091-1-brgl@bgdev.pl> <87a5hcyite.fsf@kernel.org>
- <CAMRc=Mcr7E0dxG09_gYPxg57gYAS4j2+-3x9GCS3wOcM46O=NQ@mail.gmail.com>
- <87y146ayrm.fsf@kernel.org> <CAMRc=Mfes+=59WP8dcMsiUApqjsFrY9iVFEdKU6FbTKAFP1k_A@mail.gmail.com>
- <878qw6hs4s.fsf@kernel.org> <CAMRc=Mc_Qy6-Rgsw_uOweUXtoiZGMR0D22Ou9nXUJDDdPCZqLw@mail.gmail.com>
- <1e77b503-36ff-4a97-993b-f87d658c9970@quicinc.com>
-In-Reply-To: <1e77b503-36ff-4a97-993b-f87d658c9970@quicinc.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Mon, 9 Sep 2024 10:19:44 +0200
-Message-ID: <CAMRc=Mc9kzC6PLZM2-kmuC-FtzdM8P9e-YRVxWjg28tAc7BRgg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
- of the ath11k on WCN6855
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Fri, Sep 6, 2024 at 8:38=E2=80=AFPM Jeff Johnson <quic_jjohnson@quicinc.=
-com> wrote:
->
-> On 9/6/2024 12:44 AM, Bartosz Golaszewski wrote:
-> > For upstream - if you're using the WCN6855, you must specify the
-> > inputs for the WLAN module so it's only fair they be described as
-> > "required". For out-of-tree DTS I couldn't care less.
-> >
-> > You are not correct saying that "M.2 boards don't need these" because
-> > as a matter of fact: the WLAN module on your M.2 card takes these
-> > inputs from the PMU inside the WCN6855 package.
->
-> Let me start by saying that DT is one area where I'm a newbie, so I hope =
-I can
-> get some education.
->
-> I'd like to start with an observation: I've used both WCN6855 with ath11k=
- and
-> WCN7850 with ath12k on an x86 laptop without any device tree, so from tha=
-t
-> perspective none of the device tree stuff is "required" -- these modules =
-"just
-> work".
->
+This patch series contain the below updates,
+- Adds support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface in the
+  net/ethernet/oa_tc6.c.
+  Link to the spec:
+  -----------------
+  https://opensig.org/download/document/OPEN_Alliance_10BASET1x_MAC-PHY_Serial_Interface_V1.1.pdf
 
-Yes. This is what I refer to as "fully dynamic" M.2 cards, where the
-card typically has an on-board PMIC that handles the power-up of the
-device, respecting all timings etc. No custom pins are used. You don't
-need device-tree. DT bindings don't concern this case. Even it this
-was an ARM, DT-based platform, you wouldn't need the DT entry.
+- Adds driver support for Microchip LAN8650/1 Rev.B1 10BASE-T1S MACPHY
+  Ethernet driver in the net/ethernet/microchip/lan865x/lan865x.c.
+  Link to the product:
+  --------------------
+  https://www.microchip.com/en-us/product/lan8650
 
-> However I also realize that when these are installed on Qualcomm ARM plat=
-forms
-> that there are GPIO pins that control things like XO clock, WLAN enable &
-> Bluetooth enable, as well as voltage regulators, and the device is
-> non-functional without those configured, so the device tree items are req=
-uired
-> in that environment.
->
-> So just from that perspective saying something is "required" is confusing=
- when
-> there are platforms where it isn't required. And perhaps that is what is
-> confusing Kalle as well?
->
+Testing Details:
+----------------
+The driver performance was tested using iperf3 in the below two setups
+separately.
 
-The properties are required IF you have a DT representation. Because
-if you're modeling the physical package, this is what it looks like.
-The one on your "fully dynamic" M.2 card is the same - it also has the
-same internal inputs and outputs but you're not modeling the external
-package in the first place so you don't need to care about them. But
-if you do represent the chipset and not as a black box WCN6855 in its
-entirety but its WLAN, BT and PMU modules separately then it warrants
-making the true inputs of the WLAN module mandatory in the schema.
+Setup 1:
+--------
+Node 0 - Raspberry Pi 4 with LAN8650 MAC-PHY 
+Node 1 - Raspberry Pi 4 with EVB-LAN8670-USB USB Stick
 
-Please let me know if this is enough of an explanation.
+Setup 2:
+--------
+Node 0 - SAMA7G54-EK with LAN8650 MAC-PHY 
+Node 1 - Raspberry Pi 4 with EVB-LAN8670-USB USB Stick
 
-Bart
+Achieved maximum of 9.4 Mbps.
+
+Some systems like Raspberry Pi 4 need performance mode enabled to get the
+proper clock speed for SPI. Refer below link for more details.
+
+https://github.com/raspberrypi/linux/issues/3381#issuecomment-1144723750
+
+Changes:
+v2:
+- Removed RFC tag.
+- OA TC6 framework configured in the Kconfig and Makefile to compile as a
+  module.
+- Kerneldoc headers added for all the API methods exposed to MAC driver.
+- Odd parity calculation logic updated from the below link,
+  https://elixir.bootlin.com/linux/latest/source/lib/bch.c#L348
+- Control buffer memory allocation moved to the initial function.
+- struct oa_tc6 implemented as an obaque structure.
+- Removed kthread for handling mac-phy interrupt instead threaded irq is
+  used.
+- Removed interrupt implementation for soft reset handling instead of
+  that polling has been implemented.
+- Registers name in the defines changed according to the specification
+  document.
+- Registers defines are arranged in the order of offset and followed by
+  register fields.
+- oa_tc6_write_register() implemented for writing a single register and
+  oa_tc6_write_registers() implemented for writing multiple registers.
+- oa_tc6_read_register() implemented for reading a single register and
+  oa_tc6_read_registers() implemented for reading multiple registers.
+- Removed DRV_VERSION macro as git hash provided by ethtool.
+- Moved MDIO bus registration and PHY initialization to the OA TC6 lib.
+- Replaced lan865x_set/get_link_ksettings() functions with
+  phy_ethtool_ksettings_set/get() functions.
+- MAC-PHY's standard capability register values checked against the
+  user configured values.
+- Removed unnecessary parameters validity check in various places.
+- Removed MAC address configuration in the lan865x_net_open() function as
+  it is done in the lan865x_probe() function already.
+- Moved standard registers and proprietary vendor registers to the
+  respective files.
+- Added proper subject prefixes for the DT bindings.
+- Moved OA specific properties to a separate DT bindings and corrected the
+  types & mistakes in the DT bindings.
+- Inherited OA specific DT bindings to the LAN865x specific DT bindings.
+- Removed sparse warnings in all the places.
+- Used net_err_ratelimited() for printing the error messages.
+- oa_tc6_process_rx_chunks() function and the content of oa_tc6_handler()
+  function are split into small functions.
+- Used proper macros provided by network layer for calculating the
+  MAX_ETH_LEN.
+- Return value of netif_rx() function handled properly.
+- Removed unnecessary NULL initialization of skb in the
+  oa_tc6_rx_eth_ready() function removed.
+- Local variables declaration ordered in reverse xmas tree notation.
+
+v3:
+- Completely redesigned all the patches.
+- Control and data interface patches are divided into multiple small
+  patches.
+- Device driver APIs added in the oa-tc6-framework.rst file.
+- Code readability improved in all the patches.
+- Defined macros wherever is possible.
+- Changed RESETC to STATUS0_RESETC for improving the readability.
+- Removed OA specific DT bindings.
+- Used default configurations defined in the OA spec.
+- All variables are named properly as per OA spec for more redability.
+- Bigger functions are split into multiple smaller functions.
+- DT binding check is done.
+- Phy mask is removed in phy scanning.
+- Used NET_RX_DROP to compare the rx packet submission status.
+- Indentation in the Kconfig file corrected.
+- Removed CONFIG_OF and CONFIG_ACPI ifdefs.
+- Removed MODULE_ALIAS().
+
+v4:
+- Fixed indentation in oa-tc6-framework.rst file.
+- Replaced ENODEV error code with EPROTO in the
+  oa_tc6_check_ctrl_write_reply and oa_tc6_check_ctrl_read_reply()
+  functions.
+- Renamed oa_tc6_read_sw_reset_status() function as
+  oa_tc6_read_status0().
+- Changed software reset polling delay as 1ms and polling timeout as 1s.
+- Implemented clause 45 registers direct access.
+- Replaced ENODEV error code with ENOMEM in the
+  oa_tc6_mdiobus_register() function.
+- Changed transmit skbs queue size as 2.
+- Added skb_linearize() function to convert contiguous packet data.
+- Checked kthread_should_stop() in the oa_tc6_spi_thread_handler()
+  function before proceeding for the oa_tc6_try_spi_transfer().
+- Removed netdev_err() print in the oa_tc6_allocate_rx_skb() function.
+- Added spi-peripheral-props reference in the dt-bindings.
+- Changed the fallback order in the dt-bindings.
+- Replaced netif_start_queue() with netif_wake_queue().
+- Empty data transfer performed in the oa_tc6_init() function to clear
+  the reset complete interrupt.
+- ZARFE bit in the CONFIG0 register is set to 1 to avoid lan865x halt
+  based on the recommendation in the lan865x errata.
+
+v5:
+- Added base commit info in the cover letter.
+- Fixed all the warnings reported in the oa-tc6-framework.rst file.
+- Fixed kernel-doc reported warnings.
+- Fixed reverse christmas tree notation.
+- Printed error code in case STATUS0 register read is failed.
+- Removed C29 support in the PHY initialization.
+- Returned the same error code from the function instead of replacing
+  with another error code.
+- Used netdev_alloc_skb_ip_align() to allocate receive skb buffer.
+- Enabling zero align receive frame feature moved to OA TC6 framework
+  as a helper function for vendor specific drivers.
+- Replaced eth_hw_addr_set() with eth_commit_mac_addr_change() as it is
+  a better pair for eth_prepare_mac_addr_change().
+- Fixed device tree binding issues in the driver and documentation.
+- Fixed multicast addresses hash value calculation.
+
+v6:
+- Replaced "depends on" with "select" for selecting OA_TC6 library in the
+  lan865x Kconfig file.
+- Fixed multicast address configuration.
+
+v7:
+- Removed tx skb queue handling and introduced two skb pointers to point
+  waiting and ongoing tx skb's.
+- Removed netif_rx() return value check and rx drop statistics update as
+  it is already handled in the dev_core_stats_rx_dropped_inc(skb->dev)
+  function.
+- Removed lan865x_get_drvinfo() function as the core fills this basic
+  info automatically.
+
+v8:
+- Removed unused #address-cells and #size-cells parameters description
+  from microchip,lan8650.yaml file.
+
+Parthiban Veerasooran (14):
+  Documentation: networking: add OPEN Alliance 10BASE-T1x MAC-PHY serial
+    interface
+  net: ethernet: oa_tc6: implement register write operation
+  net: ethernet: oa_tc6: implement register read operation
+  net: ethernet: oa_tc6: implement software reset
+  net: ethernet: oa_tc6: implement error interrupts unmasking
+  net: ethernet: oa_tc6: implement internal PHY initialization
+  net: phy: microchip_t1s: add c45 direct access in LAN865x internal PHY
+  net: ethernet: oa_tc6: enable open alliance tc6 data communication
+  net: ethernet: oa_tc6: implement transmit path to transfer tx ethernet
+    frames
+  net: ethernet: oa_tc6: implement receive path to receive rx ethernet
+    frames
+  net: ethernet: oa_tc6: implement mac-phy interrupt
+  net: ethernet: oa_tc6: add helper function to enable zero align rx
+    frame
+  microchip: lan865x: add driver support for Microchip's LAN865X MAC-PHY
+  dt-bindings: net: add Microchip's LAN865X 10BASE-T1S MACPHY
+
+ .../bindings/net/microchip,lan8650.yaml       |   74 +
+ Documentation/networking/index.rst            |    1 +
+ Documentation/networking/oa-tc6-framework.rst |  497 ++++++
+ MAINTAINERS                                   |   15 +
+ drivers/net/ethernet/Kconfig                  |   11 +
+ drivers/net/ethernet/Makefile                 |    1 +
+ drivers/net/ethernet/microchip/Kconfig        |    1 +
+ drivers/net/ethernet/microchip/Makefile       |    1 +
+ .../net/ethernet/microchip/lan865x/Kconfig    |   19 +
+ .../net/ethernet/microchip/lan865x/Makefile   |    6 +
+ .../net/ethernet/microchip/lan865x/lan865x.c  |  429 ++++++
+ drivers/net/ethernet/oa_tc6.c                 | 1361 +++++++++++++++++
+ drivers/net/phy/microchip_t1s.c               |   30 +
+ include/linux/oa_tc6.h                        |   24 +
+ include/uapi/linux/mdio.h                     |    1 +
+ 15 files changed, 2471 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/microchip,lan8650.yaml
+ create mode 100644 Documentation/networking/oa-tc6-framework.rst
+ create mode 100644 drivers/net/ethernet/microchip/lan865x/Kconfig
+ create mode 100644 drivers/net/ethernet/microchip/lan865x/Makefile
+ create mode 100644 drivers/net/ethernet/microchip/lan865x/lan865x.c
+ create mode 100644 drivers/net/ethernet/oa_tc6.c
+ create mode 100644 include/linux/oa_tc6.h
+
+
+base-commit: c259acab839e57eab0318f32da4ae803a8d59397
+-- 
+2.34.1
+
 
