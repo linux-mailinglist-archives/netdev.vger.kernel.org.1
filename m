@@ -1,59 +1,61 @@
-Return-Path: <netdev+bounces-126715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70CD79724F7
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:11:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6F699724FA
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:11:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 218DA2857AE
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:11:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D8BA2857D0
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:11:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72D318C924;
-	Mon,  9 Sep 2024 22:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC8318C93F;
+	Mon,  9 Sep 2024 22:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gvyrVMYD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i5z7xY5N"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AEE18A920
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 22:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722D818C937
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 22:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725919859; cv=none; b=MdeN2Kkf6XTqy2OaLmQcrWhiU6QSOVVZC6WXCwcU48kD8bTMgKqYDxkNqb9uOJQIvbQEXfJSAWcp4dFHKIQDScxGpiGswHp4/mAAjQj9mzTixI86OJWZLFiENRgraTVESGjEsyyuK1/6kUq+EXmou8nfexArla88ie3whC2CEu8=
+	t=1725919862; cv=none; b=eFXHkgc2dkLPwlMVjUGv76H0yQQTNn7BS5VE2QqBJn2obOLD94GpWg8yqx8I65mInPDIgdv77PHBWTvohuoh2+HNrjtlEPLnCVsCFmYQi0yOp4h3C7e56g/JczhnbZBO5umB9tq9J+cNxi5UrI6OssfADKjccWGyXWaFYRekeDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725919859; c=relaxed/simple;
-	bh=8DFDmzqL/q/Tguc55ykTQW5i/tuAf7IOEQGlCOplS2M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hQt6rluGH5ClHnrONmeTXigHrMvDjev1c9w/+zY855nxOaAKNwo2CTLOemNgjsgLOkxHGb+tDMyFG+JoirOH+xRg4ZmlQVVmSjHTV9SIMame58dIUeS8nqlflgVlHLXlJyfY0VVhgjt7Nf6TM9LG3JjewVKBB0bDRnJ446Ax934=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gvyrVMYD; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1725919862; c=relaxed/simple;
+	bh=WdNnbBrm9Dy7+N0JiYFVD8WhloqSXB5CASczZ2bJzSk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=uwqjo3U7KQJZ/ETVCArvXI5RHztwl667+TmsYcJC3IBgNzthrBEigt0FegmRuwTYaqPE+F0OPn7x4pyoStXRwLaDJ7dTBcf/yxpnR7ojNTZVJFxMv9wDpC2yNP8A/gaaew79QDgxdKTP2kfcLCSCJF2USO2AMJYGlRBRrkiGm/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i5z7xY5N; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725919856;
+	s=mimecast20190719; t=1725919859;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=BYUhsCRGwNHmUM+ZHicQvxJThfJ0JHZMmaRxrruXrII=;
-	b=gvyrVMYDCFdjfAT+vo/IbdvoRQOTB9t/suWZdqOBh5YVmeqags0S2D5KGNmnKPYnGzXD1o
-	JIT/36kxXz5y4Qct0D30L60/4OQb39LYn2vz9K28ubFom3lkiWehu1DIH5X6mFQnxkHOhH
-	1E3GnvMoGCF4pxm2E2jPhBGfd6NdA8g=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mIVyrhi2s5gFSElzDt3y5GPyNoI5I8A1yOTTCzp6miQ=;
+	b=i5z7xY5NJwO8jgMSsrVQQhLRlDa+Qk45CpwuMZa8fHWuq5B/YlgEPnrPpL7DUN5qk1pAMa
+	7K1Ulhv1V6OJ6Dmv+OgW3nR6fHexK7xuSan+sX3UM9ifzzbx8YQtgZ7En4EwV4s7dgxpDf
+	SULQ1d6D0KuHRRJZVstKPkLyrfsY/28=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-627-4TnaWzUbPfCE_73FEoJ4yA-1; Mon,
- 09 Sep 2024 18:10:51 -0400
-X-MC-Unique: 4TnaWzUbPfCE_73FEoJ4yA-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-508-Nt1VVq1eOA-CWABcHCX62A-1; Mon,
+ 09 Sep 2024 18:10:56 -0400
+X-MC-Unique: Nt1VVq1eOA-CWABcHCX62A-1
 Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 92BEA1956089;
-	Mon,  9 Sep 2024 22:10:48 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 94BDE1956080;
+	Mon,  9 Sep 2024 22:10:53 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.45.224.56])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5344F195608A;
-	Mon,  9 Sep 2024 22:10:43 +0000 (UTC)
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CD29B1956086;
+	Mon,  9 Sep 2024 22:10:48 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Jakub Kicinski <kuba@kernel.org>,
@@ -69,9 +71,11 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	przemyslaw.kitszel@intel.com,
 	intel-wired-lan@lists.osuosl.org,
 	edumazet@google.com
-Subject: [PATCH v7 net-next 00/15] net: introduce TX H/W shaping API
-Date: Tue, 10 Sep 2024 00:09:54 +0200
-Message-ID: <cover.1725919039.git.pabeni@redhat.com>
+Subject: [PATCH v7 net-next 01/15] genetlink: extend info user-storage to match NL cb ctx
+Date: Tue, 10 Sep 2024 00:09:55 +0200
+Message-ID: <4bd304768d7ef1fdee5033b8fe1788092ac0af38.1725919039.git.pabeni@redhat.com>
+In-Reply-To: <cover.1725919039.git.pabeni@redhat.com>
+References: <cover.1725919039.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,299 +85,184 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-We have a plurality of shaping-related drivers API, but none flexible
-enough to meet existing demand from vendors[1].
+This allows a more uniform implementation of non-dump and dump
+operations, and will be used later in the series to avoid some
+per-operation allocation.
 
-This series introduces new device APIs to configure in a flexible way
-TX H/W shaping. The new functionalities are exposed via a newly
-defined generic netlink interface and include introspection
-capabilities. Some self-tests are included, on top of a dummy
-netdevsim implementation. Finally a basic implementation for the iavf
-driver is provided.
+Additionally rename the NL_ASSERT_DUMP_CTX_FITS macro, to
+fit a more extended usage.
 
-Some usage examples:
-
-* Configure shaping on a given queue:
-
-./tools/net/ynl/cli.py --spec Documentation/netlink/specs/shaper.yaml \
-	--do set --json '{"ifindex": '$IFINDEX',
-			  "shaper": {"handle":
-				     {"scope": "queue", "id":'$QUEUEID'},
-			  "bw-max": 2000000}}'
-
-* Container B/W sharing
-
-The orchestration infrastructure wants to group the 
-container-related queues under a RR scheduling and limit the aggregate
-bandwidth:
-
-./tools/net/ynl/cli.py --spec Documentation/netlink/specs/shaper.yaml \
-	--do group --json '{"ifindex": '$IFINDEX',
-			"leaves": [
-			  {"handle": {"scope": "queue", "id":'$QID1'},
-			   "weight": '$W1'}, 
-			  {"handle": {"scope": "queue", "id":'$QID2'},
-			   "weight": '$W2'}], 
-			  {"handle": {"scope": "queue", "id":'$QID3'},
-			   "weight": '$W3'}], 
-			"handle": {"scope":"node"},
-			"bw-max": 10000000}'
-{'ifindex': $IFINDEX, 'handle': {'scope': 'node', 'id': 0}}
-
-Q1 \
-    \
-Q2 -- node 0 -------  netdev
-    / (bw-max: 10M)
-Q3 / 
-
-* Delegation
-
-A containers wants to limit the aggregate B/W bandwidth of 2 of the 3
-queues it owns - the starting configuration is the one from the
-previous point:
-
-SPEC=Documentation/netlink/specs/net_shaper.yaml
-./tools/net/ynl/cli.py --spec $SPEC \
-	--do group --json '{"ifindex": '$IFINDEX',
-			"leaves": [ 
-			  {"handle": {"scope": "queue", "id":'$QID1'},
-			   "weight": '$W1'}, 
-			  {"handle": {"scope": "queue", "id":'$QID2'},
-			   "weight": '$W2'}], 
-			"handle": {"scope": "node"},
-			"bw-max": 5000000 }'
-{'ifindex': $IFINDEX, 'handle': {'scope': 'node', 'id': 1}}
-
-Q1 -- node 1 --------\
-    / (bw-max: 5M)    \
-Q2 /                   node 0 -------  netdev
-                      /(bw-max: 10M)
-Q3 ------------------/
-
-In a group operation, when prior to the op itself, the leaves have
-different parents, the user must specify the parent handle for the
-group. I.e., starting from the previous config:
-
-./tools/net/ynl/cli.py --spec $SPEC \
-	--do group --json '{"ifindex": '$IFINDEX',
-			"leaves": [ 
-			  {"handle": {"scope": "queue", "id":'$QID1'},
-			   "weight": '$W1'}, 
-			  {"handle": {"scope": "queue", "id":'$QID3'},
-			   "weight": '$W3'}], 
-			"handle": {"scope": "node"},
-			"bw-max": 3000000 }'
-Netlink error: Invalid argument
-nl_len = 96 (80) nl_flags = 0x300 nl_type = 2
-	error: -22
-	extack: {'msg': 'All the leaves shapers must have the same old parent'}
-
-./tools/net/ynl/cli.py --spec $SPEC \
-	--do group --json '{"ifindex": '$IFINDEX',
-			"leaves": [ 
-			  {"handle": {"scope": "queue", "id":'$QID1'},
-			   "weight": '$W1'}, 
-			  {"handle": {"scope": "queue", "id":'$QID3'},
-			   "weight": '$W3'}], 
-			"handle": {"scope": "node"},
-			"parent": {"scope": "node", "id": 1},
-			"bw-max": 3000000 }
-{'ifindex': $IFINDEX, 'handle': {'scope': 'node', 'id': 2}}
-
-Q1 -- node 2 ---
-    /(bw-max:3M)\
-Q3 /             \
-         ---- node 1 \
-        / (bw-max: 5M)\
-      Q2              node 0 -------  netdev
-                      (bw-max: 10M)
-
-* Cleanup:
-
-Still starting from config 1To delete a single queue shaper
-
-./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
-	'{"ifindex": '$IFINDEX',
-	  "handle": {"scope": "queue", "id":'$QID3'}}'
-
-Q1 -- node 2 ---
-     (bw-max:3M)\
-                 \
-         ---- node 1 \
-        / (bw-max: 5M)\
-      Q2              node 0 -------  netdev
-                      (bw-max: 10M)
-
-Deleting a node shaper relinks all its leaves to the node's parent:
-
-./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
-	'{"ifindex": '$IFINDEX',
-	  "handle": {"scope": "node", "id":2}}'
-
-Q1 ---\
-       \
-        node 1----- \
-       / (bw-max: 5M)\
-Q2----/              node 0 -------  netdev
-                     (bw-max: 10M)
-
-Deleting the last shaper under a node shaper deletes the node, too:
-
-./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
-	'{"ifindex": '$IFINDEX',
-	  "handle": {"scope": "queue", "id":'$QID1'}}'
-./tools/net/ynl/cli.py --spec $SPEC --do delete --json \
-	'{"ifindex": '$IFINDEX',
-	  "handle": {"scope": "queue", "id":'$QID2'}}'
-./tools/net/ynl/cli.py --spec $SPEC --do get --json \
-	'{"ifindex": '$IFINDEX',
-	  "handle": {"scope": "node", "id": 1}}'
-Netlink error: No such file or directory
-nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
-	error: -2
-	extack: {'bad-attr': '.handle'}
-
-Such delete recurses on parents that are left over with no leaves:
-
-./tools/net/ynl/cli.py --spec $SPEC --do get --json \
-	'{"ifindex": '$IFINDEX',
-	  "handle": {"scope": "node", "id": 0}}'
-Netlink error: No such file or directory
-nl_len = 44 (28) nl_flags = 0x300 nl_type = 2
-	error: -2
-	extack: {'bad-attr': '.handle'}
-
-[1] https://lore.kernel.org/netdev/20240405102313.GA310894@kernel.org/
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
-Changes from v6:
- - move node attributes in main NL scope for group() op
- - driver must acquire dev->lock around channels update
- - implemented queue id checking in the core
+ drivers/net/vxlan/vxlan_mdb.c        | 2 +-
+ include/linux/netlink.h              | 5 +++--
+ include/net/genetlink.h              | 8 ++++++--
+ net/core/netdev-genl.c               | 2 +-
+ net/core/rtnetlink.c                 | 2 +-
+ net/devlink/devl_internal.h          | 2 +-
+ net/ethtool/rss.c                    | 2 +-
+ net/netfilter/nf_conntrack_netlink.c | 2 +-
+ net/netlink/genetlink.c              | 4 ++--
+ 9 files changed, 17 insertions(+), 12 deletions(-)
 
-v6: https://lore.kernel.org/netdev/cover.1725457317.git.pabeni@redhat.com/
-
-Changes from v5:
- - handle/shaper unsplit
- - removed 'binding' from NL api
- - several helper renames
- - added rcu protection to shaper pointer
- - implemented value checking into the core
- - handle device channels reconf
- - consolidate NL ctx handling
- - dropped idr allocator, leverage the existing xarray
- - caps names shrinking
- - group() op is optional
- - cap callback can't fail
- - more self-tests
-
-v5: https://lore.kernel.org/netdev/cover.1724944116.git.pabeni@redhat.com/
-
-Changes from v4:
- - ops operate on struct binding
- - 'root' -> 'node' rename
- - most core function/helpers operate on 'binding'
- - use NL_SET_BAD_ATTR where possible
- - some code deduplication
-
-v4: https://lore.kernel.org/netdev/cover.1724165948.git.pabeni@redhat.com/
-
-Changes from v3:
- - rename
- - locking
- - delete operates on node, too
-
-v3: https://lore.kernel.org/netdev/cover.1722357745.git.pabeni@redhat.com/
-
-Changes from RFC v2:
- - added patch 1
- - fixed deprecated API usage
-
-RFC v2: https://lore.kernel.org/netdev/cover.1721851988.git.pabeni@redhat.com/
-
-Changes from RFC v1:
- - set() and delete() ops operate on a single shaper
- - added group() op to allow grouping and nesting
- - split the NL implementation into multiple patches to help reviewing
-
-RFC v1: https://lore.kernel.org/netdev/cover.1719518113.git.pabeni@redhat.com/
-
-Paolo Abeni (11):
-  genetlink: extend info user-storage to match NL cb ctx
-  netlink: spec: add shaper YAML spec
-  net-shapers: implement NL get operation
-  net-shapers: implement NL set and delete operations
-  net-shapers: implement NL group operation
-  net-shapers: implement delete support for NODE scope shaper
-  net-shapers: implement shaper cleanup on queue deletion
-  netlink: spec: add shaper introspection support
-  net: shaper: implement introspection support
-  net-shapers: implement cap validation in the core
-  testing: net-drv: add basic shaper test
-
-Sudheer Mogilappagari (2):
-  iavf: Add net_shaper_ops support
-  iavf: add support to exchange qos capabilities
-
-Wenjun Wu (2):
-  virtchnl: support queue rate limit and quanta size configuration
-  ice: Support VF queue rate limit and quanta size configuration
-
- Documentation/netlink/specs/net_shaper.yaml   |  364 +++++
- Documentation/networking/kapi.rst             |    3 +
- MAINTAINERS                                   |    1 +
- drivers/net/Kconfig                           |    1 +
- drivers/net/ethernet/intel/Kconfig            |    1 +
- drivers/net/ethernet/intel/iavf/iavf.h        |   13 +
- drivers/net/ethernet/intel/iavf/iavf_main.c   |  162 +-
- drivers/net/ethernet/intel/iavf/iavf_txrx.h   |    2 +
- .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  157 +-
- drivers/net/ethernet/intel/ice/ice.h          |    2 +
- drivers/net/ethernet/intel/ice/ice_base.c     |    2 +
- drivers/net/ethernet/intel/ice/ice_common.c   |   21 +
- .../net/ethernet/intel/ice/ice_hw_autogen.h   |    8 +
- drivers/net/ethernet/intel/ice/ice_txrx.h     |    1 +
- drivers/net/ethernet/intel/ice/ice_type.h     |    1 +
- drivers/net/ethernet/intel/ice/ice_vf_lib.h   |    8 +
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |  335 ++++
- drivers/net/ethernet/intel/ice/ice_virtchnl.h |   11 +
- .../intel/ice/ice_virtchnl_allowlist.c        |    6 +
- drivers/net/netdevsim/ethtool.c               |    2 +
- drivers/net/netdevsim/netdev.c                |   39 +
- drivers/net/vxlan/vxlan_mdb.c                 |    2 +-
- include/linux/avf/virtchnl.h                  |  119 ++
- include/linux/netdevice.h                     |   21 +
- include/linux/netlink.h                       |    5 +-
- include/net/genetlink.h                       |    8 +-
- include/net/net_shaper.h                      |  120 ++
- include/uapi/linux/net_shaper.h               |   95 ++
- net/Kconfig                                   |    3 +
- net/Makefile                                  |    1 +
- net/core/dev.c                                |    8 +
- net/core/dev.h                                |   10 +
- net/core/netdev-genl.c                        |    2 +-
- net/core/rtnetlink.c                          |    2 +-
- net/devlink/devl_internal.h                   |    2 +-
- net/ethtool/rss.c                             |    2 +-
- net/netfilter/nf_conntrack_netlink.c          |    2 +-
- net/netlink/genetlink.c                       |    4 +-
- net/shaper/Makefile                           |    8 +
- net/shaper/shaper.c                           | 1440 +++++++++++++++++
- net/shaper/shaper_nl_gen.c                    |  154 ++
- net/shaper/shaper_nl_gen.h                    |   44 +
- tools/testing/selftests/drivers/net/Makefile  |    1 +
- tools/testing/selftests/drivers/net/shaper.py |  457 ++++++
- .../testing/selftests/net/lib/py/__init__.py  |    1 +
- tools/testing/selftests/net/lib/py/ynl.py     |    5 +
- 46 files changed, 3642 insertions(+), 14 deletions(-)
- create mode 100644 Documentation/netlink/specs/net_shaper.yaml
- create mode 100644 include/net/net_shaper.h
- create mode 100644 include/uapi/linux/net_shaper.h
- create mode 100644 net/shaper/Makefile
- create mode 100644 net/shaper/shaper.c
- create mode 100644 net/shaper/shaper_nl_gen.c
- create mode 100644 net/shaper/shaper_nl_gen.h
- create mode 100755 tools/testing/selftests/drivers/net/shaper.py
-
+diff --git a/drivers/net/vxlan/vxlan_mdb.c b/drivers/net/vxlan/vxlan_mdb.c
+index 60eb95a06d55..ebed05a2804c 100644
+--- a/drivers/net/vxlan/vxlan_mdb.c
++++ b/drivers/net/vxlan/vxlan_mdb.c
+@@ -284,7 +284,7 @@ int vxlan_mdb_dump(struct net_device *dev, struct sk_buff *skb,
+ 
+ 	ASSERT_RTNL();
+ 
+-	NL_ASSERT_DUMP_CTX_FITS(struct vxlan_mdb_dump_ctx);
++	NL_ASSERT_CTX_FITS(struct vxlan_mdb_dump_ctx);
+ 
+ 	nlh = nlmsg_put(skb, NETLINK_CB(cb->skb).portid,
+ 			cb->nlh->nlmsg_seq, RTM_NEWMDB, sizeof(*bpm),
+diff --git a/include/linux/netlink.h b/include/linux/netlink.h
+index b332c2048c75..a3ca198a3a9e 100644
+--- a/include/linux/netlink.h
++++ b/include/linux/netlink.h
+@@ -34,6 +34,7 @@ struct netlink_skb_parms {
+ 
+ #define NETLINK_CB(skb)		(*(struct netlink_skb_parms*)&((skb)->cb))
+ #define NETLINK_CREDS(skb)	(&NETLINK_CB((skb)).creds)
++#define NETLINK_CTX_SIZE	48
+ 
+ 
+ void netlink_table_grab(void);
+@@ -293,7 +294,7 @@ struct netlink_callback {
+ 	int			flags;
+ 	bool			strict_check;
+ 	union {
+-		u8		ctx[48];
++		u8		ctx[NETLINK_CTX_SIZE];
+ 
+ 		/* args is deprecated. Cast a struct over ctx instead
+ 		 * for proper type safety.
+@@ -302,7 +303,7 @@ struct netlink_callback {
+ 	};
+ };
+ 
+-#define NL_ASSERT_DUMP_CTX_FITS(type_name)				\
++#define NL_ASSERT_CTX_FITS(type_name)					\
+ 	BUILD_BUG_ON(sizeof(type_name) >				\
+ 		     sizeof_field(struct netlink_callback, ctx))
+ 
+diff --git a/include/net/genetlink.h b/include/net/genetlink.h
+index 9ab49bfeae78..9d3726e8f90e 100644
+--- a/include/net/genetlink.h
++++ b/include/net/genetlink.h
+@@ -124,7 +124,8 @@ struct genl_family {
+  * @genlhdr: generic netlink message header
+  * @attrs: netlink attributes
+  * @_net: network namespace
+- * @user_ptr: user pointers
++ * @ctx: storage space for the use by the family
++ * @user_ptr: user pointers (deprecated, use ctx instead)
+  * @extack: extended ACK report struct
+  */
+ struct genl_info {
+@@ -135,7 +136,10 @@ struct genl_info {
+ 	struct genlmsghdr *	genlhdr;
+ 	struct nlattr **	attrs;
+ 	possible_net_t		_net;
+-	void *			user_ptr[2];
++	union {
++		u8		ctx[NETLINK_CTX_SIZE];
++		void *		user_ptr[2];
++	};
+ 	struct netlink_ext_ack *extack;
+ };
+ 
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index a17d7eaeb001..bb2b9f53ef6b 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -23,7 +23,7 @@ struct netdev_nl_dump_ctx {
+ 
+ static struct netdev_nl_dump_ctx *netdev_dump_ctx(struct netlink_callback *cb)
+ {
+-	NL_ASSERT_DUMP_CTX_FITS(struct netdev_nl_dump_ctx);
++	NL_ASSERT_CTX_FITS(struct netdev_nl_dump_ctx);
+ 
+ 	return (struct netdev_nl_dump_ctx *)cb->ctx;
+ }
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index f0a520987085..472d1a27cdf8 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -6169,7 +6169,7 @@ static int rtnl_mdb_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 	int idx, s_idx;
+ 	int err;
+ 
+-	NL_ASSERT_DUMP_CTX_FITS(struct rtnl_mdb_dump_ctx);
++	NL_ASSERT_CTX_FITS(struct rtnl_mdb_dump_ctx);
+ 
+ 	if (cb->strict_check) {
+ 		err = rtnl_mdb_valid_dump_req(cb->nlh, cb->extack);
+diff --git a/net/devlink/devl_internal.h b/net/devlink/devl_internal.h
+index c7a8e13f917c..a9f064ab9ed9 100644
+--- a/net/devlink/devl_internal.h
++++ b/net/devlink/devl_internal.h
+@@ -166,7 +166,7 @@ int devlink_nl_dumpit(struct sk_buff *msg, struct netlink_callback *cb,
+ static inline struct devlink_nl_dump_state *
+ devlink_dump_state(struct netlink_callback *cb)
+ {
+-	NL_ASSERT_DUMP_CTX_FITS(struct devlink_nl_dump_state);
++	NL_ASSERT_CTX_FITS(struct devlink_nl_dump_state);
+ 
+ 	return (struct devlink_nl_dump_state *)cb->ctx;
+ }
+diff --git a/net/ethtool/rss.c b/net/ethtool/rss.c
+index e07386275e14..7cb106b590ab 100644
+--- a/net/ethtool/rss.c
++++ b/net/ethtool/rss.c
+@@ -224,7 +224,7 @@ struct rss_nl_dump_ctx {
+ 
+ static struct rss_nl_dump_ctx *rss_dump_ctx(struct netlink_callback *cb)
+ {
+-	NL_ASSERT_DUMP_CTX_FITS(struct rss_nl_dump_ctx);
++	NL_ASSERT_CTX_FITS(struct rss_nl_dump_ctx);
+ 
+ 	return (struct rss_nl_dump_ctx *)cb->ctx;
+ }
+diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
+index 123e2e933e9b..8c54c5a2a86e 100644
+--- a/net/netfilter/nf_conntrack_netlink.c
++++ b/net/netfilter/nf_conntrack_netlink.c
+@@ -3873,7 +3873,7 @@ static int __init ctnetlink_init(void)
+ {
+ 	int ret;
+ 
+-	NL_ASSERT_DUMP_CTX_FITS(struct ctnetlink_list_dump_ctx);
++	NL_ASSERT_CTX_FITS(struct ctnetlink_list_dump_ctx);
+ 
+ 	ret = nfnetlink_subsys_register(&ctnl_subsys);
+ 	if (ret < 0) {
+diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
+index feb54c63a116..29387b605f3e 100644
+--- a/net/netlink/genetlink.c
++++ b/net/netlink/genetlink.c
+@@ -997,7 +997,7 @@ static int genl_start(struct netlink_callback *cb)
+ 	info->info.attrs	= attrs;
+ 	genl_info_net_set(&info->info, sock_net(cb->skb->sk));
+ 	info->info.extack	= cb->extack;
+-	memset(&info->info.user_ptr, 0, sizeof(info->info.user_ptr));
++	memset(&info->info.ctx, 0, sizeof(info->info.ctx));
+ 
+ 	cb->data = info;
+ 	if (ops->start) {
+@@ -1104,7 +1104,7 @@ static int genl_family_rcv_msg_doit(const struct genl_family *family,
+ 	info.attrs = attrbuf;
+ 	info.extack = extack;
+ 	genl_info_net_set(&info, net);
+-	memset(&info.user_ptr, 0, sizeof(info.user_ptr));
++	memset(&info.ctx, 0, sizeof(info.ctx));
+ 
+ 	if (ops->pre_doit) {
+ 		err = ops->pre_doit(ops, skb, &info);
 -- 
 2.45.2
 
