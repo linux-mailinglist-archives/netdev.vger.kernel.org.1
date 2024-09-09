@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-126703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D590F9723F9
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:53:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7EE09723FA
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:53:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9183128339D
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:53:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB9031C221BB
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:53:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A2418B471;
-	Mon,  9 Sep 2024 20:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA4318B493;
+	Mon,  9 Sep 2024 20:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i9E5kJCW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oBPlD5I9"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E255F189F57
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 20:53:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8463918A937
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 20:53:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725915215; cv=none; b=kVfHlNWCVfzghF9PXIGqQZt/N4sBSyWXsYFV0pKKO3v481ZO5mlO9o0L6wJnDFgMTChUB1zuMvPE1v3oaWMxbu2mKGXSNpFRYvgIpwLY84EbBYdVTZch2JaI9qnwxwawYC0TqzhOTLriBd6H9wVWLfE5hbnhB4vA/oLQKzcjjSc=
+	t=1725915216; cv=none; b=Qi/XpYTC3U93gWCe6QX8xI8ezZwfEJTM9q2RR/5wtjueg3vKEp8qf29c23yFC1c64YyD0Brm2Uizl1LSoi8XnFd8u6w/YHDNVBwD0wRlW7mUI1bAQBaiUM05pBHaVatHcWAu/qXAicftynC+HAl+1E38H7+D00Uoz5YyQJ9fius=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725915215; c=relaxed/simple;
-	bh=7G5UMneBZCBfG1g7iBsjuTedysX7M5X933P216C0y/A=;
+	s=arc-20240116; t=1725915216; c=relaxed/simple;
+	bh=7hMOOtJBG6Vu4d2WOT7p2LxFu6vN551hgrpiW37wzfI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Gl2KY4WeE4ei1ze2ag0uxZsQLqAi6QM+8D1yWIhi2q0wO4QehK5tSph6lpWOKO8gSbUQx5/jDbCO3h8ipI9K+s8ib6qwcKw410Y0Ituc+X5rcRc8+99icw0mPin0hJTW/AR1ni3gnVg3iRQ2wNZPoU8dokbgk2uQBPLho3biu7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i9E5kJCW; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=tn9qXpwr0+X6lSOteAzAXsPzkONupnaOD6+kOuRHQtTkKJgQvgblFsvEEOLVrA5yemfhWTiAzuvaftyY5tHLJg3HYjOhOyT3GUR03mjeDNKrzY0GUq2F177qNyS1G/fZrRudRmEdM3feoKHV7etjapa8bK0CnG2dVYLmxE9jVIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oBPlD5I9; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1725915214; x=1757451214;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7G5UMneBZCBfG1g7iBsjuTedysX7M5X933P216C0y/A=;
-  b=i9E5kJCWjKQ1f9/ZpW/DTZ3emzGFCiMFU6/oLWr5gAO33oU8e8brJJIb
-   8OmteuEfG0DvbGVw4LInDncYKT43hlr+tyWajrqzpYEkKXqIw8g6qpscz
-   W9PX592N6F4cNIis1uOoKn+eRtSGIoz8FmrN7A7JXq4xxchi3nlB15wWf
-   CyCd9jA23sW99fetmBTtEV0xphwGZCaEbuB0Svrp20DZ2lpCZVFGYT64v
-   DQP5YEz/gzmXgx039x6GxamzuoCVdb8B7DEDdxzI6/AOWEulMO/GgBeSy
-   U8gkBYKTtddhNDz95WGaZ3PWKnuxjbszOuVr2q3hhS9HLqagVJDJjnRDL
-   g==;
-X-CSE-ConnectionGUID: DcDF+sG/SQKkulxmDRcbOQ==
-X-CSE-MsgGUID: aLiywDBxTfab/ti4crPJhQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="42151242"
+  bh=7hMOOtJBG6Vu4d2WOT7p2LxFu6vN551hgrpiW37wzfI=;
+  b=oBPlD5I9NFKmMF3qDLqhNHybL85RYCl5JdyZImP/FsXE7wef+r2g08rj
+   dZTzddKgetPvff74Qk03fUJFtw8vy/nn5X+IeEoo/7hoy44i720D7sCPf
+   MhDisYLhzt9N+bA6OZW8AlI+n/EDYhTHJIpbPtbvgpZL8XHpOb+w47RYj
+   HiCRVuoIcqi0FrTSVaARBOiQIuqoQL5gZoAaPSAtOnblKzQUGYmPKrfK0
+   B2ZH2nZ/Yw0xeyOj7+x/CW51whL6O2klt+92FmiTWAWkYu/3dkuqkwt59
+   B9YohM7BdZKDzP+gOAQapZfU2XFpYb4jLyEy848dg6qxDU4PmEVHxBFwq
+   A==;
+X-CSE-ConnectionGUID: znqCiRXVRZO97msMyr1rgQ==
+X-CSE-MsgGUID: 7ddCCOx/RoySZTPSMWvkLw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="42151247"
 X-IronPort-AV: E=Sophos;i="6.10,215,1719903600"; 
-   d="scan'208";a="42151242"
+   d="scan'208";a="42151247"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
   by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2024 13:53:33 -0700
-X-CSE-ConnectionGUID: 6z+cVd8IRxOllRKPIK5h7A==
-X-CSE-MsgGUID: FkBj0vaEQruANvR4cY+tlQ==
+X-CSE-ConnectionGUID: Ufu4a9FzSLOn/CfDg02aUw==
+X-CSE-MsgGUID: FUQekXP7QRqUx9ibgfIlog==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,215,1719903600"; 
-   d="scan'208";a="71194491"
+   d="scan'208";a="71194495"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa005.fm.intel.com with ESMTP; 09 Sep 2024 13:53:32 -0700
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -71,9 +71,9 @@ Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
 	michal.kubiak@intel.com,
 	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
 	willemb@google.com
-Subject: [PATCH net-next v3 1/6] libeth: add Tx buffer completion helpers
-Date: Mon,  9 Sep 2024 13:53:16 -0700
-Message-ID: <20240909205323.3110312-2-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next v3 2/6] idpf: convert to libeth Tx buffer completion
+Date: Mon,  9 Sep 2024 13:53:17 -0700
+Message-ID: <20240909205323.3110312-3-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.46.0.522.gc50d79eeffbf
 In-Reply-To: <20240909205323.3110312-1-anthony.l.nguyen@intel.com>
 References: <20240909205323.3110312-1-anthony.l.nguyen@intel.com>
@@ -87,190 +87,703 @@ Content-Transfer-Encoding: 8bit
 
 From: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-Software-side Tx buffers for storing DMA, frame size, skb pointers etc.
-are pretty much generic and every driver defines them the same way. The
-same can be said for software Tx completions -- same napi_consume_skb()s
-and all that...
-Add a couple simple wrappers for doing that to stop repeating the old
-tale at least within the Intel code. Drivers are free to use 'priv'
-member at the end of the structure.
+&idpf_tx_buffer is almost identical to the previous generations, as well
+as the way it's handled. Moreover, relying on dma_unmap_addr() and
+!!buf->skb instead of explicit defining of buffer's type was never good.
+Use the newly added libeth helpers to do it properly and reduce the
+copy-paste around the Tx code.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- include/net/libeth/tx.h    | 129 +++++++++++++++++++++++++++++++++++++
- include/net/libeth/types.h |  25 +++++++
- 2 files changed, 154 insertions(+)
- create mode 100644 include/net/libeth/tx.h
- create mode 100644 include/net/libeth/types.h
+ .../ethernet/intel/idpf/idpf_singleq_txrx.c   |  82 +++----
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c   | 205 +++++++-----------
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |  50 +----
+ 3 files changed, 105 insertions(+), 232 deletions(-)
 
-diff --git a/include/net/libeth/tx.h b/include/net/libeth/tx.h
-new file mode 100644
-index 000000000000..35614f9523f6
---- /dev/null
-+++ b/include/net/libeth/tx.h
-@@ -0,0 +1,129 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright (C) 2024 Intel Corporation */
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+index fe64febf7436..98f26a4b835f 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_singleq_txrx.c
+@@ -2,6 +2,7 @@
+ /* Copyright (C) 2023 Intel Corporation */
+ 
+ #include <net/libeth/rx.h>
++#include <net/libeth/tx.h>
+ 
+ #include "idpf.h"
+ 
+@@ -224,6 +225,7 @@ static void idpf_tx_singleq_map(struct idpf_tx_queue *tx_q,
+ 		/* record length, and DMA address */
+ 		dma_unmap_len_set(tx_buf, len, size);
+ 		dma_unmap_addr_set(tx_buf, dma, dma);
++		tx_buf->type = LIBETH_SQE_FRAG;
+ 
+ 		/* align size to end of page */
+ 		max_data += -dma & (IDPF_TX_MAX_READ_REQ_SIZE - 1);
+@@ -245,6 +247,8 @@ static void idpf_tx_singleq_map(struct idpf_tx_queue *tx_q,
+ 				i = 0;
+ 			}
+ 
++			tx_q->tx_buf[i].type = LIBETH_SQE_EMPTY;
 +
-+#ifndef __LIBETH_TX_H
-+#define __LIBETH_TX_H
+ 			dma += max_data;
+ 			size -= max_data;
+ 
+@@ -282,13 +286,13 @@ static void idpf_tx_singleq_map(struct idpf_tx_queue *tx_q,
+ 	tx_desc->qw1 = idpf_tx_singleq_build_ctob(td_cmd, offsets,
+ 						  size, td_tag);
+ 
+-	IDPF_SINGLEQ_BUMP_RING_IDX(tx_q, i);
++	first->type = LIBETH_SQE_SKB;
++	first->rs_idx = i;
+ 
+-	/* set next_to_watch value indicating a packet is present */
+-	first->next_to_watch = tx_desc;
++	IDPF_SINGLEQ_BUMP_RING_IDX(tx_q, i);
+ 
+ 	nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
+-	netdev_tx_sent_queue(nq, first->bytecount);
++	netdev_tx_sent_queue(nq, first->bytes);
+ 
+ 	idpf_tx_buf_hw_update(tx_q, i, netdev_xmit_more());
+ }
+@@ -306,8 +310,7 @@ idpf_tx_singleq_get_ctx_desc(struct idpf_tx_queue *txq)
+ 	struct idpf_base_tx_ctx_desc *ctx_desc;
+ 	int ntu = txq->next_to_use;
+ 
+-	memset(&txq->tx_buf[ntu], 0, sizeof(struct idpf_tx_buf));
+-	txq->tx_buf[ntu].ctx_entry = true;
++	txq->tx_buf[ntu].type = LIBETH_SQE_CTX;
+ 
+ 	ctx_desc = &txq->base_ctx[ntu];
+ 
+@@ -396,11 +399,11 @@ netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
+ 	first->skb = skb;
+ 
+ 	if (tso) {
+-		first->gso_segs = offload.tso_segs;
+-		first->bytecount = skb->len + ((first->gso_segs - 1) * offload.tso_hdr_len);
++		first->packets = offload.tso_segs;
++		first->bytes = skb->len + ((first->packets - 1) * offload.tso_hdr_len);
+ 	} else {
+-		first->bytecount = max_t(unsigned int, skb->len, ETH_ZLEN);
+-		first->gso_segs = 1;
++		first->bytes = max_t(unsigned int, skb->len, ETH_ZLEN);
++		first->packets = 1;
+ 	}
+ 	idpf_tx_singleq_map(tx_q, first, &offload);
+ 
+@@ -420,10 +423,15 @@ netdev_tx_t idpf_tx_singleq_frame(struct sk_buff *skb,
+ static bool idpf_tx_singleq_clean(struct idpf_tx_queue *tx_q, int napi_budget,
+ 				  int *cleaned)
+ {
+-	unsigned int total_bytes = 0, total_pkts = 0;
++	struct libeth_sq_napi_stats ss = { };
+ 	struct idpf_base_tx_desc *tx_desc;
+ 	u32 budget = tx_q->clean_budget;
+ 	s16 ntc = tx_q->next_to_clean;
++	struct libeth_cq_pp cp = {
++		.dev	= tx_q->dev,
++		.ss	= &ss,
++		.napi	= napi_budget,
++	};
+ 	struct idpf_netdev_priv *np;
+ 	struct idpf_tx_buf *tx_buf;
+ 	struct netdev_queue *nq;
+@@ -441,47 +449,23 @@ static bool idpf_tx_singleq_clean(struct idpf_tx_queue *tx_q, int napi_budget,
+ 		 * such. We can skip this descriptor since there is no buffer
+ 		 * to clean.
+ 		 */
+-		if (tx_buf->ctx_entry) {
+-			/* Clear this flag here to avoid stale flag values when
+-			 * this buffer is used for actual data in the future.
+-			 * There are cases where the tx_buf struct / the flags
+-			 * field will not be cleared before being reused.
+-			 */
+-			tx_buf->ctx_entry = false;
++		if (unlikely(tx_buf->type <= LIBETH_SQE_CTX)) {
++			tx_buf->type = LIBETH_SQE_EMPTY;
+ 			goto fetch_next_txq_desc;
+ 		}
+ 
+-		/* if next_to_watch is not set then no work pending */
+-		eop_desc = (struct idpf_base_tx_desc *)tx_buf->next_to_watch;
+-		if (!eop_desc)
+-			break;
+-
+-		/* prevent any other reads prior to eop_desc */
++		/* prevent any other reads prior to type */
+ 		smp_rmb();
+ 
++		eop_desc = &tx_q->base_tx[tx_buf->rs_idx];
 +
-+#include <linux/skbuff.h>
-+
-+#include <net/libeth/types.h>
-+
-+/* Tx buffer completion */
-+
-+/**
-+ * enum libeth_sqe_type - type of &libeth_sqe to act on Tx completion
-+ * @LIBETH_SQE_EMPTY: unused/empty, no action required
-+ * @LIBETH_SQE_CTX: context descriptor with empty SQE, no action required
-+ * @LIBETH_SQE_SLAB: kmalloc-allocated buffer, unmap and kfree()
-+ * @LIBETH_SQE_FRAG: mapped skb frag, only unmap DMA
-+ * @LIBETH_SQE_SKB: &sk_buff, unmap and napi_consume_skb(), update stats
-+ */
-+enum libeth_sqe_type {
-+	LIBETH_SQE_EMPTY		= 0U,
-+	LIBETH_SQE_CTX,
-+	LIBETH_SQE_SLAB,
-+	LIBETH_SQE_FRAG,
-+	LIBETH_SQE_SKB,
+ 		/* if the descriptor isn't done, no work yet to do */
+ 		if (!(eop_desc->qw1 &
+ 		      cpu_to_le64(IDPF_TX_DESC_DTYPE_DESC_DONE)))
+ 			break;
+ 
+-		/* clear next_to_watch to prevent false hangs */
+-		tx_buf->next_to_watch = NULL;
+-
+ 		/* update the statistics for this packet */
+-		total_bytes += tx_buf->bytecount;
+-		total_pkts += tx_buf->gso_segs;
+-
+-		napi_consume_skb(tx_buf->skb, napi_budget);
+-
+-		/* unmap skb header data */
+-		dma_unmap_single(tx_q->dev,
+-				 dma_unmap_addr(tx_buf, dma),
+-				 dma_unmap_len(tx_buf, len),
+-				 DMA_TO_DEVICE);
+-
+-		/* clear tx_buf data */
+-		tx_buf->skb = NULL;
+-		dma_unmap_len_set(tx_buf, len, 0);
++		libeth_tx_complete(tx_buf, &cp);
+ 
+ 		/* unmap remaining buffers */
+ 		while (tx_desc != eop_desc) {
+@@ -495,13 +479,7 @@ static bool idpf_tx_singleq_clean(struct idpf_tx_queue *tx_q, int napi_budget,
+ 			}
+ 
+ 			/* unmap any remaining paged data */
+-			if (dma_unmap_len(tx_buf, len)) {
+-				dma_unmap_page(tx_q->dev,
+-					       dma_unmap_addr(tx_buf, dma),
+-					       dma_unmap_len(tx_buf, len),
+-					       DMA_TO_DEVICE);
+-				dma_unmap_len_set(tx_buf, len, 0);
+-			}
++			libeth_tx_complete(tx_buf, &cp);
+ 		}
+ 
+ 		/* update budget only if we did something */
+@@ -521,11 +499,11 @@ static bool idpf_tx_singleq_clean(struct idpf_tx_queue *tx_q, int napi_budget,
+ 	ntc += tx_q->desc_count;
+ 	tx_q->next_to_clean = ntc;
+ 
+-	*cleaned += total_pkts;
++	*cleaned += ss.packets;
+ 
+ 	u64_stats_update_begin(&tx_q->stats_sync);
+-	u64_stats_add(&tx_q->q_stats.packets, total_pkts);
+-	u64_stats_add(&tx_q->q_stats.bytes, total_bytes);
++	u64_stats_add(&tx_q->q_stats.packets, ss.packets);
++	u64_stats_add(&tx_q->q_stats.bytes, ss.bytes);
+ 	u64_stats_update_end(&tx_q->stats_sync);
+ 
+ 	np = netdev_priv(tx_q->netdev);
+@@ -533,7 +511,7 @@ static bool idpf_tx_singleq_clean(struct idpf_tx_queue *tx_q, int napi_budget,
+ 
+ 	dont_wake = np->state != __IDPF_VPORT_UP ||
+ 		    !netif_carrier_ok(tx_q->netdev);
+-	__netif_txq_completed_wake(nq, total_pkts, total_bytes,
++	__netif_txq_completed_wake(nq, ss.packets, ss.bytes,
+ 				   IDPF_DESC_UNUSED(tx_q), IDPF_TX_WAKE_THRESH,
+ 				   dont_wake);
+ 
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 585c3dadd9bf..76479c4f3fec 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -2,10 +2,19 @@
+ /* Copyright (C) 2023 Intel Corporation */
+ 
+ #include <net/libeth/rx.h>
++#include <net/libeth/tx.h>
+ 
+ #include "idpf.h"
+ #include "idpf_virtchnl.h"
+ 
++struct idpf_tx_stash {
++	struct hlist_node hlist;
++	struct libeth_sqe buf;
 +};
 +
-+/**
-+ * struct libeth_sqe - represents a Send Queue Element / Tx buffer
-+ * @type: type of the buffer, see the enum above
-+ * @rs_idx: index of the last buffer from the batch this one was sent in
-+ * @raw: slab buffer to free via kfree()
-+ * @skb: &sk_buff to consume
-+ * @dma: DMA address to unmap
-+ * @len: length of the mapped region to unmap
-+ * @nr_frags: number of frags in the frame this buffer belongs to
-+ * @packets: number of physical packets sent for this frame
-+ * @bytes: number of physical bytes sent for this frame
-+ * @priv: driver-private scratchpad
-+ */
-+struct libeth_sqe {
-+	enum libeth_sqe_type		type:32;
-+	u32				rs_idx;
++#define idpf_tx_buf_compl_tag(buf)	(*(int *)&(buf)->priv)
++LIBETH_SQE_CHECK_PRIV(int);
 +
-+	union {
-+		void				*raw;
-+		struct sk_buff			*skb;
+ static bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
+ 			       unsigned int count);
+ 
+@@ -60,41 +69,18 @@ void idpf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+ 	}
+ }
+ 
+-/**
+- * idpf_tx_buf_rel - Release a Tx buffer
+- * @tx_q: the queue that owns the buffer
+- * @tx_buf: the buffer to free
+- */
+-static void idpf_tx_buf_rel(struct idpf_tx_queue *tx_q,
+-			    struct idpf_tx_buf *tx_buf)
+-{
+-	if (tx_buf->skb) {
+-		if (dma_unmap_len(tx_buf, len))
+-			dma_unmap_single(tx_q->dev,
+-					 dma_unmap_addr(tx_buf, dma),
+-					 dma_unmap_len(tx_buf, len),
+-					 DMA_TO_DEVICE);
+-		dev_kfree_skb_any(tx_buf->skb);
+-	} else if (dma_unmap_len(tx_buf, len)) {
+-		dma_unmap_page(tx_q->dev,
+-			       dma_unmap_addr(tx_buf, dma),
+-			       dma_unmap_len(tx_buf, len),
+-			       DMA_TO_DEVICE);
+-	}
+-
+-	tx_buf->next_to_watch = NULL;
+-	tx_buf->skb = NULL;
+-	tx_buf->compl_tag = IDPF_SPLITQ_TX_INVAL_COMPL_TAG;
+-	dma_unmap_len_set(tx_buf, len, 0);
+-}
+-
+ /**
+  * idpf_tx_buf_rel_all - Free any empty Tx buffers
+  * @txq: queue to be cleaned
+  */
+ static void idpf_tx_buf_rel_all(struct idpf_tx_queue *txq)
+ {
++	struct libeth_sq_napi_stats ss = { };
+ 	struct idpf_buf_lifo *buf_stack;
++	struct libeth_cq_pp cp = {
++		.dev	= txq->dev,
++		.ss	= &ss,
++	};
+ 	u16 i;
+ 
+ 	/* Buffers already cleared, nothing to do */
+@@ -103,7 +89,7 @@ static void idpf_tx_buf_rel_all(struct idpf_tx_queue *txq)
+ 
+ 	/* Free all the Tx buffer sk_buffs */
+ 	for (i = 0; i < txq->desc_count; i++)
+-		idpf_tx_buf_rel(txq, &txq->tx_buf[i]);
++		libeth_tx_complete(&txq->tx_buf[i], &cp);
+ 
+ 	kfree(txq->tx_buf);
+ 	txq->tx_buf = NULL;
+@@ -203,10 +189,6 @@ static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
+ 	if (!tx_q->tx_buf)
+ 		return -ENOMEM;
+ 
+-	/* Initialize tx_bufs with invalid completion tags */
+-	for (i = 0; i < tx_q->desc_count; i++)
+-		tx_q->tx_buf[i].compl_tag = IDPF_SPLITQ_TX_INVAL_COMPL_TAG;
+-
+ 	if (!idpf_queue_has(FLOW_SCH_EN, tx_q))
+ 		return 0;
+ 
+@@ -1655,37 +1637,6 @@ static void idpf_tx_handle_sw_marker(struct idpf_tx_queue *tx_q)
+ 	wake_up(&vport->sw_marker_wq);
+ }
+ 
+-/**
+- * idpf_tx_splitq_clean_hdr - Clean TX buffer resources for header portion of
+- * packet
+- * @tx_q: tx queue to clean buffer from
+- * @tx_buf: buffer to be cleaned
+- * @cleaned: pointer to stats struct to track cleaned packets/bytes
+- * @napi_budget: Used to determine if we are in netpoll
+- */
+-static void idpf_tx_splitq_clean_hdr(struct idpf_tx_queue *tx_q,
+-				     struct idpf_tx_buf *tx_buf,
+-				     struct idpf_cleaned_stats *cleaned,
+-				     int napi_budget)
+-{
+-	napi_consume_skb(tx_buf->skb, napi_budget);
+-
+-	if (dma_unmap_len(tx_buf, len)) {
+-		dma_unmap_single(tx_q->dev,
+-				 dma_unmap_addr(tx_buf, dma),
+-				 dma_unmap_len(tx_buf, len),
+-				 DMA_TO_DEVICE);
+-
+-		dma_unmap_len_set(tx_buf, len, 0);
+-	}
+-
+-	/* clear tx_buf data */
+-	tx_buf->skb = NULL;
+-
+-	cleaned->bytes += tx_buf->bytecount;
+-	cleaned->packets += tx_buf->gso_segs;
+-}
+-
+ /**
+  * idpf_tx_clean_stashed_bufs - clean bufs that were stored for
+  * out of order completions
+@@ -1696,28 +1647,25 @@ static void idpf_tx_splitq_clean_hdr(struct idpf_tx_queue *tx_q,
+  */
+ static void idpf_tx_clean_stashed_bufs(struct idpf_tx_queue *txq,
+ 				       u16 compl_tag,
+-				       struct idpf_cleaned_stats *cleaned,
++				       struct libeth_sq_napi_stats *cleaned,
+ 				       int budget)
+ {
+ 	struct idpf_tx_stash *stash;
+ 	struct hlist_node *tmp_buf;
++	struct libeth_cq_pp cp = {
++		.dev	= txq->dev,
++		.ss	= cleaned,
++		.napi	= budget,
++	};
+ 
+ 	/* Buffer completion */
+ 	hash_for_each_possible_safe(txq->stash->sched_buf_hash, stash, tmp_buf,
+ 				    hlist, compl_tag) {
+-		if (unlikely(stash->buf.compl_tag != (int)compl_tag))
++		if (unlikely(idpf_tx_buf_compl_tag(&stash->buf) !=
++			     (int)compl_tag))
+ 			continue;
+ 
+-		if (stash->buf.skb) {
+-			idpf_tx_splitq_clean_hdr(txq, &stash->buf, cleaned,
+-						 budget);
+-		} else if (dma_unmap_len(&stash->buf, len)) {
+-			dma_unmap_page(txq->dev,
+-				       dma_unmap_addr(&stash->buf, dma),
+-				       dma_unmap_len(&stash->buf, len),
+-				       DMA_TO_DEVICE);
+-			dma_unmap_len_set(&stash->buf, len, 0);
+-		}
++		libeth_tx_complete(&stash->buf, &cp);
+ 
+ 		/* Push shadow buf back onto stack */
+ 		idpf_buf_lifo_push(&txq->stash->buf_stack, stash);
+@@ -1737,8 +1685,7 @@ static int idpf_stash_flow_sch_buffers(struct idpf_tx_queue *txq,
+ {
+ 	struct idpf_tx_stash *stash;
+ 
+-	if (unlikely(!dma_unmap_addr(tx_buf, dma) &&
+-		     !dma_unmap_len(tx_buf, len)))
++	if (unlikely(tx_buf->type <= LIBETH_SQE_CTX))
+ 		return 0;
+ 
+ 	stash = idpf_buf_lifo_pop(&txq->stash->buf_stack);
+@@ -1751,20 +1698,18 @@ static int idpf_stash_flow_sch_buffers(struct idpf_tx_queue *txq,
+ 
+ 	/* Store buffer params in shadow buffer */
+ 	stash->buf.skb = tx_buf->skb;
+-	stash->buf.bytecount = tx_buf->bytecount;
+-	stash->buf.gso_segs = tx_buf->gso_segs;
++	stash->buf.bytes = tx_buf->bytes;
++	stash->buf.packets = tx_buf->packets;
++	stash->buf.type = tx_buf->type;
+ 	dma_unmap_addr_set(&stash->buf, dma, dma_unmap_addr(tx_buf, dma));
+ 	dma_unmap_len_set(&stash->buf, len, dma_unmap_len(tx_buf, len));
+-	stash->buf.compl_tag = tx_buf->compl_tag;
++	idpf_tx_buf_compl_tag(&stash->buf) = idpf_tx_buf_compl_tag(tx_buf);
+ 
+ 	/* Add buffer to buf_hash table to be freed later */
+ 	hash_add(txq->stash->sched_buf_hash, &stash->hlist,
+-		 stash->buf.compl_tag);
+-
+-	memset(tx_buf, 0, sizeof(struct idpf_tx_buf));
++		 idpf_tx_buf_compl_tag(&stash->buf));
+ 
+-	/* Reinitialize buf_id portion of tag */
+-	tx_buf->compl_tag = IDPF_SPLITQ_TX_INVAL_COMPL_TAG;
++	tx_buf->type = LIBETH_SQE_EMPTY;
+ 
+ 	return 0;
+ }
+@@ -1800,12 +1745,17 @@ do {								\
+  */
+ static void idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
+ 				 int napi_budget,
+-				 struct idpf_cleaned_stats *cleaned,
++				 struct libeth_sq_napi_stats *cleaned,
+ 				 bool descs_only)
+ {
+ 	union idpf_tx_flex_desc *next_pending_desc = NULL;
+ 	union idpf_tx_flex_desc *tx_desc;
+ 	s16 ntc = tx_q->next_to_clean;
++	struct libeth_cq_pp cp = {
++		.dev	= tx_q->dev,
++		.ss	= cleaned,
++		.napi	= napi_budget,
++	};
+ 	struct idpf_tx_buf *tx_buf;
+ 
+ 	tx_desc = &tx_q->flex_tx[ntc];
+@@ -1821,13 +1771,10 @@ static void idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
+ 		 * invalid completion tag since no buffer was used.  We can
+ 		 * skip this descriptor since there is no buffer to clean.
+ 		 */
+-		if (unlikely(tx_buf->compl_tag == IDPF_SPLITQ_TX_INVAL_COMPL_TAG))
++		if (tx_buf->type <= LIBETH_SQE_CTX)
+ 			goto fetch_next_txq_desc;
+ 
+-		eop_desc = (union idpf_tx_flex_desc *)tx_buf->next_to_watch;
+-
+-		/* clear next_to_watch to prevent false hangs */
+-		tx_buf->next_to_watch = NULL;
++		eop_desc = &tx_q->flex_tx[tx_buf->rs_idx];
+ 
+ 		if (descs_only) {
+ 			if (idpf_stash_flow_sch_buffers(tx_q, tx_buf))
+@@ -1844,8 +1791,7 @@ static void idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
+ 				}
+ 			}
+ 		} else {
+-			idpf_tx_splitq_clean_hdr(tx_q, tx_buf, cleaned,
+-						 napi_budget);
++			libeth_tx_complete(tx_buf, &cp);
+ 
+ 			/* unmap remaining buffers */
+ 			while (tx_desc != eop_desc) {
+@@ -1853,13 +1799,7 @@ static void idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
+ 							      tx_desc, tx_buf);
+ 
+ 				/* unmap any remaining paged data */
+-				if (dma_unmap_len(tx_buf, len)) {
+-					dma_unmap_page(tx_q->dev,
+-						       dma_unmap_addr(tx_buf, dma),
+-						       dma_unmap_len(tx_buf, len),
+-						       DMA_TO_DEVICE);
+-					dma_unmap_len_set(tx_buf, len, 0);
+-				}
++				libeth_tx_complete(tx_buf, &cp);
+ 			}
+ 		}
+ 
+@@ -1895,30 +1835,26 @@ do {							\
+  * this completion tag.
+  */
+ static bool idpf_tx_clean_buf_ring(struct idpf_tx_queue *txq, u16 compl_tag,
+-				   struct idpf_cleaned_stats *cleaned,
++				   struct libeth_sq_napi_stats *cleaned,
+ 				   int budget)
+ {
+ 	u16 idx = compl_tag & txq->compl_tag_bufid_m;
+ 	struct idpf_tx_buf *tx_buf = NULL;
+ 	u16 ntc = txq->next_to_clean;
++	struct libeth_cq_pp cp = {
++		.dev	= txq->dev,
++		.ss	= cleaned,
++		.napi	= budget,
++	};
+ 	u16 num_descs_cleaned = 0;
+ 	u16 orig_idx = idx;
+ 
+ 	tx_buf = &txq->tx_buf[idx];
++	if (unlikely(tx_buf->type <= LIBETH_SQE_CTX))
++		return false;
+ 
+-	while (tx_buf->compl_tag == (int)compl_tag) {
+-		if (tx_buf->skb) {
+-			idpf_tx_splitq_clean_hdr(txq, tx_buf, cleaned, budget);
+-		} else if (dma_unmap_len(tx_buf, len)) {
+-			dma_unmap_page(txq->dev,
+-				       dma_unmap_addr(tx_buf, dma),
+-				       dma_unmap_len(tx_buf, len),
+-				       DMA_TO_DEVICE);
+-			dma_unmap_len_set(tx_buf, len, 0);
+-		}
+-
+-		memset(tx_buf, 0, sizeof(struct idpf_tx_buf));
+-		tx_buf->compl_tag = IDPF_SPLITQ_TX_INVAL_COMPL_TAG;
++	while (idpf_tx_buf_compl_tag(tx_buf) == (int)compl_tag) {
++		libeth_tx_complete(tx_buf, &cp);
+ 
+ 		num_descs_cleaned++;
+ 		idpf_tx_clean_buf_ring_bump_ntc(txq, idx, tx_buf);
+@@ -1965,7 +1901,7 @@ static bool idpf_tx_clean_buf_ring(struct idpf_tx_queue *txq, u16 compl_tag,
+  */
+ static void idpf_tx_handle_rs_completion(struct idpf_tx_queue *txq,
+ 					 struct idpf_splitq_tx_compl_desc *desc,
+-					 struct idpf_cleaned_stats *cleaned,
++					 struct libeth_sq_napi_stats *cleaned,
+ 					 int budget)
+ {
+ 	u16 compl_tag;
+@@ -2008,7 +1944,7 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
+ 	ntc -= complq->desc_count;
+ 
+ 	do {
+-		struct idpf_cleaned_stats cleaned_stats = { };
++		struct libeth_sq_napi_stats cleaned_stats = { };
+ 		struct idpf_tx_queue *tx_q;
+ 		int rel_tx_qid;
+ 		u16 hw_head;
+@@ -2307,6 +2243,12 @@ unsigned int idpf_tx_desc_count_required(struct idpf_tx_queue *txq,
+ void idpf_tx_dma_map_error(struct idpf_tx_queue *txq, struct sk_buff *skb,
+ 			   struct idpf_tx_buf *first, u16 idx)
+ {
++	struct libeth_sq_napi_stats ss = { };
++	struct libeth_cq_pp cp = {
++		.dev	= txq->dev,
++		.ss	= &ss,
 +	};
 +
-+	DEFINE_DMA_UNMAP_ADDR(dma);
-+	DEFINE_DMA_UNMAP_LEN(len);
+ 	u64_stats_update_begin(&txq->stats_sync);
+ 	u64_stats_inc(&txq->q_stats.dma_map_errs);
+ 	u64_stats_update_end(&txq->stats_sync);
+@@ -2316,7 +2258,7 @@ void idpf_tx_dma_map_error(struct idpf_tx_queue *txq, struct sk_buff *skb,
+ 		struct idpf_tx_buf *tx_buf;
+ 
+ 		tx_buf = &txq->tx_buf[idx];
+-		idpf_tx_buf_rel(txq, tx_buf);
++		libeth_tx_complete(tx_buf, &cp);
+ 		if (tx_buf == first)
+ 			break;
+ 		if (idx == 0)
+@@ -2405,7 +2347,8 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
+ 		if (dma_mapping_error(tx_q->dev, dma))
+ 			return idpf_tx_dma_map_error(tx_q, skb, first, i);
+ 
+-		tx_buf->compl_tag = params->compl_tag;
++		idpf_tx_buf_compl_tag(tx_buf) = params->compl_tag;
++		tx_buf->type = LIBETH_SQE_FRAG;
+ 
+ 		/* record length, and DMA address */
+ 		dma_unmap_len_set(tx_buf, len, size);
+@@ -2479,8 +2422,7 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
+ 			 * simply pass over these holes and finish cleaning the
+ 			 * rest of the packet.
+ 			 */
+-			memset(&tx_q->tx_buf[i], 0, sizeof(struct idpf_tx_buf));
+-			tx_q->tx_buf[i].compl_tag = params->compl_tag;
++			tx_q->tx_buf[i].type = LIBETH_SQE_EMPTY;
+ 
+ 			/* Adjust the DMA offset and the remaining size of the
+ 			 * fragment.  On the first iteration of this loop,
+@@ -2525,19 +2467,19 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
+ 	/* record SW timestamp if HW timestamp is not available */
+ 	skb_tx_timestamp(skb);
+ 
++	first->type = LIBETH_SQE_SKB;
 +
-+	u32				nr_frags;
-+	u32				packets;
-+	u32				bytes;
-+
-+	unsigned long			priv;
-+} __aligned_largest;
-+
-+/**
-+ * LIBETH_SQE_CHECK_PRIV - check the driver's private SQE data
-+ * @p: type or name of the object the driver wants to fit into &libeth_sqe
-+ *
-+ * Make sure the driver's private data fits into libeth_sqe::priv. To be used
-+ * right after its declaration.
-+ */
-+#define LIBETH_SQE_CHECK_PRIV(p)					  \
-+	static_assert(sizeof(p) <= sizeof_field(struct libeth_sqe, priv))
-+
-+/**
-+ * struct libeth_cq_pp - completion queue poll params
-+ * @dev: &device to perform DMA unmapping
-+ * @ss: onstack NAPI stats to fill
-+ * @napi: whether it's called from the NAPI context
-+ *
-+ * libeth uses this structure to access objects needed for performing full
-+ * Tx complete operation without passing lots of arguments and change the
-+ * prototypes each time a new one is added.
-+ */
-+struct libeth_cq_pp {
-+	struct device			*dev;
-+	struct libeth_sq_napi_stats	*ss;
-+
-+	bool				napi;
-+};
-+
-+/**
-+ * libeth_tx_complete - perform Tx completion for one SQE
-+ * @sqe: SQE to complete
-+ * @cp: poll params
-+ *
-+ * Do Tx complete for all the types of buffers, incl. freeing, unmapping,
-+ * updating the stats etc.
-+ */
-+static inline void libeth_tx_complete(struct libeth_sqe *sqe,
-+				      const struct libeth_cq_pp *cp)
-+{
-+	switch (sqe->type) {
-+	case LIBETH_SQE_EMPTY:
-+		return;
-+	case LIBETH_SQE_SKB:
-+	case LIBETH_SQE_FRAG:
-+	case LIBETH_SQE_SLAB:
-+		dma_unmap_page(cp->dev, dma_unmap_addr(sqe, dma),
-+			       dma_unmap_len(sqe, len), DMA_TO_DEVICE);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	switch (sqe->type) {
-+	case LIBETH_SQE_SKB:
-+		cp->ss->packets += sqe->packets;
-+		cp->ss->bytes += sqe->bytes;
-+
-+		napi_consume_skb(sqe->skb, cp->napi);
-+		break;
-+	case LIBETH_SQE_SLAB:
-+		kfree(sqe->raw);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	sqe->type = LIBETH_SQE_EMPTY;
-+}
-+
-+#endif /* __LIBETH_TX_H */
-diff --git a/include/net/libeth/types.h b/include/net/libeth/types.h
-new file mode 100644
-index 000000000000..603825e45133
---- /dev/null
-+++ b/include/net/libeth/types.h
-@@ -0,0 +1,25 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Copyright (C) 2024 Intel Corporation */
-+
-+#ifndef __LIBETH_TYPES_H
-+#define __LIBETH_TYPES_H
-+
-+#include <linux/types.h>
-+
-+/**
-+ * struct libeth_sq_napi_stats - "hot" counters to update in Tx completion loop
-+ * @packets: completed frames counter
-+ * @bytes: sum of bytes of completed frames above
-+ * @raw: alias to access all the fields as an array
-+ */
-+struct libeth_sq_napi_stats {
-+	union {
-+		struct {
-+							u32 packets;
-+							u32 bytes;
-+		};
-+		DECLARE_FLEX_ARRAY(u32, raw);
-+	};
-+};
-+
-+#endif /* __LIBETH_TYPES_H */
+ 	/* write last descriptor with RS and EOP bits */
++	first->rs_idx = i;
+ 	td_cmd |= params->eop_cmd;
+ 	idpf_tx_splitq_build_desc(tx_desc, params, td_cmd, size);
+ 	i = idpf_tx_splitq_bump_ntu(tx_q, i);
+ 
+-	/* set next_to_watch value indicating a packet is present */
+-	first->next_to_watch = tx_desc;
+-
+ 	tx_q->txq_grp->num_completions_pending++;
+ 
+ 	/* record bytecount for BQL */
+ 	nq = netdev_get_tx_queue(tx_q->netdev, tx_q->idx);
+-	netdev_tx_sent_queue(nq, first->bytecount);
++	netdev_tx_sent_queue(nq, first->bytes);
+ 
+ 	idpf_tx_buf_hw_update(tx_q, i, netdev_xmit_more());
+ }
+@@ -2737,8 +2679,7 @@ idpf_tx_splitq_get_ctx_desc(struct idpf_tx_queue *txq)
+ 	struct idpf_flex_tx_ctx_desc *desc;
+ 	int i = txq->next_to_use;
+ 
+-	memset(&txq->tx_buf[i], 0, sizeof(struct idpf_tx_buf));
+-	txq->tx_buf[i].compl_tag = IDPF_SPLITQ_TX_INVAL_COMPL_TAG;
++	txq->tx_buf[i].type = LIBETH_SQE_CTX;
+ 
+ 	/* grab the next descriptor */
+ 	desc = &txq->flex_ctx[i];
+@@ -2822,12 +2763,12 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
+ 	first->skb = skb;
+ 
+ 	if (tso) {
+-		first->gso_segs = tx_params.offload.tso_segs;
+-		first->bytecount = skb->len +
+-			((first->gso_segs - 1) * tx_params.offload.tso_hdr_len);
++		first->packets = tx_params.offload.tso_segs;
++		first->bytes = skb->len +
++			((first->packets - 1) * tx_params.offload.tso_hdr_len);
+ 	} else {
+-		first->gso_segs = 1;
+-		first->bytecount = max_t(unsigned int, skb->len, ETH_ZLEN);
++		first->packets = 1;
++		first->bytes = max_t(unsigned int, skb->len, ETH_ZLEN);
+ 	}
+ 
+ 	if (idpf_queue_has(FLOW_SCH_EN, tx_q)) {
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+index 6215dbee5546..1b20cd96c613 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
+@@ -131,7 +131,6 @@ do {								\
+ 	(txq)->num_completions_pending - (txq)->complq->num_completions)
+ 
+ #define IDPF_TX_SPLITQ_COMPL_TAG_WIDTH	16
+-#define IDPF_SPLITQ_TX_INVAL_COMPL_TAG	-1
+ /* Adjust the generation for the completion tag and wrap if necessary */
+ #define IDPF_TX_ADJ_COMPL_TAG_GEN(txq) \
+ 	((++(txq)->compl_tag_cur_gen) >= (txq)->compl_tag_gen_max ? \
+@@ -149,47 +148,7 @@ union idpf_tx_flex_desc {
+ 	struct idpf_flex_tx_sched_desc flow; /* flow based scheduling */
+ };
+ 
+-/**
+- * struct idpf_tx_buf
+- * @next_to_watch: Next descriptor to clean
+- * @skb: Pointer to the skb
+- * @dma: DMA address
+- * @len: DMA length
+- * @bytecount: Number of bytes
+- * @gso_segs: Number of GSO segments
+- * @compl_tag: Splitq only, unique identifier for a buffer. Used to compare
+- *	       with completion tag returned in buffer completion event.
+- *	       Because the completion tag is expected to be the same in all
+- *	       data descriptors for a given packet, and a single packet can
+- *	       span multiple buffers, we need this field to track all
+- *	       buffers associated with this completion tag independently of
+- *	       the buf_id. The tag consists of a N bit buf_id and M upper
+- *	       order "generation bits". See compl_tag_bufid_m and
+- *	       compl_tag_gen_s in struct idpf_queue. We'll use a value of -1
+- *	       to indicate the tag is not valid.
+- * @ctx_entry: Singleq only. Used to indicate the corresponding entry
+- *	       in the descriptor ring was used for a context descriptor and
+- *	       this buffer entry should be skipped.
+- */
+-struct idpf_tx_buf {
+-	void *next_to_watch;
+-	struct sk_buff *skb;
+-	DEFINE_DMA_UNMAP_ADDR(dma);
+-	DEFINE_DMA_UNMAP_LEN(len);
+-	unsigned int bytecount;
+-	unsigned short gso_segs;
+-
+-	union {
+-		int compl_tag;
+-
+-		bool ctx_entry;
+-	};
+-};
+-
+-struct idpf_tx_stash {
+-	struct hlist_node hlist;
+-	struct idpf_tx_buf buf;
+-};
++#define idpf_tx_buf libeth_sqe
+ 
+ /**
+  * struct idpf_buf_lifo - LIFO for managing OOO completions
+@@ -496,11 +455,6 @@ struct idpf_tx_queue_stats {
+ 	u64_stats_t dma_map_errs;
+ };
+ 
+-struct idpf_cleaned_stats {
+-	u32 packets;
+-	u32 bytes;
+-};
+-
+ #define IDPF_ITR_DYNAMIC	1
+ #define IDPF_ITR_MAX		0x1FE0
+ #define IDPF_ITR_20K		0x0032
+@@ -688,7 +642,7 @@ struct idpf_tx_queue {
+ 
+ 		void *desc_ring;
+ 	};
+-	struct idpf_tx_buf *tx_buf;
++	struct libeth_sqe *tx_buf;
+ 	struct idpf_txq_group *txq_grp;
+ 	struct device *dev;
+ 	void __iomem *tail;
 -- 
 2.42.0
 
