@@ -1,141 +1,100 @@
-Return-Path: <netdev+bounces-126467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76F3C971406
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:42:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A85AC9713FA
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:40:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 341D3283EC6
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:42:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66D78283A41
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:40:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC32B1B3F1A;
-	Mon,  9 Sep 2024 09:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E74D01B2EF9;
+	Mon,  9 Sep 2024 09:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oA8r1wRg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YqG+Nef2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A31A1B2EE0;
-	Mon,  9 Sep 2024 09:41:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4791B2EF3;
+	Mon,  9 Sep 2024 09:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725874878; cv=none; b=XId6mvmb6e7S4vnfEuw6R2ohWciBXRXBf7fB8hrOE8E5lXbx/Y24zkkvlrMTIdEUtDompL46m62J7zBhiaShQtCL3KrkYHr4p8u0W+zt+7fX9Dk/2u00vanfs65L+1/HhDK2dVEunUZY5zynYwPSOG6ekcv9yD8yourVG4tiVp4=
+	t=1725874830; cv=none; b=Ie/CyJVEBdRRU6RXwV8tm6Yg2TJsaZUmTETLkx/XR1A6MIJcvseKmbqCgZLJlqCfP+AIN3iWhOB3MhPkdpaA7Bz5gxX9lNKB90ZDDJLxsyvv1CUtkarkRFG4I6+s9PsE5Bt36d9P2tEETDz0NaChppykvXcikeR0MlEWky47Oyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725874878; c=relaxed/simple;
-	bh=wETrHI/ShVWGV8wbgbyd9KGjFPNCXcYObn24PM2bGgg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OVnLkQhmiL1gkLQJYS7LnPTr3kbrhb+mPftMaFDaREcoaktzIbqFKFwlVZhGP7hrP7nEZBve164O8rGymyp+0FhMZ+ip5fN/wnonVBO4v4rXmXK+iEufz+7hbEtJfZsUmbgx3nULLa05W6yemy04h1ztVeySHdnf6yJnr/d2JgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oA8r1wRg; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725874878; x=1757410878;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wETrHI/ShVWGV8wbgbyd9KGjFPNCXcYObn24PM2bGgg=;
-  b=oA8r1wRg5BCZXG/tzb0k8aCCYQxss2NQp0slEKujuBpQSpTHWBEy1vTB
-   7bzKTFiycTG0+2U8MiNMcvvwczv33yTF44DF0qP+MrUCKrpX6lU+A2WnW
-   sc3kShKleZXcNUJrYwYbSz7YHrCfprJ5S1/gc0fgPYPcajkzRzzSghymc
-   0MAxjR7yaNnfEEF3/zdBDpb79HPydhDK1VZBKz347w8PtKulveaUfHOVr
-   jRxBB6fLMcN781RWYpWCl0xPgUzHuGa4Y5K6wdV1tCGMlIwdUDQDKAa+c
-   oQEyrHKQpLVw5EkLVJA0wxoaHrwpPd9qC3Yn9STtIp07sY9kbWCXxGu40
-   Q==;
-X-CSE-ConnectionGUID: KzyqZQ/2SQaLMw7zAtyFnQ==
-X-CSE-MsgGUID: aCQWLV4YRq6rUlS8fxOuug==
-X-IronPort-AV: E=McAfee;i="6700,10204,11189"; a="35941201"
-X-IronPort-AV: E=Sophos;i="6.10,213,1719903600"; 
-   d="scan'208";a="35941201"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2024 02:38:11 -0700
-X-CSE-ConnectionGUID: wLrI8P59Scq60Xkr/AfP+A==
-X-CSE-MsgGUID: FnGgWOHURWm9lCW+zHCTiw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,213,1719903600"; 
-   d="scan'208";a="71021034"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2024 02:37:54 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1snaqF-00000006jjo-21LH;
-	Mon, 09 Sep 2024 12:37:51 +0300
-Date: Mon, 9 Sep 2024 12:37:51 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Felix Huettner <felix.huettner@mail.schwarz>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Subject: Re: [PATCH net v1 1/1] netfilter: conntrack: Guard possoble unused
- functions
-Message-ID: <Zt7B79Q3O7mNqrOl@smile.fi.intel.com>
-References: <20240905203612.333421-1-andriy.shevchenko@linux.intel.com>
- <20240906162938.GH2097826@kernel.org>
+	s=arc-20240116; t=1725874830; c=relaxed/simple;
+	bh=thg2sO/khWHrWKgzw3zIkwY5tZ2TU2Prc0/hTjc97gc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IkDxSiw1lkWMbUdslzOdz7FMmmTuGNNPqqZG7PU7/xZ2Sat/sPZcKwSfv1+PqFFm8yM+lgAjtYrQNyyC5RWnltjbvRdpMGuDgzLlYY3tmenMIWLD8BYZYCzvcO5CjvQp4HJTe60PsgqyA3snwvUyjnxU773jMeZsxnkIE1JRi5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YqG+Nef2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B337C4CEC6;
+	Mon,  9 Sep 2024 09:40:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725874829;
+	bh=thg2sO/khWHrWKgzw3zIkwY5tZ2TU2Prc0/hTjc97gc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YqG+Nef21nF0XnUrVRCnLCYY79H05XYgQjNBPzZyUOZQcEkUehoKyWUn1vvWTzHsr
+	 YgzeYVaabc/z1mvhoybR2mpB9n7o0wJMHFNW51DyQKihQ+JojV4smF3oFfncysSKK6
+	 FzGIKuqVQyBqIDGjFublQwJfwcP4JUh9QJUkHYaL90CbFWAjRpk7EVCOEdM6cbABxQ
+	 DZRoyROo9tKMKMTaT81zS6FhHc4OweOrG4dMtNQBdNP/zRZFwwZid971t4VS0+57yx
+	 e+mdB79XDKsn3CR+6yTVaGJPIrX4K45Qj3Rw3Byiz090hTmFEatakDjq36Z5L2vOag
+	 iZb6vuzKVrPwQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD0B3804CAB;
+	Mon,  9 Sep 2024 09:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240906162938.GH2097826@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: sysfs: Fix weird usage of class's namespace relevant
+ fields
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172587483054.3400712.16196842321963432376.git-patchwork-notify@kernel.org>
+Date: Mon, 09 Sep 2024 09:40:30 +0000
+References: <20240905-fix_class_ns-v1-1-88ecccc3517c@quicinc.com>
+In-Reply-To: <20240905-fix_class_ns-v1-1-88ecccc3517c@quicinc.com>
+To: Zijun Hu <zijun_hu@icloud.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, gregkh@linuxfoundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, quic_zijuhu@quicinc.com
 
-On Fri, Sep 06, 2024 at 05:29:38PM +0100, Simon Horman wrote:
-> On Thu, Sep 05, 2024 at 11:36:12PM +0300, Andy Shevchenko wrote:
+Hello:
 
-> Local testing seems to show that the warning is still emitted
-> for ctnetlink_label_size if CONFIG_NETFILTER_NETLINK_GLUE_CT is enabled
-> but CONFIG_NF_CONNTRACK_EVENTS is not.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Can you elaborate on this, please?
-I can not reproduce.
+On Thu, 05 Sep 2024 07:35:38 +0800 you wrote:
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> Device class has two namespace relevant fields which are associated by
+> the following usage:
+> 
+> struct class {
+> 	...
+> 	const struct kobj_ns_type_operations *ns_type;
+> 	const void *(*namespace)(const struct device *dev);
+> 	...
+> }
+> if (dev->class && dev->class->ns_type)
+> 	dev->class->namespace(dev);
+> 
+> [...]
 
-#
-# Core Netfilter Configuration
-#
-CONFIG_NETFILTER_INGRESS=y
-CONFIG_NETFILTER_EGRESS=y
-CONFIG_NETFILTER_SKIP_EGRESS=y
-CONFIG_NETFILTER_NETLINK=y
-CONFIG_NETFILTER_NETLINK_LOG=y
-CONFIG_NF_CONNTRACK=y
-CONFIG_NF_LOG_SYSLOG=m
-CONFIG_NF_CONNTRACK_SECMARK=y
-# CONFIG_NF_CONNTRACK_PROCFS is not set
-# CONFIG_NF_CONNTRACK_LABELS is not set
-CONFIG_NF_CONNTRACK_FTP=y
-CONFIG_NF_CONNTRACK_IRC=y
-# CONFIG_NF_CONNTRACK_NETBIOS_NS is not set
-CONFIG_NF_CONNTRACK_SIP=y
-CONFIG_NF_CT_NETLINK=y
-CONFIG_NETFILTER_NETLINK_GLUE_CT=y
-CONFIG_NF_NAT=y
-CONFIG_NF_NAT_FTP=y
-CONFIG_NF_NAT_IRC=y
-CONFIG_NF_NAT_SIP=y
-CONFIG_NF_NAT_MASQUERADE=y
-# CONFIG_NF_TABLES is not set
-CONFIG_NETFILTER_XTABLES=y
-# CONFIG_NETFILTER_XTABLES_COMPAT is not set
+Here is the summary with links:
+  - net: sysfs: Fix weird usage of class's namespace relevant fields
+    https://git.kernel.org/netdev/net-next/c/8f088541991b
 
-
-
+You are awesome, thank you!
 -- 
-With Best Regards,
-Andy Shevchenko
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
