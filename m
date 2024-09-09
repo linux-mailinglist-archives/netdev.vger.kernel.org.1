@@ -1,260 +1,171 @@
-Return-Path: <netdev+bounces-126473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C05C971474
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:52:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C7D97145A
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:49:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35D40281029
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:52:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 342C91C22F51
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC1E1B3726;
-	Mon,  9 Sep 2024 09:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1A71B29A3;
+	Mon,  9 Sep 2024 09:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="bEXS9Nw4"
 X-Original-To: netdev@vger.kernel.org
-Received: from port70.net (port70.net [81.7.13.123])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CFFD1B0107;
-	Mon,  9 Sep 2024 09:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.7.13.123
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5FC1B14F3
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 09:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725875543; cv=none; b=lYXq5Kt1pNdeStaJIqW6wm2V8+ciFc+89jTly2fTIVt4BRdYhJRDoyxSZLAzos9C2/OLcjzVSKl02AGMTSXlbqlqf/wpSlgF5AFaGGxrnUUvx2Jhbu/lPLnhUqRNEw6I8KzDOJ3IcS6itzeXRy+xKLul5I4X5Q1MozF7PAKCpl4=
+	t=1725875393; cv=none; b=NNK0p7+DfVjk9MT6PDRU91dGkRGb1974yVt1zz+CmLoDHhxUJ1nepbifrzkX0vizYZCyZ2JFJxMsvIuYUPwW5eErJYEv+sUtNWIwaB7WGQj2kGAOOWgefFfX5cZ0HF8JB/CNHcQRSCmF9s0sbGmm8oFBC1dUylnucBgjEt4IEuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725875543; c=relaxed/simple;
-	bh=M8sb/PsgH6GywjheuqRbGJHO9C6dffq+g1GeO45Gbkc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fX7a9BKbBtZSdMKb2UHvKZ83QQYS6qpGWkyKIyG459RDZIdbbGEw8+QzOF7BMXho6aITw3PH0Texgb4yl03JrKFgbp66hKG6O30VkK/MEWS0amaHVConf8LUQ/b2r8IsNzlNwGdIMUZkhE6dCFdVwj4Bwp7aXXVBojcyuuxLDCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=port70.net; spf=pass smtp.mailfrom=port70.net; arc=none smtp.client-ip=81.7.13.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=port70.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=port70.net
-Received: by port70.net (Postfix, from userid 1002)
-	id 9A289ABEC0C7; Mon,  9 Sep 2024 11:45:27 +0200 (CEST)
-Date: Mon, 9 Sep 2024 11:45:27 +0200
-From: Szabolcs Nagy <nsz@port70.net>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Szabolcs Nagy <szabolcs.nagy@arm.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, mst@redhat.com, jasowang@redhat.com,
-	arefev@swemel.ru, alexander.duyck@gmail.com,
-	Willem de Bruijn <willemb@google.com>, stable@vger.kernel.org,
-	Jakub Sitnicki <jakub@cloudflare.com>, Felix Fietkau <nbd@nbd.name>,
-	Mark Brown <broonie@kernel.org>,
-	Yury Khrustalev <yury.khrustalev@arm.com>, nd@arm.com
-Subject: Re: [PATCH net v2] net: drop bad gso csum_start and offset in
- virtio_net_hdr
-Message-ID: <20240909094527.GA3048202@port70.net>
-References: <20240729201108.1615114-1-willemdebruijn.kernel@gmail.com>
- <ZtsTGp9FounnxZaN@arm.com>
- <66db2542cfeaa_29a385294b9@willemb.c.googlers.com.notmuch>
- <66de0487cfa91_30614529470@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1725875393; c=relaxed/simple;
+	bh=qJEcHtD3/lIxA6+g6I4vNkc35G+IepBUr6nL26HgJGQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qqJWynDGBxX05eHkL83MODv/auT8Xdu+oABFtEXDfN7GfV7uSu8bxKWYEK+daZz14/l15GYi1dk9gfWPskx/JfiXzds/HrkW94Ef8HPLmn/lGwxfWbCNqPhn/Oyd5J6lkGzmbsNwIlt7SRMj7yOdK2JDCnFSrDGNZv3CGQTZsiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=bEXS9Nw4; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 4921E88B49;
+	Mon,  9 Sep 2024 11:49:49 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1725875389;
+	bh=MNx64q/9XNzdZpqnw7FvloVFMKbR2eLLJquLc3tmUrs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bEXS9Nw44jN7NYkH2x1rB7IoLdEsqXdEycpb8laHOv+dJuR9aCbPdSSULRCkSExSv
+	 r/1KF4X0gVQIjpnqaM7Yhw1Xf7+EjNgy8rKaikkO8VFNMKxT5bqepE0MsfKGRtyRJZ
+	 r9vCT6P7m+FuxOykASHYSEMGZ6Rrz0aQ0MnHiSP4MJMZKEtP3mAGr0klGroV779SSu
+	 tQsPC2BrccBDehAuaR7c3O9rURxoAypY6D2qCsYFO98Cr4P/eHB/W36UXK+kXtLsLZ
+	 19sj65uO1JV3QTsucAdeTqR7Fz7c1KSyv9zWDHLJVmupesEueoynWaHw1P5uMsI9vy
+	 xgvFiBs/ZAn0g==
+Date: Mon, 9 Sep 2024 11:49:48 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ syzbot+3d602af7549af539274e@syzkaller.appspotmail.com
+Subject: Re: [PATCH net 1/2] net: hsr: Use the seqnr lock for frames
+ received via interlink port.
+Message-ID: <20240909114948.129735b9@wsk>
+In-Reply-To: <20240906132816.657485-2-bigeasy@linutronix.de>
+References: <20240906132816.657485-1-bigeasy@linutronix.de>
+	<20240906132816.657485-2-bigeasy@linutronix.de>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <66de0487cfa91_30614529470@willemb.c.googlers.com.notmuch>
+Content-Type: multipart/signed; boundary="Sig_/s7I4owHF4ZGfP9IjmS+c.Mz";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-* Willem de Bruijn <willemdebruijn.kernel@gmail.com> [2024-09-08 16:09:43 -0400]:
-> Willem de Bruijn wrote:
-> > Szabolcs Nagy wrote:
-> > > The 07/29/2024 16:10, Willem de Bruijn wrote:
-> > > > From: Willem de Bruijn <willemb@google.com>
-> > > > 
-> > > > Tighten csum_start and csum_offset checks in virtio_net_hdr_to_skb
-> > > > for GSO packets.
-> > > > 
-> > > > The function already checks that a checksum requested with
-> > > > VIRTIO_NET_HDR_F_NEEDS_CSUM is in skb linear. But for GSO packets
-> > > > this might not hold for segs after segmentation.
-> > > > 
-> > > > Syzkaller demonstrated to reach this warning in skb_checksum_help
-> > > > 
-> > > > 	offset = skb_checksum_start_offset(skb);
-> > > > 	ret = -EINVAL;
-> > > > 	if (WARN_ON_ONCE(offset >= skb_headlen(skb)))
-> > > > 
-> > > > By injecting a TSO packet:
-> > > > 
-> > > > WARNING: CPU: 1 PID: 3539 at net/core/dev.c:3284 skb_checksum_help+0x3d0/0x5b0
-> > > >  ip_do_fragment+0x209/0x1b20 net/ipv4/ip_output.c:774
-> > > >  ip_finish_output_gso net/ipv4/ip_output.c:279 [inline]
-> > > >  __ip_finish_output+0x2bd/0x4b0 net/ipv4/ip_output.c:301
-> > > >  iptunnel_xmit+0x50c/0x930 net/ipv4/ip_tunnel_core.c:82
-> > > >  ip_tunnel_xmit+0x2296/0x2c70 net/ipv4/ip_tunnel.c:813
-> > > >  __gre_xmit net/ipv4/ip_gre.c:469 [inline]
-> > > >  ipgre_xmit+0x759/0xa60 net/ipv4/ip_gre.c:661
-> > > >  __netdev_start_xmit include/linux/netdevice.h:4850 [inline]
-> > > >  netdev_start_xmit include/linux/netdevice.h:4864 [inline]
-> > > >  xmit_one net/core/dev.c:3595 [inline]
-> > > >  dev_hard_start_xmit+0x261/0x8c0 net/core/dev.c:3611
-> > > >  __dev_queue_xmit+0x1b97/0x3c90 net/core/dev.c:4261
-> > > >  packet_snd net/packet/af_packet.c:3073 [inline]
-> > > > 
-> > > > The geometry of the bad input packet at tcp_gso_segment:
-> > > > 
-> > > > [   52.003050][ T8403] skb len=12202 headroom=244 headlen=12093 tailroom=0
-> > > > [   52.003050][ T8403] mac=(168,24) mac_len=24 net=(192,52) trans=244
-> > > > [   52.003050][ T8403] shinfo(txflags=0 nr_frags=1 gso(size=1552 type=3 segs=0))
-> > > > [   52.003050][ T8403] csum(0x60000c7 start=199 offset=1536
-> > > > ip_summed=3 complete_sw=0 valid=0 level=0)
-> > > > 
-> > > > Mitigate with stricter input validation.
-> > > > 
-> > > > csum_offset: for GSO packets, deduce the correct value from gso_type.
-> > > > This is already done for USO. Extend it to TSO. Let UFO be:
-> > > > udp[46]_ufo_fragment ignores these fields and always computes the
-> > > > checksum in software.
-> > > > 
-> > > > csum_start: finding the real offset requires parsing to the transport
-> > > > header. Do not add a parser, use existing segmentation parsing. Thanks
-> > > > to SKB_GSO_DODGY, that also catches bad packets that are hw offloaded.
-> > > > Again test both TSO and USO. Do not test UFO for the above reason, and
-> > > > do not test UDP tunnel offload.
-> > > > 
-> > > > GSO packet are almost always CHECKSUM_PARTIAL. USO packets may be
-> > > > CHECKSUM_NONE since commit 10154dbded6d6 ("udp: Allow GSO transmit
-> > > > from devices with no checksum offload"), but then still these fields
-> > > > are initialized correctly in udp4_hwcsum/udp6_hwcsum_outgoing. So no
-> > > > need to test for ip_summed == CHECKSUM_PARTIAL first.
-> > > > 
-> > > > This revises an existing fix mentioned in the Fixes tag, which broke
-> > > > small packets with GSO offload, as detected by kselftests.
-> > > > 
-> > > > Link: https://syzkaller.appspot.com/bug?extid=e1db31216c789f552871
-> > > > Link: https://lore.kernel.org/netdev/20240723223109.2196886-1-kuba@kernel.org
-> > > > Fixes: e269d79c7d35 ("net: missing check virtio")
-> > > > Cc: stable@vger.kernel.org
-> > > > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > > > 
-> > > > ---
-> > > > 
-> > > > v1->v2
-> > > >   - skb_transport_header instead of skb->transport_header (edumazet@)
-> > > >   - typo: migitate -> mitigate
-> > > > ---
-> > > 
-> > > this breaks booting from nfs root on an arm64 fvp
-> > > model for me.
-> > > 
-> > > i see two fixup commits
-> > > 
-> > > commit 30b03f2a0592eee1267298298eac9dd655f55ab2
-> > > Author:     Jakub Sitnicki <jakub@cloudflare.com>
-> > > AuthorDate: 2024-08-08 11:56:22 +0200
-> > > Commit:     Jakub Kicinski <kuba@kernel.org>
-> > > CommitDate: 2024-08-09 21:58:08 -0700
-> > > 
-> > >     udp: Fall back to software USO if IPv6 extension headers are present
-> > > 
-> > > and
-> > > 
-> > > commit b128ed5ab27330deeeaf51ea8bb69f1442a96f7f
-> > > Author:     Felix Fietkau <nbd@nbd.name>
-> > > AuthorDate: 2024-08-19 17:06:21 +0200
-> > > Commit:     Jakub Kicinski <kuba@kernel.org>
-> > > CommitDate: 2024-08-21 17:15:05 -0700
-> > > 
-> > >     udp: fix receiving fraglist GSO packets
-> > > 
-> > > but they don't fix the issue for me,
-> > > at the boot console i see
-> > > 
-> > > ...
-> > > [    3.686846] Sending DHCP requests ., OK
-> > > [    3.687302] IP-Config: Got DHCP answer from 172.20.51.254, my address is 172.20.51.1
-> > > [    3.687423] IP-Config: Complete:
-> > > [    3.687482]      device=eth0, hwaddr=ea:0d:79:71:af:cd, ipaddr=172.20.51.1, mask=255.255.255.0, gw=172.20.51.254
-> > > [    3.687631]      host=172.20.51.1, domain=, nis-domain=(none)
-> > > [    3.687719]      bootserver=172.20.51.254, rootserver=10.2.80.41, rootpath=
-> > > [    3.687771]      nameserver0=172.20.51.254, nameserver1=172.20.51.252, nameserver2=172.20.51.251
-> > > [    3.689075] clk: Disabling unused clocks
-> > > [    3.689167] PM: genpd: Disabling unused power domains
-> > > [    3.689258] ALSA device list:
-> > > [    3.689330]   No soundcards found.
-> > > [    3.716297] VFS: Mounted root (nfs4 filesystem) on device 0:24.
-> > > [    3.716843] devtmpfs: mounted
-> > > [    3.734352] Freeing unused kernel memory: 10112K
-> > > [    3.735178] Run /sbin/init as init process
-> > > [    3.743770] eth0: bad gso: type: 1, size: 1440
-> > > [    3.744186] eth0: bad gso: type: 1, size: 1440
-> > > ...
-> > > [  154.610991] eth0: bad gso: type: 1, size: 1440
-> > > [  185.330941] nfs: server 10.2.80.41 not responding, still trying
-> > > ...
-> > > 
-> > > the "bad gso" message keeps repeating and init
-> > > is not executed.
-> > > 
-> > > if i revert the 3 patches above on 6.11-rc6 then
-> > > init runs without "bad gso" error.
-> > > 
-> > > this affects testing the arm64-gcs patches on
-> > > top of 6.11-rc3 and 6.11-rc6
-> > > 
-> > > not sure if this is an fvp or kernel bug.
-> > 
-> > Thanks for the report, sorry that you're encountering this breakage.
-> > 
-> > Makes sense that this commit introduced it
-> > 
-> >         if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
-> >                                   virtio_is_little_endian(vi->vdev))) {
-> >                 net_warn_ratelimited("%s: bad gso: type: %u, size: %u\n",
-> >                                      dev->name, hdr->hdr.gso_type,
-> >                                      hdr->hdr.gso_size);
-> >                 goto frame_err;
-> >         }
-> >         
-> > Type 1 is VIRTIO_NET_HDR_GSO_TCPV4
-> > 
-> > Most likely this application is inserting a packet with flag
-> > VIRTIO_NET_HDR_F_NEEDS_CSUM and a wrong csum_start. Or is requesting
-> > TSO without checksum offload at all. In which case the kernel goes out
-> > of its way to find the right offset, but may fail.
-> > 
-> > Which nfs-client is this? I'd like to take a look at the sourcecode.
-> > 
-> > Unfortunately the kernel warning lacks a few useful pieces of data,
-> > such as the other virtio_net_hdr fields and the packet length.
-> 
-> This happens on the virtio-net receive path, so the bad data is
-> received from the hypervisor.
-> 
-> >From what I gather that arm64 fvp (Fixed Virtual Platforms) hypervisor
-> is closed source?
-> 
-> Disabling GRO on this device will likely work as temporary workaround.
-> 
-> What we can do is instead of dropping packets to correct their offset:
-> 
->                 case SKB_GSO_TCPV4:
->                 case SKB_GSO_TCPV6:
-> -                        if (skb->csum_offset != offsetof(struct tcphdr, check))
-> -                                return -EINVAL;
-> +                        if (skb->csum_offset != offsetof(struct tcphdr, check)) {
-> +                                DEBUG_NET_WARN_ON_ONCE(1);
-> +                                skb->csum_offset = offsetof(struct tcphdr, check);
-> +                        }
-> 
-> If the issue is in csum_offset. If the new csum_start check fails,
-> that won't help.
-> 
-> It would be helpful to see these values at this point, e.g., with
-> skb_dump(KERN_INFO, skb, false);
+--Sig_/s7I4owHF4ZGfP9IjmS+c.Mz
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-thanks for the quick response.
+Hi Sebastian,
 
-i sent this issue on my last day at the company so
-i won't be able to help with this any more, sorry.
+> syzbot reported that the seqnr_lock is not acquire for frames received
+> over the interlink port. In the interlink case a new seqnr is
+> generated and assigned to the frame.
 
-fvp is closed source but has freely available binaries
-for x86_64 glibc based linux systems (behind registration
-and license agreements) so in principle the issue can be
-reproduced outside of arm but using fvp is not obvious.
+Yes, correct.
 
-hopefully somebody at arm can pick it up or at least
-report this thread to the fvp team internally.
+The seq number for frames incomming from HSR ring are extracted from
+the HSR header.
+
+For frames going from interlink (SAN) network to RedBox, the start seq
+number is assigned when node is created (and the creation node code is
+reused).
+
+> Frames, which are received over the slave port have already a sequence
+> number assigned so the lock is not required.
+>=20
+> Acquire the hsr_priv::seqnr_lock during in the invocation of
+> hsr_forward_skb() if a packet has been received from the interlink
+> port.
+>=20
+> Reported-by: syzbot+3d602af7549af539274e@syzkaller.appspotmail.com
+> Closes:
+> https://groups.google.com/g/syzkaller-bugs/c/KppVvGviGg4/m/EItSdCZdBAAJ
+> Fixes: 5055cccfc2d1c ("net: hsr: Provide RedBox support (HSR-SAN)")
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de> ---
+>  net/hsr/hsr_slave.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+> index af6cf64a00e08..464f683e016db 100644
+> --- a/net/hsr/hsr_slave.c
+> +++ b/net/hsr/hsr_slave.c
+> @@ -67,7 +67,16 @@ static rx_handler_result_t hsr_handle_frame(struct
+> sk_buff **pskb) skb_set_network_header(skb, ETH_HLEN + HSR_HLEN);
+>  	skb_reset_mac_len(skb);
+> =20
+> -	hsr_forward_skb(skb, port);
+> +	/* Only the frames received over the interlink port will
+> assign a
+> +	 * sequence number and require synchronisation vs other
+> sender.
+> +	 */
+> +	if (port->type =3D=3D HSR_PT_INTERLINK) {
+> +		spin_lock_bh(&hsr->seqnr_lock);
+
+I'm just wondering if this could have impact on offloaded HSR operation.
+
+I will try to run hsr_redbox.sh test on this patch (with QEMU) and
+share results.
+
+> +		hsr_forward_skb(skb, port);
+> +		spin_unlock_bh(&hsr->seqnr_lock);
+> +	} else {
+> +		hsr_forward_skb(skb, port);
+> +	}
+> =20
+>  finish_consume:
+>  	return RX_HANDLER_CONSUMED;
+
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/s7I4owHF4ZGfP9IjmS+c.Mz
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmbexLwACgkQAR8vZIA0
+zr0lFwgAp+PzpGyRfUz2Ji7ANR1zTWStDXoVMvLATtkJntN6QodFTFPf/w4XUZ+z
+clvptnn8hJbGVikHD54WZuLYFdq7LrXonuFJhrFRa2nuT9lzTNNfqiek0KSJw2w8
+SZ0+7lVKhkbVwd4Hr7z+0WuFrF5eV69xsnka7uGr31p0OqNe8Nd794CKboITdSFS
+tnuG21zZWXSm4jS76KcVKvNtjA5+RYrLdKQWz7D0TNdeTaBjPNiD0MHNliZz/HtV
+5w8NmZRlKYzJmhfmw8hGyjqLHAgtXhV4EVR2rwrfrTKI8Bg5KbHPv5RIpf5iKUIn
+vw9s70wCLRwRHpcc03pu49fgLdmHtQ==
+=OELS
+-----END PGP SIGNATURE-----
+
+--Sig_/s7I4owHF4ZGfP9IjmS+c.Mz--
 
