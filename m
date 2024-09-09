@@ -1,328 +1,194 @@
-Return-Path: <netdev+bounces-126364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0FE3970D9F
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:47:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556F8970DB1
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 07:50:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE3601C21CAE
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 05:47:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF0F0B21A61
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 05:50:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D75C41B2515;
-	Mon,  9 Sep 2024 05:43:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2B81AD402;
+	Mon,  9 Sep 2024 05:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FjgbLPZK"
+	dkim=pass (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b="NqYy5R7r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27DFF1AE87D
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 05:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E241AC8A5;
+	Mon,  9 Sep 2024 05:44:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725860635; cv=none; b=PthlGdRVUnv6v1ft99lhC+QZskG0iJBrFuOxUJg11ofuQQK0G+q5Qaf96GHWzqK2ql0xqQxJdG0XDe9h0uB7y7pFzjnnrYtNdyE4XLGumkdoPgsvLZeKv58JikCJkLsawGjDxKiRMw2sEhK7HxSOxrUFxVqoBXtztMgalf5Ng+I=
+	t=1725860695; cv=none; b=bCQYg58t6UMpFnc7Aoa+EqLCAP5z6uGREsHO4yKijxkO63NHndm8p+16Uy1S67fCLWXkB7+Uw5kcI+m8f0BekvqEHwB+yLQ7UWUkHM/Cv7WnUS4Yd/Nu9b+g2hZzIscXclyXcROXp8PN7WZ9mTUX9BSBONggXvvCZraeTDnmMJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725860635; c=relaxed/simple;
-	bh=PJB8MnDkY64lJweDrjdNdgxrCAth9X9p/HaOyMbjVAA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=P2eJIcnhJNh9G4CsDPWc4EPqrmqbqwY8d0FjSg6f6LOwHY1bqE/vzyuGUm0kn3Dyl8AtRtMAK++pKSC6ehOGpoW9ByzVrYA/z3mK8gtz6RdBYeczvRuWKzCcaR4HUisUudw4lgtzfXVTXaDDxQXqwrv/eS643t6bYSrcqERlDLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FjgbLPZK; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7d4fc4652f6so4906500a12.0
-        for <netdev@vger.kernel.org>; Sun, 08 Sep 2024 22:43:51 -0700 (PDT)
+	s=arc-20240116; t=1725860695; c=relaxed/simple;
+	bh=O1ycc38W3VldvShja86StoBI1PGMFy9V2eFhQuTFQxs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=laDW05Rc8JpR3H7UxJqP+eZIObpuUydOl2s+plwIOguIXb6Sg6Kzlxtcyma/iVSIAipzTU2RhRPYE7RYtvdT6pRalw9uvGAqTGnX2J8hsWf+c9k0wVUcoJsxFHu2CVk17A6A2T9oryLq48QfilTO+KdJATK0eLf6j3cIBisllcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au; spf=pass smtp.mailfrom=gmail.com; dkim=pass (1024-bit key) header.d=jms.id.au header.i=@jms.id.au header.b=NqYy5R7r; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jms.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a80eab3945eso361362466b.1;
+        Sun, 08 Sep 2024 22:44:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725860628; x=1726465428; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WTSeEQvvLz7JMkJB8rY34SUA6KPOOIDr3cyazlDccxw=;
-        b=FjgbLPZKVhfU2DWXWw/vaBN4AiU7a72MxExlOzESVkOU4SjQ9DN4jKTq+y/GpwILhE
-         nGkj8H+cuSH6jVIkLN8egUsm0Ted/iBL4R08oRUo7yVzWPIO4Z304awPqdekLEA18g5p
-         Mw2cj319aYt9sIDSryz+A8vDTOhW2WY4e8zO2nXzKjODkOlUeOIGpSFnozo3jY+7GebC
-         UOFFCYusTlVhkTPnuft1hv7hrnnMsVVv75SrYgwGiVajRxz4c5tsFD3NUVQgV6y8qNGU
-         xx9YJrfsBb9XlKQzwPt4xUgoSt1/NOK2N8dTS/MFWihI9RboOGtW/8fxmVoFlm5lUbNL
-         8p7Q==
+        d=jms.id.au; s=google; t=1725860687; x=1726465487; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7pxAZ1eVjHpYIL+4uC4a6YpmXbPdojL06PzoA4vC2/M=;
+        b=NqYy5R7r1soyOjQ60cz7AvFUF1GyGtv8VWArxrgKZ3UYniL2pRiFrr0VPBpQokh6C+
+         WOPv26JgD1IzcevFanbcRQXQZlg3DZDOYkC/Ks+2pDxqwXNmnFmAvAGYdFPoBpMa/cdC
+         R3wu8Ao5eWRTA5c2pCLW+QmBFmTOx3gJxy5oU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725860628; x=1726465428;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WTSeEQvvLz7JMkJB8rY34SUA6KPOOIDr3cyazlDccxw=;
-        b=p9YX87XfGOR0SMiCYjrh/zuUu3kxEIc2hhWKn30/dKQ39MIALwca/VXNLBm9IuDWZ7
-         eMfU9kUbV4my8CrAA940PSSqEqAIfU7np4RV8Oj6gJiMO0PcCrq7qfxB09HCBMSK7gPm
-         F3TdPL74a7adp9ZuGLuSrDF16jWH/hniELSCn/SxNOVyYvLRKPLjYPbf/bpHgaDW6V1Q
-         uw9t/lOJehZwMvFn6SBUEpm293u/uoT0XPCpLb20hnknjrxJ89Qw1GlpeKZSsqcii0ra
-         q/quBt31QNhCuO3xs9Oh48nZqSq5RZ/hcIVPhukI+0HBfMTP6Pw5G7jPZRNsHts7RSdn
-         jZOQ==
-X-Gm-Message-State: AOJu0YxSlhHq7sAYCwKL9cdKzfW3xIDs54TBkbSshzfWVvCAlFr/a4J/
-	uNXBhkv53VESeL/beXQDcoTy7NpbJq/7lVaIGTRW3C6DmR3s5lFSGLeprF9tEhTTYTq3l8Isdws
-	It6DgQdVp09mzPR0w2RvZN9VVZhX5+ACOdpdhwdZWbe3BtbfmIbF6XdCSGddDg8+w6DTGL0T10W
-	qfmT3YpZ3mZWRv9zl8EfkUsIK02TxNU27oZAjFqXl8/E7QIO+f6T5TtpOQhKY=
-X-Google-Smtp-Source: AGHT+IFlawdC4KCQfLhqI0Xy7yk4ED2go+LFfUpiqb3BRrNWwO5I+1bNuk03iJCYZid8NNj/xbpv1Yi7TsuSmuqPKg==
-X-Received: from almasrymina.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:4bc5])
- (user=almasrymina job=sendgmr) by 2002:a63:3755:0:b0:6f3:b24:6c27 with SMTP
- id 41be03b00d2f7-7d79f6e5f59mr68139a12.5.1725860627260; Sun, 08 Sep 2024
- 22:43:47 -0700 (PDT)
-Date: Mon,  9 Sep 2024 05:43:18 +0000
-In-Reply-To: <20240909054318.1809580-1-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1725860687; x=1726465487;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7pxAZ1eVjHpYIL+4uC4a6YpmXbPdojL06PzoA4vC2/M=;
+        b=iJEgHTDm9jASnM1q245YGlr9SM1qimXf4fVaKOqI8yArH3gHTZVkFOlcGRorxP3NVp
+         41yaHrK7rGG2LBXSPsBysanVzaBDWH+ioYapmdtKLKu5B+jKz8hfN4K3BgMsXy5eGQXW
+         UW24iPRMStf0cItOGUClwYpvsU1cVA9G4p+wxfJbKrEmidfNyHeHlrTjFSnsiM3GOiE0
+         K+0JzWEeH1L4ECOPE3F6c6ckTPImUFkjvN4xD0wW6YgVs7VucfoimLDCPA0LwLxhPyET
+         LDd146DJ/5+lI7fcI93E1edG38wCEkA7y/Niy4vUVeYKn2sqQPs6kOctP/Ac5rmYjvuc
+         aKdg==
+X-Forwarded-Encrypted: i=1; AJvYcCUqLUBKsDglPA+sVOkQxKZ9TPsGoXo8kcfPFraH1aqshb32KTxvxYibm1ByYsfPA1U7zOe6Kgzd@vger.kernel.org, AJvYcCXhRwG9gDzAllc3jSNG5W8EBpVmHb2eGAzNhslt1YBoWG+ohEr6PlVF4Pl5JYrvyLs30Vdd3KNKQ0+w/M8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpnbJJRgqJzcwIfOm7sYSRzp+UGmLr8Sd8TKf6g3seUqJ3qbKA
+	SG8M6obiIP/DYNyIAJmE8qJwWQoUbwLt50i923dJRxo+5cUTXUOvB7rgkjps/0a2SKOaMzNFMTJ
+	sK9Yvs5+LO73ut/YWwyIgamC19Z8=
+X-Google-Smtp-Source: AGHT+IGGCW7PztODXPKl6CWmPcAl2mDjthVbQgyNHUBRxCLRm6aJ9UQu58RWOsQEHFJuuvHZqvDIG++0o+uNCSo5MVE=
+X-Received: by 2002:a17:907:7f25:b0:a8d:6648:813f with SMTP id
+ a640c23a62f3a-a8d6648846amr9112166b.3.1725860686300; Sun, 08 Sep 2024
+ 22:44:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240909054318.1809580-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.46.0.469.g59c65b2a67-goog
-Message-ID: <20240909054318.1809580-14-almasrymina@google.com>
-Subject: [PATCH net-next v25 13/13] netdev: add dmabuf introspection
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org
-Cc: Mina Almasry <almasrymina@google.com>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"=?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?=" <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, 
-	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Shailend Chand <shailend@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Bagas Sanjaya <bagasdotme@gmail.com>, 
-	Christoph Hellwig <hch@infradead.org>, Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>
+MIME-Version: 1.0
+References: <20240822073006.817173-1-jacky_chou@aspeedtech.com>
+In-Reply-To: <20240822073006.817173-1-jacky_chou@aspeedtech.com>
+From: Joel Stanley <joel@jms.id.au>
+Date: Mon, 9 Sep 2024 15:14:33 +0930
+Message-ID: <CACPK8XddKEgT9QeDkx2Shftj582rV8sfWwJGPxuv-2HOG0GxcA@mail.gmail.com>
+Subject: Re: [PATCH] net: ftgmac100: Ensure tx descriptor updates are visible
+To: Jacky Chou <jacky_chou@aspeedtech.com>, Ryan Chen <ryan_chen@aspeedtech.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, u.kleine-koenig@pengutronix.de, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Add dmabuf information to page_pool stats:
+On Thu, 22 Aug 2024 at 17:00, Jacky Chou <jacky_chou@aspeedtech.com> wrote:
+>
+> The driver must ensure TX descriptor updates are visible
+> before updating TX pointer and TX clear pointer.
+>
+> This resolves TX hangs observed on AST2600 when running
+> iperf3.
 
-$ ./cli.py --spec ../netlink/specs/netdev.yaml --dump page-pool-get
-...
- {'dmabuf': 10,
-  'id': 456,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 455,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 454,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 453,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 452,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 451,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 450,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
- {'dmabuf': 10,
-  'id': 449,
-  'ifindex': 3,
-  'inflight': 1023,
-  'inflight-mem': 4190208},
+Thanks for re-submitting my patch and getting it merged. In the
+future, it would be best if you left the authorship, and preserved my
+commit message.
 
-And queue stats:
+ https://lore.kernel.org/all/20201020220639.130696-1-joel@jms.id.au/
 
-$ ./cli.py --spec ../netlink/specs/netdev.yaml --dump queue-get
-...
-{'dmabuf': 10, 'id': 8, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 9, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 10, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 11, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 12, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 13, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 14, 'ifindex': 3, 'type': 'rx'},
-{'dmabuf': 10, 'id': 15, 'ifindex': 3, 'type': 'rx'},
+Cheers,
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Joel
 
----
-
-v24:
-- Code cleanup, no cast and use 1 if statement (Jakub)
-
----
- Documentation/netlink/specs/netdev.yaml | 10 ++++++++++
- include/uapi/linux/netdev.h             |  2 ++
- net/core/netdev-genl.c                  |  7 +++++++
- net/core/page_pool_user.c               |  5 +++++
- tools/include/uapi/linux/netdev.h       |  2 ++
- 5 files changed, 26 insertions(+)
-
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 0c747530c275..08412c279297 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -167,6 +167,10 @@ attribute-sets:
-           "re-attached", they are just waiting to disappear.
-           Attribute is absent if Page Pool has not been detached, and
-           can still be used to allocate new memory.
-+      -
-+        name: dmabuf
-+        doc: ID of the dmabuf this page-pool is attached to.
-+        type: u32
-   -
-     name: page-pool-info
-     subset-of: page-pool
-@@ -268,6 +272,10 @@ attribute-sets:
-         name: napi-id
-         doc: ID of the NAPI instance which services this queue.
-         type: u32
-+      -
-+        name: dmabuf
-+        doc: ID of the dmabuf attached to this queue, if any.
-+        type: u32
- 
-   -
-     name: qstats
-@@ -543,6 +551,7 @@ operations:
-             - inflight
-             - inflight-mem
-             - detach-time
-+            - dmabuf
-       dump:
-         reply: *pp-reply
-       config-cond: page-pool
-@@ -607,6 +616,7 @@ operations:
-             - type
-             - napi-id
-             - ifindex
-+            - dmabuf
-       dump:
-         request:
-           attributes:
-diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-index 91bf3ecc5f1d..7c308f04e7a0 100644
---- a/include/uapi/linux/netdev.h
-+++ b/include/uapi/linux/netdev.h
-@@ -93,6 +93,7 @@ enum {
- 	NETDEV_A_PAGE_POOL_INFLIGHT,
- 	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
- 	NETDEV_A_PAGE_POOL_DETACH_TIME,
-+	NETDEV_A_PAGE_POOL_DMABUF,
- 
- 	__NETDEV_A_PAGE_POOL_MAX,
- 	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-@@ -131,6 +132,7 @@ enum {
- 	NETDEV_A_QUEUE_IFINDEX,
- 	NETDEV_A_QUEUE_TYPE,
- 	NETDEV_A_QUEUE_NAPI_ID,
-+	NETDEV_A_QUEUE_DMABUF,
- 
- 	__NETDEV_A_QUEUE_MAX,
- 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 9153a8ab0cf8..1cb954f2d39e 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -295,6 +295,7 @@ static int
- netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 			 u32 q_idx, u32 q_type, const struct genl_info *info)
- {
-+	struct net_devmem_dmabuf_binding *binding;
- 	struct netdev_rx_queue *rxq;
- 	struct netdev_queue *txq;
- 	void *hdr;
-@@ -314,6 +315,12 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 		if (rxq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
- 					     rxq->napi->napi_id))
- 			goto nla_put_failure;
-+
-+		binding = rxq->mp_params.mp_priv;
-+		if (binding &&
-+		    nla_put_u32(rsp, NETDEV_A_QUEUE_DMABUF, binding->id))
-+			goto nla_put_failure;
-+
- 		break;
- 	case NETDEV_QUEUE_TYPE_TX:
- 		txq = netdev_get_tx_queue(netdev, q_idx);
-diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-index cd6267ba6fa3..48335766c1bf 100644
---- a/net/core/page_pool_user.c
-+++ b/net/core/page_pool_user.c
-@@ -9,6 +9,7 @@
- #include <net/page_pool/types.h>
- #include <net/sock.h>
- 
-+#include "devmem.h"
- #include "page_pool_priv.h"
- #include "netdev-genl-gen.h"
- 
-@@ -213,6 +214,7 @@ static int
- page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 		  const struct genl_info *info)
- {
-+	struct net_devmem_dmabuf_binding *binding = pool->mp_priv;
- 	size_t inflight, refsz;
- 	void *hdr;
- 
-@@ -242,6 +244,9 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
- 			 pool->user.detach_time))
- 		goto err_cancel;
- 
-+	if (binding && nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, binding->id))
-+		goto err_cancel;
-+
- 	genlmsg_end(rsp, hdr);
- 
- 	return 0;
-diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
-index 91bf3ecc5f1d..7c308f04e7a0 100644
---- a/tools/include/uapi/linux/netdev.h
-+++ b/tools/include/uapi/linux/netdev.h
-@@ -93,6 +93,7 @@ enum {
- 	NETDEV_A_PAGE_POOL_INFLIGHT,
- 	NETDEV_A_PAGE_POOL_INFLIGHT_MEM,
- 	NETDEV_A_PAGE_POOL_DETACH_TIME,
-+	NETDEV_A_PAGE_POOL_DMABUF,
- 
- 	__NETDEV_A_PAGE_POOL_MAX,
- 	NETDEV_A_PAGE_POOL_MAX = (__NETDEV_A_PAGE_POOL_MAX - 1)
-@@ -131,6 +132,7 @@ enum {
- 	NETDEV_A_QUEUE_IFINDEX,
- 	NETDEV_A_QUEUE_TYPE,
- 	NETDEV_A_QUEUE_NAPI_ID,
-+	NETDEV_A_QUEUE_DMABUF,
- 
- 	__NETDEV_A_QUEUE_MAX,
- 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
--- 
-2.46.0.469.g59c65b2a67-goog
-
+>
+> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> ---
+>  drivers/net/ethernet/faraday/ftgmac100.c | 26 ++++++++++++++++--------
+>  1 file changed, 18 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
+> index 93862b027be0..9c521d0af7ac 100644
+> --- a/drivers/net/ethernet/faraday/ftgmac100.c
+> +++ b/drivers/net/ethernet/faraday/ftgmac100.c
+> @@ -582,7 +582,7 @@ static bool ftgmac100_rx_packet(struct ftgmac100 *priv, int *processed)
+>         (*processed)++;
+>         return true;
+>
+> - drop:
+> +drop:
+>         /* Clean rxdes0 (which resets own bit) */
+>         rxdes->rxdes0 = cpu_to_le32(status & priv->rxdes0_edorr_mask);
+>         priv->rx_pointer = ftgmac100_next_rx_pointer(priv, pointer);
+> @@ -666,6 +666,11 @@ static bool ftgmac100_tx_complete_packet(struct ftgmac100 *priv)
+>         ftgmac100_free_tx_packet(priv, pointer, skb, txdes, ctl_stat);
+>         txdes->txdes0 = cpu_to_le32(ctl_stat & priv->txdes0_edotr_mask);
+>
+> +       /* Ensure the descriptor config is visible before setting the tx
+> +        * pointer.
+> +        */
+> +       smp_wmb();
+> +
+>         priv->tx_clean_pointer = ftgmac100_next_tx_pointer(priv, pointer);
+>
+>         return true;
+> @@ -819,6 +824,11 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
+>         dma_wmb();
+>         first->txdes0 = cpu_to_le32(f_ctl_stat);
+>
+> +       /* Ensure the descriptor config is visible before setting the tx
+> +        * pointer.
+> +        */
+> +       smp_wmb();
+> +
+>         /* Update next TX pointer */
+>         priv->tx_pointer = pointer;
+>
+> @@ -839,7 +849,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
+>
+>         return NETDEV_TX_OK;
+>
+> - dma_err:
+> +dma_err:
+>         if (net_ratelimit())
+>                 netdev_err(netdev, "map tx fragment failed\n");
+>
+> @@ -861,7 +871,7 @@ static netdev_tx_t ftgmac100_hard_start_xmit(struct sk_buff *skb,
+>          * last fragment, so we know ftgmac100_free_tx_packet()
+>          * hasn't freed the skb yet.
+>          */
+> - drop:
+> +drop:
+>         /* Drop the packet */
+>         dev_kfree_skb_any(skb);
+>         netdev->stats.tx_dropped++;
+> @@ -1354,7 +1364,7 @@ static void ftgmac100_reset(struct ftgmac100 *priv)
+>         ftgmac100_init_all(priv, true);
+>
+>         netdev_dbg(netdev, "Reset done !\n");
+> - bail:
+> +bail:
+>         if (priv->mii_bus)
+>                 mutex_unlock(&priv->mii_bus->mdio_lock);
+>         if (netdev->phydev)
+> @@ -1554,15 +1564,15 @@ static int ftgmac100_open(struct net_device *netdev)
+>
+>         return 0;
+>
+> - err_ncsi:
+> +err_ncsi:
+>         napi_disable(&priv->napi);
+>         netif_stop_queue(netdev);
+> - err_alloc:
+> +err_alloc:
+>         ftgmac100_free_buffers(priv);
+>         free_irq(netdev->irq, netdev);
+> - err_irq:
+> +err_irq:
+>         netif_napi_del(&priv->napi);
+> - err_hw:
+> +err_hw:
+>         iowrite32(0, priv->base + FTGMAC100_OFFSET_IER);
+>         ftgmac100_free_rings(priv);
+>         return err;
+> --
+> 2.25.1
+>
+>
 
