@@ -1,110 +1,144 @@
-Return-Path: <netdev+bounces-126436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EACE397127A
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:47:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 876F397129B
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:50:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 952281F23426
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:47:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5BBC1C22A9A
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F1A1B2535;
-	Mon,  9 Sep 2024 08:47:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879831B29BB;
+	Mon,  9 Sep 2024 08:50:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="fKEiFbNp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S+q5e+Mi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F361B1D7E
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 08:47:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2B01B1515;
+	Mon,  9 Sep 2024 08:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725871637; cv=none; b=LLxE6dDmlwiB2gD30cIYsT2zFE7qFwGId/vxe9V3pPDPJdhNgOTBYXHSknp9BbokMqrUhwFepX0sHRw75EdhdxTccabK/xBxdujEtNJSlL6wnahzGa+Z5bPtBomfWPyUevRjct+VI9W0cwF3Xh5Othp5MPBKqGaCxdlsw3zOrDA=
+	t=1725871835; cv=none; b=Mlp4mKVjn+pmtHpMd3XjHAwbRhBvSvJT2K6cdtHWnIkZvZnTkoCw0tfkj4WkeZuHxH0uwokE2oWGZARY5QuJkXVr0KxQZ2qoOxtKIipjDXTRpiK9+pei4r+Tjm+8sih7vpN6h5FktLfNVvxa/qaGXdFGPbZmHWQk4sr0wuPRjvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725871637; c=relaxed/simple;
-	bh=67DL9UktAXzrHcrFumAZEwLE/YCzi76PqdEqAACbucc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BuTfeypEbrZ+CZSNG1Xeb4ORmDTrIz+FBz+/w9GgICfAtnFbp5nAset/aTTQ/vbNhtB3R4bNLFUqVVLPT1HlTGYPgsC3Q9swcedmeklxxZ8bxvuBilji96Lzx6V0NTWD1MVa81eGtuXT59ndgPpw69+k+eOD0tIQ8Jisa7aB8Is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=fKEiFbNp; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-374ca65cafdso2524008f8f.2
-        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 01:47:14 -0700 (PDT)
+	s=arc-20240116; t=1725871835; c=relaxed/simple;
+	bh=UExkI6GiOyg9fq7gq7e9415xYQTdFebhf5cMaTDpOac=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=No9uvi03izYkHLV/KxNvTZw0uuY3csSCeRxaEHiy6/O0gQdH1yciw6LarJgMs94mRQyqn7u0QnawnzX/iQzYQ4HchBHyLBXSuzQrAGbFV1zl0miwKyxBojFUGE4NIcKveYbKp9Zs1NMjVeWFSQEsJnYTECW6UpRo/l0ebJKCbAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S+q5e+Mi; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5365aa568ceso3341838e87.0;
+        Mon, 09 Sep 2024 01:50:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1725871633; x=1726476433; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eRhD01m5pD4Tx0VdaioM7TI5h41AeXLRmUnW4jKsLv4=;
-        b=fKEiFbNpdKnHeWCQAEjSiK9f5vLDjY6of7/XOJO/quo/VzpsvtL2dLXs+wyIlcVMfg
-         oQVnN35reSYT2yGwXA+zK/tUD8vIiaiURkg8MmGB4aEe+yavZYooua1ScW+CqGk9JRkY
-         0r++UYddvOFHr6Q2aWOL9wQgpGvYRuO1AmYKqUYkuVS3RLJ4cqZpH5FSdCU93mFjXk1g
-         +yP0AAoMKfxmgVGCEzeihoei5+F+mow7TjQzxwrj6MHnWNREUE5CR+cAQeZKsau8JdAK
-         bJLeMC5U8+w+piK+PpHL5Dgks8Bt+/bK88UvRHCTtwlz9Owsij+UkVvmX64Vku9UBclM
-         TaHA==
+        d=gmail.com; s=20230601; t=1725871832; x=1726476632; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qMJgZ9pgfiljRe+M72ZqUEaho/KQ7dkzOtNSpn7FOBk=;
+        b=S+q5e+MipOaJkFm6hsiB6NN0IOHTbPaHgjv4/SN7yeuHg2SPP53T7v3DFVVdvE20xF
+         BTxGN3X/ho6TGWYEqEJVJmdIeh1LiiuU5WHYKIwSY7NmtaybwkscOZBhQNUY2HMnrRM5
+         ghJxt/nCCZ+9bQJZPmc6YsIx4t6OYE4CXTUbqFTN5CaWWJGClFa2LwnQbzHLNFlB6i0U
+         ejdW9JT3rfLnQoJClpWElwQqUksJlZRSaILE980xjGliZY8s2Ql/ftA29nnw6V8bJf5Q
+         gRG7CPg8jBsjAcVnhIRQxKn4faVC/MHOdFwD3iLQYL6jaRop5lTLbtYuu00/WKP45Q4E
+         +2TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725871633; x=1726476433;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eRhD01m5pD4Tx0VdaioM7TI5h41AeXLRmUnW4jKsLv4=;
-        b=tiJbCaD/OlJ0vRckl65oKxtVkEm2tkKULrzRBixYyzq8Ph+hfatAHpqgMrowH3CEcf
-         4g8/PiZh/5MUF0wo0PzhVXy+6pyyTWAbWnS6IxSox41Hwu2rh76+Vv6TFrXIxhnWMFLK
-         Ih7bbB0oy8LCU7+uCIMf2y97aZWwpca2pdLuEQzb5n4YtlD3u5zcc3G9S5bOcmuHuOcU
-         OudTP4XbqZXo2Vv0k8vpMbcZbRmNu++fkOh/DmcaaoW0l8PLLDJjY1X+sr6YewEgzKWu
-         BC+oOQwc3L69PAAyxd2R8S+e0bxqWZgg5tTYXICsqaVPIsnOpaFDy9mg3lwI7Ez7ptZP
-         XemQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXX4ZYxfTXyXyUJjLEWAWIrJqTwdykLSjzh5fX6kHSYbNvIkOpewQQQX5YHNSi7j+ETw0ILNyM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzyy8rc6NWfOf7fUVQ3fg3FT2JYrjtcsOK1YLbnn7VyIuKkMqNT
-	iZiWohcs0evzgeKjnn21jxhnw1eHXdINVyReQF1voWTM6LIPvbKBG3Vrorn42SU=
-X-Google-Smtp-Source: AGHT+IHuH34xXlzk7fHHJpOQQ6kyrzNVVCI5+xfxdmnh0PKudIfQ/+z8O+v3Q2sgfq3jECYDUsY0AQ==
-X-Received: by 2002:adf:ec06:0:b0:374:b6f4:d8d1 with SMTP id ffacd0b85a97d-378949edc6bmr4108900f8f.13.1725871632820;
-        Mon, 09 Sep 2024 01:47:12 -0700 (PDT)
-Received: from ?IPV6:2001:a61:13b3:9201:e68f:3bce:663e:dfa9? ([2001:a61:13b3:9201:e68f:3bce:663e:dfa9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3789564a340sm5421316f8f.24.2024.09.09.01.47.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 Sep 2024 01:47:12 -0700 (PDT)
-Message-ID: <8510a98e-f950-4349-99bc-9d36febe94d3@suse.com>
-Date: Mon, 9 Sep 2024 10:47:11 +0200
+        d=1e100.net; s=20230601; t=1725871832; x=1726476632;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qMJgZ9pgfiljRe+M72ZqUEaho/KQ7dkzOtNSpn7FOBk=;
+        b=mrKjzx+L+WrZJeIF/k4gE7/1rwHpke3KyEQtKvruYTv5qZxRm29V6LvNcbMw55dw7i
+         zyyY9lLLqENoiNQl17mS2F/CclP9h4hQ4GKGWB4j/TblFaNeQf4Au/t2OrvMwswT5EXP
+         Ms5cXsZQC1lnE1Nj29bCza26GQB3nV3Wn4U8Ly9h2R+a8zA54wzsHj+VK7AP2ZwbLbJz
+         SRsfSJc1O+avKpVYMFVZi9rEufT1eHfZAxgRdrCHaiC2J/XLBUCx2a9dOgddtwieSj+/
+         zJB7xiFij/o6diq/RYJXKhVL/k8IvdmmYTZOjzxQyjHDwh5JT+nbfHNIuqNapO9glGkk
+         VDCg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtpZwjw4AliwUr2Ly4NtdWc1206fUbRSJALbr8fjg9HYXiiOm95tW1++2hiqZrhUMc+omo1eCrZFHf@vger.kernel.org, AJvYcCV2KOpkQW14fNqmzGbFCh/juqxBgqLb/F6njDNsfXTejsDU6SomLSbCJrZKkLfii2WVe+hoara5520Z@vger.kernel.org, AJvYcCVjqvKthfPfBDICcjuCzxVHI+fPaw2cEX1HRUOttRGG8mW7kver96a72S5Bx3Ur4LMDEnW2f3OE2RuWQas=@vger.kernel.org, AJvYcCVpRoHKD8wfsgQKJ74NNYcWsuZU9TeKU5cRD+cYgfdyZZuYo0CJt9jDrbTI81jzsTNHAxO0TxQny6P8ncA=@vger.kernel.org, AJvYcCVzX+utP2+R0gPNtKj4Q8jurtFGBYNqfJOHsAr04Y4V7F1RRHoILB5ySP8ghNAD95hxbXyyj3aZrZqH@vger.kernel.org, AJvYcCW1b3lU+DGSuffo/6kXRxDg8FhIxkcI9rCCqBoB1mowiOM6msqOeiCN2f/4YiIdYK6SxuFDbZLMaHJy@vger.kernel.org, AJvYcCWq1gU/rGWULCcafKjqSkHZzlW+pFp/tfbwYZZNdYXzKC8Un/Rweip4yUbp13euWZMDoTzzJ+0/Txxfq7arxkw=@vger.kernel.org, AJvYcCWzNpg8f2GG8jUBSkHTxa8VF/Lfv/ELcaOPB7LjsEAZOhMEe90qTAPw9ku0mxKfKmu1RgzLZ3Gl/QZd@vger.kernel.org, AJvYcCX8vm0bSWbzrhQfa85++rE3jvYsldvfvDQ1a+jPLGqbLAt58evuuA07e6RrjVYxqj/apsKJmfLu@vger.kernel.org, AJvYcCXMcBBmaCMYZ+0DpZk6ggtL3XRfiqh+SbT8
+ gW531k2le02MItrDTLHyIMYiw7UokuNpMdf+hoN+8S8BKA==@vger.kernel.org, AJvYcCXTk9BJBaa3oBZtHvGUdaqGs+4RmKI9fvc2ix6Kvcjew+ZR36CWbTKDbdOZ9HFSeoVEA9IQ0qQXQNDL@vger.kernel.org, AJvYcCXfBYWIJc1lM042B4AalZjxAjbQaNLN0mihj8KnuAeMjLKBinty3YGfGjRBz1xA3K608Q7rmPN+xJM=@vger.kernel.org, AJvYcCXtClLhTwJsUUPPzV2zkTAPfr3Is4MEXT3xBcTT9JM1EabLFCcY9RpVAYGWF73g76lpAaVA+obSVStK/N5o@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2+u7EhnODfDQLmMij6gUzFEYdIqUF67gmtUhkoxW26B4KLj9S
+	e540vUH54PEbaDWHfjYkF1Lpbsc+QrO+mWjhwlAX9dm9Z8xRAWy/piGTwX5hY2DGTURCAYzlP+n
+	IOzGJOZl5Mbvhv/2yLlCzkyuqvgw=
+X-Google-Smtp-Source: AGHT+IFcTF6tcgjMw6D6S0XG2rYkA0vJft71zEud+Bt80oehc9COujaTfpbyb07ODKbKRYsDsEFhP0R5k4x+NMVw2vM=
+X-Received: by 2002:a05:6512:1395:b0:536:555d:11ed with SMTP id
+ 2adb3069b0e04-536587a67d8mr8746687e87.12.1725871831380; Mon, 09 Sep 2024
+ 01:50:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] usbnet: ipheth: prevent OoB reads of NDP16
-To: Foster Snowhill <forst@pen.gy>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Georgi Valkov <gvalkov@gmail.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org
-References: <20240907230108.978355-1-forst@pen.gy>
-Content-Language: en-US
-From: Oliver Neukum <oneukum@suse.com>
-In-Reply-To: <20240907230108.978355-1-forst@pen.gy>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240909-ep93xx-v12-0-e86ab2423d4b@maquefel.me>
+In-Reply-To: <20240909-ep93xx-v12-0-e86ab2423d4b@maquefel.me>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Mon, 9 Sep 2024 11:49:54 +0300
+Message-ID: <CAHp75Veusv=f6Xf9-gL3ctoO5Njn7wiWMw-aMN45KbZ=YB=mQw@mail.gmail.com>
+Subject: Re: [PATCH v12 00/38] ep93xx device tree conversion
+To: nikita.shubin@maquefel.me
+Cc: Arnd Bergmann <arnd@arndb.de>, Hartley Sweeten <hsweeten@visionengravers.com>, 
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Lukasz Majewski <lukma@denx.de>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Sebastian Reichel <sre@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>, 
+	Guenter Roeck <linux@roeck-us.net>, Thierry Reding <thierry.reding@gmail.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
+	Mark Brown <broonie@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Damien Le Moal <dlemoal@kernel.org>, 
+	Sergey Shtylyov <s.shtylyov@omp.ru>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Ralf Baechle <ralf@linux-mips.org>, "Wu, Aaron" <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, 
+	Olof Johansson <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-clk@vger.kernel.org, linux-pm@vger.kernel.org, 
+	devicetree@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-spi@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-sound@vger.kernel.org, 
+	20240904-devm_clk_hw_register_fixed_rate_parent_data-v1-1-7f14d6b456e5@maquefel.me, 
+	20240829-cs4271-yaml-v3-1-f1624cc838f6@maquefel.me, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Mon, Sep 9, 2024 at 11:12=E2=80=AFAM Nikita Shubin via B4 Relay
+<devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
+>
+> The goal is to recieve ACKs for all patches in series to merge it via Arn=
+d branch.
+>
+> It was decided from the very beginning of these series, mostly because
+> it's a full conversion of platform code to DT and it seemed not
+> convenient to maintain compatibility with both platform and DT.
+>
+> Following patches require attention from Stephen Boyd or clk subsystem:
 
-On 08.09.24 01:01, Foster Snowhill wrote:
+Does it mean you still have a few patches without tags?
+What are their respective numbers?
 
-> To address the above issues without reimplementing more of CDC NCM,
-> rely on and check for a specific fixed format of incoming URBs
-> expected from an iOS device:
-> 
-> * 12-byte NTH16
-> * 96-byte NDP16, allowing up to 22 DPEs (up to 21 datagrams + trailer)
+> - clk: ep93xx: add DT support for Cirrus EP93xx:
+>   - tristate
+>   - drop MFD_SYSCON/REGMAP
+>   - add AUXILIARY_BUS/REGMAP_MMIO
+>   - prefixed all static with ep9xx_
+>   - s/clk_hw_register_ddiv()/ep93xx_clk_register_ddiv()/
+>   - s/clk_register_div()/ep93xx_clk_register_div()/
+>   - dropped devm_ep93xx_clk_hw_register_fixed_rate_parent_data macro
+>   - s/devm_ep93xx_clk_hw_register_fixed_rate_parent_data()/devm_clk_hw_re=
+gister_fixed_rate_parent_data()/
 
-I am afraid this is an approach we must not take. We cannot rely on
-a specific device's behavior in a class driver.
-
-This is a NACK.
-
-	Regards
-		Oliver
+--=20
+With Best Regards,
+Andy Shevchenko
 
