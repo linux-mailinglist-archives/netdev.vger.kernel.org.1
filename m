@@ -1,117 +1,123 @@
-Return-Path: <netdev+bounces-126686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F403972390
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:23:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B42EC972349
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 22:10:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FD66B22EB7
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:23:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E68B11C234BB
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 20:10:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96FD189F58;
-	Mon,  9 Sep 2024 20:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B86189916;
+	Mon,  9 Sep 2024 20:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="SI8ycpVd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QaidQYDS"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDA916EB55;
-	Mon,  9 Sep 2024 20:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4F7188CAF;
+	Mon,  9 Sep 2024 20:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725913379; cv=none; b=hu+h/AcEgYJRgTRWxLb2HkHD+i8xz3mYjW411ABzSaCGRf0PKQDb/FXRPoiKiP6xEKGcz3aYlbSOUAYnGvdZeb8fJjla2rHPToZi5ofgAdqe833E5XTwLTB4bg1U+JxvOR+wcRqHGHRlDnbvVVLCrmideZbn0za/2sDwXj0Ytx4=
+	t=1725912597; cv=none; b=OQjKENHrRowx8yVyG0SzdhaJehz9X+DWduBDO+8QKXjQPL8oOa37MNfJ4EI/y6bX/uupZpNyp2zk1jKp0Cm2B7MwZJ2+LbI8gOC6CmDrTOVAsrrZC2nEH68fOjmNmrj6soEUCWWj08t++FYPvUhG70Qnm/eA3inS/wWqL8Q/SOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725913379; c=relaxed/simple;
-	bh=fym61vLnxXmDgk70up1GmkJ4kJkjM6TUHDTPoPEQZ3A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WSl0UdoPajH3a9Dl28BZa6fDOH8VvfZzU9xSxoh/N+7LKtibTfLXxjDJBjJWVWJ4L652lr4ZLg07jgHzJx4RfQOtkOJCvIwcwvy0w48BrneF5eycuXqoARvWo+HOeUGbC0xsLWiR0nWMNvteBDbmDUscukXsTsqq4MpWMzMTIXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=SI8ycpVd; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 1DC4B86E61;
-	Mon,  9 Sep 2024 22:22:55 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1725913376;
-	bh=gh2pbKUyt80M2vvl5LahTSASU0bun/RjZ+T7oyUJOyw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SI8ycpVdcefwl+a6fifw/j7nVoXVk/vSZiyh+oMmexzbjjtSOYGLrLYcnU2zsKyuc
-	 9ROQVkyiYcc9CNVWdSIAZcZe5996rGGQWMEO6X7XNHhWQoMKIkXefZ8QYOdoOxyRh8
-	 hletsVMuCXl/ZyUoWZI5Zg+/ZBpPeDmqmu/8BdEf2VN6hTXKrKGhXZaQ/xC6zNeqZR
-	 EEzOvNKl+b8avx9KhOKNqA8uyf1PTfm0mmrGganwqJtdXVSTZbglR/0ryDG88aifG0
-	 3k+kC2fONgbho/dx55R7GRBtfJhHp8dBLv3HqZWzx4jJo1/A5cGbub5G8uzzhGcTR9
-	 5UqfZAgyqwDBQ==
-Message-ID: <a25ab711-2680-4bc0-a80e-40699b504903@denx.de>
-Date: Mon, 9 Sep 2024 21:54:41 +0200
+	s=arc-20240116; t=1725912597; c=relaxed/simple;
+	bh=dgEMI3wGf4QoZWLUf+u2E3CCQEsBsqk1dmls2e6pdGk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=A/hpemzCuHZV64FIhhhOjkM6KOUQKPL8rx7AGlX3TKZ4ZeblRkjstflxEM6H7Y4n7VUTnazHY1SsvPVv6lLuvrXhD9pmBlY/YYQZJTxRvT+60ap0pYKoa2bCF9n7mD6bACaxk6FA+fcdCTT4Kknx32TQPlXWSQbOGEviBut/d5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QaidQYDS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6148AC4CEC5;
+	Mon,  9 Sep 2024 20:09:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725912597;
+	bh=dgEMI3wGf4QoZWLUf+u2E3CCQEsBsqk1dmls2e6pdGk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=QaidQYDStABvEz91IKdOY4uT1baJ83j/AI5oe763X/6ZdiiweP/Zn9zu5sO6+RRFb
+	 8GPRZlyITkpHupRBD51GTJBf+NzZfLSDmxpWAMtevT5yl/nnEy56/RqFhOcwpKj5Ef
+	 HTUQ7xaw/AqARU2BI2JoSYObtDqgFgKHHFhyX9rrcvpO38B8KjmiIl7hLtviWCo3uX
+	 CAJUZSGX7+48VXRfszLGZ7prQyK9BzXP+FyGLdBGoc41yT4QujFf7V5ePNdEWIcf16
+	 t4FAI1f3s1h1Uuu8WSi4YPDrCzSvKukC+Y9fZTGKUvDGRXyTsUfm/t/6qGQxeKyhe4
+	 9OyWJ4p6Msj1Q==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next 0/3] mptcp: fallback to TCP after 3 MPC drop +
+ cache
+Date: Mon, 09 Sep 2024 22:09:20 +0200
+Message-Id: <20240909-net-next-mptcp-fallback-x-mpc-v1-0-da7ebb4cd2a3@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 5/5] wifi: wilc1000: Add WILC3000 support
-To: Kalle Valo <kvalo@kernel.org>
-Cc: linux-wireless@vger.kernel.org, Ajay Singh <ajay.kathat@microchip.com>,
- "David S. Miller" <davem@davemloft.net>,
- Adham Abozaeid <adham.abozaeid@microchip.com>,
- =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
- <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- devicetree@vger.kernel.org, netdev@vger.kernel.org
-References: <20240829004510.178016-1-marex@denx.de>
- <20240829004510.178016-5-marex@denx.de> <87ed5tgofh.fsf@kernel.org>
- <343a45a8-1891-4e66-a77c-ad6e4d485903@denx.de> <87seu8g96u.fsf@kernel.org>
-Content-Language: en-US
-From: Marek Vasut <marex@denx.de>
-In-Reply-To: <87seu8g96u.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+X-B4-Tracking: v=1; b=H4sIAPBV32YC/zWMQQqDMBBFryKz7sA0FTS9SukippM6qGlIQgmId
+ +8gdPEX78N7OxTOwgXu3Q6Zv1LkExWulw787OKbUV7KYMj0ZMli5KprFbdUfcLg1nVyfsGmh0c
+ aaDBhNLdgJ9BGyhyknf0H/FV4HscPltUUt3kAAAA=
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1708; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=dgEMI3wGf4QoZWLUf+u2E3CCQEsBsqk1dmls2e6pdGk=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBm31YP5itjq7vsuUpGMUuDXA8grh7Q9pjSGINKJ
+ YCw5pbFHkqJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZt9WDwAKCRD2t4JPQmmg
+ cxjQD/45Tw02DE47iFEG6myAKi/Xbw6SPrvZwxmvX4BEzQVEPCAsxjfkoCRgjn1Ahlv7NYyxhNW
+ wn2ELdrjbFeY/7o6FkuMfJnXiXfA+5E8TrwWxWGSl6rCZoYPcRPQPZjsVp3G33QS74AvrVFSu7F
+ nQaYGfSz0PejkF3HRE+HuoMGdCHMz7zB+uHt5dD/gkQ40dMHVOPGYcd35bCAx2DP6aL3iro/ZvZ
+ DYcoA8UDd6pNcx3MSM2+WIB/p7SkvNQcgsRatz43QpNA0DYkpqQXDAZzmJG4kBBDYcCB5ixc//u
+ KXy+TJgQ0xoJuekpx4mLA7y0lhYeaaXA3qOm4td682jtAsDjgkOQGHP4w3avrBKcpop7lUjgIJP
+ Qn1S5x8MwaGULkD/PBroDiognbNePeoqOOVRihQnBCG3U0jLzt69HZl/h/g3H4RqPBQNS5prjDq
+ nn6Dt6wPCs+BaeeF/B3I5ndya4k8Lpqg+ir7Cc6+ZiPkiGkrU6bdaZ6bvPdavNTRYPtSUI1jy4m
+ bmJ65hIWqWxoYh3cFcgA5tWok1yxzoFVLrbPfWVP9OdlMqvMR81hU1/lFY4Q3+xaYkyB5li7yBO
+ A5ldWxTzuVLQ/BiXDps1m5trVEuvLJu+HEN9sB+DsaSD0mxFysMceVCFMv/NuWzfghmb5ttGBA6
+ 8shW2AAL49FsOdA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On 9/9/24 5:04 PM, Kalle Valo wrote:
-> Marek Vasut <marex@denx.de> writes:
-> 
->> On 9/9/24 11:35 AM, Kalle Valo wrote:
->>
->>> Marek Vasut <marex@denx.de> writes:
->>>
->>>> From: Ajay Singh <ajay.kathat@microchip.com>
->>>>
->>>> Add support for the WILC3000 chip. The chip is similar to WILC1000,
->>>> except that the register layout is slightly different and it does
->>>> not support WPA3/SAE.
->>>>
->>>> Signed-off-by: Ajay Singh <ajay.kathat@microchip.com>
->>>> Signed-off-by: Marek Vasut <marex@denx.de>
->>> [...]
->>>
->>>> --- a/drivers/net/wireless/microchip/wilc1000/cfg80211.c
->>>> +++ b/drivers/net/wireless/microchip/wilc1000/cfg80211.c
->>>> @@ -313,6 +313,13 @@ static int connect(struct wiphy *wiphy, struct net_device *dev,
->>>>      	vif->connecting = true;
->>>>    +	if (sme->auth_type == NL80211_AUTHTYPE_SAE &&
->>>> +	    is_wilc3000(vif->wilc->chipid)) {
->>>> +		netdev_err(dev, "WILC3000: WPA3 not supported\n");
->>>> +		ret = -EOPNOTSUPP;
->>>> +		goto out_error;
->>>> +	}
->>> This looks wrong. If wilc3000 doesn't support SAE you shouldn't
->>> advertise NL80211_FEATURE_SAE to user space. I think the check for
->>> wilc3000 should be in wilc_create_wiphy():
->>> if (!is_wilc3000(vif->wilc->chipid))
->>
->> It is probably better to do "if (is_wilc1000(wl->chipid))" here.
-> 
-> Good point.
-I did send v5 which grew a few more patches to address getting chipid early.
+The SYN + MPTCP_CAPABLE packets could be explicitly dropped by firewalls
+somewhere in the network, e.g. if they decide to drop packets based on
+the TCP options, instead of stripping them off.
+
+The idea of this series is to fallback to TCP after 3 SYN+MPC drop
+(patch 2). If the connection succeeds after the fallback, it very likely
+means a blackhole has been detected. In this case (patch 3), MPTCP can
+be disabled for a certain period of time, 1h by default. If after this
+period, MPTCP is still blocked, the period is doubled. This technique is
+inspired by the one used by TCP FastOpen.
+
+This should help applications which want to use MPTCP by default on the
+client side if available.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Matthieu Baerts (NGI0) (3):
+      mptcp: export mptcp_subflow_early_fallback()
+      mptcp: fallback to TCP after SYN+MPC drops
+      mptcp: disable active MPTCP in case of blackhole
+
+ Documentation/networking/mptcp-sysctl.rst |  11 +++
+ include/net/mptcp.h                       |   4 +
+ net/ipv4/tcp_timer.c                      |   1 +
+ net/mptcp/ctrl.c                          | 133 ++++++++++++++++++++++++++++++
+ net/mptcp/mib.c                           |   3 +
+ net/mptcp/mib.h                           |   3 +
+ net/mptcp/protocol.c                      |  18 ++--
+ net/mptcp/protocol.h                      |  16 +++-
+ net/mptcp/subflow.c                       |   4 +
+ 9 files changed, 182 insertions(+), 11 deletions(-)
+---
+base-commit: bfba7bc8b7c2c100b76edb3a646fdce256392129
+change-id: 20240909-net-next-mptcp-fallback-x-mpc-07072f823f9b
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
