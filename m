@@ -1,183 +1,96 @@
-Return-Path: <netdev+bounces-126497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F8649716AD
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:23:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3998971891
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 13:47:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A731B25F29
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:23:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C64B284687
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 099081B86D6;
-	Mon,  9 Sep 2024 11:21:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 284351B5808;
+	Mon,  9 Sep 2024 11:46:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gDjOj2Y9"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FA81B6521;
-	Mon,  9 Sep 2024 11:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CA2F42AAB;
+	Mon,  9 Sep 2024 11:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725880879; cv=none; b=WIlk2qmlacjvxjsTBasZjLd38TEjj0MH8WEWoDkInhQ61/L38l/oc/qqM8XbuK4u7ll97VATLNlGb+O7/A+tN8Lrvgj5X+BHRS/HlKFjQuzp41RmetOJCcGkbHJ4Q2cPn62Dwr8i4obv418EASIckD08nAc4qaSKPIRpMjjLR1U=
+	t=1725882419; cv=none; b=ja3hzV8sQ7ODUiHLUjf8GLG9EIsKIQldOmbYlku9HsmMBsaWO7adAliGm4d8E0/nu6Iid+hCykAh9F7UJFvs2bWbURyeSlw6lH2g56rHeHODpQmTQPFvf+76VnpIGP1YjkH9fcVul4bzcW8UcDcS0Z9Kc3EUR+D85CsUax1pctY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725880879; c=relaxed/simple;
-	bh=5iq6aZDboxm6ZGBWINtqBy3Uim6XKZaYNeKYLJYVdrw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=T+QWNY54DCqy2zPPoRVSSJkjj/8uwEAgnKXVw2dSQREBsXaWSt9Hw0Ja/hQCu7pfykQLvUYrMxnddHws8bYTwatmDsPArnoyA0m4xW2lxXO4i7QM+l8X8Nxa3GtVk9YDMHLdviWi5ihRH19TvZFqUOCeOIF3Xmyqm2WTVi/ZerU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4X2PXm2Sy2z1xv0C;
-	Mon,  9 Sep 2024 19:21:12 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id EE4911400DC;
-	Mon,  9 Sep 2024 19:21:13 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 9 Sep 2024 19:21:13 +0800
-Message-ID: <42c202e6-8c4c-494f-8c28-17d66ed75880@huawei.com>
-Date: Mon, 9 Sep 2024 19:21:05 +0800
+	s=arc-20240116; t=1725882419; c=relaxed/simple;
+	bh=EN7K547/V3hc6OwQMX6UH/ciPClOzecDiiFtQmXg4MU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pxKY66BCcqCBia0mqmqftTCpQHjKO2D+CYW1uQP/vMskkA95lsDu+epw+wwExeLWrFWdwhblpejvCiKbh5z8oAK6HM/Pl3AOx5EjY6s7FlKL9cn07o3khJ+JVxel0lUn1yriQ9Go62eaa9OCzwiaoMCh4qck1j/hsv2k9bcbAuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gDjOj2Y9; arc=none smtp.client-ip=217.70.178.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay7-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::227])
+	by mslow1.mail.gandi.net (Postfix) with ESMTP id 7DE16C1C7D;
+	Mon,  9 Sep 2024 11:43:47 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 799E72000A;
+	Mon,  9 Sep 2024 11:43:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725882219;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=tsWOPP+pUgTAtYznrRMXi9VjftC2DkYnCvG3d7W5xfA=;
+	b=gDjOj2Y90kYIp6akYM9daUjcSl07DITnEXP5vZ74/anm9k5jgejF4QB7U+7UatN2EPy8QZ
+	sN3yhFRc+uUmtkEfA87Lt1ib/sJcuP664f69TYB3hGe2EgIXPp62oD4I0KbwcOT1sQ1Oi+
+	s9gsE2BUsffSDWTXxts3EFPE5sO53YF83F+qlEw+WIzcM5kbCHe7Kze1gDqkZLY7WIkmq/
+	RU5s660DPziFgHsoTApU5AVf7R1BSnVS3XkvApwrbz0IqK5S+g9JVKKCdjcW+rVINVdKx/
+	vGnp/iQka1plHVRVe3D6V/nQK54s6RXWdyWoFGzh3wGQqOUWT+M2/vRpwLLunw==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: linux-kernel@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	thomas.petazzoni@bootlin.com
+Subject: [PATCH net-next v2] MAINTAINERS: Add ethtool pse-pd to PSE NETWORK DRIVER
+Date: Mon,  9 Sep 2024 13:43:36 +0200
+Message-Id: <20240909114336.362174-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v25 00/13] Device Memory TCP
-To: Mina Almasry <almasrymina@google.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-alpha@vger.kernel.org>, <linux-mips@vger.kernel.org>,
-	<linux-parisc@vger.kernel.org>, <sparclinux@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<bpf@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-media@vger.kernel.org>, <dri-devel@lists.freedesktop.org>
-CC: Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Richard
- Henderson <richard.henderson@linaro.org>, Ivan Kokshaysky
-	<ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, Thomas
- Bogendoerfer <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
-	<James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
-	<arnd@arndb.de>, Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
-	<bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Jonathan Lemon
-	<jonathan.lemon@gmail.com>, Shuah Khan <shuah@kernel.org>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
-	<john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>,
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, Pavel Begunkov
-	<asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe
-	<jgg@ziepe.ca>, Shailend Chand <shailend@google.com>, Harshitha Ramamurthy
-	<hramamurthy@google.com>, Shakeel Butt <shakeel.butt@linux.dev>, Jeroen de
- Borst <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
-	Bagas Sanjaya <bagasdotme@gmail.com>, Christoph Hellwig <hch@infradead.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>, Taehee Yoo <ap420073@gmail.com>
-References: <20240909054318.1809580-1-almasrymina@google.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20240909054318.1809580-1-almasrymina@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 2024/9/9 13:43, Mina Almasry wrote:
+Add net/ethtool/pse-pd.c to PSE NETWORK DRIVER to receive emails concerning
+modifications to the ethtool part.
 
-> 
-> Perf - page-pool benchmark:
-> ---------------------------
-> 
-> bench_page_pool_simple.ko tests with and without these changes:
-> https://pastebin.com/raw/ncHDwAbn
-> 
-> AFAIK the number that really matters in the perf tests is the
-> 'tasklet_page_pool01_fast_path Per elem'. This one measures at about 8
-> cycles without the changes but there is some 1 cycle noise in some
-> results.
-> 
-> With the patches this regresses to 9 cycles with the changes but there
-> is 1 cycle noise occasionally running this test repeatedly.
-> 
-> Lastly I tried disable the static_branch_unlikely() in
-> netmem_is_net_iov() check. To my surprise disabling the
-> static_branch_unlikely() check reduces the fast path back to 8 cycles,
-> but the 1 cycle noise remains.
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
 
-Sorry for the late report, as I was adding a testing page_pool ko basing
-on [1] to avoid introducing performance regression when fixing the bug in
-[2].
-I used it to test the performance impact of devmem patchset for page_pool
-too, it seems there might be some noticable performance impact quite stably
-for the below testcases, about 5%~16% performance degradation as below in
-the arm64 system:
+Net mailing list was missing from v1.
+---
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-Before the devmem patchset:
- Performance counter stats for 'insmod ./page_pool_test.ko test_push_cpu=16 test_pop_cpu=16 nr_test=100000000 test_napi=1' (100 runs):
-
-         17.167561      task-clock (msec)         #    0.003 CPUs utilized            ( +-  0.40% )
-                 8      context-switches          #    0.474 K/sec                    ( +-  0.65% )
-                 0      cpu-migrations            #    0.001 K/sec                    ( +-100.00% )
-                84      page-faults               #    0.005 M/sec                    ( +-  0.13% )
-          44576552      cycles                    #    2.597 GHz                      ( +-  0.40% )
-          59627412      instructions              #    1.34  insn per cycle           ( +-  0.03% )
-          14370325      branches                  #  837.063 M/sec                    ( +-  0.02% )
-             21902      branch-misses             #    0.15% of all branches          ( +-  0.27% )
-
-       6.818873600 seconds time elapsed                                          ( +-  0.02% )
-
- Performance counter stats for 'insmod ./page_pool_test.ko test_push_cpu=16 test_pop_cpu=16 nr_test=100000000 test_napi=1 test_direct=1' (100 runs):
-
-         17.595423      task-clock (msec)         #    0.004 CPUs utilized            ( +-  0.01% )
-                 8      context-switches          #    0.460 K/sec                    ( +-  0.50% )
-                 0      cpu-migrations            #    0.000 K/sec
-                84      page-faults               #    0.005 M/sec                    ( +-  0.15% )
-          45693020      cycles                    #    2.597 GHz                      ( +-  0.01% )
-          59676212      instructions              #    1.31  insn per cycle           ( +-  0.00% )
-          14385384      branches                  #  817.564 M/sec                    ( +-  0.00% )
-             21786      branch-misses             #    0.15% of all branches          ( +-  0.14% )
-
-       4.098627802 seconds time elapsed                                          ( +-  0.11% )
-
-After the devmem patchset:
-Performance counter stats for 'insmod ./page_pool_test.ko test_push_cpu=16 test_pop_cpu=16 nr_test=100000000 test_napi=1' (100 runs):
-
-         17.047973      task-clock (msec)         #    0.002 CPUs utilized            ( +-  0.39% )
-                 8      context-switches          #    0.488 K/sec                    ( +-  0.82% )
-                 0      cpu-migrations            #    0.001 K/sec                    ( +- 70.35% )
-                84      page-faults               #    0.005 M/sec                    ( +-  0.12% )
-          44269558      cycles                    #    2.597 GHz                      ( +-  0.39% )
-          59594383      instructions              #    1.35  insn per cycle           ( +-  0.02% )
-          14362599      branches                  #  842.481 M/sec                    ( +-  0.02% )
-             21949      branch-misses             #    0.15% of all branches          ( +-  0.25% )
-
-       7.964890303 seconds time elapsed                                          ( +-  0.16% )
-
- Performance counter stats for 'insmod ./page_pool_test.ko test_push_cpu=16 test_pop_cpu=16 nr_test=100000000 test_napi=1 test_direct=1' (100 runs):
-
-         17.660975      task-clock (msec)         #    0.004 CPUs utilized            ( +-  0.02% )
-                 8      context-switches          #    0.458 K/sec                    ( +-  0.57% )
-                 0      cpu-migrations            #    0.003 K/sec                    ( +- 43.81% )
-                84      page-faults               #    0.005 M/sec                    ( +-  0.17% )
-          45862652      cycles                    #    2.597 GHz                      ( +-  0.02% )
-          59764866      instructions              #    1.30  insn per cycle           ( +-  0.01% )
-          14404323      branches                  #  815.602 M/sec                    ( +-  0.01% )
-             21826      branch-misses             #    0.15% of all branches          ( +-  0.19% )
-
-       4.304644609 seconds time elapsed                                          ( +-  0.75% )
-
-1. https://lore.kernel.org/all/20240906073646.2930809-2-linyunsheng@huawei.com/
-2. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
-
-> 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index ca1469d52076..710df2e236c4 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -18418,6 +18418,7 @@ L:	netdev@vger.kernel.org
+ S:	Maintained
+ F:	Documentation/devicetree/bindings/net/pse-pd/
+ F:	drivers/net/pse-pd/
++F:	net/ethtool/pse-pd.c
+ 
+ PSTORE FILESYSTEM
+ M:	Kees Cook <kees@kernel.org>
+-- 
+2.34.1
 
 
