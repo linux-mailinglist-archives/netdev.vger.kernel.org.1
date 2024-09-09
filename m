@@ -1,253 +1,185 @@
-Return-Path: <netdev+bounces-126429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3008F97123D
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:38:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B915B97123B
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFD1A281098
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:38:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71738285D65
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A961B1437;
-	Mon,  9 Sep 2024 08:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D9B51B1D4C;
+	Mon,  9 Sep 2024 08:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YttxzTkP"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="IbjLtfFL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529D1176246
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 08:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DCE11AE03C
+	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 08:36:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725871115; cv=none; b=hmz/zX17DhppYRxM+htruskiuq65T14kBdgVIww5xxhJ5dLOQUmgmJb+ixWsJ8SYRSKZW+fcR5zHnbwuy/LM+/HrPCoSBVTMrx+KT1ke4h1UMEk+MjCd9BvjsPHvBSZ9l9jk0DkLmR8heg2F92+QXsW1Q69s5Ka+idkgONX5B0s=
+	t=1725871002; cv=none; b=TL0UYS2JQ314U4O5uFebHZwMpAyId43yfiUCDjiXVHW8R/RlSZsUFU+A/sNq6sAhterZ+eW3Ta1BfRte1LeKY95+dpz4n1eJu0eZFvr7FYYz8vz0kTUAMa2Afy0tT8T7oBCZGJpz1Ob71TbYFvTQU2OwZU7lf40V/SXWe0AkXtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725871115; c=relaxed/simple;
-	bh=zVEcBD+3ykM/XDeE6mmT2VSdshOt2EblcTEOJFfHh5k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pR1xtx3KZTosm1l1gEch+6K/u1B312KoGNdgBWtgKw//q0AlAk5G9+eqh9TjKHFclnUMLNRe7TSrq05n5olDGuPyB1utniz1unXvc9YeIIqF4KQWT8pwxYKVQoP+AxeqMXB8vEafaw0v2M8haL1ZxOOOHkVf48A+T4GrXypEvNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YttxzTkP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725871112;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Krv/geMIzelSmSJ8w0OjsqkM55iDto6Ca93etdR5PI8=;
-	b=YttxzTkPWXWZ5G5dalNeOVEMNI4hivOVGvPcjtLBsFsQq/R7ExxVBXxcqqkyZI+kRZIieL
-	NVG/nELsJJNEzGcrMGfwH620ha+hbE3ve2W1tbem2PQXPXavqGRTcuBxHCQjT1yNYCrpRy
-	v6uwChTb8sB5lVR9eB0B8cgaskTCMLs=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-692-8txKVCGFM7Oe2wlxSVqeRQ-1; Mon, 09 Sep 2024 04:38:31 -0400
-X-MC-Unique: 8txKVCGFM7Oe2wlxSVqeRQ-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2d8a1a63f3dso4388575a91.2
-        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 01:38:30 -0700 (PDT)
+	s=arc-20240116; t=1725871002; c=relaxed/simple;
+	bh=lmUh1Os2VWUc2Mt5YKTmZXnSHDMqmwPcrvooGcPTRkw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PszP7UORlJqgK2ZQm+WjlVcnoLYO0p093pyFxTxuPkGDZK/FvnlLwtJ8z4vfoTedx9KOFzCpGHM/m3UX+hKBs61dRHNo+bjEfV7cCGdDFOraRatxu65LSlE8l4lnL4omyooiJkkWAeBj2+Zaao5WtSzQ4i8FHQwMRJQBnWWkhYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=IbjLtfFL; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c3c3b63135so4218880a12.3
+        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 01:36:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1725870998; x=1726475798; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=U7dk4DU3ijmjiVVEW11CLA+99O0eW8uFugD67ebGDoM=;
+        b=IbjLtfFL+9DQ85kRmWN97qlFRkSTur2+UmdSjfk2M1scSLUans8jgA1oULvkFnlB2a
+         jmNDkD7CyMquTf43z8XMcdmA7MOPxggsAyE33c4zEYdvBcsaL3FBJpZjHrh+9ym0U3c1
+         rq5icWuGmhCOIxG3OQPNxP2p2iuQnitqPXHmxlMnF524fdrEP6ocNHsp3moT/RMrhvlD
+         IrRO4WSQ05+h61jqB/N3HsuExUfKR5h0D1wQWZcrEVN6GVyZ6leFyRa3Rq6mnSEWZTIz
+         Wukn4pi9V03JuHvQvL0kSP9Rv/w83sE6KUrr0CtYx42zhj+6DNNH7w5DDet5F3CE5Nxz
+         vLsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725871110; x=1726475910;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Krv/geMIzelSmSJ8w0OjsqkM55iDto6Ca93etdR5PI8=;
-        b=dvMRCXBgUomdDKsQjpC7qOTZQDF21gDKFnrZUtFHrwf1OzSRQslc9J3jA4V0oINdab
-         1S7Sk727GdkYO36CrxX/inWlC+3ni2E06WOSVy2g5Rm9ZmE8UrrDrut3Vqduc4nrPcRN
-         O691ISlAKrrD+zyAMBqFkT/q2hI1wD4bJq/dbCxIEG/InNUQxWzQ9HBuGrqLwHaulMfz
-         q+PA6Vrlr3qanOPmOvTx4TW5eEm3r1+x69eoZF3x5XyeaV//TdmQc0VvbcqoBXmIUroB
-         vGTIWNZjRLUQhf9qHkbyG3Z8qF1d3Q2wFoYquoe+219awmsy9nxlpav17FXtuo/dxHMY
-         ptSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVkrnoNOWrm6zkzw1bWNv2RRbERxgkHz7K2ZlvhL8Jz4E+M9Ab4tubkUPfuoifVrR3mZ5t23Aw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzr/fiaKPNqvp7mVeYbC0nf07PF1VAvNXZ3ODkwqZGMbGmZKS+T
-	2nspSWofQvP6pFHeuIOpX3rx48DmcGfba4OGq4yNyu0YfhV0bW997SddP2u2V5t6wQwYhJPK4e6
-	TCzAmiOG/Ie+bPctU/h6J+V0rmcemYbGtAHVZIVxg29o+681uCy0NegFry+hDIUSRKvjT9Mc+hY
-	y8Joab5x+ap+rJCsVcVrmKDaU/RMV1
-X-Received: by 2002:a17:90b:2248:b0:2d3:db91:ee82 with SMTP id 98e67ed59e1d1-2dad513a8d5mr7658861a91.40.1725871109697;
-        Mon, 09 Sep 2024 01:38:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEiQYgAZQeWv5/kCTe63E0d+azPK0nA5/zjAGcSeHbPrkeYpXNNIwvTRsiLsbwJV7pYomo8GsqnxKmtZW2QW6w=
-X-Received: by 2002:a17:90b:2248:b0:2d3:db91:ee82 with SMTP id
- 98e67ed59e1d1-2dad513a8d5mr7658840a91.40.1725871109068; Mon, 09 Sep 2024
- 01:38:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725870998; x=1726475798;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U7dk4DU3ijmjiVVEW11CLA+99O0eW8uFugD67ebGDoM=;
+        b=qzTafffXtTr4mfBekWVXIADIlQYYREcIh0qbRbOJyRvxqYqgrg3ZQVjBNOdpuvpCar
+         G712/K48DpZ1Y9CL3YvwOKPg03EzYGB/DzeFE8ogYSytF4T9iiiHdY54ekBtqC/LmX6+
+         z6fEPhZvFH5/Rjz9+RXyej6qRZyoOAQT1MvK45ULQ2ZL0uGTy3mwoCv7QEm/fdN93WnR
+         PsVxIgdB5qbJscTFep9jFto+C8xAJnR6PR6Omm27EB34XfLXhaKIrkvf3yrXMakQouFu
+         fu5CYcQJiDp4kzJECbuz9RsfuDT/luRgEJysWTN+Gq6f0vwDpwDmfm+kKpqxnZWHkqTi
+         3+zA==
+X-Gm-Message-State: AOJu0YxHSdNgDHJ2FWeCm0L/x4Tq9uSyrWmBIQYnRQv0obphvxP7v7D1
+	b4UrhXtpax5bzSj9Fprg2iWeItoXEIwqpX4UKABvpDovy0SkJqPZbes72niBwm4=
+X-Google-Smtp-Source: AGHT+IF5xt/urqnGK5kkXMEMkQwK54yzNO6ecXJGgt2RkauZONzjLbplFBAxaWIFDiHIddC4GpI2IQ==
+X-Received: by 2002:a05:6402:3596:b0:5c2:112f:aa77 with SMTP id 4fb4d7f45d1cf-5c3dc7c6f49mr9177297a12.31.1725870998510;
+        Mon, 09 Sep 2024 01:36:38 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:105f:6dd9:35c9:a9e8? ([2001:67c:2fbc:1:105f:6dd9:35c9:a9e8])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd523bfsm2750376a12.53.2024.09.09.01.36.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Sep 2024 01:36:38 -0700 (PDT)
+Message-ID: <c15ca875-4684-455c-ab35-39d28f497417@openvpn.net>
+Date: Mon, 9 Sep 2024 10:38:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
- <20240906044143-mutt-send-email-mst@kernel.org> <1725612818.815039-1-xuanzhuo@linux.alibaba.com>
- <20240906045904-mutt-send-email-mst@kernel.org> <1725614736.9464588-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1725614736.9464588-1-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 9 Sep 2024 16:38:16 +0800
-Message-ID: <CACGkMEt4XmMnZWEK56npxiA_QB0x48AU9fWfA63y5PHuHpLdBQ@mail.gmail.com>
-Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, virtualization@lists.linux.dev, 
-	Si-Wei Liu <si-wei.liu@oracle.com>, Darren Kenny <darren.kenny@oracle.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 12/25] ovpn: implement packet processing
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ ryazanov.s.a@gmail.com, edumazet@google.com, andrew@lunn.ch,
+ sd@queasysnail.net
+References: <20240827120805.13681-1-antonio@openvpn.net>
+ <20240827120805.13681-13-antonio@openvpn.net>
+ <20240906192926.GO2097826@kernel.org>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <20240906192926.GO2097826@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 6, 2024 at 5:32=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
-m> wrote:
->
-> On Fri, 6 Sep 2024 05:08:56 -0400, "Michael S. Tsirkin" <mst@redhat.com> =
-wrote:
-> > On Fri, Sep 06, 2024 at 04:53:38PM +0800, Xuan Zhuo wrote:
-> > > On Fri, 6 Sep 2024 04:43:29 -0400, "Michael S. Tsirkin" <mst@redhat.c=
-om> wrote:
-> > > > On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
-> > > > > leads to regression on VM with the sysctl value of:
-> > > > >
-> > > > > - net.core.high_order_alloc_disable=3D1
-> > > > >
-> > > > > which could see reliable crashes or scp failure (scp a file 100M =
-in size
-> > > > > to VM):
-> > > > >
-> > > > > The issue is that the virtnet_rq_dma takes up 16 bytes at the beg=
-inning
-> > > > > of a new frag. When the frag size is larger than PAGE_SIZE,
-> > > > > everything is fine. However, if the frag is only one page and the
-> > > > > total size of the buffer and virtnet_rq_dma is larger than one pa=
-ge, an
-> > > > > overflow may occur. In this case, if an overflow is possible, I a=
-djust
-> > > > > the buffer size. If net.core.high_order_alloc_disable=3D1, the ma=
-ximum
-> > > > > buffer size is 4096 - 16. If net.core.high_order_alloc_disable=3D=
-0, only
-> > > > > the first buffer of the frag is affected.
-> > > > >
-> > > > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever=
- use_dma_api")
-> > > > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
-> > > > > Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a=
-540c0a@oracle.com
-> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > >
-> > > >
-> > > > Guys where are we going with this? We have a crasher right now,
-> > > > if this is not fixed ASAP I'd have to revert a ton of
-> > > > work Xuan Zhuo just did.
-> > >
-> > > I think this patch can fix it and I tested it.
-> > > But Darren said this patch did not work.
-> > > I need more info about the crash that Darren encountered.
-> > >
-> > > Thanks.
-> >
-> > So what are we doing? Revert the whole pile for now?
-> > Seems to be a bit of a pity, but maybe that's the best we can do
-> > for this release.
->
-> @Jason Could you review this?
+On 06/09/2024 21:29, Simon Horman wrote:
+> On Tue, Aug 27, 2024 at 02:07:52PM +0200, Antonio Quartulli wrote:
+>> This change implements encryption/decryption and
+>> encapsulation/decapsulation of OpenVPN packets.
+>>
+>> Support for generic crypto state is added along with
+>> a wrapper for the AEAD crypto kernel API.
+>>
+>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+> 
+> ...
+> 
+>> diff --git a/drivers/net/ovpn/io.c b/drivers/net/ovpn/io.c
+> 
+> ...
+> 
+>> @@ -54,39 +56,122 @@ static void ovpn_netdev_write(struct ovpn_peer *peer, struct sk_buff *skb)
+>>   		dev_sw_netstats_rx_add(peer->ovpn->dev, skb->len);
+>>   }
+>>   
+>> -static void ovpn_decrypt_post(struct sk_buff *skb, int ret)
+>> +void ovpn_decrypt_post(struct sk_buff *skb, int ret)
+>>   {
+>> -	struct ovpn_peer *peer = ovpn_skb_cb(skb)->peer;
+>> +	struct ovpn_crypto_key_slot *ks = ovpn_skb_cb(skb)->ctx->ks;
+>> +	struct ovpn_peer *peer = ovpn_skb_cb(skb)->ctx->peer;
+>> +	__be16 proto;
+>> +	__be32 *pid;
+>>   
+>> -	if (unlikely(ret < 0))
+>> +	/* crypto is happening asyncronously. this function will be called
+> 
+> nit: asynchronously
+> 
+>       Flagged by checkpatch.pl --codespell
 
-I think we probably need some tweaks for this patch.
+Thanks! I forgot to add the codespell flag to my last checkpatch run :-(
+Will fix it in the next version.
 
-For example, the changelog is not easy to be understood especially
-consider it starts something like:
+Cheers,
 
-"
-    leads to regression on VM with the sysctl value of:
+> 
+>> +	 * again later by the crypto callback with a proper return code
+>> +	 */
+>> +	if (unlikely(ret == -EINPROGRESS))
+>> +		return;
+> 
+> ...
 
-    - net.core.high_order_alloc_disable=3D1
-
-    which could see reliable crashes or scp failure (scp a file 100M in siz=
-e
-    to VM):
-"
-
-Need some context and actually sysctl is not a must to reproduce the
-issue, it can also happen when memory is fragmented.
-
-Another issue is that, if we move the skb_page_frag_refill() out of
-the virtnet_rq_alloc(). The function semantics turns out to be weird:
-
-skb_page_frag_refill(len, &rq->alloc_frag, gfp);
-...
-virtnet_rq_alloc(rq, len, gfp);
-
-I wonder instead of subtracting the dma->len, how about simply count
-the dma->len in len if we call virtnet_rq_aloc() in
-add_recvbuf_small()?
-
->
-> I think this problem is clear, though I do not know why it did not work
-> for Darren.
-
-I had a try. This issue could be reproduced easily and this patch
-seems to fix the issue with a KASAN enabled kernel.
-
-Thanks
-
->
-> Thanks.
->
->
-> >
-> >
-> > > >
-> > > >
-> > > > > ---
-> > > > >  drivers/net/virtio_net.c | 12 +++++++++---
-> > > > >  1 file changed, 9 insertions(+), 3 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > > index c6af18948092..e5286a6da863 100644
-> > > > > --- a/drivers/net/virtio_net.c
-> > > > > +++ b/drivers/net/virtio_net.c
-> > > > > @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_=
-queue *rq, u32 size, gfp_t gfp)
-> > > > >         void *buf, *head;
-> > > > >         dma_addr_t addr;
-> > > > >
-> > > > > -       if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)=
-))
-> > > > > -               return NULL;
-> > > > > -
-> > > > >         head =3D page_address(alloc_frag->page);
-> > > > >
-> > > > >         dma =3D head;
-> > > > > @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet=
-_info *vi, struct receive_queue *rq,
-> > > > >         len =3D SKB_DATA_ALIGN(len) +
-> > > > >               SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> > > > >
-> > > > > +       if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, =
-gfp)))
-> > > > > +               return -ENOMEM;
-> > > > > +
-> > > > >         buf =3D virtnet_rq_alloc(rq, len, gfp);
-> > > > >         if (unlikely(!buf))
-> > > > >                 return -ENOMEM;
-> > > > > @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct vi=
-rtnet_info *vi,
-> > > > >          */
-> > > > >         len =3D get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, r=
-oom);
-> > > > >
-> > > > > +       if (unlikely(!skb_page_frag_refill(len + room, alloc_frag=
-, gfp)))
-> > > > > +               return -ENOMEM;
-> > > > > +
-> > > > > +       if (!alloc_frag->offset && len + room + sizeof(struct vir=
-tnet_rq_dma) > alloc_frag->size)
-> > > > > +               len -=3D sizeof(struct virtnet_rq_dma);
-> > > > > +
-> > > > >         buf =3D virtnet_rq_alloc(rq, len + room, gfp);
-> > > > >         if (unlikely(!buf))
-> > > > >                 return -ENOMEM;
-> > > > > --
-> > > > > 2.32.0.3.g01195cf9f
-> > > >
-> >
->
-
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
