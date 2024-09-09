@@ -1,101 +1,116 @@
-Return-Path: <netdev+bounces-126445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F9CE9712A6
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:54:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E3897126F
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:46:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39F311C22003
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:54:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DCFB281807
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768A01B1D64;
-	Mon,  9 Sep 2024 08:54:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="exjn0MzE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B121B1414;
+	Mon,  9 Sep 2024 08:46:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98D501B1D49
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 08:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725872047; cv=none; b=L7SiRpavCzpbsNzlqFDB7NaYD9MJD9uk5+pC8TvHS/JY5UYwbAI18tOzLaTDkk/HTBHYkMkwFSRQ+/4Ks79ifz7P+Vhkur54xNUH3A5/O4Xe+9RZo3v9LHj/gdzzjY9gtu4c+LqxcxkvdRkmHUozLNo/WuI2NjX3l3RJwyaebpw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725872047; c=relaxed/simple;
-	bh=nQxYZYtcnFpGGORmtq4FZfiifqUwywXeic2CfpW0abM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=myyNLOnjN5cxFvV1DXwa0DpZgds//3QuP0T/0s3+bXg3DtH1Ig66yu0j4a+Ud4c2CoTXqsUNO604uUKbdHwzrRFlYaU9/MZZaGav268PDwmOO52mwSDnSGV8HDsqYotHYv04XLVEfwHJIi4F5eeOEy8UlucxOLlzRVXoZ+mIK6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=exjn0MzE; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id C24B120820;
-	Mon,  9 Sep 2024 10:45:31 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jz-bBRPlT_JS; Mon,  9 Sep 2024 10:45:31 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 12400206D0;
-	Mon,  9 Sep 2024 10:45:31 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 12400206D0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1725871531;
-	bh=ZmbbGCsZ70IQIJtexdrtkUAS5QSMKKt8b3gDmq+iYfo=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=exjn0MzE+eazQcHthRQO33kYSlBBZc8Kw9jED955aV29h2FluSmSbQ4tc6kHWXyKZ
-	 zA517sfQlZGSMnCnDdasuOumBmOLD8KyipR4Id+xLuoYrQldb/qvMeBfKTseahkAti
-	 ISwcJnxUMHRope0sHHPYDqj5mxKUli6hjo/Xrbd50JiXW+0N4ZhWxOG6Jqc4/4oL+v
-	 n7dZVFF+zqlfsR7/joDRtF9iT7w7MShEyiPjy37ws15Nj5Pqky8RKFeiS8yLhZtfW4
-	 /r9A9ph/sWgWtA3GvD1VO58LC1opVe/AmwRH4759XorWPPGS7Scw06X0Cw1kkrmYLd
-	 LxxBu/dl5nvRw==
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 9 Sep 2024 10:45:30 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 9 Sep
- 2024 10:45:30 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 7E24031829F0; Mon,  9 Sep 2024 10:45:30 +0200 (CEST)
-Date: Mon, 9 Sep 2024 10:45:30 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Christian Hopps <chopps@chopps.org>
-CC: <devel@linux-ipsec.org>, <netdev@vger.kernel.org>, Florian Westphal
-	<fw@strlen.de>, Sabrina Dubroca <sd@queasysnail.net>, Simon Horman
-	<horms@kernel.org>, Antony Antony <antony@phenome.org>
-Subject: Re: [PATCH ipsec-next v11 00/16] Add IP-TFS mode to xfrm
-Message-ID: <Zt61qqs0eN3m20An@gauss3.secunet.de>
-References: <20240907022412.1032284-1-chopps@chopps.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985738248D;
+	Mon,  9 Sep 2024 08:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725871590; cv=none; b=LiugymLk0EJyW4oDyy/mOtnMaMrP7Cf9/vNx0H9soPNLPAJsKjRoNkQVV83xCvpLs9gPzRVOQ39guCErjHbzDL+NUZBQe6a5QaYpHUDfiuhE1pOpQcNtYK02dte0wkgIclvYhEsfizlgtwODCK8Heq2rHcMIfHYTe/pquoG1fRU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725871590; c=relaxed/simple;
+	bh=tcUl2hCs4k0Q7H9hc2H77LL+imHUhLH4tI42YObtmwI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jGVCplIFLmjniYTuNRl1c8j9sDVc7YfZfKaOKHAaSR/bE653BFAVX6lFmMTf1wOK4QBwHNoFLK3YnrINajZft0cAW+0CuxD9HC71Yn/xiz669+FaHdDSiWGvg5wixaCNfzg9Nfqup1T4gykxJMqL2V+D7AfkvGLoTUi8LSPAcXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a80eab3945eso376854066b.1;
+        Mon, 09 Sep 2024 01:46:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725871587; x=1726476387;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SmgQkL3g7cnLq/WT19j17mFChxgwR1TulLJx2sAHcA8=;
+        b=ZpnxW/Ks/Ju9PGXWywNOzd2UfjZtP6/IXl0Xczlv7NE7pEtrh076iyP10VERT8UWNa
+         Hu1ufptFwGKVyl5O4y/K7h6tQVVSLP0sumwBb/QGqldnpi2lYMeL7TQizd0+Z1BrsLC8
+         SjngvtgZIi3UCYzucl72f1tABHl2X6bXIh7qyv5PqSa5NknbxxRBAFUJkHtlnUDTcnn9
+         jUKyRKNSHZ+AeQE1iWAchKakouH6A87VvNeb50IS1d7TzD20u6/zXtwTIoETBDbyNbzP
+         tivD0xDrc6tNeLYi/0CVXppDh/SmpXdhehEzguHzHI9gIX79yo5vaWWRjWD7NcZkVFcy
+         yX+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCViTyrAkt5GI6wItwncyriN4kuJKU13L581BgkkntEwTVNHPxUTN8En9A60ur2vr2Aa2JaKx6rWonYwGbAxt6+a@vger.kernel.org, AJvYcCXLO97f9/+Vy6bOAJXpV7O+sDm/kM6jtWp+XfSWelbH1jbeMX8BfW6RrMZw1fTbpb9doHW4ovxW@vger.kernel.org, AJvYcCXkagtEgfZQOf3/mnr4qz2ajM1YuL9tgqXWbmNI9VxlIxfjGOiZldm+JcAa3+qkHaHnKyrkKW5nA99McK0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSSXNRHdjG9DVGfZmTlRnbMHnGmqWQN8W3Ps0EMNqfXzWi6uRF
+	qrt7aCbgWlKjfM/MBsTUIyxtLN3U9iasqXpDHwvGZM5Gs7pj/qOw
+X-Google-Smtp-Source: AGHT+IHxHadVd7VvU1e32hlaXMljf9Ap9vwWQBYo9425NNaSR/MUDpXF1PwjCPOtWnO2AoT8TNlpKw==
+X-Received: by 2002:a17:907:3189:b0:a86:743e:7a08 with SMTP id a640c23a62f3a-a8a88667f0amr776575466b.31.1725871586044;
+        Mon, 09 Sep 2024 01:46:26 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25952632sm311706866b.60.2024.09.09.01.46.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Sep 2024 01:46:25 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: fw@strlen.de,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	pablo@netfilter.org
+Cc: rbc@meta.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org
+Subject: [PATCH nf-next v5 0/2] netfilter: Make IP_NF_IPTABLES_LEGACY selectable
+Date: Mon,  9 Sep 2024 01:46:17 -0700
+Message-ID: <20240909084620.3155679-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240907022412.1032284-1-chopps@chopps.org>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 06, 2024 at 10:23:56PM -0400, Christian Hopps wrote:
-> * Summary of Changes:
-> 
-> This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
-> (AggFrag encapsulation) has been standardized in RFC9347.
-> 
->   Link: https://www.rfc-editor.org/rfc/rfc9347.txt
+These two patches make IP_NF_IPTABLES_LEGACY and IP6_NF_IPTABLES_LEGACY
+Kconfigs user selectable, avoiding creating an extra dependency by
+enabling some other config that would select IP{6}_NF_IPTABLES_LEGACY.
 
-We have to defer this to the next development cycle. This is
-too complex for a last minute merge. net-next will shut down
-on Sept 13th and I'm unable to do the final review until then.
+Changelog:
+
+v5:
+ * Change the description of the legacy Kconfig (Pablo)
+
+v4:
+ * Remove the "depends on" part, which may come later in a separate
+   change, given its intrusive on how to configure selftests
+ * https://lore.kernel.org/all/20240829161656.832208-1-leitao@debian.org/
+
+v3:
+ * Make sure that the generate from  tools/testing/selftests/net/config
+   look the same before and after. (Jakub)
+ * https://lore.kernel.org/all/20240827145242.3094777-1-leitao@debian.org/
+
+v2:
+ * Added the new configuration in the selftest configs (Jakub)
+ * Added this simple cover letter
+ * https://lore.kernel.org/all/20240823174855.3052334-1-leitao@debian.org/
+
+v1:
+ * https://lore.kernel.org/all/20240822175537.3626036-1-leitao@debian.org/
+
+Breno Leitao (2):
+  netfilter: Make IP6_NF_IPTABLES_LEGACY selectable
+  netfilter: Make IP_NF_IPTABLES_LEGACY selectable
+
+ net/ipv4/netfilter/Kconfig | 8 +++++++-
+ net/ipv6/netfilter/Kconfig | 9 ++++++++-
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+-- 
+2.43.5
 
 
