@@ -1,142 +1,162 @@
-Return-Path: <netdev+bounces-126447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6BB69712B6
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:57:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 774BE9712BB
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 10:58:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 662D0282A51
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:57:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E7331F233CC
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 08:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F7961B2519;
-	Mon,  9 Sep 2024 08:57:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016C01B2533;
+	Mon,  9 Sep 2024 08:58:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="qrwqWohr"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC4B1B250C
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 08:57:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC1171B150A;
+	Mon,  9 Sep 2024 08:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725872251; cv=none; b=eoPizryU6kfluwADilhXS9TafsUaRtFn4L1+wv1vBlZMVm5rsQdDEp6wzINxBcuO0SMEARAH+euJks7/UKR4Mk5FZbHG2ENS5OjQ3Rx19zP7TAgj1Skzfhg5KtWjN/yE9HmRokGe+L7yHYlliVOrid1S51C5KBBsc3UASDugBJw=
+	t=1725872314; cv=none; b=AIAFg6BZMh1d2aIgKCpKB+TSvc1YnF5NrG3m9ILFVAvuGSD4Ul53Sj+yel0f0yExryK4CftIQ5+2gBOocbIzPdAph399/KeGitk78oF94CZzMG0yaDr04hjuYmG45nqo6Ha+jKNgiPiRCu0dWz4wkiW+XZdd+d1uFPRRyHGsAg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725872251; c=relaxed/simple;
-	bh=8xxXr+ro/u+DzU/FZBGhGxfHBvikVGquq4JzD94W42s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RFYfHXv4fc3u0I7MjhGOu6MhX7f5AlF70cSUuG9PSHY6qOUWZg8j8tHZvdRU6nIFJ9MaXOr+JFJokwBfAk7poeC4r0KonFdU6IW3EsJrfi4zI7iInncVViDn/oEcJ2KFunmdgfP/PiVJ38OMtGMq018PyEWULWL0I1iJ+jRIK60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1snaCq-0004Ic-JM; Mon, 09 Sep 2024 10:57:08 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1snaCo-006btk-VB; Mon, 09 Sep 2024 10:57:06 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 97BCB3366D4;
-	Mon, 09 Sep 2024 08:57:06 +0000 (UTC)
-Date: Mon, 9 Sep 2024 10:57:06 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Simon Horman <horms@kernel.org>
-Cc: Nathan Chancellor <nathan@kernel.org>, kernel@pengutronix.de, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Heiko Stuebner <heiko@sntech.de>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-rockchip@lists.infradead.org, llvm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH] can: rockchip_canfd: fix return type of
- rkcanfd_start_xmit()
-Message-ID: <20240909-arcane-practical-petrel-015d24-mkl@pengutronix.de>
-References: <20240906-rockchip-canfd-wifpts-v1-1-b1398da865b7@kernel.org>
- <20240909084448.GU2097826@kernel.org>
+	s=arc-20240116; t=1725872314; c=relaxed/simple;
+	bh=BtIb6N/65OadEVbzYDIoljRr+q5odejFkgXYzE+ot9A=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rscKeRmOl/xShiIqMS+KwVw4eJ4w4IG9uQnfTB0GCGBf3p6LwbUdkns6iDVXhpm21O2W+1YwegbsMa2kdkMSPU5NbNU0w4Ey0+7P709CmUisiZ3umTwNjisjpdErMaH3tm/hW1f21b07D6dhEqvvWkWsgSShrObeMsogyYts6q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=qrwqWohr; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 9273888D08;
+	Mon,  9 Sep 2024 10:58:23 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1725872304;
+	bh=m6dN1ufqowxfvuhPSE7wesgvmyXMXmsyT3a/MEsiJ9Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qrwqWohr1WXSwj3fE2907xEAa4lTMNBOOpaD3Z5d1XqWP49svEF3VDPq2SprPFqGA
+	 5uTW7JA4MWjcK2tORZwvcPAP3T0h78XLqrbPY4E5D9LYb/4XOI+xUcmjnLsD2bL/3y
+	 OdNskHviflAuF5n0j/RrqDhOLO40QezBmMezOU7D6JzdedNCZra6jYGCADFlcy43Qw
+	 zMZhPPkNwQigYsJvz7hICNqZAYcj5CQw7dRkhSaTegQipF260g6skrGvPdlRccdKtK
+	 31EXV22JFBPDQaG3Z/7inlTcUSGjPhHNSx8eZvLd41rsSPcuznlhPthFDXminaQ1rP
+	 R/an7xFzdd+kg==
+Date: Mon, 9 Sep 2024 10:58:22 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Jeongjun Park <aha310510@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, ricardo@marliere.net,
+ m-karicheri2@ti.com, n.zhandarovich@fintech.ru, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ syzbot+02a42d9b1bd395cbcab4@syzkaller.appspotmail.com
+Subject: Re: [PATCH net] net: hsr: prevent NULL pointer dereference in
+ hsr_proxy_announce()
+Message-ID: <20240909105822.16362339@wsk>
+In-Reply-To: <20240907190341.162289-1-aha310510@gmail.com>
+References: <20240907190341.162289-1-aha310510@gmail.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="fuepnusvih4poru2"
-Content-Disposition: inline
-In-Reply-To: <20240909084448.GU2097826@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: multipart/signed; boundary="Sig_/g5vQTmOQi/JcuOEiHPFvrW5";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-
---fuepnusvih4poru2
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+--Sig_/g5vQTmOQi/JcuOEiHPFvrW5
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On 09.09.2024 09:44:48, Simon Horman wrote:
-> On Fri, Sep 06, 2024 at 01:26:41PM -0700, Nathan Chancellor wrote:
-> > With clang's kernel control flow integrity (kCFI, CONFIG_CFI_CLANG),
-> > indirect call targets are validated against the expected function
-> > pointer prototype to make sure the call target is valid to help mitigate
-> > ROP attacks. If they are not identical, there is a failure at run time,
-> > which manifests as either a kernel panic or thread getting killed. A
-> > warning in clang aims to catch these at compile time, which reveals:
-> >=20
-> >   drivers/net/can/rockchip/rockchip_canfd-core.c:770:20: error: incompa=
-tible function pointer types initializing 'netdev_tx_t (*)(struct sk_buff *=
-, struct net_device *)' (aka 'enum netdev_tx (*)(struct sk_buff *, struct n=
-et_device *)') with an expression of type 'int (struct sk_buff *, struct ne=
-t_device *)' [-Werror,-Wincompatible-function-pointer-types-strict]
-> >     770 |         .ndo_start_xmit =3D rkcanfd_start_xmit,
-> >         |                           ^~~~~~~~~~~~~~~~~~
-> >=20
-> > ->ndo_start_xmit() in 'struct net_device_ops' expects a return type of
-> > 'netdev_tx_t', not 'int' (although the types are ABI compatible). Adjust
-> > the return type of rkcanfd_start_xmit() to match the prototype's to
-> > resolve the warning.
-> >=20
-> > Fixes: ff60bfbaf67f ("can: rockchip_canfd: add driver for Rockchip CAN-=
-FD controller")
-> > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+Hi Jeongjun,
+
+> In the function hsr_proxy_annouance() added in the previous commit=20
+> 5f703ce5c981 ("net: hsr: Send supervisory frames to HSR network=20
+> with ProxyNodeTable data"), the return value of the
+> hsr_port_get_hsr() function is not checked to be a NULL pointer,
+> which causes a NULL pointer dereference.
+
+Thank you for your patch.
+
+The code in hsr_proxy_announcement() is _only_ executed (the timer is
+configured to trigger this function) when hsr->redbox is set, which
+means that somebody has called earlier iproute2 command:
+
+ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 interlink lan3
+supervision 45 version 1
+
 >=20
-> Thanks, I was able to reproduce this problem at build time
-> and that your patch addresses it.
+> To solve this, we need to add code to check whether the return value=20
+> of hsr_port_get_hsr() is NULL.
+>=20
+> Reported-by: syzbot+02a42d9b1bd395cbcab4@syzkaller.appspotmail.com
+> Fixes: 5f703ce5c981 ("net: hsr: Send supervisory frames to HSR
+> network with ProxyNodeTable data") Signed-off-by: Jeongjun Park
+> <aha310510@gmail.com> ---
+>  net/hsr/hsr_device.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>=20
+> diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+> index e4cc6b78dcfc..b3191968e53a 100644
+> --- a/net/hsr/hsr_device.c
+> +++ b/net/hsr/hsr_device.c
+> @@ -427,6 +427,9 @@ static void hsr_proxy_announce(struct timer_list
+> *t)
+>  	 * of SAN nodes stored in ProxyNodeTable.
+>  	 */
+>  	interlink =3D hsr_port_get_hsr(hsr, HSR_PT_INTERLINK);
+> +	if (!interlink)
+> +		goto done;
+> +
+>  	list_for_each_entry_rcu(node, &hsr->proxy_node_db, mac_list)
+> { if (hsr_addr_is_redbox(hsr, node->macaddress_A))
+>  			continue;
+> @@ -441,6 +444,7 @@ static void hsr_proxy_announce(struct timer_list
+> *t) mod_timer(&hsr->announce_proxy_timer, jiffies + interval);
+>  	}
+> =20
+> +done:
+>  	rcu_read_unlock();
+>  }
+> =20
+> --
 
-FTR: the default clang in Debian unstable, clang-16.0.6 doesn't support
-this. With clang-20 from experimental it works, haven't checked older
-versions, though.
 
-regards,
-Marc
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Best regards,
 
---fuepnusvih4poru2
-Content-Type: application/pgp-signature; name="signature.asc"
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/g5vQTmOQi/JcuOEiHPFvrW5
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbeuF8ACgkQKDiiPnot
-vG+3gQf+MluezEfY084GfE16SOshu37NwV1Ignu8Goqy9G7jmMndcoundvwxiosq
-9Hd/6ILhI4GzWIF4a7UKOP6e+QPHz3eJ4V2Mgbs13QYtoLDf1nT+h+14MkiIMipK
-s6z9Ee31ptiZbn2raC7J6f8Z72+F0iysurkx39ZT8vt7Okq70pBQUN+HzPgH4Ryv
-MPcMpvh6mRaSQyC3zUuTnO1fW6hTMQGhOjJ4/TH5yaQvSo2N4qJExjM05X6Zz7lx
-uXt78y+/LA7U3Ew4fXyEhStgIxPlFalFcR47lXQzuVBmIRiV3Z44PONYJHPjsS8m
-lUd5S51lrVQG5sCik6LNGoQvZst9Yg==
-=JBly
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmbeuK4ACgkQAR8vZIA0
+zr3aWQf+LpYtx8KQQR5W5bNOlDJ7ql9rMWJUeO+uDIvvDuLJP8bf7uaJ5+i9RKZW
+HbKqOx7rYgVmqj5Aax91wIDdXY4NB7jqg0BOfCB67E45a/sVLaLqjnhqXgI6EPQ0
+yLHszr6Tte0VxjbjL66BE0jU5HUi5Xm4tyr9rHKywp4b8bz1iVBgStiQNuh2bNTI
+GTo6MBPaiDBHlYLp8Z+ZYGfaASzLxxam3Tw/bqe9o9vFxp50/cqyLdqqqH2z8IsF
+D03sUeqR/6Nshir1tKUWXLNHtY5295NgLQNKHlFNpdJ1+3JAERjXrbT3hrWiQ4SN
+/acWEqui6OstJunaMWX8YxW8xA7Fwg==
+=A/M4
 -----END PGP SIGNATURE-----
 
---fuepnusvih4poru2--
+--Sig_/g5vQTmOQi/JcuOEiHPFvrW5--
 
