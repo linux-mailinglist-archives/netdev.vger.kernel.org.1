@@ -1,163 +1,130 @@
-Return-Path: <netdev+bounces-126468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4822B971412
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:43:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ECFF971421
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 11:45:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7458E1C22C0E
-	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:43:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48289B2521A
+	for <lists+netdev@lfdr.de>; Mon,  9 Sep 2024 09:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB3E1B29D3;
-	Mon,  9 Sep 2024 09:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E43A1B2EE8;
+	Mon,  9 Sep 2024 09:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="dfZvTQsV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PA6yz94n"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C672F1B2EE0
-	for <netdev@vger.kernel.org>; Mon,  9 Sep 2024 09:43:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760191B2EDC;
+	Mon,  9 Sep 2024 09:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725875034; cv=none; b=O3v25+Jv7c85OVsdGEJzi7im54RBPAyGjW623V0d4jIx9DT02+LaFhe+u85d1la2VPwOseny9lF/WPvQp561RM/wMDTweG6jNDO8SR60cM8dharWHU9940ykVHl3vP29PC+klOi7QYpebNtsM/6LQSm/DxEdgva9xZR3TqxxeKM=
+	t=1725875076; cv=none; b=d2pNfkJZo7m4NlRY2kPkJfQlxgn9YB9kfH+CWf5Qnl29TfxbKv46o3M/AUrG/TSuKLMdrG1BD6lqTaURt2bxbdXmYbYfW0XBO50uIj+Cw9U+sld5mHMu0ubS177YxZbtaadNlTPmvZP40+9l93W0l0nAqrrDR73SFyfjb61hJJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725875034; c=relaxed/simple;
-	bh=mdCA4N+GNVY0fJkzFyi/Gl+NoZ0YobtLCyWMNATLKLs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AwXoMCVdW+8o9NOVh2LpjgHj79LbHxL4VdQIX/3+neS42hka9TKk+ksYYB7QxG8pH+34ub+DaHMoy/Ii0oUwoAI1x0x3ArtjKQwr+R6bgFH+rZuI4/LCLUtZisgzrXc3Sfj6Fl/Q58XPlzIKZyyhNdg3DW9PdmPZWmv50/gBfpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=dfZvTQsV; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 52F6788C8E;
-	Mon,  9 Sep 2024 11:43:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1725875030;
-	bh=y+ZOkuhV+ORWPzQUEat+C9lYpyiwHv49fIrrhPU8X80=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dfZvTQsVUu2HvBtcIFJNlKwOCYRyaU+N4YJmWUNwp/+khPwGu8FI9GRjU2bOtjbJQ
-	 nqX0wD+Ou6hjLQyORlQZ/vyHJFX3pm1UbPnGHK5fOBYdGcHoOpDZcVk9RwajWye/Zm
-	 S+xOvdsW8Y8msLYHqbwlvl2uvT4hd5gqRhteg7907CX0bNl8jPDwXC2IKjFqYvQnCW
-	 GUAdl7TXVocxWIHsIbWDTzlEMigRkq1h2UobhUwXPYVjw5AYqP3ZdDC1uDZfb2IBL2
-	 Jy8QSKxUrq7g5xS43RPbVyQYDQHi8GbGGifM93W8sniJGUG4SdpcBgzN0nr1m0RIE6
-	 nvj+WJizKMaYA==
-Date: Mon, 9 Sep 2024 11:43:49 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 2/2] net: hsr: Remove interlink_sequence_nr.
-Message-ID: <20240909114349.229b42b0@wsk>
-In-Reply-To: <20240906132816.657485-3-bigeasy@linutronix.de>
-References: <20240906132816.657485-1-bigeasy@linutronix.de>
-	<20240906132816.657485-3-bigeasy@linutronix.de>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1725875076; c=relaxed/simple;
+	bh=NwNF4gkNZxfITFKYRW3ZBe+PB8nJJ+vaL7edxlWc3ro=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eWyWMoz/5A+c30Mj06qHNxnvTEDtkMfFLxg69LG9uNPOKkSJdH2UezjjS92ENWc99FfG0KtKpL4BqnQ6c/SS3dwLXxZYWqkwo9yabiBMb9HNIsclaR1xYJ+LOWiw+jfykZvysQ4JTApCl/WXjqak8LawnGT1F8g0KpgrO0ZcgwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PA6yz94n; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725875075; x=1757411075;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=NwNF4gkNZxfITFKYRW3ZBe+PB8nJJ+vaL7edxlWc3ro=;
+  b=PA6yz94nIMp0FFoRFgUiQ1egfYQv7cgUZ15V9xuALmlAZ+2R/znraZD+
+   H/nM1h/VwD7lf/iE/RKcHoZbkz7ZFO3g8/34wmBDtNTFVxo61Vtang+cc
+   eD+nk4Sv+Q9Ml9ghWu2dtG5k3VehZCzJcHraVay2eTskRlQChGdt6i/HA
+   k17WogXHZ4rgbDhEkTJG1V/Yw5V9EdlDzKfpH6Y5uQUwJW0J1gWw0vhk/
+   Qi8IOp8eqqVrMMNr4MpE8sKmFQLmaLYoimWXd8Q1URNnkncJrt9qMCmgy
+   mGvZhv8vSUkEUzuONlTfmuVdpfz9k1Er+mobk6b9EUPQLnh0TFB06D6nl
+   g==;
+X-CSE-ConnectionGUID: O5KCdt01TGWHpZ7J/SKYwQ==
+X-CSE-MsgGUID: F5VQpHe9T3Kb78JWriunYw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11189"; a="27484047"
+X-IronPort-AV: E=Sophos;i="6.10,213,1719903600"; 
+   d="scan'208";a="27484047"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2024 02:44:33 -0700
+X-CSE-ConnectionGUID: bo4VfySFQ+m78PdHezdaew==
+X-CSE-MsgGUID: s4xQ+8WmQlCbXSHArVx/1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,213,1719903600"; 
+   d="scan'208";a="66250044"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Sep 2024 02:44:28 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1snawc-00000006jqy-0nMH;
+	Mon, 09 Sep 2024 12:44:26 +0300
+Date: Mon, 9 Sep 2024 12:44:25 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Pavel Tikhomirov <ptikhomirov@virtuozzo.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH net v1 1/1] netfilter: nf_reject: Fix build error when
+ CONFIG_BRIDGE_NETFILTER=n
+Message-ID: <Zt7DeR6ZgtA0MhXg@smile.fi.intel.com>
+References: <20240906145513.567781-1-andriy.shevchenko@linux.intel.com>
+ <20240907134837.GP2097826@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/PCx0GGlSJXMDUHOxp0gnyS5";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240907134837.GP2097826@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
---Sig_/PCx0GGlSJXMDUHOxp0gnyS5
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Sat, Sep 07, 2024 at 02:48:37PM +0100, Simon Horman wrote:
+> On Fri, Sep 06, 2024 at 05:55:13PM +0300, Andy Shevchenko wrote:
 
-Hi Sebastian Andrzej,
+> As mentioned in relation to another similar patch,
+> I'm not sure that resolution of W=1 warnings are fixes.
 
-> From: Eric Dumazet <edumazet@google.com>
->=20
-> Remove interlink_sequence_nr which is unused.
->=20
-> [ bigeasy: split out from Eric's patch ].
->=20
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  net/hsr/hsr_device.c | 1 -
->  net/hsr/hsr_main.h   | 1 -
->  2 files changed, 2 deletions(-)
->=20
-> diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
-> index a06e790042e2e..10393836992df 100644
-> --- a/net/hsr/hsr_device.c
-> +++ b/net/hsr/hsr_device.c
-> @@ -625,7 +625,6 @@ int hsr_dev_finalize(struct net_device *hsr_dev,
-> struct net_device *slave[2], /* Overflow soon to find bugs easier: */
->  	hsr->sequence_nr =3D HSR_SEQNR_START;
->  	hsr->sup_sequence_nr =3D HSR_SUP_SEQNR_START;
-> -	hsr->interlink_sequence_nr =3D HSR_SEQNR_START;
-> =20
->  	timer_setup(&hsr->announce_timer, hsr_announce, 0);
->  	timer_setup(&hsr->prune_timer, hsr_prune_nodes, 0);
-> diff --git a/net/hsr/hsr_main.h b/net/hsr/hsr_main.h
-> index ab1f8d35d9dcf..fcfeb79bb0401 100644
-> --- a/net/hsr/hsr_main.h
-> +++ b/net/hsr/hsr_main.h
-> @@ -203,7 +203,6 @@ struct hsr_priv {
->  	struct timer_list	prune_proxy_timer;
->  	int announce_count;
->  	u16 sequence_nr;
-> -	u16 interlink_sequence_nr; /* Interlink port seq_nr */
+Up to you, I consider they as fixes as I'm pretty much annoyed each release to
+have disable CONFIG_WERROR. But I got your point.
 
-I think that this was an attempt to exactly follow standard (point
-5.2.2.2 HSR-SAN RedBox for attachment to a single-thread LAN) which
-states that proxy node table shall keep for each interlink the sequence
-number [*]. Instead in code the sequence number for a new frame which
-comes from interlink port is assigned int:
+...
 
-hsr_get_node() -> file line 271=20
+> Possibly it is broken for some reason - like reading nskb too late -
+> but I wonder if rather than annotating niph it's scope can be reduced
+> to the code that is only compiled if CONFIG_BRIDGE_NETFILTER is enabled.
+> 
+> This also addreses what appears to be an assingment of niph without
+> the value being used - the first assingment.
+> 
+> E.g., for the ipv4 case (compile tested only!):
 
-and then this starting sequence numer is used for this proxy node table
-node.
+Please, submit a formal patch, I'm not so familiar with the guts of networking
+core to be able to produce anything better than I already did.
 
-Hence it shall be safe to remove it.
+Consider this as
+Reported-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
->  	u16 sup_sequence_nr;	/* For HSRv1 separate seq_nr for
-> supervision */ enum hsr_version prot_version;	/* Indicate if
-> HSRv0, HSRv1 or PRPv1 */ spinlock_t seqnr_lock;	/* locking for
-> sequence_nr */
+Thank you!
+
+-- 
+With Best Regards,
+Andy Shevchenko
 
 
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/PCx0GGlSJXMDUHOxp0gnyS5
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmbew1UACgkQAR8vZIA0
-zr18tAf/U6nRw0SzUTDVzCSU/HrRG7E7Y6OJYxNgt7gv1nc8I1oGarOyWU+KnaMj
-LwrmDMdlY0Dx6/UZO2WzvUpuqyN7HuMamEmIP5s1a9fl0Gv4GNKXjV42f8idXGV0
-tpyPZal9fFcQ+UXPK7iQh1whqg2oaAszHCJSEmAZikdKICd8Ya9emjGVv56wGj5n
-31hXGkoXIIydIgEVlI6nMl94/bnDgyyCZ+ZQwodZOwlnYEaD/gFA6Bq7C7FmyEBx
-uJrZitnfnuaJHsMagWr4UPnGxQCfMadFvOEyPlOUW6MF8i+7nCTRmf5M5FxtK71h
-c+hb+s8W49lMUjK1Sz9//qRQiJc25A==
-=jkrD
------END PGP SIGNATURE-----
-
---Sig_/PCx0GGlSJXMDUHOxp0gnyS5--
 
