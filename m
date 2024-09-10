@@ -1,156 +1,122 @@
-Return-Path: <netdev+bounces-126912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E94FD972E93
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:45:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C022A972EB9
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:46:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62A5FB2273A
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:45:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D0D1286868
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:46:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D92190052;
-	Tue, 10 Sep 2024 09:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ZCB+NE4p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC0B18EFD8;
+	Tue, 10 Sep 2024 09:44:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E56C183CB0;
-	Tue, 10 Sep 2024 09:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F6F18EFCB;
+	Tue, 10 Sep 2024 09:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725961407; cv=none; b=WfGW1yN/CgekIHcHIyNLsW0B7g5FOyD3DAaeFV7vrfuOHwKM2UKczb6/8HyheFd1zptBkwe4Lr0uKTM9Q7JvBaN6PW3dIslQ/Gar1e+EGIfVXEm81SoKS2FDfp3eTYgz1+RJ9Zbd+NZm+3E9/FLghYvzTYw7oT35HqRjNQuK/6g=
+	t=1725961488; cv=none; b=bzKumNJI1N421vAu9bupX24R/4pe9FX/d9LN+evPgzHoGNHD66yw8s9R1hM/jdMMKFZfOjQxReu8F+S6kIse/h1YIjnVFMImykPZthcwn7gy/RlMmkZTgWkjFrSvvcO8Kun1Zx7QXuJISShnPL910umeDfQKBZqMXstVeWyKZ74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725961407; c=relaxed/simple;
-	bh=/23hy7Mk04sacJQrQYloYrb0pp+6CKVixUjvk6VV7vM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fr1FObcvoNLkb58Su3+7ZVIjD3vVCgBwfvQfzUXxLxsFelSN9RbEKB5DHw2oMVTHUttZnJrlg2Sv0M+g75yy4DZLWnFo5iRHQS0SmXsPmXhdfWZTHeFJacXQgFz75jSNve1yr0scfb0amB89ozKi5QVizHybzUpD0Ef0mncdTCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ZCB+NE4p; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1725961405; x=1757497405;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=/23hy7Mk04sacJQrQYloYrb0pp+6CKVixUjvk6VV7vM=;
-  b=ZCB+NE4pPDCYxHN5VPccWeyfei2xGTzMHnAhaXvCV/wPhNhfQ8Sev0pT
-   ZqR5aCV+m46opZsZ3WDMczO5U/s8KFk6l9hc+Ze3jQjeWeL84wtXudT8A
-   hll47TS4AG3V/SvFLoKFQQusL2sLHyKSRU1C7uEpODQegGBA3brPFRRMQ
-   OlVQ3vIhJzbVHZ8XKdhT7/sYDomJef6C/cXr3XN7Y9cZlufeirt0FZTht
-   Az646NRDW4c6CEp6MpYmxBX20ET0PPFmhf26OPu7V7umdxe3+6LWjb1Dw
-   8biVCZbaxnhEaKfk/ZIUTAkIc9OInh01dZgnXWSd1dnf+bLVX/U+RMmQl
-   g==;
-X-CSE-ConnectionGUID: B+zr+AzST0asdRwPHFVR3w==
-X-CSE-MsgGUID: CKJnfMvNSFaHgD3TNp8zJw==
-X-IronPort-AV: E=Sophos;i="6.10,216,1719903600"; 
-   d="scan'208";a="198998003"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Sep 2024 02:43:23 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 10 Sep 2024 02:42:43 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Tue, 10 Sep 2024 02:42:41 -0700
-Date: Tue, 10 Sep 2024 09:42:40 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: Horatiu Vultur <horatiu.vultur@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, "David S. Miller" <davem@davemloft.net>,
-	"Eric Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	"Alexei Starovoitov" <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, "Jesper Dangaard Brouer" <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next 04/12] net: lan966x: use the FDMA library for
- allocation of rx buffers
-Message-ID: <20240910094240.ileosxxgujfolkza@DEN-DL-M70577>
-References: <20240905-fdma-lan966x-v1-0-e083f8620165@microchip.com>
- <20240905-fdma-lan966x-v1-4-e083f8620165@microchip.com>
- <f8b58d30-cd45-4cb6-b6ca-ac076f072688@redhat.com>
+	s=arc-20240116; t=1725961488; c=relaxed/simple;
+	bh=B/Hnf7fYM7HOeWShPDrC5NP0EgrLS05vitkWoMbwaiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HFBWqrX5EG5PR0D9wqFZLqic1cBygqBQaZTalo6HkUGsxMCVlPWw5cC1vaXbXpITUbCRzqVeXA3T9pT8OtCBmP8KBFsKWR4tDBcF6K3HMmQozKOqaY4Yg5YPpFUADp7hChSnbPWyzF/x//gWS2aH8Cc86Lz4CV+BjkzfeLyvrHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a8d43657255so320229066b.0;
+        Tue, 10 Sep 2024 02:44:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725961485; x=1726566285;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZEiLqRfxf7lBPb/a2NUaZRXiI2UrOttr4l6z8YhNi4Q=;
+        b=XxTxUrSjZ+x6DjEsFPtt+FDbh++QVilUXoX2hXpDo0B2RDJI7NLr5Al8JmCXxvnOum
+         LD0viONA0LuosXfLYWKudED5PukvQhQLJnqK0u4ljg/GYyFFfHQFEydEq6fPlLUcbuxa
+         gidwz5wSz4kr4pOTuazDXBHJMMnltGmepkogZmL886d073OOfYps289yAXQ2hUlN81Fu
+         Jgbe0vrE4X/OOFvZRELq1ZSi86RzONPSTJ5EPQWt/O4Ooi7txoegSa/xmiZW/IISjnr4
+         cTgZGwUDt6SzMb9PAJe29pOJj1ih/BI9clYiB32KMCpojM3q6nG4D1kJiXn4xT7Brg+8
+         MZ5w==
+X-Forwarded-Encrypted: i=1; AJvYcCVMf53QenMFbK6HHsVb/1/5CYl5ZiNA4sRLQMRNIrngpcbHbcrCjuS6EdbDgwcXHzRgUfAwgZc9BMKUawI=@vger.kernel.org, AJvYcCVZIb/5obvRddZD4hqeApuXXIQJ9CZ4RBQKEJaj2L/k0PvCBrEWqGbbmsLboC1PM3v6NAJJtJr5@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzc3rM4U5sS7eHhZ5l70DAKItHgedLaSmyezkdKGiqPuMlzhCk1
+	YV8ilfnXCu1RzrkndeyumYnzApFTVRA/mlrjGr3ZyuBfJn7ArXxv
+X-Google-Smtp-Source: AGHT+IFj3shL6QuYetQtig1F0qQ+MlhLBZvhKZZ4LCvSersDof8GynDsZxIfAXp8ReLBROX8xYBaPw==
+X-Received: by 2002:a17:906:f5a9:b0:a7d:a00a:a9fe with SMTP id a640c23a62f3a-a8ffaac09dfmr15128966b.17.1725961484500;
+        Tue, 10 Sep 2024 02:44:44 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d2583fc73sm455114466b.34.2024.09.10.02.44.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 02:44:44 -0700 (PDT)
+Date: Tue, 10 Sep 2024 02:44:41 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Simon Horman <horms@kernel.org>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davej@codemonkey.org.uk,
+	vlad.wing@gmail.com, max@kutsevol.com
+Subject: Re: [PATCH net-next v2 08/10] net: netconsole: do not pass userdata
+ up to the tail
+Message-ID: <20240910-certain-weasel-of-bliss-1cf769@devvm32600>
+References: <20240909130756.2722126-1-leitao@debian.org>
+ <20240909130756.2722126-9-leitao@debian.org>
+ <20240909160528.GD2097826@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f8b58d30-cd45-4cb6-b6ca-ac076f072688@redhat.com>
+In-Reply-To: <20240909160528.GD2097826@kernel.org>
 
-> Use the two functions: fdma_alloc_phys() and fdma_dcb_init() for rx
-> > buffer allocation and use the new buffers throughout.
+On Mon, Sep 09, 2024 at 05:05:28PM +0100, Simon Horman wrote:
+> On Mon, Sep 09, 2024 at 06:07:49AM -0700, Breno Leitao wrote:
+> > Do not pass userdata to send_msg_fragmented, since we can get it later.
 > > 
-> > In order to replace the old buffers with the new ones, we have to do the
-> > following refactoring:
+> > This will be more useful in the next patch, where send_msg_fragmented()
+> > will be split even more, and userdata is only necessary in the last
+> > function.
 > > 
-> >      - use fdma_alloc_phys() and fdma_dcb_init()
-> > 
-> >      - replace the variables: rx->dma, rx->dcbs and rx->last_entry
-> >        with the equivalents from the FDMA struct.
-> > 
-> >      - make use of fdma->db_size for rx buffer size.
-> > 
-> >      - add lan966x_fdma_rx_dataptr_cb callback for obtaining the dataptr.
-> > 
-> >      - Initialize FDMA struct values.
-> > 
-> > Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
-> > Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> > ---
-> >   .../net/ethernet/microchip/lan966x/lan966x_fdma.c  | 116 ++++++++++-----------
-> >   .../net/ethernet/microchip/lan966x/lan966x_main.h  |  15 ---
-> >   2 files changed, 55 insertions(+), 76 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> > index b64f04ff99a8..99d09c97737e 100644
-> > --- a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> > +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> > @@ -6,13 +6,30 @@
-> > 
-> >   #include "lan966x_main.h"
-> > 
-> > +static int lan966x_fdma_rx_dataptr_cb(struct fdma *fdma, int dcb, int db,
-> > +                                   u64 *dataptr)
-> > +{
-> > +     struct lan966x *lan966x = (struct lan966x *)fdma->priv;
-> > +     struct lan966x_rx *rx = &lan966x->rx;
-> > +     struct page *page;
-> > +
-> > +     page = page_pool_dev_alloc_pages(rx->page_pool);
-> > +     if (unlikely(!page))
-> > +             return -ENOMEM;
-> > +
-> > +     rx->page[dcb][db] = page;
-> > +     *dataptr = page_pool_get_dma_addr(page) + XDP_PACKET_HEADROOM;
-> > +
-> > +     return 0;
-> > +}
+> > Suggested-by: Simon Horman <horms@kernel.org>
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
 > 
-> Very nice cleanup indeed!
+> ...
 > 
-> Out of ENOMEM I can't recall if the following was already discussed, but
-> looking at this cb, I'm wondering if a possible follow-up could replace
-> the dataptr_cb() and nextptr_cb() with lib functions i.e. operating on
-> page pool or doing netdev allocations according to some fdma lib flags.
+> > @@ -1094,7 +1098,6 @@ static void append_release(char *buf)
+> >  
+> >  static void send_msg_fragmented(struct netconsole_target *nt,
+> >  				const char *msg,
+> > -				const char *userdata,
+> >  				int msg_len,
+> >  				int release_len)
+> >  {
+> > @@ -1103,8 +1106,10 @@ static void send_msg_fragmented(struct netconsole_target *nt,
+> >  	int offset = 0, userdata_len = 0;
+> >  	const char *header, *msgbody;
+> >  
+> > -	if (userdata)
+> > -		userdata_len = nt->userdata_length;
+> > +#ifdef CONFIG_NETCONSOLE_DYNAMIC
+> > +	userdata = nt->userdata_complete;
+> > +	userdata_len = nt->userdata_length;
+> > +#endif
 > 
-> Cheers,
+> userdata does not appear to be declared in this scope :(
 > 
-> Paolo
->
+> .../netconsole.c:1110:9: error: 'userdata' undeclared (first use in this function)
+>  1110 |         userdata = nt->userdata_complete;
 
-Hi Paolo,
+Oh, during my rebase, I moved the declaration to a patch forward, and I
+didn't catch this because I was just compiling and testing with the
+whole patchset applied.
 
-Something like this could definitely be added down the road. I initially
-left this out to reduce library complexity.
-
-Thanks for reviewing!
-
-/Daniel
+Thanks for catching it. I will send an updated version.
+--breno
 
