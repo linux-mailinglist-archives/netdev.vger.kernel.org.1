@@ -1,219 +1,117 @@
-Return-Path: <netdev+bounces-126897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A8FF972D48
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:19:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D789972D4E
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:20:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C57A02850F0
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:19:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03782B23B4D
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A5A187857;
-	Tue, 10 Sep 2024 09:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3E918859A;
+	Tue, 10 Sep 2024 09:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lfBDbMgK";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="hSw/04k5";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lfBDbMgK";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="hSw/04k5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DandZEhc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63AF12B143;
-	Tue, 10 Sep 2024 09:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B1C186289;
+	Tue, 10 Sep 2024 09:20:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725959973; cv=none; b=FVLGOsrtTC/qdm83pf/41VwW4BoLWstVg1MDXEDSL+qE/A+ugrq02K7WhonGt6eK0+9GJnyyoo6QOUbKF4zR+bUdNkvrVibl7BRfGbCYc4cZ+5HbIC9/18udHupN49y9fBb2oPkv0jZRqut5ISspjzrncTljPtYrO1uzPA/WHUE=
+	t=1725960031; cv=none; b=p1OA5UdNTBOv5/WTeKza5NCrYC2DBFW93mQZInEJ+GeEhMxDw0KxCMZKMS0stPlqHUqLayyu93oVsKH00VFWdZWDnG+YW6B/pEXWMLYFlIdQEbOQGnFGx5n+hubKoZYdRydDyElmnvJ6FjQemvwRQJglBfKGw+8+Hpc4niXKFyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725959973; c=relaxed/simple;
-	bh=EZJ2KjVe8+MIqoxXJa3jnPZTaaasnYdfUc4J7h8X9Sw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iYIjKgYM7RYPaQCgy/DUvqkVzjxMMJpaE05ut2eZgaDwHQQBNNJJ7Z7ZBCh4CqS03Co1SBs64FG8K/m6DAaFrTWRt7+TBCyXA2HDGsph6WbUxeOC6xc0CxLVOqpNF/wJigqoehkI3RltbLIuHcvB+LovKrf62y0hJr5Ca4+cch0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lfBDbMgK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=hSw/04k5; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lfBDbMgK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=hSw/04k5; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 1A3511F7CA;
-	Tue, 10 Sep 2024 09:19:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725959970; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=iHifeSDy1hOrQBMy6zAhiahj/omSnqHRNld70oH1lB8=;
-	b=lfBDbMgKn59KuCOI0BmhZrdL9u8jnyJbSi73Z7nnY+EtqtYEha6puIOgROlT/1gI7b/jPC
-	wGH3HmSlYoslgSYlz/LQ+htJiAvqlZTgBQgeEmMu8jDSRUe9mXrW67iGIhMn5+7XBG5WIh
-	KKC5XX8oA4Rt6IpJ02G6DCiaz6OE/CQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725959970;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=iHifeSDy1hOrQBMy6zAhiahj/omSnqHRNld70oH1lB8=;
-	b=hSw/04k5A0n+xQJ9JF57ti/nISsxO3zKM1aEff2RfwKn8MnQBzyWdU2SfB0Mhmtikd9e1D
-	cIkIbBglasWMt0CA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1725959970; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=iHifeSDy1hOrQBMy6zAhiahj/omSnqHRNld70oH1lB8=;
-	b=lfBDbMgKn59KuCOI0BmhZrdL9u8jnyJbSi73Z7nnY+EtqtYEha6puIOgROlT/1gI7b/jPC
-	wGH3HmSlYoslgSYlz/LQ+htJiAvqlZTgBQgeEmMu8jDSRUe9mXrW67iGIhMn5+7XBG5WIh
-	KKC5XX8oA4Rt6IpJ02G6DCiaz6OE/CQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1725959970;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=iHifeSDy1hOrQBMy6zAhiahj/omSnqHRNld70oH1lB8=;
-	b=hSw/04k5A0n+xQJ9JF57ti/nISsxO3zKM1aEff2RfwKn8MnQBzyWdU2SfB0Mhmtikd9e1D
-	cIkIbBglasWMt0CA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E97CE13A3A;
-	Tue, 10 Sep 2024 09:19:29 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id aBWeOCEP4GawSgAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Tue, 10 Sep 2024 09:19:29 +0000
-Message-ID: <e8756edc-1c85-4a03-9c6b-663a9e7d46eb@suse.cz>
-Date: Tue, 10 Sep 2024 11:19:29 +0200
+	s=arc-20240116; t=1725960031; c=relaxed/simple;
+	bh=rnuCrS753BduIzY9Zaq6w0W8UNk9xrU+v2yRFq64zj4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qbOmiOgx1wjmAdeFEb80ksSnGwewyrMLf68kc7ut49kBTjKFtjCEmLK3Ip5Yi3GGLrJypCkljPScGFletASb/r+cHT6BHHCvwm8hBmQ94x75Ao+5UPytZlVa4H41+iCAKCei5qp95IhSytx+akTSrPcUh9ONJaw8bbMCMKKkSQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DandZEhc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 329D9C4CEC6;
+	Tue, 10 Sep 2024 09:20:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725960030;
+	bh=rnuCrS753BduIzY9Zaq6w0W8UNk9xrU+v2yRFq64zj4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DandZEhcH8Nei9cSSd2BZCCTlwu2Z3mjmAZGVzw6RbILGE18lZbBNgXJcn0Kr3vJO
+	 YnWcVkTeDdaFf9QoekStBwJZixH5NVqqzAmUgAtTvsevGwrfBDXSzcnyd9Aeo6VgdH
+	 CwI76ee2l8g130Z8YG5N2jYMD1FU60eo9qI/IeaYVcgAD855HtK8kuNz8ocGUEewa1
+	 3gOZj5stf/sdZUjHbn2PeipU/rEkVK3Lj/dm1v+o4Cb0ETf3CHDlsxAnkgJXUom0Hn
+	 mHohAdLFCH8lkW3jVHRnJxywPw6sZVXmxj81AS1wGiqCenI1o3Ftab0lcRCCLEISr/
+	 FJNf64x5rrVvg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7142E3806654;
+	Tue, 10 Sep 2024 09:20:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4] memcg: add charging of already allocated slab objects
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, Shakeel Butt <shakeel.butt@linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Muchun Song <muchun.song@linux.dev>, David Rientjes <rientjes@google.com>,
- Hyeonggon Yoo <42.hyeyoo@gmail.com>, Eric Dumazet <edumazet@google.com>,
- "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240905173422.1565480-1-shakeel.butt@linux.dev>
- <5d48fe26-1e18-4941-99d4-8c03e83f5e76@redhat.com>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <5d48fe26-1e18-4941-99d4-8c03e83f5e76@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Score: -2.80
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[cmpxchg.org,kernel.org,linux.dev,google.com,gmail.com,davemloft.net,kvack.org,vger.kernel.org,meta.com];
-	RCPT_COUNT_TWELVE(0.00)[17];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	TO_DN_SOME(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/12] net: lan966x: use the newly introduced FDMA
+ library
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172596003126.183148.4876801824053155515.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Sep 2024 09:20:31 +0000
+References: <20240905-fdma-lan966x-v1-0-e083f8620165@microchip.com>
+In-Reply-To: <20240905-fdma-lan966x-v1-0-e083f8620165@microchip.com>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: horatiu.vultur@microchip.com, UNGLinuxDriver@microchip.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 
-On 9/10/24 10:26, Paolo Abeni wrote:
-> On 9/5/24 19:34, Shakeel Butt wrote:
->>    * kmem_cache_alloc_node - Allocate an object on the specified node
->>    * @s: The cache to allocate from.
->> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
->> index 64d07b842e73..3c13ca8c11fb 100644
->> --- a/net/ipv4/inet_connection_sock.c
->> +++ b/net/ipv4/inet_connection_sock.c
->> @@ -715,6 +715,7 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
->>   	release_sock(sk);
->>   	if (newsk && mem_cgroup_sockets_enabled) {
->>   		int amt = 0;
->> +		gfp_t gfp = GFP_KERNEL | __GFP_NOFAIL;
->>   
->>   		/* atomically get the memory usage, set and charge the
->>   		 * newsk->sk_memcg.
->> @@ -731,8 +732,8 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
->>   		}
->>   
->>   		if (amt)
->> -			mem_cgroup_charge_skmem(newsk->sk_memcg, amt,
->> -						GFP_KERNEL | __GFP_NOFAIL);
->> +			mem_cgroup_charge_skmem(newsk->sk_memcg, amt, gfp);
->> +		kmem_cache_charge(newsk, gfp);
->>   
->>   		release_sock(newsk);
->>   	}
-> 
-> The networking bits looks sane to me - with a very minor nit about the 
-> reverse xmas tree order in variables declaration above.
-> 
-> Acked-by: Paolo Abeni <pabeni@redhat.com>
+Hello:
 
-Great, thanks, I will adjust the ordering.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu, 5 Sep 2024 10:06:28 +0200 you wrote:
+> This patch series is the second of a 2-part series [1], that adds a new
+> common FDMA library for Microchip switch chips Sparx5 and lan966x. These
+> chips share the same FDMA engine, and as such will benefit from a common
+> library with a common implementation.  This also has the benefit of
+> removing a lot of open-coded bookkeeping and duplicate code for the two
+> drivers.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,01/12] net: lan966x: select FDMA library
+    https://git.kernel.org/netdev/net-next/c/63acda75801f
+  - [net-next,02/12] net: lan966x: use FDMA library symbols
+    https://git.kernel.org/netdev/net-next/c/1dfe4ca8cb4a
+  - [net-next,03/12] net: lan966x: replace a few variables with new equivalent ones
+    https://git.kernel.org/netdev/net-next/c/8274d40eafa3
+  - [net-next,04/12] net: lan966x: use the FDMA library for allocation of rx buffers
+    https://git.kernel.org/netdev/net-next/c/01a70754327b
+  - [net-next,05/12] net: lan966x: use FDMA library for adding DCB's in the rx path
+    https://git.kernel.org/netdev/net-next/c/2b5a09e67b72
+  - [net-next,06/12] net: lan966x: use library helper for freeing rx buffers
+    https://git.kernel.org/netdev/net-next/c/f51293b3ea89
+  - [net-next,07/12] net: lan966x: use the FDMA library for allocation of tx buffers
+    https://git.kernel.org/netdev/net-next/c/df2ddc1458c3
+  - [net-next,08/12] net: lan966x: use FDMA library for adding DCB's in the tx path
+    https://git.kernel.org/netdev/net-next/c/29cc3a66a81d
+  - [net-next,09/12] net: lan966x: use library helper for freeing tx buffers
+    https://git.kernel.org/netdev/net-next/c/8cdd0bd02283
+  - [net-next,10/12] net: lan966x: ditch tx->last_in_use variable
+    https://git.kernel.org/netdev/net-next/c/c06fef96c7d5
+  - [net-next,11/12] net: lan966x: use a few FDMA helpers throughout
+    https://git.kernel.org/netdev/net-next/c/9fbc5719f6aa
+  - [net-next,12/12] net: lan966x: refactor buffer reload function
+    https://git.kernel.org/netdev/net-next/c/89ba464fcf54
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
