@@ -1,178 +1,117 @@
-Return-Path: <netdev+bounces-126921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76362973043
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:59:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BCCF97308B
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:02:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B6C728270B
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:59:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB1DA1F25872
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:02:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73BD18C03C;
-	Tue, 10 Sep 2024 09:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC19B18C025;
+	Tue, 10 Sep 2024 10:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dwWsWYAW"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="W5EGoNSA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D65BEEC9
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 09:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA8818C00C;
+	Tue, 10 Sep 2024 10:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725962346; cv=none; b=JcML0Xl0ZFIBKMrFdPwbAaJZble10eCM9enZFIhmlPWkou5pDYi6Z8gteQkWG0B9z1dxhBfjKZN6ptQn4H6089BIwpvmbJIVbpJTynw0pclz1ONXPYlilD9N0cv4cl0TIhCzvnyxt7mlUgpAR4M/fTYMcLC8cW55s3kwOw4zcG8=
+	t=1725962469; cv=none; b=PtB/O70k9R1bfYY4qxbxGdGJ+JYxG9MAsFH6qsnGVZwYJm57uTe3Sh1g4TTVlxUPF5EOGWbeLb5jfh7tWZLk4b/dtZbCl6qkkrRIjFEB4B9DeVZwoQ1Ht2AXvd4Mjv8yB8Ft/OvqDAbFMhSOXscH5QjLuC1Iipm/yJLYuyIQBqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725962346; c=relaxed/simple;
-	bh=bQLe2pUIEEyUZE+/EAglMsUr+F12sN/BLUBijDrXSac=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bYVUsOjyA8P1xx+0J0PjXX55g2bg2oXfY8vG+djreE/uqBR1EXE2Fw2LXPRZiTWw0MC2ktz/qKIbTCeMLdQ7Ygc23ZTIU8GLo92H7PXqnjMbT8W9iXIszAVCw6gStQObPXS24pVq5EUvzGizuQ6rmSNRKi/Y/nplrkNYTSKkV3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dwWsWYAW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725962342;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jiUkwL8jiwz5bb5LLszsrQRqvrS9SIKe3P1nTjcI9RU=;
-	b=dwWsWYAWI/uWKosgUnEVQj3alAgbhDX8IzmuB/v7r4TuiF9tZaQXwUkrlfOfL1C6N1t5H4
-	GsCHCa/o7ldPtApcIbMHzwyooOO6OrXSOCux99ZTDSvuF46vwsb9i+zYKNqYpobLGGWX6f
-	1b9JMEO7mjwZk8jle4DOmYdhLFk8VPQ=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-275-clOxg29ZNSORgqSu83bQYQ-1; Tue, 10 Sep 2024 05:59:01 -0400
-X-MC-Unique: clOxg29ZNSORgqSu83bQYQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a8d2f475416so160996066b.0
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 02:59:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725962340; x=1726567140;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jiUkwL8jiwz5bb5LLszsrQRqvrS9SIKe3P1nTjcI9RU=;
-        b=whvkd8/VVNZGiuLfQYZTy3eVrGgv+b08ui7w1b7V0DNgjXFN2dEcBWxIjbj2ANu4Eq
-         XbR9Zok2Dy0a0EAxkMOZaZzWKbqMCSWknTcD6mX6s+xTFHjwrzvwMDhgBvWKh+OylfGu
-         iws+8wwi5Yk1g0w66UrFJcuRk8J+t19r63QjD+K9Hm8HxIo/biwDrJzFR9qCcFRe4vYE
-         vP+FqAyips3YUN8CemfWGP1y+3Cd8t2XI4oy+QQRxCbPhu1DRp/gC3UxdmTN8qjephGO
-         qq6O3AVV2Af1tbD4ThnM1tQlbTjUJ24pt73MDzld4OqXF++vpZJkalGIEkfGWtErYf2J
-         p96g==
-X-Forwarded-Encrypted: i=1; AJvYcCWWEVpGSkR/VGH2EeZe9NSGfpnWKbaiXMA+TdIWgeEP+2hH8/s2mO3EJcK+feijhOqb5PQMviA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVDLpz7igZwwfMjtnksiBRPgTHSCstPyC4YfO/9ds6a/xbOdpK
-	rnrEslyysSItD8apA5L26B1syNJFB5JGSgnn1Ykbpz9zKQW82rikL6eg3KROCokE7Ik4LC64OS8
-	sVQ108VP8CUQGRb3s8AgqaBj1JE7f6hI//CjbJlyYV9kWO0i6YNSloxgvKLW/4hCm
-X-Received: by 2002:a17:907:268e:b0:a86:8953:e1fe with SMTP id a640c23a62f3a-a8ffadf3c37mr21982266b.47.1725962339861;
-        Tue, 10 Sep 2024 02:58:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IERbuGqTbebYxtwPp+Ofxmyy5JzHR+T4dmVYSq8mepeZfuhvqFtrdMXLyJgC2KYWCtRG3tCIA==
-X-Received: by 2002:a17:907:268e:b0:a86:8953:e1fe with SMTP id a640c23a62f3a-a8ffadf3c37mr21979466b.47.1725962339290;
-        Tue, 10 Sep 2024 02:58:59 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-69-130.dyn.eolo.it. [146.241.69.130])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25830efdsm459314066b.41.2024.09.10.02.58.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 02:58:58 -0700 (PDT)
-Message-ID: <ff23bcb5-d2e8-4b1b-a669-feab4a97994a@redhat.com>
-Date: Tue, 10 Sep 2024 11:58:56 +0200
+	s=arc-20240116; t=1725962469; c=relaxed/simple;
+	bh=6V9HMmnSNWWXc7YgMqOhzvnAXvRlAcjh7mRLo7LvQPs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DWL+QENsfkCVfijy6l7lootmOd7qrkTZnmn476z9xMYh9/cLQE6XkfLLuwEfATmRg1RZLmsOXUCNtS+E+WRlV44Ob5nslmvqP+Cw+ikN3FyX5Uc5QQF6VAjnePT+Usfj7SBh4OaFn6RKAdt0XnzHEvs3rxTsMBbYuNkXNrE9Z04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=W5EGoNSA; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from ubuntu.home (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 66EE1200DF81;
+	Tue, 10 Sep 2024 12:00:59 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 66EE1200DF81
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1725962459;
+	bh=AwvMkIo/1KqTrDlY5ALqmh9pB7fSfgZAUHsv5hGUQxM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=W5EGoNSAOpEyqAiWxmfXWc0gLq8vWjbKlosToT3YUr2NgjDgVMfTi8MuFC65DbJKQ
+	 nHGbRsnO++C+K7e0wS+j01o7OAVUjGjdJyySzK7KtBXWykzFBhTfvH7nOOZDsuln6F
+	 R+FoB98xwuG3b+V3RvXeE1acSauzUAY3jfS5FAGFjzCgFgippL3dKVkplaCVgC4RmD
+	 RgYyh0NNijRzxupIH7daybhnew8FVB7LN80gzmi7iy686K0TP34YBKdC5PKrQo3jmq
+	 b1oWI+K71VdF4ctczSQ6QmrvUQRquETg+NzyLBvLLoBCsCpZLRYKO7fAB18mhT323j
+	 qthbwZxEyum0A==
+From: Justin Iurman <justin.iurman@uliege.be>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	aahringo@redhat.com,
+	justin.iurman@uliege.be
+Subject: [PATCH net-next] ipv6: rpl: free skb
+Date: Tue, 10 Sep 2024 12:00:32 +0200
+Message-Id: <20240910100032.18168-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCHv2 net] usbnet: fix cyclical race on disconnect with work
- queue
-To: Oliver Neukum <oneukum@suse.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org
-References: <20240905134811.35963-1-oneukum@suse.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240905134811.35963-1-oneukum@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Make rpl_input() free the skb before returning when skb_cow_head()
+fails. Use a "drop" label and goto instructions.
 
+Note: if you think it should be a fix and target "net" instead, let me
+know.
 
-On 9/5/24 15:46, Oliver Neukum wrote:
-> The work can submit URBs and the URBs can schedule the work.
-> This cycle needs to be broken, when a device is to be stopped.
-> Use a flag to do so.
-> This is a design issue as old as the driver.
-> 
-> Signed-off-by: Oliver Neukum <oneukum@suse.com>
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> CC: stable@vger.kernel.org
-> ---
-> 
-> v2: fix PM reference issue
-> 
->   drivers/net/usb/usbnet.c   | 37 ++++++++++++++++++++++++++++---------
->   include/linux/usb/usbnet.h | 17 +++++++++++++++++
->   2 files changed, 45 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-> index 18eb5ba436df..2506aa8c603e 100644
-> --- a/drivers/net/usb/usbnet.c
-> +++ b/drivers/net/usb/usbnet.c
-> @@ -464,10 +464,15 @@ static enum skb_state defer_bh(struct usbnet *dev, struct sk_buff *skb,
->   void usbnet_defer_kevent (struct usbnet *dev, int work)
->   {
->   	set_bit (work, &dev->flags);
-> -	if (!schedule_work (&dev->kevent))
-> -		netdev_dbg(dev->net, "kevent %s may have been dropped\n", usbnet_event_names[work]);
-> -	else
-> -		netdev_dbg(dev->net, "kevent %s scheduled\n", usbnet_event_names[work]);
-> +	if (!usbnet_going_away(dev)) {
-> +		if (!schedule_work(&dev->kevent))
-> +			netdev_dbg(dev->net,
-> +				   "kevent %s may have been dropped\n",
-> +				   usbnet_event_names[work]);
-> +		else
-> +			netdev_dbg(dev->net,
-> +				   "kevent %s scheduled\n", usbnet_event_names[work]);
-> +	}
->   }
->   EXPORT_SYMBOL_GPL(usbnet_defer_kevent);
->   
-> @@ -535,7 +540,8 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
->   			tasklet_schedule (&dev->bh);
->   			break;
->   		case 0:
-> -			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
-> +			if (!usbnet_going_away(dev))
-> +				__usbnet_queue_skb(&dev->rxq, skb, rx_start);
->   		}
->   	} else {
->   		netif_dbg(dev, ifdown, dev->net, "rx: stopped\n");
-> @@ -843,9 +849,18 @@ int usbnet_stop (struct net_device *net)
->   
->   	/* deferred work (timer, softirq, task) must also stop */
->   	dev->flags = 0;
-> -	del_timer_sync (&dev->delay);
-> -	tasklet_kill (&dev->bh);
-> +	del_timer_sync(&dev->delay);
-> +	tasklet_kill(&dev->bh);
->   	cancel_work_sync(&dev->kevent);
-> +
-> +	/* We have cyclic dependencies. Those calls are needed
-> +	 * to break a cycle. We cannot fall into the gaps because
-> +	 * we have a flag
-> +	 */
-> +	tasklet_kill(&dev->bh);
-> +	del_timer_sync(&dev->delay);
-> +	cancel_work_sync(&dev->kevent);
+Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+---
+ net/ipv6/rpl_iptunnel.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-I guess you do the shutdown twice because a running tasklet or timer 
-could re-schedule the others? If so, what prevent the rescheduling to 
-happen in the 2nd iteration? why can't you add usbnet_going_away() 
-checks on tasklet and timer reschedule point?
-
-Thanks,
-
-Paolo
+diff --git a/net/ipv6/rpl_iptunnel.c b/net/ipv6/rpl_iptunnel.c
+index 2c83b7586422..db3c19a42e1c 100644
+--- a/net/ipv6/rpl_iptunnel.c
++++ b/net/ipv6/rpl_iptunnel.c
+@@ -263,10 +263,8 @@ static int rpl_input(struct sk_buff *skb)
+ 	rlwt = rpl_lwt_lwtunnel(orig_dst->lwtstate);
+ 
+ 	err = rpl_do_srh(skb, rlwt);
+-	if (unlikely(err)) {
+-		kfree_skb(skb);
+-		return err;
+-	}
++	if (unlikely(err))
++		goto drop;
+ 
+ 	local_bh_disable();
+ 	dst = dst_cache_get(&rlwt->cache);
+@@ -286,9 +284,13 @@ static int rpl_input(struct sk_buff *skb)
+ 
+ 	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+ 	if (unlikely(err))
+-		return err;
++		goto drop;
+ 
+ 	return dst_input(skb);
++
++drop:
++	kfree_skb(skb);
++	return err;
+ }
+ 
+ static int nla_put_rpl_srh(struct sk_buff *skb, int attrtype,
+-- 
+2.34.1
 
 
