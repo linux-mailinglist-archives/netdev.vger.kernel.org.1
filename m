@@ -1,182 +1,155 @@
-Return-Path: <netdev+bounces-126899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 533B6972D69
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:23:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74926972D6F
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D75C51F26250
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:23:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D59002864F6
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:24:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C6B18859A;
-	Tue, 10 Sep 2024 09:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1122818893C;
+	Tue, 10 Sep 2024 09:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ipZhbniI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpITt1oN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A07A46444
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 09:23:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C461862B8;
+	Tue, 10 Sep 2024 09:24:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725960183; cv=none; b=Cg29D6BRqKxqK5qz7ISW+DvBMczQRu2CLdkWpDPGfcuz9vFFUiij54gk4Gs9f6T+C9BwrB6uhA5bCiZ/luSP2p8Qvhxci53oJERpdpJ8dX1qsEgTk7md21F2VYBMo3XUGdj9yXF/qXw9+g0zgwQ1IulOH65vjtxtOcch72nqSb4=
+	t=1725960251; cv=none; b=m3hQSLLid++3aIAAv3qLseKFpxfBIPZ0OjjQTvo/av+/fEktJMKt6ZFOd1gOpR8sh9Kb811P7zPNbD2XlDjB5xrfZFXg3BEWTfqaRdw9vQQ2BN8N2tahI6LMOLuFWkrUnnZ53J5Hq13jhN7uNihAU+IE6VXf7ScN2uVsTYLTwTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725960183; c=relaxed/simple;
-	bh=2U5eh/pdV5Pfu36l56Wzjk+bxN/WpkzMkIXcUAy/CgY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pU5/+OfKM9/wVzP7h9uYrmiGXS1ADbnIbzdWsr9dK3Fgvii54gSC5D5FZwsDQG3fWpcJ9LKOvJwZOhvCtHjYRjwCezoCdUhWpmw19abeBROB12ORBlsZI9fFL12hmXs05tffPBqw+9QvwwVeoXMNDvoqMa4BlGVrEauDUKJr6i8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ipZhbniI; arc=none smtp.client-ip=209.85.208.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-5c251a09953so4165335a12.3
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 02:23:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725960180; x=1726564980; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hMJMyFgsL0Y0uwFcwxe8Dl2qODyk+WDjNJcqT9QUeCc=;
-        b=ipZhbniIAETU/NNXrNaJwPRk/TxSOFwA6MqCZgLd2bgNa3B5x+QvhWUpGn1rla7wFa
-         bVihiPZUSZJofauiiBDVsURSC2tlPAZ2aDGAJYbxLJtV+3dR8U5yMMge56UKTsQ4DUSS
-         KonGf7caqGYy7VEKtMtKwuwEtjRkalhKLsFBmxQTmCjV3nJMJJfZ3lJxaReZN3RgoS2x
-         PX+JnCnyKbFh34sI3woVpkzIhbrmveOuZsiJ+4iHinCpMSMmA1FQFyClRPTdUIWUh/OY
-         ydWnQNoNf3tD+Kf5Dr8ip98fSsxoAuhqlWNX5Iz/lK/KQkDLQm3AnUObG8gz+IlIrQcs
-         mjqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725960180; x=1726564980;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hMJMyFgsL0Y0uwFcwxe8Dl2qODyk+WDjNJcqT9QUeCc=;
-        b=ZTswUK+nPDqI0xjf38PqsvcalDomAqieJJkhxgkeetbe+kfuhGhxOhmhklrD9J7vFa
-         TziyAg2pF00Rm93p7jviDqHvrN4bOveXXXTUMWoeMDlOQ6YpiwqVHgGn8m02HrsUnTxL
-         4k+7jTDa274E/KqgjD3pqvVPp7DipZDhtvqEBaGqHMQPGMGgsRZKRjSpHa6fEdP7xx7U
-         5Hp16/ZmQKViMWkSDKod76WXC9AJPYUad9rM17Cz8+4gGA/y77pW+U28liQxXkbqza/L
-         mIVcjaC/E3z/1D4x09ey2KDpIMlATYFN1ostjl2XnEIWXF512fhGKdsw8exV7yk/PT77
-         bFzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWt6NrwapWNvceTI2pomqa6jHd1xK5Mb+IzKUJb1wo3ztYbTcFCVv2g3/rAy7DwQOlHyH5PQPg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwfWYC3II78ndc6EGnW0tpIR0rtbsxrUpfu5GagIjU4wyKBz2Fw
-	IJ/IQQ/kAf6mRT807d97MudSV+oyAARaGf2+xPqNwkPP4mEAaOe7ajp8idE0OVDhusOt2Joe/SZ
-	Cqg==
-X-Google-Smtp-Source: AGHT+IEvLoIBQkVz2O3lTxQ+HO2S2UyQYSwe1/czliyr/A8tQLQoSeVybxzWfsDusd+EzFbXtdkyA2ny9Yw=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a05:6402:358a:b0:5c2:631b:c5bb with SMTP id
- 4fb4d7f45d1cf-5c3dc7c9e87mr9281a12.7.1725960180431; Tue, 10 Sep 2024 02:23:00
- -0700 (PDT)
-Date: Tue, 10 Sep 2024 11:22:58 +0200
-In-Reply-To: <20240904104824.1844082-7-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1725960251; c=relaxed/simple;
+	bh=q7XPAagp/JPud80GLii65MDVEGWN1lLrpC+Q7P3qjVs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=OV5bF8foLy6hk6zI61MbZ/qiAF+OGUwAE7u1A4teIcQwrpIG4fAXXVMB9NrvO1nmhQR29TTTKvtsqwQ/hDqbJLgkd4KVmOTBkbIKU4q1zrSUfoBm1OWDbt6LxLBqcWlqgHuHJX7SUpUoH175MlYY9XAiQSqv0ontxfFbr1Z10lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpITt1oN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB274C4CEC3;
+	Tue, 10 Sep 2024 09:24:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725960250;
+	bh=q7XPAagp/JPud80GLii65MDVEGWN1lLrpC+Q7P3qjVs=;
+	h=From:Subject:Date:To:Cc:From;
+	b=QpITt1oNHtiXMDeSbQRnCYfoQqmfuRJtkF33sF7v7DOkgFMq+w1iP2RPuvuGUOGJQ
+	 8kAGNqdsY7kN25ZVWKngBbNYe/4UxRxXY+iYgPkmJamb9gY6T0jwTydxQBm4JZntIK
+	 HSRcQXDuMAx6lhrGFOfI97LE3FTiG3ntORa2sHTgjY0HIWNC5eLTaX0FAZ8Qpb0RhZ
+	 GtnvePk+eeWvheF+tOjCJMz5Uyi56inxzOEvAdCbJQIfGxXlZ7cHwmqG+YunzrdOAP
+	 W83dGoSFTOWSDXsHcN5eAVFe2QnyXJ77CvometssMm5jSsIjil1jkRVGw61BohZkvW
+	 utLm1MolMkKfw==
+From: Roger Quadros <rogerq@kernel.org>
+Subject: [PATCH net-next v4 0/6] net: ethernet: ti: am65-cpsw: Add multi
+ queue RX support
+Date: Tue, 10 Sep 2024 12:23:57 +0300
+Message-Id: <20240910-am65-cpsw-multi-rx-v4-0-077fa6403043@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com> <20240904104824.1844082-7-ivanov.mikhail1@huawei-partners.com>
-Message-ID: <ZuAP8iSv_sjmlYIp@google.com>
-Subject: Re: [RFC PATCH v3 06/19] selftests/landlock: Test adding a rule for
- unhandled access
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAC0Q4GYC/33NQQ6CMBQE0KuYrv3mU6BFV97DuKDtrzZqIS0ih
+ nB3GzZqJC4nk3kzskjBUWS71cgC9S66xqdQrFdMn2t/InAmZcaRFyhQQH0TJeg2PuB2v3YOwgB
+ WCW0rQ3VJiqVhG8i6YUYPzFMHnoaOHVNzdrFrwnN+67O5/wf3GSCgxEKhVsIavb9Q8HTdNOE0e
+ z3/MHi1aPBk6Hy71UpKo0rxY+RvQ2K+aOTJsFmmTSXQGsm/jGmaXuRyA21HAQAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+ Julien Panis <jpanis@baylibre.com>, Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>
+Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+ Joe Damato <jdamato@fastly.com>, srk@ti.com, vigneshr@ti.com, 
+ danishanwar@ti.com, pekka Varis <p-varis@ti.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, 
+ bpf@vger.kernel.org, Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2670; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=q7XPAagp/JPud80GLii65MDVEGWN1lLrpC+Q7P3qjVs=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBm4BA0Za3QLGXOejHQi/umCfw73L4Wynx2DjZ6G
+ y/Na0KTS5WJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZuAQNAAKCRDSWmvTvnYw
+ k6cmEACuwPO5dORXhbjaS68uUP5gAOB+Gt2TVWd2b2cOxRdGjY205hKsYyjHFWsjjUeiF0CJOCo
+ SpLOv6W0r+P6U8vJKc5YQUxjKE6l0niqm+UWbRwFE4XxgIPY4nmXSRaL/Lqq/7/SIzCteQjtjXu
+ bv6lwNHdDH6yEf/nKSci5i0gxqJgD1imD0oX2Au2Lbpv+ngoNg3JnoYS6TszSIg4+JZFLys0S58
+ +/Qw1gOjPAPbhrazj+Goh0WGSRZYp5QCrFT0wM7j4J03Kp4+ERLsgKcRcKruf0tYJhw6zX8p/mO
+ Mseb/JDopoXPpPmtlwk9X1m92YFjOgZ0kQuKzJPor2wNIJ9pzoXoEY2mJtHNLWiZWRwodgP1be5
+ NFnkkrVRo2Nz2u2bHRrO+qsRU3Q3xqGasK5gR9r7AjqI0V28wd0rZCg3cytcJRjXuW6EkuTtkUX
+ CsS9dMFUx8oRIMWIUqxwOKNOqxLg2X51fY+cOHmdnxzWp1fQ3E2ZepplH2JHJTdHBtxN3ToVv4x
+ oKZ0IgDLOI8nzt5FvDi6hx0zNWs43WpoTN1ehVo6BqGeUdvaxfuTyVn/56Qifus0HX7U09JK6jw
+ YJqxi6hLubKEqt9cxCXRsMFMrbcFxdheNK06sr5F5Tj6DLNTmB5mDdIkQORqet/mP06vFmlXs0m
+ szC98p1a50y9AyA==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-Hi!
+Hi,
 
-On Wed, Sep 04, 2024 at 06:48:11PM +0800, Mikhail Ivanov wrote:
-> Add test that validates behaviour of Landlock after rule with
-> unhandled access is added.
->=20
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> ---
-> Changes since v2:
-> * Replaces EXPECT_EQ with ASSERT_EQ for close().
-> * Refactors commit title and message.
->=20
-> Changes since v1:
-> * Refactors commit message.
-> ---
->  .../testing/selftests/landlock/socket_test.c  | 33 +++++++++++++++++++
->  1 file changed, 33 insertions(+)
->=20
-> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testi=
-ng/selftests/landlock/socket_test.c
-> index 811bdaa95a7a..d2fedfca7193 100644
-> --- a/tools/testing/selftests/landlock/socket_test.c
-> +++ b/tools/testing/selftests/landlock/socket_test.c
-> @@ -351,4 +351,37 @@ TEST_F(protocol, rule_with_unknown_access)
->  	ASSERT_EQ(0, close(ruleset_fd));
->  }
-> =20
-> +TEST_F(protocol, rule_with_unhandled_access)
-> +{
-> +	struct landlock_ruleset_attr ruleset_attr =3D {
-> +		.handled_access_socket =3D LANDLOCK_ACCESS_SOCKET_CREATE,
-> +	};
-> +	struct landlock_socket_attr protocol =3D {
-> +		.family =3D self->prot.family,
-> +		.type =3D self->prot.type,
-> +	};
-> +	int ruleset_fd;
-> +	__u64 access;
-> +
-> +	ruleset_fd =3D
-> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
-> +	ASSERT_LE(0, ruleset_fd);
-> +
-> +	for (access =3D 1; access > 0; access <<=3D 1) {
-> +		int err;
-> +
-> +		protocol.allowed_access =3D access;
-> +		err =3D landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
-> +					&protocol, 0);
-> +		if (access =3D=3D ruleset_attr.handled_access_socket) {
-> +			EXPECT_EQ(0, err);
-> +		} else {
-> +			EXPECT_EQ(-1, err);
-> +			EXPECT_EQ(EINVAL, errno);
-> +		}
-> +	}
-> +
-> +	ASSERT_EQ(0, close(ruleset_fd));
-> +}
-> +
+am65-cpsw can support up to 8 queues at Rx. So far we have
+been using only one queue (i.e. default flow) for all RX traffic.
 
-I should probably have noticed this on the first review round; you are not
-actually exercising any scenario here where a rule with unhandled access is
-added.
+This series adds multi-queue support. The driver starts with
+1 RX queue by default. User can increase the RX queues via ethtool,
+e.g. 'ethtool -L ethx rx <N>'
 
-To clarify, the notion of an access right being "unhandled" means that the
-access right was not listed at ruleset creation time in the ruleset_attr's
-.handled_access_* field where it would have belonged.  If that is the case,
-adding a ruleset with that access right is going to be denied.
+The series also adds regmap and regfield support to some of the
+ALE registers. It adds Policer/Classifier registers and fields.
 
-As an example:
-If the ruleset only handles LANDLOCK_ACCESS_FS_WRITE_FILE and nothing else,
-then, if the test tries to insert a rule for LANDLOCK_ACCESS_SOCKET_CREATE,
-that call is supposed to fail -- because the "socket creation" access right=
- is
-not handled.
+Converting the existing ALE control APIs to regfields can be a separate
+exercise.
 
-IMHO the test would become more reasonable if it was more clearly "handling=
-"
-something entirely unrelated at ruleset creation time, e.g. one of the file
-system access rights.  (And we could do the same for the "net" and "fs" tes=
-ts as
-well.)
+Some helper functions are added to read/write to the Policer/Classifier
+registers and a default Classifier setup function is added that
+routes packets based on their PCP/DSCP priority to different RX queues.
 
-Your test is a copy of the same test for the "net" rights, which in turn is=
- a
-copy of teh same test for the "fs" rights.  When the "fs" test was written,=
- the
-"fs" access rights were the only ones that could be used at all to create a
-ruleset, but this is not true any more.
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
+---
+Changes in v4:
+- Use single macro AM65_CPSW_MAX_QUEUES for both TX and RX queues
+  to simplify code
+- reuse am65_cpsw_get/set_per_queue_coalesce for am65_cpsw_get/set_coalesce.
+- return -EINVAL if unsupported tx/rx_coalesce_usecs in
+  am65_cpsw_set_coalesce.
+- reverse Xmas tree declaration order fixes in cpsw_ale
+- Link to v3: https://lore.kernel.org/r/20240703-am65-cpsw-multi-rx-v3-0-f11cd860fd72@kernel.org
 
-=E2=80=94G=C3=BCnther
+Changes in v3:
+- code style fixes
+- squashed patches 5 and 6
+- added comment about priority to thread mapping table.
+- Added Reviewed-by Simon Horman.
+- Link to v2: https://lore.kernel.org/r/20240628-am65-cpsw-multi-rx-v2-0-c399cb77db56@kernel.org
+
+Changes in v2:
+- rebase to net/next
+- fixed RX stall issue during iperf
+- Link to v1: https://lore.kernel.org/r/20240606-am65-cpsw-multi-rx-v1-0-0704b0cb6fdc@kernel.org
+
+---
+Roger Quadros (6):
+      net: ethernet: ti: am65-cpsw: Introduce multi queue Rx
+      net: ethernet: ti: cpsw_ale: use regfields for ALE registers
+      net: ethernet: ti: cpsw_ale: use regfields for number of Entries and Policers
+      net: ethernet: ti: cpsw_ale: add Policer and Thread control register fields
+      net: ethernet: ti: cpsw_ale: add policer/classifier helpers and setup defaults
+      net: ethernet: ti: am65-cpsw: setup priority to flow mapping
+
+ drivers/net/ethernet/ti/am65-cpsw-ethtool.c |  75 +++---
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 388 ++++++++++++++++------------
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  39 +--
+ drivers/net/ethernet/ti/cpsw_ale.c          | 287 ++++++++++++++++++--
+ drivers/net/ethernet/ti/cpsw_ale.h          |  62 ++++-
+ 5 files changed, 594 insertions(+), 257 deletions(-)
+---
+base-commit: bfba7bc8b7c2c100b76edb3a646fdce256392129
+change-id: 20240606-am65-cpsw-multi-rx-fb6cf8dea5eb
+
+Best regards,
+-- 
+Roger Quadros <rogerq@kernel.org>
+
 
