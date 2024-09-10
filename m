@@ -1,106 +1,155 @@
-Return-Path: <netdev+bounces-127015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46847973A76
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:48:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BACE9973A79
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:48:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFEF81F2674B
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:48:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65BA51F26926
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E115193085;
-	Tue, 10 Sep 2024 14:45:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E591197A99;
+	Tue, 10 Sep 2024 14:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uyImq1Pg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iUMcKLAc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90BD6142E70;
-	Tue, 10 Sep 2024 14:45:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28AB6194C8B
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 14:46:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725979522; cv=none; b=ByVCFyfME0ExQdTgwhWs8YIVM97VcHEy++4ECX1ctla2y6/YvHwMer9FqaqQRgKWpHhhyXojjO4ftBG9yLoHKKYe+WPdD8xYwO7yHZ/QeoWV5woGDL0ajFbNUQ8czBnBCaqKCf/etKKHBpuFW/PH2usmaUdSaQx5npjKs0tBToQ=
+	t=1725979577; cv=none; b=cXO/hcGvmhigq+rNc675DUyCP1M3+EN+ro0qNwVCVLkHAR3kgU0Vo2IS/wwYx4dTkaHPBUE6c6K/cTXbRDsNyZeaE0TnKC1n31myfSfZNoXIHdcDtV570/1OerXb1atGQJaECv8X8qTZhniKEqQ0DVhm0osbGgG4DH7bxd2qhPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725979522; c=relaxed/simple;
-	bh=SoHs5W4jG0QBsJpEf2UuyNkEsNYUVtdflTM9GeeY0No=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Or0AuXG+MVpBPEYjvPPeHmYLBrxNnaHnPCtinXH8PQjzFPZxYEJJhgQLuXdPaZNdVu7NXDVSAV9TP9oEjKpKZ5eOybnXyslVYRV9r9Di5b5W2C9X88mMsdxRevj5aVgveGtvScw+3KYiagP4t2LGnda34GBJnqlCcBE//gTr9IQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uyImq1Pg; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0+0XKm74x/FnmbMOW0GDYbTw+dPuzExiHBKxi0oQE+o=; b=uyImq1PgKS+XW6+G1OFdZIUSaT
-	b1htsbU4p/gljy5HGIs03JfccItGL8frXjjdlFtNUPvSKZRvB4Blwc3J9TNHTtMd21VqQ/lVbYr6H
-	tpLnl1x/TR+ezICSe5nMgXnuRoILme9XnlG7xJaNgPVQwQ0uzu2t7fLZjuoU+Hm0khGw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1so26y-0077Gq-Ah; Tue, 10 Sep 2024 16:44:56 +0200
-Date: Tue, 10 Sep 2024 16:44:56 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: yoshihiro.shimoda.uh@renesas.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, wojciech.drewek@intel.com,
-	niklas.soderlund+renesas@ragnatech.se, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: rswitch: Fix a possible memory leak in
- rswitch_phy_device_init()
-Message-ID: <b1f33b6e-1054-476d-8cd4-6a0d1e02d31b@lunn.ch>
-References: <20240909092825.1117058-1-ruanjinjie@huawei.com>
+	s=arc-20240116; t=1725979577; c=relaxed/simple;
+	bh=QBQk8iEl6dze3RqfOohVjGnZZGYiaro2GBcvmc5s/gY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Yeus+DJa/o9fDyc/LlcL5EPT4vFXbOEJqr765WVR5P8ErTzKEPpfWByN1846t2NqCp0ttDJrlzLeGmNqwuhpzlf0+yiMO6NmFWUnTapiDNjeZ+mcXKk/x2fkjTOB18ju2WpTU4U42TFKBLKy239qlVP5Tb7Qrv/Gl9nt1sdbwBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iUMcKLAc; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1725979573;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=91pcgJ708frT9old80OB7Wl+qRXeJwKQ6vzaIr7kfRI=;
+	b=iUMcKLAcclvFKINvIEn1pRZj6T8D2erJuxaJyhAa98KvcntNO1uhFgFKr8vlNDnFzLRvwA
+	uPmQKhUvUxySpeTByVTMsGJ61Tb0Fpzl/eRtAdcq4uaAplBVfXp3BhevPmMcuV2e171n4c
+	Tb0Vm0XYKANLZktjnHPgthRO0nsTgG8=
+From: Sean Anderson <sean.anderson@linux.dev>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	stable@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Sean Anderson <sean.anderson@linux.dev>
+Subject: [PATCH] net: xilinx: axienet: Fix race in axienet_stop
+Date: Tue, 10 Sep 2024 10:46:07 -0400
+Message-Id: <20240910144607.1441863-1-sean.anderson@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240909092825.1117058-1-ruanjinjie@huawei.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Sep 09, 2024 at 05:28:25PM +0800, Jinjie Ruan wrote:
-> of_phy_find_device() calls bus_find_device(), which calls get_device()
-> on the returned struct device * to increment the refcount. The current
-> implementation does not decrement the refcount, which causes memory leak.
-> 
-> So add the missing phy_device_free() call to decrement the
-> refcount via put_device() to balance the refcount.
-> 
-> Fixes: 0df024d0f1d3 ("net: renesas: rswitch: Add host_interfaces setting")
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-> ---
->  drivers/net/ethernet/renesas/rswitch.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/renesas/rswitch.c b/drivers/net/ethernet/renesas/rswitch.c
-> index ff50e20856ec..69a67bd75f33 100644
-> --- a/drivers/net/ethernet/renesas/rswitch.c
-> +++ b/drivers/net/ethernet/renesas/rswitch.c
-> @@ -1404,6 +1404,7 @@ static int rswitch_phy_device_init(struct rswitch_device *rdev)
->  		goto out;
->  	__set_bit(rdev->etha->phy_interface, phydev->host_interfaces);
->  	phydev->mac_managed_pm = true;
-> +	phy_device_free(phydev);
->  
->  	phydev = of_phy_connect(rdev->ndev, phy, rswitch_adjust_link, 0,
->  				rdev->etha->phy_interface);
+[ Upstream commit 858430db28a5f5a11f8faa3a6fa805438e6f0851 ]
 
-This has the same problem as discussed in
+axienet_dma_err_handler can race with axienet_stop in the following
+manner:
 
-net: ethernet: nxp: Fix a possible memory leak in lpc_mii_probe()
+CPU 1                       CPU 2
+======================      ==================
+axienet_stop()
+    napi_disable()
+    axienet_dma_stop()
+                            axienet_dma_err_handler()
+                                napi_disable()
+                                axienet_dma_stop()
+                                axienet_dma_start()
+                                napi_enable()
+    cancel_work_sync()
+    free_irq()
 
-I've not looked to see if there are more of these 'fixes'. If there
-are, it would be good to self NACK them so they don't get accidentally
-merged.
+Fix this by setting a flag in axienet_stop telling
+axienet_dma_err_handler not to bother doing anything. I chose not to use
+disable_work_sync to allow for easier backporting.
 
-    Andrew
-
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
+Link: https://patch.msgid.link/20240903175141.4132898-1-sean.anderson@linux.dev
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[ Adjusted to apply before dmaengine support ]
+Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 ---
-pw-bot: cr
+This patch is adjusted to apply to v6.6 kernels and earlier, which do
+not contain commit 6a91b846af85 ("net: axienet: Introduce dmaengine
+support").
+
+ drivers/net/ethernet/xilinx/xilinx_axienet.h      | 3 +++
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 8 ++++++++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+index f09f10f17d7e..2facbdfbb319 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+@@ -419,6 +419,8 @@ struct axidma_bd {
+  * @tx_bytes:	TX byte count for statistics
+  * @tx_stat_sync: Synchronization object for TX stats
+  * @dma_err_task: Work structure to process Axi DMA errors
++ * @stopping:   Set when @dma_err_task shouldn't do anything because we are
++ *              about to stop the device.
+  * @tx_irq:	Axidma TX IRQ number
+  * @rx_irq:	Axidma RX IRQ number
+  * @eth_irq:	Ethernet core IRQ number
+@@ -481,6 +483,7 @@ struct axienet_local {
+ 	struct u64_stats_sync tx_stat_sync;
+ 
+ 	struct work_struct dma_err_task;
++	bool stopping;
+ 
+ 	int tx_irq;
+ 	int rx_irq;
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 144feb7a2fda..65d7aaad43fe 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -1162,6 +1162,7 @@ static int axienet_open(struct net_device *ndev)
+ 	phylink_start(lp->phylink);
+ 
+ 	/* Enable worker thread for Axi DMA error handling */
++	lp->stopping = false;
+ 	INIT_WORK(&lp->dma_err_task, axienet_dma_err_handler);
+ 
+ 	napi_enable(&lp->napi_rx);
+@@ -1217,6 +1218,9 @@ static int axienet_stop(struct net_device *ndev)
+ 
+ 	dev_dbg(&ndev->dev, "axienet_close()\n");
+ 
++	WRITE_ONCE(lp->stopping, true);
++	flush_work(&lp->dma_err_task);
++
+ 	napi_disable(&lp->napi_tx);
+ 	napi_disable(&lp->napi_rx);
+ 
+@@ -1761,6 +1765,10 @@ static void axienet_dma_err_handler(struct work_struct *work)
+ 						dma_err_task);
+ 	struct net_device *ndev = lp->ndev;
+ 
++	/* Don't bother if we are going to stop anyway */
++	if (READ_ONCE(lp->stopping))
++		return;
++
+ 	napi_disable(&lp->napi_tx);
+ 	napi_disable(&lp->napi_rx);
+ 
+-- 
+2.35.1.1320.gc452695387.dirty
+
 
