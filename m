@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-126913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C022A972EB9
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:46:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 54381972ED5
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:47:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D0D1286868
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:46:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12E1C2882EE
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC0B18EFD8;
-	Tue, 10 Sep 2024 09:44:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85ABB192D82;
+	Tue, 10 Sep 2024 09:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahSwlzOO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F6F18EFCB;
-	Tue, 10 Sep 2024 09:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F791922DC;
+	Tue, 10 Sep 2024 09:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725961488; cv=none; b=bzKumNJI1N421vAu9bupX24R/4pe9FX/d9LN+evPgzHoGNHD66yw8s9R1hM/jdMMKFZfOjQxReu8F+S6kIse/h1YIjnVFMImykPZthcwn7gy/RlMmkZTgWkjFrSvvcO8Kun1Zx7QXuJISShnPL910umeDfQKBZqMXstVeWyKZ74=
+	t=1725961528; cv=none; b=ToStFUZpGgmErQKN2Xz2NYx8xnWeILqN76w7T+Rfq2a69AU+ws5zJ3zEOYxif6EVVEeSj7E1jBTlwaqA7QI9stH+7B5djz4XNM6aT+rNq0UjIjFf3/YUmnB6IdWLdHcqnO6jmKKSZI/miD11AqLue2SjmA2tKsROd9/pX94JGjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725961488; c=relaxed/simple;
-	bh=B/Hnf7fYM7HOeWShPDrC5NP0EgrLS05vitkWoMbwaiQ=;
+	s=arc-20240116; t=1725961528; c=relaxed/simple;
+	bh=mUwcbGf/PrVLiBb/CZMhJO26havoL/aQzBE+UZNQRSo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HFBWqrX5EG5PR0D9wqFZLqic1cBygqBQaZTalo6HkUGsxMCVlPWw5cC1vaXbXpITUbCRzqVeXA3T9pT8OtCBmP8KBFsKWR4tDBcF6K3HMmQozKOqaY4Yg5YPpFUADp7hChSnbPWyzF/x//gWS2aH8Cc86Lz4CV+BjkzfeLyvrHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a8d43657255so320229066b.0;
-        Tue, 10 Sep 2024 02:44:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725961485; x=1726566285;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZEiLqRfxf7lBPb/a2NUaZRXiI2UrOttr4l6z8YhNi4Q=;
-        b=XxTxUrSjZ+x6DjEsFPtt+FDbh++QVilUXoX2hXpDo0B2RDJI7NLr5Al8JmCXxvnOum
-         LD0viONA0LuosXfLYWKudED5PukvQhQLJnqK0u4ljg/GYyFFfHQFEydEq6fPlLUcbuxa
-         gidwz5wSz4kr4pOTuazDXBHJMMnltGmepkogZmL886d073OOfYps289yAXQ2hUlN81Fu
-         Jgbe0vrE4X/OOFvZRELq1ZSi86RzONPSTJ5EPQWt/O4Ooi7txoegSa/xmiZW/IISjnr4
-         cTgZGwUDt6SzMb9PAJe29pOJj1ih/BI9clYiB32KMCpojM3q6nG4D1kJiXn4xT7Brg+8
-         MZ5w==
-X-Forwarded-Encrypted: i=1; AJvYcCVMf53QenMFbK6HHsVb/1/5CYl5ZiNA4sRLQMRNIrngpcbHbcrCjuS6EdbDgwcXHzRgUfAwgZc9BMKUawI=@vger.kernel.org, AJvYcCVZIb/5obvRddZD4hqeApuXXIQJ9CZ4RBQKEJaj2L/k0PvCBrEWqGbbmsLboC1PM3v6NAJJtJr5@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzc3rM4U5sS7eHhZ5l70DAKItHgedLaSmyezkdKGiqPuMlzhCk1
-	YV8ilfnXCu1RzrkndeyumYnzApFTVRA/mlrjGr3ZyuBfJn7ArXxv
-X-Google-Smtp-Source: AGHT+IFj3shL6QuYetQtig1F0qQ+MlhLBZvhKZZ4LCvSersDof8GynDsZxIfAXp8ReLBROX8xYBaPw==
-X-Received: by 2002:a17:906:f5a9:b0:a7d:a00a:a9fe with SMTP id a640c23a62f3a-a8ffaac09dfmr15128966b.17.1725961484500;
-        Tue, 10 Sep 2024 02:44:44 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d2583fc73sm455114466b.34.2024.09.10.02.44.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 02:44:44 -0700 (PDT)
-Date: Tue, 10 Sep 2024 02:44:41 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Simon Horman <horms@kernel.org>
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, davej@codemonkey.org.uk,
-	vlad.wing@gmail.com, max@kutsevol.com
-Subject: Re: [PATCH net-next v2 08/10] net: netconsole: do not pass userdata
- up to the tail
-Message-ID: <20240910-certain-weasel-of-bliss-1cf769@devvm32600>
-References: <20240909130756.2722126-1-leitao@debian.org>
- <20240909130756.2722126-9-leitao@debian.org>
- <20240909160528.GD2097826@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=l9okCNXzvbqysrPzmAYqJjdaRD2p1eDsdCqRTBK7NOfNatFOwIJcNWGNrGDYZtzY1xoFd92ntS3VUPgfZFfpYlJ01XCk3awHfZGzx4JNvRL7zRTAM5VRbPdKKr4PB76NffXuJMuBnOvgCF9rSa/IgqPcoTaSEvRTvA4vFZK0m6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahSwlzOO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4EBFC4CEC3;
+	Tue, 10 Sep 2024 09:45:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725961527;
+	bh=mUwcbGf/PrVLiBb/CZMhJO26havoL/aQzBE+UZNQRSo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ahSwlzOOWVOaP5Aoy0ZJcmx9+6f4az5fmllN7YayFCAU32zZllqfMTyYu9U3ScDMT
+	 81wsX67+mkAqRMSko5uRChz2/bShvt1mB9P5H15S5eghFp5pNh3RAYz+D4i1jTZVw/
+	 dSdXpbKD96f378NlRFm3EQjpJMAjTSGGMOhjamI7MJ8p6ut/1zlJ2zJJzqpS8HLeKz
+	 /dUvLQBG4ln17ZEbtG++d/R1iIpwNOhjKhEbLH8rQqC5QburdbYSaP5F6sCidGa3e9
+	 iaH6gzE9CX8VWShZT9nKl5EW4v2zEszrX8j41NHvgC7bPzX2f9679fg9l9AVvm1v4F
+	 eOetchbKBdKQg==
+Date: Tue, 10 Sep 2024 10:45:20 +0100
+From: Simon Horman <horms@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Felix Huettner <felix.huettner@mail.schwarz>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH net v1 1/1] netfilter: conntrack: Guard possoble unused
+ functions
+Message-ID: <20240910094520.GB572255@kernel.org>
+References: <20240905203612.333421-1-andriy.shevchenko@linux.intel.com>
+ <20240906162938.GH2097826@kernel.org>
+ <Zt7B79Q3O7mNqrOl@smile.fi.intel.com>
+ <20240909151712.GZ2097826@kernel.org>
+ <Zt8V5xjrZaEvR8K5@smile.fi.intel.com>
+ <20240909183043.GE2097826@kernel.org>
+ <Zt__ZT-P0kUY909z@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,49 +74,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240909160528.GD2097826@kernel.org>
+In-Reply-To: <Zt__ZT-P0kUY909z@smile.fi.intel.com>
 
-On Mon, Sep 09, 2024 at 05:05:28PM +0100, Simon Horman wrote:
-> On Mon, Sep 09, 2024 at 06:07:49AM -0700, Breno Leitao wrote:
-> > Do not pass userdata to send_msg_fragmented, since we can get it later.
+On Tue, Sep 10, 2024 at 11:12:21AM +0300, Andy Shevchenko wrote:
+> On Mon, Sep 09, 2024 at 07:30:43PM +0100, Simon Horman wrote:
+> > On Mon, Sep 09, 2024 at 06:36:07PM +0300, Andy Shevchenko wrote:
+> > > On Mon, Sep 09, 2024 at 04:17:12PM +0100, Simon Horman wrote:
+> > > > On Mon, Sep 09, 2024 at 12:37:51PM +0300, Andy Shevchenko wrote:
+> > > > > On Fri, Sep 06, 2024 at 05:29:38PM +0100, Simon Horman wrote:
+> > > > > > On Thu, Sep 05, 2024 at 11:36:12PM +0300, Andy Shevchenko wrote:
+> > > > > 
+> > > > > > Local testing seems to show that the warning is still emitted
+> > > > > > for ctnetlink_label_size if CONFIG_NETFILTER_NETLINK_GLUE_CT is enabled
+> > > 
+> > > Hold on, this is not related to the patch.
+> > > It might be another issue.
 > > 
-> > This will be more useful in the next patch, where send_msg_fragmented()
-> > will be split even more, and userdata is only necessary in the last
-> > function.
+> > Yes, sorry, I see that now too.
 > > 
-> > Suggested-by: Simon Horman <horms@kernel.org>
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > Perhaps it can be fixed separately, something like this:
 > 
-> ...
-> 
-> > @@ -1094,7 +1098,6 @@ static void append_release(char *buf)
-> >  
-> >  static void send_msg_fragmented(struct netconsole_target *nt,
-> >  				const char *msg,
-> > -				const char *userdata,
-> >  				int msg_len,
-> >  				int release_len)
-> >  {
-> > @@ -1103,8 +1106,10 @@ static void send_msg_fragmented(struct netconsole_target *nt,
-> >  	int offset = 0, userdata_len = 0;
-> >  	const char *header, *msgbody;
-> >  
-> > -	if (userdata)
-> > -		userdata_len = nt->userdata_length;
-> > +#ifdef CONFIG_NETCONSOLE_DYNAMIC
-> > +	userdata = nt->userdata_complete;
-> > +	userdata_len = nt->userdata_length;
-> > +#endif
-> 
-> userdata does not appear to be declared in this scope :(
-> 
-> .../netconsole.c:1110:9: error: 'userdata' undeclared (first use in this function)
->  1110 |         userdata = nt->userdata_complete;
+> If you make a patch, it will help somebody who has that in their configuration
+> files enabled (with the other one being disabled). Note, I use x86_64_defconfig
+> which doesn't have this specific issue to be occurred.
 
-Oh, during my rebase, I moved the declaration to a patch forward, and I
-didn't catch this because I was just compiling and testing with the
-whole patchset applied.
-
-Thanks for catching it. I will send an updated version.
---breno
+Thanks, I'll plan to submit a patch.
 
