@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-126956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19BB8973630
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 13:27:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A1F8973637
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 13:29:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A13A1F26255
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:27:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44354B2245F
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A63318E776;
-	Tue, 10 Sep 2024 11:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3899B18E76F;
+	Tue, 10 Sep 2024 11:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NSuu6Tpk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ox0QHVSP"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3BA018DF97
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 11:27:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FF9718C324
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 11:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725967638; cv=none; b=kTcLS78v82QELspi7VlLnyICRELNjNpI0m2qSIFEr2wYWm+NeYlgF68J5sqggsyC8qDu5f/swilLkV+iPuPDBPvWyGk72FpvD4+ybZsw+uIB1pG2q4zJ42KpFaQaHJ2yCbHCG3U2TIjAMFy3Y3BmgI9knBND9ktlnzKb+D4xeGM=
+	t=1725967783; cv=none; b=ECw10JJpP8ADmlqQ0HVWGIJ3UVhBaeYXuw2myoaZZbWeNG8sXYeshVjf9OcL2bviz8BhxVMjvg1rae3Vv9h2/A5MzWsVUYE0gB/FEESOsoB2UsuyMSlHN4/3SJWL0hSupQuCpkgVXxqw6J5Nbeojama1BwmBGM3X99BeUDoxXNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725967638; c=relaxed/simple;
-	bh=qctE5YfZSHy94HtnMI7ZJHq/A1Fl5gIdQZv5mKbHhfI=;
+	s=arc-20240116; t=1725967783; c=relaxed/simple;
+	bh=aOymGcjhNQMGO581Xxz6C25Se1K1B5nV9H3tOk55OAQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nKHRtcYHrjxHoj8YmKyPGFAlYerJnDex+EO+tJsIP/hVCuq5OQLcsRcuHzV8OSBE5RQl5MGxCODrYxfRV6Fx9IOpjDCsYivC1F5mZkAYwjq4X3HRXUWjGNZ/bu5AZm2uJly+0zXoyTHRBzVvQ9eAyhuVJgICdWCNAlhrj3JpotA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NSuu6Tpk; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=Epry1tqlVg//d27/S47J7AB3JEvhwBv6rZIK0o44LVp8YbaNbYAb6Oh5pfjdkGRiwtYdfula6F6IwHdjHblbZr0pRsNikAo3OCTJUCAFMdrWm3gkT2yiUJ9+T95uQw8rBL0W0ywl1ZfPPG6cGEjIKmBGnNjN24lShbejG4amp68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ox0QHVSP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725967635;
+	s=mimecast20190719; t=1725967780;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=l5rZhkMkam2M4KyWPSOYt5c6AGQl28M6Q/aZzK4Hqro=;
-	b=NSuu6TpknPA9Bs5il0AujjaxzUu20VkLe06xCTAiiRyNFHUrtOCtfUgLYMRJb2IQkIEZmu
-	Mok7BJxbdgmWG2f7FbHSu/aetHmonhJRijRTqKqdREJ3GE4iVd7TXPSHDLGhqmVrA9AMO6
-	6c6ZezHzpoP4Z9ThlEKr6usnmyWIfeo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3k0Yno5D36yM2/Zcgb354fBW/hkrA2j+HBAI2XgatF0=;
+	b=Ox0QHVSPWhe2FTH9xeUKZPLHLP+nmxZKG52tbVSBBTfP0n8Y5sHbJubD1h3xyCMXF/POPB
+	jWT3ketA6+BdYAr2/jb8mwDmvXKWbykZoJsia1PEyM7I+VyUu1STUQfLJRmux5hxP56nmg
+	DbQrJ+lF0wry1lsDgndf2CvHDQQa86I=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-170-r63VWnc8OqO3NAVDjWP8zQ-1; Tue, 10 Sep 2024 07:27:14 -0400
-X-MC-Unique: r63VWnc8OqO3NAVDjWP8zQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cb0ed9072so25778655e9.1
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 04:27:14 -0700 (PDT)
+ us-mta-348-8aRhlme5MAWNrJTUVIc5Cw-1; Tue, 10 Sep 2024 07:29:39 -0400
+X-MC-Unique: 8aRhlme5MAWNrJTUVIc5Cw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-374bacd5cccso2961778f8f.1
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 04:29:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725967633; x=1726572433;
+        d=1e100.net; s=20230601; t=1725967778; x=1726572578;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=l5rZhkMkam2M4KyWPSOYt5c6AGQl28M6Q/aZzK4Hqro=;
-        b=kqOYO3rCZFZ94gG2hSaFWPcs2Q2j3JsD+FsZ1RDptvc9BDpPC4x8TiFGTMTanbBFGQ
-         maxBp2SuMtVZg629ZDV6eBH9yzXCG9rwArA8QgI08kEB5ZV2pWa/gDadOotQi4ehsMQk
-         654+bCAF5BhKlDUrdGZwvgItWuB5+rNg3zeD8I7VPwL000iyuardSrmsd6KDoULphxmg
-         RjbzTPkUVnxsS86fmiPJ0TzBgHNOqh0Lk0+T7zM+HlXzFjyE7Jekqw+tdlRWMOrEu00V
-         zsjCVfRDKAgMVqtEHY/7fc9KfHB/jkVxdfnKoelfNxTUyY1V0asXZEtZaHaJKSBY5nNr
-         LfxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUxDF/8R84ACFmPFy3N5OYww+46kVmkbilUb947FdK8dUhmrZ0vXNyccTBWJVJxlm8zVNGIRQA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyrX2zJmiVnAZmZqKZQsCiq0kn12mJr/nAM6GHRA1QP0CYHsbZn
-	liZ6yVGHRjZ8fNokLA4q5+1l1AfVvc1ynZfoiip/Wz8fMIEPu8I6ZHOKdtau4L6xq3nAnKOhRDD
-	3SHxNQtgXC6oz0PrxUI2kYFU7QLYQNUThj1V9sYTp1D2lQo4rpTKCYw==
-X-Received: by 2002:a05:600c:1e22:b0:42c:b187:bdd5 with SMTP id 5b1f17b1804b1-42cb187c012mr84563655e9.22.1725967632972;
-        Tue, 10 Sep 2024 04:27:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFytwom/JrfOKRUuR+Dc7w8yMY8uhViCPwr/NKw/WZ2IrNQQpvBuOZXJSnixPmZuE4H3jpHiQ==
-X-Received: by 2002:a05:600c:1e22:b0:42c:b187:bdd5 with SMTP id 5b1f17b1804b1-42cb187c012mr84563325e9.22.1725967632438;
-        Tue, 10 Sep 2024 04:27:12 -0700 (PDT)
+        bh=3k0Yno5D36yM2/Zcgb354fBW/hkrA2j+HBAI2XgatF0=;
+        b=X51Zw+DMUL3QvQKE/OiTt1XqUs+25xHKFRnbwznHPktC3LSs6yFa2iNoAto8PCUsQ3
+         EXIAeqVkKQb7etmMOCCmf9A93vzeGNcFUnblYooWw0QxePOXazXYK/Gr1xal4MS8nMST
+         S4MRz2f2Ff/ZSlGy+8GEoYlAeqUxnSszOvzlG73zjgdEVfvlSh2DGt2a4F43QCDDE1fp
+         IpWQusiOhyecORTdbDoYipKMTdAvLexBgjnh+CxtUYdK/XP2KicU6o6IKJ0D4489ddjD
+         GMhteVdl+bDC8cA+b8BlBf+I46P6Ynh086uiFVlalo9pqvlRdNcWpX2OFORstrpvk17c
+         pRSg==
+X-Forwarded-Encrypted: i=1; AJvYcCUHN5Zj+u5THfwqiadBeTATvaO+rry7HodrY1w6MluqDNn2Y5sgUuUoxerZTPkmbWwptwrZeFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzK5sV0dA4lP0FVzzP0OSOMGadSrv0Yy3bqEkQsJRyD1UKCywzP
+	JQnVlGtEIqczHZxRSB/qKE8KprDTYu85nd6/wHMugbhmVOJsForHWPTmOC1lN7Tcrz0S6ecKRsn
+	SdrqDu3axbbl+55cDBzZUmZzjuendg1+zRgLASEnYO7V4g1VJYutlRw==
+X-Received: by 2002:a05:6000:4581:b0:374:ca92:5e44 with SMTP id ffacd0b85a97d-378895d6239mr8374075f8f.32.1725967777786;
+        Tue, 10 Sep 2024 04:29:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEY+YEkoOGjNl2+G//8jJ4VdFMDQlFRqdfpWwy9CZc+EaVMXGy/JX1O/pSEqP1jkH3ae8fIng==
+X-Received: by 2002:a05:6000:4581:b0:374:ca92:5e44 with SMTP id ffacd0b85a97d-378895d6239mr8374039f8f.32.1725967777174;
+        Tue, 10 Sep 2024 04:29:37 -0700 (PDT)
 Received: from [192.168.88.27] (146-241-69-130.dyn.eolo.it. [146.241.69.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb32678sm108194315e9.16.2024.09.10.04.27.11
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378956d3687sm8612612f8f.71.2024.09.10.04.29.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 04:27:12 -0700 (PDT)
-Message-ID: <1cd88b74-5329-4aeb-8917-e291be104ea0@redhat.com>
-Date: Tue, 10 Sep 2024 13:27:10 +0200
+        Tue, 10 Sep 2024 04:29:36 -0700 (PDT)
+Message-ID: <56c4fccd-787f-4936-9f4b-a1b9ebae6d03@redhat.com>
+Date: Tue, 10 Sep 2024 13:29:34 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,61 +82,178 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V4] mptcp: pm: Fix uaf in __timer_delete_sync
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: davem@davemloft.net, edumazet@google.com, geliang@kernel.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, martineau@kernel.org,
- matttbe@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
- syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com,
- syzkaller-bugs@googlegroups.com
-References: <tencent_272542BA3FBB37337F9EE91B384BB21BF008@qq.com>
- <tencent_7142963A37944B4A74EF76CD66EA3C253609@qq.com>
+Subject: Re: [net-next v5 0/5] net: stmmac: Add PCI driver support for
+ BCM8958x
+To: fancer.lancer@gmail.com
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, mcoquelin.stm32@gmail.com,
+ bcm-kernel-feedback-list@broadcom.com, richardcochran@gmail.com,
+ ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, rmk+kernel@armlinux.org.uk, ahalaney@redhat.com,
+ xiaolei.wang@windriver.com, rohan.g.thomas@intel.com,
+ Jianheng.Zhang@synopsys.com, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch,
+ linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com,
+ jitendra.vegiraju@broadcom.com, netdev@vger.kernel.org
+References: <20240904054815.1341712-1-jitendra.vegiraju@broadcom.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <tencent_7142963A37944B4A74EF76CD66EA3C253609@qq.com>
+In-Reply-To: <20240904054815.1341712-1-jitendra.vegiraju@broadcom.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 9/10/24 11:58, Edward Adam Davis wrote:
-> There are two paths to access mptcp_pm_del_add_timer, result in a race
-> condition:
+On 9/4/24 07:48, jitendra.vegiraju@broadcom.com wrote:
+> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
 > 
->       CPU1				CPU2
->       ====                               ====
->       net_rx_action
->       napi_poll                          netlink_sendmsg
->       __napi_poll                        netlink_unicast
->       process_backlog                    netlink_unicast_kernel
->       __netif_receive_skb                genl_rcv
->       __netif_receive_skb_one_core       netlink_rcv_skb
->       NF_HOOK                            genl_rcv_msg
->       ip_local_deliver_finish            genl_family_rcv_msg
->       ip_protocol_deliver_rcu            genl_family_rcv_msg_doit
->       tcp_v4_rcv                         mptcp_pm_nl_flush_addrs_doit
->       tcp_v4_do_rcv                      mptcp_nl_remove_addrs_list
->       tcp_rcv_established                mptcp_pm_remove_addrs_and_subflows
->       tcp_data_queue                     remove_anno_list_by_saddr
->       mptcp_incoming_options             mptcp_pm_del_add_timer
->       mptcp_pm_del_add_timer             kfree(entry)
+> This patchset adds basic PCI ethernet device driver support for Broadcom
+> BCM8958x Automotive Ethernet switch SoC devices.
 > 
-> In remove_anno_list_by_saddr(running on CPU2), after leaving the critical
-> zone protected by "pm.lock", the entry will be released, which leads to the
-> occurrence of uaf in the mptcp_pm_del_add_timer(running on CPU1).
+> This SoC device has PCIe ethernet MAC attached to an integrated ethernet
+> switch using XGMII interface. The PCIe ethernet controller is presented to
+> the Linux host as PCI network device.
 > 
-> Keeping a reference to add_timer inside the lock, and calling
-> sk_stop_timer_sync() with this reference, instead of "entry->add_timer".
+> The following block diagram gives an overview of the application.
+>               +=================================+
+>               |       Host CPU/Linux            |
+>               +=================================+
+>                          || PCIe
+>                          ||
+>          +==========================================+
+>          |           +--------------+               |
+>          |           | PCIE Endpoint|               |
+>          |           | Ethernet     |               |
+>          |           | Controller   |               |
+>          |           |   DMA        |               |
+>          |           +--------------+               |
+>          |           |   MAC        |   BCM8958X    |
+>          |           +--------------+   SoC         |
+>          |               || XGMII                   |
+>          |               ||                         |
+>          |           +--------------+               |
+>          |           | Ethernet     |               |
+>          |           | switch       |               |
+>          |           +--------------+               |
+>          |             || || || ||                  |
+>          +==========================================+
+>                        || || || || More external interfaces
 > 
-> Move list_del(&entry->list) to mptcp_pm_del_add_timer and inside the pm lock,
-> do not directly access any members of the entry outside the pm lock, which
-> can avoid similar "entry->x" uaf.
+> The MAC block on BCM8958x is based on Synopsis XGMAC 4.00a core. This
+> MAC IP introduces new DMA architecture called Hyper-DMA for virtualization
+> scalability.
 > 
-> Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
-> Cc: stable@vger.kernel.org
-> Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> Driver functionality specific to new MAC (DW25GMAC) is implemented in
+> new file dw25gmac.c.
+> 
+> Management of integrated ethernet switch on this SoC is not handled by
+> the PCIe interface.
+> This SoC device has PCIe ethernet MAC directly attached to an integrated
+> ethernet switch using XGMII interface.
+> 
+> v4->v5:
+>     Summary of changes in this patch series:
+>     As suggested by Serge Semin, defined common setup function for dw25gmac.
+>     To accommodate early adopter DW25GMAC used in BCM8958x device, provide
+>     a mechanism to override snps_id and snps_dev_id used for driver entry
+>     matching in hwif.c
+> 
+>     Patch1:
+>       Added plat_stmmacenet_data::snps_id,snps_dev_id fields - Serge Semin
+>     Patch2:
+>       Define common setup function for dw25gmac_setup() - Serge Semin
+>       Support DW25GMAC IPs with varying VDMA/PDMA count - Abhishek Chauhan
+>       Allocate and initialize hdma mapping configuration data dynamically
+>       based on device's VDMA/PDMA feature capabilities in dw25gmac_setup().
+>       Spelling errors in commit log, lower case 0x for hex -Amit Singh Tomar
+>     Patch3:
+>       Glue support in hwif.c for DW25GMAC in hwif.c - Serge Semin
+>       Provide an option to override snps_id and snps_dev_id when the device
+>       reports version info not conformant with driver's expectations as is
+>       the case with BCM8958x device. - Serge Semin
+>     Patch4:
+>       Remove setup function in the glue driver - Serge Semin
+>       Remove unnecessary calls pci_enable_device() and pci_set_master()
+>       in dwxgmac_brcm_pci_resume() - Jakub Kicinski
+>       Merge variable definitions to single line - Amit Singh Tomar
+> 
+> v3->v4:
+>     Based on Serge's questions, received a confirmation from Synopsys that
+>     the MAC IP is indeed the new 25GMAC design.
+>     Renamed all references of XGMAC4 to 25GMAC.
+>     The patch series is rearranged slightly as follows.
+>     Patch1 (new): Define HDMA mapping data structure in kernel's stmmac.h
+>     Patch2 (v3 Patch1): Adds dma_ops for dw25gmac in stmmac core
+>         Renamed new files dwxgmac4.* to dw25gmac.* - Serge Semin
+>         Defined new Synopsis version and device id macros for DW25GMAC.
+>         Converted bit operations to FIELD_PREP macros - Russell King
+>         Moved hwif.h to this patch, Sparse flagged warning - Simon Horman
+>         Defined macros for hardcoded values TDPS etc - Serge Semin
+>         Read number of PDMAs/VDMAs from hardware - Serge Semin
+>     Patch3 (v3 Patch2): Hooks in hardware interface handling for dw25gmac
+>         Resolved user_version quirks questions - Serge, Russell, Andrew
+>         Added new stmmac_hw entry for DW25GMAC. - Serge
+>         Added logic to override synopsis_dev_id by glue driver.
+>     Patch4 (v3 Patch3): Adds PCI driver for BCM8958x device
+>         Define bitmmap macros for hardcoded values - Andrew Lunn
+>         Added per device software node - Andrew Lunn
+>     Patch5(new/split): Adds BCM8958x driver to build system
+>     https://lore.kernel.org/netdev/20240814221818.2612484-1-jitendra.vegiraju@broadcom.com/
+> 
+> v2->v3:
+>     Addressed v2 comments from Andrew, Jakub, Russel and Simon.
+>     Based on suggestion by Russel and Andrew, added software node to create
+>     phylink in fixed-link mode.
+>     Moved dwxgmac4 specific functions to new files dwxgmac4.c and dwxgmac4.h
+>     in stmmac core module.
+>     Reorganized the code to use the existing glue logic support for xgmac in
+>     hwif.c and override ops functions for dwxgmac4 specific functions.
+>     The patch is split into three parts.
+>       Patch#1 Adds dma_ops for dwxgmac4 in stmmac core
+>       Patch#2 Hooks in the hardware interface handling for dwxgmac4
+>       Patch#3 Adds PCI driver for BCM8958x device
+>     https://lore.kernel.org/netdev/20240802031822.1862030-1-jitendra.vegiraju@broadcom.com/
+> 
+> v1->v2:
+>     Minor fixes to address coding style issues.
+>     Sent v2 too soon by mistake, without waiting for review comments.
+>     Received feedback on this version.
+>     https://lore.kernel.org/netdev/20240511015924.41457-1-jitendra.vegiraju@broadcom.com/
+> 
+> v1:
+>     https://lore.kernel.org/netdev/20240510000331.154486-1-jitendra.vegiraju@broadcom.com/
+> 
+> Jitendra Vegiraju (5):
+>    Add HDMA mapping for dw25gmac support
+>    Add basic dw25gmac support in stmmac core
+>    Integrate dw25gmac into stmmac hwif handling
+>    Add PCI driver support for BCM8958x
+>    Add BCM8958x driver to build system
+> 
+>   MAINTAINERS                                   |   8 +
+>   drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 +
+>   drivers/net/ethernet/stmicro/stmmac/Makefile  |   3 +-
+>   drivers/net/ethernet/stmicro/stmmac/common.h  |   4 +
+>   .../net/ethernet/stmicro/stmmac/dw25gmac.c    | 224 ++++++++
+>   .../net/ethernet/stmicro/stmmac/dw25gmac.h    |  92 ++++
+>   .../net/ethernet/stmicro/stmmac/dwmac-brcm.c  | 507 ++++++++++++++++++
+>   .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |   1 +
+>   .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  43 ++
+>   .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  31 ++
+>   drivers/net/ethernet/stmicro/stmmac/hwif.c    |  26 +-
+>   drivers/net/ethernet/stmicro/stmmac/hwif.h    |   1 +
+>   include/linux/stmmac.h                        |  48 ++
+>   13 files changed, 997 insertions(+), 2 deletions(-)
+>   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dw25gmac.c
+>   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dw25gmac.h
+>   create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-brcm.c
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+Hi Serge, to you think you will have time to review this series soon?
+
+We are sort in a rush to flush the net-next material before the upcoming 
+merge window.
+
+Thanks,
+
+Paolo
 
 
