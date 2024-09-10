@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-127012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E378C9739FC
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:35:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC23A973A18
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:39:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16DA728A87C
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:35:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A48D1C21630
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395591922E1;
-	Tue, 10 Sep 2024 14:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E62019413F;
+	Tue, 10 Sep 2024 14:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oe8JuEWq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZgAimHqc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06A019309C;
-	Tue, 10 Sep 2024 14:35:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3FE21940B3;
+	Tue, 10 Sep 2024 14:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725978923; cv=none; b=b9Pl8EUVLl6lSWDZAAXYqx5x5n48BzlY52WOfspJANywlZRWFnPXWc+eGCNV4siBbqNOWhkiWxmD80p6Ui2Fd/gMx+Mn0t+d4Zs9ksTNH3atjqufNrtlj7duLvrAkDWlolbLvcjxM0ra3iy1DCFIVaFG10FxPBLDvPb0pMc5EqY=
+	t=1725979175; cv=none; b=cJHcd+gFFMk36delnIuU2bClMNwKAKM/bKOLSEltbaVvlEZ+XrhqSwopCnsKtFfTpsoxOURBcX2fdC38/3QP70UEL5AAkqfrVcIvrTh6WFLD3pKSSD60caR/5urBn19H0J35XB7CMbL8w6wxAloHAM/K+bF4fLcwgUluDIu0oWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725978923; c=relaxed/simple;
-	bh=cnBKc6QSEPPGpTooPRBqwMZQ7q3hlFQG/diuM76jvik=;
+	s=arc-20240116; t=1725979175; c=relaxed/simple;
+	bh=SlCe6zFhYuhwyWnV6gLsdcSUid6440JlIzAgLc1ODdw=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=msYS3nhpvuqnOx1kJLCaFMabg2y1oBSeN/41FRG7+SKJag+GA3yQUw8O878LoG9MGARbRuy7Vr3RbyF7bFV/QdtaFDaGJ2MENMpRz3ZpktCVFcG6fcTWjRjvCa8Btf4cZAZt/Z58yW8lwbJ8k7sPz+H/EVUYc01fWJW/XxsLDDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oe8JuEWq; arc=none smtp.client-ip=209.85.222.177
+	 Mime-Version:Content-Type; b=l9GHs5CdyMcmRl37uZfEEK4DfAlbIXCYBrvPj9oOIIOlIC1PGaJKxq4eT4eyJY9PFFI9YUdPr7oT4XPzpWc8E9ZXMmZGTwYJj1I7deb+bpg9VwHFcv249rbnqntMd/hDZpEwWoBzHDVIoOJ8J16ALK8/VXKaPyHnHtbJjCgxGBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZgAimHqc; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7a99e8ad977so336984085a.3;
-        Tue, 10 Sep 2024 07:35:21 -0700 (PDT)
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e02b79c6f21so6160553276.2;
+        Tue, 10 Sep 2024 07:39:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725978920; x=1726583720; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1725979172; x=1726583972; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qQrftbtO0vVoQQg7Rm8RoTAZZxy51Jatmrm5N+2ea1c=;
-        b=Oe8JuEWqXl2hG8aJkXCGskvlybXicclkOkDooEOU3+/yARP1ENafu3kK6NgHt6p8le
-         y5re3jRluI0XCOGJsXe0813KS+a6Y6nuraT3gf9MUiAHPn1d0HaxUXlEbtw1CocH8YmZ
-         TnItXmCclyQncDwQCMnDrvFByPb8NqShYeXW+/Ph6AHWBBzYDTnzEHFf7WCTAt8xdKcU
-         ajb0Y6143YKR3QWsYRp0mm4a2PylEtlIwoJY2P/oAEioT/9CxeDDpDuIQiYhQqlE0jyq
-         CCuf6OFzyvxgXhj6o3To1hBiajMZOuHn9B78cjpCrdiI3VBJn2Z3xrsGdthpEWfzvUcs
-         SIHQ==
+        bh=8EnJYnk0tWnQ6MzZ6S4uoD2QS0ICJx7Nh5xOxSRk4+w=;
+        b=ZgAimHqc8dWJ2wOj/i62b6FS2nmwBAdoDO76kECjCjJ7joS1OtVWqCzC6FYOq3MkVa
+         zrsF4eneNl/LLGDz81cGBsqZXhEVzIh88aNWZpyOfQLzH66XJYdqDDt5t7xUMzISRbGg
+         OSzGNyCXr3UgS+sPESMYQyy/xIGf8SmGsOIcOxZTalI9feTfNDAK8dtIs/nL+Vm5SawI
+         Xu/ElbLm/9WeH2loueCZQbsmui9zYBOW5uDuNJTw3f4U28zKzvbLnYu7Foy8Vojm+n9D
+         Ae4dV0ha+IYTh9gYYrq53NWOPXoduu3WzexxmhNYphRDqhcb4PKURmKlRvfpflzS+8N4
+         uH2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725978920; x=1726583720;
+        d=1e100.net; s=20230601; t=1725979172; x=1726583972;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=qQrftbtO0vVoQQg7Rm8RoTAZZxy51Jatmrm5N+2ea1c=;
-        b=Z3/XeOeBzRw9uHtca2ShSEvkiYnXid6iSy+dkBX3XLXWFo+PIHrD14+LABy0dotfV4
-         /iQIuh1+Y8T8mNL/4KRtwT7BAzCeaLHVywtIpU9QVnOLG7bmn+LhviAL/8GqywfZmHYL
-         QDmiSiYrRAICMVcAu85FmOm6lW/7yqvoLE+Xew2N67IYgqGRHzsyKiBVbiEkuDY8xbzO
-         e6fFReXEG7Gzo82aQ15pWvIM2H63X46huT9O0AjvVbv+GY5my+hR4M3kFjCJbiW03tqf
-         qAT47xlaC3UUFlySB9UmcY2RNtkcXxSV1f2vZ8uH9tB9YJkuXYJ2wMhGJO+HUGBBl2uu
-         Bz1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU+KVwpNldyI4BYzGiVeKYVhEhEX/mU21cMn7jQvAIXGIAHTNGUKRiPAECiyYY34XuQj0U2sq0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKICojPgNZu78xTfKgSOLDfQJHDhjqSeE7CqNmbpmeJLtJY2XY
-	1vSUxUoOolPTACrmvXmQ2W8anPuMBZGYV5Wd0hZv/mfkr0VfbBeT
-X-Google-Smtp-Source: AGHT+IFMq1nOfj6B9b980/HhnIOYyLnpjL4IBtxigTBnCmfMqCS6R18QOkk52Jz2SDNpKA8RgcNxFw==
-X-Received: by 2002:a05:620a:240b:b0:7a7:fa7a:75f7 with SMTP id af79cd13be357-7a9a38ec003mr1624259685a.51.1725978920321;
-        Tue, 10 Sep 2024 07:35:20 -0700 (PDT)
+        bh=8EnJYnk0tWnQ6MzZ6S4uoD2QS0ICJx7Nh5xOxSRk4+w=;
+        b=mks30+bKe7W0hQCJPukmVsIJWhyTju1iAEuiMUbXe/nc1p/RCnuHkUplycUG3SKVk7
+         CNEbPXNL8OPZSXK5qNctATS4Ycb+T+pridA1/Uvs5BzdBpxJWpdBvZWztPbEGqBE+7WJ
+         l3/+DvhB+ndlb1FQrhSWmCG/uVPvFasQOq2jrBIuIJVazi72bDNx3aFOkwX8uAwuOtZg
+         aICzJemD9LV1JNKwEW40oK1nX1vWXjeeiswmKGTrRJI3eTdaoGxiwkH2+syosA1jJY6P
+         /du1p0ofR5pEdQdwkguOviTzK83842mTXRa43XcLcprZJzEijjXNLDxmNnPJNplNLzGm
+         SIEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUaXkkOWqHiN0vsmFe82HE8U2slUYlKYVz3gcec6JaP3KqHw8QEhlIsMatqIXgjvtVYdA8YuCo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDCGOlDkp0rIJC4eceqrWqa2iIjH77tg0wG1KsvjuDkQPpOtWQ
+	3oVsr3Q/b+jtIAGKzmbvpy125ysRGf7ExxvyRuoBjNMyD8kCSGIi
+X-Google-Smtp-Source: AGHT+IHBR0Ey5K3507QZL400N+rwdfsWqvA5Yi+ApgUqoXzAH+EIaRCEFbOsfGWgxbJugstGI1XJtw==
+X-Received: by 2002:a05:6902:2785:b0:e1a:8cec:37e6 with SMTP id 3f1490d57ef6-e1d3488d11fmr16531280276.18.1725979171590;
+        Tue, 10 Sep 2024 07:39:31 -0700 (PDT)
 Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a9a7991f7fsm311003485a.62.2024.09.10.07.35.19
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c53433982esm30573836d6.42.2024.09.10.07.39.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 07:35:19 -0700 (PDT)
-Date: Tue, 10 Sep 2024 10:35:19 -0400
+        Tue, 10 Sep 2024 07:39:31 -0700 (PDT)
+Date: Tue, 10 Sep 2024 10:39:30 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Greg KH <gregkh@linuxfoundation.org>, 
+To: Jason Wang <jasowang@redhat.com>, 
  Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Cc: netdev@vger.kernel.org, 
  davem@davemloft.net, 
@@ -79,16 +79,15 @@ Cc: netdev@vger.kernel.org,
  stable@vger.kernel.org, 
  nsz@port70.net, 
  mst@redhat.com, 
- jasowang@redhat.com, 
  yury.khrustalev@arm.com, 
  broonie@kernel.org, 
  sudeep.holla@arm.com, 
  Willem de Bruijn <willemb@google.com>, 
  stable@vger.kernel.net
-Message-ID: <66e059275c121_9de0029430@willemb.c.googlers.com.notmuch>
-In-Reply-To: <2024091024-gratitude-challenge-c4c3@gregkh>
+Message-ID: <66e05a2259919_9de00294f9@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CACGkMEsnPmbo8t6PbD8YsgKrZWHXG=Rz8ZwTDBJkSbmyzkNGSA@mail.gmail.com>
 References: <20240910004033.530313-1-willemdebruijn.kernel@gmail.com>
- <2024091024-gratitude-challenge-c4c3@gregkh>
+ <CACGkMEsnPmbo8t6PbD8YsgKrZWHXG=Rz8ZwTDBJkSbmyzkNGSA@mail.gmail.com>
 Subject: Re: [PATCH net] net: tighten bad gso csum offset check in
  virtio_net_hdr
 Precedence: bulk
@@ -99,16 +98,107 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-Greg KH wrote:
-> On Mon, Sep 09, 2024 at 08:38:52PM -0400, Willem de Bruijn wrote:
+Jason Wang wrote:
+> On Tue, Sep 10, 2024 at 8:40=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > From: Willem de Bruijn <willemb@google.com>
+> >
+> > The referenced commit drops bad input, but has false positives.
+> > Tighten the check to avoid these.
+> >
+> > The check detects illegal checksum offload requests, which produce
+> > csum_start/csum_off beyond end of packet after segmentation.
+> >
+> > But it is based on two incorrect assumptions:
+> >
+> > 1. virtio_net_hdr_to_skb with VIRTIO_NET_HDR_GSO_TCP[46] implies GSO.=
+
+> > True in callers that inject into the tx path, such as tap.
+> > But false in callers that inject into rx, like virtio-net.
+> > Here, the flags indicate GRO, and CHECKSUM_UNNECESSARY or
+> > CHECKSUM_NONE without VIRTIO_NET_HDR_F_NEEDS_CSUM is normal.
+> >
+> > 2. TSO requires checksum offload, i.e., ip_summed =3D=3D CHECKSUM_PAR=
+TIAL.
+> > False, as tcp[46]_gso_segment will fix up csum_start and offset for
+> > all other ip_summed by calling __tcp_v4_send_check.
+> >
+> > Because of 2, we can limit the scope of the fix to virtio_net_hdr
+> > that do try to set these fields, with a bogus value.
+> >
+> > Link: https://lore.kernel.org/netdev/20240909094527.GA3048202@port70.=
+net/
+> > Fixes: 89add40066f9 ("net: drop bad gso csum_start and offset in virt=
+io_net_hdr")
+> > Signed-off-by: Willem de Bruijn <willemb@google.com>
 > > Cc: <stable@vger.kernel.net>
-> 
-> This is not a correct email address :(
-> 
+> >
+> > ---
+> >
+> > Verified that the syzbot repro is still caught.
+> >
+> > An equivalent alternative would be to move the check for csum_offset
+> > to where the csum_start check is in segmentation:
+> >
+> > -    if (unlikely(skb_checksum_start(skb) !=3D skb_transport_header(s=
+kb)))
+> > +    if (unlikely(skb_checksum_start(skb) !=3D skb_transport_header(s=
+kb) ||
+> > +                 skb->csum_offset !=3D offsetof(struct tcphdr, check=
+)))
+> >
+> > Cleaner, but messier stable backport.
+> >
+> > We'll need an equivalent patch to this for VIRTIO_NET_HDR_GSO_UDP_L4.=
 
-Sorry. I'll resend with that fixed.
+> > But that csum_offset test was in a different commit, so different
+> =
 
+> Not for this patch, but I see this in UDP_L4:
+> =
 
+>                        if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM))=
+
+>                                return -EINVAL;
+> =
+
+> This seems to forbid VIRTIO_NET_HDR_F_DATA_VALID. I wonder what's the
+> reason for doing this.
+
+It tests &, not =3D=3D ?
+
+> > Fixes tag.
+> > ---
+> >  include/linux/virtio_net.h | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+> > index 6c395a2600e8d..276ca543ef44d 100644
+> > --- a/include/linux/virtio_net.h
+> > +++ b/include/linux/virtio_net.h
+> > @@ -173,7 +173,8 @@ static inline int virtio_net_hdr_to_skb(struct sk=
+_buff *skb,
+> >                         break;
+> >                 case SKB_GSO_TCPV4:
+> >                 case SKB_GSO_TCPV6:
+> > -                       if (skb->csum_offset !=3D offsetof(struct tcp=
+hdr, check))
+> > +                       if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL &&=
+
+> > +                           skb->csum_offset !=3D offsetof(struct tcp=
+hdr, check))
+> >                                 return -EINVAL;
+> >                         break;
+> >                 }
+> > --
+> > 2.46.0.598.g6f2099f65c-goog
+> >
+> =
+
+> Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks for reviewing
 
