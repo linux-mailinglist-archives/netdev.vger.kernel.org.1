@@ -1,79 +1,227 @@
-Return-Path: <netdev+bounces-126854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 102AF972AE7
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:36:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 822C5972B09
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 424BA1C2386B
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:36:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A61A31C21731
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FF2A17DFE9;
-	Tue, 10 Sep 2024 07:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33AF18562F;
+	Tue, 10 Sep 2024 07:42:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WFWX5UBO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UMvXBmn8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3396917D8BF;
-	Tue, 10 Sep 2024 07:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0670B183CB0
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 07:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725953795; cv=none; b=iFDX9ZfMAV6RvD8TnX7AFHwICTwliPavhT1L3/HCEpYLpAuONJQeP+AKSP7fy3PksUMV3lk2d9YeZ3qjKwYYbvxP49c0/UPcCYUP0ozbr5udUZ73hulWSAvBNRy/UswZeIFs+xJb/13w/PDWPonoleQJ/bOpzkOyGIZr4Mk+Q1c=
+	t=1725954129; cv=none; b=Uo6ihv2fhbvGxt394SFHhlsbIcVPo757XOkgyon7EICjtbnrfRDMOAue0b0rtTGTPnLrDZG5Jk1SqdBuCP4wNQAc1BgoqkyDAWCcsUHDd5xXo3/0klh1l3dmpH87tNQDqsOJyjq1GgT3/66pswnnt6oLNx4ngp0doLiv6uPbJOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725953795; c=relaxed/simple;
-	bh=ITn2Rn02uOxUMwunV+FyrfoKzyBtVa+mpdpYLRIZAFs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XewwsDe3dKblQW5ke3QKEVajQ2HWlHxyxo00WzBNgeEKyg6Umt2eDigOtpJ3y7BofaMgfgqrEUeNCU1SI6v3HNkAdt/OP9xkYysf3z1JFnOo3E09QFdBpWW9uTt8CkLBE5l+6EubaF3Fuft5HYf7nxmH219iNF7bQWsNHsdZ0qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WFWX5UBO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00141C4CEC3;
-	Tue, 10 Sep 2024 07:36:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725953795;
-	bh=ITn2Rn02uOxUMwunV+FyrfoKzyBtVa+mpdpYLRIZAFs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WFWX5UBOo4/eSqAfVomeHfa+dp0cNkRJNWajzquz6U9O71yc1C9YwUGeu3XcOxX+T
-	 Y7igQOldPchZ5cAUyxZnoQ26K5wzVbeWB5tKzPBw0kdpAaxWn4clKzM+GgU/Mi7hPc
-	 FkZJoemxDBDP11NJDUtfN2CaESOTa9CaaptU4rUs2mFJ/qkLn10eEO6kbm41r9vmAb
-	 lDpmHWSzVxoUUMQxS641ghSa2N1g25AjTsyG4guPXP10U3uizhoIwTDkCWeiXl1H0l
-	 XoZfSl5Ww7wS1uy4xDuN+F0bMkLiQCuywt+uZGmB0ehGck230nbd6aukl30sa9O2Iy
-	 cu5LYWNI/zHiA==
-Date: Tue, 10 Sep 2024 08:36:30 +0100
-From: Simon Horman <horms@kernel.org>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next] r8169: Fix spelling mistake: "tx_underun" ->
- "tx_underrun"
-Message-ID: <20240910073630.GC525413@kernel.org>
-References: <20240909140021.64884-1-colin.i.king@gmail.com>
+	s=arc-20240116; t=1725954129; c=relaxed/simple;
+	bh=Qyl+jeM29UcIUIpBkMaXSrvyQbplQx2dePM9hleo3fk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tNCGiuvth5irkxR52aU84kNK87nOWrOzIoKfUNcF2yall70x+mFn675EnqCcm1y5/a7ZfEt2mjJ+swoGELRBkVUeF0LHyR6LYoyPud9bsLh69N8DHxN7qfOVmmjp4mI8eURgZtF+9GBOx5kdMJLHAKRgp1mZqP2Ff2PVsuu/Dhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UMvXBmn8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725954126;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vuOGAWKRYAVrkFr1NxQHAvJfBsIuxorao5YMycZLxA4=;
+	b=UMvXBmn8SzRaGIHUSWmfuIZ/1JctGV5jM1YFtz+TV+NGoIjCKpm0dC3YB16fIsbTXrtpof
+	yDQtxIuKDW/DPBLOBy+fypv19pvqL67OYdRiuL+1kfhEuXTDRNRSJhcEmOTO9981iI4Z3E
+	l3yjDnD2RzsWs/bXOkddKy4aXaPiFXE=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-249-r28C7SC4NU66IuguIwDKaw-1; Tue, 10 Sep 2024 03:42:05 -0400
+X-MC-Unique: r28C7SC4NU66IuguIwDKaw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a8d34e41915so26340066b.2
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 00:42:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725954123; x=1726558923;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vuOGAWKRYAVrkFr1NxQHAvJfBsIuxorao5YMycZLxA4=;
+        b=v8pjzA50333LuuApgqeJEwUoxil0gRSZs1JSFd+LzCaqcJS4LnQnwcZNpQh0ld5Uai
+         sgrNJGJ53d8DOeGWzME1vQqEIHFULR641k6bQey7Z8hfu31AnHf2tu7CagL1A0xUvHie
+         mYJPLSLHztHKH8n2JoJJkogIr9/hteRGGSLTrTE2GMEmJt/P/IL4xpxBdPim50ixBgTx
+         qeN189jpAsulzgYBod27dH7ygFZDVTkT8/L2UK+CafnLwMJ081xids1IQArfH7NXI+5q
+         HjHeVN5Z4RtMbzvZh8YAPSVY+m+CBA8I3vH+78cIsghmhbWo1VTj0jY22gCtqwwYTyC0
+         TysA==
+X-Gm-Message-State: AOJu0YzpUQEdw0YEWZ5v/4S7nLOG1YcdF7+a6A3zM8cdHIaFkQA1rCrT
+	GmBgz3vav0mDHUY5XTlqcHb1pz1RReTrlah0Te5MN5C4nGrJuVt44ysAMJosRTEBXLQoaoPE2Ds
+	Q7tVX50K0xDy1HjQqtz3wa6qE8XWGUrI5VStYHFWyXoon3nsHv+JkYQ==
+X-Received: by 2002:a17:906:d555:b0:a86:9fbd:5168 with SMTP id a640c23a62f3a-a8a885be012mr934459866b.10.1725954122688;
+        Tue, 10 Sep 2024 00:42:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFlH0u6x8kCMDvPcDbginVMnhXO4lApiSQpceWmr1sBGfZmmYznkDhVeEEVWw9Lf1VtTtVaBw==
+X-Received: by 2002:a17:906:d555:b0:a86:9fbd:5168 with SMTP id a640c23a62f3a-a8a885be012mr934451466b.10.1725954121495;
+        Tue, 10 Sep 2024 00:42:01 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25cf03fcsm438718266b.162.2024.09.10.00.42.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 00:42:01 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 18BC7152C346; Tue, 10 Sep 2024 09:42:00 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Florian Kauer <florian.kauer@linutronix.de>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, David Ahern
+ <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, Mykola Lysenko
+ <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <brouer@redhat.com>,
+ linux-kselftest@vger.kernel.org, Florian Kauer
+ <florian.kauer@linutronix.de>
+Subject: Re: [PATCH net v3 2/2] bpf: selftests: send packet to devmap
+ redirect XDP
+In-Reply-To: <20240909-devel-koalo-fix-ingress-ifindex-v3-2-66218191ecca@linutronix.de>
+References: <20240909-devel-koalo-fix-ingress-ifindex-v3-0-66218191ecca@linutronix.de>
+ <20240909-devel-koalo-fix-ingress-ifindex-v3-2-66218191ecca@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 10 Sep 2024 09:41:59 +0200
+Message-ID: <87seu8dkfs.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240909140021.64884-1-colin.i.king@gmail.com>
+Content-Type: text/plain
 
-On Mon, Sep 09, 2024 at 03:00:21PM +0100, Colin Ian King wrote:
-> There is a spelling mistake in the struct field tx_underun, rename
-> it to tx_underrun.
-> 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+Florian Kauer <florian.kauer@linutronix.de> writes:
 
-Thanks Colin,
+> The current xdp_devmap_attach test attaches a program
+> that redirects to another program via devmap.
+>
+> It is, however, never executed, so do that to catch
+> any bugs that might occur during execution.
+>
+> Also, execute the same for a veth pair so that we
+> also cover the non-generic path.
+>
+> Warning: Running this without the bugfix in this series
+> will likely crash your system.
+>
+> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+> ---
+>  .../selftests/bpf/prog_tests/xdp_devmap_attach.c   | 114 +++++++++++++++++++--
+>  1 file changed, 108 insertions(+), 6 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c
+> index ce6812558287..3da45f719736 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_devmap_attach.c
+> @@ -1,6 +1,9 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> +#include <arpa/inet.h>
+>  #include <uapi/linux/bpf.h>
+>  #include <linux/if_link.h>
+> +#include <network_helpers.h>
+> +#include <net/if.h>
+>  #include <test_progs.h>
+>  
+>  #include "test_xdp_devmap_helpers.skel.h"
+> @@ -17,7 +20,7 @@ static void test_xdp_with_devmap_helpers(void)
+>  		.ifindex = IFINDEX_LO,
+>  	};
+>  	__u32 len = sizeof(info);
+> -	int err, dm_fd, map_fd;
+> +	int err, dm_fd, dm_fd_redir, map_fd;
+>  	__u32 idx = 0;
+>  
+>  
+> @@ -25,14 +28,11 @@ static void test_xdp_with_devmap_helpers(void)
+>  	if (!ASSERT_OK_PTR(skel, "test_xdp_with_devmap_helpers__open_and_load"))
+>  		return;
+>  
+> -	dm_fd = bpf_program__fd(skel->progs.xdp_redir_prog);
+> -	err = bpf_xdp_attach(IFINDEX_LO, dm_fd, XDP_FLAGS_SKB_MODE, NULL);
+> +	dm_fd_redir = bpf_program__fd(skel->progs.xdp_redir_prog);
+> +	err = bpf_xdp_attach(IFINDEX_LO, dm_fd_redir, XDP_FLAGS_SKB_MODE, NULL);
+>  	if (!ASSERT_OK(err, "Generic attach of program with 8-byte devmap"))
+>  		goto out_close;
+>  
+> -	err = bpf_xdp_detach(IFINDEX_LO, XDP_FLAGS_SKB_MODE, NULL);
+> -	ASSERT_OK(err, "XDP program detach");
+> -
+>  	dm_fd = bpf_program__fd(skel->progs.xdp_dummy_dm);
+>  	map_fd = bpf_map__fd(skel->maps.dm_ports);
+>  	err = bpf_prog_get_info_by_fd(dm_fd, &info, &len);
+> @@ -47,6 +47,23 @@ static void test_xdp_with_devmap_helpers(void)
+>  	ASSERT_OK(err, "Read devmap entry");
+>  	ASSERT_EQ(info.id, val.bpf_prog.id, "Match program id to devmap entry prog_id");
+>  
+> +	/* send a packet to trigger any potential bugs in there */
+> +	char data[10] = {};
+> +	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
+> +			    .data_in = &data,
+> +			    .data_size_in = 10,
+> +			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
+> +			    .repeat = 1,
+> +		);
+> +	err = bpf_prog_test_run_opts(dm_fd_redir, &opts);
+> +	ASSERT_OK(err, "XDP test run");
+> +
+> +	/* wait for the packets to be flushed */
+> +	kern_sync_rcu();
+> +
+> +	err = bpf_xdp_detach(IFINDEX_LO, XDP_FLAGS_SKB_MODE, NULL);
+> +	ASSERT_OK(err, "XDP program detach");
+> +
+>  	/* can not attach BPF_XDP_DEVMAP program to a device */
+>  	err = bpf_xdp_attach(IFINDEX_LO, dm_fd, XDP_FLAGS_SKB_MODE, NULL);
+>  	if (!ASSERT_NEQ(err, 0, "Attach of BPF_XDP_DEVMAP program"))
+> @@ -124,6 +141,88 @@ static void test_xdp_with_devmap_frags_helpers(void)
+>  	test_xdp_with_devmap_frags_helpers__destroy(skel);
+>  }
+>  
+> +static void test_xdp_with_devmap_helpers_veth(void)
+> +{
+> +	struct test_xdp_with_devmap_helpers *skel = NULL;
+> +	struct bpf_prog_info info = {};
+> +	struct bpf_devmap_val val = {};
+> +	struct nstoken *nstoken = NULL;
+> +	__u32 len = sizeof(info);
+> +	int err, dm_fd, dm_fd_redir, map_fd, ifindex_dst;
+> +	__u32 idx = 0;
+> +
+> +	SYS(out_close, "ip netns add testns");
+> +	nstoken = open_netns("testns");
+> +	if (!ASSERT_OK_PTR(nstoken, "setns"))
+> +		goto out_close;
+> +
+> +	SYS(out_close, "ip link add veth_src type veth peer name veth_dst");
+> +	SYS(out_close, "ip link set dev veth_src up");
+> +	SYS(out_close, "ip link set dev veth_dst up");
+> +
+> +	val.ifindex = if_nametoindex("veth_src");
+> +	ifindex_dst = if_nametoindex("veth_dst");
+> +	if (!ASSERT_NEQ(val.ifindex, 0, "val.ifindex") ||
+> +	    !ASSERT_NEQ(ifindex_dst, 0, "ifindex_dst"))
+> +		goto out_close;
+> +
+> +	skel = test_xdp_with_devmap_helpers__open_and_load();
+> +	if (!ASSERT_OK_PTR(skel, "test_xdp_with_devmap_helpers__open_and_load"))
+> +		return;
 
-I've confirmed that this addresses all instances of this problem
-in this driver.
+This should be 'goto out_close'.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+-Toke
+
 
