@@ -1,133 +1,92 @@
-Return-Path: <netdev+bounces-126951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D3249735CE
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 13:00:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 049759735CF
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 13:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAF651F25C85
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:00:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C13E52856D0
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A2B18C03E;
-	Tue, 10 Sep 2024 10:59:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0ACC18661A;
+	Tue, 10 Sep 2024 11:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ExTfI7h0"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6BB17A924
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 10:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D5D5674D;
+	Tue, 10 Sep 2024 11:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725965996; cv=none; b=LagChpwlBsPlJ0poD6isCRZH3bDWXk/pREhyYVJhXQ1SvyOs5hFGETJJGCjWrah22tu4Ah6XBUJTXpIjlegHNOG9yHqRWffq4Kusyw1R238jaIIwtS52tMUc42NiqCR0djAuXADjnPZGLUf/vugGUkhW048bPs/KI1Hi+Yl1dpI=
+	t=1725966028; cv=none; b=WT2OzyEphzXeEQ7oqY1pDal9K9u9On7oYejA6LX4jjb3/7iOSQSUd3Anvo3VU4gvdWA3Db7kVGcnVhLmuVftXF0LF/MKmkCSWGHycs3o2gNljwvzQbXTNJEKvdFL5fQV+BoO8ffP/CcGwgdUcsjkn/05GehXOB9NKunEmSmY5pU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725965996; c=relaxed/simple;
-	bh=wYl1ayaD6ODnwt71dEKiyUjl6od5SExYFo4TreaPkf4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jWRuHlTQ+6fsFnmZnnKAmKuBZo3qppMB6pq9sP/f5whWd7s3TPwtTUuijIZcNFysfu4mJV5PeRwsD/13+9Oi4nz2RUotxd+6ydoAXIe+bZ78NSE6r5qQlOc0gBvoY7X32Q4R6M0pyWJmVQayEjP06nG/dkFjPxPYyQzTpUN7zVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1snyat-0002ky-0l; Tue, 10 Sep 2024 12:59:35 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1snyas-006sMQ-9w; Tue, 10 Sep 2024 12:59:34 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id EB196337710;
-	Tue, 10 Sep 2024 10:59:33 +0000 (UTC)
-Date: Tue, 10 Sep 2024 12:59:33 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Frank Li <Frank.li@nxp.com>
-Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	"open list:CAN NETWORK DRIVERS" <linux-can@vger.kernel.org>, "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, 
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, imx@lists.linux.dev
-Subject: Re: [PATCH v2 1/1] dt-bindings: can: convert microchip,mcp251x.txt
- to yaml
-Message-ID: <20240910-neat-apricot-robin-4712b0-mkl@pengutronix.de>
-References: <20240814164407.4022211-1-Frank.Li@nxp.com>
- <Zt9csuQwWomPqlqc@lizhi-Precision-Tower-5810>
+	s=arc-20240116; t=1725966028; c=relaxed/simple;
+	bh=9csnjUCkCKmeabR2m9J+TlToNGiQQRGyTeVjHqfsHCQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=VRutVu3RpsPevhE2SbiwbCCDabP+uLGhxQ0tDuB4LpDe1ajcsCoZPGGPSjZXS8RW79FiU0p/WKNkHA+vCNBac/2vrAgAZPYpM0cG1Px0PpqyCKEbtUX9cgAkW4Q21Ckxlj0bWdT7I+h4gVtBaTYTaAV00pwmmytYCRT2MS4C+Ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ExTfI7h0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32AB3C4CEC3;
+	Tue, 10 Sep 2024 11:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725966028;
+	bh=9csnjUCkCKmeabR2m9J+TlToNGiQQRGyTeVjHqfsHCQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ExTfI7h024FusAGaGr6uiouB6LhP/r7281fwC/WzQNd08YuVR4HIKxsnMF9Ge6BEj
+	 fJ8vUouAs7fLKNMShGlYCfuE5BXfLDLKU6uPRxTJh5YiQxt929XiRkJy2ano9kbGP2
+	 rVgF8M+R3q87cpMn44GOXDW8bXTGvyEWfmWHkKD5ZjEEnlzuxN7U6kN/X1wQH6DPKm
+	 SBaHdnhVp0xlELX5evZPcLKX6vGWwld7Y88C9XPEkeKuIIo+bBu6RUUB8yGgLD0t32
+	 HByK7f+vqONcmI33v1IaqAUFpWO22agOmWNIMedYs2cyyvu0tNG1iSKrVWVG/jTmuq
+	 L+xCTNcqkxqGA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CF23806654;
+	Tue, 10 Sep 2024 11:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="tbva72wm44mzso74"
-Content-Disposition: inline
-In-Reply-To: <Zt9csuQwWomPqlqc@lizhi-Precision-Tower-5810>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2] net: ftgmac100: Enable TX interrupt to avoid TX timeout
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172596602927.216475.4554072341389364414.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Sep 2024 11:00:29 +0000
+References: <20240906062831.2243399-1-jacky_chou@aspeedtech.com>
+In-Reply-To: <20240906062831.2243399-1-jacky_chou@aspeedtech.com>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ benh@kernel.crashing.org
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri, 6 Sep 2024 14:28:31 +0800 you wrote:
+> Currently, the driver only enables RX interrupt to handle RX
+> packets and TX resources. Sometimes there is not RX traffic,
+> so the TX resource needs to wait for RX interrupt to free.
+> This situation will toggle the TX timeout watchdog when the MAC
+> TX ring has no more resources to transmit packets.
+> Therefore, enable TX interrupt to release TX resources at any time.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2] net: ftgmac100: Enable TX interrupt to avoid TX timeout
+    https://git.kernel.org/netdev/net/c/fef2843bb49f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---tbva72wm44mzso74
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 09.09.2024 16:38:10, Frank Li wrote:
-> On Wed, Aug 14, 2024 at 12:44:06PM -0400, Frank Li wrote:
-> > Convert binding doc microchip,mcp251x.txt to yaml.
-> > Additional change:
-> > - add ref to spi-peripheral-props.yaml
-> >
-> > Fix below warning:
-> > arch/arm64/boot/dts/freescale/imx8dx-colibri-eval-v3.dtb: /bus@5a000000=
-/spi@5a020000/can@0:
-> > 	failed to match any schema with compatible: ['microchip,mcp2515']
-> >
-> > Signed-off-by: Frank Li <Frank.Li@nxp.com>
-> > ---
->=20
-> Marc:
->=20
-> Ping. Conor Dooley already acked it.
-
-The patch is in net-next.
-
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/=
-Documentation/devicetree/bindings/net/can/microchip,mcp2510.yaml?id=3D09328=
-600c2f930e8814cb9deff630a56788cc8e4
-
-Sorry for not giving feedback,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---tbva72wm44mzso74
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbgJpMACgkQKDiiPnot
-vG9OmQf/Qtal/xWV4O9W0zc4ZhTtKxWHJ+MCOSEjo6iBZM/0U0ukeDAzeFQ0Qw18
-fkho1l1H7TN8uaMDIwbE8AIARN0WV+K2+Fkn/hN+ffShwCdTpfna9bEP7uU+c267
-4VL4Kczm+fgVjdeU0+RcSqPO7D1/nrRuh/TcqykWlrig3mBhhwoY10AARSsnxNSX
-cMtz1TMB1y3GCRGc8ykLffZDLCgAxhdEdy7bjk5EvLYMDy8GnW+UdZkSISx+9L5N
-E9zirBB2TmdlSAMpcVMwoXYva/NrlLIgJhX+FAlOfMCQmJKeBseyP29dRL0lo/+D
-cueMHVpHUJCxWo09+7VYX0APOiPjoQ==
-=F2Ko
------END PGP SIGNATURE-----
-
---tbva72wm44mzso74--
 
