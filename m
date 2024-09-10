@@ -1,104 +1,126 @@
-Return-Path: <netdev+bounces-126871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BAF2972B89
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:08:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08C50972BE0
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:16:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DB551C245E7
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:08:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D97E2831B8
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E91218DF94;
-	Tue, 10 Sep 2024 08:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C431187FED;
+	Tue, 10 Sep 2024 08:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c1JO7NKW"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50410188A3A;
-	Tue, 10 Sep 2024 08:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196A2187FE2;
+	Tue, 10 Sep 2024 08:12:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725955581; cv=none; b=ckgxY4DZm/RZIiLBdpuKPSXQeu7vfBdjyb/e0cHrZbF8Szi6Vr7nApqcFAplWcl2qJpwysNvp0oI2JekcWHIy0TNl9lSz321H8gg5WTWBB21xZ+4o4Vx9GT9BHOM3+iT+ov2BjB8f5noAMWgV+SwSI/FwJb46UrEwJF24xbrepc=
+	t=1725955950; cv=none; b=SZgNBCOX9FlPKbRzHaaUuhpiOS/xYqdk4XHqj/fnIoEnPJW2UrpeuBvYrzYd99FmTjdFT0jGWzFfik0CiEf3iJMs/rDFNXCxlFyOODczYRH6bRfD0cipK23clt4tIwFHtwWvRYfYzZk3kqu5vpSSodUWWnkY+LOt+H3uUxtYCX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725955581; c=relaxed/simple;
-	bh=AzWTqf9mgdhH51glUN+Q5u9Y9J9MonZTUf7E4KxwEHY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dHW8BIWW3zxnIqr0ZQ5o2eBAsUvDtnU/w7iiGCapq9fN/MwZIO7STYPRbQ6+x1nB9qTsFh4/MAQZqK+8lmY1LSg6yL381blu/fvAPV4gV+OyIpewPrQgYOiWSvXWU5pWWXNjal7dbriQg1SidRCOCHID682CjojORsf9QsPfJyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4X2x8r6xypz2Dc3f;
-	Tue, 10 Sep 2024 16:05:48 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id D7EC61A0188;
-	Tue, 10 Sep 2024 16:06:16 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 10 Sep 2024 16:06:15 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <sudongming1@huawei.com>,
-	<xujunsheng@huawei.com>, <shiyongbang@huawei.com>, <libaihan@huawei.com>,
-	<andrew@lunn.ch>, <jdamato@fastly.com>, <horms@kernel.org>,
-	<kalesh-anakkur.purayil@broadcom.com>, <jonathan.cameron@huawei.com>,
-	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<shaojijie@huawei.com>
-Subject: [PATCH V9 net-next 11/11] net: add ndo_validate_addr check in dev_set_mac_address
-Date: Tue, 10 Sep 2024 15:59:42 +0800
-Message-ID: <20240910075942.1270054-12-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240910075942.1270054-1-shaojijie@huawei.com>
-References: <20240910075942.1270054-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1725955950; c=relaxed/simple;
+	bh=X6w/BPx5GBKrPXBB3CaDS2kMB9yUmJ5UQVZ/g6ar698=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YegdEfdlTGseyYaKGYen+yqOhudxwpZEf0AXPpreiADeLEypm5QaQRXyAzO23IZUbDAC0Sg25qSYUUXzEhmxuFzpPsIP7XG43q0ro4WsV9HLOdG+lNKbwcnoU4HUGHybec8jvMgjmfOxkHxpqY3/MBsovFtn0Y0idUuY5tK4xD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c1JO7NKW; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725955949; x=1757491949;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=X6w/BPx5GBKrPXBB3CaDS2kMB9yUmJ5UQVZ/g6ar698=;
+  b=c1JO7NKWOYPt8+q5NLhYkD7Z2AWl3620cVQL8IoL3rRzLUfvlsSEjQw/
+   /Jxkdp5zhH6HLT1X5OKF+mPF6I4eOptSHNATKeyOy9bUoV7UkBeLyqfQz
+   o9LW3uptwegk5DysrW4UBFfZaJY9mMy3oMHISrHKFtZpUGkWK3og6f6GH
+   fdybnE8oEFX4VIwpDCm3zp2vwgfwuf2mSQkmWV0KcMDp/slqf7xW4uD+m
+   kOxZqZkXOgKHT0NDVmColnXWZhqlhTf0HVcUnyYlK4APM3Xn4+WMilmmT
+   v0mgnZYNUOGZdMe9dhQKg1aZkEQfcxtNGQ36ZM5xequnD76f22UDx0Oxx
+   A==;
+X-CSE-ConnectionGUID: THDnvafVShaDNko6ydX6yw==
+X-CSE-MsgGUID: Wmk+4VwlQ9eQ2NsU5zNsYA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="47204529"
+X-IronPort-AV: E=Sophos;i="6.10,216,1719903600"; 
+   d="scan'208";a="47204529"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 01:12:29 -0700
+X-CSE-ConnectionGUID: fyEZI10hQyekJ/4mrj2MmQ==
+X-CSE-MsgGUID: 7C9rnatgR5+/KfxNh0wgfg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,216,1719903600"; 
+   d="scan'208";a="97648069"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 01:12:25 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1snvz3-000000077EJ-2djD;
+	Tue, 10 Sep 2024 11:12:21 +0300
+Date: Tue, 10 Sep 2024 11:12:21 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Felix Huettner <felix.huettner@mail.schwarz>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH net v1 1/1] netfilter: conntrack: Guard possoble unused
+ functions
+Message-ID: <Zt__ZT-P0kUY909z@smile.fi.intel.com>
+References: <20240905203612.333421-1-andriy.shevchenko@linux.intel.com>
+ <20240906162938.GH2097826@kernel.org>
+ <Zt7B79Q3O7mNqrOl@smile.fi.intel.com>
+ <20240909151712.GZ2097826@kernel.org>
+ <Zt8V5xjrZaEvR8K5@smile.fi.intel.com>
+ <20240909183043.GE2097826@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240909183043.GE2097826@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-If driver implements ndo_validate_addr,
-core should check the mac address before ndo_set_mac_address.
+On Mon, Sep 09, 2024 at 07:30:43PM +0100, Simon Horman wrote:
+> On Mon, Sep 09, 2024 at 06:36:07PM +0300, Andy Shevchenko wrote:
+> > On Mon, Sep 09, 2024 at 04:17:12PM +0100, Simon Horman wrote:
+> > > On Mon, Sep 09, 2024 at 12:37:51PM +0300, Andy Shevchenko wrote:
+> > > > On Fri, Sep 06, 2024 at 05:29:38PM +0100, Simon Horman wrote:
+> > > > > On Thu, Sep 05, 2024 at 11:36:12PM +0300, Andy Shevchenko wrote:
+> > > > 
+> > > > > Local testing seems to show that the warning is still emitted
+> > > > > for ctnetlink_label_size if CONFIG_NETFILTER_NETLINK_GLUE_CT is enabled
+> > 
+> > Hold on, this is not related to the patch.
+> > It might be another issue.
+> 
+> Yes, sorry, I see that now too.
+> 
+> Perhaps it can be fixed separately, something like this:
 
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
-ChangeLog:
-v2 -> v3:
-  - Use ndo_validate_addr() instead of is_valid_ether_addr()
-    in dev_set_mac_address(), suggested by Jakub and Andrew.
-  v2: https://lore.kernel.org/all/20240820140154.137876-1-shaojijie@huawei.com/
----
- net/core/dev.c | 5 +++++
- 1 file changed, 5 insertions(+)
+If you make a patch, it will help somebody who has that in their configuration
+files enabled (with the other one being disabled). Note, I use x86_64_defconfig
+which doesn't have this specific issue to be occurred.
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 22c3f14d9287..00e0f473ed44 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -9087,6 +9087,11 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
- 		return -EOPNOTSUPP;
- 	if (sa->sa_family != dev->type)
- 		return -EINVAL;
-+	if (ops->ndo_validate_addr) {
-+		err = ops->ndo_validate_addr(dev);
-+		if (err)
-+			return err;
-+	}
- 	if (!netif_device_present(dev))
- 		return -ENODEV;
- 	err = dev_pre_changeaddr_notify(dev, sa->sa_data, extack);
 -- 
-2.33.0
+With Best Regards,
+Andy Shevchenko
+
 
 
