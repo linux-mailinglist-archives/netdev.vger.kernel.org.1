@@ -1,136 +1,146 @@
-Return-Path: <netdev+bounces-127074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 543A7973F10
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:21:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEE77973F40
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 875781C211B6
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:21:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 958F11F27162
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:24:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62FC01B532B;
-	Tue, 10 Sep 2024 17:15:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B4C91A4F3E;
+	Tue, 10 Sep 2024 17:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lUKkbX3r"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 608131B150F
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 17:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284AF1A38DE;
+	Tue, 10 Sep 2024 17:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725988544; cv=none; b=CstX8i3/Ci/f//6J8betOTRkak4JUo6d7aPvhn5R8GJ/aWbOAlISTogjFqtlk0k9yQ7SorTSWqgElU7hqZpfBc5ErotyAZuYlffHvv4/vej42wDxWTRrRd3gIUE0bvabn50mePPcVLn9HmEdsXEwRPyAvCnH4Jnjo3HctQ5CKH0=
+	t=1725988829; cv=none; b=tWTcOoxgOyNnzHrAqyvALfswedPWvh6qLxj5XlYWnls63JQ19yNbzD8xbKg1UPHcZRn9d1PbPo3vBqy22uvAVgkeQykPxvbmJ86ghCIPzZQrLMV5n6m93xYIXWg6JNdPn+9nEsp/TxW5XGUGgR2AaFcdWsJDr9iNtwS/v+XDs1A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725988544; c=relaxed/simple;
-	bh=cciAGwr6AOyIXgxx/NJC0frSUvK3iv1I4zhWUP9vrT8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=HJXKqXOuRHj4BI1zejUPw2W94wkGSd7v3DxqfXeuSTzQcJurCDkk+1ARlVBy2qCVrG7sZAb1AKKxahZq0Y/9Ag1dWurOKhFvtTU8M8eZ3oe7yYXW0FgK6Qs6QDvE56htWICFzikzaXii0vr/LRx2U8NcqBOZXF5EUgJLxRrN590=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1so4So-0005Cp-Mq
-	for netdev@vger.kernel.org; Tue, 10 Sep 2024 19:15:38 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1so4So-006wUK-44
-	for netdev@vger.kernel.org; Tue, 10 Sep 2024 19:15:38 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id CBCE2337A3F
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 17:15:37 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id E26D1337A1C;
-	Tue, 10 Sep 2024 17:15:34 +0000 (UTC)
-Received: from [172.20.34.65] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 0ac342a2;
-	Tue, 10 Sep 2024 17:15:34 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Tue, 10 Sep 2024 19:15:29 +0200
-Subject: [PATCH can v3 2/2] can: m_can: m_can_close(): stop clocks after
- device has been shut down
+	s=arc-20240116; t=1725988829; c=relaxed/simple;
+	bh=vcyFLnkvkzznCnm5LV7YtX/JXny9Ysa/px35H5yc/ik=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=s5dabkpzgDD5ar69w+FB52/KFOBq7DnDeKcZjYuoshZSiHc6ctt/LYemSCxLfDVGhtPJbOC0CxrdteuuXbp+21q4JOuHX4tbwOQmbx2FaMmxVopV+stWHqFjQIWbiMt2GZgRtQDVr85MOidKzY4xRtvldIlVnjL6m6mWt9THG20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lUKkbX3r; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 58A31C0006;
+	Tue, 10 Sep 2024 17:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725988824;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Ch6z1tjobzI++fJXbYA525eKQI+H40wH6oOlBG7IOc=;
+	b=lUKkbX3rbHq1e4tO1l0fOwoRZXIt/PkRz0pR5KPautsjwVgzUwmxgKIhykoNZVTg4GCGkf
+	uvBZZ/E2vfQNih9denOi5GN3XL/bHcdUjK9k5QVUscTl/t3G7IyrT++rvxZh092ZsYAaa+
+	SVnjd/MynHtbdqNhXn9IXRWfM/zNuLg2vOWpipNXKT23Pfy32l4by+xIyYCI4GLncHhVkR
+	rjrR5LwOBUsTJ7iq/nCOCRMkby3uVUQVITJ7zCdpYeP/r6X6o92aciYBzOClvnoNFuiwJm
+	zDmy4WZ7nw9NSI/sx9m5TuAlvJJvVx7lcdKQ8XC8aVuLJyvhO/v7o8yOGaN5Mg==
+Date: Tue, 10 Sep 2024 19:20:20 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
+ <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Nathan Chancellor <nathan@kernel.org>, Antoine Tenart
+ <atenart@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>, Dan Carpenter
+ <dan.carpenter@linaro.org>, Romain Gantois <romain.gantois@bootlin.com>
+Subject: Re: [PATCH net-next v18 07/13] net: ethtool: Introduce a command to
+ list PHYs on an interface
+Message-ID: <20240910192020.5ab9cd16@fedora.home>
+In-Reply-To: <CANn89iLQYsyADrdW04PpuxEdAEhBkVQm+uVV8=CDmX_Fswdvrw@mail.gmail.com>
+References: <20240821151009.1681151-1-maxime.chevallier@bootlin.com>
+	<20240821151009.1681151-8-maxime.chevallier@bootlin.com>
+	<CANn89iLQYsyADrdW04PpuxEdAEhBkVQm+uVV8=CDmX_Fswdvrw@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240910-can-m_can-fix-ifup-v3-2-6c1720ba45ce@pengutronix.de>
-References: <20240910-can-m_can-fix-ifup-v3-0-6c1720ba45ce@pengutronix.de>
-In-Reply-To: <20240910-can-m_can-fix-ifup-v3-0-6c1720ba45ce@pengutronix.de>
-To: Jake Hamby <Jake.Hamby@Teledyne.com>, 
- Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Dong Aisheng <b29396@freescale.com>, Varka Bhadram <varkabhadram@gmail.com>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.15-dev-88a27
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1299; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=cciAGwr6AOyIXgxx/NJC0frSUvK3iv1I4zhWUP9vrT8=;
- b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBm4H60AP5jFx/sHn8bOrTBsvMXnGQVlLW/73fY0
- MLqNgvB1bCJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZuB+tAAKCRAoOKI+ei28
- b9ZlB/0a5BccL7/BgOb/9Syvsph1JvVwUVKfb5/2GSXfsVelmcuXKZxXSxPM8tF2SrYbU58DLfl
- 69OuingQZbMlooZ3zQlGiVoPWU/hc+xoTG7EZCJxcYg+T43RzGy9j6Gd7iPDjEi06iY0p7rvHIW
- Hz6k+ux6d+/DY/dui8OQeAXcUDDcTjhrP4AGaIsxiE5A03XqbqKdyW9cnXvrwR9obw/PkH8BQgY
- hQQaklqE/pwwjmjq7lA0NfJKwiyD7imng+tRuJUwVFYGLDrOulmsrPto2Sx1V5zLc0Zmq6bH4cN
- 4oiGqRix8W4LHM1tknI/3MfF5sWv9j9xvdIPWOWucvERAEit
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-After calling m_can_stop() an interrupt may be pending or NAPI might
-still be executed. This means the driver might still touch registers
-of the IP core after the clocks have been disabled. This is not good
-practice and might lead to aborts depending on the SoC integration.
+Hello Eric,
 
-To avoid these potential problems, make m_can_close() symmetric to
-m_can_open(), i.e. stop the clocks at the end, right before shutting
-down the transceiver.
+On Tue, 10 Sep 2024 18:41:03 +0200
+Eric Dumazet <edumazet@google.com> wrote:
 
-Fixes: e0d1f4816f2a ("can: m_can: add Bosch M_CAN controller support")
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/m_can/m_can.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> > +int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info)
+> > +{
+> > +       struct phy_req_info req_info = {};
+> > +       struct nlattr **tb = info->attrs;
+> > +       struct sk_buff *rskb;
+> > +       void *reply_payload;
+> > +       int reply_len;
+> > +       int ret;
+> > +
+> > +       ret = ethnl_parse_header_dev_get(&req_info.base,
+> > +                                        tb[ETHTOOL_A_PHY_HEADER],
+> > +                                        genl_info_net(info), info->extack,
+> > +                                        true);
+> > +       if (ret < 0)
+> > +               return ret;
+> > +
+> > +       rtnl_lock();
+> > +
+> > +       ret = ethnl_phy_parse_request(&req_info.base, tb, info->extack);
+> > +       if (ret < 0)
+> > +               goto err_unlock_rtnl;
+> > +
+> > +       /* No PHY, return early */  
+> 
+> I got a syzbot report here.
 
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index c1a07013433eb7b863eee072b959f46c1d5b008d..7fec04b024d5b83eece7a0b9c70a1352ee05138a 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -1764,7 +1764,6 @@ static int m_can_close(struct net_device *dev)
- 	netif_stop_queue(dev);
- 
- 	m_can_stop(dev);
--	m_can_clk_stop(cdev);
- 	free_irq(dev->irq, dev);
- 
- 	m_can_clean(dev);
-@@ -1779,6 +1778,7 @@ static int m_can_close(struct net_device *dev)
- 
- 	close_candev(dev);
- 
-+	m_can_clk_stop(cdev);
- 	phy_power_off(cdev->transceiver);
- 
- 	return 0;
+I seem to have missed the report, sorry about that.
 
--- 
-2.45.2
+> 
+> Should we fix this with :
+> 
+> diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
+> index 560dd039c6625ac0925a0f28c14ce77cf768b6a5..4ef7c6e32d1087dc71acb467f9cd2ab8faf4dc39
+> 100644
+> --- a/net/ethtool/phy.c
+> +++ b/net/ethtool/phy.c
+> @@ -164,7 +164,7 @@ int ethnl_phy_doit(struct sk_buff *skb, struct
+> genl_info *info)
+>                 goto err_unlock_rtnl;
+> 
+>         /* No PHY, return early */
+> -       if (!req_info.pdn->phy)
+> +       if (!req_info.pdn)
+>                 goto err_unlock_rtnl;
+> 
+>         ret = ethnl_phy_reply_size(&req_info.base, info->extack);
+> 
+> 
 
+Indeed that's the correct fix. Should I send it ? ( including
+suggested-by/reported-by )
 
+Thanks,
+
+Maxime
 
