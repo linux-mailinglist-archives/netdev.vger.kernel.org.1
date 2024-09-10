@@ -1,99 +1,83 @@
-Return-Path: <netdev+bounces-126852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 204E7972ADC
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:33:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67975972AE2
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:35:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC2D8286B9A
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:33:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 140F7286511
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577D517DFFB;
-	Tue, 10 Sep 2024 07:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1030617DE2D;
+	Tue, 10 Sep 2024 07:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="f8eRsMDi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F+LltnAv"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38CAF17D36A;
-	Tue, 10 Sep 2024 07:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D337817C231;
+	Tue, 10 Sep 2024 07:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725953586; cv=none; b=Ui78YaEQhVmNHftazQbjDxhAmiH7abnDF/AVCNAlvYq8G4fheUJgL5U+P4FG/SvB3soSqLj59L189cEQb0SEg4bC3gWRrSkLdUfM1GZrwd6INzZ+w67pgUxCR4hF0kyeyIXoyNwv/q6NDrWoAiRva3pGZcJdQXVnL6geXt2PrZA=
+	t=1725953744; cv=none; b=W1RqRqspp+DjRepAwQ2wRMzyp3Fg1Q6iHYXcf78WM2ebYsX8bFP4iMGSVLjW14BezKE7cfgccsOEIChLfHggwX1FcxSpsSAeMZH68msLFnP9qqA7ytZTKshQgDlC+TnXsopWOQn5hvQ0jWqq9gKYynHVveldFA9PVuI7er7UjCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725953586; c=relaxed/simple;
-	bh=nxWRbMPcPT8DxZ6rLJCDCedHg5P5qBOshhja50/iaqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TdfOGXuWkzrMlF/bv2X78+7mfEeK13BwCYCHOWRn17gt9jmPwjBoM46/wWzUMA8UL4g6AK0KCTS9Y0LPKsPnEsTnP3Q3R2hSG2w9DYJuhd8f7b5GnFKg2w99fzFRp8r2c4SolfRxy6N5s+ul+7fCVfNCt/YZGVKDQWPq/+kJVYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=f8eRsMDi; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 24A621C0003;
-	Tue, 10 Sep 2024 07:32:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1725953581;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nxWRbMPcPT8DxZ6rLJCDCedHg5P5qBOshhja50/iaqM=;
-	b=f8eRsMDi3Xe49ZZwYx8gG1NtFsh6+O/22ApWQbL8NWdeX3tLXgwETdKiXt2rysY4RQi4lD
-	C13r7LSjg+9dQNQWFHWcdGsF8sSw4p0K52qyIp0e0M0sQ5WP2QPeoc+FigcYAM48u3ILdF
-	tYaF3zIoxOUOKXjo9sJ5arT5d8mdhW0ENBmmbDugA7eYYVCSivO4tL8X8R3cNxN7GNc9fF
-	AZ44I2znp1F9tcmYCnmKWfHFvRsK9ru5/ufu0SKC4HJZzLGauRcOU4/tnW0b7pXODzxEBo
-	z68W6zJvIbYwO9wU9EQ4B+EUN6kGL3fyt7SB5/LEk0JOh1F2u+GJKloNxriDvQ==
-Date: Tue, 10 Sep 2024 09:32:58 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
- <pabeni@redhat.com>, <claudiu.manoil@nxp.com>, <vladimir.oltean@nxp.com>,
- <louis.peens@corigine.com>, <stefan@datenfreihafen.org>,
- <alex.aring@gmail.com>, <chunkeey@googlemail.com>, <kvalo@kernel.org>,
- <briannorris@chromium.org>, <francesco@dolcini.it>,
- <set_pte_at@outlook.com>, <damien.lemoal@opensource.wdc.com>,
- <mpe@ellerman.id.au>, <horms@kernel.org>, <yinjun.zhang@corigine.com>,
- <fei.qin@corigine.com>, <johannes.berg@intel.com>,
- <ryno.swart@corigine.com>, <krzysztof.kozlowski@linaro.org>,
- <leitao@debian.org>, <liuxuenetmail@gmail.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <oss-drivers@corigine.com>,
- <linux-wpan@vger.kernel.org>, <linux-wireless@vger.kernel.org>
-Subject: Re: [PATCH 4/7] net: ieee802154: mcr20a: Use IRQF_NO_AUTOEN flag in
- request_irq()
-Message-ID: <20240910093258.358a6d85@xps-13>
-In-Reply-To: <20240909133034.1296930-5-ruanjinjie@huawei.com>
-References: <20240909133034.1296930-1-ruanjinjie@huawei.com>
-	<20240909133034.1296930-5-ruanjinjie@huawei.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1725953744; c=relaxed/simple;
+	bh=mr8XvHNsiLz95NPj4gzHNsXQjjy6cU6eIPrWByINPBI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=shkDVMF+ysXCF67T1cmoCb6ZCEbdtUsElF6iYDO8VKsRWk+nJhNi7OnBO0ey8pP0CNSD+WHrWOVE17R8Ac5nQhvY6sPpAGAnufWWlWqEedwRWI3TdsuqyjOXVY0Yzbpg7aSHJcKkUbWR9Y9pnsNbfh7cU/TUZYjmZZvBnVf37Fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F+LltnAv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46480C4CEC3;
+	Tue, 10 Sep 2024 07:35:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725953744;
+	bh=mr8XvHNsiLz95NPj4gzHNsXQjjy6cU6eIPrWByINPBI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=F+LltnAvFPIXt3RyLBcWL89DQOVgII2wPBcJ0bZsZcDXBSiOvSKq6Zs+YYN7ywkAH
+	 44vXRD1iskOjHh0FlDRzLNtoMcWY4pCR99Co/PiuBxYoq8twiP75CnXo43noW+cCy2
+	 z+GugpL3ETW/JweHSv1WARuibugQ9lUqrhADeVR2LhShsVbFN2X3+TMJiPjsb3cazf
+	 vs7RO3YyL9iXla6oBlyhaT1moplymnUONutumhYg5RpAscysiiO58DvpF08BJBL5mk
+	 I6VCCesiKllsqYr7qDEuhK89ZvNi+hmjTf7xYQEFngcEDVDav6XHz5eKTSFjInBtpc
+	 bB2ennlka90DA==
+Date: Tue, 10 Sep 2024 08:35:40 +0100
+From: Simon Horman <horms@kernel.org>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: Justin Lai <justinlai0215@realtek.com>,
+	Larry Chiu <larry.chiu@realtek.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] rtase: Fix spelling mistake: "tx_underun" ->
+ "tx_underrun"
+Message-ID: <20240910073540.GB525413@kernel.org>
+References: <20240909134612.63912-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240909134612.63912-1-colin.i.king@gmail.com>
 
-Hi Jinjie,
+On Mon, Sep 09, 2024 at 02:46:12PM +0100, Colin Ian King wrote:
+> There is a spelling mistake in the struct field tx_underun, rename
+> it to tx_underrun.
+> 
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
-ruanjinjie@huawei.com wrote on Mon, 9 Sep 2024 21:30:31 +0800:
+Thanks Colin,
 
-> disable_irq() after request_irq() still has a time gap in which
-> interrupts can come. request_irq() with IRQF_NO_AUTOEN flag will
-> disable IRQ auto-enable when request IRQ.
->=20
-> Fixes: 8c6ad9cc5157 ("ieee802154: Add NXP MCR20A IEEE 802.15.4 transceive=
-r driver")
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+I've confirmed that this addresses all instances of this problem
+in this driver. Thanks for also sending a patch for the same problem
+in the r8169 driver [1].
 
-This one could go through wpan(-next), but otherwise:
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
-Thanks,
-Miqu=C3=A8l
+[1] https://lore.kernel.org/all/20240909140021.64884-1-colin.i.king@gmail.com/
 
