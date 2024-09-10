@@ -1,170 +1,86 @@
-Return-Path: <netdev+bounces-127018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDA2D973A81
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:50:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA290973A89
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:50:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72F1A1F23ADF
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:50:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2751F1C24C09
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E86D193085;
-	Tue, 10 Sep 2024 14:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4831419412D;
+	Tue, 10 Sep 2024 14:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QRfobcFL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjBNvC/n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5940D15FA7E;
-	Tue, 10 Sep 2024 14:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC9C136E2E;
+	Tue, 10 Sep 2024 14:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725979763; cv=none; b=HhCt5Ngafp2Yhw0ak107wMoJlRYsoHtRG9BXckYhWRRmQHx39sapHad5JWXWz9Ev1gv7eafpmSGdelOyqNgCwKHTlLY6LOw7Une4UolLHkAaXHSOBMCL6JZlGW/DFuCl9fKaPatl8w53UGydoBLg+rwhGy6ThnV2s58CAmGDDZA=
+	t=1725979812; cv=none; b=rIazh6YiqxubImCoqwWOEmDTi5mhoYAaryJgu1vxBQ5nAUIpyQq1hhq4k6BUexoQxg8bSdMBgYAi3BkBeOvYPqPfCTUv1qsIGZkCGQhRI2Ie76V6+DXx/04T2M8XgSCQJHUqQT7/ROWLi/AUOkBDB7qjBgPwswhb6B6Ec93nz2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725979763; c=relaxed/simple;
-	bh=XWaMFbokrzRtCfofNCMQm6vxq7D5SaoYO1/HXlHXoUM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jz8ceQsfZ+z88AZBxNXHa863r3KaSaxTLTeFX8ebhhiY27UnVqdOR9b55Ox/QHdt3++kSpdhCRiphukjC4OxrIFG5GPpQCr5OVlgJwZJeCOxljwGXFN+boSROkFPFV2mx0pR9ey9K9yQSBCsqVKDqXy7I2tpBGARxnWD5ilhPoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QRfobcFL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DD40C4CEC3;
-	Tue, 10 Sep 2024 14:49:19 +0000 (UTC)
+	s=arc-20240116; t=1725979812; c=relaxed/simple;
+	bh=pkQXUEWeHR9vW2l3JN7yFeIl2jLgAIAgmoQiMK44X7s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KMHAwP64AoyY2do4tpmdY31ZwLpMIv43lStWVQp1AwvzvoI30fk0UNN8RnN2gWjR5CrPfi6H9oc/1iMMe22KrYA5d/U6Ceo82Ng9iFC88PMuhkQeCCy3OqoCvMeP6xJCpuQGqEst8nET3U9sF1e57O8mOgzwdUC83d1MJItEad0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjBNvC/n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2071C4CEC3;
+	Tue, 10 Sep 2024 14:50:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725979762;
-	bh=XWaMFbokrzRtCfofNCMQm6vxq7D5SaoYO1/HXlHXoUM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QRfobcFLI9GtjTDx7WiDr9f548doOS/YbQvR5TiY3pchFbRnIlg/d8YKaZdnnrCvj
-	 j3v4tLK+rgkX9UauqoOD7JZsmoIg6TB7FmxJt4c858Y0Vo7zC/o4OYwSlgT7geuJhW
-	 WbS695wKRRyPhcgvR0C6wHTje4nbOEvzBeVMWWO7mj1lSqIACq1Kwn+6uywbXU2G5j
-	 H2Ic6oeXSBSxbuk6tTm0VJgzIZvHd6nCtLei5SwShTbZn/b4975VTM4GHQLJgda00a
-	 mPwx57gkmqy8kWnvGeH9mBaN/Qpt4pYnnPx8nuH+FTJ0B/5JSzkdtlxGCWlVKlJhxC
-	 6jzjuoET8e/yA==
-Message-ID: <ee565fda-b230-4fb3-8122-e0a9248ef1d1@kernel.org>
-Date: Tue, 10 Sep 2024 16:49:18 +0200
+	s=k20201202; t=1725979811;
+	bh=pkQXUEWeHR9vW2l3JN7yFeIl2jLgAIAgmoQiMK44X7s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SjBNvC/nbUUnS4l+lLivYhQmVTE2OU3gyKSXPUfltk8veQkrXLsjZiNE99Qq/oOE1
+	 kdKlKVMrOp+OY1sfv8QGGuy/NfI0lNOYMoGShOE8mtXLcoQGfjV9SkaZA9uaB/Asue
+	 hOUgIZYDhadZVQZ3ePkqqTKUXX+MLAWbKz7zWnsBIbcc9rlAnRbwOHVrAcRaHfj2y4
+	 dw9ELzupdklmfyP3t4jX3Ae/vRHNIThLbQITCxIzYcAHcu1wG/rgZZ1hBUyitnVQY5
+	 T8SantBX9r2lPBw87BDTcbv1CWoAteh2Y3nSs5tIMgaq9ORzS8p77qfHhuGYjpJ0D6
+	 bvTXfRZ609ZcQ==
+Date: Tue, 10 Sep 2024 15:50:06 +0100
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, Matthew Wood <thepacketgeek@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	davej@codemonkey.org.uk, vlad.wing@gmail.com, max@kutsevol.com
+Subject: Re: [PATCH net-next v3 10/10] net: netconsole: fix wrong warning
+Message-ID: <20240910145006.GE572255@kernel.org>
+References: <20240910100410.2690012-1-leitao@debian.org>
+ <20240910100410.2690012-11-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Regression v6.11 booting cannot mount harddisks (xfs)
-To: Damien Le Moal <dlemoal@kernel.org>,
- Linus Torvalds <torvalds@linuxfoundation.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: Netdev <netdev@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
- linux-ide@vger.kernel.org, cassel@kernel.org, handan.babu@oracle.com,
- djwong@kernel.org, Linux-XFS <linux-xfs@vger.kernel.org>,
- hdegoede@redhat.com, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, kernel-team <kernel-team@cloudflare.com>
-References: <0a43155c-b56d-4f85-bb46-dce2a4e5af59@kernel.org>
- <d2c82922-675e-470f-a4d3-d24c4aecf2e8@kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <d2c82922-675e-470f-a4d3-d24c4aecf2e8@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240910100410.2690012-11-leitao@debian.org>
 
-
-
-On 10/09/2024 15.06, Damien Le Moal wrote:
-> On 2024/09/10 21:19, Jesper Dangaard Brouer wrote:
->> Hi Linus,
->>
->> My testlab kernel devel server isn't booting correctly on v6.11 branches
->> (e.g. net-next at 6.11.0-rc5)
->> I just confirmed this also happens on your tree tag: v6.11-rc7.
->>
->> The symptom/issue is that harddisk dev names (e.g /dev/sda, /dev/sdb,
->> /dev/sdc) gets reordered.  I switched /etc/fstab to use UUID's instead
->> (which boots on v6.10) but on 6.11 it still cannot mount harddisks and
->> doesn't fully boot.
+On Tue, Sep 10, 2024 at 03:04:05AM -0700, Breno Leitao wrote:
+> A warning is triggered when there is insufficient space in the buffer
+> for userdata. However, this is not an issue since userdata will be sent
+> in the next iteration.
 > 
-> Parallel SCSI device scanning has been around for a long time... This is
-> controlled with CONFIG_SCSI_SCAN_ASYNC. And yes, that can cause disk names to
-> change, which is why it is never a good idea to rely on them but instead use
-> /dev/disk/by-* names. Disabling CONFIG_SCSI_SCAN_ASYNC will likely not guarantee
-> that disk names will be constant, given that you seem to have 2 AHCI adapters on
-> your host and PCI device scanning is done in parallel.
+> Current warning message:
 > 
->> E.g. errors:
->>     systemd[1]: Expecting device
->> dev-disk-by\x2duuid-0c2b348d\x2de013\x2d482b\x2da91c\x2d029640ec427a.device
->> - /dev/disk/by-uuid/0c2b348d-e013-482b-a91c-029640ec42
->> 7a...
->>     [DEPEND] Dependency failed for var-lib.mount - /var/lib.
->>     [...]
->>     [ TIME ] Timed out waiting for device
->> dev-d…499e46-b40d-4067-afd4-5f6ad09fcff2.
->>     [DEPEND] Dependency failed for boot.mount - /boot.
->>
->> That corresponds to fstab's:
->>    - UUID=8b499e46-b40d-4067-afd4-5f6ad09fcff2 /boot     xfs defaults 0 0
->>    - UUID=0c2b348d-e013-482b-a91c-029640ec427a /var/lib/ xfs defaults 0 0
->>
->> It looks like disk controller initialization happens in *parallel* on
->> these newer kernels as dmesg shows init printk's overlapping:
->>
->>    [    5.683393] scsi 5:0:0:0: Direct-Access     ATA      SAMSUNG
->> MZ7KM120 003Q PQ: 0 ANSI: 5
->>    [    5.683641] scsi 7:0:0:0: Direct-Access     ATA      SAMSUNG
->> MZ7KM120 003Q PQ: 0 ANSI: 5
->>    [    5.683797] scsi 8:0:0:0: Direct-Access     ATA      Samsung SSD
->> 840  BB0Q PQ: 0 ANSI: 5
->>    [...]
->>    [    7.057376] sd 5:0:0:0: [sda] 234441648 512-byte logical blocks:
->> (120 GB/112 GiB)
->>    [    7.062279] sd 7:0:0:0: [sdb] 234441648 512-byte logical blocks:
->> (120 GB/112 GiB)
->>    [    7.070628] sd 5:0:0:0: [sda] Write Protect is off
->>    [    7.070701] sd 8:0:0:0: [sdc] 488397168 512-byte logical blocks:
->> (250 GB/233 GiB)
->>
->> Perhaps this could be a hint to what changed?
+>     ------------[ cut here ]------------
+>      WARNING: CPU: 13 PID: 3013042 at drivers/net/netconsole.c:1122 write_ext_msg+0x3b6/0x3d0
+>       ? write_ext_msg+0x3b6/0x3d0
+>       console_flush_all+0x1e9/0x330
 > 
-> See above. The disk /dev/sdX names not being reliable is rather normal.
-> Are you sure you have the correct UUIDs of your FSes on the disks ? You can
-> check them with "blkid /dev/sdX[n]"
+> The code incorrectly issues a warning when this_chunk is zero, which is
+> a valid scenario. The warning should only be triggered when this_chunk
+> is negative.
 > 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Fixes: 1ec9daf95093 ("net: netconsole: append userdata to fragmented netconsole messages")
 
-I have checked that I use the correct UUIDs.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-I checked my /etc/fstab have the UUID entries under /dev/disk/by-uuid/
-via this oneliner, which needs to have a /etc/fstab entry under each
-UUID. We can see I have one partition that I'm not using
-(0fd3bc38-6496-401f-87f2-87e09532de53), which is expected.
-
-$ for UUID in $(ls /dev/disk/by-uuid/); do echo $UUID; grep -H $UUID 
-/etc/fstab; done
-09e8c15f-80d2-47e3-8e73-d3fdfcf33eef
-/etc/fstab:UUID=09e8c15f-80d2-47e3-8e73-d3fdfcf33eef / 
-     xfs     defaults        0 0
-0c2b348d-e013-482b-a91c-029640ec427a
-/etc/fstab:UUID=0c2b348d-e013-482b-a91c-029640ec427a	/var/lib/		xfs 
-defaults 0 0
-0fd3bc38-6496-401f-87f2-87e09532de53
-581920da-1ccb-4b25-856c-036310032a74
-/etc/fstab:UUID=581920da-1ccb-4b25-856c-036310032a74	/nix			xfs	defaults 0 0
-8b499e46-b40d-4067-afd4-5f6ad09fcff2
-/etc/fstab:UUID=8b499e46-b40d-4067-afd4-5f6ad09fcff2 /boot 
-     xfs     defaults        0 0
-cd409a50-0371-47ca-9213-49a2bc7b9317
-/etc/fstab:UUID=cd409a50-0371-47ca-9213-49a2bc7b9317 swap 
-     swap    defaults        0 0
-
-
->> Any hints what commit I should try to test revert?
->> Or good starting point for bisecting?
-> 
-> You said that 6.10 works, so maybe start from there ?
-
-I tested I could boot tag v6.10, and have started bisection.
-
-I've not tried to deselect CONFIG_SCSI_SCAN_ASYNC as the kernel that
-worked on tag v6.10 also had this CONFIG_SCSI_SCAN_ASYNC enabled. So, it
-is likely not related to the async controller init.
-
---Jesper
 
