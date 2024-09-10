@@ -1,43 +1,52 @@
-Return-Path: <netdev+bounces-126840-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD5D9972A4A
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:10:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F2F972A57
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:15:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2958C283816
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:10:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 780AF1C24193
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277C917BB1A;
-	Tue, 10 Sep 2024 07:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7E717C20F;
+	Tue, 10 Sep 2024 07:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="T2k9wACp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321C613A242
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 07:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4914555884;
+	Tue, 10 Sep 2024 07:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725952237; cv=none; b=aENvCyHutk79S8K1vdB48gFHFeypsyjSPZKy6oP6bt0M3uTyNiOzqzHmaF+zsUNQ5ahiNMzYhXfJN2jXW/9Z5HpC12scKdWeSc0ofPxm35J6ttrf/8V9JoLiohtjlRFIGahTFiA3Gu/Vd3i6yJFJGZ6K+5gHoWEuNvqgVuaQkrg=
+	t=1725952533; cv=none; b=rwBIroHNkufdbV1p9lu3PAFAsMk1qXSrtCds/a3f7k2huW2hGqXYbUcxIIAtuKaVJqimrz5zO99sC8Xrt9vsb0z8p2v6uSSUIofj2+mEw69M5DzVQKP0jyMr45DLi7GctwBcv7q4Yw6iYKVTibct0Yr/9p2stdGpRY/kHhEsmsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725952237; c=relaxed/simple;
-	bh=pZCljvw97/rZNI8yaSH090YkIecfoC8uFHFATXJANM4=;
+	s=arc-20240116; t=1725952533; c=relaxed/simple;
+	bh=LVH6SKkK3cR6F01hpn7fuEDkydoETs1y5yzB1IbWltg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bfnq+fHYZYUfJPwNg7TuPM5OUQv1a5oOQxL7DTV0m4T9ENCfSQd9fULBREyfcWzXOMTdXo2/VLSTuRfFpxeOs6T6gRkk2pJGT6I3jYO4nyANtGx8TMi6VwJGmvAJX7jXQkwOGc6frSku2cyvNskcBWGuoK4pgyhYwmx2DTc1oVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.12.127] (g127.RadioFreeInternet.molgen.mpg.de [141.14.12.127])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 20F1561E5FE05;
-	Tue, 10 Sep 2024 09:09:38 +0200 (CEST)
-Message-ID: <09022c4f-37bf-4119-bf64-87e82af3673e@molgen.mpg.de>
-Date: Tue, 10 Sep 2024 09:09:37 +0200
+	 In-Reply-To:Content-Type; b=LqX61u4ZKJZXeyxjhsjLliD/iwCNQnuYXf6z5FSmsJMsv9JrZTFinelPL1irQ7XYTwMdxUkABgU9afSNrTtRVMUXgARQgw786DvS9AtLN7BOIKDzOEnLwuD1UZK0wcB4cZKKaL6mrYsC0Ptnbtntue0gddOd1PpKl3FQLchP/ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=T2k9wACp; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DCAD160002;
+	Tue, 10 Sep 2024 07:15:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725952528;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rQ60DBGOv0B3Rr4ZO4jWbLjG2NSGTwvc1sph6GoxX64=;
+	b=T2k9wACpNqFS6Y/LfZX/9lL19y7XpkmY0D8tW4yduHEuaZ3YAJjb54VlFkNWF5h8NqCKk5
+	oCDMJEO+gwOWuU8n0VllVqzrkZvV6DDVAUvIwKlq06W/wJqpPPliXIM4fXHWhyeeQQDq/U
+	LzcCH/h7rTaOsw4+H6hWkSD0UEawycl4dC2YbLvoA0P85Q3r0ZXU07DImr9EFrTiXjSLtK
+	xq0TpVOylr0h8eg9dCjktJ6bBOxFq7gI4QRRltNDefDeVnoMLf10ZRD1DGESjNZ3wGICqm
+	HWhFpE8UvoOozxGsCVGsRS+qtX+tj+5z6lUwjJOFybc5ANvFCbCZaKsoPgURSQ==
+Message-ID: <b5814f3f-d262-4577-834c-a48bbcc8d005@bootlin.com>
+Date: Tue, 10 Sep 2024 09:15:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,66 +54,82 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v7 net-next 01/15] genetlink: extend
- info user-storage to match NL cb ctx
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Donald Hunter <donald.hunter@gmail.com>,
- John Fastabend <john.fastabend@gmail.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, edumazet@google.com,
- Madhu Chittim <madhu.chittim@intel.com>, anthony.l.nguyen@intel.com,
- Simon Horman <horms@kernel.org>, przemyslaw.kitszel@intel.com,
- Jakub Kicinski <kuba@kernel.org>, intel-wired-lan@lists.osuosl.org,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>
-References: <cover.1725919039.git.pabeni@redhat.com>
- <4bd304768d7ef1fdee5033b8fe1788092ac0af38.1725919039.git.pabeni@redhat.com>
+Subject: Re: [PATCH bpf-next] selftests/bpf: convert test_xdp_features.sh to
+ test_progs
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, ebpf@linuxfoundation.org,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+References: <20240909-convert_xdp_tests-v1-1-925be5fbee3c@bootlin.com>
+ <20240909231800.72b6b328@fedora.home>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
 Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <4bd304768d7ef1fdee5033b8fe1788092ac0af38.1725919039.git.pabeni@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20240909231800.72b6b328@fedora.home>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-Dear Paolo,
+Hey Maxime,
 
-
-Thank you for your patch.
-
-Am 10.09.24 um 00:09 schrieb Paolo Abeni:
-> This allows a more uniform implementation of non-dump and dump
-> operations, and will be used later in the series to avoid some
-> per-operation allocation.
+On 9/9/24 23:18, Maxime Chevallier wrote:
+> Hi Alexis,
 > 
-> Additionally rename the NL_ASSERT_DUMP_CTX_FITS macro, to
-> fit a more extended usage.
+> On Mon, 09 Sep 2024 22:02:07 +0200
+> Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com> wrote:
 
-Should a resent be necessary, you could also mention the new name 
-`NL_ASSERT_CTX_FITS` in the commit message. (Maybe even a separate 
-commit, so the actual change is easier to review.)
+[...]
 
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->   drivers/net/vxlan/vxlan_mdb.c        | 2 +-
->   include/linux/netlink.h              | 5 +++--
->   include/net/genetlink.h              | 8 ++++++--
->   net/core/netdev-genl.c               | 2 +-
->   net/core/rtnetlink.c                 | 2 +-
->   net/devlink/devl_internal.h          | 2 +-
->   net/ethtool/rss.c                    | 2 +-
->   net/netfilter/nf_conntrack_netlink.c | 2 +-
->   net/netlink/genetlink.c              | 4 ++--
->   9 files changed, 17 insertions(+), 12 deletions(-)
+>> +static void *run_dut_echo_thread(void *arg)
+>> +{
+>> +	struct test_data *t = (struct test_data *)arg;
+>> +	__u32 magic;
+>> +
+>> +	while (!t->quit_dut_echo_thread) {
+>> +		struct sockaddr_storage addr;
+>> +		socklen_t addrlen;
+>> +		size_t n;
+>> +
+>> +		n = recvfrom(t->echo_server_sock, &magic, sizeof(magic),
+>> +			     MSG_WAITALL, (struct sockaddr *)&addr, &addrlen);
+>> +		if (n != sizeof(magic)) {
+>> +			usleep(LOOP_DELAY_US);
+>> +			continue;
+>> +		}
+>> +
+>> +		if (htonl(magic) != CMD_ECHO)
+>> +			continue;
+> 
+> Shouldn't it be ntohl here ? The former code used the ntohs helper for
+> that command, and you're sending the magic in send_echo_msg with a
+> htonl() so I guess here you might want to convert the value back to
+> host endianness.
 
-[…]
+You are right, silly mistake from me here :) That will be fixed in v2. I'll
+delay a bit before sending it to allow others to take a look at v1 too.
 
-With this:
+Thanks,
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Alexis
+> 
+> Thanks,
+> 
+> Maxime
+> 
 
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
-Kind regards,
-
-Paul
 
