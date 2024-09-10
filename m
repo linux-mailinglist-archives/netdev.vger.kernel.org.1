@@ -1,109 +1,111 @@
-Return-Path: <netdev+bounces-127038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A353973CAD
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:48:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72C2F973CBB
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:51:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04D72B273BB
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:48:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ECE8283B44
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA3F19EEC8;
-	Tue, 10 Sep 2024 15:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E37C19994D;
+	Tue, 10 Sep 2024 15:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2/hUACql";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5ZanlrMa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5N2uiM1"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE9A190046;
-	Tue, 10 Sep 2024 15:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33ED26A022;
+	Tue, 10 Sep 2024 15:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725983285; cv=none; b=TfXjlH9VnxbgfrWV9q+TrEzFmqiHRalaDH4IrUOKW6jPMEi/eMmG1B/6YHnXHF77VMqYnxOtx+Y8rhfmm0UYKSJrjHei7nN/xv+Nn3f/btEemjYE510aR8EqaEV84wtvddiZLUzwc/JOaYyqbwTE3QWsJ1scUDyxHVtD7mSrM0E=
+	t=1725983502; cv=none; b=HTcsxJOi12+dK0DUgfHi/WgecoU29wkndXheSOZ4JXiw7bjaiSSItwMhGnUfJ+LOAMt9FTJfZAywXEMTgA+O+L5MT8HUhgz4Rn7H8fViTeWvVxRvbr1WWPV185ZNPg+Z8UPgeLAsOOqn7AeH6evdJdxPVfg2aAN7L4doHMJ7vJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725983285; c=relaxed/simple;
-	bh=ShuX06qSymKQunBMk30eNESrrW3YZ/yxxr9pbVRfEYo=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=a6aUW5U+9g0aUC30wqNt2vKJrukAr4b6PT9Tsi68tH273HebSNbrgHxqpntDSm9UGNTnGsedfMUfpgAOQpDn7J+6Flg/d5/Pwws4LNW71C/6oSPBQxU3EjzceRdrKX6HgXOUg/oXuoGB0kOpJlgATh4UgzXIh5/SrfaA/wyTVI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2/hUACql; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5ZanlrMa; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1725983282;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SpAW1KO7SPjGxiD5ZFFTluIX7AWVdKtbH+RQpSycHwg=;
-	b=2/hUACqlNzUe2wkoG8sjKAuZbwsOzFw+6kEmlP6SzgBOEOSZh4LejWpw7S1VrpLeOf4gVd
-	nj8pnv42tEFtC53xNbAks7cs/aEtIeuAbmYtQTjMGMDWs+81s/ddAkXl2AWXJV/p8lJp7/
-	GsDGhoxknnFaSiM9WU5YufZ8XO72CDRxBFAumZmbIwOs8+qLbg5BcDjIINr7Qycxw4ahW2
-	XnRQ6XvkZkcR4QW0xoOmnOBozVkswKs3z0ibbzxyPl39Yn5c6llHIFSyQgppkUTM8kzyud
-	UDctPPn5Yd9w2cx9PoTtWqBjgbMFjH07+eqhGiFPh/Jy/MzaNniTbHIdKoT7KQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1725983282;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SpAW1KO7SPjGxiD5ZFFTluIX7AWVdKtbH+RQpSycHwg=;
-	b=5ZanlrMabloM0VSftqTeiAtQRaYdDEo61S6iNhba3dQXZPpAx6lDJdMOjhE/rmyJLiyXvG
-	1XKA3ItEnmtMX+Ag==
-To: Jinjie Ruan <ruanjinjie@huawei.com>, Richard Cochran
- <richardcochran@gmail.com>
-Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, anna-maria@linutronix.de,
- frederic@kernel.org, UNGLinuxDriver@microchip.com, mbenes@suse.cz,
- jstultz@google.com, andrew@lunn.ch, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next v3 1/2] posix-timers: Check timespec64 before call
- clock_set()
-In-Reply-To: <1cae2765-65cc-7dc5-8321-76c8b7ef1b8c@huawei.com>
-References: <20240909074124.964907-1-ruanjinjie@huawei.com>
- <20240909074124.964907-2-ruanjinjie@huawei.com>
- <Zt8SFUpFp7JDkNbM@hoboy.vegasvil.org>
- <f2c219c8-0765-6942-8495-b5acf3756fb1@huawei.com> <875xr3btou.ffs@tglx>
- <1cae2765-65cc-7dc5-8321-76c8b7ef1b8c@huawei.com>
-Date: Tue, 10 Sep 2024 17:48:02 +0200
-Message-ID: <87r09ra4st.ffs@tglx>
+	s=arc-20240116; t=1725983502; c=relaxed/simple;
+	bh=u+LUaZcmfiXGrPUKUlRbyxCTBqnb4HavaO+FbiBlV+A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=beOlJ+twIdPS2KHmz62wyPhrB+Hj4dSN0eDa5+t22ypzwAiBClvkUtBuJ2Yr81Jn6TPFvQj126osevvYsUnWi2C4G65a11D2Rx0zavcw1wamCWtpu6AzvEUeNSE31QRapealWwToTjjGfyfjEOiJDkeIiR8g3goeulG+4m5de44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5N2uiM1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE8C4C4CEC3;
+	Tue, 10 Sep 2024 15:51:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725983501;
+	bh=u+LUaZcmfiXGrPUKUlRbyxCTBqnb4HavaO+FbiBlV+A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=t5N2uiM1pWLNmDd5h0HKWfwfCVjfWQp+9QJG27mYdbRGl83FJ1gt6jlIzDbIyXQt/
+	 3DbT41hD7Axa7J4+BrsTqSQSK3vzw4Fb+1WdX+qvLwi0ASBpwsaBQVYOJ3o4nEAaJp
+	 EepiZmcfW9AW5CWMQqep36htQQrZiO4vE10Q1QgvyzTLpVSock/X8mdypIc9Dsc7BE
+	 1E2/wKRGg3pQqfY87+ge3T24b9BEvcNnyjBCynzBhQdYl7L0kQ+g+f7CMoKOR/7N5h
+	 dUkuebKd302kzNgTIs86SGrDrmKLMbZqLmBPZBR/nsKYa94FqEpSZACsrzIfkfaWfG
+	 5OZ/TodFS0MEg==
+Date: Tue, 10 Sep 2024 16:51:36 +0100
+From: Simon Horman <horms@kernel.org>
+To: Ayush Singh <ayush@beagleboard.org>
+Cc: d-gole@ti.com, lorforlinux@beagleboard.org, jkridner@beagleboard.org,
+	robertcnelson@beagleboard.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Tero Kristo <kristo@kernel.org>, Johan Hovold <johan@kernel.org>,
+	Alex Elder <elder@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	greybus-dev@lists.linaro.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v4 3/3] greybus: gb-beagleplay: Add firmware upload API
+Message-ID: <20240910155136.GH572255@kernel.org>
+References: <20240903-beagleplay_fw_upgrade-v4-0-526fc62204a7@beagleboard.org>
+ <20240903-beagleplay_fw_upgrade-v4-3-526fc62204a7@beagleboard.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240903-beagleplay_fw_upgrade-v4-3-526fc62204a7@beagleboard.org>
 
-On Tue, Sep 10 2024 at 20:30, Jinjie Ruan wrote:
-> On 2024/9/10 20:05, Thomas Gleixner wrote:
->> Can you please stop this handwaving and provide proper technical
->> arguments?
->> 
->> Why would PTP have less strict requirements than settimeofday()?
->
-> I checked all the PTP driver, most of them use timespec64_to_ns()
-> convert them to ns which already have a check, but the others not check
-> them, and lan743x_ptp check them differently and more, so i think this
-> is a minimum check.
+On Tue, Sep 03, 2024 at 03:02:20PM +0530, Ayush Singh wrote:
+> Register with firmware upload API to allow updating firmware on cc1352p7
+> without resorting to overlay for using the userspace flasher.
+> 
+> Communication with the bootloader can be moved out of gb-beagleplay
+> driver if required, but I am keeping it here since there are no
+> immediate plans to use the on-board cc1352p7 for anything other than
+> greybus (BeagleConnect Technology). Additionally, there do not seem to
+> any other devices using cc1352p7 or it's cousins as a co-processor.
+> 
+> Boot and Reset GPIOs are used to enable cc1352p7 bootloader backdoor for
+> flashing. The delays while starting bootloader are taken from the
+> userspace flasher since the technical specification does not provide
+> sufficient information regarding it.
+> 
+> Flashing is skipped in case we are trying to flash the same
+> image as the one that is currently present. This is determined by CRC32
+> calculation of the supplied firmware and Flash data.
+> 
+> We also do a CRC32 check after flashing to ensure that the firmware was
+> flashed properly.
+> 
+> Firmware size should be 704 KB.
+> 
+> Link: https://www.ti.com/lit/ug/swcu192/swcu192.pdf Ti CC1352p7 Tecnical Specification
 
-It does not matter at all what the PTP drivers do. What matters is what
-is correct and what not.
+nit: If you need to post a v5 for some other reason,
+     please consider updating the spelling of Technical
 
-What they do is actually wrong as they simply cut off an overly large
-value instead of rejecting it in the first place. That's not a check at
-all.
+> Link: https://openbeagle.org/beagleconnect/cc1352-flasher Userspace
+> Flasher
+> 
+> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
 
-The cutoff in timespec64_to_ns() is there to saturate the result instead
-of running into a multiplication overflow. That's correct for some use
-cases, but not a replacement for an actual useful range check.
-
-This is about correctness and correctness is not defined by what a bunch
-of drivers implement which are all a big copy & pasta orgy.
-
-Thanks,
-
-        tglx
+...
 
