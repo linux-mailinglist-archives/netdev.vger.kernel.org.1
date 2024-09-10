@@ -1,197 +1,116 @@
-Return-Path: <netdev+bounces-126991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDAD49738AD
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:31:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 182D89738FB
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:46:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EFC51F25EA4
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 13:31:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3EE6288300
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 13:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BA4192591;
-	Tue, 10 Sep 2024 13:31:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5EF19415E;
+	Tue, 10 Sep 2024 13:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TdzymwCa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwLlzpIi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339D61EB2F;
-	Tue, 10 Sep 2024 13:31:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38013194151
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 13:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725975065; cv=none; b=sbL4Q2wi7VtHkAPDNXYGewvvNM0b9HxnSLYEn05gNst5FXvVblx1U8p264ONP50S1/PmlPFk8JPoOooYh7hY7N2H8AE1JS3ba9tvoSbxg9OeYLfAQSFwPzdgj9vjewOnnGnYDXZzHR3oWGdmc4pYm9FWfKV7F+q5A8THpV+h964=
+	t=1725975895; cv=none; b=SasFF3nZf1zKG0eDdL7zb2iv+YUpp/lMLVPqHHcnTez+eeHV37mMhk2Jl/VwrV0sakkJgCveljiSG8oF1aSnjiKbQt1q/yPRQ2C9uBOOITD1NBf22d2B4W/j5Z6l2JXoOMrc+m5h2LEOdIb3AC596X0EQW7L0wWtYnj4WaGmYP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725975065; c=relaxed/simple;
-	bh=kRjHz7epwOUJHqWVRokIi0ie2XYhwI8RqMuyt+eJmDE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=loML1TIxO04aoG+Yw0lpYUKMwdHMmhjffcYQwSNaXM/3HD2JJDpiRav3hljFRYCWdyz8e6v1PY1lqVfVbFZ+1kUrntUlhGc5l8K/9heMMRDvqNI8RSUkGlb4LW7aJrHsF3wCKa49JnmW74qzaZ+qzagRvWkD7kxWDhltFE+nHhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TdzymwCa; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-7a9c3a4e809so50461585a.2;
-        Tue, 10 Sep 2024 06:31:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725975063; x=1726579863; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=vAs4JBrfNs6zZ0N76deFNoJwlS2JixdwwSmEsk3usgo=;
-        b=TdzymwCaVoEiCAael5l3khjvv48p5fBC/cqBrkFQ5ykzCUEmiC9TklwAMvYtkSG827
-         ao4FktDh0TArjRtjgNrbTvggKL3/eIx9Stzah36Ahf+BbVd/eIq/ZcjszN9jTjOBkdz5
-         RrXcjWXMpWsmC6b+YQBf/u2C2wFSyHQVZqKn+MAvumZmc047Tvo7pm12Fa+prszUMfd/
-         wJqewcHPQVEndCK4AJbHps+v9OwoVRaIkv4K4YyZuozHe/9jQDlkBWXdaV8grFaHxNoM
-         teBWSGH7TP1GHphAw0UKD1qXK2WjvQxhU1x54ARY0kRiOTUcNhFDzNfXq4OZ14vLcKlI
-         eUmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725975063; x=1726579863;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vAs4JBrfNs6zZ0N76deFNoJwlS2JixdwwSmEsk3usgo=;
-        b=c5rL+bSoDItv+2znGEbNV7nAT8WoQiXU892tJD1IZY7HJLN+aBa8dPbEQ8Dxgph/O5
-         0PlPPXeSeBwMM4yBd2qmxNB+84xaziantm+PLOAnGGoZCuGWMzplAhYIRNSVLrVuwuIc
-         Gip/B0Y2N2Pmxh+1RAOHw9Wc+oIAsQ3tTXE7zek/N8VclM3JFq4SWDzmKmE3L8PsQhd+
-         4rEjL3I/e6YWL2mU8b0Et4Xfr/w/Eu7qTmLU66VoNrmup9xkqr4FOREFMtV6CTFoybiP
-         wAkzDuNOXZmbXj71WXsSXZsPoOHMo3tN3E9jqHcRJ5ICC2sXUrd+/O4wOvsgzXaWO+BB
-         Z1WA==
-X-Forwarded-Encrypted: i=1; AJvYcCXjrok+8SxiDRVRx0QbpzYra9sFQAtqzxFVfVXdlFzRKCU6tL5gn3E2cNEmftdBs5/mD8F127A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwIK73WUwWZhWIpbwEhRPdqBygm87x+NhwSTvzLKam5iGpRpzd
-	tsUhrUAmDgPLitz4/xHtciyOWJYp0tz1fsKWzr7W0H4zQ3r395AMfunXhjbNBz9AZav6/VCpZM8
-	grRWbq8fB4uWhNMuP53QS0EXd1K4=
-X-Google-Smtp-Source: AGHT+IFkazSJoizNEunDwAuUSymYU/v45DR8DMvyaf4jL4F1ClpkNqq1+TNoJSYphCUYt7TFaTu8ikgUQMzXmOzRL30=
-X-Received: by 2002:a05:6214:2c08:b0:6c5:1453:8bfb with SMTP id
- 6a1803df08f44-6c528519a2cmr144643536d6.38.1725975063016; Tue, 10 Sep 2024
- 06:31:03 -0700 (PDT)
+	s=arc-20240116; t=1725975895; c=relaxed/simple;
+	bh=eaLqeAInK6K3654dZeMhVnccjfoZ1sMA2x4ltUHXf3M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MJbxU2Hjb49VI3RUT7n2QJ+ulM5Y7/70SF1xPHoH2fN1wF+rSNHPf2vWBb0Ivht/FFRwv2ZTYY3D77x+P6eErAEJ+ScfsrqM47Y/H+XvRbdGUS4dW8+OF+uXhSJUz0PjWE+reY1g64xAxmOIcDMObH+ncheitjbYlB8Fql8qFBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwLlzpIi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44AC9C4CEC3;
+	Tue, 10 Sep 2024 13:44:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725975894;
+	bh=eaLqeAInK6K3654dZeMhVnccjfoZ1sMA2x4ltUHXf3M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IwLlzpIipUu0Lty8wC8U4QUYv3whR9KN+ccgQE23hRCaCVhi9FClX6NtRa/zkSQ6a
+	 HZZRuJweOBela8XsGZh0c9gJozXu8jmnP7y+K+HpHz3iH8kqRh/j5yvZGw0xo/zJtc
+	 +GN36+forZFsd6EWxYmCVq6bm8ufUoWhCTQJwAw4Izmqchuw7iVW2tjqT9/PG94/6x
+	 nBod3Dv4sijGDo6xNURMqhTdhtxZfQGoqVvt8q0GiMPVwCr4WbmmsXWB/WeiC77kKl
+	 4Xy2mPCAeROiGi58hKUiX+rYuIx7UgXa794QrXoz2i3CFx91XrQmcN6GBBeZO0AbXP
+	 7s8zqY4SCfY1g==
+Date: Tue, 10 Sep 2024 14:44:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Rao Shoaib <Rao.Shoaib@oracle.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, kuniyu@amazon.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v1] Remove zero length skb's when enqueuing new OOB
+Message-ID: <20240910134451.GD572255@kernel.org>
+References: <20240910002854.264192-1-Rao.Shoaib@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240910124129.289874-1-maciej.fijalkowski@intel.com>
-In-Reply-To: <20240910124129.289874-1-maciej.fijalkowski@intel.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Tue, 10 Sep 2024 15:30:51 +0200
-Message-ID: <CAJ8uoz3tx60yLdwujSa2kmAvB+i7tj+HL-BAHgdcRMrXuq_fVA@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf-next] selftests: xsk: read current MAX_SKB_FRAGS
- from sysctl knob
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
-	bjorn@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240910002854.264192-1-Rao.Shoaib@oracle.com>
 
-On Tue, 10 Sept 2024 at 14:41, Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> Currently, xskxceiver assumes that MAX_SKB_FRAGS value is always 17
-> which is not true - since the introduction of BIG TCP this can now take
-> any value between 17 to 45 via CONFIG_MAX_SKB_FRAGS.
->
-> Adjust the TOO_MANY_FRAGS test case to read the currently configured
-> MAX_SKB_FRAGS value by reading it from /proc/sys/net/core/max_skb_frags.
-> If running system does not provide that sysctl file then let us try
-> running the test with a default value.
+On Mon, Sep 09, 2024 at 05:28:54PM -0700, Rao Shoaib wrote:
+> 13:03 Recent tests show that AF_UNIX socket code does not handle
+> the following sequence properly
+> 
+> Send OOB
+> Read OOB
+> Send OOB
+> Read (Without OOB flag)
+> 
+> The last read returns the OOB byte, which is incorrect.
+> A following read with OOB flag returns EFAULT, which is also incorrect.
+> 
+> In AF_UNIX, OOB byte is stored in a single skb, a pointer to the
+> skb is stored in the linux socket (oob_skb) and the skb is linked
+> in the socket's receive queue. Obviously, there are two refcnts on
+> the skb.
+> 
+> If the byte is read as an OOB, there will be no remaining data and
+> regular read frees the skb in managge_oob() and moves to the next skb.
+> The bug was that the next skb could be an OOB byte, but the code did
+> not check that which resulted in a regular read, receiving the OOB byte.
+> 
+> This patch adds code check the next skb obtained when a zero
+> length skb is freed.
+> 
+> The patch also adds code to check and remove an skb in front
+> of about to be added OOB if it is a zero length skb.
+> 
+> The cause of the last EFAULT was that the OOB byte had already been read
+> by the regular read but oob_skb was not cleared. This resulted in
+> __skb_datagram_iter() receiving a zero length skb to copy a byte from.
+> So EFAULT was returned.
+> 
+> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
+> Signed-off-by: Rao Shoaib <Rao.Shoaib@oracle.com>
 
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+Hi Rao,
 
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> ---
->
-> v2: instead of failing the test case when reading frag value from sysctl
->     file did not succeed, use a default count and proceed with test [Magnus]
->
->  tools/testing/selftests/bpf/xskxceiver.c | 43 +++++++++++++++++++++---
->  tools/testing/selftests/bpf/xskxceiver.h |  1 -
->  2 files changed, 38 insertions(+), 6 deletions(-)
->
-> diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-> index 92af633faea8..11f047b8af75 100644
-> --- a/tools/testing/selftests/bpf/xskxceiver.c
-> +++ b/tools/testing/selftests/bpf/xskxceiver.c
-> @@ -325,6 +325,25 @@ static bool ifobj_zc_avail(struct ifobject *ifobject)
->         return zc_avail;
->  }
->
-> +#define MAX_SKB_FRAGS_PATH "/proc/sys/net/core/max_skb_frags"
-> +static unsigned int get_max_skb_frags(void)
-> +{
-> +       unsigned int max_skb_frags = 0;
-> +       FILE *file;
-> +
-> +       file = fopen(MAX_SKB_FRAGS_PATH, "r");
-> +       if (!file) {
-> +               ksft_print_msg("Error opening %s\n", MAX_SKB_FRAGS_PATH);
-> +               return 0;
-> +       }
-> +
-> +       if (fscanf(file, "%u", &max_skb_frags) != 1)
-> +               ksft_print_msg("Error reading %s\n", MAX_SKB_FRAGS_PATH);
-> +
-> +       fclose(file);
-> +       return max_skb_frags;
-> +}
-> +
->  static struct option long_options[] = {
->         {"interface", required_argument, 0, 'i'},
->         {"busy-poll", no_argument, 0, 'b'},
-> @@ -2245,13 +2264,24 @@ static int testapp_poll_rxq_tmout(struct test_spec *test)
->
->  static int testapp_too_many_frags(struct test_spec *test)
->  {
-> -       struct pkt pkts[2 * XSK_DESC__MAX_SKB_FRAGS + 2] = {};
-> +       struct pkt *pkts;
->         u32 max_frags, i;
-> +       int ret;
->
-> -       if (test->mode == TEST_MODE_ZC)
-> +       if (test->mode == TEST_MODE_ZC) {
->                 max_frags = test->ifobj_tx->xdp_zc_max_segs;
-> -       else
-> -               max_frags = XSK_DESC__MAX_SKB_FRAGS;
-> +       } else {
-> +               max_frags = get_max_skb_frags();
-> +               if (!max_frags) {
-> +                       ksft_print_msg("Couldn't retrieve MAX_SKB_FRAGS from system, using default (17) value\n");
-> +                       max_frags = 17;
-> +               }
-> +               max_frags += 1;
-> +       }
-> +
-> +       pkts = calloc(2 * max_frags + 2, sizeof(struct pkt));
-> +       if (!pkts)
-> +               return TEST_FAILURE;
->
->         test->mtu = MAX_ETH_JUMBO_SIZE;
->
-> @@ -2281,7 +2311,10 @@ static int testapp_too_many_frags(struct test_spec *test)
->         pkts[2 * max_frags + 1].valid = true;
->
->         pkt_stream_generate_custom(test, pkts, 2 * max_frags + 2);
-> -       return testapp_validate_traffic(test);
-> +       ret = testapp_validate_traffic(test);
-> +
-> +       free(pkts);
-> +       return ret;
->  }
->
->  static int xsk_load_xdp_programs(struct ifobject *ifobj)
-> diff --git a/tools/testing/selftests/bpf/xskxceiver.h b/tools/testing/selftests/bpf/xskxceiver.h
-> index 885c948c5d83..e46e823f6a1a 100644
-> --- a/tools/testing/selftests/bpf/xskxceiver.h
-> +++ b/tools/testing/selftests/bpf/xskxceiver.h
-> @@ -55,7 +55,6 @@
->  #define XSK_UMEM__LARGE_FRAME_SIZE (3 * 1024)
->  #define XSK_UMEM__MAX_FRAME_SIZE (4 * 1024)
->  #define XSK_DESC__INVALID_OPTION (0xffff)
-> -#define XSK_DESC__MAX_SKB_FRAGS 18
->  #define HUGEPAGE_SIZE (2 * 1024 * 1024)
->  #define PKT_DUMP_NB_TO_PRINT 16
->  #define RUN_ALL_TESTS UINT_MAX
-> --
-> 2.34.1
->
->
+This is not a proper review, I will leave that to Iwashima-san and others.
+
+But I would like to note that as a fix for net it needs to be annotated as
+such.
+
+	Subject: [PATCH net v1] ...
+
+Unfortunately while the patch applies to net it does not apply to net-next.
+But without the above annotation the CI did not know to apply the patch to
+net. So the CI can't process this patch.
+
+I suggest posting a v2, targeted at net, after waiting for a review from
+Iwashima-san and others.
+
+-- 
+pw-bot: cr
 
