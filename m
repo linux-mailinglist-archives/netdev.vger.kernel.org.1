@@ -1,116 +1,96 @@
-Return-Path: <netdev+bounces-126992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 182D89738FB
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:46:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADE2897391C
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:54:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3EE6288300
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 13:46:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EF58286530
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 13:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5EF19415E;
-	Tue, 10 Sep 2024 13:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwLlzpIi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24C2191F94;
+	Tue, 10 Sep 2024 13:54:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38013194151
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 13:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1401518E11;
+	Tue, 10 Sep 2024 13:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725975895; cv=none; b=SasFF3nZf1zKG0eDdL7zb2iv+YUpp/lMLVPqHHcnTez+eeHV37mMhk2Jl/VwrV0sakkJgCveljiSG8oF1aSnjiKbQt1q/yPRQ2C9uBOOITD1NBf22d2B4W/j5Z6l2JXoOMrc+m5h2LEOdIb3AC596X0EQW7L0wWtYnj4WaGmYP4=
+	t=1725976451; cv=none; b=ixzzWpkxljJzQLbUzQDCZM3GXFEoPv+PAedi1jd3BwN+6MaMj1Km35/ShGnatdvHXIoJYTz9nb4EftGOSYjmWLJrebMwL+omvI92wbmBIug85VL5GdnZr8OuFMRB6JGdM3QvAq89fb0M9/35uOTQX3evVxIoIeqgDlawHmlzJ7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725975895; c=relaxed/simple;
-	bh=eaLqeAInK6K3654dZeMhVnccjfoZ1sMA2x4ltUHXf3M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MJbxU2Hjb49VI3RUT7n2QJ+ulM5Y7/70SF1xPHoH2fN1wF+rSNHPf2vWBb0Ivht/FFRwv2ZTYY3D77x+P6eErAEJ+ScfsrqM47Y/H+XvRbdGUS4dW8+OF+uXhSJUz0PjWE+reY1g64xAxmOIcDMObH+ncheitjbYlB8Fql8qFBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwLlzpIi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44AC9C4CEC3;
-	Tue, 10 Sep 2024 13:44:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725975894;
-	bh=eaLqeAInK6K3654dZeMhVnccjfoZ1sMA2x4ltUHXf3M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IwLlzpIipUu0Lty8wC8U4QUYv3whR9KN+ccgQE23hRCaCVhi9FClX6NtRa/zkSQ6a
-	 HZZRuJweOBela8XsGZh0c9gJozXu8jmnP7y+K+HpHz3iH8kqRh/j5yvZGw0xo/zJtc
-	 +GN36+forZFsd6EWxYmCVq6bm8ufUoWhCTQJwAw4Izmqchuw7iVW2tjqT9/PG94/6x
-	 nBod3Dv4sijGDo6xNURMqhTdhtxZfQGoqVvt8q0GiMPVwCr4WbmmsXWB/WeiC77kKl
-	 4Xy2mPCAeROiGi58hKUiX+rYuIx7UgXa794QrXoz2i3CFx91XrQmcN6GBBeZO0AbXP
-	 7s8zqY4SCfY1g==
-Date: Tue, 10 Sep 2024 14:44:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Rao Shoaib <Rao.Shoaib@oracle.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, kuniyu@amazon.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v1] Remove zero length skb's when enqueuing new OOB
-Message-ID: <20240910134451.GD572255@kernel.org>
-References: <20240910002854.264192-1-Rao.Shoaib@oracle.com>
+	s=arc-20240116; t=1725976451; c=relaxed/simple;
+	bh=NU/iu1qh7Qskzs+ak+G1JrBHFNUodngO70+yxvQpSCw=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=NsLi08nUtS7X2hc+5/Yahk+5+wRsgaskzVUCusqkZ4Ce6gc2EOWpmMJ2iyY1ie4kxRSEMn5vy25aC0EG4tuJS/XtWSN3LOIJ+mc/fcYU6n16yS5fqs2YSJKgnA3bqpnsRLXYrXQfXpb8rlPmgK9nFtQcU6xhCDv1pJ6NOqTV4q0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4X34pb60SQz1HJQB;
+	Tue, 10 Sep 2024 21:50:31 +0800 (CST)
+Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0AAEF140138;
+	Tue, 10 Sep 2024 21:54:06 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 10 Sep 2024 21:54:05 +0800
+Message-ID: <2c876485-3094-41d7-a6cf-d4c9aaaf0b3d@huawei.com>
+Date: Tue, 10 Sep 2024 21:54:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240910002854.264192-1-Rao.Shoaib@oracle.com>
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <shenjian15@huawei.com>,
+	<wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
+	<sudongming1@huawei.com>, <xujunsheng@huawei.com>, <shiyongbang@huawei.com>,
+	<libaihan@huawei.com>, <jdamato@fastly.com>, <horms@kernel.org>,
+	<kalesh-anakkur.purayil@broadcom.com>, <jonathan.cameron@huawei.com>,
+	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V9 net-next 03/11] net: hibmcge: Add mdio and hardware
+ configuration supported in this module
+To: Andrew Lunn <andrew@lunn.ch>
+References: <20240910075942.1270054-1-shaojijie@huawei.com>
+ <20240910075942.1270054-4-shaojijie@huawei.com>
+ <5a6f372d-31c3-482d-8925-d2a039643256@lunn.ch>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <5a6f372d-31c3-482d-8925-d2a039643256@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm000007.china.huawei.com (7.193.23.189)
 
-On Mon, Sep 09, 2024 at 05:28:54PM -0700, Rao Shoaib wrote:
-> 13:03 Recent tests show that AF_UNIX socket code does not handle
-> the following sequence properly
-> 
-> Send OOB
-> Read OOB
-> Send OOB
-> Read (Without OOB flag)
-> 
-> The last read returns the OOB byte, which is incorrect.
-> A following read with OOB flag returns EFAULT, which is also incorrect.
-> 
-> In AF_UNIX, OOB byte is stored in a single skb, a pointer to the
-> skb is stored in the linux socket (oob_skb) and the skb is linked
-> in the socket's receive queue. Obviously, there are two refcnts on
-> the skb.
-> 
-> If the byte is read as an OOB, there will be no remaining data and
-> regular read frees the skb in managge_oob() and moves to the next skb.
-> The bug was that the next skb could be an OOB byte, but the code did
-> not check that which resulted in a regular read, receiving the OOB byte.
-> 
-> This patch adds code check the next skb obtained when a zero
-> length skb is freed.
-> 
-> The patch also adds code to check and remove an skb in front
-> of about to be added OOB if it is a zero length skb.
-> 
-> The cause of the last EFAULT was that the OOB byte had already been read
-> by the regular read but oob_skb was not cleared. This resulted in
-> __skb_datagram_iter() receiving a zero length skb to copy a byte from.
-> So EFAULT was returned.
-> 
-> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
-> Signed-off-by: Rao Shoaib <Rao.Shoaib@oracle.com>
 
-Hi Rao,
+on 2024/9/10 20:21, Andrew Lunn wrote:
+> On Tue, Sep 10, 2024 at 03:59:34PM +0800, Jijie Shao wrote:
+>> this driver using phy through genphy device.
+> As far as i can see, there is nothing here which limits you to
+> genphy. The hardware could use any PHY driver which phylib has. In
+> general, we don't recommend genphy, it is just a fallback driver which
+> might work, but given the complexity of modern PHYs, also might not.
+>
+> What PHY do you actually have on the board?
+>
+> 	Andrew
 
-This is not a proper review, I will leave that to Iwashima-san and others.
+We use YT8521，phylib already has this driver.
+Therefore, when CONFIG_MOTORCOMM_PHY is enabled, the PHY driver is automatically used.
 
-But I would like to note that as a fix for net it needs to be annotated as
-such.
+Thuis description is a bit misleading and I'll fix it in the next version.
+I think I might need to add a dependency on CONFIG_MOTORCOMM_PHY in Kconfig
 
-	Subject: [PATCH net v1] ...
+Thanks
+	Jijie Shao
 
-Unfortunately while the patch applies to net it does not apply to net-next.
-But without the above annotation the CI did not know to apply the patch to
-net. So the CI can't process this patch.
 
-I suggest posting a v2, targeted at net, after waiting for a review from
-Iwashima-san and others.
 
--- 
-pw-bot: cr
 
