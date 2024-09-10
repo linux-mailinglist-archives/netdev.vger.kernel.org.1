@@ -1,51 +1,58 @@
-Return-Path: <netdev+bounces-126849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F44972AC2
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:30:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B40CA972ACB
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:31:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 961C028342B
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:30:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6AA21C24214
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2AC17CA1A;
-	Tue, 10 Sep 2024 07:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3DA158DB2;
+	Tue, 10 Sep 2024 07:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Kpu9cwxz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Btx9+Xyd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C59F11BC44;
-	Tue, 10 Sep 2024 07:30:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84D2335A7
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 07:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725953450; cv=none; b=qBAiQrSHrVCbD5YG2tnzdUvGrF7mVGc2bdwh9++3RrWOC16/OkW0IPdMOdNZ6Nv22liGX+KEiSxEv3lOLQdlywG/4sBiozQT0cDEcPvt+BTLKhq4nT/qpLx3MREJkljTi8sFSBfqlxalJ0D0CQNOCLyx4ev/qmO/9JIKIP/zrJI=
+	t=1725953471; cv=none; b=KQo1yRzABgH9WIWFQKHtHd0ddpirKNCx9fp13zI1TKSwZEDwDIwlSww7Re7IFsQpuQiOmnqez6ki79o6rfGPrlcqLVlVCqF9KSFDfI7rhFGwJcOOrwCsiF4YSSRuceirU51U5TPG6lNqkwJjvr8l190s+SDorwYjXCXDmAsTk1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725953450; c=relaxed/simple;
-	bh=KrKi1M0mL9cTG9gfxXfAtzMSk9BxbIrhK8UeqvacG7Q=;
+	s=arc-20240116; t=1725953471; c=relaxed/simple;
+	bh=Hl9K7dWuggPXSUr9wt7jGrQahl6IduA53CdSnaNV/YQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mrU3dcYJZpkMGiKDLziG9Psln7878vbpJ4k+xVGCQiL7wA9mJwUM0cca5R6h5DlVdVsAXy9hDd6WNKknjc0WZPy4Hd2g5U5YluOvhp3jCUCfg5SqjCbtGPd1KzRoGCPL5P2NPFath/IZSmpPlB9O8ljL4AL5MemK/GAWLoL5CLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Kpu9cwxz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09870C4CEC3;
-	Tue, 10 Sep 2024 07:30:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1725953450;
-	bh=KrKi1M0mL9cTG9gfxXfAtzMSk9BxbIrhK8UeqvacG7Q=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=N95nGH/fa0tXXUCYgc9jC8iuyAonaR21MOliymt6qEt40UJjEVKEPNoy8mwHPOTpp0N6t5txnu+mzoG8Im3WBEE5wVGzo4Np4UmdqmBAzN2lVldhn2y6AEZ2kdf6YDiX4AmYZtCuNjvBoDxxpD4pEMfN8yWkNZi7Oo5VLtth5Wc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Btx9+Xyd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 838F9C4CEC3;
+	Tue, 10 Sep 2024 07:31:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725953471;
+	bh=Hl9K7dWuggPXSUr9wt7jGrQahl6IduA53CdSnaNV/YQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Kpu9cwxzlO8vcVsLJCUhfjgWxcXa1Nuinf6a39P0pbT2lvmcNHXjsTQ+umrgyV6xl
-	 HvFOMp8ah0xSgLCjjRo4UysMjQ1YTI5DguKFfWYGUENewbjcPm3vQWeT98Jh2bMwAh
-	 PIRZTgH+CQy0RTja4cp5Y5iqDbnX4O8mDwPNbq+M=
-Date: Tue, 10 Sep 2024 09:30:47 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: stable@vger.kernel.org, netdev@vger.kernel.org, christian@theune.cc,
-	mathieu.tortuyaux@gmail.com, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH 5.15 0/4] Backport fix for net: missing check virtio
-Message-ID: <2024091037-undivided-earthy-ef7d@gregkh>
-References: <20240909182506.270136-1-willemdebruijn.kernel@gmail.com>
+	b=Btx9+Xyd7hmFc7WsldrQiSB8zD5PXdUViTghKuJXhXEgL9kGgfA0v21B1ooKnXsq/
+	 uPLkGmvmSch73YMXQOL7WhOyDI56/E0ZS18rxg4FDSu1fiBD5RyYLhOAssngEwb9+S
+	 53UqsMki4652y/Vog2uDPsI6lKCwWYSt0LRDnaymjrAZF//Dh8wazrw7Cc7N4+prBd
+	 vN2QBIGhYu5dQ/lLkmaBbrEw3qjflpC9ZIf7cWErX1/PamW5GF6XIxuotJ+r8hCv/O
+	 ums5ykN9n8qIPUjutNcetxi1gFt0u98UxJ1Tn+JCwjUuxwBB2NF4bxJ5hkZqlEUu1C
+	 BnO/6US2aI9zQ==
+Date: Tue, 10 Sep 2024 08:31:07 +0100
+From: Simon Horman <horms@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: Re: [pull request][net-next V4 00/15] mlx5 updates 2024-09-02
+Message-ID: <20240910073107.GA525413@kernel.org>
+References: <20240909181250.41596-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,42 +61,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240909182506.270136-1-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20240909181250.41596-1-saeed@kernel.org>
 
-On Mon, Sep 09, 2024 at 02:22:44PM -0400, Willem de Bruijn wrote:
-> From: Willem de Bruijn <willemb@google.com>
+On Mon, Sep 09, 2024 at 11:12:33AM -0700, Saeed Mahameed wrote:
+> From: Saeed Mahameed <saeedm@nvidia.com>
 > 
-> Backport the following commit, because it fixes an existing backport
-> that has caused multiple reports of breakage on 5.15 based kernels:
+> This series adds HW steering support in mlx5.
+> For more information please see tag log below.
 > 
->   net: drop bad gso csum_start and offset in virtio_net_hdr
+> V1->V2:
+>  - Fix sparse and checkpatch issue.
 > 
+> V2->V3:
+>  - Smatch and coccicheck fixes.
 > 
-> To backport without conflicts, also backport its two dependencies:
+> V3->V4:
+>  - Error path fixes.
 > 
->   net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation
->   gso: fix dodgy bit handling for GSO_UDP_L4
-> 
-> 
-> Also backport the one patch in netdev-net/main that references one
-> of the above in its Fixes tag:
-> 
->   net: change maximum number of UDP segments to 128
-> 
-> 
-> All four patches also exist in 6.1.109
-> 
->  include/linux/udp.h                  |  2 +-
->  include/linux/virtio_net.h           | 35 +++++++++++++++++-----------
->  net/ipv4/tcp_offload.c               |  3 +++
->  net/ipv4/udp_offload.c               | 17 +++++++++++---
->  tools/testing/selftests/net/udpgso.c |  2 +-
->  5 files changed, 40 insertions(+), 19 deletions(-)
-> 
-> -- 
-> 2.46.0.598.g6f2099f65c-goog
+> Please pull and let me know if there is any problem.
 
-all now queued up, thanks!
+Thanks for addressing my review of v2 and v3.
+I confirm that my concerns have been addressed.
 
-greg k-h
+...
 
