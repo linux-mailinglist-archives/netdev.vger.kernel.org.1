@@ -1,113 +1,132 @@
-Return-Path: <netdev+bounces-126966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17FC79736CA
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:05:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F24A89736D2
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:06:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B71591F27CED
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:05:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99EF01F27C25
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15DC518DF8C;
-	Tue, 10 Sep 2024 12:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A50518DF97;
+	Tue, 10 Sep 2024 12:06:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="sMTGcJR3";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="iM2XFtId"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l2/jyXDR"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 898EC18E76F;
-	Tue, 10 Sep 2024 12:05:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B587F13E02D;
+	Tue, 10 Sep 2024 12:06:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725969909; cv=none; b=UjvtmQ1tFg9jeJixM+Ya3oSm+JPrmcqd17DvPoKFpsyoutS+3/oRN74aB7BLrVGQdkoE1yMnSzzEQBWybKIqynktLGdxS667C9OX7keP0i16tPuxyQDjVKNEIZkVT8A8S6USY7BaLxQHlOuHqXPcivnku+uisdc04Sx202APc1c=
+	t=1725970002; cv=none; b=mTo/4QcVdqFtxPwkT4UU2dl1KGpBvA1cnMRAwSE/aut3vuqyGxZiIsTyeaG8YZmp5472NJf/0wcrr9OtPetHJc11clA+Eba628oHyTD6pYGvbdCBiHysQjqzorxwg0N+04pCd8LyP8JweDwVyJHqSybfg/FgGgBeI6GxZurCAFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725969909; c=relaxed/simple;
-	bh=fYiFsOP+Yx5RIAobm5TDbMdRmxNxoSv0KkVG19LWf88=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=atmdcRk39c1qfDomFtOuzQsOOISQC7OMkc575MIa1aQLKKINTwJNSrnuc+P0oFOj8FI20Uvq5N3s51LdYCvwpnvCgRx1vgm2audLx4z+WCSSAtJXkYHYNOCA/wW63rHRr6w74hofFjsbw7q4yh25Ax+EIVYcTXqjOGMSDrECH0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=sMTGcJR3; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=iM2XFtId; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1725969905;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YFu8BsT7eS6/kBUw8UpNUrw6HVjRkUax9lR4Q/qhmwk=;
-	b=sMTGcJR3gL5MH2s2JFreZIoR0XiBdBs2qx+TpzqNvEIXDxs2PZ+xLcRCMk+KlnzBl98Ytd
-	jmc++uewE+EqLvDdHAf4ALsTVIFUr5PHC1TSLiXFmSHpej+XkU+el08uMK6DLt/CV/umPl
-	Gjz3rwxhG+eJC5E2i/hYcMQKJYC2xefQIlQX/D+kipmItdNXCiQO1c+I/oZGu102UfejE6
-	2IFlOndzEqOG8Oo+WUX6oAfKJYWhExOuVjkksVcUwDvN1Zh8vXtwbuIB2XvuSgpbuKadEb
-	abZdoXuFW4MjHl/64TD6RiOflzELsItWj0g4QC82YCb+tN7GkF5rzuf4KQplmg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1725969905;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YFu8BsT7eS6/kBUw8UpNUrw6HVjRkUax9lR4Q/qhmwk=;
-	b=iM2XFtIdf+qPSQ+xUhWFPXG+NofroSb6EO9//IuvWpWfJzF6xCxazM8Zsqft11zMx3pnHt
-	t18gmTFeiPDy5rBg==
-To: Jinjie Ruan <ruanjinjie@huawei.com>, Richard Cochran
- <richardcochran@gmail.com>
-Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, anna-maria@linutronix.de,
- frederic@kernel.org, UNGLinuxDriver@microchip.com, mbenes@suse.cz,
- jstultz@google.com, andrew@lunn.ch, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next v3 1/2] posix-timers: Check timespec64 before call
- clock_set()
-In-Reply-To: <f2c219c8-0765-6942-8495-b5acf3756fb1@huawei.com>
-References: <20240909074124.964907-1-ruanjinjie@huawei.com>
- <20240909074124.964907-2-ruanjinjie@huawei.com>
- <Zt8SFUpFp7JDkNbM@hoboy.vegasvil.org>
- <f2c219c8-0765-6942-8495-b5acf3756fb1@huawei.com>
-Date: Tue, 10 Sep 2024 14:05:05 +0200
-Message-ID: <875xr3btou.ffs@tglx>
+	s=arc-20240116; t=1725970002; c=relaxed/simple;
+	bh=0uHqGyWQTKBICcZgWP5SFyBnuC7UuUXsU/vLXQ0WYN0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=uMizCusGUl+X7jxDtkxe6svgguYrjZno7kPKOv2d1EzA8jvgmvlnevtNkeTMIsPc4YsyKQnvlmdPGu9FXt9pk32vN9P81bU2Mpv23yogKn5cCzdgz9UF7qtohgJ+wiSknBiZuDtt95O6zTvxOFrFrH+bIDwdwOOLHETDeV9sauk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l2/jyXDR; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-374c3400367so4704078f8f.2;
+        Tue, 10 Sep 2024 05:06:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725969999; x=1726574799; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z3O0+X2UyQ0gOuFyiHB5oW6tIQsBBcRW3/8B2cCf8EM=;
+        b=l2/jyXDR3leqH8NzQlvlQ2hG0tK6qLY3S1VcW1ygpaTvuBNu+h3xKcGjRUPFWq8Sb8
+         slz1sRWElKKLd81nGA4kI0Km08Ngo/G2nBbF/9eylXQvpOlA+6FCw8RV/322xBbLeqnK
+         38KH+Pbj437fN+KAetjSwQXsBwY1xJpnlVoLQWYlUDMCRC64vArmlh7AsDdBodRdLtt3
+         XWwEBn/ZmOZq/sRnn75fRJDh6CfQbwKa+feWHIuxKTN36eZ4DAh/IaCQmhLrDIByZ8Ls
+         /2nAEbDh8K8capeyvX7TJsQb+/fESx2Xji27AOTI+5LL2a1bNqJOPrEt65iQNWBw5P2g
+         i2xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725969999; x=1726574799;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z3O0+X2UyQ0gOuFyiHB5oW6tIQsBBcRW3/8B2cCf8EM=;
+        b=gys38Q5YSoIWNOqSE4z71ST1XiV13R31NSEjLAWL0gacQiEpiXGgJCPPK1y8AIIVGL
+         dbbR0iveIL74FbShX190HRF9EjTIEdutEIoyLMBzqK1awz8abjtXkJUlg5POZmhTCs73
+         RVIBbw+0NeKfKuURuO/Bbd8bkkhw6zetuEggxTM1FQFd3OueEKfk3tQnCL1cmxcK99Oj
+         oVQr59pbrps+EIHNXUNFrUv6UrkeVb45cOhEWO/yYmh2v6IbLGzmitF+VD+snh0fzVMc
+         uK5TwhlSAItkDmFKWtxyTnsanh5cTuSzfAQBeFwBf4LH10eYplDBrOAy8fQLYS4LqaXr
+         6Wrg==
+X-Forwarded-Encrypted: i=1; AJvYcCUMkQVNU/l3zVGyx5TjFSasRfT+I7E3LxKi+CTsYbFLIiziFo63YRmvxCoY9YUnL9yTcLKPAAhi@vger.kernel.org, AJvYcCUzsYbSeCgWHj/xUmbsIALZT/PQKR8x+rjTH3k3hY1Co2vY0Wpl1Z+BP/cSY7zJjJylmbDRiYsP7FGc43M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWq/cT+mxX9iznuAN/t3VyYlBvH7HIC7XQKkcfkWI1E7YWA1dX
+	G3DGot5stvsUReDJjzpW8SCKcsI+QkiOFmnsdaEeu5M0eywnCzagqaP9AC1s
+X-Google-Smtp-Source: AGHT+IHQn/8VjDWddQEtqhPD6spb3CN4HWurt39gX0dd8Pllpw2ltiFpG//CzBeUnit4t0a3ce2WTw==
+X-Received: by 2002:a05:6000:544:b0:374:b30b:9ae7 with SMTP id ffacd0b85a97d-3789243fb20mr8658299f8f.49.1725969998573;
+        Tue, 10 Sep 2024 05:06:38 -0700 (PDT)
+Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3789564a340sm8714115f8f.24.2024.09.10.05.06.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 05:06:37 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Shahed Shaikh <shshaikh@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	GR-Linux-NIC-Dev@marvell.com,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next][V2] qlcnic: make read-only const array key static
+Date: Tue, 10 Sep 2024 13:06:35 +0100
+Message-Id: <20240910120635.115266-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 10 2024 at 19:23, Jinjie Ruan wrote:
-> On 2024/9/9 23:19, Richard Cochran wrote:
->> On Mon, Sep 09, 2024 at 03:41:23PM +0800, Jinjie Ruan wrote:
->>> diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
->>> index 1cc830ef93a7..34deec619e17 100644
->>> --- a/kernel/time/posix-timers.c
->>> +++ b/kernel/time/posix-timers.c
->>> @@ -1137,6 +1137,9 @@ SYSCALL_DEFINE2(clock_settime, const clockid_t, which_clock,
->>>  	if (get_timespec64(&new_tp, tp))
->>>  		return -EFAULT;
->>>  
->>> +	if (!timespec64_valid(&new_tp))
->>> +		return -ERANGE;
->> 
->> Why not use timespec64_valid_settod()?
->
-> It seems more limited and is only used in timekeeping or
-> do_sys_settimeofday64().
+Don't populate the const read-only array key on the stack at
+run time, instead make it static.
 
-For a very good reason.
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
-> And the timespec64_valid() is looser and wider used, which I think is
-> more appropriate here.
+---
 
-Can you please stop this handwaving and provide proper technical
-arguments?
+V2: re-order declarations for reverse christmas tree layout
 
-Why would PTP have less strict requirements than settimeofday()?
+---
+ drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-Thanks,
-
-        tglx
-
+diff --git a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
+index bcef8ab715bf..d7cdea8f604d 100644
+--- a/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
++++ b/drivers/net/ethernet/qlogic/qlcnic/qlcnic_83xx_hw.c
+@@ -2042,12 +2042,14 @@ int qlcnic_83xx_config_hw_lro(struct qlcnic_adapter *adapter, int mode)
+ 
+ int qlcnic_83xx_config_rss(struct qlcnic_adapter *adapter, int enable)
+ {
+-	int err;
+-	u32 word;
+ 	struct qlcnic_cmd_args cmd;
+-	const u64 key[] = { 0xbeac01fa6a42b73bULL, 0x8030f20c77cb2da3ULL,
+-			    0xae7b30b4d0ca2bcbULL, 0x43a38fb04167253dULL,
+-			    0x255b0ec26d5a56daULL };
++	static const u64 key[] = {
++		0xbeac01fa6a42b73bULL, 0x8030f20c77cb2da3ULL,
++		0xae7b30b4d0ca2bcbULL, 0x43a38fb04167253dULL,
++		0x255b0ec26d5a56daULL
++	};
++	u32 word;
++	int err;
+ 
+ 	err = qlcnic_alloc_mbx_args(&cmd, adapter, QLCNIC_CMD_CONFIGURE_RSS);
+ 	if (err)
+-- 
+2.39.2
 
 
