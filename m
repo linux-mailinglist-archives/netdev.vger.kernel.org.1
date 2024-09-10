@@ -1,119 +1,148 @@
-Return-Path: <netdev+bounces-126937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 217709731C4
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:14:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B27F973276
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:23:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA0511F293FF
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:14:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D6C61C2441C
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250EF18F2D6;
-	Tue, 10 Sep 2024 10:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18B519E7E7;
+	Tue, 10 Sep 2024 10:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrW5H+1w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NYs6LG6j"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D736188A0C
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 10:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A14719DFAC
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 10:17:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725963040; cv=none; b=WOPeTzitJ15bV9w8+K+RuGxXDE5pNd6qYhPjE9IunPv75Zj5jwTU4YN65eYdYSJYdsL9JanNf2P0tWfL4++BESFDJAkP6sG2cj8AWM9Xq16Vx6m0d5H4OYpYS/wZHzTx0yUlWvZJTXmzRSobZ4Um34bnYKtpKsPDg8rApr4SkWQ=
+	t=1725963436; cv=none; b=f2GivlXcy7QbG0bLgAJr6Qa5iLVvl6631Jn4mOi/RPcBuPYlXIiq54EPn34BrxissoyY8ICeXfLnKhvsES5nd3RaV5R0WNmY1lB4a7eQFPrJ8VmaV2a4kwhvILnNoHnD8p+Dd2zhkkRdSenbqHnosJjkALwn0w0CNgrxG0FmiKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725963040; c=relaxed/simple;
-	bh=yQgIcAICTK5FSWGbk9Lt7d2+qEYj6jpsnfuNFFZDyvQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SRYlWKSjM1lYB6WKmZia1kbg7iZL21Vk8qjL5Smj3pqxjFmRKiZe3OMkVFyCEWxc9eQ3KGjldbTKfUFDx7wd0n7wXDXsiW3p3A5hi3FoBKMktkDa5zTH2Lt6XN5izCbR/KrZeV7+WBY9DpK1wDqMqIVo5MRRmtGKHxNdRFM83Mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hrW5H+1w; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725963037;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=coz659OmmUlcW3lKa0lCNSzio6M2iQCVXxig+QSR0UM=;
-	b=hrW5H+1wbKRr5+l/WQ2cweyMqgdiT3f/FjBuOPWCWTShjHc0k2r00G/Dr12XplOtvZJdzL
-	XyUSAZ57IJ4jNcvRmgX1YHIcsu1sgAonJBqprIR8tYB1EaT8w6AywU77z02aoVoUCXR3LG
-	7Ik3+Kqtv/9lUvPPSnyPpv6EyFT5rAw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-371-TpFdmM4kNuW3sKXY3HdzcA-1; Tue, 10 Sep 2024 06:10:36 -0400
-X-MC-Unique: TpFdmM4kNuW3sKXY3HdzcA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42ac185e26cso42359155e9.3
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 03:10:35 -0700 (PDT)
+	s=arc-20240116; t=1725963436; c=relaxed/simple;
+	bh=wImfXMoZ5B2yLzT8FnYI1lRVaypfWo0B3Gx0AgOak9A=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=pTsI3TlTFXL7Qot70mU1LhgDtDdiEhYiH5WlaLpBe0QGZpGm3zeAjY/bXyjvuCnf5pwgNElENZnbIZqV9UQgbN9xGwaOAPu5RhVrlJQ7t7IrPHOfmimaE5d8f8YEsl3hA7jJhFLqde/DvH8cPhtscdo5ZfPgHsRztKP6Inex0yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NYs6LG6j; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-718f28f77f4so592653b3a.1
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 03:17:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725963434; x=1726568234; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xyeVR3mB1XOSCzQtVkCuXomgdvtRDbuqoRkgdL7q/VI=;
+        b=NYs6LG6jgHP06qgI9F+mJsZA6XZ5hpOvvOJw54DKB7wJ2TAugELfoc1HHT4WEaAm8N
+         Ur4aVMC9lkhFcGl+pmMCDvzEpGV0G3GpI1H2gibJayEw+RdroVzCfyY+JHx8CrBnffPh
+         N3OGbvoucENV7AmBUIuPpZYhqEuVtQnDP2piKIumpFD7t+8c2bJjkJ1U6LnzXDrL+9eP
+         /3v+JLWqrB4oeD/ZJ3EpOKzlzz7m9JCUs3J65jwbfMnPMYhxgTDXc0phG5ntvvhkCLKL
+         Tzzf6TvxqcKaoD2wqWYa7eNi2zkR7L/OuIbDey2nYGUltF7X6M75Kv7gkrm8P86qVdg5
+         fZbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725963035; x=1726567835;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=coz659OmmUlcW3lKa0lCNSzio6M2iQCVXxig+QSR0UM=;
-        b=COAgZxOE09m/k8uVpdbUJcDohT49N0aG61GEu5SI0z7Blwc5pMe0aqRz1raqGJfmTQ
-         GNmJ6k6G+vB2A/Tlovafg3mNbSmQUP+Cm75a8WrM2HklMGwVI0QN20ha/xXRhGhJWQ0K
-         1gX0XlIyz39IEVL4shf7w+WKIoC0KtZqIlXPsJlcIXgtqMg8YBMSMSrpKUhO6XGvnzzq
-         R3dEZ7Ojx4DhE8rWG2PoCgveIWbO4k2zxEZ+kcZuYMPIKDf8MWuUoRjoiJ1v6nmV9ClV
-         p+DQbXP8GdbnSBYIydZq/0H8cJDj5EDWGlTfKPMd3kCtsVdEBTOEcaDh0N0aObhR0SJW
-         gD8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVpfRK273/QPEJItJT0kqeOmZPjaPYFVIC38HEpVLxNYFAhbXscdmxLBIKAM8hYrTM9wrS4mWM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1jCp85QDcbBRFLzyBFLytZw/pWJ2IWZldP6XvRoIKB1a7SkLB
-	jDrBawDfvctiqYpyLwr3uqge0CGJzRtPlESmop6gOJ/C2pTkUn1kT0m/OwWnM4vX21xzrIH65EG
-	HsjJJbzg6NyYbovlknLBkOrfxSuyoqfN2CtYnMzDMUJtOfqXwDb5aSg==
-X-Received: by 2002:a05:600c:5106:b0:42c:ba83:3f0e with SMTP id 5b1f17b1804b1-42cba834410mr35477105e9.7.1725963034861;
-        Tue, 10 Sep 2024 03:10:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG3UJumNEoidGRa50Pqmtdr9Dobsm4P/vGruZsRioKW5XA/TzKoc4apQYmFttnD6MjWJ08qzQ==
-X-Received: by 2002:a05:600c:5106:b0:42c:ba83:3f0e with SMTP id 5b1f17b1804b1-42cba834410mr35476865e9.7.1725963034316;
-        Tue, 10 Sep 2024 03:10:34 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-69-130.dyn.eolo.it. [146.241.69.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb21cdfsm105744195e9.10.2024.09.10.03.10.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 03:10:33 -0700 (PDT)
-Message-ID: <8a1684ca-755b-4612-afe1-41340b46f2fe@redhat.com>
-Date: Tue, 10 Sep 2024 12:10:32 +0200
+        d=1e100.net; s=20230601; t=1725963434; x=1726568234;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xyeVR3mB1XOSCzQtVkCuXomgdvtRDbuqoRkgdL7q/VI=;
+        b=aPZ7W5AYJAqPNxyh62q5l5QL9F9LCY2ytBXWf54ioGEDIAgYZWCYQ/Kb6b67FIqX6q
+         +9C3/7AhmcZiE+Phz2LpwJGMrze74UFDX6mscipLEzLGfRTvNfzckYAalKU93J0BOPiz
+         ih/9uOBLXqIGI201dxAD4DIC8wxph8cDmkmSg7JACL3muaKbWUdLmwwLtA/QHFvkYADz
+         WbLNCee7h9H1XiNvPCSnTyfDKQHDI95Cmn8m2D9EZA9OGZTD9zf2DsNvnKOl08DwOLzE
+         dkk4ze11Yz6hnhRnyTtY7hnyok5yw8hhEOrEBQQp3JKVEcIYcieeTwwTPJam1x59PLcf
+         /FOQ==
+X-Gm-Message-State: AOJu0YylQvvL+MjkycnZIy23pUPhtCcrSQzW+W7F9I+kvZmmqxkAZVTz
+	4mi7RX1kbZBfKyLuzHZdfnpV7LnUxTVWw7Fq8rJ+ag/FWh/QLhjYxWSGdIui/g9e+Q==
+X-Google-Smtp-Source: AGHT+IEpS+BlakB9Lfrozp7rc6nx5VIvJZ3QOH2Cuq4xxR3pxf8xfbrD9XqRZziPh6BHJQNQy69C1w==
+X-Received: by 2002:a05:6a21:478b:b0:1cf:2d44:1f2d with SMTP id adf61e73a8af0-1cf5e1abe91mr274019637.38.1725963434074;
+        Tue, 10 Sep 2024 03:17:14 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7d8237362casm4589004a12.2.2024.09.10.03.17.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 03:17:13 -0700 (PDT)
+Date: Tue, 10 Sep 2024 10:17:08 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, Aaron Conole <aconole@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>,
+	Adrian Moreno <amorenoz@redhat.com>,
+	Stanislas Faye <sfaye@redhat.com>
+Subject: [Discuss] ARP monitor for OVS bridge over bonding
+Message-ID: <ZuAcpIqvJYmCTFFK@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/smc: add sysctl for smc_limit_hs
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
- wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
- guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- tonylu@linux.alibaba.com, edumazet@google.com
-References: <1725590135-5631-1-git-send-email-alibuda@linux.alibaba.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <1725590135-5631-1-git-send-email-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-On 9/6/24 04:35, D. Wythe wrote:
-> From: "D. Wythe" <alibuda@linux.alibaba.com>
-> 
-> In commit 48b6190a0042 ("net/smc: Limit SMC visits when handshake workqueue congested"),
-> we introduce a mechanism to put constraint on SMC connections visit
-> according to the pressure of SMC handshake process.
-> 
-> At that time, we believed that controlling the feature through netlink
-> was sufficient. However, most people have realized now that netlink is
-> not convenient in container scenarios, and sysctl is a more suitable
-> approach.
+Hi all,
 
-Not blocking this patch, but could you please describe why/how NL is 
-less convenient? is possibly just a matter of lack of command line tool 
-to operate on NL? yaml to the rescue ;)
+Recently, our customer got an issue with OVS bridge over bonding. e.g.
 
-Cheers,
+  eth0      eth1
+   |         |
+   -- bond0 --
+        |
+      br-ex (ovs-vsctl add-port br-ex bond0; ip addr add 192.168.1.1/24 dev br-ex)
 
-Paolo
 
+Before sending arp message for bond slave detecting, the bond need to check
+if the br-ex is in the same data path with bond0 via function
+bond_verify_device_path(), which using netdev_for_each_upper_dev_rcu()
+to check all upper devices. This works with normal bridge. But with ovs
+bridge, the upper device is "ovs-system" instead of br-ex.
+
+After talking with OVS developers. It turned out the real upper OVS topology
+is looks like
+
+              --------------------------------
+              |                              |
+  br-ex  -----+--      ovs-system            |
+              |                              |
+  br-int -----+--                            |
+              |                              |
+              |    bond0    eth2   veth42    |
+              |      |       |       |       |
+              |      |       |       |       |
+              -------+-------+-------+--------
+                     |       |       |
+                  +--+--+  physical  |
+                  |     |    link    |
+                eth0  eth1          veth43
+
+The br-ex is not upper link of bond0. ovs-system, instead, is the master
+of bond0. This make us unable to make sure the br-ex and bond0 is in the
+same datapath.
+
+On the other hand, as Adrián Moreno said, the packets generated on br-ex
+could be routed anywhere using OpenFlow rules (including eth2 in the
+diagram). The same with normal bridge, with tc/netfilter rules, the packets
+could also be routed to other interface instead of bond0.
+
+So the rt interface checking in bond_arp_send_all() is not always correct.
+Stanislas suggested adding a new parameter like 'arp monitor source interface'
+to binding that the user could supply. Then we can do like
+	If (rt->dst.dev == arp_src_iface->dev)
+		goto found;
+
+What do you think?
+
+Thanks
+Hangbin
 
