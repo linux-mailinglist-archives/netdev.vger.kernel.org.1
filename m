@@ -1,108 +1,111 @@
-Return-Path: <netdev+bounces-126815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78199972979
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:26:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0972972993
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:32:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 149CAB20C78
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:26:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D5121F257F7
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B585176AD0;
-	Tue, 10 Sep 2024 06:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CCC170A3D;
+	Tue, 10 Sep 2024 06:32:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0EA167265;
-	Tue, 10 Sep 2024 06:26:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A284612B143;
+	Tue, 10 Sep 2024 06:32:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725949586; cv=none; b=h7RrFki8FbhkFxjuJJLBp0K/o3W6qoh7RqGhjA4veTQS5XA6hSMuf9+/M/dfd1Eps7m2vVFFTm0ItHUqq+xKht28qY1BoODsDMAOKIEU/kSo6EEjBP6TTPsdY7l28l4kcPfGwHCX1xUrSWwANY+rKxSAVeU5awuq9ydaAJT65tk=
+	t=1725949950; cv=none; b=ASAmssTUUwDoR3D2qWYgZgiYC9RMP0aWoNHX6jnMwOi8RcesP6dxDlvHca3yhg6e5Shhh1EicqqeR0Z9KYBswZtLxdoEBmhb2aX2DSZ9dy7Ppswaz9LprcPqyVWPBfUEu3n3MQs0IFdPuHsOjByEp5lhmWupF/tTeRHt2c+N22A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725949586; c=relaxed/simple;
-	bh=/qmfKFmLdvMow1NT8OvtMXM3ryx2ZK8H+ypz/oi4Gdc=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=KrjtpQdrJQ1+ZMEUQrWt24PPybm0Bsro0LBPmr37pfmqkq/DsRecGk4fy1PPyYaQ5y6Tw7fpgHIqh5CyKLSiISR07kzq015yRtN3NPV9sswAwITiPtRjInHp4R+MfpAWPUy+I6+VfrnNvztfCj/7kn4omxFv9tvH+aByanxhKBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4X2txM5Dmvz1S9qq;
-	Tue, 10 Sep 2024 14:25:43 +0800 (CST)
-Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id 216801A016C;
-	Tue, 10 Sep 2024 14:26:12 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 10 Sep 2024 14:26:11 +0800
-Message-ID: <8f17b1be-cf69-4701-ab62-40141b1cbf99@huawei.com>
-Date: Tue, 10 Sep 2024 14:26:10 +0800
+	s=arc-20240116; t=1725949950; c=relaxed/simple;
+	bh=bpa8W3NjcJL1yAbX7z/ky/UwNP3JD/k2tvA5X+AJf9E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Stbu1kQMcUJ4R/028U1qdogc0ChLZcFR+HY0NvRfKclht/SLnUS+Fvg9/NtsMfhsfSlMqvkKwB/aC40GyQRpV2FWqYOYMIT6sLCNzW+7W+d2qSmaZ0N+UAPWq0j5/qCZZM9emjqYGr9mBa2dbMRI3FlumoqMOtbmasvomrxYtMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20688fbaeafso51661975ad.0;
+        Mon, 09 Sep 2024 23:32:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725949948; x=1726554748;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jECedyLwpWSi/LgRrXCCeEdPK7kyo5RLypA86tH+o+I=;
+        b=Z32qE2immWJhw5nBMVaPiLK+x4nTOcwr1/TSr26QGC3+E28noptFzJkQFKx2g17rcF
+         ql8PlTiXRTNm5DuvdlsYEoxMClJ9DzfMoQ1JmeDb2iTUHylVfyJTl5LSG957zqYOnRYh
+         J/2Mjzt265rq5pRJmd3hyamWd4rbIwukvIUBJzljbd0j6a/DXNEBGjEdO6kQawlF7UBt
+         Em88otKBbbjJgYggVIJ/swjaHSI2Yen+GdWiVRlhGIdxJCnBXNFGpEe5TQFLwMl4eGuQ
+         dQ/GC0nT0KHKKs9xbWd1Xd8UaETEsSjY25XeBGlqMP4GVxJXQf0dOxjdIvr2srkyOFxR
+         Behg==
+X-Forwarded-Encrypted: i=1; AJvYcCUo4Lb9xT3OKaNtjvKGUCmfdMdIzk+gfUCx7FisFfubAqe750Lr3Px55PpvyVTmJh4vdDwIGMNJ@vger.kernel.org, AJvYcCVn5bXBL1cY+C+7lEw2dN/uLae2yYoPjdrMpf3srgVRQxfL3JHtCUZmV+plIRTEuW9KL3Tz/Wpqhgo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRJMoYg+YJduWqLVIgHaWwSzXxn416z9r9QSE3M5YZICFxHffs
+	hJPOHHTCPi4NIuY0jA/tznErBnUU0wO4u+bQrpDaQgB3n2zoag7NeeMdI+1cBnazCVtyAqlgqiL
+	Q/W/W9NYp2/oDCF7JIlBwOAPQXu8=
+X-Google-Smtp-Source: AGHT+IEvMIvaSTbfqXCvRnmgvdVXjOwGK/Qnzvkw/rL/oJbx++LHi2AScRFYedF7Rmc2pswkfRM5I9huGGE8ps5yWv0=
+X-Received: by 2002:a17:902:f605:b0:205:76d0:563b with SMTP id
+ d9443c01a7336-206f035bc2emr166544305ad.0.1725949947878; Mon, 09 Sep 2024
+ 23:32:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, Kalesh Anakkur Purayil
-	<kalesh-anakkur.purayil@broadcom.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<shenjian15@huawei.com>, <wangpeiyang1@huawei.com>, <liuyonglong@huawei.com>,
-	<chenhao418@huawei.com>, <sudongming1@huawei.com>, <xujunsheng@huawei.com>,
-	<shiyongbang@huawei.com>, <libaihan@huawei.com>, <zhuyuan@huawei.com>,
-	<forest.zhouchang@huawei.com>, <jdamato@fastly.com>, <horms@kernel.org>,
-	<jonathan.cameron@huawei.com>, <shameerali.kolothum.thodi@huawei.com>,
-	<salil.mehta@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V8 net-next 05/11] net: hibmcge: Implement some .ndo
- functions
-To: Andrew Lunn <andrew@lunn.ch>
-References: <20240909023141.3234567-1-shaojijie@huawei.com>
- <20240909023141.3234567-6-shaojijie@huawei.com>
- <CAH-L+nOxj1_wHdSacC5R9WG5GeMswEQDXa4xgVFxyLHM7xjycg@mail.gmail.com>
- <116bff77-f12f-43f0-8325-b513a6779a55@huawei.com>
- <fec0a530-64d9-401c-bb43-4c5670587909@lunn.ch>
- <1a7746a7-af17-43f9-805f-fd1cbd24e607@huawei.com>
- <49166f60-bf25-4313-bacb-496103086d40@lunn.ch>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <49166f60-bf25-4313-bacb-496103086d40@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm000007.china.huawei.com (7.193.23.189)
+References: <20240909-rockchip-canfd-clang-div-libcall-v1-1-c6037ea0bb2b@kernel.org>
+In-Reply-To: <20240909-rockchip-canfd-clang-div-libcall-v1-1-c6037ea0bb2b@kernel.org>
+From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Date: Tue, 10 Sep 2024 15:32:15 +0900
+Message-ID: <CAMZ6RqKA77BWAMxL4_iAcye78JXDGxGQcEd9BJg7uCL9EO11XA@mail.gmail.com>
+Subject: Re: [PATCH net-next] can: rockchip_canfd: Use div_s64() in rkcanfd_timestamp_init()
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, kernel@pengutronix.de, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Heiko Stuebner <heiko@sntech.de>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org, 
+	llvm@lists.linux.dev, patches@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
+On Tue. 10 Sep. 2024 at 01:24, Nathan Chancellor <nathan@kernel.org> wrote:
+> When building with clang for a 32-bit target, such as arm, a libcall is
+> generated when dividing the result of clocksource_cyc2ns(), which
+> returns a signed 64-bit integer:
+>
+>   ERROR: modpost: "__aeabi_ldivmod" [drivers/net/can/rockchip/rockchip_canfd.ko] undefined!
+>
+> Use div_s64() to avoid generating the libcall.
+>
+> Fixes: 4e1a18bab124 ("can: rockchip_canfd: add hardware timestamping support")
+> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+> ---
+> This does not happen with GCC, likely because it implements
+> optimizations for division by a constant that clang does not implement.
+> ---
+>  drivers/net/can/rockchip/rockchip_canfd-timestamp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/can/rockchip/rockchip_canfd-timestamp.c b/drivers/net/can/rockchip/rockchip_canfd-timestamp.c
+> index 81cccc5fd8384ee1fec919077db48632f0fe7cc2..4ca01d385ffffdeec964b7fd954d8ba3ba3a1381 100644
+> --- a/drivers/net/can/rockchip/rockchip_canfd-timestamp.c
+> +++ b/drivers/net/can/rockchip/rockchip_canfd-timestamp.c
+> @@ -71,7 +71,7 @@ void rkcanfd_timestamp_init(struct rkcanfd_priv *priv)
+>
+>         max_cycles = div_u64(ULLONG_MAX, cc->mult);
+>         max_cycles = min(max_cycles, cc->mask);
+> -       work_delay_ns = clocksource_cyc2ns(max_cycles, cc->mult, cc->shift) / 3;
+> +       work_delay_ns = div_s64(clocksource_cyc2ns(max_cycles, cc->mult, cc->shift), 3);
 
-on 2024/9/9 22:48, Andrew Lunn wrote:
->> No, HBG_NIC_STATE_OPEN is not intended to ensure that hbg_net_open() and
->> hbg_net_stop() are mutually exclusive.
->>
->> Actually, when the driver do reset or self-test(ethtool -t or ethtool --reset or FLR).
->> We hope that no other data is transmitted or received at this time.
-> That is an invalid assumption. You could be receiving line rate
-> broadcast traffic for example, because there is a broadcast storm
-> happening.
->
-> I assume for testing, you are configuring a loopback somewhere? PHY
-> loopback or PCS loopback? I've seen some PHYs do 'broken' loopback
-> where egress traffic is looped back, but ingress traffic is also still
-> received. Is this true for your hardware? Is this why you make this
-> assumption?
->
-> What is your use case for ethtool --reset? Are you working around
-> hardware bugs? Why not simply return -EBUSY if the user tries to use
-> --reset when the interface is admin up. You then know the interface is
-> down, you don't need open/close to be re-entrant safe.
->
-> Same for testing. Return -ENETDOWN if the user tries to do self test
-> on an interface which is admin down.
->
-> 	Andrew
+I was surprised at first to see div_s64() instead of div_u64(), but
+clocksource_cyc2ns() indeed returns a s64. So this looks correct.
 
-Good idea. I'll remove priv->state first in v9. We'll discuss this 
-internally. Thank you very much. Jiji Shao
+>         priv->work_delay_jiffies = nsecs_to_jiffies(work_delay_ns);
+>         INIT_DELAYED_WORK(&priv->timestamp, rkcanfd_timestamp_work);
 
+Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 
