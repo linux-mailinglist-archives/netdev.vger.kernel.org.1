@@ -1,152 +1,135 @@
-Return-Path: <netdev+bounces-127135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9C0F974424
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 22:40:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 093E8974427
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 22:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F8761C21809
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 20:40:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C203E288166
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 20:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE6C1A4B84;
-	Tue, 10 Sep 2024 20:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15EEB1A7074;
+	Tue, 10 Sep 2024 20:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="O5TT0uFA"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FYZ/F6Fa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81B8197A6B;
-	Tue, 10 Sep 2024 20:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739A4197A6B;
+	Tue, 10 Sep 2024 20:40:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726000816; cv=none; b=tf10kQKoX4ZPHuKvhQX34CGD/Vg+fyQZKP86HFS3bL3aV7n/nazrdB1XEctMpJbQBSzoqO5kXqjGm+wkaikXzMgjLamL0iMBG+6LCQUJpzr335jNSoJcKT5MJbOTsI8wmvqczGs2+kEscR9FPplIlIlRkTXa6Fp5TI3yn5qja/M=
+	t=1726000826; cv=none; b=eYTW2fWJpGjtUV+QJZBqNomil44FQRNiONzTApCbpH1fh+CURPSh4v2+WhMzSKc9RHc8gVqfBkt0uqlf0zGk5vqU0h/OFpoFhB7tuQm8+M6zN3fEzVsU07mLnFJE4Kurxel3dbt7nAgJRNgyeSPUGkj1QkPNp+mXZDjatcRjAs8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726000816; c=relaxed/simple;
-	bh=zen7WDNeO31dhz4+IfbTkr5Qw+vuV26ucn//PvOQFAM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=aajvbEoVrtvJX5fhSInzmSReZ52lLt/iobsK5lCrj/yNQ4jKeKCZQp9S8fEisa1FHcg+N7mwYt++Fa2jEEQqRNOUrAmHJtZQ31Gk2E5cfNnxq0EGXSAyn7r3RBUA9QRkHU4Jn4lE7VoYO57OhxDNSPDQAMh7LA3/DQ1hDAUSq6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=O5TT0uFA; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48AF3Ngk023787;
-	Tue, 10 Sep 2024 20:40:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=V6DJ9sOOSOXMHDWh431m9C
-	ToIoOW32pG61L9XfIH8uo=; b=O5TT0uFAUd8dw11S7GoB27AeEviYVeBamyy4hp
-	3jwcRNG3D7EIgugAx/ogBIvh87vbySazebIQC0mFd61+MPRh7Q3QQO9m1f5D3SMv
-	nGhep1tATOILB0XLcjLnXutJrM/plnTMdzIPgbX/0QYbtox98rkM8TaLNIIKDMQw
-	kawGMiBP+CbCFPhhtgQlWLIf0rWvN6TnFR+VRAKFVFO6Hk+jFZTVWPt5MX+pTsJJ
-	QbgLqi9O6Eg7DLpUKyntSgIZFA2cq8BReJzXwUcQ6iVQtol+vlYuCszbE4PrUcoC
-	bFTJsgOxFsbjPhdB/v9Y+wwCoxz5k2GhGHWup3cLLZOQHhSg==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41gy6p79mr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Sep 2024 20:40:04 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48AKe49s011038
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 10 Sep 2024 20:40:04 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 10 Sep
- 2024 13:40:03 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Tue, 10 Sep 2024 13:40:03 -0700
-Subject: [PATCH] wifi: mac80211: constify
- ieee80211_ie_build_{he,eht}_oper() chandef
+	s=arc-20240116; t=1726000826; c=relaxed/simple;
+	bh=6T7SOnIsI601KN0KFoLcN/ZzSCZuK2pskDXrkO5CCWY=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gJIS7tzPGw/rD+pfH4W7sKnMn6K1Nq8GPgArxO1qPheJZz8Ci6zKO7IAGBnkuiZ6rELYnwDRHRBMkMe1ldee2vAamoEcmPtqoyeJoPTjWIfbMFe1m9XLIlhv02/kyE1sjiX8qKDUJfoDmB63QMJuUscqGsIXLboUvz165qIAqhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FYZ/F6Fa; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1726000824; x=1757536824;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=XY4SJY6vgtWRAaNWx9MgjEkq7Me3c0gkRLKGE36HnnA=;
+  b=FYZ/F6FaH22P5o5Ge0hT5foSZRSzE3fR7d/gbcqowzBFDMhF7fgxrnH/
+   R9q0u4sFDlhoKxGOrFoGBPH1bRvLENEX81HVfOb/586SB1xb9WmP1Ylf4
+   MZL991IITs/iE8PA6XQauSI0q9CqVKRmUvpMZ+Fz/+sWF4Psfbp1mb0Zu
+   U=;
+X-IronPort-AV: E=Sophos;i="6.10,218,1719878400"; 
+   d="scan'208";a="329665798"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 20:40:22 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:19696]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.52.222:2525] with esmtp (Farcaster)
+ id ba656067-30b6-43dd-804c-bc9ab56be096; Tue, 10 Sep 2024 20:40:22 +0000 (UTC)
+X-Farcaster-Flow-ID: ba656067-30b6-43dd-804c-bc9ab56be096
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 10 Sep 2024 20:40:20 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 10 Sep 2024 20:40:18 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <justin.iurman@uliege.be>
+CC: <aahringo@redhat.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] ipv6: rpl: free skb
+Date: Tue, 10 Sep 2024 13:40:10 -0700
+Message-ID: <20240910204010.96400-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240910100032.18168-1-justin.iurman@uliege.be>
+References: <20240910100032.18168-1-justin.iurman@uliege.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240910-wireless-utils-constify-v1-1-e59947bcb3c3@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAKKu4GYC/4WOQQ6CMBBFr2K6dkyLNFpX3sOwoGWQSaBopyCEc
- HcLC7cu3+K9/xfBGAhZ3A6LCDgSU+8TqONBuKb0TwSqEotMZrk0SsKHArbIDEOklsH1niPVMyg
- 0lbZSn1HXItmvgDVNe/lRJLYlI9hQetdsvV/G4xShK8lvUkMc+zDvb0a1qf+HRwUKrMlMpvVFy
- /x6fw/kyLuT6ztRrOv6BQfZwx7lAAAA
-To: Johannes Berg <johannes@sipsolutions.net>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.14.0
-X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: O9tBipnOqVpIAtBmE6ZGkrF1ma29V1EK
-X-Proofpoint-GUID: O9tBipnOqVpIAtBmE6ZGkrF1ma29V1EK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
- bulkscore=0 lowpriorityscore=0 mlxlogscore=989 spamscore=0 phishscore=0
- impostorscore=0 suspectscore=0 mlxscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409100153
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWB002.ant.amazon.com (10.13.139.175) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-The chandef parameter passed to ieee80211_ie_build_he_oper() and
-ieee80211_ie_build_eht_oper is read-only. Since it is never modified,
-add the const qualifier to this parameter. This makes these consistent
-with ieee80211_ie_build_ht_oper() and ieee80211_ie_build_vht_oper().
+From: Justin Iurman <justin.iurman@uliege.be>
+Date: Tue, 10 Sep 2024 12:00:32 +0200
+> Make rpl_input() free the skb before returning when skb_cow_head()
+> fails. Use a "drop" label and goto instructions.
+> 
+> Note: if you think it should be a fix and target "net" instead, let me
+> know.
 
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
- net/mac80211/ieee80211_i.h | 4 ++--
- net/mac80211/util.c        | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Please do so.
 
-diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
-index 4f0390918b60..3f4d2773b828 100644
---- a/net/mac80211/ieee80211_i.h
-+++ b/net/mac80211/ieee80211_i.h
-@@ -2545,8 +2545,8 @@ u8 *ieee80211_ie_build_vht_cap(u8 *pos, struct ieee80211_sta_vht_cap *vht_cap,
- u8 *ieee80211_ie_build_vht_oper(u8 *pos, struct ieee80211_sta_vht_cap *vht_cap,
- 				const struct cfg80211_chan_def *chandef);
- u8 ieee80211_ie_len_he_cap(struct ieee80211_sub_if_data *sdata);
--u8 *ieee80211_ie_build_he_oper(u8 *pos, struct cfg80211_chan_def *chandef);
--u8 *ieee80211_ie_build_eht_oper(u8 *pos, struct cfg80211_chan_def *chandef,
-+u8 *ieee80211_ie_build_he_oper(u8 *pos, const struct cfg80211_chan_def *chandef);
-+u8 *ieee80211_ie_build_eht_oper(u8 *pos, const struct cfg80211_chan_def *chandef,
- 				const struct ieee80211_sta_eht_cap *eht_cap);
- int ieee80211_parse_bitrates(enum nl80211_chan_width width,
- 			     const struct ieee80211_supported_band *sband,
-diff --git a/net/mac80211/util.c b/net/mac80211/util.c
-index f94faa86ba8a..f0db60878321 100644
---- a/net/mac80211/util.c
-+++ b/net/mac80211/util.c
-@@ -2752,7 +2752,7 @@ u8 *ieee80211_ie_build_vht_oper(u8 *pos, struct ieee80211_sta_vht_cap *vht_cap,
- 	return pos + sizeof(struct ieee80211_vht_operation);
- }
- 
--u8 *ieee80211_ie_build_he_oper(u8 *pos, struct cfg80211_chan_def *chandef)
-+u8 *ieee80211_ie_build_he_oper(u8 *pos, const struct cfg80211_chan_def *chandef)
- {
- 	struct ieee80211_he_operation *he_oper;
- 	struct ieee80211_he_6ghz_oper *he_6ghz_op;
-@@ -2844,7 +2844,7 @@ u8 *ieee80211_ie_build_he_oper(u8 *pos, struct cfg80211_chan_def *chandef)
- 	return pos;
- }
- 
--u8 *ieee80211_ie_build_eht_oper(u8 *pos, struct cfg80211_chan_def *chandef,
-+u8 *ieee80211_ie_build_eht_oper(u8 *pos, const struct cfg80211_chan_def *chandef,
- 				const struct ieee80211_sta_eht_cap *eht_cap)
- 
- {
+For the future submission, this kind of note and changelog between
+each revision can be placed after '---' below so that it will disappear
+during merge.
 
----
-base-commit: fe57beb026ef5f9614adfa23ee6f3c21faede2cf
-change-id: 20240910-wireless-utils-constify-1e9d5b053e5f
-
+> 
+> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+> ---
+>  net/ipv6/rpl_iptunnel.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/ipv6/rpl_iptunnel.c b/net/ipv6/rpl_iptunnel.c
+> index 2c83b7586422..db3c19a42e1c 100644
+> --- a/net/ipv6/rpl_iptunnel.c
+> +++ b/net/ipv6/rpl_iptunnel.c
+> @@ -263,10 +263,8 @@ static int rpl_input(struct sk_buff *skb)
+>  	rlwt = rpl_lwt_lwtunnel(orig_dst->lwtstate);
+>  
+>  	err = rpl_do_srh(skb, rlwt);
+> -	if (unlikely(err)) {
+> -		kfree_skb(skb);
+> -		return err;
+> -	}
+> +	if (unlikely(err))
+> +		goto drop;
+>  
+>  	local_bh_disable();
+>  	dst = dst_cache_get(&rlwt->cache);
+> @@ -286,9 +284,13 @@ static int rpl_input(struct sk_buff *skb)
+>  
+>  	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+>  	if (unlikely(err))
+> -		return err;
+> +		goto drop;
+>  
+>  	return dst_input(skb);
+> +
+> +drop:
+> +	kfree_skb(skb);
+> +	return err;
+>  }
+>  
+>  static int nla_put_rpl_srh(struct sk_buff *skb, int attrtype,
+> -- 
 
