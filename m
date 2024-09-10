@@ -1,187 +1,238 @@
-Return-Path: <netdev+bounces-127128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC5E79743A1
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 21:43:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DECA9743AD
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 21:49:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1B841C24E8C
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:43:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C439D28825B
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:49:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B2C1A76C1;
-	Tue, 10 Sep 2024 19:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102671AAE07;
+	Tue, 10 Sep 2024 19:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="oDDJlilN"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NXdlQAau"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B2F1A7061
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 19:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46DD81A76DA;
+	Tue, 10 Sep 2024 19:49:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725997410; cv=none; b=XuFsXDNksSEslvJX1EWEF8nP1cCMq0RZLqrA3on0faDAHQDFjUaXOec1rowMjjXtDDt8lsYUDhZgfWKVIakOEiGvb6NMW5NcCObizXGoJCA6FFMd7zAcQk6QSBi+h4ugejG3/uyo9umBOIwtoxnnm6SMSofs5TyUDFAnMxYWj6w=
+	t=1725997777; cv=none; b=gFrSXObNrmy1qHQ2vlhGEd634IQxhKY/EJg5ODabJAfRs+uh3mh0pQM9hDau0fmgxRy860uNdFFnviNrOtOez+tYQybFUWhDm1mUzMNmNltrY+QV52ouhzVv5KdJZyPYUWHeiQwRAybEq32ifvaY5sssTRYYEFwRftVMDAz61GI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725997410; c=relaxed/simple;
-	bh=fUauvFk9xm6PdY0fYMcea9vaRdvrdV/33sTG48bpAVM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mI59ngJT5DigaCbYFmIo+2IqndMd8ZED9PsAk74c6nDLb/SUzF7nSTVvmojJSLVoXbjDqdYSvoDuRlAIg4T1Mwa9ZCNlONHRSIX7mp835Z9KYkExvYC/lAqbSpMF7I6q/SP2VN4KdzsM+cXQeL9Rgjwnw1xjrF9i9kzoQUeO5pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=oDDJlilN; arc=none smtp.client-ip=209.85.166.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-82aa6be8457so6953839f.0
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 12:43:28 -0700 (PDT)
+	s=arc-20240116; t=1725997777; c=relaxed/simple;
+	bh=ccBxcpeuPZm8pVyeOUPxWoSYyMWp++34eVaxy+VEapU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iHD7hQHAt60MdADS5IDmdR2lPp5VPFoe2ppD1A6lbP9H7WmxUKMQIde96r17IWO4Pah9zN4XXAa+SJ/I11OPk7Q2mBZx/1xI9Hv6bFfna9+zHwZLp5XQpu2lBrwmji9u+lujy9NvI0A9zpk0wN/ATFGswTl8ESpqdIkTvGRr6sI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NXdlQAau; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725997407; x=1726602207; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GIUkVijX/obmO81YZ0hDppAp+m8ygO6cINoJy3iHW4A=;
-        b=oDDJlilNWhQos8DgLZzfwFFfZliEMS9G0zVBFIVf5JBENN0hSdM9+lBRtesczg2x8B
-         2ga3OOK8Arf4/R2VOXodZ9XsT4U3XeFmjgsdsVOwLyDJonvu8pHKfKd5Ow/7rA4F1mcp
-         dqDWvWOHu4js2EahTbwUYLebEBtVj9gt2xBic4xAklbRgoTEssjdQVkyz8H2huG48N3V
-         zEBE2cX2J1fotidfKE7GJcnjEizTtpC/o+6Gxd9a5ao2y4RDxGsEAJRn9Pc2lvDG8EE0
-         +4xMYQK4JXHimR4VLU8+WvinveIZXBNflattqZntklrumlkgaexc+SJgib8wqJZ67h4H
-         QKeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725997407; x=1726602207;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GIUkVijX/obmO81YZ0hDppAp+m8ygO6cINoJy3iHW4A=;
-        b=gGaHto/qJ+4U0IQ0KBKANS83PEyz37XxnRipiu+7z0lJIluIUTJqIth2pmd8jxTToP
-         pB3tix6JSLWsFjfDh4hVG9FaXLFQO4KyXlQUquRBQjpmYy0vGoLQ+yRWTgDItbTXukfG
-         w1/tVUxZzde5WddLqmDKHjhqsXx+MUtWE5xoIbcSBQInwczJkc9xXOVuGvyk3Get/EdR
-         OYAoXRf7ZkmdlDd+7zNzeZnvP9GwcyowKuIhTvHP/G9+KPAJwrKWOLxAD64wq8MrzWwW
-         +Le6R5CHlhMh8mf5V9aVUdvuo/0rJRBSdU3BOqQ4pGC/Ua4RVvm9sX3vs5whqVhYtJuZ
-         ZV7A==
-X-Gm-Message-State: AOJu0YwGbl1tE4Ox3nFiCMIZeUAjp05H1o+wa5a0vAEvNo1gPOc3go1W
-	1UMHPSxBRa7yHVlV/xchr/VVzBmMR+r3ohTy0RG6U0fGXE8LxpgunTe03GhCMiM=
-X-Google-Smtp-Source: AGHT+IHIko6wrr+sFUfNKE96zD/bA6pVDBoyLufvdJCHIMMC8sNiJfBBEk0IrGQr8l+j/w6VextyQA==
-X-Received: by 2002:a6b:7843:0:b0:82c:ec0f:a081 with SMTP id ca18e2360f4ac-82cfb078a0dmr393887839f.4.1725997407264;
-        Tue, 10 Sep 2024 12:43:27 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d09451dc68sm1742786173.3.2024.09.10.12.43.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 12:43:26 -0700 (PDT)
-Message-ID: <64ab096c-c493-42b1-945e-ba3547723720@kernel.dk>
-Date: Tue, 10 Sep 2024 13:43:25 -0600
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1725997776; x=1757533776;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=dACRD1j+be5FMEDwQZty04itxFHodGQg6PPtuiZvQ0E=;
+  b=NXdlQAau3mNS3QTfoekhqyykwI5wiaRRe6RXbWkHdV2sTEqM+BWF7u3x
+   kx9+r+4SfLbxRHDc+uRwMlXCKRcsjVtcsvAmCt/zEGu7//Kg7MFC63ABW
+   DyFUQgGOt6eVIceWdcwnGoU0YxHfvMmpnH7QWWPqJFFDmUr5uULk0k+EN
+   s=;
+X-IronPort-AV: E=Sophos;i="6.10,218,1719878400"; 
+   d="scan'208";a="758581941"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 19:49:24 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:47074]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.84:2525] with esmtp (Farcaster)
+ id e06452b5-6f92-4c8a-8440-4455041c59de; Tue, 10 Sep 2024 19:49:22 +0000 (UTC)
+X-Farcaster-Flow-ID: e06452b5-6f92-4c8a-8440-4455041c59de
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 10 Sep 2024 19:49:21 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 10 Sep 2024 19:49:18 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <rao.shoaib@oracle.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in unix_stream_read_actor (2)
+Date: Tue, 10 Sep 2024 12:49:10 -0700
+Message-ID: <20240910194910.90514-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <1cca9939-fe04-4e19-bc14-5e6a9323babd@oracle.com>
+References: <1cca9939-fe04-4e19-bc14-5e6a9323babd@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Regression v6.11 booting cannot mount harddisks (xfs)
-To: Jesper Dangaard Brouer <hawk@kernel.org>,
- Damien Le Moal <dlemoal@kernel.org>,
- Linus Torvalds <torvalds@linuxfoundation.org>,
- LKML <linux-kernel@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>
-Cc: Netdev <netdev@vger.kernel.org>, linux-ide@vger.kernel.org,
- cassel@kernel.org, handan.babu@oracle.com, djwong@kernel.org,
- Linux-XFS <linux-xfs@vger.kernel.org>, hdegoede@redhat.com,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- kernel-team <kernel-team@cloudflare.com>, rjones@redhat.com
-References: <0a43155c-b56d-4f85-bb46-dce2a4e5af59@kernel.org>
- <d2c82922-675e-470f-a4d3-d24c4aecf2e8@kernel.org>
- <ee565fda-b230-4fb3-8122-e0a9248ef1d1@kernel.org>
- <7fedb8c2-931f-406b-b46e-83bf3f452136@kernel.org>
- <c9096ee9-0297-4ae3-9d15-5d314cb4f96f@kernel.dk>
- <0ad933b9-9df5-4acc-aa72-d291aa7d7f4d@kernel.org>
- <894a9361-d232-41c5-8090-89fd61fadb28@kernel.dk>
- <3d87bdde-4800-4a8b-9b34-ba7998f503c3@kernel.org>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <3d87bdde-4800-4a8b-9b34-ba7998f503c3@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D035UWA004.ant.amazon.com (10.13.139.109) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 9/10/24 1:40 PM, Jesper Dangaard Brouer wrote:
+From: Shoaib Rao <rao.shoaib@oracle.com>
+Date: Tue, 10 Sep 2024 11:49:20 -0700
+> On 9/10/2024 11:33 AM, Kuniyuki Iwashima wrote:
+> > From: Shoaib Rao <rao.shoaib@oracle.com>
+> > Date: Tue, 10 Sep 2024 11:16:59 -0700
+> >> On 9/10/2024 10:57 AM, Kuniyuki Iwashima wrote:
+> >>> From: Shoaib Rao <rao.shoaib@oracle.com>
+> >>> Date: Tue, 10 Sep 2024 09:55:03 -0700
+> >>>> On 9/9/2024 5:48 PM, Kuniyuki Iwashima wrote:
+> >>>>> From: Shoaib Rao <rao.shoaib@oracle.com>
+> >>>>> Date: Mon, 9 Sep 2024 17:29:04 -0700
+> >>>>>> I have some more time investigating the issue. The sequence of packet
+> >>>>>> arrival and consumption definitely points to an issue with OOB handling
+> >>>>>> and I will be submitting a patch for that.
+> >>>>>
+> >>>>> It seems a bit late.
+> >>>>> My patches were applied few minutes before this mail was sent.
+> >>>>> https://urldefense.com/v3/__https://lore.kernel.org/netdev/172592764315.3964840.16480083161244716649.git-patchwork-notify@kernel.org/__;!!ACWV5N9M2RV99hQ!M806VrqNEGFgGXEoWG85msKAdFPXup7RzHy9Kt4q_HOfpPWsjNHn75KyFK3a3jWvOb9EEQuFGOjpqgk$
+> >>>>>
+> >>>>
+> >>>> That is a subpar fix. I am not sure why the maintainers accepted the fix
+> >>>> when it was clear that I was still looking into the issue.
+> >>>
+> >>> Just because it's not a subpar fix and you were slow and wrong,
+> >>> clining to triggering the KASAN splat without thinking much.
+> >>>
+> >>>
+> >>>> Plus the
+> >>>> claim that it fixes the panic is absolutely wrong.
+> >>>
+> >>> The _root_ cause of the splat is mishandling of OOB in manage_oob()
+> >>> which causes UAF later in another recvmsg().
+> >>>
+> >>> Honestly your patch is rather a subpar fix to me, few points:
+> >>>
+> >>>     1. The change conflicts with net-next as we have already removed
+> >>>        the additional unnecessary refcnt for OOB skb that has caused
+> >>>        so many issue reported by syzkaller
+> >>>
+> >>>     2. Removing OOB skb in queue_oob() relies on the unneeded refcnt
+> >>>        but it's not mentioned; if merge was done wrongly, another UAF
+> >>>        will be introduced in recvmsg()
+> >>>
+> >>>     3. Even the removing logic is completely unnecessary if manage_oob()
+> >>>        is changed
+> >>>
+> >>>     4. The scan_again: label is misplaced; two consecutive empty OOB skbs
+> >>>        never exist at the head of recvq
+> >>>
+> >>>     5. ioctl() is not fixed
+> >>>
+> >>>     6. No test added
+> >>>
+> >>>     7. Fixes: tag is bogus
+> >>>
+> >>>     8. Subject lacks target tree and af_unix prefix
+> >>
+> >> If you want to nit pick, nit pick away, Just because the patch email
+> >> lacks proper formatting does not make the patch technically inferior.
+> > 
+> > Ironically you just nit picked 8.
+> > 
+> > 
 > 
-> 
-> On 10/09/2024 21.21, Jens Axboe wrote:
->> On 9/10/24 1:19 PM, Jesper Dangaard Brouer wrote:
->>>
->>>
->>> On 10/09/2024 20.38, Jens Axboe wrote:
->>>> On 9/10/24 11:53 AM, Jesper Dangaard Brouer wrote:
->>>>> Hi Hellwig,
->>>>>
->>>>> I bisected my boot problem down to this commit:
->>>>>
->>>>> $ git bisect good
->>>>> af2814149883e2c1851866ea2afcd8eadc040f79 is the first bad commit
->>>>> commit af2814149883e2c1851866ea2afcd8eadc040f79
->>>>> Author: Christoph Hellwig <hch@lst.de>
->>>>> Date:   Mon Jun 17 08:04:38 2024 +0200
->>>>>
->>>>>       block: freeze the queue in queue_attr_store
->>>>>
->>>>>       queue_attr_store updates attributes used to control generating I/O, and
->>>>>       can cause malformed bios if changed with I/O in flight.  Freeze the queue
->>>>>       in common code instead of adding it to almost every attribute.
->>>>>
->>>>>       Signed-off-by: Christoph Hellwig <hch@lst.de>
->>>>>       Reviewed-by: Bart Van Assche <bvanassche@acm.org>
->>>>>       Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
->>>>>       Reviewed-by: Hannes Reinecke <hare@suse.de>
->>>>>       Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
->>>>>       Link: https://lore.kernel.org/r/20240617060532.127975-12-hch@lst.de
->>>>>       Signed-off-by: Jens Axboe <axboe@kernel.dk>
->>>>>
->>>>>    block/blk-mq.c    | 5 +++--
->>>>>    block/blk-sysfs.c | 9 ++-------
->>>>>    2 files changed, 5 insertions(+), 9 deletions(-)
->>>>>
->>>>> git describe --contains af2814149883e2c1851866ea2afcd8eadc040f79
->>>>> v6.11-rc1~80^2~66^2~15
->>>>
->>>> Curious, does your init scripts attempt to load a modular scheduler
->>>> for your root drive?
->>>
->>> I have no idea, this is just a standard Fedora 40.
->>>
->>>>
->>>> Reference: https://git.kernel.dk/cgit/linux/commit/?h=for-6.12/block&id=3c031b721c0ee1d6237719a6a9d7487ef757487b
->>>
-> 
-> [1] https://git.kernel.dk/cgit/linux/commit/?h=for-6.12/block&id=3c031b721c0ee1d6237719a6a9d7487ef757487b
-> 
->>> The commit doesn't apply cleanly on top of af2814149883e2c185.
->>>
->>> $ patch --dry-run -p1 < ../block-jens/block-jens-bootfix.patch
->>> checking file block/blk-sysfs.c
->>> Hunk #1 FAILED at 23.
->>> Hunk #2 succeeded at 469 (offset 56 lines).
->>> Hunk #3 succeeded at 484 (offset 56 lines).
->>> Hunk #4 succeeded at 723 with fuzz 1 (offset 45 lines).
->>> 1 out of 4 hunks FAILED
->>> checking file block/elevator.c
->>> Hunk #1 FAILED at 698.
->>> 1 out of 1 hunk FAILED
->>> checking file block/elevator.h
->>> Hunk #1 FAILED at 148.
->>> 1 out of 1 hunk FAILED
->>>
->>> I will try to apply and adjust manually.
->>
->> Just apply it on top of current -git, doesn't have to be your bisection
->> point.
->>
-> 
-> I applied it manually and now my testlab server boots :-)
+> I have no idea what you mean. I am more worried about technical 
+> correctness than formatting -- That does not mean formatting is not 
+> necessary.
 
-Excellent! I'll get it staged for 6.11 instead. Thank for reporting and
-testing.
+I started pointing out technical stuff and ended with nit-pick because
+"I am more worried about technical correctness", but you started nit
+picking from the last point.  That's unfortunate.
 
-> Just with the patch[1] on top of bisection point
-> ... as it was faster to recompile this way ;-)
 
-That's a pathetic excuse for a test box then ;-)
+> 
+> >> My
+> >> fix is a proper fix not a hack. The change in queue_oob is sufficient to
+> >> fix all issues including SIOCATMARK. The fix in manage_oob is just for
+> >> correctness.
+> > 
+> > Then, it should be WARN_ON_ONCE() not to confuse future readers.
+> > 
+> > 
+> >> In your fix I specifically did not like the change made to
+> >> fix SIOCATMARK.
+> > 
+> > I don't like that part too, but it's needed to avoid the additional refcnt
+> > that is much worse as syzbot has been demonstrating.
+> > 
+> 
+> syzbot has nothing to do with doing a proper fix.
 
--- 
-Jens Axboe
+You don't understand my point.  syzbot has been finding many real issues
+that were caused by poor handling of the additional refcount.
+
+Also, removing it discovered another bug in manage_oob().  That's a enough
+reason to explain why we should remove the unnecessary refcnt.
+
+
+> One has to understand 
+> the code though to do the fix at the proper location.
+
+I'm not saying that the patch is correct if it silences syzbot.
+
+Actually, I said KASAN is handy but you need not rely on it.
+
+Rather it's you who argued the splat was needed even without trying
+to understand the code.
+
+I really don't understand why you are saying this to me now.
+
+
+> 
+> > 
+> >>
+> >> What is most worrying is claim to fixing a panic when it can not even
+> >> happen with the bug.
+> > 
+> > It's only on your setup.  syzbot and I were able to trigger that with
+> > the bug.
+> > 
+> 
+> Really, what is so special about my setup that kasan does not like? Can 
+> you point me to the exact location where the access is made?
+
+I don't know, it's your job.
+
+> 
+> I am at least glad that you have backed off your assertion that my 
+> change does not fix the ioctl.
+
+Okay, I was wrong about that, and what about other points, fragile
+refcnt, non-WARN_ON_ONCE(), misplaced label, no test, bogus tag ?
+
+
+> I am sure if I keep pressing you, you 
+> will back off the panic claim as well.
+
+I also don't understand what you are saying and why you still can't
+correlate the splat and the sequences of syscalls in the repro.
+
+
+> You yourself admitted you did not 
+> know why kasan was not panicing, Has anyone else hit the same panic?
+> 
+> If you can pin point the exact location where the illegal access is 
+> made, please do so and I will accept that I am wrong, other than that I 
+> am not interested in this constant back and forth with no technical 
+> details just fluff.
+
+Please read my changelog (and mails) carefully that pin-point the
+exact location and reason where/why the illegal access happens.
+
+This will be the last mail from me in this thread.  I don't want to
+waste time on someone who doesn't read mails.
 
