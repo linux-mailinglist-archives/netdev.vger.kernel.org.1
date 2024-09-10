@@ -1,145 +1,152 @@
-Return-Path: <netdev+bounces-127134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127135-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3966E97440A
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 22:23:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9C0F974424
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 22:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A8B01C20E4C
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 20:23:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F8761C21809
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 20:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1106F19E827;
-	Tue, 10 Sep 2024 20:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE6C1A4B84;
+	Tue, 10 Sep 2024 20:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IdhMDD7y"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="O5TT0uFA"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D8217DFEF;
-	Tue, 10 Sep 2024 20:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81B8197A6B;
+	Tue, 10 Sep 2024 20:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725999811; cv=none; b=FZ9FOrMglRIum2Mo3pm9b5HFOoZjTXper+eYZoI7z9zoPIOqS4mOWZSHjVm7ECNhgis6zK2fCjn9biLPMAc9/ciWXcLIwrggV2OBlRb/Ygu5iLFTUgAVO3ijUMBXnuEGQ1zSlSb8Ql86mJE/LT7pHJaiJPfmrJ+7GErtdc+hV40=
+	t=1726000816; cv=none; b=tf10kQKoX4ZPHuKvhQX34CGD/Vg+fyQZKP86HFS3bL3aV7n/nazrdB1XEctMpJbQBSzoqO5kXqjGm+wkaikXzMgjLamL0iMBG+6LCQUJpzr335jNSoJcKT5MJbOTsI8wmvqczGs2+kEscR9FPplIlIlRkTXa6Fp5TI3yn5qja/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725999811; c=relaxed/simple;
-	bh=+2mI3aVPTFAjNlPmZ31IgSUQL2Z6Nm4c8jT5AMKE3OU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JoclZ1HRSu46p2yb/8GRHQbDVqNNTk+GUebb5w+w+w6q1wgkt9FgWksP9xme0iwZlNTVgIxvNklTgDUR7GWY0GJk9NH8ABNCFPp23F7djn//EP/gxRPt79o5EE76kaoDIOmylY50D2Ljoq0zu2Sf3C3SOqk/KDvxBbf/mvmGRVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IdhMDD7y; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=UScy8S4PwLWTUHBkvNN5SsfhvZ/groIzspKz4jIa54E=; b=Id
-	hMDD7yg8kLYwOlh7L4SAhPH327yk8+RavVcyJe/EfWsuulDzHL59+/5dsA187Tguk0XoU+lDSXFpq
-	rahOg8hncoJ4wYjDAhEptQ1+AAgl0p2a1/ygD4HxJP27kOUZa0THgeytF84uIrpdLkHyu9B1P3pCi
-	eyEaIIefOva2Z+c=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1so7OQ-0078tn-VG; Tue, 10 Sep 2024 22:23:18 +0200
-Date: Tue, 10 Sep 2024 22:23:18 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Eichenberger <eichest@gmail.com>,
-	Dimitri Fedrau <dima.fedrau@gmail.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next 3/3] net: phy: marvell-88q2xxx: Enable auto
- negotiation for mv88q2110
-Message-ID: <70b86181-7bcf-42d7-b5a8-d26ac0c4c573@lunn.ch>
-References: <20240906133951.3433788-1-niklas.soderlund+renesas@ragnatech.se>
- <20240906133951.3433788-4-niklas.soderlund+renesas@ragnatech.se>
+	s=arc-20240116; t=1726000816; c=relaxed/simple;
+	bh=zen7WDNeO31dhz4+IfbTkr5Qw+vuV26ucn//PvOQFAM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=aajvbEoVrtvJX5fhSInzmSReZ52lLt/iobsK5lCrj/yNQ4jKeKCZQp9S8fEisa1FHcg+N7mwYt++Fa2jEEQqRNOUrAmHJtZQ31Gk2E5cfNnxq0EGXSAyn7r3RBUA9QRkHU4Jn4lE7VoYO57OhxDNSPDQAMh7LA3/DQ1hDAUSq6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=O5TT0uFA; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48AF3Ngk023787;
+	Tue, 10 Sep 2024 20:40:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=V6DJ9sOOSOXMHDWh431m9C
+	ToIoOW32pG61L9XfIH8uo=; b=O5TT0uFAUd8dw11S7GoB27AeEviYVeBamyy4hp
+	3jwcRNG3D7EIgugAx/ogBIvh87vbySazebIQC0mFd61+MPRh7Q3QQO9m1f5D3SMv
+	nGhep1tATOILB0XLcjLnXutJrM/plnTMdzIPgbX/0QYbtox98rkM8TaLNIIKDMQw
+	kawGMiBP+CbCFPhhtgQlWLIf0rWvN6TnFR+VRAKFVFO6Hk+jFZTVWPt5MX+pTsJJ
+	QbgLqi9O6Eg7DLpUKyntSgIZFA2cq8BReJzXwUcQ6iVQtol+vlYuCszbE4PrUcoC
+	bFTJsgOxFsbjPhdB/v9Y+wwCoxz5k2GhGHWup3cLLZOQHhSg==
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41gy6p79mr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Sep 2024 20:40:04 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48AKe49s011038
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Sep 2024 20:40:04 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 10 Sep
+ 2024 13:40:03 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Tue, 10 Sep 2024 13:40:03 -0700
+Subject: [PATCH] wifi: mac80211: constify
+ ieee80211_ie_build_{he,eht}_oper() chandef
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240906133951.3433788-4-niklas.soderlund+renesas@ragnatech.se>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20240910-wireless-utils-constify-v1-1-e59947bcb3c3@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAKKu4GYC/4WOQQ6CMBBFr2K6dkyLNFpX3sOwoGWQSaBopyCEc
+ HcLC7cu3+K9/xfBGAhZ3A6LCDgSU+8TqONBuKb0TwSqEotMZrk0SsKHArbIDEOklsH1niPVMyg
+ 0lbZSn1HXItmvgDVNe/lRJLYlI9hQetdsvV/G4xShK8lvUkMc+zDvb0a1qf+HRwUKrMlMpvVFy
+ /x6fw/kyLuT6ztRrOv6BQfZwx7lAAAA
+To: Johannes Berg <johannes@sipsolutions.net>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.14.0
+X-ClientProxiedBy: nalasex01c.na.qualcomm.com (10.47.97.35) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: O9tBipnOqVpIAtBmE6ZGkrF1ma29V1EK
+X-Proofpoint-GUID: O9tBipnOqVpIAtBmE6ZGkrF1ma29V1EK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 adultscore=0
+ bulkscore=0 lowpriorityscore=0 mlxlogscore=989 spamscore=0 phishscore=0
+ impostorscore=0 suspectscore=0 mlxscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409100153
 
-On Fri, Sep 06, 2024 at 03:39:51PM +0200, Niklas Söderlund wrote:
-> The initial marvell-88q2xxx driver only supported the Marvell 88Q2110
-> PHY without auto negotiation support. The reason documented states that
-> the provided initialization sequence did not to work. Now a method to
-> enable auto negotiation have been found by comparing the initialization
-> of other supported devices and an out-of-tree PHY driver.
-> 
-> Perform the minimal needed initialization of the PHY to get auto
-> negotiation working and remove the limitation that disables the auto
-> negotiation feature for the mv88q2110 device.
-> 
-> With this change a 1000Mbps full duplex link is able to be negotiated
-> between two mv88q2110 and the link works perfectly. The other side also
-> reflects the manually configure settings of the master device.
-> 
->     # ethtool eth0
->     Settings for eth0:
->             Supported ports: [  ]
->             Supported link modes:   100baseT1/Full
->                                     1000baseT1/Full
->             Supported pause frame use: Symmetric Receive-only
->             Supports auto-negotiation: Yes
->             Supported FEC modes: Not reported
->             Advertised link modes:  100baseT1/Full
->                                     1000baseT1/Full
->             Advertised pause frame use: No
->             Advertised auto-negotiation: Yes
->             Advertised FEC modes: Not reported
->             Link partner advertised link modes:  100baseT1/Full
->                                                  1000baseT1/Full
->             Link partner advertised pause frame use: No
->             Link partner advertised auto-negotiation: Yes
->             Link partner advertised FEC modes: Not reported
->             Speed: 1000Mb/s
->             Duplex: Full
->             Auto-negotiation: on
->             master-slave cfg: preferred master
->             master-slave status: slave
->             Port: Twisted Pair
->             PHYAD: 0
->             Transceiver: external
->             MDI-X: Unknown
->             Link detected: yes
->             SQI: 15/15
-> 
-> Before this change I was not able to manually configure 1000Mbps link,
-> only a 100Mpps link so this change providers an improvement in
-> performance for this device.
-> 
->     [  5] local 10.1.0.2 port 5201 connected to 10.1.0.1 port 38346
->     [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
->     [  5]   0.00-1.00   sec  96.8 MBytes   812 Mbits/sec    0    469 KBytes
->     [  5]   1.00-2.00   sec  94.3 MBytes   791 Mbits/sec    0    469 KBytes
->     [  5]   2.00-3.00   sec  96.1 MBytes   806 Mbits/sec    0    469 KBytes
->     [  5]   3.00-4.00   sec  98.3 MBytes   825 Mbits/sec    0    469 KBytes
->     [  5]   4.00-5.00   sec  98.4 MBytes   825 Mbits/sec    0    469 KBytes
->     [  5]   5.00-6.00   sec  98.4 MBytes   826 Mbits/sec    0    469 KBytes
->     [  5]   6.00-7.00   sec  98.9 MBytes   830 Mbits/sec    0    469 KBytes
->     [  5]   7.00-8.00   sec  91.7 MBytes   769 Mbits/sec    0    469 KBytes
->     [  5]   8.00-9.00   sec  99.4 MBytes   834 Mbits/sec    0    747 KBytes
->     [  5]   9.00-10.00  sec   101 MBytes   851 Mbits/sec    0    747 KBytes
-> 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+The chandef parameter passed to ieee80211_ie_build_he_oper() and
+ieee80211_ie_build_eht_oper is read-only. Since it is never modified,
+add the const qualifier to this parameter. This makes these consistent
+with ieee80211_ie_build_ht_oper() and ieee80211_ie_build_vht_oper().
 
-I will mark this one as 'change-requested', when in fact it is more a
-test-requested. Once we get a Tested-by: we can merge this next cycle.
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+---
+ net/mac80211/ieee80211_i.h | 4 ++--
+ net/mac80211/util.c        | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-    Andrew
+diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
+index 4f0390918b60..3f4d2773b828 100644
+--- a/net/mac80211/ieee80211_i.h
++++ b/net/mac80211/ieee80211_i.h
+@@ -2545,8 +2545,8 @@ u8 *ieee80211_ie_build_vht_cap(u8 *pos, struct ieee80211_sta_vht_cap *vht_cap,
+ u8 *ieee80211_ie_build_vht_oper(u8 *pos, struct ieee80211_sta_vht_cap *vht_cap,
+ 				const struct cfg80211_chan_def *chandef);
+ u8 ieee80211_ie_len_he_cap(struct ieee80211_sub_if_data *sdata);
+-u8 *ieee80211_ie_build_he_oper(u8 *pos, struct cfg80211_chan_def *chandef);
+-u8 *ieee80211_ie_build_eht_oper(u8 *pos, struct cfg80211_chan_def *chandef,
++u8 *ieee80211_ie_build_he_oper(u8 *pos, const struct cfg80211_chan_def *chandef);
++u8 *ieee80211_ie_build_eht_oper(u8 *pos, const struct cfg80211_chan_def *chandef,
+ 				const struct ieee80211_sta_eht_cap *eht_cap);
+ int ieee80211_parse_bitrates(enum nl80211_chan_width width,
+ 			     const struct ieee80211_supported_band *sband,
+diff --git a/net/mac80211/util.c b/net/mac80211/util.c
+index f94faa86ba8a..f0db60878321 100644
+--- a/net/mac80211/util.c
++++ b/net/mac80211/util.c
+@@ -2752,7 +2752,7 @@ u8 *ieee80211_ie_build_vht_oper(u8 *pos, struct ieee80211_sta_vht_cap *vht_cap,
+ 	return pos + sizeof(struct ieee80211_vht_operation);
+ }
+ 
+-u8 *ieee80211_ie_build_he_oper(u8 *pos, struct cfg80211_chan_def *chandef)
++u8 *ieee80211_ie_build_he_oper(u8 *pos, const struct cfg80211_chan_def *chandef)
+ {
+ 	struct ieee80211_he_operation *he_oper;
+ 	struct ieee80211_he_6ghz_oper *he_6ghz_op;
+@@ -2844,7 +2844,7 @@ u8 *ieee80211_ie_build_he_oper(u8 *pos, struct cfg80211_chan_def *chandef)
+ 	return pos;
+ }
+ 
+-u8 *ieee80211_ie_build_eht_oper(u8 *pos, struct cfg80211_chan_def *chandef,
++u8 *ieee80211_ie_build_eht_oper(u8 *pos, const struct cfg80211_chan_def *chandef,
+ 				const struct ieee80211_sta_eht_cap *eht_cap)
+ 
+ {
 
 ---
-pw-bot: cr
+base-commit: fe57beb026ef5f9614adfa23ee6f3c21faede2cf
+change-id: 20240910-wireless-utils-constify-1e9d5b053e5f
+
 
