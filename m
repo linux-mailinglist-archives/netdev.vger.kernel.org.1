@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-126751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD82697261E
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 02:20:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9669B972620
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 02:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 543191F227FE
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:20:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A5C52851B5
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C801CAB9;
-	Tue, 10 Sep 2024 00:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BF31EB26;
+	Tue, 10 Sep 2024 00:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fnWE0ZYW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jx0CAF2x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4935079D2;
-	Tue, 10 Sep 2024 00:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 042401EA84
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 00:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725927641; cv=none; b=s1oOd0ZwEkc/RY2wHV/SLhBpIMtSydHbIZeelVC0lWb1kAWeOgDK9c8VwhMUj/5nna+y2ze3RvESM9N5ouK9q9DeTeuU/0wryMT3Z+FW/7y2Bcm1MSAnohEur39Q54rW9x9Uxh+GdL1wYEyr0+5DnoylQIEYlKSeViKAO1O8K4Y=
+	t=1725927643; cv=none; b=RlYdcu1iHjC+3gCiJ66E7K+07yp4UzkhQLm7N27IeeRZ8oBHUCSUTS6PTY/XfTTyATgMJH8Y3TnsFVJQLJiCZwCkByrTvd8lufmetBOH9K0Ka+Fv4rpEVeIk6Dj7mPBm9FS51aXefolyV2P2cIdzNuIkq+HUTmYsClfUmn2ppKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725927641; c=relaxed/simple;
-	bh=8YaZJftXQlJLKZQTe7GdEkgZEqnn9cYslRF0n3XgHSc=;
+	s=arc-20240116; t=1725927643; c=relaxed/simple;
+	bh=vRLdNklmBXhodgdCLflO4P/dwnOZ1uHDvLxVtPPDJ5U=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fUBr5m8RZCUMJPD8X3KBLgBJK9NoeihIlr1kdB3EgRHkrdsXyTDeoWdpHhNqExAJAfwvvVkySgpf+ha63zdOfD8u4EGSQSpdquSVpLvZAd+pMlSHlUfIQmWJnL0ZcvgJSKB7ZNjlGXDqqjGIiwoJOCTLGfw2cFHuy3G7syiSMqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fnWE0ZYW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B443BC4CEC5;
-	Tue, 10 Sep 2024 00:20:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725927640;
-	bh=8YaZJftXQlJLKZQTe7GdEkgZEqnn9cYslRF0n3XgHSc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fnWE0ZYWvJISixlTkdJwpGCZvhPTzoRDHVjgIcEzAWj15lT5Pu6+xLfLgjDT6tC0W
-	 Hyh5n8Ju9DwZ64QVjLnTrMpQWCWA6ohaaumrgPAIXQsJQ5GidNTbMeuN3f0nA5+lzj
-	 Un1v54UHGPN5uqfyrf0iGtdyjLCl+M09R6un5uzJbI2VS8e9RY1eOhVyCDVAwRvZTq
-	 vWxNdsoNwd/6AGqpwTfxrdCTrzuzvD31dDA1IugS3Puoy7Je5bjQAy2NsIYtlw7wcK
-	 62Jlpug6WGN7yuIAt7OqwYYmxf4dUqSd/ymLoIMR6i1dgE4euveLtTCJPutZHO9UGa
-	 RsCpk8PRgMPVQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD863806654;
+	 In-Reply-To:To:Cc; b=KzBJLeWF/B7ksgCCq+XWS9/6WU8QLBAZHuy2hUrvtX/XMjPT9rSv8JEVBY8AyAscboYjyyU/dwZoxv+49rh1vTwhmsd+lWhq0D5TJf4mrX8YoAOFNGjKigVghnk8zgMzAOXJle01h+FMUYjV+9Z1pcSivSRt+a07ligol288Rlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jx0CAF2x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7942FC4CEC5;
 	Tue, 10 Sep 2024 00:20:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725927642;
+	bh=vRLdNklmBXhodgdCLflO4P/dwnOZ1uHDvLxVtPPDJ5U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jx0CAF2xLz/sYnRRjdKjyaftQ2udeLaXbe3lmCr3hnhsVT9K5hgjQBjXLjzAdwQSU
+	 KMKv9dNJFyBwproTXzONTRieCuu3mYJz4YZxRPFMjAV7V9sG1FUzkax/w+WWayJeQE
+	 u8i8qn+10hSm/6L6+DADauJ/wiVRLpJ7YIOhfcgI6qBsIVgulDS3ijyIhsyUmZ9XF9
+	 J6GHQ7WgSjTyfa+tu1MFh8JEJ4f6T2o9EglwhBYEReBOoTDmKUZitQ74Ie2Ga6x+eT
+	 WbaSpRSgIZs9N5eZNIFrV1zYiVhU9hWPfII8rSwNwE4iC/Y7mBaZZimSTCk+kg2Xn9
+	 Qs602gZMfw+AA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD9F3806654;
+	Tue, 10 Sep 2024 00:20:44 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/3] net: can: cc770: Simplify parsing DT properties
+Subject: Re: [PATCH v1 net-next 0/4] af_unix: Correct manage_oob() when OOB
+ follows a consumed OOB.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172592764178.3964840.7976503474349657993.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Sep 2024 00:20:41 +0000
-References: <20240909063657.2287493-2-mkl@pengutronix.de>
-In-Reply-To: <20240909063657.2287493-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de, robh@kernel.org
+ <172592764315.3964840.16480083161244716649.git-patchwork-notify@kernel.org>
+Date: Tue, 10 Sep 2024 00:20:43 +0000
+References: <20240905193240.17565-1-kuniyu@amazon.com>
+In-Reply-To: <20240905193240.17565-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  9 Sep 2024 08:33:53 +0200 you wrote:
-> From: "Rob Herring (Arm)" <robh@kernel.org>
+On Thu, 5 Sep 2024 12:32:36 -0700 you wrote:
+> Recently syzkaller reported UAF of OOB skb.
 > 
-> Use of the typed property accessors is preferred over of_get_property().
-> The existing code doesn't work on little endian systems either. Replace
-> the of_get_property() calls with of_property_read_bool() and
-> of_property_read_u32().
+> The bug was introduced by commit 93c99f21db36 ("af_unix: Don't stop
+> recv(MSG_DONTWAIT) if consumed OOB skb is at the head.") but uncovered
+> by another recent commit 8594d9b85c07 ("af_unix: Don't call skb_get()
+> for OOB skb.").
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/3] net: can: cc770: Simplify parsing DT properties
-    (no matching commit)
-  - [net-next,2/3] can: rockchip_canfd: fix return type of rkcanfd_start_xmit()
-    https://git.kernel.org/netdev/net-next/c/9a0e4c18cdec
-  - [net-next,3/3] can: rockchip_canfd: rkcanfd_timestamp_init(): fix 64 bit division on 32 bit platforms
-    https://git.kernel.org/netdev/net-next/c/9c100bc3ec13
+  - [v1,net-next,1/4] af_unix: Remove single nest in manage_oob().
+    https://git.kernel.org/netdev/net-next/c/579770dd8985
+  - [v1,net-next,2/4] af_unix: Rename unlinked_skb in manage_oob().
+    https://git.kernel.org/netdev/net-next/c/beb2c5f19b6a
+  - [v1,net-next,3/4] af_unix: Move spin_lock() in manage_oob().
+    https://git.kernel.org/netdev/net-next/c/a0264a9f51fe
+  - [v1,net-next,4/4] af_unix: Don't return OOB skb in manage_oob().
+    https://git.kernel.org/netdev/net-next/c/5aa57d9f2d53
 
 You are awesome, thank you!
 -- 
