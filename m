@@ -1,68 +1,57 @@
-Return-Path: <netdev+bounces-127039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72C2F973CBB
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:51:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F270973CD0
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:58:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ECE8283B44
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:51:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 623B11C212D1
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:58:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E37C19994D;
-	Tue, 10 Sep 2024 15:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2710019F47E;
+	Tue, 10 Sep 2024 15:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t5N2uiM1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Vu69pIpw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33ED26A022;
-	Tue, 10 Sep 2024 15:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2453219E827;
+	Tue, 10 Sep 2024 15:58:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725983502; cv=none; b=HTcsxJOi12+dK0DUgfHi/WgecoU29wkndXheSOZ4JXiw7bjaiSSItwMhGnUfJ+LOAMt9FTJfZAywXEMTgA+O+L5MT8HUhgz4Rn7H8fViTeWvVxRvbr1WWPV185ZNPg+Z8UPgeLAsOOqn7AeH6evdJdxPVfg2aAN7L4doHMJ7vJU=
+	t=1725983920; cv=none; b=LIuDxPZCSg8VvpPuwjLZ9LNy2m4gv+DgLrYLolhLgl8LQVmQcMqm5EYWG9TDdhn/708Ug/J/RU78nkb2syVXjoHBa2sqaBOGn8L9ftLXeY3byTwfoE/2yOSxAIjuEYXIVRn/ZTbCO61Cdj+4FCb5uVF4yr6k4s1u7pZiND/2GkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725983502; c=relaxed/simple;
-	bh=u+LUaZcmfiXGrPUKUlRbyxCTBqnb4HavaO+FbiBlV+A=;
+	s=arc-20240116; t=1725983920; c=relaxed/simple;
+	bh=JLJaCOiABB/oP/JYn7vUsmEd/L1StlhDnijFrQJ2s7c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=beOlJ+twIdPS2KHmz62wyPhrB+Hj4dSN0eDa5+t22ypzwAiBClvkUtBuJ2Yr81Jn6TPFvQj126osevvYsUnWi2C4G65a11D2Rx0zavcw1wamCWtpu6AzvEUeNSE31QRapealWwToTjjGfyfjEOiJDkeIiR8g3goeulG+4m5de44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t5N2uiM1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE8C4C4CEC3;
-	Tue, 10 Sep 2024 15:51:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725983501;
-	bh=u+LUaZcmfiXGrPUKUlRbyxCTBqnb4HavaO+FbiBlV+A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=t5N2uiM1pWLNmDd5h0HKWfwfCVjfWQp+9QJG27mYdbRGl83FJ1gt6jlIzDbIyXQt/
-	 3DbT41hD7Axa7J4+BrsTqSQSK3vzw4Fb+1WdX+qvLwi0ASBpwsaBQVYOJ3o4nEAaJp
-	 EepiZmcfW9AW5CWMQqep36htQQrZiO4vE10Q1QgvyzTLpVSock/X8mdypIc9Dsc7BE
-	 1E2/wKRGg3pQqfY87+ge3T24b9BEvcNnyjBCynzBhQdYl7L0kQ+g+f7CMoKOR/7N5h
-	 dUkuebKd302kzNgTIs86SGrDrmKLMbZqLmBPZBR/nsKYa94FqEpSZACsrzIfkfaWfG
-	 5OZ/TodFS0MEg==
-Date: Tue, 10 Sep 2024 16:51:36 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ayush Singh <ayush@beagleboard.org>
-Cc: d-gole@ti.com, lorforlinux@beagleboard.org, jkridner@beagleboard.org,
-	robertcnelson@beagleboard.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Tero Kristo <kristo@kernel.org>, Johan Hovold <johan@kernel.org>,
-	Alex Elder <elder@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	greybus-dev@lists.linaro.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 3/3] greybus: gb-beagleplay: Add firmware upload API
-Message-ID: <20240910155136.GH572255@kernel.org>
-References: <20240903-beagleplay_fw_upgrade-v4-0-526fc62204a7@beagleboard.org>
- <20240903-beagleplay_fw_upgrade-v4-3-526fc62204a7@beagleboard.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YuVQTGWxh6SQQtE6053apULsX8Zo/eccKTjZPszZB4vm9aydHYUNL/oYrmtgAOzpy+L9idPpW+8KUPRA+k0YyslY10Woaz9b25AgqrZ6E//LZbSQUohGjVxvLw9Tdi0WVIiDECsHV/AYwmAnotj0Wmaesh3Mw/q6sVl790uYYnM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Vu69pIpw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=QDxDa9XCwWgMAD9MF1Dm8QsW5pDstiAmlvOyC9GXuKU=; b=Vu69pIpwOJbG/4sxBpf8rxtsMU
+	EZ7eu/YM/PHyBUOGEtkI3nGgGrzP7Q2ET9GLiuRPP5Q+Cs+ueavD0Ii0LjXQMvJg19r5nv59PuAtE
+	oi/N7lybsEMC22fitMpxgZ1boY/LAG2QOTgEYqt/brs5oIBLPG+3vhSPXSoH/quDfho4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1so3G2-0077k0-O0; Tue, 10 Sep 2024 17:58:22 +0200
+Date: Tue, 10 Sep 2024 17:58:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Qianqiang Liu <qianqiang.liu@163.com>
+Cc: chris.snook@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH] net: ag71xx: remove dead code path
+Message-ID: <196dc563-85ec-491d-8e2e-8749f3b07ff4@lunn.ch>
+References: <20240910152254.21238-1-qianqiang.liu@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,41 +60,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240903-beagleplay_fw_upgrade-v4-3-526fc62204a7@beagleboard.org>
+In-Reply-To: <20240910152254.21238-1-qianqiang.liu@163.com>
 
-On Tue, Sep 03, 2024 at 03:02:20PM +0530, Ayush Singh wrote:
-> Register with firmware upload API to allow updating firmware on cc1352p7
-> without resorting to overlay for using the userspace flasher.
-> 
-> Communication with the bootloader can be moved out of gb-beagleplay
-> driver if required, but I am keeping it here since there are no
-> immediate plans to use the on-board cc1352p7 for anything other than
-> greybus (BeagleConnect Technology). Additionally, there do not seem to
-> any other devices using cc1352p7 or it's cousins as a co-processor.
-> 
-> Boot and Reset GPIOs are used to enable cc1352p7 bootloader backdoor for
-> flashing. The delays while starting bootloader are taken from the
-> userspace flasher since the technical specification does not provide
-> sufficient information regarding it.
-> 
-> Flashing is skipped in case we are trying to flash the same
-> image as the one that is currently present. This is determined by CRC32
-> calculation of the supplied firmware and Flash data.
-> 
-> We also do a CRC32 check after flashing to ensure that the firmware was
-> flashed properly.
-> 
-> Firmware size should be 704 KB.
-> 
-> Link: https://www.ti.com/lit/ug/swcu192/swcu192.pdf Ti CC1352p7 Tecnical Specification
+On Tue, Sep 10, 2024 at 11:22:54PM +0800, Qianqiang Liu wrote:
+> The 'err' is always zero, so the following branch can never be executed:
+> if (err) {
+> 	ndev->stats.rx_dropped++;
+> 	kfree_skb(skb);
+> }
+> Therefore, the 'if' statement can be removed.
 
-nit: If you need to post a v5 for some other reason,
-     please consider updating the spelling of Technical
+This code was added by Oleksij Rempel <o.rempel@pengutronix.de>. It is
+good to Cc: him, he might have useful comments.
 
-> Link: https://openbeagle.org/beagleconnect/cc1352-flasher Userspace
-> Flasher
+Your changed does look correct, but maybe ret was actually supposed to
+be set somewhere? Is there an actual bug hiding here somewhere?
+
+     Andrew
+
 > 
-> Signed-off-by: Ayush Singh <ayush@beagleboard.org>
-
-...
+> Signed-off-by: Qianqiang Liu <qianqiang.liu@163.com>
+> ---
+>  drivers/net/ethernet/atheros/ag71xx.c | 12 +++---------
+>  1 file changed, 3 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+> index 96a6189cc31e..5477f3f87e10 100644
+> --- a/drivers/net/ethernet/atheros/ag71xx.c
+> +++ b/drivers/net/ethernet/atheros/ag71xx.c
+> @@ -1616,7 +1616,6 @@ static int ag71xx_rx_packets(struct ag71xx *ag, int limit)
+>  		unsigned int i = ring->curr & ring_mask;
+>  		struct ag71xx_desc *desc = ag71xx_ring_desc(ring, i);
+>  		int pktlen;
+> -		int err = 0;
+>  
+>  		if (ag71xx_desc_empty(desc))
+>  			break;
+> @@ -1646,14 +1645,9 @@ static int ag71xx_rx_packets(struct ag71xx *ag, int limit)
+>  		skb_reserve(skb, offset);
+>  		skb_put(skb, pktlen);
+>  
+> -		if (err) {
+> -			ndev->stats.rx_dropped++;
+> -			kfree_skb(skb);
+> -		} else {
+> -			skb->dev = ndev;
+> -			skb->ip_summed = CHECKSUM_NONE;
+> -			list_add_tail(&skb->list, &rx_list);
+> -		}
+> +		skb->dev = ndev;
+> +		skb->ip_summed = CHECKSUM_NONE;
+> +		list_add_tail(&skb->list, &rx_list);
+>  
+>  next:
+>  		ring->buf[i].rx.rx_buf = NULL;
+> -- 
+> 2.39.2
+> 
+> 
 
