@@ -1,78 +1,100 @@
-Return-Path: <netdev+bounces-127044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AA48973CE9
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 18:04:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB29E973D04
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 18:10:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9D3AB21F74
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:04:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A399B2119C
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2567019EEA1;
-	Tue, 10 Sep 2024 16:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503A11A0706;
+	Tue, 10 Sep 2024 16:10:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zukOn88a"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="n/WKfeNT"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f67.google.com (mail-ej1-f67.google.com [209.85.218.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A812198824;
-	Tue, 10 Sep 2024 16:04:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A38B19F480
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 16:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725984263; cv=none; b=SGh4wSjx460wDXpjmv50JdrVyJq/ldytcjpRy7aCtxXVJMtR41cwIV+x/OGG6AUiYKLeOx/qXwIYHgqscgGXvNpAhMAas+MWwGfVpTnbgLJJeVqxkBUVj9xY0byPJs0831urQzRDaoq+9C3yZBbvxsbZAd+DDPCcgs5v/wUY/Qw=
+	t=1725984649; cv=none; b=H0Fr8ZBcb+JkCNmWI+u2ZxbYQHSaYQK4Be2FjtLVzwgZkdWKNerfp77SslRpXHizVnoYYfSSjgm4dOjny5s+PTbHSw1knmZacfwUYSWc6ftD8ojMuIiPR7dNe0YJsz3tKvEc3Euctylm/AUKFKpcc984ptjQoveV0n0hPK2Nhok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725984263; c=relaxed/simple;
-	bh=lyEi07OYy0HDwQcI/tVSb6icCUDckoGveROhmrvlc/o=;
+	s=arc-20240116; t=1725984649; c=relaxed/simple;
+	bh=dM7gA/+oguMRgO7/v/MyBYt9f4M0YaqbnGL6itt+HT8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WNQshbJpOrJgKKUJ8IOfiLPmTOKLrMDzC2m5U/nd4kck35FL47/e1rJYfRUsIjE98lFztNm87w56D86EwW983MVNw6x4ft1DmUEEEMY5bOmOrYXXrfetGEmWlOI08dD0L/7yWhNQ5g3Xj3MSq95kFf3nGhGtYDtScSHE/qn6nac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zukOn88a; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0q5V/HDrRh41vRS9Fz5fpK96NnFQDgfsGbq54/gK0tY=; b=zukOn88ac0n/yjjixjNa40s1sv
-	llWM2qRl4mMc7Pt+CvyOs+4A69pme6vbBNYLQIwmPi6z30w7pltfk3vgXyypj59QFxu/A1OPmheEI
-	36XfzYEZitalx1+rI9X5TDGBB6Bkj1NjOPFfWvmcIo+G9qYrMBcT3oj3k2MQsRPxMnGw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1so3LY-0077mS-Af; Tue, 10 Sep 2024 18:04:04 +0200
-Date: Tue, 10 Sep 2024 18:04:04 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Suraj Jaiswal <jsuraj@qti.qualcomm.com>
-Cc: Andrew Halaney <ahalaney@redhat.com>,
-	"Suraj Jaiswal (QUIC)" <quic_jsuraj@quicinc.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	"bhupesh.sharma@linaro.org" <bhupesh.sharma@linaro.org>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=VAWIndTBd4EZuHEXWoz6rW27kDtkMEayWjlR1XFUcFt2X4Ac7Ssf+ar2HwCGe7pOqbVz0rUyJ/ethPen1myDtzPaPGt+X9Xy+xH+X1hJTki7iqJ/vtTnDMbreJzuLfJC2A9CU5EGF3jAxYoW7q02Ys/kexVb+OKKMk6xGW/35mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=n/WKfeNT; arc=none smtp.client-ip=209.85.218.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-ej1-f67.google.com with SMTP id a640c23a62f3a-a7aa086b077so534448166b.0
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 09:10:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1725984645; x=1726589445; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yf3Iv71aicYhG3oQ3jGMgzEb4cVqdz7BdZNP84b6Zno=;
+        b=n/WKfeNTT++E/n1PTRPvOQWZpW6xNIZkZA619v9SSuSZdfQkma3auvIWZjLubsvG/K
+         HXEusac6c3xoeuIO6Ht7SYVCt+qE5exWPlRbt4eqQatxG3fuKvvWu9YQkCSQl//MXlPr
+         i7A6ynNHWWT4jn2KrgWktf9TId+LauSTdR0hs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725984645; x=1726589445;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yf3Iv71aicYhG3oQ3jGMgzEb4cVqdz7BdZNP84b6Zno=;
+        b=BA1lktN2xTzyN/Ns6QbIWFD/w5WQZxI7TQe8R6GabOhnKjOiTNd2r9a+JRifStNo3f
+         x4jB3Kg8sI+tdFSNuqreaSPF2gjDI2OiM0S8nhe2U+gP/FrNsU2ykv+XbmwIfxOcQzo6
+         YYNU0IIb+6KbeoDURZ/3kxZJCwG7GEAloeGxDEBvYnGwYiz+8VMih76ACvolItBaNJza
+         Q2CW+8YLQyBek0lWghmmWGhq7pDhac+7MIA1VvOqeFsL13Ofotoe1sZPfdfcYVe/RhYB
+         0k9eFPS3sk1LMT0HV4Lwr1CPP9BKdIEIy0JRFjs24jgQwSBnkpuwbOPwsA6aZF5nQoiz
+         9Ztg==
+X-Gm-Message-State: AOJu0YzxmoclH97SnWbMjcdkE2ZwSE+T3Oph4/CtOAVcgcZW4XF70O31
+	Lz3NUHo3qi6KPjAMCQizNuu95W7XCnXLluY7F3PU2IgiOtC6uxyTGe5hkaJh0ow=
+X-Google-Smtp-Source: AGHT+IHxHjK63CxiZHrWwLws1xG9AiEiJEPfI1UgHEKNCqePjWh3JnXOx+0CXs1Uw1lTzvZ/w4BzBg==
+X-Received: by 2002:a17:907:6088:b0:a7a:a06b:eecd with SMTP id a640c23a62f3a-a8ffaa97ad0mr156569566b.5.1725984644883;
+        Tue, 10 Sep 2024 09:10:44 -0700 (PDT)
+Received: from LQ3V64L9R2.homenet.telecomitalia.it (host-79-23-194-51.retail.telecomitalia.it. [79.23.194.51])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25d66d7csm493714666b.224.2024.09.10.09.10.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 09:10:44 -0700 (PDT)
+Date: Tue, 10 Sep 2024 18:10:42 +0200
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
+	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>,
-	Prasad Sodagudi <psodagud@quicinc.com>,
-	Rob Herring <robh@kernel.org>, kernel <kernel@quicinc.com>
-Subject: Re: [PATCH net] net: stmmac: Stop using a single dma_map() for
- multiple descriptors
-Message-ID: <417420b8-3010-4223-a683-55a0daf3b962@lunn.ch>
-References: <20240902095436.3756093-1-quic_jsuraj@quicinc.com>
- <yy2prsz3tjqwjwxgsrumt3qt2d62gdvjwqsti3favtfmf7m5qs@eychxx5qz25f>
- <CYYPR02MB9788D9D0D2424B4F8361A736E79A2@CYYPR02MB9788.namprd02.prod.outlook.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next v2 1/9] net: napi: Add napi_storage
+Message-ID: <ZuBvgpW_iRDjICTH@LQ3V64L9R2.homenet.telecomitalia.it>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	mkarsten@uwaterloo.ca, skhawaja@google.com, sdf@fomichev.me,
+	bjorn@rivosinc.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20240908160702.56618-1-jdamato@fastly.com>
+ <20240908160702.56618-2-jdamato@fastly.com>
+ <20240909164039.501dd626@kernel.org>
+ <Zt_jn5RQAndpKjoE@LQ3V64L9R2.homenet.telecomitalia.it>
+ <20240910075217.45f66523@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,42 +103,129 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CYYPR02MB9788D9D0D2424B4F8361A736E79A2@CYYPR02MB9788.namprd02.prod.outlook.com>
+In-Reply-To: <20240910075217.45f66523@kernel.org>
 
-> On Mon, Sep 02, 2024 at 03:24:36PM GMT, Suraj Jaiswal wrote:
-> > Currently same page address is shared
-> > between multiple buffer addresses and causing smmu fault for other 
-> > descriptor if address hold by one descriptor got cleaned.
-> > Allocate separate buffer address for each descriptor for TSO path so 
-> > that if one descriptor cleared it should not clean other descriptor 
-> > address.
+On Tue, Sep 10, 2024 at 07:52:17AM -0700, Jakub Kicinski wrote:
+> On Tue, 10 Sep 2024 08:13:51 +0200 Joe Damato wrote:
+> > On Mon, Sep 09, 2024 at 04:40:39PM -0700, Jakub Kicinski wrote:
+> > > On Sun,  8 Sep 2024 16:06:35 +0000 Joe Damato wrote:  
+> > > > Add a persistent NAPI storage area for NAPI configuration to the core.
+> > > > Drivers opt-in to setting the storage for a NAPI by passing an index
+> > > > when calling netif_napi_add_storage.
+> > > > 
+> > > > napi_storage is allocated in alloc_netdev_mqs, freed in free_netdev
+> > > > (after the NAPIs are deleted), and set to 0 when napi_enable is called.  
+> > >   
+> > > >  enum {
+> > > > @@ -2009,6 +2019,9 @@ enum netdev_reg_state {
+> > > >   *	@dpll_pin: Pointer to the SyncE source pin of a DPLL subsystem,
+> > > >   *		   where the clock is recovered.
+> > > >   *
+> > > > + *	@napi_storage: An array of napi_storage structures containing per-NAPI
+> > > > + *		       settings.  
+> > > 
+> > > FWIW you can use inline kdoc, with the size of the struct it's easier
+> > > to find it. Also this doesn't need to be accessed from fastpath so you
+> > > can move it down.  
+> > 
+> > OK. I figured since it was being deref'd in napi_complete_done
+> > (where we previously read napi_defer_hard_irqs and
+> > gro_flush_timeout) it needed to be in the fast path.
+> > 
+> > I'll move it down for the next RFC.
 > 
-> I think maybe you mean something like:
-> 
->     Currently in the TSO case a page is mapped with dma_map_single(), and then
->     the resulting dma address is referenced (and offset) by multiple
->     descriptors until the whole region is programmed into the descriptors.
-> 
->     This makes it possible for stmmac_tx_clean() to dma_unmap() the first of the
->     already processed descriptors, while the rest are still being processed
->     by the DMA engine. This leads to an iommu fault due to the DMA engine using
->     unmapped memory as seen below:
-> 
->     <insert splat>
-> 
->     You can reproduce this easily by <reproduction steps>.
-> 
->     To fix this, let's map each descriptor's memory reference individually.
->     This way there's no risk of unmapping a region that's still being
->     referenced by the DMA engine in a later descriptor.
-> 
-> That's a bit nitpicky wording wise, but your first sentence is hard for me to follow (buffer addresses seems to mean descriptor?). I think showing a splat and mentioning how to reproduce is always a bonus as well.
+> Hm, fair point. In my mind I expected we still add the fast path fields
+> to NAPI instances. And the storage would only be there to stash that
+> information for the period of time when real NAPI instances are not
+> present (napi_disable() -> napi_enable() cycles).
 
-What might also be interesting is some benchmark
-numbers. dma_map_single() is not always cheap, since it has to flush
-the cache. I've no idea if only the first call is expensive, and all
-the subsequent calls are cheap? Depending on how expensive it is, some
-sort of refcounting might be cheaper?
+I see, I hadn't understood that part. It sounds like you were
+thinking we'd stash the values in between whereas I thought we were
+reading from the struct directly (hence the implementation of the
+static inline wrappers).
 
-     Andrew
+I don't really have a preference one way or the other.
+
+> But looking at napi_struct, all the cachelines seem full, anyway, so we
+> can as well split the info. No strong preference, feel free to keep as
+> is, then. But maybe rename from napi_storage to napi_config or such?
+
+I can give that a shot for the next RFC and see how it looks. We can
+always duplicate the fields in napi_struct and napi_config and copy
+them over as you suggested above.
+
+> > > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > > index 22c3f14d9287..ca90e8cab121 100644
+> > > > --- a/net/core/dev.c
+> > > > +++ b/net/core/dev.c
+> > > > @@ -6719,6 +6719,9 @@ void napi_enable(struct napi_struct *n)
+> > > >  		if (n->dev->threaded && n->thread)
+> > > >  			new |= NAPIF_STATE_THREADED;
+> > > >  	} while (!try_cmpxchg(&n->state, &val, new));
+> > > > +
+> > > > +	if (n->napi_storage)
+> > > > +		memset(n->napi_storage, 0, sizeof(*n->napi_storage));  
+> > 
+> > OK, your comments below will probably make more sense to me after I
+> > try implementing it, but I'll definitely have some questions.
+> > 
+> > > And here inherit the settings and the NAPI ID from storage, then call
+> > > napi_hash_add(). napi_hash_add() will need a minor diff to use the
+> > > existing ID if already assigned.  
+> > 
+> > I don't think I realized we settled on the NAPI ID being persistent.
+> > I'm not opposed to that, I just think I missed that part in the
+> > previous conversation.
+> > 
+> > I'll give it a shot and see what the next RFC looks like.
+> 
+> The main reason to try to make NAPI ID persistent from the start is that
+> if it works we don't have to add index to the uAPI. I don't feel
+> strongly about it, if you or anyone else has arguments against / why
+> it won't work.
+
+Yea, I think not exposing the index in the uAPI is probably a good
+idea? Making the NAPI IDs persistent let's us avoid that so I can
+give that a shot because it's easier from the user app perspective,
+IMO.
+
+> > > And the inverse of that has to happen in napi_disable() (unhash, save
+> > > settings to storage), and __netif_napi_del() (don't unhash if it has
+> > > index).
+> > > 
+> > > I think that should work?  
+> > 
+> > Only one way to find out ;)
+> > 
+> > Separately: your comment about documenting rings to NAPIs... I am
+> > not following that bit.
+> > 
+> > Is that a thing you meant should be documented for driver writers to
+> > follow to reduce churn ?
+> 
+> Which comment?
+
+In this message:
+
+https://lore.kernel.org/netdev/20240903124008.4793c087@kernel.org/
+
+You mentioned this, which I interpreted as a thing that core needs
+to solve for, but perhaps this intended as advice for drivers?
+
+  Maybe it's enough to document how rings are distributed to NAPIs?
+  
+  First set of NAPIs should get allocated to the combined channels,
+  then for remaining rx- and tx-only NAPIs they should be interleaved
+  starting with rx?
+  
+  Example, asymmetric config: combined + some extra tx:
+  
+      combined        tx
+   [0..#combined-1] [#combined..#combined+#tx-1]
+  
+  Split rx / tx - interleave:
+  
+   [0 rx0] [1 tx0] [2 rx1] [3 tx1] [4 rx2] [5 tx2] ...
+  
+  This would limit the churn when changing channel counts.
 
