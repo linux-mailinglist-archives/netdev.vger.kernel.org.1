@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-126835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 900A89729E0
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:56:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AE6FA9729DC
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC643B248AF
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:56:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1577EB24791
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:56:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2EA17E006;
-	Tue, 10 Sep 2024 06:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED5017C9FB;
+	Tue, 10 Sep 2024 06:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="tLeqx+Fu"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="J2MMgUM+"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA8C17C210
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D27B617C224
 	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 06:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725951329; cv=none; b=Oy5ehwZyyJ1/kCjKk7Nb1OeFhjJ7aXyDs/d9/wR1S3AJTB6f/H0JZ6NKUXJJith/VKI9oFYwUGBulL3+t/VISQIjYpMfJlCKKPUda8Eq1R6bygqLYHxaE0aondygLK8Eujp7c3KYaNf2fjqIL6G+Pmy/qnSbP6XBt/f1dEAPJAI=
+	t=1725951328; cv=none; b=AHY/GJIYo+QbC3C77Adb7W6TecM3BlCLhZuNt89g2Zktm0l2F+2uwxuVHmOvVLvo3NV5VB2bxf0bPrUJNpCqveMfGzgRv57BF1iuQ+apF9RE4oBUGT3q+WeCzePPfMWC1GjY1gl+OlBn2tnnIzdBDKVbrsop8aPo/pr0x0wDJLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725951329; c=relaxed/simple;
-	bh=0TST6cxqOzGGpTqTkGXpBgzChHanW4rbJG1BD8aLbu8=;
+	s=arc-20240116; t=1725951328; c=relaxed/simple;
+	bh=2SuLeyuFJWDHA7U8do1vJwuS3h5Z2OFpGils9N3eHWc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RGzcZP7mfLWEfSJwTOcGY/0zKS98dsS8yX8cUzTyueuDtG/Ws/wUbSyUMgDQE7HsKOksp2cVQCiyFPwV88dirsTTbtsqb3vtfz8iRw8uaZc6tuXWLv1YF5zhRwduytSamoWyfGXgPJtJyYP1FIYYdgKMRlbm8eoyE+BsX0Zmwk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=tLeqx+Fu; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=Y58MrYMbJ7m2pyM1ysQC/+2zdTY37GmDsz2qE+tTNrUevZ+0hhosZ3uRio5CbZ8OHf45/qautd5I36c6Xg0SBg2vYbg7vJCEYvIs4NITByk7aiWT0vERYhWN0UiSiix3cwWiId249sWU0KVLkSlvQPgZHVbYokgGsm4SLy2YiyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=J2MMgUM+; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id D090B208A2;
-	Tue, 10 Sep 2024 08:55:22 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id E3F892074B;
+	Tue, 10 Sep 2024 08:55:23 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 6h4NYGLUT-tw; Tue, 10 Sep 2024 08:55:22 +0200 (CEST)
+	with ESMTP id FebjWKBDbsl4; Tue, 10 Sep 2024 08:55:23 +0200 (CEST)
 Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 0BC78207D1;
+	by a.mx.secunet.com (Postfix) with ESMTPS id ACC1B2089F;
 	Tue, 10 Sep 2024 08:55:22 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 0BC78207D1
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com ACC1B2089F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
 	s=202301; t=1725951322;
-	bh=vorJ3V1CsURCiWLfS0xBx3s7lc9k2WC3MGLw4OwzGi0=;
+	bh=8csKfYlaZqHzHjNFu6MP3D+sydLQSCMkZgGnTdb3vrU=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=tLeqx+Fud8mpY17jdhk+G0GvJC1OYdErEpN9FGFfEsnBntDT3u4iGIwiidXV2VujO
-	 Qo1DbGhMqHl1FXzAJZiqYvHGWdLV6tMn7iw6f9V9PVY3usJK10wqrUX/Z4PXCvdLtK
-	 UvFvH4vP8JQhdA9yvW3Ecqq01w376WfAHp2PX76mPgLdzowAwu6ELnQ1BitH0Lr7Ud
-	 4ifmueJ5stTYgQkHaC509i/a7Vbr8xPznuTejwbMlm6xA4BBsxlAz2G7msIW04Jqdv
-	 sCKOmrLSpjOInYsRat28brU9ByoWEo53V6aNtWVtsrp3l4oRbafvJGam+fFf15yV53
-	 SdZKgqU56Xvug==
+	b=J2MMgUM+jTl5ZcjdH6zvWJP6/jPg+vYL4yiUUZ3eJc4/pYWTD1j7DzIQFwhg3B4U6
+	 Ei43li5zpIjaDVhFLbvhVteYybroiHRj7iE7yYZHcv5NOIa3NHR6n/iJe4gY9KvIzQ
+	 P50JwrdOp2dSKSs73OnIYP/zSG5d6z5dToge+JYFuQHgNgEPnUpTDXeFNusTcrzbWI
+	 wkW69g2Dx1nmjGcbm2h84grtAQuvIeRNWyLRgYECDukWuxgHMqakjbaUf3Ii8C6gLm
+	 9sbEdXbCb+0smzj/DLf0ssMCvFYzgeoAlK4N1bakRAnDVjF46c4LL/s5Iq5GZpq95+
+	 laRyog8Bk6b6A==
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 10 Sep 2024 08:55:21 +0200
+ 15.1.2507.39; Tue, 10 Sep 2024 08:55:22 +0200
 Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 10 Sep
  2024 08:55:20 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 65AFC318423A; Tue, 10 Sep 2024 08:55:20 +0200 (CEST)
+	id 69C1E31842E6; Tue, 10 Sep 2024 08:55:20 +0200 (CEST)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 07/13] xfrm: policy: remove remaining use of inexact list
-Date: Tue, 10 Sep 2024 08:55:01 +0200
-Message-ID: <20240910065507.2436394-8-steffen.klassert@secunet.com>
+Subject: [PATCH 08/13] xfrm: add SA information to the offloaded packet
+Date: Tue, 10 Sep 2024 08:55:02 +0200
+Message-ID: <20240910065507.2436394-9-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240910065507.2436394-1-steffen.klassert@secunet.com>
 References: <20240910065507.2436394-1-steffen.klassert@secunet.com>
@@ -82,137 +82,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-From: Florian Westphal <fw@strlen.de>
+From: wangfe <wangfe@google.com>
 
-No consumers anymore, remove it.  After this, insertion of policies
-no longer require list walk of all inexact policies but only those
-that are reachable via the candidate sets.
+In packet offload mode, append Security Association (SA) information
+to each packet, replicating the crypto offload implementation.
+The XFRM_XMIT flag is set to enable packet to be returned immediately
+from the validate_xmit_xfrm function, thus aligning with the existing
+code path for packet offload mode.
 
-This gives almost linear insertion speeds provided the inserted
-policies are for non-overlapping networks.
+This SA info helps HW offload match packets to their correct security
+policies. The XFRM interface ID is included, which is crucial in setups
+with multiple XFRM interfaces where source/destination addresses alone
+can't pinpoint the right policy.
 
-Before:
-Inserted 1000   policies in 70 ms
-Inserted 10000  policies in 1155 ms
-Inserted 100000 policies in 216848 ms
-
-After:
-Inserted 1000   policies in 56 ms
-Inserted 10000  policies in 478 ms
-Inserted 100000 policies in 4580 ms
-
-Insertion of 1m entries takes about ~40s after this change
-on my test vm.
-
-Cc: Noel Kuntze <noel@familie-kuntze.de>
-Cc: Tobias Brunner <tobias@strongswan.org>
-Signed-off-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: wangfe <wangfe@google.com>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- include/net/xfrm.h     |  1 -
- net/xfrm/xfrm_policy.c | 38 --------------------------------------
- 2 files changed, 39 deletions(-)
+ net/xfrm/xfrm_output.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index f7244ac4fa08..1fa2da22a49e 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -555,7 +555,6 @@ struct xfrm_policy {
- 	u16			family;
- 	struct xfrm_sec_ctx	*security;
- 	struct xfrm_tmpl       	xfrm_vec[XFRM_MAX_DEPTH];
--	struct hlist_node	bydst_inexact_list;
- 	struct rcu_head		rcu;
+diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
+index e5722c95b8bb..a12588e7b060 100644
+--- a/net/xfrm/xfrm_output.c
++++ b/net/xfrm/xfrm_output.c
+@@ -706,6 +706,8 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
+ 	struct xfrm_state *x = skb_dst(skb)->xfrm;
+ 	int family;
+ 	int err;
++	struct xfrm_offload *xo;
++	struct sec_path *sp;
  
- 	struct xfrm_dev_offload xdo;
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index d2feee60bb62..b79ac453ea37 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -196,8 +196,6 @@ xfrm_policy_inexact_lookup_rcu(struct net *net,
- static struct xfrm_policy *
- xfrm_policy_insert_list(struct hlist_head *chain, struct xfrm_policy *policy,
- 			bool excl);
--static void xfrm_policy_insert_inexact_list(struct hlist_head *chain,
--					    struct xfrm_policy *policy);
- 
- static bool
- xfrm_policy_find_inexact_candidates(struct xfrm_pol_inexact_candidates *cand,
-@@ -410,7 +408,6 @@ struct xfrm_policy *xfrm_policy_alloc(struct net *net, gfp_t gfp)
- 	if (policy) {
- 		write_pnet(&policy->xp_net, net);
- 		INIT_LIST_HEAD(&policy->walk.all);
--		INIT_HLIST_NODE(&policy->bydst_inexact_list);
- 		INIT_HLIST_NODE(&policy->bydst);
- 		INIT_HLIST_NODE(&policy->byidx);
- 		rwlock_init(&policy->lock);
-@@ -1228,9 +1225,6 @@ xfrm_policy_inexact_insert(struct xfrm_policy *policy, u8 dir, int excl)
- 		return ERR_PTR(-EEXIST);
- 	}
- 
--	chain = &net->xfrm.policy_inexact[dir];
--	xfrm_policy_insert_inexact_list(chain, policy);
--
- 	if (delpol)
- 		__xfrm_policy_inexact_prune_bin(bin, false);
- 
-@@ -1346,7 +1340,6 @@ static void xfrm_hash_rebuild(struct work_struct *work)
+ 	family = (x->xso.type != XFRM_DEV_OFFLOAD_PACKET) ? x->outer_mode.family
+ 		: skb_dst(skb)->ops->family;
+@@ -728,6 +730,25 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
+ 			kfree_skb(skb);
+ 			return -EHOSTUNREACH;
  		}
++		sp = secpath_set(skb);
++		if (!sp) {
++			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
++			kfree_skb(skb);
++			return -ENOMEM;
++		}
++
++		sp->olen++;
++		sp->xvec[sp->len++] = x;
++		xfrm_state_hold(x);
++
++		xo = xfrm_offload(skb);
++		if (!xo) {
++			secpath_reset(skb);
++			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
++			kfree_skb(skb);
++			return -EINVAL;
++		}
++		xo->flags |= XFRM_XMIT;
  
- 		hlist_del_rcu(&policy->bydst);
--		hlist_del_init(&policy->bydst_inexact_list);
- 
- 		newpos = NULL;
- 		chain = policy_hash_bysel(net, &policy->selector,
-@@ -1515,36 +1508,6 @@ static const struct rhashtable_params xfrm_pol_inexact_params = {
- 	.automatic_shrinking	= true,
- };
- 
--static void xfrm_policy_insert_inexact_list(struct hlist_head *chain,
--					    struct xfrm_policy *policy)
--{
--	struct xfrm_policy *pol, *delpol = NULL;
--	struct hlist_node *newpos = NULL;
--
--	hlist_for_each_entry(pol, chain, bydst_inexact_list) {
--		if (pol->type == policy->type &&
--		    pol->if_id == policy->if_id &&
--		    !selector_cmp(&pol->selector, &policy->selector) &&
--		    xfrm_policy_mark_match(&policy->mark, pol) &&
--		    xfrm_sec_ctx_match(pol->security, policy->security) &&
--		    !WARN_ON(delpol)) {
--			delpol = pol;
--			if (policy->priority > pol->priority)
--				continue;
--		} else if (policy->priority >= pol->priority) {
--			newpos = &pol->bydst_inexact_list;
--			continue;
--		}
--		if (delpol)
--			break;
--	}
--
--	if (newpos && policy->xdo.type != XFRM_DEV_OFFLOAD_PACKET)
--		hlist_add_behind_rcu(&policy->bydst_inexact_list, newpos);
--	else
--		hlist_add_head_rcu(&policy->bydst_inexact_list, chain);
--}
--
- static struct xfrm_policy *xfrm_policy_insert_list(struct hlist_head *chain,
- 						   struct xfrm_policy *policy,
- 						   bool excl)
-@@ -2346,7 +2309,6 @@ static struct xfrm_policy *__xfrm_policy_unlink(struct xfrm_policy *pol,
- 	/* Socket policies are not hashed. */
- 	if (!hlist_unhashed(&pol->bydst)) {
- 		hlist_del_rcu(&pol->bydst);
--		hlist_del_init(&pol->bydst_inexact_list);
- 		hlist_del(&pol->byidx);
+ 		return xfrm_output_resume(sk, skb, 0);
  	}
- 
 -- 
 2.34.1
 
