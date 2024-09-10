@@ -1,46 +1,54 @@
-Return-Path: <netdev+bounces-126946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E331697354D
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:47:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECB909735A8
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:54:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A748728A467
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:47:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26F191C215F9
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:54:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4C318F2F7;
-	Tue, 10 Sep 2024 10:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FDD184521;
+	Tue, 10 Sep 2024 10:54:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="BR24SVdG"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9B414D431;
-	Tue, 10 Sep 2024 10:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D049D5381A;
+	Tue, 10 Sep 2024 10:54:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725965173; cv=none; b=kQkNqeX6U8dTOa3XxiM7okUF6c4KIQHLYsOyAzB3FyjPSn4gZM8/Tw2scvCL1/eH/qBq2TfAhgZk55nghMMk8vO7odpmgxblY6is6HAakVFIewpriyhP9tHqNYm1oGJo32rMCz+T5fR5zYYdvHv+couOtjEs8n0YzBsgPLXGIRM=
+	t=1725965693; cv=none; b=Ez7FMWooIHE6KzJZkGH14pvg4uYzLc8zboxnNcVKg4rvc8cZ+Rspsbkbs5saSM9rRFXYnZTZi6HdlyJ1PtwbjkUJAtAONcmrM3h0YGqF8kY+I7eqMcvppI4khr7dAI+bJfsG8n2Y8ivrQJXbznfOEJkiqG20mutNRvrHc/sWgA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725965173; c=relaxed/simple;
-	bh=4+n+yhtKq/1EmKfGojZXbzM1JsjV8W6GtUOG1tc04HI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=YjM0l8BVTWuSa1q9GSJtnKSNTO5v7tve5Zeo5q//DdKRwqGKk9or2D2ExpAwc/vbIG1Ctcv/6pFr+V/G23oHbwB4hvAPWo8amYCNbIdcE8xwdC7P7qeJHwblZrLTAZIVcLK9fIezaObrNP45PUAonCilidaXgYTvDGyVvTVZhwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4X30jK1L8lz2DbkM;
-	Tue, 10 Sep 2024 18:45:41 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3F8F11A0188;
-	Tue, 10 Sep 2024 18:46:09 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 10 Sep 2024 18:46:08 +0800
-Message-ID: <b438256d-a233-4708-9a82-e4f5f4b86a63@huawei.com>
-Date: Tue, 10 Sep 2024 18:46:08 +0800
+	s=arc-20240116; t=1725965693; c=relaxed/simple;
+	bh=Wh+owzRCtjJxHLGFaI5wLRWKWVcggyAybw6Eyx2lcng=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Eak674zQkE2rtMM2cKiD/xII5tXoNqLs2pmXtTWXDeLAVsbaSIjlavQd2cWYdk4dTmdGpelVCVj4gbzmu1dvkUfmK5B29E0fU6V6X+6cpuYEvqqZMbpBrx+hgOzqNSJmRJ3XQjC4lYXLoz7zgI4/Tkybl/HaDsF7LIDK3jVgDMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=BR24SVdG; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 666B688F86;
+	Tue, 10 Sep 2024 12:54:48 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1725965690;
+	bh=qoaKpe8hmZdXvzj3KdwHJhDf5BJ8aJPHolFz1r34tCI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BR24SVdGaBvfhqXIeXNufheEmEPyT6Ph2a4hA/0NoIl6PC0YBO8A8q9twKZSRRFY7
+	 kwbtwguSZMrCh2KKcExaAir5U6GJaJsXayzVFvmQIGnhFWhFwnYqrd1wImPmb+sT70
+	 hE5pInkFG9s7tOmemPU331PBT+mh0GnRk8kHCzVW6aPc6mmDqyQuQW3D9EINx6aa6Z
+	 9ilvNHXrUvNbept55vrWFRHPxjqraBtdjmBehsBlu+fffBRjtchhrXHGgII3CY/MKy
+	 +kZ2L1FdGolWpPKLIoxg8ANq++yTTxNyfa7n7wzHtkRj84kAXuRWHnBApMQ0529k58
+	 WZv195s1WlgiA==
+Message-ID: <25704805-b98a-43ac-b54e-2857b12e1574@denx.de>
+Date: Tue, 10 Sep 2024 12:49:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,71 +56,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] page_pool: add a test module for page_pool
-To: Mina Almasry <almasrymina@google.com>
-CC: <hawk@kernel.org>, <ilias.apalodimas@linaro.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
-	<shuah@kernel.org>, <linux-kselftest@vger.kernel.org>
-References: <20240909091913.987826-1-linyunsheng@huawei.com>
- <CAHS8izNfLYQFgZYkRPJFonq8LH6SnV70B4pfC_cQ5gyz780cZA@mail.gmail.com>
+Subject: Re: [PATCH v5 6/9] wifi: wilc1000: Remove cmd53_buf() allocation
+To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ linux-wireless@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Adham Abozaeid <adham.abozaeid@microchip.com>,
+ Ajay Singh <ajay.kathat@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
+ <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240909193035.69823-1-marex@denx.de>
+ <20240909193035.69823-6-marex@denx.de>
+ <9602d2a7-8397-425a-b567-bc06422d89ec@bootlin.com>
 Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAHS8izNfLYQFgZYkRPJFonq8LH6SnV70B4pfC_cQ5gyz780cZA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <9602d2a7-8397-425a-b567-bc06422d89ec@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On 2024/9/10 1:28, Mina Almasry wrote:
-> On Mon, Sep 9, 2024 at 2:25 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> The testing is done by ensuring that the page allocated from
->> the page_pool instance is pushed into a ptr_ring instance in
->> a kthread/napi binded to a specified cpu, and a kthread/napi
->> binded to a specified cpu will pop the page from the ptr_ring
->> and free it back to the page_pool.
->>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+On 9/10/24 11:47 AM, Alexis Lothoré wrote:
+> On 9/9/24 21:29, Marek Vasut wrote:
+>> The cmd53_buf is a 4 byte buffer, embed it into the struct wilc_sdio.
 > 
-> It seems this test is has a correctness part and a performance part.
-> For the performance test, Jesper has out of tree tests for the
-> page_pool:
-> https://github.com/netoptimizer/prototype-kernel/blob/master/kernel/lib/bench_page_pool_simple.c
-> 
-> I have these rebased on top of net-next and use them to verify devmem
-> & memory-provider performance:
-> https://github.com/mina/linux/commit/07fd1c04591395d15d83c07298b4d37f6b56157f
-
-Yes, I used that testing ko too when adding frag API support for
-page_pool.
-
-The main issue I remembered was that it only support x86:(
-
-> 
-> My preference here (for the performance part) is to upstream the
-> out-of-tree tests that Jesper (and probably others) are using, rather
-> than adding a new performance test that is not as battle-hardened.
-
-I looked through the out-of-tree tests again, it seems we can take the
-best of them.
-For Jesper' ko:
-It seems we can do prefill as something that pp_fill_ptr_ring() does
-in bench_page_pool_simple.c to avoid the noise from the page allocator.
-
-
-For the ko in this patch:
-It uses NAPI instead of tasklet mimicking the NAPI context, support
-PP_FLAG_DMA_MAP flag testing, and return '-EAGAIN' in module_init()
-to use perf stat for collecting and calculating performance data.
-
-Is there other testcase or better practicing that we can learn from
-Jesper' out of tree ko?
-
-> 
-> --
-> Thanks,
-> Mina
-> 
+> Is this change really desirable ? I mean, looking at git log, it looks like this
+> kzalloc is voluntary, for usage with DMA (see [1] as initial fix and [2] as the
+> final patch which has landed in the driver)
+It is unrelated to the series, so I'll just drop it for now.
 
