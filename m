@@ -1,129 +1,104 @@
-Return-Path: <netdev+bounces-127105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C98897422F
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 20:30:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CC13974236
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 20:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22A011F261CC
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 18:30:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B670B21D93
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 18:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C38916F0DC;
-	Tue, 10 Sep 2024 18:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614C717A5AA;
+	Tue, 10 Sep 2024 18:31:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fwgej9u6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iie95DB5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C8A71369B6
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 18:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B186213B5AE
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 18:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725993024; cv=none; b=fAmUdsswMZTKPam98gXG7rdhVD85j9/DqbPM9Zpxj9CNqtLzBsHPsPlRsoNfmB1CtbY8ck/zdRMXh96183iT3N3Vs+9Fb/y7SMvm5cc5bapOcisaIkxZKGOCfPl/PDyaeYPvSa4hQ9NDkMO4WV7uUt4J3vFdOQXrG+0Yo2eGavs=
+	t=1725993064; cv=none; b=OcEHarRt2OPWI2Tp3Y6zG1VxYybWojiCM+Y6e/V/esQ3rFDPavf85igUAVW+30DmO+AuIK08I/bE+pDQldYk0EBho+OvLfkx7a7HXc4IW4JEoNSooMRDk2DEVLPjcuYa/JlV/R5//xaHB9yEssu5xmXs9cW3OZETZBgiDCtU+AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725993024; c=relaxed/simple;
-	bh=g3w3Tso/v/0w2ygisx+WBduPcsMuiZqkxxm3w8elGhk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZMOc6AduJSvjDwN13UM1i/iBQ+58TiAndjxvSkaRJEqRP2ZbjE3OccCixYtwHwKptUoH3Ma0tTXmN2GUVbq0mnL+wJRg39ITgJZJYon6xnXwb2xugnPVfoF1Xwpuuzg7JA1COPdylwQbgYXcESWbT6s86SSTIVi9Gq8TqdwcwB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fwgej9u6; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a8d0d0aea3cso570364266b.3
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 11:30:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1725993021; x=1726597821; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8v5Hd0GafvR7eRw+F0b/pQqT5Z7153+Dlo66ZdBXwCc=;
-        b=fwgej9u6OEaSODOdjmtWHSy36aVJ7bx12nrjcs5c9nia1ycC1CV67feJHQ7FE54lBa
-         Fa2cGwt2b5X9C8j78JWoNcbKu1UgzPX4YGOxlku+onfJFRp3vwLVhhlffTyk8aWCwzTf
-         8gFHOelzODZFTR1QyS9kS4V45SKB8RBjySgjg=
+	s=arc-20240116; t=1725993064; c=relaxed/simple;
+	bh=1CitkQ5sXoLSNxqMb/pgqnQKMYV8MdzKtnNS3Sxtqh4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Nf8KyVibolxjdAoQly+UE7y/wZNyWzYxY8kvxPz71EZcUjoXq5IXeW0AsM2Qt2soZU82St10M+w8Z+7bAytwYsVeOqgpthEJze5mMvc5sgySNQb0wZVxOYbRWWdJjzl4zPPQrf6oD2dJ2MJFd20s5clYypIZY4WCR8oulLRs244=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iie95DB5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725993061;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=83q1JUe2gwH+jcfMY5JSqKPVrFt3GXTQnTABmmzK+Lg=;
+	b=Iie95DB59r5YvAoqRvrvxxKQ2Z0umJsO6VMKCCdS4/OtUYsH4TncFIvh+7tkz0J1SwmpQU
+	dy14gr5mk8/+2dBHacLpSLMw7E3qsWEDRY21AcZeC0hT/krfpDG9ppaGYxlaPfWiWaMc8j
+	KY+k3N27xFUI9KpmqWOLhnRgdaEpWqk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-610-5MrS3OaRP_KBChevL5FLyw-1; Tue, 10 Sep 2024 14:31:00 -0400
+X-MC-Unique: 5MrS3OaRP_KBChevL5FLyw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42cb0ed9072so29730035e9.1
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 11:31:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725993021; x=1726597821;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8v5Hd0GafvR7eRw+F0b/pQqT5Z7153+Dlo66ZdBXwCc=;
-        b=QOkYvJ3dsX+bTfmCESSb54Qxqk6nXprfQ9YdbydtF9qoZH04xdhyq9ttEkZA0FBhDw
-         qzPEPA+GC5QMUmwvOQWd2q07X/Z+tqu3o8pO6YvaDO4td94a6+lREGAcQujoBZdRy60J
-         qFl3BX0OB3ZcQ3CSOecxOJU9r/R9iZYLnoCvHLPwVPQv6nhzLIFRbVHj8m5iCTJXWc8I
-         ZFekdkFNvQuic2Ll9/FacLJJgzYNbQxUchwLRZA4NqZe/IPaVi6m/z2xmJxZ+NTe4u1K
-         MRLpxnh5FTxx5KOr/+MDVSjLU6NGoQRi73GSGmSfwqLJA4A2sZlxaKdZWwR6CGz2mWkX
-         SNcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVpIn72t2HVNECC19KcW2kNtBVUMlkDQnlWuolAvBvCjUtX5lgQ1f5/5m3NSvlOBpBjNQNaUpY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzY5XTvqhuy9Q5c95PBYwYZ1AOuNz+VCq8q/FAhtOuYAPns9Nld
-	6/7soc5n2u9fbGevIGPEWxDzk7CRZYq14iMzBlf9a7bewHFMXFT0HFJlawpTVbjafJqWVLWEq3o
-	8Qe4=
-X-Google-Smtp-Source: AGHT+IF3CSafIdqKzBQ0lFTdu6tLR7xwSIBBGwZYCot0WD0yYR2xHNUP54d66rHsRZpql97Wsko1Ag==
-X-Received: by 2002:a17:907:940b:b0:a8b:c9d4:5cef with SMTP id a640c23a62f3a-a8ffab6c98dmr152734466b.29.1725993020288;
-        Tue, 10 Sep 2024 11:30:20 -0700 (PDT)
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com. [209.85.208.43])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25835686sm518540266b.18.2024.09.10.11.30.19
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 11:30:19 -0700 (PDT)
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c255e3c327so6255854a12.1
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 11:30:19 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXbYUYFq6lK6eg8SBK8tzBVBv2dsKswY99d1msiF2YpGVcZ5EviNfMGEHaLPZK6WEIf9OXoGjc=@vger.kernel.org
-X-Received: by 2002:a05:6402:34c4:b0:5be:cdaf:1c09 with SMTP id
- 4fb4d7f45d1cf-5c3dc7baef3mr12220681a12.28.1725993019011; Tue, 10 Sep 2024
- 11:30:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725993059; x=1726597859;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=83q1JUe2gwH+jcfMY5JSqKPVrFt3GXTQnTABmmzK+Lg=;
+        b=nqyMnlTUJPxxsHmH8FXN8BLeWc5DVISzGjTCORaK3bg7VTAjAcaiCKgYtb4H0tZQbH
+         5bwSl7ipQz4tC6yE7T1ZT5G0rD17PYtf5VxnRL0cHIzbLx5uROM7yH4XPi27UDyCVPoZ
+         tfBQyI2+AR9XkgrVzvujQYj2aH4mwyZZoXE11Ms6GUXBTFAcPZ+U8uB6f5JewHqYt05C
+         hshPfiBS7wzBFmHg19i1ZK0tYa32ORC+cIPHaB3pkswnKHMEJVhIdpshnXPV180RvRZ1
+         EK77ZMWk5gAx8GK9uXTXFEdviT4Mz7TaBSpgjQdWApDVwQKVYT8rOOEO+/Xq46Mef8U7
+         js7w==
+X-Gm-Message-State: AOJu0YzDHFXgoi6uTPf7X4x0d5/f0F0xnNGckFSyjzGqFSEDdZ/tCMMR
+	AsidFk7cXrgvrUe5z8mjuWeg0sb9NEzDUKLnbRHZKeR9TLM+0C9CTNIPLNv3u74SRvxNhYT9Dza
+	ktXaMPT60bz3XZZbFbNEikO1JI5Zs3OOyuPKckVvjit8j9WGWSSJJjJa2weAECw==
+X-Received: by 2002:a05:600c:1c9e:b0:42c:b508:750e with SMTP id 5b1f17b1804b1-42cb50877femr83880645e9.11.1725993059259;
+        Tue, 10 Sep 2024 11:30:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEQyPAVidCDih7MQYMPdcjEcrybzTbzrNJNpfWjxJJvIzESDQixcsK0RR4yprk64BOLZ5DNmQ==
+X-Received: by 2002:a05:600c:1c9e:b0:42c:b508:750e with SMTP id 5b1f17b1804b1-42cb50877femr83880055e9.11.1725993058075;
+        Tue, 10 Sep 2024 11:30:58 -0700 (PDT)
+Received: from debian (2a01cb058d23d6001ef525940bfc7e6a.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:1ef5:2594:bfc:7e6a])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42cb2ca95a6sm103517225e9.21.2024.09.10.11.30.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 11:30:57 -0700 (PDT)
+Date: Tue, 10 Sep 2024 20:30:55 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org
+Subject: [PATCH net 0/2] bareudp: Pull inner IP header on xmit/recv.
+Message-ID: <cover.1725992513.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0a43155c-b56d-4f85-bb46-dce2a4e5af59@kernel.org>
- <d2c82922-675e-470f-a4d3-d24c4aecf2e8@kernel.org> <ee565fda-b230-4fb3-8122-e0a9248ef1d1@kernel.org>
- <7fedb8c2-931f-406b-b46e-83bf3f452136@kernel.org>
-In-Reply-To: <7fedb8c2-931f-406b-b46e-83bf3f452136@kernel.org>
-From: Linus Torvalds <torvalds@linuxfoundation.org>
-Date: Tue, 10 Sep 2024 11:30:02 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wgO9kMbiKLcD3fY0Yt5PJSPD=9NVH0cs=xQFSk8dU9Z1Q@mail.gmail.com>
-Message-ID: <CAHk-=wgO9kMbiKLcD3fY0Yt5PJSPD=9NVH0cs=xQFSk8dU9Z1Q@mail.gmail.com>
-Subject: Re: Regression v6.11 booting cannot mount harddisks (xfs)
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
-	Christoph Hellwig <hch@infradead.org>, Netdev <netdev@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>, 
-	linux-ide@vger.kernel.org, cassel@kernel.org, handan.babu@oracle.com, 
-	djwong@kernel.org, Linux-XFS <linux-xfs@vger.kernel.org>, hdegoede@redhat.com, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	kernel-team <kernel-team@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Tue, 10 Sept 2024 at 10:53, Jesper Dangaard Brouer <hawk@kernel.org> wrote:
->
-> af2814149883e2c1851866ea2afcd8eadc040f79 is the first bad commit
+Bareudp accesses the inner IP header in its xmit and and recv paths.
+However it doesn't ensure that this header is part of skb->head.
 
-Just for fun - can you test moving the queue freezing *inside* the
-mutex, ie something like
+Both vxlan and geneve have received fixes for similar problems in the
+past. This series fixes bareudp using the same approach.
 
-  --- a/block/blk-sysfs.c
-  +++ b/block/blk-sysfs.c
-  @@ -670,11 +670,11 @@ queue_attr_store(struct kobject *kobj, struct
-attribute *attr,
-          if (!entry->store)
-                  return -EIO;
+Guillaume Nault (2):
+  bareudp: Pull inner IP header in bareudp_udp_encap_recv().
+  bareudp: Pull inner IP header on xmit.
 
-  -       blk_mq_freeze_queue(q);
-          mutex_lock(&q->sysfs_lock);
-  +       blk_mq_freeze_queue(q);
-          res = entry->store(disk, page, length);
-  -       mutex_unlock(&q->sysfs_lock);
-          blk_mq_unfreeze_queue(q);
-  +       mutex_unlock(&q->sysfs_lock);
-          return res;
-   }
+ drivers/net/bareudp.c | 26 ++++++++++++++++++++++++--
+ 1 file changed, 24 insertions(+), 2 deletions(-)
 
-(Just do it by hand, my patch is whitespace-damaged on purpose -
-untested and not well thought through).
+-- 
+2.39.2
 
-Because I'm wondering whether maybe some IO is done under the
-sysfs_lock, and then you might have a deadlock?
-
-              Linus
 
