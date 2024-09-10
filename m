@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-126834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90EDB9729DE
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:56:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F55B972A28
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:03:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3EDE1C24014
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:56:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E82471F2581F
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA76617E002;
-	Tue, 10 Sep 2024 06:55:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D8E17BEA4;
+	Tue, 10 Sep 2024 07:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="h/XCXpUc"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="tvhwhcLK"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8825617C7C2
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 06:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7335E17BB1A
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 07:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725951329; cv=none; b=eoxZSOo6DCUVcL4JFLGBjepykxn8EQSOCCvVMq6QmxSJz+C5IXU5nmti9X7eQrX4cP4k1B90PoAS/G+NERe16C70W+6ES37U9kLoGhOp+WKQ3jWv1G2/rVenM7RNM0ZZopwglQJkOPUOJQ01J3AOH5MiqCJyAD9wLb0V6dzryN4=
+	t=1725951824; cv=none; b=Ck+CBj/X2UWKzrKoIESPQuUZj+oS/U8wFlg36+YNA3ZWkJUG64gDoZBDqUF3NsmhJ5Cst6K/IXY+z/Pvgs4+U2sdo4UVZcRibhlqCkGDybE6TXjwfD35d/Qncmz2dnrJGe9Mqhg26FsLe34RcE5y+wxrk2j+N7RM+Shm8RoUgAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725951329; c=relaxed/simple;
-	bh=o+mxtvuoEYe7IxCiOxq+4IDAUuc9qZ5NfLRRguOA30A=;
+	s=arc-20240116; t=1725951824; c=relaxed/simple;
+	bh=eD9zwrp3FBb4Bn/H//ewP27Nixi906eUjV1POHPlr08=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cLW5hFlAkg+2nrq4GFGdJYde88fdeT56atQJSYLEwNAfXV5OwXn8/vxSsI5xpgSuPi5TWpcrThoAjDplUtGHwM3JnZ0kYiDDXCkVsUAa+1ie+LA0cdVG8fSEKxZjo/yuxmE0r5AHshaUvNci3SF63yGqNUu4kOTSkf1rLn2PQJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=h/XCXpUc; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=XdXOZUOeLjyH+fLIAPtfr8a7Xf4c/UxTp4bv5JkTQbgnekbG8tftQQaCg4TsA2DZDllCE9zvrSfecDwuFvU3CO1HJUtzKX6IbMWVqWHMTma0a/kZZFa5mPU48nFGYCzHRwTESFRrXhhgwdqGWMFueQ71jemP/ub7s7McYrvmsfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=tvhwhcLK; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id BC568208A3;
-	Tue, 10 Sep 2024 08:55:24 +0200 (CEST)
+	by a.mx.secunet.com (Postfix) with ESMTP id 9BBF4207D1;
+	Tue, 10 Sep 2024 09:03:39 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id zJH7tK_hNm9W; Tue, 10 Sep 2024 08:55:24 +0200 (CEST)
-Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
+	with ESMTP id Us6JRL9fKQmh; Tue, 10 Sep 2024 09:03:39 +0200 (CEST)
+Received: from cas-essen-01.secunet.de (rl1.secunet.de [10.53.40.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 2C50020893;
-	Tue, 10 Sep 2024 08:55:23 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 2C50020893
+	by a.mx.secunet.com (Postfix) with ESMTPS id 162D620799;
+	Tue, 10 Sep 2024 09:03:39 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 162D620799
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1725951323;
-	bh=8mPIfE8lEMmWMT/wY1yfBpIKylIzisJ1p7evUIA5jDc=;
+	s=202301; t=1725951819;
+	bh=pptXSAW1jGMA4twPxCr0BaJ5AvPPtsqVG4VFxC7hPj4=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=h/XCXpUcIWmH4EU4XwkrbHO5z/143lybZy2JSqDpDpH9PVwYtrvzJvzGNwJeFV6XH
-	 GC8pFzVk/+ePlWGivANAYQmU/CYMp9xhs04ogNaF5v5PNzo+06TdKboC59onj8Mol8
-	 WrWjAfnV93LtOae/Clh7kiIcict0vA1oZOeDBKClixX/7fXgHM49BsNHN+On2Zpa9+
-	 sQIJV4K4nKguRUhkhT6VEyd2ToJTySkhKrjznVdsXjSGJ23lekr34zmpLNEgBpfAM3
-	 tdrhQmuVQRxItTprHx8jt7C44tc5L5jHATgsDAgcYxFfI25NZdHerBYSp2Mp1ngogg
-	 jGFGTmvO8ZfMg==
+	b=tvhwhcLKybQifVivx9DCPpF8eSNRiUnTPAq2YmSXnEhnFwGy6wmmNlkWghw5bhsw4
+	 jEeemZVy6nTUlYEQvg9ZAEeyrQ3JcTH6MldpI3KSD5SMf3O0ByvDsGb3JpqSFsDxay
+	 i5Ts/ZaF+zwNb65qs1hO+mNQ++huv3+LidXxxKKnAa4jBgKhrG3caYkmyLU3zuz6rF
+	 vp6mRY5O/G3x59JBbQVHUiJl2gMwB0CeRptWuhusGQdgoqpOQX3r/BbNwvaPQa2Y2w
+	 9BZser1b65SZce5Y0cWOktNcvOholtfJhCqDNtnMEk1AlkI9W3wMLkT0PF1vxRXAwP
+	 X6HWBAIxVabbg==
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 10 Sep 2024 08:55:22 +0200
+ 15.1.2507.39; Tue, 10 Sep 2024 09:03:38 +0200
 Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 10 Sep
- 2024 08:55:21 +0200
+ 2024 09:03:37 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 8A7843184335; Tue, 10 Sep 2024 08:55:20 +0200 (CEST)
+	id 9931F31843BF; Tue, 10 Sep 2024 08:55:20 +0200 (CEST)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 12/13] xfrm: policy: fix null dereference
-Date: Tue, 10 Sep 2024 08:55:06 +0200
-Message-ID: <20240910065507.2436394-13-steffen.klassert@secunet.com>
+Subject: [PATCH 13/13] xfrm: policy: Restore dir assignments in xfrm_hash_rebuild()
+Date: Tue, 10 Sep 2024 08:55:07 +0200
+Message-ID: <20240910065507.2436394-14-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240910065507.2436394-1-steffen.klassert@secunet.com>
 References: <20240910065507.2436394-1-steffen.klassert@secunet.com>
@@ -86,50 +86,54 @@ X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-From: Florian Westphal <fw@strlen.de>
+From: Nathan Chancellor <nathan@kernel.org>
 
-Julian Wiedmann says:
-> +     if (!xfrm_pol_hold_rcu(ret))
+Clang warns (or errors with CONFIG_WERROR):
 
-Coverity spotted that ^^^ needs a s/ret/pol fix-up:
+  net/xfrm/xfrm_policy.c:1286:8: error: variable 'dir' is uninitialized when used here [-Werror,-Wuninitialized]
+   1286 |                 if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
+        |                      ^~~
+  net/xfrm/xfrm_policy.c:1257:9: note: initialize the variable 'dir' to silence this warning
+   1257 |         int dir;
+        |                ^
+        |                 = 0
+  1 error generated.
 
-> CID 1599386:  Null pointer dereferences  (FORWARD_NULL)
-> Passing null pointer "ret" to "xfrm_pol_hold_rcu", which dereferences it.
+A recent refactoring removed some assignments to dir because
+xfrm_policy_is_dead_or_sk() has a dir assignment in it. However, dir is
+used elsewhere in xfrm_hash_rebuild(), including within loops where it
+needs to be reloaded for each policy. Restore the assignments before the
+first use of dir to fix the warning and ensure dir is properly
+initialized throughout the function.
 
-Ditch the bogus 'ret' variable.
-
-Fixes: 563d5ca93e88 ("xfrm: switch migrate to xfrm_policy_lookup_bytype")
-Reported-by: Julian Wiedmann <jwiedmann.dev@gmail.com>
-Closes: https://lore.kernel.org/netdev/06dc2499-c095-4bd4-aee3-a1d0e3ec87c4@gmail.com/
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Reviewed-by: Simon Horman <horms@kernel.org>
+Fixes: 08c2182cf0b4 ("xfrm: policy: use recently added helper in more places")
+Acked-by: Florian Westphal <fw@strlen.de>
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_policy.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/xfrm/xfrm_policy.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 6336baa8a93c..31c14457fdaf 100644
+index 31c14457fdaf..428ee83fe298 100644
 --- a/net/xfrm/xfrm_policy.c
 +++ b/net/xfrm/xfrm_policy.c
-@@ -4429,7 +4429,7 @@ EXPORT_SYMBOL_GPL(xfrm_audit_policy_delete);
- static struct xfrm_policy *xfrm_migrate_policy_find(const struct xfrm_selector *sel,
- 						    u8 dir, u8 type, struct net *net, u32 if_id)
- {
--	struct xfrm_policy *pol, *ret = NULL;
-+	struct xfrm_policy *pol;
- 	struct flowi fl;
+@@ -1283,6 +1283,7 @@ static void xfrm_hash_rebuild(struct work_struct *work)
+ 		if (xfrm_policy_is_dead_or_sk(policy))
+ 			continue;
  
- 	memset(&fl, 0, sizeof(fl));
-@@ -4465,7 +4465,7 @@ static struct xfrm_policy *xfrm_migrate_policy_find(const struct xfrm_selector *
- 	if (IS_ERR_OR_NULL(pol))
- 		goto out_unlock;
++		dir = xfrm_policy_id2dir(policy->index);
+ 		if ((dir & XFRM_POLICY_MASK) == XFRM_POLICY_OUT) {
+ 			if (policy->family == AF_INET) {
+ 				dbits = rbits4;
+@@ -1337,6 +1338,7 @@ static void xfrm_hash_rebuild(struct work_struct *work)
+ 		hlist_del_rcu(&policy->bydst);
  
--	if (!xfrm_pol_hold_rcu(ret))
-+	if (!xfrm_pol_hold_rcu(pol))
- 		pol = NULL;
- out_unlock:
- 	rcu_read_unlock();
+ 		newpos = NULL;
++		dir = xfrm_policy_id2dir(policy->index);
+ 		chain = policy_hash_bysel(net, &policy->selector,
+ 					  policy->family, dir);
+ 
 -- 
 2.34.1
 
