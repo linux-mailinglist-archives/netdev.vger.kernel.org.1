@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-126872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A496F972B8C
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:08:41 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E787972B82
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:07:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8BCC1C2473E
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:08:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E509B23EBB
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5AB218EFE1;
-	Tue, 10 Sep 2024 08:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC17C188CBB;
+	Tue, 10 Sep 2024 08:06:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8809188591;
-	Tue, 10 Sep 2024 08:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CD5D186618;
+	Tue, 10 Sep 2024 08:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725955581; cv=none; b=YxSoqL0kKDK8yyvuQDRcLWqlb5oKeHTZsoE35a8Gdzce42Iim9K+cpCboChGykDlxrG2TfJp45JRtzDRnsoVfCvz9rZ+d20Ef7GetEFU5s/CPfd2Ul7+ROKBojQXT3EwpUkEkMPaAP3eRD0KyWKNJsHntkhhAiSfuaaYKCStOq0=
+	t=1725955579; cv=none; b=EdOtS03vt02j0ZhKd6R6M8kYRp3pfW5FbMl2iTMoiPNqG+K+OJV4IVqGicw0lo9cNYKCCkPoMvwNvjeEwBV5bE+pSAWzfWdtIf6gjZ/NbiddMf2pnupcJ31nztU3b4z0fJ3iDw4KM2PskkLMfAGTvjjk8ve37iOkn19wieTxWdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725955581; c=relaxed/simple;
-	bh=n8z4qe+MYVk5RFo8Zwlb8k+QRN74rWPCWL8z7IzkBzA=;
+	s=arc-20240116; t=1725955579; c=relaxed/simple;
+	bh=o23lB+F3Mbf7Ahxb3Izqtrpv+ylB+B8P2VFnBC/y+Fk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H2pn97b/F+j/xqEdTJJq5j9FtBG1BbOJs419M31PfTzv71SSQ+4Ln3mkOQIfqre6rQYIoip/v6AdsLENvfn+/L3NWg0fvvd75+kwmqzRVWtA9aQ0ewKY3HhICc518MfHnsFpJg9mqQMpzEF6yJ4UCCK3k7lve+eBbluXs4OtlgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	 MIME-Version:Content-Type; b=fU4TWx4APLU9WOT7QvWhahuNAHDnJ6DVzg4UbYydeZ3ElW/9n7OmtAw33QVq2VL0f5e2s2uQvkltvmpD6QYRNreJAQVCQFd1yWOrlapizh13I91DegpyMpTYuNyZAqC6yJO0llyz1Og+3nPT3IyQcavHhtswbEkV4obHIAEyZkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4X2x8V2PTJzyRl8;
-	Tue, 10 Sep 2024 16:05:30 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4X2x8n2wMTz1j8Qy;
+	Tue, 10 Sep 2024 16:05:45 +0800 (CST)
 Received: from kwepemm000007.china.huawei.com (unknown [7.193.23.189])
-	by mail.maildlp.com (Postfix) with ESMTPS id D8677180AE8;
-	Tue, 10 Sep 2024 16:06:10 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 2290E1401F3;
+	Tue, 10 Sep 2024 16:06:13 +0800 (CST)
 Received: from localhost.localdomain (10.90.30.45) by
  kwepemm000007.china.huawei.com (7.193.23.189) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 10 Sep 2024 16:06:09 +0800
+ 15.1.2507.39; Tue, 10 Sep 2024 16:06:12 +0800
 From: Jijie Shao <shaojijie@huawei.com>
 To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<pabeni@redhat.com>
@@ -50,9 +50,9 @@ CC: <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
 	<shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<shaojijie@huawei.com>
-Subject: [PATCH V9 net-next 03/11] net: hibmcge: Add mdio and hardware configuration supported in this module
-Date: Tue, 10 Sep 2024 15:59:34 +0800
-Message-ID: <20240910075942.1270054-4-shaojijie@huawei.com>
+Subject: [PATCH V9 net-next 06/11] net: hibmcge: Implement .ndo_start_xmit function
+Date: Tue, 10 Sep 2024 15:59:37 +0800
+Message-ID: <20240910075942.1270054-7-shaojijie@huawei.com>
 X-Mailer: git-send-email 2.30.0
 In-Reply-To: <20240910075942.1270054-1-shaojijie@huawei.com>
 References: <20240910075942.1270054-1-shaojijie@huawei.com>
@@ -67,580 +67,648 @@ Content-Type: text/plain
 X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
  kwepemm000007.china.huawei.com (7.193.23.189)
 
-this driver using phy through genphy device. Implements the C22
-read and write PHY registers interfaces.
-
-Some hardware interfaces related to the PHY are also implemented
-in this patch.
+Implement .ndo_start_xmit function to fill the information of the packet
+to be transmitted into the tx descriptor, and then the hardware will
+transmit the packet using the information in the tx descriptor.
+In addition, we also implemented the tx_handler function to enable the
+tx descriptor to be reused, and .ndo_tx_timeout function to print some
+information when the hardware is busy.
 
 Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 ---
 ChangeLog:
+v8 -> v9:
+  - Remove hbg_nic_is_open() judgment from ndo.xmit()
+  v8: https://lore.kernel.org/all/20240909023141.3234567-1-shaojijie@huawei.com/
 v6 -> v7:
-  - Move the define inside the function body to the top of the .c file,
-    suggested by Paolo and Andrew.
-  - Respect the reverse x-mas tree order, suggested by Paolo.
-  v6: https://lore.kernel.org/all/20240830121604.2250904-4-shaojijie@huawei.com/
-v3 -> v4:
-  - Delete unnecessary defensive code in hbg_phy_start()
-    and hbg_phy_stop(), suggested by Andrew.
-  v3: https://lore.kernel.org/all/20240822093334.1687011-1-shaojijie@huawei.com/
-RFC v2 -> v1:
-  - Use FIELD_PREP/FIELD_GET instead of union, suggested by Andrew.
-  - Delete unnecessary defensive code, suggested by Andrew.
-  RFC v2: https://lore.kernel.org/all/20240813135640.1694993-1-shaojijie@huawei.com/
+  - Add check for netif_txq_maybe_stop(), suggested by Paolo.
+  - Use dev_sw_netstats_tx_add() instead of dev->stats, suggested by Paolo.
+  v6: https://lore.kernel.org/all/20240830121604.2250904-7-shaojijie@huawei.com/
+v5 -> v6:
+  - Remove hbg_txrx_init() from probe path, alloc ring buffer in .ndo_open(),
+    and release ring buffer in .ndo_stop(), suggested by Jakub and Andrew.
+  v5: https://lore.kernel.org/all/20240827131455.2919051-1-shaojijie@huawei.com/
+v4 -> v5:
+  - Delete unnecessary semicolon, suggested by Jakub.
+  v4: https://lore.kernel.org/all/20240826081258.1881385-1-shaojijie@huawei.com/
 RFC v1 -> RFC v2:
-  - Replace linkmode_copy() with phy_remove_link_mode() to
-    simplify the PHY configuration process, suggested by Andrew.
-  - Delete hbg_get_link_status() from the scheduled task, suggested by Andrew.
-  - Add the check on the return value of phy_connect_direct(),
-    suggested by Jonathan.
-  - Adjusted the layout to place the fields and register definitions
-    in one place, suggested by Jonathan.
-  - Use macro instead of inline to fix the warning about compile-time constant
-    in FIELD_PREP(), reported by Simon Horman.
+  - Use napi_complete_done() to simplify the process, suggested by Joe Damato.
   RFC v1: https://lore.kernel.org/all/20240731094245.1967834-1-shaojijie@huawei.com/
 ---
- .../ethernet/hisilicon/hibmcge/hbg_common.h   |  19 ++
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   |  83 +++++-
- .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |  15 ++
- .../net/ethernet/hisilicon/hibmcge/hbg_main.c |   7 +-
- .../net/ethernet/hisilicon/hibmcge/hbg_mdio.c | 244 ++++++++++++++++++
- .../net/ethernet/hisilicon/hibmcge/hbg_mdio.h |  12 +
- .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |  55 ++++
- 7 files changed, 433 insertions(+), 2 deletions(-)
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
- create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.h
+ .../ethernet/hisilicon/hibmcge/hbg_common.h   |  50 ++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   |  18 ++
+ .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |   2 +
+ .../net/ethernet/hisilicon/hibmcge/hbg_irq.c  |   8 +-
+ .../net/ethernet/hisilicon/hibmcge/hbg_main.c |  54 +++-
+ .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  |  19 ++
+ .../net/ethernet/hisilicon/hibmcge/hbg_txrx.c | 261 ++++++++++++++++++
+ .../net/ethernet/hisilicon/hibmcge/hbg_txrx.h |  37 +++
+ 8 files changed, 446 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+ create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
 
 diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-index 6fbc24803942..e047539a407a 100644
+index e94ae2be5c4c..31fb03f75d31 100644
 --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
 +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_common.h
-@@ -6,6 +6,13 @@
- 
- #include <linux/netdevice.h>
- #include <linux/pci.h>
-+#include "hbg_reg.h"
+@@ -14,14 +14,63 @@
+ #define HBG_RX_SKIP1			0x00
+ #define HBG_RX_SKIP2			0x01
+ #define HBG_VECTOR_NUM			4
++#define HBG_PCU_CACHE_LINE_SIZE		32
++#define HBG_TX_TIMEOUT_BUF_LEN		1024
 +
-+#define HBG_STATUS_DISABLE		0x0
-+#define HBG_STATUS_ENABLE		0x1
-+#define HBG_DEFAULT_MTU_SIZE		1500
-+#define HBG_RX_SKIP1			0x00
-+#define HBG_RX_SKIP2			0x01
++enum hbg_dir {
++	HBG_DIR_TX = 1 << 0,
++	HBG_DIR_RX = 1 << 1,
++	HBG_DIR_TX_RX = HBG_DIR_TX | HBG_DIR_RX,
++};
++
++enum hbg_tx_state {
++	HBG_TX_STATE_COMPLETE = 0, /* clear state, must fix to 0 */
++	HBG_TX_STATE_START,
++};
  
  enum hbg_nic_state {
  	HBG_NIC_STATE_EVENT_HANDLING = 0,
-@@ -31,12 +38,24 @@ struct hbg_dev_specs {
- 	u32 rx_buf_size;
  };
  
-+struct hbg_mac {
-+	struct mii_bus *mdio_bus;
-+	struct phy_device *phydev;
-+	u8 phy_addr;
++struct hbg_priv;
++struct hbg_ring;
++struct hbg_buffer {
++	u32 state;
++	dma_addr_t state_dma;
 +
-+	u32 speed;
-+	u32 duplex;
-+	u32 autoneg;
-+	u32 link_status;
++	struct sk_buff *skb;
++	dma_addr_t skb_dma;
++	u32 skb_len;
++
++	enum hbg_dir dir;
++	struct hbg_ring *ring;
++	struct hbg_priv *priv;
 +};
 +
- struct hbg_priv {
- 	struct net_device *netdev;
- 	struct pci_dev *pdev;
- 	u8 __iomem *io_base;
- 	struct hbg_dev_specs dev_specs;
++struct hbg_ring {
++	struct hbg_buffer *queue;
++	dma_addr_t queue_dma;
++
++	union {
++		u32 head;
++		u32 ntc;
++	};
++	union {
++		u32 tail;
++		u32 ntu;
++	};
++	u32 len;
++
++	enum hbg_dir dir;
++	struct hbg_priv *priv;
++	struct napi_struct napi;
++	char *tout_log_buf; /* tx timeout log buffer */
++};
++
+ enum hbg_hw_event_type {
+ 	HBG_HW_EVENT_NONE = 0,
+ 	HBG_HW_EVENT_INIT, /* driver is loading */
++	HBG_HW_EVENT_RESET,
+ };
+ 
+ struct hbg_dev_specs {
+@@ -74,6 +123,7 @@ struct hbg_priv {
  	unsigned long state;
-+	struct hbg_mac mac;
+ 	struct hbg_mac mac;
+ 	struct hbg_vector vectors;
++	struct hbg_ring tx_ring;
  };
  
  #endif
 diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-index 23efbf0bf34f..b1281b206f2f 100644
+index 97fee714155a..61e02811c165 100644
 --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
 +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-@@ -11,6 +11,10 @@
+@@ -72,6 +72,7 @@ static int hbg_hw_dev_specs_init(struct hbg_priv *priv)
+ 	if (!is_valid_ether_addr((u8 *)dev_specs->mac_addr.sa_data))
+ 		return -EADDRNOTAVAIL;
  
- #define HBG_HW_EVENT_WAIT_TIMEOUT_US	(2 * 1000 * 1000)
- #define HBG_HW_EVENT_WAIT_INTERVAL_US	(10 * 1000)
-+/* little endian or big endian.
-+ * ctrl means packet description, data means skb packet data
-+ */
-+#define HBG_ENDIAN_CTRL_LE_DATA_BE	0x0
- 
- static bool hbg_hw_spec_is_valid(struct hbg_priv *priv)
- {
-@@ -70,7 +74,84 @@ static int hbg_hw_dev_specs_init(struct hbg_priv *priv)
++	dev_specs->max_frame_len = HBG_PCU_CACHE_LINE_SIZE + dev_specs->max_mtu;
  	return 0;
  }
  
-+void hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex)
+@@ -168,6 +169,23 @@ void hbg_hw_mac_enable(struct hbg_priv *priv, u32 enable)
+ 			    HBG_REG_PORT_ENABLE_RX_B, enable);
+ }
+ 
++u32 hbg_hw_get_fifo_used_num(struct hbg_priv *priv, enum hbg_dir dir)
 +{
-+	hbg_reg_write_field(priv, HBG_REG_PORT_MODE_ADDR,
-+			    HBG_REG_PORT_MODE_M, speed);
-+	hbg_reg_write_field(priv, HBG_REG_DUPLEX_TYPE_ADDR,
-+			    HBG_REG_DUPLEX_B, duplex);
++	if (dir & HBG_DIR_TX)
++		return hbg_reg_read_field(priv, HBG_REG_CF_CFF_DATA_NUM_ADDR,
++					  HBG_REG_CF_CFF_DATA_NUM_ADDR_TX_M);
++
++	return 0;
 +}
 +
-+static void hbg_hw_init_transmit_control(struct hbg_priv *priv)
++void hbg_hw_set_tx_desc(struct hbg_priv *priv, struct hbg_tx_desc *tx_desc)
 +{
-+	u32 control = 0;
-+
-+	control |= FIELD_PREP(HBG_REG_TRANSMIT_CONTROL_AN_EN_B, HBG_STATUS_ENABLE);
-+	control |= FIELD_PREP(HBG_REG_TRANSMIT_CONTROL_CRC_ADD_B, HBG_STATUS_ENABLE);
-+	control |= FIELD_PREP(HBG_REG_TRANSMIT_CONTROL_PAD_EN_B, HBG_STATUS_ENABLE);
-+
-+	hbg_reg_write(priv, HBG_REG_TRANSMIT_CONTROL_ADDR, control);
++	hbg_reg_write(priv, HBG_REG_TX_CFF_ADDR_0_ADDR, tx_desc->word0);
++	hbg_reg_write(priv, HBG_REG_TX_CFF_ADDR_1_ADDR, tx_desc->word1);
++	hbg_reg_write(priv, HBG_REG_TX_CFF_ADDR_2_ADDR, tx_desc->word2);
++	hbg_reg_write(priv, HBG_REG_TX_CFF_ADDR_3_ADDR, tx_desc->word3);
 +}
 +
-+static void hbg_hw_init_rx_ctrl(struct hbg_priv *priv)
-+{
-+	u32 ctrl = 0;
-+
-+	ctrl |= FIELD_PREP(HBG_REG_RX_CTRL_RX_GET_ADDR_MODE_B, HBG_STATUS_ENABLE);
-+	ctrl |= FIELD_PREP(HBG_REG_RX_CTRL_TIME_INF_EN_B, HBG_STATUS_DISABLE);
-+	ctrl |= FIELD_PREP(HBG_REG_RX_CTRL_RXBUF_1ST_SKIP_SIZE_M, HBG_RX_SKIP1);
-+	ctrl |= FIELD_PREP(HBG_REG_RX_CTRL_RXBUF_1ST_SKIP_SIZE2_M, HBG_RX_SKIP2);
-+	ctrl |= FIELD_PREP(HBG_REG_RX_CTRL_RX_ALIGN_NUM_M, NET_IP_ALIGN);
-+	ctrl |= FIELD_PREP(HBG_REG_RX_CTRL_PORT_NUM, priv->dev_specs.mac_id);
-+
-+	hbg_reg_write(priv, HBG_REG_RX_CTRL_ADDR, ctrl);
-+}
-+
-+static void hbg_hw_init_rx_pkt_mode(struct hbg_priv *priv)
-+{
-+	u32 mode = 0;
-+
-+	/* parse from L2 layer */
-+	mode |= FIELD_PREP(HBG_REG_RX_PKT_MODE_PARSE_MODE_M, 0x1);
-+
-+	hbg_reg_write(priv, HBG_REG_RX_PKT_MODE_ADDR, mode);
-+}
-+
-+static void hbg_hw_init_recv_ctrl(struct hbg_priv *priv)
-+{
-+	u32 ctrl = 0;
-+
-+	ctrl |= FIELD_PREP(HBG_REG_RECV_CONTROL_STRIP_PAD_EN_B, HBG_STATUS_ENABLE);
-+
-+	hbg_reg_write(priv, HBG_REG_RECV_CONTROL_ADDR, ctrl);
-+}
-+
-+static void hbg_hw_init_rx_control(struct hbg_priv *priv)
-+{
-+	hbg_hw_init_rx_ctrl(priv);
-+	hbg_hw_init_rx_pkt_mode(priv);
-+	hbg_hw_init_recv_ctrl(priv);
-+	hbg_reg_write_field(priv, HBG_REG_RX_BUF_SIZE_ADDR,
-+			    HBG_REG_RX_BUF_SIZE_M, priv->dev_specs.rx_buf_size);
-+	hbg_reg_write_field(priv, HBG_REG_CF_CRC_STRIP_ADDR,
-+			    HBG_REG_CF_CRC_STRIP_B, HBG_STATUS_DISABLE);
-+}
-+
- int hbg_hw_init(struct hbg_priv *priv)
+ void hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex)
  {
--	return hbg_hw_dev_specs_init(priv);
+ 	hbg_reg_write_field(priv, HBG_REG_PORT_MODE_ADDR,
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
+index 0ce500e907b3..508e41cce41e 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
+@@ -52,5 +52,7 @@ void hbg_hw_irq_enable(struct hbg_priv *priv, u32 mask, bool enable);
+ void hbg_hw_set_mtu(struct hbg_priv *priv, u16 mtu);
+ void hbg_hw_mac_enable(struct hbg_priv *priv, u32 enable);
+ void hbg_hw_set_uc_addr(struct hbg_priv *priv, u64 mac_addr);
++u32 hbg_hw_get_fifo_used_num(struct hbg_priv *priv, enum hbg_dir dir);
++void hbg_hw_set_tx_desc(struct hbg_priv *priv, struct hbg_tx_desc *tx_desc);
+ 
+ #endif
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
+index 0a70853a4928..bf5bfedd8a8c 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c
+@@ -13,6 +13,12 @@ static void hbg_irq_handle_err(struct hbg_priv *priv,
+ 			"receive error interrupt: %s\n", irq_info->name);
+ }
+ 
++static void hbg_irq_handle_tx(struct hbg_priv *priv,
++			      struct hbg_irq_info *irq_info)
++{
++	napi_schedule(&priv->tx_ring.napi);
++}
++
+ #define HBG_TXRX_IRQ_I(name, handle) \
+ 	{#name, HBG_INT_MSK_##name##_B, false, false, 0, handle}
+ #define HBG_ERR_IRQ_I(name, need_print) \
+@@ -20,7 +26,7 @@ static void hbg_irq_handle_err(struct hbg_priv *priv,
+ 
+ static struct hbg_irq_info hbg_irqs[] = {
+ 	HBG_TXRX_IRQ_I(RX, NULL),
+-	HBG_TXRX_IRQ_I(TX, NULL),
++	HBG_TXRX_IRQ_I(TX, hbg_irq_handle_tx),
+ 	HBG_ERR_IRQ_I(MAC_MII_FIFO_ERR, true),
+ 	HBG_ERR_IRQ_I(MAC_PCS_RX_FIFO_ERR, true),
+ 	HBG_ERR_IRQ_I(MAC_PCS_TX_FIFO_ERR, true),
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+index d882a7822299..a8d0e951633b 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+@@ -9,6 +9,9 @@
+ #include "hbg_hw.h"
+ #include "hbg_irq.h"
+ #include "hbg_mdio.h"
++#include "hbg_txrx.h"
++
++static void hbg_change_mtu(struct hbg_priv *priv, int new_mtu);
+ 
+ static void hbg_all_irq_enable(struct hbg_priv *priv, bool enabled)
+ {
+@@ -24,6 +27,11 @@ static void hbg_all_irq_enable(struct hbg_priv *priv, bool enabled)
+ static int hbg_net_open(struct net_device *netdev)
+ {
+ 	struct hbg_priv *priv = netdev_priv(netdev);
 +	int ret;
 +
-+	ret = hbg_hw_dev_specs_init(priv);
++	ret = hbg_txrx_init(priv);
++	if (ret)
++		return ret;
+ 
+ 	hbg_all_irq_enable(priv, true);
+ 	hbg_hw_mac_enable(priv, HBG_STATUS_ENABLE);
+@@ -33,6 +41,26 @@ static int hbg_net_open(struct net_device *netdev)
+ 	return 0;
+ }
+ 
++/* This function only can be called after hbg_txrx_uninit() */
++static int hbg_hw_txrx_clear(struct hbg_priv *priv)
++{
++	int ret;
++
++	/* After ring buffers have been released,
++	 * do a reset to release hw fifo rx ring buffer
++	 */
++	ret = hbg_hw_event_notify(priv, HBG_HW_EVENT_RESET);
 +	if (ret)
 +		return ret;
 +
-+	hbg_reg_write_field(priv, HBG_REG_BUS_CTRL_ADDR,
-+			    HBG_REG_BUS_CTRL_ENDIAN_M,
-+			    HBG_ENDIAN_CTRL_LE_DATA_BE);
-+	hbg_reg_write_field(priv, HBG_REG_MODE_CHANGE_EN_ADDR,
-+			    HBG_REG_MODE_CHANGE_EN_B, HBG_STATUS_ENABLE);
++	/* After reset, regs need to be reconfigured */
++	hbg_hw_init(priv);
++	hbg_hw_set_uc_addr(priv, ether_addr_to_u64(priv->netdev->dev_addr));
++	hbg_change_mtu(priv, priv->netdev->mtu);
 +
-+	hbg_hw_init_rx_control(priv);
-+	hbg_hw_init_transmit_control(priv);
 +	return 0;
- }
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
-index 4a62d1a610ea..47df597b885f 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.h
-@@ -27,8 +27,23 @@ static inline void hbg_reg_write64(struct hbg_priv *priv, u32 addr, u64 value)
- 	lo_hi_writeq(value, priv->io_base + addr);
++}
++
+ static int hbg_net_stop(struct net_device *netdev)
+ {
+ 	struct hbg_priv *priv = netdev_priv(netdev);
+@@ -41,8 +69,8 @@ static int hbg_net_stop(struct net_device *netdev)
+ 	netif_stop_queue(netdev);
+ 	hbg_hw_mac_enable(priv, HBG_STATUS_DISABLE);
+ 	hbg_all_irq_enable(priv, false);
+-
+-	return 0;
++	hbg_txrx_uninit(priv);
++	return hbg_hw_txrx_clear(priv);
  }
  
-+#define hbg_reg_read_field(priv, addr, mask) \
-+		FIELD_GET(mask, hbg_reg_read(priv, addr))
-+
-+#define hbg_field_modify(reg_value, mask, value) ({	\
-+		(reg_value) &= ~(mask);			\
-+		(reg_value) |= FIELD_PREP(mask, value); })
-+
-+#define hbg_reg_write_field(priv, addr, mask, val) ({		\
-+		typeof(priv) _priv = (priv);			\
-+		typeof(addr) _addr = (addr);			\
-+		u32 _value = hbg_reg_read(_priv, _addr);	\
-+		hbg_field_modify(_value, mask, val);		\
-+		hbg_reg_write(_priv, _addr, _value); })
-+
- int hbg_hw_event_notify(struct hbg_priv *priv,
- 			enum hbg_hw_event_type event_type);
- int hbg_hw_init(struct hbg_priv *priv);
-+void hbg_hw_adjust_link(struct hbg_priv *priv, u32 speed, u32 duplex);
+ static int hbg_net_set_mac_address(struct net_device *netdev, void *addr)
+@@ -92,13 +120,34 @@ static void hbg_net_get_stats64(struct net_device *netdev,
+ 	dev_fetch_sw_netstats(stats, netdev->tstats);
+ }
  
- #endif
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-index b0df3559929f..22b6557247c4 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-@@ -6,6 +6,7 @@
- #include <linux/pci.h>
- #include "hbg_common.h"
- #include "hbg_hw.h"
-+#include "hbg_mdio.h"
++static void hbg_net_tx_timeout(struct net_device *netdev, unsigned int txqueue)
++{
++	struct hbg_priv *priv = netdev_priv(netdev);
++	struct hbg_ring *ring = &priv->tx_ring;
++	char *buf = ring->tout_log_buf;
++	u32 pos = 0;
++
++	pos += scnprintf(buf + pos, HBG_TX_TIMEOUT_BUF_LEN - pos,
++			 "ring used num: %u, fifo used num: %u\n",
++			 hbg_get_queue_used_num(ring),
++			 hbg_hw_get_fifo_used_num(priv, HBG_DIR_TX));
++	pos += scnprintf(buf + pos, HBG_TX_TIMEOUT_BUF_LEN - pos,
++			 "ntc: %u, ntu: %u, irq enabled: %u\n",
++			 ring->ntc, ring->ntu,
++			 hbg_hw_irq_is_enabled(priv, HBG_INT_MSK_TX_B));
++
++	netdev_info(netdev, "%s", buf);
++}
++
+ static const struct net_device_ops hbg_netdev_ops = {
+ 	.ndo_open		= hbg_net_open,
+ 	.ndo_stop		= hbg_net_stop,
++	.ndo_start_xmit		= hbg_net_start_xmit,
+ 	.ndo_validate_addr	= eth_validate_addr,
+ 	.ndo_set_mac_address	= hbg_net_set_mac_address,
+ 	.ndo_change_mtu		= hbg_net_change_mtu,
+ 	.ndo_get_stats64	= hbg_net_get_stats64,
++	.ndo_tx_timeout		= hbg_net_tx_timeout,
+ };
  
  static int hbg_init(struct hbg_priv *priv)
- {
-@@ -15,7 +16,11 @@ static int hbg_init(struct hbg_priv *priv)
+@@ -181,6 +230,7 @@ static int hbg_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
  	if (ret)
  		return ret;
  
--	return hbg_hw_init(priv);
-+	ret = hbg_hw_init(priv);
-+	if (ret)
-+		return ret;
-+
-+	return hbg_mdio_init(priv);
- }
++	netdev->watchdog_timeo = 5 * HZ;
+ 	netdev->max_mtu = priv->dev_specs.max_mtu;
+ 	netdev->min_mtu = priv->dev_specs.min_mtu;
+ 	hbg_change_mtu(priv, HBG_DEFAULT_MTU_SIZE);
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
+index 63bb1bead8c0..0abfcd84e56b 100644
+--- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
+@@ -80,6 +80,12 @@
+ #define HBG_REG_CF_INTRPT_CLR_ADDR		(HBG_REG_SGMII_BASE + 0x0438)
+ #define HBG_REG_MAX_FRAME_LEN_ADDR		(HBG_REG_SGMII_BASE + 0x0444)
+ #define HBG_REG_MAX_FRAME_LEN_M			GENMASK(15, 0)
++#define HBG_REG_CF_CFF_DATA_NUM_ADDR		(HBG_REG_SGMII_BASE + 0x045C)
++#define HBG_REG_CF_CFF_DATA_NUM_ADDR_TX_M	GENMASK(8, 0)
++#define HBG_REG_TX_CFF_ADDR_0_ADDR		(HBG_REG_SGMII_BASE + 0x0488)
++#define HBG_REG_TX_CFF_ADDR_1_ADDR		(HBG_REG_SGMII_BASE + 0x048C)
++#define HBG_REG_TX_CFF_ADDR_2_ADDR		(HBG_REG_SGMII_BASE + 0x0490)
++#define HBG_REG_TX_CFF_ADDR_3_ADDR		(HBG_REG_SGMII_BASE + 0x0494)
+ #define HBG_REG_RX_BUF_SIZE_ADDR		(HBG_REG_SGMII_BASE + 0x04E4)
+ #define HBG_REG_RX_BUF_SIZE_M			GENMASK(15, 0)
+ #define HBG_REG_BUS_CTRL_ADDR			(HBG_REG_SGMII_BASE + 0x04E8)
+@@ -108,4 +114,17 @@ enum hbg_port_mode {
+ 	HBG_PORT_MODE_SGMII_1000M = 0x8,
+ };
  
- static int hbg_pci_init(struct pci_dev *pdev)
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
++struct hbg_tx_desc {
++	u32 word0;
++	u32 word1;
++	u32 word2; /* pkt_addr */
++	u32 word3; /* clear_addr */
++};
++
++#define HBG_TX_DESC_W0_IP_OFF_M		GENMASK(30, 26)
++#define HBG_TX_DESC_W0_l3_CS_B		BIT(2)
++#define HBG_TX_DESC_W0_WB_B		BIT(1)
++#define HBG_TX_DESC_W0_l4_CS_B		BIT(0)
++#define HBG_TX_DESC_W1_SEND_LEN_M	GENMASK(19, 4)
++
+ #endif
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
 new file mode 100644
-index 000000000000..e8938f82234c
+index 000000000000..8ef13ce06ca0
 --- /dev/null
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c
-@@ -0,0 +1,244 @@
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.c
+@@ -0,0 +1,261 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +// Copyright (c) 2024 Hisilicon Limited.
 +
-+#include <linux/phy.h>
++#include <net/netdev_queues.h>
 +#include "hbg_common.h"
-+#include "hbg_hw.h"
-+#include "hbg_mdio.h"
++#include "hbg_irq.h"
 +#include "hbg_reg.h"
++#include "hbg_txrx.h"
 +
-+#define HBG_MAC_GET_PRIV(mac) ((struct hbg_priv *)(mac)->mdio_bus->priv)
-+#define HBG_MII_BUS_GET_MAC(bus) (&((struct hbg_priv *)(bus)->priv)->mac)
++#define netdev_get_tx_ring(netdev)  (&(((struct hbg_priv *)netdev_priv(netdev))->tx_ring))
 +
-+#define HBG_MDIO_C22_MODE		0x1
-+#define HBG_MDIO_C22_REG_WRITE		0x1
-+#define HBG_MDIO_C22_REG_READ		0x2
++#define buffer_to_dma_dir(buffer) (((buffer)->dir == HBG_DIR_RX) ? \
++				   DMA_FROM_DEVICE : DMA_TO_DEVICE)
 +
-+#define HBG_MDIO_OP_TIMEOUT_US		(1 * 1000 * 1000)
-+#define HBG_MDIO_OP_INTERVAL_US		(5 * 1000)
++#define hbg_queue_used_num(head, tail, ring) ({ \
++	typeof(ring) _ring = (ring); \
++	((tail) + _ring->len - (head)) % _ring->len; })
++#define hbg_queue_left_num(head, tail, ring) \
++	((ring)->len - hbg_queue_used_num((head), (tail), (ring)) - 1)
++#define hbg_queue_is_empty(head, tail, ring) \
++	(hbg_queue_used_num((head), (tail), (ring)) == 0)
++#define hbg_queue_next_prt(p, ring) (((p) + 1) % (ring)->len)
 +
-+static void hbg_mdio_set_command(struct hbg_mac *mac, u32 cmd)
++#define HBG_TX_STOP_THRS	2
++#define HBG_TX_START_THRS	(2 * HBG_TX_STOP_THRS)
++
++static int hbg_dma_map(struct hbg_buffer *buffer)
 +{
-+	hbg_reg_write(HBG_MAC_GET_PRIV(mac), HBG_REG_MDIO_COMMAND_ADDR, cmd);
-+}
++	struct hbg_priv *priv = buffer->priv;
 +
-+static void hbg_mdio_get_command(struct hbg_mac *mac, u32 *cmd)
-+{
-+	*cmd = hbg_reg_read(HBG_MAC_GET_PRIV(mac), HBG_REG_MDIO_COMMAND_ADDR);
-+}
++	buffer->skb_dma = dma_map_single(&priv->pdev->dev,
++					 buffer->skb->data, buffer->skb_len,
++					 buffer_to_dma_dir(buffer));
++	if (unlikely(dma_mapping_error(&priv->pdev->dev, buffer->skb_dma)))
++		return -ENOMEM;
 +
-+static void hbg_mdio_set_wdata_reg(struct hbg_mac *mac, u16 wdata_value)
-+{
-+	hbg_reg_write_field(HBG_MAC_GET_PRIV(mac), HBG_REG_MDIO_WDATA_ADDR,
-+			    HBG_REG_MDIO_WDATA_M, wdata_value);
-+}
-+
-+static u32 hbg_mdio_get_rdata_reg(struct hbg_mac *mac)
-+{
-+	return hbg_reg_read_field(HBG_MAC_GET_PRIV(mac),
-+				  HBG_REG_MDIO_RDATA_ADDR,
-+				  HBG_REG_MDIO_WDATA_M);
-+}
-+
-+static int hbg_mdio_check_op_status(struct hbg_mac *mac)
-+{
-+	struct hbg_priv *priv = HBG_MAC_GET_PRIV(mac);
-+
-+	return hbg_reg_read(priv, HBG_REG_MDIO_STA_ADDR) ? -EBUSY : 0;
-+}
-+
-+static int hbg_mdio_wait_ready(struct hbg_mac *mac)
-+{
-+	struct hbg_priv *priv = HBG_MAC_GET_PRIV(mac);
-+	u32 cmd;
-+
-+	return readl_poll_timeout(priv->io_base + HBG_REG_MDIO_COMMAND_ADDR, cmd,
-+				  !FIELD_GET(HBG_REG_MDIO_COMMAND_START_B, cmd),
-+				  HBG_MDIO_OP_INTERVAL_US,
-+				  HBG_MDIO_OP_TIMEOUT_US);
-+}
-+
-+static int hbg_mdio_check_send_result(struct hbg_mac *mac)
-+{
-+	int ret;
-+
-+	ret = hbg_mdio_wait_ready(mac);
-+	if (ret)
-+		return ret;
-+
-+	return hbg_mdio_check_op_status(mac);
-+}
-+
-+static int hbg_mdio_cmd_send(struct hbg_mac *mac, u32 prt_addr, u32 dev_addr,
-+			     u32 type, u32 op_code)
-+{
-+	u32 cmd = 0;
-+
-+	hbg_mdio_get_command(mac, &cmd);
-+	hbg_field_modify(cmd, HBG_REG_MDIO_COMMAND_ST_M, type);
-+	hbg_field_modify(cmd, HBG_REG_MDIO_COMMAND_OP_M, op_code);
-+	hbg_field_modify(cmd, HBG_REG_MDIO_COMMAND_PRTAD_M, prt_addr);
-+	hbg_field_modify(cmd, HBG_REG_MDIO_COMMAND_DEVAD_M, dev_addr);
-+
-+	/* if auto scan enabled, this value need fix to 0 */
-+	hbg_field_modify(cmd, HBG_REG_MDIO_COMMAND_START_B, 0x1);
-+
-+	hbg_mdio_set_command(mac, cmd);
-+
-+	/* wait operation complete and check the result */
-+	return hbg_mdio_check_send_result(mac);
-+}
-+
-+static int hbg_mdio_read22(struct mii_bus *bus, int phy_addr, int regnum)
-+{
-+	struct hbg_mac *mac = HBG_MII_BUS_GET_MAC(bus);
-+	int ret;
-+
-+	ret = hbg_mdio_check_op_status(mac);
-+	if (ret)
-+		return ret;
-+
-+	ret = hbg_mdio_cmd_send(mac, phy_addr, regnum, HBG_MDIO_C22_MODE,
-+				HBG_MDIO_C22_REG_READ);
-+	if (ret)
-+		return ret;
-+
-+	return hbg_mdio_get_rdata_reg(mac);
-+}
-+
-+static int hbg_mdio_write22(struct mii_bus *bus, int phy_addr, int regnum,
-+			    u16 val)
-+{
-+	struct hbg_mac *mac = HBG_MII_BUS_GET_MAC(bus);
-+	int ret;
-+
-+	ret = hbg_mdio_check_op_status(mac);
-+	if (ret)
-+		return ret;
-+
-+	hbg_mdio_set_wdata_reg(mac, val);
-+	return hbg_mdio_cmd_send(mac, phy_addr, regnum, HBG_MDIO_C22_MODE,
-+				 HBG_MDIO_C22_REG_WRITE);
-+}
-+
-+static int hbg_mdio_init_hw(struct hbg_priv *priv)
-+{
-+	u32 freq = priv->dev_specs.mdio_frequency;
-+	struct hbg_mac *mac = &priv->mac;
-+	u32 cmd = 0;
-+
-+	cmd |= FIELD_PREP(HBG_REG_MDIO_COMMAND_ST_M, HBG_MDIO_C22_MODE);
-+	cmd |= FIELD_PREP(HBG_REG_MDIO_COMMAND_AUTO_SCAN_B, HBG_STATUS_DISABLE);
-+
-+	/* freq use two bits, which are stored in clk_sel and clk_sel_exp */
-+	cmd |= FIELD_PREP(HBG_REG_MDIO_COMMAND_CLK_SEL_B, freq & 0x1);
-+	cmd |= FIELD_PREP(HBG_REG_MDIO_COMMAND_CLK_SEL_EXP_B, (freq >> 1) & 0x1);
-+
-+	hbg_mdio_set_command(mac, cmd);
 +	return 0;
 +}
 +
-+static void hbg_phy_adjust_link(struct net_device *netdev)
++static void hbg_dma_unmap(struct hbg_buffer *buffer)
 +{
-+	struct hbg_priv *priv = netdev_priv(netdev);
-+	struct phy_device *phydev = netdev->phydev;
-+	u32 speed;
++	struct hbg_priv *priv = buffer->priv;
 +
-+	if (phydev->link != priv->mac.link_status) {
-+		if (phydev->link) {
-+			switch (phydev->speed) {
-+			case SPEED_10:
-+				speed = HBG_PORT_MODE_SGMII_10M;
-+				break;
-+			case SPEED_100:
-+				speed = HBG_PORT_MODE_SGMII_100M;
-+				break;
-+			case SPEED_1000:
-+				speed = HBG_PORT_MODE_SGMII_1000M;
-+				break;
-+			default:
-+				return;
-+			}
++	if (unlikely(!buffer->skb_dma))
++		return;
 +
-+			priv->mac.speed = speed;
-+			priv->mac.duplex = phydev->duplex;
-+			priv->mac.autoneg = phydev->autoneg;
-+			hbg_hw_adjust_link(priv, speed, phydev->duplex);
-+		}
++	dma_unmap_single(&priv->pdev->dev, buffer->skb_dma, buffer->skb_len,
++			 buffer_to_dma_dir(buffer));
++	buffer->skb_dma = 0;
++}
 +
-+		priv->mac.link_status = phydev->link;
-+		phy_print_status(phydev);
++static void hbg_init_tx_desc(struct hbg_buffer *buffer,
++			     struct hbg_tx_desc *tx_desc)
++{
++	u32 ip_offset = buffer->skb->network_header - buffer->skb->mac_header;
++	u32 word0 = 0;
++
++	word0 |= FIELD_PREP(HBG_TX_DESC_W0_WB_B, HBG_STATUS_ENABLE);
++	word0 |= FIELD_PREP(HBG_TX_DESC_W0_IP_OFF_M, ip_offset);
++	if (likely(buffer->skb->ip_summed == CHECKSUM_PARTIAL)) {
++		word0 |= FIELD_PREP(HBG_TX_DESC_W0_l3_CS_B, HBG_STATUS_ENABLE);
++		word0 |= FIELD_PREP(HBG_TX_DESC_W0_l4_CS_B, HBG_STATUS_ENABLE);
 +	}
++
++	tx_desc->word0 = word0;
++	tx_desc->word1 = FIELD_PREP(HBG_TX_DESC_W1_SEND_LEN_M, buffer->skb->len);
++	tx_desc->word2 = buffer->skb_dma;
++	tx_desc->word3 = buffer->state_dma;
 +}
 +
-+static void hbg_phy_disconnect(void *data)
++netdev_tx_t hbg_net_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 +{
-+	phy_disconnect((struct phy_device *)data);
++	struct hbg_ring *ring = netdev_get_tx_ring(netdev);
++	struct hbg_priv *priv = netdev_priv(netdev);
++	/* This smp_load_acquire() pairs with smp_store_release() in
++	 * hbg_tx_buffer_recycle() called in tx interrupt handle process.
++	 */
++	u32 ntc = smp_load_acquire(&ring->ntc);
++	struct hbg_buffer *buffer;
++	struct hbg_tx_desc tx_desc;
++	u32 ntu = ring->ntu;
++
++	if (unlikely(!skb->len ||
++		     skb->len > hbg_spec_max_frame_len(priv, HBG_DIR_TX))) {
++		dev_kfree_skb_any(skb);
++		netdev->stats.tx_errors++;
++		return NETDEV_TX_OK;
++	}
++
++	if (!netif_subqueue_maybe_stop(netdev, 0,
++				       hbg_queue_left_num(ntc, ntu, ring),
++				       HBG_TX_STOP_THRS, HBG_TX_START_THRS))
++		return NETDEV_TX_BUSY;
++
++	buffer = &ring->queue[ntu];
++	buffer->skb = skb;
++	buffer->skb_len = skb->len;
++	if (unlikely(hbg_dma_map(buffer))) {
++		dev_kfree_skb_any(skb);
++		return NETDEV_TX_OK;
++	}
++
++	buffer->state = HBG_TX_STATE_START;
++	hbg_init_tx_desc(buffer, &tx_desc);
++	hbg_hw_set_tx_desc(priv, &tx_desc);
++
++	/* This smp_store_release() pairs with smp_load_acquire() in
++	 * hbg_tx_buffer_recycle() called in tx interrupt handle process.
++	 */
++	smp_store_release(&ring->ntu, hbg_queue_next_prt(ntu, ring));
++	dev_sw_netstats_tx_add(netdev, 1, skb->len);
++	return NETDEV_TX_OK;
 +}
 +
-+static int hbg_phy_connect(struct hbg_priv *priv)
++static void hbg_buffer_free_skb(struct hbg_buffer *buffer)
 +{
-+	struct phy_device *phydev = priv->mac.phydev;
-+	struct device *dev = &priv->pdev->dev;
-+	int ret;
++	if (unlikely(!buffer->skb))
++		return;
 +
-+	ret = phy_connect_direct(priv->netdev, phydev, hbg_phy_adjust_link,
-+				 PHY_INTERFACE_MODE_SGMII);
-+	if (ret)
-+		return dev_err_probe(dev, ret, "failed to connect phy\n");
++	dev_kfree_skb_any(buffer->skb);
++	buffer->skb = NULL;
++}
 +
-+	ret = devm_add_action_or_reset(dev, hbg_phy_disconnect, phydev);
-+	if (ret)
-+		return ret;
++static void hbg_buffer_free(struct hbg_buffer *buffer)
++{
++	hbg_dma_unmap(buffer);
++	hbg_buffer_free_skb(buffer);
++}
 +
-+	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
-+	phy_attached_info(phydev);
++static int hbg_napi_tx_recycle(struct napi_struct *napi, int budget)
++{
++	struct hbg_ring *ring = container_of(napi, struct hbg_ring, napi);
++	/* This smp_load_acquire() pairs with smp_store_release() in
++	 * hbg_start_xmit() called in xmit process.
++	 */
++	u32 ntu = smp_load_acquire(&ring->ntu);
++	struct hbg_priv *priv = ring->priv;
++	struct hbg_buffer *buffer;
++	u32 ntc = ring->ntc;
++	int packet_done = 0;
 +
++	while (packet_done < budget) {
++		if (unlikely(hbg_queue_is_empty(ntc, ntu, ring)))
++			break;
++
++		/* make sure HW write desc complete */
++		dma_rmb();
++
++		buffer = &ring->queue[ntc];
++		if (buffer->state != HBG_TX_STATE_COMPLETE)
++			break;
++
++		hbg_buffer_free(buffer);
++		ntc = hbg_queue_next_prt(ntc, ring);
++		packet_done++;
++	}
++
++	/* This smp_store_release() pairs with smp_load_acquire() in
++	 * hbg_start_xmit() called in xmit process.
++	 */
++	smp_store_release(&ring->ntc, ntc);
++	netif_wake_queue(priv->netdev);
++
++	if (likely(napi_complete_done(napi, packet_done)))
++		hbg_hw_irq_enable(priv, HBG_INT_MSK_TX_B, true);
++
++	return packet_done;
++}
++
++static void hbg_ring_uninit(struct hbg_ring *ring)
++{
++	struct hbg_buffer *buffer;
++	u32 i;
++
++	if (!ring->queue)
++		return;
++
++	napi_disable(&ring->napi);
++	netif_napi_del(&ring->napi);
++
++	for (i = 0; i < ring->len; i++) {
++		buffer = &ring->queue[i];
++		hbg_buffer_free(buffer);
++		buffer->ring = NULL;
++		buffer->priv = NULL;
++	}
++
++	dma_free_coherent(&ring->priv->pdev->dev,
++			  ring->len * sizeof(*ring->queue),
++			  ring->queue, ring->queue_dma);
++	ring->queue = NULL;
++	ring->queue_dma = 0;
++	ring->len = 0;
++	ring->priv = NULL;
++}
++
++static int hbg_ring_init(struct hbg_priv *priv, struct hbg_ring *ring,
++			 int (*napi_poll)(struct napi_struct *, int),
++			 enum hbg_dir dir)
++{
++	struct hbg_buffer *buffer;
++	u32 i, len;
++
++	len = hbg_get_spec_fifo_max_num(priv, dir) + 1;
++	ring->queue = dma_alloc_coherent(&priv->pdev->dev,
++					 len * sizeof(*ring->queue),
++					 &ring->queue_dma, GFP_KERNEL);
++	if (!ring->queue)
++		return -ENOMEM;
++
++	for (i = 0; i < len; i++) {
++		buffer = &ring->queue[i];
++		buffer->skb_len = 0;
++		buffer->dir = dir;
++		buffer->ring = ring;
++		buffer->priv = priv;
++		buffer->state_dma = ring->queue_dma + (i * sizeof(*buffer));
++	}
++
++	ring->dir = dir;
++	ring->priv = priv;
++	ring->ntc = 0;
++	ring->ntu = 0;
++	ring->len = len;
++
++	netif_napi_add_tx(priv->netdev, &ring->napi, napi_poll);
++	napi_enable(&ring->napi);
 +	return 0;
 +}
 +
-+void hbg_phy_start(struct hbg_priv *priv)
++static int hbg_tx_ring_init(struct hbg_priv *priv)
 +{
-+	phy_start(priv->mac.phydev);
++	struct hbg_ring *tx_ring = &priv->tx_ring;
++
++	if (!tx_ring->tout_log_buf)
++		tx_ring->tout_log_buf = devm_kzalloc(&priv->pdev->dev,
++						     HBG_TX_TIMEOUT_BUF_LEN,
++						     GFP_KERNEL);
++
++	if (!tx_ring->tout_log_buf)
++		return -ENOMEM;
++
++	return hbg_ring_init(priv, tx_ring, hbg_napi_tx_recycle, HBG_DIR_TX);
 +}
 +
-+void hbg_phy_stop(struct hbg_priv *priv)
++int hbg_txrx_init(struct hbg_priv *priv)
 +{
-+	phy_stop(priv->mac.phydev);
-+}
-+
-+int hbg_mdio_init(struct hbg_priv *priv)
-+{
-+	struct device *dev = &priv->pdev->dev;
-+	struct hbg_mac *mac = &priv->mac;
-+	struct phy_device *phydev;
-+	struct mii_bus *mdio_bus;
 +	int ret;
 +
-+	mac->phy_addr = priv->dev_specs.phy_addr;
-+	mdio_bus = devm_mdiobus_alloc(dev);
-+	if (!mdio_bus)
-+		return dev_err_probe(dev, -ENOMEM, "failed to alloc MDIO bus\n");
-+
-+	mdio_bus->parent = dev;
-+	mdio_bus->priv = priv;
-+	mdio_bus->phy_mask = ~(1 << mac->phy_addr);
-+	mdio_bus->name = "hibmcge mii bus";
-+	mac->mdio_bus = mdio_bus;
-+
-+	mdio_bus->read = hbg_mdio_read22;
-+	mdio_bus->write = hbg_mdio_write22;
-+	snprintf(mdio_bus->id, MII_BUS_ID_SIZE, "%s-%s", "mii", dev_name(dev));
-+
-+	ret = devm_mdiobus_register(dev, mdio_bus);
++	ret = hbg_tx_ring_init(priv);
 +	if (ret)
-+		return dev_err_probe(dev, ret, "failed to register MDIO bus\n");
++		dev_err(&priv->pdev->dev,
++			"failed to init tx ring, ret = %d\n", ret);
 +
-+	phydev = mdiobus_get_phy(mdio_bus, mac->phy_addr);
-+	if (!phydev)
-+		return dev_err_probe(dev, -ENODEV, "failed to get phy device\n");
-+
-+	mac->phydev = phydev;
-+	hbg_mdio_init_hw(priv);
-+	return hbg_phy_connect(priv);
++	return ret;
 +}
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.h
++
++void hbg_txrx_uninit(struct hbg_priv *priv)
++{
++	hbg_ring_uninit(&priv->tx_ring);
++}
+diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
 new file mode 100644
-index 000000000000..febd02a309c7
+index 000000000000..73aca4b850a8
 --- /dev/null
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.h
-@@ -0,0 +1,12 @@
++++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_txrx.h
+@@ -0,0 +1,37 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/* Copyright (c) 2024 Hisilicon Limited. */
 +
-+#ifndef __HBG_MDIO_H
-+#define __HBG_MDIO_H
++#ifndef __HBG_TXRX_H
++#define __HBG_TXRX_H
 +
-+#include "hbg_common.h"
++#include <linux/etherdevice.h>
++#include "hbg_hw.h"
 +
-+int hbg_mdio_init(struct hbg_priv *priv);
-+void hbg_phy_start(struct hbg_priv *priv);
-+void hbg_phy_stop(struct hbg_priv *priv);
++static inline u32 hbg_spec_max_frame_len(struct hbg_priv *priv, enum hbg_dir dir)
++{
++	return (dir == HBG_DIR_TX) ? priv->dev_specs.max_frame_len :
++		priv->dev_specs.rx_buf_size;
++}
++
++static inline u32 hbg_get_spec_fifo_max_num(struct hbg_priv *priv, enum hbg_dir dir)
++{
++	return (dir == HBG_DIR_TX) ? priv->dev_specs.tx_fifo_num :
++		priv->dev_specs.rx_fifo_num;
++}
++
++static inline bool hbg_fifo_is_full(struct hbg_priv *priv, enum hbg_dir dir)
++{
++	return hbg_hw_get_fifo_used_num(priv, dir) >=
++	       hbg_get_spec_fifo_max_num(priv, dir);
++}
++
++static inline u32 hbg_get_queue_used_num(struct hbg_ring *ring)
++{
++	return (ring->ntu + ring->len - ring->ntc) % ring->len;
++}
++
++netdev_tx_t hbg_net_start_xmit(struct sk_buff *skb, struct net_device *netdev);
++int hbg_txrx_init(struct hbg_priv *priv);
++void hbg_txrx_uninit(struct hbg_priv *priv);
++
 +#endif
-diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-index 77153f1132fd..81e6d6e9a429 100644
---- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-+++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_reg.h
-@@ -17,4 +17,59 @@
- #define HBG_REG_RX_FIFO_NUM_ADDR		0x0034
- #define HBG_REG_VLAN_LAYERS_ADDR		0x0038
- 
-+/* MDIO */
-+#define HBG_REG_MDIO_BASE			0x8000
-+#define HBG_REG_MDIO_COMMAND_ADDR		(HBG_REG_MDIO_BASE + 0x0000)
-+#define HBG_REG_MDIO_COMMAND_CLK_SEL_EXP_B	BIT(17)
-+#define HBG_REG_MDIO_COMMAND_AUTO_SCAN_B	BIT(16)
-+#define HBG_REG_MDIO_COMMAND_CLK_SEL_B		BIT(15)
-+#define HBG_REG_MDIO_COMMAND_START_B		BIT(14)
-+#define HBG_REG_MDIO_COMMAND_ST_M		GENMASK(13, 12)
-+#define HBG_REG_MDIO_COMMAND_OP_M		GENMASK(11, 10)
-+#define HBG_REG_MDIO_COMMAND_PRTAD_M		GENMASK(9, 5)
-+#define HBG_REG_MDIO_COMMAND_DEVAD_M		GENMASK(4, 0)
-+#define HBG_REG_MDIO_WDATA_ADDR			(HBG_REG_MDIO_BASE + 0x0008)
-+#define HBG_REG_MDIO_WDATA_M			GENMASK(15, 0)
-+#define HBG_REG_MDIO_RDATA_ADDR			(HBG_REG_MDIO_BASE + 0x000C)
-+#define HBG_REG_MDIO_STA_ADDR			(HBG_REG_MDIO_BASE + 0x0010)
-+
-+/* GMAC */
-+#define HBG_REG_SGMII_BASE			0x10000
-+#define HBG_REG_DUPLEX_TYPE_ADDR		(HBG_REG_SGMII_BASE + 0x0008)
-+#define HBG_REG_DUPLEX_B			BIT(0)
-+#define HBG_REG_PORT_MODE_ADDR			(HBG_REG_SGMII_BASE + 0x0040)
-+#define HBG_REG_PORT_MODE_M			GENMASK(3, 0)
-+#define HBG_REG_TRANSMIT_CONTROL_ADDR		(HBG_REG_SGMII_BASE + 0x0060)
-+#define HBG_REG_TRANSMIT_CONTROL_PAD_EN_B	BIT(7)
-+#define HBG_REG_TRANSMIT_CONTROL_CRC_ADD_B	BIT(6)
-+#define HBG_REG_TRANSMIT_CONTROL_AN_EN_B	BIT(5)
-+#define HBG_REG_CF_CRC_STRIP_ADDR		(HBG_REG_SGMII_BASE + 0x01B0)
-+#define HBG_REG_CF_CRC_STRIP_B			BIT(0)
-+#define HBG_REG_MODE_CHANGE_EN_ADDR		(HBG_REG_SGMII_BASE + 0x01B4)
-+#define HBG_REG_MODE_CHANGE_EN_B		BIT(0)
-+#define HBG_REG_RECV_CONTROL_ADDR		(HBG_REG_SGMII_BASE + 0x01E0)
-+#define HBG_REG_RECV_CONTROL_STRIP_PAD_EN_B	BIT(3)
-+
-+/* PCU */
-+#define HBG_REG_RX_BUF_SIZE_ADDR		(HBG_REG_SGMII_BASE + 0x04E4)
-+#define HBG_REG_RX_BUF_SIZE_M			GENMASK(15, 0)
-+#define HBG_REG_BUS_CTRL_ADDR			(HBG_REG_SGMII_BASE + 0x04E8)
-+#define HBG_REG_BUS_CTRL_ENDIAN_M		GENMASK(2, 1)
-+#define HBG_REG_RX_CTRL_ADDR			(HBG_REG_SGMII_BASE + 0x04F0)
-+#define HBG_REG_RX_CTRL_RXBUF_1ST_SKIP_SIZE_M	GENMASK(31, 28)
-+#define HBG_REG_RX_CTRL_TIME_INF_EN_B		BIT(23)
-+#define HBG_REG_RX_CTRL_RX_ALIGN_NUM_M		GENMASK(18, 17)
-+#define HBG_REG_RX_CTRL_PORT_NUM		GENMASK(16, 13)
-+#define HBG_REG_RX_CTRL_RX_GET_ADDR_MODE_B	BIT(12)
-+#define HBG_REG_RX_CTRL_RXBUF_1ST_SKIP_SIZE2_M	GENMASK(3, 0)
-+#define HBG_REG_RX_PKT_MODE_ADDR		(HBG_REG_SGMII_BASE + 0x04F4)
-+#define HBG_REG_RX_PKT_MODE_PARSE_MODE_M	GENMASK(22, 21)
-+
-+enum hbg_port_mode {
-+	/* 0x0 ~ 0x5 are reserved */
-+	HBG_PORT_MODE_SGMII_10M = 0x6,
-+	HBG_PORT_MODE_SGMII_100M = 0x7,
-+	HBG_PORT_MODE_SGMII_1000M = 0x8,
-+};
-+
- #endif
 -- 
 2.33.0
 
