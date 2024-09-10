@@ -1,79 +1,95 @@
-Return-Path: <netdev+bounces-126896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBC3F972D3B
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:16:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8FF972D48
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:19:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16A381C247B8
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:16:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C57A02850F0
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD00F187878;
-	Tue, 10 Sep 2024 09:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8A5A187857;
+	Tue, 10 Sep 2024 09:19:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OAPs8W4n"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lfBDbMgK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="hSw/04k5";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="lfBDbMgK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="hSw/04k5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78A217D34D
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 09:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E63AF12B143;
+	Tue, 10 Sep 2024 09:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725959753; cv=none; b=Ha1Q4dY59phQz9+PxsQMBtfok6nBdei6SIJEyubq9kl/rs1OKyTQ/5oiS2DH1bOq/kmP+UlsQovko9LtuNlsRrRG/fj+fsvVAkbNZGmDNtGZDk2JyqVitHHep5YzhFI+Lh1LdvsG1CaQ1JVoKwzQ8hB4Rm4YHrh1D53i2k7cJUk=
+	t=1725959973; cv=none; b=FVLGOsrtTC/qdm83pf/41VwW4BoLWstVg1MDXEDSL+qE/A+ugrq02K7WhonGt6eK0+9GJnyyoo6QOUbKF4zR+bUdNkvrVibl7BRfGbCYc4cZ+5HbIC9/18udHupN49y9fBb2oPkv0jZRqut5ISspjzrncTljPtYrO1uzPA/WHUE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725959753; c=relaxed/simple;
-	bh=eGyGPmj8qP4a1HJ7icwsHB0lz2Y8kobW0ucA08xti3A=;
+	s=arc-20240116; t=1725959973; c=relaxed/simple;
+	bh=EZJ2KjVe8+MIqoxXJa3jnPZTaaasnYdfUc4J7h8X9Sw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jyyVO5PXtcW3CcHiwUJ1KPAGMXOqJ4rH4+GbEmg131JzVMKBNDo+2OSt0JAnNw9i5OvlZx8d2petuTZYVsIZZBj9m+gX8H0OMq+cEVAjr7iFdg4qDUu/GqStTH3subv2BJ7moeGoZen3+pjRcArSX9iV6dLVJFbcT1Rw3EgTqFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OAPs8W4n; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1725959750;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=iYIjKgYM7RYPaQCgy/DUvqkVzjxMMJpaE05ut2eZgaDwHQQBNNJJ7Z7ZBCh4CqS03Co1SBs64FG8K/m6DAaFrTWRt7+TBCyXA2HDGsph6WbUxeOC6xc0CxLVOqpNF/wJigqoehkI3RltbLIuHcvB+LovKrf62y0hJr5Ca4+cch0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lfBDbMgK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=hSw/04k5; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=lfBDbMgK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=hSw/04k5; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 1A3511F7CA;
+	Tue, 10 Sep 2024 09:19:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1725959970; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SOrTsaC9yhyU98rc48UtcdzEBQ3VCVbDacgXHoEqlXI=;
-	b=OAPs8W4nqHg+kaTblEl2K5dEUdeqIg0qcls/Wi5WRhCnMmo2NhNlrC7VV9pFS2qxVedHDZ
-	Iwqvvql/uAzSRbZEvjFE2dYB2TrRob8ugyPItTOnpMvPAIb/U80XByGvispiJ92RuC8tmY
-	SJcMVphT3nfj4FRaQe0uwIjxOYD3JL8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-53-pgX-CblwOE6geWGP2KynZA-1; Tue, 10 Sep 2024 05:15:48 -0400
-X-MC-Unique: pgX-CblwOE6geWGP2KynZA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-374bb1e931cso3105629f8f.0
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 02:15:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725959748; x=1726564548;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SOrTsaC9yhyU98rc48UtcdzEBQ3VCVbDacgXHoEqlXI=;
-        b=Vre7p4bVcHk5LkMhnYwiOzVGrFYJlJyZOPBpoyGDZh+wL4pmjt3h733kWerEgyUdFk
-         9e6avxETN/rpXWsxJfSxcevaf/NzqPB3klmPkTzY2Qz24Hgi1R3L/N6Nz69lRaEQRLmk
-         EPDCWN1/CsMOhv5x+RqqViyUAzUbu+P31G3IE2H0UXUO8ZclsU+yX7MEB99kce88WZl3
-         YN+u5sBXt4J7gLw+/0imzPCFVa1KK5PrqUuDi9RZpvA8ENqbJXkSBWdSM9iZPZZRsJD6
-         ZRehu9j31PGDW7yXbQdELsXcgyWD1+n1tnSUWt4U0AMjJWLkwGQpDd9Nh5K4UB2NMSAG
-         60Mw==
-X-Gm-Message-State: AOJu0Yw5YLBIC/gLMyr3bI1teztSn8dlZUj904yPvbkJPGGdbXsr4iue
-	IK7tuG62SaKbBXIw9A2eiR8k9lmYn33w+z9NQbckKdVzZTq3dw8iobvAFRrWHvUsnpbQF110do5
-	OfxBwzH155vmKnVDd71/fqqs+oXisv1qjqVIpLwL/kWJ3mJn0kFb0wQ==
-X-Received: by 2002:adf:e805:0:b0:378:8b56:4665 with SMTP id ffacd0b85a97d-378a8a5a250mr1421998f8f.24.1725959747764;
-        Tue, 10 Sep 2024 02:15:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGDlVz9KnKxoBPJUs8BJvknxY3Fteh43Ykemjb+fUuzFfRMvSS6AWG+AceJowT+ugSPw6DlDA==
-X-Received: by 2002:adf:e805:0:b0:378:8b56:4665 with SMTP id ffacd0b85a97d-378a8a5a250mr1421962f8f.24.1725959747193;
-        Tue, 10 Sep 2024 02:15:47 -0700 (PDT)
-Received: from [192.168.88.27] (146-241-69-130.dyn.eolo.it. [146.241.69.130])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3789564a52csm8331824f8f.11.2024.09.10.02.15.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Sep 2024 02:15:46 -0700 (PDT)
-Message-ID: <f8b58d30-cd45-4cb6-b6ca-ac076f072688@redhat.com>
-Date: Tue, 10 Sep 2024 11:15:44 +0200
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=iHifeSDy1hOrQBMy6zAhiahj/omSnqHRNld70oH1lB8=;
+	b=lfBDbMgKn59KuCOI0BmhZrdL9u8jnyJbSi73Z7nnY+EtqtYEha6puIOgROlT/1gI7b/jPC
+	wGH3HmSlYoslgSYlz/LQ+htJiAvqlZTgBQgeEmMu8jDSRUe9mXrW67iGIhMn5+7XBG5WIh
+	KKC5XX8oA4Rt6IpJ02G6DCiaz6OE/CQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1725959970;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=iHifeSDy1hOrQBMy6zAhiahj/omSnqHRNld70oH1lB8=;
+	b=hSw/04k5A0n+xQJ9JF57ti/nISsxO3zKM1aEff2RfwKn8MnQBzyWdU2SfB0Mhmtikd9e1D
+	cIkIbBglasWMt0CA==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1725959970; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=iHifeSDy1hOrQBMy6zAhiahj/omSnqHRNld70oH1lB8=;
+	b=lfBDbMgKn59KuCOI0BmhZrdL9u8jnyJbSi73Z7nnY+EtqtYEha6puIOgROlT/1gI7b/jPC
+	wGH3HmSlYoslgSYlz/LQ+htJiAvqlZTgBQgeEmMu8jDSRUe9mXrW67iGIhMn5+7XBG5WIh
+	KKC5XX8oA4Rt6IpJ02G6DCiaz6OE/CQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1725959970;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=iHifeSDy1hOrQBMy6zAhiahj/omSnqHRNld70oH1lB8=;
+	b=hSw/04k5A0n+xQJ9JF57ti/nISsxO3zKM1aEff2RfwKn8MnQBzyWdU2SfB0Mhmtikd9e1D
+	cIkIbBglasWMt0CA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E97CE13A3A;
+	Tue, 10 Sep 2024 09:19:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id aBWeOCEP4GawSgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Tue, 10 Sep 2024 09:19:29 +0000
+Message-ID: <e8756edc-1c85-4a03-9c6b-663a9e7d46eb@suse.cz>
+Date: Tue, 10 Sep 2024 11:19:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,83 +97,123 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 04/12] net: lan966x: use the FDMA library for
- allocation of rx buffers
-To: Daniel Machon <daniel.machon@microchip.com>,
- Horatiu Vultur <horatiu.vultur@microchip.com>, UNGLinuxDriver@microchip.com,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20240905-fdma-lan966x-v1-0-e083f8620165@microchip.com>
- <20240905-fdma-lan966x-v1-4-e083f8620165@microchip.com>
+Subject: Re: [PATCH v4] memcg: add charging of already allocated slab objects
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240905-fdma-lan966x-v1-4-e083f8620165@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Paolo Abeni <pabeni@redhat.com>, Shakeel Butt <shakeel.butt@linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>, Michal Hocko <mhocko@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Muchun Song <muchun.song@linux.dev>, David Rientjes <rientjes@google.com>,
+ Hyeonggon Yoo <42.hyeyoo@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+ Meta kernel team <kernel-team@meta.com>, cgroups@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240905173422.1565480-1-shakeel.butt@linux.dev>
+ <5d48fe26-1e18-4941-99d4-8c03e83f5e76@redhat.com>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <5d48fe26-1e18-4941-99d4-8c03e83f5e76@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Spam-Score: -2.80
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_TLS_ALL(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[cmpxchg.org,kernel.org,linux.dev,google.com,gmail.com,davemloft.net,kvack.org,vger.kernel.org,meta.com];
+	RCPT_COUNT_TWELVE(0.00)[17];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[]
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On 9/5/24 10:06, Daniel Machon wrote:
-> Use the two functions: fdma_alloc_phys() and fdma_dcb_init() for rx
-> buffer allocation and use the new buffers throughout.
+On 9/10/24 10:26, Paolo Abeni wrote:
+> On 9/5/24 19:34, Shakeel Butt wrote:
+>>    * kmem_cache_alloc_node - Allocate an object on the specified node
+>>    * @s: The cache to allocate from.
+>> diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+>> index 64d07b842e73..3c13ca8c11fb 100644
+>> --- a/net/ipv4/inet_connection_sock.c
+>> +++ b/net/ipv4/inet_connection_sock.c
+>> @@ -715,6 +715,7 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
+>>   	release_sock(sk);
+>>   	if (newsk && mem_cgroup_sockets_enabled) {
+>>   		int amt = 0;
+>> +		gfp_t gfp = GFP_KERNEL | __GFP_NOFAIL;
+>>   
+>>   		/* atomically get the memory usage, set and charge the
+>>   		 * newsk->sk_memcg.
+>> @@ -731,8 +732,8 @@ struct sock *inet_csk_accept(struct sock *sk, struct proto_accept_arg *arg)
+>>   		}
+>>   
+>>   		if (amt)
+>> -			mem_cgroup_charge_skmem(newsk->sk_memcg, amt,
+>> -						GFP_KERNEL | __GFP_NOFAIL);
+>> +			mem_cgroup_charge_skmem(newsk->sk_memcg, amt, gfp);
+>> +		kmem_cache_charge(newsk, gfp);
+>>   
+>>   		release_sock(newsk);
+>>   	}
 > 
-> In order to replace the old buffers with the new ones, we have to do the
-> following refactoring:
+> The networking bits looks sane to me - with a very minor nit about the 
+> reverse xmas tree order in variables declaration above.
 > 
->      - use fdma_alloc_phys() and fdma_dcb_init()
-> 
->      - replace the variables: rx->dma, rx->dcbs and rx->last_entry
->        with the equivalents from the FDMA struct.
-> 
->      - make use of fdma->db_size for rx buffer size.
-> 
->      - add lan966x_fdma_rx_dataptr_cb callback for obtaining the dataptr.
-> 
->      - Initialize FDMA struct values.
-> 
-> Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
-> Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> ---
->   .../net/ethernet/microchip/lan966x/lan966x_fdma.c  | 116 ++++++++++-----------
->   .../net/ethernet/microchip/lan966x/lan966x_main.h  |  15 ---
->   2 files changed, 55 insertions(+), 76 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> index b64f04ff99a8..99d09c97737e 100644
-> --- a/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_fdma.c
-> @@ -6,13 +6,30 @@
->   
->   #include "lan966x_main.h"
->   
-> +static int lan966x_fdma_rx_dataptr_cb(struct fdma *fdma, int dcb, int db,
-> +				      u64 *dataptr)
-> +{
-> +	struct lan966x *lan966x = (struct lan966x *)fdma->priv;
-> +	struct lan966x_rx *rx = &lan966x->rx;
-> +	struct page *page;
-> +
-> +	page = page_pool_dev_alloc_pages(rx->page_pool);
-> +	if (unlikely(!page))
-> +		return -ENOMEM;
-> +
-> +	rx->page[dcb][db] = page;
-> +	*dataptr = page_pool_get_dma_addr(page) + XDP_PACKET_HEADROOM;
-> +
-> +	return 0;
-> +}
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-Very nice cleanup indeed!
+Great, thanks, I will adjust the ordering.
 
-Out of ENOMEM I can't recall if the following was already discussed, but 
-looking at this cb, I'm wondering if a possible follow-up could replace 
-the dataptr_cb() and nextptr_cb() with lib functions i.e. operating on 
-page pool or doing netdev allocations according to some fdma lib flags.
-
-Cheers,
-
-Paolo
 
 
