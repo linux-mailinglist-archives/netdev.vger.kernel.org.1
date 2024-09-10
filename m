@@ -1,190 +1,144 @@
-Return-Path: <netdev+bounces-126884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CFB3972C64
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:41:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CA35972C6C
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:43:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01CA1287400
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:41:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E57D11F25F6A
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:43:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6BD187857;
-	Tue, 10 Sep 2024 08:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB8818757F;
+	Tue, 10 Sep 2024 08:43:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hXIrGUOr"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fzwm4aJI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C763718754D
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 08:41:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9864918593C
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 08:43:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725957683; cv=none; b=kHE+7ixuYgLsEukpsIbHErZQXtgaAINRF7BQFhBBb8B1kVxYE29S4aeCNOyiwcrNsWY32NMZSo6UNoqg1vaolWtvDgTQ17gjX6itWeyPK+CnUb8v4J6pYbkWB4yia06AjKhOzRtKqRXidAYIh1ypvwiKVBEkbnS9oaLbD6BRoC4=
+	t=1725957787; cv=none; b=MDGsP0JR7kKIHdM51asW/SPt3PMREV2Nw9trstL78cowJ4hgKSfuOesOwFa9lUNmh9pjsHA9q8XRs5yYPtXyqaK7CI5ov1JaKeIC2b1dxIK0zTSVq0N9fR7acEAFvW75w+dyTWrQYKBz2tjmS7wiU6zSvPsP1gJ/Eqx2BdJ1s6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725957683; c=relaxed/simple;
-	bh=h3cd4gSZ2HmOylFhWWptsXjKQ96ZljxG3F3gMUmWV7Y=;
+	s=arc-20240116; t=1725957787; c=relaxed/simple;
+	bh=XqYUFAg0vlcB8eqKF5HTJl8ZV1kJqv+ir3gXhFqkQ/0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=awc/QL2K6fdHkmxriwETNfR7Lxe+1BjZSxATfzDYwKWwAb3H8ZluWq+dd7Gjv3z1O+oN8DPAP5QIEV3Csjz3vabAj7IbHlybcmOJd55rWZ/myZVwDjxnLaHTAjd3m18yaq/FiVdaHCKOkYMx1QzK21tZmW1pgWWbH/o+w+MYd/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hXIrGUOr; arc=none smtp.client-ip=209.85.167.43
+	 To:Cc:Content-Type; b=eml+WSGf3EDOcLbk9ODV1WfKQ50wqJS7rxuD0noNXbfCqdaiqiyBXJywQw8Tq+jDtORWUS5V/rbxSD6Et6lVcE/RFvGrxWm1nkwcCPWt8sCEH6MN2r7yIKoc5ZOd8Z/hrRLNDIv5IYYqNKu76PHYyipb18nGMD/ifd2VLrxKEKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=fzwm4aJI; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-53653ff0251so6219243e87.0
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 01:41:21 -0700 (PDT)
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-536584f6c84so5109278e87.0
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 01:43:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1725957680; x=1726562480; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1725957784; x=1726562584; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uW2QdQj0wloRSWFt8Gzz+LlVmrD8yr5NNCkCqNcwXLo=;
-        b=hXIrGUOrAF46MN09Glw/CK8qgSDgjS9KUy30XTig8sY+jEokZXX0QAxHbJH4BOvIfO
-         WlktH2fKrIfJSJTv2b5taQWHqNpJq6LxQLXrBp1j2Qlp5vIXcSACInYlsTeqW5nH2B2z
-         DNdG1KpeXRW4Vfce7v/wIBAtKdsUUHJoLH2Fg=
+        bh=y9F0JjuMHAccb/NYm9alerb6ODTS2P4ubVMmIZG6QIM=;
+        b=fzwm4aJIzUEx1aVZNa0bmGz59S97jarEckUdFakmXPvl5lXM5w0ie/TWPJGG+WBbX3
+         sj30xB/C/U55WKQGCpXU5NxSlUAQVNsbUJogp5lPwJFkZYpWXFkrCgHGzQZNfcpgL6zM
+         jLB4bXS5mfF+4SkcA1P2HRT8Nu263w4AkFVUc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725957680; x=1726562480;
+        d=1e100.net; s=20230601; t=1725957784; x=1726562584;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=uW2QdQj0wloRSWFt8Gzz+LlVmrD8yr5NNCkCqNcwXLo=;
-        b=eiM82jTD19BdpIBbLw23G72rpKllh4ty7aSne3vminuy3DocQuxPhpZz52ThWNCblN
-         FL35zxa9ws6lK1x25C44mqd+wqBD5QNTNdxskZ1fHLN5DRlCgMZBXJ3QnmIRiCZAJ4Se
-         z+Cm14Xe3x/F2xFR1pVtSQj5harF4t6EGGKIgfFWpV9XpxtdpNw4Z/2dki0XgkpZsO/B
-         1XZjQe/u1a1GsfFg/UJdvht2xDtwZWq140VS9JMiNP18aKD3rkHNC42rEq0lU4XIkghG
-         8+gxlUrlFWod24wh130j4MLfY1DQHMQcZrW3kB7TPFVsQOIshkQFDRDn3ZHBKjo65X4w
-         qEwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU53nDyhEJCB1pC4Sq0FEXyxwMHpMgFUQv8+5w+oh+9GICWfiDfYebGYUDqcK0wVvPh/hUavLQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9X1hVOoSSs1OhyNsL3AObZJ7B/U1LmuF1Po1N4DtE9gK/WY7y
-	xYWtTBJ0s+e516MTDQ3kILBAdLA8sR02pCCFv0f6W6vJsfnvK6rdaSq2C5nmsju6MJ+PseveO5m
-	26IrsHojveQiYeQi62R+Ro++BW5WhUPHdXp/m
-X-Google-Smtp-Source: AGHT+IF8g6kvgX7mKw1bv/O6WZUDdVt2r95JVoG0Slu/IUNC0c2XDvoAirWIhaByyxBD351VDNV4OOq+DzYHU0h7bV8=
-X-Received: by 2002:a05:6512:10cf:b0:536:536a:3854 with SMTP id
- 2adb3069b0e04-5365881a749mr7055762e87.60.1725957679532; Tue, 10 Sep 2024
- 01:41:19 -0700 (PDT)
+        bh=y9F0JjuMHAccb/NYm9alerb6ODTS2P4ubVMmIZG6QIM=;
+        b=pVy5Mohvyy/r/R2lgfWjXcGBJlcG2UHFAiQYS2w5D9poLE3YpU9IgUqhBdgeOfI6+G
+         8/fCqBH+l0TlQrdTkUTR+t3aIqImUwNx/rK9YoXDdQSDwFhNf8anekxWr/boWUgXyfEx
+         rubdu6u5rxLQCoble3YNkZ9LG7pRjFnY5g8VKQOrpcQ2wCgHSlEdggLoLJ/l4WHAN/p2
+         TR+/BIzgDGIRxNKWKLtMUg0AxeQSagS8E0fnyacqjVdw4aibg422IZH/YUJZNHUDcUXg
+         0ofvDfKkN8ZW4JQt8XX2QIAWICf/bhff+rGsNqDXxCParf/f5AW6TDc1xqXX5oLG8LMi
+         vJjg==
+X-Forwarded-Encrypted: i=1; AJvYcCXKPxDTQP85flY6GUOXkIU2mpzY9pJSIWeFe1oLZooLN0swGPBHrzfHpvUMn2rpONVfIdXG2Xc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuQpWqgDchzSYsWJydJFPCBz0HrWgoK3soIJdmoS7tQ0S5BuI7
+	npMKr/SG9LGVx2tsdWHn4LJICp+1mOgaq5myjF6ZRqbuuq6tVLSU9VpiPMznfAKqx/MKbtHhiHx
+	9DH3wZt6Y5VZWxoHWhyYn84KWfZbiSNy74wcN
+X-Google-Smtp-Source: AGHT+IEI0lG6DZ1W/RH/kT6jePAUaUwyEbPISSgjK5uBLGHjGcQP5DGAVuCzaFTtShIHwgt61jv11smK+oF/vpIC/Qs=
+X-Received: by 2002:a05:6512:b1e:b0:535:3cdc:8763 with SMTP id
+ 2adb3069b0e04-536587a4249mr9639348e87.4.1725957783392; Tue, 10 Sep 2024
+ 01:43:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240910075942.1270054-1-shaojijie@huawei.com> <20240910075942.1270054-9-shaojijie@huawei.com>
-In-Reply-To: <20240910075942.1270054-9-shaojijie@huawei.com>
+References: <20240910-ti-warn-v1-0-afd1e404abbe@kernel.org> <20240910-ti-warn-v1-2-afd1e404abbe@kernel.org>
+In-Reply-To: <20240910-ti-warn-v1-2-afd1e404abbe@kernel.org>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Tue, 10 Sep 2024 14:11:07 +0530
-Message-ID: <CAH-L+nNmkJt2TXh7YLb68pET-mBEwtbMS03=iVzeVke90E=AQg@mail.gmail.com>
-Subject: Re: [PATCH V9 net-next 08/11] net: hibmcge: Implement some
- ethtool_ops functions
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, shenjian15@huawei.com, wangpeiyang1@huawei.com, 
-	liuyonglong@huawei.com, chenhao418@huawei.com, sudongming1@huawei.com, 
-	xujunsheng@huawei.com, shiyongbang@huawei.com, libaihan@huawei.com, 
-	andrew@lunn.ch, jdamato@fastly.com, horms@kernel.org, 
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, 
-	salil.mehta@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Tue, 10 Sep 2024 14:12:49 +0530
+Message-ID: <CAH-L+nOnGZkV05_N7tkaN2W_04TPVA6zhqKh9i-+rMuaN4OhzA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] net: ethernet: ti: am65-cpsw: Use __be64
+ type for id_temp
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org, 
+	linux-omap@vger.kernel.org, llvm@lists.linux.dev
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000006f598d0621bfd64c"
+	boundary="0000000000009e700d0621bfdc42"
 
---0000000000006f598d0621bfd64c
+--0000000000009e700d0621bfdc42
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 10, 2024 at 1:36=E2=80=AFPM Jijie Shao <shaojijie@huawei.com> w=
-rote:
+On Tue, Sep 10, 2024 at 12:48=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
 >
-> Implement the .get_drvinfo .get_link .get_link_ksettings to get
-> the basic information and working status of the driver.
-> Implement the .set_link_ksettings to modify the rate, duplex,
-> and auto-negotiation status.
+> The id_temp local variable in am65_cpsw_nuss_probe() is
+> used to hold a 64-bit big-endian value as it is assigned using
+> cpu_to_be64().
 >
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> It is read using memcpy(), where it is written as an identifier into a
+> byte-array.  So this can also be treated as big endian.
+>
+> As it's type is currently host byte order (u64), sparse flags
+> an endian mismatch when compiling for little-endian systems:
+>
+> .../am65-cpsw-nuss.c:3454:17: warning: incorrect type in assignment (diff=
+erent base types)
+> .../am65-cpsw-nuss.c:3454:17:    expected unsigned long long [usertype] i=
+d_temp
+> .../am65-cpsw-nuss.c:3454:17:    got restricted __be64 [usertype]
+>
+> Address this by using __be64 as the type of id_temp.
+>
+> No functional change intended.
+> Compile tested only.
+>
+> Signed-off-by: Simon Horman <horms@kernel.org>
 
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 > ---
-> ChangeLog:
-> RFC v1 -> RFC v2:
->   - Use ethtool_op_get_link(), phy_ethtool_get_link_ksettings(),
->     and phy_ethtool_set_link_ksettings() to simplify the code, suggested =
-by Andrew.
->   - Delete workqueue for this patch set, suggested by Jonathan.
->   RFC v1: https://lore.kernel.org/all/20240731094245.1967834-1-shaojijie@=
-huawei.com/
-> ---
->  .../ethernet/hisilicon/hibmcge/hbg_ethtool.c    | 17 +++++++++++++++++
->  .../ethernet/hisilicon/hibmcge/hbg_ethtool.h    | 11 +++++++++++
->  .../net/ethernet/hisilicon/hibmcge/hbg_main.c   |  2 ++
->  3 files changed, 30 insertions(+)
->  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
->  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
+>  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c b/drive=
-rs/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-> new file mode 100644
-> index 000000000000..c3370114aef3
-> --- /dev/null
-> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
-> @@ -0,0 +1,17 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +// Copyright (c) 2024 Hisilicon Limited.
-> +
-> +#include <linux/ethtool.h>
-> +#include <linux/phy.h>
-> +#include "hbg_ethtool.h"
-> +
-> +static const struct ethtool_ops hbg_ethtool_ops =3D {
-> +       .get_link               =3D ethtool_op_get_link,
-> +       .get_link_ksettings     =3D phy_ethtool_get_link_ksettings,
-> +       .set_link_ksettings     =3D phy_ethtool_set_link_ksettings,
-> +};
-> +
-> +void hbg_ethtool_set_ops(struct net_device *netdev)
-> +{
-> +       netdev->ethtool_ops =3D &hbg_ethtool_ops;
-> +}
-> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h b/drive=
-rs/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
-> new file mode 100644
-> index 000000000000..628707ec2686
-> --- /dev/null
-> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
-> @@ -0,0 +1,11 @@
-> +/* SPDX-License-Identifier: GPL-2.0+ */
-> +/* Copyright (c) 2024 Hisilicon Limited. */
-> +
-> +#ifndef __HBG_ETHTOOL_H
-> +#define __HBG_ETHTOOL_H
-> +
-> +#include <linux/netdevice.h>
-> +
-> +void hbg_ethtool_set_ops(struct net_device *netdev);
-> +
-> +#endif
-> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/=
-net/ethernet/hisilicon/hibmcge/hbg_main.c
-> index a8d0e951633b..b06524c336e2 100644
-> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
-> @@ -6,6 +6,7 @@
->  #include <linux/netdevice.h>
->  #include <linux/pci.h>
->  #include "hbg_common.h"
-> +#include "hbg_ethtool.h"
->  #include "hbg_hw.h"
->  #include "hbg_irq.h"
->  #include "hbg_mdio.h"
-> @@ -235,6 +236,7 @@ static int hbg_probe(struct pci_dev *pdev, const stru=
-ct pci_device_id *ent)
->         netdev->min_mtu =3D priv->dev_specs.min_mtu;
->         hbg_change_mtu(priv, HBG_DEFAULT_MTU_SIZE);
->         hbg_net_set_mac_address(priv->netdev, &priv->dev_specs.mac_addr);
-> +       hbg_ethtool_set_ops(netdev);
->         ret =3D devm_register_netdev(dev, netdev);
->         if (ret)
->                 return dev_err_probe(dev, ret, "failed to register netdev=
-\n");
+> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ether=
+net/ti/am65-cpsw-nuss.c
+> index a4b0e4bb7529..9e6353e0361e 100644
+> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+> @@ -3444,7 +3444,7 @@ static int am65_cpsw_nuss_probe(struct platform_dev=
+ice *pdev)
+>         struct resource *res;
+>         struct clk *clk;
+>         int ale_entries;
+> -       u64 id_temp;
+> +       __be64 id_temp;
+>         int ret, i;
+>
+>         common =3D devm_kzalloc(dev, sizeof(struct am65_cpsw_common), GFP=
+_KERNEL);
+>
 > --
-> 2.33.0
+> 2.45.2
+>
 >
 
 
@@ -192,7 +146,7 @@ ct pci_device_id *ent)
 Regards,
 Kalesh A P
 
---0000000000006f598d0621bfd64c
+--0000000000009e700d0621bfdc42
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -264,14 +218,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIASItLQirSc+d8DK88FI1t5Ruoj9sxK/h1A0fKB1hsj9MBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkxMDA4NDEyMFowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIG6fo2WBRy4V60QNRcojzQyinu2lBtJz0D17RlBqVJgHMBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkxMDA4NDMwNFowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBIdFRaI3Ug
-8pXAzMpauC7K8wuNnkJdoNt4M7FxRr9BLChT/uZgCieRvsUkMzCriZ+Xf1gnJDjCJ/Ikx2bj07wS
-3fW+Z15EqiBFJNt4ntwTNAUmjuYerkErvoxLQ6sveOnfRa5gN3ae1Kf+UUjVTujNUuNOSYK85m28
-Cb473e2QvwsfMJBRg7KxA8op5hIR/1LaeXOlKiftypzm+Z2x2X0NZ03lUWRdAICHBza1edE+P6VC
-v9TQWv9RuYZBdMfb4ZyAJ1PEfvAhhFSCG7dvetPHbMPdTzYcTHkaaSoiZwdZacpDqoN0ZwA1vAFS
-zfS0R/9rsSFmEvtI43PlGfSOawiQ
---0000000000006f598d0621bfd64c--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAlj5YNyqFx
+mvOqVIpx6ZK039JcAGvxH/6E8etvRKrv3UW8Xpgsx5B/J7aIn15G5+DlkCtGYCwzSJoDaTX2rPgg
+gZ9vkvBo+LKowFP4jyVaPoBnmz5R3tgLuWzdY3G+Eidz/H7nFrTCUyQ20ucU23Lut/ycB05pHnvW
+ZpoAxqQIZnqjm4mlO/PQFXENkhfY9OMjRxGZ5rX4G4pdMekwJ4HqlI/Cyemk47crPEEePT3W1OLw
+5vZob7TcsF3VxWitl9IjRzCcqhhP52TLIH/LLL0tDV8CEi9lbopKegjs2YZ/ucEOExVWInUs1AZU
+4SU+bk7f6n51QqLjg7CWCvK56c30
+--0000000000009e700d0621bfdc42--
 
