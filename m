@@ -1,111 +1,92 @@
-Return-Path: <netdev+bounces-126816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0972972993
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:32:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8436B972995
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:33:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D5121F257F7
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:32:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E38A8286230
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:33:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67CCC170A3D;
-	Tue, 10 Sep 2024 06:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3383D176AA5;
+	Tue, 10 Sep 2024 06:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b="v9BsMLbd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.theune.cc (mail.theune.cc [212.122.41.141])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A284612B143;
-	Tue, 10 Sep 2024 06:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C901171088;
+	Tue, 10 Sep 2024 06:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.122.41.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725949950; cv=none; b=ASAmssTUUwDoR3D2qWYgZgiYC9RMP0aWoNHX6jnMwOi8RcesP6dxDlvHca3yhg6e5Shhh1EicqqeR0Z9KYBswZtLxdoEBmhb2aX2DSZ9dy7Ppswaz9LprcPqyVWPBfUEu3n3MQs0IFdPuHsOjByEp5lhmWupF/tTeRHt2c+N22A=
+	t=1725949987; cv=none; b=tH3NMY6NGtcPtnpe0n5q5sVgMW1zSy+Q7Ehvk9g9sW74m7bH0v6CEqNP7/CtyV+hrn7WkZmzGOWwUQCXWnfd1CT/5cW6Wn51bkgadHHqI4Tkl5AKMYPai4C9+d7k+cUkP/Xbcmo4J8+6RtODKLJ9x8AUAd+nnIwUwz6+ClBbqg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725949950; c=relaxed/simple;
-	bh=bpa8W3NjcJL1yAbX7z/ky/UwNP3JD/k2tvA5X+AJf9E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Stbu1kQMcUJ4R/028U1qdogc0ChLZcFR+HY0NvRfKclht/SLnUS+Fvg9/NtsMfhsfSlMqvkKwB/aC40GyQRpV2FWqYOYMIT6sLCNzW+7W+d2qSmaZ0N+UAPWq0j5/qCZZM9emjqYGr9mBa2dbMRI3FlumoqMOtbmasvomrxYtMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20688fbaeafso51661975ad.0;
-        Mon, 09 Sep 2024 23:32:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725949948; x=1726554748;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jECedyLwpWSi/LgRrXCCeEdPK7kyo5RLypA86tH+o+I=;
-        b=Z32qE2immWJhw5nBMVaPiLK+x4nTOcwr1/TSr26QGC3+E28noptFzJkQFKx2g17rcF
-         ql8PlTiXRTNm5DuvdlsYEoxMClJ9DzfMoQ1JmeDb2iTUHylVfyJTl5LSG957zqYOnRYh
-         J/2Mjzt265rq5pRJmd3hyamWd4rbIwukvIUBJzljbd0j6a/DXNEBGjEdO6kQawlF7UBt
-         Em88otKBbbjJgYggVIJ/swjaHSI2Yen+GdWiVRlhGIdxJCnBXNFGpEe5TQFLwMl4eGuQ
-         dQ/GC0nT0KHKKs9xbWd1Xd8UaETEsSjY25XeBGlqMP4GVxJXQf0dOxjdIvr2srkyOFxR
-         Behg==
-X-Forwarded-Encrypted: i=1; AJvYcCUo4Lb9xT3OKaNtjvKGUCmfdMdIzk+gfUCx7FisFfubAqe750Lr3Px55PpvyVTmJh4vdDwIGMNJ@vger.kernel.org, AJvYcCVn5bXBL1cY+C+7lEw2dN/uLae2yYoPjdrMpf3srgVRQxfL3JHtCUZmV+plIRTEuW9KL3Tz/Wpqhgo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRJMoYg+YJduWqLVIgHaWwSzXxn416z9r9QSE3M5YZICFxHffs
-	hJPOHHTCPi4NIuY0jA/tznErBnUU0wO4u+bQrpDaQgB3n2zoag7NeeMdI+1cBnazCVtyAqlgqiL
-	Q/W/W9NYp2/oDCF7JIlBwOAPQXu8=
-X-Google-Smtp-Source: AGHT+IEvMIvaSTbfqXCvRnmgvdVXjOwGK/Qnzvkw/rL/oJbx++LHi2AScRFYedF7Rmc2pswkfRM5I9huGGE8ps5yWv0=
-X-Received: by 2002:a17:902:f605:b0:205:76d0:563b with SMTP id
- d9443c01a7336-206f035bc2emr166544305ad.0.1725949947878; Mon, 09 Sep 2024
- 23:32:27 -0700 (PDT)
+	s=arc-20240116; t=1725949987; c=relaxed/simple;
+	bh=JjY69W8Ant6AxwIhWcvkeaHDnbwAevcS9ooCv5+tFak=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=HfRjoXOiu5AXCXk8i83nRlWMEXaHRjGW2IPinJcXText+bvuS2+VAeL3xViEo8aUZCSeDiEbsS7iCSUGVfoasJs7PEn0GcH4n39JDNhRJUUaQdAnyimoDqG8pWTMasqQ4nq6UV05W6eQH4BTpMSyyqKYUzmbUAbL3w3gJzDKzz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc; spf=pass smtp.mailfrom=theune.cc; dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b=v9BsMLbd; arc=none smtp.client-ip=212.122.41.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theune.cc
+Content-Type: text/plain;
+	charset=utf-8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=theune.cc; s=mail;
+	t=1725949979; bh=JjY69W8Ant6AxwIhWcvkeaHDnbwAevcS9ooCv5+tFak=;
+	h=Subject:From:In-Reply-To:Date:Cc:References:To;
+	b=v9BsMLbduWWWKYlzuzVSKQ/eyj5ynKOKIKECE9eE42//4bhQxDWUjsqSpNdzTMBvb
+	 BdgsNexPh3pbWQs10fXwdqHDOf6TM1+f3Cf6EaPJzYF8/tMbtG8Zp8izzBK62w7ChC
+	 uRi8NF4Z+L5uOY3HFNEolO8cSgSpURCG725h8Pws=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240909-rockchip-canfd-clang-div-libcall-v1-1-c6037ea0bb2b@kernel.org>
-In-Reply-To: <20240909-rockchip-canfd-clang-div-libcall-v1-1-c6037ea0bb2b@kernel.org>
-From: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Date: Tue, 10 Sep 2024 15:32:15 +0900
-Message-ID: <CAMZ6RqKA77BWAMxL4_iAcye78JXDGxGQcEd9BJg7uCL9EO11XA@mail.gmail.com>
-Subject: Re: [PATCH net-next] can: rockchip_canfd: Use div_s64() in rkcanfd_timestamp_init()
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, kernel@pengutronix.de, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Heiko Stuebner <heiko@sntech.de>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org, 
-	llvm@lists.linux.dev, patches@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
+Subject: Re: Follow-up to "net: drop bad gso csum_start and offset in
+ virtio_net_hdr" - backport for 5.15 needed
+From: Christian Theune <christian@theune.cc>
+In-Reply-To: <66df5b684b1ea_7296f29460@willemb.c.googlers.com.notmuch>
+Date: Tue, 10 Sep 2024 08:32:38 +0200
+Cc: Greg KH <gregkh@linuxfoundation.org>,
+ Willem de Bruijn <willemb@google.com>,
+ regressions@lists.linux.dev,
+ stable@vger.kernel.org,
+ netdev@vger.kernel.org,
+ mathieu.tortuyaux@gmail.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <8348AEDD-236F-49E3-B2E3-FFD81F757DD9@theune.cc>
+References: <89503333-86C5-4E1E-8CD8-3B882864334A@theune.cc>
+ <2024090309-affair-smitten-1e62@gregkh>
+ <CA+FuTSdqnNq1sPMOUZAtH+zZy+Fx-z3pL-DUBcVbhc0DZmRWGQ@mail.gmail.com>
+ <2024090952-grope-carol-537b@gregkh>
+ <66df3fb5a228e_3d03029498@willemb.c.googlers.com.notmuch>
+ <0B75F6BF-0E0E-4BCC-8557-95A5D8D80038@theune.cc>
+ <66df5b684b1ea_7296f29460@willemb.c.googlers.com.notmuch>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 
-On Tue. 10 Sep. 2024 at 01:24, Nathan Chancellor <nathan@kernel.org> wrote:
-> When building with clang for a 32-bit target, such as arm, a libcall is
-> generated when dividing the result of clocksource_cyc2ns(), which
-> returns a signed 64-bit integer:
->
->   ERROR: modpost: "__aeabi_ldivmod" [drivers/net/can/rockchip/rockchip_canfd.ko] undefined!
->
-> Use div_s64() to avoid generating the libcall.
->
-> Fixes: 4e1a18bab124 ("can: rockchip_canfd: add hardware timestamping support")
-> Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> ---
-> This does not happen with GCC, likely because it implements
-> optimizations for division by a constant that clang does not implement.
-> ---
->  drivers/net/can/rockchip/rockchip_canfd-timestamp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/can/rockchip/rockchip_canfd-timestamp.c b/drivers/net/can/rockchip/rockchip_canfd-timestamp.c
-> index 81cccc5fd8384ee1fec919077db48632f0fe7cc2..4ca01d385ffffdeec964b7fd954d8ba3ba3a1381 100644
-> --- a/drivers/net/can/rockchip/rockchip_canfd-timestamp.c
-> +++ b/drivers/net/can/rockchip/rockchip_canfd-timestamp.c
-> @@ -71,7 +71,7 @@ void rkcanfd_timestamp_init(struct rkcanfd_priv *priv)
->
->         max_cycles = div_u64(ULLONG_MAX, cc->mult);
->         max_cycles = min(max_cycles, cc->mask);
-> -       work_delay_ns = clocksource_cyc2ns(max_cycles, cc->mult, cc->shift) / 3;
-> +       work_delay_ns = div_s64(clocksource_cyc2ns(max_cycles, cc->mult, cc->shift), 3);
+Happy to do that. I=E2=80=99ve blocked time tomorrow morning.
 
-I was surprised at first to see div_s64() instead of div_u64(), but
-clocksource_cyc2ns() indeed returns a s64. So this looks correct.
+> On 9. Sep 2024, at 22:32, Willem de Bruijn =
+<willemdebruijn.kernel@gmail.com> wrote:
+>=20
+> Christian Theune wrote:
+>> I can contribute live testing and can quickly reproduce the issue.
+>>=20
+>> If anything is there that should be tested for apart from verifying =
+the fix, I=E2=80=99d be happy to try.
+>=20
+> If you perform the repro steps and verify that this solves the issue,
+> that would be helpful, thanks.
 
->         priv->work_delay_jiffies = nsecs_to_jiffies(work_delay_ns);
->         INIT_DELAYED_WORK(&priv->timestamp, rkcanfd_timestamp_work);
 
-Reviewed-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Liebe Gr=C3=BC=C3=9Fe,
+Christian
+
+-- =20
+Christian Theune - A97C62CE - 0179 7808366
+@theuni - christian@theune.cc
+
 
