@@ -1,126 +1,89 @@
-Return-Path: <netdev+bounces-126906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0AE1972D89
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:26:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD7F972D92
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:26:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CA391F259DA
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:26:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E81A528696E
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D149E190472;
-	Tue, 10 Sep 2024 09:24:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A31188CC9;
+	Tue, 10 Sep 2024 09:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AkzD7+Gm"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FATnzlXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4385188A09;
-	Tue, 10 Sep 2024 09:24:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F074188CCB;
+	Tue, 10 Sep 2024 09:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725960281; cv=none; b=sdryvADuRTgquiGCJGwYG2ACZJXZIDRxUSZjelKyKSi7dsaXHgT7DYz+YsgO/0Yc1E3f0hUSoTCFGSzGYQTfegtGa1M2IBLt5D21Zlw/4tbw/8B59QWPdwFhKia/dpR8XMATEhRf+2Ps5vFvQQ79Hjpi1D849xYg1ARooEqwKfA=
+	t=1725960331; cv=none; b=GeDKqMKybhtmumPMkpUcvdWcAapzPNq7IwfDbsIiYPxsf+cl8QgXl/G8LkJqnwzpwXmkFG/QVAvdLxmu1QV7QTZRW7y47ncI/6cXsC9pMrUPPD+RYDzsF0PAaETrpYpbn7c5lHFXx//1FPo5o0bXjINx+dHYc0O1rnpUiQNQI0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725960281; c=relaxed/simple;
-	bh=XkhzSnvw+5dFkNxwBsvjI0GFrEiYS/TMYTriwXBUSCs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MVUaahOCnk5rjZt+/L2InQh0mWnqDoelbtOokJQTwg7xnmr3+LP3l6iSF0PnZvWsPgG7BzE5cHD+0lAATf0TkXKc6dHz6wl/p2sJkUVhEuVeKy+1I2CM2j2cNakWbacEjVq0jRRs7R9GlMUUvjenWXAeplsjdp19R1mXu2yk9EY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AkzD7+Gm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFC37C4CECE;
-	Tue, 10 Sep 2024 09:24:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725960281;
-	bh=XkhzSnvw+5dFkNxwBsvjI0GFrEiYS/TMYTriwXBUSCs=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=AkzD7+Gm2B6J5qwAVqJf5gcYNcMTZYuBjRo8G1W1BM43z9gfU6w6lrTBkRcvVyqxI
-	 5B1d0yJ9A4Czyp5VCS2k0Z0R/skxEZI5cj115tKQi7kazhSLzPtQLTO/vryaPl2mBg
-	 NdoQqWKEtdIK2vom3jfUqMw0nr8VlCu+NeOLyPMS2GwoLeh5N3ARxk1gGVuYS/7QDY
-	 i+FHilALLUC7U4R3EFhXpuOJiJHyO4s7DgqnVgNuEUAfrCriJCWelSNtQGZO2ibuhk
-	 OyDfQQFKTaiG5JHkBiqG/R8m5a1mXnTx3THbiST+kzZ4mVVCPBQZXX/NjlB4+U0+Gv
-	 9hYaLnA71WIYQ==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Tue, 10 Sep 2024 12:24:03 +0300
-Subject: [PATCH net-next v4 6/6] net: ethernet: ti: am65-cpsw: setup
- priority to flow mapping
+	s=arc-20240116; t=1725960331; c=relaxed/simple;
+	bh=D8dBIueGzesLGGRk3hZwyBzr/bbPBQNnsJH5SJOAP+M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aLdAizKJi2ArlCMRqPYMBV8LsgkpOEx5R3ECFOh4QFkWP27X2AtjN3PT7DVC/mO0CKWyc1pXZ71FXC9wOOyicD43Qr4IXv820kd1CYG/loRGvdoe9/GSfQg+Sx0Ifj5ivc2kNc/gFd58JlRFRo9jjxlJ+y5Js5QviMpBM4tYtsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FATnzlXB; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3E2371BF205;
+	Tue, 10 Sep 2024 09:25:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1725960326;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ObNOhCefIHiYjtUxb2YhyjH2bCENh8h6kLyNWuK5el4=;
+	b=FATnzlXBRX92xxwLWic/BIduiLah08DGCvSnpMuqYm+tD5JZDwz6b2/F/jDeQZgcxXKA8/
+	0OO/3jH6qbvsimn6PqP6oJMFbkvlN61i0hjb+IpEw9wbzBfLHqWBSTUAJlxDatj4P/Gr6q
+	TtOqPCiKtzUkO3DuMmVoxZszVaVjQikNX7wM8kjmvdHYA5rcfR/wWmYmPrCmI9HO/y7F3A
+	fi586sbQt9LBxOWv1X88AaaZ1BiPBVYWEMyJX67ZfOMoUmlyS8n9D/jQvcvwRseL9WeC1P
+	OM5cr7CM0ZPdTIJrIp3KcEmnunmtEn/Fihd16SB/VoL4U+/XGROWmdRWx/MqGw==
+Message-ID: <5b07e049-6e06-4290-abf4-8c542b76c47c@bootlin.com>
+Date: Tue, 10 Sep 2024 11:25:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240910-am65-cpsw-multi-rx-v4-6-077fa6403043@kernel.org>
-References: <20240910-am65-cpsw-multi-rx-v4-0-077fa6403043@kernel.org>
-In-Reply-To: <20240910-am65-cpsw-multi-rx-v4-0-077fa6403043@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Julien Panis <jpanis@baylibre.com>, Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
- Joe Damato <jdamato@fastly.com>, srk@ti.com, vigneshr@ti.com, 
- danishanwar@ti.com, pekka Varis <p-varis@ti.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, 
- bpf@vger.kernel.org, Roger Quadros <rogerq@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1093; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=XkhzSnvw+5dFkNxwBsvjI0GFrEiYS/TMYTriwXBUSCs=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBm4BA1N2SGIUlwRTcoPwYtwPHf2/tDs/B+nkSnf
- AQAY/VesceJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZuAQNQAKCRDSWmvTvnYw
- k2GlD/0YzBOgrE5fWuCktTv3MeJymXE1u9zY86fsC7rkXokxs63yMs2CbbxEFpC1b3f1NQHdM5s
- xzT2e0keX2H4cTFrTuzbJ2GDvv1+aMqL9UuvgXeUkU4wfliYUATWZvolm/u7jLKhu7BGISA9le5
- VGmSkyA94GlGxTi36SraoUEVIymCgDiZB7Rhyxoagf0edrHlP+ECMGN6aXFrUrxea6LFZ6g0g4K
- lToZ9GOG7O5OxlbPqpMUKvVu9ORRrpO3iJvUqYkU1lc66pVURBJEw4U1E0QEbG8wf9fLKjf7wXn
- bU5H8Yg66JjDAwd9JdWWyuQ7eXhF2DrqtYAC0Dt82fHuSG7BGrl317QdmjHa8YcTV3g4MnIx7xy
- V9kUf8tCx6e9ChgYNtyuR7GFEZVlH9q4tyFVHVN5L+d5T7KjisNtwf0Za+zqAc94K5EiRaRXW7I
- InlXiDE/gsUFwqrZ6gIs829YhyBm5YM9BTlQ+BvXIna+xydvbUfpu/mN3oUWl3Jiq/9s6QPKR8I
- rTskpnQG+P3oy0/xlgGGDClRpenrc9fvDvO2vWkh1HLjGK1pFW3KPeQRxBcxZA7AMStNXheVvs0
- cxcKCgxBwuFq3/8G9lhbYQ2GvOZuYnmqEghy15+0MOdgQlS/5F6+49Kyo/q57CDdCSPLvyVEqPE
- uvp+NKU9Ni4BsRg==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 5/9] wifi: wilc1000: Fold wilc_create_wiphy() into
+ cfg80211.c
+To: Marek Vasut <marex@denx.de>, linux-wireless@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Adham Abozaeid <adham.abozaeid@microchip.com>,
+ Ajay Singh <ajay.kathat@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
+ <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240909193035.69823-1-marex@denx.de>
+ <20240909193035.69823-5-marex@denx.de>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20240909193035.69823-5-marex@denx.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-Now that we support multiple RX queues, enable default priority
-to flow mapping so that higher priority packets come on higher
-channels (flows).
-
-The Classifier checks for PCP/DSCP priority in the packet and
-routes them to the appropriate flow.
-
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-Changelog:
-v4:
-- no change
-v3:
-- added Reviewed-by Simon Horman
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 76e62351b30b..cbe99017cbfa 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -2500,6 +2500,9 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 		}
- 	}
- 
-+	/* setup classifier to route priorities to flows */
-+	cpsw_ale_classifier_setup_default(common->ale, common->rx_ch_num_flows);
-+
- err:
- 	i = devm_add_action(dev, am65_cpsw_nuss_free_rx_chns, common);
- 	if (i) {
+On 9/9/24 21:29, Marek Vasut wrote:
+> The wilc_create_wiphy() is not used outside of cfg80211.c .
+> Make the function static and remove its entry from cfg80211.h
+> 
+> Signed-off-by: Marek Vasut <marex@denx.deReviewed-by: Alexis Lothoré <alexis.lothore@bootlin.com>
 
 -- 
-2.34.1
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
 
