@@ -1,210 +1,138 @@
-Return-Path: <netdev+bounces-127110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91C7E974251
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 20:38:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 286A1974258
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 20:38:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2357E1F2658E
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 18:38:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C57ED1F267CF
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 18:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B4D1A4B9F;
-	Tue, 10 Sep 2024 18:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99161A7063;
+	Tue, 10 Sep 2024 18:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VWMi8jAM"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="Nqk+Nvvg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7A7F1A4AB5;
-	Tue, 10 Sep 2024 18:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 595311A705B
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 18:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725993481; cv=none; b=Jx7J8UByQCKAFzM56hMRamdo2zxS/fO6Ywt3osUPM+tDb1eF8H/A7YxISCmUPxRNVLL8LZu4SVNyYsDNkRRwe2iq4pw6PyUIflmx0DkmUS8BglvrPYBkaL6IV+ArBNsBaXyUJk3Ar0jgP20/FhJaQpRcYfgFxuULN1ACb6GkRo8=
+	t=1725993485; cv=none; b=UessI5Cc+CBjCs6Qw1n//aCLssKp9N5VbVc7FDhX2OPZuQDW93jteOUVjbSUqUGVDovh5lkDEkMmJ8p8eQR6uuRejbg3P+W8Vg4cBA2QZNJIcWQi6RBGZNk7mLcVgQzFmrBbd/jc6p0NLt2IvKzHj5eM7LzT8AmqMu5COHikZl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725993481; c=relaxed/simple;
-	bh=+6erVIx9nJaj7/srcqN07+6DKoKkqA8z4fpFhR72wnY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E2WDWLu124oynxyHikPR57WPxd5jIChTC7PzX3/JDsuaJiIg2BXul05VrD3xzVo3YC+aMbpfl0LPoI9VDOltJ7WdK7u+6ZZp+rcILTHgnOWPFp4D+EVfdpgbJxSldqvELLJbZ1zKD3lird1ETetLduWQHeMSK9hyJqfwCtJCfvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VWMi8jAM; arc=none smtp.client-ip=209.85.208.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2f74e468baeso72379071fa.2;
-        Tue, 10 Sep 2024 11:37:59 -0700 (PDT)
+	s=arc-20240116; t=1725993485; c=relaxed/simple;
+	bh=/G60LDplpiUOLNtczH8pAta878ub+rGXfjbZSVUnOso=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mHjfspS+qbXdFqTFaiq/FScVNFnGZKSJoHh2vVBbiLbIFMydc6W48jgH0BrhbCtxe/gDASMcnjBZK8jX0eVqglYv4XibgNCDfdYmS2Sz/FFYaaZWh/9ozbOaKy71s6yMyecUSasHwjHd/ohpOpz8huUrEbZ/VxKw1eTDopm+BKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=Nqk+Nvvg; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-82aa7c3b3dbso197512139f.2
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 11:38:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725993478; x=1726598278; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MGJTDyPZrPgud+em+SoTe59IhXK+nc1Nr17gxYaoJ8M=;
-        b=VWMi8jAMnfU2vSpbFEx+KOkqiH9COb+TJAxGjjjBcEYMQ4M4pvxrTFgGw5f02y0Rdc
-         e42Si9SiUM2z2KAgoASnvLvzN7F3bHX7ToCnLHYFtXkWJeHiJ4gbkahm0CW/aUXtUVwX
-         Za/GTJCAQJRUNSoICZ4oPtcraokejsATWTVeZQAB/T5sqancHZ1ZaAhINGh67On+gppJ
-         j1e1v0F50db+gtW/b1Hans/AxeJssio8cXl0HI6TKZdiu42ZnXNJq8nZF728dkt2yNnz
-         zfa0m/ZcUW3kGaY9aGuXhB0ntLPZh2OeyKwPJJmUfC3oXR9LkgZIUHdU9t+bBO6oRCyB
-         NRxQ==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1725993482; x=1726598282; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=D+b5/+gHoJMj6mYLwHoTTL9tiXX7JbTcTJlobOiBur0=;
+        b=Nqk+NvvgFAlKvXjhElvxjHhTLQpNSEED3O/0oPRQbyN0Q+bdkY71XyVi0P+oVBfd5T
+         OrZt7Ntol2v8pLyfCLV+8kvdogyF3tkF4hsBdKmhPolLXlrzfoGDkaPuWu+2lBjGhz9R
+         jMNHaPf+UWr5Fq9l259RBL221igjsQqrhVJM0J/D+h7i88p+HpHsaOG4TptN+8Rr1/CK
+         ou9Jh+8Zp95tpN/fWNWjfrZrjvYxnhwti5vOvmTMZWrXogVWQLkoi0bqXLErgjkF/Xzn
+         z4Da2pgpHu1tyk/e8K6e2GaeiNTF3Bu0ernmyO4frj5kpsPj1xJ1qh/+UpEfE7dY+lZx
+         Bg0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725993478; x=1726598278;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MGJTDyPZrPgud+em+SoTe59IhXK+nc1Nr17gxYaoJ8M=;
-        b=Mmqt8lO9lhRV8gJEKo8lpoighyyQXpFB0kGwTgIUl6MP13mIFlsaXoPv5HDpyKBV87
-         EAPP8JW5NrXnDUGHitp308G6d1U6yVeLu9djGkJ1t0SLKfsTYq5Yrf2nyq+KAsjCm+Cj
-         fvXvt6yLetK4PXyEbR6xwgP0Oom+/ITErwS9zhGtdt5Vr9WxtmTC+Bw8iX4+ZRKNz+t0
-         2jQ6/89CdhLwwRSC71OtONb1ZTaU79UZ6zcXyqakY74v2rovuVoYIX9lshb0SbeUknfF
-         RNTSjdcs042g+qwRxYC7H3m2dtqymgWo2N03XJNaHtlCTadYoA3kwzS2iHFwt9dFQmic
-         q/jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUqdqyEP4x+nM4chDDM5ckCh2xqlZJr1ZCkJ/2483OTdxlh0QzPq+MtTG+2hlk579GzIn0=@vger.kernel.org, AJvYcCXFX73YX82HaQQJj+hxkij1xSk8CSkW6xvk2dt2oERndUKs00yTziZuuS3i/pl67gGzWxkhEA7h207KThzi@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYNnKvNaebSQQKxyrHCWMXdu6wzVUc3fVbZGNCl+55VkQ5xg8y
-	Spv1WDgwuSvevN4jLaBTcg+u7g3BtdrXQRWfzQXihfLxi4c9pgpO
-X-Google-Smtp-Source: AGHT+IGJ5N5cpAoAAMGa06fcAXoZykutRUQ7ciz6dqZCopzWKg9EwW64N+1kd17OukpLdCRli+ei0A==
-X-Received: by 2002:a2e:80d2:0:b0:2f7:5759:db45 with SMTP id 38308e7fff4ca-2f75b93079dmr59037311fa.31.1725993476881;
-        Tue, 10 Sep 2024 11:37:56 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2f75c098e9esm13200291fa.116.2024.09.10.11.37.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 11:37:56 -0700 (PDT)
-Date: Tue, 10 Sep 2024 21:37:52 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: jitendra.vegiraju@broadcom.com
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, 
-	joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, rmk+kernel@armlinux.org.uk, ahalaney@redhat.com, 
-	xiaolei.wang@windriver.com, rohan.g.thomas@intel.com, Jianheng.Zhang@synopsys.com, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, linux@armlinux.org.uk, 
-	horms@kernel.org, florian.fainelli@broadcom.com
-Subject: Re: [PATCH net-next v5 1/5] net: stmmac: Add HDMA mapping for
- dw25gmac support
-Message-ID: <7foqi3vdgc3kvyw5rrnqsqsakgfgcrhw5sihnqwza4okdnh5dd@pdsdjn32ya6u>
-References: <20240904054815.1341712-1-jitendra.vegiraju@broadcom.com>
- <20240904054815.1341712-2-jitendra.vegiraju@broadcom.com>
+        d=1e100.net; s=20230601; t=1725993482; x=1726598282;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=D+b5/+gHoJMj6mYLwHoTTL9tiXX7JbTcTJlobOiBur0=;
+        b=SiTVEBHPnY20M06AOApjHuobxchwgkDtttpeCaXxf2hFKN/PawI8oAel+f0OY0psrj
+         SIQnP/DT0ADtdD7mtbQZotMu9KSdkstpu5kWACqokv2Y5uCPIEDJM2PsbYHfNTm5JWTn
+         9XYGqVgcxzoEaL2kxa3NOeCleiPmwIy6U6S3xl0hZ+S6HMfrHaA9iuupmwgSftMkhZzW
+         cJjOYW6jvPpHvvAl6Y9ejcBSYGmC2IkgRalNH3l/QfLkTOKHPMloN14zeSrLSHfMfcwy
+         UBExEXXG0WwF/4NpVzqbIEHr+wm1v8B3gToqwoKS23WEf561MHuTqx+lSYKXgwVkZ83r
+         YqYQ==
+X-Gm-Message-State: AOJu0YwuFZH5RgMNvdlXBVc2aZ6y5LPrWlyOMvG6iVJqYaP/R4SvWUVR
+	ZEdHrX5fYzg+4EZIHlBzb0wWb8YRWfIrrVXKMdy2Hywl0HbWNY8HRSCVlsAJwmM=
+X-Google-Smtp-Source: AGHT+IH+WdV06g96c6VJrsu/wXzo0TZ/o6LkDv/UbED5p/2cJsQduOZpv686J9OeofJrMhIYG3IyTw==
+X-Received: by 2002:a05:6602:1553:b0:82c:f05f:6c8a with SMTP id ca18e2360f4ac-82cf05f9d19mr666839139f.0.1725993482337;
+        Tue, 10 Sep 2024 11:38:02 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4d09451dbe0sm1732226173.19.2024.09.10.11.38.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Sep 2024 11:38:01 -0700 (PDT)
+Message-ID: <c9096ee9-0297-4ae3-9d15-5d314cb4f96f@kernel.dk>
+Date: Tue, 10 Sep 2024 12:38:00 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240904054815.1341712-2-jitendra.vegiraju@broadcom.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Regression v6.11 booting cannot mount harddisks (xfs)
+To: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Damien Le Moal <dlemoal@kernel.org>,
+ Linus Torvalds <torvalds@linuxfoundation.org>,
+ LKML <linux-kernel@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>
+Cc: Netdev <netdev@vger.kernel.org>, linux-ide@vger.kernel.org,
+ cassel@kernel.org, handan.babu@oracle.com, djwong@kernel.org,
+ Linux-XFS <linux-xfs@vger.kernel.org>, hdegoede@redhat.com,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ kernel-team <kernel-team@cloudflare.com>
+References: <0a43155c-b56d-4f85-bb46-dce2a4e5af59@kernel.org>
+ <d2c82922-675e-470f-a4d3-d24c4aecf2e8@kernel.org>
+ <ee565fda-b230-4fb3-8122-e0a9248ef1d1@kernel.org>
+ <7fedb8c2-931f-406b-b46e-83bf3f452136@kernel.org>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <7fedb8c2-931f-406b-b46e-83bf3f452136@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Jitendra
-
-On Tue, Sep 03, 2024 at 10:48:11PM -0700, jitendra.vegiraju@broadcom.com wrote:
-> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+On 9/10/24 11:53 AM, Jesper Dangaard Brouer wrote:
+> Hi Hellwig,
 > 
-> Add hdma configuration support in include/linux/stmmac.h file.
-> The hdma configuration includes mapping of virtual DMAs to physical DMAs.
-> Define a new data structure stmmac_hdma_cfg to provide the mapping.
+> I bisected my boot problem down to this commit:
 > 
-> Introduce new plat_stmmacenet_data::snps_id,snps_dev_id to allow glue
-> drivers to specify synopsys ID and device id respectively.
-> These values take precedence over reading from HW register. This facility
-> provides a mechanism to use setup function from stmmac core module and yet
-> override MAC.VERSION CSR if the glue driver chooses to do so.
+> $ git bisect good
+> af2814149883e2c1851866ea2afcd8eadc040f79 is the first bad commit
+> commit af2814149883e2c1851866ea2afcd8eadc040f79
+> Author: Christoph Hellwig <hch@lst.de>
+> Date:   Mon Jun 17 08:04:38 2024 +0200
 > 
-> Signed-off-by: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> ---
->  include/linux/stmmac.h | 48 ++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 48 insertions(+)
+>     block: freeze the queue in queue_attr_store
 > 
-> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> index 338991c08f00..eb8136680a7b 100644
-> --- a/include/linux/stmmac.h
-> +++ b/include/linux/stmmac.h
-> @@ -89,6 +89,51 @@ struct stmmac_mdio_bus_data {
->  	bool needs_reset;
->  };
->  
-> +/* DW25GMAC Hyper-DMA Overview
-> + * Hyper-DMA allows support for large number of Virtual DMA(VDMA)
-> + * channels using a smaller set of physical DMA channels(PDMA).
-> + * This is supported by the mapping of VDMAs to Traffic Class(TC)
-> + * and PDMA to TC in each traffic direction as shown below.
-> + *
-> + *        VDMAs            Traffic Class      PDMA
-> + *       +--------+          +------+         +-----------+
-> + *       |VDMA0   |--------->| TC0  |-------->|PDMA0/TXQ0 |
-> + *TX     +--------+   |----->+------+         +-----------+
-> + *Host=> +--------+   |      +------+         +-----------+ => MAC
-> + *SW     |VDMA1   |---+      | TC1  |    +--->|PDMA1/TXQ1 |
-> + *       +--------+          +------+    |    +-----------+
-> + *       +--------+          +------+----+    +-----------+
-> + *       |VDMA2   |--------->| TC2  |-------->|PDMA2/TXQ1 |
-> + *       +--------+          +------+         +-----------+
-> + *            .                 .                 .
-> + *       +--------+          +------+         +-----------+
-> + *       |VDMAn-1 |--------->| TCx-1|-------->|PDMAm/TXQm |
-> + *       +--------+          +------+         +-----------+
-> + *
-> + *       +------+          +------+         +------+
-> + *       |PDMA0 |--------->| TC0  |-------->|VDMA0 |
-> + *       +------+   |----->+------+         +------+
-> + *MAC => +------+   |      +------+         +------+
-> + *RXQs   |PDMA1 |---+      | TC1  |    +--->|VDMA1 |  => Host
-> + *       +------+          +------+    |    +------+
-> + *            .                 .                 .
-> + */
-> +
-
-> +/* Hyper-DMA mapping configuration
-> + * Traffic Class associated with each VDMA/PDMA mapping
-> + * is stored in corresponding array entry.
-> + */
-> +struct stmmac_hdma_cfg {
-> +	u32 tx_vdmas;	/* TX VDMA count */
-> +	u32 rx_vdmas;	/* RX VDMA count */
-> +	u32 tx_pdmas;	/* TX PDMA count */
-> +	u32 rx_pdmas;	/* RX PDMA count */
-> +	u8 *tvdma_tc;	/* Tx VDMA to TC mapping array */
-> +	u8 *rvdma_tc;	/* Rx VDMA to TC mapping array */
-> +	u8 *tpdma_tc;	/* Tx PDMA to TC mapping array */
-> +	u8 *rpdma_tc;	/* Rx PDMA to TC mapping array */
-> +};
-> +
->  struct stmmac_dma_cfg {
->  	int pbl;
->  	int txpbl;
-> @@ -101,6 +146,7 @@ struct stmmac_dma_cfg {
->  	bool multi_msi_en;
->  	bool dche;
->  	bool atds;
-> +	struct stmmac_hdma_cfg *hdma_cfg;
-
-Based on what you are implementing the _static_ VDMA-TC-PDMA channels
-mapping I really don't see a value of adding all of these data here.
-The whole implementation gets to be needlessly overcomplicated.
-Moreover AFAICS there are some channels left misconfigured in the
-Patch 2 code.  Please see my comments there for more details.
-
->  };
->  
->  #define AXI_BLEN	7
-> @@ -303,5 +349,7 @@ struct plat_stmmacenet_data {
->  	int msi_tx_base_vec;
->  	const struct dwmac4_addrs *dwmac4_addrs;
->  	unsigned int flags;
-
-> +	u32 snps_id;
-> +	u32 snps_dev_id;
-
-Please move these fields to the head of the structure as the kind of
-crucial ones, and convert snps_dev_id to just dev_id.
-
-snps_id field name was selected based on the VERSION.SNPSVER field
-name (see SNPS prefix). Following that logic the VERSION.DEVID field
-should be converted to the dev_id name.
-
--Serge(y)
-
->  };
->  #endif
-> -- 
-> 2.34.1
+>     queue_attr_store updates attributes used to control generating I/O, and
+>     can cause malformed bios if changed with I/O in flight.  Freeze the queue
+>     in common code instead of adding it to almost every attribute.
 > 
+>     Signed-off-by: Christoph Hellwig <hch@lst.de>
+>     Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+>     Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+>     Reviewed-by: Hannes Reinecke <hare@suse.de>
+>     Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+>     Link: https://lore.kernel.org/r/20240617060532.127975-12-hch@lst.de
+>     Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+>  block/blk-mq.c    | 5 +++--
+>  block/blk-sysfs.c | 9 ++-------
+>  2 files changed, 5 insertions(+), 9 deletions(-)
+> 
+> git describe --contains af2814149883e2c1851866ea2afcd8eadc040f79
+> v6.11-rc1~80^2~66^2~15
+
+Curious, does your init scripts attempt to load a modular scheduler
+for your root drive?
+
+Reference: https://git.kernel.dk/cgit/linux/commit/?h=for-6.12/block&id=3c031b721c0ee1d6237719a6a9d7487ef757487b
+
+-- 
+Jens Axboe
+
 
