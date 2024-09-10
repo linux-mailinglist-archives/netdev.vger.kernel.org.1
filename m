@@ -1,122 +1,153 @@
-Return-Path: <netdev+bounces-126979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1870497376F
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:34:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AA11973779
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:35:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C348A2840A0
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:33:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52EE41C24E30
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1037190692;
-	Tue, 10 Sep 2024 12:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A44193096;
+	Tue, 10 Sep 2024 12:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dvBN11br"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jQ4Xm46q"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855E21862B8;
-	Tue, 10 Sep 2024 12:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1363A18DF72;
+	Tue, 10 Sep 2024 12:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725971634; cv=none; b=HzJtxYyoPt3UfNRU2ytfQl+MIvfJC2eZRyItPkdi7YjUmAvFPN2z0Ov/mrj8y+dYNVAQZlzkTDZ8IwllED5BAn4auZy3fSPN3xgWIgD9rdNDBM2nWlb0tDvODdUA3aNG5i4ZNfOUBNcPK2a2CYWXaZurKgkjvn2OEIShlid9k04=
+	t=1725971663; cv=none; b=L0jG5dTCrdbE1ZK1xJG2gYff6p/xZ/0pd6DlbtQ27dzxjwjajvpqaPkX+iJFzuLOOsMPLfUUPg8PzOLB1OJ1p5RUuFaJSv2DJ6Gevd6om9kwERke3JDQBN90VS2GY6ZShGjT9tFgw6cuzUXIX1zGJWT/oLaonjTyCZpZCbGojmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725971634; c=relaxed/simple;
-	bh=HuWj02VIN8Ocf8mbmtc1L+Bn3PmRey727QcI9q3Y6XE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=vDC73zI/2nKaAErUmmOfHJ9U006YBKeyMb4BTCRe0X75Ksz2Ci7iHdJMXpWj/DpNRtIYkF51iF6fD8Xifwr03NRc2TLtNxEhrsOIdqpBwx/IYZ2Pp28V4kxFMEpensTbVec+tNCMXbwuJh1xNWf/2or9En3SWZ2GcmxYKaBcmOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dvBN11br; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 99A6C60006;
-	Tue, 10 Sep 2024 12:33:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1725971625;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6f4Np0cokaH3gxapqx1PNtK4LPPwRh70Qjvz4BkTjXk=;
-	b=dvBN11brAErEHv09m7cbuwh5HER71BmxS/ZkXlRlxAngW5e4ZfV/qsreGFOgFKUh6pXHq+
-	cwaNEaMpJ0O8xXwWn+A9mrwV5WVOZYLOnZqNQhLZJolYUwRa3bZgg6a2Af7x8PBPi/zpd+
-	o+oIQtffxgujc9LcKMgiD5ZQBRwY+TzYt2C2gKjOt98LM4dnLiimONbcjODe6Jo+kM9U3d
-	+Ti8fmnY0y92ga5d/Oivrlpzm2yTLz6ZnZabLn/9VrXSaGBzXz7Qb1KDP3I2oqnugsG/Bz
-	onda+m98m2r+rinBCE+T5S0TPgqw+Qf8X/7IHNyCnJTf6Eh1FsWx3DwKuxZ/wQ==
-Message-ID: <bdc95cac-b64e-44a7-ab52-bff5dcb81b2d@bootlin.com>
-Date: Tue, 10 Sep 2024 14:33:44 +0200
+	s=arc-20240116; t=1725971663; c=relaxed/simple;
+	bh=D2of0rmBPhrdqN50P0yetrVdysC/ySiDXZoj6UmJiAQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UdyaNKxe112itg1AtTh/enKtiNzDJmEz3sQjr9k+NWs9yKIKRkLlWifHjwyXov1m2Y7Q51fYbtCM48fjwkiFcWGJLtOhhAO7Q74IER0AA9l85raBRxFmHBpjTzUYt1uC4NFq9DqspUYdDIqKj5eHMGvG75rEzSVxJxyS4CcnBaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jQ4Xm46q; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=pIOWqjZFdYf+oBYK80d0t+9czHjmiEGQG/cnsNBDATE=; b=jQ4Xm46q/0XjX88PpXmKGhfR18
+	vTwHUIOEFEpq5ATVxJLNbu+7JuPlPN698cUJcIQa+E0k2nYj6+j6+DNszmcACjYm2jl/XlKgKfeoC
+	9/pRhkVo1GbTea3QdmkThP/YIhfV2PdqGoda5aLqJ1BOB+6/U6NhsYhVNlMtGCzuqtSs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1so04S-0076ev-2R; Tue, 10 Sep 2024 14:34:12 +0200
+Date: Tue, 10 Sep 2024 14:34:12 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	sudongming1@huawei.com, xujunsheng@huawei.com,
+	shiyongbang@huawei.com, libaihan@huawei.com, jdamato@fastly.com,
+	horms@kernel.org, kalesh-anakkur.purayil@broadcom.com,
+	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
+	salil.mehta@huawei.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V9 net-next 05/11] net: hibmcge: Implement some .ndo
+ functions
+Message-ID: <a863646c-adc0-4d16-aad3-158702dfef45@lunn.ch>
+References: <20240910075942.1270054-1-shaojijie@huawei.com>
+ <20240910075942.1270054-6-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 8/9] wifi: wilc1000: Register wiphy after reading out
- chipid
-To: Marek Vasut <marex@denx.de>, linux-wireless@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Adham Abozaeid <adham.abozaeid@microchip.com>,
- Ajay Singh <ajay.kathat@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley
- <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240909193035.69823-1-marex@denx.de>
- <20240909193035.69823-8-marex@denx.de>
- <769f1405-62fc-4457-a958-b644c706140f@bootlin.com>
- <7a938ca9-8099-4901-9f05-c3347c38fc53@denx.de>
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <7a938ca9-8099-4901-9f05-c3347c38fc53@denx.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240910075942.1270054-6-shaojijie@huawei.com>
 
-On 9/10/24 12:53, Marek Vasut wrote:
-> On 9/10/24 12:08 PM, Alexis Lothoré wrote:
->> On 9/9/24 21:29, Marek Vasut wrote:
-
-[...]
-
->>>   EXPORT_SYMBOL_GPL(wilc_cfg80211_init);
->>>   +int wilc_cfg80211_register(struct wilc *wilc)
->>> +{
->>> +    wilc->wiphy->features |= NL80211_FEATURE_SAE;
->>
->> Even if I get the general need, it feels weird to have parts of the wphy init
->> performed in wilc_create_wiphy, and some parts (the features field) here.
->> Wouldn't it work to just move wilc_create_wiphy content here, since wphy will
->> not be usable anyway before eventually registering it ?
-> That's what I thought initially too, but look closely at wilc_create_wiphy():
+On Tue, Sep 10, 2024 at 03:59:36PM +0800, Jijie Shao wrote:
+> Implement the .ndo_open() .ndo_stop() .ndo_set_mac_address()
+> .ndo_change_mtu functions() and ndo.get_stats64()
+> And .ndo_validate_addr calls the eth_validate_addr function directly
 > 
-> struct wilc *wilc_create_wiphy(struct device *dev)
-> {
-> ...
-> struct wiphy *wiphy;
-> struct wilc *wl;
-> ...
-> wiphy = wiphy_new(&wilc_cfg80211_ops, sizeof(*wl));
-> ...
-> wl = wiphy_priv(wiphy); // <----------- HERE , *wl is struct wilc
-> ...
-> return wl;
-> }
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> ---
+> ChangeLog:
+> v8 -> v9:
+>   - Remove HBG_NIC_STATE_OPEN in ndo.open() and ndo.stop(),
+>     suggested by Kalesh and Andrew.
+>   - Use netif_running() instead of hbg_nic_is_open() in ndo.change_mtu(),
+>     suggested by Kalesh and Andrew
+>   v8: https://lore.kernel.org/all/20240909023141.3234567-1-shaojijie@huawei.com/
+> v6 -> v7:
+>   - Add implement ndo.get_stats64(), suggested by Paolo.
+>   v6: https://lore.kernel.org/all/20240830121604.2250904-6-shaojijie@huawei.com/
+> v5 -> v6:
+>   - Delete netif_carrier_off() in .ndo_open() and .ndo_stop(),
+>     suggested by Jakub and Andrew.
+>  v5: https://lore.kernel.org/all/20240827131455.2919051-1-shaojijie@huawei.com/
+> v3 -> v4:
+>   - Delete INITED_STATE in priv, suggested by Andrew.
+>   - Delete unnecessary defensive code in hbg_phy_start()
+>     and hbg_phy_stop(), suggested by Andrew.
+>   v3: https://lore.kernel.org/all/20240822093334.1687011-1-shaojijie@huawei.com/
+> RFC v1 -> RFC v2:
+>   - Delete validation for mtu in hbg_net_change_mtu(), suggested by Andrew.
+>   - Delete validation for mac address in hbg_net_set_mac_address(),
+>     suggested by Andrew.
+>   - Add a patch to add is_valid_ether_addr check in dev_set_mac_address,
+>     suggested by Andrew.
+>   RFC v1: https://lore.kernel.org/all/20240731094245.1967834-1-shaojijie@huawei.com/
+> ---
+>  .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 39 ++++++++
+>  .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |  3 +
+>  .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 97 +++++++++++++++++++
+>  .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  | 11 ++-
+>  4 files changed, 149 insertions(+), 1 deletion(-)
 > 
-> That 'struct wilc' is allocated as part of wiphy_new() and used all around the
-> place before we reach wiphy_register() much later on.
+> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+> index 8e971e9f62a0..97fee714155a 100644
+> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
+> @@ -15,6 +15,7 @@
+>   * ctrl means packet description, data means skb packet data
+>   */
+>  #define HBG_ENDIAN_CTRL_LE_DATA_BE	0x0
+> +#define HBG_PCU_FRAME_LEN_PLUS 4
+>  
+>  static bool hbg_hw_spec_is_valid(struct hbg_priv *priv)
+>  {
+> @@ -129,6 +130,44 @@ void hbg_hw_irq_enable(struct hbg_priv *priv, u32 mask, bool enable)
+>  	hbg_reg_write(priv, HBG_REG_CF_INTRPT_MSK_ADDR, value);
+>  }
+>  
+> +void hbg_hw_set_uc_addr(struct hbg_priv *priv, u64 mac_addr)
+> +{
+> +	hbg_reg_write64(priv, HBG_REG_STATION_ADDR_LOW_2_ADDR, mac_addr);
+> +}
+> +
+> @@ -88,6 +181,10 @@ static int hbg_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>  	if (ret)
+>  		return ret;
+>  
+> +	netdev->max_mtu = priv->dev_specs.max_mtu;
+> +	netdev->min_mtu = priv->dev_specs.min_mtu;
+> +	hbg_change_mtu(priv, HBG_DEFAULT_MTU_SIZE);
 
-Meh, true. We could still let any part affecting the struct wilc in
-wilc_create_wiphy, and move any wphy configuration in wilc_cfg80211_register,
-but then I am not sure anymore if it makes things better.
+It does not help that you added added HBG_DEFAULT_MTU_SIZE in a
+previous patch, but as far as i see, it is just ETH_DATA_LEN.
 
--- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Please use the standard defines, rather than adding your own. It makes
+the code a lot easier to understand, it is not using some special
+jumbo size by default, it is just the plain, boring, normal 1500
+bytes.
 
+    Andrew
+
+---
+pw-bot: cr
 
