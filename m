@@ -1,153 +1,190 @@
-Return-Path: <netdev+bounces-127020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2822A973A97
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:52:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9FF4973AA0
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9DCD1F233C1
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2E61C21715
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D6B195B1A;
-	Tue, 10 Sep 2024 14:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDAA757EB;
+	Tue, 10 Sep 2024 14:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M3PpaTFV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GpNfWnrN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3E91957F9;
-	Tue, 10 Sep 2024 14:52:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5D218C34B;
+	Tue, 10 Sep 2024 14:53:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725979939; cv=none; b=dIpLN7Mjw60phuzy9U1gI25sL800arNru7h2IAqgTIUC8wIz9DbVQC6eHckDWLJGFG2ig1EDziiF7iRgXHH1hONujhDAa9/fqFoAznr7yIhbSdX1udr27g8++SQo1a4A8LTz9LoxeouAEeFSoT0mkVv+rkqX/6GfbPXFs4y4oGY=
+	t=1725980037; cv=none; b=ZqL43RPTY/0+c4q1whaCScTE0b1OrZPuh+IAomeM0sUDUAyPEtF8RAqC295p1yyk9gr6BPpeuvE4GhLzGgZL2sRxNPQn4BuEGY67An/FDjASU9Zl3EGWk0vSZZzE48LB4yvoZo/ENZu53trDqLP0Duv/wwzgTfFtr0Snk1IJNLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725979939; c=relaxed/simple;
-	bh=pQ/DJDwBz9sdXFZh80HIa5hsy6UQVemtDbUkxYwlaH8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HoMcrfwK0PYmST0Jtl3ci+mxwqOnJoFy0cmCqzyBMQMh04DjyGBlgGQ7pLS4VE82M2uZ4/z7G/rAZ987QK5zoTnZZhEWv0KhH1YS0IbOKkNZn+owwM7pO8BAFjEehZwjwLnGsZATTj4SPcX43QrYm2Un8F5bVOaK+pgJrxXJtIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M3PpaTFV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86D8BC4CEC3;
-	Tue, 10 Sep 2024 14:52:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725979939;
-	bh=pQ/DJDwBz9sdXFZh80HIa5hsy6UQVemtDbUkxYwlaH8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M3PpaTFV9AsjrZRN4Jn2waUapazBBG/P6RB6wJuEXjfB+lWE4QnpSH+ECaiy25w5+
-	 VaYq/QNr9p4AQkLlM5wpyyg7eQd8ePnglSPS3bvdK4ovqWHiXNdrpG9bhfLKmBQZrs
-	 1j4vKxzRV3RnxfHnWhmyZJDv/dtl2xdsdZewhrcTzteTEqhW1dCrswmChMv4jgcP1+
-	 LS+MDLyM5Mn5C3gqXgOO35CR/egq+aZ7i/ERcFd7p7FRRg+p0diWPV4L1m0doia7SW
-	 QLuE+++69xsJRYB5dI6CDV/hsmjlqUTBfzrxo8xEp0iZ4V40OjnVWLjIcgzPLEglly
-	 kJp2Zr7T8evZw==
-Date: Tue, 10 Sep 2024 07:52:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
- sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
- sridhar.samudrala@intel.com, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v2 1/9] net: napi: Add napi_storage
-Message-ID: <20240910075217.45f66523@kernel.org>
-In-Reply-To: <Zt_jn5RQAndpKjoE@LQ3V64L9R2.homenet.telecomitalia.it>
-References: <20240908160702.56618-1-jdamato@fastly.com>
-	<20240908160702.56618-2-jdamato@fastly.com>
-	<20240909164039.501dd626@kernel.org>
-	<Zt_jn5RQAndpKjoE@LQ3V64L9R2.homenet.telecomitalia.it>
+	s=arc-20240116; t=1725980037; c=relaxed/simple;
+	bh=zKScHZ7ZqaDDUwyvpBIx4rom5y1ZiJkBljuM/JAMBo0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=MVTvt3Pdc81GiOker60lxqlhWPwPcgcj4Z5yd3IMQomAV7e1xDi2q6/XmxBsViv2NbtFiGvFauf5TZday5M4Rl1N2TE1Jzi2fpaMJqwriY6dXi6twzHDv6Mvhk2GlBzLCYxU8QvKnzcL3kLoVxcI61GYYheVDWbExdsYRpdUXgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GpNfWnrN; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4581f44b9b4so5704391cf.1;
+        Tue, 10 Sep 2024 07:53:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1725980035; x=1726584835; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rr1UKDyQ/zeb0p3Tv9UrCdmESCimLucSGCIARwY3ysA=;
+        b=GpNfWnrNlpFB1oDQqUKlAmDhwW7LzMOMzrKm6rF3viM/mFKiICxSt9Fr97WqKfMsdw
+         1YxkD/8Roj38cLm1JXsyn2xuzW9En1LmhERbVZ2TiZg6cNDDjbrDALpu9Y2kAe9pGlcb
+         zJXOyTsS4n4Waz48Fvi3vyP+QpezQW2qYJ7X4Hvn7AE31IgR/EiqIORKZtfG5guMJhuG
+         ZKKk5TKnD1ZlXK7qICbrMQjPWdeAdYzHacDzh5J1dIIp3A8IsBL39cFyROq95/ENBVw+
+         u5uCturXGZLFp9QmZhkWSFpLFuQehhEFFhsGZmPy8ZyjwEhywgxT2R0PFHDz6LfXu6NK
+         +vCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725980035; x=1726584835;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rr1UKDyQ/zeb0p3Tv9UrCdmESCimLucSGCIARwY3ysA=;
+        b=r3ndVI45t7ZeDXO62dGAt99/IULU/3qFkJe2ry4embXRajOZl1uugJ85RpfedMFOJU
+         px5pJuLmtXAREtTbCqbC+7TLChTQgnI8HU+dLLW6udJzMsXrZrLvrnFxmsseOtlSWoBe
+         IU0dPPieTTzv0nEFyZGpQU9pByQw3rJJLEZsA3Yjg7WWxn+LAXGgGPJb2WOwCo2358mr
+         AdI1SvWpZYc+pqfgd0D++KqSNP8JUe0fFYH7ka3ycMlo6zEasL8HBq21p9CCsiIB47jr
+         d9T/HCobJj3fPNNZh8/FzR6mgpo6bQe13Ziyy/oRknKaBUKhiaTDXnTyu9YHaGQAUp+p
+         LZkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVDZFJ5OyGXjElSC+DHECDz1SVj9z/xNzRYM2TubBJrTboxUPEoR14AusedeI9huyGvFfj19pI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxirljTDEaOLBSO/PM8miNlJ8BIoGm+msUvlaHbnYe81maSXvqu
+	3lVcu4mWJwvI2u15aas1y9Oe87GxjY+uV6WSv7r5ovsKuoU6wJOr
+X-Google-Smtp-Source: AGHT+IEJRZ+y4qosu/LeEY6jpJXInsEysZJJYz/4Q/d0zNu+H8545m+hFnVrOCGJgOaBnaickkWZTw==
+X-Received: by 2002:a05:622a:4184:b0:458:23fc:f345 with SMTP id d75a77b69052e-45823fcf549mr171706711cf.38.1725980034500;
+        Tue, 10 Sep 2024 07:53:54 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-458314e05a8sm18672911cf.34.2024.09.10.07.53.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 07:53:54 -0700 (PDT)
+Date: Tue, 10 Sep 2024 10:53:53 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jason Wang <jasowang@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ stable@vger.kernel.org, 
+ nsz@port70.net, 
+ mst@redhat.com, 
+ yury.khrustalev@arm.com, 
+ broonie@kernel.org, 
+ sudeep.holla@arm.com, 
+ Willem de Bruijn <willemb@google.com>, 
+ stable@vger.kernel.net
+Message-ID: <66e05d81c04fe_a00b829435@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66e05a2259919_9de00294f9@willemb.c.googlers.com.notmuch>
+References: <20240910004033.530313-1-willemdebruijn.kernel@gmail.com>
+ <CACGkMEsnPmbo8t6PbD8YsgKrZWHXG=Rz8ZwTDBJkSbmyzkNGSA@mail.gmail.com>
+ <66e05a2259919_9de00294f9@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH net] net: tighten bad gso csum offset check in
+ virtio_net_hdr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 10 Sep 2024 08:13:51 +0200 Joe Damato wrote:
-> On Mon, Sep 09, 2024 at 04:40:39PM -0700, Jakub Kicinski wrote:
-> > On Sun,  8 Sep 2024 16:06:35 +0000 Joe Damato wrote:  
-> > > Add a persistent NAPI storage area for NAPI configuration to the core.
-> > > Drivers opt-in to setting the storage for a NAPI by passing an index
-> > > when calling netif_napi_add_storage.
-> > > 
-> > > napi_storage is allocated in alloc_netdev_mqs, freed in free_netdev
-> > > (after the NAPIs are deleted), and set to 0 when napi_enable is called.  
-> >   
-> > >  enum {
-> > > @@ -2009,6 +2019,9 @@ enum netdev_reg_state {
-> > >   *	@dpll_pin: Pointer to the SyncE source pin of a DPLL subsystem,
-> > >   *		   where the clock is recovered.
-> > >   *
-> > > + *	@napi_storage: An array of napi_storage structures containing per-NAPI
-> > > + *		       settings.  
-> > 
-> > FWIW you can use inline kdoc, with the size of the struct it's easier
-> > to find it. Also this doesn't need to be accessed from fastpath so you
-> > can move it down.  
-> 
-> OK. I figured since it was being deref'd in napi_complete_done
-> (where we previously read napi_defer_hard_irqs and
-> gro_flush_timeout) it needed to be in the fast path.
-> 
-> I'll move it down for the next RFC.
+Willem de Bruijn wrote:
+> Jason Wang wrote:
+> > On Tue, Sep 10, 2024 at 8:40=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > From: Willem de Bruijn <willemb@google.com>
+> > >
+> > > The referenced commit drops bad input, but has false positives.
+> > > Tighten the check to avoid these.
+> > >
+> > > The check detects illegal checksum offload requests, which produce
+> > > csum_start/csum_off beyond end of packet after segmentation.
+> > >
+> > > But it is based on two incorrect assumptions:
+> > >
+> > > 1. virtio_net_hdr_to_skb with VIRTIO_NET_HDR_GSO_TCP[46] implies GS=
+O.
+> > > True in callers that inject into the tx path, such as tap.
+> > > But false in callers that inject into rx, like virtio-net.
+> > > Here, the flags indicate GRO, and CHECKSUM_UNNECESSARY or
+> > > CHECKSUM_NONE without VIRTIO_NET_HDR_F_NEEDS_CSUM is normal.
+> > >
+> > > 2. TSO requires checksum offload, i.e., ip_summed =3D=3D CHECKSUM_P=
+ARTIAL.
+> > > False, as tcp[46]_gso_segment will fix up csum_start and offset for=
 
-Hm, fair point. In my mind I expected we still add the fast path fields
-to NAPI instances. And the storage would only be there to stash that
-information for the period of time when real NAPI instances are not
-present (napi_disable() -> napi_enable() cycles).
+> > > all other ip_summed by calling __tcp_v4_send_check.
+> > >
+> > > Because of 2, we can limit the scope of the fix to virtio_net_hdr
+> > > that do try to set these fields, with a bogus value.
+> > >
+> > > Link: https://lore.kernel.org/netdev/20240909094527.GA3048202@port7=
+0.net/
+> > > Fixes: 89add40066f9 ("net: drop bad gso csum_start and offset in vi=
+rtio_net_hdr")
+> > > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > > Cc: <stable@vger.kernel.net>
+> > >
+> > > ---
+> > >
+> > > Verified that the syzbot repro is still caught.
+> > >
+> > > An equivalent alternative would be to move the check for csum_offse=
+t
+> > > to where the csum_start check is in segmentation:
+> > >
+> > > -    if (unlikely(skb_checksum_start(skb) !=3D skb_transport_header=
+(skb)))
+> > > +    if (unlikely(skb_checksum_start(skb) !=3D skb_transport_header=
+(skb) ||
+> > > +                 skb->csum_offset !=3D offsetof(struct tcphdr, che=
+ck)))
+> > >
+> > > Cleaner, but messier stable backport.
+> > >
+> > > We'll need an equivalent patch to this for VIRTIO_NET_HDR_GSO_UDP_L=
+4.
+> > > But that csum_offset test was in a different commit, so different
+> > =
 
-But looking at napi_struct, all the cachelines seem full, anyway, so we
-can as well split the info. No strong preference, feel free to keep as
-is, then. But maybe rename from napi_storage to napi_config or such?
+> > Not for this patch, but I see this in UDP_L4:
+> > =
 
-> > > diff --git a/net/core/dev.c b/net/core/dev.c
-> > > index 22c3f14d9287..ca90e8cab121 100644
-> > > --- a/net/core/dev.c
-> > > +++ b/net/core/dev.c
-> > > @@ -6719,6 +6719,9 @@ void napi_enable(struct napi_struct *n)
-> > >  		if (n->dev->threaded && n->thread)
-> > >  			new |= NAPIF_STATE_THREADED;
-> > >  	} while (!try_cmpxchg(&n->state, &val, new));
-> > > +
-> > > +	if (n->napi_storage)
-> > > +		memset(n->napi_storage, 0, sizeof(*n->napi_storage));  
-> 
-> OK, your comments below will probably make more sense to me after I
-> try implementing it, but I'll definitely have some questions.
-> 
-> > And here inherit the settings and the NAPI ID from storage, then call
-> > napi_hash_add(). napi_hash_add() will need a minor diff to use the
-> > existing ID if already assigned.  
-> 
-> I don't think I realized we settled on the NAPI ID being persistent.
-> I'm not opposed to that, I just think I missed that part in the
-> previous conversation.
-> 
-> I'll give it a shot and see what the next RFC looks like.
+> >                        if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM=
+))
+> >                                return -EINVAL;
+> > =
 
-The main reason to try to make NAPI ID persistent from the start is that
-if it works we don't have to add index to the uAPI. I don't feel
-strongly about it, if you or anyone else has arguments against / why
-it won't work.
+> > This seems to forbid VIRTIO_NET_HDR_F_DATA_VALID. I wonder what's the=
 
-> > And the inverse of that has to happen in napi_disable() (unhash, save
-> > settings to storage), and __netif_napi_del() (don't unhash if it has
-> > index).
-> > 
-> > I think that should work?  
-> 
-> Only one way to find out ;)
-> 
-> Separately: your comment about documenting rings to NAPIs... I am
-> not following that bit.
-> 
-> Is that a thing you meant should be documented for driver writers to
-> follow to reduce churn ?
+> > reason for doing this.
+> =
 
-Which comment?
+> It tests &, not =3D=3D ?
+
+Oh you mean as alternative, for receive of GRO from hypervisor.
+
+Yes, fair point.
+
+Then we also trust a privileged process over tun, like syzkaller.
+When it comes to checksums, I suppose that is fine: it cannot harm
+kernel integrity.
+
+One missing piece is that TCP GSO will fix up non CHECKSUM_PARTIAL
+skbs. UDP GSO does not have the same logic.=
 
