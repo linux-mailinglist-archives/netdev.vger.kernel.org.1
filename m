@@ -1,274 +1,149 @@
-Return-Path: <netdev+bounces-127085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF479740E2
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:43:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3A39740E9
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:44:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 685EB1F20ECB
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:43:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C21BA1C2542C
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:44:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2B91A2643;
-	Tue, 10 Sep 2024 17:41:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C9961A4B71;
+	Tue, 10 Sep 2024 17:42:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XP/8b/gd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpKlzFRo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37AB19F464
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 17:41:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 832981A4AC6;
+	Tue, 10 Sep 2024 17:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725990096; cv=none; b=PcPqX8yXZE+YF9QsvLs+JntXNIWKePlEXJTFbrfZLZbVyMjPfsA3VTUjqc5Lg7Fv8BMUyOUHn2ieqGXCEBoeGJPSJKFkqTvSk61y9occ1VSMTMVV6gEJfj1pHbSI1clkgPNd2CEivI2slx2j2At80jem86HVl+D5WzzMAXqCwwg=
+	t=1725990147; cv=none; b=fqEITgoy9JJGXkV/EkxGpRrTMLf63EH4QYSpJncYzxunde2rwlKXRYxgDu1cXiszG4oVahkulFJ6fUd3vnhcZ8knZhIgz3guYLv50qx6gSkb1BKJ5nN7K28JxJdL32jBvJvryfcdCO+ceE/4NfANLTbiNg986hCnSm8uTl494Ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725990096; c=relaxed/simple;
-	bh=dEHostxgrUQTfxhASbmMT98RPp6Eme+25p7K7TP/C9M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oFA5MeSytry94ohuA88i8Pg7jY3Q1bLe2l2EaUR5yvGYFxDcuf8JlfgE4/HXLnyI98n8G4/l0+FaV/E0KxfGDOXn8ROw3Phrn1iXjEz11SWXAYmBnToXaqb2Wc52BDtazicJcHivCKV/eoGQcGowTuiyBHMh0eBPTFnr42Xgz3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XP/8b/gd; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5356a2460ceso30825e87.0
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 10:41:34 -0700 (PDT)
+	s=arc-20240116; t=1725990147; c=relaxed/simple;
+	bh=bV/cCPgQmMGPZOQ6cElFw5TE2AzczFXZAlM9b/E8Fug=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=UPztstZDmRpLDNytyCa62UypwHTXXudhK+RHq7UxkS7ElPX6uktRQUDUDWslV5meFsu/sWjsvxVosTayaljNj2H7aQF2a0ThHpGQ42KWw3ttQ+UQb+bfzVJhdnLCbLcvrcJWBf3YU+zhDhYYHGBpuIWi41yE7PuTWATd9ShYLxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MpKlzFRo; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7a9ae8fc076so254417285a.2;
+        Tue, 10 Sep 2024 10:42:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725990093; x=1726594893; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1725990144; x=1726594944; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qRvd6+FNEyRgwBjwqh7XCajCi24Jftv3RTG3UBcZB0o=;
-        b=XP/8b/gdr9qyo119ZJd7yZQOxAJT1E6z9FItz4twBeIUGLqO68bMMc21dL3ASCpeVy
-         WkZyVoFABON0GfrgU1ZI9rNq72Pb/Cn/Rm511gPQQhPbHnhCyNYfocwJfJU3SvNsn13C
-         sGprounW+ls1TeBXa5pWi41oB+9zpGpKdASGaaQ14R6b2IW27gulGVlMJCuKb4JGqLxA
-         pvRfCEpa4B48Bx9ctEmPk6TMnpmfTrnmzE2MwPtCCb0Y+aPmhRWnRodDJrnmnfasK6Jl
-         Mwt5ytXYNGtPQ5HNKwRqgKdkN/8YdF4w9JWivzrc73xnjtYRYFjQv++rrgvp/wyqZONA
-         WwQw==
+        bh=osrSmdlRRbXgWjiWwZC0FQoUmfxKFrAIzTPo9tEegGU=;
+        b=MpKlzFRoClVoF96LXi8EunQL6Ypuq2Fu/80cfMmrdzbC5CR0ntB5zOVDGoyq7/cj16
+         lCOOfTbbxsCyNG+BCZ+Mk4mvkFNzDYZezFnuejZ2JVMyduyDscMoCXcKkR50+j7tlKaz
+         9glK9oJNshKOmHK4Qcxf5TtMDDBVRAzm0T1YmnB7/T3D+en3H9UtCHwVZEVbuTiRoVoj
+         7MxpWyKoKVhQnwnu5Dq1Ev9TflWyfR60etJC22bVXC4L/CUy8JspPWNRISwvBRu2S+Oq
+         ZUD8L2t0lN9fiaQhYzwhQGGhdK16sQmPv+RNH/93szvUo5NkKcIKKNF7VU1eHWNzbyK3
+         CjkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725990093; x=1726594893;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qRvd6+FNEyRgwBjwqh7XCajCi24Jftv3RTG3UBcZB0o=;
-        b=En9JPpZAoSMDyvRL1Slixg9Afx1KNLw8RW5MRr0+aDloT1XcEt8FvsN1NtSX2a/IU1
-         zOY1FCnk5SJj5XOHVfLor1M08lMbOfDvQHLFtjI0xGjcAd0tDIwqv/E/SREFmXVhNN4Y
-         pSJEAQVHO/OzqAZ5CeDKj6WCDUvEv6+pv6AerH6zlH5xA7WwQcgKAoxlnQH7frf366Ii
-         kYbSI6DDyuCWYJwGeu1pDCN03/JvzIrg4iykl7To0b7zshrLHY8wz/iGz5v5zFF44W0o
-         +BaGq8ujULipnLeCVwyEdwFsNpj20LwvJBBk7oczkdXb7UQsXrC8lnvmimPRudZNHn+L
-         o30g==
-X-Forwarded-Encrypted: i=1; AJvYcCWz51m/aCPTNozutv90f6UPOalxCtRO7eDv+dVD+yb6hmkRXhxzTsaC063BBkMJOvni7/E3cbo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxikG6IlwqenckCkX+oI855ZZpqrOSLLSvnmdJNhTi7mPWobiDW
-	K9N0A8G33A6OAGpSMl8tmjUq6aHpS17tHcj/mDTtxkowj9F72TZNgdDmfGeTzp1vWhCxBc4UVyI
-	UJ4ONy/LKsUEDlCxARDqomrqSJch0bp0lSF+Y
-X-Google-Smtp-Source: AGHT+IGmqjEsD+ZSK7Kq99lDy9iP1P9BexIFvYcppz62nH2Sql+mSbRPQjG2dYpHE6+f8ABvXv/fJnLDamZfLogRKw8=
-X-Received: by 2002:a05:6512:b85:b0:535:68b2:9589 with SMTP id
- 2adb3069b0e04-5367431fdeemr16812e87.2.1725990092431; Tue, 10 Sep 2024
- 10:41:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1725990144; x=1726594944;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=osrSmdlRRbXgWjiWwZC0FQoUmfxKFrAIzTPo9tEegGU=;
+        b=Uz5u/CjAWntKF8Hnj2iMOiiIuZYLWfKoultmh5KneyA0t56rIzLqBIcckxPNg6jCNt
+         0wxWyWAqV/oH6qV46osmX4dZALQgV16EJy1UwcMUOJ5CqtS2dpwTOAi30T1GQ5hodfUw
+         O8G8eyMFwmSNoBlPuuMjP7salMmwvflTs6i9t9rVhJkGHARwLGQwn9ChPMm4OEClWNRL
+         kG0cP/TA5PetQQbMvlPyvKYjUoKhYJ26jMD7RIH1TiWiPkIZWzxEGU/C3429WM+E1X/y
+         glEnGeJ5kjwSC1y3nQ0a39SNJtUBC7GuUfLdlnNNGXPIdWTEr0/pI7j5lsS2HjO52y3R
+         DqIw==
+X-Forwarded-Encrypted: i=1; AJvYcCUmk/EqoytxzjjxiLHbbGFhs6AnwtIZFinqcFnmt4cs9sfh0wI/59gNYtlCzmuyfYufDfC+DPmK0q6nfxvvULVS@vger.kernel.org, AJvYcCV/+x9MxqVwI3pxoZ7ltFjwwW+S6oFDrFdHmD0qNUJG5SD5QxRNYnByG4288WaJbIr6JYT3ZjlNtWUz0kg=@vger.kernel.org, AJvYcCWhx1JaeI+lWXxLZSAmKu6HnNevqI0WhTGkdxsc73RbmqZhIHsRYvNvlME0I1CNbikpWI364ZaV@vger.kernel.org
+X-Gm-Message-State: AOJu0YykUyzO0AZ21rBKHSfSgoSWyCk9GwrjuxmXCPCsgNcl0D3iKfZG
+	AKzLT9YALPgdBV1k8cPZ9pOZW0q2lLjVaW3Tc1PjxVYqzYENmeDa
+X-Google-Smtp-Source: AGHT+IHvwbLEki8g7DoGbzuEAVprt0WWYMJSyX1CbpAViPsW6cMv0Yc1UKcT8kk8wS5Y/sF9i5dOig==
+X-Received: by 2002:a05:620a:4629:b0:7a9:b3a1:94ca with SMTP id af79cd13be357-7a9b3a197c4mr1254397985a.35.1725990144340;
+        Tue, 10 Sep 2024 10:42:24 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a9a796ad15sm328004285a.30.2024.09.10.10.42.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 10:42:23 -0700 (PDT)
+Date: Tue, 10 Sep 2024 13:42:23 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Sean Anderson <sean.anderson@linux.dev>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ Willem de Bruijn <willemb@google.com>, 
+ linux-kernel@vger.kernel.org, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <66e084ff8f8aa_c435329483@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6d5ca057-87a3-4ec2-a733-8f0c1fb11158@linux.dev>
+References: <20240906210743.627413-1-sean.anderson@linux.dev>
+ <66dbb4fcbf560_2af86229423@willemb.c.googlers.com.notmuch>
+ <9d5bf385-2ef0-435d-b6f9-1de55533653b@linux.dev>
+ <CANn89iJaXgR6c+moGB5kX6ATbLX6fMP0mUBQN=SAsZfdz5ywNw@mail.gmail.com>
+ <66df2fd2d6595_3bff929459@willemb.c.googlers.com.notmuch>
+ <20240909165116.1bdb4757@kernel.org>
+ <66df9a6d42871_81fd3294e8@willemb.c.googlers.com.notmuch>
+ <6d5ca057-87a3-4ec2-a733-8f0c1fb11158@linux.dev>
+Subject: Re: [PATCH net] selftests: net: csum: Fix checksums for packets with
+ non-zero padding
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240828181011.1591242-1-namangulati@google.com>
- <ZtBQLqqMrpCLBMw1@LQ3V64L9R2> <CAMP57yW99Y+CS+h_bayj_hBfoGQE+bdfVHuwfHZ3q+KueTS+iw@mail.gmail.com>
- <30ddb66a-aeea-480d-bf79-38fc06ea45b0@uwaterloo.ca>
-In-Reply-To: <30ddb66a-aeea-480d-bf79-38fc06ea45b0@uwaterloo.ca>
-From: Naman Gulati <namangulati@google.com>
-Date: Tue, 10 Sep 2024 10:41:21 -0700
-Message-ID: <CAMP57yWQGKnHcn3gkPvz1bvPO=+VTvyMJ5OHZpp=WYX=CBhZvA@mail.gmail.com>
-Subject: Re: [PATCH] Add provision to busyloop for events in ep_poll.
-To: Martin Karsten <mkarsten@uwaterloo.ca>
-Cc: Joe Damato <jdamato@fastly.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	Stanislav Fomichev <sdf@fomichev.me>, linux-kernel@vger.kernel.org, skhawaja@google.com, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 4, 2024 at 5:46=E2=80=AFAM Martin Karsten <mkarsten@uwaterloo.c=
-a> wrote:
->
-> On 2024-09-04 01:52, Naman Gulati wrote:
-> > Thanks all for the comments and apologies for the delay in replying.
-> > Stan and Joe I=E2=80=99ve addressed some of the common concerns below.
-> >
-> > On Thu, Aug 29, 2024 at 3:40=E2=80=AFAM Joe Damato <jdamato@fastly.com>=
- wrote:
-> >>
-> >> On Wed, Aug 28, 2024 at 06:10:11PM +0000, Naman Gulati wrote:
-> >>> NAPI busypolling in ep_busy_loop loops on napi_poll and checks for ne=
-w
-> >>> epoll events after every napi poll. Checking just for epoll events in=
- a
-> >>> tight loop in the kernel context delivers latency gains to applicatio=
-ns
-> >>> that are not interested in napi busypolling with epoll.
-> >>>
-> >>> This patch adds an option to loop just for new events inside
-> >>> ep_busy_loop, guarded by the EPIOCSPARAMS ioctl that controls epoll n=
-api
-> >>> busypolling.
-> >>
-> >> This makes an API change, so I think that linux-api@vger.kernel.org
-> >> needs to be CC'd ?
-> >>
-> >>> A comparison with neper tcp_rr shows that busylooping for events in
-> >>> epoll_wait boosted throughput by ~3-7% and reduced median latency by
-> >>> ~10%.
-> >>>
-> >>> To demonstrate the latency and throughput improvements, a comparison =
-was
-> >>> made of neper tcp_rr running with:
-> >>>      1. (baseline) No busylooping
-> >>
-> >> Is there NAPI-based steering to threads via SO_INCOMING_NAPI_ID in
-> >> this case? More details, please, on locality. If there is no
-> >> NAPI-based flow steering in this case, perhaps the improvements you
-> >> are seeing are a result of both syscall overhead avoidance and data
-> >> locality?
-> >>
-> >
-> > The benchmarks were run with no NAPI steering.
-> >
-> > Regarding syscall overhead, I reproduced the above experiment with
-> > mitigations=3Doff
-> > and found similar results as above. Pointing to the fact that the
-> > above gains are
-> > materialized from more than just avoiding syscall overhead.
->
-> I suppose the natural follow-up questions are:
->
-> 1) Where do the gains come from? and
->
-> 2) Would they materialize with a realistic application?
->
-> System calls have some overhead even with mitigations=3Doff. In fact I
-> understand on modern CPUs security mitigations are not that expensive to
-> begin with? In a micro-benchmark that does nothing else but bouncing
-> packets back and forth, this overhead might look more significant than
-> in a realistic application?
->
-> It seems your change does not eliminate any processing from each
-> packet's path, but instead eliminates processing in between packet
-> arrivals? This might lead to a small latency improvement, which might
-> turn into a small throughput improvement in these micro-benchmarks, but
-> that might quickly evaporate when an application has actual work to do
-> in between packet arrivals.
+Sean Anderson wrote:
+> On 9/9/24 21:01, Willem de Bruijn wrote:
+> > Jakub Kicinski wrote:
+> >> On Mon, 09 Sep 2024 13:26:42 -0400 Willem de Bruijn wrote:
+> >> > > This seems to be a bug in the driver.
+> >> > > 
+> >> > > A call to skb_put_padto(skb, ETH_ZLEN) should be added.  
+> >> > 
+> >> > In which case this test detecting it may be nice to have, for lack of
+> >> > a more targeted test.
+> >> 
+> >> IIUC we're basically saying that we don't need to trim because pad
+> >> should be 0? In that case maybe let's keep the patch but add a check 
+> >> on top which scans the pad for non-zero bytes, and print an informative
+> >> warning?
+> > 
+> > Data arriving with padding probably deserves a separate test.
+> > 
+> > We can use this csum test as stand-in, I suppose.
+> > 
+> > Is it safe to assume that all padding is wrong on ingress, not just
+> > non-zero padding. The ip stack itself treats it as benign and trims
+> > the trailing bytes silently.
+> > 
+> > I do know of legitimate cases of trailer data lifting along.
+> 
+> Ideally we would test that
+> 
+> - Ingress padding is ignored.
 
-This is a good point, and I was able to confirm this. I profiled the
-changes in the
-patch by fixing the number of threads and flows but scaling message sizes w=
-ith
-tcp_rr, using the notion that creating and processing large messages in tcp=
-_rr
-would take more time. As the message size increases from 1 B to MSS (4KB
-in my setup), I found that the difference in latency and throughput diminis=
-hes
-between looping inside epoll vs looping on nonblocking epoll_wait in usersp=
-ace.
+I think the goal of a hardware padding test is to detect when padding
+leaks onto the wire.
 
-Understandably, as the message sizes increase the application becomes the
-bottleneck and the syscall overhead becomes marginal to the whole cost of t=
-he
-operation.
+If not adding a new test, detect in csum and fail anytime padding is
+detected (i.e., not only non-zero)?
 
-I also found that looping inside epoll yields latency and throughput
-improvements again when message sizes increase past MSS. I believe this can
-be rationalized as the cost of processing the packet in the application is =
-then
-amortized over the multiple transmitted segments and the system call overhe=
-ad
-becomes more prominent again.
+> - Egress padding does not leak past the buffer. The easiest way to
+>   handle this would be to check that it is constant (e.g. all the
+>   padding uses the same value), but this could have false-positives for
+>   e.g. timestamps.
+> 
+> --Sean
 
-This is some rough data showing the above
-Setup: 5 threads on both client and server, 30 flows, mitigations=3Doff,
-both server
-and client using the same request/response size
 
-Looping inside epoll:
-Message Size  Throughput  Latency P50  Latency P90  Latency P99  Latency P9=
-9.9
- 1 B                   543971         57                 76
-      93                  106
- 250 B               501245         60                 77
-    97                  109
- 500 B               494467         60                 77
-    93                  111
- 1 KB                 486412         60                 77
-     97                  114
- 2 KB                 385125         77                 96
-     114                123
- 4 KB                 378612         78                 97
-     119                129
- 8 KB                 349214         83                109
-    125                137
- 16 KB               379276         156               202
-  243                274
-Looping in userspace:
-Message Size  Throughput  Latency P50  Latency P90  Latency P99  Latency P9=
-9.9
- 1 B                   496296         59                 76
-      95                   109
- 250 B               468840         67                 77
-    97                   111
- 500 B               476804         61                 78
-    97                   110
- 1 KB                 464273         65                 79
-    100                  115
- 2 KB                 388334         76                 97
-    114                  122
- 4 KB                 377851         79                 98
-    118                  124
- 8 KB                 333718         91                115
-   128                  141
- 16 KB               354708         157               253
- 307                  343
-
-I also examined the perf traces for both looping setups and compared the
-overhead delta between the invocation of epoll_wait in glibc and the invoca=
-tion
-of do_epoll_wait in the kernel to measure just the overhead of calling the
-system call. With 1 B messages, looping in userspace had a higher overhead
-in CPU cycles for invoking the syscall compared to looping inside epoll, ho=
-wever
-the overhead gap also shrinks as the message sizes increase and the syscall
-overhead becomes increasingly marginal.
-
-I believe testing with a benchmark like memcached and using napi steering
-would confirm the same results, and I recognize now that most regular workl=
-oads
-won=E2=80=99t benefit from this patch.
-
->
-> It would be good to know a little more about your experiments. You are
-> referring to 5 threads, but does that mean 5 cores were busy on both
-> client and server during the experiment? Which of client or server is
-> the bottleneck? In your baseline experiment, are all 5 server cores
-> busy? How many RX queues are in play and how is interrupt routing
-> configured?
-
-Apologies, should have been clearer in the description. The server and clie=
-nt
-were both using 5 threads to handle the connections without any CPU pinning=
-.
-I did however confirm that all threads used distinct cores from
-scheduling traces
-and there was no contention.
-Both hosts had 32 queues with a napi instance per queue.
-
->
-> Thanks,
-> Martin
->
->
-
-Given the above analysis it doesn=E2=80=99t make sense adding the extra kno=
-bs to the
-epoll interface for an optimization that's not widely applicable, therefore=
- this
-patch can be considered as not needed.
-Nonetheless, appreciate the feedback Joe and Martin.
 
