@@ -1,78 +1,79 @@
-Return-Path: <netdev+bounces-126883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C795972C57
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:40:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CFB3972C64
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:41:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAA80B254F5
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:40:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01CA1287400
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9E9186615;
-	Tue, 10 Sep 2024 08:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6BD187857;
+	Tue, 10 Sep 2024 08:41:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ONCX68Sb"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hXIrGUOr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9BD183CB0
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 08:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C763718754D
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 08:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725957595; cv=none; b=i4NrntSPodHmukp78Bc2D8DX4zSv/RjRXRuPj48sBThUoBpnBPDZB00rUvWgw5gjyJLaNwZKHnGo3ywdWZuEX+TannrOafWQFjhAwP6rFXimjlP/U4+8vfMfLbEqnbawybm16iP28hk8QVs5vmn+biAOLVnSqheDUiRJjBRSmoA=
+	t=1725957683; cv=none; b=kHE+7ixuYgLsEukpsIbHErZQXtgaAINRF7BQFhBBb8B1kVxYE29S4aeCNOyiwcrNsWY32NMZSo6UNoqg1vaolWtvDgTQ17gjX6itWeyPK+CnUb8v4J6pYbkWB4yia06AjKhOzRtKqRXidAYIh1ypvwiKVBEkbnS9oaLbD6BRoC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725957595; c=relaxed/simple;
-	bh=xe4iYDT34BzN3d/GP/7zMPbOoJJEDc0SEpnEvvwOfRk=;
+	s=arc-20240116; t=1725957683; c=relaxed/simple;
+	bh=h3cd4gSZ2HmOylFhWWptsXjKQ96ZljxG3F3gMUmWV7Y=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DJTKrZ3tIjWlLXa3jkARXVYqtUBxrFGsS9GA8lJHWKx51RlgjDSag5QR87Ttc+96fgGoJf6i7KCWwDALvhsAVwZo2crm4t9brXqGrsVzMRes/yatZ6yeW/mPG1qjszC2pp8HPjPicz+Wj8xNCU7yQJC8sXf92eOZPTCofq2Hg+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ONCX68Sb; arc=none smtp.client-ip=209.85.167.49
+	 To:Cc:Content-Type; b=awc/QL2K6fdHkmxriwETNfR7Lxe+1BjZSxATfzDYwKWwAb3H8ZluWq+dd7Gjv3z1O+oN8DPAP5QIEV3Csjz3vabAj7IbHlybcmOJd55rWZ/myZVwDjxnLaHTAjd3m18yaq/FiVdaHCKOkYMx1QzK21tZmW1pgWWbH/o+w+MYd/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hXIrGUOr; arc=none smtp.client-ip=209.85.167.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-53658f30749so4430678e87.3
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 01:39:52 -0700 (PDT)
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-53653ff0251so6219243e87.0
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 01:41:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1725957591; x=1726562391; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1725957680; x=1726562480; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=In7HJxZg9xKsGD34FLQbQsWcl/e0oCrDaDS+23mjqoI=;
-        b=ONCX68SbrE5tqox2gC39ZETQQzsdXOD2p4AuLqsIg8gczIWj2okDDDZ1KhyFI4kXFH
-         Fbf+C6KcKMS/C96DrGLM2CXwT6IzesTXlL/B9IV4ZSfxoBG23yNkmq3QZ+AGlwr6HeJj
-         HF7mbMkpJON5TrsxDVvP6bbPA7bYT7YMpN8Vc=
+        bh=uW2QdQj0wloRSWFt8Gzz+LlVmrD8yr5NNCkCqNcwXLo=;
+        b=hXIrGUOrAF46MN09Glw/CK8qgSDgjS9KUy30XTig8sY+jEokZXX0QAxHbJH4BOvIfO
+         WlktH2fKrIfJSJTv2b5taQWHqNpJq6LxQLXrBp1j2Qlp5vIXcSACInYlsTeqW5nH2B2z
+         DNdG1KpeXRW4Vfce7v/wIBAtKdsUUHJoLH2Fg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725957591; x=1726562391;
+        d=1e100.net; s=20230601; t=1725957680; x=1726562480;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=In7HJxZg9xKsGD34FLQbQsWcl/e0oCrDaDS+23mjqoI=;
-        b=dg7qVEBlpSA7wfsB9MEMqblbJiS7fTaDo7Hk6XJQoEfxFX+GQl9xkApKZ3Nv5YC7JA
-         TuJU6um/yWU5KIcbBAdal7/E8u5iTCjAMqQdgE7SLLwJ0Rdc0UL4gviL4OrV78CkUOUn
-         HG4N8Az9qDfixbNy3zyvCqqp3t12dvO5vmpoAft43Ik/DJ55w/oAlDv8hyF3m8oBLeUj
-         k9OsdWDqew7Llj1293qW9g+6jxSi9rD7LhBaMc8WKAJ21i1NRzC0yWnwFVeU9hB18MbS
-         Z7oCcE6kUOXMql9+N9pBWylqDFdnuIFzz59JztlTemh4KzY94OiCEfohN0hX865qemdF
-         S6vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXwTyoPTE7sk0nWgF06WrmT6xBhDvxuGtxEqQpTZMwSo20m+IsP1VfB93kLWbKXcuR0IduLIcU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSxXYQOICFZ4h0XkN/f1VdZd8I7qqDa75EjwsR4o0MMnc+JewE
-	cqSc6YOD/X3Ww9gM8lSGoj3uJIJSsDGgzS5s076QTojBykJV8mjs9vHr1b4uN39ofLZrmkmt4wc
-	qFsrcX/eth0X5Olz4c+vycXb0wJlrOjX5LwRj
-X-Google-Smtp-Source: AGHT+IEz+kYsGxbleMYs9U1Tm9Et7mOJ/LfxNeo0wDfSU4TSao91FeAyZODetK1syzh0EUEKilqIFvFIkepFbASRebI=
-X-Received: by 2002:a05:6512:3ba5:b0:533:901:e455 with SMTP id
- 2adb3069b0e04-536587a545emr9944947e87.2.1725957590451; Tue, 10 Sep 2024
- 01:39:50 -0700 (PDT)
+        bh=uW2QdQj0wloRSWFt8Gzz+LlVmrD8yr5NNCkCqNcwXLo=;
+        b=eiM82jTD19BdpIBbLw23G72rpKllh4ty7aSne3vminuy3DocQuxPhpZz52ThWNCblN
+         FL35zxa9ws6lK1x25C44mqd+wqBD5QNTNdxskZ1fHLN5DRlCgMZBXJ3QnmIRiCZAJ4Se
+         z+Cm14Xe3x/F2xFR1pVtSQj5harF4t6EGGKIgfFWpV9XpxtdpNw4Z/2dki0XgkpZsO/B
+         1XZjQe/u1a1GsfFg/UJdvht2xDtwZWq140VS9JMiNP18aKD3rkHNC42rEq0lU4XIkghG
+         8+gxlUrlFWod24wh130j4MLfY1DQHMQcZrW3kB7TPFVsQOIshkQFDRDn3ZHBKjo65X4w
+         qEwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU53nDyhEJCB1pC4Sq0FEXyxwMHpMgFUQv8+5w+oh+9GICWfiDfYebGYUDqcK0wVvPh/hUavLQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9X1hVOoSSs1OhyNsL3AObZJ7B/U1LmuF1Po1N4DtE9gK/WY7y
+	xYWtTBJ0s+e516MTDQ3kILBAdLA8sR02pCCFv0f6W6vJsfnvK6rdaSq2C5nmsju6MJ+PseveO5m
+	26IrsHojveQiYeQi62R+Ro++BW5WhUPHdXp/m
+X-Google-Smtp-Source: AGHT+IF8g6kvgX7mKw1bv/O6WZUDdVt2r95JVoG0Slu/IUNC0c2XDvoAirWIhaByyxBD351VDNV4OOq+DzYHU0h7bV8=
+X-Received: by 2002:a05:6512:10cf:b0:536:536a:3854 with SMTP id
+ 2adb3069b0e04-5365881a749mr7055762e87.60.1725957679532; Tue, 10 Sep 2024
+ 01:41:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240910075942.1270054-1-shaojijie@huawei.com> <20240910075942.1270054-12-shaojijie@huawei.com>
-In-Reply-To: <20240910075942.1270054-12-shaojijie@huawei.com>
+References: <20240910075942.1270054-1-shaojijie@huawei.com> <20240910075942.1270054-9-shaojijie@huawei.com>
+In-Reply-To: <20240910075942.1270054-9-shaojijie@huawei.com>
 From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Tue, 10 Sep 2024 14:09:37 +0530
-Message-ID: <CAH-L+nP2oy4Haw1+8Jy3GGgphxBii8m2zD03FXbC0SeR7QdhQg@mail.gmail.com>
-Subject: Re: [PATCH V9 net-next 11/11] net: add ndo_validate_addr check in dev_set_mac_address
+Date: Tue, 10 Sep 2024 14:11:07 +0530
+Message-ID: <CAH-L+nNmkJt2TXh7YLb68pET-mBEwtbMS03=iVzeVke90E=AQg@mail.gmail.com>
+Subject: Re: [PATCH V9 net-next 08/11] net: hibmcge: Implement some
+ ethtool_ops functions
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
 	pabeni@redhat.com, shenjian15@huawei.com, wangpeiyang1@huawei.com, 
@@ -82,51 +83,106 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com, 
 	salil.mehta@huawei.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000001f12b30621bfd154"
+	boundary="0000000000006f598d0621bfd64c"
 
---0000000000001f12b30621bfd154
+--0000000000006f598d0621bfd64c
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, Sep 10, 2024 at 1:36=E2=80=AFPM Jijie Shao <shaojijie@huawei.com> w=
 rote:
 >
-> If driver implements ndo_validate_addr,
-> core should check the mac address before ndo_set_mac_address.
+> Implement the .get_drvinfo .get_link .get_link_ksettings to get
+> the basic information and working status of the driver.
+> Implement the .set_link_ksettings to modify the rate, duplex,
+> and auto-negotiation status.
 >
 > Signed-off-by: Jijie Shao <shaojijie@huawei.com>
 > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 > ---
 > ChangeLog:
-> v2 -> v3:
->   - Use ndo_validate_addr() instead of is_valid_ether_addr()
->     in dev_set_mac_address(), suggested by Jakub and Andrew.
->   v2: https://lore.kernel.org/all/20240820140154.137876-1-shaojijie@huawe=
-i.com/
+> RFC v1 -> RFC v2:
+>   - Use ethtool_op_get_link(), phy_ethtool_get_link_ksettings(),
+>     and phy_ethtool_set_link_ksettings() to simplify the code, suggested =
+by Andrew.
+>   - Delete workqueue for this patch set, suggested by Jonathan.
+>   RFC v1: https://lore.kernel.org/all/20240731094245.1967834-1-shaojijie@=
+huawei.com/
 > ---
->  net/core/dev.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  .../ethernet/hisilicon/hibmcge/hbg_ethtool.c    | 17 +++++++++++++++++
+>  .../ethernet/hisilicon/hibmcge/hbg_ethtool.h    | 11 +++++++++++
+>  .../net/ethernet/hisilicon/hibmcge/hbg_main.c   |  2 ++
+>  3 files changed, 30 insertions(+)
+>  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+>  create mode 100644 drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
 >
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 22c3f14d9287..00e0f473ed44 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -9087,6 +9087,11 @@ int dev_set_mac_address(struct net_device *dev, st=
-ruct sockaddr *sa,
->                 return -EOPNOTSUPP;
->         if (sa->sa_family !=3D dev->type)
->                 return -EINVAL;
-> +       if (ops->ndo_validate_addr) {
-> +               err =3D ops->ndo_validate_addr(dev);
-> +               if (err)
-> +                       return err;
-> +       }
-[Kalesh] It would be better to move this code after
-netif_device_present() check. Minor nit and there will not be any
-functional impact.
->         if (!netif_device_present(dev))
->                 return -ENODEV;
->         err =3D dev_pre_changeaddr_notify(dev, sa->sa_data, extack);
+> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c b/drive=
+rs/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+> new file mode 100644
+> index 000000000000..c3370114aef3
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.c
+> @@ -0,0 +1,17 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +// Copyright (c) 2024 Hisilicon Limited.
+> +
+> +#include <linux/ethtool.h>
+> +#include <linux/phy.h>
+> +#include "hbg_ethtool.h"
+> +
+> +static const struct ethtool_ops hbg_ethtool_ops =3D {
+> +       .get_link               =3D ethtool_op_get_link,
+> +       .get_link_ksettings     =3D phy_ethtool_get_link_ksettings,
+> +       .set_link_ksettings     =3D phy_ethtool_set_link_ksettings,
+> +};
+> +
+> +void hbg_ethtool_set_ops(struct net_device *netdev)
+> +{
+> +       netdev->ethtool_ops =3D &hbg_ethtool_ops;
+> +}
+> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h b/drive=
+rs/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
+> new file mode 100644
+> index 000000000000..628707ec2686
+> --- /dev/null
+> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_ethtool.h
+> @@ -0,0 +1,11 @@
+> +/* SPDX-License-Identifier: GPL-2.0+ */
+> +/* Copyright (c) 2024 Hisilicon Limited. */
+> +
+> +#ifndef __HBG_ETHTOOL_H
+> +#define __HBG_ETHTOOL_H
+> +
+> +#include <linux/netdevice.h>
+> +
+> +void hbg_ethtool_set_ops(struct net_device *netdev);
+> +
+> +#endif
+> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c b/drivers/=
+net/ethernet/hisilicon/hibmcge/hbg_main.c
+> index a8d0e951633b..b06524c336e2 100644
+> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_main.c
+> @@ -6,6 +6,7 @@
+>  #include <linux/netdevice.h>
+>  #include <linux/pci.h>
+>  #include "hbg_common.h"
+> +#include "hbg_ethtool.h"
+>  #include "hbg_hw.h"
+>  #include "hbg_irq.h"
+>  #include "hbg_mdio.h"
+> @@ -235,6 +236,7 @@ static int hbg_probe(struct pci_dev *pdev, const stru=
+ct pci_device_id *ent)
+>         netdev->min_mtu =3D priv->dev_specs.min_mtu;
+>         hbg_change_mtu(priv, HBG_DEFAULT_MTU_SIZE);
+>         hbg_net_set_mac_address(priv->netdev, &priv->dev_specs.mac_addr);
+> +       hbg_ethtool_set_ops(netdev);
+>         ret =3D devm_register_netdev(dev, netdev);
+>         if (ret)
+>                 return dev_err_probe(dev, ret, "failed to register netdev=
+\n");
 > --
 > 2.33.0
 >
@@ -136,7 +192,7 @@ functional impact.
 Regards,
 Kalesh A P
 
---0000000000001f12b30621bfd154
+--0000000000006f598d0621bfd64c
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -208,14 +264,14 @@ a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
 x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
 VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
 bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIGcMoCdaYZXw4bvU6qTtha0BuX6T1sJeMFssmQjZ01xIMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkxMDA4Mzk1MVowaQYJKoZIhvcNAQkPMVwwWjAL
+AQkEMSIEIASItLQirSc+d8DK88FI1t5Ruoj9sxK/h1A0fKB1hsj9MBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkxMDA4NDEyMFowaQYJKoZIhvcNAQkPMVwwWjAL
 BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAw99v102zF
-ScJy8QrlAwGDpkis9sfLy/+jymzWvcMX+DLMIGtrKF/ioAElz05lflFv+cq3F2gnQz5X1ZW1aJ48
-AiaJGvsUwRNsqq9zjhh+2r9hwAbSSo0pay9QN49r22gOKvtDpUVciKg6bt/u6RW5Sh5vV4KYxLB2
-OKAr9EzF/8K2eiiGpbrEIptTPWps77Lk/gMjGg6pEwJFw8v1M2+sOayoG5NVrLjuVonTXelOUWdW
-cqwpP/Jw11GzUZ7hmcxS2et8jLtnMSWab1wX3z1k/mh7nUgHim8l/nCo6gCZOdoQZhDlEL+gfFFG
-M1CVBgI6/PZYmDvc0mn7j4vfDe+M
---0000000000001f12b30621bfd154--
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBIdFRaI3Ug
+8pXAzMpauC7K8wuNnkJdoNt4M7FxRr9BLChT/uZgCieRvsUkMzCriZ+Xf1gnJDjCJ/Ikx2bj07wS
+3fW+Z15EqiBFJNt4ntwTNAUmjuYerkErvoxLQ6sveOnfRa5gN3ae1Kf+UUjVTujNUuNOSYK85m28
+Cb473e2QvwsfMJBRg7KxA8op5hIR/1LaeXOlKiftypzm+Z2x2X0NZ03lUWRdAICHBza1edE+P6VC
+v9TQWv9RuYZBdMfb4ZyAJ1PEfvAhhFSCG7dvetPHbMPdTzYcTHkaaSoiZwdZacpDqoN0ZwA1vAFS
+zfS0R/9rsSFmEvtI43PlGfSOawiQ
+--0000000000006f598d0621bfd64c--
 
