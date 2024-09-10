@@ -1,159 +1,110 @@
-Return-Path: <netdev+bounces-127115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7276E9742ED
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 21:05:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BC66974302
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 21:07:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A577E1C26039
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:05:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC0071C25301
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:07:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA8AB1A4B7A;
-	Tue, 10 Sep 2024 19:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C63C1A76AE;
+	Tue, 10 Sep 2024 19:07:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YjSugIze"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o8VeGU5w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88FC01A08A6;
-	Tue, 10 Sep 2024 19:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F6A194C77;
+	Tue, 10 Sep 2024 19:07:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725995128; cv=none; b=jMXKKhgsTsgZBXiJDtprOSXNvac6KgpF0TgFnZb3ReKbGAP0ywzakjNr1zDSk8HNsb8z0WH9KqM1RnxbIkyqFOJFyHBdsQq1mcO++NguKsHUnH9LHRaAbvAyMTG3ksLnHTLkmmSpEEw72X+IIPBmNyDTW7Jdlzwe54ui/CI8sPk=
+	t=1725995221; cv=none; b=WUgbSPsSF8xDJyjmlpLwo16m2tb7qlLWRX+WWq81euQb4Mt/gLJ4ymLM07ujeEENnp6L/F6X9hPV7/fckm0bOdkV5GNbyBJbtTcz7K5dz7WVu2LaM6WDTL6CzxW0lugs5o91QabetXAehIrp7e4nndMCFOsccS85A0Lji0hr62g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725995128; c=relaxed/simple;
-	bh=C3ZeDgPXAfSZWBVnm4n6Mx6Y3fiU3fMZS6UYTtOPrlg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W0fGQ9i42hXsVhfhjdkcoJWXPc6H1pg76QihtTX+aQjATCWPQ1QuURzxCo0d8UunwMefAkKCXFlWljHHSZxCuM3xs5nqRfLaS5SRKYASe56fEydWUDf+K2rVBMarZws5zsCKFxQfQgom3Bh7ts8WCdsfTq6yVoK/wmDDigaEEj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YjSugIze; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37D09C4CEC3;
-	Tue, 10 Sep 2024 19:05:27 +0000 (UTC)
+	s=arc-20240116; t=1725995221; c=relaxed/simple;
+	bh=AEl+XWnBo7uqP/QHSL4Rbk+JcONDvvX5zrFxYRMYfeo=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=aTYAls7OsVp1OiRHaI3LkPTTxbhvHoPWOAE82L9vFH16diGvdSxjzEM3lcErz+wIY6QK/fdjTJEi3TpeQz/kx7fOrZcElzzEwijXyzqHC4lep92SLs2OyEmfCpl6upQ+9Ibv0mr8Bio4UVk5PykrbPOoRe1+hwWWPsOQ0eMzcAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o8VeGU5w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5F61C4CEC3;
+	Tue, 10 Sep 2024 19:06:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725995128;
-	bh=C3ZeDgPXAfSZWBVnm4n6Mx6Y3fiU3fMZS6UYTtOPrlg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YjSugIzeeRXzHGAJbdqovwScWPHDefcg+9ae1ZDyTfsEdeU6f585fk10WsHZEjz2E
-	 EpHRZwbZ4+fWyVsdGg+QLZO6owVh0YfFdqbz3fh2rF7AwRH8VGzLOzNtY1b2zz+h7x
-	 tPugLSz2hmgZf+Ki46pc5Len5aMX06ccJcaIvd086t0Jl4fcn4cqqExpkmRBzUiEJQ
-	 ZE1s3hwjknbd8Imr/eJ/igayIH3DoVg1sk7AkWW+4y5gjuTpFWnybXmaK6VWpI1DTU
-	 bATKAfrlf/B4g8+D12kjDwuUEG/l1J8sJDPhGvn3UGcQgtV/7mzFHlSNar6Ib/aTPp
-	 begjABtc63sRg==
-Date: Tue, 10 Sep 2024 12:05:25 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Simon Horman <horms@kernel.org>, kernel@pengutronix.de,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiko Stuebner <heiko@sntech.de>, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rockchip@lists.infradead.org, llvm@lists.linux.dev,
-	patches@lists.linux.dev
-Subject: Re: [PATCH] can: rockchip_canfd: fix return type of
- rkcanfd_start_xmit()
-Message-ID: <20240910190525.GA1169362@thelio-3990X>
-References: <20240906-rockchip-canfd-wifpts-v1-1-b1398da865b7@kernel.org>
- <20240909084448.GU2097826@kernel.org>
- <20240909-arcane-practical-petrel-015d24-mkl@pengutronix.de>
- <20240909143546.GX2097826@kernel.org>
- <20240910-utopian-meticulous-dodo-4ec230-mkl@pengutronix.de>
+	s=k20201202; t=1725995220;
+	bh=AEl+XWnBo7uqP/QHSL4Rbk+JcONDvvX5zrFxYRMYfeo=;
+	h=From:Subject:Date:To:Cc:From;
+	b=o8VeGU5wxKTFKDHd/Zq79lxv2WqJV+ph2ocHko5wrdxdyrKDoQSPkS5PvawEigqIK
+	 Apqxdez3s7U7IxEgmlajeEspvhXno8wBFH3WDod8XBr5MFBgN/6cWpBtc3RddDcpy0
+	 VhPwNEH19Gpt9lO23s7HbeDANsaQNO08J5Mh44UJcjFIDWuncmNPNgDZviDJRF2TJI
+	 NRGMhnvdkJpq7U3sjF4H22HvsyDlg9H73SQkMj9+GvnpXgj7dJK8msMoEvkCHQxRVK
+	 x3Rl1dzmgYhY8QSAfLSrbSWgpq0I2u2JRtHCRtXZVCPmstjZWnR6jDhQNETIkQ2Dh+
+	 OBqsMSTkSdFvw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/3] selftests: mptcp: misc. small fixes
+Date: Tue, 10 Sep 2024 21:06:35 +0200
+Message-Id: <20240910-net-selftests-mptcp-fix-install-v1-0-8f124aa9156d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240910-utopian-meticulous-dodo-4ec230-mkl@pengutronix.de>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALuY4GYC/x2NQQoCMRAEv7LM2YFsUNj4FfEQY68OxBgygwjL/
+ t3BY9FU10aKIVA6TxsNfETl3Rzmw0TlmdsDLHdniiEeQ5oDNxgr6mpQU351K51X+bI0tVwrx9s
+ SM045pbKQv/QBn/+FC7lM133/AaH2ish2AAAA
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=936; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=AEl+XWnBo7uqP/QHSL4Rbk+JcONDvvX5zrFxYRMYfeo=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBm4JjQO/OcS2v+crSTacELJ2iXNcYW5NhoqD9aN
+ UNtPPUlW4qJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZuCY0AAKCRD2t4JPQmmg
+ cxD3EACNvE1PFEfPnkuhoFb/wF6TQtY/EuUxYLg8PzHSGh2wgTfH2Lj27XAx/VdmcdmRE0eoHYj
+ tOLGKFa5PDakgjHOpkOhgJoQnCaa1eF3IDUUbD9xUdt3NiywFyGJjaogymocsMKW7FTZNyFQTlp
+ R7Tfv43nGW/xuS4rQAKKprtqnw8nZsRRQXj54jKdxljbRqGVQyvnodLpmHXiwoBaUirmbPY6iSJ
+ rCXmV/5Q0WBRXZ1NP3P8+7vGYjSzLkewJw0/Ye0kCpZrkbmkb/i0IfddBaflJ9H9zAc2gWupwNd
+ mQgQdJIbLFXJNyCoeLJf+2/M/H7xDxxSqvpJUd6jLNZBWkKw1ULwNzf95b7q2HxZOrJEb7CtEB5
+ TCLIwr8FLe0EgmYPYv0/EY8lhvwD+CUgsQBpn0PJaeMF2gRVwUReAVx+wqWkhYLVYLsWHWXdfhP
+ ZIIY3qWM53y06bBgDLuD6DtptobCoVaxttWwNOyZe9/lf2ZUHWpoJSUaSXaC5VMJ6Qm+oTGHTH5
+ PcC+JcNE9DjEV3mbIUKQK5xrHuaQMEXEHd96u+1geZWFpX427Qx/Jsrg3QrpbClnjzCkx1YBqxA
+ oI5Tb5QmrgInvyutZM9fnw1tThfYnUuQ96RpbH7aH+HKgJwyckHRYV1fgDsdGBIpx9L5mSNFrGE
+ TzjhKUCmzPDvMiQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Hi Marc,
+Here are some various fixes for the MPTCP selftests.
 
-On Tue, Sep 10, 2024 at 11:56:56AM +0200, Marc Kleine-Budde wrote:
-> On 09.09.2024 15:35:46, Simon Horman wrote:
-> > On Mon, Sep 09, 2024 at 10:57:06AM +0200, Marc Kleine-Budde wrote:
-> > > On 09.09.2024 09:44:48, Simon Horman wrote:
-> > > > On Fri, Sep 06, 2024 at 01:26:41PM -0700, Nathan Chancellor wrote:
-> > > > > With clang's kernel control flow integrity (kCFI, CONFIG_CFI_CLANG),
-> > > > > indirect call targets are validated against the expected function
-> > > > > pointer prototype to make sure the call target is valid to help mitigate
-> > > > > ROP attacks. If they are not identical, there is a failure at run time,
-> > > > > which manifests as either a kernel panic or thread getting killed. A
-> > > > > warning in clang aims to catch these at compile time, which reveals:
-> > > > > 
-> > > > >   drivers/net/can/rockchip/rockchip_canfd-core.c:770:20: error: incompatible function pointer types initializing 'netdev_tx_t (*)(struct sk_buff *, struct net_device *)' (aka 'enum netdev_tx (*)(struct sk_buff *, struct net_device *)') with an expression of type 'int (struct sk_buff *, struct net_device *)' [-Werror,-Wincompatible-function-pointer-types-strict]
-> > > > >     770 |         .ndo_start_xmit = rkcanfd_start_xmit,
-> > > > >         |                           ^~~~~~~~~~~~~~~~~~
-> > > > > 
-> > > > > ->ndo_start_xmit() in 'struct net_device_ops' expects a return type of
-> > > > > 'netdev_tx_t', not 'int' (although the types are ABI compatible). Adjust
-> > > > > the return type of rkcanfd_start_xmit() to match the prototype's to
-> > > > > resolve the warning.
-> > > > > 
-> > > > > Fixes: ff60bfbaf67f ("can: rockchip_canfd: add driver for Rockchip CAN-FD controller")
-> > > > > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> > > > 
-> > > > Thanks, I was able to reproduce this problem at build time
-> > > > and that your patch addresses it.
-> > > 
-> > > FTR: the default clang in Debian unstable, clang-16.0.6 doesn't support
-> > > this. With clang-20 from experimental it works, haven't checked older
-> > > versions, though.
-> > 
-> > FTR: I checked using 18.1.8 from here [1][2].
-> > 
-> > [1] https://mirrors.edge.kernel.org/pub/tools/llvm/
-> > [2] https://mirrors.edge.kernel.org/pub/tools/llvm/files/
-> 
-> I was a bit hasty yesterday, clang-20 and W=1 produces these errors:
-> 
-> | include/linux/vmstat.h:517:36: error: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Werror,-Wenum-enum-conversion]
-> |   517 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-> |       |                               ~~~~~~~~~~~ ^ ~~~
-> | 1 error generated.
+Patch 1 fixes a recently modified test to continue to work as expected
+on older kernels. This is a fix for a recent fix that can be backported
+up to v5.15.
 
-Unfortunately, this is a completely tangential issue. You can see some
-backstory behind it in commit 75b5ab134bb5 ("kbuild: Move
--Wenum-{compare-conditional,enum-conversion} into W=1"). To be honest, I
-should consider moving that to W=2...
+Patch 2 and 3 include dependences when exporting or installing the
+tests. Two fixes for v6.11-rc1.
 
-> However I fail to reproduce the ndo_start_xmit problem. Even with 18.1.8
-> from kernel.org.
-> 
-> 
-> The following command (ARCH is unset, compiling x86 -> x86) produces the
-> above shown "vmstat.h" problems....
-> 
-> | $ make LLVM=1 LLVM_IAS=1 LLVM_SUFFIX=-20 drivers/net/can/rockchip/  W=1 CONFIG_WERROR=0
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Matthieu Baerts (NGI0) (3):
+      selftests: mptcp: join: restrict fullmesh endp on 1st sf
+      selftests: mptcp: include lib.sh file
+      selftests: mptcp: include net_helper.sh file
 
-FYI, you could shorten this to just:
+ tools/testing/selftests/net/mptcp/Makefile      | 2 ++
+ tools/testing/selftests/net/mptcp/mptcp_join.sh | 4 +++-
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+---
+base-commit: 48aa361c5db0b380c2b75c24984c0d3e7c1e8c09
+change-id: 20240910-net-selftests-mptcp-fix-install-2b82ae5a99c8
 
-  $ make LLVM=-20 drivers/net/can/rockchip/ W=1 CONFIG_WERROR=0
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-As LLVM_SUFFIX will be set through LLVM and LLVM_IAS has defaulted to 1
-since 5.15.
-
-Does CONFIG_WERROR=0 work? It seems like it is still present above.
-
-> ... but not the ndo_start_xmit problem.
-> 
-> 
-> Am I missing a vital .config option?
-
-No, I might not have made it clear in this commit message but this
-warning is not on by default. I am looking to turn it on at some point
-so I keep up with the warnings that it produces but there is one
-subsystem that has several instances and I am unsure of how to solve
-them to the maintainer's satisfaction. You can test it by adding
-
-  KCFLAGS=-Wincompatible-function-pointer-types-strict
-
-to your make command above and it should reproduce.
-
-Cheers,
-Nathan
 
