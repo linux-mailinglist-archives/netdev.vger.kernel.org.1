@@ -1,150 +1,332 @@
-Return-Path: <netdev+bounces-127141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A49B9744EC
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 23:36:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B64349744F8
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 23:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AABD2B23EBB
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 21:36:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75D8F288DFB
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 21:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C2F1AB529;
-	Tue, 10 Sep 2024 21:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142F11AAE07;
+	Tue, 10 Sep 2024 21:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iFyuemhI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9kZzkZ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DD51A7AC6;
-	Tue, 10 Sep 2024 21:35:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D09B18CBE6
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 21:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726004159; cv=none; b=r/lD9bkNjgRh7smq/xoX1vEFn7tQbYJ+W8sdx5jahl6KZUknSPGciIC/lV5QAaYxGaR58NxwgyPSKmk8a21piOHFU6FO8bnoZuVJEeXpN+U5/ZJLI9jB6ffWe7dMXKKOI3/7vy+Tg/EFznbc3umg7Trql6PTuAa3en0vG5f2ygI=
+	t=1726004515; cv=none; b=NMLbsZ6tiY0r7WD/1qPxEApF9caDqZDkKuh6I0EOncAaOoocVdlJr8CpMS96Msk0i+57ckbGN73cU+Dgq5fQHE4pGVRpiKgj86d0T4PMcxWNUbmYL5rB+nx1WjBDkrIIBsd7iho1A6DPw17KXsfBLSToE/8GDUri565FwiEHEwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726004159; c=relaxed/simple;
-	bh=szFnczvHmBZ/pMniQwesxtxy7hfJ622efUkCBfeCJPg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ovnMO0E1xJLfFpls+RskSYSF4ndJ3u/iyOj9N56X1GdSdIkYdjoObvhdA4egafKWjDmHUlIMD1ljfxvPAsao/Lz30o9VUT1UXVH9GreCLlsYIyGCq/jTIMvJeXIe1VpFnyXo7Gd8znZW1aQ0wq1sHRDuB26aCUZf9FhSACSok0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iFyuemhI; arc=none smtp.client-ip=209.85.160.176
+	s=arc-20240116; t=1726004515; c=relaxed/simple;
+	bh=3db2goRONDrXz0EluDtm1usvRK6K/4HT1Y7waApa9o0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VDHwvcMiC0w98imSRSZ5MwhPUJiwsc+CVYQbrICfzJnHejfBCk8343ai20SVR3IuA8z3gWPB74v2KqbZQasEbE841PoNUkucP2vszHAirl16dWgg6shNkpQlNImDlBXeEdTHbJEo4nun5lV8NS2CeWt+WSJk96a2UXXPnk6GcE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a9kZzkZ0; arc=none smtp.client-ip=209.85.216.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-4583209a17dso20961081cf.1;
-        Tue, 10 Sep 2024 14:35:58 -0700 (PDT)
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2d8a744aa9bso3879174a91.3
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 14:41:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726004157; x=1726608957; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=q37krJr137qr8WgC32YYtTAU5pG51Ymlb6eZufhZZno=;
-        b=iFyuemhICKqHy0NHT9jE4qwLUksdw5El3TF00VfgUfkC1guo0XkPport3upLmZyKbT
-         wzXKMTh38je0Ct32knejKBl4j4vFtfFbediqaYq6CSGHzhC8J1VHuIprRi3cBEu+xQ5X
-         XnxdN6uNkobCRkIdy3eq688oEMaFhgJvVQLp+EGeJIVsmZo2MxiKmPpMeoO8tc5b/lOC
-         A3BvPi6osLjJ/f+eDZFeZa+bQz8MzFx0Sjt7VJXmJvobYXGfNyNuDYl+BZK19rXIPa5R
-         hfafaf3mOGCvycf8WvzlJUJ4P1+Cjn7+6uQBnAH+RmlM/5QqSUlYfP4SpB6bEpztfUAr
-         aIqw==
+        d=gmail.com; s=20230601; t=1726004512; x=1726609312; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Aw+6lFFj6ydEjI4u0rC5LELrB7W3bbCNrFSSnF9eFsE=;
+        b=a9kZzkZ0u7e0vPZurX150CDXurTKQ6OKK9UXfEAhtitUcUcTpb0krkG/czWG28r+UT
+         fbjtrv9v3mPD93G4GHlTSyZ/8IaJN7nDpU9gVUjR6gRlJKG64CXYwMR/n4B0Yz3WSqyW
+         T8ToFiFccYiDJRbBYXiIHGvq+xFccIRAD9HYZWLmT7vRa6OhfA79r4QO74kVbH6rfNXw
+         9BZdmDVhP4Jnh6vnkBmqqfwLag6yOjXf5yN7mkUHUSKGqIQ5FmX2DVsZD6MfhBCSBj7f
+         Vr9qnxFkh8qAm6l1peOEB+8tONB4tpCJs8C8EK1pr6MdGAD/5BZOexLzFRLqAC6zk7sx
+         SZBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726004157; x=1726608957;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q37krJr137qr8WgC32YYtTAU5pG51Ymlb6eZufhZZno=;
-        b=AFMLgK4vnNUi2gnd4A0DyFm39gZN53YwcI1ptTXl36kGb66hI0++P5s/4HNSSw24yb
-         ZZ4b7ZTsf0ohpmPY5FiOYwK9ekk/EyIGX4P4wWbE52YEWalfSkwB6I3yawhkr+dO5Bio
-         GZx584TUyyh/IeuDNKs5ZbFNZ+KXSxt84L2mzmz/a8+//qTP80nXHri9gXOCZl5Y2tay
-         PuoxjPqhNARp70iyBUv5n1/d3fOx9ILADyQ8pP8DXyDXkPfufCRwPlfIknUXF4cvnaJC
-         SwKnyRYj+Y5OKl9S42VBo9eoPsPnNb5lo1IKe8YUwFnpeR8rev5/jy5l42A0ddJvlgAu
-         1riw==
-X-Forwarded-Encrypted: i=1; AJvYcCX2wmFKQLAEwDCcbmQm0rlqK+AVnEQ98cNvVPWmmJ91vdpKGidaqpwAUyduyjY+Yt8XBCwD5/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/TBdPMtZbeXMOUQn+HOkjC/EqBlDrUHqK9jrMuMmFph9JjHrC
-	zNXrTLc6GXGj3mh2zVIsj7ryTe+D//MC0rx0ymbInDEG8JSuMZdQvxce8g==
-X-Google-Smtp-Source: AGHT+IH/FKyl/I4H6T2TpJyVr4rSrA1KpyyI2nimgOPNLc0sR8fu4ipUU5lfEnKkHFCztcp2NluXkw==
-X-Received: by 2002:ac8:588a:0:b0:44f:e905:e5f7 with SMTP id d75a77b69052e-4580c7a1cc4mr273993611cf.51.1726004156960;
-        Tue, 10 Sep 2024 14:35:56 -0700 (PDT)
-Received: from willemb.c.googlers.com.com (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45822f99490sm33190861cf.94.2024.09.10.14.35.56
+        d=1e100.net; s=20230601; t=1726004512; x=1726609312;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Aw+6lFFj6ydEjI4u0rC5LELrB7W3bbCNrFSSnF9eFsE=;
+        b=ooQrdbkh6eE0IWVugpgOEoNdCdtANnUANWLyES2Fy1kLbFn/lSYmhdUnCbCk8vsgov
+         cwy7LS7L8dx0NoCWSXzYYu2BIAOWItqly7y0TeLlXElmLtJbn08nQMfZQsirZjfs9cid
+         t8EKJru7CoOf27YBQkAt0vS1fvlvH7ag/q+6pkZCa4HoI8+59fQwQoDmuXXy9dWSSTEs
+         qZTOICdXpJOokFH4RqYwQYh9BVNo88+xO0zNQNl2bp2wHxGjzaKcukqPJPoSrEzhskSg
+         f1x/sRGXO8YSB0IglLanukobK+Kz/VZ/9nk+lXz4V+hlEmV/n0N0IufF9OijSNlCgX29
+         A17w==
+X-Gm-Message-State: AOJu0YxtxRuwlbOjCiyjzp4UGi1Jvjxnn8SXqnO/eS11Who6zlh8607X
+	+rpE175+ytK8qP1jXPvkCBkWzhcT9D0rPlvf7IR3329mMOmQoqQ=
+X-Google-Smtp-Source: AGHT+IEvOgVrw/812SeiaWST2kBcmXnMbFJk+4080I5B6q/Gwjl34UD296M23Ho2l2tkjto19ArQ+Q==
+X-Received: by 2002:a17:90b:4d08:b0:2d3:caeb:a9ad with SMTP id 98e67ed59e1d1-2dad50ed05fmr14690679a91.31.1726004512294;
+        Tue, 10 Sep 2024 14:41:52 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2db0419ae89sm6989195a91.13.2024.09.10.14.41.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 14:35:56 -0700 (PDT)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	stable@vger.kernel.org,
-	nsz@port70.net,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	yury.khrustalev@arm.com,
-	broonie@kernel.org,
-	sudeep.holla@arm.com,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net v2] net: tighten bad gso csum offset check in virtio_net_hdr
-Date: Tue, 10 Sep 2024 17:35:35 -0400
-Message-ID: <20240910213553.839926-1-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.46.0.598.g6f2099f65c-goog
+        Tue, 10 Sep 2024 14:41:51 -0700 (PDT)
+Date: Tue, 10 Sep 2024 14:41:51 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Madhu Chittim <madhu.chittim@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Donald Hunter <donald.hunter@gmail.com>, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
+	edumazet@google.com
+Subject: Re: [PATCH v7 net-next 11/15] testing: net-drv: add basic shaper test
+Message-ID: <ZuC9H5uABXA0-SYo@mini-arch>
+References: <cover.1725919039.git.pabeni@redhat.com>
+ <5f17d61004db141808b15d50485d0ccb69cbfa12.1725919039.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5f17d61004db141808b15d50485d0ccb69cbfa12.1725919039.git.pabeni@redhat.com>
 
-From: Willem de Bruijn <willemb@google.com>
+On 09/10, Paolo Abeni wrote:
+> Leverage a basic/dummy netdevsim implementation to do functional
+> coverage for NL interface.
+> 
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> v5 -> v6:
+>   - additional test-cases for delegation and queue reconf
+> 
+> v4 -> v5:
+>   - updated to new driver API
+>   - more consistent indentation
+> 
+> rfc v1 -> v2:
+>   - added more test-cases WRT nesting and grouping
+> ---
+>  drivers/net/Kconfig                           |   1 +
+>  drivers/net/netdevsim/ethtool.c               |   2 +
+>  drivers/net/netdevsim/netdev.c                |  39 ++
+>  tools/testing/selftests/drivers/net/Makefile  |   1 +
+>  tools/testing/selftests/drivers/net/shaper.py | 457 ++++++++++++++++++
+>  .../testing/selftests/net/lib/py/__init__.py  |   1 +
+>  tools/testing/selftests/net/lib/py/ynl.py     |   5 +
+>  7 files changed, 506 insertions(+)
+>  create mode 100755 tools/testing/selftests/drivers/net/shaper.py
+> 
+> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+> index 9920b3a68ed1..1fd5acdc73c6 100644
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -641,6 +641,7 @@ config NETDEVSIM
+>  	depends on PTP_1588_CLOCK_MOCK || PTP_1588_CLOCK_MOCK=n
+>  	select NET_DEVLINK
+>  	select PAGE_POOL
+> +	select NET_SHAPER
+>  	help
+>  	  This driver is a developer testing tool and software model that can
+>  	  be used to test various control path networking APIs, especially
+> diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
+> index 1436905bc106..5fe1eaef99b5 100644
+> --- a/drivers/net/netdevsim/ethtool.c
+> +++ b/drivers/net/netdevsim/ethtool.c
+> @@ -103,8 +103,10 @@ nsim_set_channels(struct net_device *dev, struct ethtool_channels *ch)
+>  	struct netdevsim *ns = netdev_priv(dev);
+>  	int err;
+>  
+> +	mutex_lock(&dev->lock);
+>  	err = netif_set_real_num_queues(dev, ch->combined_count,
+>  					ch->combined_count);
+> +	mutex_unlock(&dev->lock);
+>  	if (err)
+>  		return err;
+>  
+> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+> index 017a6102be0a..cad85bb0cf54 100644
+> --- a/drivers/net/netdevsim/netdev.c
+> +++ b/drivers/net/netdevsim/netdev.c
+> @@ -22,6 +22,7 @@
+>  #include <net/netdev_queues.h>
+>  #include <net/page_pool/helpers.h>
+>  #include <net/netlink.h>
+> +#include <net/net_shaper.h>
+>  #include <net/pkt_cls.h>
+>  #include <net/rtnetlink.h>
+>  #include <net/udp_tunnel.h>
+> @@ -475,6 +476,43 @@ static int nsim_stop(struct net_device *dev)
+>  	return 0;
+>  }
+>  
+> +static int nsim_shaper_set(struct net_shaper_binding *binding,
+> +			   const struct net_shaper *shaper,
+> +			   struct netlink_ext_ack *extack)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int nsim_shaper_del(struct net_shaper_binding *binding,
+> +			   const struct net_shaper_handle *handle,
+> +			   struct netlink_ext_ack *extack)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int nsim_shaper_group(struct net_shaper_binding *binding,
+> +			     int leaves_count,
+> +			     const struct net_shaper *leaves,
+> +			     const struct net_shaper *root,
+> +			     struct netlink_ext_ack *extack)
+> +{
+> +	return 0;
+> +}
+> +
+> +static void nsim_shaper_cap(struct net_shaper_binding *binding,
+> +			    enum net_shaper_scope scope,
+> +			    unsigned long *flags)
+> +{
+> +	*flags = ULONG_MAX;
+> +}
+> +
+> +static const struct net_shaper_ops nsim_shaper_ops = {
+> +	.set			= nsim_shaper_set,
+> +	.delete			= nsim_shaper_del,
+> +	.group			= nsim_shaper_group,
+> +	.capabilities		= nsim_shaper_cap,
+> +};
+> +
+>  static const struct net_device_ops nsim_netdev_ops = {
+>  	.ndo_start_xmit		= nsim_start_xmit,
+>  	.ndo_set_rx_mode	= nsim_set_rx_mode,
+> @@ -496,6 +534,7 @@ static const struct net_device_ops nsim_netdev_ops = {
+>  	.ndo_bpf		= nsim_bpf,
+>  	.ndo_open		= nsim_open,
+>  	.ndo_stop		= nsim_stop,
+> +	.net_shaper_ops		= &nsim_shaper_ops,
+>  };
+>  
+>  static const struct net_device_ops nsim_vf_netdev_ops = {
+> diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+> index 39fb97a8c1df..25aec5c081df 100644
+> --- a/tools/testing/selftests/drivers/net/Makefile
+> +++ b/tools/testing/selftests/drivers/net/Makefile
+> @@ -9,6 +9,7 @@ TEST_PROGS := \
+>  	ping.py \
+>  	queues.py \
+>  	stats.py \
+> +	shaper.py
+>  # end of TEST_PROGS
+>  
+>  include ../../lib.mk
+> diff --git a/tools/testing/selftests/drivers/net/shaper.py b/tools/testing/selftests/drivers/net/shaper.py
+> new file mode 100755
+> index 000000000000..3504d51985bc
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/shaper.py
+> @@ -0,0 +1,457 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_true, KsftSkipEx
+> +from lib.py import EthtoolFamily, NetshaperFamily
+> +from lib.py import NetDrvEnv
+> +from lib.py import NlError
+> +from lib.py import cmd
+> +
+> +def get_shapers(cfg, nl_shaper) -> None:
+> +    try:
+> +        shapers = nl_shaper.get({'ifindex': cfg.ifindex}, dump=True)
+> +    except NlError as e:
+> +        if e.error == 95:
+> +            raise KsftSkipEx("shapers not supported by the device")
+> +        raise
+> +
+> +    # Default configuration: no shapers configured.
+> +    ksft_eq(len(shapers), 0)
+> +
+> +def get_caps(cfg, nl_shaper) -> None:
+> +    try:
+> +        caps = nl_shaper.cap_get({'ifindex': cfg.ifindex}, dump=True)
+> +    except NlError as e:
+> +        if e.error == 95:
+> +            raise KsftSkipEx("shapers not supported by the device")
+> +        raise
+> +
+> +    # Each device implementing shaper support must support some
+> +    # features in at least a scope.
+> +    ksft_true(len(caps)> 0)
+> +
+> +def set_qshapers(cfg, nl_shaper) -> None:
+> +    try:
+> +        caps = nl_shaper.cap_get({'ifindex': cfg.ifindex,
+> +                                 'scope':'queue'})
+> +    except NlError as e:
+> +        if e.error == 95:
+> +            raise KsftSkipEx("shapers not supported by the device")
+> +        raise
+> +    if not 'support-bw-max' in caps or not 'support-metric-bps' in caps:
+> +        raise KsftSkipEx("device does not support queue scope shapers with bw_max and metric bps")
+> +
+> +    cfg.queues = True;
+> +    netnl = EthtoolFamily()
+> +    channels = netnl.channels_get({'header': {'dev-index': cfg.ifindex}})
+> +    if channels['combined-count'] == 0:
+> +        cfg.rx_type = 'rx'
+> +        cfg.nr_queues = channels['rx-count']
+> +    else:
+> +        cfg.rx_type = 'combined'
+> +        cfg.nr_queues = channels['combined-count']
+> +    if cfg.nr_queues < 3:
+> +        raise KsftSkipEx("device does not support enough queues min 3 found {cfg.nr_queues}")
+> +
+> +    nl_shaper.set({'ifindex': cfg.ifindex,
+> +                   'handle': {'scope': 'queue', 'id': 1},
+> +                   'metric': 'bps',
+> +                   'bw-max': 10000})
+> +    nl_shaper.set({'ifindex': cfg.ifindex,
+> +                   'handle': {'scope': 'queue', 'id': 2},
+> +                   'metric': 'bps',
+> +                   'bw-max': 20000})
+> +
+> +    # Querying a specific shaper not yet configured must fail.
+> +    raised = False
+> +    try:
+> +        shaper_q0 = nl_shaper.get({'ifindex': cfg.ifindex,
+> +                                   'handle': {'scope': 'queue', 'id': 0}})
+> +    except (NlError):
+> +        raised = True
+> +    ksft_eq(raised, True)
+> +
+> +    shaper_q1 = nl_shaper.get({'ifindex': cfg.ifindex,
+> +                              'handle': {'scope': 'queue', 'id': 1}})
 
-The referenced commit drops bad input, but has false positives.
-Tighten the check to avoid these.
+[..]
 
-The check detects illegal checksum offload requests, which produce
-csum_start/csum_off beyond end of packet after segmentation.
+> +    ksft_eq(shaper_q1, {'ifindex': cfg.ifindex,
+> +                        'parent': {'scope': 'netdev'},
+> +                        'handle': {'scope': 'queue', 'id': 1},
+> +                        'metric': 'bps',
+> +                        'bw-max': 10000})
+> +
 
-But it is based on two incorrect assumptions:
+Before comparison, you probably need to drop some fields that are not
+expected? 
 
-1. virtio_net_hdr_to_skb with VIRTIO_NET_HDR_GSO_TCP[46] implies GSO.
-True in callers that inject into the tx path, such as tap.
-But false in callers that inject into rx, like virtio-net.
-Here, the flags indicate GRO, and CHECKSUM_UNNECESSARY or
-CHECKSUM_NONE without VIRTIO_NET_HDR_F_NEEDS_CSUM is normal.
+# # Check failed {'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 1}, 'metric': 'bps', 'bw-min': 517778718638633216, 'bw-max': 10000, 'burst': 18446683600580769792, 'priority': 60858368, 'weight': 4294936704} != {'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 1}, 'metric': 'bps', 'bw-max': 10000} 
+# # Check| At /home/virtme/testing-18/tools/testing/selftests/drivers/net/./shaper.py, line 83, in set_qshapers:
+# # Check|     ksft_eq(shapers, [{'ifindex': cfg.ifindex,
+# # Check failed [{'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 1}, 'metric': 'bps', 'bw-min': 517778718638633216, 'bw-max': 10000, 'burst': 18446683600580769792, 'priority': 60858368, 'weight': 4294936704}, {'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 2}, 'metric': 'bps', 'bw-min': 517778718638633216, 'bw-max': 20000, 'burst': 18446683600580769792, 'priority': 60858368, 'weight': 4294936704}] != [{'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 1}, 'metric': 'bps', 'bw-max': 10000}, {'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 2}, 'metric': 'bps', 'bw-max': 20000}]
 
-2. TSO requires checksum offload, i.e., ip_summed == CHECKSUM_PARTIAL.
-False, as tcp[46]_gso_segment will fix up csum_start and offset for
-all other ip_summed by calling __tcp_v4_send_check.
+https://netdev-3.bots.linux.dev/vmksft-net-drv-dbg/results/766702/4-shaper-py/stdout
 
-Because of 2, we can limit the scope of the fix to virtio_net_hdr
-that do try to set these fields, with a bogus value.
+Debug builds are also reporting a UBSAN error:
 
-Link: https://lore.kernel.org/netdev/20240909094527.GA3048202@port70.net/
-Fixes: 89add40066f9 ("net: drop bad gso csum_start and offset in virtio_net_hdr")
-Signed-off-by: Willem de Bruijn <willemb@google.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Cc: stable@vger.kernel.org
+https://netdev-3.bots.linux.dev/vmksft-net-drv-dbg/results/766702/4-shaper-py/stderr
 
 ---
-
-Changes v1->v2:
-- Fix Cc:
-- Add Acks from v1
----
- include/linux/virtio_net.h | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index 6c395a2600e8d..276ca543ef44d 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -173,7 +173,8 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 			break;
- 		case SKB_GSO_TCPV4:
- 		case SKB_GSO_TCPV6:
--			if (skb->csum_offset != offsetof(struct tcphdr, check))
-+			if (skb->ip_summed == CHECKSUM_PARTIAL &&
-+			    skb->csum_offset != offsetof(struct tcphdr, check))
- 				return -EINVAL;
- 			break;
- 		}
--- 
-2.46.0.598.g6f2099f65c-goog
-
+pw-bot: cr
 
