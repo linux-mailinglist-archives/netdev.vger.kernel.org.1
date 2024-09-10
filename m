@@ -1,135 +1,91 @@
-Return-Path: <netdev+bounces-126841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F2F972A57
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:15:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69ECE972A70
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:18:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 780AF1C24193
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:15:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBB7E2865AF
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:18:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7E717C20F;
-	Tue, 10 Sep 2024 07:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB1517C7CC;
+	Tue, 10 Sep 2024 07:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="T2k9wACp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JGenVeDF"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4914555884;
-	Tue, 10 Sep 2024 07:15:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4397D17C7BD;
+	Tue, 10 Sep 2024 07:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725952533; cv=none; b=rwBIroHNkufdbV1p9lu3PAFAsMk1qXSrtCds/a3f7k2huW2hGqXYbUcxIIAtuKaVJqimrz5zO99sC8Xrt9vsb0z8p2v6uSSUIofj2+mEw69M5DzVQKP0jyMr45DLi7GctwBcv7q4Yw6iYKVTibct0Yr/9p2stdGpRY/kHhEsmsA=
+	t=1725952687; cv=none; b=Bm6yJAH9Q+rAhep5JrK0fd4heckkrtctBPPT1a80xw6/FksLlP8pBztvadl62UHB8GyCK/jycOh3lJt42sxTLJJo+Xu+uXhhDqONMwqb/g4q4qOULSQmbTDOOj/Uu/qzHXjgwsGuBaDWWA+XpGOJiDGJ+eLQLUZDqhDwJfcTHcc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725952533; c=relaxed/simple;
-	bh=LVH6SKkK3cR6F01hpn7fuEDkydoETs1y5yzB1IbWltg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LqX61u4ZKJZXeyxjhsjLliD/iwCNQnuYXf6z5FSmsJMsv9JrZTFinelPL1irQ7XYTwMdxUkABgU9afSNrTtRVMUXgARQgw786DvS9AtLN7BOIKDzOEnLwuD1UZK0wcB4cZKKaL6mrYsC0Ptnbtntue0gddOd1PpKl3FQLchP/ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=T2k9wACp; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DCAD160002;
-	Tue, 10 Sep 2024 07:15:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1725952528;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rQ60DBGOv0B3Rr4ZO4jWbLjG2NSGTwvc1sph6GoxX64=;
-	b=T2k9wACpNqFS6Y/LfZX/9lL19y7XpkmY0D8tW4yduHEuaZ3YAJjb54VlFkNWF5h8NqCKk5
-	oCDMJEO+gwOWuU8n0VllVqzrkZvV6DDVAUvIwKlq06W/wJqpPPliXIM4fXHWhyeeQQDq/U
-	LzcCH/h7rTaOsw4+H6hWkSD0UEawycl4dC2YbLvoA0P85Q3r0ZXU07DImr9EFrTiXjSLtK
-	xq0TpVOylr0h8eg9dCjktJ6bBOxFq7gI4QRRltNDefDeVnoMLf10ZRD1DGESjNZ3wGICqm
-	HWhFpE8UvoOozxGsCVGsRS+qtX+tj+5z6lUwjJOFybc5ANvFCbCZaKsoPgURSQ==
-Message-ID: <b5814f3f-d262-4577-834c-a48bbcc8d005@bootlin.com>
-Date: Tue, 10 Sep 2024 09:15:26 +0200
+	s=arc-20240116; t=1725952687; c=relaxed/simple;
+	bh=OnyMkOUZUp3mVLWHnjm3K66y8reg6sgBhI6dE1mMjYk=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=aeMYopslueJOyVOgEWG9KJsS5WHsehIfvP+Tpvt75kg5CC09BG83YTiNEd9VUg/34NJzpSgYuEb1R/2zNXMAXp34rubXf2DEmnnCsc4MrOkPfNHzkSJ6L8n4gBSPbNCQ1nXOosHz4ZOsPIEsRiX8vb0oGdj7YkFLt9KhrtsgU08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JGenVeDF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1BE0C4CEC3;
+	Tue, 10 Sep 2024 07:18:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725952686;
+	bh=OnyMkOUZUp3mVLWHnjm3K66y8reg6sgBhI6dE1mMjYk=;
+	h=From:Subject:Date:To:Cc:From;
+	b=JGenVeDFkaAhwiBhE0wl3TChSfLAhJqBLTUSvjz35IZrYtVTkYoZKoqFDBjMbr3HL
+	 EPv1gsURNVPR7cnsm1ydTcJnLovAqNI0CoWJftiEH69y6QqQDM7+OMw179jrQ+xESk
+	 mjPxHhxeFiBMHDFEXoNwab1vuuPoOHsiuR6R/Xq3uUbr1sDnLi6Kf/NaYbFVUiGuJ9
+	 RHGPiqyzd789VIslYGWeV67fnw6yht/HCoGVhWgFrxW2jHL95m4Pte6xpfqIw3JdJU
+	 l7aI9/sWDWzvgIejwPNTPHRFEqZG5P3L4FFTkn8XzEyHMREAFMdETDg/x8BfPzJpCW
+	 Gy9u1hJUN0FgA==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next 0/3] net: ethernet: ti: Address some warnings
+Date: Tue, 10 Sep 2024 08:17:55 +0100
+Message-Id: <20240910-ti-warn-v1-0-afd1e404abbe@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] selftests/bpf: convert test_xdp_features.sh to
- test_progs
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>, ebpf@linuxfoundation.org,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-References: <20240909-convert_xdp_tests-v1-1-925be5fbee3c@bootlin.com>
- <20240909231800.72b6b328@fedora.home>
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20240909231800.72b6b328@fedora.home>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKPy32YC/x3MQQqAIBBA0avErBtQKdCuEi3KxprNFColRHdPW
+ j74/AcSRaYEQ/NApIsTH1Kh2wb8PstGyGs1GGU65bTCzHjPUXBd/OI6a03oDdT6jBS4/KcRhDI
+ KlQzT+34RCdTcYwAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+ Roger Quadros <rogerq@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+Cc: netdev@vger.kernel.org, linux-omap@vger.kernel.org, 
+ llvm@lists.linux.dev
+X-Mailer: b4 0.14.0
 
-Hey Maxime,
+Hi,
 
-On 9/9/24 23:18, Maxime Chevallier wrote:
-> Hi Alexis,
-> 
-> On Mon, 09 Sep 2024 22:02:07 +0200
-> Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com> wrote:
+This patchset addresses some warnings flagged by Sparse, and clang-18 in
+TI Ethernet drivers.
 
-[...]
+Although these changes do not alter the functionality of the code, by
+addressing them real problems introduced in future which are flagged by
+tooling will stand out more readily.
 
->> +static void *run_dut_echo_thread(void *arg)
->> +{
->> +	struct test_data *t = (struct test_data *)arg;
->> +	__u32 magic;
->> +
->> +	while (!t->quit_dut_echo_thread) {
->> +		struct sockaddr_storage addr;
->> +		socklen_t addrlen;
->> +		size_t n;
->> +
->> +		n = recvfrom(t->echo_server_sock, &magic, sizeof(magic),
->> +			     MSG_WAITALL, (struct sockaddr *)&addr, &addrlen);
->> +		if (n != sizeof(magic)) {
->> +			usleep(LOOP_DELAY_US);
->> +			continue;
->> +		}
->> +
->> +		if (htonl(magic) != CMD_ECHO)
->> +			continue;
-> 
-> Shouldn't it be ntohl here ? The former code used the ntohs helper for
-> that command, and you're sending the magic in send_echo_msg with a
-> htonl() so I guess here you might want to convert the value back to
-> host endianness.
+Compile tested only.
 
-You are right, silly mistake from me here :) That will be fixed in v2. I'll
-delay a bit before sending it to allow others to take a look at v1 too.
+---
+Simon Horman (3):
+      net: ethernet: ti: am65-cpsw: Address __percpu Sparse warnings
+      net: ethernet: ti: am65-cpsw: Use __be64 type for id_temp
+      net: ethernet: ti: cpsw_ale: Remove unused accessor functions
 
-Thanks,
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c |  8 +++-----
+ drivers/net/ethernet/ti/cpsw_ale.c       | 30 +++++++++++++++++++++---------
+ 2 files changed, 24 insertions(+), 14 deletions(-)
 
-Alexis
-> 
-> Thanks,
-> 
-> Maxime
-> 
-
--- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+base-commit: a9b1fab3b69f163bbe7a012d0c3f6b5204500c05
 
 
