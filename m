@@ -1,69 +1,112 @@
-Return-Path: <netdev+bounces-127031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F5A2973B8E
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:23:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0231973BF3
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:30:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C208F285E9C
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:23:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CB1BB2739A
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:30:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE0E19412D;
-	Tue, 10 Sep 2024 15:19:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB3F19E972;
+	Tue, 10 Sep 2024 15:29:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZhbRoA+b"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="UBs++z1T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24697187FFF;
-	Tue, 10 Sep 2024 15:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E91719DF8D;
+	Tue, 10 Sep 2024 15:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725981589; cv=none; b=VdjV6s70Y0gsQCEibVHiwZbVGNTWv/90bTMVLlQ9Xk8FAsd0EAK07nHL6D4muUWd55P9hfN2/b/Agb1vqHH4jKqZYILblVI1k1YePQTPkT8QE2Tc615fq4ZQrXvKJhIW1Dmt2MzN8I7GOgLGsn2D8ER+V9/2gd0E0yEEv+Vp93c=
+	t=1725982175; cv=none; b=geA3Xp8mVOE2YLjZErcMfCE15vTlzr18eB88wEARRK/KK3lSRwhB1F6BacR0zy3S5r3sB9euT5ElXaYPSMy/l/n9bP5U/x4jsOGKnxYWZ87eZ8sgIvsUH/jbFYzA/K8C9+6cwLprjGbvrbESN4y/a5+H+XZybhxTZERUQkkRPSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725981589; c=relaxed/simple;
-	bh=g6MRt2X0IezHPsQOUsCC6hfgBU7YvQ6y7IEwJ4E2BkE=;
-	h=Date:From:To:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hy8XwA4Md0GhAOctU+mIj5sAQLuXA6yABH9I3F25CrECKYpVrn5Ym3CQq+4a5W0thkyTgBp6r78zUFAjIFfmgwTOGIZJSyASTneDgD9agmu1FXQj67bd28LtEakjUwmZI4v3YbU0V3h9IASgvv/5sXcKrtyE5HwWzxzYkzCryd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZhbRoA+b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 786BBC4CEC3;
-	Tue, 10 Sep 2024 15:19:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725981588;
-	bh=g6MRt2X0IezHPsQOUsCC6hfgBU7YvQ6y7IEwJ4E2BkE=;
-	h=Date:From:To:Subject:In-Reply-To:References:From;
-	b=ZhbRoA+bkY6aUD/PhRR6YIskIrshkdmHLDG/qxqJ0/7SCIE9bRZB2aV8se997DeQf
-	 gUp/Z4zHvMZCKgPaa2Cm9x0YbUpMaIhMspoKka/ulp1dkZObe48Sh8MdS0cG/AQ2TK
-	 npalG++xO7Np3RCyJLWUXtkkxR13rx4q1DTeXLS6DAczN4gJe8SxPoh3TU2CLREDJi
-	 gEZ6lV5vmRLO326Y7sUL9wpXSylqnDy7NzAR5WibD2r+XKLzh6RnMcfazr+nOYXoZ9
-	 +gMVKA/G8JG3DhxC5muRSSt14LwaUvZyl5H6C5FGp/6YgdYcpIQ9XLxDyf8i640e+h
-	 +sJulHngwkDsw==
-Date: Tue, 10 Sep 2024 08:19:47 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [ANN] netdev call - Sep 10th
-Message-ID: <20240910081947.2b98da16@kernel.org>
-In-Reply-To: <20240909155146.1c19d5c8@kernel.org>
-References: <20240909155146.1c19d5c8@kernel.org>
+	s=arc-20240116; t=1725982175; c=relaxed/simple;
+	bh=jFmVaKmmHNZGFdYN0+VBcVRTpDAGMmgTlh0VFcnyDeM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jOFOMGBAetLE1S3fe+M/adihVj7spxs4T2gncRDE6YD1xdx14MDT5NWeUtAY8YPUOsM4Q1dfI90IraC0BNUxfMH0nrpvCD8nx+p87ZZ2jwyvBQ2nrlSvdYyNSh8SVsy93qyU1Ze/7dvvVLHaXOw/NAytUmWIkqwhyNhQ9c+xXDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=UBs++z1T; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=ArzjG
+	6hUzs5vAOb1Re2raUqKbqfoIYdw23kvQ0HX0h8=; b=UBs++z1TUdzNiZZfcdbNG
+	/tCoEF1fb/YznAwlxUKPp7SEGfhnw6vhtZLJqZbu9DxNhNNfl0go+E2iGDEUA66q
+	Cibm0gwvDBtAfCqSBYKb95fGGQLyGWI0CW67bBE0kU/lYdI/ARx/Z3RH+zw0tU35
+	W13zgY75k+WaOXfM4QfLSM=
+Received: from iZbp1asjb3cy8ks0srf007Z.. (unknown [120.26.85.94])
+	by gzga-smtp-mta-g3-2 (Coremail) with SMTP id _____wAXhZE+ZeBm0yOpIQ--.61635S2;
+	Tue, 10 Sep 2024 23:26:55 +0800 (CST)
+From: Qianqiang Liu <qianqiang.liu@163.com>
+To: chris.snook@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Qianqiang Liu <qianqiang.liu@163.com>
+Subject: [PATCH] net: ag71xx: remove dead code path
+Date: Tue, 10 Sep 2024 23:22:54 +0800
+Message-Id: <20240910152254.21238-1-qianqiang.liu@163.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAXhZE+ZeBm0yOpIQ--.61635S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KF48uw48CF48Gry7Gr48WFg_yoW8Jw17pr
+	43Kay8Kr48CF18Ja48Zr4xZF98GayvyrZIgry3G3yFvF1UAr4YqFy7KFWUKr1xWrWFkw1a
+	vw1FyF12yFsxJwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UhNVPUUUUU=
+X-CM-SenderInfo: xtld01pldqwhxolxqiywtou0bp/1tbiRQFWamXAo0w+iwAAsH
 
-On Mon, 9 Sep 2024 15:51:46 -0700 Jakub Kicinski wrote:
-> The bi-weekly call is scheduled for tomorrow at 8:30 am (PT) / 
-> 5:30 pm (~EU), at https://bbb.lwn.net/rooms/ldm-chf-zxx-we7/join
-> (yes, that is the right link, sorry for sharing old one last time).
-> 
-> No agenda, yet, please propose. I will cancel if nobody replies
-> with topics on the list.
+The 'err' is always zero, so the following branch can never be executed:
+if (err) {
+	ndev->stats.rx_dropped++;
+	kfree_skb(skb);
+}
+Therefore, the 'if' statement can be removed.
 
-Alright, no topics, so - canceled!
+Signed-off-by: Qianqiang Liu <qianqiang.liu@163.com>
+---
+ drivers/net/ethernet/atheros/ag71xx.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+index 96a6189cc31e..5477f3f87e10 100644
+--- a/drivers/net/ethernet/atheros/ag71xx.c
++++ b/drivers/net/ethernet/atheros/ag71xx.c
+@@ -1616,7 +1616,6 @@ static int ag71xx_rx_packets(struct ag71xx *ag, int limit)
+ 		unsigned int i = ring->curr & ring_mask;
+ 		struct ag71xx_desc *desc = ag71xx_ring_desc(ring, i);
+ 		int pktlen;
+-		int err = 0;
+ 
+ 		if (ag71xx_desc_empty(desc))
+ 			break;
+@@ -1646,14 +1645,9 @@ static int ag71xx_rx_packets(struct ag71xx *ag, int limit)
+ 		skb_reserve(skb, offset);
+ 		skb_put(skb, pktlen);
+ 
+-		if (err) {
+-			ndev->stats.rx_dropped++;
+-			kfree_skb(skb);
+-		} else {
+-			skb->dev = ndev;
+-			skb->ip_summed = CHECKSUM_NONE;
+-			list_add_tail(&skb->list, &rx_list);
+-		}
++		skb->dev = ndev;
++		skb->ip_summed = CHECKSUM_NONE;
++		list_add_tail(&skb->list, &rx_list);
+ 
+ next:
+ 		ring->buf[i].rx.rx_buf = NULL;
+-- 
+2.39.2
+
 
