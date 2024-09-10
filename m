@@ -1,95 +1,151 @@
-Return-Path: <netdev+bounces-127025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F6AB973AC9
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:00:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 269CA973AD0
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:01:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51CC81C24AD5
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:00:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AE30B21AA7
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 15:01:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6FD192D9D;
-	Tue, 10 Sep 2024 15:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85278156C69;
+	Tue, 10 Sep 2024 15:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tA8SZ7g/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mB61+Kfa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E85A130495;
-	Tue, 10 Sep 2024 15:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D726F305;
+	Tue, 10 Sep 2024 15:00:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725980431; cv=none; b=CXdeKMASVxIbYB1N5E9JjqK1Fw7x9SJvtiYs23XL7bS98Bx8CEBRSXF3yoW30krjOkRG/WoCVerfsYIfCnWphPpAdmP6iVh9BK+0mow/R81fzQyPOP6hzFBMz3cr/96RyvydroHtcaP3WP6Cjlc2oUJVZWu9jy2aHgZjmJisMms=
+	t=1725980456; cv=none; b=TC0vLC/3Kx3m0WSuFHGTTcBU+YEFopGT0oj8pWxIYrJrk2G1xi4L+9yb5GOxwudF7kaxYyyt/WLBjp/uQUG3kTxrmT0ihjekSQn0ZZZEcNgeMgK6Cf1enaM75/U1ZDR/3Gyo3+Lw8iw+oPv1ZDjxMU7sXBp40ocr0antr7rukCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725980431; c=relaxed/simple;
-	bh=7vVe+kPQm7LdEuy1q3f3ICanaOlQ9fti1HVs2FHxLLk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uZ1Oo4EzfeckR8WuO6xUL/0hLvHjEsA7n/p/Vqh6yUDYRdcskMR0aPoayd2hmFJY5SpTK6wo7CXq/gZuzE7K86KG9vmIcoEk5grDSwhFe/v5Sdh0PVsxWD0nfFhyNTFvZmabWZrX0vfVO5rpgz+Gl1ORYD8bgCJJglcPu0ReqY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tA8SZ7g/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5D34C4CEC3;
-	Tue, 10 Sep 2024 15:00:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725980431;
-	bh=7vVe+kPQm7LdEuy1q3f3ICanaOlQ9fti1HVs2FHxLLk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tA8SZ7g/4QP4sGbMqHiBbBzbBV/Rh+DoYKeKl5Ii/YQyZRIRUUMHOxFfCVaBrJXiE
-	 natEnmjxUIDJwPaXy6LLAjlX6s/4RIVGmPhnsh4Ca+S8X4e/TJR9DKaHq6WLBCYXkU
-	 oSI8ZciywI9mPw/B3+7+jYWZKExbXcWbNceUU6c0cqw49SXtZTpesQomckLpDeC5AR
-	 LDQtvzeZjkcHSFZ9WNgNL4XiQ690k3WNf93muaFhn62LBreMaql3JaR5UhgMe975KA
-	 6SJmDVW7lB5powxsHmPdmfWUMYz4MLJvzjz8vV4lzE+VVCFlVDPWF1gv0HrIP1DG6D
-	 t9D2lGbAuJauw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3400A3804CAB;
-	Tue, 10 Sep 2024 15:00:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1725980456; c=relaxed/simple;
+	bh=j7tjGVSW8H3+q0t9e0IaeNfipepQz25epPeXce/Z4AA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UZYMheiSUtGj8QyqehUgyrHZQENNXQGfSW8BqnuMHJqVXal8Rsgj315zFOJi8sKZLXWXor0IqZtXRcKtZc/l5XrTdRYoanA/vWhM6DeXsqKCvONgvzrkKEBBjMPucXNeb+hAr3DFKrkpxH6hW1XnVQJaXHvrYesaFHIQBDtqCKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mB61+Kfa; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725980455; x=1757516455;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=j7tjGVSW8H3+q0t9e0IaeNfipepQz25epPeXce/Z4AA=;
+  b=mB61+Kfa4H0OZ0RRHKYPlo36wPVKKTmlKbYXhymQen5IAUFel1s9uDWy
+   uCshamx4KI79sNVR3MJGeHAkLRko4oujdYWGPdDlMbBAmxzn2ELuVuS3c
+   dPtvIBaxPpO5mmTPMvwvj9/nVhtICYmWfu0BH0G4V0i5roK+dvmwODHkq
+   T5lOTtFwmS0DIPJseduQMoDU5ZGXq2tTY5HCFf1vBKGNdASTeO0ssEGFH
+   1v4B7PDRM8ZV+bGfLl5y8zKt6GWyTSMPVVs1bbozrf/kDNlkCT3o3gW9V
+   /LNBADa5AHUXMbWeyygu4wcBgWqmZhp00KSaPAr5WMJpT49AE5oyZqBIz
+   A==;
+X-CSE-ConnectionGUID: +vf6wpRuQwSTbuA1dYsZ5Q==
+X-CSE-MsgGUID: 8/k93VU8TaS36IiNEBCwzg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11191"; a="24880241"
+X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
+   d="scan'208";a="24880241"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 08:00:49 -0700
+X-CSE-ConnectionGUID: T8gd7uDyQnSWOWsUCSSmKQ==
+X-CSE-MsgGUID: PGauhd31SA+bb4UACjoxSQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
+   d="scan'208";a="67824809"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 10 Sep 2024 08:00:46 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1so2MF-0002Ea-0t;
+	Tue, 10 Sep 2024 15:00:43 +0000
+Date: Tue, 10 Sep 2024 23:00:34 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jeongjun Park <aha310510@gmail.com>, davem@davemloft.net,
+	dsahern@kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, kafai@fb.com, weiwan@google.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jeongjun Park <aha310510@gmail.com>
+Subject: Re: [PATCH net] net: prevent NULL pointer dereference in
+ rt_fibinfo_free() and rt_fibinfo_free_cpus()
+Message-ID: <202409102210.krjQJVRr-lkp@intel.com>
+References: <20240909184827.123071-1-aha310510@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] Bluetooth: replace deprecated strncpy with strscpy_pad
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <172598043203.283578.7669553872558102167.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Sep 2024 15:00:32 +0000
-References: <20240905-strncpy-net-bluetooth-cmtp-capi-c-v1-1-c2d49caa2d36@google.com>
-In-Reply-To: <20240905-strncpy-net-bluetooth-cmtp-capi-c-v1-1-c2d49caa2d36@google.com>
-To: Justin Stitt <justinstitt@google.com>
-Cc: isdn@linux-pingi.de, marcel@holtmann.org, johan.hedberg@gmail.com,
- luiz.dentz@gmail.com, netdev@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- kees@kernel.org, linux-hardening@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240909184827.123071-1-aha310510@gmail.com>
 
-Hello:
+Hi Jeongjun,
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+kernel test robot noticed the following build warnings:
 
-On Thu, 05 Sep 2024 15:54:40 -0700 you wrote:
-> strncpy() is deprecated for use on NUL-terminated destination strings [0]
-> and as such we should prefer more robust and less ambiguous string interfaces.
-> 
-> The CAPI (part II) [1] states that the manufacturer id should be a
-> "zero-terminated ASCII string" and should "always [be] zero-terminated."
-> 
-> Much the same for the serial number: "The serial number, a seven-digit
-> number coded as a zero-terminated ASCII string".
-> 
-> [...]
+[auto build test WARNING on net/main]
 
-Here is the summary with links:
-  - Bluetooth: replace deprecated strncpy with strscpy_pad
-    https://git.kernel.org/bluetooth/bluetooth-next/c/278dcc36b992
+url:    https://github.com/intel-lab-lkp/linux/commits/Jeongjun-Park/net-prevent-NULL-pointer-dereference-in-rt_fibinfo_free-and-rt_fibinfo_free_cpus/20240910-025008
+base:   net/main
+patch link:    https://lore.kernel.org/r/20240909184827.123071-1-aha310510%40gmail.com
+patch subject: [PATCH net] net: prevent NULL pointer dereference in rt_fibinfo_free() and rt_fibinfo_free_cpus()
+config: arc-randconfig-002-20240910 (https://download.01.org/0day-ci/archive/20240910/202409102210.krjQJVRr-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240910/202409102210.krjQJVRr-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409102210.krjQJVRr-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   net/ipv4/fib_semantics.c: In function 'rt_fibinfo_free':
+>> net/ipv4/fib_semantics.c:156:13: warning: the comparison will always evaluate as 'true' for the address of 'dst' will never be NULL [-Waddress]
+     156 |         if (!&rt->dst)
+         |             ^
+   In file included from include/net/ip.h:30,
+                    from net/ipv4/fib_semantics.c:37:
+   include/net/route.h:56:33: note: 'dst' declared here
+      56 |         struct dst_entry        dst;
+         |                                 ^~~
+   net/ipv4/fib_semantics.c: In function 'rt_fibinfo_free_cpus':
+   net/ipv4/fib_semantics.c:209:21: warning: the comparison will always evaluate as 'true' for the address of 'dst' will never be NULL [-Waddress]
+     209 |                 if (!&rt->dst)
+         |                     ^
+   include/net/route.h:56:33: note: 'dst' declared here
+      56 |         struct dst_entry        dst;
+         |                                 ^~~
+
+
+vim +156 net/ipv4/fib_semantics.c
+
+   149	
+   150	static void rt_fibinfo_free(struct rtable __rcu **rtp)
+   151	{
+   152		struct rtable *rt = rcu_dereference_protected(*rtp, 1);
+   153	
+   154		if (!rt)
+   155			return;
+ > 156		if (!&rt->dst)
+   157			return;
+   158	
+   159		/* Not even needed : RCU_INIT_POINTER(*rtp, NULL);
+   160		 * because we waited an RCU grace period before calling
+   161		 * free_fib_info_rcu()
+   162		 */
+   163	
+   164		dst_dev_put(&rt->dst);
+   165		dst_release_immediate(&rt->dst);
+   166	}
+   167	
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
