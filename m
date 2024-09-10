@@ -1,170 +1,264 @@
-Return-Path: <netdev+bounces-127082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D57C9973FDC
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:33:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C6989740E7
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 19:44:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25EDAB2482F
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:33:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 075BCB295F6
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 17:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F891BF33C;
-	Tue, 10 Sep 2024 17:23:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2995A1A38D9;
+	Tue, 10 Sep 2024 17:38:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c3XADfnQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AWPvvdtr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4575B1BF30B
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 17:23:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE63619D8A4;
+	Tue, 10 Sep 2024 17:38:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725989027; cv=none; b=YuAPmfUD9WE3y/zAgxBopq/OkLTX/JApLE1cFQxLUSJuPqCaQwA9wg7kmsX3lD3eOHEWXbzJQaPL+2YZPpR5PDeqLB7rH7OolDegLTqmgqmBCR1DL16Jmk4V1KKU8KvhO7dl3ExRdnOenxyWmDa/ZC/cDPXBJW9xaD4RwjLArEw=
+	t=1725989916; cv=none; b=Yb4IIv3Quh4rlN0ST/SGFQILsMMtPE5HFnGXY6sB6I3dgPZePOPBva5D9ueUycjFgKA3iED1yc0NL3Wq0fOa1rn/+IqeYd1gUScnSmXWNwYQIr9OPl3RPTk8lpGqikLXvrK7n1FUuz1FTsP4vYIFXee8Lu7jhLJSC4AYUyT6eCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725989027; c=relaxed/simple;
-	bh=cwljm74luVO5e4l1ekmKrtc1UWVIFq8KDx2FNieUIok=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=toLxkTa7fEfbrv+cRtkFs3q2OL0hN2oB/U2YcfU4rFKMebeBHu+8PWvD2vof5zip1mQJAwVVa8pM0YKrIe/Wj+DrmNkftKJPw/Uo+D64ldbQ86P8OjSfvmuVEbdqapj7AUPTvPeO9Ufq62WARSdCIvHE+MbHKaoNYqbvk0n4hg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c3XADfnQ; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a8d0d82e76aso16194066b.3
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 10:23:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1725989024; x=1726593824; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tGgqOlCUn95hobX0YX6rcgMk2qcy9JjHjUpxhldUGPk=;
-        b=c3XADfnQGvSLwsprzznkGCXYJVISVgL24gVDqnjgJ2kb15sStA27N6zbEFqqzM6WsM
-         7MNn36Llykj0Jci2MqgOr6ddvDsmrgjjcvDlCkAPpFQ3LoX6VmLIUmGgWrRR5hQMvRKU
-         kxxDA2fqe5CekdCrcjWLj6MXF3lJVtLu157twmRLQNpAL4gq+22yOSF0ju1ZuurVmlaF
-         D2e6OhIggZPiiB7A5e7FVfbT/bKR+LHzr34NJlaqUSrGr2ZgVWzSMz2YWNW4kQYRoRx9
-         nACMLcgZLOFF84cXcGR3+VeXOBr0noWQ5aM9IDSJbPaxMjLHtEa5TcC6lt6e9e5Lln+V
-         wJNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725989024; x=1726593824;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tGgqOlCUn95hobX0YX6rcgMk2qcy9JjHjUpxhldUGPk=;
-        b=uzTEaGPtGkxniU/sIzOK7VpRtRh7RTPN+6XVaHwiGbN5UpVh+SwUK1cVNHvmMJEZRt
-         p4RuFjjaMpitAwyiNDMPY3J9ARdz0JZ832zwLXLKxl3WeiUihBzI2evwlvD8ATonw8hc
-         vgim2VVNLwbm/fqgbS7DLHt4hJslCimBe9yvxX+zCJ27CK38ITHeKPvF3RPDje5NismJ
-         FVylQQd+D/sECptShpUpW3eM7tJPNP/SxFqfWgtYoOGcRdV7Ztp4U5ePwL7NYE1ntfbW
-         6LEqBi8NwBjIATlU3ir0hcjZtntA7rrthKKGyfkh++gNqeGZpkiehLIYw2I0ArgXKNkh
-         pFDA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8TxAvovAfcYPJ/Ha1FHOHcGvTulG8/Eu7BU957eMjj9kUK3KJtaKkw0POSIxg4WGEh3X7NC8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywa4k/u5ZY7MDB/g63h2sbQ5O2H5zOrT297jU2/lblAT997nr8N
-	0FYWdokMBUiwr1UMF5zQjuSnYxapdEU/w546O1Aag7o9kf3cQYPyIWO/h/aCEidXT3DwCVzM4Ee
-	uYljIMsr/G6mzx6UddQLWRXb+HCNdlLBkVS7s
-X-Google-Smtp-Source: AGHT+IF8UdrAEx9jcrmShfHoP/xocZ4z2EyxKqrKVfdtU5YG9dM3CP7WcLiNIc7Had7soIp+4AkGJwiZsoN6njgJlbM=
-X-Received: by 2002:a17:907:3682:b0:a86:a866:9e26 with SMTP id
- a640c23a62f3a-a8ffaaa4c30mr215958766b.3.1725989022916; Tue, 10 Sep 2024
- 10:23:42 -0700 (PDT)
+	s=arc-20240116; t=1725989916; c=relaxed/simple;
+	bh=V3TbLJmBJh/RUf9NWcwcwaoIBu22nRcRBhAdtaOmmx8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RWR6xzLvtBSrTe00aXpNPRS0okBCyYNlSUvyOZNk78T64LhKWs+3iyC9HK/C2vd5MThUkzG++jokw63Ni0jZP0ZIvFs2xRNT/yU3SMqtnoEI64LvF5RJHAkUe2PqT7qcUlhwMZ6MxFqYorrBM6x5kxEbkGMj9fAtmyEPWbmTzPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AWPvvdtr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B858DC4CEC3;
+	Tue, 10 Sep 2024 17:38:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725989915;
+	bh=V3TbLJmBJh/RUf9NWcwcwaoIBu22nRcRBhAdtaOmmx8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AWPvvdtrGpaFnZ+m8UY7CkqmlFRy01oDMQ/Fm1mmY4ngdlWzr4Y/IiJAU7kT9mLeh
+	 is/CNN0NsNBzzmunj1KK2/ekwLSPbcWcJXJHoUv5S/ZJo8EFpiLozzZiLLWzPXEe2E
+	 eKbv7jZZJ2XkT5dgFCYghrnjYUKM7ilMuSnlfYLbym8KIOL2BSl/LSp0bQYvWaWQH3
+	 AmQuwZUZ6qks7UzltsK3B1JepLiCcWu4usFhOfu07iALagnGlIw+b6ffpdHbVwOsDd
+	 Ed77C3JcTDTGGZYNF/03tM5nkIpBkLpBEWE8odtdC8zl5uRkC2Rhe2l13o+Qg1Rx2l
+	 Bck14E5flotXw==
+Message-ID: <7df37a43-e2d6-4775-859d-1ca05f456e21@kernel.org>
+Date: Tue, 10 Sep 2024 20:38:28 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240821151009.1681151-1-maxime.chevallier@bootlin.com>
- <20240821151009.1681151-8-maxime.chevallier@bootlin.com> <CANn89iLQYsyADrdW04PpuxEdAEhBkVQm+uVV8=CDmX_Fswdvrw@mail.gmail.com>
- <20240910192020.5ab9cd16@fedora.home>
-In-Reply-To: <20240910192020.5ab9cd16@fedora.home>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 10 Sep 2024 19:23:30 +0200
-Message-ID: <CANn89iKRW0WpGAh1tKqY345D8WkYCPm3Y9ym--Si42JZrQAu1g@mail.gmail.com>
-Subject: Re: [PATCH net-next v18 07/13] net: ethtool: Introduce a command to
- list PHYs on an interface
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, =?UTF-8?B?TWFyZWsgQmVow7pu?= <kabel@kernel.org>, 
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>, 
-	=?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>, 
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org, 
-	Nathan Chancellor <nathan@kernel.org>, Antoine Tenart <atenart@kernel.org>, 
-	Marc Kleine-Budde <mkl@pengutronix.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Romain Gantois <romain.gantois@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 4/5] net: ti: icssg-prueth: Enable HSR Tx
+ duplication, Tx Tag and Rx Tag offload
+To: MD Danish Anwar <danishanwar@ti.com>, robh@kernel.org,
+ jan.kiszka@siemens.com, dan.carpenter@linaro.org, saikrishnag@marvell.com,
+ andrew@lunn.ch, javier.carrasco.cruz@gmail.com, jacob.e.keller@intel.com,
+ diogo.ivo@siemens.com, horms@kernel.org, richardcochran@gmail.com,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, srk@ti.com,
+ Vignesh Raghavendra <vigneshr@ti.com>,
+ Ravi Gunasekaran <r-gunasekaran@ti.com>
+References: <20240906111538.1259418-1-danishanwar@ti.com>
+ <20240906111538.1259418-5-danishanwar@ti.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <20240906111538.1259418-5-danishanwar@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 10, 2024 at 7:20=E2=80=AFPM Maxime Chevallier
-<maxime.chevallier@bootlin.com> wrote:
->
-> Hello Eric,
->
-> On Tue, 10 Sep 2024 18:41:03 +0200
-> Eric Dumazet <edumazet@google.com> wrote:
->
-> > > +int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info)
-> > > +{
-> > > +       struct phy_req_info req_info =3D {};
-> > > +       struct nlattr **tb =3D info->attrs;
-> > > +       struct sk_buff *rskb;
-> > > +       void *reply_payload;
-> > > +       int reply_len;
-> > > +       int ret;
-> > > +
-> > > +       ret =3D ethnl_parse_header_dev_get(&req_info.base,
-> > > +                                        tb[ETHTOOL_A_PHY_HEADER],
-> > > +                                        genl_info_net(info), info->e=
-xtack,
-> > > +                                        true);
-> > > +       if (ret < 0)
-> > > +               return ret;
-> > > +
-> > > +       rtnl_lock();
-> > > +
-> > > +       ret =3D ethnl_phy_parse_request(&req_info.base, tb, info->ext=
-ack);
-> > > +       if (ret < 0)
-> > > +               goto err_unlock_rtnl;
-> > > +
-> > > +       /* No PHY, return early */
-> >
-> > I got a syzbot report here.
->
-> I seem to have missed the report, sorry about that.
->
-> >
-> > Should we fix this with :
-> >
-> > diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
-> > index 560dd039c6625ac0925a0f28c14ce77cf768b6a5..4ef7c6e32d1087dc71acb46=
-7f9cd2ab8faf4dc39
-> > 100644
-> > --- a/net/ethtool/phy.c
-> > +++ b/net/ethtool/phy.c
-> > @@ -164,7 +164,7 @@ int ethnl_phy_doit(struct sk_buff *skb, struct
-> > genl_info *info)
-> >                 goto err_unlock_rtnl;
-> >
-> >         /* No PHY, return early */
-> > -       if (!req_info.pdn->phy)
-> > +       if (!req_info.pdn)
-> >                 goto err_unlock_rtnl;
-> >
-> >         ret =3D ethnl_phy_reply_size(&req_info.base, info->extack);
-> >
-> >
->
-> Indeed that's the correct fix. Should I send it ? ( including
-> suggested-by/reported-by )
 
-Yes please, go ahead.
 
->
-> Thanks,
->
-> Maxime
+On 06/09/2024 14:15, MD Danish Anwar wrote:
+> From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+> 
+> The HSR stack allows to offload its Tx packet duplication functionality to
+> the hardware. Enable this offloading feature for ICSSG driver. Add support
+> to offload HSR Tx Tag Insertion and Rx Tag Removal and duplicate discard.
+> 
+> Inorder to enable hsr-tag-ins-offload, hsr-dup-offload must also be enabled
+
+"In order"
+
+> as these are tightly coupled in the firmware implementation.
+> 
+> Duplicate discard is done as part of RX tag removal and it is
+> done by the firmware. When driver sends the r30 command
+> ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE, firmware does RX tag removal as well as
+> duplicate discard.
+> 
+> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> ---
+>  drivers/net/ethernet/ti/icssg/icssg_common.c | 18 ++++++++++---
+>  drivers/net/ethernet/ti/icssg/icssg_config.c |  4 ++-
+>  drivers/net/ethernet/ti/icssg/icssg_config.h |  2 ++
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.c | 28 +++++++++++++++++++-
+>  drivers/net/ethernet/ti/icssg/icssg_prueth.h |  3 +++
+>  5 files changed, 50 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_common.c b/drivers/net/ethernet/ti/icssg/icssg_common.c
+> index b9d8a93d1680..fdebeb2f84e0 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_common.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_common.c
+> @@ -660,14 +660,15 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
+>  {
+>  	struct cppi5_host_desc_t *first_desc, *next_desc, *cur_desc;
+>  	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct prueth *prueth = emac->prueth;
+>  	struct netdev_queue *netif_txq;
+>  	struct prueth_tx_chn *tx_chn;
+>  	dma_addr_t desc_dma, buf_dma;
+> +	u32 pkt_len, dst_tag_id;
+>  	int i, ret = 0, q_idx;
+>  	bool in_tx_ts = 0;
+>  	int tx_ts_cookie;
+>  	void **swdata;
+> -	u32 pkt_len;
+>  	u32 *epib;
+>  
+>  	pkt_len = skb_headlen(skb);
+> @@ -712,9 +713,20 @@ enum netdev_tx icssg_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev
+>  
+>  	/* set dst tag to indicate internal qid at the firmware which is at
+>  	 * bit8..bit15. bit0..bit7 indicates port num for directed
+> -	 * packets in case of switch mode operation
+> +	 * packets in case of switch mode operation and port num 0
+> +	 * for undirected packets in case of HSR offload mode
+>  	 */
+> -	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, (emac->port_id | (q_idx << 8)));
+> +	dst_tag_id = emac->port_id | (q_idx << 8);
+> +
+> +	if (prueth->is_hsr_offload_mode &&
+> +	    (ndev->features & NETIF_F_HW_HSR_DUP))
+> +		dst_tag_id = PRUETH_UNDIRECTED_PKT_DST_TAG;
+> +
+> +	if (prueth->is_hsr_offload_mode &&
+> +	    (ndev->features & NETIF_F_HW_HSR_TAG_INS))
+> +		epib[1] |= PRUETH_UNDIRECTED_PKT_TAG_INS;
+> +
+> +	cppi5_desc_set_tags_ids(&first_desc->hdr, 0, dst_tag_id);
+>  	k3_udma_glue_tx_dma_to_cppi5_addr(tx_chn->tx_chn, &buf_dma);
+>  	cppi5_hdesc_attach_buf(first_desc, buf_dma, pkt_len, buf_dma, pkt_len);
+>  	swdata = cppi5_hdesc_get_swdata(first_desc);
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+> index 7b2e6c192ff3..72ace151d8e9 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+> @@ -531,7 +531,9 @@ static const struct icssg_r30_cmd emac_r32_bitmask[] = {
+>  	{{EMAC_NONE,  0xffff4000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx ENABLE*/
+>  	{{EMAC_NONE,  0xbfff0000, EMAC_NONE, EMAC_NONE}},	/* Preemption on Tx DISABLE*/
+>  	{{0xffff0010,  EMAC_NONE, 0xffff0010, EMAC_NONE}},	/* VLAN AWARE*/
+> -	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}}	/* VLAN UNWARE*/
+> +	{{0xffef0000,  EMAC_NONE, 0xffef0000, EMAC_NONE}},	/* VLAN UNWARE*/
+> +	{{0xffff2000, EMAC_NONE, EMAC_NONE, EMAC_NONE}},	/* HSR_RX_OFFLOAD_ENABLE */
+> +	{{0xdfff0000, EMAC_NONE, EMAC_NONE, EMAC_NONE}}		/* HSR_RX_OFFLOAD_DISABLE */
+>  };
+>  
+>  int icssg_set_port_state(struct prueth_emac *emac,
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
+> index 1ac60283923b..92c2deaa3068 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_config.h
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
+> @@ -80,6 +80,8 @@ enum icssg_port_state_cmd {
+>  	ICSSG_EMAC_PORT_PREMPT_TX_DISABLE,
+>  	ICSSG_EMAC_PORT_VLAN_AWARE_ENABLE,
+>  	ICSSG_EMAC_PORT_VLAN_AWARE_DISABLE,
+> +	ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE,
+> +	ICSSG_EMAC_HSR_RX_OFFLOAD_DISABLE,
+>  	ICSSG_EMAC_PORT_MAX_COMMANDS
+>  };
+>  
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index 676168d6fded..9af06454ba64 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -41,7 +41,10 @@
+>  #define DEFAULT_PORT_MASK	1
+>  #define DEFAULT_UNTAG_MASK	1
+>  
+> -#define NETIF_PRUETH_HSR_OFFLOAD_FEATURES	NETIF_F_HW_HSR_FWD
+> +#define NETIF_PRUETH_HSR_OFFLOAD_FEATURES	(NETIF_F_HW_HSR_FWD | \
+> +						 NETIF_F_HW_HSR_DUP | \
+> +						 NETIF_F_HW_HSR_TAG_INS | \
+> +						 NETIF_F_HW_HSR_TAG_RM)
+>  
+>  /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
+>  #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
+> @@ -758,6 +761,21 @@ static void emac_change_hsr_feature(struct net_device *ndev,
+>  	}
+>  }
+>  
+> +static netdev_features_t emac_ndo_fix_features(struct net_device *ndev,
+> +					       netdev_features_t features)
+> +{
+> +	/* In order to enable hsr tag insertion offload, hsr dup offload must
+> +	 * also be enabled as these two are tightly coupled in firmware
+> +	 * implementation.
+> +	 */
+> +	if (features & NETIF_F_HW_HSR_TAG_INS)
+> +		features |= NETIF_F_HW_HSR_DUP;
+
+What if only NETIF_F_HW_HSR_DUP was set? Don't you have to set NETIF_F_HW_HSR_TAG_INS as well?
+
+> +	else
+> +		features &= ~NETIF_F_HW_HSR_DUP;
+
+what if NETIF_F_HW_HSR_DUP was still set?
+
+I think you need to write a logic like follows.
+	if both are already cleared in ndev->features and any one is set in features you set both in features.
+	if both are already set in ndev->features and any one is cleared in features you clear both in features.
+
+is this reasonable?
+
+> +
+> +	return features;
+> +}
+> +
+>  static int emac_ndo_set_features(struct net_device *ndev,
+>  				 netdev_features_t features)
+>  {
+> @@ -780,6 +798,7 @@ static const struct net_device_ops emac_netdev_ops = {
+>  	.ndo_eth_ioctl = icssg_ndo_ioctl,
+>  	.ndo_get_stats64 = icssg_ndo_get_stats64,
+>  	.ndo_get_phys_port_name = icssg_ndo_get_phys_port_name,
+> +	.ndo_fix_features = emac_ndo_fix_features,
+>  	.ndo_set_features = emac_ndo_set_features,
+>  };
+>  
+> @@ -1007,6 +1026,13 @@ static void icssg_change_mode(struct prueth *prueth)
+>  
+>  	for (mac = PRUETH_MAC0; mac < PRUETH_NUM_MACS; mac++) {
+>  		emac = prueth->emac[mac];
+> +		if (prueth->is_hsr_offload_mode) {
+> +			if (emac->ndev->features & NETIF_F_HW_HSR_TAG_RM)
+> +				icssg_set_port_state(emac, ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE);
+> +			else
+> +				icssg_set_port_state(emac, ICSSG_EMAC_HSR_RX_OFFLOAD_DISABLE);
+> +		}
+> +
+>  		if (netif_running(emac->ndev)) {
+>  			icssg_fdb_add_del(emac, eth_stp_addr, prueth->default_vlan,
+>  					  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.h b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> index a4b025fae797..bba6da2e6bd8 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.h
+> @@ -59,6 +59,9 @@
+>  
+>  #define IEP_DEFAULT_CYCLE_TIME_NS	1000000	/* 1 ms */
+>  
+> +#define PRUETH_UNDIRECTED_PKT_DST_TAG	0
+> +#define PRUETH_UNDIRECTED_PKT_TAG_INS	BIT(30)
+> +
+>  /* Firmware status codes */
+>  #define ICSS_HS_FW_READY 0x55555555
+>  #define ICSS_HS_FW_DEAD 0xDEAD0000	/* lower 16 bits contain error code */
+
+-- 
+cheers,
+-roger
 
