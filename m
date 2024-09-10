@@ -1,231 +1,127 @@
-Return-Path: <netdev+bounces-126885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CA35972C6C
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:43:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76EFB972C79
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:48:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E57D11F25F6A
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:43:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A700D1C243AB
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:48:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB8818757F;
-	Tue, 10 Sep 2024 08:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C871186E25;
+	Tue, 10 Sep 2024 08:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="fzwm4aJI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2r0+MNe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9864918593C
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 08:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEECC17DFFD;
+	Tue, 10 Sep 2024 08:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725957787; cv=none; b=MDGsP0JR7kKIHdM51asW/SPt3PMREV2Nw9trstL78cowJ4hgKSfuOesOwFa9lUNmh9pjsHA9q8XRs5yYPtXyqaK7CI5ov1JaKeIC2b1dxIK0zTSVq0N9fR7acEAFvW75w+dyTWrQYKBz2tjmS7wiU6zSvPsP1gJ/Eqx2BdJ1s6o=
+	t=1725958089; cv=none; b=jI3Oe33fFrwlqfTMY81Dic4/NJjb9sEK1rqHjYEmyoPRbFAwxSVOmh0A9LbY8fei7E7uEkC9A7W/VKLf4Iu2NZUlMyCRjyN+NvJ3EH47kZuo2eVsM2klsDI9fS/ckdoGbKtHGvhDPp/TabGWYlG6B2eIcWfD0OPsuK+2nZCT7t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725957787; c=relaxed/simple;
-	bh=XqYUFAg0vlcB8eqKF5HTJl8ZV1kJqv+ir3gXhFqkQ/0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eml+WSGf3EDOcLbk9ODV1WfKQ50wqJS7rxuD0noNXbfCqdaiqiyBXJywQw8Tq+jDtORWUS5V/rbxSD6Et6lVcE/RFvGrxWm1nkwcCPWt8sCEH6MN2r7yIKoc5ZOd8Z/hrRLNDIv5IYYqNKu76PHYyipb18nGMD/ifd2VLrxKEKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=fzwm4aJI; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-536584f6c84so5109278e87.0
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 01:43:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1725957784; x=1726562584; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=y9F0JjuMHAccb/NYm9alerb6ODTS2P4ubVMmIZG6QIM=;
-        b=fzwm4aJIzUEx1aVZNa0bmGz59S97jarEckUdFakmXPvl5lXM5w0ie/TWPJGG+WBbX3
-         sj30xB/C/U55WKQGCpXU5NxSlUAQVNsbUJogp5lPwJFkZYpWXFkrCgHGzQZNfcpgL6zM
-         jLB4bXS5mfF+4SkcA1P2HRT8Nu263w4AkFVUc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725957784; x=1726562584;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y9F0JjuMHAccb/NYm9alerb6ODTS2P4ubVMmIZG6QIM=;
-        b=pVy5Mohvyy/r/R2lgfWjXcGBJlcG2UHFAiQYS2w5D9poLE3YpU9IgUqhBdgeOfI6+G
-         8/fCqBH+l0TlQrdTkUTR+t3aIqImUwNx/rK9YoXDdQSDwFhNf8anekxWr/boWUgXyfEx
-         rubdu6u5rxLQCoble3YNkZ9LG7pRjFnY5g8VKQOrpcQ2wCgHSlEdggLoLJ/l4WHAN/p2
-         TR+/BIzgDGIRxNKWKLtMUg0AxeQSagS8E0fnyacqjVdw4aibg422IZH/YUJZNHUDcUXg
-         0ofvDfKkN8ZW4JQt8XX2QIAWICf/bhff+rGsNqDXxCParf/f5AW6TDc1xqXX5oLG8LMi
-         vJjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKPxDTQP85flY6GUOXkIU2mpzY9pJSIWeFe1oLZooLN0swGPBHrzfHpvUMn2rpONVfIdXG2Xc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuQpWqgDchzSYsWJydJFPCBz0HrWgoK3soIJdmoS7tQ0S5BuI7
-	npMKr/SG9LGVx2tsdWHn4LJICp+1mOgaq5myjF6ZRqbuuq6tVLSU9VpiPMznfAKqx/MKbtHhiHx
-	9DH3wZt6Y5VZWxoHWhyYn84KWfZbiSNy74wcN
-X-Google-Smtp-Source: AGHT+IEI0lG6DZ1W/RH/kT6jePAUaUwyEbPISSgjK5uBLGHjGcQP5DGAVuCzaFTtShIHwgt61jv11smK+oF/vpIC/Qs=
-X-Received: by 2002:a05:6512:b1e:b0:535:3cdc:8763 with SMTP id
- 2adb3069b0e04-536587a4249mr9639348e87.4.1725957783392; Tue, 10 Sep 2024
- 01:43:03 -0700 (PDT)
+	s=arc-20240116; t=1725958089; c=relaxed/simple;
+	bh=noGUHiHs9Zgm+97JzXrmCR7Pe+55n1E+td0QbsIhGos=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N/WEDpFOMXSA4Id00t6Ig670WN1+zHLXboV0kxiqoSDWmjyneUiR+rl6849f+ldVIrCddqUh80oJJwLwlRiSORJJfM38IDUrQy1KZlFzPwDXfLgxkQH6GbVDcRgHtErnIe1FTEOExWoVg4atLGM/8UQekKcmCnjSuY9JFzb/IJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2r0+MNe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D0BEC4CEC3;
+	Tue, 10 Sep 2024 08:48:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725958089;
+	bh=noGUHiHs9Zgm+97JzXrmCR7Pe+55n1E+td0QbsIhGos=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=m2r0+MNeB2u9StkmzgwwW/TCbugtRSVWg3UcYjI6B0svQIl7eBYZCj/mf2xTuIdBB
+	 TGTVn/fgu6xJuyt9a2oJpatsxeNIiPm1/4WV03U2Sh0qBRp7Fxwnr0akkah7A9hCfR
+	 p1POAOYSCG/NciqVHR5XZJEZrQDDOPRqDVdHZKjvqilVpWQhQuYL+0Twp4TJwG1Vtb
+	 cXuS/oLZP9ZLm2bdBwl/EByEva/bIYZgV0YWDH6p+rj0RbwnBlt7yd1UxIQP51N7MH
+	 BxxrMjeNkXQspjQJBGweadLGHAQcZFBmjmNzMYr25wIKiaiwLuStl27k024YW4cuA1
+	 cKyV2I3C8DLAQ==
+Message-ID: <e34bc47d-aada-4bf8-ac29-d3462f351f20@kernel.org>
+Date: Tue, 10 Sep 2024 10:48:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240910-ti-warn-v1-0-afd1e404abbe@kernel.org> <20240910-ti-warn-v1-2-afd1e404abbe@kernel.org>
-In-Reply-To: <20240910-ti-warn-v1-2-afd1e404abbe@kernel.org>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Tue, 10 Sep 2024 14:12:49 +0530
-Message-ID: <CAH-L+nOnGZkV05_N7tkaN2W_04TPVA6zhqKh9i-+rMuaN4OhzA@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] net: ethernet: ti: am65-cpsw: Use __be64
- type for id_temp
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org, 
-	linux-omap@vger.kernel.org, llvm@lists.linux.dev
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000009e700d0621bfdc42"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next] bpf: cpumap: Move xdp:xdp_cpumap_kthread
+ tracepoint before rcv
+To: Daniel Xu <dxu@dxuuu.xyz>, davem@davemloft.net, ast@kernel.org,
+ kuba@kernel.org, daniel@iogearbox.net, john.fastabend@gmail.com,
+ andrii@kernel.org
+Cc: martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org, lorenzo@kernel.org,
+ aleksander.lobakin@intel.com, kernel-team@meta.com
+References: <47615d5b5e302e4bd30220473779e98b492d47cd.1725585718.git.dxu@dxuuu.xyz>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <47615d5b5e302e4bd30220473779e98b492d47cd.1725585718.git.dxu@dxuuu.xyz>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---0000000000009e700d0621bfdc42
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 10, 2024 at 12:48=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> The id_temp local variable in am65_cpsw_nuss_probe() is
-> used to hold a 64-bit big-endian value as it is assigned using
-> cpu_to_be64().
->
-> It is read using memcpy(), where it is written as an identifier into a
-> byte-array.  So this can also be treated as big endian.
->
-> As it's type is currently host byte order (u64), sparse flags
-> an endian mismatch when compiling for little-endian systems:
->
-> .../am65-cpsw-nuss.c:3454:17: warning: incorrect type in assignment (diff=
-erent base types)
-> .../am65-cpsw-nuss.c:3454:17:    expected unsigned long long [usertype] i=
-d_temp
-> .../am65-cpsw-nuss.c:3454:17:    got restricted __be64 [usertype]
->
-> Address this by using __be64 as the type of id_temp.
->
-> No functional change intended.
-> Compile tested only.
->
-> Signed-off-by: Simon Horman <horms@kernel.org>
 
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+On 06/09/2024 03.22, Daniel Xu wrote:
+> cpumap takes RX processing out of softirq and onto a separate kthread.
+> Since the kthread needs to be scheduled in order to run (versus softirq
+> which does not), we can theoretically experience extra latency if the
+> system is under load and the scheduler is being unfair to us.
+> 
+> Moving the tracepoint to before passing the skb list up the stack allows
+> users to more accurately measure enqueue/dequeue latency introduced by
+> cpumap via xdp:xdp_cpumap_enqueue and xdp:xdp_cpumap_kthread tracepoints.
+> 
+
+It makes sense for me to move this :-)
+It actually fits my use-case even better.
+
+> f9419f7bd7a5 ("bpf: cpumap add tracepoints") which added the tracepoints
+> states that the intent behind them was for general observability and for
+> a feedback loop to see if the queues are being overwhelmed. This change
+> does not mess with either of those use cases but rather adds a third
+> one.
+
+Yes, my use-case is to this as a feedback loop, to see when queue is
+overwhelmed as you say.  I will soon be playing with this feature in
+production environments, so I'm excited that it looks like you have
+similar use-cases for this :-)
+
+> 
+> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
 > ---
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ether=
-net/ti/am65-cpsw-nuss.c
-> index a4b0e4bb7529..9e6353e0361e 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -3444,7 +3444,7 @@ static int am65_cpsw_nuss_probe(struct platform_dev=
-ice *pdev)
->         struct resource *res;
->         struct clk *clk;
->         int ale_entries;
-> -       u64 id_temp;
-> +       __be64 id_temp;
->         int ret, i;
->
->         common =3D devm_kzalloc(dev, sizeof(struct am65_cpsw_common), GFP=
-_KERNEL);
->
-> --
-> 2.45.2
->
->
-
-
---=20
-Regards,
-Kalesh A P
-
---0000000000009e700d0621bfdc42
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIG6fo2WBRy4V60QNRcojzQyinu2lBtJz0D17RlBqVJgHMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkxMDA4NDMwNFowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAlj5YNyqFx
-mvOqVIpx6ZK039JcAGvxH/6E8etvRKrv3UW8Xpgsx5B/J7aIn15G5+DlkCtGYCwzSJoDaTX2rPgg
-gZ9vkvBo+LKowFP4jyVaPoBnmz5R3tgLuWzdY3G+Eidz/H7nFrTCUyQ20ucU23Lut/ycB05pHnvW
-ZpoAxqQIZnqjm4mlO/PQFXENkhfY9OMjRxGZ5rX4G4pdMekwJ4HqlI/Cyemk47crPEEePT3W1OLw
-5vZob7TcsF3VxWitl9IjRzCcqhhP52TLIH/LLL0tDV8CEi9lbopKegjs2YZ/ucEOExVWInUs1AZU
-4SU+bk7f6n51QqLjg7CWCvK56c30
---0000000000009e700d0621bfdc42--
+>   kernel/bpf/cpumap.c | 6 ++++--
+>   1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+> index fbdf5a1aabfe..a2f46785ac3b 100644
+> --- a/kernel/bpf/cpumap.c
+> +++ b/kernel/bpf/cpumap.c
+> @@ -354,12 +354,14 @@ static int cpu_map_kthread_run(void *data)
+>   
+>   			list_add_tail(&skb->list, &list);
+>   		}
+> -		netif_receive_skb_list(&list);
+>   
+> -		/* Feedback loop via tracepoint */
+> +		/* Feedback loop via tracepoint.
+> +		 * NB: keep before recv to allow measuring enqueue/dequeue latency.
+> +		 */
+>   		trace_xdp_cpumap_kthread(rcpu->map_id, n, kmem_alloc_drops,
+>   					 sched, &stats);
+>   
+> +		netif_receive_skb_list(&list);
+>   		local_bh_enable(); /* resched point, may call do_softirq() */
+>   	}
+>   	__set_current_state(TASK_RUNNING);
 
