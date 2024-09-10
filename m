@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-126826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 830049729D6
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:55:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A369729D7
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:55:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C3842862F6
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:55:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F8601F25468
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:55:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB6617BB12;
-	Tue, 10 Sep 2024 06:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8B317BEAD;
+	Tue, 10 Sep 2024 06:55:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="zm8+H34w"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="xbFimtHs"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD2E517ADF1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7A817ADF8
 	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 06:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725951325; cv=none; b=PxlYbzpEFq5XndiFtHVBiScVP9r3Ky5bgdFxuQ8c9P3w1DRlBX+qHkCvi7yY88A9YCt8/vYpJ6rdee4E4mHjVcFRfpl+XyaHRPsB7/CxNQnPcc8y4ThigTDiiD1R13qH7XTRzMtzpiqbzSk597uslFD1YRlexH98AB5J6TtfIDc=
+	t=1725951326; cv=none; b=H02yY/mV1lMCxqk1dsY6OvJ/bmXR8NJl+kkN1EkNkP3kdpElgceqQaZQKW4yWvAYNc/NzpVzsNhZVz/zVcXXa8smcG45gDrHC2sLiDcKF6loL9fKSfjUaHjEkQRMVG9XHBRLiTaoif09w0r0zanTbtJjPKV5FKSGYKBi5uLbTrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725951325; c=relaxed/simple;
-	bh=RJdxDspsIkMexFz8u6rSIAX8xha9ppNa4YIYohlVjx8=;
+	s=arc-20240116; t=1725951326; c=relaxed/simple;
+	bh=C1sQJrysadKVov/BUFBcf14939hvnBcrKQJC1g+2+J4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WPNuTjlDIAn6lrbG98dmpwQEdinqSfRWBJnYtiHMqa7v8q1XQTLE5Ep+kxXC55ZbTU8MjBoGzgkq4hk/h4L+tB9qbhFOw1KrRyqOoxU/U0uT745FXhk8BBI+Stuy9mtiBRpS1mOj2F5l/6HQxMdOCbx4G2K7APQfPm7qKRl2kpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=zm8+H34w; arc=none smtp.client-ip=62.96.220.36
+	 MIME-Version:Content-Type; b=DAH0nw4WzGeWnBOYHHv47NxgzhXY/veSb+dk010DW1t1xzpfx2cDY1UVB5G0xClOnPkCqZV8J82K1eN0xXxBdptDuuXVsPX14cN2MT4kSru1brt6ASS2ZpQ2lKVsO9k1z/+LPacAGD93rwoKYB9hTcg+J+wSvDbbRJdwBHs15Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=xbFimtHs; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 6AD1620899;
+	by a.mx.secunet.com (Postfix) with ESMTP id 3F3CB20897;
 	Tue, 10 Sep 2024 08:55:22 +0200 (CEST)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id 8NYefbJl8yeT; Tue, 10 Sep 2024 08:55:22 +0200 (CEST)
+	with ESMTP id rLMIj_M2iXp8; Tue, 10 Sep 2024 08:55:21 +0200 (CEST)
 Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id DEB0E2074B;
+	by a.mx.secunet.com (Postfix) with ESMTPS id 62F582087C;
 	Tue, 10 Sep 2024 08:55:21 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com DEB0E2074B
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 62F582087C
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
 	s=202301; t=1725951321;
-	bh=IRztqup5ks2ZMtLrfzn4qHW/9FuWOjd4TSiMvDaUn5w=;
+	bh=CH5HoGUf1QaFlflLthiElsDzEZn5T/jbEbFEUzZpNDw=;
 	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-	b=zm8+H34w9/b3si24+rzNDU/NWP5ifgkw8iODEHgBHaGYx77BooASgYaYORynAqVrM
-	 IwEpbEwqoTwGDJX29sgoKGTkNwnRsdHuysotYJ2F0ck1kQg+Vw+TAYixmqDgWJ2sTM
-	 crgVaumvc2ANstTJrkFX0sGWkwRgUlGgcjdtxB+lksi7b1HLgGrcjaJMOJisKpDyUD
-	 Pb0zCQ/6nPnop04FeBFAMONq/hSu7b31/dyuMjRj3xcD7raaU9J+0hRk9RWH3i9Bn/
-	 TswqFp+FU5uC0pcEfVY3m/VvopxGe1IHGlEtraiFSB/Y3QTY3QMWqCsnHML8hCGxfr
-	 QMUOUEFeRPXJg==
+	b=xbFimtHsvPnJcXgAc9gbsXrE8bsDMn38G6oZXlo01vZU58iDnSHxn0+Ada8zO61+3
+	 pP3uCI/TiIRq1ipNytnByXq6BHugwJKHq3arYAQY9ZLfh300wQuzPFpeUQBoJlLPWw
+	 29R5BbFWARXpGH3q6kIrCWv33vcmTI8fqAIpx521fiZWN3pp7yeJmd+FBBj6mpmLDu
+	 B3yPCr4hpcU+goWuyLIk/Mfjc1gJN99HVx/kdm/GlJwOxK7CpDLxl1FTBwVD3hIjkv
+	 ghWZdOwQ6owNCv7TSu4t4T2SwFReXjqOIa0kLMm+xA7l73jr369XlPauRiVoJ9CY69
+	 I3qGUNkZ7IZnA==
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -63,14 +63,14 @@ Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 10 Sep
  2024 08:55:20 +0200
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 208FA3180085; Tue, 10 Sep 2024 08:55:20 +0200 (CEST)
+	id 28C62318008E; Tue, 10 Sep 2024 08:55:20 +0200 (CEST)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 01/13] xfrm: Remove documentation WARN_ON to limit return values for offloaded SA
-Date: Tue, 10 Sep 2024 08:54:55 +0200
-Message-ID: <20240910065507.2436394-2-steffen.klassert@secunet.com>
+Subject: [PATCH 02/13] net: add copy from skb_seq_state to buffer function
+Date: Tue, 10 Sep 2024 08:54:56 +0200
+Message-ID: <20240910065507.2436394-3-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240910065507.2436394-1-steffen.klassert@secunet.com>
 References: <20240910065507.2436394-1-steffen.klassert@secunet.com>
@@ -86,43 +86,76 @@ X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-From: Patrisious Haddad <phaddad@nvidia.com>
+From: Christian Hopps <chopps@labn.net>
 
-The original idea to put WARN_ON() on return value from driver code was
-to make sure that packet offload doesn't have silent fallback to
-SW implementation, like crypto offload has.
+Add an skb helper function to copy a range of bytes from within
+an existing skb_seq_state.
 
-In reality, this is not needed as all *swan implementations followed
-this request and used explicit configuration style to make sure that
-"users will get what they ask".
-So instead of forcing drivers to make sure that even their internal flows
-don't return -EOPNOTSUPP, let's remove this WARN_ON.
-
-Signed-off-by: Patrisious Haddad <phaddad@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Christian Hopps <chopps@labn.net>
 Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
 ---
- net/xfrm/xfrm_device.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ include/linux/skbuff.h |  1 +
+ net/core/skbuff.c      | 35 +++++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 9a44d363ba62..f123b7c9ec82 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -328,12 +328,8 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
- 		/* User explicitly requested packet offload mode and configured
- 		 * policy in addition to the XFRM state. So be civil to users,
- 		 * and return an error instead of taking fallback path.
--		 *
--		 * This WARN_ON() can be seen as a documentation for driver
--		 * authors to do not return -EOPNOTSUPP in packet offload mode.
- 		 */
--		WARN_ON(err == -EOPNOTSUPP && is_packet_offload);
--		if (err != -EOPNOTSUPP || is_packet_offload) {
-+		if ((err != -EOPNOTSUPP && !is_packet_offload) || is_packet_offload) {
- 			NL_SET_ERR_MSG_WEAK(extack, "Device failed to offload this state");
- 			return err;
- 		}
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 29c3ea5b6e93..a871533b8568 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -1433,6 +1433,7 @@ void skb_prepare_seq_read(struct sk_buff *skb, unsigned int from,
+ unsigned int skb_seq_read(unsigned int consumed, const u8 **data,
+ 			  struct skb_seq_state *st);
+ void skb_abort_seq_read(struct skb_seq_state *st);
++int skb_copy_seq_read(struct skb_seq_state *st, int offset, void *to, int len);
+ 
+ unsigned int skb_find_text(struct sk_buff *skb, unsigned int from,
+ 			   unsigned int to, struct ts_config *config);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 83f8cd8aa2d1..fe4b2dc5c19b 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4409,6 +4409,41 @@ void skb_abort_seq_read(struct skb_seq_state *st)
+ }
+ EXPORT_SYMBOL(skb_abort_seq_read);
+ 
++/**
++ * skb_copy_seq_read() - copy from a skb_seq_state to a buffer
++ * @st: source skb_seq_state
++ * @offset: offset in source
++ * @to: destination buffer
++ * @len: number of bytes to copy
++ *
++ * Copy @len bytes from @offset bytes into the source @st to the destination
++ * buffer @to. `offset` should increase (or be unchanged) with each subsequent
++ * call to this function. If offset needs to decrease from the previous use `st`
++ * should be reset first.
++ *
++ * Return: 0 on success or -EINVAL if the copy ended early
++ */
++int skb_copy_seq_read(struct skb_seq_state *st, int offset, void *to, int len)
++{
++	const u8 *data;
++	u32 sqlen;
++
++	for (;;) {
++		sqlen = skb_seq_read(offset, &data, st);
++		if (sqlen == 0)
++			return -EINVAL;
++		if (sqlen >= len) {
++			memcpy(to, data, len);
++			return 0;
++		}
++		memcpy(to, data, sqlen);
++		to += sqlen;
++		offset += sqlen;
++		len -= sqlen;
++	}
++}
++EXPORT_SYMBOL(skb_copy_seq_read);
++
+ #define TS_SKB_CB(state)	((struct skb_seq_state *) &((state)->cb))
+ 
+ static unsigned int skb_ts_get_next_block(unsigned int offset, const u8 **text,
 -- 
 2.34.1
 
