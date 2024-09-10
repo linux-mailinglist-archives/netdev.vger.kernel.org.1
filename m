@@ -1,83 +1,76 @@
-Return-Path: <netdev+bounces-126936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C4269731C8
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:15:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48DF9973125
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:09:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3269EB2A1E7
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:14:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 085AC287D9E
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 10:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4EF18C340;
-	Tue, 10 Sep 2024 10:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="pCk0rRF4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 031BA19C56E;
+	Tue, 10 Sep 2024 10:04:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-221.mail.qq.com (out203-205-221-221.mail.qq.com [203.205.221.221])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0647188A0C;
-	Tue, 10 Sep 2024 10:10:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 433141922F2;
+	Tue, 10 Sep 2024 10:04:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725963017; cv=none; b=mBcOkwfH1A5moqKQdwquv7uTrEtTu1PNn+aE0ZTERLbwZcHFDiPrtCxMWCix5sSb0WVWqLR/WBxh8FTiXL8hGoK/AwzdG5K5u1SbPqHiqcrtgWZvJxoOppr5+a6inkLfDYrD0nAz+GO+Uq0J7boCrDUi6q0Eq2HiVfok/vDQNBU=
+	t=1725962683; cv=none; b=CNerJ1k178sw+VQ4ynJLgc7u0ESUhGkxVr6QOX2apSO1Wjo174UOTb2hgZsztP6ORbAunvk/0O/5aKCxkrGEJb1mL5Q1mPKx3v514AHwHzuuROfxE7cp1ao5bRicxipPf0mV2Aj60cgkgVLzcOMaNQDzUWzEFe8pa13J2VTTqJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725963017; c=relaxed/simple;
-	bh=9+c9pvgoddnrMvDhdI6Wh8Iz8hbCY/65n/sGOMz/UlA=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=p+ykqDfNiHyS+3cfdNib6CLpbH9RCy/PqKWGJIXPeUE+PprpXNyqiE3yJ2Tfr0va9CJxr6quY17+PSzYfD+ZqOzt6fhnkK7b3CjBUrSjiVON3ePE+YlmKD2sFH9N88+ss2wbuK0xT1bBPAu/zXUj/mWMuL9j7sG0TM7XHoQRr/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=pCk0rRF4; arc=none smtp.client-ip=203.205.221.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1725962711; bh=SH5quYrxe+ydY/dZue9zWjjQGockMw3uC6pR6yuHmC0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=pCk0rRF4CKm8dEwCpRUsrKXFLhsp5LePti14GKHEk0FcXfal0ByDGLhZ7lEeAdS66
-	 SVq+p4e0Pwlmx4HEqADPMa73EmoSEIxUlxiQVkC9iWyx2WsBUB/oQiY1W44j61U4J7
-	 80wdifw4QFtyEhSd52zzhqyj1uicQimbeTVBTeik=
-Received: from pek-lxu-l1.wrs.com ([111.198.224.50])
-	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
-	id EB82C6BA; Tue, 10 Sep 2024 17:58:56 +0800
-X-QQ-mid: xmsmtpt1725962336tey4kg212
-Message-ID: <tencent_7142963A37944B4A74EF76CD66EA3C253609@qq.com>
-X-QQ-XMAILINFO: MoTnVqEimZYUDPMNuaEEYD1qKiYGKR18HtjHTCrT9DFB6E6aYK2PWPueA8De56
-	 P5jrFDiiQQqQQFd8Cxr6HKaKZyl1Z3fyvyHD8pwgAKbXJ5ZwF3mH+GCFFnEIChpjNneSaKRu9NQc
-	 7WbFeayXT4kaQevoB9LajPHWxkAEmzaEB1lw75XEhiArRrbQ3NnBAknTMNGR0lM3L0B50LxBObm/
-	 ifIzj7bXQOc/1hX7NmCPpN8kc/e2xGyCIW8yH4ZWiVMLUbAPuXM8krf9Ypk3rQTkOYCa2Q/RfNIq
-	 DwdGOX8aJjYXF9SRecYLKQDVo9D7b3jPEW+/vfnp+No4kxo3dIJGoRs+BcmBY3v3J0Wo1e5FNuaq
-	 VF5lCBuNTD42I3GxXBRGKSuAQ9fgElF4zk3iueDv9arxK58cA5r/+9kXj69lniegPw3sFei75C9T
-	 UwIKWhgf0RV+74swfUUrqG5BuolVXntmBhJA1UPDZPQQAJAiSWGy1lkK1Y9CVAzb/46c04ssDRkl
-	 Cx4RSH3buQK00B7Osb/+FHXZ2FVJS36fiMZctefRod+kuH7uRts9Zo2meXRckT+9pzpomlAkXb2Q
-	 YdLgTG/QkHnEr0L3Qj57u9d3ZuP9KY/rP9Wf/Aq7wLHjr8Zt1DLgoHvuwrRv0mhGvWQmuAoJNonr
-	 iv1O7m9aDFa6ojTOiT9rrDHFPgfS9rb2DH5YGOcuSl1fBzRTJBxYmEtry+y9t+rnJWsLtlzMihfL
-	 jDJvNlwY+xSu0gIWNfHENwKgIdsD2T319KGuN6NUGhyT/ki1rFYxqwVyWBRkx80LiIIxyHuDcOvL
-	 SY8U+rYd0muh0wYg4boHX9FlvIbpbPS2WSxFPvenM00N1paEXhy9QgV0U6g7zxO9uQPOQD6XH22/
-	 kGs6tOUZIEL3QSqaOZRUUsgujLGxoUIUHF5DoupAX5SJ5X/zPDP/c1A4djpNioqZgt/Zno8fYQCn
-	 cf4F4kklhD/LcmnhKrUyB/NVRyfpz+tMgUsNKx4keYV2G2C1sK4TSGH1TKFHY4u3BgF4p+ss50DN
-	 vHi7LKz1YKozdRep8GjLl33xUFZZkCaNI4eJKo7VBHzhc5wKyv6CXnOsJ1qUQ=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-From: Edward Adam Davis <eadavis@qq.com>
-To: eadavis@qq.com
-Cc: davem@davemloft.net,
+	s=arc-20240116; t=1725962683; c=relaxed/simple;
+	bh=BJV+r7fxxZqQ1eqNqmwAaK9bvos/cwcmNDivLsg5oJE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OJ1OF2myz8NM3beKJagnXPouX/0tD8SY16dynWaYUmNcZHqTiF6s63NHSa1Jpbc6/QEg+G9PNJfvBy/8pFRaa8BxYsYQ2GvL5Vi9ckf2IwmUoOF766OSMRsFM0CkwHs/IJK6f+1qTcfdBJUxBNGK0I4K9MEl2E33uzbab8cMzQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c3d2f9f896so5740771a12.1;
+        Tue, 10 Sep 2024 03:04:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725962680; x=1726567480;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NN/RftK0AtSsIg+UinUpjGI9Wdbejwds073AkbWDML8=;
+        b=swMb8zShGi96JPDNZGZODhoygtLDcM+CBelJQ++ojWbwH+8tCAaNHAeTU8z6Mg00oh
+         b6MlgD0yCCCaOFMs1YnIIehhEEIBdyMnW6YId2a9EprOxWIV1rrWy0aQD5YJ70BiAia7
+         kqZPwTnj129yTUmZcQpMZaqiGgnPTdS3k/3yb4byd6pMumcPI3KYtNziNvmQ+ldw6QSa
+         LUb06zgLy+k1omL5Qq9lg81XPvawiKPGp8NVKPrxY0zTk9NYg2Cg9jCPsq8yVWiRAQtO
+         1PRiwpKKDKjc1SLMdngb0pFd5kPoe88y7VpADaJE0lQLiMsA9dY5VFut1sb4V0aO1iGw
+         7jVg==
+X-Forwarded-Encrypted: i=1; AJvYcCUMHZmwJYR4AniuM20UnBhJwoHht+xnYcj9lxkYw8IrNf5I5rZbtFePjgP6Sxs/A9jAnPz6T5sfbNiGoP4=@vger.kernel.org, AJvYcCUOgsWZmgt6Av6/m8cWd4D/3FJrZhdoEN6BoZ+p3en3tJ8GcSENvfqt5eECJA/q6smnwPpcI7A7@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0EaZcTTCyFo1adjA6+/G7BbOa3OPC/355GWxRY0DjIEdpE1V8
+	EcXPkZ88m4eWnmNkABjd3m2mPY/wlqGohZHJ08sh2FPX1cLDqFK0
+X-Google-Smtp-Source: AGHT+IFX0pPWRAvDvfmSjrPODi7Lnuscg7NdxM/DXlinVH0dQq1JKuZbuzWHOWNdzZkncYbyFtaveA==
+X-Received: by 2002:a05:6402:3486:b0:5c3:2440:8570 with SMTP id 4fb4d7f45d1cf-5c3e9742dd6mr6770241a12.26.1725962680332;
+        Tue, 10 Sep 2024 03:04:40 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-114.fbsv.net. [2a03:2880:30ff:72::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd52071sm4102474a12.44.2024.09.10.03.04.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 03:04:39 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
 	edumazet@google.com,
-	geliang@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	martineau@kernel.org,
-	matttbe@kernel.org,
-	mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
 	pabeni@redhat.com,
-	syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH net V4] mptcp: pm: Fix uaf in __timer_delete_sync
-Date: Tue, 10 Sep 2024 17:58:56 +0800
-X-OQ-MSGID: <20240910095855.2618606-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <tencent_272542BA3FBB37337F9EE91B384BB21BF008@qq.com>
-References: <tencent_272542BA3FBB37337F9EE91B384BB21BF008@qq.com>
+	Matthew Wood <thepacketgeek@gmail.com>
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	davej@codemonkey.org.uk,
+	vlad.wing@gmail.com,
+	max@kutsevol.com
+Subject: [PATCH net-next v3 10/10] net: netconsole: fix wrong warning
+Date: Tue, 10 Sep 2024 03:04:05 -0700
+Message-ID: <20240910100410.2690012-11-leitao@debian.org>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20240910100410.2690012-1-leitao@debian.org>
+References: <20240910100410.2690012-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,87 +79,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There are two paths to access mptcp_pm_del_add_timer, result in a race
-condition:
+A warning is triggered when there is insufficient space in the buffer
+for userdata. However, this is not an issue since userdata will be sent
+in the next iteration.
 
-     CPU1				CPU2
-     ====                               ====
-     net_rx_action
-     napi_poll                          netlink_sendmsg
-     __napi_poll                        netlink_unicast
-     process_backlog                    netlink_unicast_kernel
-     __netif_receive_skb                genl_rcv
-     __netif_receive_skb_one_core       netlink_rcv_skb
-     NF_HOOK                            genl_rcv_msg
-     ip_local_deliver_finish            genl_family_rcv_msg
-     ip_protocol_deliver_rcu            genl_family_rcv_msg_doit
-     tcp_v4_rcv                         mptcp_pm_nl_flush_addrs_doit
-     tcp_v4_do_rcv                      mptcp_nl_remove_addrs_list
-     tcp_rcv_established                mptcp_pm_remove_addrs_and_subflows
-     tcp_data_queue                     remove_anno_list_by_saddr
-     mptcp_incoming_options             mptcp_pm_del_add_timer
-     mptcp_pm_del_add_timer             kfree(entry)
+Current warning message:
 
-In remove_anno_list_by_saddr(running on CPU2), after leaving the critical
-zone protected by "pm.lock", the entry will be released, which leads to the
-occurrence of uaf in the mptcp_pm_del_add_timer(running on CPU1).
+    ------------[ cut here ]------------
+     WARNING: CPU: 13 PID: 3013042 at drivers/net/netconsole.c:1122 write_ext_msg+0x3b6/0x3d0
+      ? write_ext_msg+0x3b6/0x3d0
+      console_flush_all+0x1e9/0x330
 
-Keeping a reference to add_timer inside the lock, and calling
-sk_stop_timer_sync() with this reference, instead of "entry->add_timer".
+The code incorrectly issues a warning when this_chunk is zero, which is
+a valid scenario. The warning should only be triggered when this_chunk
+is negative.
 
-Move list_del(&entry->list) to mptcp_pm_del_add_timer and inside the pm lock,
-do not directly access any members of the entry outside the pm lock, which
-can avoid similar "entry->x" uaf.
-
-Fixes: 00cfd77b9063 ("mptcp: retransmit ADD_ADDR when timeout")
-Cc: stable@vger.kernel.org
-Reported-and-tested-by: syzbot+f3a31fb909db9b2a5c4d@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=f3a31fb909db9b2a5c4d
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Fixes: 1ec9daf95093 ("net: netconsole: append userdata to fragmented netconsole messages")
 ---
- net/mptcp/pm_netlink.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ drivers/net/netconsole.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index 3e4ad801786f..f195b577c367 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -331,15 +331,21 @@ mptcp_pm_del_add_timer(struct mptcp_sock *msk,
- {
- 	struct mptcp_pm_add_entry *entry;
- 	struct sock *sk = (struct sock *)msk;
-+	struct timer_list *add_timer = NULL;
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 86473dc2963f..624bfb342da0 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -1165,8 +1165,14 @@ static void send_fragmented_body(struct netconsole_target *nt, char *buf,
  
- 	spin_lock_bh(&msk->pm.lock);
- 	entry = mptcp_lookup_anno_list_by_saddr(msk, addr);
--	if (entry && (!check_id || entry->addr.id == addr->id))
-+	if (entry && (!check_id || entry->addr.id == addr->id)) {
- 		entry->retrans_times = ADD_ADDR_RETRANS_MAX;
-+		add_timer = &entry->add_timer;
-+	}
-+	if (!check_id && entry)
-+		list_del(&entry->list);
- 	spin_unlock_bh(&msk->pm.lock);
- 
--	if (entry && (!check_id || entry->addr.id == addr->id))
--		sk_stop_timer_sync(sk, &entry->add_timer);
-+	/* no lock, because sk_stop_timer_sync() is calling del_timer_sync() */
-+	if (add_timer)
-+		sk_stop_timer_sync(sk, add_timer);
- 
- 	return entry;
- }
-@@ -1430,7 +1436,6 @@ static bool remove_anno_list_by_saddr(struct mptcp_sock *msk,
- 
- 	entry = mptcp_pm_del_add_timer(msk, addr, false);
- 	if (entry) {
--		list_del(&entry->list);
- 		kfree(entry);
- 		return true;
- 	}
+ 			this_chunk = min(userdata_len - sent_userdata,
+ 					 MAX_PRINT_CHUNK - preceding_bytes);
+-			if (WARN_ON_ONCE(this_chunk <= 0))
++			if (WARN_ON_ONCE(this_chunk < 0))
++				/* this_chunk could be zero if all the previous
++				 * message used all the buffer. This is not a
++				 * problem, userdata will be sent in the next
++				 * iteration
++				 */
+ 				return;
++
+ 			memcpy(buf + this_header + this_offset,
+ 			       userdata + sent_userdata,
+ 			       this_chunk);
 -- 
-2.43.0
-
+2.43.5
 
 
