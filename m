@@ -1,82 +1,79 @@
-Return-Path: <netdev+bounces-126766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBCF497265E
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 02:51:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E218297266F
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 02:56:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFF3A1C2372C
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:51:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 123A41C21653
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:56:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9273958222;
-	Tue, 10 Sep 2024 00:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8376A332;
+	Tue, 10 Sep 2024 00:56:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="YOhofLNf"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="03SMuY8m"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2077.outbound.protection.outlook.com [40.107.244.77])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2056.outbound.protection.outlook.com [40.107.236.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5B555E58;
-	Tue, 10 Sep 2024 00:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD9159167;
+	Tue, 10 Sep 2024 00:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.56
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725929478; cv=fail; b=MCfxCEZr4NOJ4DghKpxhtMXrzSA82ouTIrbyLgBAgKtBGNz7WwZX5iYEsi3+BHiLGfjrrOP9BZ1N1/BUe3ve06R+xORBVl6iIYvsbS89HefD89cGAp4Trfjwlqk2yMz3p1uX9mw3kKDDtRMiYhLZckO8zyy+348fCDIgNIfqYeQ=
+	t=1725929769; cv=fail; b=Q9J0GDPl1tBlhiVc2PGSnM9FWR67eWMa8sJ/1hnkea38gUyQ1kpCGyLeQFpTD8Nn7RXV4SjnzThEqeO5/kkGTX71ng7LjApWu4MUgKueD7lCf/eLIyRV3Rw4tfBUNS0+0uw4zsdwKnwtcWI37Do83LN+7wlX6pnQBmDg8EFVRt4=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725929478; c=relaxed/simple;
-	bh=PZrWmGO6Bh5XRe2IvFOY82+6MJyS8jf+5FhLnFWbqhc=;
+	s=arc-20240116; t=1725929769; c=relaxed/simple;
+	bh=mDYKz+AzASHtm84XJnsCXhsCOb9BAr9+H2lbxYhoWEc=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qvtoqORyUr/UwE7pS6F+7z1eoZYNzyRZdPiOVef3hHPZE897ZKBA0TjYU00kAKdqxR62GIAirNMqSqy8D3NhyX7HXZOfemxePaPJqFlVHhhxkcuxN2cSya0kYsWi3x9+/mSsNRuLVRMOQkk+CvuJ8uXHZUlhdPo6uyl0I+wBPqc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=YOhofLNf; arc=fail smtp.client-ip=40.107.244.77
+	 Content-Type:MIME-Version; b=Zb8WvY3cynuBr3+c+CuB53hB9HrnRWMuas+nYshO3C19fFXKo+TEdzk5n7fPcMVAOcii4cI8GlEHc4301mF994DHV4z6g8x167zrZdY7+v5RF35cTSPcgi+6vEKggIVT8RqWG9Y2RUPiNk9lofKjkiCBTpu2PIarxxIkaJKgH3M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=03SMuY8m; arc=fail smtp.client-ip=40.107.236.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PaNA8c0dwOtHzQkAFWoN4w/YiPBHr5wMj9bSxYwjAyGL+Cu4UY0u3VyuW1rYgIU2+8NROVnuaOaBOIRxQvFDXpQMw9wNSINxTldP8ezpfJrw1hWT1gmCrPAnZQKKhhLL1psUrIhGPKVwQY0d4ga9HEtrUT9Mql9wU8ym76iGm7TbVboBojUHUJcf72os8SGOTH8dq60XCceZGKHFREfZLGieCW4ZeJANQgPx/dDUgAf5l7F+1mUpH1gf6s7aysnsKUXPxRgwOKh2FuEONYlHNl+bleDIT22MZhdUTaqBIcDarZZUrf21x8iq1NXsOAMFUIp1gBbnKGihjBiMw+bGWg==
+ b=Xil6DU1qBJ1aub3X9MJDBiuZS0W7//ZPmSfayBGnQFAoJAZY5DgPQDXZ9+fc/bKphf+Q0n/SjsInOdu+JXFLP39lqimv/tQYleAWbrPihBSxzdCDuT9RHa6oy0XtI8LXp7wMVwJngW4BIY8FtQ2AG8ra2gJPGMpxwD8TU2qWyh/v7TNURnsfluH1Q/fXNCRUDzVLYqHa0jDRBdY5RpYkIYWfmkJP1L4ilKm1JRIhmA9LykRyz/Jum2yQ86Qz/9sWFq1+Q0BsTIW7uKw2dFPn/UyC4nK7UXaKq9lQDb+NbJRUAwz0kq2S9KAopftnFFH8R596ySQ+Bnc/tAv8kSQ7Pg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dLIrpysRuj3lYB0eTMPaAT2wCCET5TVKlOORqn1MpLE=;
- b=LlIUWUfzBMBiYr4/Bk5bKShmldXheMMGoN0BmL9lwoFv0mBd1SHiuDS2LNKWSS1q07ySN4lf1sa9ZfToxzaso83J63YWOJIlZ/IVbsLYRHpn1wnKGecjtQtofIFKUPAF0gCIfG9050PjZKAxxVcqm2fJgq5aHmwVfdHcIaKT+GXKH+kvCkpIPlrnU81XYbQKKJHd4H2sc+1KE247M7zZoWynqwP7jWdFx487D4mQeLPgM4ESb0XQRYly7asTfozUFS5OpFtEUc5RUKgUZnCNZNK+51wbX9uo8+/izUHG60VW9T5nwFO7tJQ1A61MG95uA/YnIN0SR4ue9Cp8XABMHw==
+ bh=4+dg2XQB1n63MHR7Viss6FdZJXYe0YQNEQoalzRzMAU=;
+ b=COpPd/VnAmGlY/DFPb7WYwWExZKE17cl5fluJCBezkL3pl8Dc8RjyljR7oilfokAcY0y3CGksW4t0i8wHGD9Cj9EdD3yrYxExPUfyfohgZtA3g7DzVs0NaKN0KFQTlAecznWBgWR4udcT9NKGETFIHjOQQ/Kyn+Z2fm6TgBPYWugzVVFJmbVf1/rwa4RQms3t1RqVGj3Mo0mFixk58EEgpGrhRmDxJsErmJyvDFLFGjUB3oqvrLZsgwhvgmqEOmo6zHesPgQTqGRpuhCNITUghL6WK7dxQY38FbwHUkeseCfrfLQFM5bueLLKI9IM4YPGPuMU5IslYFpeKR1Xx3Vhw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dLIrpysRuj3lYB0eTMPaAT2wCCET5TVKlOORqn1MpLE=;
- b=YOhofLNfzbyrVUNUEwZeHGscORgTuKRwIDXCk0LzGke1mrm5so7aDUOL1WBeouiCxQP/StxgPKuy6TrpXVpcs2HYfNJkIcDVg8b3OzObqmVEGvIh12zn4z1UATHwfVPui45vycSFf04LJaojiyFsq4g7dWZ1l4PcWXdMQQXmntc=
+ bh=4+dg2XQB1n63MHR7Viss6FdZJXYe0YQNEQoalzRzMAU=;
+ b=03SMuY8mzBRwg9tSM/xNPOjPxpiQnDtceo04UQNHGpE1aRWgzY3xHpOmlp5HqfWPr5cJ+26V30tor0Ydfj48QtpAj2U91/uEj4Kq1I3n21YQM8IZOWiuwc5zxEKsXynDUcyya9iNSw06/Ij7ODCTIy8I7yeGdYmmP9hbxlrlytY=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
  CH3PR12MB8657.namprd12.prod.outlook.com (2603:10b6:610:172::6) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7918.23; Tue, 10 Sep 2024 00:51:12 +0000
+ 15.20.7918.23; Tue, 10 Sep 2024 00:56:04 +0000
 Received: from DS0PR12MB6583.namprd12.prod.outlook.com
  ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
  ([fe80::c8a9:4b0d:e1c7:aecb%6]) with mapi id 15.20.7939.022; Tue, 10 Sep 2024
- 00:51:12 +0000
-Message-ID: <4f33691d-4997-4145-9cfe-f8e5a187e4ac@amd.com>
-Date: Mon, 9 Sep 2024 17:51:07 -0700
+ 00:56:04 +0000
+Message-ID: <fca00e5f-638b-4457-8832-f8458899ecc8@amd.com>
+Date: Mon, 9 Sep 2024 17:56:01 -0700
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net: xilinx: axienet: Fix IRQ coalescing packet
- count overflow
+Subject: Re: [PATCH net] net: xilinx: axienet: Schedule NAPI in two steps
+Content-Language: en-US
 To: Sean Anderson <sean.anderson@linux.dev>,
  Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
  "David S . Miller" <davem@davemloft.net>, Eric Dumazet
  <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Andy Chiu <andy.chiu@sifive.com>, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>, Ariane Keller
- <ariane.keller@tik.ee.ethz.ch>, Daniel Borkmann <daniel@iogearbox.net>,
- linux-arm-kernel@lists.infradead.org, Michal Simek <michal.simek@amd.com>
-References: <20240909230908.1319982-1-sean.anderson@linux.dev>
-Content-Language: en-US
+Cc: Robert Hancock <robert.hancock@calian.com>, linux-kernel@vger.kernel.org,
+ Michal Simek <michal.simek@amd.com>, linux-arm-kernel@lists.infradead.org
+References: <20240909231904.1322387-1-sean.anderson@linux.dev>
 From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <20240909230908.1319982-1-sean.anderson@linux.dev>
+In-Reply-To: <20240909231904.1322387-1-sean.anderson@linux.dev>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BL0PR02CA0050.namprd02.prod.outlook.com
- (2603:10b6:207:3d::27) To DS0PR12MB6583.namprd12.prod.outlook.com
+X-ClientProxiedBy: SJ0PR03CA0243.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a0::8) To DS0PR12MB6583.namprd12.prod.outlook.com
  (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,169 +83,144 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CH3PR12MB8657:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9b6cb96d-4ce7-464e-622c-08dcd132aaae
+X-MS-Office365-Filtering-Correlation-Id: 6e68c47e-299a-41c3-507d-08dcd13358dc
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?OGtBL0UxV2JxUUdncEIzQTMrZlYwOEN0aWlnU3k4K0hHUFpvNEplRC91OUJt?=
- =?utf-8?B?aTFOMGlmdHFmbERUNGs0U0JuMHExQWQ5YjVPRnArcjhrNkt2VTlSNWQxb2hw?=
- =?utf-8?B?YS9FcmR4NkhMWHVjZXhaSmsrN0dhREdVeEIxZC9oOWVlVXl6MzUzendtam1J?=
- =?utf-8?B?SEdmMUJBVVNhK2hNemFHU1V1elRBMFpPcEVHUWZGZTg0dUlVQ0JCdkg1bDB2?=
- =?utf-8?B?VUozcFFkajJWTDFneTZlYUxKZjc0bnVQdUovWTdGV3FTbjlBd2o1UGphM0dU?=
- =?utf-8?B?QmNEYjZOWGgzL2J4YktHMGc3dytRTEVieTFtbnB0RnQyQy9GckVpMVdrS3JQ?=
- =?utf-8?B?dEJSZDY1cnhUQm0yK3N5QnFHdncvRVRrR2QwTG9wcGhQbTZaalZNZ2orZXpG?=
- =?utf-8?B?cXVRVTNnNjdiSk1EMlZpYlF6ZkdoZ0MyRm9kZ0dTYTRZZkRhMU81SkQycjF0?=
- =?utf-8?B?Qk11bUJhRUp6M1lUbWFXNWxmdU1aaDFKeEsyRytXZTBCNDZPdmkrM0hObHBB?=
- =?utf-8?B?eUZKbFowaGRseWJwS3JMVEZlemJaRnc5MElILzZxemJQSU5TQjkrZzlJTGk1?=
- =?utf-8?B?eDhtMk12c2wrVG5SRGVraExUa3hWc0VtM25xMlRBOHFWUy9aVFFvb2RVek04?=
- =?utf-8?B?YmVnK3EyMUdDekU0UkZMazBjNmRUV0dYOWFYVGtuVUpVMkpyMml4VFZxeUp4?=
- =?utf-8?B?OWN3bW9RcVlBQnZlZDJrcVpHelZlYjVnUnZ4SmhVU1htYnVXZTdlUkhGT3Av?=
- =?utf-8?B?L2czenhXbGQvNkd6RUdOZE8yNGY3ZnZlRzM2NEdZZHgyWHFCYi9xVkN2dVpa?=
- =?utf-8?B?bW9mcGZCQm9GOFNNRSttNlRIT0ZhNUtoY2MwRjIzZExUSVN0SE8vaExsMmkx?=
- =?utf-8?B?VVU3RWJxYVoxR0gySkZ0UmpkR3pMVENJVC9halJVWWdENHJSNStWbGx0WFVk?=
- =?utf-8?B?aEhhRkJ2YjdEaTJidndyOUl1c1o0aHZzN1lkUDUydnpqS2V0a0xLblVrYjBD?=
- =?utf-8?B?eFp1TVRSZVFVaW5idTFtSHJFME42Wm9MSFRvdGg2bTcvUW9ycUovMFV6VDNv?=
- =?utf-8?B?L2lDSHZaSG4rYmxXYzZ0OWZ3bWZuUzFBSFFZNjJEWFJIcUVsTlU5WGxmdWp2?=
- =?utf-8?B?eTBIelh6bjdCVzhhbUNPT3BIdGZSUDhYbW85WEFzQUh0bWRaa0dYU1ZXUVAy?=
- =?utf-8?B?M2VPZFdwd0FCZzY1aHVscXExTmFBZkc3V1hyZVhvV3NTd1gzTFc0bW0wZmpm?=
- =?utf-8?B?NFprb1IxQkZjbnRGdk05U29FNlI3Q0J0bE1TcTVzVjZWQTZaR3ZkZTlEUFpE?=
- =?utf-8?B?ZmEybDZBeStzNGF4eUJ4S0hUdURDRTZzY2h2cmk2YStBRTRwekozQzI5Mmsr?=
- =?utf-8?B?b1kzODUwMzRkZnBpeTdsWWhwc3hzOWFUWmh0bm82WW1sN2xiemtPK3N0TDNi?=
- =?utf-8?B?YUl5N2VIcmZTNWZSNVMyUGZCY3c5Tnk0QTBwWFVyWmUxKzBXekF6SHB5MzlD?=
- =?utf-8?B?OWJDR2JiZnlYT0lMbUNNOWp4eEdnVUIzOFFhNFR5U3dDTjVQaDJRcWtrYWk3?=
- =?utf-8?B?TDBkSVBqMDRrdzBsWU4yUVBneSsvYVF4SnFNL1NaZXh0eTdIMkQ3SDNsY0di?=
- =?utf-8?B?QnppeTVmR0lQVFluZFA3UmtIZkhBOVY3VGxmcFE5WlJlSnV2cWJyVjVraTNh?=
- =?utf-8?B?QU9YVXpkM2VBSWxINWJ1SFpGWlJ5KzBJOHdWYUxPR3RhVEZMQTZJVkcveTR6?=
- =?utf-8?B?bHQwc3ZlMitYRFk0WllkS2YyV0xWSlpEU1ZwOEMxSjd3RFY4RGJtRTdma25p?=
- =?utf-8?B?U3Qwam84b21abjRsd3BCQT09?=
+	=?utf-8?B?MmZKazBZa1FKRERhOGErSDgvMjhCMVYyTDVIcVFYaWhBRmxEcjRHVUtqaFBy?=
+ =?utf-8?B?aFZGZ0ZHQWtqaUxJeXRzRHNEbzUxY0pOa21kRkZOcGtTVks1ZjkyMEJZTHdo?=
+ =?utf-8?B?TE9lYlZPMCtnd2xFV0FsVzhRR0o4SzVXcnBZZUNFYXdQZGdlU1J4MWxRUVds?=
+ =?utf-8?B?VVpkVUFRMm9oTE5zOXhnOGRScnZCeGtxTDkzMWRaV2I4UFNjZDAxTExpcWhD?=
+ =?utf-8?B?b3M3RFV0dFdqSlFXMUU0QTdXZjYwTE9BY3Vaa2tsWHYybXhBV1BJa1Bsb3VZ?=
+ =?utf-8?B?OTgvQmpzeUE3REZKdU0zYXBsUWtEcC8yeGZnYlhMc0hzT1FtYUxpYk1KR1lC?=
+ =?utf-8?B?eWFYekppTXNRNW0xMzBBanhHbmRuR1BtcGc2SVBoYUZ3dlpZRndraWNvcEVm?=
+ =?utf-8?B?SDhYc3BnNjNpSjRnTXdqK2hKcERNOGZ2MU82SW9UV1NFSUlDdmQ1b1ZhWkEv?=
+ =?utf-8?B?TkhqWnB5QXJDdWRZaThxUGRWMFY4Wk1VdHpGczlQa29UV21PYjlCRXVNT0x5?=
+ =?utf-8?B?UnBiNk1ZclVCb1Vjc0g0S3JsM3RDbUY2Q1YrQWZOcjVTZDloZEFjUTh4YitK?=
+ =?utf-8?B?MjVsVm9yeDIvbUJsR1FOL2hFdFpoM2VtdFZDUGhnREIxZ3BEOTN1eVFhNGx6?=
+ =?utf-8?B?NWdwNWVCQXJpQVgrSXU4elNBUTBCRy9TeEd0NW1tVUIwSENSTURqekoyNUdC?=
+ =?utf-8?B?d2JrdkIrS1VISnp5a3lBQjh2L3R2ZStFQmtIRlBySGpyVTVQelZpU3lSQWVF?=
+ =?utf-8?B?ZStqSGFlOVFETm95d0NMdnJmcWd1VVJIUm5VTzAweDRNUnpKYkpqMjA2WUtK?=
+ =?utf-8?B?ZTcvYmttdEhwekRWSnBXK3BjdnhxVTF2WjkvZ0ROaWRvTmVaR2VTT0poRjk5?=
+ =?utf-8?B?bnhoVENVQm5tT1lLSUVFbEljMzNYbFFJRkNGNDNuWENZTUszR1FoWDZLQ3Na?=
+ =?utf-8?B?emNLbmJWZC9RZ2ZHdGxsSjNtaEwwMUh2OE1YaVdMZldvOG4yWVJnOWFwaUZ0?=
+ =?utf-8?B?K3NrejRuWWhsWGx2eHBmUjlsb0FHVHZiUUJzSStyZlF5TWNwWHJudmx2ZjZ5?=
+ =?utf-8?B?UzY2UEtudTdoQldVaWkybktub2RGQklPaEt4ZU5zL2hQU0VCQTlNRWx1b2RG?=
+ =?utf-8?B?djJqcGNHcjhqNFFUcXRPdjBjZWU5ZHJuQ0psUm9NK2xtb0JmWUttU3dRQmJ2?=
+ =?utf-8?B?VFJ3U3ZlM1RLc2o4RVRaTkI1WmpyTVh4ZEYzWUhSVWxtR0cwSHZVTnQ1ZXYr?=
+ =?utf-8?B?U20vWU14bHdybEh4VGMxRkZJN0tpeG00YTNQOUwrVDgxaUN0bURyNnl4TC9l?=
+ =?utf-8?B?M0QwRWpBc1ViTU1Vd0lpQTcxUzFoRE83Y1dxSjRTOTJyWUhLc0ZTN0MyY2V5?=
+ =?utf-8?B?M2JOMlpycnR1cnJwaTduYjZ5YkpidDhnNlVYYmRvMExzWXlmd3ZlTUJld3hX?=
+ =?utf-8?B?WmkwbXdoQXdVNTM2MGpVM0dRcXovYmQ0cVptcWJtdkFQT2dCb0ZUMGZvdUth?=
+ =?utf-8?B?N0JpL3dQSnVUbW4wREJObHFyQUR3RlZRaUdPd2VCREVtV0lNTXJpNmlmZmoy?=
+ =?utf-8?B?dWIyV3hpaUNyN3gvRUpvMGRBY2RDc1Jpd0doRysrU0hvYVpZWjhsU0FONGo5?=
+ =?utf-8?B?Y3BreCtQdjM5L2MrU3VNL2dPQWlVUmxqalZhQzNQMlU4Vnc4SjZzV0pRdUtj?=
+ =?utf-8?B?QnJQRVNNRThBZnRZSy9JdlFrMVFGQmZuSENSVFgwV0hlMzdDSmF3WWVrWnRj?=
+ =?utf-8?B?MUFHUWZqeDZUZDdNRUJDSXdzQytMMnZUelZvWVdrSjNBaTJIVlRWd0dvN0sr?=
+ =?utf-8?B?RFZuZUxKQlF2MktmdmlXQT09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZERYSktXMkk4cVBzbSt0cGJ2ZE9ZVE9wcCtOUGZHTjZhVXd5Z1NPMGhPQWh1?=
- =?utf-8?B?OEpxSXNoNXVaR0g5V2pKeVA0U3lXNCtQMDBQTXhWRnpURnJ5UUxYdE5acm51?=
- =?utf-8?B?VVlJK0hOcUJGTkprM0poeGhkakVncVdyQXdWN1RJLzIxS0NZTkxBdG5xQ3hY?=
- =?utf-8?B?elREdVE2QVU2Y3ZBekVFNGdPaFBNTjIxRitzL1hIZzRicEJnbllwZ3QwN0s2?=
- =?utf-8?B?bWhoZVVXOEROQVNrQm03Qlp0cVFjcE40WitoTzJNVXVqMVBZTnZSVVcwSitH?=
- =?utf-8?B?azBQeUVVMnptVkN6aHFxRFlOS3FLRGhiTWlvTUNjMTVnNEhTaTRqVktQMUNk?=
- =?utf-8?B?VHJBNENKWjE0cy8vVE1HTnJsdjNkcGdVK1R0NS9GaGpqdkNjRXVZOVYzV2xX?=
- =?utf-8?B?cXAwOW8xUkZRYUJNU3dLT2MyNnRpWVpSVFVRNXdzZnlvY09WTFFOY1BObk1i?=
- =?utf-8?B?cm0rbjA4cU1vYWgrMWgvWUdBTG41Sy80ZjdFZEZIWlhVUW12RFFCZEF6Y2NZ?=
- =?utf-8?B?VlljOVlMdTFjVS9jR2hBM1JuS2lMWWMySW5zQnNNYkNqOHRlRGZ0QlJ6Skxo?=
- =?utf-8?B?ZmhhQ3N6emt6SmV3UkNkTVVNWnhrVE9FaW1FTDhka2o2ZXlEZDJBWGJBa0xo?=
- =?utf-8?B?NkJCcmxNci8rNjQrTWM2dGx5ckNqTEhSa29iMWE5QkV4RzVxWDIwODg2cmZy?=
- =?utf-8?B?c0UzK0l6cWFOdyt1d056QmNvbWt2Q2ZDazdWRjBOTlRLc2VVQkNYN2VUMzdr?=
- =?utf-8?B?M2JRKys3cWcyNzltZmV6c2xlNEVrVUNqYjNFMTJPN3RwVkxwSldmdnR0TUEw?=
- =?utf-8?B?NVdlTjJ5WWZGQmxUUUlaSEdiVDB3aVdNNWVzNG1IRTVWbG1ROC9YZVRDbXFq?=
- =?utf-8?B?QWNST1kwTlEwN1RPSDhqS09DZ3U5R0Z5cHFLdTJaS1hMUFlUT3RldEcyUlJr?=
- =?utf-8?B?ZUJRcGNZMTg2NXM0cGZjell4K3dBa2JuWE5IRE9YZ1RYc05PYzBBS0NWSnN0?=
- =?utf-8?B?anJqNEg4dmdrNmdCUXFUL2NXemVIUW9PN0w2TEtsSmRIUUZxaExuSWJyNEVh?=
- =?utf-8?B?bGdNbVZxbFAyZ2pqRVdmL3hGbUpUelBZVlprYWhpY0ZwSmdvUWtQKytTN1hQ?=
- =?utf-8?B?UStOaFRKaWNPWis0V25xUDU2SVVXTFFpS0w0bW1Bb2l0aXNtMnRkVVNhdmNP?=
- =?utf-8?B?WFNDVlBvcmE1dGkvcnJxTXI0UGVtNzRTS245WmJGTG42MDAvTUZYTkxtWFB2?=
- =?utf-8?B?cDB4RXNWbnRwaWlkMlF4OXRSeFZYelI3YTJMRjlYbDlWUkE1d0pCZnNsNGlh?=
- =?utf-8?B?bkhoTDJ5UDFNTy95MXh1Y3RtT1pqdUZ2TjgxZkNvMHNydmZOSzA1bHBoTmdY?=
- =?utf-8?B?WUYvMDI0LzY4cytPMUdNSHg2MmJuTmZkcWJMWFNKWEpuT3NOVmJJU3FEVmZV?=
- =?utf-8?B?U3VldVd0Y1c0UW1wWUc5NGFsSTYyZzhzWVdyNk52WXZ4bVplcHZWM0FqRWlN?=
- =?utf-8?B?ZUtid2Z2aFBPc0VudVhEQTJEbGlhUU5wTDNIWDd4RllmR0pHRkFPWTJQUXR4?=
- =?utf-8?B?U2x4VW9wanVFNVQ1cDZUaXJzalp2WjRGa1Fmc2ZnaXp3K2l1NjV1Mzk4Qi80?=
- =?utf-8?B?UzJKb1ZERUlJZ2VjSGRoMEpCN2FzWWF0ak1xQWZjamJ1Y1dUSnE1ZnIvdTdk?=
- =?utf-8?B?ZWVHWHdkQjcyNWM0U2dpRWlRQURXQjZhMjcrK09JY0F0UDllZ3AvQTRyRThh?=
- =?utf-8?B?MDZsc0JQcjEvbzJpQ1dISmJleE51Yk1GRVRZSHcrZkVsc3VCTEcxOExVeE1H?=
- =?utf-8?B?R0o2U3lSYjlSVm1RQ2dRcFhkcmJFcmdEU1NYZVBZN1BQRDlUNlB5RHpWaXNB?=
- =?utf-8?B?SW9vWlc1dG55dFZsdGllN25KRnJ5d2I5NDQzemllNzVKUndzUEpyUFA2MmVI?=
- =?utf-8?B?VXdVcXNJcjY3NXRuTHlXZGpiMTNyZllxN3p5UWdNRkJLOWVZbU43N0hzQ3dh?=
- =?utf-8?B?aTd6YUxJaExUMUpVcnV5czBHUTZYZGpHb2t1RWZVZi8wOFQwU2hyTjZPeE5W?=
- =?utf-8?B?c1hvM3ZBays5cGo5cFJUMGlDbjAzSXExclFnL2RtWStpZnk5TWlrbDdWK1Bn?=
- =?utf-8?Q?5goj57DkOO8gtqWp0GwtvR8Re?=
+	=?utf-8?B?UGxQWFBpU2FqNVErZVo2OW5UdThBRDNQM3Buejg3Wk83Rkl4SGZSS0JqazVs?=
+ =?utf-8?B?Vm1reVFGcjB4RytCZWl6TitMK0N3cjhiWEpJQzJaMGR6R0ZVQmZTNktJYXZB?=
+ =?utf-8?B?Z0lET3FiVWFyTUMrc09RQTJlWTlIOG9GSm1yK0RrYzlFbHNoSVU3em9UdGZK?=
+ =?utf-8?B?MHhDQXpPR2ZjZ3crZ040SjBMQm9nbzJ1TTlMckwyNStnQkN6cVJLMG4xOW9C?=
+ =?utf-8?B?YVM3dU15N1VsZXdrdGtTcFVzbDBpQlh6NFRhTWFRZ3FmbW9NdTNZV0VJVTNB?=
+ =?utf-8?B?QVpLRUFJOVdYSVpCVWFhcktLNkhaZGNTdjdmT09tQkJSeFc0VUFlYkFpVFBZ?=
+ =?utf-8?B?N292eWZnQlJBbGlPa1VwVWhTbmdSN240STZUejl5bmlzZjFvZEVOTk1LTUt2?=
+ =?utf-8?B?QTVIbVFaTEkyR3R5WGpVcitOL2JzU1FLVXFHcmQ3ZWdHS0gwZ3JWQ1lHRXF2?=
+ =?utf-8?B?dUhYeEsrdkpYVGRJVmU0Z3NZN2twT1Q5UnhYOEMvVmgxMEVRV3lqdnBDdmk0?=
+ =?utf-8?B?K3UvcGVZNXNLNVI3RjMwUUluRXN0VkxaVnVGNVZCL1VRNFZ5UDRuelRmRXJh?=
+ =?utf-8?B?elZhMUdQWnZqYnpPeVRoeVFTRC9nT3BSQTFnRTc1aGhUNUZiMG5HZDFRWEww?=
+ =?utf-8?B?VEU5dUgwVmRORXQ1amZ2QjkxQytRV2RNYmtrdE44eVhQYzBpTmtTUnA0Vmhv?=
+ =?utf-8?B?ZzNVZkUzZzFmUm8vblZ4SDhvQzRrbGlQMGJzcTVEQXNGWkwzaXpCSUVDdVo1?=
+ =?utf-8?B?MWljU3VHaXZUcWNQTFRZRm9pOS9LVWVxa2IzWFhRRFQ3RnF6OGx0cVZmTDNL?=
+ =?utf-8?B?UUFTWmlQb29iTm5VWlo1S2hCR2dtaHlwa3o3eTQxdytNUkk4dTR2d3ZnQVZw?=
+ =?utf-8?B?TjNXYmE0Vm1walh3cE81UWV1WWdaNEhhSjZCVnhhMlZtbFRGd1lPc3RoTDJI?=
+ =?utf-8?B?cnFheWhyRzJtZkNXMndJNFhuYVZFSVZmbkc5NXFQMUp2aEIxb2w3eUoxWmV1?=
+ =?utf-8?B?Nm52d0pPbnF2QW9TYWd4aGl3V3JPemQ0ZStlTy9vVWpRY05zM1ZpeFdJdTRO?=
+ =?utf-8?B?NHk5TnpFYjJWYnJPYitKRjVvU2tjUEU1VWwxOXdmUXRoSDhQUWN3L0I1WnZZ?=
+ =?utf-8?B?cERMQ2swelhvVFoyMTdwdU51Zy9TMUdFUWw5Tktubld4VjdtQjFBeE40REgx?=
+ =?utf-8?B?cnBiRmUwUnVDMUUydU9CdjhVSElDS1QvY25JZUQ2MXJMeGxBVTcvNU16QTZ1?=
+ =?utf-8?B?RTE0R0lpanRWY2tLQmdkeHFTQjlvOFV0em5vL1Rwak5tdXZhcVZMSWdIb2ZU?=
+ =?utf-8?B?ZFlKc2hucDFYelRpYitJVUl5dWVFUW9nMXhLVFV1Smdrei9wTlVJcUVLNFJC?=
+ =?utf-8?B?UTRwRkVzZ2pWdU5ONGcyV3paZHdyQVM4MlFCQlB1bWRDMEZMRHo4TEVVY0lp?=
+ =?utf-8?B?Vy9iTFFFQ2JpR0V3NllrbjV2aXlwWjlId3FPcmllbGdpYjVieEx2eHd2WXli?=
+ =?utf-8?B?SUZsbTdEWXNDellsT1BNREhRTk5samc2bitDMFo3QkppWTF4aXd3eTQ0SFgy?=
+ =?utf-8?B?OCs3SjNYR0xlem9CdE56VklvYW16TUd3aVRMM21oRXA0WDR0RzdQczhQQWps?=
+ =?utf-8?B?Q3hwRDA0SFdBV3VobWkrZ3FGOFVjTGFuZ3liMnM1Z2I0YmpFUjkwa1kvQVVS?=
+ =?utf-8?B?TFVFWUE0ZzVuT3hNaS9oc2RXUzVETS9ialVRRktFVTQ5dVcwbHczSzNqSnY3?=
+ =?utf-8?B?ME56eVlRWGNLbW1heElhNnpTRDdta2drblV4NE12STB4L0RGNzJTaVNKYmVN?=
+ =?utf-8?B?eVBSUXhzSzFOUGhCUGVhL202dDhVeEp5OVBJWUpTWnZxL2lLZzR0YkVjV3lR?=
+ =?utf-8?B?TndpcUpZaVIrenFMZm1FSk9GbUVaL2pyS2FkWVN5ZUQvcnQveWdtMHR0a1Jm?=
+ =?utf-8?B?NWs2amxOSm04UFp6WG84eXdNcExFMmowdVNwNndzWTIwRzVQZkllSStEb2o5?=
+ =?utf-8?B?ZTRxbUpPODcxeFpudFY5NkhzUGRTTFBzR1RDZytaWXNiZXdDTklsRkZZL3J6?=
+ =?utf-8?B?U29iYjUyMlZ2RVlvaHFGZ0Fkak1pNTJLelhScWVKNDJTdkdvQUsvemJ4WTk1?=
+ =?utf-8?Q?xHXbTtQ2eXGqeZmGcd/7jTM6U?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b6cb96d-4ce7-464e-622c-08dcd132aaae
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e68c47e-299a-41c3-507d-08dcd13358dc
 X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2024 00:51:12.3286
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2024 00:56:04.5476
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hKLN2xtwqSJmqTE/dzfW6eXJ17NQVd2CiGA8vp+k0ptCvVA/5CE7JyJdtJcEzi+JBchCpO4f0jRfwXqSjoGl8w==
+X-MS-Exchange-CrossTenant-UserPrincipalName: FGIaomNoHUYAKt5aOuBmSznXYbthkAyTb0Yw0PZMQk7PkqhQ6Axs57q0on1JaWQqhbk72kHOoZLCSzSTCNF91A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8657
 
-On 9/9/2024 4:09 PM, Sean Anderson wrote:
+On 9/9/2024 4:19 PM, Sean Anderson wrote:
 > 
-> If coalece_count is greater than 255 it will not fit in the register and
-
-s/coalece_count/coalesce_count/
-
-Otherwise
+> As advised by Documentation/networking/napi.rst, masking IRQs after
+> calling napi_schedule can be racy. Avoid this by only masking/scheduling
+> if napi_schedule_prep returns true. Additionally, since we are running
+> in an IRQ context we can use the irqoff variant as well.
+> 
+> Fixes: 9e2bc267e780 ("net: axienet: Use NAPI for TX completion path")
+> Fixes: cc37610caaf8 ("net: axienet: implement NAPI and GRO receive")
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
 
 Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
 
-
-> will overflow. This can be reproduced by running
-> 
->      # ethtool -C ethX rx-frames 256
-> 
-> which will result in a timeout of 0us instead. Fix this by clamping the
-> counts to the maximum value.
-> 
-> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
-> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet driver")
 > ---
 > 
-> Changes in v2:
-> - Use FIELD_MAX to extract the max value from the mask
-> - Expand the commit message with an example on how to reproduce this
->    issue
+>   drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 14 ++++++++------
+>   1 file changed, 8 insertions(+), 6 deletions(-)
 > 
->   drivers/net/ethernet/xilinx/xilinx_axienet.h      | 5 ++---
->   drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 8 ++++++--
->   2 files changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-> index 1223fcc1a8da..54db69893565 100644
-> --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
-> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-> @@ -109,11 +109,10 @@
->   #define XAXIDMA_BD_CTRL_TXEOF_MASK     0x04000000 /* Last tx packet */
->   #define XAXIDMA_BD_CTRL_ALL_MASK       0x0C000000 /* All control bits */
-> 
-> -#define XAXIDMA_DELAY_MASK             0xFF000000 /* Delay timeout counter */
-> -#define XAXIDMA_COALESCE_MASK          0x00FF0000 /* Coalesce counter */
-> +#define XAXIDMA_DELAY_MASK             ((u32)0xFF000000) /* Delay timeout counter */
-> +#define XAXIDMA_COALESCE_MASK          ((u32)0x00FF0000) /* Coalesce counter */
-> 
->   #define XAXIDMA_DELAY_SHIFT            24
-> -#define XAXIDMA_COALESCE_SHIFT         16
-> 
->   #define XAXIDMA_IRQ_IOC_MASK           0x00001000 /* Completion intr */
->   #define XAXIDMA_IRQ_DELAY_MASK         0x00002000 /* Delay interrupt */
 > diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> index 9eb300fc3590..89b63695293d 100644
+> index 9eb300fc3590..4f67072d5149 100644
 > --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
 > +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> @@ -252,7 +252,9 @@ static u32 axienet_usec_to_timer(struct axienet_local *lp, u32 coalesce_usec)
->   static void axienet_dma_start(struct axienet_local *lp)
->   {
->          /* Start updating the Rx channel control register */
-> -       lp->rx_dma_cr = (lp->coalesce_count_rx << XAXIDMA_COALESCE_SHIFT) |
-> +       lp->rx_dma_cr = FIELD_PREP(XAXIDMA_COALESCE_MASK,
-> +                                  min(lp->coalesce_count_rx,
-> +                                      FIELD_MAX(XAXIDMA_COALESCE_MASK))) |
->                          XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_ERROR_MASK;
->          /* Only set interrupt delay timer if not generating an interrupt on
->           * the first RX packet. Otherwise leave at 0 to disable delay interrupt.
-> @@ -264,7 +266,9 @@ static void axienet_dma_start(struct axienet_local *lp)
->          axienet_dma_out32(lp, XAXIDMA_RX_CR_OFFSET, lp->rx_dma_cr);
+> @@ -1222,9 +1222,10 @@ static irqreturn_t axienet_tx_irq(int irq, void *_ndev)
+>                  u32 cr = lp->tx_dma_cr;
 > 
->          /* Start updating the Tx channel control register */
-> -       lp->tx_dma_cr = (lp->coalesce_count_tx << XAXIDMA_COALESCE_SHIFT) |
-> +       lp->tx_dma_cr = FIELD_PREP(XAXIDMA_COALESCE_MASK,
-> +                                  min(lp->coalesce_count_tx,
-> +                                      FIELD_MAX(XAXIDMA_COALESCE_MASK))) |
->                          XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_ERROR_MASK;
->          /* Only set interrupt delay timer if not generating an interrupt on
->           * the first TX packet. Otherwise leave at 0 to disable delay interrupt.
+>                  cr &= ~(XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_DELAY_MASK);
+> -               axienet_dma_out32(lp, XAXIDMA_TX_CR_OFFSET, cr);
+> -
+> -               napi_schedule(&lp->napi_tx);
+> +               if (napi_schedule_prep(&lp->napi_tx)) {
+> +                       axienet_dma_out32(lp, XAXIDMA_TX_CR_OFFSET, cr);
+> +                       __napi_schedule_irqoff(&lp->napi_tx);
+> +               }
+>          }
+> 
+>          return IRQ_HANDLED;
+> @@ -1266,9 +1267,10 @@ static irqreturn_t axienet_rx_irq(int irq, void *_ndev)
+>                  u32 cr = lp->rx_dma_cr;
+> 
+>                  cr &= ~(XAXIDMA_IRQ_IOC_MASK | XAXIDMA_IRQ_DELAY_MASK);
+> -               axienet_dma_out32(lp, XAXIDMA_RX_CR_OFFSET, cr);
+> -
+> -               napi_schedule(&lp->napi_rx);
+> +               if (napi_schedule_prep(&lp->napi_rx)) {
+> +                       axienet_dma_out32(lp, XAXIDMA_RX_CR_OFFSET, cr);
+> +                       __napi_schedule_irqoff(&lp->napi_rx);
+> +               }
+>          }
+> 
+>          return IRQ_HANDLED;
 > --
 > 2.35.1.1320.gc452695387.dirty
 > 
