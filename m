@@ -1,179 +1,522 @@
-Return-Path: <netdev+bounces-126917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09145972FA2
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:53:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEA8C972F9E
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 11:53:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E1541C23EB4
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:53:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 275FFB267E8
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:53:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0376618C025;
-	Tue, 10 Sep 2024 09:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A5718BBAC;
+	Tue, 10 Sep 2024 09:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="RAa1y33D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WLzDofea"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2129.outbound.protection.outlook.com [40.107.94.129])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1CD2184101;
-	Tue, 10 Sep 2024 09:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.129
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725962005; cv=fail; b=SM+48mhtHfn381O1nVd7jqXzbHUG42ZKmaGJIjSeESp5wLfbiAY3Nvqlw6O/WhZN3xKDBUBR2cXHcUWAJYejFaHuoJQjzuZt7XbHFCiLDurVGCikImLfs5VOHZfJy+migHGtQ2h8Jm5QB6VYEXUJH5MIoOBAQktELID0KADhTAo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725962005; c=relaxed/simple;
-	bh=aRrGsiKg0uojT4GHZN/rO9yZoPvouoE3c2c63s70IxA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=udaIWjVfl0Ope6Is/obgPZPtmTzXWIh70vXQwP50DoRehtQD3Gr6Q1KdsKwF2pZvXkUj+Ugz6ya0EQptVkHmDyw91dfA+CS+dGTS3nSfentQBJRieS4vDDCSfLUeT53Lpa4QzDVLvtYIVSeo1kZyd5MCqycgvf8JWIqtwNqccGQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=RAa1y33D; arc=fail smtp.client-ip=40.107.94.129
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bsqsvnLrEK0kkBD8Wv8t6dYiF9EMef2iqzG7uVve38Moav91DrzW8BvJtxpT+kM+tHIchNHQ66tr/CotH5GpCUFUJvWlnnFMiVGgtD9xqBd/eweLY6UIE+QRK+tOixK+bu3q/hZLrNa24SzipAkYU1ou50/Og3pnF/H2zRnSCxGrD2yIgGbPqZba1AHDNlY+FGqV/+VjRDEzPisp9PAHBSNpILa4EROI8C3nSCIoy4QKwMrN2NiytINfIQNGJkRzYpetj2Vv5yJ5qOFLtrVwMJIwfUCXoNsip4Z6BSmEkSMXEIHU+pDdmz2emcQ+VpO2YuAZ68j0vNkSSPPB30pIEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=c9CTWQN3noY/IQ6xr5lJV8GmCNTc4yhyPjTK7DvUi9Y=;
- b=iWEXN7iplH22AWqccWQVbXuHqXyLa3CrndLGLF1e/3htEAk0rPvohEQRB+bKjAc+bu4TOKgYwv9XbsonKB4AHO6IFFER0WS8Cf9XJS6l+UmF8QRy5qaMMdd+GKG2utMyXHra0o8LtpPhk5osHHq0vemjMGV5dkZ/AT/CHAbrMLz9e+PQy43Q459+wi538C5oWGzHsu2iMg24SjKcslaNWfuVQhYZWlxL/lyY4ELk8cvAAOmsd8uKfj4FceF9fwtTnNOeUIr5yUrA2aznknw0zVIKrqkvt9naGRyTQkpSBolZFbdTx1kpFkIMfTkwmjzN4RtWlW8ns0LCQectvF36Lw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A6813AD09
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 09:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1725961997; cv=none; b=kdsYN8aO9rnxF8MDbyygMju5Q5ZvTAjy3DhFx4rpGhJ9KSXjdBsxEDsM1jD4F1Rgjk8sDrxeY/hTrRpEk77IYQRCqGSnKmzF1MBSiDuF8mTZjaUJsAQsibgSCMHbl5kD0dWdZeCDjIpHhelgpxTeAa73FQ9i10P9lev7MMAfJi8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1725961997; c=relaxed/simple;
+	bh=81gq+otx7jHu7AOWySHvV2Tcky0fjerGRHuesV+TGts=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=TcFsDl0cUoArNgK+keKB/0sm/VGKBeaJgXYV5cfUHYd5TfedE9spGlUoWuxoYqDMRsT6A0VUKc7lLmi5xEvgI9NXrWlwTB6lhl5BbNWjaJm0jQfJ4+dqu7RP4hUx7Hx3T1D5cgN8hJzIdaGDsPsE4CbudX/vgW85gunFpqpQxVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WLzDofea; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0b8fa94718so11084549276.0
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 02:53:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=c9CTWQN3noY/IQ6xr5lJV8GmCNTc4yhyPjTK7DvUi9Y=;
- b=RAa1y33D4niRCEUbsyH2NbEoqKkcDO1f8Fo5yDH5xB7ZTVpGp+9k4ILuylORXwWJC4Z+8yI7RpgEHHFL/AgmymAkDCnUB/GT7TUyPzMqlicVWqNcEgngv+VnsLNQMQwHFfFJJWfvo0/tkjLfEJOwBJ6tRpBuhEcIQO85pg1lhMI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
- by MW4PR13MB5578.namprd13.prod.outlook.com (2603:10b6:303:182::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Tue, 10 Sep
- 2024 09:53:21 +0000
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::bbcb:1c13:7639:bdc0]) by BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::bbcb:1c13:7639:bdc0%6]) with mapi id 15.20.7939.017; Tue, 10 Sep 2024
- 09:53:20 +0000
-Date: Tue, 10 Sep 2024 11:53:04 +0200
-From: Louis Peens <louis.peens@corigine.com>
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, claudiu.manoil@nxp.com, vladimir.oltean@nxp.com,
-	stefan@datenfreihafen.org, alex.aring@gmail.com,
-	miquel.raynal@bootlin.com, chunkeey@googlemail.com,
-	kvalo@kernel.org, briannorris@chromium.org, francesco@dolcini.it,
-	set_pte_at@outlook.com, damien.lemoal@opensource.wdc.com,
-	mpe@ellerman.id.au, horms@kernel.org, yinjun.zhang@corigine.com,
-	fei.qin@corigine.com, johannes.berg@intel.com,
-	ryno.swart@corigine.com, krzysztof.kozlowski@linaro.org,
-	leitao@debian.org, liuxuenetmail@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, oss-drivers@corigine.com,
-	linux-wpan@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [PATCH 3/7] nfp: Use IRQF_NO_AUTOEN flag in request_irq()
-Message-ID: <ZuAXAFNp0Th9ymkb@LouisNoVo>
-References: <20240909133034.1296930-1-ruanjinjie@huawei.com>
- <20240909133034.1296930-4-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240909133034.1296930-4-ruanjinjie@huawei.com>
-X-ClientProxiedBy: JNAP275CA0048.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4e::11)
- To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+        d=google.com; s=20230601; t=1725961994; x=1726566794; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EMz5B/4IJ1lXNGYRccROAw8/P8DjxPhP/Sf9/WYgr9Q=;
+        b=WLzDofeaer6qGGkeP06PBcF4J84OkBeoKkMAeKrtgkOBZahSLyzYKwOqXfod1yMQZC
+         9OdfxtL2zjl701rtxMD9OA8BAdm+lhj3R62L1N/DaHMAvFNvqs2XYEAfPhguyc43wJ0k
+         cvqR7P7vRbgpwun6Z1WD+0TYYvhC70FZLJDVFzvdhSyWjHE3liNfqaXotD/7gNKuBbmp
+         2P23se/qtFT400kFqFpw/VSPcS8A8n90A2v+9i0asji/hjN/lnceooSOGL8VA8W2WmC9
+         EhZW/q7DRIDPiHrneQDe4H2bZaOID4ffWK/D3PqIoaA80HSjCo/baUCrBMPCrbQ/XptL
+         qUHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1725961994; x=1726566794;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=EMz5B/4IJ1lXNGYRccROAw8/P8DjxPhP/Sf9/WYgr9Q=;
+        b=lbIfdZU/s8RHcZWPuR4ZT6szYQ+37EF6horgyAt4uJlw2vb0y8FB1vRdH8hL4A1nGk
+         GdXi2IOdZlrXdgKBsjZJtkngTApG3vstT0SDjH+MpgthRrbZYCoaRdT/ZufwY1YjuyZq
+         1xmWkiYUFF9f3DJjY2xyTjR7WVKY5MW2+Jw/9iyIcJj37uU71L8lhlZIYLfY6JdQrKRk
+         zvni2QfNg79n1I+PMCy503eC3Rzdk6Q747XgpKUB2RExmJFTD44VZlFfWa2d47L74QnZ
+         xJdVOarCM0WMqVi6O6beB9I0eS6Pc+MgMnFc9zRdXwRNGG6u91A2bZU/ApLXt62hHcdE
+         Mbhw==
+X-Forwarded-Encrypted: i=1; AJvYcCVkrKeGyU18RYQ/yVlZwGeG0kQSDbOMkvchTaMfrT89+5/pueGgqPiQ5FlGSClcGivgqMYj3Uc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzy1Wmn6JPikJ1g35vGU1pS56b8LKVforr1w17ngeNl7oSBsS1z
+	v3PeNsGWUo6XEK40QJTCDCSOYxRqqz0Z3NobiKC6tPZYOrL1BjPZ6ZTluiUgS9egjLc8lRT9NXi
+	aVQ==
+X-Google-Smtp-Source: AGHT+IFp31mybrwSeyiZyjxrPm9wvhsdcCO1CpSJ7vKq+U2FvdT+YuHJauCLW4TelV5BwIOTdj/XRrdhEfw=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a05:6902:1549:b0:e17:c4c5:bcb2 with SMTP id
+ 3f1490d57ef6-e1d34a16ab6mr359884276.7.1725961994133; Tue, 10 Sep 2024
+ 02:53:14 -0700 (PDT)
+Date: Tue, 10 Sep 2024 11:53:11 +0200
+In-Reply-To: <20240904104824.1844082-4-ivanov.mikhail1@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|MW4PR13MB5578:EE_
-X-MS-Office365-Filtering-Correlation-Id: 546edb6a-f48c-4ca6-a0bc-08dcd17e6701
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?du9A0wM9LcFvAAdfQSj653DpgaGeMnaKbZ+r6pEUxbIccMOlK+UWR7MGVfKa?=
- =?us-ascii?Q?pcPCYluqdra/4rWfI1aSJ5gpp688/QZgILBjsDtTKqISXNDs1e1FNfy0c6j+?=
- =?us-ascii?Q?M8SJve8QMWvPgV60aohAHLltunqwJL4RN9GGoKx/BCZcHd7X0ruymAW5/+AQ?=
- =?us-ascii?Q?a7vhnaY9RqSWAD72cOPHyRtKeku1tKkzuQtonArQfc7mg9fviSBIgxjiDDUN?=
- =?us-ascii?Q?m3C5WeL1+2L2GEZrT3Qca2XxNVuYBcJ0jTkHVsj7OOJbvLi+RD9qLUS2BZgU?=
- =?us-ascii?Q?o7ylfG2GIaHJAGMSk6s7Z3cGuLj8wYrWOTP9J7M827yVbVR6ZBkHUqCisOSX?=
- =?us-ascii?Q?Ha9rkU2cLrZijSgxojD4n/GDorxqpB4GhALCPl4x+XkD+/gaaDQLFZCCobOH?=
- =?us-ascii?Q?bi9EG1yKt1a/JVgfXwx704Kf2vL1kJexqiJbM+ZejHTU4kOGp4Y5ySiuVyEs?=
- =?us-ascii?Q?rCT6Voy8rOMBrG3p6jMHJ1VOSpnMKcXdiqchz6IxM5r8rgW8m9Fo5CRTdtJl?=
- =?us-ascii?Q?Kxy79+h9+aX+HQ1PO1CIbXAMd2hL5UyYgREIiLoRORz2+tbM/YUKgSgSP52F?=
- =?us-ascii?Q?h+WMNluzKrtTuynrb401B6b6FAaRlYlxBVdSrdT7lnYIRtf5FPVvt236M+w6?=
- =?us-ascii?Q?Qxbe52qbJtqr4FNTBfipEldeKFi3xNa2fLkcNkuhtHZHTDyfnFjs8y/RuVrp?=
- =?us-ascii?Q?1+HR/fe0O001jJYP6aDkL3u2DS8qoQFQTpG2e3BHwVgKVJrirVwj3yprSg8R?=
- =?us-ascii?Q?tNuH4+cGdjNZaswOUXKlwNTv8abqlXiIbKnwQyeQtM2rpcPu4pYH6qTvE1FR?=
- =?us-ascii?Q?yZILX+kf1o/0GXDg3ORBMRNUjDkYwP2Q1WUg8+2spwVcrh9/oOt4EU4pBXhy?=
- =?us-ascii?Q?LtbRR5YSKrHVFrLrZMWjeO4Cf7keDX+HpUYmrY7zgPY2zuKvo6DnxyoHjSN/?=
- =?us-ascii?Q?x1Azc1z0dFHpAqoXnJva/nezB/sdqTlYx6uDu7uGEBIRZTwN8K9PXijRa9hr?=
- =?us-ascii?Q?HzvYtLtEPfbo7f1dAowDLneUkqbHLOcSOnZxfeMuL+t/dQiogOn65pZXSStg?=
- =?us-ascii?Q?/FgoNNZ669Ao7E91FlK9dkoCAel3T3l1NzGdUzKFJZTgLe5CQuuRGh7NcTWa?=
- =?us-ascii?Q?4Hb9sC8UcX0lmpNzxkqnvmwZi6PIVMoRL0Uf4erQ8YtgXurbvEx49IQzXrGX?=
- =?us-ascii?Q?n0EFxvcDcSVKD8NW0BiS/N4k7OHsi0hC0sGgQGnAOB9e/dTTNdvCGsnbjYIs?=
- =?us-ascii?Q?JEvVVlymaHRSNOtIJ0fCsyZYWaCcQ6so9QLaixLSbS4y0DH0ITsidXUF5qBp?=
- =?us-ascii?Q?X0noyDUID+gIKWoF1W3D/v1oID0L+wTk4I066tODKwnT9w=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?EgootFrPMU9Bt7ncDY6NDFhOlUDgbb1rrAS6KhDP7ulfYZ6qdn39QVojcLah?=
- =?us-ascii?Q?oMI2cb71e8Uvyr4i0BPZn5Dlqfb/d/SyqDUiF11+rQcPn6CghXlCXXzwF4z3?=
- =?us-ascii?Q?Dy2ML4nwhIj2C/F3vMnpFPP63fj8xeilm6XHivUuMoKEG9vkcTo4j822+O5N?=
- =?us-ascii?Q?VNemYVtf04KjowQgmT3br+GtWF8eeJj0xcvCZF0yrzkqhRhDOfNN3X5abbPG?=
- =?us-ascii?Q?Gm4DS76HEiImacfaiyyvSme3xaSf4TIsGQQZT8ffGvc0+Ovc/Y19ZFBp1IdD?=
- =?us-ascii?Q?7Dlpe+i0sVwFvbgmvdRuviCFuF/jfv3PuXd7l0k7LAltMEaR5b1eoMVc1bwy?=
- =?us-ascii?Q?/WLSe81cCRfyu/9GUQsBMaIpeaiXvzmgsK+yY+Imfc+prHVVHlpT5wev8IBr?=
- =?us-ascii?Q?JcfFLNUKHS5TcMx1nHGN9Cq6CIZFtm6BodoDKU2hkx078ur2RA0JtspTm1Yf?=
- =?us-ascii?Q?PQjClAiPM8bX0AFqjl3zUFJ5Wx6VQc/HJScXgNrSdjnOWGv9t827TB5p9lmC?=
- =?us-ascii?Q?x9UFt+VTt3HUMVlvBcw8LJtghcPh64ZMuCuH472m9cAtHUio/J7tEHR/zTC7?=
- =?us-ascii?Q?HwGl99HEdv2V/3muUnY3hdm6hnRolysWiNQQkk30Ixk/+ws88RggPVaL/om1?=
- =?us-ascii?Q?66W+H856LNBa4YLjcVNyZWEUCJbavs8syGhPwNeVs44ZiQlut6VQnGuPihTv?=
- =?us-ascii?Q?+HDDvCfPoE7OxQzOfnrJZK4/TQphGmeY7HKW1VqB0whvzWu0UzpFkpE17R9H?=
- =?us-ascii?Q?y0/AS4McMw5DbOSACZexKzjhORsTLmJdDYMuT3/HNOyyJZmbJF+6GIlvqiyv?=
- =?us-ascii?Q?oeNwcoD3yOhYnMTCcjI27KtAffg9CMoqMGWdglJFlM7tC9AiL96gWWMXdjsZ?=
- =?us-ascii?Q?Bvn0VcJ69tfH4Jz9Zr9pzJfODrByKqI8V2/H84k3Cz8xD867UzncMxY2pPoT?=
- =?us-ascii?Q?k4akQXTC+Qxi7V83qtYu6Cq1gTItsKNsiOTOGqg2aopmj9/dBy1q7Mm9AwtH?=
- =?us-ascii?Q?4rAzVm62AYOdvycba6TvdP9snBDO+NbXX4JQ0jlRwHwFd1TX6YgnIi8dvX2w?=
- =?us-ascii?Q?AyQKYCWUCJ98PPn2VQzTUitRESpSQt2rib9nnha1xT5tbCfa+KOMFbnGcTPN?=
- =?us-ascii?Q?je8OLHsLWVgPBgIoYApUs9ANXso9eIaABYqmzei+8mNJHyB3qK4M/FX9sVq9?=
- =?us-ascii?Q?LeAj3BcS2NBlG5JrNjOExSoU0N0kmKWyQu49F4CanXa9Cxmuu9YRjTJZtJrV?=
- =?us-ascii?Q?d0O36MGgMUA3RdI1K9bjWY2NbTlt4lm4MHDVj/y0ppH16ZCVCxTX0E4FqiVq?=
- =?us-ascii?Q?uSCAysLc7wvHMFH7VFuy4bASLFfqFFF5GjC1OSaBChqlQfdEG5ODDKVMRiKz?=
- =?us-ascii?Q?AU4Zta2P0cNQHVrwodbmqtjCDRGxGDSSjJypIM6ZJacEgd8eok4BK7g/+OAH?=
- =?us-ascii?Q?p6/phJky6AoHWU0FcG6KajeOwIU+Ox3zf1kGim+801jD1RsRCcPwofopLxUh?=
- =?us-ascii?Q?zJiuF9En3C7Ln/l/Sn5CJ5BCbySy8os5Byb5Hnhb4+P9YGla1TaMbRmt/ZEv?=
- =?us-ascii?Q?2l71GVommrO1WLF8c2BHab0s/dNCBwF24QAR9Ya53fpK6SEGyGkdZln3p9m9?=
- =?us-ascii?Q?uQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 546edb6a-f48c-4ca6-a0bc-08dcd17e6701
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Sep 2024 09:53:20.5334
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9RmqeliFVXcxs2h7nkYoX9ysr7ipRjzKjjRTwf1+mMOlLWKR1I+8PuBlBToP7SgoYqXWPB63riydKWrd75qz4DyWD5S9WYn4S4Aq4CYqgeQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR13MB5578
+Mime-Version: 1.0
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com> <20240904104824.1844082-4-ivanov.mikhail1@huawei-partners.com>
+Message-ID: <ZuAXB6wTd-neVYao@google.com>
+Subject: Re: [RFC PATCH v3 03/19] selftests/landlock: Test basic socket restriction
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 09, 2024 at 09:30:30PM +0800, Jinjie Ruan wrote:
-> [Some people who received this message don't often get email from ruanjinjie@huawei.com. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
-> 
-> disable_irq() after request_irq() still has a time gap in which
-> interrupts can come. request_irq() with IRQF_NO_AUTOEN flag will
-> disable IRQ auto-enable when request IRQ.
-> 
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+On Wed, Sep 04, 2024 at 06:48:08PM +0800, Mikhail Ivanov wrote:
+> Initiate socket_test.c selftests.
+>=20
+> Add `protocol` fixture to test all possible family+type variants that
+> can be used to create user space socket. Add all options required by
+> this protocols in config. Support CAP_NET_RAW capability which is
+> required by some protocols.
+>=20
+> Add simple socket access right checking test.
+>=20
+> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
 > ---
->  drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-Hi, thanks for propagating this. For the nfp driver:
+> Changes since v2:
+> * Extends variants of `protocol` fixture with every socket protocol
+>   that can be used to create user space sockets.
+> * Adds `SYS_ADMIN`, `NET_ADMIN` and `NET_RAW` capabilities required for
+>   some socket protocols.
+> * Removes network namespace creation in `protocol` fixture setup.
+>   Sockets of some protocols can be created only in initial network
+>   namespace. This shouldn't cause any issues until `protocol` fixture
+>   is used in connection or binding tests.
+> * Extends config file with a set of options required by socket protocols.
+> * Adds CAP_NET_RAW capability to landlock selftests which is required
+>   to create sockets of some protocols.
+> * Adds protocol field to the `protocol` fixture.
+> * Adds test_socket_variant() helper and changes the signature of
+>   test_socket() helper.
+> * Checks socket(2) when ruleset is not established.
+> * Removes checks for AF_UNSPEC. This is moved to unsupported_af_and_prot
+>   test.
+> * Removes `service_fixture` struct.
+> * Minor fixes.
+> * Refactors commit message and title.
+>=20
+> Changes since v1:
+> * Replaces test_socket_create() and socket_variant() helpers
+>   with test_socket().
+> * Renames domain to family in protocol fixture.
+> * Remove AF_UNSPEC fixture entry and add unspec_srv0 fixture field to
+>   check AF_UNSPEC socket creation case.
+> * Formats code with clang-format.
+> * Refactors commit message.
+> ---
+>  tools/testing/selftests/landlock/common.h     |   1 +
+>  tools/testing/selftests/landlock/config       |  47 +++
+>  .../testing/selftests/landlock/socket_test.c  | 297 ++++++++++++++++++
+>  3 files changed, 345 insertions(+)
+>  create mode 100644 tools/testing/selftests/landlock/socket_test.c
+>=20
+> diff --git a/tools/testing/selftests/landlock/common.h b/tools/testing/se=
+lftests/landlock/common.h
+> index 7e2b431b9f90..28df49fa22d5 100644
+> --- a/tools/testing/selftests/landlock/common.h
+> +++ b/tools/testing/selftests/landlock/common.h
+> @@ -66,6 +66,7 @@ static void _init_caps(struct __test_metadata *const _m=
+etadata, bool drop_all)
+>  		CAP_NET_BIND_SERVICE,
+>  		CAP_SYS_ADMIN,
+>  		CAP_SYS_CHROOT,
+> +		CAP_NET_RAW,
+>  		/* clang-format on */
+>  	};
+>  	const unsigned int noroot =3D SECBIT_NOROOT | SECBIT_NOROOT_LOCKED;
+> diff --git a/tools/testing/selftests/landlock/config b/tools/testing/self=
+tests/landlock/config
+> index 29af19c4e9f9..0b8e906ca59b 100644
+> --- a/tools/testing/selftests/landlock/config
+> +++ b/tools/testing/selftests/landlock/config
+> @@ -13,3 +13,50 @@ CONFIG_SHMEM=3Dy
+>  CONFIG_SYSFS=3Dy
+>  CONFIG_TMPFS=3Dy
+>  CONFIG_TMPFS_XATTR=3Dy
+> +
+> +#
+> +# Support of socket protocols for socket_test
+> +#
+> +CONFIG_AF_KCM=3Dy
+> +CONFIG_AF_RXRPC=3Dy
+> +CONFIG_ATALK=3Dy
+> +CONFIG_ATM=3Dy
+> +CONFIG_AX25=3Dy
+> +CONFIG_BPF_SYSCALL=3Dy
+> +CONFIG_BT=3Dy
+> +CONFIG_CAIF=3Dy
+> +CONFIG_CAN_BCM=3Dy
+> +CONFIG_CAN=3Dy
+> +CONFIG_CRYPTO_USER_API_AEAD=3Dy
+> +CONFIG_CRYPTO=3Dy
+> +CONFIG_HAMRADIO=3Dy
+> +CONFIG_IEEE802154_SOCKET=3Dy
+> +CONFIG_IEEE802154=3Dy
+> +CONFIG_INET=3Dy
+> +CONFIG_INFINIBAND=3Dy
+> +CONFIG_IP_SCTP=3Dy
+> +CONFIG_ISDN=3Dy
+> +CONFIG_LLC2=3Dy
+> +CONFIG_LLC=3Dy
+> +CONFIG_MCTP=3Dy
+> +CONFIG_MISDN=3Dy
+> +CONFIG_NETDEVICES=3Dy
+> +CONFIG_NET_KEY=3Dy
+> +CONFIG_NETROM=3Dy
+> +CONFIG_NFC=3Dy
+> +CONFIG_PACKET=3Dy
+> +CONFIG_PCI=3Dy
+> +CONFIG_PHONET=3Dy
+> +CONFIG_PPPOE=3Dy
+> +CONFIG_PPP=3Dy
+> +CONFIG_QRTR=3Dy
+> +CONFIG_RDS=3Dy
+> +CONFIG_ROSE=3Dy
+> +CONFIG_SMC=3Dy
+> +CONFIG_TIPC=3Dy
+> +CONFIG_UNIX=3Dy
+> +CONFIG_VMWARE_VMCI_VSOCKETS=3Dy
+> +CONFIG_VMWARE_VMCI=3Dy
+> +CONFIG_VSOCKETS=3Dy
+> +CONFIG_X25=3Dy
+> +CONFIG_XDP_SOCKETS=3Dy
+> \ No newline at end of file
+> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testi=
+ng/selftests/landlock/socket_test.c
+> new file mode 100644
+> index 000000000000..63bb269c9d07
+> --- /dev/null
+> +++ b/tools/testing/selftests/landlock/socket_test.c
+> @@ -0,0 +1,297 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Landlock tests - Socket
+> + *
+> + * Copyright =C2=A9 2024 Huawei Tech. Co., Ltd.
+> + */
+> +
+> +#define _GNU_SOURCE
+> +
+> +#include <linux/landlock.h>
+> +#include <linux/pfkeyv2.h>
+> +#include <linux/kcm.h>
+> +#include <linux/can.h>
+> +#include <linux/in.h>
+> +#include <sys/prctl.h>
+> +
+> +#include "common.h"
+> +
+> +struct protocol_variant {
+> +	int family;
+> +	int type;
+> +	int protocol;
+> +};
+> +
+> +static int test_socket(int family, int type, int protocol)
+> +{
+> +	int fd;
+> +
+> +	fd =3D socket(family, type | SOCK_CLOEXEC, protocol);
+> +	if (fd < 0)
+> +		return errno;
+> +	/*
+> +	 * Mixing error codes from close(2) and socket(2) should not lead to an=
+y
+> +	 * (access type) confusion for this test.
+> +	 */
+> +	if (close(fd) !=3D 0)
+> +		return errno;
+> +	return 0;
+> +}
+> +
+> +static int test_socket_variant(const struct protocol_variant *const prot=
+)
+> +{
+> +	return test_socket(prot->family, prot->type, prot->protocol);
+> +}
+> +
+> +FIXTURE(protocol)
+> +{
+> +	struct protocol_variant prot;
+> +};
+> +
+> +FIXTURE_VARIANT(protocol)
+> +{
+> +	const struct protocol_variant prot;
+> +};
+> +
+> +FIXTURE_SETUP(protocol)
+> +{
+> +	disable_caps(_metadata);
+> +	self->prot =3D variant->prot;
+> +
+> +	/*
+> +	 * Some address families require this caps to be set
+> +	 * (e.g. AF_CAIF, AF_KEY).
+> +	 */
+> +	set_cap(_metadata, CAP_SYS_ADMIN);
+> +	set_cap(_metadata, CAP_NET_ADMIN);
+> +	set_cap(_metadata, CAP_NET_RAW);
+> +};
+> +
+> +FIXTURE_TEARDOWN(protocol)
+> +{
+> +	clear_cap(_metadata, CAP_SYS_ADMIN);
+> +	clear_cap(_metadata, CAP_NET_ADMIN);
+> +	clear_cap(_metadata, CAP_NET_RAW);
+> +}
+> +
+> +#define PROTOCOL_VARIANT_EXT_ADD(family_, type_, protocol_) \
+> +	FIXTURE_VARIANT_ADD(protocol, family_##_##type_)    \
+> +	{                                                   \
+> +		.prot =3D {                                   \
+> +			.family =3D AF_##family_,             \
+> +			.type =3D SOCK_##type_,               \
+> +			.protocol =3D protocol_,              \
+> +		},                                          \
+> +	}
+> +
+> +#define PROTOCOL_VARIANT_ADD(family, type) \
+> +	PROTOCOL_VARIANT_EXT_ADD(family, type, 0)
+> +
+> +/*
+> + * Every protocol that can be used to create socket using create() metho=
+d
+> + * of net_proto_family structure is tested (e.g. this method is used to
+> + * create socket with socket(2)).
+> + *
+> + * List of address families that are not tested:
+> + * - AF_ASH, AF_SNA, AF_WANPIPE, AF_NETBEUI, AF_IPX, AF_DECNET, AF_ECONE=
+T
+> + *   and AF_IRDA are not implemented in kernel.
+> + * - AF_BRIDGE, AF_MPLS can't be used for creating sockets.
+> + * - AF_SECURITY - pseudo AF (Cf. socket.h).
+> + * - AF_IB is reserved by infiniband.
+> + */
+> +
+> +/* Cf. unix_create */
+> +PROTOCOL_VARIANT_ADD(UNIX, STREAM);
+> +PROTOCOL_VARIANT_ADD(UNIX, RAW);
+> +PROTOCOL_VARIANT_ADD(UNIX, DGRAM);
+> +PROTOCOL_VARIANT_ADD(UNIX, SEQPACKET);
+> +
+> +/* Cf. inet_create */
+> +PROTOCOL_VARIANT_ADD(INET, STREAM);
+> +PROTOCOL_VARIANT_ADD(INET, DGRAM);
+> +PROTOCOL_VARIANT_EXT_ADD(INET, RAW, IPPROTO_TCP);
+> +PROTOCOL_VARIANT_EXT_ADD(INET, SEQPACKET, IPPROTO_SCTP);
+> +
+> +/* Cf. ax25_create */
+> +PROTOCOL_VARIANT_ADD(AX25, DGRAM);
+> +PROTOCOL_VARIANT_ADD(AX25, SEQPACKET);
+> +PROTOCOL_VARIANT_ADD(AX25, RAW);
+> +
+> +/* Cf. atalk_create */
+> +PROTOCOL_VARIANT_ADD(APPLETALK, RAW);
+> +PROTOCOL_VARIANT_ADD(APPLETALK, DGRAM);
+> +
+> +/* Cf. nr_create */
+> +PROTOCOL_VARIANT_ADD(NETROM, SEQPACKET);
+> +
+> +/* Cf. pvc_create */
+> +PROTOCOL_VARIANT_ADD(ATMPVC, DGRAM);
+> +PROTOCOL_VARIANT_ADD(ATMPVC, RAW);
+> +PROTOCOL_VARIANT_ADD(ATMPVC, RDM);
+> +PROTOCOL_VARIANT_ADD(ATMPVC, SEQPACKET);
+> +PROTOCOL_VARIANT_ADD(ATMPVC, DCCP);
+> +PROTOCOL_VARIANT_ADD(ATMPVC, PACKET);
+> +
+> +/* Cf. x25_create */
+> +PROTOCOL_VARIANT_ADD(X25, SEQPACKET);
+> +
+> +/* Cf. inet6_create */
+> +PROTOCOL_VARIANT_ADD(INET6, STREAM);
+> +PROTOCOL_VARIANT_ADD(INET6, DGRAM);
+> +PROTOCOL_VARIANT_EXT_ADD(INET6, RAW, IPPROTO_TCP);
+> +
+> +/* Cf. rose_create */
+> +PROTOCOL_VARIANT_ADD(ROSE, SEQPACKET);
+> +
+> +/* Cf. pfkey_create */
+> +PROTOCOL_VARIANT_EXT_ADD(KEY, RAW, PF_KEY_V2);
+> +
+> +/* Cf. netlink_create */
+> +PROTOCOL_VARIANT_ADD(NETLINK, RAW);
+> +PROTOCOL_VARIANT_ADD(NETLINK, DGRAM);
+> +
+> +/* Cf. packet_create */
+> +PROTOCOL_VARIANT_ADD(PACKET, DGRAM);
+> +PROTOCOL_VARIANT_ADD(PACKET, RAW);
+> +PROTOCOL_VARIANT_ADD(PACKET, PACKET);
+> +
+> +/* Cf. svc_create */
+> +PROTOCOL_VARIANT_ADD(ATMSVC, DGRAM);
+> +PROTOCOL_VARIANT_ADD(ATMSVC, RAW);
+> +PROTOCOL_VARIANT_ADD(ATMSVC, RDM);
+> +PROTOCOL_VARIANT_ADD(ATMSVC, SEQPACKET);
+> +PROTOCOL_VARIANT_ADD(ATMSVC, DCCP);
+> +PROTOCOL_VARIANT_ADD(ATMSVC, PACKET);
+> +
+> +/* Cf. rds_create */
+> +PROTOCOL_VARIANT_ADD(RDS, SEQPACKET);
+> +
+> +/* Cf. pppox_create + pppoe_create */
+> +PROTOCOL_VARIANT_ADD(PPPOX, STREAM);
+> +PROTOCOL_VARIANT_ADD(PPPOX, DGRAM);
+> +PROTOCOL_VARIANT_ADD(PPPOX, RAW);
+> +PROTOCOL_VARIANT_ADD(PPPOX, RDM);
+> +PROTOCOL_VARIANT_ADD(PPPOX, SEQPACKET);
+> +PROTOCOL_VARIANT_ADD(PPPOX, DCCP);
+> +PROTOCOL_VARIANT_ADD(PPPOX, PACKET);
+> +
+> +/* Cf. llc_ui_create */
+> +PROTOCOL_VARIANT_ADD(LLC, DGRAM);
+> +PROTOCOL_VARIANT_ADD(LLC, STREAM);
+> +
+> +/* Cf. can_create */
+> +PROTOCOL_VARIANT_EXT_ADD(CAN, DGRAM, CAN_BCM);
+> +
+> +/* Cf. tipc_sk_create */
+> +PROTOCOL_VARIANT_ADD(TIPC, STREAM);
+> +PROTOCOL_VARIANT_ADD(TIPC, SEQPACKET);
+> +PROTOCOL_VARIANT_ADD(TIPC, DGRAM);
+> +PROTOCOL_VARIANT_ADD(TIPC, RDM);
+> +
+> +/* Cf. l2cap_sock_create */
+> +#ifndef __s390x__
+> +PROTOCOL_VARIANT_ADD(BLUETOOTH, SEQPACKET);
+> +PROTOCOL_VARIANT_ADD(BLUETOOTH, STREAM);
+> +PROTOCOL_VARIANT_ADD(BLUETOOTH, DGRAM);
+> +PROTOCOL_VARIANT_ADD(BLUETOOTH, RAW);
+> +#endif
+> +
+> +/* Cf. iucv_sock_create */
+> +#ifdef __s390x__
+> +PROTOCOL_VARIANT_ADD(IUCV, STREAM);
+> +PROTOCOL_VARIANT_ADD(IUCV, SEQPACKET);
+> +#endif
+> +
+> +/* Cf. rxrpc_create */
+> +PROTOCOL_VARIANT_EXT_ADD(RXRPC, DGRAM, PF_INET);
+> +
+> +/* Cf. mISDN_sock_create */
+> +#define ISDN_P_BASE 0 /* Cf. linux/mISDNif.h */
+> +#define ISDN_P_TE_S0 0x01 /* Cf. linux/mISDNif.h */
+> +PROTOCOL_VARIANT_EXT_ADD(ISDN, RAW, ISDN_P_BASE);
+> +PROTOCOL_VARIANT_EXT_ADD(ISDN, DGRAM, ISDN_P_TE_S0);
+> +
+> +/* Cf. pn_socket_create */
+> +PROTOCOL_VARIANT_ADD(PHONET, DGRAM);
+> +PROTOCOL_VARIANT_ADD(PHONET, SEQPACKET);
+> +
+> +/* Cf. ieee802154_create */
+> +PROTOCOL_VARIANT_ADD(IEEE802154, RAW);
+> +PROTOCOL_VARIANT_ADD(IEEE802154, DGRAM);
+> +
+> +/* Cf. caif_create */
+> +PROTOCOL_VARIANT_ADD(CAIF, SEQPACKET);
+> +PROTOCOL_VARIANT_ADD(CAIF, STREAM);
+> +
+> +/* Cf. alg_create */
+> +PROTOCOL_VARIANT_ADD(ALG, SEQPACKET);
+> +
+> +/* Cf. nfc_sock_create + rawsock_create */
+> +PROTOCOL_VARIANT_ADD(NFC, SEQPACKET);
+> +
+> +/* Cf. vsock_create */
+> +#if defined(__x86_64__) || defined(__aarch64__)
+> +PROTOCOL_VARIANT_ADD(VSOCK, DGRAM);
+> +PROTOCOL_VARIANT_ADD(VSOCK, STREAM);
+> +PROTOCOL_VARIANT_ADD(VSOCK, SEQPACKET);
+> +#endif
+> +
+> +/* Cf. kcm_create */
+> +PROTOCOL_VARIANT_EXT_ADD(KCM, DGRAM, KCMPROTO_CONNECTED);
+> +PROTOCOL_VARIANT_EXT_ADD(KCM, SEQPACKET, KCMPROTO_CONNECTED);
+> +
+> +/* Cf. qrtr_create */
+> +PROTOCOL_VARIANT_ADD(QIPCRTR, DGRAM);
+> +
+> +/* Cf. smc_create */
+> +#ifndef __alpha__
+> +PROTOCOL_VARIANT_ADD(SMC, STREAM);
+> +#endif
+> +
+> +/* Cf. xsk_create */
+> +PROTOCOL_VARIANT_ADD(XDP, RAW);
+> +
+> +/* Cf. mctp_pf_create */
+> +PROTOCOL_VARIANT_ADD(MCTP, DGRAM);
+> +
+> +TEST_F(protocol, create)
+> +{
+> +	const struct landlock_ruleset_attr ruleset_attr =3D {
+> +		.handled_access_socket =3D LANDLOCK_ACCESS_SOCKET_CREATE,
+> +	};
+> +	const struct landlock_socket_attr create_socket_attr =3D {
+> +		.allowed_access =3D LANDLOCK_ACCESS_SOCKET_CREATE,
+> +		.family =3D self->prot.family,
+> +		.type =3D self->prot.type,
+> +	};
+> +	int ruleset_fd;
+> +
+> +	/* Tries to create a socket when ruleset is not established. */
+> +	ASSERT_EQ(0, test_socket_variant(&self->prot));
+> +
+> +	ruleset_fd =3D
+> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+> +	ASSERT_LE(0, ruleset_fd);
+> +
+> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
+> +				       &create_socket_attr, 0));
+> +
+> +	enforce_ruleset(_metadata, ruleset_fd);
+> +	ASSERT_EQ(0, close(ruleset_fd));
+> +
+> +	/* Tries to create a socket when protocol is allowed. */
+> +	EXPECT_EQ(0, test_socket_variant(&self->prot));
+> +
+> +	/* Denied create. */
+> +	ruleset_fd =3D
+> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+> +	ASSERT_LE(0, ruleset_fd);
+> +
+> +	enforce_ruleset(_metadata, ruleset_fd);
+> +	ASSERT_EQ(0, close(ruleset_fd));
+> +
+> +	/* Tries to create a socket when protocol is restricted. */
+> +	EXPECT_EQ(EACCES, test_socket_variant(&self->prot));
+> +}
+> +
+> +TEST_HARNESS_MAIN
+> --=20
+> 2.34.1
+>
 
-Signed-off-by: Louis Peens <louis.peens@corigine.com>
+Reviewed-by: G=C3=BCnther Noack <gnoack@google.com>
 
