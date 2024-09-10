@@ -1,96 +1,82 @@
-Return-Path: <netdev+bounces-126749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3338A972604
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 02:00:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C92C97260A
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 02:07:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D3CE1C2040E
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:00:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E1ADB20ECA
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 00:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90724436B;
-	Tue, 10 Sep 2024 00:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD9F1859;
+	Tue, 10 Sep 2024 00:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qoeS3/yh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OrA+YXSn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75A73CF7E;
-	Tue, 10 Sep 2024 00:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D1481E
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 00:07:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725926433; cv=none; b=cYG8iwfSmbS8VYEusPG+J9h5LNmPncTnhQ8juCcRmtktJA2w30RNjepE6FJzcI1UCcylkGVZ9cr6AHXuWar7wWLwdxL4cKVW2rtmwSl+bIXB1nmHW4bXWvGF/p9rcqFnayw4dLcHrBk5TtWItBWlwRx0TtFBTfqsGUf9ewwXvSA=
+	t=1725926859; cv=none; b=fe8Kv5EQmsaOdLp4CEe9VdLyJ/x0g0zALVfJC1T6mLqZvt3dwEl5l6JgB2F6S+jXaD2ABvB6SXT9tt6DV4JT6DrDD+R4vDX/iqOVj4cY/P87IiOD/UmxCfZyfZ0NtIeCsKmrWa4P/x5aV1CIOvJr+5MAJnV2y3EMkdB5ZAoFfBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725926433; c=relaxed/simple;
-	bh=gshxbRjlsuxCQBmbSgS5/MFLrNIDc9GlgrGSqqVJbPU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mMVCaAkFoRCL0JKRCy39DNk3VCYfiKgxhwrgtbWeyHitU3R7DJLqAPLVKrHpOaixLu6IbJJ/GeU1ifVvyzIPs+UIEM4VilgKAPfinHlF0jKZfLH6vYEUS3XyKG+tViOF+Oa8TiH9UoAfsFXhHc6rnm92Ttw37rliGJiBBgth3To=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qoeS3/yh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C0D0C4CEC6;
-	Tue, 10 Sep 2024 00:00:33 +0000 (UTC)
+	s=arc-20240116; t=1725926859; c=relaxed/simple;
+	bh=hDtMFnvMyTA3j13ZXrs1kBIAuCL27ZyrET7pW9wG13E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LR5CedhjU+i9POOse2xJr5F+sFNM3IC/hKQdO/pzXqiCblpwnSLTK96q13dhgMG5M3m6WEw+ZRNduApNhJJ/u48g3ABre130cWcTKCscQMcUQWWzhZ5TEVPxQStLIGLweyP9WF9vbAgheS+whd/oE2g3ZqnOUSr8O584kYNuzxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OrA+YXSn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C923C4CEC5;
+	Tue, 10 Sep 2024 00:07:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725926433;
-	bh=gshxbRjlsuxCQBmbSgS5/MFLrNIDc9GlgrGSqqVJbPU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qoeS3/yhJsFUM6pJD1jRA9Wj3azkZxWBgQ1/47BMDJ+iHIi3CFFqgyf1R9BR7YNsy
-	 52d50w7RBi6Nm7kiOSOiXM5phaZYEHftfXdvCPNXRpKPfwligEYSHmr835UNegH8lx
-	 3b47FSg9wJW98OZhLDcnxtbkNYCIMy50LiU+PxfaA5QxmrlEhaMgIRapxUpNDhehdC
-	 yIQtR+fVWr+vj1l1e/BKTZYONb020G1ApImYOmNmyNpONTnvxcO6HJAZ6m4UXIOwkm
-	 g0Q/h15KDss5hYIXMEJKfCWpn0d+G4A7a1kZy4HuhQR2vGlcWTMtV0u/8S1+yInNRM
-	 WTJ4R7nmNHtmw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDF13806654;
-	Tue, 10 Sep 2024 00:00:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1725926858;
+	bh=hDtMFnvMyTA3j13ZXrs1kBIAuCL27ZyrET7pW9wG13E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OrA+YXSnZ3hCQQnEuRSYW8kuSUHMYvmtX8w8k/dkO3DPu0csJGR7Cwc5GzatNfLQm
+	 /cADJjQJNkZOXTrKgcfKfkI9pxZBSxFvMkCk5Hd7m/cLb/FBqyyb70tO/GNzjqNywx
+	 IPj9qPbpigvEje3Z54LMXoPfmdIhWg1JcK3qRBpxqwvZ8YWig6+fLc4gZ6K3TCMwhx
+	 +7lfk83mxuCoFFzJyfTNjF3O5nsAZkzxSVFOOEr9hXQY6Gz1D0s9JFyW7143kgd9SE
+	 qtvJSk8dS3HWk5omSB/MTxplwQs/hkjW9gpfScg0YA+eGuitRnyOc2AOIuibIphWT4
+	 U39D4GivnQscg==
+Date: Mon, 9 Sep 2024 17:07:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ales Nezbeda <anezbeda@redhat.com>
+Cc: netdev@vger.kernel.org, sdf@fomichev.me, sd@queasysnail.net,
+ davem@davemloft.net
+Subject: Re: [PATCH net v2] selftests: rtnetlink: add 'ethtool' as a
+ dependency
+Message-ID: <20240909170737.1dbaa027@kernel.org>
+In-Reply-To: <20240909083410.60121-1-anezbeda@redhat.com>
+References: <20240909083410.60121-1-anezbeda@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] selftests: return failure when timestamps can't
- be reported
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172592643426.3961170.381877473938074234.git-patchwork-notify@kernel.org>
-Date: Tue, 10 Sep 2024 00:00:34 +0000
-References: <20240905160035.62407-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240905160035.62407-1-kerneljasonxing@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shuah@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
- kernelxing@tencent.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon,  9 Sep 2024 10:34:10 +0200 Ales Nezbeda wrote:
+> Fixes: 3b5222e2ac57 ("selftests: rtnetlink: add MACsec offload tests")
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Don't think it qualifies as a fix, it's an improvement.
 
-On Fri,  6 Sep 2024 00:00:35 +0800 you wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> When I was trying to modify the tx timestamping feature, I found that
-> running "./txtimestamp -4 -C -L 127.0.0.1" didn't reflect the error:
-> I succeeded to generate timestamp stored in the skb but later failed
-> to report it to the userspace (which means failed to put css into cmsg).
-> It can happen when someone writes buggy codes in __sock_recv_timestamp(),
-> for example.
-> 
-> [...]
+> +require_command()
+> +{
+> +	local cmd=$1; shift
+> +
+> +	if [[ ! -x "$(command -v "$cmd")" ]]; then
+> +		echo "SKIP: $cmd not installed"
+> +		exit $ksft_skip
+> +	fi
+> +}
 
-Here is the summary with links:
-  - [net-next,v2] selftests: return failure when timestamps can't be reported
-    https://git.kernel.org/netdev/net-next/c/a7e387375f22
-
-You are awesome, thank you!
+You can use net/forwarding's lib.sh in net/, altnames.sh already 
+uses it.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
