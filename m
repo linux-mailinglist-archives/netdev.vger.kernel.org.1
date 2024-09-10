@@ -1,135 +1,153 @@
-Return-Path: <netdev+bounces-126822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F21439729BE
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:44:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F082D9729CC
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:51:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B606B237B2
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:44:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DCF5B22C44
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729B117ADE2;
-	Tue, 10 Sep 2024 06:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC67617965E;
+	Tue, 10 Sep 2024 06:51:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HQ550xSO"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="stYx2Exr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB41208A5;
-	Tue, 10 Sep 2024 06:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B7C1B85FC
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 06:51:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725950686; cv=none; b=cuP6wniRIgG2fQBl5cbs0kbz0Q9KkRwj7ligkxtqzIPi1yycT5RVpratG5GMWZnK5O3rTiYjnS2rhvauvhTC2OdzCCJ0HpnmfSh7UwoHO2Hp62VHZ+BWVHba+xBoMfhBP+npm7O6SG3NlRH8bWEC+KCBmjxqYeDjrjYh90HEQrc=
+	t=1725951109; cv=none; b=RGW89M47Ez56JquS+Pedu8kk/+8+r8n/l2vE51+kRs3szrw21u/Gkppxiy2YW51bIwaY3A9cxT9G9B3Oi18nZq2aPpg5GzZ1OdiWM4/WeaoVB7j9A6WdaIuKkC8FUCM/mD+UPLvdu3sgf/+UNPj8xbO94ghj8ANqOG8ADmB9Txw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725950686; c=relaxed/simple;
-	bh=nHnXaPv3ZxJwVaKNgDaBMtI7zm71hl2BFvIrhZbkT7U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Jn/xwnqVD6ncFhoZtf4zVrExN2huxfAIimhx9sQ4aOBHyB/VpbXdbf0Xu0Wz6Fy/jhxHFOfYMG2R0wVCBeMtrtxjZjkMwiP7TL9etILo9KG0rqaTIm1yLPiKk9HoGF17IzS1v4SEfDNiIIHZG7btSF0zzO4UFJRi7W/w63yrRGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HQ550xSO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4502C4CEC3;
-	Tue, 10 Sep 2024 06:44:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1725950685;
-	bh=nHnXaPv3ZxJwVaKNgDaBMtI7zm71hl2BFvIrhZbkT7U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HQ550xSOyqkguE3g7zqkKxcXjiL6kyO50tXKBIo+lT0IkCW31FxCp3NIZE/DcHMfs
-	 wqWOywomj5V5CTXTQgznTcf+emiyhsZ4MAQoBqvSSfYIPX3hPapbA0JrLt8X14s/Qw
-	 nkDSkCSQvQ8qFihe3GdGVvCITn7XwJADRiQcLDk0m0mTkMwTCFLzSrjXyGVPlDwyT1
-	 +L02NO500DF0t9uS6fiJD/+aibOK0HpmE+jlTPW8JSJisrmfbLW6wUC9vJJGM6Y364
-	 vADoue/sk482kXsIRyLJ3kg3N0UQ8rLgtzs35kdYqWOSl/M+/Y/pYhPT0txy4cP2v9
-	 i+wACgrmyCl0Q==
-Date: Tue, 10 Sep 2024 07:44:41 +0100
-From: Simon Horman <horms@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, claudiu.manoil@nxp.com,
-	mail@david-bauer.net
-Subject: Re: [PATCH net-next] net: gianfar: fix NVMEM mac address
-Message-ID: <20240910064441.GH2097826@kernel.org>
-References: <20240908213554.11979-1-rosenp@gmail.com>
- <20240909085542.GV2097826@kernel.org>
- <CAKxU2N_1t5osUc53p=G2tRLRctwbxQr3p3fScR-N1kgoNxc80Q@mail.gmail.com>
- <CAKxU2N9kgnqAgo2mHxExjgZos+MvhZw40LWCr4pYOL5DUcJJWg@mail.gmail.com>
- <20240909184850.GG2097826@kernel.org>
- <CAKxU2N_y9CM=P3ki2XGDV+9nZ9SCQwC3y2qWRHbiEZzKK_t62Q@mail.gmail.com>
+	s=arc-20240116; t=1725951109; c=relaxed/simple;
+	bh=zj2wCWFwSTwiZOz1TbdRs2PiphUB2ntK7PaANojphRM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ifFbBTx4ZsiakYrAO1lskJK40iPiUfJuksl1qwvNeSxTtOR1ZKfK81r1Tl0+2NLtiBsB6DuT0jvt8cSvBghIn/xDYPwL3ObQ/G1lN/zhOneOYrU1AhUT2KOIgefS3Y0ytm4BDrzKezJLHqE3/joPT3AEfSOgDtLzAKDYuw+kuhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=stYx2Exr; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48A0hTkT005470;
+	Tue, 10 Sep 2024 08:51:29 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=selector1; bh=
+	1kggNHfukLEneAOODgmHhQlE0AXv2Yh1xe37OKiCxSU=; b=stYx2Exreo1CuwFw
+	5A1MFO9rRRLuIkG+zrR4kTynxqu5Q7SfouFrYBCQPNnvXNZofrwIxn3YoezSBSNB
+	DkASRuBRpQAiAaMmbG5QHoF+WYuYdEB4thenGzSI6azTRQUvkZG+Ei936/Ab4uf/
+	HCyPblWtWFFPUyc+jTMQP1FVTUzd9MBaKeGhXyMoGuNdLoHKVwEvcUh1B2BR857M
+	g2PSQnvVJFi0Hyt0peAGQVZPJcwXXbOOsk4NtvpWVqmXTbPOlbPwQma3qlv39Vmu
+	UsHS+Uogn+DdcQQXuifP2PO9gQx3VJwRvKWAaGcqXxqE0QJHl8R+fXXY0pvy7f8a
+	AICelQ==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 41gyeh0961-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 10 Sep 2024 08:51:29 +0200 (MEST)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 3FEF04002D;
+	Tue, 10 Sep 2024 08:50:29 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 9A019241393;
+	Tue, 10 Sep 2024 08:49:59 +0200 (CEST)
+Received: from [10.48.86.164] (10.48.86.164) by SHFDAG1NODE2.st.com
+ (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Tue, 10 Sep
+ 2024 08:49:58 +0200
+Message-ID: <b7f33997-de4e-4a3d-ab1e-0e8fc77854ec@foss.st.com>
+Date: Tue, 10 Sep 2024 08:49:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKxU2N_y9CM=P3ki2XGDV+9nZ9SCQwC3y2qWRHbiEZzKK_t62Q@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] Regression with commit: ptp: Add .getmaxphase callback to
+ ptp_clock_info
+To: Richard Cochran <richardcochran@gmail.com>
+CC: Rahul Rameshbabu <rrameshbabu@nvidia.com>, <netdev@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
+        Maciek Machnikowski <maciek@machnikowski.net>
+References: <8aac51e0-ce2d-4236-b16e-901f18619103@foss.st.com>
+ <Zt8V3dmVGSsj2nKy@hoboy.vegasvil.org>
+Content-Language: en-US
+From: Christophe ROULLIER <christophe.roullier@foss.st.com>
+In-Reply-To: <Zt8V3dmVGSsj2nKy@hoboy.vegasvil.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SHFCAS1NODE2.st.com (10.75.129.73) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-On Mon, Sep 09, 2024 at 12:14:38PM -0700, Rosen Penev wrote:
-> On Mon, Sep 9, 2024 at 11:48 AM Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Mon, Sep 09, 2024 at 11:20:20AM -0700, Rosen Penev wrote:
-> > > On Mon, Sep 9, 2024 at 11:11 AM Rosen Penev <rosenp@gmail.com> wrote:
-> > > >
-> > > > On Mon, Sep 9, 2024 at 1:55 AM Simon Horman <horms@kernel.org> wrote:
-> > > > >
-> > > > > On Sun, Sep 08, 2024 at 02:35:54PM -0700, Rosen Penev wrote:
-> > > > > > If nvmem loads after the ethernet driver, mac address assignments will
-> > > > > > not take effect. of_get_ethdev_address returns EPROBE_DEFER in such a
-> > > > > > case so we need to handle that to avoid eth_hw_addr_random.
-> > > > > >
-> > > > > > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> > > > > > ---
-> > > > > >  drivers/net/ethernet/freescale/gianfar.c | 2 ++
-> > > > > >  1 file changed, 2 insertions(+)
-> > > > > >
-> > > > > > diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-> > > > > > index 634049c83ebe..9755ec947029 100644
-> > > > > > --- a/drivers/net/ethernet/freescale/gianfar.c
-> > > > > > +++ b/drivers/net/ethernet/freescale/gianfar.c
-> > > > > > @@ -716,6 +716,8 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
-> > > > > >               priv->device_flags |= FSL_GIANFAR_DEV_HAS_BUF_STASHING;
-> > > > > >
-> > > > > >       err = of_get_ethdev_address(np, dev);
-> > > > > > +     if (err == -EPROBE_DEFER)
-> > > > > > +             return err;
-> > > > >
-> > > > > To avoid leaking resources, I think this should be:
-> > > > >
-> > > > >                 goto err_grp_init;
-> > > > will do in v2. Unfortunately net-next closes today AFAIK.
-> > > On second thought, where did you find this?
-> > >
-> > > git grep err_grp_init
-> > >
-> > > returns nothing.
-> > >
-> > > Not only that, this function has no goto.
-> >
-> > Maybe we are looking at different things for some reason.
-> Well that's embarrassing. Locally I seem to have a commit that adds a
-> bunch of devm and as a result these gotos. Unfortunately I don't have
-> the hardware to test those changes. I'll be doing a v2 for when
-> net-next opens.
+Hi Richard,
 
-No problem. TBH it is a relief, as I was beginning to doubt my own sanity.
+On 9/9/24 17:35, Richard Cochran wrote:
+> On Mon, Sep 09, 2024 at 05:13:02PM +0200, Christophe ROULLIER wrote:
+>> Hi Rahul, All,
+>>
+>> I'm facing regression using ptp in STM32 platform with kernel v6.6.
+>>
+>> When I use ptp4l I have now an error message :
+>>
+>> ptp4l[116.627]: config item (null).step_window is 0
+>> PTP_CLOCK_GETCAPS: Inappropriate ioctl for device
+> Strange.  The ptp4l code does simply:
+>
+> 	err = ioctl(fd, PTP_CLOCK_GETCAPS, caps);
+> 	if (err)
+> 		perror("PTP_CLOCK_GETCAPS");
+>
+> But this kernel change...
+>
+>> This regression was introduced in kernel v6.3 by commit "ptp: Add
+>> .getmaxphase callback to ptp_clock_info" SHA1:
+>> c3b60ab7a4dff6e6e608e685b70ddc3d6b2aca81:
+> ...should not have changed the ioctl magic number:
+>
+> diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_clock.h
+> index 1d108d597f66d..05cc35fc94acf 100644
+> --- a/include/uapi/linux/ptp_clock.h
+> +++ b/include/uapi/linux/ptp_clock.h
+> @@ -95,7 +95,8 @@ struct ptp_clock_caps {
+>   	int cross_timestamping;
+>   	/* Whether the clock supports adjust phase */
+>   	int adjust_phase;
+> -	int rsv[12];   /* Reserved for future use. */
+> +	int max_phase_adj; /* Maximum phase adjustment in nanoseconds. */
+> +	int rsv[11];       /* Reserved for future use. */
+>   };
+>
+> Maybe the compiler added or removed padding?  What compilers did you
+> use?
 
-> >
-> > I'm looking at this:
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/ethernet/freescale/gianfar.c?id=bfba7bc8b7c2c100b76edb3a646fdce256392129#n814
-> >
-> > > > >
-> > > > > Flagged by Smatch.
-> > > > >
-> > > > > >       if (err) {
-> > > > > >               eth_hw_addr_random(dev);
-> > > > > >               dev_info(&ofdev->dev, "Using random MAC address: %pM\n", dev->dev_addr);
-> > > > >
-> > > > > --
-> > > > > pw-bot: cr
-> > >
-> 
+I've tested with platform 32bits and 64 bits and I have same error.
+
+Toolchain/compiler used are:
+
+aarch64-ostl-linux-gcc --version
+aarch64-ostl-linux-gcc (GCC) 11.3.0
+or
+
+arm-ostl-linux-gnueabi-gcc --version
+arm-ostl-linux-gnueabi-gcc (GCC) 12.2.0
+
+Thanks,
+
+Christophe
+
+>
+> Thanks,
+> Richard
+>
+>
+>
+>
 
