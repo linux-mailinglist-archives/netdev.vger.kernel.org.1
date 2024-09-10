@@ -1,153 +1,110 @@
-Return-Path: <netdev+bounces-126839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46BFC972A2D
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:06:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD5D9972A4A
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 09:10:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFC69B2141A
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:06:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2958C283816
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 07:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7E417C213;
-	Tue, 10 Sep 2024 07:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hf8LRGSr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 277C917BB1A;
+	Tue, 10 Sep 2024 07:10:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C618217BB3F
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 07:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 321C613A242
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 07:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725951961; cv=none; b=OHnlc1u2KGJ3BJYKHu9b+CqnBYME8XrckRADN+5pld2k2HhX1bN3Ok4o1HUqSoEJi8Olkg7LZeLYKaJlJ9uyEmdEyRO+mZl5//PICPchlgm/VN061YJgaxad4ZI78A71M7yBP90zcg4TFbvT1WQEkUE5qwRTTS5nf6JUZ+rQLzY=
+	t=1725952237; cv=none; b=aENvCyHutk79S8K1vdB48gFHFeypsyjSPZKy6oP6bt0M3uTyNiOzqzHmaF+zsUNQ5ahiNMzYhXfJN2jXW/9Z5HpC12scKdWeSc0ofPxm35J6ttrf/8V9JoLiohtjlRFIGahTFiA3Gu/Vd3i6yJFJGZ6K+5gHoWEuNvqgVuaQkrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725951961; c=relaxed/simple;
-	bh=gqF06DA7eFnsn0rKiQDdVrzFfjrAyFqYKop9G+HSQT8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ha37xbN0spBVZjuEIQB6qOTSKQVq0oUKPkistTP85I1AX0uGEFETD+iJWSNbcoHi+7EjaQO/5j1wYV9lOehKA+c+zys4IyyQTTmI6/wb/ICa+sh8cC/fHvwL26WsAVQAAMZqUhf6TVIgYUW6zH6VLRrzDiELWVqKJJ40y3TgJDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hf8LRGSr; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1725951959; x=1757487959;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gqF06DA7eFnsn0rKiQDdVrzFfjrAyFqYKop9G+HSQT8=;
-  b=Hf8LRGSrsTdsnuKsyThRKxzHePaPCf22qpZ05ji2cIddWtonRVS49RLD
-   waLkamVEtHfL+LPsf9GSE/skzqU7VuKXBa+Ek4lOShTTsHlHsB8FPD3dl
-   KbmcQbTwNyivczteM/T1XZwkdxOdIAS4akmM9M1uJNhIPfIBpoxtZG7dW
-   FEOIMLpyWfy+AxDvWLSSnh5ET4xswtuSbPMPFYkrtzm00VTts+Kp52vBB
-   yNcOjRewXUDpQ8EGVTtitKLY92lXVjb0X7RVRdONwOqD2oRgZgpl6YnuR
-   YJ/pmNuzgX6+RKsQgb5sk7Hyb7ozMttdZrmNXGYXQ2bd537rP6qJQ8Quz
-   Q==;
-X-CSE-ConnectionGUID: DgYU3Vt0Tau7ig6+JY3kGA==
-X-CSE-MsgGUID: AWYnv49pTByzItyn5zuTpQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="28571872"
-X-IronPort-AV: E=Sophos;i="6.10,216,1719903600"; 
-   d="scan'208";a="28571872"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 00:05:57 -0700
-X-CSE-ConnectionGUID: n/zJixobRey0zzAxypIMUQ==
-X-CSE-MsgGUID: tEfp3j0WQM2xmbrEPdFTiQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,216,1719903600"; 
-   d="scan'208";a="97638226"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by orviesa002.jf.intel.com with ESMTP; 10 Sep 2024 00:05:51 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1snuwd-0000CK-1L;
-	Tue, 10 Sep 2024 07:05:47 +0000
-Date: Tue, 10 Sep 2024 15:05:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Vadim Fedorenko <vadfed@meta.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Willem de Bruijn <willemb@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Jason Xing <kerneljasonxing@gmail.com>,
-	Simon Horman <horms@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 2/3] net_tstamp: add SCM_TS_OPT_ID for RAW
- sockets
-Message-ID: <202409101415.65PxVwQn-lkp@intel.com>
-References: <20240909165046.644417-3-vadfed@meta.com>
+	s=arc-20240116; t=1725952237; c=relaxed/simple;
+	bh=pZCljvw97/rZNI8yaSH090YkIecfoC8uFHFATXJANM4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bfnq+fHYZYUfJPwNg7TuPM5OUQv1a5oOQxL7DTV0m4T9ENCfSQd9fULBREyfcWzXOMTdXo2/VLSTuRfFpxeOs6T6gRkk2pJGT6I3jYO4nyANtGx8TMi6VwJGmvAJX7jXQkwOGc6frSku2cyvNskcBWGuoK4pgyhYwmx2DTc1oVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [141.14.12.127] (g127.RadioFreeInternet.molgen.mpg.de [141.14.12.127])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 20F1561E5FE05;
+	Tue, 10 Sep 2024 09:09:38 +0200 (CEST)
+Message-ID: <09022c4f-37bf-4119-bf64-87e82af3673e@molgen.mpg.de>
+Date: Tue, 10 Sep 2024 09:09:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240909165046.644417-3-vadfed@meta.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v7 net-next 01/15] genetlink: extend
+ info user-storage to match NL cb ctx
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Donald Hunter <donald.hunter@gmail.com>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, edumazet@google.com,
+ Madhu Chittim <madhu.chittim@intel.com>, anthony.l.nguyen@intel.com,
+ Simon Horman <horms@kernel.org>, przemyslaw.kitszel@intel.com,
+ Jakub Kicinski <kuba@kernel.org>, intel-wired-lan@lists.osuosl.org,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>
+References: <cover.1725919039.git.pabeni@redhat.com>
+ <4bd304768d7ef1fdee5033b8fe1788092ac0af38.1725919039.git.pabeni@redhat.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <4bd304768d7ef1fdee5033b8fe1788092ac0af38.1725919039.git.pabeni@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Vadim,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/net_tstamp-add-SCM_TS_OPT_ID-to-provide-OPT_ID-in-control-message/20240910-005324
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240909165046.644417-3-vadfed%40meta.com
-patch subject: [PATCH net-next v4 2/3] net_tstamp: add SCM_TS_OPT_ID for RAW sockets
-config: arm-integrator_defconfig (https://download.01.org/0day-ci/archive/20240910/202409101415.65PxVwQn-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 05f5a91d00b02f4369f46d076411c700755ae041)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240910/202409101415.65PxVwQn-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409101415.65PxVwQn-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from net/ipv4/tcp.c:252:
-   In file included from include/linux/inet_diag.h:5:
-   In file included from include/net/netlink.h:6:
-   In file included from include/linux/netlink.h:7:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/arm/include/asm/cacheflush.h:10:
-   In file included from include/linux/mm.h:2232:
-   include/linux/vmstat.h:517:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     517 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> net/ipv4/tcp.c:485:25: error: use of undeclared identifier 'sockc'
-     485 |                 sock_tx_timestamp(sk, sockc, &shinfo->tx_flags);
-         |                                       ^
-   1 warning and 1 error generated.
+Dear Paolo,
 
 
-vim +/sockc +485 net/ipv4/tcp.c
+Thank you for your patch.
 
-   476	
-   477	static void tcp_tx_timestamp(struct sock *sk, u16 tsflags)
-   478	{
-   479		struct sk_buff *skb = tcp_write_queue_tail(sk);
-   480	
-   481		if (tsflags && skb) {
-   482			struct skb_shared_info *shinfo = skb_shinfo(skb);
-   483			struct tcp_skb_cb *tcb = TCP_SKB_CB(skb);
-   484	
- > 485			sock_tx_timestamp(sk, sockc, &shinfo->tx_flags);
-   486			if (tsflags & SOF_TIMESTAMPING_TX_ACK)
-   487				tcb->txstamp_ack = 1;
-   488			if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK)
-   489				shinfo->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;
-   490		}
-   491	}
-   492	
+Am 10.09.24 um 00:09 schrieb Paolo Abeni:
+> This allows a more uniform implementation of non-dump and dump
+> operations, and will be used later in the series to avoid some
+> per-operation allocation.
+> 
+> Additionally rename the NL_ASSERT_DUMP_CTX_FITS macro, to
+> fit a more extended usage.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Should a resent be necessary, you could also mention the new name 
+`NL_ASSERT_CTX_FITS` in the commit message. (Maybe even a separate 
+commit, so the actual change is easier to review.)
+
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+>   drivers/net/vxlan/vxlan_mdb.c        | 2 +-
+>   include/linux/netlink.h              | 5 +++--
+>   include/net/genetlink.h              | 8 ++++++--
+>   net/core/netdev-genl.c               | 2 +-
+>   net/core/rtnetlink.c                 | 2 +-
+>   net/devlink/devl_internal.h          | 2 +-
+>   net/ethtool/rss.c                    | 2 +-
+>   net/netfilter/nf_conntrack_netlink.c | 2 +-
+>   net/netlink/genetlink.c              | 4 ++--
+>   9 files changed, 17 insertions(+), 12 deletions(-)
+
+[…]
+
+With this:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
