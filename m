@@ -1,153 +1,186 @@
-Return-Path: <netdev+bounces-126980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AA11973779
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:35:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A9049737C7
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:41:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52EE41C24E30
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:35:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D55C81F2631D
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 12:41:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A44193096;
-	Tue, 10 Sep 2024 12:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56E5191F7B;
+	Tue, 10 Sep 2024 12:41:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jQ4Xm46q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JLrCfCVB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1363A18DF72;
-	Tue, 10 Sep 2024 12:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2991917FF;
+	Tue, 10 Sep 2024 12:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725971663; cv=none; b=L0jG5dTCrdbE1ZK1xJG2gYff6p/xZ/0pd6DlbtQ27dzxjwjajvpqaPkX+iJFzuLOOsMPLfUUPg8PzOLB1OJ1p5RUuFaJSv2DJ6Gevd6om9kwERke3JDQBN90VS2GY6ZShGjT9tFgw6cuzUXIX1zGJWT/oLaonjTyCZpZCbGojmw=
+	t=1725972098; cv=none; b=LVAro6WOZE1mV30csHi/XFMEQyvGsdbiNUUrLXB9X2CWuj2YZu8dy5eC8y4pFReIlkQulsSG1jp1WP4HcW0Z1IUyN0NssoedCuV+lSGlkFYQOK5ndgOGTsuMYyh/m5uAEPg/Zj3rUVVd06fHEeZPPFoIPgryHfdx1TV6mkjjkko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725971663; c=relaxed/simple;
-	bh=D2of0rmBPhrdqN50P0yetrVdysC/ySiDXZoj6UmJiAQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UdyaNKxe112itg1AtTh/enKtiNzDJmEz3sQjr9k+NWs9yKIKRkLlWifHjwyXov1m2Y7Q51fYbtCM48fjwkiFcWGJLtOhhAO7Q74IER0AA9l85raBRxFmHBpjTzUYt1uC4NFq9DqspUYdDIqKj5eHMGvG75rEzSVxJxyS4CcnBaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jQ4Xm46q; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pIOWqjZFdYf+oBYK80d0t+9czHjmiEGQG/cnsNBDATE=; b=jQ4Xm46q/0XjX88PpXmKGhfR18
-	vTwHUIOEFEpq5ATVxJLNbu+7JuPlPN698cUJcIQa+E0k2nYj6+j6+DNszmcACjYm2jl/XlKgKfeoC
-	9/pRhkVo1GbTea3QdmkThP/YIhfV2PdqGoda5aLqJ1BOB+6/U6NhsYhVNlMtGCzuqtSs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1so04S-0076ev-2R; Tue, 10 Sep 2024 14:34:12 +0200
-Date: Tue, 10 Sep 2024 14:34:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, shenjian15@huawei.com, wangpeiyang1@huawei.com,
-	liuyonglong@huawei.com, chenhao418@huawei.com,
-	sudongming1@huawei.com, xujunsheng@huawei.com,
-	shiyongbang@huawei.com, libaihan@huawei.com, jdamato@fastly.com,
-	horms@kernel.org, kalesh-anakkur.purayil@broadcom.com,
-	jonathan.cameron@huawei.com, shameerali.kolothum.thodi@huawei.com,
-	salil.mehta@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V9 net-next 05/11] net: hibmcge: Implement some .ndo
- functions
-Message-ID: <a863646c-adc0-4d16-aad3-158702dfef45@lunn.ch>
-References: <20240910075942.1270054-1-shaojijie@huawei.com>
- <20240910075942.1270054-6-shaojijie@huawei.com>
+	s=arc-20240116; t=1725972098; c=relaxed/simple;
+	bh=3qR2hYXZ3Wgt0ewP+9TFYTe4gn+0zSUHo7GvUyV7i/4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=c4tiLseoD79uf637fJi3iTovg0thJImEHmo8i2+leXyTljOhFZrfC7VGBsp3nXK8HqL7VQrWef/pL6fUIsKUArAlLhjUy9K6NSN/2YVxUluVKVuDnPUZ5wFluYLmq3QAHYmXOCk22UQkQuua/AJeBv0nDA+8SK26dogEFKzJ70o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JLrCfCVB; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1725972097; x=1757508097;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3qR2hYXZ3Wgt0ewP+9TFYTe4gn+0zSUHo7GvUyV7i/4=;
+  b=JLrCfCVBaSZKbca32QGryK7U3ios9jUA4qfl6ZksVNA6PKJ5dqhOFpu1
+   DjUMs9nhhHPDCt8n5imLBZ8PpFS98MZdF86oqv2P9Urw4MIlYOcBPFkfC
+   eGFDWwNzdmgfJnVIbfFMbpLPJqDO733f9QJ66lgqxa6KC5woNmvKNrawL
+   2WtowHpAhrfjYaAbsO3YU5PqoHm2KDMc2SA5bAatC/05GcsGlBtPHeBaS
+   AOUARRi/kAe4+r5ZL9CDAg1Bx8MjRMEeexVEWRCE6AwcLHWHulOyVSt3/
+   DIQFRCpvhX6i6YRERFl3Hhlt/+ISBM7dDfw1AJiXT4/Pm4NWU02fwXC45
+   w==;
+X-CSE-ConnectionGUID: id1rmDCQS0CtV3cY1YMEMA==
+X-CSE-MsgGUID: 7HkntKPJSCOFTc+8U/h9Tg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11190"; a="28606086"
+X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
+   d="scan'208";a="28606086"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Sep 2024 05:41:35 -0700
+X-CSE-ConnectionGUID: 5Xpyh1n3SGCvdRNgKK753g==
+X-CSE-MsgGUID: tyhg5HQCTwS4kCNluNgoXw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,217,1719903600"; 
+   d="scan'208";a="71415350"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by fmviesa005.fm.intel.com with ESMTP; 10 Sep 2024 05:41:33 -0700
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: bpf@vger.kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org
+Cc: netdev@vger.kernel.org,
+	magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH v2 bpf-next] selftests: xsk: read current MAX_SKB_FRAGS from sysctl knob
+Date: Tue, 10 Sep 2024 14:41:29 +0200
+Message-Id: <20240910124129.289874-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240910075942.1270054-6-shaojijie@huawei.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 10, 2024 at 03:59:36PM +0800, Jijie Shao wrote:
-> Implement the .ndo_open() .ndo_stop() .ndo_set_mac_address()
-> .ndo_change_mtu functions() and ndo.get_stats64()
-> And .ndo_validate_addr calls the eth_validate_addr function directly
-> 
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> ---
-> ChangeLog:
-> v8 -> v9:
->   - Remove HBG_NIC_STATE_OPEN in ndo.open() and ndo.stop(),
->     suggested by Kalesh and Andrew.
->   - Use netif_running() instead of hbg_nic_is_open() in ndo.change_mtu(),
->     suggested by Kalesh and Andrew
->   v8: https://lore.kernel.org/all/20240909023141.3234567-1-shaojijie@huawei.com/
-> v6 -> v7:
->   - Add implement ndo.get_stats64(), suggested by Paolo.
->   v6: https://lore.kernel.org/all/20240830121604.2250904-6-shaojijie@huawei.com/
-> v5 -> v6:
->   - Delete netif_carrier_off() in .ndo_open() and .ndo_stop(),
->     suggested by Jakub and Andrew.
->  v5: https://lore.kernel.org/all/20240827131455.2919051-1-shaojijie@huawei.com/
-> v3 -> v4:
->   - Delete INITED_STATE in priv, suggested by Andrew.
->   - Delete unnecessary defensive code in hbg_phy_start()
->     and hbg_phy_stop(), suggested by Andrew.
->   v3: https://lore.kernel.org/all/20240822093334.1687011-1-shaojijie@huawei.com/
-> RFC v1 -> RFC v2:
->   - Delete validation for mtu in hbg_net_change_mtu(), suggested by Andrew.
->   - Delete validation for mac address in hbg_net_set_mac_address(),
->     suggested by Andrew.
->   - Add a patch to add is_valid_ether_addr check in dev_set_mac_address,
->     suggested by Andrew.
->   RFC v1: https://lore.kernel.org/all/20240731094245.1967834-1-shaojijie@huawei.com/
-> ---
->  .../net/ethernet/hisilicon/hibmcge/hbg_hw.c   | 39 ++++++++
->  .../net/ethernet/hisilicon/hibmcge/hbg_hw.h   |  3 +
->  .../net/ethernet/hisilicon/hibmcge/hbg_main.c | 97 +++++++++++++++++++
->  .../net/ethernet/hisilicon/hibmcge/hbg_reg.h  | 11 ++-
->  4 files changed, 149 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-> index 8e971e9f62a0..97fee714155a 100644
-> --- a/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-> +++ b/drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c
-> @@ -15,6 +15,7 @@
->   * ctrl means packet description, data means skb packet data
->   */
->  #define HBG_ENDIAN_CTRL_LE_DATA_BE	0x0
-> +#define HBG_PCU_FRAME_LEN_PLUS 4
->  
->  static bool hbg_hw_spec_is_valid(struct hbg_priv *priv)
->  {
-> @@ -129,6 +130,44 @@ void hbg_hw_irq_enable(struct hbg_priv *priv, u32 mask, bool enable)
->  	hbg_reg_write(priv, HBG_REG_CF_INTRPT_MSK_ADDR, value);
->  }
->  
-> +void hbg_hw_set_uc_addr(struct hbg_priv *priv, u64 mac_addr)
-> +{
-> +	hbg_reg_write64(priv, HBG_REG_STATION_ADDR_LOW_2_ADDR, mac_addr);
-> +}
-> +
-> @@ -88,6 +181,10 @@ static int hbg_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  	if (ret)
->  		return ret;
->  
-> +	netdev->max_mtu = priv->dev_specs.max_mtu;
-> +	netdev->min_mtu = priv->dev_specs.min_mtu;
-> +	hbg_change_mtu(priv, HBG_DEFAULT_MTU_SIZE);
+Currently, xskxceiver assumes that MAX_SKB_FRAGS value is always 17
+which is not true - since the introduction of BIG TCP this can now take
+any value between 17 to 45 via CONFIG_MAX_SKB_FRAGS.
 
-It does not help that you added added HBG_DEFAULT_MTU_SIZE in a
-previous patch, but as far as i see, it is just ETH_DATA_LEN.
+Adjust the TOO_MANY_FRAGS test case to read the currently configured
+MAX_SKB_FRAGS value by reading it from /proc/sys/net/core/max_skb_frags.
+If running system does not provide that sysctl file then let us try
+running the test with a default value.
 
-Please use the standard defines, rather than adding your own. It makes
-the code a lot easier to understand, it is not using some special
-jumbo size by default, it is just the plain, boring, normal 1500
-bytes.
-
-    Andrew
-
+Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 ---
-pw-bot: cr
+
+v2: instead of failing the test case when reading frag value from sysctl
+    file did not succeed, use a default count and proceed with test [Magnus]
+
+ tools/testing/selftests/bpf/xskxceiver.c | 43 +++++++++++++++++++++---
+ tools/testing/selftests/bpf/xskxceiver.h |  1 -
+ 2 files changed, 38 insertions(+), 6 deletions(-)
+
+diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
+index 92af633faea8..11f047b8af75 100644
+--- a/tools/testing/selftests/bpf/xskxceiver.c
++++ b/tools/testing/selftests/bpf/xskxceiver.c
+@@ -325,6 +325,25 @@ static bool ifobj_zc_avail(struct ifobject *ifobject)
+ 	return zc_avail;
+ }
+ 
++#define MAX_SKB_FRAGS_PATH "/proc/sys/net/core/max_skb_frags"
++static unsigned int get_max_skb_frags(void)
++{
++	unsigned int max_skb_frags = 0;
++	FILE *file;
++
++	file = fopen(MAX_SKB_FRAGS_PATH, "r");
++	if (!file) {
++		ksft_print_msg("Error opening %s\n", MAX_SKB_FRAGS_PATH);
++		return 0;
++	}
++
++	if (fscanf(file, "%u", &max_skb_frags) != 1)
++		ksft_print_msg("Error reading %s\n", MAX_SKB_FRAGS_PATH);
++
++	fclose(file);
++	return max_skb_frags;
++}
++
+ static struct option long_options[] = {
+ 	{"interface", required_argument, 0, 'i'},
+ 	{"busy-poll", no_argument, 0, 'b'},
+@@ -2245,13 +2264,24 @@ static int testapp_poll_rxq_tmout(struct test_spec *test)
+ 
+ static int testapp_too_many_frags(struct test_spec *test)
+ {
+-	struct pkt pkts[2 * XSK_DESC__MAX_SKB_FRAGS + 2] = {};
++	struct pkt *pkts;
+ 	u32 max_frags, i;
++	int ret;
+ 
+-	if (test->mode == TEST_MODE_ZC)
++	if (test->mode == TEST_MODE_ZC) {
+ 		max_frags = test->ifobj_tx->xdp_zc_max_segs;
+-	else
+-		max_frags = XSK_DESC__MAX_SKB_FRAGS;
++	} else {
++		max_frags = get_max_skb_frags();
++		if (!max_frags) {
++			ksft_print_msg("Couldn't retrieve MAX_SKB_FRAGS from system, using default (17) value\n");
++			max_frags = 17;
++		}
++		max_frags += 1;
++	}
++
++	pkts = calloc(2 * max_frags + 2, sizeof(struct pkt));
++	if (!pkts)
++		return TEST_FAILURE;
+ 
+ 	test->mtu = MAX_ETH_JUMBO_SIZE;
+ 
+@@ -2281,7 +2311,10 @@ static int testapp_too_many_frags(struct test_spec *test)
+ 	pkts[2 * max_frags + 1].valid = true;
+ 
+ 	pkt_stream_generate_custom(test, pkts, 2 * max_frags + 2);
+-	return testapp_validate_traffic(test);
++	ret = testapp_validate_traffic(test);
++
++	free(pkts);
++	return ret;
+ }
+ 
+ static int xsk_load_xdp_programs(struct ifobject *ifobj)
+diff --git a/tools/testing/selftests/bpf/xskxceiver.h b/tools/testing/selftests/bpf/xskxceiver.h
+index 885c948c5d83..e46e823f6a1a 100644
+--- a/tools/testing/selftests/bpf/xskxceiver.h
++++ b/tools/testing/selftests/bpf/xskxceiver.h
+@@ -55,7 +55,6 @@
+ #define XSK_UMEM__LARGE_FRAME_SIZE (3 * 1024)
+ #define XSK_UMEM__MAX_FRAME_SIZE (4 * 1024)
+ #define XSK_DESC__INVALID_OPTION (0xffff)
+-#define XSK_DESC__MAX_SKB_FRAGS 18
+ #define HUGEPAGE_SIZE (2 * 1024 * 1024)
+ #define PKT_DUMP_NB_TO_PRINT 16
+ #define RUN_ALL_TESTS UINT_MAX
+-- 
+2.34.1
+
 
