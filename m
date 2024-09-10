@@ -1,81 +1,118 @@
-Return-Path: <netdev+bounces-127147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A42C1974554
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 00:03:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 650E5974565
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 00:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66F15283CD5
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 22:03:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 957651C25376
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 22:09:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3EA318DF94;
-	Tue, 10 Sep 2024 22:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4921ABEC0;
+	Tue, 10 Sep 2024 22:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nu9yfT52"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wjdt+G3R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB111A255E
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 22:03:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F2E51A38EE;
+	Tue, 10 Sep 2024 22:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726005819; cv=none; b=s0KzfKMhobRFfMu/McaHa/i+lUcID7m82Kr/Yw0m2Frgn6uAHDHwQs6hF3jTPMQFIaPPHr8Zy9bbdigF7+a/Q+IiyFe2iOz0yqBMuppzq1eCTkhxNc9qE1fBEkqOBwxt57sbmgufhkuo55JwENjsVaztrg66n9VY8WUxyvD8c6g=
+	t=1726006158; cv=none; b=JCVN9Ko18BjAtyE7IWmIDMQxqeLyLMSoUIDnUmS04rqArQ5d9Y3CED5vtok/crjJIeumknGjp6NxR1yRXLYjGUPa2Lu1bbmOw2LWokoCd9vVGCiSBeDfmIuLVPPKLE5pf1NTmcESA9/ZNBtMy1/8EEM9lp5ruL7GRaQZL45JnD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726005819; c=relaxed/simple;
-	bh=sfENmLrwlWzvAOD+5XYnB6P0qhJUFGqNql3IOwc8uH8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HukH6GzckQlATbbPA4WqJ/vXCV0JTEl0dWusxYVYngD6ZP7u6CadBbO9UdVALm6XowoEWU+n7qTG0S4+2WrHK5Z0DdSOuVwar1X0VgwaaHPZhe4GEr6+wV5FF1m0jhG0/jBXKKTfiABBcfaYXc50NJvEnqWiFSgq3ccnc96L3IU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nu9yfT52; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CF2FC4CEC3;
-	Tue, 10 Sep 2024 22:03:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726005819;
-	bh=sfENmLrwlWzvAOD+5XYnB6P0qhJUFGqNql3IOwc8uH8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Nu9yfT52CBf8EpHW3/x8hc+x4TEsNJt3RBAgA5+R5xuXiIwBgBpqFqu730gMGZAsb
-	 LEla0lCFWkE3xZX8SuJPAtyyoWQiVAsLwkv4eja95BwOJjqStcx7bqQA9bjSjnLEds
-	 JXCjVEtQzktNQaoDB/U/fiLi4914CKHAuXj87HqX3D6yNA0P11Sdcd25jySUqWZMj5
-	 eosJ4sEvcdXdRKsJrgXXfBZATKMOcCR7w0BLB+sYY0PNssy3kloTX1TuF+v/enOUtC
-	 eYb6mD8Od2ovSgElA9WK5r/4ATJ46eaG6Uo+10pHzdGhTIjAvgHpa6b+lYGdzj7ikH
-	 ifHnX6Lk7gp+w==
-Date: Tue, 10 Sep 2024 15:03:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
- <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Donald Hunter <donald.hunter@gmail.com>,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, edumazet@google.com
-Subject: Re: [PATCH v7 net-next 14/15] iavf: Add net_shaper_ops support
-Message-ID: <20240910150337.6c397227@kernel.org>
-In-Reply-To: <6c6b03fca7cc58658d47e0f3da68bbbcda4ae1ec.1725919039.git.pabeni@redhat.com>
-References: <cover.1725919039.git.pabeni@redhat.com>
-	<6c6b03fca7cc58658d47e0f3da68bbbcda4ae1ec.1725919039.git.pabeni@redhat.com>
+	s=arc-20240116; t=1726006158; c=relaxed/simple;
+	bh=UC492TViKow3sU0MNcqyylalwJUa6SkDtCaqKQQko50=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jnjkskIt3MnaMrIhkMC2j155gaCnDtai14B4vnSRYPEebPplx99qUlrLW1lbAyNIvG5P9n3vqeocoSscb8XQ5APuOaNpjUywk8A9rHBS7pzH2f6Z03uSOMW9W7E9kUhDWtpb6VldUBkboHWX9hK/pBvn6CQRMzwpYHNmCM83T1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wjdt+G3R; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-206aee40676so50457935ad.0;
+        Tue, 10 Sep 2024 15:09:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726006156; x=1726610956; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4773Rvu09r0h6PHXGaI6AMnY7/hdXotFStOCXJRY+po=;
+        b=Wjdt+G3RPd22S+ps1oCdw8JrxrsnXvIYGwZ7sEfIQyMPyzt+gMBBJrEfI+2QkKF1Qt
+         BXL8SOg1RRWbqI0EpdC3+IJorXrMkIjJNMmrIC8dKpxu5LrcBsMCSprWdcs09fMwkGHj
+         LFqNxzTGgd5WQuymoM39BeVYU5bxY67x9Uh5QpYMVKmoJu2hQQrJAs2gAXXDB9r3nene
+         UULqm96b6Z7Ei+LDV4uzUxf7QAQswk5faqlfXUiQS2cnnk+ra6FoWRmNflUHLoNEqSV/
+         BIUDQZMSHG6cg/+vwdSdj2RUl9MhPpm2NNOs/c5HGhBsYt5HMsG1tXA1PHm7Uo5y+fdo
+         QawA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726006156; x=1726610956;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4773Rvu09r0h6PHXGaI6AMnY7/hdXotFStOCXJRY+po=;
+        b=X0FzaAipSI2J2UUm/DEhxzruW/Zse4MnPtWi4Qe/tSABjn3miWp4mljksrgFVQsFOM
+         q+HQp4sekfl1v+S67KDANAYqwdvygqeV2XatCAIomt+Pwf66UtEpp9GqtJktetj//X6m
+         GWROwkwhmt3ZMvHZRS94FLblNEkEjw2E9OmFK3X1IITkmeQwA2K1vdpm8NbTSYLZZsp9
+         ByljRMW+/VEm9IlpOrKElpzOqUlfVT0YtCJR3dqqYazoghuhb5/+/hL5n7virQS3a1Jg
+         sNOAlG17UbrcyHdCVO3dvCbgRHMaHiuSV/PCkjijmBSUJDHAUiffk6A1kYWSgZgb5pTF
+         Q6vg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwNskuY85FOwa9O98zNG8xiZOVu97iV5P/qvhfdXN8bL7hs45qj7R6Mm8WRdDGP08jmwfms6C+pqUtbi4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLizD3wQsVkLHA4Psx1VoElITIxM41MkB9S0q7fT1zBk0Vk9Jp
+	Lyt0cPZ8tvfbjO7mR60MfT+toGo6XjMgc/TEY0/DogTQonWE9HlOjybh9w7P
+X-Google-Smtp-Source: AGHT+IGsAMFMKE8Go/IHg15W8t4bWEhonD919grXqat/P6VH98GgrcZV2ysBDWdzrPJpOUTev+amFQ==
+X-Received: by 2002:a17:902:c408:b0:205:951b:563f with SMTP id d9443c01a7336-2074c6fe6b6mr24778705ad.49.1726006155844;
+        Tue, 10 Sep 2024 15:09:15 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710f38218sm52946525ad.292.2024.09.10.15.09.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 15:09:15 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	jacob.e.keller@intel.com,
+	horms@kernel.org,
+	sd@queasysnail.net,
+	chunkeey@gmail.com
+Subject: [PATCHv2 net-next] net: gianfar: fix NVMEM mac address
+Date: Tue, 10 Sep 2024 15:09:13 -0700
+Message-ID: <20240910220913.14101-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 10 Sep 2024 00:10:08 +0200 Paolo Abeni wrote:
-> +	if (adapter->netdev->reg_state == NETREG_REGISTERED) {
-> +		mutex_lock(&adapter->netdev->lock);
-> +		devlock = true;
-> +	}
+If nvmem loads after the ethernet driver, mac address assignments will
+not take effect. of_get_ethdev_address returns EPROBE_DEFER in such a
+case so we need to handle that to avoid eth_hw_addr_random.
 
-This leads to a false positive in cocci.
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+ v2: use goto instead of return
+---
+ drivers/net/ethernet/freescale/gianfar.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Any concerns about moving the mutex_init() / _destroy() into
-alloc_netdev_mqs() / free_netdev()?  I guess one could argue
-that narrower scope of the lock being valid may help catching 
-errors, but I think we'll instead end up with more checks like
-the above sprinkled around than bugs caught?
+diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
+index 2baef59f741d..ecb1703ea150 100644
+--- a/drivers/net/ethernet/freescale/gianfar.c
++++ b/drivers/net/ethernet/freescale/gianfar.c
+@@ -754,6 +754,8 @@ static int gfar_of_init(struct platform_device *ofdev, struct net_device **pdev)
+ 		priv->device_flags |= FSL_GIANFAR_DEV_HAS_BUF_STASHING;
+ 
+ 	err = of_get_ethdev_address(np, dev);
++	if (err == -EPROBE_DEFER)
++		goto err_grp_init;
+ 	if (err) {
+ 		eth_hw_addr_random(dev);
+ 		dev_info(&ofdev->dev, "Using random MAC address: %pM\n", dev->dev_addr);
+-- 
+2.46.0
+
 
