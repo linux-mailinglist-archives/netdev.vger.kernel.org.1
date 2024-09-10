@@ -1,190 +1,169 @@
-Return-Path: <netdev+bounces-127021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9FF4973AA0
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:54:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 638AB973AA8
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 16:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2E61C21715
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:54:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1684B22239
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 14:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDAA757EB;
-	Tue, 10 Sep 2024 14:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5231196C6C;
+	Tue, 10 Sep 2024 14:55:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GpNfWnrN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bt/hZ6KX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5D218C34B;
-	Tue, 10 Sep 2024 14:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B07F189903;
+	Tue, 10 Sep 2024 14:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725980037; cv=none; b=ZqL43RPTY/0+c4q1whaCScTE0b1OrZPuh+IAomeM0sUDUAyPEtF8RAqC295p1yyk9gr6BPpeuvE4GhLzGgZL2sRxNPQn4BuEGY67An/FDjASU9Zl3EGWk0vSZZzE48LB4yvoZo/ENZu53trDqLP0Duv/wwzgTfFtr0Snk1IJNLA=
+	t=1725980135; cv=none; b=D62i2AeObanv2yyOKB4awIPTn8io6e5z6G10IWOlq1u5J0QTrpgvtnvD8MlIgsZoepOqcaFGoYguAcYTUTWOqp2sWNMjXwwgu83+dyRr1qaji49LZGbZJvDNF9ZZVO1ucZQvub/ts6Hu/j3H2892a3IJmNl6JZBM5uaQMxkY+tE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725980037; c=relaxed/simple;
-	bh=zKScHZ7ZqaDDUwyvpBIx4rom5y1ZiJkBljuM/JAMBo0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=MVTvt3Pdc81GiOker60lxqlhWPwPcgcj4Z5yd3IMQomAV7e1xDi2q6/XmxBsViv2NbtFiGvFauf5TZday5M4Rl1N2TE1Jzi2fpaMJqwriY6dXi6twzHDv6Mvhk2GlBzLCYxU8QvKnzcL3kLoVxcI61GYYheVDWbExdsYRpdUXgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GpNfWnrN; arc=none smtp.client-ip=209.85.160.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4581f44b9b4so5704391cf.1;
-        Tue, 10 Sep 2024 07:53:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1725980035; x=1726584835; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rr1UKDyQ/zeb0p3Tv9UrCdmESCimLucSGCIARwY3ysA=;
-        b=GpNfWnrNlpFB1oDQqUKlAmDhwW7LzMOMzrKm6rF3viM/mFKiICxSt9Fr97WqKfMsdw
-         1YxkD/8Roj38cLm1JXsyn2xuzW9En1LmhERbVZ2TiZg6cNDDjbrDALpu9Y2kAe9pGlcb
-         zJXOyTsS4n4Waz48Fvi3vyP+QpezQW2qYJ7X4Hvn7AE31IgR/EiqIORKZtfG5guMJhuG
-         ZKKk5TKnD1ZlXK7qICbrMQjPWdeAdYzHacDzh5J1dIIp3A8IsBL39cFyROq95/ENBVw+
-         u5uCturXGZLFp9QmZhkWSFpLFuQehhEFFhsGZmPy8ZyjwEhywgxT2R0PFHDz6LfXu6NK
-         +vCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725980035; x=1726584835;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rr1UKDyQ/zeb0p3Tv9UrCdmESCimLucSGCIARwY3ysA=;
-        b=r3ndVI45t7ZeDXO62dGAt99/IULU/3qFkJe2ry4embXRajOZl1uugJ85RpfedMFOJU
-         px5pJuLmtXAREtTbCqbC+7TLChTQgnI8HU+dLLW6udJzMsXrZrLvrnFxmsseOtlSWoBe
-         IU0dPPieTTzv0nEFyZGpQU9pByQw3rJJLEZsA3Yjg7WWxn+LAXGgGPJb2WOwCo2358mr
-         AdI1SvWpZYc+pqfgd0D++KqSNP8JUe0fFYH7ka3ycMlo6zEasL8HBq21p9CCsiIB47jr
-         d9T/HCobJj3fPNNZh8/FzR6mgpo6bQe13Ziyy/oRknKaBUKhiaTDXnTyu9YHaGQAUp+p
-         LZkw==
-X-Forwarded-Encrypted: i=1; AJvYcCVDZFJ5OyGXjElSC+DHECDz1SVj9z/xNzRYM2TubBJrTboxUPEoR14AusedeI9huyGvFfj19pI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxirljTDEaOLBSO/PM8miNlJ8BIoGm+msUvlaHbnYe81maSXvqu
-	3lVcu4mWJwvI2u15aas1y9Oe87GxjY+uV6WSv7r5ovsKuoU6wJOr
-X-Google-Smtp-Source: AGHT+IEJRZ+y4qosu/LeEY6jpJXInsEysZJJYz/4Q/d0zNu+H8545m+hFnVrOCGJgOaBnaickkWZTw==
-X-Received: by 2002:a05:622a:4184:b0:458:23fc:f345 with SMTP id d75a77b69052e-45823fcf549mr171706711cf.38.1725980034500;
-        Tue, 10 Sep 2024 07:53:54 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-458314e05a8sm18672911cf.34.2024.09.10.07.53.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 07:53:54 -0700 (PDT)
-Date: Tue, 10 Sep 2024 10:53:53 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- stable@vger.kernel.org, 
- nsz@port70.net, 
- mst@redhat.com, 
- yury.khrustalev@arm.com, 
- broonie@kernel.org, 
- sudeep.holla@arm.com, 
- Willem de Bruijn <willemb@google.com>, 
- stable@vger.kernel.net
-Message-ID: <66e05d81c04fe_a00b829435@willemb.c.googlers.com.notmuch>
-In-Reply-To: <66e05a2259919_9de00294f9@willemb.c.googlers.com.notmuch>
-References: <20240910004033.530313-1-willemdebruijn.kernel@gmail.com>
- <CACGkMEsnPmbo8t6PbD8YsgKrZWHXG=Rz8ZwTDBJkSbmyzkNGSA@mail.gmail.com>
- <66e05a2259919_9de00294f9@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH net] net: tighten bad gso csum offset check in
- virtio_net_hdr
+	s=arc-20240116; t=1725980135; c=relaxed/simple;
+	bh=U1H5UjDwEAvnyXdqEJPmbXEa33TZuT0QfjD2PpoqWa8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iKAu+DR86C3Za+wRSaBfO+7m2Q2qGSRV6hfKnGOKxBkJk1wKAb4rA/NT40eU6lt5JeU1Fpyk0E7HMjdvoACXePQd85eb8SjTApTpJOYvEbdRwiFRgjdnE7r7oNxPwRB2TQZS249FG10IbBteEy5C/Mw0MduD87LkH/rTqprKO88=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bt/hZ6KX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC009C4CEC3;
+	Tue, 10 Sep 2024 14:55:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1725980135;
+	bh=U1H5UjDwEAvnyXdqEJPmbXEa33TZuT0QfjD2PpoqWa8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Bt/hZ6KXwP+aol2aTvTh5LXiCvjSWI5d8SoV/ZC4RRmrXQKPVWfDg6S1Btf8jvgyU
+	 2stb8pYRbkGPKk504CbatNriAAW04RUPBWeFr6ASd6hkhG6iHDtFXFifLTFo4Y0joV
+	 Do06HD2a94IsXFc+Hg4NQ2tZ7DN6kiF82eQf17qpTm1l/tcqusLxT2Fg3oIN1fCrKS
+	 YmlDX7Cfa8eBzKgAkzZxXb/J9/Kx1LPJjteqYlg6sAU6Pwc7Tiib3RkXmNPOcaqkeR
+	 5XhUJFYil6y7Dv7U8F/dZa6IQ5JU4T23BxDbzIzVT4vrvDVr5OQjRLm6GDt72WR2DF
+	 mAAqwj4OglWmg==
+Message-ID: <77443af4-c16e-4bcc-84bd-d808f12b9770@kernel.org>
+Date: Tue, 10 Sep 2024 16:55:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH bpf-next/net v5 3/3] selftests/bpf: Add mptcp subflow
+ subtest
+Content-Language: en-GB
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240910-upstream-bpf-next-20240506-mptcp-subflow-test-v5-0-2c664a7da47c@kernel.org>
+ <20240910-upstream-bpf-next-20240506-mptcp-subflow-test-v5-3-2c664a7da47c@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240910-upstream-bpf-next-20240506-mptcp-subflow-test-v5-3-2c664a7da47c@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Willem de Bruijn wrote:
-> Jason Wang wrote:
-> > On Tue, Sep 10, 2024 at 8:40=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > From: Willem de Bruijn <willemb@google.com>
-> > >
-> > > The referenced commit drops bad input, but has false positives.
-> > > Tighten the check to avoid these.
-> > >
-> > > The check detects illegal checksum offload requests, which produce
-> > > csum_start/csum_off beyond end of packet after segmentation.
-> > >
-> > > But it is based on two incorrect assumptions:
-> > >
-> > > 1. virtio_net_hdr_to_skb with VIRTIO_NET_HDR_GSO_TCP[46] implies GS=
-O.
-> > > True in callers that inject into the tx path, such as tap.
-> > > But false in callers that inject into rx, like virtio-net.
-> > > Here, the flags indicate GRO, and CHECKSUM_UNNECESSARY or
-> > > CHECKSUM_NONE without VIRTIO_NET_HDR_F_NEEDS_CSUM is normal.
-> > >
-> > > 2. TSO requires checksum offload, i.e., ip_summed =3D=3D CHECKSUM_P=
-ARTIAL.
-> > > False, as tcp[46]_gso_segment will fix up csum_start and offset for=
+Hello,
 
-> > > all other ip_summed by calling __tcp_v4_send_check.
-> > >
-> > > Because of 2, we can limit the scope of the fix to virtio_net_hdr
-> > > that do try to set these fields, with a bogus value.
-> > >
-> > > Link: https://lore.kernel.org/netdev/20240909094527.GA3048202@port7=
-0.net/
-> > > Fixes: 89add40066f9 ("net: drop bad gso csum_start and offset in vi=
-rtio_net_hdr")
-> > > Signed-off-by: Willem de Bruijn <willemb@google.com>
-> > > Cc: <stable@vger.kernel.net>
-> > >
-> > > ---
-> > >
-> > > Verified that the syzbot repro is still caught.
-> > >
-> > > An equivalent alternative would be to move the check for csum_offse=
-t
-> > > to where the csum_start check is in segmentation:
-> > >
-> > > -    if (unlikely(skb_checksum_start(skb) !=3D skb_transport_header=
-(skb)))
-> > > +    if (unlikely(skb_checksum_start(skb) !=3D skb_transport_header=
-(skb) ||
-> > > +                 skb->csum_offset !=3D offsetof(struct tcphdr, che=
-ck)))
-> > >
-> > > Cleaner, but messier stable backport.
-> > >
-> > > We'll need an equivalent patch to this for VIRTIO_NET_HDR_GSO_UDP_L=
-4.
-> > > But that csum_offset test was in a different commit, so different
-> > =
+On 10/09/2024 16:13, Matthieu Baerts (NGI0) wrote:
+> From: Geliang Tang <tanggeliang@kylinos.cn>
+> 
+> This patch adds a subtest named test_subflow in test_mptcp to load and
+> verify the newly added MPTCP subflow BPF program. To goal is to make
+> sure it is possible to set different socket options per subflows, while
+> the userspace socket interface only lets the application to set the same
+> socket options for the whole MPTCP connection and its multiple subflows.
+> 
+> To check that, a client and a server are started in a dedicated netns,
+> with veth interfaces to simulate multiple paths. They will exchange data
+> to allow the creation of an additional subflow.
 
-> > Not for this patch, but I see this in UDP_L4:
-> > =
+(...)
 
-> >                        if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM=
-))
-> >                                return -EINVAL;
-> > =
+> diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
+> index d2ca32fa3b21..c30f032edaca 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
+> @@ -335,10 +339,132 @@ static void test_mptcpify(void)
+>  	close(cgroup_fd);
+>  }
 
-> > This seems to forbid VIRTIO_NET_HDR_F_DATA_VALID. I wonder what's the=
+(...)
 
-> > reason for doing this.
-> =
+> +static void wait_for_new_subflows(int fd)
+> +{
+> +	socklen_t len;
+> +	u8 subflows;
+> +	int err, i;
+> +
+> +	len = sizeof(subflows);
+> +	/* Wait max 1 sec for new subflows to be created */
+> +	for (i = 0; i < 10; i++) {
+> +		err = getsockopt(fd, SOL_MPTCP, MPTCP_INFO, &subflows, &len);
+> +		if (!err && subflows > 0)
+> +			break;
+> +
+> +		sleep(0.1);
 
-> It tests &, not =3D=3D ?
+As reported by the CI, we are not in Python, usleep() should be used
+here. I missed that one during my review. I will send a new version with
+the fix tomorrow. Sorry for the noise.
 
-Oh you mean as alternative, for receive of GRO from hypervisor.
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
-Yes, fair point.
-
-Then we also trust a privileged process over tun, like syzkaller.
-When it comes to checksums, I suppose that is fine: it cannot harm
-kernel integrity.
-
-One missing piece is that TCP GSO will fix up non CHECKSUM_PARTIAL
-skbs. UDP GSO does not have the same logic.=
 
