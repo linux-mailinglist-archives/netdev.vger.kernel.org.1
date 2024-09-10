@@ -1,178 +1,237 @@
-Return-Path: <netdev+bounces-126809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-126810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46AD097295D
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:16:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2266972961
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 08:17:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24564282C03
-	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:16:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63B52285C0F
+	for <lists+netdev@lfdr.de>; Tue, 10 Sep 2024 06:17:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14413170A1B;
-	Tue, 10 Sep 2024 06:16:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8C5172773;
+	Tue, 10 Sep 2024 06:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="tz28vgUA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Za70h5tb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F7E4167265
-	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 06:16:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F45144D0C
+	for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 06:17:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1725948972; cv=none; b=P0UOk9BaHFPL94sVPdwQiF7i3LqXPmA1JMhmoJmrgxR8fwFAFkSz1mldGMoAXxJOk7b1SFOc8n+0ycCOgceINGwOE/V6INF8hZrf6pr1HKmQHIMYF9OOwltKWzcQTyQhE/bSBKBefwT6mB0TdWhtSf4ygcXbQU1KIBihGjh63Do=
+	t=1725949051; cv=none; b=Rk9hslfZ9PIsJNS+YNfP+j1RFqy5UkTjN6OKJ0O4BJtX9r5xcwAcG7DT00KdZoqvLPG/HXJnuzijR8Z03gSauRhiYoCjR9QszwQRibl1cCbT+vgmtsmqv+NQ0vsRHeuO7XEWh6C00F9yrQRAokFgDdGGKNrvVLBcmgyRw8iC2T4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1725948972; c=relaxed/simple;
-	bh=fS+d5wsY061jH8ZI60Sc5NNKF+kYjSYtjRqsQAYPBew=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tSEgojKhfsG9czGzejor+dvlq0fDJ7duQrm6oeulUZNhB1L1wbMFh0Y/+3tkokDkj///0cJ7W+yDf8PMwwRD26AdQY0sR1BJQM1Nf65bliqpkNgL2bq15sEo0zBRjecC4d946KTFJjupruc8xqgz4frcFVDtwktNrlvuwfMn96w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=tz28vgUA; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a8a7596b7dfso826721966b.0
-        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 23:16:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1725948968; x=1726553768; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AmAJsURwK+DW3m7B8gIUcePAXx8kg8IYRNC4SJLU320=;
-        b=tz28vgUAVE/F1gJXar1CAMOjMC8NoOconw2qquROTB2JL+QeAPNW2qMlAgWoimWz9o
-         dhxGOK21LSusWNs9XuPi0krfaG4OVjLHmmiEXq0MUjCvKiplMTcAHe+OSXCDroQaiyok
-         kE8LNvh16SELKJaw52PQXzrrWyy7tQUtG/CwI=
+	s=arc-20240116; t=1725949051; c=relaxed/simple;
+	bh=apSLvM16KuVNlK4P/CKuNN6/KBmqfvU9I1gYpnamwq8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=obmo4CKqjQ4ECa2F+QhhjR+Wus4VdCN9uxSve3RC9jCz7vQ1ujro44WEaBEzYjZHvpy5KXmQjjonHrWEnNyHX/tqXtkSguX87AERC0DLgdTzg/T1XRkd7SSw0SHnrUbEhf3LkDuK3C7253FmNyEInw/7K3QvrAd5vLGNi4d7Lvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Za70h5tb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1725949048;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bj0nMfxoMR9WYn/fCaj2CQbQuewmYvIdWgi5BIJAKQ0=;
+	b=Za70h5tblc5KNbocfezLNuQHQCMt+S943eM/1DGAmXDRsPoU4cp91loa58RcrJo+lkcn0h
+	tKQjoyp2NYSeZkFTrV7jjy0C5BkpYNtrb+QB5g+lHffWlsmhjgmc6c9I/yB6h5fd+lRiZt
+	5ujCUN8ZoN76x031ef62NZugwQALMTY=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-367-BGDe6ZJ2MDuB6tauDfFdtQ-1; Tue, 10 Sep 2024 02:17:25 -0400
+X-MC-Unique: BGDe6ZJ2MDuB6tauDfFdtQ-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2d8859d6e9dso339835a91.1
+        for <netdev@vger.kernel.org>; Mon, 09 Sep 2024 23:17:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1725948968; x=1726553768;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AmAJsURwK+DW3m7B8gIUcePAXx8kg8IYRNC4SJLU320=;
-        b=Ccn8Z0RNiqFvwMMRJ4CsZ9GjLlyoU4PDHqARw/gr5ZgJlk/8amN4S1v6cb/RjBqTYg
-         VxZe5r6q/HmO7Jvx4SUQ5JsvIad4q/E3JOXNw6RQ9x8ORNnWHTLhH/W6N89olioUA9GM
-         NHfcMuR2fVzauZBnYekSZr0ivUi7hYpW4DfQ9tNgLHCjOSw+zjrnnUjefyBPNossPnqR
-         yEoVuDjS+UDyPtMFjUQ2/Rv+mJmHdynl8FD4W5X3e0NH61QBWNoLFG4yw6NY7eeVDZav
-         du2VTnRU4Kn97fiIemhzYXUvCEtv+2xroCFemZHt+a3qn1EjV9nebUhn/BioOTIuxFan
-         WwnQ==
-X-Gm-Message-State: AOJu0YyXmF6BkvRYQk9wrFhGF2FAjHLUlXkyq34Gpm40yRzmWGH78VuD
-	eG86mPTpnauV2hqQIothz2yxeQdfZMD6qhZ5BDDN/QIgXOfsIcMK+ZpGO6Vt1FM=
-X-Google-Smtp-Source: AGHT+IGCdY6kRLZrhsdxNiLuOef48H30NNJ7sic/8YXeJN8qXza4dE7+l4JboW3AjfrZC7fMmWNQkw==
-X-Received: by 2002:a17:907:7216:b0:a8d:4e69:4030 with SMTP id a640c23a62f3a-a8d72e670bbmr212380666b.19.1725948967720;
-        Mon, 09 Sep 2024 23:16:07 -0700 (PDT)
-Received: from LQ3V64L9R2.homenet.telecomitalia.it (host-79-23-194-51.retail.telecomitalia.it. [79.23.194.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25ced201sm430117266b.168.2024.09.09.23.16.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Sep 2024 23:16:07 -0700 (PDT)
-Date: Tue, 10 Sep 2024 08:16:05 +0200
-From: Joe Damato <jdamato@fastly.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, kuba@kernel.org,
-	skhawaja@google.com, sdf@fomichev.me, bjorn@rivosinc.com,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v2 1/9] net: napi: Add napi_storage
-Message-ID: <Zt_kJT9jCy1rLLCr@LQ3V64L9R2.homenet.telecomitalia.it>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, kuba@kernel.org, skhawaja@google.com,
-	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240908160702.56618-1-jdamato@fastly.com>
- <20240908160702.56618-2-jdamato@fastly.com>
- <Zt4N1RoplScF2Dbw@LQ3V64L9R2.homenet.telecomitalia.it>
- <Zt94tXG_lzGLWo1w@mini-arch>
+        d=1e100.net; s=20230601; t=1725949044; x=1726553844;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bj0nMfxoMR9WYn/fCaj2CQbQuewmYvIdWgi5BIJAKQ0=;
+        b=QQfcUFwDMp4QrnDy8nSTkxfHWJ/2eBFoP7OdqaOmqdqtBUu/MJ8+xHVqAOHNg5F2c4
+         DMg1+2MvcWe2BR62lXQXcLXsLwgjqhGuKBbUCCv/IF5NVj/T/hpu62XUoXuGYJrsbyza
+         KuG2E2ceuAW2nMNu8dgX7RVxL3rQN7UmFy9HsCcbUaqDs7s+DDccCmgxyDz/3I6EUJkk
+         Ai2LNnRC3nOMA4vL+4CPWcq3Ut1vlAq7Hqn6seYg0xHAwq5Q+WwxRa/L8ikEnPMSpxgs
+         8ifCNdyjkFkDCmWsMNYft5ygwXz2Pxieg5cdYax9zik1p39M87BS9IlYRGNjQlIH+SNT
+         UNow==
+X-Forwarded-Encrypted: i=1; AJvYcCWQWIRiWVcTkWSjw5GbEj/34E99HF7EZPTYgpxUMbE2rv8jFgjQrOEgEVsi3MGbRT0E2Vovv2w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJOOXh+bc55qB5cGkfYZZZ7bIBLlVQaC1pg2tVeQBpgSXZwVj4
+	mzNkUfmjRbhSPauJ4C7hmGdRODFGZu3bH3WM0aYZVCWrUN7xyGHVXJVB0j+24BQ3jaADUE73e5s
+	/N4O2FvR64uI21PnP44TU69VUpp2Q5mb8MtuapyGJbYzvcDvOcYwYrFFyGQ4g7X0BiMCM2dMAKQ
+	KhQMu0uWjC5VY8QIUb3XCnEzZYSq54
+X-Received: by 2002:a17:90b:48d0:b0:2d8:9c97:3c33 with SMTP id 98e67ed59e1d1-2dad50e87f5mr11817676a91.28.1725949044454;
+        Mon, 09 Sep 2024 23:17:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGKc+OqQ9yWduDtl0C+YOrPtPAFc1naFHJxIYbXwEhs4t4ljMH4mChR8cgk7DUVT3rKLtmssrTfEVBU0bCb2HA=
+X-Received: by 2002:a17:90b:48d0:b0:2d8:9c97:3c33 with SMTP id
+ 98e67ed59e1d1-2dad50e87f5mr11817656a91.28.1725949043908; Mon, 09 Sep 2024
+ 23:17:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zt94tXG_lzGLWo1w@mini-arch>
+References: <20240820071913.68004-1-xuanzhuo@linux.alibaba.com>
+ <20240908153930-mutt-send-email-mst@kernel.org> <1725851336.7999291-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvirXU9816r31UCUz8ne-URj-h-txG6Ozd8vwBp-=sbSQ@mail.gmail.com> <1725871860.6174653-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1725871860.6174653-2-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 10 Sep 2024 14:17:12 +0800
+Message-ID: <CACGkMEtvabru_uja8chVhLC27pDoP6y_mBqTKEmN1ohWuAQFPw@mail.gmail.com>
+Subject: Re: [PATCH net] virtio-net: fix overflow inside virtnet_rq_alloc
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, virtualization@lists.linux.dev, 
+	Si-Wei Liu <si-wei.liu@oracle.com>, Darren Kenny <darren.kenny@oracle.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 09, 2024 at 03:37:41PM -0700, Stanislav Fomichev wrote:
-> On 09/08, Joe Damato wrote:
-> > On Sun, Sep 08, 2024 at 04:06:35PM +0000, Joe Damato wrote:
-> > > Add a persistent NAPI storage area for NAPI configuration to the core.
-> > > Drivers opt-in to setting the storage for a NAPI by passing an index
-> > > when calling netif_napi_add_storage.
-> > > 
-> > > napi_storage is allocated in alloc_netdev_mqs, freed in free_netdev
-> > > (after the NAPIs are deleted), and set to 0 when napi_enable is called.
-> > > 
-> > > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > > ---
-> > >  .../networking/net_cachelines/net_device.rst  |  1 +
-> > >  include/linux/netdevice.h                     | 34 +++++++++++++++++++
-> > >  net/core/dev.c                                | 18 +++++++++-
-> > >  3 files changed, 52 insertions(+), 1 deletion(-)
-> > > 
-> > 
-> > [...]
-> > 
-> > > --- a/net/core/dev.c
-> > > +++ b/net/core/dev.c
-> > > @@ -6719,6 +6719,9 @@ void napi_enable(struct napi_struct *n)
-> > >  		if (n->dev->threaded && n->thread)
-> > >  			new |= NAPIF_STATE_THREADED;
-> > >  	} while (!try_cmpxchg(&n->state, &val, new));
-> > > +
-> > > +	if (n->napi_storage)
-> > > +		memset(n->napi_storage, 0, sizeof(*n->napi_storage));
-> > 
-> > This part is very obviously wrong ;)
-> > 
-> > I think when I was reading the other thread about resetting on
-> > channel change [1] I got a bit confused.
-> > 
-> > Maybe what was intended was on napi_enable, do nothing / remove the
-> > above code (which I suppose would give the persistence desired?).
-> > 
-> > But modify net/ethtool/channels.c to reset NAPIs to the global
-> > (sysfs) settings? Not sure how to balance both persistence with
-> > queue count changes in a way that makes sense for users of the API.
-> > 
-> > And, I didn't quite follow the bits about:
-> >   1. The proposed ring to NAPI mapping
-> 
-> [..]
-> 
-> >   2. The two step "takeover" which seemed to imply that we might
-> >      pull napi_id into napi_storage? Or maybe I just read that part
-> >      wrong?
-> 
-> Yes, the suggestion here is to drop patch #2 from your series and
-> keep napi_id as a user facing 'id' for the persistent storage. But,
-> obviously, this requires persistent napi_id(s) that survive device
-> resets.
-> 
-> The function that allocates new napi_id is napi_hash_add
-> from netif_napi_add_weight. So we can do either of the following:
-> 1. Keep everything as is, but add the napi_rehash somewhere
->    around napi_enable to 'takeover' previously allocated napi_id.
-> 2. (preferred) Separate napi_hash_add out of netif_napi_add_weight.
->    And have some new napi_hash_with_id(previous_napi_id) to expose it to the
->    userspace. Then convert mlx5 to this new interface.
+On Mon, Sep 9, 2024 at 4:52=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
+m> wrote:
+>
+> On Mon, 9 Sep 2024 16:47:02 +0800, Jason Wang <jasowang@redhat.com> wrote=
+:
+> > On Mon, Sep 9, 2024 at 11:16=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > >
+> > > On Sun, 8 Sep 2024 15:40:32 -0400, "Michael S. Tsirkin" <mst@redhat.c=
+om> wrote:
+> > > > On Tue, Aug 20, 2024 at 03:19:13PM +0800, Xuan Zhuo wrote:
+> > > > > leads to regression on VM with the sysctl value of:
+> > > > >
+> > > > > - net.core.high_order_alloc_disable=3D1
+> > > > >
+> > > > > which could see reliable crashes or scp failure (scp a file 100M =
+in size
+> > > > > to VM):
+> > > > >
+> > > > > The issue is that the virtnet_rq_dma takes up 16 bytes at the beg=
+inning
+> > > > > of a new frag. When the frag size is larger than PAGE_SIZE,
+> > > > > everything is fine. However, if the frag is only one page and the
+> > > > > total size of the buffer and virtnet_rq_dma is larger than one pa=
+ge, an
+> > > > > overflow may occur. In this case, if an overflow is possible, I a=
+djust
+> > > > > the buffer size. If net.core.high_order_alloc_disable=3D1, the ma=
+ximum
+> > > > > buffer size is 4096 - 16. If net.core.high_order_alloc_disable=3D=
+0, only
+> > > > > the first buffer of the frag is affected.
+> > > > >
+> > > > > Fixes: f9dac92ba908 ("virtio_ring: enable premapped mode whatever=
+ use_dma_api")
+> > > > > Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> > > > > Closes: http://lore.kernel.org/all/8b20cc28-45a9-4643-8e87-ba164a=
+540c0a@oracle.com
+> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > >
+> > > >
+> > > > BTW why isn't it needed if we revert f9dac92ba908?
+> > >
+> > >
+> > > This patch fixes the bug in premapped mode.
+> > >
+> > > The revert operation just disables premapped mode.
+> > >
+> > > So I think this patch is enough to fix the bug, and we can enable
+> > > premapped by default.
+> > >
+> > > If you worry about the premapped mode, I advice you merge this patch =
+and do
+> > > the revert[1]. Then the bug is fixed, and the premapped mode is
+> > > disabled by default, we can just enable it for af-xdp.
+> > >
+> > > [1]: http://lore.kernel.org/all/20240906123137.108741-1-xuanzhuo@linu=
+x.alibaba.com
+> >
+> > Though I think this is a good balance but if we can't get more inputs
+> > from Darren. It seems safer to merge what he had tested.
+>
+> So you mean just merge this:
+>
+>         http://lore.kernel.org/all/20240906123137.108741-1-xuanzhuo@linux=
+.alibaba.com
+>
+> Right?
 
-Jakub is this what you were thinking too?
+It looks to me it hasn't been tested by Darren yet.
 
-If this is the case, then the netlink code needs to be tweaked to
-operate on NAPI IDs again (since they are persistent) instead of
-ifindex + napi_storage index?
+Thanks
 
-LMK.
+>
+> Thanks
+>
+>
+> >
+> > Thanks
+> >
+> > >
+> > > Thanks.
+> > >
+> > >
+> > > >
+> > > > > ---
+> > > > >  drivers/net/virtio_net.c | 12 +++++++++---
+> > > > >  1 file changed, 9 insertions(+), 3 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > > index c6af18948092..e5286a6da863 100644
+> > > > > --- a/drivers/net/virtio_net.c
+> > > > > +++ b/drivers/net/virtio_net.c
+> > > > > @@ -918,9 +918,6 @@ static void *virtnet_rq_alloc(struct receive_=
+queue *rq, u32 size, gfp_t gfp)
+> > > > >     void *buf, *head;
+> > > > >     dma_addr_t addr;
+> > > > >
+> > > > > -   if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> > > > > -           return NULL;
+> > > > > -
+> > > > >     head =3D page_address(alloc_frag->page);
+> > > > >
+> > > > >     dma =3D head;
+> > > > > @@ -2421,6 +2418,9 @@ static int add_recvbuf_small(struct virtnet=
+_info *vi, struct receive_queue *rq,
+> > > > >     len =3D SKB_DATA_ALIGN(len) +
+> > > > >           SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> > > > >
+> > > > > +   if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)=
+))
+> > > > > +           return -ENOMEM;
+> > > > > +
+> > > > >     buf =3D virtnet_rq_alloc(rq, len, gfp);
+> > > > >     if (unlikely(!buf))
+> > > > >             return -ENOMEM;
+> > > > > @@ -2521,6 +2521,12 @@ static int add_recvbuf_mergeable(struct vi=
+rtnet_info *vi,
+> > > > >      */
+> > > > >     len =3D get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room)=
+;
+> > > > >
+> > > > > +   if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gf=
+p)))
+> > > > > +           return -ENOMEM;
+> > > > > +
+> > > > > +   if (!alloc_frag->offset && len + room + sizeof(struct virtnet=
+_rq_dma) > alloc_frag->size)
+> > > > > +           len -=3D sizeof(struct virtnet_rq_dma);
+> > > > > +
+> > > > >     buf =3D virtnet_rq_alloc(rq, len + room, gfp);
+> > > > >     if (unlikely(!buf))
+> > > > >             return -ENOMEM;
+> > > > > --
+> > > > > 2.32.0.3.g01195cf9f
+> > > >
+> > >
+> >
+>
+
 
