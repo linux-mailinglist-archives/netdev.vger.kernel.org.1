@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-127579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42B3E975C6C
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 23:29:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A3E6975C5E
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 23:27:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 669F41C22501
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 21:29:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 628C51C221CD
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 21:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09491BBBE7;
-	Wed, 11 Sep 2024 21:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6AA185B50;
+	Wed, 11 Sep 2024 21:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="c7vVVkaR"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="pVN0VytA"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6717E1BBBCB;
-	Wed, 11 Sep 2024 21:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AB73D3B8;
+	Wed, 11 Sep 2024 21:27:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726090051; cv=none; b=WjFwzWFzkYlI469lGebgfuwuaGpJsjMgDT5ROJELAiy+OVYO+1kPh5WLyutgluA+UJx95RShSBXupA1IK6487AOWUN6aKZbYBuB1yI690fZ+/7a5M8zzKkKW4m00IohHLa5ekXv6tKVUNNS5GOQvSu7jvihA+og4uoO4eZ+zNQY=
+	t=1726090047; cv=none; b=YDKbjBn4rNX2T2IbtdLOjL0yRSOCnaaLk0N/IY/qL7XxQd6cwxSygCalil9kYaJ+eBPSIljQHE9LjAgX5nj6vXNUR12/K+bSirxhnLESKBZmuV/Cf4gKtwxk4BtCTUbCZHMPJNyIWw50Hv2Xpo2joJAkWpg04ZpZvysO2XXmjPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726090051; c=relaxed/simple;
-	bh=/R4ZU5IYO3Vn/DPYHuaQpJVae+A/JDPR9fxCl2uTiwA=;
+	s=arc-20240116; t=1726090047; c=relaxed/simple;
+	bh=61k1xxD3POH+Cv03/8iOHFG6UUq4CTctSR0CjEBqmi4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zyq2BpHRNts0Zdq0OciICk5neQo8ifDeFazWor4LfUwvMbw04/jefuQmoB6JWuU7a/Ml6zQpMKvE8jnid7vBVelkuBJJQ94jjdW46p8XrjJc9PrZ8ZhhIcBm1rmj5X45jy9ou/0Z9imh9w1dk7IzQSayzH8ZfWBwdddF3XQ7LEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=c7vVVkaR; arc=none smtp.client-ip=217.70.183.197
+	 MIME-Version; b=lylDIMysSwvaadNgxluv5ShhN0R4rORD3XcqPvLAN5Yb7wZGuZYD8Y5NFNFLe4xwEHIfVZjiKCp8dE+OwCQc5tsMzqXRVB1LEBQ+1Ioje2mw4LFyK1xGi+5o23/VcFHHzSZjrpwKqyqPvM0xrtWFdYxv0GtFTKMeD/+WsrawbgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=pVN0VytA; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5172A1C0009;
-	Wed, 11 Sep 2024 21:27:21 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5FDE41C0007;
+	Wed, 11 Sep 2024 21:27:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1726090042;
+	t=1726090043;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=r+zUuX3TEbTMb9kGTTFtZ/4QRQvlQbBoikmP33WrT2E=;
-	b=c7vVVkaR6qgBhveBee5BJEAHpUWbU/OeW8RhW1fEPvcE223RWBnwwv2ik8ZhCQRI5uN9VP
-	hApM8iG52eyHVTB9FhDmil9D8qrYeNHh5myaY+P7CSaIjDZfWsgWlffg6vNJ5YC69ENbgx
-	IVTMRQNoeolDZwpoED3jLm6lCLQwmornnPu+QZ5y2xQ4XpPqSOKdePn6ENt7Z8Y+XHqKLb
-	c4XYeNDyQTqiG3ojp9kmioBAGLpNJMdtJ98ADHKA7cYKRFIEUOZ41b8EG6lBo5VfpsDi5e
-	d/8URapmbAJnk9KE7HcG9Chh7UrNCTxPwlXM7zlNBIU4Y5NvRrtizGJUuetbVQ==
+	bh=iTHUsTokc6keqjCmtL8zLGzjeMZ5JmPR1O6Y5URBSdE=;
+	b=pVN0VytACzwRPUE34ySLv963Aa+9JfBNVXQgt+PFbBS7eNOkv6HIy0cmg9HWe7yF0tCQLd
+	AZ2hRMNkcqY3hvJrLCjj9mGeAy4TjLtIQB4kQLDMF65W/rajiwfxmRDJ+WwSb/2Ua9swmO
+	TOEf39F0u8r3h6owiIoNgPOaCEXfaH4nN0kDK/MdKkK81Hz6lbKrfnDDdd43qvIpBZWIrB
+	5Ca5uVqZ/5s13Q8onUC7y+NAqAsgp5L3KsQBeFQNKl611OcV5l97Sl9N28KTfLwkQSpN3I
+	xouqjxvZ18o3h0EWCZfrdGiMa32mwK1EJreVrS0Ux26xeDuY6CPpDErwAyihBg==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: davem@davemloft.net
 Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
@@ -65,9 +65,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
 	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
 	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: [PATCH net-next 5/7] net: phy: introduce ethtool_phy_ops to get and set phy configuration
-Date: Wed, 11 Sep 2024 23:27:09 +0200
-Message-ID: <20240911212713.2178943-6-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next 6/7] net: ethtool: phy: allow reporting and setting the phy isolate status
+Date: Wed, 11 Sep 2024 23:27:10 +0200
+Message-ID: <20240911212713.2178943-7-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240911212713.2178943-1-maxime.chevallier@bootlin.com>
 References: <20240911212713.2178943-1-maxime.chevallier@bootlin.com>
@@ -80,176 +80,210 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Expose phy-specific configuration hooks to get and set the state of an
-ethernet PHY's internal configuration.
-
-So far, these parameters include the loopback state of the PHY
-(host-side loopback) and the isolation state of the PHY.
-
-The .get_config() ethtool_phy_ops gets these status information from the
-phy_device's internal flags, while the .set_config() operation allows
-changing these configuration parameters.
+Add the isolate and loopback status information to the ETHTOOL_PHY_GET
+netlink command attributes, and allow changing these parameters from a
+newly-introduced ETHTOOL_PHY_SET command.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/phy/phy.c        | 59 ++++++++++++++++++++++++++++++++++++
- drivers/net/phy/phy_device.c |  2 ++
- include/linux/ethtool.h      |  8 +++++
- include/linux/phy.h          | 21 +++++++++++++
- 4 files changed, 90 insertions(+)
+ Documentation/networking/ethtool-netlink.rst |  2 +
+ include/uapi/linux/ethtool_netlink.h         |  3 +
+ net/ethtool/netlink.c                        |  8 +++
+ net/ethtool/netlink.h                        |  1 +
+ net/ethtool/phy.c                            | 75 ++++++++++++++++++++
+ 5 files changed, 89 insertions(+)
 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 4f3e742907cb..0cdb0fc30727 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1811,3 +1811,62 @@ int phy_ethtool_nway_reset(struct net_device *ndev)
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index ba90457b8b2d..bbd4ca8b9dbd 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -2234,6 +2234,8 @@ Kernel response contents:
+                                                 bus, the name of this sfp bus
+   ``ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME`` string  if the phy controls an sfp bus,
+                                                 the name of the sfp bus
++  ``ETHTOOL_A_PHY_ISOLATE``             u8      The PHY Isolate status
++  ``ETHTOOL_A_PHY_LOOPBACK``            u8      The PHY Loopback status
+   ===================================== ======  ===============================
+ 
+ When ``ETHTOOL_A_PHY_UPSTREAM_TYPE`` is PHY_UPSTREAM_PHY, the PHY's parent is
+diff --git a/include/uapi/linux/ethtool_netlink.h b/include/uapi/linux/ethtool_netlink.h
+index 283305f6b063..070565dcf497 100644
+--- a/include/uapi/linux/ethtool_netlink.h
++++ b/include/uapi/linux/ethtool_netlink.h
+@@ -59,6 +59,7 @@ enum {
+ 	ETHTOOL_MSG_MM_SET,
+ 	ETHTOOL_MSG_MODULE_FW_FLASH_ACT,
+ 	ETHTOOL_MSG_PHY_GET,
++	ETHTOOL_MSG_PHY_SET,
+ 
+ 	/* add new constants above here */
+ 	__ETHTOOL_MSG_USER_CNT,
+@@ -1079,6 +1080,8 @@ enum {
+ 	ETHTOOL_A_PHY_UPSTREAM_INDEX,		/* u32 */
+ 	ETHTOOL_A_PHY_UPSTREAM_SFP_NAME,	/* string */
+ 	ETHTOOL_A_PHY_DOWNSTREAM_SFP_NAME,	/* string */
++	ETHTOOL_A_PHY_ISOLATE,			/* u8 */
++	ETHTOOL_A_PHY_LOOPBACK,			/* u8 */
+ 
+ 	/* add new constants above here */
+ 	__ETHTOOL_A_PHY_CNT,
+diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
+index e3f0ef6b851b..26982f47a934 100644
+--- a/net/ethtool/netlink.c
++++ b/net/ethtool/netlink.c
+@@ -394,6 +394,7 @@ ethnl_default_requests[__ETHTOOL_MSG_USER_CNT] = {
+ 	[ETHTOOL_MSG_PLCA_GET_STATUS]	= &ethnl_plca_status_request_ops,
+ 	[ETHTOOL_MSG_MM_GET]		= &ethnl_mm_request_ops,
+ 	[ETHTOOL_MSG_MM_SET]		= &ethnl_mm_request_ops,
++	[ETHTOOL_MSG_PHY_SET]		= &ethnl_phy_request_ops,
+ };
+ 
+ static struct ethnl_dump_ctx *ethnl_dump_context(struct netlink_callback *cb)
+@@ -1243,6 +1244,13 @@ static const struct genl_ops ethtool_genl_ops[] = {
+ 		.policy = ethnl_phy_get_policy,
+ 		.maxattr = ARRAY_SIZE(ethnl_phy_get_policy) - 1,
+ 	},
++	{
++		.cmd	= ETHTOOL_MSG_PHY_SET,
++		.flags	= GENL_UNS_ADMIN_PERM,
++		.doit	= ethnl_default_set_doit,
++		.policy = ethnl_phy_set_policy,
++		.maxattr = ARRAY_SIZE(ethnl_phy_set_policy) - 1,
++	},
+ };
+ 
+ static const struct genl_multicast_group ethtool_nl_mcgrps[] = {
+diff --git a/net/ethtool/netlink.h b/net/ethtool/netlink.h
+index 203b08eb6c6f..7ae73e2eab32 100644
+--- a/net/ethtool/netlink.h
++++ b/net/ethtool/netlink.h
+@@ -485,6 +485,7 @@ extern const struct nla_policy ethnl_mm_get_policy[ETHTOOL_A_MM_HEADER + 1];
+ extern const struct nla_policy ethnl_mm_set_policy[ETHTOOL_A_MM_MAX + 1];
+ extern const struct nla_policy ethnl_module_fw_flash_act_policy[ETHTOOL_A_MODULE_FW_FLASH_PASSWORD + 1];
+ extern const struct nla_policy ethnl_phy_get_policy[ETHTOOL_A_PHY_HEADER + 1];
++extern const struct nla_policy ethnl_phy_set_policy[ETHTOOL_A_PHY_MAX + 1];
+ 
+ int ethnl_set_features(struct sk_buff *skb, struct genl_info *info);
+ int ethnl_act_cable_test(struct sk_buff *skb, struct genl_info *info);
+diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
+index 99d2a8b6144c..cc1dc45a6264 100644
+--- a/net/ethtool/phy.c
++++ b/net/ethtool/phy.c
+@@ -30,10 +30,13 @@ ethnl_phy_reply_size(const struct ethnl_req_info *req_base,
+ 	struct phy_req_info *req_info = PHY_REQINFO(req_base);
+ 	struct phy_device_node *pdn = req_info->pdn;
+ 	struct phy_device *phydev = pdn->phy;
++	const struct ethtool_phy_ops *ops;
+ 	size_t size = 0;
+ 
+ 	ASSERT_RTNL();
+ 
++	ops = ethtool_phy_ops;
++
+ 	/* ETHTOOL_A_PHY_INDEX */
+ 	size += nla_total_size(sizeof(u32));
+ 
+@@ -66,6 +69,14 @@ ethnl_phy_reply_size(const struct ethnl_req_info *req_base,
+ 			size += nla_total_size(strlen(sfp_name) + 1);
+ 	}
+ 
++	if (ops && ops->get_config) {
++		/* ETHTOOL_A_PHY_ISOLATE */
++		size += nla_total_size(sizeof(u8));
++
++		/* ETHTOOL_A_PHY_LOOPBACK */
++		size += nla_total_size(sizeof(u8));
++	}
++
+ 	return size;
+ }
+ 
+@@ -75,10 +86,20 @@ ethnl_phy_fill_reply(const struct ethnl_req_info *req_base, struct sk_buff *skb)
+ 	struct phy_req_info *req_info = PHY_REQINFO(req_base);
+ 	struct phy_device_node *pdn = req_info->pdn;
+ 	struct phy_device *phydev = pdn->phy;
++	const struct ethtool_phy_ops *ops;
++	struct phy_device_config cfg;
+ 	enum phy_upstream ptype;
++	int ret;
+ 
+ 	ptype = pdn->upstream_type;
+ 
++	ops = ethtool_phy_ops;
++	if (ops && ops->get_config) {
++		ret = ops->get_config(phydev, &cfg);
++		if (ret)
++			return ret;
++	}
++
+ 	if (nla_put_u32(skb, ETHTOOL_A_PHY_INDEX, phydev->phyindex) ||
+ 	    nla_put_string(skb, ETHTOOL_A_PHY_NAME, dev_name(&phydev->mdio.dev)) ||
+ 	    nla_put_u32(skb, ETHTOOL_A_PHY_UPSTREAM_TYPE, ptype))
+@@ -114,6 +135,14 @@ ethnl_phy_fill_reply(const struct ethnl_req_info *req_base, struct sk_buff *skb)
+ 			return -EMSGSIZE;
+ 	}
+ 
++	/* Append PHY configuration, if possible */
++	if (!ops || !ops->get_config)
++		return 0;
++
++	if (nla_put_u8(skb, ETHTOOL_A_PHY_ISOLATE, cfg.isolate) ||
++	    nla_put_u8(skb, ETHTOOL_A_PHY_LOOPBACK, cfg.loopback))
++		return -EMSGSIZE;
++
+ 	return 0;
+ }
+ 
+@@ -311,3 +340,49 @@ int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 
  	return ret;
  }
- EXPORT_SYMBOL(phy_ethtool_nway_reset);
 +
-+/**
-+ * phy_get_config - Get PHY configuration parameters
-+ * @phydev: the PHY device to act upon
-+ * @phy_cfg:  The configuration to apply
-+ */
-+
-+int phy_get_config(struct phy_device *phydev,
-+		   struct phy_device_config *phy_cfg)
-+{
-+	mutex_lock(&phydev->lock);
-+	phy_cfg->isolate = phydev->isolated;
-+	phy_cfg->loopback = phydev->loopback_enabled;
-+	mutex_unlock(&phydev->lock);
-+
-+	return 0;
-+}
-+
-+/**
-+ * phy_set_config - Set PHY configuration parameters
-+ * @phydev: the PHY device to act upon
-+ * @phy_cfg: the configuration to apply
-+ * @extack: a netlink extack for useful error reporting
-+ */
-+
-+int phy_set_config(struct phy_device *phydev,
-+		   const struct phy_device_config *phy_cfg,
-+		   struct netlink_ext_ack *extack)
-+{
-+	bool loopback_change, isolate_change;
-+	int ret;
-+
-+	/* As the phydev's loopback and isolation state are protected by the
-+	 * phy lock, check first if we'll need to perform the action,
-+	 * then do them as a second step.
-+	 */
-+	mutex_lock(&phydev->lock);
-+	isolate_change = (phy_cfg->isolate != phydev->isolated);
-+	loopback_change = (phy_cfg->loopback != phydev->loopback_enabled);
-+	mutex_unlock(&phydev->lock);
-+
-+	if (isolate_change) {
-+		ret = phy_isolate(phydev, phy_cfg->isolate);
-+		if (ret) {
-+			NL_SET_ERR_MSG(extack, "Error while configuring PHY isolation");
-+			return ret;
-+		}
-+	}
-+
-+	if (loopback_change) {
-+		ret = phy_loopback(phydev, phy_cfg->loopback);
-+		if (ret) {
-+			NL_SET_ERR_MSG(extack, "Error while configuring PHY loopback");
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 2a3db1043626..0714a2b83d18 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -3845,6 +3845,8 @@ static const struct ethtool_phy_ops phy_ethtool_phy_ops = {
- 	.get_plca_status	= phy_ethtool_get_plca_status,
- 	.start_cable_test	= phy_start_cable_test,
- 	.start_cable_test_tdr	= phy_start_cable_test_tdr,
-+	.get_config		= phy_get_config,
-+	.set_config		= phy_set_config,
- };
- 
- static const struct phylib_stubs __phylib_stubs = {
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index 12f6dc567598..480ee99a69a5 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -1140,6 +1140,7 @@ struct phy_device;
- struct phy_tdr_config;
- struct phy_plca_cfg;
- struct phy_plca_status;
-+struct phy_device_config;
- 
- /**
-  * struct ethtool_phy_ops - Optional PHY device options
-@@ -1151,6 +1152,8 @@ struct phy_plca_status;
-  * @get_plca_status: Get PLCA configuration.
-  * @start_cable_test: Start a cable test
-  * @start_cable_test_tdr: Start a Time Domain Reflectometry cable test
-+ * @get_config: Retrieve phy device configuration parameters
-+ * @set_config: Set phy device configuration parameters
-  *
-  * All operations are optional (i.e. the function pointer may be set to %NULL)
-  * and callers must take this into account. Callers must hold the RTNL lock.
-@@ -1172,6 +1175,11 @@ struct ethtool_phy_ops {
- 	int (*start_cable_test_tdr)(struct phy_device *phydev,
- 				    struct netlink_ext_ack *extack,
- 				    const struct phy_tdr_config *config);
-+	int (*get_config)(struct phy_device *phydev,
-+			  struct phy_device_config *phy_cfg);
-+	int (*set_config)(struct phy_device *phydev,
-+			  const struct phy_device_config *phy_cfg,
-+			  struct netlink_ext_ack *extack);
- };
- 
- /**
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index f0a8a5459fbe..ee0364d2afc3 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -887,6 +887,22 @@ enum phy_led_modes {
- 	__PHY_LED_MODES_NUM,
- };
- 
-+/**
-+ * struct phy_device_config - General PHY device configuration parameters for
-+ * status reporting and bulk configuration
-+ *
-+ * A structure containing generic PHY device information, allowing to expose
-+ * internal status to userspace, and perform PHY configuration in a controlled
-+ * manner.
-+ *
-+ * @isolate: The MII-side isolation status of the PHY
-+ * @loopback: The loopback state of the PHY
-+ */
-+struct phy_device_config {
-+	bool isolate;
-+	bool loopback;
++const struct nla_policy ethnl_phy_set_policy[] = {
++	[ETHTOOL_A_PHY_HEADER]		=
++		NLA_POLICY_NESTED(ethnl_header_policy_phy),
++	[ETHTOOL_A_PHY_ISOLATE]		= NLA_POLICY_MAX(NLA_U8, 1),
++	[ETHTOOL_A_PHY_LOOPBACK]	= NLA_POLICY_MAX(NLA_U8, 1),
 +};
 +
- /**
-  * struct phy_led: An LED driven by the PHY
-  *
-@@ -2067,6 +2083,11 @@ int phy_ethtool_set_plca_cfg(struct phy_device *phydev,
- 			     struct netlink_ext_ack *extack);
- int phy_ethtool_get_plca_status(struct phy_device *phydev,
- 				struct phy_plca_status *plca_st);
-+int phy_get_config(struct phy_device *phydev,
-+		   struct phy_device_config *phy_cfg);
-+int phy_set_config(struct phy_device *phydev,
-+		   const struct phy_device_config *phy_cfg,
-+		   struct netlink_ext_ack *extack);
- 
- int __phy_hwtstamp_get(struct phy_device *phydev,
- 		       struct kernel_hwtstamp_config *config);
++static int ethnl_set_phy(struct ethnl_req_info *req_info, struct genl_info *info)
++{
++	struct netlink_ext_ack *extack = info->extack;
++	const struct ethtool_phy_ops *ops;
++	struct nlattr **tb = info->attrs;
++	struct phy_device_config cfg;
++	struct phy_device *phydev;
++	bool mod = false;
++	int ret;
++
++	ops = ethtool_phy_ops;
++	if (!ops || !ops->set_config || !ops->get_config)
++		return -EOPNOTSUPP;
++
++	/* We're running under rtnl */
++	phydev = ethnl_req_get_phydev(req_info, tb[ETHTOOL_A_PHY_HEADER],
++				      extack);
++	if (IS_ERR_OR_NULL(phydev))
++		return -ENODEV;
++
++	ret = ops->get_config(phydev, &cfg);
++	if (ret)
++		return ret;
++
++	ethnl_update_bool(&cfg.isolate, tb[ETHTOOL_A_PHY_ISOLATE], &mod);
++	ethnl_update_bool(&cfg.loopback, tb[ETHTOOL_A_PHY_LOOPBACK], &mod);
++
++	if (!mod)
++		return 0;
++
++	/* Returning 0 is fine as we don't have a notification */
++	return ops->set_config(phydev, &cfg, extack);
++}
++
++const struct ethnl_request_ops ethnl_phy_request_ops = {
++	.hdr_attr		= ETHTOOL_A_PHY_HEADER,
++	.set			= ethnl_set_phy,
++};
 -- 
 2.46.0
 
