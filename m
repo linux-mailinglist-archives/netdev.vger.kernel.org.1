@@ -1,104 +1,94 @@
-Return-Path: <netdev+bounces-127172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DC5397475B
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 02:27:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B009974767
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 02:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 509D71C217A6
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 00:27:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C88C21F26602
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 00:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B708460;
-	Wed, 11 Sep 2024 00:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 504D43D7A;
+	Wed, 11 Sep 2024 00:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PjgjE7Q7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ON8K0b48"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62016B644;
-	Wed, 11 Sep 2024 00:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB5D182D2;
+	Wed, 11 Sep 2024 00:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726014423; cv=none; b=s4djcOqkI9T0a++J5WEFG0HDmViCjE6Z9hOuCPBEMbnYOoQTxAkkHucEzh73Szg+BNfx4l1m9cUvu/3o/dudUXUcapDvS5Er/Ak/+b/EEMxtXdnWjfnP2iQ9UBlXyPO96kb+sx5z1QCkdw7rMnSjMYISTUt4hCGsDnl4H5t0WEE=
+	t=1726014666; cv=none; b=QslJCLHviJI3yMFqYWNhw2aon1nu5M8Fx6VsQl0lDP2oZza2cZ3TxcaCSzoSb3p8NEIZzpj09O0BflYeBH22k4hBIBTa0CE3AYkPULMYzaZoF2lMC35CJIZkYfh/e2ex2m9QD95rv6qFiHoYwm/n/0RMJWOhMtnTbhkZOBeZGs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726014423; c=relaxed/simple;
-	bh=5274iZ8DDuZ6UF/AYxJL9A8/JlsyvGh4kdepPcKklAo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hr/AV/X1FhdXl9XpO26zed1JYpGdQrrTc1sBMSDjIObnNyVPVUR5NnbhCNT994MjTQc7THng+rsqixuqNrUgqebQluzh46uPnERCgY+ZPbeyBuZgNqmIu5dIv6yscmgar/rf9ln5Ld9dQ7wqqrm56wd4UKuK6MEuzjGregDMojk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PjgjE7Q7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F8B9C4CEC3;
-	Wed, 11 Sep 2024 00:27:02 +0000 (UTC)
+	s=arc-20240116; t=1726014666; c=relaxed/simple;
+	bh=3kW1RB4QEC2GKwjIBHKcaFVhGmcWAsqzYdeAByh20BU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=dOOrZNDgIGex7UNEWvR3LCDgf1OkenRBrOJM21DfnBAf50LPASO6jG2X8u+MhPgxBF0BbR62F0ofDDDR+SgPH+FOvJ0GvK8p2achw8y8E0qmfuuXPAMeaPYc7qWF5gUil1zhJvSVdtxVFMhsVmO+1jtQwmdP5G/pG5s6OLGuI1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ON8K0b48; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5914C4CECC;
+	Wed, 11 Sep 2024 00:31:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726014423;
-	bh=5274iZ8DDuZ6UF/AYxJL9A8/JlsyvGh4kdepPcKklAo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=PjgjE7Q7t10O/pJr6d0VuPbXOKPmop1Tx9gJ3ubXdOpDGSlb0b008a9Xs67XYvihf
-	 nJW6P/ITStMOrd9dOzpR5fyNF5N5bBTiepx7kqeEnUFBsUNzUAxAVj5qmFDb+YEPel
-	 RzAD3ErA+10o0Yx96FInjiuJgbqAoZwFo73tjmxoJljFV5CUiXlQrSB6wVrduVipq/
-	 WSv5pWL9s4pHLqQJ5mGN1SZ/pYrN22BRfhrXejfktkSlRg5gjTMxBplDkzUJRUXC0a
-	 hlOKMPt/sK0KfVY31RPYXjo5X0hlLAdlgh1SUAHci8PG1cAtHW1AiZLdpGxhN+zmaL
-	 MifOyJzXDjBWw==
-Date: Tue, 10 Sep 2024 17:27:01 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: jane400 <jane400@postmarketos.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- ~postmarketos/upstreaming@lists.sr.ht
-Subject: Re: [PATCH] uapi/if_arp.h: guard struct definition to not redefine
- libc's definitions
-Message-ID: <20240910172701.74164f87@kernel.org>
-In-Reply-To: <20240909092921.7377-2-jane400@postmarketos.org>
-References: <20240909092921.7377-2-jane400@postmarketos.org>
+	s=k20201202; t=1726014665;
+	bh=3kW1RB4QEC2GKwjIBHKcaFVhGmcWAsqzYdeAByh20BU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ON8K0b48Q34PsbhEeiBYmky2O5j8KG4JSP3PTxoFvTHlGEYVuhSymcE2oPzLZrLkd
+	 ZbNLlH4bgcj8EPPCQ34rfbCa6hdu2KpsVX+1QxaicEIjXxXJtwqyqdcsDfyoJVJTmK
+	 YZM0/PdhND1fIKmunpnOHTBkkXAgKC5Kc8llC2eEVKwO/NZ3N9BB4EoI039EIVPIwP
+	 b8ayn58ZKRdqgSMDXWAUb18Ca6MjYn1d1KkbcRFW6Ryc58oHh//8e4WDOPXDXDL+Uc
+	 3qcpaPZh4VUNXLmVBfZLg7DVkAzhYg/Xgp/5mmeNg9/aCfKi9bpdq8uhh9QWky4Fqh
+	 n2Rj4OFq1puwA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E533822FA4;
+	Wed, 11 Sep 2024 00:31:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] dt-bindings: net: tja11xx: fix the broken binding
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172601466675.440312.6346971513083505539.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Sep 2024 00:31:06 +0000
+References: <20240909012152.431647-1-wei.fang@nxp.com>
+In-Reply-To: <20240909012152.431647-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, andrew@lunn.ch,
+ f.fainelli@gmail.com, hkallweit1@gmail.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
 
-On Mon,  9 Sep 2024 11:28:55 +0200 jane400 wrote:
+Hello:
 
-Could you please update the From fields in the email / the author of
-the patch to have your full name like the sign off? Right now it says:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
- From: jane400 <jane400@postmarketos.org>
-
-> musl libc defines the structs arpreq, arpreq_old and arphdr in
-
-Could you add some reference to when the structs were added to musl?
-Web link, or a version number, perhaps?
-
-> diff --git a/include/uapi/linux/libc-compat.h b/include/uapi/linux/libc-compat.h
-> index 8254c937c9f4..e722c213f18b 100644
-> --- a/include/uapi/linux/libc-compat.h
-> +++ b/include/uapi/linux/libc-compat.h
-> @@ -194,6 +194,14 @@
->  #define __UAPI_DEF_IF_NET_DEVICE_FLAGS_LOWER_UP_DORMANT_ECHO 1
->  #endif
->  
-> +/* Definitions for if_arp.h */
-> +#ifndef __UAPI_DEF_IF_ARP_ARPREQ
-> +#define __UAPI_DEF_IF_ARP_ARPREQ	1
-> +#endif
-> +#ifndef __UAPI_DEF_IF_ARP_ARPHDR
-> +#define __UAPI_DEF_IF_ARP_ARPHDR	1
-> +#endif
-> +
->  /* Definitions for in.h */
->  #ifndef __UAPI_DEF_IN_ADDR
->  #define __UAPI_DEF_IN_ADDR		1
+On Mon,  9 Sep 2024 09:21:52 +0800 you wrote:
+> As Rob pointed in another mail thread [1], the binding of tja11xx PHY
+> is completely broken, the schema cannot catch the error in the DTS. A
+> compatiable string must be needed if we want to add a custom propety.
+> So extract known PHY IDs from the tja11xx PHY drivers and convert them
+> into supported compatible string list to fix the broken binding issue.
 > 
-> base-commit: 89f5e14d05b4852db5ecdf222dc6a13edc633658
+> [1]: https://lore.kernel.org/netdev/31058f49-bac5-49a9-a422-c43b121bf049@kernel.org/T/
+> 
+> [...]
 
-The code change looks almost good, I think you're missing the code for
-handling getting included after the user space, tho? look around how
-existing definitions are handled.. 
+Here is the summary with links:
+  - [v2,net] dt-bindings: net: tja11xx: fix the broken binding
+    https://git.kernel.org/netdev/net/c/2f9caba9b2f6
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
