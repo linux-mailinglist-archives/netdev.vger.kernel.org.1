@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-127466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F8C975805
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:15:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D459E975806
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:15:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 539DE28A392
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:15:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 001791C25FDD
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823561AE034;
-	Wed, 11 Sep 2024 16:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088C41AE852;
+	Wed, 11 Sep 2024 16:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="SusyNQmg"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="rEBXGX1N"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DAB81AB6D7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1901AC885;
 	Wed, 11 Sep 2024 16:15:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726071317; cv=none; b=uk5hCTcYWeo5dM/ocjaK3jTIDdvPXdG4U9WGenj21YOWPDOWOaETarD2Q4cFPK+UlYrCXLqKMQgi+foKTOxSjCjbyGMzjQvVs3XYJMI2JGn8KdTe35tXrqBRnaPhWp/T7V9SsY4eYOGX6NPjGMg4FL/Zj72qnyAhAoM4uGP9wIE=
+	t=1726071317; cv=none; b=Cg3NNRJq47wEeN5FDHmhGXhfczCulk7hCo8PtD3dGV2H6PlS0gFh2XWiiWCpEGwJVWogUJ9tu/7Fr7HslNkewDAdhqdernwsoDf2Og4/8rCXKFQQL/4hFtpxiTyV85gKOsxprYcGsQSgtL7DlcaszcZW9YlfTNrs7vQEKXiV3PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726071317; c=relaxed/simple;
-	bh=1bQ6ImyF/jGacshZUQQdTdRKhwSlL3Wx8mjhu+pdUFg=;
+	bh=ftM+DDnmQmOYnwN5aQVtFV0dJlz1AGJWP+A1i0WPDNQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N6UdNPlHLZ9bdOl0GRnkrSjhcpaim3I0qqWvlRJ0b0oja3+1ORqZb99LkjNANTrJlvc1uHIRBjpxMU9X1zn3J5YPOxl5n0eKWdow7rS3TRA9W6pTKGH9xNjVIshBlWJhSROo00n8EtV+B2vHhaKeowmKvgYfRul7dszmJqOnKpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=SusyNQmg; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=sS+sXpWHY+PQNkm9l9X1/kCVlVJF2Zad2t5/XUnNBN2WAPXLaDQ3WK9H+gdbPCBaTm3GEn1ePCR0E5odkxyictuD9yL3IUbKjqupHFi3K1iJYhNjg9F031kxmci4A1hksdNJUw0azzYJ7Fp5FKcnlE76OLSeRZGrr8P23sMlANM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=rEBXGX1N; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1726071315; x=1757607315;
+  t=1726071316; x=1757607316;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=1bQ6ImyF/jGacshZUQQdTdRKhwSlL3Wx8mjhu+pdUFg=;
-  b=SusyNQmgkYTWZIQuRHLa5uUVwS71Pb/lD36cXbz0+tYygj2+oIdtGLFR
-   SXd8VX/JVkt2/p+dBBnZ3IukIFZVjhevXkaVJnIbx2CAyiUzI1nKOXPPP
-   SwiWvnux9bxwQKZQki0KbEKQBkJC3WlX1GYNtpbXjbFd0RbCmeCs8+Vv4
-   STBu4TUBpsdrAHG/qXYAxuyyAdQ+w0p1/abY2PBe/oZG8TsmK9eWk1Xc/
-   O/GHpMVtVsHstVtNBuQ0iGEMhmMM7N0qNgYu4e4mngr7VH74ZWFSjySwT
-   XqoTFgMU2o1gN9qJN+Ok95M7WEGqeqd2ROtdPlfJftFVKqXWmVSbpwsTS
-   Q==;
+  bh=ftM+DDnmQmOYnwN5aQVtFV0dJlz1AGJWP+A1i0WPDNQ=;
+  b=rEBXGX1N4OLxZX09J2SWsuc3MdXPWTViQQJAyNFuEZWnkVCemVIXFJLS
+   1TwvuG+BcTIHUB+lL/q5tcndaILSXePdTZocxFIaD0hLLfPyCvyF4inuU
+   nqPSDAUPwYHf/bKGMHE5gP9oQfPm1lIfeqt+cDvs6jwA0iNd8XbDh1BUk
+   3PeeK9bCmIfCCW/ktSTeyOzcdvTbJpuWiBlHs56epUf9E5QDifzkFh7w1
+   JJSqEnaKUp0QtT+gaZMg8Z+Hyvo9fItTYtmzSmql0El1Ou7UR5BuWdB8Z
+   iFT4NMNHSzXdeVgcsAgcd3ELpvwx0xH3uMOzPuyBSf+WNh2aIgeZ3+tmX
+   w==;
 X-CSE-ConnectionGUID: I+zUQG3KSiiiwGtN22Ixjw==
-X-CSE-MsgGUID: 8lKrkbRIRvCbJptRylhr1Q==
+X-CSE-MsgGUID: c072b4IOQiqRjevIyY933Q==
 X-IronPort-AV: E=Sophos;i="6.10,220,1719903600"; 
-   d="scan'208";a="32280150"
+   d="scan'208";a="32280151"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
   by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Sep 2024 09:15:12 -0700
 Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 11 Sep 2024 09:15:05 -0700
+ 15.1.2507.35; Wed, 11 Sep 2024 09:15:10 -0700
 Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 11 Sep 2024 09:15:00 -0700
+ 15.1.2507.35 via Frontend Transport; Wed, 11 Sep 2024 09:15:05 -0700
 From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
@@ -66,9 +66,9 @@ CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<maxime.chevallier@bootlin.com>, <rdunlap@infradead.org>, <andrew@lunn.ch>,
 	<Steen.Hegelund@microchip.com>, <Raju.Lakkaraju@microchip.com>,
 	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next V2 3/5] net: lan743x: Register the platform device for sfp pluggable module
-Date: Wed, 11 Sep 2024 21:40:52 +0530
-Message-ID: <20240911161054.4494-4-Raju.Lakkaraju@microchip.com>
+Subject: [PATCH net-next V2 4/5] net: lan743x: Implement phylink pcs
+Date: Wed, 11 Sep 2024 21:40:53 +0530
+Message-ID: <20240911161054.4494-5-Raju.Lakkaraju@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
 References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
@@ -81,119 +81,177 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-Add support for sfp pluggable module as platform device handle the gpio
-input and output signals and i2c bus access the sfp eeprom data.
+Register MDIO bus for PCS layer to use Synopsys designware XPCS, support
+SGMII/1000Base-X/2500Base-X interfaces.
 
 Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 ---
 Change List:
-============
-V1 -> V2:
-  - Add platform_device_unregister( ) when sfp register fail 
-V0 -> V1:
-  - No change
+============                                                                    
+V2 : Include this new patch in the V2 series. 
 
  drivers/net/ethernet/microchip/Kconfig        |  1 +
- drivers/net/ethernet/microchip/lan743x_main.c | 43 +++++++++++++++++++
- drivers/net/ethernet/microchip/lan743x_main.h |  1 +
- 3 files changed, 45 insertions(+)
+ drivers/net/ethernet/microchip/lan743x_main.c | 72 ++++++++++++++++++-
+ drivers/net/ethernet/microchip/lan743x_main.h |  2 +
+ 3 files changed, 73 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/microchip/Kconfig b/drivers/net/ethernet/microchip/Kconfig
-index 9c08a4af257a..3dacf39b49b4 100644
+index 3dacf39b49b4..793a20ef51fc 100644
 --- a/drivers/net/ethernet/microchip/Kconfig
 +++ b/drivers/net/ethernet/microchip/Kconfig
-@@ -52,6 +52,7 @@ config LAN743X
- 	select PHYLINK
+@@ -53,6 +53,7 @@ config LAN743X
  	select I2C_PCI1XXXX
  	select GP_PCI1XXXX
-+	select SFP
+ 	select SFP
++	select PCS_XPCS
  	help
  	  Support for the Microchip LAN743x and PCI11x1x families of PCI
  	  Express Ethernet devices
 diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index dc571020ae1b..c1061e2972f9 100644
+index c1061e2972f9..ef76d0c1642f 100644
 --- a/drivers/net/ethernet/microchip/lan743x_main.c
 +++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -16,6 +16,7 @@
- #include <linux/iopoll.h>
- #include <linux/crc16.h>
- #include <linux/phylink.h>
-+#include <linux/platform_device.h>
- #include "lan743x_main.h"
- #include "lan743x_ethtool.h"
- 
-@@ -187,6 +188,11 @@ static int pci1xxxx_gpio_dev_get(struct lan743x_adapter *adapter)
- 
- static void lan743x_pci_cleanup(struct lan743x_adapter *adapter)
- {
-+	if (adapter->sfp_dev) {
-+		platform_device_unregister(adapter->sfp_dev);
-+		adapter->sfp_dev = NULL;
-+	}
-+
- 	if (adapter->nodes) {
- 		software_node_unregister_node_group(adapter->nodes->group);
- 		kfree(adapter->nodes);
-@@ -3062,6 +3068,31 @@ static int lan743x_swnodes_register(struct lan743x_adapter *adapter)
- 	return software_node_register_node_group(nodes->group);
+@@ -1143,6 +1143,28 @@ static int lan743x_get_lsd(int speed, int duplex, u8 mss)
+ 	return lsd;
  }
  
-+static int lan743x_sfp_register(struct lan743x_adapter *adapter)
++static int pci11x1x_pcs_read(struct mii_bus *bus, int addr, int devnum,
++			     int regnum)
 +{
-+	struct pci_dev *pdev = adapter->pdev;
-+	struct platform_device_info sfp_info;
-+	struct platform_device *sfp_dev;
++	struct lan743x_adapter *adapter = bus->priv;
 +
-+	memset(&sfp_info, 0, sizeof(sfp_info));
-+	sfp_info.parent = &adapter->pdev->dev;
-+	sfp_info.fwnode = software_node_fwnode(adapter->nodes->group[SWNODE_SFP]);
-+	sfp_info.name = "sfp";
-+	sfp_info.id = (pdev->bus->number << 8) | pdev->devfn;
-+	sfp_dev = platform_device_register_full(&sfp_info);
-+	if (IS_ERR(sfp_dev)) {
-+		netif_err(adapter, drv, adapter->netdev,
-+			  "Failed to register SFP device\n");
-+		return PTR_ERR(sfp_dev);
-+	}
++	if (addr)
++		return -EOPNOTSUPP;
 +
-+	adapter->sfp_dev = sfp_dev;
-+	netif_dbg(adapter, drv, adapter->netdev,
-+		  "SFP platform device registered");
-+
-+	return 0;
++	return lan743x_sgmii_read(adapter, devnum, regnum);
 +}
 +
- static int lan743x_phylink_sgmii_config(struct lan743x_adapter *adapter)
- {
- 	u32 sgmii_ctl;
-@@ -3851,6 +3882,18 @@ static int lan743x_pcidev_probe(struct pci_dev *pdev,
- 	if (ret)
- 		goto cleanup_pci;
- 
-+	if (adapter->is_sfp_support_en) {
-+		adapter->i2c_adap->dev.fwnode =
-+			software_node_fwnode(adapter->nodes->group[SWNODE_I2C]);
++static int pci11x1x_pcs_write(struct mii_bus *bus, int addr, int devnum,
++			      int regnum, u16 val)
++{
++	struct lan743x_adapter *adapter = bus->priv;
 +
-+		ret = lan743x_sfp_register(adapter);
-+		if (ret < 0) {
-+			netif_err(adapter, probe, netdev,
-+				  "Failed to register sfp (%d)\n", ret);
-+			goto cleanup_pci;
++	if (addr)
++		return -EOPNOTSUPP;
++
++	return lan743x_sgmii_write(adapter, devnum, regnum, val);
++}
++
+ static int lan743x_sgmii_mpll_set(struct lan743x_adapter *adapter,
+ 				  u16 baud)
+ {
+@@ -3201,6 +3223,19 @@ void lan743x_mac_eee_enable(struct lan743x_adapter *adapter, bool enable)
+ 	lan743x_csr_write(adapter, MAC_CR, mac_cr);
+ }
+ 
++static struct phylink_pcs *
++lan743x_phylink_mac_select_pcs(struct phylink_config *config,
++			       phy_interface_t interface)
++{
++	struct net_device *netdev = to_net_dev(config->dev);
++	struct lan743x_adapter *adapter = netdev_priv(netdev);
++
++	if (adapter->xpcs)
++		return &adapter->xpcs->pcs;
++
++	return NULL;
++}
++
+ static void lan743x_phylink_mac_config(struct phylink_config *config,
+ 				       unsigned int link_an_mode,
+ 				       const struct phylink_link_state *state)
+@@ -3302,6 +3337,7 @@ static void lan743x_phylink_mac_link_up(struct phylink_config *config,
+ }
+ 
+ static const struct phylink_mac_ops lan743x_phylink_mac_ops = {
++	.mac_select_pcs = lan743x_phylink_mac_select_pcs,
+ 	.mac_config = lan743x_phylink_mac_config,
+ 	.mac_link_down = lan743x_phylink_mac_link_down,
+ 	.mac_link_up = lan743x_phylink_mac_link_up,
+@@ -3654,6 +3690,9 @@ static void lan743x_hardware_cleanup(struct lan743x_adapter *adapter)
+ 
+ static void lan743x_mdiobus_cleanup(struct lan743x_adapter *adapter)
+ {
++	if (adapter->xpcs)
++		xpcs_destroy(adapter->xpcs);
++
+ 	mdiobus_unregister(adapter->mdiobus);
+ }
+ 
+@@ -3763,6 +3802,7 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
+ 
+ static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
+ {
++	struct dw_xpcs *xpcs;
+ 	u32 sgmii_ctl;
+ 	int ret;
+ 
+@@ -3783,8 +3823,17 @@ static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
+ 				  "SGMII operation\n");
+ 			adapter->mdiobus->read = lan743x_mdiobus_read_c22;
+ 			adapter->mdiobus->write = lan743x_mdiobus_write_c22;
+-			adapter->mdiobus->read_c45 = lan743x_mdiobus_read_c45;
+-			adapter->mdiobus->write_c45 = lan743x_mdiobus_write_c45;
++			if (adapter->is_sfp_support_en) {
++				adapter->mdiobus->read_c45 =
++					pci11x1x_pcs_read;
++				adapter->mdiobus->write_c45 =
++					pci11x1x_pcs_write;
++			} else {
++				adapter->mdiobus->read_c45 =
++					 lan743x_mdiobus_read_c45;
++				adapter->mdiobus->write_c45 =
++					 lan743x_mdiobus_write_c45;
++			}
+ 			adapter->mdiobus->name = "lan743x-mdiobus-c45";
+ 			netif_dbg(adapter, drv, adapter->netdev,
+ 				  "lan743x-mdiobus-c45\n");
+@@ -3820,9 +3869,28 @@ static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
+ 	ret = mdiobus_register(adapter->mdiobus);
+ 	if (ret < 0)
+ 		goto return_error;
++
++	if (adapter->is_sfp_support_en) {
++		if (!adapter->phy_interface)
++			lan743x_phy_interface_select(adapter);
++
++		xpcs = xpcs_create_mdiodev(adapter->mdiobus, 0,
++					   adapter->phy_interface);
++		if (IS_ERR(xpcs)) {
++			netdev_err(adapter->netdev, "failed to create xpcs\n");
++			ret = PTR_ERR(xpcs);
++			goto err_destroy_xpcs;
 +		}
++		adapter->xpcs = xpcs;
 +	}
 +
- 	ret = lan743x_mdiobus_init(adapter);
- 	if (ret)
- 		goto cleanup_hardware;
+ 	return 0;
+ 
++err_destroy_xpcs:
++	xpcs_destroy(xpcs);
++
+ return_error:
++	mdiobus_free(adapter->mdiobus);
+ 	return ret;
+ }
+ 
 diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index bf0d0f285e39..c303a69c3bea 100644
+index c303a69c3bea..f7480a401a27 100644
 --- a/drivers/net/ethernet/microchip/lan743x_main.h
 +++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -1129,6 +1129,7 @@ struct lan743x_adapter {
- 	struct phylink_config	phylink_config;
+@@ -10,6 +10,7 @@
+ #include <linux/i2c.h>
+ #include <linux/gpio/machine.h>
+ #include <linux/auxiliary_bus.h>
++#include <linux/pcs/pcs-xpcs.h>
+ #include "lan743x_ptp.h"
+ 
+ #define DRIVER_AUTHOR   "Bryan Whitehead <Bryan.Whitehead@microchip.com>"
+@@ -1130,6 +1131,7 @@ struct lan743x_adapter {
  	struct lan743x_sw_nodes	*nodes;
  	struct i2c_adapter	*i2c_adap;
-+	struct platform_device	*sfp_dev;
+ 	struct platform_device	*sfp_dev;
++	struct dw_xpcs		*xpcs;
  };
  
  #define LAN743X_COMPONENT_FLAG_RX(channel)  BIT(20 + (channel))
