@@ -1,59 +1,71 @@
-Return-Path: <netdev+bounces-127356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BC2797530E
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:59:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C4B9975361
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42C841F22B01
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:59:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BF57289909
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC38B18EFF9;
-	Wed, 11 Sep 2024 12:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAE1218DF97;
+	Wed, 11 Sep 2024 13:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="VepjVBko"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="dwhjibgK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.avm.de (mail.avm.de [212.42.244.119])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240ED1885B4;
-	Wed, 11 Sep 2024 12:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB161714AC;
+	Wed, 11 Sep 2024 13:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726059530; cv=none; b=sr5XK3ehd+mKGeZ/pynPblP1R3IlHdI7pzYPZL399MXhw+1aCTufSM8u+VArdrHF2LXbzG/AsGHbAZZnWWaFTrpkiV1sTB6Lp03XHrNoyY35u/uzvjIw/8m+m6KDB2Ric7jZybCFS5IDggxFVHyVJzerBChOqJ0NkT0L5/rhF0g=
+	t=1726060608; cv=none; b=fY4LuYd7tImxXGxWDpE2daB/tlMxJC1G7/T20CVU4PrrOaok1194gS7WtDphS0T0lgSL3S2eC1jzjHQ6iGP82fV2CUGF5dz9/XMZ5E81hmTSV1zp/T6LsjM8jgCVZKKcwA5KrE+TEEEGB5QW/5kM/BxQeT36j2ylCn8EZPz9Mbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726059530; c=relaxed/simple;
-	bh=sFSDhVHyWubHq285UfVdEgDt9J2WxtbLEEQB4iHlfn8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sMxYV2Sa71gM1oMc1yflzMVaEbgZyPgxTVMJk2Wq+vVAVRakkAOBuFn8bRKhoDmR9Rsty+xyZPQSHlxMcixtfOQvSbRxJnXU8jlU6ya/HVSb1hXU+yxtDp5xE1hwFVYMacudB9EFyVTeo2tmFeo+5c+ISaeK79VSKYa+Ck+z05g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=VepjVBko; arc=none smtp.client-ip=212.42.244.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
-	t=1726059509; bh=sFSDhVHyWubHq285UfVdEgDt9J2WxtbLEEQB4iHlfn8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=VepjVBkoYroeW66fT/oDII4FCr899MvoG8ubwqOAols6PhvRjHkF+w+BzByn8tUO8
-	 BAJGMWH5ZYzU59dPTe5Ly9G3WmXrkAMpJLZP9lyUDFgul/YwHYjJ74aN73OTCP8Z+v
-	 iPJt+VDqUo6PMGqyKVusDB5OCkITa9uJDUc4NsJg=
-Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
-	by mail.avm.de (Postfix) with ESMTPS;
-	Wed, 11 Sep 2024 14:58:28 +0200 (CEST)
-From: Thomas Martitz <tmartitz-oss@avm.de>
-To: Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: jnixdorf-oss@avm.de,
-	Thomas Martitz <tmartitz-oss@avm.de>,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH RFC] net: bridge: drop packets with a local source
-Date: Wed, 11 Sep 2024 14:58:17 +0200
-Message-ID: <20240911125820.471469-1-tmartitz-oss@avm.de>
+	s=arc-20240116; t=1726060608; c=relaxed/simple;
+	bh=GVeidM8o4ega2wg1yFoIZMqzVWIF2rHgnizr5mTMjy0=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Df6MwIl0aej8k0a+A9KFBE/p76TsA803NBAqoySw+tPYMu8jc+C7FroqhHnzi2HwkDpFEsChCX0WwbdiRPabV6n2bycUGFUL+7xxfvJdopZM1+mirC24v4Au2NQWv4aL+a6RTJU+kF/i+vBA8BUZAXVWwkyZlQDEApsy9DHtV4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=dwhjibgK; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1726060606; x=1757596606;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GVeidM8o4ega2wg1yFoIZMqzVWIF2rHgnizr5mTMjy0=;
+  b=dwhjibgK3SEyjy93nSNDvlGuKDb5Xqo0BDlnQEyTLCb0A2tERXHdm2Wv
+   qm3MDlEyaNbI1gJZcJFH6cNTrqBW8bh+YmZw1jxCKH7llZqMu4QMoJ8vG
+   vuJZQqnkPsoqT0WiQHuI33gK2PjODWoWUa9p1PVT6dqq8hMwh6xjmAEfr
+   j3rmcDtQkBXMaju6bqUknAvs38xPYPZunes5U8p1y8OLI3azr3FCHjKd/
+   ODVbovtfG/+iI7XVxi6L19/CoQgNv7zvlNc+mXb0Xw3gPsKGL9rT3ZzFq
+   X5hYFwyG7JHt5JA8CJMmCpj5Z38jcRtWY0xdX+dgK1fTaLL2M6YhJ7lvk
+   A==;
+X-CSE-ConnectionGUID: s3pohALoT4KsIphbLOcJTg==
+X-CSE-MsgGUID: mUuEqcJAS+e4nNrD5qXyrw==
+X-IronPort-AV: E=Sophos;i="6.10,220,1719903600"; 
+   d="scan'208";a="262630041"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Sep 2024 06:16:45 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 11 Sep 2024 06:16:04 -0700
+Received: from HYD-DK-UNGSW20.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Wed, 11 Sep 2024 06:16:01 -0700
+From: Tarun Alle <tarun.alle@microchip.com>
+To: <arun.ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next V3] net: phy: microchip_t1: SQI support for LAN887x
+Date: Wed, 11 Sep 2024 18:41:24 +0530
+Message-ID: <20240911131124.203290-1-tarun.alle@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,91 +73,218 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-purgate-ID: 149429::1726059508-E4599885-C19FD759/0/0
-X-purgate-type: clean
-X-purgate-size: 3382
-X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
-X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
-X-purgate: clean
+Content-Type: text/plain
 
-Currently, there is only a warning if a packet enters the bridge
-that has the bridge's or one port's MAC address as source.
+From: Tarun Alle <Tarun.Alle@microchip.com>
 
-Clearly this indicates a network loop (or even spoofing) so we
-generally do not want to process the packet. Therefore, move the check
-already done for 802.1x scenarios up and do it unconditionally.
+Add support for measuring Signal Quality Index for LAN887x T1 PHY.
+Signal Quality Index (SQI) is measure of Link Channel Quality from
+0 to 7, with 7 as the best. By default, a link loss event shall
+indicate an SQI of 0.
 
-For example, a common scenario we see in the field:
-In a accidental network loop scenario, if an IGMP join
-loops back to us, it would cause mdb entries to stay indefinitely
-even if there's no actual join from the outside. Therefore
-this change can effectively prevent multicast storms, at least
-for simple loops.
-
-Signed-off-by: Thomas Martitz <tmartitz-oss@avm.de>
+Signed-off-by: Tarun Alle <Tarun.Alle@microchip.com>
 ---
- net/bridge/br_fdb.c   |  4 +---
- net/bridge/br_input.c | 17 ++++++++++-------
- 2 files changed, 11 insertions(+), 10 deletions(-)
+v2 -> v3
+Addressed below review comment
+- Replaced hard-coded values with ARRAY_SIZE(rawtable).
+---
+v1 -> v2
+Addressed below review comments
+- Replaced hard-coded 200 with ARRAY_SIZE(rawtable).
+- Replaced return value -EINVAL with -ENETDOWN.
+- Changed link checks.
+---
+ drivers/net/phy/microchip_t1.c | 155 +++++++++++++++++++++++++++++++++
+ 1 file changed, 155 insertions(+)
 
-diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
-index c77591e63841..e33b2583e129 100644
---- a/net/bridge/br_fdb.c
-+++ b/net/bridge/br_fdb.c
-@@ -900,9 +900,7 @@ void br_fdb_update(struct net_bridge *br, struct net_bridge_port *source,
- 	if (likely(fdb)) {
- 		/* attempt to update an entry for a local interface */
- 		if (unlikely(test_bit(BR_FDB_LOCAL, &fdb->flags))) {
--			if (net_ratelimit())
--				br_warn(br, "received packet on %s with own address as source address (addr:%pM, vlan:%u)\n",
--					source->dev->name, addr, vid);
-+			return;
- 		} else {
- 			unsigned long now = jiffies;
- 			bool fdb_modified = false;
-diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
-index ceaa5a89b947..06db92d03dd3 100644
---- a/net/bridge/br_input.c
-+++ b/net/bridge/br_input.c
-@@ -77,7 +77,7 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
- {
- 	struct net_bridge_port *p = br_port_get_rcu(skb->dev);
- 	enum br_pkt_type pkt_type = BR_PKT_UNICAST;
--	struct net_bridge_fdb_entry *dst = NULL;
-+	struct net_bridge_fdb_entry *fdb_src, *dst = NULL;
- 	struct net_bridge_mcast_port *pmctx;
- 	struct net_bridge_mdb_entry *mdst;
- 	bool local_rcv, mcast_hit = false;
-@@ -108,10 +108,14 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
- 				&state, &vlan))
- 		goto out;
+diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
+index 5732ad65e7f9..29ab45b919dc 100644
+--- a/drivers/net/phy/microchip_t1.c
++++ b/drivers/net/phy/microchip_t1.c
+@@ -2,6 +2,7 @@
+ // Copyright (C) 2018 Microchip Technology
  
--	if (p->flags & BR_PORT_LOCKED) {
--		struct net_bridge_fdb_entry *fdb_src =
--			br_fdb_find_rcu(br, eth_hdr(skb)->h_source, vid);
--
-+	fdb_src = br_fdb_find_rcu(br, eth_hdr(skb)->h_source, vid);
-+	if (fdb_src && test_bit(BR_FDB_LOCAL, &fdb_src->flags)) {
-+		/* Spoofer or short-curcuit on the network. Drop the packet. */
-+		if (net_ratelimit())
-+			br_warn(br, "received packet on %s with own address as source address (addr:%pM, vlan:%u)\n",
-+				p->dev->name, eth_hdr(skb)->h_source, vid);
-+		goto drop;
-+	} else if (p->flags & BR_PORT_LOCKED) {
- 		if (!fdb_src) {
- 			/* FDB miss. Create locked FDB entry if MAB is enabled
- 			 * and drop the packet.
-@@ -120,8 +124,7 @@ int br_handle_frame_finish(struct net *net, struct sock *sk, struct sk_buff *skb
- 				br_fdb_update(br, p, eth_hdr(skb)->h_source,
- 					      vid, BIT(BR_FDB_LOCKED));
- 			goto drop;
--		} else if (READ_ONCE(fdb_src->dst) != p ||
--			   test_bit(BR_FDB_LOCAL, &fdb_src->flags)) {
-+		} else if (READ_ONCE(fdb_src->dst) != p) {
- 			/* FDB mismatch. Drop the packet without roaming. */
- 			goto drop;
- 		} else if (test_bit(BR_FDB_LOCKED, &fdb_src->flags)) {
+ #include <linux/kernel.h>
++#include <linux/sort.h>
+ #include <linux/module.h>
+ #include <linux/delay.h>
+ #include <linux/mii.h>
+@@ -188,6 +189,20 @@
+ #define LAN887X_EFUSE_READ_DAT9_SGMII_DIS	BIT(9)
+ #define LAN887X_EFUSE_READ_DAT9_MAC_MODE	GENMASK(1, 0)
+ 
++#define LAN887X_COEFF_PWR_DN_CONFIG_100		0x0404
++#define LAN887X_COEFF_PWR_DN_CONFIG_100_V	0x16d6
++#define LAN887X_SQI_CONFIG_100			0x042e
++#define LAN887X_SQI_CONFIG_100_V		0x9572
++#define LAN887X_SQI_MSE_100			0x483
++
++#define LAN887X_POKE_PEEK_100			0x040d
++#define LAN887X_POKE_PEEK_100_EN		BIT(0)
++
++#define LAN887X_COEFF_MOD_CONFIG		0x080d
++#define LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN	BIT(8)
++
++#define LAN887X_DCQ_SQI_STATUS			0x08b2
++
+ #define DRIVER_AUTHOR	"Nisar Sayed <nisar.sayed@microchip.com>"
+ #define DRIVER_DESC	"Microchip LAN87XX/LAN937x/LAN887x T1 PHY driver"
+ 
+@@ -1420,6 +1435,144 @@ static void lan887x_get_strings(struct phy_device *phydev, u8 *data)
+ 		ethtool_puts(&data, lan887x_hw_stats[i].string);
+ }
+ 
++/* Compare block to sort in ascending order */
++static int data_compare(const void *a, const void *b)
++{
++	return  *(u16 *)a - *(u16 *)b;
++}
++
++static int lan887x_get_sqi_100M(struct phy_device *phydev)
++{
++	u16 rawtable[200];
++	u32 sqiavg = 0;
++	u8 sqinum;
++	int rc;
++
++	/* Configuration of SQI 100M */
++	rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
++			   LAN887X_COEFF_PWR_DN_CONFIG_100,
++			   LAN887X_COEFF_PWR_DN_CONFIG_100_V);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, MDIO_MMD_VEND1, LAN887X_SQI_CONFIG_100,
++			   LAN887X_SQI_CONFIG_100_V);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_SQI_CONFIG_100);
++	if (rc != LAN887X_SQI_CONFIG_100_V)
++		return -EINVAL;
++
++	rc = phy_modify_mmd(phydev, MDIO_MMD_VEND1, LAN887X_POKE_PEEK_100,
++			    LAN887X_POKE_PEEK_100_EN,
++			    LAN887X_POKE_PEEK_100_EN);
++	if (rc < 0)
++		return rc;
++
++	/* Required before reading register
++	 * otherwise it will return high value
++	 */
++	msleep(50);
++
++	/* Link check before raw readings */
++	rc = genphy_c45_read_link(phydev);
++	if (rc < 0)
++		return rc;
++
++	if (!phydev->link)
++		return -ENETDOWN;
++
++	/* Get 200 SQI raw readings */
++	for (int i = 0; i < ARRAY_SIZE(rawtable); i++) {
++		rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
++				   LAN887X_POKE_PEEK_100,
++				   LAN887X_POKE_PEEK_100_EN);
++		if (rc < 0)
++			return rc;
++
++		rc = phy_read_mmd(phydev, MDIO_MMD_VEND1,
++				  LAN887X_SQI_MSE_100);
++		if (rc < 0)
++			return rc;
++
++		rawtable[i] = rc;
++	}
++
++	/* Link check after raw readings */
++	rc = genphy_c45_read_link(phydev);
++	if (rc < 0)
++		return rc;
++
++	if (!phydev->link)
++		return -ENETDOWN;
++
++	/* Sort SQI raw readings in ascending order */
++	sort(rawtable, ARRAY_SIZE(rawtable), sizeof(u16), data_compare, NULL);
++
++	/* Keep inliers and discard outliers */
++	for (int i = ARRAY_SIZE(rawtable) / 5;
++	     i < ARRAY_SIZE(rawtable) / 5 * 4; i++)
++		sqiavg += rawtable[i];
++
++	/* Get SQI average */
++	sqiavg /= 120;
++
++	if (sqiavg < 75)
++		sqinum = 7;
++	else if (sqiavg < 94)
++		sqinum = 6;
++	else if (sqiavg < 119)
++		sqinum = 5;
++	else if (sqiavg < 150)
++		sqinum = 4;
++	else if (sqiavg < 189)
++		sqinum = 3;
++	else if (sqiavg < 237)
++		sqinum = 2;
++	else if (sqiavg < 299)
++		sqinum = 1;
++	else
++		sqinum = 0;
++
++	return sqinum;
++}
++
++static int lan887x_get_sqi(struct phy_device *phydev)
++{
++	int rc, val;
++
++	if (phydev->speed != SPEED_1000 &&
++	    phydev->speed != SPEED_100) {
++		return -ENETDOWN;
++	}
++
++	if (phydev->speed == SPEED_100)
++		return lan887x_get_sqi_100M(phydev);
++
++	/* Writing DCQ_COEFF_EN to trigger a SQI read */
++	rc = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
++			      LAN887X_COEFF_MOD_CONFIG,
++			      LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN);
++	if (rc < 0)
++		return rc;
++
++	/* Wait for DCQ done */
++	rc = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
++				       LAN887X_COEFF_MOD_CONFIG, val, ((val &
++				       LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN) !=
++				       LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN),
++				       10, 200, true);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_DCQ_SQI_STATUS);
++	if (rc < 0)
++		return rc;
++
++	return FIELD_GET(T1_DCQ_SQI_MSK, rc);
++}
++
+ static struct phy_driver microchip_t1_phy_driver[] = {
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_LAN87XX),
+@@ -1468,6 +1621,8 @@ static struct phy_driver microchip_t1_phy_driver[] = {
+ 		.suspend	= genphy_suspend,
+ 		.resume		= genphy_resume,
+ 		.read_status	= genphy_c45_read_status,
++		.get_sqi	= lan887x_get_sqi,
++		.get_sqi_max	= lan87xx_get_sqi_max,
+ 	}
+ };
+ 
 -- 
-2.46.0
+2.34.1
 
 
