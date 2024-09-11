@@ -1,420 +1,150 @@
-Return-Path: <netdev+bounces-127583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD8A975CF6
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 00:17:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E8EA975D0B
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 00:20:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CBF4B2428F
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:17:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26F4C1F21761
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C98B013DDC3;
-	Wed, 11 Sep 2024 22:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD72B185B5D;
+	Wed, 11 Sep 2024 22:20:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ajJJCEwG"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="OpTinlDO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E036178C9D;
-	Wed, 11 Sep 2024 22:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 855EE224CF
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 22:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726093033; cv=none; b=IilMjb+gmDB/EGFEaM6Rw3dV7mzpubZyodcxEyCeVHfIDsivFdyl9QFM5tGEVAIs87FgqzeCnOmLrbbTg8IYDJEJp0NkNpnbVLUCt+BuvEKaBghH3HUjfR+KQYdm03V7mVGrq7fTmkcQHotXsfG9/X6aDLntOPVqMz3qp+Unb/s=
+	t=1726093247; cv=none; b=CJB6cS6bAKADk49gSYpcTekKROtAhVvLCqf0RxuG6WLFtZm1Olyb63S8+36JfMghI+9UILY61TYLM86sq6qzIMSVGfgZ55h9HK+FjA6SQkJBxoBk0vbnbNt0dXo73ctQ6pRKM4MtHBPn6CZrpLdJ3jHP1WNYYkTK+hH2cd+xsbY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726093033; c=relaxed/simple;
-	bh=HAZvut5ojoivTzmWO5diUmUE4hKVVm1KC06x8zix0Do=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ItAX+twA8BZBt+t+Pg5SZ3WDZ4r0YCKt3XA/oLWpFhf2wzGwfWTAjf6lYzHHyk9GJZ5JoP6jCIrjBa5VKuMLYakhoBYsusDYnYf5WWrCSFdpSYtQqVx2sD+bp8qGedy44UgWn6CDSViQcHEPBo9PzJb/J2FEnVYWu+FjfzeYGaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ajJJCEwG; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726093031; x=1757629031;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=HAZvut5ojoivTzmWO5diUmUE4hKVVm1KC06x8zix0Do=;
-  b=ajJJCEwGu7abt0argqg2K8+472ky9D8pbVbwGEKHyRbdhDWKxiUE0j25
-   qz9nOtk5ns1RlI49WG8Kbd0OGnJ/uJE629W8UquA7kEawwKVHGgTdkpre
-   W2pRhHvqyHKEgrBb8kx3w4jNqds9vl87aO2s+2Uum+FlgV2FQ44W/TUQL
-   JzzWS9Tir4nEtIYN742w259zk1XGf2hMlbNHqX0Av7Dj+EqvcM+xcjWUe
-   vtcugrfuvBiJt0LXRWEGh5X4XZC3wR7XLyj+GQqtI2nOkRaK0XzXP3NSE
-   hObjpfnkQGPYlu9xyPrUCMfDWM9dcwi8RovqLbqhK2EZRI7vRLwFngZXq
-   g==;
-X-CSE-ConnectionGUID: 5/HOX8olQZ65FuUPkogBsA==
-X-CSE-MsgGUID: pohDT81RSEuq0XHWysw1DQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11192"; a="35491382"
-X-IronPort-AV: E=Sophos;i="6.10,221,1719903600"; 
-   d="scan'208";a="35491382"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2024 15:17:10 -0700
-X-CSE-ConnectionGUID: GDBd7FHSQdqjpYVhOsd1nA==
-X-CSE-MsgGUID: JlzhHhs/S36BmuiLyqnSvA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,221,1719903600"; 
-   d="scan'208";a="68286631"
-Received: from rchernet-mobl4.amr.corp.intel.com (HELO [10.125.108.13]) ([10.125.108.13])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2024 15:17:08 -0700
-Message-ID: <06cc4873-d841-4a41-b681-e73bd7a3d4d8@intel.com>
-Date: Wed, 11 Sep 2024 15:17:07 -0700
+	s=arc-20240116; t=1726093247; c=relaxed/simple;
+	bh=6fLxcYrOQQA+m+AIGGkPMdruL+3RcmZdzbX5zPpJ20k=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=lY6PO7s/QEPxu8yvfy0gPdQUr2HMMSt8BHafWOFtKSXCnnYl3ZpLJYjDic9lQReXO9dzzl7gyXnNO1LC/1X9IKcCBQv6jXniDHF45V5Pc5vNsdaafu4gUn9hsVqtpgejFu3ruFPOVuYKdjwWqb0GahSy2A6J++wX6Z2a4qfiLvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=OpTinlDO; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com [209.85.208.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 974623F5E4
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 22:20:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1726093243;
+	bh=6fLxcYrOQQA+m+AIGGkPMdruL+3RcmZdzbX5zPpJ20k=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type;
+	b=OpTinlDOINa6ENiUpnKKGjJQ/6d2jbvwtVG4GZhNBX0oLs11yL+v2QDYlsbgB1kve
+	 ZXFMT6TTrwOE1ooDh0Yp+jwfYnuZF569Oxi9S+7Mlwv7MhR95DgeLCaaNqB7pU+g2E
+	 g1RrwskSC85xNfGO2YwFLiDIeM7LYPpUAUjZVk972WBQl85PWxsYA2erzF1bPDg3qz
+	 coCw5wHNMHGdxXL0tFfd3PwW2UjDkE1jllhIy36IfeVYfaQSuY2BbcQ1ePi6PkSJte
+	 Hnp9w30nmPGuh/9g/xNoCBd09OcaiJg81P9gMaySJjHVAAXBb3I97z531IDpReP2w8
+	 qJ5tO3bD2yIWg==
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5c25680de68so133886a12.2
+        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 15:20:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726093241; x=1726698041;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6fLxcYrOQQA+m+AIGGkPMdruL+3RcmZdzbX5zPpJ20k=;
+        b=LZc7TegG+ckLGqsyHozAi4z2M7MV9JOeTBxa7YSoSj1VZvmBTnk4MlDM3ffUa2wV9l
+         /IJA2UjXGQrQhPngbRHOE2sJYhw7GcfAIDgnze3wNmhMfp06ZD+fe2dQTR0oKobR7+Vb
+         W0XFUSlNn3e4aSp7BOjt4R0FrB46fX0IEumGoxlnFgHQyXL7zLAjb+ksDARGmvCGY4OZ
+         oUXfVdK7W1Oc9Ou2aoItMbd9qXi2zLYfmux5qSbAyvnkgo6NxKEOGzyg3pz7MXzT1Oj5
+         Y+dv2yBJ3qXJweGNYHIyxlSHq4OddwJAk12KhHBXLDa+HSoOB8Z4JiQs/qY/NjMaKiTz
+         /ezg==
+X-Forwarded-Encrypted: i=1; AJvYcCUETRqSKz39TAuEwiukUm6FMQ33tX9SkNFyEMErzq8Ik6Q31i8u6cuSVjZyV04UkNrmHDLGM2w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yywb21QQcxEnVXE+1MekzfqLWq4SjYCZ9Do19f0KeD2FygfISDA
+	dOmWpuLUYx3+jmYf8XOSTPwDon2HmpIAuJ6iEtTE0AgOFBhrXAdDLzGOGd23g1XWophaLpz4lDf
+	cY4fjwoAkM0eK5eWGdlGz1NycBORj0wkxUbCBAO7eBUxGxMi8osTSqbnv+jRhVyWxHLJzqRVcfE
+	5vfRxErMXmwPJy+Zwyjo/S6gZ/JCxFqImnavMz5Q4vOVHH
+X-Received: by 2002:a05:6402:d06:b0:5c3:d0d9:dafb with SMTP id 4fb4d7f45d1cf-5c413e204ddmr549370a12.18.1726093241539;
+        Wed, 11 Sep 2024 15:20:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGTcajhxeWWd3SregpvGVod0mzMDtfb5zLZ0X+BcACSQzdaH3TPTPrPigfHLi4IPATA+RiiRvRAaups9GPR8as=
+X-Received: by 2002:a05:6402:d06:b0:5c3:d0d9:dafb with SMTP id
+ 4fb4d7f45d1cf-5c413e204ddmr549341a12.18.1726093240493; Wed, 11 Sep 2024
+ 15:20:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 02/20] cxl: add capabilities field to cxl_dev_state and
- cxl_port
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20240907081836.5801-1-alejandro.lucero-palau@amd.com>
- <20240907081836.5801-3-alejandro.lucero-palau@amd.com>
-Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20240907081836.5801-3-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Mitchell Augustin <mitchell.augustin@canonical.com>
+Date: Wed, 11 Sep 2024 17:20:29 -0500
+Message-ID: <CAHTA-uZDaJ-71o+bo8a96TV4ck-8niimztQFaa=QoeNdUm-9wg@mail.gmail.com>
+Subject: Namespaced network devices not cleaned up properly after execution of
+ pmtu.sh kernel selftest
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Jacob Martin <jacob.martin@canonical.com>, dann frazier <dann.frazier@canonical.com>
+Content-Type: text/plain; charset="UTF-8"
 
+Hello,
 
+We recently identified a bug still impacting upstream, triggered
+occasionally by one of the kernel selftests (net/pmtu.sh) that
+sometimes causes the following behavior:
+* One of this tests's namespaced network devices does not get properly
+cleaned up when the namespace is destroyed, evidenced by
+`unregister_netdevice: waiting for veth_A-R1 to become free. Usage
+count = 5` appearing in the dmesg output repeatedly
+* Once we start to see the above `unregister_netdevice` message, an
+un-cancelable hang will occur on subsequent attempts to run `modprobe
+ip6_vti` or `rmmod ip6_vti`
 
-On 9/7/24 1:18 AM, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Type2 devices have some Type3 functionalities as optional like an mbox
-> or an hdm decoder, and CXL core needs a way to know what an CXL accelerator
-> implements.
-> 
-> Add a new field for keeping device capabilities as discovered during
-> initialization.
-> 
-> Add same field to cxl_port which for an endpoint will use those
-> capabilities discovered previously, and which will be initialized when
-> calling cxl_port_setup_regs for no endpoints.
+Jacob and I have both investigated various conditions under which this
+bug state does / does not occur, which is documented more thoroughly
+in the following BugLink:
+https://bugs.launchpad.net/ubuntu-kernel-tests/+bug/2072501
 
-I don't quite understand what you are trying to say here.
+We expect that veth_A-R1's refcount should be cleaned up by the time
+execution of pmtu.sh finishes since the relevant namespaces are
+deleted during cleanup of the test suite. We've observed this behavior
+on several kernels, at least as old as stable branches like
+linux-6.1.y and as recent as v6.11-rc6, so this does not seem like a
+new regression. (did not have a chance to test on rc7 yet).
 
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> ---
->  drivers/cxl/core/port.c |  9 +++++----
->  drivers/cxl/core/regs.c | 20 +++++++++++++-------
->  drivers/cxl/cxl.h       |  8 +++++---
->  drivers/cxl/cxlmem.h    |  2 ++
->  drivers/cxl/pci.c       |  9 +++++----
->  include/linux/cxl/cxl.h | 30 ++++++++++++++++++++++++++++++
->  6 files changed, 60 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/cxl/core/port.c b/drivers/cxl/core/port.c
-> index 1d5007e3795a..39b20ddd0296 100644
-> --- a/drivers/cxl/core/port.c
-> +++ b/drivers/cxl/core/port.c
-> @@ -749,7 +749,7 @@ static struct cxl_port *cxl_port_alloc(struct device *uport_dev,
->  }
->  
->  static int cxl_setup_comp_regs(struct device *host, struct cxl_register_map *map,
-> -			       resource_size_t component_reg_phys)
-> +			       resource_size_t component_reg_phys, u32 *caps)
->  {
->  	*map = (struct cxl_register_map) {
->  		.host = host,
-> @@ -763,7 +763,7 @@ static int cxl_setup_comp_regs(struct device *host, struct cxl_register_map *map
->  	map->reg_type = CXL_REGLOC_RBI_COMPONENT;
->  	map->max_size = CXL_COMPONENT_REG_BLOCK_SIZE;
->  
-> -	return cxl_setup_regs(map);
-> +	return cxl_setup_regs(map, caps);
->  }
->  
->  static int cxl_port_setup_regs(struct cxl_port *port,
-> @@ -772,7 +772,7 @@ static int cxl_port_setup_regs(struct cxl_port *port,
->  	if (dev_is_platform(port->uport_dev))
->  		return 0;
->  	return cxl_setup_comp_regs(&port->dev, &port->reg_map,
-> -				   component_reg_phys);
-> +				   component_reg_phys, &port->capabilities);
->  }
->  
->  static int cxl_dport_setup_regs(struct device *host, struct cxl_dport *dport,
-> @@ -789,7 +789,7 @@ static int cxl_dport_setup_regs(struct device *host, struct cxl_dport *dport,
->  	 * NULL.
->  	 */
->  	rc = cxl_setup_comp_regs(dport->dport_dev, &dport->reg_map,
-> -				 component_reg_phys);
-> +				 component_reg_phys, &dport->port->capabilities);
->  	dport->reg_map.host = host;
->  	return rc;
->  }
-> @@ -858,6 +858,7 @@ static struct cxl_port *__devm_cxl_add_port(struct device *host,
->  		port->reg_map = cxlds->reg_map;
->  		port->reg_map.host = &port->dev;
->  		cxlmd->endpoint = port;
-> +		port->capabilities = cxlds->capabilities;
->  	} else if (parent_dport) {
->  		rc = dev_set_name(dev, "port%d", port->id);
->  		if (rc)
-> diff --git a/drivers/cxl/core/regs.c b/drivers/cxl/core/regs.c
-> index e1082e749c69..8b8abcadcb93 100644
-> --- a/drivers/cxl/core/regs.c
-> +++ b/drivers/cxl/core/regs.c
-> @@ -1,6 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0-only
->  /* Copyright(c) 2020 Intel Corporation. */
->  #include <linux/io-64-nonatomic-lo-hi.h>
-> +#include <linux/cxl/cxl.h>
->  #include <linux/device.h>
->  #include <linux/slab.h>
->  #include <linux/pci.h>
-> @@ -36,7 +37,7 @@
->   * Probe for component register information and return it in map object.
->   */
->  void cxl_probe_component_regs(struct device *dev, void __iomem *base,
-> -			      struct cxl_component_reg_map *map)
-> +			      struct cxl_component_reg_map *map, u32 *caps)
->  {
->  	int cap, cap_count;
->  	u32 cap_array;
-> @@ -84,6 +85,7 @@ void cxl_probe_component_regs(struct device *dev, void __iomem *base,
->  			decoder_cnt = cxl_hdm_decoder_count(hdr);
->  			length = 0x20 * decoder_cnt + 0x10;
->  			rmap = &map->hdm_decoder;
-> +			*caps |= BIT(CXL_DEV_CAP_HDM);
->  			break;
->  		}
->  		case CXL_CM_CAP_CAP_ID_RAS:
-> @@ -91,6 +93,7 @@ void cxl_probe_component_regs(struct device *dev, void __iomem *base,
->  				offset);
->  			length = CXL_RAS_CAPABILITY_LENGTH;
->  			rmap = &map->ras;
-> +			*caps |= BIT(CXL_DEV_CAP_RAS);
->  			break;
->  		default:
->  			dev_dbg(dev, "Unknown CM cap ID: %d (0x%x)\n", cap_id,
-> @@ -117,7 +120,7 @@ EXPORT_SYMBOL_NS_GPL(cxl_probe_component_regs, CXL);
->   * Probe for device register information and return it in map object.
->   */
->  void cxl_probe_device_regs(struct device *dev, void __iomem *base,
-> -			   struct cxl_device_reg_map *map)
-> +			   struct cxl_device_reg_map *map, u32 *caps)
->  {
->  	int cap, cap_count;
->  	u64 cap_array;
-> @@ -146,10 +149,12 @@ void cxl_probe_device_regs(struct device *dev, void __iomem *base,
->  		case CXLDEV_CAP_CAP_ID_DEVICE_STATUS:
->  			dev_dbg(dev, "found Status capability (0x%x)\n", offset);
->  			rmap = &map->status;
-> +			*caps |= BIT(CXL_DEV_CAP_DEV_STATUS);
->  			break;
->  		case CXLDEV_CAP_CAP_ID_PRIMARY_MAILBOX:
->  			dev_dbg(dev, "found Mailbox capability (0x%x)\n", offset);
->  			rmap = &map->mbox;
-> +			*caps |= BIT(CXL_DEV_CAP_MAILBOX_PRIMARY);
->  			break;
->  		case CXLDEV_CAP_CAP_ID_SECONDARY_MAILBOX:
->  			dev_dbg(dev, "found Secondary Mailbox capability (0x%x)\n", offset);
-> @@ -157,6 +162,7 @@ void cxl_probe_device_regs(struct device *dev, void __iomem *base,
->  		case CXLDEV_CAP_CAP_ID_MEMDEV:
->  			dev_dbg(dev, "found Memory Device capability (0x%x)\n", offset);
->  			rmap = &map->memdev;
-> +			*caps |= BIT(CXL_DEV_CAP_MEMDEV);
->  			break;
->  		default:
->  			if (cap_id >= 0x8000)
-> @@ -421,7 +427,7 @@ static void cxl_unmap_regblock(struct cxl_register_map *map)
->  	map->base = NULL;
->  }
->  
-> -static int cxl_probe_regs(struct cxl_register_map *map)
-> +static int cxl_probe_regs(struct cxl_register_map *map, u32 *caps)
->  {
->  	struct cxl_component_reg_map *comp_map;
->  	struct cxl_device_reg_map *dev_map;
-> @@ -431,12 +437,12 @@ static int cxl_probe_regs(struct cxl_register_map *map)
->  	switch (map->reg_type) {
->  	case CXL_REGLOC_RBI_COMPONENT:
->  		comp_map = &map->component_map;
-> -		cxl_probe_component_regs(host, base, comp_map);
-> +		cxl_probe_component_regs(host, base, comp_map, caps);
->  		dev_dbg(host, "Set up component registers\n");
->  		break;
->  	case CXL_REGLOC_RBI_MEMDEV:
->  		dev_map = &map->device_map;
-> -		cxl_probe_device_regs(host, base, dev_map);
-> +		cxl_probe_device_regs(host, base, dev_map, caps);
->  		if (!dev_map->status.valid || !dev_map->mbox.valid ||
->  		    !dev_map->memdev.valid) {
->  			dev_err(host, "registers not found: %s%s%s\n",
-> @@ -455,7 +461,7 @@ static int cxl_probe_regs(struct cxl_register_map *map)
->  	return 0;
->  }
->  
-> -int cxl_setup_regs(struct cxl_register_map *map)
-> +int cxl_setup_regs(struct cxl_register_map *map, u32 *caps)
->  {
->  	int rc;
->  
-> @@ -463,7 +469,7 @@ int cxl_setup_regs(struct cxl_register_map *map)
->  	if (rc)
->  		return rc;
->  
-> -	rc = cxl_probe_regs(map);
-> +	rc = cxl_probe_regs(map, caps);
->  	cxl_unmap_regblock(map);
->  
->  	return rc;
-> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
-> index 9afb407d438f..07c153aa3d77 100644
-> --- a/drivers/cxl/cxl.h
-> +++ b/drivers/cxl/cxl.h
-> @@ -284,9 +284,9 @@ struct cxl_register_map {
->  };
->  
->  void cxl_probe_component_regs(struct device *dev, void __iomem *base,
-> -			      struct cxl_component_reg_map *map);
-> +			      struct cxl_component_reg_map *map, u32 *caps);
->  void cxl_probe_device_regs(struct device *dev, void __iomem *base,
-> -			   struct cxl_device_reg_map *map);
-> +			   struct cxl_device_reg_map *map, u32 *caps);
->  int cxl_map_component_regs(const struct cxl_register_map *map,
->  			   struct cxl_component_regs *regs,
->  			   unsigned long map_mask);
-> @@ -300,7 +300,7 @@ int cxl_find_regblock_instance(struct pci_dev *pdev, enum cxl_regloc_type type,
->  			       struct cxl_register_map *map, int index);
->  int cxl_find_regblock(struct pci_dev *pdev, enum cxl_regloc_type type,
->  		      struct cxl_register_map *map);
-> -int cxl_setup_regs(struct cxl_register_map *map);
-> +int cxl_setup_regs(struct cxl_register_map *map, u32 *caps);
->  struct cxl_dport;
->  resource_size_t cxl_rcd_component_reg_phys(struct device *dev,
->  					   struct cxl_dport *dport);
-> @@ -600,6 +600,7 @@ struct cxl_dax_region {
->   * @cdat: Cached CDAT data
->   * @cdat_available: Should a CDAT attribute be available in sysfs
->   * @pci_latency: Upstream latency in picoseconds
-> + * @capabilities: those capabilities as defined in device mapped registers
->   */
->  struct cxl_port {
->  	struct device dev;
-> @@ -623,6 +624,7 @@ struct cxl_port {
->  	} cdat;
->  	bool cdat_available;
->  	long pci_latency;
-> +	u32 capabilities;
->  };
->  
->  /**
-> diff --git a/drivers/cxl/cxlmem.h b/drivers/cxl/cxlmem.h
-> index afb53d058d62..37c043100300 100644
-> --- a/drivers/cxl/cxlmem.h
-> +++ b/drivers/cxl/cxlmem.h
-> @@ -424,6 +424,7 @@ struct cxl_dpa_perf {
->   * @ram_res: Active Volatile memory capacity configuration
->   * @serial: PCIe Device Serial Number
->   * @type: Generic Memory Class device or Vendor Specific Memory device
-> + * @capabilities: those capabilities as defined in device mapped registers
->   */
->  struct cxl_dev_state {
->  	struct device *dev;
-> @@ -438,6 +439,7 @@ struct cxl_dev_state {
->  	struct resource ram_res;
->  	u64 serial;
->  	enum cxl_devtype type;
-> +	u32 capabilities;
->  };
->  
->  /**
-> diff --git a/drivers/cxl/pci.c b/drivers/cxl/pci.c
-> index 742a7b2a1be5..58f325019886 100644
-> --- a/drivers/cxl/pci.c
-> +++ b/drivers/cxl/pci.c
-> @@ -503,7 +503,7 @@ static int cxl_rcrb_get_comp_regs(struct pci_dev *pdev,
->  }
->  
->  static int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
-> -			      struct cxl_register_map *map)
-> +			      struct cxl_register_map *map, u32 *caps)
->  {
->  	int rc;
->  
-> @@ -520,7 +520,7 @@ static int cxl_pci_setup_regs(struct pci_dev *pdev, enum cxl_regloc_type type,
->  	if (rc)
->  		return rc;
->  
-> -	return cxl_setup_regs(map);
-> +	return cxl_setup_regs(map, caps);
->  }
->  
->  static int cxl_pci_ras_unmask(struct pci_dev *pdev)
-> @@ -827,7 +827,8 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  	else
->  		cxl_set_dvsec(cxlds, dvsec);
->  
-> -	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map);
-> +	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_MEMDEV, &map,
-> +				&cxlds->capabilities);
->  	if (rc)
->  		return rc;
->  
-> @@ -840,7 +841,7 @@ static int cxl_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  	 * still be useful for management functions so don't return an error.
->  	 */
->  	rc = cxl_pci_setup_regs(pdev, CXL_REGLOC_RBI_COMPONENT,
-> -				&cxlds->reg_map);
-> +				&cxlds->reg_map, &cxlds->capabilities);
->  	if (rc)
->  		dev_warn(&pdev->dev, "No component registers (%d)\n", rc);
->  	else if (!cxlds->reg_map.component_map.ras.valid)
-> diff --git a/include/linux/cxl/cxl.h b/include/linux/cxl/cxl.h
-> index e78eefa82123..930b1b9c1d6a 100644
-> --- a/include/linux/cxl/cxl.h
-> +++ b/include/linux/cxl/cxl.h
-> @@ -12,6 +12,36 @@ enum cxl_resource {
->  	CXL_ACCEL_RES_PMEM,
->  };
->  
-> +/* Capabilities as defined for:
-> + *
-> + *	Component Registers (Table 8-22 CXL 3.0 specification)
-> + *	Device Registers (8.2.8.2.1 CXL 3.0 specification)
+This issue also only occurs very infrequently, and reproducibility is
+extremely susceptible to very minor timing variations in the pmtu.sh
+test case. (in fact, I was unable to reproduce the bug with the
+version of pmtu.sh and lib.sh in v6.11-rc6 - not because the kernel is
+unaffected (it is affected, as confirmed by running an older kernel's
+pmtu.sh on it), but because v6.11-rc6 introduces some unrelated
+functional changes to the tests that cause a slightly longer test
+execution time.)
+It is also difficult to reproduce the bug on slower CPUs, or even on
+faster CPUs where the cpufreq scaling governor is not set to
+`performance`.
 
-Should just use 3.1 since that's the latest spec.
+However, I can easily reproduce the issue on an Nvidia Grace/Hopper
+machine (and other platforms with modern CPUs) with the performance
+governor set by doing the following:
+* Install/boot any affected kernel
+* Clone the kernel tree just to get an older version of the test cases
+without subtle timing changes that mask the issue (such as
+https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/noble/tree/?h=Ubuntu-6.8.0-39.39)
+* cd tools/testing/selftests/net
+* while true; do sudo ./pmtu.sh pmtu_ipv6_ipv6_exception; done
 
-> + */
-> +
-> +enum cxl_dev_cap {
-> +	/* capabilities from Component Registers */
-> +	CXL_DEV_CAP_RAS,
-> +	CXL_DEV_CAP_SEC,
-> +	CXL_DEV_CAP_LINK,
-> +	CXL_DEV_CAP_HDM,
-> +	CXL_DEV_CAP_SEC_EXT,
-> +	CXL_DEV_CAP_IDE,
-> +	CXL_DEV_CAP_SNOOP_FILTER,
-> +	CXL_DEV_CAP_TIMEOUT_AND_ISOLATION,
-> +	CXL_DEV_CAP_CACHEMEM_EXT,
-> +	CXL_DEV_CAP_BI_ROUTE_TABLE,
-> +	CXL_DEV_CAP_BI_DECODER,
-> +	CXL_DEV_CAP_CACHEID_ROUTE_TABLE,
-> +	CXL_DEV_CAP_CACHEID_DECODER,
-> +	CXL_DEV_CAP_HDM_EXT,
-> +	CXL_DEV_CAP_METADATA_EXT,
-> +	/* capabilities from Device Registers */
-> +	CXL_DEV_CAP_DEV_STATUS,
-> +	CXL_DEV_CAP_MAILBOX_PRIMARY,
-> +	CXL_DEV_CAP_MAILBOX_SECONDARY,
+If running on an appropriately fast CPU, you should start seeing
+`unregister_netdevice: waiting for veth_A-R1 to become free. Usage
+count = 5` in dmesg at some point. (On Grace/Hopper, it happens in
+under a minute, reliably). After that point, attempts to interact with
+ip6_vti will hang.
 
-Does the OS ever uses the SECONDARY mailbox?
+Please let me know if there is any other info I can provide to assist
+in debugging this.
 
-> +	CXL_DEV_CAP_MEMDEV,
-> +};
-> +
->  struct cxl_dev_state *cxl_accel_state_create(struct device *dev);
->  
->  void cxl_set_dvsec(struct cxl_dev_state *cxlds, u16 dvsec);
+Thanks,
+Mitchell Augustin
+Software Engineer - Ubuntu Partner Engineering
 
