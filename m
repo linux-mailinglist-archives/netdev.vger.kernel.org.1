@@ -1,155 +1,126 @@
-Return-Path: <netdev+bounces-127213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E919797490D
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 06:14:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B32B974910
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 06:21:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A9B2288242
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 04:14:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DDCC1C24009
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 04:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E2C40862;
-	Wed, 11 Sep 2024 04:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC3024A08;
+	Wed, 11 Sep 2024 04:21:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D0mi67UC"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Ogiynayg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A893714287
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 04:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F58C144
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 04:21:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726028065; cv=none; b=kcqm7eqwa5Tdmi4S26ObOLenJx8tR4+fusiFm+2FvnR8QDxb20DdUsnbw8yKcdz8qTjjR6bvA1bI+PHRw5aR+qpWAeh6cXByHUXfkifYStboJu718ZPWehJ3VQekUhlnYVsEU/w0Q+uPMtyoI+EhEjpws4CKFjTyeQXZmtlP7os=
+	t=1726028463; cv=none; b=Ap7u5zF6CRWw3lJlOi8OsOKplfJCoGifNkBOFj8c+QfTzNNhlFj4NxDUS7+iIEo25TXbFykDSaZ13nXO/jPLe33SojpVMwMq+/HKTcNPmItHlQvnzV6If+1dncO1dAM00VEaWxKX6unNkuEp/HC90GDFgBMr+HnDWlV6WrW2nWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726028065; c=relaxed/simple;
-	bh=RPStZsHG3cMsrPT7TcvcHhcuYIxgrJTGmtUA6lnirl8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uyQb8jj2p4PVx2YBfn7Pcau9RqQeyr87vXnJsoGCrtsAxxcrrxTOeygmn243w7tm6Q52HhmKXinkSbyhUEUy9lFHM7cnbbGlZn4CbOYXF6RVs0PbkIUKSLSSrfL3HpfNcWTCCUm2m+qyYCcsMlUwZ8iCKM1wY9MS5t91ahBoXzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D0mi67UC; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-205909af9b5so50107055ad.3
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 21:14:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726028063; x=1726632863; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/zo1Mz0mCibvDjuHMiLv6hWXuOi9Lehm9B8rJqA3HQI=;
-        b=D0mi67UC5OpgFHs+ENaLnWHi64I6fTJh8zGUdOattHZfohSlFD8Z2QHBOVyW8DbcD0
-         k7Xpbas27lDe4AlKrMqF2f32+xqw7ogxTKGio2ov5Pti72nEM++EuuHdhnTa5m1SSzfA
-         wpMfaXu5KmsNoBfgz9+nATdmyl2fGOB7sQlUBYwalNUh0gVvvt5jiXFHjEnUUTgRuHrm
-         2EBOftuExdXJrmpE9C82cgQoDeCFO6CzoPMbNz2JJR7VbgW7gBu6MOQ3BWgdFWDx6eV/
-         fSqFE4jcpP42STcLOWt8h9kgFrRdQLK8ICcSAnTUbhP/xgqkyqb5hhpXqruHjbkeSaML
-         PhEQ==
+	s=arc-20240116; t=1726028463; c=relaxed/simple;
+	bh=qjIPle1X5kAuS9zc9Tnq4VuW3Zc4fxyBC7oRUz9K7fE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=E/uAU9KhsAMt0Qj3mOAaap1rh9IUDEwHEQoVTHaIKo3BoSjnc8BIRepcHR1Egbj9Ron0IVJwxHKykYywsYnlHY+YILEFuDtR1tKWTtwXzqVOAfoSzqv0NgCvYxqARG9MXveHEPtEBlloYJoMpTpYF3jSzPFrYOlSzsR8EWQ3lqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Ogiynayg; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 4AC5B3F5B8
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 04:20:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1726028459;
+	bh=ckeGLCEhOMWatxIf6SnWAR9PTInu/komYkbIKWSH8cU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type;
+	b=Ogiynayg9lqU9IeOWiN8kjqAxql/vt2s5dAjdaWxV6ZTAzOo3sQFO8YLuxPOFZuIS
+	 wj30iBvgTZvYsSe2Y7DrFkjKe53kPYageh/tmFkrEePAtjMGk78Bn+D7OgtYVK7G5m
+	 A4MEjLCBZm2LY+GzpFk+9cIh1AGR2qtBvPD462DybtGyLpvMwyVXOTOnJ+djqEyCFZ
+	 7GWM4m6oSxQLm6KKqu2Yh1Ygfl0wwHvEZVl0sb/VVmKwXJzG7SCnl7LrpTNT4C9unn
+	 YpDprj9DtOmFd62K2c2kiL/0h5oqRwmeM1tRbocm5ahdGInS+eji4UohTvXgMA/8wR
+	 uWuFgRu5wbozA==
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-718db8e61bfso7361324b3a.0
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 21:20:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726028063; x=1726632863;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/zo1Mz0mCibvDjuHMiLv6hWXuOi9Lehm9B8rJqA3HQI=;
-        b=V65hG9MK0J42KhdLxZqW3tGgiDtzs1R9mv+fWzvum+nWiIz3X0TT7nA8xFi66p3By+
-         AXoHWW32/6+38heSkeJ+Otq/Fzd0p3Sr+SsrDlQPA5qmNn2c6Wi1aqglQWNejxP3C1pP
-         B0tI15dQR8up93lBBrbw79m3ec25hShonVHlnd8gwI8RCvn6sYEiO/bK5CcZaWunY37W
-         xs5suHDLzHdwUgmXIHcpfkJLyIQAJBSqa4oP0ohM+OrT40rLfDriURP1zjR82yQkT8Uu
-         Ssnl6c+JjgfIfwhSi4rxLmpRlTmfjSDOvVEbydqrHl+17Adz6TUG2iPd7LO807wrHWC1
-         niZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV8ZCPoeg/wBG9OGqmMpZvajIZLniSyGvL6nXcasa+LNfj67PJNugAe2iVWyRq+msXZvpr3ayM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcVyIal+J08bPB4rnd+0vo4IryZR9xRkOhN18kdS3qK5/QhxVk
-	sYWPo4HKWJplpK+kAvqDoOD1Uc2bGZnX70XMXxFVgNGu8vtbNs00
-X-Google-Smtp-Source: AGHT+IEjeKgBWbJHlGU+5f2VOqN+FcVXZq58rhxC2Mh1ohKTfc3RRYH6VVTMOOz4of2DIXMZOrZ+sA==
-X-Received: by 2002:a17:902:f542:b0:207:5665:32b2 with SMTP id d9443c01a7336-207566533ddmr12321155ad.40.1726028062738;
-        Tue, 10 Sep 2024 21:14:22 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20710eeaa8fsm55464565ad.142.2024.09.10.21.14.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2024 21:14:22 -0700 (PDT)
-Date: Tue, 10 Sep 2024 21:14:19 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Christophe ROULLIER <christophe.roullier@foss.st.com>
-Cc: Rahul Rameshbabu <rrameshbabu@nvidia.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	Maciek Machnikowski <maciek@machnikowski.net>
-Subject: Re: [BUG] Regression with commit: ptp: Add .getmaxphase callback to
- ptp_clock_info
-Message-ID: <ZuEZG6DM3SUdkE62@hoboy.vegasvil.org>
-References: <8aac51e0-ce2d-4236-b16e-901f18619103@foss.st.com>
- <Zt8V3dmVGSsj2nKy@hoboy.vegasvil.org>
- <b7f33997-de4e-4a3d-ab1e-0e8fc77854ec@foss.st.com>
+        d=1e100.net; s=20230601; t=1726028458; x=1726633258;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ckeGLCEhOMWatxIf6SnWAR9PTInu/komYkbIKWSH8cU=;
+        b=aDHlGUHn7ifdsEsf8AoQuWLiUq3rKnexYnGfHkAnbbO1VVCNPPOoHe2x9TV8YkOCzi
+         0hG5ZgkWVlwneJ9mKXll1XVmKVgHE0OhTAoVNhC8HotUzQ92EYeELgNFLbnVi9NX0kxf
+         cuA8S7ReDN+PCLJftq6XkSGPDxTT0k+Pqggjo7e+nyVCvyQBK/mJv2E1rlzL5Q04nCDI
+         fFjzyd7dc0F4+5Dpr4936tON0qnONgyA9ZZ3yIOGc4FEslhCWUvPxTwoZBaxaliaqgLy
+         +sjl70BxUIJmmXCgrIl4h4oFx8XvtXIDbu6r/ApE4NS5DenkHU5UB5KInX21lFHTRmVd
+         yDIA==
+X-Forwarded-Encrypted: i=1; AJvYcCXubNY6NWyl98Wa/Kd3E84+daDyHOfqIj/W0vkwcVtSh7oxvjgvS1RBVFipOGOIgsS0qxOxWpE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2WElz2Z3xOVKCcyqq2eZIAG4/eZ948OPwNyN0hDoBiy22Ftfc
+	9AymYGGAGTE4PsbiGX0IBBAf8ijsVyTXURmfMfwULz7JVTfdRD6M1QMKgACj0WQjG4DnBefNLiX
+	2xrUnmUFSBfz1elErv5veiyIVKu4H0Sre2NRTSTECR6T5O3vd1cS3eBXJMgmB7Gc9DGteR2mPaU
+	mO9s27
+X-Received: by 2002:a05:6a00:886:b0:70d:22b5:5420 with SMTP id d2e1a72fcca58-718d5e5476fmr25933619b3a.15.1726028457686;
+        Tue, 10 Sep 2024 21:20:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGbjgcD/xB0Dyjk+DCBVIMuIFxDQQgs5sulPbzkXnCpb5EcOtlvmxjgmLjNmGOz+VNi8kolRA==
+X-Received: by 2002:a05:6a00:886:b0:70d:22b5:5420 with SMTP id d2e1a72fcca58-718d5e5476fmr25933603b3a.15.1726028457320;
+        Tue, 10 Sep 2024 21:20:57 -0700 (PDT)
+Received: from localhost (211-75-139-218.hinet-ip.hinet.net. [211.75.139.218])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-719090c9b15sm2099014b3a.202.2024.09.10.21.20.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 Sep 2024 21:20:57 -0700 (PDT)
+From: Atlas Yu <atlas.yu@canonical.com>
+To: stephen@networkplumber.org
+Cc: atlas.yu@canonical.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net v1] dev_ioctl: fix the type of ifr_flags
+Date: Wed, 11 Sep 2024 12:20:47 +0800
+Message-ID: <20240911042050.45254-1-atlas.yu@canonical.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240910205642.2d4a64ca@hermes.local>
+References: <20240910205642.2d4a64ca@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b7f33997-de4e-4a3d-ab1e-0e8fc77854ec@foss.st.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 10, 2024 at 08:49:57AM +0200, Christophe ROULLIER wrote:
-> I've tested with platform 32bits and 64 bits and I have same error.
-> 
-> Toolchain/compiler used are:
-> 
-> aarch64-ostl-linux-gcc --version
-> aarch64-ostl-linux-gcc (GCC) 11.3.0
-> or
-> 
-> arm-ostl-linux-gnueabi-gcc --version
-> arm-ostl-linux-gnueabi-gcc (GCC) 12.2.0
+On Wed, Sep 11, 2024 at 11:56 AM
+Stephen Hemminger <stephen@networkplumber.org> wrote:
+> On Wed, 11 Sep 2024 11:46:08 +0800
+> Atlas Yu <atlas.yu@canonical.com> wrote:
+> > diff --git a/include/uapi/linux/if.h b/include/uapi/linux/if.h
+> > index 797ba2c1562a..b612b6cd7446 100644
+> > --- a/include/uapi/linux/if.h
+> > +++ b/include/uapi/linux/if.h
+> > @@ -244,7 +244,7 @@ struct ifreq {
+> >               struct  sockaddr ifru_broadaddr;
+> >               struct  sockaddr ifru_netmask;
+> >               struct  sockaddr ifru_hwaddr;
+> > -             short   ifru_flags;
+> > +             unsigned int    ifru_flags;
+> >               int     ifru_ivalue;
+> >               int     ifru_mtu;
+> >               struct  ifmap ifru_map;
+>
+> NAK
+> This breaks userspace ABI. There is no guarantee that
+> older application correctly zeros the upper flag bits.
 
-Something is off.
-
-Can you run `pahole` on the ptp4l binaries that you are using, and
-check the layout of `struct ptp_clock_caps` ?
-
-It should look something like the ones below...
-
-Thanks,
-Richard
-
----
-struct ptp_clock_caps1 {
-        int                        max_adj;              /*     0     4 */
-        int                        n_alarm;              /*     4     4 */
-        int                        n_ext_ts;             /*     8     4 */
-        int                        n_per_out;            /*    12     4 */
-        int                        pps;                  /*    16     4 */
-        int                        rsv[15];              /*    20    60 */
-
-        /* size: 80, cachelines: 2, members: 6 */
-        /* last cacheline: 16 bytes */
-};
-struct ptp_clock_caps2 {
-        int                        max_adj;              /*     0     4 */
-        int                        n_alarm;              /*     4     4 */
-        int                        n_ext_ts;             /*     8     4 */
-        int                        n_per_out;            /*    12     4 */
-        int                        pps;                  /*    16     4 */
-        int                        n_pins;               /*    20     4 */
-        int                        cross_timestamping;   /*    24     4 */
-        int                        adjust_phase;         /*    28     4 */
-        int                        rsv[12];              /*    32    48 */
-
-        /* size: 80, cachelines: 2, members: 9 */
-        /* last cacheline: 16 bytes */
-};
-struct ptp_clock_caps3 {
-        int                        max_adj;              /*     0     4 */
-        int                        n_alarm;              /*     4     4 */
-        int                        n_ext_ts;             /*     8     4 */
-        int                        n_per_out;            /*    12     4 */
-        int                        pps;                  /*    16     4 */
-        int                        n_pins;               /*    20     4 */
-        int                        cross_timestamping;   /*    24     4 */
-        int                        adjust_phase;         /*    28     4 */
-        int                        max_phase_adj;        /*    32     4 */
-        int                        rsv[11];              /*    36    44 */
-
-        /* size: 80, cachelines: 2, members: 10 */
-        /* last cacheline: 16 bytes */
-};
+Thanks, any suggestions though? How about introducing
+another ioctl request for these extended bits.
 
