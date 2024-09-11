@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-127295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D79974E64
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:20:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07F50974E65
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23EB1B22FE8
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 09:20:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B25DC1F25B65
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 09:20:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E2B154434;
-	Wed, 11 Sep 2024 09:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3DE716D9DF;
+	Wed, 11 Sep 2024 09:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uxWHB135"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qgE0iB2b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 330A214EC59
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 09:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF0315FA92
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 09:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726046414; cv=none; b=FGwfEtw5ExBphGYOHDK31O6X2mzkm34kHhC/LTyveg/iePtsC/3XLsJd/x3qj6axpvdRgYfGmcuA9XyfgtOKDZUfc2JgGz+tWH2XSx75MZn4Zi8Daq4C4xqNv9x2W1rmZLqzXO4guA7iXfGAy856/SWeW94c9sv7jgWTWcKVyEE=
+	t=1726046416; cv=none; b=DlC6kewmsfvpVzOq1FIOQ0CDpt+4Iwy2yijAJaa+aGw7bzGEUY21t7TtmeGZ/91EzVhWIEoNsoGFge940696DeEij2tKWJ/cg9eIIgrWAIdzkCN5VQ0z8cPsPqenFoXTnewCHRGg4coWP3WA58Wz4XJhzrq1HgVm48waOk5LuAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726046414; c=relaxed/simple;
-	bh=XJ1f4UL1hV23DNdA6AAbP2McooUqG5E4gAJRIXupsHo=;
+	s=arc-20240116; t=1726046416; c=relaxed/simple;
+	bh=OZpOOSzs5/qgRRWicjtE8KW4++NC+2qKWxh8IJnHljI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eYOAVfLvWUWkY9Z5mfdxy+pNehZOfvApZNDVCFS3sAYJPvIr7ib1hXS86UH/aePPzKai4i3LGpLxIK99rQQ2G6c11tm2QYLxZUMkuAAbqkj0Lppk73FJhsoMPXTHUE/vx3ptPtTOXd0vRfoqMO5IFgTsTkak+ZIJ/l595lNky7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uxWHB135; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9047C4CEC5;
-	Wed, 11 Sep 2024 09:20:11 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=ffZutkuV0YgRTj24XWW9k2Gq8ry0aatot9Brhk/QjO/AHhoykMmUQs1do2we+55BnRRLTmZwJMwUqE7f/XTRrIFlujfGhtwuyxpfyihHQbPX08gjc3yztJ6fmBZI5Fa5Ux4thdGedXfHswjyP/seaTOCGFeCY+eYeOwaW/teZiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qgE0iB2b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24F09C4CECC;
+	Wed, 11 Sep 2024 09:20:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726046413;
-	bh=XJ1f4UL1hV23DNdA6AAbP2McooUqG5E4gAJRIXupsHo=;
+	s=k20201202; t=1726046416;
+	bh=OZpOOSzs5/qgRRWicjtE8KW4++NC+2qKWxh8IJnHljI=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uxWHB135M61ulMq5h4D6cJVH7Gu53FYNUov4IKtANREYo3fvnYVc4COe+qAp5vAZV
-	 MUADvUZ5F2eGRLEiYYY7NWXnWdziS8AL2XBlBqiyjexr/B+UiNW9x1RDVz0eHe0WDg
-	 cgyr14U5Koya8RIMw0/ITwMuVZuA69hmGCbs9cZSeAZI+w8IRvB0ECaqqvp/v8lGbk
-	 ZpnlsrpQKEZEWhGzMmL98akTwLSYlfs30ZGQdALenIfxkd/xPzNvVjBSrQb0gmjbdR
-	 9ZGTke7FlQIXd1ujnxzXtmXeu4r4kJnoioPyRgbARutvNdbySa0KgBpx6TPBroa/7y
-	 FZt1vXM+zhqxw==
-Message-ID: <7f38540a-4d02-4d0d-9c81-ffc614219da5@kernel.org>
-Date: Wed, 11 Sep 2024 11:20:09 +0200
+	b=qgE0iB2bhnJ5MmwZLW1tJo6wSuWSRWJiEyt8ZWvkem4VkF3s7cGLg65v5BPH8jywa
+	 y2TzevpgyDPK3JSwarWorsbwEto/b3YQ/3DIEgJFe6rRLsfqGyZApEm4CI9mGWD8X7
+	 3EyziLSh5Fsw5+rOrL1InCSrUDx1p9uClwZL5L6mToCRADxH82iIp5GuweTeGxhDsM
+	 EXOunn8PFHQKpJNJWdar/qjPlqRLly4jRForKrvVr9YDdNJqZCe9ifqyrxmsohQ/HE
+	 F7/EIBo4cO0W1jO04WK2hhP1G08xtDtl+3COzh1mfZLVX2+GuyfN1OAZGfFnWw2uVh
+	 PYfKw4hFEBi9A==
+Message-ID: <d0964c32-268b-445e-a2e5-687600f63ce5@kernel.org>
+Date: Wed, 11 Sep 2024 11:20:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,15 +50,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 1/3] selftests/net: packetdrill: run in netns and
- expand config
+Subject: Re: [PATCH net-next 2/3] selftests/net: packetdrill: import
+ tcp/zerocopy
 Content-Language: en-GB
 To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
 Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
  pabeni@redhat.com, ncardwell@google.com,
  Willem de Bruijn <willemb@google.com>
 References: <20240911000154.929317-1-willemdebruijn.kernel@gmail.com>
- <20240911000154.929317-2-willemdebruijn.kernel@gmail.com>
+ <20240911000154.929317-3-willemdebruijn.kernel@gmail.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -104,7 +104,7 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20240911000154.929317-2-willemdebruijn.kernel@gmail.com>
+In-Reply-To: <20240911000154.929317-3-willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
@@ -113,14 +113,33 @@ Hi Willem,
 On 11/09/2024 01:59, Willem de Bruijn wrote:
 > From: Willem de Bruijn <willemb@google.com>
 > 
-> Run packetdrill tests inside netns.
-> They may change system settings, such as sysctl.
+> Same as initial tests, import verbatim from
+> github.com/google/packetdrill, aside from:
 > 
-> Also expand config with a few more needed CONFIGs.
+> - update `source ./defaults.sh` path to adjust for flat dir
+> - add SPDX headers
+> - remove author statements if any
+> 
+> Also import set_sysctls.py, which many scripts depend on to set
+> sysctls and then restore them later. This is no longer strictly needed
+> for namespacified sysctl. But not all sysctls are namespacified, and
+> doesn't hurt if they are.
 
-Thank you for the follow-up. It looks good to me!
+Then you also need to list this new file in the Makefile, added to
+TEST_INCLUDES.
 
-Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+(Also, even if I'm sure that's fine, Git complained when I applied this
+patch)
+
+  .git/rebase-apply/patch:216: new blank line at EOF.
+  +
+  .git/rebase-apply/patch:267: new blank line at EOF.
+  +
+  .git/rebase-apply/patch:712: new blank line at EOF.
+  +
+  .git/rebase-apply/patch:776: new blank line at EOF.
+  +
+  warning: 4 lines add whitespace errors.
 
 Cheers,
 Matt
