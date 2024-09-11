@@ -1,119 +1,97 @@
-Return-Path: <netdev+bounces-127428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 508619755D0
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:43:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82F899755CE
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:42:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82BCB1C22CF1
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:43:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5381F2794A
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:42:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59CB019F12F;
-	Wed, 11 Sep 2024 14:42:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C3401A304A;
+	Wed, 11 Sep 2024 14:41:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="eizSyDBx"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3rjDxk1S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0254B185954
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 14:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9FCD1A3030;
+	Wed, 11 Sep 2024 14:41:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726065751; cv=none; b=BFeIV4VcXMfp+SRGDYOjG0TdNJX+zxmZYY5KThJFVObsRPdI1mtorUk1ZwVFYZ+usEwDEtVWcuOAPKdM+AO5UyW6wvCaOYWUR0OFDmvhKfmcMF8Nes4TqwouCeB+yeZSHBWQyRA0tSfXJF8Bi2En/LpQ79lV5c7ctAIJJu8AVy0=
+	t=1726065678; cv=none; b=JFLgksTcGlY508HmkzJvzXD/3vScrORtqw3XorzcGAPZAt8pp9GTt1E7rbpPKK++fBohSBqFRtSqDrj9jkKW5pF/X5IcslFXy59TjMw2q/jBpDnQjEdENY+kzuJQgnc6G+bExApZqh86urBDWP+KHGhS+eCyIrj+ZphXxJf4vvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726065751; c=relaxed/simple;
-	bh=f/128AteF2svPgXo8CH8dthfp+5ydTjymU4vIkiJJe8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=btUXN0GSTnIrFrTyv9jI1bDULxXku1PuUfQhUHfyZ5Rb9TBOb706+5IrVTUROqGResdsiw2Z7+xfvNdYq2UXpYBxGi+aUDLVIypa4PSN3pL9LoHhxaI8dvSkUARPWtbW5RkmTlZX/DJvuofZ4Z3DtayrOehO3ATpVmnsSSI2scI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=eizSyDBx; arc=none smtp.client-ip=185.136.64.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 20240911144216dfe4d20b3a79e61a59
-        for <netdev@vger.kernel.org>;
-        Wed, 11 Sep 2024 16:42:16 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=c9PcQZFfNdq8cUu9sqpnFLswW6Zin2UTvho5Wq+tuEE=;
- b=eizSyDBxVpSvjni1XMMj6PhpkbTUBjCbkU/8EclL0rc/j2HAXGp6cFI5VV6J9NsnFZ65Ff
- Rs2XfVJLw04GNsVDnkIUVXLS0Q08s2MFeADXPip+FUkIstZDVp03Xyrk6XWKM3C8K+YvmVK2
- JHzWHkIbhsA6iFJZWT24DnqS0YoqqFLICVAPud3Vu4J8z0zbQRNHa5EGMvyUr7/lHPZ7LrKt
- ukm4xi/CXhO5KFDOMaKfeFfFg4JzgW+rLWN8/F90RXny/Tp9XbsDqSI2/wvSGVCiDw5ZT/oT
- VLUtQUfANBzjBNmVCspZj6VGRUQAwuBgQgQEzMgNVhRvioB7i5oRHzrg==;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-To: netdev@vger.kernel.org
-Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: dsa: lan9303: avoid dsa_switch_shutdown()
-Date: Wed, 11 Sep 2024 16:40:03 +0200
-Message-ID: <20240911144006.48481-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1726065678; c=relaxed/simple;
+	bh=3Z/oed22zgRXX/UWxZEvfrVoDzpUzLNfFriEfxP+4+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gJSazqJlcBtMXp42snmPQVjnGc5z2ofBreRIioHY2M0NORJ3K/zU+mxowr2bRnj/GIFJ4VNzs8tCZA+Q2+7mpIC1gtU5xq2IxE8n9amQ/bYZtJaycAoPSxmV3Y5SH7z8hXpYxzAXpxKERQqd3FKD5/BxlrZtIOr4VL/VtDwh3XE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3rjDxk1S; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cwX/d7s8taJ27bBmNgSIlqFsFF6eCFJzdq+jAwfqESY=; b=3rjDxk1S1+AJVgfJlvcVlviosV
+	BOHjldbf7yHNBu81t5tp0U5jZGeD0DdqI86y4ED6PLUmTK1jiSMlDQgsuuPevhdlw60oOXn3d4lTm
+	fqvXubYxCqsNDlp0l+FIUb5IyD0QaMcy+kjtCzaD6WjyBXSXl+wdKeY8+MFhU88xtwA4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1soOWl-007DaL-Mq; Wed, 11 Sep 2024 16:41:03 +0200
+Date: Wed, 11 Sep 2024 16:41:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, shenjian15@huawei.com, wangpeiyang1@huawei.com,
+	liuyonglong@huawei.com, chenhao418@huawei.com,
+	sudongming1@huawei.com, xujunsheng@huawei.com,
+	shiyongbang@huawei.com, libaihan@huawei.com, jdamato@fastly.com,
+	horms@kernel.org, jonathan.cameron@huawei.com,
+	shameerali.kolothum.thodi@huawei.com, salil.mehta@huawei.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V9 net-next 11/11] net: add ndo_validate_addr check in
+ dev_set_mac_address
+Message-ID: <a167de50-9759-4ba6-97a6-96cd6356fdc3@lunn.ch>
+References: <20240910075942.1270054-1-shaojijie@huawei.com>
+ <20240910075942.1270054-12-shaojijie@huawei.com>
+ <CAH-L+nP2oy4Haw1+8Jy3GGgphxBii8m2zD03FXbC0SeR7QdhQg@mail.gmail.com>
+ <dbc5f648-4fc0-48f6-be71-cbecd1f54522@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbc5f648-4fc0-48f6-be71-cbecd1f54522@huawei.com>
 
-From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+> This patch may not work as expected.
+> 
+> ndo_validate_addr() has only one parameter.
+> The sa parameter of the MAC address is not transferred to the function.
+> So ndo_validate_addr() checks the old MAC address, not the new MAC address.
 
-dsa_switch_shutdown() doesn't bring down any ports, but only disconnects
-slaves from master. Packets still come afterwards into master port and the
-ports are being polled for link status. This leads to crashes:
+Yes, i agree. The current API does not lend itself to validation
+before change.
 
-Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
-CPU: 0 PID: 442 Comm: kworker/0:3 Tainted: G O 6.1.99+ #1
-Workqueue: events_power_efficient phy_state_machine
-pc : lan9303_mdio_phy_read
-lr : lan9303_phy_read
-Call trace:
- lan9303_mdio_phy_read
- lan9303_phy_read
- dsa_slave_phy_read
- __mdiobus_read
- mdiobus_read
- genphy_update_link
- genphy_read_status
- phy_check_link_status
- phy_state_machine
- process_one_work
- worker_thread
+> I haven't found a better way to fix it yet.
 
-Call lan9303_remove() instead to really unregister all ports before zeroing
-drvdata and dsa_ptr.
+Maybe in dev_set_mac_address(), make a copy of dev->dev_addr. Call
+ops->ndo_set_mac_address(). If there is no error call
+ndo_validate_addr(). If that returns an error, call
+ops->ndo_set_mac_address() again with the old MAC address, and then
+return the error from ndo_validate_addr().
 
-Fixes: 0650bf52b31f ("net: dsa: be compatible with masters which unregister on shutdown")
-Cc: stable@vger.kernel.org
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
----
- drivers/net/dsa/lan9303-core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It is not great, but it is the best i can think of.
 
-diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
-index 268949939636..ecd507355f51 100644
---- a/drivers/net/dsa/lan9303-core.c
-+++ b/drivers/net/dsa/lan9303-core.c
-@@ -1477,7 +1477,7 @@ EXPORT_SYMBOL(lan9303_remove);
- 
- void lan9303_shutdown(struct lan9303 *chip)
- {
--	dsa_switch_shutdown(chip->ds);
-+	lan9303_remove(chip);
- }
- EXPORT_SYMBOL(lan9303_shutdown);
- 
--- 
-2.46.0
+Since this is not as simple i was expecting, feel free to drop it from
+your patchset, and submit it as a standalone patch.
 
+	Andrew
 
