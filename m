@@ -1,102 +1,174 @@
-Return-Path: <netdev+bounces-127604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07B37975DAD
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 01:21:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3564975DBF
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 01:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C41C12858C6
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 23:21:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F24B1F22CAD
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 23:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393401BD4F7;
-	Wed, 11 Sep 2024 23:20:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BBA185B6E;
+	Wed, 11 Sep 2024 23:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZjuPVQZb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o25ZVdyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC821BB6A0;
-	Wed, 11 Sep 2024 23:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533431AE845
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 23:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726096845; cv=none; b=GxVeXkjU+Fq/atxevTIpORdL5qYf1TC8R+rtMjEvcy9RAP6Xq5q5dt+CwnUMmflrevHp+uxfyWZjIY25d0V9SYSHP2zg50hqIBTYX4T6mYBlMIi7qlnHymAusqdZgTZ449e9hCVOrknB1+9xbXE2GzBBuUDU+Z6nAXId+JCoAVM=
+	t=1726098253; cv=none; b=KzZgZex1nOVTOZKZk642TYYchvIgc689Puws1YWccvLa/rvhS389ZU44QUDfq8bggBpSX1uiuMbDSqkb+rniz0WpLzCPxiH0NIrZE39wKLTPPUSnzz0R34VvAlmXorDCREANLR71IQYAJG+DYbQYDHHVuJopWNAvNGnVq85jVFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726096845; c=relaxed/simple;
-	bh=xoeaEsUH4Gbw86lnyllWO3ymn3uzNxvFhzCkvRXqd+U=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=H3CRZCLXr5a6K71Khly5pi1FGOFP9PzyBkeTFE+QKbi31MBsIxsJyh9p2njVAS22clr7WndhJkyblcayAwGTd+lDXlUxC9dZyCiJEAfimnxSDvORhoniT+Ca84X8eV1NOH40qnAiPJsaX1+hPAyyqTKKXQqMW7X6u+M6w95zjO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZjuPVQZb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C446C4CEC0;
-	Wed, 11 Sep 2024 23:20:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726096844;
-	bh=xoeaEsUH4Gbw86lnyllWO3ymn3uzNxvFhzCkvRXqd+U=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZjuPVQZbgIymAz3FeMIpwl3wl8mEpI+zZdL8Pm/UTJEego+gEOXwcJ1xU9ewzE+yD
-	 pZTM3HtdD7N7dBXe7LHPci0SgW0IaAzFjFJdtRP1n75l9Cu+DMEvVI9KuTdZipZoXd
-	 XQNmsuqbtXnH9Aig/LvKJbpGVbqtxZshG97bJ89aPdUOgh8WKO4H0DOJ10PpRWPMqK
-	 JE9PX2DgiJVtCru1RrwAaFjOo+IJpBmcUvkJKqoNleTbrRZbVX/WwqeaZCPx39N86y
-	 xT0SIZsSFUx4WpGSRyH/T1ccrTPwYVwwqyfbCMR8HWNs/3x3KZ6GUsCwOS/QnTiNOW
-	 XpJrjRYk3sPTQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0263806656;
-	Wed, 11 Sep 2024 23:20:46 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1726098253; c=relaxed/simple;
+	bh=TZvKk+aBa1gxaCCHniqOn5LTKrUf552B6WpBkAaylu8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LelPykvvAgEX7IS7SqPycLNNmkry0KY8BA0GOG64Rb0eEZ/lYhv+hhgK7TgSU26aZ3nc3E2/q27FkIZeWpp/ufxOair7s7YLvwAijs3eWbeq47cZuvQnGSnVDXIKfcHpB6MO+ZraHt1Ij7YA2J32JmfxMXduMXYnM8ankyuIbWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o25ZVdyC; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5356aa9a0afso472133e87.2
+        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 16:44:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726098248; x=1726703048; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2jDCB4+Ox2YHS0ikdUG/pV1MDZUz4L9aV0DcLYdAPqA=;
+        b=o25ZVdyC/Nw6fG8Jkz0BMK75gkikXD97PuEdgIEdwQ7QF0xlvigbTX5AZyVpItYZcv
+         c7dqr3PJPPfmf7CllRzCtnXr7QRZeohoQbqhb3r8foIAx35ZUY7elfFKkEPENELGHxTQ
+         HGlvzZ3KNkH61auRTSICwrPoV3r/IZqkeALwnvSTuIWLnyUFjv5I6256HzOZ6Jj2dMiA
+         IPrbJ0Y6ZFygEAD3Pe+XrkR1budfT/O65nzRzcdYVMYo4TpRdoEB+AmR7bUY0gZ9khBX
+         VJBq9eJR0lfp2C+1QQ3yExlrW3v7H4TWBmVHHYPj/q9FK1dGAh07FPA4oWidUxF4zc/G
+         diYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726098248; x=1726703048;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2jDCB4+Ox2YHS0ikdUG/pV1MDZUz4L9aV0DcLYdAPqA=;
+        b=w/P/hsTcoBinSK6ANqz5h0dXxRxdlnZNj07PPJYiqRBQ+zEv3ZZlNWjyAe88tluDVC
+         iRC8Y9dMdcvdmWDTNPk9QAEV9QrtKKypMtTvgyC+wzx1u6ucMFZuLGJ08cIan57/GxAA
+         K8qrg0S92KWwP/wbXRddlAVeHk8yfZ+416Bi5zqGiO4AYPq51NGci+PPnL/0Zy51iBAH
+         LzRAzy9ADznY6V9kGjbhBkufhOBXwVsRy0zuQGyuko3wXStIj2igtjTbfypm2dPnTghl
+         sFskEVAZfDwuXblD+ND6WjqW3Peb07qQKVTjKiMVvrQkbVDtHuXbBzBwhVhsyIA4hs5l
+         CXtA==
+X-Forwarded-Encrypted: i=1; AJvYcCWw6fNOZ1Dfce/xG7lQJxSrSwGcwiDx9ohE1qFuLBUapOKjrfr8OStgCwcB/Zm0ZgFHyGRAaOY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyH0syQtUoK0ktXv7c2L2Nq6j9e8BXNo6nRCfRWzf8jF6hsb0lA
+	9ezsI9fFGOPRc3AJIjEZ6WDX7mSGiPByePDS++PAz/jhaqx6bjd8f4jdDy3hg0S8U/Au1ISX0HS
+	wyM4f2DswPXQIfNA7fkhuqHxt2JmuwVHJwe/WD4FeIbGHkQDtU1SoGjU=
+X-Google-Smtp-Source: AGHT+IGhSme5cXkK3EUBM+K8SxsIR8ybN9PvtObrG6PhesDpnpYk8xJ+KCWCi3W1k5U0IPu8K+bnDgAz6J4U22VXvoY=
+X-Received: by 2002:a05:6512:3c9f:b0:535:681d:34b0 with SMTP id
+ 2adb3069b0e04-53678fe6a7emr772699e87.47.1726098247382; Wed, 11 Sep 2024
+ 16:44:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3] mptcp: fallback to TCP after 3 MPC drop +
- cache
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172609684550.1105624.18253068127743198847.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Sep 2024 23:20:45 +0000
-References: <20240909-net-next-mptcp-fallback-x-mpc-v1-0-da7ebb4cd2a3@kernel.org>
-In-Reply-To: <20240909-net-next-mptcp-fallback-x-mpc-v1-0-da7ebb4cd2a3@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- dsahern@kernel.org, corbet@lwn.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+References: <20240822200252.472298-1-wangfe@google.com> <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
+ <20240831173934.GC4000@unreal> <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
+ <20240902094452.GE4026@unreal> <Zt67MfyiRQrYTLHC@gauss3.secunet.de> <20240911104040.GG4026@unreal>
+In-Reply-To: <20240911104040.GG4026@unreal>
+From: Feng Wang <wangfe@google.com>
+Date: Wed, 11 Sep 2024 16:43:55 -0700
+Message-ID: <CADsK2K_ip7YUipHa3ZYW7tmvgU0_vEsDTkeACrgi7oN5VLTqpQ@mail.gmail.com>
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, 
+	antony.antony@secunet.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Steffen,
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Can you reconsider the revert of the CL? Based on our discussion, I
+believe we've reached a consensus that the xfrm id is necessary. If
+some customers prefer not to utilize it, we can extend the offload
+flag (something like XFRM_DEV_OFFLOAD_FLAG_ACQ) to manage this
+behavior. The default setting would remain consistent with the current
+implementation.
 
-On Mon, 09 Sep 2024 22:09:20 +0200 you wrote:
-> The SYN + MPTCP_CAPABLE packets could be explicitly dropped by firewalls
-> somewhere in the network, e.g. if they decide to drop packets based on
-> the TCP options, instead of stripping them off.
-> 
-> The idea of this series is to fallback to TCP after 3 SYN+MPC drop
-> (patch 2). If the connection succeeds after the fallback, it very likely
-> means a blackhole has been detected. In this case (patch 3), MPTCP can
-> be disabled for a certain period of time, 1h by default. If after this
-> period, MPTCP is still blocked, the period is doubled. This technique is
-> inspired by the one used by TCP FastOpen.
-> 
-> [...]
+Thank you!
 
-Here is the summary with links:
-  - [net-next,1/3] mptcp: export mptcp_subflow_early_fallback()
-    https://git.kernel.org/netdev/net-next/c/65b02260a0e0
-  - [net-next,2/3] mptcp: fallback to TCP after SYN+MPC drops
-    https://git.kernel.org/netdev/net-next/c/6982826fe5e5
-  - [net-next,3/3] mptcp: disable active MPTCP in case of blackhole
-    https://git.kernel.org/netdev/net-next/c/27069e7cb3d1
+Feng
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+On Wed, Sep 11, 2024 at 3:40=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
+rote:
+>
+> On Mon, Sep 09, 2024 at 11:09:05AM +0200, Steffen Klassert wrote:
+> > On Mon, Sep 02, 2024 at 12:44:52PM +0300, Leon Romanovsky wrote:
+> > > On Mon, Sep 02, 2024 at 09:44:24AM +0200, Steffen Klassert wrote:
+> > > > >
+> > > > > Steffen,
+> > > > >
+> > > > > What is your position on this patch?
+> > > > > It is the same patch (logically) as the one that was rejected bef=
+ore?
+> > > > > https://lore.kernel.org/all/ZfpnCIv+8eYd7CpO@gauss3.secunet.de/
+> > > >
+> > > > This is an infrastructure patch to support routing based IPsec
+> > > > with xfrm interfaces. I just did not notice it because it was not
+> > > > mentioned in the commit message of the first patchset. This should =
+have
+> > > > been included into the packet offload API patchset, but I overlooke=
+d
+> > > > that xfrm interfaces can't work with packet offload mode. The stack
+> > > > infrastructure should be complete, so that drivers can implement
+> > > > that without the need to fix the stack before.
+> > >
+> > > Core implementation that is not used by any upstream code is rarely
+> > > right thing to do. It is not tested, complicates the code and mostly
+> > > overlooked when patches are reviewed. The better way will be to exten=
+d
+> > > the stack when this feature will be actually used and needed.
+> >
+> > This is our tradeoff, an API should be fully designed from the
+> > beginning, everything else is bad design and will likely result
+> > in band aids (as it happens here). The API can be connected to
+> > netdevsim to test it.
+> >
+> > Currently the combination of xfrm interfaces and packet offload
+> > is just broken.
+>
+> I don't think that it is broken. It is just not implemented. XFRM
+> interfaces are optional field, which is not really popular in the
+> field.
+>
+> > Unfortunalely this patch does not fix it.
+> >
+> > I think we need to do three things:
+> >
+> > - Fix xfrm interfaces + packet offload combination
+> >
+> > - Extend netdevsim to support packet offload
+> >
+> > - Extend the API for xfrm interfaces (and everything
+> >   else we forgot).
+>
+> This is the most challenging part. It is not clear what should
+> we extend if customers are not asking for it and they are extremely
+> happy with the current IPsec packet offload state.
+>
+> BTW, I'm aware of one gap, which is not clear how to handle, and
+> it is combination of policy sockets and offload.
+>
+> >
+> > > IMHO, attempt to enrich core code without showing users of this new f=
+low
+> > > is comparable to premature optimization.
+> > >
+> > > And Feng more than once said that this code is for some out-of-tree
+> > > driver.
+> >
+> > It is an API, so everyone can use it.
+>
+> Of course, as long as in-kernel user exists.
+>
+> Thanks
 
