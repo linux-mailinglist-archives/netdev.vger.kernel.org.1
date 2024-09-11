@@ -1,427 +1,108 @@
-Return-Path: <netdev+bounces-127209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABC279748F1
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 05:54:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28CCF9748F8
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 05:56:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF92E1C21740
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 03:54:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E046F287B39
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 03:56:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 443693D96D;
-	Wed, 11 Sep 2024 03:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652D339FD7;
+	Wed, 11 Sep 2024 03:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cg94Su/u"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="X+w+cTu4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5199C2D057
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 03:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756F1A936
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 03:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726026883; cv=none; b=ZCIcenmDGylqS28FTbDhuVUJdVaDLd2/0yEeKV9id9CpP6MSv7w62kHMDca88f/YKpE3IGaPunS/BoPKp/6ncTciZb6S9W4dPtnNhenmEiqq5Az/KAnn6c4B/Q8EbAc34yTeUC4HCGZ+U4gMa7mO6bnrQ2tvoDIvgH1iWBlVuHY=
+	t=1726027007; cv=none; b=fP1ZpOY/Q0JWkrPh3f13ou1jjAS3Z2k/fjF+E4Xl0RzK801BX+em9YCd9WkZjGy3R4D6Nhc6z4oMAon7FdtkL3Ctgly8aWbAMjIDirCOpyGJdqH5EJOVD/deS3n8yL8UTkhli/cV/FRqCjjY1HVdrJgoEqt4+/MlSFdUgrqAVL8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726026883; c=relaxed/simple;
-	bh=2CWAlhlnKcc7MH6/E5lXRf4vRW1usWDyg6TKtD9rkEY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZFUduW7AEd6bJxRFkNdlp3Tj1hWwex9k3s7uYItSduuHvmI07ImMxwSiVh9SEsKXuqkf4pUzaYO/V6nzcSvBiZaNWxh8b1aBzrJ/m1bslbgSJm9PMQsOlXm62G49l62EwXf34JlyG4sLPM65kx8tRiT+o0Z0zISDM+veNMDOJ3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Cg94Su/u; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726026880;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=01mHA8SQdMZDR/tmlv/TJXMa+tfVx6a6L+cHkA4B0lQ=;
-	b=Cg94Su/uBB3yM6ZV/VBnQI1BNaYvAYIkb+OeHIQ/msGMk/ozX/m1n7fzfywtzkYR5bYJfT
-	0a1Y+RbbSmJdhAdL27Wzwmn/H98mb4qRxOUG9mv4piZUDLLJCQIFgBGb9zDRiVAy/4rC39
-	FtOZt1l9L4g8fd2dckLePw3iHNPJR+g=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-116-LuhCVjXtNzmjxz6Rn8pXaQ-1; Tue, 10 Sep 2024 23:54:39 -0400
-X-MC-Unique: LuhCVjXtNzmjxz6Rn8pXaQ-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2d889fc26e7so6410624a91.3
-        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 20:54:38 -0700 (PDT)
+	s=arc-20240116; t=1726027007; c=relaxed/simple;
+	bh=8p5CmDjsAdK61oHtAKDY35RYvtpZHIPa/0wqYuiCFXM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ri5pAqvxai61JpHCqIWolor2ohhloiA5qfdXomHobi9le8BPb2E42/YbV6K6ltxa5Stqb5VTAc0F9QBcEXm0TWV3PvTzQTrqdSrK28fPbpKI9L3k1XyLLMkBdaTsKTCbCjMyEVagEsTWTkJXyfXYM9Tx/AzlnqdkhH6OqHR1++o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=X+w+cTu4; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2d89229ac81so4948793a91.0
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 20:56:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1726027005; x=1726631805; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dRId34MrmjwBQCGTBCcIdTbyoq/BbAp29HJ2NQfUuq4=;
+        b=X+w+cTu4JgiYjPyWWKVBsvQZiGvjtu8Jlp1lRZtijWCwInccV0rRJMlVU+5o3m80FR
+         vuhy6OOryB3rx6QW7usqvlwnJ+jhMfv+7wHuMRXqRfAU7wHPAOEe0ICp9rX2/25fFKuy
+         nhZaGebmLPSedpsF48EtjI6fhtVZ5VhE9umI87nGPCCuN5L6xiuMgUZQ6V9rf6ptRysG
+         ADEWqNGpkcs8xcr7N+tKO3puV12DdXg1p9actZLJaY/9Kd3pr3VbUeMywUPjFQoNJK5Q
+         bzd7qApoTmgnvp3oQ/M3WWauFzsVoF62AhWxk14Q5pA/P+0X5X441woDxVO5395eFQUs
+         hTvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726026878; x=1726631678;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1726027005; x=1726631805;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=01mHA8SQdMZDR/tmlv/TJXMa+tfVx6a6L+cHkA4B0lQ=;
-        b=EmtSLOJBzaGeClxZA9idRnOKke0OB1xwpk454NOM5wvc8OzB+DXvHzVTiDiBXELJs9
-         W/aQKjGyIq9ietnplJLryjjzsKyfFC8LMM7sSkKCj/fmScFV6UBKFuYWcwnaqBKMlRwz
-         t+WNdDmPVcasOsSdjixIhWocBy97Xyqz+qRcR6VIGN59zGuRZTK2z+EU+Ibc74TrnqtU
-         HdvzWBhueEL2e4TPe6ukLGdW0zgqA7aXz7j3EzAPMRMRKSqSHfMnn32eDvsnk4dpKxHo
-         GnQSzLSWVaDo7c4J3KEZJB3remjFEbwN4vf7kTkN1cZcEDM36iO2GcFMf8rh6AfXhS+n
-         wGgQ==
-X-Gm-Message-State: AOJu0YwqYGfPbrKvx9x2GAHn3KLLa0SHn0GMVGAGM0eK8qVArd5qOdeb
-	h8xCLbpBWCDKd8tgBdqK1/rv4kkOj6ctypOVkju1mHzxeo14KzeJKKHTjipMzK8bSA2xeabLuGw
-	CkQpuOmH3Eyc5BApSSA+KTJE0YiN2u3gCHqyYtzNgavnRiEP7uYFQLRZI1oV/PFlkEBxO5v2XaA
-	3BSQE0OehuDZNeyTv/VCdsWCU3GTsE
-X-Received: by 2002:a17:90a:b702:b0:2d3:d066:f58b with SMTP id 98e67ed59e1d1-2dad50d19aemr15719534a91.12.1726026877665;
-        Tue, 10 Sep 2024 20:54:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHvmBe+V3UYcFMyoFiIsyQUF0YlakYvGmsNdl8vM8Y/lmMTmDeGH486oED+qxAKBuiGUGjc4+9vpUHYWVIokWU=
-X-Received: by 2002:a17:90a:b702:b0:2d3:d066:f58b with SMTP id
- 98e67ed59e1d1-2dad50d19aemr15719500a91.12.1726026876990; Tue, 10 Sep 2024
- 20:54:36 -0700 (PDT)
+        bh=dRId34MrmjwBQCGTBCcIdTbyoq/BbAp29HJ2NQfUuq4=;
+        b=QC5AD9cpXZeBOT7vxcnBhFEhl2lIg9ukSbkSJ9Em8h4EERLezuXFRHx7x1c/mtRBiI
+         oK4bzkV7KGQWjUcuJC9m/2JPwwpsmbn/TYj6Bx9+1BEVbkAZrQmptXCSJJ4lZAQq1nIt
+         5BMGfL7bB/kJsLFxu+ERe3FRMAQraPLBTG0ArTGBURtsLhA2lrkxzkVF7+xwtYkRsUug
+         O7me8+UzsgbMskT+HECrg8Z8Rx3J+cCyNdRjeiobMg2iZhZ3mpaqCrmiiZ87Y+ChVuXW
+         gXuB+DE9MMKonq7LrWtKxMY5lSF1j2UikEPElHJsAEGh1+QMTaDWj/jSwDMIt28u6KfP
+         u43Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU7iZ7GKYa84R5w6VL0SmEcxKc0/2Mz995/lrLpFW7vsSTOFRnmUD8VWgl5v2koIXbsB4DoSCg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw7+QY6i/pM8Y/0TF22SG2UOO7XlPtSVpb1RhTPfC/jgkxcTORp
+	zQs+DGarkpA6gGdjtXut84K4WVy6N8cSSZ61cRWUV0ekA6mN07Bt8vdNsAOz7Pg=
+X-Google-Smtp-Source: AGHT+IH+Wbk9xLKsf4qNLxlGvXGi3co1pfLth7JoExCcN+noE1farZRdTbjPaemHoKe1jzMWp48v+A==
+X-Received: by 2002:a17:90a:510b:b0:2d8:8cef:3d64 with SMTP id 98e67ed59e1d1-2dad4de10dfmr19117653a91.6.1726027004740;
+        Tue, 10 Sep 2024 20:56:44 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2db0419aab4sm7362746a91.15.2024.09.10.20.56.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Sep 2024 20:56:44 -0700 (PDT)
+Date: Tue, 10 Sep 2024 20:56:42 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Atlas Yu <atlas.yu@canonical.com>
+Cc: kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+ pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net v1] dev_ioctl: fix the type of ifr_flags
+Message-ID: <20240910205642.2d4a64ca@hermes.local>
+In-Reply-To: <20240911034608.43192-1-atlas.yu@canonical.com>
+References: <20240911034608.43192-1-atlas.yu@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240820073330.9161-1-xuanzhuo@linux.alibaba.com> <20240820073330.9161-5-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240820073330.9161-5-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 11 Sep 2024 11:54:25 +0800
-Message-ID: <CACGkMEt19u07b_2GkT_tEBhpKJj97VoF-jcSqoaTyEULoWvdFw@mail.gmail.com>
-Subject: Re: [PATCH net-next 04/13] virtio_ring: perform premapped operations
- based on per-buffer
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 20, 2024 at 3:33=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> The current configuration sets the virtqueue (vq) to premapped mode,
-> implying that all buffers submitted to this queue must be mapped ahead
-> of time. This presents a challenge for the virtnet send queue (sq): the
-> virtnet driver would be required to keep track of dma information for vq
-> size * 17, which can be substantial. However, if the premapped mode were
-> applied on a per-buffer basis, the complexity would be greatly reduced.
-> With AF_XDP enabled, AF_XDP buffers would become premapped, while kernel
-> skb buffers could remain unmapped.
+On Wed, 11 Sep 2024 11:46:08 +0800
+Atlas Yu <atlas.yu@canonical.com> wrote:
 
-Is this only applied to TX or both TX and RX.
+> diff --git a/include/uapi/linux/if.h b/include/uapi/linux/if.h
+> index 797ba2c1562a..b612b6cd7446 100644
+> --- a/include/uapi/linux/if.h
+> +++ b/include/uapi/linux/if.h
+> @@ -244,7 +244,7 @@ struct ifreq {
+>  		struct	sockaddr ifru_broadaddr;
+>  		struct	sockaddr ifru_netmask;
+>  		struct  sockaddr ifru_hwaddr;
+> -		short	ifru_flags;
+> +		unsigned int	ifru_flags;
+>  		int	ifru_ivalue;
+>  		int	ifru_mtu;
+>  		struct  ifmap ifru_map;
 
->
-> We can distinguish them by sg_page(sg), When sg_page(sg) is NULL, this
-> indicates that the driver has performed DMA mapping in advance, allowing
-> the Virtio core to directly utilize sg_dma_address(sg) without
-> conducting any internal DMA mapping.
-
-This seems conflict with the code below?
-
-#define sg_is_premapped(sg) (!sg_page(sg))
-
-And rethink of the design, a question is that is there a chance that
-VM_PFNMAP area could be used for virtio-net? If it is true, the trick
-for sg_page() can not work?
-
-A quick glance told me AF_XEP seems to be safe as it uses
-pin_user_pages(), but we need to check other possibilities.
-
-Or we need to fall back to our previous idea, having new APIs.
-
-> Additionally, DMA unmap operations
-> for this buffer will be bypassed.
->
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/virtio/virtio_ring.c | 70 +++++++++++++++++++++---------------
->  1 file changed, 41 insertions(+), 29 deletions(-)
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index b43eca93015c..7efddc71af67 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -235,6 +235,7 @@ static void vring_free(struct virtqueue *_vq);
->   */
->
->  #define to_vvq(_vq) container_of_const(_vq, struct vring_virtqueue, vq)
-> +#define sg_is_premapped(sg) (!sg_page(sg))
->
->  static bool virtqueue_use_indirect(const struct vring_virtqueue *vq,
->                                    unsigned int total_sg)
-> @@ -292,9 +293,10 @@ static bool vring_use_dma_api(const struct virtio_de=
-vice *vdev)
->         return false;
->  }
->
-> -static bool vring_need_unmap_buffer(const struct vring_virtqueue *vring)
-> +static bool vring_need_unmap_buffer(const struct vring_virtqueue *vring,
-> +                                   const struct vring_desc_extra *extra)
->  {
-> -       return vring->use_dma_api && !vring->premapped;
-> +       return vring->use_dma_api && (extra->addr !=3D DMA_MAPPING_ERROR)=
-;
->  }
->
->  size_t virtio_max_dma_size(const struct virtio_device *vdev)
-> @@ -366,7 +368,7 @@ static struct device *vring_dma_dev(const struct vrin=
-g_virtqueue *vq)
->  static int vring_map_one_sg(const struct vring_virtqueue *vq, struct sca=
-tterlist *sg,
->                             enum dma_data_direction direction, dma_addr_t=
- *addr)
->  {
-> -       if (vq->premapped) {
-> +       if (sg_is_premapped(sg)) {
->                 *addr =3D sg_dma_address(sg);
->                 return 0;
->         }
-> @@ -457,7 +459,7 @@ static unsigned int vring_unmap_one_split(const struc=
-t vring_virtqueue *vq,
->                                  (flags & VRING_DESC_F_WRITE) ?
->                                  DMA_FROM_DEVICE : DMA_TO_DEVICE);
->         } else {
-> -               if (!vring_need_unmap_buffer(vq))
-> +               if (!vring_need_unmap_buffer(vq, extra))
->                         goto out;
->
->                 dma_unmap_page(vring_dma_dev(vq),
-> @@ -510,7 +512,7 @@ static inline unsigned int virtqueue_add_desc_split(s=
-truct virtqueue *vq,
->                                                     dma_addr_t addr,
->                                                     unsigned int len,
->                                                     u16 flags,
-> -                                                   bool indirect)
-> +                                                   bool indirect, bool p=
-remapped)
->  {
->         u16 next;
->
-> @@ -518,7 +520,7 @@ static inline unsigned int virtqueue_add_desc_split(s=
-truct virtqueue *vq,
->         desc[i].addr =3D cpu_to_virtio64(vq->vdev, addr);
->         desc[i].len =3D cpu_to_virtio32(vq->vdev, len);
->
-> -       extra[i].addr =3D addr;
-> +       extra[i].addr =3D premapped ? DMA_MAPPING_ERROR : addr;
->         extra[i].len =3D len;
->         extra[i].flags =3D flags;
->
-> @@ -611,7 +613,7 @@ static inline int virtqueue_add_split(struct virtqueu=
-e *_vq,
->                          */
->                         i =3D virtqueue_add_desc_split(_vq, desc, extra, =
-i, addr, sg->length,
->                                                      VRING_DESC_F_NEXT,
-> -                                                    indirect);
-> +                                                    indirect, sg_is_prem=
-apped(sg));
->                 }
->         }
->         for (; n < (out_sgs + in_sgs); n++) {
-> @@ -629,12 +631,12 @@ static inline int virtqueue_add_split(struct virtqu=
-eue *_vq,
->                                                      sg->length,
->                                                      VRING_DESC_F_NEXT |
->                                                      VRING_DESC_F_WRITE,
-> -                                                    indirect);
-> +                                                    indirect, sg_is_prem=
-apped(sg));
->                 }
->         }
->         /* Last one doesn't continue. */
->         desc[prev].flags &=3D cpu_to_virtio16(_vq->vdev, ~VRING_DESC_F_NE=
-XT);
-> -       if (!indirect && vring_need_unmap_buffer(vq))
-> +       if (!indirect && vring_need_unmap_buffer(vq, &extra[prev]))
->                 vq->split.desc_extra[prev & (vq->split.vring.num - 1)].fl=
-ags &=3D
->                         ~VRING_DESC_F_NEXT;
->
-> @@ -643,19 +645,15 @@ static inline int virtqueue_add_split(struct virtqu=
-eue *_vq,
->                 dma_addr_t addr =3D vring_map_single(
->                         vq, desc, total_sg * sizeof(struct vring_desc),
->                         DMA_TO_DEVICE);
-> -               if (vring_mapping_error(vq, addr)) {
-> -                       if (vq->premapped)
-> -                               goto free_indirect;
-> -
-> +               if (vring_mapping_error(vq, addr))
->                         goto unmap_release;
-> -               }
->
->                 virtqueue_add_desc_split(_vq, vq->split.vring.desc,
->                                          vq->split.desc_extra,
->                                          head, addr,
->                                          total_sg * sizeof(struct vring_d=
-esc),
->                                          VRING_DESC_F_INDIRECT,
-> -                                        false);
-> +                                        false, false);
->         }
->
->         /* We're using some buffers from the free list. */
-> @@ -712,7 +710,6 @@ static inline int virtqueue_add_split(struct virtqueu=
-e *_vq,
->                 i =3D vring_unmap_one_split(vq, &extra[i]);
->         }
->
-> -free_indirect:
->         if (indirect)
->                 kfree(desc);
->
-> @@ -794,7 +791,7 @@ static void detach_buf_split(struct vring_virtqueue *=
-vq, unsigned int head,
->                                 VRING_DESC_F_INDIRECT));
->                 BUG_ON(len =3D=3D 0 || len % sizeof(struct vring_desc));
->
-> -               if (vring_need_unmap_buffer(vq)) {
-> +               if (vq->use_dma_api) {
->                         for (j =3D 0; j < len / sizeof(struct vring_desc)=
-; j++)
->                                 vring_unmap_one_split(vq, &extra[j]);
->                 }
-> @@ -1228,7 +1225,7 @@ static void vring_unmap_extra_packed(const struct v=
-ring_virtqueue *vq,
->                                  (flags & VRING_DESC_F_WRITE) ?
->                                  DMA_FROM_DEVICE : DMA_TO_DEVICE);
->         } else {
-> -               if (!vring_need_unmap_buffer(vq))
-> +               if (!vring_need_unmap_buffer(vq, extra))
->                         return;
->
->                 dma_unmap_page(vring_dma_dev(vq),
-> @@ -1309,7 +1306,7 @@ static int virtqueue_add_indirect_packed(struct vri=
-ng_virtqueue *vq,
->                         i++;
->
->                         if (unlikely(vq->use_dma_api)) {
-> -                               extra[i].addr =3D addr;
-> +                               extra[i].addr =3D sg_is_premapped(sg) ? D=
-MA_MAPPING_ERROR : addr;
->                                 extra[i].len =3D sg->length;
->                                 extra[i].flags =3D n < out_sgs ?  0 : VRI=
-NG_DESC_F_WRITE;
->                         }
-> @@ -1320,12 +1317,8 @@ static int virtqueue_add_indirect_packed(struct vr=
-ing_virtqueue *vq,
->         addr =3D vring_map_single(vq, desc,
->                         total_sg * sizeof(struct vring_packed_desc),
->                         DMA_TO_DEVICE);
-> -       if (vring_mapping_error(vq, addr)) {
-> -               if (vq->premapped)
-> -                       goto free_desc;
-> -
-> +       if (vring_mapping_error(vq, addr))
->                 goto unmap_release;
-> -       }
->
->         vq->packed.vring.desc[head].addr =3D cpu_to_le64(addr);
->         vq->packed.vring.desc[head].len =3D cpu_to_le32(total_sg *
-> @@ -1383,7 +1376,6 @@ static int virtqueue_add_indirect_packed(struct vri=
-ng_virtqueue *vq,
->         for (i =3D 0; i < err_idx; i++)
->                 vring_unmap_extra_packed(vq, &extra[i]);
->
-> -free_desc:
->         kfree(desc);
->
->         END_USE(vq);
-> @@ -1474,7 +1466,8 @@ static inline int virtqueue_add_packed(struct virtq=
-ueue *_vq,
->                         desc[i].id =3D cpu_to_le16(id);
->
->                         if (unlikely(vq->use_dma_api)) {
-> -                               vq->packed.desc_extra[curr].addr =3D addr=
-;
-> +                               vq->packed.desc_extra[curr].addr =3D sg_i=
-s_premapped(sg) ?
-> +                                       DMA_MAPPING_ERROR : addr;
->                                 vq->packed.desc_extra[curr].len =3D sg->l=
-ength;
->                                 vq->packed.desc_extra[curr].flags =3D
->                                         le16_to_cpu(flags);
-> @@ -1625,10 +1618,9 @@ static void detach_buf_packed(struct vring_virtque=
-ue *vq,
->                 if (!extra)
->                         return;
->
-> -               if (vring_need_unmap_buffer(vq)) {
-> +               if (vq->use_dma_api) {
->                         len =3D vq->packed.desc_extra[id].len;
-> -                       for (i =3D 0; i < len / sizeof(struct vring_packe=
-d_desc);
-> -                                       i++)
-> +                       for (i =3D 0; i < len / sizeof(struct vring_packe=
-d_desc); i++)
-
-Unnecessary changes?
-
-
->                                 vring_unmap_extra_packed(vq, &extra[i]);
->                 }
->                 kfree(desc);
-> @@ -2212,6 +2204,11 @@ static inline int virtqueue_add(struct virtqueue *=
-_vq,
->   * @data: the token identifying the buffer.
->   * @gfp: how to do memory allocations (if necessary).
->   *
-> + * When sg_page(sg) is NULL, this indicates that the driver has performe=
-d DMA
-> + * mapping in advance, allowing the virtio core to directly utilize
-> + * sg_dma_address(sg) without conducting any internal DMA mapping. Addit=
-ionally,
-> + * DMA unmap operations for this buffer will be bypassed.
-> + *
->   * Caller must ensure we don't call this with other virtqueue operations
->   * at the same time (except where noted).
->   *
-> @@ -2246,6 +2243,11 @@ EXPORT_SYMBOL_GPL(virtqueue_add_sgs);
->   * @data: the token identifying the buffer.
->   * @gfp: how to do memory allocations (if necessary).
->   *
-> + * When sg_page(sg) is NULL, this indicates that the driver has performe=
-d DMA
-> + * mapping in advance, allowing the virtio core to directly utilize
-> + * sg_dma_address(sg) without conducting any internal DMA mapping. Addit=
-ionally,
-> + * DMA unmap operations for this buffer will be bypassed.
-> + *
->   * Caller must ensure we don't call this with other virtqueue operations
->   * at the same time (except where noted).
->   *
-> @@ -2268,6 +2270,11 @@ EXPORT_SYMBOL_GPL(virtqueue_add_outbuf);
->   * @data: the token identifying the buffer.
->   * @gfp: how to do memory allocations (if necessary).
->   *
-> + * When sg_page(sg) is NULL, this indicates that the driver has performe=
-d DMA
-> + * mapping in advance, allowing the virtio core to directly utilize
-> + * sg_dma_address(sg) without conducting any internal DMA mapping. Addit=
-ionally,
-> + * DMA unmap operations for this buffer will be bypassed.
-> + *
->   * Caller must ensure we don't call this with other virtqueue operations
->   * at the same time (except where noted).
->   *
-> @@ -2291,6 +2298,11 @@ EXPORT_SYMBOL_GPL(virtqueue_add_inbuf);
->   * @ctx: extra context for the token
->   * @gfp: how to do memory allocations (if necessary).
->   *
-> + * When sg_page(sg) is NULL, this indicates that the driver has performe=
-d DMA
-> + * mapping in advance, allowing the virtio core to directly utilize
-> + * sg_dma_address(sg) without conducting any internal DMA mapping. Addit=
-ionally,
-> + * DMA unmap operations for this buffer will be bypassed.
-> + *
->   * Caller must ensure we don't call this with other virtqueue operations
->   * at the same time (except where noted).
->   *
-> --
-> 2.32.0.3.g01195cf9f
->
-
-Thanks
-
+NAK
+This breaks userspace ABI. There is no guarantee that
+older application correctly zeros the upper flag bits.
 
