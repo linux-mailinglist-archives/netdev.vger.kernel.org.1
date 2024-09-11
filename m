@@ -1,61 +1,89 @@
-Return-Path: <netdev+bounces-127494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15B9B975928
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 19:17:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50B30975930
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 19:20:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48B4F1C22F6E
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:17:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B142873E8
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:20:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182C51AC8B2;
-	Wed, 11 Sep 2024 17:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAD0C19755E;
+	Wed, 11 Sep 2024 17:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qs45Z9y0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yy92hCvX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE5C5FB8D;
-	Wed, 11 Sep 2024 17:17:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1921B142F;
+	Wed, 11 Sep 2024 17:19:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726075048; cv=none; b=JMIGTibQYfKo7azPQuSC4Sr9jlbwVh820B308bZpt1dVEwlC8d93nYCEaLSSJo8mKYHj9llx4lqS44NdgdOlqryLPl/8dritzL39EFz+BaErRkeuEDLk2AGlIQzuCDxUW2ez09/w8Y1fAtuQlHvU2VUROg/GmTDrpQUw4m7hhoQ=
+	t=1726075178; cv=none; b=FyhkT/8PaDy7v9d0x62yq1EtE4a1LDfLB/rxnPLBKISsJ4xlVZ5UkRmaCZfDiBAduL9Llf8RYa2lKS9rOjxC2dMMj2Dq/ZuD4x4prKndoVu2CyZtNsgV6OUUueTECyC6Pd0uW22Zp1IcwzN8v3M9eGHZCxlwbTI3TZz8aAqUijw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726075048; c=relaxed/simple;
-	bh=5UYjBU3+9f00Np4eAEbrOzDEg12YW2NhV/ZLEb9TKVA=;
+	s=arc-20240116; t=1726075178; c=relaxed/simple;
+	bh=nb43cDsO0TADiQir4ODMmF3/zIgggQPtWv1K/xJZfOU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UD09OiKZtH8TvxEEsnf+2fdottLYLw50s5mkf2r+odq9pz58oEjI+yxc0DUDoeTomSFIxQaW2K2+5TCIwyYqy52rXdvmcEbbqvdJtDehN0zGBJLgxIhHvI1m9QpkcVC6ABnxuzsKpyU4CMA8x2pTGIlqdeD/V/kmJTUpQiPn6ew=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qs45Z9y0; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=AoOBj7v9nDNKWYQoDY048eHpYi95ao0hxBfOBrjvCak=; b=qs45Z9y04KuW6iWKLiBjF3McLC
-	Z/wG2hq9fjVH5JvdGznc4BGIn3p9Xrc6VfWHVDh6khYfdENippiKCDA3pDac2m1LMhenISso4vi8U
-	rlU83UehjON5gTygZJdVz2T0UXxZcAiPN06/YYriWkSwEDkDaI4UZ2lT2Q/o7eN8sb3E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1soQxu-007Eix-Ik; Wed, 11 Sep 2024 19:17:14 +0200
-Date: Wed, 11 Sep 2024 19:17:14 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
-	Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next V2 2/5] net: lan743x: Add support to
- software-nodes for sfp
-Message-ID: <cb39041e-9b72-4b76-bfd7-03f825b20f23@lunn.ch>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-3-Raju.Lakkaraju@microchip.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=D/nwDqY58G82mjMguAIrNiY2mEm/sP23rBxlmi3ytr/9v2X6sxiA3ALNaCM2tay2P4AB6Ua6UVuLG/FEP875GitcQWG3q2d5ztPG9eLsB+RPLuGvaOjphNmKDBI6tP47iNdlXwnjgtxhmcfbsIOPqgKiNiFgboj3iRgUyXaQjdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yy92hCvX; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42cb1e3b449so6608445e9.3;
+        Wed, 11 Sep 2024 10:19:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726075175; x=1726679975; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WVEqi6YJV2uXXOJa4zIXz+knYBt9ewc3uLNRHvGVXVM=;
+        b=Yy92hCvXqjL+cJ1Mh3N3bYPlL7AL6S68qt9/Rf/3CL3fbW7E3ivM/YINgcYnDLKCfA
+         D8sAJauW0+GBriZVd0kBMTRJNcpFJBtVE+H9fdYYLbyqTh39aRGhPDRQ51ljtvyuY28J
+         zsZK/ek/zfpnR729HluhMN3Y/LVrwfFlGuWy3JGwdDeeWNY954SNZgd7rDUNq4kpQW9+
+         Rp1xLKF6Fdmpx6m2T7vSAugORCJelv8bmCb+2GYxNx3fdiL3jWB48p+ALI0ytBIdDw47
+         NxnImUMnEU95f6bifwGVNa8EdHCkzTop+QeiND26KmR9LjSbix+9Sc1Hq09gXzv+Hbca
+         vPkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726075175; x=1726679975;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WVEqi6YJV2uXXOJa4zIXz+knYBt9ewc3uLNRHvGVXVM=;
+        b=Z9R/CthfZmSIBq9OoHYYFrb8VkHAN/EOgLlFZGCQ79I+ngOWEGa07AYpVSbdwp9BK4
+         eWoUpt924g66mX1ToJUPHgXPoXLD4SSVYlKSs3xBWji4r3rXdrQANMf1ax+z30UU8aDv
+         5dO+3gaB3s2X/ouOX7PxVV/O4uxM6SFDh77rqf3Z5KgbYW51s81iIkXOoTJsO1r7UwSx
+         VmFhd/VCQpiK6VOBBa/IT1bKrJu2alQKJl543rE8lH27cL030xk0WDs5UhyBFj5d72UT
+         x339+pvWzAiM8rpAV0+ophxtAzBNRQE9Y7fJ3/k3W5vc0lt+GtQSpTq34mpWjH788Pid
+         OXDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVaxiUDO48eU3pWuOUzeDlUA7BYgcuqnDSCOvnpHhlc9lUYb5m5qRJxoQjfCv9bWEWkBSNBIbg5@vger.kernel.org, AJvYcCXjpzRSJVRZbjShRvDzAP1bYutN2TXRwjFhzRHIGyHJu6CpugY4qemcZuJG5vbJNoQJ0FM5W/k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSFBTeVaS+qwtVbljQWzjT88FA5n96XEZam/VeCEDljUqjD+af
+	c4FBE4iOAkWGUpnNecVAzLOuQmTMU/ujtGlEPYwD3I66t3Pdel2x
+X-Google-Smtp-Source: AGHT+IHWYHM19QehhAcotmTIJvBKXFis0R5R6N0r5fH8IHZwGZcMtIleCSsPTl1axXVq8UXDAEZAHA==
+X-Received: by 2002:a05:600c:3b25:b0:42c:b79c:5647 with SMTP id 5b1f17b1804b1-42cdb53861dmr1187725e9.3.1726075175094;
+        Wed, 11 Sep 2024 10:19:35 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb8b7fcsm148928345e9.47.2024.09.11.10.19.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 10:19:34 -0700 (PDT)
+Date: Wed, 11 Sep 2024 20:19:32 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
+Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] net: dsa: lan9303: avoid dsa_switch_shutdown()
+Message-ID: <20240911171932.yqt5emtb4xmrdqgq@skbuf>
+References: <20240911144006.48481-1-alexander.sverdlin@siemens.com>
+ <20240911162834.6ta45exyhbggujwl@skbuf>
+ <9976228b12417fd3a71f00bd23000e17c1e16a3f.camel@siemens.com>
+ <06f6c7d6f1e812c862af892f89d56d74b69995f9.camel@siemens.com>
+ <7b9dc2a2494c2af62cd37e506bbad73a44819c36.camel@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,70 +92,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240911161054.4494-3-Raju.Lakkaraju@microchip.com>
+In-Reply-To: <7b9dc2a2494c2af62cd37e506bbad73a44819c36.camel@siemens.com>
 
-> diff --git a/drivers/net/ethernet/microchip/Kconfig b/drivers/net/ethernet/microchip/Kconfig
-> index 2e3eb37a45cd..9c08a4af257a 100644
-> --- a/drivers/net/ethernet/microchip/Kconfig
-> +++ b/drivers/net/ethernet/microchip/Kconfig
-> @@ -50,6 +50,8 @@ config LAN743X
->  	select CRC16
->  	select CRC32
->  	select PHYLINK
-> +	select I2C_PCI1XXXX
-> +	select GP_PCI1XXXX
+On Wed, Sep 11, 2024 at 05:09:08PM +0000, Sverdlin, Alexander wrote:
+> On Wed, 2024-09-11 at 19:04 +0200, Alexander Sverdlin wrote:
+> > > > The difference between that and this is the extra lan9303_disable_processing_port()
+> > > > calls here. But while that does disable RX on switch ports, it still doesn't wait
+> > > > for pending RX frames to be processed. So the race is still open. No?
+> > 
+> > besides from the below, I've expected this question... In the meanwhile I've tested
+> > mv88e6xxx driver, but it (accidentally) has no MDIO race vs shutdown.
+> > After some shallow review of the drivers I didn't find dev_get_drvdata <= mdio_read
+> > pattern therefore I've posted this tested patch.
+> > 
+> > If you'd prefer to solve this centrally for all drivers, I can test your patch from
+> > the MDIO-drvdata PoV.
+> 
+> But this would mean throwing away the whole
+> "net: dsa: be compatible with masters which unregister on shutdown" work?
 
-GP_ is odd. GPIO drivers usually use GPIO_. Saying that, GPIO_PCI1XXXX
-is not in 6.11-rc7. Is it in gpio-next?
+I did not propose anything (yet). I'm still trying to form a mental model
+of what is broken and what works. Hence the request to test that change.
 
-> +static void *pci1xxxx_perif_drvdata_get(struct lan743x_adapter *adapter,
-> +					u16 perif_id)
-> +{
-> +	struct pci_dev *pdev = adapter->pdev;
-> +	struct pci_bus *perif_bus;
-> +	struct pci_dev *perif_dev;
-> +	struct pci_dev *br_dev;
-> +	struct pci_bus *br_bus;
-> +	struct pci_dev *dev;
-> +
-> +	/* PCI11x1x devices' PCIe topology consists of a top level pcie
-> +	 * switch with up to four downstream ports, some of which have
-> +	 * integrated endpoints connected to them. One of the downstream ports
-> +	 * has an embedded single function pcie ethernet controller which is
-> +	 * handled by this driver. Another downstream port has an
-> +	 * embedded multifunction pcie endpoint, with four pcie functions
-> +	 * (the "peripheral controllers": I2C controller, GPIO controller,
-> +	 * UART controllers, SPIcontrollers)
-> +	 * The code below navigates the PCI11x1x topology
-> +	 * to find (by matching its PCI device ID) the peripheral controller
-> +	 * that should be paired to the embedded ethernet controller.
-> +	 */
-> +	br_dev = pci_upstream_bridge(pdev);
-> +	if (!br_dev) {
-> +		netif_err(adapter, drv, adapter->netdev,
-> +			  "upstream bridge not found\n");
-> +		return br_dev;
-> +	}
-> +
-> +	br_bus = br_dev->bus;
-> +	list_for_each_entry(dev, &br_bus->devices, bus_list) {
-> +		if (dev->vendor == PCI1XXXX_VENDOR_ID &&
-> +		    (dev->device & ~PCI1XXXX_DEV_MASK) ==
-> +		     PCI1XXXX_BR_PERIF_ID) {
-> +			perif_bus = dev->subordinate;
-> +			list_for_each_entry(perif_dev, &perif_bus->devices,
-> +					    bus_list) {
-> +				if (perif_dev->vendor == PCI1XXXX_VENDOR_ID &&
-> +				    (perif_dev->device & ~PCI1XXXX_DEV_MASK) ==
-> +				     perif_id)
-> +					return pci_get_drvdata(perif_dev);
-> +			}
-> +		}
-> +	}
-
-It would be good to have the PCI Maintainers review of this. Maybe
-pull this out into a patch of its own and Cc: Bjorn Helgaas
-<bhelgaas@google.com>
-
-	Andrew
+OTOH, this patch is equally throwing away the whole "net: dsa: be
+compatible with masters which unregister on shutdown" work (for lan9303).
 
