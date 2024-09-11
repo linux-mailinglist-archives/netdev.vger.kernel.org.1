@@ -1,187 +1,277 @@
-Return-Path: <netdev+bounces-127250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02382974C36
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:08:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0998D974C4A
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:16:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BCB2B23013
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 08:08:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91EE9286371
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 08:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E67314A606;
-	Wed, 11 Sep 2024 08:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA4613D50B;
+	Wed, 11 Sep 2024 08:16:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Sm3thne9"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="C/aNJF02"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2040.outbound.protection.outlook.com [40.107.223.40])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBE613C9D4;
-	Wed, 11 Sep 2024 08:08:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726042115; cv=fail; b=qV2cFje/5u2/Ix7hwZRyLuI4bOqOWT44u8BRddYWzD1dn540T9yzuYVEMgU7lxSkI9y5+P5RhBUtStgw3YHn96F8BS9gXld0jXnHPPTwqX+XIcfBaMvq5Gzl/N003RNan9g0hGJB+YsZz/1QFbPYix0ZUT6owPRiVpJAkO3wfoQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726042115; c=relaxed/simple;
-	bh=tA4zhAhZA8IR/XvBdiOm0P11fukvtVYOVD1nNtH5tu4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=bUURsb3Uq6GG/EcUPWyEy9a4gWMdrrjKd2JvBwhy7RsUhUyyZeuoXylrwFbowf4EMR1DuPziEIsxshuyBtqxVXe+cqTGwpjaqhItrgdGRumsmHWBoLLPVywFnunfJBm7QOkpBtOdU/8+UVZZAae+S/BFdidEm8FMYleuJD5IvY4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Sm3thne9; arc=fail smtp.client-ip=40.107.223.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=hN0t456BZlJNf9MNAlsCTbI9ScoSgj121crBYdQC0R303YOGFrMSoNYjkTDusp2FnX4RtrLVOaYHElj//UCpKoemGVv2QeiKnEbOZ9XSesG8uwqGu12Klcb7H1JXHvdDnNQS4AquUhuUgxm/72wH6Sq65+CgXs+8pqynO7+TxsLgCWzwMLlgM4hPtNeEynzJKEsW356vLAAcyzuFd24c4Kd02Wf0cK+Wwgu1EInVJkSLyOeDxKtl0cEVYfrozP/C9Qu5slqKb3yrRLTFDsIoBY2wvMw7bRo6nm+SUsQbLe6pAvnTLL3/lO5Lje85s2ZIAeadTS+ZuYjd6ADQMcjaow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=d8ZIl9aYRESON/dPMI2Yjsg47qRkwv5bFiLB8F+1YdU=;
- b=y00ATCetEg3wN1ZyliAKcflrgcnEQt6l1DkfqnGXD/IqvJVaZ0lSExHXgHPdoWCkteUcQjNXH26fciFv80W70ih6ceR1Nsqx4Ty64Ej6KGyD1f8FKLKCB0vFMl8G3348nmMdOloh5ML3PGKVftw7n0OsvhLa/zJJcHi715GJl546AHhhpfFm1Ecx7ZjcRohIavqzMWOtzoNcgE0wpmFsTCkO6hCy5Knsp0s0TqgooGBbKsHbqMnc3ntfPqwzZ5F8RjFboP3GwYzbWSys7tOsm37md4kDQ2HBEJMvs986mT0pwwSAb64dD0S+Q4ZToqxtLZfXe9MvkNp/vpPVWEsW4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d8ZIl9aYRESON/dPMI2Yjsg47qRkwv5bFiLB8F+1YdU=;
- b=Sm3thne9bJ7zG80oVf/yL/L5DuF6EQyXn/Bd470AT1lNk7N2LeFq10scaqQS+avicgKEHvevDHvzpR5pUYJrLnScw04mLrw8om11VVGt2U1Bar7qznElBdR2KDJmOiPc1HbCB6Q8od9bH1TReTIpvAUwgQsLvdrV2wMhU90l5qO1gweTxHjctnnvJuDr45NgJu4/1HFPQs4lTB4ug0FQv9G3YUQeibByIusoUTKA7TEduFaN8IHre38d2cjf6oUTWaJgb8elk9Byps4vFJRKluiAH0AAP+bJk4Y7Lc2Wz27GUZ3/dre6KjQdhGMHtLVc79ILw5DYFaIHZT3wMVjrsw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by DM6PR12MB4452.namprd12.prod.outlook.com (2603:10b6:5:2a4::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.25; Wed, 11 Sep
- 2024 08:08:31 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8%6]) with mapi id 15.20.7918.024; Wed, 11 Sep 2024
- 08:08:30 +0000
-Date: Wed, 11 Sep 2024 11:08:20 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: kuba@kernel.org, aleksander.lobakin@intel.com, horms@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	dsahern@kernel.org, dongml2@chinatelecom.cn, amcohen@nvidia.com,
-	gnault@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com,
-	razor@blackwall.org, petrm@nvidia.com, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v3 06/12] net: vxlan: make vxlan_snoop() return
- drop reasons
-Message-ID: <ZuFP9EAu4MxlY7k0@shredder.lan>
-References: <20240909071652.3349294-1-dongml2@chinatelecom.cn>
- <20240909071652.3349294-7-dongml2@chinatelecom.cn>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240909071652.3349294-7-dongml2@chinatelecom.cn>
-X-ClientProxiedBy: TL2P290CA0005.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:2::15) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A75913D510;
+	Wed, 11 Sep 2024 08:16:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726042592; cv=none; b=jc4s2YY1e096vPExUSf24Q1n3q4QkVqhLOzH1ov7UQU6KHn2IWh1qq8CgkYRGQ0OXq/wQTQghoXRTdvLz4qhwvHNCYFldDQaVv9J5qWyFBy39OJMNfbiT32AwozP/JgdDm59GrYnBvb/J/umhPe5pKW08veLDDQ5TyKAwGg64lQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726042592; c=relaxed/simple;
+	bh=xORRYaOI65Nln4gdGbFiF+cXnA6mtFGHnoEkL0is48w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KE77bvzynfBjoX7nqFfSm/vNzHaaSv8GcnRMhE0Tzax9b47HgUaTZ/rbd5pGBk6oo0zMWPvmZGPQcUCjYsY7/x6upYfBF479TVcTEAuZWjneNCQG6jmpFYwHS8U+h77q6cRFVglmDf9Z6PLF0oaRr5pYOf9FMYRaH/uqkEiNgGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=C/aNJF02; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 48B8G6SK044012;
+	Wed, 11 Sep 2024 03:16:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1726042566;
+	bh=d1PHMLAifrqnQnQ87o9A1quYM6RpIYl7JQF3tGF2juY=;
+	h=From:To:CC:Subject:Date;
+	b=C/aNJF02QDNKp8cyqP46TX+Kn59xWo1EH70RsZGtfk7GlsqOWR4H9yB2lQrO4iH5j
+	 aG7dq7226MCHZx+Ows3DctFRNKb90M5NdnY2GjmlqOhUvdrVjCN5eVir8987jHkNrs
+	 Bg+PwMO+vsOJ3nHWl3nY7irFC6FWZHdEfuW5VZ28=
+Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 48B8G6qU092044;
+	Wed, 11 Sep 2024 03:16:06 -0500
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE108.ent.ti.com
+ (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 11
+ Sep 2024 03:16:05 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 11 Sep 2024 03:16:05 -0500
+Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 48B8G5bn011414;
+	Wed, 11 Sep 2024 03:16:05 -0500
+Received: from localhost (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 48B8G4Es032107;
+	Wed, 11 Sep 2024 03:16:05 -0500
+From: MD Danish Anwar <danishanwar@ti.com>
+To: <robh@kernel.org>, <jan.kiszka@siemens.com>, <dan.carpenter@linaro.org>,
+        <r-gunasekaran@ti.com>, <saikrishnag@marvell.com>, <andrew@lunn.ch>,
+        <javier.carrasco.cruz@gmail.com>, <jacob.e.keller@intel.com>,
+        <diogo.ivo@siemens.com>, <horms@kernel.org>,
+        <richardcochran@gmail.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Vignesh Raghavendra
+	<vigneshr@ti.com>,
+        Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net-next v6 0/5] Introduce HSR offload support for ICSSG
+Date: Wed, 11 Sep 2024 13:45:58 +0530
+Message-ID: <20240911081603.2521729-1-danishanwar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|DM6PR12MB4452:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4318a151-b72d-4b54-2bae-08dcd238ec5d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ORqy9wLp393ykSgCoRr3R+0K+VPmpTEQcwqhzVYZIjjeC0XJQpx4hzywD+cG?=
- =?us-ascii?Q?d8VTiR+NDcf1QOtp/rbAhrvDDaVHH6kn1DWDMsikeSpdWWXA6JLDzSANsO2p?=
- =?us-ascii?Q?akQR0MtoXlzYBNhPt6p+6JeCMx4SK6aV+mw41vHpcn0WUArtDyENSc6cv5lM?=
- =?us-ascii?Q?sVEYnwRqgiZcWFyVOzSqw7tW8e8FjHbDSOUNsqmA+/s1xug0eJ8VsxKFvpQW?=
- =?us-ascii?Q?SO2Qg0wW6RK+/dIpOSon+nKXa2YaGWsMyJd41FuTGUnj2PTOnCyKQlpAhft6?=
- =?us-ascii?Q?EqTw7IcNYR4UFdcGZi7+EtqMNuIm6tbrFzNnX6lWKZxxYgL+S2MEdFV0s5Jz?=
- =?us-ascii?Q?+xptyLLa4FE4BjOTb3OyE0uWhIbjXDTVaoNcItpOuhT/Rwjsl1c2FYbpg/fA?=
- =?us-ascii?Q?QrfAxnbSKprZWofe0QkFn9+pc2iYdKCqXwtteilVuO79BiZHhvMGPJo6YyCD?=
- =?us-ascii?Q?CtEJLNbeK0p1C7ta1vFtnSH3ImotnKicH234aNso2/K+QyGRZST/AKC4g3sW?=
- =?us-ascii?Q?kb2ddalCpeXzpyBgwTUNmSBPTvuNH6AsVynMAhg9PgFCWHNrba41t5GR4LpT?=
- =?us-ascii?Q?dbybMApi4qTrTRN2ZgKOTuIflLZbGqWRfCjSS4piM3WC4xDESZ20tX/LGVzC?=
- =?us-ascii?Q?YZ8xTkNOe5npIBkzzwTjQ1AphuFazlDTaL/VLLrAgpOlQ2N/1Rk5tx/6Of6v?=
- =?us-ascii?Q?RIow6+WNT3iZOFf0PVDf3dI2NN8EGQls6vDAQKf2sjnIHTSuWz5tiT/uhqFe?=
- =?us-ascii?Q?5h1f34BDjlALe99UXLprbulATLlHvoU6idi5oMGo+RPybhwSb2YACf1Q33Ad?=
- =?us-ascii?Q?X1gz/KbIARfVw+HdbNzQIsux6ndHTWTVo/kad1D4hl+2suz1vsW4vrdD0nZw?=
- =?us-ascii?Q?5DwX2jlx3c+Rxcr4ZSNyOwb+tB4ydwjBl1Z+GBHZDVAFaDcqFliMzyJ95h+Y?=
- =?us-ascii?Q?NQJhdrpu5dkZSQ8Z+XOo2n5AE4ZClgMyaJJShuYdZqpPJM9fDuI8nrZmT3YN?=
- =?us-ascii?Q?DCKhOPkHZ/N4Cubp82gnAvi04xYXnWnG64Avr5EdqhpxKCj7w/1QV7VQ2R4q?=
- =?us-ascii?Q?hEBQiCteuN+V9re5EsLdRE8h/7Yv8yAkHQhNkDE86TURGnVZDk3RtAc29y+4?=
- =?us-ascii?Q?xnXt+7NBtXpPBzGX/1mtN+pOlFTEkD6lpjJLy4QPzAZ/dyaq+0j78CGSlP00?=
- =?us-ascii?Q?WvLcI0BHNIUQKZcy8Xy1iU7iJH96wCdfkP3JgSBkHaVep5EuHunUNPQf8yRh?=
- =?us-ascii?Q?i1INv9w5c/MsGDTTB88iwAprqpfirusaqbNrKA0GxE/UXiwaxpQwhNJToWro?=
- =?us-ascii?Q?oq6WOUiCgbylE0Jz4CyjbKOMXMA1tw+3rCxteDRZ/vMJDQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?nCNWiCxeRIi9Sn/OG/BYoiDZi34tRzRL04+300etXdux7a+8GS1Vx/G6F9Ue?=
- =?us-ascii?Q?fB5NF0yCr8CG5vtaooAXMiPXDdL2Q3jWHHgDFPp02I5/pZdv+0iKlDziygX8?=
- =?us-ascii?Q?rFmfMNeYATcjnrGM6C5xLLbZ8fFWUPIhi/ljombrhdoMSOmAZ2KVCODFbzdr?=
- =?us-ascii?Q?sL828eC0z3EPH2BRq+jYcGPm7KOJohJrn2pWmTv/1sJnYHY/Y4E7g1LTlA8J?=
- =?us-ascii?Q?WvWwoBra4v328hAKO88uW2iptyYN91SjpY8NfGPVSmhRvVN5ecEUIqJWiLhk?=
- =?us-ascii?Q?ILJHCJ12FA+T5NzlcQAhPsotWGaBcCgrNkky8i371+PqbOA/V0MemooFWqpR?=
- =?us-ascii?Q?SEKdHqrCkQZvSyMz9L9kVKlH9DzMFWR9Bama5COOXLvPwdUbX7u4ONuuCqAJ?=
- =?us-ascii?Q?iTI23oGOYrbk1vJdtimn6T5F+uRNaV5YmYGs/DLPqcjvxTWrGSo2nqLJ2mVP?=
- =?us-ascii?Q?lLuates0j6zknCrZYIqhVB+lE7KNGUPspCH3Wa4Yy6WriJzHXwXdoB7xODIK?=
- =?us-ascii?Q?YGfeS4QWCYgvuA6iJH7I+zb5kui4BV6Y2OLEon6TsALmoViwmHusBLHcHguq?=
- =?us-ascii?Q?gQ9mW9QA6t2tN0FUqV1ISlgPBcJ9/8cYXqAKELNq22r8o8WRaASFAFsWC3kJ?=
- =?us-ascii?Q?aq7lRB+zXJp1WHZDA8PmLjYZuZDBQKYRX/R4jaPwzbXZABjCQ12zqL/C3acV?=
- =?us-ascii?Q?2eifccAy3YZ5hq2nh0w/b4cd2ecMOrg8vXKdkptdRM2aDfj7QlF+btYRYeU7?=
- =?us-ascii?Q?7TVYQI+eI/e4/xgER83Ye1CNlGWTSoBrbjnY5nwIYvNI5j/6n7ndfl+l3fhL?=
- =?us-ascii?Q?KM907oKoK51arDpNpx6vxo+DR/EglSjyjQS8u9pcjtXc9mEmLd5s7MlCJTbJ?=
- =?us-ascii?Q?TXFIkH/npAoMHBQQwLn/5TcxZt93u/Q72K3pbb3q9vkZ9NYxYkRoeezcyubd?=
- =?us-ascii?Q?6RiaUlw+BScahVTonkBtcPqmNEdVF8z9SNPnw0BQhVOHeqtLh2D0cntpoqFT?=
- =?us-ascii?Q?mx96edSjaq/qO7Lu4SpC+NGEgjSrUF758WngLKgVCWblyNzuIgcFBvTVDG1D?=
- =?us-ascii?Q?H4FizerRbV/Re5bPmRbVotD5jkt8ww3AT2FlLKdXpBIU/vdHHXp0M/rPrqUY?=
- =?us-ascii?Q?+nqawPvERfJqQW3QpHfYSG7ZBNjHZdqT8NHOxy86yyPcWDkHepL7YObHGz5b?=
- =?us-ascii?Q?EF/IKrlW6rbPGHdyw17bewNE7EyD5HxBv+ESEBvgi6Nbp6/I5ndvz5QV05+G?=
- =?us-ascii?Q?m+MlYHjHFM84Gs91tbmgWUk2lPTvfmjn/x28OTaZJyp1XkPmDuZPzyk9F57/?=
- =?us-ascii?Q?UCHKrddBUfY+lhbLkyDZAUgNGa1vG98szVJe5hjS9GvYzO5jd+tp8iOXagoR?=
- =?us-ascii?Q?T+ktWNDmX/mJklrb8a5/qz/LDxXJzjp6Ohkty0HyRdojQB5+Mw1v+E7EaQ1i?=
- =?us-ascii?Q?RLBGGmRv8wvP8+ueZguMpyxIr2Q8LeXUAe2zBzntUHBGr0v0mOKAhsR+NwCj?=
- =?us-ascii?Q?otzX7AHxkodQkp+4jqeETFXJXVpAjcDAcwJF+UYG9pPKtLwoZ5j+xIYxtAo/?=
- =?us-ascii?Q?OjV2fbLSUHnEux5PcD0RtHck0bpZjc6MeMa+hmHQ?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4318a151-b72d-4b54-2bae-08dcd238ec5d
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2024 08:08:30.6499
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RlTr2U0yFvrRvZbUKjsVMg+eOEYwj+pkJtMGVjQWkUwv9Rgir7OGB3FaobFdd62kxxoLP6NrL0r3gAdCj6g94w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4452
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Mon, Sep 09, 2024 at 03:16:46PM +0800, Menglong Dong wrote:
-> @@ -1447,7 +1448,7 @@ static bool vxlan_snoop(struct net_device *dev,
->  
->  	/* Ignore packets from invalid src-address */
->  	if (!is_valid_ether_addr(src_mac))
-> -		return true;
-> +		return SKB_DROP_REASON_VXLAN_INVALID_SMAC;
+Hi All,
+This series introduces HSR offload support for ICSSG driver. To support HSR
+offload to hardware, ICSSG HSR firmware is used.
 
-[...]
+This series introduces,
+1. HSR frame offload support for ICSSG driver.
+2. HSR Tx Packet duplication offload
+3. HSR Tx Tag and Rx Tag offload
+4. Multicast filtering support in HSR offload mode.
+5. Dependencies related to IEP.
 
-> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
-> index 98259d2b3e92..1b9ec4a49c38 100644
-> --- a/include/net/dropreason-core.h
-> +++ b/include/net/dropreason-core.h
-> @@ -94,6 +94,8 @@
->  	FN(TC_RECLASSIFY_LOOP)		\
->  	FN(VXLAN_INVALID_HDR)		\
->  	FN(VXLAN_VNI_NOT_FOUND)		\
-> +	FN(VXLAN_INVALID_SMAC)		\
+HSR Test Setup:
+--------------
 
-Since this is now part of the core reasons, why not name it
-"INVALID_SMAC" so that it could be reused outside of the VXLAN driver?
-For example, the bridge driver has the exact same check in its receive
-path (see br_handle_frame()).
+     ___________           ___________           ___________
+    |           | Link AB |           | Link BC |           |
+  __|   AM64*   |_________|   AM64    |_________|   AM64*   |___
+ |  | Station A |         | Station B |         | Station C |   |
+ |  |___________|         |___________|         |___________|   |
+ |                                                              |
+ |______________________________________________________________|
+                            Link CA
+ *Could be any device that supports two ethernet interfaces.
 
-> +	FN(VXLAN_ENTRY_EXISTS)		\
->  	FN(IP_TUNNEL_ECN)		\
->  	FNe(MAX)
+Steps to switch to HSR frame forward offload mode:
+-------------------------------------------------
+Example assuming eth1, eth2 ports of ICSSG1 on AM64-EVM
+
+  1) Enable HSR offload for both interfaces
+      ethtool -K eth1 hsr-fwd-offload on
+      ethtool -K eth1 hsr-dup-offload on
+      ethtool -K eth1 hsr-tag-ins-offload on
+      ethtool -K eth1 hsr-tag-rm-offload on
+
+      ethtool -K eth2 hsr-fwd-offload on
+      ethtool -K eth2 hsr-dup-offload on
+      ethtool -K eth2 hsr-tag-ins-offload on
+      ethtool -K eth2 hsr-tag-rm-offload on
+
+  2) Create HSR interface and add slave interfaces to it
+      ip link add name hsr0 type hsr slave1 eth1 slave2 eth2 \
+    supervision 45 version 1
+
+  3) Add IP address to the HSR interface
+      ip addr add <IP_ADDR>/24 dev hsr0
+
+  4) Bring up the HSR interface
+      ip link set hsr0 up
+
+Switching back to previous mode:
+--------------------------------
+  1) Delete HSR interface
+      ip link delete hsr0
+
+  2) Disable HSR port-to-port offloading mode, packet duplication
+      ethtool -K eth1 hsr-fwd-offload off
+      ethtool -K eth1 hsr-dup-offload off
+      ethtool -K eth1 hsr-tag-ins-offload off
+      ethtool -K eth1 hsr-tag-rm-offload off
+
+      ethtool -K eth2 hsr-fwd-offload off
+      ethtool -K eth2 hsr-dup-offload off
+      ethtool -K eth2 hsr-tag-ins-offload off
+      ethtool -K eth2 hsr-tag-rm-offload off
+
+Testing the port-to-port frame forward offload feature:
+-----------------------------------------------------
+  1) Connect the LAN cables as shown in the test setup.
+  2) Configure Station A and Station C in HSR non-offload mode.
+  3) Configure Station B is HSR offload mode.
+  4) Since HSR is a redundancy protocol, disconnect cable "Link CA",
+     to ensure frames from Station A reach Station C only through
+     Station B.
+  5) Run iperf3 Server on Station C and client on station A.
+  7) Check the CPU usage on Station B.
+
+CPU usage report on Station B using mpstat when running UDP iperf3:
+-------------------------------------------------------------------
+
+  1) Non-Offload case
+  -------------------
+  CPU  %usr  %nice  %sys %iowait  %irq  %soft  %steal  %guest   %idle
+  all  0.00   0.00  0.50    0.00  3.52  29.15    0.00    0.00   66.83
+    0  0.00   0.00  0.00    0.00  7.00  58.00    0.00    0.00   35.00
+    1  0.00   0.00  0.99    0.00  0.99   0.00    0.00    0.00   98.02
+
+  2) Offload case
+  ---------------
+  CPU  %usr  %nice  %sys %iowait  %irq  %soft  %steal  %guest   %idle
+  all  0.00   0.00  0.00    0.00  0.50   0.00    0.00    0.00   99.50
+    0  0.00   0.00  0.99    0.00  0.00   0.00    0.00    0.00   99.01
+    1  0.00   0.00  0.00    0.00  0.00   0.00    0.00    0.00  100.00
+
+Note:
+1) At the very least, hsr-fwd-offload must be enabled.
+   Without offloading the port-to-port offload, other
+   HSR offloads cannot be enabled.
+
+2) hsr-tag-ins-offload and hsr-dup-offload are tightly coupled in
+   the firmware implementation. They both need to be enabled / disabled
+   together.
+
+Changes from v5 to v6:
+*) Dropped ndo_set_features API as asked by Roger.
+*) Modified emac_ndo_fix_features as asked by Roger Quadros
+<rogerq@kernel.org>
+
+Changes from v4 to v5:
+*) Fixed warning reported by kernel test robot [0].
+
+Changes from v3 to v4:
+*) Simplified ndo_set_features() implementation as suggested by Roger Quadros
+<rogerq@kernel.org>
+*) Maintained 80 character limit per line wherever possible.
+*) Returning -EOPNOTSUPP whenever offloading is not possible.
+*) Changed dev_dbg() prints to netdev_dbg() as suggested by Alexander
+Lobakin <aleksander.lobakin@intel.com>
+*) Squashed patch [1] and [2] together as hsr tag ins is dependent on hsr
+tx duplication. Also didn't add Roger's RB tag from patch [2] as the patch
+is now merged with [1] in patch 4/5.
+*) Implemented emac_ndo_fix_features() to make sure NETIF_F_HW_HSR_DUP is
+enabled / disabled with NETIF_F_HW_HSR_TAG_INS as suggested by Roger
+Quadros <rogerq@kernel.org>
+*) Added Roger's RB tag to patch 5/5.
+*) Modified commit message of patch 3/5 to state that driver will be back
+to previously used mode once HSR is disabled.
+
+Changes from v2 to v3:
+*) Renamed APIs common to switch and hsr modes with suffix _fw_offload.
+*) Returning EOPNOTSUPP in prueth_hsr_port_link() as suggested by
+   Andrew Lunn <andrew@lunn.ch>
+*) Dropped unneccassary dev_err prints and changed dev_err to dev_dbg
+   where applicable.
+*) Renamed NETIF_PRUETH_HSR_OFFLOAD to NETIF_PRUETH_HSR_OFFLOAD_FEATURES
+   to make it clear it is a collection of features, not an alias for one
+   feature.
+*) Added Kernel doc entries for @hsr_members and @is_hsr_offload_mode as
+   suggested by Simon Horman <horms@kernel.org>
+*) Dropped patch [3] as it is no longer needed in this series. It is
+   already merged to net/main by commit [4].
+*) Collected Reviewed-by tag from Roger Quadros <rogerq@kernel.org> for
+   PATCH 1/6 and PATCH 2/6.
+*) Added if check for current mode before calling __dev_mc_unsync as
+   suggested by Roger Quadros <rogerq@kernel.org>
+*) Updated commit message of PATCH 6/6 to describe handling of duplicate
+   discard in the driver.
+
+Changes from v1 to v2:
+*) Modified patch 2/7 to only contain code movement as suggested by
+   Dan Carpenter <dan.carpenter@linaro.org>
+*) Added patch 3/7 by splitting it from 2/6 as the patch is not part of
+   code movement done in patch 2/7.
+*) Rebased on latest net-next/main.
+
+v1: https://lore.kernel.org/all/20240808110800.1281716-1-danishanwar@ti.com/
+v2: https://lore.kernel.org/all/20240813074233.2473876-1-danishanwar@ti.com
+v3: https://lore.kernel.org/all/20240828091901.3120935-1-danishanwar@ti.com/
+v4: https://lore.kernel.org/all/20240904100506.3665892-1-danishanwar@ti.com/
+v5: https://lore.kernel.org/all/20240906111538.1259418-1-danishanwar@ti.com/
+
+[0] https://lore.kernel.org/all/202409061658.vSwcFJiK-lkp@intel.com/
+[1] https://lore.kernel.org/all/20240828091901.3120935-5-danishanwar@ti.com/
+[2] https://lore.kernel.org/all/20240828091901.3120935-7-danishanwar@ti.com/
+[3] https://lore.kernel.org/all/20240813074233.2473876-2-danishanwar@ti.com/
+[4] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=e846be0fba85
+
+MD Danish Anwar (4):
+  net: ti: icss-iep: Move icss_iep structure
+  net: ti: icssg-prueth: Stop hardcoding def_inc
+  net: ti: icssg-prueth: Add support for HSR frame forward offload
+  net: ti: icssg-prueth: Add multicast filtering support in HSR mode
+
+Ravi Gunasekaran (1):
+  net: ti: icssg-prueth: Enable HSR Tx duplication, Tx Tag and Rx Tag
+    offload
+
+ drivers/net/ethernet/ti/icssg/icss_iep.c      |  72 -------
+ drivers/net/ethernet/ti/icssg/icss_iep.h      |  73 ++++++-
+ .../net/ethernet/ti/icssg/icssg_classifier.c  |   1 +
+ drivers/net/ethernet/ti/icssg/icssg_common.c  |  18 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.c  |  22 ++-
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |   2 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 185 +++++++++++++++++-
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   9 +
+ 8 files changed, 290 insertions(+), 92 deletions(-)
+
+
+base-commit: f3b6129b7d252b2fbdcac2e0005abc6804dc287c
+-- 
+2.34.1
+
 
