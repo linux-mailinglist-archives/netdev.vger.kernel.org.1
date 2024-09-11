@@ -1,83 +1,50 @@
-Return-Path: <netdev+bounces-127410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BAEF97546C
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:48:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A82997548F
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:52:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E597288885
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:48:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 528462837A3
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9FB1A2C3C;
-	Wed, 11 Sep 2024 13:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85114187353;
+	Wed, 11 Sep 2024 13:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="pRqGDVCC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbAbuFEX"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7083E1A2644;
-	Wed, 11 Sep 2024 13:46:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC3D18593F;
+	Wed, 11 Sep 2024 13:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726062398; cv=none; b=KFEfL1JAZZl/qnoSTmujFENPzJTJPZI40jDqoayFDnSSBezcObgxt3HU9e3kpKzUb7ehim6Q1bx4zt1OXgqumo7opGDZdqFOihU9jUPqSlAtrqH3SZathUQZ/EMC2x7c9BHfpJggfb1HGhsRsszn1GX04fpo2HDXEHjCWSjjrvc=
+	t=1726062630; cv=none; b=mWYwlEIU/IsaY/fSUaFGgEfdhqhZMhDoU4lliKM3RYrqnoK8A5RHg+qp9DAHu71zzQl8kja7YZFV8TLBSYRenBcwK3+gK7oMJbbqwpQyZb4qGsJh1I/oKSXQOa8JX5ZZADfoJPyVV0opg3IMh4mqqgEqXi/wM+oO5WM+8OjNYFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726062398; c=relaxed/simple;
-	bh=zQmbZKg3+vNuAPvSUPF3vnq7Kcui4CbKT25w+X4Es0U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j+kc1G3Zc+UTvURpai/C5ANEha6fmWFmoVyYsO36OELM9q5LXcAzzWQQKPmp1keTy0vKfq+YKwXLrDe1f/CQlMh69JitIFs5E5vbrS0o6K7ZkeQJlIbnpXFDdlzvjPfoFN6XST9vVCMa6h9d5bRIWXZV+isgknHVQK1uLiPWNbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=pRqGDVCC; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BD583E000F;
-	Wed, 11 Sep 2024 13:46:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1726062388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=n23LjBJEpWfCJ+ZxF/dGp1fjzZeTLOwCdh892p3XNbw=;
-	b=pRqGDVCCBpD3EjD2DQcSvoUP39gd3hMsePX4B4dOblNuSkMYeWHKtCmj+mFNetkskrgpHo
-	QNwEkf1JoCLaoOpzxWHl/pwzQUp8VSnAK0m5l1qP/7yTiF+n7fI6zfx0jfOzHXLqO5yY36
-	jP0bidcJ21tRvHi4u62uX0FqVnA5L7gulFKm3uslDHCu6EUz5QQOUPcVjtNiWPrWwD7RGm
-	yrnUP4/xse0sRzWgKEMTgJJ3+T+JVTSD9hDBqdjHDkZGxFnM+jJsu0hyKxCdNE6u3STK8g
-	BI+WPsRlbHmmXmMjBvD5ABzN3b0W47fBuPVIuwAxps0QrM/1+LpRqxtKDuWmRg==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Nathan Chancellor <nathan@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
-Subject: [PATCH net-next] net: ethtool: phy: Clear the netdev context pointer for DUMP requests
-Date: Wed, 11 Sep 2024 15:46:21 +0200
-Message-ID: <20240911134623.1739633-1-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1726062630; c=relaxed/simple;
+	bh=S7446+9lkYYtrrftnee+FNljo0veD58VbH7E7EawyhU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qveHBYdoM3QoRZsYyGTYdOdghlD9GF3tXohkx/1//kRNDmGzO2llaFXVRV/cLSZARpDOVNdqXoyZntRNqWudBrh/Mf1ph+O53K6GXq2ENHYOx5N3mCjC0FiWMxxNdEJWce3CjiUPCbd8P7yEo5hXI3GfbBMtMkpBL1ti04lVMMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbAbuFEX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0D8AC4CEC0;
+	Wed, 11 Sep 2024 13:50:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726062629;
+	bh=S7446+9lkYYtrrftnee+FNljo0veD58VbH7E7EawyhU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rbAbuFEXj4+/y8J3MEcthkL9RWaWL2UvpGshV4JtjkmkDoTplnuedh7tXb2EP2bDL
+	 f7XHdJV/z5Bnqdc8vzUdsmkOPwmWbHA3k2RFiA3xS1l0PfvYAc7jmln25sqIHuLHEm
+	 uWtQtvgw7Z05qr/q2zCAynIJE3y+czaXiGZCcLZGmXpjvnsjpHf1g8NxJ+t2wqf8lw
+	 P2Tg9fPp/C6mzzY6Oq1DK42djSoAlw4G1DqT/YLlELAXh2Cp17UFCGA81KJ2h+7EWv
+	 EMHQaLrcyltvMSg8W5otxL8EEZt8HI/n4CLKo0N+6nOORpfjkuMfjs1v7JyJsctO1C
+	 yA4xGN2j9axEQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C993806656;
+	Wed, 11 Sep 2024 13:50:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,40 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Subject: Re: [PATCH v2 bpf-next] selftests: xsk: read current MAX_SKB_FRAGS from
+ sysctl knob
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172606263103.924230.15052310270717202282.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Sep 2024 13:50:31 +0000
+References: <20240910124129.289874-1-maciej.fijalkowski@intel.com>
+In-Reply-To: <20240910124129.289874-1-maciej.fijalkowski@intel.com>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ bjorn@kernel.org
 
-The context info allows continuing DUMP requests, shall they fill the
-netlink buffer. When performing unfiltered dump request, clear the dev
-pointer in the context at the end of the dump, avoiding the release of
-the netdevice. In the case of a filtered DUMP, the refcount for the
-netdev was held when parsing the header, and is released in the .done()
-callback.
+Hello:
 
-Reported-by: syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/000000000000d3bf150621d361a7@google.com/
-Fixes: 17194be4c8e1 ("net: ethtool: Introduce a command to list PHYs on an interface")
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- net/ethtool/phy.c | 5 +++++
- 1 file changed, 5 insertions(+)
+This patch was applied to bpf/bpf-next.git (net)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
-index 560dd039c662..99d2a8b6144c 100644
---- a/net/ethtool/phy.c
-+++ b/net/ethtool/phy.c
-@@ -301,6 +301,11 @@ int ethnl_phy_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
- 
- 			ctx->phy_index = 0;
- 		}
-+
-+		/* Clear the context netdev pointer so avoid a netdev_put from
-+		 * the .done() callback
-+		 */
-+		ctx->phy_req_info->base.dev = NULL;
- 	}
- 	rtnl_unlock();
- 
+On Tue, 10 Sep 2024 14:41:29 +0200 you wrote:
+> Currently, xskxceiver assumes that MAX_SKB_FRAGS value is always 17
+> which is not true - since the introduction of BIG TCP this can now take
+> any value between 17 to 45 via CONFIG_MAX_SKB_FRAGS.
+> 
+> Adjust the TOO_MANY_FRAGS test case to read the currently configured
+> MAX_SKB_FRAGS value by reading it from /proc/sys/net/core/max_skb_frags.
+> If running system does not provide that sysctl file then let us try
+> running the test with a default value.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v2,bpf-next] selftests: xsk: read current MAX_SKB_FRAGS from sysctl knob
+    https://git.kernel.org/bpf/bpf-next/c/d41905b3bb89
+
+You are awesome, thank you!
 -- 
-2.46.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
