@@ -1,188 +1,177 @@
-Return-Path: <netdev+bounces-127379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 699DB97538D
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:23:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E22839753DE
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:29:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 396E51F21293
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:23:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 286C3B22CC9
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:29:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE031AB6F6;
-	Wed, 11 Sep 2024 13:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B32E1A3A8B;
+	Wed, 11 Sep 2024 13:25:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bui4WZRS";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5E38U+n8"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KCFl3nVF"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2088.outbound.protection.outlook.com [40.107.93.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E911A3AB3;
-	Wed, 11 Sep 2024 13:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726060688; cv=none; b=MRslGkBw6C9VpZuG9Uac7preJa2WzRzeW+Ic6UDgzHjpGI8LZcLhX9Dn/HvEhdbd8TkOZZdWSGDLJ6qCyrJr/qB//lvvNyeu7ZqUqYqbyyiZJUKwNeHIiMEWDIvlrHoQRWFBJV0kpukQONIoGURGlL64azINypRDdi9kRXMLSgc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726060688; c=relaxed/simple;
-	bh=cg2PM211DmAM8vwNyyfctOBpXOxyEn3IDg9VxjRMYA0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Mwi2OL3LZ6nuTtECuduQkeupUPnYQ+Zp1J7xZtX+w9ewj2+wbtMcEOVmDld64hPndaLTH3hQyqRXqK6xmgv4ADF6F0drGq+u3H0TGqFffnOZFAyXdeYj+K78hSnFwmtsC9CQ+Vj6iPpxhRKc+L/1nI9KP+daDFACNjToT9NqlZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bui4WZRS; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5E38U+n8; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Anna-Maria Behnsen <anna-maria@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1726060680;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WI2cVBehM4PSxc5rOEnLQmGjNkeoiI7dtjBCguJbkM0=;
-	b=bui4WZRSjaen6LSXlR60ad3uGIxj3a9CJ/f4590OmMxSmHvGAKXYwBWMBRM+zX5NIlw8LB
-	+Z14pHB2ipmWz8Dx9lvIRZrbskwPFkxCkiv/hOCG9yRYO3ACJwSRXf01nOHxsSk4z/LRWb
-	ijxOz+TzmknjWZCM2KvhaC0g/Y77uiBMxlD8hkdV352M/a9gK+mHvx4MvdfnImHuQICeUC
-	vy04SsZgMnScdhXWy96qkUkKCHmU/wZSJxhfgQpU3DD9YdTdzN3sGZiXR24y7nxiD0YKH7
-	JxiWhdlo4WwW8g5FvG8fmGiu7O5+gPYJ7bhjDUuGbyUV8o2xGA8fdRT+Ls6uQw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1726060680;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WI2cVBehM4PSxc5rOEnLQmGjNkeoiI7dtjBCguJbkM0=;
-	b=5E38U+n8OGQsnDRDhQ/VQZJedSZYkMquasple8yZL5aP1SOiXlmzlA0gMRsSSdtHcoLbX2
-	n+DE3KOwPx0V4xCg==
-Date: Wed, 11 Sep 2024 15:17:57 +0200
-Subject: [PATCH 21/21] ntp: Move pps monitors into ntp_data
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88408190667
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 13:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726061152; cv=fail; b=d34vLK0s1qg+Nr5jCIQzokwwcpi+UT36vnsUyhcL8kDt9sb08WKrmADCwXvi95sMk3N1CL7ZhlS39mZxxY/ZlB6XMA2wnJdlzml3xATo93PanXnV5bHTKNSw/KDMBVY3btoHc4VscsnY6F7TONr1KJaz0pKpk1DvyR+Fjgku2GU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726061152; c=relaxed/simple;
+	bh=zSECs6q7dMqYzFgftSWtgPWjIQfS2rlx1HgdgGcAC/U=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=FBsWq/3aOPJadlbsCQaHcspoNoRswoT7aA0EcrIX1sV4Fi0+s2UEgPXysIZk1PfvOVE1u2n9iskZKodeniqQ4XtppcKv6/40aN5qZBBw9pUHWnQPk8ulZbfFqWrX7BK8gQU5paWA8CgE81ZdIET5wO7mkcUUg46WpRN6UgsPlb8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KCFl3nVF; arc=fail smtp.client-ip=40.107.93.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uszxul0IVVoWd23Z8U/2HA2lc7tHFe/hmOdfuUjWjhbMfUHETADtbf0jkxYoWaNLA+yT97d8pX1gEFMIn3/uDBRN3dzFNqTOek7txILXmZQU0gi70XXAKIRAXin4XTGFEQOd1iKhsXZFUv4MHGwXuOIXY+qvwRfG80BIJy1nOTOBk7Mla8rSUsMRl/jQDEuT20rt3k9k2ZcQYxM8gNkNeg7xzWeBZpzHtnVuTqqc/rVx8wTTXisJoV5OOwk4yvq2DWiliaepqgVxYPnV8I2GVgeyzg/jiqYZt0qutHTMADgaucaNRiYaWULm+cOJkFUpGaJv/A/8ifXaGYh53ymOEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LW9SR+peIEUL/mK5NWcuq1gFqpQuVNQIah1dY64+0BM=;
+ b=qNOw7A5z9eNPuSQwx20wJR48Ao0GPtOrGGrr8Mc3V0a3xFsiRlTlwjB24jegAOjXGtSR0nvi76yBUMK5MHZmu9YdXlE5lWquzuEyhCr9wUBGqEuLD6dqZuHwlqTev/kBRzEdRSICN0wUjFpzItKvXGBXhyFEZ9kYVKerID+z9JvMYY3tB8+Ycjc1wuwcp2BcNzp0LmyX1fMOBHyg7wABo8rnk7HYuj0Batm3n7pVPUFvGzu3VYk1JTlMOZSUkTq0iEDhJsw17flU3iwAzVZYwxvxlXk/U4JJSjbmEkq/CuWjSEPsC4espthQKR++e1QYqIzOikCjz7dyADZQWr26xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LW9SR+peIEUL/mK5NWcuq1gFqpQuVNQIah1dY64+0BM=;
+ b=KCFl3nVFjss0eB2egs/RxMJXgNwo5tzBRwLJyBQaJ6mZCjQXIlCkS96P0r2f1V9G5/o9ED973gCkNNhhVxr5246fcAOGSqAE3/x97Whnwq3qfCXlP+ktZk0uc6eaUObntPesyINRfNPQ3Ecl4pq7xYjJySr8lrlUN1/X5abFZrso80wUvEudKB96G26rxvFd2hu9Sxc3dzQM0r450VhW1wIyS5cV/j7WNMsN4EMM5toy44RFxH/FWSvsHDHTZ0PaQNjGmVbnTP3jEH1a/hquzhRu0hi+7SjsDgvlvomenNG9k0KoDgnJK8b/3Q/dRGs8wC2ksD8JmfoyR4oGf9P6yQ==
+Received: from PH7PR12MB5903.namprd12.prod.outlook.com (2603:10b6:510:1d7::14)
+ by MW4PR12MB7165.namprd12.prod.outlook.com (2603:10b6:303:21b::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7918.28; Wed, 11 Sep
+ 2024 13:25:46 +0000
+Received: from PH7PR12MB5903.namprd12.prod.outlook.com
+ ([fe80::2abe:232c:fb73:f2fe]) by PH7PR12MB5903.namprd12.prod.outlook.com
+ ([fe80::2abe:232c:fb73:f2fe%4]) with mapi id 15.20.7939.017; Wed, 11 Sep 2024
+ 13:25:45 +0000
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeed@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Tariq Toukan
+	<tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+	<leonro@nvidia.com>, Itamar Gozlan <igozlan@nvidia.com>
+Subject: RE: [net-next V4 04/15] net/mlx5: HWS, added tables handling
+Thread-Topic: [net-next V4 04/15] net/mlx5: HWS, added tables handling
+Thread-Index: AQHbAuPs4pdaOELryUGYv9Q+ko6ig7JR5AMAgACx+8A=
+Date: Wed, 11 Sep 2024 13:25:45 +0000
+Message-ID:
+ <PH7PR12MB5903E31CE45DB93B2F63FA20C09B2@PH7PR12MB5903.namprd12.prod.outlook.com>
+References: <20240909181250.41596-1-saeed@kernel.org>
+	<20240909181250.41596-5-saeed@kernel.org>
+ <20240910194710.668b1ff0@kernel.org>
+In-Reply-To: <20240910194710.668b1ff0@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR12MB5903:EE_|MW4PR12MB7165:EE_
+x-ms-office365-filtering-correlation-id: db85a7f5-9404-49d8-6613-08dcd2653de0
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?/kqPlaeq6alG/fvLC5p3CzBsTrvTy3ubI2CdTABBJrd922gIS2SzL2ZXiojJ?=
+ =?us-ascii?Q?i7O1UYc72Bas2c0JQIiX5bVBeBkrt32EpbpEVb35gP8DmY5Cix7Ch+8CkC+i?=
+ =?us-ascii?Q?A4wRShJKggZvkZuHGvPuZ9RuxOBwAmCyC000EiX6VugqImZUxD3WkSh89p6D?=
+ =?us-ascii?Q?BTLb2D1dC7QfbFnuMGeXZtS2wTrI0EhREy+VSrrEgxYMDSMYH/4tt7zB5bMr?=
+ =?us-ascii?Q?nepZOtZCdNBJtL7guAFoA/1JDKLADTQSiAXpD9xzHNkhB/T/gUljoh2XqSBZ?=
+ =?us-ascii?Q?XWZxLkW7ZVr1ccO5AqLm9NPvy7MMKJNcdZ5f998pidnOO1SnkKowf9YVvc//?=
+ =?us-ascii?Q?fKqWgFBI9Udcz6LP+v88OUPcEepKQ3bt8IVM3oGV1cQCie79ZZcqJ80Yb2be?=
+ =?us-ascii?Q?m9VPeEHqWuVSdeaKvEbCjyZy/iBpA9RWsWR3EZGZmzhLyE2yJVH/mNjQxP5t?=
+ =?us-ascii?Q?pn2qr1XUs32XKJ5rS4gpe8YWXvBJvjJNZ2MiXUvrMW6KfQERvoP3juXSRHak?=
+ =?us-ascii?Q?ao7S/U9JWkVZm2UjuYaU30Ve0zHeYRmhMXiOYMFEisKYLWwRBQwZiWRCJAzy?=
+ =?us-ascii?Q?0fFamKXzQtt68NoRQjHvtCQrOr7A0nVyQfddbPG0SRVbzYVzNNwbWxrmambb?=
+ =?us-ascii?Q?GzP959xy5CdYh3zrc9VvM5124WFSm1u1vt7lmarFCe5Y29CPs6dGZfv6ibPP?=
+ =?us-ascii?Q?kKJfJIDBKPfz5dwNIAMcoPbfA6aZRZ4LK5AD+EEH2FnyIjHuNdJIrfjrOczO?=
+ =?us-ascii?Q?WTkDCzIUIegBu7Lpv0pjqQ0fK5aRylcN2116Yv4VzMC6WJrCQtboWTeVJRbM?=
+ =?us-ascii?Q?TMuI1WQodu47IFyOh7+S6Wi01Vda75E7ZTZPoi2feFkT4C6cnHFcc6Lbpw+T?=
+ =?us-ascii?Q?sShgLbNXRR3Kjlodb30Z2EYPXQzUfJkOcrAFtAxmI1akqHHymLEnkSqHHYnx?=
+ =?us-ascii?Q?xg/eijyJoQ7f3MjBScoHgz8ABYNe0FQOLNabTrzb7BrjgL1VTZOMD/8nWAJ2?=
+ =?us-ascii?Q?qbpm0+H4i7P4zo90T37ZvvogX8SJhEOXldPQiFzc4gR9sAVrTUapXQyK9ZyI?=
+ =?us-ascii?Q?F/YaerfcPPgVSlbQumU8ue0HXIVl8qCfC9s3u9wiTJA4cByMkgOzRHE+MNJW?=
+ =?us-ascii?Q?u7hb87UGaJqJSL0fVUtWZzKH3nAf9dl3e1blwePIhG90eIo9DAe9Hm6oWeoa?=
+ =?us-ascii?Q?rEsDajxhC4F68aNLgR3uqkq+VAyB6/o/vyuJeWQPTLmvWfLGgsbLXM8d1TIQ?=
+ =?us-ascii?Q?Jq/9Ac2tvRALcp8DJMBxmfLyA98pFG7nqe6jgmeii6I3oEhmd/JvdhsfjHWr?=
+ =?us-ascii?Q?hDkheMh0bkikUretGhxqMQThNtbgWkaBUvg6Lbu5Tw3gc6WfHwT9P07hmUMk?=
+ =?us-ascii?Q?PYdO7TEdn/xZZCTNnKoQG9t9Cq1CDR6h2YHSUUMmDtcCRy7EdA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR12MB5903.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?wxgg0ChApzA5OwYWAwXV71+siNZY/pzR1kblho7g1BSgaRQxGlwYuNOVNor/?=
+ =?us-ascii?Q?gyVo1oQI+6NUuA1rXd7VUR5Z7/I0UBS+uHYhy9M4b9m1cTYD8mVIJazO015E?=
+ =?us-ascii?Q?RgWCnCartJCcRkowSuPsD009nusjC4VNil12a5TGXbdyAAVvElGknQQ6ZzW4?=
+ =?us-ascii?Q?rXIrXuShLe6jdX0cHDorUeVcmRl4kEL3rSeo8tAZtbEPP2ZjLNWTDM9JMpym?=
+ =?us-ascii?Q?Adn7uHiFzZLP9Su/9ti/1zAITvwxsggda/UL9bTBLzjIGiDwcLzXF2YBEkXZ?=
+ =?us-ascii?Q?n6VSYMFk0qRKenCLQYx+vQHHLigzX7Nlbs0mPwcAfye0LGPOKS3a2XkJpTdG?=
+ =?us-ascii?Q?ZA1/Ji866guBwwVI9HNwq542w8y3VbF/qz5bxqeUrO2IF23WgqGo+bf63zHp?=
+ =?us-ascii?Q?38liXYPtacH1n0pY+HmjvF9TcAFcthAKuv8kQDh61JnAxmKn6rAFCzuRSq1w?=
+ =?us-ascii?Q?SYI+23xWER+R92PGxttEufQVCD3Z8VjllIc37erE5d7Y+oBpZTXRZblrnznd?=
+ =?us-ascii?Q?lQHBjbyVAzJE5e6hiCDV2ovz5dQcYicgD1GhfLuxucNxzx7Yg0RXcyl/kV6d?=
+ =?us-ascii?Q?HCF4j9kYxIBEcj9al8ioGUQRBSPIAWBu07A2123Zid/U3PDEjTR5TIzbm8zc?=
+ =?us-ascii?Q?1Oj3P+siGCo6R0XE2xx5YP0aSggkXAb0+Ix2uR9B2bHOUkEFHx5+NmXI2/cs?=
+ =?us-ascii?Q?ooN3RqUsaaGhlXmp/SjCotwiUtOIjSgtEUaPTFo7F7opVnmFm/txPvxOed7Q?=
+ =?us-ascii?Q?9i5JJYCu4gPBcWO8ZLTo2c78e55FOvukea0r7TUd8OJYLKgqV9RHUxQL7uuu?=
+ =?us-ascii?Q?Kw0MsUUmIuzTmfHsLl76tsZlmaS9N06SzZ3vwRqotjag9GeOHijd4lj3kS+0?=
+ =?us-ascii?Q?aMA8MHuTXUPZcuyfZ0MNFgy1wK2jKyLNw76RXKNrr3i7s2PTBwEB0BvufXj9?=
+ =?us-ascii?Q?DHQDw+bjMkbXGTGp5UVw3A/Lr4Z55LxneV60a3XFzRYNEmL15UYftGEHjtZH?=
+ =?us-ascii?Q?xXTuFW5/BHA9MCYCDW4zFXS3yO36LJB2aC81uVFFXDIKGL5PpXrQ9OO8hLkS?=
+ =?us-ascii?Q?ndbigTjI6iSnNNRFvt7BIvdvsytoJPux+WwpZtMn8AJaMw9ctcUolCWw1vxs?=
+ =?us-ascii?Q?nb70EuQiKvQ2hJUQAeGy+1Tzq8WDG6McmRN7Y98F7aD2+xTvWGKfbqensPeq?=
+ =?us-ascii?Q?1tmVnH+wbK3414FApdlDqdp/6YW1x+VJRH+M5MO2W/aWzPvyd4IF5Br3zWs9?=
+ =?us-ascii?Q?4JGEE3PZKXNGWHs1x93nVQiAsUJSbYmTCmTKUEJIuj7B0/t9vKV4Zg20izgH?=
+ =?us-ascii?Q?X+OBKjsb3I7J0aZ1E85OzVNyFpk/srpAHuqF0Ch22rdX4qBt0nhZuGqT+rKB?=
+ =?us-ascii?Q?utqN1hskoEz5mWDsvwHPYvUs9/uy9sM8aCagIDUXMjjixvWVppYIlCJ+4nJ2?=
+ =?us-ascii?Q?OJIPCZIEEoOHPeOiEYMrtDD9JGPAQSWxdWMDq3qeUVwR90dW3T3JqXMUCzZi?=
+ =?us-ascii?Q?T1FECkUolnU5Vq7w+KvAF6RkunECo0lsTsMYSNEoGHW72ICx7gb844B496zD?=
+ =?us-ascii?Q?nnRewkt0Wl+bqJSXIu5TUYH/ejVQ83Twh+bXSHLO?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-21-2d52f4e13476@linutronix.de>
-References: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-0-2d52f4e13476@linutronix.de>
-In-Reply-To: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-0-2d52f4e13476@linutronix.de>
-To: John Stultz <jstultz@google.com>, 
- Frederic Weisbecker <frederic@kernel.org>, 
- Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- Miroslav Lichvar <mlichvar@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Christopher S Hall <christopher.s.hall@intel.com>, 
- Anna-Maria Behnsen <anna-maria@linutronix.de>
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR12MB5903.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: db85a7f5-9404-49d8-6613-08dcd2653de0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Sep 2024 13:25:45.1004
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bXXUzERM7PFwLOFDnIRkd13fgNRS0frpvWxf0Zk1wWDYOc2BTLeDV1czmw1Fl1j46ISjsKBccQh66LcaQqsy4Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7165
 
-From: Thomas Gleixner <tglx@linutronix.de>
+> From: Jakub Kicinski <kuba@kernel.org>
+>=20
+> On Mon,  9 Sep 2024 11:12:37 -0700 Saeed Mahameed wrote:
+> > +out:
+> > +     mutex_unlock(&ctx->ctrl_lock);
+> > +     return -ret;
+>=20
+> the -ret is on purpose?
 
-Finalize the conversion from static variables to struct based data.
+Nope. Fixed here and in couple of other places.
+Will send patch soon.
+Thanks!
 
-No functional change.
-
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
----
- kernel/time/ntp.c | 33 ++++++++++++++++-----------------
- 1 file changed, 16 insertions(+), 17 deletions(-)
-
-diff --git a/kernel/time/ntp.c b/kernel/time/ntp.c
-index c3089d8be0f7..a2f57599a815 100644
---- a/kernel/time/ntp.c
-+++ b/kernel/time/ntp.c
-@@ -48,6 +48,10 @@
-  * @pps_intcnt:		PPS interval counter
-  * @pps_freq:		PPS frequency offset in scaled ns/s
-  * @pps_stabil:		PPS current stability in scaled ns/s
-+ * @pps_calcnt:		PPS monitor: calibration intervals
-+ * @pps_jitcnt:		PPS monitor: jitter limit exceeded
-+ * @pps_stbcnt:		PPS monitor: stability limit exceeded
-+ * @pps_errcnt:		PPS monitor: calibration errors
-  *
-  * Protected by the timekeeping locks.
-  */
-@@ -75,6 +79,10 @@ struct ntp_data {
- 	int			pps_intcnt;
- 	s64			pps_freq;
- 	long			pps_stabil;
-+	long			pps_calcnt;
-+	long			pps_jitcnt;
-+	long			pps_stbcnt;
-+	long			pps_errcnt;
- #endif
- };
- 
-@@ -110,15 +118,6 @@ static struct ntp_data tk_ntp_data = {
- 				   intervals to decrease it */
- #define PPS_MAXWANDER	100000	/* max PPS freq wander (ns/s) */
- 
--/*
-- * PPS signal quality monitors
-- */
--static long pps_calcnt;		/* calibration intervals */
--static long pps_jitcnt;		/* jitter limit exceeded */
--static long pps_stbcnt;		/* stability limit exceeded */
--static long pps_errcnt;		/* calibration errors */
--
--
- /*
-  * PPS kernel consumer compensates the whole phase error immediately.
-  * Otherwise, reduce the offset by a fixed factor times the time constant.
-@@ -204,10 +203,10 @@ static inline void pps_fill_timex(struct ntp_data *ntpdata, struct __kernel_time
- 		txc->jitter = ntpdata->pps_jitter / NSEC_PER_USEC;
- 	txc->shift	   = ntpdata->pps_shift;
- 	txc->stabil	   = ntpdata->pps_stabil;
--	txc->jitcnt	   = pps_jitcnt;
--	txc->calcnt	   = pps_calcnt;
--	txc->errcnt	   = pps_errcnt;
--	txc->stbcnt	   = pps_stbcnt;
-+	txc->jitcnt	   = ntpdata->pps_jitcnt;
-+	txc->calcnt	   = ntpdata->pps_calcnt;
-+	txc->errcnt	   = ntpdata->pps_errcnt;
-+	txc->stbcnt	   = ntpdata->pps_stbcnt;
- }
- 
- #else /* !CONFIG_NTP_PPS */
-@@ -935,7 +934,7 @@ static long hardpps_update_freq(struct ntp_data *ntpdata, struct pps_normtime fr
- 	/* Check if the frequency interval was too long */
- 	if (freq_norm.sec > (2 << ntpdata->pps_shift)) {
- 		ntpdata->time_status |= STA_PPSERROR;
--		pps_errcnt++;
-+		ntpdata->pps_errcnt++;
- 		pps_dec_freq_interval(ntpdata);
- 		printk_deferred(KERN_ERR "hardpps: PPSERROR: interval too long - %lld s\n",
- 				freq_norm.sec);
-@@ -954,7 +953,7 @@ static long hardpps_update_freq(struct ntp_data *ntpdata, struct pps_normtime fr
- 	if (delta > PPS_MAXWANDER || delta < -PPS_MAXWANDER) {
- 		printk_deferred(KERN_WARNING "hardpps: PPSWANDER: change=%ld\n", delta);
- 		ntpdata->time_status |= STA_PPSWANDER;
--		pps_stbcnt++;
-+		ntpdata->pps_stbcnt++;
- 		pps_dec_freq_interval(ntpdata);
- 	} else {
- 		/* Good sample */
-@@ -999,7 +998,7 @@ static void hardpps_update_phase(struct ntp_data *ntpdata, long error)
- 		printk_deferred(KERN_WARNING "hardpps: PPSJITTER: jitter=%ld, limit=%ld\n",
- 				jitter, (ntpdata->pps_jitter << PPS_POPCORN));
- 		ntpdata->time_status |= STA_PPSJITTER;
--		pps_jitcnt++;
-+		ntpdata->pps_jitcnt++;
- 	} else if (ntpdata->time_status & STA_PPSTIME) {
- 		/* Correct the time using the phase offset */
- 		ntpdata->time_offset = div_s64(((s64)correction) << NTP_SCALE_SHIFT,
-@@ -1064,7 +1063,7 @@ void __hardpps(const struct timespec64 *phase_ts, const struct timespec64 *raw_t
- 
- 	/* Signal is ok. Check if the current frequency interval is finished */
- 	if (freq_norm.sec >= (1 << ntpdata->pps_shift)) {
--		pps_calcnt++;
-+		ntpdata->pps_calcnt++;
- 		/* Restart the frequency calibration interval */
- 		ntpdata->pps_fbase = *raw_ts;
- 		hardpps_update_freq(ntpdata, freq_norm);
-
--- 
-2.39.2
-
+-- YK
 
