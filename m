@@ -1,105 +1,120 @@
-Return-Path: <netdev+bounces-127514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02641975A0D
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:10:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC938975A1D
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:12:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FAA61F21A1A
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:10:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CA59B21305
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3701C1917E5;
-	Wed, 11 Sep 2024 18:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01661B9B2A;
+	Wed, 11 Sep 2024 18:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JVIl2iRv"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="eUW318JE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C54C1A7AD2
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 18:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A131B5339
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 18:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726078231; cv=none; b=jI1l/xIJ39PRTfkeobXbIxlI7lRrkeSJvDzH7Rnf5p3Qqvpf/g5KpC6X7GehDFUVDSCfqmreYdm+u+dpsbTBUaJYPcM8qm24oSkvYtPQ7GqNU8ct2VmnWuwWiHnf0PAEMRbMGYrA2gnvobDke+GI8Yv8YbO3hrWXbC9QJkFeYgY=
+	t=1726078308; cv=none; b=aqMZOetQMemwPGX4no/nkvR0KBzgxAYu2D9Xtjuv/NsLq5+P+B+Um2/YKRuBlpsFKdC6+8hBbCKIGCIola8acQPIVdUHwaRFsNu1r6GN1O6GZfjhRJ2vX1926a9BrcnWr0IQ1o+3rBL+aaEOfj0PFG7DdQFKVzID4r7xppIJfDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726078231; c=relaxed/simple;
-	bh=n06C4KbKH5L8Hd1NFW8h4ZWpC6UDxZQwCu5kTxp73Ho=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VUUBAwk9FUGCGKITOeGY94r0RNb02dkPH9BDC0IWDIAYiXBhQCBi03fiaOapk/6iTk/C44MUCdBG8PL2SKycTDUZOe2X8ksyLAokVh6dMRIosT0HN5PWnsquXW6SMh7mojk7nnNtrUBB1bDm4+orrwkkrde+acKm7zS6s7JuNzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JVIl2iRv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726078228;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H9ulHhVQt0qTv76m8xS0G7aEW8B2dUBdBiBS/EUaaiI=;
-	b=JVIl2iRvYQhz0zYhrgpwOErjvEOmjqljOLanFbMPP73KVeRDGfaQuwv9KxF3kPLE/admuZ
-	d5zqDuqXw1jDm15tG6iqeJgI9/zQ5QdTr9suvr0bxXn4jGDGdnHbJJr8cCugpcXYjlZmiq
-	Sjl0iaWtFN2Y0rH4G0AjbpSUykUxG8E=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-296-YvuYueo_OU66Fks6ZgU63g-1; Wed, 11 Sep 2024 14:10:27 -0400
-X-MC-Unique: YvuYueo_OU66Fks6ZgU63g-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-374b981dd62so65130f8f.3
-        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 11:10:27 -0700 (PDT)
+	s=arc-20240116; t=1726078308; c=relaxed/simple;
+	bh=z857oVhOO9Ge5wn4k4nabsLRCg+zyT2pPs33TkWJQgE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rVzHCBjlL38TZ3Mab8aYHL79+G0EdTj5dGVJ6Rpfke12SXVyqwS79eXqh2ifwvCfH7tw95/yEh4x5tpxg3nGvx3bI/So4KTZnaDVEbAFtY4DJCUlxkAq8l/MfOJJP8P8MG8Q35PtP6wa1DMTe9S9Lza7tnubT3vzZghbAHv7k9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=eUW318JE; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c3c3b63135so60992a12.3
+        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 11:11:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1726078305; x=1726683105; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QXiJI/L0vchgadKCOX7xJsbzxv2AfJtb8fmGhILgPNI=;
+        b=eUW318JEqq3nOOv6q0RUOLmp8SJ1uSU1b2C8OAfpd/hUduiMZufOcxFsok2YhIY+sH
+         gUgZGx7ODA4p1X1V6xWFU9PSHmtqwv30qc6TgN0gu4Dd1CP8o322VZbjeh3yL6DT/kwu
+         13uZhH51W0HyJ0qal+HpoqxAI9CANUztim8FI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726078226; x=1726683026;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H9ulHhVQt0qTv76m8xS0G7aEW8B2dUBdBiBS/EUaaiI=;
-        b=BXfzX8vLcfHq+aXMvr9aYClY28DDNSY8gn9uVYpKJzO/Ehz6pAXuXemMU5HL16KtHy
-         ymqFE48Ky2ZEn5TT5bgXVl9uCi7EhOniAjJNT88OGs1AbebIbiTmTexjnoMAclDNH1EG
-         HNgfyOLZf8wmfD4JuHq66GEnncbwo1ZIAEMoSWWo4gFuO2MQkLh7SPjROIrIdZyA7jWL
-         5ziReYCXBQu8HzAXQVCIiJ6IHJwq9s7ldTJEKcZ0UnfmLdV/Z7QKM6wZrTaMcjfOmmuo
-         JlB4FOt4nWdkWJS02IwZlW1uMedsFksp5OV0YTDHeSpdGrv0a5Cc3FsCkLw2hxTw41c9
-         MBdw==
-X-Forwarded-Encrypted: i=1; AJvYcCVC9AgdHOgZY0cGIQVAG+r30KLQ3VJEfS/BonpthM5kcY/VB9kZqMblPMuIdiYx8WUtEtFegVI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaBZxunuze+eK/xaCzSNUNe3xWA2jm4zIfMUYQVLrqOcpGpcFC
-	E5602Ow/Jebxd+Y2yb7b07MW003/Zn2ZdT0K9s5YOLr2Cx7iceQoxjg+CeapezW6XteCXvLpEyD
-	4jMYvuZhrU3OBbZOIjrCTTXjWwFYsXt6pzuk7D9xwaQh2UKWaay2jcQ==
-X-Received: by 2002:a5d:4841:0:b0:369:9358:4634 with SMTP id ffacd0b85a97d-378c2cf3e20mr64287f8f.19.1726078225947;
-        Wed, 11 Sep 2024 11:10:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGEjk6+e1goGbPimoiKYwqNPqhCCNklehgfmgycaeZ5xJWqfTi5p+BHD4IZr7oN8sledeDO6A==
-X-Received: by 2002:a5d:4841:0:b0:369:9358:4634 with SMTP id ffacd0b85a97d-378c2cf3e20mr64250f8f.19.1726078224815;
-        Wed, 11 Sep 2024 11:10:24 -0700 (PDT)
-Received: from debian (2a01cb058d23d600901e7567fb9bd901.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:901e:7567:fb9b:d901])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37895675c11sm12126128f8f.55.2024.09.11.11.10.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 11:10:24 -0700 (PDT)
-Date: Wed, 11 Sep 2024 20:10:22 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net 0/2] bareudp: Pull inner IP header on xmit/recv.
-Message-ID: <ZuHdDh4tmFgYutWJ@debian>
-References: <cover.1725992513.git.gnault@redhat.com>
- <ZuFdn61NlY80sCyO@debian>
- <20240911075816.171c626f@kernel.org>
+        d=1e100.net; s=20230601; t=1726078305; x=1726683105;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QXiJI/L0vchgadKCOX7xJsbzxv2AfJtb8fmGhILgPNI=;
+        b=Iq5Y0amCPucRhZ7GuwPf1MFV9j+YCAP0GK5QK3jrYF5p2ePk/wnIC8sj1sPTIMnXNV
+         e327h5uEhGoj/ztuJtB9JNMra7OzhNA7VNkbj1lH941amHsmL1i7EF/F+PPxWDw+DUpi
+         wnLcFam/dY00XQg2wzWYqhbCM2AoYwvEcAvl9EgswJFQbmH2ZEUvEkvZCZVhFs7A/dcj
+         /Sicd0HIP/r2DD3KtgM9kF/YapZmRZiWT7IQvokUwYeg+EZ9PUKEPpxwVttJ5UtWXU6U
+         dSnp0OANeV/j6xeeBsEHFKVJLiCGxefzCXypFQXCzLpiqsUAEVBFtkej3z27yQMYe/bD
+         Qpfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWxaODjIe6e004hUP6Yz+7LoKnBPfmzt0aHLy982L2Pf5dOhAvRlQouRq8gRwbHBm5sq4zJK34=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzO7UvGQ6iTK+DlHGN7Cq1TJt5T0T3rX3Ubn/6V85X2diG5zC45
+	wzDEERmuNZi7vYZnAB3aghmKi+5YASD9ziNvYrAW774VaF3+ZqMUVZ8BKaoxEhYpS5TKd1eGZoz
+	cv+vH+A==
+X-Google-Smtp-Source: AGHT+IHEyxVW3+w8T3S6enxb99EkFT5T5RiazLkgyvcpmHJR4swpsLRcDJ7LlTsEPyMTbi4c9sJFgQ==
+X-Received: by 2002:a50:aad8:0:b0:5c2:6d58:4e1f with SMTP id 4fb4d7f45d1cf-5c413e57af1mr198444a12.33.1726078304798;
+        Wed, 11 Sep 2024 11:11:44 -0700 (PDT)
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com. [209.85.208.41])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd8c4d4sm5630728a12.82.2024.09.11.11.11.42
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Sep 2024 11:11:43 -0700 (PDT)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c245c62362so113688a12.0
+        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 11:11:42 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUySyzf8CLiBWjQ73uArxJPSzjySLwpwWN1Pf/Ojm8WcX0b68oRkNCWGwOyckUBZo6YXhNjGLs=@vger.kernel.org
+X-Received: by 2002:a05:6402:33d5:b0:5c2:5620:f70 with SMTP id
+ 4fb4d7f45d1cf-5c413e4fbd6mr215370a12.28.1726078302536; Wed, 11 Sep 2024
+ 11:11:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911075816.171c626f@kernel.org>
+References: <cover.1726074904.git.lorenzo.stoakes@oracle.com> <b38d8936eaddd524d19823f7429138e2ef24e0d1.1726074904.git.lorenzo.stoakes@oracle.com>
+In-Reply-To: <b38d8936eaddd524d19823f7429138e2ef24e0d1.1726074904.git.lorenzo.stoakes@oracle.com>
+From: Linus Torvalds <torvalds@linuxfoundation.org>
+Date: Wed, 11 Sep 2024 11:11:25 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgWJmQJSWz_5S8ZqEpDs1t3Abym9DPZfUzWu+OCNM3igw@mail.gmail.com>
+Message-ID: <CAHk-=wgWJmQJSWz_5S8ZqEpDs1t3Abym9DPZfUzWu+OCNM3igw@mail.gmail.com>
+Subject: Re: [PATCH hotfix 6.11 v2 3/3] minmax: reduce min/max macro expansion
+ in atomisp driver
+To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Richard Narron <richard@aaazen.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Hans de Goede <hdegoede@redhat.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, 
+	Sakari Ailus <sakari.ailus@linux.intel.com>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Marcin Wojtas <marcin.s.wojtas@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S . Miller" <davem@davemloft.net>, 
+	Arnd Bergmann <arnd@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-media@vger.kernel.org, linux-staging@lists.linux.dev, 
+	linux-mm@kvack.org, Andrew Lunn <andrew@lunn.ch>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Sep 11, 2024 at 07:58:16AM -0700, Jakub Kicinski wrote:
-> On Wed, 11 Sep 2024 11:06:39 +0200 Guillaume Nault wrote:
-> > Forgot the Fixes: tag... :/
-> > Will send v2 soon.
-> 
-> Too soon, in fact:
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#tl-dr
+On Wed, 11 Sept 2024 at 10:51, Lorenzo Stoakes
+<lorenzo.stoakes@oracle.com> wrote:
+>
+> Avoid unnecessary nested min()/max() which results in egregious macro
+> expansion. Use clamp_t() as this introduces the least possible expansion.
 
-Forgot that rule, sorry. Thanks for reminding me.
+I took this (single) patch directly, since that's the one that
+actually causes build problems in limited environments (admittedly not
+in current git with the more invasive min/max cleanups, but in order
+to be back-ported).
 
+Plus it cleans up the code with more legible inline functions, rather
+than just doing some minimal syntactic changes. I expanded on the
+commit message to say that.
+
+The two others I'll leave for now and see what maintainers of their
+respective areas think.
+
+            Linus
 
