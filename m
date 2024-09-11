@@ -1,110 +1,78 @@
-Return-Path: <netdev+bounces-127540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2338B975B5C
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:09:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7235975B61
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:10:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF24DB216E1
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:09:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABB182835E0
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B7811BAEF9;
-	Wed, 11 Sep 2024 20:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C921BAEFA;
+	Wed, 11 Sep 2024 20:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TaWJl/CA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMCW44Kw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC131B6520
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3F5224CC
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726085353; cv=none; b=jgK5IwXBf3jx8QxtexmbGLsZBb/mjh/44/tlD7oq4Bu2zvdC8R/dMcnHl566eTMQxj31qugPgoc0cmJIEiCe1FHgDTi+Cn3zRXdRhd7tU3r7AA36G2UG+KoXUf2KzivGcX/3xryAZL6gFXNLC1i+2b7qHds6WxJoq1oCqVgxpX8=
+	t=1726085438; cv=none; b=f9/2/GsUmeUu0CatJxQqIpZoQGv5deEFFwizhgFJ161LE7Mhfl8k0bNDj1Jqii0lhWR0dCDUIavVZyMkagcNRUSXYMDpTM4HYG0xCreMqCPN/I1l638HNsePSoe2w9qKBPHxr0htvbdRHi3ygtFvp5oaaPVszE0fvW3GTVlmjGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726085353; c=relaxed/simple;
-	bh=r1JOqL3SMuhLoG9ZrTANujvTb8IR0/561m+yfMw290k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=U7qL+QqZIMLaXEeVm4u9s9FhHXEJOBO/WAhWi4ugg6u3UjkuFshVcMBe0k3Vfx+dzwTak2O1kTLfRTSWZE5a6j/snnIW1gzpPEFEyekrtShXLZ+B3bgCwOV0pK4v3kaXFDJ3O8h7nekbja0qm8lcHeapCZrTzUw1FLgJOCeiHKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TaWJl/CA; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a8a7cdfdd80so39345466b.0
-        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 13:09:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726085350; x=1726690150; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r1JOqL3SMuhLoG9ZrTANujvTb8IR0/561m+yfMw290k=;
-        b=TaWJl/CA71qt773CNDROhpyTbON1eFQ+8tR1Hrosh3cR40+UVaj/xjc1Xo+EHz33E2
-         WcI/ybRpTGA6nnxDQI3C+uMOkqIQ2j6ibTLC4mN5UkEzaLoltH6QWHrrXHHd0qQcq/B6
-         fzQ/+/P99PkN6mQvQ3Iapneu6WzZex6Zjxlks1KqpOQTF/Lv8owJPyqQ3B04XImDm1ak
-         m2w9UfnXPgPEkWRa5FUqdD8lhB6PSCzxjUGbE+755tMSKImTDjayiuo3O0Ue37/eeLD0
-         sE5YMKED7AgHyAGhRh+gaARAQfCqIVJg4b+ICwQbk/b4ijptnFDfu7ipCe5UJPsVjOPN
-         FvUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726085350; x=1726690150;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r1JOqL3SMuhLoG9ZrTANujvTb8IR0/561m+yfMw290k=;
-        b=iLmdqQPsYOFm+bRDD5pcjPDGwCkKnrYc/X9pBse+6pLi/EuNHRcdsc5RoGKWQKSqOp
-         CkplX7M6K2CAKbxmr/HstSQX65wOqIINivE62J7A/zIauzsX78g/W9CUPv0tIEGi2WdY
-         cFGaB0Axj+tw40Nj1NGIi1YA4665WKBql5jVIVJpz2kqlNAhCMFBNuqtj5DEuMrl9MUs
-         GYKIktGKat8G1FFAyX8RsgCfrATwWY/82uGzcgUw9BGTpWqZ9jsapYYNZGHt2VWnAwrk
-         6dtD/vcf06eoWl8LfMQRwNwnFs2y3CE3wK2iDPmOVLZoVFcMMDQoB3ckemku6+k8fRqP
-         y/7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUUnmtH/GVw2NoB8IadeqkCKgTt3JlzmsfQvuExTohd0GDKrvQYo51iEJpzvTHKLP4JCNByAcU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWHxZS7zru5E1rxUPnVq8e7seHI+xnRxNbmHM/mgvHDglCxIcT
-	F+6FoyGSc7m6+o8URXzFvRVP6j1LIB0y4bHipjHNP6WyP2kiL5UAjkkCZ6r1Obs7dTR9plZ9+rK
-	8UOcTxNTZ1LusJMMILwYZjspc6tWr90l6p9o=
-X-Google-Smtp-Source: AGHT+IGWDQse6TyscgG5CfIR+8gOsyQKavEm8292qY8ZHQsZge2FuH6Ti9KhFX+uKagr39m9dkmwP219Kf1Yc5vk1VI=
-X-Received: by 2002:a17:907:6e9f:b0:a8d:5288:f48d with SMTP id
- a640c23a62f3a-a90294bd976mr51828166b.32.1726085349509; Wed, 11 Sep 2024
- 13:09:09 -0700 (PDT)
+	s=arc-20240116; t=1726085438; c=relaxed/simple;
+	bh=J4c3xjnZLTDroeV2SN5gd+r9iSvv5ishsPraXfx12ZA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nr2xyPfEJxHwmloX0r1QZfN535HxD8GJqb7ogpsNmu/UZiYzocHAAbdxHtDagUR6wbcprJQtY6ZlPosap7gWutfrQ+CWDOaqlDw4fOh2gPkzIsS9xX7swlrFEw0l5LYLbotkfnUKFV41wb8uXK4qhlmXZePAEC+2fJ3p9oJrTKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kMCW44Kw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4CEDC4CEC0;
+	Wed, 11 Sep 2024 20:10:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726085438;
+	bh=J4c3xjnZLTDroeV2SN5gd+r9iSvv5ishsPraXfx12ZA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=kMCW44KwFElljtFDL2FRXTeflakGulL/l6lBoODScmolyEhK2kZoA74RoTvmTeT9R
+	 YuvrGKIn7sJm0i0g4bPfiD3Km+A9eQVoJHcNjXkR8DO7xhgwk4kxHkpjdAyLl4UtB3
+	 G9PGEn+wHxdfhf5O9XcN0A4EG/Aa+BcXmb6EfKxepoYzEkhX1LjKQiz60Ci+g/LwxT
+	 o2eHd5yGEmSNk7x0Q/hhm1OgBKj1d0EdK62v/IdSb1yHdHUU6rQtQh7joa9TiqOrRp
+	 sAWpMbfm+JlkU+7hRUmCU6joM6/lzVaCkCI13sxlcSXOEHKU/0Gk94q6N9XZRaZAys
+	 6GXTcuqn7ksQA==
+Date: Wed, 11 Sep 2024 13:10:35 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew@lunn.ch>, David Ahern <dsahern@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Alexander Duyck <alexanderduyck@fb.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/5] eth: fbnic: add initial PHC support
+Message-ID: <20240911131035.74c5e8f9@kernel.org>
+In-Reply-To: <c1003a1b-cf6f-4332-b0c7-5461a164097e@linux.dev>
+References: <20240911124513.2691688-1-vadfed@meta.com>
+	<20240911124513.2691688-3-vadfed@meta.com>
+	<006042c0-e1d5-4fbc-aa7f-94a74cfbef0e@lunn.ch>
+	<c1003a1b-cf6f-4332-b0c7-5461a164097e@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-0-2d52f4e13476@linutronix.de>
- <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-3-2d52f4e13476@linutronix.de>
-In-Reply-To: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-3-2d52f4e13476@linutronix.de>
-From: John Stultz <jstultz@google.com>
-Date: Wed, 11 Sep 2024 13:08:57 -0700
-Message-ID: <CANDhNCpPnU7-=QWU7hWWn5LOCsb3kJFJ=VwyHc-b0ssepE6SXA@mail.gmail.com>
-Subject: Re: [PATCH 03/21] ntp: Clean up comments
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Miroslav Lichvar <mlichvar@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Christopher S Hall <christopher.s.hall@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 11, 2024 at 6:17=E2=80=AFAM Anna-Maria Behnsen
-<anna-maria@linutronix.de> wrote:
->
-> From: Thomas Gleixner <tglx@linutronix.de>
->
-> Usage of different comment formatting makes fast reading and parsing the
-> code harder. There are several multi-line comments which do not follow th=
-e
-> coding style by starting with a line only containing '/*'. There are also
-> comments which do not start with capitals.
->
-> Clean up all those comments to be consistent and remove comments which
-> document the obvious.
->
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+On Wed, 11 Sep 2024 20:49:51 +0100 Vadim Fedorenko wrote:
+> >> + * TBD: alias u64_stats_sync & co. with some more appropriate names upstream.  
+> > 
+> > This is upstream, so maybe now is a good time to decide?  
+> 
+> That's good question. Do we need another set of helpers just because of 
+> names? Obviously, the internals will be the same sequence magic.
 
-Acked-by: John Stultz <jstultz@google.com>
-
-Thanks for the cleanup!
--john
+Good question. To be clear we want a seq lock that goes away on 64b
+since what it protects is accessed on the fast path (potentially per
+packet). We could s/u64_stats/u64_seq/ the existing helpers. But that
+sounds like a lot for a single user. Dunno..
 
