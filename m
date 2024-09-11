@@ -1,140 +1,159 @@
-Return-Path: <netdev+bounces-127470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECBA897580F
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:16:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B62B6975828
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97ADB1F28212
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:16:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77705B27311
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:19:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB851AE87E;
-	Wed, 11 Sep 2024 16:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4921AE864;
+	Wed, 11 Sep 2024 16:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Re5r7x30"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iiSrTmDv"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903EA1AD40D;
-	Wed, 11 Sep 2024 16:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975651AE038;
+	Wed, 11 Sep 2024 16:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726071353; cv=none; b=NbqfoI/J88i8cXty3OZnzDoVq/tbuerf4mLLX15axz+qA9hVD7CrXRvz01ScpyH3UKkyQehdVu7hxeygUKW+hYvGLsi2rrKhBlsOJNbYZ4qDgP7OMjr2fRC8cBOm7pNFO3Oc1CrstpFhr8s2IolmJCUpxUk9g1pj97Q5Fp98F/Q=
+	t=1726071577; cv=none; b=DwareqghLs8ZCLBL2HVXbZlsNyZFD9XcutXMn3RYCUMm8wYzPmqUIVf74btP1agTmlbpAMkiVTUsjjtPtiX9TTxjSIrOOFW1fDdKeRh83eFv/mwenPlXImlfe9aCHvGS0U8oTUK6bUdNpLvw61DgswGQ4eK6v4L6rN5cI1tmdN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726071353; c=relaxed/simple;
-	bh=DGQSUDDdyRJOFJ1VH1Rob5rJribm+UEFtdMpF8HJa/c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tCcUX3boIy+zfNpyZ17Xa1a1ObQ6uS5oapT/zNKbHQFLIeintC++H6ITK3mDQGNG5TkjiuzDgT/UsJc+XxToHe82lE7cPD856KrW7zNunFBcwaEUQWc7G0GGg8cz1DtdFrtv12ucrtEzzD+KiwHcUTUd7LKVE1Qk66MnX4wvJFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Re5r7x30; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1726071351; x=1757607351;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=DGQSUDDdyRJOFJ1VH1Rob5rJribm+UEFtdMpF8HJa/c=;
-  b=Re5r7x30RQQZfymvdu3Oel0wtUao0yurL+SUISivC1LCmxIjQssyJBdR
-   f67zcg/imbW3HArJvtfVv+0hZNlrlWN6/iV1zxnQm+5hzUUbmhHk/RVmS
-   g4I4c0no5IEOLq2JWdGxvUwarFUYZiXgk8ecO3jIWNT+2UhFrTXjwPc+u
-   VBs7h7zd7mfkBpHXpYgpeMxNEpRCbZ7/Z+EMeSVcsOLvnzVxPkvxlAsUL
-   Cy4/4dMPbvmbWHsXwM97n5XBxTvTUnmf573LzBxNyU0KmABluZUhujXVj
-   2v327uP0Aq+WymGijumS5OHaFkYg1BRV86iQUg4No2M5m2RnGOpMyRcfi
-   A==;
-X-CSE-ConnectionGUID: wQTYqSpVRaKatvgABLE7Ew==
-X-CSE-MsgGUID: Za8HzPuCTpetq2lmKjkOpA==
-X-IronPort-AV: E=Sophos;i="6.10,220,1719903600"; 
-   d="scan'208";a="34798045"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Sep 2024 09:15:50 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 11 Sep 2024 09:15:15 -0700
-Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Wed, 11 Sep 2024 09:15:11 -0700
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <bryan.whitehead@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
-	<maxime.chevallier@bootlin.com>, <rdunlap@infradead.org>, <andrew@lunn.ch>,
-	<Steen.Hegelund@microchip.com>, <Raju.Lakkaraju@microchip.com>,
-	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH net-next V2 5/5] net: lan743x: Add Support for 2.5G SFP with 2500Base-X Interface
-Date: Wed, 11 Sep 2024 21:40:54 +0530
-Message-ID: <20240911161054.4494-6-Raju.Lakkaraju@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1726071577; c=relaxed/simple;
+	bh=lwlZJUmP9LcD4uQACLs3u1hgzJYRAuuAtfArazJJYQ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UyerrgMSeXDAK+fCv4JTOcQ5E02VdQxUt8nHDJe9qEMLMguonm8uYfzOjsgRWAo2e4YWccMiTwF79Ukwl6kiQCII0qfq7FeYd0i2Czwr99ut+u+11CaKsYOhg+TPgKF1t6LJ6gp4qnif2OnYOAdWnQmOihIEowdre0Y/xMVCQJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iiSrTmDv; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-53661ac5ba1so2546354e87.2;
+        Wed, 11 Sep 2024 09:19:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726071573; x=1726676373; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lwlZJUmP9LcD4uQACLs3u1hgzJYRAuuAtfArazJJYQ8=;
+        b=iiSrTmDv8zWDM8Ce73mbj+NyaBn86kLAblS5UiNGEoVmNOhBIONY27IztzWeZMxbqr
+         Ithukyn0UJu4g/kuETqapeg5ZRLo5Ppc+m070OAqOwarsuvcjCMGgKtmFJgwE9B//Ky7
+         iDGp2vTSo+Lcv9NMcitPDyWaW/1vene1DIBSUKeC4srHZhJZHTk/Mebabxi1I75/1qkD
+         MhYJ/TufTFnHhHLC2jPseOj+jp0PtzEzp8RbTU82K/TJgSOWQLmyNwGvYMLsRJcHxtQL
+         HdJJvOMknQdRTKb4Gt/CBZID3YAPB3Ryv8hru0Y7EvfRgPhr89cmUSZZb0kAiA7HLWb8
+         Co+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726071573; x=1726676373;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lwlZJUmP9LcD4uQACLs3u1hgzJYRAuuAtfArazJJYQ8=;
+        b=MCAjyhocAiHCTRtMSPk6GQg+qBG5D83yp6QQesc1GY5F87KPhBlAe4mp+ybmBx5jgv
+         qRkIY7JExLPmwkoH1BGBfedL36Xbvs2NXOjGc2BDeZau+4GiscTn9UOOYaCS54ZWX2iL
+         mTeneXAII6p5TuB9wEfo+yVweQWZeK4Ur4XDmlvIq2F4HBw12T1vnnhwJv0Az02XY+xT
+         y02Bl3jBVLFooSyXGHL0HZxvAEu/zQu++/2i1QLp1TraF5i1TXlu+HolymNENaW18xd6
+         XPTR0F+xguSqjaJB4MxHmLWGCQI4tUtF8KQHzycy4h/1Sl9WfbeqjcSFh1sm9dkrqbHp
+         6LJA==
+X-Forwarded-Encrypted: i=1; AJvYcCU8rkarfVLONkvil1WbvogxEGRPyeEywOdMoVFRF+riawz2LDh2KJX9hSc7OYpW+1EsF52uRGCtVrINRg==@vger.kernel.org, AJvYcCUxwGUFCLklMaxZreI47KDFTf2UTUA5uO4z16LCGlwZGmOydA9loUzwEn71JSUl4hdIzcrBy8I8mF5P53yl@vger.kernel.org, AJvYcCVKGify8M11hK1Ly6U6pnlAXzdx+6BY3W5qQnfRAzJbS911bvVF0YKknu+VJy1R3yU+zCj+ACRZhYDp@vger.kernel.org, AJvYcCVTq/+DINN7eoathAlwqUssl0RGIyHbCNoqTHkV649iCzq1DJq3hxezE1lsukSIflBXZHG2Xm+LxkwZ@vger.kernel.org, AJvYcCViGBGRIwRDtO53gtbBPLf9pnx4oMvOBMsyHSQP1lTLH9EDBlsmwwrDDgNCpbvvKRBEn821IkF/W7BL@vger.kernel.org, AJvYcCVoFGDFijezUCqEDKiYBOkzxr5LY8zg849EO3R1STLNb9WkcfcK23fJ8fm7UhRFvrImKdh0wG7iU44=@vger.kernel.org, AJvYcCW03NDG0TsX6ZLihBupK4TmIrIlPCufHgOxa8bFRTMSrdG1lvRZdSol991EPKDILAfcG1GBTcyqUBvvIsA=@vger.kernel.org, AJvYcCW8ZRFtXIp/aUawUB5qJL78+uCIL2rm742yO4lbso/GsgXS1vZ1bpKfTORD//EZR6hyBRu1SiNrFMC9@vger.kernel.org, AJvYcCWcVDfTCzZ3ELzePXhUVICP9RshYHigXXoICuWPV9Qgy1ghGEoo/1vefe32SVhpoIpTPO5kDkebXEDBbgjWEp8=@vger.kernel.org, AJvYcCX48OZS5U9iF9erUTOdWN2H/MeI
+ YafbohTjAEdGwXQ7+2Esg5rjH+yqEy3rl2vVk6nge9IxMLtn@vger.kernel.org, AJvYcCXP551LEphZJwnn28J1Kvr3iaWsS45S9PifNrjd9mFrVBBUGqrHj28i8zXPFOJR6vHtdyEABRIsjHXW2Gs=@vger.kernel.org, AJvYcCXWCc9ImALnuuLTdRm0AxwBJu8S7DCnZJts2b+yLg/v7fD8AaACxAPelx1/skYadEcO93FIAK0dr7Dc@vger.kernel.org, AJvYcCXkrhJNRUyiNCOgpJ4m63v5C32O2ge3tlu76+dpHbI1R+7Ck1om8ODUzRunM9PJIhU+7Qs7zwfIhVs7@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBbdQw4f1RmKmDCsAdAeymkqq568iWSS/3rmoQaTU7el3Eugw5
+	5teNXOJSy1rqkEoa7yjoI5zhbpyEM06h2y05z4rkWmjjC5yS5YNPibbxGH31IV0SNHiA/COi85u
+	bD+I9osT1UPW5wEdWtfNbdXePy4U=
+X-Google-Smtp-Source: AGHT+IEfiqu9Tkr72UxQfCKwEwXNERhL9+EEF5iQAUfNY4YtEQqPnVlXr1xTzedLm0smIgh8R+iSdzkbG8ZOJ96JeDI=
+X-Received: by 2002:a05:6512:10d6:b0:52b:bf8e:ffea with SMTP id
+ 2adb3069b0e04-53673c96a84mr2008337e87.40.1726071572960; Wed, 11 Sep 2024
+ 09:19:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <20240909-ep93xx-v12-0-e86ab2423d4b@maquefel.me>
+ <CAHp75Veusv=f6Xf9-gL3ctoO5Njn7wiWMw-aMN45KbZ=YB=mQw@mail.gmail.com>
+ <0e3902c9a42b05b0227e767b227624c6fe8fd2bb.camel@maquefel.me> <cff6b9b6-6ede-435a-9271-829fde82550d@app.fastmail.com>
+In-Reply-To: <cff6b9b6-6ede-435a-9271-829fde82550d@app.fastmail.com>
+From: Andy Shevchenko <andy.shevchenko@gmail.com>
+Date: Wed, 11 Sep 2024 19:18:56 +0300
+Message-ID: <CAHp75Vc2Dbj0GAua4b85L8jgcGzdBfMdRgnuTSWNiGj0zKHU7A@mail.gmail.com>
+Subject: Re: [PATCH v12 00/38] ep93xx device tree conversion
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Nikita Shubin <nikita.shubin@maquefel.me>, 
+	Hartley Sweeten <hsweeten@visionengravers.com>, 
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	Lukasz Majewski <lukma@denx.de>, Linus Walleij <linus.walleij@linaro.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, 
+	Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>, 
+	Sebastian Reichel <sre@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Vinod Koul <vkoul@kernel.org>, Wim Van Sebroeck <wim@linux-watchdog.org>, 
+	Guenter Roeck <linux@roeck-us.net>, Thierry Reding <thierry.reding@gmail.com>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
+	Mark Brown <broonie@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Miquel Raynal <miquel.raynal@bootlin.com>, Richard Weinberger <richard@nod.at>, 
+	Vignesh Raghavendra <vigneshr@ti.com>, Damien Le Moal <dlemoal@kernel.org>, 
+	Sergey Shtylyov <s.shtylyov@omp.ru>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, 
+	Ralf Baechle <ralf@linux-mips.org>, Aaron Wu <Aaron.Wu@analog.com>, Lee Jones <lee@kernel.org>, 
+	Olof Johansson <olof@lixom.net>, Niklas Cassel <cassel@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, 
+	"open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>, linux-clk@vger.kernel.org, 
+	linux-pm@vger.kernel.org, devicetree@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-watchdog@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-spi@vger.kernel.org, 
+	Netdev <netdev@vger.kernel.org>, linux-mtd@lists.infradead.org, 
+	linux-ide@vger.kernel.org, linux-input@vger.kernel.org, 
+	linux-sound@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Support for 2.5G SFP modules utilizing the 2500Base-X interface.
-The implementation includes integration with the Phylink subsystem to
-manage the link state and configuration dynamically.
+On Wed, Sep 11, 2024 at 6:13=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote=
+:
+>
+> On Mon, Sep 9, 2024, at 09:02, Nikita Shubin wrote:
+> > On Mon, 2024-09-09 at 11:49 +0300, Andy Shevchenko wrote:
+> >> On Mon, Sep 9, 2024 at 11:12=E2=80=AFAM Nikita Shubin via B4 Relay
+> >> <devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
+> >> >
+> >> > The goal is to recieve ACKs for all patches in series to merge it
+> >> > via Arnd branch.
+> >> >
+> >> > It was decided from the very beginning of these series, mostly
+> >> > because
+> >> > it's a full conversion of platform code to DT and it seemed not
+> >> > convenient to maintain compatibility with both platform and DT.
+> >> >
+> >> > Following patches require attention from Stephen Boyd or clk
+> >> > subsystem:
+> >>
+> >> Does it mean you still have a few patches without tags?
+> >> What are their respective numbers?
+> >
+> > The clk is the last one as i think, all others can be ACKed by
+> > Alexander or by Arnd himself.
+>
+> I've merged the series into the for-next branch of the arm-soc
+> tree now. The timing isn't great as I was still waiting for
+> that final Ack, but it seem better to have it done than to keep
+> respinning the series.
+>
+> I won't send it with the initial pull requests this week
+> but hope to send this one once I get beck from LPC, provided
+> there are no surprises that require a rebase.
 
-Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
----
-Change List:
-============
-V2 : Include this new patch in the V2 series. 
+Thank you!
 
- drivers/net/ethernet/microchip/lan743x_main.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+This, in particular, will move forward to the GPIO descriptor and
+getting rid of old legacy GPIO APIs.
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index ef76d0c1642f..7fe699e5a134 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -1495,7 +1495,10 @@ static void lan743x_phy_interface_select(struct lan743x_adapter *adapter)
- 	data = lan743x_csr_read(adapter, MAC_CR);
- 	id_rev = adapter->csr.id_rev & ID_REV_ID_MASK_;
- 
--	if (adapter->is_pci11x1x && adapter->is_sgmii_en)
-+	if (adapter->is_pci11x1x && adapter->is_sgmii_en &&
-+	    adapter->is_sfp_support_en)
-+		adapter->phy_interface = PHY_INTERFACE_MODE_2500BASEX;
-+	else if (adapter->is_pci11x1x && adapter->is_sgmii_en)
- 		adapter->phy_interface = PHY_INTERFACE_MODE_SGMII;
- 	else if (id_rev == ID_REV_ID_LAN7430_)
- 		adapter->phy_interface = PHY_INTERFACE_MODE_GMII;
-@@ -3359,6 +3362,7 @@ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
- 	lan743x_phy_interface_select(adapter);
- 
- 	switch (adapter->phy_interface) {
-+	case PHY_INTERFACE_MODE_2500BASEX:
- 	case PHY_INTERFACE_MODE_SGMII:
- 		__set_bit(PHY_INTERFACE_MODE_SGMII,
- 			  adapter->phylink_config.supported_interfaces);
-@@ -3412,12 +3416,13 @@ static int lan743x_phylink_connect(struct lan743x_adapter *adapter)
- 	struct device_node *dn = adapter->pdev->dev.of_node;
- 	struct net_device *dev = adapter->netdev;
- 	struct phy_device *phydev;
--	int ret;
-+	int ret = 0;
- 
- 	if (dn)
- 		ret = phylink_of_phy_connect(adapter->phylink, dn, 0);
- 
--	if (!dn || (ret && !lan743x_phy_handle_exists(dn))) {
-+	if (!adapter->is_sfp_support_en &&
-+	    (!dn || (ret && !lan743x_phy_handle_exists(dn)))) {
- 		phydev = phy_find_first(adapter->mdiobus);
- 		if (phydev) {
- 			/* attach the mac to the phy */
--- 
-2.34.1
-
+--=20
+With Best Regards,
+Andy Shevchenko
 
