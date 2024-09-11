@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-127399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74B6B975412
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:36:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25404975422
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:38:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A678E1C243FC
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:36:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4E601F22779
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88A6C1ACDF9;
-	Wed, 11 Sep 2024 13:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66F1A1B81A5;
+	Wed, 11 Sep 2024 13:30:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="NE9e93mi";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dzIAPHKj"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="k9Keo4Qo";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="8fgySdYY"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4B51ABEBA;
-	Wed, 11 Sep 2024 13:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE0F31AC8A3;
+	Wed, 11 Sep 2024 13:30:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726061412; cv=none; b=bpvco6mOVWpql5147xAdD3qvClesT3YS0c+3ZrPtDvLRxbnPjleoBxCBiybz8dY8lQzee1J4W70Qhl3FAX5SYjqSIjORCLJSKe9y/KoTXf7cqklkHxPfiQsjcBIn2d694p4kz1fDSsBvncU24umUkXiohZJxMfEEELJY1h+Wc2k=
+	t=1726061415; cv=none; b=r7Xb/acpwKuZYQUayGcSFTuT/ptoI1+AuT/vRiDXuVf2BeOaGciK0c8WHcpq3RFKIo8aIpV92YsO/WN+QkjRzGG450YoIl+dUeC+E5doAM/xZr6wCiwHaR4yJX0/DRRRu4YwMtYI9m6MnaMalBTh9I7sDyETiagxefv1RCtQwEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726061412; c=relaxed/simple;
-	bh=11k2zg2iWHkeGOqyjca+7sno045Z743cSq0hqnRE8VY=;
+	s=arc-20240116; t=1726061415; c=relaxed/simple;
+	bh=5kskezftqXH5tjvjLiOu2UaXf3ww0dfSozmmELKWZMs=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=btwz8XfcEXVG8O98nkAyP815bj9FY5F9wT0JhrD6VpRKuZd0+s4gBUiC+E6dKF17vKAbZ8P/6Q1GcUunwY4fwx01N7geOXxoPKF2hVGQ6H55D0+XwYpc2VPDTX7N/wmtfYqm5S6jJkq4Oh+AHZwvPmEfX0fro4xr0urI9ZmSe8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=NE9e93mi; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dzIAPHKj; arc=none smtp.client-ip=193.142.43.55
+	 In-Reply-To:To:Cc; b=cQ3tfo9OzPk3HyTs1xD7MYVapzzQBuERme6ejh6NQkpQsCofjrZX3Mig41BNAghfgS980K8CZYothMR+T2HLkhsDIBdGSIFQLBEkyNMGUQIRupCGumH9tLyXwz7xZIEVXDDpBePIwIEVFJjXn9Yo5gQRv3MhOQohmjt5pYgJ8Qo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=k9Keo4Qo; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=8fgySdYY; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Anna-Maria Behnsen <anna-maria@linutronix.de>
@@ -39,24 +39,24 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nAOR7ivePhht6tHAppOLIeJDMDAplgh861T+7mUgea0=;
-	b=NE9e93mia4vb1EFuX+WN65jId2v4/VfCHFmtPUm4oXklvPhuUSB2h0OrOyAYw7Dfre5wQ0
-	OCJVzRMyY9+UpnsgvKTjT9aE+SwQL8v02eNuuesggS9+kYNciPI8O6eo6cIC+FC/n399Ov
-	6CWxhsG8L6Ie48VczJf0ay4fpg0T5wVO42/AwbF1UXu7S5XC9C2jWYgPi/HIsx8bt7TDvM
-	5tTDL3WS9XKTJ9CRvJsoNMKgEkVNPClbIY5cKpMji3fdWe9WArtwi7D/Xj20nqCPqu0Wm8
-	nBkI9KenRY0djYPQ0fjmXSgWKuxnZPyGzZLN68i44K0E365OInZBFmxeWaNwMA==
+	bh=tnkgY5EEf+tSEdiS0FM2oNqC9upPmA4xGg33OJxUNdM=;
+	b=k9Keo4QonC0Yqm3cnM6LR0VGRcbSBSOBOvtIDt0tpMMwcd4sGkU5y+5FrRHDaBL2WqGLI3
+	ZRVXP6q2sTy7KtD0fTX0jv3lxytgfPFj+fhXyhPdq+h8ugaEYVvukEi6Anm8Re3BhhaUaa
+	Dxyt8ijqRq1guF/MhuovMiKsALyNhx3PitAIj+HOcZQyPcfiwDAZS9cThvdUtOVSPxSKW5
+	xBXoT9+EmCtEtLdhyaKVBfqXqkNdd6juDOu+sMQ1iD2fBNF/PU2QjMMPC5wSX9wyeCNj6z
+	Ob8ImQ9lk0XQgiDhmlmDfUOaWklFLetOBk4MJsZSJhhfWZ4/Rp73YgEXV46BCA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
 	s=2020e; t=1726061409;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nAOR7ivePhht6tHAppOLIeJDMDAplgh861T+7mUgea0=;
-	b=dzIAPHKjMms06kzgzsbBsUZxfDHX5vEDjNOQHOMZjT6iX9PC7BzM6pduWnkDvxIR1+DQ1E
-	u4cEqHjkvQHzNDCA==
-Date: Wed, 11 Sep 2024 15:30:02 +0200
-Subject: [PATCH 18/24] timekeeping: Rework timekeeping_init() to use
- shadow_timekeeper
+	bh=tnkgY5EEf+tSEdiS0FM2oNqC9upPmA4xGg33OJxUNdM=;
+	b=8fgySdYYm6ifiAEEabzUWN89HWR37RTQwPj843g8TJvpes6WM1sgnuWXXMjzP2XCw17PaY
+	HmIAMgEMGcvY1WAQ==
+Date: Wed, 11 Sep 2024 15:30:03 +0200
+Subject: [PATCH 19/24] timekeeping: Rework timekeeping_inject_sleeptime64()
+ to use shadow_timekeeper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,7 +65,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240911-devel-anna-maria-b4-timers-ptp-timekeeping-v1-18-f7cae09e25d6@linutronix.de>
+Message-Id: <20240911-devel-anna-maria-b4-timers-ptp-timekeeping-v1-19-f7cae09e25d6@linutronix.de>
 References: <20240911-devel-anna-maria-b4-timers-ptp-timekeeping-v1-0-f7cae09e25d6@linutronix.de>
 In-Reply-To: <20240911-devel-anna-maria-b4-timers-ptp-timekeeping-v1-0-f7cae09e25d6@linutronix.de>
 To: John Stultz <jstultz@google.com>, 
@@ -77,50 +77,52 @@ Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
  Christopher S Hall <christopher.s.hall@intel.com>, 
  Anna-Maria Behnsen <anna-maria@linutronix.de>
 
-For timekeeping_init() the sequence count write held time is not relevant
-and it could keep working on the real timekeeper, but there is no reason to
-make it different from other timekeeper updates.
+Updates of the timekeeper can be done by operating on the shadow timekeeper
+and afterwards copying the result into the real timekeeper. This has the
+advantage, that the sequence count write protected region is kept as small
+as possible.
 
-Convert it to operate on the shadow timekeeper.
+Convert timekeeping_inject_sleeptime64() to use this scheme.
 
 Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
 ---
- kernel/time/timekeeping.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ kernel/time/timekeeping.c | 22 +++++++---------------
+ 1 file changed, 7 insertions(+), 15 deletions(-)
 
 diff --git a/kernel/time/timekeeping.c b/kernel/time/timekeeping.c
-index 9b4fd620f895..223429b1ca06 100644
+index 223429b1ca06..244bb58dcda9 100644
 --- a/kernel/time/timekeeping.c
 +++ b/kernel/time/timekeeping.c
-@@ -1778,7 +1778,7 @@ static bool persistent_clock_exists;
- void __init timekeeping_init(void)
+@@ -1893,22 +1893,14 @@ bool timekeeping_rtc_skipsuspend(void)
+  */
+ void timekeeping_inject_sleeptime64(const struct timespec64 *delta)
  {
- 	struct timespec64 wall_time, boot_offset, wall_to_mono;
 -	struct timekeeper *tk = &tk_core.timekeeper;
-+	struct timekeeper *tk = &tk_core.shadow_timekeeper;
- 	struct clocksource *clock;
- 
- 	tkd_basic_setup(&tk_core);
-@@ -1802,7 +1802,7 @@ void __init timekeeping_init(void)
- 	wall_to_mono = timespec64_sub(boot_offset, wall_time);
- 
- 	guard(raw_spinlock_irqsave)(&tk_core.lock);
--	write_seqcount_begin(&tk_core.seq);
-+
- 	ntp_init();
- 
- 	clock = clocksource_default_clock();
-@@ -1815,9 +1815,7 @@ void __init timekeeping_init(void)
- 
- 	tk_set_wall_to_mono(tk, wall_to_mono);
- 
--	timekeeping_update(&tk_core, tk, TK_MIRROR | TK_CLOCK_WAS_SET);
+-	unsigned long flags;
 -
--	write_seqcount_end(&tk_core.seq);
-+	timekeeping_update_staged(&tk_core, TK_CLOCK_WAS_SET);
- }
+-	raw_spin_lock_irqsave(&tk_core.lock, flags);
+-	write_seqcount_begin(&tk_core.seq);
+-
+-	suspend_timing_needed = false;
+-
+-	timekeeping_forward_now(tk);
+-
+-	__timekeeping_inject_sleeptime(tk, delta);
+-
+-	timekeeping_update(&tk_core, tk, TK_UPDATE_ALL | TK_MIRROR);
++	scoped_guard(raw_spinlock_irqsave, &tk_core.lock) {
++		struct timekeeper *tk = &tk_core.shadow_timekeeper;
  
- /* time in seconds when suspend began for persistent clock */
+-	write_seqcount_end(&tk_core.seq);
+-	raw_spin_unlock_irqrestore(&tk_core.lock, flags);
++		suspend_timing_needed = false;
++		timekeeping_forward_now(tk);
++		__timekeeping_inject_sleeptime(tk, delta);
++		timekeeping_update_staged(&tk_core, TK_UPDATE_ALL);
++	}
+ 
+ 	/* Signal hrtimers about time change */
+ 	clock_was_set(CLOCK_SET_WALL | CLOCK_SET_BOOT);
 
 -- 
 2.39.2
