@@ -1,71 +1,119 @@
-Return-Path: <netdev+bounces-127423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 461CF975586
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:33:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 508619755D0
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:43:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B26B0B2740D
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:33:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82BCB1C22CF1
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:43:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EAA0192B88;
-	Wed, 11 Sep 2024 14:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59CB019F12F;
+	Wed, 11 Sep 2024 14:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bixKOhF6"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="eizSyDBx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mta-64-226.siemens.flowmailer.net (mta-64-226.siemens.flowmailer.net [185.136.64.226])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A79B1714AC
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 14:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0254B185954
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 14:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.226
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726065212; cv=none; b=oXSPhAxxEcIobhBUQBgmWtR0Cc5CUXZGQlJB7ZBYtU4xvbfMOsRx1LzUHfuSquDZVPHJhNsSxDTt3FlPFKp9dG8TPpmTZmihExar+Xu6w/9XEdnabgEWwuuwU6fgklAmXhApiZ6/H28ueOuqu3JDy3vl1aaw9MvxJOMSH+Ec1KA=
+	t=1726065751; cv=none; b=BFeIV4VcXMfp+SRGDYOjG0TdNJX+zxmZYY5KThJFVObsRPdI1mtorUk1ZwVFYZ+usEwDEtVWcuOAPKdM+AO5UyW6wvCaOYWUR0OFDmvhKfmcMF8Nes4TqwouCeB+yeZSHBWQyRA0tSfXJF8Bi2En/LpQ79lV5c7ctAIJJu8AVy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726065212; c=relaxed/simple;
-	bh=P24d+bB5BU7iCUMdqRD4AJf34y/KzQTAqPUUMnlnxFM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HDlbht5L8hvI8pC1msrK1FdvD61LKROof/+EJDLt4Xr2V9N7wGCrpn6kbShQw0OUBIiD6dVktF1kYugcHmNX0ZfkuCP42rhVo3Sa2HzAMTIx3Z1a3qkb+TA9fCBfN+ha7uSJpDfYjyoGGh+g1xCvj0mWR4e/3orswDubkLTPPps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bixKOhF6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0AD0C4CEC0;
-	Wed, 11 Sep 2024 14:33:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726065211;
-	bh=P24d+bB5BU7iCUMdqRD4AJf34y/KzQTAqPUUMnlnxFM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bixKOhF6vR5GNkVFbrVEfbgn5RYeXUF/ZUFOzOcAH7dqAwvmyScy+duRaDY1I2qlM
-	 oVNzYjxGRnfPL508Iqv5FwpfK3RunreAPDzq63TUxxhU3Mf4SmXu0cjTSWanWhb7pw
-	 B3r6Q+KU4IxHhtbhn7krg3w/AnWEEtTtLofTe2dUxythlkdE1FpF42p8bOH7yJL9z5
-	 rkNMhUwu288OI3ZDpLbdoRSZOxHj6LDU93Vs1LO5MVVdZZ2IiAGJeooXcrQ6Dx3vDv
-	 D54z4aW2iw1mQn53oGSvd1lLYoQEtz7uzYN8UZJQLyyKKqIMdsPrTYginCVR32XA2J
-	 Lpv+QRoJk/JAA==
-Date: Wed, 11 Sep 2024 07:33:29 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Sverdlin <alexander.sverdlin@gmail.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net] net: dsa: lan9303: avoid dsa_switch_shutdown()
-Message-ID: <20240911073329.155db2d6@kernel.org>
-In-Reply-To: <cecf48f4ae26a642125bb06765abda0a952cdf6e.camel@siemens.com>
-References: <cecf48f4ae26a642125bb06765abda0a952cdf6e.camel@siemens.com>
+	s=arc-20240116; t=1726065751; c=relaxed/simple;
+	bh=f/128AteF2svPgXo8CH8dthfp+5ydTjymU4vIkiJJe8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=btUXN0GSTnIrFrTyv9jI1bDULxXku1PuUfQhUHfyZ5Rb9TBOb706+5IrVTUROqGResdsiw2Z7+xfvNdYq2UXpYBxGi+aUDLVIypa4PSN3pL9LoHhxaI8dvSkUARPWtbW5RkmTlZX/DJvuofZ4Z3DtayrOehO3ATpVmnsSSI2scI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=eizSyDBx; arc=none smtp.client-ip=185.136.64.226
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-226.siemens.flowmailer.net with ESMTPSA id 20240911144216dfe4d20b3a79e61a59
+        for <netdev@vger.kernel.org>;
+        Wed, 11 Sep 2024 16:42:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=alexander.sverdlin@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=c9PcQZFfNdq8cUu9sqpnFLswW6Zin2UTvho5Wq+tuEE=;
+ b=eizSyDBxVpSvjni1XMMj6PhpkbTUBjCbkU/8EclL0rc/j2HAXGp6cFI5VV6J9NsnFZ65Ff
+ Rs2XfVJLw04GNsVDnkIUVXLS0Q08s2MFeADXPip+FUkIstZDVp03Xyrk6XWKM3C8K+YvmVK2
+ JHzWHkIbhsA6iFJZWT24DnqS0YoqqFLICVAPud3Vu4J8z0zbQRNHa5EGMvyUr7/lHPZ7LrKt
+ ukm4xi/CXhO5KFDOMaKfeFfFg4JzgW+rLWN8/F90RXny/Tp9XbsDqSI2/wvSGVCiDw5ZT/oT
+ VLUtQUfANBzjBNmVCspZj6VGRUQAwuBgQgQEzMgNVhRvioB7i5oRHzrg==;
+From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
+To: netdev@vger.kernel.org
+Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: dsa: lan9303: avoid dsa_switch_shutdown()
+Date: Wed, 11 Sep 2024 16:40:03 +0200
+Message-ID: <20240911144006.48481-1-alexander.sverdlin@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-456497:519-21489:flowmailer
 
-On Wed, 4 Sep 2024 11:07:42 +0200 Alexander Sverdlin wrote:
-> dsa_switch_shutdown() doesn't bring down any ports, but only disconnects
-> slaves from master. Packets still come afterwards into master port and the
-> ports are being polled for link status. This leads to crashes:
+From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 
-Something is wrong with the date on your (email) system, the email
-arrived with a date from a week ago. It's not going to get ingested
-into our patch handling systems.
+dsa_switch_shutdown() doesn't bring down any ports, but only disconnects
+slaves from master. Packets still come afterwards into master port and the
+ports are being polled for link status. This leads to crashes:
+
+Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
+CPU: 0 PID: 442 Comm: kworker/0:3 Tainted: G O 6.1.99+ #1
+Workqueue: events_power_efficient phy_state_machine
+pc : lan9303_mdio_phy_read
+lr : lan9303_phy_read
+Call trace:
+ lan9303_mdio_phy_read
+ lan9303_phy_read
+ dsa_slave_phy_read
+ __mdiobus_read
+ mdiobus_read
+ genphy_update_link
+ genphy_read_status
+ phy_check_link_status
+ phy_state_machine
+ process_one_work
+ worker_thread
+
+Call lan9303_remove() instead to really unregister all ports before zeroing
+drvdata and dsa_ptr.
+
+Fixes: 0650bf52b31f ("net: dsa: be compatible with masters which unregister on shutdown")
+Cc: stable@vger.kernel.org
+Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+---
+ drivers/net/dsa/lan9303-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
+index 268949939636..ecd507355f51 100644
+--- a/drivers/net/dsa/lan9303-core.c
++++ b/drivers/net/dsa/lan9303-core.c
+@@ -1477,7 +1477,7 @@ EXPORT_SYMBOL(lan9303_remove);
+ 
+ void lan9303_shutdown(struct lan9303 *chip)
+ {
+-	dsa_switch_shutdown(chip->ds);
++	lan9303_remove(chip);
+ }
+ EXPORT_SYMBOL(lan9303_shutdown);
+ 
 -- 
-pw-bot: cr
+2.46.0
+
 
