@@ -1,110 +1,133 @@
-Return-Path: <netdev+bounces-127498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EAAA97595A
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 19:27:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A81C797596D
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 19:30:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A110D1C22EA7
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:27:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A7D02819CD
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:30:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA3A51B1417;
-	Wed, 11 Sep 2024 17:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662AC1B14E9;
+	Wed, 11 Sep 2024 17:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Rl5HHneR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xmf8yDVz"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5073A1B29C1;
-	Wed, 11 Sep 2024 17:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34FA11AC42D
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 17:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726075598; cv=none; b=qS6Ey6mZREPqJgmNa+Hqr291SWiiy4yP3jHGM1J0UDtY/J3nlMfcQ9ZpIYWG7W1k47PhSTmoCzLtP4X9hyCnI3nhcOLKxN4VtEmnZb8quyepKRI3e/OFtuSdSpv2GUlHEQqF3IK65+rLmNRjxup/8kGz/v3tEMmYtPlAETpz8D8=
+	t=1726075847; cv=none; b=NmUrjxzZZQAsvtNLqn0Ekl9l2EdxNSEAFw8IP3FR0imCTrqoYp6Ser+OHfACTtAlEoo/K25TlRZOnEuo/ZNyLgy6OCjbTv70LwbJzBlG9r/Fd/Ioz0cRj9xIx+uTNGmq64u34Z6BrUHYjxrYVLtU/Hcv8F/5+FB1S0gCqC85Gec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726075598; c=relaxed/simple;
-	bh=V/0J+gwv/n3AtLA+rJXg3PKb+fScaPY1w1sU6qEwptg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ltGanLv0McXL/4RHUow0Chysr/OoqSInragxED8LwtcJGWFaNQLZV8GFfPurD21XLN1U8c/08hTrGvt9Nc8hVfGt6QepaNUpn0f/wjwbX1BqqGOdZWurdP01QGi13HNynoCqZOSDtzyQC2riDuzxGZPn5eQmzapLi7vL17qPwvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Rl5HHneR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JnKWS+Fj8X3K2J34ug0Ii1c0TCxXIH/EG4XIfAwIB2E=; b=Rl5HHneRL2ql7I9bnSjF5Il1aV
-	yKkRuMHXQPLwE61I9My+acCCMpPwxrquNO4a/KXcDTM/z+WeOTvo2Yw7kbQGdnKixCDOjWF+Ij412
-	SXP/J2HOU4gwgA0JtU2K7gs7DPOEM+jisycvjOd6aqNRgs6ufFOo/u1UcUf30D/opz1I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1soR6l-007Emn-6K; Wed, 11 Sep 2024 19:26:23 +0200
-Date: Wed, 11 Sep 2024 19:26:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
-	Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next V2 4/5] net: lan743x: Implement phylink pcs
-Message-ID: <c6e36569-e3a8-4962-ac85-2fd7d35ab5d1@lunn.ch>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-5-Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1726075847; c=relaxed/simple;
+	bh=l1Upy7XrmB9UBM+BJiQVMme9YiNZuLukgnwErS690GY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cVITPvyjoUuEKE1SPQcc66pYLYJYlFHoNEKJotqrcGJyqtwg4tqD/T6kqE/wk4fi3sKNxIBdNR9VaIY09cz43pKIQvTl9iK5gNeNRSBo5hT5kKoSu3hCvM9wAZF4z/aow8UyCTsHNlnEjSFVBPE+XfVb15FDmGv35caztEon8QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xmf8yDVz; arc=none smtp.client-ip=91.218.175.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c5974d0f-0636-470e-87ef-b2936d54cd87@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726075842;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2doHaDLybrvva11Biu2GeRSbEa9P9PAas2ldszHt6Vg=;
+	b=Xmf8yDVzIy+6eJnTOsfrb4yvMC8zHjpJm7xQibwzW4YlxIT6jpLPh95qt3N/sg2hLCV7B1
+	bQnOkv8mWf+6vk4MdO75VClmSE6wRKCGpj7qq6XHY30M6vzwoKReb5+rMalNHizCiYzuEf
+	l+oS0vIhCrHLxh2exrOBs/NllTjeJiY=
+Date: Wed, 11 Sep 2024 10:30:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911161054.4494-5-Raju.Lakkaraju@microchip.com>
+Subject: Re: [PATCH bpf-next v3 1/5] bpf: Support __nullable argument suffix
+ for tp_btf
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: edumazet@google.com, rostedt@goodmis.org, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, mykolal@fb.com, shuah@kernel.org,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ thinker.li@gmail.com, juntong.deng@outlook.com, jrife@google.com,
+ alan.maguire@oracle.com, davemarchevsky@fb.com, dxu@dxuuu.xyz,
+ vmalik@redhat.com, cupertino.miranda@oracle.com, mattbobrowski@google.com,
+ xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, bpf@vger.kernel.org
+References: <20240911033719.91468-1-lulie@linux.alibaba.com>
+ <20240911033719.91468-2-lulie@linux.alibaba.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240911033719.91468-2-lulie@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> +static int pci11x1x_pcs_read(struct mii_bus *bus, int addr, int devnum,
-> +			     int regnum)
+On 9/10/24 8:37 PM, Philo Lu wrote:
+> Pointers passed to tp_btf were trusted to be valid, but some tracepoints
+> do take NULL pointer as input, such as trace_tcp_send_reset(). Then the
+> invalid memory access cannot be detected by verifier.
+> 
+> This patch fix it by add a suffix "__nullable" to the unreliable
+> argument. The suffix is shown in btf, and PTR_MAYBE_NULL will be added
+> to nullable arguments. Then users must check the pointer before use it.
+> 
+> A problem here is that we use "btf_trace_##call" to search func_proto.
+> As it is a typedef, argument names as well as the suffix are not
+> recorded. To solve this, I use bpf_raw_event_map to find
+> "__bpf_trace##template" from "btf_trace_##call", and then we can see the
+> suffix.
+> 
+> Suggested-by: Alexei Starovoitov <ast@kernel.org>
+> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+> ---
+>   kernel/bpf/btf.c      |  9 +++++++++
+>   kernel/bpf/verifier.c | 36 ++++++++++++++++++++++++++++++++----
+>   2 files changed, 41 insertions(+), 4 deletions(-)
+> 
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 1e29281653c62..d1ea38d08f301 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -6385,6 +6385,12 @@ static bool prog_args_trusted(const struct bpf_prog *prog)
+>   	}
+>   }
+>   
+> +static bool prog_arg_maybe_null(const struct bpf_prog *prog, const struct btf *btf,
+
+The "prog" arg is not used, so the following nit...
+
+
+> +				const struct btf_param *arg)
 > +{
-> +	struct lan743x_adapter *adapter = bus->priv;
-> +
-> +	if (addr)
-> +		return -EOPNOTSUPP;
-> +
-> +	return lan743x_sgmii_read(adapter, devnum, regnum);
+> +	return btf_param_match_suffix(btf, arg, "__nullable");
 > +}
+> +
+>   int btf_ctx_arg_offset(const struct btf *btf, const struct btf_type *func_proto,
+>   		       u32 arg_no)
+>   {
+> @@ -6554,6 +6560,9 @@ bool btf_ctx_access(int off, int size, enum bpf_access_type type,
+>   	if (prog_args_trusted(prog))
+>   		info->reg_type |= PTR_TRUSTED;
+>   
+> +	if (prog_arg_maybe_null(prog, btf, &args[arg]))
 
->  static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
->  {
-> +	struct dw_xpcs *xpcs;
->  	u32 sgmii_ctl;
->  	int ret;
->  
-> @@ -3783,8 +3823,17 @@ static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
->  				  "SGMII operation\n");
->  			adapter->mdiobus->read = lan743x_mdiobus_read_c22;
->  			adapter->mdiobus->write = lan743x_mdiobus_write_c22;
-> -			adapter->mdiobus->read_c45 = lan743x_mdiobus_read_c45;
-> -			adapter->mdiobus->write_c45 = lan743x_mdiobus_write_c45;
-> +			if (adapter->is_sfp_support_en) {
-> +				adapter->mdiobus->read_c45 =
-> +					pci11x1x_pcs_read;
-> +				adapter->mdiobus->write_c45 =
-> +					pci11x1x_pcs_write;
+... I changed it to directly use
+btf_param_match_suffix(btf, &args[arg], "__nullable"),
 
-As you can see, the naming convention is to put the bus transaction
-type on the end. So please name these pci11x1x_pcs_read_c45...
+and removed the new prog_arg_maybe_null(). There are already a few 
+is_kfunc_arg_{nullable, ...} helpers in verifier.c. Maybe we can consider 
+refactoring them (if) there are more use cases like this in the future.
 
-Also, am i reading this correct. C22 transfers will go out a
-completely different bus to C45 transfers when there is an SFP?
-
-If there are two physical MDIO busses, please instantiate two Linux
-MDIO busses.
-
-    Andrew
-
----
-pw-bot: cr
 
