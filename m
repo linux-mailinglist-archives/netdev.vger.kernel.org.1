@@ -1,131 +1,144 @@
-Return-Path: <netdev+bounces-127271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75032974CD5
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:40:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05F25974CDA
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:41:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01355B22DEA
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 08:40:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC9A228804E
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 08:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52FD155330;
-	Wed, 11 Sep 2024 08:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E7CC155398;
+	Wed, 11 Sep 2024 08:41:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nIHMZPMH"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="SdxOBws3";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ZmqffyMT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2FA1552EE;
-	Wed, 11 Sep 2024 08:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DCC13D881;
+	Wed, 11 Sep 2024 08:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726044003; cv=none; b=A7A3jFF1wWUR/RwwXDX4wSyweU/YLoIQltpu8p7+ZjdqAqlOaZ0zDqrRooS3Y5HB/rIs3TfInRZtHmkOiug1YoWrENmjnKZ5Qr+HeJwzAiPZCbJh9Oxx2WW7+nUdsWFno9n7aXXxBCDTbSipJ/HhQe4AecelQ13XlSycgrMzuKw=
+	t=1726044107; cv=none; b=mUuWLhOckod9MXZ6wRlI6wA02LpytM9y9Lpr2oq5gx4raNhwNVWl0PYlW2htcgK+CpkqUP4d3ESWaAIPGVKt4BD6CyJPN7dMs0vwaiiNtUBZnLt9kadFRonCe0DYJA6I+dbBOcvzuZrzZyAoGJLLpNaUucFeDiRYY5CzvBgdnnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726044003; c=relaxed/simple;
-	bh=pjO1Xtf6xnRkbXFbIjBTuXviXNMS0tKSzaObW+4ZC7A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IPO1m0vzNJdE8SBwGCgFAcLKthbZC3PIEE0iEBFFH8IuEij415yMgS0l99TGa+iK0kifcZ+J5MmyBoXzvdn/WzPL9sPo7CNVabb60RAxI9I2ZxJaxAXHqqL8poL4FCoo0Acb4V5ivfhL1RjwkDBBhS8HpsaDgWXO/HX+8e+Bv/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nIHMZPMH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D5B5C4CEC5;
-	Wed, 11 Sep 2024 08:40:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726044003;
-	bh=pjO1Xtf6xnRkbXFbIjBTuXviXNMS0tKSzaObW+4ZC7A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nIHMZPMHgLqvhkvMaUIDgL4SPTwrQl/xGvDNj7oZSiYr5bmStobHLtdTGzRUWcYDS
-	 S7KbJ+otJ0Gs+Y+S17HxwGgUTnIuZRvqoCXQh9iuR1BDq9ZuIgya7IrI+P6bNxSX4j
-	 zedzenrt2du+vvw7VK90tnuQiBjJcRkA0TGKCI7vVbdabgfbYAUnMpHZZK9TFbM6Lz
-	 CLt42Ph9wSAHcoPsLQl+1V6ZkeE0ROQTGEZCFjQYg1VYbEdVdNJRUMMrczDkUkrtZ5
-	 glUCXb8V7Nobzi3AY2bIv2K4oLWjjYXe84Awzf0luUBeQW3t0vvAl+tb8OOMTNs1cu
-	 RiutmvM4IeHQg==
-Date: Wed, 11 Sep 2024 09:39:58 +0100
-From: Simon Horman <horms@kernel.org>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: syzbot+c229849f5b6c82eba3c2@syzkaller.appspotmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
-	Jeongjun Park <aha310510@gmail.com>
-Subject: Re: [PATCH net] net: hsr: Fix null-ptr-deref in hsr_proxy_announce
-Message-ID: <20240911083958.GC678243@kernel.org>
-References: <0000000000000d402f0621c44c87@google.com>
- <tencent_CF67CC46D7D2DBC677898AEEFBAECD0CAB06@qq.com>
+	s=arc-20240116; t=1726044107; c=relaxed/simple;
+	bh=QXVqM0ep9qjiaA9b9Ehze7JRk9JPQ8NbDOqiRkeXycs=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=YFVawX3H+J9tKE+0lfpwidKIv5i2cKJPnFvcab58AWS3qExGipqkZabkOLC4DQwBhXzSRRXs49in5e8P7YBf2VDs1bxkj2jMxPEdf0Hto2+zfQji9fopHTPWIX8tABSUieE392tjHCJOVBuJwOuu2pDC7v98rPKaJfTAxoH6ESM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=SdxOBws3; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ZmqffyMT; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Florian Kauer <florian.kauer@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1726044103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=S8DgETyTbstBPqNt/W783jDRLO3m8aY7HIUj6g/Rass=;
+	b=SdxOBws3hVPBY+p4UOwFCZnBq2lCgpKCpTaqTYoby5YUmEa7QZ8cFQV4De4DYXC/VBYwZS
+	DIyACh2FIrLLeuBcqB77g5JJRaOiTf0CSIlKIazTRzmsUAccR919Oreyvftrfiy54bGgOH
+	0Gwqv7E3WgPWDTwsbNU88Zd+RY+0OZmWZGQinL7ABYBhWtVwFoj34OHo8JSnHU2BoeUhC7
+	ggpXbN8DglrbuXsdG9vngShBqo0CCCdTGhyEW8B527s0zTbLcTh3cPPBCSUy5kKlFQ+ynA
+	53UNN5FrtFMkMk33PwlqVt+hxHdjPRcCtH5awgvDvqSsbZC8Pof0Ox4rnrmzKw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1726044103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=S8DgETyTbstBPqNt/W783jDRLO3m8aY7HIUj6g/Rass=;
+	b=ZmqffyMTIbdbpEVAOIA6FZOn28+ATq/xEF0JhifJhbzdqnHt27oXYDnpBozQZ4Dj3FWp9A
+	IJV0btl3EpavMOAQ==
+Subject: [PATCH net v4 0/2] bpf: devmap: provide rxq after redirect
+Date: Wed, 11 Sep 2024 10:41:17 +0200
+Message-Id: <20240911-devel-koalo-fix-ingress-ifindex-v4-0-5c643ae10258@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <tencent_CF67CC46D7D2DBC677898AEEFBAECD0CAB06@qq.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAK1X4WYC/43NQWoDMQwF0KsEr6tgaVyn7ir3KF14bCURHexiT
+ 8yUMHevmVUogXT5pc/7N1W5CFf1vrupwk2q5NSDedmpcPHpzCCxZ0WajHb6FSI3nuAr+ynDSRa
+ QdC5cK8hJUuQFRkduiOaAcbSqK9+Fe21b+FCJZ/XZjxepcy4/22rD7fXvgYaAEJG8jgcTyIXjJ
+ Ok6l5xk2Ufe/Eb3pn1uEmgwwXukYI0ZzSNzuDfdc3PoprWEb+iQQ/B/zXVdfwG5w1HjfwEAAA=
+ =
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
+ David Ahern <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, 
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <brouer@redhat.com>, 
+ linux-kselftest@vger.kernel.org, 
+ Florian Kauer <florian.kauer@linutronix.de>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1330;
+ i=florian.kauer@linutronix.de; h=from:subject:message-id;
+ bh=QXVqM0ep9qjiaA9b9Ehze7JRk9JPQ8NbDOqiRkeXycs=;
+ b=owEBbQKS/ZANAwAKATKF5IolV+EkAcsmYgBm4Ve2q3uIsaisQd/QMc/3rfqJRbR7SwtNoe65X
+ nIw+lleztOJAjMEAAEKAB0WIQSG5cmCLvpm5t9g7UUyheSKJVfhJAUCZuFXtgAKCRAyheSKJVfh
+ JP3LEACT/JMK5dc0j/ZpyYvNchRugdPGrn2/HyYaJe4+SjWnG2t0ICv1OPuah+X7KF5GgJxNBI2
+ MfOCaBkVIdzRmtVBjLw9ot+DljSbv0N38kPvTW0SMvAn0B/sVsK4vJmbFl1Y7UHWJXk3aLmoMoe
+ eFKPKthMslryz4GF/6MAWaHOkmtzMqDe5dW63xJljBUtZMbrVACRqDkhDgcqcKGv6dkkoNfcvWe
+ Q2DAM1IeA2kjCZgB65EF0KRvjgeO8vnGxgn2CNi20aINHZQ7aVn5hXFYmzSDbJLX2lzvLmLMaFK
+ jfH9I16RsOFDKMQr0FXZ57OQhc6O1veAThcmpymcFqpsWl0dpqMgHpyJSkfw1gL7rx7iEhyfNdZ
+ 3oi0YY0wXJPhWS/DKohPZ2IDP5cFRtUUco7HAlsV6y2lDdyyJhm8lG9kH2UkynHDtrlEZT5rEzB
+ Kfdu7XjY5xcWLVsaov7mABBLu7L8Zc2RXypaM02ODoMRbAWzrOljVWkjwkXF3r9M3qpEPkOkI99
+ ArOT3Tb+TNJ4uRFFNI4qpkkjsy00b/RgfOL242mFvYbzzEh1mzrIrcmkY1Y5ByKgVBOmn796W/b
+ T21+vEVsuBAy32wl2u859P7bmhpOo0R82gvjYqe12oRilmZLPVsb1TFyTiSrrQ5uPic6kZ/RjzB
+ CkftbMV4Y312RxA==
+X-Developer-Key: i=florian.kauer@linutronix.de; a=openpgp;
+ fpr=F17D8B54133C2229493E64A0B5976DD65251944E
 
-+ Jeongjun Park, syzbot+c229849f5b6c82eba3c2
+rxq contains a pointer to the device from where
+the redirect happened. Currently, the BPF program
+that was executed after a redirect via BPF_MAP_TYPE_DEVMAP*
+does not have it set.
 
-On Tue, Sep 10, 2024 at 10:50:40PM +0800, Edward Adam Davis wrote:
-> The NULL pointer is interlink, return by hsr_port_get_hsr(), before using it,
-> it is necessary to add a null pointer check.
-> 
-> [Syzbot reported]
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000003: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
-> CPU: 0 UID: 0 PID: 11 Comm: kworker/u8:0 Not tainted 6.11.0-rc6-syzkaller-00180-g4c8002277167 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-> Workqueue: netns cleanup_net
-> RIP: 0010:send_hsr_supervision_frame+0x37/0xa90 net/hsr/hsr_device.c:290
-> Code: 53 48 83 ec 38 48 89 54 24 30 49 89 f7 49 89 fd 48 bb 00 00 00 00 00 fc ff df e8 54 a0 f9 f5 49 8d 6d 18 48 89 e8 48 c1 e8 03 <80> 3c 18 00 74 08 48 89 ef e8 7b e6 60 f6 48 8b 6d 00 4d 89 fc 49
-> RSP: 0018:ffffc90000007a70 EFLAGS: 00010206
-> RAX: 0000000000000003 RBX: dffffc0000000000 RCX: ffff88801ced3c00
-> RDX: 0000000000000100 RSI: ffffc90000007b40 RDI: 0000000000000000
-> RBP: 0000000000000018 R08: ffffffff8b995013 R09: 1ffffffff283c908
-> R10: dffffc0000000000 R11: ffffffff8b99ec30 R12: ffff888065030e98
-> R13: 0000000000000000 R14: ffff888065030cf0 R15: ffffc90000007b40
-> FS:  0000000000000000(0000) GS:ffff8880b8800000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f76c4f21cf8 CR3: 000000000e734000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <IRQ>
->  hsr_proxy_announce+0x23a/0x4c0 net/hsr/hsr_device.c:420
->  call_timer_fn+0x18e/0x650 kernel/time/timer.c:1792
->  expire_timers kernel/time/timer.c:1843 [inline]
->  __run_timers kernel/time/timer.c:2417 [inline]
->  __run_timer_base+0x66a/0x8e0 kernel/time/timer.c:2428
->  run_timer_base kernel/time/timer.c:2437 [inline]
->  run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2447
->  handle_softirqs+0x2c4/0x970 kernel/softirq.c:554
->  __do_softirq kernel/softirq.c:588 [inline]
->  invoke_softirq kernel/softirq.c:428 [inline]
->  __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
->  irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
->  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
->  sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
->  
-> Fixes: 5f703ce5c98 ("net: hsr: Send supervisory frames to HSR network with ProxyNodeTable data")
-> Reported-by: syzbot+c229849f5b6c82eba3c2@syzkaller.appspotmail.com
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Add bugfix and related selftest.
 
-Hi Edward,
+Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+---
+Changes in v4:
+- return -> goto out_close, thanks Toke
+- Link to v3: https://lore.kernel.org/r/20240909-devel-koalo-fix-ingress-ifindex-v3-0-66218191ecca@linutronix.de
 
-Thanks for your patch. I agree that it is correct.  But I also believe that
-it duplicates a slightly earlier patch by Jeongjun Park.
+Changes in v3:
+- initialize skel to NULL, thanks Stanislav
+- Link to v2: https://lore.kernel.org/r/20240906-devel-koalo-fix-ingress-ifindex-v2-0-4caa12c644b4@linutronix.de
 
-- [PATCH net] net: hsr: prevent NULL pointer dereference in hsr_proxy_announce()
-  https://lore.kernel.org/all/20240907190341.162289-1-aha310510@gmail.com/
+Changes in v2:
+- changed fixes tag
+- added selftest
+- Link to v1: https://lore.kernel.org/r/20240905-devel-koalo-fix-ingress-ifindex-v1-1-d12a0d74c29c@linutronix.de
 
-Unfortunately we don't seem to have a "duplicate" state in patchwork,
-so I'll go for "rejected".
+---
+Florian Kauer (2):
+      bpf: devmap: provide rxq after redirect
+      bpf: selftests: send packet to devmap redirect XDP
 
-It also seems that there are duplicate syzbot reports for this problem [1][2]
-I will attempt to mark [2] as a duplicate of [1].
+ kernel/bpf/devmap.c                                |  11 +-
+ .../selftests/bpf/prog_tests/xdp_devmap_attach.c   | 114 +++++++++++++++++++--
+ 2 files changed, 115 insertions(+), 10 deletions(-)
+---
+base-commit: 8e69c96df771ab469cec278edb47009351de4da6
+change-id: 20240905-devel-koalo-fix-ingress-ifindex-b9293d471db6
 
-[1] https://syzkaller.appspot.com/bug?extid=02a42d9b1bd395cbcab4
-[2] https://syzkaller.appspot.com/bug?extid=c229849f5b6c82eba3c2
-
+Best regards,
 -- 
-pw-bot: rejected
+Florian Kauer <florian.kauer@linutronix.de>
+
 
