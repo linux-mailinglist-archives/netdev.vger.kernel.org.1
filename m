@@ -1,200 +1,115 @@
-Return-Path: <netdev+bounces-127479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7932F9758AC
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:45:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 600269758AE
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:46:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0074F1F23C94
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:45:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92FBB1C22874
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:46:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64AD01AED2E;
-	Wed, 11 Sep 2024 16:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B379E1AC8B2;
+	Wed, 11 Sep 2024 16:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="A0GkQkbv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AlHtOJvS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-24.smtpout.orange.fr [80.12.242.24])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A111A76D1
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 16:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACE54D8B9
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 16:45:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726073113; cv=none; b=ini0s9VxSGXgGRpiz+6fgCl23+/sd5efngTK5hrDQVrVwRjlm/viPIDsa36z6daF1M6JLXxuJsaOaCcwRAExgY0getxNgibdzL2Fr38vME55g4IA5IqGu4N0vZxiNGAxuaYlYKRoichZs0LaClQs8nDNdkKyXDzEHuMrWPPj46A=
+	t=1726073158; cv=none; b=SU3VXq/pRr62F4Y84Z24/EbhHrhR+YKE5YEgRmCXpAzzP4B+3FjrTZBbChD2h5XDAdFl68F8fEISaU7Qw0WJGtqJOn8VBW2f3Sd3g7gxZPRYQC9ahHRxQsyIRE5YwoMg0vgjkGJvfS0thWy5SU2pluePhhLzyfGgvu4wvanxvIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726073113; c=relaxed/simple;
-	bh=0C4pyzHqU2uZnhHV1u90GXJZEhiWgCBkyp1OFAxXpnA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z3DplqtCTs0vY+P+3JwwPoStKk+TCgH0MhUfYMPJRxErKWDc9f2Avp3LH0UXPkKtJut/Y9sg7GNGd0s+GWsxpuTEe+U+wm/yxehAqrQtHo+zKdEBAF2n7uEoopkwZ/c9ZHAez0SyEWmi0RL8G+2sEK2xS2hM+aWPFqHjxKbkHQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=A0GkQkbv; arc=none smtp.client-ip=80.12.242.24
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id oQShseUj484dOoQShsRZiD; Wed, 11 Sep 2024 18:45:03 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1726073103;
-	bh=oz7sEm4TmuoZotUnLKmSUBPrxRGrP40SdxvR1To+EnU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=A0GkQkbvUPq172zCDeYgo+fq7+CnUC7327LK7/x4XxpQBseiW84xhnF+a99iKl81t
-	 nw+iYPAue49VDgxXXy/hyQTySlBIFjjL3hcxOz/qdOtWlYkWfi7/l/jk4DSb/G3TlA
-	 heMNXAuwKNlk9FnZxe24Y0ketlqwdNLqI9P7irKiqf7I/BF+2jWK51FwX0YexcU5aT
-	 IwGyNfcQ5/qEQEdFgCKMFQCvE+DtuxNDphmUcbS54e5OKJ8/5rqRMvWSU+hBXwbA/j
-	 Qry7OQJpJA3kSBXjAaT3fuMdT6Humk6TWZk+Y5slIDOb90cQfxp/OP5N9fJ/Cb5g5a
-	 jmsh9kKug9cOg==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Wed, 11 Sep 2024 18:45:03 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <e542d2fc-0587-45a3-bc58-ee0a078a626a@wanadoo.fr>
-Date: Wed, 11 Sep 2024 18:44:58 +0200
+	s=arc-20240116; t=1726073158; c=relaxed/simple;
+	bh=muxbbxDRVsv2QDMfqnXVSHvG5Uhx6abcDQ4fYY/K+bg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZyjeLHwgXEGSVcVXO3LhVD1RoSvWHjSGXYJ4ZbFPt1LWkVt37QqNw828l/NkRrwxgyYxkBUR9Mm514PD+W+lc7cIqZKB6Ygx6rJ3tnsOB6hNbK/EWVmJJUK/bwvV7Z2YFoxXFUHE5ACCw6wzp/Q43qaPxrf2LN+Sf136VBnHSTo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AlHtOJvS; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3e03b6d99c3so14982b6e.0
+        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 09:45:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726073156; x=1726677956; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RiJY8mEVntebwdt1Up6l8zcXWONEhIecSMn8XiTv8oU=;
+        b=AlHtOJvScC2VReoq9eyd+q4KnkP1Wqo429/4txEMFid8oX26uMK07MippCOq5hS83k
+         fRSsFtBuhu0yExOImI+JcFtQgkSgPYvgMbG+5TIyAtWRAau4plrYw5yABL64UDlHlSkS
+         la7a/+eRRvhzhZB2IB2P5Dm51k6nVCmxvpzhBWKGuCw/hdNBLTMD/MaaQ8/FGPur7FAi
+         zx9HaHJgC89FvtCok/pPITAio6tru1VqQBQYUrFa96N/BDJLscgVUnNtSWeKvVy9lDeO
+         H7ZeKfu65j/eWTHnEL1bv/VWP8zklnpee1FFkJJANK8Xu2I7NapKVrztPfxLXH52XJaZ
+         BM1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726073156; x=1726677956;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RiJY8mEVntebwdt1Up6l8zcXWONEhIecSMn8XiTv8oU=;
+        b=COPhskvz1k3GhbO9Utx8InJdNX257/SAqkvD0vvFrUt8XgGOVP4kIpnVvEcoXqkXp5
+         R4t5cRAUctIqL140R3S7a6SN33STwoqg7c5J3PFUJ9gJYSgS70SpEjX3xl1OppxYZh9O
+         n91na+4D+wS6hespheLuHc4r4r6GSNgwVhVtrPDEndcYxkfEQzHzjxzfS9SuvNtbmQSl
+         wADLe5Yxy6Ju/AnV/qzwW87rWKYI4HVYsaKzHAUVB3FxacCMaJxVNMRlx6tG9+9xFHeD
+         flml+t04lL3QjpDJYimMmuZXLrc8gB1KLrzyET1T1+MAdul+KuFcFGxi0ZFlURaN/ays
+         v0pg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvGWTcZBZL4fgb8gMzQJ7ppxX/p6CFcUpiQL8yiimIH+UiopXZWJ9vJTVXmsIMKMCp/8jR8zg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlrS0my+0fApxKxKoT4zN0iWIb/KSO87S4vN8jqj0ClsYXeWon
+	smLDbpXWoInYgkf+9CQ2jd3ZnA3Fw1K/sNZOqIQYTi58XNlAn/3x
+X-Google-Smtp-Source: AGHT+IHLsil175UcveB/DLKXzfNwquBwKPZzqvslqQ9oVYng4a/a0g4dPtkEYu1F6tfnXtQ1Vvbewg==
+X-Received: by 2002:a05:6808:3a16:b0:3e0:4441:8cb4 with SMTP id 5614622812f47-3e0681a163cmr3040017b6e.10.1726073156257;
+        Wed, 11 Sep 2024 09:45:56 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:6166:a54d:77fb:b10d])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fdde8cbsm186390a12.60.2024.09.11.09.45.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 09:45:55 -0700 (PDT)
+Date: Wed, 11 Sep 2024 09:45:54 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Dmitry Antipov <dmantipov@yandex.ru>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+	Jakub Sitnicki <jakub@cloudflare.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: [PATCH RFC net] net: sockmap: avoid race between
+ sock_map_destroy() and sk_psock_put()
+Message-ID: <ZuHJQitSaAYFRFNB@pop-os.localdomain>
+References: <20240905064257.3870271-1-dmantipov@yandex.ru>
+ <Zt3up5aOcu5icAUr@pop-os.localdomain>
+ <5d23bd86-150f-40a3-ab43-a468b3133bc4@yandex.ru>
+ <ZuEdeDBHKj1q9NlV@pop-os.localdomain>
+ <1ae54555-0998-4c76-bbb3-60e9746f9688@yandex.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V2 1/5] net: lan743x: Add SFP support check flag
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, bryan.whitehead@microchip.com,
- UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
- maxime.chevallier@bootlin.com, rdunlap@infradead.org, andrew@lunn.ch,
- Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
- linux-kernel@vger.kernel.org
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-2-Raju.Lakkaraju@microchip.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20240911161054.4494-2-Raju.Lakkaraju@microchip.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1ae54555-0998-4c76-bbb3-60e9746f9688@yandex.ru>
 
-Le 11/09/2024 à 18:10, Raju Lakkaraju a écrit :
-> Support for SFP in the PCI11x1x devices is indicated by the "is_sfp_support_en"
-> flag in the STRAP register. This register is loaded at power up from the
-> PCI11x1x EEPROM contents (which specify the board configuration).
+On Wed, Sep 11, 2024 at 12:51:04PM +0300, Dmitry Antipov wrote:
+> On 9/11/24 7:32 AM, Cong Wang wrote:
 > 
-> Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> ---
-> Change List:
-> ============
-> V1 -> V2:
->    - Change variable name from "chip_rev" to "fpga_rev"
-> V0 -> V1:
->    - No changes
+> > I never tested the RDS code (hence why I didn't post it). But for the warning
+> > itself, actually disabling CONFIG_RDS made it disappear on my side, yet
+> > another reason why I suspect it is RDS related.
 > 
->   drivers/net/ethernet/microchip/lan743x_main.c | 34 +++++++++++++++----
->   drivers/net/ethernet/microchip/lan743x_main.h |  3 ++
->   2 files changed, 30 insertions(+), 7 deletions(-)
+> OTOH sockmap code depends from CONFIG_BPF_SYSCALL. So I'm pretty sure that
+> there are more sockmap users beyond RDS and turning off CONFIG_RDS by itself
+> is not too useful for further investigations of this case.
 > 
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-> index 4dc5adcda6a3..20a42a2c7b0e 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
-> @@ -28,9 +28,9 @@
->   
->   #define RFE_RD_FIFO_TH_3_DWORDS	0x3
->   
-> -static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
-> +static int pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
->   {
-> -	u32 chip_rev;
-> +	u32 fpga_rev;
->   	u32 cfg_load;
->   	u32 hw_cfg;
->   	u32 strap;
-> @@ -41,7 +41,7 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
->   	if (ret < 0) {
->   		netif_err(adapter, drv, adapter->netdev,
->   			  "Sys Lock acquire failed ret:%d\n", ret);
-> -		return;
-> +		return ret;
->   	}
->   
->   	cfg_load = lan743x_csr_read(adapter, ETH_SYS_CONFIG_LOAD_STARTED_REG);
-> @@ -55,10 +55,15 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
->   			adapter->is_sgmii_en = true;
->   		else
->   			adapter->is_sgmii_en = false;
-> +
-> +		if ((strap & STRAP_SFP_USE_EN_) && (strap & STRAP_SFP_EN_))
-> +			adapter->is_sfp_support_en = true;
-> +		else
-> +			adapter->is_sfp_support_en = false;
->   	} else {
-> -		chip_rev = lan743x_csr_read(adapter, FPGA_REV);
-> -		if (chip_rev) {
-> -			if (chip_rev & FPGA_SGMII_OP)
-> +		fpga_rev = lan743x_csr_read(adapter, FPGA_REV);
-> +		if (fpga_rev) {
-> +			if (fpga_rev & FPGA_SGMII_OP)
->   				adapter->is_sgmii_en = true;
->   			else
->   				adapter->is_sgmii_en = false;
-> @@ -66,8 +71,21 @@ static void pci11x1x_strap_get_status(struct lan743x_adapter *adapter)
->   			adapter->is_sgmii_en = false;
->   		}
->   	}
-> +
-> +	if (adapter->is_pci11x1x && !adapter->is_sgmii_en &&
-> +	    adapter->is_sfp_support_en) {
-> +		netif_err(adapter, drv, adapter->netdev,
-> +			  "Invalid eeprom cfg: sfp enabled with sgmii disabled");
-> +		return -EINVAL;
-> +	}
-> +
->   	netif_dbg(adapter, drv, adapter->netdev,
->   		  "SGMII I/F %sable\n", adapter->is_sgmii_en ? "En" : "Dis");
-> +	netif_dbg(adapter, drv, adapter->netdev,
-> +		  "SFP support %sable\n", adapter->is_sfp_support_en ?
-> +		  "En" : "Dis");
 
-Hi,
+I guess you totally misunderstand my point. As a significant sockmap
+contributor, I am certainly aware of sockmap users. My point is that I
+needed to narrow down the problem to CONFIG_RDS when I was debugging it.
 
-Maybe using str_enable_disable() or str_enabled_disabled()?
+So, please let me know if you can still reproduce this after disabling
+CONFIG_RDS, because I could not reproduce it any more. If you can,
+please kindly share the stack trace without rds_* functions.
 
-CJ
-
-> +
-> +	return 0;
->   }
->   
->   static bool is_pci11x1x_chip(struct lan743x_adapter *adapter)
-> @@ -3470,7 +3488,9 @@ static int lan743x_hardware_init(struct lan743x_adapter *adapter,
->   		adapter->max_tx_channels = PCI11X1X_MAX_TX_CHANNELS;
->   		adapter->used_tx_channels = PCI11X1X_USED_TX_CHANNELS;
->   		adapter->max_vector_count = PCI11X1X_MAX_VECTOR_COUNT;
-> -		pci11x1x_strap_get_status(adapter);
-> +		ret = pci11x1x_strap_get_status(adapter);
-> +		if (ret < 0)
-> +			return ret;
->   		spin_lock_init(&adapter->eth_syslock_spinlock);
->   		mutex_init(&adapter->sgmii_rw_lock);
->   		pci11x1x_set_rfe_rd_fifo_threshold(adapter);
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-> index 8ef897c114d3..f7e96496600b 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.h
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.h
-> @@ -36,6 +36,8 @@
->   
->   #define STRAP_READ			(0x0C)
->   #define STRAP_READ_USE_SGMII_EN_	BIT(22)
-> +#define STRAP_SFP_USE_EN_		BIT(31)
-> +#define STRAP_SFP_EN_			BIT(15)
->   #define STRAP_READ_SGMII_EN_		BIT(6)
->   #define STRAP_READ_SGMII_REFCLK_	BIT(5)
->   #define STRAP_READ_SGMII_2_5G_		BIT(4)
-> @@ -1079,6 +1081,7 @@ struct lan743x_adapter {
->   	u8			max_tx_channels;
->   	u8			used_tx_channels;
->   	u8			max_vector_count;
-> +	bool			is_sfp_support_en;
->   
->   #define LAN743X_ADAPTER_FLAG_OTP		BIT(0)
->   	u32			flags;
-
+Thanks.
 
