@@ -1,154 +1,160 @@
-Return-Path: <netdev+bounces-127167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77D5D974724
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 02:10:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F9D797472F
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 02:17:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DE302877EA
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 00:10:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6E702846F0
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 00:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921CE10F1;
-	Wed, 11 Sep 2024 00:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E551388;
+	Wed, 11 Sep 2024 00:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eFXBisme"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="a3eZSySl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62328161;
-	Wed, 11 Sep 2024 00:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D0D7EBE;
+	Wed, 11 Sep 2024 00:17:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726013451; cv=none; b=bMYZN7uGseTnMfd44X6dvXI3zBTNUTGyFkYgGe1kMlP5ySJ4ibSxAUqNHjNCDYCnLqHeBAFTzNdVVhXWSC3xiHhX0dqvmjDGGDZ0Tne65+evL/pivxKm0m8ZlhU0FAPzfqeJ9qigwcQSioPlUEMF5yhoEm2FJjg/ChIOXxhiPrQ=
+	t=1726013837; cv=none; b=hxfpgVx0QLTpCo8ANfa9XrIkTdwS4DZTPP2EO+n7YEwaKl1Ob/BJTaj9fuc+pnL7ezBNDswzg6AlCHDaFqEtZbbyUuL3SMHQb5JMKbNhjNpcKx7wbTRTSAUzK05Gx/gsSq8eKv04gNkiy9e6CavvDrsZTQGsJ+oQzmeJyyEGzIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726013451; c=relaxed/simple;
-	bh=dHIdRcR5mTgJHf2WyepD+aXCWnQw4zMiEb95qQFo4WM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gJY5BCCZeW2Wp3UGcT5GBmzYHvUsLpWxhNyJAg9BBR4q/vgORGFfNVdvelQ1cq1Q05Jmlfur97rYPxFfV9q/esRfRYq/L0KO6lW+4S52WmnUwiCDYS4ftJ7txGS37OhAkqYv8WtxwdhfogSlmPcHVi+I1b6tcCEHSzQCG6kkYig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eFXBisme; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2AB50C4CEC3;
-	Wed, 11 Sep 2024 00:10:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726013450;
-	bh=dHIdRcR5mTgJHf2WyepD+aXCWnQw4zMiEb95qQFo4WM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eFXBismetIxuW8kAtXFmYRkZcZF3t+EsfiMQLTAyT/Qw+Vei8rQMQuGeobJfa3sU8
-	 3cPQWiXup1KV7XisZItr+2jTThuIKUHO6ULP2ozODLV+puuS6sHOOtHtBu3w6vJjR7
-	 p5DhIKgLX1a2pg7TmFfKKJmDkw0fRY2GRSr4dgu/P7eIpgUfwgwN/oFokiK9vgePub
-	 OK2UYkcEgsF/tKowrZEfA5z7i8w6CzcIGb6mVWfGjwr9MxdewwN+UzWl2hQ4tY8Uut
-	 5l/crkMoV7srMvPmYqiO/gruQBCEvsrsIVytpnakjvO2sbpIV2nEDF4K8A7mR0VaQy
-	 AUQ3vmKuClQPA==
-Date: Tue, 10 Sep 2024 17:10:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, skhawaja@google.com,
- sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
- sridhar.samudrala@intel.com, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v2 1/9] net: napi: Add napi_storage
-Message-ID: <20240910171048.768a62b0@kernel.org>
-In-Reply-To: <ZuBvgpW_iRDjICTH@LQ3V64L9R2.homenet.telecomitalia.it>
-References: <20240908160702.56618-1-jdamato@fastly.com>
-	<20240908160702.56618-2-jdamato@fastly.com>
-	<20240909164039.501dd626@kernel.org>
-	<Zt_jn5RQAndpKjoE@LQ3V64L9R2.homenet.telecomitalia.it>
-	<20240910075217.45f66523@kernel.org>
-	<ZuBvgpW_iRDjICTH@LQ3V64L9R2.homenet.telecomitalia.it>
+	s=arc-20240116; t=1726013837; c=relaxed/simple;
+	bh=BYzWPhWbZ5AJad5Uxdm18cFl6WCX0WmPKaMV6WUroww=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L4MCWuRlZVJswTE/Zoq/K+RldAclKTckjQdIuVWidF0HJP4r8WYYcpfl7LwEECNMwqbaRC+PH3CQj6txraSHWLIWDnKFwTK5KTPhMoWdA9YYm0KJ0liMih7jRQ+tEqAgZtgV87V53Dt12lIO5Z7N4McCOZDiFkywKmxe1y2IURA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=a3eZSySl; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1726013836; x=1757549836;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=I76F7c150W4LR2B0J953rkue5lkGVCE1RnkJN1D2pZk=;
+  b=a3eZSySlqud0NaWSyUdJVdcvESqDskOXeKbbT+uvXc+7+jKhGDrUfq0B
+   mo6suIc3K5zR/O/M+rTwjbxO1htaQQcMnnw/3Lcs/fYSxMBACRYANrea1
+   murow5r888HGAAgN4nEGdcU4SvP1+jUtwh4R/SbBZWyL/g/7lIOWy9hrU
+   k=;
+X-IronPort-AV: E=Sophos;i="6.10,218,1719878400"; 
+   d="scan'208";a="452721937"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2024 00:17:10 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:8428]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.21.152:2525] with esmtp (Farcaster)
+ id a6c5571e-3fa2-4822-ab9e-52f5220bb29a; Wed, 11 Sep 2024 00:17:09 +0000 (UTC)
+X-Farcaster-Flow-ID: a6c5571e-3fa2-4822-ab9e-52f5220bb29a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 11 Sep 2024 00:17:08 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.20) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 11 Sep 2024 00:17:06 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <rao.shoaib@oracle.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzbot+8811381d455e3e9ec788@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in unix_stream_read_actor (2)
+Date: Tue, 10 Sep 2024 17:16:58 -0700
+Message-ID: <20240911001658.27733-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <1b494cee-560c-48f0-99d7-60561c91b4f1@oracle.com>
+References: <1b494cee-560c-48f0-99d7-60561c91b4f1@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D032UWA001.ant.amazon.com (10.13.139.62) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, 10 Sep 2024 18:10:42 +0200 Joe Damato wrote:
-> On Tue, Sep 10, 2024 at 07:52:17AM -0700, Jakub Kicinski wrote:
-> > Hm, fair point. In my mind I expected we still add the fast path fields
-> > to NAPI instances. And the storage would only be there to stash that
-> > information for the period of time when real NAPI instances are not
-> > present (napi_disable() -> napi_enable() cycles).  
-> 
-> I see, I hadn't understood that part. It sounds like you were
-> thinking we'd stash the values in between whereas I thought we were
-> reading from the struct directly (hence the implementation of the
-> static inline wrappers).
-> 
-> I don't really have a preference one way or the other.
-
-Me neither. I suspect having the fields in napi_struct to be slightly
-more optimal. No need for indirect accesses via napi->storage->$field,
-and conditions to check if napi->storage is set. We can make sure we
-populate the fields in NAPIs when they are created and when sysfs writes
-happen. So slightly better fastpath locality at the expense of more
-code on the control path keeping it in sync.
-
-FWIW the more we discuss this the less I like the word "storage" :)
-If you could sed -i 's/storage/config/' on the patches that'd great :)
-
-> > > I don't think I realized we settled on the NAPI ID being persistent.
-> > > I'm not opposed to that, I just think I missed that part in the
-> > > previous conversation.
-> > > 
-> > > I'll give it a shot and see what the next RFC looks like.  
+From: Shoaib Rao <rao.shoaib@oracle.com>
+Date: Tue, 10 Sep 2024 16:42:33 -0700
+> On 9/10/2024 3:59 PM, Kuniyuki Iwashima wrote:
+> > From: Shoaib Rao <rao.shoaib@oracle.com>
+> > Date: Tue, 10 Sep 2024 15:30:08 -0700
+> >> My fellow engineer let's first take a breath and calm down. We both are
+> >> trying to do the right thing. Now read my comments below and if I still
+> >> don't get it, please be patient, maybe I am not as smart as you are.
+> >>
+> >> On 9/10/2024 2:53 PM, Kuniyuki Iwashima wrote:
+> >>> From: Shoaib Rao <rao.shoaib@oracle.com>
+> >>> Date: Tue, 10 Sep 2024 13:57:04 -0700
+> >>>> The commit Message:
+> >>>>
+> >>>> syzbot reported use-after-free in unix_stream_recv_urg(). [0]
+> >>>>
+> >>>> The scenario is
+> >>>>
+> >>>>      1. send(MSG_OOB)
+> >>>>      2. recv(MSG_OOB)
+> >>>>         -> The consumed OOB remains in recv queue
+> >>>>      3. send(MSG_OOB)
+> >>>>      4. recv()
+> >>>>         -> manage_oob() returns the next skb of the consumed OOB
+> >>>>         -> This is also OOB, but unix_sk(sk)->oob_skb is not cleared
+> >>>>      5. recv(MSG_OOB)
+> >>>>         -> unix_sk(sk)->oob_skb is used but already freed
+> >>>
+> >>> How did you miss this ?
+> >>>
+> >>> Again, please read my patch and mails **carefully**.
+> >>>
+> >>> unix_sk(sk)->oob_sk wasn't cleared properly and illegal access happens
+> >>> in unix_stream_recv_urg(), where ->oob_skb is dereferenced.
+> >>>
+> >>> Here's _technical_ thing that you want.
+> >>
+> >> This is exactly what I am trying to point out to you.
+> >> The skb has proper references and is NOT de-referenced because
+> >> __skb_datagram_iter() detects that the length is zero and returns EFAULT.
 > > 
-> > The main reason to try to make NAPI ID persistent from the start is that
-> > if it works we don't have to add index to the uAPI. I don't feel
-> > strongly about it, if you or anyone else has arguments against / why
-> > it won't work.  
-> 
-> Yea, I think not exposing the index in the uAPI is probably a good
-> idea? Making the NAPI IDs persistent let's us avoid that so I can
-> give that a shot because it's easier from the user app perspective,
-> IMO.
-
-Right, basically we can always add it later. Removing it later won't
-be possible :S
-
-> > > Only one way to find out ;)
-> > > 
-> > > Separately: your comment about documenting rings to NAPIs... I am
-> > > not following that bit.
-> > > 
-> > > Is that a thing you meant should be documented for driver writers to
-> > > follow to reduce churn ?  
+> > It's dereferenced as UNIXCB(skb).consumed first in
+> > unix_stream_read_actor().
 > > 
-> > Which comment?  
 > 
-> In this message:
-> 
-> https://lore.kernel.org/netdev/20240903124008.4793c087@kernel.org/
-> 
-> You mentioned this, which I interpreted as a thing that core needs
-> to solve for, but perhaps this intended as advice for drivers?
-> 
->   Maybe it's enough to document how rings are distributed to NAPIs?
->   
->   First set of NAPIs should get allocated to the combined channels,
->   then for remaining rx- and tx-only NAPIs they should be interleaved
->   starting with rx?
->   
->   Example, asymmetric config: combined + some extra tx:
->   
->       combined        tx
->    [0..#combined-1] [#combined..#combined+#tx-1]
->   
->   Split rx / tx - interleave:
->   
->    [0 rx0] [1 tx0] [2 rx1] [3 tx1] [4 rx2] [5 tx2] ...
->   
->   This would limit the churn when changing channel counts.
+> That does not matter as the skb still has a refernce. That is why I 
+> asked you to print the reference count.
 
-Oh, yes. I'm not sure _where_ to document it. But if the driver supports
-asymmetric ring count or dedicated Rx and Tx NAPIs - this is the
-recommended way to distributing the rings to NAPIs, to, as you say,
-limit the config churn / mismatch after ring count changes.
+It does matter.  Please read carefully again...
+
+
+> > Then, 1 byte of data is copied without -EFAULT because
+> > unix_stream_recv_urg() always passes 1 as chunk (size) to
+> > recv_actor().
+> 
+> Can you verify this because IIRC it is not de-refernced. AFAIK, KASAN 
+> does nothing that would cause returning EFAULT and if KASAN does spot 
+> this illegal access why is it not pancing the system or producing a report.
+> 
+> This is where we disagree.
+
+The returned value from recv_actor() was exact 1 when KASAN was off.
+It was -EFAULT only when KASAN was on.
+
+Anyway, -EFAULT is not that important and I'm not so interested in how
+KASAN triggers that.  What's important is the fact that the first UAF
+is UNIXCB() and the bug happens before that.
+
+[...]
+> > Note this is on top of net-next where no additional refcnt is taken
+> > for OOB
+
+Also in my patch:
+
+  The recent commit 8594d9b85c07 ("af_unix: Don't call skb_get() for OOB
+  skb.") uncovered the issue.
 
