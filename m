@@ -1,107 +1,92 @@
-Return-Path: <netdev+bounces-127567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66DCA975BD7
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:37:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6321E975C09
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:47:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 993E41C21241
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:37:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D53DCB23A2F
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:47:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849E414C5AF;
-	Wed, 11 Sep 2024 20:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28371BC07D;
+	Wed, 11 Sep 2024 20:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uCmmK6Mk"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cVdNGgsw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D124B14D6E9
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45601C2E9
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:45:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726087017; cv=none; b=FYr3aizQAC/DderrC96vDVC6k9Z6tFTsLlQYUFMG2pY+zVtJXDuyfusnCZK+qknWGWH8XxsT/zc4eZCqlbAXguyT3c1L/Id7ZawEIgQRZYYmkzua/YqHsslbk9jbPzyzLr7YM9voT5sdHeduV0+FvXXIo8vnHBwOrwtcuSWqbFo=
+	t=1726087524; cv=none; b=X1GiFuLMvW2tLwhNOmAbnJko71aqBrhNNobUhD0XtM8GiNntrmc/oaS/eNhOBHHCwZA+CSye0w8WbH6yEcRdcekf7s4IZ1kYaHQXUx3OXugEjPFdhYM3zO7dGGfEGIjWASlCcRzT4maTdiGV5ALRl9bpxvGlNeSmhp3VjXlNZMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726087017; c=relaxed/simple;
-	bh=Uw9yAXR8rk4p9Ffamo+FQ8Lvj3P8KR87sahb6gOn9js=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BUKTGHeLPiYRHsrdaRjkGgkIYuuSDd3XS4Wp5VI7LHunn0OqJG+S8V+aUBGjAdwQlcU9DBtTXjq1L4nIvOnb3xWtjDQK7RsCHmPhlIIq5tBOVHQDJWkbO+74si2UP4nOzoUpYQszM2mqa23WKzSwwMayazsjeoY7F3C7heY3MhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uCmmK6Mk; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a8d0d0aea3cso29124766b.3
-        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 13:36:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726087014; x=1726691814; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uw9yAXR8rk4p9Ffamo+FQ8Lvj3P8KR87sahb6gOn9js=;
-        b=uCmmK6Mkgqqr+cDYCM9EtiXzngEgUgjzDne9WsRHG0jUSycpJ1P95ZsD50HOxWMrgH
-         fgHIxBe6dKn0Bv6G/Oc3PAf6279ARTg9Ejpu6SRCttBqMsaLyOqW4P8sWeC7r/4tRogP
-         5mUAIq4HdZT1cp8EEZXRvs4r3dKO3xS1JYq/iUPA204v3O9RR9lbwRifZoCa12IdQniQ
-         +y99/QrzjadlvVPdonc6z4dzD7+VbZ0eS+8xbNrrYsRMX/NKfDFJYJELIGuhgDDa8xmC
-         gZc26BozrONm0mblumOSgRxqO9bASr/EvRUYkvgFU/wzZCOpvzPyiDq/7hy/FNeaygbl
-         Ul1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726087014; x=1726691814;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Uw9yAXR8rk4p9Ffamo+FQ8Lvj3P8KR87sahb6gOn9js=;
-        b=AAKJGZSIl8WXL3eBN4EvgY0pkz3kExgvvTBMS51/hz/SleIWaVfcf7MB0K3rAJbVtv
-         sVO32YoDKePmmfH2GTTtPU2V6yc5hb5VztstsTK4lEoi4rTlhfoqVGDykLtnZjMx03n5
-         U+e3aaCRc+duwv/wWBAmQoyxOz+YdNtJGuDBLqWlPlMu3sHJF1zmFyVehtn3cL305B7I
-         B/UMNZmXQnIdMNaojRh4VF0lD+DuPX2HL5d5JkkMS+mdlON5A1Ycsd8ctm+ZkA7R2JxJ
-         wSegVGJ7LkouGtjRnivIEqCX6vw0XokKxKEsxUmhi/wGwk/lDkBBkAedq0LSM/snNpDH
-         GC8w==
-X-Forwarded-Encrypted: i=1; AJvYcCWuELSGn+3dv2ci3Fx1X2ox5b8PCU/LAEdq5NrMxAmEfSlmbFDGLRcLIZF3rj/EwUzZTA3z+0A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweiVGyxbIZwbg+tEx6hYwO6dFuY0eEzXzzFenVxDRFU4Bxqn/4
-	U9/KrPijAA1uX1heMN12BxPvWQWAxtQBvX9cIEMQCqaF5zR6e9X99sXeWlxToHCn6ThYbHu2PPB
-	4NqWcbzBnbFTtG2H8PT4EfKG9EKyXBU8H/qc=
-X-Google-Smtp-Source: AGHT+IFlRA/31VVjyLO6IgPZgimZuNZEpPlP6ku769FDbIwcGpgPhwzV47lU293LtufUhrwsWjhHkWk8LifM+eC1/3o=
-X-Received: by 2002:a17:906:f592:b0:a8d:3705:4101 with SMTP id
- a640c23a62f3a-a90294cdcc7mr55683966b.39.1726087013614; Wed, 11 Sep 2024
- 13:36:53 -0700 (PDT)
+	s=arc-20240116; t=1726087524; c=relaxed/simple;
+	bh=D1fHgIdQfkUBtWdVqUq5gZu7uUUn9awQLJClmfSX02c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kVZWyZulqhDH4To2W3GNMpzO7XJq6SL/dlzo5Gj4yPFN9V7CLDcR9wf0S65CoKHlYcgTfVfOJnGuCmFwDKjJb3RHOmajq2LCvDhtsZ9gZgbRfFyzjsV6M0t3EvpxoNGnyfn0l4J3tmwb/1wAYZPNF9qxhaRuzaCdsOiG1kuPl7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cVdNGgsw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NKxpnKThnuRb1DCyK1P3S9wNVBFay/ooTSE9FrEWQw4=; b=cVdNGgswF/2o5LdM2Np9IDF3i/
+	M17YKzdodL6A3UBSdzU+V5LDdIHSZE5qJEh7EWbfdlIwuAwLraB0CWrUqx9KreaHIL1uUwma4EfJq
+	5Ju3ETvZp7vILeygG+6mt7Juz8ixM3yWlSewB56SCiGOxdW4V+q4jxiYX3XmRt9V8Sm0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1soUD9-007Fce-OD; Wed, 11 Sep 2024 22:45:11 +0200
+Date: Wed, 11 Sep 2024 22:45:11 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexander Duyck <alexanderduyck@fb.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/5] eth: fbnic: add initial PHC support
+Message-ID: <4c720c2e-7a60-4f94-96bd-94ab59fa8905@lunn.ch>
+References: <20240911124513.2691688-1-vadfed@meta.com>
+ <20240911124513.2691688-3-vadfed@meta.com>
+ <006042c0-e1d5-4fbc-aa7f-94a74cfbef0e@lunn.ch>
+ <c1003a1b-cf6f-4332-b0c7-5461a164097e@linux.dev>
+ <20240911131035.74c5e8f9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-0-2d52f4e13476@linutronix.de>
- <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-13-2d52f4e13476@linutronix.de>
-In-Reply-To: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-13-2d52f4e13476@linutronix.de>
-From: John Stultz <jstultz@google.com>
-Date: Wed, 11 Sep 2024 13:36:41 -0700
-Message-ID: <CANDhNCqoaK0o_8Us2BgDb7DjEU-f3YmXE6iOA+SBqX8o_jSfRw@mail.gmail.com>
-Subject: Re: [PATCH 13/21] ntp: Move time_adj/ntp_tick_adj into ntp_data
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Miroslav Lichvar <mlichvar@redhat.com>, Richard Cochran <richardcochran@gmail.com>, 
-	Christopher S Hall <christopher.s.hall@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911131035.74c5e8f9@kernel.org>
 
-On Wed, Sep 11, 2024 at 6:18=E2=80=AFAM Anna-Maria Behnsen
-<anna-maria@linutronix.de> wrote:
->
-> From: Thomas Gleixner <tglx@linutronix.de>
->
-> Continue the conversion from static variables to struct based data.
->
-> No functional change.
->
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+On Wed, Sep 11, 2024 at 01:10:35PM -0700, Jakub Kicinski wrote:
+> On Wed, 11 Sep 2024 20:49:51 +0100 Vadim Fedorenko wrote:
+> > >> + * TBD: alias u64_stats_sync & co. with some more appropriate names upstream.  
+> > > 
+> > > This is upstream, so maybe now is a good time to decide?  
+> > 
+> > That's good question. Do we need another set of helpers just because of 
+> > names? Obviously, the internals will be the same sequence magic.
+> 
+> Good question. To be clear we want a seq lock that goes away on 64b
+> since what it protects is accessed on the fast path (potentially per
+> packet). We could s/u64_stats/u64_seq/ the existing helpers. But that
+> sounds like a lot for a single user. Dunno..
 
-Running out of steam to review them all closely, but they look sane
-and simple, so for the rest of this set:
-Acked-by: John Stultz <jstultz@google.com>
+It does sound like a lot of a single user.
 
-thanks
--john
+And what is the likelihood of this device ever being used on a 32 bit
+system? It is a server class NIC. Are there still 32 bit servers in
+use?
+
+Maybe "depends on 64BIT" with a good commit message why?
+
+	Andrew
 
