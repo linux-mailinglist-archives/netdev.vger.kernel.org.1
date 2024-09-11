@@ -1,132 +1,121 @@
-Return-Path: <netdev+bounces-127324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C17A974FDF
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:41:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E033975058
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EFF91C22A70
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:41:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15CA61F2240A
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C40715DBB3;
-	Wed, 11 Sep 2024 10:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB12186E4F;
+	Wed, 11 Sep 2024 11:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p+01lOju"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=usama.anjum@collabora.com header.b="cl6W/o8+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A0039AEB
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 10:40:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726051246; cv=none; b=o/3GT2VLs+p7n15oSl8WfNYswnAOB5E6qTTVdYIwpuvZzk93fsIysKZUVOUwOINgW5ct2lTV5dpghmWvWAk5Hl+xlmZEApCWMhkmGdVKGAzn3dy3WHXTCdbU7D8aa4ZRLrrwgXEL5nXloKHHGMKIEaxTAqjEBVpjzjfa2EkA0Pk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726051246; c=relaxed/simple;
-	bh=fmtW2qHDJCExAMPhfQra5Vcs4sdEJaS6wDsLMjOCI18=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=upQQOGzrEo0DBd+1g7G5VjAuXEVfuSFXFMw2mQqRpw4IRZPguv46QUL3M6DK0VSQrNQ1dyEmtZFS6Ri1hFcEk66Jmij3kODEmK39OFqPhPrDAC+NedQaqHTqf5xQ7l4iSB0J5tvWqb9Sl7Yg8d9OdctjfMyT9ao9UZuPp7S+dzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p+01lOju; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BD99C4CEC5;
-	Wed, 11 Sep 2024 10:40:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726051245;
-	bh=fmtW2qHDJCExAMPhfQra5Vcs4sdEJaS6wDsLMjOCI18=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p+01lOjuJ/jXsLkaUQT2Px2rAuiiPbPD42p9tPo+eCXsw9wSVhABeO51ymwq4evWb
-	 oM4pvZxGs4wL9qseLKaRt3QXG8DgrOqB5Nh1JtXcSZgcqHTYvNIwwx/baJEPlbAOfs
-	 cu5Sp246J/PAHDiOyxhj0ovJ/vzLiznb5o/OMLI4nR57a/+aQRScd/s2TQwyRz1cE2
-	 aXQw1gTsJUqrYUc79kx7DvCugd76gLNqO7DnE5IpeOcezS8Bf7lFsZv3gdg6ueY+RM
-	 6150uc3kMRnQX0NysS8w+BleHr3UlWDKR16aEjFIZTTfThBfYEdYinftXsmeE5DcKy
-	 HQKTzRXJa89yQ==
-Date: Wed, 11 Sep 2024 13:40:40 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Feng Wang <wangfe@google.com>, netdev@vger.kernel.org,
-	antony.antony@secunet.com
-Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
-Message-ID: <20240911104040.GG4026@unreal>
-References: <20240822200252.472298-1-wangfe@google.com>
- <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
- <20240831173934.GC4000@unreal>
- <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
- <20240902094452.GE4026@unreal>
- <Zt67MfyiRQrYTLHC@gauss3.secunet.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B849185B42;
+	Wed, 11 Sep 2024 11:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726052409; cv=pass; b=XbEiX0LPeqhMhIxHWtNiM21HFMFkc5EtC7mW12Z3312ptQq3O9H3XbG+Z6L2/ji+9dTBYkj8H+jvmpyxxeuXac7ycM/uW5ZyEun6wUhYXHtImft9PY8ocLI3pqh7PhEUKHue29p98EI1/cDWIo4hJtiXeLXWNbiLNCTyum65XTQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726052409; c=relaxed/simple;
+	bh=Q2C48jeUh9GAAXa/UipFpoOJmtlF20nq9q1sZnfECOI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UKQTX0Ma8KgMcXR2e5XsaDQ94vyRiRy1477cQz38mGneWbGr5dg83rGcEDm/KHK9SBShindFdo4C7qlwJOZMhyDahu0sL1VZNzCQMSAeXsphCUml2gGpUUA26f/oKHvGGFt6Cfe7tw2ZpUUsaQMy+QpBLRoJn0KYatZnIAs/iyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=usama.anjum@collabora.com header.b=cl6W/o8+; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1726052383; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=C13aku2Ns5KTPQ6QTr7s6rIwh3q7fWSpKQuXgRkkblDCQ+YadMUlFaC0/YMHxv1S5n9u1N/ILDsHJEi4Sk4bSdSanZHvdxWsjji5mGOLp0UkoA1FkrfUWsaNHonxrMRot50NZ/4g71/Ji1lULtF4uOKZDEFacEVc6rbrJU0NXCU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1726052383; h=Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=kStjaEMg3PiBnNUf6GpKxxqL6ll8T7NBJDyR23ubwac=; 
+	b=ngITzAGI/qSPOEhf4hSomnINxm7s0Dt7HMJSal3Uqg7+p2nv/MHhsbSf9t+nF/9HjkE/9+3uS0PvsTRpb7QtW476osiYqJ3EAXaan4P25gqxJrKvBpZtC7UgBxbeDlhlCtlrM3XJkEYZPcbYCbnHaVPDtrW84evGSeC1Gf6zmUA=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=usama.anjum@collabora.com;
+	dmarc=pass header.from=<usama.anjum@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1726052383;
+	s=zohomail; d=collabora.com; i=usama.anjum@collabora.com;
+	h=From:From:To:To:Cc:Cc:Subject:Subject:Date:Date:Message-Id:Message-Id:MIME-Version:Content-Transfer-Encoding:Reply-To;
+	bh=kStjaEMg3PiBnNUf6GpKxxqL6ll8T7NBJDyR23ubwac=;
+	b=cl6W/o8++XOzCMW5ZI0FUBup6OKhX6qBx5VAy8AtiXfzMzLoMz8pE7Vr8XSuoYLe
+	4qpZH0Qy86rFxZWo0nGBftY6OCAOByulc4ffg3JlDBzMoWrTiTpCPvqesue5qxG3KK6
+	72HBLeWIPwwucChGriQ9LyA9TtnMxjYRW6hvTToY=
+Received: by mx.zohomail.com with SMTPS id 1726052381179761.9736664066929;
+	Wed, 11 Sep 2024 03:59:41 -0700 (PDT)
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+To: Chris Snook <chris.snook@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
+	kernel@collabora.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: ethernet: ag71xx: Remove dead code
+Date: Wed, 11 Sep 2024 15:59:24 +0500
+Message-Id: <20240911105924.4028423-1-usama.anjum@collabora.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zt67MfyiRQrYTLHC@gauss3.secunet.de>
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-On Mon, Sep 09, 2024 at 11:09:05AM +0200, Steffen Klassert wrote:
-> On Mon, Sep 02, 2024 at 12:44:52PM +0300, Leon Romanovsky wrote:
-> > On Mon, Sep 02, 2024 at 09:44:24AM +0200, Steffen Klassert wrote:
-> > > > 
-> > > > Steffen,
-> > > > 
-> > > > What is your position on this patch?
-> > > > It is the same patch (logically) as the one that was rejected before?
-> > > > https://lore.kernel.org/all/ZfpnCIv+8eYd7CpO@gauss3.secunet.de/
-> > > 
-> > > This is an infrastructure patch to support routing based IPsec
-> > > with xfrm interfaces. I just did not notice it because it was not
-> > > mentioned in the commit message of the first patchset. This should have
-> > > been included into the packet offload API patchset, but I overlooked
-> > > that xfrm interfaces can't work with packet offload mode. The stack
-> > > infrastructure should be complete, so that drivers can implement
-> > > that without the need to fix the stack before.
-> > 
-> > Core implementation that is not used by any upstream code is rarely
-> > right thing to do. It is not tested, complicates the code and mostly
-> > overlooked when patches are reviewed. The better way will be to extend
-> > the stack when this feature will be actually used and needed.
-> 
-> This is our tradeoff, an API should be fully designed from the
-> beginning, everything else is bad design and will likely result
-> in band aids (as it happens here). The API can be connected to
-> netdevsim to test it.
-> 
-> Currently the combination of xfrm interfaces and packet offload
-> is just broken. 
+The err variable isn't being used anywhere other than getting
+initialized to 0 and then it is being checked in if condition. The
+condition can never be true. Remove the err and deadcode.
 
-I don't think that it is broken. It is just not implemented. XFRM
-interfaces are optional field, which is not really popular in the
-field.
+Fixes: d51b6ce441d3 ("net: ethernet: add ag71xx driver")
+Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+---
+ drivers/net/ethernet/atheros/ag71xx.c | 12 +++---------
+ 1 file changed, 3 insertions(+), 9 deletions(-)
 
-> Unfortunalely this patch does not fix it.
-> 
-> I think we need to do three things:
-> 
-> - Fix xfrm interfaces + packet offload combination
-> 
-> - Extend netdevsim to support packet offload
-> 
-> - Extend the API for xfrm interfaces (and everything
->   else we forgot).
+diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
+index db2a8ade62055..a90fc6834d53e 100644
+--- a/drivers/net/ethernet/atheros/ag71xx.c
++++ b/drivers/net/ethernet/atheros/ag71xx.c
+@@ -1619,7 +1619,6 @@ static int ag71xx_rx_packets(struct ag71xx *ag, int limit)
+ 		unsigned int i = ring->curr & ring_mask;
+ 		struct ag71xx_desc *desc = ag71xx_ring_desc(ring, i);
+ 		int pktlen;
+-		int err = 0;
+ 
+ 		if (ag71xx_desc_empty(desc))
+ 			break;
+@@ -1649,14 +1648,9 @@ static int ag71xx_rx_packets(struct ag71xx *ag, int limit)
+ 		skb_reserve(skb, offset);
+ 		skb_put(skb, pktlen);
+ 
+-		if (err) {
+-			ndev->stats.rx_dropped++;
+-			kfree_skb(skb);
+-		} else {
+-			skb->dev = ndev;
+-			skb->ip_summed = CHECKSUM_NONE;
+-			list_add_tail(&skb->list, &rx_list);
+-		}
++		skb->dev = ndev;
++		skb->ip_summed = CHECKSUM_NONE;
++		list_add_tail(&skb->list, &rx_list);
+ 
+ next:
+ 		ring->buf[i].rx.rx_buf = NULL;
+-- 
+2.39.2
 
-This is the most challenging part. It is not clear what should
-we extend if customers are not asking for it and they are extremely
-happy with the current IPsec packet offload state.
-
-BTW, I'm aware of one gap, which is not clear how to handle, and
-it is combination of policy sockets and offload.
-
-> 
-> > IMHO, attempt to enrich core code without showing users of this new flow
-> > is comparable to premature optimization.
-> > 
-> > And Feng more than once said that this code is for some out-of-tree
-> > driver.
-> 
-> It is an API, so everyone can use it.
-
-Of course, as long as in-kernel user exists.
-
-Thanks
 
