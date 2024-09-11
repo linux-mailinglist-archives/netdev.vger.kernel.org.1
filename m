@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-127546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF7A975B8B
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:18:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82F20975B8C
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:18:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD8271C219D9
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:18:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F7681F23482
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:18:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1BA1BB69A;
-	Wed, 11 Sep 2024 20:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4219A1BB6A7;
+	Wed, 11 Sep 2024 20:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fQl7Hv+m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AOXzw1R6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5789A1BB696
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8AD1BB6A3
 	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:18:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726085882; cv=none; b=nwlyoD3+JgHIprTCYW4WloKfsDwenYgWziFsdIOzlKcO/Xg/yxAbR/2LQ4BMOpdfF6mnNu7Rejxib/oCYVTFR5ToZTRYclzeiptzqv3piD+KG75Y5Kc6Rzq8g/hreJ3t11ZQVw5NbHaDjhh+H7NqJTl98MebJvH4vByecFOwwDw=
+	t=1726085883; cv=none; b=kzWfxoNNLIsDeco2ahGRUDNDGLx4IKQnbt+Ii5tk6nnhptjOisztJMn9YyNjwe1JU0GUM7W2wMMCiX7CQzzTLjimOP7muHcjEqc2f4ngcab9LhuEAizS9q1SuulntmzLRu0muRn3fh0NSDEN931JPfZlnadyBZOqD726RS8z5OQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726085882; c=relaxed/simple;
-	bh=vBN8vBcLLZ7D/zw9ZNtIzp9q+Xf5WKDt/BJe/4F90rQ=;
+	s=arc-20240116; t=1726085883; c=relaxed/simple;
+	bh=ee+P0FxBP1RKQQ0qKPtlAHTqufqpBeNmaRPPK4O4W2Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xb/+/Gn9BrjuOJqWz8k25vv5rdiQX9hw+46DZeFw3xFctxNprOQL1BDWM/KfZsUG0bmXgzSzjRPdkLZ6Y8e25MUdBm9FbA2PT3dIek6gKK/cea2dm7ct7qlE+Gd8CueSxH5b+eARsHe7JyOyOrwMhDc2EMctSgwyZDLCIPXzkAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fQl7Hv+m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D118FC4CEC0;
-	Wed, 11 Sep 2024 20:18:01 +0000 (UTC)
+	 MIME-Version; b=nX/r8b4TXsGTSuNhpxysgwiHHPbvQH2YFUD0Pc0g73FDRMdSUu01OJRawXVcMKq7um3bDEcd4CM0duVS/qxtTn+/j6uGGzwSe5RkPYDl9nVdaoydEfxFNOqqIxOfYBMgwIKJQm4n01sZCAVTG/QMKs2Nc9k5X5JsHRfHEfvYCMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AOXzw1R6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A610AC4CECD;
+	Wed, 11 Sep 2024 20:18:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726085881;
-	bh=vBN8vBcLLZ7D/zw9ZNtIzp9q+Xf5WKDt/BJe/4F90rQ=;
+	s=k20201202; t=1726085882;
+	bh=ee+P0FxBP1RKQQ0qKPtlAHTqufqpBeNmaRPPK4O4W2Q=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fQl7Hv+mKtQXJxcu3OCe1EpcGPOwZn33Capv2Gut+I+Yh02G7BrA8Npmx+jgt7W4a
-	 cRfN1VlqUMwph53p0mrEmO8zRbtN5QbXlGNau13DdxoqO5saZVUGmXfSvAQ4aqIwM/
-	 7amQjHdJGVXS2CYB1I/5bl6R+RvzA18BkMw9GDvYjJ2n3EeYIcV9zW3FYTmlG5ILLU
-	 U5pA+/ggdcDDVD4oj/FNOCdLSspS/sncpgptrV8xUMvqiYHqYWuVRkehIgNwrVpTNV
-	 l+rakZ2gEx4MexvmsWxdqy/GnwHSEp8sDmQj6DP3StpNl/5PobBDI/9Rytl6bkSKZC
-	 x4QdaLDDIQBzw==
+	b=AOXzw1R6A+l6E8ncmZTboEAmIADNsdqAw/isiE/D6qnrVS5Gehjsw5Cm4w+vk7psy
+	 z1KMfTWPYJLG/rKW1xG4gxMVhTAev2F4a2r+QRQ9AK4ntdJDsUs3TVLz4tbEx9R8Tu
+	 UHT8ZZ7IKhlc+sqCW12bM18pZM6Iall7G4h4zZKm+nTgORMvhmQ6W7MYmSFetDTfF4
+	 W/zIt8MNz0tUQO8kM75M4kilG5/W88zokbDtRf/bWg5LNi3ErNpuG18kKkpv0jGAMq
+	 07YyMJTXsQFhPSVbYfwRPc0AkR6L9ANqnikIkRxkSapnaWc9oxNd94og01oyt/Tuz5
+	 7G/ik45r1UM3g==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,10 +51,11 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
 	Yevgeny Kliteynik <kliteyn@nvidia.com>
-Subject: [net-next 02/15] net/mlx5: HWS, fixed error flow return values of some functions
-Date: Wed, 11 Sep 2024 13:17:44 -0700
-Message-ID: <20240911201757.1505453-3-saeed@kernel.org>
+Subject: [net-next 03/15] net/mlx5: fs, move steering common function to fs_cmd.h
+Date: Wed, 11 Sep 2024 13:17:45 -0700
+Message-ID: <20240911201757.1505453-4-saeed@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240911201757.1505453-1-saeed@kernel.org>
 References: <20240911201757.1505453-1-saeed@kernel.org>
@@ -66,78 +67,129 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+From: Moshe Shemesh <moshe@nvidia.com>
 
-Fixed all the '-ret' returns in error flow of functions to 'ret',
-as the internal functions are already returning negative error values
-(e.g. -EINVAL)
+As preparation for HW steering support in fs core level, move SW
+steering helper function that can be reused by HW steering to fs_cmd.h.
+The function mlx5_fs_cmd_is_fw_term_table() checks if a flow table is a
+flow steering termination table and so should be handled by FW steering.
 
-Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c     | 2 +-
- .../mellanox/mlx5/core/steering/hws/mlx5hws_rule.c        | 8 ++++----
- .../mellanox/mlx5/core/steering/hws/mlx5hws_table.c       | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/fs_cmd.h  |  8 +++++++
+ .../mellanox/mlx5/core/steering/fs_dr.c       | 24 +++++++------------
+ 2 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
-index 1964261415aa..33d2b31e4b46 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
-@@ -967,7 +967,7 @@ int mlx5hws_matcher_attach_at(struct mlx5hws_matcher *matcher,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.h b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.h
+index 53e0e5137d3f..7eb7b3ffe3d8 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.h
+@@ -124,4 +124,12 @@ const struct mlx5_flow_cmds *mlx5_fs_cmd_get_fw_cmds(void);
  
- 	ret = hws_matcher_check_and_process_at(matcher, at);
- 	if (ret)
--		return -ret;
-+		return ret;
+ int mlx5_fs_cmd_set_l2table_entry_silent(struct mlx5_core_dev *dev, u8 silent_mode);
+ int mlx5_fs_cmd_set_tx_flow_table_root(struct mlx5_core_dev *dev, u32 ft_id, bool disconnect);
++
++static inline bool mlx5_fs_cmd_is_fw_term_table(struct mlx5_flow_table *ft)
++{
++	if (ft->flags & MLX5_FLOW_TABLE_TERMINATION)
++		return true;
++
++	return false;
++}
+ #endif
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
+index 50c2554c9ccf..40d06051cdc6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
+@@ -9,14 +9,6 @@
+ #include "fs_dr.h"
+ #include "dr_types.h"
  
- 	required_stes = at->num_of_action_stes - (!is_jumbo || at->only_term);
- 	if (matcher->action_ste[MLX5HWS_ACTION_STE_IDX_ANY].max_stes < required_stes) {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_rule.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_rule.c
-index c79ee70edf03..8a011b958b43 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_rule.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_rule.c
-@@ -751,11 +751,11 @@ int mlx5hws_rule_destroy(struct mlx5hws_rule *rule,
+-static bool dr_is_fw_term_table(struct mlx5_flow_table *ft)
+-{
+-	if (ft->flags & MLX5_FLOW_TABLE_TERMINATION)
+-		return true;
+-
+-	return false;
+-}
+-
+ static int mlx5_cmd_dr_update_root_ft(struct mlx5_flow_root_namespace *ns,
+ 				      struct mlx5_flow_table *ft,
+ 				      u32 underlay_qpn,
+@@ -70,7 +62,7 @@ static int mlx5_cmd_dr_create_flow_table(struct mlx5_flow_root_namespace *ns,
+ 	u32 flags;
+ 	int err;
  
- 	ret = hws_rule_enqueue_precheck(rule, attr);
- 	if (unlikely(ret))
--		return -ret;
-+		return ret;
+-	if (dr_is_fw_term_table(ft))
++	if (mlx5_fs_cmd_is_fw_term_table(ft))
+ 		return mlx5_fs_cmd_get_fw_cmds()->create_flow_table(ns, ft,
+ 								    ft_attr,
+ 								    next_ft);
+@@ -110,7 +102,7 @@ static int mlx5_cmd_dr_destroy_flow_table(struct mlx5_flow_root_namespace *ns,
+ 	struct mlx5dr_action *action = ft->fs_dr_table.miss_action;
+ 	int err;
  
- 	ret = hws_rule_destroy_hws(rule, attr);
+-	if (dr_is_fw_term_table(ft))
++	if (mlx5_fs_cmd_is_fw_term_table(ft))
+ 		return mlx5_fs_cmd_get_fw_cmds()->destroy_flow_table(ns, ft);
  
--	return -ret;
-+	return ret;
- }
+ 	err = mlx5dr_table_destroy(ft->fs_dr_table.dr_table);
+@@ -135,7 +127,7 @@ static int mlx5_cmd_dr_modify_flow_table(struct mlx5_flow_root_namespace *ns,
+ 					 struct mlx5_flow_table *ft,
+ 					 struct mlx5_flow_table *next_ft)
+ {
+-	if (dr_is_fw_term_table(ft))
++	if (mlx5_fs_cmd_is_fw_term_table(ft))
+ 		return mlx5_fs_cmd_get_fw_cmds()->modify_flow_table(ns, ft, next_ft);
  
- int mlx5hws_rule_action_update(struct mlx5hws_rule *rule,
-@@ -767,7 +767,7 @@ int mlx5hws_rule_action_update(struct mlx5hws_rule *rule,
+ 	return set_miss_action(ns, ft, next_ft);
+@@ -154,7 +146,7 @@ static int mlx5_cmd_dr_create_flow_group(struct mlx5_flow_root_namespace *ns,
+ 					    match_criteria_enable);
+ 	struct mlx5dr_match_parameters mask;
  
- 	ret = hws_rule_enqueue_precheck_update(rule, attr);
- 	if (unlikely(ret))
--		return -ret;
-+		return ret;
+-	if (dr_is_fw_term_table(ft))
++	if (mlx5_fs_cmd_is_fw_term_table(ft))
+ 		return mlx5_fs_cmd_get_fw_cmds()->create_flow_group(ns, ft, in,
+ 								    fg);
  
- 	ret = hws_rule_create_hws(rule,
- 				  attr,
-@@ -776,5 +776,5 @@ int mlx5hws_rule_action_update(struct mlx5hws_rule *rule,
- 				  at_idx,
- 				  rule_actions);
+@@ -179,7 +171,7 @@ static int mlx5_cmd_dr_destroy_flow_group(struct mlx5_flow_root_namespace *ns,
+ 					  struct mlx5_flow_table *ft,
+ 					  struct mlx5_flow_group *fg)
+ {
+-	if (dr_is_fw_term_table(ft))
++	if (mlx5_fs_cmd_is_fw_term_table(ft))
+ 		return mlx5_fs_cmd_get_fw_cmds()->destroy_flow_group(ns, ft, fg);
  
--	return -ret;
-+	return ret;
- }
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_table.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_table.c
-index 9dbc3e9da5ea..8c063a8d87d7 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_table.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_table.c
-@@ -489,5 +489,5 @@ int mlx5hws_table_set_default_miss(struct mlx5hws_table *tbl,
- 	return 0;
- out:
- 	mutex_unlock(&ctx->ctrl_lock);
--	return -ret;
-+	return ret;
- }
+ 	return mlx5dr_matcher_destroy(fg->fs_dr_matcher.dr_matcher);
+@@ -279,7 +271,7 @@ static int mlx5_cmd_dr_create_fte(struct mlx5_flow_root_namespace *ns,
+ 	int err = 0;
+ 	int i;
+ 
+-	if (dr_is_fw_term_table(ft))
++	if (mlx5_fs_cmd_is_fw_term_table(ft))
+ 		return mlx5_fs_cmd_get_fw_cmds()->create_fte(ns, ft, group, fte);
+ 
+ 	actions = kcalloc(MLX5_FLOW_CONTEXT_ACTION_MAX, sizeof(*actions),
+@@ -740,7 +732,7 @@ static int mlx5_cmd_dr_delete_fte(struct mlx5_flow_root_namespace *ns,
+ 	int err;
+ 	int i;
+ 
+-	if (dr_is_fw_term_table(ft))
++	if (mlx5_fs_cmd_is_fw_term_table(ft))
+ 		return mlx5_fs_cmd_get_fw_cmds()->delete_fte(ns, ft, fte);
+ 
+ 	err = mlx5dr_rule_destroy(rule->dr_rule);
+@@ -765,7 +757,7 @@ static int mlx5_cmd_dr_update_fte(struct mlx5_flow_root_namespace *ns,
+ 	struct fs_fte fte_tmp = {};
+ 	int ret;
+ 
+-	if (dr_is_fw_term_table(ft))
++	if (mlx5_fs_cmd_is_fw_term_table(ft))
+ 		return mlx5_fs_cmd_get_fw_cmds()->update_fte(ns, ft, group, modify_mask, fte);
+ 
+ 	/* Backup current dr rule details */
 -- 
 2.46.0
 
