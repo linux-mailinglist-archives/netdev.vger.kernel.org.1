@@ -1,156 +1,106 @@
-Return-Path: <netdev+bounces-127319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54F8F974F5E
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:10:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D66A974F66
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:10:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 876A21C21FD4
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:10:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 408D02821CD
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38D44187861;
-	Wed, 11 Sep 2024 10:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3B1184523;
+	Wed, 11 Sep 2024 10:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lahY+rCF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="biBE3PuQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42538183CBC
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 10:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4961183CCA;
+	Wed, 11 Sep 2024 10:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726049335; cv=none; b=mYZ7CTKrD7PDVDiTniSsUGPyfSUtQxXJV16Ush+KOIgURFXIYaouLtI2vY88XwoGGVwfqN/n9zUdWvU8yskHlkQFrg1nPfqslWNMZc3NmRHCsn7lg5pYg3cVdmhwgd4NmCK8oVmUjXjTkEnjRzYlwN1e4n+hPBz0uyzuyVpgod8=
+	t=1726049431; cv=none; b=AUkIqnr3mxYIu4THVA4WNRNB63ZTHAZxClPkZdWD2+aPH8f0rQPQUGZ9piQ64auekOms5eIGZYyJ1D5g207ix+46vDG7nmpVhmmXAtvqIs9n55miVJ78NP1Ig9G00cfUPU9rOtOWgUKoXar5ItPaJSpo6HbYXs522xOiRR+zmUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726049335; c=relaxed/simple;
-	bh=9p4+hZQjh71lVxuvzfXMO5h2mg2JsxoLOa6VRFSlmYg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oaLeXnVeZONPajeCpZjMrCqLIJ2ytEjCTfZG52NlAbDFD/KavBkni8I2aRvMZdSyO7SK+t9sXnXUC9ov3UOwnsI7rR6N9Gi7l2kx8mO/o+lTztzeiWABzUXoGTKhD0s6Ydut9FS34Jl7aR4zqNsyEdKgGoj2RtqxLiY3yB7YxgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lahY+rCF; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c25f01879fso1995344a12.1
-        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 03:08:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726049331; x=1726654131; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B9hdLYUUwjUF1hpY600kXGnyLYC/hudZ8vg3i7Z84wI=;
-        b=lahY+rCFdc/x5Z1c4MUKDG+FGYDkd8Xuf4qKowNyZJgaLwDs2Ij0l+836HiKYVTrbi
-         8PQ1TlVs/kJ3ZPd1N7ZeQvVJ+b25CyeSZqsY5r21xit5OjAP8UhN7lCgk39Ju0mXWSLM
-         xn/Wi6IMvDjaNtqMQzFySFyAMOQt8pt8dkYHNkzimz7wUxeWEjMFLVepohFqf9rx0diB
-         +z++oS8ZZpDtvMkaM7oC0N7M23ZMwaMX++F/nD18i5ilxGL1yE6IjYMegXFJ7jc7vFkw
-         vgXYIgWYUFk6wA8b0ePzSqvZMixeIusKiE7OzHynJnmjCmP9UXWRMzcI6RxYVNZwY77Y
-         jGpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726049331; x=1726654131;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B9hdLYUUwjUF1hpY600kXGnyLYC/hudZ8vg3i7Z84wI=;
-        b=UsWy7clA5InxbI4cnmbcVBNEvSYpK2n/Uc5qBVomRnWN2rBRbs3DOspsFaZm9PPEpk
-         Twz4+MZte9lx070ZHddi4dvmLgpQYzFR6/OL+Y3nK5WAbWDWDP+gR0Qr3565HSL0fFpU
-         CwEW7XNFarjfhe0bbLFv+qAAEYg4jkpl3mPvbykMCQ+eKq41lyMzki5GxuclpwuFWHOa
-         AqROiLK9lfdcNeOEvn9ZRk0yTkKA8AgWF4YWJToCIs5SKbuxSDlyBrkPgwx0F+qD0CzH
-         q0UGCHlkHqNZFkiSR6L6CgZypiix+lHjLmmeZYl9uIkw//0pFRl+q0IKFb2NlS+2ZJVJ
-         UUkw==
-X-Forwarded-Encrypted: i=1; AJvYcCU6ccS7uDFVOyLNCh9w6aBFGFPxL6Yrri72QNv5xpJn0nTlvGk+urjgTxQSIxUnMjl8ijavULs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz04dCFcvvrqeQhCqGna24wZuTwvuaoGOeg82dNiV5/N7GSNQmb
-	i35o1+++v/4WAyAmFdEif8V7nQMmyKnlCuQvzJnMtykmEK9GdzSdtWj7HvZdSlYyXNV+p5j5Zry
-	1WRFqDnrRi1cmcGHzdv9vVQr8K96FoFe3zg8B
-X-Google-Smtp-Source: AGHT+IFkRabYBVWE7beqKCTPtmzMJTAcAA4DOyN0ipywboc72PB58+sFy/RcmZ1ciMDzBl90IvVFngE+dsyhyzBF+LQ=
-X-Received: by 2002:a05:6402:5ca:b0:5be:eaf1:807d with SMTP id
- 4fb4d7f45d1cf-5c40bc5ba38mr1201960a12.29.1726049330681; Wed, 11 Sep 2024
- 03:08:50 -0700 (PDT)
+	s=arc-20240116; t=1726049431; c=relaxed/simple;
+	bh=06fkwrLjY2/fniZWS4mcw4m1AubrB1trbnaxhYs/urc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=P7mBc2FDKOmh+na9tdFKthzIc7gTBT9RQ+JbGWOsg7EpZo2K3ie2OAHvMAZ0PMYnLyOagKD0qTv+JesNI+wxPKf5PXct120TM5/GRSyOCvjdzzLQADTXTshPAWN/nxzvrk0uASs+T6EMm+aM+HhK/aK/OXZP4c1KNn1sksy8icc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=biBE3PuQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4364C4CEC5;
+	Wed, 11 Sep 2024 10:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726049430;
+	bh=06fkwrLjY2/fniZWS4mcw4m1AubrB1trbnaxhYs/urc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=biBE3PuQYW45aHRIsJTV24neAqMcPn8D5bcP+xeKIVBNQBXyZdLa3CNUcMIhpRlMX
+	 ZlONmDeD1tfWf/294g0qPOb0+vYvZWoFBJZXQ1yAlDV5EYFPhivYWg8xHaXUUJ7Hoo
+	 z/rRHNUcr1eDfN42/dLPdzIXgwG6xY5LYmk3DqgmEhyrXTWUlgcz76Q5qaZW6yJnM/
+	 m6K86OBREA4QwtZR1Mqqvz8xm8otYUAR9dLGwVZ3EemRylaAtlvpnf0qMMfkH8Ia/F
+	 njGPvLmSCak0zLu2f//A4k14hwxH2CMydB1nU2yaB+ir99Y0cNgKkhtEwFb1Ubz/al
+	 IorAU7q9JZ2Kw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB35A3822FA4;
+	Wed, 11 Sep 2024 10:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000d3bf150621d361a7@google.com> <20240911120406.123aa4d4@fedora.home>
-In-Reply-To: <20240911120406.123aa4d4@fedora.home>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 11 Sep 2024 12:08:36 +0200
-Message-ID: <CANn89iJBFiHzMPCXyDB4=MAvE0OY5izFUzHxb3cnRzTRr=M3yA@mail.gmail.com>
-Subject: Re: [syzbot] [net?] WARNING: refcount bug in ethnl_phy_done
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: syzbot <syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com>, 
-	christophe.leroy@csgroup.eu, davem@davemloft.net, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next V6 0/5] Add support to PHYLINK for LAN743x/PCI11x1x
+ chips
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172604943175.568857.6737661563582328586.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Sep 2024 10:10:31 +0000
+References: <20240906103511.28416-1-Raju.Lakkaraju@microchip.com>
+In-Reply-To: <20240906103511.28416-1-Raju.Lakkaraju@microchip.com>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux@armlinux.org.uk,
+ kuba@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ richardcochran@gmail.com, rdunlap@infradead.org,
+ bryan.whitehead@microchip.com, edumazet@google.com, pabeni@redhat.com,
+ maxime.chevallier@bootlin.com, linux-kernel@vger.kernel.org,
+ horms@kernel.org, UNGLinuxDriver@microchip.com
 
-On Wed, Sep 11, 2024 at 12:04=E2=80=AFPM Maxime Chevallier
-<maxime.chevallier@bootlin.com> wrote:
->
-> Hi,
->
-> On Wed, 11 Sep 2024 01:00:23 -0700
-> syzbot <syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com> wrote:
->
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    a9b1fab3b69f Merge branch 'ionic-convert-rx-queue-buffe=
-rs-..
-> > git tree:       net-next
-> > console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D1193c49f980=
-000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D37742f4fda0=
-d1b09
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=3De9ed4e4368d45=
-0c8f9db
-> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for D=
-ebian) 2.40
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D14bb7bc79=
-80000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D17b0a100580=
-000
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/0459f959b12d/d=
-isk-a9b1fab3.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/337f1be5353b/vmli=
-nux-a9b1fab3.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/0e3701969c4a=
-/bzImage-a9b1fab3.xz
-> >
-> > The issue was bisected to:
-> >
-> > commit 17194be4c8e1e82d8b484e58cdcb495c0714d1fd
-> > Author: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > Date:   Wed Aug 21 15:10:01 2024 +0000
-> >
-> >     net: ethtool: Introduce a command to list PHYs on an interface
-> >
-> > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D1034a49f=
-980000
-> > final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D1234a49f=
-980000
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D1434a49f980=
-000
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the co=
-mmit:
-> > Reported-by: syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
-> > Fixes: 17194be4c8e1 ("net: ethtool: Introduce a command to list PHYs on=
- an interface")
->
-> I'm currently investigating this. I couldn't reproduce it though, even
-> with the C reproducer, although this was on an arm64 box. I'll give it
-> a try on x86_64 with the provided .config, see if I can figure out
-> what's going on, as it looks like the ethnl_phy_start() doesn't get
-> called.
+Hello:
 
-Make sure to have in your .config
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-CONFIG_REF_TRACKER=3Dy
-CONFIG_NET_DEV_REFCNT_TRACKER=3Dy
-CONFIG_NET_NS_REFCNT_TRACKER=3Dy
+On Fri, 6 Sep 2024 16:05:06 +0530 you wrote:
+> This is the follow-up patch series of
+> https://lkml.iu.edu/hypermail/linux/kernel/2310.2/02078.html
+> 
+> Divide the PHYLINK adaptation and SFP modifications into two separate patch
+> series.
+> 
+> The current patch series focuses on transitioning the LAN743x driver's PHY
+> support from phylib to phylink.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,V6,1/5] net: phylink: Add phylink_set_fixed_link() to configure fixed link state in phylink
+    https://git.kernel.org/netdev/net-next/c/4b3fc475c61f
+  - [net-next,V6,2/5] net: lan743x: Create separate PCS power reset function
+    https://git.kernel.org/netdev/net-next/c/ef0250456cc3
+  - [net-next,V6,3/5] net: lan743x: Create separate Link Speed Duplex state function
+    https://git.kernel.org/netdev/net-next/c/92b740a43fea
+  - [net-next,V6,4/5] net: lan743x: Migrate phylib to phylink
+    https://git.kernel.org/netdev/net-next/c/a5f199a8d8a0
+  - [net-next,V6,5/5] net: lan743x: Add support to ethtool phylink get and set settings
+    https://git.kernel.org/netdev/net-next/c/f95f28d794ed
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
