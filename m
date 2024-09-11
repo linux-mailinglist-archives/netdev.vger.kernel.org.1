@@ -1,174 +1,107 @@
-Return-Path: <netdev+bounces-127605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3564975DBF
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 01:44:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF3F4975DC4
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 01:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F24B1F22CAD
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 23:44:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29857B23A1A
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 23:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25BBA185B6E;
-	Wed, 11 Sep 2024 23:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989081865F9;
+	Wed, 11 Sep 2024 23:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="o25ZVdyC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f+ZcnKWy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533431AE845
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 23:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DB686126;
+	Wed, 11 Sep 2024 23:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726098253; cv=none; b=KzZgZex1nOVTOZKZk642TYYchvIgc689Puws1YWccvLa/rvhS389ZU44QUDfq8bggBpSX1uiuMbDSqkb+rniz0WpLzCPxiH0NIrZE39wKLTPPUSnzz0R34VvAlmXorDCREANLR71IQYAJG+DYbQYDHHVuJopWNAvNGnVq85jVFI=
+	t=1726098702; cv=none; b=fxlDL0hhGMPT8BBzkfkU48g4uUEQ5LXcOw7t0+mdrNv9Yr/TRdPZvJl4noopw4jR9GReSZ1nm3e+h+U6QlhAn9cuw1wy7XdDNL/lUUjc+RBzcGGwqHPEjQbzjdAzKRCK5whq0p3I5V6etYIUAsOosFkxSySsyIRfQUvoFDk+rfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726098253; c=relaxed/simple;
-	bh=TZvKk+aBa1gxaCCHniqOn5LTKrUf552B6WpBkAaylu8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LelPykvvAgEX7IS7SqPycLNNmkry0KY8BA0GOG64Rb0eEZ/lYhv+hhgK7TgSU26aZ3nc3E2/q27FkIZeWpp/ufxOair7s7YLvwAijs3eWbeq47cZuvQnGSnVDXIKfcHpB6MO+ZraHt1Ij7YA2J32JmfxMXduMXYnM8ankyuIbWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=o25ZVdyC; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-5356aa9a0afso472133e87.2
-        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 16:44:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726098248; x=1726703048; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2jDCB4+Ox2YHS0ikdUG/pV1MDZUz4L9aV0DcLYdAPqA=;
-        b=o25ZVdyC/Nw6fG8Jkz0BMK75gkikXD97PuEdgIEdwQ7QF0xlvigbTX5AZyVpItYZcv
-         c7dqr3PJPPfmf7CllRzCtnXr7QRZeohoQbqhb3r8foIAx35ZUY7elfFKkEPENELGHxTQ
-         HGlvzZ3KNkH61auRTSICwrPoV3r/IZqkeALwnvSTuIWLnyUFjv5I6256HzOZ6Jj2dMiA
-         IPrbJ0Y6ZFygEAD3Pe+XrkR1budfT/O65nzRzcdYVMYo4TpRdoEB+AmR7bUY0gZ9khBX
-         VJBq9eJR0lfp2C+1QQ3yExlrW3v7H4TWBmVHHYPj/q9FK1dGAh07FPA4oWidUxF4zc/G
-         diYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726098248; x=1726703048;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2jDCB4+Ox2YHS0ikdUG/pV1MDZUz4L9aV0DcLYdAPqA=;
-        b=w/P/hsTcoBinSK6ANqz5h0dXxRxdlnZNj07PPJYiqRBQ+zEv3ZZlNWjyAe88tluDVC
-         iRC8Y9dMdcvdmWDTNPk9QAEV9QrtKKypMtTvgyC+wzx1u6ucMFZuLGJ08cIan57/GxAA
-         K8qrg0S92KWwP/wbXRddlAVeHk8yfZ+416Bi5zqGiO4AYPq51NGci+PPnL/0Zy51iBAH
-         LzRAzy9ADznY6V9kGjbhBkufhOBXwVsRy0zuQGyuko3wXStIj2igtjTbfypm2dPnTghl
-         sFskEVAZfDwuXblD+ND6WjqW3Peb07qQKVTjKiMVvrQkbVDtHuXbBzBwhVhsyIA4hs5l
-         CXtA==
-X-Forwarded-Encrypted: i=1; AJvYcCWw6fNOZ1Dfce/xG7lQJxSrSwGcwiDx9ohE1qFuLBUapOKjrfr8OStgCwcB/Zm0ZgFHyGRAaOY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyH0syQtUoK0ktXv7c2L2Nq6j9e8BXNo6nRCfRWzf8jF6hsb0lA
-	9ezsI9fFGOPRc3AJIjEZ6WDX7mSGiPByePDS++PAz/jhaqx6bjd8f4jdDy3hg0S8U/Au1ISX0HS
-	wyM4f2DswPXQIfNA7fkhuqHxt2JmuwVHJwe/WD4FeIbGHkQDtU1SoGjU=
-X-Google-Smtp-Source: AGHT+IGhSme5cXkK3EUBM+K8SxsIR8ybN9PvtObrG6PhesDpnpYk8xJ+KCWCi3W1k5U0IPu8K+bnDgAz6J4U22VXvoY=
-X-Received: by 2002:a05:6512:3c9f:b0:535:681d:34b0 with SMTP id
- 2adb3069b0e04-53678fe6a7emr772699e87.47.1726098247382; Wed, 11 Sep 2024
- 16:44:07 -0700 (PDT)
+	s=arc-20240116; t=1726098702; c=relaxed/simple;
+	bh=Y6kf4Wi6KDs88Xo6Q2D9THZIQ/bLuNqar2amyrJ7IBE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XmqMqKab0rfybZub1CDKOSLH2fesGgFBLsAiXsjN6w/WIWjPW1Jtc1vfsypoeQZYp3A5GmZbpakdyn/1ibULeLY8SsJlH/rn4RM2VPlAUYHweK5FN3OAagJAo7XQw/iu1vA8+LR3k6mwSo7BtjVCPOz/NCVMOVHvC0r/N0bvwMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f+ZcnKWy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50AE2C4CEC0;
+	Wed, 11 Sep 2024 23:51:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726098701;
+	bh=Y6kf4Wi6KDs88Xo6Q2D9THZIQ/bLuNqar2amyrJ7IBE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=f+ZcnKWyi/9UeOBLlF/Z3b+5pgzmUkwOiy10JBnuRxQTfqc4Hosspr/wpoDJIXVtI
+	 kk0Li2BICh2E/3SN852se+VptdvCM2DHcgLnkE0ORU+Y5ST9cfAITgQLxSLvpZtB8l
+	 cP7ALk2w2e5Qos/NuLD9CdmEP0Ect8bsLcdMpfJ8b1+b2HAIht0Sp/fZ2cd7GyPmJy
+	 9bLOKQqMIKNXXxWOnOx+r8fPJc/IqtLrGWUeo4yJE6I75CJiYJahEgze1GP1U7y7fn
+	 Ix/Lxos3H3MZngCNdicv+J6H7X8MkOpu7NQwIqH8EH1F754GbaaG0nel0DeqXjyNbk
+	 87ebwq7P0sF9A==
+Date: Wed, 11 Sep 2024 16:51:40 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ Prasad Sodagudi <psodagud@quicinc.com>, Andrew Halaney
+ <ahalaney@redhat.com>, Rob Herring <robh@kernel.org>, <kernel@quicinc.com>
+Subject: Re: [PATCH v2] net: stmmac: allocate separate page for buffer
+Message-ID: <20240911165140.566d9fdb@kernel.org>
+In-Reply-To: <20240910124841.2205629-2-quic_jsuraj@quicinc.com>
+References: <20240910124841.2205629-1-quic_jsuraj@quicinc.com>
+	<20240910124841.2205629-2-quic_jsuraj@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822200252.472298-1-wangfe@google.com> <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
- <20240831173934.GC4000@unreal> <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
- <20240902094452.GE4026@unreal> <Zt67MfyiRQrYTLHC@gauss3.secunet.de> <20240911104040.GG4026@unreal>
-In-Reply-To: <20240911104040.GG4026@unreal>
-From: Feng Wang <wangfe@google.com>
-Date: Wed, 11 Sep 2024 16:43:55 -0700
-Message-ID: <CADsK2K_ip7YUipHa3ZYW7tmvgU0_vEsDTkeACrgi7oN5VLTqpQ@mail.gmail.com>
-Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, 
-	antony.antony@secunet.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Steffen,
+On Tue, 10 Sep 2024 18:18:41 +0530 Suraj Jaiswal wrote:
+> Currently for TSO page is mapped with dma_map_single()
+> and then resulting dma address is referenced (and offset)
+> by multiple descriptors until the whole region is
+> programmed into the descriptors.
+> This makes it possible for stmmac_tx_clean() to dma_unmap()
+> the first of the already processed descriptors, while the
+> rest are still being processed by the DMA engine. This leads
+> to an iommu fault due to the DMA engine using unmapped memory
+> as seen below:
+> 
+> arm-smmu 15000000.iommu: Unhandled context fault: fsr=0x402,
+> iova=0xfc401000, fsynr=0x60003, cbfrsynra=0x121, cb=38
+> 
+> Descriptor content:
+>      TDES0       TDES1   TDES2   TDES3
+> 317: 0xfc400800  0x0     0x36    0xa02c0b68
+> 318: 0xfc400836  0x0     0xb68   0x90000000
+> 
+> As we can see above descriptor 317 holding a page address
+> and 318 holding the buffer address by adding offset to page
+> addess. Now if 317 descritor is cleaned as part of tx_clean()
+> then we will get SMMU fault if 318 descriptor is getting accessed.
 
-Can you reconsider the revert of the CL? Based on our discussion, I
-believe we've reached a consensus that the xfrm id is necessary. If
-some customers prefer not to utilize it, we can extend the offload
-flag (something like XFRM_DEV_OFFLOAD_FLAG_ACQ) to manage this
-behavior. The default setting would remain consistent with the current
-implementation.
+The device is completing earlier chunks of the payload before the entire
+payload is sent? That's very unusual, is there a manual you can quote
+on this?
 
-Thank you!
+> To fix this, let's map each descriptor's memory reference individually.
+> This way there's no risk of unmapping a region that's still being
+> referenced by the DMA engine in a later descriptor.
 
-Feng
+This adds overhead. Why not wait with unmapping until the full skb is
+done? Presumably you can't free half an skb, anyway.
 
-On Wed, Sep 11, 2024 at 3:40=E2=80=AFAM Leon Romanovsky <leon@kernel.org> w=
-rote:
->
-> On Mon, Sep 09, 2024 at 11:09:05AM +0200, Steffen Klassert wrote:
-> > On Mon, Sep 02, 2024 at 12:44:52PM +0300, Leon Romanovsky wrote:
-> > > On Mon, Sep 02, 2024 at 09:44:24AM +0200, Steffen Klassert wrote:
-> > > > >
-> > > > > Steffen,
-> > > > >
-> > > > > What is your position on this patch?
-> > > > > It is the same patch (logically) as the one that was rejected bef=
-ore?
-> > > > > https://lore.kernel.org/all/ZfpnCIv+8eYd7CpO@gauss3.secunet.de/
-> > > >
-> > > > This is an infrastructure patch to support routing based IPsec
-> > > > with xfrm interfaces. I just did not notice it because it was not
-> > > > mentioned in the commit message of the first patchset. This should =
-have
-> > > > been included into the packet offload API patchset, but I overlooke=
-d
-> > > > that xfrm interfaces can't work with packet offload mode. The stack
-> > > > infrastructure should be complete, so that drivers can implement
-> > > > that without the need to fix the stack before.
-> > >
-> > > Core implementation that is not used by any upstream code is rarely
-> > > right thing to do. It is not tested, complicates the code and mostly
-> > > overlooked when patches are reviewed. The better way will be to exten=
-d
-> > > the stack when this feature will be actually used and needed.
-> >
-> > This is our tradeoff, an API should be fully designed from the
-> > beginning, everything else is bad design and will likely result
-> > in band aids (as it happens here). The API can be connected to
-> > netdevsim to test it.
-> >
-> > Currently the combination of xfrm interfaces and packet offload
-> > is just broken.
->
-> I don't think that it is broken. It is just not implemented. XFRM
-> interfaces are optional field, which is not really popular in the
-> field.
->
-> > Unfortunalely this patch does not fix it.
-> >
-> > I think we need to do three things:
-> >
-> > - Fix xfrm interfaces + packet offload combination
-> >
-> > - Extend netdevsim to support packet offload
-> >
-> > - Extend the API for xfrm interfaces (and everything
-> >   else we forgot).
->
-> This is the most challenging part. It is not clear what should
-> we extend if customers are not asking for it and they are extremely
-> happy with the current IPsec packet offload state.
->
-> BTW, I'm aware of one gap, which is not clear how to handle, and
-> it is combination of policy sockets and offload.
->
-> >
-> > > IMHO, attempt to enrich core code without showing users of this new f=
-low
-> > > is comparable to premature optimization.
-> > >
-> > > And Feng more than once said that this code is for some out-of-tree
-> > > driver.
-> >
-> > It is an API, so everyone can use it.
->
-> Of course, as long as in-kernel user exists.
->
-> Thanks
+Please added Fixes tag and use "PATCH net" as the subject tag/prefix.
+-- 
+pw-bot: cr
 
