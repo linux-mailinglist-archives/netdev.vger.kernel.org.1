@@ -1,299 +1,140 @@
-Return-Path: <netdev+bounces-127516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30562975A1E
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:13:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB51975A2B
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:17:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFBA51F21A42
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:13:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67087282857
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723741B142E;
-	Wed, 11 Sep 2024 18:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439721A3021;
+	Wed, 11 Sep 2024 18:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T9d5E9v/"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="rKuo1xxl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [83.166.143.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFC51917E5
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 18:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726078379; cv=fail; b=dolWUlXOrSRLZ8DISNtY9W4qks5NrwISUx9xKeLEV9gY3AK44I2/KC42jMkVB2bobzwuU7Oj17j71atYV0PM3NyiCV2MvcH4y99YyNIC6Oh7ND9+dDt4XKWd8VNaSX7o96ORglRcScKukDRa6X8cZcbCcQqQ7asfmY8aUjwFWMo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726078379; c=relaxed/simple;
-	bh=/geGXKoGVNWHBmRJhV6pHvQE0D5ldK3lI1+Qjtpql28=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=h1BG/PTQlRbktdoZEFwgDWGOQoW0D86a8LKYUNLM+vES8+LdASR/e2dx8tkpkQLrqWyAQOc30VTbaPWao7Fyz8vJUV0eTtrbEsFjEz9+vqTSaDNXTML7DAieP9blcvYl8thXV4wcCj0t/GxajnNHJF0xS/GWIxYN5iC3TMKjqck=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T9d5E9v/; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726078377; x=1757614377;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=/geGXKoGVNWHBmRJhV6pHvQE0D5ldK3lI1+Qjtpql28=;
-  b=T9d5E9v/R9OQ0FzKqcMu29OiApk/Nbts7NDLBiSQZ2H8ZLQmd/mRpi5z
-   rabEzyTgEETL5OGYWVPKogau89vFiPIIYPRcXRZyrHwAwJ0XRpSUo1Ocq
-   ou5JFNB7bzCsTx8YodAVZrqZtW7vacJaN6fQRmFn0PTMopGE5qPxiyqyS
-   siL4N2glVps/0mxSs21iyRXOjLdw7SoCu2E5Va4a4+9X4I6G6h+VO/pMK
-   Bi6RAOaGNcHzaOE1NKg1t8ywFEjJaiqvNyokafQHOViH96j8h3Q+lmb9V
-   bVSXJsza8B9qo43Ilvei0Xa08MY2+1+yQPQT+0/AwIBn5uNFC6IGFCeaK
-   A==;
-X-CSE-ConnectionGUID: Dy86ROFtQfSp8i05S7eq3A==
-X-CSE-MsgGUID: 3B6e1JIyS9CVEgvXfVYarg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11192"; a="35491216"
-X-IronPort-AV: E=Sophos;i="6.10,220,1719903600"; 
-   d="scan'208";a="35491216"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Sep 2024 11:12:57 -0700
-X-CSE-ConnectionGUID: QvM76g7ySiy8/fl/M1LHTw==
-X-CSE-MsgGUID: f/Lo25TBQxuNcmTNhqo25w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,220,1719903600"; 
-   d="scan'208";a="72045261"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Sep 2024 11:12:57 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 11 Sep 2024 11:12:56 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 11 Sep 2024 11:12:56 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 11 Sep 2024 11:12:56 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.44) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 11 Sep 2024 11:12:56 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DDv/tgigzc4AagftGFTfMyEFbVzfQIb0ydwmkXrXgD0qGc0eL1MyXlFaaAvvHRCjODKpsyJuzsn1Vn18QOuLTORtQI/ae2Il+mxRYfOiOlEGYrN+ZTH2SGbNacTa4FZGV6/IJ59t6VBLxRdnTlyELcRegjOTRn315X2LaXdRoJ7OQDjbUUkam6U8mRSfkkAb9fvGvKxd+WxFduIMcF/cSUO7pshs5P2irMbBksbdaPUjlI/EQcmmGXwOKRIFBgVVHYafn4Tv5CP0FxzyaQj1uyHlN6+9tiON84QJzZ+WLosBU+ICMUqA/DC0TK+fkUm4DcxKbMJ1AsTKi8NSt4v2TA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N2ud9N6nqPuJF0EtfDfHDyrOtuPcf9g/tkUC4AxtWh4=;
- b=Bhes+pyCwuX8qbkrRZUtZyiO7mGqKlTne/aMmqtc6xF3q8iy8t5KjPNBaY88QipzbKPPjmXFGSuCrgafH8XNtatDn6y71+z/OJbyzHPNPgAw2hF5JWcjGcp8hppBSOufhs3E5tQhiHqz1MrXfu00HuWO4g7OE3yes+RaKUF4XTVyy8tFO/qbklXtdkbD1mVsQbg+q/Vc4hcbVYorQbd2bc6FU9ySLOZERvr4NIfgwge0lfUR4wpm0N/48Tvt8XB9azBfKLjfIIszVu4yI3PGC6RnySDMCRYratagYjZYKmEKlOXzPiqqwYpeeCT4v4nkLxjB8/OeOPcT6lLhjaLIvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SJ0PR11MB6720.namprd11.prod.outlook.com (2603:10b6:a03:479::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Wed, 11 Sep
- 2024 18:12:52 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.7939.022; Wed, 11 Sep 2024
- 18:12:52 +0000
-Message-ID: <795ab8e6-8759-4e7e-a8ed-c072ab5253ec@intel.com>
-Date: Wed, 11 Sep 2024 11:12:49 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v2] ice: fix memleak in
- ice_init_tx_topology()
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, Pucha Himasekhar Reddy
-	<himasekharx.reddy.pucha@intel.com>, Larysa Zaremba
-	<larysa.zaremba@intel.com>, <netdev@vger.kernel.org>, Mateusz Polchlopek
-	<mateusz.polchlopek@intel.com>
-References: <20240910135814.35693-2-przemyslaw.kitszel@intel.com>
- <4fc61caf-e922-44d6-b3b6-f286fe179107@intel.com>
- <2d5dbb96-d96b-4528-b098-ea1fb9c762f2@intel.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <2d5dbb96-d96b-4528-b098-ea1fb9c762f2@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY3PR05CA0004.namprd05.prod.outlook.com
- (2603:10b6:a03:254::9) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF731AC89D
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 18:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726078647; cv=none; b=cVniW8Qy6w+MJNJghOcrLdlZHjTppvD/U3GcE3JngoFB3LVhH9cVLbr4rRy8mA9lpYAn4KMpLRuZuojuqsxz1Fgvs5zdzLwqaAYl3+qgjlJ75yRv8EJNouANAvwW4HyBwDzdjejrVSztPmdtCsX21TwrIZRoYiSLRPRASp7xR5A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726078647; c=relaxed/simple;
+	bh=Iv7X5S71r9G8/8xCax5nJjG2CNB8/rQcjQXAMuNXl+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gxcNT4WF97IhlUd2MSu9x8oq+gv750e1i3urYBt5tKgM+EHZD2U4xj4WXPjWB92t02JHsJX6hPiDm0bDrDvldHClsyGsvjl3x0LIDkWsT5OCMEi54CDIzFihKLmvjbb3314uO8nVQPBBTbMAN7q89PxVmtw13prhWJ9VbGiyUSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=rKuo1xxl; arc=none smtp.client-ip=83.166.143.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4X3pgs0CMCzXH1;
+	Wed, 11 Sep 2024 20:17:13 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1726078632;
+	bh=2VJrSaRcSGNHnP75mgU3Crci81AkrircpLyaN62nmUE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rKuo1xxlqeWVXz6ApHqUCrGp3w15gL0PNnZpT//NwiuTTPeN91YRkh4uAcKy269vk
+	 TDHwGnSdeK4bYWP0MHroX/UK6Ork+jTHv07FgZPgG5+BboRnpcFSOdQyrCoN+XIOZX
+	 MkCYLnA4y8XMFjm14OG6db/bKOJ0LmJkeLhMdxuM=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4X3pgr0xH1zWmB;
+	Wed, 11 Sep 2024 20:17:12 +0200 (CEST)
+Date: Wed, 11 Sep 2024 20:17:04 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v4 0/6] landlock: Signal scoping support
+Message-ID: <20240911.BieLu8DooJiw@digikod.net>
+References: <cover.1725657727.git.fahimitahera@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ0PR11MB6720:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3ef89647-2989-4315-d347-08dcd28d59c7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?UFFnVkIzKzBsYXMrZ1p3TTdqYjZNeDlGczZCWUIrN0o3OXJLb3dHdWdhblA2?=
- =?utf-8?B?Q3RvdEN5cFh2MmlzakdnUVhmUkhJRkl4UGpQMUtnaFBQNmEvNlVQdVRmYk85?=
- =?utf-8?B?S1EwY1g3L1VLNWl2TFlIRTg3YXFWT01hd05DS0YvMG9Sa244OGtDeVYvdG45?=
- =?utf-8?B?YXUzMzN6bmZ5NGYySHhXK0hVdEk4akROazlpUDF5dnYycUtxVlVIV250eHE4?=
- =?utf-8?B?aDlZRGJnQUZVclRCNU9XSWlUcnplcUM4aG0vc0pLUmF3bE1lampWVEFUam8r?=
- =?utf-8?B?Wk1HU0dSNGpNdUtaUWJQcjRrWGtIWFlteXdIWWtRLzA1VkZKYnFaZkxPTEVm?=
- =?utf-8?B?SkNrZUQ1clBseXUwMzYvTFVCbHAzS3lFRjkyNkwrTTQ3SFN5bGlKZGpUTFJy?=
- =?utf-8?B?MkFMYkp0MURVdGdNT2wrdVdFMzEzYlZLeVJWK0Q0ZWVKV3BORFFGeFVmYm5W?=
- =?utf-8?B?eE5JMGY0S1RwNlRMcU84U1R0eG9qNDZiWS9mbC94RGkwbGRaNVVWdmhya0ti?=
- =?utf-8?B?Si9rQkw1KzJ4QnhheFhCUnRCUEMrTzVzdENxZ2NIV3JkQVZJemNjQWpKOXp4?=
- =?utf-8?B?RzlmQWI5VzVWUUFsRXNvOE12NFdEUkNqN0hvNnRnRnJTSE5CRkd0ZkJtQVkr?=
- =?utf-8?B?aGEzdVkvNTh1MDJPU2RNYVBHVVFBOXZSd3AyZEh3QUtFQ3RyTklGQmMzQmNF?=
- =?utf-8?B?VnppbGNHc2owMzBxVktJb1N4KzBpRDByQ1ZiRThiRGFWWWVhcDNqbUMxbWJ2?=
- =?utf-8?B?TWxUYk94K2l6ZmwxdmIraS9CZklvbFdIRVl6eC9wOW0xLzZXbEljemRLbXFu?=
- =?utf-8?B?YWE1ckxxUUdqV3ZJeVhudTh1QzRxcnFQMm1OZXpJTHI2K0xNaCtvbTUramhq?=
- =?utf-8?B?M1k1S09BOU0za0VpbVZXY0FTOE5YL3hpSTZNeWZocFJkYnp3RDRIUm91N0ZB?=
- =?utf-8?B?a1BNOGZlM3pySTNVaElkdGJjeHpyU0pDZGtLSFgxVzVHcWt1VW9xRUEwUUYv?=
- =?utf-8?B?WnVzSVdOS0tjYWZYZDFaTGpaalZURGkzajBuMHNIWTRhVWl6eU5zdkFMaEJM?=
- =?utf-8?B?VkdKWjY1Y0szdHpkWjN6Tk0vTmhWKzN3cW1Hakc1VmJrN3RCSVdsNlBmbkh6?=
- =?utf-8?B?aGdkR3ZPMy9ubkxJaGVLbENndTBoWEpvd3htaVhDRkoyQnZ3NnhUZmtVZGpi?=
- =?utf-8?B?UVZCM3hHMTdNL0Q0WVZ6RERKZFZUWlBtdG9KdkNuWWVEcXVLQno5dDR4b21p?=
- =?utf-8?B?S2lmbmtVVmo3OGlZc0RtN2UvdWFmMWRjemN0Q0EyZUY1QkN1VXpHOHlpcGhX?=
- =?utf-8?B?WkZkcGxtQkZ1L1BiRUpTaHFocFZmajZUQTBSL3RwelFxbCt2VUF2WHN4V21p?=
- =?utf-8?B?Mkh0T05ZYnkxSXlQdkdNMkJVdStZSlF4WmR3TEpSaTBVYlcyc1VoNWhLN3FT?=
- =?utf-8?B?ZlhuNFoyQkxkZ05NL3kwNDcyRnNKbVVFaWlyd0FMWjh1THFuU2ZabnZZMVd6?=
- =?utf-8?B?V2xGRUw4b3BiOGhRaE1oNGNOUUJLVDhQTlJ4QUxzUm8yNGpoVjJEUnB0OXND?=
- =?utf-8?B?Wktma05HcWpiV0R6azlwZTl0Vis1by9vRUVFamYvdE9KakRMSlVTZ1JXQ2JW?=
- =?utf-8?B?OVl1aFR4K3ZXYzR0MTlOYXBUWmJzc2FsMENGYUxIanZUcHNpcDVLYU1RaXJG?=
- =?utf-8?B?eDRhQkgzL3VVUTlpRWR6RC80MldsQXlCaDdXTi9Nd2NZYm50d1FZZlNTVkdT?=
- =?utf-8?B?TWVobGpNNGdOSmRGYlFZcThIbDJOZVh3bW0zTTdJdDhGSy82VnUzNXBvQlM2?=
- =?utf-8?Q?lykMfP3EY/x9tjW/zQIXLZ3a7LHEv1PSL5cdc=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aEdaQWh3RHVLelNSbXI1eHovRkxmRFFHOXJ4WVBNZDBTK2k0Q0x4UjlKaTFP?=
- =?utf-8?B?d0NLcXdpMTdERmMrbC85QjZTa3ZMeWdRbVFYV3pKZnY4eXpZdzhVVUN6TVhR?=
- =?utf-8?B?R3RKOU5WNFk2QldnL1RnZ24wRmZGcld4STlwWU9qSUUyem9LcHIyZnhyQjRY?=
- =?utf-8?B?bkhNdmg1UkM0K3p5QzJ3bWJ4UXhwRnpkQ0w3aEg4dFNuZWd1ckNHWUY3dEVq?=
- =?utf-8?B?YUg3aExycFBFTXMranVaZnZXanFMWjE1SURKYktFRi8va3p2cHVJN0tYcURN?=
- =?utf-8?B?K1VSR3ZKMXBPa3RQYlhLYktkL1hZZlYwd3lWdVF5QVNPTlFKeDhtelRYQURN?=
- =?utf-8?B?ckhzcFFCZHFMRTBiMC9CZXpRZ2IyZWxMM0RvZmV3UGZDd1daZ3czaXlHYnJR?=
- =?utf-8?B?a1RWdWV1UHhvYVhzelRyaWJuMVRGbU42MHN2SmF4NVR2MS9tWjdrTmNUZTBY?=
- =?utf-8?B?bjRMTXpuM1lSQkV0SjMrY21lYTRiNkszQWkvNWQvTWZEMUU5ZWxKblJXVXRj?=
- =?utf-8?B?MDlBYit6N0kwTVZpNmlmNXBCTDkzcmFtM1VSdXJld2swYTVpM2hneXg1ZTJI?=
- =?utf-8?B?NkNmQ0s1V0MyVU85N1B5WjN1eU51ZDB1akxNSitYS0tsS2M1OVVRYTY5UStW?=
- =?utf-8?B?SHZuZVFFSTRhdmU1ek5HWnMySGNudzFSUVlVTVBadG1nVkpTR3hXS0dIUXVJ?=
- =?utf-8?B?RGNUbXREZnBVNHBYckVKV1BPUVJ3dG1zbEdlaHJpcmNGMEVESTZycmp3V2VM?=
- =?utf-8?B?M3h5T21zbWNyK0R3dkJBNjhxWVd5SjA2ZGQvNFpVc1JRb3dNeGRPd2NzQWsv?=
- =?utf-8?B?NUY4OTF4ZWtFd1pMRVEyY2lYcE9EVThWZlpEY2V6TEFVRnFjNDBKZm1MWXdX?=
- =?utf-8?B?akpGZENydE80QXlNUkplcER1OEpRSUEvQUorUU0rdWJQajNjSi9sRE4zdThh?=
- =?utf-8?B?SWY5VEZiTXZVdHk1ckRFRi85anNrK2VmbVpBQWdhWUdFejlrWVZhYjl1NVRl?=
- =?utf-8?B?MXBwcHBqYmNMNzcyNVlrTzgxdUwwZHVyelYvWjI5NXQ2NkFIVVUrNk9qbFI4?=
- =?utf-8?B?cnlKKzh4SWxGd3p1b09GQTBqREdjZG5WMk1xNGlhc2VZdXlQd01XZmoyemM5?=
- =?utf-8?B?eUVBMVRqU2Z3TnFLajNRNExVRWNiOHZtcXYwRWxodjdDN0MweHczR3phMHZx?=
- =?utf-8?B?YlY4RnZZakV5dDlQRUdoT0xUbmNMYzNzZkh2UEd3aXVSdWxCK05BQlFnOHBz?=
- =?utf-8?B?L0owZ1pHNzBrRmNTOGx1bFVTZXFuOXJTbXFtME9UR1o0dXlSWlRkZEZBVk9m?=
- =?utf-8?B?SGhwZDZsVnMwb0pDVlVXbXBGaEhkUFJ2Uzdud1ptY05salJ3TG40WnBDTzRI?=
- =?utf-8?B?b1RwQWM1Yk9lWU8yR0pPc1JzY3VSbUM0ampJTVhIMDVxMTNKMFl4TGZjN0Zj?=
- =?utf-8?B?ZHV1T0tjTEtOaFdDVzRZSnB2RWV0b2xMakRxclBtUmhKaTZveUJKQkp3WkJT?=
- =?utf-8?B?SFltK2ZMYTNsbjhYRWR3d0h0UFd3RnNwZUR3a1JQaDFmaVRyd3dqUnBlbmNy?=
- =?utf-8?B?Z3FPaG8yeDZscW1jRjNMbnAxcnR0MFZQZmtTWmxYUkovSE5IMDRzaDJhY1lR?=
- =?utf-8?B?ZGwyTDFIQWN6WG9yZTF4WjlQcW9CTmEzQ1c4ZG4vbHdzTTRka0VFNnJUb2Zj?=
- =?utf-8?B?T3NvTXl6cVNsNDNWZml3THlsdnpWMkdTbGpaN1NSc1RUdDJ6Q3ZIQTJlR1Zn?=
- =?utf-8?B?Qkd5LzYvLzNFdFhrMVhYalNycVZLckNWUDJGaDk2eDIxanJ3SDRHZkFDbXNN?=
- =?utf-8?B?L09EeWlRQ1pRRjA2TitsZFdTdTNPOVVmYWEzNmJodHhCeFJEQkU5NlZrRlll?=
- =?utf-8?B?MTRDWG9SYWI3c2xDbUI5RGpEYWR4ZGFSb1pSMTFmaXRKbGZqSUFiM2tRUk45?=
- =?utf-8?B?VFYyYzhkT05XL2RuaWdEdFh4bXZTOFlkeExFZDNkSkdTYXBnWGVxeW90RnUz?=
- =?utf-8?B?ZHVTZ0hGYnpqclU3Qzg1MHFBTU8wV2liLzd6MnNzaldGRzBlc3NPMXFlOE5k?=
- =?utf-8?B?MHpSV1RweUhESmNEYVkwVk9DOGhid21uVEFIcWNWYXNmclRETTMxaEFXT1pO?=
- =?utf-8?B?R091TjVQNjIxK3F6ZUQ5NzRLZzBmQ1pDNXVZQ3gyU2hFWWd3QytDZjNaRldo?=
- =?utf-8?B?Z1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3ef89647-2989-4315-d347-08dcd28d59c7
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2024 18:12:51.9889
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: w/ZftgC5k8fjcW9V5pmCE9vQhsQgSCy5/mNppT0snc165i2pzuoQlt3Bu3Gump4+uKzhaMlRt7dlqErquF2tTXj47MRMyY83IcfY6jAOqlc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB6720
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cover.1725657727.git.fahimitahera@gmail.com>
+X-Infomaniak-Routing: alpha
 
+We should also have the same tests as for scoped_vs_unscoped variants.
+I renamed them from the abstract unix socket patch series, please take a
+look:
+https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git/log/?h=next
 
+I'll send more reviews tomorrow and I'll fix most of them in my -next
+branch (WIP), except for the hook_file_send_sigiotask tests and these
+scoped_vs_unscoped variants that you should resolve.
 
-On 9/11/2024 1:37 AM, Przemek Kitszel wrote:
-> On 9/10/24 23:30, Jacob Keller wrote:
->>
->>
->> On 9/10/2024 6:57 AM, Przemek Kitszel wrote:
->>> Fix leak of the FW blob (DDP pkg).
->>>
->>> Make ice_cfg_tx_topo() const-correct, so ice_init_tx_topology() can avoid
->>> copying whole FW blob. Copy just the topology section, and only when
->>> needed. Reuse the buffer allocated for the read of the current topology.
->>>
->>> This was found by kmemleak, with the following trace for each PF:
->>>      [<ffffffff8761044d>] kmemdup_noprof+0x1d/0x50
->>>      [<ffffffffc0a0a480>] ice_init_ddp_config+0x100/0x220 [ice]
->>>      [<ffffffffc0a0da7f>] ice_init_dev+0x6f/0x200 [ice]
->>>      [<ffffffffc0a0dc49>] ice_init+0x29/0x560 [ice]
->>>      [<ffffffffc0a10c1d>] ice_probe+0x21d/0x310 [ice]
->>>
->>> Constify ice_cfg_tx_topo() @buf parameter.
->>> This cascades further down to few more functions.
->>>
->>
->> Nice!
->>
->> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+On Fri, Sep 06, 2024 at 03:30:02PM -0600, Tahera Fahimi wrote:
+> This patch series adds scoping mechanism for signals.
+> Closes: https://github.com/landlock-lsm/linux/issues/8
 > 
-> Thanks!
+> Problem
+> =======
 > 
->>
->>> Fixes: cc5776fe1832 ("ice: Enable switching default Tx scheduler topology")
->>> CC: Larysa Zaremba <larysa.zaremba@intel.com>
->>> CC: Jacob Keller <jacob.e.keller@intel.com>
->>> CC: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
->>> CC: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
->>> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->>> ---
->>> this patch obsoletes two other, so I'm dropping RB tags
->>> v1, iwl-net: https://lore.kernel.org/netdev/20240904123306.14629-2-przemyslaw.kitszel@intel.com/
->>>      wrong assumption that ice_get_set_tx_topo() does not modify the buffer
->>>      on adminq SET variant, it sometimes does, to fill the response, thanks
->>>      to Pucha Himasekhar Reddy for finding it out;
->>> almost-const-correct iwl-next patch:
->>> https://lore.kernel.org/intel-wired-lan/20240904093135.8795-2-przemyslaw.kitszel@intel.com
->>> it was just some of this patch, now it is const-correct
->>> ---
->>
->> Right. So now we're doing the const correctness in this patch along with
->> the fix?
+> A sandboxed process is currently not restricted from sending signals
+> (e.g. SIGKILL) to processes outside the sandbox since Landlock has no
+> restriction on signals(see more details in [1]).
 > 
-> yes
+> A simple way to apply this restriction would be to scope signals the
+> same way abstract unix sockets are restricted.
 > 
->>
->> Would it make sense to fix the copy issue but leave const updates to the
->> next tree?
->>
->> I think I'm fine with this, but wonder if it will make backporting a bit
->> more difficult? Probably not, given that this code is rarely modified.
+> [1]https://lore.kernel.org/all/20231023.ahphah4Wii4v@digikod.net/
 > 
-> hard to say, but I think one commit will make it a little bit easier, as
-> there will be smaller number of possible sets of commits applied
-> (at least in this case)
+> Solution
+> ========
 > 
->>
->> The const fixes are also relatively smaller than I anticipated :D
+> To solve this issue, we extend the "scoped" field in the Landlock
+> ruleset attribute structure by introducing "LANDLOCK_SCOPED_SIGNAL"
+> field to specify that a ruleset will deny sending any signals from
+> within the sandbox domain to its parent(i.e. any parent sandbox or
+> non-sandbox processes).
 > 
-> just adding kfree(), knowing the proper solution is to make code
-> const-correct, is just a workaround, not a proper fix
+> Example
+> =======
 > 
-> change is still rather small, and splitting into two would require
-> postponing -next one to be after -net (as it will just remove the added
-> kfree())
+> Create a sansboxed shell and pass the character "s" to LL_SCOPED:
+> LL_FD_RO=/ LL_FS_RW=. LL_SCOPED="s" ./sandboxer /bin/bash
+> Try to send a signal(like SIGTRAP) to a process ID <PID> through:
+> kill -SIGTRAP <PID>
+> The sandboxed process should not be able to send the signal.
 > 
-
-Well I was thinking of splitting it as the change in this patch where
-you move the buffer copy, and change how we allocate things but with a
-forced cast, instead of changing all the function prototypes to const.
-
-However, I think this is small enough its fine as-is.
-
->>
->> Thanks,
->> Jake
+> Previous Versions
+> =================
+> v3:https://lore.kernel.org/all/cover.1723680305.git.fahimitahera@gmail.com/
+> v2:https://lore.kernel.org/all/cover.1722966592.git.fahimitahera@gmail.com/
+> v1:https://lore.kernel.org/all/cover.1720203255.git.fahimitahera@gmail.com/
+> 
+> Tahera Fahimi (6):
+>   landlock: Add signal scoping control
+>   selftest/landlock: Signal restriction tests
+>   selftest/landlock: Add signal_scoping_threads test
+>   selftest/landlock: Test file_send_sigiotask by sending out-of-bound
+>     message
+>   sample/landlock: Support sample for signal scoping restriction
+>   landlock: Document LANDLOCK_SCOPED_SIGNAL
+> 
+>  Documentation/userspace-api/landlock.rst      |  22 +-
+>  include/uapi/linux/landlock.h                 |   3 +
+>  samples/landlock/sandboxer.c                  |  17 +-
+>  security/landlock/fs.c                        |  17 +
+>  security/landlock/fs.h                        |   6 +
+>  security/landlock/limits.h                    |   2 +-
+>  security/landlock/task.c                      |  59 +++
+>  .../selftests/landlock/scoped_signal_test.c   | 371 ++++++++++++++++++
+>  .../testing/selftests/landlock/scoped_test.c  |   2 +-
+>  9 files changed, 486 insertions(+), 13 deletions(-)
+>  create mode 100644 tools/testing/selftests/landlock/scoped_signal_test.c
+> 
+> -- 
+> 2.34.1
 > 
 
