@@ -1,106 +1,151 @@
-Return-Path: <netdev+bounces-127320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D66A974F66
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:10:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7A6974FAE
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:27:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 408D02821CD
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:10:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD88F1C22855
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3B1184523;
-	Wed, 11 Sep 2024 10:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E2F1802DD;
+	Wed, 11 Sep 2024 10:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="biBE3PuQ"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Xu8Y3dRD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4961183CCA;
-	Wed, 11 Sep 2024 10:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC1814A606;
+	Wed, 11 Sep 2024 10:27:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726049431; cv=none; b=AUkIqnr3mxYIu4THVA4WNRNB63ZTHAZxClPkZdWD2+aPH8f0rQPQUGZ9piQ64auekOms5eIGZYyJ1D5g207ix+46vDG7nmpVhmmXAtvqIs9n55miVJ78NP1Ig9G00cfUPU9rOtOWgUKoXar5ItPaJSpo6HbYXs522xOiRR+zmUc=
+	t=1726050445; cv=none; b=VODWM0TPVugE9ehZcuWrJLGDlHDGW1eTui1zXSkkm873k67iPJvK6Nz9/ZkaMmebUdu1zsXvST1Edk3g9N6olQ3wAmWlRFChtxzA8Mq7A8PFNajv46w1CrMH4gRoZANNTy2ogfsbscU200pVT6AiDyCTfPHPxppiwMh3BdJZpLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726049431; c=relaxed/simple;
-	bh=06fkwrLjY2/fniZWS4mcw4m1AubrB1trbnaxhYs/urc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=P7mBc2FDKOmh+na9tdFKthzIc7gTBT9RQ+JbGWOsg7EpZo2K3ie2OAHvMAZ0PMYnLyOagKD0qTv+JesNI+wxPKf5PXct120TM5/GRSyOCvjdzzLQADTXTshPAWN/nxzvrk0uASs+T6EMm+aM+HhK/aK/OXZP4c1KNn1sksy8icc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=biBE3PuQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4364C4CEC5;
-	Wed, 11 Sep 2024 10:10:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726049430;
-	bh=06fkwrLjY2/fniZWS4mcw4m1AubrB1trbnaxhYs/urc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=biBE3PuQYW45aHRIsJTV24neAqMcPn8D5bcP+xeKIVBNQBXyZdLa3CNUcMIhpRlMX
-	 ZlONmDeD1tfWf/294g0qPOb0+vYvZWoFBJZXQ1yAlDV5EYFPhivYWg8xHaXUUJ7Hoo
-	 z/rRHNUcr1eDfN42/dLPdzIXgwG6xY5LYmk3DqgmEhyrXTWUlgcz76Q5qaZW6yJnM/
-	 m6K86OBREA4QwtZR1Mqqvz8xm8otYUAR9dLGwVZ3EemRylaAtlvpnf0qMMfkH8Ia/F
-	 njGPvLmSCak0zLu2f//A4k14hwxH2CMydB1nU2yaB+ir99Y0cNgKkhtEwFb1Ubz/al
-	 IorAU7q9JZ2Kw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB35A3822FA4;
-	Wed, 11 Sep 2024 10:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1726050445; c=relaxed/simple;
+	bh=rqT9eY0boblbsatS6ps+fzXUv/Y8bmaKnqZFJdAYxpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SvgUminEbxLLrcyMOBKLM1gXfM5fb7CqS3cm0RJr2o1Z6dro3ezd/qbVL5X4YN/g70mO0UcHD0u2JImyYXVuRINDD4MIyfoXrRdlkOiQpWqo4n50p2NWHFfswd5Xj9qpV8TsGDqooY7kAPptuk/ivnLeV9RhZ2uchfYTS4Nypu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Xu8Y3dRD; arc=none smtp.client-ip=220.197.31.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
+	Content-Type; bh=fV673DpfFA4MYNHfQAvK+I/5OpdY8LmvXQLXqXTiBUI=;
+	b=Xu8Y3dRDI2FOngWW50UTmcMSEFljtkXZoLD1JxeEeaI66kPQ8OvmUcTUQuLot/
+	Jpu0FWIEUn3eji1eBov9XRY4Bmrndvh2UB+uzzmupkHfp9mgkcjlfnF+xbjPOWi3
+	fwp6BkDsZWGnaZaNV86xHnd4tqRJOqsIoyZcAs2RjgPLA=
+Received: from localhost (unknown [120.26.85.94])
+	by gzga-smtp-mta-g2-3 (Coremail) with SMTP id _____wDnD6bzb+FmSVO0AQ--.2273S2;
+	Wed, 11 Sep 2024 18:24:51 +0800 (CST)
+Date: Wed, 11 Sep 2024 18:24:51 +0800
+From: Qianqiang Liu <qianqiang.liu@163.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Tze-nan.Wu@mediatek.com, xiyou.wangcong@gmail.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: check the return value of the copy_from_sockptr
+Message-ID: <ZuFv88V0qhcwfOgP@iZbp1asjb3cy8ks0srf007Z>
+References: <20240911050435.53156-1-qianqiang.liu@163.com>
+ <CANn89iKhbQ1wDq1aJyTiZ-yW1Hm-BrKq4V5ihafebEgvWvZe2w@mail.gmail.com>
+ <ZuFTgawXgC4PgCLw@iZbp1asjb3cy8ks0srf007Z>
+ <CANn89i+G-ycrV57nc-XrgToJhwJuhuCGtHpWtFsLvot7Wu9k+w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next V6 0/5] Add support to PHYLINK for LAN743x/PCI11x1x
- chips
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172604943175.568857.6737661563582328586.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Sep 2024 10:10:31 +0000
-References: <20240906103511.28416-1-Raju.Lakkaraju@microchip.com>
-In-Reply-To: <20240906103511.28416-1-Raju.Lakkaraju@microchip.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, linux@armlinux.org.uk,
- kuba@kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- richardcochran@gmail.com, rdunlap@infradead.org,
- bryan.whitehead@microchip.com, edumazet@google.com, pabeni@redhat.com,
- maxime.chevallier@bootlin.com, linux-kernel@vger.kernel.org,
- horms@kernel.org, UNGLinuxDriver@microchip.com
+In-Reply-To: <CANn89i+G-ycrV57nc-XrgToJhwJuhuCGtHpWtFsLvot7Wu9k+w@mail.gmail.com>
+X-CM-TRANSID:_____wDnD6bzb+FmSVO0AQ--.2273S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Zr18Kry5JFy8WFWrWr18uFg_yoW8KF18pF
+	1Yy3WDXrZ7XFWvqFnYgay8WryrAr4Sy3yUCa4vyry8ZFsrW3WfXry29F4akFnrWr4fArZI
+	qrWjgw1Yy3Z5Aa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jq9akUUUUU=
+X-CM-SenderInfo: xtld01pldqwhxolxqiywtou0bp/1tbiRQ1XamXAo2ARQgABsB
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 6 Sep 2024 16:05:06 +0530 you wrote:
-> This is the follow-up patch series of
-> https://lkml.iu.edu/hypermail/linux/kernel/2310.2/02078.html
+On Wed, Sep 11, 2024 at 11:12:24AM +0200, Eric Dumazet wrote:
+> On Wed, Sep 11, 2024 at 10:23 AM Qianqiang Liu <qianqiang.liu@163.com> wrote:
+> >
+> > > I do not think it matters, because the copy is performed later, with
+> > > all the needed checks.
+> >
+> > No, there is no checks at all.
+> >
 > 
-> Divide the PHYLINK adaptation and SFP modifications into two separate patch
-> series.
+> Please elaborate ?
+> Why should maintainers have to spend time to provide evidence to
+> support your claims ?
+> Have you thought about the (compat) case ?
 > 
-> The current patch series focuses on transitioning the LAN743x driver's PHY
-> support from phylib to phylink.
+> There are plenty of checks. They were there before Stanislav commit.
 > 
-> [...]
+> Each getsockopt() handler must perform the same actions.
+> 
+> For instance, look at do_ipv6_getsockopt()
+> 
+> If you find one getsockopt() method failing to perform the checks,
+> please report to us.
 
-Here is the summary with links:
-  - [net-next,V6,1/5] net: phylink: Add phylink_set_fixed_link() to configure fixed link state in phylink
-    https://git.kernel.org/netdev/net-next/c/4b3fc475c61f
-  - [net-next,V6,2/5] net: lan743x: Create separate PCS power reset function
-    https://git.kernel.org/netdev/net-next/c/ef0250456cc3
-  - [net-next,V6,3/5] net: lan743x: Create separate Link Speed Duplex state function
-    https://git.kernel.org/netdev/net-next/c/92b740a43fea
-  - [net-next,V6,4/5] net: lan743x: Migrate phylib to phylink
-    https://git.kernel.org/netdev/net-next/c/a5f199a8d8a0
-  - [net-next,V6,5/5] net: lan743x: Add support to ethtool phylink get and set settings
-    https://git.kernel.org/netdev/net-next/c/f95f28d794ed
+Sorry, let me explain a little bit.
 
-You are awesome, thank you!
+The issue was introduced in this commit: 33f339a1ba54e ("bpf, net: Fix a
+potential race in do_sock_getsockopt()")
+
+diff --git a/net/socket.c b/net/socket.c
+index fcbdd5bc47ac..0a2bd22ec105 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2362,7 +2362,7 @@ INDIRECT_CALLABLE_DECLARE(bool tcp_bpf_bypass_getsockopt(int level,
+ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 		       int optname, sockptr_t optval, sockptr_t optlen)
+ {
+-	int max_optlen __maybe_unused;
++	int max_optlen __maybe_unused = 0;
+ 	const struct proto_ops *ops;
+ 	int err;
+ 
+@@ -2371,7 +2371,7 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 		return err;
+ 
+ 	if (!compat)
+-		max_optlen = BPF_CGROUP_GETSOCKOPT_MAX_OPTLEN(optlen);
++		copy_from_sockptr(&max_optlen, optlen, sizeof(int));
+ 
+ 	ops = READ_ONCE(sock->ops);
+ 	if (level == SOL_SOCKET) {
+
+The return value of "copy_from_sockptr()" in "do_sock_getsockopt()" was
+not checked. So, I added the following patch:
+
+diff --git a/net/socket.c b/net/socket.c
+index 0a2bd22ec105..6b9a414d01d5 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -2370,8 +2370,11 @@ int do_sock_getsockopt(struct socket *sock, bool compat, int level,
+ 	if (err)
+ 		return err;
+ 
+-	if (!compat)
+-		copy_from_sockptr(&max_optlen, optlen, sizeof(int));
++	if (!compat) {
++		err = copy_from_sockptr(&max_optlen, optlen, sizeof(int));
++		if (err)
++			return -EFAULT;
++	}
+ 
+ 	ops = READ_ONCE(sock->ops);
+ 	if (level == SOL_SOCKET) {
+
+Maybe I missed something?
+
+If you think it's not an issue, then I'm OK with it.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Best,
+Qianqiang Liu
 
 
