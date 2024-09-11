@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-127554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2379975B93
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:19:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9BE975B95
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:19:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A9E5B216A8
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:19:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46499283725
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A4D11BC9E4;
-	Wed, 11 Sep 2024 20:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC6C21BC9F6;
+	Wed, 11 Sep 2024 20:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q0zyng9l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l2kZRYH2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764FC1BC08C
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 983E01BC9EF
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726085890; cv=none; b=fKWu1JHLnW3EufUHS71C+Lxqv/0MVykbgQvD87q04MpnKSeIZu6w6I049rrxi2FSnVrI46R3kX0ZBnHY5/ggFouM7jNYgtu9TP+6vma6fv9EHX2lEx+1jrYeGDzGeMYktBDBXyReLKcYEwHgAr99t8YDI36hQoBiqaAh/BUJRf4=
+	t=1726085891; cv=none; b=JKsPh5hEVsKwrVtjeR5Lp6lFasiM3zW0xMhp2vLYpryWd352P0a2Ewh2Bjbxvs7R+GVC49JvLhvEXhHGfQE8sQ9ARQeFo3+clbeI5GOI1t9OCUxOVuxl5NRGIYu3z+i5K4qMdGdA4feMyMGnzUsCwBqUbyKxN2Pw50jRyn7v+hM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726085890; c=relaxed/simple;
-	bh=jMILBPjBT7Ny8/R1MNZowwNPK2ZFV+S752tvdK7v87o=;
+	s=arc-20240116; t=1726085891; c=relaxed/simple;
+	bh=6uUuu+csHF6SvcQYbb09/cdTCd0l+VTCR6V+o0xMgA4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jb+jbiGGXd6Twfv3YBioDsH5YtpiH8CrQdNXUc36peIuNfbIaOn9nBPxMSV4BZphzagC3OxveiA0tkigUz2skMkXH1ifbNtkDBTayoC8B4Ji9WeTfRIGQjeHaC2oG2X8M+DsT16OHGIqmggDJqgXJjlgja3ba2glnpCaEdnk4Sk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q0zyng9l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B802C4CEC6;
-	Wed, 11 Sep 2024 20:18:10 +0000 (UTC)
+	 MIME-Version; b=MiduIDUat1HDWRYhGzNTLbX32Ru4S8fc7DIWBwpYy38CAgQ2n9snfX8+VTrr13B2mqggnoJQy4KxxoaassSpnDEtIWkTYIeWYZBiRT6lMipFRx1FDtFrhKrv8BmQuOQ32wiEk8Y3GbKQN9brhsBU44ydJ6cgikGKNx4iaAgYbww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l2kZRYH2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E22EC4CEC6;
+	Wed, 11 Sep 2024 20:18:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726085890;
-	bh=jMILBPjBT7Ny8/R1MNZowwNPK2ZFV+S752tvdK7v87o=;
+	s=k20201202; t=1726085891;
+	bh=6uUuu+csHF6SvcQYbb09/cdTCd0l+VTCR6V+o0xMgA4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Q0zyng9lcp7654OfV3M+wP5Kmi3Ktn4H4/SNa/G2++tc2HtNp353KJ6O1s3uVK6AB
-	 zDfu3OmgDziHHZdvUGzwKLWZK6ybEdBGlZ+rajSTX1OQiCo+ZM0hPorTHJ4yYIAObk
-	 Sull/P6Q5KD4oEKZ5L8N9lGsvWO4AoKBoxl1uDPbap2/YcovKyK89cdW+L79p/aF3v
-	 skK03lToNYHo/Ym0nvqjXVvQb//ghMZG922tCIIRtOeIym7ZW1WlosNCwpN79dEXsc
-	 rj7GfSRhJRIKh0kVF8oOFC8kdEAwdpflpVQ1xXoHu3CXh5mJQ5mx+NoqkgO+t9aziw
-	 dMFVw3wr2CKzg==
+	b=l2kZRYH2TCi0SyaPSMezvM8mZoETE7Z9gP0YnfJMjcxy1svWU9LzqkZu/WvgWVG91
+	 /bq3w1DyNbil4OM4B1a4+G19j4H4stw2MB6bHP3L7GWbMbAnQBDwiokB8KTrRc1QLD
+	 sFU/FYFhTZhZWpBl6Z1HyaMGn8Dl5QN/a7mZQC9ZP9RG12lgIM0hMEXaycdHUwGIZz
+	 4/ZLDwdKjZOzN9iaJwLdxdlt53fIagRylkeQYGf13mIgSMwwL+C5eeNnKkWhlAogGC
+	 Sowr3EpxyJyqrbTaCMNblOCv19CCju4vvQCSwZ3p4IyzUvF1EKzxUitZcLR+KaOrIk
+	 KwfpLfcxgUiCg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,10 +51,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: [net-next 11/15] net/mlx5: Skip HotPlug check on sync reset using hot reset
-Date: Wed, 11 Sep 2024 13:17:53 -0700
-Message-ID: <20240911201757.1505453-12-saeed@kernel.org>
+	Shay Drory <shayd@nvidia.com>
+Subject: [net-next 12/15] net/mlx5: Allow users to configure affinity for SFs
+Date: Wed, 11 Sep 2024 13:17:54 -0700
+Message-ID: <20240911201757.1505453-13-saeed@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240911201757.1505453-1-saeed@kernel.org>
 References: <20240911201757.1505453-1-saeed@kernel.org>
@@ -66,57 +66,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Moshe Shemesh <moshe@nvidia.com>
+From: Shay Drory <shayd@nvidia.com>
 
-Sync reset request is nacked by the driver when PCIe bridge connected to
-mlx5 device has HotPlug interrupt enabled. However, when using reset
-method of hot reset this check can be skipped as Hotplug is supported on
-this reset method.
+SFs didn't allow to configure IRQ affinity for its vectors. Allow users
+to configure the affinity of the SFs irqs.
 
-Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
+Signed-off-by: Shay Drory <shayd@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
-index bda74cb9c975..4f55e55ecb55 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fw_reset.c
-@@ -412,7 +412,8 @@ static int mlx5_check_dev_ids(struct mlx5_core_dev *dev, u16 dev_id)
- 	return 0;
- }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index f15ecaef1331..2505f90c0b39 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@ -896,7 +896,7 @@ static int comp_irq_request_sf(struct mlx5_core_dev *dev, u16 vecidx)
+ 	if (!mlx5_irq_pool_is_sf_pool(pool))
+ 		return comp_irq_request_pci(dev, vecidx);
  
--static bool mlx5_is_reset_now_capable(struct mlx5_core_dev *dev)
-+static bool mlx5_is_reset_now_capable(struct mlx5_core_dev *dev,
-+				      u8 reset_method)
- {
- 	u16 dev_id;
- 	int err;
-@@ -423,9 +424,11 @@ static bool mlx5_is_reset_now_capable(struct mlx5_core_dev *dev)
- 	}
- 
- #if IS_ENABLED(CONFIG_HOTPLUG_PCI_PCIE)
--	err = mlx5_check_hotplug_interrupt(dev);
--	if (err)
--		return false;
-+	if (reset_method != MLX5_MFRL_REG_PCI_RESET_METHOD_HOT_RESET) {
-+		err = mlx5_check_hotplug_interrupt(dev);
-+		if (err)
-+			return false;
-+	}
- #endif
- 
- 	err = pci_read_config_word(dev->pdev, PCI_DEVICE_ID, &dev_id);
-@@ -446,7 +449,7 @@ static void mlx5_sync_reset_request_event(struct work_struct *work)
- 		mlx5_core_warn(dev, "Failed reading MFRL, err %d\n", err);
- 
- 	if (err || test_bit(MLX5_FW_RESET_FLAGS_NACK_RESET_REQUEST, &fw_reset->reset_flags) ||
--	    !mlx5_is_reset_now_capable(dev)) {
-+	    !mlx5_is_reset_now_capable(dev, fw_reset->reset_method)) {
- 		err = mlx5_fw_reset_set_reset_sync_nack(dev);
- 		mlx5_core_warn(dev, "PCI Sync FW Update Reset Nack %s",
- 			       err ? "Failed" : "Sent");
+-	af_desc.is_managed = 1;
++	af_desc.is_managed = false;
+ 	cpumask_copy(&af_desc.mask, cpu_online_mask);
+ 	cpumask_andnot(&af_desc.mask, &af_desc.mask, &table->used_cpus);
+ 	irq = mlx5_irq_affinity_request(dev, pool, &af_desc);
 -- 
 2.46.0
 
