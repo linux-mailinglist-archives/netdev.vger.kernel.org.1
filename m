@@ -1,187 +1,171 @@
-Return-Path: <netdev+bounces-127440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11FE397568A
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:13:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8AF99756AC
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 365FD1C221A8
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:13:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BA5B28131E
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47E41A4B84;
-	Wed, 11 Sep 2024 15:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4FD1AAE24;
+	Wed, 11 Sep 2024 15:16:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="kN1SQopp";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="XCql8XUa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="etI66wkz"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout6-smtp.messagingengine.com (fout6-smtp.messagingengine.com [103.168.172.149])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F139A64A8F;
-	Wed, 11 Sep 2024 15:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C8922AE90;
+	Wed, 11 Sep 2024 15:16:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726067593; cv=none; b=XHftsZzoreHV1NYNxwUMTOODmmAM1RyNbY6ID2uCtxJIGfDgaRnXK7oksF1f/a9fZz1C39hWpPnfA315U5Qaj1PkHCWfxf6fz3nsRcyIjqteSiw9wqmYmmr6IIRaCyEV7G3AO2OO5CGMaoWhTkz0arirZW13XLsu+NrmpOO7Kqo=
+	t=1726067806; cv=none; b=CxZx/MoLU4t/pNpeYAqUrzwKucWmQKBz5XUmV8RGT6RYc6FWRx+ySfx8aYCI1kA5lM+dlmGpjRAefVZsIN8CgJi0lItyHxLYFl0avXXO/+CdQdFoH/xO3fYquRhS5wyeca8pq69Eq8m9NpjqR81bLWYTOiaAW/7L6mw/I+2puUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726067593; c=relaxed/simple;
-	bh=WYSo2PbdmOt952RgPLexG7kR5bugRClHNNEt8x7IqTE=;
-	h=MIME-Version:Date:From:To:Cc:Message-Id:In-Reply-To:References:
-	 Subject:Content-Type; b=MCuHtNNbdIZHGmCKD1cfAOepU9qgCU91EzkLNnEnSU2avmBNqNnumfyUZG+takBTLEJj3KlDYEfN3ydQ/5FRX+Ciusn43BxeUJKVsAdZIoxAz69wONCR10q/vroc0q4LxdKxDHjKiI76la8LbVyaHY0jMqbooqK9D+mijTLaw4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=kN1SQopp; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=XCql8XUa; arc=none smtp.client-ip=103.168.172.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from phl-compute-10.internal (phl-compute-10.phl.internal [10.202.2.50])
-	by mailfout.phl.internal (Postfix) with ESMTP id 1088E1380199;
-	Wed, 11 Sep 2024 11:13:11 -0400 (EDT)
-Received: from phl-imap-11 ([10.202.2.101])
-  by phl-compute-10.internal (MEProxy); Wed, 11 Sep 2024 11:13:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1726067591;
-	 x=1726153991; bh=W3/bFLF5GPmG/oJuoeXrc+CcLB5pp1RgCukpWqx8NY4=; b=
-	kN1SQoppsrfhQ1aKwXkZbakGlLdt9X7n0Qpj/jN4UR1Y3eNgfSXpaqnXU2jvT2SO
-	CkKtJctqSn1epUMSsgTMq94lbckLuTjWebG421B1IDhx+wTpY91SAQbai5EzqCLj
-	R95I9h/Oyrbf0WnPZczXlzIg7iR9OZRJOQVGeLeTXeijjQZUN9pssjm0tQL1Ck4j
-	zmCdVn/KgcSUzh3PEDQzQyXH51CECcn0v6jPm0mQP/MY+7V5gk0nq6+l3gCmtc/g
-	ty+HY7W6MR9EvZlDKxtvn7S6GuJIvWJn5pCaHnSKZaMQioVWClMCwcd/dkDHZESD
-	MQC/E8Utlc7jhB8oJkSUEQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1726067591; x=
-	1726153991; bh=W3/bFLF5GPmG/oJuoeXrc+CcLB5pp1RgCukpWqx8NY4=; b=X
-	Cql8XUardaZ101GAHySvPbidSWgvrUhHQTCY77YF3/JUkwctwdWEm38bkCyLGtt/
-	8J16Bl06FqQMUJtlhObOyitk5m7QP44iPGfGHHv0aKH/ADQhxP5Aiy6+CoohSNhJ
-	Rhh4Auxf90Hnlp1iddYVLU6hc1fMMYmgb2+cmg3Fjo/WnIAeHVoCzZhj1YgNYPcr
-	1ohJKWJiuShFO5wslaYiWy/j2dw0LyVqm9nBXt8d//9b1SRq9ZTSl3YOskUEJXlB
-	nwUS/fpAc5NQ4sli8XBxEYlbcPYALdQSiG546mzXcfi7kXY6pJzGjqIFv6FqVOCf
-	5cJTRRRLjcMtic9xhj/4A==
-X-ME-Sender: <xms:hrPhZv7WKy14IaSXDvrB34WD0cgYbD5Ijoe3JWsHr6GlacVyDBKooA>
-    <xme:hrPhZk7a8Fxhynsc8w8RlayRPVgkEYNKUatMkcijCIuyuLVk0jSfOdBnS-5RByWau
-    RcFm8SjrTnUKfsMc_o>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudejuddgkeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepofggfffhvfevkfgjfhfutgfgsehtqhertdertdej
-    necuhfhrohhmpedftehrnhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrd
-    guvgeqnecuggftrfgrthhtvghrnhepvdfhvdekueduveffffetgfdvveefvdelhedvvdeg
-    jedvfeehtdeggeevheefleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpe
-    hmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvgdpnhgspghrtghpthhtohepkedp
-    mhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvgh
-    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqphhmsehvghgvrhdr
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqphifmhesvhhgvghrrdhkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhsohhunhgusehvghgvrhdrkhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqshhpihesvhhgvghrrdhkvghrnh
-    gvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdifrghttghhughoghesvhhgvghrrdhk
-    vghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehhshifvggvthgvnhesvhhishhiohhnvghnghhrrghvvghr
-    shdrtghomh
-X-ME-Proxy: <xmx:hrPhZmdf99FfYnKem1AvJRPrIWg_fpZhxEh7VXJW1DiQT-3DEsIlAw>
-    <xmx:hrPhZgKV4S-Tu8NFrkX1SKt93sCnq7evJA8rGaJW17oS2EqYyvfRuA>
-    <xmx:hrPhZjICCGVAAUPix4F6pKGjdQzOYquZK8famopAqgECfsZSkw7yfA>
-    <xmx:hrPhZpx3YBmlZtpGZtemz01LfUC4tyicKeisD-A40BaSPyvkkrpYOg>
-    <xmx:h7PhZgqUnZj763mof6oSn8RoTf9JC4c3LkDlkkuvY8-Y5nodlrUuSzYN>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.phl.internal (Postfix, from userid 501)
-	id C2F2D222006F; Wed, 11 Sep 2024 11:13:10 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
+	s=arc-20240116; t=1726067806; c=relaxed/simple;
+	bh=S+MvNjtO0ytOudQaCNbsEFFb/f2LYmj39wai1aL4pbU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=pvM6SaVPYKoR+zDIP6zOjgOPyfHR3Sb8HIEZlyJDHmls/9dBxznwUl6ZrdynVssfm4p2ls9n4rjSRnNKO6T5krMlX6Yoau6g/JhsiCPj1i5SGyxGaII5cOVamSxQKwKdHYrHrtIK0IvGAK01T2NbPPlX5rnBbnAQGX5px5Smhpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=etI66wkz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AB90C4CEC0;
+	Wed, 11 Sep 2024 15:16:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726067806;
+	bh=S+MvNjtO0ytOudQaCNbsEFFb/f2LYmj39wai1aL4pbU=;
+	h=From:Subject:Date:To:Cc:From;
+	b=etI66wkzVA4DEZzh4ZOwPMEyvpurFg1rMqz64QmiUxP7q7RaqXxrHzbjYkSmYhXOD
+	 I+byxGp/zIwheE17qys15yy+LZycgbZGGIIFNCE7tkKG9Pu3ajXUozNFSn6IYGg+48
+	 VDobE1s4j5oHjMnIifx0I1j18lSkkgmCphts7iKYggJIHjI9+5iikISMh1bGTCCk2g
+	 CmZVwp8Qyp+TzPIvkE0+Zstzh4kTvkVzmwNrTAHsTZKp+aIYBmCZ7VLm73mrqCO/Nf
+	 wHqygbR7GG2mAD5WAcKuX3yUY1baEdr1IjuHEDtH1Q4ELuXTFeqlOEzKvYwiXNr1Vm
+	 dEnsrN7beSTIQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH bpf-next/net v6 0/3] selftests/bpf: new MPTCP subflow
+ subtest
+Date: Wed, 11 Sep 2024 17:16:15 +0200
+Message-Id: <20240911-upstream-bpf-next-20240506-mptcp-subflow-test-v6-0-7872294c466b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Wed, 11 Sep 2024 15:12:49 +0000
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Nikita Shubin" <nikita.shubin@maquefel.me>,
- "Andy Shevchenko" <andy.shevchenko@gmail.com>
-Cc: "Hartley Sweeten" <hsweeten@visionengravers.com>,
- "Alexander Sverdlin" <alexander.sverdlin@gmail.com>,
- "Russell King" <linux@armlinux.org.uk>,
- "Lukasz Majewski" <lukma@denx.de>,
- "Linus Walleij" <linus.walleij@linaro.org>,
- "Bartosz Golaszewski" <brgl@bgdev.pl>,
- "Andy Shevchenko" <andy@kernel.org>,
- "Michael Turquette" <mturquette@baylibre.com>,
- "Stephen Boyd" <sboyd@kernel.org>, "Sebastian Reichel" <sre@kernel.org>,
- "Rob Herring" <robh+dt@kernel.org>,
- "Krzysztof Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
- "Conor Dooley" <conor+dt@kernel.org>, "Vinod Koul" <vkoul@kernel.org>,
- "Wim Van Sebroeck" <wim@linux-watchdog.org>,
- "Guenter Roeck" <linux@roeck-us.net>,
- "Thierry Reding" <thierry.reding@gmail.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- "Mark Brown" <broonie@kernel.org>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Miquel Raynal" <miquel.raynal@bootlin.com>,
- "Richard Weinberger" <richard@nod.at>,
- "Vignesh Raghavendra" <vigneshr@ti.com>,
- "Damien Le Moal" <dlemoal@kernel.org>,
- "Sergey Shtylyov" <s.shtylyov@omp.ru>,
- "Dmitry Torokhov" <dmitry.torokhov@gmail.com>,
- "Liam Girdwood" <lgirdwood@gmail.com>,
- "Jaroslav Kysela" <perex@perex.cz>, "Takashi Iwai" <tiwai@suse.com>,
- "Ralf Baechle" <ralf@linux-mips.org>, "Aaron Wu" <Aaron.Wu@analog.com>,
- "Lee Jones" <lee@kernel.org>, "Olof Johansson" <olof@lixom.net>,
- "Niklas Cassel" <cassel@kernel.org>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- "open list:GPIO SUBSYSTEM" <linux-gpio@vger.kernel.org>,
- linux-clk@vger.kernel.org, linux-pm@vger.kernel.org,
- devicetree@vger.kernel.org, dmaengine@vger.kernel.org,
- linux-watchdog@vger.kernel.org, linux-pwm@vger.kernel.org,
- linux-spi@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-mtd@lists.infradead.org, linux-ide@vger.kernel.org,
- linux-input@vger.kernel.org, linux-sound@vger.kernel.org,
- "Bartosz Golaszewski" <bartosz.golaszewski@linaro.org>,
- "Krzysztof Kozlowski" <krzysztof.kozlowski@linaro.org>,
- "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
- "Andrew Lunn" <andrew@lunn.ch>
-Message-Id: <cff6b9b6-6ede-435a-9271-829fde82550d@app.fastmail.com>
-In-Reply-To: <0e3902c9a42b05b0227e767b227624c6fe8fd2bb.camel@maquefel.me>
-References: <20240909-ep93xx-v12-0-e86ab2423d4b@maquefel.me>
- <CAHp75Veusv=f6Xf9-gL3ctoO5Njn7wiWMw-aMN45KbZ=YB=mQw@mail.gmail.com>
- <0e3902c9a42b05b0227e767b227624c6fe8fd2bb.camel@maquefel.me>
-Subject: Re: [PATCH v12 00/38] ep93xx device tree conversion
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD+04WYC/5XPQW7DIBAF0KtErEuL8YBNV71HlQXgIUFNsAXET
+ RT57iVWW7fyysvRH70/cycJo8dEXnd3EnH0yfehDPJpR+xRhwNS35WZcMaBCSbpZUg5oj5TMzg
+ a8Jrpb3Qesh1ouhh36j9pxpSp0+ikFGCcrkkxh4jOX+e+d/IjvATMZF/So0+5j7f5mLGad77xZ
+ mPvWFFGkRtrOgeqFc3bB8aAp+c+Huaqkf/l1VaeFx4YtJYraMuDK75e+IbVW/n6cb3pLO9AlRq
+ 14mHhWya28lB4bsBqqRQoVa94sfCqYlt58eCtlKCbTkNj//HTNH0B2RMgoXUCAAA=
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3750; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=S+MvNjtO0ytOudQaCNbsEFFb/f2LYmj39wai1aL4pbU=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBm4bRYFg84oWNrBXx+cmmchIQ++h1C1EtARPeHm
+ eofBNvf4JCJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZuG0WAAKCRD2t4JPQmmg
+ c8nREADLwqZoyLMp383gck64X1CAIasXJH6nbJJ1Eosx7sH1f9Xl2iEq8T5om8VOz29bcm0uVJq
+ xVRFM9Z6tcb+UZ9CFHc1NNnKkF9kzRPLswD3CCqfw6vi3cutOJcJfnwdJ0nBMAwXpeknJs07DDt
+ 4tfhJ8d4EMxMDQjzabuImRUA4VQov7gC1p7KWOxKk5iIO1zCU5jyZePue+aUEr8py0gDmwhCErc
+ +TASZo16CUIDdUGG4dSQDGk4MvZX6ThsgLBf/JNtlKVnWHrt2iDEi3JSHuKOsXbY9YzIHuadvss
+ Kjxyubh5JPu7f6Z0uFXPAmhS0OfpLm6/PkQsK44PLH49La1B1tIuh8tIY06fmoiW7wKSy8pmIOT
+ xbGZaWSFDC+30jlg+o09SsGg6ukOJxEAv0xXF3o8SoQfFIZfq03JMyEqczrWk4i6fWamfSsSA1g
+ 9LK8mrnBLN3aO93vHTjvFlWuAKztwKyf3oTkXneeVo8Hjo+AF5ooMybPLWclh/ySExOfghkWrXl
+ l58YGye4/P5ah90yJh+w9NwOHRjZY9cE4jeISe85T4hgguGuxM9e/htWUhmjs4ypQGsGV4tpPMJ
+ dO+UvQHojbYid1Y8FQnPAb9aU4u+ShdmqNUsx+BHEd3YJ8O89A3cI869Htxqu72bOwPzbDj4RdB
+ srmm/D2iFKMQ8hA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Mon, Sep 9, 2024, at 09:02, Nikita Shubin wrote:
-> On Mon, 2024-09-09 at 11:49 +0300, Andy Shevchenko wrote:
->> On Mon, Sep 9, 2024 at 11:12=E2=80=AFAM Nikita Shubin via B4 Relay
->> <devnull+nikita.shubin.maquefel.me@kernel.org> wrote:
->> >=20
->> > The goal is to recieve ACKs for all patches in series to merge it
->> > via Arnd branch.
->> >=20
->> > It was decided from the very beginning of these series, mostly
->> > because
->> > it's a full conversion of platform code to DT and it seemed not
->> > convenient to maintain compatibility with both platform and DT.
->> >=20
->> > Following patches require attention from Stephen Boyd or clk
->> > subsystem:
->>=20
->> Does it mean you still have a few patches without tags?
->> What are their respective numbers?
->
-> The clk is the last one as i think, all others can be ACKed by
-> Alexander or by Arnd himself.
+In this series from Geliang, modifying MPTCP BPF selftests, we have:
 
-I've merged the series into the for-next branch of the arm-soc
-tree now. The timing isn't great as I was still waiting for
-that final Ack, but it seem better to have it done than to keep
-respinning the series.
+- A new MPTCP subflow BPF program setting socket options per subflow: it
+  looks better to have this old test program in the BPF selftests to
+  track regressions and to serve as example.
 
-I won't send it with the initial pull requests this week
-but hope to send this one once I get beck from LPC, provided
-there are no surprises that require a rebase.
+  Note: Nicolas is no longer working at Tessares, but he did this work
+  while working for them, and his email address is no longer available.
 
-     Arnd
+- A new hook in the same BPF program to do the verification step.
+
+- A new MPTCP BPF subtest validating the new BPF program added in the
+  first patch, with the help of the new hook added in the second patch.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Changes in v6:
+- Patch 3/3: use usleep() instead of sleep()
+- Series: rebased on top of bpf-next/net
+- Link to v5: https://lore.kernel.org/r/20240910-upstream-bpf-next-20240506-mptcp-subflow-test-v5-0-2c664a7da47c@kernel.org
+
+Changes in v5:
+- See the individual changelog for more details about them
+- Patch 1/3: set TCP on the 2nd subflow
+- Patch 2/3: new
+- Patch 3/3: use the BPF program from patch 2/3 to do the validation
+             instead of using ss.
+- Series: rebased on top of bpf-next/net
+- Link to v4: https://lore.kernel.org/r/20240805-upstream-bpf-next-20240506-mptcp-subflow-test-v4-0-2b4ca6994993@kernel.org
+
+Changes in v4:
+- Drop former patch 2/3: MPTCP's pm_nl_ctl requires a new header file:
+  - I will check later if it is possible to avoid having duplicated
+    header files in tools/include/uapi, but no need to block this series
+    for that. Patch 2/3 can be added later if needed.
+- Patch 2/2: skip the test if 'ip mptcp' is not available.
+- Link to v3: https://lore.kernel.org/r/20240703-upstream-bpf-next-20240506-mptcp-subflow-test-v3-0-ebdc2d494049@kernel.org
+
+Changes in v3:
+- Sorry for the delay between v2 and v3, this series was conflicting
+  with the "add netns helpers", but it looks like it is on hold:
+  https://lore.kernel.org/cover.1715821541.git.tanggeliang@kylinos.cn
+- Patch 1/3 includes "bpf_tracing_net.h", introduced in between.
+- New patch 2/3: "selftests/bpf: Add mptcp pm_nl_ctl link".
+- Patch 3/3: use the tool introduced in patch 2/3 + SYS_NOFAIL() helper.
+- Link to v2: https://lore.kernel.org/r/20240509-upstream-bpf-next-20240506-mptcp-subflow-test-v2-0-4048c2948665@kernel.org
+
+Changes in v2:
+- Previous patches 1/4 and 2/4 have been dropped from this series:
+  - 1/4: "selftests/bpf: Handle SIGINT when creating netns":
+    - A new version, more generic and no longer specific to MPTCP BPF
+      selftest will be sent later, as part of a new series. (Alexei)
+  - 2/4: "selftests/bpf: Add RUN_MPTCP_TEST macro":
+    - Removed, not to hide helper functions in macros. (Alexei)
+- The commit message of patch 1/2 has been clarified to avoid some
+  possible confusions spot by Alexei.
+- Link to v1: https://lore.kernel.org/r/20240507-upstream-bpf-next-20240506-mptcp-subflow-test-v1-0-e2bcbdf49857@kernel.org
+
+---
+Geliang Tang (2):
+      selftests/bpf: Add getsockopt to inspect mptcp subflow
+      selftests/bpf: Add mptcp subflow subtest
+
+Nicolas Rybowski (1):
+      selftests/bpf: Add mptcp subflow example
+
+ MAINTAINERS                                       |   2 +-
+ tools/testing/selftests/bpf/prog_tests/mptcp.c    | 127 +++++++++++++++++++++
+ tools/testing/selftests/bpf/progs/mptcp_bpf.h     |  42 +++++++
+ tools/testing/selftests/bpf/progs/mptcp_subflow.c | 128 ++++++++++++++++++++++
+ 4 files changed, 298 insertions(+), 1 deletion(-)
+---
+base-commit: 23dc9867329c72b48e5039ac93fbf50d9099cdb3
+change-id: 20240506-upstream-bpf-next-20240506-mptcp-subflow-test-faef6654bfa3
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
 
