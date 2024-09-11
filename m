@@ -1,380 +1,655 @@
-Return-Path: <netdev+bounces-127416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB6B69754FA
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:07:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A79F797550E
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:14:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3DE5B25390
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:07:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33A981F22A78
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B4D19AA75;
-	Wed, 11 Sep 2024 14:07:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F28119C552;
+	Wed, 11 Sep 2024 14:14:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="SHcmv3DP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GU7ZH12d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775C818592F
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 14:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0779918858A
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 14:14:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726063662; cv=none; b=lFqn5iHQE2MRjitWbhIpAnsd4uxsJvRtHaEfKoSZY5xcajxVkhDwUbGUI/xVXXospZrNiuV2WPiWWUqGMSadIeuXHCFvT6GnDdmDC3bw9sN0xwrnoiiobCVq79cWVTLtegpNGPCXneyyhXM5mMoLYtJ24Xc4eUt5aHH+Rkvj+3I=
+	t=1726064073; cv=none; b=kQ87IdFXuhxZF+HtatBmZuLy8F6MU/960DX1vks1pAOnrxSU+BxrGZMsucxSb8qdOifk02tkASTDY3qbHmHc1T8KvX2g8QaFKGzMU2EksfJHVKx2Tb1OBwa0tO08KMUQyrA7+6rTqAsp6F6NcdBUdMWjCh5mpywSLDAGKYbBaTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726063662; c=relaxed/simple;
-	bh=+ftgcK4f2/to4uKrWv0xYCn5/Z7eucHBzJwmljvUKok=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FND7QHUKo2Xb5aDhhT89x+SpMyM+n6PIdhezKymuYqx3JYhCSlcoirgXb+ePoDMYT0ag7WjVmwl7VTX3Qj62DP0lTCZ8F2CNLR4+8Rpq75OjgrWQ80Ru/1Oqk7FJJmOChMsXbsfAlu6DpGS1hzTXvNUr5dzzhVve3oyg9tWRF5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=SHcmv3DP; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com [209.85.221.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id AC5E53F5B0
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 14:07:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1726063656;
-	bh=p9rxqlWWT14NUIS+09dJZ0yxmRTciNgyh/Jd1Ehnhvs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=SHcmv3DPJWCWRFHSEPSQ6rYD9beXjT2PjcBB/c3yf/WcjTD2cl2s+Ubv0Lw/EfV8n
-	 r3ufKfZDNHhwt4mqXSVAK6raTx0FoGWx948RUlOdb/phl2dvwJ/MBNA6ouM4ZsP6Li
-	 hTwDSIi5SdY1XFX3kDWCcWqzn5PmvJQus+M6VVQBPeI1onKn6MRDwokeaq91oxt6H7
-	 /o85+M6i42cD7HZjZmoyYOZ+D2qse+d7jnMXWr7csE3pHJuNGjkAchDNo4TC/6HnHk
-	 s0+1t9YyVXjdpL+dhJ2pxnfFXgKOfKOFzu3xf25mq8gAbmhts/r7+X2vUUZKGPIC6S
-	 +cEkFVO2QEGQQ==
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-374c54e188dso518450f8f.1
-        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 07:07:36 -0700 (PDT)
+	s=arc-20240116; t=1726064073; c=relaxed/simple;
+	bh=TUc1KU1MznrzkuTWKQ5eAxqyDQii8n9dhK3yZQ9zBSA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=eYenqSd8bCoqNA6H/plW4tQwBqK3PotLNactpA9gQ8NtmwbwuGhWxhI9oDMMy22kpoc4OVZKPnBI3RSvUnH+SabdC3+xxMvTpaDs/Fk4nGcxFygWJ0ISQYnN7aXfHgXqVLnzukAjPeh/QeR/N7yi+QS3MAN/Pu+yq7U7K1XnrbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GU7ZH12d; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726064069;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=niG1SRTvrtaYVmXDD+x0Lv431jhZ7HP+deUzZrsxCVM=;
+	b=GU7ZH12d2lcF8v0qDaPfbKm5xiVt68SoOC7wAhzLxUnSojFM0kj0/HeEu5CHJK5ltSRUGS
+	Nne5efosdZWA/baCtapcYTNFl1Ch0yuznEpf8f0/r5OT7qYGg3VhpZrbs52I8GRA7VMwLg
+	ZvpdQUnuc7cD6EOO8WieK/3+fLOZaKw=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-615-j9o9-ER6MP-3_m9uIVyXlw-1; Wed, 11 Sep 2024 10:14:28 -0400
+X-MC-Unique: j9o9-ER6MP-3_m9uIVyXlw-1
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-5c25cf44030so4580927a12.0
+        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 07:14:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726063656; x=1726668456;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1726064067; x=1726668867;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=p9rxqlWWT14NUIS+09dJZ0yxmRTciNgyh/Jd1Ehnhvs=;
-        b=q/Nzez8D3oW7Lm9T1O7kS0KtfNU/sJlUzcTPDsPi7ruQCjsod2TAt+xk617IkL1Uvl
-         fS6YK8MKcDqeRdk7pZj3rcHcUTjBFx15c+YdrLqTvXu1lTNLZUJwH7ajeWKyG/uGdSxo
-         Knv9+BPKAh9V5IS97k5kNN4AIF1UW0DWJDfuQ0eeHPbq+eRxmHJTTlSVlM6sncBpiul2
-         TagpX1YAmnPH86aUzRqUFb44Ehq33qFhVeACFbMlzM0tt6hatkAic1Je+regeQCd5u89
-         exxpXAsMjrfPsVlzXFK6Z3DLn+CJ5IJXl2G8LN45jU7WPAHNwCQO6UlkCxpuymrnjW3U
-         jp6g==
-X-Forwarded-Encrypted: i=1; AJvYcCVpr2jipjVy0edOEoZi0lXJ5RhdO9NM94sOUUro68VeEsZ7A2azFW1kKuEoLgwCLx61Ar3pvnc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLcCmTyncoS5y+t7M/2j9UxaZtMYXEc5CjSsNTIPkX1nKL4XcY
-	prHoegkXOIxki3ErtXw6eNBj4mLYXzTc3WKN9Ku59LJkqhlTKZIq4251VuaGmuf/D+6NOzLrDBB
-	Xk7OMJw5GgJTlIzIxou5pMZ4i/DnC1kQSMqcznZX+neSADnFqtvZhpPoByX8GQuuJ8mD9pV9+Qz
-	9aQX47fQRocNz9e71fGeA0j47msDxMmABBfow+qoztDA4n
-X-Received: by 2002:a05:6000:1961:b0:374:c878:4519 with SMTP id ffacd0b85a97d-378a89fd429mr4082080f8f.3.1726063656018;
-        Wed, 11 Sep 2024 07:07:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEk5ibF+cE3CpFPavweiRicJEmiK24xmMX0WQixiJHD123vmnWtqTTch4Cn0+inoB5F6wo7AYvMdxX2EMijBh8=
-X-Received: by 2002:a05:6000:1961:b0:374:c878:4519 with SMTP id
- ffacd0b85a97d-378a89fd429mr4082055f8f.3.1726063655347; Wed, 11 Sep 2024
- 07:07:35 -0700 (PDT)
+        bh=niG1SRTvrtaYVmXDD+x0Lv431jhZ7HP+deUzZrsxCVM=;
+        b=o1mWYIMSzb7YkAs1ISJ4DiCvSkFuL1Rb2D9mBM0KLYkzUHK2S+guA9TQllFUwaR6nF
+         84BEfHxugs/aBgnV75HhTQwNA4NBiNsel/HKKF8VDb+U6F44o20ARkVgSM0vUrU+Fl38
+         ZTnuLREViucSl43KMnzpQxLB9LjjYqT69WSXzcV4MI/DvEqUhpH6a10eVZkvxCa8Y/C6
+         KMyhyA+m5Hezx1LkqrHNMFlq1XB8yTQLzCm4yH3Q7zpok8vNBoH7wVsFcnrSlqvf4nqs
+         GaZ0EYMZyliXdp8nnzlS/TVFHAn0OXoJh4VBDvmsgZBJs0o0gXdrVRHtiRBfDDGnpYy5
+         jngA==
+X-Forwarded-Encrypted: i=1; AJvYcCXifauqk8g4hqhYwIJtm+BbW4R0VMlrMV0rgyTllnk11UOjhPdNXWuiy0rfsVGiU+d5jGDs4jQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyeBV3MBS/QAhu5mux/1A9AROaqveWdoOZExzOiMhJUaUGanCzX
+	vs3XRpUyMd6W05534IT4kTTW008ZMA4Rg0FSEUfd01BsaSVVFsS6dpc3Mass2iE+nn8w3UPtSdu
+	K638+oRQLBWzYjHF7TzQuVxztoX4Zt280Au9UFInw8u8eu1P0l30mUw==
+X-Received: by 2002:a05:6402:3596:b0:5c2:112f:aa77 with SMTP id 4fb4d7f45d1cf-5c3dc7c6f49mr16198949a12.31.1726064067140;
+        Wed, 11 Sep 2024 07:14:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFcxfrSTFiuJc4PQYb7wZ+3L9gcS01qdsW5TOGaLxsUChyXjaeKiLlD/bwsQqajw/Uv5XqzNw==
+X-Received: by 2002:a05:6402:3596:b0:5c2:112f:aa77 with SMTP id 4fb4d7f45d1cf-5c3dc7c6f49mr16198881a12.31.1726064066145;
+        Wed, 11 Sep 2024 07:14:26 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd5215asm5491230a12.56.2024.09.11.07.14.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 07:14:25 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 95E09152C52E; Wed, 11 Sep 2024 16:14:24 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Florian Kauer <florian.kauer@linutronix.de>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
+ Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, Masami
+ Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ xdp-newbies@vger.kernel.org
+Subject: Re: [PATCH] bpf: devmap: allow for repeated redirect
+In-Reply-To: <93a97de4-a93d-4d5b-841d-c2f95dcedb0f@linutronix.de>
+References: <20240909-devel-koalo-fix-redirect-v1-1-2dd90771146c@linutronix.de>
+ <87o74vewko.fsf@toke.dk>
+ <098b5603-0feb-4013-a9ee-8d1c8edaf4f8@linutronix.de>
+ <877cbiee3y.fsf@toke.dk>
+ <93a97de4-a93d-4d5b-841d-c2f95dcedb0f@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 11 Sep 2024 16:14:24 +0200
+Message-ID: <87ttemcm67.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240906083539.154019-1-en-wei.wu@canonical.com>
- <8707a2c6-644d-4ccd-989f-1fb66c48d34a@gmail.com> <CAMqyJG0FcY0hymX6xyZwiWbD8zdsYwWG7GMu2zcL9-bMkq-pMw@mail.gmail.com>
- <038166f4-9c47-4017-9543-4b4a5ca503f5@gmail.com> <CAMqyJG0-35Phq1i3XkTyJfjzk07BNuOvPyDpdbFECzbEPHp_ig@mail.gmail.com>
- <ed753ef5-3913-413a-ad46-2abe742489b2@gmail.com> <CAMqyJG1Z13Xkw28jrKKhthJphjBBxmEpsKTVPmuU0auHHz-fxQ@mail.gmail.com>
- <166d0df9-e06e-420e-a074-c33abd422add@gmail.com>
-In-Reply-To: <166d0df9-e06e-420e-a074-c33abd422add@gmail.com>
-From: En-Wei WU <en-wei.wu@canonical.com>
-Date: Wed, 11 Sep 2024 22:07:23 +0800
-Message-ID: <CAMqyJG1YJjRKGVgWzp4MJRrCP__VUc_k7ORa=2RMdr4TU6N9mg@mail.gmail.com>
-Subject: Re: [PATCH net] r8169: correct the reset timing of RTL8125 for
- link-change event
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: nic_swsd@realtek.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kuan-ying.lee@canonical.com, 
-	kai.heng.feng@canonical.com, me@lagy.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Thanks for your great support!
+Florian Kauer <florian.kauer@linutronix.de> writes:
 
+> On 9/11/24 11:25, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Florian Kauer <florian.kauer@linutronix.de> writes:
+>>=20
+>>> Hi Toke,
+>>>
+>>> On 9/10/24 10:34, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>>>> Florian Kauer <florian.kauer@linutronix.de> writes:
+>>>>
+>>>>> Currently, returning XDP_REDIRECT from a xdp/devmap program
+>>>>> is considered as invalid action and an exception is traced.
+>>>>>
+>>>>> While it might seem counterintuitive to redirect in a xdp/devmap
+>>>>> program (why not just redirect to the correct interface in the
+>>>>> first program?), we faced several use cases where supporting
+>>>>> this would be very useful.
+>>>>>
+>>>>> Most importantly, they occur when the first redirect is used
+>>>>> with the BPF_F_BROADCAST flag. Using this together with xdp/devmap
+>>>>> programs, enables to perform different actions on clones of
+>>>>> the same incoming frame. In that case, it is often useful
+>>>>> to redirect either to a different CPU or device AFTER the cloning.
+>>>>>
+>>>>> For example:
+>>>>> - Replicate the frame (for redundancy according to IEEE 802.1CB FRER)
+>>>>>   and then use the second redirect with a cpumap to select
+>>>>>   the path-specific egress queue.
+>>>>>
+>>>>> - Also, one of the paths might need an encapsulation that
+>>>>>   exceeds the MTU. So a second redirect can be used back
+>>>>>   to the ingress interface to send an ICMP FRAG_NEEDED packet.
+>>>>>
+>>>>> - For OAM purposes, you might want to send one frame with
+>>>>>   OAM information back, while the original frame in passed forward.
+>>>>>
+>>>>> To enable these use cases, add the XDP_REDIRECT case to
+>>>>> dev_map_bpf_prog_run. Also, when this is called from inside
+>>>>> xdp_do_flush, the redirect might add further entries to the
+>>>>> flush lists that are currently processed. Therefore, loop inside
+>>>>> xdp_do_flush until no more additional redirects were added.
+>>>>>
+>>>>> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+>>>>
+>>>> This is an interesting use case! However, your implementation makes it
+>>>> way to easy to end up in a situation that loops forever, so I think we
+>>>> should add some protection against that. Some details below:
+>>>>
+>>>>> ---
+>>>>>  include/linux/bpf.h        |  4 ++--
+>>>>>  include/trace/events/xdp.h | 10 ++++++----
+>>>>>  kernel/bpf/devmap.c        | 37 +++++++++++++++++++++++++++--------
+>>>>>  net/core/filter.c          | 48 +++++++++++++++++++++++++++---------=
+----------
+>>>>>  4 files changed, 65 insertions(+), 34 deletions(-)
+>>>>>
+>>>>> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+>>>>> index 3b94ec161e8c..1b57cbabf199 100644
+>>>>> --- a/include/linux/bpf.h
+>>>>> +++ b/include/linux/bpf.h
+>>>>> @@ -2498,7 +2498,7 @@ struct sk_buff;
+>>>>>  struct bpf_dtab_netdev;
+>>>>>  struct bpf_cpu_map_entry;
+>>>>>=20=20
+>>>>> -void __dev_flush(struct list_head *flush_list);
+>>>>> +void __dev_flush(struct list_head *flush_list, int *redirects);
+>>>>>  int dev_xdp_enqueue(struct net_device *dev, struct xdp_frame *xdpf,
+>>>>>  		    struct net_device *dev_rx);
+>>>>>  int dev_map_enqueue(struct bpf_dtab_netdev *dst, struct xdp_frame *x=
+dpf,
+>>>>> @@ -2740,7 +2740,7 @@ static inline struct bpf_token *bpf_token_get_f=
+rom_fd(u32 ufd)
+>>>>>  	return ERR_PTR(-EOPNOTSUPP);
+>>>>>  }
+>>>>>=20=20
+>>>>> -static inline void __dev_flush(struct list_head *flush_list)
+>>>>> +static inline void __dev_flush(struct list_head *flush_list, int *re=
+directs)
+>>>>>  {
+>>>>>  }
+>>>>>=20=20
+>>>>> diff --git a/include/trace/events/xdp.h b/include/trace/events/xdp.h
+>>>>> index a7e5452b5d21..fba2c457e727 100644
+>>>>> --- a/include/trace/events/xdp.h
+>>>>> +++ b/include/trace/events/xdp.h
+>>>>> @@ -269,9 +269,9 @@ TRACE_EVENT(xdp_devmap_xmit,
+>>>>>=20=20
+>>>>>  	TP_PROTO(const struct net_device *from_dev,
+>>>>>  		 const struct net_device *to_dev,
+>>>>> -		 int sent, int drops, int err),
+>>>>> +		 int sent, int drops, int redirects, int err),
+>>>>>=20=20
+>>>>> -	TP_ARGS(from_dev, to_dev, sent, drops, err),
+>>>>> +	TP_ARGS(from_dev, to_dev, sent, drops, redirects, err),
+>>>>>=20=20
+>>>>>  	TP_STRUCT__entry(
+>>>>>  		__field(int, from_ifindex)
+>>>>> @@ -279,6 +279,7 @@ TRACE_EVENT(xdp_devmap_xmit,
+>>>>>  		__field(int, to_ifindex)
+>>>>>  		__field(int, drops)
+>>>>>  		__field(int, sent)
+>>>>> +		__field(int, redirects)
+>>>>>  		__field(int, err)
+>>>>>  	),
+>>>>>=20=20
+>>>>> @@ -288,16 +289,17 @@ TRACE_EVENT(xdp_devmap_xmit,
+>>>>>  		__entry->to_ifindex	=3D to_dev->ifindex;
+>>>>>  		__entry->drops		=3D drops;
+>>>>>  		__entry->sent		=3D sent;
+>>>>> +		__entry->redirects	=3D redirects;
+>>>>>  		__entry->err		=3D err;
+>>>>>  	),
+>>>>>=20=20
+>>>>>  	TP_printk("ndo_xdp_xmit"
+>>>>>  		  " from_ifindex=3D%d to_ifindex=3D%d action=3D%s"
+>>>>> -		  " sent=3D%d drops=3D%d"
+>>>>> +		  " sent=3D%d drops=3D%d redirects=3D%d"
+>>>>>  		  " err=3D%d",
+>>>>>  		  __entry->from_ifindex, __entry->to_ifindex,
+>>>>>  		  __print_symbolic(__entry->act, __XDP_ACT_SYM_TAB),
+>>>>> -		  __entry->sent, __entry->drops,
+>>>>> +		  __entry->sent, __entry->drops, __entry->redirects,
+>>>>>  		  __entry->err)
+>>>>>  );
+>>>>>=20=20
+>>>>> diff --git a/kernel/bpf/devmap.c b/kernel/bpf/devmap.c
+>>>>> index 7878be18e9d2..89bdec49ea40 100644
+>>>>> --- a/kernel/bpf/devmap.c
+>>>>> +++ b/kernel/bpf/devmap.c
+>>>>> @@ -334,7 +334,8 @@ static int dev_map_hash_get_next_key(struct bpf_m=
+ap *map, void *key,
+>>>>>  static int dev_map_bpf_prog_run(struct bpf_prog *xdp_prog,
+>>>>>  				struct xdp_frame **frames, int n,
+>>>>>  				struct net_device *tx_dev,
+>>>>> -				struct net_device *rx_dev)
+>>>>> +				struct net_device *rx_dev,
+>>>>> +				int *redirects)
+>>>>>  {
+>>>>>  	struct xdp_txq_info txq =3D { .dev =3D tx_dev };
+>>>>>  	struct xdp_rxq_info rxq =3D { .dev =3D rx_dev };
+>>>>> @@ -359,6 +360,13 @@ static int dev_map_bpf_prog_run(struct bpf_prog =
+*xdp_prog,
+>>>>>  			else
+>>>>>  				frames[nframes++] =3D xdpf;
+>>>>>  			break;
+>>>>> +		case XDP_REDIRECT:
+>>>>> +			err =3D xdp_do_redirect(rx_dev, &xdp, xdp_prog);
+>>>>> +			if (unlikely(err))
+>>>>> +				xdp_return_frame_rx_napi(xdpf);
+>>>>> +			else
+>>>>> +				*redirects +=3D 1;
+>>>>> +			break;
+>>>>
+>>>> It's a bit subtle, but dev_map_bpf_prog_run() also filters the list of
+>>>> frames in the queue in-place (the frames[nframes++] =3D xdpf; line abo=
+ve),
+>>>> which only works under the assumption that the array in bq->q is not
+>>>> modified while this loop is being run. But now you're adding a call in
+>>>> the middle that may result in the packet being put back on the same
+>>>> queue in the middle, which means that this assumption no longer holds.
+>>>>
+>>>> So you need to clear the bq->q queue first for this to work.
+>>>> Specifically, at the start of bq_xmit_all(), you'll need to first copy
+>>>> all the packet pointer onto an on-stack array, then run the rest of the
+>>>> function on that array. There's already an initial loop that goes
+>>>> through all the frames, so you can just do it there.
+>>>>
+>>>> So the loop at the start of bq_xmit_all() goes from the current:
+>>>>
+>>>> 	for (i =3D 0; i < cnt; i++) {
+>>>> 		struct xdp_frame *xdpf =3D bq->q[i];
+>>>>
+>>>> 		prefetch(xdpf);
+>>>> 	}
+>>>>
+>>>>
+>>>> to something like:
+>>>>
+>>>>         struct xdp_frame *frames[DEV_MAP_BULK_SIZE];
+>>>>
+>>>> 	for (i =3D 0; i < cnt; i++) {
+>>>> 		struct xdp_frame *xdpf =3D bq->q[i];
+>>>>
+>>>> 		prefetch(xdpf);
+>>>>                 frames[i] =3D xdpf;
+>>>> 	}
+>>>>
+>>>>         bq->count =3D 0; /* bq is now empty, use the 'frames' and 'cnt'
+>>>>                           stack variables for the rest of the function=
+ */
+>>>>
+>>>>
+>>>>
+>>>>>  		default:
+>>>>>  			bpf_warn_invalid_xdp_action(NULL, xdp_prog, act);
+>>>>>  			fallthrough;
+>>>>> @@ -373,7 +381,7 @@ static int dev_map_bpf_prog_run(struct bpf_prog *=
+xdp_prog,
+>>>>>  	return nframes; /* sent frames count */
+>>>>>  }
+>>>>>=20=20
+>>>>> -static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, u32 flags)
+>>>>> +static void bq_xmit_all(struct xdp_dev_bulk_queue *bq, u32 flags, in=
+t *redirects)
+>>>>>  {
+>>>>>  	struct net_device *dev =3D bq->dev;
+>>>>>  	unsigned int cnt =3D bq->count;
+>>>>> @@ -390,8 +398,10 @@ static void bq_xmit_all(struct xdp_dev_bulk_queu=
+e *bq, u32 flags)
+>>>>>  		prefetch(xdpf);
+>>>>>  	}
+>>>>>=20=20
+>>>>> +	int new_redirects =3D 0;
+>>>>>  	if (bq->xdp_prog) {
+>>>>> -		to_send =3D dev_map_bpf_prog_run(bq->xdp_prog, bq->q, cnt, dev, bq=
+->dev_rx);
+>>>>> +		to_send =3D dev_map_bpf_prog_run(bq->xdp_prog, bq->q, cnt, dev, bq=
+->dev_rx,
+>>>>> +				&new_redirects);
+>>>>>  		if (!to_send)
+>>>>>  			goto out;
+>>>>>  	}
+>>>>> @@ -413,19 +423,21 @@ static void bq_xmit_all(struct xdp_dev_bulk_que=
+ue *bq, u32 flags)
+>>>>>=20=20
+>>>>>  out:
+>>>>>  	bq->count =3D 0;
+>>>>> -	trace_xdp_devmap_xmit(bq->dev_rx, dev, sent, cnt - sent, err);
+>>>>> +	*redirects +=3D new_redirects;
+>>>>> +	trace_xdp_devmap_xmit(bq->dev_rx, dev, sent, cnt - sent - new_redir=
+ects,
+>>>>> +			new_redirects, err);
+>>>>>  }
+>>>>>=20=20
+>>>>>  /* __dev_flush is called from xdp_do_flush() which _must_ be signall=
+ed from the
+>>>>>   * driver before returning from its napi->poll() routine. See the co=
+mment above
+>>>>>   * xdp_do_flush() in filter.c.
+>>>>>   */
+>>>>> -void __dev_flush(struct list_head *flush_list)
+>>>>> +void __dev_flush(struct list_head *flush_list, int *redirects)
+>>>>>  {
+>>>>>  	struct xdp_dev_bulk_queue *bq, *tmp;
+>>>>>=20=20
+>>>>>  	list_for_each_entry_safe(bq, tmp, flush_list, flush_node) {
+>>>>> -		bq_xmit_all(bq, XDP_XMIT_FLUSH);
+>>>>> +		bq_xmit_all(bq, XDP_XMIT_FLUSH, redirects);
+>>>>>  		bq->dev_rx =3D NULL;
+>>>>>  		bq->xdp_prog =3D NULL;
+>>>>>  		__list_del_clearprev(&bq->flush_node);
+>>>>> @@ -458,8 +470,17 @@ static void bq_enqueue(struct net_device *dev, s=
+truct xdp_frame *xdpf,
+>>>>>  {
+>>>>>  	struct xdp_dev_bulk_queue *bq =3D this_cpu_ptr(dev->xdp_bulkq);
+>>>>>=20=20
+>>>>> -	if (unlikely(bq->count =3D=3D DEV_MAP_BULK_SIZE))
+>>>>> -		bq_xmit_all(bq, 0);
+>>>>> +	if (unlikely(bq->count =3D=3D DEV_MAP_BULK_SIZE)) {
+>>>>> +		int redirects =3D 0;
+>>>>> +
+>>>>> +		bq_xmit_all(bq, 0, &redirects);
+>>>>> +
+>>>>> +		/* according to comment above xdp_do_flush() in
+>>>>> +		 * filter.c, xdp_do_flush is always called at
+>>>>> +		 * the end of the NAPI anyway, so no need to act
+>>>>> +		 * on the redirects here
+>>>>> +		 */
+>>>>
+>>>> While it's true that it will be called again in NAPI, the purpose of
+>>>> calling bq_xmit_all() here is to make room space for the packet on the
+>>>> bulk queue that we're about to enqueue, and if bq_xmit_all() can just
+>>>> put the packet back on the queue, there is no guarantee that this will
+>>>> succeed. So you will have to handle that case here.
+>>>>
+>>>> Since there's also a potential infinite recursion issue in the
+>>>> do_flush() functions below, I think it may be better to handle this
+>>>> looping issue inside bq_xmit_all().
+>>>>
+>>>> I.e., structure the code so that bq_xmit_all() guarantees that when it
+>>>> returns it has actually done its job; that is, that bq->q is empty.
+>>>>
+>>>> Given the above "move all frames out of bq->q at the start" change, th=
+is
+>>>> is not all that hard. Simply add a check after the out: label (in
+>>>> bq_xmit_all()) to check if bq->count is actually 0, and if it isn't,
+>>>> start over from the beginning of that function. This also makes it
+>>>> straight forward to add a recursion limit; after looping a set number =
+of
+>>>> times (say, XMIT_RECURSION_LIMIT), simply turn XDP_REDIRECT into drops.
+>>>>
+>>>> There will need to be some additional protection against looping forev=
+er
+>>>> in __dev_flush(), to handle the case where a packet is looped between
+>>>> two interfaces. This one is a bit trickier, but a similar recursion
+>>>> counter could be used, I think.
+>>>
+>>>
+>>> Thanks a lot for the extensive support!
+>>> Regarding __dev_flush(), could the following already be sufficient?
+>>>
+>>> void __dev_flush(struct list_head *flush_list)
+>>> {
+>>>         struct xdp_dev_bulk_queue *bq, *tmp;
+>>>         int i,j;
+>>>
+>>>         for (i =3D 0; !list_empty(flush_list) && i < XMIT_RECURSION_LIM=
+IT; i++) {
+>>>                 /* go through list in reverse so that new items
+>>>                  * added to the flush_list will only be handled
+>>>                  * in the next iteration of the outer loop
+>>>                  */
+>>>                 list_for_each_entry_safe_reverse(bq, tmp, flush_list, f=
+lush_node) {
+>>>                         bq_xmit_all(bq, XDP_XMIT_FLUSH);
+>>>                         bq->dev_rx =3D NULL;
+>>>                         bq->xdp_prog =3D NULL;
+>>>                         __list_del_clearprev(&bq->flush_node);
+>>>                 }
+>>>         }
+>>>
+>>>         if (i =3D=3D XMIT_RECURSION_LIMIT) {
+>>>                 pr_warn("XDP recursion limit hit, expect packet loss!\n=
+");
+>>>
+>>>                 list_for_each_entry_safe(bq, tmp, flush_list, flush_nod=
+e) {
+>>>                         for (j =3D 0; j < bq->count; j++)
+>>>                                 xdp_return_frame_rx_napi(bq->q[i]);
+>>>
+>>>                         bq->count =3D 0;
+>>>                         bq->dev_rx =3D NULL;
+>>>                         bq->xdp_prog =3D NULL;
+>>>                         __list_del_clearprev(&bq->flush_node);
+>>>                 }
+>>>         }
+>>> }
+>>=20
+>> Yeah, this would work, I think (neat trick with iterating the list in
+>> reverse!), but instead of the extra loop in the end, I would suggest
+>> passing in an extra 'allow_redirect' parameter to bq_xmit_all(). Since
+>> you'll already have to handle the recursion limit inside that function,
+>> you can just reuse the same functionality by passing in the parameter in
+>> the last iteration of the first loop.
+>>=20
+>> Also, definitely don't put an unconditional warn_on() in the fast path -
+>> that brings down the system really quickly if it's misconfigured :)
+>>=20
+>> A warn_on_once() could work, but really I would suggest just reusing the
+>> _trace_xdp_redirect_map_err() tracepoint with a new error code (just has
+>> to be one we're not currently using and that vaguely resembles what this
+>> is about; ELOOP, EOVERFLOW or EDEADLOCK, maybe?).
+>
+>
+> The 'allow_redirect' parameter is a very good idea! If I also forward that
+> to dev_map_bpf_prog_run and do something like the following, I can just
+> reuse the existing error handling. Or is that too implict/too ugly?
+>
+> switch (act) {
+> case XDP_PASS:
+>         err =3D xdp_update_frame_from_buff(&xdp, xdpf);
+>         if (unlikely(err < 0))
+>                 xdp_return_frame_rx_napi(xdpf);
+>         else
+>                 frames[nframes++] =3D xdpf;
+>         break;
+> case XDP_REDIRECT:
+>         if (allow_redirect) {
+>                 err =3D xdp_do_redirect(rx_dev, &xdp, xdp_prog);
+>                 if (unlikely(err))
+>                         xdp_return_frame_rx_napi(xdpf);
+>                 else
+>                         *redirects +=3D 1;
+>                 break;
+>         } else
+>                 fallthrough;
+> default:
+>         bpf_warn_invalid_xdp_action(NULL, xdp_prog, act);
+>         fallthrough;
 
-On Wed, 11 Sept 2024 at 19:58, Heiner Kallweit <hkallweit1@gmail.com> wrote=
-:
+Yes, I was imagining something like this. Not sure if we want to turn it
+into an "invalid action" this way (it should probably be a separate
+tracepoint as I mentioned in the previous email). But otherwise, yeah!
+
+> case XDP_ABORTED:
+>         trace_xdp_exception(tx_dev, xdp_prog, act);
+>         fallthrough;
+> case XDP_DROP:
+>         xdp_return_frame_rx_napi(xdpf);
+>         break;
+> }
 >
-> On 11.09.2024 12:38, En-Wei WU wrote:
-> >> Also wrt ALDPS: Do you have the firmware for the NIC loaded?
-> > The firmware is rtl8125b-2_0.0.2 07/13/20
-> >
-> Thanks. Question was because I found an older statement from Realtek
-> stating that ALDPS requires firmware to work correctly.
 >
-> >> Just to be sure. Can you test with the following?
-> > Your patch works for our machine. Seems like the root cause is indeed t=
-he ALDPS.
-> >
-> Great! Not sure what's going on, maybe a silicon bug. ALDPS may e.g. stop=
- some
-> clock and hw misses to re-enable it on link-up. Then I will submit the ch=
-ange
-> to disable ALDPS. Later we maybe can remove the reset on link-down.
+>>=20
+>>>> In any case, this needs extensive selftests, including ones with devmap
+>>>> programs that loop packets (both redirect from a->a, and from
+>>>> a->b->a->b) to make sure the limits work correctly.
+>>>
+>>>
+>>> Good point! I am going to prepare some.
+>>>
+>>>
+>>>>
+>>>>> +	}
+>>>>>=20=20
+>>>>>  	/* Ingress dev_rx will be the same for all xdp_frame's in
+>>>>>  	 * bulk_queue, because bq stored per-CPU and must be flushed
+>>>>> diff --git a/net/core/filter.c b/net/core/filter.c
+>>>>> index 8569cd2482ee..b33fc0b1444a 100644
+>>>>> --- a/net/core/filter.c
+>>>>> +++ b/net/core/filter.c
+>>>>> @@ -4287,14 +4287,18 @@ static const struct bpf_func_proto bpf_xdp_ad=
+just_meta_proto =3D {
+>>>>>  void xdp_do_flush(void)
+>>>>>  {
+>>>>>  	struct list_head *lh_map, *lh_dev, *lh_xsk;
+>>>>> +	int redirect;
+>>>>>=20=20
+>>>>> -	bpf_net_ctx_get_all_used_flush_lists(&lh_map, &lh_dev, &lh_xsk);
+>>>>> -	if (lh_dev)
+>>>>> -		__dev_flush(lh_dev);
+>>>>> -	if (lh_map)
+>>>>> -		__cpu_map_flush(lh_map);
+>>>>> -	if (lh_xsk)
+>>>>> -		__xsk_map_flush(lh_xsk);
+>>>>> +	do {
+>>>>> +		redirect =3D 0;
+>>>>> +		bpf_net_ctx_get_all_used_flush_lists(&lh_map, &lh_dev, &lh_xsk);
+>>>>> +		if (lh_dev)
+>>>>> +			__dev_flush(lh_dev, &redirect);
+>>>>> +		if (lh_map)
+>>>>> +			__cpu_map_flush(lh_map);
+>>>>> +		if (lh_xsk)
+>>>>> +			__xsk_map_flush(lh_xsk);
+>>>>> +	} while (redirect > 0);
+>>>>>  }
+>>>>>  EXPORT_SYMBOL_GPL(xdp_do_flush);
+>>>>>=20=20
+>>>>> @@ -4303,20 +4307,24 @@ void xdp_do_check_flushed(struct napi_struct =
+*napi)
+>>>>>  {
+>>>>>  	struct list_head *lh_map, *lh_dev, *lh_xsk;
+>>>>>  	bool missed =3D false;
+>>>>> +	int redirect;
+>>>>>=20=20
+>>>>> -	bpf_net_ctx_get_all_used_flush_lists(&lh_map, &lh_dev, &lh_xsk);
+>>>>> -	if (lh_dev) {
+>>>>> -		__dev_flush(lh_dev);
+>>>>> -		missed =3D true;
+>>>>> -	}
+>>>>> -	if (lh_map) {
+>>>>> -		__cpu_map_flush(lh_map);
+>>>>> -		missed =3D true;
+>>>>> -	}
+>>>>> -	if (lh_xsk) {
+>>>>> -		__xsk_map_flush(lh_xsk);
+>>>>> -		missed =3D true;
+>>>>> -	}
+>>>>> +	do {
+>>>>> +		redirect =3D 0;
+>>>>> +		bpf_net_ctx_get_all_used_flush_lists(&lh_map, &lh_dev, &lh_xsk);
+>>>>> +		if (lh_dev) {
+>>>>> +			__dev_flush(lh_dev, &redirect);
+>>>>> +			missed =3D true;
+>>>>> +		}
+>>>>> +		if (lh_map) {
+>>>>> +			__cpu_map_flush(lh_map);
+>>>>> +			missed =3D true;
+>>>>> +		}
+>>>>> +		if (lh_xsk) {
+>>>>> +			__xsk_map_flush(lh_xsk);
+>>>>> +			missed =3D true;
+>>>>> +		}
+>>>>> +	} while (redirect > 0);
+>>>>
+>>>> With the change suggested above (so that bq_xmit_all() guarantees the
+>>>> flush is completely done), this looping is not needed anymore. However,
+>>>> it becomes important in which *order* the flushing is done
+>>>> (__dev_flush() should always happen first), so adding a comment to note
+>>>> this would be good.
+>>>
+>>>
+>>> I guess, if we remove the loop here and we still want to cover the case=
+ of
+>>> redirecting from devmap program via cpumap, we need to fetch the lh_map=
+ again
+>>> after calling __dev_flush, right?
+>>> So I think we should no longer use bpf_net_ctx_get_all_used_flush_lists=
+ then:
+>>>
+>>>         lh_dev =3D bpf_net_ctx_get_dev_flush_list();
+>>>         if (lh_dev)
+>>>                 __dev_flush(lh_dev);
+>>>         lh_map =3D bpf_net_ctx_get_cpu_map_flush_list();
+>>>         if (lh_map)
+>>>                 __cpu_map_flush(lh_map);
+>>>         lh_xsk =3D bpf_net_ctx_get_xskmap_flush_list();
+>>>         if (lh_xsk)
+>>>                 __xsk_map_flush(lh_xsk);
+>>>
+>>> But bpf_net_ctx_get_all_used_flush_lists also includes additional checks
+>>> for IS_ENABLED(CONFIG_BPF_SYSCALL) and IS_ENABLED(CONFIG_XDP_SOCKETS),
+>>> so I guess they should be directly included in the xdp_do_flush and
+>>> xdp_do_check_flushed?
+>>> Then we could remove the bpf_net_ctx_get_all_used_flush_lists.
+>>> Or do you have an idea for a more elegant solution?
+>>=20
+>> I think cpumap is fine because that doesn't immediately redirect back to
+>> the bulk queue; instead __cpu_map_flush() will put the frames on a
+>> per-CPU ring buffer and wake the kworker on that CPU. Which will in turn
+>> do another xdp_do_flush() if the cpumap program does a redirect. So in
+>> other words, we only need to handle recursion of devmap redirects :)
 >
-> Not having ALDPS shouldn't be too much of an issue. Runtime PM (if enable=
-d)
-> will put the NIC to D3hot after 10s anyway.
+> I likely miss something here, but the scenario I am thinking about is the=
+ following:
 >
-> > On Wed, 11 Sept 2024 at 17:16, Heiner Kallweit <hkallweit1@gmail.com> w=
-rote:
-> >>
-> >> On 11.09.2024 09:01, En-Wei WU wrote:
-> >>>> What is the link partner in your case?
-> >>> My link partner is FS S3900-48T4S switch.
-> >>>
-> >>>>  If you put a simple switch in between, does this help?
-> >>> I just put a simple D-link switch in between with the original kernel=
-,
-> >>> the issue remains (re-plugging it after 3 seconds).
-> >>>
-> >>>> It makes more the impression that after 3s of link-down the chip (PH=
-Y?)
-> >>>> transitions to a mode where it doesn't wake up after re-plugging the=
- cable.
-> >>> I've done a ftrace on the r8169.ko and the phy driver (realtek.ko),
-> >>> and I found that the phy did wake up:
-> >>>
-> >>>    kworker/u40:4-267   [003]   297.026314: funcgraph_entry:
-> >>>        |      phy_link_change() {
-> >>> 3533    kworker/u40:4-267   [003]   297.026315: funcgraph_entry:
-> >>>  6.704 us   |        netif_carrier_on();
-> >>> 3534    kworker/u40:4-267   [003]   297.026322: funcgraph_entry:
-> >>>             |        r8169_phylink_handler() {
-> >>> 3535    kworker/u40:4-267   [003]   297.026322: funcgraph_entry:
-> >>>  0.257 us   |          rtl_link_chg_patch();
-> >>> 3536    kworker/u40:4-267   [003]   297.026324: funcgraph_entry:
-> >>>  4.026 us   |          netif_tx_wake_queue();
-> >>> 3537    kworker/u40:4-267   [003]   297.026328: funcgraph_entry:
-> >>>             |          phy_print_status() {
-> >>> 3538    kworker/u40:4-267   [003]   297.026329: funcgraph_entry:
-> >>>  0.245 us   |            phy_duplex_to_str();
-> >>> 3539    kworker/u40:4-267   [003]   297.026329: funcgraph_entry:
-> >>>  0.240 us   |            phy_speed_to_str();
-> >>> 3540    kworker/u40:4-267   [003]   297.026329: funcgraph_entry:
-> >>> + 12.798 us  |            netdev_info();
-> >>> 3541    kworker/u40:4-267   [003]   297.026343: funcgraph_exit:
-> >>> + 14.385 us  |          }
-> >>> 3542    kworker/u40:4-267   [003]   297.026343: funcgraph_exit:
-> >>> + 21.217 us  |        }
-> >>> 3543    kworker/u40:4-267   [003]   297.026343: funcgraph_exit:
-> >>> + 28.785 us  |      }
-> >>>
-> >>> So I doubt that the issue isn't necessarily related to the ALDPS,
-> >>> because the PHY seems to have woken up.
-> >>>
-> >>> After looking at the reset function (plus the TX queue issue
-> >>> previously reported by the user) , I'm wondering if the problem is
-> >>> related to DMA:
-> >>> static void rtl_reset_work(struct rtl8169_private *tp) {
-> >>>     ....
-> >>>     for (i =3D 0; i < NUM_RX_DESC; i++)
-> >>>          rtl8169_mark_to_asic(tp->RxDescArray + i);
-> >>>     ....
-> >>> }
-> >>>
-> >>> On Wed, 11 Sept 2024 at 01:06, Heiner Kallweit <hkallweit1@gmail.com>=
- wrote:
-> >>>>
-> >>>> On 09.09.2024 07:25, En-Wei WU wrote:
-> >>>>> Hi Heiner,
-> >>>>>
-> >>>>> Thank you for the quick response.
-> >>>>>
-> >>>>> On Sat, 7 Sept 2024 at 05:17, Heiner Kallweit <hkallweit1@gmail.com=
-> wrote:
-> >>>>>>
-> >>>>>> On 06.09.2024 10:35, En-Wei Wu wrote:
-> >>>>>>> The commit 621735f59064 ("r8169: fix rare issue with broken rx af=
-ter
-> >>>>>>> link-down on RTL8125") set a reset work for RTL8125 in
-> >>>>>>> r8169_phylink_handler() to avoid the MAC from locking up, this
-> >>>>>>> makes the connection broken after unplugging then re-plugging the
-> >>>>>>> Ethernet cable.
-> >>>>>>>
-> >>>>>>> This is because the commit mistakenly put the reset work in the
-> >>>>>>> link-down path rather than the link-up path (The commit message s=
-ays
-> >>>>>>> it should be put in the link-up path).
-> >>>>>>>
-> >>>>>> That's not what the commit message is saying. It says vendor drive=
-r
-> >>>>>> r8125 does it in the link-up path.
-> >>>>>> I moved it intentionally to the link-down path, because traffic ma=
-y
-> >>>>>> be flowing already after link-up.
-> >>>>>>
-> >>>>>>> Moving the reset work from the link-down path to the link-up path=
- fixes
-> >>>>>>> the issue. Also, remove the unnecessary enum member.
-> >>>>>>>
-> >>>>>> The user who reported the issue at that time confirmed that the or=
-iginal
-> >>>>>> change fixed the issue for him.
-> >>>>>> Can you explain, from the NICs perspective, what exactly the diffe=
-rence
-> >>>>>> is when doing the reset after link-up?
-> >>>>>> Including an explanation how the original change suppresses the li=
-nk-up
-> >>>>>> interrupt. And why that's not the case when doing the reset after =
-link-up.
-> >>>>>
-> >>>>> The host-plug test under original change does have the link-up
-> >>>>> interrupt and r8169_phylink_handler() called. There is not much clu=
-e
-> >>>>> why calling reset in link-down path doesn't work but in link-up doe=
-s.
-> >>>>>
-> >>>>> After several new tests, I found that with the original change, the
-> >>>>> link won't break if I unplug and then plug the cable within about 3
-> >>>>> seconds. On the other hand, the connections always break if I re-pl=
-ug
-> >>>>> the cable after a few seconds.
-> >>>>>
-> >>>> Interesting finding. 3 seconds sounds like it's unrelated to runtime=
- pm,
-> >>>> because this has a 10s delay before the chip is transitioned to D3ho=
-t.
-> >>>> It makes more the impression that after 3s of link-down the chip (PH=
-Y?)
-> >>>> transitions to a mode where it doesn't wake up after re-plugging the=
- cable.
-> >>>>
-> >>>> Just a wild guess: It may be some feature like ALDPS (advanced link-=
-down
-> >>>> power saving). Depending on the link partner this may result in not =
-waking
-> >>>> up again, namely if the link partner uses ALDPS too.
-> >>>> What is the link partner in your case? If you put a simple switch in=
- between,
-> >>>> does this help?
-> >>>>
-> >>>> In the RTL8211F datasheet I found the following:
-> >>>>
-> >>>> Link Down Power Saving Mode.
-> >>>> 1: Reflects local device entered Link Down Power Saving Mode,
-> >>>> i.e., cable not plugged in (reflected after 3 sec)
-> >>>> 0: With cable plugged in
-> >>>>
-> >>>> This is a 1Gbps PHY, but Realtek may use the same ALDPS mechanism wi=
-th the
-> >>>> integrated PHY of RTL8125. The 3s delay described there perfectly ma=
-tches
-> >>>> your finding.
-> >>>>
-> >>>>> With this new patch (reset in link-up path), both of the tests work
-> >>>>> without any error.
-> >>>>>
-> >>>>>>
-> >>>>>> I simply want to be convinced enough that your change doesn't brea=
-k
-> >>>>>> behavior for other users.
-> >>>>>>
-> >>>>>>> Fixes: 621735f59064 ("r8169: fix rare issue with broken rx after =
-link-down on RTL8125")
-> >>>>>>> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
-> >>>>>>> ---
-> >>>>>>>  drivers/net/ethernet/realtek/r8169_main.c | 11 +++++------
-> >>>>>>>  1 file changed, 5 insertions(+), 6 deletions(-)
-> >>>>>>>
-> >>>>>>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/=
-net/ethernet/realtek/r8169_main.c
-> >>>>>>> index 3507c2e28110..632e661fc74b 100644
-> >>>>>>> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> >>>>>>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> >>>>>>> @@ -590,7 +590,6 @@ struct rtl8169_tc_offsets {
-> >>>>>>>  enum rtl_flag {
-> >>>>>>>       RTL_FLAG_TASK_ENABLED =3D 0,
-> >>>>>>>       RTL_FLAG_TASK_RESET_PENDING,
-> >>>>>>> -     RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE,
-> >>>>>>>       RTL_FLAG_TASK_TX_TIMEOUT,
-> >>>>>>>       RTL_FLAG_MAX
-> >>>>>>>  };
-> >>>>>>> @@ -4698,8 +4697,6 @@ static void rtl_task(struct work_struct *wo=
-rk)
-> >>>>>>>  reset:
-> >>>>>>>               rtl_reset_work(tp);
-> >>>>>>>               netif_wake_queue(tp->dev);
-> >>>>>>> -     } else if (test_and_clear_bit(RTL_FLAG_TASK_RESET_NO_QUEUE_=
-WAKE, tp->wk.flags)) {
-> >>>>>>> -             rtl_reset_work(tp);
-> >>>>>>>       }
-> >>>>>>>  out_unlock:
-> >>>>>>>       rtnl_unlock();
-> >>>>>>> @@ -4729,11 +4726,13 @@ static void r8169_phylink_handler(struct =
-net_device *ndev)
-> >>>>>>>       if (netif_carrier_ok(ndev)) {
-> >>>>>>>               rtl_link_chg_patch(tp);
-> >>>>>>>               pm_request_resume(d);
-> >>>>>>> -             netif_wake_queue(tp->dev);
-> >>>>>>> -     } else {
-> >>>>>>> +
-> >>>>>>>               /* In few cases rx is broken after link-down otherw=
-ise */
-> >>>>>>>               if (rtl_is_8125(tp))
-> >>>>>>> -                     rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_N=
-O_QUEUE_WAKE);
-> >>>>>>> +                     rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_P=
-ENDING);
-> >>>>>>> +             else
-> >>>>>>> +                     netif_wake_queue(tp->dev);
-> >>>>>>
-> >>>>>> This call to netif_wake_queue() isn't needed any longer, it was in=
-troduced with
-> >>>>>> the original change only.
-> >>>>>>
-> >>>>>>> +     } else {
-> >>>>>>>               pm_runtime_idle(d);
-> >>>>>>>       }
-> >>>>>>>
-> >>>>>>
-> >>>>>
-> >>>>> CC. Martin Kj=C3=A6r J=C3=B8rgensen  <me@lagy.org>, could you kindl=
-y test if
-> >>>>> this new patch works on your environment? Thanks!
-> >>>>>
-> >>>>> En-Wei,
-> >>>>> Best regards.
-> >>>>
-> >>
-> >> Just to be sure. Can you test with the following?
-> >>
-> >>
-> >> diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers=
-/net/ethernet/realtek/r8169_phy_config.c
-> >> index 2c8845e08..cf29b1208 100644
-> >> --- a/drivers/net/ethernet/realtek/r8169_phy_config.c
-> >> +++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
-> >> @@ -1060,6 +1060,7 @@ static void rtl8125a_2_hw_phy_config(struct rtl8=
-169_private *tp,
-> >>         phy_modify_paged(phydev, 0xa86, 0x15, 0x0001, 0x0000);
-> >>         rtl8168g_enable_gphy_10m(phydev);
-> >>
-> >> +       rtl8168g_disable_aldps(phydev);
-> >>         rtl8125a_config_eee_phy(phydev);
-> >>  }
-> >>
-> >> @@ -1099,6 +1100,7 @@ static void rtl8125b_hw_phy_config(struct rtl816=
-9_private *tp,
-> >>         phy_modify_paged(phydev, 0xbf8, 0x12, 0xe000, 0xa000);
-> >>
-> >>         rtl8125_legacy_force_mode(phydev);
-> >> +       rtl8168g_disable_aldps(phydev);
-> >>         rtl8125b_config_eee_phy(phydev);
-> >>  }
-> >>
-> >> --
-> >> 2.46.0
-> >>
-> >>
+> 1. cpu_map and xsk_map flush list are empty, while the dev flush map has
+>    a single frame pending, i.e. in the current implementation after
+>    executing bpf_net_ctx_get_all_used_flush_lists:
+>    lh_dev =3D something
+>    lh_map =3D lh_xsk =3D NULL
 >
+> 2. __dev_flush gets called and executes a bpf program on the frame
+>    that returns with "return bpf_redirect_map(&cpu_map, 0, 0);"
+>    and that adds an item to the cpumap flush list.
+>
+> 3. Since __dev_flush is only able to handle devmap redirects itself,
+>    the item is still on the cpumap flush list after __dev_flush
+>    has returned.
+>
+> 4. lh_map, however, is still NULL, so __cpu_map_flush does not
+>    get called and thus the kworker is never woken up.
+>
+> That is at least what I see on the running system that the kworker
+> is never woken up, but I might have done something else wrong...
+
+Ah, yes, I see what you mean. Yup, you're right,
+bpf_net_ctx_get_all_used_flush_lists() will no longer work, we'll have
+to get the others after __dev_flush()
+
+-Toke
+
 
