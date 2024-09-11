@@ -1,84 +1,87 @@
-Return-Path: <netdev+bounces-127449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6E49975743
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:36:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA8EE97574D
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:38:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A75B1F22321
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:36:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A0141F25508
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176141A3044;
-	Wed, 11 Sep 2024 15:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50BCC1AB6DA;
+	Wed, 11 Sep 2024 15:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="iV6vfjmS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="3jD/8apA"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2069.outbound.protection.outlook.com [40.107.244.69])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2044.outbound.protection.outlook.com [40.107.212.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D178193099;
-	Wed, 11 Sep 2024 15:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB0C1A3AB8;
+	Wed, 11 Sep 2024 15:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.44
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726069013; cv=fail; b=aeqF+O3d3jcGP/xj87cVv8Mp/hnAnAcI+k251ULTeNTlxc5yKZkOV3hWwyNA2Qjt4y/mN/E/nPq/vhzcT9THn2D8TPF/uY6/9/DZ6lXrkdq57wecL4GItIGN5U6UYrAlkXeIVsl6Gposnq6NqwQ/jNFFqGYle6n5ghorPtt5seM=
+	t=1726069100; cv=fail; b=tjI9emQuheMesgMmUTV/51jG/E7vJHA5VYYT/sF88ifPfCPlp37tUhz5oB3ENaM63+Z8ZNVxXeG8A85SlXBWJD0wHfstmC0arg8D+oT8DJDIW+Y0q2Te+Yq8WAlK3jpbTpdr1tFfu9RmSB6YJZ5+u77oBsKPNC3+eG4g4SiZf2s=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726069013; c=relaxed/simple;
-	bh=o3eQiaqVmnByz0NiAaEjd2OfgyeIzJ/7NtzbB1llRmw=;
+	s=arc-20240116; t=1726069100; c=relaxed/simple;
+	bh=PRVuPVlKcr9LPF96iIIFB5KJAp4hrhbWx2PSBRim4Fk=;
 	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ViBFjkEufZM74c+SC8NUlW/pItMvdDHfirJU7FXMnbBQzgC8fJmUuvzoff+6eWI0RQRh/xb//Ajc80uAF8a6i+O72jWq408S7NK1Y4iW2gur4bR6WNQKaiN0PagS/klPOFLvYOl+nCailgMhQMlfmzwqOlgynCfY+tFHrkvRTqA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=iV6vfjmS; arc=fail smtp.client-ip=40.107.244.69
+	 Content-Type:MIME-Version; b=IMI9dsxBmwamECSglPAhgG+U46bqU5UeknQN/TYpJQVLxee1XKLQ4nwWG7cR3wVSke6FapEdPoNzYORY3quTdZZySPeHc3LirTLUhElNPS6/n4l997Et8TE3EeK5j5DQ4rTYYfBMWEZlbT0gz+EE3D09EsMY2dkaZtE2uyzuK30=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=3jD/8apA; arc=fail smtp.client-ip=40.107.212.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nrummik1bfob7ruy2TZdSV4/js/57pkTYBCTR0/uya8ks9VCPMPQKlC5Pqne/5skLjJDXJrukyeWJa32F5AqWfKCfn4iaOONXhGvJxkRNkXnTxvcJ4YHqVYuPZ58RkIpgQheOCTKPCNHuPe/eff3drasYchlw1rIZ2KSnU2iaoPpQmgosHDLdweksh74iQghJNU4/FuMIzbtMxWpCFkjfln/WsihQnhHZMcoc4pjwnu6ZOrYZhUjZUxbeOd+Ci60IGC3tcmEvbxnGnjwXRc1ZApxYNtTWsewiGkjwPPJCo3qvXaMnhnY6a1DT1GX5qo+xQ2yZ4EE7JO0fiOAr+5P3A==
+ b=lZDu9JSyy3iaAhY7tVZj/Ym26LE//p5u9NZOUYS2W/s+F+UVDPNrkCNPIzjrMDrb1pZtOHLXg1qnhAWdftgBLkiyp3tQ1kPS2x1KrkEGK1nHKrkRoPM1RO+qQbYE3s04ih92QPcAdTOb8VmTZmveTItadHpPOmxGZjRv6nWkSJ8lUbCas72UXh9fOO7RTfZi7LKBqJ3ShZGGzH9PGtcGXovpfZBA41kvtpLAHaWgXALdmYD5H8zdmd31NkwvufkUCWI4AUp4uUG8SbR0MVvTnG97JvYrtfZPsd0fv0aPOixzM3r0VcJPJtLwQlpWS3sO7hxXstQcsXF5NNA0SbUStw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OE+z43A2IpL0IVTLxJ4w8laSbNadIBiCVpXAi/6GJXE=;
- b=g6QRlolufUCGk62FAGRcjYSPnxHq7/2oP1VFsliKwaPrPCXOX7BM651EgZDfR7Ebq2YPtRxDNjKZJV5fg6fWQKnUHchEzwnA6lMp0Ltv04lpIMYd6MzpC0hKGws4cRkXNt9ZmnsbhVK6AfPZV8pyxyR+YlfEVMMth6/qy19uP1phenWfmDrq9XwN5Jt9RGaqoo57vKYa7qKiCiBS5RzKNlJPR0Gwv7/B52oP02CjzVfNWPMRLrYvBKSye9scntJNNuvv5ZH+1UzOq7Ns0kaN3n5qFzw7p+lEZ5+ZZ6584PDzz4dcETL/mswfjKdgNx65/JaQOMDxoWzQ2GXsxbdUAA==
+ bh=90woEczDQLv6hWzWwgVoFwelawKJCvQGaz9+4SEjB14=;
+ b=U4uJArBhIwv57uaQRLLQTzOkpCtf/SSo1w9tRBIYAkys6Jqup2NNAbOc3zRIE7ffz1jFDIsRWFSuNfE2J8Sxbk+KfzvWzrES3tr37I/6pL6XpfNTYlanmNpehUOjejQgA8RlCKaUnbJ9cbkF4ZOFXssdgolzI+NSF3omUuh3qCooafiWqguvk7/PNEs6F+46Bov9xYengFD7XSfmfh89xJl7SJ7LE5pXucFVbDDaJiVPXZ1njwlL7Uv7R262xorSMOUA6ngGg/h+W3Ek0nqcpUxgo/tA7rOwreSP6xu1bn8XPaV0I/drz+k857Z07wo/K4T7OURulsKq33sHAHiUSw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OE+z43A2IpL0IVTLxJ4w8laSbNadIBiCVpXAi/6GJXE=;
- b=iV6vfjmS2Nhso8znfk6BXNZlUIRpSvCDM2SnrpFPqv/Vp3/VkM9jQ+7CcLLe0jlhBoutJdq2YAvgS6/XhlO6Y2fFwEkhiHNs/4BSwNEEa9vCkQhsdDRtGEbX+Kk37e6uWSryxsmc/uMoxj0BeqGrb/c2yFa0YwAL6yn6EGTHayE=
+ bh=90woEczDQLv6hWzWwgVoFwelawKJCvQGaz9+4SEjB14=;
+ b=3jD/8apAyqNaoAQcBVWjxT1N9l7Sadnthl1smu2rwOPZzVIzwfvoIV0MFD77RXyG06g0iJ92mExCsCAZZFMEdXq796pyRJ3yL72JbOibm3YywBbdgbMU/PpJaIkJRzfOKFk1Nk2bv3MFmeHWx7qoO1jtoCExwwrmQr5ZzVDC58M=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by IA1PR12MB6601.namprd12.prod.outlook.com (2603:10b6:208:3a3::15) with
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by PH7PR12MB7307.namprd12.prod.outlook.com (2603:10b6:510:20b::9) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Wed, 11 Sep
- 2024 15:36:45 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a%3]) with mapi id 15.20.7962.016; Wed, 11 Sep 2024
- 15:36:45 +0000
-Message-ID: <a5939151-adc6-4385-9072-ce4ff57bf67f@amd.com>
-Date: Wed, 11 Sep 2024 08:36:43 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/4] bnxt_en: add support for rx-copybreak
- ethtool command
-To: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, corbet@lwn.net,
- michael.chan@broadcom.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org
-Cc: ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, andrew@lunn.ch,
- hkallweit1@gmail.com, kory.maincent@bootlin.com, ahmed.zaki@intel.com,
- paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com,
- maxime.chevallier@bootlin.com, danieller@nvidia.com,
- aleksander.lobakin@intel.com
-References: <20240911145555.318605-1-ap420073@gmail.com>
- <20240911145555.318605-2-ap420073@gmail.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.25; Wed, 11 Sep
+ 2024 15:38:13 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7962.016; Wed, 11 Sep 2024
+ 15:38:13 +0000
+Message-ID: <c7b9cafc-4d9d-f443-12b5-bf3d7b178d2c@amd.com>
+Date: Wed, 11 Sep 2024 16:37:20 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH V4 11/12] bnxt_en: Add TPH support in BNXT driver
 Content-Language: en-US
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <20240911145555.318605-2-ap420073@gmail.com>
+To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jonathan.Cameron@Huawei.com, helgaas@kernel.org, corbet@lwn.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+ michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+ somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+ manoj.panicker2@amd.com, Eric.VanTassell@amd.com, vadim.fedorenko@linux.dev,
+ horms@kernel.org, bagasdotme@gmail.com, bhelgaas@google.com,
+ lukas@wunner.de, paul.e.luse@intel.com, jing2.liu@intel.com
+References: <20240822204120.3634-1-wei.huang2@amd.com>
+ <20240822204120.3634-12-wei.huang2@amd.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20240822204120.3634-12-wei.huang2@amd.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0385.namprd03.prod.outlook.com
- (2603:10b6:a03:3a1::30) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+X-ClientProxiedBy: LO4P123CA0670.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:351::16) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,228 +89,271 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|IA1PR12MB6601:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2ea5ed70-6c71-4439-5b50-08dcd2778ad6
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|PH7PR12MB7307:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2ed6c432-2acd-4534-f467-08dcd277bf06
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7416014;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dzExU0MzdS9hVmo2bEpOaCtpdnU3UXlWMkEwdXNOWVFKcWpnU280QlBIOXNx?=
- =?utf-8?B?Q0lvVXRTMDFtM1JqaWlEMXV3eHdYaDd5NkhGRGIwUVMwU1V1SkxmWitBaEVp?=
- =?utf-8?B?TE9Kem8zOTUvcXBFdzNTSm9DdGpINVJRdXdsZWxmZDNOQ25ZSUUrbm9EV3N5?=
- =?utf-8?B?QnN2ckFxMEcyTzZzS3JoblhQVHNtQnZqU1ZvN2tyeXVzTkQzdWFWN0dCWE5K?=
- =?utf-8?B?U2JIME1Kc01iT2dsOHBOKzg0OGJPS1RNYnlUM0tvdmZvRHltaUM4T1pkLzFP?=
- =?utf-8?B?QUtTb25aMG1sZzFycktEOXJlMjFTbk02c3V3QVBWb0JIQklvM1JFYTEvUUhF?=
- =?utf-8?B?ZzlsNFdyU3pGL29wRy9GaGQ4WExxdlhTM2ZJUWVoeTFFMmNWczlwUHhyR3Jp?=
- =?utf-8?B?eGRKemNZa2FLc29ZOFY0VmIzVjlVVzVZSWFKZHlKODAzZHdmYUZYTmN5bnBx?=
- =?utf-8?B?UWtXbmxpWm9JTXJoYU4veVorRDliT0R0U1BqZVozb0EzQ0Q4TjA4RktwMEhU?=
- =?utf-8?B?QVdKNks0RXhidmx5YXREb3o5SGl6eE5IWXFjN1RsS1FiVGVTU0N4d25IaVZk?=
- =?utf-8?B?YUlQdjZVYitEVHRDejVBTTl2Y1FvU05BOHo2RFlrWGJ3NE5wSHVGRml2YmlT?=
- =?utf-8?B?dGhPekJCdkNJZEZsalhWUng2Q1VSU2hLVXd2TnpmQmU4eDVDeGJvYmdVK1pX?=
- =?utf-8?B?bTNaMTg1TGtMS25xWWtoTUhhbjhwa0FYb01KeVN5VXJ6eUFHc3FKaGluY096?=
- =?utf-8?B?NWxQS0lCWWJiVkFoNlZ6V0t0M2doSjlIRDNxVTRvWFFLWjNvM0NnNllnNDdK?=
- =?utf-8?B?a2x5dnVVQ3BIUkd1MDEyK1NUcEJVZXZFRDZLUkFJUFVkQU15aGlnbmJiNlZI?=
- =?utf-8?B?aXQvL1pFMmh2aXhRbVFhbzc3NTMvUlRzd3g4VDhiSnRkR0NkaHgxWFVBZ2s2?=
- =?utf-8?B?RWRWREtwTTl1MkNBQlFEaHdtMEtKMGJSaDdNSzN6Z1diNWI1UHRhd25DRnJ5?=
- =?utf-8?B?YkZ0WU5NOGY3eWJxMW45TTNtTG5JVzRrNmwyYmdDWDUwbFlCT3g0ZWZ6cVRn?=
- =?utf-8?B?WGRqeE0vUm5BVVhBWHV5Wm5qblpOTVNCNXpPSFBxTlowc2tYdEsweXViYnRZ?=
- =?utf-8?B?Z3hiN0xBWHRXVW1CRHJidlZndDJ4WWFIc3d6YklVaWlPNUVlNGp1bndUN3dW?=
- =?utf-8?B?UVBHRk5BWTJ4MC9aZVlyTU00QUJEeS9UMUQ0WGttQXZLdnlHcEFaendxZHhq?=
- =?utf-8?B?V1dFQVBsdEIvSXN5N0tlYmF6OGNWL1F5Y2xFSG90WmlBQ0pyeEM2OGJXRUht?=
- =?utf-8?B?RDBVZDNWdFNvTHoxK1ZWT2R3R0c0d1ZCT2tvRmF3MHdYUE02N1NscjQ0bldE?=
- =?utf-8?B?SURIU2ZOM0RSTTVQZ0RSSzR3SHhSajRUZXkzVTAwSzVVV0g0cEF5c2JrTFpa?=
- =?utf-8?B?WmlHV0Z4OWpQeDRxa0o3VjNBYUVrc1NVRXlDMzZsbXFOOHFQWGFVYnZFenha?=
- =?utf-8?B?MG1LYzk3TXIzQ243WGM1Zm03SE42K09YWXN3MkxKMW5SeEJ4aVJ2OEFNSXpT?=
- =?utf-8?B?ZDg0Ym5QbXNYUUR3c1lBYkZrZldvRXRlRDVZN2MwRGhGUFFGWVNhZm9rcmZ6?=
- =?utf-8?B?VXBUYUN5Q2hZT2x6aWYwVXdIak56WXJ5U1ZYU0FLRmZTOUZFaEJZSDRFQ3JI?=
- =?utf-8?B?WXFMTDUwWk1ZWndBY2VJa2R3bGR1N2lvMDd4Nzd6RXBmVnZrR21nNDIzaGtH?=
- =?utf-8?B?Uit4UlR1dXo5K1JjS3BTWVVKdTY2ZXlubEpQSDlnTnJaNHVQWFVLMUxINVN0?=
- =?utf-8?B?VWQ4TkdEQ3REb2l0UWZlQT09?=
+	=?utf-8?B?VTdUTCsxY3JwRWpRTE54Y25Kdjg1UWNRbVdCR2Fia2F2Wm00S1k2K2JsQTFS?=
+ =?utf-8?B?NVQzNjMvc3BnSHhZUEVQMHZjVWpPOU9wbDdNRkpBSmlNSTJxTWJoY0RMRlor?=
+ =?utf-8?B?aldrRVVHZHBaUGFVc0dXUzJkK0VQSWovSFIwKy95Sk5LbU9MOEhzN0Z2WGpu?=
+ =?utf-8?B?OFdua3ZrQ3RIMlVYZndKcWR3bHIzNjVuZFgrclRobkIvSHQ2NkxDKy9Qbitn?=
+ =?utf-8?B?aU04b014VVNCUHZ6TktsaXVTTlg3QlhjYVR4NXdjUm5nc1ltRWlxVytkdUxF?=
+ =?utf-8?B?MjVydnd6elpUVDhCSE81M29YazdLSUNxaHVXNVExeXB0Y0VVb3c2anNuL1pR?=
+ =?utf-8?B?RGxUL3NYYzlOc0tuaHlTVDFIVXllN3Foek1pUFFpUVlHRGlpcGYvZEpDRkc1?=
+ =?utf-8?B?Mks5OGJJV0FpSlcwSHRFaVd4bnNzeThJTjBLNVQ2L2ZoZExrRi8rd04wbXA3?=
+ =?utf-8?B?UWcxa2FSYXpBVHZ5Y1M1Nk53OVFBYTZqQUFFcFhlaWdmMFBublB4RDBaRndO?=
+ =?utf-8?B?bEp4NTMwNEZWZUhTblFabEhNRXJCbFVjYkpER1VqNUpQVUJBM2hacmxBK1V2?=
+ =?utf-8?B?cVJTNktYRzFwMWFyTzh4Q1MwNVNmZlRvbTRpdTBJWDJ4RW5iL0VWUTlUcjVI?=
+ =?utf-8?B?dUNvN2M1SWMybmUySjJFWURwNDdib1htZS9CR3M0aDIyZW5LNTE4L2FIdUI1?=
+ =?utf-8?B?Tk45elNpVU1JNGNZcDE3TmZDbEx3WmhJSGphTUxyckVLZDNVdEhGdXc2VTBk?=
+ =?utf-8?B?Q001WU92TFArRk1zL05KU0tGbnVQTmhSR0JNem9uWEwvaFZtaFlmSno5ejBo?=
+ =?utf-8?B?eUU4YnJsL1RvSmlxOWNnRnRQSEhsQ2JlNWp2RUZqeWpJcWFIaEh2dkdGbHRN?=
+ =?utf-8?B?c0VJZzlTd0E4RnJlZzFxUHVpYjd2OXpSQ0htUlB4cW94V0JEaXZjWkNpNmVl?=
+ =?utf-8?B?N09qeVAzTHVRRjZSeExlVVIrN3RDR2ZrZTNtTWlFRCtmVWg4bmdPWElBQUQ5?=
+ =?utf-8?B?Q28zVGhIbUNabVJmRFBjdVQ0cGlTdVZIMHQzVTBsYThRZWd3cHk2Q0ZUK0ln?=
+ =?utf-8?B?bEVQaGRWSGlBd2hMRzhuSlVMNDRjZy9rWjErQVVkWUtSNFZ5eWM3c3g5YlJn?=
+ =?utf-8?B?N0MvdWw3OVRpWUkwMDV3ZUV4aWc1SmJPdmRKYUs2cHU3Z2FRamFYR1QwcnlD?=
+ =?utf-8?B?eHYzUEtWdDY0MHA3Wmw2d2lCVjU1bTkxdWFPMlEvSnFaWDJCTllobjVzMWY2?=
+ =?utf-8?B?bk8yWEE2dlFIeXl3ZWIvWEwxSzFIOFR1TEs1SmpwMS9CL1NGM2hOakN4WDRi?=
+ =?utf-8?B?ZlFiSTQ5TFFsMnhvTGJkK0xrbEs1cFM2bjZqZng2YWNNVWpVUGVvdW04eDRT?=
+ =?utf-8?B?UlFUNWJ0OWd5YnZOWW9NTytrZnAwMDJwTU1ic3lPdUFHTXZWQ1pXUThLMXBO?=
+ =?utf-8?B?aEFidjFSK0dFY2RiQUJzazBHcmMwK1dWRUpaYi9kZVBzN1loTVc3Y0VlZ21E?=
+ =?utf-8?B?VlBEVGh0bEpPYURVbFZhbXhKZ3g0czU0UWVBOStlWDRxYnlyODJYaTNCZndJ?=
+ =?utf-8?B?eEZReUtCTGpqWmIvSUU0NFhnc3NCUUd4eW1hM1duM09KNHR5L2hvZXE2UENH?=
+ =?utf-8?B?NXdscnNJK3pnOTlvbkMzY2YwUmt5TktIVWVndVM5VGJ0cDdTRU5FQlNITXFJ?=
+ =?utf-8?B?eVBFaEt0bE5IZXJucklQZzZ6QTQ4MkpmN3RqN2pKQVRJSGxib05xSjRzbjlo?=
+ =?utf-8?B?QXo3N1dMbEFHdWNreDVjS05KaGhRSnUwOGNIY0M3SzFKckUwVmdnU1l4ZzY0?=
+ =?utf-8?B?M0FJS3oyNzNnQmJPTjZGUT09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MmZ4QUlEVXFLcSt6WlBVMm9nOHArRzVRTGdBazJTV3NBRmM0ZDNNTXQ0R25O?=
- =?utf-8?B?aWZkTmk5YktXeTZaWUdxLzNQc21vVCtHTkJZSngwVCtUT3JjKzI3Z3dHalZE?=
- =?utf-8?B?QXVGRWpoWHJpVHJRZHBrRmUzZ3c3TGM5VDBaWXZ0N2JSNi9vMDFlRlorOXlM?=
- =?utf-8?B?RXFrSmxqYkpyanIvalozaVZtMW1CakFLN25Udm95UUZabFpXdlgzNjhLNm1S?=
- =?utf-8?B?NjhrQmJFOXlwUXdLd2ozb21laC95RzJJMnFFWTVGckgrNUF5aksxV3hySU1Y?=
- =?utf-8?B?ZVkzbGVjOEc1R2xEc05pUnBBMmN4RDZwUktlU0pCdll0M0pYakNGZTNBN3Js?=
- =?utf-8?B?WExkdFVrbG9wSFZyUXQ1QndCdjV4dGZNVWdDcU95emdsdlRsekUvMDRra2tk?=
- =?utf-8?B?ZjJrMEJsbmJnZXpsU0k2UkhGbGU3WkpLclJ5ZjF2ME4rWGREQlJwUmxNdUIz?=
- =?utf-8?B?c3NtK3FoalFOaGRNYWJidFk0KzZkbUVRbitMNnNtWEd1WkNsUDMwWHpGT0ho?=
- =?utf-8?B?NjlxYWpwSXdyaHlEQk0xUFVUUm1nak5WU29tTUZjcDl4L3FZNDBBT1cxRWMy?=
- =?utf-8?B?WVpwOVBvTVRZcEc3cFRPV2ZyOUcvbXprZmw2bENJempwbVdmTGpsWnUzOEJL?=
- =?utf-8?B?ZlhraE9iM2NnWC93Y3hUVGRzOGdTVUVoekpIRkw3RDRDZzJieUJYdS9LSlVx?=
- =?utf-8?B?aWNtZ1ZzbjJtT2oyNk9pOGpMbVpXMzdGNjNta1JRcjIyRFJJcTloZGFyMi84?=
- =?utf-8?B?M2N2aUdBdFo5c3d2bStrZEtVemZRcW9OeWN5MmJpbHc5ZHgrUlVhQ0tUL21q?=
- =?utf-8?B?c3JsTkdodjJTam0wR2VLdWRNN3ZHZXI3dkc3elN1Vi9Oa2p4Rm0zaUdvRGJn?=
- =?utf-8?B?WGpNMXFidU9DMDJWVmZtQTVJZlU3VkhJbzlIMXBoNE1PVGFTV2NpYTg1R1Z3?=
- =?utf-8?B?WEpIbVZ2YjJsaytYMTc1Yy85Y1hWa0Ribm5UWW16RmplMnMyNW4xQTlmZ0s5?=
- =?utf-8?B?VDh6TEVENGJOMWovZVhnRlpzRVh0dG01N1dhYUkzeG1zK2ZhWXdqaVNoZ3l0?=
- =?utf-8?B?L2xPaW1ZdklobzZOa3FJTGNFT25PUVRIUGswcFRtMFdwK2hGMGJmOTVBRWFE?=
- =?utf-8?B?T2VLT2tPUjVpTmQ5SE81ODNBa1RWaUpHUFptNytqYXNBblliRjhHTzhnNVZX?=
- =?utf-8?B?Y2gxWkNDWWxtTjdwZW9ZalArRk1mSE02RzdlYjVPcWRROThaZXQ1aVdMWWRk?=
- =?utf-8?B?VVB6QXZBQ2huL1V1d3RNMVY4OEw5YjVQNGNUYVpMY0JlUUFCY2YzMSt6citQ?=
- =?utf-8?B?ZGxiTTRLbVF2SFdMNUFZd0dEQ2lzYW51YnlGdXZHM3JyUEdScXZKcEpieUNi?=
- =?utf-8?B?YnAvRHNSeUVnV21IRlBSc0FFM202VnVtd2h2Skw5a0tnT1VQbi8yMm43Znk3?=
- =?utf-8?B?ZjdRalk4K0lvc1VaTDRnOTZWWm9NeGZEV1dxb1RiWklRbDVJam5SSlBtZjJW?=
- =?utf-8?B?MnNlQ1U3U0hJTXdydEdmazJnRDFFVnVCWGNIenJlcUJYZDZHaVFEVTFPL2di?=
- =?utf-8?B?dk55OEFKT3Q3bWR1OFlOQnhndUJZQnpvLzNqcEdJTUZtSVY1aktjRmx0clFM?=
- =?utf-8?B?Zms4aTE0aURaMit5ZFhBOVAvSzF5L1E1clRkbTNRY0MwTGRRZVl4QzBMVHBi?=
- =?utf-8?B?andxaDc4cTJiUzN0M2VmOHh0cWM4UXVRRmRtSGlSRmZ5UEJjSjB3QmxIdVE4?=
- =?utf-8?B?dlg1SXVjZlpwL3ovOGN6TFNvZmZaZ3lXSlFVTkpLM2d3MXBHYzVyVTBWNEs4?=
- =?utf-8?B?cmtqUlM3emVwWDJtR1JzYzZvR2l3QU1GQnBqOHNIZUU0dGlkbUxGMVJ3enpP?=
- =?utf-8?B?dk1PZzg4di9ucnR4L21ac3Z3VUViTVAzLzJqZTBDL01ZOEdDZ01kMzNiWDk5?=
- =?utf-8?B?N1FNQVNnQzZDQXlveHJuTlFPcm56OXR4d1NGbWF4MStsTEVybW4rL28rVFJh?=
- =?utf-8?B?Wno5bis3Wk0wZGU3MlhkYmE3SGlmd0lHNzF6dlRDRjc2RVMwQldLS1pIOTFk?=
- =?utf-8?B?L0V2bHpYQ3NTZW4zVlg3N1E3WDAzSjhhTXZMS3VEN2MvOGRubmgxSEpYb25y?=
- =?utf-8?Q?+y9EkvV3o+HOqSY6vxwT23XQl?=
+	=?utf-8?B?ek9ZZDF1d05PMDcvQ3lzRFZpNDNpc2pJWU5uNEpwOFdsZmZSZE5RU1Y5Z002?=
+ =?utf-8?B?V01takR2ZnRMdUpVOXlOYmoyK3RWNUlnanc0TGFGWU0yaFRuOUJWOXppZGRV?=
+ =?utf-8?B?bnZzTk92eXZLYVQxWlBJc3c3ckhyeVo3ZHdWRktCNmNWQWJzekpmNHUwZ3Y3?=
+ =?utf-8?B?RUwra3doYWxlRG1ZUlRrWWtvM3BPNDVlblUvWU1ENnpYWUU2ZmZzdG5ROUtK?=
+ =?utf-8?B?ZkNsYjR2azZqR0pjQlpIUGROVldZRGdjdWR6Y21DeXdsY1lOWE1MRThRcWsv?=
+ =?utf-8?B?RWJDc0N6cGtBTHhDOHMybExQS3RPOExwamlHZTlLMk5ENEQ0MmIwTEg1andW?=
+ =?utf-8?B?VW5sSlVDbEpDSjdhRytWUk9aTThwYXliZkI5dlk4a2JrcldSWDc4WTNlWVoy?=
+ =?utf-8?B?UWJxNkh5MkVPeWZxK3lrcVVYQld6TjVMQndXRDNTem80dTV5MktZcUdTU3ZY?=
+ =?utf-8?B?aXhROUNOVmo3Uy8yWHptbUFheGRsVzJxQ3J3aGJhK3kwQ1htZzZKS3pFb0gr?=
+ =?utf-8?B?anV5U0VBdlZaNTNiakp2YzBRdmNNbTVaRXlNT05OVGljZWpYQVBFMnJ5WjNa?=
+ =?utf-8?B?NnF0SUxQTDUxdkxyM3U4NENMMG5hM3BzSC81ZlVxNC9WamUxdm9wODZKUzJm?=
+ =?utf-8?B?dVVRS29OVmJQWW8zSDhpNzZ2Snh1bVUrUEwwV1RRWGhWRlhkT1ZEMXdqdVpq?=
+ =?utf-8?B?cFQ2dm51aEtIVnJzUTJZUGJ4RE5RYmxBVWIwbCs0ZmF5ekxRaWtQRlpxbDlV?=
+ =?utf-8?B?WG5JUm0vVGJzdmVqaUdFUU1iTnZueE9FWlYwQW1QRTk2YXE1OVBsa0hwRDlW?=
+ =?utf-8?B?WXBxNnNpL3pnbFRNcXpEZDcwN29pRWdTNGJzM0tpVTFBMUdoNDhCT2NUT2wx?=
+ =?utf-8?B?ODRMT2s0OU5kOHZ0SHErdnFFVWxEMEVDWC96Ri9tZlVMbERjMkt2TzN6aTJY?=
+ =?utf-8?B?TWVVUERrTytCbUJaa3B4TlRoZGo0ZkZHQy8vZkg5a01PVDRWVHBmOS9XdEd4?=
+ =?utf-8?B?c3RDYk5kM3UrdHBhR1VicEp2dCtUc0x0VTNEb2RhZTNKNW1OT015TEpHL3U5?=
+ =?utf-8?B?MkFWczFidHQ1U1dqbnowcWdJVEtTcmNVd1ZQZUlRM0VRVlhKQUZqaFlRTG1I?=
+ =?utf-8?B?RWkxRk1zRGV4V3kwcnNDT3VzSVo2VUpPbS9uUkpmakdodHlTRVRMNUdtWlZH?=
+ =?utf-8?B?UUt2dFRYZGcvRmUvTVZTV0JBODlQNzZ5YkVPYitVR2lDdzBPTjdxbnRuaHhV?=
+ =?utf-8?B?R0lsbnJJZGo5bXZKL3VWMWtIZUVtQXVQUmhiM1lUUUIvejZ3QjJGaUgzdHpX?=
+ =?utf-8?B?WmlEYmxITUxhakpJYmJPOGhZZlNSSTRUT2pMRlJJblFRMi9XeU5PTjc0akRI?=
+ =?utf-8?B?bVhuRnVrNFRSTEMwK2lleEJtQmRPbTgvNXhFMHB3WTFBcElBd3BXV3hOaHlQ?=
+ =?utf-8?B?bENFMk9sdWdERldjamFoWWp4RVFQZENTOWxhOStGNWJmRHRFRzNkdXRnVG9P?=
+ =?utf-8?B?MVdLVXFjbFZtUk9HUy85M2VBSE5Ba3ZvNHlHTVZvcGlEUG8ySXFZeTRGVDEw?=
+ =?utf-8?B?RThROVpSS0szUWJkRDE1dXArUlZCd0pObHVZenFtZ3ZwVUM3N2dnVlBFb0NU?=
+ =?utf-8?B?Q2hvRVNFamFhSU1IZzRoc2I5NEZnbVNoUk85OGdtTFA1ZlNudk8rai9wdzRL?=
+ =?utf-8?B?eGFOQlRQR2I5bUtxYTRUNlVPQ2JzVW5oTUdOek90N0RsMlJSUmwxcjI4UUV4?=
+ =?utf-8?B?OHZROERsaHI0eVVaYm9HemsxYnhMRDJZYXJBSXgwa0lUK0NNcXRnWGVpQ041?=
+ =?utf-8?B?QmUxQWUvem1GdFlNSGhwNXQzMDV6aVYwWHEwYTd2b29XVUpjYmgyb0VSNTZ1?=
+ =?utf-8?B?NmJYSTVVWnhEcUp6MG1HZ3NQc2NaRkw2WnBLUHg4czZuN2h3YjVPODVUQ3ZC?=
+ =?utf-8?B?TEozZFNjYzV6VmF0dm9mUGRGVnRxeWdyRng0UTZFNnQrM090OEJSV0Y3Zkpm?=
+ =?utf-8?B?ZUs2ZXhJcVBqUDJmb1IwajBOK2UrSmY0MG14RDEyTHVpNU5CN3RDcnA1YUtt?=
+ =?utf-8?B?Z2xuNUZDRndvaW5obmlxaytuYllORDl4Ukp1TUs2WlI4YmovTGRJZjh5Uzdt?=
+ =?utf-8?Q?xmucxTaZmBqpHLm9r9y0VKGPm?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2ea5ed70-6c71-4439-5b50-08dcd2778ad6
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ed6c432-2acd-4534-f467-08dcd277bf06
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2024 15:36:45.3513
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2024 15:38:13.1075
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: M5Lom5ZkBeZHLpRAtg1vZlovpSx3xupHKUgYJGGuSt669ncHFyXWHXfvp+y7One9hmLSQ6zzYXYTSXDfBufPxg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6601
+X-MS-Exchange-CrossTenant-UserPrincipalName: s35Z9xRmaRgovHKtv0OlnAkD+GRYXdpxNDxKbGX8hf6e2UFxEgs3Wi6bvjDCNdtpTUApj21X5lMGxZEG4d9g+w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7307
 
 
-
-On 9/11/2024 7:55 AM, Taehee Yoo wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
-> The bnxt_en driver supports rx-copybreak, but it couldn't be set by
-> userspace. Only the default value(256) has worked.
-> This patch makes the bnxt_en driver support following command.
-> `ethtool --set-tunable <devname> rx-copybreak <value> ` and
-> `ethtool --get-tunable <devname> rx-copybreak`.
-> 
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+On 8/22/24 21:41, Wei Huang wrote:
+> From: Manoj Panicker <manoj.panicker2@amd.com>
+>
+> Implement TPH support in Broadcom BNXT device driver. The driver uses
+> TPH functions to retrieve and configure the device's Steering Tags when
+> its interrupt affinity is being changed.
+>
+> Co-developed-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 > ---
-> 
-> v2:
->   - Define max/vim rx_copybreak value.
-> 
->   drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 24 ++++++----
->   drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  6 ++-
->   .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 47 ++++++++++++++++++-
->   3 files changed, 66 insertions(+), 11 deletions(-)
-> 
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.c | 78 +++++++++++++++++++++++
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.h |  4 ++
+>   2 files changed, 82 insertions(+)
+>
 > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-
-<snip>
-
-> +static void bnxt_init_ring_params(struct bnxt *bp)
-> +{
-> +       bp->rx_copybreak = BNXT_DEFAULT_RX_COPYBREAK;
-> +}
-> +
->   /* bp->rx_ring_size, bp->tx_ring_size, dev->mtu, BNXT_FLAG_{G|L}RO flags must
->    * be set on entry.
->    */
-> @@ -4465,7 +4470,6 @@ void bnxt_set_ring_params(struct bnxt *bp)
->          rx_space = rx_size + ALIGN(max(NET_SKB_PAD, XDP_PACKET_HEADROOM), 8) +
->                  SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
-> 
-> -       bp->rx_copy_thresh = BNXT_RX_COPY_THRESH;
->          ring_size = bp->rx_ring_size;
->          bp->rx_agg_ring_size = 0;
->          bp->rx_agg_nr_pages = 0;
-> @@ -4510,7 +4514,8 @@ void bnxt_set_ring_params(struct bnxt *bp)
->                                    ALIGN(max(NET_SKB_PAD, XDP_PACKET_HEADROOM), 8) -
->                                    SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->                  } else {
-> -                       rx_size = SKB_DATA_ALIGN(BNXT_RX_COPY_THRESH + NET_IP_ALIGN);
-> +                       rx_size = SKB_DATA_ALIGN(bp->rx_copybreak +
-> +                                                NET_IP_ALIGN);
-
-Tiny nit, but why did you wrap NET_IP_ALIGN to the next line?
-
->                          rx_space = rx_size + NET_SKB_PAD +
->                                  SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->                  }
-> @@ -6424,8 +6429,8 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
->                                            VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
->                  req->enables |=
->                          cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
-> -               req->jumbo_thresh = cpu_to_le16(bp->rx_copy_thresh);
-> -               req->hds_threshold = cpu_to_le16(bp->rx_copy_thresh);
-> +               req->jumbo_thresh = cpu_to_le16(bp->rx_copybreak);
-> +               req->hds_threshold = cpu_to_le16(bp->rx_copybreak);
->          }
->          req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
->          return hwrm_req_send(bp, req);
-> @@ -15864,6 +15869,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
->          bnxt_init_l2_fltr_tbl(bp);
->          bnxt_set_rx_skb_mode(bp, false);
->          bnxt_set_tpa_flags(bp);
-> +       bnxt_init_ring_params(bp);
->          bnxt_set_ring_params(bp);
->          bnxt_rdma_aux_device_init(bp);
->          rc = bnxt_set_dflt_rings(bp, true);
-
-<snip>
-
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> index f71cc8188b4e..201c3fcba04e 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> @@ -4319,6 +4319,49 @@ static int bnxt_get_eee(struct net_device *dev, struct ethtool_keee *edata)
->          return 0;
+> index ffa74c26ee53..5903cd36b54d 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -55,6 +55,7 @@
+>   #include <net/page_pool/helpers.h>
+>   #include <linux/align.h>
+>   #include <net/netdev_queues.h>
+> +#include <linux/pci-tph.h>
+>   
+>   #include "bnxt_hsi.h"
+>   #include "bnxt.h"
+> @@ -10821,6 +10822,58 @@ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
+>   	return 0;
 >   }
-> 
-> +static int bnxt_set_tunable(struct net_device *dev,
-> +                           const struct ethtool_tunable *tuna,
-> +                           const void *data)
+>   
+> +static void __bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
+> +				       const cpumask_t *mask)
 > +{
-> +       struct bnxt *bp = netdev_priv(dev);
-> +       u32 rx_copybreak;
+> +	struct bnxt_irq *irq;
+> +	u16 tag;
 > +
-> +       switch (tuna->id) {
-> +       case ETHTOOL_RX_COPYBREAK:
-> +               rx_copybreak = *(u32 *)data;
-> +               if (rx_copybreak < BNXT_MIN_RX_COPYBREAK ||
-> +                   rx_copybreak > BNXT_MAX_RX_COPYBREAK)
-> +                       return -EINVAL;
-> +               if (rx_copybreak != bp->rx_copybreak) {
-> +                       bp->rx_copybreak = rx_copybreak;
+> +	irq = container_of(notify, struct bnxt_irq, affinity_notify);
+> +	cpumask_copy(irq->cpu_mask, mask);
+> +
+> +	if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
+> +				cpumask_first(irq->cpu_mask), &tag))
 
-Should bp->rx_copybreak get set before closing the interface in the 
-netif_running case? Can changing this while traffic is running cause any 
-unexpected issues?
 
-I wonder if this would be better/safer?
+I understand just one cpu from the mask has to be used, but I wonder if 
+some check should be done for ensuring the mask is not mad.
 
-if (netif_running(dev)) {
-	bnxt_close_nic(bp, false, false);
-	bp->rx_copybreak = rx_copybreak;
-	bnxt_set_ring_params(bp);
-	bnxt_open_nic(bp, false, false);
-} else {
-	bp->rx_copybreak = rx_copybreak;
-}
+This is control path and the related queue is going to be restarted, so 
+maybe a sanity check for ensuring all the cpus in the mask are from the 
+same CCX complex?
 
-Thanks,
+That would be an iteration checking the tag is the same one for all of 
+them. If not, at least a warning stating the tag/CCX/cpu used.
 
-Brett
 
-> +                       if (netif_running(dev)) {
-> +                               bnxt_close_nic(bp, false, false);
-> +                               bnxt_set_ring_params(bp);
-> +                               bnxt_open_nic(bp, false, false);
-> +                       }
-> +               }
-> +               return 0;
-> +       default:
-> +               return -EOPNOTSUPP;
-> +       }
+> +		return;
+> +
+> +	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag))
+> +		return;
+> +
+> +	if (netif_running(irq->bp->dev)) {
+> +		rtnl_lock();
+> +		bnxt_close_nic(irq->bp, false, false);
+> +		bnxt_open_nic(irq->bp, false, false);
+> +		rtnl_unlock();
+> +	}
 > +}
 > +
-
-<snip>
+> +static void __bnxt_irq_affinity_release(struct kref __always_unused *ref)
+> +{
+> +}
+> +
+> +static void bnxt_release_irq_notifier(struct bnxt_irq *irq)
+> +{
+> +	irq_set_affinity_notifier(irq->vector, NULL);
+> +}
+> +
+> +static void bnxt_register_irq_notifier(struct bnxt *bp, struct bnxt_irq *irq)
+> +{
+> +	struct irq_affinity_notify *notify;
+> +
+> +	/* Nothing to do if TPH is not enabled */
+> +	if (!pcie_tph_enabled(bp->pdev))
+> +		return;
+> +
+> +	irq->bp = bp;
+> +
+> +	/* Register IRQ affinility notifier */
+> +	notify = &irq->affinity_notify;
+> +	notify->irq = irq->vector;
+> +	notify->notify = __bnxt_irq_affinity_notify;
+> +	notify->release = __bnxt_irq_affinity_release;
+> +
+> +	irq_set_affinity_notifier(irq->vector, notify);
+> +}
+> +
+>   static void bnxt_free_irq(struct bnxt *bp)
+>   {
+>   	struct bnxt_irq *irq;
+> @@ -10843,11 +10896,17 @@ static void bnxt_free_irq(struct bnxt *bp)
+>   				free_cpumask_var(irq->cpu_mask);
+>   				irq->have_cpumask = 0;
+>   			}
+> +
+> +			bnxt_release_irq_notifier(irq);
+> +
+>   			free_irq(irq->vector, bp->bnapi[i]);
+>   		}
+>   
+>   		irq->requested = 0;
+>   	}
+> +
+> +	/* Disable TPH support */
+> +	pcie_disable_tph(bp->pdev);
+>   }
+>   
+>   static int bnxt_request_irq(struct bnxt *bp)
+> @@ -10870,6 +10929,13 @@ static int bnxt_request_irq(struct bnxt *bp)
+>   	if (!(bp->flags & BNXT_FLAG_USING_MSIX))
+>   		flags = IRQF_SHARED;
+>   
+> +	/* Enable TPH support as part of IRQ request */
+> +	if (pcie_tph_modes(bp->pdev) & PCI_TPH_CAP_INT_VEC) {
+> +		rc = pcie_enable_tph(bp->pdev, PCI_TPH_CAP_INT_VEC);
+> +		if (rc)
+> +			netdev_warn(bp->dev, "failed enabling TPH support\n");
+> +	}
+> +
+>   	for (i = 0, j = 0; i < bp->cp_nr_rings; i++) {
+>   		int map_idx = bnxt_cp_num_to_irq_num(bp, i);
+>   		struct bnxt_irq *irq = &bp->irq_tbl[map_idx];
+> @@ -10893,8 +10959,10 @@ static int bnxt_request_irq(struct bnxt *bp)
+>   
+>   		if (zalloc_cpumask_var(&irq->cpu_mask, GFP_KERNEL)) {
+>   			int numa_node = dev_to_node(&bp->pdev->dev);
+> +			u16 tag;
+>   
+>   			irq->have_cpumask = 1;
+> +			irq->msix_nr = map_idx;
+>   			cpumask_set_cpu(cpumask_local_spread(i, numa_node),
+>   					irq->cpu_mask);
+>   			rc = irq_set_affinity_hint(irq->vector, irq->cpu_mask);
+> @@ -10904,6 +10972,16 @@ static int bnxt_request_irq(struct bnxt *bp)
+>   					    irq->vector);
+>   				break;
+>   			}
+> +
+> +			bnxt_register_irq_notifier(bp, irq);
+> +
+> +			/* Init ST table entry */
+> +			if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
+> +						cpumask_first(irq->cpu_mask),
+> +						&tag))
+> +				break;
+> +
+> +			pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag);
+>   		}
+>   	}
+>   	return rc;
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> index 6bbdc718c3a7..ae1abcc1bddf 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+> @@ -1224,6 +1224,10 @@ struct bnxt_irq {
+>   	u8		have_cpumask:1;
+>   	char		name[IFNAMSIZ + 2];
+>   	cpumask_var_t	cpu_mask;
+> +
+> +	struct bnxt	*bp;
+> +	int		msix_nr;
+> +	struct irq_affinity_notify affinity_notify;
+>   };
+>   
+>   #define HWRM_RING_ALLOC_TX	0x1
 
