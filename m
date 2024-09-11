@@ -1,108 +1,84 @@
-Return-Path: <netdev+bounces-127448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20C7F97573E
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:35:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E49975743
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:36:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 451041C21C91
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:35:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A75B1F22321
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 15:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16D9A13D2B2;
-	Wed, 11 Sep 2024 15:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176141A3044;
+	Wed, 11 Sep 2024 15:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="iLg4OmpG";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Z4QQGQOJ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="iV6vfjmS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2069.outbound.protection.outlook.com [40.107.244.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D0DF1E498;
-	Wed, 11 Sep 2024 15:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D178193099;
+	Wed, 11 Sep 2024 15:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.69
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726068937; cv=fail; b=Vhe4+VeiTWgDy+6ZJr1WzxfUqD4ER0jmWE/N13iGbz1yts4EkZQWBYnxRqPQety1k54S2iOBbbZho8S0l90ZWO8j8DxLNAkzN3iNavO6xrmvf3Gn79xi5+F1DXkXabJ3qXjleEYNoLHFYBGtJrITXmpfzikOIlSM7hwstyYG5us=
+	t=1726069013; cv=fail; b=aeqF+O3d3jcGP/xj87cVv8Mp/hnAnAcI+k251ULTeNTlxc5yKZkOV3hWwyNA2Qjt4y/mN/E/nPq/vhzcT9THn2D8TPF/uY6/9/DZ6lXrkdq57wecL4GItIGN5U6UYrAlkXeIVsl6Gposnq6NqwQ/jNFFqGYle6n5ghorPtt5seM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726068937; c=relaxed/simple;
-	bh=9cNMKNcLLZoFsVkHyXGxMNVMIfytkKWKWuKtEHb87EQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Fr1EhfqriOkiVzDUQ78xdtiIbtiAkeap/n6LvuqkvTSxJp/vy17Y15sI6e8ctXZjmnCcGIwd5WDgkYRW2br1TpRinuCqs4WC6Fa+H2EyiiTo3nOtHiKmwGrXWnfno6O9eNiOXsENrHSO9zH+Lv5b8DdjAJlhhIcuJZaJd7nqMFU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=iLg4OmpG; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Z4QQGQOJ; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48BCgKYx029050;
-	Wed, 11 Sep 2024 15:35:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
-	from:to:cc:subject:date:message-id:content-transfer-encoding
-	:content-type:mime-version; s=corp-2023-11-20; bh=zPLb9nAaWKiEJF
-	ZP5IdeNSvq052g4acKgJEqK9nuHnQ=; b=iLg4OmpG5/8FUKAzcclzX8EM2Zqlk/
-	OsLTbGH8QBhX62SsrGJw1jJuIv3uD0DJdQryfsnrerZR1hPjup2dsD9ox/WTdiXv
-	0jEhURKUXcT1hJYME2df3gBO7IreoTbIEzV0QkJU0T7lEg5irrQCOAmDFrfP5xpI
-	VCjnm/XRYYfFk5PcEYCfvs8we8qwAHQFQnKQyvPCPes1wrOvljbnk6ra7fiFWwFL
-	8RuQWV2ayqzBco9ENVTJZbGTwSoVhjhq+jsYYcJHqFAy7LJcWQh9cTVKbWPdcQy0
-	VLSo6w/DnZ0mzIM5ZggFNxcnb/i0fIyt4z5EELHOGOnYVARTVMlplZYQ==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 41gdrb8k4u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Sep 2024 15:35:10 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 48BF3EDG019854;
-	Wed, 11 Sep 2024 15:35:08 GMT
-Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2172.outbound.protection.outlook.com [104.47.59.172])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 41gd9gmu3h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 11 Sep 2024 15:35:08 +0000
+	s=arc-20240116; t=1726069013; c=relaxed/simple;
+	bh=o3eQiaqVmnByz0NiAaEjd2OfgyeIzJ/7NtzbB1llRmw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ViBFjkEufZM74c+SC8NUlW/pItMvdDHfirJU7FXMnbBQzgC8fJmUuvzoff+6eWI0RQRh/xb//Ajc80uAF8a6i+O72jWq408S7NK1Y4iW2gur4bR6WNQKaiN0PagS/klPOFLvYOl+nCailgMhQMlfmzwqOlgynCfY+tFHrkvRTqA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=iV6vfjmS; arc=fail smtp.client-ip=40.107.244.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fY5Gr/SYWsARR2w6Y6XtYRN7GNuRP1/+lwm88/dypm1j5EJA5FHC2QVsyytK5ZNuAhulW/AqdQT82yOEqWV2SbNKRO3Rp//iKVIZHPIQnT9MucEPRP7E7HfGV+9Vah2GcCFJdS/nhicOrffII/mgc9jQcruWJozqOLUS6neYl5t2H5v4mEGsGTPYYsSQ7Sa+g5GkRUZHwlWE30hje4aEiuZP/+3JagB7kP6vYFAsw3hEpE8VI3p2G5V8ZN2IQHcYrVCJ4bWyxyC9/dx3jN/tSN58qDtpfzmyDRLf9dCM44bEi5Od9ASfTocvZ3MfJewPyQXY9ysgIYRNT2hk0H9yLg==
+ b=nrummik1bfob7ruy2TZdSV4/js/57pkTYBCTR0/uya8ks9VCPMPQKlC5Pqne/5skLjJDXJrukyeWJa32F5AqWfKCfn4iaOONXhGvJxkRNkXnTxvcJ4YHqVYuPZ58RkIpgQheOCTKPCNHuPe/eff3drasYchlw1rIZ2KSnU2iaoPpQmgosHDLdweksh74iQghJNU4/FuMIzbtMxWpCFkjfln/WsihQnhHZMcoc4pjwnu6ZOrYZhUjZUxbeOd+Ci60IGC3tcmEvbxnGnjwXRc1ZApxYNtTWsewiGkjwPPJCo3qvXaMnhnY6a1DT1GX5qo+xQ2yZ4EE7JO0fiOAr+5P3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zPLb9nAaWKiEJFZP5IdeNSvq052g4acKgJEqK9nuHnQ=;
- b=qLzjOGBLEAoydCSUHzOR8IbbSYIb5DIaAwVFQ3ZnVUMl8x1SM07/B211wc7LYo0pkxVAWjbAGemOt7lKMwUG0IHofpotZsn/PwucCI0JxV0bjLQWLZvMlxvI3mcECZMSPdzqRa37HCVreFDX79FVeeqzUgQFggASA6L4LKkwqdImVEma8kvhuQtPczTJQ6c8bn8UdD2iKY3twDcfe+DrEC1IEHrVGkS0SBZNs8Do8cKeWY/HwTkvlO/6wjrkjTjQXu5sf1m1apj6Hjc0JmFIXP4iw32e3mqTSvuZkLlEEj9eSOWkSXbUCFUDxiy72LnspNyu+RL/DvrnqNLqOWJ7Iw==
+ bh=OE+z43A2IpL0IVTLxJ4w8laSbNadIBiCVpXAi/6GJXE=;
+ b=g6QRlolufUCGk62FAGRcjYSPnxHq7/2oP1VFsliKwaPrPCXOX7BM651EgZDfR7Ebq2YPtRxDNjKZJV5fg6fWQKnUHchEzwnA6lMp0Ltv04lpIMYd6MzpC0hKGws4cRkXNt9ZmnsbhVK6AfPZV8pyxyR+YlfEVMMth6/qy19uP1phenWfmDrq9XwN5Jt9RGaqoo57vKYa7qKiCiBS5RzKNlJPR0Gwv7/B52oP02CjzVfNWPMRLrYvBKSye9scntJNNuvv5ZH+1UzOq7Ns0kaN3n5qFzw7p+lEZ5+ZZ6584PDzz4dcETL/mswfjKdgNx65/JaQOMDxoWzQ2GXsxbdUAA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zPLb9nAaWKiEJFZP5IdeNSvq052g4acKgJEqK9nuHnQ=;
- b=Z4QQGQOJTIkZnHrhDYNjRI/RTh7+6DODw2qp9ZQSqPExyJsJKH3e8wISyne1007HoiMXcSRP1zjaBlEqx0AUrxeDCdTmUB8KioceBqx8H7RD6GPPMvmwCSTNZs1iiWRMA5ZuA2qxju00Qlc3ihOy/As38yf+YeLRcdQUJMx2W5g=
-Received: from SJ0PR10MB5613.namprd10.prod.outlook.com (2603:10b6:a03:3d0::5)
- by DS7PR10MB4976.namprd10.prod.outlook.com (2603:10b6:5:3a5::11) with
+ bh=OE+z43A2IpL0IVTLxJ4w8laSbNadIBiCVpXAi/6GJXE=;
+ b=iV6vfjmS2Nhso8znfk6BXNZlUIRpSvCDM2SnrpFPqv/Vp3/VkM9jQ+7CcLLe0jlhBoutJdq2YAvgS6/XhlO6Y2fFwEkhiHNs/4BSwNEEa9vCkQhsdDRtGEbX+Kk37e6uWSryxsmc/uMoxj0BeqGrb/c2yFa0YwAL6yn6EGTHayE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
+ by IA1PR12MB6601.namprd12.prod.outlook.com (2603:10b6:208:3a3::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.18; Wed, 11 Sep
- 2024 15:35:05 +0000
-Received: from SJ0PR10MB5613.namprd10.prod.outlook.com
- ([fe80::4239:cf6f:9caa:940e]) by SJ0PR10MB5613.namprd10.prod.outlook.com
- ([fe80::4239:cf6f:9caa:940e%5]) with mapi id 15.20.7962.016; Wed, 11 Sep 2024
- 15:35:05 +0000
-From: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Richard Narron <richard@aaazen.com>, Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Sakari Ailus <sakari.ailus@linux.intel.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Marcin Wojtas <marcin.s.wojtas@gmail.com>,
-        Russell King <linux@armlinux.org.uk>,
-        "David S . Miller" <davem@davemloft.net>,
-        Arnd Bergmann <arnd@kernel.org>,
-        Linus Torvalds <torvalds@linuxfoundation.org>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-staging@lists.linux.dev, linux-mm@kvack.org,
-        stable@vger.kernel.org
-Subject: [PATCH hotfix 6.11] minmax: reduce egregious min/max macro expansion
-Date: Wed, 11 Sep 2024 16:34:57 +0100
-Message-ID: <20240911153457.1005227-1-lorenzo.stoakes@oracle.com>
-X-Mailer: git-send-email 2.46.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: LO4P265CA0200.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:318::15) To SJ0PR10MB5613.namprd10.prod.outlook.com
- (2603:10b6:a03:3d0::5)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Wed, 11 Sep
+ 2024 15:36:45 +0000
+Received: from PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
+ ([fe80::bfd5:ffcf:f153:636a%3]) with mapi id 15.20.7962.016; Wed, 11 Sep 2024
+ 15:36:45 +0000
+Message-ID: <a5939151-adc6-4385-9072-ce4ff57bf67f@amd.com>
+Date: Wed, 11 Sep 2024 08:36:43 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/4] bnxt_en: add support for rx-copybreak
+ ethtool command
+To: Taehee Yoo <ap420073@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, corbet@lwn.net,
+ michael.chan@broadcom.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org
+Cc: ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, andrew@lunn.ch,
+ hkallweit1@gmail.com, kory.maincent@bootlin.com, ahmed.zaki@intel.com,
+ paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com,
+ maxime.chevallier@bootlin.com, danieller@nvidia.com,
+ aleksander.lobakin@intel.com
+References: <20240911145555.318605-1-ap420073@gmail.com>
+ <20240911145555.318605-2-ap420073@gmail.com>
+Content-Language: en-US
+From: Brett Creeley <bcreeley@amd.com>
+In-Reply-To: <20240911145555.318605-2-ap420073@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0385.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a1::30) To PH0PR12MB7982.namprd12.prod.outlook.com
+ (2603:10b6:510:28d::5)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -110,199 +86,228 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ0PR10MB5613:EE_|DS7PR10MB4976:EE_
-X-MS-Office365-Filtering-Correlation-Id: bf6f50eb-14c6-4228-7726-08dcd2774f83
+X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|IA1PR12MB6601:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2ea5ed70-6c71-4439-5b50-08dcd2778ad6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7416014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?OP0Vj+Q/Ah+5gjFxOv19bJhXUTeBj8h4Y31eMQg8uTOPRjai+qENAvCZ31IP?=
- =?us-ascii?Q?LGo9FMrdDn7G4YJhPrJJS4XUJvLU8CEJaC61h68AYe11IKWFrl0OeT7qKXoL?=
- =?us-ascii?Q?S3GUwwF/JM8R1av3RVqXiB8z20SWlDvpB93XcKranPZDDm/EdMA7UwdUvKg/?=
- =?us-ascii?Q?I0IFOiFAB26QGEJAKRtG+L7Uu7XFxmmJNUBTOlZIq6HcS3++sqZ0h3xBeWKg?=
- =?us-ascii?Q?mKxEYfLvbByB04kwGtQPhXabmmsWv0D5/G9JBgBYou1U+6zc6oJDiHCXAsCe?=
- =?us-ascii?Q?F1POUUTPUCAR2Fbi19nE9DySFX2Bi+Th5EbhLZQ6+7KQM+b7Sa85eb9M45Z3?=
- =?us-ascii?Q?KvlLs9iOwhNud4fCO30Nixtj4d4aAYOLqN/6Q8XYFVTfpQt0fbP9oy1cFipv?=
- =?us-ascii?Q?FBGLVc59SOWwBr7dHz5sPMdXN2uFcOnmnHc+0gTz/m778dS4KNsgAd8HIWbG?=
- =?us-ascii?Q?XEa0hkw0W3ToJyeWgmgiEVO82nD0O5W8fjvef8G8RTLxvRO4Wc3sXC/L31Xc?=
- =?us-ascii?Q?E8ORqOZqZfcKUB4fYbqPSC4x6tThS+0vs3RKkzbTGsR1a1R3vx1WcYyQ/Dhe?=
- =?us-ascii?Q?L/0PmWuwYADQvM96WRutw0fgHC/MdbUPUBixo1zzgsmAQoGuKMpfUrnOzFiQ?=
- =?us-ascii?Q?ux98fDdMtY2UqWFCPpM63vKaD87tOugMckhFQ865kLCu6P7lyTRgGbiT9xbk?=
- =?us-ascii?Q?8WaBve45CkpVSQGFvuf00VHa0DSF1xP+ehsCfX2gXgI8qW5eoE3QyCUHE37G?=
- =?us-ascii?Q?jWgepLCUkmxmiPj1mWRr+OnOWT844v+yUP1/yAvRSlcVqcbbhb+Foxim82mn?=
- =?us-ascii?Q?BeD5xru4q6wBG+j9BayVrNDhTmozQBkCwXDFYs93kBdrO/RDGYYaaB76mNyX?=
- =?us-ascii?Q?0kreJ2vE5/e/nZgMl6Jed+xXD6HTSi9/RBPDw4I4fcAZVnlmTz667wdPYN1n?=
- =?us-ascii?Q?7nFF60yBd60oZH0IsTTcaI4zxarc6/xGYICaqyZbRSYR+qwcl+92SQqJKgmj?=
- =?us-ascii?Q?bnX/HOMsP62KqbjErvOj6IIVmX7S/AqQ+1DuLQUojlZ5JMwUNk4aIKM2zzqp?=
- =?us-ascii?Q?lKQqPGXOGMecEbxmG999AP6lly9WWfkOwwVHzbb5I1W4DoE/pnYJBrr8x0pq?=
- =?us-ascii?Q?miVT2z0jdPeHIAHVXOWtEFREKcSOb/XxOxCEJUjjn7NypWlQEOUiQVsCS1t/?=
- =?us-ascii?Q?pbWcX8APWvVi52F2Tb6bAFYV6PFRe0IOvv9ZI3tFku7rfeXXB9K+wICtwzQR?=
- =?us-ascii?Q?J5Lnz7IoDyrLxHeT26yymIjZ6xgwC9UgdhSzlGbfa1NdVohEdYq/m9SIDiHf?=
- =?us-ascii?Q?XeX41659d0sDjdsw1Vd3PtXt0AHGLFFwjZtL77N2qAOc1xEovZX0EkQwbeKR?=
- =?us-ascii?Q?yZOMc4A=3D?=
+	=?utf-8?B?dzExU0MzdS9hVmo2bEpOaCtpdnU3UXlWMkEwdXNOWVFKcWpnU280QlBIOXNx?=
+ =?utf-8?B?Q0lvVXRTMDFtM1JqaWlEMXV3eHdYaDd5NkhGRGIwUVMwU1V1SkxmWitBaEVp?=
+ =?utf-8?B?TE9Kem8zOTUvcXBFdzNTSm9DdGpINVJRdXdsZWxmZDNOQ25ZSUUrbm9EV3N5?=
+ =?utf-8?B?QnN2ckFxMEcyTzZzS3JoblhQVHNtQnZqU1ZvN2tyeXVzTkQzdWFWN0dCWE5K?=
+ =?utf-8?B?U2JIME1Kc01iT2dsOHBOKzg0OGJPS1RNYnlUM0tvdmZvRHltaUM4T1pkLzFP?=
+ =?utf-8?B?QUtTb25aMG1sZzFycktEOXJlMjFTbk02c3V3QVBWb0JIQklvM1JFYTEvUUhF?=
+ =?utf-8?B?ZzlsNFdyU3pGL29wRy9GaGQ4WExxdlhTM2ZJUWVoeTFFMmNWczlwUHhyR3Jp?=
+ =?utf-8?B?eGRKemNZa2FLc29ZOFY0VmIzVjlVVzVZSWFKZHlKODAzZHdmYUZYTmN5bnBx?=
+ =?utf-8?B?UWtXbmxpWm9JTXJoYU4veVorRDliT0R0U1BqZVozb0EzQ0Q4TjA4RktwMEhU?=
+ =?utf-8?B?QVdKNks0RXhidmx5YXREb3o5SGl6eE5IWXFjN1RsS1FiVGVTU0N4d25IaVZk?=
+ =?utf-8?B?YUlQdjZVYitEVHRDejVBTTl2Y1FvU05BOHo2RFlrWGJ3NE5wSHVGRml2YmlT?=
+ =?utf-8?B?dGhPekJCdkNJZEZsalhWUng2Q1VSU2hLVXd2TnpmQmU4eDVDeGJvYmdVK1pX?=
+ =?utf-8?B?bTNaMTg1TGtMS25xWWtoTUhhbjhwa0FYb01KeVN5VXJ6eUFHc3FKaGluY096?=
+ =?utf-8?B?NWxQS0lCWWJiVkFoNlZ6V0t0M2doSjlIRDNxVTRvWFFLWjNvM0NnNllnNDdK?=
+ =?utf-8?B?a2x5dnVVQ3BIUkd1MDEyK1NUcEJVZXZFRDZLUkFJUFVkQU15aGlnbmJiNlZI?=
+ =?utf-8?B?aXQvL1pFMmh2aXhRbVFhbzc3NTMvUlRzd3g4VDhiSnRkR0NkaHgxWFVBZ2s2?=
+ =?utf-8?B?RWRWREtwTTl1MkNBQlFEaHdtMEtKMGJSaDdNSzN6Z1diNWI1UHRhd25DRnJ5?=
+ =?utf-8?B?YkZ0WU5NOGY3eWJxMW45TTNtTG5JVzRrNmwyYmdDWDUwbFlCT3g0ZWZ6cVRn?=
+ =?utf-8?B?WGRqeE0vUm5BVVhBWHV5Wm5qblpOTVNCNXpPSFBxTlowc2tYdEsweXViYnRZ?=
+ =?utf-8?B?Z3hiN0xBWHRXVW1CRHJidlZndDJ4WWFIc3d6YklVaWlPNUVlNGp1bndUN3dW?=
+ =?utf-8?B?UVBHRk5BWTJ4MC9aZVlyTU00QUJEeS9UMUQ0WGttQXZLdnlHcEFaendxZHhq?=
+ =?utf-8?B?V1dFQVBsdEIvSXN5N0tlYmF6OGNWL1F5Y2xFSG90WmlBQ0pyeEM2OGJXRUht?=
+ =?utf-8?B?RDBVZDNWdFNvTHoxK1ZWT2R3R0c0d1ZCT2tvRmF3MHdYUE02N1NscjQ0bldE?=
+ =?utf-8?B?SURIU2ZOM0RSTTVQZ0RSSzR3SHhSajRUZXkzVTAwSzVVV0g0cEF5c2JrTFpa?=
+ =?utf-8?B?WmlHV0Z4OWpQeDRxa0o3VjNBYUVrc1NVRXlDMzZsbXFOOHFQWGFVYnZFenha?=
+ =?utf-8?B?MG1LYzk3TXIzQ243WGM1Zm03SE42K09YWXN3MkxKMW5SeEJ4aVJ2OEFNSXpT?=
+ =?utf-8?B?ZDg0Ym5QbXNYUUR3c1lBYkZrZldvRXRlRDVZN2MwRGhGUFFGWVNhZm9rcmZ6?=
+ =?utf-8?B?VXBUYUN5Q2hZT2x6aWYwVXdIak56WXJ5U1ZYU0FLRmZTOUZFaEJZSDRFQ3JI?=
+ =?utf-8?B?WXFMTDUwWk1ZWndBY2VJa2R3bGR1N2lvMDd4Nzd6RXBmVnZrR21nNDIzaGtH?=
+ =?utf-8?B?Uit4UlR1dXo5K1JjS3BTWVVKdTY2ZXlubEpQSDlnTnJaNHVQWFVLMUxINVN0?=
+ =?utf-8?B?VWQ4TkdEQ3REb2l0UWZlQT09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR10MB5613.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7416014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?PF14XC+HVHm13NsuP39TrWZMLDgF+ZZPYUG2GoBVGO+HjzggZ/jPkEZE4KpE?=
- =?us-ascii?Q?qUTUWyaHOH5t2/lEVIXZ8pGzNf6NBSVVP+vpYbc3bV5uYDFtq2LJ1f/kbs/G?=
- =?us-ascii?Q?G3tPNupA5pVCDTlHLuI08cs9bgJM8y5xspeNqpPw0cEn5Gy6+n6V+1B4vY/y?=
- =?us-ascii?Q?35jWBJMhRNgneUpPJ4ALYaZz1UEmHjVAxvCTkmUHMdaTcSoP1SKGYoqSCoLE?=
- =?us-ascii?Q?tFQWhvhkNPtpD3WldGaFNprqtC/zvWMXggXfdvVZP5Ttw+F+Oyav/TEzxaXg?=
- =?us-ascii?Q?bsVQO7t3NO7DSu+UyDruEtb4ob0YLYNmDGiqyFeTIPnThEBuLeyoLPszV2xz?=
- =?us-ascii?Q?tjaMUaAA2sNH0EDlFHx0pcNo3U5Alib5e9THyhDOI5DzGd/HBbNsocoW7krK?=
- =?us-ascii?Q?OrdA9K6JqjUvRGVVP2wAyRM2qS6tGhToSjo2aY/R/jG/xruvaPf7839trqig?=
- =?us-ascii?Q?t/wR3EgGDLCN5Vsvll7bH6sguPOP0dhNb/UThfZfTjFEQWkdI0f/JW/WwZvs?=
- =?us-ascii?Q?DC+LFKy2UKm30LanE8rjZsvf5HTZVTJDbbogXpKlOH8R2f9wv57nvYfC254c?=
- =?us-ascii?Q?v+Biofe+ANXWOdO+/rNf5l5sCNT3fkov09wer5qsgIXWdMIkzUcvdXvk3s64?=
- =?us-ascii?Q?3ZRA4j6zTrzEmmv4ADIs4b02DoLpHTbFWZEMrzEi6x8lUfHzERJXXb2ctTPE?=
- =?us-ascii?Q?08Y9oumVSzmDGsUAqmv6ICWW7PiFyRlnRu9dDqcF8AXOUbOM5drYQPkE1n/Q?=
- =?us-ascii?Q?MOTwOHtL76iQ/PZ2AbEfSxcHn/tCmFNsTIDLLc8WsL/CGCQUgVMsicPfle3K?=
- =?us-ascii?Q?qVlhLhrHwEmGG7bYEl2J8FK/R1VobP3k+rAAOcaItc8I4jXkp9Y+VkOEBJtt?=
- =?us-ascii?Q?laU5s+cQJzth2eLzdfZhULZRVxy1Al65/kN7nZHgbejZoYqStqAHqUeouuvd?=
- =?us-ascii?Q?r18RAzOdl8g49EJf7vVaiJbFvKcmD/ErTLj6aFyjZ0PTErSlLauQNqOEpKPk?=
- =?us-ascii?Q?Tf0GXOo6psdSTz3ZrcOxHYYws32CO7kTStvnDvFY0WVyHQP6Kz/IVIwVsCX+?=
- =?us-ascii?Q?MVUtE0OfD9XNjoamfMST0B7coKo2uALbB3Ff/grSbzxfkdloamJ2hCdzOXrK?=
- =?us-ascii?Q?hqrIgUQpAXlRB4lH6fwyBJ2lja2fInH1bleCCGNGP4lwhXAt5OHYjIknL/TS?=
- =?us-ascii?Q?aohFBeZbMOFZode6JqkbFUHAxTFRawBqBZdnUy+FSfpT/OZdzl4p5XmkNQiS?=
- =?us-ascii?Q?4e+C9f1PFq0mSz2HF5bVEHZ9wUodZUGpW4mXai1QjZ7F5PLuApMTYrWneocz?=
- =?us-ascii?Q?3dn5knrgIc0YVhWqBlxgNJakzJTay4gvdwJkuIndB8JOfRnjbEz5wRNbJfr5?=
- =?us-ascii?Q?FStEdCR9EA3xPly1uwiHFJmoKHLfJYrFRDBGaL9bwW1nzzr0w+CSTiJA+xtE?=
- =?us-ascii?Q?xhpu1p7dutS2VBkMDPQ0bpU5iz2zn920kxoik8Nu2IaLTuojd4Ru8bQa1e/x?=
- =?us-ascii?Q?jLBOyC+TWNRhPwEOcjut8SpCDlsmhIsdGWHIn07EK5azfUjRkqNBm5f3rSMh?=
- =?us-ascii?Q?B7p7+UJLgmtFw0+J1kl+WwpPGDcVcDFv6KOCf6EVu881iv+8ht52EZp0BISw?=
- =?us-ascii?Q?Aw=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	wKt2Vn/rX6ryuJ73K1/NPzFgGuqoKe755/vF15YISiqp4+hxfAgy9DP5UHqOD/9otWZqHX/I+LaxfBm1TyHsGa0jXQb0CegplvRTHhNa9yLKUxS8Fj/G45ciLb9NmYx0t9gu5krKaS8BAjzEhaMk1sUlPIM4dWB7aMw6DwtJ4pyTsbuRKfsf70isDwu0BA7W77U6eByt6d4MezP/+ekmKvsiFRUyxI/qvX1sXYJ45YMNz2KcM24dwkm5A6oNYN4O6YOXes5beSZOSVETwzJVlAhZZrqrqiAmQXOlYZb5qKSDc+AiDWlAtgRylElA4EcBc2zod5jXecwyFgPusJGePs3w6w88In46HiB2CSGxCBOHrIpUs6IHhSywPOcdCeqBir83CXav6AFt7v3nlsf6lw3bynN7xAgsEYltTx6hn/hfwsAMsSfdnurbN2Xbj1zgRCF5W+8dY91BvVi0EFf00xf8UxGoVaNCH5qTalJqHfpa2aBaGKWvAXTfPvfR6JsUD65ScQ5HWLUikN5/VaIui3WCytfUwm1er9fyKdrlHVPbiQCIDxX01rPSNYdTdDIOztT1OSv5MQV9xiC5MWm68dwcb0Buxcx5sAU1Y6XOvwU=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bf6f50eb-14c6-4228-7726-08dcd2774f83
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR10MB5613.namprd10.prod.outlook.com
+	=?utf-8?B?MmZ4QUlEVXFLcSt6WlBVMm9nOHArRzVRTGdBazJTV3NBRmM0ZDNNTXQ0R25O?=
+ =?utf-8?B?aWZkTmk5YktXeTZaWUdxLzNQc21vVCtHTkJZSngwVCtUT3JjKzI3Z3dHalZE?=
+ =?utf-8?B?QXVGRWpoWHJpVHJRZHBrRmUzZ3c3TGM5VDBaWXZ0N2JSNi9vMDFlRlorOXlM?=
+ =?utf-8?B?RXFrSmxqYkpyanIvalozaVZtMW1CakFLN25Udm95UUZabFpXdlgzNjhLNm1S?=
+ =?utf-8?B?NjhrQmJFOXlwUXdLd2ozb21laC95RzJJMnFFWTVGckgrNUF5aksxV3hySU1Y?=
+ =?utf-8?B?ZVkzbGVjOEc1R2xEc05pUnBBMmN4RDZwUktlU0pCdll0M0pYakNGZTNBN3Js?=
+ =?utf-8?B?WExkdFVrbG9wSFZyUXQ1QndCdjV4dGZNVWdDcU95emdsdlRsekUvMDRra2tk?=
+ =?utf-8?B?ZjJrMEJsbmJnZXpsU0k2UkhGbGU3WkpLclJ5ZjF2ME4rWGREQlJwUmxNdUIz?=
+ =?utf-8?B?c3NtK3FoalFOaGRNYWJidFk0KzZkbUVRbitMNnNtWEd1WkNsUDMwWHpGT0ho?=
+ =?utf-8?B?NjlxYWpwSXdyaHlEQk0xUFVUUm1nak5WU29tTUZjcDl4L3FZNDBBT1cxRWMy?=
+ =?utf-8?B?WVpwOVBvTVRZcEc3cFRPV2ZyOUcvbXprZmw2bENJempwbVdmTGpsWnUzOEJL?=
+ =?utf-8?B?ZlhraE9iM2NnWC93Y3hUVGRzOGdTVUVoekpIRkw3RDRDZzJieUJYdS9LSlVx?=
+ =?utf-8?B?aWNtZ1ZzbjJtT2oyNk9pOGpMbVpXMzdGNjNta1JRcjIyRFJJcTloZGFyMi84?=
+ =?utf-8?B?M2N2aUdBdFo5c3d2bStrZEtVemZRcW9OeWN5MmJpbHc5ZHgrUlVhQ0tUL21q?=
+ =?utf-8?B?c3JsTkdodjJTam0wR2VLdWRNN3ZHZXI3dkc3elN1Vi9Oa2p4Rm0zaUdvRGJn?=
+ =?utf-8?B?WGpNMXFidU9DMDJWVmZtQTVJZlU3VkhJbzlIMXBoNE1PVGFTV2NpYTg1R1Z3?=
+ =?utf-8?B?WEpIbVZ2YjJsaytYMTc1Yy85Y1hWa0Ribm5UWW16RmplMnMyNW4xQTlmZ0s5?=
+ =?utf-8?B?VDh6TEVENGJOMWovZVhnRlpzRVh0dG01N1dhYUkzeG1zK2ZhWXdqaVNoZ3l0?=
+ =?utf-8?B?L2xPaW1ZdklobzZOa3FJTGNFT25PUVRIUGswcFRtMFdwK2hGMGJmOTVBRWFE?=
+ =?utf-8?B?T2VLT2tPUjVpTmQ5SE81ODNBa1RWaUpHUFptNytqYXNBblliRjhHTzhnNVZX?=
+ =?utf-8?B?Y2gxWkNDWWxtTjdwZW9ZalArRk1mSE02RzdlYjVPcWRROThaZXQ1aVdMWWRk?=
+ =?utf-8?B?VVB6QXZBQ2huL1V1d3RNMVY4OEw5YjVQNGNUYVpMY0JlUUFCY2YzMSt6citQ?=
+ =?utf-8?B?ZGxiTTRLbVF2SFdMNUFZd0dEQ2lzYW51YnlGdXZHM3JyUEdScXZKcEpieUNi?=
+ =?utf-8?B?YnAvRHNSeUVnV21IRlBSc0FFM202VnVtd2h2Skw5a0tnT1VQbi8yMm43Znk3?=
+ =?utf-8?B?ZjdRalk4K0lvc1VaTDRnOTZWWm9NeGZEV1dxb1RiWklRbDVJam5SSlBtZjJW?=
+ =?utf-8?B?MnNlQ1U3U0hJTXdydEdmazJnRDFFVnVCWGNIenJlcUJYZDZHaVFEVTFPL2di?=
+ =?utf-8?B?dk55OEFKT3Q3bWR1OFlOQnhndUJZQnpvLzNqcEdJTUZtSVY1aktjRmx0clFM?=
+ =?utf-8?B?Zms4aTE0aURaMit5ZFhBOVAvSzF5L1E1clRkbTNRY0MwTGRRZVl4QzBMVHBi?=
+ =?utf-8?B?andxaDc4cTJiUzN0M2VmOHh0cWM4UXVRRmRtSGlSRmZ5UEJjSjB3QmxIdVE4?=
+ =?utf-8?B?dlg1SXVjZlpwL3ovOGN6TFNvZmZaZ3lXSlFVTkpLM2d3MXBHYzVyVTBWNEs4?=
+ =?utf-8?B?cmtqUlM3emVwWDJtR1JzYzZvR2l3QU1GQnBqOHNIZUU0dGlkbUxGMVJ3enpP?=
+ =?utf-8?B?dk1PZzg4di9ucnR4L21ac3Z3VUViTVAzLzJqZTBDL01ZOEdDZ01kMzNiWDk5?=
+ =?utf-8?B?N1FNQVNnQzZDQXlveHJuTlFPcm56OXR4d1NGbWF4MStsTEVybW4rL28rVFJh?=
+ =?utf-8?B?Wno5bis3Wk0wZGU3MlhkYmE3SGlmd0lHNzF6dlRDRjc2RVMwQldLS1pIOTFk?=
+ =?utf-8?B?L0V2bHpYQ3NTZW4zVlg3N1E3WDAzSjhhTXZMS3VEN2MvOGRubmgxSEpYb25y?=
+ =?utf-8?Q?+y9EkvV3o+HOqSY6vxwT23XQl?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ea5ed70-6c71-4439-5b50-08dcd2778ad6
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2024 15:35:05.7749
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Sep 2024 15:36:45.3513
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ApBU/7LR5sKmFntxPot5FFfNuaWNTWVHKuYOGwl7UbnMNtnZR6HX32tX16pC4++81SSkeGf3ro0acJ4DR95oVB2QVN9M6GYFCxIOUl0z9yw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR10MB4976
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-10_12,2024-09-09_02,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 suspectscore=0
- bulkscore=0 mlxscore=0 phishscore=0 malwarescore=0 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2408220000 definitions=main-2409110118
-X-Proofpoint-ORIG-GUID: VWOhwP_lXaEvL0Ny3nh40PcpAJu6SwMS
-X-Proofpoint-GUID: VWOhwP_lXaEvL0Ny3nh40PcpAJu6SwMS
+X-MS-Exchange-CrossTenant-UserPrincipalName: M5Lom5ZkBeZHLpRAtg1vZlovpSx3xupHKUgYJGGuSt669ncHFyXWHXfvp+y7One9hmLSQ6zzYXYTSXDfBufPxg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6601
 
-Avoid nested min()/max() which results in egregious macro expansion.
 
-This issue was introduced by commit 867046cc7027 ("minmax: relax check to
-allow comparison between unsigned arguments and signed constants") [2].
 
-Work has been done to address the issue of egregious min()/max() macro
-expansion in commit 22f546873149 ("minmax: improve macro expansion and type
-checking") and related, however it appears that some issues remain on more
-tightly constrained systems.
+On 9/11/2024 7:55 AM, Taehee Yoo wrote:
+> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+> 
+> 
+> The bnxt_en driver supports rx-copybreak, but it couldn't be set by
+> userspace. Only the default value(256) has worked.
+> This patch makes the bnxt_en driver support following command.
+> `ethtool --set-tunable <devname> rx-copybreak <value> ` and
+> `ethtool --get-tunable <devname> rx-copybreak`.
+> 
+> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+> ---
+> 
+> v2:
+>   - Define max/vim rx_copybreak value.
+> 
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 24 ++++++----
+>   drivers/net/ethernet/broadcom/bnxt/bnxt.h     |  6 ++-
+>   .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 47 ++++++++++++++++++-
+>   3 files changed, 66 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 
-Adjust a few known-bad cases of deeply nested macros to avoid doing so to
-mitigate this. Porting the patch first proposed in [1] to Linus's tree.
+<snip>
 
-Running an allmodconfig build using the methodology described in [2] we
-observe a 35 MiB reduction in generated code.
+> +static void bnxt_init_ring_params(struct bnxt *bp)
+> +{
+> +       bp->rx_copybreak = BNXT_DEFAULT_RX_COPYBREAK;
+> +}
+> +
+>   /* bp->rx_ring_size, bp->tx_ring_size, dev->mtu, BNXT_FLAG_{G|L}RO flags must
+>    * be set on entry.
+>    */
+> @@ -4465,7 +4470,6 @@ void bnxt_set_ring_params(struct bnxt *bp)
+>          rx_space = rx_size + ALIGN(max(NET_SKB_PAD, XDP_PACKET_HEADROOM), 8) +
+>                  SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+> 
+> -       bp->rx_copy_thresh = BNXT_RX_COPY_THRESH;
+>          ring_size = bp->rx_ring_size;
+>          bp->rx_agg_ring_size = 0;
+>          bp->rx_agg_nr_pages = 0;
+> @@ -4510,7 +4514,8 @@ void bnxt_set_ring_params(struct bnxt *bp)
+>                                    ALIGN(max(NET_SKB_PAD, XDP_PACKET_HEADROOM), 8) -
+>                                    SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>                  } else {
+> -                       rx_size = SKB_DATA_ALIGN(BNXT_RX_COPY_THRESH + NET_IP_ALIGN);
+> +                       rx_size = SKB_DATA_ALIGN(bp->rx_copybreak +
+> +                                                NET_IP_ALIGN);
 
-The difference is much more significant prior to recent minmax fixes which
-were not backported. As per [1] prior these the reduction is more like 200
-MiB.
+Tiny nit, but why did you wrap NET_IP_ALIGN to the next line?
 
-This resolves an issue with slackware 15.0 32-bit compilation as reported
-by Richard Narron.
+>                          rx_space = rx_size + NET_SKB_PAD +
+>                                  SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>                  }
+> @@ -6424,8 +6429,8 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
+>                                            VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
+>                  req->enables |=
+>                          cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
+> -               req->jumbo_thresh = cpu_to_le16(bp->rx_copy_thresh);
+> -               req->hds_threshold = cpu_to_le16(bp->rx_copy_thresh);
+> +               req->jumbo_thresh = cpu_to_le16(bp->rx_copybreak);
+> +               req->hds_threshold = cpu_to_le16(bp->rx_copybreak);
+>          }
+>          req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
+>          return hwrm_req_send(bp, req);
+> @@ -15864,6 +15869,7 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+>          bnxt_init_l2_fltr_tbl(bp);
+>          bnxt_set_rx_skb_mode(bp, false);
+>          bnxt_set_tpa_flags(bp);
+> +       bnxt_init_ring_params(bp);
+>          bnxt_set_ring_params(bp);
+>          bnxt_rdma_aux_device_init(bp);
+>          rc = bnxt_set_dflt_rings(bp, true);
 
-Presumably the min/max fixups would be difficult to backport, this patch
-should be easier and fix's Richard's problem in 5.15.
+<snip>
 
-[0]:https://lore.kernel.org/all/b97faef60ad24922b530241c5d7c933c@AcuMS.aculab.com/
-[1]:https://lore.kernel.org/lkml/5882b96e-1287-4390-8174-3316d39038ef@lucifer.local/
-[2]:https://lore.kernel.org/linux-mm/36aa2cad-1db1-4abf-8dd2-fb20484aabc3@lucifer.local/
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> index f71cc8188b4e..201c3fcba04e 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> @@ -4319,6 +4319,49 @@ static int bnxt_get_eee(struct net_device *dev, struct ethtool_keee *edata)
+>          return 0;
+>   }
+> 
+> +static int bnxt_set_tunable(struct net_device *dev,
+> +                           const struct ethtool_tunable *tuna,
+> +                           const void *data)
+> +{
+> +       struct bnxt *bp = netdev_priv(dev);
+> +       u32 rx_copybreak;
+> +
+> +       switch (tuna->id) {
+> +       case ETHTOOL_RX_COPYBREAK:
+> +               rx_copybreak = *(u32 *)data;
+> +               if (rx_copybreak < BNXT_MIN_RX_COPYBREAK ||
+> +                   rx_copybreak > BNXT_MAX_RX_COPYBREAK)
+> +                       return -EINVAL;
+> +               if (rx_copybreak != bp->rx_copybreak) {
+> +                       bp->rx_copybreak = rx_copybreak;
 
-Reported-by: Richard Narron <richard@aaazen.com>
-Closes: https://lore.kernel.org/all/4a5321bd-b1f-1832-f0c-cea8694dc5aa@aaazen.com/
-Fixes: 867046cc7027 ("minmax: relax check to allow comparison between unsigned arguments and signed constants")
-Cc: stable@vger.kernel.org
-Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
----
- drivers/net/ethernet/marvell/mvpp2/mvpp2.h    |  2 +-
- .../staging/media/atomisp/pci/sh_css_frac.h   | 26 ++++++++++++++-----
- include/linux/skbuff.h                        |  6 ++++-
- 3 files changed, 25 insertions(+), 9 deletions(-)
+Should bp->rx_copybreak get set before closing the interface in the 
+netif_running case? Can changing this while traffic is running cause any 
+unexpected issues?
 
-diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-index e809f91c08fb..8b431f90efc3 100644
---- a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-+++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-@@ -23,7 +23,7 @@
- /* The PacketOffset field is measured in units of 32 bytes and is 3 bits wide,
-  * so the maximum offset is 7 * 32 = 224
-  */
--#define MVPP2_SKB_HEADROOM	min(max(XDP_PACKET_HEADROOM, NET_SKB_PAD), 224)
-+#define MVPP2_SKB_HEADROOM	clamp_t(int, XDP_PACKET_HEADROOM, NET_SKB_PAD, 224)
+I wonder if this would be better/safer?
 
- #define MVPP2_XDP_PASS		0
- #define MVPP2_XDP_DROPPED	BIT(0)
-diff --git a/drivers/staging/media/atomisp/pci/sh_css_frac.h b/drivers/staging/media/atomisp/pci/sh_css_frac.h
-index b90b5b330dfa..a973394c5bc0 100644
---- a/drivers/staging/media/atomisp/pci/sh_css_frac.h
-+++ b/drivers/staging/media/atomisp/pci/sh_css_frac.h
-@@ -32,12 +32,24 @@
- #define uISP_VAL_MAX		      ((unsigned int)((1 << uISP_REG_BIT) - 1))
+if (netif_running(dev)) {
+	bnxt_close_nic(bp, false, false);
+	bp->rx_copybreak = rx_copybreak;
+	bnxt_set_ring_params(bp);
+	bnxt_open_nic(bp, false, false);
+} else {
+	bp->rx_copybreak = rx_copybreak;
+}
 
- /* a:fraction bits for 16bit precision, b:fraction bits for ISP precision */
--#define sDIGIT_FITTING(v, a, b) \
--	min_t(int, max_t(int, (((v) >> sSHIFT) >> max(sFRACTION_BITS_FITTING(a) - (b), 0)), \
--	  sISP_VAL_MIN), sISP_VAL_MAX)
--#define uDIGIT_FITTING(v, a, b) \
--	min((unsigned int)max((unsigned)(((v) >> uSHIFT) \
--	>> max((int)(uFRACTION_BITS_FITTING(a) - (b)), 0)), \
--	  uISP_VAL_MIN), uISP_VAL_MAX)
-+static inline int sDIGIT_FITTING(short v, int a, int b)
-+{
-+	int fit_shift = sFRACTION_BITS_FITTING(a) - b;
-+
-+	v >>= sSHIFT;
-+	v >>= fit_shift > 0 ? fit_shift : 0;
-+
-+	return clamp_t(int, v, sISP_VAL_MIN, sISP_VAL_MAX);
-+}
-+
-+static inline unsigned int uDIGIT_FITTING(unsigned int v, int a, int b)
-+{
-+	int fit_shift = uFRACTION_BITS_FITTING(a) - b;
-+
-+	v >>= uSHIFT;
-+	v >>= fit_shift > 0 ? fit_shift : 0;
-+
-+	return clamp_t(unsigned int, v, uISP_VAL_MIN, uISP_VAL_MAX);
-+}
+Thanks,
 
- #endif /* __SH_CSS_FRAC_H */
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 29c3ea5b6e93..d53b296df504 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -3164,7 +3164,11 @@ static inline int pskb_network_may_pull(struct sk_buff *skb, unsigned int len)
-  * NET_IP_ALIGN(2) + ethernet_header(14) + IP_header(20/40) + ports(8)
-  */
- #ifndef NET_SKB_PAD
--#define NET_SKB_PAD	max(32, L1_CACHE_BYTES)
-+#if L1_CACHE_BYTES < 32
-+#define NET_SKB_PAD	32
-+#else
-+#define NET_SKB_PAD	L1_CACHE_BYTES
-+#endif
- #endif
+Brett
 
- int ___pskb_trim(struct sk_buff *skb, unsigned int len);
---
-2.46.0
+> +                       if (netif_running(dev)) {
+> +                               bnxt_close_nic(bp, false, false);
+> +                               bnxt_set_ring_params(bp);
+> +                               bnxt_open_nic(bp, false, false);
+> +                       }
+> +               }
+> +               return 0;
+> +       default:
+> +               return -EOPNOTSUPP;
+> +       }
+> +}
+> +
+
+<snip>
 
