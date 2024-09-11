@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-127552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4784975B91
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:18:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D9E36975B92
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:18:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 442701F21D7A
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:18:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 873FA1F22281
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2027C1BC077;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED93F1BC08E;
 	Wed, 11 Sep 2024 20:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="crMdY0Yi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VkiLJe7z"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C8F1B9B5E
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAAEB1BC08C
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726085888; cv=none; b=dZD9dbGF3Tw1jvAGCsQALgnqj/R6eu3w/mnP1T864PVz9UncBUBj9JscJ7C/5GRKL9QihADmjEK1t0sTmll3hw9AxbQocAD6gmmxU2FtcjdYVCBtQ4wXxmil4FKUN4YTJqXj16X3uAn2KCrLljZ8OEC5jK9dVK/c6fXHoP3kdMo=
+	t=1726085888; cv=none; b=WdOL9uIjydzuRPQ/fPApqDg5ycW6dIZW6U/XRkELEG8m8E4YkqMYsnv2vO2cBpuBFIahHjAaifKv4SKn7YFwjPKWflNwXim9wGOpgL61LvsKzKgDqjlrUw6s7NgK2rmVD4zgWxQsvYxnuKnbsLPeHb4Et8bzbu7/nWEXodL9PEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726085888; c=relaxed/simple;
-	bh=7fTjO4We6aNih+xTlsJRQViYmze9jfa3Dx2PtUZGkqg=;
+	bh=upYpjQrqC75ftc4oQLPSsruk8IyT9MKz31yuIQ/d1Wc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VuWulzhZn9Jbqwj0Jkbd3lcnUBWyaYntdosB2V6CTtxXF118GJA0DJO0a4kS9ROfGePqux0pZfa9Ehpz/zehP2fc815fIVKBX3pEMqR9b70vZ8sYdkzM96agXzdzcG1FyuCRN71PSlAfMBr9CpCUjsTUhg9pftHkjgOJkECAi/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=crMdY0Yi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8579C4CECC;
-	Wed, 11 Sep 2024 20:18:07 +0000 (UTC)
+	 MIME-Version; b=j2uqisW1y2apdLwY9dVlRgFrIciZo6FYj8jbp4sRKymWjZn4hRFuS++JP4h0EQKNwY94fpPDrrPsqUybu9fVb1mQD4PSjk3hhiTpeQfameomJ0sQrRj/hnIhUxBSCZU+I+074q7DcGpYkNwkvZpCBDl4aJ3Z2a2KXmEWi4oo0Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VkiLJe7z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A975C4CECD;
+	Wed, 11 Sep 2024 20:18:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726085887;
-	bh=7fTjO4We6aNih+xTlsJRQViYmze9jfa3Dx2PtUZGkqg=;
+	s=k20201202; t=1726085888;
+	bh=upYpjQrqC75ftc4oQLPSsruk8IyT9MKz31yuIQ/d1Wc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=crMdY0YiSDeVSyIQ4mv5z/YnAo2rbl43fNfWsRO/tdAUDlAmnNugc9OFoiYmjsrZ5
-	 IP2Yocw1TBRXJHE5luKPFYr6UNJ46mx9Oa2KxKjN5tCdnKzEEksv9TRnkxCrQ2Bqcm
-	 Q4QDBuUsTiTS2gTJ9S2NN1caoIal51tCPI1loZQlINayOe8A60nHTy0/++YL9m/FOw
-	 udI53WYZyFDnfLBEByU4FrpEaP4XsPqypTNirlYiAT4iEZzlY6B2duf6Yjcn8m+fFF
-	 iuUoQYBGuCAqkhgHQQjDPTp6PyHCA2ycLUTBkD8jBHRMrZTFgiI1l+CpSaYL5nucZp
-	 fQ4Wbfe090mJw==
+	b=VkiLJe7zFLYiIYRrDj1+8TYDGrevCHFyq3Dolj/vEWgnMlLzTzQ2hi10cCFMPcVWQ
+	 t1uGP0n636HA46X2biMq1j1aDxng0PT5GEsWE5W73blPEEcaoupckJAvgGfp4sX4Lj
+	 5xIKsR8/WJokMbPxiA4zvt23QnA812BfX0J9vxIH+WiJ3V87G0M+b6VAzvJ+k5/EiW
+	 Ng2XjwN2ZUCVoAIiG4UxkMt53eAMyt5yUiqrUBnOtKFEo9ADT7mhzwxM1kICxbU0AW
+	 +EMEzpbAvBfuwHv5YwC9Yfk/gmuxzmMF4Z6EUbr9NkoL5oK6K7en1lsaspZPL6zmED
+	 Xr3BIZCzZ9PTg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,10 +51,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>
-Subject: [net-next 08/15] net/mlx5: fs, add support for no append at software level
-Date: Wed, 11 Sep 2024 13:17:50 -0700
-Message-ID: <20240911201757.1505453-9-saeed@kernel.org>
+	Moshe Shemesh <moshe@nvidia.com>
+Subject: [net-next 09/15] net/mlx5: Add device cap for supporting hot reset in sync reset flow
+Date: Wed, 11 Sep 2024 13:17:51 -0700
+Message-ID: <20240911201757.1505453-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240911201757.1505453-1-saeed@kernel.org>
 References: <20240911201757.1505453-1-saeed@kernel.org>
@@ -66,443 +66,55 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Mark Bloch <mbloch@nvidia.com>
+From: Moshe Shemesh <moshe@nvidia.com>
 
-Native capability for some steering engines lacks support for adding an
-additional match with the same value to the same flow group. To accommodate
-the NO APPEND flag in these scenarios, we include the new rule in the
-existing flow table entry (fte) without immediate hardware commitment. When
-a request is made to delete the corresponding hardware rule, we then commit
-the pending rule to hardware.
+New devices with new FW can support sync reset for firmware activate
+using hot reset. Add capability for supporting it and add MFRL field to
+query from FW which type of PCI reset method to use while handling sync
+reset events.
 
-Only one pending rule is supported because NO_APPEND is primarily used
-during replacement operations. In this scenario, a rule is initially added.
-When it needs replacement, the new rule is added with NO_APPEND set. Only
-after the insertion of the new rule is the original rule deleted.
-
-Signed-off-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/fs_cmd.c  |   2 +-
- .../net/ethernet/mellanox/mlx5/core/fs_core.c | 245 +++++++++++++++++-
- .../net/ethernet/mellanox/mlx5/core/fs_core.h |   7 +
- .../mellanox/mlx5/core/steering/fs_dr.c       |   4 +-
- 4 files changed, 242 insertions(+), 16 deletions(-)
+ include/linux/mlx5/mlx5_ifc.h | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-index 1a14f8dd878f..676005854dad 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c
-@@ -1071,7 +1071,7 @@ static int mlx5_cmd_create_match_definer(struct mlx5_flow_root_namespace *ns,
- static u32 mlx5_cmd_get_capabilities(struct mlx5_flow_root_namespace *ns,
- 				     enum fs_flow_table_type ft_type)
- {
--	return 0;
-+	return MLX5_FLOW_STEERING_CAP_DUPLICATE_MATCH;
- }
- 
- static const struct mlx5_flow_cmds mlx5_flow_cmds = {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-index 57df2a6bcb42..8505d5e241e1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-@@ -613,6 +613,31 @@ static void modify_fte(struct fs_fte *fte)
- 	fte->act_dests.modify_mask = 0;
- }
- 
-+static void del_sw_hw_dup_rule(struct fs_node *node)
-+{
-+	struct mlx5_flow_rule *rule;
-+	struct fs_fte *fte;
-+
-+	fs_get_obj(rule, node);
-+	fs_get_obj(fte, rule->node.parent);
-+	trace_mlx5_fs_del_rule(rule);
-+
-+	if (is_fwd_next_action(rule->sw_action)) {
-+		mutex_lock(&rule->dest_attr.ft->lock);
-+		list_del(&rule->next_ft);
-+		mutex_unlock(&rule->dest_attr.ft->lock);
-+	}
-+
-+	/* If a pending rule is being deleted it means
-+	 * this is a NO APPEND rule, so there are no partial deletions,
-+	 * all the rules of the mlx5_flow_handle are going to be deleted
-+	 * and the rules aren't shared with any other mlx5_flow_handle instance
-+	 * so no need to do any bookkeeping like in del_sw_hw_rule().
-+	 */
-+
-+	kfree(rule);
-+}
-+
- static void del_sw_hw_rule(struct fs_node *node)
- {
- 	struct mlx5_flow_rule *rule;
-@@ -658,12 +683,33 @@ static void del_sw_hw_rule(struct fs_node *node)
- 	kfree(rule);
- }
- 
-+static void switch_to_pending_act_dests(struct fs_fte *fte)
-+{
-+	struct fs_node *iter;
-+
-+	memcpy(&fte->act_dests, &fte->dup->act_dests, sizeof(fte->act_dests));
-+
-+	list_bulk_move_tail(&fte->node.children,
-+			    fte->dup->children.next,
-+			    fte->dup->children.prev);
-+
-+	list_for_each_entry(iter, &fte->node.children, list)
-+		iter->del_sw_func = del_sw_hw_rule;
-+
-+	/* Make sure the fte isn't deleted
-+	 * as mlx5_del_flow_rules() decreases the refcount
-+	 * of the fte to trigger deletion.
-+	 */
-+	tree_get_node(&fte->node);
-+}
-+
- static void del_hw_fte(struct fs_node *node)
- {
- 	struct mlx5_flow_root_namespace *root;
- 	struct mlx5_flow_table *ft;
- 	struct mlx5_flow_group *fg;
- 	struct mlx5_core_dev *dev;
-+	bool pending_used = false;
- 	struct fs_fte *fte;
- 	int err;
- 
-@@ -675,16 +721,33 @@ static void del_hw_fte(struct fs_node *node)
- 	WARN_ON(fte->act_dests.dests_size);
- 	dev = get_dev(&ft->node);
- 	root = find_root(&ft->node);
-+
-+	if (fte->dup && !list_empty(&fte->dup->children)) {
-+		switch_to_pending_act_dests(fte);
-+		pending_used = true;
-+	} else {
-+		/* Avoid double call to del_hw_fte */
-+		node->del_hw_func = NULL;
-+	}
-+
- 	if (node->active) {
--		err = root->cmds->delete_fte(root, ft, fte);
--		if (err)
--			mlx5_core_warn(dev,
--				       "flow steering can't delete fte in index %d of flow group id %d\n",
--				       fte->index, fg->id);
--		node->active = false;
-+		if (pending_used) {
-+			err = root->cmds->update_fte(root, ft, fg,
-+						     fte->act_dests.modify_mask, fte);
-+			if (err)
-+				mlx5_core_warn(dev,
-+					       "flow steering can't update to pending rule in index %d of flow group id %d\n",
-+					       fte->index, fg->id);
-+			fte->act_dests.modify_mask = 0;
-+		} else {
-+			err = root->cmds->delete_fte(root, ft, fte);
-+			if (err)
-+				mlx5_core_warn(dev,
-+					       "flow steering can't delete fte in index %d of flow group id %d\n",
-+					       fte->index, fg->id);
-+			node->active = false;
-+		}
- 	}
--	/* Avoid double call to del_hw_fte */
--	fte->node.del_hw_func = NULL;
- }
- 
- static void del_sw_fte(struct fs_node *node)
-@@ -702,6 +765,7 @@ static void del_sw_fte(struct fs_node *node)
- 				     rhash_fte);
- 	WARN_ON(err);
- 	ida_free(&fg->fte_allocator, fte->index - fg->start_index);
-+	kvfree(fte->dup);
- 	kmem_cache_free(steering->ftes_cache, fte);
- }
- 
-@@ -1105,18 +1169,45 @@ static int update_root_ft_create(struct mlx5_flow_table *ft, struct fs_prio
- 	return err;
- }
- 
-+static bool rule_is_pending(struct fs_fte *fte, struct mlx5_flow_rule *rule)
-+{
-+	struct mlx5_flow_rule *tmp_rule;
-+	struct fs_node *iter;
-+
-+	if (!fte->dup || list_empty(&fte->dup->children))
-+		return false;
-+
-+	list_for_each_entry(iter, &fte->dup->children, list) {
-+		tmp_rule = container_of(iter, struct mlx5_flow_rule, node);
-+
-+		if (tmp_rule == rule)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- static int _mlx5_modify_rule_destination(struct mlx5_flow_rule *rule,
- 					 struct mlx5_flow_destination *dest)
- {
- 	struct mlx5_flow_root_namespace *root;
-+	struct fs_fte_action *act_dests;
- 	struct mlx5_flow_table *ft;
- 	struct mlx5_flow_group *fg;
-+	bool pending = false;
- 	struct fs_fte *fte;
- 	int modify_mask = BIT(MLX5_SET_FTE_MODIFY_ENABLE_MASK_DESTINATION_LIST);
- 	int err = 0;
- 
- 	fs_get_obj(fte, rule->node.parent);
--	if (!(fte->act_dests.action.action & MLX5_FLOW_CONTEXT_ACTION_FWD_DEST))
-+
-+	pending = rule_is_pending(fte, rule);
-+	if (pending)
-+		act_dests = &fte->dup->act_dests;
-+	else
-+		act_dests = &fte->act_dests;
-+
-+	if (!(act_dests->action.action & MLX5_FLOW_CONTEXT_ACTION_FWD_DEST))
- 		return -EINVAL;
- 	down_write_ref_node(&fte->node, false);
- 	fs_get_obj(fg, fte->node.parent);
-@@ -1124,8 +1215,9 @@ static int _mlx5_modify_rule_destination(struct mlx5_flow_rule *rule,
- 
- 	memcpy(&rule->dest_attr, dest, sizeof(*dest));
- 	root = find_root(&ft->node);
--	err = root->cmds->update_fte(root, ft, fg,
--				     modify_mask, fte);
-+	if (!pending)
-+		err = root->cmds->update_fte(root, ft, fg,
-+					     modify_mask, fte);
- 	up_write_ref_node(&fte->node, false);
- 
- 	return err;
-@@ -1455,6 +1547,16 @@ static struct mlx5_flow_handle *alloc_handle(int num_rules)
- 	return handle;
- }
- 
-+static void destroy_flow_handle_dup(struct mlx5_flow_handle *handle,
-+				    int i)
-+{
-+	for (; --i >= 0;) {
-+		list_del(&handle->rule[i]->node.list);
-+		kfree(handle->rule[i]);
-+	}
-+	kfree(handle);
-+}
-+
- static void destroy_flow_handle(struct fs_fte *fte,
- 				struct mlx5_flow_handle *handle,
- 				struct mlx5_flow_destination *dest,
-@@ -1470,6 +1572,61 @@ static void destroy_flow_handle(struct fs_fte *fte,
- 	kfree(handle);
- }
- 
-+static struct mlx5_flow_handle *
-+create_flow_handle_dup(struct list_head *children,
-+		       struct mlx5_flow_destination *dest,
-+		       int dest_num,
-+		       struct fs_fte_action *act_dests)
-+{
-+	static int dst = BIT(MLX5_SET_FTE_MODIFY_ENABLE_MASK_DESTINATION_LIST);
-+	static int count = BIT(MLX5_SET_FTE_MODIFY_ENABLE_MASK_FLOW_COUNTERS);
-+	struct mlx5_flow_rule *rule = NULL;
-+	struct mlx5_flow_handle *handle;
-+	int i = 0;
-+	int type;
-+
-+	handle = alloc_handle((dest_num) ? dest_num : 1);
-+	if (!handle)
-+		return NULL;
-+
-+	do {
-+		rule = alloc_rule(dest + i);
-+		if (!rule)
-+			goto free_rules;
-+
-+		/* Add dest to dests list- we need flow tables to be in the
-+		 * end of the list for forward to next prio rules.
-+		 */
-+		tree_init_node(&rule->node, NULL, del_sw_hw_dup_rule);
-+		if (dest &&
-+		    dest[i].type != MLX5_FLOW_DESTINATION_TYPE_FLOW_TABLE)
-+			list_add(&rule->node.list, children);
-+		else
-+			list_add_tail(&rule->node.list, children);
-+
-+		if (dest) {
-+			act_dests->dests_size++;
-+
-+			if (is_fwd_dest_type(dest[i].type))
-+				act_dests->fwd_dests++;
-+
-+			type = dest[i].type ==
-+				MLX5_FLOW_DESTINATION_TYPE_COUNTER;
-+			act_dests->modify_mask |= type ? count : dst;
-+		}
-+		handle->rule[i] = rule;
-+	} while (++i < dest_num);
-+
-+	return handle;
-+
-+free_rules:
-+	destroy_flow_handle_dup(handle, i);
-+	act_dests->dests_size = 0;
-+	act_dests->fwd_dests = 0;
-+
-+	return NULL;
-+}
-+
- static struct mlx5_flow_handle *
- create_flow_handle(struct fs_fte *fte,
- 		   struct mlx5_flow_destination *dest,
-@@ -1963,6 +2120,62 @@ lookup_fte_locked(struct mlx5_flow_group *g,
- 	return fte_tmp;
- }
- 
-+/* Native capability lacks support for adding an additional match with the same value
-+ * to the same flow group. To accommodate the NO APPEND flag in these scenarios,
-+ * we include the new rule in the existing flow table entry (fte) without immediate
-+ * hardware commitment. When a request is made to delete the corresponding hardware rule,
-+ * we then commit the pending rule to hardware.
-+ */
-+static struct mlx5_flow_handle *
-+add_rule_dup_match_fte(struct fs_fte *fte,
-+		       const struct mlx5_flow_spec *spec,
-+		       struct mlx5_flow_act *flow_act,
-+		       struct mlx5_flow_destination *dest,
-+		       int dest_num)
-+{
-+	struct mlx5_flow_handle *handle;
-+	struct fs_fte_dup *dup;
-+	int i = 0;
-+
-+	if (!fte->dup) {
-+		dup = kvzalloc(sizeof(*dup), GFP_KERNEL);
-+		if (!dup)
-+			return ERR_PTR(-ENOMEM);
-+		/* dup will be freed when the fte is freed
-+		 * this way we don't allocate / free dup on every rule deletion
-+		 * or creation
-+		 */
-+		INIT_LIST_HEAD(&dup->children);
-+		fte->dup = dup;
-+	}
-+
-+	if (!list_empty(&fte->dup->children)) {
-+		mlx5_core_warn(get_dev(&fte->node),
-+			       "Can have only a single duplicate rule\n");
-+
-+		return ERR_PTR(-EEXIST);
-+	}
-+
-+	fte->dup->act_dests.action = *flow_act;
-+	fte->dup->act_dests.flow_context = spec->flow_context;
-+	fte->dup->act_dests.dests_size = 0;
-+	fte->dup->act_dests.fwd_dests = 0;
-+	fte->dup->act_dests.modify_mask = BIT(MLX5_SET_FTE_MODIFY_ENABLE_MASK_ACTION);
-+
-+	handle = create_flow_handle_dup(&fte->dup->children,
-+					dest, dest_num,
-+					&fte->dup->act_dests);
-+	if (!handle)
-+		return ERR_PTR(-ENOMEM);
-+
-+	for (i = 0; i < handle->num_rules; i++) {
-+		tree_add_node(&handle->rule[i]->node, &fte->node);
-+		trace_mlx5_fs_add_rule(handle->rule[i]);
-+	}
-+
-+	return handle;
-+}
-+
- static struct mlx5_flow_handle *
- try_add_to_existing_fg(struct mlx5_flow_table *ft,
- 		       struct list_head *match_head,
-@@ -1973,6 +2186,7 @@ try_add_to_existing_fg(struct mlx5_flow_table *ft,
- 		       int ft_version)
- {
- 	struct mlx5_flow_steering *steering = get_steering(&ft->node);
-+	struct mlx5_flow_root_namespace *root = find_root(&ft->node);
- 	struct mlx5_flow_group *g;
- 	struct mlx5_flow_handle *rule;
- 	struct match_list *iter;
-@@ -1986,7 +2200,9 @@ try_add_to_existing_fg(struct mlx5_flow_table *ft,
- 		return  ERR_PTR(-ENOMEM);
- 
- search_again_locked:
--	if (flow_act->flags & FLOW_ACT_NO_APPEND)
-+	if (flow_act->flags & FLOW_ACT_NO_APPEND &&
-+	    (root->cmds->get_capabilities(root, root->table_type) &
-+	     MLX5_FLOW_STEERING_CAP_DUPLICATE_MATCH))
- 		goto skip_search;
- 	version = matched_fgs_get_version(match_head);
- 	/* Try to find an fte with identical match value and attempt update its
-@@ -1999,7 +2215,10 @@ try_add_to_existing_fg(struct mlx5_flow_table *ft,
- 		fte_tmp = lookup_fte_locked(g, spec->match_value, take_write);
- 		if (!fte_tmp)
- 			continue;
--		rule = add_rule_fg(g, spec, flow_act, dest, dest_num, fte_tmp);
-+		if (flow_act->flags & FLOW_ACT_NO_APPEND)
-+			rule = add_rule_dup_match_fte(fte_tmp, spec, flow_act, dest, dest_num);
-+		else
-+			rule = add_rule_fg(g, spec, flow_act, dest, dest_num, fte_tmp);
- 		/* No error check needed here, because insert_fte() is not called */
- 		up_write_ref_node(&fte_tmp->node, false);
- 		tree_put_node(&fte_tmp->node, false);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
-index 19ba63063d09..964937f17cf5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.h
-@@ -133,6 +133,7 @@ enum mlx5_flow_steering_capabilty {
- 	MLX5_FLOW_STEERING_CAP_VLAN_PUSH_ON_RX = 1UL << 0,
- 	MLX5_FLOW_STEERING_CAP_VLAN_POP_ON_TX = 1UL << 1,
- 	MLX5_FLOW_STEERING_CAP_MATCH_RANGES = 1UL << 2,
-+	MLX5_FLOW_STEERING_CAP_DUPLICATE_MATCH = 1UL << 3,
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index b6f8e3834bd3..542da2b066d1 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -1855,7 +1855,8 @@ struct mlx5_ifc_cmd_hca_cap_bits {
+ 	u8         reserved_at_328[0x2];
+ 	u8	   relaxed_ordering_read[0x1];
+ 	u8         log_max_pd[0x5];
+-	u8         reserved_at_330[0x6];
++	u8         reserved_at_330[0x5];
++	u8         pcie_reset_using_hotreset_method[0x1];
+ 	u8         pci_sync_for_fw_update_with_driver_unload[0x1];
+ 	u8         vnic_env_cnt_steering_fail[0x1];
+ 	u8         vport_counter_local_loopback[0x1];
+@@ -11180,6 +11181,11 @@ struct mlx5_ifc_mcda_reg_bits {
+ 	u8         data[][0x20];
  };
  
- struct mlx5_flow_steering {
-@@ -238,12 +239,18 @@ struct fs_fte_action {
- 	struct mlx5_flow_act		action;
- };
- 
-+struct fs_fte_dup {
-+	struct list_head children;
-+	struct fs_fte_action act_dests;
++enum {
++	MLX5_MFRL_REG_PCI_RESET_METHOD_LINK_TOGGLE = 0,
++	MLX5_MFRL_REG_PCI_RESET_METHOD_HOT_RESET = 1,
 +};
 +
- /* Type of children is mlx5_flow_rule */
- struct fs_fte {
- 	struct fs_node			node;
- 	struct mlx5_fs_dr_rule		fs_dr_rule;
- 	u32				val[MLX5_ST_SZ_DW_MATCH_PARAM];
- 	struct fs_fte_action		act_dests;
-+	struct fs_fte_dup		*dup;
- 	u32				index;
- 	enum fs_fte_status		status;
- 	struct rhash_head		hash;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
-index 15ef118eade0..833cb68c744f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/fs_dr.c
-@@ -813,11 +813,11 @@ static int mlx5_cmd_dr_destroy_ns(struct mlx5_flow_root_namespace *ns)
- static u32 mlx5_cmd_dr_get_capabilities(struct mlx5_flow_root_namespace *ns,
- 					enum fs_flow_table_type ft_type)
- {
--	u32 steering_caps = 0;
-+	u32 steering_caps = MLX5_FLOW_STEERING_CAP_DUPLICATE_MATCH;
- 
- 	if (ft_type != FS_FT_FDB ||
- 	    MLX5_CAP_GEN(ns->dev, steering_format_version) == MLX5_STEERING_FORMAT_CONNECTX_5)
--		return 0;
-+		return steering_caps;
- 
- 	steering_caps |= MLX5_FLOW_STEERING_CAP_VLAN_PUSH_ON_RX;
- 	steering_caps |= MLX5_FLOW_STEERING_CAP_VLAN_POP_ON_TX;
+ enum {
+ 	MLX5_MFRL_REG_RESET_STATE_IDLE = 0,
+ 	MLX5_MFRL_REG_RESET_STATE_IN_NEGOTIATION = 1,
+@@ -11207,7 +11213,8 @@ struct mlx5_ifc_mfrl_reg_bits {
+ 	u8         pci_sync_for_fw_update_start[0x1];
+ 	u8         pci_sync_for_fw_update_resp[0x2];
+ 	u8         rst_type_sel[0x3];
+-	u8         reserved_at_28[0x4];
++	u8         pci_reset_req_method[0x3];
++	u8         reserved_at_2b[0x1];
+ 	u8         reset_state[0x4];
+ 	u8         reset_type[0x8];
+ 	u8         reset_level[0x8];
 -- 
 2.46.0
 
