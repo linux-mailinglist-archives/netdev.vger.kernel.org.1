@@ -1,100 +1,255 @@
-Return-Path: <netdev+bounces-127340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2110975173
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:08:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 503239751AC
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:15:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C8B41F21B7F
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:08:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD8C31F222C9
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0338E18733C;
-	Wed, 11 Sep 2024 12:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB77188A06;
+	Wed, 11 Sep 2024 12:15:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="PilP3+G6"
+	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="nl6gX6a8"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from qs51p00im-qukt01071502.me.com (qs51p00im-qukt01071502.me.com [17.57.155.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22B973477;
-	Wed, 11 Sep 2024 12:08:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A840218B485
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 12:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726056514; cv=none; b=fQ3Pg0C6vPswU2MDG0thOoSLsj0ki7NiM+Yq0/yD64zKJF5cUCan4EselVMNWGh+CRiigQbUvdPZ9tnDPohTQyiyvnKBFKsC2DtyBogh5XTwwiB8rLdbd0YJ7JghYgJOJZ5pijUta+nmNCbwLFJzGVrZQUGZol9lyq6Bk3Eg93I=
+	t=1726056927; cv=none; b=fGlrnoQM4SPiLn9Sp9aPBXutJdOGlLk8EFLgPpIhssm022shNmfN9LBgDcVgIrCCCSFIYm3twJvBlwDAxAia6ZNUh5KFtMEDamYY/FeefkCmc35Pc1zSFB5DM4CAr2jTgl6195IlCSZXy+l6ocnMnY3qeidLyCjhIpzIzGuk+P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726056514; c=relaxed/simple;
-	bh=QLNnXWWCJuxLHShYf3yyFq9X0ONNT3DDkry63vs9LW8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eZ+0m4LVEtJNZCc66TTx04nT/HIAW6DZiqdwNP+rioJPtpVyA2WgmwKHSK8+B1iKTyaB30G8y2jbOvChOFWKNzYiW2lhNCokjs7FMTuNVR57VyU9WoeXiqEI9cPbnhuaR0rimnXROIkraUGIS7AEf1hH7GZdSaqL2go9xFlvQVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=PilP3+G6; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=UcnSSS5sRbFX0joRIuOGLRbcv8l/EOFUaWyvL+VtAak=; b=PilP3+G6Zom03ujXLIAxQBJ/qi
-	/6aw+pkStQIo1qMMhJxujyZfFPK0z5YQHk0Uph41N6mBmv1UJXV0iXemI8DWq87SwkGjX+OfmGJnN
-	ycxd9PeRJPsxEm5vdG+vZGeOlVG61teU6iM1/Kg4RPqEBBY+2B04yf193PWjgYrw4URc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1soM8x-007CXl-Dx; Wed, 11 Sep 2024 14:08:19 +0200
-Date: Wed, 11 Sep 2024 14:08:19 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org,
-	Len Brown <len.brown@intel.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	netdev@vger.kernel.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH v2 12/15] iopoll/regmap/phy/snd: Fix comment referencing
- outdated timer documentation
-Message-ID: <0a7f2282-cbd0-4f27-bfe4-30b0c1a4705b@lunn.ch>
-References: <20240911-devel-anna-maria-b4-timers-flseep-v2-0-b0d3f33ccfe0@linutronix.de>
- <20240911-devel-anna-maria-b4-timers-flseep-v2-12-b0d3f33ccfe0@linutronix.de>
+	s=arc-20240116; t=1726056927; c=relaxed/simple;
+	bh=uvBoEJkZPMzyJY7fNpBdAjA0QoUIlWc+SNmkMyLKgLs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PgiZbkFMY3al3ZkWNfOiMk/94pFbJnhnKgkVapeWM+WJWUGVTK32VWBTsQuGZS/dD/n1T1cEHguPBj1gZxh80yQ1of+2BEv/YO5fm0k0lIn+Ur0L/tFQPfTHQ1B1z7I9rer/Xg5a3EbNQeG4JdhRQJLDu1fScIXzI+v22FtWxUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=nl6gX6a8; arc=none smtp.client-ip=17.57.155.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
+	s=1a1hai; t=1726056924;
+	bh=mJlRX5g2zaG0MjZJ0FgGPU46Ka9U2vJBRMtqv60HUcQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	b=nl6gX6a8Or3CYv+xGVRogzvx62ADgQCxshMMOyl+F7R5zWIMMc61zC9UcJqmxmoH0
+	 7bZJsNJ94N3tjX+zcHiBeJmG3fAQHs6t57pxk2y/zss/tzGtZR3eF0a78g5Bo6hEdh
+	 uJdmlxQxHfSvHYm1CDV2E/TVqz1HA7LRED85xr1IR1r5ROhi11GA+UQJj4nSR/HMCJ
+	 5Z4hmaPiOYyzsK8d3SvdsB+gezQa4pOO/tLUiOCxB0sRvMP8elO7j43vyycU7TW7It
+	 4q17nVQgZacy8dACvRCSbh80uMYnS/Qkc36uceYOmplUrrNptIC8KSBdWFZUj6oZP6
+	 5NjbzjJVKnq1Q==
+Received: from [192.168.1.26] (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
+	by qs51p00im-qukt01071502.me.com (Postfix) with ESMTPSA id D215666803FE;
+	Wed, 11 Sep 2024 12:15:16 +0000 (UTC)
+Message-ID: <11576596-f0e4-4e88-a200-ed22b86d5974@icloud.com>
+Date: Wed, 11 Sep 2024 20:14:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911-devel-anna-maria-b4-timers-flseep-v2-12-b0d3f33ccfe0@linutronix.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] cxl/region: Find free cxl decoder by
+ device_for_each_child()
+To: Dan Williams <dan.j.williams@intel.com>,
+ quic_zijuhu <quic_zijuhu@quicinc.com>, Ira Weiny <ira.weiny@intel.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Davidlohr Bueso <dave@stgolabs.net>,
+ Jonathan Cameron <jonathan.cameron@huawei.com>,
+ Dave Jiang <dave.jiang@intel.com>,
+ Alison Schofield <alison.schofield@intel.com>,
+ Vishal Verma <vishal.l.verma@intel.com>, Timur Tabi <timur@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ linux-cxl@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240905-const_dfc_prepare-v4-0-4180e1d5a244@quicinc.com>
+ <20240905-const_dfc_prepare-v4-1-4180e1d5a244@quicinc.com>
+ <2024090531-mustang-scheming-3066@gregkh>
+ <66df52d15129a_2cba232943d@iweiny-mobl.notmuch>
+ <66df9692e324d_ae21294ad@dwillia2-mobl3.amr.corp.intel.com.notmuch>
+ <a6dae308-ff34-4479-a638-8c12ff2e8d32@quicinc.com>
+ <66dfc7d4f11a3_32646294f7@dwillia2-xfh.jf.intel.com.notmuch>
+ <e7e6ea66-bcfe-4af4-9f82-ae39fef1a976@icloud.com>
+ <66e06d66ca21b_3264629448@dwillia2-xfh.jf.intel.com.notmuch>
+ <66e08f9beb6a2_326462945d@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Language: en-US
+From: Zijun Hu <zijun_hu@icloud.com>
+In-Reply-To: <66e08f9beb6a2_326462945d@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-ORIG-GUID: UC_ONF6QW8nNb7s75RrcWy0ShHB2d9R8
+X-Proofpoint-GUID: UC_ONF6QW8nNb7s75RrcWy0ShHB2d9R8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-10_12,2024-09-09_02,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 spamscore=0
+ mlxlogscore=999 bulkscore=0 suspectscore=0 mlxscore=0 phishscore=0
+ adultscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2308100000 definitions=main-2409110092
 
-On Wed, Sep 11, 2024 at 07:13:38AM +0200, Anna-Maria Behnsen wrote:
-> Function descriptions in iopoll.h, regmap.h, phy.h and sound/soc/sof/ops.h
-> copied all the same outdated documentation about sleep/delay function
-> limitations. In those comments, the generic (and still outdated) timer
-> documentation file is referenced.
+On 2024/9/11 02:27, Dan Williams wrote:
+> Dan Williams wrote:
+> [..]
+>> So, while regionB would be the next decoder to allocate after regionC is
+>> torn down, it is not a free decoder while decoderC and regionC have not been
+>> reclaimed.
 > 
-> As proper function descriptions for used delay and sleep functions are in
-> place, simply update the descriptions to reference to them. While at it fix
-> missing colon after "Returns" in function description and move return value
-> description to the end of the function description.
+> The "simple" conversion is bug compatible with the current
+> implementation, but here's a path to both constify the
+> device_find_child() argument, *and* prevent unwanted allocations by
+> allocating decoders precisely by id.  Something like this, it passes a
+> quick unit test run:
 > 
-> Cc: Andrew Lunn <andrew@lunn.ch>
-> Cc: Heiner Kallweit <hkallweit1@gmail.com>
-> Cc: Jaroslav Kysela <perex@perex.cz>
-> Cc: Takashi Iwai <tiwai@suse.com>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-sound@vger.kernel.org
-> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
-> ---
-> v2: Add cleanup of usage of 'Returns' in function description
-> ---
->  include/linux/iopoll.h | 52 +++++++++++++++++++++++++-------------------------
->  include/linux/phy.h    |  9 +++++----
 
-For the phy.h parts:
+sounds good.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> diff --git a/drivers/cxl/core/port.c b/drivers/cxl/core/port.c
+> index 1d5007e3795a..749a281819b4 100644
+> --- a/drivers/cxl/core/port.c
+> +++ b/drivers/cxl/core/port.c
+> @@ -1750,7 +1750,8 @@ static int cxl_decoder_init(struct cxl_port *port, struct cxl_decoder *cxld)
+>  	struct device *dev;
+>  	int rc;
+>  
+> -	rc = ida_alloc(&port->decoder_ida, GFP_KERNEL);
+> +	rc = ida_alloc_max(&port->decoder_ida, CXL_DECODER_NR_MAX - 1,
+> +			   GFP_KERNEL);
+>  	if (rc < 0)
+>  		return rc;
+>  
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+> index 21ad5f242875..1f7b3a9ebfa3 100644
+> --- a/drivers/cxl/core/region.c
+> +++ b/drivers/cxl/core/region.c
+> @@ -794,26 +794,16 @@ static size_t show_targetN(struct cxl_region *cxlr, char *buf, int pos)
+>  	return rc;
+>  }
+>  
+> -static int match_free_decoder(struct device *dev, void *data)
+> +static int match_decoder_id(struct device *dev, void *data)
+>  {
+>  	struct cxl_decoder *cxld;
+> -	int *id = data;
+> +	int id = *(int *) data;
+>  
+>  	if (!is_switch_decoder(dev))
+>  		return 0;
+>  
+>  	cxld = to_cxl_decoder(dev);
+> -
+> -	/* enforce ordered allocation */
+> -	if (cxld->id != *id)
+> -		return 0;
+> -
+> -	if (!cxld->region)
+> -		return 1;
+> -
+> -	(*id)++;
+> -
+> -	return 0;
+> +	return cxld->id == id;
+>  }
+>  
+>  static int match_auto_decoder(struct device *dev, void *data)
+> @@ -840,16 +830,29 @@ cxl_region_find_decoder(struct cxl_port *port,
+>  			struct cxl_region *cxlr)
+>  {
+>  	struct device *dev;
+> -	int id = 0;
+> -
+>  	if (port == cxled_to_port(cxled))
+>  		return &cxled->cxld;
+>  
+>  	if (test_bit(CXL_REGION_F_AUTO, &cxlr->flags))
+>  		dev = device_find_child(&port->dev, &cxlr->params,
+>  					match_auto_decoder);
+> -	else
+> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
+> +	else {
+> +		int id, last;
+> +
+> +		/*
+> +		 * Find next available decoder, but fail new decoder
+> +		 * allocations if out-of-order region destruction has
+> +		 * occurred
+> +		 */
+> +		id = find_first_zero_bit(port->decoder_alloc,
+> +					 CXL_DECODER_NR_MAX);
+> +		last = find_last_bit(port->decoder_alloc, CXL_DECODER_NR_MAX);
+> +
+> +		if (id >= CXL_DECODER_NR_MAX ||
+> +		    (last < CXL_DECODER_NR_MAX && id != last + 1))
+> +			return NULL;
 
-    Andrew
+Above finding logic seems wrong.
+what about below one ?
+
+ last = find_last_bit(port->decoder_alloc, CXL_DECODER_NR_MAX);
+
+ if (last >= CXL_DECODER_NR_MAX)
+    id = 0;
+ else if (last + 1 < CXL_DECODER_NR_MAX)
+    id = last + 1;
+ else
+    return NULL;
+
+> +		dev = device_find_child(&port->dev, &id, match_decoder_id);
+> +	}
+>  	if (!dev)
+>  		return NULL;
+>  	/*
+> @@ -943,6 +946,9 @@ static void cxl_rr_free_decoder(struct cxl_region_ref *cxl_rr)
+>  
+>  	dev_WARN_ONCE(&cxlr->dev, cxld->region != cxlr, "region mismatch\n");
+>  	if (cxld->region == cxlr) {
+> +		struct cxl_port *port = to_cxl_port(cxld->dev.parent);
+> +
+> +		clear_bit(cxld->id, port->decoder_alloc);
+>  		cxld->region = NULL;
+>  		put_device(&cxlr->dev);
+>  	}
+> @@ -977,6 +983,7 @@ static int cxl_rr_ep_add(struct cxl_region_ref *cxl_rr,
+>  	cxl_rr->nr_eps++;
+>  
+>  	if (!cxld->region) {
+> +		set_bit(cxld->id, port->decoder_alloc);
+>  		cxld->region = cxlr;
+>  		get_device(&cxlr->dev);
+>  	}
+> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
+> index 9afb407d438f..750cd027d0b0 100644
+> --- a/drivers/cxl/cxl.h
+> +++ b/drivers/cxl/cxl.h
+> @@ -578,6 +578,9 @@ struct cxl_dax_region {
+>  	struct range hpa_range;
+>  };
+>  
+> +/* Max as of CXL 3.1 (8.2.4.20.1 CXL HDM Decoder Capability Register) */
+> +#define CXL_DECODER_NR_MAX 32
+> +
+>  /**
+>   * struct cxl_port - logical collection of upstream port devices and
+>   *		     downstream port devices to construct a CXL memory
+> @@ -591,6 +594,7 @@ struct cxl_dax_region {
+>   * @regions: cxl_region_ref instances, regions mapped by this port
+>   * @parent_dport: dport that points to this port in the parent
+>   * @decoder_ida: allocator for decoder ids
+> + * @decoder_alloc: decoder busy/free (@cxld->region set) bitmap
+>   * @reg_map: component and ras register mapping parameters
+>   * @nr_dports: number of entries in @dports
+>   * @hdm_end: track last allocated HDM decoder instance for allocation ordering
+> @@ -611,6 +615,7 @@ struct cxl_port {
+>  	struct xarray regions;
+>  	struct cxl_dport *parent_dport;
+>  	struct ida decoder_ida;
+> +	DECLARE_BITMAP(decoder_alloc, CXL_DECODER_NR_MAX);
+>  	struct cxl_register_map reg_map;
+>  	int nr_dports;
+>  	int hdm_end;
+
 
