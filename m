@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-127562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA1AD975BB1
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:25:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32E29975BB5
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F80E1F234E7
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:25:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E851A284961
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F9F1BBBEB;
-	Wed, 11 Sep 2024 20:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF661BB680;
+	Wed, 11 Sep 2024 20:27:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Nu23TnYP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YEfvoARy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213A31BBBD2
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB08D1B9B5E
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726086320; cv=none; b=LyuQtG3IoEzG2oLDOFaNYwyG8sWIR5RGX0c/VKjkT/cgmgONKqSzwOiUe1ngyPSNQbP3Xjp8LN5JptUPa18W+OCeFzpqYUYOeT1Yj4Y+hNiODkosbROwyFb9/+ntXsjBFTxg+b7RkRl7v1Yv8gcmtOIQh+UJ7I+xHzrDgTsY8MI=
+	t=1726086443; cv=none; b=DigMjemFEzVP6thS8MianGrAAZOl/wWP5o1BmcAkMxgeDGEdWrEQIXGv8Y0ZphGvkCcFKnOB052s6BbwXAR8bR8QJeBLT54G2M0dpnWCwgwrN1uqWDmXe/UqAo97oUcVhTLN8VlGGBHcg5kduB9wqvazltaQGjkYUujtC86uzj8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726086320; c=relaxed/simple;
-	bh=vA7u+UZJCFjVYkHzh9rRqVi/HTXF1QCq70f2BOwy1Rk=;
+	s=arc-20240116; t=1726086443; c=relaxed/simple;
+	bh=usQB6eg6mpIjrsouU/6sUW2LWu5N/XOscjT9iNplmEo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WFhiznXNvC2c8yVQP77iNmpVos6wnklJR7e34mrCu4Jo2a3jQ3SJCZtw9p9JalJsgrAtczSXrvHTcuC9Q2+y15D9BIR3RtP8IGNM4j+BxYaNv8N3N+MLUlDT5DyVuI36Ool2M0/pONCcwB3IWvBx+hby+bE1l01d3Yhav6rm030=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Nu23TnYP; arc=none smtp.client-ip=209.85.208.43
+	 To:Cc:Content-Type; b=n97zNEHxzH2SWb+LTCM7NAT7XhYybABvWdBVuEAaTFFGGLKYaLar9jJ2Wt3GtieyO92IpseG8AZNG+cEKS5fk9aVsHwq9TRVt7kS8Fd2oIYdXQzGqkUbZ/JRcF2aNUlZNvrXcCQywvT/eSgim4UzQNFMnwRDpaaK2AtgGh73+tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YEfvoARy; arc=none smtp.client-ip=209.85.167.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c3ed267a7bso226270a12.3
-        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 13:25:18 -0700 (PDT)
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5365aa568ceso273249e87.0
+        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 13:27:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726086317; x=1726691117; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1726086440; x=1726691240; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vA7u+UZJCFjVYkHzh9rRqVi/HTXF1QCq70f2BOwy1Rk=;
-        b=Nu23TnYP27d09xVXdL3O8USoIL42HV5QDrMrIvYQpFWsCg7O3xAHJQnq+c52vEBsvv
-         7DJZiyeBT7+7AdP27EBP+q5w16YKBta6kO0AGkdK/d9ILUOauPnksS5AbtGBd8NtHA97
-         Nq/Z4hMO3a0uUWFytu131bweEwGS/Y8HRolTg0xHFr9VqgG5qrvifIPIHI1swjWZpS/J
-         WyROvnTMhHvxv4kgPGDEY4pGjSPfCGzkEMLOwjQQbzJm3vdGU2bTrQMW5Gw16SfwawtH
-         AjCHUL/xStYjeZ56PPQqKKFrtMDIl60oUTHe0JIkPpv2h0q4caEWAAkqZLMUncXNDEQ4
-         FTGQ==
+        bh=usQB6eg6mpIjrsouU/6sUW2LWu5N/XOscjT9iNplmEo=;
+        b=YEfvoARyWSQ3LozHIRtsuSCZbRcDqLuHPpYK0CnEHBOACmLm4qSdM3bOT8ZZRndG/e
+         NgGspu/x3ym85FPBXT0kNtdq6cHunvEzERWMILpBEUV8CCi4zI2fuJRdExq5oIPrfl6P
+         5vJpp2HR91ZJZ/rhj7/mLH8h3jQLcvchCgbutIYL32h0sEJJqihab32CoMhtRRQZiMuV
+         dHsdC64xeWYf6cA5bN8QcBbIQXNr/oyR4fIlElCULLXNPAWvp8NIndp+1nF1Cow0ZN89
+         tBkrFj0l4AfK5mbqGQvRFJ56/9PXpzyX5YV0j64e5lh6t/Rwl9lP1TGm/5RtIAHl5x3L
+         XhWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726086317; x=1726691117;
+        d=1e100.net; s=20230601; t=1726086440; x=1726691240;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vA7u+UZJCFjVYkHzh9rRqVi/HTXF1QCq70f2BOwy1Rk=;
-        b=ZTk9Qw60wOeb2JKlj4Ei6MIJp4DfPHL9f0f5LRR59mKKw015Y80pF2OTJh2frhWcKh
-         n3C0zhW1eTsNWXM9MsMzHhQBeYE4dG20Wz8VANdVWXafJAnVlhgU/UMmie9m10Hj7uv8
-         D/ixz2EHzEDqeVeo5KtiXzbgOsqsGkcfpoAKm8ZIXd0vc8+ull+2SVBmDwOvRocIwDgQ
-         AAVKTRry2VNQMTJZfiKAVGT20dQRLkguDlXi/6I9MD0rJvNudleg51qWyxkEQs9ntVkN
-         HTwaMia5pxMBUOEyxnaYBFnLOjiRWkKv+JlufQuyIpkzfoJXY5e40+8P37a9qJGUHPzE
-         khpw==
-X-Forwarded-Encrypted: i=1; AJvYcCVAM1wUNWyIk6g4la525F5PmzBamE2sgQ1LYHp1jWME/9YbRWXN4UGYvHasrN7O5ejFSZAuGDI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSJ3+Rph1UCK7sTI3GrFQbeaBPU+1KV99PF/E0qgGVjwB9Swbu
-	te1WlJACb/bLutJHAmaYA0LFJz2kEg8KG//Gakte5glqKtemahlmVwv940fJBevgWFoFCwokGYM
-	vu5S+SHTyG6C6BY35mGfbY7JRBPvE19J1zfw=
-X-Google-Smtp-Source: AGHT+IFMjRe77yFuysdfaosrC8DOmjCWlZJ2RFEl5VdqH/ls60M/dHZlo0e2StLsun7t07Y99I8+FEnKM3PFKoVIoZ4=
-X-Received: by 2002:a17:906:d7c7:b0:a7d:e5b1:bf65 with SMTP id
- a640c23a62f3a-a902943596emr54029066b.21.1726086317086; Wed, 11 Sep 2024
- 13:25:17 -0700 (PDT)
+        bh=usQB6eg6mpIjrsouU/6sUW2LWu5N/XOscjT9iNplmEo=;
+        b=HhGzVdnnRBRn05T8lh7KagJgQlWyQwY0Q+05Tc1NGakBsX8YXyupcriDhLrxMksF0Q
+         1ASjWPNB/6mcfiq0i6S+85LHLlzHiqYrXXgD5coE375HtU/uSZ/GPGN5S2Eb7uSqHTZc
+         TwlD2g8sfngaskpa+JIXrXpKHqTWrgJliarchYj63dJa5ako2BR3XIYARf2G9SbFYH3b
+         ewyKRPlZca49iwfCrPSTd9nzRdkLyLoywNrGRHogQRBwYNlqNyZdA2D4eWvZhGTFX22d
+         n6T9QYPpJdDLAtShGbgSAbBGZgXj+NVfh3FUNLV1OgMdC43kEH2do+EURKn6xrZtQ1BI
+         /MUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXGXGUDL/l3PIZJ+VTajWtgiNh0RFfNCMxrhK0DEO/KknMt2yOUJCD7dVEOxbQAR/9ae+DclBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDfARsipnPTR3SZezw3lz3zkLzZAnSA10YrV9ktSEn6qMZ0ZhT
+	MciW/5+0mWxyffawf3LWxzEEnBySzxUD7AqAygF+FT3GKiPrLDP3i3Ll+JREsBsr4OkO3L9E2/9
+	KoUkF4phmHA3TmdZndDA+jtW+DfcX5KLyTN8=
+X-Google-Smtp-Source: AGHT+IG4PlV5COBYM0Q2Nd2Q2wDM/W9ZwRGrJE/N0l3sWkn7WmQMK2BHy4vlP8e6y/RG0l80VfT0klkI72P4nGw8EEE=
+X-Received: by 2002:a05:6512:318e:b0:535:6a34:b8c3 with SMTP id
+ 2adb3069b0e04-53678fab4a8mr420583e87.5.1726086439266; Wed, 11 Sep 2024
+ 13:27:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,12 +72,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-0-2d52f4e13476@linutronix.de>
- <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-9-2d52f4e13476@linutronix.de>
-In-Reply-To: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-9-2d52f4e13476@linutronix.de>
+ <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-10-2d52f4e13476@linutronix.de>
+In-Reply-To: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-10-2d52f4e13476@linutronix.de>
 From: John Stultz <jstultz@google.com>
-Date: Wed, 11 Sep 2024 13:25:04 -0700
-Message-ID: <CANDhNCpAOQvUEg1SSqmdLevH6JrnFnu5qib8p7zygt8LFcCgYA@mail.gmail.com>
-Subject: Re: [PATCH 09/21] ntp: Move tick_stat* into ntp_data
+Date: Wed, 11 Sep 2024 13:27:07 -0700
+Message-ID: <CANDhNCrNpLWEbBmx=6a5i6HVtCe4FXrJG9RsY_ak3gi5-1eHPw@mail.gmail.com>
+Subject: Re: [PATCH 10/21] ntp: Move time_offset/constant into ntp_data
 To: Anna-Maria Behnsen <anna-maria@linutronix.de>
 Cc: Frederic Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
@@ -98,10 +98,8 @@ On Wed, Sep 11, 2024 at 6:18=E2=80=AFAM Anna-Maria Behnsen
 > Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 > Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
 
-No objection on this, but I wonder if it might be worth dropping the
-time_ prefix when you've moved the fields into the ntp_data structure?
+Same optional suggestion on dropping the time_ prefix, otherwise:
 
-Otherwise,
 Acked-by: John Stultz <jstultz@google.com>
 
 thanks
