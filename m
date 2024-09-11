@@ -1,73 +1,109 @@
-Return-Path: <netdev+bounces-127190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76A89974850
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 04:47:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9167597485E
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 04:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20D271F2563A
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 02:47:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47BB92875D7
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 02:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80E64273FC;
-	Wed, 11 Sep 2024 02:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBE9029CF6;
+	Wed, 11 Sep 2024 02:53:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IHd2OcxB"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Pr9FBQbD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BEBFB676
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 02:47:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F284010A0E;
+	Wed, 11 Sep 2024 02:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726022832; cv=none; b=THaO7QQcLaYy+vBlQ6r8MlPZdcDxNT8zGatuWVj3/OgQO4pbKIRVmzp1cEu2dR3wpyKqBZFB0rr8uQxw/SEhMMRW2IUrwt6fUe/Xv85yDBzjj+B6WXgBT+KDEidyvcwqCdL2O38w0QF7SCaNUcknOVQtAOc4nTkQtRVCKi0beTo=
+	t=1726023237; cv=none; b=SfVhOQeHOS7QTaoUTkC6wkwT+khEn6J4wu3N4Tnp7y4Tf1d8abbR31ULwlDwHy7PH3a7EJBGLqOiO4HfuTQ+ht+MM1aJx0DHNgvQstazh6l4MQKV79c2P2sY5i65NSILJXfaT/J7I6nR2jXcVEDLzpMXfKUYfs0inP+mfX8lzCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726022832; c=relaxed/simple;
-	bh=hlk1hTCFSRd48EFd0aHEmczsATYcqRa30JLCV4ubyUk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JiIAvLY/TvSI712K+XZo/GqExDRA6piPTYtxuFwCaIMOzT5kr+pX8LoyXxlQqlTgElPueQC1EvOZgY1RUUDfGsZXL+/pF1Xw5A/VfdsLGU5KjWMtNzDA4tXCYtDdDVovCTdSflmkl/6bm2LfsAIQSoWhNM3E6lh5KeewMKS1lrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IHd2OcxB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A405C4CEC4;
-	Wed, 11 Sep 2024 02:47:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726022831;
-	bh=hlk1hTCFSRd48EFd0aHEmczsATYcqRa30JLCV4ubyUk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IHd2OcxB9rglrpT8ZTahN+5KU2ZQzEw1ukeG1q5wrA0rY7GuZ6vG5GRIkfYIoMd/u
-	 cHGJGvauwRuRoMcizmV3uudF7frlWDGIcXHBMQWryRv8VqtMeUoKZpSo4DeJQdM4U1
-	 EZFG5S4Oo8nVSKE5c0h/2kU7K1Sb0vk0xpP5/nMq8nSIUHzYKoTjRVBR9vGjjm5sVq
-	 YUHFENPCkSLlJHia5ZUVfmbrupJ+jRvReuVS6JeFMSn/Zwe8VOcjBa+ofEtNba6g0B
-	 oz+Z4RF/WgkOmWHZu9boNCLHF7aY9nJFBmks3U1vk1kpJudfljIwZx0m13esDbnwjL
-	 ze7655l0BcsHg==
-Date: Tue, 10 Sep 2024 19:47:10 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Saeed Mahameed
- <saeedm@nvidia.com>, netdev@vger.kernel.org, Tariq Toukan
- <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
- <leonro@nvidia.com>, Yevgeny Kliteynik <kliteyn@nvidia.com>, Itamar Gozlan
- <igozlan@nvidia.com>
-Subject: Re: [net-next V4 04/15] net/mlx5: HWS, added tables handling
-Message-ID: <20240910194710.668b1ff0@kernel.org>
-In-Reply-To: <20240909181250.41596-5-saeed@kernel.org>
-References: <20240909181250.41596-1-saeed@kernel.org>
-	<20240909181250.41596-5-saeed@kernel.org>
+	s=arc-20240116; t=1726023237; c=relaxed/simple;
+	bh=wbrGTFkl9vaEApSOli/mFkxjbDDeXUBQAFnWakdQiU0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FOwdBYfTjdlvYSXDiGfBMtMnN8aaIMNABSIOmHDHHOxKt5NvZ7ePbUfddVF4aiK12Yu1KBQhN67tGAgwDxarjd4A8L3+QwLbzUBaOWrWrmNSvJ5hpKjmb/5Wv9akS9ZD/5EyCWOX2Uu7DBLEjT59J4iF77f9LMcpmPo729cWi5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Pr9FBQbD; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1726023225; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=Ad2HgtRlxXNAN6IdzsclPeKOqae5OG8pTw7F+XYL2e8=;
+	b=Pr9FBQbDLbbzUEf/kHFv3WFuyOgevbWFYLwCDbsidQ0rHUqg3Svaz8vWq+O4USMKUGeGNJHmQJKukXCxbhqHQ9qBjhsSqDhH/mYmWk85ZtxIe7eWKgjCKVNO/9j9PQeATkH8E8GfBX45K6+VOiZa3yiUJi6Oav3UUCybmutmUYk=
+Received: from 30.221.149.106(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WEmGA3m_1726023224)
+          by smtp.aliyun-inc.com;
+          Wed, 11 Sep 2024 10:53:44 +0800
+Message-ID: <763f0662-c001-4bce-accf-1d7cf2fbaf60@linux.alibaba.com>
+Date: Wed, 11 Sep 2024 10:53:42 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/smc: add sysctl for smc_limit_hs
+To: Paolo Abeni <pabeni@redhat.com>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, wintera@linux.ibm.com,
+ guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+ tonylu@linux.alibaba.com, edumazet@google.com
+References: <1725590135-5631-1-git-send-email-alibuda@linux.alibaba.com>
+ <8a1684ca-755b-4612-afe1-41340b46f2fe@redhat.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <8a1684ca-755b-4612-afe1-41340b46f2fe@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Mon,  9 Sep 2024 11:12:37 -0700 Saeed Mahameed wrote:
-> +out:
-> +	mutex_unlock(&ctx->ctrl_lock);
-> +	return -ret;
 
-the -ret is on purpose?
+
+On 9/10/24 6:10 PM, Paolo Abeni wrote:
+> On 9/6/24 04:35, D. Wythe wrote:
+>> From: "D. Wythe" <alibuda@linux.alibaba.com>
+>>
+>> In commit 48b6190a0042 ("net/smc: Limit SMC visits when handshake 
+>> workqueue congested"),
+>> we introduce a mechanism to put constraint on SMC connections visit
+>> according to the pressure of SMC handshake process.
+>>
+>> At that time, we believed that controlling the feature through netlink
+>> was sufficient. However, most people have realized now that netlink is
+>> not convenient in container scenarios, and sysctl is a more suitable
+>> approach.
+>
+> Not blocking this patch, but could you please describe why/how NL is 
+> less convenient? is possibly just a matter of lack of command line 
+> tool to operate on NL? yaml to the rescue ;)
+>
+> Cheers,
+>
+> Paolo
+
+Hi Paolo,
+
+Based on the information I've gathered, there are several aspects:
+
+1. There is a lack of support for YAML on NL in popular products.
+
+2. The infrastructure related to NLwas not yet sound enough. For 
+example, how to disable
+settings for certain NL in container, while we can do it within sysctls. 
+Also, regular synchronization.
+NL may be able to implement it (maybe via Yaml ), but it still be waiting
+for support in popular products.
+
+Best wishes,
+D. Wythe
+
+
+
+
 
