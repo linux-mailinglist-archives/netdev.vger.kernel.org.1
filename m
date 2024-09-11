@@ -1,117 +1,102 @@
-Return-Path: <netdev+bounces-127239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A910C974B97
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 09:39:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3C4C974B9D
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 09:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 513F81F28B7C
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 07:39:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C8191F290D7
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 07:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DE41DA5E;
-	Wed, 11 Sep 2024 07:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B38713D8AC;
+	Wed, 11 Sep 2024 07:40:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b="5Ki3W3/g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6+kTvrZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.theune.cc (mail.theune.cc [212.122.41.141])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4238422075;
-	Wed, 11 Sep 2024 07:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.122.41.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A61A13D52B;
+	Wed, 11 Sep 2024 07:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726040376; cv=none; b=uUYq25lteIffDIcLAZxZwhVWi0cJUAL7ovftznqPXSZK0cUufFPYp4xPRV5t1MKeGHl898MNBXHhy5xmNQPW+hz+ih7c8J3EJer/ODgqcfWFBaYR5pBHm5xqoHFjT26S8opjxhjWb7Ff0XtpzqjE31k/beFcro4CNILRj7KfjQE=
+	t=1726040408; cv=none; b=e+trRcMlbnyuH8TJ1Lpx8Q4ky2c7BtM+fbay87hR1mSwDW4EFg4Ocsfe34xTx3tbY96yuq7QvwK3QITLmTKhEk+mLmC8jTMypMSsIJgJcokwUuxi61oGxls4IXo9WMRe4oPzoJIq2WVUQQsgddoTbN+8piH/oSlpqyz2KIyRQFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726040376; c=relaxed/simple;
-	bh=XEbNjJM9eSTfS1MMUJ9+jbUpQ3vdaHQaKr6cGtfzsV0=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=jYPX9SArH36b7lib8NHQ1+rf0b3DG0t0nf4DhC6f43XFRG1y7YK69UW+U2PxUKoU72kM4zv1DYnr0jfznZZlMuhsc4xrinVxNLteuoCGQnDis/bJKZd6dx+WHP3NCn+/mVzbPe2sWxwhxKPt4M8lvFCZ4LzWhZNAl375Houm1MM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc; spf=pass smtp.mailfrom=theune.cc; dkim=pass (1024-bit key) header.d=theune.cc header.i=@theune.cc header.b=5Ki3W3/g; arc=none smtp.client-ip=212.122.41.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=theune.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=theune.cc
-Content-Type: text/plain;
-	charset=utf-8
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=theune.cc; s=mail;
-	t=1726040362; bh=XEbNjJM9eSTfS1MMUJ9+jbUpQ3vdaHQaKr6cGtfzsV0=;
-	h=Subject:From:In-Reply-To:Date:Cc:References:To;
-	b=5Ki3W3/gZsG/UfxvBauC0hCeWpgRETafZDsYcghwc2NqBmoMQOAa5DsAZ8O3mv4IM
-	 W3TXfMU99qyr4K21PJ5JiuGWwhFnFJC2gbhiDtu9aaku9Z9hB4LG0jvOnjYA4w4vnL
-	 kSHH476xzAoVEm1ss9cwwPZ4tIgPJ71qitb1lrg8=
+	s=arc-20240116; t=1726040408; c=relaxed/simple;
+	bh=z1b6pVa9eOEfyu40NGxDNSnXinjavrHxuv1qkW3GbrY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Am/tpuAGoDWhBmaghpBmWc0wHgg8e2PQaDDcT7im9kVeX+mahNGl5GkRMOokxknd1/6DAk1vdSmZjWw1Ds0V6oqtnzVxeeqH4ieW5amoD2g+ZvpUFenxuvmPkHMS8IUWRiyjfdJ4g6TQRXwQVov8yK+x1LR4Khh/blGaWMETLz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6+kTvrZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13C6CC4CEC5;
+	Wed, 11 Sep 2024 07:40:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726040407;
+	bh=z1b6pVa9eOEfyu40NGxDNSnXinjavrHxuv1qkW3GbrY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T6+kTvrZAyfVT0Fr/VAiUShNjAwuC9B2choCKXVSsuoob9cexbdlh1zGin9hSIGgi
+	 RJITnbAq98KwaUHfqYkjvYJ/IvV7brxszWX5GqUvc/uelH8IE+R5n8TZR5AcYBz4Vs
+	 QFi/0BuWRN3cIXEg25H72dAsPMV7gtH4FDrSmsDJQOBKuMOkAshrtje6TQYHfAxAgH
+	 5phm+38PJSlayeVg0wE753BEf7Fu17FbuKl1V66jJFqd4WYGOlvybD+F0L9JoEFMo6
+	 0LzQ9xXxME9frdBF7BKAE2oQSdNQ+V0Wo56IuP67NE+hSd/idmZM79HWQdk4nK6E5C
+	 b7xoSQEci/xAg==
+Date: Wed, 11 Sep 2024 08:40:01 +0100
+From: Simon Horman <horms@kernel.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Julien Panis <jpanis@baylibre.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Joe Damato <jdamato@fastly.com>,
+	srk@ti.com, vigneshr@ti.com, danishanwar@ti.com,
+	pekka Varis <p-varis@ti.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v4 5/6] net: ethernet: ti: cpsw_ale: add
+ policer/classifier helpers and setup defaults
+Message-ID: <20240911074001.GM572255@kernel.org>
+References: <20240910-am65-cpsw-multi-rx-v4-0-077fa6403043@kernel.org>
+ <20240910-am65-cpsw-multi-rx-v4-5-077fa6403043@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51\))
-Subject: Re: Follow-up to "net: drop bad gso csum_start and offset in
- virtio_net_hdr" - backport for 5.15 needed
-From: Christian Theune <christian@theune.cc>
-In-Reply-To: <8348AEDD-236F-49E3-B2E3-FFD81F757DD9@theune.cc>
-Date: Wed, 11 Sep 2024 09:39:01 +0200
-Cc: Greg KH <gregkh@linuxfoundation.org>,
- Willem de Bruijn <willemb@google.com>,
- regressions@lists.linux.dev,
- stable@vger.kernel.org,
- netdev@vger.kernel.org,
- mathieu.tortuyaux@gmail.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <AD8BDB95-0B4A-435F-9813-5727305CA515@theune.cc>
-References: <89503333-86C5-4E1E-8CD8-3B882864334A@theune.cc>
- <2024090309-affair-smitten-1e62@gregkh>
- <CA+FuTSdqnNq1sPMOUZAtH+zZy+Fx-z3pL-DUBcVbhc0DZmRWGQ@mail.gmail.com>
- <2024090952-grope-carol-537b@gregkh>
- <66df3fb5a228e_3d03029498@willemb.c.googlers.com.notmuch>
- <0B75F6BF-0E0E-4BCC-8557-95A5D8D80038@theune.cc>
- <66df5b684b1ea_7296f29460@willemb.c.googlers.com.notmuch>
- <8348AEDD-236F-49E3-B2E3-FFD81F757DD9@theune.cc>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240910-am65-cpsw-multi-rx-v4-5-077fa6403043@kernel.org>
 
-Hi,
+On Tue, Sep 10, 2024 at 12:24:02PM +0300, Roger Quadros wrote:
+> The Policer registers in the ALE register space are just shadow registers
+> and use an index field in the policer table control register to read/write
+> to the actual Polier registers.
+> Add helper functions to Read and Write to Policer registers.
+> 
+> Also add a helper function to set the thread value to classifier/policer
+> mapping. Any packet that first matches the classifier will be sent to the
+> thread (flow) that is set in the classifier to thread mapping table.
+> If not set then it goes to the default flow.
+> 
+> Default behaviour is to have 8 classifiers to map 8 DSCP/PCP
+> priorities to N receive threads (flows). N depends on number of
+> RX channels enabled for the port.
+> As per the standard [1] User prioritie 1 (Background) and 2 (Spare) have
+> lower priority than the user priority 0 (default). User priority 1 being
+> of the lowest priority.
+> 
+> [1] IEEE802.1D-2004, IEEE Standard for Local and metropolitan area networks
+> Table G-2 - Traffic type acronyms
+> Table G-3 - Defining traffic types
+> 
+> Signed-off-by: Roger Quadros <rogerq@kernel.org>
 
-I just took 5.15.166 + the 4 patches by Willem as they=E2=80=99re =
-currently in the queue. The applied cleanly (which you already tested) =
-and I can demonstrate the known error (bad gso: type: 4, size: 1428) on =
-5.15.166 without the patches and it=E2=80=99s gone on 5.15.166 with the =
-patches.
-
-Thanks everyone!
-
-Hugs,
-Christian
-
-> On 10. Sep 2024, at 08:32, Christian Theune <christian@theune.cc> =
-wrote:
->=20
-> Happy to do that. I=E2=80=99ve blocked time tomorrow morning.
->=20
->> On 9. Sep 2024, at 22:32, Willem de Bruijn =
-<willemdebruijn.kernel@gmail.com> wrote:
->>=20
->> Christian Theune wrote:
->>> I can contribute live testing and can quickly reproduce the issue.
->>>=20
->>> If anything is there that should be tested for apart from verifying =
-the fix, I=E2=80=99d be happy to try.
->>=20
->> If you perform the repro steps and verify that this solves the issue,
->> that would be helpful, thanks.
->=20
->=20
-> Liebe Gr=C3=BC=C3=9Fe,
-> Christian
->=20
-> -- =20
-> Christian Theune - A97C62CE - 0179 7808366
-> @theuni - christian@theune.cc
->=20
-
-Liebe Gr=C3=BC=C3=9Fe,
-Christian
-
--- =20
-Christian Theune - A97C62CE - 0179 7808366
-@theuni - christian@theune.cc
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
