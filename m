@@ -1,94 +1,88 @@
-Return-Path: <netdev+bounces-127519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55B54975A48
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:22:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20259975A7C
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:45:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E925287001
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:22:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB8B62871D3
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CEAA1AC8A6;
-	Wed, 11 Sep 2024 18:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD1F185B7B;
+	Wed, 11 Sep 2024 18:45:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=jbsky.fr header.i=@jbsky.fr header.b="tIqmMOVm"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from pmg.home.arpa (i19-les02-ix2-176-181-14-251.dsl.dyn.abo.bbox.fr [176.181.14.251])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 796221A4F06
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 18:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81F37DA66;
+	Wed, 11 Sep 2024 18:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.181.14.251
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726078922; cv=none; b=T42PGLtz3PWn7fMMzv4jvGb+UfdVCpnAyeOyYIQWhC5aHshlDkdMXtVfr0T7HKxiY4nII1grDTWyKhlY2aRo6hmC7oGmTeVBVQebdGsi7QhxLpFq+VBn6fJUVt+6Ydh6kGbu46UgoITIkbMp1xcqnRWVfMgn/eEo7sKuhSEQm1E=
+	t=1726080327; cv=none; b=E3YigIFgdyjredhf7oCCuv6bOdHp7JtHgpN8oFI7iHv8neEnUqilQmruMhoORAkbSXPywtSiHDRvgD8KhVUuurEDblWQLW96fjoTDObxNlYlAsMTgdaba2nowdtYfYkjao8Lo4Fu+UzO19RYV4E+r8D6kLUNcAzuRLkwwl1SH20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726078922; c=relaxed/simple;
-	bh=OY3BzXk1qWT2o2hEK3HOuMSlubGPieKOG4qZn+5Vj+Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UAVWsOG9UHdh7PVmPD1a0eUqN2BHsXL6PCiCsStPlI+jFWXJZZwSjm9ApmCokIYgB2kgn6q7BdZfvwHW4jBSvsWW8EXt6baMmpCn3BPMFtBnWQgpGdzxGwQpHm7U+xm3a0Lh3jBmnqtETLWG/5pRfuZ84Xno+4PSlZSm87AJQhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1soRyY-0006j5-Qn; Wed, 11 Sep 2024 20:21:58 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1soRyW-007C6P-9x; Wed, 11 Sep 2024 20:21:56 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1soRyW-001z2q-0d;
-	Wed, 11 Sep 2024 20:21:56 +0200
-Date: Wed, 11 Sep 2024 20:21:56 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	thomas.petazzoni@bootlin.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next] Documentation: networking: Fix missing PSE
- documentation issue
-Message-ID: <ZuHfxK7tStKUfM0U@pengutronix.de>
-References: <20240911144711.693216-1-kory.maincent@bootlin.com>
+	s=arc-20240116; t=1726080327; c=relaxed/simple;
+	bh=gW5j0ruWh8TrtaENG4c/a09DC6UAyDssRURGEh0kYgo=;
+	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=B7GktIPiC8rz5JVEJe3DVYoXadPZC3Dsh45Jn0Ug9ssETX9uYA8Oz467vh6hYCUmWgLAqCr3DWvFM44rc0jAAy3qQVJ2I2Ynydnilf4sSIPW8xKfn8o58tinEk78LryODKE9IKdiikq2IxXuL76N61MqYrQJ2+o7NzMv41Inmvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jbsky.fr; spf=pass smtp.mailfrom=jbsky.fr; dkim=pass (2048-bit key) header.d=jbsky.fr header.i=@jbsky.fr header.b=tIqmMOVm; arc=none smtp.client-ip=176.181.14.251
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jbsky.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jbsky.fr
+Received: from pmg.home.arpa (localhost [127.0.0.1])
+	by pmg.home.arpa (Proxmox) with ESMTP id 8AEDC223CD;
+	Wed, 11 Sep 2024 20:45:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jbsky.fr; h=cc
+	:content-transfer-encoding:content-type:content-type:date:from
+	:from:in-reply-to:message-id:mime-version:references:reply-to
+	:subject:subject:to:to; s=pmg1; bh=gW5j0ruWh8TrtaENG4c/a09DC6UAy
+	DssRURGEh0kYgo=; b=tIqmMOVmXKn8bY/6hEOL9C47CSHY/Mh8dpAXP21pdcDi2
+	BrFZKHfAux+XZaXHLU2nY24rA4x9hV48lUaSH1sC1zEFiCFEfyae8rnWVFtZ0mXa
+	OUT+21Dp/eXbOv4RfMuveWUujX4bh+OnJRSL7zBXWrXYcfFVmVVOZqPLFIuIED0i
+	FH07l//gnHSjsXp7wb6HukfQA/Pk8R1HN2P9yTObzGA8xWPDMFeWZoYCXVaVV0tb
+	kembyrYYT/bfiP1z6AYRH5Hi1WoeuCxBzo4f5zIp/7G5mXYJN5w46ooSQYgcrLC5
+	PHJ/ZoGonXhLs5vMKRrZC46N1BLaIFl9xIMKn/7Sw==
+Subject: Re: [PATCH v2] mvneta: fix "napi poll" infinite loop
+To: thomas.petazzoni@bootlin.com, davem@davemloft.net, kuba@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240911112846.285033-1-webmaster@jbsky.fr>
+From: Julien Blais <webmaster@jbsky.fr>
+Message-ID: <dfdc195c-eaca-fdd2-5540-d4029bddd465@jbsky.fr>
+Date: Wed, 11 Sep 2024 20:45:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20240911112846.285033-1-webmaster@jbsky.fr>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240911144711.693216-1-kory.maincent@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 
-On Wed, Sep 11, 2024 at 04:47:11PM +0200, Kory Maincent wrote:
-> Fix a missing end of phrase in the documentation. It describes the
-> ETHTOOL_A_C33_PSE_ACTUAL_PW attribute, which was not fully explained.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Hello,
 
-Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Maxime, you've enlightened me, yes, what I've committed is useless as
+it's dealt with further on.
 
-Thank you!
+Anyway, I can't reproduce it, I was on the wrong track.
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Yes, for my next commit I'll test the mail so as not to have this
+“disclamer” anymore.
+
+Thanks for your feedback!
+
+All the best,
+
+Julien Blais
+
+
+
+--
+This e-mail and any attached files are confidential and may be legally privileged. If you are not the addressee, any disclosure, reproduction, copying, distribution, or other dissemination or use of this communication is strictly prohibited. If you have received this transmission in error please notify the sender immediately and then delete this mail.
+E-mail transmission cannot be guaranteed to be secure or error free as information could be intercepted, corrupted, lost, destroyed, arrive late or incomplete, or contain viruses. The sender therefore does not accept liability for any errors or omissions in the contents of this message which arise as a result of e-mail transmission or changes to transmitted date not specifically approved by the sender.
+If this e-mail or attached files contain information which do not relate to our professional activity we do not accept liability for such information.
+
 
