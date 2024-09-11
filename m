@@ -1,286 +1,187 @@
-Return-Path: <netdev+bounces-127204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 762DF9748BF
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 05:38:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 399BD9748C3
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 05:41:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D07D28821B
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 03:38:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0F381F268D0
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 03:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0C595589B;
-	Wed, 11 Sep 2024 03:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9763EA76;
+	Wed, 11 Sep 2024 03:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="eY88Uns3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e0fR/vPr"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9F64D8D0;
-	Wed, 11 Sep 2024 03:37:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A7AA3BBF5
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 03:41:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726025853; cv=none; b=R53uyECQFg94Cw3LOKslH4BBl39ozn78iXKNvzmQpQLwjDE/H1/kHGFpdMrkIl3J8UHIo+1YoUclAFZJKOK8QGhpiWtjdNiAhEuxq2/pURjnEXXG7EEzzH0UJ7QK0EoGp1iCPQjGUd0/r/nTFPAmO0UWR/Y43K+iYPS+mzvN8rc=
+	t=1726026105; cv=none; b=k6zAHkwXCBnDDnVRIsMUumvUMhGqB1BT1gP7iFyqrG+408b8zk8BhUweqFutvisFQabcjmlEQasm2/bnCDPg6SJKaEpGAEu8ojwOyPztGdQ5VnJMf8m20XWIZM3iq2ma8pmslTcrPJ+d84LLHWYHqKu9jt38/nXelXm13e4Kvsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726025853; c=relaxed/simple;
-	bh=fQA4ZmvJjUsqFOFX7s+On/lT0lNIldNAFmE9GyYmXH4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=V0bYsW6pzp6QCxTL7CHm5otLTV4QW6FsikCSHvW5O6AkOq5IGOvsqtht0j7x+yythnfm/E7Zlu0aNf/OVSgpaBPnj1N1Xb3WYbrxP4a7JBr3aPj55Qohn1PEuhdSiB+zf138ofP7/EA/66PZbhoMZoi21J4Vz0oNgA/1w5LFor4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=eY88Uns3; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1726025849; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=kt0hxrOo2gJqVz1HQLnyjblcCFmCzmyTJPG3om2eI2M=;
-	b=eY88Uns37ojjTnGt4S10fZDjIUyfsiTGgqdEKL22BL9tFoxbOozZMdqPjjN5IADeoISgrQ6adDINp924ZtUZ4kiUkj1/3UVz39Hekc6smbqZtsG5odMU2aptMb7nGUNHc3OwPbHkavOxMjvikB+LSaWB4oRGdKKMlqseNCDNR18=
-Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WEmDPhO_1726025847)
-          by smtp.aliyun-inc.com;
-          Wed, 11 Sep 2024 11:37:27 +0800
-From: Philo Lu <lulie@linux.alibaba.com>
-To: bpf@vger.kernel.org
-Cc: edumazet@google.com,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	martin.lau@linux.dev,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mykolal@fb.com,
-	shuah@kernel.org,
-	mcoquelin.stm32@gmail.com,
-	alexandre.torgue@foss.st.com,
-	thinker.li@gmail.com,
-	juntong.deng@outlook.com,
-	jrife@google.com,
-	alan.maguire@oracle.com,
-	davemarchevsky@fb.com,
-	dxu@dxuuu.xyz,
-	vmalik@redhat.com,
-	cupertino.miranda@oracle.com,
-	mattbobrowski@google.com,
-	xuanzhuo@linux.alibaba.com,
-	netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org
-Subject: [PATCH bpf-next v3 5/5] selftests/bpf: Expand skb dynptr selftests for tp_btf
-Date: Wed, 11 Sep 2024 11:37:19 +0800
-Message-Id: <20240911033719.91468-6-lulie@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20240911033719.91468-1-lulie@linux.alibaba.com>
-References: <20240911033719.91468-1-lulie@linux.alibaba.com>
+	s=arc-20240116; t=1726026105; c=relaxed/simple;
+	bh=rJYvWkB7ScfNu1HSBhulsrDv6xXwX4/vF8+VLJ/vb0I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=os75hcILZa//tQuLk+x715A+7hqTv3+7rP2nw2hcZHU2aAAmyXH7zimfhH4NFuzuRcyYvc+J7qRQykknaqThQjxJGVslNu5c9tiZi+rJ+9WPK9P4KFu1LzpoHU96aYg+kLpjYMHE38I6IZq99q+rDbMYWaJzygVEChpO9RQec+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e0fR/vPr; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726026103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B+J236T6pgkbhgAgrX3KyOZMQGHGE3Be/dQ9diTCoxY=;
+	b=e0fR/vPrN8CgL4RwnNwjfekQXeI/5Wn+DCobviwKzC093KBPMMYkKvUU/T89tUzHq+RMfh
+	J/OuEGdVQU7Q8jYGEOnrqtf5M0cdTUpFFQX3Ym8jfcTaKLF0k8pbZIoBhYsKgHFshnys5Z
+	/YKjG9Iqg3NzsKiIAtUVLOce3gDXDaU=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-684-vVsEjKuDP6yrs-h2-SPbGA-1; Tue, 10 Sep 2024 23:41:41 -0400
+X-MC-Unique: vVsEjKuDP6yrs-h2-SPbGA-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2d889fde2aaso7588157a91.0
+        for <netdev@vger.kernel.org>; Tue, 10 Sep 2024 20:41:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726026100; x=1726630900;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B+J236T6pgkbhgAgrX3KyOZMQGHGE3Be/dQ9diTCoxY=;
+        b=Y+8yDYj0c76/Gc3sYq+DLHwvvIBaJ0fupqiRJu27lzjVU2e6K7WnWoP0cEvJOaZ2sZ
+         A5FOt6OZ9RUQ8OnLQ70wMYBNBtnag6W4J9YgbXdAbUcYaqxhCuY2EJKQSs2h87+QPe4s
+         nLDBLaYKaD1/NGZg5EuM+dK5olmkR3rTxH/Z2e+fmcLJakd3ZD+0g+0EGX7E1/UVrE5M
+         +xWnVbIyKlBdkTttNq+ez9P5ZGPvfrwnhqu3scElORrwcFW+luOKzWYG0zojcpS59MZT
+         mxHZqZPbpwd+FEmmYFAgNfarih/wF7Bs2nGu2QJmlG/kOgQzfJIu3z/mAcv9hrIwIIOp
+         pQaw==
+X-Gm-Message-State: AOJu0YwcsKyXnbBhZFR4SswRQ/SLQicee2gGXkInrR0H2+8HUgc5DKHj
+	XvfQOXweWsnAI714L0TvtCKZKJq+wKXEuRovK2s9vJ+XT4f3tg2GgB/Mz1ou7ronQ171hlVkNYQ
+	n6idaQqT7YMpJ9R+3V92JqIqZDlqlTGVSpwgG/u2s+vxR9ZrKf6AW6Mi+WrCONYYF9S+lsf+p9U
+	6xTDhuFO4MakT1VjRzvIIJ0iT6Nemr
+X-Received: by 2002:a17:90b:274d:b0:2d8:f0e2:96bc with SMTP id 98e67ed59e1d1-2dad4de1093mr22343359a91.4.1726026100061;
+        Tue, 10 Sep 2024 20:41:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHaDwp3Q0SLnWzKfVCgb9BODneaoPaF+zndWs3xBjNW61sf48WRFvCmYORhIvNKIq+tqmO6iMQDPRfKisgXoG8=
+X-Received: by 2002:a17:90b:274d:b0:2d8:f0e2:96bc with SMTP id
+ 98e67ed59e1d1-2dad4de1093mr22343332a91.4.1726026099534; Tue, 10 Sep 2024
+ 20:41:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240910004033.530313-1-willemdebruijn.kernel@gmail.com>
+ <CACGkMEsnPmbo8t6PbD8YsgKrZWHXG=Rz8ZwTDBJkSbmyzkNGSA@mail.gmail.com>
+ <66e05a2259919_9de00294f9@willemb.c.googlers.com.notmuch> <66e05d81c04fe_a00b829435@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66e05d81c04fe_a00b829435@willemb.c.googlers.com.notmuch>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 11 Sep 2024 11:41:28 +0800
+Message-ID: <CACGkMEt9NLqwLB-fyUi0qNW7ZKO2o7rgC1Y+=UTHw8eXf=Coqw@mail.gmail.com>
+Subject: Re: [PATCH net] net: tighten bad gso csum offset check in virtio_net_hdr
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	edumazet@google.com, pabeni@redhat.com, stable@vger.kernel.org, 
+	nsz@port70.net, mst@redhat.com, yury.khrustalev@arm.com, broonie@kernel.org, 
+	sudeep.holla@arm.com, Willem de Bruijn <willemb@google.com>, stable@vger.kernel.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add 3 test cases for skb dynptr used in tp_btf:
-- test_dynptr_skb_tp_btf: use skb dynptr in tp_btf and make sure it is
-  read-only.
-- skb_invalid_ctx_fentry/skb_invalid_ctx_fexit: bpf_dynptr_from_skb
-  should fail in fentry/fexit.
+On Tue, Sep 10, 2024 at 10:54=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Willem de Bruijn wrote:
+> > Jason Wang wrote:
+> > > On Tue, Sep 10, 2024 at 8:40=E2=80=AFAM Willem de Bruijn
+> > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > >
+> > > > From: Willem de Bruijn <willemb@google.com>
+> > > >
+> > > > The referenced commit drops bad input, but has false positives.
+> > > > Tighten the check to avoid these.
+> > > >
+> > > > The check detects illegal checksum offload requests, which produce
+> > > > csum_start/csum_off beyond end of packet after segmentation.
+> > > >
+> > > > But it is based on two incorrect assumptions:
+> > > >
+> > > > 1. virtio_net_hdr_to_skb with VIRTIO_NET_HDR_GSO_TCP[46] implies GS=
+O.
+> > > > True in callers that inject into the tx path, such as tap.
+> > > > But false in callers that inject into rx, like virtio-net.
+> > > > Here, the flags indicate GRO, and CHECKSUM_UNNECESSARY or
+> > > > CHECKSUM_NONE without VIRTIO_NET_HDR_F_NEEDS_CSUM is normal.
+> > > >
+> > > > 2. TSO requires checksum offload, i.e., ip_summed =3D=3D CHECKSUM_P=
+ARTIAL.
+> > > > False, as tcp[46]_gso_segment will fix up csum_start and offset for
+> > > > all other ip_summed by calling __tcp_v4_send_check.
+> > > >
+> > > > Because of 2, we can limit the scope of the fix to virtio_net_hdr
+> > > > that do try to set these fields, with a bogus value.
+> > > >
+> > > > Link: https://lore.kernel.org/netdev/20240909094527.GA3048202@port7=
+0.net/
+> > > > Fixes: 89add40066f9 ("net: drop bad gso csum_start and offset in vi=
+rtio_net_hdr")
+> > > > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > > > Cc: <stable@vger.kernel.net>
+> > > >
+> > > > ---
+> > > >
+> > > > Verified that the syzbot repro is still caught.
+> > > >
+> > > > An equivalent alternative would be to move the check for csum_offse=
+t
+> > > > to where the csum_start check is in segmentation:
+> > > >
+> > > > -    if (unlikely(skb_checksum_start(skb) !=3D skb_transport_header=
+(skb)))
+> > > > +    if (unlikely(skb_checksum_start(skb) !=3D skb_transport_header=
+(skb) ||
+> > > > +                 skb->csum_offset !=3D offsetof(struct tcphdr, che=
+ck)))
+> > > >
+> > > > Cleaner, but messier stable backport.
+> > > >
+> > > > We'll need an equivalent patch to this for VIRTIO_NET_HDR_GSO_UDP_L=
+4.
+> > > > But that csum_offset test was in a different commit, so different
+> > >
+> > > Not for this patch, but I see this in UDP_L4:
+> > >
+> > >                        if (!(hdr->flags & VIRTIO_NET_HDR_F_NEEDS_CSUM=
+))
+> > >                                return -EINVAL;
+> > >
+> > > This seems to forbid VIRTIO_NET_HDR_F_DATA_VALID. I wonder what's the
+> > > reason for doing this.
+> >
+> > It tests &, not =3D=3D ?
+>
+> Oh you mean as alternative, for receive of GRO from hypervisor.
 
-In test_dynptr_skb_tp_btf, to trigger the tracepoint in kfree_skb,
-test_pkt_access is used for its test_run, as in kfree_skb.c. Because the
-test process is different from others, a new setup type is defined,
-i.e., SETUP_SKB_PROG_TP.
+Or it could be a physical device that can do GRO HW.
 
-The result is like:
-$ ./test_progs -t 'dynptr/test_dynptr_skb_tp_btf'
-  #84/14   dynptr/test_dynptr_skb_tp_btf:OK
-  #84      dynptr:OK
-  #127     kfunc_dynptr_param:OK
-  Summary: 2/1 PASSED, 0 SKIPPED, 0 FAILED
+>
+> Yes, fair point.
+>
+> Then we also trust a privileged process over tun, like syzkaller.
+> When it comes to checksums, I suppose that is fine: it cannot harm
+> kernel integrity.
 
-$ ./test_progs -t 'dynptr/skb_invalid_ctx_f'
-  #84/85   dynptr/skb_invalid_ctx_fentry:OK
-  #84/86   dynptr/skb_invalid_ctx_fexit:OK
-  #84      dynptr:OK
-  #127     kfunc_dynptr_param:OK
-  Summary: 2/2 PASSED, 0 SKIPPED, 0 FAILED
+Yes.
 
-Also fix two coding style nits (change spaces to tabs).
+>
+> One missing piece is that TCP GSO will fix up non CHECKSUM_PARTIAL
+> skbs. UDP GSO does not have the same logic.
+>
 
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
----
- .../testing/selftests/bpf/prog_tests/dynptr.c | 36 +++++++++++++++++--
- .../testing/selftests/bpf/progs/dynptr_fail.c | 25 +++++++++++++
- .../selftests/bpf/progs/dynptr_success.c      | 23 ++++++++++++
- 3 files changed, 82 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/dynptr.c b/tools/testing/selftests/bpf/prog_tests/dynptr.c
-index 7cfac53c0d58d..ba40be8b1c4ef 100644
---- a/tools/testing/selftests/bpf/prog_tests/dynptr.c
-+++ b/tools/testing/selftests/bpf/prog_tests/dynptr.c
-@@ -9,6 +9,7 @@
- enum test_setup_type {
- 	SETUP_SYSCALL_SLEEP,
- 	SETUP_SKB_PROG,
-+	SETUP_SKB_PROG_TP,
- };
- 
- static struct {
-@@ -28,6 +29,7 @@ static struct {
- 	{"test_dynptr_clone", SETUP_SKB_PROG},
- 	{"test_dynptr_skb_no_buff", SETUP_SKB_PROG},
- 	{"test_dynptr_skb_strcmp", SETUP_SKB_PROG},
-+	{"test_dynptr_skb_tp_btf", SETUP_SKB_PROG_TP},
- };
- 
- static void verify_success(const char *prog_name, enum test_setup_type setup_type)
-@@ -35,7 +37,7 @@ static void verify_success(const char *prog_name, enum test_setup_type setup_typ
- 	struct dynptr_success *skel;
- 	struct bpf_program *prog;
- 	struct bpf_link *link;
--       int err;
-+	int err;
- 
- 	skel = dynptr_success__open();
- 	if (!ASSERT_OK_PTR(skel, "dynptr_success__open"))
-@@ -47,7 +49,7 @@ static void verify_success(const char *prog_name, enum test_setup_type setup_typ
- 	if (!ASSERT_OK_PTR(prog, "bpf_object__find_program_by_name"))
- 		goto cleanup;
- 
--       bpf_program__set_autoload(prog, true);
-+	bpf_program__set_autoload(prog, true);
- 
- 	err = dynptr_success__load(skel);
- 	if (!ASSERT_OK(err, "dynptr_success__load"))
-@@ -87,6 +89,36 @@ static void verify_success(const char *prog_name, enum test_setup_type setup_typ
- 
- 		break;
- 	}
-+	case SETUP_SKB_PROG_TP:
-+	{
-+		struct __sk_buff skb = {};
-+		struct bpf_object *obj;
-+		int aux_prog_fd;
-+
-+		/* Just use its test_run to trigger kfree_skb tracepoint */
-+		err = bpf_prog_test_load("./test_pkt_access.bpf.o", BPF_PROG_TYPE_SCHED_CLS,
-+					 &obj, &aux_prog_fd);
-+		if (!ASSERT_OK(err, "prog_load sched cls"))
-+			goto cleanup;
-+
-+		LIBBPF_OPTS(bpf_test_run_opts, topts,
-+			    .data_in = &pkt_v4,
-+			    .data_size_in = sizeof(pkt_v4),
-+			    .ctx_in = &skb,
-+			    .ctx_size_in = sizeof(skb),
-+		);
-+
-+		link = bpf_program__attach(prog);
-+		if (!ASSERT_OK_PTR(link, "bpf_program__attach"))
-+			goto cleanup;
-+
-+		err = bpf_prog_test_run_opts(aux_prog_fd, &topts);
-+
-+		if (!ASSERT_OK(err, "test_run"))
-+			goto cleanup;
-+
-+		break;
-+	}
- 	}
- 
- 	ASSERT_EQ(skel->bss->err, 0, "err");
-diff --git a/tools/testing/selftests/bpf/progs/dynptr_fail.c b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-index 68b8c6eca5083..8f36c9de75915 100644
---- a/tools/testing/selftests/bpf/progs/dynptr_fail.c
-+++ b/tools/testing/selftests/bpf/progs/dynptr_fail.c
-@@ -6,6 +6,7 @@
- #include <stdbool.h>
- #include <linux/bpf.h>
- #include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
- #include <linux/if_ether.h>
- #include "bpf_misc.h"
- #include "bpf_kfuncs.h"
-@@ -1254,6 +1255,30 @@ int skb_invalid_ctx(void *ctx)
- 	return 0;
- }
- 
-+SEC("fentry/skb_tx_error")
-+__failure __msg("must be referenced or trusted")
-+int BPF_PROG(skb_invalid_ctx_fentry, void *skb)
-+{
-+	struct bpf_dynptr ptr;
-+
-+	/* this should fail */
-+	bpf_dynptr_from_skb(skb, 0, &ptr);
-+
-+	return 0;
-+}
-+
-+SEC("fexit/skb_tx_error")
-+__failure __msg("must be referenced or trusted")
-+int BPF_PROG(skb_invalid_ctx_fexit, void *skb)
-+{
-+	struct bpf_dynptr ptr;
-+
-+	/* this should fail */
-+	bpf_dynptr_from_skb(skb, 0, &ptr);
-+
-+	return 0;
-+}
-+
- /* Reject writes to dynptr slot for uninit arg */
- SEC("?raw_tp")
- __failure __msg("potential write to dynptr at off=-16")
-diff --git a/tools/testing/selftests/bpf/progs/dynptr_success.c b/tools/testing/selftests/bpf/progs/dynptr_success.c
-index 5985920d162e7..bfcc85686cf04 100644
---- a/tools/testing/selftests/bpf/progs/dynptr_success.c
-+++ b/tools/testing/selftests/bpf/progs/dynptr_success.c
-@@ -5,6 +5,7 @@
- #include <stdbool.h>
- #include <linux/bpf.h>
- #include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
- #include "bpf_misc.h"
- #include "bpf_kfuncs.h"
- #include "errno.h"
-@@ -544,3 +545,25 @@ int test_dynptr_skb_strcmp(struct __sk_buff *skb)
- 
- 	return 1;
- }
-+
-+SEC("tp_btf/kfree_skb")
-+int BPF_PROG(test_dynptr_skb_tp_btf, void *skb, void *location)
-+{
-+	__u8 write_data[2] = {1, 2};
-+	struct bpf_dynptr ptr;
-+	int ret;
-+
-+	if (bpf_dynptr_from_skb(skb, 0, &ptr)) {
-+		err = 1;
-+		return 1;
-+	}
-+
-+	/* since tp_btf skbs are read only, writes should fail */
-+	ret = bpf_dynptr_write(&ptr, 0, write_data, sizeof(write_data), 0);
-+	if (ret != -EINVAL) {
-+		err = 2;
-+		return 1;
-+	}
-+
-+	return 1;
-+}
--- 
-2.32.0.3.g01195cf9f
+Thanks
 
 
