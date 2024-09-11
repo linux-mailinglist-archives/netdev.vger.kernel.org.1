@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-127591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8CA6975D37
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 00:30:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26781975D43
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 00:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F03DB24670
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:30:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8528B24C55
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BAC154C0B;
-	Wed, 11 Sep 2024 22:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD5261BC091;
+	Wed, 11 Sep 2024 22:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T09dSuDV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oz0KHvbz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9E7224CF;
-	Wed, 11 Sep 2024 22:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84FE51BC090;
+	Wed, 11 Sep 2024 22:30:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726093830; cv=none; b=XCq8s2MfDXS1Txki2kA3S5KpXtMO4OkSosWIoxaEIAHAG3Y7ISOIunWAXVFqo0F5WUCIgsSPR/1iySCQhNTkdpdhbBWrR19Qd10dBC46S132yAWxOP9yUBvE2D+JSx0ELumX2N6iIEuSgDbH5I5zERLQ2fzbpQCWE9lvyrpzgtI=
+	t=1726093845; cv=none; b=NS6MQjh/zLR6PnxjcTbv0gelgyMGwoNfJiD594mq1pJpwUMY5VEWi0Ris0zFiZg2FZ1DXhx2tqbyOC7MtEKnmKeX4B/rHogNeS90tMWahloD3YIwaZrb4JP00Rp7htV3enOCChoPglQ/osQ2LrtNXRW91MZg7a1T1tQ6ny9Lmqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726093830; c=relaxed/simple;
-	bh=9CY7jtiBhyePSX79v/9ohwRq9HgavX2rGlMwlGxscd0=;
+	s=arc-20240116; t=1726093845; c=relaxed/simple;
+	bh=+0RZQhXILzmEw8W3YzujBZf0t6vLdLC6oYp/GoPl910=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gJftPhebrXFbcQyYKsk/goN4n3aiki1+kJjLirbsjgzckVUgGTG/k4lnxn95PQlY44PAuvMMd3MGD1BoxfC5Ogio0vHoiV7JitpaiAVr4vrGsvReEj+PyKMBAVTGsw7GilwD/YFOBfVqDeiY6yoqrH8T3IM88sfrIObl9I+GUTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T09dSuDV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DE67C4CEC0;
-	Wed, 11 Sep 2024 22:30:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=aGJUfksQhCgv7pHg2k/4u1otR5T4evL2at7CRO6MOCwducETMMs9CiD+CeJfffWbLsNzuKv2DQf4g8qY57+7AINrjdughfEpCAjqUx7xtK1a1rgc+0G2J7qkhYoO/FYNV3cEkWiRVVG5lajA6mN2yB7zfFFQ9TUHH48PyCMv5Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oz0KHvbz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66BA3C4CECF;
+	Wed, 11 Sep 2024 22:30:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726093829;
-	bh=9CY7jtiBhyePSX79v/9ohwRq9HgavX2rGlMwlGxscd0=;
+	s=k20201202; t=1726093845;
+	bh=+0RZQhXILzmEw8W3YzujBZf0t6vLdLC6oYp/GoPl910=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=T09dSuDVfXTXLXyPX/PYSlJS8rQOJqPKUmkttN7s8u3oHDbkVQ+UZ+a/MjQHUxb1m
-	 4kmJUapHfZwGp7rnxo+fASXtisrz2Qus1BnysPIxZc1qtKKuF90EzUp3Dnj/MnqvAI
-	 IxKpQ8BXd0i4d4d0GXlT0+RIIjtyl4IwPiem3eYVC/AoCpkugMRp9EZ+aS9/QXfZZQ
-	 /JFM1jSgKg4BVozTUgWOgHKhGZWEqIb8QTYA7zmOYOtPGTtkPWUz57MpbGoWwwQ0Vd
-	 vaF8rfYo23jDH+3o+m/+0lZKMknDyP0aM1JBOJPHZZjPQ4xvo2XMiy4fnyiHnJvCoI
-	 d42Ij0O3OJCEQ==
+	b=oz0KHvbzJru83xqhtkk9xFFlx5NB+1NIP0HIUH35GNWs1E+db/vuxJPoVJ+FEEnY4
+	 cK1duUdu6XIXjzP+Xfi7ZJ0mdK660zD/aeyKLkpQ9GSCmlK0Ixo9jeMWcVU0NmpPfc
+	 eZAA2fc/hjBS6CpPxwmoDe0NsObbBvtvPBeyIOdaCo6ed877SDWLLfm78Bb4WAzLqt
+	 y9WdCbZ79L7NmgNaTo7HVkeu+RXL54SbV/bm7DZ8raHq5kYUThoIbw4Px/YtIjhjJY
+	 hUvexewI+qrzvT4gJk2MyhAMOBT+SCkOCKfpQ4fKEv74DPT3IZfo436Gz5ey1qw39I
+	 GMtG4Dagq45Xw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E373806656;
-	Wed, 11 Sep 2024 22:30:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCE73806656;
+	Wed, 11 Sep 2024 22:30:47 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] selftests: mptcp: misc. small fixes
+Subject: Re: pull-request: wireless-next-2024-09-11
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172609383002.1065358.12169361654383136843.git-patchwork-notify@kernel.org>
-Date: Wed, 11 Sep 2024 22:30:30 +0000
-References: <20240910-net-selftests-mptcp-fix-install-v1-0-8f124aa9156d@kernel.org>
-In-Reply-To: <20240910-net-selftests-mptcp-fix-install-v1-0-8f124aa9156d@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <172609384625.1065358.6518424528532813444.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Sep 2024 22:30:46 +0000
+References: <20240911084147.A205DC4AF0F@smtp.kernel.org>
+In-Reply-To: <20240911084147.A205DC4AF0F@smtp.kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This pull request was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 10 Sep 2024 21:06:35 +0200 you wrote:
-> Here are some various fixes for the MPTCP selftests.
+On Wed, 11 Sep 2024 08:41:47 +0000 (UTC) you wrote:
+> Hi,
 > 
-> Patch 1 fixes a recently modified test to continue to work as expected
-> on older kernels. This is a fix for a recent fix that can be backported
-> up to v5.15.
+> here's a pull request to net-next tree, more info below. Please let me know if
+> there are any problems.
 > 
-> Patch 2 and 3 include dependences when exporting or installing the
-> tests. Two fixes for v6.11-rc1.
+> Kalle
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] selftests: mptcp: join: restrict fullmesh endp on 1st sf
-    https://git.kernel.org/netdev/net/c/49ac6f05ace5
-  - [net,2/3] selftests: mptcp: include lib.sh file
-    https://git.kernel.org/netdev/net/c/1a5a2d19e827
-  - [net,3/3] selftests: mptcp: include net_helper.sh file
-    https://git.kernel.org/netdev/net/c/c66c08e51b55
+  - pull-request: wireless-next-2024-09-11
+    https://git.kernel.org/netdev/net-next/c/a18c097eda42
 
 You are awesome, thank you!
 -- 
