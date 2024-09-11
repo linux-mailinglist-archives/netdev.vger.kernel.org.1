@@ -1,106 +1,195 @@
-Return-Path: <netdev+bounces-127570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68C40975C15
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:58:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93B21975C50
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 23:15:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 297D8281BD3
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:58:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 221831F21D92
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 21:15:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B131F14A096;
-	Wed, 11 Sep 2024 20:58:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC5314389F;
+	Wed, 11 Sep 2024 21:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="icmHwbnI"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="HAkJNKQr"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A8E3D3B8
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:58:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2D1043144;
+	Wed, 11 Sep 2024 21:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726088288; cv=none; b=XB7fjS1YBoiXJZG/HDHWISenY5PRfDFFFkIvS/DP7DrKAn/BXa3RZVgNqieyxponD84fiX4NLE1ZC19FWIwcR+mc3cAae2GdjC544qw8FCXRt2W9QvzqBTJY09YL6ISXOZUBZKQA+q/m4G+eEh/ex0kx8YlC2KJtZoRr6xt2ji8=
+	t=1726089335; cv=none; b=m+gRSNyUZ9yZpzXnw+1aoMAJxbBnl409FZr79dRj+G4vLL/KPDkhiF3xCHzxj9Hos5pC7v2XmsP2xhmvdvhF6EirpB2EVhGVzvBQWw8yv3b9DzaqgO9gl5VOdguAu017nVrTINT0lL8Zwhp4yblUR4b8fGIBPKAa+9uR0jjTo9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726088288; c=relaxed/simple;
-	bh=WdHYhlDr0nrY/shpZl1gEvLt7eS4xQRdlHVaebsM+ec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J0saZVXlu4jcFwUbx9qGhOdJ/wSC07uy6Ii6szKtaTjUJ2ItgQQUE2PG2zsI0I8jrYabdbT34fNdaMvGgkfSOZInPPZ1ChwZ7Io5JhiaTC3wQPSzGnqDchNT+U9ocv7SvPlJ5NAwK5EpasPKOH4cLxkm6whC08BSRbZVdcMpjCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=icmHwbnI; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=smgOifiQdNUjpHBcg4tZ8DkBdEcwy5jVm7G1psfO4EI=; b=icmHwbnIfhqE7XBiPLngPjo7aG
-	ptZIu5rq1R9JLjAbFpLhc85XFV0pK4QAVK7nSa3njwxU9jRRR1De8f2q1Z8md7poCSQ3hjgGTExCC
-	Dh99mzCcoBoTDCQn0r8zxY0icvyc9sLPmJsMTDshk2KYyi35vmWpqKzhl53PPFS04/yk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1soUPa-007FhY-7e; Wed, 11 Sep 2024 22:58:02 +0200
-Date: Wed, 11 Sep 2024 22:58:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Hans-Frieder Vogt <hfdevel@gmx.net>
-Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 3/5] net: phy: aquantia: search for
- firmware-name in fwnode
-Message-ID: <0f811481-0976-4aec-a000-417d8b0a2a98@lunn.ch>
-References: <trinity-da86cb70-f227-403a-be94-6e6a3fd0a0ca-1726082854312@3c-app-gmx-bs04>
+	s=arc-20240116; t=1726089335; c=relaxed/simple;
+	bh=aiD4jhs3FNjaxej74Kkim9aO3yEkdJdFx125jZtqfoU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RHfKkE1mxYV3AHMx3G7Evw7zvuOEpT7ZmNP5+OE0FDdkK6WHjk+1M2osaQkIsudL5nGUuEBe5/vS7PFg8J4+p3uQk4EYjNLVy8S6ari2dr3DED92x3v5nqxyPYbZJRbxSI9Gh0DmMvhV4tM/u0R7vOiN/SlIqIuLXQwP/JE9tGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=HAkJNKQr; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=lMzcWWA+32JebC4lylEGT5XwBsI22pFn2wLTuzdXq00=; b=HAkJNKQr4KBd4s7PeQ9YfwGj8J
+	Rt6kDy/2CrPL+ismsJp3v4JlYm0IrH//fql/4W0288/eH3bgtguvBZfJjhiM/wz717LZBq/oZqOXc
+	ARhnAztLyp32QhHNjM+1t22UhnY8DwiUqT/BbvFqCMurcuYvSydBWf5deZM0vmlaRU1GVYqxv7Tbr
+	vfGLMbjT0zXvYkh4+hclqlp6MDmoQaXyYuRa1QH+h3XZnNLJrT/93dfvhWW45GMQDN+QQF8hJLGDY
+	13n9Bu4OEYZfZW8YFVrWKWygJ6vTyVdayYIPYMLpYUmn17caWovYDl5PNFLfLQphVZ640eLlumy5x
+	83eKsOYQ==;
+Received: from 55.249.197.178.dynamic.cust.swisscom.net ([178.197.249.55] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1soUgQ-000AhQ-R0; Wed, 11 Sep 2024 23:15:26 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf-next 2024-09-11
+Date: Wed, 11 Sep 2024 23:15:25 +0200
+Message-Id: <20240911211525.13834-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <trinity-da86cb70-f227-403a-be94-6e6a3fd0a0ca-1726082854312@3c-app-gmx-bs04>
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27395/Wed Sep 11 10:32:20 2024)
 
-On Wed, Sep 11, 2024 at 09:27:34PM +0200, Hans-Frieder Vogt wrote:
-> For loading of a firmware file over the filesystem, and
-> if the system is non-device-tree, try finding firmware-name from the software
-> node (or: fwnode) of the mdio device. This software node may have been
-> provided by the MAC or MDIO driver.
-> 
-> Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
-> ---
->  drivers/net/phy/aquantia/aquantia_firmware.c | 25 +++++++++++++++++++-
->  1 file changed, 24 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/phy/aquantia/aquantia_firmware.c b/drivers/net/phy/aquantia/aquantia_firmware.c
-> index 090fcc9a3413..f6154f815d72 100644
-> --- a/drivers/net/phy/aquantia/aquantia_firmware.c
-> +++ b/drivers/net/phy/aquantia/aquantia_firmware.c
-> @@ -324,14 +324,37 @@ static int aqr_firmware_load_nvmem(struct phy_device *phydev)
->  static int aqr_firmware_load_fs(struct phy_device *phydev)
->  {
->  	struct device *dev = &phydev->mdio.dev;
-> +	struct fwnode_handle *fw_node;
->  	const struct firmware *fw;
->  	const char *fw_name;
-> +	u32 phy_id;
->  	int ret;
-> 
->  	ret = of_property_read_string(dev->of_node, "firmware-name",
->  				      &fw_name);
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-Did you try just replacing this with:
+The following pull-request contains BPF updates for your *net-next* tree.
 
-    	ret = device_property_read_string(dev, "firmware-name", &fw_name);
+We've added 12 non-merge commits during the last 16 day(s) which contain
+a total of 20 files changed, 228 insertions(+), 30 deletions(-).
 
-As far as i understand, the device_property_ functions will look
-around in OF, ACPI and swnode to find the given property. As long as
-the MAC driver puts the property in the right place, i _think_ this
-will just work.
+There's a minor merge conflict in netkit driver, resolve as follows
+(https://lore.kernel.org/bpf/2444df33-cd03-a929-9ce8-3cf1376d3f78@iogearbox.net):
 
-	Andrew
+  	dev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+  	dev->priv_flags |= IFF_PHONY_HEADROOM;
+  	dev->priv_flags |= IFF_NO_QUEUE;
++ 	dev->priv_flags |= IFF_DISABLE_NETPOLL;
+ +	dev->lltx = true;
+  
+  	dev->ethtool_ops = &netkit_ethtool_ops;
+  	dev->netdev_ops  = &netkit_netdev_ops;
+
+The main changes are:
+
+1) Enable bpf_dynptr_from_skb for tp_btf such that this can be used to easily
+   parse skbs in BPF programs attached to tracepoints, from Philo Lu.
+
+2) Add a cond_resched() point in BPF's sock_hash_free() as there have been
+   several syzbot soft lockup reports recently, from Eric Dumazet.
+
+3) Fix xsk_buff_can_alloc() to account for queue_empty_descs which got noticed
+   when zero copy ice driver started to use it, from Maciej Fijalkowski.
+
+4) Move the xdp:xdp_cpumap_kthread tracepoint before cpumap pushes skbs up via
+   netif_receive_skb_list() to better measure latencies, from Daniel Xu.
+
+5) Follow-up to disable netpoll support from netkit, from Daniel Borkmann.
+
+6) Improve xsk selftests to not assume a fixed MAX_SKB_FRAGS of 17 but instead
+   gather the actual value via /proc/sys/net/core/max_skb_frags, also from
+   Maciej Fijalkowski.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Breno Leitao, Cong Wang, Jakub Kicinski, Jakub Sitnicki, Jesper Dangaard 
+Brouer, John Fastabend, Magnus Karlsson, Martin KaFai Lau, Nikolay 
+Aleksandrov, Stanislav Fomichev, syzbot
+
+----------------------------------------------------------------
+
+The following changes since commit f8fdda9e4f988c210b1e4519a28ddbf7d29b0038:
+
+  Merge branch 'tc-adjust-network-header-after-2nd-vlan-push' (2024-08-27 11:37:46 +0200)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to b1339be951ad31947ae19bc25cb08769bf255100:
+
+  sock_map: Add a cond_resched() in sock_hash_free() (2024-09-11 22:16:04 +0200)
+
+----------------------------------------------------------------
+bpf-next-for-netdev
+
+----------------------------------------------------------------
+Daniel Borkmann (1):
+      netkit: Disable netpoll support
+
+Daniel Xu (1):
+      bpf, cpumap: Move xdp:xdp_cpumap_kthread tracepoint before rcv
+
+Eric Dumazet (1):
+      sock_map: Add a cond_resched() in sock_hash_free()
+
+Maciej Fijalkowski (2):
+      xsk: Bump xsk_queue::queue_empty_descs in xp_can_alloc()
+      selftests/xsk: Read current MAX_SKB_FRAGS from sysctl knob
+
+Martin KaFai Lau (1):
+      Merge branch 'bpf: Allow skb dynptr for tp_btf'
+
+Philo Lu (5):
+      bpf: Support __nullable argument suffix for tp_btf
+      selftests/bpf: Add test for __nullable suffix in tp_btf
+      tcp: Use skb__nullable in trace_tcp_send_reset
+      bpf: Allow bpf_dynptr_from_skb() for tp_btf
+      selftests/bpf: Expand skb dynptr selftests for tp_btf
+
+Simon Horman (1):
+      bpf, sockmap: Correct spelling skmsg.c
+
+Yaxin Chen (1):
+      tcp_bpf: Remove an unused parameter for bpf_tcp_ingress()
+
+ drivers/net/netkit.c                               |  1 +
+ include/trace/events/tcp.h                         | 12 +++---
+ kernel/bpf/btf.c                                   |  3 ++
+ kernel/bpf/cpumap.c                                |  6 ++-
+ kernel/bpf/verifier.c                              | 36 ++++++++++++++++--
+ net/core/filter.c                                  |  3 +-
+ net/core/skmsg.c                                   |  2 +-
+ net/core/sock_map.c                                |  1 +
+ net/ipv4/tcp_bpf.c                                 |  4 +-
+ net/xdp/xsk_buff_pool.c                            | 10 ++++-
+ net/xdp/xsk_queue.h                                |  5 ---
+ .../selftests/bpf/bpf_testmod/bpf_testmod-events.h |  6 +++
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c        |  2 +
+ tools/testing/selftests/bpf/prog_tests/dynptr.c    | 37 ++++++++++++++++++-
+ .../selftests/bpf/prog_tests/tp_btf_nullable.c     | 14 +++++++
+ tools/testing/selftests/bpf/progs/dynptr_fail.c    | 25 +++++++++++++
+ tools/testing/selftests/bpf/progs/dynptr_success.c | 23 ++++++++++++
+ .../selftests/bpf/progs/test_tp_btf_nullable.c     | 24 ++++++++++++
+ tools/testing/selftests/bpf/xskxceiver.c           | 43 +++++++++++++++++++---
+ tools/testing/selftests/bpf/xskxceiver.h           |  1 -
+ 20 files changed, 228 insertions(+), 30 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/tp_btf_nullable.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_tp_btf_nullable.c
 
