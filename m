@@ -1,172 +1,166 @@
-Return-Path: <netdev+bounces-127259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 412C5974C6D
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:20:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC61F974C75
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 10:21:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B1A68B259DD
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 08:20:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F7EF2837A4
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 08:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24C901714B9;
-	Wed, 11 Sep 2024 08:18:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D832C153837;
+	Wed, 11 Sep 2024 08:20:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E19313BC26
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 08:18:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1537F13C3F6;
+	Wed, 11 Sep 2024 08:19:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726042709; cv=none; b=dPCXruJUkBHvW/0aqvtSRDjFEF51SdO19dc1muS3EExyKh18vokx97QG9mGHhWAtfAF7YLlBR+OhY2M8/X6E12FHDCuOesxID/tdbXk16v7zI6uRG6Q4eYBD2LQa6AvcSs+qjiM+NucAwdmqx4lqd6+z4UtlLIYM1B2aicpD53Y=
+	t=1726042803; cv=none; b=CPCxH6OG+j9aSSTEDUHbGY5QY9o8gBzw71vwQ3M0IMoSrxUA/7n7qIGDDa9WHyhJislmjRzW3jIETF8Yz3453qAO5X1n5sYPTNil9ujcOqpQ2XJJP+SBSRb3jXIEjeRVuvL3XF7JhHJw69ZAs7oF3B8y98JNnpY5vvo/Os6W/9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726042709; c=relaxed/simple;
-	bh=S3pm95ToL3JHQkbqiOGpkw8FdP37yZ6JFOgmrb7/W8g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GSj7xIY248wXF0Tm3/JsBV61CcQXG7ix1ZDh/kuC5kfMbDpq8jiwGljYpcGhFmwIwKDYIGvOMly3+P7AgQ+rAIxthC/0USuqaXSg/efF7I96xSlUqo6Jq14Ty4t8IvjQM4GBaqaFNpmT3Gxjuho73nRMQ6TH/N9nPUhgdJvpNOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1soIYB-0006va-8T; Wed, 11 Sep 2024 10:18:07 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1soIY9-0075kf-Kg; Wed, 11 Sep 2024 10:18:05 +0200
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 49B393380B1;
-	Wed, 11 Sep 2024 08:18:05 +0000 (UTC)
-Date: Wed, 11 Sep 2024 10:18:04 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, kernel@pengutronix.de, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Heiko Stuebner <heiko@sntech.de>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-rockchip@lists.infradead.org, llvm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH] can: rockchip_canfd: fix return type of
- rkcanfd_start_xmit()
-Message-ID: <20240911-quirky-wandering-mastodon-fea5b3-mkl@pengutronix.de>
-References: <20240906-rockchip-canfd-wifpts-v1-1-b1398da865b7@kernel.org>
- <20240909084448.GU2097826@kernel.org>
- <20240909-arcane-practical-petrel-015d24-mkl@pengutronix.de>
- <20240909143546.GX2097826@kernel.org>
- <20240910-utopian-meticulous-dodo-4ec230-mkl@pengutronix.de>
- <20240910190525.GA1169362@thelio-3990X>
+	s=arc-20240116; t=1726042803; c=relaxed/simple;
+	bh=9VMUszZaeIWHmM4Y7Yv+ayb1ZPtSphTJzQLaaR82afY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=AOXUkMbiQQUy8r8gf5nfRRkWOsLnTtOn6aJu8VANBcxDAhiSOe06Oz7YwCAvar541g4ofd3g3UaPAH4lhfhipoa2vJuSfhGK/lbANDv1l6rBLtY1mGr4f+tsJ2IZhm+0CWNnKmlUbdMbhLx1OItN2CbmZeWyGrVD4Np/n1wVYpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4X3YPP43VczyQrr;
+	Wed, 11 Sep 2024 16:18:49 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4C2EE18006C;
+	Wed, 11 Sep 2024 16:19:56 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 11 Sep 2024 16:19:52 +0800
+Message-ID: <fd6ef478-4d0b-03f2-78f6-8bfd0fc3a846@huawei-partners.com>
+Date: Wed, 11 Sep 2024 11:19:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="rzg4bxks4bvdsike"
-Content-Disposition: inline
-In-Reply-To: <20240910190525.GA1169362@thelio-3990X>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 06/19] selftests/landlock: Test adding a rule for
+ unhandled access
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-7-ivanov.mikhail1@huawei-partners.com>
+ <ZuAP8iSv_sjmlYIp@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZuAP8iSv_sjmlYIp@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
+On 9/10/2024 12:22 PM, Günther Noack wrote:
+> Hi!
+> 
+> On Wed, Sep 04, 2024 at 06:48:11PM +0800, Mikhail Ivanov wrote:
+>> Add test that validates behaviour of Landlock after rule with
+>> unhandled access is added.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>> Changes since v2:
+>> * Replaces EXPECT_EQ with ASSERT_EQ for close().
+>> * Refactors commit title and message.
+>>
+>> Changes since v1:
+>> * Refactors commit message.
+>> ---
+>>   .../testing/selftests/landlock/socket_test.c  | 33 +++++++++++++++++++
+>>   1 file changed, 33 insertions(+)
+>>
+>> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
+>> index 811bdaa95a7a..d2fedfca7193 100644
+>> --- a/tools/testing/selftests/landlock/socket_test.c
+>> +++ b/tools/testing/selftests/landlock/socket_test.c
+>> @@ -351,4 +351,37 @@ TEST_F(protocol, rule_with_unknown_access)
+>>   	ASSERT_EQ(0, close(ruleset_fd));
+>>   }
+>>   
+>> +TEST_F(protocol, rule_with_unhandled_access)
+>> +{
+>> +	struct landlock_ruleset_attr ruleset_attr = {
+>> +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> +	};
+>> +	struct landlock_socket_attr protocol = {
+>> +		.family = self->prot.family,
+>> +		.type = self->prot.type,
+>> +	};
+>> +	int ruleset_fd;
+>> +	__u64 access;
+>> +
+>> +	ruleset_fd =
+>> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+>> +	ASSERT_LE(0, ruleset_fd);
+>> +
+>> +	for (access = 1; access > 0; access <<= 1) {
+>> +		int err;
+>> +
+>> +		protocol.allowed_access = access;
+>> +		err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
+>> +					&protocol, 0);
+>> +		if (access == ruleset_attr.handled_access_socket) {
+>> +			EXPECT_EQ(0, err);
+>> +		} else {
+>> +			EXPECT_EQ(-1, err);
+>> +			EXPECT_EQ(EINVAL, errno);
+>> +		}
+>> +	}
+>> +
+>> +	ASSERT_EQ(0, close(ruleset_fd));
+>> +}
+>> +
+> 
+> I should probably have noticed this on the first review round; you are not
+> actually exercising any scenario here where a rule with unhandled access is
+> added.
+> 
+> To clarify, the notion of an access right being "unhandled" means that the
+> access right was not listed at ruleset creation time in the ruleset_attr's
+> .handled_access_* field where it would have belonged.  If that is the case,
+> adding a ruleset with that access right is going to be denied.
+> 
+> As an example:
+> If the ruleset only handles LANDLOCK_ACCESS_FS_WRITE_FILE and nothing else,
+> then, if the test tries to insert a rule for LANDLOCK_ACCESS_SOCKET_CREATE,
+> that call is supposed to fail -- because the "socket creation" access right is
+> not handled.
 
---rzg4bxks4bvdsike
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This test was added to exercise adding a rule with future possible
+"unhandled" access rights of "socket" type, but since this patch
+implements only one, this test is really meaningless. Thank you for
+this note!
 
-On 10.09.2024 12:05:25, Nathan Chancellor wrote:
-> > I was a bit hasty yesterday, clang-20 and W=3D1 produces these errors:
-> >=20
-> > | include/linux/vmstat.h:517:36: error: arithmetic between different en=
-umeration types ('enum node_stat_item' and 'enum lru_list') [-Werror,-Wenum=
--enum-conversion]
-> > |   517 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip=
- "nr_"
-> > |       |                               ~~~~~~~~~~~ ^ ~~~
-> > | 1 error generated.
->=20
-> Unfortunately, this is a completely tangential issue. You can see some
-> backstory behind it in commit 75b5ab134bb5 ("kbuild: Move
-> -Wenum-{compare-conditional,enum-conversion} into W=3D1"). To be honest, I
-> should consider moving that to W=3D2...
+> 
+> IMHO the test would become more reasonable if it was more clearly "handling"
+> something entirely unrelated at ruleset creation time, e.g. one of the file
+> system access rights.  (And we could do the same for the "net" and "fs" tests as
+> well.)
+> 
+> Your test is a copy of the same test for the "net" rights, which in turn is a
+> copy of teh same test for the "fs" rights.  When the "fs" test was written, the
+> "fs" access rights were the only ones that could be used at all to create a
+> ruleset, but this is not true any more.
 
-Thanks for the background info. I wanted to point out that at least
-clang-20 with W=3D1 finds _something_, though not that what I wanted to
-reproduce :)
+Good idea! Can I implement such test in the current patchset?
 
-> > However I fail to reproduce the ndo_start_xmit problem. Even with 18.1.8
-> > from kernel.org.
-> >=20
-> >=20
-> > The following command (ARCH is unset, compiling x86 -> x86) produces the
-> > above shown "vmstat.h" problems....
-> >=20
-> > | $ make LLVM=3D1 LLVM_IAS=3D1 LLVM_SUFFIX=3D-20 drivers/net/can/rockch=
-ip/  W=3D1 CONFIG_WERROR=3D0
->=20
-> FYI, you could shorten this to just:
->=20
->   $ make LLVM=3D-20 drivers/net/can/rockchip/ W=3D1 CONFIG_WERROR=3D0
->=20
-> As LLVM_SUFFIX will be set through LLVM and LLVM_IAS has defaulted to 1
-> since 5.15.
-
-Thanks, scripts updated :)
-
-> Does CONFIG_WERROR=3D0 work? It seems like it is still present above.
-
-Yes, it works.
-
-> > ... but not the ndo_start_xmit problem.
-> >=20
-> > Am I missing a vital .config option?
->=20
-> No, I might not have made it clear in this commit message but this
-> warning is not on by default. I am looking to turn it on at some point
-> so I keep up with the warnings that it produces but there is one
-> subsystem that has several instances and I am unsure of how to solve
-> them to the maintainer's satisfaction. You can test it by adding
->=20
->   KCFLAGS=3D-Wincompatible-function-pointer-types-strict
->=20
-> to your make command above and it should reproduce.
-
-That was the missing link. Can reproduce now, thanks!
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---rzg4bxks4bvdsike
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbhUjkACgkQKDiiPnot
-vG/tHQf+NTtvl9Ppp0bGbHnkqrViW25ecpIjPSkKou/0aP23Rr+N4EsbvqwAoDOK
-QTzEW6pIIPog26QQx66TpvOVFKnqECRugjegrzVlaozWMJn0RT9RO2jw8ezmi1qJ
-A+hF6ivY4IgKdIM21ojVnM0tgLQWC2YILXtmibZEgUcU6tCCSt0W1XiVLWn7tA8Z
-vJkNKxWoVnHMAn9a1N9A+miYLHrFGLKb5Wy0oxWUokGQ0eXWhhWWet1DmudjEgQz
-8rShcLAf7Ew0uB+ziNkrdJhcNviEU/PeFx54/Q28Rnp3fH+ZxReqke9nLH363wLA
-TVpVWiK1iygrjmRr+gWrZdlarnd2mQ==
-=O5L3
------END PGP SIGNATURE-----
-
---rzg4bxks4bvdsike--
+> 
+> —Günther
 
