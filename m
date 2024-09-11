@@ -1,250 +1,328 @@
-Return-Path: <netdev+bounces-127292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E10A974E43
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:15:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D58F974E4F
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:15:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A26111F25A9C
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 09:15:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2B371C26A4C
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 09:15:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B014717C7CA;
-	Wed, 11 Sep 2024 09:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C9DE18593A;
+	Wed, 11 Sep 2024 09:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Bwm6rY/x"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f41SzjDf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F0517E8EA
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 09:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5AE183CB8;
+	Wed, 11 Sep 2024 09:14:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726046042; cv=none; b=XuiKh0CvXAvkrAEvFEOMIbZFPEwF43nqfsxaCQxCzbB5k0x3IL6CV0xQH1wWPnhdqFLjVqt30aupNXX/ky2Skl5SCFdiAic8U42H4L73OMfCWar3sauhU6AV9N7lsZO9ubHfZw5etkWnzN18JFuCdXhlsx6MoTm8FW50etm8/gY=
+	t=1726046074; cv=none; b=oX5jP0obtWTZzd4i6QXVohnkfgcA6LM0RcKPHWJeMh/8PlHPPBLF34pLvrW+ZltSA+i5mZb+sjJCSdVtRkiJMi2cCfozb92oX6d82QDpCSPysgWFmaNGWpUB5vfhz2JCcaAMAPh58IGPhoRu7XlLX/N6o9b0BVwllUCBDClnAxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726046042; c=relaxed/simple;
-	bh=YDwaWUAbkmap2GF4/sQXZDU1oxmzAxgjzqggD9Yyw3A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sHB3J+El8P9A7SKSahlmHRGF3b+q4kNXGEzrxpx9LXRLtGPYiOIYxft7FRoTTVTvLHjCWGHraGCtNX9RtP2s29vFOvdCx/aTWGs4y7CSf/LCEGbOf71w2ydLa8jIdU1EeviBymbI5MxyJUv5zoUt7hqvdc4rJwmqnoSEXDOI+M0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Bwm6rY/x; arc=none smtp.client-ip=67.231.153.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 48B6PgL6011391;
-	Wed, 11 Sep 2024 02:13:51 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=3EkngEYNZGZAOssLAttCy2MgOyfhoZFiMl/mDaX4HGQ=; b=
-	Bwm6rY/xOeGPMNXYZkr3/jx/+Gx+Wgeq81AjB1yy99ET3Ni5BL6beKgA0c9PUsOn
-	Y/fXv8bzggH9TeuBSEBtQkyk5qfhdYoem0VB7s0kDNuPmtNAyymr4llPR+gtFKve
-	5kcWKqF4gcZ5jmoStFlVpTmAUFQKzEOZ2F1WU34QuJdsSaIhj992zn0bTor0GMVU
-	RzY+Nbvauyi6RHk3+XeifLoDhZwINugJ28lHqoGke+2s1azNUzBFx/Q8XdAdnYe9
-	JyL/DjAz77qUFxulxDywwvU0ua3YJuKOZj+wSCFt6ojXPv9ppXoniNGbhCpKLBEr
-	3gbRDrliJuSlPUX0GfrfKA==
-Received: from mail.thefacebook.com ([163.114.134.16])
-	by m0001303.ppops.net (PPS) with ESMTPS id 41k44nh3cb-4
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 11 Sep 2024 02:13:51 -0700 (PDT)
-Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::150d) by
- mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server id
- 15.2.1544.11; Wed, 11 Sep 2024 09:13:48 +0000
-From: Vadim Fedorenko <vadfed@meta.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-        Willem de Bruijn
-	<willemb@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>,
-        David Ahern <dsahern@kernel.org>,
-        Jason Xing
-	<kerneljasonxing@gmail.com>,
-        Simon Horman <horms@kernel.org>
-CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next v5 3/3] selftests: txtimestamp: add SCM_TS_OPT_ID test
-Date: Wed, 11 Sep 2024 02:13:33 -0700
-Message-ID: <20240911091333.1870071-4-vadfed@meta.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20240911091333.1870071-1-vadfed@meta.com>
-References: <20240911091333.1870071-1-vadfed@meta.com>
+	s=arc-20240116; t=1726046074; c=relaxed/simple;
+	bh=k63Xb5JdFWNvwvex9LRCUWIaHk8AWqg543ojPWu+5uQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OeyqZ9C5RfLaWbyOQQjF1cgPQt2uQC0UgbFeCKwvOUWsXsgURSqKsJOeo6UnsAlhf3eMnyQNeMRaY6rv6CekjDKspOSDATsfCim27ZLRB4n/9LtM5pl/xafvKr89kdMyZpZ7TZzYbPIjlgp4VcxIgtG6vYcRYg/Fux4n0D+XRSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f41SzjDf; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c3c30e663fso2113494a12.1;
+        Wed, 11 Sep 2024 02:14:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726046069; x=1726650869; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=J4m6whvAlloaXv0IhhihhHg3Z82jfxR5j2mp47TZX3g=;
+        b=f41SzjDftKjVUr8y5T9IJvebKgEXEpYdE1JqSkkeK5ZuWIM/JnGx/3hSAChhtrpypL
+         kzDIhYuz8YZmwv80JFYSSU1ZImFF7/Gz9G+Vm0EccqObcJQo9hI3RAyv6aEVNn0GGTmX
+         vv9RPvSBrll/V4OPbsItCI/r2/JsSn67EvrmL74/dhB6V9AVgqkohWoDw0LJrLCm9TBK
+         APtQwo0cs6L3IIGv9djbxp+W0X2y23svs22ko00ETQeHY+yVlOR414cpttw9IyqWGvX5
+         gpYVhLrQdG16ZxYQ026hsxxqnjxhnqs9On+DtxM3q9uYhaMYkoLToKq7iwElSwuRnOnl
+         S+Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726046070; x=1726650870;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J4m6whvAlloaXv0IhhihhHg3Z82jfxR5j2mp47TZX3g=;
+        b=cZid42bmlSUNVfXHrvLi3uJ9vKoShoj396Y16kVGvpOTE4a5eRxJcHvKszlp+iYRLp
+         fqdqA7sjGlD8IXlE5uoWJRLz4Es0qWQsjy/GTprtu+0gkjy9XcL2TFRQctpmSciKD3qS
+         Z286AiXaGGfBiJKdBGQ59oQ3t085RPhQoV2AMmy5itRcUoQJG1fH4OhuagNM+fwZeAvY
+         x346FWlcoUTCR5zroZGxm1UH0aztrPz/rEMlCCp94Ba4/yRRLifwrjGEZ9YsyW59Txw6
+         w5wPTWAwmZB+FSoMyudMaIYiq/mujnu/TAVMmBJu7W61ukZuMmW27Sw4OjfpJbkMPoNw
+         NEVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW0VxIDrX1CFn5TagyBQQIqv1nZEcmhQVbahP3GiBHrKjzkiRWUXpcbuyJRIprN+C3Ee5vCVvEB@vger.kernel.org, AJvYcCXXwqEMeY62C8T4c02O3Jv9EDWEoXMFFzgL8bQLEtl+97QBFllsu13FlwV2ycKYvTDaqwFahpCBF3j4iZ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1yZJAXgdbMqhDLMPALwC/+PEh4yLOl72U4saDGgI1JgnBeme7
+	sbOt4ICsgxsg0VwICMom2puoXIIWLbL1l3ipI/Qp22L2clHpC2MO
+X-Google-Smtp-Source: AGHT+IGLso4CDdytxsKCOsVdY2doq/i6PZ+8fpyqNyawtoyXgd+r0IxTmH5OALSWPHhZqCYKmtDDqw==
+X-Received: by 2002:a17:907:25c6:b0:a8d:3b04:29db with SMTP id a640c23a62f3a-a90048c7949mr266336466b.39.1726046068889;
+        Wed, 11 Sep 2024 02:14:28 -0700 (PDT)
+Received: from ?IPV6:2a01:c23:c1da:1f00:388c:fb65:b9fd:94c3? (dynamic-2a01-0c23-c1da-1f00-388c-fb65-b9fd-94c3.c23.pool.telefonica.de. [2a01:c23:c1da:1f00:388c:fb65:b9fd:94c3])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a8d25d63bebsm589190066b.207.2024.09.11.02.14.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Sep 2024 02:14:28 -0700 (PDT)
+Message-ID: <1f8c55ea-4995-4879-9505-8f80fcf67e67@gmail.com>
+Date: Wed, 11 Sep 2024 11:14:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] r8169: correct the reset timing of RTL8125 for
+ link-change event
+To: En-Wei WU <en-wei.wu@canonical.com>
+Cc: nic_swsd@realtek.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kuan-ying.lee@canonical.com,
+ kai.heng.feng@canonical.com, me@lagy.org
+References: <20240906083539.154019-1-en-wei.wu@canonical.com>
+ <8707a2c6-644d-4ccd-989f-1fb66c48d34a@gmail.com>
+ <CAMqyJG0FcY0hymX6xyZwiWbD8zdsYwWG7GMu2zcL9-bMkq-pMw@mail.gmail.com>
+ <038166f4-9c47-4017-9543-4b4a5ca503f5@gmail.com>
+ <CAMqyJG0-35Phq1i3XkTyJfjzk07BNuOvPyDpdbFECzbEPHp_ig@mail.gmail.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <CAMqyJG0-35Phq1i3XkTyJfjzk07BNuOvPyDpdbFECzbEPHp_ig@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: KA6QgL8JOKDVaOUi_iuPF2fpFttUzVdK
-X-Proofpoint-GUID: KA6QgL8JOKDVaOUi_iuPF2fpFttUzVdK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-10_12,2024-09-09_02,2024-09-02_01
 
-Extend txtimestamp test to run with fixed tskey using
-SCM_TS_OPT_ID control message for all types of sockets.
+On 11.09.2024 09:01, En-Wei WU wrote:
+>> What is the link partner in your case?
+> My link partner is FS S3900-48T4S switch.
+> 
+>>  If you put a simple switch in between, does this help?
+> I just put a simple D-link switch in between with the original kernel,
+> the issue remains (re-plugging it after 3 seconds).
+> 
+>> It makes more the impression that after 3s of link-down the chip (PHY?)
+>> transitions to a mode where it doesn't wake up after re-plugging the cable.
+> I've done a ftrace on the r8169.ko and the phy driver (realtek.ko),
+> and I found that the phy did wake up:
+> 
+>    kworker/u40:4-267   [003]   297.026314: funcgraph_entry:
+>        |      phy_link_change() {
+> 3533    kworker/u40:4-267   [003]   297.026315: funcgraph_entry:
+>  6.704 us   |        netif_carrier_on();
+> 3534    kworker/u40:4-267   [003]   297.026322: funcgraph_entry:
+>             |        r8169_phylink_handler() {
+> 3535    kworker/u40:4-267   [003]   297.026322: funcgraph_entry:
+>  0.257 us   |          rtl_link_chg_patch();
+> 3536    kworker/u40:4-267   [003]   297.026324: funcgraph_entry:
+>  4.026 us   |          netif_tx_wake_queue();
+> 3537    kworker/u40:4-267   [003]   297.026328: funcgraph_entry:
+>             |          phy_print_status() {
+> 3538    kworker/u40:4-267   [003]   297.026329: funcgraph_entry:
+>  0.245 us   |            phy_duplex_to_str();
+> 3539    kworker/u40:4-267   [003]   297.026329: funcgraph_entry:
+>  0.240 us   |            phy_speed_to_str();
+> 3540    kworker/u40:4-267   [003]   297.026329: funcgraph_entry:
+> + 12.798 us  |            netdev_info();
+> 3541    kworker/u40:4-267   [003]   297.026343: funcgraph_exit:
+> + 14.385 us  |          }
+> 3542    kworker/u40:4-267   [003]   297.026343: funcgraph_exit:
+> + 21.217 us  |        }
+> 3543    kworker/u40:4-267   [003]   297.026343: funcgraph_exit:
+> + 28.785 us  |      }
+> 
+> So I doubt that the issue isn't necessarily related to the ALDPS,
+> because the PHY seems to have woken up.
+> 
+> After looking at the reset function (plus the TX queue issue
+> previously reported by the user) , I'm wondering if the problem is
+> related to DMA:
+> static void rtl_reset_work(struct rtl8169_private *tp) {
+>     ....
+>     for (i = 0; i < NUM_RX_DESC; i++)
+>          rtl8169_mark_to_asic(tp->RxDescArray + i);
+>     ....
+> }
+> 
+Thanks for re-testing. I don't think it's something on the MAC side.
+For the MAC it should make no difference whether the reset is done
+during link-down or after link-up. Therefore I believe it's something
+on the PHY side.
+Also wrt ALDPS: Do you have the firmware for the NIC loaded?
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
----
- tools/include/uapi/asm-generic/socket.h    |  2 +
- tools/testing/selftests/net/txtimestamp.c  | 44 +++++++++++++++++-----
- tools/testing/selftests/net/txtimestamp.sh | 12 +++---
- 3 files changed, 43 insertions(+), 15 deletions(-)
-
-diff --git a/tools/include/uapi/asm-generic/socket.h b/tools/include/uapi/asm-generic/socket.h
-index 54d9c8bf7c55..281df9139d2b 100644
---- a/tools/include/uapi/asm-generic/socket.h
-+++ b/tools/include/uapi/asm-generic/socket.h
-@@ -124,6 +124,8 @@
- #define SO_PASSPIDFD		76
- #define SO_PEERPIDFD		77
- 
-+#define SCM_TS_OPT_ID		78
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
-diff --git a/tools/testing/selftests/net/txtimestamp.c b/tools/testing/selftests/net/txtimestamp.c
-index d626f22f9550..dae91eb97d69 100644
---- a/tools/testing/selftests/net/txtimestamp.c
-+++ b/tools/testing/selftests/net/txtimestamp.c
-@@ -77,6 +77,8 @@ static bool cfg_epollet;
- static bool cfg_do_listen;
- static uint16_t dest_port = 9000;
- static bool cfg_print_nsec;
-+static uint32_t ts_opt_id;
-+static bool cfg_use_cmsg_opt_id;
- 
- static struct sockaddr_in daddr;
- static struct sockaddr_in6 daddr6;
-@@ -136,12 +138,13 @@ static void validate_key(int tskey, int tstype)
- 	/* compare key for each subsequent request
- 	 * must only test for one type, the first one requested
- 	 */
--	if (saved_tskey == -1)
-+	if (saved_tskey == -1 || cfg_use_cmsg_opt_id)
- 		saved_tskey_type = tstype;
- 	else if (saved_tskey_type != tstype)
- 		return;
- 
- 	stepsize = cfg_proto == SOCK_STREAM ? cfg_payload_len : 1;
-+	stepsize = cfg_use_cmsg_opt_id ? 0 : stepsize;
- 	if (tskey != saved_tskey + stepsize) {
- 		fprintf(stderr, "ERROR: key %d, expected %d\n",
- 				tskey, saved_tskey + stepsize);
-@@ -484,7 +487,7 @@ static void fill_header_udp(void *p, bool is_ipv4)
- 
- static void do_test(int family, unsigned int report_opt)
- {
--	char control[CMSG_SPACE(sizeof(uint32_t))];
-+	char control[2 * CMSG_SPACE(sizeof(uint32_t))];
- 	struct sockaddr_ll laddr;
- 	unsigned int sock_opt;
- 	struct cmsghdr *cmsg;
-@@ -624,18 +627,32 @@ static void do_test(int family, unsigned int report_opt)
- 		msg.msg_iov = &iov;
- 		msg.msg_iovlen = 1;
- 
--		if (cfg_use_cmsg) {
-+		if (cfg_use_cmsg || cfg_use_cmsg_opt_id) {
- 			memset(control, 0, sizeof(control));
- 
- 			msg.msg_control = control;
--			msg.msg_controllen = sizeof(control);
-+			msg.msg_controllen = cfg_use_cmsg * CMSG_SPACE(sizeof(uint32_t));
-+			msg.msg_controllen += cfg_use_cmsg_opt_id * CMSG_SPACE(sizeof(uint32_t));
- 
--			cmsg = CMSG_FIRSTHDR(&msg);
--			cmsg->cmsg_level = SOL_SOCKET;
--			cmsg->cmsg_type = SO_TIMESTAMPING;
--			cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+			cmsg = NULL;
-+			if (cfg_use_cmsg) {
-+				cmsg = CMSG_FIRSTHDR(&msg);
-+				cmsg->cmsg_level = SOL_SOCKET;
-+				cmsg->cmsg_type = SO_TIMESTAMPING;
-+				cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+
-+				*((uint32_t *)CMSG_DATA(cmsg)) = report_opt;
-+			}
-+			if (cfg_use_cmsg_opt_id) {
-+				cmsg = cmsg ? CMSG_NXTHDR(&msg, cmsg) : CMSG_FIRSTHDR(&msg);
-+				cmsg->cmsg_level = SOL_SOCKET;
-+				cmsg->cmsg_type = SCM_TS_OPT_ID;
-+				cmsg->cmsg_len = CMSG_LEN(sizeof(uint32_t));
-+
-+				*((uint32_t *)CMSG_DATA(cmsg)) = ts_opt_id;
-+				saved_tskey = ts_opt_id;
-+			}
- 
--			*((uint32_t *) CMSG_DATA(cmsg)) = report_opt;
- 		}
- 
- 		val = sendmsg(fd, &msg, 0);
-@@ -685,6 +702,7 @@ static void __attribute__((noreturn)) usage(const char *filepath)
- 			"  -L    listen on hostname and port\n"
- 			"  -n:   set no-payload option\n"
- 			"  -N:   print timestamps and durations in nsec (instead of usec)\n"
-+			"  -o N: use SCM_TS_OPT_ID control message to provide N as tskey\n"
- 			"  -p N: connect to port N\n"
- 			"  -P:   use PF_PACKET\n"
- 			"  -r:   use raw\n"
-@@ -705,7 +723,7 @@ static void parse_opt(int argc, char **argv)
- 	int c;
- 
- 	while ((c = getopt(argc, argv,
--				"46bc:CeEFhIl:LnNp:PrRS:t:uv:V:x")) != -1) {
-+				"46bc:CeEFhIl:LnNo:p:PrRS:t:uv:V:x")) != -1) {
- 		switch (c) {
- 		case '4':
- 			do_ipv6 = 0;
-@@ -746,6 +764,10 @@ static void parse_opt(int argc, char **argv)
- 		case 'N':
- 			cfg_print_nsec = true;
- 			break;
-+		case 'o':
-+			ts_opt_id = strtoul(optarg, NULL, 10);
-+			cfg_use_cmsg_opt_id = true;
-+			break;
- 		case 'p':
- 			dest_port = strtoul(optarg, NULL, 10);
- 			break;
-@@ -803,6 +825,8 @@ static void parse_opt(int argc, char **argv)
- 		error(1, 0, "cannot ask for pktinfo over pf_packet");
- 	if (cfg_busy_poll && cfg_use_epoll)
- 		error(1, 0, "pass epoll or busy_poll, not both");
-+	if (cfg_proto == SOCK_STREAM && cfg_use_cmsg_opt_id)
-+		error(1, 0, "TCP sockets don't support SCM_TS_OPT_ID");
- 
- 	if (optind != argc - 1)
- 		error(1, 0, "missing required hostname argument");
-diff --git a/tools/testing/selftests/net/txtimestamp.sh b/tools/testing/selftests/net/txtimestamp.sh
-index 25baca4b148e..fe4649bb8786 100755
---- a/tools/testing/selftests/net/txtimestamp.sh
-+++ b/tools/testing/selftests/net/txtimestamp.sh
-@@ -37,11 +37,13 @@ run_test_v4v6() {
- run_test_tcpudpraw() {
- 	local -r args=$@
- 
--	run_test_v4v6 ${args}		# tcp
--	run_test_v4v6 ${args} -u	# udp
--	run_test_v4v6 ${args} -r	# raw
--	run_test_v4v6 ${args} -R	# raw (IPPROTO_RAW)
--	run_test_v4v6 ${args} -P	# pf_packet
-+	run_test_v4v6 ${args}		  # tcp
-+	run_test_v4v6 ${args} -u	  # udp
-+	run_test_v4v6 ${args} -u -o 42	  # udp with fixed tskey
-+	run_test_v4v6 ${args} -r	  # raw
-+	run_test_v4v6 ${args} -r -o 42	  # raw
-+	run_test_v4v6 ${args} -R	  # raw (IPPROTO_RAW)
-+	run_test_v4v6 ${args} -P	  # pf_packet
- }
- 
- run_test_all() {
--- 
-2.43.5
+> On Wed, 11 Sept 2024 at 01:06, Heiner Kallweit <hkallweit1@gmail.com> wrote:
+>>
+>> On 09.09.2024 07:25, En-Wei WU wrote:
+>>> Hi Heiner,
+>>>
+>>> Thank you for the quick response.
+>>>
+>>> On Sat, 7 Sept 2024 at 05:17, Heiner Kallweit <hkallweit1@gmail.com> wrote:
+>>>>
+>>>> On 06.09.2024 10:35, En-Wei Wu wrote:
+>>>>> The commit 621735f59064 ("r8169: fix rare issue with broken rx after
+>>>>> link-down on RTL8125") set a reset work for RTL8125 in
+>>>>> r8169_phylink_handler() to avoid the MAC from locking up, this
+>>>>> makes the connection broken after unplugging then re-plugging the
+>>>>> Ethernet cable.
+>>>>>
+>>>>> This is because the commit mistakenly put the reset work in the
+>>>>> link-down path rather than the link-up path (The commit message says
+>>>>> it should be put in the link-up path).
+>>>>>
+>>>> That's not what the commit message is saying. It says vendor driver
+>>>> r8125 does it in the link-up path.
+>>>> I moved it intentionally to the link-down path, because traffic may
+>>>> be flowing already after link-up.
+>>>>
+>>>>> Moving the reset work from the link-down path to the link-up path fixes
+>>>>> the issue. Also, remove the unnecessary enum member.
+>>>>>
+>>>> The user who reported the issue at that time confirmed that the original
+>>>> change fixed the issue for him.
+>>>> Can you explain, from the NICs perspective, what exactly the difference
+>>>> is when doing the reset after link-up?
+>>>> Including an explanation how the original change suppresses the link-up
+>>>> interrupt. And why that's not the case when doing the reset after link-up.
+>>>
+>>> The host-plug test under original change does have the link-up
+>>> interrupt and r8169_phylink_handler() called. There is not much clue
+>>> why calling reset in link-down path doesn't work but in link-up does.
+>>>
+>>> After several new tests, I found that with the original change, the
+>>> link won't break if I unplug and then plug the cable within about 3
+>>> seconds. On the other hand, the connections always break if I re-plug
+>>> the cable after a few seconds.
+>>>
+>> Interesting finding. 3 seconds sounds like it's unrelated to runtime pm,
+>> because this has a 10s delay before the chip is transitioned to D3hot.
+>> It makes more the impression that after 3s of link-down the chip (PHY?)
+>> transitions to a mode where it doesn't wake up after re-plugging the cable.
+>>
+>> Just a wild guess: It may be some feature like ALDPS (advanced link-down
+>> power saving). Depending on the link partner this may result in not waking
+>> up again, namely if the link partner uses ALDPS too.
+>> What is the link partner in your case? If you put a simple switch in between,
+>> does this help?
+>>
+>> In the RTL8211F datasheet I found the following:
+>>
+>> Link Down Power Saving Mode.
+>> 1: Reflects local device entered Link Down Power Saving Mode,
+>> i.e., cable not plugged in (reflected after 3 sec)
+>> 0: With cable plugged in
+>>
+>> This is a 1Gbps PHY, but Realtek may use the same ALDPS mechanism with the
+>> integrated PHY of RTL8125. The 3s delay described there perfectly matches
+>> your finding.
+>>
+>>> With this new patch (reset in link-up path), both of the tests work
+>>> without any error.
+>>>
+>>>>
+>>>> I simply want to be convinced enough that your change doesn't break
+>>>> behavior for other users.
+>>>>
+>>>>> Fixes: 621735f59064 ("r8169: fix rare issue with broken rx after link-down on RTL8125")
+>>>>> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
+>>>>> ---
+>>>>>  drivers/net/ethernet/realtek/r8169_main.c | 11 +++++------
+>>>>>  1 file changed, 5 insertions(+), 6 deletions(-)
+>>>>>
+>>>>> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> index 3507c2e28110..632e661fc74b 100644
+>>>>> --- a/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+>>>>> @@ -590,7 +590,6 @@ struct rtl8169_tc_offsets {
+>>>>>  enum rtl_flag {
+>>>>>       RTL_FLAG_TASK_ENABLED = 0,
+>>>>>       RTL_FLAG_TASK_RESET_PENDING,
+>>>>> -     RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE,
+>>>>>       RTL_FLAG_TASK_TX_TIMEOUT,
+>>>>>       RTL_FLAG_MAX
+>>>>>  };
+>>>>> @@ -4698,8 +4697,6 @@ static void rtl_task(struct work_struct *work)
+>>>>>  reset:
+>>>>>               rtl_reset_work(tp);
+>>>>>               netif_wake_queue(tp->dev);
+>>>>> -     } else if (test_and_clear_bit(RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE, tp->wk.flags)) {
+>>>>> -             rtl_reset_work(tp);
+>>>>>       }
+>>>>>  out_unlock:
+>>>>>       rtnl_unlock();
+>>>>> @@ -4729,11 +4726,13 @@ static void r8169_phylink_handler(struct net_device *ndev)
+>>>>>       if (netif_carrier_ok(ndev)) {
+>>>>>               rtl_link_chg_patch(tp);
+>>>>>               pm_request_resume(d);
+>>>>> -             netif_wake_queue(tp->dev);
+>>>>> -     } else {
+>>>>> +
+>>>>>               /* In few cases rx is broken after link-down otherwise */
+>>>>>               if (rtl_is_8125(tp))
+>>>>> -                     rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_NO_QUEUE_WAKE);
+>>>>> +                     rtl_schedule_task(tp, RTL_FLAG_TASK_RESET_PENDING);
+>>>>> +             else
+>>>>> +                     netif_wake_queue(tp->dev);
+>>>>
+>>>> This call to netif_wake_queue() isn't needed any longer, it was introduced with
+>>>> the original change only.
+>>>>
+>>>>> +     } else {
+>>>>>               pm_runtime_idle(d);
+>>>>>       }
+>>>>>
+>>>>
+>>>
+>>> CC. Martin Kjær Jørgensen  <me@lagy.org>, could you kindly test if
+>>> this new patch works on your environment? Thanks!
+>>>
+>>> En-Wei,
+>>> Best regards.
+>>
 
 
