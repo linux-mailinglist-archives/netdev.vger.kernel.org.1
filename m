@@ -1,105 +1,152 @@
-Return-Path: <netdev+bounces-127331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D35CC9750D3
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:30:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EBE9750CB
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:28:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 489C91F22C9F
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:30:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5B141F232F7
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3781865F3;
-	Wed, 11 Sep 2024 11:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20DEE186614;
+	Wed, 11 Sep 2024 11:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jbsky.fr header.i=@jbsky.fr header.b="OekTVH/9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V7VtAthN"
 X-Original-To: netdev@vger.kernel.org
-Received: from pmg.home.arpa (i19-les02-ix2-176-181-14-251.sfr.lns.abo.bbox.fr [176.181.14.251])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07870185954;
-	Wed, 11 Sep 2024 11:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.181.14.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D1AF1547CF
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 11:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726054237; cv=none; b=DincsF8L1bxxhs4hoqQKWA86HY8mw/Pt1KSiMV+qlSufvzL0S3Bc49x+ruFMu/KrNVypS1sknUp0NkymwHXJjokIt11VXZmj6qDQFLTb6vYgreYMgfuUVopRK5DU5NGGBmlQi1AQDUM5Q9XZA8AUbLh5h4Q6eRvpIA7yse4dLIM=
+	t=1726054127; cv=none; b=eqiF+/oIVBLsw9VZwVMGx6ITIXFCORneMFP3NBxRQj5obTD+P3pkJOqMALVdkt0L12J4xTIlB/xXzMoZzvP85y4/O38DC4iKV+90/+k4aVoqwjwc7ory4QWFGPdEs3y3mEQmk0geGuQp3lIJF3SSzITicJd36KDEXCvV0TduJc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726054237; c=relaxed/simple;
-	bh=WCK5FI+80mUthsABAMMem19ibajtBlPK6xI5q5jaaT4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kFm6lYNGT5xWZLVzJ5Bi1bpX+XBwDBS7EPIuqr+4k+q9G9K4Rpi8paMZiipr4WMWIJHRqiQhlbM5DyWwDEWanzs4H+qx39JwuED0rIXHGUdE2q8U2McxEIiGD9MI6s7XxGFwuVALabSLf2Kv9qzt41Avl1+opod0wUGKXk6TeLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jbsky.fr; spf=pass smtp.mailfrom=jbsky.fr; dkim=pass (2048-bit key) header.d=jbsky.fr header.i=@jbsky.fr header.b=OekTVH/9; arc=none smtp.client-ip=176.181.14.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jbsky.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jbsky.fr
-Received: from pmg.home.arpa (localhost [127.0.0.1])
-	by pmg.home.arpa (Proxmox) with ESMTP id 34025223CA;
-	Wed, 11 Sep 2024 13:22:58 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jbsky.fr; h=cc
-	:cc:content-transfer-encoding:date:from:from:message-id
-	:mime-version:reply-to:subject:subject:to:to; s=pmg1; bh=TNpLvTy
-	A+susO36tSI+Z3LxDrONyGqbbgC4owiC0rDs=; b=OekTVH/94JsVN208BZ2/K4w
-	Q2Yi6viRnBlQiVp9k/2r+zpdk1o/SzWrrvhfIscmnD85Hh8mDgSuk7jxeC9A4Hl9
-	w2OIErK0tR77RCOc7gCVQCY1A6cYu5sitixSttfJiS1iSWSYH6R2FkVRtHTGDVRl
-	rYEnqSpW9GnGDJPcJNNuU4IkxkAW7HPQYdA4yE1JqZ8U8rorsOKx2EsPowPFBWAc
-	ZoPr0Nv+zg19p/o4lqy+U6f92Y8a3fkYWvEU9V9tmT6qf64f8ATk/5DJejtP0Tpl
-	FuRMSacx3+jS8e72dDA3iN2zvf2rIz/WF1Pnv+ML8Neh9WjghhhZwVypRr8r6wQ=
-	=
-From: Julien Blais <webmaster@jbsky.fr>
-To: thomas.petazzoni@bootlin.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Julien Blais <webmaster@jbsky.fr>
-Subject: [PATCH] mvneta: fix "napi poll" infinite loop
-Date: Wed, 11 Sep 2024 13:22:45 +0200
-Message-Id: <20240911112245.283832-1-webmaster@jbsky.fr>
+	s=arc-20240116; t=1726054127; c=relaxed/simple;
+	bh=4qh5VK526gLJCKyAtpJ7CQCiCpZ0f2OJAqyu4PMcOqU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HEQ6Q94658M2HOMskAnVCXIkpoGuOTbwrTNsW2GUt7FYPghfCTCG+tO8rAOnSidEN1/xkVfIORzS4i3HQLvpRI+Tcc4TKzkd+AKwMW911TsYey/e+ZPHoA2i+tkRf554leFG64Do7SaK3yeqGQ6Za7wD0FDRwlf4JVOPBXpwEMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V7VtAthN; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726054124;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BAmyKuMNqITkrSfy8qg6MUrMSNseX/neKbDPXn2drV8=;
+	b=V7VtAthN2A8O8xNfvsAEfNryZ055gRwbYY0WCydaT3GVNLfvLFtO0AaSKR++YGbb6n1YGl
+	twZ6DDeXzdtTp3N9VN3fnxHq9I9pit3zJq/fNTDpw2v0ORTYzWnkzmzo2KUJcRw0Ty9hhM
+	4Y3RUT9E+96/iLNkMw7to/CcVF1PU6o=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-396-aauh3YLRPuC4VeuoQadUlw-1; Wed, 11 Sep 2024 07:28:43 -0400
+X-MC-Unique: aauh3YLRPuC4VeuoQadUlw-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2f75ea32971so35204141fa.1
+        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 04:28:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726054122; x=1726658922;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BAmyKuMNqITkrSfy8qg6MUrMSNseX/neKbDPXn2drV8=;
+        b=XHvUIpylO8dKC1Db4NODcAiEOjkV8V/q0fkszlPLZGUAEHdyorfwDrGyiFKLgx6UGx
+         z3ufe4zE4zBzmyvg6n/vuf9d1Us+ONgyeRtrSVlYBV+t3phynTzgKOwQe2sOGtW1Fa4P
+         YPRtUqVgoTuGTkqH4jzQfpwRbanp6F6k4b/z3YdAvWoTDb8DkdKTemgce2YctDlM9+42
+         4UKfuXS1xpeprGOXTr3dv6KrCt4nfYX26a2A+oBvXPjDmVJ0TYMDfhNhmc/fWzCwIEmY
+         D2iRqWNHyybqUXH/C6vtmt7gHQS8oyY4PjdREGXid6gznXvcGooyg8HFjtPkGnRpiWBe
+         bVbQ==
+X-Gm-Message-State: AOJu0Yxrhdok0pAqW2G/JAd3t+EwrZifIRaSh9rD258RHUusaVLy3xV7
+	zBZatCEaLiTzkeY2NcTPvtGj05vll3OdbOahh5cMY1yQNJMg8MgkyR0oYlLhgud5CNn1l5sVJy1
+	oQrtRClbFyI9G4VG+a9Jz2vqJplqrzoEF8bWxgZJDARjygM7VN8BZWA==
+X-Received: by 2002:a2e:b8c5:0:b0:2f7:603c:ef99 with SMTP id 38308e7fff4ca-2f7603cf586mr90361941fa.16.1726054121556;
+        Wed, 11 Sep 2024 04:28:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGIKTns3rMOAydZQgVabYfA2U4q50Qe0gkibAVCl1FWXltjSMrzgK/bbPrPG4mSYk55jQJFUg==
+X-Received: by 2002:a2e:b8c5:0:b0:2f7:603c:ef99 with SMTP id 38308e7fff4ca-2f7603cf586mr90361621fa.16.1726054120483;
+        Wed, 11 Sep 2024 04:28:40 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1ec:a3d1:80b4:b3a2:70bf:9d18])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd8c4c6sm5307012a12.86.2024.09.11.04.28.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 04:28:39 -0700 (PDT)
+Date: Wed, 11 Sep 2024 07:28:36 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next 03/13] virtio_ring: packed: harden dma unmap for
+ indirect
+Message-ID: <20240911072537-mutt-send-email-mst@kernel.org>
+References: <20240820073330.9161-1-xuanzhuo@linux.alibaba.com>
+ <20240820073330.9161-4-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240820073330.9161-4-xuanzhuo@linux.alibaba.com>
 
-In percpu mode, when there's a network load, one of the cpus can be
-solicited without having anything to process.
-If 0 is returned to napi poll, napi will ignore the next requests,
-causing an infinite loop with ISR handling.
+As gcc luckily noted:
 
-Without this change, patches hang around fixing the queue at 0 and
-the interrupt remains stuck on the 1st CPU.
-The percpu conf is useless in this case, so we might as well remove it.
+On Tue, Aug 20, 2024 at 03:33:20PM +0800, Xuan Zhuo wrote:
+> @@ -1617,23 +1617,24 @@ static void detach_buf_packed(struct vring_virtqueue *vq,
+>  	}
+>  
+>  	if (vq->indirect) {
+> +		struct vring_desc_extra *extra;
+>  		u32 len;
+>  
+>  		/* Free the indirect table, if any, now that it's unmapped. */
+> -		desc = state->indir_desc;
+> -		if (!desc)
 
-Signed-off-by: Julien Blais <webmaster@jbsky.fr>
----
- drivers/net/ethernet/marvell/mvneta.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+desc is no longer initialized here
 
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index 3f124268b..8084b573e 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -3185,8 +3185,10 @@ static int mvneta_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (rx_done < budget) {
--		cause_rx_tx = 0;
--		napi_complete_done(napi, rx_done);
-+		if (rx_done)
-+			napi_complete_done(napi, rx_done);
-+		else
-+			napi_complete(napi);
- 
- 		if (pp->neta_armada3700) {
- 			unsigned long flags;
--- 
-2.30.2
+> +		extra = state->indir;
+> +		if (!extra)
+>  			return;
+>  
+>  		if (vring_need_unmap_buffer(vq)) {
+>  			len = vq->packed.desc_extra[id].len;
+>  			for (i = 0; i < len / sizeof(struct vring_packed_desc);
+>  					i++)
+> -				vring_unmap_desc_packed(vq, &desc[i]);
+> +				vring_unmap_extra_packed(vq, &extra[i]);
+>  		}
+>  		kfree(desc);
 
 
+but freed here
 
---
-This e-mail and any attached files are confidential and may be legally privileged. If you are not the addressee, any disclosure, reproduction, copying, distribution, or other dissemination or use of this communication is strictly prohibited. If you have received this transmission in error please notify the sender immediately and then delete this mail.
-E-mail transmission cannot be guaranteed to be secure or error free as information could be intercepted, corrupted, lost, destroyed, arrive late or incomplete, or contain viruses. The sender therefore does not accept liability for any errors or omissions in the contents of this message which arise as a result of e-mail transmission or changes to transmitted date not specifically approved by the sender.
-If this e-mail or attached files contain information which do not relate to our professional activity we do not accept liability for such information.
+> -		state->indir_desc = NULL;
+> +		state->indir = NULL;
+>  	} else if (ctx) {
+> -		*ctx = state->indir_desc;
+> +		*ctx = state->indir;
+>  	}
+>  }
+
+
+It seems unlikely this was always 0 on all paths with even
+a small amount of stress, so now I question how this was tested.
+Besides, do not ignore compiler warnings, and do not tweak code
+to just make compiler shut up - they are your friend.
+
+>  
+> -- 
+> 2.32.0.3.g01195cf9f
 
 
