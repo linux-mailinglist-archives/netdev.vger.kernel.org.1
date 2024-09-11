@@ -1,94 +1,120 @@
-Return-Path: <netdev+bounces-127338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B42097514C
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:59:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FFD797516B
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:05:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A1DD285312
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:58:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29B01C22264
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734F3188013;
-	Wed, 11 Sep 2024 11:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87551865F6;
+	Wed, 11 Sep 2024 12:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lhraf1s0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qrtomjd/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A645187553;
-	Wed, 11 Sep 2024 11:58:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207F96F2FD;
+	Wed, 11 Sep 2024 12:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726055933; cv=none; b=Z6rfbPStb3EFdFo19GTrSKqABy0xw9eKg8aiLjaKe3WzkmJdzB/CXh5yqxJblQJKDRC1se7yw0XB5cGXkCjkamYpDl1g5ZXBb/xS6Yg9rqRTtWYVOYlT6M6cH3Tp6QBLqopm70Nm8craaV4j908RBzhDw9g4vLuZqgAV7II84/0=
+	t=1726056345; cv=none; b=Ee68qLnkpmxm8lOZoLW/fU1MiBdUoViZFqiGopjjV32mPJyaEjqOY9lmjtYy9KSFtJ/mcPpzLCxLSvt0MOcE2n/RbN97MvhjMmtYcF/BFbETtkRvaRrwPJjf1aPJAc/c6dMV68267eGBUdbiUKHiG4EYfCyucejefRPXaQ/L5WQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726055933; c=relaxed/simple;
-	bh=W3MeGbMlXZEqOFQo3hp3zV5fFKX5WmK0/yDi8Hjdt+E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XTWTQLYrYZEp4TUVrQ2BQ77gpncD7zRW5o/Wqqx7TcLo7rptCUh3qOmz/M1+dxRRHm3ZlX0CAXKLW4RyU0L5QSx0tsfzCAQgfpkuGYsdshkLnUQxIT074vgFmm07tmG46XlMUw9CoW3tclf4EDMzc9VQ6AMr83V/AoSJhd8seu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lhraf1s0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48D66C4CEC5;
-	Wed, 11 Sep 2024 11:58:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726055932;
-	bh=W3MeGbMlXZEqOFQo3hp3zV5fFKX5WmK0/yDi8Hjdt+E=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=lhraf1s0FVdZEzUazr/xZemjDjXENi2gI0E4s5fTSyrKC/cRXyth/VrPFehBk+oNB
-	 P7t+iPh2LifTh3rXIXgVWILiPwybC49XZehOLplPjCA6Qrgo7kuNv15cBCt8f1vX3Y
-	 onDJ+iUPlW8nAkGcFkr5KzFOC8q3FvJcd3j6wptUIAU9+0rV1laLq3dCNuStvlHKOG
-	 r01Rq/BI8ZPFD2iMw0BbRBzx18JBVuEXb1KrbynSEr0Wka35xIT+qnVAYF5p8sd19b
-	 p+gWynQAk7yliFxSu0sBfsddIsFBWoRVLVy2KgnzS/FzBq4vsND924GALFthTjhwIr
-	 sNl7fdn1aVJzQ==
-Message-ID: <1797e2e3-e500-4e35-902b-07f173d0e67b@kernel.org>
-Date: Wed, 11 Sep 2024 14:58:45 +0300
+	s=arc-20240116; t=1726056345; c=relaxed/simple;
+	bh=pSWGESCfZCSIn/49L0VazriLwFlPwXSfbu4bYb7pzdY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CfspZwbfv/vIlwSg4o9nRU24FeVRX+x4069SdsVyNt0slvUPvMSBlaNlD3PdPkwdg7jaEc6EbtEhiHjr8XKhAVtP3XTL1yF9MyJwOxXfteDLoD5nB1I898lxEEyTaeIN/3bluaCmYeeaS7TVcHH0kKr9JtivoMGr8cQhIfe7aCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qrtomjd/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hiT4ktdB8h0ynWeUnBnGAgt8pvZOzLf4GvYT1wzQK3E=; b=qrtomjd/MHg1ceJfq0+ek4eNlP
+	oIT7PoBp6AqoC1rTNAUYtOeNBUJWLmNZsQhxJGmXiktIKkeHUhjqO0Czs9ZHO225xlru2dwvahvV5
+	QpOjEXO4keL0vJFRLyI7I7iBpoguV5AToScLD4qsUuR80scNnxu+LHnl+n5Ci2klIyqg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1soM6D-007CWC-Ei; Wed, 11 Sep 2024 14:05:29 +0200
+Date: Wed, 11 Sep 2024 14:05:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rob Herring <robh@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] dt-bindings: net: ethernet-phy: Add
+ master-slave role property for SPE PHYs
+Message-ID: <443a53a5-71ac-4287-9951-df3c54b11b8d@lunn.ch>
+References: <20240909124342.2838263-1-o.rempel@pengutronix.de>
+ <20240909124342.2838263-2-o.rempel@pengutronix.de>
+ <20240909162009.GA339652-robh@kernel.org>
+ <c2e4539f-34ba-4fcf-a319-8fb006ee0974@lunn.ch>
+ <CAL_Jsq+qJStck1OTiXg0jPR3EPEpLsu-or0pNqNh0orFjf+0uA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 4/5] net: ti: icssg-prueth: Enable HSR Tx
- duplication, Tx Tag and Rx Tag offload
-To: MD Danish Anwar <danishanwar@ti.com>, robh@kernel.org,
- jan.kiszka@siemens.com, dan.carpenter@linaro.org, r-gunasekaran@ti.com,
- saikrishnag@marvell.com, andrew@lunn.ch, javier.carrasco.cruz@gmail.com,
- jacob.e.keller@intel.com, diogo.ivo@siemens.com, horms@kernel.org,
- richardcochran@gmail.com, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com,
- Vignesh Raghavendra <vigneshr@ti.com>
-References: <20240911081603.2521729-1-danishanwar@ti.com>
- <20240911081603.2521729-5-danishanwar@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20240911081603.2521729-5-danishanwar@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL_Jsq+qJStck1OTiXg0jPR3EPEpLsu-or0pNqNh0orFjf+0uA@mail.gmail.com>
 
+> It seems silly to maintain both forever. I'd rather have one or the
+> other than both.
 
+It currently seems like 802.3 is going to keep with master/slave in
+the body of the text. And they don't even have to deal with breaking
+backwards compatibility. So i suggest we keep with master/slave, but
+comment that an annex of the standard proposes alternative names of
+leader/follower. But don't actually accept them.
 
-On 11/09/2024 11:16, MD Danish Anwar wrote:
-> From: Ravi Gunasekaran <r-gunasekaran@ti.com>
 > 
-> The HSR stack allows to offload its Tx packet duplication functionality to
-> the hardware. Enable this offloading feature for ICSSG driver. Add support
-> to offload HSR Tx Tag Insertion and Rx Tag Removal and duplicate discard.
+> > As to you comment about it being unclear what it means i would suggest
+> > a reference to 802.3 section 1.4.389:
+> >
+> >   1.4.389 master Physical Layer device (PHY): Within IEEE 802.3, in a
+> >   100BASE-T2, 1000BASE-T, 10BASE-T1L, 100BASE-T1, 1000BASE-T1, or any
+> >   MultiGBASE-T link containing a pair of PHYs, the PHY that uses an
+> >   external clock for generating its clock signals to determine the
+> >   timing of transmitter and receiver operations. It also uses the
+> >   master transmit scrambler generator polynomial for side-stream
+> >   scrambling. Master and slave PHY status is determined during the
+> >   Auto-Negotiation process that takes place prior to establishing the
+> >   transmission link, or in the case of a PHY where Auto-Negotiation is
+> >   optional and not used, master and slave PHY status
 > 
-> hsr tag insertion offload and hsr dup offload are tightly coupled in
-> firmware implementation. Both these features need to be enabled / disabled
-> together.
-> 
-> Duplicate discard is done as part of RX tag removal and it is
-> done by the firmware. When driver sends the r30 command
-> ICSSG_EMAC_HSR_RX_OFFLOAD_ENABLE, firmware does RX tag removal as well as
-> duplicate discard.
-> 
-> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> phy-status? Shrug.
 
-Reviewed-by: Roger Quadros <rogerq@kernel.org>
+phy-status is too generic. Maybe 'timing-role' ?
+
+> 
+> Another thought. Is it possible that h/w strapping disables auto-neg,
+> but you actually want to override that and force auto-neg?
+
+Autoneg can be used for a bunch of parameters. In automotive
+situations, it is generally disabled and those parameters are
+forced. In more tradition settings those parameters are
+negotiated. However, even with autoneg enabled, you can force each
+individual parameter, rather than negotiate it.
+
+So we would need a DT parameter about autoneg in general. And then a
+DT parameter about 'timing-role', where force-master/force-slave means
+don't negotiate, and prefer-master/prefer-slave means do negotiate
+with the given preference.
+
+	Andrew
 
