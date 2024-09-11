@@ -1,259 +1,125 @@
-Return-Path: <netdev+bounces-127472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13BF097584C
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:25:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3DF9975863
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 18:27:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C92572882BD
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:25:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1163CB2B2D1
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 16:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD591AE873;
-	Wed, 11 Sep 2024 16:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CF51AE86E;
+	Wed, 11 Sep 2024 16:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JsBGly/s"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hjtVOQv+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE62192D86
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 16:24:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60A41AC440
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 16:25:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726071901; cv=none; b=pojxdPMiCtsFeG1SdQgYGUwPBsp6zQAE1tfIJBy1h+2kdpJ8uBc9fe83hjRjnAb5MJdf3tHisxExa4Vb9lvbhpt8Okd/D2OuaEBPDDQm4S86sQ71ZaSSh09Wd2R62wMjZohSfIguEPiTBUJdzDuWIT4QUhzmtcfPrSFOMB/vY9o=
+	t=1726071927; cv=none; b=Q2+w2yqIzLXbghdH8dz3bce7g/z0hmrZXUhL3dXWrHVxM49wAu6Zx8ViR0GAksbHm7j7HN7jtcaNfdhvE1hVMEoK8Wdalfek6z/qnb+wvO/iGDPLDA0NBOjRvwROT9Nf4T7QSM8PNMKowxPEERhB/LutItrDHwA0IhYP/Z8lIY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726071901; c=relaxed/simple;
-	bh=1bcQW7c1jxdlfBunQ6YWyGYMwuwT68C1Dp4B2rFeirs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tz0Y+p+cUNPgIIkgiPrV/faRV54Bd2EmwnOSl63CpSQn9eWrOzFKebsNt5n0HkLFFzehxlLeZ2yeMzgrElmS27+YVEbQZ6WTW7ehmsuwCFyUeG8EYDABk0B4tBAmSc2/2aAkebwrV5wSMs+p5nnVNICNiCOCQsgWGlpxDicrhdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JsBGly/s; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726071898;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=NPuIsJ7LH/NryQa0KHKubTcC5NBQjBwl3HztcdDab5w=;
-	b=JsBGly/sa/jNAApO/gyHOID2EsyBEo6MSf/zJbRnJpyjuBUYdRWsyKvF6SVERhzkRHIf4C
-	Ai3L9o2p5+3fbQBcAXAkwZU47pgrn6d52oiMVsuoFxgbDKukBj3q/aEI45E9vg7miPUT99
-	/c4n1rbq9rFzeYtSNWuAuogCE+KsSpw=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-695-UFB8CnuqMEiakj3jmF0CRg-1; Wed, 11 Sep 2024 12:24:57 -0400
-X-MC-Unique: UFB8CnuqMEiakj3jmF0CRg-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-535681e6f8eso6528189e87.1
-        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 09:24:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726071896; x=1726676696;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NPuIsJ7LH/NryQa0KHKubTcC5NBQjBwl3HztcdDab5w=;
-        b=sdd/dx68EECzaMmkzeF20e3TWk9ZeyTLWPt/gZicNRArOHAk7dCWJyaqZyYFmN25pt
-         fhVY7hBDWZXsFMtCaK+Tkbe+3lnJ8fMgLRdNrzUkRq3vIWaJJYqHGnISAU4hQY+YT6qD
-         gkN6pRj3281msXtRHppBle9Eed1AE8je0h2YkoMAo+KpZ/aokqu6/mzbQAd6xpnQWk0G
-         Yq5Q7e4k/xtGP023ieeVm5HVMbLhfy+LkIilU3nx6cRJy2G2KOSrtHf2hTezPvKM0/O1
-         f3obW0vwfM67Z5WlDChuuHkonyG+Hh8RDaRWHBYXsl/ugbv1ok3Eu7Oaj8AZDA+f3zCI
-         o8Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCXlO81Px5fpdMSR/Sz0oe10gncVFyEcPGJ63GR5d+5zrLIMrM/MONwDvATvXZamQkUJAqji754=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZq8xc2KAkotBqen/WsjW0tgwLMoYJU2riz7Y7TpQ+4Q2ww1Nw
-	TRfRej3lCMR3pOqqXemh6QIzyS5kb6M7iFM2TgLlodE0aaoSRsnCGUksUHnWhVxHBMzk/bV/00m
-	Pc2A4ljzGGYczlPTTHoJhISxufoH2jPbXhVfgWXKVNGBHBMLa8y/OOA==
-X-Received: by 2002:a05:6512:1283:b0:52c:e0fb:92c0 with SMTP id 2adb3069b0e04-536587c8177mr12892270e87.34.1726071896001;
-        Wed, 11 Sep 2024 09:24:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHG/2rhUxgQSM96b6JP5Itt5QRcGCTl4PERNI00A/LttGPDuJaR7APim2eBySdgsSLLCiwQCw==
-X-Received: by 2002:a05:6512:1283:b0:52c:e0fb:92c0 with SMTP id 2adb3069b0e04-536587c8177mr12892232e87.34.1726071895341;
-        Wed, 11 Sep 2024 09:24:55 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25d3597asm629355766b.186.2024.09.11.09.24.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Sep 2024 09:24:54 -0700 (PDT)
-Message-ID: <181dec64-5906-4cdd-bb29-40bc7c02d63e@redhat.com>
-Date: Wed, 11 Sep 2024 18:24:54 +0200
+	s=arc-20240116; t=1726071927; c=relaxed/simple;
+	bh=ED39QgUo07vQv1Zc2jpIcvmXn1vPCfIGqfcC+N2zvDI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WVWTu/PSXAGFDZ4Cjurkuk5OX75D37QZuYKQ61Nrkry+cretOsWQUi/Vy5pBLQwvMpG2vaJY6DmXEH97sGy4WW4CMBh+GDce46zolQnpe5qGDY8ah5Wl38UWb9uNjpEB8cfCyiDpohI6sX6ezGoXQ/PocDxcpXwvY1SiS2FAueI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hjtVOQv+; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Lb2TkYLVjnRkWLLVzGs5OFfOtLMr1WZEP7Rvo/ME51M=; b=hjtVOQv+U7UTcEMSroT5kZ6Nn3
+	yadrshEw+C9qkfzs875m8rrehIxcbrOTfoOhbeCwrpdeWvDXDUkznz7SWZxKkUHM7CNIUGCb4ha1S
+	DgrB7+RBZLpb3CGHi7hO7CtjX+nLmBq75ugMeklhwldejTabz0fuoRrWMet3vHp0dNFQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1soQ9X-007EPC-EO; Wed, 11 Sep 2024 18:25:11 +0200
+Date: Wed, 11 Sep 2024 18:25:11 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexander Duyck <alexanderduyck@fb.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 2/5] eth: fbnic: add initial PHC support
+Message-ID: <006042c0-e1d5-4fbc-aa7f-94a74cfbef0e@lunn.ch>
+References: <20240911124513.2691688-1-vadfed@meta.com>
+ <20240911124513.2691688-3-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH hotfix 6.11] minmax: reduce egregious min/max macro
- expansion
-To: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>,
- Andrew Morton <akpm@linux-foundation.org>
-Cc: Richard Narron <richard@aaazen.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Mauro Carvalho Chehab <mchehab@kernel.org>,
- Sakari Ailus <sakari.ailus@linux.intel.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Marcin Wojtas <marcin.s.wojtas@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S . Miller"
- <davem@davemloft.net>, Arnd Bergmann <arnd@kernel.org>,
- Linus Torvalds <torvalds@linuxfoundation.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- linux-staging@lists.linux.dev, linux-mm@kvack.org, stable@vger.kernel.org
-References: <20240911153457.1005227-1-lorenzo.stoakes@oracle.com>
-Content-Language: en-US, nl
-From: Hans de Goede <hdegoede@redhat.com>
-In-Reply-To: <20240911153457.1005227-1-lorenzo.stoakes@oracle.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911124513.2691688-3-vadfed@meta.com>
 
-Hi Lorenzo,
+It appears that Richard has not been Cc:ed.
 
-On 9/11/24 5:34 PM, Lorenzo Stoakes wrote:
-> Avoid nested min()/max() which results in egregious macro expansion.
-> 
-> This issue was introduced by commit 867046cc7027 ("minmax: relax check to
-> allow comparison between unsigned arguments and signed constants") [2].
-> 
-> Work has been done to address the issue of egregious min()/max() macro
-> expansion in commit 22f546873149 ("minmax: improve macro expansion and type
-> checking") and related, however it appears that some issues remain on more
-> tightly constrained systems.
-> 
-> Adjust a few known-bad cases of deeply nested macros to avoid doing so to
-> mitigate this. Porting the patch first proposed in [1] to Linus's tree.
-> 
-> Running an allmodconfig build using the methodology described in [2] we
-> observe a 35 MiB reduction in generated code.
-> 
-> The difference is much more significant prior to recent minmax fixes which
-> were not backported. As per [1] prior these the reduction is more like 200
-> MiB.
-> 
-> This resolves an issue with slackware 15.0 32-bit compilation as reported
-> by Richard Narron.
-> 
-> Presumably the min/max fixups would be difficult to backport, this patch
-> should be easier and fix's Richard's problem in 5.15.
-> 
-> [0]:https://lore.kernel.org/all/b97faef60ad24922b530241c5d7c933c@AcuMS.aculab.com/
-> [1]:https://lore.kernel.org/lkml/5882b96e-1287-4390-8174-3316d39038ef@lucifer.local/
-> [2]:https://lore.kernel.org/linux-mm/36aa2cad-1db1-4abf-8dd2-fb20484aabc3@lucifer.local/
-> 
-> Reported-by: Richard Narron <richard@aaazen.com>
-> Closes: https://lore.kernel.org/all/4a5321bd-b1f-1832-f0c-cea8694dc5aa@aaazen.com/
-> Fixes: 867046cc7027 ("minmax: relax check to allow comparison between unsigned arguments and signed constants")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Lorenzo Stoakes <lorenzo.stoakes@oracle.com>
-
-Thank you for your patch.
-
-I must say that I'm not a fan of that this is patching 3 totally
-unrelated files here in a single patch.
-
-This is e.g. going to be a problem if we need to revert one of
-the changes because of regressions...
-
-So I would prefer this to be split into 3 patches.
-
-One review comment for the atomisp bits inline / below.
-
-> ---
->  drivers/net/ethernet/marvell/mvpp2/mvpp2.h    |  2 +-
->  .../staging/media/atomisp/pci/sh_css_frac.h   | 26 ++++++++++++++-----
->  include/linux/skbuff.h                        |  6 ++++-
->  3 files changed, 25 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-> index e809f91c08fb..8b431f90efc3 100644
-> --- a/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-> +++ b/drivers/net/ethernet/marvell/mvpp2/mvpp2.h
-> @@ -23,7 +23,7 @@
->  /* The PacketOffset field is measured in units of 32 bytes and is 3 bits wide,
->   * so the maximum offset is 7 * 32 = 224
->   */
-> -#define MVPP2_SKB_HEADROOM	min(max(XDP_PACKET_HEADROOM, NET_SKB_PAD), 224)
-> +#define MVPP2_SKB_HEADROOM	clamp_t(int, XDP_PACKET_HEADROOM, NET_SKB_PAD, 224)
-> 
->  #define MVPP2_XDP_PASS		0
->  #define MVPP2_XDP_DROPPED	BIT(0)
-> diff --git a/drivers/staging/media/atomisp/pci/sh_css_frac.h b/drivers/staging/media/atomisp/pci/sh_css_frac.h
-> index b90b5b330dfa..a973394c5bc0 100644
-> --- a/drivers/staging/media/atomisp/pci/sh_css_frac.h
-> +++ b/drivers/staging/media/atomisp/pci/sh_css_frac.h
-> @@ -32,12 +32,24 @@
->  #define uISP_VAL_MAX		      ((unsigned int)((1 << uISP_REG_BIT) - 1))
-> 
->  /* a:fraction bits for 16bit precision, b:fraction bits for ISP precision */
-> -#define sDIGIT_FITTING(v, a, b) \
-> -	min_t(int, max_t(int, (((v) >> sSHIFT) >> max(sFRACTION_BITS_FITTING(a) - (b), 0)), \
-> -	  sISP_VAL_MIN), sISP_VAL_MAX)
-> -#define uDIGIT_FITTING(v, a, b) \
-> -	min((unsigned int)max((unsigned)(((v) >> uSHIFT) \
-> -	>> max((int)(uFRACTION_BITS_FITTING(a) - (b)), 0)), \
-> -	  uISP_VAL_MIN), uISP_VAL_MAX)
-> +static inline int sDIGIT_FITTING(short v, int a, int b)
-> +{
-
-drivers/staging/media/atomisp/pci/isp/kernels/s3a/s3a_1.0/ia_css_s3a.host.c
-
-calls this with ia_css_3a_config.af_fir1_coef / .af_fir2_coef
-as first argument those are of the ia_css_s0_15 type which is:
-
-/* Signed fixed point value, 0 integer bits, 15 fractional bits */
-typedef s32 ia_css_s0_15;
-
-please replace the "short v" with "int v" 
-
-I think that you can then also replace clamp_t() with clamp()
-
-
-> +	int fit_shift = sFRACTION_BITS_FITTING(a) - b;
+> +/* Precision Time Protocol Registers */
+> +#define FBNIC_CSR_START_PTP		0x04800 /* CSR section delimiter */
+> +#define FBNIC_PTP_REG_BASE		0x04800		/* 0x12000 */
 > +
-> +	v >>= sSHIFT;
-> +	v >>= fit_shift > 0 ? fit_shift : 0;
+> +#define FBNIC_PTP_CTRL			0x04800		/* 0x12000 */
+> +#define FBNIC_PTP_CTRL_EN			CSR_BIT(0)
+> +#define FBNIC_PTP_CTRL_MONO_EN			CSR_BIT(4)
+> +#define FBNIC_PTP_CTRL_TQS_OUT_EN		CSR_BIT(8)
+> +#define FBNIC_PTP_CTRL_MAC_OUT_IVAL		CSR_GENMASK(16, 12)
+> +#define FBNIC_PTP_CTRL_TICK_IVAL		CSR_GENMASK(23, 20)
 > +
-> +	return clamp_t(int, v, sISP_VAL_MIN, sISP_VAL_MAX);
-> +}
+> +#define FBNIC_PTP_ADJUST		0x04801		/* 0x12004 */
+> +#define FBNIC_PTP_ADJUST_INIT			CSR_BIT(0)
+> +#define FBNIC_PTP_ADJUST_SUB_NUDGE		CSR_BIT(8)
+> +#define FBNIC_PTP_ADJUST_ADD_NUDGE		CSR_BIT(16)
+> +#define FBNIC_PTP_ADJUST_ADDEND_SET		CSR_BIT(24)
 > +
-> +static inline unsigned int uDIGIT_FITTING(unsigned int v, int a, int b)
-> +{
-> +	int fit_shift = uFRACTION_BITS_FITTING(a) - b;
+> +#define FBNIC_PTP_INIT_HI		0x04802		/* 0x12008 */
+> +#define FBNIC_PTP_INIT_LO		0x04803		/* 0x1200c */
 > +
-> +	v >>= uSHIFT;
-> +	v >>= fit_shift > 0 ? fit_shift : 0;
+> +#define FBNIC_PTP_NUDGE_NS		0x04804		/* 0x12010 */
+> +#define FBNIC_PTP_NUDGE_SUBNS		0x04805		/* 0x12014 */
 > +
-> +	return clamp_t(unsigned int, v, uISP_VAL_MIN, uISP_VAL_MAX);
-> +}
+> +#define FBNIC_PTP_ADD_VAL_NS		0x04806		/* 0x12018 */
+> +#define FBNIC_PTP_ADD_VAL_NS_MASK		CSR_GENMASK(15, 0)
+> +#define FBNIC_PTP_ADD_VAL_SUBNS		0x04807	/* 0x1201c */
+> +
+> +#define FBNIC_PTP_CTR_VAL_HI		0x04808		/* 0x12020 */
+> +#define FBNIC_PTP_CTR_VAL_LO		0x04809		/* 0x12024 */
+> +
+> +#define FBNIC_PTP_MONO_PTP_CTR_HI	0x0480a		/* 0x12028 */
+> +#define FBNIC_PTP_MONO_PTP_CTR_LO	0x0480b		/* 0x1202c */
+> +
+> +#define FBNIC_PTP_CDC_FIFO_STATUS	0x0480c		/* 0x12030 */
+> +#define FBNIC_PTP_SPARE			0x0480d		/* 0x12034 */
+> +#define FBNIC_CSR_END_PTP		0x0480d /* CSR section delimiter */
 
-Regular clamp() should work here ? all parameters are already
-unsigned ints.
+We know the PCS is a licensed block. Is this also licensed? Should it
+be placed in driver/ptp so others who licence the same block can
+re-uses it?
 
-Regards,
+> +/* FBNIC timing & PTP implementation
+> + * Datapath uses truncated 40b timestamps for scheduling and event reporting.
+> + * We need to promote those to full 64b, hence we periodically cache the top
+> + * 32bit of the HW time counter. Since this makes our time reporting non-atomic
+> + * we leave the HW clock free running and adjust time offsets in SW as needed.
+> + * Time offset is 64bit - we need a seq counter for 32bit machines.
+> + * Time offset and the cache of top bits are independent so we don't need
+> + * a coherent snapshot of both - READ_ONCE()/WRITE_ONCE() + writer side lock
+> + * are enough.
+> + *
+> + * TBD: alias u64_stats_sync & co. with some more appropriate names upstream.
 
-Hans
+This is upstream, so maybe now is a good time to decide?
 
-
-
-
-> 
->  #endif /* __SH_CSS_FRAC_H */
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 29c3ea5b6e93..d53b296df504 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -3164,7 +3164,11 @@ static inline int pskb_network_may_pull(struct sk_buff *skb, unsigned int len)
->   * NET_IP_ALIGN(2) + ethernet_header(14) + IP_header(20/40) + ports(8)
->   */
->  #ifndef NET_SKB_PAD
-> -#define NET_SKB_PAD	max(32, L1_CACHE_BYTES)
-> +#if L1_CACHE_BYTES < 32
-> +#define NET_SKB_PAD	32
-> +#else
-> +#define NET_SKB_PAD	L1_CACHE_BYTES
-> +#endif
->  #endif
-> 
->  int ___pskb_trim(struct sk_buff *skb, unsigned int len);
-> --
-> 2.46.0
-> 
-
+	Andrew
 
