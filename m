@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-127289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2415974E3E
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:14:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7591C974E41
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:15:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 044F1B27DFE
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 09:14:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2915B23509
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 09:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8774C179965;
-	Wed, 11 Sep 2024 09:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9477417DFFC;
+	Wed, 11 Sep 2024 09:14:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="IAF1HD/8"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="OsZ2AhX/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9926C15E5B8
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 09:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B866B17C7CA
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 09:13:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.153.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726046037; cv=none; b=SvQS803762tIyXDhSHaX2VcY6tR1E2a8yG722iNv1RrewKrlkZXRRjYDjQ73qHfvFjoVM3dnoPKIxl5J4wPf3uHXl2FnlL8wFQGTHXZh3Z2WragMn4xq8Ci1i2+rBHh3SPKG5ZULCAWiFt9WWTZWPPjkniZxainr279A/YTRHck=
+	t=1726046040; cv=none; b=q8GuVpXksXFYVi3LY/6l1FMi1x/SnC0Li6eF7Ghl1u0/Y0FzuBqJ9Zn2bE/lcD47JgDnOt6SDsFsR9qkua+Xyd12KUGmiXYU78/8WoF17NeX9vurPGsUr/aRJcD4l3msOyhDi9IvWgbAqSeamvNoFkvro2p6BMK9jk27o5dtvzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726046037; c=relaxed/simple;
-	bh=2hDVqxGSpkaiNbsHBMvpVeEm10K72qeXSNf8uIzlwjg=;
+	s=arc-20240116; t=1726046040; c=relaxed/simple;
+	bh=UXGqUZGxE+wt5C2uZm9+qUFA98tywyjA2kUADCA6CcA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ASyWhyszYHSRVqT3IWJMHnQJhRg++EKnTdPm3hgJi9qSMPMBsynb7jk00IXhmXqrzzwTKL8sgexDA7bLABIbF+Fgo/JUz08S4indw5+CM2321loqxjn1xoajCpiUNYx8Rt94X/DLeZvQopUk8AyDIh3PdwboRZBzraF8nyURBIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=IAF1HD/8; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=PHAStN918Xf6P5C5WwK1FjSUodhpxBlibCdOWnfVGrOa5p2+Ei/lWWwHq6CWqmlNbU3d2SxWnO5QigLqKAQBBk1nLxa6Ft2vz1gfdqqeb1zfFQ5KKDCfNFB/d+2hAIMqRyLbf9OcJ6ClV+xyZESepw86AlydBgZ24QRQIaIdtkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=OsZ2AhX/; arc=none smtp.client-ip=67.231.153.30
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48B80Sxg028418;
-	Wed, 11 Sep 2024 02:13:47 -0700
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+	by m0001303.ppops.net (8.18.1.2/8.18.1.2) with ESMTP id 48B6PgL4011391;
+	Wed, 11 Sep 2024 02:13:50 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
 	:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=Khqn/SdahkRLrsHcqlfLthF6kKTBTC+HSb/crJy+Bts=; b=
-	IAF1HD/8gBu6fnSqCrDGaMtcsnM2599ZYzIbNRFJocs0CdYob0pROTteVYZ4bTzH
-	j2DTvczWJcrclm0R0eE3qsBCC+Z7m/7bjw4ICvqVsrRA2vf4YoM0WchSKeIEGuU8
-	7TrRVjOuy5hsB9b3qmmCUlXmkIqLAPeLkXx+6fTjV9gontCvlg1yqVe71nCo3EPe
-	47OO/3mwkD14kSAQQaZ9AyvbA5uqbw3ZDUR0o623mam3qR6n5doAkrLuKPfAIaBy
-	QrZInKRzLVVd6uI4kOJuHCIiGRIcGUeWHS9m3zym4eX0P0Kvp59clNusUiMAWzS9
-	jAQd3CPgpH60R8H27mVGdA==
+	s2048-2021-q4; bh=BesDjpRha7XLTQQkhy88l2/Eejia1KrB5i+cPh7i9kY=; b=
+	OsZ2AhX/sRk58zdFZ0gUUE9QQ2JlMPcRosx9ogShd0orhmaJCTQPhJu8PVZyfiKm
+	uRAfEMF/X3JVnw63Z2II9nJo8wdv4gkt6yYnNyTVgG8IB29/Z/1A6R0JGCmSQ9j2
+	/JimxLcluObRhZX2PxDTOUtPC7mLzOOgkVDMnpdJENzMo1fj0/nzHj25bvJTt2h8
+	f2TcZQjBErZShAYKvJWv0eqrr/0roW90Mr9mUoMqqa0v3i3USu3MbrwN4YUXrHkF
+	Q8l68I0a+QediRuz4TXbEUuIbFPIPc+10ODVyNPUoH39QyA7lAUUWg3THrKUjwyJ
+	mcTQRm0/NkGh+4mBAyn4nw==
 Received: from mail.thefacebook.com ([163.114.134.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41k7adra08-20
+	by m0001303.ppops.net (PPS) with ESMTPS id 41k44nh3cb-2
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Wed, 11 Sep 2024 02:13:47 -0700 (PDT)
+	Wed, 11 Sep 2024 02:13:49 -0700 (PDT)
 Received: from devvm4158.cln0.facebook.com (2620:10d:c085:108::150d) by
  mail.thefacebook.com (2620:10d:c08b:78::c78f) with Microsoft SMTP Server id
- 15.2.1544.11; Wed, 11 Sep 2024 09:13:43 +0000
+ 15.2.1544.11; Wed, 11 Sep 2024 09:13:45 +0000
 From: Vadim Fedorenko <vadfed@meta.com>
 To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
         Willem de Bruijn
@@ -62,9 +62,9 @@ To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	<kerneljasonxing@gmail.com>,
         Simon Horman <horms@kernel.org>
 CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>
-Subject: [PATCH net-next v5 1/3] net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in control message
-Date: Wed, 11 Sep 2024 02:13:31 -0700
-Message-ID: <20240911091333.1870071-2-vadfed@meta.com>
+Subject: [PATCH net-next v5 2/3] net_tstamp: add SCM_TS_OPT_ID for RAW sockets
+Date: Wed, 11 Sep 2024 02:13:32 -0700
+Message-ID: <20240911091333.1870071-3-vadfed@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20240911091333.1870071-1-vadfed@meta.com>
 References: <20240911091333.1870071-1-vadfed@meta.com>
@@ -76,299 +76,235 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: ZSReyt0B9p8EY_QEvK_00gJLbwV-NaQM
-X-Proofpoint-ORIG-GUID: ZSReyt0B9p8EY_QEvK_00gJLbwV-NaQM
+X-Proofpoint-ORIG-GUID: Btzu3rkFHY1x_5VdoZ-QpkHQ1pzhWqlB
+X-Proofpoint-GUID: Btzu3rkFHY1x_5VdoZ-QpkHQ1pzhWqlB
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-10_12,2024-09-09_02,2024-09-02_01
 
-SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate TX
-timestamps and packets sent via socket. Unfortunately, there is no way
-to reliably predict socket timestamp ID value in case of error returned
-by sendmsg. For UDP sockets it's impossible because of lockless
-nature of UDP transmit, several threads may send packets in parallel. In
-case of RAW sockets MSG_MORE option makes things complicated. More
-details are in the conversation [1].
-This patch adds new control message type to give user-space
-software an opportunity to control the mapping between packets and
-values by providing ID with each sendmsg for UDP sockets.
-The documentation is also added in this patch.
-
-[1] https://lore.kernel.org/netdev/CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com/
+The last type of sockets which supports SOF_TIMESTAMPING_OPT_ID is RAW
+sockets. To add new option this patch converts all callers (direct and
+indirect) of _sock_tx_timestamp to provide sockcm_cookie instead of
+tsflags. And while here fix __sock_tx_timestamp to receive tsflags as
+__u32 instead of __u16.
 
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
 ---
- Documentation/networking/timestamping.rst | 14 ++++++++++++++
- arch/alpha/include/uapi/asm/socket.h      |  2 ++
- arch/mips/include/uapi/asm/socket.h       |  2 ++
- arch/parisc/include/uapi/asm/socket.h     |  2 ++
- arch/sparc/include/uapi/asm/socket.h      |  2 ++
- include/net/inet_sock.h                   |  4 +++-
- include/net/sock.h                        |  7 +++++++
- include/uapi/asm-generic/socket.h         |  2 ++
- net/core/sock.c                           | 13 +++++++++++++
- net/ipv4/ip_output.c                      | 19 ++++++++++++++-----
- net/ipv6/ip6_output.c                     | 20 ++++++++++++++------
- 11 files changed, 75 insertions(+), 12 deletions(-)
+ include/net/sock.h     | 27 ++++++++++++++++++---------
+ net/can/raw.c          |  2 +-
+ net/ipv4/ip_output.c   |  2 +-
+ net/ipv4/raw.c         |  2 +-
+ net/ipv4/tcp.c         |  7 ++++---
+ net/ipv6/ip6_output.c  |  2 +-
+ net/ipv6/raw.c         |  2 +-
+ net/packet/af_packet.c |  6 +++---
+ net/socket.c           |  2 +-
+ 9 files changed, 31 insertions(+), 21 deletions(-)
 
-diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
-index 8199e6917671..b37bfbfc7d79 100644
---- a/Documentation/networking/timestamping.rst
-+++ b/Documentation/networking/timestamping.rst
-@@ -194,6 +194,20 @@ SOF_TIMESTAMPING_OPT_ID:
-   among all possibly concurrently outstanding timestamp requests for
-   that socket.
- 
-+  The process can optionally override the default generated ID, by
-+  passing a specific ID with control message SCM_TS_OPT_ID (not
-+  supported for TCP sockets)::
-+
-+    struct msghdr *msg;
-+    ...
-+    cmsg			 = CMSG_FIRSTHDR(msg);
-+    cmsg->cmsg_level		 = SOL_SOCKET;
-+    cmsg->cmsg_type		 = SCM_TS_OPT_ID;
-+    cmsg->cmsg_len		 = CMSG_LEN(sizeof(__u32));
-+    *((__u32 *) CMSG_DATA(cmsg)) = opt_id;
-+    err = sendmsg(fd, msg, 0);
-+
-+
- SOF_TIMESTAMPING_OPT_ID_TCP:
-   Pass this modifier along with SOF_TIMESTAMPING_OPT_ID for new TCP
-   timestamping applications. SOF_TIMESTAMPING_OPT_ID defines how the
-diff --git a/arch/alpha/include/uapi/asm/socket.h b/arch/alpha/include/uapi/asm/socket.h
-index e94f621903fe..99dec81e7c84 100644
---- a/arch/alpha/include/uapi/asm/socket.h
-+++ b/arch/alpha/include/uapi/asm/socket.h
-@@ -140,6 +140,8 @@
- #define SO_PASSPIDFD		76
- #define SO_PEERPIDFD		77
- 
-+#define SCM_TS_OPT_ID		78
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64
-diff --git a/arch/mips/include/uapi/asm/socket.h b/arch/mips/include/uapi/asm/socket.h
-index 60ebaed28a4c..bb3dc8feb205 100644
---- a/arch/mips/include/uapi/asm/socket.h
-+++ b/arch/mips/include/uapi/asm/socket.h
-@@ -151,6 +151,8 @@
- #define SO_PASSPIDFD		76
- #define SO_PEERPIDFD		77
- 
-+#define SCM_TS_OPT_ID		78
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64
-diff --git a/arch/parisc/include/uapi/asm/socket.h b/arch/parisc/include/uapi/asm/socket.h
-index be264c2b1a11..c3ab3b3289eb 100644
---- a/arch/parisc/include/uapi/asm/socket.h
-+++ b/arch/parisc/include/uapi/asm/socket.h
-@@ -132,6 +132,8 @@
- #define SO_PASSPIDFD		0x404A
- #define SO_PEERPIDFD		0x404B
- 
-+#define SCM_TS_OPT_ID		0x404C
-+
- #if !defined(__KERNEL__)
- 
- #if __BITS_PER_LONG == 64
-diff --git a/arch/sparc/include/uapi/asm/socket.h b/arch/sparc/include/uapi/asm/socket.h
-index 682da3714686..9b40f0a57fbc 100644
---- a/arch/sparc/include/uapi/asm/socket.h
-+++ b/arch/sparc/include/uapi/asm/socket.h
-@@ -133,6 +133,8 @@
- #define SO_PASSPIDFD             0x0055
- #define SO_PEERPIDFD             0x0056
- 
-+#define SCM_TS_OPT_ID            0x0057
-+
- #if !defined(__KERNEL__)
- 
- 
-diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-index 394c3b66065e..f01dd273bea6 100644
---- a/include/net/inet_sock.h
-+++ b/include/net/inet_sock.h
-@@ -174,6 +174,7 @@ struct inet_cork {
- 	__s16			tos;
- 	char			priority;
- 	__u16			gso_size;
-+	u32			ts_opt_id;
- 	u64			transmit_time;
- 	u32			mark;
- };
-@@ -241,7 +242,8 @@ struct inet_sock {
- 	struct inet_cork_full	cork;
- };
- 
--#define IPCORK_OPT	1	/* ip-options has been held in ipcork.opt */
-+#define IPCORK_OPT		1	/* ip-options has been held in ipcork.opt */
-+#define IPCORK_TS_OPT_ID	2	/* ts_opt_id field is valid, overriding sk_tskey */
- 
- enum {
- 	INET_FLAGS_PKTINFO	= 0,
 diff --git a/include/net/sock.h b/include/net/sock.h
-index f51d61fab059..a2738cfd4804 100644
+index a2738cfd4804..e5ded32b4801 100644
 --- a/include/net/sock.h
 +++ b/include/net/sock.h
-@@ -952,6 +952,12 @@ enum sock_flags {
- };
+@@ -2658,39 +2658,48 @@ static inline void sock_recv_cmsgs(struct msghdr *msg, struct sock *sk,
+ 		sock_write_timestamp(sk, 0);
+ }
  
- #define SK_FLAGS_TIMESTAMP ((1UL << SOCK_TIMESTAMP) | (1UL << SOCK_TIMESTAMPING_RX_SOFTWARE))
-+/*
-+ * The highest bit of sk_tsflags is reserved for kernel-internal
-+ * SOCKCM_FLAG_TS_OPT_ID. There is a check in core/sock.c to control that
-+ * SOF_TIMESTAMPING* values do not reach this reserved area
-+ */
-+#define SOCKCM_FLAG_TS_OPT_ID	BIT(31)
+-void __sock_tx_timestamp(__u16 tsflags, __u8 *tx_flags);
++void __sock_tx_timestamp(__u32 tsflags, __u8 *tx_flags);
  
- static inline void sock_copy_flags(struct sock *nsk, const struct sock *osk)
+ /**
+  * _sock_tx_timestamp - checks whether the outgoing packet is to be time stamped
+  * @sk:		socket sending this packet
+- * @tsflags:	timestamping flags to use
++ * @sockc:	pointer to socket cmsg cookie to get timestamping info
+  * @tx_flags:	completed with instructions for time stamping
+  * @tskey:      filled in with next sk_tskey (not for TCP, which uses seqno)
+  *
+  * Note: callers should take care of initial ``*tx_flags`` value (usually 0)
+  */
+-static inline void _sock_tx_timestamp(struct sock *sk, __u16 tsflags,
++static inline void _sock_tx_timestamp(struct sock *sk,
++				      const struct sockcm_cookie *sockc,
+ 				      __u8 *tx_flags, __u32 *tskey)
  {
-@@ -1794,6 +1800,7 @@ struct sockcm_cookie {
- 	u64 transmit_time;
- 	u32 mark;
- 	u32 tsflags;
-+	u32 ts_opt_id;
- };
- 
- static inline void sockcm_init(struct sockcm_cookie *sockc,
-diff --git a/include/uapi/asm-generic/socket.h b/include/uapi/asm-generic/socket.h
-index 8ce8a39a1e5f..db3df3e74b01 100644
---- a/include/uapi/asm-generic/socket.h
-+++ b/include/uapi/asm-generic/socket.h
-@@ -135,6 +135,8 @@
- #define SO_PASSPIDFD		76
- #define SO_PEERPIDFD		77
- 
-+#define SCM_TS_OPT_ID		78
++	__u32 tsflags = sockc->tsflags;
 +
- #if !defined(__KERNEL__)
+ 	if (unlikely(tsflags)) {
+ 		__sock_tx_timestamp(tsflags, tx_flags);
+ 		if (tsflags & SOF_TIMESTAMPING_OPT_ID && tskey &&
+-		    tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK)
+-			*tskey = atomic_inc_return(&sk->sk_tskey) - 1;
++		    tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK) {
++			if (tsflags & SOCKCM_FLAG_TS_OPT_ID)
++				*tskey = sockc->ts_opt_id;
++			else
++				*tskey = atomic_inc_return(&sk->sk_tskey) - 1;
++		}
+ 	}
+ 	if (unlikely(sock_flag(sk, SOCK_WIFI_STATUS)))
+ 		*tx_flags |= SKBTX_WIFI_STATUS;
+ }
  
- #if __BITS_PER_LONG == 64 || (defined(__x86_64__) && defined(__ILP32__))
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 468b1239606c..4b694a5a3d5d 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2831,6 +2831,8 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+-static inline void sock_tx_timestamp(struct sock *sk, __u16 tsflags,
++static inline void sock_tx_timestamp(struct sock *sk,
++				     const struct sockcm_cookie *sockc,
+ 				     __u8 *tx_flags)
  {
- 	u32 tsflags;
+-	_sock_tx_timestamp(sk, tsflags, tx_flags, NULL);
++	_sock_tx_timestamp(sk, sockc, tx_flags, NULL);
+ }
  
-+	BUILD_BUG_ON(SOF_TIMESTAMPING_LAST == (1 << 31));
-+
- 	switch (cmsg->cmsg_type) {
- 	case SO_MARK:
- 		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
-@@ -2859,6 +2861,17 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
- 			return -EINVAL;
- 		sockc->transmit_time = get_unaligned((u64 *)CMSG_DATA(cmsg));
- 		break;
-+	case SCM_TS_OPT_ID:
-+		if (sk_is_tcp(sk))
-+			return -EINVAL;
-+		tsflags = READ_ONCE(sk->sk_tsflags);
-+		if (!(tsflags & SOF_TIMESTAMPING_OPT_ID))
-+			return -EINVAL;
-+		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-+			return -EINVAL;
-+		sockc->ts_opt_id = *(u32 *)CMSG_DATA(cmsg);
-+		sockc->tsflags |= SOCKCM_FLAG_TS_OPT_ID;
-+		break;
- 	/* SCM_RIGHTS and SCM_CREDENTIALS are semantically in SOL_UNIX. */
- 	case SCM_RIGHTS:
- 	case SCM_CREDENTIALS:
+-static inline void skb_setup_tx_timestamp(struct sk_buff *skb, __u16 tsflags)
++static inline void skb_setup_tx_timestamp(struct sk_buff *skb,
++					  const struct sockcm_cookie *sockc)
+ {
+-	_sock_tx_timestamp(skb->sk, tsflags, &skb_shinfo(skb)->tx_flags,
++	_sock_tx_timestamp(skb->sk, sockc, &skb_shinfo(skb)->tx_flags,
+ 			   &skb_shinfo(skb)->tskey);
+ }
+ 
+diff --git a/net/can/raw.c b/net/can/raw.c
+index 00533f64d69d..255c0a8f39d6 100644
+--- a/net/can/raw.c
++++ b/net/can/raw.c
+@@ -966,7 +966,7 @@ static int raw_sendmsg(struct socket *sock, struct msghdr *msg, size_t size)
+ 	skb->mark = READ_ONCE(sk->sk_mark);
+ 	skb->tstamp = sockc.transmit_time;
+ 
+-	skb_setup_tx_timestamp(skb, sockc.tsflags);
++	skb_setup_tx_timestamp(skb, &sockc);
+ 
+ 	err = can_send(skb, ro->loopback);
+ 
 diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 49811c9281d4..0c7049f50369 100644
+index 0c7049f50369..e5c55a95063d 100644
 --- a/net/ipv4/ip_output.c
 +++ b/net/ipv4/ip_output.c
-@@ -973,7 +973,7 @@ static int __ip_append_data(struct sock *sk,
- 	unsigned int maxfraglen, fragheaderlen, maxnonfragsize;
- 	int csummode = CHECKSUM_NONE;
- 	struct rtable *rt = dst_rtable(cork->dst);
--	bool paged, hold_tskey, extra_uref = false;
-+	bool paged, hold_tskey = false, extra_uref = false;
- 	unsigned int wmem_alloc_delta = 0;
- 	u32 tskey = 0;
- 
-@@ -1049,10 +1049,15 @@ static int __ip_append_data(struct sock *sk,
- 
- 	cork->length += length;
- 
--	hold_tskey = cork->tx_flags & SKBTX_ANY_TSTAMP &&
--		     READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID;
--	if (hold_tskey)
--		tskey = atomic_inc_return(&sk->sk_tskey) - 1;
-+	if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
-+	    READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID) {
-+		if (cork->flags & IPCORK_TS_OPT_ID) {
-+			tskey = cork->ts_opt_id;
-+		} else {
-+			tskey = atomic_inc_return(&sk->sk_tskey) - 1;
-+			hold_tskey = true;
-+		}
-+	}
- 
- 	/* So, what's going on in the loop below?
- 	 *
-@@ -1327,6 +1332,10 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
+@@ -1331,7 +1331,7 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
+ 	cork->priority = ipc->priority;
  	cork->transmit_time = ipc->sockc.transmit_time;
  	cork->tx_flags = 0;
- 	sock_tx_timestamp(sk, ipc->sockc.tsflags, &cork->tx_flags);
-+	if (ipc->sockc.tsflags & SOCKCM_FLAG_TS_OPT_ID) {
-+		cork->flags |= IPCORK_TS_OPT_ID;
-+		cork->ts_opt_id = ipc->sockc.ts_opt_id;
-+	}
+-	sock_tx_timestamp(sk, ipc->sockc.tsflags, &cork->tx_flags);
++	sock_tx_timestamp(sk, &ipc->sockc, &cork->tx_flags);
+ 	if (ipc->sockc.tsflags & SOCKCM_FLAG_TS_OPT_ID) {
+ 		cork->flags |= IPCORK_TS_OPT_ID;
+ 		cork->ts_opt_id = ipc->sockc.ts_opt_id;
+diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+index 474dfd263c8b..0e9e01967ec9 100644
+--- a/net/ipv4/raw.c
++++ b/net/ipv4/raw.c
+@@ -370,7 +370,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
  
- 	return 0;
+ 	skb->ip_summed = CHECKSUM_NONE;
+ 
+-	skb_setup_tx_timestamp(skb, sockc->tsflags);
++	skb_setup_tx_timestamp(skb, sockc);
+ 
+ 	if (flags & MSG_CONFIRM)
+ 		skb_set_dst_pending_confirm(skb, 1);
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index e359a9161445..62f31d6b4659 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -474,15 +474,16 @@ void tcp_init_sock(struct sock *sk)
  }
+ EXPORT_SYMBOL(tcp_init_sock);
+ 
+-static void tcp_tx_timestamp(struct sock *sk, u16 tsflags)
++static void tcp_tx_timestamp(struct sock *sk, struct sockcm_cookie *sockc)
+ {
+ 	struct sk_buff *skb = tcp_write_queue_tail(sk);
++	u32 tsflags = sockc->tsflags;
+ 
+ 	if (tsflags && skb) {
+ 		struct skb_shared_info *shinfo = skb_shinfo(skb);
+ 		struct tcp_skb_cb *tcb = TCP_SKB_CB(skb);
+ 
+-		sock_tx_timestamp(sk, tsflags, &shinfo->tx_flags);
++		sock_tx_timestamp(sk, sockc, &shinfo->tx_flags);
+ 		if (tsflags & SOF_TIMESTAMPING_TX_ACK)
+ 			tcb->txstamp_ack = 1;
+ 		if (tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK)
+@@ -1318,7 +1319,7 @@ int tcp_sendmsg_locked(struct sock *sk, struct msghdr *msg, size_t size)
+ 
+ out:
+ 	if (copied) {
+-		tcp_tx_timestamp(sk, sockc.tsflags);
++		tcp_tx_timestamp(sk, &sockc);
+ 		tcp_push(sk, flags, mss_now, tp->nonagle, size_goal);
+ 	}
+ out_nopush:
 diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index f26841f1490f..ff6bd8d85e9a 100644
+index ff6bd8d85e9a..205673179b3c 100644
 --- a/net/ipv6/ip6_output.c
 +++ b/net/ipv6/ip6_output.c
-@@ -1402,7 +1402,10 @@ static int ip6_setup_cork(struct sock *sk, struct inet_cork_full *cork,
+@@ -1401,7 +1401,7 @@ static int ip6_setup_cork(struct sock *sk, struct inet_cork_full *cork,
+ 	cork->base.gso_size = ipc6->gso_size;
  	cork->base.tx_flags = 0;
  	cork->base.mark = ipc6->sockc.mark;
- 	sock_tx_timestamp(sk, ipc6->sockc.tsflags, &cork->base.tx_flags);
--
-+	if (ipc6->sockc.tsflags & SOCKCM_FLAG_TS_OPT_ID) {
-+		cork->base.flags |= IPCORK_TS_OPT_ID;
-+		cork->base.ts_opt_id = ipc6->sockc.ts_opt_id;
-+	}
- 	cork->base.length = 0;
- 	cork->base.transmit_time = ipc6->sockc.transmit_time;
+-	sock_tx_timestamp(sk, ipc6->sockc.tsflags, &cork->base.tx_flags);
++	sock_tx_timestamp(sk, &ipc6->sockc, &cork->base.tx_flags);
+ 	if (ipc6->sockc.tsflags & SOCKCM_FLAG_TS_OPT_ID) {
+ 		cork->base.flags |= IPCORK_TS_OPT_ID;
+ 		cork->base.ts_opt_id = ipc6->sockc.ts_opt_id;
+diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+index 608fa9d05b55..8476a3944a88 100644
+--- a/net/ipv6/raw.c
++++ b/net/ipv6/raw.c
+@@ -629,7 +629,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
  
-@@ -1433,7 +1436,7 @@ static int __ip6_append_data(struct sock *sk,
- 	bool zc = false;
- 	u32 tskey = 0;
- 	struct rt6_info *rt = dst_rt6_info(cork->dst);
--	bool paged, hold_tskey, extra_uref = false;
-+	bool paged, hold_tskey = false, extra_uref = false;
- 	struct ipv6_txoptions *opt = v6_cork->opt;
- 	int csummode = CHECKSUM_NONE;
- 	unsigned int maxnonfragsize, headersize;
-@@ -1543,10 +1546,15 @@ static int __ip6_append_data(struct sock *sk,
- 			flags &= ~MSG_SPLICE_PAGES;
+ 	skb->ip_summed = CHECKSUM_NONE;
+ 
+-	skb_setup_tx_timestamp(skb, sockc->tsflags);
++	skb_setup_tx_timestamp(skb, sockc);
+ 
+ 	if (flags & MSG_CONFIRM)
+ 		skb_set_dst_pending_confirm(skb, 1);
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index 4a364cdd445e..83ef86c0dd88 100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -2118,7 +2118,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
+ 	skb->priority = READ_ONCE(sk->sk_priority);
+ 	skb->mark = READ_ONCE(sk->sk_mark);
+ 	skb_set_delivery_type_by_clockid(skb, sockc.transmit_time, sk->sk_clockid);
+-	skb_setup_tx_timestamp(skb, sockc.tsflags);
++	skb_setup_tx_timestamp(skb, &sockc);
+ 
+ 	if (unlikely(extra_len == 4))
+ 		skb->no_fcs = 1;
+@@ -2650,7 +2650,7 @@ static int tpacket_fill_skb(struct packet_sock *po, struct sk_buff *skb,
+ 	skb->priority = READ_ONCE(po->sk.sk_priority);
+ 	skb->mark = READ_ONCE(po->sk.sk_mark);
+ 	skb_set_delivery_type_by_clockid(skb, sockc->transmit_time, po->sk.sk_clockid);
+-	skb_setup_tx_timestamp(skb, sockc->tsflags);
++	skb_setup_tx_timestamp(skb, sockc);
+ 	skb_zcopy_set_nouarg(skb, ph.raw);
+ 
+ 	skb_reserve(skb, hlen);
+@@ -3115,7 +3115,7 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
+ 		goto out_free;
  	}
  
--	hold_tskey = cork->tx_flags & SKBTX_ANY_TSTAMP &&
--		     READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID;
--	if (hold_tskey)
--		tskey = atomic_inc_return(&sk->sk_tskey) - 1;
-+	if (cork->tx_flags & SKBTX_ANY_TSTAMP &&
-+	    READ_ONCE(sk->sk_tsflags) & SOF_TIMESTAMPING_OPT_ID) {
-+		if (cork->flags & IPCORK_TS_OPT_ID) {
-+			tskey = cork->ts_opt_id;
-+		} else {
-+			tskey = atomic_inc_return(&sk->sk_tskey) - 1;
-+			hold_tskey = true;
-+		}
-+	}
+-	skb_setup_tx_timestamp(skb, sockc.tsflags);
++	skb_setup_tx_timestamp(skb, &sockc);
  
- 	/*
- 	 * Let's try using as much space as possible.
+ 	if (!vnet_hdr.gso_type && (len > dev->mtu + reserve + extra_len) &&
+ 	    !packet_extra_vlan_len_allowed(dev, skb)) {
+diff --git a/net/socket.c b/net/socket.c
+index 8d8b84fa404a..25bb8c0f7e57 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -688,7 +688,7 @@ void sock_release(struct socket *sock)
+ }
+ EXPORT_SYMBOL(sock_release);
+ 
+-void __sock_tx_timestamp(__u16 tsflags, __u8 *tx_flags)
++void __sock_tx_timestamp(__u32 tsflags, __u8 *tx_flags)
+ {
+ 	u8 flags = *tx_flags;
+ 
 -- 
 2.43.5
 
