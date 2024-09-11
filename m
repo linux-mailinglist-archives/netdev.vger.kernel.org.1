@@ -1,84 +1,188 @@
-Return-Path: <netdev+bounces-127501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40BC397596F
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 19:31:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86888975977
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 19:34:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09C94282245
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:31:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DA2E2830C4
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 17:34:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E91AF1B150D;
-	Wed, 11 Sep 2024 17:31:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103FC1B29C9;
+	Wed, 11 Sep 2024 17:34:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="G0Z4rkox"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JswkxbU2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641131AC8BE;
-	Wed, 11 Sep 2024 17:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28C21B14E9
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 17:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726075874; cv=none; b=X1kuh0G0Qnn602a60enEGvcl2HQIj8iQQG4RRD5WKw5wFzoOgQ8hNVOZnDhIiP8RbNxbXvnIm9Sg6J+vUHilR++K3RRwW3i+rljaNCf679F8FgI51GkV2r86pA4U5NTvkVDW+efU9EipAx1SLQ20x/G88Z1mDyKd1wXTSRLL3iE=
+	t=1726076045; cv=none; b=dVec5ANWI2AyNnOxy1KX6TgwJe0Z3BEnVvuShuxzO4fZ065D9zbTmVyY7m5rzuVJdgdO4fVqNji6pHXOxaBakot1CHMGlp1xTmfkQVJOpx1RPaz7uS6ygKRM7uc2aKyAAlq4P5SyDk7QP7OHTTE1qLAMIg7hGKalJ8opL41vatA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726075874; c=relaxed/simple;
-	bh=mRaM2t/rbSGkrMbtS9n67rdf9rDIXKRWk+ETwGowD/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GA7ZMT7M5whAxqevgW77o3QUg7weSc+HS1RAyNpjdVZhY4r1lV6QPSxye2syp8x3QUtftoTqLApvA0SmTWU9qHo2+nS74GPjDfbmaAkTUfz2ZaDze5EU1p2pLvkY4q2e0k0zL4MuhwDZsc7UwSLgBqoanfNsa1N0Bew/tH6da64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G0Z4rkox; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=L1XCqinyQGPfUahG7TVwCefg+V1JXC5HVaYEwdzrGj4=; b=G0Z4rkoxlxkluExA04hB0+09fW
-	mU1GHVNAjEBEn+RkVSUrBC/w79bYCQPsuhzal/EYYVDJmlIVImYWtzb+hbuFZ9hr3GYVIS3VxhNKL
-	2LOX3XcOhDOk8HX4NCqRyh/cBFKUBObaI0jsRTQijOM1As7wsEv5UqK7ROH0+rgvhamk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1soRBF-007Eov-Sn; Wed, 11 Sep 2024 19:31:01 +0200
-Date: Wed, 11 Sep 2024 19:31:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
-	Steen.Hegelund@microchip.com, daniel.machon@microchip.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next V2 5/5] net: lan743x: Add Support for 2.5G SFP
- with 2500Base-X Interface
-Message-ID: <82067738-f569-448b-b5d8-7111bef2a8e9@lunn.ch>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-6-Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1726076045; c=relaxed/simple;
+	bh=ADWMV/I7PLbTMRzO2ohvog05sKANIhJw045KoKiwBzM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fu7ZY1sOf91l35oDCd5+Txu5xqK6J0hcYYClcc6y7g4dC7oG9yuuC/jfr2qA/bywEuEh2EnZPwMwuXVIzPcOdDIPjXssVjmlcO0GIbfU2Z4WDZs1s6tRPG9gTAVo3ainJxKFXWMR3DsPcR3nGt6d8VbNfgdw8tcht5y/w8YFyzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JswkxbU2; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8047db0c-39eb-4b98-89e4-f0822805c309@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726076040;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XHalqKbvZbOtWyamwKtGLymNQ5l/tzEX6wRT+G1VD8U=;
+	b=JswkxbU25MFkIWcSkH0RXhnzmZRmEClO+nWuNt8VfY5NR99TnGeP3iicd8FRhyNEyGEx03
+	CPn7+Kn4y/YXMT5luiRCeneDVNlBLz4+Bqb53w1PWjAyDCbsXwOeB3AujiiFCWhbPxHkMu
+	qJDl64Ay8Dw/iAF+FsISwgp+ynH25NY=
+Date: Wed, 11 Sep 2024 10:33:49 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911161054.4494-6-Raju.Lakkaraju@microchip.com>
+Subject: Re: [PATCH bpf-next v3 5/5] selftests/bpf: Expand skb dynptr
+ selftests for tp_btf
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: bpf@vger.kernel.org, edumazet@google.com, rostedt@goodmis.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, mykolal@fb.com, shuah@kernel.org,
+ mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+ thinker.li@gmail.com, juntong.deng@outlook.com, jrife@google.com,
+ alan.maguire@oracle.com, davemarchevsky@fb.com, dxu@dxuuu.xyz,
+ vmalik@redhat.com, cupertino.miranda@oracle.com, mattbobrowski@google.com,
+ xuanzhuo@linux.alibaba.com, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+References: <20240911033719.91468-1-lulie@linux.alibaba.com>
+ <20240911033719.91468-6-lulie@linux.alibaba.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240911033719.91468-6-lulie@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> @@ -3359,6 +3362,7 @@ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
->  	lan743x_phy_interface_select(adapter);
->  
->  	switch (adapter->phy_interface) {
-> +	case PHY_INTERFACE_MODE_2500BASEX:
->  	case PHY_INTERFACE_MODE_SGMII:
->  		__set_bit(PHY_INTERFACE_MODE_SGMII,
->  			  adapter->phylink_config.supported_interfaces);
+On 9/10/24 8:37 PM, Philo Lu wrote:
+> Add 3 test cases for skb dynptr used in tp_btf:
+> - test_dynptr_skb_tp_btf: use skb dynptr in tp_btf and make sure it is
+>    read-only.
+> - skb_invalid_ctx_fentry/skb_invalid_ctx_fexit: bpf_dynptr_from_skb
+>    should fail in fentry/fexit.
+> 
+> In test_dynptr_skb_tp_btf, to trigger the tracepoint in kfree_skb,
+> test_pkt_access is used for its test_run, as in kfree_skb.c. Because the
+> test process is different from others, a new setup type is defined,
+> i.e., SETUP_SKB_PROG_TP.
+> 
+> The result is like:
+> $ ./test_progs -t 'dynptr/test_dynptr_skb_tp_btf'
+>    #84/14   dynptr/test_dynptr_skb_tp_btf:OK
+>    #84      dynptr:OK
+>    #127     kfunc_dynptr_param:OK
+>    Summary: 2/1 PASSED, 0 SKIPPED, 0 FAILED
+> 
+> $ ./test_progs -t 'dynptr/skb_invalid_ctx_f'
+>    #84/85   dynptr/skb_invalid_ctx_fentry:OK
+>    #84/86   dynptr/skb_invalid_ctx_fexit:OK
+>    #84      dynptr:OK
+>    #127     kfunc_dynptr_param:OK
+>    Summary: 2/2 PASSED, 0 SKIPPED, 0 FAILED
+> 
+> Also fix two coding style nits (change spaces to tabs).
+> 
+> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+> ---
+>   .../testing/selftests/bpf/prog_tests/dynptr.c | 36 +++++++++++++++++--
+>   .../testing/selftests/bpf/progs/dynptr_fail.c | 25 +++++++++++++
+>   .../selftests/bpf/progs/dynptr_success.c      | 23 ++++++++++++
+>   3 files changed, 82 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/bpf/prog_tests/dynptr.c b/tools/testing/selftests/bpf/prog_tests/dynptr.c
+> index 7cfac53c0d58d..ba40be8b1c4ef 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/dynptr.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/dynptr.c
+> @@ -9,6 +9,7 @@
+>   enum test_setup_type {
+>   	SETUP_SYSCALL_SLEEP,
+>   	SETUP_SKB_PROG,
+> +	SETUP_SKB_PROG_TP,
+>   };
+>   
+>   static struct {
+> @@ -28,6 +29,7 @@ static struct {
+>   	{"test_dynptr_clone", SETUP_SKB_PROG},
+>   	{"test_dynptr_skb_no_buff", SETUP_SKB_PROG},
+>   	{"test_dynptr_skb_strcmp", SETUP_SKB_PROG},
+> +	{"test_dynptr_skb_tp_btf", SETUP_SKB_PROG_TP},
+>   };
+>   
+>   static void verify_success(const char *prog_name, enum test_setup_type setup_type)
+> @@ -35,7 +37,7 @@ static void verify_success(const char *prog_name, enum test_setup_type setup_typ
+>   	struct dynptr_success *skel;
+>   	struct bpf_program *prog;
+>   	struct bpf_link *link;
+> -       int err;
+> +	int err;
+>   
+>   	skel = dynptr_success__open();
+>   	if (!ASSERT_OK_PTR(skel, "dynptr_success__open"))
+> @@ -47,7 +49,7 @@ static void verify_success(const char *prog_name, enum test_setup_type setup_typ
+>   	if (!ASSERT_OK_PTR(prog, "bpf_object__find_program_by_name"))
+>   		goto cleanup;
+>   
+> -       bpf_program__set_autoload(prog, true);
+> +	bpf_program__set_autoload(prog, true);
+>   
+>   	err = dynptr_success__load(skel);
+>   	if (!ASSERT_OK(err, "dynptr_success__load"))
+> @@ -87,6 +89,36 @@ static void verify_success(const char *prog_name, enum test_setup_type setup_typ
+>   
+>   		break;
+>   	}
+> +	case SETUP_SKB_PROG_TP:
+> +	{
+> +		struct __sk_buff skb = {};
+> +		struct bpf_object *obj;
+> +		int aux_prog_fd;
+> +
+> +		/* Just use its test_run to trigger kfree_skb tracepoint */
+> +		err = bpf_prog_test_load("./test_pkt_access.bpf.o", BPF_PROG_TYPE_SCHED_CLS,
+> +					 &obj, &aux_prog_fd);
+> +		if (!ASSERT_OK(err, "prog_load sched cls"))
+> +			goto cleanup;
+> +
+> +		LIBBPF_OPTS(bpf_test_run_opts, topts,
+> +			    .data_in = &pkt_v4,
+> +			    .data_size_in = sizeof(pkt_v4),
+> +			    .ctx_in = &skb,
+> +			    .ctx_size_in = sizeof(skb),
+> +		);
+> +
+> +		link = bpf_program__attach(prog);
+> +		if (!ASSERT_OK_PTR(link, "bpf_program__attach"))
+> +			goto cleanup;
+> +
+> +		err = bpf_prog_test_run_opts(aux_prog_fd, &topts);
 
-I _think_ you also need to set the PHY_INTERFACE_MODE_2500BASEX bit in
-phylink_config.supported_interfaces if you actually support it.
+bpf_link__destroy(link) is needed. I fixed it and applied. Thanks.
 
-Have you tested an SFP module capable of 2500BASEX?
-
-	Andrew
+> +
+> +		if (!ASSERT_OK(err, "test_run"))
+> +			goto cleanup;
+> +
+> +		break;
+> +	}
+>   	}
 
