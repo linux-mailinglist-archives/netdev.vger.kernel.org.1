@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-127569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6321E975C09
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:47:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17AFF975C07
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:47:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D53DCB23A2F
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:47:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A5631C215D9
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28371BC07D;
-	Wed, 11 Sep 2024 20:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71CF13D52A;
+	Wed, 11 Sep 2024 20:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cVdNGgsw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6SqiIc9"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45601C2E9
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1C53D3B8;
+	Wed, 11 Sep 2024 20:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726087524; cv=none; b=X1GiFuLMvW2tLwhNOmAbnJko71aqBrhNNobUhD0XtM8GiNntrmc/oaS/eNhOBHHCwZA+CSye0w8WbH6yEcRdcekf7s4IZ1kYaHQXUx3OXugEjPFdhYM3zO7dGGfEGIjWASlCcRzT4maTdiGV5ALRl9bpxvGlNeSmhp3VjXlNZMM=
+	t=1726087523; cv=none; b=bxbIS2MFeQY0olYMVeREvcpGsqjU8A44kzk4uHjHGjw39B7+dtMktS3JwDzX1lZ/MjOaeq4labgksqE3AjvEExkbNoCzbMe3c7xLM+V6OmTrMjyTeB25uNnl0pP/o7+L8rX41pCaasyNM8xlpWJ057XoJy4/VaBxi3JXkKNCB6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726087524; c=relaxed/simple;
-	bh=D1fHgIdQfkUBtWdVqUq5gZu7uUUn9awQLJClmfSX02c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kVZWyZulqhDH4To2W3GNMpzO7XJq6SL/dlzo5Gj4yPFN9V7CLDcR9wf0S65CoKHlYcgTfVfOJnGuCmFwDKjJb3RHOmajq2LCvDhtsZ9gZgbRfFyzjsV6M0t3EvpxoNGnyfn0l4J3tmwb/1wAYZPNF9qxhaRuzaCdsOiG1kuPl7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cVdNGgsw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NKxpnKThnuRb1DCyK1P3S9wNVBFay/ooTSE9FrEWQw4=; b=cVdNGgswF/2o5LdM2Np9IDF3i/
-	M17YKzdodL6A3UBSdzU+V5LDdIHSZE5qJEh7EWbfdlIwuAwLraB0CWrUqx9KreaHIL1uUwma4EfJq
-	5Ju3ETvZp7vILeygG+6mt7Juz8ixM3yWlSewB56SCiGOxdW4V+q4jxiYX3XmRt9V8Sm0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1soUD9-007Fce-OD; Wed, 11 Sep 2024 22:45:11 +0200
-Date: Wed, 11 Sep 2024 22:45:11 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Alexander Duyck <alexanderduyck@fb.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 2/5] eth: fbnic: add initial PHC support
-Message-ID: <4c720c2e-7a60-4f94-96bd-94ab59fa8905@lunn.ch>
-References: <20240911124513.2691688-1-vadfed@meta.com>
- <20240911124513.2691688-3-vadfed@meta.com>
- <006042c0-e1d5-4fbc-aa7f-94a74cfbef0e@lunn.ch>
- <c1003a1b-cf6f-4332-b0c7-5461a164097e@linux.dev>
- <20240911131035.74c5e8f9@kernel.org>
+	s=arc-20240116; t=1726087523; c=relaxed/simple;
+	bh=O7Y69PIgkHEXOoMMCpXya+p8Azq0hznxZoTw6hqs7N4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=POHJXn/eFufNmW9B0hCv39ktY+2EFCqFi96WMx80gXDXzotLVwNcq8L5TyEjV/TGOGINamxpmdYdX7hXSWT0fyBba6Bu15l+aXbv5jSqKU/vDTIpfCpFx+RhEJ2cWJ3RvPSr6+zFN9sP3gIZ1n/EawL33moOgqnogpEfmBP3oPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q6SqiIc9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA92DC4CEC0;
+	Wed, 11 Sep 2024 20:45:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726087523;
+	bh=O7Y69PIgkHEXOoMMCpXya+p8Azq0hznxZoTw6hqs7N4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=q6SqiIc9yNxuyQqx/UFI40FeMtxCbDPL8b4N7i4RpA1A7L/r322HZbgErsctwRnwQ
+	 eK1t3OpSzC4GB7/iIYcphpzZibit6Eg5fuc9v1nh+jYen1zj1mMli/CkiKzTBvFBGc
+	 FXmD3xx7Luta2m5GPRWBMYgS9nLLq1u0HAiFELjAXi89lSYjxvrw+o6NYFFZ7huYe/
+	 AWUH4ZepXWvebjmqYO8//pFjEMG11RLKvS1FjHX4eS4mrmNU9mHkip2njd3Id21k2I
+	 +pHa8ZlzDTDAkVEEcpufL/0IRfL0kHX3NNkPAU2gZxiD/9hGwMd30YR2oDdsxD+1ou
+	 m6qWCNGMelE7g==
+Date: Wed, 11 Sep 2024 13:45:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
+Subject: Re: pull-request: wireless-next-2024-09-11
+Message-ID: <20240911134521.7f510329@kernel.org>
+In-Reply-To: <20240911084147.A205DC4AF0F@smtp.kernel.org>
+References: <20240911084147.A205DC4AF0F@smtp.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911131035.74c5e8f9@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 11, 2024 at 01:10:35PM -0700, Jakub Kicinski wrote:
-> On Wed, 11 Sep 2024 20:49:51 +0100 Vadim Fedorenko wrote:
-> > >> + * TBD: alias u64_stats_sync & co. with some more appropriate names upstream.  
-> > > 
-> > > This is upstream, so maybe now is a good time to decide?  
-> > 
-> > That's good question. Do we need another set of helpers just because of 
-> > names? Obviously, the internals will be the same sequence magic.
-> 
-> Good question. To be clear we want a seq lock that goes away on 64b
-> since what it protects is accessed on the fast path (potentially per
-> packet). We could s/u64_stats/u64_seq/ the existing helpers. But that
-> sounds like a lot for a single user. Dunno..
+On Wed, 11 Sep 2024 08:41:47 +0000 (UTC) Kalle Valo wrote:
+> here's a pull request to net-next tree, more info below. Please let me know if
+> there are any problems.
 
-It does sound like a lot of a single user.
+For a follow up, clang W=1 says:
 
-And what is the likelihood of this device ever being used on a 32 bit
-system? It is a server class NIC. Are there still 32 bit servers in
-use?
-
-Maybe "depends on 64BIT" with a good commit message why?
-
-	Andrew
+../drivers/net/wireless/realtek/rtw89/coex.c:6323:23: warning: variable 'cnt_2g' set but not used [-Wunused-but-set-variable]
+ 6323 |         u8 i, mode, cnt = 0, cnt_2g = 0, cnt_5g = 0, phy_now = RTW89_PHY_MAX, phy_dbcc;
+      |                              ^
+../drivers/net/wireless/realtek/rtw89/coex.c:6323:35: warning: variable 'cnt_5g' set but not used [-Wunused-but-set-variable]
+ 6323 |         u8 i, mode, cnt = 0, cnt_2g = 0, cnt_5g = 0, phy_now = RTW89_PHY_MAX, phy_dbcc;
+      |                                          ^
+2 warnings generated.
+../drivers/staging/rtl8712/rtl8712_recv.c:139:6: warning: variable 'drvinfo_sz' set but not used [-Wunused-but-set-variable]
+  139 |         u16 drvinfo_sz;
+      |             ^
+1 warning generated.
+../drivers/staging/rtl8723bs/core/rtw_efuse.c:285:6: warning: variable 'efuseValue' set but not used [-Wunused-but-set-variable]
+  285 |         u32 efuseValue;
+      |             ^
+1 warning generated.
+../drivers/staging/rtl8723bs/core/rtw_recv.c:2030:7: warning: variable 'cnt' set but not used [-Wunused-but-set-variable]
+ 2030 |                 int cnt = 0;
+      |                     ^
+1 warning generated.
+../drivers/staging/rtl8723bs/core/rtw_pwrctrl.c:288:6: warning: variable 'poll_cnt' set but not used [-Wunused-but-set-variable]
+  288 |                 u8 poll_cnt = 0;
+      |                    ^
 
