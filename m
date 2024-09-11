@@ -1,89 +1,106 @@
-Return-Path: <netdev+bounces-127568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17AFF975C07
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:47:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68C40975C15
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:58:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A5631C215D9
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:47:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 297D8281BD3
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:58:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A71CF13D52A;
-	Wed, 11 Sep 2024 20:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B131F14A096;
+	Wed, 11 Sep 2024 20:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6SqiIc9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="icmHwbnI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1C53D3B8;
-	Wed, 11 Sep 2024 20:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A8E3D3B8
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726087523; cv=none; b=bxbIS2MFeQY0olYMVeREvcpGsqjU8A44kzk4uHjHGjw39B7+dtMktS3JwDzX1lZ/MjOaeq4labgksqE3AjvEExkbNoCzbMe3c7xLM+V6OmTrMjyTeB25uNnl0pP/o7+L8rX41pCaasyNM8xlpWJ057XoJy4/VaBxi3JXkKNCB6I=
+	t=1726088288; cv=none; b=XB7fjS1YBoiXJZG/HDHWISenY5PRfDFFFkIvS/DP7DrKAn/BXa3RZVgNqieyxponD84fiX4NLE1ZC19FWIwcR+mc3cAae2GdjC544qw8FCXRt2W9QvzqBTJY09YL6ISXOZUBZKQA+q/m4G+eEh/ex0kx8YlC2KJtZoRr6xt2ji8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726087523; c=relaxed/simple;
-	bh=O7Y69PIgkHEXOoMMCpXya+p8Azq0hznxZoTw6hqs7N4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=POHJXn/eFufNmW9B0hCv39ktY+2EFCqFi96WMx80gXDXzotLVwNcq8L5TyEjV/TGOGINamxpmdYdX7hXSWT0fyBba6Bu15l+aXbv5jSqKU/vDTIpfCpFx+RhEJ2cWJ3RvPSr6+zFN9sP3gIZ1n/EawL33moOgqnogpEfmBP3oPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q6SqiIc9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA92DC4CEC0;
-	Wed, 11 Sep 2024 20:45:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726087523;
-	bh=O7Y69PIgkHEXOoMMCpXya+p8Azq0hznxZoTw6hqs7N4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q6SqiIc9yNxuyQqx/UFI40FeMtxCbDPL8b4N7i4RpA1A7L/r322HZbgErsctwRnwQ
-	 eK1t3OpSzC4GB7/iIYcphpzZibit6Eg5fuc9v1nh+jYen1zj1mMli/CkiKzTBvFBGc
-	 FXmD3xx7Luta2m5GPRWBMYgS9nLLq1u0HAiFELjAXi89lSYjxvrw+o6NYFFZ7huYe/
-	 AWUH4ZepXWvebjmqYO8//pFjEMG11RLKvS1FjHX4eS4mrmNU9mHkip2njd3Id21k2I
-	 +pHa8ZlzDTDAkVEEcpufL/0IRfL0kHX3NNkPAU2gZxiD/9hGwMd30YR2oDdsxD+1ou
-	 m6qWCNGMelE7g==
-Date: Wed, 11 Sep 2024 13:45:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Kalle Valo <kvalo@kernel.org>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: pull-request: wireless-next-2024-09-11
-Message-ID: <20240911134521.7f510329@kernel.org>
-In-Reply-To: <20240911084147.A205DC4AF0F@smtp.kernel.org>
-References: <20240911084147.A205DC4AF0F@smtp.kernel.org>
+	s=arc-20240116; t=1726088288; c=relaxed/simple;
+	bh=WdHYhlDr0nrY/shpZl1gEvLt7eS4xQRdlHVaebsM+ec=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=J0saZVXlu4jcFwUbx9qGhOdJ/wSC07uy6Ii6szKtaTjUJ2ItgQQUE2PG2zsI0I8jrYabdbT34fNdaMvGgkfSOZInPPZ1ChwZ7Io5JhiaTC3wQPSzGnqDchNT+U9ocv7SvPlJ5NAwK5EpasPKOH4cLxkm6whC08BSRbZVdcMpjCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=icmHwbnI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=smgOifiQdNUjpHBcg4tZ8DkBdEcwy5jVm7G1psfO4EI=; b=icmHwbnIfhqE7XBiPLngPjo7aG
+	ptZIu5rq1R9JLjAbFpLhc85XFV0pK4QAVK7nSa3njwxU9jRRR1De8f2q1Z8md7poCSQ3hjgGTExCC
+	Dh99mzCcoBoTDCQn0r8zxY0icvyc9sLPmJsMTDshk2KYyi35vmWpqKzhl53PPFS04/yk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1soUPa-007FhY-7e; Wed, 11 Sep 2024 22:58:02 +0200
+Date: Wed, 11 Sep 2024 22:58:02 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Hans-Frieder Vogt <hfdevel@gmx.net>
+Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	FUJITA Tomonori <fujita.tomonori@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 3/5] net: phy: aquantia: search for
+ firmware-name in fwnode
+Message-ID: <0f811481-0976-4aec-a000-417d8b0a2a98@lunn.ch>
+References: <trinity-da86cb70-f227-403a-be94-6e6a3fd0a0ca-1726082854312@3c-app-gmx-bs04>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <trinity-da86cb70-f227-403a-be94-6e6a3fd0a0ca-1726082854312@3c-app-gmx-bs04>
 
-On Wed, 11 Sep 2024 08:41:47 +0000 (UTC) Kalle Valo wrote:
-> here's a pull request to net-next tree, more info below. Please let me know if
-> there are any problems.
+On Wed, Sep 11, 2024 at 09:27:34PM +0200, Hans-Frieder Vogt wrote:
+> For loading of a firmware file over the filesystem, and
+> if the system is non-device-tree, try finding firmware-name from the software
+> node (or: fwnode) of the mdio device. This software node may have been
+> provided by the MAC or MDIO driver.
+> 
+> Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
+> ---
+>  drivers/net/phy/aquantia/aquantia_firmware.c | 25 +++++++++++++++++++-
+>  1 file changed, 24 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/phy/aquantia/aquantia_firmware.c b/drivers/net/phy/aquantia/aquantia_firmware.c
+> index 090fcc9a3413..f6154f815d72 100644
+> --- a/drivers/net/phy/aquantia/aquantia_firmware.c
+> +++ b/drivers/net/phy/aquantia/aquantia_firmware.c
+> @@ -324,14 +324,37 @@ static int aqr_firmware_load_nvmem(struct phy_device *phydev)
+>  static int aqr_firmware_load_fs(struct phy_device *phydev)
+>  {
+>  	struct device *dev = &phydev->mdio.dev;
+> +	struct fwnode_handle *fw_node;
+>  	const struct firmware *fw;
+>  	const char *fw_name;
+> +	u32 phy_id;
+>  	int ret;
+> 
+>  	ret = of_property_read_string(dev->of_node, "firmware-name",
+>  				      &fw_name);
 
-For a follow up, clang W=1 says:
+Did you try just replacing this with:
 
-../drivers/net/wireless/realtek/rtw89/coex.c:6323:23: warning: variable 'cnt_2g' set but not used [-Wunused-but-set-variable]
- 6323 |         u8 i, mode, cnt = 0, cnt_2g = 0, cnt_5g = 0, phy_now = RTW89_PHY_MAX, phy_dbcc;
-      |                              ^
-../drivers/net/wireless/realtek/rtw89/coex.c:6323:35: warning: variable 'cnt_5g' set but not used [-Wunused-but-set-variable]
- 6323 |         u8 i, mode, cnt = 0, cnt_2g = 0, cnt_5g = 0, phy_now = RTW89_PHY_MAX, phy_dbcc;
-      |                                          ^
-2 warnings generated.
-../drivers/staging/rtl8712/rtl8712_recv.c:139:6: warning: variable 'drvinfo_sz' set but not used [-Wunused-but-set-variable]
-  139 |         u16 drvinfo_sz;
-      |             ^
-1 warning generated.
-../drivers/staging/rtl8723bs/core/rtw_efuse.c:285:6: warning: variable 'efuseValue' set but not used [-Wunused-but-set-variable]
-  285 |         u32 efuseValue;
-      |             ^
-1 warning generated.
-../drivers/staging/rtl8723bs/core/rtw_recv.c:2030:7: warning: variable 'cnt' set but not used [-Wunused-but-set-variable]
- 2030 |                 int cnt = 0;
-      |                     ^
-1 warning generated.
-../drivers/staging/rtl8723bs/core/rtw_pwrctrl.c:288:6: warning: variable 'poll_cnt' set but not used [-Wunused-but-set-variable]
-  288 |                 u8 poll_cnt = 0;
-      |                    ^
+    	ret = device_property_read_string(dev, "firmware-name", &fw_name);
+
+As far as i understand, the device_property_ functions will look
+around in OF, ACPI and swnode to find the given property. As long as
+the MAC driver puts the property in the right place, i _think_ this
+will just work.
+
+	Andrew
 
