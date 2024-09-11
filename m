@@ -1,104 +1,155 @@
-Return-Path: <netdev+bounces-127330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65D8E9750CE
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:29:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 679C19750D5
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 13:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98CB91C2290A
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:29:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8E951F232E2
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 11:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4D918593A;
-	Wed, 11 Sep 2024 11:29:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jbsky.fr header.i=@jbsky.fr header.b="CRgDCGeO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C84E4185B78;
+	Wed, 11 Sep 2024 11:31:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pmg.home.arpa (i19-les02-ix2-176-181-14-251.dsl.dyn.abo.bbox.fr [176.181.14.251])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BFD7DA81;
-	Wed, 11 Sep 2024 11:29:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.181.14.251
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E7314F100;
+	Wed, 11 Sep 2024 11:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726054144; cv=none; b=bMY1bYp3wAPsBgZvDt5vp33p3jeWvIUvoy2VBLD9EiYK6hQM47J3guvn8BTJxWrF6OTjwAQOa2XheVV3/b9zcgDremnMiaLmnGNI7uyxhcImWcZpY4kTF1/UV6T+1HXG9gHo44n7L0vgff7uNmMWUKUokD3KEI1wZ9wHICPWyuE=
+	t=1726054282; cv=none; b=lulZSmpmyJXg5o4kvfoIdJnYaHeKKFetXlT2sqWcSi3nvxoh9f5SqjPuUw/Lql7lCTUBmlfIAtFF60OIfTe1vTgfHwZsfXJ1cgbji6bps39YsF5q19vQZ1/d+7TrTTz1u/asNeUGHawW7HMH4oZzqDw5c7D51iVXXcpDRNisWyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726054144; c=relaxed/simple;
-	bh=k9GOcmhJC466QzkABqserR0HiILCJ/LRGBvVCwgtSLg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ufs8ljB5k0g2ch2gbdOJGzYu4TWGooGtyRl79YP2rBHfK13W6cXssLyAaQA7JOY7+mfOhtMZYzl56OwIGMOn3EopXjh4mjSahg/9x8WJq9l9vYVyonVIqNJvvsvordo7BnNGrHgX99CTQ9ayE97FHHjeRp3vZi2EcgVcG3m5CA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jbsky.fr; spf=pass smtp.mailfrom=jbsky.fr; dkim=pass (2048-bit key) header.d=jbsky.fr header.i=@jbsky.fr header.b=CRgDCGeO; arc=none smtp.client-ip=176.181.14.251
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jbsky.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jbsky.fr
-Received: from pmg.home.arpa (localhost [127.0.0.1])
-	by pmg.home.arpa (Proxmox) with ESMTP id 4C639223CD;
-	Wed, 11 Sep 2024 13:28:59 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jbsky.fr; h=cc
-	:cc:content-transfer-encoding:date:from:from:message-id
-	:mime-version:reply-to:subject:subject:to:to; s=pmg1; bh=pWQdPBZ
-	U4iT8+rX31aSpkJm70LrFePUPmnw9lMgoydo=; b=CRgDCGeOrYoIFqKm2CAqkCd
-	pdPbH0Qf40YihhPOSOPBqb0KSomingIqXcYz41SuLQ7wgv8fyGyLpW5wiGpzb2V0
-	sSkecQEV7DcyGg9fXtA7qNWkJB8oIcSRhwjBvDBT81xHtHiPj+kCkw8MLzSVn3dU
-	Fm/T79Wl3syRn7ikowO3TUhNF1zmxuOGPC466EeEfj9Jmp9HS8mLkxqHZyZ2rZxE
-	VlZvabD5EOKMS7kDpGAhu5YT3TpKUXmG90HAzweDaRwKKeWLfjxLEGZ9OCnds3wS
-	VoOHRS2o+7qPed3AkvLaSguhm0ahSR06M3DnoJYzgcPG9zlETwVYbkjMNs9fmZw=
-	=
-From: Julien Blais <webmaster@jbsky.fr>
-To: thomas.petazzoni@bootlin.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Julien Blais <webmaster@jbsky.fr>
-Subject: [PATCH v2] mvneta: fix "napi poll" infinite loop
-Date: Wed, 11 Sep 2024 13:28:46 +0200
-Message-Id: <20240911112846.285033-1-webmaster@jbsky.fr>
+	s=arc-20240116; t=1726054282; c=relaxed/simple;
+	bh=RNMWO2WtthbJKl9msB3Y5qZod76Z7zlwONaoHt/pM3w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Gpie8H4BaAFtKEdM2ohbXV2dE3tsuESuzncgCY6cCOGcUDz6rc4G/wvd6UkBzoymOn/jIXB5HSEMzjRYhsngyCgJxGHXtle0hct7xIYQU00hnMkbWrMyOcRKfIenGRxIGDTKsGUfI30/W/CMLZlQeCbEUC95lk/CdtXvBG6Ohrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4X3dfv3VlSz2Cp5l;
+	Wed, 11 Sep 2024 19:30:47 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id D79FF14010C;
+	Wed, 11 Sep 2024 19:31:16 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 11 Sep 2024 19:31:16 +0800
+Message-ID: <15d963c2-1854-4fb7-a7a4-d8ed8cafead3@huawei.com>
+Date: Wed, 11 Sep 2024 19:31:16 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v18 12/14] net: replace page_frag with
+ page_frag_cache
+To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>, <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
+	<alexander.duyck@gmail.com>, Ayush Sawal <ayush.sawal@chelsio.com>, Eric
+ Dumazet <edumazet@google.com>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, Ingo
+ Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, Juri Lelli
+	<juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt
+	<rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, Mel Gorman
+	<mgorman@suse.de>, Valentin Schneider <vschneid@redhat.com>, John Fastabend
+	<john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>, David
+ Ahern <dsahern@kernel.org>, Matthieu Baerts <matttbe@kernel.org>, Mat
+ Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, Jamal
+ Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri
+ Pirko <jiri@resnulli.us>, Boris Pismenny <borisp@nvidia.com>,
+	<bpf@vger.kernel.org>, <mptcp@lists.linux.dev>
+References: <20240906073646.2930809-1-linyunsheng@huawei.com>
+ <20240906073646.2930809-13-linyunsheng@huawei.com>
+ <1884e171-cc87-4238-abd1-0f6be1e0b279@redhat.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <1884e171-cc87-4238-abd1-0f6be1e0b279@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-In percpu mode, when there's a network load, one of the cpus can be
-solicited without having anything to process.
-If 0 is returned to napi poll, napi will ignore the next requests,
-causing an infinite loop with ISR handling.
+On 2024/9/10 22:04, Paolo Abeni wrote:
+> On 9/6/24 09:36, Yunsheng Lin wrote:
+>> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+>> index 49811c9281d4..6190d9bfd618 100644
+>> --- a/net/ipv4/ip_output.c
+>> +++ b/net/ipv4/ip_output.c
+>> @@ -953,7 +953,7 @@ static int __ip_append_data(struct sock *sk,
+>>                   struct flowi4 *fl4,
+>>                   struct sk_buff_head *queue,
+>>                   struct inet_cork *cork,
+>> -                struct page_frag *pfrag,
+>> +                struct page_frag_cache *nc,
+>>                   int getfrag(void *from, char *to, int offset,
+>>                       int len, int odd, struct sk_buff *skb),
+>>                   void *from, int length, int transhdrlen,
+>> @@ -1228,13 +1228,19 @@ static int __ip_append_data(struct sock *sk,
+>>               copy = err;
+>>               wmem_alloc_delta += copy;
+>>           } else if (!zc) {
+>> +            struct page_frag page_frag, *pfrag;
+>>               int i = skb_shinfo(skb)->nr_frags;
+>> +            void *va;
+>>                 err = -ENOMEM;
+>> -            if (!sk_page_frag_refill(sk, pfrag))
+>> +            pfrag = &page_frag;
+>> +            va = sk_page_frag_alloc_refill_prepare(sk, nc, pfrag);
+>> +            if (!va)
+>>                   goto error;
+>>                 skb_zcopy_downgrade_managed(skb);
+>> +            copy = min_t(int, copy, pfrag->size);
+>> +
+>>               if (!skb_can_coalesce(skb, i, pfrag->page,
+>>                             pfrag->offset)) {
+>>                   err = -EMSGSIZE;
+>> @@ -1242,18 +1248,18 @@ static int __ip_append_data(struct sock *sk,
+>>                       goto error;
+>>                     __skb_fill_page_desc(skb, i, pfrag->page,
+>> -                             pfrag->offset, 0);
+>> +                             pfrag->offset, copy);
+>>                   skb_shinfo(skb)->nr_frags = ++i;
+>> -                get_page(pfrag->page);
+>> +                page_frag_commit(nc, pfrag, copy);
+>> +            } else {
+>> +                skb_frag_size_add(&skb_shinfo(skb)->frags[i - 1],
+>> +                          copy);
+>> +                page_frag_commit_noref(nc, pfrag, copy);
+>>               }
+>> -            copy = min_t(int, copy, pfrag->size - pfrag->offset);
+>> -            if (getfrag(from,
+>> -                    page_address(pfrag->page) + pfrag->offset,
+>> -                    offset, copy, skb->len, skb) < 0)
+>> +
+>> +            if (getfrag(from, va, offset, copy, skb->len, skb) < 0)
+>>                   goto error_efault;
+> 
+> Should the 'commit' happen only when 'getfrag' is successful?
+> 
+> Similar question in the ipv6 code.
 
-Without this change, patches hang around fixing the queue at 0 and
-the interrupt remains stuck on the 1st CPU.
-The percpu conf is useless in this case, so we might as well remove it.
+Good question.
+First of all, even it fails, the 'goto' will handle it correctly as the
+skb_shinfo(skb)->nr_frags is setup correctly.
+And then 'getfrag' being failure is an unlikely case, right?
 
-Signed-off-by: Julien Blais <webmaster@jbsky.fr>
----
- drivers/net/ethernet/marvell/mvneta.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+I thought about moving it when coding, but decided not to mainly get_page()
+is also called before 'getfrag' as above, and I guess 'getfrag' might
+involve memcpy'ing causing the cache eviction for the above data, so it
+might make sense to do the likely case before 'getfrag'.
 
-diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
-index 3f124268b..b6e89b888 100644
---- a/drivers/net/ethernet/marvell/mvneta.c
-+++ b/drivers/net/ethernet/marvell/mvneta.c
-@@ -3186,7 +3186,10 @@ static int mvneta_poll(struct napi_struct *napi, int budget)
- 
- 	if (rx_done < budget) {
- 		cause_rx_tx = 0;
--		napi_complete_done(napi, rx_done);
-+		if (rx_done)
-+			napi_complete_done(napi, rx_done);
-+		else
-+			napi_complete(napi);
- 
- 		if (pp->neta_armada3700) {
- 			unsigned long flags;
--- 
-2.39.2
-
-
-
---
-This e-mail and any attached files are confidential and may be legally privileged. If you are not the addressee, any disclosure, reproduction, copying, distribution, or other dissemination or use of this communication is strictly prohibited. If you have received this transmission in error please notify the sender immediately and then delete this mail.
-E-mail transmission cannot be guaranteed to be secure or error free as information could be intercepted, corrupted, lost, destroyed, arrive late or incomplete, or contain viruses. The sender therefore does not accept liability for any errors or omissions in the contents of this message which arise as a result of e-mail transmission or changes to transmitted date not specifically approved by the sender.
-If this e-mail or attached files contain information which do not relate to our professional activity we do not accept liability for such information.
-
+> 
+> Thanks,
+> 
+> Paolo
+> 
+> 
 
