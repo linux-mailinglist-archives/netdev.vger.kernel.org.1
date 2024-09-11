@@ -1,51 +1,80 @@
-Return-Path: <netdev+bounces-127341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503239751AC
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:15:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAD4A9751DF
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 14:21:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD8C31F222C9
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:15:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28C1E1C21A33
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 12:21:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB77188A06;
-	Wed, 11 Sep 2024 12:15:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E47185B7A;
+	Wed, 11 Sep 2024 12:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="nl6gX6a8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="htt+uc7F"
 X-Original-To: netdev@vger.kernel.org
-Received: from qs51p00im-qukt01071502.me.com (qs51p00im-qukt01071502.me.com [17.57.155.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A840218B485
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 12:15:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E462176ADE
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 12:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726056927; cv=none; b=fGlrnoQM4SPiLn9Sp9aPBXutJdOGlLk8EFLgPpIhssm022shNmfN9LBgDcVgIrCCCSFIYm3twJvBlwDAxAia6ZNUh5KFtMEDamYY/FeefkCmc35Pc1zSFB5DM4CAr2jTgl6195IlCSZXy+l6ocnMnY3qeidLyCjhIpzIzGuk+P0=
+	t=1726057256; cv=none; b=WW6aK56rJXY8wPfO7UW95KR2l2Abf08/qoSuPV41WDorgg5idiZyK5cAC/gEgMyoNMgHqjv91IGeKBLASrqn0rUOruzF7KWsAX2O2K1Uew8wNX8Kxi2Eaxp3TvuprtjdfB5N9gMy2xLBybeWIiXLXmXl0/f/uLdyP87zZXYlqgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726056927; c=relaxed/simple;
-	bh=uvBoEJkZPMzyJY7fNpBdAjA0QoUIlWc+SNmkMyLKgLs=;
+	s=arc-20240116; t=1726057256; c=relaxed/simple;
+	bh=+OtcHmKqOaBrLslEHoDVuszHtt0pMfNdMC/JAAqio6s=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PgiZbkFMY3al3ZkWNfOiMk/94pFbJnhnKgkVapeWM+WJWUGVTK32VWBTsQuGZS/dD/n1T1cEHguPBj1gZxh80yQ1of+2BEv/YO5fm0k0lIn+Ur0L/tFQPfTHQ1B1z7I9rer/Xg5a3EbNQeG4JdhRQJLDu1fScIXzI+v22FtWxUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=nl6gX6a8; arc=none smtp.client-ip=17.57.155.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1726056924;
-	bh=mJlRX5g2zaG0MjZJ0FgGPU46Ka9U2vJBRMtqv60HUcQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	b=nl6gX6a8Or3CYv+xGVRogzvx62ADgQCxshMMOyl+F7R5zWIMMc61zC9UcJqmxmoH0
-	 7bZJsNJ94N3tjX+zcHiBeJmG3fAQHs6t57pxk2y/zss/tzGtZR3eF0a78g5Bo6hEdh
-	 uJdmlxQxHfSvHYm1CDV2E/TVqz1HA7LRED85xr1IR1r5ROhi11GA+UQJj4nSR/HMCJ
-	 5Z4hmaPiOYyzsK8d3SvdsB+gezQa4pOO/tLUiOCxB0sRvMP8elO7j43vyycU7TW7It
-	 4q17nVQgZacy8dACvRCSbh80uMYnS/Qkc36uceYOmplUrrNptIC8KSBdWFZUj6oZP6
-	 5NjbzjJVKnq1Q==
-Received: from [192.168.1.26] (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
-	by qs51p00im-qukt01071502.me.com (Postfix) with ESMTPSA id D215666803FE;
-	Wed, 11 Sep 2024 12:15:16 +0000 (UTC)
-Message-ID: <11576596-f0e4-4e88-a200-ed22b86d5974@icloud.com>
-Date: Wed, 11 Sep 2024 20:14:48 +0800
+	 In-Reply-To:Content-Type; b=XQTJZ//boHNwQv+NiJLTzj3GFWbirfEyvomTSInEaYPKJKHZOwMUsLetGjoJdumYay/LD9cKQCglszIWs/wgph8SpbzIqaSjLXUHUF8SEjTtnt0sjAj7A1jyMe9TBS9qK5zlvI7BtokN6K8MMr9JptIHJaM8cExgPYttmZ6iOpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=htt+uc7F; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726057253;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=n3lZx7MOn0cvUlutwjGz/taR5dti/49PxN0KWJf8nvQ=;
+	b=htt+uc7FawBknmj+/gAVNMAaOSOMhA65rcwT+vA1p+iYQx+z+Gch/R1+20hzjPkrTyo2mL
+	cESKq6w3H9WafGaFuOYfGdagRI1rIt7ZQVBDP4ATsLGpwhILR9TE6hScqaC4e1wQB3TAEf
+	HcwNwNoh4rPLM+wEfJPaiN/R3sNTshI=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-479-ECZ_282RP2eTjmRTOki_iQ-1; Wed, 11 Sep 2024 08:20:52 -0400
+X-MC-Unique: ECZ_282RP2eTjmRTOki_iQ-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a870f3a65a0so484399466b.0
+        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 05:20:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726057251; x=1726662051;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n3lZx7MOn0cvUlutwjGz/taR5dti/49PxN0KWJf8nvQ=;
+        b=veDGFBStDQjV5ufltySHv8OMs9vdeJEY1hCEKNgvy/s4wuf0Nyn8jMCn/ilTd1oLuw
+         kQr7AC+m2NBZij1F9WfIOLtAx1BRpzT5i4N1cR7hyjO3QNLW3UqyAkOVNfBHrmhHcczj
+         pU1m6WvAHrzP21o35u3ycaaxwwWs6B9p03GRJuv/iyoZqWCENMInr9GdlWDgrdEHnlPd
+         XDR2iVOqw1cmHRY1mNzxayjYJcr0UsBQRjyLM1b3JF160K2MOMf8zPO3L99tnadxPaax
+         /KL/IOFxbbRhf8S61o/TQrGRA3BTHm3g/YfAiiR+n6Jt/k4aRlPtad4LeL8681wp3/AB
+         hImQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQnt16Bj4bHFSV8Tr6gJoedRjIYalemVVVzJesAI6eiQotDB1fmWWQKEgkkRZYL4NhPb1hgzs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5M16ws/lMSqmwQ3VL4oUPobz3zYKFWfYPMdQypmwpOsBtuyt/
+	yhGEB6Q4XotXtRhdWWcOBkZxYE7bRSxzjWpD1+pji/6j5opd4qMFyQDLa4otWwvtu4pjZo1DPOf
+	EcLpd2L39jRs8FaMK8d/D49OOrsI1dvR78/3+p4s8TTSXS8PBHoXXZw==
+X-Received: by 2002:a17:907:c27:b0:a7a:9a78:4b5a with SMTP id a640c23a62f3a-a8ffad9da29mr446884766b.52.1726057250861;
+        Wed, 11 Sep 2024 05:20:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEse7/q3fks/g38TDGilxuqdMvvKGvYQPRWSe7VE2frNIQ+csBboiwxRmv/9sL6IOGSSY5V2w==
+X-Received: by 2002:a17:907:c27:b0:a7a:9a78:4b5a with SMTP id a640c23a62f3a-a8ffad9da29mr446880566b.52.1726057250314;
+        Wed, 11 Sep 2024 05:20:50 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:c32:7800:5bfa:a036:83f0:f9ec? (2001-1c00-0c32-7800-5bfa-a036-83f0-f9ec.cable.dynamic.v6.ziggo.nl. [2001:1c00:c32:7800:5bfa:a036:83f0:f9ec])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d259c76e2sm605309766b.79.2024.09.11.05.20.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Sep 2024 05:20:49 -0700 (PDT)
+Message-ID: <1d0478b2-efdf-4c1f-bf2c-a5cb2214168c@redhat.com>
+Date: Wed, 11 Sep 2024 14:20:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,203 +82,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] cxl/region: Find free cxl decoder by
- device_for_each_child()
-To: Dan Williams <dan.j.williams@intel.com>,
- quic_zijuhu <quic_zijuhu@quicinc.com>, Ira Weiny <ira.weiny@intel.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Davidlohr Bueso <dave@stgolabs.net>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- Dave Jiang <dave.jiang@intel.com>,
- Alison Schofield <alison.schofield@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Timur Tabi <timur@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-cxl@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240905-const_dfc_prepare-v4-0-4180e1d5a244@quicinc.com>
- <20240905-const_dfc_prepare-v4-1-4180e1d5a244@quicinc.com>
- <2024090531-mustang-scheming-3066@gregkh>
- <66df52d15129a_2cba232943d@iweiny-mobl.notmuch>
- <66df9692e324d_ae21294ad@dwillia2-mobl3.amr.corp.intel.com.notmuch>
- <a6dae308-ff34-4479-a638-8c12ff2e8d32@quicinc.com>
- <66dfc7d4f11a3_32646294f7@dwillia2-xfh.jf.intel.com.notmuch>
- <e7e6ea66-bcfe-4af4-9f82-ae39fef1a976@icloud.com>
- <66e06d66ca21b_3264629448@dwillia2-xfh.jf.intel.com.notmuch>
- <66e08f9beb6a2_326462945d@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <66e08f9beb6a2_326462945d@dwillia2-xfh.jf.intel.com.notmuch>
+Subject: Re: [PATCH -next v2] platform/olpc: Remove redundant null pointer
+ checks in olpc_ec_setup_debugfs()
+To: Li Zetao <lizetao1@huawei.com>, mchehab@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, wens@csie.org,
+ jernej.skrabec@gmail.com, samuel@sholland.org, heiko@sntech.de,
+ yisen.zhuang@huawei.com, salil.mehta@huawei.com, hauke@hauke-m.de,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, wellslutw@gmail.com, radhey.shyam.pandey@amd.com,
+ michal.simek@amd.com, ilpo.jarvinen@linux.intel.com, ruanjinjie@huawei.com,
+ hverkuil-cisco@xs4all.nl, u.kleine-koenig@pengutronix.de,
+ jacky_chou@aspeedtech.com, jacob.e.keller@intel.com
+Cc: linux-media@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+ linux-rockchip@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, platform-driver-x86@vger.kernel.org
+References: <20240907031009.3591057-1-lizetao1@huawei.com>
+ <20240907031009.3591057-2-lizetao1@huawei.com>
+Content-Language: en-US, nl
+From: Hans de Goede <hdegoede@redhat.com>
+In-Reply-To: <20240907031009.3591057-2-lizetao1@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: UC_ONF6QW8nNb7s75RrcWy0ShHB2d9R8
-X-Proofpoint-GUID: UC_ONF6QW8nNb7s75RrcWy0ShHB2d9R8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-10_12,2024-09-09_02,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 spamscore=0
- mlxlogscore=999 bulkscore=0 suspectscore=0 mlxscore=0 phishscore=0
- adultscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2308100000 definitions=main-2409110092
 
-On 2024/9/11 02:27, Dan Williams wrote:
-> Dan Williams wrote:
-> [..]
->> So, while regionB would be the next decoder to allocate after regionC is
->> torn down, it is not a free decoder while decoderC and regionC have not been
->> reclaimed.
+Hi,
+
+On 9/7/24 5:09 AM, Li Zetao wrote:
+> Since the debugfs_create_dir() never returns a null pointer, checking
+> the return value for a null pointer is redundant. Since
+> debugfs_create_file() can deal with a ERR_PTR() style pointer, drop
+> the check.
 > 
-> The "simple" conversion is bug compatible with the current
-> implementation, but here's a path to both constify the
-> device_find_child() argument, *and* prevent unwanted allocations by
-> allocating decoders precisely by id.  Something like this, it passes a
-> quick unit test run:
+> Signed-off-by: Li Zetao <lizetao1@huawei.com>
+
+Thank you for your patch, I've applied this patch to my review-hans 
+branch:
+https://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86.git/log/?h=review-hans
+
+Note it will show up in my review-hans branch once I've pushed my
+local branch there, which might take a while.
+
+Once I've run some tests on this branch the patches there will be
+added to the platform-drivers-x86/for-next branch and eventually
+will be included in the pdx86 pull-request to Linus for the next
+merge-window.
+
+Regards,
+
+Hans
+
+
+
+
+> ---
+> v1 -> v2:
+> v1:
+> https://lore.kernel.org/all/20240903143714.2004947-1-lizetao1@huawei.com/
 > 
-
-sounds good.
-
-> diff --git a/drivers/cxl/core/port.c b/drivers/cxl/core/port.c
-> index 1d5007e3795a..749a281819b4 100644
-> --- a/drivers/cxl/core/port.c
-> +++ b/drivers/cxl/core/port.c
-> @@ -1750,7 +1750,8 @@ static int cxl_decoder_init(struct cxl_port *port, struct cxl_decoder *cxld)
->  	struct device *dev;
->  	int rc;
+>  drivers/platform/olpc/olpc-ec.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/drivers/platform/olpc/olpc-ec.c b/drivers/platform/olpc/olpc-ec.c
+> index 921520475ff6..48e9861bb571 100644
+> --- a/drivers/platform/olpc/olpc-ec.c
+> +++ b/drivers/platform/olpc/olpc-ec.c
+> @@ -332,9 +332,6 @@ static struct dentry *olpc_ec_setup_debugfs(void)
+>  	struct dentry *dbgfs_dir;
 >  
-> -	rc = ida_alloc(&port->decoder_ida, GFP_KERNEL);
-> +	rc = ida_alloc_max(&port->decoder_ida, CXL_DECODER_NR_MAX - 1,
-> +			   GFP_KERNEL);
->  	if (rc < 0)
->  		return rc;
->  
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index 21ad5f242875..1f7b3a9ebfa3 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -794,26 +794,16 @@ static size_t show_targetN(struct cxl_region *cxlr, char *buf, int pos)
->  	return rc;
->  }
->  
-> -static int match_free_decoder(struct device *dev, void *data)
-> +static int match_decoder_id(struct device *dev, void *data)
->  {
->  	struct cxl_decoder *cxld;
-> -	int *id = data;
-> +	int id = *(int *) data;
->  
->  	if (!is_switch_decoder(dev))
->  		return 0;
->  
->  	cxld = to_cxl_decoder(dev);
+>  	dbgfs_dir = debugfs_create_dir("olpc-ec", NULL);
+> -	if (IS_ERR_OR_NULL(dbgfs_dir))
+> -		return NULL;
 > -
-> -	/* enforce ordered allocation */
-> -	if (cxld->id != *id)
-> -		return 0;
-> -
-> -	if (!cxld->region)
-> -		return 1;
-> -
-> -	(*id)++;
-> -
-> -	return 0;
-> +	return cxld->id == id;
->  }
+>  	debugfs_create_file("cmd", 0600, dbgfs_dir, NULL, &ec_dbgfs_ops);
 >  
->  static int match_auto_decoder(struct device *dev, void *data)
-> @@ -840,16 +830,29 @@ cxl_region_find_decoder(struct cxl_port *port,
->  			struct cxl_region *cxlr)
->  {
->  	struct device *dev;
-> -	int id = 0;
-> -
->  	if (port == cxled_to_port(cxled))
->  		return &cxled->cxld;
->  
->  	if (test_bit(CXL_REGION_F_AUTO, &cxlr->flags))
->  		dev = device_find_child(&port->dev, &cxlr->params,
->  					match_auto_decoder);
-> -	else
-> -		dev = device_find_child(&port->dev, &id, match_free_decoder);
-> +	else {
-> +		int id, last;
-> +
-> +		/*
-> +		 * Find next available decoder, but fail new decoder
-> +		 * allocations if out-of-order region destruction has
-> +		 * occurred
-> +		 */
-> +		id = find_first_zero_bit(port->decoder_alloc,
-> +					 CXL_DECODER_NR_MAX);
-> +		last = find_last_bit(port->decoder_alloc, CXL_DECODER_NR_MAX);
-> +
-> +		if (id >= CXL_DECODER_NR_MAX ||
-> +		    (last < CXL_DECODER_NR_MAX && id != last + 1))
-> +			return NULL;
-
-Above finding logic seems wrong.
-what about below one ?
-
- last = find_last_bit(port->decoder_alloc, CXL_DECODER_NR_MAX);
-
- if (last >= CXL_DECODER_NR_MAX)
-    id = 0;
- else if (last + 1 < CXL_DECODER_NR_MAX)
-    id = last + 1;
- else
-    return NULL;
-
-> +		dev = device_find_child(&port->dev, &id, match_decoder_id);
-> +	}
->  	if (!dev)
->  		return NULL;
->  	/*
-> @@ -943,6 +946,9 @@ static void cxl_rr_free_decoder(struct cxl_region_ref *cxl_rr)
->  
->  	dev_WARN_ONCE(&cxlr->dev, cxld->region != cxlr, "region mismatch\n");
->  	if (cxld->region == cxlr) {
-> +		struct cxl_port *port = to_cxl_port(cxld->dev.parent);
-> +
-> +		clear_bit(cxld->id, port->decoder_alloc);
->  		cxld->region = NULL;
->  		put_device(&cxlr->dev);
->  	}
-> @@ -977,6 +983,7 @@ static int cxl_rr_ep_add(struct cxl_region_ref *cxl_rr,
->  	cxl_rr->nr_eps++;
->  
->  	if (!cxld->region) {
-> +		set_bit(cxld->id, port->decoder_alloc);
->  		cxld->region = cxlr;
->  		get_device(&cxlr->dev);
->  	}
-> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
-> index 9afb407d438f..750cd027d0b0 100644
-> --- a/drivers/cxl/cxl.h
-> +++ b/drivers/cxl/cxl.h
-> @@ -578,6 +578,9 @@ struct cxl_dax_region {
->  	struct range hpa_range;
->  };
->  
-> +/* Max as of CXL 3.1 (8.2.4.20.1 CXL HDM Decoder Capability Register) */
-> +#define CXL_DECODER_NR_MAX 32
-> +
->  /**
->   * struct cxl_port - logical collection of upstream port devices and
->   *		     downstream port devices to construct a CXL memory
-> @@ -591,6 +594,7 @@ struct cxl_dax_region {
->   * @regions: cxl_region_ref instances, regions mapped by this port
->   * @parent_dport: dport that points to this port in the parent
->   * @decoder_ida: allocator for decoder ids
-> + * @decoder_alloc: decoder busy/free (@cxld->region set) bitmap
->   * @reg_map: component and ras register mapping parameters
->   * @nr_dports: number of entries in @dports
->   * @hdm_end: track last allocated HDM decoder instance for allocation ordering
-> @@ -611,6 +615,7 @@ struct cxl_port {
->  	struct xarray regions;
->  	struct cxl_dport *parent_dport;
->  	struct ida decoder_ida;
-> +	DECLARE_BITMAP(decoder_alloc, CXL_DECODER_NR_MAX);
->  	struct cxl_register_map reg_map;
->  	int nr_dports;
->  	int hdm_end;
+>  	return dbgfs_dir;
 
 
