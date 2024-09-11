@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-127595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D6E975D67
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 00:53:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 737AC975D8C
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 01:02:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6688E1F232BD
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:53:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A66D11C2238E
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 23:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257AF181BA8;
-	Wed, 11 Sep 2024 22:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1F11BC06E;
+	Wed, 11 Sep 2024 22:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HtG9kuT1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HOTBOtIz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0102614B09C
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 22:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628031BA294;
+	Wed, 11 Sep 2024 22:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726095206; cv=none; b=qb8J30pBPXQbD+yRmF+CZMG1xgxrZvY7tN59IN8bmcUcq8q2BPSmPgSQ4bi7RKMulutCAWcAyHrzTkussopLJ8d76vQ4ttdNTN8zgFDE0cd2xn6Vi1m7wt2G6/d5pICDuG1SUmf/k0JguXUpQOjZcTS6Js+mI4v6FSx+llrp6IA=
+	t=1726095554; cv=none; b=uS8dJ3bOrt8sroT2VzU0n9aIDl7QEEL/+SURa+qMnMBd/+iWawFeFJ/epCJ+WiKIsfcE8Cs7CUoOaV/12Kf9YGsdLFm+IfI4Jr7gEqyXYyDwF3TtmfrtdIvBJt+9LDI4yyKQGRTwciB9Z7iuh/HmhG1ZztvreXqT/3Q869VzqQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726095206; c=relaxed/simple;
-	bh=3TzezdTE7xvrbPx0sXbeKin53v+VhHRFb/xY7Zzhk5A=;
+	s=arc-20240116; t=1726095554; c=relaxed/simple;
+	bh=84PJn/d6I3AuEiKoOZrQVc/IzbNYCuP+fQcUfAk+Ahg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D1+2zemqO9VvLtHK8FKd5E84LpAbX8zNla0cCC1vh+Kv8TyAwS0dbDgb8Bb03rYVHNEDX7VFYZP0NS7pDBUkxqjYm0DbtCdIBsS7ZiigUa/gwz8d+oUKDmNkimrA1dJ/EHnVNe1i/FqapWNAm8fwPfp5xpuO8nuFUV7ftHppehI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HtG9kuT1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D263C4CEC0;
-	Wed, 11 Sep 2024 22:53:25 +0000 (UTC)
+	 MIME-Version:Content-Type; b=pyqpi6pmGlyPP8T5DrRPvmUBy84kYAWqlSsvEGA+YPgN3K4OVNdGUKFEAzfUHr4AnMMUGLLcTt++m7tWQXMa695CUOdmtUaEEa4HYqHkIOk39QxXl6DLZPYHwlrNYKuN5/DxgMkBeSBHyPzCDNd9fTjMtoYgTz0PVOLDNWu+IAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HOTBOtIz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9884AC4CEC0;
+	Wed, 11 Sep 2024 22:59:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726095205;
-	bh=3TzezdTE7xvrbPx0sXbeKin53v+VhHRFb/xY7Zzhk5A=;
+	s=k20201202; t=1726095554;
+	bh=84PJn/d6I3AuEiKoOZrQVc/IzbNYCuP+fQcUfAk+Ahg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HtG9kuT137xbpY88Q8cFnHOEX2d/z6A5ftj0jct76gbP/qtQ+gEPNUYlamh0QszL2
-	 uEpEJCeUqqUsWX7ZwPN99WSCuWNyQOjjZ8LERBfyCEH0R1E4rhgv+EIvjQ8Y9dDsh2
-	 eY8YNuzwaeXoWq96Pl4rERTolifaTC7ES9CpUgd020IAV/ngmsotbbIsd6mKOWfzug
-	 F62GaIhKX9i54EGUqw1WfS4I3EZDOhMujwX+t8kkxg7x7VblL73J8NssED1fIG4TY1
-	 iw7omP/HOQ7g74ac6FQUFRuVQF517anw0iT1LXHQggvQRkE5YBRqKPMUezOi9uqs2k
-	 U6DkqF16rHeoA==
-Date: Wed, 11 Sep 2024 15:53:24 -0700
+	b=HOTBOtIzsGhew4x/uGucD5xC6ERlwFvWVp+mvASVcenfiD5Pyl/l7q4Hq4V9+E0Ku
+	 AHt3Mgtz9EWofe07m6v9WA/ZzNJ+bNRIYc0xiCiXM7QHFvjI/9bEFzJSpLdrZAIN7n
+	 ihMUP2QIXCCICfdChUywQPBkx0r90xQ020s69qPpzvRYxj+ntcti7zAr1SRuMGQuE/
+	 Aj4Ns0RYcgOsKCb3dIpf6E4phDjy86FXwRnnOrKs63Cb6VtF5b9O8sEPzg2DS76Oae
+	 s/kTrrWsbnQXvw9JCtViR/+h7waVHGsagVN8C93rNun19i5r419CyG7u6HKs9hmvvB
+	 bGupZualD9Ddg==
+Date: Wed, 11 Sep 2024 15:59:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Lukasz Majewski <lukma@denx.de>
-Subject: Re: [PATCH net 0/2] net: hsr: Use the seqnr lock for frames
- received via interlink port.
-Message-ID: <20240911155324.79802853@kernel.org>
-In-Reply-To: <20240906132816.657485-1-bigeasy@linutronix.de>
-References: <20240906132816.657485-1-bigeasy@linutronix.de>
+To: <andrew@lunn.ch>
+Cc: Divya Koppera <divya.koppera@microchip.com>,
+ <arun.ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>,
+ <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+ <edumazet@google.com>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy: microchip_t1: Cable Diagnostics for
+ lan887x
+Message-ID: <20240911155912.1c36cf3c@kernel.org>
+In-Reply-To: <20240909114339.3446-1-divya.koppera@microchip.com>
+References: <20240909114339.3446-1-divya.koppera@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,16 +63,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri,  6 Sep 2024 15:25:30 +0200 Sebastian Andrzej Siewior wrote:
-> I hope the two patches in a series targeting different trees is okay.
+On Mon, 9 Sep 2024 17:13:39 +0530 Divya Koppera wrote:
+> Add support for cable diagnostics in lan887x PHY.
+> Using this we can diagnose connected/open/short wires and
+> also length where cable fault is occurred.
 
-Not really. Out of curiosity did you expect them to be applied
-immediately but separately; or that we would stash half of the
-series somewhere until the trees converge?
-
-> Otherwise I will resend.
-
-The fix doesn't look super urgent and with a repost it won't have
-time to get into tomorrow's PR with fixes. So I just pushed them
-both into net-next.
+Hi Andrew, is this one in your review queue by any chance? :)
 
