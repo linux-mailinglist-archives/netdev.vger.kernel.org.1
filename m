@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-127557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4125975B96
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:19:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 537AF975B97
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:19:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC043282513
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:19:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8621E1C222B4
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 20:19:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A23F71BCA06;
-	Wed, 11 Sep 2024 20:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F56E1BCA12;
+	Wed, 11 Sep 2024 20:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ku3GTcZD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SZPXUEm1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EDE11BCA03
-	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C73C1BCA0E
+	for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 20:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726085892; cv=none; b=Ldt+h57vdPCws+P//KvqyIjdDifevJntsAGqC235HIemcWesiJaoLjE+9Os9tMWHqTQgpU4QCxjuN2O2YYxJQ6wR7WwQV9qIx2f4brGLnjj1H4kZzuAA9GU6U8gzQhOuYk8ZhKx4IONSivw/nlrC/uHXY9NbJUp7TTBnvwiD7V4=
+	t=1726085893; cv=none; b=rLaFDZ5NSd9FJfZlSvvdhITfCM8OMj2tYleR3OMbBZyp2Q1MZ1bV+YBJ9WBselgfaQ8CO2ai23MSclvU7eb0lgRa3LdxgUzyhe1nI+COKzyy394nE8jMyeBjtDSnWkh2Kj6TZZm0qEeeadWVNn3Rj9mmzdLpiIbdBoVgfHk1bAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726085892; c=relaxed/simple;
-	bh=+mKWEhrW3JZFLhDi1U5P+R+9vnoXBFNaKGthBmrityE=;
+	s=arc-20240116; t=1726085893; c=relaxed/simple;
+	bh=CgjwSvF6d17c++A2qwIGw4V31UIpCOjzuXwCm0R38hs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CHQs5dmzY7J7W7oIzgo+hENQZlNlZZH2+XdfTdXELVvbf21juOLNsodxWB23D6pE5YSRvEaum4pSotg49JKiWbsfLiBEmHNUAtn4xPtCiWeszP7wPlF9lwfqcU3rBtM2f8bNUX6vsv/sgn+Su5iB1tmkcLXjKrIuRZtltK+aJ2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ku3GTcZD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06C02C4CEC6;
+	 MIME-Version; b=kiOnAH60TkiZQ0MUpLJHxVwDpqq4SMME4ctGiLw/vLejJ+RpR6UrKlxuo2krSOTMBW1eotpry/nVDXx0M5pkf+JcbRaUIFJ024u0/Bx9DIk/xbPOw2uGGsFCgW84OfFNeFPZ69soB/Xg3oI+IhPFFwuHYU4MXenKSQMCSg+i6bA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SZPXUEm1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D492FC4CEC0;
 	Wed, 11 Sep 2024 20:18:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1726085892;
-	bh=+mKWEhrW3JZFLhDi1U5P+R+9vnoXBFNaKGthBmrityE=;
+	bh=CgjwSvF6d17c++A2qwIGw4V31UIpCOjzuXwCm0R38hs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ku3GTcZD4J8l1wzyYdVTublECCXjRfoPknp+Wk3005+37WgocC/DkYO0bIwFi5g89
-	 hM4vwoYP7g6YSC5Usl1USbXjVkb9+ctF1IXu4Kfm8jWkW1FKhZEPexr6BEcthcqZA1
-	 hM0XgaGCeh2uBSxfmztHnaxSJpTqczrTzMTpUj69q8G/saKlOUPFz6j4Rse7+/Hded
-	 27IIKCif0hb7ORzHt5q+KR2e5E+6qohaCqgrAN9BNmGQ48caWUNww6fEwGMlwjMCF8
-	 c+XpVOQ1fT5Rz2S/hPQAO9+QoS14sMVqLMsU68ijzRWaPyyGiXX6z6ac2EDpAeZIOt
-	 cjf6w/IACCE5A==
+	b=SZPXUEm1YRi9gPanJlhsQnhle9SVMjs1iKm0j9fWBp39H8fi09xoZFegiZBS+RXoS
+	 KEdLJrsJ/Bl5aZ0yn0/JTRs659eLLHBrTc0wJTebrWx8QeZu83qJA2u7Avg4aY9ZVf
+	 EYNCH8U4OhqTa9OryzeRYiPv1b55m+eYtwdC2D4NatStDyNDslsOgf80vJQbL++siB
+	 qyqA4EuLQ6NgrI5/wV/vHrqq6jHA7ZbmvyrfG1Jeu/YABVFdH3PIM9JcvjOuORGzZG
+	 Vzgq7Mf9kP5bp2hp0zmcPmZkR/iZHkbK3bWBRytStfGgJbmht+9QtUQg4MZ5+604ba
+	 Fw+rPetuKdT2g==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,10 +51,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>
-Subject: [net-next 13/15] net/mlx5: Add NOT_READY command return status
-Date: Wed, 11 Sep 2024 13:17:55 -0700
-Message-ID: <20240911201757.1505453-14-saeed@kernel.org>
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [net-next 14/15] net/mlx5e: SHAMPO, Add no-split ethtool counters for header/data split
+Date: Wed, 11 Sep 2024 13:17:56 -0700
+Message-ID: <20240911201757.1505453-15-saeed@kernel.org>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240911201757.1505453-1-saeed@kernel.org>
 References: <20240911201757.1505453-1-saeed@kernel.org>
@@ -66,70 +66,116 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shay Drory <shayd@nvidia.com>
+From: Dragos Tatulea <dtatulea@nvidia.com>
 
-Add a new command status MLX5_CMD_STAT_NOT_READY to handle cases
-where the firmware is not ready.
+When SHAMPO can't identify the protocol/header of a packet, it will
+yield a packet that is not split - all the packet is in the data part.
+Count this value in packets and bytes.
 
-Signed-off-by: Shay Drory <shayd@nvidia.com>
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/cmd.c | 7 ++++++-
- include/linux/mlx5/device.h                   | 1 +
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ .../ethernet/mellanox/mlx5/counters.rst          | 16 ++++++++++++++++
+ drivers/net/ethernet/mellanox/mlx5/core/en_rx.c  |  3 +++
+ .../net/ethernet/mellanox/mlx5/core/en_stats.c   |  6 ++++++
+ .../net/ethernet/mellanox/mlx5/core/en_stats.h   |  4 ++++
+ 4 files changed, 29 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-index 20768ef2e9d2..9af8ddb4a78f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/cmd.c
-@@ -754,6 +754,8 @@ static const char *cmd_status_str(u8 status)
- 		return "bad resource";
- 	case MLX5_CMD_STAT_RES_BUSY:
- 		return "resource busy";
-+	case MLX5_CMD_STAT_NOT_READY:
-+		return "FW not ready";
- 	case MLX5_CMD_STAT_LIM_ERR:
- 		return "limits exceeded";
- 	case MLX5_CMD_STAT_BAD_RES_STATE_ERR:
-@@ -787,6 +789,7 @@ static int cmd_status_to_err(u8 status)
- 	case MLX5_CMD_STAT_BAD_SYS_STATE_ERR:		return -EIO;
- 	case MLX5_CMD_STAT_BAD_RES_ERR:			return -EINVAL;
- 	case MLX5_CMD_STAT_RES_BUSY:			return -EBUSY;
-+	case MLX5_CMD_STAT_NOT_READY:			return -EAGAIN;
- 	case MLX5_CMD_STAT_LIM_ERR:			return -ENOMEM;
- 	case MLX5_CMD_STAT_BAD_RES_STATE_ERR:		return -EINVAL;
- 	case MLX5_CMD_STAT_IX_ERR:			return -EINVAL;
-@@ -815,14 +818,16 @@ EXPORT_SYMBOL(mlx5_cmd_out_err);
- static void cmd_status_print(struct mlx5_core_dev *dev, void *in, void *out)
- {
- 	u16 opcode, op_mod;
-+	u8 status;
- 	u16 uid;
+diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst
+index 3bd72577af9a..99d95be4d159 100644
+--- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst
++++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/counters.rst
+@@ -218,6 +218,22 @@ the software port.
+        [#accel]_.
+      - Informative
  
- 	opcode = in_to_opcode(in);
- 	op_mod = MLX5_GET(mbox_in, in, op_mod);
- 	uid    = MLX5_GET(mbox_in, in, uid);
-+	status = MLX5_GET(mbox_out, out, status);
++   * - `rx[i]_hds_nosplit_packets`
++     - Number of packets that were not split in header/data split mode. A
++       packet will not get split when the hardware does not support its
++       protocol splitting. An example such a protocol is ICMPv4/v6. Currently
++       TCP and UDP with IPv4/IPv6 are supported for header/data split
++       [#accel]_.
++     - Informative
++
++   * - `rx[i]_hds_nosplit_bytes`
++     - Number of bytes for packets that were not split in header/data split
++       mode. A packet will not get split when the hardware does not support its
++       protocol splitting. An example such a protocol is ICMPv4/v6. Currently
++       TCP and UDP with IPv4/IPv6 are supported for header/data split
++       [#accel]_.
++     - Informative
++
+    * - `rx[i]_lro_packets`
+      - The number of LRO packets received on ring i [#accel]_.
+      - Acceleration
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index de9d01036c28..8e24ba96c779 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -2346,6 +2346,9 @@ static void mlx5e_handle_rx_cqe_mpwrq_shampo(struct mlx5e_rq *rq, struct mlx5_cq
+ 			stats->hds_nodata_packets++;
+ 			stats->hds_nodata_bytes += head_size;
+ 		}
++	} else {
++		stats->hds_nosplit_packets++;
++		stats->hds_nosplit_bytes += data_bcnt;
+ 	}
  
- 	if (!uid && opcode != MLX5_CMD_OP_DESTROY_MKEY &&
--	    opcode != MLX5_CMD_OP_CREATE_UCTX)
-+	    opcode != MLX5_CMD_OP_CREATE_UCTX && status != MLX5_CMD_STAT_NOT_READY)
- 		mlx5_cmd_out_err(dev, opcode, op_mod, out);
- }
- 
-diff --git a/include/linux/mlx5/device.h b/include/linux/mlx5/device.h
-index a94bc9e3af96..d0f7d1f36c5e 100644
---- a/include/linux/mlx5/device.h
-+++ b/include/linux/mlx5/device.h
-@@ -1449,6 +1449,7 @@ enum {
- 	MLX5_CMD_STAT_BAD_SYS_STATE_ERR		= 0x4,
- 	MLX5_CMD_STAT_BAD_RES_ERR		= 0x5,
- 	MLX5_CMD_STAT_RES_BUSY			= 0x6,
-+	MLX5_CMD_STAT_NOT_READY			= 0x7,
- 	MLX5_CMD_STAT_LIM_ERR			= 0x8,
- 	MLX5_CMD_STAT_BAD_RES_STATE_ERR		= 0x9,
- 	MLX5_CMD_STAT_IX_ERR			= 0xa,
+ 	mlx5e_shampo_complete_rx_cqe(rq, cqe, cqe_bcnt, *skb);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+index e7a3290a708a..611ec4b6f370 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.c
+@@ -144,6 +144,8 @@ static const struct counter_desc sw_stats_desc[] = {
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_gro_large_hds) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_hds_nodata_packets) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_hds_nodata_bytes) },
++	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_hds_nosplit_packets) },
++	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_hds_nosplit_bytes) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_ecn_mark) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_removed_vlan_packets) },
+ 	{ MLX5E_DECLARE_STAT(struct mlx5e_sw_stats, rx_csum_unnecessary) },
+@@ -347,6 +349,8 @@ static void mlx5e_stats_grp_sw_update_stats_rq_stats(struct mlx5e_sw_stats *s,
+ 	s->rx_gro_large_hds           += rq_stats->gro_large_hds;
+ 	s->rx_hds_nodata_packets      += rq_stats->hds_nodata_packets;
+ 	s->rx_hds_nodata_bytes        += rq_stats->hds_nodata_bytes;
++	s->rx_hds_nosplit_packets     += rq_stats->hds_nosplit_packets;
++	s->rx_hds_nosplit_bytes       += rq_stats->hds_nosplit_bytes;
+ 	s->rx_ecn_mark                += rq_stats->ecn_mark;
+ 	s->rx_removed_vlan_packets    += rq_stats->removed_vlan_packets;
+ 	s->rx_csum_none               += rq_stats->csum_none;
+@@ -2062,6 +2066,8 @@ static const struct counter_desc rq_stats_desc[] = {
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, gro_large_hds) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, hds_nodata_packets) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, hds_nodata_bytes) },
++	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, hds_nosplit_packets) },
++	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, hds_nosplit_bytes) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, ecn_mark) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, removed_vlan_packets) },
+ 	{ MLX5E_DECLARE_RX_STAT(struct mlx5e_rq_stats, wqe_err) },
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
+index 4c5858c1dd82..5961c569cfe0 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_stats.h
+@@ -156,6 +156,8 @@ struct mlx5e_sw_stats {
+ 	u64 rx_gro_large_hds;
+ 	u64 rx_hds_nodata_packets;
+ 	u64 rx_hds_nodata_bytes;
++	u64 rx_hds_nosplit_packets;
++	u64 rx_hds_nosplit_bytes;
+ 	u64 rx_mcast_packets;
+ 	u64 rx_ecn_mark;
+ 	u64 rx_removed_vlan_packets;
+@@ -356,6 +358,8 @@ struct mlx5e_rq_stats {
+ 	u64 gro_large_hds;
+ 	u64 hds_nodata_packets;
+ 	u64 hds_nodata_bytes;
++	u64 hds_nosplit_packets;
++	u64 hds_nosplit_bytes;
+ 	u64 mcast_packets;
+ 	u64 ecn_mark;
+ 	u64 removed_vlan_packets;
 -- 
 2.46.0
 
