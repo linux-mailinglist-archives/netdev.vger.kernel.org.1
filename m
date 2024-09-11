@@ -1,107 +1,99 @@
-Return-Path: <netdev+bounces-127590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A57A975D33
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 00:30:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8CA6975D37
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 00:30:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AF47285543
-	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:30:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F03DB24670
+	for <lists+netdev@lfdr.de>; Wed, 11 Sep 2024 22:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA0161ABEA4;
-	Wed, 11 Sep 2024 22:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BAC154C0B;
+	Wed, 11 Sep 2024 22:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMkk8RCf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T09dSuDV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1D0C524D7;
-	Wed, 11 Sep 2024 22:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D9E7224CF;
+	Wed, 11 Sep 2024 22:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726093796; cv=none; b=baiQ3yvMY7zJTfk++Zt8w5v1cBldcOPdM8oxdvYyPbl8V7vdtTqIaEpDI//kseqiTL0rW1ZMsqNybnz0eKKgPHWkoKVUmZDSd7GcJE8EekQuK6LO7iWOhiH3yfeUVwrbN7vgg99C0NHNLtLNNtfH9NRc1YJNN8BH7CuFBqR02mc=
+	t=1726093830; cv=none; b=XCq8s2MfDXS1Txki2kA3S5KpXtMO4OkSosWIoxaEIAHAG3Y7ISOIunWAXVFqo0F5WUCIgsSPR/1iySCQhNTkdpdhbBWrR19Qd10dBC46S132yAWxOP9yUBvE2D+JSx0ELumX2N6iIEuSgDbH5I5zERLQ2fzbpQCWE9lvyrpzgtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726093796; c=relaxed/simple;
-	bh=+t4gE1MEvz4FV50ss0nopF9qH1yH8IqfKkUVSuZ4q8M=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=PZC50PDFpzG33ZUg/mr9imOx2Kn7J8qkAPL9dnLNKgs2kiZZQLH4h01lVu3ehtE/m1HXcKvirnRW2GUCLNI/VPXP1Cf6ybKLPG15IsDleWlmlPuMTkOB5xlB5TvNdRg+srXbIIGmkZkTczSXikXYbrsHsbd/Liv7WBunVbWB834=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMkk8RCf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7997BC4CEC0;
-	Wed, 11 Sep 2024 22:29:55 +0000 (UTC)
+	s=arc-20240116; t=1726093830; c=relaxed/simple;
+	bh=9CY7jtiBhyePSX79v/9ohwRq9HgavX2rGlMwlGxscd0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=gJftPhebrXFbcQyYKsk/goN4n3aiki1+kJjLirbsjgzckVUgGTG/k4lnxn95PQlY44PAuvMMd3MGD1BoxfC5Ogio0vHoiV7JitpaiAVr4vrGsvReEj+PyKMBAVTGsw7GilwD/YFOBfVqDeiY6yoqrH8T3IM88sfrIObl9I+GUTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T09dSuDV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DE67C4CEC0;
+	Wed, 11 Sep 2024 22:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726093796;
-	bh=+t4gE1MEvz4FV50ss0nopF9qH1yH8IqfKkUVSuZ4q8M=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=JMkk8RCfMrgIz4Ma8VhiCmTK7GP9utOXWsYld4waoagDHGVXJUQkH7cvsvscetJfY
-	 gxAcItOVPKWZhpZTPC8gdQO+PVePdHZn6LElGeEoxYSzFJ8FiLN1McmnbRaRt3E+P5
-	 AeCYaSSoHK5h4DJPOZ9HODat6NUAa0Gp9tK6mOd1YoxlmVkX8InMK8w1sCslosGDvl
-	 W09qmsg7GxlV//1B+SoZ3Mj8dh+mbQRyEOu67Nqm19bunTvtenfGUEmxcZXr0k7vrB
-	 59smdklMqKK2kDsQKyj8iq+K3XFlkY6I7QaKtUOhaj/asCfR/+anWf1t5C3Lr1GADI
-	 ySOhqCba/88YQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  linux-wireless@vger.kernel.org
-Subject: Re: pull-request: wireless-next-2024-09-11
-References: <20240911084147.A205DC4AF0F@smtp.kernel.org>
-	<20240911134521.7f510329@kernel.org>
-Date: Thu, 12 Sep 2024 01:29:53 +0300
-In-Reply-To: <20240911134521.7f510329@kernel.org> (Jakub Kicinski's message of
-	"Wed, 11 Sep 2024 13:45:21 -0700")
-Message-ID: <87ikv1bz8e.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=k20201202; t=1726093829;
+	bh=9CY7jtiBhyePSX79v/9ohwRq9HgavX2rGlMwlGxscd0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=T09dSuDVfXTXLXyPX/PYSlJS8rQOJqPKUmkttN7s8u3oHDbkVQ+UZ+a/MjQHUxb1m
+	 4kmJUapHfZwGp7rnxo+fASXtisrz2Qus1BnysPIxZc1qtKKuF90EzUp3Dnj/MnqvAI
+	 IxKpQ8BXd0i4d4d0GXlT0+RIIjtyl4IwPiem3eYVC/AoCpkugMRp9EZ+aS9/QXfZZQ
+	 /JFM1jSgKg4BVozTUgWOgHKhGZWEqIb8QTYA7zmOYOtPGTtkPWUz57MpbGoWwwQ0Vd
+	 vaF8rfYo23jDH+3o+m/+0lZKMknDyP0aM1JBOJPHZZjPQ4xvo2XMiy4fnyiHnJvCoI
+	 d42Ij0O3OJCEQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E373806656;
+	Wed, 11 Sep 2024 22:30:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/3] selftests: mptcp: misc. small fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172609383002.1065358.12169361654383136843.git-patchwork-notify@kernel.org>
+Date: Wed, 11 Sep 2024 22:30:30 +0000
+References: <20240910-net-selftests-mptcp-fix-install-v1-0-8f124aa9156d@kernel.org>
+In-Reply-To: <20240910-net-selftests-mptcp-fix-install-v1-0-8f124aa9156d@kernel.org>
+To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shuah@kernel.org, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-Jakub Kicinski <kuba@kernel.org> writes:
+Hello:
 
-> On Wed, 11 Sep 2024 08:41:47 +0000 (UTC) Kalle Valo wrote:
->> here's a pull request to net-next tree, more info below. Please let me know if
->> there are any problems.
->
-> For a follow up, clang W=1 says:
->
-> ../drivers/net/wireless/realtek/rtw89/coex.c:6323:23: warning:
-> variable 'cnt_2g' set but not used [-Wunused-but-set-variable]
->  6323 |         u8 i, mode, cnt = 0, cnt_2g = 0, cnt_5g = 0, phy_now = RTW89_PHY_MAX, phy_dbcc;
->       |                              ^
-> ../drivers/net/wireless/realtek/rtw89/coex.c:6323:35: warning:
-> variable 'cnt_5g' set but not used [-Wunused-but-set-variable]
->  6323 |         u8 i, mode, cnt = 0, cnt_2g = 0, cnt_5g = 0, phy_now = RTW89_PHY_MAX, phy_dbcc;
->       |                                          ^
-> 2 warnings generated.
-> ../drivers/staging/rtl8712/rtl8712_recv.c:139:6: warning: variable
-> 'drvinfo_sz' set but not used [-Wunused-but-set-variable]
->   139 |         u16 drvinfo_sz;
->       |             ^
-> 1 warning generated.
-> ../drivers/staging/rtl8723bs/core/rtw_efuse.c:285:6: warning: variable
-> 'efuseValue' set but not used [-Wunused-but-set-variable]
->   285 |         u32 efuseValue;
->       |             ^
-> 1 warning generated.
-> ../drivers/staging/rtl8723bs/core/rtw_recv.c:2030:7: warning: variable
-> 'cnt' set but not used [-Wunused-but-set-variable]
->  2030 |                 int cnt = 0;
->       |                     ^
-> 1 warning generated.
-> ../drivers/staging/rtl8723bs/core/rtw_pwrctrl.c:288:6: warning:
-> variable 'poll_cnt' set but not used [-Wunused-but-set-variable]
->   288 |                 u8 poll_cnt = 0;
->       |                    ^
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-What's the deadline for these? Do you need the fixes tomorrow or can it
-wait a week or two?
+On Tue, 10 Sep 2024 21:06:35 +0200 you wrote:
+> Here are some various fixes for the MPTCP selftests.
+> 
+> Patch 1 fixes a recently modified test to continue to work as expected
+> on older kernels. This is a fix for a recent fix that can be backported
+> up to v5.15.
+> 
+> Patch 2 and 3 include dependences when exporting or installing the
+> tests. Two fixes for v6.11-rc1.
+> 
+> [...]
 
+Here is the summary with links:
+  - [net,1/3] selftests: mptcp: join: restrict fullmesh endp on 1st sf
+    https://git.kernel.org/netdev/net/c/49ac6f05ace5
+  - [net,2/3] selftests: mptcp: include lib.sh file
+    https://git.kernel.org/netdev/net/c/1a5a2d19e827
+  - [net,3/3] selftests: mptcp: include net_helper.sh file
+    https://git.kernel.org/netdev/net/c/c66c08e51b55
+
+You are awesome, thank you!
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+
 
