@@ -1,90 +1,141 @@
-Return-Path: <netdev+bounces-127703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6313976203
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:59:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07011976222
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:06:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34941B215C7
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 06:58:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0BBE1F23AD4
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD2201898EA;
-	Thu, 12 Sep 2024 06:58:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9EB218BC00;
+	Thu, 12 Sep 2024 07:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="kUtO357X"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="oesJpYl1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384002F3E
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 06:58:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F6AC18D64F;
+	Thu, 12 Sep 2024 07:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726124333; cv=none; b=n+GCJ+GUmfxUrbs4PN4XluKPrhURXJs6YR+vKj9dET0VSBdamyiI6/w6aayNOhiY7sTZTie3oDcwcza5RJz9Kky/j18dvWg/h8RqK5c/ivmKuGTmTMRBgqIXwiRrFq4M64A/Kz7aCSZlWFJ7iEzmDAvZxr2hEraZL4XJ/1GkezI=
+	t=1726124756; cv=none; b=juEjg4XC3orLTm6rir+SJ8qSBTJktkX3MDrcXSYsqPynv5IDvXjRu/jpKED5HxJU7ALZJGcEQtKB6yuEvhp3dpKqo2UoG0giP80BeaXecCovX9tRNYBZzZxvEGqH8MG55bSNavr5OuEfnjJ8VGcCHBdQq9ECZp7gbMdwnFk1/Ds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726124333; c=relaxed/simple;
-	bh=Zq0KYLfCj3KEXz7MuKtQrOPmulVRTkaftgQzc4/hyKU=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=I3IrL1yQeELsU9/OsHY7nSlKkwlIaXeozqVXHDuH1qeF8Kbi+3xorpfj8sZ7t1FMMhlHfEO/2XNdZ+ef0Sa43k48QX2nuDvDzKAIXB1NVTJonXu/cv+ONHNAcCxjwjLLRDaJiMqxDCSl/Sog/sU4XMLEWGf67BxQDJYM+HKL8Q4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=kUtO357X; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 48C6whak020289
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 12 Sep 2024 08:58:45 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1726124326; bh=qzsoOLVeaNZANsqcfOgNnDlHJOqPsL1hvmi6pjtRk/4=;
-	h=Date:From:To:Cc:Subject;
-	b=kUtO357Xu340IEGdy7+pn+uQGoco9WSa18sqZ6rqZtxJbKFVzn1emXDWU8BlD0hmT
-	 vYV2ilLP/jyZuH6nrV06+huklsqykQI/awPqvjz5RCGousiCY6NN8chIcKgYHC0AjU
-	 XewnHR20w2fbVcq2aM2CFeJQ71YmVHr/rcQZMwyw=
-Message-ID: <54419258-fa69-447b-9e3f-35accf891d43@ans.pl>
-Date: Wed, 11 Sep 2024 23:58:42 -0700
+	s=arc-20240116; t=1726124756; c=relaxed/simple;
+	bh=jfC1FvSAZQRxLqykAKguyf2O9rPCVwccAocswSihxcg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ag0xUePw8t4i7bACptGyT/pwiZ/r4qPrbxFDYP9EKREmnbC5KNZwfVDmFSWpcMAwQI3FHo9nIyH777RhShrawTDsfaUXPnXoBD8eM7/8+XVcnbVUaj/ddfc3Qnopc6R0keYfSKuJ5CgXvVEOvMUng7FEjKO1wvis5yd3K1LqgaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=oesJpYl1; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1726124754; x=1757660754;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=jfC1FvSAZQRxLqykAKguyf2O9rPCVwccAocswSihxcg=;
+  b=oesJpYl1E4Mtem3aFuBDQ3X8nQvqUyvpngqQ5bs/iErTX4gGW7kaSaBM
+   ZGecM712JoaHXWPBqfdtRopBYu9mrjtXju7dFtNUse3Ctf0SEdE60SSxj
+   cfkq3cGJCBPTzkNnY/KUibK5dk7h7LPSUIWq0dE1KDGqG1fCg/R5IKytb
+   /KQq4BdwMujuO1S72hS3mvYFx9dxZ8414lsdzCBi7xEAH8hEh6UcjSnxe
+   NOl/GuTMpG4nLhcfNsF3azJK30aaMn8qPQQ2BQUu0nxE1+GsTC0HV9Olv
+   MaifhHCIkGp5o1A7966PEEwlhp9t64OhV38SUPtAwEA9FURT/aXzyEvKX
+   g==;
+X-CSE-ConnectionGUID: Zqffe1M+SWCcMURK/0Nsgw==
+X-CSE-MsgGUID: vD6UNw6/TYSN8Trr5dGMBw==
+X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
+   d="scan'208";a="34836728"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Sep 2024 00:05:53 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 12 Sep 2024 00:05:22 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 12 Sep 2024 00:05:22 -0700
+Date: Thu, 12 Sep 2024 12:31:33 +0530
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+CC: Andrew Lunn <andrew@lunn.ch>, Raju Lakkaraju
+	<Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <bryan.whitehead@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
+	<rdunlap@infradead.org>, <Steen.Hegelund@microchip.com>,
+	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next V2 5/5] net: lan743x: Add Support for 2.5G SFP
+ with 2500Base-X Interface
+Message-ID: <ZuKRzWTi2lIbBl0/@HYD-DK-UNGSW21.microchip.com>
+References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
+ <20240911161054.4494-6-Raju.Lakkaraju@microchip.com>
+ <82067738-f569-448b-b5d8-7111bef2a8e9@lunn.ch>
+ <20240911220138.30575de5@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-To: Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew@lunn.ch>,
-        Michal Kubecek <mkubecek@suse.cz>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: [PATCH ethtool 2/2] qsf: Better handling of Page A2h netlink read
- failure
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240911220138.30575de5@fedora.home>
 
-Print "Failed to read Page A2h." error message to provide more context
-for "netlink error: (...)" info.
+The 09/11/2024 22:01, Maxime Chevallier wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> 
+> On Wed, 11 Sep 2024 19:31:01 +0200
+> Andrew Lunn <andrew@lunn.ch> wrote:
+> 
+> > > @@ -3359,6 +3362,7 @@ static int lan743x_phylink_create(struct lan743x_adapter *adapter)
+> > >     lan743x_phy_interface_select(adapter);
+> > >
+> > >     switch (adapter->phy_interface) {
+> > > +   case PHY_INTERFACE_MODE_2500BASEX:
+> > >     case PHY_INTERFACE_MODE_SGMII:
+> > >             __set_bit(PHY_INTERFACE_MODE_SGMII,
+> > >                       adapter->phylink_config.supported_interfaces);
+> >
+> > I _think_ you also need to set the PHY_INTERFACE_MODE_2500BASEX bit in
+> > phylink_config.supported_interfaces if you actually support it.
+> 
+> It's actually being set a bit below. However that raises the
+> question of why.
+> 
+> On the variant that don't have this newly-introduced SFP support but do
+> have sgmii support (!is_sfp_support_en && is_sgmii_en), can this chip
+> actually support 2500BaseX ?
 
-Signed-off-by: Krzysztof Piotr Oledzki <ole@ans.pl>
----
- sfpid.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Yes. 
+PCI11010/PCI11414 chip's PCS support SGMII/2500Baxe-X I/F at 2.5Gpbs
+We need to over clocking at a bit rate of 3.125 Gbps for 2.5Gbps event SGMII
+I/F
 
-diff --git a/sfpid.c b/sfpid.c
-index 1bc45c1..d9bda70 100644
---- a/sfpid.c
-+++ b/sfpid.c
-@@ -494,8 +494,10 @@ int sff8079_show_all_nl(struct cmd_context *ctx)
- 	/* Read A2h page */
- 	ret = sff8079_get_eeprom_page(ctx, SFF8079_I2C_ADDRESS_HIGH,
- 				      buf + ETH_MODULE_SFF_8079_LEN);
--	if (ret)
-+	if (ret) {
-+		fprintf(stderr, "Failed to read Page A2h.\n");
- 		goto out;
-+	}
- 
- 	sff8472_show_all(buf);
- out:
+From data sheet:
+"The SGMII interface also supports over clocking at a bit rate of 3.125 Gbps for an effective 2.5 Gbps data rate. 10 and
+100 Mbps modes are also scaled up by 2.5x but are most likely not useful."
+
+> 
+> If so, is there a point in getting a different default interface
+> returned from lan743x_phy_interface_select() depending on wether or not
+> there's SFP support ?
+
+Yes.
+
+This LAN743x driver support following chips
+ 1. LAN7430 - GMII I/F
+ 2. LAN7431 - MII I/F
+ 3. PCI11010/PCI11414 - RGMII or SGMII/1000Base-X/2500Base-X
+
+> 
+> Maxime
+> 
+
 -- 
-2.46.0
+Thanks,                                                                         
+Raju
 
