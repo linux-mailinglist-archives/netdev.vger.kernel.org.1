@@ -1,140 +1,150 @@
-Return-Path: <netdev+bounces-127716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063A2976332
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:45:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C3C1976407
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 10:07:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A504F1F2203A
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:45:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7356B21029
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:07:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CCD18F2DD;
-	Thu, 12 Sep 2024 07:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="qSGMdRyF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA141917E8;
+	Thu, 12 Sep 2024 08:06:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151E318E03D;
-	Thu, 12 Sep 2024 07:45:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A34C1917C0
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 08:06:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726127106; cv=none; b=TFOgu3YhsbF0T7xmw5aSG/3GT1ZxPFF0anF1FlS5vJMBFl9PfJhkUjcQoDP14SDBJY/T/pAPNe6OA3ARZIEfKCi+/IuEYoOklZy67+q/xDQtqx4Jsh+3r/cpXWI42bGkc3JBfq5Zx+N3PIHx+ZgjhK6jvnedFzo6rsJUmYf+8pE=
+	t=1726128389; cv=none; b=tLYvdyljbH1YeUoisVm4+7c2GbPfAadQQoJkeLqhsSttmnI8edkvWtglodKWrt3QRGeOD+6m+JMSJndGhVABHwe7JFirK57qDfkQz/c8BYZKQtEpoSX/oEEy2Fi528cNFjccGfKRnNk4yzI4oznbI6NcdWZ48hBdbu+8myKa9sw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726127106; c=relaxed/simple;
-	bh=Xu6sHgDKfgjbkEDyE3lLSibg39hwTKnEOVkCaHjK/cE=;
-	h=From:To:Subject:Date:Message-Id; b=IOJhiw3gTidcoWTRJQMPSJqqUrtALUDTIqGGAY3AAeXpcpTqpDdvMahdWkatNTJqsnaelNxLq0Y4PYti9bx8cQ4U/0t9EIplH4kGfrX63nkvH50Tubir41q7vi8L8nqC60WR2MZpx+Zkeky7m4hQ31obUx33M19gaAc8UEGmIf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=qSGMdRyF; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1173)
-	id A01E220B9A9C; Thu, 12 Sep 2024 00:45:04 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A01E220B9A9C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1726127104;
-	bh=jPfdFXZMhBELWCsu42PbhhsboZKB4K+0hkhbL/v0eZc=;
-	h=From:To:Subject:Date:From;
-	b=qSGMdRyF9DMPGqyStHV94plqd897WMSZn7iqv12xpXjMjiYpO3TpJB8JB+fC/4oZK
-	 oaJL98B4vOUD1+hHio+A+Zz6bRi01GKX14ccEn4yreK1cfjbSXsW/+vr6Qx9jpOYC0
-	 DtigHJ9C3VysAXg/w5SJ8CxjwOddb3ULFjy2Nvu8=
-From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shradhagupta@linux.microsoft.com,
-	ahmed.zaki@intel.com,
-	ernis@linux.microsoft.com,
-	colin.i.king@gmail.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1726128389; c=relaxed/simple;
+	bh=P0QW3eUui3jH3ahZzJIfEnfBUeffglKNHp4BLtQwZgg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EUN4W86uy872wzCpo3Slc+zQl2xar5uIEKv9TlfueHMiMxLx2z1uWTp8ghy23sxi0u52ceV5kXzC3bDYVJ8unluNpCcfpxntsIINzILIwMJiBSrHaajyMVrzniansbFHi7aFvHeukAGdso88GYfPzJWZRPH1KlKiE9cOq+yjp/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1soeq9-00048c-53; Thu, 12 Sep 2024 10:06:09 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1soeq6-007Kg6-Qh; Thu, 12 Sep 2024 10:06:06 +0200
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 44E80338DE4;
+	Thu, 12 Sep 2024 07:45:05 +0000 (UTC)
+Date: Thu, 12 Sep 2024 09:45:05 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Jake Hamby <Jake.Hamby@teledyne.com>, 
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Dong Aisheng <b29396@freescale.com>, Varka Bhadram <varkabhadram@gmail.com>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: mana: Add get_link and get_link_ksettings in ethtool
-Date: Thu, 12 Sep 2024 00:44:43 -0700
-Message-Id: <1726127083-28538-1-git-send-email-ernis@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+Subject: Re: [PATCH can v3 1/2] can: m_can: enable NAPI before enabling
+ interrupts
+Message-ID: <20240912-ingenious-ruddy-deer-327fdb-mkl@pengutronix.de>
+References: <20240910-can-m_can-fix-ifup-v3-0-6c1720ba45ce@pengutronix.de>
+ <20240910-can-m_can-fix-ifup-v3-1-6c1720ba45ce@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="o53ahiqpbfpfpvdc"
+Content-Disposition: inline
+In-Reply-To: <20240910-can-m_can-fix-ifup-v3-1-6c1720ba45ce@pengutronix.de>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Add support for the ethtool get_link and get_link_ksettings
-operations. Display standard port information using ethtool.
 
-Before the change:
-$ethtool enP30832s1
->No data available
+--o53ahiqpbfpfpvdc
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-After the change:
-$ethtool enP30832s1
->Settings for enP30832s1:
-        Supported ports: [  ]
-        Supported link modes:   Not reported
-        Supported pause frame use: No
-        Supports auto-negotiation: Yes
-        Supported FEC modes: Not reported
-        Advertised link modes:  Not reported
-        Advertised pause frame use: No
-        Advertised auto-negotiation: Yes
-        Advertised FEC modes: Not reported
-        Speed: Unknown!
-        Duplex: Full
-        Auto-negotiation: on
-        Port: Direct Attach Copper
-        PHYAD: 0
-        Transceiver: internal
-        Link detected: yes
+On 10.09.2024 19:15:28, Marc Kleine-Budde wrote:
+> From: Jake Hamby <Jake.Hamby@Teledyne.com>
+>=20
+> If an interrupt (RX-complete or error flag) is set when bringing up
+> the CAN device, e.g. due to CAN bus traffic before initializing the
+> device, when m_can_start() is called and interrupts are enabled,
+> m_can_isr() is called immediately, which disables all CAN interrupts
+> and calls napi_schedule().
+>=20
+> Because napi_enable() isn't called until later in m_can_open(), the
+> call to napi_schedule() never schedules the m_can_poll() callback and
+> the device is left with interrupts disabled and can't receive any CAN
+> packets until rebooted.
+>=20
+> This can be verified by running "cansend" from another device before
+> setting the bitrate and calling "ip link set up can0" on the test
+> device. Adding debug lines to m_can_isr() shows it's called with flags
+> (IR_EP | IR_EW | IR_CRCE), which calls m_can_disable_all_interrupts()
+> and napi_schedule(), and then m_can_poll() is never called.
+>=20
+> Move the call to napi_enable() above the call to m_can_start() to
+> enable any initial interrupt flags to be handled by m_can_poll() so
+> that interrupts are reenabled. Add a call to napi_disable() in the
+> error handling section of m_can_open(), to handle the case where later
+> functions return errors.
+>=20
+> Also, in m_can_close(), move the call to napi_disable() below the call
+> to m_can_stop() to ensure all interrupts are handled when bringing
+> down the device. This race condition is much less likely to occur.
+>=20
+> Tested on a Microchip SAMA7G54 MPU. The fix should be applicable to
+> any SoC with a Bosch M_CAN controller.
+>=20
+> Signed-off-by: Jake Hamby <Jake.Hamby@Teledyne.com>
+> Fixes: e0d1f4816f2a ("can: m_can: add Bosch M_CAN controller support")
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
----
- .../ethernet/microsoft/mana/mana_ethtool.c    | 20 +++++++++++++++++++
- 1 file changed, 20 insertions(+)
+Tested successfully on a stm32mp1.
 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-index 146d5db1792f..c2716d6cad36 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-@@ -369,6 +369,24 @@ static int mana_set_channels(struct net_device *ndev,
- 	return err;
- }
- 
-+static int mana_get_link_ksettings(struct net_device *ndev,
-+				   struct ethtool_link_ksettings *cmd)
-+{
-+	cmd->base.duplex = DUPLEX_FULL;
-+	cmd->base.autoneg = AUTONEG_ENABLE;
-+	cmd->base.port = PORT_DA;
-+
-+	ethtool_link_ksettings_zero_link_mode(cmd, supported);
-+	ethtool_link_ksettings_zero_link_mode(cmd, advertising);
-+
-+	ethtool_link_ksettings_add_link_mode(cmd, supported,
-+					     Autoneg);
-+	ethtool_link_ksettings_add_link_mode(cmd, advertising,
-+					     Autoneg);
-+
-+	return 0;
-+}
-+
- const struct ethtool_ops mana_ethtool_ops = {
- 	.get_ethtool_stats	= mana_get_ethtool_stats,
- 	.get_sset_count		= mana_get_sset_count,
-@@ -380,4 +398,6 @@ const struct ethtool_ops mana_ethtool_ops = {
- 	.set_rxfh		= mana_set_rxfh,
- 	.get_channels		= mana_get_channels,
- 	.set_channels		= mana_set_channels,
-+	.get_link_ksettings	= mana_get_link_ksettings,
-+	.get_link		= ethtool_op_get_link,
- };
--- 
-2.34.1
+Tested-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
+regards,
+Mar
+c
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--o53ahiqpbfpfpvdc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbim/4ACgkQKDiiPnot
+vG+eqgf/Y278Mm2VhmA92JQSpeHGcr4HsaZMY8T8Hb9gCZDC6NMNbz8bSt8Fquaj
+NxF8TRlPaTHn5HJSGklvy1IOm3ZMqt9qdqBVDZzK9+zFdQEk5AusVm0PUzUA8ykB
+wpSan5ztoT+a5CQilB/YVSyLOxma2AEV9pDrfaq2YtWexRTRPkJ6BvmfW7lOmtu/
+SqGIjjCfVo5UwcTBJR5qb6bd3VUcr0ftewKRa3RHcYJ7do7vTCabK9EOFz3DvKky
+EsDfbVRXTWdiR17QcsXkiESzuP5iWAqh1jajKivZLeo1Qsj9d7ijb3skznNruxF5
+5yCaDZN0lEHJHRb43HGKFhCvEFiSDQ==
+=yeUS
+-----END PGP SIGNATURE-----
+
+--o53ahiqpbfpfpvdc--
 
