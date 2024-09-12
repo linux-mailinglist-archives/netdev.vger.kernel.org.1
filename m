@@ -1,245 +1,132 @@
-Return-Path: <netdev+bounces-127778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D6E0976692
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:16:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCFE59766AC
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:25:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F116A1F221BF
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 10:16:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 476FEB21379
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 10:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF65218E349;
-	Thu, 12 Sep 2024 10:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9BC19E963;
+	Thu, 12 Sep 2024 10:25:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QW0yoWa3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t7FqY+Fv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E64418BBB5;
-	Thu, 12 Sep 2024 10:16:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836FD1E51D;
+	Thu, 12 Sep 2024 10:25:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726136163; cv=none; b=uFOoUQRll2wPMIs/cRJEiOtzz3TA5U4KswLPwhujj3BHJSspY0EwAoK+48T4cf8zCgwST/M7YJec8PyJ32UC13IODkUTQ2SqP1n9QYv1+iK52SWu7+K3ZG+x5DzrTSRPzSWZJQWuPlDiT7WO0kHFxrDy5fqfd8l5mrbyEd7gQ9E=
+	t=1726136742; cv=none; b=O41NiAwpM4/diSIc4CGiBiXm3UBc/v9un3ty0wg+oIduPzXy8siOlzt2SMbR6SmVJ66rt6o2r/N6VF1Q7Ux5fWlu0470Owgu09gmmkMAGB0tm9cS5+raL8epzSN0Zb3eijwkJAgcoJyEvgIfrWT7MAYVzOWVd24jh7Ala25rVsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726136163; c=relaxed/simple;
-	bh=7ia31fMR0A+vpsMyeoe7wrNQzSw6DnAzPia3mDtQi/c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ubZ81z/zOE8HT3JNTCxpgZpmzS5td3SqWt43M0XvHj1gZgtk8T08VKeeyepQxZwxX6w9+w7eRf2kVnH2numvGNuHm2BNcyiuewfvA0PC22cDia3Kao7CV1Y3YdSnb9o0ejRAv/c8s92LFeJcqCo3vZiO0L6+7zFsvLM3PiuBRlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QW0yoWa3; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-42cb1866c00so1206605e9.0;
-        Thu, 12 Sep 2024 03:16:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726136160; x=1726740960; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uTJzWfY3+cDmojDWu6bJjQ67EkjBtjV1XQmN5oPZvkc=;
-        b=QW0yoWa3f94dJAHiTt3hLEu+fi6uRBEDt5OnlI5aTnBsukxrGlBDk3ioLFGqrdGMwk
-         YsyDB/+KNdtXrTb8uesC5VghqBnJXLPqtLGxIWpQLAqkUIS/Qs9I7Zp2KhwGKm+1P3cK
-         Lmh33jEobIuBPbpJnpv67luD6Fnupuppf/imXXzCrT7k3r3cceEnYbyUC/pSDPu9TvYg
-         vy1x1ncoAVO8EA3F68gcTqGxaI2RKtRUBDfrMKLRZiYlqPjIblt1Kq9EGL2LIKH4vvbr
-         gx6DZ49NRiloIncmH/VkpvX78DlRyIZD/5YgScKpsxlXMT9+73D9LufyFb16kP7JuK6v
-         RcCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726136160; x=1726740960;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uTJzWfY3+cDmojDWu6bJjQ67EkjBtjV1XQmN5oPZvkc=;
-        b=kpOfrtAp5TpJOVt3pOVfO99B30i5WayMdTLew+Ss2FsBKIldrfxCMHhyD2SJEKvpeL
-         GmOS3XIzbXX+//YN4nYFuQrUEjPv3eg2qJe855hRmixTueZUCt6GEP33Ya6gyNxhq6e+
-         0BcDPhIziH0QXg5MH1rjH+02Hzh4c41IgFL61MKg2ciwqzerZ3PtsXq8hICjIXyry2gA
-         EGFFDZdggurCvpmxwn5UQ0kZXRMMqS0U4GRzPz1RMg0hHh4ZiHzjQnanpVhx7nJdYnc6
-         dOdh2dw8qxkiT/nvTxXJmEW92r0aSjgfvpOiiP1zYAP4oHUqOHbtDQ3idbtmPrliIbOL
-         Be6A==
-X-Forwarded-Encrypted: i=1; AJvYcCXRDUYFfmjM7f9u8svhb4KoKf66LPB1Ub9c+e+OcqTQJDB3E751doWM/upYeDTDuCCtS/dgqv0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyCpMYClVw6KsXBwl8YU64PFsqzJNEiyNTZrLyYVu1FwkM1CIcV
-	CWPAL/I5zmYlsSWGfcUpZDbeg4Mxd5hmKfY5knhQwaIc3QqPz3z2
-X-Google-Smtp-Source: AGHT+IEeOvVRKEI4bIc7kzwTYEoIGJdm4NNzlKJj2a9L7BY+kHh9FKcq1j69r5aUBglVk/DeoUadGw==
-X-Received: by 2002:a05:600c:35ca:b0:42c:c082:fafb with SMTP id 5b1f17b1804b1-42cdb576f91mr9368685e9.6.1726136159499;
-        Thu, 12 Sep 2024 03:15:59 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42caeb8162dsm168541255e9.29.2024.09.12.03.15.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 03:15:58 -0700 (PDT)
-Date: Thu, 12 Sep 2024 13:15:56 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "A. Sverdlin" <alexander.sverdlin@siemens.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net] net: dsa: lan9303: avoid dsa_switch_shutdown()
-Message-ID: <20240912101556.tvlvf2rq5nmxz7ui@skbuf>
-References: <20240911144006.48481-1-alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1726136742; c=relaxed/simple;
+	bh=oXbbTjOHGHmZtZvnO4Qfes2ALZT/UJIHdI3bDDQzfLQ=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=unTuLXDgz1erUvRG8ZHhAoTuNm0hl+73cEyyZZRKf3IyDFBcV2NYbPEF18npPnNN11TwXxESRG7txg/NGbskbBiqXHY9efEjQKzyH+h0bhdBvRT/Qrh7MzQpK7S7wA7zIE1psCB3CkoyMTnafu5ySc3OexRe2InKM8uau1Ndncc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t7FqY+Fv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97D2FC4CEC3;
+	Thu, 12 Sep 2024 10:25:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726136741;
+	bh=oXbbTjOHGHmZtZvnO4Qfes2ALZT/UJIHdI3bDDQzfLQ=;
+	h=From:Date:Subject:To:Cc:From;
+	b=t7FqY+FvUxu5OXhh7crKNG3iZ69w6gsY11E4Fc4nnFrRyZP3v72IrJDFe786PvFXN
+	 yaMuaf6O+ecwbn5MM1NAxHZtFEBtmy4wp0D4QHEXxaXvj2dQIlzAvYdY77pai42aHL
+	 9ykfpxzIwQvOWWcQFQMzUXOoWXJIknJLTvK6IS5vLpzMCbLCpz+CgPfbe6yJOI4/oA
+	 +3VZagcKlzkWs609XgXKeknvjAhbiJAg0juPYMte6VqTL+KjMD1PDnES/nBMWgj+Wu
+	 ECfm+prS4CL5x5sLfpqOV1pAXGJtpin7+tlfC+YvtihO1jF/LoTMTx+dvZyDT7r44g
+	 s2/gzx7wmzc5g==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Thu, 12 Sep 2024 12:25:29 +0200
+Subject: [PATCH net-next] memory-provider: fix compilation issue without
+ SYSFS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="klwebu7hkzbri3lw"
-Content-Disposition: inline
-In-Reply-To: <20240911144006.48481-1-alexander.sverdlin@siemens.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240912-net-next-fix-get_netdev_rx_queue_index-v1-1-d73a1436be8c@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAJjB4mYC/zWNwQrCMBBEf6Xs2YUkFqH9FZEQm7HdS9QkLYHSf
+ +8ieJjDG5g3OxVkQaGx2yljkyLvpGAvHU1LSDNYojI543ozWMcJVdMqv6TxjOq1iNh8bv67YoW
+ XFNE4WHPto30ONxdIZZ8MHfyO7vR30OM4TmV5KWuCAAAA
+To: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Kaiyuan Zhang <kaiyuanz@google.com>, 
+ Mina Almasry <almasrymina@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1752; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=oXbbTjOHGHmZtZvnO4Qfes2ALZT/UJIHdI3bDDQzfLQ=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBm4sGib91L7eitagSjw9kzYEQxKTG4nYn9I3RM0
+ ZQGJMyTVQuJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZuLBogAKCRD2t4JPQmmg
+ cy/zEACpAeui9HGTi1xdx8pVB8E+XEFoUDJUe31hBfp+Nx7GDqwWDHYqOTxyN50HA7vX/H4/K2h
+ djQAXjz62oMzcvKiE7HnQMRi5vBQ4MRCmRR8AO0A8dowTrZXWYnnk1gKX1mt8iiMr02Jl5lBU3M
+ iLivXq3dcrGyh9/fWKx89ZVZ3X0U88oYgjAjwurtjTfCungTHwbdpDcO/kBqmnoqLzHBrZqalu5
+ 8RERGJlG9gvUR1L1s92iYujaMQk8qd9e85bIkXFO+nmpe4uiqhit/iiUpHLfO731iBcvAA6DWxU
+ Mb19OPpLtu+/tBBVJj6swvaOn/fg2nuVF4uj8hvHTnZEetq7btHOKhJZNXxze1QDInWFUmIjpEU
+ 1rbe7PjHAeXsAogJWaE+rxvxC2SNpwGjZ2SiKlXdwciNpGFC5b5wBt9TCiZtpkkCLIaOr1/fP+J
+ Vva9D1jNWF8qvLPHZbUUdL7PqJsV3UC6C08byd1GDWTsDQ68fgpm/Z8o5pzGI2AU31FbQB0iGg6
+ BH5InEpyH7MDBbTNV+x9Pa+0w8QTFovsy7Ph2YluH+MhSOJBbYXyq26Ccq1g/+rKNR84UeCB4xB
+ c1UWnZvjIcPtHDu1dG2vP8ei2pzNzxgoU/d2D7LZ+C7S6euNE2iHdkpbHNtNDM9WHDVD9ZNQDn3
+ dGN8srlZ9HhXrIg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
+When CONFIG_SYSFS is not set, the kernel fails to compile:
 
---klwebu7hkzbri3lw
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+     net/core/page_pool_user.c:368:45: error: implicit declaration of function 'get_netdev_rx_queue_index' [-Werror=implicit-function-declaration]
+      368 |                 if (pool->slow.queue_idx == get_netdev_rx_queue_index(rxq)) {
+          |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~
 
-Hi Alexander,
+When CONFIG_SYSFS is not set, get_netdev_rx_queue_index() is not defined
+as well. In this case, page_pool_check_memory_provider() cannot check
+the memory provider, and a success answer can be returned instead.
 
-On Wed, Sep 11, 2024 at 04:40:03PM +0200, A. Sverdlin wrote:
-> From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-> 
-> dsa_switch_shutdown() doesn't bring down any ports, but only disconnects
-> slaves from master. Packets still come afterwards into master port and the
-> ports are being polled for link status. This leads to crashes:
-> 
-> Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
-> CPU: 0 PID: 442 Comm: kworker/0:3 Tainted: G O 6.1.99+ #1
-> Workqueue: events_power_efficient phy_state_machine
-> pc : lan9303_mdio_phy_read
-> lr : lan9303_phy_read
-> Call trace:
->  lan9303_mdio_phy_read
->  lan9303_phy_read
->  dsa_slave_phy_read
->  __mdiobus_read
->  mdiobus_read
->  genphy_update_link
->  genphy_read_status
->  phy_check_link_status
->  phy_state_machine
->  process_one_work
->  worker_thread
-> 
-> Call lan9303_remove() instead to really unregister all ports before zeroing
-> drvdata and dsa_ptr.
-> 
-> Fixes: 0650bf52b31f ("net: dsa: be compatible with masters which unregister on shutdown")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-> ---
-
-Could you please test this alternative solution (patch attached) for both reported problems?
-
-Thanks.
-
---klwebu7hkzbri3lw
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-net-dsa-improve-shutdown-sequence.patch"
-
-From e9ffae9325d1bf683e455f78ac1804b3612a4fd7 Mon Sep 17 00:00:00 2001
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-Date: Thu, 12 Sep 2024 01:14:19 +0300
-Subject: [PATCH] net: dsa: improve shutdown sequence
-
-Alexander Sverdlin presents 2 problems during shutdown with the
-lan9303 driver. One is specific to lan9303 and the other just happens
-to reproduce there.
-
-The first problem is that lan9303 is unique among DSA drivers in that it
-calls dev_get_drvdata() at "arbitrary runtime" (not probe, not shutdown,
-not remove):
-
-phy_state_machine()
--> ...
-   -> dsa_user_phy_read()
-      -> ds->ops->phy_read()
-         -> lan9303_phy_read()
-            -> chip->ops->phy_read()
-               -> lan9303_mdio_phy_read()
-                  -> dev_get_drvdata()
-
-But we never stop the phy_state_machine(), so it may continue to run
-after dsa_switch_shutdown(). Our common pattern in all DSA drivers is
-to set drvdata to NULL to suppress the remove() method that may come
-afterwards. But in this case it will result in an NPD.
-
-The second problem is that the way in which we set
-dp->conduit->dsa_ptr = NULL; is concurrent with receive packet
-processing. dsa_switch_rcv() checks once whether dev->dsa_ptr is NULL,
-but afterwards, rather than continuing to use that non-NULL value,
-dev->dsa_ptr is dereferenced again and again without NULL checks:
-dsa_conduit_find_user() and many other places. In between dereferences,
-there is no locking to ensure that what was valid once continues to be
-valid.
-
-Both problems have the common aspect that closing the conduit interface
-solves them.
-
-In the first case, dev_close(conduit) triggers the NETDEV_GOING_DOWN
-event in dsa_user_netdevice_event() which closes user ports as well.
-dsa_port_disable_rt() calls phylink_stop(), which synchronously stops
-the phylink state machine, and ds->ops->phy_read() will thus no longer
-call into the driver after this point.
-
-In the second case, dev_close(conduit) should do this, as per
-Documentation/networking/driver.rst:
-
-| Quiescence
-| ----------
-|
-| After the ndo_stop routine has been called, the hardware must
-| not receive or transmit any data.  All in flight packets must
-| be aborted. If necessary, poll or wait for completion of
-| any reset commands.
-
-So it should be sufficient to ensure that later, when we zeroize
-conduit->dsa_ptr, there will be no concurrent dsa_switch_rcv() call
-on this conduit.
-
-The addition of the netif_device_detach() function is to ensure that
-ioctls, rtnetlinks and ethtool requests on the user ports no longer
-propagate down to the driver - we're no longer prepared to handle them.
-
-Link: https://lore.kernel.org/netdev/2d2e3bba17203c14a5ffdabc174e3b6bbb9ad438.camel@siemens.com/
-Link: https://lore.kernel.org/netdev/c1bf4de54e829111e0e4a70e7bd1cf523c9550ff.camel@siemens.com/
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Fixes: 0f9214046893 ("memory-provider: dmabuf devmem memory provider")
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/dsa/dsa.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ net/core/page_pool_user.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-index 668c729946ea..1664547deffd 100644
---- a/net/dsa/dsa.c
-+++ b/net/dsa/dsa.c
-@@ -1577,6 +1577,7 @@ EXPORT_SYMBOL_GPL(dsa_unregister_switch);
- void dsa_switch_shutdown(struct dsa_switch *ds)
+diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+index 48335766c1bf..a98c0a76b33f 100644
+--- a/net/core/page_pool_user.c
++++ b/net/core/page_pool_user.c
+@@ -353,6 +353,7 @@ void page_pool_unlist(struct page_pool *pool)
+ int page_pool_check_memory_provider(struct net_device *dev,
+ 				    struct netdev_rx_queue *rxq)
  {
- 	struct net_device *conduit, *user_dev;
-+	LIST_HEAD(close_list);
- 	struct dsa_port *dp;
- 
- 	mutex_lock(&dsa2_mutex);
-@@ -1586,10 +1587,16 @@ void dsa_switch_shutdown(struct dsa_switch *ds)
- 
- 	rtnl_lock();
- 
-+	dsa_switch_for_each_cpu_port(dp, ds)
-+		list_add(&dp->conduit->close_list, &close_list);
-+
-+	dev_close_many(&close_list, true);
-+
- 	dsa_switch_for_each_user_port(dp, ds) {
- 		conduit = dsa_port_to_conduit(dp);
- 		user_dev = dp->user;
- 
-+		netif_device_detach(user_dev);
- 		netdev_upper_dev_unlink(conduit, user_dev);
++#ifdef CONFIG_SYSFS
+ 	struct net_devmem_dmabuf_binding *binding = rxq->mp_params.mp_priv;
+ 	struct page_pool *pool;
+ 	struct hlist_node *n;
+@@ -372,6 +373,9 @@ int page_pool_check_memory_provider(struct net_device *dev,
  	}
+ 	mutex_unlock(&page_pools_lock);
+ 	return -ENODATA;
++#else
++	return 0;
++#endif
+ }
  
+ static void page_pool_unreg_netdev_wipe(struct net_device *netdev)
+
+---
+base-commit: 3cfb5aa10cb78571e214e48a3a6e42c11d5288a1
+change-id: 20240912-net-next-fix-get_netdev_rx_queue_index-a1034d1b962a
+
+Best regards,
 -- 
-2.34.1
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-
---klwebu7hkzbri3lw--
 
