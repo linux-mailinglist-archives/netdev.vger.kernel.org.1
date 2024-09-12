@@ -1,111 +1,170 @@
-Return-Path: <netdev+bounces-127811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACCBE976A31
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:14:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A43E8976A56
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:18:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 139F6B20E13
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 13:14:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C91161C234EF
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 13:18:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C401AB6DC;
-	Thu, 12 Sep 2024 13:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BdwqLfYt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B4C1ABEA7;
+	Thu, 12 Sep 2024 13:18:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B091A7061
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 13:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4383D1A76C9;
+	Thu, 12 Sep 2024 13:18:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726146851; cv=none; b=JRhOYJppWIW3dzELjYVBAJwcM5EISi+ShKaA/4/JUaaJ4QqAhvlhENsHU5t47eomPSuGmOz53Mqjfh7UDx9IIfUe4JD/mEX+cZoVkaUtCkUpFqq3B0TRWNdh8LRzCTcDqfL3GkUvTaLBIVZtQWUPUpEa1+zl3Mk7XhbAnDkItxY=
+	t=1726147084; cv=none; b=XfsxrxMAHed1Na/aXInxe9Plx/slVHN0QX/Jxt79o3jkOw9jDV2M3xOFUKhgSb2T5RIGNAgLMcS+8kxWrA0v9RZeFb/wY6Wk0yjkoudHIVs4CWQXvvRbKOJHbJKqhSeBCRqYTcvLwr/3moR27i+qzxVlLgn+Hz5zmDEMgjfCQbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726146851; c=relaxed/simple;
-	bh=EahhHOZt8keeU4ar/K3KrCm52yfxkzfLyfHmsF6kR3U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mRRUT0uYt+yw6epxFr/buEOvsbTyPmAQUN8GWzXtTUL8l6q59EW9qMV3v4f6ydjeUeA3Oxn9zhmRlC9joHHxJfh9wjqb0Z98IYUcKnuG2vBiI7nfScDvoetRD7wASivbdrmlhxUZlXZ9vp7MMmgbBjD000ErEON/rdBE3lcnyNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BdwqLfYt; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6db67400db4so9132367b3.1
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 06:14:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726146849; x=1726751649; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oqZthTFDmLUBDICo0tY9ep01KRkPGioFv1nuqT38niQ=;
-        b=BdwqLfYtVFWVw9pOzr80hvnMV1wkEhIp1+7W88IjrY1XrbTVFK9nz5aKEGDXGpAFF4
-         UudSSMSkDE+pen8CFuJ0QE9n9rBr/gbFl+hg3Ge/KtLCqTGhaHqyUo6YeSZFE3jdFKId
-         oh7O/CF4Xd7t4JFYj5vefMp2XqZOVjJYc+Gv3Qvm2UMmc1nmmqgesAqsV9G17cfmO/c8
-         YkGCXJ7qaTzFiLXaRuI0G3J2P5ulHaEWi+WHZItoa074afJpVN2lAnm9Wu5g/5C6mcux
-         IfgoDu6b/47Ffyq0Sr7jYGqEY+Su6uvMWuDtLj9uB32TGsxc8RSetTuidZ2Z/Ek5W+Tj
-         gFYw==
+	s=arc-20240116; t=1726147084; c=relaxed/simple;
+	bh=8vtiuWy8DEEYZuh8z5JLVaTZZ+OrEOoXgyyr+iakjlE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KMlNcxqtuk+tSasHd0KDYFL9g/sOBkubUXx0L9B5tKD0BaL5z+LCydkDS/4UswJpQERhhyAtlolvhUI+N7/rDhuP0tRc4r3YxrYnHwcjcaW5Rd8Wc8ucic8U4HGpfRE2tmvEWteV9vgX82YaQugZ9hG3fQlEDMgJVFAgiO1/KjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-374c3400367so925323f8f.2;
+        Thu, 12 Sep 2024 06:18:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726146849; x=1726751649;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oqZthTFDmLUBDICo0tY9ep01KRkPGioFv1nuqT38niQ=;
-        b=WOXBbRwtWzlH8b237UL1iKc6hmpsuu2A3rMOApIEGUHWoCfbTRR2s6saca0IhkDFm1
-         t4oYuL1cQ8E5hYGlbyu7tEWOD+U35evOqTvlfY4uyyA+Dm/BpW5CYhW2uLZwzEUvIhLP
-         VU+GWcE2EjP39HZUCJwnbqYkgWRPUOi27Nfj/gJOosYHbH2j6T00YI7xwMPpBSLT301t
-         hQkOBpBdnU78oIbvNIiBl/khraKJt+Dw6PH0xo56UnbPZ96E8m79zDYpOIOM9k1BWmPv
-         Jac2uLwHNPVTAJnd23DfXYxiTcrYkXZg3eA3aZk+GvXfcU9OrNSDVU8GX0KrgeSzE5JC
-         csmg==
-X-Forwarded-Encrypted: i=1; AJvYcCXc1PasNitN8QUcC7Vz3nc5kZ6P7l4ezvzq3uxZQ7QWFHNF8K+RI/O1KiBmtsL9diLI9BWdbA0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDyNmxzuJ4ILSMBmhmiiuQ5s95nle5FXoh4mV9tC0wUmFx9+dy
-	7jEG7FVd3J3ap+VuOUF8Fijk51q7GxriVtevExQDxiegHdgAX5JWpwrvo16/e5NIG4BO9zgxiyz
-	ms2SxXKSumWc4Fon/a2JZEG9paSHg3bfgbw+/
-X-Google-Smtp-Source: AGHT+IH1d8eCzkBWXAFxzhfG/a0ZEazgbphcGtDN1lb8mUPmfqNakNE04uuDzX1r3b0WC+e6GWV0vC/FOmDvoreDt3Q=
-X-Received: by 2002:a05:690c:4442:b0:6af:8662:ff43 with SMTP id
- 00721157ae682-6dbb6b9da3amr26148847b3.37.1726146848448; Thu, 12 Sep 2024
- 06:14:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726147080; x=1726751880;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k+jkhZtCbEDKlDFBZYWklnHtzrWSfKD6Ka+gxj0l1wk=;
+        b=QKnqf0UmiI5+5P1WOMCPcr6N/Xc/Ajdwmu4MUplDGRVjTKxhNRdXgB7E/fEz5xUtIf
+         PoZlMKA2kFKoq53KTAYYp8ayzboznMfhNwkXaVXVyx2XrG0o3KhwszgbecoeN5sE4rdM
+         DpI5mYDhiSNT66Fb/qmApfcZjJ8OgeFudX/1S4kQXcjn+buJu6UKkCoE5LjjAwAmwPq3
+         ZcNQK61lFW9OX1HwMn8wAUTRlbQ5DeTm6W8Vbg6qM03jOPcmTyyztrgIeEoUFDrbMN2Q
+         ESI7ut5XtJuDfh8QsvXXjI7dGTDhjouVOaAGZdtVbixu2qE5SJ8cpABHMWTLfzJXpqn5
+         bFaw==
+X-Forwarded-Encrypted: i=1; AJvYcCVWOtNLfWTC1jzgpFmCj4KrbHnnQfIRzvPVjRYt5w6aPL1Vzrb0oV/YXI4mKr8COzkaSKFN7+Iq8DFwnCBi@vger.kernel.org, AJvYcCVqgCINT3MxkOyuqdNrI2O1glzt/yAcGpv0aZljjmuQwgBJGYYrp/O1AtOaNofjts15ZDbGN0Q5@vger.kernel.org, AJvYcCWRomv1pUrfRZrs3okzIfmyriqTkmkw86YG/lrWfS7LPDyH9wC8HpXsiThIFLlHLp1rwPE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyzhu3bM8PLU+13AJ9AIfg9l1umb/qbeng1Be6/hFyDVoHR7wwB
+	XMz/ryEycFtYcTwpJySsjg56NTfrOFNv7iyVgkMPKUXskZnirx1L
+X-Google-Smtp-Source: AGHT+IH2FK1sZsXCQcQITQimeUOtmON1FCsxoZGOoivBPz1eG/mktX+Dh3Repf8UyTiOlZqLX7uTeQ==
+X-Received: by 2002:a5d:6751:0:b0:374:c512:87ce with SMTP id ffacd0b85a97d-378c2d0359fmr2390588f8f.30.1726147080369;
+        Thu, 12 Sep 2024 06:18:00 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25d40b2esm748160266b.194.2024.09.12.06.17.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 06:17:59 -0700 (PDT)
+Date: Thu, 12 Sep 2024 06:17:55 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, andrii@kernel.org, ast@kernel.org,
+	syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
+	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org,
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Subject: Re: [PATCH net-net] tun: Assign missing bpf_net_context.
+Message-ID: <20240912-hypnotic-messy-leopard-f1d2b0@leitao>
+References: <000000000000adb970061c354f06@google.com>
+ <20240702114026.1e1f72b7@kernel.org>
+ <20240703122758.i6lt_jii@linutronix.de>
+ <20240703120143.43cc1770@kernel.org>
+ <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
+ <20240912122847.x70_LgN_@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240912063119.1277322-1-anders.roxell@linaro.org>
-In-Reply-To: <20240912063119.1277322-1-anders.roxell@linaro.org>
-From: Willem de Bruijn <willemb@google.com>
-Date: Thu, 12 Sep 2024 09:13:30 -0400
-Message-ID: <CA+FuTSeFg5AcSxdp4AKi4iPROF8r2dy2BhaMKpCrFD8FM3G=Ug@mail.gmail.com>
-Subject: Re: [PATCH] selftests: Makefile: add missing 'net/lib' to targets
-To: Anders Roxell <anders.roxell@linaro.org>
-Cc: shuah@kernel.org, kuba@kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Network Development <netdev@vger.kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240912122847.x70_LgN_@linutronix.de>
 
-On Thu, Sep 12, 2024 at 2:31=E2=80=AFAM Anders Roxell <anders.roxell@linaro=
-.org> wrote:
->
-> Fixes: 1d0dc857b5d8 ("selftests: drv-net: add checksum tests")
-> Signed-off-by: Anders Roxell <anders.roxell@linaro.org>
+Hello Sabastian,
 
-This target is automatically built for targets that depend on it.
+Thanks for the quick reply!
 
-See the commit that introduced it, b86761ff6374.
+On Thu, Sep 12, 2024 at 02:28:47PM +0200, Sebastian Andrzej Siewior wrote:
+> On 2024-09-12 05:06:36 [-0700], Breno Leitao wrote:
+> > Hello Sebastian, Jakub,
+> Hi,
+> 
+> > I've seen some crashes in 6.11-rc7 that seems related to 401cb7dae8130
+> > ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.").
+> > 
+> > Basically bpf_net_context is NULL, and it is being dereferenced by
+> > bpf_net_ctx->ri.kern_flags (offset 0x38) in the following code.
+> > 
+> > 	static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
+> > 	{
+> > 		struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+> > 		if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_RI_INIT)) {
+> > 
+> > That said, it means that bpf_net_ctx_get() is returning NULL.
+> > 
+> > This stack is coming from the bpf function bpf_redirect()
+> > 	BPF_CALL_2(bpf_redirect, u32, ifindex, u64, flags)
+> > 	{
+> > 	      struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+> > 
+> > 
+> > Since I don't think there is XDP involved, I wondering if we need some
+> > preotection before calling bpf_redirect()
+> 
+> This origins in netkit_xmit(). If my memory serves me, then Daniel told
+> me that netkit is not doing any redirect and therefore does not need
+> "this". This must have been during one of the first "designs"/ versions. 
 
-+++ b/tools/testing/selftests/Makefile
-@@ -116,6 +116,13 @@ TARGETS +=3D zram
- TARGETS_HOTPLUG =3D cpu-hotplug
- TARGETS_HOTPLUG +=3D memory-hotplug
+Right, I've seen several crashes related to this, and in all of them it
+is through netkit_xmit() -> netkit_run() ->  bpf_prog_run()
 
-+# Networking tests want the net/lib target, include it automatically
-+ifneq ($(filter net,$(TARGETS)),)
-+ifeq ($(filter net/lib,$(TARGETS)),)
-+       INSTALL_DEP_TARGETS :=3D net/lib
-+endif
-+endif
+> If you are saying, that this is possible then something must be done.
+> Either assign a context or reject the bpf program.
 
-If you believe that it needs to be included directly, please expand
-the commit message with the reasoning.
+If we want to assign a context, do you meant something like the
+following?
+
+Author: Breno Leitao <leitao@debian.org>
+Date:   Thu Sep 12 06:11:28 2024 -0700
+
+    netkit: Assign missing bpf_net_context.
+    
+    During the introduction of struct bpf_net_context handling for
+    XDP-redirect, the netkit driver has been missed.
+    
+    Set the bpf_net_context before invoking netkit_xmit() program within the
+    netkit driver.
+    
+    Fixes: 401cb7dae8130 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
+    Signed-off-by: Breno Leitao <leitao@debian.org>
+
+diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+index 79232f5cc088..f8af57b7a1e8 100644
+--- a/drivers/net/netkit.c
++++ b/drivers/net/netkit.c
+@@ -65,6 +65,7 @@ static struct netkit *netkit_priv(const struct net_device *dev)
+ 
+ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
++	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+ 	struct netkit *nk = netkit_priv(dev);
+ 	enum netkit_action ret = READ_ONCE(nk->policy);
+ 	netdev_tx_t ret_dev = NET_XMIT_SUCCESS;
+@@ -72,6 +73,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	struct net_device *peer;
+ 	int len = skb->len;
+ 
++	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+ 	rcu_read_lock();
+ 	peer = rcu_dereference(nk->peer);
+ 	if (unlikely(!peer || !(peer->flags & IFF_UP) ||
+@@ -110,6 +112,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		break;
+ 	}
+ 	rcu_read_unlock();
++	bpf_net_ctx_clear(bpf_net_ctx);
+ 	return ret_dev;
+ }
 
