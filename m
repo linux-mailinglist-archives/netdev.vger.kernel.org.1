@@ -1,158 +1,140 @@
-Return-Path: <netdev+bounces-127717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2527976336
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:46:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 063A2976332
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:45:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 106331C222FA
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:46:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A504F1F2203A
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B594F188CDA;
-	Thu, 12 Sep 2024 07:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CCD18F2DD;
+	Thu, 12 Sep 2024 07:45:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mtATTw89"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="qSGMdRyF"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F38215C3;
-	Thu, 12 Sep 2024 07:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151E318E03D;
+	Thu, 12 Sep 2024 07:45:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726127162; cv=none; b=P8uLr44PjEK1tTA5w5x68Gk0zaqnIy6QcpdQaz5hU7LnLvUntBbP6AH2w8S19uzqNHeWxj5U8GemHv0uCj+X0rYq7KH/E3SRA1kxyZhHJGTj2r5ZB8VNuIZDuLniqppTP4YJZ+tGefgYL+76VfZ7u2JmZd5oz+i6cZPAnpa7Vas=
+	t=1726127106; cv=none; b=TFOgu3YhsbF0T7xmw5aSG/3GT1ZxPFF0anF1FlS5vJMBFl9PfJhkUjcQoDP14SDBJY/T/pAPNe6OA3ARZIEfKCi+/IuEYoOklZy67+q/xDQtqx4Jsh+3r/cpXWI42bGkc3JBfq5Zx+N3PIHx+ZgjhK6jvnedFzo6rsJUmYf+8pE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726127162; c=relaxed/simple;
-	bh=gxixtiXWhXKrK6lRYUR6BtWH4pwbLNWKx4gI8/Q6X/w=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=Ov7B5E8SVgvIaUGzN1s/qKBXDISEfN1whWT4J91BVc84gy5Nrrs3WluvHIjluP51yGsex1yDLf8wXwMZCAZ41YqrhJ2m9YV5ya4etXDMpvBDCNMSlJcb805mj9C9hDTz0RLlR8c62l33OrWuY8bCclp9HXxjZwWZ4Kc9w79o/YI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mtATTw89; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1726127157; h=Message-ID:Subject:Date:From:To;
-	bh=t48v7BDcLuiIfdxjk6XqmMjp9eUrfEzCF1KkgXR9eUA=;
-	b=mtATTw89vMmSK6W5KgjhxoKTfsXJuGDwPpcpS3g9ibJeTIPM34+HgYQ75ByLfKY/nhgIc/xc/GOL/Gfa8JHeNoTtY3sU10istMRd/DvgY7oQzb8eB38/Vz9F//8/ajxIz0pXX0oEH+gM7BjPqINA5arh2LBERffunMB52sxryAQ=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WEqckP1_1726127156)
-          by smtp.aliyun-inc.com;
-          Thu, 12 Sep 2024 15:45:57 +0800
-Message-ID: <1726126994.8755774-3-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 03/13] virtio_ring: packed: harden dma unmap for indirect
-Date: Thu, 12 Sep 2024 15:43:14 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: netdev@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240820073330.9161-1-xuanzhuo@linux.alibaba.com>
- <20240820073330.9161-4-xuanzhuo@linux.alibaba.com>
- <20240911072537-mutt-send-email-mst@kernel.org>
- <1726124138.2346847-1-xuanzhuo@linux.alibaba.com>
- <20240912030013-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240912030013-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1726127106; c=relaxed/simple;
+	bh=Xu6sHgDKfgjbkEDyE3lLSibg39hwTKnEOVkCaHjK/cE=;
+	h=From:To:Subject:Date:Message-Id; b=IOJhiw3gTidcoWTRJQMPSJqqUrtALUDTIqGGAY3AAeXpcpTqpDdvMahdWkatNTJqsnaelNxLq0Y4PYti9bx8cQ4U/0t9EIplH4kGfrX63nkvH50Tubir41q7vi8L8nqC60WR2MZpx+Zkeky7m4hQ31obUx33M19gaAc8UEGmIf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=qSGMdRyF; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id A01E220B9A9C; Thu, 12 Sep 2024 00:45:04 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A01E220B9A9C
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1726127104;
+	bh=jPfdFXZMhBELWCsu42PbhhsboZKB4K+0hkhbL/v0eZc=;
+	h=From:To:Subject:Date:From;
+	b=qSGMdRyF9DMPGqyStHV94plqd897WMSZn7iqv12xpXjMjiYpO3TpJB8JB+fC/4oZK
+	 oaJL98B4vOUD1+hHio+A+Zz6bRi01GKX14ccEn4yreK1cfjbSXsW/+vr6Qx9jpOYC0
+	 DtigHJ9C3VysAXg/w5SJ8CxjwOddb3ULFjy2Nvu8=
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shradhagupta@linux.microsoft.com,
+	ahmed.zaki@intel.com,
+	ernis@linux.microsoft.com,
+	colin.i.king@gmail.com,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: mana: Add get_link and get_link_ksettings in ethtool
+Date: Thu, 12 Sep 2024 00:44:43 -0700
+Message-Id: <1726127083-28538-1-git-send-email-ernis@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-On Thu, 12 Sep 2024 03:38:12 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Thu, Sep 12, 2024 at 02:55:38PM +0800, Xuan Zhuo wrote:
-> > On Wed, 11 Sep 2024 07:28:36 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > As gcc luckily noted:
-> > >
-> > > On Tue, Aug 20, 2024 at 03:33:20PM +0800, Xuan Zhuo wrote:
-> > > > @@ -1617,23 +1617,24 @@ static void detach_buf_packed(struct vring_virtqueue *vq,
-> > > >  	}
-> > > >
-> > > >  	if (vq->indirect) {
-> > > > +		struct vring_desc_extra *extra;
-> > > >  		u32 len;
-> > > >
-> > > >  		/* Free the indirect table, if any, now that it's unmapped. */
-> > > > -		desc = state->indir_desc;
-> > > > -		if (!desc)
-> > >
-> > > desc is no longer initialized here
-> >
-> >
-> > Will fix.
-> >
-> >
-> > >
-> > > > +		extra = state->indir;
-> > > > +		if (!extra)
-> > > >  			return;
-> > > >
-> > > >  		if (vring_need_unmap_buffer(vq)) {
-> > > >  			len = vq->packed.desc_extra[id].len;
-> > > >  			for (i = 0; i < len / sizeof(struct vring_packed_desc);
-> > > >  					i++)
-> > > > -				vring_unmap_desc_packed(vq, &desc[i]);
-> > > > +				vring_unmap_extra_packed(vq, &extra[i]);
-> > > >  		}
-> > > >  		kfree(desc);
-> > >
-> > >
-> > > but freed here
-> > >
-> > > > -		state->indir_desc = NULL;
-> > > > +		state->indir = NULL;
-> > > >  	} else if (ctx) {
-> > > > -		*ctx = state->indir_desc;
-> > > > +		*ctx = state->indir;
-> > > >  	}
-> > > >  }
-> > >
-> > >
-> > > It seems unlikely this was always 0 on all paths with even
-> > > a small amount of stress, so now I question how this was tested.
-> > > Besides, do not ignore compiler warnings, and do not tweak code
-> > > to just make compiler shut up - they are your friend.
-> >
-> > I agree.
-> >
-> > Normally I do this by make W=12, but we have too many message,
-> > so I missed this.
-> >
-> > 	make W=12 drivers/net/virtio_net.o drivers/virtio/virtio_ring.o
-> >
-> > If not W=12, then I did not get any warning message.
-> > How do you get the message quickly?
-> >
-> > Thanks.
->
->
-> If you stress test this for a long enough time, and with
-> debug enabled, you will see a crash.
+Add support for the ethtool get_link and get_link_ksettings
+operations. Display standard port information using ethtool.
 
-I only stress tested the split ring. For the packed ring, I
-just performed a simple verification.
+Before the change:
+$ethtool enP30832s1
+>No data available
 
-I will street test for two mode in next version.
+After the change:
+$ethtool enP30832s1
+>Settings for enP30832s1:
+        Supported ports: [  ]
+        Supported link modes:   Not reported
+        Supported pause frame use: No
+        Supports auto-negotiation: Yes
+        Supported FEC modes: Not reported
+        Advertised link modes:  Not reported
+        Advertised pause frame use: No
+        Advertised auto-negotiation: Yes
+        Advertised FEC modes: Not reported
+        Speed: Unknown!
+        Duplex: Full
+        Auto-negotiation: on
+        Port: Direct Attach Copper
+        PHYAD: 0
+        Transceiver: internal
+        Link detected: yes
 
-Thanks.
+Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+---
+ .../ethernet/microsoft/mana/mana_ethtool.c    | 20 +++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+index 146d5db1792f..c2716d6cad36 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+@@ -369,6 +369,24 @@ static int mana_set_channels(struct net_device *ndev,
+ 	return err;
+ }
+ 
++static int mana_get_link_ksettings(struct net_device *ndev,
++				   struct ethtool_link_ksettings *cmd)
++{
++	cmd->base.duplex = DUPLEX_FULL;
++	cmd->base.autoneg = AUTONEG_ENABLE;
++	cmd->base.port = PORT_DA;
++
++	ethtool_link_ksettings_zero_link_mode(cmd, supported);
++	ethtool_link_ksettings_zero_link_mode(cmd, advertising);
++
++	ethtool_link_ksettings_add_link_mode(cmd, supported,
++					     Autoneg);
++	ethtool_link_ksettings_add_link_mode(cmd, advertising,
++					     Autoneg);
++
++	return 0;
++}
++
+ const struct ethtool_ops mana_ethtool_ops = {
+ 	.get_ethtool_stats	= mana_get_ethtool_stats,
+ 	.get_sset_count		= mana_get_sset_count,
+@@ -380,4 +398,6 @@ const struct ethtool_ops mana_ethtool_ops = {
+ 	.set_rxfh		= mana_set_rxfh,
+ 	.get_channels		= mana_get_channels,
+ 	.set_channels		= mana_set_channels,
++	.get_link_ksettings	= mana_get_link_ksettings,
++	.get_link		= ethtool_op_get_link,
+ };
+-- 
+2.34.1
 
-
->
->
-> > >
-> > > >
-> > > > --
-> > > > 2.32.0.3.g01195cf9f
-> > >
->
 
