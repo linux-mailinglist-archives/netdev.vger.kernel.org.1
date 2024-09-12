@@ -1,121 +1,94 @@
-Return-Path: <netdev+bounces-127666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B85D975F99
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 05:19:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA1A2975FB9
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 05:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD7EC1C21FC2
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 03:19:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7E88281E78
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 03:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCB77D07E;
-	Thu, 12 Sep 2024 03:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500E76F30D;
+	Thu, 12 Sep 2024 03:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="kL/RcbnM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dikDMS4c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6506228F5;
-	Thu, 12 Sep 2024 03:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CDAC38DE1;
+	Thu, 12 Sep 2024 03:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726111155; cv=none; b=Dj/2j4dVKh5TKQiBFCk6JGTfkNpREtGd0KGnnjbHM5BIX5ftpR0XAJvuNEIkcY/kCTNNL+iuIzJQhr9zXTut9BBKQt/NMhXMoBRaxlu3acIZ9E50JeZejV+IIZLs7gabv24oylCWjATkwxza9DtB4+x9cnWg7eUj/RTKt1YlVIE=
+	t=1726111829; cv=none; b=LRtvknufJGlm61dU0+H6nT07S8xrTS0R4dJGrLCyUfjV8waPdLLa3ASrdFq0lV5V7MLxBeWvvsQlyHyYREn06DGGdymG0k/kZ7cTVkMDuikY7PyJYZLOOpAptKo6IacwhSAmoUub/sgvWpUHkAiccy2wxr9KrrgwErgbp7Xl9u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726111155; c=relaxed/simple;
-	bh=10Hzo8yoE0IM8JuqwSpnU2triLci0mempS8gwX6EpIA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=QcGUsJUl/yFgW7kj4ASMhT7f1IaeWT7DhgUUX4nus3o3Hi0h46atcVBLOHsAiiG4qlF0LFz5WS/3iMALBzCDJSCgPRjMIGkc8OEiG4YEJ/aDF7xfxqK2aKmcNfY+QkxD/vPoWlfvxbwONHywfZlTYrEG/YMheawcNVBqawDlGEc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=kL/RcbnM; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1726111148;
-	bh=HuOlq/KZ6L7kveB/YZxaq/groAzlZhjQD6fVM8bZYvo=;
-	h=Date:From:To:Cc:Subject:From;
-	b=kL/RcbnMN7nI2PRIi2RAE1up4F66uo4HbtN+MlES+RUWoENjJvqfIVJ9S3MV5XT7f
-	 NjeJUEaxFVxHXXEpVhvicYpHp61qvvmHZopQ2sriXI7qKN9x0KvgBG3lST9Z6CxVUT
-	 G7j+PGj9N42t1zxTu+dD8o+yRmoO1Lim9BXdQfneZzG9DVSrYJQP6fctp6c1kHU/xl
-	 CQDyJQZ9UstZMNKWMfBOAaAGJHnEH7Qq7lbDRXC2Gm5Un5gHczHaDVaT3WY7tnYRWq
-	 n2GAO7kvQLqXxrgIZi9h3sjFBWTpHT5eU9i8WJA0zLpYqL3I5tWDBclLhYRqwCFCTo
-	 Ht9qqBoY1A2KQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X42j82DVTz4wcL;
-	Thu, 12 Sep 2024 13:19:07 +1000 (AEST)
-Date: Thu, 12 Sep 2024 13:19:06 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the net-next tree
-Message-ID: <20240912131906.1d96c87c@canb.auug.org.au>
+	s=arc-20240116; t=1726111829; c=relaxed/simple;
+	bh=QZu+4xV3LZUNN7Sfm6G0q9k4hp5C4LSFH1bQsy7zm7E=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=HIN/Da/ZlcSzh3LHq9VLJmrmsG4pAEYxMH7/jOVL6i8tdu9ktJSD8X/rfnnVkswTV2ho+J4wwY5uMxZrzX8sUCFo50B2WvW06ubOvBT61yCv9zOUzPTCL8x+cKGL+3/ZeDkxyYWBsMWbI+p+aWtP8cmglg2seLNbvpk3swlY8fU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dikDMS4c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9965AC4CEC0;
+	Thu, 12 Sep 2024 03:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726111828;
+	bh=QZu+4xV3LZUNN7Sfm6G0q9k4hp5C4LSFH1bQsy7zm7E=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dikDMS4cFgSF0R0QvcgG/AvDShyEBTbF6azbRiE9On0z8Zs3qg3qEuFlEtEmezAcR
+	 QunW117FEA72ZerC2b/NTWuArQaaxQSUYw4l8SLEY6GuSuFnRL9LPyQX5GzX/MVI3O
+	 n4kUPGXe1tofdDj4Nkn4yL0lC0CunnPxmoQsoJKQo7zhU9enOg21deev3F8hw5/pyh
+	 oq4lZtFyi0Ai5In63+l9AZzxqjXZAhJY7K2wkHeRoK+xCFTbyykqWh+4NWNkkJGpbB
+	 navoxdjxQsGpWR3zwxvujLg16Xxtt45OQBZUei2lgPxQmyLU0VcY6YnnrR9tQkFVda
+	 YNVG0gm1IjKmg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB26E3806656;
+	Thu, 12 Sep 2024 03:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/285=.ozpEip_Z0hBq/vOPbI";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: phy: microchip_t1: Cable Diagnostics for
+ lan887x
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172611182979.1151055.4219099086765234993.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Sep 2024 03:30:29 +0000
+References: <20240909114339.3446-1-divya.koppera@microchip.com>
+In-Reply-To: <20240909114339.3446-1-divya.koppera@microchip.com>
+To: Divya Koppera <Divya.Koppera@microchip.com>
+Cc: arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
---Sig_/285=.ozpEip_Z0hBq/vOPbI
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi all,
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-After merging the net-next tree, today's linux-next build (x86_64
-allmodconfig) failed like this:
+On Mon, 9 Sep 2024 17:13:39 +0530 you wrote:
+> Add support for cable diagnostics in lan887x PHY.
+> Using this we can diagnose connected/open/short wires and
+> also length where cable fault is occurred.
+> 
+> Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
+> ---
+>  drivers/net/phy/microchip_t1.c | 413 +++++++++++++++++++++++++++++++++
+>  1 file changed, 413 insertions(+)
 
-net/hsr/hsr_slave.c: In function 'hsr_handle_frame':
-net/hsr/hsr_slave.c:74:34: error: 'struct hsr_priv' has no member named 'se=
-qnr_lock'
-   74 |                 spin_lock_bh(&hsr->seqnr_lock);
-      |                                  ^~
-net/hsr/hsr_slave.c:76:36: error: 'struct hsr_priv' has no member named 'se=
-qnr_lock'
-   76 |                 spin_unlock_bh(&hsr->seqnr_lock);
-      |                                    ^~
+Here is the summary with links:
+  - [net-next] net: phy: microchip_t1: Cable Diagnostics for lan887x
+    https://git.kernel.org/netdev/net-next/c/b2c8a506f6a7
 
-Caused by commit
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  430d67bdcb04 ("net: hsr: Use the seqnr lock for frames received via inter=
-link port.")
 
-interatcing with commit
-
-  b3c9e65eb227 ("net: hsr: remove seqnr_lock")
-
-from the net tree.
-
-I have reverted commit 430d67bdcb04.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/285=.ozpEip_Z0hBq/vOPbI
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbiXaoACgkQAVBC80lX
-0GxwaQf+N2eP8DpXGuJFiNCVeEVF7fhQAArmB9cfpG881ciHGRsjfuu4BK8mNMeU
-x7/6Vo23ZbpcdxLhDbh0AgQJrb7muUP3qM8fV0MBMDH92PsoE4YUaRr7BrCOL+oR
-Hg9mLWs3hM9iZdjS5VbnIDNVK1FjooKeY3nrPaCsuYpebiCG0YgiwtxifM5MAHer
-onCsRFqw7PYg4g+AVAeqD2KI2hP20Osc5D3VY4JopLR5XRo7imlJEpbC46A6l6MR
-fS59Tzwf25fhkHakTPpzdFpKe4d9werw3dWuPmcwvengevccb+eC9ieSd1/aXQdF
-r549hyMA7Zu790ElLhVxEC34oD6amg==
-=F7Vg
------END PGP SIGNATURE-----
-
---Sig_/285=.ozpEip_Z0hBq/vOPbI--
 
