@@ -1,169 +1,161 @@
-Return-Path: <netdev+bounces-127951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCDF59772C9
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 22:36:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 433AA9772D5
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 22:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0FE31C20F20
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:36:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 058A0286054
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F56619048C;
-	Thu, 12 Sep 2024 20:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77891C174F;
+	Thu, 12 Sep 2024 20:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A1q3Myjx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wFlx9HxJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 013E51B9853
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 20:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CC41BF81C
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 20:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726173414; cv=none; b=XlrqadguDQBluv0KHIwMhJjPfAk3Xah0tUE6avQC+7AnOxwqYUdMv5CE1s6Sx6oTRPV8+8ylC/pxyXIpLO6mawOdbSCNzYy58XYOWX1SSe+PV+t951XgRXMly0B2/f7FNS9sYOklb/BMDOEdqwvawcSFjUjHShhFQeNgBWmhyf8=
+	t=1726173843; cv=none; b=kD+FBr0ZTVLwmqmSEZBvX+5m+JodXha8a74GgALnNIpVuCTqs6J+3jZs15YtPIb+dSK33qzflubirvO3YQKp4a6Y1fisMPkjICVFEFHz3uMwR+EHHzNG8ILwPDs0/0yCfe2j2WgwBg9NEhRv6mVjdQSh5GwcHhKnOY+LVkLBU6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726173414; c=relaxed/simple;
-	bh=vYSmvhVzTb/ojA8zFaO4mqc/pMpDbvp6SukfIutnTJI=;
+	s=arc-20240116; t=1726173843; c=relaxed/simple;
+	bh=POeMZyrSzWfT0c/EFYH4aVeVC1H3dWbv5VrEhXmoxgw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OgzCZQZO+SUpWMlFfHtjMsrrFaC20LRrndFj54FH1nlE7n1uq+ycINdJNqw1tu+2VHHUtAxAPGxjfe0aAcdR88uh0xlXZmt0FqAW2U5vkkYl6fWP8QaX2vBOw6/p8Z3ZrPW08I+UwHqHSCieDev3PvY083457bFjSAbjM8/91tY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A1q3Myjx; arc=none smtp.client-ip=209.85.160.179
+	 To:Cc:Content-Type; b=B7DcIszzHF4Jalf9pqwG/UhWHt0m7AG8pOWZPlvhUay2kCtlh12D+TBbFHA4OcGGnZHjwmINuGw6yb3CJ1/UQG4HDLyKyFiIz/IbNkG4nHd5mk+ycf1CKWJQWhxV/nZYyEhwHCLvIiDCM63ML3cZRX0NHM1YDZPiueAnDLfPtZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wFlx9HxJ; arc=none smtp.client-ip=209.85.217.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-4581cec6079so77421cf.0
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 13:36:52 -0700 (PDT)
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-49bdc6e2e2cso493486137.0
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 13:44:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726173412; x=1726778212; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1726173841; x=1726778641; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Tw5LJsO2czgWcpyERZkhXuWq3KG/XH01vCRDOf6gWew=;
-        b=A1q3Myjx49U8kOBYfhgxgFSGqAd1QLGVkFKzIeXkLyhgI+ySSfaogFFB+xn9JNXcjN
-         m8egLs/c1X5iVxOt7gSuIhgBOefjj3TXvtTguMWx5FocG9YAESLSloMG0R1y/I3BXXYq
-         muxznn8pQgkKzsAXf6Ela9b/HIZ7JfwBJhjeVq5DOqww2TJ43+fH+oKkjQZOCWDz7ppy
-         NtRrvNvUQls1DfwuW9uu9mppWXXuSNjDXZvmgBYRa0hf06Lv4BKWOKGUJoMxfau7HAQJ
-         IckdJsUC+exUC7zGXjsFf3wqkR3tRPqdWuwPlfc09VJ1dd2OHIpVa5jG8QCQlcL4/dWi
-         FsRA==
+        bh=7DjwiIxMiUHr1M6b4I5f9AEu55zXyA3J0twzo/v710c=;
+        b=wFlx9HxJS6WhEJjtnpyuDRH6cxGr+0GWzT35/x2kDdCv9W2k4A7/T3uzsAHFgjNkQ+
+         TdAEI9ebLq91wjS8R2Ot8kKSRmHf93bwVmU/KoLBDP4Q5x72t/Z51T9rLT7wn9DueLSU
+         D0hGu/BRwlcdn6CMokng56PFRoSakH9BmsO2Ik9R4WabwzyEGdC/a4hOlCZJcxKpVih4
+         EPIJcTzVkUqF7+WFPr5icBgxt7mDRWTcFX6m/Jc3xAoBb6lfVA5TD+1w89bqIZGEY+CE
+         ljHVZpjgLB9UnclbR2aCe0r9k7cKmWV6f2slht/jUIRBOgtvkYeHP441A3ht5vSoAaK6
+         ykmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726173412; x=1726778212;
+        d=1e100.net; s=20230601; t=1726173841; x=1726778641;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Tw5LJsO2czgWcpyERZkhXuWq3KG/XH01vCRDOf6gWew=;
-        b=JI/5cVAXRPx8WV1Wkt6gNCineGP6vuOcN6KIgiJt/0V8Obr3oRdFiuImOE3uf/YW2K
-         pJaw03SONKElYbXFTxO/liygeTkhqHw1/kKLuK8oQEM8Nsh3dO/lBm6PuudvNseNw7tw
-         nVY+SbXZd9vwM4uyhWdHX1GXAcFEOs545t4NmQzkNwNV7zXtf4lb4yU31orsg4Kv9wQ6
-         OrJzo9YtaokTgxTaxlQPb3lhQo8nfxUMJkEiuH2EN1vyzxrdkqZHm9jC5nFSqmdhKQQg
-         Odyqasr2lmIpbIs4Z6jLeygM64eCUNuIG6JuqlprAlX5l38JAwJ5AINfeCfSXnsDKJ4S
-         zSpg==
-X-Gm-Message-State: AOJu0Yw1DymLadyq8lYQFQCUJXSb2lYoZLb3eM90vQcoEQyMc+KjLyTX
-	Zkr5aQ9Qajf0JL55DEB5hXVrMFYnbTOJ5ua0q5vxP1X4D7srL0d5/K2LHqOLTpl3JY86G06mXhJ
-	FCZsm5oR3JWX/KI5Bb4cksoDltYVYkiNnaT+w
-X-Google-Smtp-Source: AGHT+IFi+TRD8cbKw52SKSp/m7Cn0nCkwTJBGCJgdwAA9oozrEb9bLB0qNrqT/UvMEECoGAfsM+nKDguBXu0yKxj3Cw=
-X-Received: by 2002:a05:622a:1312:b0:456:7740:c874 with SMTP id
- d75a77b69052e-458643fe57dmr4042151cf.1.1726173411504; Thu, 12 Sep 2024
- 13:36:51 -0700 (PDT)
+        bh=7DjwiIxMiUHr1M6b4I5f9AEu55zXyA3J0twzo/v710c=;
+        b=HBMW/Njo3ykjUJmSVoOgJ7gwswmbpTwOdhd+n0OpU9oEcLQKdAB9PjOj7Qr+MjTzQi
+         zCBUooTu4ji8yH/MC0v2f9dStcVd47GmGLtOA/ADZrrMNa2BDrof0oYhQVJ6dcq61efT
+         YzeNFpDjYHV2iMAhJ3vInW3SEWxveDGoA2WRgHAfakyvxpLdi9op9UahbaoSjG4LVwNb
+         UJjZHtVdPbOPvTWrEMy55hRoSD/edeB5oMmQNlzgf8OOtu0nuNeMUU7rAxRza1RDigpl
+         woe6gYH3510qV5dRXYWMwhCCC7wn8pw6rKxCVpVknfKQCVeYaTSXqtLH2VEHoIY03CcL
+         SlVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFi67hgly+d+Byip43X9IxTySxfJpILYJvtIeic4hIxmVAMYTuQcfibO4TciDKJpS1if7EyUk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOa5R+tiJDXN2HitaYJqgEsfdBt8jyEUiea9Do1okj+Khj+z3i
+	HMR3+TQO6P8Cj8AenHa9BU2bZH/7WemWk92OZ5SH46rfh0B2VLey5+SiW6zMQcU/SY1qxTC0s22
+	fuWOUWwRH2MJSFHCstQc3bwljFvTeyfWvfY2s
+X-Google-Smtp-Source: AGHT+IHCLGoDTbD9LAUphE9SPUrx3KUcIqiqyoGvbi+stviqZGZ5BDOXy0oCRC9AnOS0a9EEOZIMy5Ntm4L7cGK4dJE=
+X-Received: by 2002:a05:6102:a48:b0:49b:e7d7:3e1b with SMTP id
+ ada2fe7eead31-49d41468125mr4919245137.3.1726173840757; Thu, 12 Sep 2024
+ 13:44:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240912171251.937743-1-sdf@fomichev.me> <20240912171251.937743-2-sdf@fomichev.me>
-In-Reply-To: <20240912171251.937743-2-sdf@fomichev.me>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 12 Sep 2024 13:36:39 -0700
-Message-ID: <CAHS8izNzP_-CS2FyuUo6xRzumMAFRbkE00DOzmHpjBSkMUP3PA@mail.gmail.com>
-Subject: Re: [PATCH net-next 01/13] selftests: ncdevmem: Add a flag for the selftest
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com
+References: <20240909-strncpy-net-caif-chnl_net-c-v1-1-438eb870c155@google.com>
+ <20240910093751.GA572255@kernel.org>
+In-Reply-To: <20240910093751.GA572255@kernel.org>
+From: Justin Stitt <justinstitt@google.com>
+Date: Thu, 12 Sep 2024 13:43:49 -0700
+Message-ID: <CAFhGd8qQ_e_rh1xQqAnaAZmA7R+ftRGjprxGp+njoqg_FGMCSw@mail.gmail.com>
+Subject: Re: [PATCH] caif: replace deprecated strncpy with strscpy_pad
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
+	Kees Cook <kees@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 12, 2024 at 10:12=E2=80=AFAM Stanislav Fomichev <sdf@fomichev.m=
-e> wrote:
+Hi,
+
+On Tue, Sep 10, 2024 at 2:37=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
 >
-> And rename it to 'probing'. This is gonna be used in the selftests
-> to probe devmem functionality.
+> On Mon, Sep 09, 2024 at 04:39:28PM -0700, Justin Stitt wrote:
+> > strncpy() is deprecated for use on NUL-terminated destination strings [=
+1] and
+> > as such we should prefer more robust and less ambiguous string interfac=
+es.
+> >
+> > Towards the goal of [2], replace strncpy() with an alternative that
+> > guarantees NUL-termination and NUL-padding for the destination buffer.
 >
-> Cc: Mina Almasry <almasrymina@google.com>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> ---
->  tools/testing/selftests/net/ncdevmem.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+> Hi Justin,
 >
-> diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selft=
-ests/net/ncdevmem.c
-> index 64d6805381c5..352dba211fb0 100644
-> --- a/tools/testing/selftests/net/ncdevmem.c
-> +++ b/tools/testing/selftests/net/ncdevmem.c
-> @@ -523,8 +523,9 @@ void run_devmem_tests(void)
->  int main(int argc, char *argv[])
->  {
->         int is_server =3D 0, opt;
-> +       int probe =3D 0;
+> I am curious to know why the _pad variant was chosen.
+
+I chose the _pad variant as it matches the behavior of strncpy in this
+context, ensuring minimal functional change. I think the point you're
+trying to get at is that the net_device should be zero allocated to
+begin with -- rendering all thus NUL-padding superfluous. I have some
+questions out of curiosity: 1) do all control paths leading here
+zero-allocate the net_device struct? and 2) does it matter that this
+private data be NUL-padded (I assume not).
+
+With all that being said, I'd be happy to send a v2 using the regular
+strscpy variant if needed.
+
 >
-> -       while ((opt =3D getopt(argc, argv, "ls:c:p:v:q:t:f:")) !=3D -1) {
-> +       while ((opt =3D getopt(argc, argv, "ls:c:p:v:q:t:f:P")) !=3D -1) =
-{
->                 switch (opt) {
->                 case 'l':
->                         is_server =3D 1;
-> @@ -550,6 +551,9 @@ int main(int argc, char *argv[])
->                 case 'f':
->                         ifname =3D optarg;
->                         break;
-> +               case 'P':
-> +                       probe =3D 1;
-> +                       break;
->                 case '?':
->                         printf("unknown option: %c\n", optopt);
->                         break;
-> @@ -561,7 +565,10 @@ int main(int argc, char *argv[])
->         for (; optind < argc; optind++)
->                 printf("extra arguments: %s\n", argv[optind]);
->
-> -       run_devmem_tests();
-> +       if (probe) {
-> +               run_devmem_tests();
-> +               return 0;
-> +       }
->
+> > Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#st=
+rncpy-on-nul-terminated-strings [1]
+> > Link: https://github.com/KSPP/linux/issues/90 [2]
+> > Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en=
+.html
+> > Cc: Kees Cook <keescook@chromium.org>
+> > Cc: linux-hardening@vger.kernel.org
+> > Signed-off-by: Justin Stitt <justinstitt@google.com>
+> > ---
+> > Note: build-tested only.
+> > ---
+> >  net/caif/chnl_net.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/net/caif/chnl_net.c b/net/caif/chnl_net.c
+> > index 47901bd4def1..ff37dceefa26 100644
+> > --- a/net/caif/chnl_net.c
+> > +++ b/net/caif/chnl_net.c
+> > @@ -347,7 +347,7 @@ static int chnl_net_init(struct net_device *dev)
+> >       struct chnl_net *priv;
+> >       ASSERT_RTNL();
+> >       priv =3D netdev_priv(dev);
+> > -     strncpy(priv->name, dev->name, sizeof(priv->name));
+> > +     strscpy_pad(priv->name, dev->name);
+> >       INIT_LIST_HEAD(&priv->list_field);
+> >       return 0;
+> >  }
+> >
+> > ---
+> > base-commit: bc83b4d1f08695e85e85d36f7b803da58010161d
+> > change-id: 20240909-strncpy-net-caif-chnl_net-c-a505e955e697
+> >
+> > Best regards,
+> > --
+> > Justin Stitt <justinstitt@google.com>
+> >
+> >
 
-Before this change:
-./ncdevmem (runs run_devmem_tests() and exits)
-./ncdevmem -l: runs devmem tests and listens
+I appreciate the review.
 
-And I plan to add, for the tx path:
-
-./ncdevmem -c: runs devmem tests and does a devmem client.
-
-After this change, running ncdevmem with no flags just exits without
-doing anything; a bit weird IMO, but I'm not opposed if you see an
-upside.
-
-Is your intention with this change to not run the devmem tests on
-listen? Maybe something like:
-
-if (is_server)
-  return do_server();
-else if (is_client) /* to be added */
-  return do_client();
-else
-  run_devmem_tests();
-
-return 0;
-
-?
-
-But, I'm not totally opposed if you see an upside. Maybe use -p
-instead of -P for consistency.
-
-
-
---
-Thanks,
-Mina
+Thanks
+Justin
 
