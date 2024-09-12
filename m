@@ -1,180 +1,160 @@
-Return-Path: <netdev+bounces-127804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76879976987
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:49:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CC2C9769A1
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:52:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A92C71C20F6A
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:49:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61E181C221D6
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6671A2627;
-	Thu, 12 Sep 2024 12:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B5B19F43A;
+	Thu, 12 Sep 2024 12:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nI9OEDuZ"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="hQ+9/jWR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6127318E04A
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 12:49:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFAA1A0BD0
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 12:51:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726145378; cv=none; b=eE7z7dbMVF9lBL0xZMbsSjY2r1PGgyf40MAX7gLBgwfq59+N1z8ZnZO6RKCSvj7N0XTZAGkLUrpLgMe3/fal9VSmSv0G4zE1aBYCnZevAYtE9nwCrPD0ZgbWW5Ssj4S7maAG6Y4vjDT5EAt3h6uvIgkvm4zlB4TUvedmPDwGAb0=
+	t=1726145503; cv=none; b=iHqLVhsh/lI76B+Ga8imujQE412TmNJwmfsaIJqpFfYd1jCRU34mGUFwqRk8f+wXie81fjPnvusZhn4qnx/W4OaU1CL8yLpfjkj0OD/pUYyDT2HWPAz7LOGSXNYJ2JygNRWx5IPf1eDrsipqI0ZtrkgaI2aXXFq7wWVB1El5jz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726145378; c=relaxed/simple;
-	bh=p3QBE5QEv+TqZ+cYTRnIe5AYdRUPitJ+C6cLLbx+jxI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rj8TdrZ9dgYT+r3VLQiA6HzaxO+UuvTR25+Ybzy9IOJKRTjKHyR6ASaZ6shzR8SnXubiNqq6HeIRakZI5kPhS2vkDtp0zwd1LggeFnakRBElQ5OIbRVHIM6WDE6D5pMJrJ8yzC7jsGSPC7X16rgxDKYya5e+J1Z52hxIHbIItyg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nI9OEDuZ; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3a045f08fd6so263935ab.0
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 05:49:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726145376; x=1726750176; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cq8WYeWUrnhXK0NeTYagBg5yp4YGBI9SyavQHTWxNGc=;
-        b=nI9OEDuZBbURfb0F+kFWjcIaS0AtMwKZDBXJYvajj07un5Fgv8co8ik5/kZVKaVwbG
-         zQi7k1oJAfgDzOAA18GrNSEtT4S2JbgcoVyA09HUJ9de3O9VnIny90aqZWktB1EoRIpm
-         GR1SyLMPAa6/OlHNINKTq7wlFaZmeF7tBJifK76PrrnRUAyRdc8zXb0BD7KhZAYYyb+L
-         HrQxP/BXu3tt0vp8gMkLs8N5TDoCDp/n5/nF6HdfvjAQk4EFVwIYKjtrepcnStWX7cRg
-         a983/uUeNdVyznAje0vH/dA6jTPnFZcj+bvkwYvzpFd57agXMj1P/kxLUHJhkoHwTPf/
-         KdaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726145376; x=1726750176;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cq8WYeWUrnhXK0NeTYagBg5yp4YGBI9SyavQHTWxNGc=;
-        b=NeJbacRYQNbET8TPTrvcS1xbH2Voat6gHlc67aRQe76haeObBkJq7sykQe2tDWGCeQ
-         PyWnmqwCirxAmEsYLwa2/FFLqRLHHD/i8BtX5zmzCmpe0anAaqV7AOxmtjDaql3Tyq2P
-         xDefD17km8LrQ05wb3Pu+j/Rji8s4zaAGm8hDIv/Ze+Aan+JKmm7Rq+1aX18oypnFUcu
-         sK+tNrGRQGWgIMjf+3zOI1Edgdx6+M7mT0Ch/QGzaiK1i+5K8er0fRbY1Ps8Qcc16jRz
-         pG6w0bNo+KPJ0F++LCabpjmTbw2fmfgj2SOR/rF8aAKLh2fgoB0weVPoeA9dSflzoJGg
-         5VWw==
-X-Forwarded-Encrypted: i=1; AJvYcCWBIAvJ68vPk+M+bmDVeHtKc30zIfmdFzHuG0tQLKvXorSivuwYf6Wi3V8Yn8JBZFLyoLaFRSM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUuX968gnsnUSmQqzD+Y3y2/6pIiOJP2+O+ZeKvRvt8my5pwqL
-	XxVVdDs1tPyBqbhlw+MG5XlPhHHOjQvlH6zw2/CuYGfWwwr4Q4AXrxftxgcCqyv/V0w33wl1u/z
-	nFvbkhAUoJJroQmL4Sh0JNGXr2sGB97DZEqqC
-X-Google-Smtp-Source: AGHT+IGFRenuzU06NEUD8eoRW+qg2CN9wPF7RykjhsRvAZRW74bI1jCxGSj75TM+PYQll6CvvJOwUshzn7nmY1rcVH0=
-X-Received: by 2002:a05:6e02:b48:b0:375:cd0d:9342 with SMTP id
- e9e14a558f8ab-3a08569094bmr3087625ab.3.1726145376170; Thu, 12 Sep 2024
- 05:49:36 -0700 (PDT)
+	s=arc-20240116; t=1726145503; c=relaxed/simple;
+	bh=+s4cuWV9FCCV9kiSXQStJDVMi0ZGdbkjYyuMGpZLoOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AtxF8RxO9mFJWjpKOIL9g/419c80qeG/wYuhz9BBpvnuZbBLdQ591qr6Kpb1xpzr2XuWFlumh0r+IF62+xEwhZHz623hX2nHGYjbHRnXIJmzKTrhFgPWKww5ZzX7yhO6kH99pLG1FMO+nlThaLzrOP+vaVPtpceru3b/zy0T4Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=hQ+9/jWR; arc=none smtp.client-ip=84.16.66.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4X4HPg4kqyzFTL;
+	Thu, 12 Sep 2024 14:51:35 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1726145495;
+	bh=MzPZaWCk9rvJ+Krjp/BYLyr4/9IRkRBCVaUs47HsSns=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hQ+9/jWRLB6fSjcbjyJ3ZgZVtnDYdvGoFn+QSDDoakC0TJ69jaA4gLd4qOLT/it9C
+	 tiv9FfMHRA9QPK01WiUD8ekW4ySx3aGif2Y7zK/TbJjRC7fp9/IO5IfiBN9QPP/7mI
+	 ilAhkYql4sFyiQK1syEp15heZnGiMbVlmMHAukCY=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4X4HPf1L79zPxq;
+	Thu, 12 Sep 2024 14:51:34 +0200 (CEST)
+Date: Thu, 12 Sep 2024 14:51:24 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v4 0/6] landlock: Signal scoping support
+Message-ID: <20240912.eix6ith8Zuxa@digikod.net>
+References: <cover.1725657727.git.fahimitahera@gmail.com>
+ <20240911.BieLu8DooJiw@digikod.net>
+ <ZuIynFIRt475uBP5@tahera-OptiPlex-5000>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240912-net-next-fix-get_netdev_rx_queue_index-v1-1-d73a1436be8c@kernel.org>
-In-Reply-To: <20240912-net-next-fix-get_netdev_rx_queue_index-v1-1-d73a1436be8c@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 12 Sep 2024 05:49:23 -0700
-Message-ID: <CAHS8izOkpnLM_Uev79skrmdQjdOGwy_oYWV7xb3hNpSb=yYZ6g@mail.gmail.com>
-Subject: Re: [PATCH net-next] memory-provider: fix compilation issue without SYSFS
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZuIynFIRt475uBP5@tahera-OptiPlex-5000>
+X-Infomaniak-Routing: alpha
 
-On Thu, Sep 12, 2024 at 3:25=E2=80=AFAM Matthieu Baerts (NGI0)
-<matttbe@kernel.org> wrote:
->
-> When CONFIG_SYSFS is not set, the kernel fails to compile:
->
->      net/core/page_pool_user.c:368:45: error: implicit declaration of fun=
-ction 'get_netdev_rx_queue_index' [-Werror=3Dimplicit-function-declaration]
->       368 |                 if (pool->slow.queue_idx =3D=3D get_netdev_rx=
-_queue_index(rxq)) {
->           |                                             ^~~~~~~~~~~~~~~~~=
-~~~~~~~~
->
-> When CONFIG_SYSFS is not set, get_netdev_rx_queue_index() is not defined
-> as well. In this case, page_pool_check_memory_provider() cannot check
-> the memory provider, and a success answer can be returned instead.
->
+On Wed, Sep 11, 2024 at 06:15:24PM -0600, Tahera Fahimi wrote:
+> On Wed, Sep 11, 2024 at 08:17:04PM +0200, Mickaël Salaün wrote:
+> > We should also have the same tests as for scoped_vs_unscoped variants.
+> Hi, 
+> 
+> Thanks for the review, I will add them soon.
+> > I renamed them from the abstract unix socket patch series, please take a
+> > look:
+> > https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git/log/?h=next
+> Wonderful! Thank you :)
+> 
+> > I'll send more reviews tomorrow and I'll fix most of them in my -next
+> > branch (WIP), except for the hook_file_send_sigiotask tests and these
+> > scoped_vs_unscoped variants that you should resolve.
+> I will keep an eye on reviews. What parts of hook_file_send_sigiotask
+> would need changes?
 
-Thanks Matthieu, and sorry about that.
+The file_send_sigiotask hook was not fully covered.  It's OK now, I
+reworked this test to fix that with four variants.
 
-I have reproduced the build error and the fix resolves it. But...
+You still need to work on the scoped_vs_unscoped tests for signaling
+though.
 
-> Fixes: 0f9214046893 ("memory-provider: dmabuf devmem memory provider")
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
->  net/core/page_pool_user.c | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-> index 48335766c1bf..a98c0a76b33f 100644
-> --- a/net/core/page_pool_user.c
-> +++ b/net/core/page_pool_user.c
-> @@ -353,6 +353,7 @@ void page_pool_unlist(struct page_pool *pool)
->  int page_pool_check_memory_provider(struct net_device *dev,
->                                     struct netdev_rx_queue *rxq)
->  {
-> +#ifdef CONFIG_SYSFS
->         struct net_devmem_dmabuf_binding *binding =3D rxq->mp_params.mp_p=
-riv;
->         struct page_pool *pool;
->         struct hlist_node *n;
-> @@ -372,6 +373,9 @@ int page_pool_check_memory_provider(struct net_device=
- *dev,
->         }
->         mutex_unlock(&page_pools_lock);
->         return -ENODATA;
-> +#else
-> +       return 0;
-
-...we can't assume success when we cannot check the memory provider.
-The memory provider check is somewhat critical; we rely on it to
-detect that the driver does not support memory providers or is not
-doing the right thing, and report that to the user. I don't think we
-can silently disable the check when the CONFIG_SYSFS is disabled.
-Please return -ENODATA or some other error here.
-
-If we disable devmem TCP for !CONFIG_SYSFS we should probably add
-something to the docs saying this. I can do that in a follow up
-change.
-
-However, I'm looking at the definition of get_netdev_rx_queue_index()
-and at first glance I don't see anything there that is actually
-dependent on CONFIG_SYSFS. Can we do this instead? I have build-tested
-it and it resolves the build issue as well:
-
-```
-diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queue.h
-index ac34f5fb4f71..596836abf7bf 100644
---- a/include/net/netdev_rx_queue.h
-+++ b/include/net/netdev_rx_queue.h
-@@ -45,7 +45,6 @@ __netif_get_rx_queue(struct net_device *dev, unsigned int=
- rxq)
-        return dev->_rx + rxq;
- }
-
--#ifdef CONFIG_SYSFS
- static inline unsigned int
- get_netdev_rx_queue_index(struct netdev_rx_queue *queue)
- {
-@@ -55,7 +54,6 @@ get_netdev_rx_queue_index(struct netdev_rx_queue *queue)
-        BUG_ON(index >=3D dev->num_rx_queues);
-        return index;
- }
--#endif
- ```
-
-Matthieu, I'm happy to follow up with v2 of this fix if you don't have time=
-.
-
---=20
-Thanks,
-Mina
+> 
+> > On Fri, Sep 06, 2024 at 03:30:02PM -0600, Tahera Fahimi wrote:
+> > > This patch series adds scoping mechanism for signals.
+> > > Closes: https://github.com/landlock-lsm/linux/issues/8
+> > > 
+> > > Problem
+> > > =======
+> > > 
+> > > A sandboxed process is currently not restricted from sending signals
+> > > (e.g. SIGKILL) to processes outside the sandbox since Landlock has no
+> > > restriction on signals(see more details in [1]).
+> > > 
+> > > A simple way to apply this restriction would be to scope signals the
+> > > same way abstract unix sockets are restricted.
+> > > 
+> > > [1]https://lore.kernel.org/all/20231023.ahphah4Wii4v@digikod.net/
+> > > 
+> > > Solution
+> > > ========
+> > > 
+> > > To solve this issue, we extend the "scoped" field in the Landlock
+> > > ruleset attribute structure by introducing "LANDLOCK_SCOPED_SIGNAL"
+> > > field to specify that a ruleset will deny sending any signals from
+> > > within the sandbox domain to its parent(i.e. any parent sandbox or
+> > > non-sandbox processes).
+> > > 
+> > > Example
+> > > =======
+> > > 
+> > > Create a sansboxed shell and pass the character "s" to LL_SCOPED:
+> > > LL_FD_RO=/ LL_FS_RW=. LL_SCOPED="s" ./sandboxer /bin/bash
+> > > Try to send a signal(like SIGTRAP) to a process ID <PID> through:
+> > > kill -SIGTRAP <PID>
+> > > The sandboxed process should not be able to send the signal.
+> > > 
+> > > Previous Versions
+> > > =================
+> > > v3:https://lore.kernel.org/all/cover.1723680305.git.fahimitahera@gmail.com/
+> > > v2:https://lore.kernel.org/all/cover.1722966592.git.fahimitahera@gmail.com/
+> > > v1:https://lore.kernel.org/all/cover.1720203255.git.fahimitahera@gmail.com/
+> > > 
+> > > Tahera Fahimi (6):
+> > >   landlock: Add signal scoping control
+> > >   selftest/landlock: Signal restriction tests
+> > >   selftest/landlock: Add signal_scoping_threads test
+> > >   selftest/landlock: Test file_send_sigiotask by sending out-of-bound
+> > >     message
+> > >   sample/landlock: Support sample for signal scoping restriction
+> > >   landlock: Document LANDLOCK_SCOPED_SIGNAL
+> > > 
+> > >  Documentation/userspace-api/landlock.rst      |  22 +-
+> > >  include/uapi/linux/landlock.h                 |   3 +
+> > >  samples/landlock/sandboxer.c                  |  17 +-
+> > >  security/landlock/fs.c                        |  17 +
+> > >  security/landlock/fs.h                        |   6 +
+> > >  security/landlock/limits.h                    |   2 +-
+> > >  security/landlock/task.c                      |  59 +++
+> > >  .../selftests/landlock/scoped_signal_test.c   | 371 ++++++++++++++++++
+> > >  .../testing/selftests/landlock/scoped_test.c  |   2 +-
+> > >  9 files changed, 486 insertions(+), 13 deletions(-)
+> > >  create mode 100644 tools/testing/selftests/landlock/scoped_signal_test.c
+> > > 
+> > > -- 
+> > > 2.34.1
+> > > 
+> 
+> 
 
