@@ -1,174 +1,309 @@
-Return-Path: <netdev+bounces-127695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 832A79761BC
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:42:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C8199761A0
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:39:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 468E928907A
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 06:42:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF3721F22E6B
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 06:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3750B18BB90;
-	Thu, 12 Sep 2024 06:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64FFC18953D;
+	Thu, 12 Sep 2024 06:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="k18FcBsF"
+	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="ZDlSgDhc"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DA341C6A;
-	Thu, 12 Sep 2024 06:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C513307B;
+	Thu, 12 Sep 2024 06:39:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726123354; cv=none; b=DdY9GM65DXpFYfRlpdUFuBKunmaForkUhtFI+TZZM8XBfCinEmNRq6WUVELjvOuP+yM5bqPmddQs8PiSwLoIYjzG3S8VesDcoUv5u02759RZodnih7O4PIMZ6GYlZQPpwaAba4nMCPoNnGf/K1ciYd3u9vqCwZTB888L4EABoLg=
+	t=1726123177; cv=none; b=GQYar3Rmu6Jj6jIPrdfZYsJvsaOSFhp+ardTs5Jpd/kX/+H1nJu2uL7uUX0RSRwVlIVFJ2B61ri3U0PW8hXuQpIl5urMgpgx9ruQSAv+zE8wMWC9Mg4V5XY4ZBRqAE7RfnLCDD1RF/31IpCJjVlrfAoO0AQx2Qny+pq7HTAFM1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726123354; c=relaxed/simple;
-	bh=6F7DQe+L3BREmGjEsaCKRr5QCmjZVBoGA1cXdrfxT1o=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VRcrAv/gWMZlG1bvRohEhEkVhah4t/8zr8t2S5c/m2qwIseF60ruDLJOUcKAAKkVQvJG/nfdCcauN6tOWopj3J+xmEQgWDNy05A7LawirE+B7LlkjvlFNw5/obIuD6+7G9332zkqGlOTB5zCzMnyutoqBLwMMKUcKDuuP8U7c8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=k18FcBsF; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1726123351; x=1757659351;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=6F7DQe+L3BREmGjEsaCKRr5QCmjZVBoGA1cXdrfxT1o=;
-  b=k18FcBsFlIbbHZrMoRAoq3zxSwIBgyzU2+EAkTk2Gjz6Fx50kcJvx6PZ
-   3ghIllz8NrBB1eTZoiVlqs3etUrPxxCZrcSEtYqm/12oE97riRmeFtKf0
-   7RFdqL0f8yOQBeYVBFE9vF4GMrDKnPllKXRkZvtzC/SClTYQfxi5rYIoU
-   /9cF42tKCxDbniuDj02PPkgy2UR723kSYNp29XhXQ/2GT22KNlHqsDAp6
-   qOMs7ZTNQBQ003nYxMAlfknMX0VybS0AaQaaDv1ZI8FARxxzhC3ozVYoQ
-   50j6pKRE59iu40WPP2atvnY+dKVs7Bzrt0xA+p3ikQWwmFP8BlJqhU/Og
-   w==;
-X-CSE-ConnectionGUID: Tmxvnl0DRNWu6pE3O8ITQg==
-X-CSE-MsgGUID: 4X1WTZ2wRXmlJqeEAp2d6Q==
-X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
-   d="scan'208";a="199114384"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Sep 2024 23:42:30 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 11 Sep 2024 23:42:29 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 11 Sep 2024 23:42:29 -0700
-Date: Thu, 12 Sep 2024 12:08:40 +0530
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <bryan.whitehead@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
-	<maxime.chevallier@bootlin.com>, <rdunlap@infradead.org>,
-	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next V2 2/5] net: lan743x: Add support to
- software-nodes for sfp
-Message-ID: <ZuKMcMexEAqTLnSc@HYD-DK-UNGSW21.microchip.com>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-3-Raju.Lakkaraju@microchip.com>
- <cb39041e-9b72-4b76-bfd7-03f825b20f23@lunn.ch>
+	s=arc-20240116; t=1726123177; c=relaxed/simple;
+	bh=qMti8TOkF49at/JjjM+2xZd1VDN8ouRs1Xy7zFMILuU=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=XssP4y+9NQPLgOWUsBoDPJr9Kn5MrEar2ikG4oN7pGlME8FOOCxre1AhbfQR6IvvA0soSqkLw4TRPfmDNx3T2L9LwC560eRxm9ShLjLE9RAlF2J+fXWdaIwPNa1WRK+MbCynSRTPnGGx5UFnLqoA2ovEp83PIOzVhq0LvDvbluk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=ZDlSgDhc; arc=none smtp.client-ip=217.79.154.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
+X-Virus-Scanned: amavisd-new at emenem.pl
+Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
+	(authenticated bits=0)
+	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 48C6clPq019590
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 12 Sep 2024 08:38:49 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
+	t=1726123133; bh=EZB+B2jWXk2HnC/1CNaI0I+2FNtEtAYvByasMjqWJb0=;
+	h=Date:From:To:Cc:Subject;
+	b=ZDlSgDhcvucG32W5brufng+MytqdyyQ+LRs2SH4IAmX17BJ5/7OWl7iC3ILRKbvY9
+	 9sAZxQXgIgGrxPh48HrO9GtcvH8mclf5tgvY1KtlRuU2pcKCT55iFYsYqUpst5QAVl
+	 +viO25z2spBYFKjSZWp4mvUdofj00YnTHkE8BL/g=
+Message-ID: <14a24f93-f8d6-4bc7-8b87-86489bcedb28@ans.pl>
+Date: Wed, 11 Sep 2024 23:38:45 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <cb39041e-9b72-4b76-bfd7-03f825b20f23@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
+To: Ido Schimmel <idosch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>, Yishai Hadas <yishaih@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        linux-rdma@vger.kernel.org
+Subject: [PATCH net-next 1/4] mlx4/mlx5: {mlx4,mlx5e}_en_get_module_info
+ cleanup
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
+Use SFF8024 constants defined in linux/sfp.h instead of private ones.
 
-The 09/11/2024 19:17, Andrew Lunn wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> 
-> > diff --git a/drivers/net/ethernet/microchip/Kconfig b/drivers/net/ethernet/microchip/Kconfig
-> > index 2e3eb37a45cd..9c08a4af257a 100644
-> > --- a/drivers/net/ethernet/microchip/Kconfig
-> > +++ b/drivers/net/ethernet/microchip/Kconfig
-> > @@ -50,6 +50,8 @@ config LAN743X
-> >       select CRC16
-> >       select CRC32
-> >       select PHYLINK
-> > +     select I2C_PCI1XXXX
-> > +     select GP_PCI1XXXX
-> 
-> GP_ is odd. GPIO drivers usually use GPIO_. Saying that, GPIO_PCI1XXXX
-> is not in 6.11-rc7. Is it in gpio-next?
-> 
+Make mlx4_en_get_module_info() and mlx5e_get_module_info() to look
+as close as possible to each other.
 
-Yes. But GPIO driver developer use this.
-I have to use the same here.
+Simplify the logic for selecting SFF_8436 vs SFF_8636.
 
-It's exist in 6.11-rc6
-drivers/misc/mchp_pci1xxxx/Kconfig
-This was defined along back.
+Signed-off-by: Krzysztof Piotr Oledzki <ole@ans.pl>
+---
+ .../net/ethernet/mellanox/mlx4/en_ethtool.c   | 33 ++++++++++---------
+ drivers/net/ethernet/mellanox/mlx4/port.c     |  9 ++---
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  | 28 +++++++++-------
+ .../net/ethernet/mellanox/mlx5/core/port.c    |  9 ++---
+ include/linux/mlx4/device.h                   |  7 ----
+ include/linux/mlx5/port.h                     |  8 -----
+ 6 files changed, 44 insertions(+), 50 deletions(-)
 
->Is it in gpio-next? 
-No. available in net-next
-
-> > +static void *pci1xxxx_perif_drvdata_get(struct lan743x_adapter *adapter,
-> > +                                     u16 perif_id)
-> > +{
-> > +     struct pci_dev *pdev = adapter->pdev;
-> > +     struct pci_bus *perif_bus;
-> > +     struct pci_dev *perif_dev;
-> > +     struct pci_dev *br_dev;
-> > +     struct pci_bus *br_bus;
-> > +     struct pci_dev *dev;
-> > +
-> > +     /* PCI11x1x devices' PCIe topology consists of a top level pcie
-> > +      * switch with up to four downstream ports, some of which have
-> > +      * integrated endpoints connected to them. One of the downstream ports
-> > +      * has an embedded single function pcie ethernet controller which is
-> > +      * handled by this driver. Another downstream port has an
-> > +      * embedded multifunction pcie endpoint, with four pcie functions
-> > +      * (the "peripheral controllers": I2C controller, GPIO controller,
-> > +      * UART controllers, SPIcontrollers)
-> > +      * The code below navigates the PCI11x1x topology
-> > +      * to find (by matching its PCI device ID) the peripheral controller
-> > +      * that should be paired to the embedded ethernet controller.
-> > +      */
-> > +     br_dev = pci_upstream_bridge(pdev);
-> > +     if (!br_dev) {
-> > +             netif_err(adapter, drv, adapter->netdev,
-> > +                       "upstream bridge not found\n");
-> > +             return br_dev;
-> > +     }
-> > +
-> > +     br_bus = br_dev->bus;
-> > +     list_for_each_entry(dev, &br_bus->devices, bus_list) {
-> > +             if (dev->vendor == PCI1XXXX_VENDOR_ID &&
-> > +                 (dev->device & ~PCI1XXXX_DEV_MASK) ==
-> > +                  PCI1XXXX_BR_PERIF_ID) {
-> > +                     perif_bus = dev->subordinate;
-> > +                     list_for_each_entry(perif_dev, &perif_bus->devices,
-> > +                                         bus_list) {
-> > +                             if (perif_dev->vendor == PCI1XXXX_VENDOR_ID &&
-> > +                                 (perif_dev->device & ~PCI1XXXX_DEV_MASK) ==
-> > +                                  perif_id)
-> > +                                     return pci_get_drvdata(perif_dev);
-> > +                     }
-> > +             }
-> > +     }
-> 
-> It would be good to have the PCI Maintainers review of this. Maybe
-> pull this out into a patch of its own and Cc: Bjorn Helgaas
-> <bhelgaas@google.com>
-
-Sure. I will add Cc: Bjorn Helgaas.
-
-> 
->         Andrew
-
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
+index cd17a3f4faf8..4c985d62af12 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
+@@ -40,6 +40,7 @@
+ #include <net/ip.h>
+ #include <linux/bitmap.h>
+ #include <linux/mii.h>
++#include <linux/sfp.h>
+ 
+ #include "mlx4_en.h"
+ #include "en_port.h"
+@@ -2029,33 +2030,35 @@ static int mlx4_en_get_module_info(struct net_device *dev,
+ 
+ 	/* Read first 2 bytes to get Module & REV ID */
+ 	ret = mlx4_get_module_info(mdev->dev, priv->port,
+-				   0/*offset*/, 2/*size*/, data);
++				   0 /*offset*/, 2 /*size*/, data);
+ 	if (ret < 2)
+ 		return -EIO;
+ 
+-	switch (data[0] /* identifier */) {
+-	case MLX4_MODULE_ID_QSFP:
+-		modinfo->type = ETH_MODULE_SFF_8436;
++	/* data[0] = identifier byte */
++	switch (data[0]) {
++	case SFF8024_ID_QSFP_8438:
++		modinfo->type       = ETH_MODULE_SFF_8436;
+ 		modinfo->eeprom_len = ETH_MODULE_SFF_8436_MAX_LEN;
+ 		break;
+-	case MLX4_MODULE_ID_QSFP_PLUS:
+-		if (data[1] >= 0x3) { /* revision id */
+-			modinfo->type = ETH_MODULE_SFF_8636;
+-			modinfo->eeprom_len = ETH_MODULE_SFF_8636_MAX_LEN;
+-		} else {
+-			modinfo->type = ETH_MODULE_SFF_8436;
++	case SFF8024_ID_QSFP_8436_8636:
++		/* data[1] = revision id */
++		if (data[1] < 0x3) {
++			modinfo->type       = ETH_MODULE_SFF_8436;
+ 			modinfo->eeprom_len = ETH_MODULE_SFF_8436_MAX_LEN;
++			break;
+ 		}
+-		break;
+-	case MLX4_MODULE_ID_QSFP28:
+-		modinfo->type = ETH_MODULE_SFF_8636;
++		fallthrough;
++	case SFF8024_ID_QSFP28_8636:
++		modinfo->type       = ETH_MODULE_SFF_8636;
+ 		modinfo->eeprom_len = ETH_MODULE_SFF_8636_MAX_LEN;
+ 		break;
+-	case MLX4_MODULE_ID_SFP:
+-		modinfo->type = ETH_MODULE_SFF_8472;
++	case SFF8024_ID_SFP:
++		modinfo->type       = ETH_MODULE_SFF_8472;
+ 		modinfo->eeprom_len = ETH_MODULE_SFF_8472_LEN;
+ 		break;
+ 	default:
++		netdev_err(dev, "%s: cable type not recognized: 0x%x\n",
++			   __func__, data[0]);
+ 		return -EINVAL;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx4/port.c b/drivers/net/ethernet/mellanox/mlx4/port.c
+index 4e43f4a7d246..6dbd505e7f30 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/port.c
++++ b/drivers/net/ethernet/mellanox/mlx4/port.c
+@@ -34,6 +34,7 @@
+ #include <linux/if_ether.h>
+ #include <linux/if_vlan.h>
+ #include <linux/export.h>
++#include <linux/sfp.h>
+ 
+ #include <linux/mlx4/cmd.h>
+ 
+@@ -2139,12 +2140,12 @@ int mlx4_get_module_info(struct mlx4_dev *dev, u8 port,
+ 		return ret;
+ 
+ 	switch (module_id) {
+-	case MLX4_MODULE_ID_SFP:
++	case SFF8024_ID_SFP:
+ 		mlx4_sfp_eeprom_params_set(&i2c_addr, &page_num, &offset);
+ 		break;
+-	case MLX4_MODULE_ID_QSFP:
+-	case MLX4_MODULE_ID_QSFP_PLUS:
+-	case MLX4_MODULE_ID_QSFP28:
++	case SFF8024_ID_QSFP_8438:
++	case SFF8024_ID_QSFP_8436_8636:
++	case SFF8024_ID_QSFP28_8636:
+ 		mlx4_qsfp_eeprom_params_set(&i2c_addr, &page_num, &offset);
+ 		break;
+ 	default:
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+index 4d123dae912c..12a22e5c60ae 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_ethtool.c
+@@ -32,6 +32,7 @@
+ 
+ #include <linux/dim.h>
+ #include <linux/ethtool_netlink.h>
++#include <linux/sfp.h>
+ 
+ #include "en.h"
+ #include "en/channels.h"
+@@ -1899,36 +1900,39 @@ static int mlx5e_get_module_info(struct net_device *netdev,
+ {
+ 	struct mlx5e_priv *priv = netdev_priv(netdev);
+ 	struct mlx5_core_dev *dev = priv->mdev;
+-	int size_read = 0;
++	int ret;
+ 	u8 data[4] = {0};
+ 
+-	size_read = mlx5_query_module_eeprom(dev, 0, 2, data);
+-	if (size_read < 2)
++	/* Read first 2 bytes to get Module & REV ID */
++	ret = mlx5_query_module_eeprom(dev,
++				       0 /*offset*/, 2 /*size*/, data);
++	if (ret < 2)
+ 		return -EIO;
+ 
+ 	/* data[0] = identifier byte */
+ 	switch (data[0]) {
+-	case MLX5_MODULE_ID_QSFP:
++	case SFF8024_ID_QSFP_8438:
+ 		modinfo->type       = ETH_MODULE_SFF_8436;
+ 		modinfo->eeprom_len = ETH_MODULE_SFF_8436_MAX_LEN;
+ 		break;
+-	case MLX5_MODULE_ID_QSFP_PLUS:
+-	case MLX5_MODULE_ID_QSFP28:
++	case SFF8024_ID_QSFP_8436_8636:
+ 		/* data[1] = revision id */
+-		if (data[0] == MLX5_MODULE_ID_QSFP28 || data[1] >= 0x3) {
+-			modinfo->type       = ETH_MODULE_SFF_8636;
+-			modinfo->eeprom_len = ETH_MODULE_SFF_8636_MAX_LEN;
+-		} else {
++		if (data[1] < 0x3) {
+ 			modinfo->type       = ETH_MODULE_SFF_8436;
+ 			modinfo->eeprom_len = ETH_MODULE_SFF_8436_MAX_LEN;
++			break;
+ 		}
++		fallthrough;
++	case SFF8024_ID_QSFP28_8636:
++		modinfo->type       = ETH_MODULE_SFF_8636;
++		modinfo->eeprom_len = ETH_MODULE_SFF_8636_MAX_LEN;
+ 		break;
+-	case MLX5_MODULE_ID_SFP:
++	case SFF8024_ID_SFP:
+ 		modinfo->type       = ETH_MODULE_SFF_8472;
+ 		modinfo->eeprom_len = ETH_MODULE_SFF_8472_LEN;
+ 		break;
+ 	default:
+-		netdev_err(priv->netdev, "%s: cable type not recognized:0x%x\n",
++		netdev_err(priv->netdev, "%s: cable type not recognized: 0x%x\n",
+ 			   __func__, data[0]);
+ 		return -EINVAL;
+ 	}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/port.c b/drivers/net/ethernet/mellanox/mlx5/core/port.c
+index 50931584132b..4258489a5782 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/port.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/port.c
+@@ -30,6 +30,7 @@
+  * SOFTWARE.
+  */
+ 
++#include <linux/sfp.h>
+ #include <linux/mlx5/port.h>
+ #include "mlx5_core.h"
+ 
+@@ -425,12 +426,12 @@ int mlx5_query_module_eeprom(struct mlx5_core_dev *dev,
+ 		return err;
+ 
+ 	switch (module_id) {
+-	case MLX5_MODULE_ID_SFP:
++	case SFF8024_ID_SFP:
+ 		mlx5_sfp_eeprom_params_set(&query.i2c_address, &query.page, &offset);
+ 		break;
+-	case MLX5_MODULE_ID_QSFP:
+-	case MLX5_MODULE_ID_QSFP_PLUS:
+-	case MLX5_MODULE_ID_QSFP28:
++	case SFF8024_ID_QSFP_8438:
++	case SFF8024_ID_QSFP_8436_8636:
++	case SFF8024_ID_QSFP28_8636:
+ 		mlx5_qsfp_eeprom_params_set(&query.i2c_address, &query.page, &offset);
+ 		break;
+ 	default:
+diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
+index 27f42f713c89..a75bfb2a4438 100644
+--- a/include/linux/mlx4/device.h
++++ b/include/linux/mlx4/device.h
+@@ -487,13 +487,6 @@ enum {
+ #define MSTR_SM_CHANGE_MASK (MLX4_EQ_PORT_INFO_MSTR_SM_SL_CHANGE_MASK | \
+ 			     MLX4_EQ_PORT_INFO_MSTR_SM_LID_CHANGE_MASK)
+ 
+-enum mlx4_module_id {
+-	MLX4_MODULE_ID_SFP              = 0x3,
+-	MLX4_MODULE_ID_QSFP             = 0xC,
+-	MLX4_MODULE_ID_QSFP_PLUS        = 0xD,
+-	MLX4_MODULE_ID_QSFP28           = 0x11,
+-};
+-
+ enum { /* rl */
+ 	MLX4_QP_RATE_LIMIT_NONE		= 0,
+ 	MLX4_QP_RATE_LIMIT_KBS		= 1,
+diff --git a/include/linux/mlx5/port.h b/include/linux/mlx5/port.h
+index e68d42b8ce65..e9495271160f 100644
+--- a/include/linux/mlx5/port.h
++++ b/include/linux/mlx5/port.h
+@@ -40,14 +40,6 @@ enum mlx5_beacon_duration {
+ 	MLX5_BEACON_DURATION_INF = 0xffff,
+ };
+ 
+-enum mlx5_module_id {
+-	MLX5_MODULE_ID_SFP              = 0x3,
+-	MLX5_MODULE_ID_QSFP             = 0xC,
+-	MLX5_MODULE_ID_QSFP_PLUS        = 0xD,
+-	MLX5_MODULE_ID_QSFP28           = 0x11,
+-	MLX5_MODULE_ID_DSFP		= 0x1B,
+-};
+-
+ enum mlx5_an_status {
+ 	MLX5_AN_UNAVAILABLE = 0,
+ 	MLX5_AN_COMPLETE    = 1,
 -- 
-Thanks,                                                                         
-Raju
+2.46.0
 
