@@ -1,233 +1,134 @@
-Return-Path: <netdev+bounces-127958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D393977383
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 23:19:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BB6297738A
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 23:22:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCA98284BDC
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 21:19:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E82C1C220DF
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 21:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4D31B9853;
-	Thu, 12 Sep 2024 21:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6B01C233B;
+	Thu, 12 Sep 2024 21:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b="Es30tNfZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eILEPcnx"
 X-Original-To: netdev@vger.kernel.org
-Received: from ci74p00im-qukt09081902.me.com (ci74p00im-qukt09081902.me.com [17.57.156.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD9A13D89D
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 21:19:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.156.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFEF1B9853
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 21:22:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726175944; cv=none; b=tyoKrdnw46Wo1PG2f2i/KkYSGWKY8abHiHquHDqoeOaA4YD/Qe77R++HBvn++7FbYTE3LozEY4XT2t9rYoG5P4ejJ/T7GT07JrahxC8td4FiGsRAtKYTIQynccGZ12ONR/PHHTC8WdVDcLi5fYwWXdN4ZJWRt2TohrQPrCasZV0=
+	t=1726176132; cv=none; b=FITb57fvKQ81kN1Y7IJyQZCgljY2Mr8gYJpxY8KEO87nbPFW1CZhdt5TgMxPmH8hBDIIKWu0Bxr6dSiXyy+KUQwvFWgH8qchSnnHvpkhtp7QaVETgcZuwW5CeRqT1ctPjOSiJppoF6pezAASC3I+Qz5CDe0uK5qpo3Tk3/6zRB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726175944; c=relaxed/simple;
-	bh=89xDsc8rPiqQdYQrasQa/ym5eXT7n4JZWt8JY+1zNKs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tzIhBX8/+6uMsCOwRdE/FMuCDY4lOZ1c76DwCQnxaBzW3TEjHADE3i2hyGcyoNVsfFWfUopYcm1eYuAr+ANF0GwjDc4MEEd+6w1rmOblAOC/u+XmLxW1c5IGcFz4LwMcg948Y2xhzdHPuiML8t60D+RWdToeCVvVpvqO6tT7ChY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy; spf=pass smtp.mailfrom=pen.gy; dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b=Es30tNfZ; arc=none smtp.client-ip=17.57.156.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pen.gy
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pen.gy; s=sig1;
-	t=1726175941; bh=vovF47F5HplS3Hx4Wtm0+Hlb8XzHo4WlYQMicnj+0uw=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=Es30tNfZDCL8vQkj0rMAlE0J/5Dy2y1J5tV//Kdms1rilFqJ4viDAXbOQgZaJiH6N
-	 JjdtGK7XeBY8ffleDq3MCxHQcsgq9t99XciRghGCNJ+iWQZqnJ3p0D7JfB0XjjUBZC
-	 UoYY/du9UI1hd8aHQejg/9pLd0OwP3bh92A0dI89Yrb6aYy5/b59icuCONgw0LC4XU
-	 jWinksd7zngbcsd+I+VvtijEHCip5vwtTS1XAorD7ysXjKbZCtSZTzpgNVFPW8+iK4
-	 yuSPoc4pqh3OmFLM9y4ViyIuQE9IvgNSUd5UIN3GVGK7D/+Hy6gMFiWj6UVDeDh9iP
-	 /EJDNbUcmI0BA==
-Received: from fossa.iopsys.eu (ci77p00im-dlb-asmtp-mailmevip.me.com [17.57.156.26])
-	by ci74p00im-qukt09081902.me.com (Postfix) with ESMTPSA id B426E290031F;
-	Thu, 12 Sep 2024 21:18:58 +0000 (UTC)
-From: Foster Snowhill <forst@pen.gy>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Georgi Valkov <gvalkov@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Oliver Neukum <oneukum@suse.com>,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: [PATCH net-next v2] usbnet: ipheth: prevent OoB reads of NDP16
-Date: Thu, 12 Sep 2024 23:18:17 +0200
-Message-ID: <20240912211817.1707844-1-forst@pen.gy>
-X-Mailer: git-send-email 2.45.1
+	s=arc-20240116; t=1726176132; c=relaxed/simple;
+	bh=TQawtmTUJgfQqSFgNjDib+wpBVm05rng4pvOeawm/ZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bSLWxNX9cnEX0pi6XszBVoq2yg9Jt/COiQ5hvVEarO3vEiHOMad/E490Q1/De5wlzc0rieLgGHRTijDIGo5503SW2wdaEL0F1bYtwOA9COLEVaCUKQ48EiFstsxpccB11W4Wy+L0FuH+zs7759IM4o0xlPDx31Ht7t7xM2dJ3lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eILEPcnx; arc=none smtp.client-ip=209.85.160.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-277dd761926so137507fac.2
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 14:22:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726176129; x=1726780929; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zuU9UIhvXjSz78840FaGp7kb94KPeUI24x6/4WDdi4o=;
+        b=eILEPcnxbcWGxW1bPxyXVTtgtCjVqE/m0WQPk0oWz0wn9KCYSRt57kJD9Dx6koEWYs
+         ZSy6qInfjIoD0+MRhJQ9QdE8cznX7BwTYBONEo0py0hca2CA2XZ5yDYiQy1apZszl8QK
+         pdsyyzmDhg1+eyreHRgSmC63C5UryBdu5fKfeceb30PLS8NY1w0kCu/6TIyzTWT7d6J/
+         kHwGbQOSz+u+mnYCWmTZ5a6vY0MzgslxbRw8K+85aj20MW8Iz3Dp5MXtNghX+93lmu9D
+         1BaicQuINKMLgCrpGV8QHayl+DuKcTchttu8qJaio5xq6i4AfpS9cU+E1hzfS8fDIijg
+         jtqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726176129; x=1726780929;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zuU9UIhvXjSz78840FaGp7kb94KPeUI24x6/4WDdi4o=;
+        b=AvoT94inxfV8yFCwTOR8SfjMn2dtgbJgzmVB+MuqzxwiGeVVFGxNMpkLck8DivSgD8
+         QX1WpmGhvoq/n2pmdAjTsmeMCFUop9Q8jpxghrmOTmOiW5F8ZliPOwWk89TOfYNCMrqQ
+         VZ1qk+za6eDg43GyWAYFN/fxLuAVy0G47uyru90hQRrPdHS9rrfHltNmovz5KK8i5AeO
+         8gOiw2jH4SmGV/z+75O8nLi6RT3SrUnGIy0puwqhDuxRLAGqKu60kRp1I8VcyHM9cXs5
+         PW5EvG4KBLMM1ULHkJ6K4ECiAi1KdYGuM27nG/M0O+rWXW3J6dG9JaW0Fn5NbtFDmwSr
+         Evuw==
+X-Forwarded-Encrypted: i=1; AJvYcCXLT1fDkIgJHxigPX6lrS09ryH7PWxHZfZpcCfXdIVnAui4zLCHEL9VydwtZ1RaZWAdb11mCrs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlbRIvXeSa3gy4KIYeCmPXMyAK06mxhPrYbrAKqEjS0fgcMKl3
+	GiE/kf+vQdzjyCEUT4U9mOwJfISY2e/N6CGYFSB5gauotZbmnZ5t8xWj5xP7zg==
+X-Google-Smtp-Source: AGHT+IFkVoD/Nk+SYy04kMCW6WhfdrSdzd/PRUZlVwBXDw7def1QUPBiiqZ1N65kkjgIJI+qKHmPfQ==
+X-Received: by 2002:a05:687c:2c2a:b0:260:ebf7:d0e7 with SMTP id 586e51a60fabf-27c68955c20mr593311fac.15.1726176129175;
+        Thu, 12 Sep 2024 14:22:09 -0700 (PDT)
+Received: from google.com (30.64.135.34.bc.googleusercontent.com. [34.135.64.30])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-27ba3ebabfcsm3299170fac.24.2024.09.12.14.22.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 14:22:08 -0700 (PDT)
+Date: Thu, 12 Sep 2024 14:22:05 -0700
+From: Justin Stitt <justinstitt@google.com>
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
+	alx@kernel.org, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
+	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH v8 7/8] net: Replace strcpy() with strscpy()
+Message-ID: <sp3njca35fg5drajiy5ofq5t6nfmbhzec3alsm2o4itsdispdt@e45zirwvovcm>
+References: <20240828030321.20688-1-laoar.shao@gmail.com>
+ <20240828030321.20688-8-laoar.shao@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: 9zy841-CfjNvdSs-yK8ol7y2yKXUlhJA
-X-Proofpoint-ORIG-GUID: 9zy841-CfjNvdSs-yK8ol7y2yKXUlhJA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-12_08,2024-09-12_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 spamscore=0
- malwarescore=0 mlxlogscore=917 bulkscore=0 clxscore=1030 phishscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2409120155
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240828030321.20688-8-laoar.shao@gmail.com>
 
-In "NCM mode", the iOS device encapsulates RX (phone->computer) traffic
-in NCM Transfer Blocks (similarly to CDC NCM). However, unlike reverse
-tethering (handled by the `cdc_ncm` driver), regular tethering is not
-compliant with the CDC NCM spec, as the device is missing the necessary
-descriptors, and TX (computer->phone) traffic is not encapsulated
-at all. Thus `ipheth` implements a very limited subset of the spec with
-the sole purpose of parsing RX URBs.
+Hi,
 
-In the first iteration of the NCM mode implementation, there were a few
-potential out of bounds reads when processing malformed URBs received
-from a connected device:
+On Wed, Aug 28, 2024 at 11:03:20AM GMT, Yafang Shao wrote:
+> To prevent errors from occurring when the src string is longer than the dst
+> string in strcpy(), we should use strscpy() instead. This approach
+> also facilitates future extensions to the task comm.
+> 
+> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: David Ahern <dsahern@kernel.org>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  net/ipv6/ndisc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+> index b8eec1b6cc2c..cf7c36463b33 100644
+> --- a/net/ipv6/ndisc.c
+> +++ b/net/ipv6/ndisc.c
+> @@ -1944,7 +1944,7 @@ static void ndisc_warn_deprecated_sysctl(const struct ctl_table *ctl,
+>  	static char warncomm[TASK_COMM_LEN];
+>  	static int warned;
+>  	if (strcmp(warncomm, current->comm) && warned < 5) {
+> -		strcpy(warncomm, current->comm);
+> +		strscpy(warncomm, current->comm);
+>  		pr_warn("process `%s' is using deprecated sysctl (%s) net.ipv6.neigh.%s.%s - use net.ipv6.neigh.%s.%s_ms instead\n",
+>  			warncomm, func,
+>  			dev_name, ctl->procname,
+> -- 
+> 2.43.5
+> 
+>
 
-* Only the start of NDP16 (wNdpIndex) was checked to fit in the URB
-  buffer.
-* Datagram length check as part of DPEs could overflow.
-* DPEs could be read past the end of NDP16 and even end of URB buffer
-  if a trailer DPE wasn't encountered.
+Reviewed-by: Justin Stitt <justinstitt@google.com>
 
-The above is not expected to happen in normal device operation.
-
-To address the above issues for iOS devices in NCM mode, rely on
-and check for a specific fixed format of incoming URBs expected from
-an iOS device:
-
-* 12-byte NTH16
-* 96-byte NDP16, allowing up to 22 DPEs (up to 21 datagrams + trailer)
-
-On iOS, NDP16 directly follows NTH16, and its length is constant
-regardless of the DPE count.
-
-Adapt the driver to use the fixed URB format. Set an upper bound for
-the DPE count based on the expected header size. Always expect a null
-trailer DPE.
-
-The minimal URB length of 108 bytes (IPHETH_NCM_HEADER_SIZE) in NCM mode
-is already enforced in ipheth since introduction of NCM mode support.
-
-Signed-off-by: Foster Snowhill <forst@pen.gy>
-Tested-by: Georgi Valkov <gvalkov@gmail.com>
----
-v2: No code changes. Update commit message to further clarify that
-    `ipheth` is not and does not aim to be a complete or spec-compliant
-    CDC NCM implementation.
-v1: https://lore.kernel.org/netdev/20240907230108.978355-1-forst@pen.gy/
-
-This should perhaps go into "net" rather than "net-next"? I submitted
-the previous patch series to "net-next", but it got merged into "net"
-[1]. However it's quite late in the 6.11-rc cycle, so not sure.
-
-[1]: https://lore.kernel.org/netdev/172320844026.3782387.2037318141249570355.git-patchwork-notify@kernel.org/
----
- drivers/net/usb/ipheth.c | 64 ++++++++++++++++++++++------------------
- 1 file changed, 36 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/net/usb/ipheth.c b/drivers/net/usb/ipheth.c
-index 46afb95ffabe..8c62501f47a9 100644
---- a/drivers/net/usb/ipheth.c
-+++ b/drivers/net/usb/ipheth.c
-@@ -61,7 +61,16 @@
- #define IPHETH_USBINTF_PROTO    1
- 
- #define IPHETH_IP_ALIGN		2	/* padding at front of URB */
--#define IPHETH_NCM_HEADER_SIZE  (12 + 96) /* NCMH + NCM0 */
-+/* On iOS devices, NCM headers in RX have a fixed size:
-+ * - NTH16 (NCMH): 12 bytes, as per CDC NCM 1.0 spec
-+ * - NDP16 (NCM0): 96 bytes
-+ */
-+#define IPHETH_NDP16_HEADER_SIZE 96
-+#define IPHETH_NDP16_MAX_DPE	((IPHETH_NDP16_HEADER_SIZE - \
-+				  sizeof(struct usb_cdc_ncm_ndp16)) / \
-+				 sizeof(struct usb_cdc_ncm_dpe16))
-+#define IPHETH_NCM_HEADER_SIZE	(sizeof(struct usb_cdc_ncm_nth16) + \
-+				 IPHETH_NDP16_HEADER_SIZE)
- #define IPHETH_TX_BUF_SIZE      ETH_FRAME_LEN
- #define IPHETH_RX_BUF_SIZE_LEGACY (IPHETH_IP_ALIGN + ETH_FRAME_LEN)
- #define IPHETH_RX_BUF_SIZE_NCM	65536
-@@ -213,9 +222,9 @@ static int ipheth_rcvbulk_callback_ncm(struct urb *urb)
- 	struct usb_cdc_ncm_ndp16 *ncm0;
- 	struct usb_cdc_ncm_dpe16 *dpe;
- 	struct ipheth_device *dev;
-+	u16 dg_idx, dg_len;
- 	int retval = -EINVAL;
- 	char *buf;
--	int len;
- 
- 	dev = urb->context;
- 
-@@ -225,41 +234,40 @@ static int ipheth_rcvbulk_callback_ncm(struct urb *urb)
- 	}
- 
- 	ncmh = urb->transfer_buffer;
--	if (ncmh->dwSignature != cpu_to_le32(USB_CDC_NCM_NTH16_SIGN) ||
--	    le16_to_cpu(ncmh->wNdpIndex) >= urb->actual_length) {
--		dev->net->stats.rx_errors++;
--		return retval;
--	}
-+	if (ncmh->dwSignature != cpu_to_le32(USB_CDC_NCM_NTH16_SIGN))
-+		goto rx_error;
- 
--	ncm0 = urb->transfer_buffer + le16_to_cpu(ncmh->wNdpIndex);
--	if (ncm0->dwSignature != cpu_to_le32(USB_CDC_NCM_NDP16_NOCRC_SIGN) ||
--	    le16_to_cpu(ncmh->wHeaderLength) + le16_to_cpu(ncm0->wLength) >=
--	    urb->actual_length) {
--		dev->net->stats.rx_errors++;
--		return retval;
--	}
-+	/* On iOS, NDP16 directly follows NTH16 */
-+	ncm0 = urb->transfer_buffer + sizeof(struct usb_cdc_ncm_nth16);
-+	if (ncm0->dwSignature != cpu_to_le32(USB_CDC_NCM_NDP16_NOCRC_SIGN))
-+		goto rx_error;
- 
- 	dpe = ncm0->dpe16;
--	while (le16_to_cpu(dpe->wDatagramIndex) != 0 &&
--	       le16_to_cpu(dpe->wDatagramLength) != 0) {
--		if (le16_to_cpu(dpe->wDatagramIndex) >= urb->actual_length ||
--		    le16_to_cpu(dpe->wDatagramIndex) +
--		    le16_to_cpu(dpe->wDatagramLength) > urb->actual_length) {
--			dev->net->stats.rx_length_errors++;
--			return retval;
--		}
-+	for (int dpe_i = 0; dpe_i < IPHETH_NDP16_MAX_DPE; ++dpe_i, ++dpe) {
-+		dg_idx = le16_to_cpu(dpe->wDatagramIndex);
-+		dg_len = le16_to_cpu(dpe->wDatagramLength);
-+
-+		/* Null DPE must be present after last datagram pointer entry
-+		 * (3.3.1 USB CDC NCM spec v1.0)
-+		 */
-+		if (dg_idx == 0 && dg_len == 0)
-+			return 0;
-+
-+		if (dg_idx < IPHETH_NCM_HEADER_SIZE ||
-+		    dg_idx >= urb->actual_length ||
-+		    dg_len > urb->actual_length - dg_idx)
-+			goto rx_error;
- 
--		buf = urb->transfer_buffer + le16_to_cpu(dpe->wDatagramIndex);
--		len = le16_to_cpu(dpe->wDatagramLength);
-+		buf = urb->transfer_buffer + dg_idx;
- 
--		retval = ipheth_consume_skb(buf, len, dev);
-+		retval = ipheth_consume_skb(buf, dg_len, dev);
- 		if (retval != 0)
- 			return retval;
--
--		dpe++;
- 	}
- 
--	return 0;
-+rx_error:
-+	dev->net->stats.rx_errors++;
-+	return retval;
- }
- 
- static void ipheth_rcvbulk_callback(struct urb *urb)
--- 
-2.45.1
-
+Thanks
+Justin
 
