@@ -1,231 +1,180 @@
-Return-Path: <netdev+bounces-127902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E91976FA3
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:38:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA965976FCD
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:50:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7B811F262F4
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:38:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 412FE1F249F9
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0101D189526;
-	Thu, 12 Sep 2024 17:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319C51BF305;
+	Thu, 12 Sep 2024 17:49:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="puXsQxor"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="axWQtc1y"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD63B1B1402;
-	Thu, 12 Sep 2024 17:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726162676; cv=none; b=TG1mVj+Z+EzGrIIiA3FIggS6Ohc/+zKKyqVXGsq/QGVXIjQC9fTOFLZsy4WHEPmyRR6okwpj61D++nqU+JreewePeB2F32pg5haPOGW23gbRvH5UB7S5/ebXfmKr9pGrnbqjBtP9ObsXJXN+9WELEGRUMtdy7ybvNZJDkmitHA4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726162676; c=relaxed/simple;
-	bh=B8EL+9+b+t9SUXyOoAFdFBITc2Oye2+Mb9NUh5olAl4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nyz6P0Dk0Xfzp5hmK8C+ITd8inHT+4F2uFH2KE9ZMWP7dIOUC7cAWSSWNqB6MkghECkwEtInV9xC9KVCyMXXEmGjUW9vomDGKy/gApQf/UwMgkOYRmPRaBU/LJT6sHOuPGogG+SyDLKVMxlY8HWXVwalZTnjgVOEcHQUT7rGJwI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=puXsQxor; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1726162672;
-	bh=B8EL+9+b+t9SUXyOoAFdFBITc2Oye2+Mb9NUh5olAl4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=puXsQxor0x/43rdISwlqcirvH9yJqkzSvK0YUU9NdVxld6IUhFFcp4aH5xGC6ub2V
-	 CrPd4VIlAxAOA+D5ZNesrgx9LcNpcVolUE+glSIt+W9QiDp7rt7BvDgHpVAj+9zYi6
-	 H0YU0liKQOG+Ud9Mu1CkX6EgTc03ij+bIxBmZTXfP/vPeEFEwPI0Bhi69N8Lt4kNe2
-	 j3EQDrfLD4gyFpYapGXkd/cDIGLiWCyV9rS0ejHvcVOHMzhpl9Rwmt8j0pYi1GG2W2
-	 rqp63gYfY75ZRPIHjLgg4vRSbImIO3oLah9cvraBpvyDKCueb0yoyAh1ocnFc7TTwI
-	 Huy2cRy8zxN/Q==
-Received: from pan.lan (unknown [IPv6:2a00:23c6:c32f:9100::16d])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: martyn)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 5784B17E1063;
-	Thu, 12 Sep 2024 19:37:52 +0200 (CEST)
-From: Martyn Welch <martyn.welch@collabora.com>
-To: Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: kernel@collabora.com,
-	Martyn Welch <martyn.welch@collabora.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4] net: enetc: Replace ifdef with IS_ENABLED
-Date: Thu, 12 Sep 2024 18:37:40 +0100
-Message-ID: <20240912173742.484549-1-martyn.welch@collabora.com>
-X-Mailer: git-send-email 2.45.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759EB1BE85C;
+	Thu, 12 Sep 2024 17:49:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726163384; cv=fail; b=sF0FAFUyssCE96G/f/QgA7VscwK+gBo1YlBVviyu6TN7gzZRPBWdwYxp477fKXsSIc7+tXgvllCwX9rv3sfV6qhmK4hAnsDRyNPIxMPOPbQtokJdtWcHZjJddfmwhPRuca3Qkxbfup/V+zyzIgBqRuN+RpizSRHXKBvCgfWDDt4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726163384; c=relaxed/simple;
+	bh=wM+ar2m646XQn+DscnCZRNwoupIcB57xayLYkFNAAoA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QM7hReGOXfNoxwOfQIGsZFkvdsCnawtJttP77ksBXYdaSOPSQIjsuzNNQaQrIqKB2TdYJHM4l0asHsqa1KkqzvRiXf5G5cRfGFzQAloDXgj0nRmH6RM80B6draIUmIwS4s57LprDdfEj7h+QvPlqpVlQ/J5kHzCQfDuVN7vmwMM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=axWQtc1y; arc=fail smtp.client-ip=40.107.94.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gRzW0jMmVHJuKzLHRTEe/hAvhzq+2FWmg8xK/UuED2v6x5/IMOIBPgixhDI+eKbfd1W/oSlID0jCUxlP8DkdulAlMO9SSD/A8VeLrUEjcc1+ARXk1MzvonMNIje4nVAkxk7hVFxKBs+xFfaopbkCpJBClbFgShicUG/jdWkBUO+cvW1I8dGX4/Hb4i0nDNSNrF2qVTN40XaC4V7Ca0EOQnVBzmQ04YGtFPjw9gWutF9fZcWaj3/3bDWY0+11y0oYsRd21ksGe8jN4dxySLcItEXf1oGb/gqekjQdskN24/xsa4Sse8Ktw/K0xQAMHw0wfEQszpzqyABjmcctHpySsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vljwI1YkJJTCGlA4K3W3vwOWwnugRRxtvijlNs7OzrA=;
+ b=jXVgANRoCjKY+TmW3QAjicbTnloLg4hh4z+pBoB3oEJvBPGouJucH+yBK+EBZVwM/KhQ/4yqBS6ktKdgPqthBFxYu0eFDHrZnHFoDvAFNO2l78PztQyVppEdH7l8jXm8Dwgq+OCrMZuQXVTcv3p+8jn0Ii3UQh7RCWaSLM5STA8F/5BR0ZaTJJN6ebBfN3bXFxDWKrdLJJy//VaS5w/4W/PLMB8osRdpMeleJWEaLm/2pJIdPasmTBD3XuqXuH9oWWeGUh9s0/2r86nugmq879d5ZoJr5avpnQ82hYn5CqDacMVM3jL09QGMzNFIykdeUmcJzCgOXxuZQlRydtAgvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=fb.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vljwI1YkJJTCGlA4K3W3vwOWwnugRRxtvijlNs7OzrA=;
+ b=axWQtc1yEg9/cQCmegX+Akqo+N6BWSuWVVQZt+yx4ImcoNH50GeyCDpJQRKqYPoi7NrX2hfzEvjW7lfBzbE5VPk1usWMCTjlp9yFPNk3zIYlALB5tIqShga9iQMYWc8U2VWs83qmdZNxXtlHzD2251Zc50hXDbMLUpoFttjKGbI=
+Received: from BYAPR06CA0035.namprd06.prod.outlook.com (2603:10b6:a03:d4::48)
+ by PH7PR12MB5973.namprd12.prod.outlook.com (2603:10b6:510:1d8::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Thu, 12 Sep
+ 2024 17:49:36 +0000
+Received: from CO1PEPF000075ED.namprd03.prod.outlook.com
+ (2603:10b6:a03:d4:cafe::3a) by BYAPR06CA0035.outlook.office365.com
+ (2603:10b6:a03:d4::48) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24 via Frontend
+ Transport; Thu, 12 Sep 2024 17:49:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1PEPF000075ED.mail.protection.outlook.com (10.167.249.36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7918.13 via Frontend Transport; Thu, 12 Sep 2024 17:49:34 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 12 Sep
+ 2024 12:49:32 -0500
+From: Brett Creeley <brett.creeley@amd.com>
+To: <alexanderduyck@fb.com>, <kuba@kernel.org>, <kernel-team@meta.com>,
+	<davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: <jdamato@fastly.com>, <brett.creeley@amd.com>, <stable@vger.kernel.org>
+Subject: [PATCH net] fbnic: Set napi irq value after calling netif_napi_add
+Date: Thu, 12 Sep 2024 10:49:22 -0700
+Message-ID: <20240912174922.10550-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000075ED:EE_|PH7PR12MB5973:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6a59d9b1-45b7-4b94-3152-08dcd3534388
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?HIoTBXrBERJp0OQQUUFDVNOvzPBkrep8jNP944tyrfg9UtQ8AzfrS3BtTe2h?=
+ =?us-ascii?Q?AGty0PC36usKDoN+OvLMFTp75NUDLFW3ULzApjnVNY+66/k+Nl9Ty2t/zm9x?=
+ =?us-ascii?Q?t7X89YGXKlBaKTajd0CkIBT6bKHEMVfNazgCJgBo4oZqxo91aGs3w8TbiIST?=
+ =?us-ascii?Q?QbHnhfYmSRkuozg2paaMX1a7ayg/kS7SJXpS2H/xfRNMpnZxGCi0hVpG4SYd?=
+ =?us-ascii?Q?WQEevt8Jf9wpzyIahCGMY9pidJqGLagEPHTcihEm6r5sOVsEl6lJluGXLW33?=
+ =?us-ascii?Q?i/t4hCFR9xm6pgSo69c4N2OMsZzYI+ngzESD+xDBiOuSmM/sav1wuUzH4Dxt?=
+ =?us-ascii?Q?41cp7mp4+d3cHGTEVGAwiGsCc65oTd/eH3pwmUsnMdQceLR4Ql76I7wf29tt?=
+ =?us-ascii?Q?cgdIyTd38tJpGlHajX5t2xNWLZYUeBm9Yk6/MBX5JsaG5FLxq35wPn+hEu/u?=
+ =?us-ascii?Q?PfFsporWPNwJoDXdof4VAUfBbR3uN9tOsB0tKYQXwnQFAnAFeBea2NMEOSGw?=
+ =?us-ascii?Q?aKia3vLRF66oo13xPJEUa7XhKZusswC40ckBu2Q7n1aODcLdD+6nXEgKSFcI?=
+ =?us-ascii?Q?it58FyfIKYQis9/xdT6y7uwNUF5x8G7cjTrUweEdibNnFZBZF90noQ/DIdUe?=
+ =?us-ascii?Q?UNLOYasr1nBy1iTi1wQf3i1KgTyWYk+VNfBidBm6XbTDWr/MFNCHqwtCXGbn?=
+ =?us-ascii?Q?Dovc6oqgau6v9Df/MjifS5tT90JH1gljhtqykYUdMSNFhdaPlyA29Z8+H+2b?=
+ =?us-ascii?Q?YyMQHE18athmSjTmT3I+7pWFl84CtR2+FyhFMxHyzvRoQO5b66Qo6+XZni2l?=
+ =?us-ascii?Q?yBpsRmBD5OdgyJExDkauWwIQSmniAgYKbmIe+TlZPEIx2MOXxtgSp0tSIpHJ?=
+ =?us-ascii?Q?JAN5G1J1IFSVuVjwCIfJcSy1F538xqsFk2RFVu5sEJ1rMNE5nI4HEB9i+uuv?=
+ =?us-ascii?Q?IrkDnZ6v+ZcRD8FCYc6Ov1iwdkSYmukSrmNyD0MB2oOd6X8Va+PtTKTNT6jL?=
+ =?us-ascii?Q?FhSrYd86P6Y6hd9NIVYhW8353qorCukBFQ+vjRg0YFNI7oalZ2ZqPFCTkCtH?=
+ =?us-ascii?Q?3XuQn/ruia9IH+XGwmW7co5Cg2AlNL0mXSzHDGbQuK7N/67rOLg9NYtASu6n?=
+ =?us-ascii?Q?+c56kYTcYsEuddYdiqTrMeYRO23QzCgfP53wziFOJnQ/PqXVk+2TF02wOdRs?=
+ =?us-ascii?Q?HNC+JnyHQBIyCdEREWgyoT5m//zqQShVzzcQYhDHChstR9Q9klIZDMQrZ4vF?=
+ =?us-ascii?Q?lOlIj5JMPJiiJmc2Zh5/yZXuBLrrTD7SI6OWLzFxv+FW7JaltC+LjFP3hV1m?=
+ =?us-ascii?Q?yO6DAsdAw0ldT4+CwCCw3v34fvXeIhiu0b4KIeYNulidXUFk3E8cp/hKzjH7?=
+ =?us-ascii?Q?taw+LZqxtRQS/MwQW4vhGN7gVIzCEmjbGFXXyI4TnO5dWjHhkLvDdOMcfPp3?=
+ =?us-ascii?Q?GuW9U2EP51iqA4EgJHTb9MU//T6azq28?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2024 17:49:34.6793
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a59d9b1-45b7-4b94-3152-08dcd3534388
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000075ED.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5973
 
-The enetc driver uses ifdefs when checking whether
-CONFIG_FSL_ENETC_PTP_CLOCK is enabled in a number of places. This works
-if the driver is built-in but fails if the driver is available as a
-kernel module. Replace the instances of ifdef with use of the IS_ENABLED
-macro, that will evaluate as true when this feature is built as a kernel
-module and follows the kernel's coding style.
+The driver calls netif_napi_set_irq() and then calls netif_napi_add(),
+which calls netif_napi_add_weight(). At the end of
+netif_napi_add_weight() is a call to netif_napi_set_irq(napi, -1), which
+clears the previously set napi->irq value. Fix this by calling
+netif_napi_set_irq() after calling netif_napi_add().
 
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Signed-off-by: Martyn Welch <martyn.welch@collabora.com>
+This was found when reviewing another patch and I have no way to test
+this, but the fix seemed relatively straight forward.
+
+Cc: stable@vger.kernel.org
+Fixes: bc6107771bb4 ("eth: fbnic: Allocate a netdevice and napi vectors with queues")
+Signed-off-by: Brett Creeley <brett.creeley@amd.com>
 ---
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Changes since v1:
-  - Switched from preprocessor conditionals to normal C conditionals.
-
-Changes since v2:
-  - Reworked enetc_ethtool.c changes to fit around changes merged in
-    net-next.
-
-Changes since v3:
-  - Correction of SOB ordering.
-  - Removal of unneeded `__maybe_unused` tags.
-
-drivers/net/ethernet/freescale/enetc/enetc.c  | 22 ++++++++-----------
- drivers/net/ethernet/freescale/enetc/enetc.h  |  9 +++-----
- .../ethernet/freescale/enetc/enetc_ethtool.c  | 12 ++++++----
- 3 files changed, 20 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index 5c45f42232d3..66e3e982882a 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -977,7 +977,6 @@ static int enetc_refill_rx_ring(struct enetc_bdr *rx_ring, const int buff_cnt)
- 	return j;
- }
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index 0ed4c9fff5d8..72f88ae7815f 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -1012,14 +1012,14 @@ static int fbnic_alloc_napi_vector(struct fbnic_dev *fbd, struct fbnic_net *fbn,
+ 	nv->fbd = fbd;
+ 	nv->v_idx = v_idx;
  
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
- static void enetc_get_rx_tstamp(struct net_device *ndev,
- 				union enetc_rx_bd *rxbd,
- 				struct sk_buff *skb)
-@@ -1001,7 +1000,6 @@ static void enetc_get_rx_tstamp(struct net_device *ndev,
- 		shhwtstamps->hwtstamp = ns_to_ktime(tstamp);
- 	}
- }
--#endif
+-	/* Record IRQ to NAPI struct */
+-	netif_napi_set_irq(&nv->napi,
+-			   pci_irq_vector(to_pci_dev(fbd->dev), nv->v_idx));
+-
+ 	/* Tie napi to netdev */
+ 	list_add(&nv->napis, &fbn->napis);
+ 	netif_napi_add(fbn->netdev, &nv->napi, fbnic_poll);
  
- static void enetc_get_offloads(struct enetc_bdr *rx_ring,
- 			       union enetc_rx_bd *rxbd, struct sk_buff *skb)
-@@ -1041,10 +1039,9 @@ static void enetc_get_offloads(struct enetc_bdr *rx_ring,
- 		__vlan_hwaccel_put_tag(skb, tpid, le16_to_cpu(rxbd->r.vlan_opt));
- 	}
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
--	if (priv->active_offloads & ENETC_F_RX_TSTAMP)
-+	if (IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK) &&
-+	    (priv->active_offloads & ENETC_F_RX_TSTAMP))
- 		enetc_get_rx_tstamp(rx_ring->ndev, rxbd, skb);
--#endif
- }
- 
- /* This gets called during the non-XDP NAPI poll cycle as well as on XDP_PASS,
-@@ -2882,7 +2879,6 @@ void enetc_set_features(struct net_device *ndev, netdev_features_t features)
- }
- EXPORT_SYMBOL_GPL(enetc_set_features);
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
- static int enetc_hwtstamp_set(struct net_device *ndev, struct ifreq *ifr)
- {
- 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
-@@ -2951,17 +2947,17 @@ static int enetc_hwtstamp_get(struct net_device *ndev, struct ifreq *ifr)
- 	return copy_to_user(ifr->ifr_data, &config, sizeof(config)) ?
- 	       -EFAULT : 0;
- }
--#endif
- 
- int enetc_ioctl(struct net_device *ndev, struct ifreq *rq, int cmd)
- {
- 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
--	if (cmd == SIOCSHWTSTAMP)
--		return enetc_hwtstamp_set(ndev, rq);
--	if (cmd == SIOCGHWTSTAMP)
--		return enetc_hwtstamp_get(ndev, rq);
--#endif
++	/* Record IRQ to NAPI struct */
++	netif_napi_set_irq(&nv->napi,
++			   pci_irq_vector(to_pci_dev(fbd->dev), nv->v_idx));
 +
-+	if (IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)) {
-+		if (cmd == SIOCSHWTSTAMP)
-+			return enetc_hwtstamp_set(ndev, rq);
-+		if (cmd == SIOCGHWTSTAMP)
-+			return enetc_hwtstamp_get(ndev, rq);
-+	}
- 
- 	if (!priv->phylink)
- 		return -EOPNOTSUPP;
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.h b/drivers/net/ethernet/freescale/enetc/enetc.h
-index a9c2ff22431c..97524dfa234c 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.h
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.h
-@@ -184,10 +184,9 @@ static inline union enetc_rx_bd *enetc_rxbd(struct enetc_bdr *rx_ring, int i)
- {
- 	int hw_idx = i;
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
--	if (rx_ring->ext_en)
-+	if (IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK) && rx_ring->ext_en)
- 		hw_idx = 2 * i;
--#endif
-+
- 	return &(((union enetc_rx_bd *)rx_ring->bd_base)[hw_idx]);
- }
- 
-@@ -199,10 +198,8 @@ static inline void enetc_rxbd_next(struct enetc_bdr *rx_ring,
- 
- 	new_rxbd++;
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
--	if (rx_ring->ext_en)
-+	if (IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK) && rx_ring->ext_en)
- 		new_rxbd++;
--#endif
- 
- 	if (unlikely(++new_index == rx_ring->bd_count)) {
- 		new_rxbd = rx_ring->bd_base;
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-index 47c478e08d44..2563eb8ac7b6 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc_ethtool.c
-@@ -851,7 +851,12 @@ static int enetc_get_ts_info(struct net_device *ndev,
- 		symbol_put(enetc_phc_index);
- 	}
- 
--#ifdef CONFIG_FSL_ENETC_PTP_CLOCK
-+	if (!IS_ENABLED(CONFIG_FSL_ENETC_PTP_CLOCK)) {
-+		info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE;
-+
-+		return 0;
-+	}
-+
- 	info->so_timestamping = SOF_TIMESTAMPING_TX_HARDWARE |
- 				SOF_TIMESTAMPING_RX_HARDWARE |
- 				SOF_TIMESTAMPING_RAW_HARDWARE |
-@@ -860,11 +865,10 @@ static int enetc_get_ts_info(struct net_device *ndev,
- 	info->tx_types = (1 << HWTSTAMP_TX_OFF) |
- 			 (1 << HWTSTAMP_TX_ON) |
- 			 (1 << HWTSTAMP_TX_ONESTEP_SYNC);
-+
- 	info->rx_filters = (1 << HWTSTAMP_FILTER_NONE) |
- 			   (1 << HWTSTAMP_FILTER_ALL);
--#else
--	info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE;
--#endif
-+
- 	return 0;
- }
+ 	/* Tie nv back to PCIe dev */
+ 	nv->dev = fbd->dev;
  
 -- 
-2.45.2
+2.17.1
 
 
