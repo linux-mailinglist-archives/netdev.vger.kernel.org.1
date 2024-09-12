@@ -1,60 +1,72 @@
-Return-Path: <netdev+bounces-127736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A819C97640D
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 10:09:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF3C1976419
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 10:13:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FE951F24299
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:09:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DD401C23672
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C60318F2FB;
-	Thu, 12 Sep 2024 08:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F5118FDDB;
+	Thu, 12 Sep 2024 08:13:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jnjBzjON"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FiTcdWCc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA1018BBB6;
-	Thu, 12 Sep 2024 08:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1D218F2FB
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 08:13:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726128574; cv=none; b=Cw9Mx58i/HRFoaBkoO77opI9oU4B4yxzcPzUwu8PdnQNz4JDy6oizro7Yku5h3Iy4YU8yC5qvys5NVaVqN6eYmiwp4Mt3NtDWgTCISeBzBh2RPNaQUo9yE8/uVRW3T1XShNh1uSBXG8/V/t+qL0n7CEtvD57zpSyqSaL4zc2kn0=
+	t=1726128792; cv=none; b=BrfGJQ0OaaHHdzrsdUBvYf44qkqMUbD0RaG/WIShB5xiPCbcPXlWNCVTgvElsYFA439pD9d5SoQOVXeMujcHBtdkYHsRgngPi0UoZ915zTEWgZjrHnjHAHIob5tyWqWEW1GoQujUZM4JNxNdJe33FHpxBjE6le07MGKf/FtwnAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726128574; c=relaxed/simple;
-	bh=SES32wNoIGrGed28oBc2F5wQIjRruZj+eJv3fRuFOgM=;
+	s=arc-20240116; t=1726128792; c=relaxed/simple;
+	bh=OIzbugZ8+w82y/GQ5XlRUkvrI/8TKghHlbg88MrRrf0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L8Rzpy7fEQcI76hvrBY5zvLTdxMV64VcjLxVdyAOyXcW3v6W8Apc4yzS5NqR7QVgjXLFGDk2ihtDo9IhXWQoNIQ7m977/ovXR9ZA3nStjujudGwXPwFplVcfpCftI0jlnn+CxznBX051DBfQfMsczQA0INpB3eIW+XkpbJafzhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jnjBzjON; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7046C4CEC3;
-	Thu, 12 Sep 2024 08:09:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726128574;
-	bh=SES32wNoIGrGed28oBc2F5wQIjRruZj+eJv3fRuFOgM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jnjBzjONOKd5NBx/TMxrHMdgJkPExfk3Qf6fErCrrlEOQNURa2YUtyrps27kbKwzy
-	 rErspzq4hsieZJbg5HO5OjegNnRonh2tiHjaN0TDAZgc8xbFcgB8nFfboNMJhjDEaa
-	 7QXumVS7YM1b0lQVUDmq5PYkh2rAgiR1I22dC/FAM8JWQszkd6IY4EX//4If9nIXqz
-	 Mu4g5raHbRkOqh4xJY7NrlUjL6ML46CuAzb4CiT/tmnGAuQ7qjlwQl0U/ErDD3he89
-	 dRz1/R1MLAWxZmHKw9dOKt/GGFxy9M9Z3F7QR4UIdwNFpPHXUmdxJAjzX6m0wjkccy
-	 SAdXHse8argzQ==
-Date: Thu, 12 Sep 2024 09:09:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	thomas.petazzoni@bootlin.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH net-next] Documentation: networking: Fix missing PSE
- documentation issue
-Message-ID: <20240912080929.GD572255@kernel.org>
-References: <20240911144711.693216-1-kory.maincent@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=j968pQZQFUGalFs7CjWiYaZ9+F5hh2E0frpWYuDogu5OiOOqJ7HKnf+UnjVFYDpt9DORpw2fDxXPA3bvflLV96T0PMhrifL8cpyVs315FVPtXLVLsRkca9EPdI6t07Fn5eW98wQm9fEPBF8u5TxubWQQ8/d84AkGC+h7J9EdZrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FiTcdWCc; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726128790;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=I/d1SgyYtM49Uvgf3ca5OttSFKxWT9MmZxx9vMSYJgo=;
+	b=FiTcdWCcz27U6O7WMN6QWSC7Q59WdKeJ3CJGTOMLFGmBSFiWxep+epu70lhEfjpdrHqXNu
+	oD0YQXU/FDz/F+9GpFN5eHzpOIuWG8vws4RFuo06Bel6HeSPU6yPuxHfWb9no3hgXlZVSS
+	pEjo+H1BnBKaF+F9VbHDsqYz/CPvwZQ=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-134-8wcMhIZmPzy_R_N0RYqfeA-1; Thu,
+ 12 Sep 2024 04:13:06 -0400
+X-MC-Unique: 8wcMhIZmPzy_R_N0RYqfeA-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D47141954B2D;
+	Thu, 12 Sep 2024 08:13:04 +0000 (UTC)
+Received: from localhost (unknown [10.43.135.229])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E816F195605A;
+	Thu, 12 Sep 2024 08:13:01 +0000 (UTC)
+Date: Thu, 12 Sep 2024 10:12:59 +0200
+From: Miroslav Lichvar <mlichvar@redhat.com>
+To: Anna-Maria Behnsen <anna-maria@linutronix.de>
+Cc: John Stultz <jstultz@google.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
+	Christopher S Hall <christopher.s.hall@intel.com>
+Subject: Re: [PATCH 00/21] ntp: Rework to prepare support of indenpendent PTP
+ clocks
+Message-ID: <ZuKii1KDGHSXElB6@localhost>
+References: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-0-2d52f4e13476@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,40 +75,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240911144711.693216-1-kory.maincent@bootlin.com>
+In-Reply-To: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-0-2d52f4e13476@linutronix.de>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Wed, Sep 11, 2024 at 04:47:11PM +0200, Kory Maincent wrote:
-> Fix a missing end of phrase in the documentation. It describes the
-> ETHTOOL_A_C33_PSE_ACTUAL_PW attribute, which was not fully explained.
+On Wed, Sep 11, 2024 at 03:17:36PM +0200, Anna-Maria Behnsen wrote:
+> This problem can be solved by emulating clock_gettime() via the system
+> clock source e.g. TSC on x86. Such emulation requires:
 > 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
->  Documentation/networking/ethtool-netlink.rst | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
-> index ba90457b8b2d..b1390878ba84 100644
-> --- a/Documentation/networking/ethtool-netlink.rst
-> +++ b/Documentation/networking/ethtool-netlink.rst
-> @@ -1801,8 +1801,9 @@ the PSE and the PD. This option is corresponding to ``IEEE 802.3-2022``
->  30.9.1.1.8 aPSEPowerClassification.
->  
->  When set, the optional ``ETHTOOL_A_C33_PSE_ACTUAL_PW`` attribute identifies
-> -This option is corresponding to ``IEEE 802.3-2022`` 30.9.1.1.23 aPSEActualPower.
-> -Actual power is reported in mW.
-> +the actual power drawn by the C33 PSE. This option is corresponding to
+> 1. timekeeping mechanism similar to the existing system timekeeping
+> 2. clock steering equivalent to NTP/adjtimex()
 
-nit: While we are here, perhaps we can also update the grammar.
+I'm trying to understand what independent PTP clocks means here. Is
+the goal to provide virtual PTP clocks running on top of the system
+clocksource (e.g. TSC) similarly to what is currently done for
+physical PTP clocks by writing to /sys/class/ptp/ptp*/n_vclocks,
+expecting the virtual clocks to be synchronized by applications like
+phc2sys?
 
-     This attribute corresponds to...
+Or is this more about speeding up the reading of the PHC, where the
+kernel itself would be tracking the offset using one of the PTP
+driver's PTP_SYS_OFFSET operations and emulating a fast-reading PHC?
 
-> +``IEEE 802.3-2022`` 30.9.1.1.23 aPSEActualPower. Actual power is reported
-> +in mW.
->  
->  When set, the optional ``ETHTOOL_A_C33_PSE_EXT_STATE`` attribute identifies
->  the extended error state of the C33 PSE. Possible values are:
-> -- 
-> 2.34.1
-> 
-> 
+-- 
+Miroslav Lichvar
+
 
