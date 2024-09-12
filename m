@@ -1,119 +1,132 @@
-Return-Path: <netdev+bounces-127635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73B12975ECD
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:16:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 775C7975EE7
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:30:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C5FBB235F2
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:16:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B15A31C21D0F
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5964D2AF16;
-	Thu, 12 Sep 2024 02:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6F23CF58;
+	Thu, 12 Sep 2024 02:29:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="jHC1MUMV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H8/l9Jml"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 518552EAE5;
-	Thu, 12 Sep 2024 02:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00653A8E4;
+	Thu, 12 Sep 2024 02:29:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726107387; cv=none; b=rIVEIJ8Awjn4pizgNnnsKeAOFqtobuf+hg5SyvMIGPhSrr9JJOPQGmUzXNmJBheQdd84tWVOuGzbDpe4qJUlMDDbc+UJG8gQhmNInw1s+7BtwNiDOpsR4Yn+5C2QcSEmbJUt3nMvgILIS4g+3YcUmhitno83UQzIo/n6U3VcIFM=
+	t=1726108196; cv=none; b=srvQypltVXEb1vmxjfND+wZjwKaFA+K//hh5LL1DddoOpgC5xae72d9rRxrOoTOILdZtBGFqpMDOFf+UjKNPNfbEswf44/UOXfexxZGsT8lrd2xTIz41a/SVBpRcQsf9KCNnKX02kSTgHownmy/o3vBiV2kCNqaZOPviNqWiVwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726107387; c=relaxed/simple;
-	bh=rPuy1Ff10KOvt7O5pU7bhBViYS+YgNCDPrhsJY9z/1M=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=GDnImJmqOyA7P8wpIPMk09LOGY/QQj6BbzCrzpPcDmdG4ddP8BFEuOwdahUeFrDsftHL7DmSwaK2mswKzFXEbfsYoSR+dtLAmZXs6ebLlLy38fNrM9IEPeMQ0xWOg0DO+Qo1USFtFC32ZBee8vdi7BYCbJJKS84LN2juZTP116o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=jHC1MUMV; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1726107382;
-	bh=XvebqfpgRkKov2LFe+PC2QWLyi2MOqj3FjjMED5eDZ0=;
-	h=Date:From:To:Cc:Subject:From;
-	b=jHC1MUMV6SUuBKoq6JWCzoFLGpCedC31zpi+8CNx+PwPF3eyQgoNurLSGDmJcEVLG
-	 vt/jj8ojtuJMovs9CVuKP/TU+Gk03c5UvPKFy30SzO7QvG4LI1lWBAb9mz2vFqah/B
-	 LUCX5OedGbLMCCpr11sxUQQvafke6vo5O8jHEx5c40NurWNeGowe3dUtz06nmPw0W1
-	 mY5B4niUCCeQW302Z1TFxA74jYpQIP5zomsLhw4pviZbuHmWQqhykTtVgN684zUqAY
-	 p3tjsayDuYSvP1MZ1j510vhFxCzBu/gt/nLle0h9iBU26ymOWsHEl+ZL5gGIrEe2xi
-	 ojyuBJ4/U05fg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X41Jk01Rxz4x0K;
-	Thu, 12 Sep 2024 12:16:21 +1000 (AEST)
-Date: Thu, 12 Sep 2024 12:16:21 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>, Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20240912121621.5593aa8b@canb.auug.org.au>
+	s=arc-20240116; t=1726108196; c=relaxed/simple;
+	bh=t08umSXdAuGeBddaW526nzG0WyKi1PzANkSvIgym6lo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PkaPBfLQgLoJ24Dhe8jDFnF2L9EbMjdOVvr1X1zXB/yiz0kMxMl349l1mVMZf7GKj8qEuZU/InzE4OD/VC7cmg5alfaQhFOs/yE3E/PSxUjmJupFtjZRNK0QEPIjUtfcYAY8T9do9hVMDdhSS+RRSqsG5EPOX+FJSUeenj5tCmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H8/l9Jml; arc=none smtp.client-ip=209.85.219.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-dff1ccdc17bso541873276.0;
+        Wed, 11 Sep 2024 19:29:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726108194; x=1726712994; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mWRMmHm+FfWDYa8yX01QI6M1EYeU0fnEELtdBrM9ofw=;
+        b=H8/l9JmliZTmlC+we2Zfp06Lp2UrmFOGlS6F54zAgPWgBjyn+sjEPnakdWsOz/1X/E
+         H2DH3SNIxl9jMvawXRBTZdZz3FJQRTukVtdyaGGHodE1nGCoDp41BJ/PdnKjFwmmxsSF
+         YTrHH5LXojpqTUm7vBEBvxNJF9p2/VLq2aLxqy0vJg7hxIsvYd7KeAz0B5FmXRt8KNVG
+         0wwz9szRDZ++sKQS6KUkUrO44x5pVw8Rx9S2v2xAaTxFQQKWBo4RQosADh8Rud+wqlSl
+         4Y1oiNnx1CwJlKiWk8aVH63Cr4AVBkRTYljydCndolO5fqmcA2UYlAwWWLb51QMuZqX6
+         XQRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726108194; x=1726712994;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mWRMmHm+FfWDYa8yX01QI6M1EYeU0fnEELtdBrM9ofw=;
+        b=safbRqW3fhqRXoCDMFhRPS99pNZdktiAoslR1Kz8E4EYo89OnTMunwwWM9sI+A+Kx8
+         7xx54GiJCM8losy+/dKwYQ+kqCnj1AFBvDjgMLNp71+fDSsB4LaUZJU0ANaz/v4oH6Jd
+         dsVE0MVjCX8YM001GzaYsSfusgAeXrzM9wQa/u5Glt+iFCFs7te4/4mPfl6oTpVdgAkf
+         Htu+CkvsnICIqL66R+caOnKD06dde37dXMZR9B6BBCUV1L8Yku1UduIt/93e04mci1xS
+         hn3jzHXAjbp1N0Y9wJZzQc4cBMftmDAHmujMNGbzAz2tqOs6DoOrtdkffSTIvQYAySW1
+         0mCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVuJQXwISg8SS14x8FQby0LeewyCUOFU3sW7t9KYUOvZka6rtSuW7o10frYPu1SpHF1hIMku1Q5@vger.kernel.org, AJvYcCXGcHXeULT2RABVOhGeMLzpBTgDgE+jsAgKfI8obY3SBj0RvAG9RIYX0FLB1v8BLspuCDZN6Iul5qSvmIE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiyHR37bLxSYdaHUyBmJYWEVMVJ1nLFAtLU4ptvVFzjIHsn/9C
+	YzWayl9PptRceG3rppXn7plUbnMp9uxw2HLns9mYo8G4Iu4X+IDpRsDa0WEu7e30I9FejEL+DCp
+	0PO/kf1E7jGhy0trsvjPuMKrDAMk=
+X-Google-Smtp-Source: AGHT+IExPuoKunfojdj2czxk8KU+K07L0H57eNKlbS8wQqYKtiU+V90C/1MT/sEzKtMGaP4J/Nqfdiu31017kjeWy/M=
+X-Received: by 2002:a05:6902:1149:b0:e11:82fb:70c with SMTP id
+ 3f1490d57ef6-e1d9dc6624bmr1844103276.51.1726108193657; Wed, 11 Sep 2024
+ 19:29:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/pylc+n2aTgKyRTc1JwelXnX";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/pylc+n2aTgKyRTc1JwelXnX
-Content-Type: text/plain; charset=US-ASCII
+References: <20240909071652.3349294-1-dongml2@chinatelecom.cn>
+ <20240909071652.3349294-7-dongml2@chinatelecom.cn> <ZuFP9EAu4MxlY7k0@shredder.lan>
+In-Reply-To: <ZuFP9EAu4MxlY7k0@shredder.lan>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Thu, 12 Sep 2024 10:30:01 +0800
+Message-ID: <CADxym3ZUx7v38YU6DpAxLU_PSOqHTpvz3qyvE4B3UhSHR2K67w@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 06/12] net: vxlan: make vxlan_snoop() return
+ drop reasons
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: kuba@kernel.org, aleksander.lobakin@intel.com, horms@kernel.org, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	dsahern@kernel.org, dongml2@chinatelecom.cn, amcohen@nvidia.com, 
+	gnault@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com, 
+	razor@blackwall.org, petrm@nvidia.com, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Wed, Sep 11, 2024 at 4:08=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
+ote:
+>
+> On Mon, Sep 09, 2024 at 03:16:46PM +0800, Menglong Dong wrote:
+> > @@ -1447,7 +1448,7 @@ static bool vxlan_snoop(struct net_device *dev,
+> >
+> >       /* Ignore packets from invalid src-address */
+> >       if (!is_valid_ether_addr(src_mac))
+> > -             return true;
+> > +             return SKB_DROP_REASON_VXLAN_INVALID_SMAC;
+>
+> [...]
+>
+> > diff --git a/include/net/dropreason-core.h b/include/net/dropreason-cor=
+e.h
+> > index 98259d2b3e92..1b9ec4a49c38 100644
+> > --- a/include/net/dropreason-core.h
+> > +++ b/include/net/dropreason-core.h
+> > @@ -94,6 +94,8 @@
+> >       FN(TC_RECLASSIFY_LOOP)          \
+> >       FN(VXLAN_INVALID_HDR)           \
+> >       FN(VXLAN_VNI_NOT_FOUND)         \
+> > +     FN(VXLAN_INVALID_SMAC)          \
+>
+> Since this is now part of the core reasons, why not name it
+> "INVALID_SMAC" so that it could be reused outside of the VXLAN driver?
+> For example, the bridge driver has the exact same check in its receive
+> path (see br_handle_frame()).
+>
 
-Today's linux-next merge of the net-next tree got conflicts in:
+Yeah, I checked the br_handle_frame() and it indeed does
+the same check.
 
-  net/hsr/hsr_device.c
-  net/hsr/hsr_main.h
+I'll rename it to INVALID_SMAC for general usage.
 
-between commit:
-
-  b3c9e65eb227 ("net: hsr: remove seqnr_lock")
-
-from the net tree and commit:
-
-  35e24f28c2e9 ("net: hsr: Remove interlink_sequence_nr.")
-
-from the net-next tree.
-
-I fixed it up (the former incorporated the latter) and can carry the
-fix as necessary. This is now fixed as far as linux-next is concerned,
-but any non trivial conflicts should be mentioned to your upstream
-maintainer when your tree is submitted for merging.  You may also want
-to consider cooperating with the maintainer of the conflicting tree to
-minimise any particularly complex conflicts.
-
-
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/pylc+n2aTgKyRTc1JwelXnX
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbiTvUACgkQAVBC80lX
-0Gw4Zwf9FgLRWoqb866dGySYBPJdnf/SPUpawp4Ue2xYHoeBcPdNKcPmdn1ZWHq6
-1Q5WTsOmSQik10U6awjZn7oI+i1zA+xlb50TaINdm4/71D5qrQ1BFdoH4p49maU0
-5mFwm1OoWra+ipJ0TgPfTYYhkMYEQQmJ7UO29DbcC2E3M6GYWyHue9eB6thmBFqh
-f2xUqmx2FUcAEAIuw+ULzf3UVp4FtSKkSNvvwzL3SgVwoHOhPVhDmYCVq5Neg++S
-S5b60egoku1690g/iuKsu0cNsjAiJHLk9+O4we/Q7sdArc1tzKstOYzMNpdjJACF
-ZQaBNsYUoXNumtJSdnwwJXuc7CjZqA==
-=Cpa0
------END PGP SIGNATURE-----
-
---Sig_/pylc+n2aTgKyRTc1JwelXnX--
+Thanks!
+Menglong Dong
+> > +     FN(VXLAN_ENTRY_EXISTS)          \
+> >       FN(IP_TUNNEL_ECN)               \
+> >       FNe(MAX)
 
