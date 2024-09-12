@@ -1,90 +1,106 @@
-Return-Path: <netdev+bounces-127863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 834AC976E7D
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:13:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25BF7976E84
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:15:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91EABB239AE
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:13:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57BAB1C23789
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:15:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55EA13D245;
-	Thu, 12 Sep 2024 16:13:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EC0A15443D;
+	Thu, 12 Sep 2024 16:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Iw0lvd7p"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Us45u6BS"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5BF4AEF4;
-	Thu, 12 Sep 2024 16:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF11D14A092;
+	Thu, 12 Sep 2024 16:15:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726157609; cv=none; b=GFlHYP/KWagWl/21iI27ulLhibPOPDhMei+Tf07rXcVuppOpB2tonJRRp+lvDGv0oEnrMibQG1N2po7CkGZZ4W2TnMvA5gOo2y/dByT9niy9f71w7eP/bcxHev6CkB4XUay5at5GRzMF5hV9MA9m9BcJW0WIqQ68ltXM+pzHB0Q=
+	t=1726157706; cv=none; b=VKJSzN4+9YH8GAXnthCcnegblrzJgMo6bQ4FaMJB0FB3Pzi1+oFxvYWXLBRBO+FQsoClDgwV/IQ7TSGq7qlcc/Bpf3s9dqSU5sUQ9/E6/4+FNsUuTywmVVePvGsPXWEvv2jC75NPskp4u/3RD9V1ZkT/Is5CuCtblXp9VAyph5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726157609; c=relaxed/simple;
-	bh=OmBNvMITlRvb/PXVvd52qXHe7Mn5kVTL0UEHOyL4oFg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oJH7oNdt7EQUqWiyeWGyHu64992wNn1fi0DwM03nIXRsaZBHbe5mB9MrEF2C2xPCpvZUX496NhHp3Pq3A89V0stdqwHqT58pVRiSdVP0j2zkKAQVE/POC0sg8/GoF1O3Da4vfcngNpX+1zJALfp5quIRpa+Yx2dIwd3vISHDWZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Iw0lvd7p; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=1L5pXQ28q1fdoApfphTH3xK6rcuMrjSLTotIfwo+pTE=; b=Iw0lvd7pKeU4Y2DGDxdV8KhpxF
-	tECzdll2V5BOdQpJFYNPyaesZgQDD2wbTIhKNG2KmDPizQYmu6t1JO5S8SQYNcMN/uKDr4xDKfIqy
-	wt2QZF6TNYXk/xyCCs2HqjDRr41NNAAbx1cixpkODp4Eo4ni+ttS1HMb46ErHwaIjRGE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1somRX-007K6X-JT; Thu, 12 Sep 2024 18:13:15 +0200
-Date: Thu, 12 Sep 2024 18:13:15 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ronnie.Kunin@microchip.com
-Cc: Raju.Lakkaraju@microchip.com, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Bryan.Whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
-	Steen.Hegelund@microchip.com, Daniel.Machon@microchip.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next V2 4/5] net: lan743x: Implement phylink pcs
-Message-ID: <100f9c30-f6cc-4995-a6e9-2856dd3a029f@lunn.ch>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-5-Raju.Lakkaraju@microchip.com>
- <c6e36569-e3a8-4962-ac85-2fd7d35ab5d1@lunn.ch>
- <ZuKP6XcWTSk0SUn4@HYD-DK-UNGSW21.microchip.com>
- <cbc505ca-3df0-4139-87a1-db603f9f426a@lunn.ch>
- <PH8PR11MB79651A4A42D0492064F6541B95642@PH8PR11MB7965.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1726157706; c=relaxed/simple;
+	bh=+z5vSVsqHnO2ipIBd+YFZ/PE7fmOt9+3lf1B+WMstCo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XUXati6QbzdjYo9XriGFRUMv66kxfZP3tx8cz8NMNc/Zz1WvPp4HsHdA7cb14XJDB3TH/smJcqkyuIq02kntF2g7vWtcTIdAGVVBNNJ1Kcrrdi99whswvYGamMhlZ4gx37WW1QVcgsRuo2mPp63QYbKfxmE9zUOaBLG/lg3ss4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Us45u6BS; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48CCj07j011518;
+	Thu, 12 Sep 2024 09:14:57 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=TFX1Va4RcGu5v1s1RQJLbpP
+	TQ/vDrcCic/gmU++00GI=; b=Us45u6BSeJN1970YWt/U218UGXK2lehFFpJTq2l
+	BdZnKTKnTml/dDu4lFBo622EZWWCyyQDtxrZspBQMrS+CDA3EwOlqYcxckJIMS9j
+	W8HscYRqyQsZ9QJC/fY+T9g9bTHcBNwbbCP9IpRgl5VuYiHQR0ij27palKWXxJdh
+	yPiFUXo6rAxR9UAq9RjzU/55evfW5Et6YvLn4L39D48h2q41+RjXhwMKAA5hM13j
+	KSeYfWqn8OGtA/tc5fEh7+fZWEhITaCLBa9tKHXEJzqrkWaRhxIOkDdzNecrJeRs
+	5xKW/DhXI5NQGiu9YTwh7ixDlfelCAQvs0GjHDKi+2WnUfg==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 41ks8ptydc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 12 Sep 2024 09:14:57 -0700 (PDT)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 12 Sep 2024 09:14:56 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 12 Sep 2024 09:14:56 -0700
+Received: from virtx40.. (unknown [10.28.34.196])
+	by maili.marvell.com (Postfix) with ESMTP id F05A53F7078;
+	Thu, 12 Sep 2024 09:14:52 -0700 (PDT)
+From: Linu Cherian <lcherian@marvell.com>
+To: <davem@davemloft.net>, <sgoutham@marvell.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <gakula@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        Linu Cherian
+	<lcherian@marvell.com>
+Subject: [PATCH v2 net-next 0/2] octeontx2: Few debugfs enhancements
+Date: Thu, 12 Sep 2024 21:44:48 +0530
+Message-ID: <20240912161450.164402-1-lcherian@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH8PR11MB79651A4A42D0492064F6541B95642@PH8PR11MB7965.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: oPKILyMUVH7uvlZFGO4ZxYKye3O8-H3O
+X-Proofpoint-GUID: oPKILyMUVH7uvlZFGO4ZxYKye3O8-H3O
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-> Our PCI11x1x hardware has a single MDIO controller that gets used
-> regardless of whether the chip interface is set to RGMII or to
-> SGMII/BASE-X.
+Changelog from v1:
+Removed wrong mutex_unlock invocations.
 
-That would be the external MDIO bus. 
+Patch 1 adds a devlink param to enable/disable counters for default
+rules. Once enabled, counters can be read from the debugfs files 
 
-But where is the PCS connected?
+Patch 2 adds channel info to the existing device - RPM map debugfs files  
 
-> When we are using an SFP, the MDIO lines from our controller are not
-> used / connected at all to the SFP.
+Linu Cherian (2):
+  octeontx2-af: Knobs for NPC default rule counters
+  octeontx2-af: debugfs: Add Channel info to RPM map
 
-Correct. The SFP cage does not have MDIO pins. There are two commonly
-used protocols for MDIO over I2C, which phylink supports. The MAC
-driver is not involved. All it needs to report to phylink is when the
-PCS transitions up/down.
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |   8 +-
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  11 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |  32 +++++
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 134 ++++++++++++++++--
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  36 ++---
+ 5 files changed, 178 insertions(+), 43 deletions(-)
 
-    Andrew
+-- 
+2.34.1
+
 
