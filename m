@@ -1,196 +1,164 @@
-Return-Path: <netdev+bounces-127916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2739770D1
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:29:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B8B09770D5
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:30:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DC851C24AB0
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:29:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1D3F2841E7
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1571E18BBB4;
-	Thu, 12 Sep 2024 18:29:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F20154BEA;
+	Thu, 12 Sep 2024 18:30:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="P3/VtViT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kcQnmABf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584DA4AEF4
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 18:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571C02BAE3;
+	Thu, 12 Sep 2024 18:30:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726165771; cv=none; b=BCz/z9/mxI89u34RNt18g52qsJNau5AHHt1KkOi28H5Otsz45sepuBujgPkK5GKimFqYLN3zFWfIaItBG9cEkZCTJF7oydMsTVJHjU8zeajG1sq8O9TQogg6Pe/PQHnwbib4LdFYSpWex1Uw+Wa/q9S8Gacu7dbxkgXNmxIiIWQ=
+	t=1726165832; cv=none; b=IvUvnFl1f8yIREtOqqvIiU9zaqj6wIcutyK13OJDFyteR73O3AfyMeaePvxnqhBWi0OMQQVl04fThZLuql43iLkByQ6zz4oXixweKpeJnbrUwjdS0apiPovXcHU0RbLNWUszjPsnJrQ/1ReGuYTGSPe7zGlnSnMjyCTn+/iAMrc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726165771; c=relaxed/simple;
-	bh=HZI//WySyughwcD+Btxs2LG1gz2BCMAMQr3DEaS8ky8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=HskQ2trge2B6Gffadf3OIjtpysMiR4JS7IyeC/V6I91vvj+D8Qj/nynSmG8naPxyRK/oPTwdXlCaKMUU9GKc0TDMyfJdCBGKiXvMp0OoTwCsdMvigkBODgNM90kXig1nVNyMEJVhB2++cV266DyssLuCns5/A8M4RwnvCqGA+HY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=P3/VtViT; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5bef295a429so1660632a12.2
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 11:29:29 -0700 (PDT)
+	s=arc-20240116; t=1726165832; c=relaxed/simple;
+	bh=MT5KHTU8WR3Lh8HyRqCKb/WSBh/7HuIcNHL+nSm7P4U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rU9QmLdsN/uShgabojEqEaYMsucET7BpsX761m6AUbgLmdhrp5hcn6umT2wYdJG8tAwmz4ET0qm4Eu3VdF+Xu14705clev+PHOJNek+dV+bfdsI9EVgnDPTRQsI84W294UIYUqspxShgs1qnoP6kg/Ync2oJ5g2YsgMq0GVJxx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kcQnmABf; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-457cfc2106aso604831cf.2;
+        Thu, 12 Sep 2024 11:30:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1726165768; x=1726770568; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=rOB2WcL9RquLUjHxKpnc/JbDeyP28VrxUBkxQrzVXUQ=;
-        b=P3/VtViT3WM/XRzIWL965pMkL0+5ONrtYQgxvl+qKKLr6nAJPOzphLY1CcoZElsv8G
-         Mx6WPkmNcMFIrJtWT9BZu8N0TO1sfNgTn1WBNYthtiFlaXIPKtKA9KeR4LNk16ELuWUb
-         YyJmej+ueZHlVjdL2Qh40meRrSKy5/kgF//6M=
+        d=gmail.com; s=20230601; t=1726165830; x=1726770630; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=8kAPGqrsaGxGyW2RkQBExyp9b+qbaXCkJ9biAhcsg9U=;
+        b=kcQnmABfAzamGYVM/riKrU/YbRJ66KCENS5X1lfaqawC39P4cGyBXeEJ7wVGHKLRKc
+         m5OinedwsWZmRWIMxeVv23OzFXQDP+CcVnS8WCnA8NFzVPnx4FxqJVgEXx/5a/cH4re9
+         50gN5ki3L98XrCJpoymQ0fvze+WOXtW+D7B2YxiN/5nCs5md9Bs5SkjSyHVxIIRjUs08
+         EKmCsVf7KwI4yGrBhk8VE5hDbSrOSNa0fIMQkyxl/y0a1Ihno9KmBFbbQUj4/etMRRFJ
+         Xl4HKll3T8AXjNYRGFRtDmHtdb9a/Ywkn3qLYJ0YZPocQ3H7tT40zLc7Q3bW1UsK2tdJ
+         engw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726165768; x=1726770568;
-        h=to:subject:message-id:date:from:in-reply-to:references:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rOB2WcL9RquLUjHxKpnc/JbDeyP28VrxUBkxQrzVXUQ=;
-        b=uOA/1bfAdsTk1p0GpwNXsWjcYRgMuMYsBcFSlGE+YWnAPNkTuAniH25mq5hyl//bH4
-         4UkN3Z2bb0C7uPdGvimKiG1/gqnA6LlI9JfHhnH/ogSUWcjIDwbQUbOcOS1hHABGmObg
-         RSf7nHHWG9n/EchbvYrUUoRd+YMHsH7T6SL//Yd5yHoC2DDj49kjCHazQwlcVIcC8sP7
-         tc3YRTSmfhtpaGFhDL5MG8HXB4FKbVvJKK+G29hOaybP2GZhPaG2KE1DfXf04IJxRMX1
-         5R99yRGWrgs3ARmnHzm7tRSXBOiMMuTyPWdAWCH/fxpz+9Ddq8hD3TdSJkijHU5rBw4X
-         3IeA==
-X-Forwarded-Encrypted: i=1; AJvYcCXb7ZSd23llbyXV3z25yX9/9xKuFibWxnHdgkkLqW4zD5RGwBVuNV2O47VkAFhffeD0Ai1N96g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwC7wvKXmXLgUCFgxXz/1hYFmk+Pnnp49J7XwTLMOcbt+Sek7ON
-	8kQMJSFR1uAqHgDJLFTX28iBfLMIT4926lR2Y8u708OuAVujntWx8CPNsHy0oDsvhh5SgRfhQ1e
-	71yYVsEddQjlt5He3+/7ASXZNZ08VLnCYv82m
-X-Google-Smtp-Source: AGHT+IFU5FI6NTA1/YF+IHQqCd33p2NKIgM28S8xG4PTVKr9YJ9+pzSSAFjo3RDfkyjN8kVKVxHSp471X+nRPoIpidA=
-X-Received: by 2002:a05:6402:3548:b0:5c2:5f1d:e1a2 with SMTP id
- 4fb4d7f45d1cf-5c413e07f9bmr3175626a12.4.1726165767444; Thu, 12 Sep 2024
- 11:29:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726165830; x=1726770630;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8kAPGqrsaGxGyW2RkQBExyp9b+qbaXCkJ9biAhcsg9U=;
+        b=Z1p1bBYArZuXVj0REg6rGmhwy5kwRow74SwnjoY51ZWur0PV8Te0z2yZO89JccLLfh
+         EN9OPg8RePGZICBwMU4Q8BFYFjPIIvikGOKK5batAOdXOPS6BjMC+4foY078k0WKU1tS
+         knfFHUSU9BARKRV6g5qAeDrZZTb24OW5qyQkDXL7nzUbQ6AdO+gr5FKKHjt69Fl82i4K
+         3JjUF5JKmiETy/hCeVWV+pvfJHaakP2P6DvBkJoWHxpHByDqS/FrrS9kvbUf5DR22cD8
+         FFYAQ/VJpQndn7FJG4KRJKLWVvjkB/Q8TBOoFVnYlA/P7KhSd9eECFKE9bYHU7qmWQ3R
+         2O5A==
+X-Forwarded-Encrypted: i=1; AJvYcCX871JgmDc3obBdkBjaiQ4Q98jsLNODlumdg9aCeCfRCFGs2XObBUubnxpbgGcuisWSpxuDyulNTQzDTdw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzizPP6/ezJtBMYCNK7xijsFWjtJIL2gPxi0UAPXF7RjQuw39PU
+	a2xjah5W8+LWKiOcBkUKUahjvwpMc6p0MA18BVsWfM/BWt5MjQU3
+X-Google-Smtp-Source: AGHT+IHvjweDt4gwowcrHz7d1Nh2Onzk4zDJ35JKD/AOU27y3GTFI54WS2V+BQf4Utn8pRA4Kd4xww==
+X-Received: by 2002:a05:622a:4e86:b0:453:7634:bbfa with SMTP id d75a77b69052e-4599d237db8mr1580331cf.21.1726165829962;
+        Thu, 12 Sep 2024 11:30:29 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45822f60a4csm55521151cf.62.2024.09.12.11.30.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Sep 2024 11:30:29 -0700 (PDT)
+Message-ID: <7736f0f2-8a99-4329-b290-089454d56e36@gmail.com>
+Date: Thu, 12 Sep 2024 11:30:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240912155830.14688-1-jdamato@fastly.com> <CACKFLimO60wNu3VggJ+cs9K2SBfMBtATCFxZ+3J1Hy3dbfLOCg@mail.gmail.com>
- <ZuMvY6_MolZYMT9m@LQ3V64L9R2.homenet.telecomitalia.it>
-In-Reply-To: <ZuMvY6_MolZYMT9m@LQ3V64L9R2.homenet.telecomitalia.it>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Thu, 12 Sep 2024 11:29:15 -0700
-Message-ID: <CACKFLinpY29JQoBMTw6z00GwJVXLDvJTswTS=VMxki7SdX6R4Q@mail.gmail.com>
-Subject: Re: [PATCH net-next] tg3: Link IRQs to NAPI instances
-To: Joe Damato <jdamato@fastly.com>, Michael Chan <michael.chan@broadcom.com>, 
-	netdev@vger.kernel.org, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	Michael Chan <mchan@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000006dd4320621f0490b"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/7] net: phy: allow isolating PHY devices
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
+ <kabel@kernel.org>, =?UTF-8?Q?K=C3=B6ry_Maincent?=
+ <kory.maincent@bootlin.com>, Oleksij Rempel <o.rempel@pengutronix.de>
+References: <20240911212713.2178943-1-maxime.chevallier@bootlin.com>
+ <20240911212713.2178943-2-maxime.chevallier@bootlin.com>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <20240911212713.2178943-2-maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---0000000000006dd4320621f0490b
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 9/11/24 14:27, Maxime Chevallier wrote:
+> The 802.3 specifications describes the isolation mode as setting the
+> PHY's MII interface in high-impedance mode, thus isolating the PHY from
+> that bus. This effectively breaks the link between the MAC and the PHY,
+> but without necessarily disrupting the link between the PHY and the LP.
+> 
+> This mode can be useful for testing purposes, but also when there are
+> multiple PHYs on the same MII bus (a case that the 802.3 specification
+> refers to).
+> 
+> In Isolation mode, the PHY will still continue to respond to MDIO
+> commands.
+> 
+> Introduce a helper to set the phy in an isolated mode.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-On Thu, Sep 12, 2024 at 11:13=E2=80=AFAM Joe Damato <jdamato@fastly.com> wr=
-ote:
->
-> On Thu, Sep 12, 2024 at 11:04:02AM -0700, Michael Chan wrote:
-> > Looks good, but why not just add netif_napi_set_irq() to the existing
-> > loop in tg3_napi_init()?  It will reduce the lines of code a bit.
-> > Thanks.
->
-> I made a separate function because:
->   - tg3_napi_init would need two calls (once for i=3D0, and once in
->     the loop), and
->   - tg3_napi_init and tg3_napi_enable are separated in the driver,
->     so I figured I'd separate the IRQ linking, too.
->
+Not sure where that comment belongs so I will put it here, one thing 
+that concerns me is if you have hardware that is not strapped to be 
+isolated by default, and the PHY retains the state configured by Linux, 
+such that the PHY is in isolation mode. A boot loader that is not 
+properly taking the PHY out of isolation mode would be unavailable to 
+use it and that would be a bug that Linux would likely be on the hook to 
+fix.
 
-tg3_napi_enable() needs to be separated because it is called in
-multiple places and tg3_napi_init() is only called once.
-
-Even with 2 calls in tg3_napi_init(), I think it will still reduce the
-lines of code.  Or we can do this to do everything in the loop:
-
-for (i =3D 0; i < tp->irq_cnt; i++) {
-        netif_napi_add(tp->dev, &tp->napi[i].napi, i ? tg3_poll_msix :
-tg3_poll);
-        netif_set_napi_irq(...);
-}
-
---0000000000006dd4320621f0490b
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIO442C4aW8iBNsUP9ZypAKTOAJy4acwB
-5Dyw5cfSFKK+MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDkx
-MjE4MjkyOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCNSzaidbh1UurJg9ubfIEL16GZhdYLQWYxm0vkFsnFsbJROoug
-QW2TNRQz2+Ja0mUjmHn0z6sqb2J+WqScH+E1kXCO4l6krQ8wzBf3qKQA6bf6li3tVWNMq9UIVECf
-Cli5daPuKwGyriGLZYr5lAwyOvVtRrBsJt6h/6zE+8c0Oi0oOxBfONDWWYeGzwblm/zczfgv59bw
-M6RZOiBA1w2lpz7StlPjGscfs3k1gD4KShMfEabWcXESiaxZN87GEAl7C4Dki5fyyIAJM+Qgtk1o
-APqNUk2CDQrRkQQiDy6a7RXUthl3k20w0LLapBPzds753By6igG5b3C76T+Ud1cV
---0000000000006dd4320621f0490b--
+Would recommend adding a phy_shutdown() method which is called upon 
+reboot/kexec and which, based upon a quirk/flag can ensure that the 
+isolation bit is cleared.
+-- 
+Florian
 
