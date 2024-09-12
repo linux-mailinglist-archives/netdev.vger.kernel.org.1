@@ -1,135 +1,129 @@
-Return-Path: <netdev+bounces-127856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70EA5976E44
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:56:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F63976E47
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:58:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E47BEB22890
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:56:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 437611C231B5
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:58:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9991AE845;
-	Thu, 12 Sep 2024 15:56:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 442BC1AD25F;
+	Thu, 12 Sep 2024 15:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A9gI7mt5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230E91898F8;
-	Thu, 12 Sep 2024 15:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39281898F8;
+	Thu, 12 Sep 2024 15:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726156610; cv=none; b=VakQXOLjqfJoXsMiIrtb6iBXbiTi7DQvhK2lgld8/hGphpK8MVfxFRxATRtHgRD/s62TDovhTgvMbvVPSAg1sqsMN69cCc1xr/AWkop6MFReilxtpzLEM0xRkpxDjQu0YWYAoASItPgJPCvqXPhlcHJwIHHKVIiA1xCR85eq4BI=
+	t=1726156710; cv=none; b=Xv2wkhvW0LTQiqVXIEORpaitem/rkTOnUP9IywZBb3IlAUkzack2R6KKG/8bhjbhUTMlJAmmUkgmspEpO7DEwltcAxrqgXwpVzciobjSwDgCCx7o4xEUOTMoQ+7DOr8DYbSGKveA6ym7SgrRuV1c/d/mycXjU9XKAFVwb8rBM9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726156610; c=relaxed/simple;
-	bh=g49SySub1/dItFepy17pW9UeExN0v3axhuVwMBKg6Ck=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IizGM+XdEIYBxgJLdM8mnkvJgGtg40pW6CrQ20OWUP4gtX5u5y9rxLNucFWjd3sWsN9FYRjBpNyffGbuAsa7ms4IlNBciDbNQyA92wa6t4ABAsol55jZFVQ57TcNIleDLVObNBI8rPxvZ74rFmlAXDxPiLGClwALlYXrgEJkSjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c3cdba33b0so1319713a12.1;
-        Thu, 12 Sep 2024 08:56:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726156607; x=1726761407;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yGaUXUnd+3YrSKr0uQW+5rH8w8R3hUvGqKU6U5pnEgc=;
-        b=wSfTNMaxsNzsSqBav1cH6Z/wpxhPX8FHaqDum16PbRiWsjJWX4QvpJse6/Yk4ivklq
-         KtsPtMHZNy3yElxLQ/PU6xUw//sGeU62JcZdR0WEEByZqqhxEpiDs5leUDCbTe6pgxsR
-         NJFM201sNzMNMDtYe3PBbZfkfN2bGqn7O5NctUR7tdMRny2sQjAjs2BLbRPz4QU28asp
-         Jt69l4wPY5rfUnU6DHOGYxkCN25CBQFqcFFAy6KxnNF6ZChLcn0F/KF3vErcSNNe6pgr
-         SeB2xL4I1ZC5zaf8iYpHzqTFaXgPjAvTGTSKMznPZd1qHipfxz1/JoT7Y5dw3FvT43l3
-         Yixw==
-X-Forwarded-Encrypted: i=1; AJvYcCUGzeV1AjP1YrHeIagdkYStj36smkC6TyVALLscwvGhZ3SEEbsuKVEXzdTK3XkoZkFdfP0=@vger.kernel.org, AJvYcCVlCIn8hf7/wR2FhIoDbCYS9YAL0/2s22vZRewutrXqmoa2KIPBp8Csw33NJY/tbtMSd9mpy+ESFAfBRVEW@vger.kernel.org, AJvYcCWnMa7FxSkF4gyjEFpxwGkDjyeynpvBlarqqqXPnV1nbRaKPdAXecinFTsf9/HoD4A7apmb+kJq@vger.kernel.org
-X-Gm-Message-State: AOJu0YydK3DRqA3IOhzV3FBrGZ798KoCHGL1jNhaMaZmmRY1+2s/0fYA
-	6Fb3FBgZX30yDBMSJq+Hfj3OPFIrhF/N0qHIf/T1U2htUrMIAI0L
-X-Google-Smtp-Source: AGHT+IFEVLSg4hnq7/mj2dYIi3u+/01S44Pby+SK9xvZ2fN4+LAa4p7Jwb3LPSybIGLkNSik8PPO2g==
-X-Received: by 2002:a05:6402:3510:b0:57c:c166:ba6 with SMTP id 4fb4d7f45d1cf-5c413e2000fmr2150556a12.19.1726156606522;
-        Thu, 12 Sep 2024 08:56:46 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd8c4c6sm6668081a12.86.2024.09.12.08.56.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 08:56:45 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	bpf@vger.kernel.org,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: vadim.fedorenko@linux.dev,
-	andrii@kernel.org,
-	netdev@vger.kernel.org (open list:BPF [NETKIT] (BPF-programmable network device)),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] netkit: Assign missing bpf_net_context
-Date: Thu, 12 Sep 2024 08:56:19 -0700
-Message-ID: <20240912155620.1334587-1-leitao@debian.org>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1726156710; c=relaxed/simple;
+	bh=1Ko5Dls2c1hX5w2NRaDx//iGt1OVI1HCAjuDj8EumLI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qXArTx8eDhqPQbZKkr9DeAfEN7KRt1EMI7oHWpZAimnezPfemZ+QsE+DtOTD4xLXH9q4C89lrPQQG/dqkzs6YAlWgUl/q2hgaJqTxXqIZubhPPFKcs9c0F/78zWyVzhN+hBkBefo6pWRN9iy20SEsrP8UbI6YzhlCP+lBBJoPQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A9gI7mt5; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IVv1rGK6/cvSY2NOa9yHoyQQRJMjdh5Sedz2/XGUvsw=; b=A9gI7mt58YP+mQ4LWZMeYkziIy
+	rxehZaiam3eGsSZ8JwZd7ITzJmGHQ2vuMs19suQBw/eofyF3bIhGz94r4jqlRzY3YxGNPHCg/wPCu
+	3QTmUxu5gVFq8zoSMM7bicyWCJ2kgY0IF6g1K+042uMjIZCZjB9HP9vJkuaJwfPQFXYg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1somD0-007JzN-F8; Thu, 12 Sep 2024 17:58:14 +0200
+Date: Thu, 12 Sep 2024 17:58:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ronnie.Kunin@microchip.com
+Cc: Raju.Lakkaraju@microchip.com, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Bryan.Whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
+	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
+	Steen.Hegelund@microchip.com, Daniel.Machon@microchip.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next V2 1/5] net: lan743x: Add SFP support check flag
+Message-ID: <ad0813aa-1a11-4a26-8bc7-528ef51cf0c2@lunn.ch>
+References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
+ <20240911161054.4494-2-Raju.Lakkaraju@microchip.com>
+ <a40de4e3-28a9-4628-960c-894b6c912229@lunn.ch>
+ <ZuKKMIz2OuL8UbgS@HYD-DK-UNGSW21.microchip.com>
+ <e5e4659c-a9e2-472b-957b-9eee80741ccf@lunn.ch>
+ <PH8PR11MB7965848234A8DF14466E49C095642@PH8PR11MB7965.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH8PR11MB7965848234A8DF14466E49C095642@PH8PR11MB7965.namprd11.prod.outlook.com>
 
-During the introduction of struct bpf_net_context handling for
-XDP-redirect, the netkit driver has been missed, which also requires it
-because NETKIT_REDIRECT invokes skb_do_redirect() which is accessing the
-per-CPU variables. Otherwise we see the following crash:
+> > > > > +     if (adapter->is_pci11x1x && !adapter->is_sgmii_en &&
+> > > > > +         adapter->is_sfp_support_en) {
+> > > > > +             netif_err(adapter, drv, adapter->netdev,
+> > > > > +                       "Invalid eeprom cfg: sfp enabled with sgmii disabled");
+> > > > > +             return -EINVAL;
+> > > >
+> > > > is_sgmii_en actually means PCS? An SFP might need 1000BaseX or
+> > > > SGMII,
+> > >
+> > > No, not really.
+> > > The PCI11010/PCI1414 chip can support either an RGMII interface or an
+> > > SGMII/1000Base-X/2500Base-X interface.
+> > 
+> > A generic name for SGMII/1000Base-X/2500Base-X would be PCS, or maybe SERDES. To me, is_sgmii_en
+> > means SGMII is enabled, but in fact it actually means SGMII/1000Base-X/2500Base-X is enabled. I just
+> > think this is badly named. It would be more understandable if it was is_pcs_en.
+> > 
+> > > According to the datasheet,
+> > > the "Strap Register (STRAP)" bit 6 is described as "SGMII_EN_STRAP"
+> > > Therefore, the flag is named "is_sgmii_en".
+> > 
+> > Just because the datasheet uses a bad name does not mean the driver has to also use it.
+> > 
+> >         Andrew
+> 
+> The hardware architect, who is a very bright guy (it's not me :-), just called the strap SGMII_EN in order not to make the name too long and to contrast it with the opposite polarity of the bit which means the interface is set to RGMII; but in the description of the strap he clearly stated what it is:
+> 	SGMII_EN_STRAP
+> 	0 = RGMII
+> 	1 = SGMII / 1000/2500BASE-X
+> 
+> I don't think PCS or Serdes (both of which get used in other technologies - some of which are also included in this chip and are therefore bound to create even more confusion if used) are good choices either.
 
-	BUG: kernel NULL pointer dereference, address: 0000000000000038
-	bpf_redirect()
-	netkit_xmit()
-	dev_hard_start_xmit()
+SERDES i understand, PCI itself is a SERDES. But what are the other
+uses of PCS? At least in the context of networking, PCS is reasonably
+well understood.
 
-Set the bpf_net_context before invoking netkit_xmit() program within the
-netkit driver.
+> That being said, if it makes it more we can certainly call this flag "is_sgmii_basex_en". How's that sound ?
 
-Fixes: 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Acked-by: Daniel Borkmann <daniel@iogearbox.net>
-Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- drivers/net/netkit.c | 3 +++
- 1 file changed, 3 insertions(+)
+Better. But i still think PCS is better.
 
-diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-index 16789cd446e9..3f4187102e77 100644
---- a/drivers/net/netkit.c
-+++ b/drivers/net/netkit.c
-@@ -65,6 +65,7 @@ static struct netkit *netkit_priv(const struct net_device *dev)
- 
- static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
- {
-+	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
- 	struct netkit *nk = netkit_priv(dev);
- 	enum netkit_action ret = READ_ONCE(nk->policy);
- 	netdev_tx_t ret_dev = NET_XMIT_SUCCESS;
-@@ -72,6 +73,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
- 	struct net_device *peer;
- 	int len = skb->len;
- 
-+	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
- 	rcu_read_lock();
- 	peer = rcu_dereference(nk->peer);
- 	if (unlikely(!peer || !(peer->flags & IFF_UP) ||
-@@ -110,6 +112,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
- 		break;
- 	}
- 	rcu_read_unlock();
-+	bpf_net_ctx_clear(bpf_net_ctx);
- 	return ret_dev;
- }
- 
--- 
-2.43.5
+But you need to look at the wider context:
 
+> > > > > +                       "Invalid eeprom cfg: sfp enabled with sgmii disabled");
+
+SGMII is wrong here as well. You could flip it around:
+
+> > > > > +                       "Invalid eeprom cfg: sfp enabled with RGMII");
+
+In terms of reviewing this code, i have to ask myself the question,
+does it really mean SGMII when it says SGMII? When you are talking
+about Base-T, i don't know of any 1000BaseX PHYs, so you can be sloppy
+with the term SGMII. But as soon as SFPs come into the mix, SGMII vs
+1000BaseX becomes important, so you want the code to really mean SGMII
+when it says SGMII.
+
+     Andrew
 
