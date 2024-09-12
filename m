@@ -1,127 +1,117 @@
-Return-Path: <netdev+bounces-127791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7878C9767E4
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 13:29:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC57F9767F2
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 13:33:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A84A285DF8
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 11:29:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19DCE1C20E35
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 11:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191371A3A9F;
-	Thu, 12 Sep 2024 11:27:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7CE18A6A9;
+	Thu, 12 Sep 2024 11:33:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z/aOsJmn"
+	dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b="a+bSlcPc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail.avm.de (mail.avm.de [212.42.244.119])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4CB1A3A96;
-	Thu, 12 Sep 2024 11:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35BA1339BC;
+	Thu, 12 Sep 2024 11:33:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.42.244.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726140426; cv=none; b=nfQlXQ9gH5OFaBgo2+5ayqJIurBjzhyK4loHKzbE0fxIFeP+Q/IZB4c3uCYRJ0yzHEmQZnB+VAJRGE9puTRH/64ZQwgpVEauhwiUOUEXETYiMpdCB1iV8iPpp5CtISDw1m+Q6nNRJUjB0WE7iO2IS5dM+3ie9whNqKD9EI4TYB4=
+	t=1726140825; cv=none; b=aywKes6Z1FWvYuhMXxtjDhLcXVbUetlEtAug6he5Qtqg2F9j5M05y4zAxFDQxskAr6hK5jr15vy/ydLrEJCaCe+ZMRyJ5M6iFUfkbVBfJRDKg+3W5Pd5MA/TCB37en7rjeORHv/XfoKewESY/FvH0eBc3HJNEOVTN1kqphe1nek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726140426; c=relaxed/simple;
-	bh=DxB0YhCPzaPYBjQ9+N/1u7xN+x8IRRQdqUxm0evMBYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CUuMAdOxgWctHiOCGLFC3cG9QbxG0wImr1e/EW26RmInRjrk/vZnDiDBqOUzYOz5/RdmjO1bUUJ6XXXMoQTm14cEpuy7BWzAlclxWhtqbpt2FIHGnfwQjKe1fJvCQcAlRimbuJ5iez8iSHQryXU6c2FaqSDeSQFBq8PVZP+qgcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z/aOsJmn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D977C4CEC3;
-	Thu, 12 Sep 2024 11:27:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726140425;
-	bh=DxB0YhCPzaPYBjQ9+N/1u7xN+x8IRRQdqUxm0evMBYg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z/aOsJmnj2Bx64Zta36HlSZAgYOHdmte+dVZz4gI8eTIJTpkCSL9xXCW1Z2WiBrB5
-	 u9hcjhYkJklF0KFaEQtG9lOFYF+mVUKS5d3uqOnaF9THczGdqmDcdLvaKpor/HNLT4
-	 WDi65//nt90DhqVNPDbmEVKiKxKBHLDC4Tw6HX5iXWP06pFSNZBa5erqiHl01tDNpA
-	 FTvi3scVb1g8S2wCX9scBMQJogrcWAJtuqlGijcCCqv4kz5FfXEt4PiHWXB63hTA/L
-	 orhbqyHYdjXn9Csn4Sb5raTmLFs+Kh/ncIkdnhf6t+dDHq+RN14UypM+b5rk7v0aY3
-	 ruexj/MPkBYpQ==
-Date: Thu, 12 Sep 2024 12:27:00 +0100
-From: Simon Horman <horms@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
-	linux-omap@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH net-next 3/3] net: ethernet: ti: cpsw_ale: Remove unused
- accessor functions
-Message-ID: <20240912112700.GK572255@kernel.org>
-References: <20240910-ti-warn-v1-0-afd1e404abbe@kernel.org>
- <20240910-ti-warn-v1-3-afd1e404abbe@kernel.org>
- <78b4ca2a-9448-4451-8e25-c57306af38e9@kernel.org>
- <20240912085929.GF572255@kernel.org>
- <97c7665c-d05f-4363-94c6-9ce89921096a@kernel.org>
+	s=arc-20240116; t=1726140825; c=relaxed/simple;
+	bh=0qyj5L1lY3J+eSYHvtfw7NpUKHPg++eN0xabTIOhBAc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g2h/Kvyosfzn3MCaC2GPrNzU1Bp8D18J6pbxSbatMkSttz8/6NmLKuyWMX/bJGrYTRRuZ3b2BKooRw1ZKfMkDa9BsCiyXhl6H5qt4WS0dNf6Fl/QV2/4h2VFn5wkAdN19TFQEMdQK9Mv56yk1cF4b6guL4kU6eNj+eYLqaz5xXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de; spf=pass smtp.mailfrom=avm.de; dkim=pass (1024-bit key) header.d=avm.de header.i=@avm.de header.b=a+bSlcPc; arc=none smtp.client-ip=212.42.244.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=avm.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=avm.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=avm.de; s=mail;
+	t=1726140820; bh=0qyj5L1lY3J+eSYHvtfw7NpUKHPg++eN0xabTIOhBAc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=a+bSlcPcvguA1OteUakBVxlz5axiVCjjAWURY36WTof4YAA5nk84R4tZqAY+8ZsK4
+	 epgZL0saapGxzjaKhtmZO46IliYFqfBanmL0RsyvqfZoFZIxfOfkQU/aYfmeLTekYn
+	 HtNRSm7rIV2fnqGwAMxZHcXeiF8WkEOKBVKVDXwg=
+Received: from mail-auth.avm.de (dovecot-mx-01.avm.de [212.42.244.71])
+	by mail.avm.de (Postfix) with ESMTPS;
+	Thu, 12 Sep 2024 13:33:40 +0200 (CEST)
+Message-ID: <9b245c1e-997a-4224-a819-3a3f1aee8b3f@avm.de>
+Date: Thu, 12 Sep 2024 13:33:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <97c7665c-d05f-4363-94c6-9ce89921096a@kernel.org>
+Subject: Re: [PATCH RFC] net: bridge: drop packets with a local source
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov
+ <razor@blackwall.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, jnixdorf-oss@avm.de,
+ bridge@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240911125820.471469-1-tmartitz-oss@avm.de>
+ <210e3e45-21b3-4cbe-9372-297f32cf6967@lunn.ch>
+Content-Language: de-DE, en-US
+From: tmartitz-oss <tmartitz-oss@avm.de>
+In-Reply-To: <210e3e45-21b3-4cbe-9372-297f32cf6967@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-purgate-ID: 149429::1726140820-E259D885-C8B33756/0/0
+X-purgate-type: clean
+X-purgate-size: 1746
+X-purgate-Ad: Categorized by eleven eXpurgate (R) http://www.eleven.de
+X-purgate: This mail is considered clean (visit http://www.eleven.de for further information)
+X-purgate: clean
 
-On Thu, Sep 12, 2024 at 01:54:45PM +0300, Roger Quadros wrote:
-> 
-> 
-> On 12/09/2024 11:59, Simon Horman wrote:
-> > On Thu, Sep 12, 2024 at 10:07:27AM +0300, Roger Quadros wrote:
-> >> Hi Simon,
-> >>
-> >> On 10/09/2024 10:17, Simon Horman wrote:
+Hello Andrew,
 
-...
+Am 11.09.24 um 18:33 schrieb Andrew Lunn:
+> On Wed, Sep 11, 2024 at 02:58:17PM +0200, Thomas Martitz wrote:
+>> Currently, there is only a warning if a packet enters the bridge
+>> that has the bridge's or one port's MAC address as source.
+>>
+>> Clearly this indicates a network loop (or even spoofing) so we
+>> generally do not want to process the packet. Therefore, move the check
+>> already done for 802.1x scenarios up and do it unconditionally.
+> Does 802.1d say anything about this?
+>
+> Quoting the standard gives you a strong case for getting the patch
+> merged.
 
-> >>>  	ALE_ENT_VID_MEMBER_LIST = 0,
-> >>>  	ALE_ENT_VID_UNREG_MCAST_MSK,
-> >>> @@ -217,14 +229,14 @@ static const struct ale_entry_fld vlan_entry_k3_cpswxg[] = {
-> >>>  
-> >>>  DEFINE_ALE_FIELD(entry_type,		60,	2)
-> >>>  DEFINE_ALE_FIELD(vlan_id,		48,	12)
-> >>> -DEFINE_ALE_FIELD(mcast_state,		62,	2)
-> >>> +DEFINE_ALE_FIELD_SET(mcast_state,	62,	2)
-> >>
-> >> I don't understand why we need separate macros for GET and SET.
-> >> The original intent was to use one macro for both.
-> >>
-> >> Otherwise we will have to add DEFINE_ALE_FIELD/1_SET to all the fields.
-> > 
-> > Hi Roger,
-> > 
-> > Sorry for not being clearer.
-> > 
-> > My intent was to avoid declaring functions that are never used.
-> > Perhaps it is best explained by some examples.
-> > 
-> > In the case of mcast_state, the compiler flags that the get accessor is
-> > never used. The intent is of this patch addresses that by declaring the set
-> > accessor for mcast_state. Likewise for other similar cases.
-> > 
-> > OTOH, in the case of, f.e. vlan_id, the set and get accessor functions are
-> > both used, and DEFINE_ALE_FIELD continues to be used to define them both.
-> > DEFINE_ALE_FIELD is implemented as the combination of _SET and _GET.
-> > 
-> 
-> Thanks for the explanation Simon. I understand now.
-> 
-> Would using __maybe_unused__ be preferable to get rid of the warnings?
-> That way we don't need to care if both set/get helpers are used or not
-> and don't have to touch the below code ever again except to add new fields.
+I have 802.1q, the successor to 802.1d, at hand. It's a large document 
+and I haven't read
+all the details yet. From a coarse reading I get the impression that a 
+bridge entity could
+chose to filter such frames (based on "Filter Database" information 
+which translates to our
+BR_FDB_LOCAL flag), or forward to potential ports.
 
-Thanks Roger,
+If we say we still want to forward these frames, that would probably be 
+OK. The main
+purpose of the patch is to avoid local processing of IGMP and other 
+stuff. So at a minimum
+we must avoid passing the frame up the stack and IGMP/MLD snooping code 
+in addition
+to the current handling (which is limited to avoiding to update the FDB).
 
-IMHO, it is nicer to not declare them at all.  But I do get your point and
-I'm happy to try that approach if you prefer it.
+However, I have a hard time to imagine legitimate cases of forwarding a 
+frame again
+that we obviously send out earlier. This is not helpful to our overall 
+goal to stop storms when
+customers manage to make loops in their networks (remember that we build 
+routers
+for end-user homes and loops are a constant source of problem reports).
 
-...
+Dropping on ingress is, in my opinion, also the better response to MAC 
+spoofers on the network.
+
+Best regards.
+
+
 
