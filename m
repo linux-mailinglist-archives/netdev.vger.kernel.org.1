@@ -1,133 +1,193 @@
-Return-Path: <netdev+bounces-127966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0FB49773CA
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 23:49:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C65469773E5
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 23:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A3912836C4
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 21:49:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F230285E77
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 21:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33BA1ACDE8;
-	Thu, 12 Sep 2024 21:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BD811C230A;
+	Thu, 12 Sep 2024 21:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y6XLh57h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JvlEuMEP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F81A5F
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 21:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057FFA5F
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 21:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726177773; cv=none; b=Li1A6rwkkq6sLxuiqk0tMe25KrSB8DSBZuflAnpyjMR5zIWsCgmjwHDIAveCxHpJ33lPYW/GdVcd+Ct900TuLIy2wE2R7zjGTb1lnXOYthnY9bF0pJhODTQelIsLo00orlIDDcPlgJ2jKYEhvomMe3BNb0iwmuhG73MAgKftbKw=
+	t=1726177989; cv=none; b=hcorxBhP+E74M989gAwQ/nk2wrSEfgS1Fa9vPGTcsyqqBOlPh0oQn58f2WHFvsI1Vb4bTxdx5Gjo8yXBmYMW2khKzBzJRJh5UdCc+IMtNVsYdr+yOtFzWTrkRb0OwzFiee+2+GSZuLyjGC86a6TD9fM7yfyoVWqMJs1dEcdB6Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726177773; c=relaxed/simple;
-	bh=okHn4jO2CopvmI3B3YN/dcfyRYalvqUjcRs7l+mEffk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ijv4V4H7kpMOhta+FBdUHepW8nuUkm8s4m2sgDql1gsN9kH2f3Eu7hmYNALT3EsOM2MVec9AWuTrh+F5a3Dq1UH9kud2JFZ6T/JZW267Iwgp0SMZWAXji2KpQyS0xrDHiGw5UIEkGq2TQ8SFrHvjEHrxjRL5z5upDClVJ+JgS8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y6XLh57h; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-206bd1c6ccdso2339085ad.3
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 14:49:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726177771; x=1726782571; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3/+Zn9RYfbejd/vHg+oD6L2xyTe6Qu7GQBKxalBy+ls=;
-        b=Y6XLh57hh1qGV+OcA+lXNZoaa31qzdEskbpxBMLo9SJPBQJPeZV4B6Tc7B3y7Hr2C5
-         ELXjJyWDbz8MOplVQGsJ7hHyln9zh5j0N6FBAVwt2ftVIGMd4bkbszH8c4Uckw2kWeSY
-         HObvSne3eh1U4GyLGiAkRMRJl8mDyC/fbJO6GouZyclGhYbp8i3Yg+PvYn0b7H/NgBLw
-         BR+rkNt6b/mykPjvoOP5o7Rn5HPdZ5kM6kMWCaVbGAvmDZERQTq7h0I453rF5B/UNtU4
-         Wl9y+poCpAR57o0cuW9SwIPWL7TWhcDWBeHaXx4KHVM/vPUmRucH08DwfflpqkgDOgwU
-         kXRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726177771; x=1726782571;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3/+Zn9RYfbejd/vHg+oD6L2xyTe6Qu7GQBKxalBy+ls=;
-        b=Rc8VxqBhQ9A6iDj0lxXcbrOaxuIm0rNtQFwZPRv/0oYtjf9nxrDe43uerIxs8vRj8g
-         dGxVe1I3s9pVWJflcuuBh2W9WIZoPmO8d+lUypuxG/Td/O2+5qmd/CZbtEPW22WvglVt
-         Ktl8p/0Xm22doUYltaYaxkejmEfOUyB8x1YOp+NVByichMZWuTr7x5qKbNzsn3SoiSgb
-         4HmnSRJ+Ns/XwKnFjcI9RvdARg7VSHpHsAemDdCe7tNnnECD0BBnHeYiudTc3hGagJbX
-         Lr6k3wd9ZCK/noIjPjoDAMUlJyn0VgVON4x7noV2gj2dMy4Ze6ZbFxC954/VNop07U9R
-         wEHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUixN7ie13TkMEMsNqOFnFsbfNas1TuLpHbJLr7zYDjSKHySas7BOHp+RkWv3pgDBgOxcE4MSo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9aHiJC5+rDMCQLFr7VgWevgjpOLLKHdQfcii78W1bQZHhAK/x
-	/ROBCSV1q3ty0aQxe+QlzQjTZWunEFLOhexpXKYmFN+UK+5NEZM=
-X-Google-Smtp-Source: AGHT+IFMmw5DnQT/CefJSBASW8MEMsW95FahM6B1ZzfNA3KqTIyJLfcH5HsXYDF4T3OQLd5J+94BZw==
-X-Received: by 2002:a17:902:e852:b0:203:a14d:ed0 with SMTP id d9443c01a7336-20781b42d61mr8816205ad.11.1726177770829;
-        Thu, 12 Sep 2024 14:49:30 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076b009742sm18237795ad.263.2024.09.12.14.49.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 14:49:30 -0700 (PDT)
-Date: Thu, 12 Sep 2024 14:49:29 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next 05/13] selftests: ncdevmem: Unify error handling
-Message-ID: <ZuNh6alWd1U1ZQLY@mini-arch>
-References: <20240912171251.937743-1-sdf@fomichev.me>
- <20240912171251.937743-6-sdf@fomichev.me>
- <CAHS8izP7MENG+q3y00LbAhzkP9yuLkC6NV3Bs77aQ5nw6YK4AA@mail.gmail.com>
+	s=arc-20240116; t=1726177989; c=relaxed/simple;
+	bh=M02Yp/++Q6/PamqLiLH8hwVR7m4vnsgGb1d97TzsVqg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DNaM67tHDPIl920eL2pMEXhRzhYeBylVn7sQHx51naoVe/U8A6Moq95LHscO/5tkmYBswxwDjrLRtpVdHFgP7+ZF5NHWT5r0TPTMIsCbHai029CcI+eymCy4D5cDepe/mrxwvkq8iquaBxEcC30smAs49Xzfae35JGE0lyT+1g0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JvlEuMEP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A23BC4CEC3;
+	Thu, 12 Sep 2024 21:53:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726177988;
+	bh=M02Yp/++Q6/PamqLiLH8hwVR7m4vnsgGb1d97TzsVqg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JvlEuMEPjjB9b31nhcgcJxAOvxwKcPOhRqD50LMyqGLOEoEKtAP9kKKgq+TkgzjO4
+	 TZPjCEWq1xg7eeXBEPfQyRmvcTvSTTRKpppc7LrshTCmxdmZUyX5LkHAAVuBGfzLKh
+	 dQdjjYykXgxbcJ1rRqMBKpJQqx0qvWyiOE+Y5Fj6XcV0FiSSI7tzdf4JML2rLgtOxF
+	 esu9lmBSUQMYEA4LZKDh4eX7BSZjyUO84wDIzcKdxRie92/250KasSl7JQNoWVkr1W
+	 IA0lhInWX4ke+LMjHkzXcev+Enh1R1F/fgJ9HaorVwI3xvxD+yrbwesMiaLDwOIMMg
+	 KbCPPqSYFH8Zw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us
+Subject: [PATCH net-next] net: sched: cls_api: improve the error message for ID allocation failure
+Date: Thu, 12 Sep 2024 14:53:06 -0700
+Message-ID: <20240912215306.2060709-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izP7MENG+q3y00LbAhzkP9yuLkC6NV3Bs77aQ5nw6YK4AA@mail.gmail.com>
 
-On 09/12, Mina Almasry wrote:
-> On Thu, Sep 12, 2024 at 10:13 AM Stanislav Fomichev <sdf@fomichev.me> wrote:
-> >
-> > There is a bunch of places where error() calls look out of place.
-> > Use the same error(1, errno, ...) pattern everywhere.
-> >
-> > Cc: Mina Almasry <almasrymina@google.com>
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> > ---
-> >  tools/testing/selftests/net/ncdevmem.c | 12 ++++++------
-> >  1 file changed, 6 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
-> > index a20f40adfde8..c0da2b2e077f 100644
-> > --- a/tools/testing/selftests/net/ncdevmem.c
-> > +++ b/tools/testing/selftests/net/ncdevmem.c
-> > @@ -332,32 +332,32 @@ int do_server(struct memory_buffer *mem)
-> >
-> >         ret = inet_pton(server_sin.sin_family, server_ip, &server_sin.sin_addr);
-> >         if (socket < 0)
-> > -               error(79, 0, "%s: [FAIL, create socket]\n", TEST_PREFIX);
-> > +               error(1, 0, "%s: [FAIL, create socket]\n", TEST_PREFIX);
-> >
-> >         socket_fd = socket(server_sin.sin_family, SOCK_STREAM, 0);
-> >         if (socket < 0)
-> > -               error(errno, errno, "%s: [FAIL, create socket]\n", TEST_PREFIX);
-> > +               error(1, errno, "%s: [FAIL, create socket]\n", TEST_PREFIX);
-> >
-> 
-> To be honest this was a bit intentional. For example here, I want to
-> see what errno socket() failed with; it's a clue to why it failed.
-> 
-> I guess you're not actually removing that, right? You're making the
-> return code of ncdevmem 1, but it will still print the errno of the
-> subfailure? That sounds fine.
-> 
-> Isn't it a bit more standard for the sub errno to be the return of the
-> parent process. But not opposed. If you think this is better we can go
-> for it.
+We run into an exhaustion problem with the kernel-allocated filter IDs.
+Our allocation problem can be fixed on the user space side,
+but the error message in this case was quite misleading:
 
-Yes, this will still print the correct errno.
+  "Filter with specified priority/protocol not found" (EINVAL)
+
+Specifically when we can't allocate a _new_ ID because filter with
+lowest ID already _exists_, saying "filter not found", is confusing.
+
+Kernel allocates IDs in range of 0xc0000 -> 0x8000, giving out ID one
+lower than lowest existing in that range. The error message makes sense
+when tcf_chain_tp_find() gets called for GET and DEL but for NEW we
+need to provide more specific error messages for all three cases:
+
+ - user wants the ID to be auto-allocated but filter with ID 0x8000
+   already exists
+
+ - filter already exists and can be replaced, but user asked
+   for a protocol change
+
+ - filter doesn't exist
+
+Caller of tcf_chain_tp_insert_unique() doesn't set extack today,
+so don't bother plumbing it in.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: jhs@mojatatu.com
+CC: xiyou.wangcong@gmail.com
+CC: jiri@resnulli.us
+---
+ net/sched/cls_api.c | 27 ++++++++++++++++-----------
+ 1 file changed, 16 insertions(+), 11 deletions(-)
+
+diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
+index 17d97bbe890f..a2e5c7975dda 100644
+--- a/net/sched/cls_api.c
++++ b/net/sched/cls_api.c
+@@ -1932,7 +1932,8 @@ static void tcf_chain_tp_remove(struct tcf_chain *chain,
+ static struct tcf_proto *tcf_chain_tp_find(struct tcf_chain *chain,
+ 					   struct tcf_chain_info *chain_info,
+ 					   u32 protocol, u32 prio,
+-					   bool prio_allocate);
++					   bool prio_allocate,
++					   struct netlink_ext_ack *extack);
+ 
+ /* Try to insert new proto.
+  * If proto with specified priority already exists, free new proto
+@@ -1957,7 +1958,7 @@ static struct tcf_proto *tcf_chain_tp_insert_unique(struct tcf_chain *chain,
+ 	}
+ 
+ 	tp = tcf_chain_tp_find(chain, &chain_info,
+-			       protocol, prio, false);
++			       protocol, prio, false, NULL);
+ 	if (!tp)
+ 		err = tcf_chain_tp_insert(chain, &chain_info, tp_new);
+ 	mutex_unlock(&chain->filter_chain_lock);
+@@ -2017,7 +2018,8 @@ static void tcf_chain_tp_delete_empty(struct tcf_chain *chain,
+ static struct tcf_proto *tcf_chain_tp_find(struct tcf_chain *chain,
+ 					   struct tcf_chain_info *chain_info,
+ 					   u32 protocol, u32 prio,
+-					   bool prio_allocate)
++					   bool prio_allocate,
++					   struct netlink_ext_ack *extack)
+ {
+ 	struct tcf_proto **pprev;
+ 	struct tcf_proto *tp;
+@@ -2028,9 +2030,14 @@ static struct tcf_proto *tcf_chain_tp_find(struct tcf_chain *chain,
+ 	     pprev = &tp->next) {
+ 		if (tp->prio >= prio) {
+ 			if (tp->prio == prio) {
+-				if (prio_allocate ||
+-				    (tp->protocol != protocol && protocol))
++				if (prio_allocate) {
++					NL_SET_ERR_MSG(extack, "Lowest ID from auto-alloc range already in use");
++					return ERR_PTR(-ENOSPC);
++				}
++				if (tp->protocol != protocol && protocol) {
++					NL_SET_ERR_MSG(extack, "Protocol mismatch for filter with specified priority");
+ 					return ERR_PTR(-EINVAL);
++				}
+ 			} else {
+ 				tp = NULL;
+ 			}
+@@ -2043,6 +2050,7 @@ static struct tcf_proto *tcf_chain_tp_find(struct tcf_chain *chain,
+ 		tcf_proto_get(tp);
+ 	} else {
+ 		chain_info->next = NULL;
++		NL_SET_ERR_MSG(extack, "Filter with specified priority/protocol not found");
+ 	}
+ 	return tp;
+ }
+@@ -2311,9 +2319,8 @@ static int tc_new_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+ 
+ 	mutex_lock(&chain->filter_chain_lock);
+ 	tp = tcf_chain_tp_find(chain, &chain_info, protocol,
+-			       prio, prio_allocate);
++			       prio, prio_allocate, extack);
+ 	if (IS_ERR(tp)) {
+-		NL_SET_ERR_MSG(extack, "Filter with specified priority/protocol not found");
+ 		err = PTR_ERR(tp);
+ 		goto errout_locked;
+ 	}
+@@ -2538,9 +2545,8 @@ static int tc_del_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+ 
+ 	mutex_lock(&chain->filter_chain_lock);
+ 	tp = tcf_chain_tp_find(chain, &chain_info, protocol,
+-			       prio, false);
++			       prio, false, extack);
+ 	if (!tp || IS_ERR(tp)) {
+-		NL_SET_ERR_MSG(extack, "Filter with specified priority/protocol not found");
+ 		err = tp ? PTR_ERR(tp) : -ENOENT;
+ 		goto errout_locked;
+ 	} else if (tca[TCA_KIND] && nla_strcmp(tca[TCA_KIND], tp->ops->kind)) {
+@@ -2678,10 +2684,9 @@ static int tc_get_tfilter(struct sk_buff *skb, struct nlmsghdr *n,
+ 
+ 	mutex_lock(&chain->filter_chain_lock);
+ 	tp = tcf_chain_tp_find(chain, &chain_info, protocol,
+-			       prio, false);
++			       prio, false, extack);
+ 	mutex_unlock(&chain->filter_chain_lock);
+ 	if (!tp || IS_ERR(tp)) {
+-		NL_SET_ERR_MSG(extack, "Filter with specified priority/protocol not found");
+ 		err = tp ? PTR_ERR(tp) : -ENOENT;
+ 		goto errout;
+ 	} else if (tca[TCA_KIND] && nla_strcmp(tca[TCA_KIND], tp->ops->kind)) {
+-- 
+2.46.0
+
 
