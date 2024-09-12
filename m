@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-127889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 746E6976F5A
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:13:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27629976F5B
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:13:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A72B51C23AC1
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:13:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59FC91C23AF0
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398881BF7EA;
-	Thu, 12 Sep 2024 17:13:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768DE1BF7F1;
+	Thu, 12 Sep 2024 17:13:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B591BF7E8
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 17:13:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2561BF800
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 17:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726161182; cv=none; b=hh19/TaMDC+owai4PYkCNJFFTF/q8BLAH7/xiwqdPxtEH1aVWQRqGQSrhoi04Bpl8h5IxVxNRAXxPHF+bnJra9pZNvQcqZQp+ea4DHfP6Cnpfnb07Kqpl1VOJ8mf5NveMxg3OvXCwyTxUqxiPD/BUxGc9LYVisRRtxBJkH+ozms=
+	t=1726161183; cv=none; b=EDUm7qeW6MjUIXShPAVXDSWVIpxV6wtL5HREcgY61TwCHeEAAx7c/tmJLqAkk9LVO63hSzYZRIIWIUj5NfsuEtMPyGRQniO8KQAftI99uE4Ut6caaefzMVV5IH4UWbwyN9maEXfJk099L4PdRz5ASvE2+jqJlplfLBoNsIOv66U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726161182; c=relaxed/simple;
-	bh=DVzHYsp76hzKZntoTHzwpHhzyso+ZaOXyFoTe6z5YJ4=;
+	s=arc-20240116; t=1726161183; c=relaxed/simple;
+	bh=LAzwia09eV/4sSpw5mcMv/0gaW8i6IEmagmcjr/4NzM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pv6Z0wQzxmpIW174AVoye89xif4ENcxjhSPpLQj1zC61IVL05uOChWkfD5hxRLGSI3X3vxsJVWL9xj31/0UG/fKoa7GyypuNTdyqAC/P/XTSSHfg25mxWHXhI6MsIyDhGTdl4q+OC8uO6gUJ3BVVeN3dCmaVWQjq/kTHj4L/fY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.175
+	 MIME-Version; b=Bbbcph192O48WHnIYSLJXx8lVU/Dp3HbXrjrrJreyIwp+4F0dT9JLB+Bq4OYfVSj8wCDrkGe3SwZSEmFLG3Spp70y4ByCI47NeTuxBQktOJiTpbA4E0Px7HR3Tnwm1XjTNuQZ1jjEP1KqUkfiIA343Uf9nb1lXoWVoAu+9EDy/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-6e7b121be30so953630a12.1
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 10:13:00 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2059112f0a7so8185ad.3
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 10:13:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726161180; x=1726765980;
+        d=1e100.net; s=20230601; t=1726161181; x=1726765981;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2GrjV5gEwYp3sQT3vkyltKULjMmlJYoJQd5AnCA8UJg=;
-        b=MJvTJPCJO2CYNkIHM0IMJ749Zwhkjr8W9HqDcySCgoh9XrMLkbys1fRG8FMlXcz/Y6
-         gB1rSoJYuoBq2Gciur+OTH+WkkAmPaTBxMDkh93Qx09tW0bVEBeIolnvzKqykg+V8G+b
-         SQpb7mdRAog1DXHQXk8oVevnSFTX4tOs6pIEvpXy7SavSSmAPzKHR8hQMP970/OUHIUI
-         T9gdg3UZQHRrgrw/OpC5YOTW/Nf6AtykzGJjMeo13XLDDlhsItfX0/6TMbFyg3IZBmS8
-         yiWXX3TMYLKegCKhnWHceAAjRWwSM75Bg+KBQmwIMffmqSfWEmlnhRNnWK4IHCygTq4p
-         ivow==
-X-Gm-Message-State: AOJu0Yw0+0dK6eqiA5AXh0O5bcQMhGzCPUd1EVH5JHk/hqh047SDZMeG
-	kDudIsYGpUBBU1ghDBavs+tXarJT+xa5Yp24XxpX9gQVS6LSN5RkHm86
-X-Google-Smtp-Source: AGHT+IGT019AEEyWUlzr95G+Ry5239IM9yBY+lqdvLZiabMV3fC8f3yeGSdbzYRc6DWz+Dfobysqzg==
-X-Received: by 2002:a05:6a21:1813:b0:1cf:6c87:89e5 with SMTP id adf61e73a8af0-1cf764c2b90mr4230693637.48.1726161179742;
-        Thu, 12 Sep 2024 10:12:59 -0700 (PDT)
+        bh=tFrKSN0qGcocZdoBbERENThA5G9MGT7/eNUPdgl7EpE=;
+        b=LmhJxAXfd3WIwajh0b3ZKA18ZTN6u6dMonEBDhx7+BFAZc2lc4jOLMvR90lXMgB1k5
+         CI6VHsT7KwibIKsyPxsGwINxXcV3nm9SJgLYcFQ69ESTRPf2ZJXrnYkOhbtW5K0NLkrP
+         okBVl7QFKFCs0QaNDBUWJkp2vT8l3f2aTNP0shFrmhCR7ylYigUuAy8fCKPrx2/IGQXj
+         0HTEVN9WYWMQIn+B8HarkSw8MyHDTk09CedyfF87MvUxdssCcohLJynaxav2dLR12hgw
+         3DE/NUT02xaXaXSA1uI2dVEBjiHvhd74Wa5kRc84FdFhO5fzmdTxIt+2LI2ufAFObRZZ
+         +Bjg==
+X-Gm-Message-State: AOJu0YxVx6RmG4y0YzED3xVGpCUiQAnhuyKaYQCNqb06gv9tCkJF/WZu
+	H8v9qNfC7fktVC+JDaFy08x+hRDaOzTE7V++bkqjDePTCcV5qtXuz4Zw
+X-Google-Smtp-Source: AGHT+IHkkx1xCurwuETkXacyYdyxpvKtfCyPMJieuvBmVbwrKDeOfaiffEeZmZA39Nw6ytlBZPKKQw==
+X-Received: by 2002:a17:902:dacf:b0:205:8b84:d60c with SMTP id d9443c01a7336-2076e3998damr47573045ad.35.1726161181072;
+        Thu, 12 Sep 2024 10:13:01 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fba4766sm1979878a12.12.2024.09.12.10.12.59
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076af47657sm16500015ad.79.2024.09.12.10.13.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 10:12:59 -0700 (PDT)
+        Thu, 12 Sep 2024 10:13:00 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -59,9 +59,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Mina Almasry <almasrymina@google.com>
-Subject: [PATCH net-next 06/13] selftests: ncdevmem: Remove client_ip
-Date: Thu, 12 Sep 2024 10:12:44 -0700
-Message-ID: <20240912171251.937743-7-sdf@fomichev.me>
+Subject: [PATCH net-next 07/13] selftests: ncdevmem: Remove default arguments
+Date: Thu, 12 Sep 2024 10:12:45 -0700
+Message-ID: <20240912171251.937743-8-sdf@fomichev.me>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240912171251.937743-1-sdf@fomichev.me>
 References: <20240912171251.937743-1-sdf@fomichev.me>
@@ -73,48 +73,69 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-It's used only in ntuple filter, but having dst address/port should
-be enough.
+To make it clear what's required and what's not. Also, some of the
+values don't seem like a good defaults; for example eth1.
 
 Cc: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- tools/testing/selftests/net/ncdevmem.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ tools/testing/selftests/net/ncdevmem.c | 34 +++++++++-----------------
+ 1 file changed, 12 insertions(+), 22 deletions(-)
 
 diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
-index c0da2b2e077f..77f6cb166ada 100644
+index 77f6cb166ada..829a7066387a 100644
 --- a/tools/testing/selftests/net/ncdevmem.c
 +++ b/tools/testing/selftests/net/ncdevmem.c
-@@ -62,7 +62,6 @@
-  */
+@@ -42,30 +42,11 @@
+ #define MSG_SOCK_DEVMEM 0x2000000
+ #endif
  
- static char *server_ip = "192.168.1.4";
--static char *client_ip = "192.168.1.2";
- static char *port = "5201";
+-/*
+- * tcpdevmem netcat. Works similarly to netcat but does device memory TCP
+- * instead of regular TCP. Uses udmabuf to mock a dmabuf provider.
+- *
+- * Usage:
+- *
+- *	On server:
+- *	ncdevmem -s <server IP> -c <client IP> -f eth1 -l -p 5201 -v 7
+- *
+- *	On client:
+- *	yes $(echo -e \\x01\\x02\\x03\\x04\\x05\\x06) | \
+- *		tr \\n \\0 | \
+- *		head -c 5G | \
+- *		nc <server IP> 5201 -p 5201
+- *
+- * Note this is compatible with regular netcat. i.e. the sender or receiver can
+- * be replaced with regular netcat to test the RX or TX path in isolation.
+- */
+-
+-static char *server_ip = "192.168.1.4";
+-static char *port = "5201";
++static char *server_ip;
++static char *port;
  static int start_queue = 8;
  static int num_queues = 8;
-@@ -228,8 +227,8 @@ static int configure_channels(unsigned int rx, unsigned int tx)
+-static char *ifname = "eth1";
++static char *ifname;
+ static unsigned int ifindex;
+ static unsigned int dmabuf_id;
  
- static int configure_flow_steering(void)
- {
--	return run_command("sudo ethtool -N %s flow-type tcp4 src-ip %s dst-ip %s src-port %s dst-port %s queue %d >&2",
--			   ifname, client_ip, server_ip, port, port, start_queue);
-+	return run_command("sudo ethtool -N %s flow-type tcp4 dst-ip %s dst-port %s queue %d >&2",
-+			   ifname, server_ip, port, start_queue);
- }
+@@ -573,6 +554,15 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
  
- static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
-@@ -553,9 +552,6 @@ int main(int argc, char *argv[])
- 		case 's':
- 			server_ip = optarg;
- 			break;
--		case 'c':
--			client_ip = optarg;
--			break;
- 		case 'p':
- 			port = optarg;
- 			break;
++	if (!server_ip)
++		error(1, 0, "Missing -s argument\n");
++
++	if (!port)
++		error(1, 0, "Missing -p argument\n");
++
++	if (!ifname)
++		error(1, 0, "Missing -f argument\n");
++
+ 	ifindex = if_nametoindex(ifname);
+ 
+ 	for (; optind < argc; optind++)
 -- 
 2.46.0
 
