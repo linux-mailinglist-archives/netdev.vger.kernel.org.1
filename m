@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-127727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85E729763F5
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 10:06:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5856B97640A
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 10:07:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B883C1C208B5
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:06:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 600B41C22EFE
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:07:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A494C1925A8;
-	Thu, 12 Sep 2024 08:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96C1191F62;
+	Thu, 12 Sep 2024 08:06:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E2E190665
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 08:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7277418F2FB
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 08:06:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726128379; cv=none; b=pHP3PeahXBTJ8CowL5/iFrXfnP/FFrxZaFiBk33qWGsU127Uqd75g3C42QnTMMdI5KpjFtVDwfkd+OeV2d8AKGwhlEoRRW41p2FxOIqe13k53WV85SYYwUsSdnGC3YwFmX8Wt/FlGkhFyefOeU5X97bqsB87gBWP6mrQoEvECKk=
+	t=1726128396; cv=none; b=rsSiPAPPo6sk8W4ZNGPnzsE/+N6aR4a1Hxh3BcA4BGlldvSkQmYv984Nz89/Ktv37bgHU9VQ76yknm+6Dl/aAW/U2396auefk+wIe5ZrDfkq5xsZD3jk/l4BiibQ2bJG/vYWuEBYKosSB2V9wPC/WJhz33JsvyZcwf5htKFu7wA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726128379; c=relaxed/simple;
-	bh=8MZSrcJZ4j6ERG43xGYW02k1WDzKj2clsxG6RrsaDlw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GzLxJM9GK6i8bUotEKzjXgQY/8REoXFZAQMHKzcznJH8g+tBCUEHGdza7h0VGWGtDzKd1LpmzdExLxBQYeGGOExtbXfdi+k3ZEB6f3gOdGeqzBSbawZpBfpgn2OuiQfZTsAnhRdkfCssnVrEsz/mLCCOp5BfiIJHp+wCdBfnzmU=
+	s=arc-20240116; t=1726128396; c=relaxed/simple;
+	bh=yo6ClgrrYtZtJj0pgLHxHUjiwKMsQVS4UyGqBqyc2Ic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C9Wo+gjE49ZszlcQvnM46eAnH3aB7+2bvi+P3AH3CCMRetR2c2egb5+RCyrlSW9DVhbDjKt1Hz7qVZ7dyQrznYBZ8g+r5QsRYtYE81vCeiyU4YXkyTClJaXBYSV1MtvGotmkfPyrdVTtHi6lmzDcv3ayJlLSzAOOrU5lWlyLAyI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,87 +33,205 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1soeqA-0004AC-2Z
-	for netdev@vger.kernel.org; Thu, 12 Sep 2024 10:06:10 +0200
+	id 1soeqA-0004AS-FW; Thu, 12 Sep 2024 10:06:10 +0200
 Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1soeq7-007Khn-IK
-	for netdev@vger.kernel.org; Thu, 12 Sep 2024 10:06:07 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id A3664338EF2
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 08:04:43 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	id 1soeq7-007KiX-Rx; Thu, 12 Sep 2024 10:06:07 +0200
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id F13D6338EA4;
-	Thu, 12 Sep 2024 08:04:40 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 1b460190;
-	Thu, 12 Sep 2024 08:04:40 +0000 (UTC)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id E4905338DC1;
+	Thu, 12 Sep 2024 07:35:27 +0000 (UTC)
+Date: Thu, 12 Sep 2024 09:35:27 +0200
 From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [PATCH net-next 5/5] can: rockchip_canfd: rkcanfd_handle_error_int_reg_ec(): fix decoding of error code register
-Date: Thu, 12 Sep 2024 09:59:02 +0200
-Message-ID: <20240912080438.2826895-6-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240912080438.2826895-1-mkl@pengutronix.de>
-References: <20240912080438.2826895-1-mkl@pengutronix.de>
+To: Charan Pedumuru <charan.pedumuru@microchip.com>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Nicolas Ferre <nicolas.ferre@microchip.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: net: can: atmel: Convert to json schema
+Message-ID: <20240912-literate-caped-mandrill-4c0c9d-mkl@pengutronix.de>
+References: <20240912-can-v1-1-c5651b1809bb@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="orv67sewbwknpnrd"
+Content-Disposition: inline
+In-Reply-To: <20240912-can-v1-1-c5651b1809bb@microchip.com>
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
 X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Probably due to a copy/paste error rkcanfd_handle_error_int_reg_ec()
-checks twice if the RKCANFD_REG_ERROR_CODE_TX_ACK_EOF bit is set in
-reg_ec.
 
-Keep the correct check for RKCANFD_REG_ERROR_CODE_TX_ACK_EOF and
-remove the superfluous one.
+--orv67sewbwknpnrd
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://patch.msgid.link/9a46d10d-e4e3-40a5-8fb6-f4637959f124@stanley.mountain
-Fixes: ff60bfbaf67f ("can: rockchip_canfd: add driver for Rockchip CAN-FD controller")
-Link: https://patch.msgid.link/20240911-can-rockchip_canfd-fixes-v1-2-5ce385b5ab10@pengutronix.de
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/rockchip/rockchip_canfd-core.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+On 12.09.2024 11:19:16, Charan Pedumuru wrote:
+> Convert atmel-can documentation to yaml format
+>=20
+> Signed-off-by: Charan Pedumuru <charan.pedumuru@microchip.com>
+> ---
+>  .../bindings/net/can/atmel,at91sam9263-can.yaml    | 67 ++++++++++++++++=
+++++++
+>  .../devicetree/bindings/net/can/atmel-can.txt      | 15 -----
+>  2 files changed, 67 insertions(+), 15 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/can/atmel,at91sam9263-=
+can.yaml b/Documentation/devicetree/bindings/net/can/atmel,at91sam9263-can.=
+yaml
+> new file mode 100644
+> index 000000000000..269af4c993a7
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/can/atmel,at91sam9263-can.yaml
+> @@ -0,0 +1,67 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/can/atmel,at91sam9263-can.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Atmel CAN Controller
+> +
+> +maintainers:
+> +  - Nicolas Ferre <nicolas.ferre@microchip.com>
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - enum:
+> +          - atmel,at91sam9263-can
+> +          - atmel,at91sam9x5-can
+> +          - microchip,sam9x60-can
 
-diff --git a/drivers/net/can/rockchip/rockchip_canfd-core.c b/drivers/net/can/rockchip/rockchip_canfd-core.c
-index 6883153e8fc1..df18c85fc078 100644
---- a/drivers/net/can/rockchip/rockchip_canfd-core.c
-+++ b/drivers/net/can/rockchip/rockchip_canfd-core.c
-@@ -491,11 +491,9 @@ rkcanfd_handle_error_int_reg_ec(struct rkcanfd_priv *priv, struct can_frame *cf,
- 		else if (reg_ec & RKCANFD_REG_ERROR_CODE_TX_CRC)
- 			cf->data[3] = CAN_ERR_PROT_LOC_CRC_SEQ;
- 		else if (reg_ec & RKCANFD_REG_ERROR_CODE_TX_ACK_EOF)
--			cf->data[3] = CAN_ERR_PROT_LOC_ACK;
-+			cf->data[3] = CAN_ERR_PROT_LOC_ACK_DEL;
- 		else if (reg_ec & RKCANFD_REG_ERROR_CODE_TX_ACK)
- 			cf->data[3] = CAN_ERR_PROT_LOC_ACK;
--		else if (reg_ec & RKCANFD_REG_ERROR_CODE_TX_ACK_EOF)
--			cf->data[3] = CAN_ERR_PROT_LOC_ACK_DEL;
- 		/* RKCANFD_REG_ERROR_CODE_TX_ERROR */
- 		else if (reg_ec & RKCANFD_REG_ERROR_CODE_TX_OVERLOAD)
- 			cf->data[2] |= CAN_ERR_PROT_OVERLOAD;
--- 
-2.45.2
+The driver doesn't have a compatible for "microchip,sam9x60-can".
 
+> +      - items:
+> +          - enum:
+> +              - microchip,sam9x60-can
+> +          - const: atmel,at91sam9x5-can
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  clock-names:
+> +    items:
+> +      - const: can_clk
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +
+> +allOf:
+> +  - $ref: can-controller.yaml#
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - microchip,sam9x60-can
+> +    then:
+> +      required:
+> +        - compatible
+> +        - reg
+> +        - interrupts
+> +        - clocks
+> +        - clock-names
 
+AFAICS clock-names is required for all compatibles.
+
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +    can0: can@f000c000 {
+
+I think unused labels should be removed.
+
+> +          compatible =3D "atmel,at91sam9x5-can";
+> +          reg =3D <0xf000c000 0x300>;
+> +          interrupts =3D <30 IRQ_TYPE_LEVEL_HIGH 3>;
+> +    };
+> diff --git a/Documentation/devicetree/bindings/net/can/atmel-can.txt b/Do=
+cumentation/devicetree/bindings/net/can/atmel-can.txt
+> deleted file mode 100644
+> index 218a3b3eb27e..000000000000
+> --- a/Documentation/devicetree/bindings/net/can/atmel-can.txt
+> +++ /dev/null
+> @@ -1,15 +0,0 @@
+> -* AT91 CAN *
+> -
+> -Required properties:
+> -  - compatible: Should be "atmel,at91sam9263-can", "atmel,at91sam9x5-can=
+" or
+> -    "microchip,sam9x60-can"
+> -  - reg: Should contain CAN controller registers location and length
+> -  - interrupts: Should contain IRQ line for the CAN controller
+> -
+> -Example:
+> -
+> -	can0: can@f000c000 {
+> -		compatible =3D "atmel,at91sam9x5-can";
+> -		reg =3D <0xf000c000 0x300>;
+> -		interrupts =3D <40 4 5>
+> -	};
+>=20
+> ---
+> base-commit: 32ffa5373540a8d1c06619f52d019c6cdc948bb4
+> change-id: 20240912-can-8eb7f8e7566d
+>=20
+> Best regards,
+> --=20
+> Charan Pedumuru <charan.pedumuru@microchip.com>
+>=20
+>=20
+>=20
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--orv67sewbwknpnrd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbimbwACgkQKDiiPnot
+vG+igQf7BhUphCaYd67/BKLQBNIguPGy39T5kQzPkdg/QflMpcz6bSZQXYsvyguA
+GsRPQcDt7APYW7tTpTnIa0ZNlYj+lF7cWPl9afS90kk4kRAPPvSYb9Vd2UAMjsPt
+m/jhQsupujHXJg8m2REBHmB0npIGoHuL+kqg0qRIIucFWs0jgsMPG6C11e/QiFtQ
+ArgNdeuIsS7DUqKNXy9eb43tnRSomQkn4M1NojRVKSmAuzMrvheHmKA2mQOLJ2Or
+4JRvI/oRZsbx1KBxqID2y/NMb9pk7TbVw6gZnTLJcYKg5GmhXuIbPIP3RZ6eWnB4
+8h+/7/1vWZlVuhVrFKzyXj9OfBiIyQ==
+=50PA
+-----END PGP SIGNATURE-----
+
+--orv67sewbwknpnrd--
 
