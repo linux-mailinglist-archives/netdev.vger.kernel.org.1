@@ -1,85 +1,90 @@
-Return-Path: <netdev+bounces-127862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53162976E6B
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:08:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 834AC976E7D
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:13:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1917F283438
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:08:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91EABB239AE
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0600613D52F;
-	Thu, 12 Sep 2024 16:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55EA13D245;
+	Thu, 12 Sep 2024 16:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="rpvQsnS8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Iw0lvd7p"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB93A4AEF4
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 16:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5BF4AEF4;
+	Thu, 12 Sep 2024 16:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726157283; cv=none; b=mq///NtT91yS1ktQTu46E9TfwEtDf6TzeihL8lkGw9T8Z6duZEQM9Z/IOfyZQJhhujZE2FaPjbCRQjeoy4dTYBtDPCBTckP+uvQRisQzX1WN5Fl7K+zWF9VWn5ec8J3tSQlJVaKMn2aZwUtCMW+a1lXh5sYorXtReSxcBPrsBLM=
+	t=1726157609; cv=none; b=GFlHYP/KWagWl/21iI27ulLhibPOPDhMei+Tf07rXcVuppOpB2tonJRRp+lvDGv0oEnrMibQG1N2po7CkGZZ4W2TnMvA5gOo2y/dByT9niy9f71w7eP/bcxHev6CkB4XUay5at5GRzMF5hV9MA9m9BcJW0WIqQ68ltXM+pzHB0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726157283; c=relaxed/simple;
-	bh=NiEL1aOUQKcCmhchSWTms+dFdXeS36cHJRZLygWOz2s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VsGEEvyqOD/7mhvOPiAxyF6uOhu0RXDW7gwVLW8Q8RaJdjdcrUYj2UOMXgLkgmMOZ+6QgZ02sVmKTcd/QgAj/obuXckUWSupMZl1Xowa+NQD3w/+2FquaeAALxA1SkD3RPBlozFM5kENDS0FnmvjqyFabDj4B+YCtp6ZxWuettQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=rpvQsnS8; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8ee8a13f-8308-42af-86a6-610bcde5f7f3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726157279;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rFBCYm/EpAKj1YNbowSJMHUtEx3CEWM0kM3TF/YAY8M=;
-	b=rpvQsnS82zGRxXybsFKH5tKV5N3Nv3wD3Q3A5lCHljhkZxaFoIfZzlOmbUL+QGjPxZszJN
-	e51ucs2xnq88zyXAZD3U2hNefGVtnV+BxwB1nHXWuRcx1W6zmhzuAghmeQTEZkQ4vQ63LF
-	24BVXoUX8Oc/RhOI/MVAwAOJNDTbh/E=
-Date: Thu, 12 Sep 2024 12:07:54 -0400
+	s=arc-20240116; t=1726157609; c=relaxed/simple;
+	bh=OmBNvMITlRvb/PXVvd52qXHe7Mn5kVTL0UEHOyL4oFg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oJH7oNdt7EQUqWiyeWGyHu64992wNn1fi0DwM03nIXRsaZBHbe5mB9MrEF2C2xPCpvZUX496NhHp3Pq3A89V0stdqwHqT58pVRiSdVP0j2zkKAQVE/POC0sg8/GoF1O3Da4vfcngNpX+1zJALfp5quIRpa+Yx2dIwd3vISHDWZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Iw0lvd7p; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1L5pXQ28q1fdoApfphTH3xK6rcuMrjSLTotIfwo+pTE=; b=Iw0lvd7pKeU4Y2DGDxdV8KhpxF
+	tECzdll2V5BOdQpJFYNPyaesZgQDD2wbTIhKNG2KmDPizQYmu6t1JO5S8SQYNcMN/uKDr4xDKfIqy
+	wt2QZF6TNYXk/xyCCs2HqjDRr41NNAAbx1cixpkODp4Eo4ni+ttS1HMb46ErHwaIjRGE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1somRX-007K6X-JT; Thu, 12 Sep 2024 18:13:15 +0200
+Date: Thu, 12 Sep 2024 18:13:15 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ronnie.Kunin@microchip.com
+Cc: Raju.Lakkaraju@microchip.com, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, Bryan.Whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
+	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
+	Steen.Hegelund@microchip.com, Daniel.Machon@microchip.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next V2 4/5] net: lan743x: Implement phylink pcs
+Message-ID: <100f9c30-f6cc-4995-a6e9-2856dd3a029f@lunn.ch>
+References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
+ <20240911161054.4494-5-Raju.Lakkaraju@microchip.com>
+ <c6e36569-e3a8-4962-ac85-2fd7d35ab5d1@lunn.ch>
+ <ZuKP6XcWTSk0SUn4@HYD-DK-UNGSW21.microchip.com>
+ <cbc505ca-3df0-4139-87a1-db603f9f426a@lunn.ch>
+ <PH8PR11MB79651A4A42D0492064F6541B95642@PH8PR11MB7965.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: xilinx: axienet: Schedule NAPI in two steps
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Robert Hancock <robert.hancock@calian.com>,
- linux-kernel@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
- linux-arm-kernel@lists.infradead.org
-References: <20240909231904.1322387-1-sean.anderson@linux.dev>
- <20240910185801.42b7c17f@kernel.org>
- <f63bf0ad-2846-4108-9a3f-9ea113959af0@linux.dev>
- <20240912084322.148d7fb2@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20240912084322.148d7fb2@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH8PR11MB79651A4A42D0492064F6541B95642@PH8PR11MB7965.namprd11.prod.outlook.com>
 
-On 9/12/24 11:43, Jakub Kicinski wrote:
-> On Thu, 12 Sep 2024 10:23:06 -0400 Sean Anderson wrote:
->> __napi_schedule_irqoff selects between __napi_schedule and
->> ____napi_schedule based on whether PREEMPT_RT is enabled. Is there some
->> other way to force IRQ threading?
-> 
-> I think so, IIRC threadirqs= kernel boot option lets you do it.
-> I don't remember all the details now :( LMK if I'm wrong
+> Our PCI11x1x hardware has a single MDIO controller that gets used
+> regardless of whether the chip interface is set to RGMII or to
+> SGMII/BASE-X.
 
-Hm, maybe __napi_schedule_irqoff should be updated to take that into
-account. I will resend without this change.
+That would be the external MDIO bus. 
 
---Sean
+But where is the PCS connected?
+
+> When we are using an SFP, the MDIO lines from our controller are not
+> used / connected at all to the SFP.
+
+Correct. The SFP cage does not have MDIO pins. There are two commonly
+used protocols for MDIO over I2C, which phylink supports. The MAC
+driver is not involved. All it needs to report to phylink is when the
+PCS transitions up/down.
+
+    Andrew
 
