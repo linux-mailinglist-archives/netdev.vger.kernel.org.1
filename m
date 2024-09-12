@@ -1,143 +1,138 @@
-Return-Path: <netdev+bounces-127956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CADC977358
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 23:08:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C326977368
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 23:14:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 087F62839E9
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 21:08:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C0071C213F1
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 21:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50CD1C2307;
-	Thu, 12 Sep 2024 21:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE2B11C2422;
+	Thu, 12 Sep 2024 21:14:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OE2U3eIs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TgrAtnXr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC5E1C1AA9
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 21:08:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 312131C2326
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 21:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726175290; cv=none; b=hXQN2V3JnkAZQSuODzAS6RLRearyOIER/Qds0JRjL9ip0ToFRhu6C8hRgkHY4g6GpdP+DambqU2sGx9cN+T8HhdarEHKdUYC69vMxJoiYSQCXC6rI6glNNkZmOotngR98FoOadLyNaVBeMhZ/Y8s2nqlpJYvVykxnn0ic+fsAk0=
+	t=1726175693; cv=none; b=ecikbgF9aSKNHy29APbNCJSss/fTjKJtdWBu0Rd6j+46+YqpeeKcSwJ4qwoyfGdi0DqWHbimWR3QczhCb4vG2YQZlGh2Dqr4ksicxk11Jj1oJ95xtDZy49Vz+xNk8ZN2VafEs8hlIi/SohnjWfM78mq/UCOW6bmkfxJguN0aG/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726175290; c=relaxed/simple;
-	bh=7FmWEpkWETI6rAOdNBqSPwiupiNbAImQ0z9BL82/uB4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KCbke8Uom2iozlrclECnRw9nZgMDdYPiCygx1iHTw+FK94jAi08k/Yn3t5XWQLkuxPYvvtXNYhs24gNVR892gKN/qX9Gw7CllQA0/77pa8ek3Ac8hKiHNEXaMb2fIv9n4iogOlcK4cph6CsnHzxdtuiexi7/Ts/t//cLrr5l7uE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OE2U3eIs; arc=none smtp.client-ip=209.85.160.173
+	s=arc-20240116; t=1726175693; c=relaxed/simple;
+	bh=peVnoRwbqecr/0PJF00iv4hFysL5tmps7T44YTBQn1E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lybie4kkNBhdSKvkus3c6VeZvk2423bOYzILJ90OHF2NZoKPO/khhJRePZkc5GQxb5hDhiWklCfLT9SbqHsKBZxezGqUu5OPG1lhVvzmALKafXE/9s74jge7wIUHS6ptjM964ylto/ATnTFcUv1JPhsKg6tnfiuKpqqIL6qI9TQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TgrAtnXr; arc=none smtp.client-ip=209.85.167.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4581cec6079so83971cf.0
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 14:08:09 -0700 (PDT)
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3e03a5ed4d7so745760b6e.1
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 14:14:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726175288; x=1726780088; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7FmWEpkWETI6rAOdNBqSPwiupiNbAImQ0z9BL82/uB4=;
-        b=OE2U3eIsbcqZ/o1UwnCQu5+Ynpy6n13g652UMBK0Vu2ttYmqMSwoVyUs4FWjSAOrX0
-         QjeKSF+oXXRIvd/4txjzxCoenh/Tyo7dra0TEWeBpt9fwCsiLfjnpOG4qmejuOB7H6PD
-         bJXi0awetJcxI7yCwZinbtua/Mnx67l82qHRlRJWews/Z+g7ELtqjbfDrnqPfvM1ft0r
-         QpG1IRmlZ9FAm+yWP7aPuwZPK2wdyIzyJhIvSEesvoHOGoe48RXzSadfut9c0rgrvqXy
-         ZqpT65dSDd7/X4z04MJl2x9XRHXXAQOr5aVv9Jxe7IZdzVdgYQK1xwQs1MIn7a6jj8yU
-         5SKw==
+        d=google.com; s=20230601; t=1726175691; x=1726780491; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2EO0qmaSPp73jvXnTs7TJzCKL8q51LBbEbQNyisfg4c=;
+        b=TgrAtnXr/7OJjvCVwZLNYSuwZYI+CkWtp53jxLr5DY6OZMrP9OBl6+HAyQk39Vmnoh
+         qqFlvNt44CLztfbZrj0FuRCR2iGPcc5KwKMipprl2samIjPIUTwaC70Mb9o7pSqUALGS
+         Y1XgtxzCoN2PV7HZ0F2hE5CbBIAFQWCEhapMSPTvKUjbbG/dkBUb37F4sJm/Y1dxF/Fr
+         W6/AXeohOW30JF1yMFMif9gq8qYKoFtgGFkSwa9AId0I5wgxwi5PemXv+4fDECM9suBZ
+         3A3nv5hCG0cMhnOLAQ3WtQ+XBjSLOF1Q0kJvhR5D+s+tgs3yeGY0AdbQe17Y81c19wFz
+         +PjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726175288; x=1726780088;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7FmWEpkWETI6rAOdNBqSPwiupiNbAImQ0z9BL82/uB4=;
-        b=TLLQk+x7/mtaENs7OYCKiKsJiKU5sI4d4VKgEVp+v2keyR1jraVoUjImOmsW2GegJn
-         FnpWDeje4KzkIgUj+j6W0/I9hMJu5VR6DShCerl50bk+0+zqLxzVSBOnrgKJLrXDdnDc
-         Gfy141cIwmo3FXS0CsEGvdycBRltmkYwvAGUhI3YGzkPOHKQG4LDW3IO+hE8NTG7oloO
-         1e0Q/C6T+HzDwcA65becC8qYjKIKDX6nX/2mQDdLhQgocn5YtxlP3JmPveD6h+Qccuhs
-         lD4pdjvc6LKS8diL6fM0+g/XzUpE8hy5W7DfA1/yWnaid8drfui72QqQL8D/Gp3ZL5uc
-         0n8Q==
-X-Gm-Message-State: AOJu0Yy4HcoOIqfSnr0CqZ0pBFEuRbky3p165JMpVvgliS47IyIai+fQ
-	ttGIWcIOr7oiJPMSaDCWl1fmKp5lZjbJWRghMABJqbYAXOLkE3Uf+ug5F0yxZvTFGY3xx1/7C83
-	ep3nyVl31ESCbjBtxPQYVzyKhK9U2Z3r8YTau
-X-Google-Smtp-Source: AGHT+IFTczjdQuyMfT7o0Y3cvlaURLRVAhNJDSgFv3XHPantUoK3EpvfYn2DV3uCfyYgjE4CrXJvAA5UPtDeUvQTyNI=
-X-Received: by 2002:ac8:7f41:0:b0:447:f958:ab83 with SMTP id
- d75a77b69052e-45864549fddmr4203891cf.21.1726175287878; Thu, 12 Sep 2024
- 14:08:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726175691; x=1726780491;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2EO0qmaSPp73jvXnTs7TJzCKL8q51LBbEbQNyisfg4c=;
+        b=t0L53+iG+cN9sDuE0Umajb4rgBkqUCZ6qOPsA/gAhoO0WuA2m1KF1x61Q7aA7rhDBL
+         k1f4aEU6QnKVFUG+Bldz6UNaMBJ43R0HRwNLFxPi1myHQdKizUBBL31fGypM/paKjNiM
+         XEQCHfrX+hO+wV83V5kxO7SsgsTUiTwrkE91wwVqFNvLWRcamAI/J0NxQ277+IkfiUxs
+         8FDSPWkrwVIR4kd9WW/3f6+il8I9ictPfvo4IBM1Y9ZoFCNSnoR8fWB6dNH2GZFsw/gB
+         +YaEZ/lSHR+CwyJIT3w3fKXDMU3JBPZbOGepDwTUUr810b5pWJ/s01EFQ2XHRKJx2PDU
+         ht1g==
+X-Forwarded-Encrypted: i=1; AJvYcCVzsAKbmLBxK3amQgtcoOq4/maQbYF8as0zzMMQCqWyM1TxC9jI3TtPNCJqf51b2DmrVzSuEf8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziNzlOZeMnAbXoFfBcheb/zLlbOLNFHD4vhVc0r1VUvsDQTlgk
+	BpWNf1hA6f/X+P69jqshA+Io5HjdHTeXYCNwNdcGHn/vSu1RU0alBbt9cvbKMw==
+X-Google-Smtp-Source: AGHT+IEXhrO73skogk/s/nT+zYKnKQ0Yub0DnxaAiKfl03Q20IYpu3fPe1nRti4noHn1qI7LW/QNUg==
+X-Received: by 2002:a05:6808:399b:b0:3d9:3a2f:959e with SMTP id 5614622812f47-3e0719ee561mr3950771b6e.0.1726175691128;
+        Thu, 12 Sep 2024 14:14:51 -0700 (PDT)
+Received: from google.com (30.64.135.34.bc.googleusercontent.com. [34.135.64.30])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5e1cab53594sm2250200eaf.43.2024.09.12.14.14.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 14:14:50 -0700 (PDT)
+Date: Thu, 12 Sep 2024 14:14:47 -0700
+From: Justin Stitt <justinstitt@google.com>
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
+	alx@kernel.org, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
+	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Quentin Monnet <qmo@kernel.org>
+Subject: Re: [PATCH v8 4/8] bpftool: Ensure task comm is always NUL-terminated
+Message-ID: <ozoyqz5a7zssggowambojv4x6fbhdl6iqjopgnycca223jm6sz@pdzdmshhdgwn>
+References: <20240828030321.20688-1-laoar.shao@gmail.com>
+ <20240828030321.20688-5-laoar.shao@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240912171251.937743-1-sdf@fomichev.me> <ZuNFcP6UM4e5EdUX@mini-arch>
-In-Reply-To: <ZuNFcP6UM4e5EdUX@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 12 Sep 2024 14:07:54 -0700
-Message-ID: <CAHS8izM8e4OhOFjRm9cF2LuN=ePWPgd-EY09fZHSybgcOaH4MA@mail.gmail.com>
-Subject: Re: [PATCH net-next 00/13] selftests: ncdevmem: Add ncdevmem to ksft
-To: Stanislav Fomichev <stfomichev@gmail.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	David Wei <dw@davidwei.uk>, Taehee Yoo <ap420073@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240828030321.20688-5-laoar.shao@gmail.com>
 
-On Thu, Sep 12, 2024 at 12:48=E2=80=AFPM Stanislav Fomichev
-<stfomichev@gmail.com> wrote:
->
-> On 09/12, Stanislav Fomichev wrote:
-> > The goal of the series is to simplify and make it possible to use
-> > ncdevmem in an automated way from the ksft python wrapper.
-> >
-> > ncdevmem is slowly mutated into a state where it uses stdout
-> > to print the payload and the python wrapper is added to
-> > make sure the arrived payload matches the expected one.
->
-> Mina, what's your plan/progress on the upstreamable TX side? I hope
-> you're still gonna finish it up?
->
+Hi,
 
-I'm very open to someone pushing the TX side, but there is a bit of a
-need here to get the TX side done sooner than later. In reality I
-don't think anyone cares as much as me to push this ASAP so I
-plan/hope to look into it. I have made some progress but a bit to be
-worked through at the moment. I hope to have something ready as the
-merge window reopens; very likely doable.
+On Wed, Aug 28, 2024 at 11:03:17AM GMT, Yafang Shao wrote:
+> Let's explicitly ensure the destination string is NUL-terminated. This way,
+> it won't be affected by changes to the source string.
+> 
+> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> Reviewed-by: Quentin Monnet <qmo@kernel.org>
+> ---
+>  tools/bpf/bpftool/pids.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/tools/bpf/bpftool/pids.c b/tools/bpf/bpftool/pids.c
+> index 9b898571b49e..23f488cf1740 100644
+> --- a/tools/bpf/bpftool/pids.c
+> +++ b/tools/bpf/bpftool/pids.c
+> @@ -54,6 +54,7 @@ static void add_ref(struct hashmap *map, struct pid_iter_entry *e)
+>  		ref = &refs->refs[refs->ref_cnt];
+>  		ref->pid = e->pid;
+>  		memcpy(ref->comm, e->comm, sizeof(ref->comm));
+> +		ref->comm[sizeof(ref->comm) - 1] = '\0';
 
-> I have a PoC based on your old RFC over here (plus all the selftests to
-> verify it). I also have a 'loopback' mode to test/verify UAPI parts on qe=
-mu
-> without real HW.
->
+...
 
-This sounds excellent. Where is here? Is there a link missing?
+>  		refs->ref_cnt++;
+>  
+>  		return;
+> @@ -77,6 +78,7 @@ static void add_ref(struct hashmap *map, struct pid_iter_entry *e)
+>  	ref = &refs->refs[0];
+>  	ref->pid = e->pid;
+>  	memcpy(ref->comm, e->comm, sizeof(ref->comm));
+> +	ref->comm[sizeof(ref->comm) - 1] = '\0';
 
-I'm happy to push those patches forward, giving you full credit of
-course (either signed-off-by both of us or 'Based on work by
-stfomichev@gmail.com' etc).
+Excuse my ignorance, do we not have a strscpy() equivalent usable in bpf
+code?
 
-> Should I post it as an RFC once the merge window closes? Or maybe send
-> it off list? I don't intent to push those patches further. If you already
-> have the implementation on your side, maybe at least the selftests will b=
-e
-> helpful to reuse?
+>  	refs->ref_cnt = 1;
+>  	refs->has_bpf_cookie = e->has_bpf_cookie;
+>  	refs->bpf_cookie = e->bpf_cookie;
+> -- 
+> 2.43.5
+> 
 
-Everything would be useful to reuse. Thank you very much, this is amazing.
-
-BTW, I was planning on looking into both TX and improving tests and
-you have looked into both, which is amazing, thank you. Would you
-Pavel/David/Taehee others would be interested in, say, a monthly
-face-to-face call to discuss future work? I am under the impression
-Taehee will push devmem support for bnxt and Pavel for io uring ZC, so
-we may have a bunch of details to discuss.
-
-Any sync would be hosted on bbb, public to anyone to join.
-
-No pressure, of course. Communicating on-list via email has worked so
-far, so in a sense there is no reason to change things :D
-
---=20
-Thanks,
-Mina
+Thanks
+Justin
 
