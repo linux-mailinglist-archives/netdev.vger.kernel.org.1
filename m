@@ -1,142 +1,74 @@
-Return-Path: <netdev+bounces-127851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A8DE976E09
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:43:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E951976E0B
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:43:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0149A1F2134E
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:43:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2564F283E3E
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A07B71B9833;
-	Thu, 12 Sep 2024 15:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4951B9845;
+	Thu, 12 Sep 2024 15:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eibCqRXI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c6gSNx66"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702EF126BE2;
-	Thu, 12 Sep 2024 15:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D221B4C3F;
+	Thu, 12 Sep 2024 15:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726155786; cv=none; b=SB9ugC2mdnhmKmZNz0sCAG5uII9F5ASxrBoIK8/Utfzo/GpzggLxoUNL/v/be+jk2HuJTdGkYm+wKKkrwxAhxZ0/CBsNffjy13Htcno3zH/5aK7kigfwc8SIclbJ7l7kyVe+n0Eoh4pNLAOgg6fUsWgkuaURuO91NhpKJxj4keA=
+	t=1726155803; cv=none; b=d1SS53GlYATPHGXd2bJ2BTzT8IBPzviIwpXRLPUNOll9JmKkh+cAILgOmymJEtfYsiKpocQKxfkcstzhArIpagddC70hl5yiOpbkBeYn7sSxeD9EoCAj7hEVBgWQEjpqCkYEl4+xcO7Y8Q7Fh4DfSXQ0Il6/L0AxoS++WN9hfvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726155786; c=relaxed/simple;
-	bh=DJlTnMXTzSPE1wESPOeCcZKNceRrE6lAZaXs++xgXE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f/vmG7iyK1z8eaAoVGxYEWXMDAEOUHad7mgf9krfplkq13yWD//WYklIBl/WLETWRACVhvxYMtkhE0MKA7OpPFRce7xQnXRCha7uEIPLCxURQjYjYyqulR+kRXeHAHp0qyH2jRe64LOS0jtIZUTI/92ZGcjUqwCWFBEgr7qiuAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eibCqRXI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65650C4CEC5;
-	Thu, 12 Sep 2024 15:43:03 +0000 (UTC)
+	s=arc-20240116; t=1726155803; c=relaxed/simple;
+	bh=1dnbxympOIF+tngqPF0O0fLCSge+TV8u1h+YESuf8L8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DV0VxFIYwswiy7UV0WzwMkhqmFV43vLOMTxuoeSRkh38dpc8gc8AMWsX9W7y645jSK5p2ReuaqWfLdWh0hgu+GS54EDHNHw7cydAscdWG5JIMHrGIRn21bMXDEeGtd9CG9YZ1gjUrZA5eVzjJrrdT/aFmj1LXllpelQJ+N9qwzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c6gSNx66; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D79B2C4CEC3;
+	Thu, 12 Sep 2024 15:43:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726155785;
-	bh=DJlTnMXTzSPE1wESPOeCcZKNceRrE6lAZaXs++xgXE0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eibCqRXIj9PPuDHUlmcBe4B2uO6JYtDsXRfiDXuSkEawhkI3mQIg82Q4wyEvN0dgf
-	 9VMf6e2HNAtsFQqZMmTZ8jEVlUtZ3VudP55TT1LLWWSqRgQfGseasdXfKeSR6ZLX7J
-	 0D8P5NBk/UQpPWn7yVtGt+fov9Lkix45dK065NbQTYJE004Og3cbBTYIKAzF4NDTEM
-	 ICR7NSF8DDcJIvOxhMXXQNwnGVEWXUQL/fza5TOu9MPZ2Fa1TRmlZb0ilNJem8d4ju
-	 e/aDbPQbdJ+1MPs2/EQMbVMAoIXMrMmNJWlt7ZDtLcPD48icq6oiosWmve/fOQX8rP
-	 nySChV/vodEyQ==
-Date: Thu, 12 Sep 2024 16:43:01 +0100
-From: Simon Horman <horms@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
-	linux-omap@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH net-next 3/3] net: ethernet: ti: cpsw_ale: Remove unused
- accessor functions
-Message-ID: <20240912154301.GP572255@kernel.org>
-References: <20240910-ti-warn-v1-0-afd1e404abbe@kernel.org>
- <20240910-ti-warn-v1-3-afd1e404abbe@kernel.org>
- <78b4ca2a-9448-4451-8e25-c57306af38e9@kernel.org>
- <20240912085929.GF572255@kernel.org>
- <97c7665c-d05f-4363-94c6-9ce89921096a@kernel.org>
- <20240912112700.GK572255@kernel.org>
- <88515afd-6c5a-4245-bcff-d3340e94aa26@kernel.org>
+	s=k20201202; t=1726155803;
+	bh=1dnbxympOIF+tngqPF0O0fLCSge+TV8u1h+YESuf8L8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=c6gSNx66ZtiCGKPeWBEK1gPF/M7S0N5qgX6eTl0bNeWlDraCBsHufu+4tgFVCQcYV
+	 jiPt2hPqzPvXHdAB3BgVVV7xNApprZOxbyJJ/flNIw70Y1/qJzukVU1yuLx1eFWygL
+	 f/D+0ogiquU4pxfA/8Se57xjSvIYBueXlLJl9tJEUGK9ZnV0dlkDIgooceOxy+T0Mw
+	 JTYyEDc12bxRsT0g/yNaNBPnyS5R3NfMWn/ndB9hIqlTF2geDrlTqCKJAxGa3gWN/r
+	 LNAKQQpV6iGI2L5Mr80jdpLTbodEFmlv6kX35kXky3QygIk5JmiNLbVpLnJy2AemBr
+	 gEMv1S+KWHbcg==
+Date: Thu, 12 Sep 2024 08:43:22 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, Robert Hancock
+ <robert.hancock@calian.com>, linux-kernel@vger.kernel.org, Michal Simek
+ <michal.simek@amd.com>, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net] net: xilinx: axienet: Schedule NAPI in two steps
+Message-ID: <20240912084322.148d7fb2@kernel.org>
+In-Reply-To: <f63bf0ad-2846-4108-9a3f-9ea113959af0@linux.dev>
+References: <20240909231904.1322387-1-sean.anderson@linux.dev>
+	<20240910185801.42b7c17f@kernel.org>
+	<f63bf0ad-2846-4108-9a3f-9ea113959af0@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88515afd-6c5a-4245-bcff-d3340e94aa26@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 12, 2024 at 04:29:29PM +0300, Roger Quadros wrote:
-> 
-> 
-> On 12/09/2024 14:27, Simon Horman wrote:
-> > On Thu, Sep 12, 2024 at 01:54:45PM +0300, Roger Quadros wrote:
-> >>
-> >>
-> >> On 12/09/2024 11:59, Simon Horman wrote:
-> >>> On Thu, Sep 12, 2024 at 10:07:27AM +0300, Roger Quadros wrote:
-> >>>> Hi Simon,
-> >>>>
-> >>>> On 10/09/2024 10:17, Simon Horman wrote:
-> > 
-> > ...
-> > 
-> >>>>>  	ALE_ENT_VID_MEMBER_LIST = 0,
-> >>>>>  	ALE_ENT_VID_UNREG_MCAST_MSK,
-> >>>>> @@ -217,14 +229,14 @@ static const struct ale_entry_fld vlan_entry_k3_cpswxg[] = {
-> >>>>>  
-> >>>>>  DEFINE_ALE_FIELD(entry_type,		60,	2)
-> >>>>>  DEFINE_ALE_FIELD(vlan_id,		48,	12)
-> >>>>> -DEFINE_ALE_FIELD(mcast_state,		62,	2)
-> >>>>> +DEFINE_ALE_FIELD_SET(mcast_state,	62,	2)
-> >>>>
-> >>>> I don't understand why we need separate macros for GET and SET.
-> >>>> The original intent was to use one macro for both.
-> >>>>
-> >>>> Otherwise we will have to add DEFINE_ALE_FIELD/1_SET to all the fields.
-> >>>
-> >>> Hi Roger,
-> >>>
-> >>> Sorry for not being clearer.
-> >>>
-> >>> My intent was to avoid declaring functions that are never used.
-> >>> Perhaps it is best explained by some examples.
-> >>>
-> >>> In the case of mcast_state, the compiler flags that the get accessor is
-> >>> never used. The intent is of this patch addresses that by declaring the set
-> >>> accessor for mcast_state. Likewise for other similar cases.
-> >>>
-> >>> OTOH, in the case of, f.e. vlan_id, the set and get accessor functions are
-> >>> both used, and DEFINE_ALE_FIELD continues to be used to define them both.
-> >>> DEFINE_ALE_FIELD is implemented as the combination of _SET and _GET.
-> >>>
-> >>
-> >> Thanks for the explanation Simon. I understand now.
-> >>
-> >> Would using __maybe_unused__ be preferable to get rid of the warnings?
-> >> That way we don't need to care if both set/get helpers are used or not
-> >> and don't have to touch the below code ever again except to add new fields.
-> > 
-> > Thanks Roger,
-> > 
-> > IMHO, it is nicer to not declare them at all.  But I do get your point and
-> > I'm happy to try that approach if you prefer it.
-> > 
-> > ...
-> 
-> Simon,
-> 
-> I don't have any preference. I'll leave it to you to decide on your next spin. Thanks.
+On Thu, 12 Sep 2024 10:23:06 -0400 Sean Anderson wrote:
+> __napi_schedule_irqoff selects between __napi_schedule and
+> ____napi_schedule based on whether PREEMPT_RT is enabled. Is there some
+> other way to force IRQ threading?
 
-Thanks, let me think about it.
-
-I'll probably hold off on v2 until the next the development cycle as
-the patch queue seems busy enough this week.
+I think so, IIRC threadirqs= kernel boot option lets you do it.
+I don't remember all the details now :( LMK if I'm wrong
 
