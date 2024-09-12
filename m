@@ -1,146 +1,136 @@
-Return-Path: <netdev+bounces-127858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C64E6976E4A
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:58:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C8AB976E50
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:59:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32FD71C23889
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:58:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5E021F212CA
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE061B78FC;
-	Thu, 12 Sep 2024 15:58:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C064919599C;
+	Thu, 12 Sep 2024 15:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="GDS4tjt3"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Emjb+8ci"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward502b.mail.yandex.net (forward502b.mail.yandex.net [178.154.239.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C091A2567
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 15:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8F4192B87
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 15:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726156719; cv=none; b=lhj7Lqi6BKvE+PXCI4pZ/vdEPvKB+Nn+kYHnGwINptaDCcUg4w2G3Zg4NQKbE3IDS0dTVFtpCUZRcOgkdRDJ1oI9xMhpMSm2No2zSc5BL70WpF4uIf4Ej32AgowEt6+zcWW+u0f3tYQ4J1fRAQrh8/FASapELy4OaRSPQM3gVa0=
+	t=1726156786; cv=none; b=LYCTPArCYbAF/Qggjj2FYJDfvZaS3ODszYLJ/LTFJOwHZQqkZ64qn8wdc3vkgjgtMF2uGOYxCuPH53gpcpolT/gXiv/FUgq41dzLAemNM/RzUu/+QNiuf+fur1SBptEXCfzz0+sBQgQxYb3sqnisgWaJdIE6kMEGXa2PMxMY9EY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726156719; c=relaxed/simple;
-	bh=U9dUmOOuXwqX5mq5q+c61lnytJLwV7sVtmKS0yIcsSw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J4iaKROZUEwPBykQgh0LXcpk8n5V6MxtYUnlGpNFhuqK87K3uoeXszgRFtSt2ghlNmM+XOsWWzkvHvCUR3+VUJuaGcNk8/NlGDxDHF1t/hyjKHUFO1GgwzqdO8aPKR+QuiEfyeRQtOqujgHZ+hfh+fqydx/ZGMwDx6lv3ZBMc+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=GDS4tjt3; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3e040388737so592335b6e.3
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 08:58:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1726156717; x=1726761517; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QYJCNJBfM3mnUo54efKbh8cT5QtGE+6/2LtRTMxqLoo=;
-        b=GDS4tjt3M3sXn+ItjcSGcbN78M+3NQnT2/GqI0d4l3MIQJthhVBdkGU3aZXYCYXSxi
-         BFSNFYJj3IzEYivyCDukdcWGiTM2t2KanXMrlhCp7avbOnN1f0iajVmQYO+CWzwcD2yt
-         HbhY5OaAYqlNHs3Q7KEo7EB4CPVuwj8nWWlZ4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726156717; x=1726761517;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QYJCNJBfM3mnUo54efKbh8cT5QtGE+6/2LtRTMxqLoo=;
-        b=C4GcW6YgJ2B8i1WlhmvpTws/kZcAHqA9G70A/spheBapybzhJbyCYFXZAefXaftFr9
-         MkBJrl+ZqS4GWZ9hYR7n2dv3HG9okeepgVbLBkJiNoqm0fNa10UhlcJ1Z6ElOD7BE3AH
-         Z5DWv4iirkC9I8fxUxPS6327x9Ab1u7++BqKCyo5w1101qIcmiiVePPUT3uaB1ZPlRP1
-         MfTxEJZgTHh8+h5URY0Ih871FdIxOPKYWDoVdM1n0+R4FYJR+/Siinb9WHTK7MBtfX4r
-         3GFU1lNzBtwtuo+2I4r8Sbpi9ToF8wpMt7lDAXFUOJOfZyCVJf5JDNsTzJ+phJZEJ4fp
-         Bn4A==
-X-Gm-Message-State: AOJu0YxnBymBFvMGnGWN1i6ENpCXEgG/QfSA9LYTdOBM2FgqTRAKUfRd
-	WbFL96XlaeVTyoMWyupqa01qaee39X4eu2gjRukjmeZpNAec1UHm4m3JBYbXbuiD2bauUOX9CM2
-	dRqyg76t9nlviEeoapYFb4RSI62+C+79sbN0JlpgTd67HBYkPdwxV3DmHqHn/O4nBxpLkmX7OSP
-	KE/RzssoZ1LRz05c18Sevh1YZDrfzL0V3COVVCDg==
-X-Google-Smtp-Source: AGHT+IG3uy2cnoFLcKM6BA2VUcWTFVL1Y4Nki9RUdsjOWsRn+gcYCkgHPFUU6mCU9sbh30OTyZ5Mtw==
-X-Received: by 2002:a05:6870:7b47:b0:277:d7f1:db53 with SMTP id 586e51a60fabf-27c3f2c3db5mr2514880fac.17.1726156716474;
-        Thu, 12 Sep 2024 08:58:36 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fbb527csm1913939a12.27.2024.09.12.08.58.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 08:58:35 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] tg3: Link IRQs to NAPI instances
-Date: Thu, 12 Sep 2024 15:58:30 +0000
-Message-Id: <20240912155830.14688-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1726156786; c=relaxed/simple;
+	bh=MoMfcM1Jtr/RtubOuBcJdVaSEXScaU8oh1dlpg3sOeI=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=gSuLQlXdIsCrRxA4Tvv3Gi4dkKSiaGhTzQYFBOXzEKqkRVlMbh5QLtaFM5Re2EKj//yKCBFZ47vig2fh0NQs230BaF4SFPUaOj+EyYTjgilwKDcH26PLsFMpWg6F4aVnPXKZwJRO6lqChFctKZsfLzaonjnOKNMBDP4t6cXwvhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Emjb+8ci; arc=none smtp.client-ip=178.154.239.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net [IPv6:2a02:6b8:c1c:2a89:0:640:c90:0])
+	by forward502b.mail.yandex.net (Yandex) with ESMTPS id 9C8B15E741;
+	Thu, 12 Sep 2024 18:59:40 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id dxmC8E5LlW20-ghUb5ZUz;
+	Thu, 12 Sep 2024 18:59:39 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1726156779; bh=MoMfcM1Jtr/RtubOuBcJdVaSEXScaU8oh1dlpg3sOeI=;
+	h=In-Reply-To:Subject:To:From:Cc:Date:References:Message-ID;
+	b=Emjb+8ciDGM018dEUqKAY54AvJg9QjEml4vBS9wQ9TLQ+HjrQexVSBjH46KGdp9Fh
+	 tbIZBnM4df4ThCOy7qDf37NwGvmEchgp/0G3mbqOjicVIdWqUSgPsMTeYSMMHFetcc
+	 KnOppRvxSFRz7iUXvayswJpg39Luji9HK0Yq5UlA=
+Authentication-Results: mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <9c8146a5-c7fc-40ae-81bb-37a2c12c2384@yandex.ru>
+Date: Thu, 12 Sep 2024 18:59:39 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <20240905064257.3870271-1-dmantipov@yandex.ru>
+ <Zt3up5aOcu5icAUr@pop-os.localdomain>
+ <5d23bd86-150f-40a3-ab43-a468b3133bc4@yandex.ru>
+ <ZuEdeDBHKj1q9NlV@pop-os.localdomain>
+ <1ae54555-0998-4c76-bbb3-60e9746f9688@yandex.ru>
+ <ZuHJQitSaAYFRFNB@pop-os.localdomain>
+Content-Language: en-US
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Autocrypt: addr=dmantipov@yandex.ru; keydata=
+ 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
+ A/UwwXBRuvydGV0=
+Subject: Re: [PATCH RFC net] net: sockmap: avoid race between
+ sock_map_destroy() and sk_psock_put()
+In-Reply-To: <ZuHJQitSaAYFRFNB@pop-os.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Link IRQs to NAPI instances with netif_napi_set_irq. This information
-can be queried with the netdev-genl API.
+On 9/11/24 7:45 PM, Cong Wang wrote:
 
-Compare the output of /proc/interrupts for my tg3 device with the output of
-netdev-genl after applying this patch:
+> I guess you totally misunderstand my point. As a significant sockmap
+> contributor, I am certainly aware of sockmap users. My point is that I
+> needed to narrow down the problem to CONFIG_RDS when I was debugging it.
 
-$ cat /proc/interrupts | grep eth0 | cut -f1 --delimiter=':'
- 331
- 332
- 333
- 334
- 335
+I've narrowed down the problem to possible race condition between two
+functions. "Narrowing down" the problem to a 17.5Kloc-sized subsystem
+is not too helpful.
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-			 --dump napi-get --json='{"ifindex": 2}'
+> So, please let me know if you can still reproduce this after disabling
+> CONFIG_RDS, because I could not reproduce it any more. If you can,
+> please kindly share the stack trace without rds_* functions.
 
-[{'id': 149, 'ifindex': 2, 'irq': 335},
- {'id': 148, 'ifindex': 2, 'irq': 334},
- {'id': 147, 'ifindex': 2, 'irq': 333},
- {'id': 146, 'ifindex': 2, 'irq': 332},
- {'id': 145, 'ifindex': 2, 'irq': 331}]
+Yes, this issue requires CONFIG_RDS and CONFIG_RDS_TCP to reproduce. But
+syzbot reproducer I'm working with doesn't create RDS sockets explicitly
+(with 'socket(AF_RDS, ..., ...)' or so). When two options above are enabled,
+the default network namespace has special kernel-space socket which is
+created in 'rds_tcp_listen_init()' and (if my understanding of the namespaces
+is correct) may be inherited with 'unshare(CLONE_NEWNET)'. So just enabling
+these two options makes the kernel vulnerable.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/ethernet/broadcom/tg3.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+So I'm still gently asking you to check whether there is a race condition
+I've talked about. Hopefully this shouldn't be too hard for a significant
+sockmap contributor.
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 378815917741..c187b13ab3e6 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -7393,6 +7393,14 @@ static int tg3_poll(struct napi_struct *napi, int budget)
- 	return work_done;
- }
- 
-+static void tg3_napi_set_irq(struct tg3 *tp)
-+{
-+	int i;
-+
-+	for (i = 0; i < tp->irq_cnt; i++)
-+		netif_napi_set_irq(&tp->napi[i].napi, tp->napi[i].irq_vec);
-+}
-+
- static void tg3_napi_disable(struct tg3 *tp)
- {
- 	int i;
-@@ -11652,7 +11660,7 @@ static int tg3_start(struct tg3 *tp, bool reset_phy, bool test_irq,
- 		goto out_ints_fini;
- 
- 	tg3_napi_init(tp);
--
-+	tg3_napi_set_irq(tp);
- 	tg3_napi_enable(tp);
- 
- 	for (i = 0; i < tp->irq_cnt; i++) {
--- 
-2.25.1
-
+Dmitry
 
