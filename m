@@ -1,70 +1,77 @@
-Return-Path: <netdev+bounces-127896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9F47976F66
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:14:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52615976F6A
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:15:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54B401F22EF1
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:14:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13F3D281944
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E7A51C0DCB;
-	Thu, 12 Sep 2024 17:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC0E1BE25C;
+	Thu, 12 Sep 2024 17:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="EyG6xjGL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE191C172D
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 17:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D9F49654
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 17:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726161191; cv=none; b=QLjwnVu0H+N8Qd7Cd0YDV9WmaJT5SYnWHqQfheUUUnskuLfrnQfljawZQ0PdlLRIqGg22i7I0PZo6xMFfCjI9BZyoHMpguNl8y9oKjtcuj/GijAmDim15FP9JYZqTpM4pifHZB6uyny6JvoFPMdv858pElvV3K2rNNipPo5brSc=
+	t=1726161299; cv=none; b=s7qAh4kHTiTMBcpRruMSXaJ89px2HPUKkTIsb319xx8J3g4co9olcjSL9KdRaERXdCYkkvRJtMLzUDiVSlvundMJLglb/7Q1LyE0Am/zQdI88RC0JQdQCTLr8U+xSpVb0Tki8ktDuamV5xtbuXoQFHdGlsyQWQq3mkquIJ2t3BY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726161191; c=relaxed/simple;
-	bh=7oLxcbQRmn+3arYJxRSLC70a1Lo0hbIRKyGSPf/VgUY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fro2dEotCueC4B2ZaENV7mTBI5bor9jIzuw4Y4uBiUI5afCkYu3SmVFIkwzEtXHwyXpY0y62N5xBxMJXmS+BLiYCaEPtUFKx1IfDnFfwYJVPSYgZJZVkLqF+SdANT+R9MWfaLCU9pkXhgTaDhDg3ABtncxnAKH8Ps0DqLLmAFOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2055136b612so16841915ad.0
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 10:13:09 -0700 (PDT)
+	s=arc-20240116; t=1726161299; c=relaxed/simple;
+	bh=X/8dSa6Si8j86RcrAC3yTRSUMQ2+9mgrF5IHUg1rLMM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q34rqOvgzNyLEQAj10OiqUdbcJpVMyNI3npuHM9WxedKFhM37vshrwUzCGGYZlbXG8tXQm0v6g2u4xrMRaf+UUzN9c+rQEbTqYFZKqoT2Gd5/BL1lss0AMEWqSJ0RFl40lG2+bDVTT5f9EQn77LDeNMaKcsnHi1rvTthFxBJJYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=EyG6xjGL; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-718d91eef2eso804925b3a.1
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 10:14:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1726161296; x=1726766096; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0kYk0hVyvaX7KwaimyLasjhw8gwXmSfmWWg+9dvi0cA=;
+        b=EyG6xjGLUllGSHKJJSiMpQoCu4QNyg9/AZkmvaWlTwCFRWP7tzRp0E0vBOgvJRv5IW
+         pPokfxkYuCbwXHRLI8SlAkxiG8njz1SG7bhMbZg2a6pF+ITkRWXXScPR1hsG4Q3t85OB
+         /TczDbfULq13haXbGYcMlAJnVtVkYfe9OYXM3ccJAsex3TqsPz0h+Bm7C4DGEXSyJ3KS
+         ItI68wie+W5RIWhinGmYK9AITRTzmYTsa54KFHElksnGoK8/k6IxTvRF+uRtADIHaP1M
+         b/8kHsDRIFp0X1gqxkMe9jQSEv83KToEin1MMpfRS0k46LDPjYL2BB4/A/jrt4P+wJBG
+         LY2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726161188; x=1726765988;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ANPrqn/poK0SEPZlBGuiyz+Mam0cf6wHjUBvoH8Fniw=;
-        b=KHrGKncq6hOSXRw/9c7fQW6Ax0Y/i1JYvInkRXTcj8v5HZ0KeNB5ZX0JGJEHtG2Cfb
-         61uBIh+lsbpSNEbnscpA/uXNEOFxdQBSbevywxtnshGsbUa6umZpKK2Q8jSJQdiOlf0g
-         tsEVXqLXD/E+0TmqC0dqME/ZxZBsQoyzyfP3IkpALJ31Nvu99OrBLCdZGVtdr8cFSZG6
-         oit8W/YgfGmP0PQXkpBDIjgoR2Z4BKIOxFBsS5BfdPt4Tf/WjxPBD6mejH3AbfA+PhKs
-         mz5mO9qpv3+P5Lg1FaQc2q/IoD5wEUlXNdZzi7+mP9fjnnNjUyEfSkSAl6MGCVOrLv7W
-         2Qcw==
-X-Gm-Message-State: AOJu0YwuAS9lh5dTdKadKLHvDFRI3VWu5puBYI9iuh942Ar4PlKtB5Oq
-	XthNBF//UWNK9xnBd9cdRAdfRQBkOEHMzw3uFqkzYqAjT5pzx61ale7Y
-X-Google-Smtp-Source: AGHT+IH8RmYpXkdTtqJxRAZ2QgEN1Sn3I0/njDd8I2S03Zh+KiuVzsO0UckfBl3IBbVUFsxjOaUjEQ==
-X-Received: by 2002:a17:902:db05:b0:206:c12d:abad with SMTP id d9443c01a7336-2076e393e31mr67584275ad.34.1726161188715;
-        Thu, 12 Sep 2024 10:13:08 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076af47935sm16550585ad.106.2024.09.12.10.13.08
+        d=1e100.net; s=20230601; t=1726161296; x=1726766096;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0kYk0hVyvaX7KwaimyLasjhw8gwXmSfmWWg+9dvi0cA=;
+        b=Zvq6IzYUb3lvkgpoMbFLZeO62LUoXuUgh5UEZOYYWer3EgPFvOmxlJJpyk3+NUqFpE
+         3H7npOksGL4LEkBtvwc9KqFqdPrh15xylkZbrYHJG3EKb7tZcVZIcOG/YZSS0xEu2/3l
+         e49G9L8dfeO1+T1OT9Cf+svwLX9NIK9O8o5Fp/IUb+lhyi4tLKUSSRKcTbxt4xKEjGK6
+         aYhy6OstnqyYKYTspJdkqTfsThsSjH/tofQ0cgz0XMbHGmwHloAPXmnAtSGnKd+QaR0t
+         hddkMMNGGx6CO7RPkTYzBbo1PZhOncYE66uBMuKk+mUbIa8RyUZizgFN2gjP3kjbbPIq
+         HS+w==
+X-Gm-Message-State: AOJu0YwZgqJkZw42QE5aJLqKpSpjAIyRNtaACKFq+hRVrYPZLgsuH2rK
+	wINWCjmO5mSVCBxu/pMfMtG448cyLgHgyZsJn54vUGCkystTBnYEfbOn9hqwkrAXbZvWs5yASEU
+	r
+X-Google-Smtp-Source: AGHT+IFeFzfepH3xVTtICzvejNXFvWYIR6ONEGgBHgtKTw+66Mh3xriLj9BjVGy10yoX2ZCqjWq6oQ==
+X-Received: by 2002:a05:6a00:6f4d:b0:718:eeab:97ca with SMTP id d2e1a72fcca58-71907d98483mr18499227b3a.2.1726161296145;
+        Thu, 12 Sep 2024 10:14:56 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fddc6f9sm1731375a12.70.2024.09.12.10.14.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 10:13:08 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
+        Thu, 12 Sep 2024 10:14:55 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	Mina Almasry <almasrymina@google.com>
-Subject: [PATCH net-next 13/13] selftests: ncdevmem: Add automated test
-Date: Thu, 12 Sep 2024 10:12:51 -0700
-Message-ID: <20240912171251.937743-14-sdf@fomichev.me>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240912171251.937743-1-sdf@fomichev.me>
-References: <20240912171251.937743-1-sdf@fomichev.me>
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute] replace use of term 'Sanity check'
+Date: Thu, 12 Sep 2024 10:14:20 -0700
+Message-ID: <20240912171446.12854-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,100 +80,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Only RX side for now and small message to test the setup.
-In the future, we can extend it to TX side and to testing
-both sides with a couple of megs of data.
+The term "sanity check" is on the Tier2 word list (should replace).
+See https://inclusivenaming.org/word-lists/tier-2/sanity-check/
 
-  make \
-  	-C tools/testing/selftests \
-  	TARGETS="drivers/net" \
-  	install INSTALL_PATH=~/tmp/ksft
-
-  scp ~/tmp/ksft ${HOST}:
-  scp ~/tmp/ksft ${PEER}:
-
-  cfg+="NETIF=${DEV}\n"
-  cfg+="LOCAL_V6=${HOST_IP}\n"
-  cfg+="REMOTE_V6=${PEER_IP}\n"
-  cfg+="REMOTE_TYPE=ssh\n"
-  cfg+="REMOTE_ARGS=root@${PEER}\n"
-
-  echo -e "$cfg" | ssh root@${HOST} "cat > ksft/drivers/net/net.config"
-  ssh root@${HOST} "cd ksft && ./run_kselftest.sh -t drivers/net:devmem.py"
-
-Cc: Mina Almasry <almasrymina@google.com>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- tools/testing/selftests/drivers/net/Makefile  |  1 +
- tools/testing/selftests/drivers/net/devmem.py | 46 +++++++++++++++++++
- 2 files changed, 47 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/devmem.py
+ misc/arpd.c | 3 +--
+ tipc/node.c | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index bb8f7374942e..00da59970a76 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -5,6 +5,7 @@ TEST_INCLUDES := $(wildcard lib/py/*.py) \
- 		 ../../net/lib.sh \
+diff --git a/misc/arpd.c b/misc/arpd.c
+index 3185620f..e77ef539 100644
+--- a/misc/arpd.c
++++ b/misc/arpd.c
+@@ -494,8 +494,7 @@ static void get_arp_pkt(void)
+ 	if (ifnum && !handle_if(sll.sll_ifindex))
+ 		return;
  
- TEST_PROGS := \
-+	devmem.py \
- 	netcons_basic.sh \
- 	ping.py \
- 	queues.py \
-diff --git a/tools/testing/selftests/drivers/net/devmem.py b/tools/testing/selftests/drivers/net/devmem.py
-new file mode 100755
-index 000000000000..bbd32e0b0fe2
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/devmem.py
-@@ -0,0 +1,46 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+import errno
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import ksft_eq, KsftSkipEx
-+from lib.py import NetDrvEpEnv
-+from lib.py import bkg, cmd, rand_port, wait_port_listen
-+from lib.py import ksft_disruptive
-+
-+
-+def require_devmem(cfg):
-+    if not hasattr(cfg, "_devmem_probed"):
-+        port = rand_port()
-+        probe_command = f"./ncdevmem -P -f {cfg.ifname} -s {cfg.v6} -p {port}"
-+        cfg._devmem_supported = cmd(probe_command, fail=False, shell=True).ret == 0
-+        cfg._devmem_probed = True
-+
-+    if not cfg._devmem_supported:
-+        raise KsftSkipEx("Test requires devmem support")
-+
-+
-+@ksft_disruptive
-+def check_rx(cfg) -> None:
-+    cfg.require_v6()
-+    require_devmem(cfg)
-+
-+    port = rand_port()
-+    listen_cmd = f"./ncdevmem -l -f {cfg.ifname} -s {cfg.v6} -p {port}"
-+
-+    with bkg(listen_cmd) as nc:
-+        wait_port_listen(port)
-+        cmd(f"echo -e \"hello\\nworld\"| nc {cfg.v6} {port}", host=cfg.remote, shell=True)
-+
-+    ksft_eq(nc.stdout.strip(), "hello\nworld")
-+
-+
-+def main() -> None:
-+    with NetDrvEpEnv(__file__) as cfg:
-+        ksft_run([check_rx],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
+-	/* Sanity checks */
+-
++	/* Validate packet */
+ 	if (n < sizeof(*a) ||
+ 	    (a->ar_op != htons(ARPOP_REQUEST) &&
+ 	     a->ar_op != htons(ARPOP_REPLY)) ||
+diff --git a/tipc/node.c b/tipc/node.c
+index e645d374..b84a3fa1 100644
+--- a/tipc/node.c
++++ b/tipc/node.c
+@@ -252,7 +252,7 @@ get_ops:
+ 	/* Get master key indication */
+ 	opt_master = get_opt(opts, "master");
+ 
+-	/* Sanity check if wrong option */
++	/* Validate node key */
+ 	if (opt_nodeid && opt_master) {
+ 		fprintf(stderr, "error, per-node key cannot be master\n");
+ 		return -EINVAL;
 -- 
-2.46.0
+2.45.2
 
 
