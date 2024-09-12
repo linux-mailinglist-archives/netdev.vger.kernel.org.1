@@ -1,161 +1,142 @@
-Return-Path: <netdev+bounces-127952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 433AA9772D5
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 22:44:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E66119772DB
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 22:46:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 058A0286054
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:44:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71FD1285FBE
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77891C174F;
-	Thu, 12 Sep 2024 20:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74EB21C0DEB;
+	Thu, 12 Sep 2024 20:46:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wFlx9HxJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U50hkH8F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+Received: from mail-ua1-f45.google.com (mail-ua1-f45.google.com [209.85.222.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CC41BF81C
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 20:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFBA1BF80E
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 20:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726173843; cv=none; b=kD+FBr0ZTVLwmqmSEZBvX+5m+JodXha8a74GgALnNIpVuCTqs6J+3jZs15YtPIb+dSK33qzflubirvO3YQKp4a6Y1fisMPkjICVFEFHz3uMwR+EHHzNG8ILwPDs0/0yCfe2j2WgwBg9NEhRv6mVjdQSh5GwcHhKnOY+LVkLBU6A=
+	t=1726174012; cv=none; b=nGMj0pHZeM62x6LGLOzJIA4Q9gmpqZYL5rPPIUdHmlVHVxMwfm6CO0UHxePhdmNKhJ49hNOIaS7iAP9X3CezLb16goWKHr9SxjQwIud53iag5wARs4I6ESC+/E7Q/Dmz/bEojpD18pecniNHKscOMxQ6/grz55+Fls/UZs+mLvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726173843; c=relaxed/simple;
-	bh=POeMZyrSzWfT0c/EFYH4aVeVC1H3dWbv5VrEhXmoxgw=;
+	s=arc-20240116; t=1726174012; c=relaxed/simple;
+	bh=PUgomda2CyhMlJY9xvvj+l3lLegayrInbUbBuHIKUHw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B7DcIszzHF4Jalf9pqwG/UhWHt0m7AG8pOWZPlvhUay2kCtlh12D+TBbFHA4OcGGnZHjwmINuGw6yb3CJ1/UQG4HDLyKyFiIz/IbNkG4nHd5mk+ycf1CKWJQWhxV/nZYyEhwHCLvIiDCM63ML3cZRX0NHM1YDZPiueAnDLfPtZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wFlx9HxJ; arc=none smtp.client-ip=209.85.217.51
+	 To:Cc:Content-Type; b=YtriCaeXjpkfr6yooTtyXWU0jYZ17jx/DwXZsu7qjH+bEBGP0UvYoeLzz1pYIXkfRIxYqRHA0z8rAR154P62WZf7ZQ+VHdSMDrBhQXLg7ygjOdjWxioTnPI1bE3EKEy6bY4zJE038QTE8Vc6PMgu9PhdO42r5sWAp4gm/AJPcyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U50hkH8F; arc=none smtp.client-ip=209.85.222.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-49bdc6e2e2cso493486137.0
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 13:44:01 -0700 (PDT)
+Received: by mail-ua1-f45.google.com with SMTP id a1e0cc1a2514c-846bcb525f7so393774241.3
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 13:46:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726173841; x=1726778641; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1726174010; x=1726778810; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7DjwiIxMiUHr1M6b4I5f9AEu55zXyA3J0twzo/v710c=;
-        b=wFlx9HxJS6WhEJjtnpyuDRH6cxGr+0GWzT35/x2kDdCv9W2k4A7/T3uzsAHFgjNkQ+
-         TdAEI9ebLq91wjS8R2Ot8kKSRmHf93bwVmU/KoLBDP4Q5x72t/Z51T9rLT7wn9DueLSU
-         D0hGu/BRwlcdn6CMokng56PFRoSakH9BmsO2Ik9R4WabwzyEGdC/a4hOlCZJcxKpVih4
-         EPIJcTzVkUqF7+WFPr5icBgxt7mDRWTcFX6m/Jc3xAoBb6lfVA5TD+1w89bqIZGEY+CE
-         ljHVZpjgLB9UnclbR2aCe0r9k7cKmWV6f2slht/jUIRBOgtvkYeHP441A3ht5vSoAaK6
-         ykmg==
+        bh=wK58VG1V7FuECBcBg38MFAxruS5KPVTGw+RO+/DWnyY=;
+        b=U50hkH8Fr1D+FwvTK/Ah61oO19h9A/6MrZhQQ5vcX0V4rt/WZ99w53//MbLqyY5LUF
+         KTZ1mxEAznhf+5UMFUhg6Y/LE6xzQytZp/P8mabW5QbOHdpIbQpfEzbVC2O3BuAs2mdP
+         qPF6D/MNrWMY/vOtDKY5vPv8p2GFNgvu/19E/le+G5FbKL1oI8Zbt5i+U6/dW64Yd11y
+         nNTV7yu2TwGEJWdNosrLblu7XKVc5V19osN6CLezIYyrIHsAvBqvj+ZId3Pww7jCF5V4
+         RYP6OIel6NCEMhI2YCf9xkdeGMUXsXCeqdh8gefy2VLHUR52sxgXgRiK4rZbQslRjFVD
+         cYhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726173841; x=1726778641;
+        d=1e100.net; s=20230601; t=1726174010; x=1726778810;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7DjwiIxMiUHr1M6b4I5f9AEu55zXyA3J0twzo/v710c=;
-        b=HBMW/Njo3ykjUJmSVoOgJ7gwswmbpTwOdhd+n0OpU9oEcLQKdAB9PjOj7Qr+MjTzQi
-         zCBUooTu4ji8yH/MC0v2f9dStcVd47GmGLtOA/ADZrrMNa2BDrof0oYhQVJ6dcq61efT
-         YzeNFpDjYHV2iMAhJ3vInW3SEWxveDGoA2WRgHAfakyvxpLdi9op9UahbaoSjG4LVwNb
-         UJjZHtVdPbOPvTWrEMy55hRoSD/edeB5oMmQNlzgf8OOtu0nuNeMUU7rAxRza1RDigpl
-         woe6gYH3510qV5dRXYWMwhCCC7wn8pw6rKxCVpVknfKQCVeYaTSXqtLH2VEHoIY03CcL
-         SlVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFi67hgly+d+Byip43X9IxTySxfJpILYJvtIeic4hIxmVAMYTuQcfibO4TciDKJpS1if7EyUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwOa5R+tiJDXN2HitaYJqgEsfdBt8jyEUiea9Do1okj+Khj+z3i
-	HMR3+TQO6P8Cj8AenHa9BU2bZH/7WemWk92OZ5SH46rfh0B2VLey5+SiW6zMQcU/SY1qxTC0s22
-	fuWOUWwRH2MJSFHCstQc3bwljFvTeyfWvfY2s
-X-Google-Smtp-Source: AGHT+IHCLGoDTbD9LAUphE9SPUrx3KUcIqiqyoGvbi+stviqZGZ5BDOXy0oCRC9AnOS0a9EEOZIMy5Ntm4L7cGK4dJE=
-X-Received: by 2002:a05:6102:a48:b0:49b:e7d7:3e1b with SMTP id
- ada2fe7eead31-49d41468125mr4919245137.3.1726173840757; Thu, 12 Sep 2024
- 13:44:00 -0700 (PDT)
+        bh=wK58VG1V7FuECBcBg38MFAxruS5KPVTGw+RO+/DWnyY=;
+        b=enQT/Y6fOyUG46ghhI9/ewJtJzVPgxQsYhgdrJtJOqx9YX0A9rP1gNhKGU7SIj2Lri
+         xhqKISGvii3XKy5AV7xiCb3UDppX0g+pqzeA0JMBs0hROIr4kqR0oAwCHwrZlXX8pBHQ
+         FWCwmnQrQP6BBO65dlTh76B6rlGPmRSQGxzOlAmyuLZ1VYO2jdKkeIhpASNRXiGrBDiu
+         ZmPB386EN9ovSjN5kc86C8T1dyAxofRXjwKBci+t6NN3dt3sI+ITjin5jUZeP4YOh1VU
+         9uC1wtYXLb7lMfeKLzzwr4cAePrdUeO5Ild4vKoGg7UlpGcIpIgj+L0qhjRkiEgZNqw+
+         bX3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCV3kp+JPgJRkQzA6pf67D+c2z8/fiXaiVMx7z5A/dh85PSQhH5gh+tCiqJUmKMI9nC/d+b78Pk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbgeyUBYVKOLY+bHg2w15Wtit9WLU0Qe46lmUyaJib8mK4wFDE
+	O+s7aTdWS2VESKhoR3yGJh2RFKjl2N9CLL0nFtJ0NAIj6JAjhPqVxkHjxznD1dwa2fPnCP6U1R0
+	tquskJqxYAOkwKOFOJb3+Xe+4qwdCQxAM1O+p
+X-Google-Smtp-Source: AGHT+IFR9c4mGvOi2HrDdg0buWSsv/T5WBLE+nQhkC9Wov8wJy7lx1tENOcz5mVUb25Wiz64bUjJDIXKFIwDlZYJ3b8=
+X-Received: by 2002:a05:6102:94d:b0:498:d3b7:be37 with SMTP id
+ ada2fe7eead31-49d41459242mr4307759137.3.1726174009541; Thu, 12 Sep 2024
+ 13:46:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240909-strncpy-net-caif-chnl_net-c-v1-1-438eb870c155@google.com>
- <20240910093751.GA572255@kernel.org>
-In-Reply-To: <20240910093751.GA572255@kernel.org>
+References: <20240911015228.1555779-1-kuba@kernel.org>
+In-Reply-To: <20240911015228.1555779-1-kuba@kernel.org>
 From: Justin Stitt <justinstitt@google.com>
-Date: Thu, 12 Sep 2024 13:43:49 -0700
-Message-ID: <CAFhGd8qQ_e_rh1xQqAnaAZmA7R+ftRGjprxGp+njoqg_FGMCSw@mail.gmail.com>
-Subject: Re: [PATCH] caif: replace deprecated strncpy with strscpy_pad
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	Kees Cook <kees@kernel.org>
+Date: Thu, 12 Sep 2024 13:46:38 -0700
+Message-ID: <CAFhGd8oaLC3Q=eopGb2=VPnhNVM4vb9rkGP0hM-gdT2C4m7c=g@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: caif: remove unused name
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, horms@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi,
 
-On Tue, Sep 10, 2024 at 2:37=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
+On Tue, Sep 10, 2024 at 6:52=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> On Mon, Sep 09, 2024 at 04:39:28PM -0700, Justin Stitt wrote:
-> > strncpy() is deprecated for use on NUL-terminated destination strings [=
-1] and
-> > as such we should prefer more robust and less ambiguous string interfac=
-es.
-> >
-> > Towards the goal of [2], replace strncpy() with an alternative that
-> > guarantees NUL-termination and NUL-padding for the destination buffer.
->
-> Hi Justin,
->
-> I am curious to know why the _pad variant was chosen.
+> Justin sent a patch to use strscpy_pad() instead of strncpy()
+> on the name field. Simon rightly asked why the _pad() version
+> is used, and looking closer name seems completely unused,
+> the last code which referred to it was removed in
+> commit 8391c4aab1aa ("caif: Bugfixes in CAIF netdevice for close and flow=
+ control")
 
-I chose the _pad variant as it matches the behavior of strncpy in this
-context, ensuring minimal functional change. I think the point you're
-trying to get at is that the net_device should be zero allocated to
-begin with -- rendering all thus NUL-padding superfluous. I have some
-questions out of curiosity: 1) do all control paths leading here
-zero-allocate the net_device struct? and 2) does it matter that this
-private data be NUL-padded (I assume not).
-
-With all that being said, I'd be happy to send a v2 using the regular
-strscpy variant if needed.
+Thanks for looking into this a bit deeper.
 
 >
-> > Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#st=
-rncpy-on-nul-terminated-strings [1]
-> > Link: https://github.com/KSPP/linux/issues/90 [2]
-> > Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.en=
-.html
-> > Cc: Kees Cook <keescook@chromium.org>
-> > Cc: linux-hardening@vger.kernel.org
-> > Signed-off-by: Justin Stitt <justinstitt@google.com>
-> > ---
-> > Note: build-tested only.
-> > ---
-> >  net/caif/chnl_net.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/net/caif/chnl_net.c b/net/caif/chnl_net.c
-> > index 47901bd4def1..ff37dceefa26 100644
-> > --- a/net/caif/chnl_net.c
-> > +++ b/net/caif/chnl_net.c
-> > @@ -347,7 +347,7 @@ static int chnl_net_init(struct net_device *dev)
-> >       struct chnl_net *priv;
-> >       ASSERT_RTNL();
-> >       priv =3D netdev_priv(dev);
-> > -     strncpy(priv->name, dev->name, sizeof(priv->name));
-> > +     strscpy_pad(priv->name, dev->name);
-> >       INIT_LIST_HEAD(&priv->list_field);
-> >       return 0;
-> >  }
-> >
-> > ---
-> > base-commit: bc83b4d1f08695e85e85d36f7b803da58010161d
-> > change-id: 20240909-strncpy-net-caif-chnl_net-c-a505e955e697
-> >
-> > Best regards,
-> > --
-> > Justin Stitt <justinstitt@google.com>
-> >
-> >
+> Link: https://lore.kernel.org/20240909-strncpy-net-caif-chnl_net-c-v1-1-4=
+38eb870c155@google.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: justinstitt@google.com
+> CC: horms@kernel.org
+>
+> It's a bit unusual to take over patch submissions but the initial
+> submission was too low effort to count :|
+> ---
+>  net/caif/chnl_net.c | 2 --
+>  1 file changed, 2 deletions(-)
 
-I appreciate the review.
+the best kind of diff :)
 
-Thanks
-Justin
+>
+> diff --git a/net/caif/chnl_net.c b/net/caif/chnl_net.c
+> index 47901bd4def1..94ad09e36df2 100644
+> --- a/net/caif/chnl_net.c
+> +++ b/net/caif/chnl_net.c
+> @@ -47,7 +47,6 @@ struct chnl_net {
+>         struct caif_connect_request conn_req;
+>         struct list_head list_field;
+>         struct net_device *netdev;
+> -       char name[256];
+>         wait_queue_head_t netmgmt_wq;
+>         /* Flow status to remember and control the transmission. */
+>         bool flowenabled;
+> @@ -347,7 +346,6 @@ static int chnl_net_init(struct net_device *dev)
+>         struct chnl_net *priv;
+>         ASSERT_RTNL();
+>         priv =3D netdev_priv(dev);
+> -       strncpy(priv->name, dev->name, sizeof(priv->name));
+>         INIT_LIST_HEAD(&priv->list_field);
+>         return 0;
+>  }
+> --
+> 2.46.0
+>
+
+Acked-by: Justin Stitt <justinstitt@google.com>
 
