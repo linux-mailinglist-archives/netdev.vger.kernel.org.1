@@ -1,132 +1,108 @@
-Return-Path: <netdev+bounces-127636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 775C7975EE7
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:30:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7A2975EEC
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:33:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B15A31C21D0F
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:30:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6334C1F2296D
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6F23CF58;
-	Thu, 12 Sep 2024 02:29:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C5DB2D05D;
+	Thu, 12 Sep 2024 02:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H8/l9Jml"
+	dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b="I+yM0KMH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f193.google.com (mail-yb1-f193.google.com [209.85.219.193])
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D00653A8E4;
-	Thu, 12 Sep 2024 02:29:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7030C250EC;
+	Thu, 12 Sep 2024 02:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726108196; cv=none; b=srvQypltVXEb1vmxjfND+wZjwKaFA+K//hh5LL1DddoOpgC5xae72d9rRxrOoTOILdZtBGFqpMDOFf+UjKNPNfbEswf44/UOXfexxZGsT8lrd2xTIz41a/SVBpRcQsf9KCNnKX02kSTgHownmy/o3vBiV2kCNqaZOPviNqWiVwk=
+	t=1726108396; cv=none; b=Ju1sH+uUJfFDEVDTS/NH6Nd0ohGMfAjic/kCMSKdRgvpJ8lS2EThgBesh7QUTP42V966BDg9dtIuGFw6SFSpuyQ6TKuVvkf4PXO6LXk2wpxZMt+lbCXAqH6+mhfw8DncrJ9uEo4GHJiRPldhfILZo5DVBz6OW+ua+ji1/rZRUe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726108196; c=relaxed/simple;
-	bh=t08umSXdAuGeBddaW526nzG0WyKi1PzANkSvIgym6lo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PkaPBfLQgLoJ24Dhe8jDFnF2L9EbMjdOVvr1X1zXB/yiz0kMxMl349l1mVMZf7GKj8qEuZU/InzE4OD/VC7cmg5alfaQhFOs/yE3E/PSxUjmJupFtjZRNK0QEPIjUtfcYAY8T9do9hVMDdhSS+RRSqsG5EPOX+FJSUeenj5tCmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H8/l9Jml; arc=none smtp.client-ip=209.85.219.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f193.google.com with SMTP id 3f1490d57ef6-dff1ccdc17bso541873276.0;
-        Wed, 11 Sep 2024 19:29:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726108194; x=1726712994; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mWRMmHm+FfWDYa8yX01QI6M1EYeU0fnEELtdBrM9ofw=;
-        b=H8/l9JmliZTmlC+we2Zfp06Lp2UrmFOGlS6F54zAgPWgBjyn+sjEPnakdWsOz/1X/E
-         H2DH3SNIxl9jMvawXRBTZdZz3FJQRTukVtdyaGGHodE1nGCoDp41BJ/PdnKjFwmmxsSF
-         YTrHH5LXojpqTUm7vBEBvxNJF9p2/VLq2aLxqy0vJg7hxIsvYd7KeAz0B5FmXRt8KNVG
-         0wwz9szRDZ++sKQS6KUkUrO44x5pVw8Rx9S2v2xAaTxFQQKWBo4RQosADh8Rud+wqlSl
-         4Y1oiNnx1CwJlKiWk8aVH63Cr4AVBkRTYljydCndolO5fqmcA2UYlAwWWLb51QMuZqX6
-         XQRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726108194; x=1726712994;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mWRMmHm+FfWDYa8yX01QI6M1EYeU0fnEELtdBrM9ofw=;
-        b=safbRqW3fhqRXoCDMFhRPS99pNZdktiAoslR1Kz8E4EYo89OnTMunwwWM9sI+A+Kx8
-         7xx54GiJCM8losy+/dKwYQ+kqCnj1AFBvDjgMLNp71+fDSsB4LaUZJU0ANaz/v4oH6Jd
-         dsVE0MVjCX8YM001GzaYsSfusgAeXrzM9wQa/u5Glt+iFCFs7te4/4mPfl6oTpVdgAkf
-         Htu+CkvsnICIqL66R+caOnKD06dde37dXMZR9B6BBCUV1L8Yku1UduIt/93e04mci1xS
-         hn3jzHXAjbp1N0Y9wJZzQc4cBMftmDAHmujMNGbzAz2tqOs6DoOrtdkffSTIvQYAySW1
-         0mCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVuJQXwISg8SS14x8FQby0LeewyCUOFU3sW7t9KYUOvZka6rtSuW7o10frYPu1SpHF1hIMku1Q5@vger.kernel.org, AJvYcCXGcHXeULT2RABVOhGeMLzpBTgDgE+jsAgKfI8obY3SBj0RvAG9RIYX0FLB1v8BLspuCDZN6Iul5qSvmIE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxiyHR37bLxSYdaHUyBmJYWEVMVJ1nLFAtLU4ptvVFzjIHsn/9C
-	YzWayl9PptRceG3rppXn7plUbnMp9uxw2HLns9mYo8G4Iu4X+IDpRsDa0WEu7e30I9FejEL+DCp
-	0PO/kf1E7jGhy0trsvjPuMKrDAMk=
-X-Google-Smtp-Source: AGHT+IExPuoKunfojdj2czxk8KU+K07L0H57eNKlbS8wQqYKtiU+V90C/1MT/sEzKtMGaP4J/Nqfdiu31017kjeWy/M=
-X-Received: by 2002:a05:6902:1149:b0:e11:82fb:70c with SMTP id
- 3f1490d57ef6-e1d9dc6624bmr1844103276.51.1726108193657; Wed, 11 Sep 2024
- 19:29:53 -0700 (PDT)
+	s=arc-20240116; t=1726108396; c=relaxed/simple;
+	bh=RqdZqomXAwCyOm15Ifcp/0ilFc9KF41m0H52KNmV10Q=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jTCs6X4i2FobI5Bqa1BPsJXFPbXlP1tFMIb2VC8OtXMTFmHqgjgVbKnsZHGH/K82BJnc4LoAnr0gho8CCFj8N3WLlemkwMpT558U87+9vAERhEiHXiKCChqI9KkLJs35hLxCyfckGRx8QB5K/JG4+A1KChAX7/fXwn3zAyORDjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; dkim=temperror (0-bit key) header.d=realtek.com header.i=@realtek.com header.b=I+yM0KMH; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 48C2X85A0541259, This message is accepted by code: ctloc85258
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=realtek.com; s=dkim;
+	t=1726108388; bh=RqdZqomXAwCyOm15Ifcp/0ilFc9KF41m0H52KNmV10Q=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:Content-Transfer-Encoding:MIME-Version;
+	b=I+yM0KMH5jRw/B85Bv+PRWrVrIJsJqB8SS7a0FhoWW+UFGxC8b9tt0xmBczBerC/p
+	 ikm9N8mqXNqIJhr6M3t6GHqD7PwxZjKSwiqZQzZpN9Tk9haHBbzcETq23g99NjB5y3
+	 l7tPYd1Ep4DmSCQHhngC5RSmsGOPtezL2UwepNudELABFse5X8MjwEp/TmxC1M3zv6
+	 0PqspJutBWiXIN1tU13MS2RvD/wjvdkgwHDiwEDFxRcvv/6AoE/w37thTy+8U3Pqq7
+	 6/gVe3QIWXdHzR+JOUV74SJpI4cxTJBTdD+vxFfWJlxSG9Get2m8e3tUL+hbBdPwE9
+	 DqwP1jgjw/Srg==
+Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
+	by rtits2.realtek.com.tw (8.15.2/3.05/5.92) with ESMTPS id 48C2X85A0541259
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 12 Sep 2024 10:33:08 +0800
+Received: from RTEXDAG01.realtek.com.tw (172.21.6.100) by
+ RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 12 Sep 2024 10:33:08 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXDAG01.realtek.com.tw (172.21.6.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 12 Sep 2024 10:33:08 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f]) by
+ RTEXMBS04.realtek.com.tw ([fe80::2882:4142:db9:db1f%11]) with mapi id
+ 15.01.2507.035; Thu, 12 Sep 2024 10:33:08 +0800
+From: Ping-Ke Shih <pkshih@realtek.com>
+To: Jakub Kicinski <kuba@kernel.org>, Kalle Valo <kvalo@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>
+Subject: RE: pull-request: wireless-next-2024-09-11
+Thread-Topic: pull-request: wireless-next-2024-09-11
+Thread-Index: AQHbBCaF/9K30GyQfUOAvskhRTD9drJSiJ+AgACjYo7//3uwgIAAAHyAgADGoYA=
+Date: Thu, 12 Sep 2024 02:33:08 +0000
+Message-ID: <0b6a69a39d6b463da41c5a83b747e4cd@realtek.com>
+References: <20240911084147.A205DC4AF0F@smtp.kernel.org>
+	<20240911134521.7f510329@kernel.org>	<87ikv1bz8e.fsf@kernel.org>
+	<20240911153633.7a01a6c7@kernel.org> <20240911153817.0c150bc6@kernel.org>
+In-Reply-To: <20240911153817.0c150bc6@kernel.org>
+Accept-Language: en-US, zh-TW
+Content-Language: zh-TW
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240909071652.3349294-1-dongml2@chinatelecom.cn>
- <20240909071652.3349294-7-dongml2@chinatelecom.cn> <ZuFP9EAu4MxlY7k0@shredder.lan>
-In-Reply-To: <ZuFP9EAu4MxlY7k0@shredder.lan>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Thu, 12 Sep 2024 10:30:01 +0800
-Message-ID: <CADxym3ZUx7v38YU6DpAxLU_PSOqHTpvz3qyvE4B3UhSHR2K67w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 06/12] net: vxlan: make vxlan_snoop() return
- drop reasons
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: kuba@kernel.org, aleksander.lobakin@intel.com, horms@kernel.org, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	dsahern@kernel.org, dongml2@chinatelecom.cn, amcohen@nvidia.com, 
-	gnault@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com, 
-	razor@blackwall.org, petrm@nvidia.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 11, 2024 at 4:08=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
-ote:
->
-> On Mon, Sep 09, 2024 at 03:16:46PM +0800, Menglong Dong wrote:
-> > @@ -1447,7 +1448,7 @@ static bool vxlan_snoop(struct net_device *dev,
+Jakub Kicinski <kuba@kernel.org> wrote:
+> On Wed, 11 Sep 2024 15:36:33 -0700 Jakub Kicinski wrote:
+> > > What's the deadline for these? Do you need the fixes tomorrow or can =
+it
+> > > wait a week or two?
 > >
-> >       /* Ignore packets from invalid src-address */
-> >       if (!is_valid_ether_addr(src_mac))
-> > -             return true;
-> > +             return SKB_DROP_REASON_VXLAN_INVALID_SMAC;
->
-> [...]
->
-> > diff --git a/include/net/dropreason-core.h b/include/net/dropreason-cor=
-e.h
-> > index 98259d2b3e92..1b9ec4a49c38 100644
-> > --- a/include/net/dropreason-core.h
-> > +++ b/include/net/dropreason-core.h
-> > @@ -94,6 +94,8 @@
-> >       FN(TC_RECLASSIFY_LOOP)          \
-> >       FN(VXLAN_INVALID_HDR)           \
-> >       FN(VXLAN_VNI_NOT_FOUND)         \
-> > +     FN(VXLAN_INVALID_SMAC)          \
->
-> Since this is now part of the core reasons, why not name it
-> "INVALID_SMAC" so that it could be reused outside of the VXLAN driver?
-> For example, the bridge driver has the exact same check in its receive
-> path (see br_handle_frame()).
->
+> > It can wait, half of them are old anyway
+>=20
+> Oh, that's because they are in staging :) I missed that.
+> But anyway, I don't think that a harmless, single compiler,
+> W=3D1 warning is a blocker.
 
-Yeah, I checked the br_handle_frame() and it indeed does
-the same check.
+I have fixed warnings of "wifi: rtw89" by [1]. For staging code, I use anot=
+her
+patchset [2] to fix it.
 
-I'll rename it to INVALID_SMAC for general usage.
+I'm not sure [1] should go wireless or rtw tree. Please guide me. Thanks.=20
 
-Thanks!
-Menglong Dong
-> > +     FN(VXLAN_ENTRY_EXISTS)          \
-> >       FN(IP_TUNNEL_ECN)               \
-> >       FNe(MAX)
+[1] https://lore.kernel.org/linux-wireless/20240912021626.10494-1-pkshih@re=
+altek.com/T/#u
+[2] https://lore.kernel.org/linux-staging/20240912022522.10715-1-pkshih@rea=
+ltek.com/T/#t
+
+
 
