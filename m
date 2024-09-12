@@ -1,198 +1,141 @@
-Return-Path: <netdev+bounces-127747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81996976514
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 10:59:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE453976525
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 11:06:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A56FD1C22D76
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:59:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AD4AB2241D
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:06:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86EBE192D89;
-	Thu, 12 Sep 2024 08:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5038119259B;
+	Thu, 12 Sep 2024 09:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/CtgxfV"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hJcTxavP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E98126C16;
-	Thu, 12 Sep 2024 08:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DF7E136338;
+	Thu, 12 Sep 2024 09:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726131575; cv=none; b=nXRqrObqn3RFQiC0xhokiyiBKTzJq6MMAJCtYXxQw1BO7oNFYQD72xPiZaL+g4rUtd6EtHYdId5NenDS52pNmFG6TG+tLLBhEhOPrW37hu5xOyCxbmv2m0surrzIjQag37s0G7BOH/9VL0iw0LjTNLsFGFGWkzvwC0naZWhOEHk=
+	t=1726131987; cv=none; b=mY+RRJ63mN1NufB5oNnHLKns8Wqg00+zr+C4O58SmpMmmwrivWImGeuIbpmv9xb2972ndx0R31FLCKoPrFoKSeyLHB/Ypu5guvRritppdtAtT1JWj+u3aH+Aww5uRBHImgXGaZ8wxTR7w6L1azoru7xgM6TA1sttT8nXZuUJkKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726131575; c=relaxed/simple;
-	bh=5wbXtFl13LS4fzM8TQZTImPk5C3pfWEpGNTii/WzCkA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QTYV2BdFB5jHXRa5TbmNSxFfpPl+VV8K/CnRi/L2p1QxLAWLC+VBVS7llJoCjw2KxarLaW5hp2Drb9dOL8xUZCeQZ7bi+JMhOEJNJyV8ab3ccFDM18v3ANDQOXuXqnNoLymqMRGytkN96janlb6add8VhLyi9iTraLVlnTLnJaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/CtgxfV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F2F1C4CEC3;
-	Thu, 12 Sep 2024 08:59:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726131574;
-	bh=5wbXtFl13LS4fzM8TQZTImPk5C3pfWEpGNTii/WzCkA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M/CtgxfVU2D/w1RmOoTi0eip/rfA0KuoA1S0sRFkVN1djn/ltmt83JWAcaOjPqvEE
-	 DoarBNsXKxN9kxThfFfiXlmSxvYS45uGksKK8eOHmxj4hbxTYykOXOgb+ZDpG2VJLS
-	 kDJNIJahyLaxaaNGexEJ9Sc0Uy42++Em46W4nNJZcUDrN2ec/ZUWK3ia9BpVqxbq9v
-	 FS/9J10o3mB0LSojf16TCO0+vpXKqW3E3J4R1Evp2LVqIYTHGabL40f5fKec+AaJ7W
-	 yBr/VSy59BU4sb/SkCoNscNGF70YvNIsj/qnFwBUQqBRaJ/5cYa7LjmIRig7/0XscB
-	 xK4UDMDyWgPaw==
-Date: Thu, 12 Sep 2024 09:59:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1726131987; c=relaxed/simple;
+	bh=gmWaGnaYgvGtbS+/WmvQDW233G9+1neW7bCLMHLlyQY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LdeD6P6/MYfddpNzqsbek6/O9bMUZWCmxsqhDNXA8UXrR6X4vnaRau2eoFKq8OHPQKe1NR8+KgrRPVwpInm0BkBf1YZvaJxRb7iE1q5sASkQ1KpaMBfyKUu3bRhtxWixNZJAdZ10AxR4unExjuAu0ZrVVM08P1YSq8eAxzJVfEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hJcTxavP; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 830EB24000A;
+	Thu, 12 Sep 2024 09:06:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1726131982;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=IF+Eaipz1NUyYQfRLpw/7X4WaLCiU+z8IzAnLdbUwUQ=;
+	b=hJcTxavPDHghkve0RstAdi2ef2NNqHjw2MxQEDkpMRuz3G0m4iEF05cjhuexy1lfJDZeyS
+	LxQNYsljFGd/OVcU+lOxw34N1WiuqYHnpc8ZTk58AoILmF7vjf4MOEQDoEnTwe1CWRmT03
+	8fNywin7C88k2rVdGM7ccykm84fILrS3J7k4z9rVg00ytxHmSjWJiQ7EQFmBl00enOMhh1
+	Kv44vOqy4XAhVJRmh/1O+rFiDHqCgD7Krc2nlRKjrlpfYq/GdE2uRAaVuu5TYZsTDylSCM
+	iSAqlhRivio+zaeRT2u3C1ZaWHNicnGmDCx39LQvupZchWcSeon5fPgx9dmI0Q==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Simon Horman <horms@kernel.org>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	thomas.petazzoni@bootlin.com,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, netdev@vger.kernel.org,
-	linux-omap@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH net-next 3/3] net: ethernet: ti: cpsw_ale: Remove unused
- accessor functions
-Message-ID: <20240912085929.GF572255@kernel.org>
-References: <20240910-ti-warn-v1-0-afd1e404abbe@kernel.org>
- <20240910-ti-warn-v1-3-afd1e404abbe@kernel.org>
- <78b4ca2a-9448-4451-8e25-c57306af38e9@kernel.org>
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: [PATCH net-next v2] Documentation: networking: Fix missing PSE documentation and grammar issues
+Date: Thu, 12 Sep 2024 11:05:50 +0200
+Message-Id: <20240912090550.743174-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <78b4ca2a-9448-4451-8e25-c57306af38e9@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, Sep 12, 2024 at 10:07:27AM +0300, Roger Quadros wrote:
-> Hi Simon,
-> 
-> On 10/09/2024 10:17, Simon Horman wrote:
-> > W=1 builds flag that some accessor functions for ALE fields are unused.
-> > 
-> > Address this by splitting up the macros used to define these
-> > accessors to allow only those that are used to be declared.
-> > 
-> > The warnings are verbose, but for example, the mcast_state case is
-> > flagged by clang-18 as:
-> > 
-> > .../cpsw_ale.c:220:1: warning: unused function 'cpsw_ale_get_mcast_state' [-Wunused-function]
-> >   220 | DEFINE_ALE_FIELD(mcast_state,           62,     2)
-> >       | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > .../cpsw_ale.c:145:19: note: expanded from macro 'DEFINE_ALE_FIELD'
-> >   145 | static inline int cpsw_ale_get_##name(u32 *ale_entry)                   \
-> >       |                   ^~~~~~~~~~~~~~~~~~~
-> > <scratch space>:196:1: note: expanded from here
-> >   196 | cpsw_ale_get_mcast_state
-> >       | ^~~~~~~~~~~~~~~~~~~~~~~~
-> > 
-> > Compile tested only.
-> > No functional change intended.
-> > 
-> > Signed-off-by: Simon Horman <horms@kernel.org>
-> > ---
-> >  drivers/net/ethernet/ti/cpsw_ale.c | 30 +++++++++++++++++++++---------
-> >  1 file changed, 21 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
-> > index 64bf22cd860c..d37b4ddd6787 100644
-> > --- a/drivers/net/ethernet/ti/cpsw_ale.c
-> > +++ b/drivers/net/ethernet/ti/cpsw_ale.c
-> > @@ -141,27 +141,39 @@ static inline void cpsw_ale_set_field(u32 *ale_entry, u32 start, u32 bits,
-> >  	ale_entry[idx] |=  (value << start);
-> >  }
-> >  
-> > -#define DEFINE_ALE_FIELD(name, start, bits)				\
-> > +#define DEFINE_ALE_FIELD_GET(name, start, bits)				\
-> >  static inline int cpsw_ale_get_##name(u32 *ale_entry)			\
-> >  {									\
-> >  	return cpsw_ale_get_field(ale_entry, start, bits);		\
-> > -}									\
-> > +}
-> > +
-> > +#define DEFINE_ALE_FIELD_SET(name, start, bits)				\
-> >  static inline void cpsw_ale_set_##name(u32 *ale_entry, u32 value)	\
-> >  {									\
-> >  	cpsw_ale_set_field(ale_entry, start, bits, value);		\
-> >  }
-> >  
-> > -#define DEFINE_ALE_FIELD1(name, start)					\
-> > +#define DEFINE_ALE_FIELD(name, start, bits)				\
-> > +DEFINE_ALE_FIELD_GET(name, start, bits)					\
-> > +DEFINE_ALE_FIELD_SET(name, start, bits)
-> > +
-> > +#define DEFINE_ALE_FIELD1_GET(name, start)				\
-> >  static inline int cpsw_ale_get_##name(u32 *ale_entry, u32 bits)		\
-> >  {									\
-> >  	return cpsw_ale_get_field(ale_entry, start, bits);		\
-> > -}									\
-> > +}
-> > +
-> > +#define DEFINE_ALE_FIELD1_SET(name, start)				\
-> >  static inline void cpsw_ale_set_##name(u32 *ale_entry, u32 value,	\
-> >  		u32 bits)						\
-> >  {									\
-> >  	cpsw_ale_set_field(ale_entry, start, bits, value);		\
-> >  }
-> >  
-> > +#define DEFINE_ALE_FIELD1(name, start)					\
-> > +DEFINE_ALE_FIELD1_GET(name, start)					\
-> > +DEFINE_ALE_FIELD1_SET(name, start)
-> > +
-> >  enum {
-> >  	ALE_ENT_VID_MEMBER_LIST = 0,
-> >  	ALE_ENT_VID_UNREG_MCAST_MSK,
-> > @@ -217,14 +229,14 @@ static const struct ale_entry_fld vlan_entry_k3_cpswxg[] = {
-> >  
-> >  DEFINE_ALE_FIELD(entry_type,		60,	2)
-> >  DEFINE_ALE_FIELD(vlan_id,		48,	12)
-> > -DEFINE_ALE_FIELD(mcast_state,		62,	2)
-> > +DEFINE_ALE_FIELD_SET(mcast_state,	62,	2)
-> 
-> I don't understand why we need separate macros for GET and SET.
-> The original intent was to use one macro for both.
-> 
-> Otherwise we will have to add DEFINE_ALE_FIELD/1_SET to all the fields.
+Fix a missing end of phrase in the documentation. It describes the
+ETHTOOL_A_C33_PSE_ACTUAL_PW attribute, which was not fully explained.
 
-Hi Roger,
+Also, fix grammar issues by using simple present tense instead of
+present continuous.
 
-Sorry for not being clearer.
+Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
 
-My intent was to avoid declaring functions that are never used.
-Perhaps it is best explained by some examples.
+Change in v2:
+- Add grammar issue fixes.
+---
+ Documentation/networking/ethtool-netlink.rst | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-In the case of mcast_state, the compiler flags that the get accessor is
-never used. The intent is of this patch addresses that by declaring the set
-accessor for mcast_state. Likewise for other similar cases.
+diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+index ba90457b8b2d..295563e91082 100644
+--- a/Documentation/networking/ethtool-netlink.rst
++++ b/Documentation/networking/ethtool-netlink.rst
+@@ -1768,7 +1768,7 @@ Kernel response contents:
+ When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` attribute identifies
+ the operational state of the PoDL PSE functions.  The operational state of the
+ PSE function can be changed using the ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL``
+-action. This option is corresponding to ``IEEE 802.3-2018`` 30.15.1.1.2
++action. This attribute corresponds to ``IEEE 802.3-2018`` 30.15.1.1.2
+ aPoDLPSEAdminState. Possible values are:
+ 
+ .. kernel-doc:: include/uapi/linux/ethtool.h
+@@ -1782,8 +1782,8 @@ The same goes for ``ETHTOOL_A_C33_PSE_ADMIN_STATE`` implementing
+ 
+ When set, the optional ``ETHTOOL_A_PODL_PSE_PW_D_STATUS`` attribute identifies
+ the power detection status of the PoDL PSE.  The status depend on internal PSE
+-state machine and automatic PD classification support. This option is
+-corresponding to ``IEEE 802.3-2018`` 30.15.1.1.3 aPoDLPSEPowerDetectionStatus.
++state machine and automatic PD classification support. This attribute
++corresponds to ``IEEE 802.3-2018`` 30.15.1.1.3 aPoDLPSEPowerDetectionStatus.
+ Possible values are:
+ 
+ .. kernel-doc:: include/uapi/linux/ethtool.h
+@@ -1797,12 +1797,13 @@ The same goes for ``ETHTOOL_A_C33_PSE_ADMIN_PW_D_STATUS`` implementing
+ 
+ When set, the optional ``ETHTOOL_A_C33_PSE_PW_CLASS`` attribute identifies
+ the power class of the C33 PSE. It depends on the class negotiated between
+-the PSE and the PD. This option is corresponding to ``IEEE 802.3-2022``
++the PSE and the PD. This attribute corresponds to ``IEEE 802.3-2022``
+ 30.9.1.1.8 aPSEPowerClassification.
+ 
+ When set, the optional ``ETHTOOL_A_C33_PSE_ACTUAL_PW`` attribute identifies
+-This option is corresponding to ``IEEE 802.3-2022`` 30.9.1.1.23 aPSEActualPower.
+-Actual power is reported in mW.
++the actual power drawn by the C33 PSE. This attribute corresponds to
++``IEEE 802.3-2022`` 30.9.1.1.23 aPSEActualPower. Actual power is reported
++in mW.
+ 
+ When set, the optional ``ETHTOOL_A_C33_PSE_EXT_STATE`` attribute identifies
+ the extended error state of the C33 PSE. Possible values are:
+@@ -1851,7 +1852,7 @@ Request contents:
+   ======================================  ======  =============================
+ 
+ When set, the optional ``ETHTOOL_A_PODL_PSE_ADMIN_CONTROL`` attribute is used
+-to control PoDL PSE Admin functions. This option is implementing
++to control PoDL PSE Admin functions. This option implements
+ ``IEEE 802.3-2018`` 30.15.1.2.1 acPoDLPSEAdminControl. See
+ ``ETHTOOL_A_PODL_PSE_ADMIN_STATE`` for supported values.
+ 
+-- 
+2.34.1
 
-OTOH, in the case of, f.e. vlan_id, the set and get accessor functions are
-both used, and DEFINE_ALE_FIELD continues to be used to define them both.
-DEFINE_ALE_FIELD is implemented as the combination of _SET and _GET.
-
-> 
-> >  DEFINE_ALE_FIELD1(port_mask,		66)
-> >  DEFINE_ALE_FIELD(super,			65,	1)
-> >  DEFINE_ALE_FIELD(ucast_type,		62,     2)
-> > -DEFINE_ALE_FIELD1(port_num,		66)
-> > -DEFINE_ALE_FIELD(blocked,		65,     1)
-> > -DEFINE_ALE_FIELD(secure,		64,     1)
-> > -DEFINE_ALE_FIELD(mcast,			40,	1)
-> > +DEFINE_ALE_FIELD1_SET(port_num,		66)
-> > +DEFINE_ALE_FIELD_SET(blocked,		65,     1)
-> > +DEFINE_ALE_FIELD_SET(secure,		64,     1)
-> > +DEFINE_ALE_FIELD_GET(mcast,		40,	1)
-> >  
-> >  #define NU_VLAN_UNREG_MCAST_IDX	1
-> >  
-> > 
-> 
-> -- 
-> cheers,
-> -roger
-> 
 
