@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-127648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41BB8975F34
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:51:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37E0C975F36
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE4871F23FE2
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:51:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40C771C224DA
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF13D186E30;
-	Thu, 12 Sep 2024 02:49:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A5418756E;
+	Thu, 12 Sep 2024 02:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PFkOecj2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AW5Km/b4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1056D18454E;
-	Thu, 12 Sep 2024 02:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 614DE1865ED;
+	Thu, 12 Sep 2024 02:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726109360; cv=none; b=Vsr0H1QJaZcM94dO2fVy4KlGoYbwSqwmmgHzpWoLijn5kIQD2a6bT73MkuHI1MINZ/QTRehXDMK5c4EiTwPOtPqBQICUEk/lmQZYbgsE/M9FAgIub4TUzQLDD1EOSxa33go73HxD0KK4AuUh8pcDE1aSRsjNIPiWZEmhSWDR7LY=
+	t=1726109361; cv=none; b=Br6l5Z7cW5pZzW0C9a+a8TaYoPhF1Qc89Q4KhI6/DDo61cTRAQDjOCXjLcfZAITv85tYhmZPlyfgvTwcT1Y5DiajvK4jCv1DR43mIJyNiZDiNFjQPxvrQZHnTBKNotx5pDbN4cyR1/3ES+SgC5q3Q9OZeUHZZjh4bEfriXij+aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726109360; c=relaxed/simple;
-	bh=MpKQum0tr3BS9RUq7x1/3dRFKuJ8n1B3Rp374A6OKCg=;
+	s=arc-20240116; t=1726109361; c=relaxed/simple;
+	bh=YuhkxiKelW07zOkVj2Rxf9p0M25KQ7Taj3/ZESvg2ac=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dRbjeOLiAG0s+q1gpH5el/iLNKfQcbnfxO1MvVCxddaYXYtlFY9qHD/lySvEKRzJA9NrqnsOltfeaDISVHLPL6kkYfIh5peoOvbWB9XUL+yA4OS+2qRV7VvFqtVLLdmkG5Y2iKhxF9LHi4YP//uptin1ehrDfQDGvtqebVyk52E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PFkOecj2; arc=none smtp.client-ip=209.85.216.48
+	 MIME-Version; b=PTwC/p387P8XxnIcaSqiV62ZD4iZgsj/o5p1gbsWTOHrWYsPM/FdnbcZKnvBkRZxV0sxgX7E+92cN/X6BD5El/K51o5RNV2YDPip77UKsV8AVxrX/tF/wkceZ9ZMaocPYFJ0gVbNrnLq56KMtQSTp9VVV23eGaKfp+QD4JohSss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AW5Km/b4; arc=none smtp.client-ip=209.85.216.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2d87f34a650so293398a91.1;
-        Wed, 11 Sep 2024 19:49:18 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2d8abac30ddso384305a91.0;
+        Wed, 11 Sep 2024 19:49:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726109358; x=1726714158; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1726109359; x=1726714159; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HHbY3iXU6oTg8xBbw7cLs3EtU4xaU9OWnxt/k7vTmRI=;
-        b=PFkOecj28E/q0kjUOlVTeJzeOx90LC096Fm7QaBCN/4joIZh0VMAu4jG1rPC2u2pGw
-         DNrRQVLRgyJ6biehDx0q9iLDbLscaZzaFicRTMD/bEf07kOOeEWJCR3RKzMWaqgfAs3N
-         o2ulqkUjqRC5wQoCHJURKniGpZ80Sc9pzy+Lmy1nif4y3Pp4ABLDpHjTzW96deEDx4bD
-         kuDsu1ICheXqNbEQnaOTwnJnN663qkS3cctxsnnJLc4eKWtr4reixCgHZMewb4gg/7dv
-         hdXVoAuDT30HzsFNuaa3EiaWcy9bySHTSxQViBL+tRonaOs8HD0AimyMJaP3hodxbUFX
-         ZcvA==
+        bh=wlsJzSA2eH+FC3sZW03rQKJ3IOa/GsfL6MLaSKHuklI=;
+        b=AW5Km/b4TiEYcueoxiesCxndyyflu5xgX+gbjbkyi+wE2cP40ljhv934dvqw4nIPOb
+         iU0PMFrhWCpp/7T3pTeGxqiYyf3rsSnl3S5mSuk0fTEWL/88zmo6IGzRj2K+UUyMX1Cv
+         5ogTGy1D92j9uReYg2dgK54Dunn9BB0WANt/OtsHdn5H5vVuhmmmkd6UMYuu7FmIiNju
+         Ke8RfTbUq555JLsGOkSqjYdSilVIBI70NHfdFZ5d6Xk+wpv2XZPsPfjwodds5+5R1r1T
+         38YqDKGFJECTB3QnoPxdFmNeLHYBKsV8iTOpb/uwJIQjRrdz9uPocDzZlcO/iDUUQVpm
+         DvHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726109358; x=1726714158;
+        d=1e100.net; s=20230601; t=1726109359; x=1726714159;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HHbY3iXU6oTg8xBbw7cLs3EtU4xaU9OWnxt/k7vTmRI=;
-        b=C15C/KBa5WOYc+5YxvImx+szXHpVnGD8C0Ef00xYe3viUfpfpMwIlcpxyIV976+Ddd
-         vonVfwA0u97g1s3JW8LEhfi9ZvtHnsC9nYbPsuuH6G1eu/O3t47IEOX5WDJM6G0lEoWc
-         Y9dWPBK9X6y5oOOMIngj5z7QEEDCx3e+XRkM3rfxEjZKpigWy5dedsr190NdEllRvCKx
-         h9OnZhWYy4gLwPh+EGZWEfGMuTLQpSj0enqwf7VcVLUD+dUUMEm8upFInV7vdllqgWv3
-         AZv2dnGEbJ/Yzgd8hmhxC+CvrSfBksBetW32VzmRL1nAaf6c4hzwVpVJwWHI4WRNAeNg
-         PCiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJ0lgOUm+zvnnP7dZJwHGTWXq31MLDyE8Yxwe5bn2Gy1TOUDWikphb1pc9eqNyAvfMSnDqS9DSQ7BYGQE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwauLLbPj3OyExHZAFYBqwSwXErN/UWatUxsLF8cxxi2d/kQVFH
-	OMyxlxVl6NX8GaXcshqJnQbLdu5K4roLdxhWRh0MPMwFIp54bKsssFdulZEk
-X-Google-Smtp-Source: AGHT+IFHI+tv4FqYFefd5/J4FcwpjjrphiiIcuVrtRcQN9xJFjQCoJV00A1NFHST+OPRYnYBesqcjQ==
-X-Received: by 2002:a17:90a:ee86:b0:2d8:719d:98a2 with SMTP id 98e67ed59e1d1-2db9fc5416bmr2016564a91.7.1726109358136;
-        Wed, 11 Sep 2024 19:49:18 -0700 (PDT)
+        bh=wlsJzSA2eH+FC3sZW03rQKJ3IOa/GsfL6MLaSKHuklI=;
+        b=U3mzl1IKS51mk3zVlr1UntifXcWrEz6/Qj8RjTdBY2QLUxVWpTKnmswUI5jr/KL6I6
+         IaF94lc8FTvuG02beJrJYpaAatYvFXyy7tz1qTMuPgRxH0m+QrmF7WnzOpkUWEyjOfw3
+         L9SMvy1EE66rDKZ7eKfkLuGn5dIo8tnEcpsXLn9FxbIt98kW480dGMxCopwAT7YpMi/T
+         pkL3CSBWDBi7JVMKkZEyef9hyTDMyeVKgX0vFCvNRLBDXvckH0XejkV2HktWBDTsfYE7
+         zcb6o1qbFpUy90OMQ8imo+mmJWBRDwP0Pmspe3VzU1fegIIQaUvBmcqEazHGOKcSWJCo
+         LF/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXLNoZxczs0eWBSLWwepVNyMbO3VITmAC5jfGuJtRL0pyfQJn1hB2TMGsQBfu9VyvX+mwISmDaeIwxSfGA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOAmlBGcN+YDROwTrLtCTF4THauZW1oZg/TEX9qN3Lz0W/LACD
+	UmddEDmU0vwOYkNHis/Kv06mMojpiyGwyDWgM/eFxgHIwNkC+R2tHqY2hbQG
+X-Google-Smtp-Source: AGHT+IFq4uLyJF+fHCXrCU6xczE4PGO7pby5jjXU+wmJ0XNIt4G6GnyJcM6GpJxvFWJaoQJB2uvfVg==
+X-Received: by 2002:a17:90a:c28c:b0:2d8:7a54:51a6 with SMTP id 98e67ed59e1d1-2dba007dfc2mr1576106a91.33.1726109359598;
+        Wed, 11 Sep 2024 19:49:19 -0700 (PDT)
 Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dadbfe4897sm11457868a91.7.2024.09.11.19.49.16
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dadbfe4897sm11457868a91.7.2024.09.11.19.49.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Sep 2024 19:49:17 -0700 (PDT)
+        Wed, 11 Sep 2024 19:49:19 -0700 (PDT)
 From: Rosen Penev <rosenp@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
@@ -79,9 +79,9 @@ Cc: andrew@lunn.ch,
 	horms@kernel.org,
 	sd@queasysnail.net,
 	chunkeey@gmail.com
-Subject: [PATCHv5 net-next 8/9] net: ibm: emac: remove all waiting code
-Date: Wed, 11 Sep 2024 19:49:02 -0700
-Message-ID: <20240912024903.6201-9-rosenp@gmail.com>
+Subject: [PATCHv5 net-next 9/9] net: ibm: emac: get rid of wol_irq
+Date: Wed, 11 Sep 2024 19:49:03 -0700
+Message-ID: <20240912024903.6201-10-rosenp@gmail.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240912024903.6201-1-rosenp@gmail.com>
 References: <20240912024903.6201-1-rosenp@gmail.com>
@@ -93,150 +93,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-EPROBE_DEFER, which probably wasn't available when this driver was
-written, can be used instead of waiting manually.
+This is completely unused.
 
 Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/ethernet/ibm/emac/core.c | 55 ++++------------------------
- 1 file changed, 7 insertions(+), 48 deletions(-)
+ drivers/net/ethernet/ibm/emac/core.c | 13 +++----------
+ 1 file changed, 3 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-index 6556f9b2b48f..60c4943ca09d 100644
+index 60c4943ca09d..dac570f3c110 100644
 --- a/drivers/net/ethernet/ibm/emac/core.c
 +++ b/drivers/net/ethernet/ibm/emac/core.c
-@@ -32,7 +32,6 @@
- #include <linux/ethtool.h>
- #include <linux/mii.h>
- #include <linux/bitops.h>
--#include <linux/workqueue.h>
- #include <linux/of.h>
- #include <linux/of_address.h>
- #include <linux/of_irq.h>
-@@ -96,11 +95,6 @@ MODULE_LICENSE("GPL");
- static u32 busy_phy_map;
- static DEFINE_MUTEX(emac_phy_map_lock);
+@@ -3029,9 +3029,8 @@ static int emac_probe(struct platform_device *ofdev)
+ 	if (err)
+ 		goto err_gone;
  
--/* This is the wait queue used to wait on any event related to probe, that
-- * is discovery of MALs, other EMACs, ZMII/RGMIIs, etc...
-- */
--static DECLARE_WAIT_QUEUE_HEAD(emac_probe_wait);
--
- /* Having stable interface names is a doomed idea. However, it would be nice
-  * if we didn't have completely random interface names at boot too :-) It's
-  * just a matter of making everybody's life easier. Since we are doing
-@@ -116,9 +110,6 @@ static DECLARE_WAIT_QUEUE_HEAD(emac_probe_wait);
- #define EMAC_BOOT_LIST_SIZE	4
- static struct device_node *emac_boot_list[EMAC_BOOT_LIST_SIZE];
- 
--/* How long should I wait for dependent devices ? */
--#define EMAC_PROBE_DEP_TIMEOUT	(HZ * 5)
--
- /* I don't want to litter system log with timeout errors
-  * when we have brain-damaged PHY.
-  */
-@@ -973,8 +964,6 @@ static void __emac_set_multicast_list(struct emac_instance *dev)
- 	 * we need is just to stop RX channel. This seems to work on all
- 	 * tested SoCs.                                                --ebs
- 	 *
--	 * If we need the full reset, we might just trigger the workqueue
--	 * and do it async... a bit nasty but should work --BenH
- 	 */
- 	dev->mcast_pending = 0;
- 	emac_rx_disable(dev);
-@@ -2378,7 +2367,9 @@ static int emac_check_deps(struct emac_instance *dev,
- 		if (deps[i].drvdata != NULL)
- 			there++;
+-	/* Get interrupts. EMAC irq is mandatory, WOL irq is optional */
++	/* Get interrupts. EMAC irq is mandatory */
+ 	dev->emac_irq = irq_of_parse_and_map(np, 0);
+-	dev->wol_irq = irq_of_parse_and_map(np, 1);
+ 	if (!dev->emac_irq) {
+ 		printk(KERN_ERR "%pOF: Can't map main interrupt\n", np);
+ 		err = -ENODEV;
+@@ -3055,13 +3054,13 @@ static int emac_probe(struct platform_device *ofdev)
+ 	if (!dev->emacp) {
+ 		dev_err(&ofdev->dev, "can't map device registers");
+ 		err = -ENOMEM;
+-		goto err_irq_unmap;
++		goto err_gone;
  	}
--	return there == EMAC_DEP_COUNT;
-+	if (there != EMAC_DEP_COUNT)
-+		return -EPROBE_DEFER;
-+	return 0;
- }
- 
- static void emac_put_deps(struct emac_instance *dev)
-@@ -2390,19 +2381,6 @@ static void emac_put_deps(struct emac_instance *dev)
- 	platform_device_put(dev->tah_dev);
- }
- 
--static int emac_of_bus_notify(struct notifier_block *nb, unsigned long action,
--			      void *data)
--{
--	/* We are only intereted in device addition */
--	if (action == BUS_NOTIFY_BOUND_DRIVER)
--		wake_up_all(&emac_probe_wait);
--	return 0;
--}
--
--static struct notifier_block emac_of_bus_notifier = {
--	.notifier_call = emac_of_bus_notify
--};
--
- static int emac_wait_deps(struct emac_instance *dev)
- {
- 	struct emac_depentry deps[EMAC_DEP_COUNT];
-@@ -2419,18 +2397,13 @@ static int emac_wait_deps(struct emac_instance *dev)
- 		deps[EMAC_DEP_MDIO_IDX].phandle = dev->mdio_ph;
- 	if (dev->blist && dev->blist > emac_boot_list)
- 		deps[EMAC_DEP_PREV_IDX].phandle = 0xffffffffu;
--	bus_register_notifier(&platform_bus_type, &emac_of_bus_notifier);
--	wait_event_timeout(emac_probe_wait,
--			   emac_check_deps(dev, deps),
--			   EMAC_PROBE_DEP_TIMEOUT);
--	bus_unregister_notifier(&platform_bus_type, &emac_of_bus_notifier);
--	err = emac_check_deps(dev, deps) ? 0 : -ENODEV;
-+	err = emac_check_deps(dev, deps);
- 	for (i = 0; i < EMAC_DEP_COUNT; i++) {
- 		of_node_put(deps[i].node);
- 		if (err)
- 			platform_device_put(deps[i].ofdev);
- 	}
--	if (err == 0) {
-+	if (!err) {
- 		dev->mal_dev = deps[EMAC_DEP_MAL_IDX].ofdev;
- 		dev->zmii_dev = deps[EMAC_DEP_ZMII_IDX].ofdev;
- 		dev->rgmii_dev = deps[EMAC_DEP_RGMII_IDX].ofdev;
-@@ -3087,12 +3060,8 @@ static int emac_probe(struct platform_device *ofdev)
  
  	/* Wait for dependent devices */
  	err = emac_wait_deps(dev);
--	if (err) {
--		printk(KERN_ERR
--		       "%pOF: Timeout waiting for dependent devices\n", np);
--		/*  display more info about what's missing ? */
-+	if (err)
- 		goto err_irq_unmap;
--	}
+ 	if (err)
+-		goto err_irq_unmap;
++		goto err_gone;
  	dev->mal = platform_get_drvdata(dev->mal_dev);
  	if (dev->mdio_dev != NULL)
  		dev->mdio_instance = platform_get_drvdata(dev->mdio_dev);
-@@ -3192,10 +3161,6 @@ static int emac_probe(struct platform_device *ofdev)
- 	wmb();
- 	platform_set_drvdata(ofdev, dev);
- 
--	/* There's a new kid in town ! Let's tell everybody */
--	wake_up_all(&emac_probe_wait);
--
--
- 	printk(KERN_INFO "%s: EMAC-%d %pOF, MAC %pM\n",
- 	       ndev->name, dev->cell_index, np, ndev->dev_addr);
- 
-@@ -3228,14 +3193,8 @@ static int emac_probe(struct platform_device *ofdev)
- 	if (dev->wol_irq)
- 		irq_dispose_mapping(dev->wol_irq);
+@@ -3189,9 +3188,6 @@ static int emac_probe(struct platform_device *ofdev)
+ 	mal_unregister_commac(dev->mal, &dev->commac);
+  err_rel_deps:
+ 	emac_put_deps(dev);
+- err_irq_unmap:
+-	if (dev->wol_irq)
+-		irq_dispose_mapping(dev->wol_irq);
   err_gone:
--	/* if we were on the bootlist, remove us as we won't show up and
--	 * wake up all waiters to notify them in case they were waiting
--	 * on us
--	 */
--	if (blist) {
-+	if (blist)
+ 	if (blist)
  		*blist = NULL;
--		wake_up_all(&emac_probe_wait);
--	}
- 	return err;
+@@ -3218,9 +3214,6 @@ static void emac_remove(struct platform_device *ofdev)
+ 
+ 	mal_unregister_commac(dev->mal, &dev->commac);
+ 	emac_put_deps(dev);
+-
+-	if (dev->wol_irq)
+-		irq_dispose_mapping(dev->wol_irq);
  }
  
+ /* XXX Features in here should be replaced by properties... */
 -- 
 2.46.0
 
