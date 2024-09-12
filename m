@@ -1,70 +1,68 @@
-Return-Path: <netdev+bounces-127800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 885629768F7
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:18:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB575976914
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:25:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 169D7B23B0F
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:18:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61B2BB20F7C
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126AE1A0BEE;
-	Thu, 12 Sep 2024 12:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C501A42A8;
+	Thu, 12 Sep 2024 12:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Qcc23E+A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D0919992A;
-	Thu, 12 Sep 2024 12:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61C741A3A96;
+	Thu, 12 Sep 2024 12:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726143516; cv=none; b=uoOIE8FQoKFtsldrc9lxcWIRqU0fNtfnbgEt8r9qUqGBsDH7yOz/5EW1yc5HRCjudD/esPxndybp5izCIRhrb0KqmuJfhQK7zZmr0UG/onMmldIna71BNsptrx4IteGe3xI+682YKSB8PXPbA4kOiSkOyvno/ZnAcUAlXvOFKt4=
+	t=1726143897; cv=none; b=gcNk5q7bSDr0dopr/GuCYvYobgaw/9BgLEVhSFKAs6hlb/fJnQuCaBcI30TBcSNSIMyHrcMWbKuKfYULq25Va7XGUE3LYiEATrsktxpEQlJgKB8SCGGoNPK0bg5WKmPQ1WfGKNy644/WFzgIGmV7jTOEnQ+rN3nVakyqY7Ovsb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726143516; c=relaxed/simple;
-	bh=r3zxlM4VUHNbjP2euPsbiwCGlILtmoLXaiv2W4eRKTo=;
+	s=arc-20240116; t=1726143897; c=relaxed/simple;
+	bh=FRng+cMcwQMKVnWZW9h7CJJYKyq4oEf6Bbu86/1oL1Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nCRndsCqqMLZYrIV9dos2kMN3zooAb/07B0uLaweBDYryDvV9iRqFcFI9YMTG0gjN3YZk5JmqifvyY1NNBIwP3mRKrvxtpkAUqHdQzC3UmvyzMd7esDV5ljPnJ9ByTUnpdCcsjPXtxk/vHmzLIjgS0N603EfGpf3h4CFdauffMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a8d56155f51so112426666b.2;
-        Thu, 12 Sep 2024 05:18:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726143513; x=1726748313;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sG37F+BnEO0H/LIYsBFWUXBHGgaywY3AQMTmtrOCdqA=;
-        b=gzJefGGD2AAcOaryTZRvZoF+0L3XsgIK3DfcfP0lU6L2Hw/p8JxgxA4uwBUzztScXv
-         Na0Wu6THzrAVwAp3FOXizIgCvEYpFyg9tIO299RNDUr7wQv9XnfZqQ7J8I0j7a05e4Ro
-         GTwMz9CvBOBsA1eA/mdm8Rcy/yJNBwR6N9FwSNBT24DS1wX6q/YmmTHxKIzroOnHSIYl
-         80GKCbXIL8Qs+2v/H1DhJ95hglg/A+oX7oZx/I/3/o7sNJpFVxRXLhUZZbXjP25WTGUa
-         z2a/qybMlA5wqgWckW0wmxSRxSvicGTu60FQjJ6Ix4Nh+MAfa54GRd9tUsLUXZdHEO6c
-         3WCA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBEtu/AP07PUqIPfmDsHDZJl62W7HZOa/dNWGJI5rnPSVbfbj2unM+NLZ0h8BGDoVITQ4NlzrY0rJAY6I=@vger.kernel.org, AJvYcCWnl6Uet3ZAqBTjy44uwZ10gsv1A6RiQ37jA5Vx4VdxspwGC7ie6orOCc9SUv2NXGICguPnLAbr@vger.kernel.org, AJvYcCXa3dDUhvh7MMD5OXqXUAQMtaMzCPmebFenJD/2+MMaQO8D1esdmSGgRptpX3W8Vd1/4BWAef0bhIeAOuDVXDJ/@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWwEyXN69LkpuP3yVZCd1b8a8nRYWaGAypKq1PVegNqcEGSKER
-	szPrp5xuIoLyWkJCoMp8C+aJ1FHROO5X+wJJlPQIBxKSJ3pcH1t0CH8zcg==
-X-Google-Smtp-Source: AGHT+IH+q4gdBuX+ZUYgVOKXM+tfBQAypJi9lq6OeZ8F6i9PxYgHK5Bv2YpyZsNuwjMyXa9Pz9wuow==
-X-Received: by 2002:a17:907:980f:b0:a86:7ba9:b061 with SMTP id a640c23a62f3a-a90296715c0mr225128966b.64.1726143512016;
-        Thu, 12 Sep 2024 05:18:32 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25ced17asm750185966b.170.2024.09.12.05.18.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 05:18:31 -0700 (PDT)
-Date: Thu, 12 Sep 2024 05:18:29 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, rbc@meta.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH nf-next v5 0/2] netfilter: Make IP_NF_IPTABLES_LEGACY
- selectable
-Message-ID: <20240912-omniscient-imposing-lynx-2bf5ac@leitao>
-References: <20240909084620.3155679-1-leitao@debian.org>
- <20240911-weightless-maize-ferret-5c23e1@devvm32600>
- <ZuIVIDubGwLMh1RS@calendula>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mYq+5QB4OQjdqU8e2Zm7h/JwuzCnEM+jSf4pM8lOSknJuT/opvNrXhnq/ODlNT1JEIW6n1q6cogIaYcelpLUE5rbeJnBuPIk5DAytvhNfgORgdfveAaoduVTQKgDmAfx4J9mMJbbS68U2ZAZ0ero+mshSaebZLr0NiEb72+nsJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Qcc23E+A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1FB9C4CEC3;
+	Thu, 12 Sep 2024 12:24:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726143897;
+	bh=FRng+cMcwQMKVnWZW9h7CJJYKyq4oEf6Bbu86/1oL1Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Qcc23E+AfF8wTibBCKmNZ4QMpEN2nWYM4IehjV7PjXYbetENXL2jpMMfWatGznTrU
+	 ohnt5H5hZqf0ONtcZ8iaK+LOkmyi4P3pgfKmuusPXCNEM2a3ZvVMKgq7ZGhuz2KHaU
+	 Gt2yjnQgy3tpA+PTslxmxNGwKGtylyhu0jxJIw1zguH2EQdGcBqMe6gn5zJy7JN3ck
+	 wkhzTB5FN9WpC6yPeqPE1WyvOK2AATdI2kW+9L6EV+wcHRP4hC4lhLBNOG9EXfdyHG
+	 oBQaJ0rXxWOifkoBXNqBJLWaCRE/xJyKrgvdE3+h8DtEPgNbmExtvmzSoPnb/M3a6M
+	 lHrFJb1lhZSNw==
+Date: Thu, 12 Sep 2024 13:24:51 +0100
+From: Simon Horman <horms@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	=?utf-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: Re: [PATCH net-next 3/7] net: phy: lxt: Mark LXT973 PHYs as having a
+ broken isolate mode
+Message-ID: <20240912122451.GM572255@kernel.org>
+References: <20240911212713.2178943-1-maxime.chevallier@bootlin.com>
+ <20240911212713.2178943-4-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,22 +71,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZuIVIDubGwLMh1RS@calendula>
+In-Reply-To: <20240911212713.2178943-4-maxime.chevallier@bootlin.com>
 
-On Thu, Sep 12, 2024 at 12:09:36AM +0200, Pablo Neira Ayuso wrote:
-> On Wed, Sep 11, 2024 at 08:25:52AM -0700, Breno Leitao wrote:
-> > Hello,
-> > 
-> > On Mon, Sep 09, 2024 at 01:46:17AM -0700, Breno Leitao wrote:
-> > > These two patches make IP_NF_IPTABLES_LEGACY and IP6_NF_IPTABLES_LEGACY
-> > > Kconfigs user selectable, avoiding creating an extra dependency by
-> > > enabling some other config that would select IP{6}_NF_IPTABLES_LEGACY.
-> > 
-> > Any other feedback regarding this change? This is technically causing
-> > user visible regression and blocks us from rolling out recent kernels.
+On Wed, Sep 11, 2024 at 11:27:07PM +0200, Maxime Chevallier wrote:
+> Testing showed that PHYs from the LXT973 family have a non-working
+> isolate mode, where the MII lines aren't set in high-impedance as would
+> be expected. Prevent isolating these PHYs.
 > 
-> What regressions? This patch comes with no Fixes: tag.
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+>  drivers/net/phy/lxt.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/net/phy/lxt.c b/drivers/net/phy/lxt.c
+> index e3bf827b7959..55cf67391533 100644
+> --- a/drivers/net/phy/lxt.c
+> +++ b/drivers/net/phy/lxt.c
+> @@ -334,6 +334,7 @@ static struct phy_driver lxt97x_driver[] = {
+>  	.read_status	= lxt973a2_read_status,
+>  	.suspend	= genphy_suspend,
+>  	.resume		= genphy_resume,
+> +	.flags		= PHY_NO_ISOLATE,
+>  }, {
+>  	.phy_id		= 0x00137a10,
+>  	.name		= "LXT973",
+> @@ -344,6 +345,7 @@ static struct phy_driver lxt97x_driver[] = {
+>  	.config_aneg	= lxt973_config_aneg,
+>  	.suspend	= genphy_suspend,
+>  	.resume		= genphy_resume,
+> +	.flags		= PHY_NO_ISOLATE,
+>  } };
 
-Sorry, I should have said "This is technically causing user lack of
-flexibility when configuring the kernel"
+Hi Maxime,
+
+This duplicates setting .flags for each array member
+updated by this patch.
+
+>  
+>  module_phy_driver(lxt97x_driver);
+
+-- 
+pw-bot: cr
 
