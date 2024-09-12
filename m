@@ -1,161 +1,85 @@
-Return-Path: <netdev+bounces-127786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 555FD976725
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 13:04:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0778B976731
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 13:10:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D5651F2131A
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 11:04:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4920283BFE
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 11:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFAAF19F419;
-	Thu, 12 Sep 2024 11:04:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 924B91A0BD7;
+	Thu, 12 Sep 2024 11:10:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="izIfune2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rWu9BMRM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB8418BBBD;
-	Thu, 12 Sep 2024 11:04:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6899E18E043;
+	Thu, 12 Sep 2024 11:10:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726139071; cv=none; b=t41kE2U5Lb1Bg+iZsMEwxzP4PSj2XpKJVU47vsLqJQGB6tXHZQB478dVtOH9K/OorH35Dk/uk07ehdfwaT9uNHdAjCo3GZbWubm/5e1nNZAag9bGZ9y1GY5i+jrDUMbms2tjXfSAlol64Ls8/7Yq5OOaNib4Y67WVNQLwpUpVbs=
+	t=1726139408; cv=none; b=gY08smx/6EKkmtVJ0I3SZDQm2RwyrRScS1lyrfC+vHAIebek3rotkriEOkdq3wWohma3R0r3XYrlKnyhhknDEO0iaect54YEigcxdj1MfsbCNME98Rpqzy4FSKsdS8P/OFVpTmQro3ET2X4iB3KpuNcygu3kWMAL/qO1N7j0zNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726139071; c=relaxed/simple;
-	bh=dah/t4pBaon0ZrPwTPNOlEGI+mng6bDX8DQZUHIMK3g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EylwWXuDshS5mZyNh8ns2RtCPobqCSsuoaqaTkmd7YHbQWhGeCFYMYJcPEgYMWc2p6Y0LxDHSnfRbw/k0T39yY5LiAQUs/tCLfdlrtu8jIaa33OGtz9vhbvnGlkcdMI50e8UDs9w3NU6jVCuh64eH+YRzmthYQ3elV477o3pjq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=izIfune2; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6c353f2f954so6177386d6.3;
-        Thu, 12 Sep 2024 04:04:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726139069; x=1726743869; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=x5Q3ipe6iraRB2cXHJCx3k9HqMaTXiX/VIcnXuYFAHM=;
-        b=izIfune2WE+VhmhxaLu8XtI0iIifm1Zr82IdYvCl539QksH6YuqC4VmevU3UFlwkEe
-         AG4vfgkJ9CYDsnw+gNkcaKSSz43pmei49kG4dmIyiCdQmSsDgjSV3P5REFhUnzOi+3cs
-         Unntnp9RVubm8gtHSLnBDFx4QqbHltmvm4skFGhIoxpAvrs4tQB36rii63wDclj8fnSn
-         Y1I1elxquBHOYIm6rCJIEVf/e4yAuZeL2Vx8rSTbiOv+gMD+e0/0P8eNskWfKI9+42On
-         PzkqS0E3+8KMUxRD1DgXImD/Cf38lMEntKCbm7ukVrzEjadZYtLVjHqra+zV2Uz5oCwx
-         Xe1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726139069; x=1726743869;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=x5Q3ipe6iraRB2cXHJCx3k9HqMaTXiX/VIcnXuYFAHM=;
-        b=cLUDvatcl5lTkIMDO28JPST27EpGAQ3VST+V/FudezN6wcq+f04CKUSOjsjre91PkF
-         Cs3XOY1TFBvPD/tWr1Vp3HObPOkuTov8alt+Rzx23clEGUo7kXRdEhPgf58axjTTYp6U
-         NW2GoTr65aAgQdVS5IwkWhlY4Y2+RT4/YHzEb2GJhStrfgROSsQi3lK7tON/WQKO36va
-         BAVtKIDE89hdn93e9Tr3zERZlyvXgXZ90ksO3e3YoVXVIeVA4XmwNANZu8/W9KJZHjoR
-         wO2EscCvEXssJui2BN9hq9ZrqgobzyT+aifFthvC9jmXEqHLC+HPPJ1RkwJLsfwNBY0W
-         Bk9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUTncXMoJSSWhKR3qZj/tzmYQCRCvwkO1wobz7RkRwrDyWaaGlazcutLiwehmHEyV8mq4/D9GM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXGhfuyxsqrumZcsxJj4yRi7M5DVqfgrdkffOvpE7ODTRSgCd8
-	K34QxyUEdIGMbjOkNXkn3Z3IWOQ/LLnzCysgLzoRgvCIf8cl+UpqU6GCeTZZ0BGp2MrzqkZ902t
-	4RXShqyGLrUv37vobPFuWZ30gzNqmraTnGSY=
-X-Google-Smtp-Source: AGHT+IFWJQHE9ZDHEOlrcZGgiEsKN9SiJLa/euV5Y9zDdTVTjAGC14kH+VE61M+9u7wMIYSasMm6u76PuGR+hPKyZHQ=
-X-Received: by 2002:a05:6214:5c05:b0:6c3:61bd:a10 with SMTP id
- 6a1803df08f44-6c5735584efmr36590096d6.16.1726139068983; Thu, 12 Sep 2024
- 04:04:28 -0700 (PDT)
+	s=arc-20240116; t=1726139408; c=relaxed/simple;
+	bh=oy3t622oJ9y+zBSmV8Hg+lcYB3qkvoxDjsisvYrdppE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e8Uz9artYbDn1ay0Cq7WOSd5aLn+DswXfYdwrAp3VCSaGS9Uladi1DgY3MQCk4GB7r1MucWKbj8OdoB2ebsR1f/HpwjF9N9KbO/4nx1Ha3wep/o0OzE61YRwDzjeXQSGkvTMnpDE96mM4kcrAVWmM8EqGYATAPphuE222Oegohc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rWu9BMRM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B658CC4CEC3;
+	Thu, 12 Sep 2024 11:10:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726139407;
+	bh=oy3t622oJ9y+zBSmV8Hg+lcYB3qkvoxDjsisvYrdppE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rWu9BMRMIZdrUo2PalQuBsGnB+9JnFSU/DqQw6d9z+BjowPoVlwKvlQ/25LdoOXk5
+	 BudvONRc8oDogUUf7qK/Nk7tPlMY37qPhxWo/eru6X+51QDh8TE8xRJMALvetLfNVo
+	 gVfmVmelDJTNGhk0ABnRWNodtoIeYLJ8mDYSvwWKJnh6ktNRc1HKV1HBFeohpSUzgS
+	 zzZMvGikWzmqOJm8A6Kh6gA1lX0PCu5uo/WykBE1L4AbUGwuSJH7pDbua1Vo08ct93
+	 2CR1zhYTkytu/6Yf69DUnQcsN8uYSWp3/TUVLmezR7ybPK2agEXYgzp690DtURzEW1
+	 bgvBWt9n5+fdA==
+Date: Thu, 12 Sep 2024 12:10:03 +0100
+From: Simon Horman <horms@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	thomas.petazzoni@bootlin.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH net-next v2] Documentation: networking: Fix missing PSE
+ documentation and grammar issues
+Message-ID: <20240912111003.GI572255@kernel.org>
+References: <20240912090550.743174-1-kory.maincent@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240911191019.296480-1-maciej.fijalkowski@intel.com>
-In-Reply-To: <20240911191019.296480-1-maciej.fijalkowski@intel.com>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Thu, 12 Sep 2024 13:04:17 +0200
-Message-ID: <CAJ8uoz2yjB7nj495x3CuiwHfuU+T0g3MXy4DScG2iT6gtkQsqg@mail.gmail.com>
-Subject: Re: [PATCH bpf] xsk: fix batch alloc API on non-coherent systems
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com, 
-	bjorn@kernel.org, Dries De Winter <ddewinter@synamedia.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240912090550.743174-1-kory.maincent@bootlin.com>
 
-On Wed, 11 Sept 2024 at 21:10, Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> In cases when synchronizing DMA operations is necessary,
-> xsk_buff_alloc_batch() returns a single buffer instead of the requested
-> count. This puts the pressure on drivers that use batch API as they have
-> to check for this corner case on their side and take care of allocations
-> by themselves, which feels counter productive. Let us improve the core
-> by looping over xp_alloc() @max times when slow path needs to be taken.
->
-> Another issue with current interface, as spotted and fixed by Dries, was
-> that when driver called xsk_buff_alloc_batch() with @max == 0, for slow
-> path case it still allocated and returned a single buffer, which should
-> not happen. By introducing the logic from first paragraph we kill two
-> birds with one stone and address this problem as well.
-
-Thanks Maciej and Dries for finding and fixing this.
-
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-
-> Fixes: 47e4075df300 ("xsk: Batched buffer allocation for the pool")
-> Reported-and-tested-by: Dries De Winter <ddewinter@synamedia.com>
-> Co-developed-by: Dries De Winter <ddewinter@synamedia.com>
-> Signed-off-by: Dries De Winter <ddewinter@synamedia.com>
-> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+On Thu, Sep 12, 2024 at 11:05:50AM +0200, Kory Maincent wrote:
+> Fix a missing end of phrase in the documentation. It describes the
+> ETHTOOL_A_C33_PSE_ACTUAL_PW attribute, which was not fully explained.
+> 
+> Also, fix grammar issues by using simple present tense instead of
+> present continuous.
+> 
+> Reviewed-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 > ---
->  net/xdp/xsk_buff_pool.c | 25 ++++++++++++++++++-------
->  1 file changed, 18 insertions(+), 7 deletions(-)
->
-> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> index 29afa880ffa0..5e2e03042ef3 100644
-> --- a/net/xdp/xsk_buff_pool.c
-> +++ b/net/xdp/xsk_buff_pool.c
-> @@ -623,20 +623,31 @@ static u32 xp_alloc_reused(struct xsk_buff_pool *pool, struct xdp_buff **xdp, u3
->         return nb_entries;
->  }
->
-> -u32 xp_alloc_batch(struct xsk_buff_pool *pool, struct xdp_buff **xdp, u32 max)
-> +static u32 xp_alloc_slow(struct xsk_buff_pool *pool, struct xdp_buff **xdp,
-> +                        u32 max)
->  {
-> -       u32 nb_entries1 = 0, nb_entries2;
-> +       int i;
->
-> -       if (unlikely(pool->dev && dma_dev_need_sync(pool->dev))) {
-> +       for (i = 0; i < max; i++) {
->                 struct xdp_buff *buff;
->
-> -               /* Slow path */
->                 buff = xp_alloc(pool);
-> -               if (buff)
-> -                       *xdp = buff;
-> -               return !!buff;
-> +               if (unlikely(!buff))
-> +                       return i;
-> +               *xdp = buff;
-> +               xdp++;
->         }
->
-> +       return max;
-> +}
-> +
-> +u32 xp_alloc_batch(struct xsk_buff_pool *pool, struct xdp_buff **xdp, u32 max)
-> +{
-> +       u32 nb_entries1 = 0, nb_entries2;
-> +
-> +       if (unlikely(pool->dev && dma_dev_need_sync(pool->dev)))
-> +               return xp_alloc_slow(pool, xdp, max);
-> +
->         if (unlikely(pool->free_list_cnt)) {
->                 nb_entries1 = xp_alloc_reused(pool, xdp, max);
->                 if (nb_entries1 == max)
-> --
-> 2.34.1
->
->
+> 
+> Change in v2:
+> - Add grammar issue fixes.
+
+Thanks for the update.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
