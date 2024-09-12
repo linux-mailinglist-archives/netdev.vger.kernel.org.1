@@ -1,113 +1,176 @@
-Return-Path: <netdev+bounces-127827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C4E0976BE7
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:24:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79A73976BF0
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:25:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3A0A1F27A53
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:24:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07E59B21D52
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CEA91AE87F;
-	Thu, 12 Sep 2024 14:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E266F1B12F2;
+	Thu, 12 Sep 2024 14:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T8f4WN0B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F01D2BB09
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 14:24:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A371AE87F
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 14:25:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726151071; cv=none; b=E9aCvReIDz72KTQMM/e29Y5jNAjR+ySlV5DA7ZXYPdZry4k9Od4LNaHPLrwBErhJvI7jp5Y+Ocn8ljsAO32ctmFG5cCRhVM9FLGercaPu83OQkP5eLHs/CJH8j3vnSGAxXEkc34Npj4XmH4aHbeKkePoIkA3QAVthmnd02ghMQA=
+	t=1726151140; cv=none; b=DEmdHJhqHqntqXS1/Md51tY+GLVvDxQwBED1ct5r5lA7fiTCnZxjmJfmwEWziI4Qfuzg125o8CNJ4PBwrIW56dzxAyNvkHmgbxE/erGg0iYpI6Tb+ERfBsmFdZ/1vAaPDt5V7acc1+//nItEG8/Eqh4WD82dbKrhDRtv5V591Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726151071; c=relaxed/simple;
-	bh=K7rEH5qYX0Elm7IC8BbIy1pVnj+AeI1J+4BNBcJrNQA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BmluZgH67U3MZWOGlymsRfM/qhUmOYg/jlZWhTGjsOOgNrw+UfaOobdZ23ZJPRJcsArFONrOFUxl3FPPZhfSNSWJUVJvQY9CKbYxfl4YSW5BeDNpgooZyGqJoY7qzSHLxZ790BRM+fGUBDS+1vSk/KwbVOPR6570fWGf9LVEaqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a0459a8a46so12477965ab.3
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 07:24:29 -0700 (PDT)
+	s=arc-20240116; t=1726151140; c=relaxed/simple;
+	bh=8OYqBuEjfe5EjdWcxDT76k63UIQ5ek8DyxYuIqau7AA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jAw+FPphgmOSPAdlI+lrvH9e26JOHJlDf1gwejKE4ezWJcL7ssExl3v/Gpsp/pZ7kqI04Dd6nLsjkwsRmwUakv3Ez6j2ZVxHZg5igAWQo4RjnpGCxIQHciKqZHpPVMLZLvFfhiKc+WeFYE/KiU77lPt5GxO58eu0/st2eE7zZL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T8f4WN0B; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4582b71df40so237851cf.1
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 07:25:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726151138; x=1726755938; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iwLc+XjyWhYA8wehQi12J7lKOf62muLl4QoZfdwa35k=;
+        b=T8f4WN0B1r0Ru+CIVCuCki26uryBc7LHH9HWG+2A03bvVo2ecFCy+FpKoE3PBVVA9J
+         ObyU3VA6wYjRzpbFQQxiFTNiT0tkfP2eIvjdQel3Ljfd0heCfijLWZGG6lmRNml/fAH9
+         WLe0Ky2aBnRy0I3NSE/T+CJgCzH/3uvew02aesnXrljPFkOtJBzruKmC5kZJpMcUmo86
+         quMhUdM9krrv1wrsiljAq3RUizV66IYw1aZvwyGxWXlyWcXNCs0OvOSmFSbcVzGIN5HZ
+         grXK2u9oq2LvWdWRKoGHnwWwI83D/BvGWKhbdFR+sm/uccV0q/HHUqGLFTullfY4HMqX
+         D9TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726151069; x=1726755869;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BcodMDARtg5q8rY7YVLhjjqRo/SOtRdhBndQsSIEwVo=;
-        b=rsjoemWxMr5Q3xBVAxKDPccTXhq+j6UK89wGqYl5rwL3Q7dlmKh+8gd5Qw+249WX9A
-         /FnkHDWaQdhY/cGWk6T3Ik0z2rH6DB3BOlPWGSgy1H7KHy3VFprpXWNc6g+Th1DF9sRJ
-         wj3Weq0KAEigAGpx5Z8j2WyOT60Sn28SefVb9ozJPyrJYuzu8K8Ju2kfBHtn2Pox3c4c
-         FcQESjhU54Kc6HMm0JuyeFPV90HtEbgsGvWkt2ZBmBmJCVO4EQOyU8q+9bkzBvYZyP70
-         DLDL0JCMQanwNj2qoCRiVtB3jkC6r84nb/Ts4S9ohkfHM/BgryGxuf986pudAmDelAWJ
-         GRMA==
-X-Forwarded-Encrypted: i=1; AJvYcCXjNUtLQTfVq3udCNH3KcDESMb4a5zNLsZs78ba0xse1Np5Ayisk3gUzOgg0aFfxaxGbmh2c3k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+M+/isUX1VaSiqYVnIA+i8NAatnzdw2jlcOn7DWv2b7hjr1bc
-	x1+GY5V7flnJ+q3J3U0xOzCgKwAJ2OTNkAJMFCdf116OL2FqJ6tLFp52hTRaEkXEcnAD5ytbP7S
-	IOb/osTkAVmtibNsrsR+/W53FyAaFYGicAJsvKKkBorBokBERw989QLo=
-X-Google-Smtp-Source: AGHT+IEdL7uhb4g4phrP2I0ij5S1wqHsFVilkFydHnWkzAqWblt2ZYsam8xuhJ9OdpS14Hgoe9VH3UGfouYwBsD/wcEdxSKkDzJ3
+        d=1e100.net; s=20230601; t=1726151138; x=1726755938;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iwLc+XjyWhYA8wehQi12J7lKOf62muLl4QoZfdwa35k=;
+        b=Hz2OYRgSmAjyE1g5exKe1XEKzEH7ozWDwIdy3T1CIieDD6CG/R95UbTWXHjq1D+A4M
+         kqK/VwJte2dTNG7lyCSDOt9w4QqyIYhQ2t3IX4N2Eec3sEGOvJHyjhbhENfMgTNtoRZq
+         X0jr/oWToXsML+pFpkzPEoxBot7NZFRWkKsTYqhQBLeui5YYa3BSm0kDQ6M2Pk5qYGzE
+         u8XMs59QJ9Tc1RYZA/C97x5kxXy9hmDBSBtlGrNOPgIonpMXU/umb7ZU8bnpvJfGxt6X
+         fghsMt0dDuhg0/qcbUcT6bvxTq7wfCKDmnqKT5msWxmToyLce5apwzCUuzFxbj/u4/jR
+         TljA==
+X-Forwarded-Encrypted: i=1; AJvYcCVGsNGMq9RouXmysD17g49wX/Bkl/8AsFoeuBo54TFTH7HPBTbXCZ0wMXJzqanps+U+pYdbCmY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzwo1FwuLlq0tSHknM4PN3kdK5CdM7unE7/Vj4l8leBPqsOXPVA
+	9xqYFZ0TLMHWFMS+YlaAbPzo6+1Hxm0M9nIqMVdINNEhImmHIkjH44D9YNMRKf9PulhtVSNeicQ
+	VMoVUf6r0uzuvdsssgDh484vsPToDzEXMVV2s
+X-Google-Smtp-Source: AGHT+IFyltmncYSZz561uPWQsvsGb5DFmLf+mGb3Vo6WS5NNhJE43ms4WKqkq6D4X3fyD6kxk1+1bYCNn1kURkFiU6A=
+X-Received: by 2002:a05:622a:202:b0:456:7f34:f560 with SMTP id
+ d75a77b69052e-458608812bdmr4020001cf.22.1726151137360; Thu, 12 Sep 2024
+ 07:25:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1747:b0:39f:58f9:8d7c with SMTP id
- e9e14a558f8ab-3a084958fadmr24310285ab.26.1726151069178; Thu, 12 Sep 2024
- 07:24:29 -0700 (PDT)
-Date: Thu, 12 Sep 2024 07:24:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004eac7a0621ecdda7@google.com>
-Subject: [syzbot] Monthly wireless report (Sep 2024)
-From: syzbot <syzbot+listdf434a578949274ad9b5@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <20240912124514.2329991-1-linyunsheng@huawei.com> <20240912124514.2329991-3-linyunsheng@huawei.com>
+In-Reply-To: <20240912124514.2329991-3-linyunsheng@huawei.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 12 Sep 2024 07:25:23 -0700
+Message-ID: <CAHS8izPc8fy08mL1RJtnxiOvTx=Uk037Q5SKobC80jQocEKMJQ@mail.gmail.com>
+Subject: Re: [RFC 2/2] page_pool: fix IOMMU crash when driver has already unbound
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	liuyonglong@huawei.com, fanghaiqing@huawei.com, 
+	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck <alexander.duyck@gmail.com>, 
+	IOMMU <iommu@lists.linux.dev>, Wei Fang <wei.fang@nxp.com>, 
+	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, 
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Felix Fietkau <nbd@nbd.name>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, 
+	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, bpf@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello wireless maintainers/developers,
+On Thu, Sep 12, 2024 at 5:51=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> Networking driver with page_pool support may hand over page
+> still with dma mapping to network stack and try to reuse that
+> page after network stack is done with it and passes it back
+> to page_pool to avoid the penalty of dma mapping/unmapping.
+> With all the caching in the network stack, some pages may be
+> held in the network stack without returning to the page_pool
+> soon enough, and with VF disable causing the driver unbound,
+> the page_pool does not stop the driver from doing it's
+> unbounding work, instead page_pool uses workqueue to check
+> if there is some pages coming back from the network stack
+> periodically, if there is any, it will do the dma unmmapping
+> related cleanup work.
+>
+> As mentioned in [1], attempting DMA unmaps after the driver
+> has already unbound may leak resources or at worst corrupt
+> memory. Fundamentally, the page pool code cannot allow DMA
+> mappings to outlive the driver they belong to.
+>
+> Currently it seems there are at least two cases that the page
+> is not released fast enough causing dma unmmapping done after
+> driver has already unbound:
+> 1. ipv4 packet defragmentation timeout: this seems to cause
+>    delay up to 30 secs:
+>
+> 2. skb_defer_free_flush(): this may cause infinite delay if
+>    there is no triggering for net_rx_action().
+>
+> In order not to do the dma unmmapping after driver has already
+> unbound and stall the unloading of the networking driver, add
+> the pool->items array to record all the pages including the ones
+> which are handed over to network stack, so the page_pool can
+> do the dma unmmapping for those pages when page_pool_destroy()
+> is called.
+>
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+The approach in this patch is a bit complicated. I wonder if there is
+something simpler that we can do. From reading the thread, it seems
+the issue is that in __page_pool_release_page_dma we're calling
+dma_unmap_page_attrs() on a pool->p.dev that has been deleted via
+device_del, right?
 
-During the period, 3 new issues were detected and 0 were fixed.
-In total, 34 issues are still open and 140 have been fixed so far.
+Why not consider pool->p.dev unusable if pool->destroy_cnt > 0? I.e.
+in __page_pool_release_page_dma, we can skip dma_unmap_page_attrs() if
+destry_cnt > 0?
 
-Some of the still happening issues:
+More generally, probably any use of pool->p.dev may be invalid if
+page_pool_destroy has been called. The call sites can be scrubbed for
+latent bugs.
 
-Ref  Crashes Repro Title
-<1>  27179   Yes   WARNING in __ieee80211_beacon_get
-                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
-<2>  5657    Yes   WARNING in __cfg80211_ibss_joined (2)
-                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<3>  1724    Yes   WARNING in ath6kl_bmi_get_target_info (2)
-                   https://syzkaller.appspot.com/bug?extid=92c6dd14aaa230be6855
-<4>  1132    Yes   WARNING in ieee80211_start_next_roc
-                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
-<5>  1129    Yes   WARNING in rate_control_rate_init (3)
-                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
-<6>  568     Yes   WARNING in plfxlc_mac_release
-                   https://syzkaller.appspot.com/bug?extid=51a42f7c2e399392ea82
-<7>  285     No    INFO: task hung in rfkill_global_led_trigger_worker (3)
-                   https://syzkaller.appspot.com/bug?extid=50499e163bfa302dfe7b
-<8>  109     Yes   WARNING in ieee80211_free_ack_frame (2)
-                   https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
-<9>  75      No    INFO: task hung in ath9k_hif_usb_firmware_cb (3)
-                   https://syzkaller.appspot.com/bug?extid=e9b1ff41aa6a7ebf9640
-<10> 52      Yes   WARNING in minstrel_ht_update_caps
-                   https://syzkaller.appspot.com/bug?extid=d805aca692aded25f888
+The hard part is handling the concurrency. I'm not so sure we can fix
+this without introducing some synchronization between the
+page_pool_destroy seeing the device go away and the code paths using
+the device. Are these being called from the fast paths? Jespers
+benchmark can tell for sure if there is any impact on the fast path.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> Note, the devmem patchset seems to make the bug harder to fix
+> and to backport too, this patch does not consider fixing the
+> case for devmem yet.
+>
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+FWIW from a quick look I did not see anything in this patch that is
+extremely hard to port to netmem. AFAICT the issue is that you skipped
+changing page_pool to page_pool_items in net_iov. Once that is done, I
+think the rest should be straightforward.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+--=20
+Thanks,
+Mina
 
