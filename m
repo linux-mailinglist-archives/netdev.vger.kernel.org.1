@@ -1,121 +1,116 @@
-Return-Path: <netdev+bounces-127802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB823976916
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:25:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 373BC976925
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:29:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41584B217AE
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:25:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3917B226FE
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE431A42B2;
-	Thu, 12 Sep 2024 12:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 994211A4E76;
+	Thu, 12 Sep 2024 12:28:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="wK4MuNj6";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="3zV2dOXt"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D862B1A3A96;
-	Thu, 12 Sep 2024 12:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D12F1A0BEE;
+	Thu, 12 Sep 2024 12:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726143907; cv=none; b=YTPSzbEez5ErrjOETBJgbs6vE5ZbQksMdk27OjvYjCC8i+C4UC4m3UVJL3JrnVgk2z52j9kx9ud057pn7YpNi9mEb311v7DGzWyjn/DNql+5GBvng/KowsRdzdlvRfAjyVbEJiUAVHmZ2+KUjHAgXc7efsz078L8Rw4nS8C5VzU=
+	t=1726144132; cv=none; b=srcFlk6cNyPjnMA2obWaBex18OfboJsyUU9aOoYA6uhtlZW6GR71HAoSz89d7hopCbwWxV2x+Ptedw0f3GkTKi0dvUDZ6v2jhI0jx74sTBCUsI6FPm423GnQ06ddb+Qjp74p0CKvWQwKOdwX5JP/ySiBBOSyNyBNyIhqZ3iUU4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726143907; c=relaxed/simple;
-	bh=AMuIaVSJHzuWYwJl7hvZoXf7g9cTP2qfMqoenAkyZYs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Bg6Pl3bMyehKPlIfQ90lBihibvdbjw4L9v7/6J8mIMZVK+yieHIVmRsk6OjthgPYRbrFiFlq2/ZTwAS3Bg28nuvDIckmVgQ6/EBN8D7sV3l/eTQyrwP7GYmxWYqDOHnRPv/6SgFzIFf1H/l6nA5KNoPihQXmnRbyJ1W9QDI2+1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4X4GpP2lFtz1j8Tj;
-	Thu, 12 Sep 2024 20:24:29 +0800 (CST)
-Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id E00AC14013B;
-	Thu, 12 Sep 2024 20:24:59 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 12 Sep 2024 20:24:59 +0800
-Message-ID: <46efd1be-688e-ecd0-a9e1-cf5f69d0110f@huawei.com>
-Date: Thu, 12 Sep 2024 20:24:58 +0800
+	s=arc-20240116; t=1726144132; c=relaxed/simple;
+	bh=m0ipOqG6MW2dNKERRWywqNGBIxidZ5+s5VOAIb/Tfhg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hfB/RihjygIuPp89mxsBmfmQrUOfxTi5obvGGSv8uzIaw/jb2OuDzT0V327IpKd27NhLojYcQbJpOzI91S2u7dGmbt1T9+EyJ+wF3Fjjjlh6RxiiwpI4obLZBIBuvEn06Huyo01SxhaqXk718PHwoKCFzWpoU0Otpg/iTo4QRts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=wK4MuNj6; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=3zV2dOXt; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 12 Sep 2024 14:28:47 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1726144129;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HMbQ5wV8vf2Nm/7RjLSdhxJBLrcV/qVUrcxoqXcD+8E=;
+	b=wK4MuNj6KQPQpQbzWffOtY0pJHYwl+nho726eiZBSmKlO2U29FRxI+adMH+nqAUhVyuQp5
+	pUrPe6I6ZK//I6ILat/Sjx4lhn8Q9Nq4n7c64+T1fwY/5gY3UDYaMWj/7ED3hPMWknfQTq
+	uxO/IGNQVxuMEb2iCwdDqt1HlezFPnXCy/nGT9SInlkavzcaBpEHfSNuWKZeq++U8fd7PQ
+	h1xGKxUO6vJcBZjEmBSZofR+FICib6KOi56dDAMHvqhwEvyD1B7AR3Kl81pECGm2EL4Tjq
+	Fp88iInUpjAeiGhyaix1IkcGqxlle8KAqPu3s8si2lDIfoLjbSJCIx99MOkGyg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1726144129;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HMbQ5wV8vf2Nm/7RjLSdhxJBLrcV/qVUrcxoqXcD+8E=;
+	b=3zV2dOXtDquWz0hnlrLEveEQ0VloOdcb9xwkDMwcUCrD0iT7RJiVirKwRirG63OrFLrRXE
+	L/pxzmAFGA5c6GDg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, andrii@kernel.org, ast@kernel.org,
+	syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
+	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org,
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Subject: Re: [PATCH net-net] tun: Assign missing bpf_net_context.
+Message-ID: <20240912122847.x70_LgN_@linutronix.de>
+References: <000000000000adb970061c354f06@google.com>
+ <20240702114026.1e1f72b7@kernel.org>
+ <20240703122758.i6lt_jii@linutronix.de>
+ <20240703120143.43cc1770@kernel.org>
+ <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH -next v3 1/2] posix-timers: Check timespec64 before call
- clock_set()
-Content-Language: en-US
-To: Thomas Gleixner <tglx@linutronix.de>, Richard Cochran
-	<richardcochran@gmail.com>
-CC: <bryan.whitehead@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<anna-maria@linutronix.de>, <frederic@kernel.org>,
-	<UNGLinuxDriver@microchip.com>, <mbenes@suse.cz>, <jstultz@google.com>,
-	<andrew@lunn.ch>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240909074124.964907-1-ruanjinjie@huawei.com>
- <20240909074124.964907-2-ruanjinjie@huawei.com>
- <Zt8SFUpFp7JDkNbM@hoboy.vegasvil.org>
- <ea351ea0-5095-d7ae-5592-ec3bd45c771c@huawei.com> <874j6l9ixk.ffs@tglx>
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-In-Reply-To: <874j6l9ixk.ffs@tglx>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemh500013.china.huawei.com (7.202.181.146)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
 
+On 2024-09-12 05:06:36 [-0700], Breno Leitao wrote:
+> Hello Sebastian, Jakub,
+Hi,
 
-
-On 2024/9/12 20:04, Thomas Gleixner wrote:
-> On Thu, Sep 12 2024 at 10:53, Jinjie Ruan wrote:
+> I've seen some crashes in 6.11-rc7 that seems related to 401cb7dae8130
+> ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.").
 > 
->> On 2024/9/9 23:19, Richard Cochran wrote:
->>> On Mon, Sep 09, 2024 at 03:41:23PM +0800, Jinjie Ruan wrote:
->>>> diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
->>>> index 1cc830ef93a7..34deec619e17 100644
->>>> --- a/kernel/time/posix-timers.c
->>>> +++ b/kernel/time/posix-timers.c
->>>> @@ -1137,6 +1137,9 @@ SYSCALL_DEFINE2(clock_settime, const clockid_t, which_clock,
->>>>  	if (get_timespec64(&new_tp, tp))
->>>>  		return -EFAULT;
->>>>  
->>>> +	if (!timespec64_valid(&new_tp))
->>>> +		return -ERANGE;
->>>
->>> Why not use timespec64_valid_settod()?
->>
->> There was already checks in following code, so it is not necessary to
->> check NULL or timespec64_valid() in ptp core and its drivers, only the
->> second patch is needed.
->>
->> 169 int do_sys_settimeofday64(const struct timespec64 *tv, const struct
->> timezone *tz)
->>  170 {
->>  171 >-------static int firsttime = 1;
->>  172 >-------int error = 0;
->>  173
->>  174 >-------if (tv && !timespec64_valid_settod(tv))
->>  175 >------->-------return -EINVAL;
+> Basically bpf_net_context is NULL, and it is being dereferenced by
+> bpf_net_ctx->ri.kern_flags (offset 0x38) in the following code.
 > 
-> How does this code validate timespecs for clock_settime(clockid) where
-> clockid != CLOCK_REALTIME?
-
-According to the man manual of clock_settime(), the other clockids are
-not settable.
-
-And in Linux kernel code, except for CLOCK_REALTIME which is defined in
-posix_clocks array, the clock_set() hooks are not defined and will
-return -EINVAL in SYSCALL_DEFINE2(clock_settime), so the check is not
-necessary.
-
+> 	static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
+> 	{
+> 		struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+> 		if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_RI_INIT)) {
 > 
-> Thanks,
+> That said, it means that bpf_net_ctx_get() is returning NULL.
 > 
->         tglx
+> This stack is coming from the bpf function bpf_redirect()
+> 	BPF_CALL_2(bpf_redirect, u32, ifindex, u64, flags)
+> 	{
+> 	      struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+> 
+> 
+> Since I don't think there is XDP involved, I wondering if we need some
+> preotection before calling bpf_redirect()
+
+This origins in netkit_xmit(). If my memory serves me, then Daniel told
+me that netkit is not doing any redirect and therefore does not need
+"this". This must have been during one of the first "designs"/ versions. 
+
+If you are saying, that this is possible then something must be done.
+Either assign a context or reject the bpf program.
+
+Sebastian
 
