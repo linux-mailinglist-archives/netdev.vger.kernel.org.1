@@ -1,106 +1,126 @@
-Return-Path: <netdev+bounces-127650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB5E975F4D
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:54:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B668975F60
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:57:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A27A51C22B96
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:54:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65DA2288F1C
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA55B13D50A;
-	Thu, 12 Sep 2024 02:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DED15126BE3;
+	Thu, 12 Sep 2024 02:56:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="O13N8h7G"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4653E13AA5D;
-	Thu, 12 Sep 2024 02:53:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8DE126BF7
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 02:56:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726109631; cv=none; b=Dh74Dc5OmizHPPY/KazbF8/NO2MqkiOskmoDC4oc9WUYjR3pNAcQ6XpssYOiOmKj/NSTaNTRFiPWeplSUXyzhroqfuJDvXRxIRhJnXfE9YfBvYU6IaBj7zuG7JxBLfzX9+kVR0ZLkW9mFj9A1TeXqygJjwcjdGfPwvXkxQw8Sjs=
+	t=1726109816; cv=none; b=WlV4ckL15Of/MYecTg0WDIVK7niss7WmpEzKLsvuYUpmzNNu0PqzN6+1Y62cRJ0uAjCYT4iMTv0y7KyZqco48OU/MHWOBae/HMSUUDh7liCZgJe9LOHmRO3/GnV43uPc0TSwzITt+934C2ySM2EWL2xkqQmUfamAix1Lapn53dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726109631; c=relaxed/simple;
-	bh=rKKjoUamE/k8TvE++nL1Z700qyaVlVKJjrxktWUMzkk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tTpe3kxZ79vF9u8mnsJh8zvlNaOpyeoruukB7s70/qdyCAAPwv6M+VuKgxvzdYt5yf3A36xwpvqi0dfbU+dnVSuzXdPDddCijB+bMGz9RB6jL1lE8A6FgaB0vT+ON2l48pTuxlGNox0qOutgpFkBtZosNeuHj36gFpmbrmPkV88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4X426Z5Q21zyR4n;
-	Thu, 12 Sep 2024 10:52:38 +0800 (CST)
-Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7FF6D180064;
-	Thu, 12 Sep 2024 10:53:46 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 12 Sep 2024 10:53:45 +0800
-Message-ID: <ea351ea0-5095-d7ae-5592-ec3bd45c771c@huawei.com>
-Date: Thu, 12 Sep 2024 10:53:44 +0800
+	s=arc-20240116; t=1726109816; c=relaxed/simple;
+	bh=utyDe5eZCMdGV6R5hhAx0NCl89O3xZZBOa2ynVuR1cE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TyGL7vAOrapgW/J71nVaSlBAPVLIez6GAQvpTmnZxgePjlyyWtvUXt8LnOqARfneKQjSyzIjqW1wIUbdXvTyCytTj4QVZnsDZxMAj0uciWRl2XRtboBFeZAlfLdJKSlEktNPX/jqx3UdX3QoaG4JXpLFFmEhkqQowyz6qJ+NkXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=O13N8h7G; arc=none smtp.client-ip=54.207.22.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1726109763;
+	bh=ItiN5nFTSra7Vr5po2FBwHrIsvZx+V/Mwk2BLpZP71Q=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=O13N8h7GMx6hf49YADLg10jyJfjywFsLuPWNJghfa0dg4YOAFH+1Rr/lBmcHd+obj
+	 aseRJGw5IVBYTjpWVdtJ4v/yJv0z/ToRs790d8qMHHHOFSPbm+oY2yyy0GP+xVXb+b
+	 TlV2cXPgD9Uu9gdiWe87TdV7X2tv78x/GaCPggxE=
+X-QQ-mid: bizesmtp81t1726109745ti5gwwm0
+X-QQ-Originating-IP: Q9VlWd8TNoXtY9lblvywY1Ehy7N3aYevzbIayxgrJRM=
+Received: from localhost.localdomain ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 12 Sep 2024 10:55:42 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 7041621352797983170
+From: WangYuli <wangyuli@uniontech.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	sashal@kernel.org,
+	william.qiu@starfivetech.com,
+	emil.renner.berthing@canonical.com,
+	conor.dooley@microchip.com,
+	wangyuli@uniontech.com,
+	xingyu.wu@starfivetech.com,
+	walker.chen@starfivetech.com,
+	robh@kernel.org,
+	hal.feng@starfivetech.com
+Cc: kernel@esmil.dk,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	paul.walmsley@sifive.com,
+	palmer@dabbelt.com,
+	aou@eecs.berkeley.edu,
+	devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	richardcochran@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH 6.6 v2 1/4] riscv: dts: starfive: add assigned-clock* to limit frquency
+Date: Thu, 12 Sep 2024 10:55:05 +0800
+Message-ID: <3A31C289BC240955+20240912025539.1928223-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.43.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH -next v3 1/2] posix-timers: Check timespec64 before call
- clock_set()
-Content-Language: en-US
-To: Richard Cochran <richardcochran@gmail.com>
-CC: <bryan.whitehead@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<anna-maria@linutronix.de>, <frederic@kernel.org>, <tglx@linutronix.de>,
-	<UNGLinuxDriver@microchip.com>, <mbenes@suse.cz>, <jstultz@google.com>,
-	<andrew@lunn.ch>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240909074124.964907-1-ruanjinjie@huawei.com>
- <20240909074124.964907-2-ruanjinjie@huawei.com>
- <Zt8SFUpFp7JDkNbM@hoboy.vegasvil.org>
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-In-Reply-To: <Zt8SFUpFp7JDkNbM@hoboy.vegasvil.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemh500013.china.huawei.com (7.202.181.146)
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
+From: William Qiu <william.qiu@starfivetech.com>
 
+[ Upstream commit af571133f7ae028ec9b5fdab78f483af13bf28d3 ]
 
-On 2024/9/9 23:19, Richard Cochran wrote:
-> On Mon, Sep 09, 2024 at 03:41:23PM +0800, Jinjie Ruan wrote:
->> diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
->> index 1cc830ef93a7..34deec619e17 100644
->> --- a/kernel/time/posix-timers.c
->> +++ b/kernel/time/posix-timers.c
->> @@ -1137,6 +1137,9 @@ SYSCALL_DEFINE2(clock_settime, const clockid_t, which_clock,
->>  	if (get_timespec64(&new_tp, tp))
->>  		return -EFAULT;
->>  
->> +	if (!timespec64_valid(&new_tp))
->> +		return -ERANGE;
-> 
-> Why not use timespec64_valid_settod()?
+In JH7110 SoC, we need to go by-pass mode, so we need add the
+assigned-clock* properties to limit clock frquency.
 
-There was already checks in following code, so it is not necessary to
-check NULL or timespec64_valid() in ptp core and its drivers, only the
-second patch is needed.
+Signed-off-by: William Qiu <william.qiu@starfivetech.com>
+Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+Signed-off-by: Conor Dooley <conor.dooley@microchip.com>
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ .../riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-169 int do_sys_settimeofday64(const struct timespec64 *tv, const struct
-timezone *tz)
- 170 {
- 171 >-------static int firsttime = 1;
- 172 >-------int error = 0;
- 173
- 174 >-------if (tv && !timespec64_valid_settod(tv))
- 175 >------->-------return -EINVAL;
+diff --git a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi
+index 062b97c6e7df..4874e3bb42ab 100644
+--- a/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi
++++ b/arch/riscv/boot/dts/starfive/jh7110-starfive-visionfive-2.dtsi
+@@ -204,6 +204,8 @@ &i2c6 {
+ 
+ &mmc0 {
+ 	max-frequency = <100000000>;
++	assigned-clocks = <&syscrg JH7110_SYSCLK_SDIO0_SDCARD>;
++	assigned-clock-rates = <50000000>;
+ 	bus-width = <8>;
+ 	cap-mmc-highspeed;
+ 	mmc-ddr-1_8v;
+@@ -220,6 +222,8 @@ &mmc0 {
+ 
+ &mmc1 {
+ 	max-frequency = <100000000>;
++	assigned-clocks = <&syscrg JH7110_SYSCLK_SDIO1_SDCARD>;
++	assigned-clock-rates = <50000000>;
+ 	bus-width = <4>;
+ 	no-sdio;
+ 	no-mmc;
+-- 
+2.43.4
 
-
-
-> 
-> Thanks,
-> Richard
 
