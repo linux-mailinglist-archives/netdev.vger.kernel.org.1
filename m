@@ -1,180 +1,132 @@
-Return-Path: <netdev+bounces-127905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA965976FCD
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:50:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E6DA976FC3
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:49:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 412FE1F249F9
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:50:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7F271F24A70
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319C51BF305;
-	Thu, 12 Sep 2024 17:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="axWQtc1y"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FAAA1BE860;
+	Thu, 12 Sep 2024 17:49:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759EB1BE85C;
-	Thu, 12 Sep 2024 17:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.59
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726163384; cv=fail; b=sF0FAFUyssCE96G/f/QgA7VscwK+gBo1YlBVviyu6TN7gzZRPBWdwYxp477fKXsSIc7+tXgvllCwX9rv3sfV6qhmK4hAnsDRyNPIxMPOPbQtokJdtWcHZjJddfmwhPRuca3Qkxbfup/V+zyzIgBqRuN+RpizSRHXKBvCgfWDDt4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726163384; c=relaxed/simple;
-	bh=wM+ar2m646XQn+DscnCZRNwoupIcB57xayLYkFNAAoA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QM7hReGOXfNoxwOfQIGsZFkvdsCnawtJttP77ksBXYdaSOPSQIjsuzNNQaQrIqKB2TdYJHM4l0asHsqa1KkqzvRiXf5G5cRfGFzQAloDXgj0nRmH6RM80B6draIUmIwS4s57LprDdfEj7h+QvPlqpVlQ/J5kHzCQfDuVN7vmwMM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=axWQtc1y; arc=fail smtp.client-ip=40.107.94.59
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gRzW0jMmVHJuKzLHRTEe/hAvhzq+2FWmg8xK/UuED2v6x5/IMOIBPgixhDI+eKbfd1W/oSlID0jCUxlP8DkdulAlMO9SSD/A8VeLrUEjcc1+ARXk1MzvonMNIje4nVAkxk7hVFxKBs+xFfaopbkCpJBClbFgShicUG/jdWkBUO+cvW1I8dGX4/Hb4i0nDNSNrF2qVTN40XaC4V7Ca0EOQnVBzmQ04YGtFPjw9gWutF9fZcWaj3/3bDWY0+11y0oYsRd21ksGe8jN4dxySLcItEXf1oGb/gqekjQdskN24/xsa4Sse8Ktw/K0xQAMHw0wfEQszpzqyABjmcctHpySsA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vljwI1YkJJTCGlA4K3W3vwOWwnugRRxtvijlNs7OzrA=;
- b=jXVgANRoCjKY+TmW3QAjicbTnloLg4hh4z+pBoB3oEJvBPGouJucH+yBK+EBZVwM/KhQ/4yqBS6ktKdgPqthBFxYu0eFDHrZnHFoDvAFNO2l78PztQyVppEdH7l8jXm8Dwgq+OCrMZuQXVTcv3p+8jn0Ii3UQh7RCWaSLM5STA8F/5BR0ZaTJJN6ebBfN3bXFxDWKrdLJJy//VaS5w/4W/PLMB8osRdpMeleJWEaLm/2pJIdPasmTBD3XuqXuH9oWWeGUh9s0/2r86nugmq879d5ZoJr5avpnQ82hYn5CqDacMVM3jL09QGMzNFIykdeUmcJzCgOXxuZQlRydtAgvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=fb.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vljwI1YkJJTCGlA4K3W3vwOWwnugRRxtvijlNs7OzrA=;
- b=axWQtc1yEg9/cQCmegX+Akqo+N6BWSuWVVQZt+yx4ImcoNH50GeyCDpJQRKqYPoi7NrX2hfzEvjW7lfBzbE5VPk1usWMCTjlp9yFPNk3zIYlALB5tIqShga9iQMYWc8U2VWs83qmdZNxXtlHzD2251Zc50hXDbMLUpoFttjKGbI=
-Received: from BYAPR06CA0035.namprd06.prod.outlook.com (2603:10b6:a03:d4::48)
- by PH7PR12MB5973.namprd12.prod.outlook.com (2603:10b6:510:1d8::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Thu, 12 Sep
- 2024 17:49:36 +0000
-Received: from CO1PEPF000075ED.namprd03.prod.outlook.com
- (2603:10b6:a03:d4:cafe::3a) by BYAPR06CA0035.outlook.office365.com
- (2603:10b6:a03:d4::48) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24 via Frontend
- Transport; Thu, 12 Sep 2024 17:49:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1PEPF000075ED.mail.protection.outlook.com (10.167.249.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Thu, 12 Sep 2024 17:49:34 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 12 Sep
- 2024 12:49:32 -0500
-From: Brett Creeley <brett.creeley@amd.com>
-To: <alexanderduyck@fb.com>, <kuba@kernel.org>, <kernel-team@meta.com>,
-	<davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <jdamato@fastly.com>, <brett.creeley@amd.com>, <stable@vger.kernel.org>
-Subject: [PATCH net] fbnic: Set napi irq value after calling netif_napi_add
-Date: Thu, 12 Sep 2024 10:49:22 -0700
-Message-ID: <20240912174922.10550-1-brett.creeley@amd.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73865149C50;
+	Thu, 12 Sep 2024 17:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726163371; cv=none; b=p+XWhJR5H9BE5ydAgT9vlfqyXFeLaSzIGT7AGHv5zf4HrBC5RzpFJWfdOhJIznsR98LhyYwuCzMMsnLADmKWM12ZyGiBcACvGbFE1RKxyTbHiVhUMCNBgfVhuN/q5mUExjdgV84snNj7HoyjP4lKStJyLFUHq2eARKa7kKIEaG4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726163371; c=relaxed/simple;
+	bh=C5U1bcY1T+1rchz/nfQuV9RtGy8VEcB1pZLozPFTIYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IYAhsNx7E6N0bovpMx9FYcEAhI2eKRjE6E8WtwiEs8Dn5H0ZRAiXWDwAYhwBxaVgbdEF4mrkClt4d0o1C1F8qZNmFnw7PLXDwi0ggerWv4y47mdVvMq9MjEymtSnIdDSVOmaQA1uV7cmPaTrBD5IWMIDIhuaQiYS3RXvL8OTBQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c26815e174so84017a12.0;
+        Thu, 12 Sep 2024 10:49:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726163368; x=1726768168;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aG6T1eQjFkj0EwYfybn/Brg9qKOXhI/1MoAEcTM2NxE=;
+        b=AOpkFbOZbH1R6l+QAGi3ds1NddeWAviywmQnEcQA2ImLYC9znMyp+o0u1UK8eRp0/7
+         T/wsfv6Q7q3vfe11VT6kG74PFObf1Gh1AtOvPAoiv/RfoMWC/zOGmb7uK3xknTp6RAyZ
+         nr4YHIP4irTbxAtqBunrGWWrZROSSNSJWNWhyL9wvrh4V1BgY8S/WsPS1A9+Q6S9F3LU
+         hgG/EB2GPODGhmJizeG+H4wTsEw6la1dHlIbv7XMR5PqIofi9Ze1ade/iefjcgNTnDMg
+         YaQcE3k18CdyoN9h0SR8qFvWhM4JEvqq+EXUi6y30eqKA5dtZaHUvoc9TeTvJ2nsD5cE
+         wQww==
+X-Forwarded-Encrypted: i=1; AJvYcCUf/o8qEuWEx4retNbTvxWfTuCjmp5Vif7gDzrH55QfqzgSNIoLyqBiAkQo6rxO3FGDOMqm/KTaVYbRR9E=@vger.kernel.org, AJvYcCWW/QgHattUk1/FrVbeDfvtnPVS0XuFBHewSN81A/9XlYanU06rh63UuH7MwcNxKE0XLPmEZL7V@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz8NC+qmBgAmxN/xdVbTAPC7D2h3B/7Wmykkq3nufd406v5yBtC
+	kdD1UjxN1ZywxZ5m6mf9xGSIoCJh7T5MMlbIu5DWWNXGgc5BYlCQ
+X-Google-Smtp-Source: AGHT+IHrEJDc6pS8fzTbZTav71UY+P1dnrFfHwbVRdt4kB6psPXPJ4F6J3gL+HuwtbG40G5/7nxJuA==
+X-Received: by 2002:a05:6402:2803:b0:5c3:2440:8570 with SMTP id 4fb4d7f45d1cf-5c41e1acc7amr68881a12.26.1726163366674;
+        Thu, 12 Sep 2024 10:49:26 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd523bfsm6832356a12.53.2024.09.12.10.49.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 10:49:26 -0700 (PDT)
+Date: Thu, 12 Sep 2024 10:49:24 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Maksym Kutsevol <max@kutsevol.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] netcons: Add udp send fail statistics to
+ netconsole
+Message-ID: <20240912-honest-industrious-skua-9902c3@leitao>
+References: <20240912173608.1821083-1-max@kutsevol.com>
+ <20240912173608.1821083-2-max@kutsevol.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000075ED:EE_|PH7PR12MB5973:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6a59d9b1-45b7-4b94-3152-08dcd3534388
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?HIoTBXrBERJp0OQQUUFDVNOvzPBkrep8jNP944tyrfg9UtQ8AzfrS3BtTe2h?=
- =?us-ascii?Q?AGty0PC36usKDoN+OvLMFTp75NUDLFW3ULzApjnVNY+66/k+Nl9Ty2t/zm9x?=
- =?us-ascii?Q?t7X89YGXKlBaKTajd0CkIBT6bKHEMVfNazgCJgBo4oZqxo91aGs3w8TbiIST?=
- =?us-ascii?Q?QbHnhfYmSRkuozg2paaMX1a7ayg/kS7SJXpS2H/xfRNMpnZxGCi0hVpG4SYd?=
- =?us-ascii?Q?WQEevt8Jf9wpzyIahCGMY9pidJqGLagEPHTcihEm6r5sOVsEl6lJluGXLW33?=
- =?us-ascii?Q?i/t4hCFR9xm6pgSo69c4N2OMsZzYI+ngzESD+xDBiOuSmM/sav1wuUzH4Dxt?=
- =?us-ascii?Q?41cp7mp4+d3cHGTEVGAwiGsCc65oTd/eH3pwmUsnMdQceLR4Ql76I7wf29tt?=
- =?us-ascii?Q?cgdIyTd38tJpGlHajX5t2xNWLZYUeBm9Yk6/MBX5JsaG5FLxq35wPn+hEu/u?=
- =?us-ascii?Q?PfFsporWPNwJoDXdof4VAUfBbR3uN9tOsB0tKYQXwnQFAnAFeBea2NMEOSGw?=
- =?us-ascii?Q?aKia3vLRF66oo13xPJEUa7XhKZusswC40ckBu2Q7n1aODcLdD+6nXEgKSFcI?=
- =?us-ascii?Q?it58FyfIKYQis9/xdT6y7uwNUF5x8G7cjTrUweEdibNnFZBZF90noQ/DIdUe?=
- =?us-ascii?Q?UNLOYasr1nBy1iTi1wQf3i1KgTyWYk+VNfBidBm6XbTDWr/MFNCHqwtCXGbn?=
- =?us-ascii?Q?Dovc6oqgau6v9Df/MjifS5tT90JH1gljhtqykYUdMSNFhdaPlyA29Z8+H+2b?=
- =?us-ascii?Q?YyMQHE18athmSjTmT3I+7pWFl84CtR2+FyhFMxHyzvRoQO5b66Qo6+XZni2l?=
- =?us-ascii?Q?yBpsRmBD5OdgyJExDkauWwIQSmniAgYKbmIe+TlZPEIx2MOXxtgSp0tSIpHJ?=
- =?us-ascii?Q?JAN5G1J1IFSVuVjwCIfJcSy1F538xqsFk2RFVu5sEJ1rMNE5nI4HEB9i+uuv?=
- =?us-ascii?Q?IrkDnZ6v+ZcRD8FCYc6Ov1iwdkSYmukSrmNyD0MB2oOd6X8Va+PtTKTNT6jL?=
- =?us-ascii?Q?FhSrYd86P6Y6hd9NIVYhW8353qorCukBFQ+vjRg0YFNI7oalZ2ZqPFCTkCtH?=
- =?us-ascii?Q?3XuQn/ruia9IH+XGwmW7co5Cg2AlNL0mXSzHDGbQuK7N/67rOLg9NYtASu6n?=
- =?us-ascii?Q?+c56kYTcYsEuddYdiqTrMeYRO23QzCgfP53wziFOJnQ/PqXVk+2TF02wOdRs?=
- =?us-ascii?Q?HNC+JnyHQBIyCdEREWgyoT5m//zqQShVzzcQYhDHChstR9Q9klIZDMQrZ4vF?=
- =?us-ascii?Q?lOlIj5JMPJiiJmc2Zh5/yZXuBLrrTD7SI6OWLzFxv+FW7JaltC+LjFP3hV1m?=
- =?us-ascii?Q?yO6DAsdAw0ldT4+CwCCw3v34fvXeIhiu0b4KIeYNulidXUFk3E8cp/hKzjH7?=
- =?us-ascii?Q?taw+LZqxtRQS/MwQW4vhGN7gVIzCEmjbGFXXyI4TnO5dWjHhkLvDdOMcfPp3?=
- =?us-ascii?Q?GuW9U2EP51iqA4EgJHTb9MU//T6azq28?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Sep 2024 17:49:34.6793
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a59d9b1-45b7-4b94-3152-08dcd3534388
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000075ED.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5973
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240912173608.1821083-2-max@kutsevol.com>
 
-The driver calls netif_napi_set_irq() and then calls netif_napi_add(),
-which calls netif_napi_add_weight(). At the end of
-netif_napi_add_weight() is a call to netif_napi_set_irq(napi, -1), which
-clears the previously set napi->irq value. Fix this by calling
-netif_napi_set_irq() after calling netif_napi_add().
+Hello Maksym,
 
-This was found when reviewing another patch and I have no way to test
-this, but the fix seemed relatively straight forward.
+Thanks for the patch, it is looking good. A few nits:
 
-Cc: stable@vger.kernel.org
-Fixes: bc6107771bb4 ("eth: fbnic: Allocate a netdevice and napi vectors with queues")
-Signed-off-by: Brett Creeley <brett.creeley@amd.com>
----
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On Thu, Sep 12, 2024 at 10:28:52AM -0700, Maksym Kutsevol wrote:
+> +/**
+> + * netpoll_send_udp_count_errs - Wrapper for netpoll_send_udp that counts errors
+> + * @nt: target to send message to
+> + * @msg: message to send
+> + * @len: length of message
+> + *
+> + * Calls netpoll_send_udp and classifies the return value. If an error
+> + * occurred it increments statistics in nt->stats accordingly.
+> + * Only calls netpoll_send_udp if CONFIG_NETCONSOLE_DYNAMIC is disabled.
+> + */
+> +static void netpoll_send_udp_count_errs(struct netconsole_target *nt, const char *msg, int len)
+> +{
+> +	int result = netpoll_send_udp(&nt->np, msg, len);
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 0ed4c9fff5d8..72f88ae7815f 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -1012,14 +1012,14 @@ static int fbnic_alloc_napi_vector(struct fbnic_dev *fbd, struct fbnic_net *fbn,
- 	nv->fbd = fbd;
- 	nv->v_idx = v_idx;
- 
--	/* Record IRQ to NAPI struct */
--	netif_napi_set_irq(&nv->napi,
--			   pci_irq_vector(to_pci_dev(fbd->dev), nv->v_idx));
--
- 	/* Tie napi to netdev */
- 	list_add(&nv->napis, &fbn->napis);
- 	netif_napi_add(fbn->netdev, &nv->napi, fbnic_poll);
- 
-+	/* Record IRQ to NAPI struct */
-+	netif_napi_set_irq(&nv->napi,
-+			   pci_irq_vector(to_pci_dev(fbd->dev), nv->v_idx));
-+
- 	/* Tie nv back to PCIe dev */
- 	nv->dev = fbd->dev;
- 
--- 
-2.17.1
+Would you get a "variable defined but not used" type of eror if
+CONFIG_NETCONSOLE_DYNAMIC is disabled?
 
+> +
+> +	if (IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC)) {
+> +		if (result == NET_XMIT_DROP) {
+> +			u64_stats_update_begin(&nt->stats.syncp);
+> +			u64_stats_inc(&nt->stats.xmit_drop_count);
+> +			u64_stats_update_end(&nt->stats.syncp);
+> +		} else if (result == -ENOMEM) {
+> +			u64_stats_update_begin(&nt->stats.syncp);
+> +			u64_stats_inc(&nt->stats.enomem_count);
+> +			u64_stats_update_end(&nt->stats.syncp);
+> +		}
+> +	}
+
+Would this look better?
+
+	if (IS_ENABLED(CONFIG_NETCONSOLE_DYNAMIC)) {
+		u64_stats_update_begin(&nt->stats.syncp);
+
+		if (result == NET_XMIT_DROP)
+			u64_stats_inc(&nt->stats.xmit_drop_count);
+		else if (result == -ENOMEM)
+			u64_stats_inc(&nt->stats.enomem_count);
+		else
+			WARN_ONCE(true, "invalid result: %d\n", result)
+
+		u64_stats_update_end(&nt->stats.syncp);
+	}
+
+Thanks
+--breno
 
