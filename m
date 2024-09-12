@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-127871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59090976EBC
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7B87976EBD
 	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 733D01F250B5
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9958F2869F3
 	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F54D1AB6CA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EB1C1AE053;
 	Thu, 12 Sep 2024 16:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="T5t1450Y"
+	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="ATgpih5I"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1506B185939
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 16:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5CA185E65
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 16:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726158721; cv=none; b=cio3iRduxwtscOFy7uKF4KwCTJ96ogSH5Q2m+biqBRPOBriuAQ+wwt2BW30YArv7Z4+zV95tFDCsmH7QrfjAnemMnFnNQn2uBAIB6WVYW/tXpGyKW86FICRpxENgfyo8Gl+fn/Tr/C8TGWqyYWe3lxsoWPp4EoqBvlp2NIalqCQ=
+	t=1726158721; cv=none; b=t5PozsdApOprP1oCuW50x6Wsg3ZXr8jCQmc9wzhV/bKASC5lVnbo/2b2U/R7PKk5sH58I9RdfZlS3/E1v6NkgCOtCKoTIA8FnD3ZyAWIXab00WmWotGanVYiMqOe9H4FGmtbvWgLFGmMiOkIzTpDZsAT2zmbL9la7O+9MvwQZEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1726158721; c=relaxed/simple;
-	bh=mROasj/jJLiBjrGzuvCibSwTGL4Ha0eEl/HZaRj0hew=;
+	bh=v+3ZQ33Xn+JIeQrCCnOgdM03UApoIn2WtCYce3XXyjk=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JHeC5TVhywjRLPjO9wJp+vdb+K2cvTSPPft0EkaET2ZseI5CvrQVODjSzjp3hgB+e1BSNwd2V7pDgOY3UZ9hZ9OSSn2+ftnsITslMjajNA/ROHQcSDo49E7C1F6B8Y7FycidGWYcJi/Lzr2eJ/29R6b0tQh6tFPkNe7CwlHM4K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=T5t1450Y; arc=none smtp.client-ip=67.231.145.42
+	 MIME-Version:Content-Type; b=Hs9cUZWGiPuBmSMr0ijrqkvF9OTcghc/tH42oJDjoHrO9Ijn8XE9au7wHayy/VzRwiqhaFfQg+jTWw7DfEQLT0D31wvrFw72WopUN3AQgsa8iUWEgsQXMUB5xONe6gRu9r2ipQ+BbJ+g/KlBEfSW/BdvyBqkVt8zg99KRC5auR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=ATgpih5I; arc=none smtp.client-ip=67.231.145.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
 Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48CFJPL2003510;
-	Thu, 12 Sep 2024 09:31:45 -0700
+	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48CFJPL4003510;
+	Thu, 12 Sep 2024 09:31:46 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
 	:to:cc:subject:date:message-id:in-reply-to:references
 	:mime-version:content-transfer-encoding:content-type; s=
-	s2048-2021-q4; bh=f3gdEeVGwMRqL5UJVCENypJRPGhg4mtDeAymTUdlJzc=; b=
-	T5t1450YPfdnlxebwG6FdeH1f2FX/dKrwA86iIgQMvMiWVrtxoZgh87brN/jc7V3
-	TSr00MPbnsh1Q1BuHpNZrODxNOhwE1DX5G4GOMVe8tewA+j1l6UYhPibj9bzoD57
-	L7RXjcrF4YzWROKkKZ4A0n9DeGY6qGX9Ogdxyt61lpgQGiF6MDhScf8eUNdGIXGs
-	v5mpPsk9IcAsQ/oWccRby5m6NRCy0BbZzVw9kew9l74kePZO0iI0UtHc7aDSOFIB
-	Lh5Hul82G0h3SafYXIPX1QcgKwVwmgkOJkAdiPfsbHxkVdUd1I6KX9A2zWXB22ER
-	Jz0gbGHAKrLcTjvQ61T/rA==
+	s2048-2021-q4; bh=DA4xKm8D0cVnzxGUxALzmUYWsHCoP9g2mYJDOozSYrg=; b=
+	ATgpih5IIkzDEfBRTkDPnN4aA0GWcOucSfI0eQCCBUtcZfoshyDW/2ATRCdzVuzD
+	x72MN+xWVYaEighgO85dAnCLvfH8GhcW0PPm0yEHlhb45BsvPZNfY/u5P3MoGRX6
+	efsgTzai1I9t24OqxXNJwV5dQwY7I3ahGrbW5/Wz/JeDdt/v2Zp02CUeI2M3Q4hn
+	7zIvS+2Nxng1rDqY1nxrw5eEIxh39IkOkOHIFH3F4UF2uimR6kft93hMU1pPa4j2
+	868vdB1FZJdJ6Bg6NY4W6jUd/qUFhar+AYGQI9NwsgaNc2G3XsAJAhPCEXr8hncK
+	brV8QN6tWb3iCHrn1f6mDw==
 Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41kr50w16h-5
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 41kr50w16h-7
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Thu, 12 Sep 2024 09:31:44 -0700 (PDT)
+	Thu, 12 Sep 2024 09:31:46 -0700 (PDT)
 Received: from devvm4158.cln0.facebook.com (2620:10d:c0a8:1b::30) by
  mail.thefacebook.com (2620:10d:c0a9:6f::237c) with Microsoft SMTP Server id
- 15.2.1544.11; Thu, 12 Sep 2024 16:31:41 +0000
+ 15.2.1544.11; Thu, 12 Sep 2024 16:31:42 +0000
 From: Vadim Fedorenko <vadfed@meta.com>
 To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
         Jakub Kicinski
@@ -63,9 +63,9 @@ To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 CC: Vadim Fedorenko <vadfed@meta.com>, <netdev@vger.kernel.org>,
         "Richard
  Cochran" <richardcochran@gmail.com>
-Subject: [PATCH net-next v2 2/5] eth: fbnic: add initial PHC support
-Date: Thu, 12 Sep 2024 09:31:20 -0700
-Message-ID: <20240912163123.551882-3-vadfed@meta.com>
+Subject: [PATCH net-next v2 3/5] eth: fbnic: add RX packets timestamping support
+Date: Thu, 12 Sep 2024 09:31:21 -0700
+Message-ID: <20240912163123.551882-4-vadfed@meta.com>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20240912163123.551882-1-vadfed@meta.com>
 References: <20240912163123.551882-1-vadfed@meta.com>
@@ -77,538 +77,345 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: UuQHIOtR3k0GX2B2JXSAEN43SMMDsePa
-X-Proofpoint-ORIG-GUID: UuQHIOtR3k0GX2B2JXSAEN43SMMDsePa
+X-Proofpoint-GUID: -VedaDCQ3zsRmZs3WoKXyy_W_2kfDK_A
+X-Proofpoint-ORIG-GUID: -VedaDCQ3zsRmZs3WoKXyy_W_2kfDK_A
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
  definitions=2024-09-12_05,2024-09-12_01,2024-09-02_01
 
-Create PHC device and provide callbacks needed for ptp_clock device.
+Add callbacks to support timestamping configuration via ethtool.
+Add processing of RX timestamps.
 
 Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
 ---
- drivers/net/ethernet/meta/fbnic/Makefile      |   3 +-
- drivers/net/ethernet/meta/fbnic/fbnic.h       |  11 +
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  38 +++
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  11 +-
- .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  15 +
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |   9 +-
- drivers/net/ethernet/meta/fbnic/fbnic_time.c  | 311 ++++++++++++++++++
- 7 files changed, 394 insertions(+), 4 deletions(-)
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_time.c
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  1 +
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 16 +++-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    | 80 +++++++++++++++++++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  3 +
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   | 31 +++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 60 ++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  1 +
+ 7 files changed, 191 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
-index ed4533a73c57..8615d516a274 100644
---- a/drivers/net/ethernet/meta/fbnic/Makefile
-+++ b/drivers/net/ethernet/meta/fbnic/Makefile
-@@ -18,4 +18,5 @@ fbnic-y := fbnic_devlink.o \
- 	   fbnic_phylink.o \
- 	   fbnic_rpc.o \
- 	   fbnic_tlv.o \
--	   fbnic_txrx.o
-+	   fbnic_txrx.o \
-+	   fbnic_time.o
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
-index 0f9e8d79461c..ca59261f0155 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-@@ -6,6 +6,7 @@
- 
- #include <linux/interrupt.h>
- #include <linux/io.h>
-+#include <linux/ptp_clock_kernel.h>
- #include <linux/types.h>
- #include <linux/workqueue.h>
- 
-@@ -49,6 +50,16 @@ struct fbnic_dev {
- 	/* Number of TCQs/RCQs available on hardware */
- 	u16 max_num_queues;
- 
-+	/* Lock protecting writes to @time_high, @time_offset of fbnic_netdev,
-+	 * and the HW time CSR machinery.
-+	 */
-+	spinlock_t time_lock;
-+	/* Externally accessible PTP clock, may be NULL */
-+	struct ptp_clock *ptp;
-+	struct ptp_clock_info ptp_info;
-+	/* Last @time_high refresh time in jiffies (to catch stalls) */
-+	unsigned long last_read;
-+
- 	/* Local copy of hardware statistics */
- 	struct fbnic_hw_stats hw_stats;
- };
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-index 21db509acbc1..290b924b7749 100644
+index 290b924b7749..79cdd231d327 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
-@@ -413,6 +413,44 @@ enum {
- #define FBNIC_TMI_DROP_CTRL		0x04401		/* 0x11004 */
- #define FBNIC_TMI_DROP_CTRL_EN			CSR_BIT(0)
- #define FBNIC_CSR_END_TMI		0x0443f	/* CSR section delimiter */
+@@ -586,6 +586,7 @@ enum {
+ };
+ 
+ #define FBNIC_RPC_ACT_TBL0_DMA_HINT		CSR_GENMASK(24, 16)
++#define FBNIC_RPC_ACT_TBL0_TS_ENA		CSR_BIT(28)
+ #define FBNIC_RPC_ACT_TBL0_RSS_CTXT_ID		CSR_BIT(30)
+ 
+ #define FBNIC_RPC_ACT_TBL1_DEFAULT	0x0840b		/* 0x2102c */
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+index ffc773014e0f..3afb7227574a 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
+@@ -10,8 +10,22 @@ static int
+ fbnic_get_ts_info(struct net_device *netdev,
+ 		  struct kernel_ethtool_ts_info *tsinfo)
+ {
++	struct fbnic_net *fbn = netdev_priv(netdev);
 +
-+/* Precision Time Protocol Registers */
-+#define FBNIC_CSR_START_PTP		0x04800 /* CSR section delimiter */
-+#define FBNIC_PTP_REG_BASE		0x04800		/* 0x12000 */
++	tsinfo->phc_index = ptp_clock_index(fbn->fbd->ptp);
 +
-+#define FBNIC_PTP_CTRL			0x04800		/* 0x12000 */
-+#define FBNIC_PTP_CTRL_EN			CSR_BIT(0)
-+#define FBNIC_PTP_CTRL_MONO_EN			CSR_BIT(4)
-+#define FBNIC_PTP_CTRL_TQS_OUT_EN		CSR_BIT(8)
-+#define FBNIC_PTP_CTRL_MAC_OUT_IVAL		CSR_GENMASK(16, 12)
-+#define FBNIC_PTP_CTRL_TICK_IVAL		CSR_GENMASK(23, 20)
+ 	tsinfo->so_timestamping =
+-		SOF_TIMESTAMPING_TX_SOFTWARE;
++		SOF_TIMESTAMPING_TX_SOFTWARE |
++		SOF_TIMESTAMPING_RX_HARDWARE |
++		SOF_TIMESTAMPING_RAW_HARDWARE;
 +
-+#define FBNIC_PTP_ADJUST		0x04801		/* 0x12004 */
-+#define FBNIC_PTP_ADJUST_INIT			CSR_BIT(0)
-+#define FBNIC_PTP_ADJUST_SUB_NUDGE		CSR_BIT(8)
-+#define FBNIC_PTP_ADJUST_ADD_NUDGE		CSR_BIT(16)
-+#define FBNIC_PTP_ADJUST_ADDEND_SET		CSR_BIT(24)
-+
-+#define FBNIC_PTP_INIT_HI		0x04802		/* 0x12008 */
-+#define FBNIC_PTP_INIT_LO		0x04803		/* 0x1200c */
-+
-+#define FBNIC_PTP_NUDGE_NS		0x04804		/* 0x12010 */
-+#define FBNIC_PTP_NUDGE_SUBNS		0x04805		/* 0x12014 */
-+
-+#define FBNIC_PTP_ADD_VAL_NS		0x04806		/* 0x12018 */
-+#define FBNIC_PTP_ADD_VAL_NS_MASK		CSR_GENMASK(15, 0)
-+#define FBNIC_PTP_ADD_VAL_SUBNS		0x04807	/* 0x1201c */
-+
-+#define FBNIC_PTP_CTR_VAL_HI		0x04808		/* 0x12020 */
-+#define FBNIC_PTP_CTR_VAL_LO		0x04809		/* 0x12024 */
-+
-+#define FBNIC_PTP_MONO_PTP_CTR_HI	0x0480a		/* 0x12028 */
-+#define FBNIC_PTP_MONO_PTP_CTR_LO	0x0480b		/* 0x1202c */
-+
-+#define FBNIC_PTP_CDC_FIFO_STATUS	0x0480c		/* 0x12030 */
-+#define FBNIC_PTP_SPARE			0x0480d		/* 0x12034 */
-+#define FBNIC_CSR_END_PTP		0x0480d /* CSR section delimiter */
-+
- /* Rx Buffer Registers */
- #define FBNIC_CSR_START_RXB		0x08000	/* CSR section delimiter */
- enum {
++	tsinfo->rx_filters =
++		BIT(HWTSTAMP_FILTER_NONE) |
++		BIT(HWTSTAMP_FILTER_PTP_V1_L4_EVENT) |
++		BIT(HWTSTAMP_FILTER_PTP_V2_L4_EVENT) |
++		BIT(HWTSTAMP_FILTER_PTP_V2_L2_EVENT) |
++		BIT(HWTSTAMP_FILTER_PTP_V2_EVENT) |
++		BIT(HWTSTAMP_FILTER_ALL);
+ 
+ 	return 0;
+ }
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index a400616a24d4..6e6d8988db54 100644
+index 6e6d8988db54..c08798fad203 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -42,18 +42,24 @@ int __fbnic_open(struct fbnic_net *fbn)
- 		goto free_resources;
- 	}
+@@ -324,6 +324,84 @@ void fbnic_clear_rx_mode(struct net_device *netdev)
+ 	__dev_mc_unsync(netdev, NULL);
+ }
  
--	err = fbnic_fw_init_heartbeat(fbd, false);
-+	err = fbnic_time_start(fbn);
- 	if (err)
- 		goto release_ownership;
- 
-+	err = fbnic_fw_init_heartbeat(fbd, false);
-+	if (err)
-+		goto time_stop;
++static int fbnic_hwtstamp_get(struct net_device *netdev,
++			      struct kernel_hwtstamp_config *config)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
 +
- 	err = fbnic_pcs_irq_enable(fbd);
- 	if (err)
--		goto release_ownership;
-+		goto time_stop;
- 	/* Pull the BMC config and initialize the RPC */
- 	fbnic_bmc_rpc_init(fbd);
- 	fbnic_rss_reinit(fbd, fbn);
++	*config = fbn->hwtstamp_config;
++
++	return 0;
++}
++
++static int fbnic_hwtstamp_set(struct net_device *netdev,
++			      struct kernel_hwtstamp_config *config,
++			      struct netlink_ext_ack *extack)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	int old_rx_filter;
++
++	if (config->source != HWTSTAMP_SOURCE_NETDEV)
++		return -EOPNOTSUPP;
++
++	if (!kernel_hwtstamp_config_changed(config, &fbn->hwtstamp_config))
++		return 0;
++
++	/* Upscale the filters */
++	switch (config->rx_filter) {
++	case HWTSTAMP_FILTER_NONE:
++	case HWTSTAMP_FILTER_ALL:
++	case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
++	case HWTSTAMP_FILTER_PTP_V2_EVENT:
++		break;
++	case HWTSTAMP_FILTER_NTP_ALL:
++		config->rx_filter = HWTSTAMP_FILTER_ALL;
++		break;
++	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
++	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
++		config->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
++		break;
++	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_L4_DELAY_REQ:
++		config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L4_EVENT;
++		break;
++	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_L2_DELAY_REQ:
++		config->rx_filter = HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
++		break;
++	case HWTSTAMP_FILTER_PTP_V2_SYNC:
++	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
++		config->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
++		break;
++	default:
++		return -ERANGE;
++	}
++
++	/* Configure */
++	old_rx_filter = fbn->hwtstamp_config.rx_filter;
++	memcpy(&fbn->hwtstamp_config, config, sizeof(*config));
++
++	if (old_rx_filter != config->rx_filter && netif_running(fbn->netdev)) {
++		fbnic_rss_reinit(fbn->fbd, fbn);
++		fbnic_write_rules(fbn->fbd);
++	}
++
++	/* Save / report back filter configuration
++	 * Note that our filter configuration is inexact. Instead of
++	 * filtering for a specific UDP port or L2 Ethertype we are
++	 * filtering in all UDP or all non-IP packets for timestamping. So
++	 * if anything other than FILTER_ALL is requested we report
++	 * FILTER_SOME indicating that we will be timestamping a few
++	 * additional packets.
++	 */
++	if (config->rx_filter > HWTSTAMP_FILTER_ALL)
++		config->rx_filter = HWTSTAMP_FILTER_SOME;
++
++	return 0;
++}
++
+ static void fbnic_get_stats64(struct net_device *dev,
+ 			      struct rtnl_link_stats64 *stats64)
+ {
+@@ -401,6 +479,8 @@ static const struct net_device_ops fbnic_netdev_ops = {
+ 	.ndo_set_mac_address	= fbnic_set_mac,
+ 	.ndo_set_rx_mode	= fbnic_set_rx_mode,
+ 	.ndo_get_stats64	= fbnic_get_stats64,
++	.ndo_hwtstamp_get	= fbnic_hwtstamp_get,
++	.ndo_hwtstamp_set	= fbnic_hwtstamp_set,
+ };
  
- 	return 0;
-+time_stop:
-+	fbnic_time_stop(fbn);
- release_ownership:
- 	fbnic_fw_xmit_ownership_msg(fbn->fbd, false);
- free_resources:
-@@ -82,6 +88,7 @@ static int fbnic_stop(struct net_device *netdev)
- 	fbnic_down(fbn);
- 	fbnic_pcs_irq_disable(fbn->fbd);
- 
-+	fbnic_time_stop(fbn);
- 	fbnic_fw_xmit_ownership_msg(fbn->fbd, false);
- 
- 	fbnic_free_resources(fbn);
+ static void fbnic_get_queue_stats_rx(struct net_device *dev, int idx,
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index 6c27da09a612..f530e3235634 100644
+index f530e3235634..b8417b300778 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -33,6 +33,15 @@ struct fbnic_net {
- 	u8 fec;
- 	u8 link_mode;
+@@ -54,6 +54,9 @@ struct fbnic_net {
+ 	struct fbnic_queue_stats rx_stats;
+ 	u64 link_down_events;
  
-+	/* Cached top bits of the HW time counter for 40b -> 64b conversion */
-+	u32 time_high;
-+	/* Protect readers of @time_offset, writers take @time_lock. */
-+	struct u64_stats_sync time_seq;
-+	/* Offset in ns between free running NIC PHC and time set via PTP
-+	 * clock callbacks
-+	 */
-+	s64 time_offset;
++	/* Time stampinn filter config */
++	struct kernel_hwtstamp_config hwtstamp_config;
 +
- 	u16 num_tx_queues;
- 	u16 num_rx_queues;
+ 	struct list_head napis;
+ };
  
-@@ -60,6 +69,12 @@ void fbnic_reset_queues(struct fbnic_net *fbn,
- 			unsigned int tx, unsigned int rx);
- void fbnic_set_ethtool_ops(struct net_device *dev);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+index c8aa29fc052b..337b8b3aef2f 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+@@ -244,6 +244,12 @@ void fbnic_bmc_rpc_init(struct fbnic_dev *fbd)
+ 	 ((_ip) ? FBNIC_RPC_TCAM_ACT1_IP_VALID : 0) |	\
+ 	 ((_v6) ? FBNIC_RPC_TCAM_ACT1_IP_IS_V6 : 0))
  
-+int fbnic_ptp_setup(struct fbnic_dev *fbd);
-+void fbnic_ptp_destroy(struct fbnic_dev *fbd);
-+void fbnic_time_init(struct fbnic_net *fbn);
-+int fbnic_time_start(struct fbnic_net *fbn);
-+void fbnic_time_stop(struct fbnic_net *fbn);
++#define FBNIC_TSTAMP_MASK(_all, _udp, _ether)			\
++	(((_all) ? ((1u << FBNIC_NUM_HASH_OPT) - 1) : 0) |	\
++	 ((_udp) ? (1u << FBNIC_UDP6_HASH_OPT) |		\
++		   (1u << FBNIC_UDP4_HASH_OPT) : 0) |		\
++	 ((_ether) ? (1u << FBNIC_ETHER_HASH_OPT) : 0))
 +
- void __fbnic_set_rx_mode(struct net_device *netdev);
- void fbnic_clear_rx_mode(struct net_device *netdev);
+ void fbnic_rss_reinit(struct fbnic_dev *fbd, struct fbnic_net *fbn)
+ {
+ 	static const u32 act1_value[FBNIC_NUM_HASH_OPT] = {
+@@ -255,6 +261,7 @@ void fbnic_rss_reinit(struct fbnic_dev *fbd, struct fbnic_net *fbn)
+ 		FBNIC_ACT1_INIT(0, 0, 1, 0),	/* IP4 */
+ 		0				/* Ether */
+ 	};
++	u32 tstamp_mask = 0;
+ 	unsigned int i;
  
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-index a4809fe0fc24..32e5b4cc55bd 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-@@ -300,14 +300,20 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto init_failure_mode;
- 	}
+ 	/* To support scenarios where a BMC is present we must write the
+@@ -264,6 +271,28 @@ void fbnic_rss_reinit(struct fbnic_dev *fbd, struct fbnic_net *fbn)
+ 	BUILD_BUG_ON(FBNIC_RSS_EN_NUM_UNICAST * 2 != FBNIC_RSS_EN_NUM_ENTRIES);
+ 	BUILD_BUG_ON(ARRAY_SIZE(act1_value) != FBNIC_NUM_HASH_OPT);
  
-+	err = fbnic_ptp_setup(fbd);
-+	if (err)
-+		goto ifm_free_netdev;
-+
- 	err = fbnic_netdev_register(netdev);
- 	if (err) {
- 		dev_err(&pdev->dev, "Netdev registration failed: %d\n", err);
--		goto ifm_free_netdev;
-+		goto ifm_destroy_ptp;
- 	}
- 
- 	return 0;
- 
-+ifm_destroy_ptp:
-+	fbnic_ptp_destroy(fbd);
- ifm_free_netdev:
- 	fbnic_netdev_free(fbd);
- init_failure_mode:
-@@ -342,6 +348,7 @@ static void fbnic_remove(struct pci_dev *pdev)
- 
- 		fbnic_netdev_unregister(netdev);
- 		cancel_delayed_work_sync(&fbd->service_task);
-+		fbnic_ptp_destroy(fbd);
- 		fbnic_netdev_free(fbd);
- 	}
- 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_time.c b/drivers/net/ethernet/meta/fbnic/fbnic_time.c
-new file mode 100644
-index 000000000000..f79b1388cb6e
---- /dev/null
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_time.c
-@@ -0,0 +1,311 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
-+
-+#include <linux/bitfield.h>
-+#include <linux/jiffies.h>
-+#include <linux/limits.h>
-+#include <linux/ptp_clock_kernel.h>
-+#include <linux/timer.h>
-+
-+#include "fbnic.h"
-+#include "fbnic_csr.h"
-+#include "fbnic_netdev.h"
-+
-+/* FBNIC timing & PTP implementation
-+ * Datapath uses truncated 40b timestamps for scheduling and event reporting.
-+ * We need to promote those to full 64b, hence we periodically cache the top
-+ * 32bit of the HW time counter. Since this makes our time reporting non-atomic
-+ * we leave the HW clock free running and adjust time offsets in SW as needed.
-+ * Time offset is 64bit - we need a seq counter for 32bit machines.
-+ * Time offset and the cache of top bits are independent so we don't need
-+ * a coherent snapshot of both - READ_ONCE()/WRITE_ONCE() + writer side lock
-+ * are enough.
-+ */
-+
-+/* Period of refresh of top bits of timestamp, give ourselves a 8x margin.
-+ * This should translate to once a minute.
-+ * The use of nsecs_to_jiffies() should be safe for a <=40b nsec value.
-+ */
-+#define FBNIC_TS_HIGH_REFRESH_JIF	nsecs_to_jiffies((1ULL << 40) / 16)
-+
-+static struct fbnic_dev *fbnic_from_ptp_info(struct ptp_clock_info *ptp)
-+{
-+	return container_of(ptp, struct fbnic_dev, ptp_info);
-+}
-+
-+/* This function is "slow" because we could try guessing which high part
-+ * is correct based on low instead of re-reading, and skip reading @hi
-+ * twice altogether if @lo is far enough from 0.
-+ */
-+static u64 __fbnic_time_get_slow(struct fbnic_dev *fbd)
-+{
-+	u32 hi, lo;
-+
-+	lockdep_assert_held(&fbd->time_lock);
-+
-+	do {
-+		hi = fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_HI);
-+		lo = fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_LO);
-+	} while (hi != fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_HI));
-+
-+	return (u64)hi << 32 | lo;
-+}
-+
-+static void __fbnic_time_set_addend(struct fbnic_dev *fbd, u64 addend)
-+{
-+	lockdep_assert_held(&fbd->time_lock);
-+
-+	fbnic_wr32(fbd, FBNIC_PTP_ADD_VAL_NS,
-+		   FIELD_PREP(FBNIC_PTP_ADD_VAL_NS_MASK, addend >> 32));
-+	fbnic_wr32(fbd, FBNIC_PTP_ADD_VAL_SUBNS, (u32)addend);
-+}
-+
-+static void fbnic_ptp_fresh_check(struct fbnic_dev *fbd)
-+{
-+	if (time_is_after_jiffies(fbd->last_read +
-+				  FBNIC_TS_HIGH_REFRESH_JIF * 3 / 2))
-+		return;
-+
-+	dev_warn(fbd->dev, "NIC timestamp refresh stall, delayed by %lu sec\n",
-+		 (jiffies - fbd->last_read - FBNIC_TS_HIGH_REFRESH_JIF) / HZ);
-+}
-+
-+static void fbnic_ptp_refresh_time(struct fbnic_dev *fbd, struct fbnic_net *fbn)
-+{
-+	unsigned long flags;
-+	u32 hi;
-+
-+	spin_lock_irqsave(&fbd->time_lock, flags);
-+	hi = fbnic_rd32(fbn->fbd, FBNIC_PTP_CTR_VAL_HI);
-+	if (!fbnic_present(fbd))
-+		goto out; /* Don't bother handling, reset is pending */
-+	WRITE_ONCE(fbn->time_high, hi);
-+	fbd->last_read = jiffies;
-+ out:
-+	spin_unlock_irqrestore(&fbd->time_lock, flags);
-+}
-+
-+static long fbnic_ptp_do_aux_work(struct ptp_clock_info *ptp)
-+{
-+	struct fbnic_dev *fbd = fbnic_from_ptp_info(ptp);
-+	struct fbnic_net *fbn;
-+
-+	fbn = netdev_priv(fbd->netdev);
-+
-+	fbnic_ptp_fresh_check(fbd);
-+	fbnic_ptp_refresh_time(fbd, fbn);
-+
-+	return FBNIC_TS_HIGH_REFRESH_JIF;
-+}
-+
-+static int fbnic_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
-+{
-+	int scale = 16; /* scaled_ppm has 16 fractional places */
-+	struct fbnic_dev *fbd = fbnic_from_ptp_info(ptp);
-+	u64 scaled_delta, dclk_period;
-+	unsigned long flags;
-+	s64 delta;
-+	int sgn;
-+
-+	sgn = scaled_ppm >= 0 ? 1 : -1;
-+	scaled_ppm *= sgn;
-+
-+	/* d_clock is 600 MHz; which in Q16.32 fixed point ns is: */
-+	dclk_period = (((u64)1000000000) << 32) / FBNIC_CLOCK_FREQ;
-+
-+	while (scaled_ppm > U64_MAX / dclk_period) {
-+		scaled_ppm >>= 1;
-+		scale--;
++	/* Set timestamp mask with 1b per flow type */
++	if (fbn->hwtstamp_config.rx_filter != HWTSTAMP_FILTER_NONE) {
++		switch (fbn->hwtstamp_config.rx_filter) {
++		case HWTSTAMP_FILTER_ALL:
++			tstamp_mask = FBNIC_TSTAMP_MASK(1, 1, 1);
++			break;
++		case HWTSTAMP_FILTER_PTP_V2_EVENT:
++			tstamp_mask = FBNIC_TSTAMP_MASK(0, 1, 1);
++			break;
++		case HWTSTAMP_FILTER_PTP_V1_L4_EVENT:
++		case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
++			tstamp_mask = FBNIC_TSTAMP_MASK(0, 1, 0);
++			break;
++		case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
++			tstamp_mask = FBNIC_TSTAMP_MASK(0, 0, 1);
++			break;
++		default:
++			netdev_warn(fbn->netdev, "Unsupported hwtstamp_rx_filter\n");
++			break;
++		}
 +	}
 +
-+	scaled_delta = (u64)scaled_ppm * dclk_period;
-+	delta = div_u64(scaled_delta, 1000 * 1000) >> scale;
-+	delta *= sgn;
-+
-+	spin_lock_irqsave(&fbd->time_lock, flags);
-+	__fbnic_time_set_addend(fbd, dclk_period + delta);
-+	fbnic_wr32(fbd, FBNIC_PTP_ADJUST, FBNIC_PTP_ADJUST_ADDEND_SET);
-+
-+	/* Flush, make sure FBNIC_PTP_ADD_VAL_* is stable for at least 4 clks */
-+	fbnic_rd32(fbd, FBNIC_PTP_SPARE);
-+	spin_unlock_irqrestore(&fbd->time_lock, flags);
-+
-+	return fbnic_present(fbd) ? 0 : -EIO;
-+}
-+
-+static int fbnic_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
+ 	/* Program RSS hash enable mask for host in action TCAM/table. */
+ 	for (i = fbnic_bmc_present(fbd) ? 0 : FBNIC_RSS_EN_NUM_UNICAST;
+ 	     i < FBNIC_RSS_EN_NUM_ENTRIES; i++) {
+@@ -287,6 +316,8 @@ void fbnic_rss_reinit(struct fbnic_dev *fbd, struct fbnic_net *fbn)
+ 
+ 		if (!dest)
+ 			dest = FBNIC_RPC_ACT_TBL0_DROP;
++		else if (tstamp_mask & (1u << flow_type))
++			dest |= FBNIC_RPC_ACT_TBL0_TS_ENA;
+ 
+ 		if (act1_value[flow_type] & FBNIC_RPC_TCAM_ACT1_L4_VALID)
+ 			dest |= FIELD_PREP(FBNIC_RPC_ACT_TBL0_DMA_HINT,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+index ff40879c3654..0169858584e5 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
+@@ -43,6 +43,43 @@ static void fbnic_ring_wr32(struct fbnic_ring *ring, unsigned int csr, u32 val)
+ 	writel(val, csr_base + csr);
+ }
+ 
++/**
++ * fbnic_ts40_to_ns() - convert descriptor timestamp to PHC time
++ * @fbn: netdev priv of the FB NIC
++ * @ts40: timestamp read from a descriptor
++ *
++ * Convert truncated 40 bit device timestamp as read from a descriptor
++ * to the full PHC time in nanoseconds.
++ * TBD: maybe split arguments to 32b low / 8b high if convenient
++ */
++static __maybe_unused u64 fbnic_ts40_to_ns(struct fbnic_net *fbn, u64 ts40)
 +{
-+	struct fbnic_dev *fbd = fbnic_from_ptp_info(ptp);
-+	struct fbnic_net *fbn;
-+	unsigned long flags;
-+
-+	fbn = netdev_priv(fbd->netdev);
-+
-+	spin_lock_irqsave(&fbd->time_lock, flags);
-+	u64_stats_update_begin(&fbn->time_seq);
-+	WRITE_ONCE(fbn->time_offset, READ_ONCE(fbn->time_offset) + delta);
-+	u64_stats_update_end(&fbn->time_seq);
-+	spin_unlock_irqrestore(&fbd->time_lock, flags);
-+
-+	return 0;
-+}
-+
-+static int
-+fbnic_ptp_gettimex64(struct ptp_clock_info *ptp, struct timespec64 *ts,
-+		     struct ptp_system_timestamp *sts)
-+{
-+	struct fbnic_dev *fbd = fbnic_from_ptp_info(ptp);
-+	struct fbnic_net *fbn;
-+	unsigned long flags;
++	unsigned int s;
 +	u64 time_ns;
-+	u32 hi, lo;
-+
-+	fbn = netdev_priv(fbd->netdev);
-+
-+	spin_lock_irqsave(&fbd->time_lock, flags);
++	s64 offset;
++	u8 ts_top;
++	u32 high;
 +
 +	do {
-+		hi = fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_HI);
-+		ptp_read_system_prets(sts);
-+		lo = fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_LO);
-+		ptp_read_system_postts(sts);
-+		/* Similarly to comment above __fbnic_time_get_slow()
-+		 * - this can be optimized if needed.
-+		 */
-+	} while (hi != fbnic_rd32(fbd, FBNIC_PTP_CTR_VAL_HI));
++		s = u64_stats_fetch_begin(&fbn->time_seq);
++		offset = READ_ONCE(fbn->time_offset);
++	} while (u64_stats_fetch_retry(&fbn->time_seq, s));
 +
-+	time_ns = ((u64)hi << 32 | lo) + fbn->time_offset;
-+	spin_unlock_irqrestore(&fbd->time_lock, flags);
++	high = READ_ONCE(fbn->time_high);
 +
-+	if (!fbnic_present(fbd))
-+		return -EIO;
++	/* Bits 63..40 from periodic clock reads, 39..0 from ts40 */
++	time_ns = (u64)(high >> 8) << 40 | ts40;
 +
-+	*ts = ns_to_timespec64(time_ns);
++	/* Compare bits 32-39 between periodic reads and ts40,
++	 * see if HW clock may have wrapped since last read
++	 */
++	ts_top = ts40 >> 32;
++	if (ts_top < (u8)high && (u8)high - ts_top > U8_MAX / 2)
++		time_ns += 1ULL << 40;
 +
-+	return 0;
++	return time_ns + offset;
 +}
 +
-+static int
-+fbnic_ptp_settime64(struct ptp_clock_info *ptp, const struct timespec64 *ts)
+ static unsigned int fbnic_desc_unused(struct fbnic_ring *ring)
+ {
+ 	return (ring->head - ring->tail - 1) & ring->size_mask;
+@@ -710,6 +747,10 @@ static struct sk_buff *fbnic_build_skb(struct fbnic_napi_vector *nv,
+ 	/* Set MAC header specific fields */
+ 	skb->protocol = eth_type_trans(skb, nv->napi.dev);
+ 
++	/* Add timestamp if present */
++	if (pkt->hwtstamp)
++		skb_hwtstamps(skb)->hwtstamp = pkt->hwtstamp;
++
+ 	return skb;
+ }
+ 
+@@ -720,6 +761,23 @@ static enum pkt_hash_types fbnic_skb_hash_type(u64 rcd)
+ 						     PKT_HASH_TYPE_L2;
+ }
+ 
++static void fbnic_rx_tstamp(struct fbnic_napi_vector *nv, u64 rcd,
++			    struct fbnic_pkt_buff *pkt)
 +{
-+	struct fbnic_dev *fbd = fbnic_from_ptp_info(ptp);
 +	struct fbnic_net *fbn;
-+	unsigned long flags;
-+	u64 dev_ns, host_ns;
-+	int ret;
++	u64 ns, ts;
 +
-+	fbn = netdev_priv(fbd->netdev);
-+
-+	host_ns = timespec64_to_ns(ts);
-+
-+	spin_lock_irqsave(&fbd->time_lock, flags);
-+
-+	dev_ns = __fbnic_time_get_slow(fbd);
-+
-+	if (fbnic_present(fbd)) {
-+		u64_stats_update_begin(&fbn->time_seq);
-+		WRITE_ONCE(fbn->time_offset, host_ns - dev_ns);
-+		u64_stats_update_end(&fbn->time_seq);
-+		ret = 0;
-+	} else {
-+		ret = -EIO;
-+	}
-+	spin_unlock_irqrestore(&fbd->time_lock, flags);
-+
-+	return ret;
-+}
-+
-+static const struct ptp_clock_info fbnic_ptp_info = {
-+	.owner			= THIS_MODULE,
-+	/* 1,000,000,000 - 1 PPB to ensure increment is positive
-+	 * after max negative adjustment.
-+	 */
-+	.max_adj		= 999999999,
-+	.do_aux_work		= fbnic_ptp_do_aux_work,
-+	.adjfine		= fbnic_ptp_adjfine,
-+	.adjtime		= fbnic_ptp_adjtime,
-+	.gettimex64		= fbnic_ptp_gettimex64,
-+	.settime64		= fbnic_ptp_settime64,
-+};
-+
-+static void fbnic_ptp_reset(struct fbnic_dev *fbd)
-+{
-+	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
-+	u64 dclk_period;
-+
-+	fbnic_wr32(fbd, FBNIC_PTP_CTRL,
-+		   FBNIC_PTP_CTRL_EN |
-+		   FIELD_PREP(FBNIC_PTP_CTRL_TICK_IVAL, 1));
-+
-+	/* d_clock is 600 MHz; which in Q16.32 fixed point ns is: */
-+	dclk_period = (((u64)1000000000) << 32) / FBNIC_CLOCK_FREQ;
-+
-+	__fbnic_time_set_addend(fbd, dclk_period);
-+
-+	fbnic_wr32(fbd, FBNIC_PTP_INIT_HI, 0);
-+	fbnic_wr32(fbd, FBNIC_PTP_INIT_LO, 0);
-+
-+	fbnic_wr32(fbd, FBNIC_PTP_ADJUST, FBNIC_PTP_ADJUST_INIT);
-+
-+	fbnic_wr32(fbd, FBNIC_PTP_CTRL,
-+		   FBNIC_PTP_CTRL_EN |
-+		   FBNIC_PTP_CTRL_TQS_OUT_EN |
-+		   FIELD_PREP(FBNIC_PTP_CTRL_MAC_OUT_IVAL, 3) |
-+		   FIELD_PREP(FBNIC_PTP_CTRL_TICK_IVAL, 1));
-+
-+	fbnic_rd32(fbd, FBNIC_PTP_SPARE);
-+
-+	fbn->time_offset = 0;
-+	fbn->time_high = 0;
-+}
-+
-+void fbnic_time_init(struct fbnic_net *fbn)
-+{
-+	/* This is not really a statistic, but the lockng primitive fits
-+	 * our usecase perfectly, we need an atomic 8 bytes READ_ONCE() /
-+	 * WRITE_ONCE() behavior.
-+	 */
-+	u64_stats_init(&fbn->time_seq);
-+}
-+
-+int fbnic_time_start(struct fbnic_net *fbn)
-+{
-+	fbnic_ptp_refresh_time(fbn->fbd, fbn);
-+	/* Assume that fbnic_ptp_do_aux_work() will never be called if not
-+	 * scheduled here
-+	 */
-+	return ptp_schedule_worker(fbn->fbd->ptp, FBNIC_TS_HIGH_REFRESH_JIF);
-+}
-+
-+void fbnic_time_stop(struct fbnic_net *fbn)
-+{
-+	ptp_cancel_worker_sync(fbn->fbd->ptp);
-+	fbnic_ptp_fresh_check(fbn->fbd);
-+}
-+
-+int fbnic_ptp_setup(struct fbnic_dev *fbd)
-+{
-+	struct device *dev = fbd->dev;
-+	unsigned long flags;
-+
-+	spin_lock_init(&fbd->time_lock);
-+
-+	spin_lock_irqsave(&fbd->time_lock, flags); /* Appease lockdep */
-+	fbnic_ptp_reset(fbd);
-+	spin_unlock_irqrestore(&fbd->time_lock, flags);
-+
-+	memcpy(&fbd->ptp_info, &fbnic_ptp_info, sizeof(fbnic_ptp_info));
-+
-+	fbd->ptp = ptp_clock_register(&fbd->ptp_info, dev);
-+	if (IS_ERR(fbd->ptp))
-+		dev_err(dev, "Failed to register PTP: %pe\n", fbd->ptp);
-+
-+	return PTR_ERR_OR_ZERO(fbd->ptp);
-+}
-+
-+void fbnic_ptp_destroy(struct fbnic_dev *fbd)
-+{
-+	if (!fbd->ptp)
++	if (!FIELD_GET(FBNIC_RCD_OPT_META_TS, rcd))
 +		return;
-+	ptp_clock_unregister(fbd->ptp);
++
++	fbn = netdev_priv(nv->napi.dev);
++	ts = FIELD_GET(FBNIC_RCD_OPT_META_TS_MASK, rcd);
++	ns = fbnic_ts40_to_ns(fbn, ts);
++
++	/* Add timestamp to shared info */
++	pkt->hwtstamp = ns_to_ktime(ns);
 +}
++
+ static void fbnic_populate_skb_fields(struct fbnic_napi_vector *nv,
+ 				      u64 rcd, struct sk_buff *skb,
+ 				      struct fbnic_q_triad *qt)
+@@ -784,6 +842,8 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
+ 			if (FIELD_GET(FBNIC_RCD_OPT_META_TYPE_MASK, rcd))
+ 				break;
+ 
++			fbnic_rx_tstamp(nv, rcd, pkt);
++
+ 			/* We currently ignore the action table index */
+ 			break;
+ 		case FBNIC_RCD_TYPE_META:
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+index 2f91f68d11d5..682d875f08c0 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
+@@ -47,6 +47,7 @@ struct fbnic_net;
+ 
+ struct fbnic_pkt_buff {
+ 	struct xdp_buff buff;
++	ktime_t hwtstamp;
+ 	u32 data_truesize;
+ 	u16 data_len;
+ 	u16 nr_frags;
 -- 
 2.43.5
 
