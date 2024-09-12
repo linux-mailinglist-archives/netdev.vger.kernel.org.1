@@ -1,53 +1,54 @@
-Return-Path: <netdev+bounces-127753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9DA997655C
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 11:20:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A3FF97655F
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 11:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 859221F23249
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:20:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47A082847C7
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0958E19E963;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC40919F105;
 	Thu, 12 Sep 2024 09:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hsuYZ6tB"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kM+1+Ahu"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284F919006A;
-	Thu, 12 Sep 2024 09:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1816F190675;
+	Thu, 12 Sep 2024 09:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726132819; cv=none; b=JVfcjTl/+e72lUrVsW9UfPaOo4iE6V96MRJWJhaQ3tv5D85Fi+yqC6plNNeSy/cIwMse3E51M6sL5PbdMznqucl3VuiBBblAtUyemfWOI+LbFJcxjCpk6TpnY+FkquPSi1wRG5aYz7zhS4o6+Mvq0O8IRZ2ZMgmd/26bIh50kk0=
+	t=1726132820; cv=none; b=ne7MJRL4GczqHEtRamcAB7r96EcL+EGalGt7q8WzK9pIGkV6OIBPLWEKyIOfPyKuvkaHiRXlpiU6Ux7OAHqigpMFcMEFOISzupBUXNxgbwc4l/p377wAmcJjCl7nIElJ3lihCGrPtRTP+tdDhLLOPTqtGY6uLTeGfdzx6jYjnI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726132819; c=relaxed/simple;
-	bh=gxWJLdsbUew7yDGM8C/C34DUSyBUoVzKhbTYo1x9fa0=;
+	s=arc-20240116; t=1726132820; c=relaxed/simple;
+	bh=j2CDIlRAqYOUw44emUEbwqYGv+uqh685KjTuPfyHLrg=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RfP4B6fEc/EEBWOGXNICRexdr850x4w5P/aE/7EZ9zEFBDeLpt2ogTFyJ3GBtbEie/j/5EKV6yveEXCyclVNs5XKMPJqDlFyHPY13+SAbpp2gyWCKXWMMa7xEerbmXfOgmEydmKv++zGKx4gNvToN6gjCXl5mFi4/fRa6wqxGqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hsuYZ6tB; arc=none smtp.client-ip=217.70.183.200
+	 In-Reply-To:To:Cc; b=JYIfMTnRZ9cBD/I/nYTy8UtisRQNUQihmPgpSB3pvROs/Xx+NNpbimP7Wdcb3bjZSYrkAEjLaNIjpaJeKmuXIiYGMw7VLYF644YpnC1Iak3Nu7bhv9IQojvV/gXQuwiLh+7h5LH8ml37OlGTDyAnPpm8rwlGZGqBuxxul04PqDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kM+1+Ahu; arc=none smtp.client-ip=217.70.183.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E6C2320012;
-	Thu, 12 Sep 2024 09:20:14 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9EE1C20010;
+	Thu, 12 Sep 2024 09:20:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1726132815;
+	t=1726132816;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=fhVnlUKOgIu5/UvU5Yq2KFQNf61+9gVyEs9J5wPnkG4=;
-	b=hsuYZ6tB0IMs3nEpNIYRo7UIH6fV49gyLVgvmiWMlMk67gXLBqh2DbICJFlk5ErQ6RBXAo
-	Vf+zJhCugcM+YTVHDD3vqvlLcrB42GaHVoDu0NT29gIl+htb547abrO8rszLcfTP0xzAGS
-	0sof4ec/VnzCudOmSnExjDL7M/sgATgylIwWgz7m5/TpPf9zB9y2MKSOHbqhpaEqjb5nBk
-	1YQCKE8rsqu0XFnXrmeJYb69ZHGTqmAzeV8ycClbSOXyoEMqK5DSLA8oPTEXKkj/jOEF3a
-	SXaasu4X3zJHIZe1GLQjz3mj9nqNtMGkXIk6A4H5T/5dHqzIKlOn+VhY+mgFJw==
+	bh=ZHe8OJYspWoaHU9WVb1XPlu+LICOnsvuNjbBgFu9lGE=;
+	b=kM+1+AhumfKj2pTrFIuWJUd90X9YjLZrXXZzVgBn8jxs6jRX0NbupMbsGas9fkz/vCZjCI
+	Q8F9bqsv0UJpYcKjA2qRfT/KEMzdQoV2vdOiu84ktM+8WQ+bwchlobk6OtOjxtCi+6U49L
+	aSsJAQpeyHrCTrU84ATDhKn+ILeubJLnJXo40AZcN/mtqQbDYpz63YSRefnnshP7fF50NV
+	NSFWqTuOIUVHDDF0gM2uW/lpY8YYpQaCUnzA/ciYhBghV9L6eUzFuhdoXH5V54vFmmotJQ
+	oCF7GBZ4aU+Jlc2uwOoIMRa6U046tH4yQqmDNNF3sYD+r6nxnN6bpEuugf0Xfw==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Thu, 12 Sep 2024 11:20:03 +0200
-Subject: [PATCH ethtool-next 2/3] ethtool.8: Fix small documentation nit
+Date: Thu, 12 Sep 2024 11:20:04 +0200
+Subject: [PATCH ethtool-next 3/3] ethtool.8: Add documentation for new C33
+ PSE features
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240912-feature_poe_power_cap-v1-2-499e3dd996d7@bootlin.com>
+Message-Id: <20240912-feature_poe_power_cap-v1-3-499e3dd996d7@bootlin.com>
 References: <20240912-feature_poe_power_cap-v1-0-499e3dd996d7@bootlin.com>
 In-Reply-To: <20240912-feature_poe_power_cap-v1-0-499e3dd996d7@bootlin.com>
 To: Oleksij Rempel <o.rempel@pengutronix.de>, 
@@ -71,22 +72,71 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Remove useless .RE macro call.
+Add documentation to described the newly C33 PSE features supported.
 
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
- ethtool.8.in | 1 -
- 1 file changed, 1 deletion(-)
+ ethtool.8.in | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/ethtool.8.in b/ethtool.8.in
-index bf8af57..3b4df42 100644
+index 3b4df42..39bbd2e 100644
 --- a/ethtool.8.in
 +++ b/ethtool.8.in
-@@ -1809,7 +1809,6 @@ status depend on internal PSE state machine and automatic PD classification
+@@ -542,6 +542,7 @@ ethtool \- query or control network driver and hardware settings
+ .BR enable | disable ]
+ .RB [ c33\-pse\-admin\-control
+ .BR enable | disable ]
++.BN c33\-pse\-avail\-pw\-limit N
+ .HP
+ .B ethtool \-\-flash\-module\-firmware
+ .I devname
+@@ -1809,6 +1810,36 @@ status depend on internal PSE state machine and automatic PD classification
  support. It corresponds to IEEE 802.3-2022 30.9.1.1.5
  (aPSEPowerDetectionStatus) with potential values being
  .B disabled, searching, delivering power, test, fault, other fault
--.RE
++.TP
++.B c33-pse-extended-state
++This attribute indicates the Extended state of the c33 PSE. The extended
++state correlated with the c33 PSE Extended Substate allows to have more
++detail on the c33 PSE current error state.
++It corresponds to IEEE 802.3-2022 33.2.4.4 Variables.
++.TP
++.B c33-pse-extended-substate
++This attribute indicates the Extended substate of the c33 PSE. Correlated
++with the c33 PSE Extended state value, it allows to have more detail on the
++c33 PSE current error state.
++.TP
++.B c33-pse-power-class
++This attribute identifies the power class of the c33 PSE. It depends on
++the class negotiated between the PSE and the PD. It corresponds to
++IEEE 802.3-2022 30.9.1.1.8 (aPSEPowerClassification).
++.TP
++.B c33-pse-actual-power
++This attribute identifies the actual power drawn by the c33 PSE. It
++corresponds to ``IEEE 802.3-2022`` 30.9.1.1.23 (aPSEActualPower). Actual
++power is reported in mW.
++.TP
++.B c33-pse-available-power-limit
++This attribute identifies the configured c33 PSE power limit in mW.
++.TP
++.B c33-pse-power-limit-ranges
++This attribute specifies the allowed power limit ranges in mW for
++configuring the c33-pse-avail-pw-limit parameter. It defines the valid
++power levels that can be assigned to the c33 PSE in compliance with the
++c33 standard.
+ 
+ .RE
+ .TP
+@@ -1823,6 +1854,11 @@ This parameter manages PoDL PSE Admin operations in accordance with the IEEE
+ .A2 c33-pse-admin-control \ enable disable
+ This parameter manages c33 PSE Admin operations in accordance with the IEEE
+ 802.3-2022 30.9.1.2.1 (acPSEAdminControl) specification.
++.TP
++.B c33-pse-avail-pw-limit \ N
++This parameter manages c33 PSE Available Power Limit in mW, in accordance
++with the IEEE 802.3-2022 33.2.4.4 Variables (pse_available_power)
++specification.
  
  .RE
  .TP
