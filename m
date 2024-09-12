@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-127875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EE6976EC6
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:33:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2606976ECA
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:33:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFD3F286A10
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:33:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51ECAB24CB3
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:33:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1591BA27E;
-	Thu, 12 Sep 2024 16:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF9FC1B9B33;
+	Thu, 12 Sep 2024 16:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p5KbPoHP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JOM5TRfb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7458F1B9B33;
-	Thu, 12 Sep 2024 16:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6D71865ED;
+	Thu, 12 Sep 2024 16:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726158791; cv=none; b=kWTrzgalaO0vn05WpMqJIiQeUUbWNh69r+P6pDnyF6DE38ruTmfi9RtWnHItNdD+WtKbdJ2DiLc28IjhHo/WW0J1YjLsj/wBJk4QTtorDLouGs6iJ3o3GlrEiVHfK685zZ2QjTrj8ygM/Bjx9ARJVGTyGoHjIMplAuATdTNKUac=
+	t=1726158794; cv=none; b=W0ziwlSp1SPyQg4S8W68Zexgr+DKSHjp6SQdpkbGsJI4qnzUB3SNk7/f5gx/EfhxjAU9vim2+le2FlW3g5gzi/Ut9jEpp7zC24ETxMjYvZc0Yl+77ZiIaF1aOtwarU0WsKTTclU6ZpP/HOXdXL7H8DEbSpeR+9oGolCI3uYGtSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726158791; c=relaxed/simple;
-	bh=kg9bQEmh6+n7yuTtLUfLR9/UZPbKJC2JEyK4nXkHhH0=;
+	s=arc-20240116; t=1726158794; c=relaxed/simple;
+	bh=RJ/rsTqfJsi7HX8JrXAOqj7jxzrHlUkrE0IsT+BeVyA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PQz7oXmPDLvqMbbva1v/ishHI16YRN9hPJ/xSWTqTeuVWIPf87F3ia+3Li9xhI0v07UkD9/U7kYW55KER77I6PnL7T+ezqC8lcEUZ6mK2LjL0vdXqC1Z2CaRI4frfkSLTH5CLjpdzuu6wle/HmK7guUa9Vc3NA7RNkI7hQsxNO4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p5KbPoHP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 000FAC4CEC3;
-	Thu, 12 Sep 2024 16:33:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=CrIxc7RMfiocu1qsb3YNv3nrtR4bVgAEajgy4D90Ji9o5QG5XaLp9i/tGQF5yLjY2rpRlNknYA1vpecCpE88YIg0VvLjkh1N3GE64i+H9FAVWQcjKi6xD+uigb3iwJPFWGJ4S/ChLiDrBv4XbbRnfc4YZWy1/kZFFOW90HLUuX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JOM5TRfb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18877C4CEC3;
+	Thu, 12 Sep 2024 16:33:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726158791;
-	bh=kg9bQEmh6+n7yuTtLUfLR9/UZPbKJC2JEyK4nXkHhH0=;
+	s=k20201202; t=1726158794;
+	bh=RJ/rsTqfJsi7HX8JrXAOqj7jxzrHlUkrE0IsT+BeVyA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p5KbPoHPQUYPa1TnhhQfsgVIFprQ8UUMy14amfBNLbLoaUkk3FGNYTcL9JSZFI3LA
-	 Num3AQBnTQNhf/gp2OTm8jFQJaKrVq75UV9Xx1wB48qS+jBj2O7sbxSEu1Co07yWnL
-	 972XIz6cB4QCautTsvshoN7TSMWIwJINz2WYj0gqbAyj0HOSiYgPzN1gR1+qI1svAF
-	 6qniwRZ5Oh68mCCeMUp705XdPWZMWzDikQArfslVJ2pQa9AalZhFFJZQO9+ZIKKflZ
-	 Ta6o1zXj00IkkDgNTVhQeNCQVpdd7gD4JJd4Quq6SjP98cG17JXhTR3dIS4HvQfo1u
-	 KXcM1STUhgBpw==
+	b=JOM5TRfbOc71NFRgtcbZxpD33gcCjGOVLAuzmdJJEW/yma+eULX1K8/epnJsyqQsk
+	 EJWk155bp7m2fzvv8OioW24quF768VahV8l5cMA5wsS1sE/eg8wyAath9HrtCQQHlb
+	 JbNW84AvpCU/6D1BR1hbYitHTjeNPrLVoyZnKVfaQ3NdDvDDWuAimeVMiwhjfEkj0S
+	 tmrO2VgyRFUfnpHQpN2lxlDb50RP6zmOOBdctgWtW9DKT/DYdhk68w+fGM1ZFAMYwq
+	 Y145sncCVHNeUW4xPJHhUwFsttlj6x1fktg5572C8FAswQ5vt57VDqRn0ACWI3lDax
+	 pjtMy2JmtOeqQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DD73822D1B;
-	Thu, 12 Sep 2024 16:33:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D233822D1B;
+	Thu, 12 Sep 2024 16:33:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2024-08-23
+Subject: Re: [PATCH net-next 0/8] Some modifications to optimize code readability
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <172615879199.1648954.13776016691534059369.git-patchwork-notify@kernel.org>
-Date: Thu, 12 Sep 2024 16:33:11 +0000
-References: <20240823200008.65241-1-luiz.dentz@gmail.com>
-In-Reply-To: <20240823200008.65241-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+ <172615879499.1648954.6225809739644290566.git-patchwork-notify@kernel.org>
+Date: Thu, 12 Sep 2024 16:33:14 +0000
+References: <20240822133908.1042240-1-lizetao1@huawei.com>
+In-Reply-To: <20240822133908.1042240-1-lizetao1@huawei.com>
+To: Li Zetao <lizetao1@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, marcel@holtmann.org, johan.hedberg@gmail.com,
+ luiz.dentz@gmail.com, idryomov@gmail.com, xiubli@redhat.com,
+ dsahern@kernel.org, trondmy@kernel.org, anna@kernel.org,
+ chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de,
+ okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, jmaloy@redhat.com,
+ ying.xue@windriver.com, linux@treblig.org, jacob.e.keller@intel.com,
+ willemb@google.com, kuniyu@amazon.com, wuyun.abel@bytedance.com,
+ quic_abchauha@quicinc.com, gouhao@uniontech.com, netdev@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, ceph-devel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, tipc-discussion@lists.sourceforge.net
 
 Hello:
 
-This pull request was applied to bluetooth/bluetooth-next.git (master)
+This series was applied to bluetooth/bluetooth-next.git (master)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 23 Aug 2024 16:00:08 -0400 you wrote:
-> The following changes since commit 8af174ea863c72f25ce31cee3baad8a301c0cf0f:
+On Thu, 22 Aug 2024 21:39:00 +0800 you wrote:
+> This patchset is mainly optimized for readability in contexts where size
+> needs to be determined. By using min() or max(), or even directly
+> removing redundant judgments (such as the 5th patch), the code is more
+> consistent with the context.
 > 
->   net: mana: Fix race of mana_hwc_post_rx_wqe and new hwc response (2024-08-23 14:24:24 +0100)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-08-23
+> Li Zetao (8):
+>   atm: use min() to simplify the code
+>   Bluetooth: use min() to simplify the code
+>   net: caif: use max() to simplify the code
+>   libceph: use min() to simplify the code
+>   net: remove redundant judgments to simplify the code
+>   ipv6: mcast: use min() to simplify the code
+>   tipc: use min() to simplify the code
+>   SUNRPC: use min() to simplify the code
 > 
 > [...]
 
 Here is the summary with links:
-  - pull request: bluetooth 2024-08-23
-    https://git.kernel.org/bluetooth/bluetooth-next/c/31a972959ae5
+  - [net-next,1/8] atm: use min() to simplify the code
+    (no matching commit)
+  - [net-next,2/8] Bluetooth: use min() to simplify the code
+    (no matching commit)
+  - [net-next,3/8] net: caif: use max() to simplify the code
+    https://git.kernel.org/bluetooth/bluetooth-next/c/b4985aa8e312
+  - [net-next,4/8] libceph: use min() to simplify the code
+    (no matching commit)
+  - [net-next,5/8] net: remove redundant judgments to simplify the code
+    (no matching commit)
+  - [net-next,6/8] ipv6: mcast: use min() to simplify the code
+    https://git.kernel.org/bluetooth/bluetooth-next/c/26549dab8a46
+  - [net-next,7/8] tipc: use min() to simplify the code
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a18308623ce3
+  - [net-next,8/8] SUNRPC: use min() to simplify the code
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
