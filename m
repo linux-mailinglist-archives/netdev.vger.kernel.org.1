@@ -1,125 +1,203 @@
-Return-Path: <netdev+bounces-127944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14C809772A3
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 22:17:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E27F49772C1
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 22:35:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D45BA2818BF
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:17:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 276CCB23AF0
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9EC31C0DC5;
-	Thu, 12 Sep 2024 20:17:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAD41B4C21;
+	Thu, 12 Sep 2024 20:34:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WULTLVTq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RyrDsSmr"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724701BE860;
-	Thu, 12 Sep 2024 20:17:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9080D18BC19
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 20:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726172240; cv=none; b=Wbs4BmeTpyVBIFp3D8OJfrg4teQ4uY8c44/v4ZMxC12hdYjx6qCAHCpZLlTOSSMZ7xiv8X0ITya0G8LpPlOBm4QGHD5vkswwIVyH3BuPOhb4Uy3Q8ZAHfsXGrca0QyK0T0kH2V6iGZnkDqMbRv71L4qqN1xmbTx0Xt/C2/LfXVs=
+	t=1726173298; cv=none; b=dEbb1+SckJ8iWgqFeYeiFDVi+Cc+ltuDpUDE6TZkadvXcST+fSaIsBnlu4oM7XYVUAGX2j9PRTgQRfu0x8cjgWA5qSU0E69XqaKcla5rT/xoRgh33xMhDDa+74a+k12P1j+QHIieYDyR6HxAGBKwHGF48Apy3n+qzsntDds8MDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726172240; c=relaxed/simple;
-	bh=8a+l0yLQWur4LKXx0doeTxIU/vtMw8YiiyuXqMHBOm8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=laDS/M1DBoa02t3/aIzsmBy/Jt62e3TeNcSPNyPCUEUKqZFwjDPU7wHPUCtZl/ta3WyOoyxGG42cbJBVc6aaBaGeqZ9GAbabbhMrKxy5pyNeofZ0Lxb32W+03qw/SGD3WAVCa72QS20TxS2/0l60LWjlC1Q7CpZUattGLGur76s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WULTLVTq; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 882071C0006;
-	Thu, 12 Sep 2024 20:17:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1726172235;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7FHWP2eO7j89fwZAZ2ZAC37i/e8x92BhFYNL0dz2678=;
-	b=WULTLVTq388DEtesiWaluvko106Vc8fjvhyDgcRAkDTUIiVTQUDeS7cQsYUzzRQgRINdNH
-	aP/VJwKcLnrdxdT5kcepfLfN6O77qjqXgcNWQZApBtwB4PTxD6wA0/mEUVHs5s0VwBfIL+
-	E/UFoGRbRqYBZYTCe1INUtZULUN1aQcvpnIi2nRABJLc/u8p8zAF3OrHOC/zI1V4vTMMM8
-	YyUtV7IRT55KKuowZHylQ9bNrlL5jR3aCXWDyLn9W3ZZc77a785ZD1tVmRGd8pFvFbXjrW
-	j6XWVYAg5bHMbNwzMseRWtT/hDbC79IQ60SA5lPxk+wgpzU12RdIUcfdzNZHqg==
-Message-ID: <fb7db9a9-5b9a-4b77-8dc6-f30b839bec27@bootlin.com>
-Date: Thu, 12 Sep 2024 22:17:13 +0200
+	s=arc-20240116; t=1726173298; c=relaxed/simple;
+	bh=6ssNlhg/JFl7SteLcLEJtupjCRQRjhSqECxKZ0vx9j8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QEH6Ub3MjHfvIPQbQTKDZ472GhWqE6dy1ixpGsaTEzDLJub96pRz07FphoVyNMasVULipEYFn/BL5LAR4U1YI1xCqatFimufmp1DHtN53/JGTrjcHdIZJirDq/GcRTnDfdyOqAYgR6pXfZkZXeZ8smkJ8L7sQqgQub3Q0fhYU8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RyrDsSmr; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4582a5b495cso17171cf.1
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 13:34:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726173295; x=1726778095; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9PELiwfnDOC6zAiAB5SgZ/0zqhz7nxGQJtEXd3szGgs=;
+        b=RyrDsSmr3crSYDbg77YDcuPh4+dZaaxsboqyFNrwjyJt1czkSWRmBNi9g1AVFxHRzW
+         BKJZKPlmy3CXjnvxPKI0fRciTNS27Ce3OVsSSDWP7P8Eyy58RM5qCtdIDpDXECLod6Bi
+         6F/fdG7rdJ4W40KB3GciIs5kqE06NnP4PnIRpk3bty1TT5yc3mvDuSiFzL78h73uo0qf
+         NWuzjMxmdkxeLohj5gW/rj7RJ+GeUIoNoCFgHQaUzO6ivejJ7IE0bMf4RvQOOteJc4VR
+         51JfbltAydrs9ESq1cGcOUPMtCO6aXWCaidheoMHGwSVkaQE//CxxhunoAcGVxkdiCgo
+         V1FQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726173295; x=1726778095;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9PELiwfnDOC6zAiAB5SgZ/0zqhz7nxGQJtEXd3szGgs=;
+        b=tchQ4kzGcAYhjk4pMZgW3r2+3lUbvNBWQAgZQHilBmLVIq+k+TvWSONzNTAWm+tc6p
+         KF9baq2eynfDoQy3OnDwUIAdZzXMmBiNXI5JL3mCMmqAaS2sdIai+yGg384WNrb0akLM
+         1rVdh5iq2v3gdohqPwwHGw8vbRXu0/WaUqssdqmONDqPrqUdD/dpPoghH+pxjbEEMNbT
+         4bMXMQy8IBOt9qIPNHOMej1chziuwpMqw0qFONLGUhKhmzRvL/XyjEkWKEiCkvq+Ge0e
+         OOVeWX1uXTODLEtcmgCPuwo+QwRWnp047Z26cmxiNZo1XD97aXk9y9pf1L/2GjgbeNaa
+         H0vA==
+X-Gm-Message-State: AOJu0YyeSscMMApGVHnAieyZnKzYKF+o4j8nDoewsJwqFCaH36nOebdX
+	jwcfX/PhAMJ1vRYBgjzsYNRFtFshxTFGBsqquOaf1DLnEgOtqWSDwIQ2eEm1+YRK9uyXsCVhWjL
+	4sBkZVsPFvMuUT+gjlTkB9/m4A028HKh/lH+h
+X-Google-Smtp-Source: AGHT+IGwaLOqx/LUP8zBbk8daEyYzBtXDjGREXTKLxp6CdiaSrgFTXQw9P2wKIECokmcdxdfcoUtj0ZQTtdn2ARXR4w=
+X-Received: by 2002:ac8:5845:0:b0:456:7ec0:39a9 with SMTP id
+ d75a77b69052e-45864400565mr3916491cf.5.1726173295147; Thu, 12 Sep 2024
+ 13:34:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: convert test_xdp_features.sh
- to test_progs
-To: Simon Horman <horms@kernel.org>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, ebpf@linuxfoundation.org,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-References: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
- <20240911141824.GZ572255@kernel.org>
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20240911141824.GZ572255@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
+References: <20240912171251.937743-1-sdf@fomichev.me> <20240912171251.937743-14-sdf@fomichev.me>
+In-Reply-To: <20240912171251.937743-14-sdf@fomichev.me>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 12 Sep 2024 13:34:41 -0700
+Message-ID: <CAHS8izPj0r_nARfwrhSz+wHqVDbQ8jqpezXrujfD-CXymRgaVQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 13/13] selftests: ncdevmem: Add automated test
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Simon,
+On Thu, Sep 12, 2024 at 10:13=E2=80=AFAM Stanislav Fomichev <sdf@fomichev.m=
+e> wrote:
+>
+> Only RX side for now and small message to test the setup.
+> In the future, we can extend it to TX side and to testing
+> both sides with a couple of megs of data.
+>
+>   make \
+>         -C tools/testing/selftests \
+>         TARGETS=3D"drivers/net" \
+>         install INSTALL_PATH=3D~/tmp/ksft
+>
+>   scp ~/tmp/ksft ${HOST}:
+>   scp ~/tmp/ksft ${PEER}:
+>
+>   cfg+=3D"NETIF=3D${DEV}\n"
+>   cfg+=3D"LOCAL_V6=3D${HOST_IP}\n"
+>   cfg+=3D"REMOTE_V6=3D${PEER_IP}\n"
+>   cfg+=3D"REMOTE_TYPE=3Dssh\n"
+>   cfg+=3D"REMOTE_ARGS=3Droot@${PEER}\n"
+>
+>   echo -e "$cfg" | ssh root@${HOST} "cat > ksft/drivers/net/net.config"
+>   ssh root@${HOST} "cd ksft && ./run_kselftest.sh -t drivers/net:devmem.p=
+y"
+>
+> Cc: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 
-On 9/11/24 16:18, Simon Horman wrote:
+Thank you _very_ much. I had an action item to figure this out, and
+awesome to see you beat me to it!
 
-[...]
+I'll take a deeper look and test and provide reviewed-by.
 
->> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_features.c b/tools/testing/selftests/bpf/prog_tests/xdp_features.c
->> new file mode 100644
->> index 000000000000..bcb36a2d2767
->> --- /dev/null
->> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_features.c
->> @@ -0,0 +1,446 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +
->> +/**
->> + * Test XDP features
->> + *
->> + * Sets up a veth pair, and for each xdp feature under test:
->> + * - asks the tested interface its xdp capabilities through bpf_xdp_query
->> + * - attach and run some specific programs on both interfaces to check if
->> + *   announced capability is respected
->> + */
-> 
-> Hi Alexis,
-> 
-> This is neither a full review nor an issue that needs to block progress.
-> But, FWIIW, the comment above is not a Kernel doc, yet starts with '/**'.
-> I suggest that it should start with '/*' instead.
 
-ACK. I'll wait for more comments on the series, and add the fix to the
-corresponding revision, if any.
+> ---
+>  tools/testing/selftests/drivers/net/Makefile  |  1 +
+>  tools/testing/selftests/drivers/net/devmem.py | 46 +++++++++++++++++++
+>  2 files changed, 47 insertions(+)
+>  create mode 100755 tools/testing/selftests/drivers/net/devmem.py
+>
+> diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing=
+/selftests/drivers/net/Makefile
+> index bb8f7374942e..00da59970a76 100644
+> --- a/tools/testing/selftests/drivers/net/Makefile
+> +++ b/tools/testing/selftests/drivers/net/Makefile
+> @@ -5,6 +5,7 @@ TEST_INCLUDES :=3D $(wildcard lib/py/*.py) \
+>                  ../../net/lib.sh \
+>
+>  TEST_PROGS :=3D \
+> +       devmem.py \
+>         netcons_basic.sh \
+>         ping.py \
+>         queues.py \
+> diff --git a/tools/testing/selftests/drivers/net/devmem.py b/tools/testin=
+g/selftests/drivers/net/devmem.py
+> new file mode 100755
+> index 000000000000..bbd32e0b0fe2
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/devmem.py
+> @@ -0,0 +1,46 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +import errno
+> +from lib.py import ksft_run, ksft_exit
+> +from lib.py import ksft_eq, KsftSkipEx
+> +from lib.py import NetDrvEpEnv
+> +from lib.py import bkg, cmd, rand_port, wait_port_listen
+> +from lib.py import ksft_disruptive
+> +
+> +
+> +def require_devmem(cfg):
+> +    if not hasattr(cfg, "_devmem_probed"):
+> +        port =3D rand_port()
+> +        probe_command =3D f"./ncdevmem -P -f {cfg.ifname} -s {cfg.v6} -p=
+ {port}"
+> +        cfg._devmem_supported =3D cmd(probe_command, fail=3DFalse, shell=
+=3DTrue).ret =3D=3D 0
+> +        cfg._devmem_probed =3D True
+> +
+> +    if not cfg._devmem_supported:
+> +        raise KsftSkipEx("Test requires devmem support")
+> +
+> +
+> +@ksft_disruptive
+> +def check_rx(cfg) -> None:
+> +    cfg.require_v6()
+> +    require_devmem(cfg)
+> +
+> +    port =3D rand_port()
+> +    listen_cmd =3D f"./ncdevmem -l -f {cfg.ifname} -s {cfg.v6} -p {port}=
+"
+> +
+> +    with bkg(listen_cmd) as nc:
+> +        wait_port_listen(port)
+> +        cmd(f"echo -e \"hello\\nworld\"| nc {cfg.v6} {port}", host=3Dcfg=
+.remote, shell=3DTrue)
+> +
+> +    ksft_eq(nc.stdout.strip(), "hello\nworld")
+> +
+> +
+> +def main() -> None:
+> +    with NetDrvEpEnv(__file__) as cfg:
+> +        ksft_run([check_rx],
+> +                 args=3D(cfg, ))
+> +    ksft_exit()
+> +
+> +
+> +if __name__ =3D=3D "__main__":
+> +    main()
+> --
+> 2.46.0
+>
 
+
+--
 Thanks,
-
-Alexis
-
--- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Mina
 
