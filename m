@@ -1,111 +1,87 @@
-Return-Path: <netdev+bounces-127824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB6C3976BCF
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:20:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A3A976BDF
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:23:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04D311C20F64
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:20:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 788711F264F1
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE90B1A76DD;
-	Thu, 12 Sep 2024 14:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B6021AD24C;
+	Thu, 12 Sep 2024 14:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Dmzhz82m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14BDE2209B;
-	Thu, 12 Sep 2024 14:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502D31A76D7
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 14:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726150802; cv=none; b=SOneohNmOVnNTL65LvlWscPcd3LReNCH7Dm3ttzsD4pIm/qSdH1a3yw5pk4MKWeaeWrK7aHQUNVCCVwc8UHOqJsLLoh0iroBCdwGSLimA97y4FYsZ9mauqMFnL6dDrcU3RUop0qYNNKyzfKzTs/+1R4M3EZ/D6cZYz21El0OwpU=
+	t=1726150995; cv=none; b=ebfsSpAhvy8Mek0AR4TmxUxnTLOE+/gO3kMoP1qT5sYezVG7vUp/wRHhRi1uGO1DOYyLZRWB09brXjVnj58s4fC38l9cKmMyMDS0sgpq25BDNQd60RyNHGvoyNLdQMv9W56j4A4VRMioVBKQKWwonX1HJoAVjO2Nqess9vr3ucA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726150802; c=relaxed/simple;
-	bh=4/3k8eSBLVRxWjjDz4zpjcNLnIc/Iyi2JVGo4hJT5vY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ij8bmPdsRu2RM6kKluGVTy3Ptk0AaQszzGLIHjDXbAOGaoBrAbUYt6cZK6wGyUo1rHIBKO7BUFUpytIgtk64GbdupxJimZf99SvXpCdKb44PeiUv2kMLETMIM2L3GEv/s3jqRFiTxLSJlOMuLnBoUcs8grq+j/3f5dkm5w/TLFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a8d43657255so148753166b.0;
-        Thu, 12 Sep 2024 07:19:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726150798; x=1726755598;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sMB0zTs8cLiRSiVrxlZ0xkuyxGcJBoqexzlsqpyjifc=;
-        b=gkzLGv5AS5XT94Ijp47wL4CFu461GyaJyKBI77n0JY/mQw2J4PqgjYXNYABISBCqWT
-         c0IhdU3Dz10PTLiLyTISfzwjn0tiai9xKJtPfQuBxxGM4zyNp4oPS4FV+uF64G+t3UN7
-         4oCSwd8lENmjjPUWrqy7FPSd0KGlImbQLqQf4ubq8c2dfnzHGVfwwaCTd10Dlw4p1FBZ
-         BwfyjJLLCtqrHuMsvkaKAT3e527d6CIwRGmd6Lkd3YzFKUTb8PGuq59rCIxVDJX6doqp
-         H6lAyd+YH0HStG83x/+uccsakomx5wyRt85uKAoHEJZ3WLl/ks1D0YFkrXzze6+S4xZ3
-         kwfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/BoKm5jcV9jnJREiFpmKkeRgMa9lyUFAhKwGtlh14gdDmyfQ27cvhPD0xBI6t6aTfln8=@vger.kernel.org, AJvYcCVAV5AvfZy8Y+NI2zR2eYnAkaoJUEkFIzkUhWM9841dNHXBhx76GtnZjVPIoakW6zplebaL2LD1@vger.kernel.org, AJvYcCXrf+BlAGTTTv96N7LygtvV1Ev2R284hyfyrQTrxGQWgkrGRL7JmXdp0XssPL33BIC8rhbI9ibGjC31F9ly@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE9jPRoIw5ouaVKjYesBjAstda3wwWcFOjYgZvs30V9hxJySrV
-	WbR474t9xHJW4TqHQNl5SKFknIq9tf5pYVCuuJCLlkrU98ujn6hi
-X-Google-Smtp-Source: AGHT+IGVJBZNSgTp+xRvrjPYefM1Zf0fuwu6vuda7SmUnzN9agjv/WRe7/dOg5spQ/6xxYY3rjbnHw==
-X-Received: by 2002:a17:907:3e0d:b0:a86:b042:585a with SMTP id a640c23a62f3a-a902970d12bmr277494866b.57.1726150797582;
-        Thu, 12 Sep 2024 07:19:57 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9013376712sm197716266b.53.2024.09.12.07.19.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 07:19:56 -0700 (PDT)
-Date: Thu, 12 Sep 2024 07:19:54 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Jakub Kicinski <kuba@kernel.org>, andrii@kernel.org, ast@kernel.org,
-	syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
-	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
-	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev,
-	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org,
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Subject: Re: [PATCH net-net] tun: Assign missing bpf_net_context.
-Message-ID: <20240912-organic-spoonbill-of-discourse-ad2e6e@leitao>
-References: <000000000000adb970061c354f06@google.com>
- <20240702114026.1e1f72b7@kernel.org>
- <20240703122758.i6lt_jii@linutronix.de>
- <20240703120143.43cc1770@kernel.org>
- <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
- <20240912122847.x70_LgN_@linutronix.de>
- <20240912-hypnotic-messy-leopard-f1d2b0@leitao>
- <9a2a1cce-8d92-4d10-87ea-4cdf1934d5fb@linux.dev>
+	s=arc-20240116; t=1726150995; c=relaxed/simple;
+	bh=oWzSbl9SOryhrEfvgC31aG2vf60JanCUGc273K6cBVg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OOZmdcRhCN0vWznUBmwYXYz2XrDX6RDXwONkeqSDLlUNiMfviFTMpXlHgv7sFcC4gduPTWmmag5w6fY8v2Xe2pzqglVcBlbv3p+yHqf4bO2yhHFYuLv4d+Ef+kgX6nqe8WIMUwrQRMk+ftCuoJesnQy9dCkJkUdTRexqO/QX+dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Dmzhz82m; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f63bf0ad-2846-4108-9a3f-9ea113959af0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726150991;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JQcj2YDJcPOkha5AjFb9sgabfqS/mkYXHsp1WXdSRE0=;
+	b=Dmzhz82mKpoK7vDeWNHJ8FrrSmRqWeE4p4A2Gg7IU4qsDs5hfY+ZYc7GEvOoOQOfqMkUMX
+	kncnb80/XNvOBRgi8lkmllfzNjB7cho4BWysXMLUfH7qP1RXO8+3J8wi6763V7vo77VvX7
+	l+qodB+IidCdHyBcI9NN0+g9d/sni84=
+Date: Thu, 12 Sep 2024 10:23:06 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9a2a1cce-8d92-4d10-87ea-4cdf1934d5fb@linux.dev>
+Subject: Re: [PATCH net] net: xilinx: axienet: Schedule NAPI in two steps
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Robert Hancock <robert.hancock@calian.com>,
+ linux-kernel@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
+ linux-arm-kernel@lists.infradead.org
+References: <20240909231904.1322387-1-sean.anderson@linux.dev>
+ <20240910185801.42b7c17f@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <20240910185801.42b7c17f@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello Vadim,
-
-On Thu, Sep 12, 2024 at 02:32:55PM +0100, Vadim Fedorenko wrote:
-> On 12/09/2024 14:17, Breno Leitao wrote:
-> > @@ -72,6 +73,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
-> >   	struct net_device *peer;
-> >   	int len = skb->len;
-> > +	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
-> >   	rcu_read_lock();
+On 9/10/24 21:58, Jakub Kicinski wrote:
+> On Mon,  9 Sep 2024 19:19:04 -0400 Sean Anderson wrote:
+>> Additionally, since we are running
+>> in an IRQ context we can use the irqoff variant as well.
 > 
-> Hi Breno,
-> 
-> looks like bpf_net_ctx should be set under rcu read lock...
+> The _irqoff variant is a bit of a minefield. It causes issues if kernel
+> is built with forced IRQ threading. With datacenter NICs forced
+> threading is never used so we look the other way. Since this is a fix
+> and driver is embedded I reckon we should stick to __napi_schedule().
 
-Why exactly?
+Does it?
 
-I saw in some examples where bpf_net_ctx_set() was set inside the
-rcu_read_lock(), but, I was not able to come up with justification to do
-the same. Would you mind elaborating why this might be needed inside the
-lock?
+__napi_schedule_irqoff selects between __napi_schedule and
+____napi_schedule based on whether PREEMPT_RT is enabled. Is there some
+other way to force IRQ threading?
 
-Thanks for the review,
---breno
+--Sean
 
