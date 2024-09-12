@@ -1,91 +1,158 @@
-Return-Path: <netdev+bounces-127714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 246579762D8
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:38:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2527976336
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:46:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEE54282318
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:38:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 106331C222FA
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD1DF18DF90;
-	Thu, 12 Sep 2024 07:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B594F188CDA;
+	Thu, 12 Sep 2024 07:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PeQbHF3O"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mtATTw89"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953F718DF62;
-	Thu, 12 Sep 2024 07:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F38215C3;
+	Thu, 12 Sep 2024 07:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726126713; cv=none; b=eqDQUVrcHorVP6dcV9G+0snFC1E5F0cCqm9Kgy7zvCV4hev7tnDTUlrvexnwUrih9uXlFK923oXjYJQ38LtuLL8PWLm2fIfSuV+7c5vMBYB3BLRkFozKrepnB9FGF1Zmmc7IqDVc2+96cXRXg+4dKVHnGHAHiNnvCVfFSYH/zDU=
+	t=1726127162; cv=none; b=P8uLr44PjEK1tTA5w5x68Gk0zaqnIy6QcpdQaz5hU7LnLvUntBbP6AH2w8S19uzqNHeWxj5U8GemHv0uCj+X0rYq7KH/E3SRA1kxyZhHJGTj2r5ZB8VNuIZDuLniqppTP4YJZ+tGefgYL+76VfZ7u2JmZd5oz+i6cZPAnpa7Vas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726126713; c=relaxed/simple;
-	bh=irrjP1SPtrwhI1dMYbrHujrM85Kly89z4dFpcoZwE3Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RLb1K85PBu0axSv4R30I0BffXj6gzZJAXGRmrwudAi5VSG4p/QraD2W/TXIDoJ/bbs0cI7sNCTrZvrt0q4/4qq7c0nB6wc6qdxIRiwAr7Q4pn5uw4EtoUFTxuhptzGTO2JgB0nhpMzkpEqSVptRXv66o9skl5CBQnFV51TdZpjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PeQbHF3O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D2BAC4CECC;
-	Thu, 12 Sep 2024 07:38:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726126713;
-	bh=irrjP1SPtrwhI1dMYbrHujrM85Kly89z4dFpcoZwE3Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PeQbHF3OCytGUlUZaM5mhkjX35bNjWjoTlp7Ebp+oUdiZXUoGjtiaE8x5Z3yS1YaD
-	 2EE2kykiTOETNiCuWCzudXp9xBNVzN65BAvN28PjCfSofRfRRtPw2wcqVhAsw76SH5
-	 00mVOYFLRLasbeMovJwAEjn3ceYrLvK56gY1et+loChC9qx2qsIq3Ub4jE4Xjd24yT
-	 PQXDbgXMbgXF1OADqbNX0HDLShwtZluhpGw7MNCZ+hK7KVq7R2h98CI2vjFZf6JSjW
-	 Zxl8UrEmt9o6bg2YQWOV5Es/C66/iK6ReCCLcHaC0HXbpWD+I2H4P5mZeOen1eqbkk
-	 Uc+ZmBm+XUwOw==
-Date: Thu, 12 Sep 2024 08:38:28 +0100
-From: Simon Horman <horms@kernel.org>
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: John Stultz <jstultz@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, Miroslav Lichvar <mlichvar@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Christopher S Hall <christopher.s.hall@intel.com>
-Subject: Re: [PATCH 10/24] timekeeping: Define a struct type for tk_core to
- make it reusable
-Message-ID: <20240912073828.GC572255@kernel.org>
-References: <20240911-devel-anna-maria-b4-timers-ptp-timekeeping-v1-0-f7cae09e25d6@linutronix.de>
- <20240911-devel-anna-maria-b4-timers-ptp-timekeeping-v1-10-f7cae09e25d6@linutronix.de>
+	s=arc-20240116; t=1726127162; c=relaxed/simple;
+	bh=gxixtiXWhXKrK6lRYUR6BtWH4pwbLNWKx4gI8/Q6X/w=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=Ov7B5E8SVgvIaUGzN1s/qKBXDISEfN1whWT4J91BVc84gy5Nrrs3WluvHIjluP51yGsex1yDLf8wXwMZCAZ41YqrhJ2m9YV5ya4etXDMpvBDCNMSlJcb805mj9C9hDTz0RLlR8c62l33OrWuY8bCclp9HXxjZwWZ4Kc9w79o/YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mtATTw89; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1726127157; h=Message-ID:Subject:Date:From:To;
+	bh=t48v7BDcLuiIfdxjk6XqmMjp9eUrfEzCF1KkgXR9eUA=;
+	b=mtATTw89vMmSK6W5KgjhxoKTfsXJuGDwPpcpS3g9ibJeTIPM34+HgYQ75ByLfKY/nhgIc/xc/GOL/Gfa8JHeNoTtY3sU10istMRd/DvgY7oQzb8eB38/Vz9F//8/ajxIz0pXX0oEH+gM7BjPqINA5arh2LBERffunMB52sxryAQ=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WEqckP1_1726127156)
+          by smtp.aliyun-inc.com;
+          Thu, 12 Sep 2024 15:45:57 +0800
+Message-ID: <1726126994.8755774-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 03/13] virtio_ring: packed: harden dma unmap for indirect
+Date: Thu, 12 Sep 2024 15:43:14 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: netdev@vger.kernel.org,
+ Jason Wang <jasowang@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20240820073330.9161-1-xuanzhuo@linux.alibaba.com>
+ <20240820073330.9161-4-xuanzhuo@linux.alibaba.com>
+ <20240911072537-mutt-send-email-mst@kernel.org>
+ <1726124138.2346847-1-xuanzhuo@linux.alibaba.com>
+ <20240912030013-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240912030013-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911-devel-anna-maria-b4-timers-ptp-timekeeping-v1-10-f7cae09e25d6@linutronix.de>
 
-On Wed, Sep 11, 2024 at 03:29:54PM +0200, Anna-Maria Behnsen wrote:
-> The struct tk_core uses is not reusable. As long as there is only a single
-> timekeeper, this is not a problem. But when the timekeeper infrastructure
-> will be reused for per ptp clock timekeepers, an explicit struct type is
-> required.
-> 
-> Define struct tk_data as explicit struct type for tk_core.
-> 
-> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+On Thu, 12 Sep 2024 03:38:12 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Thu, Sep 12, 2024 at 02:55:38PM +0800, Xuan Zhuo wrote:
+> > On Wed, 11 Sep 2024 07:28:36 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > As gcc luckily noted:
+> > >
+> > > On Tue, Aug 20, 2024 at 03:33:20PM +0800, Xuan Zhuo wrote:
+> > > > @@ -1617,23 +1617,24 @@ static void detach_buf_packed(struct vring_virtqueue *vq,
+> > > >  	}
+> > > >
+> > > >  	if (vq->indirect) {
+> > > > +		struct vring_desc_extra *extra;
+> > > >  		u32 len;
+> > > >
+> > > >  		/* Free the indirect table, if any, now that it's unmapped. */
+> > > > -		desc = state->indir_desc;
+> > > > -		if (!desc)
+> > >
+> > > desc is no longer initialized here
+> >
+> >
+> > Will fix.
+> >
+> >
+> > >
+> > > > +		extra = state->indir;
+> > > > +		if (!extra)
+> > > >  			return;
+> > > >
+> > > >  		if (vring_need_unmap_buffer(vq)) {
+> > > >  			len = vq->packed.desc_extra[id].len;
+> > > >  			for (i = 0; i < len / sizeof(struct vring_packed_desc);
+> > > >  					i++)
+> > > > -				vring_unmap_desc_packed(vq, &desc[i]);
+> > > > +				vring_unmap_extra_packed(vq, &extra[i]);
+> > > >  		}
+> > > >  		kfree(desc);
+> > >
+> > >
+> > > but freed here
+> > >
+> > > > -		state->indir_desc = NULL;
+> > > > +		state->indir = NULL;
+> > > >  	} else if (ctx) {
+> > > > -		*ctx = state->indir_desc;
+> > > > +		*ctx = state->indir;
+> > > >  	}
+> > > >  }
+> > >
+> > >
+> > > It seems unlikely this was always 0 on all paths with even
+> > > a small amount of stress, so now I question how this was tested.
+> > > Besides, do not ignore compiler warnings, and do not tweak code
+> > > to just make compiler shut up - they are your friend.
+> >
+> > I agree.
+> >
+> > Normally I do this by make W=12, but we have too many message,
+> > so I missed this.
+> >
+> > 	make W=12 drivers/net/virtio_net.o drivers/virtio/virtio_ring.o
+> >
+> > If not W=12, then I did not get any warning message.
+> > How do you get the message quickly?
+> >
+> > Thanks.
+>
+>
+> If you stress test this for a long enough time, and with
+> debug enabled, you will see a crash.
 
-...
+I only stress tested the split ring. For the packed ring, I
+just performed a simple verification.
 
-Hi Anna-Maria,
+I will street test for two mode in next version.
 
-I wonder if the order of this and the previous patch should
-be reversed, or the two patches should be squashed together.
+Thanks.
 
-I am seeing a build failure with only patches 01-09/24 of this series
-applied, which seem to be resolved by applying this patch.
 
-.../timekeeping.c:1735:43: warning: declaration of 'struct tk_data' will not be visible outside of this function [-Wvisibility]
- 1735 | static __init void tkd_basic_setup(struct tk_data *tkd)
-...
+
+>
+>
+> > >
+> > > >
+> > > > --
+> > > > 2.32.0.3.g01195cf9f
+> > >
+>
 
