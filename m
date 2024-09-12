@@ -1,172 +1,149 @@
-Return-Path: <netdev+bounces-127954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E4769772DF
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 22:47:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0061F97733F
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 23:00:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BD28286103
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:47:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 320A01C24025
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 21:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2378E1C1753;
-	Thu, 12 Sep 2024 20:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6371C2328;
+	Thu, 12 Sep 2024 20:59:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2eiThzkk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fwSk6H6F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD38E1C0DEA
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 20:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A301C0DD9
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 20:59:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726174057; cv=none; b=FrJVwVA9W+1ISkJZERBdEhJ6tJZmaY5qoBqFeAI/nxGJDhPIb5In2nEd02zuF0XL/Qa8l2xc0DwC1m6KWsV/ry2QYj9jTBxAHgvaxGb6kcWjSxZA5NzRL9HZRHfWCYCbswVTHN1zVIeJELZJ6kLuIVHYMFgcxPFeMUy/W0ejSjA=
+	t=1726174791; cv=none; b=f9fh5Cp6DOeCNza4LC/4+ljHND+RCtQnBAcMIfbahXQ4XMgMQBZDMATK0nXO8bchjaB4oxQ94GGkW+/DQeXgc34yDpZwmLEuSTXrQfX6X88vIvwuBwBU0egtquO/TAzv+MRew3Rqa4WWxf6g6bZfeFNEa/SwF2DKt0selq4e8W0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726174057; c=relaxed/simple;
-	bh=YVOONdyMDfAAPT3E8i8vp3i+ah2xetTTBd9LCjlO3Ko=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q9sCDP6R8PqN+9EMdLprreDeAiA/4fuvzu+2i0B2CZ3vR1fNFnp4vhESjGeRE16IApByD791veALuRrSHQI3J4XJwXD/0/lJ4YZ+VmAHwYZQh1urfBH5l5euVmQ0I2m+pjVcjJWwu/IyL4052Ms/Ri9I9tRgoQddL0Jp/Us1pkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2eiThzkk; arc=none smtp.client-ip=209.85.217.53
+	s=arc-20240116; t=1726174791; c=relaxed/simple;
+	bh=cAbAdJfAWvXcMGzLQXEJz8mvDAf9C94T25Rumz8sqaY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fOk/l/W83oDakBUlq0+ZNZMlOd+vXzmcKej3N8uE0pZFJz7NPTOjtRoQ4W4MoNtt7m9qZRDqqvEjFdqbLjzivNqgQE253A1d/9YXAUObfYU2MimHwBHO39k6DPD5JSXaXWqXBCeBCdNaNzQE96eHPjbuD/YFHsUfrQJaEZCPmEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fwSk6H6F; arc=none smtp.client-ip=209.85.160.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-49bbed1dad5so354476137.3
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 13:47:34 -0700 (PDT)
+Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-277f19ee2a2so784820fac.1
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 13:59:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726174053; x=1726778853; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EW6ORuO6UAIknL/dRfg0azJ4PmYS1WR3P3nm1fuxNAU=;
-        b=2eiThzkkVdTBfRG2fQ4tQhgYOyjOkxV6cQc4kxjoeWiIW84RHisbJWR21QsqCU5z1S
-         x7ySv3GdC5aBq7qccu4AXKD+ArIYXi4dU5Eyh+s43lMn2j5kiwnEJsUtN9ady+QOJDKR
-         Bm5RH/9mOQT+w/cNif+u/NZc7b6s3A2dsZ2kKwOscfLTmtYoUMaAnhq2NBiGlLX5gCNH
-         4ZoheI1yfgcmaprwyNITmst1SP3O8bU4CttVBuhMMi1zG4zRZ5Kdv5hAHe2oGq1/6Dhp
-         VMCizoduj8H47z1QH4NOYfEsoHLXYpO7Zmdp5yCqqzXi7au8fqIRz0zN1EWGj7YXi6gy
-         Mx0g==
+        d=google.com; s=20230601; t=1726174788; x=1726779588; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8mM5Z0KLUO8efTiZgA6ECQxJ5r+uA/1F2hapQlso44M=;
+        b=fwSk6H6FwFSImla2JI4db2pKAihE3YGTsdT6hM7GiyLo8SRYVdzhLPUrn5lI0G4KXC
+         bKOqdpt9tLhJkQoG9TJfdFqctjoJXVjK+WS4grWX2SGXuPat7AvL/3nTrGb9ZU1e5pTk
+         8wsnnRYD0GJAqvSAq7s0OHt8leWJKpEMZvvtvTBK5bvZmBROM1v0Lzt30OoCjXXDqiCj
+         RuOdhh8EBGO+/mX+EJN8eT99KItxRnyvsgtua7OzQ0XEftb2ryV6PFR9a1oi6UO8TshT
+         H+H2WCqRy/z3JHygHgUcpjaDm3rt7rHd3EMcEeuuVKkk55Vd97MD1X4vqC+qVKehiOC2
+         cHig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726174053; x=1726778853;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EW6ORuO6UAIknL/dRfg0azJ4PmYS1WR3P3nm1fuxNAU=;
-        b=nPOL2nRXGwKjFcz/161rUbLnP1+D8dR0WzfLNhouyEiVR2xaiDfTBbMUntDSuOuxw2
-         P0KvOX5GPlY01NcdN61055M9F+ksLlrFdz/Kj4jNKvL+B0svAIe0Larc2BdPxXohlRbf
-         JnzMI9cuwalFuMTNL0HPfZDxrjBil40HGYJpnja15/9EvblO2xTwIGxXtiP/cUhKtXtU
-         taOsaPU5YOd07A88ecBa83lqOBJACJuQJe2en6RPvJPn2b2Ti0kmtHjLHURop039Ol0M
-         oFWDnJdcxXJmVAhV1QK8Ar8e4VXcdD46ynIov+e3a30xD22cfdQPG7CBjcGpNNs2oaxA
-         rccg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjcO3IpL5+/7p6GrLXZb+kle3jnfVywBbjLqBB1EBNlFEFsMc0Hjd+egKOwcpvnnrUHWB9Z00=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9TjeG9NSjVmynotWUK0ttvD/fvzRrj0hJ4syK+FZpF24U8Q5C
-	FkSEMgYhnrspf3tt/Io6cNL9i3H2lFWr0HgPt8qODsoAwI0MHkMotgcuzDuAoP7vqhqegdUaI73
-	BUAkK5Wi4S/OA0mVfkMkOE1NporYfYbtIgOQM
-X-Google-Smtp-Source: AGHT+IENltP/J2FRcSH0t6JFPlpXTtj8oHiZ0wN117RfOO9nTGm+9hN4pJU4dEgwVrAW+FqPGfO3010PigbLkApwA3E=
-X-Received: by 2002:a05:6102:c92:b0:49b:eae3:bdae with SMTP id
- ada2fe7eead31-49d414806a4mr3292598137.9.1726174053304; Thu, 12 Sep 2024
- 13:47:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726174788; x=1726779588;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8mM5Z0KLUO8efTiZgA6ECQxJ5r+uA/1F2hapQlso44M=;
+        b=shuSlaLe+iX+tnvgB5a7SLjcHtSdLSZomNVz41TCP8pTDLrpWTEksfbkug/KUZPcrc
+         Wo8UZ908FO4U/XjSdbqo6nEAnfqgxax1Pmp6kKJZOw7gbeO/FIwg3pGfhAPdT7SR7rAE
+         s0/UTQuGYxls/r4caTXXYmbQUKzOMgUMChvECoryPQPlmJj2aZv2eet6OKdgc48VqZtW
+         gZ50fn8BPGuqHvClAV1uDEEcDc9Ka2ls6u8gR6efn3VN8MBJ1eDKdJ7fF9lXB0Sz4dnP
+         58gn3cID0k5RuUh+EW0W9PHaFpZbYHVsB6U4Mka+ZwRDIXBQbCIOtASmCHn0CTgHnUVn
+         oZZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXMua6OgcV6B1wIDc/19iMVt5oO4jBgxEbIYAC4XD+jlr4kYf/6iG/o9JSEGlro+sRG+zefjF0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4DhPjiXaKbWa8yKbWoRy3XgBIBiPY+YxvxHRcLeN8JviZUEoU
+	r8iEo7dt/tbhh15NZcmR6yo0pxkTD7e41RAqcva2I3xyebBRdteqqwASIHzb/Q==
+X-Google-Smtp-Source: AGHT+IFM1AXJ051IzPPqsl49dRXV3EAPdU7MADRa2Tisd07EWLACnR0AfN41J2K91Abg++8l1F9PzA==
+X-Received: by 2002:a05:6870:610c:b0:27b:6267:61b0 with SMTP id 586e51a60fabf-27c3f603118mr3165118fac.32.1726174787877;
+        Thu, 12 Sep 2024 13:59:47 -0700 (PDT)
+Received: from google.com (30.64.135.34.bc.googleusercontent.com. [34.135.64.30])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-27ba3f3f125sm3276542fac.25.2024.09.12.13.59.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 13:59:47 -0700 (PDT)
+Date: Thu, 12 Sep 2024 13:59:42 -0700
+From: Justin Stitt <justinstitt@google.com>
+To: Yafang Shao <laoar.shao@gmail.com>
+Cc: akpm@linux-foundation.org, torvalds@linux-foundation.org, 
+	alx@kernel.org, ebiederm@xmission.com, alexei.starovoitov@gmail.com, 
+	rostedt@goodmis.org, catalin.marinas@arm.com, penguin-kernel@i-love.sakura.ne.jp, 
+	linux-mm@kvack.org, linux-fsdevel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, audit@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	selinux@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	dri-devel@lists.freedesktop.org, Paul Moore <paul@paul-moore.com>, Eric Paris <eparis@redhat.com>
+Subject: Re: [PATCH v8 2/8] auditsc: Replace memcpy() with strscpy()
+Message-ID: <u42f2oneitzqmzh2tvwokzjxawj6utitu7rongurqeiglkvkvc@ryjktmvutysi>
+References: <20240828030321.20688-1-laoar.shao@gmail.com>
+ <20240828030321.20688-3-laoar.shao@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240909-strncpy-net-caif-chnl_net-c-v1-1-438eb870c155@google.com>
- <20240910093751.GA572255@kernel.org> <CAFhGd8qQ_e_rh1xQqAnaAZmA7R+ftRGjprxGp+njoqg_FGMCSw@mail.gmail.com>
-In-Reply-To: <CAFhGd8qQ_e_rh1xQqAnaAZmA7R+ftRGjprxGp+njoqg_FGMCSw@mail.gmail.com>
-From: Justin Stitt <justinstitt@google.com>
-Date: Thu, 12 Sep 2024 13:47:22 -0700
-Message-ID: <CAFhGd8r2PO9qLej9okVpwcfL2Kz5oCahdnzEVRpCJVm+b5g-Bw@mail.gmail.com>
-Subject: Re: [PATCH] caif: replace deprecated strncpy with strscpy_pad
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, 
-	Kees Cook <kees@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240828030321.20688-3-laoar.shao@gmail.com>
 
-On Thu, Sep 12, 2024 at 1:43=E2=80=AFPM Justin Stitt <justinstitt@google.co=
-m> wrote:
->
-> Hi,
->
-> On Tue, Sep 10, 2024 at 2:37=E2=80=AFAM Simon Horman <horms@kernel.org> w=
-rote:
-> >
-> > On Mon, Sep 09, 2024 at 04:39:28PM -0700, Justin Stitt wrote:
-> > > strncpy() is deprecated for use on NUL-terminated destination strings=
- [1] and
-> > > as such we should prefer more robust and less ambiguous string interf=
-aces.
-> > >
-> > > Towards the goal of [2], replace strncpy() with an alternative that
-> > > guarantees NUL-termination and NUL-padding for the destination buffer=
-.
-> >
-> > Hi Justin,
-> >
-> > I am curious to know why the _pad variant was chosen.
->
-> I chose the _pad variant as it matches the behavior of strncpy in this
-> context, ensuring minimal functional change. I think the point you're
-> trying to get at is that the net_device should be zero allocated to
-> begin with -- rendering all thus NUL-padding superfluous. I have some
-> questions out of curiosity: 1) do all control paths leading here
-> zero-allocate the net_device struct? and 2) does it matter that this
-> private data be NUL-padded (I assume not).
->
-> With all that being said, I'd be happy to send a v2 using the regular
-> strscpy variant if needed.
+Hi,
 
-I just saw [1] so let's go with that, obviously.
+On Wed, Aug 28, 2024 at 11:03:15AM GMT, Yafang Shao wrote:
+> Using strscpy() to read the task comm ensures that the name is
+> always NUL-terminated, regardless of the source string. This approach also
+> facilitates future extensions to the task comm.
+> 
+> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> Acked-by: Paul Moore <paul@paul-moore.com>
+> Cc: Eric Paris <eparis@redhat.com>
+> ---
+>  kernel/auditsc.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/kernel/auditsc.c b/kernel/auditsc.c
+> index 6f0d6fb6523f..e4ef5e57dde9 100644
+> --- a/kernel/auditsc.c
+> +++ b/kernel/auditsc.c
+> @@ -2730,7 +2730,7 @@ void __audit_ptrace(struct task_struct *t)
+>  	context->target_uid = task_uid(t);
+>  	context->target_sessionid = audit_get_sessionid(t);
+>  	security_task_getsecid_obj(t, &context->target_sid);
+> -	memcpy(context->target_comm, t->comm, TASK_COMM_LEN);
+> +	strscpy(context->target_comm, t->comm);
+>  }
+>  
+>  /**
+> @@ -2757,7 +2757,7 @@ int audit_signal_info_syscall(struct task_struct *t)
+>  		ctx->target_uid = t_uid;
+>  		ctx->target_sessionid = audit_get_sessionid(t);
+>  		security_task_getsecid_obj(t, &ctx->target_sid);
+> -		memcpy(ctx->target_comm, t->comm, TASK_COMM_LEN);
+> +		strscpy(ctx->target_comm, t->comm);
+>  		return 0;
+>  	}
+>  
+> @@ -2778,7 +2778,7 @@ int audit_signal_info_syscall(struct task_struct *t)
+>  	axp->target_uid[axp->pid_count] = t_uid;
+>  	axp->target_sessionid[axp->pid_count] = audit_get_sessionid(t);
+>  	security_task_getsecid_obj(t, &axp->target_sid[axp->pid_count]);
+> -	memcpy(axp->target_comm[axp->pid_count], t->comm, TASK_COMM_LEN);
+> +	strscpy(axp->target_comm[axp->pid_count], t->comm);
+>  	axp->pid_count++;
+>  
+>  	return 0;
+> -- 
+> 2.43.5
+> 
 
->
-> >
-> > > Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#=
-strncpy-on-nul-terminated-strings [1]
-> > > Link: https://github.com/KSPP/linux/issues/90 [2]
-> > > Link: https://manpages.debian.org/testing/linux-manual-4.8/strscpy.9.=
-en.html
-> > > Cc: Kees Cook <keescook@chromium.org>
-> > > Cc: linux-hardening@vger.kernel.org
-> > > Signed-off-by: Justin Stitt <justinstitt@google.com>
-> > > ---
-> > > Note: build-tested only.
-> > > ---
-> > >  net/caif/chnl_net.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/caif/chnl_net.c b/net/caif/chnl_net.c
-> > > index 47901bd4def1..ff37dceefa26 100644
-> > > --- a/net/caif/chnl_net.c
-> > > +++ b/net/caif/chnl_net.c
-> > > @@ -347,7 +347,7 @@ static int chnl_net_init(struct net_device *dev)
-> > >       struct chnl_net *priv;
-> > >       ASSERT_RTNL();
-> > >       priv =3D netdev_priv(dev);
-> > > -     strncpy(priv->name, dev->name, sizeof(priv->name));
-> > > +     strscpy_pad(priv->name, dev->name);
-> > >       INIT_LIST_HEAD(&priv->list_field);
-> > >       return 0;
-> > >  }
-> > >
-> > > ---
-> > > base-commit: bc83b4d1f08695e85e85d36f7b803da58010161d
-> > > change-id: 20240909-strncpy-net-caif-chnl_net-c-a505e955e697
-> > >
-> > > Best regards,
-> > > --
-> > > Justin Stitt <justinstitt@google.com>
-> > >
-> > >
->
-> I appreciate the review.
->
-> Thanks
-> Justin
+Good usage of two-argument strscpy(). This helps towards [1].
 
-[1]: https://lore.kernel.org/all/20240911015228.1555779-1-kuba@kernel.org/
+Reviewed-by: Justin Stitt <justinstitt@google.com>
+
+[1]: https://github.com/KSPP/linux/issues/90
 
 Thanks
 Justin
