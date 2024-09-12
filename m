@@ -1,284 +1,225 @@
-Return-Path: <netdev+bounces-127877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DF5D976ED8
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:36:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2FAD976F07
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:46:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAF5728576B
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:36:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2C691C20BF1
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9D501B654F;
-	Thu, 12 Sep 2024 16:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1153F1AE845;
+	Thu, 12 Sep 2024 16:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="x1ROdXH1"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="n0pI0bbV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lG17qCaI"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2075.outbound.protection.outlook.com [40.107.220.75])
+Received: from fout5-smtp.messagingengine.com (fout5-smtp.messagingengine.com [103.168.172.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717341AD262;
-	Thu, 12 Sep 2024 16:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726158972; cv=fail; b=ZbFroVHkkL9Q6drzqw05mlsvosrH3Bg3xf3CUEuEh8gO0Yf7hGCuyAug91mMohs/Ngh0adSJ+vQlZTidL2wXnGcXAJcdq8wpJQfxoE/h727UtfHuLix219fEdxrIpfZr2oud6aJ+mHGzQdRJmuulDkSAx3v9ZOjb1crCdWfhXN4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726158972; c=relaxed/simple;
-	bh=Zq6PU9hACj3KBGbkm8qibNN4/1XzICfyAb9+UAMI8lo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=kV+gmlfgaCtIiznnORK7EhaujxTABaOm1JcbmgXYkPYY0NVzyLD0wU/ylF6JXJU1J44zMynE9/K0Zx///qzjEvzgSuIBaeQLXi7xzReiWMul6JsliyF9JX6WXoGeWnsolG9VDO97RP64Fs+Ut210H4tiHRKpAXwrZemv07KxP6o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=x1ROdXH1; arc=fail smtp.client-ip=40.107.220.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cH+kFncMimfhsMzYj0TfWC8Indn4mipqZ03UaPEx9fmwRQR9aQhZt3sOwE4jKquq7tjKNrFrO0wX4QNm+viJUkTM3rPMZbz+qKk39/G6/0I6O0i068ns9pq/MdQOZ/4/zJTQIsHdc+QUGtlYU6dFBmPacCK3NXsKtg3mdDvOQVNgKd/xoYHm+XmfFq553pRZq/HLINtLMVn8riCi9Ecai1nh243pbdPPyrHfT7yiBaESwqZOYHeTQ19ZCt0bRlFkFGLqfCnAJKOfFqeDqzDfhKhV9q2875+kLj0dsjr9oi0/a0dF6DmRAFAGcpGemO0HO0xM/QUgB4/nNo2otYvR5w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LgA7m0xByn/+LLF950yqNFSRGtedM7rBCP/zQSRSRVc=;
- b=Zu0W6pK3bGiagiU/UEwPGcJ19ln+h9S9Dn3wq2ufSaYaki/Wj9DWZc4lRo88v5INb+ucxLzSVJn2BLAp2zjndGvNn9JzMr3XQD0LrFUqhOLCixLix2srOSX5QwuqjdRvgCJ/TOv+Nkh9hQGioHuUvqEMdqxqIp4+HdtRvqJQj5nD61KXr0En2MMCjqW5OHUo/M1Ugu1BJRxB1LZy+Kf2nmM5vZcfnps5UjfN84GkhJ2SQnDttTy+iFPFeqvB6cLC+dB3+sFFnxq2NeydMw/MpVUBm9Q8YiN8dGzl7jCqlnml6wM7oENhvQV8PQSkGvgECUp16FChxiIeQdxZN8YkqA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LgA7m0xByn/+LLF950yqNFSRGtedM7rBCP/zQSRSRVc=;
- b=x1ROdXH1tE8Z8IOU9ot7T3jBT/4sZ0eXvFHNQlPUQPIAm3xSuuaPKFrkigzUizbH66zsA61LtXwe2aOLBM4PDUT3nK7nNS6F00aQpMGAqwdZcn3DWvPuwoDol0bCWfTURCEPkxOyqZ2iUuSsc1Tr0TOG6YN8l1MFYcGrbZUjsp25HIeiq6f/mWto8hQgCy6nbFTONtInr3AVzIZ4gdA4G21jDbBrZrI72I0INCvmqC0gfKHeFVlpxKsJw6U1BFCATRjNm9BA2R1N7Yq73H8Gmn5HXeWoc990TbHrsVHfe/8yNOtr7bJfgIgcnY+GNcevaePuGYJ9ZqixRhGkFVHxsQ==
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
- by PH8PR11MB8106.namprd11.prod.outlook.com (2603:10b6:510:255::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24; Thu, 12 Sep
- 2024 16:36:07 +0000
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739]) by PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::ad6c:cf56:3c3d:4739%3]) with mapi id 15.20.7918.024; Thu, 12 Sep 2024
- 16:36:07 +0000
-From: <Ronnie.Kunin@microchip.com>
-To: <andrew@lunn.ch>
-CC: <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <Bryan.Whitehead@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
-	<maxime.chevallier@bootlin.com>, <rdunlap@infradead.org>,
-	<Steen.Hegelund@microchip.com>, <Daniel.Machon@microchip.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next V2 1/5] net: lan743x: Add SFP support check flag
-Thread-Topic: [PATCH net-next V2 1/5] net: lan743x: Add SFP support check flag
-Thread-Index:
- AQHbBGXGELjLauDUqEuTABaTIHCmgrJS0SWAgADgLwCAAIyPgIAACRTwgAAJYwCAAAOM4A==
-Date: Thu, 12 Sep 2024 16:36:07 +0000
-Message-ID:
- <PH8PR11MB7965DD30A84DB845BEC4070E95642@PH8PR11MB7965.namprd11.prod.outlook.com>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-2-Raju.Lakkaraju@microchip.com>
- <a40de4e3-28a9-4628-960c-894b6c912229@lunn.ch>
- <ZuKKMIz2OuL8UbgS@HYD-DK-UNGSW21.microchip.com>
- <e5e4659c-a9e2-472b-957b-9eee80741ccf@lunn.ch>
- <PH8PR11MB7965848234A8DF14466E49C095642@PH8PR11MB7965.namprd11.prod.outlook.com>
- <ad0813aa-1a11-4a26-8bc7-528ef51cf0c2@lunn.ch>
-In-Reply-To: <ad0813aa-1a11-4a26-8bc7-528ef51cf0c2@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|PH8PR11MB8106:EE_
-x-ms-office365-filtering-correlation-id: c6a0a041-ad96-4163-f103-08dcd3490098
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?5OVZV9IaVlL4f9lwbXNT15MS1WcVCermFPNfEOw1Jg0uebR7S0XS8SIDSDof?=
- =?us-ascii?Q?0JHeRHWlllRgAJM8a/KQKI98jW3IakXk9fjr91A5caOrK0t5MDG+fiBNpH/U?=
- =?us-ascii?Q?aFUcAWk5kTFbqJFX0LITKoUrc6B7dR901+XY0XmFugL+FjTOy2lIgStcfGlq?=
- =?us-ascii?Q?Iw5OAlqEjIbEY1r4yiz1BzTrjafEZfMZcY5h6nuuyLWvZNoeRBCS/NN/xGvS?=
- =?us-ascii?Q?BLTabNShmjCWEPMd65a0avx3CNFm1i8p/sm6gN32RQUYqfwzWau5gFpmZR25?=
- =?us-ascii?Q?0CkVRY1LRVCOl7I/xP7olB8CrrPAiyBs5Xbiru5H4OnliXGMkl+uponw02Ls?=
- =?us-ascii?Q?DMuYn1l1O0cmIKHGJ26TIo5ipJEc6dlAPJMgjIAeZzHrXfIePE7ZaEJDVpUv?=
- =?us-ascii?Q?i7hkSxVtO8858ai4jmG7L3yKnXXqey1vbZ/Vd8KvKbZYOVa6TxYizjRihBFk?=
- =?us-ascii?Q?hLPWRTZgfK20TqeekMxEtcsBue0sMd8PXcodcWCQrIeP7e2XQ88vcBCPzX67?=
- =?us-ascii?Q?Htgf/TIR85T/4AKsMgYQubbPaHcwO+wJV7Lhv/F2lhPr78CJpJDKN/gGPZZs?=
- =?us-ascii?Q?HUMe32YzoDfnSIUnizXlb4QTpm+xwHUJby+gXZjlK4b5ZPcvX2WA95OfL9ZN?=
- =?us-ascii?Q?evSVh4OwhSCy9VzEN1ADqJ/Y5q/J2JYWNesM17NK4Sw8edwKDHjpk9hy8GCC?=
- =?us-ascii?Q?zmxFjQVk3LzEFMWr1pd1SXDHqVn0baOISMNLDDFXoPOQpBKUcJlEt0nztaVy?=
- =?us-ascii?Q?r2omWAdNBECCE3iHIjAj75YGY6c1Wb+luo959fuvPL1EtvmATnJF3R7bES5x?=
- =?us-ascii?Q?tqqKBQLdh+yi1WR0l4lU/Bx9q7uWnII3x04kkQPq6Hv3q/Dn0T5V3kTsQtPy?=
- =?us-ascii?Q?MX5SbkszGMO6ZYuJnqL5VQNxpf/o1iCm/G4rWaiF/k6QLXI4iVCqnJviGKxv?=
- =?us-ascii?Q?xLEH9auDgIulTEYS0y0qP1v53YgRSl1629D9UVjWo5ARckDmb/v6kI8tNdcu?=
- =?us-ascii?Q?KGd5zxugmRBI/qU/eAGfXntRA7cd5SPFX4LyUhM3xH4CKVoS7wVVTID9oLW3?=
- =?us-ascii?Q?LtkjaUzRoq1qorIjcwTxd2Lj06b+ZpMhqtzJurXO3Nk8v6+qbtZ66BAsLY5h?=
- =?us-ascii?Q?tPVSi5QrwO7E/joAg06GxfdN0lyIINVrm3nq8cWgx41QDYByVzfTFXf0aBxr?=
- =?us-ascii?Q?9LkTNpfB7MH4ubHI0S5R8vy4TiLxUUL4sqP+Gj82pzH9nZOi24xZ5MSr70+i?=
- =?us-ascii?Q?mlHVQY2MpYJYOWHgQIX6lVWRsumP52/qaZi9+BlNZ/XB/nxPKAt66jzfW8vh?=
- =?us-ascii?Q?PTpsLXxCHk1m8ralw4MvLM9rqgoz2Ia0Ddtu0fS8m5Eax+RvRXID8jV+Zc1T?=
- =?us-ascii?Q?4zGWRH/a4J+b6p+EkB9fr0+Jo03n6uV1FGjf3UOFMrdcGvpNhw=3D=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?EsisSVwvxA/B8GdmcY+B79axpSkOo4QcTV+GgIG7SZk+dc2pRpfNaUsV4U+B?=
- =?us-ascii?Q?an8nMpHI0HrhX/zxk4UP1aFZ2A4vB1nptbd9eihj88a3lGshmPVVlg2zUcbn?=
- =?us-ascii?Q?ZAroGA48BkmL7piF+gLTnKC1LFlnc3kdME3LHMDftaxJQpV+OczzHvqedDBA?=
- =?us-ascii?Q?m05VziYcix3jL6HuzHRO/upJZkx0FLBQ689Rok/jcm859M63TxicW999Z3qt?=
- =?us-ascii?Q?Xjk52NVakG/F+yodH+z4DIzNVg5Z88FCvUS2WY5fTYHkaA91TJlDlaklsADt?=
- =?us-ascii?Q?CEsjc9izaK47UTMQBkOfn3bJFDNdI7iG7mWw8FLCjfP7KWN58Rqu4UTj/HvJ?=
- =?us-ascii?Q?tJriCdjRwm+fqZD1YsUwbf/uDacedx5DKg/gQ0AkC6sY52KifwxasFjSQwer?=
- =?us-ascii?Q?w4cJxZ0nNYYNq2NQ/FR31fKld03EAoWqb5IcSJOHMwoO999NOuq4/s1+jMPf?=
- =?us-ascii?Q?pl8TY+jOlblnkcWtjSqpfcpT3paCZiZC1sIw18HWnK74L7MEaQ9rk2A0UJFY?=
- =?us-ascii?Q?ga0xMpIfHv+naGNXdv4nl8oZNH6GwF4QQ39Whd588hAMVcBVWzvOETJPJs3D?=
- =?us-ascii?Q?LbK1XuIKHhhgGll+AODv7tsd3EKO2H6vzPPWmjjQ4vZ+u45SmeID4B18yKOm?=
- =?us-ascii?Q?x96LEVy7PYDkbaEYr5WNE0RUIb1WwEeo+MVs48S7peHGAB42BvdvqfFoIFTV?=
- =?us-ascii?Q?BWeJ4zu5m7QG47F7skbUWnIdjp99ASYgAE7keRGuS/LLNhVZPNkiIJoR6xbt?=
- =?us-ascii?Q?U5aFVkYK4HjqxkAOwtgTZNXi5Ba9ZGHB/CB2GTPSXco+w6rHtBBYVgzIBuei?=
- =?us-ascii?Q?WnHzjmc//aQtLldEvuSq76vLZlg31Je0VerYZT08xgDm+FOsG9vkxBW/ZlxR?=
- =?us-ascii?Q?K8LX/Ma6rF341mUHsag1BGnAOs4opgKX8J5Ki13DFKPR6uAFY+VAbcQ8H+dH?=
- =?us-ascii?Q?CB7bsQkfWTJvWP3znTXOxj16rHndvIY4c7z7K5JhxRFPEU8JeFXLKCDO5hKy?=
- =?us-ascii?Q?Mzas9RTpkDZTaEk7D3NPsyz6AGkxoBwLLHxaP14sVxN2ePrjbysxNc7ieI2C?=
- =?us-ascii?Q?+c2lv2WgfVE8CkU9AzgpS9xRCpHKjEcuFtwxikYYb1kEHXuot7pZD0CzarYV?=
- =?us-ascii?Q?D5/LPYHAxZ0Cp2D9e3iCeywoWDjijGtn3VUsoY0EJ0+FWDOwXdufWnRai+KF?=
- =?us-ascii?Q?uXLTsVn4lLZyiyQy3DZGNQbGFeL0Kl59GKsrpksce10inQf8LFptbR5SkmZ4?=
- =?us-ascii?Q?PCJYgRMJ6lyItxDOxaWBcnQsLsiRGpo21B/v3762vfjjtIobuSQ6qKN26Cy1?=
- =?us-ascii?Q?3xo8z3N4yzcXdAs4WdUmQ68purEGokoOJZadp8xNz0mEfB6ztdaWsJq0j8Qb?=
- =?us-ascii?Q?r8riYfSrbwQtw6N8rScbZWPuaVyw4LPmEd4hQXI/Wbh+mSOH3wzruOAMOa0W?=
- =?us-ascii?Q?+rLauuDj3jlPPvrkCG0azs2qjfsguok/pkuSPTlKUni793QpKpi4EpXZFNv8?=
- =?us-ascii?Q?Ap+/ZLtaGQlP08YOEcJogHE20snz7F+0iZyodROta8paUTfSqKCpmB1GH81R?=
- =?us-ascii?Q?3I3id/ZyKBs8IFnETILH7hxB8IkH+D7MX5YlSoeN?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90E817BED2
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 16:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726159574; cv=none; b=fhzeaHF2wAGU4/fQXQgJd6UOlxVE56Kstp9qWOXBBpdHKOlU9enj3cJc0NCe/HAVZmVOSNKP/F/FIatEP8F1xoJcO0tje8jEPpH/XmyTHSC2aKhuVTDPa16qfBB9PJWZr8nKb0b7RQHNOujFvU+ycPmgSAykD2uDPvq4hCP7gzw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726159574; c=relaxed/simple;
+	bh=/XcJ7oKix/Eu0RdyNgqwKKxPKkabS524PCuYlGa0+Ro=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=puhKBeLwdfJWWWvUnHc0iT6Cv/rX8XX6LWDjO4Wbveg9hg5f+f2aL2DabRkfE7HhhUAAYI1HMxe4pDOJZm6ZUw9aSMQLcThyZ1bgVxjtNSmNyOf2yJXyN+m12pW3cD8c9Rhiqht98OxMcVzBzs656GDjmmP26H4hi3/qcVGMz0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=n0pI0bbV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lG17qCaI; arc=none smtp.client-ip=103.168.172.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfout.phl.internal (Postfix) with ESMTP id 82AAF1380226;
+	Thu, 12 Sep 2024 12:36:15 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-08.internal (MEProxy); Thu, 12 Sep 2024 12:36:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
+	 t=1726158975; x=1726245375; bh=aaweFkwW6x/5eAJ/IyPp0u5PDtnYEDar
+	gBRK5QFWJWw=; b=n0pI0bbVrOp0J+a0gZ+a0aSekZGaFZ1ktrscPG/tE6uCkwC6
+	/ksAqsVCkaso2ZiK1qlhCUHKhpkpAsSOjQCVlJdLyVihLOk338zDoOgiivHv2vS/
+	Aij7n8kmR+1cuh+6EzT/ye6ey2aosgVcJFXKUwG0nIyOziT/7acTwGEXX676VKOx
+	saFyf/k0RHlQyupt/RAKprRTwQIKUsLLV0NC/8RxceMmYi9zlNS30YzRRt0MZcp9
+	4ltbofmyEIY2ZG1T2XQiNbAdUMFYi6ryMAaylC+X5wLwSdPuAM3Nz3YFpdGbQydD
+	ZG6b/S7Sbwmlpvkv7mHQFlpXdpxGSRVSAox91g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1726158975; x=
+	1726245375; bh=aaweFkwW6x/5eAJ/IyPp0u5PDtnYEDargBRK5QFWJWw=; b=l
+	G17qCaInZIAcYVhMhg/KDVKTxP+GyRFpc3y1dfNNgLDMnyZUngSwTT8UEvheSQKo
+	0M8hCgYy/qYiE0BC7Us37btekzP7a4pkuJLM2mEhoIMBK0ntY4i6P+024+1uKcor
+	/923s30qnrGSeQRedOTCV4ULgDXmDYyxb9aoxdiJRPE0y2okwdD7nTYEGANEa4YS
+	Ygle+YD9DozrJ5FW84gsWlCPJLRkUKPDWD+u0maqJyXgjx1v41kQTkZFyLXHN8bw
+	czJDan73NGAcCcrLc7UxkxGfGLqJnv9+4ZZqdazFfsIjGoac2u/L6PoqZPo0QoLG
+	onEfZHwL5d/KE1OB2bQSw==
+X-ME-Sender: <xms:fhjjZp-a2OYhc92cIqWy8D6bcwxuo0wACb_sPVKtsU8rJgA_lDLYcw>
+    <xme:fhjjZtvLrpls59bkfP6pTnlxi35TO-rDgwm-x3sSRiKVyN78XiVMkrccOlmRf7ZsV
+    8MneGeOb1e2CUFdf68>
+X-ME-Received: <xmr:fhjjZnDm10mcZt58ePovUYMgHVlq32HiA9gLPqCUJppYKjPrxP2oI92w9TgvliVt0gjduQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudejfedguddtgecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefhvfevufgjfhfogggtgfffkfesthhqredtredt
+    jeenucfhrhhomheplfgrhicugghoshgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrd
+    hnvghtqeenucggtffrrghtthgvrhhnpeegfefghffghffhjefgveekhfeukeevffethffg
+    tddutdefffeuheelgeelieeuhfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgspghrtghpthht
+    ohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehrrgiiohhrsegslhgrtg
+    hkfigrlhhlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
+    thdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtghomhdprhgtphhtth
+    hopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprghnugihsehg
+    rhgvhihhohhushgvrdhnvghtpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorh
+    hgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehirdhm
+    rgigihhmvghtshesohhvnhdrohhrghdprhgtphhtthhopegrtghonhholhgvsehrvgguhh
+    grthdrtghomh
+X-ME-Proxy: <xmx:fxjjZtcpGT4nFIFZqW957iUHsPBQjPqyEHb39YWNsijqJKhzmG05ow>
+    <xmx:fxjjZuO-xUzkCcCmY8WLALhgz0SNe05KPFb4bUMelCBQ8vNF3fJ1Kw>
+    <xmx:fxjjZvnU3K3pi254ZjIdsZNDnKQamII9JXeyKIDd4DBaT629J-fMfA>
+    <xmx:fxjjZov1hyRjK_k6WGdpGBh2h6BgPfLI4ciah2bW8r6C6JHjEy8-MQ>
+    <xmx:fxjjZotvANpncMudjnw-iZRwtNkjRGHNfZplSDyQMXXNwbf6ufrurRtW>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 12 Sep 2024 12:36:14 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 465E29FC8F; Thu, 12 Sep 2024 09:36:13 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 454B59FBCC;
+	Thu, 12 Sep 2024 09:36:13 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Hangbin Liu <liuhangbin@gmail.com>
+cc: netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
+    "David S . Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Eric Dumazet <edumazet@google.com>,
+    Nikolay Aleksandrov <razor@blackwall.org>,
+    Simon Horman <horms@kernel.org>, Aaron Conole <aconole@redhat.com>,
+    Ilya Maximets <i.maximets@ovn.org>,
+    Adrian Moreno <amorenoz@redhat.com>,
+    Stanislas Faye <sfaye@redhat.com>
+Subject: Re: [Discuss] ARP monitor for OVS bridge over bonding
+In-reply-to: <ZuAcpIqvJYmCTFFK@fedora>
+References: <ZuAcpIqvJYmCTFFK@fedora>
+Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
+   message dated "Tue, 10 Sep 2024 10:17:08 -0000."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c6a0a041-ad96-4163-f103-08dcd3490098
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Sep 2024 16:36:07.5715
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jXN2r+My7rHh36EZjomyNDrknvcuqIKVRWgOkK/BWprr6psBUyGR2CyIAyAzYlmugFLwC3fzC0RLdRhr+D0hqsZ1AjTTkaqmRZdDGuegyTg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8106
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 12 Sep 2024 09:36:13 -0700
+Message-ID: <385751.1726158973@famine>
 
+Hangbin Liu <liuhangbin@gmail.com> wrote:
 
+>Hi all,
+>
+>Recently, our customer got an issue with OVS bridge over bonding. e.g.
+>
+>  eth0      eth1
+>   |         |
+>   -- bond0 --
+>        |
+>      br-ex (ovs-vsctl add-port br-ex bond0; ip addr add 192.168.1.1/24 de=
+v br-ex)
+>
+>
+>Before sending arp message for bond slave detecting, the bond need to check
+>if the br-ex is in the same data path with bond0 via function
+>bond_verify_device_path(), which using netdev_for_each_upper_dev_rcu()
+>to check all upper devices. This works with normal bridge. But with ovs
+>bridge, the upper device is "ovs-system" instead of br-ex.
+>
+>After talking with OVS developers. It turned out the real upper OVS topolo=
+gy
+>is looks like
+>
+>              --------------------------------
+>              |                              |
+>  br-ex  -----+--      ovs-system            |
+>              |                              |
+>  br-int -----+--                            |
+>              |                              |
+>              |    bond0    eth2   veth42    |
+>              |      |       |       |       |
+>              |      |       |       |       |
+>              -------+-------+-------+--------
+>                     |       |       |
+>                  +--+--+  physical  |
+>                  |     |    link    |
+>                eth0  eth1          veth43
+>
+>The br-ex is not upper link of bond0. ovs-system, instead, is the master
+>of bond0. This make us unable to make sure the br-ex and bond0 is in the
+>same datapath.
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Thursday, September 12, 2024 11:58 AM
-> To: Ronnie Kunin - C21729 <Ronnie.Kunin@microchip.com>
-> Cc: Raju Lakkaraju - I30499 <Raju.Lakkaraju@microchip.com>; netdev@vger.k=
-ernel.org;
-> davem@davemloft.net; edumazet@google.com; kuba@kernel.org; pabeni@redhat.=
-com; Bryan
-> Whitehead - C21958 <Bryan.Whitehead@microchip.com>; UNGLinuxDriver
-> <UNGLinuxDriver@microchip.com>; linux@armlinux.org.uk; maxime.chevallier@=
-bootlin.com;
-> rdunlap@infradead.org; Steen Hegelund - M31857 <Steen.Hegelund@microchip.=
-com>; Daniel Machon -
-> M70577 <Daniel.Machon@microchip.com>; linux-kernel@vger.kernel.org
-> Subject: Re: [PATCH net-next V2 1/5] net: lan743x: Add SFP support check =
-flag
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> > > > > > +     if (adapter->is_pci11x1x && !adapter->is_sgmii_en &&
-> > > > > > +         adapter->is_sfp_support_en) {
-> > > > > > +             netif_err(adapter, drv, adapter->netdev,
-> > > > > > +                       "Invalid eeprom cfg: sfp enabled with s=
-gmii disabled");
-> > > > > > +             return -EINVAL;
-> > > > >
-> > > > > is_sgmii_en actually means PCS? An SFP might need 1000BaseX or
-> > > > > SGMII,
-> > > >
-> > > > No, not really.
-> > > > The PCI11010/PCI1414 chip can support either an RGMII interface or
-> > > > an SGMII/1000Base-X/2500Base-X interface.
-> > >
-> > > A generic name for SGMII/1000Base-X/2500Base-X would be PCS, or
-> > > maybe SERDES. To me, is_sgmii_en means SGMII is enabled, but in fact
-> > > it actually means SGMII/1000Base-X/2500Base-X is enabled. I just thin=
-k this is badly named. It would
-> be more understandable if it was is_pcs_en.
-> > >
-> > > > According to the datasheet,
-> > > > the "Strap Register (STRAP)" bit 6 is described as "SGMII_EN_STRAP"
-> > > > Therefore, the flag is named "is_sgmii_en".
-> > >
-> > > Just because the datasheet uses a bad name does not mean the driver h=
-as to also use it.
-> > >
-> > >         Andrew
-> >
-> > The hardware architect, who is a very bright guy (it's not me :-), just=
- called the strap SGMII_EN in order
-> not to make the name too long and to contrast it with the opposite polari=
-ty of the bit which means the
-> interface is set to RGMII; but in the description of the strap he clearly=
- stated what it is:
-> >       SGMII_EN_STRAP
-> >       0 =3D RGMII
-> >       1 =3D SGMII / 1000/2500BASE-X
-> >
-> > I don't think PCS or Serdes (both of which get used in other technologi=
-es - some of which are also
-> included in this chip and are therefore bound to create even more confusi=
-on if used) are good choices
-> either.
->=20
-> SERDES i understand, PCI itself is a SERDES. But what are the other uses =
-of PCS? At least in the context of
-> networking, PCS is reasonably well understood.
+	I'm guessing that this is in the context of an openstack
+deployment, as "br-ex" and "br-int" are names commonly chosen for the
+OVS bridges in openstack.
 
-Here's one example: the LAN743x device, which this driver also services, do=
-es not support either SGMII or BASEX. It only supports RGMII, but it does h=
-ave an internal PHY and its MMDs at address 3 controls the Ethernet PCS.=20
+	But, yes, OVS bridge configuration is very different from the
+linux bridge, and the ARP monitor was not designed with OVS in mind.
 
->=20
-> > That being said, if it makes it more we can certainly call this flag "i=
-s_sgmii_basex_en". How's that
-> sound ?
->=20
-> Better. But i still think PCS is better.
->=20
-> But you need to look at the wider context:
->=20
-> > > > > > +                       "Invalid eeprom cfg: sfp enabled with
-> > > > > > + sgmii disabled");
->=20
-> SGMII is wrong here as well. You could flip it around:
->=20
-> > > > > > +                       "Invalid eeprom cfg: sfp enabled with
-> > > > > > + RGMII");
+	I'll also point out that OVS has its own bonding, although it
+does not implement functionality equivalent to the ARP monitor.
 
-Agreed. There are some other debug/err messages that were not clear that I =
-also suggested Raju to change and he will submit in the next version of thi=
-s the patch series.
+	However, OVS does provide an implementation of RFC 5880 BFD
+(Bidirectional Forwarding Detection).  The openstack deployments that
+I'm familiar with typically use the kernel bonding in LACP mode along
+with BFD.  Is there a reason that OVS + BFD is unsuitable for your
+purposes?
 
->=20
-> In terms of reviewing this code, i have to ask myself the question, does =
-it really mean SGMII when it says
-> SGMII? When you are talking about Base-T, i don't know of any 1000BaseX P=
-HYs, so you can be sloppy
-> with the term SGMII. But as soon as SFPs come into the mix, SGMII vs 1000=
-BaseX becomes important, so
-> you want the code to really mean SGMII when it says SGMII.
+>On the other hand, as Adri=C3=A1n Moreno said, the packets generated on br=
+-ex
+>could be routed anywhere using OpenFlow rules (including eth2 in the
+>diagram). The same with normal bridge, with tc/netfilter rules, the packets
+>could also be routed to other interface instead of bond0.
 
-That's fine. But the particular strap (and that is what that flag tracks) y=
-ou are talking about needs to be set for either SGMII or BASEX. Whatever el=
-se may need to be handled differently is taken care (I guess within the Lin=
-ux framework)  when the phylink interface (PHY_INTERFACE_MODE_*) ends up fl=
-ipping=20
+	True, and, at least in the openstack OVN/OVS deployments I'm
+familiar with, heavy use of openflow rules is the usual configuration.
+Those deployments also make use of tc rules for various purposes.
 
->=20
->      Andrew
+>So the rt interface checking in bond_arp_send_all() is not always correct.
+>Stanislas suggested adding a new parameter like 'arp monitor source interf=
+ace'
+>to binding that the user could supply. Then we can do like
+>	If (rt->dst.dev =3D=3D arp_src_iface->dev)
+>		goto found;
+>
+>What do you think?
+
+	A single "arp_src_iface" parameter won't scale if there are
+multiple ARP targets, as each target might need a different
+"arp_src_iface."
+
+	Also, the original purpose of bond_verify_device_path() is to
+return VLAN tags in the device stack so that the ARP will be properly
+tagged.
+
+	I think what you're really asking for is a "I know what I'm
+doing" option to bypass the checks in bond_arp_send_all().  That would
+also skip the VLAN tag search, so it's not necessarily a perfect
+solution.
+
+	Before considering such a change, I'd like to know why OVS + BFD
+over a kernel bond attached to the OVS bridge is unsuitable for your use
+case, as that's a common configuration I've seen with OVS.
+
+	-J
+
+---
+	-Jay Vosburgh, jv@jvosburgh.net
+
 
