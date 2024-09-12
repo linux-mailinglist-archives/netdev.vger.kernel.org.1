@@ -1,51 +1,50 @@
-Return-Path: <netdev+bounces-127859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C8AB976E50
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:59:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F7CA976E5E
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:04:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5E021F212CA
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:59:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 887561C239B6
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C064919599C;
-	Thu, 12 Sep 2024 15:59:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE30126BEC;
+	Thu, 12 Sep 2024 16:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Emjb+8ci"
+	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="IBqgYdhP"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward502b.mail.yandex.net (forward502b.mail.yandex.net [178.154.239.146])
+Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8F4192B87
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 15:59:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758D44AEF4;
+	Thu, 12 Sep 2024 16:04:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726156786; cv=none; b=LYCTPArCYbAF/Qggjj2FYJDfvZaS3ODszYLJ/LTFJOwHZQqkZ64qn8wdc3vkgjgtMF2uGOYxCuPH53gpcpolT/gXiv/FUgq41dzLAemNM/RzUu/+QNiuf+fur1SBptEXCfzz0+sBQgQxYb3sqnisgWaJdIE6kMEGXa2PMxMY9EY=
+	t=1726157049; cv=none; b=lTdO4dGny6qoRILF4G+BV31czwNEfwSNRb538PUVpoifLxW1YEqlAHSBxyASULBFpOf/a/nK+dFlpHDBXY6D7S0Ua+29APjzG3lSW6rBMEJch9YUo7nbqL7D+F9ynmBISX+XBSHZiow9DWzQftPFq9c0RJ5bsxwwrjwRo7KOesg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726156786; c=relaxed/simple;
-	bh=MoMfcM1Jtr/RtubOuBcJdVaSEXScaU8oh1dlpg3sOeI=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=gSuLQlXdIsCrRxA4Tvv3Gi4dkKSiaGhTzQYFBOXzEKqkRVlMbh5QLtaFM5Re2EKj//yKCBFZ47vig2fh0NQs230BaF4SFPUaOj+EyYTjgilwKDcH26PLsFMpWg6F4aVnPXKZwJRO6lqChFctKZsfLzaonjnOKNMBDP4t6cXwvhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Emjb+8ci; arc=none smtp.client-ip=178.154.239.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net [IPv6:2a02:6b8:c1c:2a89:0:640:c90:0])
-	by forward502b.mail.yandex.net (Yandex) with ESMTPS id 9C8B15E741;
-	Thu, 12 Sep 2024 18:59:40 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id dxmC8E5LlW20-ghUb5ZUz;
-	Thu, 12 Sep 2024 18:59:39 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1726156779; bh=MoMfcM1Jtr/RtubOuBcJdVaSEXScaU8oh1dlpg3sOeI=;
-	h=In-Reply-To:Subject:To:From:Cc:Date:References:Message-ID;
-	b=Emjb+8ciDGM018dEUqKAY54AvJg9QjEml4vBS9wQ9TLQ+HjrQexVSBjH46KGdp9Fh
-	 tbIZBnM4df4ThCOy7qDf37NwGvmEchgp/0G3mbqOjicVIdWqUSgPsMTeYSMMHFetcc
-	 KnOppRvxSFRz7iUXvayswJpg39Luji9HK0Yq5UlA=
-Authentication-Results: mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <9c8146a5-c7fc-40ae-81bb-37a2c12c2384@yandex.ru>
-Date: Thu, 12 Sep 2024 18:59:39 +0300
+	s=arc-20240116; t=1726157049; c=relaxed/simple;
+	bh=wsDv/arzCurRGG01CnlJKHW8usTiuaP12/HqZwORRYc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ZR8r1vgj6KaUi8ei59Is02KCsjeKnHvPQFwd7wSEQvSC1gWPLRABnkaZ9Lv5osqnESQM31lY4B7GCh3ywYoFb+N/wPF13k13rSclY1UTcHpa1zJ/kmqHV117dpDC4I1tS2VMcxk3H0xBaIs3tl5xML3EiJX4jN6uiPlwu5NfEYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=IBqgYdhP; arc=none smtp.client-ip=217.79.154.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
+X-Virus-Scanned: amavisd-new at emenem.pl
+Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
+	(authenticated bits=0)
+	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 48CG3YP5005529
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Thu, 12 Sep 2024 18:03:36 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
+	t=1726157019; bh=LB5PI2X1hzWTYFdIScuV1AnGwjQxdobearLktnQZJbQ=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To;
+	b=IBqgYdhPTW43M0+KGOJgEdFmBSNsmKpa4QZQ6NWHqLArVPJHynNn7OwL79ioqUn9S
+	 ChFMDQ/pikgXbYgfvlO01PQaZouMYxB3Jsty7XnEYOyyeur3jTBRHmfPhNbM7bdwFC
+	 aWvLo+qmu+75keuoduOu9ZrBAr0stKXiz+NYpie8=
+Message-ID: <f8ebfe69-d169-4e97-9191-4fb06db3a9fc@ans.pl>
+Date: Thu, 12 Sep 2024 09:03:33 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,84 +52,90 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- lvc-project@linuxtesting.org
-References: <20240905064257.3870271-1-dmantipov@yandex.ru>
- <Zt3up5aOcu5icAUr@pop-os.localdomain>
- <5d23bd86-150f-40a3-ab43-a468b3133bc4@yandex.ru>
- <ZuEdeDBHKj1q9NlV@pop-os.localdomain>
- <1ae54555-0998-4c76-bbb3-60e9746f9688@yandex.ru>
- <ZuHJQitSaAYFRFNB@pop-os.localdomain>
+Subject: Re: [PATCH net-next 2/4] mlx4: Use MLX4_ATTR_CABLE_INFO instead of
+ 0xFF60 magic value
+From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
+To: Ido Schimmel <idosch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Yishai Hadas <yishaih@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        linux-rdma@vger.kernel.org
+References: <12a1d143-35d6-43f3-b8b3-ab0198f5540a@ans.pl>
 Content-Language: en-US
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- A/UwwXBRuvydGV0=
-Subject: Re: [PATCH RFC net] net: sockmap: avoid race between
- sock_map_destroy() and sk_psock_put()
-In-Reply-To: <ZuHJQitSaAYFRFNB@pop-os.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <12a1d143-35d6-43f3-b8b3-ab0198f5540a@ans.pl>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 9/11/24 7:45 PM, Cong Wang wrote:
+On 11.09.2024 at 23:40, Krzysztof Olędzki wrote:
+> Use MLX4_ATTR_CABLE_INFO instead of 0xFF60 magic value.
+> 
+> Also, remove MLX4_ATTR_EXTENDED_PORT_INFO which should have been done in
+> commit 8154c07fe14e ("mlx4_core: Get rid of redundant ext_port_cap flags").
 
-> I guess you totally misunderstand my point. As a significant sockmap
-> contributor, I am certainly aware of sockmap users. My point is that I
-> needed to narrow down the problem to CONFIG_RDS when I was debugging it.
+Turns out this is not true, as it is still used in ib_link_query_port() from drivers/infiniband/hw/mlx4/main.c
 
-I've narrowed down the problem to possible race condition between two
-functions. "Narrowing down" the problem to a 17.5Kloc-sized subsystem
-is not too helpful.
+Will wait for other comments and then send v2, for consistency how about I'll move cpu_to_be16() into that function?
 
-> So, please let me know if you can still reproduce this after disabling
-> CONFIG_RDS, because I could not reproduce it any more. If you can,
-> please kindly share the stack trace without rds_* functions.
+> 
+> Signed-off-by: Krzysztof Piotr Oledzki <ole@ans.pl>
+> ---
+>  drivers/net/ethernet/mellanox/mlx4/port.c | 8 ++++----
+>  include/linux/mlx4/device.h               | 2 +-
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx4/port.c b/drivers/net/ethernet/mellanox/mlx4/port.c
+> index 6dbd505e7f30..1ebd459d1d21 100644
+> --- a/drivers/net/ethernet/mellanox/mlx4/port.c
+> +++ b/drivers/net/ethernet/mellanox/mlx4/port.c
+> @@ -2052,7 +2052,7 @@ static int mlx4_get_module_id(struct mlx4_dev *dev, u8 port, u8 *module_id)
+>  	inmad->class_version = 0x1;
+>  	inmad->mgmt_class = 0x1;
+>  	inmad->base_version = 0x1;
+> -	inmad->attr_id = cpu_to_be16(0xFF60); /* Module Info */
+> +	inmad->attr_id = cpu_to_be16(MLX4_ATTR_CABLE_INFO);
+>  
+>  	cable_info = (struct mlx4_cable_info *)inmad->data;
+>  	cable_info->dev_mem_address = 0;
+> @@ -2071,7 +2071,7 @@ static int mlx4_get_module_id(struct mlx4_dev *dev, u8 port, u8 *module_id)
+>  		ret = be16_to_cpu(outmad->status);
+>  		mlx4_warn(dev,
+>  			  "MLX4_CMD_MAD_IFC Get Module ID attr(%x) port(%d) i2c_addr(%x) offset(%d) size(%d): Response Mad Status(%x) - %s\n",
+> -			  0xFF60, port, I2C_ADDR_LOW, 0, 1, ret,
+> +			  MLX4_ATTR_CABLE_INFO, port, I2C_ADDR_LOW, 0, 1, ret,
+>  			  cable_info_mad_err_str(ret));
+>  		ret = -ret;
+>  		goto out;
+> @@ -2170,7 +2170,7 @@ int mlx4_get_module_info(struct mlx4_dev *dev, u8 port,
+>  	inmad->class_version = 0x1;
+>  	inmad->mgmt_class = 0x1;
+>  	inmad->base_version = 0x1;
+> -	inmad->attr_id = cpu_to_be16(0xFF60); /* Module Info */
+> +	inmad->attr_id = cpu_to_be16(MLX4_ATTR_CABLE_INFO);
+>  
+>  	if (offset < I2C_PAGE_SIZE && offset + size > I2C_PAGE_SIZE)
+>  		/* Cross pages reads are not allowed
+> @@ -2195,7 +2195,7 @@ int mlx4_get_module_info(struct mlx4_dev *dev, u8 port,
+>  		ret = be16_to_cpu(outmad->status);
+>  		mlx4_warn(dev,
+>  			  "MLX4_CMD_MAD_IFC Get Module info attr(%x) port(%d) i2c_addr(%x) offset(%d) size(%d): Response Mad Status(%x) - %s\n",
+> -			  0xFF60, port, i2c_addr, offset, size,
+> +			  MLX4_ATTR_CABLE_INFO, port, i2c_addr, offset, size,
+>  			  ret, cable_info_mad_err_str(ret));
+>  
+>  		if (i2c_addr == I2C_ADDR_HIGH &&
+> diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
+> index a75bfb2a4438..4f2ff466b459 100644
+> --- a/include/linux/mlx4/device.h
+> +++ b/include/linux/mlx4/device.h
+> @@ -265,7 +265,7 @@ enum {
+>  };
+>  
+>  
+> -#define MLX4_ATTR_EXTENDED_PORT_INFO	cpu_to_be16(0xff90)
+> +#define MLX4_ATTR_CABLE_INFO		0xff60
+>  
+>  enum {
+>  	MLX4_BMME_FLAG_WIN_TYPE_2B	= 1 <<  1,
 
-Yes, this issue requires CONFIG_RDS and CONFIG_RDS_TCP to reproduce. But
-syzbot reproducer I'm working with doesn't create RDS sockets explicitly
-(with 'socket(AF_RDS, ..., ...)' or so). When two options above are enabled,
-the default network namespace has special kernel-space socket which is
-created in 'rds_tcp_listen_init()' and (if my understanding of the namespaces
-is correct) may be inherited with 'unshare(CLONE_NEWNET)'. So just enabling
-these two options makes the kernel vulnerable.
-
-So I'm still gently asking you to check whether there is a race condition
-I've talked about. Hopefully this shouldn't be too hard for a significant
-sockmap contributor.
-
-Dmitry
 
