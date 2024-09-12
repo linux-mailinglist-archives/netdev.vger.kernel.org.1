@@ -1,89 +1,86 @@
-Return-Path: <netdev+bounces-127639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D966A975F03
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:40:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B70A8975F24
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 04:49:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AA6F285777
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:40:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78EAE28567A
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 02:49:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6069F7581A;
-	Thu, 12 Sep 2024 02:40:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC55524D7;
+	Thu, 12 Sep 2024 02:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="PvrHir5T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IEBW6Fut"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744722A1D6
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 02:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38AE81E4A2;
+	Thu, 12 Sep 2024 02:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726108836; cv=none; b=d1SNTrevkN5Qke3hejqjToq63HZlzmxZC2B1e9w9ThUXJxnEDxFRrrj2WfqLmifXrEp9W1z+pg3Q0OfSq2vkHYQTw5t5w9Vr9Un0ihK4g+ImmCyYh4JwBknXQJsJT15tnfRS7Pflu+2q+36ABShFpN6r+LMge37jPgnsv7ipuTQ=
+	t=1726109348; cv=none; b=TboeKrZ4/XH/ElG1c/lgfGcxpPdBbefWsMhLR6HhMuT4zg1bvrQKGU/ien/VgaHCaJl+Rxii4LbwMWxfV7XI4QrD1mPwd/LBclA8DXdKsJhgSU5y4llLNWfwUiT8svJwlwFJXByrMQs5fLwEwUCXedqs2WqTg/dVZKdiTxuMRn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726108836; c=relaxed/simple;
-	bh=ikMaM0e3Ao7ipftHTCb/8lPOjUaaOs0Rn2KOeeVjgC0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W8qPVaBfnDcTpGK4zGTcmlkb6sgZiTCxUHy5UmkWsdeRDZB7Aq3LqhqlaScOUabPe6UutrTETrKqqp9UeAyDyk2yMcuouid4GVGCZKLfrGlcK7eLmkBJWhr8c6m6tcRCB09HrJ1+fG3C7F0v6hLKuWmKrL40J1ATPSZW+st53Kw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=PvrHir5T; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6802A3F5E4
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 02:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1726108830;
-	bh=9xFVQgF67aC4OrVJ8fcF8pG0+PqyehAIbGoYV6EaEXc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version;
-	b=PvrHir5TQIGlyT73DZRu9Aqt870HO5r5PevgUhCUc8D27TWUEhL7lNkykKjI7AZGp
-	 606sNUKZHn3PhmDX0b0coyiIu92iD55AGPZTWBHc22Iov0hbVF/k9XseT1UfxhmF6e
-	 7wmVHQznfkeJmwIniHEk34ul1nr7Tt2IHdC99ZXMlyyLlL2oA80J9P7uhzcnAbmXZ3
-	 GyzWca8r8veZlNpRVODdt/ST41ZFvkIUZ9jCPV/YPortcxo9rqpVZy+4g+35GTymCN
-	 pmCnOH/rNK0Of7M0Ji+5b4lMnIXBtD8C29ravi96kiT4x3J2T60C6+FuU3lCe9RNMQ
-	 SFjjtQbGptkxg==
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-718f3c2fcffso601717b3a.3
-        for <netdev@vger.kernel.org>; Wed, 11 Sep 2024 19:40:30 -0700 (PDT)
+	s=arc-20240116; t=1726109348; c=relaxed/simple;
+	bh=tAM95XGTzbapPftXsftKEV3TNf2Al+BWzAnhD70VsNM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TA4/LkM0M8ILD7lFXNPgHtGoNVIvF1zfw+iZSKC0XQMnKwgqT2ZWnYwX+RYZk0UAlV6dOMHMQNP35UA0v9wLuUXJUsQ5fNEEOPs1yy3sDtY0SZL5pQlk2yV5vBRpEOzivxg1zwJRIiFLWskn4nZLBXP7l/uLbu3C/DOIW/tYCh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IEBW6Fut; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2053f6b8201so4559105ad.2;
+        Wed, 11 Sep 2024 19:49:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726109346; x=1726714146; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4fkjJuBXsGdganvltri3POVXvXTvnOSAc4m3VYvsJR4=;
+        b=IEBW6FutdzjfPwYLleEUxLDfaqqDIHMUVN+pEQ3pO0c2KU6duOeio79jgN9R12LTHl
+         /1UolEGhtOt9RoKLhByVmMkBpDJFkr7hHpE98jd+xaJH1g6J2g+0stewARv2SwxjB+s7
+         34ZN153oCoWvrgdIKjdAmn/Nir0YAMuR3gltJRMfdQQ/26puvEE/Z4iLqjBRPxlaWw5d
+         shijYlWWkCi50PgfiEkRV/FOke4gCNeS1RWd4xoDM1KYgIyoQjIUQADIyKm+1mFNlV3+
+         QYI9nrq7oq2pEVUe0C+Rv0bA8adEggxoix79JM9SVaTTK67pGWZ2ACqptCC+rCvsnB7U
+         0IPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726108829; x=1726713629;
+        d=1e100.net; s=20230601; t=1726109346; x=1726714146;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=9xFVQgF67aC4OrVJ8fcF8pG0+PqyehAIbGoYV6EaEXc=;
-        b=cRJhJMiBTP33mXyNyBjtxtPqult3FcmoUXnrFMaYG5JoKd5MNEzewLSBdDBjk5sr8t
-         kd4FCOXV3m9MdbOWvhWEBBuMOBVQSiJqwGVdqcn+wkx0D84JVRdCjFQG8sUv//rdLBvw
-         oCwIulG5mucGGQisAEvZ+JztTz/K4iPKDTnSYrGCOdff1GVGSnNbUtFkRdLAu8Q5+ucq
-         b2FcMUC6Z12jkXGjQPEyhYRlXqeLLAveJuJVrIwxdTxCYs2AwaFKZFiWRpvYnXwYEl/J
-         osKpF/DL7f+7hhDqxDUthrezEElJ8YJaQO9V1wguYXAjya7tNCmzqUSqz/kCICmK9LE0
-         nHZQ==
-X-Gm-Message-State: AOJu0YyjANLYxjo2x7ZM+8IHhp9H9qkOz/sLvX5sIu86jped8BULrJVG
-	V/a0cxy7RtAy0Xnn8hMeoYIaFkyBy4MJbqqVD1MJUS2Svc6LdPZl6WzfxsCLdQCVlNtPTIaKY9O
-	NM7HzfwKAtkOWk8wdFvJ828LhgGzJkuT2wOx2OCjb0PfDs6uR7no+bNLqZQ1pcoHwzoxRGw==
-X-Received: by 2002:a05:6a00:92a0:b0:70d:2cf6:5e6 with SMTP id d2e1a72fcca58-71926088d5emr1933896b3a.15.1726108827971;
-        Wed, 11 Sep 2024 19:40:27 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEaviSHj/QrkbosoIlU6MgMiMW0fyAitvLrdX8wODPdF2LNcNsCgKg006w5bbU36gO297fcIA==
-X-Received: by 2002:a05:6a00:92a0:b0:70d:2cf6:5e6 with SMTP id d2e1a72fcca58-71926088d5emr1933867b3a.15.1726108827544;
-        Wed, 11 Sep 2024 19:40:27 -0700 (PDT)
-Received: from localhost (211-75-139-218.hinet-ip.hinet.net. [211.75.139.218])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-71908fc8d53sm3642285b3a.38.2024.09.11.19.40.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Sep 2024 19:40:27 -0700 (PDT)
-From: Atlas Yu <atlas.yu@canonical.com>
-To: edumazet@google.com,
+        bh=4fkjJuBXsGdganvltri3POVXvXTvnOSAc4m3VYvsJR4=;
+        b=JkLyhkPj1SqwcnmH0M1XQ5iFypkA6AHI2Di90ATOAEuSKvfLlgmFoSgVzMQ7pmnfPd
+         i4xK7ILyZUQejWfJw8UuFVrH/6foXr9eQzEpZEEDVWrYzUZ7E3dRh7sCSK6AsYQQWp5I
+         /2vmSE1x47YA5hM3z7fNpqXVDRAhm0irik3XW8ae/BnhHzNDdO6fF7D18qUCVCin9PFr
+         AMDejOLTzSNfBoVKpUz17miHj2t154SbHzv6CQzrUyV40qpteUPYicDh2D8zRjlUzYeK
+         6ZkJE6aZEk1hqHS6D2KLKXkvJGcZRVUeDDdW1ql91mm/zMxmJGekUtDGaTAwStO11KT6
+         gXhw==
+X-Forwarded-Encrypted: i=1; AJvYcCXUucwB2BgO9qU1l2mjfZHTFnw/6Oc7HUqxmpts65xQYd9hOIhlijm4FDx9s6fDlmoSDee1WUJquAMI/Mw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmAXdep/5CGEWH/YhcTB4XSZEsTFYOrWoFcyN/S9MLV+vN+FZw
+	twxicf8wjQqd1YwKAVR/5u7/WZT7KzFAcy6xl0uSrDEw5FJHkkkyj+/EGNA6
+X-Google-Smtp-Source: AGHT+IHA8DfiFFRviUD4f3bxvHEivYR9Io0vIEajbxKVVrUJBB58GqHng4vf8V7gdxeBA4alu50lFw==
+X-Received: by 2002:a17:90b:4b45:b0:2da:5347:b0fa with SMTP id 98e67ed59e1d1-2db9ffb137dmr1703060a91.18.1726109346308;
+        Wed, 11 Sep 2024 19:49:06 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dadbfe4897sm11457868a91.7.2024.09.11.19.49.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Sep 2024 19:49:05 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: andrew@lunn.ch,
 	davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	stephen@networkplumber.org
-Cc: netdev@vger.kernel.org,
-	Atlas Yu <atlas.yu@canonical.com>
-Subject: [PATCH net v1] netlink: optimize the NMLSG_OK macro
-Date: Thu, 12 Sep 2024 10:40:18 +0800
-Message-ID: <20240912024018.8117-1-atlas.yu@canonical.com>
-X-Mailer: git-send-email 2.43.0
+	linux-kernel@vger.kernel.org,
+	jacob.e.keller@intel.com,
+	horms@kernel.org,
+	sd@queasysnail.net,
+	chunkeey@gmail.com
+Subject: [PATCHv5 net-next 0/9] net: ibm: emac: modernize a bit
+Date: Wed, 11 Sep 2024 19:48:54 -0700
+Message-ID: <20240912024903.6201-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,35 +89,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When nlmsg_len >= sizeof(hdr) and nlmsg_len <= len are true, we can set
-up an inequation: len >= nlmsg_len >= sizeof(hdr), which makes checking
-len >= sizeof(hdr) useless.
+v2: removed the waiting code in favor of EPROBE_DEFER.
+v3: reverse xmas order fix, unnecessary assignment fix, wrong usage of
+EPROBE_DEFER fix.
+v4: fixed line length warnings and unused goto.
+v5: Add back accidentally left out commit
 
-gcc -O3 cannot optimize ok1 to generate the same instructions as ok2 on
-x86_64 (not investigated on other architectures).
-  int ok1(int a, int b, int c) { return a >= b && c >= b && c <= a; }
-  int ok2(int a, int b, int c) { return c >= b && c <= a; }
+Rosen Penev (9):
+  net: ibm: emac: use devm for alloc_etherdev
+  net: ibm: emac: manage emac_irq with devm
+  net: ibm: emac: use devm for of_iomap
+  net: ibm: emac: remove mii_bus with devm
+  net: ibm: emac: use devm for register_netdev
+  net: ibm: emac: use netdev's phydev directly
+  net: ibm: emac: replace of_get_property
+  net: ibm: emac: remove all waiting code
+  net: ibm: emac: get rid of wol_irq
 
-Signed-off-by: Atlas Yu <atlas.yu@canonical.com>
----
- include/uapi/linux/netlink.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/ethernet/ibm/emac/core.c | 219 +++++++++------------------
+ drivers/net/ethernet/ibm/emac/core.h |   4 -
+ 2 files changed, 71 insertions(+), 152 deletions(-)
 
-diff --git a/include/uapi/linux/netlink.h b/include/uapi/linux/netlink.h
-index f87aaf28a649..85dcfa6b33af 100644
---- a/include/uapi/linux/netlink.h
-+++ b/include/uapi/linux/netlink.h
-@@ -104,8 +104,7 @@ struct nlmsghdr {
- #define NLMSG_NEXT(nlh,len)	 ((len) -= NLMSG_ALIGN((nlh)->nlmsg_len), \
- 				  (struct nlmsghdr *)(((char *)(nlh)) + \
- 				  NLMSG_ALIGN((nlh)->nlmsg_len)))
--#define NLMSG_OK(nlh,len) ((len) >= (int)sizeof(struct nlmsghdr) && \
--			   (nlh)->nlmsg_len >= sizeof(struct nlmsghdr) && \
-+#define NLMSG_OK(nlh,len) ((nlh)->nlmsg_len >= sizeof(struct nlmsghdr) && \
- 			   (nlh)->nlmsg_len <= (len))
- #define NLMSG_PAYLOAD(nlh,len) ((nlh)->nlmsg_len - NLMSG_SPACE((len)))
- 
 -- 
-2.43.0
+2.46.0
 
 
