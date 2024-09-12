@@ -1,157 +1,120 @@
-Return-Path: <netdev+bounces-127833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36D38976C4A
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:37:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02079976C4F
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:41:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D68E21F22D5E
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:37:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B4ACB20E13
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D80D91B1D5F;
-	Thu, 12 Sep 2024 14:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UqmkcdBv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641221B29C2;
+	Thu, 12 Sep 2024 14:40:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDBB1AD279;
-	Thu, 12 Sep 2024 14:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E7C3D556;
+	Thu, 12 Sep 2024 14:40:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726151869; cv=none; b=naAswUt9bUTjzyAPPCP4159AD8sL6wN8PuurlC7c1Dm6a2BY9wa8ORlOFEpV3P9/fxk+TxnNr/tAyueDoAbSn802yp3qGnF5kPVAh6FUDbC43Zk8aJgIHghtUpb5j8Hg7Rx8m86zUkJBJAwDbFOfuQZ4SrJsJVsxEx9jSYCn/c8=
+	t=1726152059; cv=none; b=mrMG4ZDpD2fzVdMwto1dEzOXPwee8+6YMF5uF7zmsktlfrGvwQDP31L9KXCzT+TjEypwNU9Kv2Q7axz7r/6mTX7X78v37TuMUy9HQoEMmTeqpe6QTmz1Kna5O0jEcowYzP5EBKrZ8z5HXkqlMOSVv3sO2tkUoNNjiIZt+tm4YhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726151869; c=relaxed/simple;
-	bh=aaWSOI6MHJpLiPOnj5+JUWz8WRVEzc2V3HK4lxMCrXg=;
+	s=arc-20240116; t=1726152059; c=relaxed/simple;
+	bh=5Q8EeO7IWmCisueTMEdgf82zML0ivjll3WApTztREac=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HymfjYSMgQv5JK2IpheqPQImq2bU1UEJqwg5GdhXSAeSoyzIir0c7Usfr+P/iY91RKieuWy2ZJ7mEk4xa6Wm3kpVDWnHzD2YZQ/aFndzDz1BtlVGKDjz4sQ3MLQQCdk1SDJvFfqO12V3PlLARNqoNkeW7inGNB2WfWGjHcd26M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UqmkcdBv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63210C4CEC3;
-	Thu, 12 Sep 2024 14:37:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726151869;
-	bh=aaWSOI6MHJpLiPOnj5+JUWz8WRVEzc2V3HK4lxMCrXg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UqmkcdBva718XKuLTmddQooosXpq27yFyMFL567h3OryjxwVrDJOdtHm5QJaKCxcm
-	 93KB1ZBPVPNnvAtgJDn1WHP9ywGz+muzfZorn2eHYEmO1kCCd7e1K6wRph5z9yE6Ve
-	 GvjMTETF6ht/xp8V5qLMdt1aYPVSBmiDt0GE9/aNzg1JAMwFYoc1WNVHZC/aMTUbsG
-	 RUj4a4KfesifilOHjhd81AGQhorbOiKV1m+Ri/V/X4egcafHZpHZ7/m+Lu0k2a5jER
-	 XNFJMwDf8ZMPCYPcpNQFAgR16FubTNv5NRBuJo49G68/ghUhWQc6Znzxr8urVYRXF0
-	 6y4w7XLpj3RoQ==
-Date: Thu, 12 Sep 2024 15:37:40 +0100
-From: Lee Jones <lee@kernel.org>
-To: Herve Codina <herve.codina@bootlin.com>, Arnd Bergmann <arnd@arndb.de>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>,
-	Andy Shevchenko <andy.shevchenko@gmail.com>,
-	Simon Horman <horms@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Derek Kiernan <derek.kiernan@amd.com>,
-	Dragan Cvetic <dragan.cvetic@amd.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	UNGLinuxDriver@microchip.com, Rob Herring <robh@kernel.org>,
-	Saravana Kannan <saravanak@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-pci@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	Allan Nielsen <allan.nielsen@microchip.com>,
-	Luca Ceresoli <luca.ceresoli@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>
-Subject: Re: [PATCH v5 3/8] mfd: syscon: Add reference counting and device
- managed support
-Message-ID: <20240912143740.GD24460@google.com>
-References: <20240808154658.247873-1-herve.codina@bootlin.com>
- <20240808154658.247873-4-herve.codina@bootlin.com>
- <20240903153839.GB6858@google.com>
- <20240903180116.717a499b@bootlin.com>
- <20240909095203.3d6effdb@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XMk9RcaJQlI2jixtquynndJmOi0o+Apc6stSjFsUVVcYB5c+aclR8niFeCutYQw/DRBZQHE5gqPaZgMBnJ74PsdJwwDwSeWBgghai7TXwsY283nhAlLB3h6tEnvM1SH9mbzTA9H66k+/eZhZnN/Heg7z+8Fq5Ht3eB+NAmR+qTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a8a706236bfso80554666b.0;
+        Thu, 12 Sep 2024 07:40:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726152056; x=1726756856;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QLdXsCii9/gYxEQoBDMcsRP0n0Dk6hYYTZqqP6ceFgo=;
+        b=wBrfdE6Lde9BgOCsBTqha9NJbYBbYfLbuudsp73OrvTw28RsjDvW0lqMRw0W6UvUK5
+         B9pNbxF2rA7Gc+kDBFLNKVHntr8W6CJ5Y0AayKsZKL2yzarhaWu6rvMQ9jD5UNdjRchP
+         +wbQ0eHyJjG9bU7NyiWIg4QIUUdwNng/6q93zRtdhTnLYGl4f3n+bHosqC21e3HJx89g
+         /hWq/cQdbG4r+X7MDUbr54n439bQrvEDwHVPshlCGo8K+CUB4Xpl85YNRbdUoMDhY/Zn
+         TEQNlZMZ16BRY9zC4tEcrEzEm5VwG7iu8ccIwra7+xsZw+NEdJkrRsZSklhOnoaSd9X4
+         hEbA==
+X-Forwarded-Encrypted: i=1; AJvYcCV7zqvtxxrSdoVdoA9NcttgZVwrTeEdPMpRU77+segt/vEKyndBhfx3yhEZRDnLcry44BY=@vger.kernel.org, AJvYcCWjckjTofl4H5IkaT+KH+EZBMTH74wnee1z1eSyGnQ3H1rGYy8C8hMIS7va/r/M9kr0+QZXTXKG@vger.kernel.org, AJvYcCXoZOlbilEFjD7mcV/CsPPjqDbzpMT2FE517GgXC5jEv5b2EfFEW6PvSm73txVSwKSwFTjuW+TeBX+fW0qv@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCbGIKLrrD1BZABDStT123Bs+c0ORJEN5c2WKYx17ipAoVy1K+
+	rTf21WLcSc+njqmiuqGtXYs5bOO6WUCa6pX4is+9DF8PgnQrQBbY
+X-Google-Smtp-Source: AGHT+IG93XXZFGRrW1suIchQ7gpC2xDF1Q80orW3dYtGvyPa0Qg72wWYtsceWm22Zo5WWSgNGWmTCA==
+X-Received: by 2002:a05:6402:2551:b0:5c3:cb45:2e with SMTP id 4fb4d7f45d1cf-5c413e0577fmr3046068a12.5.1726152055771;
+        Thu, 12 Sep 2024 07:40:55 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd8cdebsm6544247a12.95.2024.09.12.07.40.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 07:40:55 -0700 (PDT)
+Date: Thu, 12 Sep 2024 07:40:52 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>, andrii@kernel.org, ast@kernel.org,
+	syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
+	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org,
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Subject: Re: [PATCH net-net] tun: Assign missing bpf_net_context.
+Message-ID: <20240912-polite-wooden-jellyfish-acae2f@leitao>
+References: <000000000000adb970061c354f06@google.com>
+ <20240702114026.1e1f72b7@kernel.org>
+ <20240703122758.i6lt_jii@linutronix.de>
+ <20240703120143.43cc1770@kernel.org>
+ <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
+ <20240912122847.x70_LgN_@linutronix.de>
+ <20240912-hypnotic-messy-leopard-f1d2b0@leitao>
+ <9a2a1cce-8d92-4d10-87ea-4cdf1934d5fb@linux.dev>
+ <20240912-organic-spoonbill-of-discourse-ad2e6e@leitao>
+ <20240912143029.x5iudw-g@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240909095203.3d6effdb@bootlin.com>
+In-Reply-To: <20240912143029.x5iudw-g@linutronix.de>
 
-On Mon, 09 Sep 2024, Herve Codina wrote:
-
-> Hi Lee, Arnd,
-> 
-> On Tue, 3 Sep 2024 18:01:16 +0200
-> Herve Codina <herve.codina@bootlin.com> wrote:
-> 
-> > Hi Lee,
+On Thu, Sep 12, 2024 at 04:30:29PM +0200, Sebastian Andrzej Siewior wrote:
+> On 2024-09-12 07:19:54 [-0700], Breno Leitao wrote:
+> > Hello Vadim,
 > > 
-> > On Tue, 3 Sep 2024 16:38:39 +0100
-> > Lee Jones <lee@kernel.org> wrote:
-> > 
-> > > On Thu, 08 Aug 2024, Herve Codina wrote:
-> > >   
-> > > > From: Clément Léger <clement.leger@bootlin.com>
-> > > > 
-> > > > Syscon releasing is not supported.
-> > > > Without release function, unbinding a driver that uses syscon whether
-> > > > explicitly or due to a module removal left the used syscon in a in-use
-> > > > state.
-> > > > 
-> > > > For instance a syscon_node_to_regmap() call from a consumer retrieves a
-> > > > syscon regmap instance. Internally, syscon_node_to_regmap() can create
-> > > > syscon instance and add it to the existing syscon list. No API is
-> > > > available to release this syscon instance, remove it from the list and
-> > > > free it when it is not used anymore.
-> > > > 
-> > > > Introduce reference counting in syscon in order to keep track of syscon
-> > > > usage using syscon_{get,put}() and add a device managed version of
-> > > > syscon_regmap_lookup_by_phandle(), to automatically release the syscon
-> > > > instance on the consumer removal.
-> > > > 
-> > > > Signed-off-by: Clément Léger <clement.leger@bootlin.com>
-> > > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > > > ---
-> > > >  drivers/mfd/syscon.c       | 138 ++++++++++++++++++++++++++++++++++---
-> > > >  include/linux/mfd/syscon.h |  16 +++++
-> > > >  2 files changed, 144 insertions(+), 10 deletions(-)    
+> > On Thu, Sep 12, 2024 at 02:32:55PM +0100, Vadim Fedorenko wrote:
+> > > On 12/09/2024 14:17, Breno Leitao wrote:
+> > > > @@ -72,6 +73,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+> > > >   	struct net_device *peer;
+> > > >   	int len = skb->len;
+> > > > +	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+> > > >   	rcu_read_lock();
 > > > 
-> > > This doesn't look very popular.
+> > > Hi Breno,
 > > > 
-> > > What are the potential ramifications for existing users?
-> > >   
+> > > looks like bpf_net_ctx should be set under rcu read lock...
 > > 
-> > Existing user don't use devm_syscon_regmap_lookup_by_phandle() nor
-> > syscon_put_regmap().
+> > Why exactly?
 > > 
-> > So refcount is incremented but never decremented. syscon is never
-> > released. Exactly the same as current implementation.
-> > Nothing change for existing users.
-> > 
-> > Best regards,
-> > Hervé
+> > I saw in some examples where bpf_net_ctx_set() was set inside the
+> > rcu_read_lock(), but, I was not able to come up with justification to do
+> > the same. Would you mind elaborating why this might be needed inside the
+> > lock?
 > 
-> I hope I answered to Lee's question related to possible impacts on
-> existing drivers.
-> 
-> Is there anything else that blocks this patch from being applied ?
+> It might have been done due to simpler nesting or other reasons but
+> there is no requirement to do this under RCU protection. The assignment
+> and cleanup is always performed task-local.
 
-Arnd usually takes care of Syscon reviews.
+Thanks. I will keep it out of the RCU lock then, as in the patch above.
 
-Perhaps he's out on vacation.
-
-Let's wait a little longer, since it's too late for this cycle anyway.
-
--- 
-Lee Jones [李琼斯]
+--breno
 
