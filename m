@@ -1,120 +1,95 @@
-Return-Path: <netdev+bounces-127834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02079976C4F
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:41:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D01C5976C5B
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:43:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B4ACB20E13
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:41:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B4B01F24057
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 641221B29C2;
-	Thu, 12 Sep 2024 14:40:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665161B373C;
+	Thu, 12 Sep 2024 14:43:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="SXMklcag"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E7C3D556;
-	Thu, 12 Sep 2024 14:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 267651AB6D5;
+	Thu, 12 Sep 2024 14:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726152059; cv=none; b=mrMG4ZDpD2fzVdMwto1dEzOXPwee8+6YMF5uF7zmsktlfrGvwQDP31L9KXCzT+TjEypwNU9Kv2Q7axz7r/6mTX7X78v37TuMUy9HQoEMmTeqpe6QTmz1Kna5O0jEcowYzP5EBKrZ8z5HXkqlMOSVv3sO2tkUoNNjiIZt+tm4YhA=
+	t=1726152202; cv=none; b=mhKuuewfrJ+okDPsnFe9kMZJjgmnMbGVZNIaX1Tdznb8lkaCm7MB/oTz+zYr6TierI0fW6fbVMgFuZXENMcACD/iJsw9K+p0iYaV3PmIPmZrs6bHFeNYrvYQULhPF7BYSgGr3XQc+s2/tVkz8EkbS+9BOiOnIVTu7xdq0N5DmuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726152059; c=relaxed/simple;
-	bh=5Q8EeO7IWmCisueTMEdgf82zML0ivjll3WApTztREac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XMk9RcaJQlI2jixtquynndJmOi0o+Apc6stSjFsUVVcYB5c+aclR8niFeCutYQw/DRBZQHE5gqPaZgMBnJ74PsdJwwDwSeWBgghai7TXwsY283nhAlLB3h6tEnvM1SH9mbzTA9H66k+/eZhZnN/Heg7z+8Fq5Ht3eB+NAmR+qTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a8a706236bfso80554666b.0;
-        Thu, 12 Sep 2024 07:40:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726152056; x=1726756856;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QLdXsCii9/gYxEQoBDMcsRP0n0Dk6hYYTZqqP6ceFgo=;
-        b=wBrfdE6Lde9BgOCsBTqha9NJbYBbYfLbuudsp73OrvTw28RsjDvW0lqMRw0W6UvUK5
-         B9pNbxF2rA7Gc+kDBFLNKVHntr8W6CJ5Y0AayKsZKL2yzarhaWu6rvMQ9jD5UNdjRchP
-         +wbQ0eHyJjG9bU7NyiWIg4QIUUdwNng/6q93zRtdhTnLYGl4f3n+bHosqC21e3HJx89g
-         /hWq/cQdbG4r+X7MDUbr54n439bQrvEDwHVPshlCGo8K+CUB4Xpl85YNRbdUoMDhY/Zn
-         TEQNlZMZ16BRY9zC4tEcrEzEm5VwG7iu8ccIwra7+xsZw+NEdJkrRsZSklhOnoaSd9X4
-         hEbA==
-X-Forwarded-Encrypted: i=1; AJvYcCV7zqvtxxrSdoVdoA9NcttgZVwrTeEdPMpRU77+segt/vEKyndBhfx3yhEZRDnLcry44BY=@vger.kernel.org, AJvYcCWjckjTofl4H5IkaT+KH+EZBMTH74wnee1z1eSyGnQ3H1rGYy8C8hMIS7va/r/M9kr0+QZXTXKG@vger.kernel.org, AJvYcCXoZOlbilEFjD7mcV/CsPPjqDbzpMT2FE517GgXC5jEv5b2EfFEW6PvSm73txVSwKSwFTjuW+TeBX+fW0qv@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCbGIKLrrD1BZABDStT123Bs+c0ORJEN5c2WKYx17ipAoVy1K+
-	rTf21WLcSc+njqmiuqGtXYs5bOO6WUCa6pX4is+9DF8PgnQrQBbY
-X-Google-Smtp-Source: AGHT+IG93XXZFGRrW1suIchQ7gpC2xDF1Q80orW3dYtGvyPa0Qg72wWYtsceWm22Zo5WWSgNGWmTCA==
-X-Received: by 2002:a05:6402:2551:b0:5c3:cb45:2e with SMTP id 4fb4d7f45d1cf-5c413e0577fmr3046068a12.5.1726152055771;
-        Thu, 12 Sep 2024 07:40:55 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c3ebd8cdebsm6544247a12.95.2024.09.12.07.40.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 07:40:55 -0700 (PDT)
-Date: Thu, 12 Sep 2024 07:40:52 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Jakub Kicinski <kuba@kernel.org>, andrii@kernel.org, ast@kernel.org,
-	syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
-	bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
-	eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev,
-	netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org,
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Subject: Re: [PATCH net-net] tun: Assign missing bpf_net_context.
-Message-ID: <20240912-polite-wooden-jellyfish-acae2f@leitao>
-References: <000000000000adb970061c354f06@google.com>
- <20240702114026.1e1f72b7@kernel.org>
- <20240703122758.i6lt_jii@linutronix.de>
- <20240703120143.43cc1770@kernel.org>
- <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
- <20240912122847.x70_LgN_@linutronix.de>
- <20240912-hypnotic-messy-leopard-f1d2b0@leitao>
- <9a2a1cce-8d92-4d10-87ea-4cdf1934d5fb@linux.dev>
- <20240912-organic-spoonbill-of-discourse-ad2e6e@leitao>
- <20240912143029.x5iudw-g@linutronix.de>
+	s=arc-20240116; t=1726152202; c=relaxed/simple;
+	bh=5dPDL/akI8510Bvk9s4NT0x8bg8G/mibEYyLZ1vEnXQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RCvJhrTnfvGM9nEw/yOyc33QtsFsJuIk7J13YDYcB7ZHCOBXeWmM2mfFzErdSnqCVU2JZFHr1NYsRXC6xXfqc2a4kyKYd8WJy6byCRjSuYpe8LY4Fa56kOCCvpXrdl63wWe8784tNv/JPxyVYSCuZCtTwG4n/LB2iwyeb39AeoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=SXMklcag; arc=none smtp.client-ip=117.135.210.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=7ulpk
+	EqvslMLAqlB3/y0tIJkh9m/nwy2+ESqvMYqvhU=; b=SXMklcag1rZ8+Dxq65u8O
+	0NdGCEJ02aWj99OB1rlXbXlvNQ/CC2bC6/8ancP9wswC2G143irpqlVE9qYCr8iz
+	Pb76hFVPuOyF9PG+7dox3IXw1z8aDWKhh6+FM2H5LM89OHqXZNQn676XOkYj9ggc
+	PNWqXvRk2nER/2pHqtr90o=
+Received: from 192.168.0.110 (unknown [117.147.35.238])
+	by gzga-smtp-mta-g2-2 (Coremail) with SMTP id _____wAXC0Xm_eJmecy5Gw--.57154S2;
+	Thu, 12 Sep 2024 22:42:47 +0800 (CST)
+From: Zhengchao Shao <shaozhengchao@163.com>
+To: netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com,
+	shaozhengchao@163.com
+Subject: [PATCH net-next] net/smc: remove useless macros in smc_close.h
+Date: Thu, 12 Sep 2024 22:42:40 +0800
+Message-ID: <20240912144240.8635-1-shaozhengchao@163.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240912143029.x5iudw-g@linutronix.de>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wAXC0Xm_eJmecy5Gw--.57154S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKF15Kw1xCr1fXF43Aw18Xwb_yoWxurX_A3
+	48ur4xW3WrZFn7KrWkKw42vrWvvr4kXrWrZFn0yFy5Ga18tr4UuFsYgFnxA3sI9wsxuFW3
+	XF45Xr4qya42kjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7sRMrWrDUUUUU==
+X-CM-SenderInfo: pvkd065khqwuxkdrqiywtou0bp/1tbizR1YvGV4JIPqTgABsr
 
-On Thu, Sep 12, 2024 at 04:30:29PM +0200, Sebastian Andrzej Siewior wrote:
-> On 2024-09-12 07:19:54 [-0700], Breno Leitao wrote:
-> > Hello Vadim,
-> > 
-> > On Thu, Sep 12, 2024 at 02:32:55PM +0100, Vadim Fedorenko wrote:
-> > > On 12/09/2024 14:17, Breno Leitao wrote:
-> > > > @@ -72,6 +73,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
-> > > >   	struct net_device *peer;
-> > > >   	int len = skb->len;
-> > > > +	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
-> > > >   	rcu_read_lock();
-> > > 
-> > > Hi Breno,
-> > > 
-> > > looks like bpf_net_ctx should be set under rcu read lock...
-> > 
-> > Why exactly?
-> > 
-> > I saw in some examples where bpf_net_ctx_set() was set inside the
-> > rcu_read_lock(), but, I was not able to come up with justification to do
-> > the same. Would you mind elaborating why this might be needed inside the
-> > lock?
-> 
-> It might have been done due to simpler nesting or other reasons but
-> there is no requirement to do this under RCU protection. The assignment
-> and cleanup is always performed task-local.
+After commit 51f1de79ad8e("net/smc: replace sock_put worker by
+socket refcounting") is merged, SMC-COSES_SOCK_PUT_DELAY is no
+longer used. So, remove it.
 
-Thanks. I will keep it out of the RCU lock then, as in the patch above.
+Signed-off-by: Zhengchao Shao <shaozhengchao@163.com>
+---
+ net/smc/smc_close.h | 1 -
+ 1 file changed, 1 deletion(-)
 
---breno
+diff --git a/net/smc/smc_close.h b/net/smc/smc_close.h
+index 634fea2b7c95..9baee2eafc3b 100644
+--- a/net/smc/smc_close.h
++++ b/net/smc/smc_close.h
+@@ -17,7 +17,6 @@
+ #include "smc.h"
+ 
+ #define SMC_MAX_STREAM_WAIT_TIMEOUT		(2 * HZ)
+-#define SMC_CLOSE_SOCK_PUT_DELAY		HZ
+ 
+ void smc_close_wake_tx_prepared(struct smc_sock *smc);
+ int smc_close_active(struct smc_sock *smc);
+-- 
+2.34.1
+
 
