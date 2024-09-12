@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-127898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 195B6976F74
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:20:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45A38976F76
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:22:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D475F284F06
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:20:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BC67284E76
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:22:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 728D81B1402;
-	Thu, 12 Sep 2024 17:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67711BCA18;
+	Thu, 12 Sep 2024 17:22:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="GYMtXO31"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="V5B3B/Nc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 769761EB2A
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 17:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8DD158DD2
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 17:22:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726161617; cv=none; b=p0kDpnbuXpblO4n4bGY0tykwgiezMPipuFRezrein+Txh3Cio6bn3tr6fZdfI0mVgFhh0y1ZI3oYpZGrob0q65ZbXCgRrJINLgFeHaq5zWPRkMXlfkuay9DZEFkw7cqgrSLXNn+vnOJtVtSP1u1NjOtpQjU+Gchmjg0YaGLAOV4=
+	t=1726161759; cv=none; b=bKxQQpAFVibMjf6XXdwDJuLghrfgM0nrLsxIFPKGAmDOysfcyJCZSo5M92DSV0bHMXAcMwcncikqau45yp29OMuCxfrZbQJanH85hjK1t8tYic+LV82A/5BijBrGmrCTX0nWiSF2KpcJNFzDNSvjdCz2Jd4DUOISd7NX2xvttqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726161617; c=relaxed/simple;
-	bh=zuxp/ffiRSeFBwa10fLp69PsdexTfFsicC9F4jcEjug=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g2zDn+nYUAkjpf+tQWmc5k8q6ZGPjHXtL9trSRqj92R7FPnrNjMD2Pv9OHg8himd6pTj3rRkWCpGL7kRvr8l65uC0/1sJYZbljs/hL/95gcmOyBMIKptmdKiM/M+jqlzih/i1lgUiQrB/jau/QKCt6DNwJ7/AMo4yW3gIp+yI+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=GYMtXO31; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1726161759; c=relaxed/simple;
+	bh=+CPiuDILduzJ8yOWSpYZUgUop3k+LBnc7dRgjO39FqI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JP1rjHE7IYFtl0L8C5FoHn0eZnz2TCxwLXl8wfjkv5Fy2Bha6YIE7YrXZdnmMqwnMSpGO1CL1SAN0+FfOMy5lE+K08BjlX4pI9xFOQ5EVkzifRvzPc9kfg/73JaPBqa4F1kHWeuQVhD5F57M2SABesZNhw5Reg1Tej20oRi8vVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=V5B3B/Nc; arc=none smtp.client-ip=209.85.215.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2053525bd90so238445ad.0
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 10:20:15 -0700 (PDT)
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-6bce380eb96so821441a12.0
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 10:22:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1726161614; x=1726766414; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1726161757; x=1726766557; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8xHZ4Uje01zsLE6BJdhmRRJqgkyFY6ipd8JgBKKHu/c=;
-        b=GYMtXO31pIz7FnIS6YVpCLIQwxHS+3x0BrazywxNQ6Nv+9efVf6Cn1VS32P5zNgbjS
-         dxM8TmwVfh/54xjgH7mluY1z6eyItIQuWPUqBaX+JonNqV3XNjgodPUUny4pEPwNmInv
-         kJr/lkBCel3iXXCzN/QKInefj0xwJCW4vaTjRyt6M9BwG0uuhrYH8dhD6rDxnSjJPApa
-         JXHrh+s9O/ukFn9qAhgT6yN/8tGAdI09Yk4fe0Qv36aTn4kgfuwNh6k38taTyRHDdo9+
-         QqgGBA+1rsmZ1TY/yFcl4gJjdelmvfUtu6r+0ifvxMmtsuJoVn+R2nK30ZDLGzjNyC61
-         N7yQ==
+        bh=ovyET/m+2xBCMIdrCLLFfUruKHw9DOajXdhiEGOLTyI=;
+        b=V5B3B/NczMiLj40/PusxL1xDu8QYB6/YRr0v2iRgdIO3pVy9tnHPYOy8uLsbENlTo6
+         Az/pvydMwOkM0qVqjEq4L96Sozpu4DxXgx7PwYB9yphmnRTSH367fAbMR/GooVvnkmhv
+         MvJjCy53jOAnwmfKcT+xA/dIEjRgVVdCioG3f8wd0LnwqNvmydMcOBlC68nky/dNAqDA
+         tXFbNdTUE/hk34KpY+Ih19eMKJzvEHGwm8BkVZHB7+67RLmVdGncX27a1z2ySweGIlaZ
+         gTTqeejElWPPqH7UqMgRy9IJ8p7qCactDsak+59ZTnbfeY3cj+emd9q0ZqRxYC2DfcXV
+         B1Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726161614; x=1726766414;
+        d=1e100.net; s=20230601; t=1726161757; x=1726766557;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8xHZ4Uje01zsLE6BJdhmRRJqgkyFY6ipd8JgBKKHu/c=;
-        b=N+ZenWYRmpZwUhvmqRlxZ5WxeEqOAO6C7kjLr7TRqWxlYkJl8b+4+0+CR5MDCJ9otO
-         hi8vP/25JugWTj7TH9BJQl2EsqToSaPKcjtsGMftDln6NmrV6BVepTWjZ6kzmDLjhiLP
-         4/7zQSBeOKupavx7fU1FVfptOnyv+wGZ48lB36zbA/nekGCvABIyLxBzoNdYyl6KT07/
-         1JHDF0OztJEYKtDir375IZsVkJMuTSj/AmJI0gv0HOHj4oz0Cf+TtmFwYQVsXDtu8bbZ
-         Zmx6CgkHpKpgV7lndzrK2KxAbi/V5ESDTw0ZEZ0a9RblLT/HwRzz8InKXrw3bH8JTy7m
-         Pu+w==
-X-Gm-Message-State: AOJu0Yzp2LMN9c56mvdSlEGQi0dK+YXnGwMhWTWg2Y775CGv15hTXBLA
-	k2H21N9MXBIRF9+mXX11RKB6YZrYPI8/HrMTzV1UHLzwP551bld2ZW5tMepegogqpp81sDrdAMg
-	S
-X-Google-Smtp-Source: AGHT+IGTjLouClY/TCV/gpWouL2gEuYXSYdFwHbfWDSxVQ7d3JK+hGrmZzsFY/xgB7vJNJypkcpTCg==
-X-Received: by 2002:a17:903:41cb:b0:206:ae39:9f4 with SMTP id d9443c01a7336-2076e35ebfamr42015935ad.20.1726161614543;
-        Thu, 12 Sep 2024 10:20:14 -0700 (PDT)
+        bh=ovyET/m+2xBCMIdrCLLFfUruKHw9DOajXdhiEGOLTyI=;
+        b=F5l1w3fYtG8CcTP7r3vk+EcdH2dNO6RNVecGTiAFcPkI1qkQ0BeqLaFpOER3ajF4lo
+         sKw96E1sc+NAXBgi3i3Erz2BmWGnDDNwhSNbxC6p04fsUUowmnAlZ3QX3NNiEHWHz+nj
+         s9uDONra1X6ox5pEDRlwnUhedQ1g0xvnXy7dRHXWR+JKEdDfiYK0cyrnhwEaxHvVohtn
+         tgwYX96wNIvbAoRVKQygzJRXhJcbK40vlAgWPAGPpVIjODm568/uu3fJkBJ93Y2v9Xrs
+         rfNW0Sb1F3vutyy8fxXw92ut4wMx0GNmOz1WW1ZVrOQLwjxG1iZmPFOgs2PpvIsd+mcr
+         wPBg==
+X-Gm-Message-State: AOJu0Ywq78Eit3U/Jk0MZd5pe6NNSHguAGZee31PygipdMrvt/ta0wfe
+	ApAX24YDe7NEEpOzZVh3bUos2fYl3HzvMRDRSs6hlfkleq3wzCcRd9ZHluMX+ySWZM3XSO7irXd
+	F
+X-Google-Smtp-Source: AGHT+IFH6tx9bfibw/7Yo/9XlyPZnh0dbaYYLqIIAh6gWKuPyQ5micbtfpuZSky+nAzY62tn3Z9MoQ==
+X-Received: by 2002:a05:6a21:1698:b0:1cf:499c:f918 with SMTP id adf61e73a8af0-1cf75eb9258mr4815237637.18.1726161757122;
+        Thu, 12 Sep 2024 10:22:37 -0700 (PDT)
 Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076b01b3fasm16385055ad.289.2024.09.12.10.20.13
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71908fca189sm4818501b3a.23.2024.09.12.10.22.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 10:20:14 -0700 (PDT)
+        Thu, 12 Sep 2024 10:22:36 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute] man: replace use of word segregate
-Date: Thu, 12 Sep 2024 10:19:53 -0700
-Message-ID: <20240912172003.13210-1-stephen@networkplumber.org>
+Subject: [PATCH iproute] man: replace use of term whitelist
+Date: Thu, 12 Sep 2024 10:22:03 -0700
+Message-ID: <20240912172226.13352-1-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -80,28 +80,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The term segregate carries a lot of racist baggage in the US.
-It is on the Inclusive Naming word list.
-See: https://inclusivenaming.org/word-lists/tier-3/segregate/
+Avoid use of term whitelist because it propgates white == good
+assumptions. Not really neede on the man page.
+See: https://inclusivenaming.org/word-lists/tier-1/whitelist/
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- man/man8/ip-rule.8 | 2 +-
+ man/man8/tc-ife.8 | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/man/man8/ip-rule.8 b/man/man8/ip-rule.8
-index d10b8b21..48f8222f 100644
---- a/man/man8/ip-rule.8
-+++ b/man/man8/ip-rule.8
-@@ -220,7 +220,7 @@ select the destination prefix to match.
- select the incoming device to match. If the interface is loopback,
- the rule only matches packets originating from this host. This means
- that you may create separate routing tables for forwarded and local
--packets and, hence, completely segregate them.
-+packets and, hence, completely separate them.
+diff --git a/man/man8/tc-ife.8 b/man/man8/tc-ife.8
+index fd2df6c3..7565c592 100644
+--- a/man/man8/tc-ife.8
++++ b/man/man8/tc-ife.8
+@@ -120,7 +120,7 @@ Match with skb mark of 17:
  
- .TP
- .BI oif " NAME"
+ Configure the sending side to encode for the filters above. Use a destination
+ IP address of 192.168.122.237/24, then tag with skb mark of decimal 17. Encode
+-the packaet with ethertype 0xdead, add skb->mark to whitelist of metadatum to
++the packaet with ethertype 0xdead, add skb->mark to allowed list of metadatum to
+ send, and rewrite the destination MAC address to 02:15:15:15:15:15.
+ 
+ .RS
 -- 
 2.45.2
 
