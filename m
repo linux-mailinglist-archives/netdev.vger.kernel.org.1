@@ -1,141 +1,157 @@
-Return-Path: <netdev+bounces-127710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 041D09762B8
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:31:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0443A9762BD
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:33:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 374B81C2333F
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:31:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 370AB1C22404
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FB218BC39;
-	Thu, 12 Sep 2024 07:31:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3225D18DF90;
+	Thu, 12 Sep 2024 07:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="igidT5i6"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CWEpvclX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB6518BC34;
-	Thu, 12 Sep 2024 07:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1063178C7B;
+	Thu, 12 Sep 2024 07:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726126285; cv=none; b=fy8APF+hbfgPuK8De2GxoVoDP9KPyoG543K0Zf+WDtxRxz7axps5twXL6OPhW7GIzUrl8AnrfFHiLwPCPVwsSeMXP6Eil/RiQcSnpdUiZyMEpuiNGugKQqwVAju/SX+sCT0vrdI/VXqVSUXoZzuUCUnIAYjcyQ68jUNY3QS3Yjc=
+	t=1726126382; cv=none; b=MgbMIpY5CxfppGLhDp7HAltgOYXO3N1+n8TNqK7Y3pjFJ9y7CfFNBJ3i/JOXwVYvJMf0HKR3H2o7IYedYOm424Qz1tCwxmulpwOqRhyiwGZjyfX/x5enldf3iIpx1QgnAojL9tJEY7L5wz3Ie5Tz4Sd69ZCetVAh+wcrkpC6GBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726126285; c=relaxed/simple;
-	bh=Qjd/2vEv6cDDhx4kT/W7J1TOl49DryW7hpUIRS+bdQI=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=XGZKBJQ7t+3NIU19px7hDO1GKm4KVLjaprr5e+p10slNXFPYZH8QwkgME1h19RkvmibXfRHZl6k6MFQOw8Kuqv30yAjziSBrdH/RnnDp3lLo5H1Pc40LPlRgjcQsOcnsHfvJXeCJXxtnvL1+jR3XgOMP8m+IlmGfIQW/eBzC7ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=igidT5i6; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1726126279; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=Gn7Rgru6zf1coeblHX+Gt/mTQByJxXbKoW7M8vaCPfo=;
-	b=igidT5i6UZq4C9LB14NOvke4ljCX+nI/COuJ/Po6ZuOPIw1H1YtEt2xMxaB1zJ0k1HWG7Ex3bdPL24Eow6S+G1dHXkihcGEZq05ZvxUwz5dLYf8CHXVLZucIMuNlmMh06FnTRpV1kGLOKqQ+HMOVMZrFYeFZaPmQMkw66AAuZmA=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WEqceuJ_1726126278)
-          by smtp.aliyun-inc.com;
-          Thu, 12 Sep 2024 15:31:18 +0800
-Message-ID: <1726126234.0404134-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next 02/13] virtio_ring: split: harden dma unmap for indirect
-Date: Thu, 12 Sep 2024 15:30:34 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240820073330.9161-1-xuanzhuo@linux.alibaba.com>
- <20240820073330.9161-3-xuanzhuo@linux.alibaba.com>
- <CACGkMEuN6mFv2NjkA-NFBE2NCt0F1EW5Gk=X0dC4hz45Ns+jhw@mail.gmail.com>
-In-Reply-To: <CACGkMEuN6mFv2NjkA-NFBE2NCt0F1EW5Gk=X0dC4hz45Ns+jhw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1726126382; c=relaxed/simple;
+	bh=A0OLi+CRloHyK/Ua4rHjaFAPFQYO8jOgh8kX9YifaN0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tQGSembQjBmyHcwvSp6ftGwrinx/Bbfwz0Rnnv6Q+PblYdNJSvV0f32wdudIoo9Bin3UEm9IK3Dltj8ZM3pSPNNMdDuYvQHQOnxgfKOaBTTAoD5SDadrEcM3BOY/+J+gEeVzsNheap7dJGM5RSOokYt5dbT6bz62MiVylIX5EBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CWEpvclX; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1726126380; x=1757662380;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=A0OLi+CRloHyK/Ua4rHjaFAPFQYO8jOgh8kX9YifaN0=;
+  b=CWEpvclX97d2Yrq9XxSVEETrq4ydiUk4STBJlqts65R3soA9H7FCMvxl
+   v4OkInI78IHyNMjW66LuKKJREh7gVkaDTerHhwXhLMdXGJvStPPIKpou3
+   6KloXlGhdDHAcMsgN0Ss/1S4/hSaKmO8QIW7sEai9XordKoPbU1C0jr7p
+   CKkCWn3zAOB1YCiMV6G9be8iiDyWGnC9dtZZG8+PD2Rj5GY3WLSBxbQq8
+   2jND3WG4xF3up5uhkBMiGiqdLO+kseaNSgieHHssu/f5zJNHZ1xGUFFwy
+   Q9/Wjb+UN+yz5kaZNLqulIw5hYbDOrRFh8Rv/QN5rBIKfnPoS6kBgj2y6
+   A==;
+X-CSE-ConnectionGUID: LpRQBBlMQkGueR9dw36uBA==
+X-CSE-MsgGUID: f7yaRPOpS069i9Newcnl4A==
+X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
+   d="asc'?scan'208";a="31577165"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Sep 2024 00:32:58 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 12 Sep 2024 00:32:23 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex01.mchp-main.com (10.10.85.143)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Thu, 12 Sep 2024 00:32:20 -0700
+Date: Thu, 12 Sep 2024 08:31:46 +0100
+From: Conor Dooley <conor.dooley@microchip.com>
+To: WangYuli <wangyuli@uniontech.com>
+CC: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	<stable@vger.kernel.org>, <gregkh@linuxfoundation.org>, <sashal@kernel.org>,
+	<william.qiu@starfivetech.com>, <emil.renner.berthing@canonical.com>,
+	<xingyu.wu@starfivetech.com>, <walker.chen@starfivetech.com>,
+	<robh@kernel.org>, <hal.feng@starfivetech.com>, <kernel@esmil.dk>,
+	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+	<conor+dt@kernel.org>, <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
+	<aou@eecs.berkeley.edu>, <devicetree@vger.kernel.org>,
+	<linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<richardcochran@gmail.com>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH 6.6 1/4] riscv: dts: starfive: add assigned-clock* to
+ limit frquency
+Message-ID: <20240912-sketch-research-ad02c157cbf3@wendy>
+References: <D200DC520B462771+20240909074645.1161554-1-wangyuli@uniontech.com>
+ <20240909-fidgeting-baggage-e9ef9fab9ca4@wendy>
+ <ac72665f-0138-4951-aa90-d1defebac9ca@linaro.org>
+ <20240909-wrath-sway-0fe29ff06a22@wendy>
+ <DBEFAD22C49AAFC6+58debc20-5281-4ae7-a418-a4b232be9458@uniontech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="dUrs2a+ddceNZFId"
+Content-Disposition: inline
+In-Reply-To: <DBEFAD22C49AAFC6+58debc20-5281-4ae7-a418-a4b232be9458@uniontech.com>
 
-On Wed, 11 Sep 2024 11:46:30 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Aug 20, 2024 at 3:33=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > 1. this commit hardens dma unmap for indirect
->
-> I think we need to explain why we need such hardening. For example
-> indirect use stream mapping which is read-only from the device. So it
-> looks to me like it doesn't require hardening by itself.
->
-> > 2. the subsequent commit uses the struct extra to record whether the
-> >    buffers need to be unmapped or not.
->
-> It's better to explain why such a decision could not be implied with
-> the existing metadata.
->
-> >  So we need a struct extra for
-> >    every desc, whatever it is indirect or not.
->
-> If this is the real reason, we need to tweak the title.
+--dUrs2a+ddceNZFId
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-YES. It is.
+On Thu, Sep 12, 2024 at 10:38:20AM +0800, WangYuli wrote:
+>=20
+> On 2024/9/9 19:17, Conor Dooley wrote:
+> > [6.6] in the subject and Sasha/Greg/stable list on CC, so I figure it is
+> > for stable, yeah. Only one of these patches is a "fix", and not really a
+> > functional one, so I would like to know why this stuff is being
+> > backported. I think under some definition of "new device IDs and quirks"
+> > it could be suitable, but it'd be a looser definition than I personally
+> > agree with!
+> These submissions will help to ensure a more stable behavior for the RISC=
+-V
+> devices involved on the Linux-6.6.y kernel,
 
-I will tweak the title in next version.
+I'll accept that argument for the first patch, but the three that are
+adding support for audio devices on the platform cannot really be
+described as making behaviour more stable. I don't hugely object to
+these being backported, but I would like a more accurate justification
+for it being done - even if that is just that "we are using this board
+with 6.6 and would like audio to work, which these 3 simple patches
+allow it to do".
 
+> and as far as I can tell,they
+> won't introduce any new issues (please correct me if I'm wrong).
 
->
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/virtio/virtio_ring.c | 122 ++++++++++++++++-------------------
-> >  1 file changed, 57 insertions(+), 65 deletions(-)
-> >
-> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > index 228e9fbcba3f..582d2c05498a 100644
-> > --- a/drivers/virtio/virtio_ring.c
-> > +++ b/drivers/virtio/virtio_ring.c
-> > @@ -67,9 +67,16 @@
-> >  #define LAST_ADD_TIME_INVALID(vq)
-> >  #endif
-> >
-> > +struct vring_desc_extra {
-> > +       dma_addr_t addr;                /* Descriptor DMA addr. */
-> > +       u32 len;                        /* Descriptor length. */
-> > +       u16 flags;                      /* Descriptor flags. */
-> > +       u16 next;                       /* The next desc state in a lis=
-t. */
-> > +};
-> > +
-> >  struct vring_desc_state_split {
-> >         void *data;                     /* Data for callback. */
-> > -       struct vring_desc *indir_desc;  /* Indirect descriptor, if any.=
- */
-> > +       struct vring_desc_extra *indir; /* Indirect descriptor, if any.=
- */
->
-> Btw, it might be worth explaining that this will be allocated with an
-> indirect descriptor table so we won't stress more to the memory
-> allocator.
+I don't know. Does this first patch require a driver change for the
+mmc driver to work correctly?
 
-Will do.
+> > Oh, and also, the 4 patches aren't threaded - you should fix that
+>=20
+> I apologize for my ignorance about the correct procedure...
+>=20
+> For instance,for these four commits,I first used 'git format-patch -4' to
+> create four consecutive .patch files,and then used 'git send-email
+> --annotate --cover-letter --thread ./*.patch' to send them,but the result
+> wasn't as expected...
+>=20
+> I'm not sure where the problem lies...
 
-Thanks.
+I'm not sure, I don't send patches using that method. Usually I output
+my patches to a directory and call git send-email using the path to that
+directory.
 
+Cheers,
+Conor.
 
->
-> Thanks
->
->
+--dUrs2a+ddceNZFId
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZuKY4gAKCRB4tDGHoIJi
+0r2pAQDK9tw50M9/pd5jx1uyrtkDT/RUbd0s3qpnx1Z0YSYF9AEA+k8EKSF51lvO
+hrrZQj9ToA2Lnoo4N8es473eQLiq+g8=
+=6MvV
+-----END PGP SIGNATURE-----
+
+--dUrs2a+ddceNZFId--
 
