@@ -1,127 +1,149 @@
-Return-Path: <netdev+bounces-127797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37E139768B4
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:08:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A28059768BD
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:10:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D16861F286DF
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:08:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6A5B1C21998
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 12:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C885C1A302B;
-	Thu, 12 Sep 2024 12:06:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C7119F413;
+	Thu, 12 Sep 2024 12:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ajk7wXdU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8/kXq8e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE27288BD;
-	Thu, 12 Sep 2024 12:06:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2B72C6BB;
+	Thu, 12 Sep 2024 12:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726142815; cv=none; b=spbgFBlt1qFSmMaibINCpufqBz+7xTwFj4meVol0AtV5+oMPTNTIcLmC+Q46cpymz5lVEaa/tXlk9SX7zqzEVeEKWq/WzWgna7tkR1W+wlGhw7Zei2hWi7v2eF7I+jxZw+1FUJim1qiD4VhpTHMwOOHCduEcHHwu2j8t7TFSqH0=
+	t=1726143007; cv=none; b=ZxLBqJAUjbmVM69XqDKJqK7c4Vm6hbs9GCYQt5krxS+ksrur5Wyboyij/KDmvnEQ1Aou9J3CabKlR/K2u+DLIhqna9GCkIDRNYF+OR2fgrHTdjnyqAAJFE2OZ9a7zaobV9RVzQ48941XPFOVxVXqZgXkCKqXQI0nIZ7EV2vyvnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726142815; c=relaxed/simple;
-	bh=3gEYxdKITE9bSx6s7salL3QkKWEweio8sGwWyG+ZYvY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BdyrJuNIbXXnZlRhYMvzhXraBv/44b74n1GkDwMxjmWMsyYp/99scmRSuMWWBd0qaCaNEZwBMk+PsW4odck0Y7tQ/qM4s8EcoSfBhL/yoF+xh5p1hr0NTdWsCribdXdP8eVRT+4aifcOMXoM0V1+Fll9NzSq+VAHSd4Gq64MiHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ajk7wXdU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94DCFC4CEC3;
-	Thu, 12 Sep 2024 12:06:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726142815;
-	bh=3gEYxdKITE9bSx6s7salL3QkKWEweio8sGwWyG+ZYvY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ajk7wXdUDAjpSVxvXuYLE51TI1c8VoinPIDrSCX9hMizIjOJTdLgRugxCjGnfODzg
-	 qa4VbhlryM8/315NDA/q+KB0qmOaRuQ4gFpIDQlyIDPFa/vKMRlkldi9Jv9iGcPZb7
-	 JLyQz246GznxS2dcVxM3fSTz0YXexmxGGdrh53R4NMJLYbsL/BWOTnWDp/thOH/q/m
-	 LOEw8Q1Wehvh6ZHLLheP7Hi5kmq1oarpeeXrrDma523JHvKgngdTDs/Lx6M5K0kh/x
-	 Ruca7rEeUQv0eAvHub91DvpE9zDZ+5vV4dWoluT2rKbHA59ocx4CSq7iwRbIdrSytM
-	 swJ3boIm9Bovw==
-Date: Thu, 12 Sep 2024 13:06:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1 1/1] net: ks8851: use %*ph to print small
- buffer
-Message-ID: <20240912120651.GL572255@kernel.org>
-References: <20240911193630.2884828-1-andriy.shevchenko@linux.intel.com>
+	s=arc-20240116; t=1726143007; c=relaxed/simple;
+	bh=lVvZUUG+zyn/ZfXGNBItiXEKNsLuGv5HEwMfC6/HDw0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=WyK3cMYUJYSxBFAVnB4vrQeud/YPoPKhOzao9JjGlX08PaTp0cuSyfUPgnToogSv3HDn7pkw5sxqIxUzUuQwgXvU5db2bq6ta9/DU9kD5BKpEmea6Z4dXAWUomaoQYEr2daMd8Hb4Tu5myZqJ3Ki7r/KZWY4Xe/r5rcwNUHfelo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S8/kXq8e; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6c159150ff4so6757076d6.2;
+        Thu, 12 Sep 2024 05:10:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726143004; x=1726747804; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=msixuc5DjYAhtMCMiouAiME28Ctun/SSEXrHmmI1f7Y=;
+        b=S8/kXq8eYjOURLVnUWEjqvDgx2PleXQgjeSQNWkyD5AGqgGFljzRn35LUXcH9j3iV/
+         W1IYLkhsnP1v9SMTd+B55YVGbqhcbQ2XB1DwAYlWCIvkJHCYg8I7LYEDznW+CZnJqcGD
+         HvT6Y4J/4v9iodARjDqmrobR0ngvgkF8bsp484+y50VAagdylnuGpPUGvlfFSSfrLL1W
+         WOBEXALTYdb7Uu5ZAO3HCu4fxoicXuFxunmISGuo3PqBeMou+fkxPxwd9yjx2ya5lVGG
+         4wVr38gL54456Hey6MjzuwdEIPpkRViEIPne5eFnqTCDzqi3cFLbSs9tOFE4rOFy7uuh
+         xZeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726143004; x=1726747804;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=msixuc5DjYAhtMCMiouAiME28Ctun/SSEXrHmmI1f7Y=;
+        b=TDAx20zkRjx8Pm570d9OHE1WCuH6kPc3hOmBg+b0qeFCq5iwdOAi4p7gTBKMOKnELr
+         NDhCNnIHFtPExrktRtTyQFzz5fnYdDAAqe6owxb3xdcsbuxguQsF1sVigCnYoQ8Iscxh
+         rzkBqTUobesqrJ7UEFc81E9uEbE77zvquiUkY2qMLScEipOsfWokHYUXaLiYsiZpGMl1
+         6YKMeDMjLPZXAFyGOuQUDxWy6Ngqv0be9Q7E4kebVJhHm0f6c95jkc4OzYwzQMZOQFrd
+         NQNG3Xf7+oy5cHgkxCoWTGlkv2iukmv5kaZ5XeWFaXjLoNzAPrj0fxAATSGpWldO0re+
+         xRbw==
+X-Forwarded-Encrypted: i=1; AJvYcCWHOTY2g1I/ocCZ/7wcQ25MXPyBeS6FaCAvW7hiQIIzQU3zDHFuzPaZqMY/LdXXUCd87zuAsrzm@vger.kernel.org, AJvYcCXYp1YOlG7uGAw3gtEeL+4GNu56s7shoN7WeUVUeOjblo0px4PfcJiDBoiEGt5T54seEmynDn+2efBX7ms1+Oo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxeH+RultqOuCXkhjbgb6jVPM5UtGDOH2Xzkz69INaK6DYZUjaY
+	V3/QZ9E0uWweZj8it99L92mJlzQZCdMl6ZO1QW+uC3cS6kI7+MPz
+X-Google-Smtp-Source: AGHT+IExa2ElXKLKc/w9WjBtRYBCBXPtGboQdVxdbXGPlYF7+fDNkNgtONBgfbsBwqo9oUDLBpeM3Q==
+X-Received: by 2002:a05:6214:3c85:b0:6c5:5326:18a5 with SMTP id 6a1803df08f44-6c57352ac57mr42674486d6.28.1726143004063;
+        Thu, 12 Sep 2024 05:10:04 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c534787340sm53159836d6.143.2024.09.12.05.10.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Sep 2024 05:10:03 -0700 (PDT)
+Date: Thu, 12 Sep 2024 08:10:03 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Matthieu Baerts <matttbe@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ ncardwell@google.com, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <66e2da1b440cc_14a89129431@willemb.c.googlers.com.notmuch>
+In-Reply-To: <ed54ad21-4a5b-4bbb-8f16-22fbfe1bd738@kernel.org>
+References: <20240912005317.1253001-1-willemdebruijn.kernel@gmail.com>
+ <ed54ad21-4a5b-4bbb-8f16-22fbfe1bd738@kernel.org>
+Subject: Re: [PATCH net-next v2 0/3] selftests/net: packetdrill: netns and two
+ imports
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911193630.2884828-1-andriy.shevchenko@linux.intel.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 11, 2024 at 10:36:30PM +0300, Andy Shevchenko wrote:
-> Use %*ph format to print small buffer as hex string.
-
-Hi Andy,
-
-Perhaps it would be worth mentioning that this patch
-changes the output format such that there is a space
-between each byte rather than each 32-bit word.
-
-Or at least, that is what a local hack on my side indicated
-things would look like :)
-
+Matthieu Baerts wrote:
+> Hi Willem,
 > 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  drivers/net/ethernet/micrel/ks8851_common.c | 19 +------------------
->  1 file changed, 1 insertion(+), 18 deletions(-)
+> On 12/09/2024 02:52, Willem de Bruijn wrote:
+> > From: Willem de Bruijn <willemb@google.com>
+> > 
+> > 1/3: run in nets, as discussed, and add missing CONFIGs
+> > 2/3: import tcp/zerocopy
+> > 3/3: import tcp/slow_start
 > 
-> diff --git a/drivers/net/ethernet/micrel/ks8851_common.c b/drivers/net/ethernet/micrel/ks8851_common.c
-> index 7fa1820db9cc..a07ffc53da64 100644
-> --- a/drivers/net/ethernet/micrel/ks8851_common.c
-> +++ b/drivers/net/ethernet/micrel/ks8851_common.c
-> @@ -215,22 +215,6 @@ static void ks8851_init_mac(struct ks8851_net *ks, struct device_node *np)
->  	ks8851_write_mac_addr(dev);
->  }
->  
-> -/**
-> - * ks8851_dbg_dumpkkt - dump initial packet contents to debug
-> - * @ks: The device state
-> - * @rxpkt: The data for the received packet
-> - *
-> - * Dump the initial data from the packet to dev_dbg().
-> - */
-> -static void ks8851_dbg_dumpkkt(struct ks8851_net *ks, u8 *rxpkt)
-> -{
-> -	netdev_dbg(ks->netdev,
-> -		   "pkt %02x%02x%02x%02x %02x%02x%02x%02x %02x%02x%02x%02x\n",
-> -		   rxpkt[4], rxpkt[5], rxpkt[6], rxpkt[7],
-> -		   rxpkt[8], rxpkt[9], rxpkt[10], rxpkt[11],
-> -		   rxpkt[12], rxpkt[13], rxpkt[14], rxpkt[15]);
-> -}
-> -
->  /**
->   * ks8851_rx_pkts - receive packets from the host
->   * @ks: The device information.
-> @@ -296,8 +280,7 @@ static void ks8851_rx_pkts(struct ks8851_net *ks, struct sk_buff_head *rxq)
->  
->  				ks->rdfifo(ks, rxpkt, rxalign + 8);
->  
-> -				if (netif_msg_pktdata(ks))
-> -					ks8851_dbg_dumpkkt(ks, rxpkt);
-> +				netif_dbg(ks, pktdata, ks->netdev, "pkt %12ph\n", &rxpkt[4]);
-
-nit: I would have line wrapped this so it is <= 80 columns wide.
-
->  
->  				skb->protocol = eth_type_trans(skb, ks->netdev);
->  				__skb_queue_tail(rxq, skb);
-> -- 
-> 2.43.0.rc1.1336.g36b5255a03ac
+> Thank you for the v2. This new version looks good to me:
+> 
+> Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 > 
 > 
+> I didn't pay too much attention to the new tests, because they look
+> good, heavily tested I suppose, and I guess the goal is not to diverge
+> from the original ones for the moment. Still, please note that the CI
+> reported some timing issues with tcp_zerocopy_closed.pkt when using a
+> debug kernel config, e.g.
+> 
+> > tcp_zerocopy_closed.pkt:22: timing error: expected system call return at 0.100596 sec but happened at 0.109564 sec; tolerance 0.004000 sec
+> 
+> https://netdev.bots.linux.dev/contest.html?executor=vmksft-packetdrill-dbg&test=tcp-zerocopy-closed-pkt
+
+Thanks Matthieu. I did not run the dbg variant often enough to observe
+that. Note to self to run more times before I submit.
+
+It seems to fail 2/10 times on the dbg spinner. I don't have an
+explanation for the failure yet. The line itself has no expected delay
+
+# script packet:  0.113203 S 0:0(0) <mss 1460,sackOK,TS val 0 ecr 0,nop,wscale 8>
+# actual packet:  0.107191 S 0:0(0) win 65535 <mss 1460,sackOK,TS val 0 ecr 0,nop,wscale 8>
+
+   +0.1 recvmsg(4, {msg_name(...)=...,
+                    msg_iov(1)=[{...,0}],
+                    msg_flags=MSG_ERRQUEUE,
+                    msg_control=[]}, MSG_ERRQUEUE) = -1 EAGAIN (Resource temporarily unavailable)
+
+   +0...0 connect(4, ..., ...) = 0
+
+   +0 > S 0:0(0) <mss 1460,sackOK,TS val 0 ecr 0,nop,wscale 8>
+
+I guess the expectation includes the +0.1 delay before calling recvmsg, and that
+timer fired a bit early.
+
+I previously shared a draft patch to adjust --tolerance_usecs in dbg runs.
+May have to send that after all.
+
+https://lore.kernel.org/netdev/66da5b8b27259_27bb41294c@willemb.c.googlers.com.notmuch/
 
