@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-127890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27629976F5B
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:13:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A81976F5C
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 19:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59FC91C23AF0
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:13:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FCB31F2416F
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 17:13:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 768DE1BF7F1;
-	Thu, 12 Sep 2024 17:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07C71BFE14;
+	Thu, 12 Sep 2024 17:13:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2561BF800
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 17:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A13D1BF7E8
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 17:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726161183; cv=none; b=EDUm7qeW6MjUIXShPAVXDSWVIpxV6wtL5HREcgY61TwCHeEAAx7c/tmJLqAkk9LVO63hSzYZRIIWIUj5NfsuEtMPyGRQniO8KQAftI99uE4Ut6caaefzMVV5IH4UWbwyN9maEXfJk099L4PdRz5ASvE2+jqJlplfLBoNsIOv66U=
+	t=1726161184; cv=none; b=jkvYVIgvQeaN2OntnIp3sooYIx30bHNBRPfcxc+2dagiRS5pK/aoisOH/3CGcXe/ufn0WmF4NEPb+8UAqU+SWBRvE+LrJi/yr4pjAMBMNEi2GyuF28crsx0XOf1MvDhFEkq57eNw13NqPnP1JxEzhuz0I3lF7StixwtyhtzGc28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726161183; c=relaxed/simple;
-	bh=LAzwia09eV/4sSpw5mcMv/0gaW8i6IEmagmcjr/4NzM=;
+	s=arc-20240116; t=1726161184; c=relaxed/simple;
+	bh=IzWaiPNvZ7bQ6KBmyTsfp9Gb6J1yGwGTM4RbN18g7x0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Bbbcph192O48WHnIYSLJXx8lVU/Dp3HbXrjrrJreyIwp+4F0dT9JLB+Bq4OYfVSj8wCDrkGe3SwZSEmFLG3Spp70y4ByCI47NeTuxBQktOJiTpbA4E0Px7HR3Tnwm1XjTNuQZ1jjEP1KqUkfiIA343Uf9nb1lXoWVoAu+9EDy/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version; b=DY2ujJ62R1EjVaXjVbQlxozKVjBju8jNBGdNcS2zGpIhdQWmGT5myXDoaO8/08DhwMQ/UL/Hc8by0wdL4+D2gvok26lFJXVkK+IDlX7HoseQ7XxUHCPL0k2XPkYbWscn87R8ELVwR5K10g53HYKYgDPGuDtBo8FxtbYcFkiq+S0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2059112f0a7so8185ad.3
-        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 10:13:01 -0700 (PDT)
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-7db2e3fa438so113852a12.1
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 10:13:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726161181; x=1726765981;
+        d=1e100.net; s=20230601; t=1726161182; x=1726765982;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tFrKSN0qGcocZdoBbERENThA5G9MGT7/eNUPdgl7EpE=;
-        b=LmhJxAXfd3WIwajh0b3ZKA18ZTN6u6dMonEBDhx7+BFAZc2lc4jOLMvR90lXMgB1k5
-         CI6VHsT7KwibIKsyPxsGwINxXcV3nm9SJgLYcFQ69ESTRPf2ZJXrnYkOhbtW5K0NLkrP
-         okBVl7QFKFCs0QaNDBUWJkp2vT8l3f2aTNP0shFrmhCR7ylYigUuAy8fCKPrx2/IGQXj
-         0HTEVN9WYWMQIn+B8HarkSw8MyHDTk09CedyfF87MvUxdssCcohLJynaxav2dLR12hgw
-         3DE/NUT02xaXaXSA1uI2dVEBjiHvhd74Wa5kRc84FdFhO5fzmdTxIt+2LI2ufAFObRZZ
-         +Bjg==
-X-Gm-Message-State: AOJu0YxVx6RmG4y0YzED3xVGpCUiQAnhuyKaYQCNqb06gv9tCkJF/WZu
-	H8v9qNfC7fktVC+JDaFy08x+hRDaOzTE7V++bkqjDePTCcV5qtXuz4Zw
-X-Google-Smtp-Source: AGHT+IHkkx1xCurwuETkXacyYdyxpvKtfCyPMJieuvBmVbwrKDeOfaiffEeZmZA39Nw6ytlBZPKKQw==
-X-Received: by 2002:a17:902:dacf:b0:205:8b84:d60c with SMTP id d9443c01a7336-2076e3998damr47573045ad.35.1726161181072;
-        Thu, 12 Sep 2024 10:13:01 -0700 (PDT)
+        bh=Vu7kSS7sdkITFMlpea1V2u6bxvXk4hNcHq8Tp7Juc5k=;
+        b=sFkGYkqoaL915KEpriOS+ArPjRjT1GeIsmayq95LSVauKkXHGZCqrNjGY9zKXuDSxa
+         XxXdbvg96KxZOGjySnAOYBB5bdcWA6x8mAsbTe+vx+ptifbxd/Jx+B5+/5oVRxiy2BNs
+         BkVV/kH8uHJZFRKY6d7GFyxJMNt7Yp1z7E3GB9TjlwgmBpumfX+zbk2vhUFLvhSbPffR
+         lEnwewCnEAUB0Xi4yGEM0nG4i/Etw6WtopMj2uuIWE3Aa8w+nezYODIaL93p+e7Ln26R
+         FfCd+2cQzVkXYoGuq3FwR4FxeJfYZXDnaWeSDmgEt1S5pplXyO0a9mGwwVohKWtbrbbm
+         wM1g==
+X-Gm-Message-State: AOJu0YygtekwXbIwmdUJevidLeFIRCQpT+nEIIXNgzfD3o5hdTBaeGXe
+	J43HIIWIIuzxuHS6Xj+Fd9Rms8eRVjZCSBuBfyr6avp+ESXAH/VvIxtx
+X-Google-Smtp-Source: AGHT+IGwkINhU3KQ9dR3W3onRodQXRDmgK+AIiiEdzuxjpKNwfKxVHl//532RlhR/LPuP/cs3vKE2w==
+X-Received: by 2002:a05:6a20:b2a8:b0:1cf:3677:1c4a with SMTP id adf61e73a8af0-1cf75eb94cfmr3877393637.16.1726161182281;
+        Thu, 12 Sep 2024 10:13:02 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076af47657sm16500015ad.79.2024.09.12.10.13.00
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fbb581esm2011440a12.34.2024.09.12.10.13.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 10:13:00 -0700 (PDT)
+        Thu, 12 Sep 2024 10:13:01 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -59,9 +59,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Mina Almasry <almasrymina@google.com>
-Subject: [PATCH net-next 07/13] selftests: ncdevmem: Remove default arguments
-Date: Thu, 12 Sep 2024 10:12:45 -0700
-Message-ID: <20240912171251.937743-8-sdf@fomichev.me>
+Subject: [PATCH net-next 08/13] selftests: ncdevmem: Switch to AF_INET6
+Date: Thu, 12 Sep 2024 10:12:46 -0700
+Message-ID: <20240912171251.937743-9-sdf@fomichev.me>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240912171251.937743-1-sdf@fomichev.me>
 References: <20240912171251.937743-1-sdf@fomichev.me>
@@ -73,69 +73,165 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To make it clear what's required and what's not. Also, some of the
-values don't seem like a good defaults; for example eth1.
+Use dualstack socket to support both v4 and v6. v4-mapped-v6 address
+can be used to do v4.
 
 Cc: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- tools/testing/selftests/net/ncdevmem.c | 34 +++++++++-----------------
- 1 file changed, 12 insertions(+), 22 deletions(-)
+ tools/testing/selftests/net/ncdevmem.c | 84 +++++++++++++++++---------
+ 1 file changed, 56 insertions(+), 28 deletions(-)
 
 diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
-index 77f6cb166ada..829a7066387a 100644
+index 829a7066387a..d82e550369c0 100644
 --- a/tools/testing/selftests/net/ncdevmem.c
 +++ b/tools/testing/selftests/net/ncdevmem.c
-@@ -42,30 +42,11 @@
- #define MSG_SOCK_DEVMEM 0x2000000
- #endif
+@@ -206,10 +206,18 @@ static int configure_channels(unsigned int rx, unsigned int tx)
+ 	return run_command("sudo ethtool -L %s rx %u tx %u", ifname, rx, tx);
+ }
  
--/*
-- * tcpdevmem netcat. Works similarly to netcat but does device memory TCP
-- * instead of regular TCP. Uses udmabuf to mock a dmabuf provider.
-- *
-- * Usage:
-- *
-- *	On server:
-- *	ncdevmem -s <server IP> -c <client IP> -f eth1 -l -p 5201 -v 7
-- *
-- *	On client:
-- *	yes $(echo -e \\x01\\x02\\x03\\x04\\x05\\x06) | \
-- *		tr \\n \\0 | \
-- *		head -c 5G | \
-- *		nc <server IP> 5201 -p 5201
-- *
-- * Note this is compatible with regular netcat. i.e. the sender or receiver can
-- * be replaced with regular netcat to test the RX or TX path in isolation.
-- */
+-static int configure_flow_steering(void)
++static int configure_flow_steering(struct sockaddr_in6 *server_sin)
+ {
+-	return run_command("sudo ethtool -N %s flow-type tcp4 dst-ip %s dst-port %s queue %d >&2",
+-			   ifname, server_ip, port, start_queue);
++	const char *addr = server_ip;
++	const char *type = "tcp6";
++
++	if (IN6_IS_ADDR_V4MAPPED(&server_sin->sin6_addr)) {
++		type = "tcp4";
++		addr = strrchr(server_ip, ':') + 1;
++	}
++
++	return run_command("sudo ethtool -N %s flow-type %s dst-ip %s dst-port %s queue %d >&2",
++			   ifname, type, addr, port, start_queue);
+ }
+ 
+ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
+@@ -257,13 +265,43 @@ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
+ 	return -1;
+ }
+ 
++static int enable_reuseaddr(int fd)
++{
++	int opt = 1;
++	int ret;
++
++	ret = setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &opt, sizeof(opt));
++	if (ret)
++		return -errno;
++
++	ret = setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
++	if (ret)
++		return -errno;
++
++	return 0;
++}
++
++static int parse_address(const char *str, int port, struct sockaddr_in6 *sin6)
++{
++	int ret;
++
++	sin6->sin6_family = AF_INET6;
++	sin6->sin6_port = htons(port);
++
++	ret = inet_pton(sin6->sin6_family, str, &sin6->sin6_addr);
++	if (ret < 0)
++		return -1;
++
++	return 0;
++}
++
+ int do_server(struct memory_buffer *mem)
+ {
+ 	char ctrl_data[sizeof(int) * 20000];
+ 	struct netdev_queue_id *queues;
+ 	size_t non_page_aligned_frags = 0;
+-	struct sockaddr_in client_addr;
+-	struct sockaddr_in server_sin;
++	struct sockaddr_in6 client_addr;
++	struct sockaddr_in6 server_sin;
+ 	size_t page_aligned_frags = 0;
+ 	size_t total_received = 0;
+ 	socklen_t client_addr_len;
+@@ -275,9 +313,12 @@ int do_server(struct memory_buffer *mem)
+ 	int socket_fd;
+ 	int client_fd;
+ 	size_t i = 0;
+-	int opt = 1;
+ 	int ret;
+ 
++	ret = parse_address(server_ip, atoi(port), &server_sin);
++	if (ret < 0)
++		error(1, 0, "parse server address");
++
+ 	if (reset_flow_steering())
+ 		error(1, 0, "Failed to reset flow steering\n");
+ 
+@@ -286,7 +327,7 @@ int do_server(struct memory_buffer *mem)
+ 		error(1, 0, "Failed to configure rss\n");
+ 
+ 	/* Flow steer our devmem flows to start_queue */
+-	if (configure_flow_steering())
++	if (configure_flow_steering(&server_sin))
+ 		error(1, 0, "Failed to configure flow steering\n");
+ 
+ 	sleep(1);
+@@ -307,29 +348,16 @@ int do_server(struct memory_buffer *mem)
+ 	if (!tmp_mem)
+ 		error(1, ENOMEM, "malloc failed");
+ 
+-	server_sin.sin_family = AF_INET;
+-	server_sin.sin_port = htons(atoi(port));
 -
--static char *server_ip = "192.168.1.4";
--static char *port = "5201";
-+static char *server_ip;
-+static char *port;
- static int start_queue = 8;
- static int num_queues = 8;
--static char *ifname = "eth1";
-+static char *ifname;
- static unsigned int ifindex;
- static unsigned int dmabuf_id;
+-	ret = inet_pton(server_sin.sin_family, server_ip, &server_sin.sin_addr);
+-	if (socket < 0)
+-		error(1, 0, "%s: [FAIL, create socket]\n", TEST_PREFIX);
+-
+-	socket_fd = socket(server_sin.sin_family, SOCK_STREAM, 0);
++	socket_fd = socket(AF_INET6, SOCK_STREAM, 0);
+ 	if (socket < 0)
+ 		error(1, errno, "%s: [FAIL, create socket]\n", TEST_PREFIX);
  
-@@ -573,6 +554,15 @@ int main(int argc, char *argv[])
- 		}
- 	}
+-	ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &opt,
+-			 sizeof(opt));
+-	if (ret)
+-		error(1, errno, "%s: [FAIL, set sock opt]\n", TEST_PREFIX);
+-
+-	ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt,
+-			 sizeof(opt));
++	ret = enable_reuseaddr(socket_fd);
+ 	if (ret)
+-		error(1, errno, "%s: [FAIL, set sock opt]\n", TEST_PREFIX);
++		error(1, errno, "%s: [FAIL, reuseaddr]\n", TEST_PREFIX);
  
-+	if (!server_ip)
-+		error(1, 0, "Missing -s argument\n");
-+
-+	if (!port)
-+		error(1, 0, "Missing -p argument\n");
-+
-+	if (!ifname)
-+		error(1, 0, "Missing -f argument\n");
-+
- 	ifindex = if_nametoindex(ifname);
+ 	fprintf(stderr, "binding to address %s:%d\n", server_ip,
+-		ntohs(server_sin.sin_port));
++		ntohs(server_sin.sin6_port));
  
- 	for (; optind < argc; optind++)
+ 	ret = bind(socket_fd, &server_sin, sizeof(server_sin));
+ 	if (ret)
+@@ -341,16 +369,16 @@ int do_server(struct memory_buffer *mem)
+ 
+ 	client_addr_len = sizeof(client_addr);
+ 
+-	inet_ntop(server_sin.sin_family, &server_sin.sin_addr, buffer,
++	inet_ntop(AF_INET6, &server_sin.sin6_addr, buffer,
+ 		  sizeof(buffer));
+ 	fprintf(stderr, "Waiting or connection on %s:%d\n", buffer,
+-		ntohs(server_sin.sin_port));
++		ntohs(server_sin.sin6_port));
+ 	client_fd = accept(socket_fd, &client_addr, &client_addr_len);
+ 
+-	inet_ntop(client_addr.sin_family, &client_addr.sin_addr, buffer,
++	inet_ntop(AF_INET6, &client_addr.sin6_addr, buffer,
+ 		  sizeof(buffer));
+ 	fprintf(stderr, "Got connection from %s:%d\n", buffer,
+-		ntohs(client_addr.sin_port));
++		ntohs(client_addr.sin6_port));
+ 
+ 	while (1) {
+ 		struct iovec iov = { .iov_base = iobuf,
 -- 
 2.46.0
 
