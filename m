@@ -1,121 +1,237 @@
-Return-Path: <netdev+bounces-127723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78F4D9763EC
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 10:06:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DD2597638D
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:55:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B834B2128F
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:06:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BADE81F2211F
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:55:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A2A190470;
-	Thu, 12 Sep 2024 08:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6B418C92D;
+	Thu, 12 Sep 2024 07:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="cGEYbPOx"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B68F818E047
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 08:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387A81552E1;
+	Thu, 12 Sep 2024 07:54:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726128377; cv=none; b=RjFYSxdIyUzbrXOeX7wWEZ9bwJ1ddDFjQozan3p82K8JILf9Zf6ufLHihhD2IPO0kVQC8bcGdOky3UxSVbiUX7HUFJRotccIFvcQ3wG+NfrsSHQ8J6JeLY9YCvoFXGcy11wIW8ewgmPeLvzYCVAp/lnnvvYJZ+NlTBEsY0onifw=
+	t=1726127698; cv=none; b=swa9q1239CaKTQ6IilS+aZx0viactBg/NJLYV8Mpb1d8PkoUj0tmJaISmGxb523czZBBidCeIF0J31tTBXb1lN7imA7kiQlUKeRQ1jhy9f6oq6mbqYc+HpMB8h1Rs0tJy0n3dUa9g1as7nr0XBQyLYeXFfq53MdYJj5HFc64fl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726128377; c=relaxed/simple;
-	bh=m3E5MwYpaRhY2fMnX29PCSV5vHZDqyE0QUttflXc2OU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fW07axj+IYhT4ybO5Fvy5caWR7mtrxiN2RmIOfiIS4GT6tishJmYhOvS8C6Rn0ZRua6ZhHS2T5KWOrrduW7Oi/+MNmku1FfGa5ABQUOhHo/NgMBA9VbFE8BvR0dA+spUafEQtXEjwqN9WD6XChDJ7rft+xP0vuah/dMQoScRYZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1soeq6-00047h-OO
-	for netdev@vger.kernel.org; Thu, 12 Sep 2024 10:06:06 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1soeq6-007KfJ-7O
-	for netdev@vger.kernel.org; Thu, 12 Sep 2024 10:06:06 +0200
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 033D9338E5E
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 07:58:08 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 9EC75338E0C;
-	Thu, 12 Sep 2024 07:58:06 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id f61e43ab;
-	Thu, 12 Sep 2024 07:58:06 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 5/5] can: m_can: m_can_close(): stop clocks after device has been shut down
-Date: Thu, 12 Sep 2024 09:50:54 +0200
-Message-ID: <20240912075804.2825408-6-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240912075804.2825408-1-mkl@pengutronix.de>
-References: <20240912075804.2825408-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1726127698; c=relaxed/simple;
+	bh=sElidT79qVQ7KtOCqREnVwSj8TXMDi0zyUeG+ytS4QI=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=RdGoPAdLvDBQpxuP56nNrZjpGA3e53WLhvsHH3ZNquIGhTPTf/etQc2B6nujxdL2ViL5pq6WfPoQ6SM9mGv6MED+6ULOLILAndkzdi2PWG4L88ELWlE9I99NGN6Wo/oiabKoBd8HunjOWR0DqhMbTmCmwqv2HIdqBoEdM0Zctqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=cGEYbPOx; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1726127693; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=Tu9bJSc7T/p8sXY32nlC4PN7veHBrgOxRQTrewk/iUU=;
+	b=cGEYbPOxTR4KOb8Qeww39p3vtuNIau+JPk+Aryox+ZQCr1qoKcFLKASYO56Qgh+zlzgx520rRqKp7ufK0nwb3tk1oEf+Qohh+KPDfVZrKW6sfOBOvEpG8UpOjZ4tWCxTFW/tAnOWEL3c9/Em2ldTxU6r8L0/H4dU2tUFLNomNJk=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WEqjsid_1726127691)
+          by smtp.aliyun-inc.com;
+          Thu, 12 Sep 2024 15:54:52 +0800
+Message-ID: <1726127678.0431764-5-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next 08/13] virtio_net: xsk: bind/unbind xsk for tx
+Date: Thu, 12 Sep 2024 15:54:38 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20240820073330.9161-1-xuanzhuo@linux.alibaba.com>
+ <20240820073330.9161-9-xuanzhuo@linux.alibaba.com>
+ <CACGkMEuD9kp5Mgpqu+zszcYsiAyX_H-A-LfPM+YJPijeUtWJcw@mail.gmail.com>
+In-Reply-To: <CACGkMEuD9kp5Mgpqu+zszcYsiAyX_H-A-LfPM+YJPijeUtWJcw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-After calling m_can_stop() an interrupt may be pending or NAPI might
-still be executed. This means the driver might still touch registers
-of the IP core after the clocks have been disabled. This is not good
-practice and might lead to aborts depending on the SoC integration.
+On Wed, 11 Sep 2024 12:08:06 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Tue, Aug 20, 2024 at 3:33=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > This patch implement the logic of bind/unbind xsk pool to sq and rq.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/net/virtio_net.c | 54 ++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 54 insertions(+)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 96abee36738b..6a36a204e967 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -295,6 +295,10 @@ struct send_queue {
+> >
+> >         /* Record whether sq is in reset state. */
+> >         bool reset;
+> > +
+> > +       struct xsk_buff_pool *xsk_pool;
+> > +
+> > +       dma_addr_t xsk_hdr_dma_addr;
+> >  };
+> >
+> >  /* Internal representation of a receive virtqueue */
+> > @@ -494,6 +498,8 @@ struct virtio_net_common_hdr {
+> >         };
+> >  };
+> >
+> > +static struct virtio_net_common_hdr xsk_hdr;
+> > +
+> >  static void virtnet_sq_free_unused_buf(struct virtqueue *vq, void *buf=
+);
+> >  static int virtnet_xdp_handler(struct bpf_prog *xdp_prog, struct xdp_b=
+uff *xdp,
+> >                                struct net_device *dev,
+> > @@ -5476,6 +5482,29 @@ static int virtnet_rq_bind_xsk_pool(struct virtn=
+et_info *vi, struct receive_queu
+> >         return err;
+> >  }
+> >
+> > +static int virtnet_sq_bind_xsk_pool(struct virtnet_info *vi,
+> > +                                   struct send_queue *sq,
+> > +                                   struct xsk_buff_pool *pool)
+> > +{
+> > +       int err, qindex;
+> > +
+> > +       qindex =3D sq - vi->sq;
+> > +
+> > +       virtnet_tx_pause(vi, sq);
+> > +
+> > +       err =3D virtqueue_reset(sq->vq, virtnet_sq_free_unused_buf);
+> > +       if (err) {
+> > +               netdev_err(vi->dev, "reset tx fail: tx queue index: %d =
+err: %d\n", qindex, err);
+> > +               pool =3D NULL;
+> > +       }
+> > +
+> > +       sq->xsk_pool =3D pool;
+> > +
+> > +       virtnet_tx_resume(vi, sq);
+> > +
+> > +       return err;
+> > +}
+> > +
+> >  static int virtnet_xsk_pool_enable(struct net_device *dev,
+> >                                    struct xsk_buff_pool *pool,
+> >                                    u16 qid)
+> > @@ -5484,6 +5513,7 @@ static int virtnet_xsk_pool_enable(struct net_dev=
+ice *dev,
+> >         struct receive_queue *rq;
+> >         struct device *dma_dev;
+> >         struct send_queue *sq;
+> > +       dma_addr_t hdr_dma;
+> >         int err, size;
+> >
+> >         if (vi->hdr_len > xsk_pool_get_headroom(pool))
+> > @@ -5521,6 +5551,10 @@ static int virtnet_xsk_pool_enable(struct net_de=
+vice *dev,
+> >         if (!rq->xsk_buffs)
+> >                 return -ENOMEM;
+> >
+> > +       hdr_dma =3D dma_map_single(dma_dev, &xsk_hdr, vi->hdr_len, DMA_=
+TO_DEVICE);
+>
+> Let's use the virtqueue_dma_xxx() wrappers here.
 
-To avoid these potential problems, make m_can_close() symmetric to
-m_can_open(), i.e. stop the clocks at the end, right before shutting
-down the transceiver.
+Will fix.
 
-Fixes: e0d1f4816f2a ("can: m_can: add Bosch M_CAN controller support")
-Link: https://patch.msgid.link/20240910-can-m_can-fix-ifup-v3-2-6c1720ba45ce@pengutronix.de
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/m_can/m_can.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index c1a07013433e..7fec04b024d5 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -1764,7 +1764,6 @@ static int m_can_close(struct net_device *dev)
- 	netif_stop_queue(dev);
- 
- 	m_can_stop(dev);
--	m_can_clk_stop(cdev);
- 	free_irq(dev->irq, dev);
- 
- 	m_can_clean(dev);
-@@ -1779,6 +1778,7 @@ static int m_can_close(struct net_device *dev)
- 
- 	close_candev(dev);
- 
-+	m_can_clk_stop(cdev);
- 	phy_power_off(cdev->transceiver);
- 
- 	return 0;
--- 
-2.45.2
+Thanks.
 
 
+>
+> > +       if (dma_mapping_error(dma_dev, hdr_dma))
+> > +               return -ENOMEM;
+> > +
+> >         err =3D xsk_pool_dma_map(pool, dma_dev, 0);
+> >         if (err)
+> >                 goto err_xsk_map;
+> > @@ -5529,11 +5563,23 @@ static int virtnet_xsk_pool_enable(struct net_d=
+evice *dev,
+> >         if (err)
+> >                 goto err_rq;
+> >
+> > +       err =3D virtnet_sq_bind_xsk_pool(vi, sq, pool);
+> > +       if (err)
+> > +               goto err_sq;
+> > +
+> > +       /* Now, we do not support tx offset, so all the tx virtnet hdr =
+is zero.
+> > +        * So all the tx packets can share a single hdr.
+> > +        */
+> > +       sq->xsk_hdr_dma_addr =3D hdr_dma;
+> > +
+> >         return 0;
+> >
+> > +err_sq:
+> > +       virtnet_rq_bind_xsk_pool(vi, rq, NULL);
+> >  err_rq:
+> >         xsk_pool_dma_unmap(pool, 0);
+> >  err_xsk_map:
+> > +       dma_unmap_single(dma_dev, hdr_dma, vi->hdr_len, DMA_TO_DEVICE);
+> >         return err;
+> >  }
+> >
+> > @@ -5542,19 +5588,27 @@ static int virtnet_xsk_pool_disable(struct net_=
+device *dev, u16 qid)
+> >         struct virtnet_info *vi =3D netdev_priv(dev);
+> >         struct xsk_buff_pool *pool;
+> >         struct receive_queue *rq;
+> > +       struct device *dma_dev;
+> > +       struct send_queue *sq;
+> >         int err;
+> >
+> >         if (qid >=3D vi->curr_queue_pairs)
+> >                 return -EINVAL;
+> >
+> > +       sq =3D &vi->sq[qid];
+> >         rq =3D &vi->rq[qid];
+> >
+> >         pool =3D rq->xsk_pool;
+> >
+> >         err =3D virtnet_rq_bind_xsk_pool(vi, rq, NULL);
+> > +       err |=3D virtnet_sq_bind_xsk_pool(vi, sq, NULL);
+> >
+> >         xsk_pool_dma_unmap(pool, 0);
+> >
+> > +       dma_dev =3D virtqueue_dma_dev(sq->vq);
+> > +
+> > +       dma_unmap_single(dma_dev, sq->xsk_hdr_dma_addr, vi->hdr_len, DM=
+A_TO_DEVICE);
+>
+> And here.
+>
+> Thanks
+>
+> > +
+> >         kvfree(rq->xsk_buffs);
+> >
+> >         return err;
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
