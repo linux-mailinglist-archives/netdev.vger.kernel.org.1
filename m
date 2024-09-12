@@ -1,224 +1,223 @@
-Return-Path: <netdev+bounces-127912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9823D977038
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:19:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 937069770C5
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 20:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FF362844A7
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:19:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5636528AAD2
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 18:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65849149C50;
-	Thu, 12 Sep 2024 18:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E836A1C1738;
+	Thu, 12 Sep 2024 18:21:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OyKORvDQ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dZn7XhtD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E6713A40F;
-	Thu, 12 Sep 2024 18:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E233131E2D
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 18:21:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726165169; cv=none; b=RnM6vCk+atFmPtKeqLlGQL34lj0UbOD/gr9KsbNEvCf8XLjIjkq59eo7IogPqOF76YQk+J5qq5I2r8ZrLO4zilR+GrlbqLq1ykUZ499MQyVbC8EhzFqW7fmqkYJWOWOaVLHsAly6UYY8XmWywQ0j4SxUvQk7ot9XrDx4ukM35dc=
+	t=1726165300; cv=none; b=Ume+jMje5xp9I5ub77oPb08WxO9XxcEu7KbjlmvUu4QMhNQLP+1P59eMiFNBjVmGOnZScfPwBfngabDza50Jps4ouUvlFDwdIxyFrcKIkZ0GpxwkDz25o78ECIULXvAWPvHDOx0nUwEklJU4d9+tyAXpshz6Jyi3cFJU7Mmhvh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726165169; c=relaxed/simple;
-	bh=HpHolYa6A2/YXxNfS7x9hzMkFm/efMnzar7kgms8g4g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HiaF1dziCKNoYrwB/NSXRXKzIrZD3QTwKMbTo15RaRnk0En3ZcVexHcbsccppUex/S0t/ZKCIPhVnUeOm8K51UoBcNH4NU5W2A2nxF1nr6mieA4IUj5Bmi3n7e5hxckVo1ewDazG3K0GfJ9XkJyf4/Ib805zm6hvPGvuggFnJBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OyKORvDQ; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726165168; x=1757701168;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=HpHolYa6A2/YXxNfS7x9hzMkFm/efMnzar7kgms8g4g=;
-  b=OyKORvDQx2bkBZ3QesCzgthFyUo5OHOi5amYrRBSoWfP8RYVxDExNLlq
-   zDyZtY+4KXvV/l7+yQHiWaOvcWYdKsiNsYVisZFYv1O4DaEziMuDPwKv2
-   hsGb1NzIFpB0bPlXrirHzhTbxUgl0CPVmaerHP/NcgQaHdWNBQIXWG0EI
-   /kePykQ+Lw68hHSih4XH6IkLNaAG26ilxIFOvB8w/eemhQ9qufGZKdP4S
-   zsoyUeCUsjxrhhR9c0UL1uMeZitoJWwZBRiSR4XjStOq1ofpjMPvxvUMp
-   RfyM85iFpxMTp8dog+QDZz/Svyuz4m4vFP0x8NRahJ3gJFznxe9sUUXtM
-   Q==;
-X-CSE-ConnectionGUID: yF8kvIE3RaewwlrL99OaCQ==
-X-CSE-MsgGUID: C2bORb7KT0SqL7RDSZzshA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11193"; a="24913793"
-X-IronPort-AV: E=Sophos;i="6.10,223,1719903600"; 
-   d="scan'208";a="24913793"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 11:19:28 -0700
-X-CSE-ConnectionGUID: swMaWhScQkOriQVe+KE2Yw==
-X-CSE-MsgGUID: 8P26sSKFQYuSQc/XvaZ6sQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,223,1719903600"; 
-   d="scan'208";a="67422250"
-Received: from apaszkie-mobl2.apaszkie-mobl2 (HELO [10.125.108.93]) ([10.125.108.93])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Sep 2024 11:19:26 -0700
-Message-ID: <740c2831-4131-4471-b0ae-23eb816e0600@intel.com>
-Date: Thu, 12 Sep 2024 11:19:25 -0700
+	s=arc-20240116; t=1726165300; c=relaxed/simple;
+	bh=p/gq/CW9SsZCWw/rFyaYSuBTd6L5vMoAbxTuysSTuuM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kRZrmrttbKgUw9wiNaQ82UfSl5sFU/5U15LHPgmKWqI6Fig8br6Ee+lFhppw8fCl5jpF+nu8ldiglaflE3SHrvN7JgVo0idnaWzkFC+bKJuDE99YdIsVTEBuLBpenVApYMwpiT59aJfTLQoN3HahlXiMlOndBN+J6Irgj1MEOgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dZn7XhtD; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4581cec6079so40021cf.0
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 11:21:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726165298; x=1726770098; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ppRney/4jGQpW6a37DhJ8+kAp0WczyW6xnrNGRl/XJw=;
+        b=dZn7XhtDTxILqvEL9qXThQ/uf0CE8dcSJx0au6P1oTZuj1zA/tm6gcHPXYrEB65tqj
+         5rhCtztuGJLAQPbth6bYf55+ceXiRRpNwJ1xoOBJh8AtI8+igOpBXNLwLi3ov595j5pp
+         WwbdcNVV6UiYvvCe9wPS3Opbxvuh3Xw+eFwPrArmhlnX16LNP8493/8JaAr0NH4+rO5u
+         1kCNwdGMl/47l7l8e4ermaiTfDqovkzmNsxTlCog/KDEwZq9uLtS+m+AwvxmPrvd0W1I
+         X3yypaXm0NaxgNa0lKszz5xSfS+TWRcm0O+pGfD7e/BCfov7Hc3rxxHCRBHrEJlIwaD6
+         51cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726165298; x=1726770098;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ppRney/4jGQpW6a37DhJ8+kAp0WczyW6xnrNGRl/XJw=;
+        b=QzTXL0Kkic0qajdSo3cHcyH6OWDL1sWgHEV1HZv3giuaLvSCI2MI0vbOjbSJBjPdQt
+         vjkCTciYtMEVU3jZxQ2MHEamqdPT9Vt5tlA2xSBu/lfE+JJldyuTdaIrGbiYHZeWPX0i
+         U3CRS67oo3MjZDTEtJTUpNId7k14B13WzWLi2JDpsyMylOxNpk1muSNOjCmM0qRJ9Io7
+         3aslNHN8/VeprYvskavDCNjrLPN36kauxa3bkvor60UeeKlIdTYZmth4EcZohnm/TsGe
+         5gFH5juTJifYsaIK8VU8JWHJOyrS2uZMZKm52YMCrr7/XUo9vLBxMmmWpU+obDFB74X4
+         hF7A==
+X-Forwarded-Encrypted: i=1; AJvYcCWEj9TvdwcGOapzrmSMG7aeaFnYOmV52sBTCpiEEUUWn4U536D1uEx+Qep4AS1Kjqoc4ZBgYVs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk3P83/7f2UtgM3m1kob+MgFQKwzBAmThF/hrWhajkNsyvafDy
+	Z0EOtMziW9ik9Ajq5f1LjSzvM5zgXk3AL0z3rN1LbJx+uVgz+ij0wzfvuNuUh5ko2++Y+/mcDYn
+	CcHKgIkR1EUzgi8Vc8qMhdyoGr57+raVK+m9O
+X-Google-Smtp-Source: AGHT+IEiDUGqxZVfqgS2lhZx6D//y9/VnB7axc7qguCSr867pXQTVePOCTRxp3C6vdlwPdINoIgDAIvmR9uxhpniHM4=
+X-Received: by 2002:a05:622a:24f:b0:456:7d9f:2af8 with SMTP id
+ d75a77b69052e-458645121e9mr3751071cf.7.1726165297692; Thu, 12 Sep 2024
+ 11:21:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 09/20] cxl: support type2 memdev creation
-To: alejandro.lucero-palau@amd.com, linux-cxl@vger.kernel.org,
- netdev@vger.kernel.org, dan.j.williams@intel.com, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com
-Cc: Alejandro Lucero <alucerop@amd.com>
-References: <20240907081836.5801-1-alejandro.lucero-palau@amd.com>
- <20240907081836.5801-10-alejandro.lucero-palau@amd.com>
-Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20240907081836.5801-10-alejandro.lucero-palau@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240912-net-next-fix-get_netdev_rx_queue_index-v1-1-d73a1436be8c@kernel.org>
+ <CAHS8izOkpnLM_Uev79skrmdQjdOGwy_oYWV7xb3hNpSb=yYZ6g@mail.gmail.com> <73a104e0-d73f-4836-92fd-4bef415900d4@kernel.org>
+In-Reply-To: <73a104e0-d73f-4836-92fd-4bef415900d4@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 12 Sep 2024 11:21:23 -0700
+Message-ID: <CAHS8izMEzug_c+LYG3=tPq6ARQjsXQqCwkO+t0hPpWiivxTB1A@mail.gmail.com>
+Subject: Re: [PATCH net-next] memory-provider: fix compilation issue without SYSFS
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Pavel Begunkov <asml.silence@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Sep 12, 2024 at 8:26=E2=80=AFAM Matthieu Baerts <matttbe@kernel.org=
+> wrote:
+>
+> Hi Mina,
+>
+> Thank you for your reply!
+>
+> On 12/09/2024 14:49, Mina Almasry wrote:
+> > On Thu, Sep 12, 2024 at 3:25=E2=80=AFAM Matthieu Baerts (NGI0)
+> > <matttbe@kernel.org> wrote:
+> >>
+> >> When CONFIG_SYSFS is not set, the kernel fails to compile:
+> >>
+> >>      net/core/page_pool_user.c:368:45: error: implicit declaration of =
+function 'get_netdev_rx_queue_index' [-Werror=3Dimplicit-function-declarati=
+on]
+> >>       368 |                 if (pool->slow.queue_idx =3D=3D get_netdev=
+_rx_queue_index(rxq)) {
+> >>           |                                             ^~~~~~~~~~~~~~=
+~~~~~~~~~~~
+> >>
+> >> When CONFIG_SYSFS is not set, get_netdev_rx_queue_index() is not defin=
+ed
+> >> as well. In this case, page_pool_check_memory_provider() cannot check
+> >> the memory provider, and a success answer can be returned instead.
+> >>
+> >
+> > Thanks Matthieu, and sorry about that.
+> >
+> > I have reproduced the build error and the fix resolves it. But...
+> >
+> >> Fixes: 0f9214046893 ("memory-provider: dmabuf devmem memory provider")
+> >> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> >> ---
+> >>  net/core/page_pool_user.c | 4 ++++
+> >>  1 file changed, 4 insertions(+)
+> >>
+> >> diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
+> >> index 48335766c1bf..a98c0a76b33f 100644
+> >> --- a/net/core/page_pool_user.c
+> >> +++ b/net/core/page_pool_user.c
+> >> @@ -353,6 +353,7 @@ void page_pool_unlist(struct page_pool *pool)
+> >>  int page_pool_check_memory_provider(struct net_device *dev,
+> >>                                     struct netdev_rx_queue *rxq)
+> >>  {
+> >> +#ifdef CONFIG_SYSFS
+> >>         struct net_devmem_dmabuf_binding *binding =3D rxq->mp_params.m=
+p_priv;
+> >>         struct page_pool *pool;
+> >>         struct hlist_node *n;
+> >> @@ -372,6 +373,9 @@ int page_pool_check_memory_provider(struct net_dev=
+ice *dev,
+> >>         }
+> >>         mutex_unlock(&page_pools_lock);
+> >>         return -ENODATA;
+> >> +#else
+> >> +       return 0;
+> >
+> > ...we can't assume success when we cannot check the memory provider.
+> > The memory provider check is somewhat critical; we rely on it to
+> > detect that the driver does not support memory providers or is not
+> > doing the right thing, and report that to the user. I don't think we
+> > can silently disable the check when the CONFIG_SYSFS is disabled.
+> > Please return -ENODATA or some other error here.
+>
+> I initially returned 0 to have the same behaviour as when
+> CONFIG_PAGE_POOL is not defined. But thanks to your explanations, I
+> understand it seems better to return -ENODATA here. Or another errno, to
+> let the userspace understanding there is a different error? I can send a
+> v2 after the 24h rate-limit period if you are OK with that.
+>
+
+Yes, -EOPNOTSUPP would be my preference here. I think it makes sense,
+we should not support memory-providers on configs where core can't
+verify that the driver did the right thing.
+
+[...]
+
+> > However, I'm looking at the definition of get_netdev_rx_queue_index()
+> > and at first glance I don't see anything there that is actually
+> > dependent on CONFIG_SYSFS. Can we do this instead? I have build-tested
+> > it and it resolves the build issue as well:
+> >
+> > ```
+> > diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queu=
+e.h
+> > index ac34f5fb4f71..596836abf7bf 100644
+> > --- a/include/net/netdev_rx_queue.h
+> > +++ b/include/net/netdev_rx_queue.h
+> > @@ -45,7 +45,6 @@ __netif_get_rx_queue(struct net_device *dev, unsigned=
+ int rxq)
+> >         return dev->_rx + rxq;
+> >  }
+> >
+> > -#ifdef CONFIG_SYSFS
+> >  static inline unsigned int
+> >  get_netdev_rx_queue_index(struct netdev_rx_queue *queue)
+> >  {
+> > @@ -55,7 +54,6 @@ get_netdev_rx_queue_index(struct netdev_rx_queue *que=
+ue)
+> >         BUG_ON(index >=3D dev->num_rx_queues);
+> >         return index;
+> >  }
+> > -#endif
+> >  ```
+>
+> I briefly looked at taking this path when I saw what this helper was
+> doing, but then I saw all operations related to the received queues were
+> enabled only when CONFIG_SYSFS is set, see commit a953be53ce40
+> ("net-sysfs: add support for device-specific rx queue sysfs
+> attributes"). I understood from that it is better not to look at
+> dev->_rx or dev->num_rx_queues when CONFIG_SYSFS is not set. I'm not
+> very familiar to that part of the code, but it feels like removing this
+> #ifdef might be similar to the "return 0" I suggested: silently
+> disabling the check, no?
+>
+> I *think* it might be clearer to return an error when SYSFS is not set.
+>
+
+FWIW it looks like commit e817f85652c1 ("xdp: generic XDP handling of
+xdp_rxq_info") reverted almost all the CONFIG_SYSFS checks set by
+commit a953be53ce40 ("net-sysfs: add support for device-specific rx
+queue sysfs attributes"), at least from a quick look.
+
+But I understand your CI is probably very annoyed by the build
+failure. I would be happy to reviewed-by a patch with just the change
+to the error return value, and I can look into making this work with
+CONFIG_SYSFS after the merge window.
 
 
-
-On 9/7/24 1:18 AM, alejandro.lucero-palau@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
-> 
-> Add memdev creation from sfc driver.
-> 
-> Current cxl core is relying on a CXL_DEVTYPE_CLASSMEM type device when
-> creating a memdev leading to problems when obtaining cxl_memdev_state
-> references from a CXL_DEVTYPE_DEVMEM type. This last device type is
-> managed by a specific vendor driver and does not need same sysfs files
-> since not userspace intervention is expected. This patch checks for the
-> right device type in those functions using cxl_memdev_state.
-> 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> ---
->  drivers/cxl/core/cdat.c            |  3 +++
->  drivers/cxl/core/memdev.c          |  9 +++++++++
->  drivers/cxl/mem.c                  | 17 +++++++++++------
->  drivers/net/ethernet/sfc/efx_cxl.c |  7 +++++++
->  include/linux/cxl/cxl.h            |  2 ++
->  5 files changed, 32 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/cxl/core/cdat.c b/drivers/cxl/core/cdat.c
-> index bb83867d9fec..0d4679c137d4 100644
-> --- a/drivers/cxl/core/cdat.c
-> +++ b/drivers/cxl/core/cdat.c
-> @@ -558,6 +558,9 @@ void cxl_region_perf_data_calculate(struct cxl_region *cxlr,
->  	};
->  	struct cxl_dpa_perf *perf;
->  
-> +	if (!mds)
-> +		return;
-> +
->  	switch (cxlr->mode) {
->  	case CXL_DECODER_RAM:
->  		perf = &mds->ram_perf;
-> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
-> index 836faf09b328..5f8418620b70 100644
-> --- a/drivers/cxl/core/memdev.c
-> +++ b/drivers/cxl/core/memdev.c
-> @@ -468,6 +468,9 @@ static umode_t cxl_ram_visible(struct kobject *kobj, struct attribute *a, int n)
->  	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
->  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->  
-> +	if (!mds)
-> +		return 0;
-
-I think instead of altering the sysfs visible attributes, what you really want is to not register the unwanted group attributes. Or basically only register the cxl_memdev_attribute_group and not the other ones. Otherwise it gets really messy. And whomever adds future attributes need to also remember the special case. I think you can refer to core/port.c and look at the different decoder types as inspiration for creating different memdev types where it has cxl_decoder_base_attribute_group and then tack on specific attribute groups.
-
-DJ 
-
-> +
->  	if (a == &dev_attr_ram_qos_class.attr)
->  		if (mds->ram_perf.qos_class == CXL_QOS_CLASS_INVALID)
->  			return 0;
-> @@ -487,6 +490,9 @@ static umode_t cxl_pmem_visible(struct kobject *kobj, struct attribute *a, int n
->  	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
->  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->  
-> +	if (!mds)
-> +		return 0;
-> +
->  	if (a == &dev_attr_pmem_qos_class.attr)
->  		if (mds->pmem_perf.qos_class == CXL_QOS_CLASS_INVALID)
->  			return 0;
-> @@ -507,6 +513,9 @@ static umode_t cxl_memdev_security_visible(struct kobject *kobj,
->  	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
->  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->  
-> +	if (!mds)
-> +		return 0;
-> +
->  	if (a == &dev_attr_security_sanitize.attr &&
->  	    !test_bit(CXL_SEC_ENABLED_SANITIZE, mds->security.enabled_cmds))
->  		return 0;
-> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
-> index 7de232eaeb17..5c7ad230bccb 100644
-> --- a/drivers/cxl/mem.c
-> +++ b/drivers/cxl/mem.c
-> @@ -131,12 +131,14 @@ static int cxl_mem_probe(struct device *dev)
->  	dentry = cxl_debugfs_create_dir(dev_name(dev));
->  	debugfs_create_devm_seqfile(dev, "dpamem", dentry, cxl_mem_dpa_show);
->  
-> -	if (test_bit(CXL_POISON_ENABLED_INJECT, mds->poison.enabled_cmds))
-> -		debugfs_create_file("inject_poison", 0200, dentry, cxlmd,
-> -				    &cxl_poison_inject_fops);
-> -	if (test_bit(CXL_POISON_ENABLED_CLEAR, mds->poison.enabled_cmds))
-> -		debugfs_create_file("clear_poison", 0200, dentry, cxlmd,
-> -				    &cxl_poison_clear_fops);
-> +	if (mds) {
-> +		if (test_bit(CXL_POISON_ENABLED_INJECT, mds->poison.enabled_cmds))
-> +			debugfs_create_file("inject_poison", 0200, dentry, cxlmd,
-> +					    &cxl_poison_inject_fops);
-> +		if (test_bit(CXL_POISON_ENABLED_CLEAR, mds->poison.enabled_cmds))
-> +			debugfs_create_file("clear_poison", 0200, dentry, cxlmd,
-> +					    &cxl_poison_clear_fops);
-> +	}
->  
->  	rc = devm_add_action_or_reset(dev, remove_debugfs, dentry);
->  	if (rc)
-> @@ -222,6 +224,9 @@ static umode_t cxl_mem_visible(struct kobject *kobj, struct attribute *a, int n)
->  	struct cxl_memdev *cxlmd = to_cxl_memdev(dev);
->  	struct cxl_memdev_state *mds = to_cxl_memdev_state(cxlmd->cxlds);
->  
-> +	if (!mds)
-> +		return 0;
-> +
->  	if (a == &dev_attr_trigger_poison_list.attr)
->  		if (!test_bit(CXL_POISON_ENABLED_LIST,
->  			      mds->poison.enabled_cmds))
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index 14fab41fe10a..899bc823a212 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -83,6 +83,13 @@ int efx_cxl_init(struct efx_nic *efx)
->  	 */
->  	cxl_set_media_ready(cxl->cxlds);
->  
-> +	cxl->cxlmd = devm_cxl_add_memdev(&pci_dev->dev, cxl->cxlds);
-> +	if (IS_ERR(cxl->cxlmd)) {
-> +		pci_err(pci_dev, "CXL accel memdev creation failed");
-> +		rc = PTR_ERR(cxl->cxlmd);
-> +		goto err;
-> +	}
-> +
->  	return 0;
->  err:
->  	kfree(cxl->cxlds);
-> diff --git a/include/linux/cxl/cxl.h b/include/linux/cxl/cxl.h
-> index 08723b2d75bc..fc0859f841dc 100644
-> --- a/include/linux/cxl/cxl.h
-> +++ b/include/linux/cxl/cxl.h
-> @@ -55,4 +55,6 @@ int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds);
->  int cxl_request_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
->  int cxl_release_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
->  void cxl_set_media_ready(struct cxl_dev_state *cxlds);
-> +struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
-> +				       struct cxl_dev_state *cxlds);
->  #endif
+--=20
+Thanks,
+Mina
 
