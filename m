@@ -1,149 +1,146 @@
-Return-Path: <netdev+bounces-127696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A42E29761BF
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:43:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 937529761D2
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:50:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27F671F230C6
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 06:43:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06CC2B21520
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 06:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B7D18BC26;
-	Thu, 12 Sep 2024 06:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A5A18BC22;
+	Thu, 12 Sep 2024 06:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="D8MtRxoK"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ul9Ctz7n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD168189BB0;
-	Thu, 12 Sep 2024 06:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7557018BBBC;
+	Thu, 12 Sep 2024 06:50:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726123354; cv=none; b=IxdyMeYoCaA2FEVx8iXpOflxWfHFnL8nYBDpPvDXjceSZkFhQu9hTuBlJRuaGVH/uZk+rkO7/IISFQVTLnWTWxgODcoeM+qtt2DtHdLt2z7VZy/wTWUNyyLbaL+yk/RQHlonOCVMrf1hPUiPI/msDTkeYA+fdXuAEglctLi2d7E=
+	t=1726123834; cv=none; b=oC7YWs9dGqsGgWGW0/svOgyr60IFcmkcj1ETk9KcCuqnQaree91vQMahGGgyNZFBWLHV3oJ50eTxgPoXkM/uHg63xfgAWnr0otzTcfSqbTfZQpHjKrpm/nhsEFZTrJ8nMf0c/GrKM7E//W1D3fpRrWnb2MsfVgtK60Zo6Ugjk+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726123354; c=relaxed/simple;
-	bh=D5Pn4h1284j4OUOqpZme8DG3ltDWWwpkQMEEd3WMpgI=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=l6r9wMPnk2a0KASyodxY9aOOc+8OeszgpFzLyOOZvPR0oCyOf3Sris8iKhNfw9I9KbtXCYbmWxR44DQHwUoa7BWWmt+XfGHDUCehlnS8vWR2J+zQ0cpvkw+p++op8xy/VqJoPUlW6dEYOu0RlDHWm0JhHAhiPiF4kpuJeDNZq6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=D8MtRxoK; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 48C6gBPw019738
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Thu, 12 Sep 2024 08:42:12 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1726123335; bh=OQCdqXcgMg0VpcDr+sngwSohrYLV13e2sD1Rt2GwKuc=;
-	h=Date:From:To:Cc:Subject;
-	b=D8MtRxoKVDXnXt0bG7GbM4aDlSymXdaKtUepfxG9kS2bIXr60Oj0vkMjA0BcybjRA
-	 zKj2ZUfxgAj98uufwJl9oQkZn0uQkFRchWDHEx7UbbYw4N3nZ9A2jq7wrb8FtGw5Jp
-	 bDbmRqguon5fCbjHvOUUb9N950gvt4RjitZS+uVw=
-Message-ID: <d04814fb-1ee1-4987-b8a1-d7d6b834c360@ans.pl>
-Date: Wed, 11 Sep 2024 23:42:10 -0700
+	s=arc-20240116; t=1726123834; c=relaxed/simple;
+	bh=EBxemKti4xJ8vmNgq76QSfaB4SSu/PnBKc2/y5ixnTo=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MgLIDNl/etEvpZCRnsErn03eRuu5fBFwYqlp3xnQC4VSu4VQoa/v/U+mS/ovsOVAHbZEloDgcf6k2p5QlxVGBRRXqIsDDbq7HpJu1wO/CBgfAQW55C2+WWAId3hprYfW9h7VgPRDF7EQofIIBbA2IIj4pserwiu2iHqEh7BVP5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ul9Ctz7n; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1726123832; x=1757659832;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EBxemKti4xJ8vmNgq76QSfaB4SSu/PnBKc2/y5ixnTo=;
+  b=ul9Ctz7nBBySkVrOs6xlVe+/PYam0VWInPJ2iAi0/0oUACof54s5Wgv0
+   LTQEHXh7id5cHpMGK/RXy8Mh0jUfWFe8nlfq976nVzIi45US7Pc/o7zKw
+   ivPFCgroyKhpE8Vo9C/sXvSe+RnMZq62Wx5DWENSHfg0mX/p/V0JAPhI9
+   /yUE8iVp+vJbMr9qNYuFOTmavucjWeVwyynqnDD+sV9tt/9tKgDsl/glw
+   6a8HhtQVkdz5Xsa+1Y2+Nmkqf8VH7Y6d84rQCjs6VMHYjs0HQ3LCSRur+
+   +fiGK3uGlaymlDkdKRY8aZyVKnDKZedkjYsAWqnKwH5SZLxVlYAMN7rrh
+   g==;
+X-CSE-ConnectionGUID: wr6MJFrmSWapl9D4DJKCyw==
+X-CSE-MsgGUID: 4dzz1YawRqybKms59QTE+w==
+X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
+   d="scan'208";a="31685584"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Sep 2024 23:50:31 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 11 Sep 2024 23:50:00 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Wed, 11 Sep 2024 23:50:00 -0700
+Date: Thu, 12 Sep 2024 12:16:10 +0530
+From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <bryan.whitehead@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
+	<rdunlap@infradead.org>, <andrew@lunn.ch>, <Steen.Hegelund@microchip.com>,
+	<daniel.machon@microchip.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next V2 4/5] net: lan743x: Implement phylink pcs
+Message-ID: <ZuKOMjMWUf5d9mL8@HYD-DK-UNGSW21.microchip.com>
+References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
+ <20240911161054.4494-5-Raju.Lakkaraju@microchip.com>
+ <20240911192425.428db5ac@fedora.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-To: Ido Schimmel <idosch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Yishai Hadas <yishaih@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        linux-rdma@vger.kernel.org
-Subject: [PATCH net-next 4/4] mlx4: mlx4_get_port_ib_caps() cleanup
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240911192425.428db5ac@fedora.home>
 
-Remove magic values and casts from mlx4_get_port_ib_caps() and use
-proper structures instead.
+Hi Maxime,
 
-Replace 0x0015 with MLX4_ATTR_PORT_INFO that is named after a similar
-const from ib_smi.h and because "GetPortInfo MAD" name is also mentioned
-in the Firmware Release Notes.
+Thank you for review the patches.
 
-Use cap_mask name after "struct ib_port_info" given the offset (64 + 20)
-matches.
+The 09/11/2024 19:24, Maxime Chevallier wrote:
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+> 
+> Hello Raju,
+> 
+> On Wed, 11 Sep 2024 21:40:53 +0530
+> Raju Lakkaraju <Raju.Lakkaraju@microchip.com> wrote:
+> 
+> [...]
+> 
+> > @@ -3820,9 +3869,28 @@ static int lan743x_mdiobus_init(struct lan743x_adapter *adapter)
+> >       ret = mdiobus_register(adapter->mdiobus);
+> >       if (ret < 0)
+> >               goto return_error;
+> > +
+> > +     if (adapter->is_sfp_support_en) {
+> > +             if (!adapter->phy_interface)
+> > +                     lan743x_phy_interface_select(adapter);
+> > +
+> > +             xpcs = xpcs_create_mdiodev(adapter->mdiobus, 0,
+> > +                                        adapter->phy_interface);
+> > +             if (IS_ERR(xpcs)) {
+> > +                     netdev_err(adapter->netdev, "failed to create xpcs\n");
+> > +                     ret = PTR_ERR(xpcs);
+> > +                     goto err_destroy_xpcs;
+> > +             }
+> > +             adapter->xpcs = xpcs;
+> > +     }
+> > +
+> >       return 0;
+> >
+> > +err_destroy_xpcs:
+> > +     xpcs_destroy(xpcs);
+> 
+> It looks like here, you're destroying the xpcs only when the xpcs
+> couln't be created in the first place, so no need to destroy it :)
 
-Signed-off-by: Krzysztof Piotr Oledzki <ole@ans.pl>
----
- drivers/net/ethernet/mellanox/mlx4/port.c | 26 ++++++++++++++---------
- include/linux/mlx4/device.h               |  2 +-
- 2 files changed, 17 insertions(+), 11 deletions(-)
+Ok. I will remove
 
-diff --git a/drivers/net/ethernet/mellanox/mlx4/port.c b/drivers/net/ethernet/mellanox/mlx4/port.c
-index 8c2a384404f9..d5109e38cbd5 100644
---- a/drivers/net/ethernet/mellanox/mlx4/port.c
-+++ b/drivers/net/ethernet/mellanox/mlx4/port.c
-@@ -1054,10 +1054,15 @@ int mlx4_unbond_vlan_table(struct mlx4_dev *dev)
- 	return ret;
- }
- 
-+struct mlx4_mad_port_info {
-+	u8 reserved[20];
-+	__be32 cap_mask;
-+};
-+
- int mlx4_get_port_ib_caps(struct mlx4_dev *dev, u8 port, __be32 *caps)
- {
- 	struct mlx4_cmd_mailbox *inmailbox, *outmailbox;
--	u8 *inbuf, *outbuf;
-+	struct mlx4_mad_ifc *inmad, *outmad;
- 	int err;
- 
- 	inmailbox = mlx4_alloc_cmd_mailbox(dev);
-@@ -1070,20 +1075,21 @@ int mlx4_get_port_ib_caps(struct mlx4_dev *dev, u8 port, __be32 *caps)
- 		return PTR_ERR(outmailbox);
- 	}
- 
--	inbuf = inmailbox->buf;
--	outbuf = outmailbox->buf;
--	inbuf[0] = 1;
--	inbuf[1] = 1;
--	inbuf[2] = 1;
--	inbuf[3] = 1;
--	*(__be16 *) (&inbuf[16]) = cpu_to_be16(0x0015);
--	*(__be32 *) (&inbuf[20]) = cpu_to_be32(port);
-+	inmad = (struct mlx4_mad_ifc *)(inmailbox->buf);
-+	outmad = (struct mlx4_mad_ifc *)(outmailbox->buf);
-+
-+	inmad->method = 0x1; /* Get */
-+	inmad->class_version = 0x1;
-+	inmad->mgmt_class = 0x1;
-+	inmad->base_version = 0x1;
-+	inmad->attr_id = cpu_to_be16(MLX4_ATTR_PORT_INFO);
-+	inmad->attr_mod = cpu_to_be32(port);
- 
- 	err = mlx4_cmd_box(dev, inmailbox->dma, outmailbox->dma, port, 3,
- 			   MLX4_CMD_MAD_IFC, MLX4_CMD_TIME_CLASS_C,
- 			   MLX4_CMD_NATIVE);
- 	if (!err)
--		*caps = *(__be32 *) (outbuf + 84);
-+		*caps = ((struct mlx4_mad_port_info *)outmad->data)->cap_mask;
- 	mlx4_free_cmd_mailbox(dev, inmailbox);
- 	mlx4_free_cmd_mailbox(dev, outmailbox);
- 	return err;
-diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
-index 4f2ff466b459..e64fc35c80b6 100644
---- a/include/linux/mlx4/device.h
-+++ b/include/linux/mlx4/device.h
-@@ -264,7 +264,7 @@ enum {
- 	MLX4_FUNC_CAP_DMFS_A0_STATIC	= 1L << 2
- };
- 
--
-+#define MLX4_ATTR_PORT_INFO		0x0015
- #define MLX4_ATTR_CABLE_INFO		0xff60
- 
- enum {
+But i was little bit confusion here.
+
+In xpcs_create_mdiodev( ) function, inside the mdio_device_create( ) function 
+allocate memory for mdio_device
+
+Then, in xpcs_create( ) function to create data by calling xpcs_create_data( )
+function, create dw_xpcs memory.
+
+It's reason, for safe side, I updte xpcs destroy
+
+> 
+> Best regards,
+> 
+> Maxime
+
 -- 
-2.46.0
+Thanks,                                                                         
+Raju
 
