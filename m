@@ -1,157 +1,189 @@
-Return-Path: <netdev+bounces-127711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0443A9762BD
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:33:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A3329762C9
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 09:35:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 370AB1C22404
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:33:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F1B41C22143
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 07:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3225D18DF90;
-	Thu, 12 Sep 2024 07:33:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517CF18BBA5;
+	Thu, 12 Sep 2024 07:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CWEpvclX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CX5VzK+J"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1063178C7B;
-	Thu, 12 Sep 2024 07:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79087186E58
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 07:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726126382; cv=none; b=MgbMIpY5CxfppGLhDp7HAltgOYXO3N1+n8TNqK7Y3pjFJ9y7CfFNBJ3i/JOXwVYvJMf0HKR3H2o7IYedYOm424Qz1tCwxmulpwOqRhyiwGZjyfX/x5enldf3iIpx1QgnAojL9tJEY7L5wz3Ie5Tz4Sd69ZCetVAh+wcrkpC6GBg=
+	t=1726126539; cv=none; b=o8fgT0w4XIlkEA9N8KbBwOtIwhQPBkEgQiJthTTMY0A4nZt84W6uGBu7wauykBexh8i6E1UI/n8+V6PFfxcFgTlsu10Y607qS38MWOnzmFkVJcQzkIV34kHwJyVdTf7X4t8icGvUxQ9nTIcrT1MwIPnBWxYiPGmKtEXIG5MX+Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726126382; c=relaxed/simple;
-	bh=A0OLi+CRloHyK/Ua4rHjaFAPFQYO8jOgh8kX9YifaN0=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tQGSembQjBmyHcwvSp6ftGwrinx/Bbfwz0Rnnv6Q+PblYdNJSvV0f32wdudIoo9Bin3UEm9IK3Dltj8ZM3pSPNNMdDuYvQHQOnxgfKOaBTTAoD5SDadrEcM3BOY/+J+gEeVzsNheap7dJGM5RSOokYt5dbT6bz62MiVylIX5EBQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CWEpvclX; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1726126380; x=1757662380;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=A0OLi+CRloHyK/Ua4rHjaFAPFQYO8jOgh8kX9YifaN0=;
-  b=CWEpvclX97d2Yrq9XxSVEETrq4ydiUk4STBJlqts65R3soA9H7FCMvxl
-   v4OkInI78IHyNMjW66LuKKJREh7gVkaDTerHhwXhLMdXGJvStPPIKpou3
-   6KloXlGhdDHAcMsgN0Ss/1S4/hSaKmO8QIW7sEai9XordKoPbU1C0jr7p
-   CKkCWn3zAOB1YCiMV6G9be8iiDyWGnC9dtZZG8+PD2Rj5GY3WLSBxbQq8
-   2jND3WG4xF3up5uhkBMiGiqdLO+kseaNSgieHHssu/f5zJNHZ1xGUFFwy
-   Q9/Wjb+UN+yz5kaZNLqulIw5hYbDOrRFh8Rv/QN5rBIKfnPoS6kBgj2y6
-   A==;
-X-CSE-ConnectionGUID: LpRQBBlMQkGueR9dw36uBA==
-X-CSE-MsgGUID: f7yaRPOpS069i9Newcnl4A==
-X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
-   d="asc'?scan'208";a="31577165"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Sep 2024 00:32:58 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 12 Sep 2024 00:32:23 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex01.mchp-main.com (10.10.85.143)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Thu, 12 Sep 2024 00:32:20 -0700
-Date: Thu, 12 Sep 2024 08:31:46 +0100
-From: Conor Dooley <conor.dooley@microchip.com>
-To: WangYuli <wangyuli@uniontech.com>
-CC: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	<stable@vger.kernel.org>, <gregkh@linuxfoundation.org>, <sashal@kernel.org>,
-	<william.qiu@starfivetech.com>, <emil.renner.berthing@canonical.com>,
-	<xingyu.wu@starfivetech.com>, <walker.chen@starfivetech.com>,
-	<robh@kernel.org>, <hal.feng@starfivetech.com>, <kernel@esmil.dk>,
-	<robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-	<conor+dt@kernel.org>, <paul.walmsley@sifive.com>, <palmer@dabbelt.com>,
-	<aou@eecs.berkeley.edu>, <devicetree@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<richardcochran@gmail.com>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH 6.6 1/4] riscv: dts: starfive: add assigned-clock* to
- limit frquency
-Message-ID: <20240912-sketch-research-ad02c157cbf3@wendy>
-References: <D200DC520B462771+20240909074645.1161554-1-wangyuli@uniontech.com>
- <20240909-fidgeting-baggage-e9ef9fab9ca4@wendy>
- <ac72665f-0138-4951-aa90-d1defebac9ca@linaro.org>
- <20240909-wrath-sway-0fe29ff06a22@wendy>
- <DBEFAD22C49AAFC6+58debc20-5281-4ae7-a418-a4b232be9458@uniontech.com>
+	s=arc-20240116; t=1726126539; c=relaxed/simple;
+	bh=uhFaBT3eSnVu4Qfkz/ZQSlU7RrPtKmeYKr5aDLq+vZU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AwA8EWMqAqPvL2aQerrUXALhDSggxSssVp2xMPuf+YNR/CYMgBWU5y316RhXmBn3XxBRTZmqHtxU/gRCeNLpA7DQAIEapfs06LioR9ux/h7HZPGY6VKpAVGanKskNdLAdJD7hUfk1o8+3uitU9F7izku7dzsEMib7lIwbtjYa7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CX5VzK+J; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5bf01bdaff0so723075a12.3
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 00:35:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726126536; x=1726731336; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S0hFF9Ufg5tJAUtGx+1QcEX70VmZ5BNJfaBbgW27+8M=;
+        b=CX5VzK+Juc7Vp49Uh4DtPTbeLtE9p4GFhSw340pvFBL6Fn87T1nbbgqutS62vgS95Q
+         pi64TzMf1vc23e35vm07c34luOfAIoO7HoEEFPVeWigSFRJVYM4qLIJRzM/WgZukFiu4
+         C1ugQPzWq99O/QH8SljLRZQuwZaIR0nVZkNHHqRCmMCRxUSS93vz/t5rFsWCI0gGGZDM
+         /T1nERIjrmpY1h3nLnch6bpAuy3JLNs84HhcniA/ZLMTK/IPY/iUsGmz7v8xAQNjPwJR
+         SRSmuNXXfXoLNCwvT9OfNYuSigrZy5oKlP58sr/Fj5oH7KrgxBIGyMQShUHRMU0k5avl
+         G+Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726126536; x=1726731336;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S0hFF9Ufg5tJAUtGx+1QcEX70VmZ5BNJfaBbgW27+8M=;
+        b=hrds5FInwZyyfOrrzH+VTQDqkT1nEwMa1YFwQf5vloImdbDaA6VuJKouhcaYDbgTPP
+         cuMzEPsz4N4ii6JpbVbumXb1kTbmH4sYhTbeuy/Rks3yhR/o3ZKsG03O8sqakrb3vldg
+         xyPWJyH3Z53wsNO8cCOvD9+kJhLsQ62DgoIFz8LZdHra8iPeYNZ8yPecTVA5NB2TPu+v
+         vAAUchzPaZwUmfGp5S3CokVzB5lrhU296SX8U4GwlP6cLP3kbfM1inCq9/ioRx2pGfqz
+         wgQBwSL6bz+exFGwsMoDVir/o92fWyJ2ULVNHMTbMZe42ktxa5R2XoS6yjbmchX5jUtR
+         FWpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV06ll57Pt2VW6PGf4eHjhUI0qtVlbSIyV6PcnfcefqdUY+iDwpyvh0cFI594phBLfbwUBtzxI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+pT0zMIy8C2X1IuTaXIkW/I1N7tOFzxq/oxWWgqSdywPK9oaG
+	dEmX6wHSdknsIGSUbsqppoWIUgTwwiS7ehBDbnf9JDp21WEex2TP/+NMpdBa8BHU1KoDrTbetYz
+	mDNkQmZPigL55W58iYz658Gln7dsY/PKfOwUL
+X-Google-Smtp-Source: AGHT+IFcXvb5XmwiR+MJ2LMIHHLGzLdAhP6xrcp+BGvr2AUERIhvmKbyioD2GxtT2eWKzJbZXLszw0lmYp5/VCDlnto=
+X-Received: by 2002:a05:6402:4308:b0:5c3:c388:2e36 with SMTP id
+ 4fb4d7f45d1cf-5c413e0892bmr1288929a12.3.1726126534725; Thu, 12 Sep 2024
+ 00:35:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="dUrs2a+ddceNZFId"
-Content-Disposition: inline
-In-Reply-To: <DBEFAD22C49AAFC6+58debc20-5281-4ae7-a418-a4b232be9458@uniontech.com>
-
---dUrs2a+ddceNZFId
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20240912071702.221128-1-en-wei.wu@canonical.com>
+In-Reply-To: <20240912071702.221128-1-en-wei.wu@canonical.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 12 Sep 2024 09:35:19 +0200
+Message-ID: <CANn89iJZGH+yEfJxfPWa3Hm7jxb-aeY2Up4HufmLMnVuQXt38A@mail.gmail.com>
+Subject: Re: [PATCH ipsec v2] xfrm: check MAC header is shown with both
+ skb->mac_len and skb_mac_header_was_set()
+To: En-Wei Wu <en-wei.wu@canonical.com>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kai.heng.feng@canonical.com, chia-lin.kao@canonical.com, 
+	anthony.wong@canonical.com, kuan-ying.lee@canonical.com, 
+	chris.chiu@canonical.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 12, 2024 at 10:38:20AM +0800, WangYuli wrote:
->=20
-> On 2024/9/9 19:17, Conor Dooley wrote:
-> > [6.6] in the subject and Sasha/Greg/stable list on CC, so I figure it is
-> > for stable, yeah. Only one of these patches is a "fix", and not really a
-> > functional one, so I would like to know why this stuff is being
-> > backported. I think under some definition of "new device IDs and quirks"
-> > it could be suitable, but it'd be a looser definition than I personally
-> > agree with!
-> These submissions will help to ensure a more stable behavior for the RISC=
--V
-> devices involved on the Linux-6.6.y kernel,
+On Thu, Sep 12, 2024 at 9:17=E2=80=AFAM En-Wei Wu <en-wei.wu@canonical.com>=
+ wrote:
+>
+> When we use Intel WWAN with xfrm, our system always hangs after
+> browsing websites for a few seconds. The error message shows that
+> it is a slab-out-of-bounds error:
+>
+> [ 67.162014] BUG: KASAN: slab-out-of-bounds in xfrm_input+0x426e/0x6740
+> [ 67.162030] Write of size 2 at addr ffff888156cb814b by task ksoftirqd/2=
+/26
+>
+> The reason is that the eth_hdr(skb) inside if statement evaluated
+> to an unexpected address with skb->mac_header =3D ~0U (indicating there
+> is no MAC header). The unreliability of skb->mac_len causes the if
+> statement to become true even if there is no MAC header inside the
+> skb data buffer.
+>
+> Check both the skb->mac_len and skb_mac_header_was_set(skb) fixes this is=
+sue.
+>
+> Fixes: 87cdf3148b11 ("xfrm: Verify MAC header exists before overwriting e=
+th_hdr(skb)->h_proto")
+> Signed-off-by: En-Wei Wu <en-wei.wu@canonical.com>
+> ---
+> Changes in v2:
+> * Change the title from "xfrm: avoid using skb->mac_len to decide if mac =
+header is shown"
+> * Remain skb->mac_len check
+> * Apply fix on ipv6 path too
+> ---
+>  net/xfrm/xfrm_input.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+> index 749e7eea99e4..eef0145c73a7 100644
+> --- a/net/xfrm/xfrm_input.c
+> +++ b/net/xfrm/xfrm_input.c
+> @@ -251,7 +251,7 @@ static int xfrm4_remove_tunnel_encap(struct xfrm_stat=
+e *x, struct sk_buff *skb)
+>
+>         skb_reset_network_header(skb);
+>         skb_mac_header_rebuild(skb);
+> -       if (skb->mac_len)
+> +       if (skb->mac_len && skb_mac_header_was_set(skb))
+>                 eth_hdr(skb)->h_proto =3D skb->protocol;
 
-I'll accept that argument for the first patch, but the three that are
-adding support for audio devices on the platform cannot really be
-described as making behaviour more stable. I don't hugely object to
-these being backported, but I would like a more accurate justification
-for it being done - even if that is just that "we are using this board
-with 6.6 and would like audio to work, which these 3 simple patches
-allow it to do".
+I would swap the two conditions :
+We might in the future debug kernels leave mac_len uninitialized if
+mac_header was never set.
 
-> and as far as I can tell,they
-> won't introduce any new issues (please correct me if I'm wrong).
+It would be nice to catch the issue sooner.
+Something is calling skb_reset_mac_len() while the mac_header was not set ?
+Considering the stack trace, I can not see why mac_header is not set.
+Could you try the following patch, and compile your test kernel with
+CONFIG_DEBUG_NET=3Dy ?
 
-I don't know. Does this first patch require a driver change for the
-mmc driver to work correctly?
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 39f1d16f362887821caa022464695c4045461493..fb06dc81039253bafeb49f0b722=
+8748e898f480f
+100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -2909,9 +2909,19 @@ static inline void
+skb_reset_inner_headers(struct sk_buff *skb)
+        skb->inner_transport_header =3D skb->transport_header;
+ }
 
-> > Oh, and also, the 4 patches aren't threaded - you should fix that
->=20
-> I apologize for my ignorance about the correct procedure...
->=20
-> For instance,for these four commits,I first used 'git format-patch -4' to
-> create four consecutive .patch files,and then used 'git send-email
-> --annotate --cover-letter --thread ./*.patch' to send them,but the result
-> wasn't as expected...
->=20
-> I'm not sure where the problem lies...
++static inline int skb_mac_header_was_set(const struct sk_buff *skb)
++{
++       return skb->mac_header !=3D (typeof(skb->mac_header))~0U;
++}
++
+ static inline void skb_reset_mac_len(struct sk_buff *skb)
+ {
+-       skb->mac_len =3D skb->network_header - skb->mac_header;
++       if (!skb_mac_header_was_set(skb)) {
++               DEBUG_NET_WARN_ON_ONCE(1);
++               skb->mac_len =3D 0;
++       } else {
++               skb->mac_len =3D skb->network_header - skb->mac_header;
++       }
+ }
 
-I'm not sure, I don't send patches using that method. Usually I output
-my patches to a directory and call git send-email using the path to that
-directory.
+ static inline unsigned char *skb_inner_transport_header(const struct sk_bu=
+ff
+@@ -3014,11 +3024,6 @@ static inline void
+skb_set_network_header(struct sk_buff *skb, const int offset)
+        skb->network_header +=3D offset;
+ }
 
-Cheers,
-Conor.
-
---dUrs2a+ddceNZFId
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZuKY4gAKCRB4tDGHoIJi
-0r2pAQDK9tw50M9/pd5jx1uyrtkDT/RUbd0s3qpnx1Z0YSYF9AEA+k8EKSF51lvO
-hrrZQj9ToA2Lnoo4N8es473eQLiq+g8=
-=6MvV
------END PGP SIGNATURE-----
-
---dUrs2a+ddceNZFId--
+-static inline int skb_mac_header_was_set(const struct sk_buff *skb)
+-{
+-       return skb->mac_header !=3D (typeof(skb->mac_header))~0U;
+-}
+-
+ static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
+ {
+        DEBUG_NET_WARN_ON_ONCE(!skb_mac_header_was_set(skb));
 
