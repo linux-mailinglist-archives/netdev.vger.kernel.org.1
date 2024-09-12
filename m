@@ -1,115 +1,113 @@
-Return-Path: <netdev+bounces-127826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5933D976BE2
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:24:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C4E0976BE7
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:24:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F7961F22D2F
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:24:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3A0A1F27A53
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3711AD25F;
-	Thu, 12 Sep 2024 14:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6maEOsC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CEA91AE87F;
+	Thu, 12 Sep 2024 14:24:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721B82BB09;
-	Thu, 12 Sep 2024 14:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F01D2BB09
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 14:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726151063; cv=none; b=TGLDev3RPbIAnZmDUFnE3Z6GjdT30/INEbccFooG635peTGP/aL2iE0bV87tUsjo5f6Ju7+QufdWuqH/dbgu6mZj4gf69TSbKol5M/N7EoUUWtcHs14dPlKax9dV5dtSsg+SRAlKlWU3SCJIgpExBZvRdoA9CfehLviu+6RqTbI=
+	t=1726151071; cv=none; b=E9aCvReIDz72KTQMM/e29Y5jNAjR+ySlV5DA7ZXYPdZry4k9Od4LNaHPLrwBErhJvI7jp5Y+Ocn8ljsAO32ctmFG5cCRhVM9FLGercaPu83OQkP5eLHs/CJH8j3vnSGAxXEkc34Npj4XmH4aHbeKkePoIkA3QAVthmnd02ghMQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726151063; c=relaxed/simple;
-	bh=DE8LCwYBBBoP7mkIx3nkN1NwNmY7aG3Ig8Uq+Rcy+4g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Fq0G11TMvvRCuXx/RY3D+LaiDP0X6GjTLrFt6lhcXbWLT/HsyFymSQB1+HGdfNv8HVe7QoJtD4RI/sy18H4cHvp79WbC9VZHJiiR52YnqycK1cITShZzQK0nq8py9pAiqz979Jnsarjl0uxxCmoZ60Z9zJVizs58YxDv+savxfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6maEOsC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2850C4CEC5;
-	Thu, 12 Sep 2024 14:24:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726151062;
-	bh=DE8LCwYBBBoP7mkIx3nkN1NwNmY7aG3Ig8Uq+Rcy+4g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=n6maEOsCTqRa/8uwso9+tRoBQXPEDe4J1bb4dJPGFY8RASg5nusWSjLKq+x2pxyiT
-	 4Y6RThrncvt7gdXmcemSJ0jH38x7xazGi72rBFhuM+TRv+1//w+nsSrjAo573Aiqo8
-	 NxUbZUyJF0zZIIQzySYJD834V5z57NWr+TBgs0Jq1AKozuiijB2p1zEwauzzRL78DF
-	 Aygw6jVx/8Qp2+MuP3WNLOaaOm3oGNdtUtu/CPh9L3CGgqHA1TBIIy32ExSFn2WUVp
-	 QnG3/rJ9iUE11n2uf/SHjM4d3K5cn+QEOVAkZTJzx0a04H2etEjOZbhfwURH3l18uQ
-	 w1gDRq0XnEGBg==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 11A90152C614; Thu, 12 Sep 2024 16:24:20 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Breno Leitao
- <leitao@debian.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, andrii@kernel.org, ast@kernel.org,
- syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
- bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
- john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
- linux-kernel@vger.kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org,
- syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Subject: Re: [PATCH net-net] tun: Assign missing bpf_net_context.
-In-Reply-To: <20240912122847.x70_LgN_@linutronix.de>
-References: <000000000000adb970061c354f06@google.com>
- <20240702114026.1e1f72b7@kernel.org>
- <20240703122758.i6lt_jii@linutronix.de>
- <20240703120143.43cc1770@kernel.org>
- <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
- <20240912122847.x70_LgN_@linutronix.de>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 12 Sep 2024 16:24:20 +0200
-Message-ID: <87wmjhar1n.fsf@toke.dk>
+	s=arc-20240116; t=1726151071; c=relaxed/simple;
+	bh=K7rEH5qYX0Elm7IC8BbIy1pVnj+AeI1J+4BNBcJrNQA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BmluZgH67U3MZWOGlymsRfM/qhUmOYg/jlZWhTGjsOOgNrw+UfaOobdZ23ZJPRJcsArFONrOFUxl3FPPZhfSNSWJUVJvQY9CKbYxfl4YSW5BeDNpgooZyGqJoY7qzSHLxZ790BRM+fGUBDS+1vSk/KwbVOPR6570fWGf9LVEaqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a0459a8a46so12477965ab.3
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 07:24:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726151069; x=1726755869;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BcodMDARtg5q8rY7YVLhjjqRo/SOtRdhBndQsSIEwVo=;
+        b=rsjoemWxMr5Q3xBVAxKDPccTXhq+j6UK89wGqYl5rwL3Q7dlmKh+8gd5Qw+249WX9A
+         /FnkHDWaQdhY/cGWk6T3Ik0z2rH6DB3BOlPWGSgy1H7KHy3VFprpXWNc6g+Th1DF9sRJ
+         wj3Weq0KAEigAGpx5Z8j2WyOT60Sn28SefVb9ozJPyrJYuzu8K8Ju2kfBHtn2Pox3c4c
+         FcQESjhU54Kc6HMm0JuyeFPV90HtEbgsGvWkt2ZBmBmJCVO4EQOyU8q+9bkzBvYZyP70
+         DLDL0JCMQanwNj2qoCRiVtB3jkC6r84nb/Ts4S9ohkfHM/BgryGxuf986pudAmDelAWJ
+         GRMA==
+X-Forwarded-Encrypted: i=1; AJvYcCXjNUtLQTfVq3udCNH3KcDESMb4a5zNLsZs78ba0xse1Np5Ayisk3gUzOgg0aFfxaxGbmh2c3k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+M+/isUX1VaSiqYVnIA+i8NAatnzdw2jlcOn7DWv2b7hjr1bc
+	x1+GY5V7flnJ+q3J3U0xOzCgKwAJ2OTNkAJMFCdf116OL2FqJ6tLFp52hTRaEkXEcnAD5ytbP7S
+	IOb/osTkAVmtibNsrsR+/W53FyAaFYGicAJsvKKkBorBokBERw989QLo=
+X-Google-Smtp-Source: AGHT+IEdL7uhb4g4phrP2I0ij5S1wqHsFVilkFydHnWkzAqWblt2ZYsam8xuhJ9OdpS14Hgoe9VH3UGfouYwBsD/wcEdxSKkDzJ3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+X-Received: by 2002:a05:6e02:1747:b0:39f:58f9:8d7c with SMTP id
+ e9e14a558f8ab-3a084958fadmr24310285ab.26.1726151069178; Thu, 12 Sep 2024
+ 07:24:29 -0700 (PDT)
+Date: Thu, 12 Sep 2024 07:24:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004eac7a0621ecdda7@google.com>
+Subject: [syzbot] Monthly wireless report (Sep 2024)
+From: syzbot <syzbot+listdf434a578949274ad9b5@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
+Hello wireless maintainers/developers,
 
-> On 2024-09-12 05:06:36 [-0700], Breno Leitao wrote:
->> Hello Sebastian, Jakub,
-> Hi,
->
->> I've seen some crashes in 6.11-rc7 that seems related to 401cb7dae8130
->> ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.").
->> 
->> Basically bpf_net_context is NULL, and it is being dereferenced by
->> bpf_net_ctx->ri.kern_flags (offset 0x38) in the following code.
->> 
->> 	static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
->> 	{
->> 		struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
->> 		if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_RI_INIT)) {
->> 
->> That said, it means that bpf_net_ctx_get() is returning NULL.
->> 
->> This stack is coming from the bpf function bpf_redirect()
->> 	BPF_CALL_2(bpf_redirect, u32, ifindex, u64, flags)
->> 	{
->> 	      struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
->> 
->> 
->> Since I don't think there is XDP involved, I wondering if we need some
->> preotection before calling bpf_redirect()
->
-> This origins in netkit_xmit(). If my memory serves me, then Daniel told
-> me that netkit is not doing any redirect and therefore does not need
-> "this". This must have been during one of the first "designs"/ versions. 
->
-> If you are saying, that this is possible then something must be done.
-> Either assign a context or reject the bpf program.
+This is a 31-day syzbot report for the wireless subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/wireless
 
-Netkit definitely redirects, so it should assign a context object in
-netkit_xmit()...
+During the period, 3 new issues were detected and 0 were fixed.
+In total, 34 issues are still open and 140 have been fixed so far.
 
--Toke
+Some of the still happening issues:
+
+Ref  Crashes Repro Title
+<1>  27179   Yes   WARNING in __ieee80211_beacon_get
+                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
+<2>  5657    Yes   WARNING in __cfg80211_ibss_joined (2)
+                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
+<3>  1724    Yes   WARNING in ath6kl_bmi_get_target_info (2)
+                   https://syzkaller.appspot.com/bug?extid=92c6dd14aaa230be6855
+<4>  1132    Yes   WARNING in ieee80211_start_next_roc
+                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
+<5>  1129    Yes   WARNING in rate_control_rate_init (3)
+                   https://syzkaller.appspot.com/bug?extid=9bdc0c5998ab45b05030
+<6>  568     Yes   WARNING in plfxlc_mac_release
+                   https://syzkaller.appspot.com/bug?extid=51a42f7c2e399392ea82
+<7>  285     No    INFO: task hung in rfkill_global_led_trigger_worker (3)
+                   https://syzkaller.appspot.com/bug?extid=50499e163bfa302dfe7b
+<8>  109     Yes   WARNING in ieee80211_free_ack_frame (2)
+                   https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
+<9>  75      No    INFO: task hung in ath9k_hif_usb_firmware_cb (3)
+                   https://syzkaller.appspot.com/bug?extid=e9b1ff41aa6a7ebf9640
+<10> 52      Yes   WARNING in minstrel_ht_update_caps
+                   https://syzkaller.appspot.com/bug?extid=d805aca692aded25f888
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
+
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
+
+You may send multiple commands in a single email message.
 
