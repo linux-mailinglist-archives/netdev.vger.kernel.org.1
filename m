@@ -1,136 +1,176 @@
-Return-Path: <netdev+bounces-127679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49918976145
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:18:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70DDC97616A
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 08:21:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ECEE1C21741
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 06:18:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 328ED281EEA
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 06:21:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D3F190662;
-	Thu, 12 Sep 2024 06:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B378188A00;
+	Thu, 12 Sep 2024 06:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="uc6ZkvVI"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="SzZ7v/Ho"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A029319007E;
-	Thu, 12 Sep 2024 06:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050AA12D20D
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 06:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726121800; cv=none; b=Tvd4hJNW43qaSMUuygegSGR8cDm9O1jf6Kf13zr7I0N5soQdJUWUE6Xou8NvXGR8vFrpa+qLHdzByw7ut125rPA2lB88wLjBztbLc7fNd1DwrUB8ad/uw/4X6W/4k3JdVKN+K9QFBw7ZH9zkqsRPu/2YAfKwptjuWWWrKdT8MgA=
+	t=1726122060; cv=none; b=Av/s1uX6Zy4InlRB3mvXz+m6Q1wZ4/ZKYNiq/tnUlXl2wyu2V6yLM5nDM7FzmvKqb22zF0uBbVbJo2DdbDyN9tYaE5cPuSGFFJXJWVb4zydPu80EdDzVFQwbj8hGypoFGg7PM6jdblhzFWubj4kQpkXnOZKgbqaNo76M2ZTcwNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726121800; c=relaxed/simple;
-	bh=3te06F52EECb2zHYBCV9siwUvxC5m1Tha4fFDOs3ZDo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jvAB+E56Gb9iFTUtLnKSx0wKeypq0WiJ1LoTjb3A4cnA7vJDJkxFIFmwT7HFtWDg16fZDJSxTMd7WMKJJ8yTABT7utGEFEn7xsIaxixK9x1sbPZBV+lWuNVj2BTWcUnBZB9Q31eqzofk0pgkE55NuB7QICW+XJmdtYCGQG5AeoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=uc6ZkvVI; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1726121799; x=1757657799;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=3te06F52EECb2zHYBCV9siwUvxC5m1Tha4fFDOs3ZDo=;
-  b=uc6ZkvVIKrikXVd07HRBM5nCwQd8EgzFRh1UGHv/InvnzBdgKbLLmA7x
-   Ml4eQXNlMiqEov9C2Va0EhdWWTET5gMqP8ulRlJ1bh3LytAKFL8K2bDt6
-   KWsPlf1E0q/rK0drpBoO+AEbdtJ5mCrhgzvhn1ViSW7GEwW0KP+EtBK5X
-   l8CtEL2DtchvbrCzUwDbw8hndJ9gxTN7pAOuNvTQ1Ffd/IdcKX63VEYFB
-   R5BHmTFpIUm2xeMaHgcCS+dG5Tb6FVH+GRcF64CMZoHRpteflVQXd3bpk
-   qwML6fPbFHW2MSuIWj/feLLM+yj5mzZ95pdG+cccMabiS9+Z1pKy/kGCm
-   A==;
-X-CSE-ConnectionGUID: 7K3ZszrYS2q1e5jxC3SWdA==
-X-CSE-MsgGUID: 6c+WZ7KDSwaApPmAU8bS9g==
-X-IronPort-AV: E=Sophos;i="6.10,222,1719903600"; 
-   d="scan'208";a="31684618"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Sep 2024 23:16:37 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 11 Sep 2024 23:15:56 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Wed, 11 Sep 2024 23:15:55 -0700
-Date: Thu, 12 Sep 2024 11:42:05 +0530
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-CC: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <bryan.whitehead@microchip.com>,
-	<UNGLinuxDriver@microchip.com>, <linux@armlinux.org.uk>,
-	<maxime.chevallier@bootlin.com>, <rdunlap@infradead.org>, <andrew@lunn.ch>,
-	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next V2 1/5] net: lan743x: Add SFP support check flag
-Message-ID: <ZuKGNc3GaALRYnuA@HYD-DK-UNGSW21.microchip.com>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-2-Raju.Lakkaraju@microchip.com>
- <e542d2fc-0587-45a3-bc58-ee0a078a626a@wanadoo.fr>
+	s=arc-20240116; t=1726122060; c=relaxed/simple;
+	bh=gzbSoPirbdV6OvBwyuWqLFshkq7xcrFRuE660vVWxGU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DLgUjrH5tzWbgUw8CGCS8hxm6Whw0Y+kICgG+LWC2LncOIDbIZdwVQ/Wjf89dkLnAQH6VCVR4KAnMnD3pmjaOA3EWj9CDZ9+xbCrDwJfzIDJ3nJTmpxCmJaTevt2lWkja5O7I/o12aHlec0KhdbD7tETuRJ3xj8NpUQ/fN7PRaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=SzZ7v/Ho; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1726122049; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=59yYUrpUy3/4Te83JX89VyLwpxLKMTv2A1pEy9jghpc=;
+	b=SzZ7v/HoyxGjfOZIiy5k8fFrqbwJ1t8DIMTV/ohEiLnFdGf/RZf9Z4JqyHBTCPdVKQbPBfcfRYrkWpOWLSAuXlWz+w9KE6ffd0/Z+8SndJQ7c9amjc3EH2nqaabCd89rkvnSzSTGNQYvIg/3UjA09ZffWYRkGvSvP1pSK/w/8ik=
+Received: from 30.221.149.207(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WEqHQH5_1726122047)
+          by smtp.aliyun-inc.com;
+          Thu, 12 Sep 2024 14:20:48 +0800
+Message-ID: <a054f2ef-c72f-4679-a123-003e0cf7839d@linux.alibaba.com>
+Date: Thu, 12 Sep 2024 14:20:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <e542d2fc-0587-45a3-bc58-ee0a078a626a@wanadoo.fr>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch net] smc: use RCU version of lower netdev searching
+To: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org
+Cc: Cong Wang <cong.wang@bytedance.com>,
+ syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com,
+ Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>
+References: <20240912000446.1025844-1-xiyou.wangcong@gmail.com>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <20240912000446.1025844-1-xiyou.wangcong@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Christophe,
 
-Thank you for review the patches.
 
-The 09/11/2024 18:44, Christophe JAILLET wrote:
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+On 9/12/24 8:04 AM, Cong Wang wrote:
+> From: Cong Wang <cong.wang@bytedance.com>
 > 
-> Le 11/09/2024 à 18:10, Raju Lakkaraju a écrit :
-> > Support for SFP in the PCI11x1x devices is indicated by the "is_sfp_support_en"
-> > flag in the STRAP register. This register is loaded at power up from the
-> > PCI11x1x EEPROM contents (which specify the board configuration).
-> > 
-> > Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-> > ---
-> > Change List:
-> > ============
-> > V1 -> V2:
-> >    - Change variable name from "chip_rev" to "fpga_rev"
-> > V0 -> V1:
-> >    - No changes
-> > 
-> >   drivers/net/ethernet/microchip/lan743x_main.c | 34 +++++++++++++++----
-> >   drivers/net/ethernet/microchip/lan743x_main.h |  3 ++
-> >   2 files changed, 30 insertions(+), 7 deletions(-)
-> > 
-> >       netif_dbg(adapter, drv, adapter->netdev,
-> >                 "SGMII I/F %sable\n", adapter->is_sgmii_en ? "En" : "Dis");
-> > +     netif_dbg(adapter, drv, adapter->netdev,
-> > +               "SFP support %sable\n", adapter->is_sfp_support_en ?
-> > +               "En" : "Dis");
+> Both netdev_walk_all_lower_dev() and netdev_lower_get_next() have a
+> RCU version, which are netdev_walk_all_lower_dev_rcu() and
+> netdev_next_lower_dev_rcu(). Switching to the RCU version would
+> eliminate the need for RTL lock, thus could amend the deadlock
+> complaints from syzbot. And it could also potentially speed up its
+> callers like smc_connect().
 > 
-> Hi,
-> 
-> Maybe using str_enable_disable() or str_enabled_disabled()?
-> 
+> Reported-by: syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f
+> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+> Cc: Jan Karcher <jaka@linux.ibm.com>
+> Cc: "D. Wythe" <alibuda@linux.alibaba.com>
+> Cc: Tony Lu <tonylu@linux.alibaba.com>
+> Cc: Wen Gu <guwen@linux.alibaba.com>
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
 
-Accepted. I will use str_enabled_disabled( ).
 
-> CJ
-> 
-> > +
-> > +     return 0;
-> >   }
-> > 
-> 
+Haven't looked at your code yet, but the issue you fixed doesn't exist.
+The real reason is that we lacks some lockdep annotations for
+IPPROTO_SMC.
 
--- 
-Thanks,                                                                         
-Raju
+Thanks,
+D. Wythe
+
+> ---
+>   net/smc/smc_core.c |  6 +++---
+>   net/smc/smc_pnet.c | 14 +++++++-------
+>   2 files changed, 10 insertions(+), 10 deletions(-)
+> 
+> diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
+> index 3b95828d9976..574039b7d456 100644
+> --- a/net/smc/smc_core.c
+> +++ b/net/smc/smc_core.c
+> @@ -1850,9 +1850,9 @@ int smc_vlan_by_tcpsk(struct socket *clcsock, struct smc_init_info *ini)
+>   	}
+>   
+>   	priv.data = (void *)&ini->vlan_id;
+> -	rtnl_lock();
+> -	netdev_walk_all_lower_dev(ndev, smc_vlan_by_tcpsk_walk, &priv);
+> -	rtnl_unlock();
+> +	rcu_read_lock();
+> +	netdev_walk_all_lower_dev_rcu(ndev, smc_vlan_by_tcpsk_walk, &priv);
+> +	rcu_read_unlock();
+>   
+>   out_rel:
+>   	dst_release(dst);
+> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+> index 2adb92b8c469..b8ee6da08638 100644
+> --- a/net/smc/smc_pnet.c
+> +++ b/net/smc/smc_pnet.c
+> @@ -29,7 +29,6 @@
+>   #include "smc_ism.h"
+>   #include "smc_core.h"
+>   
+> -static struct net_device *__pnet_find_base_ndev(struct net_device *ndev);
+>   static struct net_device *pnet_find_base_ndev(struct net_device *ndev);
+>   
+>   static const struct nla_policy smc_pnet_policy[SMC_PNETID_MAX + 1] = {
+> @@ -791,7 +790,7 @@ static void smc_pnet_add_base_pnetid(struct net *net, struct net_device *dev,
+>   {
+>   	struct net_device *base_dev;
+>   
+> -	base_dev = __pnet_find_base_ndev(dev);
+> +	base_dev = pnet_find_base_ndev(dev);
+>   	if (base_dev->flags & IFF_UP &&
+>   	    !smc_pnetid_by_dev_port(base_dev->dev.parent, base_dev->dev_port,
+>   				    ndev_pnetid)) {
+> @@ -857,7 +856,7 @@ static int smc_pnet_netdev_event(struct notifier_block *this,
+>   		smc_pnet_add_base_pnetid(net, event_dev, ndev_pnetid);
+>   		return NOTIFY_OK;
+>   	case NETDEV_DOWN:
+> -		event_dev = __pnet_find_base_ndev(event_dev);
+> +		event_dev = pnet_find_base_ndev(event_dev);
+>   		if (!smc_pnetid_by_dev_port(event_dev->dev.parent,
+>   					    event_dev->dev_port, ndev_pnetid)) {
+>   			/* remove from PNETIDs list */
+> @@ -925,7 +924,6 @@ static struct net_device *__pnet_find_base_ndev(struct net_device *ndev)
+>   {
+>   	int i, nest_lvl;
+>   
+> -	ASSERT_RTNL();
+>   	nest_lvl = ndev->lower_level;
+>   	for (i = 0; i < nest_lvl; i++) {
+>   		struct list_head *lower = &ndev->adj_list.lower;
+> @@ -933,7 +931,9 @@ static struct net_device *__pnet_find_base_ndev(struct net_device *ndev)
+>   		if (list_empty(lower))
+>   			break;
+>   		lower = lower->next;
+> -		ndev = netdev_lower_get_next(ndev, &lower);
+> +		ndev = netdev_next_lower_dev_rcu(ndev, &lower);
+> +		if (!ndev)
+> +			break;
+>   	}
+>   	return ndev;
+>   }
+> @@ -945,9 +945,9 @@ static struct net_device *__pnet_find_base_ndev(struct net_device *ndev)
+>    */
+>   static struct net_device *pnet_find_base_ndev(struct net_device *ndev)
+>   {
+> -	rtnl_lock();
+> +	rcu_read_lock();
+>   	ndev = __pnet_find_base_ndev(ndev);
+> -	rtnl_unlock();
+> +	rcu_read_unlock();
+>   	return ndev;
+>   }
+>   
 
