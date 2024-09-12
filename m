@@ -1,139 +1,170 @@
-Return-Path: <netdev+bounces-127813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD35976A94
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:29:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9177A976AB2
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 15:33:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03D62281856
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 13:29:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1251B1F24ED8
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 13:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B211AC459;
-	Thu, 12 Sep 2024 13:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8753C1AD9CF;
+	Thu, 12 Sep 2024 13:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fogam7TV"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kVRR7k8v"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77ACD1A0BD0;
-	Thu, 12 Sep 2024 13:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216511AD276
+	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 13:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726147775; cv=none; b=KgOsYMAswGmXH+V2M/5/zpYmgriuhPRm/JFnCRh+7bt6ESlGkVcb0rLEBN0JCd4kummHQlVTwZVp9Qsjc8jot7ZDs9ZHdC5ohBtH+0MzTcNTJdVRV9+OAopinXAbQFair8uC6o4RRqMDQoAVqJMEJeQnLjGR8301uGuNzXX3RWo=
+	t=1726147987; cv=none; b=szc6+bo3XeqMV4IyFJXgYdDPs3ziR60eGn0iXc3CNqDs6jIWO58zfhefLNbkooiUufMGkdQN9xcVKj8ZiXpZO5x1FbeomNChONgJVo8Z4TjEoJrUNzkINxRxpQ7DUH6JX0YS9yTG5vLDgVpSTw8xd7Ab+D4GSNb10m04aqz+I08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726147775; c=relaxed/simple;
-	bh=cDR842oWCxDc+RlGVodDRKRscX8dR9N/N15PRmbdwMI=;
+	s=arc-20240116; t=1726147987; c=relaxed/simple;
+	bh=CPeu07DxP3wbB3dMsGK7rsRNYxCKorSGumHxlY94PXE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=te6aPth+TXz7OLq4YBTsV/T9OTmU9KENnzO9g9GbJrkcRneT2sMzXbPj033dSjdTLsV9Wluf/yhmlPvEaMJ7hMeHt0+j6iAIKFlfBFIGp2CT8MuoRjsygxRZTrlov+q6p6fqjSpq70C4y46ioNfAauBbEh1TSixBhTH+sXyD75A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fogam7TV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F8AEC4CEC3;
-	Thu, 12 Sep 2024 13:29:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726147775;
-	bh=cDR842oWCxDc+RlGVodDRKRscX8dR9N/N15PRmbdwMI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Fogam7TVDWvBHPKQUS7C5sx3DDmHl1szs5RP6yUe0XoYmtkf205JODwMmgmtj7sCB
-	 weokamqV8wmqJoI6gXZtPR6oB7yE2CI0L4bREI+R9R3XHH6HQy7hhxTRTVr/Jymr9b
-	 KTxULy1FrWQtcjUzIQ2Aub1KZH8deDZhffly0YutdkYiw8ueenVkPz8vXeMmFSAwdC
-	 cBxQkzcduhLmcP4R4emSBuLp6hq77Lr9E/QXQKcyQioadisYzCsIlBbjKHC00kru+o
-	 hgQkWwJtJ+WUE68/UcU2vy9IkhPJg6FZ1Fy/TAPf9PVWQLJrLXNIMzSgCf/tba0uq0
-	 HHUgjVZNklSyg==
-Message-ID: <88515afd-6c5a-4245-bcff-d3340e94aa26@kernel.org>
-Date: Thu, 12 Sep 2024 16:29:29 +0300
+	 In-Reply-To:Content-Type; b=Sm3Kvfc0pla0kMTp1RdgPHO4hbJnDq7g9CJt+UNZwVSxaZ/e/R/T+iUzjTHhW1kyV5eKb44cZG7HyLod9Qw9F/giICL4LR4U0frjnDecexPswUwK1jg6dfj/1FsK95MCMKXFbN62ZdfWu4P++ecASCNay3gtJDFGhWjc6T5UrmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kVRR7k8v; arc=none smtp.client-ip=91.218.175.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <9a2a1cce-8d92-4d10-87ea-4cdf1934d5fb@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726147981;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tyq9bRI1TS3hXpjwHtn17hObsWlvaRNqSMNKcUTXNC0=;
+	b=kVRR7k8vkeBdRcCmr9Ft0hnm4G456BoZGtzeOSUTMlEcvcZYa/9Wk4GXEZAVvx+VPoqw1N
+	qcCVjagUQ1IBLQlbkz6BJwcY1JUkVxlKo489HEBXe53dUzpr37qUnIJGcknMfGvpW3iaO2
+	DbeZ6QLelw07hRNsVnCFGPFVm48tjNQ=
+Date: Thu, 12 Sep 2024 14:32:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/3] net: ethernet: ti: cpsw_ale: Remove unused
- accessor functions
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- netdev@vger.kernel.org, linux-omap@vger.kernel.org, llvm@lists.linux.dev
-References: <20240910-ti-warn-v1-0-afd1e404abbe@kernel.org>
- <20240910-ti-warn-v1-3-afd1e404abbe@kernel.org>
- <78b4ca2a-9448-4451-8e25-c57306af38e9@kernel.org>
- <20240912085929.GF572255@kernel.org>
- <97c7665c-d05f-4363-94c6-9ce89921096a@kernel.org>
- <20240912112700.GK572255@kernel.org>
+Subject: Re: [PATCH net-net] tun: Assign missing bpf_net_context.
+To: Breno Leitao <leitao@debian.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, andrii@kernel.org, ast@kernel.org,
+ syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
+ bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
+ john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+ linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org,
+ sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com,
+ yonghong.song@linux.dev
+References: <000000000000adb970061c354f06@google.com>
+ <20240702114026.1e1f72b7@kernel.org> <20240703122758.i6lt_jii@linutronix.de>
+ <20240703120143.43cc1770@kernel.org>
+ <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
+ <20240912122847.x70_LgN_@linutronix.de>
+ <20240912-hypnotic-messy-leopard-f1d2b0@leitao>
 Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20240912112700.GK572255@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240912-hypnotic-messy-leopard-f1d2b0@leitao>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 12/09/2024 14:27, Simon Horman wrote:
-> On Thu, Sep 12, 2024 at 01:54:45PM +0300, Roger Quadros wrote:
+On 12/09/2024 14:17, Breno Leitao wrote:
+> Hello Sabastian,
+> 
+> Thanks for the quick reply!
+> 
+> On Thu, Sep 12, 2024 at 02:28:47PM +0200, Sebastian Andrzej Siewior wrote:
+>> On 2024-09-12 05:06:36 [-0700], Breno Leitao wrote:
+>>> Hello Sebastian, Jakub,
+>> Hi,
 >>
+>>> I've seen some crashes in 6.11-rc7 that seems related to 401cb7dae8130
+>>> ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.").
+>>>
+>>> Basically bpf_net_context is NULL, and it is being dereferenced by
+>>> bpf_net_ctx->ri.kern_flags (offset 0x38) in the following code.
+>>>
+>>> 	static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
+>>> 	{
+>>> 		struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+>>> 		if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_RI_INIT)) {
+>>>
+>>> That said, it means that bpf_net_ctx_get() is returning NULL.
+>>>
+>>> This stack is coming from the bpf function bpf_redirect()
+>>> 	BPF_CALL_2(bpf_redirect, u32, ifindex, u64, flags)
+>>> 	{
+>>> 	      struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+>>>
+>>>
+>>> Since I don't think there is XDP involved, I wondering if we need some
+>>> preotection before calling bpf_redirect()
 >>
->> On 12/09/2024 11:59, Simon Horman wrote:
->>> On Thu, Sep 12, 2024 at 10:07:27AM +0300, Roger Quadros wrote:
->>>> Hi Simon,
->>>>
->>>> On 10/09/2024 10:17, Simon Horman wrote:
+>> This origins in netkit_xmit(). If my memory serves me, then Daniel told
+>> me that netkit is not doing any redirect and therefore does not need
+>> "this". This must have been during one of the first "designs"/ versions.
 > 
-> ...
+> Right, I've seen several crashes related to this, and in all of them it
+> is through netkit_xmit() -> netkit_run() ->  bpf_prog_run()
 > 
->>>>>  	ALE_ENT_VID_MEMBER_LIST = 0,
->>>>>  	ALE_ENT_VID_UNREG_MCAST_MSK,
->>>>> @@ -217,14 +229,14 @@ static const struct ale_entry_fld vlan_entry_k3_cpswxg[] = {
->>>>>  
->>>>>  DEFINE_ALE_FIELD(entry_type,		60,	2)
->>>>>  DEFINE_ALE_FIELD(vlan_id,		48,	12)
->>>>> -DEFINE_ALE_FIELD(mcast_state,		62,	2)
->>>>> +DEFINE_ALE_FIELD_SET(mcast_state,	62,	2)
->>>>
->>>> I don't understand why we need separate macros for GET and SET.
->>>> The original intent was to use one macro for both.
->>>>
->>>> Otherwise we will have to add DEFINE_ALE_FIELD/1_SET to all the fields.
->>>
->>> Hi Roger,
->>>
->>> Sorry for not being clearer.
->>>
->>> My intent was to avoid declaring functions that are never used.
->>> Perhaps it is best explained by some examples.
->>>
->>> In the case of mcast_state, the compiler flags that the get accessor is
->>> never used. The intent is of this patch addresses that by declaring the set
->>> accessor for mcast_state. Likewise for other similar cases.
->>>
->>> OTOH, in the case of, f.e. vlan_id, the set and get accessor functions are
->>> both used, and DEFINE_ALE_FIELD continues to be used to define them both.
->>> DEFINE_ALE_FIELD is implemented as the combination of _SET and _GET.
->>>
->>
->> Thanks for the explanation Simon. I understand now.
->>
->> Would using __maybe_unused__ be preferable to get rid of the warnings?
->> That way we don't need to care if both set/get helpers are used or not
->> and don't have to touch the below code ever again except to add new fields.
+>> If you are saying, that this is possible then something must be done.
+>> Either assign a context or reject the bpf program.
 > 
-> Thanks Roger,
+> If we want to assign a context, do you meant something like the
+> following?
 > 
-> IMHO, it is nicer to not declare them at all.  But I do get your point and
-> I'm happy to try that approach if you prefer it.
+> Author: Breno Leitao <leitao@debian.org>
+> Date:   Thu Sep 12 06:11:28 2024 -0700
 > 
-> ...
+>      netkit: Assign missing bpf_net_context.
+>      
+>      During the introduction of struct bpf_net_context handling for
+>      XDP-redirect, the netkit driver has been missed.
+>      
+>      Set the bpf_net_context before invoking netkit_xmit() program within the
+>      netkit driver.
+>      
+>      Fixes: 401cb7dae8130 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
+>      Signed-off-by: Breno Leitao <leitao@debian.org>
+> 
+> diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+> index 79232f5cc088..f8af57b7a1e8 100644
+> --- a/drivers/net/netkit.c
+> +++ b/drivers/net/netkit.c
+> @@ -65,6 +65,7 @@ static struct netkit *netkit_priv(const struct net_device *dev)
+>   
+>   static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+>   {
+> +	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+>   	struct netkit *nk = netkit_priv(dev);
+>   	enum netkit_action ret = READ_ONCE(nk->policy);
+>   	netdev_tx_t ret_dev = NET_XMIT_SUCCESS;
+> @@ -72,6 +73,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+>   	struct net_device *peer;
+>   	int len = skb->len;
+>   
+> +	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+>   	rcu_read_lock();
 
-Simon,
+Hi Breno,
 
-I don't have any preference. I'll leave it to you to decide on your next spin. Thanks.
+looks like bpf_net_ctx should be set under rcu read lock...
 
--- 
-cheers,
--roger
+>   	peer = rcu_dereference(nk->peer);
+>   	if (unlikely(!peer || !(peer->flags & IFF_UP) ||
+> @@ -110,6 +112,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+>   		break;
+>   	}
+>   	rcu_read_unlock();
+> +	bpf_net_ctx_clear(bpf_net_ctx);
+>   	return ret_dev;
+>   }
+
+
 
