@@ -1,87 +1,115 @@
-Return-Path: <netdev+bounces-127825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A3A976BDF
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:23:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5933D976BE2
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 16:24:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 788711F264F1
-	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:23:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F7961F22D2F
+	for <lists+netdev@lfdr.de>; Thu, 12 Sep 2024 14:24:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B6021AD24C;
-	Thu, 12 Sep 2024 14:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3711AD25F;
+	Thu, 12 Sep 2024 14:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Dmzhz82m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n6maEOsC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502D31A76D7
-	for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 14:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721B82BB09;
+	Thu, 12 Sep 2024 14:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726150995; cv=none; b=ebfsSpAhvy8Mek0AR4TmxUxnTLOE+/gO3kMoP1qT5sYezVG7vUp/wRHhRi1uGO1DOYyLZRWB09brXjVnj58s4fC38l9cKmMyMDS0sgpq25BDNQd60RyNHGvoyNLdQMv9W56j4A4VRMioVBKQKWwonX1HJoAVjO2Nqess9vr3ucA=
+	t=1726151063; cv=none; b=TGLDev3RPbIAnZmDUFnE3Z6GjdT30/INEbccFooG635peTGP/aL2iE0bV87tUsjo5f6Ju7+QufdWuqH/dbgu6mZj4gf69TSbKol5M/N7EoUUWtcHs14dPlKax9dV5dtSsg+SRAlKlWU3SCJIgpExBZvRdoA9CfehLviu+6RqTbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726150995; c=relaxed/simple;
-	bh=oWzSbl9SOryhrEfvgC31aG2vf60JanCUGc273K6cBVg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OOZmdcRhCN0vWznUBmwYXYz2XrDX6RDXwONkeqSDLlUNiMfviFTMpXlHgv7sFcC4gduPTWmmag5w6fY8v2Xe2pzqglVcBlbv3p+yHqf4bO2yhHFYuLv4d+Ef+kgX6nqe8WIMUwrQRMk+ftCuoJesnQy9dCkJkUdTRexqO/QX+dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Dmzhz82m; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f63bf0ad-2846-4108-9a3f-9ea113959af0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726150991;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JQcj2YDJcPOkha5AjFb9sgabfqS/mkYXHsp1WXdSRE0=;
-	b=Dmzhz82mKpoK7vDeWNHJ8FrrSmRqWeE4p4A2Gg7IU4qsDs5hfY+ZYc7GEvOoOQOfqMkUMX
-	kncnb80/XNvOBRgi8lkmllfzNjB7cho4BWysXMLUfH7qP1RXO8+3J8wi6763V7vo77VvX7
-	l+qodB+IidCdHyBcI9NN0+g9d/sni84=
-Date: Thu, 12 Sep 2024 10:23:06 -0400
+	s=arc-20240116; t=1726151063; c=relaxed/simple;
+	bh=DE8LCwYBBBoP7mkIx3nkN1NwNmY7aG3Ig8Uq+Rcy+4g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Fq0G11TMvvRCuXx/RY3D+LaiDP0X6GjTLrFt6lhcXbWLT/HsyFymSQB1+HGdfNv8HVe7QoJtD4RI/sy18H4cHvp79WbC9VZHJiiR52YnqycK1cITShZzQK0nq8py9pAiqz979Jnsarjl0uxxCmoZ60Z9zJVizs58YxDv+savxfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n6maEOsC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2850C4CEC5;
+	Thu, 12 Sep 2024 14:24:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726151062;
+	bh=DE8LCwYBBBoP7mkIx3nkN1NwNmY7aG3Ig8Uq+Rcy+4g=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=n6maEOsCTqRa/8uwso9+tRoBQXPEDe4J1bb4dJPGFY8RASg5nusWSjLKq+x2pxyiT
+	 4Y6RThrncvt7gdXmcemSJ0jH38x7xazGi72rBFhuM+TRv+1//w+nsSrjAo573Aiqo8
+	 NxUbZUyJF0zZIIQzySYJD834V5z57NWr+TBgs0Jq1AKozuiijB2p1zEwauzzRL78DF
+	 Aygw6jVx/8Qp2+MuP3WNLOaaOm3oGNdtUtu/CPh9L3CGgqHA1TBIIy32ExSFn2WUVp
+	 QnG3/rJ9iUE11n2uf/SHjM4d3K5cn+QEOVAkZTJzx0a04H2etEjOZbhfwURH3l18uQ
+	 w1gDRq0XnEGBg==
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 11A90152C614; Thu, 12 Sep 2024 16:24:20 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Breno Leitao
+ <leitao@debian.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, andrii@kernel.org, ast@kernel.org,
+ syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
+ bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
+ john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+ linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org,
+ syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Subject: Re: [PATCH net-net] tun: Assign missing bpf_net_context.
+In-Reply-To: <20240912122847.x70_LgN_@linutronix.de>
+References: <000000000000adb970061c354f06@google.com>
+ <20240702114026.1e1f72b7@kernel.org>
+ <20240703122758.i6lt_jii@linutronix.de>
+ <20240703120143.43cc1770@kernel.org>
+ <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
+ <20240912122847.x70_LgN_@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 12 Sep 2024 16:24:20 +0200
+Message-ID: <87wmjhar1n.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: xilinx: axienet: Schedule NAPI in two steps
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, Robert Hancock <robert.hancock@calian.com>,
- linux-kernel@vger.kernel.org, Michal Simek <michal.simek@amd.com>,
- linux-arm-kernel@lists.infradead.org
-References: <20240909231904.1322387-1-sean.anderson@linux.dev>
- <20240910185801.42b7c17f@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Sean Anderson <sean.anderson@linux.dev>
-In-Reply-To: <20240910185801.42b7c17f@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain
 
-On 9/10/24 21:58, Jakub Kicinski wrote:
-> On Mon,  9 Sep 2024 19:19:04 -0400 Sean Anderson wrote:
->> Additionally, since we are running
->> in an IRQ context we can use the irqoff variant as well.
-> 
-> The _irqoff variant is a bit of a minefield. It causes issues if kernel
-> is built with forced IRQ threading. With datacenter NICs forced
-> threading is never used so we look the other way. Since this is a fix
-> and driver is embedded I reckon we should stick to __napi_schedule().
+Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
 
-Does it?
+> On 2024-09-12 05:06:36 [-0700], Breno Leitao wrote:
+>> Hello Sebastian, Jakub,
+> Hi,
+>
+>> I've seen some crashes in 6.11-rc7 that seems related to 401cb7dae8130
+>> ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.").
+>> 
+>> Basically bpf_net_context is NULL, and it is being dereferenced by
+>> bpf_net_ctx->ri.kern_flags (offset 0x38) in the following code.
+>> 
+>> 	static inline struct bpf_redirect_info *bpf_net_ctx_get_ri(void)
+>> 	{
+>> 		struct bpf_net_context *bpf_net_ctx = bpf_net_ctx_get();
+>> 		if (!(bpf_net_ctx->ri.kern_flags & BPF_RI_F_RI_INIT)) {
+>> 
+>> That said, it means that bpf_net_ctx_get() is returning NULL.
+>> 
+>> This stack is coming from the bpf function bpf_redirect()
+>> 	BPF_CALL_2(bpf_redirect, u32, ifindex, u64, flags)
+>> 	{
+>> 	      struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+>> 
+>> 
+>> Since I don't think there is XDP involved, I wondering if we need some
+>> preotection before calling bpf_redirect()
+>
+> This origins in netkit_xmit(). If my memory serves me, then Daniel told
+> me that netkit is not doing any redirect and therefore does not need
+> "this". This must have been during one of the first "designs"/ versions. 
+>
+> If you are saying, that this is possible then something must be done.
+> Either assign a context or reject the bpf program.
 
-__napi_schedule_irqoff selects between __napi_schedule and
-____napi_schedule based on whether PREEMPT_RT is enabled. Is there some
-other way to force IRQ threading?
+Netkit definitely redirects, so it should assign a context object in
+netkit_xmit()...
 
---Sean
+-Toke
 
