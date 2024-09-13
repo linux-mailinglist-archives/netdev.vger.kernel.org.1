@@ -1,143 +1,74 @@
-Return-Path: <netdev+bounces-128049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30F91977AAC
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:07:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56272977AED
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:27:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9EC51F26C39
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 08:07:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 906B51C25BEC
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 08:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1BA21BD02E;
-	Fri, 13 Sep 2024 08:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 420AC1D6C4C;
+	Fri, 13 Sep 2024 08:26:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bApFRuI7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0064b401.pphosted.com (mx0a-0064b401.pphosted.com [205.220.166.238])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35912154C04;
-	Fri, 13 Sep 2024 08:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.166.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0C61D67BF
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 08:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726214870; cv=none; b=cZGddZ0eUJ3rpXpaxqCtzs3Nhe4qkxuiZsgQP7CRaobRH4RWVkAWXjHekGQT7ZEXuB3UPDzLIO1k1+34lUPZ23lCLGX8YHKx6VFqtIpPzC7AelsIEBrYqGRfR5+S2ecKdZ895mpFF9abz3MCUVQf01V6avf6DzXrFwWr00GmEpw=
+	t=1726216002; cv=none; b=XTZ/h0T5zxltuC8ZIHat4y0qsg1k6bZakjpkKwe/ZD5toEyTPB+aNy02cAEv11ThTIEuivF7ZsV88iQzp51UA7kWtlBk8PZI7VkfdpQAx5r+j04LChePmglP7R/CbKJg2zoUx49xqGjUUZC5LxL8rIi/RCMhprkxOve2KcV2UZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726214870; c=relaxed/simple;
-	bh=9ujN5GDn3kjjokM6XfuxHvZV/LXXR6pjqoGAAGI+SfA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NynwcQSgbfJFci/N16rfI4AOWwILFVYvHn5hfRntRJTBuNYdG3l5MbJtlAm7wcZo05kWBM+TwW8XsqZnSH/tfbHO1prfI9+/vNw/5OkxbRv+ELTnwieptx40jvzeq6J8T0E1cW29G1jfqk1NkvXxabmXuMvBbuZyPTVlkaBfXu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.166.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48D3XOTJ008583;
-	Fri, 13 Sep 2024 01:07:18 -0700
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 41gpbk6qfj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 13 Sep 2024 01:07:18 -0700 (PDT)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 13 Sep 2024 01:07:17 -0700
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.39 via Frontend Transport; Fri, 13 Sep 2024 01:07:14 -0700
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com>
-CC: <christophe.leroy@csgroup.eu>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <maxime.chevallier@bootlin.com>,
-        <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH net-next] net: ethtool: phy: Distinguish whether dev is got by phy start or doit
-Date: Fri, 13 Sep 2024 16:07:13 +0800
-Message-ID: <20240913080714.1809254-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <000000000000d3bf150621d361a7@google.com>
-References: <000000000000d3bf150621d361a7@google.com>
+	s=arc-20240116; t=1726216002; c=relaxed/simple;
+	bh=JLdfytEtHIe7P5Eqx/WTDXAAcTdEgV0X98t4QtCf8fw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TUNdKsqcQ9H0kP6Nt2JJD20Jey5cG0KuTSqdhGbw/x6pO7+DgiDOVAowVQTStMbyI5HpcYlTy7WVGBOqS/+U/C77fLLvVWZQSpiS4GLeMz0ZW0jLN+SGBRNEU5jWtnZkDe3mQJBDQvqoQSknFJa6gil7wLP5No5GGx96pbuEsRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bApFRuI7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3CACC4CEC0;
+	Fri, 13 Sep 2024 08:26:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726216001;
+	bh=JLdfytEtHIe7P5Eqx/WTDXAAcTdEgV0X98t4QtCf8fw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bApFRuI78POd8ENVe2tghcXufOWgF8kaQdNXXZJ29xPDgJlTwnzIEBoaBKkJ15/Sd
+	 pDFUG5JWkGHnQeX5JIuXFoCyKu3MyXTy6EZ9hPm0xCaMllTY2kFEBn6ebFDIUa221A
+	 98jJOJjiaS0+jXq20+erE7AzH+YlKfWvSLTdhhGkqy6tHeLt1dD75XSPAPi3zyq2Pm
+	 akyZiRsIkP782Z6bQZfDRCuSI0TgKGutj393AvUJ9vXA4vHHYwZLjAIYKvCMsxayYv
+	 gJqFnXDMW8k5X3AtWasgts7zUoATp5bbB8FleP71eeQLBec9wHclijGSNJGWQ8dTNX
+	 GXQte38ywqp6A==
+Date: Fri, 13 Sep 2024 09:26:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yu Liao <liaoyu15@huawei.com>
+Cc: davem@davemloft.net, xiexiuqi@huawei.com, netdev@vger.kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Subject: Re: [PATCH net-next] net: hsr: convert to use new timer API
+Message-ID: <20240913082637.GS572255@kernel.org>
+References: <20240912033912.1019563-1-liaoyu15@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: _3xazUSHFPwHRqc0I3lfNArgubU8KGIU
-X-Authority-Analysis: v=2.4 cv=Ye3v5BRf c=1 sm=1 tr=0 ts=66e3f2b6 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=EaEq8P2WXUwA:10 a=hSkVLCK3AAAA:8 a=edf1wS77AAAA:8 a=t7CeM3EgAAAA:8 a=40mUqnhr4SogbDg-WAEA:9 a=cQPPKAXgyycSBL8etih5:22
- a=DcSpbTIhAlouE1Uv7lRv:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-ORIG-GUID: _3xazUSHFPwHRqc0I3lfNArgubU8KGIU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-13_04,2024-09-13_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- spamscore=0 mlxlogscore=888 clxscore=1011 bulkscore=0 malwarescore=0
- mlxscore=0 lowpriorityscore=0 phishscore=0 suspectscore=0
- priorityscore=1501 classifier=spam authscore=0 adjust=0 reason=mlx
- scancount=1 engine=8.21.0-2408220000 definitions=main-2409130055
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240912033912.1019563-1-liaoyu15@huawei.com>
 
-Syzbot reported a refcount bug in ethnl_phy_done.
-This is because when executing ethnl_phy_done, it does not know who obtained
-the dev(it can be got by ethnl_phy_doit or ethnl_phy_start) and directly
-executes ethnl_parse_header_dev_put as long as the dev is not NULL.
-Add dev_start_doit to the structure phy_req_info to distinguish who obtains dev.
+On Thu, Sep 12, 2024 at 11:39:12AM +0800, Yu Liao wrote:
+> del_timer_sync() has been renamed to timer_delete_sync(). Inconsistent
+> API usage makes the code a bit confusing, so replace with the new API.
+> 
+> No functional changes intended.
+> 
+> Signed-off-by: Yu Liao <liaoyu15@huawei.com>
 
-Fixes: 17194be4c8e1 ("net: ethtool: Introduce a command to list PHYs on an interface")
-Reported-and-tested-by: syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=e9ed4e4368d450c8f9db
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
----
- net/ethtool/phy.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Thanks, I agree that it is currently inconsistent.
+And that this patch addresses all relevant calls in this function.
 
-diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
-index 4ef7c6e32d10..321a7f89803f 100644
---- a/net/ethtool/phy.c
-+++ b/net/ethtool/phy.c
-@@ -13,6 +13,7 @@
- struct phy_req_info {
- 	struct ethnl_req_info		base;
- 	struct phy_device_node		*pdn;
-+	u8 dev_start_doit;
- };
- 
- #define PHY_REQINFO(__req_base) \
-@@ -157,6 +158,9 @@ int ethnl_phy_doit(struct sk_buff *skb, struct genl_info *info)
- 	if (ret < 0)
- 		return ret;
- 
-+	if (req_info.base.dev)
-+		req_info.dev_start_doit = 0;
-+
- 	rtnl_lock();
- 
- 	ret = ethnl_phy_parse_request(&req_info.base, tb, info->extack);
-@@ -223,10 +227,14 @@ int ethnl_phy_start(struct netlink_callback *cb)
- 					 false);
- 	ctx->ifindex = 0;
- 	ctx->phy_index = 0;
-+	ctx->phy_req_info->dev_start_doit = 0;
- 
- 	if (ret)
- 		kfree(ctx->phy_req_info);
- 
-+	if (ctx->phy_req_info->base.dev)
-+		ctx->phy_req_info->dev_start_doit = 1;
-+
- 	return ret;
- }
- 
-@@ -234,7 +242,7 @@ int ethnl_phy_done(struct netlink_callback *cb)
- {
- 	struct ethnl_phy_dump_ctx *ctx = (void *)cb->ctx;
- 
--	if (ctx->phy_req_info->base.dev)
-+	if (ctx->phy_req_info->base.dev && ctx->phy_req_info->dev_start_doit)
- 		ethnl_parse_header_dev_put(&ctx->phy_req_info->base);
- 
- 	kfree(ctx->phy_req_info);
--- 
-2.43.0
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
