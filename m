@@ -1,164 +1,250 @@
-Return-Path: <netdev+bounces-128211-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 266A6978821
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 20:48:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E66F0978825
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 20:51:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AD9E1F23984
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:48:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4A32288EAA
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:51:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D9FE12C46D;
-	Fri, 13 Sep 2024 18:48:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF6C139590;
+	Fri, 13 Sep 2024 18:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="XD7QUY80"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="BseMTovv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
+Received: from AM0PR83CU005.outbound.protection.outlook.com (mail-westeuropeazon11010071.outbound.protection.outlook.com [52.101.69.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D818172A
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 18:47:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726253281; cv=none; b=EIpjgwS1SJjvZGCZfSIoSLrtazFkK68iNHoJ39390Wlw/CXnEkJtnafjCXfYw8dhzxnkCWcpB5Tm6imU3NOruP6XwQym0fos99FJjhyiT1IrjXdIB2v+HvRo5BZmDgIUOsLWZlG+Ygqv74HCRxk+ECM5dUMN6NuFbFVlF/1TE8w=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726253281; c=relaxed/simple;
-	bh=s7ndScSrjr0hOWpmQOityGRkXjX69thSQe63mpk5b3Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bvwDdxqvJpu9J92eqJN27/ogkNmaGmakCKoRZp64hngm18pO4La3sPM7K4G9q2TZhqcGatNuJyYCjjZfu0jbgWdZSP3YUmnSc+KUc53SMr5V4CVwB4IERjkwo1xTt/ORtV/tp2cSqkJUMe99lyi1MJH4UXpApYugDsTQJ8lUoA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=XD7QUY80; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f3132254-85cb-4572-b0cf-578e2d43db76@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726253277;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QRTQ+ZaQ8+DT1PhzC6WM6iZQF0HtBfAEO3at1wXL+xQ=;
-	b=XD7QUY8002qrPBOxD5oBSibcARqE0z9/+Ry8AOahbaeMg7sS1J9JQr2t0aJbpo2UL+0dY0
-	fDure2UHKwqV0xDtT66QJh1ENdR/nm05qxP1VbUlyNq/BCg0VldMYLJXp0HIJ/UT19hpeX
-	l04/KW62Tp71qfMtnq60u0H2MlxTf40=
-Date: Fri, 13 Sep 2024 11:47:48 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF098172A;
+	Fri, 13 Sep 2024 18:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.69.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726253464; cv=fail; b=r3pe5AmJ1Mg62CFhCfy+6Hq4X4JG77/ccdJBjO6Igx5jqE+Zew8xzVGXWmoTUC453RtsSYY3DskbIYQg4fZq7DqK4J688bZyVIgpusrqHI//wfn6Zq9Bj4fRSnEHikUWSg6gW/hmI5WKfPMLyaHIcCBSGF5MOnAghH+MnVh33xY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726253464; c=relaxed/simple;
+	bh=fkMZwTS7XmR89TqxoZ9Twwy8SRdBCMwt0gsrttYOqak=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=LK9HxD8QaUWpciyVh3ZsBCKFxsgzbvgtYJPUIz72Rd5Ydyb7o7eScco5dmEjfkX6oQyOUAJcqjL+1BPSQ3YbbvvMkAInXhwsj6acVHgc0m/XnZicWcf2u58civA6PN1L6AKYE/u+Gi0WruzclqS1kcurxy/WMRi2qEl4+8KoUoI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=BseMTovv; arc=fail smtp.client-ip=52.101.69.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ML/K5JGVKk16TYfPWltNNfq9SP4zVSKhEpAByPJIEd6eiZ2Fe6BZYxG6e3FsOkivlgcnhF/n1nkWyBQ9E2vri8yLXtpdMbdn0Iv3Isk7CW2OH9TnwGFt4cBsJ76seVS8roizmwAriHMAKR5CLpoifCn4PHHbPLk3WnmketXMKjZBn9HF20y76VGyNrIfAbgYl4DJAsHJZe3qrrbrmGeMYLKR1IJYzdWwS/vjIky4ZYzkIf595Nr08PEGXYZsqUUwwS83qJ1rxMRXWpMD6njRadwlIxzOmL4+hf/KWM0IiqOpvsIOCbM1RhIgsHTaxAVzUlp4daSfKz2KZ0p2fsRL+w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ioX1cMPY0xF+YU4kcQrOtY2Gu0TZmvawWi6+xcSz150=;
+ b=m72pH+7Lxj/X6cXmnTNFvuPiXoy2g6sfg5sY4NxRsQvfPIv8QyX2iTlK5sjENny1Q9YUw427tkJuyICK2UZQXqpiE4VFipp5wUlgwuMvcFWtCJlExH+ACSIbl2jDzU1lNs22/GgnjFuDjPCH1+WIh3DE8cyOCgPeP9dr1iJKFByo+hR1cSIJAJIwWrn/m/bCMFJ6ACOzqaM8r78VA0hAP1GCYteOh7Zv7f+q5fQbIxnQ1T5R2n/4879HT11kfgXUXvYZF/n/Gi2+1J/Yyjl2vczJlZrrTJQ/ZyWxdX3sqZM37okI92xhI2slakqzkLwLVQ307bga7mhQHwUwvKVQCg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ioX1cMPY0xF+YU4kcQrOtY2Gu0TZmvawWi6+xcSz150=;
+ b=BseMTovvw4fpBFzxSHmXGlHbpc0VwTixewLgVKlJtOf4ok8y3v2C9sZbDCXUd6ths+oxhonYPzTaFLUzK6yG+ul+kVtE3OsryFTNZSu5WqJMdSRdtwLG9Ztuiyud2/Lmr5DLq1CcrWHtWg/7GmVrlgo6NjjZTEqX8jYqJALUbrrAUuEyjlPRZt/Fv8VVd6ZDiCOWAhl0OWXOLla351thoHcQRUGbxRz/aexkl1Z7QCtZ0SLwsPKdwnMisIyhJr0yJoFtbP6/LiyjmN2uGctmd4qE0h/M3W9BfyllvMl4ANTVE/0EbxFDB+XIz82h7p7nJPtrLeBaGAeuT7sHx+G+Ow==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by VI1PR04MB10025.eurprd04.prod.outlook.com (2603:10a6:800:1e0::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.17; Fri, 13 Sep
+ 2024 18:50:56 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.7962.017; Fri, 13 Sep 2024
+ 18:50:56 +0000
+Date: Fri, 13 Sep 2024 21:50:53 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] dt-bindings: net: dsa: the adjacent DSA
+ port must appear first in "link" property
+Message-ID: <20240913185053.rr23ym5otprgiphb@skbuf>
+References: <20240913131507.2760966-1-vladimir.oltean@nxp.com>
+ <20240913131507.2760966-3-vladimir.oltean@nxp.com>
+ <20240913-estimate-badland-5ab577e69bab@spud>
+ <c2244d42-eda4-4bbc-9805-cc2c2ae38109@lunn.ch>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c2244d42-eda4-4bbc-9805-cc2c2ae38109@lunn.ch>
+X-ClientProxiedBy: VI1P190CA0050.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:800:1bb::15) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] ipv6: avoid possible NULL deref in
- rt6_uncached_list_flush_dev()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, "Eric W. Biederman" <ebiederm@xmission.com>,
- Martin KaFai Lau <kafai@fb.com>
-References: <20240913083147.3095442-1-edumazet@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20240913083147.3095442-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|VI1PR04MB10025:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c0dd374-93b0-4d13-f263-08dcd425005e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?LXCEGau85UjjJhhQw+SIxtz8atG0PRFyWclek3V7WsuB4h2cc5B23gB84sVO?=
+ =?us-ascii?Q?vG/N+56LdwcZNqTrdUZ85BfNRhQECiKSU3hl+G7oMnyNHnLrPHQtJyAFRvhJ?=
+ =?us-ascii?Q?qGb/H6MUotWF4h1r5TBYd1127/ameF4yIXVBwh4ywEiFQb0MnKjNcwY2hdIM?=
+ =?us-ascii?Q?rJ6MjgsnKBQhOJOOA4o1edzL4QnvfWP9LkF0eGwmL79BI3s3mlxsTA741SCg?=
+ =?us-ascii?Q?wIzKYyiQvUxHIU3PgUJB7RafIIgwPH6SwYTOUoQj95xgVUSb8NW6RFhHEDGw?=
+ =?us-ascii?Q?3nj1J7WT3eum8eNCI+DRPY+kEmpGIDzcfK6qiC2WO4XHGZcy5ggHPIkfJlwp?=
+ =?us-ascii?Q?DAuskF5svj904OqtUoDQq0tZSgYWUmDVysROBJ8l23tHmF8vd59ybaT8CCKy?=
+ =?us-ascii?Q?cYOtbfht3GePqnJABaN8vfcy7nnSgyK9sAbYz0rnzWUBxfjgMGSsl0TxMRPT?=
+ =?us-ascii?Q?aBZgufXXCm5acnYPVNrdFfUS/v3wFpbOyzi7hz+ep8XXh9sW0hcpkY7soeh/?=
+ =?us-ascii?Q?lkasWJyrUnxgtAinEQLkpj1cOcEcYLcDRWK8mPWPIMZOCRdl9zgtQ73bZQiI?=
+ =?us-ascii?Q?55MutW8kHqyQIwJlxqu6/NawBG4Ae9IviJKIManOnwmUKDBHvtm8aXF+uOOp?=
+ =?us-ascii?Q?iRdgh3F90XzuHuKgRZqmomr1iyY5SUY+NVOauw5pEc3nfL9OyvI0Bs51FLtF?=
+ =?us-ascii?Q?RtjfGaHdJYSFypFdPIyGgtsv77NivOhdSGRbMbrUHtUIPd5NPEB195NYryH+?=
+ =?us-ascii?Q?ZJ5kHj7KWSicKc8vqCgBOSbJfpD1IjHF5zv50NQYqFVhHqG7aBO/g4122gqO?=
+ =?us-ascii?Q?sTNmKZEEuff9QMsRg0P9m6Sq4OgclKzwofj9KZDmvnCfkrC3JyXwZka8xnEU?=
+ =?us-ascii?Q?upmcsE3adTCaijt3/xmE5TKGmMI2rYVKP+lzTVY/HoZgxjLiHMkFbgvU4+mh?=
+ =?us-ascii?Q?jDHrx1Z6UCkbc1ZKHgeQ4+EbKOrGr3WbGvtcAv6aC4+GcyqOUrslPPdrXTPT?=
+ =?us-ascii?Q?S8q79jbMLznOkqK0ZihGG1VDTGPniXtG3rfxvadXBfzOpo1UaVS5/pccfICT?=
+ =?us-ascii?Q?9bz7oDefp2EYMYpgrPJTnJublQvWVlJjZbKKlxt6QdKfJhWbGQ7Xrj4TRVEP?=
+ =?us-ascii?Q?1eQ0YQpZ728Ca5GLOThKKWdQgkc9Nl5jh2AaWLFeIiPcxXS9Qx8foaDBkNsl?=
+ =?us-ascii?Q?OeEcgObWTUltxY9ET4luNmV/UDK3/DVQ7hDkpgvQyXmygQtWkTxyexww/gCY?=
+ =?us-ascii?Q?dQ07EPcqe4reUq0CPvcdBAj5/PvGrJ3+pOwRhpvETgRb+arbSh/NusPiSpwi?=
+ =?us-ascii?Q?qQjIWotj6LdydQ6AK6c/wk6t2xInNZGdcOgcBRrSxO3HHw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?MSy2UnkZ3oIau8HL+2z/uV9wedkpDde22/qI2e3QJrahMO6lM+JpUzuWM5jJ?=
+ =?us-ascii?Q?qS0VP8Ibj5pZ9mwlPK82W2T0U0IHcIxuBwQqjMRVzmydcKAmHOPWlIBQXOeN?=
+ =?us-ascii?Q?NJCnF9fP/EVh68N8H5fqv2NTqyKOY+s+OouLmuhjOApB+dHTPd1UDdw4Rjo2?=
+ =?us-ascii?Q?AbtEY4avuBRGwp7J5fywAQhgyom7UCA29z5zBLpucgnyHvPZ+2eS96YdOTMV?=
+ =?us-ascii?Q?/mJfDJUzzx6nFFy5Z3ek5+mqQqhowM4x2wuO+BxhKuafNET3MymI7/tnbF37?=
+ =?us-ascii?Q?1NkLZBzWX85mhqKpqTa26g015L5bzwdVD3tphTWCwsgO2rpQvj0xUUkwN1lR?=
+ =?us-ascii?Q?JsTy1meJPpkd3pEVWMIX1gex6TLrY9Mtm5w8yQXabSJjVCh4VqfVC9Hj/qTY?=
+ =?us-ascii?Q?UI2nag5JkbLrinR8RxiiQ02MOE3z+Ujfk24kgcVnIB7IssubEWpu6zGnwvGq?=
+ =?us-ascii?Q?IKbC3wbSx5pa1C2a+wD0zLf7PTOC0vwNXP2QXVzvPptgNDlrhehG1Ez7X+gN?=
+ =?us-ascii?Q?DVxAtROxn1OZp/9qiNR7VL14TlsJgSYnjG6s+wFM5caxU09O+oY8YKwdskiA?=
+ =?us-ascii?Q?GwSq/k2lTiQBtwODb/OrVMIUytq2r+wpKbuScZTbt9jta4vtHD7j523v7GXO?=
+ =?us-ascii?Q?/03fG2ITtfKrO/+Hjy8TfHlkchnKbvMByWKUtLbIZeyBm59h+Z5iEY99Y2Gg?=
+ =?us-ascii?Q?UAyBxcT7nkzt2xGYiBFMVfghRtsoHBxkSC0RAEhrHzeczloLso3iygs4Admk?=
+ =?us-ascii?Q?H+pinI9qJhF38Za8dRj3KoXGMQtn44DyST0fCzYOfjyXpgoxYTWyR57IzT8u?=
+ =?us-ascii?Q?Lj9DuEsyRHFxYa1/ekjuCFtoXIWd5UToptio4FJrVVewi8B4atyWgR+fpY0E?=
+ =?us-ascii?Q?PY6GI1rVzG9SErMWzsPuBRm3AV+JdvC3ebxltiPws9uPP45SsQMj1uM862Vl?=
+ =?us-ascii?Q?83TXSP3b93C+L2lANXRDFFgk5l8/qtZj1lc55nSZLxwwY/jngkFMmf0muOVS?=
+ =?us-ascii?Q?S5cLQkeb60u82R/WxUtiRrozmdujleWPue5zQNQfb/g2vDKAFQxCq+RksyiN?=
+ =?us-ascii?Q?n6cmwQyPnWjlGLoXADr3OmjqTcqv6oDI8A3rIIa5/tbdwb1sKRvrTrwTbTIc?=
+ =?us-ascii?Q?aCh/tzpdOh/6caQ5wXFmkKZnLYxZNygfBB1UXMQ9CKA662h0xCWv2snVw92C?=
+ =?us-ascii?Q?FjsQMdDSEb7y1QvYvXcY7BNLz6nhKIsJ6WDOE0x46CjpqhoYwUIkliVHGmQ5?=
+ =?us-ascii?Q?tT3d/090zG3zFqmxajcPcn9AzRKch0wdWOLc4ZLYibgTLcUlBtPwuC17plW1?=
+ =?us-ascii?Q?OeAET4IzCj0IQ66Fu9KWeImu8vHY604JTxM22A+PtsoGltGmLAm4oTRHvKyk?=
+ =?us-ascii?Q?LA6a/5nJvZpCaxJw/zXhvtPOktgrRFot0qHG2Iga1wBcGik7v+JV8+6vSkno?=
+ =?us-ascii?Q?J+lqxrEU8Xwci9fRPffZ3FHJRYVROIOCTQ6GPUaGfQSdaSSrmqLk17mk1POu?=
+ =?us-ascii?Q?K37Kg9HIAZK6D+mde5/cFalIlg8zu0EyF12we3Zlj/3UGoBClwoSntPNFuen?=
+ =?us-ascii?Q?N3MMyT5xmC14H3KX+j7vEG/l/i/EBA+CFT+jwOHlOdBq6DF2L9Mdnvboys7+?=
+ =?us-ascii?Q?/g=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c0dd374-93b0-4d13-f263-08dcd425005e
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2024 18:50:56.7619
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jP2G8COsk9sP69Z3ODoKDntyvVNxXfY75zyedvY+g1kg6XJo7I58iuh6coxL7P4XMWLysH36v8S2kSK0sFj3XQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB10025
 
-On 9/13/24 1:31 AM, Eric Dumazet wrote:
-> Blamed commit accidentally removed a check for rt->rt6i_idev being NULL,
-> as spotted by syzbot:
-> 
-> Oops: general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
-> CPU: 1 UID: 0 PID: 10998 Comm: syz-executor Not tainted 6.11.0-rc6-syzkaller-00208-g625403177711 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
->   RIP: 0010:rt6_uncached_list_flush_dev net/ipv6/route.c:177 [inline]
->   RIP: 0010:rt6_disable_ip+0x33e/0x7e0 net/ipv6/route.c:4914
-> Code: 41 80 3c 04 00 74 0a e8 90 d0 9b f7 48 8b 7c 24 08 48 8b 07 48 89 44 24 10 4c 89 f0 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <80> 3c 08 00 74 08 4c 89 f7 e8 64 d0 9b f7 48 8b 44 24 18 49 39 06
-> RSP: 0018:ffffc900047374e0 EFLAGS: 00010246
-> RAX: 0000000000000000 RBX: 1ffff1100fdf8f33 RCX: dffffc0000000000
-> RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff88807efc78c0
-> RBP: ffffc900047375d0 R08: 0000000000000003 R09: fffff520008e6e8c
-> R10: dffffc0000000000 R11: fffff520008e6e8c R12: 1ffff1100fdf8f18
-> R13: ffff88807efc7998 R14: 0000000000000000 R15: ffff88807efc7930
-> FS:  0000000000000000(0000) GS:ffff8880b8900000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000020002a80 CR3: 0000000022f62000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->   <TASK>
->    addrconf_ifdown+0x15d/0x1bd0 net/ipv6/addrconf.c:3856
->   addrconf_notify+0x3cb/0x1020
->    notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
->    call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
->    call_netdevice_notifiers net/core/dev.c:2046 [inline]
->    unregister_netdevice_many_notify+0xd81/0x1c40 net/core/dev.c:11352
->    unregister_netdevice_many net/core/dev.c:11414 [inline]
->    unregister_netdevice_queue+0x303/0x370 net/core/dev.c:11289
->    unregister_netdevice include/linux/netdevice.h:3129 [inline]
->    __tun_detach+0x6b9/0x1600 drivers/net/tun.c:685
->    tun_detach drivers/net/tun.c:701 [inline]
->    tun_chr_close+0x108/0x1b0 drivers/net/tun.c:3510
->    __fput+0x24a/0x8a0 fs/file_table.c:422
->    task_work_run+0x24f/0x310 kernel/task_work.c:228
->    exit_task_work include/linux/task_work.h:40 [inline]
->    do_exit+0xa2f/0x27f0 kernel/exit.c:882
->    do_group_exit+0x207/0x2c0 kernel/exit.c:1031
->    __do_sys_exit_group kernel/exit.c:1042 [inline]
->    __se_sys_exit_group kernel/exit.c:1040 [inline]
->    __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1040
->    x64_sys_call+0x2634/0x2640 arch/x86/include/generated/asm/syscalls_64.h:232
->    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->    do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f1acc77def9
-> Code: Unable to access opcode bytes at 0x7f1acc77decf.
-> RSP: 002b:00007ffeb26fa738 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f1acc77def9
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000043
-> RBP: 00007f1acc7dd508 R08: 00007ffeb26f84d7 R09: 0000000000000003
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-> R13: 0000000000000003 R14: 00000000ffffffff R15: 00007ffeb26fa8e0
->   </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
->   RIP: 0010:rt6_uncached_list_flush_dev net/ipv6/route.c:177 [inline]
->   RIP: 0010:rt6_disable_ip+0x33e/0x7e0 net/ipv6/route.c:4914
-> Code: 41 80 3c 04 00 74 0a e8 90 d0 9b f7 48 8b 7c 24 08 48 8b 07 48 89 44 24 10 4c 89 f0 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df <80> 3c 08 00 74 08 4c 89 f7 e8 64 d0 9b f7 48 8b 44 24 18 49 39 06
-> RSP: 0018:ffffc900047374e0 EFLAGS: 00010246
-> RAX: 0000000000000000 RBX: 1ffff1100fdf8f33 RCX: dffffc0000000000
-> RDX: 0000000000000000 RSI: 0000000000000004 RDI: ffff88807efc78c0
-> RBP: ffffc900047375d0 R08: 0000000000000003 R09: fffff520008e6e8c
-> R10: dffffc0000000000 R11: fffff520008e6e8c R12: 1ffff1100fdf8f18
-> R13: ffff88807efc7998 R14: 0000000000000000 R15: ffff88807efc7930
-> FS:  0000000000000000(0000) GS:ffff8880b8900000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000020002a80 CR3: 0000000022f62000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> 
-> Fixes: e332bc67cf5e ("ipv6: Don't call with rt6_uncached_list_flush_dev")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Eric W. Biederman <ebiederm@xmission.com>
-> Cc: Martin KaFai Lau <kafai@fb.com>
-> ---
->   net/ipv6/route.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index 219701caba1e9496f4a7add7e97251ab111a67f0..b4dcd8f3e7babae45e0b40bd80f871be06757b82 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -174,7 +174,7 @@ static void rt6_uncached_list_flush_dev(struct net_device *dev)
->   			struct net_device *rt_dev = rt->dst.dev;
->   			bool handled = false;
->   
-> -			if (rt_idev->dev == dev) {
-> +			if (rt_idev && rt_idev->dev == dev) {
+Hi Conor, Andrew,
 
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
+Thanks for taking a look at the patch.
 
+On Fri, Sep 13, 2024 at 07:26:49PM +0200, Andrew Lunn wrote:
+> On Fri, Sep 13, 2024 at 06:04:17PM +0100, Conor Dooley wrote:
+> > On Fri, Sep 13, 2024 at 04:15:05PM +0300, Vladimir Oltean wrote:
+> > > If we don't add something along these lines, it is absolutely impossible
+> > > to know, for trees with 3 or more switches, which links represent direct
+> > > connections and which don't.
+> > > 
+> > > I've studied existing mainline device trees, and it seems that the rule
+> > > has been respected thus far. I've actually tested such a 3-switch setup
+> > > with the Turris MOX.
+> > 
+> > What about out of tree (so in u-boot or the likes)? Are there other
+> > users that we need to care about?
+
+In U-Boot there is only armada-3720-turris-mox.dts which is in sync with
+Linux as far as I'm aware. Also, we don't really support cascade ports
+in U-Boot DM_DSA yet. So all device trees in U-Boot should be coming
+from Linux. I'm not aware of other device tree users, sadly.
+
+> > This doesn't really seem like an ABI change, if this is the established
+> > convention, but feels like a fixes tag and backports to stable etc are
+> > in order to me.
+> 
+> Looking at the next patch, it does not appear to change the behaviour
+> of existing drivers, it just adds additional information a driver may
+> choose to use.
+> 
+> As Vladimir says, all existing instances already appear to be in this
+> order, but that is just happen stance, because it does not matter. So
+> i would be reluctant to say there is an established convention.
+
+Yes, indeed, it's not a convention yet. However, it is a convention I
+would really like to establish, based on the practice I have seen.
+
+> The mv88e6xxx driver does not care about the order of the list, and
+> this patch series does not appear to change that. So i'm O.K. with the
+> code changes.
+> 
+> > > -      Should be a list of phandles to other switch's DSA port. This
+> > > -      port is used as the outgoing port towards the phandle ports. The
+> > > -      full routing information must be given, not just the one hop
+> > > -      routes to neighbouring switches
+> > > +      Should be a list of phandles to other switch's DSA port. This port is
+> > > +      used as the outgoing port towards the phandle ports. In case of trees
+> > > +      with more than 2 switches, the full routing information must be given.
+> > > +      The first element of the list must be the directly connected DSA port
+> > > +      of the adjacent switch.
+> 
+> I would prefer to weaken this, just to avoid future backwards
+> compatibility issues. `must` is too strong, because mv88e6xxx does not
+> care, and there could be DT blobs out there which do not conform to
+> this. Maybe 'For the SJA1105, the first element ...".
+> 
+> What i don't want is some future developer reading this, assume it is
+> actually true when it maybe is not, and making use of it in the
+> mv88e6xxx or the core, breaking backwards compatibility.
+
+Backward compatibility issues aside, the way dp->link_dp is populated
+can _only_ be done based on the assumption that this is true.
+
+I'm afraid that any verb less strong than "must" would be insufficient
+for my patch 3/4.
+
+I have unpublished downstream patches which even make all the rest of
+the "link = <...>" elements optional. Bottom line, only the direct
+connection between ports (first element) represents hardware description.
+The other reachable ports (the routing table, practically speaking) can be*
+computed based on breadth-first search at DSA probe time. They are
+listed in the device tree for "convenience".
+
+*and IMO, also should be. For a 3-switch daisy chain, there are 8 links
+to describe, and for a 4-switch daisy chain, there are 22 links, if my
+math is correct. I think it's unreasonable to expect that board DT
+writers won't make mistakes in listing this amount of elements, rather
+than just concentrating on the physically relevant info - the direct
+connection.
+
+Baking the assumption proposed here into the binding now makes the BFS
+algorithm perfectly implementable, and the binding much more scalable.
+
+Do you have reasonable concerns that there exist device trees which are
+written differently than "first 'link' element is the direct connection"?
 
