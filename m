@@ -1,102 +1,87 @@
-Return-Path: <netdev+bounces-128214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B42978837
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 20:55:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CFDB978847
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 20:57:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25F541F21E96
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:55:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08FFA1F27205
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:57:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC2313213A;
-	Fri, 13 Sep 2024 18:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A43613AD20;
+	Fri, 13 Sep 2024 18:57:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="nJ8l+26h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XUkhnOtW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383E582D70
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 18:55:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BEF7B3FE;
+	Fri, 13 Sep 2024 18:57:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726253735; cv=none; b=BS3WAjg8WeJEe7TCS3OyI2uaoSBS5+2V8q4XeHof/0tfGcSypVez9SeHVyx3LWn74OATBscbxy/TnRTQeOFtFtFvg6U7w4RHn7vTbm76Yyodv6onUf+dKiJc3GsZf0vHBm9WE47myTEY83w1+fxwp875feODF+7nME1GEJvsHTk=
+	t=1726253837; cv=none; b=Ra37TEW/SGetyAnxLJk49feOPVAAx2Fhr70MnytZqqN3zZr8f0AQRhtQfoo0lL9hqeaswpw7QBsUcjEZl7Ku9Oxyfygf4ezP5Eh9hxKd6S91eVQNveLPLJpmyKvpuM+6kO35/+TuNpg7Ipd5XeC2YAUuGhPoUtPBMdc3s63I6TA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726253735; c=relaxed/simple;
-	bh=V+VmYPTZRE3hzK62YCRKPBn1g2RyukAfOJtc1OgpEBU=;
+	s=arc-20240116; t=1726253837; c=relaxed/simple;
+	bh=hJCTc/6yHUDiq+TBBk5Sp8setNzjVIzn21aRuMamIfs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dFryQdi2ciqzKADez0JOl3kaQzSbhcINMzI0FrU6BxY/JALcT2P84jtD6f5JOBrE1H/6juquQ4iDIYLZ0DPCR+rFb4nTi8JwZlUg0fIWjvehii0DvFaQSfchdMA64od3Mrt8StupNxjeiukk2CnX1dZN9LgrAnwFLwVzzzyfXIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=nJ8l+26h; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a8d2b24b7a8so652615566b.1
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 11:55:33 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dOYO8fOTQV1j9eBhdXtUiwSz9pQjgJiopznrSO7OOWwiZgrWw4f9+GOA4GV1NavSgP1ufYJniwjCyhBcR+jVNV7YrmRkYkCfzyhz/VNn/URc062RcvqD9IO1yR0mYxge/eVYv0ewDihKJDH9by1H/0D7PuWK/uDwrtaP3rFCRzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XUkhnOtW; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a8a91c8cdd5so24641266b.0;
+        Fri, 13 Sep 2024 11:57:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1726253732; x=1726858532; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5SDYQ7lzcTR7t7MivDajHBL9N4FwFQeM0m9Pk7CbHHE=;
-        b=nJ8l+26hEJhxdnD+J5xpJKSaXOgr1fwaCJFlBl8x438jI8WpiYraJD9V8NsQn5UsgC
-         tZ3GyGhb/Rc1T0ZpSUJFqQmmKc45QLeetKr75fe9msLMfWhWHYYDfutJcYVzUwdm4H+7
-         MQk8QnTYU3L/Yne1jRwcyQLSA51lapkYmgl6c=
+        d=gmail.com; s=20230601; t=1726253834; x=1726858634; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9KT7wTlkKWAPIvLq2FwcNHktlSLs65MPKXB4TMfQmcA=;
+        b=XUkhnOtWBiI9/kj6VY1ug1ZuJUDi04JJbyELUbiq5C+xW6JMFEl9sk3LcC7p2qsjU0
+         3vSIyorBkKR6R2pabMaqHrJllQ9KKFuJyJKDuDKm/zGRQa+2DbNVbe3so6R7zALhKfGt
+         /xjDwzR/uDCkqlK0AXOUHYLYhQ28Vox3Vq08vwEvcaufBTHp4cQfqJGzHl77h7Js9esA
+         2Hx7tbJ6WYr7VofElpLpcIfRLNhD0gKOoC4rFgYU6ggpOhQiwpxYLuVNL4vACpCRFNll
+         G8ynCpnaVDYSPKe8AjlBYelfrQ8+4OseDJUnTLRucXGuGCCe58TqaoU2yGob00uu9YTW
+         WO5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726253732; x=1726858532;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5SDYQ7lzcTR7t7MivDajHBL9N4FwFQeM0m9Pk7CbHHE=;
-        b=VVEeyQHa4xAKGjsWWbyXtgmQ+6hDQqicmG7DSmBlElXjToKRuP7YA0pd1tNGxavv8P
-         O4GMXRxqVxpiuWsoc4RN2MV4C7nNeeiwQ/17zZmIv92KE/Uf4e1cEvY3ptt2TNXHpjfL
-         5h2PZW2g+FOWVTJiN09Hr87272aA69HEf29/B3cHfqLAxnHYbE0YIstFdr4hM9S6T5UY
-         98JmPyfDJKdMw6J5hS/e1s09wV7dnEpGCLP+rh00E3tAIWdxnI0+MWMNc4KKZencQ0NO
-         Jlh6EaHZXinSNLvJvJlPFFnU9IC7NFdnBW6WTWT9ysDxXP/fCzRSl88OC12GwwWsaJ6r
-         qObg==
-X-Gm-Message-State: AOJu0YzqwXtnueYQW9HuEZYH6+dIlJX4yR+cuyYmuRBXsVyYVnAirum6
-	f1Oh9YMTLqAEMTxDeWZFQWeNBLMThKfT5/gdQSOr0TFnZverLNtsjyasyzviQw4=
-X-Google-Smtp-Source: AGHT+IHnCvCp+xq1tGI3ArJ6ViTY+PYeT7JnNVeEAe4ZbrJxfhBSFEIBXJggCl2+kXNhZMsIaMn+kQ==
-X-Received: by 2002:a17:907:9721:b0:a80:c0ed:2145 with SMTP id a640c23a62f3a-a902a3d105cmr839070866b.2.1726253731882;
-        Fri, 13 Sep 2024 11:55:31 -0700 (PDT)
-Received: from LQ3V64L9R2.homenet.telecomitalia.it (host-79-23-194-51.retail.telecomitalia.it. [79.23.194.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25d63bebsm898006366b.207.2024.09.13.11.55.30
+        d=1e100.net; s=20230601; t=1726253834; x=1726858634;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9KT7wTlkKWAPIvLq2FwcNHktlSLs65MPKXB4TMfQmcA=;
+        b=hsSq1QJqojPFcjU2NYUwLU6YMuC7PU7nxRYQrhZMCj0nZ59dQWcOZQfBCNffL50r2D
+         0Ug6m87CaXaE7ItDBAuWk/Sij3ATHBa6SylG8XMPEUCu8VcwaLheEij7BA5HkvgDNUg8
+         T24bDHwDfPiVnQ/SmsP+GMKjfHZnlQD3L0j8H1eLjvlioZarzZyEsIRiLa0wCuGPRdId
+         OdZLoRmPNEdviuPr6v/5m/tt84DNw2XUequGxkz9SItVL1EYDACyZKOUIXsIrJY3vZHS
+         iWJgaqoNxp6N40vJOnHv1qjKqeUoBXkc5SY/1v9F4NSUi7mxpfwGtmebhD7WBJkPH5sH
+         xIcg==
+X-Forwarded-Encrypted: i=1; AJvYcCUDQZUi9fhn0DWbl7RyywczI7oI+i9QgsH1E0QhxjBv06LN71o0rartIWiAez/Uot9Z9/UDezk=@vger.kernel.org, AJvYcCUxdlthxDKwegFQu7X/W+3OdXakquQ9BgjtRyej5Z/gDIavW97NnGzFBSr/xb8RMI+2DTCied75@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlTTxzE7kJP7KLtNW/hA85I6b2ThtvEEdf8/SBm+a2F5z2uM+C
+	mLmZ3PoOqG6VNfUZSHbLtpT1Sf/KSHOzjwoS3tO3Tef/qongHeqW8xYjF43V
+X-Google-Smtp-Source: AGHT+IFbActLfWh0JQuS9i+kFBb15J/wpQaWel27SEDeC5pzYsdKrSUVbCQSNwLtzSMuskdWM4XVfA==
+X-Received: by 2002:a17:907:7d87:b0:a8a:9054:83b5 with SMTP id a640c23a62f3a-a90293fc43fmr309031666b.3.1726253833015;
+        Fri, 13 Sep 2024 11:57:13 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d258339dasm902858366b.38.2024.09.13.11.57.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2024 11:55:31 -0700 (PDT)
-Date: Fri, 13 Sep 2024 20:55:29 +0200
-From: Joe Damato <jdamato@fastly.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, kuba@kernel.org,
-	skhawaja@google.com, sdf@fomichev.me, bjorn@rivosinc.com,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v3 5/9] net: napi: Add napi_config
-Message-ID: <ZuSKofgZbfn_n8tb@LQ3V64L9R2.homenet.telecomitalia.it>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, kuba@kernel.org, skhawaja@google.com,
-	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240912100738.16567-1-jdamato@fastly.com>
- <20240912100738.16567-6-jdamato@fastly.com>
- <ZuR5jU3BGbsut-q6@mini-arch>
+        Fri, 13 Sep 2024 11:57:12 -0700 (PDT)
+Date: Fri, 13 Sep 2024 21:57:09 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
+Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] net: dsa: lan9303: avoid dsa_switch_shutdown()
+Message-ID: <20240913185709.uchyicqqcuwyya5u@skbuf>
+References: <20240911144006.48481-1-alexander.sverdlin@siemens.com>
+ <20240912101556.tvlvf2rq5nmxz7ui@skbuf>
+ <ae8d43993c2195925c9cbb4a9db565985709eaf8.camel@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,52 +90,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZuR5jU3BGbsut-q6@mini-arch>
+In-Reply-To: <ae8d43993c2195925c9cbb4a9db565985709eaf8.camel@siemens.com>
 
-On Fri, Sep 13, 2024 at 10:42:37AM -0700, Stanislav Fomichev wrote:
-> On 09/12, Joe Damato wrote:
+Hi Alexander,
 
-[...]
+On Fri, Sep 13, 2024 at 04:16:57PM +0000, Sverdlin, Alexander wrote:
+> > > Fixes: 0650bf52b31f ("net: dsa: be compatible with masters which unregister on shutdown")
+> 
+> Do you think it would make sense to add the same Fixes: tag as above?
+> (That's the earlier one of the two)
+> 
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+> > > ---
+> > 
+> > Could you please test this alternative solution (patch attached) for both reported problems?
+> 
+> We had two LAN9303-equipped systems running overnight with PROVE_LOCKING+PROVE_RCU and without,
+> and I also ran couple of reboots with PROVE_LOCKING on a Marvell mv6xxx equipped HW.
+> All of the above for a backport to v6.1, but this part should be OK, I believe.
+> 
+> Overall looks very good, you can add my
+> Reviewed-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+> Tested-by: Alexander Sverdlin <alexander.sverdlin@siemens.com> 
+> when you officially publish the patch.
 
-> > @@ -6505,12 +6517,13 @@ static void napi_hash_add(struct napi_struct *napi)
-> >  		if (unlikely(++napi_gen_id < MIN_NAPI_ID))
-> >  			napi_gen_id = MIN_NAPI_ID;
-> >  	} while (napi_by_id(napi_gen_id));
-> 
-> [..]
-> 
-> > -	napi->napi_id = napi_gen_id;
-> > -
-> > -	hlist_add_head_rcu(&napi->napi_hash_node,
-> > -			   &napi_hash[napi->napi_id % HASH_SIZE(napi_hash)]);
-> >  
-> >  	spin_unlock(&napi_hash_lock);
-> > +
-> > +	napi_hash_add_with_id(napi, napi_gen_id);
-> 
-> nit: it is very unlikely that napi_gen_id is gonna wrap around after the
-> spin_unlock above, but maybe it's safer to have the following?
-> 
-> static void __napi_hash_add_with_id(struct napi_struct *napi, unsigned int napi_id)
-> {
-> 	napi->napi_id = napi_id;
-> 	hlist_add_head_rcu(&napi->napi_hash_node,
-> 			   &napi_hash[napi->napi_id % HASH_SIZE(napi_hash)]);
-> }
-> 
-> static void napi_hash_add_with_id(struct napi_struct *napi, unsigned int napi_id)
-> {
-> 	spin_lock(&napi_hash_lock);
-> 	__napi_hash_add_with_id(...);
-> 	spin_unlock(&napi_hash_lock);
-> }
-> 
-> And use __napi_hash_add_with_id here before spin_unlock?
+Thanks for testing, I really appreciate it.
 
-Thanks for taking a look.
-
-Sure, that seems reasonable. I can add that for the rfcv4.
-
-I'll probably hold off on posting the rfcv4 until either after LPC
-and/or after I have some time to debug the mlx5/page_pool thing.
+I will add all the required tags for the formal patch submission.
 
