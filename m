@@ -1,182 +1,120 @@
-Return-Path: <netdev+bounces-128224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503E997890A
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:40:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15B0C978919
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:48:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C40F01F23296
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:40:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B55D21F21F4E
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:48:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC571465A0;
-	Fri, 13 Sep 2024 19:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89DD1448DF;
+	Fri, 13 Sep 2024 19:48:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="hfMEeYIq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CDcvzDSU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com [209.85.218.65])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3338512C54D
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 19:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4564A06;
+	Fri, 13 Sep 2024 19:48:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726256395; cv=none; b=cHlycVT5d9G1514EL09QQJrvA4dgzmnbCBx3wVMm+eOz2K+v4GJNzL+V9JHso0PA7hL9juWPg06NBT/oQQZ17wNskGMhDPmf8myS86JLDEPqflNSEsVEpmwwaddbSzuZfctb1yu7MxYZI8E1ZekR8ZPW14coiFHE62FJRsvS70s=
+	t=1726256932; cv=none; b=B96U/XEmDrEpsNtYFK5HQL++3XNsmWfp5CeqnsHdTrIn89fMQZAgo7TkVEcge8lxXJRBqLLBRSftGSTfbhk8v7mKkOXyyUfHRMmIu+TgRudEd8zPxFr0lm6AQ6oPzwrCOk4lQg/EL4+VMdv1M914MoR709Qiy/VFyY0Mx/sIAGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726256395; c=relaxed/simple;
-	bh=CMo7HkkIhI1I7aI8ilt0+qYkkVtrZmJ4OottzfDvO6Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yj5bm6gVKFg73KpB/uYq07AZj5XbNKIuhRBPXRgJUcukc+h41y30kdwZWVGTkZJSezm/q1FpebgnfgVrIYb+O+PNqXM4fQopANtuOfv2Nn5MrqCSPLMDnnxagrJ8J0jZ+nvX6SKSSAnzeA6h2/1c/lbOWLAuZJ+MzAQzGAs/c54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=hfMEeYIq; arc=none smtp.client-ip=209.85.218.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ej1-f65.google.com with SMTP id a640c23a62f3a-a8a6d1766a7so310184866b.3
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 12:39:54 -0700 (PDT)
+	s=arc-20240116; t=1726256932; c=relaxed/simple;
+	bh=wXx6gycub3wwaBxUU3Rpj/KlRbaF2yP/lASR3+ACbBk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iqe0pkPV3yVs7lgT+J8V+BRMxqb6kcJyh2wR70eOdLWDS9kgzH+3xnDgX0CBPUIeNo77AizZDLGG4z3hSxQbNkiP+Fbkx/EQkfaVATRdJ6pP1vuR+KT+10Fpibu5M29sD5tJS76ujc5kmx+tQi2jmLI2o6gl6exk4/RIZcixcw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CDcvzDSU; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-375e5c12042so1440335f8f.3;
+        Fri, 13 Sep 2024 12:48:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1726256392; x=1726861192; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G5CQI17h6VCYt4zGN52zL9wyqg2yBHJSk6YPjhxtg2Q=;
-        b=hfMEeYIq0E7XiIOnaENE+m0ZAYe1nK9r3tnTUpseNJtY3+K3k+bLqL3PEIvbwDccXS
-         QTC+u5r7eHYDPObbV9f1PUZ2DTmJV2H+oL/VTzLpXLJuGSQjIVUisAVgPNfggWcstxhJ
-         lIyon8B3eG+wTroLMMw2bJK6eR7mbJtH9kfeg=
+        d=gmail.com; s=20230601; t=1726256929; x=1726861729; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wXx6gycub3wwaBxUU3Rpj/KlRbaF2yP/lASR3+ACbBk=;
+        b=CDcvzDSUpS+EUwvAnsz7OPuCP1OT4LtSuNCrJ6Q00NEG9WtP9wDgu+Y4Bf1MGuEMPF
+         /JFDmHGRb8/j9TpwvjvphH29wx8BUzHWKQgViiaLUQsvlKRItqhaUxaMomO/rOeq4MuD
+         CTg8x3CsUW2fyJqp5bFReqfL03iWla9d0gfohVv6natnMkQgSLqC47tRaAT5he5DxE04
+         LSif5X5mohvRR4WjoBTTWYzTrMknmhdf/wM6q4bq5Tbvgmxld54Rd0Usu0Uawj+QrHJb
+         Si9wz215W1Dxu8hUBC8ItJwy+duhuc9J930OuzuaTRybSZblzJRjzTwqWacm0h6mnXQJ
+         ft1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726256392; x=1726861192;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G5CQI17h6VCYt4zGN52zL9wyqg2yBHJSk6YPjhxtg2Q=;
-        b=SbVHP0m0OXyICer9Cen5Tj4um4zBYEQfEyLVO96cJBkIC2d5i0dGrKwswRBrF1AJ1d
-         NkP5n+YHmMXWm6+ma0UjnrnHsY70yyuqxunA6REfdJDumndtPeFb/+NawcdQscJX85SV
-         Tc8xvcavhSCnxDQl7u2NiWawl6Y9jN4gXA2EWCwVsvbQFVDIx7XHp0nKwTSlW5MrfHc4
-         Ng9a9vXRslIlJCAlkNKpErRLG0WEDvfgXlCU6LanOMQWbJpBj+WqI+9gyzmsGCNgavir
-         L+KQY9rJMvFjwLLqdFMlnw6UmgZ9WOrwpNmhJeiR2XH4zvXorUF8eV+h3yHp9wxb/TzJ
-         Y0RQ==
-X-Gm-Message-State: AOJu0Yw09wLzm/eEKkWdXfEwgdnyyoC3YlVlgt6QfT8yGO6G5Vfd5Io+
-	3qUgQ3xbsiC9qU/znKYB0+kEgAyLNv/YIlt1GGGRWOC+0PpmKC61M1rez/2ZRB0=
-X-Google-Smtp-Source: AGHT+IGt1aG8kG/1Hgn/PR9xu8QfYT2lfl93SU7pfYjcITtFlHzQXzZGxUHxJ1HFhi5SShCzMCXnTQ==
-X-Received: by 2002:a17:907:e8d:b0:a86:80ef:4fe5 with SMTP id a640c23a62f3a-a9029617930mr702246266b.47.1726256392054;
-        Fri, 13 Sep 2024 12:39:52 -0700 (PDT)
-Received: from LQ3V64L9R2.homenet.telecomitalia.it (host-79-23-194-51.retail.telecomitalia.it. [79.23.194.51])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d258354ecsm899909866b.8.2024.09.13.12.39.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2024 12:39:51 -0700 (PDT)
-Date: Fri, 13 Sep 2024 21:39:49 +0200
-From: Joe Damato <jdamato@fastly.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, mkarsten@uwaterloo.ca, kuba@kernel.org,
-	skhawaja@google.com, sdf@fomichev.me, bjorn@rivosinc.com,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v3 5/9] net: napi: Add napi_config
-Message-ID: <ZuSVBfgrN5wigT90@LQ3V64L9R2.homenet.telecomitalia.it>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca, kuba@kernel.org, skhawaja@google.com,
-	sdf@fomichev.me, bjorn@rivosinc.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Jiri Pirko <jiri@resnulli.us>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20240912100738.16567-1-jdamato@fastly.com>
- <20240912100738.16567-6-jdamato@fastly.com>
- <ZuR5jU3BGbsut-q6@mini-arch>
+        d=1e100.net; s=20230601; t=1726256929; x=1726861729;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wXx6gycub3wwaBxUU3Rpj/KlRbaF2yP/lASR3+ACbBk=;
+        b=Kb8q7BDFtEIGTb2y5UYfT6UK9z03HPO3urHYaWsQE1R5Q5qUn6LSEU/PRPwUqYx+3j
+         ya40TqKa72tPbykh3B4Doi71kw3AbKsXWVU7bWFXOtq5dMFx4yZxHDtUpBY2SYmxLEKu
+         lxfCjzgzjYY30ZvaH+m9vw9SHobhgqvydzxEQJ36Cwes38SjQVYR2bdsZdaidVE3bXPX
+         NchSE4pARMiMOFJZYciZYWCh+Eke3n83W5sdTUn6llHflQH0Q+6nF/avxeGb7bqpTZ65
+         ABWHZvz7KAAd0mYCC5By+Y/HKQ/dXl6bVJZgWqEmrG9G+/yP+kV2WmK44jdsndK9LSnQ
+         5EcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU345LYxQrO6efZpCd+OpHC4c2b7uZYVdwJsRpp59JK/DfOKhDHZl6dqK7Cd38Rh6cJcYA=@vger.kernel.org, AJvYcCWofrATTgI5Ce6hPlCdLNl4MiTMOlJJ4JAMJiBdFWR7Te3vtQVp93PF4LD0L1eBVC1cduAZOGE0@vger.kernel.org
+X-Gm-Message-State: AOJu0YwPj+XDn516Xl1U3ugkmy7SmJ3hDGszmP5JCjtDouBHyMxrSL5f
+	YHCMdizuHS7fOtpxPFs72mDgKaFwqBuksSMlnfn78cONKxspVmn1HTg+ypwLFXL9uzI7HeuWlPv
+	ilv3QA1pEWVMmsP9yayjqy6s7Ixg=
+X-Google-Smtp-Source: AGHT+IH8W9syhiarFLSK3Fjj/YKDt2NVpTG2U4vHTeBbkIoBtlQfC46UefLlGFgRTVDOOIGuvDF5QDu3CeDPWQYT+0M=
+X-Received: by 2002:a05:6000:1f89:b0:374:c040:b00e with SMTP id
+ ffacd0b85a97d-378c2d5a827mr4487423f8f.39.1726256929310; Fri, 13 Sep 2024
+ 12:48:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZuR5jU3BGbsut-q6@mini-arch>
+References: <20240911191019.296480-1-maciej.fijalkowski@intel.com> <CAJ8uoz2yjB7nj495x3CuiwHfuU+T0g3MXy4DScG2iT6gtkQsqg@mail.gmail.com>
+In-Reply-To: <CAJ8uoz2yjB7nj495x3CuiwHfuU+T0g3MXy4DScG2iT6gtkQsqg@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 13 Sep 2024 12:48:37 -0700
+Message-ID: <CAADnVQKUsT3vU_bcPYBNbnD-W5+CkyEcshW7e2c0Ayj-G1D0HA@mail.gmail.com>
+Subject: Re: [PATCH bpf] xsk: fix batch alloc API on non-coherent systems
+To: Magnus Karlsson <magnus.karlsson@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Network Development <netdev@vger.kernel.org>, 
+	"Karlsson, Magnus" <magnus.karlsson@intel.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Dries De Winter <ddewinter@synamedia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 13, 2024 at 10:42:37AM -0700, Stanislav Fomichev wrote:
-> On 09/12, Joe Damato wrote:
+On Thu, Sep 12, 2024 at 4:04=E2=80=AFAM Magnus Karlsson
+<magnus.karlsson@gmail.com> wrote:
+>
+> On Wed, 11 Sept 2024 at 21:10, Maciej Fijalkowski
+> <maciej.fijalkowski@intel.com> wrote:
+> >
+> > In cases when synchronizing DMA operations is necessary,
+> > xsk_buff_alloc_batch() returns a single buffer instead of the requested
+> > count. This puts the pressure on drivers that use batch API as they hav=
+e
+> > to check for this corner case on their side and take care of allocation=
+s
+> > by themselves, which feels counter productive. Let us improve the core
+> > by looping over xp_alloc() @max times when slow path needs to be taken.
+> >
+> > Another issue with current interface, as spotted and fixed by Dries, wa=
+s
+> > that when driver called xsk_buff_alloc_batch() with @max =3D=3D 0, for =
+slow
+> > path case it still allocated and returned a single buffer, which should
+> > not happen. By introducing the logic from first paragraph we kill two
+> > birds with one stone and address this problem as well.
+>
+> Thanks Maciej and Dries for finding and fixing this.
+>
+> Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
 
-[...]
+We already did the last bpf and bpf-next/net PRs before the merge window,
+so reassigning to netdev.
 
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -6493,6 +6493,18 @@ EXPORT_SYMBOL(napi_busy_loop);
-> >  
-> >  #endif /* CONFIG_NET_RX_BUSY_POLL */
-> >  
-> > +static void napi_hash_add_with_id(struct napi_struct *napi, unsigned int napi_id)
-> > +{
-> > +	spin_lock(&napi_hash_lock);
-> > +
-> > +	napi->napi_id = napi_id;
-> > +
-> > +	hlist_add_head_rcu(&napi->napi_hash_node,
-> > +			   &napi_hash[napi->napi_id % HASH_SIZE(napi_hash)]);
-> > +
-> > +	spin_unlock(&napi_hash_lock);
-> > +}
-> > +
-> >  static void napi_hash_add(struct napi_struct *napi)
-> >  {
-> >  	if (test_bit(NAPI_STATE_NO_BUSY_POLL, &napi->state))
-> > @@ -6505,12 +6517,13 @@ static void napi_hash_add(struct napi_struct *napi)
-> >  		if (unlikely(++napi_gen_id < MIN_NAPI_ID))
-> >  			napi_gen_id = MIN_NAPI_ID;
-> >  	} while (napi_by_id(napi_gen_id));
-> 
-> [..]
-> 
-> > -	napi->napi_id = napi_gen_id;
-> > -
-> > -	hlist_add_head_rcu(&napi->napi_hash_node,
-> > -			   &napi_hash[napi->napi_id % HASH_SIZE(napi_hash)]);
-> >  
-> >  	spin_unlock(&napi_hash_lock);
-> > +
-> > +	napi_hash_add_with_id(napi, napi_gen_id);
-> 
-> nit: it is very unlikely that napi_gen_id is gonna wrap around after the
-> spin_unlock above, but maybe it's safer to have the following?
-> 
-> static void __napi_hash_add_with_id(struct napi_struct *napi, unsigned int napi_id)
-> {
-> 	napi->napi_id = napi_id;
-> 	hlist_add_head_rcu(&napi->napi_hash_node,
-> 			   &napi_hash[napi->napi_id % HASH_SIZE(napi_hash)]);
-> }
-> 
-> static void napi_hash_add_with_id(struct napi_struct *napi, unsigned int napi_id)
-> {
-> 	spin_lock(&napi_hash_lock);
-> 	__napi_hash_add_with_id(...);
-> 	spin_unlock(&napi_hash_lock);
-> }
-> 
-> And use __napi_hash_add_with_id here before spin_unlock?
-
-After making this change and re-testing on a couple reboots, I haven't
-been able to reproduce the page pool issue I mentioned in the other
-email [1].
-
-Not sure if I've just been... "getting lucky" or if this fixed
-something that I won't fully grasp until I read the mlx5 source
-again.
-
-Will test it a few more times, though.
-
-[1]: https://lore.kernel.org/netdev/ZuMC2fYPPtWggB2w@LQ3V64L9R2.homenet.telecomitalia.it/
+Acked-by: Alexei Starovoitov <ast@kernel.org>
 
