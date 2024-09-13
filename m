@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-128107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A899780C7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 15:11:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5208E97805B
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 14:47:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 196231F24F9B
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 13:11:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57126B220A1
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 12:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C111D9339;
-	Fri, 13 Sep 2024 13:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7B71DA10D;
+	Fri, 13 Sep 2024 12:47:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hj/JYQyF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bw6LM+0i"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 683F919F415
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 13:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3C18187849;
+	Fri, 13 Sep 2024 12:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726233103; cv=none; b=ldgJcRLKbAsN8F9ULpe2FP/eK/9xoMRqUjQp0rid3UQn+7aIm+PUPo/I3Wuk7TYZfrb/j1ARnE2CUCCZL7XbzLApmukK9bVZwhludes+s5c5szV2YdGHYce0fs1w8GzzghoNLpdJcBfpEk/ozY+kFJS0lj0BB7uL0dP1jdcf3Xk=
+	t=1726231644; cv=none; b=aMc9cpN5otO54S5bp/Z15PA9DaieaSvUcgbGEUrtfpuZ6xuLQMMkjeSnDXLRLlbyV949gE0iic7H9mvSwzFR/KJzWZh7lMeT7zaPp22rkuRLbQgyCymnZzbb3wODnuYZAEbFlwkdYlyzfh0iWhS/VEkxVdu95q1PYmaa9d98DzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726233103; c=relaxed/simple;
-	bh=cDPtjMuuk/qx6XqkUfSD6MX3nF2r4irS45wxJ72/W5s=;
+	s=arc-20240116; t=1726231644; c=relaxed/simple;
+	bh=dytsdhDN/9pGMh6yc+9ZYSvQ7kBiCiIouvoAmRRF9L4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oZ51MHaxwzR4fadJHF4RATN7tvgq2TweBMvfA9+qKe9qF+TikN/VZGQEMMnc8P6SU6lmW6hfGOUJ6oUcYcdpDX6rUHtvnkWXUYKLJw9x5uYxSwC2TzQyZRS5M34awtsIqzNrvq3ENJaVGK84XNm8KV08zjD5ziC+1QZSDl/VPFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hj/JYQyF; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=e7TYD6HUbF5KFXNcIX7a9VXGqGts0Zq5d+pIuD1FtaM=; b=hj/JYQyFuxhQVLokf8Q4GDp0LW
-	SHX+mAAmGeqSttwMeBZvviKqrajwrL+0+fLC+Kr/VBM2UptU2btDdNNmTriarbda9b2Rz4SOa4wXm
-	el991rff369YF8BmPt7JHocU4vFVgan2iUtH06OMdd1OKXeW/ybrD8fa7MNoWolXU/D0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sp5gc-007OJg-83; Fri, 13 Sep 2024 14:46:06 +0200
-Date: Fri, 13 Sep 2024 14:46:06 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: hfdevel@gmx.net, netdev@vger.kernel.org, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next 5/5] net: tn40xx: register swnode and connect it
- to the mdiobus
-Message-ID: <04d22526-205b-4a59-b344-5bafdb9ce37f@lunn.ch>
-References: <trinity-e71bfb76-697e-4f08-a106-40cb6672054f-1726083287252@3c-app-gmx-bs04>
- <20240913.065543.2091600194424222387.fujita.tomonori@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=s8vv10whe36Rc+wsqwI+z80VUi/qpJtZHtspRPDaJ1w0/AMDJMs7N0AXYhx6eDGxGAftSTUpKVpsrkYkmzlpLCtCbAo+u5xmALt0j9CDQEx7jDb2g2vXj1iRmSRFVDcMMIYaalWFDoQRmwZPlsS0T5T84MMMH1bL9K2Uk7O5RSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bw6LM+0i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88653C4CECC;
+	Fri, 13 Sep 2024 12:47:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726231644;
+	bh=dytsdhDN/9pGMh6yc+9ZYSvQ7kBiCiIouvoAmRRF9L4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Bw6LM+0ifzfgUKnzzoWJ9wGowtFMPySe9V/kk/pH2orG208I5yCkg+8QQn4UXzK4l
+	 PiP+0kZGdvVgVAho+jx5QCNh466EuDpBADn2Cd6+2FDmN+E9UofniIIR3wAuf4Xq3c
+	 JNZmrvMXWoHiWCKFgnDot/rKvd5GoYLbgIfGiVvDkNqubNX3M92y0dLWQdeBGJyzQZ
+	 LLUMlE7EeYxBxFa+GErwhi01hKXelQ+PEP6+4VFiQz8raHEQ4Su9M8l4G0MAEAWP/d
+	 7HboiDDiSQ5fc35OTQeAQ5JB1PBtd75LPkZQRumUL9CrKvZ7tsfTINNFKkDvlMCZ8j
+	 iut7YU+OBLVVw==
+Date: Fri, 13 Sep 2024 13:47:20 +0100
+From: Simon Horman <horms@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH net-next v1] memory-provider: disable building dmabuf mp
+ on !CONFIG_PAGE_POOL
+Message-ID: <20240913124720.GA572255@kernel.org>
+References: <20240913060746.2574191-1-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,38 +61,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240913.065543.2091600194424222387.fujita.tomonori@gmail.com>
+In-Reply-To: <20240913060746.2574191-1-almasrymina@google.com>
 
-> >  #define TN40_MDIO_CMD_READ BIT(15)
-> > 
-> > +#define AQR105_FIRMWARE "tehuti/aqr105-tn40xx.cld"
+On Fri, Sep 13, 2024 at 06:07:45AM +0000, Mina Almasry wrote:
+> When CONFIG_TRACEPOINTS=y but CONFIG_PAGE_POOL=n, we end up with this
+> build failure that is reported by the 0-day bot:
 > 
-> This firmware is for AQR PHY so aquantia directory is the better
-> place?
+> ld: vmlinux.o: in function `mp_dmabuf_devmem_alloc_netmems':
+> >> (.text+0xc37286): undefined reference to `__tracepoint_page_pool_state_hold'
+> >> ld: (.text+0xc3729a): undefined reference to `__SCT__tp_func_page_pool_state_hold'
+> >> ld: vmlinux.o:(__jump_table+0x10c48): undefined reference to `__tracepoint_page_pool_state_hold'
+> >> ld: vmlinux.o:(.static_call_sites+0xb824): undefined reference to `__SCK__tp_func_page_pool_state_hold'
+> 
+> The root cause is that in this configuration, traces are enabled but the
+> page_pool specific trace_page_pool_state_hold is not registered.
+> 
+> There is no reason to build the dmabuf memory provider when
+> CONFIG_PAGE_POOL is not present, as it's really a provider to the
+> page_pool.
+> 
+> In fact the whole NET_DEVMEM is RX path-only at the moment, so we can
+> make the entire config dependent on the PAGE_POOL.
+> 
+> Note that this may need to be revisited after/while devmem TX is
+> added,  as devmem TX likely does not need CONFIG_PAGE_POOL. For now this
+> build fix is sufficient.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Closes: https://lore.kernel.org/oe-kbuild-all/202409131239.ysHQh4Tv-lkp@intel.com/
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-I don't know the correct answer to this. One thing to consider is how
-it gets packaged.
-
-on my Debian system:
-
-p   firmware-adi                                             - Binary firmware for Analog Devices Inc. DSL modem chips (dummmy pac
-i   firmware-amd-graphics                                    - Binary firmware for AMD/ATI graphics chips                         
-p   firmware-ast                                             - Binary firmware for ASpeed Technologies graphics chips             
-p   firmware-ath9k-htc                                       - firmware for AR7010 and AR9271 USB wireless adapters               
-p   firmware-ath9k-htc-dbgsym                                - QCA ath9k-htc Firmware ELF file                                    
-p   firmware-atheros                                         - Binary firmware for Qualcomm Atheros wireless cards                
-p   firmware-b43-installer                                   - firmware installer for the b43 driver                              
-p   firmware-b43legacy-installer                             - firmware installer for the b43legacy driver                        
-p   firmware-bnx2                                            - Binary firmware for Broadcom NetXtremeII                           
-p   firmware-bnx2x                                           - Binary firmware for Broadcom NetXtreme II 10Gb                     
-p   firmware-brcm80211                                       - Binary firmware for Broadcom/Cypress 802.11 wireless cards
-
-It seems to get packaged by vendor. Given the mess aquantia firmware
-is, we are going to end up with lots of firmwares in firmware-aquantia
-which are never needed. If the firmware is placed into tehuti,
-installing firmware-tehuti gives you just what you need.
-
-So i can see the logic of tehuti/aqr105-tn40xx.cld
-
-	Andrew
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Simon Horman <horms@kernel.org> # build-tested
 
