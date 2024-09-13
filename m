@@ -1,125 +1,227 @@
-Return-Path: <netdev+bounces-128208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90A81978798
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 20:10:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2FF89787BF
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 20:24:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5787628A86E
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:10:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8237A2810E2
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:24:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214D7126C01;
-	Fri, 13 Sep 2024 18:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A76412E1E9;
+	Fri, 13 Sep 2024 18:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NHAVNtU2"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5346A1369AA;
-	Fri, 13 Sep 2024 18:10:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7EEF1EEE0
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 18:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726251017; cv=none; b=kAx0Rx/UL5k8k/s4XVZVZQ928laWNh1RexEIhb2/j52pE6KIsd3WaZ1ZYkz5kRNg0Zfish4gLIWM/TP1G015yieZupM8uHB35CSyv+5+PnPP0gSOlvXKfTGnaji4uZUmf0BkSYHI6tZJH/DTV8g1OHnDjsTYzAVr28F/wP9191o=
+	t=1726251866; cv=none; b=GSqEsWTmiqJUTO/lb0dz3p51Rq5qOPkDZVqMBSL1+iuIasBok/xlU6PhkWvZsysDEA+xI3cvEpu/OLUNV/UcSPboYBpbAhnvSKnZaRjIosm3ucCDbarFyFPKgaD5g/NDtgoBqRoQHaKdkjIFxDsb5XYpKhUGKY0znT31VgbERh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726251017; c=relaxed/simple;
-	bh=O8scwiWyAnwSXutpVNoqI/DhWOLcnKhK8KKLUO66aLo=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VCQ0/erAU8EVHATxexOsJmzoJMxY1Nb5JKWFndD3bFw94HhgklLrcHetWUD1gvBsDJ+3UPWmXCYz88yYZCTefqB85Yhjfa9VK7KPm/SBizMUTMWFUvIOXRKxDliVD8pYRq3zFxhYtPFSFe3TdCjfYVIo3+awIdayG3gNEss2qyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4X52L73fccz6K5nT;
-	Sat, 14 Sep 2024 02:06:07 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2BBDE140B3C;
-	Sat, 14 Sep 2024 02:10:12 +0800 (CST)
-Received: from localhost (10.48.150.243) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 13 Sep
- 2024 20:10:11 +0200
-Date: Fri, 13 Sep 2024 19:10:09 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <martin.habets@xilinx.com>,
-	<edward.cree@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <edumazet@google.com>, Alejandro Lucero
-	<alucerop@amd.com>
-Subject: Re: [PATCH v3 20/20] efx: support pio mapping based on cxl
-Message-ID: <20240913191009.00001eec@Huawei.com>
-In-Reply-To: <20240907081836.5801-21-alejandro.lucero-palau@amd.com>
-References: <20240907081836.5801-1-alejandro.lucero-palau@amd.com>
-	<20240907081836.5801-21-alejandro.lucero-palau@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1726251866; c=relaxed/simple;
+	bh=FMnCn4o2qdaSUXi73ndLZFMOMrjiifMev7x7oJtFz8M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V/+2GoOEM95/TuQslkigSj1Bdbk/Wr59rR+VCmZZ67PeM6D0zdruKtyXk+9j5/KSaGHXt51DVYCMqnNSMPQ1VYTE7HmO++5ApbkroNezEzlByqVTnyNJAGat+TqGVAU23feFjUzodLrajUFia0WW9RzCjQU1TTPvldfpJErbk7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NHAVNtU2; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d17da5b6-6273-4c2c-abd7-99378723866e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726251861;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=STET5AXaIIGQswDEEBI7EGCg3LCwzAn8DRb4QZJG3wQ=;
+	b=NHAVNtU2cEONxvAu5BGBDbSFgBqCccPGRmQmvrLsgOs+A5Y6y+mOVEcHed8JXsQMwAlnzo
+	Fx1QOCna/Rmoh6YMKAt9XOlXOML0A1aj9hMU4nMbomT7DJR6V7Tj+J5EKWTaNeRYpm14pB
+	7Wzjx/uoB51Yp0VvQ297kU+shUjruG0=
+Date: Fri, 13 Sep 2024 11:24:09 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Subject: Re: [RFC PATCH 2/3] ipv6: Run a reverse sk_lookup on sendmsg.
+To: Tiago Lam <tiagolam@cloudflare.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Jakub Sitnicki <jakub@cloudflare.com>,
+ kernel-team@cloudflare.com
+References: <20240913-reverse-sk-lookup-v1-0-e721ea003d4c@cloudflare.com>
+ <20240913-reverse-sk-lookup-v1-2-e721ea003d4c@cloudflare.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240913-reverse-sk-lookup-v1-2-e721ea003d4c@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
- frapeml500008.china.huawei.com (7.182.85.71)
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, 7 Sep 2024 09:18:36 +0100
-alejandro.lucero-palau@amd.com wrote:
-
-> From: Alejandro Lucero <alucerop@amd.com>
+On 9/13/24 2:39 AM, Tiago Lam wrote:
+> This follows the same rationale provided for the ipv4 counterpart, where
+> it now runs a reverse socket lookup when source addresses and/or ports
+> are changed, on sendmsg, to check whether egress traffic should be
+> allowed to go through or not.
 > 
-> With a device supporting CXL and successfully initialised, use the cxl
-> region to map the memory range and use this mapping for PIO buffers.
+> As with ipv4, the ipv6 sendmsg path is also extended here to support the
+> IPV6_ORIGDSTADDR ancilliary message to be able to specify a source
+> address/port.
 > 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-One trivial thing.
+> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Signed-off-by: Tiago Lam <tiagolam@cloudflare.com>
+> ---
+>   net/ipv6/datagram.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>   net/ipv6/udp.c      |  8 ++++--
+>   2 files changed, 82 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
+> index fff78496803d..4214dda1c320 100644
+> --- a/net/ipv6/datagram.c
+> +++ b/net/ipv6/datagram.c
+> @@ -756,6 +756,27 @@ void ip6_datagram_recv_ctl(struct sock *sk, struct msghdr *msg,
+>   }
+>   EXPORT_SYMBOL_GPL(ip6_datagram_recv_ctl);
+>   
+> +static inline bool reverse_sk_lookup(struct flowi6 *fl6, struct sock *sk,
+> +				     struct in6_addr *saddr, __be16 sport)
+> +{
+> +	if (static_branch_unlikely(&bpf_sk_lookup_enabled) &&
+> +	    (saddr && sport) &&
+> +	    (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr, saddr) || inet_sk(sk)->inet_sport != sport)) {
+> +		struct sock *sk_egress;
+> +
+> +		bpf_sk_lookup_run_v6(sock_net(sk), IPPROTO_UDP, &fl6->daddr, fl6->fl6_dport,
+> +				     saddr, ntohs(sport), 0, &sk_egress);
 
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index dd2dbfb8ba15..ef57f833b8a7 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -21,9 +21,9 @@
->  int efx_cxl_init(struct efx_nic *efx)
->  {
->  	struct pci_dev *pci_dev = efx->pci_dev;
-> +	resource_size_t start, end, max = 0;
->  	struct efx_cxl *cxl;
->  	struct resource res;
-> -	resource_size_t max;
->  	u16 dvsec;
->  	int rc;
->  
-> @@ -132,10 +132,27 @@ int efx_cxl_init(struct efx_nic *efx)
->  		goto err_region;
->  	}
->  
-> +	rc = cxl_get_region_params(cxl->efx_region, &start, &end);
-> +	if (rc) {
-> +		pci_err(pci_dev, "CXL getting regions params failed");
-> +		goto err_map;
+iirc, in the ingress path, the sk could also be selected by a tc bpf prog doing 
+bpf_sk_assign. Then this re-run on sk_lookup may give an incorrect result?
+
+In general, is it necessary to rerun any bpf prog if the user space has 
+specified the IP[v6]_ORIGDSTADDR.
+
+> +		if (!IS_ERR_OR_NULL(sk_egress) &&
+> +		    atomic64_read(&sk_egress->sk_cookie) == atomic64_read(&sk->sk_cookie))
+> +			return true;
+> +
+> +		net_info_ratelimited("No reverse socket lookup match for local addr %pI6:%d remote addr %pI6:%d\n",
+> +				     &saddr, ntohs(sport), &fl6->daddr, ntohs(fl6->fl6_dport));
 > +	}
 > +
-> +	cxl->ctpio_cxl = ioremap(start, end - start);
-> +	if (!cxl->ctpio_cxl) {
-> +		pci_err(pci_dev, "CXL ioremap region failed");
-> +		rc = -EIO;
-> +		goto err_map;
-> +	}
+> +	return false;
+> +}
 > +
-> +	efx->efx_cxl_pio_initialised = true;
+>   int ip6_datagram_send_ctl(struct net *net, struct sock *sk,
+>   			  struct msghdr *msg, struct flowi6 *fl6,
+>   			  struct ipcm6_cookie *ipc6)
+> @@ -844,7 +865,62 @@ int ip6_datagram_send_ctl(struct net *net, struct sock *sk,
+>   
+>   			break;
+>   		    }
+> +		case IPV6_ORIGDSTADDR:
+> +			{
+> +			struct sockaddr_in6 *sockaddr_in;
+> +			struct net_device *dev = NULL;
 > +
->  	cxl_release_endpoint(cxl->cxlmd, cxl->endpoint);
->  
->  	return 0;
->  
-> +err_map:
-> +		cxl_region_detach(cxl->cxled);
+> +			if (cmsg->cmsg_len < CMSG_LEN(sizeof(struct sockaddr_in6))) {
+> +				err = -EINVAL;
+> +				goto exit_f;
+> +			}
+> +
+> +			sockaddr_in = (struct sockaddr_in6 *)CMSG_DATA(cmsg);
+> +
+> +			addr_type = __ipv6_addr_type(&sockaddr_in->sin6_addr);
+> +
+> +			if (addr_type & IPV6_ADDR_LINKLOCAL)
+> +				return -EINVAL;
+> +
+> +			/* If we're egressing with a different source address and/or port, we
+> +			 * perform a reverse socket lookup.  The rationale behind this is that we
+> +			 * can allow return UDP traffic that has ingressed through sk_lookup to
+> +			 * also egress correctly. In case the reverse lookup fails, we
+> +			 * continue with the normal path.
+> +			 *
+> +			 * The lookup is performed if either source address and/or port changed, and
+> +			 * neither is "0".
+> +			 */
+> +			if (reverse_sk_lookup(fl6, sk, &sockaddr_in->sin6_addr,
+> +					      sockaddr_in->sin6_port)) {
+> +				/* Override the source port and address to use with the one we
+> +				 * got in cmsg and bail early.
+> +				 */
+> +				fl6->saddr = sockaddr_in->sin6_addr;
+> +				fl6->fl6_sport = sockaddr_in->sin6_port;
+> +				break;
+> +			}
+>   
+> +			if (addr_type != IPV6_ADDR_ANY) {
+> +				int strict = __ipv6_addr_src_scope(addr_type) <= IPV6_ADDR_SCOPE_LINKLOCAL;
+> +
+> +				if (!ipv6_can_nonlocal_bind(net, inet_sk(sk)) &&
+> +				    !ipv6_chk_addr_and_flags(net,
+> +							     &sockaddr_in->sin6_addr,
+> +							     dev, !strict, 0,
+> +							     IFA_F_TENTATIVE) &&
+> +				    !ipv6_chk_acast_addr_src(net, dev,
+> +							     &sockaddr_in->sin6_addr))
+> +					err = -EINVAL;
+> +				else
+> +					fl6->saddr = sockaddr_in->sin6_addr;
+> +			}
+> +
+> +			if (err)
+> +				goto exit_f;
+> +
+> +			break;
+> +			}
+>   		case IPV6_FLOWINFO:
+>   			if (cmsg->cmsg_len < CMSG_LEN(4)) {
+>   				err = -EINVAL;
+> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+> index 6602a2e9cdb5..6121cbb71ad3 100644
+> --- a/net/ipv6/udp.c
+> +++ b/net/ipv6/udp.c
+> @@ -1476,6 +1476,12 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+>   
+>   	fl6->flowi6_uid = sk->sk_uid;
+>   
+> +	/* We use fl6's daddr and fl6_sport in the reverse sk_lookup done
+> +	 * within ip6_datagram_send_ctl() now.
+> +	 */
+> +	fl6->daddr = *daddr;
+> +	fl6->fl6_sport = inet->inet_sport;
+> +
+>   	if (msg->msg_controllen) {
+>   		opt = &opt_space;
+>   		memset(opt, 0, sizeof(struct ipv6_txoptions));
+> @@ -1511,10 +1517,8 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+>   
+>   	fl6->flowi6_proto = sk->sk_protocol;
+>   	fl6->flowi6_mark = ipc6.sockc.mark;
+> -	fl6->daddr = *daddr;
+>   	if (ipv6_addr_any(&fl6->saddr) && !ipv6_addr_any(&np->saddr))
+>   		fl6->saddr = np->saddr;
+> -	fl6->fl6_sport = inet->inet_sport;
+>   
+>   	if (cgroup_bpf_enabled(CGROUP_UDP6_SENDMSG) && !connected) {
+>   		err = BPF_CGROUP_RUN_PROG_UDP6_SENDMSG_LOCK(sk,
+> 
 
-Odd looking indent.
-
->  err_region:
->  	cxl_dpa_free(efx->cxl->cxled);
->  err_release:
 
