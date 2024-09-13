@@ -1,177 +1,188 @@
-Return-Path: <netdev+bounces-128172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD79A9785B9
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:27:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DB319785D0
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:33:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83C271F25E09
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 16:27:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 498D81C22AB8
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 16:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0BE537F8;
-	Fri, 13 Sep 2024 16:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82E09757E0;
+	Fri, 13 Sep 2024 16:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1lIKr8Ay"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="WIY7Z/3I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-42ae.mail.infomaniak.ch (smtp-42ae.mail.infomaniak.ch [84.16.66.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551C54A21
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 16:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F8274418
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 16:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726244853; cv=none; b=KMvmH/mK9fTsvlf0oEDso2x7sWwxWExC8eb02TTpivUY22eAef6RT4fBlEQxjVJNztqQDZMhoqyPnhOJZO5N3pvFPKehoOchjwnz7vrjjRoIXWSj7nQNNWBPmzVCwBWlAmfkeppGScrnIqBCFA0+zoRbd+yijhJ9KNCGbackOl4=
+	t=1726245206; cv=none; b=jQeNGL3q5RZKHY5Z1UFyehSUEIIXwD4uAS8VUHqZDSOpyeqfRFY6yW3yQ29Kvk1pER3V4TzU+Y2t2XRLVd4pK2I50t+yO8GjVdCCLEu30oq4aKxKrxNbs3aPl6y5/8nEqG8mKY3H09juz4e3rika1FzYEf1h0aMPEBS3gFctY5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726244853; c=relaxed/simple;
-	bh=8h5Rfxoes1F/EQEOg2e1jm/KAtjsu5tZuD6b6E74r4c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Eia508Prn5WlbQkRxtJ/k0k7oAUokBgSkFmwqvmopC2qnsBpqAJ7zACgt0tofcJ9ft3FkUV9WH00v7quTSZinPL29V4yggz1Dy7/uOaqz9KCk6xhiEUc78v7A17waeC3uCRijxLEZQWU5QHgZ8QN/suHm8MOVB1dDixDipWuLoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1lIKr8Ay; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4581cec6079so289221cf.0
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 09:27:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726244850; x=1726849650; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kaogzt0x83O50oW2Cdc8KsfEPIv2RHrKFooPdPcHuF0=;
-        b=1lIKr8AyxHNKFxB554AF19Kd7F/bHOqYVm/pVuG+G0WrUVcZuqqCzq9KxHJfXdWqJp
-         cGNvgw8gg25neqbex5UV34ycxw1WLIcmE6GfKsnv0iABDTaZBAjHKGYHm91kfSq6Eh55
-         YEzW2DX2WJFTqNPrAZ480SCCFDriNj/8NguAiPbhHB/UxKW5c5DLJoGjSJ49iePULnCZ
-         rCvAVpz27l0IM/ee0+s18oZWcS4T/YHEztinmwZB88EVUQ0YlRsM2VeLhmUWaMx9LL1o
-         R1mntdJCnidd2wxb5fhh292QM9LqPd/tbqce61hgmOflFDg0564WrCKQr0DryT1hzS72
-         a5ZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726244850; x=1726849650;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kaogzt0x83O50oW2Cdc8KsfEPIv2RHrKFooPdPcHuF0=;
-        b=KyO1T6nzkepW+eIAB5gwK5G36a3YXBef6mmFUngzC1fBSm0rTl1u/wfn7yQKF2P64l
-         6zSKh73eRBpWkI/CIRqL9k9+PE2gehzmQa2fyU0dnqnlw2LL9jGk0sybe5ijOurZi91i
-         4aVtw5cr3/z/14KI8l/PnyCQGTBIUx1vsbnj5TMzwyvgiZrEPAthcy769TMyLsEYExJA
-         9+67U+M8eFYycDJcKW93ShgyILxU8fqpxxd41XpNNWYVnXU557BUuDlrVo2Rqpps2Mb2
-         LeRDq8xgZrpe3qo4q6LQ46tB3gNXc7shYXlzs4CANWpyEXVnp6vRsqlpT4KkX4If5f7V
-         OA2A==
-X-Forwarded-Encrypted: i=1; AJvYcCXOPBsqmoyQrIsFgOYA+JAobet0hNqq59yDKmhPB1htQsPCxHpwJWRGt2Am6vHB5QJUD7bAJgQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk40KGzY0GNoIWt34UtHeZJinINAgobZ0Jdis9/jIhLppdhRYM
-	JuBQeSQaWLcFMpPaHStw8P6AYpWml9g7Dh/Qgu3QLmlGnOtE2NbF7ii4RKfsg7jXhMqga9lXzn0
-	k9OsWpALu4rav9nFCuIJ8rXfr3p5Y9C0Zx8T7
-X-Google-Smtp-Source: AGHT+IFLIVO3GAQiV32AIRq5tRq8/+Y6XmNS4xK792rwOjota6Ua04VI9PjqMQ/wHusA5aDseJUdCQZv6B0+BHgZ16k=
-X-Received: by 2002:a05:622a:4cc:b0:456:796b:2fe5 with SMTP id
- d75a77b69052e-45864512051mr7158501cf.9.1726244849858; Fri, 13 Sep 2024
- 09:27:29 -0700 (PDT)
+	s=arc-20240116; t=1726245206; c=relaxed/simple;
+	bh=f+359BLhYQ/Pg24mzq1ifHF0ls/rX9zTnkmJM6Jpxkc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mUZTeZOzlKc+xSILsdVyyF97WT8Lj1w/o0Q2DD+9MjCJFBV/uHPJi4RVfS+K9ixliS57YrF/TsYwfJU18TKMs1+y5Pf8y4+xBfZRgV0D58POto6+qBMxujgk4PgxkR0sWHfOhl3lNrcgPEcwzn6z2v5JFtEfSUs1PwuLYbaRHKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=WIY7Z/3I; arc=none smtp.client-ip=84.16.66.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4X50Gw0wvPz9ZT;
+	Fri, 13 Sep 2024 18:33:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1726245192;
+	bh=jL3SgGv5TLclTQUubcFPqq833ZrkKmojbZCL1JIDaHg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WIY7Z/3IAa1GQIu+Lv08iD0+3zMhCcwthtjR8rC73MwiT6LKOiStafOZpFbSedAeJ
+	 DVXoy+jV6k49dVfznUPANh0X3SbBACoUO38ERyTmWkEyCKp4PvWuPS33Vu6pklZBuA
+	 HYn/eLOZsxDQPDEcJiB+Ir1yXUiVUDJLEckTDRCo=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4X50Gv0fyVzJ4f;
+	Fri, 13 Sep 2024 18:33:11 +0200 (CEST)
+Date: Fri, 13 Sep 2024 18:33:03 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Tahera Fahimi <fahimitahera@gmail.com>
+Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com, 
+	jmorris@namei.org, serge@hallyn.com, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bjorn3_gh@protonmail.com, jannh@google.com, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v11 0/8] Landlock: Add abstract UNIX socket restriction
+Message-ID: <20240913.Doof4aiK8soh@digikod.net>
+References: <cover.1725494372.git.fahimitahera@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240913125302.0a06b4c7@canb.auug.org.au> <20240912200543.2d5ff757@kernel.org>
- <20240913204138.7cdb762c@canb.auug.org.au> <20240913083426.30aff7f4@kernel.org>
- <20240913084938.71ade4d5@kernel.org> <913e2fbd-d318-4c9b-aed2-4d333a1d5cf0@cs-soprasteria.com>
-In-Reply-To: <913e2fbd-d318-4c9b-aed2-4d333a1d5cf0@cs-soprasteria.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 13 Sep 2024 09:27:17 -0700
-Message-ID: <CAHS8izPf29T51QB4u46NJRc=C77vVDbR1nXekJ5-ysJJg8fK8g@mail.gmail.com>
-Subject: Re: linux-next: build failure after merge of the net-next tree
-To: christophe.leroy2@cs-soprasteria.com
-Cc: Jakub Kicinski <kuba@kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, 
-	David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
-	Networking <netdev@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cover.1725494372.git.fahimitahera@gmail.com>
+X-Infomaniak-Routing: alpha
 
-On Fri, Sep 13, 2024 at 9:13=E2=80=AFAM LEROY Christophe
-<christophe.leroy2@cs-soprasteria.com> wrote:
->
->
->
-> Le 13/09/2024 =C3=A0 17:49, Jakub Kicinski a =C3=A9crit :
-> > On Fri, 13 Sep 2024 08:34:26 -0700 Jakub Kicinski wrote:
-> >>> The second "asm" above (CONFIG_PPC_KERNEL_PREFIXED is not set).  I am
-> >>> guessing by searching for "39" in net/core/page_pool.s
-> >>>
-> >>> This is maybe called from page_pool_unref_netmem()
-> >>
-> >> Thanks! The compiler version helped, I can repro with GCC 14.
-> >>
-> >> It's something special about compound page handling on powerpc64,
-> >> AFAICT. I'm guessing that the assembler is mad that we're doing
-> >> an unaligned read:
-> >>
-> >>     3300         ld 8,39(8)       # MEM[(const struct atomic64_t *)_29=
-].counter, t
-> >>
-> >> which does indeed look unaligned to a naked eye. If I replace
-> >> virt_to_head_page() with virt_to_page() on line 867 in net/core/page_p=
-ool.c
-> >> I get:
-> >>
-> >>     2982         ld 8,40(10)      # MEM[(const struct atomic64_t *)_94=
-].counter, t
-> >>
-> >> and that's what we'd expect. It's reading pp_ref_count which is at
-> >> offset 40 in struct net_iov. I'll try to take a closer look at
-> >> the compound page handling, with powerpc assembly book in hand,
-> >> but perhaps this rings a bell for someone?
-> >
-> > Oh, okay, I think I understand now. My lack of MM knowledge showing.
-> > So if it's a compound head we do:
-> >
-> > static inline unsigned long _compound_head(const struct page *page)
-> > {
-> >          unsigned long head =3D READ_ONCE(page->compound_head);
-> >
-> >          if (unlikely(head & 1))
-> >                  return head - 1;
-> >          return (unsigned long)page_fixed_fake_head(page);
-> > }
-> >
-> > Presumably page->compound_head stores the pointer to the head page.
-> > I'm guessing the compiler is "smart" and decides "why should I do
-> > ld (page - 1) + 40, when I can do ld page + 39 :|
-> >
-> > I think it's a compiler bug...
-> >
->
-> Would it work if you replace it with following ?
->
->         return head & ~1;
->
+I have reworked a bit the patches, including the signal scoping ones,
+and they are here:
+https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git/log/?h=next
 
-I was able to reproduce with the correct compiler version, and yes,
-this fixes the build for me. Thanks!
+This is based on a manual merge of some VFS changes and LSM changes
+required for this patch series:
+https://git.kernel.org/pub/scm/linux/kernel/git/mic/linux.git/commit/?h=next&id=24dfe95e493086a99acf7df1ef23d9f21f8cdec7
 
-Probably healthy to add UL, yes?
+My changes are explained in the "[mic: ...]" part of the commit
+messages. Please send two last patch series, with this changes and reply
+to it with your comments if any.
 
-diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-index 5769fe6e4950..ea4005d2d1a9 100644
---- a/include/linux/page-flags.h
-+++ b/include/linux/page-flags.h
-@@ -239,8 +239,8 @@ static inline unsigned long _compound_head(const
-struct page *page)
- {
-        unsigned long head =3D READ_ONCE(page->compound_head);
-
--       if (unlikely(head & 1))
--               return head - 1;
-+       if (unlikely(head & 1UL))
-+               return head & ~1UL;
-        return (unsigned long)page_fixed_fake_head(page);
- }
-
-Other than that I think this is a correct fix. Jakub, what to do here.
-Do I send this fix to the mm tree or to net-next?
-
---=20
-Thanks,
-Mina
+On Wed, Sep 04, 2024 at 06:13:54PM -0600, Tahera Fahimi wrote:
+> This patch series adds scoping mechanism for abstract UNIX sockets.
+> Closes: https://github.com/landlock-lsm/linux/issues/7
+> 
+> Problem
+> =======
+> 
+> Abstract UNIX sockets are used for local inter-process communications
+> independent of the filesystem. Currently, a sandboxed process can
+> connect to a socket outside of the sandboxed environment, since Landlock
+> has no restriction for connecting to an abstract socket address(see more
+> details in [1,2]). Access to such sockets for a sandboxed process should
+> be scoped the same way ptrace is limited.
+> 
+> [1] https://lore.kernel.org/all/20231023.ahphah4Wii4v@digikod.net/
+> [2] https://lore.kernel.org/all/20231102.MaeWaepav8nu@digikod.net/
+> 
+> Solution
+> ========
+> 
+> To solve this issue, we extend the user space interface by adding a new
+> "scoped" field to Landlock ruleset attribute structure. This field can
+> contains different rights to restrict different functionalities. For
+> abstract UNIX sockets, we introduce
+> "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" field to specify that a ruleset
+> will deny any connection from within the sandbox domain to its parent
+> (i.e. any parent sandbox or non-sandbox processes).
+> 
+> Example
+> =======
+> 
+> Starting a listening socket with socat(1):
+>         socat abstract-listen:mysocket -
+> 
+> Starting a sandboxed shell from $HOME with samples/landlock/sandboxer:
+>         LL_FS_RO=/ LL_FS_RW=. LL_SCOPED="a" ./sandboxer /bin/bash
+> 
+> If we try to connect to the listening socket, the connection gets
+> refused.
+>         socat - abstract-connect:mysocket --> fails
+> 
+> 
+> Notes of Implementation
+> =======================
+> 
+> * Using the "scoped" field provides enough compatibility and flexibility
+>   to extend the scoping mechanism for other IPCs(e.g. signals).
+> 
+> * To access the domain of a socket, we use its credentials of the file's
+>   FD which point to the credentials of the process that created the
+>   socket (see more details in [3]). Cases where the process using the
+>   socket has a different domain than the process created it are covered
+>   in the "outside_socket" test.
+> 
+> [3]https://lore.kernel.org/all/20240611.Pi8Iph7ootae@digikod.net/
+> 
+> Previous Versions
+> =================
+> v10:https://lore.kernel.org/all/cover.1724125513.git.fahimitahera@gmail.com/
+> v9: https://lore.kernel.org/all/cover.1723615689.git.fahimitahera@gmail.com/
+> v8: https://lore.kernel.org/all/cover.1722570749.git.fahimitahera@gmail.com/
+> v7: https://lore.kernel.org/all/cover.1721269836.git.fahimitahera@gmail.com/
+> v6: https://lore.kernel.org/all/Zn32CYZiu7pY+rdI@tahera-OptiPlex-5000/
+> and https://lore.kernel.org/all/Zn32KKIJrY7Zi51K@tahera-OptiPlex-5000/
+> v5: https://lore.kernel.org/all/ZnSZnhGBiprI6FRk@tahera-OptiPlex-5000/
+> v4: https://lore.kernel.org/all/ZnNcE3ph2SWi1qmd@tahera-OptiPlex-5000/
+> v3: https://lore.kernel.org/all/ZmJJ7lZdQuQop7e5@tahera-OptiPlex-5000/
+> v2: https://lore.kernel.org/all/ZgX5TRTrSDPrJFfF@tahera-OptiPlex-5000/
+> v1: https://lore.kernel.org/all/ZgXN5fi6A1YQKiAQ@tahera-OptiPlex-5000/
+> 
+> Tahera Fahimi (8):
+>   Landlock: Add abstract UNIX socket restriction
+>   selftests/landlock: Add test for handling unknown scope
+>   selftests/landlock: Add abstract UNIX socket restriction tests
+>   selftests/landlock: Add tests for UNIX sockets with any address
+>     formats
+>   selftests/landlock: Test connected vs non-connected datagram UNIX
+>     socket
+>   selftests/landlock: Restrict inherited datagram UNIX socket to connect
+>   sample/landlock: Add support abstract UNIX socket restriction
+>   Landlock: Document LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET and ABI
+>     version
+> 
+>  Documentation/userspace-api/landlock.rst      |  45 +-
+>  include/uapi/linux/landlock.h                 |  28 +
+>  samples/landlock/sandboxer.c                  |  61 +-
+>  security/landlock/limits.h                    |   3 +
+>  security/landlock/ruleset.c                   |   7 +-
+>  security/landlock/ruleset.h                   |  24 +-
+>  security/landlock/syscalls.c                  |  17 +-
+>  security/landlock/task.c                      | 136 +++
+>  tools/testing/selftests/landlock/base_test.c  |   2 +-
+>  tools/testing/selftests/landlock/common.h     |  38 +
+>  tools/testing/selftests/landlock/net_test.c   |  31 +-
+>  .../landlock/scoped_abstract_unix_test.c      | 993 ++++++++++++++++++
+>  .../selftests/landlock/scoped_base_variants.h | 154 +++
+>  .../selftests/landlock/scoped_common.h        |  28 +
+>  .../scoped_multiple_domain_variants.h         | 154 +++
+>  .../testing/selftests/landlock/scoped_test.c  |  33 +
+>  16 files changed, 1709 insertions(+), 45 deletions(-)
+>  create mode 100644 tools/testing/selftests/landlock/scoped_abstract_unix_test.c
+>  create mode 100644 tools/testing/selftests/landlock/scoped_base_variants.h
+>  create mode 100644 tools/testing/selftests/landlock/scoped_common.h
+>  create mode 100644 tools/testing/selftests/landlock/scoped_multiple_domain_variants.h
+>  create mode 100644 tools/testing/selftests/landlock/scoped_test.c
+> 
+> -- 
+> 2.34.1
+> 
 
