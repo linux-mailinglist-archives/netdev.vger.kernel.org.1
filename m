@@ -1,452 +1,306 @@
-Return-Path: <netdev+bounces-128073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 249D5977CFA
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 12:10:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80794977D02
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 12:14:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0EE81F28071
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:10:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABBDA1C21A5C
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81DC1D7E37;
-	Fri, 13 Sep 2024 10:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E361D7E51;
+	Fri, 13 Sep 2024 10:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GleGUMva"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="dVCn/rys"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from omta34.uswest2.a.cloudfilter.net (omta34.uswest2.a.cloudfilter.net [35.89.44.33])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A671C1BD00C;
-	Fri, 13 Sep 2024 10:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE1B41D6C7F
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 10:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=35.89.44.33
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726222195; cv=none; b=fxxghVX9r/z4xreDWcWiogYunsmzCVBXDUy4UlZRJ9ICLPKkNLi/+TFPsbQslyHd0kg2xUKTr6+lIDauSBk1y3xRkHkAfRyuKi/6Lw/6txayeVsRArtolMg3nIhd6tgXz7Zzk3zSOG5nx2eUhCahVFsO2jLgh74r88vCHHUvOa8=
+	t=1726222462; cv=none; b=Gqw4074o/imIAcne8c4pcUO57Zivuc541XzOsqzG/HtyupJS4gGU7cWW/KyBSL9dfJbWmM1YEgT9FUxmaE2pqnr5UB5E3kkN2OtfFVNNOWtn8PO4SWWVlY5PfEy7i78tQRYGMXw3oLViH37DXVcwyRemntQxC8benuxBRWg9JYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726222195; c=relaxed/simple;
-	bh=5NL6uJk5LsiQIDKXPQWx1qh9J00FQM8sUX7ubiq7xEg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MwxG23g2H/c3UGr4FxQponbrlwjRHgIuMtBSANQ5ZTnrY5BGGZuzhN8Z/Et3UoqPFrVOGuXEmiSmkm5feWxYsnoGXNAuJNy9xYT6hulWLSWbD7eGu9q3kkIGbWVAvEHkat9xzrezRRGksU8fJQDtX9RShtSf3TXX+6q6SkMRTRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GleGUMva; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1726222183; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=EzddndEhDLh4njeVTOgqDCB9YBh4kB/8IqneKpFCkv8=;
-	b=GleGUMvanjiPIkTE2xDa3V4NOzsHCHTyI3brDCi+EYcQYUHOotByGQaQXeQAIOBd+4vXnMiXyH5dDB1TvQlyTgLwPD1r2qMKxSWahSx8e2qfUsIBOK7WLGgHU7cJpdJmJDN8lrnb8biqDhvHeVTqT0UPSMOVnSqRoEtJuiTQ6iI=
-Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WEueUUv_1726222181)
-          by smtp.aliyun-inc.com;
-          Fri, 13 Sep 2024 18:09:42 +0800
-From: Philo Lu <lulie@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	antony.antony@secunet.com,
-	steffen.klassert@secunet.com,
-	linux-kernel@vger.kernel.org,
-	dust.li@linux.alibaba.com,
-	jakub@cloudflare.com
-Subject: [RFC PATCH net-next] net/udp: Add 4-tuple hash for connected socket
-Date: Fri, 13 Sep 2024 18:09:41 +0800
-Message-Id: <20240913100941.8565-1-lulie@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	s=arc-20240116; t=1726222462; c=relaxed/simple;
+	bh=jwnUKFwawSYD1vuSblqX+PfrC395ExZkCFFaSIohnmw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qbpUoNPpEdP9SdIlaUJ7c2A2okUOx6fLWVKIweNnchoT60ovFGA94h507bTYOZL9yMH4aRzAtRp9JJq0ymz3aiigXTCv4IhVWbvtv9/trzylk+BnR2nFB1yg9IKVOKQxT2ioVQmrkzFyEUrxyNiaipcYK9rDYlO9BxVY3IbxmhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=dVCn/rys; arc=none smtp.client-ip=35.89.44.33
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5006a.ext.cloudfilter.net ([10.0.29.179])
+	by cmsmtp with ESMTPS
+	id oJcEsZGg0Vpzpp3Jks6ZRl; Fri, 13 Sep 2024 10:14:20 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id p3JjstSgAk5Y2p3Jjse9ax; Fri, 13 Sep 2024 10:14:19 +0000
+X-Authority-Analysis: v=2.4 cv=R5QFG8RX c=1 sm=1 tr=0 ts=66e4107b
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=rpUMG24A1zG+UrzXDtAMsg==:17
+ a=IkcTkHD0fZMA:10 a=EaEq8P2WXUwA:10 a=7T7KSl7uo7wA:10 a=anyJmfQTAAAA:8
+ a=NEAV23lmAAAA:8 a=VwQbUJbxAAAA:8 a=i3X5FwGiAAAA:8 a=QyXUC8HyAAAA:8
+ a=Co-KuMXxJcsvc7DC3HAA:9 a=QEXdDO2ut3YA:10 a=mmqRlSCDY2ywfjPLJ4af:22
+ a=Xt_RvD8W3m28Mn_h3AK8:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/i8RPO9eFL0DrWzxkq+6NW6yIxztwoW7oSYVe/XjxhU=; b=dVCn/rys8mxpvhTDhfDYs3l5Xq
+	788w1/MnJX0vAj7vyX6Q1iaeQ4CmVKXq3a6BH5yIn/Sv4SiXLVZHYZVBi8IZWJyLAZnKNv935qsJ1
+	aK9/K2DT1gCz5WL8grPJNGma3y52tUxbrkFoNn9P45lAj3NH8gM9eiEDa8RlsdymGCkMDjomH8Aip
+	BrfPFBlhpgztlI7kyphcRu28QcXy2N3ITByp56x+kgkNb0wotj1hoeQVuzI39u0M3N/6vUw+Cex0h
+	q44r37cmljPwp7qUycQ07vm/MxwBoKAWTUYvtx96mbIpwnk9YvJrmsYxbXNPvn713tSXofLP/HIXZ
+	1oS0nlmQ==;
+Received: from [185.44.53.103] (port=34042 helo=[192.168.1.187])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1sp3Jg-001LX5-1t;
+	Fri, 13 Sep 2024 05:14:17 -0500
+Message-ID: <7e1d4077-51d7-45ce-bab4-efec875b36f2@embeddedor.com>
+Date: Fri, 13 Sep 2024 12:14:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2][next] wifi: iwlwifi: mvm: Use __counted_by() and avoid
+ -Wfamnae warnings
+To: kernel test robot <lkp@intel.com>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Miri Korenblit <miriam.rachel.korenblit@intel.com>,
+ Kalle Valo <kvalo@kernel.org>, Johannes Berg <johannes@sipsolutions.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <ZrZs5KL5Pz9tIinr@cute> <202408110634.V68RFEtW-lkp@intel.com>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <202408110634.V68RFEtW-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 185.44.53.103
+X-Source-L: No
+X-Exim-ID: 1sp3Jg-001LX5-1t
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.1.187]) [185.44.53.103]:34042
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfH+eLJnx11ftEIXaty+RAcQQuhB0Jk44F+kuUMKOmW8WpWRLLrCc33VY6juirpHcSuEQvwBERQaKXH/yGg1kSNVQW/odPcLOoxfP4t9pV07eFP/r1QHm
+ gCFTCL+b6YuLQQ5Y1GhoqHClL6PIOFqerGmyUOBag+8gPgUQzpIpzTmcS8/UHFil66rXuDhe8nbigqPC1WONunxaoVnuMZPFXaQ=
 
-This RFC patch introduces 4-tuple hash for connected udp sockets, to
-make udp lookup faster. It is a tentative proposal and any comment is
-welcome.
 
-Currently, the udp_table has two hash table, the port hash and portaddr
-hash. But for UDP server, all sockets have the same local port and addr,
-so they are all on the same hash slot within a reuseport group. And the
-target sock is selected by scoring.
 
-In some applications, the UDP server uses connect() for each incoming
-client, and then the socket (fd) is used exclusively by the client. In
-such scenarios, current scoring method can be ineffcient with a large
-number of connections, resulting in high softirq overhead.
+On 10/08/24 22:26, kernel test robot wrote:
+> Hi Gustavo,
+> 
+> kernel test robot noticed the following build errors:
+> 
+> [auto build test ERROR on wireless-next/main]
+> [also build test ERROR on wireless/main linus/master v6.11-rc2 next-20240809]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Gustavo-A-R-Silva/wifi-iwlwifi-mvm-Use-__counted_by-and-avoid-Wfamnae-warnings/20240810-103759
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git main
+> patch link:    https://lore.kernel.org/r/ZrZs5KL5Pz9tIinr%40cute
+> patch subject: [PATCH v2][next] wifi: iwlwifi: mvm: Use __counted_by() and avoid -Wfamnae warnings
+> config: riscv-allmodconfig (https://download.01.org/0day-ci/archive/20240811/202408110634.V68RFEtW-lkp@intel.com/config)
+> compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project f86594788ce93b696675c94f54016d27a6c21d18)
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240811/202408110634.V68RFEtW-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202408110634.V68RFEtW-lkp@intel.com/
+> 
+> All errors (new ones prefixed by >>):
+> 
+>     In file included from drivers/net/wireless/intel/iwlwifi/mvm/d3.c:7:
+>     In file included from include/linux/etherdevice.h:20:
+>     In file included from include/linux/if_ether.h:19:
+>     In file included from include/linux/skbuff.h:17:
+>     In file included from include/linux/bvec.h:10:
+>     In file included from include/linux/highmem.h:8:
+>     In file included from include/linux/cacheflush.h:5:
+>     In file included from arch/riscv/include/asm/cacheflush.h:9:
+>     In file included from include/linux/mm.h:2228:
+>     include/linux/vmstat.h:500:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+>       500 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+>           |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+>       501 |                            item];
+>           |                            ~~~~
+>     include/linux/vmstat.h:507:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+>       507 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+>           |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+>       508 |                            NR_VM_NUMA_EVENT_ITEMS +
+>           |                            ~~~~~~~~~~~~~~~~~~~~~~
+>     include/linux/vmstat.h:514:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+>       514 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+>           |                               ~~~~~~~~~~~ ^ ~~~
+>     include/linux/vmstat.h:519:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+>       519 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+>           |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+>       520 |                            NR_VM_NUMA_EVENT_ITEMS +
+>           |                            ~~~~~~~~~~~~~~~~~~~~~~
+>     include/linux/vmstat.h:528:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+>       528 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+>           |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+>       529 |                            NR_VM_NUMA_EVENT_ITEMS +
+>           |                            ~~~~~~~~~~~~~~~~~~~~~~
+>>> drivers/net/wireless/intel/iwlwifi/mvm/d3.c:2149:2: error: call to '__compiletime_assert_1044' declared with 'error' attribute: BUILD_BUG_ON failed: conf->keylen < WLAN_KEY_LEN_GCMP_256
+>      2149 |         BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_GCMP_256);
+>           |         ^
+>     include/linux/build_bug.h:50:2: note: expanded from macro 'BUILD_BUG_ON'
+>        50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+>           |         ^
+>     include/linux/build_bug.h:39:37: note: expanded from macro 'BUILD_BUG_ON_MSG'
+>        39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+>           |                                     ^
+>     include/linux/compiler_types.h:510:2: note: expanded from macro 'compiletime_assert'
+>       510 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+>           |         ^
+>     include/linux/compiler_types.h:498:2: note: expanded from macro '_compiletime_assert'
+>       498 |         __compiletime_assert(condition, msg, prefix, suffix)
+>           |         ^
+>     include/linux/compiler_types.h:491:4: note: expanded from macro '__compiletime_assert'
+>       491 |                         prefix ## suffix();                             \
+>           |                         ^
+>     <scratch space>:38:1: note: expanded from here
+>        38 | __compiletime_assert_1044
+>           | ^
+>>> drivers/net/wireless/intel/iwlwifi/mvm/d3.c:2148:2: error: call to '__compiletime_assert_1043' declared with 'error' attribute: BUILD_BUG_ON failed: conf->keylen < WLAN_KEY_LEN_CCMP
+>      2148 |         BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_CCMP);
+>           |         ^
+>     include/linux/build_bug.h:50:2: note: expanded from macro 'BUILD_BUG_ON'
+>        50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condition)
+>           |         ^
+>     include/linux/build_bug.h:39:37: note: expanded from macro 'BUILD_BUG_ON_MSG'
+>        39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+>           |                                     ^
+>     include/linux/compiler_types.h:510:2: note: expanded from macro 'compiletime_assert'
+>       510 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+>           |         ^
+>     include/linux/compiler_types.h:498:2: note: expanded from macro '_compiletime_assert'
+>       498 |         __compiletime_assert(condition, msg, prefix, suffix)
+>           |         ^
+>     include/linux/compiler_types.h:491:4: note: expanded from macro '__compiletime_assert'
+>       491 |                         prefix ## suffix();                             \
+>           |                         ^
+>     <scratch space>:34:1: note: expanded from here
+>        34 | __compiletime_assert_1043
+>           | ^
+>     5 warnings and 2 errors generated.
+> 
+> 
+> vim +2149 drivers/net/wireless/intel/iwlwifi/mvm/d3.c
+> 
+>    2134	
+>    2135	static bool iwl_mvm_gtk_rekey(struct iwl_wowlan_status_data *status,
+>    2136				      struct ieee80211_vif *vif,
+>    2137				      struct iwl_mvm *mvm, u32 gtk_cipher)
+>    2138	{
+>    2139		int i, j;
+>    2140		struct ieee80211_key_conf *key;
+>    2141		DEFINE_FLEX(struct ieee80211_key_conf, conf, key, keylen,
+>    2142			    WOWLAN_KEY_MAX_SIZE);
+>    2143		int link_id = vif->active_links ? __ffs(vif->active_links) : -1;
 
-To solve the problem, a 4-tuple hash list is added to udp_table, and is
-updated when calling connect(). Then __udp4_lib_lookup() firstly
-searches the 4-tuple hash list, and return directly if success. A new
-sockopt UDP_HASH4 is added to enable it. So the usage is:
-1. socket()
-2. bind()
-3. setsockopt(UDP_HASH4)
-4. connect()
 
-AFAICT the patch (if useful) can be further improved by:
-(a) Support disable with sockopt UDP_HASH4. Now it cannot be disabled
-once turned on until the socket closed.
-(b) Better interact with hash2/reuseport. Now hash4 hardly affects other
-mechanisms, but maintaining sockets in both hash4 and hash2 lists seems
-unnecessary.
-(c) Support early demux and ipv6.
+Holy molly guaca-guaca... swapping the above two lines fixes the issue:
 
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
----
- include/linux/udp.h      |   8 +++
- include/net/udp.h        |  17 +++++-
- include/uapi/linux/udp.h |   1 +
- net/ipv4/udp.c           | 127 +++++++++++++++++++++++++++++++++++++--
- net/ipv6/udp.c           |   2 +-
- 5 files changed, 147 insertions(+), 8 deletions(-)
+diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/d3.c b/drivers/net/wireless/intel/iwlwifi/mvm/d3.c
+index 581455ab5e6d..764580cf6c58 100644
+--- a/drivers/net/wireless/intel/iwlwifi/mvm/d3.c
++++ b/drivers/net/wireless/intel/iwlwifi/mvm/d3.c
+@@ -2138,9 +2138,8 @@ static bool iwl_mvm_gtk_rekey(struct iwl_wowlan_status_data *status,
+  {
+         int i, j;
+         struct ieee80211_key_conf *key;
+-       DEFINE_FLEX(struct ieee80211_key_conf, conf, key, keylen,
+-                   WOWLAN_KEY_MAX_SIZE);
+         int link_id = vif->active_links ? __ffs(vif->active_links) : -1;
++       DEFINE_FLEX(struct ieee80211_key_conf, conf, key, keylen, WOWLAN_KEY_MAX_SIZE);
 
-diff --git a/include/linux/udp.h b/include/linux/udp.h
-index 3eb3f2b9a2a0..c7b28e52fc49 100644
---- a/include/linux/udp.h
-+++ b/include/linux/udp.h
-@@ -42,6 +42,7 @@ enum {
- 	UDP_FLAGS_ENCAP_ENABLED, /* This socket enabled encap */
- 	UDP_FLAGS_UDPLITE_SEND_CC, /* set via udplite setsockopt */
- 	UDP_FLAGS_UDPLITE_RECV_CC, /* set via udplite setsockopt */
-+	UDP_FLAGS_HASH4_ENABLED, /* Use 4-tuple hash */
- };
- 
- struct udp_sock {
-@@ -56,6 +57,10 @@ struct udp_sock {
- 	int		 pending;	/* Any pending frames ? */
- 	__u8		 encap_type;	/* Is this an Encapsulation socket? */
- 
-+	/* For UDP 4-tuple hash */
-+	__u16 udp_lrpa_hash;
-+	struct hlist_node udp_lrpa_node;
-+
- 	/*
- 	 * Following member retains the information to create a UDP header
- 	 * when the socket is uncorked.
-@@ -206,6 +211,9 @@ static inline void udp_allow_gso(struct sock *sk)
- #define udp_portaddr_for_each_entry_rcu(__sk, list) \
- 	hlist_for_each_entry_rcu(__sk, list, __sk_common.skc_portaddr_node)
- 
-+#define udp_lrpa_for_each_entry_rcu(__up, list) \
-+	hlist_for_each_entry_rcu(__up, list, udp_lrpa_node)
-+
- #define IS_UDPLITE(__sk) (__sk->sk_protocol == IPPROTO_UDPLITE)
- 
- #endif	/* _LINUX_UDP_H */
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 61222545ab1c..a05d79d35fbb 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -67,12 +67,15 @@ struct udp_hslot {
-  *
-  *	@hash:	hash table, sockets are hashed on (local port)
-  *	@hash2:	hash table, sockets are hashed on (local port, local address)
-+ *	@hash4:	hash table, sockets are hashed on
-+ *		(local port, local address, remote port, remote address)
-  *	@mask:	number of slots in hash tables, minus 1
-  *	@log:	log2(number of slots in hash table)
-  */
- struct udp_table {
- 	struct udp_hslot	*hash;
- 	struct udp_hslot	*hash2;
-+	struct udp_hslot	*hash4;
- 	unsigned int		mask;
- 	unsigned int		log;
- };
-@@ -94,6 +97,17 @@ static inline struct udp_hslot *udp_hashslot2(struct udp_table *table,
- 	return &table->hash2[hash & table->mask];
- }
- 
-+static inline struct udp_hslot *udp_hashslot4(struct udp_table *table,
-+					      unsigned int hash)
-+{
-+	return &table->hash4[hash & table->mask];
-+}
-+
-+static inline bool udp_hashed4(const struct sock *sk)
-+{
-+	return !hlist_unhashed(&udp_sk(sk)->udp_lrpa_node);
-+}
-+
- extern struct proto udp_prot;
- 
- extern atomic_long_t udp_memory_allocated;
-@@ -193,7 +207,7 @@ static inline int udp_lib_hash(struct sock *sk)
- }
- 
- void udp_lib_unhash(struct sock *sk);
--void udp_lib_rehash(struct sock *sk, u16 new_hash);
-+void udp_lib_rehash(struct sock *sk, u16 new_hash, u16 new_hash4);
- 
- static inline void udp_lib_close(struct sock *sk, long timeout)
- {
-@@ -286,6 +300,7 @@ int udp_rcv(struct sk_buff *skb);
- int udp_ioctl(struct sock *sk, int cmd, int *karg);
- int udp_init_sock(struct sock *sk);
- int udp_pre_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len);
-+int udp_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len);
- int __udp_disconnect(struct sock *sk, int flags);
- int udp_disconnect(struct sock *sk, int flags);
- __poll_t udp_poll(struct file *file, struct socket *sock, poll_table *wait);
-diff --git a/include/uapi/linux/udp.h b/include/uapi/linux/udp.h
-index 1a0fe8b151fb..5b9ecbbec144 100644
---- a/include/uapi/linux/udp.h
-+++ b/include/uapi/linux/udp.h
-@@ -34,6 +34,7 @@ struct udphdr {
- #define UDP_NO_CHECK6_RX 102	/* Disable accpeting checksum for UDP6 */
- #define UDP_SEGMENT	103	/* Set GSO segmentation size */
- #define UDP_GRO		104	/* This socket can receive UDP GRO packets */
-+#define UDP_HASH4	105	/* Enable 4-tuple hash with connect() */
- 
- /* UDP encapsulation types */
- #define UDP_ENCAP_ESPINUDP_NON_IKE	1 /* unused  draft-ietf-ipsec-nat-t-ike-00/01 */
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 8accbf4cb295..aac0251ff6fa 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -478,6 +478,27 @@ static struct sock *udp4_lib_lookup2(const struct net *net,
- 	return result;
- }
- 
-+static struct sock *udp4_lib_lookup4(const struct net *net,
-+				     __be32 saddr, __be16 sport,
-+				     __be32 daddr, unsigned int hnum,
-+				     int dif, int sdif,
-+				     struct udp_table *udptable)
-+{
-+	unsigned int hash4 = udp_ehashfn(net, daddr, hnum, saddr, sport);
-+	const __portpair ports = INET_COMBINED_PORTS(sport, hnum);
-+	struct udp_hslot *hslot4 = udp_hashslot4(udptable, hash4);
-+	struct udp_sock *up;
-+	struct sock *sk;
-+
-+	INET_ADDR_COOKIE(acookie, saddr, daddr);
-+	udp_lrpa_for_each_entry_rcu(up, &hslot4->head) {
-+		sk = (struct sock *)up;
-+		if (inet_match(net, sk, acookie, ports, dif, sdif))
-+			return sk;
-+	}
-+	return NULL;
-+}
-+
- /* UDP is nearly always wildcards out the wazoo, it makes no sense to try
-  * harder than this. -DaveM
-  */
-@@ -490,6 +511,10 @@ struct sock *__udp4_lib_lookup(const struct net *net, __be32 saddr,
- 	struct udp_hslot *hslot2;
- 	struct sock *result, *sk;
- 
-+	result = udp4_lib_lookup4(net, saddr, sport, daddr, hnum, dif, sdif, udptable);
-+	if (result)
-+		return result;
-+
- 	hash2 = ipv4_portaddr_hash(net, daddr, hnum);
- 	slot2 = hash2 & udptable->mask;
- 	hslot2 = &udptable->hash2[slot2];
-@@ -1933,6 +1958,51 @@ int udp_pre_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
- }
- EXPORT_SYMBOL(udp_pre_connect);
- 
-+/* call with sock lock */
-+static void udp4_hash4(struct sock *sk)
-+{
-+	struct udp_hslot *hslot, *hslot4;
-+	struct net *net = sock_net(sk);
-+	struct udp_table *udptable;
-+	unsigned int hash;
-+
-+	if (sk_unhashed(sk) || udp_hashed4(sk) ||
-+	    inet_sk(sk)->inet_rcv_saddr == htonl(INADDR_ANY))
-+		return;
-+
-+	hash = udp_ehashfn(net, inet_sk(sk)->inet_rcv_saddr, inet_sk(sk)->inet_num,
-+			   inet_sk(sk)->inet_daddr, inet_sk(sk)->inet_dport);
-+
-+	udptable = net->ipv4.udp_table;
-+	hslot = udp_hashslot(udptable, net, udp_sk(sk)->udp_port_hash);
-+	hslot4 = udp_hashslot4(udptable, hash);
-+	udp_sk(sk)->udp_lrpa_hash = hash;
-+
-+	spin_lock_bh(&hslot->lock);
-+	if (rcu_access_pointer(sk->sk_reuseport_cb))
-+		reuseport_detach_sock(sk);
-+
-+	spin_lock(&hslot4->lock);
-+	hlist_add_head_rcu(&udp_sk(sk)->udp_lrpa_node, &hslot4->head);
-+	hslot4->count++;
-+	spin_unlock(&hslot4->lock);
-+
-+	spin_unlock_bh(&hslot->lock);
-+}
-+
-+int udp_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
-+{
-+	int res;
-+
-+	lock_sock(sk);
-+	res = __ip4_datagram_connect(sk, uaddr, addr_len);
-+	if (!res && udp_test_bit(HASH4_ENABLED, sk))
-+		udp4_hash4(sk);
-+	release_sock(sk);
-+	return res;
-+}
-+EXPORT_SYMBOL(udp_connect);
-+
- int __udp_disconnect(struct sock *sk, int flags)
- {
- 	struct inet_sock *inet = inet_sk(sk);
-@@ -1974,7 +2044,7 @@ void udp_lib_unhash(struct sock *sk)
- {
- 	if (sk_hashed(sk)) {
- 		struct udp_table *udptable = udp_get_table_prot(sk);
--		struct udp_hslot *hslot, *hslot2;
-+		struct udp_hslot *hslot, *hslot2, *hslot4;
- 
- 		hslot  = udp_hashslot(udptable, sock_net(sk),
- 				      udp_sk(sk)->udp_port_hash);
-@@ -1992,6 +2062,14 @@ void udp_lib_unhash(struct sock *sk)
- 			hlist_del_init_rcu(&udp_sk(sk)->udp_portaddr_node);
- 			hslot2->count--;
- 			spin_unlock(&hslot2->lock);
-+
-+			if (udp_hashed4(sk)) {
-+				hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
-+				spin_lock(&hslot4->lock);
-+				hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
-+				hslot4->count--;
-+				spin_unlock(&hslot4->lock);
-+			}
- 		}
- 		spin_unlock_bh(&hslot->lock);
- 	}
-@@ -2001,16 +2079,20 @@ EXPORT_SYMBOL(udp_lib_unhash);
- /*
-  * inet_rcv_saddr was changed, we must rehash secondary hash
-  */
--void udp_lib_rehash(struct sock *sk, u16 newhash)
-+void udp_lib_rehash(struct sock *sk, u16 newhash, u16 newhash4)
- {
- 	if (sk_hashed(sk)) {
-+		struct udp_hslot *hslot, *hslot2, *nhslot2, *hslot4, *nhslot4;
- 		struct udp_table *udptable = udp_get_table_prot(sk);
--		struct udp_hslot *hslot, *hslot2, *nhslot2;
- 
- 		hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
- 		nhslot2 = udp_hashslot2(udptable, newhash);
- 		udp_sk(sk)->udp_portaddr_hash = newhash;
- 
-+		hslot4 = udp_hashslot4(udptable, udp_sk(sk)->udp_lrpa_hash);
-+		nhslot4 = udp_hashslot4(udptable, newhash4);
-+		udp_sk(sk)->udp_lrpa_hash = newhash4;
-+
- 		if (hslot2 != nhslot2 ||
- 		    rcu_access_pointer(sk->sk_reuseport_cb)) {
- 			hslot = udp_hashslot(udptable, sock_net(sk),
-@@ -2033,6 +2115,18 @@ void udp_lib_rehash(struct sock *sk, u16 newhash)
- 				spin_unlock(&nhslot2->lock);
- 			}
- 
-+			if (udp_hashed4(sk) && hslot4 != nhslot4) {
-+				spin_lock(&hslot4->lock);
-+				hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
-+				hslot4->count--;
-+				spin_unlock(&hslot4->lock);
-+
-+				spin_lock(&nhslot4->lock);
-+				hlist_add_head_rcu(&udp_sk(sk)->udp_lrpa_node, &nhslot4->head);
-+				nhslot4->count++;
-+				spin_unlock(&nhslot4->lock);
-+			}
-+
- 			spin_unlock_bh(&hslot->lock);
- 		}
- 	}
-@@ -2044,7 +2138,10 @@ void udp_v4_rehash(struct sock *sk)
- 	u16 new_hash = ipv4_portaddr_hash(sock_net(sk),
- 					  inet_sk(sk)->inet_rcv_saddr,
- 					  inet_sk(sk)->inet_num);
--	udp_lib_rehash(sk, new_hash);
-+	u16 new_hash4 = udp_ehashfn(sock_net(sk),
-+				    inet_sk(sk)->inet_rcv_saddr, inet_sk(sk)->inet_num,
-+				    inet_sk(sk)->inet_daddr, inet_sk(sk)->inet_dport);
-+	udp_lib_rehash(sk, new_hash, new_hash4);
- }
- 
- static int __udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
-@@ -2757,6 +2854,14 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
- 		udp_assign_bit(ACCEPT_L4, sk, valbool);
- 		set_xfrm_gro_udp_encap_rcv(up->encap_type, sk->sk_family, sk);
- 		break;
-+	case UDP_HASH4:
-+		/* Currently, reset HASH4_ENABLED is not supported */
-+		if (!valbool && udp_test_bit(HASH4_ENABLED, sk))
-+			return -EPERM;
-+
-+		if (valbool && !udp_test_bit(HASH4_ENABLED, sk))
-+			udp_set_bit(HASH4_ENABLED, sk);
-+		break;
- 
- 	/*
- 	 * 	UDP-Lite's partial checksum coverage (RFC 3828).
-@@ -2846,6 +2951,10 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
- 		val = udp_test_bit(GRO_ENABLED, sk);
- 		break;
- 
-+	case UDP_HASH4:
-+		val = udp_test_bit(HASH4_ENABLED, sk);
-+		break;
-+
- 	/* The following two cannot be changed on UDP sockets, the return is
- 	 * always 0 (which corresponds to the full checksum coverage of UDP). */
- 	case UDPLITE_SEND_CSCOV:
-@@ -2938,7 +3047,7 @@ struct proto udp_prot = {
- 	.owner			= THIS_MODULE,
- 	.close			= udp_lib_close,
- 	.pre_connect		= udp_pre_connect,
--	.connect		= ip4_datagram_connect,
-+	.connect		= udp_connect,
- 	.disconnect		= udp_disconnect,
- 	.ioctl			= udp_ioctl,
- 	.init			= udp_init_sock,
-@@ -3429,7 +3538,7 @@ void __init udp_table_init(struct udp_table *table, const char *name)
- 	unsigned int i;
- 
- 	table->hash = alloc_large_system_hash(name,
--					      2 * sizeof(struct udp_hslot),
-+					      3 * sizeof(struct udp_hslot),
- 					      uhash_entries,
- 					      21, /* one slot per 2 MB */
- 					      0,
-@@ -3449,6 +3558,12 @@ void __init udp_table_init(struct udp_table *table, const char *name)
- 		table->hash2[i].count = 0;
- 		spin_lock_init(&table->hash2[i].lock);
- 	}
-+	table->hash4 = table->hash2 + (table->mask + 1);
-+	for (i = 0; i <= table->mask; i++) {
-+		INIT_HLIST_HEAD(&table->hash4[i].head);
-+		table->hash4[i].count = 0;
-+		spin_lock_init(&table->hash4[i].lock);
-+	}
- }
- 
- u32 udp_flow_hashrnd(void)
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 52dfbb2ff1a8..47659381222d 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -111,7 +111,7 @@ void udp_v6_rehash(struct sock *sk)
- 					  &sk->sk_v6_rcv_saddr,
- 					  inet_sk(sk)->inet_num);
- 
--	udp_lib_rehash(sk, new_hash);
-+	udp_lib_rehash(sk, new_hash, 0); /* 4-tuple hash not implemented */
- }
- 
- static int compute_score(struct sock *sk, const struct net *net,
--- 
-2.32.0.3.g01195cf9f
+         conf->cipher = gtk_cipher;
 
+
+This is the first time I've seen this compiler behavior when building DEFINE_FLEX() changes...
+
+--
+Gustavo
+
+>    2144	
+>    2145		conf->cipher = gtk_cipher;
+>    2146	
+>    2147		BUILD_BUG_ON(WLAN_KEY_LEN_CCMP != WLAN_KEY_LEN_GCMP);
+>> 2148		BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_CCMP);
+>> 2149		BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_GCMP_256);
+>    2150		BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_TKIP);
+>    2151		BUILD_BUG_ON(conf->keylen < sizeof(status->gtk[0].key));
+>    2152	
+>    2153		switch (gtk_cipher) {
+>    2154		case WLAN_CIPHER_SUITE_CCMP:
+>    2155		case WLAN_CIPHER_SUITE_GCMP:
+>    2156			conf->keylen = WLAN_KEY_LEN_CCMP;
+>    2157			break;
+>    2158		case WLAN_CIPHER_SUITE_GCMP_256:
+>    2159			conf->keylen = WLAN_KEY_LEN_GCMP_256;
+>    2160			break;
+>    2161		case WLAN_CIPHER_SUITE_TKIP:
+>    2162			conf->keylen = WLAN_KEY_LEN_TKIP;
+>    2163			break;
+>    2164		default:
+>    2165			WARN_ON(1);
+>    2166		}
+>    2167	
+>    2168		for (i = 0; i < ARRAY_SIZE(status->gtk); i++) {
+>    2169			if (!status->gtk[i].len)
+>    2170				continue;
+>    2171	
+>    2172			conf->keyidx = status->gtk[i].id;
+>    2173			IWL_DEBUG_WOWLAN(mvm,
+>    2174					 "Received from FW GTK cipher %d, key index %d\n",
+>    2175					 conf->cipher, conf->keyidx);
+>    2176			memcpy(conf->key, status->gtk[i].key,
+>    2177			       sizeof(status->gtk[i].key));
+>    2178	
+>    2179			key = ieee80211_gtk_rekey_add(vif, conf, link_id);
+>    2180			if (IS_ERR(key))
+>    2181				return false;
+>    2182	
+>    2183			for (j = 0; j < ARRAY_SIZE(status->gtk_seq); j++) {
+>    2184				if (!status->gtk_seq[j].valid ||
+>    2185				    status->gtk_seq[j].key_id != key->keyidx)
+>    2186					continue;
+>    2187				iwl_mvm_set_key_rx_seq_idx(key, status, j);
+>    2188				break;
+>    2189			}
+>    2190			WARN_ON(j == ARRAY_SIZE(status->gtk_seq));
+>    2191		}
+>    2192	
+>    2193		return true;
+>    2194	}
+>    2195	
+> 
 
