@@ -1,94 +1,136 @@
-Return-Path: <netdev+bounces-128024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FD4D9777B5
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 06:10:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E54F9777BB
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 06:13:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F924287324
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 04:10:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 612861C245CF
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 04:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D631BF7F9;
-	Fri, 13 Sep 2024 04:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9E511C4634;
+	Fri, 13 Sep 2024 04:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MgOE955W"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="KmIMA84I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 389C52F34;
-	Fri, 13 Sep 2024 04:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C7512F34;
+	Fri, 13 Sep 2024 04:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726200629; cv=none; b=e18d2N2bSjizhdmcR5cPuSAY/qVjTgJ+EumcEIdJwzTSb+S+WZarF5rZlu2VrpbPse4uDE25fUxTqnVsa+jvvYo0qfcfLjhhmu09oHDjTa6KQEhIu/0zyqAzJC62F0KnWcpmhjApQtoQ6KUEveBdhSggAmXgrgDfU0yjKGSvJDA=
+	t=1726200804; cv=none; b=b6oAFfG6tBs0oIu6E9d1nCtQhWGKi48mF691n/9wq3ws1utaPjz3wOLQ3uIoxjOy3/QeHFW2zxqXXZ7girE8GpNyJHhDUAT2IK1+tIyFEe3QcQt1X1ITLWf65sDf4sgmc3E9o4bzxJTlxDO9IrVqV/ApYQunqwWczG7bhyPNjno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726200629; c=relaxed/simple;
-	bh=5vIHCYXtzn7UxwQSbmW8xK3PQ6Dn29GIwu2v6TdB7ws=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=B9IPg4RZOcJ/GisE20hul6nd+vC0sO1Xs0gAJVRafFxlP01tjnThy7yJ8Co4FgP5Su4wciMPNF3H364DpDfg1o7GpXoAbEVOIiOItl7dcu+XRWLuOKnopIdhj/PkKbOMFL94YnZ51GvNTKdpNXEVu/7TmwufIYh79/8rZ8gMJCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MgOE955W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B88E9C4CEC0;
-	Fri, 13 Sep 2024 04:10:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726200628;
-	bh=5vIHCYXtzn7UxwQSbmW8xK3PQ6Dn29GIwu2v6TdB7ws=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MgOE955WRhcYj3BbUFC3HVrQJDSF2Yz7XBk8cCS4JRQ+plE8PrpyuVUbjguf/dcVA
-	 vr2EtxJl+wbqxX1hq6OCFDRSp4D48ode766C9+nwHXo+V9bQISE294hoarTXioRgtp
-	 EtoqW41/NMQr7Ttj0F677UHibNohHmMYG0cC7clY9XKtBd4sQYatumSmD7H1MvHR6N
-	 kaCHVMpDu4lo8M5+X+UwJSXNiGES7t6pDsrr9mxtJHtyLW+2T+H5xlHIPppXTu7lYo
-	 eeJ4Lk4xCaa9KZDKhU6+qwJIvdqS2pdlh++IZCXon0IHLT6+Fv18SerjRy9Jps/9ON
-	 3JNtIOn5zKx8g==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E1D3806644;
-	Fri, 13 Sep 2024 04:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1726200804; c=relaxed/simple;
+	bh=4XqDGGtz1dCKr7V/BZ88LjM75pJZcMSO9nE8I1H3svo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fW/PipalJVlTNvpdM7OMZ7h7lhrsFEKsL3WS8CwNOHuEnbr3ZA/EeAQ9/dRIfPwJHUBOIlKRDmJ/okXKZsYBjK4Kb/MLAhoQjW6tylvPidC41s8+sNNIAsgdg1qkxXY0qPWAHMjKuwq9N2orgok+1Qf9+4rDBrRQQUiBTb0NUzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=KmIMA84I; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1726200799;
+	bh=X4PBrmZHLei+R69RRoCehgALDzSHVQBLSOFAUmTzQ3c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KmIMA84IY6t0WB+nrP6u2VJpWtSIdrP9reMzoaCOVR/OLay1GE88JfHNTzJPxnSNI
+	 16Xg+6eCQL3Sjh/DMZiJMIIb9VLF5cfHLo+ZVhTQp/LD9QxtK/wvh2cXj6peYSHFGy
+	 LXGvoUAhJPh9F1Zl4d+PbkRrny0qsUoCuKjm10Mli5FtFviHzyPYZm19QUgVZzJmJL
+	 4zUZ/c6G4Bun63II9FRsg1j6lI+2HKiC9CvYcDFcoiM1pucF9eqzhmZjJg+nrW0B9E
+	 tisGr87MOSvs0SpsEQJX1JUCjvcHQbDQIW4h4YtKdbv0fvGnlj+lQPFjw0cWZ1sa8U
+	 J7uE4okzSBMLQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X4gsB4FZXz4x8v;
+	Fri, 13 Sep 2024 14:13:18 +1000 (AEST)
+Date: Fri, 13 Sep 2024 14:13:17 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Mina Almasry <almasrymina@google.com>, David Miller
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the net-next tree
+Message-ID: <20240913141317.3309f1c6@canb.auug.org.au>
+In-Reply-To: <20240912210008.35118a91@kernel.org>
+References: <20240913125302.0a06b4c7@canb.auug.org.au>
+	<20240912200543.2d5ff757@kernel.org>
+	<CAHS8izN0uCbZXqcfCRwL6is6tggt=KZCYyheka4CLBskqhAiog@mail.gmail.com>
+	<20240912210008.35118a91@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] memory-provider: fix compilation issue without
- SYSFS
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172620063003.1811461.5245926285155991709.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Sep 2024 04:10:30 +0000
-References: <20240913032824.2117095-1-almasrymina@google.com>
-In-Reply-To: <20240913032824.2117095-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, matttbe@kernel.org
+Content-Type: multipart/signed; boundary="Sig_/Y+XH_ig6bj5yTZruu/bMi=S";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hello:
+--Sig_/Y+XH_ig6bj5yTZruu/bMi=S
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Hi Jakub,
 
-On Fri, 13 Sep 2024 03:28:24 +0000 you wrote:
-> When CONFIG_SYSFS is not set, the kernel fails to compile:
-> 
->      net/core/page_pool_user.c:368:45: error: implicit declaration of function 'get_netdev_rx_queue_index' [-Werror=implicit-function-declaration]
->       368 |                 if (pool->slow.queue_idx == get_netdev_rx_queue_index(rxq)) {
->           |                                             ^~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> When CONFIG_SYSFS is not set, get_netdev_rx_queue_index() is not defined
-> as well.
-> 
-> [...]
+On Thu, 12 Sep 2024 21:00:08 -0700 Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Thu, 12 Sep 2024 20:14:06 -0700 Mina Almasry wrote:
+> > > On Fri, 13 Sep 2024 12:53:02 +1000 Stephen Rothwell wrote:   =20
+> > > > /home/sfr/next/tmp/ccuSzwiR.s: Assembler messages:
+> > > > /home/sfr/next/tmp/ccuSzwiR.s:2579: Error: operand out of domain (3=
+9 is not a multiple of 4)
+> > > > make[5]: *** [/home/sfr/next/next/scripts/Makefile.build:229: net/c=
+ore/page_pool.o] Error 1   =20
+> > >
+> > > Ugh, bad times for networking, I just "fixed" the HSR one a few hours
+> > > ago. Any idea what line of code this is? I'm dusting off my powerpc
+> > > build but the error is somewhat enigmatic.   =20
+> >=20
+> > FWIW I couldn't reproduce this with these steps on top of
+> > net-next/main (devmem TCP is there):
+> >=20
+> > make ARCH=3Dpowerpc CROSS_COMPILE=3Dpowerpc-linux-gnu- ppc64_defconfig
+> > make ARCH=3Dpowerpc CROSS_COMPILE=3Dpowerpc-linux-gnu- -j80
+> >=20
+> > (build succeeds)
+> >=20
+> > What am I doing wrong? =20
+>=20
+> I don't see it either, gcc 11.1. Given the burst of powerpc build
+> failures that just hit the list I'm wondering if this is real.
 
-Here is the summary with links:
-  - [net-next,v2] memory-provider: fix compilation issue without SYSFS
-    https://git.kernel.org/netdev/net-next/c/52fa3b6532ec
+$ gcc --version
+gcc (Debian 14.2.0-3) 14.2.0
+$ ld --version
+GNU ld (GNU Binutils for Debian) 2.43.1
+$ as --version
+GNU assembler (GNU Binutils for Debian) 2.43.1
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+All on a Powerpc 64 LE host.
+--=20
+Cheers,
+Stephen Rothwell
 
+--Sig_/Y+XH_ig6bj5yTZruu/bMi=S
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbju90ACgkQAVBC80lX
+0GweJQf8Ca95bs0DiLRrvi+xGpDhhoYVs89TRHyQMR03NlBKZikWFmWOFrWyb/Ki
+NFCbTiep4nyWVzx5R8SqbTovHY4WeGgGDrrxUoy+r4UxZP7vwVz3hW8qxvyoBwi5
+dJyMQYZfG2CUSewluk5d89ch/TcFcx76J0qE/f1rTm03RI0KZfjJfQeU+vEar9Gw
+6d0rBVCRQt+MECIGyfa+nVowoz/TL69bwum4aS6oQMk9A7TaJE6Ba3I2MOIclvGy
+GLt77ZW9M3o//aQ3B8zug0rw4OmX2Jxv5WjY9tmJ0m7xf7cCWwSHxWZZsRgv0AWF
+OXk3svuX1SB3UsSwx6wCXXPHAza7aQ==
+=pvdE
+-----END PGP SIGNATURE-----
+
+--Sig_/Y+XH_ig6bj5yTZruu/bMi=S--
 
