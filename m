@@ -1,157 +1,248 @@
-Return-Path: <netdev+bounces-128136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 960B797833D
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:04:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D0097833F
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17805B222A9
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 15:04:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B04B1F24E99
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 15:04:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D896374FF;
-	Fri, 13 Sep 2024 15:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9D340855;
+	Fri, 13 Sep 2024 15:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pt+P3Dt1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CmxZI3yD"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666E328366;
-	Fri, 13 Sep 2024 15:04:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C60BD481C0
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 15:04:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726239852; cv=none; b=dWF/JomUm7uTyYto6281QKYlSQWXVUcNNxUIgy3jitt0SzBhmHM8yppDaSCHiwQoK/x1nFI49UMeEBJu0vCy54E0mUTXrCCkeGbkOhdCHowvr9n73CWVT0B5+71rfG+9P+wnEV9gE+yMgYhjMcsrGH9U92NqZm016biDT3lY894=
+	t=1726239855; cv=none; b=TurKrLKW2hVHA4//FV+i/bqHbn9Cw4RctsQT92wN1LQlnvK29Hvl0GsDO+ZxapxZitDLC4ENWCpY5LOQOA37stcA+RJUB4mS4ZuhXiVN6Y0oYAdr0XeIZVM9/d1DQP92XTHno1lPVOhVpqX2ylykKwI2w1hdXlex1s4Z5k0S0po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726239852; c=relaxed/simple;
-	bh=RsIRhVtaZpo3ac3+pu0UVgkzx27Fk2CKoiVYYrnj2NU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=re1pjzcYmCsqaoNdGjYygSBVMayj8urU3tK0Kor7A+SqfdROqtcQGsmC8Rk6zhNk8QH+RWxB0ZBuKpQNjjgJo0RuX3mQwfE/xrrEUGLsKl5hGJXx02+QUSsOnitm5VZ7pktZVfNkvc+kU/SUfuTD1v6pW41yyfHFRF4eAjJWI9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pt+P3Dt1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mDPiCm6axJxwKPkIrMZyEkQmZQPHQrr21Uo9jvJLswo=; b=pt+P3Dt1NnqdxnzXQZ9Of2Sc8E
-	KGNYZ7MDM0LIwVtEBkGNr9uKy8bOKkktFN76r7CJ7L/En861Qi/HjaBnoIHfFqvFoNVBzoPCNJ5Nv
-	cnamYhVDdMuQjocOTepSsau8i7a54JnwqULsOtDLpI21MqhuU8g5FrfmYj0usNFEA+6U=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sp7pr-007OxV-9b; Fri, 13 Sep 2024 17:03:47 +0200
-Date: Fri, 13 Sep 2024 17:03:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ronnie.Kunin@microchip.com
-Cc: Raju.Lakkaraju@microchip.com, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Bryan.Whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
-	Steen.Hegelund@microchip.com, Daniel.Machon@microchip.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next V2 4/5] net: lan743x: Implement phylink pcs
-Message-ID: <867aadb8-6e48-4c7c-883b-6f88caefcaa6@lunn.ch>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-5-Raju.Lakkaraju@microchip.com>
- <c6e36569-e3a8-4962-ac85-2fd7d35ab5d1@lunn.ch>
- <ZuKP6XcWTSk0SUn4@HYD-DK-UNGSW21.microchip.com>
- <cbc505ca-3df0-4139-87a1-db603f9f426a@lunn.ch>
- <PH8PR11MB79651A4A42D0492064F6541B95642@PH8PR11MB7965.namprd11.prod.outlook.com>
- <ZuP9y+5YntuUJNTe@HYD-DK-UNGSW21.microchip.com>
- <4559162d-5502-4fc3-9e46-65393e28e082@lunn.ch>
- <PH8PR11MB7965B1A0ABAF1AAD42C57F1A95652@PH8PR11MB7965.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1726239855; c=relaxed/simple;
+	bh=9Jq5heZv6b/G0/qHl7vyQQclyuTLGMSCenWr/F3FZfE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sCZAuKb/lx6R/fgRgosORocoNGWIKMkwXaL3ytrgN1l90Zo26Zyd2S2NVuHqnCzfkHhzsz748jxfMu002Dva1vBZdBSJkp3Y1Q3NVxDpgykIfdpzh25aQ2DQGkjXyXPj86s6rXrztKybQlZFAhd898TTG8M9eW44mcWdgQ2/MME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CmxZI3yD; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e1ce98dcafaso1604258276.0
+        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 08:04:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726239853; x=1726844653; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kMooRL8xhzsH6xqnm/1sRryKaBRAuskayMhnUalpEU0=;
+        b=CmxZI3yDZgrEGn2hG3MhYemyLPuqSNq0EYjBK35GppBGK8p2OWhfrLdTHrvZkHBUQ3
+         BNVVrgOr6Ue3rAoimRl2RJUiSoOa0gC8VlOaeynfkJfKm/C5ME+CF+DGit6A4rvrCSMv
+         phUZ5LH8Jh+EuRCML6hB+chkmwI+8WWORHayZoMSm4T7Yed0fKXO4L2mLaqNfSf9LLHo
+         9LDWm7sypeCX/UBjlwTB7MFianBkIsVtG8mbPdyL3XoEqI75mZpBcw73qbtwgyR+5H4K
+         PZ1QJu0tQr/mU1A/V3Ufu7XkV53xdhRIqAOcUAqUGTStuTkN7ACkNfpwWv80+fgegyCS
+         ANKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726239853; x=1726844653;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kMooRL8xhzsH6xqnm/1sRryKaBRAuskayMhnUalpEU0=;
+        b=JrZ6CowPD4wM34mQKXNRV0crwF0oDzFF8CILpzA777kUZZhaAoVEhN1T+7CNfSdn+9
+         BpgWBsLv8X7dPoCsZSBNgtLItUNG80TuIFsN/agAm6Dezy5SQaW2W6X1fh51zwHfYjgI
+         dxFAadmneb6VvaZ8WdqWxIwZ8YqD/32Tc7YrSNr7a2uJCZr4McIguJlRaA0L27QP26mR
+         zJVA+q+GG99ilgmGNONoHXosAvhekwbNusKN8AOmU+f6l52GHiuxVfsF2hlmKUThamRT
+         9bROOuQfM0UpGcUXfJpWCoyEYbw0rvF43zZgTv38Vf419GZUatX6pNO+lSFCw64eTsal
+         QvaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZdCAO61d/AlW6Ft9vzIiv8RWqaq7yRQYxj81+fwqbPyIrloZqauJ4vOCKUCdlGIP0Fl1hIbk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyp0+LpuK3AAZ+UFYYpu54X19kmwXuMJ/m/9WMSNcjjWFm3e1XE
+	97vchFwqrepdHDrAXdA/5Bnn5yjqapSPZN70GfcrrVSXtHEApij4fZXBRFE/1p2T8efTKmzvXFN
+	REg==
+X-Google-Smtp-Source: AGHT+IHPZMCyWHT83M1ghRe6sD+Qw6yM3pzsmUI3KueeQSwZIV+gzAa9f5lmoK6+cuhUcGnAFCxQrkHWJbA=
+X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
+ (user=gnoack job=sendgmr) by 2002:a25:c586:0:b0:e03:53a4:1a7 with SMTP id
+ 3f1490d57ef6-e1db0122872mr5902276.10.1726239852809; Fri, 13 Sep 2024 08:04:12
+ -0700 (PDT)
+Date: Fri, 13 Sep 2024 17:04:10 +0200
+In-Reply-To: <fd6ef478-4d0b-03f2-78f6-8bfd0fc3a846@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH8PR11MB7965B1A0ABAF1AAD42C57F1A95652@PH8PR11MB7965.namprd11.prod.outlook.com>
+Mime-Version: 1.0
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-7-ivanov.mikhail1@huawei-partners.com>
+ <ZuAP8iSv_sjmlYIp@google.com> <fd6ef478-4d0b-03f2-78f6-8bfd0fc3a846@huawei-partners.com>
+Message-ID: <ZuRUagjolNjXsS3r@google.com>
+Subject: Re: [RFC PATCH v3 06/19] selftests/landlock: Test adding a rule for
+ unhandled access
+From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 13, 2024 at 02:23:03PM +0000, Ronnie.Kunin@microchip.com wrote:
-> > > It's my mistake. We don't need 2 MDIO buses.
-> > > If SFP present, XPC's MDIO bus can use, If not sfp, LAN743x MDIO bus
-> > > can use.
-> > 
-> > I still think this is wrong. Don't focus on 'sfp present'.
-> > 
-> > Other MAC drivers don't even know there is an SFP cage connected vs a PHY. They just tell phylink the list
-> > of link modes they support, and phylink tells it which one to use when the media has link.
-> > 
-> > You have a set of hardware building blocks, A MAC, a PCS, an MDIO bus.
-> > Use the given abstractions in Linux to export them to the core, and then let Linux combine them as
-> > needed.
-> > 
-> > Back to my question about EEPROM vs fuses. I assume it is an EEPROM, ...
-> 
-> How RGMII vs "SGMII-BASEX"  is controlled ?
-> The hardware default is RGMII. That can be overwritten by OTP (similar functionality to EFuse, inside the PCI11010), which also can be further overwritten by EEPROM (outside the PCI11010). That will setup the initial value the device will have by the time the software first sees it. But it is a live bit in a register, so it can be changed at runtime if it was desired.
+On Wed, Sep 11, 2024 at 11:19:48AM +0300, Mikhail Ivanov wrote:
+> On 9/10/2024 12:22 PM, G=C3=BCnther Noack wrote:
+> > Hi!
+> >=20
+> > On Wed, Sep 04, 2024 at 06:48:11PM +0800, Mikhail Ivanov wrote:
+> > > Add test that validates behaviour of Landlock after rule with
+> > > unhandled access is added.
+> > >=20
+> > > Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+> > > ---
+> > > Changes since v2:
+> > > * Replaces EXPECT_EQ with ASSERT_EQ for close().
+> > > * Refactors commit title and message.
+> > >=20
+> > > Changes since v1:
+> > > * Refactors commit message.
+> > > ---
+> > >   .../testing/selftests/landlock/socket_test.c  | 33 ++++++++++++++++=
++++
+> > >   1 file changed, 33 insertions(+)
+> > >=20
+> > > diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/t=
+esting/selftests/landlock/socket_test.c
+> > > index 811bdaa95a7a..d2fedfca7193 100644
+> > > --- a/tools/testing/selftests/landlock/socket_test.c
+> > > +++ b/tools/testing/selftests/landlock/socket_test.c
+> > > @@ -351,4 +351,37 @@ TEST_F(protocol, rule_with_unknown_access)
+> > >   	ASSERT_EQ(0, close(ruleset_fd));
+> > >   }
+> > > +TEST_F(protocol, rule_with_unhandled_access)
+> > > +{
+> > > +	struct landlock_ruleset_attr ruleset_attr =3D {
+> > > +		.handled_access_socket =3D LANDLOCK_ACCESS_SOCKET_CREATE,
+> > > +	};
+> > > +	struct landlock_socket_attr protocol =3D {
+> > > +		.family =3D self->prot.family,
+> > > +		.type =3D self->prot.type,
+> > > +	};
+> > > +	int ruleset_fd;
+> > > +	__u64 access;
+> > > +
+> > > +	ruleset_fd =3D
+> > > +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+> > > +	ASSERT_LE(0, ruleset_fd);
+> > > +
+> > > +	for (access =3D 1; access > 0; access <<=3D 1) {
+> > > +		int err;
+> > > +
+> > > +		protocol.allowed_access =3D access;
+> > > +		err =3D landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
+> > > +					&protocol, 0);
+> > > +		if (access =3D=3D ruleset_attr.handled_access_socket) {
+> > > +			EXPECT_EQ(0, err);
+> > > +		} else {
+> > > +			EXPECT_EQ(-1, err);
+> > > +			EXPECT_EQ(EINVAL, errno);
+> > > +		}
+> > > +	}
+> > > +
+> > > +	ASSERT_EQ(0, close(ruleset_fd));
+> > > +}
+> > > +
+> >=20
+> > I should probably have noticed this on the first review round; you are =
+not
+> > actually exercising any scenario here where a rule with unhandled acces=
+s is
+> > added.
+> >=20
+> > To clarify, the notion of an access right being "unhandled" means that =
+the
+> > access right was not listed at ruleset creation time in the ruleset_att=
+r's
+> > .handled_access_* field where it would have belonged.  If that is the c=
+ase,
+> > adding a ruleset with that access right is going to be denied.
+> >=20
+> > As an example:
+> > If the ruleset only handles LANDLOCK_ACCESS_FS_WRITE_FILE and nothing e=
+lse,
+> > then, if the test tries to insert a rule for LANDLOCK_ACCESS_SOCKET_CRE=
+ATE,
+> > that call is supposed to fail -- because the "socket creation" access r=
+ight is
+> > not handled.
+>=20
+> This test was added to exercise adding a rule with future possible
+> "unhandled" access rights of "socket" type, but since this patch
+> implements only one, this test is really meaningless. Thank you for
+> this note!
+>=20
+> >=20
+> > IMHO the test would become more reasonable if it was more clearly "hand=
+ling"
+> > something entirely unrelated at ruleset creation time, e.g. one of the =
+file
+> > system access rights.  (And we could do the same for the "net" and "fs"=
+ tests as
+> > well.)
+> >=20
+> > Your test is a copy of the same test for the "net" rights, which in tur=
+n is a
+> > copy of teh same test for the "fs" rights.  When the "fs" test was writ=
+ten, the
+> > "fs" access rights were the only ones that could be used at all to crea=
+te a
+> > ruleset, but this is not true any more.
+>=20
+> Good idea! Can I implement such test in the current patchset?
 
-In a DT system phy-mode will tell you this. You don't have DT, at
-least not at the moment, so your EEPROM makes sense for this, the
-RGMII vs "SGMII-BASEX" bit.
+Yes, I think it would be a good idea.
 
-> 
-> > ... and the PCS always exists. So
-> > always instantiate an MDIO bus and instantiate the PCS. The MDIO bus always exists, so instantiate an
-> > MDIO bus.
-> 
-> No, you can't do that with this device because:
-> - There are shared pins in the chip between RGMII and SGMII/BASEX
+I would, in fact, recommend to turn the rule_with_unhandled_access test int=
+o that test.
 
-Which is typical in SoC. What you generally have is lots of IP blocks,
-I2C, SPI, GPIO, PWM, NAND controllers etc. The total number of
-inputs/outputs of these blocks is more than the legs on the chip. You
-then have a pinmux, which connects the internal blocks to the pins.
+The test traces its roots clearly to
 
-All the devices exist, but only a subset is connected to the outside
-world.
+  TEST_F(mini, rule_with_unhandled_access)  from net_test.c
 
-For RGMII vs SGMII/BASEX, it probably does not make sense to
-instantiate the PCS in RGMII mode. However, in SGMII/BASEX it should
-always exist, because it is connected to the outside world.
+and to
 
-> - Furthermore, I need to check with the HW architect, but I suspect
->   that the block that was not selected is shutdown to save power as
->   well.
+  TEST_F_FORK(layout1, rule_with_unhandled_access)  from fs_test.c
 
-I would also expect that when the PCS device is probed, it is left in
-a lower power state. For an external PHY, you don't need the PCS
-running until the PHY has link, autoneg has completed, and phylink
-will tell you to configure the PCS to SGMII or 2500BaseX. For an SFP,
-you need to read out the contents of the SFP EEPROM, look for LOS to
-indicate there is link, and then phylink will determine SGMII,
-1000BaseX or 2500BaseX and tell you how to configure it. It is only at
-that point do you need to take the PCS out of low power mode.
 
-Independent of RGMII vs SGMII/BASEX, the MDIO bus always exists. Both
-modes need it. And Linux just considers it an MDIO, not necessarily an
-MDIO bus for this MAC. So i would expect to always see a fully
-functioning MDIO bus.
+and I think all three variants would better be advised to create a ruleset =
+with
 
-One of the weird and wonderful use cases: There are lots of ComExpress
-boards with Intel 10G Ethernet interfaces. There are developers who
-create base boards for them with Ethernet switches. They connect the
-10G interface to one port of the switch. But to manage the switch they
-need MDIO. The Intel 10G drivers bury the MDIO in firmware, Linux
-cannot access is. So they are forced to use three GPIOs and bitbang
-MDIO. It is slow. Now imaging i put your device on the baseboard. I
-use its MAC connected to a 1G/2.5G PHY, on the MDIO bus, which i uses
-as the management interface for the box. Additional i connect the MDIO
-bus to the switch, to manage the switch. Linux has no problems with
-this, MDIO is just a bus with devices on it. But phylink will want
-access to the PCS to switch it between SGMII and 2500BaseX depending
-on what the PHY negotiates. Plus we need C45 to talk to the switch.
+struct landlock_ruleset_attr ruleset_attr =3D {
+	.handled_access_something_entirely_different =3D LANDLOCK_ACCESS_WHATEVER,
+}
 
-The proposed hijacking for C45 from the MDIO bus to talk to the PCS
-when there is an SFP breaks this, and as far as i can see, for no real
-reason other than being too lazy to put the PCS on its own Linux MDIO
-bus.
+and then check their corresponding fs, net and socket access rights using a
+landlock_add_rule() call for the access rights that belong to the respectiv=
+e
+module, so that it exercises the scenario where userspace attempts to use t=
+he
+access right in a rule, but the surrounding ruleset did not restrict the sa=
+me
+access right (it was "unhandled").
 
-      Andrew
+In spirit, it would be nicest if we could create a ruleset where nothing at=
+ all
+is handled, but I believe in that case, the landlock_create_ruleset() call =
+would
+already fail.
+
+=E2=80=94G=C3=BCnther
+
+P.S.: I am starting to grow a bit uncomfortable with the amount of duplicat=
+ed
+test code that we start having across the different types of access rights.=
+  If
+you see a way to keep this more in check, while still keeping the tests
+expressive and not over-frameworking them, let's try to move in that direct=
+ion
+if we can. :)
 
