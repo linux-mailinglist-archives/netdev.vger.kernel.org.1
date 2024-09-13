@@ -1,303 +1,532 @@
-Return-Path: <netdev+bounces-128204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E16197874B
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:56:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5658978754
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:58:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A5E52813DD
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:56:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 456591F21FD0
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335B386277;
-	Fri, 13 Sep 2024 17:56:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55F7B86131;
+	Fri, 13 Sep 2024 17:58:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="Di/JwXmF";
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="YOL70UOo"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="Lvxo4QZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from a7-42.smtp-out.eu-west-1.amazonses.com (a7-42.smtp-out.eu-west-1.amazonses.com [54.240.7.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9227E563;
-	Fri, 13 Sep 2024 17:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.240.7.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7EC84DE4;
+	Fri, 13 Sep 2024 17:58:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726250206; cv=none; b=bp2dgdNaSoQFOIXlUKx/rZfNmQY02Okkmebve9soDmhStZO5BGBFGyBsAVUTksXQ5V6ZKnidBu7VHFDGpu+EqGh2R5Qnbuxhlwd00LeWpOqjp6KSYnln1x/YqP7m9GJIjIwYwpM2tYPvPR6sPpn+4Xxckq3xzvZj9BbICWKwkaE=
+	t=1726250320; cv=none; b=IEqOdDTowGqPUuUUU50RiZLpGiRG5R9p6eojkMkpkVIJueHTK5Fo1nrttsCbBiorI1KHkBDWcQOeKkg+gaofRLu9nxdN59LmxFRMe3RPtcInmpMdXsVh8riFxUaBztaqxK+BT4UjgQNpsp4qwW3GbuM3qFUZHQM/K7FfA2cfSy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726250206; c=relaxed/simple;
-	bh=az4ZktDFrE5TgTvlrcCfwj/RIYM0HEZatbNxSRklh+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GmrqI1Cz+OXxTH+xrNgpynG8egLx/AguYsl4Zej2Qn3gF00mTjAiFBVq2fOOOwp8zSRgJuYvYRreENwk2F41GdVbeqaKc3dwe740lP0wlY7bKZwLyr52JTC7pSncKh8D6KdV2jjEWuCCCKzLAvUXx1tJy5lQYczfTh3sqe9KE64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=amazonses.collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=Di/JwXmF; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=YOL70UOo; arc=none smtp.client-ip=54.240.7.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazonses.collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=4232tfv5ebdrjdwkr5zzm7kytdkokgug; d=collabora.com; t=1726250202;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To;
-	bh=az4ZktDFrE5TgTvlrcCfwj/RIYM0HEZatbNxSRklh+w=;
-	b=Di/JwXmF/SJcAnKO8D6cAL2CBT9am0orNDFrj0txVP6AwtPc2me+4uTL/LpsMuu1
-	Xq0757YIlpmmpmAoUcUR7UYBJaIcPRlkTER+CF+F+m8sJdaesgYTDrwl6Qau6l85Qby
-	bBQ1g+aOPwfZrfcEMQKBC/XowbkmKQdmhQDx/t1wYuu4IHp6xKHAKhSdE7ve4t8cUSy
-	T5bXGJWyy+4c+DIv/Ys90fSzTt2mxAtmGopV5JkHLKnPZOadZ48El4XCeazvcPlK3ZS
-	SgJIn9ZcEfSlIlPjL+e1+xXZrGeawpMQALYFvh1SYmt/LcQLDg17+A+b6rOY71MNPtm
-	uMIlsEE0yw==
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=uku4taia5b5tsbglxyj6zym32efj7xqv; d=amazonses.com; t=1726250202;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:Content-Type:In-Reply-To:Feedback-ID;
-	bh=az4ZktDFrE5TgTvlrcCfwj/RIYM0HEZatbNxSRklh+w=;
-	b=YOL70UOo692aR5WV8EoRAyLS8cUkDZG+3JUOaEHm1ZFKG0NILHBlFcG/MBro5iSt
-	RBCZMKSU76gJakfI50VpojoPgFTKBA/57DYt1Enk83SpY90hlrl0rp6TLsdz9UCXn1h
-	dH4ja0d3tTRsJBb3KEj5U1YzLF3lzv1pYLdc1C7w=
-Date: Fri, 13 Sep 2024 17:56:42 +0000
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: Jacobe Zang <jacobe.zang@wesion.com>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Conor Dooley <conor+dt@kernel.org>, van Spriel <arend@broadcom.com>, 
-	Arend van Spriel <arend.vanspriel@broadcom.com>, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com, 
-	nick@khadas.com, Ondrej Jirman <megi@xff.cz>
-Subject: Re: [PATCH v14 4/4] wifi: brcmfmac: add flag for random seed during
- firmware download
-Message-ID: <01020191ec87b457-619e709d-46d1-4c57-b3df-d4e6fd13db5d-000000@eu-west-1.amazonses.com>
-References: <20240910-wireless-mainline-v14-0-9d80fea5326d@wesion.com>
- <20240910-wireless-mainline-v14-4-9d80fea5326d@wesion.com>
+	s=arc-20240116; t=1726250320; c=relaxed/simple;
+	bh=OkhiLu30m+oryjFjRxJOSBro4yUbMWyA8Ykvb/voTg8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TEAifX20clpcUe2fkLc6FlpZowYr7Ngh1ymdaghsJN1Qplo/cFPL1Enf6+KuhzC1FqeU1Fl2r9kK9jItJOo60FbsihdrMiy/DUBrqQ0Z3r/1CbPSV54s2gBQ4FaBT2Z4PcCxXuMrf/KhX1nBbnZEbH9ISSs3VSYtfEFZ5DblEmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=Lvxo4QZZ; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: c8c1d08471f911efb66947d174671e26-20240914
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=dAYFA4v4r/lRr/Fl63USBgf2C6IzZowyjg1mrdzkMRw=;
+	b=Lvxo4QZZ9vIsWE7cRvBb8i+HZx76EtbEsJuzKj+TC18iLAZMBvCcqyucq8GvzUW9D03s6ozXqZp152F8npOPlAKlzijtZqxPUxQnG2aITbG8SMFDf2T5ivxEzbFg4akucT5jBzBmXQqlwQgaq0WN6lLqPKGa6I6YY3v1KMxOb7A=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:b098bca1-9008-4b55-b185-9ba69913abc4,IP:0,U
+	RL:25,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:25
+X-CID-META: VersionHash:6dc6a47,CLOUDID:1b7c2ed0-7921-4900-88a1-3aef019a55ce,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: c8c1d08471f911efb66947d174671e26-20240914
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
+	(envelope-from <macpaul.lin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1627288026; Sat, 14 Sep 2024 01:58:30 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Sat, 14 Sep 2024 01:58:25 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Sat, 14 Sep 2024 01:58:25 +0800
+From: Macpaul Lin <macpaul.lin@mediatek.com>
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Liam
+ Girdwood" <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Sean Wang
+	<sean.wang@mediatek.com>, Sen Chu <sen.chu@mediatek.com>, Macpaul Lin
+	<macpaul.lin@mediatek.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	Alexandre Mergnat <amergnat@baylibre.com>
+CC: Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
+	Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
+	MediaTek Chromebook Upstream
+	<Project_Global_Chrome_Upstream_Group@mediatek.com>, Chen-Yu Tsai
+	<wenst@chromium.org>
+Subject: [PATCH v3 1/3] regulator: dt-bindings: mt6323: Convert to DT schema
+Date: Sat, 14 Sep 2024 01:57:53 +0800
+Message-ID: <20240913175753.6562-1-macpaul.lin@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="zwbcc5564rrrwrd7"
-Content-Disposition: inline
-In-Reply-To: <20240910-wireless-mainline-v14-4-9d80fea5326d@wesion.com>
-Feedback-ID: ::1.eu-west-1.YpP9ZbxnARFfy3Cb5pfsLd/pdsXBCNK0KEM7HforL4k=:AmazonSES
-X-SES-Outgoing: 2024.09.13-54.240.7.42
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--4.305700-8.000000
+X-TMASE-MatchedRID: NhKiZ9p2PIYLazoQyrpm0ooLoibgjVEXh8Ytn75ClDPOxDyJFXIPjmm0
+	zqcSNzI+8iNHpqH9BdjTpx8mj0GpKQHvpLYTRPZ4A9lly13c/gEraL2mh8ZVK7uqk4cq52pzjYm
+	hMHKljSB7K5tSEDlvEjlvwKfYC3Nk6qLlkd1ucwbIOn6NK8S1a7iEAx7vTxsO3M5CjuZOAD56HQ
+	e588lqzbk8fKyBc/ip5JZWpbmrOY4Ycyu6gJU0ixWCVBr+Ay988XH8gB0IKwjDV+mMbk1eU+J1Z
+	55wDcxT3RZ9a0/2ZKnztrsG7YgmNDDP0IvaLA2NwVaayvK71l+PmFSaq6xM+AWLdH3H/apCl9+Z
+	xpHSoIvi8zVgXoAltlPcOF1Vw1gmC24oEZ6SpSmb4wHqRpnaDigOEbLfjmA5aooCMGc1W1Hpwhs
+	NpfogAb0opK0w56BNLF0tvKPSBORx20zB7k9ZVJsluOOkV58wCKK/N8kLZqAl3wSLGDvECvI2nu
+	Dg9d7QFezHPq6MHFSrV/xdKQcFSY0leYQxW8u2ZyMWcibO/JI=
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--4.305700-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP:
+	CE9E49EF4B262BE6B04E9E0012D213014BC795A05BF29FEA5AD319B6C9027D852000:8
+X-MTK: N
 
+Convert the MT6323 regulator binding from the old text-based format to
+the new DT schema style. The property "regulator-name" has been added
+as required property to reflect current usage in mt6323.dtsi.
 
---zwbcc5564rrrwrd7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Examples have been streamlined and relocated to the parent schema file:
+  mfd/mediatek,mt6397.yaml.
 
-Hi,
+Update maintainer and submitter information with new entries from MediaTek.
 
-On Tue, Sep 10, 2024 at 11:04:14AM GMT, Jacobe Zang wrote:
-> Providing the random seed to firmware was tied to the fact that the
-> device has a valid OTP, which worked for some Apple chips. However,
-> it turns out the BCM43752 device also needs the random seed in order
-> to get firmware running. Suspect it is simply tied to the firmware
-> branch used for the device. Introducing a mechanism to allow setting
-> it for a device through the device table.
->=20
-> Co-developed-by: Ondrej Jirman <megi@xff.cz>
-> Signed-off-by: Ondrej Jirman <megi@xff.cz>
-> Co-developed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
-> ---
+The reference document cited in "mediatek,mt7530.yaml" has been updated
+to point to this new DT schema file
 
-Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.com>
-Tested-by: Sebastian Reichel <sebastian.reichel@collabora.com> # On RK3588 =
-EVB1
+Signed-off-by: Sen Chu <sen.chu@mediatek.com>
+Signed-off-by: Macpaul Lin <macpaul.lin@mediatek.com>
+---
+ .../bindings/net/dsa/mediatek,mt7530.yaml     |   4 +-
+ .../regulator/mediatek,mt6323-regulator.yaml  | 120 +++++++++
+ .../bindings/regulator/mt6323-regulator.txt   | 237 ------------------
+ 3 files changed, 122 insertions(+), 239 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml
+ delete mode 100644 Documentation/devicetree/bindings/regulator/mt6323-regulator.txt
 
-Greetings,
+Changes for v1 and v2:
+ - This is the first version of converting mt6323-regulator.
+   This is because converting mt6323-regulator together
+   with mfd/mediatek,mt6397.yaml, so we've create a patch set
+   instead of single patch for each skydives.
+ - This patch has been made base on linux-next/master git repo.
 
--- Sebastian
+Changes for v3:
+ - Rebased on linux-next/master git repo near next-20240906.
+ - Added 'regulator-name' to 'requried' property to reflect current usage.
+ - replace ^(buck_)? and ^(ldo_)? to ^buck_ and ^ldo_ prefix.
+ - Update file name of 'mediatek,mt6323-regulator.yaml' in
+   'mediatek,mt7530.yaml'
 
->  .../wireless/broadcom/brcm80211/brcmfmac/pcie.c    | 52 ++++++++++++++++=
-++----
->  .../broadcom/brcm80211/include/brcm_hw_ids.h       |  2 +
->  2 files changed, 46 insertions(+), 8 deletions(-)
->=20
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c b/dr=
-ivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
-> index 190e8990618c5..c0fdaa4dceda4 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
-> +++ b/drivers/net/wireless/broadcom/brcm80211/brcmfmac/pcie.c
-> @@ -66,6 +66,7 @@ BRCMF_FW_DEF(4365C, "brcmfmac4365c-pcie");
->  BRCMF_FW_DEF(4366B, "brcmfmac4366b-pcie");
->  BRCMF_FW_DEF(4366C, "brcmfmac4366c-pcie");
->  BRCMF_FW_DEF(4371, "brcmfmac4371-pcie");
-> +BRCMF_FW_CLM_DEF(43752, "brcmfmac43752-pcie");
->  BRCMF_FW_CLM_DEF(4377B3, "brcmfmac4377b3-pcie");
->  BRCMF_FW_CLM_DEF(4378B1, "brcmfmac4378b1-pcie");
->  BRCMF_FW_CLM_DEF(4378B3, "brcmfmac4378b3-pcie");
-> @@ -104,6 +105,7 @@ static const struct brcmf_firmware_mapping brcmf_pcie=
-_fwnames[] =3D {
->  	BRCMF_FW_ENTRY(BRCM_CC_43664_CHIP_ID, 0xFFFFFFF0, 4366C),
->  	BRCMF_FW_ENTRY(BRCM_CC_43666_CHIP_ID, 0xFFFFFFF0, 4366C),
->  	BRCMF_FW_ENTRY(BRCM_CC_4371_CHIP_ID, 0xFFFFFFFF, 4371),
-> +	BRCMF_FW_ENTRY(BRCM_CC_43752_CHIP_ID, 0xFFFFFFFF, 43752),
->  	BRCMF_FW_ENTRY(BRCM_CC_4377_CHIP_ID, 0xFFFFFFFF, 4377B3), /* revision I=
-D 4 */
->  	BRCMF_FW_ENTRY(BRCM_CC_4378_CHIP_ID, 0x0000000F, 4378B1), /* revision I=
-D 3 */
->  	BRCMF_FW_ENTRY(BRCM_CC_4378_CHIP_ID, 0xFFFFFFE0, 4378B3), /* revision I=
-D 5 */
-> @@ -353,6 +355,7 @@ struct brcmf_pciedev_info {
->  			  u16 value);
->  	struct brcmf_mp_device *settings;
->  	struct brcmf_otp_params otp;
-> +	bool fwseed;
->  #ifdef DEBUG
->  	u32 console_interval;
->  	bool console_active;
-> @@ -1715,14 +1718,14 @@ static int brcmf_pcie_download_fw_nvram(struct br=
-cmf_pciedev_info *devinfo,
->  		memcpy_toio(devinfo->tcm + address, nvram, nvram_len);
->  		brcmf_fw_nvram_free(nvram);
-> =20
-> -		if (devinfo->otp.valid) {
-> +		if (devinfo->fwseed) {
->  			size_t rand_len =3D BRCMF_RANDOM_SEED_LENGTH;
->  			struct brcmf_random_seed_footer footer =3D {
->  				.length =3D cpu_to_le32(rand_len),
->  				.magic =3D cpu_to_le32(BRCMF_RANDOM_SEED_MAGIC),
->  			};
-> =20
-> -			/* Some Apple chips/firmwares expect a buffer of random
-> +			/* Some chips/firmwares expect a buffer of random
->  			 * data to be present before NVRAM
->  			 */
->  			brcmf_dbg(PCIE, "Download random seed\n");
-> @@ -2394,6 +2397,37 @@ static void brcmf_pcie_debugfs_create(struct devic=
-e *dev)
->  }
->  #endif
-> =20
-> +struct brcmf_pcie_drvdata {
-> +	enum brcmf_fwvendor vendor;
-> +	bool fw_seed;
-> +};
-> +
-> +enum {
-> +	BRCMF_DRVDATA_CYW,
-> +	BRCMF_DRVDATA_BCA,
-> +	BRCMF_DRVDATA_WCC,
-> +	BRCMF_DRVDATA_WCC_SEED,
-> +};
-> +
-> +static const struct brcmf_pcie_drvdata drvdata[] =3D {
-> +	[BRCMF_DRVDATA_CYW] =3D {
-> +		.vendor =3D BRCMF_FWVENDOR_CYW,
-> +		.fw_seed =3D false,
-> +	},
-> +	[BRCMF_DRVDATA_BCA] =3D {
-> +		.vendor =3D BRCMF_FWVENDOR_BCA,
-> +		.fw_seed =3D false,
-> +	},
-> +	[BRCMF_DRVDATA_WCC] =3D {
-> +		.vendor =3D BRCMF_FWVENDOR_WCC,
-> +		.fw_seed =3D false,
-> +	},
-> +	[BRCMF_DRVDATA_WCC_SEED] =3D {
-> +		.vendor =3D BRCMF_FWVENDOR_WCC,
-> +		.fw_seed =3D true,
-> +	},
-> +};
-> +
->  /* Forward declaration for pci_match_id() call */
->  static const struct pci_device_id brcmf_pcie_devid_table[];
-> =20
-> @@ -2475,9 +2509,10 @@ brcmf_pcie_probe(struct pci_dev *pdev, const struc=
-t pci_device_id *id)
->  	bus->bus_priv.pcie =3D pcie_bus_dev;
->  	bus->ops =3D &brcmf_pcie_bus_ops;
->  	bus->proto_type =3D BRCMF_PROTO_MSGBUF;
-> -	bus->fwvid =3D id->driver_data;
->  	bus->chip =3D devinfo->coreid;
->  	bus->wowl_supported =3D pci_pme_capable(pdev, PCI_D3hot);
-> +	bus->fwvid =3D drvdata[id->driver_data].vendor;
-> +	devinfo->fwseed =3D drvdata[id->driver_data].fw_seed;
->  	dev_set_drvdata(&pdev->dev, bus);
-> =20
->  	ret =3D brcmf_alloc(&devinfo->pdev->dev, devinfo->settings);
-> @@ -2663,14 +2698,14 @@ static const struct dev_pm_ops brcmf_pciedrvr_pm =
-=3D {
->  		BRCM_PCIE_VENDOR_ID_BROADCOM, (dev_id), \
->  		PCI_ANY_ID, PCI_ANY_ID, \
->  		PCI_CLASS_NETWORK_OTHER << 8, 0xffff00, \
-> -		BRCMF_FWVENDOR_ ## fw_vend \
-> +		BRCMF_DRVDATA_ ## fw_vend \
->  	}
->  #define BRCMF_PCIE_DEVICE_SUB(dev_id, subvend, subdev, fw_vend) \
->  	{ \
->  		BRCM_PCIE_VENDOR_ID_BROADCOM, (dev_id), \
->  		(subvend), (subdev), \
->  		PCI_CLASS_NETWORK_OTHER << 8, 0xffff00, \
-> -		BRCMF_FWVENDOR_ ## fw_vend \
-> +		BRCMF_DRVDATA_ ## fw_vend \
->  	}
-> =20
->  static const struct pci_device_id brcmf_pcie_devid_table[] =3D {
-> @@ -2698,9 +2733,10 @@ static const struct pci_device_id brcmf_pcie_devid=
-_table[] =3D {
->  	BRCMF_PCIE_DEVICE(BRCM_PCIE_4366_5G_DEVICE_ID, BCA),
->  	BRCMF_PCIE_DEVICE(BRCM_PCIE_4371_DEVICE_ID, WCC),
->  	BRCMF_PCIE_DEVICE(BRCM_PCIE_43596_DEVICE_ID, CYW),
-> -	BRCMF_PCIE_DEVICE(BRCM_PCIE_4377_DEVICE_ID, WCC),
-> -	BRCMF_PCIE_DEVICE(BRCM_PCIE_4378_DEVICE_ID, WCC),
-> -	BRCMF_PCIE_DEVICE(BRCM_PCIE_4387_DEVICE_ID, WCC),
-> +	BRCMF_PCIE_DEVICE(BRCM_PCIE_4377_DEVICE_ID, WCC_SEED),
-> +	BRCMF_PCIE_DEVICE(BRCM_PCIE_4378_DEVICE_ID, WCC_SEED),
-> +	BRCMF_PCIE_DEVICE(BRCM_PCIE_4387_DEVICE_ID, WCC_SEED),
-> +	BRCMF_PCIE_DEVICE(BRCM_PCIE_43752_DEVICE_ID, WCC_SEED),
-> =20
->  	{ /* end: all zeroes */ }
->  };
-> diff --git a/drivers/net/wireless/broadcom/brcm80211/include/brcm_hw_ids.=
-h b/drivers/net/wireless/broadcom/brcm80211/include/brcm_hw_ids.h
-> index 44684bf1b9acc..c1e22c589d85e 100644
-> --- a/drivers/net/wireless/broadcom/brcm80211/include/brcm_hw_ids.h
-> +++ b/drivers/net/wireless/broadcom/brcm80211/include/brcm_hw_ids.h
-> @@ -52,6 +52,7 @@
->  #define BRCM_CC_43664_CHIP_ID		43664
->  #define BRCM_CC_43666_CHIP_ID		43666
->  #define BRCM_CC_4371_CHIP_ID		0x4371
-> +#define BRCM_CC_43752_CHIP_ID		43752
->  #define BRCM_CC_4377_CHIP_ID		0x4377
->  #define BRCM_CC_4378_CHIP_ID		0x4378
->  #define BRCM_CC_4387_CHIP_ID		0x4387
-> @@ -94,6 +95,7 @@
->  #define BRCM_PCIE_4366_5G_DEVICE_ID	0x43c5
->  #define BRCM_PCIE_4371_DEVICE_ID	0x440d
->  #define BRCM_PCIE_43596_DEVICE_ID	0x4415
-> +#define BRCM_PCIE_43752_DEVICE_ID	0x449d
->  #define BRCM_PCIE_4377_DEVICE_ID	0x4488
->  #define BRCM_PCIE_4378_DEVICE_ID	0x4425
->  #define BRCM_PCIE_4387_DEVICE_ID	0x4433
->=20
-> --=20
-> 2.34.1
->=20
->=20
+diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+index ea979bc..413db38 100644
+--- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+@@ -129,8 +129,8 @@ properties:
+   io-supply:
+     description: |
+       Phandle to the regulator node necessary for the I/O power.
+-      See Documentation/devicetree/bindings/regulator/mt6323-regulator.txt for
+-      details for the regulator setup on these boards.
++      See Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml
++      for details for the regulator setup on these boards.
+ 
+   mediatek,mcm:
+     type: boolean
+diff --git a/Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml b/Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml
+new file mode 100644
+index 0000000..01b0aba
+--- /dev/null
++++ b/Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml
+@@ -0,0 +1,120 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/regulator/mediatek,mt6323-regulator.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: MediaTek MT6323 Regulator
++
++maintainers:
++  - John Crispin <john@phrozen.org>
++  - Sen Chu <sen.chu@mediatek.com>
++  - Macpaul Lin <macpaul.lin@mediatek.com>
++
++description: |
++  Regulator node of the PMIC. This node should under the PMIC's device node.
++  All voltage regulators provided by the PMIC are described as sub-nodes of
++  this node.
++
++properties:
++  compatible:
++    items:
++      - const: mediatek,mt6323-regulator
++
++patternProperties:
++  "^buck_v(pa|proc|sys)$":
++    description: Buck regulators
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(camio|cn18)$":
++    description: LDO with fixed 1.8V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v((io|rf)18)$":
++    description: LDOs with fixed 1.825V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(a|rtc|tcxo|(cn|io)28)$":
++    description: LDOs with fixed 2.8V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(usb)$":
++    description: LDOs with fixed 3.3V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(cn33_(bt|wifi))$":
++    description: LDOs with variable 3.3V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(cama|camaf|camd|emc3v3|gp[123]|ibr|m|mc|mch|sim[12])$":
++    description: LDOs with variable output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++required:
++  - compatible
++
++additionalProperties: false
++
+diff --git a/Documentation/devicetree/bindings/regulator/mt6323-regulator.txt b/Documentation/devicetree/bindings/regulator/mt6323-regulator.txt
+deleted file mode 100644
+index a48749d..0000000
+--- a/Documentation/devicetree/bindings/regulator/mt6323-regulator.txt
++++ /dev/null
+@@ -1,237 +0,0 @@
+-Mediatek MT6323 Regulator
+-
+-All voltage regulators are defined as subnodes of the regulators node. A list
+-of regulators provided by this controller are defined as subnodes of the
+-PMIC's node. Each regulator is named according to its regulator type,
+-buck_<name> and ldo_<name>. The definition for each of these nodes is defined
+-using the standard binding for regulators at
+-Documentation/devicetree/bindings/regulator/regulator.txt.
+-
+-The valid names for regulators are::
+-BUCK:
+-  buck_vproc, buck_vsys, buck_vpa
+-LDO:
+-  ldo_vtcxo, ldo_vcn28, ldo_vcn33_bt, ldo_vcn33_wifi, ldo_va, ldo_vcama,
+-  ldo_vio28, ldo_vusb, ldo_vmc, ldo_vmch, ldo_vemc3v3, ldo_vgp1, ldo_vgp2,
+-  ldo_vgp3, ldo_vcn18, ldo_vsim1, ldo_vsim2, ldo_vrtc, ldo_vcamaf, ldo_vibr,
+-  ldo_vrf18, ldo_vm, ldo_vio18, ldo_vcamd, ldo_vcamio
+-
+-Example:
+-
+-	pmic: mt6323 {
+-		mt6323regulator: regulators {
+-			mt6323_vproc_reg: buck_vproc{
+-				regulator-name = "vproc";
+-				regulator-min-microvolt = < 700000>;
+-				regulator-max-microvolt = <1350000>;
+-				regulator-ramp-delay = <12500>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vsys_reg: buck_vsys{
+-				regulator-name = "vsys";
+-				regulator-min-microvolt = <1400000>;
+-				regulator-max-microvolt = <2987500>;
+-				regulator-ramp-delay = <25000>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vpa_reg: buck_vpa{
+-				regulator-name = "vpa";
+-				regulator-min-microvolt = < 500000>;
+-				regulator-max-microvolt = <3650000>;
+-			};
+-
+-			mt6323_vtcxo_reg: ldo_vtcxo{
+-				regulator-name = "vtcxo";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <90>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vcn28_reg: ldo_vcn28{
+-				regulator-name = "vcn28";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <185>;
+-			};
+-
+-			mt6323_vcn33_bt_reg: ldo_vcn33_bt{
+-				regulator-name = "vcn33_bt";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3600000>;
+-				regulator-enable-ramp-delay = <185>;
+-			};
+-
+-			mt6323_vcn33_wifi_reg: ldo_vcn33_wifi{
+-				regulator-name = "vcn33_wifi";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3600000>;
+-				regulator-enable-ramp-delay = <185>;
+-			};
+-
+-			mt6323_va_reg: ldo_va{
+-				regulator-name = "va";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vcama_reg: ldo_vcama{
+-				regulator-name = "vcama";
+-				regulator-min-microvolt = <1500000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vio28_reg: ldo_vio28{
+-				regulator-name = "vio28";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vusb_reg: ldo_vusb{
+-				regulator-name = "vusb";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vmc_reg: ldo_vmc{
+-				regulator-name = "vmc";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <36>;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vmch_reg: ldo_vmch{
+-				regulator-name = "vmch";
+-				regulator-min-microvolt = <3000000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <36>;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vemc3v3_reg: ldo_vemc3v3{
+-				regulator-name = "vemc3v3";
+-				regulator-min-microvolt = <3000000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <36>;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vgp1_reg: ldo_vgp1{
+-				regulator-name = "vgp1";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vgp2_reg: ldo_vgp2{
+-				regulator-name = "vgp2";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <3000000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vgp3_reg: ldo_vgp3{
+-				regulator-name = "vgp3";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vcn18_reg: ldo_vcn18{
+-				regulator-name = "vcn18";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vsim1_reg: ldo_vsim1{
+-				regulator-name = "vsim1";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <3000000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vsim2_reg: ldo_vsim2{
+-				regulator-name = "vsim2";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <3000000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vrtc_reg: ldo_vrtc{
+-				regulator-name = "vrtc";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vcamaf_reg: ldo_vcamaf{
+-				regulator-name = "vcamaf";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vibr_reg: ldo_vibr{
+-				regulator-name = "vibr";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <36>;
+-			};
+-
+-			mt6323_vrf18_reg: ldo_vrf18{
+-				regulator-name = "vrf18";
+-				regulator-min-microvolt = <1825000>;
+-				regulator-max-microvolt = <1825000>;
+-				regulator-enable-ramp-delay = <187>;
+-			};
+-
+-			mt6323_vm_reg: ldo_vm{
+-				regulator-name = "vm";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vio18_reg: ldo_vio18{
+-				regulator-name = "vio18";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vcamd_reg: ldo_vcamd{
+-				regulator-name = "vcamd";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vcamio_reg: ldo_vcamio{
+-				regulator-name = "vcamio";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-		};
+-	};
+-- 
+2.45.2
 
---zwbcc5564rrrwrd7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmbkfNgACgkQ2O7X88g7
-+pq7OQ/+IdJA2aA8tgY4+FH+WP79mRil3jqsbZUoHSD74mEMrRuB/2RY2Mbq6B9H
-xPNo8Z7pCT01rZBr5ibXbk3MtJjmo5lqEQYtAH+TH7AgUisqIHIVyQEXFRswibQC
-IePUgrgW4T8fNyJbfwuuUy+x6ajfTmRkIpMwNLq6cd7X4m2ayeVsWjZvKSmh59U5
-5UDhNvY4QJbVkyBV5fXvwagIukZGLXZ9uhjo/JIKubPOCVTTEFbxNB7ZFkA+gTzO
-48+hcg7BK/fN/Qb0Eb81VIMG1koSx1h5q9EkHowyyLNrWzs0R+N9sq41HvbYNvY5
-IfUWPiagradIY5JyiOfibk0xKlb64j0nZ1er1GaD6EJmQVRhh7KRBoMX0xQGcn0K
-4YCAWmDcMhz303cLJkSIQSaF4Oj6ioF9ZGxAHuyz7C2QhqFPWRljzQ3oX8paDXaj
-mKwGvVDE528jtgpHB3MC9+EnnyjyQjO4vyeyYhqFrUNu23su76xivdYTJmnrikCH
-WDAETRO/RFBA6Z5b8q83C2kM36HIvgkNtwLb1tu+gcQ+94F0ymhzP7v4pLOQ09KJ
-XA47mMSvf2u5nqQNkSb37x4xfG2znVDEE8dsQ7TU+5QT3tII4EXKSWz8HBflDZ5r
-4PIfFHb+x5UpTNuFRvwikuYSzjUAwDVRg8T+PQ6WoSkCWsErP+A=
-=fYCg
------END PGP SIGNATURE-----
-
---zwbcc5564rrrwrd7--
 
