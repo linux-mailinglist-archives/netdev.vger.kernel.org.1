@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-128154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA4F39784E4
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:31:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 919EA9784E6
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:31:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A0272837D9
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 15:31:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23DA31F28E28
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 15:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EACAF811F1;
-	Fri, 13 Sep 2024 15:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 188FE83CD6;
+	Fri, 13 Sep 2024 15:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Kmls93rO"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="I53Qhe10"
 X-Original-To: netdev@vger.kernel.org
 Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013057.outbound.protection.outlook.com [52.101.67.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D544678274;
-	Fri, 13 Sep 2024 15:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260FA58ABC;
+	Fri, 13 Sep 2024 15:30:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.57
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726241402; cv=fail; b=VNoIAj+w6oO419wKZuld0MOGDppcYvZDKf9nWwrOtOtmmg9XGz+Js+62usHH8P5HSFtUeupeln6Vty90W4Q6G+mKsTwQkMajeuqP5NVvnINTi7/6WOHfEN1UFJGrT8QeaHZroQOiRpcT1ntTztK7IwWwsNydy443wnHzlLGG+cE=
+	t=1726241405; cv=fail; b=ZqmJuh6wA8WjP+MR3SafzfT51ofzww3f88vrTkZh+tV5Na1+mTOUY6lvJ2ShEbnJIzQnAFOvqnA7pnSi/xHhIws8O4beOAKEUVprah74eWRtJ2Zwwgr6ncOn+OmhajVI+JLsSTIolNNtBn3QBu4TJT1TZzX7PQ0YSFGYzsC6m3I=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726241402; c=relaxed/simple;
-	bh=2Se3rDJhvDhtVigxdSwLsLYyZRn52VwmRM21FMzMJOI=;
+	s=arc-20240116; t=1726241405; c=relaxed/simple;
+	bh=CFTQkXARLrbiWK5Fjt+9IWoCYC7i0aLvyV97d58THWg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Mzkfkw2wtfvgF6D9T44O/rxTHD0x9ZE9YBOePNqthX8PmHWe1m89kt//MdDlCPw0q3jXZNyUU7cQ0NvUHgSuPV5ofhaO5TXyvUUb6+wsbF3JA1AbtAbTqPVMl/W3GJNr3Nc0dWqhffAwQJfAN9cbTtwM/rrfBjVVf9uVbF8CI7Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Kmls93rO; arc=fail smtp.client-ip=52.101.67.57
+	 Content-Type:MIME-Version; b=leBg/SuEuqdXPj/Zfl2sRpgVu2LvS5XpjcoG3M4hJg2yu4nxtayGZ0ZgGVKFMd55OF8ETHfNkxrOgpW+Syk0COu0ix/1pDe1bodowpf8nOtmk5boR3JVIjl+ijgPYuY7ieCaIv+8rTGBawXhuAFneka2hSKB1h9eGg1b+2SRjeo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=I53Qhe10; arc=fail smtp.client-ip=52.101.67.57
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=F0tuXL+Zb7huInzHxpzH27Ch521isbm630LD4DyMiWzkuFqTuTp4cKzMZ4kRlIiNkMixBOA1YdIQSg77Iq96lWvoQlk7X9vGX67jFsJUT58gJTY9bqPzOWPTPEzMP0QQzyQ0PLMZoeX/q+/PHjy2iY2ZR3ZC80F7zriuXleRntWJbr8nl6L19hQCWss5etxfStor4NDyARIW4bC7ZcrugNFjEEBAJus/MToFO0I3YIb7oZrfWLrFeAf+osKwN28ESODJWK9S7F/TdPv2O4h1EwDFC0KvLRgQj8SBIiZhjs+GyHz51oKjaSSFrr4EF0b2kiMdrdpzWhcbAeV8h/q8gw==
+ b=XvS3f+pSXVYMy3nIyOlTAtjnf7HB7WjAq4Y+DzK03lrJUNPD423/iW4cCNTD3S64fLL9khyhygsEIagpck4DEhV+RHGH9BXMgeCHmx9F8/y2wU9WzIB5BiWafYggoFKNR1EqelABsU326M0//PeVz5G5hCSPMDd4NjS2f4isjQ/EZDhz7RhIYnqTrmaZa4bR0wExCa3vGQq2OfQc3/ji5a9H/DcePqKLBDNq+mdttSOr92Dg1W6LzMtlNhtAzqO0SBsXa7oNCtHAbLQI3F+gLxngAer0n1PzomtrxiNb8AiCm2jILHNllc6Hh7yrjOK5j2KUOHXBQ6QnkzSD+Ds0FQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DchtiU/jQuHINxUB9m8ahl7bth2S63ZrtTh0jYxO1D8=;
- b=RFz4PH+gh0jReZ5ZXzg6Y4HAIj8yIAoWh3VQs7wfnVM9tExFOlZfx2ivX2uyDq0wg8+fb/OyCtkcvgLU9/KR+A77GN9KuCBq60poc2+4s+oF5q3UcpUTNBz5FJ4sD/l2o56g+6PWbsm3ayJtuLJewtocvTCY+PWAA7zNCc7V3fmsD7TvFqhm+Kn7t5RmBm5thuonGJtnQqf7ELBlPoNR82kFAZH9wckXLaBb8/i1g3nq2vzqKgim0FOlUewAMaTK7TIls4bVxg0563+BNB24yR6YR3Ao0ETBjglTYQtbZxyE+0V36ivjR+XSsEPxTnaFMg7bFZTjI5ZRVXBBtdHM+g==
+ bh=vp3n0w8kiu08ys3ePnJtcAdFwmPlCL8Ag7hSZf169v0=;
+ b=QL3NSWS+qwETmCy9pDG3oSstzElPKkihaqvQSXl68PsVxfw9o10rG8lmHfnPSRU8aYawOp1nM5nrkzjg1B0s0XpNnXgdNcl619CvrmLeY8PM8Bv76LlkzvP7dHi3gUyOQBK6h4jn6vx5WbC8XsqIWH7aqRIjJaafPmYJVfwHFkBgcSEv3CrZ2jk/rMlrKjpES4kwYS2e765xhUO0fE8DHOynl2BhwCUsaduqYp/XSovPhzKpnGX0HIGNurNxpx4V224cGXQEYUkstdxKwxf2R9U09QVfm5lfvoJgedjGbacvHzTqFMGeqOmvUzHJ0+DXSx3GqKshDhT88urSvwepLg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DchtiU/jQuHINxUB9m8ahl7bth2S63ZrtTh0jYxO1D8=;
- b=Kmls93rO/V5rA6iwSASbXY8GMtEpg9VIAZGcjA0wNam5hbCvOmZCgDa6GzBF9S+er4iySAc7PClsQtgzYFReelTdt+DVPizFV1Ur2CrBtPAiQpZcOfJmUX2goXHFHPZY1KIKZzyMSuj4fnFprOl8Nk5ao1HU4JpJw3zEos9Nh1XEhdgg8w7YZeO6YEqfg3wm2sfKqrcaom+HJg2G2JtdmONXSDdIoe6RrAQk7X1NBOrkbr1ihkLzNz+IG3aDcYY0cZXHpAWVjN35cdiTf4lqP2VlxPLY9mWZnpkY6Pp7Gu1LvLgQRGt/5/DqGT27nF9Ruxha9Elx0gsFkUpu0AfygQ==
+ bh=vp3n0w8kiu08ys3ePnJtcAdFwmPlCL8Ag7hSZf169v0=;
+ b=I53Qhe10swltE+KtkPW0aZ02H9z4SHm4xuCAePALm+KDkJWABjVQy7Zyu9Phzw1KlrWsYgQcgPSgME+g18TrGKsoukHXKuSqV0wJdN4pkIFw4QqRkCtmj0pG9tdQzGk5HUkkwxt/R9CXQ79cDDbX6eaIlkOMZZQqk8XbTbuJMrrHEF4+zLhbpFqRAiZveMuJVdgnjNJZrxHAHFHM1IICQfIIa0T874qnIQhlTfwZrXc4BmOHAcHSETkKeQb57JQoAlOWvO2XKnl8IUZTOuUE/zdvwlTZC8OmugwxIdJX/R0cL2oeS7SErMQ+5nTlYkzIeRPn4c2rtIhdWhkCKltZDA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
  by VI2PR04MB10859.eurprd04.prod.outlook.com (2603:10a6:800:278::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.19; Fri, 13 Sep
- 2024 15:29:53 +0000
+ 2024 15:29:54 +0000
 Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
  ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.7962.017; Fri, 13 Sep 2024
- 15:29:53 +0000
+ 15:29:54 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -73,9 +73,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Cong Wang <xiyou.wangcong@gmail.com>,
 	Jiri Pirko <jiri@resnulli.us>,
 	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net-next 5/6] net: dsa: allow matchall mirroring rules towards the CPU
-Date: Fri, 13 Sep 2024 18:29:14 +0300
-Message-Id: <20240913152915.2981126-6-vladimir.oltean@nxp.com>
+Subject: [RFC PATCH net-next 6/6] net: mscc: ocelot: allow tc-flower mirred action towards foreign interfaces
+Date: Fri, 13 Sep 2024 18:29:15 +0300
+Message-Id: <20240913152915.2981126-7-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240913152915.2981126-1-vladimir.oltean@nxp.com>
 References: <20240913152915.2981126-1-vladimir.oltean@nxp.com>
@@ -92,160 +92,201 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|VI2PR04MB10859:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7deef44c-d956-46e5-deb0-08dcd408e9f1
+X-MS-Office365-Filtering-Correlation-Id: 1deb5022-b4e8-4512-bf17-08dcd408eaf2
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|52116014|376014|7416014|1800799024|366016|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Vs7lg7YsTeyUa8sO7owIQp10CloYJ4SaGukZkXtUCRyFcZiwaT+VW1B93IMK?=
- =?us-ascii?Q?KrhJ8ZZOTKXxvvqp0lxevv9QKHh9ug+GaHiBRE45t/x/JTSm+2HCKKeMhXsk?=
- =?us-ascii?Q?TpmmJuZ4ZPcFXpbnbTRigx6ovDs3SIHeqj4p1tYMYTUdWgDG13i0+wZuciWt?=
- =?us-ascii?Q?C2cfeVeLyGbGz+IHUKtAnm7PoF6KLRKYBkR0O7cDqwnrtuAtBd5GQDyDVT5B?=
- =?us-ascii?Q?jzksPtpTdrtn85M1eF/AC/drL9t3iswAOkElgLnPIw9YvhrTkBlEXDoR+bgp?=
- =?us-ascii?Q?AAisEB1KAsS7/23YMbgsWcEVTYdnf/nl2l5VOIcq8S6yieMal5d2P1zwKptu?=
- =?us-ascii?Q?teukmy8+ZJpYTPNX1YZGr7lGj9BoWLZ7YAR9xDZpOcA1P3tzZNwjbe5Cmo4N?=
- =?us-ascii?Q?3qF1ZLI6OFuWT+6KZan7FuW/Qt3YQxj5d6ZWCoMf2upGQ627ACqgMIm4Nyvt?=
- =?us-ascii?Q?ds+BtHkEugx37n9diGsAMOgdAT6UJqIkMqvc/nsWgZtxtpEf5pHurhJFtvK3?=
- =?us-ascii?Q?fEeubNzfEMEQine2Vc4Gj29KqCob+2XS4VZPaH39GLLj2BK0CqnuZYypQIzY?=
- =?us-ascii?Q?MmvrPJCU9tbq0nSzbQidPA/bydLCtu/sI8aEwgqdWmdWapYmOoXMNIGd2eii?=
- =?us-ascii?Q?HzBJps2G3PKRaQnv9b70WAs5ul38SU69Jns7mwgmFfp9jsg6QR6l/Umj8DXB?=
- =?us-ascii?Q?oDo4wJFUZ/zG7YxeYrxVFW2YHt4N5Keslo32o1Wwv5KieAxfQvs4jm75vwia?=
- =?us-ascii?Q?+FWQElknSrze1FpojBxl/IZ4TDCm7uUh9zeyX0J7Ctj9HCyMi5F+UbtCHUNM?=
- =?us-ascii?Q?9YKjYvNdOsQZsx8+1Mmasnw+bhElAuVjm8+vH5KsArzS7iJ72fE2u1qERs+y?=
- =?us-ascii?Q?Xf4wtzi7j/Aa7xTg+zMd6gLMHkleonWzdREM/CLKjzwkUf6oirltdyzR7thV?=
- =?us-ascii?Q?IMb2IQoEMBaf8MWrr9oNuvoJbFzMP5OlaZ1a9Zb1aVC4Aho7cRJDfi94FOum?=
- =?us-ascii?Q?CYZ2zjGfYXzZzIk64jvk6IKGVlIPbOoapWAvxWneNtOrhIuZxugm7I+eNd3u?=
- =?us-ascii?Q?Z1KCPRtQpvT5IU6qhRJbvc1yevdbrurLenR7Cn3PH168dnZjNbIzhY6R1POg?=
- =?us-ascii?Q?7Cg6dfuKXT0lWYZNSr0QPUAswqYEtaBXi+1m95Obgv1fCSs40iClRFwUAEeT?=
- =?us-ascii?Q?IpexG5NqSkyMpwCAchXvGLINYlMRTF6FSjWCnMGv69WlBwrzoSiDg5o7vFXv?=
- =?us-ascii?Q?sIOhKamVfOwlKYwV+UHnuYw32+27fasALolO6smFyE4bfSXiuu6BDq4fkRFw?=
- =?us-ascii?Q?HFkq27Dp+zlpFNBR+dPxrsRniaS2XG4LGfLuFfsXkhQgAbqTTvd80+nfPj4J?=
- =?us-ascii?Q?ordTc5z1GSm/IuEkyeMjPlP6He9IgAN0YARZ5YRbf0Z70f3yYA=3D=3D?=
+	=?us-ascii?Q?WSW9zz8Mq6YRv8MJe6qC7IYzY4BDm1eFy/9PQbLaIlxy5GLnJiUno9RRbhXe?=
+ =?us-ascii?Q?dAQQ7vBBzTWKNdA72j9rrAh3VIO5UMw/EtOtOXkBSWlpNjahQ6+77b9TH4za?=
+ =?us-ascii?Q?plDe+y1eK2Z99yLPY1vBAg+Hge7UC5cDUR6Er9U7RlKCSOl1RVXoQ760XJQ/?=
+ =?us-ascii?Q?HDSE61mla/Ce5m7k5lym3dtW7IN4K3SGKa+8Mwl1wqEidHWlFcQchNvIDUAo?=
+ =?us-ascii?Q?JbnS9XwIjrecX1YX3/vtLwGrFNcJINrLxGRqN920aXEzY3DgeS4roS9CPvb5?=
+ =?us-ascii?Q?TP6qogik2wJyDOhlm76B1++0UuSMA4p2Ra8cyeYs3dpMZtW39i9CvmkDV5dc?=
+ =?us-ascii?Q?u68Q17Xg28H7ZbwQzhVzkvbX6ijI/i7/SFu8uUmpOx/RnopoUKbPIKvmrzLd?=
+ =?us-ascii?Q?QnmKeSbzn4uLzOrLDr0sVtjZJt/UybZE8JSHzQ6Jx1efjYo51BKzX+UM2QAO?=
+ =?us-ascii?Q?KkiAzkUIVHT/S82qE4CAODDOk0CbhVunQsqTMtieYM66g21H0vw7c7h8md5E?=
+ =?us-ascii?Q?T9Lgf+7AhxFrVoHpNNzNSF625gdTd1vEuBVequ/DU+t4cMMZKRP5uGJAys/o?=
+ =?us-ascii?Q?xR9gFPnotBrCn/nFxv+qGyBh6qPM/4lCDfL0DkFBP/FV76firpjqwWSm4tmM?=
+ =?us-ascii?Q?qRblg1XUNlbWqNGOmuWzi3wBBZ8NvhERtpHp/oqIguelZxYDPcLmqyzs9dQj?=
+ =?us-ascii?Q?QGQ3fa3LoWF3pKsGe6To9yHqX2kqyjuQ6CDXig+nDDn8S099fAlPuDij9P4C?=
+ =?us-ascii?Q?yFZ1X3QptwLT65GmJYE6T4lczr/RUVfgDzipTok9u41zlMcQi3NPzO0fvhT/?=
+ =?us-ascii?Q?IwSFWLR3bRjaYWLr2EAda6WB8ap2aDhTJKYEGyk3q48ut1uocMNAwXLEXkTE?=
+ =?us-ascii?Q?6H7C8fMF21EIfU5oKywlZxurYt1AEYEAP4HuXABkDzJ9DLySsonNLFtRwxXq?=
+ =?us-ascii?Q?ra+r1Bt9ttlHjHme3nc5lm7Wwt6aGW1J/w/nWsXCuSu00iolWexbCdMQLtAc?=
+ =?us-ascii?Q?FdWXIaHwMxEPM5fUrt1LGfmDDBnMA30NJ+i+OpBeoDaUamVyIos2CoO1i98r?=
+ =?us-ascii?Q?AINqsJZoT3BtLbvnVZ7KG5PTbWlzqPgWDftdSHLombESDdncafU4Pg6aXFrk?=
+ =?us-ascii?Q?BS3iB4nINI5RfJF08op8coWnmm0rVEeG04cZfRRBgm+PsmppLmbJkfJZYtzI?=
+ =?us-ascii?Q?L0fhm+sRGcPWrjuDP3Q78ThwvveDNlr8dLdayeL8NdkwZSdYnyYVKJcg40iD?=
+ =?us-ascii?Q?WRDzt9UtSMbrvslGPRpBVtdb4CeQ9Nntu8sktzqb2XcCfwEMHwgmvOzU8LYq?=
+ =?us-ascii?Q?KRF2RRvChUlBb8iiGGtiz5qe9oluh8cRG7Afge1tnQaVpZAnBuE0DYHLqf2Q?=
+ =?us-ascii?Q?EFNCur3wINEVVMkPebnTklcVfqSoo2joSPXkuT9OQ6v0yEcTxA=3D=3D?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(7416014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?TgB1rIaTvbAg1KxdipKrkj6GiDpRs8C7nWAYes3qpQG43/SuEHCqfVHjroSo?=
- =?us-ascii?Q?UMObHNo6J+EY1G2JH1s3T8pyPHd2oZSn0FQLPR7jra7uDptEcne2kvh2w6hk?=
- =?us-ascii?Q?x9qmiFX4c4opJoiHnpct7Cc7J70JhrjauU0/plG1SsAgKAbXorY+OcqToVpt?=
- =?us-ascii?Q?YPgIoKuau+egxBV9mUPUwfKPOIEJZ5BmhWCtkt4BDotOHBCHoj2R9AUCVB8Q?=
- =?us-ascii?Q?SaCqg2QQyKyIt3zHwHdUBBjdvDN5hKmqmkQWXGV5VXOjzga/9u+uYgIdrqHH?=
- =?us-ascii?Q?Fhuy50rg+JDjeP1pkzeW4Vek41k9Jyo+foub3MbUqVKWanhgFj7fgMe/G7W6?=
- =?us-ascii?Q?X/8MaWDmPXzTF9lkscnPp8sczBB5vev4JZrFJUmg2LDwkp1S9rCbrxYw2KuN?=
- =?us-ascii?Q?TSho4sYskHh0xGVVhCljs926zvi9smRgzrhMFKXl5FWYV6RurbGrYpaDc6OY?=
- =?us-ascii?Q?0A/JIWMwZC5lEPXZpcDknG1C5tQOpSCCxKKwm2zpasAU0GjqJI5E7PuDvvJu?=
- =?us-ascii?Q?s3zKQbUdyedE2o0MN9ET6602epzBkEUeFM4PsMHZJdvfx1Ib/8oOfGSFi/2b?=
- =?us-ascii?Q?XAYYubQa5zOzmzwii21zVUiY6HqrthTgHCJXlwmbT3T7yHG7sf5eLoX4FW4/?=
- =?us-ascii?Q?+lrg7rdyy1jjux/1DQw2KGsvK7cfttdAee9G1bGvUYgEHLw59hFCuMcy2eUV?=
- =?us-ascii?Q?ow5MNWwKFgtzsZgTQjHZmTGoP1F8nhAnbd1AKeGfotphqWAkTZGnpf4lVY42?=
- =?us-ascii?Q?DfPltTYM8qUt1YVL4zWBzcgtkfk4jZh8Nk21R5ykXttlqq1IX0NkCrsNFrkX?=
- =?us-ascii?Q?coIwwYdqoP0PvZH3R+gkG/rcr+w8xs+Msp3Ak/4pf8XdH0DQ/yWLvz76Ol//?=
- =?us-ascii?Q?D5Qz4nBIn36AsKwiW+WO2sx2w2IT1XFd7am5q145I0arYZMQi8EMatAqLJzd?=
- =?us-ascii?Q?6XArzXyfclXfG6GGHFAUf5UuHuAwdWyKEDuTW/39150894vrLjKAKDVBj4rQ?=
- =?us-ascii?Q?ZHRChq7CzvO49kLw5lmKo5Ap4k3XZf3yKxS8I1X8K66NZB+0i/JcjttqxreW?=
- =?us-ascii?Q?DMMZUinDWQPO/LWSlVqxOLp35+cmnrzGZesxQzStp9YpHhQNVubQYfUKa2OZ?=
- =?us-ascii?Q?+JYMxCfBCPgYAuJ4SctgMD251M9UElInDjekQcOaBxqabPuQQn6jzVPiuIBZ?=
- =?us-ascii?Q?4Q8RNpjLFQcUnNcrKpzQnHKdhw+7biz1vGStqIG1rUQI5+5lWcyeEA7C4D84?=
- =?us-ascii?Q?3+IXm8jDxcKGAbWVnE+Fy27zAc20H1AP8OntgSxabwiJBxPlun/hpiqPZkws?=
- =?us-ascii?Q?LEa4UaBVnF0uWRdGW+Xm20PTL5hGXrOClz+qSdFE7aU8YwZWL0uBGr484egW?=
- =?us-ascii?Q?zGeNJmyD9t/u1vKIcvOD8w4qraXGZvRzsyI7QwsOY3+m+sTgeBTynel7+z6Q?=
- =?us-ascii?Q?FXLI0Aiko0lGB2MDOx2IUGhwVT85XwhrW7Spd2cXfgaEytuWkvbetg5h3BWX?=
- =?us-ascii?Q?Gc4aaZBrDFA2oMeLmEFCC0ZLylC2y2kjwE/sZoEOEfbMQCyb5nhGvWaPIPCR?=
- =?us-ascii?Q?sngGQDdZJFBzSZDZ9hd1sfQX9UqIxQylVeMvy5z3Eb7GNdk4SNlaQQZd9r7v?=
- =?us-ascii?Q?GQ=3D=3D?=
+	=?us-ascii?Q?kKCbjCgtUp3/5wDdCGQEXeNywbG+uTf/tR72vUhl0v6e2v3eCL2GXChX3xni?=
+ =?us-ascii?Q?O2YM/BmcfuQRvJxx77gVYSh36Zg7dgmO4l3MXegMW7F/SSGtZfW87cDel9lA?=
+ =?us-ascii?Q?GUlfQA477emXgjZX/TfOvgkR0Z+uziIAIKXrTDvcmNj78Vyz2vTDVqW9pIpg?=
+ =?us-ascii?Q?oxwXwrQPwqif/fFgckV8nIfdDl01iDkQoD4qRrcO8mpyjkrgd5qjKd84FasP?=
+ =?us-ascii?Q?joNRcN5TLBR3rIyQaZLUL1CHeYu7yFff5PN6PvJN66fRbvEX0Ut9zHpdSyP6?=
+ =?us-ascii?Q?+VEN12rjlhqHsAqGIF/yoViMxAy1/bcRiYpV9afQNNOirFgPFDgldAQtKoJS?=
+ =?us-ascii?Q?vfhMK2yaEAtc6aUfZxUweNML4uk43bez4oggTpg0rm1KbUwKdCfLdoN/muqA?=
+ =?us-ascii?Q?vRD2/q5wdidUsHzNB9r2hb0CQGPrG2jHAXJPdhp3SsaU25cqYLwfAOhCtwpl?=
+ =?us-ascii?Q?FLaE+e/jGKW/GvKWh6Xgd4pgq+dGV4RqRAB00dpZBS3NtmjvQTgPV1luCY0O?=
+ =?us-ascii?Q?t4EPLzvX+7A5rGfPyn2HUN7hTYrGZLAoRkVH1Macc5o0GyE6Nx33lEk/ZBGC?=
+ =?us-ascii?Q?oX/1GDrAH5P8w5l6yYVfxkqEgIB/Rxi4jE0buWymjH+M6Bwqkx93WACjDrXw?=
+ =?us-ascii?Q?sfv66wKsRiwtVdZgWqsljcatgBXk2VqL3YMBGDijZywVfSesCo9muvj9PVdM?=
+ =?us-ascii?Q?720H8rSrLc/4BW4Wkdutk0P6iXUORHCVKO1nRs6+NK10VJWO6Vv/bd7mbMNJ?=
+ =?us-ascii?Q?8k0Tr27VmPL3c+yBPbWP6kE5jBJ1U/6dGi7SxcrzE9JW6y8QWbHwVbVYxpox?=
+ =?us-ascii?Q?FrwuOECQJxnhsh57n1pgh/D5gmLwmdg3Bz8g8RNJ+gWWWvWCDEfKwNTzXLox?=
+ =?us-ascii?Q?ho2x/lAgBX05zDmZgCPEardD87R0XaD5LyBrjq0eh+1l4lIr3MPbWz5ocXxV?=
+ =?us-ascii?Q?TxmLTMuC8XGnY+ZBmHI9HgicK5nxaCW1l3nNzG/DLb0RKo9VrRf16r6Y5Llj?=
+ =?us-ascii?Q?hzSAaTeSJQ0/p/1aTA3vwoZ1s2+7Wq1omR2/g7/yM/0XLNQJeOZEFkK8w2Ol?=
+ =?us-ascii?Q?wkR0pVJeV7b6xy4TyBBnemcx5HAXGcKz/YYC1ub8vMDWvcdpG2+QacJXssnW?=
+ =?us-ascii?Q?C4DUCNu7ZVEHtSxsJ/j4ZhmO1z5USkbKZMgaQkJFS3HLwrbHBRFHFP/VeivV?=
+ =?us-ascii?Q?mIuKgerIjrqASP+kQ9FfG+H9+ncumwypZvqeERSk5LuMpp9Af++2TqzLIoH9?=
+ =?us-ascii?Q?awru5XbuDG5SuLCZg1pTTJGufY7hkYiUGQiiBy4aqOYAkEehb44pbYMRdwLC?=
+ =?us-ascii?Q?F8Cm+hAUtL7YmG9SuTVUFAir4zr/FFVpgVKNVTXqVjew+88N65/+JmBBfnmC?=
+ =?us-ascii?Q?VN4vpujdU9jWTeVmInx3ROOzqPiapSAoBV/+0+5GeLJ9qKKZaSVEjCKumrlM?=
+ =?us-ascii?Q?Hy4QMbbFCtQB9YA0/A8d73NBUt3R0XACAJ5zqO1FoVVJWIbT6Q26ymvF0q0i?=
+ =?us-ascii?Q?5FUB1eDyhWBc+emxDEubU8OX/NZgnTISUxYo+DwFdQenCZfXo1Ti6JbhG/3X?=
+ =?us-ascii?Q?0iiGcETmF6inmLn0ExvGoZtizNJJDsu3AGcnFHUN33ufBseHJzxZQE2hJL6j?=
+ =?us-ascii?Q?3g=3D=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7deef44c-d956-46e5-deb0-08dcd408e9f1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1deb5022-b4e8-4512-bf17-08dcd408eaf2
 X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2024 15:29:53.5195
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2024 15:29:54.9020
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rEGs//RPpBJrvTo6bo7Uw79bddCFJ+oyyX6fKb9e9VoutGGs74HDR10V77wdJgbkPS9L1llnAn9sQldRvwfdAg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: M29167tPjEEa2YeE0tuUnYotwCTJSEAQ9PHAhPm07NqhaqE4+oRaltQhIvUzUE2Kf/knN65ZYsLEF3+gWqZpVg==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10859
 
-If the CPU bandwidth capacity permits, it may be useful to mirror the
-entire ingress of a user port to software.
+Debugging certain flows in the offloaded switch data path can be done by
+installing two tc-mirred filters for mirroring: one in the hardware data
+path, which copies the frames to the CPU, and one which takes the frame
+from there and mirrors it to a virtual interface like a dummy device,
+where it can be seen with tcpdump.
 
-This is in fact possible to express even if there is no net_device
-representation for the CPU port. In fact, that representation wouldn't
-have even helped.
+The effect of having 2 filters run on the same packet can be obtained by
+default using tc, by not specifying either the 'skip_sw' or 'skip_hw'
+keywords.
 
-The idea behind implementing this is that currently, we refuse to
-offload any mirroring towards a non-DSA target net_device. But if we
-acknowledge the fact that to reach any foreign net_device, the switch
-must send the packet to the CPU anyway, then we can simply offload just
-that part, and let the software do the rest.
+Instead of refusing to offload mirroring/redirecting packets towards
+interfaces that aren't switch ports, just treat every other destination
+for what it is: something that is handled in software, behind the CPU
+port.
 
-Example:
+Usage:
 
 $ ip link add dummy0 type dummy; ip link set dummy0 up
 $ tc qdisc add dev swp0 clsact
-$ tc filter add dev swp0 ingress matchall action mirred ingress mirror dev dummy0
+$ tc filter add dev swp0 ingress protocol ip flower action mirred ingress mirror dev dummy0
 
 Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 ---
- net/dsa/user.c | 31 +++++++++++++++++++++++++------
- 1 file changed, 25 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/mscc/ocelot_flower.c | 58 ++++++++++++++++++-----
+ 1 file changed, 46 insertions(+), 12 deletions(-)
 
-diff --git a/net/dsa/user.c b/net/dsa/user.c
-index c8ddbe22d647..bd3e3944931e 100644
---- a/net/dsa/user.c
-+++ b/net/dsa/user.c
-@@ -1365,7 +1365,7 @@ dsa_user_mall_tc_entry_find(struct net_device *dev, unsigned long cookie)
- static int
- dsa_user_add_cls_matchall_mirred(struct net_device *dev,
- 				 struct tc_cls_matchall_offload *cls,
--				 bool ingress)
-+				 bool ingress, bool ingress_target)
- {
- 	struct netlink_ext_ack *extack = cls->common.extack;
- 	struct dsa_port *dp = dsa_user_to_port(dev);
-@@ -1398,10 +1398,25 @@ dsa_user_add_cls_matchall_mirred(struct net_device *dev,
- 	if (!act->dev)
- 		return -EINVAL;
+diff --git a/drivers/net/ethernet/mscc/ocelot_flower.c b/drivers/net/ethernet/mscc/ocelot_flower.c
+index a057ec3dab97..d03a7e636290 100644
+--- a/drivers/net/ethernet/mscc/ocelot_flower.c
++++ b/drivers/net/ethernet/mscc/ocelot_flower.c
+@@ -228,6 +228,36 @@ ocelot_flower_parse_egress_vlan_modify(struct ocelot_vcap_filter *filter,
+ 	return 0;
+ }
  
--	if (!dsa_user_dev_check(act->dev))
--		return -EOPNOTSUPP;
--
--	to_dp = dsa_user_to_port(act->dev);
-+	if (dsa_user_dev_check(act->dev)) {
-+		if (ingress_target) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Cannot mirror to ingress of target port");
++static int
++ocelot_flower_parse_egress_port(struct ocelot *ocelot, struct flow_cls_offload *f,
++				const struct flow_action_entry *a, bool mirror,
++				struct netlink_ext_ack *extack)
++{
++	const char *act_string = mirror ? "mirror" : "redirect";
++	int egress_port = ocelot->ops->netdev_to_port(a->dev);
++	enum flow_action_id offloadable_act_id;
++
++	offloadable_act_id = mirror ? FLOW_ACTION_MIRRED : FLOW_ACTION_REDIRECT;
++
++	/* Mirroring towards foreign interfaces is handled in software */
++	if (egress_port < 0) {
++		if (f->skip_sw) {
++			NL_SET_ERR_MSG_FMT_MOD(extack,
++					       "Can only %s to CPU if filter also runs in software",
++					       act_string);
 +			return -EOPNOTSUPP;
 +		}
-+		to_dp = dsa_user_to_port(act->dev);
-+	} else {
-+		/* Handle mirroring to foreign target ports as a mirror towards
-+		 * the CPU. The software tc rule will take the packets from
-+		 * there.
-+		 */
-+		if (cls->skip_sw) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Can only mirred to CPU if filter also runs in software");
-+			return -EOPNOTSUPP;
-+		}
-+		to_dp = dp->cpu_dp;
++		egress_port = ocelot->num_phys_ports;
++	} else if (a->id != offloadable_act_id) {
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "Can %s only to egress of ocelot port",
++				       act_string);
++		return -EOPNOTSUPP;
 +	}
- 
- 	if (dp->ds != to_dp->ds) {
- 		NL_SET_ERR_MSG_MOD(extack,
-@@ -1506,7 +1521,11 @@ static int dsa_user_add_cls_matchall(struct net_device *dev,
- 
- 	switch (action->entries[0].id) {
- 	case FLOW_ACTION_MIRRED:
--		return dsa_user_add_cls_matchall_mirred(dev, cls, ingress);
-+		return dsa_user_add_cls_matchall_mirred(dev, cls, ingress,
-+							false);
-+	case FLOW_ACTION_MIRRED_INGRESS:
-+		return dsa_user_add_cls_matchall_mirred(dev, cls, ingress,
-+							true);
- 	case FLOW_ACTION_POLICE:
- 		return dsa_user_add_cls_matchall_police(dev, cls, ingress);
- 	default:
++
++	return egress_port;
++}
++
+ static int ocelot_flower_parse_action(struct ocelot *ocelot, int port,
+ 				      bool ingress, struct flow_cls_offload *f,
+ 				      struct ocelot_vcap_filter *filter)
+@@ -356,6 +386,7 @@ static int ocelot_flower_parse_action(struct ocelot *ocelot, int port,
+ 			filter->type = OCELOT_VCAP_FILTER_OFFLOAD;
+ 			break;
+ 		case FLOW_ACTION_REDIRECT:
++		case FLOW_ACTION_REDIRECT_INGRESS:
+ 			if (filter->block_id != VCAP_IS2) {
+ 				NL_SET_ERR_MSG_MOD(extack,
+ 						   "Redirect action can only be offloaded to VCAP IS2");
+@@ -366,17 +397,19 @@ static int ocelot_flower_parse_action(struct ocelot *ocelot, int port,
+ 						   "Last action must be GOTO");
+ 				return -EOPNOTSUPP;
+ 			}
+-			egress_port = ocelot->ops->netdev_to_port(a->dev);
+-			if (egress_port < 0) {
+-				NL_SET_ERR_MSG_MOD(extack,
+-						   "Destination not an ocelot port");
+-				return -EOPNOTSUPP;
+-			}
++
++			egress_port = ocelot_flower_parse_egress_port(ocelot, f,
++								      a, false,
++								      extack);
++			if (egress_port < 0)
++				return egress_port;
++
+ 			filter->action.mask_mode = OCELOT_MASK_MODE_REDIRECT;
+ 			filter->action.port_mask = BIT(egress_port);
+ 			filter->type = OCELOT_VCAP_FILTER_OFFLOAD;
+ 			break;
+ 		case FLOW_ACTION_MIRRED:
++		case FLOW_ACTION_MIRRED_INGRESS:
+ 			if (filter->block_id != VCAP_IS2) {
+ 				NL_SET_ERR_MSG_MOD(extack,
+ 						   "Mirror action can only be offloaded to VCAP IS2");
+@@ -387,12 +420,13 @@ static int ocelot_flower_parse_action(struct ocelot *ocelot, int port,
+ 						   "Last action must be GOTO");
+ 				return -EOPNOTSUPP;
+ 			}
+-			egress_port = ocelot->ops->netdev_to_port(a->dev);
+-			if (egress_port < 0) {
+-				NL_SET_ERR_MSG_MOD(extack,
+-						   "Destination not an ocelot port");
+-				return -EOPNOTSUPP;
+-			}
++
++			egress_port = ocelot_flower_parse_egress_port(ocelot, f,
++								      a, true,
++								      extack);
++			if (egress_port < 0)
++				return egress_port;
++
+ 			filter->egress_port.value = egress_port;
+ 			filter->action.mirror_ena = true;
+ 			filter->type = OCELOT_VCAP_FILTER_OFFLOAD;
 -- 
 2.34.1
 
