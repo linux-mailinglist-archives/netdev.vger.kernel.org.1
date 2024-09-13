@@ -1,145 +1,104 @@
-Return-Path: <netdev+bounces-128077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E603977DDE
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 12:41:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F34977DE7
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 12:46:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2801B22C6C
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:41:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A2151F25822
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45B591D6C6C;
-	Fri, 13 Sep 2024 10:41:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF9771D7E59;
+	Fri, 13 Sep 2024 10:46:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="XyxoIQDE"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RckU/D8L";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JaR8+4ix"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 186701B9826;
-	Fri, 13 Sep 2024 10:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F8891D7E39;
+	Fri, 13 Sep 2024 10:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726224107; cv=none; b=tzqnljHX9RUjktaO8VpXWjnf+LDlJPo9H4kfY0DeUxPf7j/hbjrpcxCWLR5yW6XFP5KMAWtQVYUmTJGWlliDcQJ1Gyg4DUgMhrcjARrvh3H+J5NqmAWYrtj16AdVpdczoLvlxuf3QNhJwfYJbl7TXEbPij++LkxpOPkDYlRowFo=
+	t=1726224391; cv=none; b=Rsh6LszN4miBwG+0AC5bqqUNS3hMgYqNiyvRhVK5wypRHgII02OOdxU5hfdsgDyMmKOPzyh4ExY5rU2CN82DMl/p9cy01XoTEeKEIeyGydCDuynAcZw0XMaNbB63odzyYJ8ltGUJ+ANzhwHMIpv++O66rOmCn1MfB8wU3lq6quA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726224107; c=relaxed/simple;
-	bh=JICNTVqX1nbtOb/rRWVWNUiKb0VIP6ogub7x0oZyFeM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sbz3n+j32br+qpLbXrp+ccDQt2wlXIkx/HVH9wH9nF1S0A18OAqhMJ1eQ1cSoGEmbqyidU2aCdGQj3ugVSgnJMDLP36jvJvIkzzOe1bK2AfXKdlT6xYV37fhWwulvWyUS07fSFmwt/NxTVh4bxBXXbeyjWubqu2i80JSZFKz6WU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=XyxoIQDE; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1726224100;
-	bh=KqjBufrxC1T+9UNimGFrPXe7rI3jiWjqihf9xX0aIeg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XyxoIQDErSA1qKR62zcOAPzg2joowjqZfj8xhd1SPLWne9anPPVLrnPsDtdLjyoNn
-	 mDBKHofLzOlr+o4Yv0XXu42U9nlvcGc7VPrEQOCeYvtRMqGiqpWGkEyMbt7BSV0oYo
-	 qJedo1H2i9/RxPhw6Ztz+KT519n6LmAMgFDLzp1CmnODXfXswnnwzZDI00nB+GnQm1
-	 n0wlbV8LMRnAy9heSAeCDSvY6qymWPXzCBx5naFxQWj2o4Lhxru0H/VPgvQBx0+LA9
-	 O6cu0X31e1nCzU/gocznUcF+tuswkBy3NU+BX8vfHL/y2U0uXUOXSy6+5jMz1/sQQK
-	 n1H41yt0vrHyw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X4rTH3Yq1z4xD7;
-	Fri, 13 Sep 2024 20:41:39 +1000 (AEST)
-Date: Fri, 13 Sep 2024 20:41:38 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Mina Almasry <almasrymina@google.com>, Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>
-Subject: Re: linux-next: build failure after merge of the net-next tree
-Message-ID: <20240913204138.7cdb762c@canb.auug.org.au>
-In-Reply-To: <20240912200543.2d5ff757@kernel.org>
-References: <20240913125302.0a06b4c7@canb.auug.org.au>
-	<20240912200543.2d5ff757@kernel.org>
+	s=arc-20240116; t=1726224391; c=relaxed/simple;
+	bh=KCWk/dnVPJwIbDkehd9oHsFwt8PrYfUPofvCbjHB2G0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=E0GQ+x51Ua+a6X9s/s6jT7Nssxt64EVvVprgyWHaQLlfwOveub9k5bBa35AvgixVMYungj1oSldSib1N/MFKurWGLCp0jcl9PG+zKEBl0ne8ksjwx4awfyZrOIwjv0eivwuvZt/yxT6DIQdkjXle4igqTEFQRYfMp6Sr+2lx6Zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RckU/D8L; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JaR8+4ix; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1726224388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BnsRMqXCsoNSxev+bzoyLtV5/e+uievz8pnFWnbeXXU=;
+	b=RckU/D8LtemwgfefZNK5f3PvEUsmbnsCEktJoUmFDsViCepWwZ56LLJY+99843OpLnX47U
+	WSnPZ3FX++x1FeY+V7jCSbVrEPOm3PEGN4FZZ2xPDhDjiPLu1fqWEf5rgDNASTQe3+v7Mz
+	MaNebGhBoOGFp9V3OqvrLioyFsn81dGxQn0RyfTutdKlPkJ/8oZuKbNLQaiAe2S0dG2xd8
+	xho197EemNvBl2RXxTwS2KXC1QiVksEsJhpAmie+m3ecj7mhHmUKD9TBMu1H4dEtL+N22F
+	R/KApj//MRmg+e3wdZNWuXYQ+fzkQFgh0LYi5PrgdAmsd49DbQljsYQIn9mbTA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1726224388;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BnsRMqXCsoNSxev+bzoyLtV5/e+uievz8pnFWnbeXXU=;
+	b=JaR8+4ixFirPagxehqLX8jzIZ+iLxSrrJtSdtxmc/fAQ4ZLTYv8Z6fx32DjesY/CkTBjFj
+	toFF1MlSfVy5dXDw==
+To: Jinjie Ruan <ruanjinjie@huawei.com>, Richard Cochran
+ <richardcochran@gmail.com>
+Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, anna-maria@linutronix.de,
+ frederic@kernel.org, UNGLinuxDriver@microchip.com, mbenes@suse.cz,
+ jstultz@google.com, andrew@lunn.ch, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next v3 1/2] posix-timers: Check timespec64 before call
+ clock_set()
+In-Reply-To: <46efd1be-688e-ecd0-a9e1-cf5f69d0110f@huawei.com>
+References: <20240909074124.964907-1-ruanjinjie@huawei.com>
+ <20240909074124.964907-2-ruanjinjie@huawei.com>
+ <Zt8SFUpFp7JDkNbM@hoboy.vegasvil.org>
+ <ea351ea0-5095-d7ae-5592-ec3bd45c771c@huawei.com> <874j6l9ixk.ffs@tglx>
+ <46efd1be-688e-ecd0-a9e1-cf5f69d0110f@huawei.com>
+Date: Fri, 13 Sep 2024 12:46:28 +0200
+Message-ID: <87v7yz96gr.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/OqNqPcdJGXr8HswA1u3OcDh";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain
 
---Sig_/OqNqPcdJGXr8HswA1u3OcDh
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
-
-Hi Jakub,
-
-On Thu, 12 Sep 2024 20:05:43 -0700 Jakub Kicinski <kuba@kernel.org> wrote:
+On Thu, Sep 12 2024 at 20:24, Jinjie Ruan wrote:
+> On 2024/9/12 20:04, Thomas Gleixner wrote:
+>> How does this code validate timespecs for clock_settime(clockid) where
+>> clockid != CLOCK_REALTIME?
 >
-> On Fri, 13 Sep 2024 12:53:02 +1000 Stephen Rothwell wrote:
-> > /home/sfr/next/tmp/ccuSzwiR.s: Assembler messages:
-> > /home/sfr/next/tmp/ccuSzwiR.s:2579: Error: operand out of domain (39 is=
- not a multiple of 4)
-> > make[5]: *** [/home/sfr/next/next/scripts/Makefile.build:229: net/core/=
-page_pool.o] Error 1 =20
->=20
-> Ugh, bad times for networking, I just "fixed" the HSR one a few hours
-> ago. Any idea what line of code this is? I'm dusting off my powerpc
-> build but the error is somewhat enigmatic.
+> According to the man manual of clock_settime(), the other clockids are
+> not settable.
+>
+> And in Linux kernel code, except for CLOCK_REALTIME which is defined in
+> posix_clocks array, the clock_set() hooks are not defined and will
+> return -EINVAL in SYSCALL_DEFINE2(clock_settime), so the check is not
+> necessary.
 
-I have bisected it (just using the net-next tree) to commit
+You clearly understand the code you are modifying:
 
-8ab79ed50cf10f338465c296012500de1081646f is the first bad commit
-commit 8ab79ed50cf10f338465c296012500de1081646f
-Author: Mina Almasry <almasrymina@google.com>
-Date:   Tue Sep 10 17:14:49 2024 +0000
+const struct k_clock clock_posix_dynamic = {
+	.clock_getres           = pc_clock_getres,
+        .clock_set              = pc_clock_settime, 
 
-    page_pool: devmem support
-   =20
+which is what PTP clocks use and that's what this is about, no?
 
-And it may be pointing at arch/powerpc/include/asm/atomic.h line 200
-which is this:
+Thanks,
 
-static __inline__ s64 arch_atomic64_read(const atomic64_t *v)
-{
-        s64 t;
-
-        /* -mprefixed can generate offsets beyond range, fall back hack */
-        if (IS_ENABLED(CONFIG_PPC_KERNEL_PREFIXED))
-                __asm__ __volatile__("ld %0,0(%1)" : "=3Dr"(t) : "b"(&v->co=
-unter))
-;
-        else
-                __asm__ __volatile__("ld%U1%X1 %0,%1" : "=3Dr"(t) : "m<>"(v=
-->counter));
-
-        return t;
-}
-
-The second "asm" above (CONFIG_PPC_KERNEL_PREFIXED is not set).  I am
-guessing by searching for "39" in net/core/page_pool.s
-
-This is maybe called from page_pool_unref_netmem()
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/OqNqPcdJGXr8HswA1u3OcDh
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbkFuIACgkQAVBC80lX
-0GzYvwf+My4BrCjgWnAkd9yuW9q9y0XFB9nX8bAWXutRCiTw22e2MPif0yBJptC+
-6mFCLLQUcov4q6REPXui/S6HfFoVSnc4Brl7FK002mDBjkZDRG+/JY9o+NBLECP9
-gfZLmb4gvvcPtWM9i43hI1LG0xL/vFPri3jsRLwnbzMjwDd9QuzL4GVKGZXbSO5C
-bzJGd3+jzVfMYpMSIcSxYmHR1gDr2fuSJObVoDk7hx9bW7RlgKM0tdg2s7qx+pDs
-DSdELdrDXxgAyArQBLUdzkLok1HNpMaqXqinY+jhPlzc1B8FL3T1eyiUrz1FLp4K
-gkIxUT3Wnq93H6SNB1uFO4CMXStdDQ==
-=3Adj
------END PGP SIGNATURE-----
-
---Sig_/OqNqPcdJGXr8HswA1u3OcDh--
+        tglx
 
