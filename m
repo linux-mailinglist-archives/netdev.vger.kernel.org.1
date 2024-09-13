@@ -1,99 +1,124 @@
-Return-Path: <netdev+bounces-128071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128072-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 538D7977CD7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 12:04:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EBAD977CE0
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 12:05:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C2311C22024
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:04:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7911E1C2475B
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:05:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167361D88A4;
-	Fri, 13 Sep 2024 10:03:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26C21D7E55;
+	Fri, 13 Sep 2024 10:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fRqlPiDN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B7B1D86F4
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 10:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31331BF80A;
+	Fri, 13 Sep 2024 10:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726221805; cv=none; b=kN45JohHzkBckv66dfopn6/JRA4UysMQ1MOjUw4EWF1JUb2KpgFbME3CsKgjw7P5YLg4I4Bj10lFvGrEbrpdesg5d36IN70PPuIP2PCKNgJnSSFUcIA7uVu9OrBMu/VG/wIBMKoiUb+twhJiJa1SBR8qLn8YDCVSDFmRACEOJG4=
+	t=1726221922; cv=none; b=HjazE0zYUqpjF+fKxeJVVzEpupk/tQ6eB3udlL0hNB6ZQ+R+kOWx/UEkWqghG0xb7ZKG+Rnf/fKFgu32N7yssYHJ+LIiDxwsGpY7TFKkQS9sZ7W0+95dixdnUllok6Qkrz/KTkItqQI08sXsVmzWK4s4aSv5BTEYRXj3kMKTiGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726221805; c=relaxed/simple;
-	bh=FbUmRP2XHGZQhiOCWtw7JE6mpsESXDH4ur8n7VuSaiY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=u8L1v+kxWUFYJYx44u5yEWnPdfbP83hHjntXLCJLf2kAtoM/RY0vSIusOBxFk+73+O7RdTy7OhYZjFDWp2BW5y2bOYIiP0tOxRDcroZCcxpJobo5Cy4BsylpoC2hSI2QVPoaC/Dct7s3q33F8H6HNQ5xN2hLi/Z0Hw/kuUKyxAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39f4e119c57so18600395ab.2
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 03:03:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726221802; x=1726826602;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EMSeyNmo4I5UKIr27ZSFVFOvJj/3uCTuGvzRA3OhzIM=;
-        b=AljVAACUw4wqKRZIaVVe9c8p0pWHo4paGOVb3T5G1535LjysY8/opnVNbM1vb6HblA
-         JLMb7x3TYnBU5dvmL7PyZixeAgQta8lQOrM08R0TDjxqXDCDNsdyW6xkUlgva+gen1DE
-         9zKZSrLQLmxuHsBcIMSlmvUyNgG0almGv5260JVOyo7MYf94vqNTjiw1XKvtu8Cdhlen
-         6mjTj9LkwmeI+9xcG4iepQm4q61uaVD+wE5fayFtRUHiYGfG0LxKVVwltTLPb/PzeVMO
-         SFDOOMnUlaf34yTthazm1k+fo5g36aREgGSGN+aXjBhHYDSSaGWEVSRB1as0YOeeVqjW
-         Kb/w==
-X-Forwarded-Encrypted: i=1; AJvYcCV1h8ZLpzIffUAJo0I0ditokASZSc0Z32MItf67BFIK8z81PWVoaqVqN+0Wjqtju1l4no0PGBg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxk2Y4+IrAS9LBfIJw6PqR2UAOIJx+opaUAS3dv84r76MxOP43h
-	54JWqIhx8Dxdv2MghFbBAp8NrzhQJtWsl3iP7gSqV8xdju1yYdvRUfm/h6zsvfNKIRSc9FEkY0I
-	ZvVVhuSS3lZVTSa4KVr1Z0iDr9FiOxF+rAs1midAV6CtEr4QSjQiBJeE=
-X-Google-Smtp-Source: AGHT+IGUtAV7wYUEQOtWKgLLetpmFJnkMxMiloBQa0eQtht2JsrKsSBTlQgqXwlD1EtBNmyF24ElD7niM2jw2fYU953TyI4tkOdx
+	s=arc-20240116; t=1726221922; c=relaxed/simple;
+	bh=bh/PlsZrGxdwL3qvcu5bFhI/khkna86n9sWvpxziZH8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=llXXQGJJXDazRqLeyRxOFyInqoixobQ+24es97or9z/PQlCxquIOTuGUnq/mYA2WdoOk/4JqT2CVkKNakGwKw8P2F+i1QjshCAINBGZN6avTxBUyYl5paEkvdJqfyHp1fBKezmECdl14MxW4LyTQVl+EuOd3LG2pnYC71qziF1M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fRqlPiDN; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D9C8A1C0009;
+	Fri, 13 Sep 2024 10:05:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1726221918;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=sb8OmTvdd+dIsC9dyf2pocv8PVncITqBRJUMunpw6gw=;
+	b=fRqlPiDNyGAeKYA0J99L2csaRyTf9rsykL2gUTFW3WA7eGha7aGdXfTFQ9Drlg4p+4LB+7
+	YVF9w2pXzk1i1RlAdH566a3RQmcXsH51k/Nh0F3L5DJS/PPEWzln+tamotbPCrO9VgqNsO
+	FQraR/7rSsCXteVM6AntmjxZWXsmQUv5310EFBwOh4+mhS9dAwNP9Xjd8AyiNVn5T9+Chg
+	Wt0hW8q/0XKh+bUUXd/f3jD5dIw3qMM2wla2P7OqwWy57WmQWsy05fByUkPM8/OdulTiTG
+	EDeZFXcasB4slkj8CFPZhL0DWAyDdwhqBOQcu8ta7twYg0tSTymJ3kEpL16VLQ==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
+	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
+	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	mwojtas@chromium.org,
+	Nathan Chancellor <nathan@kernel.org>,
+	Antoine Tenart <atenart@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
+Subject: [PATCH net-next] net: ethtool: phy: Don't set the context dev pointer for unfiltered DUMP
+Date: Fri, 13 Sep 2024 12:05:14 +0200
+Message-ID: <20240913100515.167341-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d1a:b0:3a0:4bd1:c1ba with SMTP id
- e9e14a558f8ab-3a084924382mr47735975ab.16.1726221802575; Fri, 13 Sep 2024
- 03:03:22 -0700 (PDT)
-Date: Fri, 13 Sep 2024 03:03:22 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000058a7dd0621fd5528@google.com>
-Subject: [syzbot] Monthly hams report (Sep 2024)
-From: syzbot <syzbot+listd30be793d42f6338da3b@syzkaller.appspotmail.com>
-To: linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello hams maintainers/developers,
+The context info allows continuing DUMP requests, shall they fill the
+netlink buffer.
 
-This is a 31-day syzbot report for the hams subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/hams
+In the case of filtered DUMP requests, a reference on the netdev is
+grabbed in the .start() callback and release in .done().
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 6 issues are still open and 35 have been fixed so far.
+Unfiltered DUMP request don't need the dev pointer to be set in the context
+info, doing so will trigger an unwanted netdev_put() in .done().
 
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 687     Yes   WARNING: refcount bug in ax25_release (3)
-                  https://syzkaller.appspot.com/bug?extid=33841dc6aa3e1d86b78a
-<2> 312     Yes   KMSAN: uninit-value in ax25cmp (3)
-                  https://syzkaller.appspot.com/bug?extid=74161d266475935e9c5d
-<3> 18      Yes   KMSAN: uninit-value in nr_route_frame
-                  https://syzkaller.appspot.com/bug?extid=f770ce3566e60e5573ac
-
+Reported-by: syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/netdev/000000000000d3bf150621d361a7@google.com/
+Fixes: 17194be4c8e1 ("net: ethtool: Introduce a command to list PHYs on an interface")
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+This patch fixes a commit that still lives in net-next.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+ net/ethtool/phy.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+diff --git a/net/ethtool/phy.c b/net/ethtool/phy.c
+index 4ef7c6e32d10..ed8f690f6bac 100644
+--- a/net/ethtool/phy.c
++++ b/net/ethtool/phy.c
+@@ -251,8 +251,6 @@ static int ethnl_phy_dump_one_dev(struct sk_buff *skb, struct net_device *dev,
+ 	int ret = 0;
+ 	void *ehdr;
+ 
+-	pri->base.dev = dev;
+-
+ 	if (!dev->link_topo)
+ 		return 0;
+ 
+-- 
+2.46.0
 
-You may send multiple commands in a single email message.
 
