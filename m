@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-128143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2845897845D
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:18:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE129978460
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:18:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38020B21F6A
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 15:18:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F0B61F262BA
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 15:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC40619F402;
-	Fri, 13 Sep 2024 15:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D7451A707D;
+	Fri, 13 Sep 2024 15:09:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85441940B1
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 15:09:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E61357CBA
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 15:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726240161; cv=none; b=vDM11r+7KnaPJC1m1lRnzOri0QJQYNk5S7AtchkhWfw3a075eAl1ssyzYsifc6KIUV6XmhTYxYti8YUPW2GAVWdwrxfZVpXNzRhygEeOd+a4/ps7i5rbc7JynExBZ8SxelbUtE6NPhyqnrGUTEbzIXDtGIBbBCA9vJQHxikechU=
+	t=1726240162; cv=none; b=A+Duko9A2rJm0LXsdaAG0JXGaS/ixA/EnwGelLa5SV7DFIe45lt/jtyacqD8MgXTKK5E+nPd0kdyZu+/maZNvAJ/CteFLNg4P64H1eG1MviT7W4z6yLtnQDwMX4QDGh4jt7DWqiE+BuZOKMp5JUIeTI9MQpLzLVXKOk1SRzKxnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726240161; c=relaxed/simple;
-	bh=SkvKwuPo7UxOmrDrzH7qaSZXVrlBq3i98F02AMtVG8I=;
+	s=arc-20240116; t=1726240162; c=relaxed/simple;
+	bh=thMplTqGsVoAKQjqdpX+ivt5zp8lr0k4I0E/jip2AYU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GeySjy2iVrhX5Qhf8teNm/DFORs61+9B0nnL1YJ7alnC6G0LO594wuA6s8WhESEE7ne2SM/O/4UT5C0HSB2cn1Lkf6+lKM2fSc+ucsx9L6Z/KRk8yYyGIa64cL3mp8HDwpYprXbqKfrUAGzygFMOBjKKb32FQQStIsmvUrgoeQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.169
+	 MIME-Version; b=S88R/YIMeaRmTLxkV1HFLejVJ6/eCc22OXvzRIXwX0fcqgZkKmgAJCIDDlGiQQkEJdOwfnnfyx5OWXFgt/dyahHe/PJV0XqEBY1W0ksrpNckftC8orTz9t6xAL3SenzLY1JdVfWlONPjSbXg2XhrWKB7GXOlmKx0/YV/3br9ckI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-718816be6cbso1810066b3a.1
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 08:09:19 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20573eb852aso22403595ad.1
+        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 08:09:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726240159; x=1726844959;
+        d=1e100.net; s=20230601; t=1726240160; x=1726844960;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Pm2lrSuufGMlKVGzBX5HFp3PItCIiPEtXPG9Wd2GwOo=;
-        b=Qg7ZwbSylMGkjAKe7wtEBXFoOGVgdMouGcaDd7JY1pWBiTJwk8PFJZnA9RjE4ThXkg
-         pebXbkHaqOWTeVMah5n0hR8jFHr5SFA9adOC/rGXOoMjGzVxMqykEm+03deSU7d36Ls9
-         JfJVyk5WD5e7WvjFsKaOnWVNQ0rG4sjNI+6oPyAnM09mA38q7Z5HcoUtzp3ghhtgrcET
-         52A4sTul0CebXJ/WZMsEcuK+UIWDxfwzKDEZJ0yQd6dppdpdWU6VpHmZd7hyi67KE44Z
-         nsEX1ou955LPl4HeGXRx1Gd9Ue6ZBEQR+eTJfmwXpvOtkPy7eldlQWn3N7K1wvOCJ5ty
-         n1xA==
-X-Gm-Message-State: AOJu0YxN5kWQdMk/JIQj184pi5W8T/x0LoBKcCSQISh7GYObmhXobS+I
-	eZLkEX9eX2LtrTztJ+2ShrMNNIiz2EtR/SiItNl1C7Nw+lM6E3iq7o9c
-X-Google-Smtp-Source: AGHT+IGs6xAlSg+koXxhtL87EXdX3TkjxUFKlDpjZX8x4PTDNnJMuNVwnIvt00JqhNPO1MfYm0mDcQ==
-X-Received: by 2002:a05:6a00:b83:b0:70b:a46:7db7 with SMTP id d2e1a72fcca58-719260962c0mr9703018b3a.16.1726240158771;
-        Fri, 13 Sep 2024 08:09:18 -0700 (PDT)
+        bh=snrfTNjrCzwTsZeODG3Q86ZYElMWnO3LXsHzUKno/38=;
+        b=L2RzS6NhkYaUXnXKZW0RgC1tMkc4JnnbAvtDyJFUdlqtVhAfRJCPnT+joEJskBStZQ
+         57eA9b3LhzAiho/xTgWnVdXZ0spZPNCbHUBBEDe2YiWYrlA2ku2+3gsop4/sPx6NWlwm
+         Wo8sta3GO57bb/fh+Led4gKpzheW3n0Y8hHUbJdWezNkuirwHgldwhvPF0x6gZKfca0+
+         ua2xr2zLvt5yWHbh+WuEg6OWQB7adsl3sF04d6lXIRZsHzOh64cy+6VmWxtXPgvpPX9t
+         G2WOV4NT4l6452MYw9A+FhY2jwt8NQ7li6Uo1LymopfJ4vBo3KOH6ECQqKZcRCnKovAa
+         6vtA==
+X-Gm-Message-State: AOJu0YycU5S490OCe4pYjs7orutaqJaVYo7inTG3Jq6MwVCyoetaEyNY
+	1pYxaWlWnmLsWinBw1wzN4dj/dHAo9To/jL8kzwR93Oeiuj+RQsKaifH
+X-Google-Smtp-Source: AGHT+IE7QOSdlHjULOBOI83xfaemrriY7xbxfdlyhAQ4bMaKhnfh7ZDRrWK/bh4OzAjdWPSODRa04g==
+X-Received: by 2002:a17:902:e884:b0:205:8a8b:bd2a with SMTP id d9443c01a7336-2074c6df0bemr185612255ad.22.1726240160113;
+        Fri, 13 Sep 2024 08:09:20 -0700 (PDT)
 Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fbb527csm3523941a12.27.2024.09.13.08.09.18
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2076afdd00esm29051635ad.130.2024.09.13.08.09.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2024 08:09:18 -0700 (PDT)
+        Fri, 13 Sep 2024 08:09:19 -0700 (PDT)
 From: Stanislav Fomichev <sdf@fomichev.me>
 To: netdev@vger.kernel.org
 Cc: davem@davemloft.net,
@@ -59,9 +59,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	Mina Almasry <almasrymina@google.com>
-Subject: [RFC PATCH net-next v1 2/4] selftests: ncdevmem: Implement client side
-Date: Fri, 13 Sep 2024 08:09:11 -0700
-Message-ID: <20240913150913.1280238-3-sdf@fomichev.me>
+Subject: [RFC PATCH net-next v1 3/4] selftests: ncdevmem: Implement loopback mode
+Date: Fri, 13 Sep 2024 08:09:12 -0700
+Message-ID: <20240913150913.1280238-4-sdf@fomichev.me>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240913150913.1280238-1-sdf@fomichev.me>
 References: <20240913150913.1280238-1-sdf@fomichev.me>
@@ -73,270 +73,254 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The offset and size are passed via iov_base and iov_len. The dmabuf
-is passed via SCM_DEVMEM_DMABUF cmsg.
+In loopback mode, start both client and server on
+the same IP and share dmabuf. The kernel will forward
+the packets back to the receiving socket. Note that in
+this mode, the server doesn't exercise bind-rx and
+flow steering. Driver's TX and RX paths are also bypassed.
+IOW, we are testing only UAPI and TCP stack.
+
+Running with the following:
+  dev=eth0
+  addr=192.168.1.4
+
+  ip addr add $addr dev $dev
+  ip link set $dev up
+  ret=$(echo -e "hello\nworld" | ./tools/testing/selftests/drivers/net/ncdevmem -L -f $dev -s ::ffff:$addr -p 5201)
+  echo "[$ret]"
+
+  want=$(echo -e "hello\nworld")
+  if [ "$ret" != "$want" ]; then
+          echo "FAIL!"
+          exit 1
+  fi
+
+Outputs:
+  using queues 0..1
+  binding to address ::ffff:192.168.1.4:5201
+  Waiting or connection on ::ffff:192.168.1.4:5201
+  got tx dmabuf id=1
+  Connect to ::ffff:192.168.1.4 5201 (via eth0)
+  Got connection from ::ffff:192.168.1.4:54040
+  DEBUG: read line_size=6
+  DEBUG: sendmsg_ret=6
+  recvmsg ret=6
+  received frag_page=0, in_page_offset=0, frag_offset=0, frag_size=6, token=1, total_received=6, dmabuf_id=1
+  total_received=6
+  tx complete [0,0]
+  DEBUG: read line_size=6
+  DEBUG: sendmsg_ret=6
+  recvmsg ret=6
+  received frag_page=0, in_page_offset=6, frag_offset=6, frag_size=6, token=1, total_received=12, dmabuf_id=1
+  total_received=12
+  tx complete [1,1]
+  ncdevmem: tx ok
+  recvmsg ret=0
+  client exited
+  ncdevmem: ok
+  page_aligned_frags=0, non_page_aligned_frags=2
+  [hello
+  world]
 
 Cc: Mina Almasry <almasrymina@google.com>
 Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 ---
- .../testing/selftests/drivers/net/ncdevmem.c  | 212 +++++++++++++++++-
- 1 file changed, 210 insertions(+), 2 deletions(-)
+ .../testing/selftests/drivers/net/ncdevmem.c  | 97 +++++++++++++------
+ 1 file changed, 67 insertions(+), 30 deletions(-)
 
 diff --git a/tools/testing/selftests/drivers/net/ncdevmem.c b/tools/testing/selftests/drivers/net/ncdevmem.c
-index 3883a67d387f..4e0dbe2e515b 100644
+index 4e0dbe2e515b..615818cf5349 100644
 --- a/tools/testing/selftests/drivers/net/ncdevmem.c
 +++ b/tools/testing/selftests/drivers/net/ncdevmem.c
-@@ -22,6 +22,7 @@
+@@ -12,6 +12,7 @@
+ #define __iovec_defined
+ #include <fcntl.h>
+ #include <malloc.h>
++#include <pthread.h>
+ #include <error.h>
  
- #include <linux/memfd.h>
- #include <linux/dma-buf.h>
-+#include <linux/errqueue.h>
- #include <linux/udmabuf.h>
- #include <libmnl/libmnl.h>
- #include <linux/types.h>
-@@ -50,6 +51,7 @@ static int num_queues = 1;
- static char *ifname;
+ #include <arpa/inet.h>
+@@ -52,6 +53,9 @@ static char *ifname;
  static unsigned int ifindex;
  static unsigned int dmabuf_id;
-+static unsigned int tx_dmabuf_id;
+ static unsigned int tx_dmabuf_id;
++static bool loopback;
++static pthread_cond_t cond = PTHREAD_COND_INITIALIZER;
++static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
  
  struct memory_buffer {
  	int fd;
-@@ -326,6 +328,49 @@ static int bind_rx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
- 	return -1;
- }
+@@ -358,6 +362,8 @@ static int bind_tx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
  
-+static int bind_tx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
-+			 struct ynl_sock **ys)
-+{
-+	struct netdev_bind_tx_req *req = NULL;
-+	struct netdev_bind_tx_rsp *rsp = NULL;
-+	struct ynl_error yerr;
-+
-+	*ys = ynl_sock_create(&ynl_netdev_family, &yerr);
-+	if (!*ys) {
-+		fprintf(stderr, "YNL: %s\n", yerr.msg);
-+		return -1;
+ 	fprintf(stderr, "got tx dmabuf id=%d\n", rsp->id);
+ 	tx_dmabuf_id = rsp->id;
++	if (loopback)
++		dmabuf_id = tx_dmabuf_id;
+ 
+ 	netdev_bind_tx_req_free(req);
+ 	netdev_bind_tx_rsp_free(rsp);
+@@ -409,11 +415,11 @@ static int do_server(struct memory_buffer *mem)
+ 	struct sockaddr_in6 client_addr;
+ 	struct sockaddr_in6 server_sin;
+ 	size_t page_aligned_frags = 0;
++	struct ynl_sock *ys = NULL;
+ 	size_t total_received = 0;
+ 	socklen_t client_addr_len;
+ 	bool is_devmem = false;
+ 	char *tmp_mem = NULL;
+-	struct ynl_sock *ys;
+ 	char iobuf[819200];
+ 	char buffer[256];
+ 	int socket_fd;
+@@ -425,33 +431,33 @@ static int do_server(struct memory_buffer *mem)
+ 	if (ret < 0)
+ 		error(1, 0, "parse server address");
+ 
+-	if (reset_flow_steering())
+-		error(1, 0, "Failed to reset flow steering\n");
++	if (!loopback) {
++		if (reset_flow_steering())
++			error(1, 0, "Failed to reset flow steering\n");
+ 
+-	if (configure_headersplit(1))
+-		error(1, 0, "Failed to enable TCP header split\n");
++		if (configure_headersplit(1))
++			error(1, 0, "Failed to enable TCP header split\n");
+ 
+-	/* Configure RSS to divert all traffic from our devmem queues */
+-	if (configure_rss())
+-		error(1, 0, "Failed to configure rss\n");
++		if (configure_rss())
++			error(1, 0, "Failed to configure rss\n");
+ 
+-	/* Flow steer our devmem flows to start_queue */
+-	if (configure_flow_steering(&server_sin))
+-		error(1, 0, "Failed to configure flow steering\n");
++		if (configure_flow_steering(&server_sin))
++			error(1, 0, "Failed to configure flow steering\n");
+ 
+-	sleep(1);
++		sleep(1);
+ 
+-	queues = malloc(sizeof(*queues) * num_queues);
++		queues = malloc(sizeof(*queues) * num_queues);
+ 
+-	for (i = 0; i < num_queues; i++) {
+-		queues[i]._present.type = 1;
+-		queues[i]._present.id = 1;
+-		queues[i].type = NETDEV_QUEUE_TYPE_RX;
+-		queues[i].id = start_queue + i;
+-	}
++		for (i = 0; i < num_queues; i++) {
++			queues[i]._present.type = 1;
++			queues[i]._present.id = 1;
++			queues[i].type = NETDEV_QUEUE_TYPE_RX;
++			queues[i].id = start_queue + i;
++		}
+ 
+-	if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
+-		error(1, 0, "Failed to bind\n");
++		if (bind_rx_queue(ifindex, mem->fd, queues, num_queues, &ys))
++			error(1, 0, "Failed to bind\n");
++	}
+ 
+ 	tmp_mem = malloc(mem->size);
+ 	if (!tmp_mem)
+@@ -478,6 +484,12 @@ static int do_server(struct memory_buffer *mem)
+ 
+ 	client_addr_len = sizeof(client_addr);
+ 
++	if (loopback) {
++		pthread_mutex_lock(&mutex);
++		pthread_cond_signal(&cond);
++		pthread_mutex_unlock(&mutex);
 +	}
 +
-+	req = netdev_bind_tx_req_alloc();
-+	netdev_bind_tx_req_set_ifindex(req, ifindex);
-+	netdev_bind_tx_req_set_fd(req, dmabuf_fd);
-+
-+	rsp = netdev_bind_tx(*ys, req);
-+	if (!rsp) {
-+		perror("netdev_bind_tx");
-+		goto err_close;
-+	}
-+
-+	if (!rsp->_present.id) {
-+		perror("id not present");
-+		goto err_close;
-+	}
-+
-+	fprintf(stderr, "got tx dmabuf id=%d\n", rsp->id);
-+	tx_dmabuf_id = rsp->id;
-+
-+	netdev_bind_tx_req_free(req);
-+	netdev_bind_tx_rsp_free(rsp);
-+
-+	return 0;
-+
-+err_close:
-+	fprintf(stderr, "YNL failed: %s\n", (*ys)->err.msg);
-+	netdev_bind_tx_req_free(req);
-+	ynl_sock_destroy(*ys);
-+	return -1;
-+}
-+
- static int enable_reuseaddr(int fd)
- {
- 	int opt = 1;
-@@ -356,7 +401,7 @@ static int parse_address(const char *str, int port, struct sockaddr_in6 *sin6)
+ 	inet_ntop(AF_INET6, &server_sin.sin6_addr, buffer,
+ 		  sizeof(buffer));
+ 	fprintf(stderr, "Waiting or connection on %s:%d\n", buffer,
+@@ -514,7 +526,7 @@ static int do_server(struct memory_buffer *mem)
+ 		}
+ 		if (ret == 0) {
+ 			fprintf(stderr, "client exited\n");
+-			goto cleanup;
++			break;
+ 		}
+ 
+ 		i++;
+@@ -585,15 +597,11 @@ static int do_server(struct memory_buffer *mem)
+ 	fprintf(stderr, "page_aligned_frags=%lu, non_page_aligned_frags=%lu\n",
+ 		page_aligned_frags, non_page_aligned_frags);
+ 
+-	fprintf(stderr, "page_aligned_frags=%lu, non_page_aligned_frags=%lu\n",
+-		page_aligned_frags, non_page_aligned_frags);
+-
+-cleanup:
+-
+ 	free(tmp_mem);
+ 	close(client_fd);
+ 	close(socket_fd);
+-	ynl_sock_destroy(ys);
++	if (ys)
++		ynl_sock_destroy(ys);
+ 
+ 	return 0;
+ }
+@@ -818,6 +826,15 @@ static int do_client(struct memory_buffer *mem)
  	return 0;
  }
  
--int do_server(struct memory_buffer *mem)
-+static int do_server(struct memory_buffer *mem)
- {
- 	char ctrl_data[sizeof(int) * 20000];
- 	struct netdev_queue_id *queues;
-@@ -610,6 +655,169 @@ void run_devmem_tests(void)
- 	provider->free(mem);
- }
- 
-+static void wait_compl(int fd)
++static void *server_thread(void *data)
 +{
-+	struct sock_extended_err *serr;
-+	struct msghdr msg = {};
-+	char control[100] = {};
-+	struct cmsghdr *cm;
-+	int retries = 10;
-+	__u32 hi, lo;
-+	int ret;
++	struct memory_buffer *mem = data;
 +
-+	msg.msg_control = control;
-+	msg.msg_controllen = sizeof(control);
++	do_server(mem);
 +
-+	while (retries--) {
-+		ret = recvmsg(fd, &msg, MSG_ERRQUEUE);
-+		if (ret < 0) {
-+			if (errno == EAGAIN) {
-+				usleep(100);
-+				continue;
-+			}
-+			perror("recvmsg(MSG_ERRQUEUE)");
-+			return;
-+		}
-+		if (msg.msg_flags & MSG_CTRUNC)
-+			error(1, 0, "MSG_CTRUNC\n");
-+
-+		for (cm = CMSG_FIRSTHDR(&msg); cm; cm = CMSG_NXTHDR(&msg, cm)) {
-+			if (cm->cmsg_level != SOL_IP &&
-+			    cm->cmsg_level != SOL_IPV6)
-+				continue;
-+			if (cm->cmsg_level == SOL_IP &&
-+			    cm->cmsg_type != IP_RECVERR)
-+				continue;
-+			if (cm->cmsg_level == SOL_IPV6 &&
-+			    cm->cmsg_type != IPV6_RECVERR)
-+				continue;
-+
-+			serr = (void *)CMSG_DATA(cm);
-+			if (serr->ee_origin != SO_EE_ORIGIN_ZEROCOPY)
-+				error(1, 0, "wrong origin %u", serr->ee_origin);
-+			if (serr->ee_errno != 0)
-+				error(1, 0, "wrong errno %d", serr->ee_errno);
-+
-+			hi = serr->ee_data;
-+			lo = serr->ee_info;
-+
-+			fprintf(stderr, "tx complete [%d,%d]\n", lo, hi);
-+			return;
-+		}
-+	}
-+
-+	fprintf(stderr, "did not receive tx completion\n");
-+}
-+
-+static int do_client(struct memory_buffer *mem)
-+{
-+	struct sockaddr_in6 server_sin;
-+	struct ynl_sock *ys = NULL;
-+	ssize_t line_size = 0;
-+	char *line = NULL;
-+	char buffer[256];
-+	size_t len = 0;
-+	size_t off = 0;
-+	int socket_fd;
-+	int opt = 1;
-+	int ret;
-+
-+	ret = parse_address(server_ip, atoi(port), &server_sin);
-+	if (ret < 0)
-+		error(-1, 0, "parse server address");
-+
-+	socket_fd = socket(AF_INET6, SOCK_STREAM, 0);
-+	if (ret < 0) {
-+		fprintf(stderr, "%s: [FAIL, create socket]\n", TEST_PREFIX);
-+		exit(76);
-+	}
-+
-+	ret = setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, ifname,
-+			 strlen(ifname) + 1);
-+	if (ret) {
-+		fprintf(stderr, "%s: [FAIL, bindtodevice]: %s\n", TEST_PREFIX,
-+			strerror(errno));
-+		exit(76);
-+	}
-+
-+	if (bind_tx_queue(ifindex, mem->fd, &ys))
-+		error(1, 0, "Failed to bind\n");
-+
-+	ret = setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &opt, sizeof(opt));
-+	if (ret) {
-+		fprintf(stderr, "%s: [FAIL, set sock opt]: %s\n", TEST_PREFIX,
-+			strerror(errno));
-+		exit(76);
-+	}
-+
-+	inet_ntop(AF_INET6, &server_sin.sin6_addr, buffer, sizeof(buffer));
-+	fprintf(stderr, "Connect to %s %d (via %s)\n", buffer,
-+		ntohs(server_sin.sin6_port), ifname);
-+
-+	ret = connect(socket_fd, &server_sin, sizeof(server_sin));
-+	if (ret) {
-+		fprintf(stderr, "%s: [FAIL, connect]: %s\n", TEST_PREFIX,
-+			strerror(errno));
-+		exit(76);
-+	}
-+
-+	while (1) {
-+		free(line);
-+		line = NULL;
-+		line_size = getline(&line, &len, stdin);
-+
-+		if (line_size < 0)
-+			break;
-+
-+		fprintf(stderr, "DEBUG: read line_size=%ld\n", line_size);
-+
-+		provider->memcpy_to_device(mem, off, line, line_size);
-+
-+		while (line_size) {
-+			struct iovec iov = {
-+				.iov_base = (void *)off,
-+				.iov_len = line_size,
-+			};
-+			char ctrl_data[CMSG_SPACE(sizeof(int))];
-+			struct msghdr msg = {};
-+			struct cmsghdr *cmsg;
-+
-+			msg.msg_iov = &iov;
-+			msg.msg_iovlen = 1;
-+
-+			msg.msg_control = ctrl_data;
-+			msg.msg_controllen = sizeof(ctrl_data);
-+
-+			cmsg = CMSG_FIRSTHDR(&msg);
-+			cmsg->cmsg_level = SOL_SOCKET;
-+			cmsg->cmsg_type = SCM_DEVMEM_DMABUF;
-+			cmsg->cmsg_len = CMSG_LEN(sizeof(int));
-+			*((int *)CMSG_DATA(cmsg)) = tx_dmabuf_id;
-+
-+			ret = sendmsg(socket_fd, &msg, MSG_SOCK_DEVMEM);
-+			if (ret < 0)
-+				continue;
-+			else
-+				fprintf(stderr, "DEBUG: sendmsg_ret=%d\n", ret);
-+
-+			off += ret;
-+			line_size -= ret;
-+
-+			wait_compl(socket_fd);
-+		}
-+	}
-+
-+	fprintf(stderr, "%s: tx ok\n", TEST_PREFIX);
-+
-+	free(line);
-+	close(socket_fd);
-+
-+	if (ys)
-+		ynl_sock_destroy(ys);
-+
-+	return 0;
++	return (void *)NULL;
 +}
 +
  int main(int argc, char *argv[])
  {
  	struct memory_buffer *mem;
-@@ -675,7 +883,7 @@ int main(int argc, char *argv[])
+@@ -825,11 +842,14 @@ int main(int argc, char *argv[])
+ 	int probe = 0;
+ 	int ret;
+ 
+-	while ((opt = getopt(argc, argv, "ls:c:p:q:t:f:P")) != -1) {
++	while ((opt = getopt(argc, argv, "Lls:c:p:q:t:f:P")) != -1) {
+ 		switch (opt) {
+ 		case 'l':
+ 			is_server = 1;
+ 			break;
++		case 'L':
++			loopback = true;
++			break;
+ 		case 's':
+ 			server_ip = optarg;
+ 			break;
+@@ -883,7 +903,24 @@ int main(int argc, char *argv[])
  	}
  
  	mem = provider->alloc(getpagesize() * NUM_PAGES);
--	ret = is_server ? do_server(mem) : 1;
-+	ret = is_server ? do_server(mem) : do_client(mem);
+-	ret = is_server ? do_server(mem) : do_client(mem);
++	if (loopback) {
++		pthread_t thread;
++		int rc;
++
++		rc = pthread_create(&thread, NULL, server_thread, mem);
++		if (rc != 0)
++			error(-1, -errno, "pthread_create failed");
++
++		pthread_mutex_lock(&mutex);
++		pthread_cond_wait(&cond, &mutex);
++		pthread_mutex_unlock(&mutex);
++
++		ret = do_client(mem);
++
++		pthread_join(thread, NULL);
++	} else {
++		ret = is_server ? do_server(mem) : do_client(mem);
++	}
  	provider->free(mem);
  
  	return ret;
