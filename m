@@ -1,168 +1,134 @@
-Return-Path: <netdev+bounces-128228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBC389789E7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 22:25:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF2899789E4
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 22:24:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3159F286C1A
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 20:25:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92F4B1F260E8
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 20:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DCD14F9EE;
-	Fri, 13 Sep 2024 20:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1221474A5;
+	Fri, 13 Sep 2024 20:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="I1ZXgwCx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZMbr6xew"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-14.smtpout.orange.fr [80.12.242.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ACA514EC6E
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 20:24:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A03D1448F2;
+	Fri, 13 Sep 2024 20:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726259085; cv=none; b=S6ia3TDvnosl00hM3kfJUlEJ4FVPFsPsz6DZSAo3cdsQNqH4q2mA4alvOa4N2KiGvl/zZ02TmChTcOLuNL1WgcdT+o9XFWd9w37Iu95bVA0jct7a2O2Z9F1rEuN+CavhlO5dpEbgxuWRNUbbN4qbzEO9JTd34tEK+umnbXBe5co=
+	t=1726259080; cv=none; b=lyuAlExggDyb6eUft4+ZsBSMeFLJ3a9AprmKXkBc6R2Gtna/b2CUVRA07q7ccImyhcbkh8WO+BKYkOJxoetmtikwYmStn8pnlMtq9pfMLjdznf/KFGjO5se71QmnTLO/jG98cJI6tGwmNR1iVGR304ggTwxoXBjgIu50jJBEH8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726259085; c=relaxed/simple;
-	bh=aeHHirsDTzlsKVKlkvJxIJprybC9ohBEqeiu92MY3xU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XSbbmain3K7pfnXH6U3Uqn51df2IdtOc7UeXpCoYSZBOrnpCXcxZO4uNbT9RDuK1cNA1vyUV05hGBBZPjCrJwt2L7GHoQBfMoZ2ZxeRDsPKdOmNSc11cHw1oMbPvZkzXjXMJmfvgLjlj/NVIjTxZj2AfFew34PykKH9e5qbvTX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=I1ZXgwCx; arc=none smtp.client-ip=80.12.242.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id pCqCs5pkRXiYbpCqDs5fby; Fri, 13 Sep 2024 22:24:34 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1726259074;
-	bh=IFlge7GQc7i+yk+ZZfEDZaPwa4VYufyWQBRelpdZhAs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=I1ZXgwCxzN4AkerjsejnGQV9v+1T/tFRqmuj96Ku2S9RRbEmqH/TvBEk+/RpBUKbU
-	 hIx/QEzJ9R7AuM6YDPGKYxSplhCPdfDUFQVVSr4OQamd2cDwYcUjfEuKxhPL3T1Osd
-	 hBbNLS8eHOodu0R+vLSGe/5SiQco1FBGrPnaIXk0QFR/cdcQpbKpg8ljcAnivBWIlL
-	 /81LRski1PZZ9fAZxpXzZM462Y2jHiIzfjxabcMrlP/3ZANdY5qg4RjQ4+yd2qrCyg
-	 qfKtXVN9Pdi4yBF/5/pPGlUhH560RBO/0RN3lWnyvRFwyMhr7qowwYiSPyC5oLFtO6
-	 3D5kOkPeCdcvg==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Fri, 13 Sep 2024 22:24:34 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <4e4defa9-ef2f-4ff1-95ca-6627c24db20c@wanadoo.fr>
-Date: Fri, 13 Sep 2024 22:24:28 +0200
+	s=arc-20240116; t=1726259080; c=relaxed/simple;
+	bh=SLAQonTzL+ETpOKN32UdFXtUV4JfAqDvyG7i/mcZUuY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fpfm7wamNd8lgKz9QBzJX2MotzM7KQkqBtwsxVKRRcPzXog2fEmKtgg+SLATdNTUMC5clG5TWOIzFeRQUpgGXh89O5dl1XWhdg/toHgaxA03U0CycLKHSaH8hQhFJwrP7v9GgCqdGulzSfvMUx431EC3mzPyEjPCviyAzPujwE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZMbr6xew; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39B63C4CEC0;
+	Fri, 13 Sep 2024 20:24:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726259079;
+	bh=SLAQonTzL+ETpOKN32UdFXtUV4JfAqDvyG7i/mcZUuY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZMbr6xewxaHNK3ojM9J9pajyvXeWe5WgsUPGP70h8Yc4iy6AYb1YF3RogVna6Y43l
+	 eX/Wjf3kxcl0yNJpZV4VHvb1N5Hq+IQW3OjMCY0AngOQVPcqbEK5sgh4QkYnkLwSgd
+	 t8kqzXb3u07J+r4Xzx/qOMlPwkbxOln0ZBXWntIKo9gUC5AB7/3opz8rEuxyJrpMGX
+	 jI66HLUDzuayUrQw/4C6+rUMQcRSw01t5/t03SACah6W8x1LwStSwZdXzWz2sFFlkv
+	 VhQOhkT+iOxlhLl2A8Bra8P+gTU+BdYAqgpIdFnoFcSkze/BkELe5gkr45it+JfCBl
+	 2QZv4LSzZaMfg==
+Date: Fri, 13 Sep 2024 13:24:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Matthew Wilcox <willy@infradead.org>, Stephen Rothwell
+ <sfr@canb.auug.org.au>, christophe.leroy2@cs-soprasteria.com, David Miller
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: linux-next: build failure after merge of the net-next tree
+Message-ID: <20240913132438.4235abe4@kernel.org>
+In-Reply-To: <CAHS8izNSjZ9z2JfODbpo-ULgOcz1dGe5xe7_LKU-8LzJN_z-iw@mail.gmail.com>
+References: <20240913125302.0a06b4c7@canb.auug.org.au>
+	<20240912200543.2d5ff757@kernel.org>
+	<20240913204138.7cdb762c@canb.auug.org.au>
+	<20240913083426.30aff7f4@kernel.org>
+	<20240913084938.71ade4d5@kernel.org>
+	<913e2fbd-d318-4c9b-aed2-4d333a1d5cf0@cs-soprasteria.com>
+	<CAHS8izPf29T51QB4u46NJRc=C77vVDbR1nXekJ5-ysJJg8fK8g@mail.gmail.com>
+	<20240913113619.4bf2bf16@kernel.org>
+	<CAHS8izNSjZ9z2JfODbpo-ULgOcz1dGe5xe7_LKU-8LzJN_z-iw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 7/8] net: ethernet: fs_enet: simplify clock
- handling with devm accessors
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
- Pantelis Antoniou <pantelis.antoniou@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Herve Codina <herve.codina@bootlin.com>,
- linuxppc-dev@lists.ozlabs.org
-References: <20240904171822.64652-1-maxime.chevallier@bootlin.com>
- <20240904171822.64652-8-maxime.chevallier@bootlin.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20240904171822.64652-8-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Le 04/09/2024 à 19:18, Maxime Chevallier a écrit :
-> devm_clock_get_enabled() can be used to simplify clock handling for the
-> PER register clock.
+On Fri, 13 Sep 2024 13:05:32 -0700 Mina Almasry wrote:
+> Change, got NAKed:
+> https://lore.kernel.org/netdev/ZuSQ9BT9Vg7O2kXv@casper.infradead.org/
+
+Humpf.
+
+> But AFAICT we don't really need to do this inside of mm, affecting
+> things like compound_head. This equivalent change also makes the build
+> pass. Does this look good?
 > 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> ---
->   .../ethernet/freescale/fs_enet/fs_enet-main.c    | 16 ++++------------
->   drivers/net/ethernet/freescale/fs_enet/fs_enet.h |  2 --
->   2 files changed, 4 insertions(+), 14 deletions(-)
+> diff --git a/include/net/netmem.h b/include/net/netmem.h
+> index 8a6e20be4b9d..58f2120cd392 100644
+> --- a/include/net/netmem.h
+> +++ b/include/net/netmem.h
+> @@ -100,7 +100,15 @@ static inline netmem_ref net_iov_to_netmem(struct
+> net_iov *niov)
 > 
-> diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-> index c96a6b9e1445..ec43b71c0eba 100644
-> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
-> @@ -900,14 +900,9 @@ static int fs_enet_probe(struct platform_device *ofdev)
->   	 * but require enable to succeed when a clock was specified/found,
->   	 * keep a reference to the clock upon successful acquisition
->   	 */
-> -	clk = devm_clk_get(&ofdev->dev, "per");
-> -	if (!IS_ERR(clk)) {
-> -		ret = clk_prepare_enable(clk);
-> -		if (ret)
-> -			goto out_deregister_fixed_link;
-> -
-> -		fpi->clk_per = clk;
-> -	}
-> +	clk = devm_clk_get_enabled(&ofdev->dev, "per");
-> +	if (IS_ERR(clk))
-> +		goto out_deregister_fixed_link;
+>  static inline netmem_ref page_to_netmem(struct page *page)
+>  {
+> -       return (__force netmem_ref)page;
+> +       /* page* exported from the mm stack would not have the LSB set, but the
+> +        * GCC 14 powerpc compiler will optimize reads into this pointer into
+> +        * unaligned reads as it sees address arthemetic in _compound_head().
+> +        *
+> +        * Explicitly clear the LSB until what looks like a GCC compiler issue
+> +        * is resolved.
+> +        */
+> +       DEBUG_NET_WARN_ON_ONCE((unsigned long)page & 1UL);
+> +       return (__force netmem_ref)page & ~1UL;
+>  }
 
-Hi,
+Hmm. Not really, the math this is doing is a bit of a cargo cult,
+AFAIU the operation itself is meaningless. It works because it
+achieves breaking the optimization/register chain in the compiler.
+But the exact ALU op doesn't matter. So pretending LSB is meaningful 
+could be confusing to the reader.
 
-I don't know if this can lead to the same issue, but a similar change 
-broke a use case in another driver. See the discussion at[1].
+I think this will achieve the same effect without the spurious ALU
+operations (apologies for broken whitespace):
 
-It ended to using devm_clk_get_optional_enabled() to keep the same 
-behavior as before.
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index a813d30d2135..b7e0acaed933 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -864,7 +864,11 @@ void page_pool_put_page_bulk(struct page_pool *pool, void **data,
+        allow_direct = page_pool_napi_local(pool);
+ 
+        for (i = 0; i < count; i++) {
+-               netmem_ref netmem = page_to_netmem(virt_to_head_page(data[i]));
++               struct page *page = virt_to_head_page(data[i]);
++               netmem_ref netmem;
++
++               /* $explanation */
++               netmem = page_to_netmem(READ_ONCE(page));
+ 
+                /* It is not the last user for the page frag case */
+                if (!page_pool_is_last_ref(netmem))
 
-CJ
-
-[1]: 
-https://lore.kernel.org/all/20240912104630.1868285-2-ardb+git@google.com/
-
->   
->   	privsize = sizeof(*fep) +
->   		   sizeof(struct sk_buff **) *
-> @@ -917,7 +912,7 @@ static int fs_enet_probe(struct platform_device *ofdev)
->   	ndev = alloc_etherdev(privsize);
->   	if (!ndev) {
->   		ret = -ENOMEM;
-> -		goto out_put;
-> +		goto out_deregister_fixed_link;
->   	}
->   
->   	SET_NETDEV_DEV(ndev, &ofdev->dev);
-> @@ -979,8 +974,6 @@ static int fs_enet_probe(struct platform_device *ofdev)
->   	fep->ops->cleanup_data(ndev);
->   out_free_dev:
->   	free_netdev(ndev);
-> -out_put:
-> -	clk_disable_unprepare(fpi->clk_per);
->   out_deregister_fixed_link:
->   	of_node_put(fpi->phy_node);
->   	if (of_phy_is_fixed_link(ofdev->dev.of_node))
-> @@ -1001,7 +994,6 @@ static void fs_enet_remove(struct platform_device *ofdev)
->   	fep->ops->cleanup_data(ndev);
->   	dev_set_drvdata(fep->dev, NULL);
->   	of_node_put(fep->fpi->phy_node);
-> -	clk_disable_unprepare(fep->fpi->clk_per);
->   	if (of_phy_is_fixed_link(ofdev->dev.of_node))
->   		of_phy_deregister_fixed_link(ofdev->dev.of_node);
->   	free_netdev(ndev);
-> diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet.h b/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
-> index ee49749a3202..6ebb1b4404c7 100644
-> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
-> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet.h
-> @@ -119,8 +119,6 @@ struct fs_platform_info {
->   	int napi_weight;	/* NAPI weight			*/
->   
->   	int use_rmii;		/* use RMII mode		*/
-> -
-> -	struct clk *clk_per;	/* 'per' clock for register access */
->   };
->   
->   struct fs_enet_private {
-
+If it makes sense could you polish it up and submit?
 
