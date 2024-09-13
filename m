@@ -1,150 +1,102 @@
-Return-Path: <netdev+bounces-128017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB2997779B
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 05:56:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87C3C9777A0
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 05:56:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46DEA1F25776
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 03:56:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20A18B2402C
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 03:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C370A1BC078;
-	Fri, 13 Sep 2024 03:55:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A581B653C;
+	Fri, 13 Sep 2024 03:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Nir4rlgq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OH6tcAyW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 014C83716D;
-	Fri, 13 Sep 2024 03:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4801E1B12EC
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 03:56:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726199759; cv=none; b=Ybkw3R+xB+oPCVKq6G0IQ0Zbdul3WKNBiIij7ehLLwaYxPls6qU1WSdydTIx2zFrKDoPOaA7HPMkch+4R1PVsL4I3Eg0CuLbgu4vbpbRUXMOhhXcSXsu0LNXqRKYVepBVpSELdniB5lBQ2UI62tzfrRLbo4hhZ4vp1fZMIX8jxA=
+	t=1726199804; cv=none; b=aQr1a+i6HKfhG+iwmkIJ/qAJoau+JRVD1HxXpQUtw81nHz9D1QVv3gm38yLzFMBcE+Et7aVTbpLdPA3bCGwKamropNHuxy4sMeIra7MtTwxnWhcktqAVfh604rmK0cajXgi5oEXeKl+8YW/JA4fjDOEeC216gLbyb0sjgWwOC2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726199759; c=relaxed/simple;
-	bh=XEf+xBWqSZosQFjsRQCHe7OPs4kOLwcwmr/7EEWmscU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=d+L4CtOeyW65BdqEQDE/V+0ZA0KLsBOGbmJ/SLCcVkef+HBCh7yJ+zYbavycs0u+0KI4kj/CxhSXH7fHEqmC27NiI8sH8+WZ3eFQYtcZ5uYkT8IqW/4IalStELqJImb422Btf9Tkhry3ZWZBuPf4myQJvAigXQWQ3vBo6dYKGNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Nir4rlgq; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1726199753;
-	bh=SVVUXGwkJdQgfUdfteDebc7NB12XpEgE4fZlbLLMeoI=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Nir4rlgqnHFqA8NozeRB0Iumduyt4/OkXNFuVSLnUksJcV5SWfZZW/a/wYvbYV3cZ
-	 RXX3l/ehTFfmwKBPi0mpxFPl+kpUtDjlX0SdAALD1jIL/UOndfUskYXak4s0akFdtn
-	 T7wqpocXR5lwYSIhHV7SmXO+384RsSqOXbJu6oCkWagBDWdIiR42b3HAb0GCaTj4iY
-	 JVZJWJgLK3yu9PcYayaA+V5QfXO0/2oYieyuPuHklTczZZZQ2N6ImkIQM8cNNR/EUD
-	 nF1pwAOShdFMMb6k8jcCRSOEPGQB7i+YUKdViIxkErdVjUWMeX1wJqG1CanHJcWlvc
-	 v5xGtUTDuXz9w==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X4gT41v80z4wy9;
-	Fri, 13 Sep 2024 13:55:52 +1000 (AEST)
-Date: Fri, 13 Sep 2024 13:55:51 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, David Chinner
- <david@fromorbit.com>
-Cc: "Darrick J. Wong" <djwong@kernel.org>, Al Viro
- <viro@zeniv.linux.org.uk>, <linux-xfs@vger.kernel.org>, bpf
- <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux Kernel
- Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the bpf-next tree
-Message-ID: <20240913135551.4156251c@canb.auug.org.au>
+	s=arc-20240116; t=1726199804; c=relaxed/simple;
+	bh=A4lORGDJykMfJEoecQjXlm20PYTQ/4n6Cqy/ls27JLs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kn6L3qQHPdhVo5FiTOB9sV+x/UcSW8cHCbFVXSzeO9cbmtP43aIh7jWhINiRJ2zUXzrXi3pE5ynoEo2dLOxba0CSbx9W9WcfwpjYgRftjUUoOXDhlib/hJFC23qVxWzmKNipoQLWbRiklQZGv3DsRgRjCMaDbu51rEtyxzONSRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OH6tcAyW; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-39f54079599so5312335ab.0
+        for <netdev@vger.kernel.org>; Thu, 12 Sep 2024 20:56:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726199802; x=1726804602; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A4lORGDJykMfJEoecQjXlm20PYTQ/4n6Cqy/ls27JLs=;
+        b=OH6tcAyWY/palogoa4S+VFDSX8y569z0zNzPrSL5p39DbsTalzl053zjLT2iHXYAdS
+         Hs0JmT/PSLobyeSDRidn3tMzTkSSrYjdLDVPS+W+bB1FpwTR/ohJoRk9q/lwW/9MpEzG
+         E0mP0+FgFpLIjudOcJQnL5zm0uoxsIBkxmb8fcq3WrftBAYi2MsDNeJqJ7GjmLFpwXHS
+         Ns3bqX2ap7RIib70Vw1/xbysYl9gV4/Km8VtEPF+lkzE2KalGD3daNajH81RlcZy+I7j
+         t3m8NRqNKef1ZurhmVHfTCfYMv83T+eCIZ8BLpFIuhgAYuKjlHNhEJGnwv3VXPYke+Al
+         9LPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726199802; x=1726804602;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A4lORGDJykMfJEoecQjXlm20PYTQ/4n6Cqy/ls27JLs=;
+        b=bDW+s1NU6HBOgqBWnYes5dpWfck0/8FSUx4asgwQ82T4w7sXUEX+whHehc9Ed2p6W6
+         R8MuYtuurC92WKE3q/rX1xG3GN1htRuzvfYAlp0e8I5MMK0SVSIe3mMX3YcsFzFJj/Pj
+         V2oBqKyfHGlfn1e3qZEICt4w/+HCYBFvdE7sYbfEwTWnkdnIKGIWmjYxv6vdEPgHFfhp
+         YmXuPSTXZoh+v+ihFVnEHJeNhjnkErC+/pI9Uyw9ogt7zzrt95YZCcKmsSeWGpho5mXB
+         dVYPh2NpmMZpLp8p4oFJXjWCERBysM/2NlDzN7YTn3j2MMq/nxlMwffRckIMNG35A/VO
+         fWTA==
+X-Forwarded-Encrypted: i=1; AJvYcCX/52zLgap8KdDhoS2G0FwOpNGbGgg9yUe0IJpGygiVKPFm0LwvI5x2IFXFPBSFPSAHf/m+6UU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIduyjr6BcyzMyIcyZZOoXfmRBX+ZzCaqB9DYn0WxMR1wcA5Yd
+	CGndJA5+hGDp2O+VK70Uowi8NJFT0zjLvvgZd5l2Uj79mBFhxhVYb0H4YtN1QRJK75T9Z1OfOti
+	KuIdYLNLVXEGDy8O/vuaAumF32tI=
+X-Google-Smtp-Source: AGHT+IHL6VFNY/bSes8t9b5Je8fpEdVBIcneZQhV1MEoScUAR5jgNRdVQD0Ht2ebSTQnOva2Pq71RG/Cm2oAPwBPm7A=
+X-Received: by 2002:a05:6e02:1cab:b0:39b:35d8:dc37 with SMTP id
+ e9e14a558f8ab-3a08464e389mr38054905ab.13.1726199802255; Thu, 12 Sep 2024
+ 20:56:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/rXB2FGQB1LHlS=gzzOd7Q/.";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/rXB2FGQB1LHlS=gzzOd7Q/.
-Content-Type: text/plain; charset=US-ASCII
+References: <20240911091333.1870071-1-vadfed@meta.com> <20240911091333.1870071-3-vadfed@meta.com>
+In-Reply-To: <20240911091333.1870071-3-vadfed@meta.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 13 Sep 2024 11:56:06 +0800
+Message-ID: <CAL+tcoA51aPZQM=d6haXPKoRHeR255MM5WWKEOuZsbr4UVB5jQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/3] net_tstamp: add SCM_TS_OPT_ID for RAW sockets
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Willem de Bruijn <willemb@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Wed, Sep 11, 2024 at 5:13=E2=80=AFPM Vadim Fedorenko <vadfed@meta.com> w=
+rote:
+>
+> The last type of sockets which supports SOF_TIMESTAMPING_OPT_ID is RAW
+> sockets. To add new option this patch converts all callers (direct and
+> indirect) of _sock_tx_timestamp to provide sockcm_cookie instead of
+> tsflags. And while here fix __sock_tx_timestamp to receive tsflags as
+> __u32 instead of __u16.
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
 
-After merging the bpf-next tree, today's linux-next build (powerpc
-ppc64_defconfig) failed like this:
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-fs/xfs/xfs_exchrange.c: In function 'xfs_ioc_commit_range':
-fs/xfs/xfs_exchrange.c:938:19: error: 'struct fd' has no member named 'file'
-  938 |         if (!file1.file)
-      |                   ^
-fs/xfs/xfs_exchrange.c:940:26: error: 'struct fd' has no member named 'file'
-  940 |         fxr.file1 =3D file1.file;
-      |                          ^
-
-Caused by commit
-
-  1da91ea87aef ("introduce fd_file(), convert all accessors to it.")
-
-interacting with commit
-
-  398597c3ef7f ("xfs: introduce new file range commit ioctls")
-
-I have applied the following patch for today.
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Fri, 13 Sep 2024 13:53:35 +1000
-Subject: [PATCH] fix up 3 for "introduce fd_file(), convert all accessors to
- it."
-
-interacting with commit "xfs: introduce new file range commit ioctls"
-from the xfs tree.
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- fs/xfs/xfs_exchrange.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/fs/xfs/xfs_exchrange.c b/fs/xfs/xfs_exchrange.c
-index 39fe02a8deac..75cb53f090d1 100644
---- a/fs/xfs/xfs_exchrange.c
-+++ b/fs/xfs/xfs_exchrange.c
-@@ -935,9 +935,9 @@ xfs_ioc_commit_range(
- 	fxr.file2_ctime.tv_nsec	=3D kern_f->file2_ctime_nsec;
-=20
- 	file1 =3D fdget(args.file1_fd);
--	if (!file1.file)
-+	if (fd_empty(file1))
- 		return -EBADF;
--	fxr.file1 =3D file1.file;
-+	fxr.file1 =3D fd_file(file1);
-=20
- 	error =3D xfs_exchange_range(&fxr);
- 	fdput(file1);
---=20
-2.45.2
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/rXB2FGQB1LHlS=gzzOd7Q/.
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbjt8cACgkQAVBC80lX
-0GyDNAf+LQQb+QL9TMZKMLzFxlsmKmHfGwNU9a4yhYswnkWHszjKPEzU8wZlkjcK
-MUk0qywdEGYTO8Qvk9d9/ZJLtvUVp5eLS6mH4637OGAB5JrgPF3rHFujLaMNQXmg
-6lRXcz2YL1GGwPr/RZjey7AcBWz93hUEbKccCnJ8Sm1wGNwDOmw4Rab/A/ybHrZh
-a4omj+z+MnjtckezzzwTwbmVmmD7mKOf6RZC242PF1hPjvMV//wYJ9B/Odw/nU+Q
-OVtCAtFidN1hR1avssCcsPqnmsRzrm1o1E8WydakC++DPqld3S/AU0rhAI/ehORG
-wxJgS9CDBGYAytFOombExKjZYAfp3w==
-=wx01
------END PGP SIGNATURE-----
-
---Sig_/rXB2FGQB1LHlS=gzzOd7Q/.--
+Thanks!
 
