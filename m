@@ -1,103 +1,89 @@
-Return-Path: <netdev+bounces-128020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE279777A3
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 05:59:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F6449777A6
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 06:00:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DAC61C23AA7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 03:59:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB7171F25785
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 04:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB851BAEFC;
-	Fri, 13 Sep 2024 03:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36A51D31BD;
+	Fri, 13 Sep 2024 04:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZYQ+Xdw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lbm3z5oj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B4588827;
-	Fri, 13 Sep 2024 03:59:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53F74C627;
+	Fri, 13 Sep 2024 04:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726199948; cv=none; b=GHoafOGmVJ9L44zfcXSo/dT72omWNR+zhvjLqfaajqsZVQBjOLiFFmSPQKP4WwuVz3lGWbAMJPQkpn+RP4HX58Ye6m1TplzGmiKdBg4Vv0i9FnEDR49vz6i+z0fPFCuJxdRY0nblIyhnqgFUs2iDtY0C1AHSppgTBdxns330KIU=
+	t=1726200009; cv=none; b=CTTfXGQ/NRvCWob1Ss+I0Ir1TnAmKttD65+ZyRYmqgI4SZssxzsJIz9woo5G0zEDpzhwcr1rjGFHqJjXSawDAHGKFU0nEqh44PUTufDqa8b8uuH477mCh1yXU1V5iLbXbTXV1imFEz7eBeRF0cWHGLtSFyP1JGQ+dTcFE3IMnzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726199948; c=relaxed/simple;
-	bh=IzxT5gkhqp2J+sCRoxwmPWq6zoqDVYhumEnaZbg0CYM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Pn1i0uAytc/8KKoOprXdsF5VMbD4hwXQZTlIoU/3yxIIp8EDVjfEzwsxXsi0GELa1b1qTfh5cjXNak4chmXBAXD9liKk1kw81MwK+HHy/OTQImKdClFfpgKJ+u0JdBH6dz4Rl0b2WCzf1sKp9JK4G+ScEnwmB2iBAH9yUDMYGZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZZYQ+Xdw; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-71790ed8c2dso1430012b3a.3;
-        Thu, 12 Sep 2024 20:59:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726199947; x=1726804747; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IzxT5gkhqp2J+sCRoxwmPWq6zoqDVYhumEnaZbg0CYM=;
-        b=ZZYQ+Xdw/mjOt2LkzqMsLXzWi207E49Wm1E9x+AK/PDOASxdYJreLv6S/k9gIaybCA
-         BrDaIv1eFV2Y95wvMwera5KEiytnRnO0VqAtzb8QfHx30hmVYvHqV/SjAXou5TjOtWog
-         7IvpHktRPVINSdvdO0gKO2HY9zYFpMAu47g1hOAmQ0sacm/FUgqWuvyPzdQCuVD4zb8H
-         OPKBjpJ6/YRwUcNm5fIPUu3lE3D453YJLDU4pZZErLsLiyTE0TgnIDEbnwXnIFXnnbsw
-         R4D1xEA6ozlPZgPv2praOcPd7GeXeWfUpbHiRBOyxROYYqE1dq9hZrnubvi7Ce0PGqZg
-         4rXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726199947; x=1726804747;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IzxT5gkhqp2J+sCRoxwmPWq6zoqDVYhumEnaZbg0CYM=;
-        b=X2Q/+e5/zVUZkY7QJGHzEvQlC94r/JeFrVehZBh4/zhzy6inYhGzuy50YoiXYfQpgO
-         xLgHSgEAbtevYeHMeglMuu17Xs+JpzCK8CmRd+PGuVxGI1KSmoVLwxJ2LXr4IsfqPlBg
-         gz+dw86FU8Ns/z0+GbvbRokKIL0YiJGHVHDdibhBuEdRgVreA2BdEhXq0m8tByGNLJdp
-         9bgZJjI9MfKfC4wdQc7DbKWTZs5Sg6oCh/pCI79eWLne6oYyx3H6PHSJdWHKUtE12MCx
-         kR+/ZS2gakDSt/hvAv3CIJsCq6n0V9AFNGA5B0aLzROWqM32O0mJ3dMFX6Omc0i3eeUD
-         ryvg==
-X-Forwarded-Encrypted: i=1; AJvYcCWgMuG3fk+5CXxXFFUdFWDhIDH59hjm12IkfNMGM/ofAoZN1tdeCH9IoYKjvaV8kLg9JFdsMNwz@vger.kernel.org, AJvYcCWyCYzC7F6QGnbYKoDTgRuGbQfL9+aMQ2uYJpt/u6H43bU08vzVwyvsEr44k9LRmiIS/l1Xam/KRTMc0WY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQGDaokXX8w/mGstG04z4jhRv6fCI5r020dD/3C/mU8gp9+2zK
-	MErCNplt7LsLH0V7QJ2EGj/lSCS8FkuKw5pU12eewyB0Wq/2ftTd
-X-Google-Smtp-Source: AGHT+IFEi+dW0Ycy5VWpFJ7Od16TQ4UAfRiog3o2tMOTfn2qAAfQZ0erwWerN1rTFhkt7TZoP8X95A==
-X-Received: by 2002:a05:6a00:14d0:b0:717:9768:a4ed with SMTP id d2e1a72fcca58-7192609318dmr8855576b3a.16.1726199946712;
-        Thu, 12 Sep 2024 20:59:06 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-719090cbca6sm5273151b3a.197.2024.09.12.20.59.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Sep 2024 20:59:06 -0700 (PDT)
-Date: Thu, 12 Sep 2024 20:59:04 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Miroslav Lichvar <mlichvar@redhat.com>
-Cc: Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	John Stultz <jstultz@google.com>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Christopher S Hall <christopher.s.hall@intel.com>
-Subject: Re: [PATCH 00/21] ntp: Rework to prepare support of indenpendent PTP
- clocks
-Message-ID: <ZuO4iOyN2myqMdEW@hoboy.vegasvil.org>
-References: <20240911-devel-anna-maria-b4-timers-ptp-ntp-v1-0-2d52f4e13476@linutronix.de>
- <ZuKii1KDGHSXElB6@localhost>
+	s=arc-20240116; t=1726200009; c=relaxed/simple;
+	bh=wCJj0QjizHN7+JE+3jSIfcY/91jPrm4H+frL7X4JJmk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nUdJmn0CHVsPaCCqhspXOp/FSyXfeT8roVQAXyRgeQW+RsENhxrAXn/RuM+e2v1G/v8eRYk7sGRUJCLsojbctKm87Rk3jqICoXjckE9YCfOGqvma/rGldwpJcglwgd8CTSuKtei4/bsb6nhPSAXzbiApxbVBiVIS1xp08rwmm5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lbm3z5oj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3CF6C4CEC0;
+	Fri, 13 Sep 2024 04:00:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726200009;
+	bh=wCJj0QjizHN7+JE+3jSIfcY/91jPrm4H+frL7X4JJmk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Lbm3z5ojJmlbc9rdAjj8CZd1pciC9uBZe8CDWMK2ejaTxAAo6u1reBWchlHSl8xRE
+	 3V6/nqTUAEC3B47bfsW5cNtxVl0cJTGChqrVZnr1Wy3MQA3ul8Wcmug2WMTINO/R3W
+	 jdqyOVBUS/KMU0SvCj8MIs8jW4RbKYGTYi9GPhuVVFW9Ji8bwNXkBz4Ujc1hzkLQma
+	 tS2dNm412fivMl7NhXHQbvrPuPnA8KmjPqNjkftmSUnRUNhbn/esKAY6xzYNcVZ/9+
+	 vI33pBZEw8tG5sJoeV/dxV75IAWKMseIgoT5nGLzXUGvSuXBjB7BtCgZyb6GVZ3jdz
+	 V+E3j1p08Go+A==
+Date: Thu, 12 Sep 2024 21:00:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, David Miller
+ <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the net-next tree
+Message-ID: <20240912210008.35118a91@kernel.org>
+In-Reply-To: <CAHS8izN0uCbZXqcfCRwL6is6tggt=KZCYyheka4CLBskqhAiog@mail.gmail.com>
+References: <20240913125302.0a06b4c7@canb.auug.org.au>
+	<20240912200543.2d5ff757@kernel.org>
+	<CAHS8izN0uCbZXqcfCRwL6is6tggt=KZCYyheka4CLBskqhAiog@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZuKii1KDGHSXElB6@localhost>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 12, 2024 at 10:12:59AM +0200, Miroslav Lichvar wrote:
-> I'm trying to understand what independent PTP clocks means here.
+On Thu, 12 Sep 2024 20:14:06 -0700 Mina Almasry wrote:
+> > On Fri, 13 Sep 2024 12:53:02 +1000 Stephen Rothwell wrote:  
+> > > /home/sfr/next/tmp/ccuSzwiR.s: Assembler messages:
+> > > /home/sfr/next/tmp/ccuSzwiR.s:2579: Error: operand out of domain (39 is not a multiple of 4)
+> > > make[5]: *** [/home/sfr/next/next/scripts/Makefile.build:229: net/core/page_pool.o] Error 1  
+> >
+> > Ugh, bad times for networking, I just "fixed" the HSR one a few hours
+> > ago. Any idea what line of code this is? I'm dusting off my powerpc
+> > build but the error is somewhat enigmatic.  
+> 
+> FWIW I couldn't reproduce this with these steps on top of
+> net-next/main (devmem TCP is there):
+> 
+> make ARCH=powerpc CROSS_COMPILE=powerpc-linux-gnu- ppc64_defconfig
+> make ARCH=powerpc CROSS_COMPILE=powerpc-linux-gnu- -j80
+> 
+> (build succeeds)
+> 
+> What am I doing wrong?
 
-Me, too.
-
-It is not easy to see where this is going...
-
-Thanks,
-Richard
-
+I don't see it either, gcc 11.1. Given the burst of powerpc build
+failures that just hit the list I'm wondering if this is real.
 
