@@ -1,118 +1,103 @@
-Return-Path: <netdev+bounces-128157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90BBD9784F4
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:34:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D0479784FE
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:37:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39E6D1F218D6
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 15:34:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46A211C21C39
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 15:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCA32AD17;
-	Fri, 13 Sep 2024 15:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 587F23B782;
+	Fri, 13 Sep 2024 15:37:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fvnRCFVH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sEtY0NeT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D5FDF60;
-	Fri, 13 Sep 2024 15:34:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF3F6208B0
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 15:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726241668; cv=none; b=tv92kbBO5NoPv7g7SXl08zfApDeU2Mmkxjes2jkkcS3maguYWcLeTNzdKmgCIiSnb0k0YfadbmKhA1u+MWCsjVxCaVzo4IFrtGI3XErLH/yK03WGa+FMrgUXm5/XHWAwUjCWG8wQBbZt3uheN9ZTfiRFvHAZkvX6D2JZZmKakHE=
+	t=1726241870; cv=none; b=K+YYa5+Kr02iGpBqTFEVlWfUX9/Fn6TVwyFElIRYtxKvHTtzCcpiYeCafAPGO3CiXZ+bnD+F8x0NnCoQbFaHlTWvqhaS4wwHc4tFvQ3ql0+7qMHU20bOd2UHDlu6lnrCYgOGTSF5eITdCuS511t3nqRLZ2uji4xXY7yOObdQXZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726241668; c=relaxed/simple;
-	bh=aeBS/jexYN5ZGjpVm407B7hRMZZ4ukiBkzvptBAgJaU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K8whIktNnD9tMaYTkWysVxoYKQLMKsgEmchp91ZdWo896lf5WJWg4NTR9+L17QyptrJF1az+N4SDZ+QpQS1NkGxkzJmD8vTq/z56gBjpkzNfVEBZxSxFOW8YvD0fbYc3h5Gxni6vfxiJmSycdvG3l8oSw2YpEyMBgd+1VxCXCmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fvnRCFVH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58843C4CEC0;
-	Fri, 13 Sep 2024 15:34:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726241667;
-	bh=aeBS/jexYN5ZGjpVm407B7hRMZZ4ukiBkzvptBAgJaU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fvnRCFVHGls2KVupkmqKoiiT6kDNtgpUr/OtlXRhNExNuQwj/1mVFgnCGu6RaHVN5
-	 yImCV0xqRqSYRTa9WEA+G6dyWs7hKhAnshmW04/6UdqvfI1ZyEPv6myYvbZIPgzbLg
-	 RaDUjFNXhcs8MG0e708PDLA25bqBQWChlPVii3HZYW72/c6lGzBGAJnxLSX/YMLpI8
-	 9k38k21KExHymnbg6c/H0/mlbkb7dvWpnkHsi09iQz2zpXi7IuX+PtRbZiAWZB1TtJ
-	 CqA4Q+iV2ZG0HIcpVu76xHsnZ2Jha/4JTDOnOOWMHG8pkc8Z/8DzdVi32zwqL8t5u6
-	 woBDZts1VdL6g==
-Date: Fri, 13 Sep 2024 08:34:26 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Mina Almasry <almasrymina@google.com>, Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- linuxppc-dev@lists.ozlabs.org
-Subject: Re: linux-next: build failure after merge of the net-next tree
-Message-ID: <20240913083426.30aff7f4@kernel.org>
-In-Reply-To: <20240913204138.7cdb762c@canb.auug.org.au>
-References: <20240913125302.0a06b4c7@canb.auug.org.au>
-	<20240912200543.2d5ff757@kernel.org>
-	<20240913204138.7cdb762c@canb.auug.org.au>
+	s=arc-20240116; t=1726241870; c=relaxed/simple;
+	bh=8ixziJ+NoVh4KOQg8C8NgzofR7i3xJZLSc06BKDtxXE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Mbd74ban0GGRyhNCRbnTsJNb+mUzOcp7PxRxo6sIvKvjB7OkjfxyMQKRAmQQ+xE3pS3Ubxszxd4XrdvLdSzAaY1OdlVmBVjE5ppIW1XbOu2Y7Lwlb/QCB4i8bj+weW/AlllBPzwYT0tMBvZvrQVB6ORb47lF8m1xrRd9yA0Z1jo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sEtY0NeT; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a8d60e23b33so283503266b.0
+        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 08:37:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726241867; x=1726846667; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8ixziJ+NoVh4KOQg8C8NgzofR7i3xJZLSc06BKDtxXE=;
+        b=sEtY0NeTFRRF0/RcRwDu45eVUcbz3bjNqVmz2rjiT+avVsEusmNo6bkt4fy+GF8aw9
+         rPezas8OvrcZAwlq5yd7FzIT1E8puhG0yWxJU33qfvHCEW/u7nOoaTvz+bqW3dIE5A1X
+         YxrASmZCe+7/io1+HuIqLtPKWdFFVtfuhCuQFC6hN4zr8BxmQL/CC73LLJF7Umeml5B7
+         D9wai5DTnC+66bViMRa62HM/YNxEcf26j3mwzj+/IRs3yRYjukhn6/IMDkudU03RYi/4
+         jaDmp7mbReG1Nn1KVOVPrW/3aUta4/mChqitfQUhGnTSG5DtKevkR4sbEOmZe1Uft2Kn
+         mgaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726241867; x=1726846667;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8ixziJ+NoVh4KOQg8C8NgzofR7i3xJZLSc06BKDtxXE=;
+        b=qUsnfkGfR6S+O4IMHLjU8D3G5E+iPpWPJePypD+UEsZ/nu1fv8kzrOE4r0x8H+vQrH
+         u22LzHcc3IcAGCarkwN9tDZDzCE7tH+MdGLO0zBBDSOYRjKGlqRWRr9hSnoC1/0OPm+9
+         2ctWO1HqmCmR174eOSCaDRRV/eK020gq5o62jlWFRQtIXaIOTVnsMc+6XYRWvuiJuS+a
+         8I8vqmoJUBqWFtV1QswetslS24RPpdEmM5ODZkuYGLC7sF8GCJPAnQWzm7Ss3KL1LDCK
+         2QvI/QRk8Lc/7WwTKfJFnKqxtnjDdD3Mi1ryjVlU+b6IBkq4mDsAJP3GsmcEda9dQ/pw
+         WJ0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXDMPgfLwRUw40CBYKP3LBhDpz+CcFKKuchpznXp3/sZChoVVwBZBQEiVsWuMxlySum2YYWfAg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxefDDg+CYb6dSMx/qj7WhGEJRq28oB5XIUvLiJeHg3EKrm5SMJ
+	sRyfnoiJGeg5lw5N3L1gDCJth0c6fWzyEoJFdg6Z2SC9Z0YqKVamZeIsf4a16hflxaElDM9ykAv
+	yqVqZxcHy+4mjkEj2C19/jYGRwwroOwPcY4yu
+X-Google-Smtp-Source: AGHT+IGb5+Ky2+5hGPg9TOJMT/1uVEafLvwFY32TQ483pUMrOKix9BbKOuCjTfYl0Y8ZspD31CnMtbkI1Ixvmdip3Nc=
+X-Received: by 2002:a17:907:e2cf:b0:a8c:d6a3:d03a with SMTP id
+ a640c23a62f3a-a902947d3f4mr643415066b.21.1726241866556; Fri, 13 Sep 2024
+ 08:37:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240913145711.2284295-1-sean.anderson@linux.dev>
+In-Reply-To: <20240913145711.2284295-1-sean.anderson@linux.dev>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 13 Sep 2024 17:37:35 +0200
+Message-ID: <CANn89i+BGju58H3u6-Z_tZApjaMC+LB5XEocPbuTWK9owHyM4Q@mail.gmail.com>
+Subject: Re: [PATCH net v2] net: xilinx: axienet: Schedule NAPI in two steps
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Michal Simek <michal.simek@amd.com>, 
+	linux-kernel@vger.kernel.org, Robert Hancock <robert.hancock@calian.com>, 
+	Shannon Nelson <shannon.nelson@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 13 Sep 2024 20:41:38 +1000 Stephen Rothwell wrote:
-> I have bisected it (just using the net-next tree) to commit
-> 
-> 8ab79ed50cf10f338465c296012500de1081646f is the first bad commit
-> commit 8ab79ed50cf10f338465c296012500de1081646f
-> Author: Mina Almasry <almasrymina@google.com>
-> Date:   Tue Sep 10 17:14:49 2024 +0000
-> 
->     page_pool: devmem support
->     
-> 
-> And it may be pointing at arch/powerpc/include/asm/atomic.h line 200
-> which is this:
-> 
-> static __inline__ s64 arch_atomic64_read(const atomic64_t *v)
-> {
->         s64 t;
-> 
->         /* -mprefixed can generate offsets beyond range, fall back hack */
->         if (IS_ENABLED(CONFIG_PPC_KERNEL_PREFIXED))
->                 __asm__ __volatile__("ld %0,0(%1)" : "=r"(t) : "b"(&v->counter))
-> ;
->         else
->                 __asm__ __volatile__("ld%U1%X1 %0,%1" : "=r"(t) : "m<>"(v->counter));
-> 
->         return t;
-> }
-> 
-> The second "asm" above (CONFIG_PPC_KERNEL_PREFIXED is not set).  I am
-> guessing by searching for "39" in net/core/page_pool.s
-> 
-> This is maybe called from page_pool_unref_netmem()
+On Fri, Sep 13, 2024 at 4:57=E2=80=AFPM Sean Anderson <sean.anderson@linux.=
+dev> wrote:
+>
+> As advised by Documentation/networking/napi.rst, masking IRQs after
+> calling napi_schedule can be racy. Avoid this by only masking/scheduling
+> if napi_schedule_prep returns true.
+>
+> Fixes: 9e2bc267e780 ("net: axienet: Use NAPI for TX completion path")
+> Fixes: cc37610caaf8 ("net: axienet: implement NAPI and GRO receive")
+> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+> ---
 
-Thanks! The compiler version helped, I can repro with GCC 14.
-
-It's something special about compound page handling on powerpc64,
-AFAICT. I'm guessing that the assembler is mad that we're doing
-an unaligned read:
-
-   3300         ld 8,39(8)       # MEM[(const struct atomic64_t *)_29].counter, t
-
-which does indeed look unaligned to a naked eye. If I replace
-virt_to_head_page() with virt_to_page() on line 867 in net/core/page_pool.c
-I get:
-
-   2982         ld 8,40(10)      # MEM[(const struct atomic64_t *)_94].counter, t
-
-and that's what we'd expect. It's reading pp_ref_count which is at
-offset 40 in struct net_iov. I'll try to take a closer look at 
-the compound page handling, with powerpc assembly book in hand, 
-but perhaps this rings a bell for someone?
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
