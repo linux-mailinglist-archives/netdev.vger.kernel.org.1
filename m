@@ -1,100 +1,105 @@
-Return-Path: <netdev+bounces-128090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EB42977EDF
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 13:51:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23A81977F32
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 14:04:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 465DC1F228B2
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 11:51:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CA681C2205D
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 12:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB1991D88A0;
-	Fri, 13 Sep 2024 11:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41681D9348;
+	Fri, 13 Sep 2024 12:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Afv6Xwzi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gqnwkAxG"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 641BC1D6C7F;
-	Fri, 13 Sep 2024 11:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252181D86D8
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 12:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726228311; cv=none; b=Wg2IlaUtee0plOrL/n00NzQlStCsjRiECJqKUVa4nwqitYK3lUQFX4TouoCdAEsAgsc28L6ZyRFmnf17FX3I+eFl1F8aNQ5HJ6Hz1sQ+ABsIatv0oxUiOUkOLa7sBMkSXl4/DZWsJJHIHMDNsUKIYMzvdN/odMZAFpKave+KZZY=
+	t=1726229023; cv=none; b=E4CRyIp8qaIC4PhbWJHw8NjzNdqJQGMjhlXQULHFZx7f710nyqra2UsrLFzrg76k4PVs7qqgrkD0s1kW0SsF16teYHd9fU8bk5M0g24oL0dj7V8Bmq1TlQRGtOaN2PC/Fyfe9NwTO/1btTWODr3DdI7k7ub4QOUW+r7TaOMx8pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726228311; c=relaxed/simple;
-	bh=1TLm4rAZ5pFpsYIIQFLhLiHFR2YYzQXDu6UGmffJLJY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UdSoOP1PiC4xjb/OGvk01RKeWqEq0WYdf92LsWe0K5LqiSqF8H+HEGXKZsTWe+dk74FFxWH4hHBQBPwg9yvorRZp41ZZnUqu/x2ya3zhzlM9/tlQKpkVwEuCtucywI0ACW29DHhmTIsTa361qeafhVRvXwYjorCl3UOed7jVCqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Afv6Xwzi; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 833F140002;
-	Fri, 13 Sep 2024 11:51:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1726228307;
+	s=arc-20240116; t=1726229023; c=relaxed/simple;
+	bh=9ng40oYAgRV62vDU8LkffBGgKUXp5k6gcUL9UTEfGhg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o2F+kalMaB4YCWfonrVsfpViOSGJl4qn6MlRyuM17qP01lToNp5d4TIaVB5KdQWpB4IoEa3AwmXVMTOHfhKGrsVzP4jkigxk5A4lp5IG8ld0f8uSFE5kIycz9A2DLaAw/pblsXVca4rQ/Pn6oir3Tred+mqrwa00mwwnkPYk1w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gqnwkAxG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726229021;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=o22ld+Ml/WqxlcTNuea7Zj0lN6reXMa5feXwsZPjWbs=;
-	b=Afv6XwzikOJ1Oxj7sjkT5xnkekmXx3kGpt6E4zviM0lqGfyyWrgQGf6xz0Z72g15ndFsxN
-	+zsa2jjS8MBWHCr8Lanlxa/RjOsz7vUKhdJSi4HOqFD1a+8TI3DegsICkCJbXPGzxFln5i
-	KkBiu2QG17SVcV21otBbvdONZHQMn86SSNlvvsWtYpbQQs1LKhGVRNDF2BNbry+i2FjIze
-	dIieib+x/XuXQDu5gDaTFh3s7RgOfEFr/53+Hy2okgkWp3YejE1CCv8MO9WQqhZsZBNqiK
-	1mMD9TVKROec5eqr0PU2gmegww2mZvTE7zr4Oz3GqKemu9TywB4cpFTYTCzGvw==
-Date: Fri, 13 Sep 2024 13:51:45 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Lizhi Xu <lizhi.xu@windriver.com>
-Cc: <syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com>,
- <christophe.leroy@csgroup.eu>, <davem@davemloft.net>,
- <edumazet@google.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <pabeni@redhat.com>,
- <syzkaller-bugs@googlegroups.com>
-Subject: Re: [PATCH net-next] net: ethtool: phy: Distinguish whether dev is
- got by phy start or doit
-Message-ID: <20240913135145.2c9ac50c@fedora.home>
-In-Reply-To: <20240913080714.1809254-1-lizhi.xu@windriver.com>
-References: <000000000000d3bf150621d361a7@google.com>
-	<20240913080714.1809254-1-lizhi.xu@windriver.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	bh=/qGbd8bqgZoV5GwVi3px8eV61nhOypciW6N1GHtrHxI=;
+	b=gqnwkAxGvDB0kvvYFaPM84A7mPITmmWK/DU9GSyjkqvOP3XEjWA14NVPCznyboZLJTkZTy
+	rSOLXde/G1sn05mrhLNpmrslFIKXu6HZ7pqJT71i70QDeW2MW/ejHTIzPAdXOcmrzHyLZ9
+	GlYfYpJVUWyWK4Oww4JGb00rb2Y62C8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-29-ghay2b80Ncyrw7XhARDMpA-1; Fri, 13 Sep 2024 08:03:39 -0400
+X-MC-Unique: ghay2b80Ncyrw7XhARDMpA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3750b4feb9fso1024458f8f.1
+        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 05:03:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726229018; x=1726833818;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/qGbd8bqgZoV5GwVi3px8eV61nhOypciW6N1GHtrHxI=;
+        b=IMb9eD5pdJwg5WjJLRMYIRlS8X+YfdBlgLYk7hx5xG9x56M5WPejIXzrmcPI4uhl3r
+         7SCb6FLoodVt5AFH039bl5lIDO3ur+JmnHQbyuHXyjNz/4LlBCFEvHOubBcY9uVjzG6M
+         Fpv9qZ35vZugOMsn8iHOL1t1pS3f5Q58ReLVXyyjRm+kCiObuw0VnKAeDz8qssa9V7l8
+         fmEAMt3zyHVmjnr8GYvHH9uwuQ8m/mmC5RMN8WwEz3AAnaFnLhTaj5XNCioFnc6mCvUl
+         s0O3KE2iGG1KhLTp28040ZlwncCT8nG7tjgkLJbDu42+R+HOPf7/qq0su+AXM0yqwgMq
+         HdHQ==
+X-Gm-Message-State: AOJu0Yw1QpGHV8bbeHJc2zQ8eqjhggyiWGno4ATweVFvt4mQuu73gZEy
+	eXyDcO+BAWY8Dok6oMlq4JKvy7Q0wguYItPQhdmkSUY46nyxTHAGLJSgh9MOMg+fPhnsE4/jwpm
+	zqJCLAhIhkoZQs9c2v0V8e4nW5BkGJHkYcWCc1t3BCojYmeXnYJeZ2w==
+X-Received: by 2002:a5d:6d85:0:b0:374:c3e4:d6e3 with SMTP id ffacd0b85a97d-378c27a258cmr4698815f8f.5.1726229018549;
+        Fri, 13 Sep 2024 05:03:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHxearb4HlVaXXsJRkbiDTagvRnei2oGV5VLKRtSVw6kXChafcExboyoB/cqdrTPdFfg5MTmA==
+X-Received: by 2002:a5d:6d85:0:b0:374:c3e4:d6e3 with SMTP id ffacd0b85a97d-378c27a258cmr4698752f8f.5.1726229017404;
+        Fri, 13 Sep 2024 05:03:37 -0700 (PDT)
+Received: from debian (2a01cb058d23d600f8cdc4d4209368b3.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:f8cd:c4d4:2093:68b3])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378a72367b6sm11073692f8f.52.2024.09.13.05.03.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Sep 2024 05:03:36 -0700 (PDT)
+Date: Fri, 13 Sep 2024 14:03:35 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org
+Subject: Re: [PATCH net-next 1/6] net: fib_rules: Add DSCP selector attribute
+Message-ID: <ZuQqF/UN0ZeXZaIi@debian>
+References: <20240911093748.3662015-1-idosch@nvidia.com>
+ <20240911093748.3662015-2-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911093748.3662015-2-idosch@nvidia.com>
 
-Hi,
-
-On Fri, 13 Sep 2024 16:07:13 +0800
-Lizhi Xu <lizhi.xu@windriver.com> wrote:
-
-> Syzbot reported a refcount bug in ethnl_phy_done.
-> This is because when executing ethnl_phy_done, it does not know who obtained
-> the dev(it can be got by ethnl_phy_doit or ethnl_phy_start) and directly
-> executes ethnl_parse_header_dev_put as long as the dev is not NULL.
-> Add dev_start_doit to the structure phy_req_info to distinguish who obtains dev.
+On Wed, Sep 11, 2024 at 12:37:43PM +0300, Ido Schimmel wrote:
+> The FIB rule TOS selector is implemented differently between IPv4 and
+> IPv6. In IPv4 it is used to match on the three "Type of Services" bits
+> specified in RFC 791, while in IPv6 is it is used to match on the six
+> DSCP bits specified in RFC 2474.
 > 
-> Fixes: 17194be4c8e1 ("net: ethtool: Introduce a command to list PHYs on an interface")
-> Reported-and-tested-by: syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=e9ed4e4368d450c8f9db
-> Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+> Add a new FIB rule attribute to allow matching on DSCP. The attribute
+> will be used to implement a 'dscp' selector in ip-rule with a consistent
+> behavior between IPv4 and IPv6.
 
-Thanks for addressing this, however I've already sent a first fix for
-this [1] yesterday, followed-up by a second one [2] with another
-approach following the reviews.
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
-[1] : https://lore.kernel.org/netdev/20240913091404.3d4a9d19@fedora.home/T/#m4777416dbe26bf97b3a0a323fc71a93b40e0f7fb
-[2] : https://lore.kernel.org/netdev/20240913100515.167341-1-maxime.chevallier@bootlin.com/T/#u
-
-Best regards,
-
-Maxime
 
