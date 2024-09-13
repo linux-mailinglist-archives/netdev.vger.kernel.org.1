@@ -1,132 +1,117 @@
-Return-Path: <netdev+bounces-128040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72789977995
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 09:25:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01E58977997
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 09:27:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84408B252D1
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 07:25:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76AF3B23DA5
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 07:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCE0187334;
-	Fri, 13 Sep 2024 07:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7E61BC078;
+	Fri, 13 Sep 2024 07:27:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqDlCX20"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BaHhRIDc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47D6F1B9B3E
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 07:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E8177107;
+	Fri, 13 Sep 2024 07:27:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726212306; cv=none; b=lWYZbIxFO3JYh0YAmELFm0LH5oxZLG8755ZJEKcGvfRD+jTzjmA2rFujs0sxt+VeXiDXcJSm8fGnbRWVP8iuuGMyNWPwYmNLNkfMxuP9v+XhB3Y7niwV/5JmNuFZXtr07kLTkXo9illPTmKxSMGT3cAUEz6jtExaIm0mWQ+fvgM=
+	t=1726212425; cv=none; b=fHWB1kwOAVZePlw4Hz5MLOvMWZMgiha7XdnCbJ1UE+MMFhS6NGhKGmLqhKjxszjPv4ed4WiOM6ynBRUkVqf9gt+YkIgwoo3YCycVr5/pognmc3psHER3G7VOBnnNpaZexTVWa3cEJqPOfKijoUgVm3NnA2NmchdxINDJ3x/ZgrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726212306; c=relaxed/simple;
-	bh=Dr+NTsOdckpyJ9QjYWFcjtmzaimU0NLvQrY+704mVYk=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=oEQ+WXL7j5+aUruEW0JZ0duCWGYcmYCKw1X3FCcuzFWG8IOYi8oFXIU38Iegx/9IXV9cMLUAPsRE8A6GPaUkCDgKMNXuZ8M1945LLx9w9RrUNeobmdiDk4hhIn/3AodkKFCb5luVvvtRjB350fVnitqIpxK9iWplQcpDOghq7JI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dqDlCX20; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2053a0bd0a6so18829395ad.3
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 00:25:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726212304; x=1726817104; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y+E/Cj2sUSKsqIWoS2514usEvp5ibNeqiHKZA9hwExs=;
-        b=dqDlCX208G05r/UIOmtnniQOD+kjkqGEL7LJ7C25cI3v//wkcsbUWF2921ejpcpw7r
-         GsxCOIMbtG0gaBWJaraH7PzPUiqDuZ8DKRXDRjybQ3Z4IKKtCjdoClXcDOM3Y4CWzjBv
-         o/4J4Y0iPpS7Z0BdWSKP3102CGTRR0a1iSfYdLIzyz1d4+DFMhB9gO/C6K6pJImKNScm
-         BYIyOPnjDOLrDk1YeiN5EoPiSD54/3LKyxJnmBTisx1pawHvf9013RFX4jEQATm6HRtq
-         pQNETDXJUSwxV/seaaz7rbL5PsuY1cosbIunt2MKwZKj/MddcDwnzE2vlwRbtE7r8o4T
-         bc2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726212304; x=1726817104;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Y+E/Cj2sUSKsqIWoS2514usEvp5ibNeqiHKZA9hwExs=;
-        b=hmdjBefEqfux+4HuVus7hF/tjoAfeFcU4lBffTjsJ1kFURhXxg0Ddo8d5M9vqff9dl
-         YAq+UsuW6ub4cRFg41RPpkNgEdDbt2iOFVE+Y/rY5Nhl9qggnmyi+k/kJNk1o1ltocYi
-         RZlxefEcMXpMme/e86fglfp3FVOlVMfdHCCH6napvipDLb92dM3csbfbADoR/W7CPRee
-         FBMjysErY6hyceoYsiSUHpcih99ovQXCeQ+p3IZ5jUUHgiUg0DyoTQv2jE5cmQb6ijeN
-         lWtUwE6O87/mWhHjhjmyrwkQ/MjnqrOw1MB8YHPS3q536kmh/1LDMUtPmu0UMMKQN3b6
-         0cpg==
-X-Gm-Message-State: AOJu0Yw4FwaJciXMXesPsxHj/cg/iFCvMAfFzCNZ4SmyZKyFTPGX4pQz
-	7kpX8jZLDp1j/6vRNmAx42Ef44nd6ySaTz5PQgmxACKI+ITL+0BD
-X-Google-Smtp-Source: AGHT+IE8L7BL09jVlWM0YxLnJ/Xc9ekC+By4RePzMEeHJkyUOIoj3JXWX/PoJP/5urWJ61v4UKCgnQ==
-X-Received: by 2002:a05:6a21:6711:b0:1cc:da34:585e with SMTP id adf61e73a8af0-1cf764c40d2mr7726514637.46.1726212304316;
-        Fri, 13 Sep 2024 00:25:04 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db1fba4866sm2833426a12.3.2024.09.13.00.25.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2024 00:25:03 -0700 (PDT)
-Date: Fri, 13 Sep 2024 07:24:49 +0000 (UTC)
-Message-Id: <20240913.072449.1448639398786513810.fujita.tomonori@gmail.com>
-To: hfdevel@gmx.net
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, fujita.tomonori@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next 4/5] net: tn40xx: enable driver to support
- TN4010 cards with AQR105 PHY
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <trinity-0e61ef5a-b461-485b-a7ea-787ffe9b1689-1726083054223@3c-app-gmx-bs04>
-References: <trinity-0e61ef5a-b461-485b-a7ea-787ffe9b1689-1726083054223@3c-app-gmx-bs04>
+	s=arc-20240116; t=1726212425; c=relaxed/simple;
+	bh=YHrWZ756TWnCmNV+PsSyXX+0zIj/PE3ia94PWJfIGm0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WJAjpb8M0YMicKafZhq1j72CXXOtWHDRF/5qO3GTjuD9SsKvxuiIfER1sKqrWAOjREn7PwV7PQFBqFvclF8UPLC0uCXXGmjMoklNEE50Fwa+8H3wr8cxQf8J/iGiTh/R6Ysn56ORx7xOk2mQq9quMglR70JL25eLAakMNr/1VrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BaHhRIDc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B28EC4CEC0;
+	Fri, 13 Sep 2024 07:27:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726212425;
+	bh=YHrWZ756TWnCmNV+PsSyXX+0zIj/PE3ia94PWJfIGm0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BaHhRIDccAB+chq4vfIolGjqSeEg83jXPD9rNbdUr9nB5/qalCkKmr1FX/E8z3e8A
+	 Fq2G5AaOuXhVk6j+SjVejHhvtB1b14B8RT3I909sg4e1/JOPKttO+W4O8PstFZa/tF
+	 U2MoY8GK5rjFdB0ee9DQ9gWLeJ79qbhess8Q/RmCHjX+IkVyufUTNX3KH3r9JZq9PG
+	 IJJOJA2f6q237Wh9f5SSsO1L+T0/3RFpi43x42GqwpcQSBpo29bk0rlpdzOdBB4dzq
+	 hfSkl93kcOr7NY6EOvPA004XRR7x0+IKyvGh9B6yUFhu8rEPQINRj0/IyDlGkWSIhy
+	 QEGwyGjkY0Mgw==
+Date: Fri, 13 Sep 2024 08:26:58 +0100
+From: Simon Horman <horms@kernel.org>
+To: Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	ebpf@linuxfoundation.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2] selftests/bpf: convert test_xdp_features.sh
+ to test_progs
+Message-ID: <20240913072658.GR572255@kernel.org>
+References: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
+ <20240911141824.GZ572255@kernel.org>
+ <fb7db9a9-5b9a-4b77-8dc6-f30b839bec27@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fb7db9a9-5b9a-4b77-8dc6-f30b839bec27@bootlin.com>
 
-On Wed, 11 Sep 2024 21:30:54 +0200
-Hans-Frieder Vogt <hfdevel@gmx.net> wrote:
-
-> Prepare the tn40xx driver to load for Tehuti TN9510 cards
-> and set bit 3 in the TN40_REG_MDIO_CMD_STAT register, because otherwise the
-> AQR105 PHY will not be found. The function of bit 3 is unclear, but may have
-> something to do with the length of the preamble in MDIO communication.
+On Thu, Sep 12, 2024 at 10:17:13PM +0200, Alexis Lothoré wrote:
+> Hi Simon,
 > 
-> Signed-off-by: Hans-Frieder Vogt <hfdevel@gmx.net>
-> ---
->  drivers/net/ethernet/tehuti/tn40.c | 4 ++++
->  1 file changed, 4 insertions(+)
+> On 9/11/24 16:18, Simon Horman wrote:
 > 
-> diff --git a/drivers/net/ethernet/tehuti/tn40.c b/drivers/net/ethernet/tehuti/tn40.c
-> index 259bdac24cf2..4e6f2f781ffc 100644
-> --- a/drivers/net/ethernet/tehuti/tn40.c
-> +++ b/drivers/net/ethernet/tehuti/tn40.c
-> @@ -1760,6 +1760,9 @@ static int tn40_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
->  		goto err_unset_drvdata;
->  	}
+> [...]
 > 
-> +	/* essential for identification of some PHYs is bit 3 set */
-> +	ret = tn40_read_reg(priv, TN40_REG_MDIO_CMD_STAT);
-> +	tn40_write_reg(priv, TN40_REG_MDIO_CMD_STAT, ret | 0x8);
->  	ret = tn40_mdiobus_init(priv);
+> >> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_features.c b/tools/testing/selftests/bpf/prog_tests/xdp_features.c
+> >> new file mode 100644
+> >> index 000000000000..bcb36a2d2767
+> >> --- /dev/null
+> >> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_features.c
+> >> @@ -0,0 +1,446 @@
+> >> +// SPDX-License-Identifier: GPL-2.0
+> >> +
+> >> +/**
+> >> + * Test XDP features
+> >> + *
+> >> + * Sets up a veth pair, and for each xdp feature under test:
+> >> + * - asks the tested interface its xdp capabilities through bpf_xdp_query
+> >> + * - attach and run some specific programs on both interfaces to check if
+> >> + *   announced capability is respected
+> >> + */
+> > 
+> > Hi Alexis,
+> > 
+> > This is neither a full review nor an issue that needs to block progress.
+> > But, FWIIW, the comment above is not a Kernel doc, yet starts with '/**'.
+> > I suggest that it should start with '/*' instead.
+> 
+> ACK. I'll wait for more comments on the series, and add the fix to the
+> corresponding revision, if any.
 
-How about setting the speed of mdio 1MHZ by calling
-tn40_mdio_set_speed() like the vendor driver?
-
-The following works for my TN9510 card.
-
-diff --git a/drivers/net/ethernet/tehuti/tn40_mdio.c b/drivers/net/ethernet/tehuti/tn40_mdio.c
-index bbd95fabbea0..e8b8dea250f2 100644
---- a/drivers/net/ethernet/tehuti/tn40_mdio.c
-+++ b/drivers/net/ethernet/tehuti/tn40_mdio.c
-@@ -183,6 +183,7 @@ int tn40_mdiobus_init(struct tn40_priv *priv)
- 			ret);
- 	}
- 
-+	tn40_mdio_set_speed(priv, TN40_MDIO_SPEED_1MHZ);
- 	ret = devm_mdiobus_register(&pdev->dev, bus);
- 	if (ret) {
- 		dev_err(&pdev->dev, "failed to register mdiobus %d %u %u\n",
+Thanks, much appreciated.
 
