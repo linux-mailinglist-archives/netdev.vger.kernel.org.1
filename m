@@ -1,261 +1,323 @@
-Return-Path: <netdev+bounces-128181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A0ED978666
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:06:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8988597866C
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:07:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AFD4B21748
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:06:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48B85281988
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27F7D84E0A;
-	Fri, 13 Sep 2024 17:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C5581720;
+	Fri, 13 Sep 2024 17:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hx792GEJ"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="35Tl/+z2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="S3x8OFGn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5B97DA95
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 17:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC3D63C;
+	Fri, 13 Sep 2024 17:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726247180; cv=none; b=LnCi0pB7e/W4PUM9IFA0NYQurpbzErAlcDaHL67zUE7hkjjbyGEClHkF7vwSy/1LZCcBRji+mfOG2/fdyumseuLHbk9bgkUlSejAXeTiR/4MkZPpoVLRkJeFcM5P3ZH2mRZmjaxjXToN5El+AV2FpgrFGTroog8OpgyKYxEjFcM=
+	t=1726247271; cv=none; b=WEu5DMFmvxlhTKhFZ+A1q4i3QgTG0KQ+k7TFIUIlXnGy/fN+SD7XrtnnP6gVFCOS8uUJFA5UYRuE6nYvS/8DRHQyfXmcEtjVq49mJPrI5GSqXsOOi4NOKNwhyW7PXhjy4cJdIC4zq98Q+uiPKikIgrAVZSTjtbc1k1+n0i+SUnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726247180; c=relaxed/simple;
-	bh=CRsmI6gxOMpsuLo45bPY23hXw9zGyGQD78sbCV3nJ6s=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ZVPdfb6ClmQHxlJ0WAg2gfzIOmZ0s+/au4r6J/LvJcqWrqe2c7Hj6LNktAo5SgURe1a/n48tFV7ncR2t6VLYueUlOBaYVyq05B8i7IyryKB5+JymnqSSh+LfyIAKmuSKyuC5WrtrUiv5TEXquOtzA8ApYcBNgOJeTfkY10dL16Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hx792GEJ; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e02a4de4f4eso4619660276.1
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 10:06:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726247177; x=1726851977; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VMQEfmmM5zZqs/FvdexqNs9m62IGW0F3qftdOVgtTgw=;
-        b=Hx792GEJVOmRzXEEq3MqP4mQXmyA2+uEplfDBq+NBZgWIizz3GAWS+sleKPwf0ZUuW
-         iF2HxuIVAiWVwez2vNZtu0m56q3aeHDV90CtpKFHf+CaE5V33bZI+Q4bXBnNFvFk65yN
-         ATZ6ldMMZqmrsEPo0o8+zT9BthwuVBlxECejqyc0gDR5WLDb76kqA0PLH9TjYGsPLX+X
-         JgNGHLC52i69eHMoGQ9zRCTMSuxNLWlovR2AiJjBCsvQAXqSC754zHshb/EbOP05gNpi
-         6P6o/o64zab7ldxYuTEVG3RtedDY1uo7HFzjEfXA1daSJw3OdpVBYqCHo7o07v+Vuont
-         BtsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726247177; x=1726851977;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=VMQEfmmM5zZqs/FvdexqNs9m62IGW0F3qftdOVgtTgw=;
-        b=lxWOMtlZf7pEN2D+jSKYk9aILcGnymbM8wxgsmrqHGIov2KUy6jdtl5oFgjQSbgM7n
-         CZHHI1ZeefBGf6G554SzLWCdjLkEdAqelgs4nNVii/yPposvYZ2zBojYPt9fxM8NHj2l
-         mMQY60SEw2UAG07LLK2ODAJlMxh5IbkNY0pDmFBgi/PyKW3W2dZdHDcAdHqqgJxBtvAQ
-         43GX9tiPgOuASnqvFwQKO8EAputej072fjb6ZW6H84aDBMCUtPsVT9KkL5wR4Q4LF95m
-         MPFeBO/PSs/QcOQOnTHv5dg+zQghT1tlxmU69ajAM5hDUJb+4JXM+GLJZDCHAU2EDcHw
-         ILEA==
-X-Gm-Message-State: AOJu0YzyTPGViFrJUmFNuLPm+YbzFWm/5D5sMAqzNBGTGtq7DGJml0CM
-	NNLJw3eFjAZO6yD7A2OTB9PuJ42L5mgC7x90oqGBX0vsRaxqtdA8+sXArxnf728zM2qzeDOUHfB
-	tmuZBzaTSlQ==
-X-Google-Smtp-Source: AGHT+IH+hEOPIFUf35hL64NfJSvMuo2gRulrcjdy2bDnXXGH16YTKcVNMgOaDNBj/LFwj+LiFKKVQhGYnm2XVg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:e446:0:b0:e11:6a73:b0d with SMTP id
- 3f1490d57ef6-e1d9dc3b6c9mr8174276.6.1726247177281; Fri, 13 Sep 2024 10:06:17
- -0700 (PDT)
-Date: Fri, 13 Sep 2024 17:06:15 +0000
+	s=arc-20240116; t=1726247271; c=relaxed/simple;
+	bh=PYV58iWVC3PKfH4IsiVSBIPaNqZ76nH3yQUqTmGQM2s=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=Wkt7cbTKcsOs5vMiRg0Bp95Cp20X4IxaiTELN5HChR4R00oeE/TyK79tPhj3MfFPF+kpJ7RuhVJ25W3ApXR1WxMKMfjK5YDIxbu78zNc34JxZaHHdQQEJHp5Fvs8D5j+CXnsx8xGfrfYBFEf0wPX9N5i2FFrXWXqXBkb+viKpr8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=35Tl/+z2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=S3x8OFGn; arc=none smtp.client-ip=103.168.172.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 7B2EE114008B;
+	Fri, 13 Sep 2024 13:07:48 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Fri, 13 Sep 2024 13:07:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm3;
+	 t=1726247268; x=1726333668; bh=ltRxHgFwdb8npWJX4/vmgTP+KogieigH
+	7exQIEBZgn8=; b=35Tl/+z23qNzU/034/LfXvlbJwK6VyYwrgTyHYrdgC5aNVNI
+	Bpr6peHFBlEeSNcpgNXLpUS7m5c4cDIzxMC37mmFmw1eMrKjIEhmLqmlYL/WsWeh
+	CFQGOdxE074PeAtcaL0V2TDY8IEdZ78OwXT+vryvKM++W0v15wwrywg6GN/6a+ur
+	oIsXHtpjh/7Io2x7zmQKVGICD0mj3Gn9sN9vwgRY1pzPIvrBIeuqhGJpjgIMB3Ph
+	XClpHz2MEsXA3HSSCr6mBw31Uf9ELtJqB8jtLUf+29TVm8QuWRPJJblj+ibeicdN
+	AuAJpchtuiWl5l2AVt4jLqnRBG5Q7JGj19Z/+A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1726247268; x=
+	1726333668; bh=ltRxHgFwdb8npWJX4/vmgTP+KogieigH7exQIEBZgn8=; b=S
+	3x8OFGnnmzi1IWD+tONeGkKsJoHGBCc9djSDCeznHAVXRW1DiBIrMVjp6AecWpF1
+	uj3VQuwq8u4Eusy2gNzQz1SNOUHzb8yu8Hg9/T02eN5fpwNjR2EcctmRcdeGl+d0
+	TPw6KOl0XOrfiy7YpZEewnq+jMKHOVk5lWL2lXw6TYzpPMp9X5mEcIZ0NtAE9Jk7
+	BDLFWFTi8hM14TSo8A/m5vv6HghSYeLoDr1eGGvgtzyIeoarxMYMttlZ0Ty5COkN
+	/6wEqdHb88qFCbMnoFn2U3hMtL0JCa5/Gf8OUltdI3TOLidi25XBh0FbRh1oVNPg
+	lPNtaxbDZY/qQUReZ+1Pg==
+X-ME-Sender: <xms:ZHHkZg672g1SYSXClDiwAevO6MVTDuT89KO6YaxcnHEbcA5IaLTqsA>
+    <xme:ZHHkZh5VDkdw3Zz5b2JfxyHk9v3HHPjHpJ-SNrVVmD-3Bsoh2qVTjfzVt68NTCb8U
+    3rjilATfFWtblb9GQg>
+X-ME-Received: <xmr:ZHHkZveJm5SIdlAUFw9FG8l_QNai80_jPKEX91vg9FmBS99s_2rXGZ775tmLP0wsKcPs_Q>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrudejjedguddtkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpefhvfevufgjfhfogggtgfffkfesthhqredtredt
+    jeenucfhrhhomheplfgrhicugghoshgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrd
+    hnvghtqeenucggtffrrghtthgvrhhnpeegfefghffghffhjefgveekhfeukeevffethffg
+    tddutdefffeuheelgeelieeuhfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgspghrtghpthht
+    ohepkedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmh
+    hlohhfthdrnhgvthdprhgtphhtthhopehsuhhrvghshhdvhedugeesghhmrghilhdrtgho
+    mhdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    eprghnugihsehgrhgvhihhohhushgvrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtg
+    hpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:ZHHkZlIUxaqX4myGwMEdeekI7zZJtqk0Ye_HpKgqxvWdNG5JPpk7gQ>
+    <xmx:ZHHkZkIXB9qwxGshNVqnaDiliWL-jy5ElLMGx7ryCxA8WwHQE0gz9Q>
+    <xmx:ZHHkZmzPqGG7w1ZXXpuMzRxsUlmlJX3afT9Hy-8tp0ztpnE4txYj8A>
+    <xmx:ZHHkZoLqaJGuzPFZlGqJxCGO2ENBVrMmOS1ACnjL6PFnSHE1fwRKvQ>
+    <xmx:ZHHkZj_eLE7X5I_P9Kv4_hTVwqzMzhA3eal6LyphZ2TsLbZ3GUOAI0Xs>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 13 Sep 2024 13:07:47 -0400 (EDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 9AE159FC93; Fri, 13 Sep 2024 10:07:46 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 99D4A9FC8E;
+	Fri, 13 Sep 2024 10:07:46 -0700 (PDT)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: suresh ks <suresh2514@gmail.com>
+cc: andy@greyhouse.net, davem@davemloft.net, edumazet@google.com,
+    kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: bonding: do not set force_primary if reselect is set to failure
+In-reply-to: <CABAyFk4dzN_Oprod1LM_X1x+-bHg8HxnJ1OzhLRD092mY4ON3w@mail.gmail.com>
+References: <20240912064043.36956-1-suresh2514@gmail.com> <397121.1726186016@famine> <CABAyFk4dzN_Oprod1LM_X1x+-bHg8HxnJ1OzhLRD092mY4ON3w@mail.gmail.com>
+Comments: In-reply-to suresh ks <suresh2514@gmail.com>
+   message dated "Fri, 13 Sep 2024 08:06:06 +0530."
+X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.662.g92d0881bb0-goog
-Message-ID: <20240913170615.3670897-1-edumazet@google.com>
-Subject: [PATCH net] netfilter: nf_reject_ipv6: fix nf_reject_ip6_tcphdr_put()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 13 Sep 2024 10:07:46 -0700
+Message-ID: <417266.1726247266@famine>
 
-syzbot reported that nf_reject_ip6_tcphdr_put() was possibly sending
-garbage on the four reserved tcp bits (th->res1)
+suresh ks <suresh2514@gmail.com> wrote:
 
-Use skb_put_zero() to clear the whole TCP header,
-as done in nf_reject_ip_tcphdr_put()
+>Hi,
+>
+>Thanks  a lot for reviewing.
+>
+>I was working for a customer issue where they removed a primary NIC for sw=
+itch
+>maintenance and when added back, it caused iscsi storage outage because th=
+ey
+>did not expect the bod to do a failover.
+>
+>So bonding is behaving as default. But then I thought maybe we can do
+>something to cater for such scenarios and came up with this idea.  But
+>I agree my
+>testing was not a failure as I see ""Link Failure Count: 0" there.  I
+>used the below
+>command from my kvm host to simulate a link down and up.
+>
+>     virsh  detach-interface testvm1  --type network --mac 52:54:00:d7:a7:=
+2a
+>
+>and attached it back with:
+>
+>    virsh  attach-interface testvm1 --type network --source default
+>--mac 52:54:00:d7:a7:2a
+>     --model e1000e --config --live
 
-BUG: KMSAN: uninit-value in nf_reject_ip6_tcphdr_put+0x688/0x6c0 net/ipv6/netfilter/nf_reject_ipv6.c:255
-  nf_reject_ip6_tcphdr_put+0x688/0x6c0 net/ipv6/netfilter/nf_reject_ipv6.c:255
-  nf_send_reset6+0xd84/0x15b0 net/ipv6/netfilter/nf_reject_ipv6.c:344
-  nft_reject_inet_eval+0x3c1/0x880 net/netfilter/nft_reject_inet.c:48
-  expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
-  nft_do_chain+0x438/0x22a0 net/netfilter/nf_tables_core.c:288
-  nft_do_chain_inet+0x41a/0x4f0 net/netfilter/nft_chain_filter.c:161
-  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
-  nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
-  nf_hook include/linux/netfilter.h:269 [inline]
-  NF_HOOK include/linux/netfilter.h:312 [inline]
-  ipv6_rcv+0x29b/0x390 net/ipv6/ip6_input.c:310
-  __netif_receive_skb_one_core net/core/dev.c:5661 [inline]
-  __netif_receive_skb+0x1da/0xa00 net/core/dev.c:5775
-  process_backlog+0x4ad/0xa50 net/core/dev.c:6108
-  __napi_poll+0xe7/0x980 net/core/dev.c:6772
-  napi_poll net/core/dev.c:6841 [inline]
-  net_rx_action+0xa5a/0x19b0 net/core/dev.c:6963
-  handle_softirqs+0x1ce/0x800 kernel/softirq.c:554
-  __do_softirq+0x14/0x1a kernel/softirq.c:588
-  do_softirq+0x9a/0x100 kernel/softirq.c:455
-  __local_bh_enable_ip+0x9f/0xb0 kernel/softirq.c:382
-  local_bh_enable include/linux/bottom_half.h:33 [inline]
-  rcu_read_unlock_bh include/linux/rcupdate.h:908 [inline]
-  __dev_queue_xmit+0x2692/0x5610 net/core/dev.c:4450
-  dev_queue_xmit include/linux/netdevice.h:3105 [inline]
-  neigh_resolve_output+0x9ca/0xae0 net/core/neighbour.c:1565
-  neigh_output include/net/neighbour.h:542 [inline]
-  ip6_finish_output2+0x2347/0x2ba0 net/ipv6/ip6_output.c:141
-  __ip6_finish_output net/ipv6/ip6_output.c:215 [inline]
-  ip6_finish_output+0xbb8/0x14b0 net/ipv6/ip6_output.c:226
-  NF_HOOK_COND include/linux/netfilter.h:303 [inline]
-  ip6_output+0x356/0x620 net/ipv6/ip6_output.c:247
-  dst_output include/net/dst.h:450 [inline]
-  NF_HOOK include/linux/netfilter.h:314 [inline]
-  ip6_xmit+0x1ba6/0x25d0 net/ipv6/ip6_output.c:366
-  inet6_csk_xmit+0x442/0x530 net/ipv6/inet6_connection_sock.c:135
-  __tcp_transmit_skb+0x3b07/0x4880 net/ipv4/tcp_output.c:1466
-  tcp_transmit_skb net/ipv4/tcp_output.c:1484 [inline]
-  tcp_connect+0x35b6/0x7130 net/ipv4/tcp_output.c:4143
-  tcp_v6_connect+0x1bcc/0x1e40 net/ipv6/tcp_ipv6.c:333
-  __inet_stream_connect+0x2ef/0x1730 net/ipv4/af_inet.c:679
-  inet_stream_connect+0x6a/0xd0 net/ipv4/af_inet.c:750
-  __sys_connect_file net/socket.c:2061 [inline]
-  __sys_connect+0x606/0x690 net/socket.c:2078
-  __do_sys_connect net/socket.c:2088 [inline]
-  __se_sys_connect net/socket.c:2085 [inline]
-  __x64_sys_connect+0x91/0xe0 net/socket.c:2085
-  x64_sys_call+0x27a5/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:43
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+	This removes the interface entirely, so it's not just a link
+failure.  You could probably simulate a link failure via something like
+"ip link set dev ${INTERFACE} down", followed by a later "up" to restore
+link state.  This would happen in the testvm1, and ${INTERFACE} is the
+name of the bond member interface.
 
-Uninit was stored to memory at:
-  nf_reject_ip6_tcphdr_put+0x60c/0x6c0 net/ipv6/netfilter/nf_reject_ipv6.c:249
-  nf_send_reset6+0xd84/0x15b0 net/ipv6/netfilter/nf_reject_ipv6.c:344
-  nft_reject_inet_eval+0x3c1/0x880 net/netfilter/nft_reject_inet.c:48
-  expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
-  nft_do_chain+0x438/0x22a0 net/netfilter/nf_tables_core.c:288
-  nft_do_chain_inet+0x41a/0x4f0 net/netfilter/nft_chain_filter.c:161
-  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
-  nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
-  nf_hook include/linux/netfilter.h:269 [inline]
-  NF_HOOK include/linux/netfilter.h:312 [inline]
-  ipv6_rcv+0x29b/0x390 net/ipv6/ip6_input.c:310
-  __netif_receive_skb_one_core net/core/dev.c:5661 [inline]
-  __netif_receive_skb+0x1da/0xa00 net/core/dev.c:5775
-  process_backlog+0x4ad/0xa50 net/core/dev.c:6108
-  __napi_poll+0xe7/0x980 net/core/dev.c:6772
-  napi_poll net/core/dev.c:6841 [inline]
-  net_rx_action+0xa5a/0x19b0 net/core/dev.c:6963
-  handle_softirqs+0x1ce/0x800 kernel/softirq.c:554
-  __do_softirq+0x14/0x1a kernel/softirq.c:588
+>So what would be the best solution here if I want to take out a
+>primary NIC for maintenance,
+>and then add it back ?.
 
-Uninit was stored to memory at:
-  nf_reject_ip6_tcphdr_put+0x2ca/0x6c0 net/ipv6/netfilter/nf_reject_ipv6.c:231
-  nf_send_reset6+0xd84/0x15b0 net/ipv6/netfilter/nf_reject_ipv6.c:344
-  nft_reject_inet_eval+0x3c1/0x880 net/netfilter/nft_reject_inet.c:48
-  expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
-  nft_do_chain+0x438/0x22a0 net/netfilter/nf_tables_core.c:288
-  nft_do_chain_inet+0x41a/0x4f0 net/netfilter/nft_chain_filter.c:161
-  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
-  nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
-  nf_hook include/linux/netfilter.h:269 [inline]
-  NF_HOOK include/linux/netfilter.h:312 [inline]
-  ipv6_rcv+0x29b/0x390 net/ipv6/ip6_input.c:310
-  __netif_receive_skb_one_core net/core/dev.c:5661 [inline]
-  __netif_receive_skb+0x1da/0xa00 net/core/dev.c:5775
-  process_backlog+0x4ad/0xa50 net/core/dev.c:6108
-  __napi_poll+0xe7/0x980 net/core/dev.c:6772
-  napi_poll net/core/dev.c:6841 [inline]
-  net_rx_action+0xa5a/0x19b0 net/core/dev.c:6963
-  handle_softirqs+0x1ce/0x800 kernel/softirq.c:554
-  __do_softirq+0x14/0x1a kernel/softirq.c:588
+	You could clear the primary option on the bond for the
+maintenance window, and later set primary to the desired interface when
+everything is ready for that interface to become active again.
 
-Uninit was created at:
-  slab_post_alloc_hook mm/slub.c:3998 [inline]
-  slab_alloc_node mm/slub.c:4041 [inline]
-  kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4084
-  kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:583
-  __alloc_skb+0x363/0x7b0 net/core/skbuff.c:674
-  alloc_skb include/linux/skbuff.h:1320 [inline]
-  nf_send_reset6+0x98d/0x15b0 net/ipv6/netfilter/nf_reject_ipv6.c:327
-  nft_reject_inet_eval+0x3c1/0x880 net/netfilter/nft_reject_inet.c:48
-  expr_call_ops_eval net/netfilter/nf_tables_core.c:240 [inline]
-  nft_do_chain+0x438/0x22a0 net/netfilter/nf_tables_core.c:288
-  nft_do_chain_inet+0x41a/0x4f0 net/netfilter/nft_chain_filter.c:161
-  nf_hook_entry_hookfn include/linux/netfilter.h:154 [inline]
-  nf_hook_slow+0xf4/0x400 net/netfilter/core.c:626
-  nf_hook include/linux/netfilter.h:269 [inline]
-  NF_HOOK include/linux/netfilter.h:312 [inline]
-  ipv6_rcv+0x29b/0x390 net/ipv6/ip6_input.c:310
-  __netif_receive_skb_one_core net/core/dev.c:5661 [inline]
-  __netif_receive_skb+0x1da/0xa00 net/core/dev.c:5775
-  process_backlog+0x4ad/0xa50 net/core/dev.c:6108
-  __napi_poll+0xe7/0x980 net/core/dev.c:6772
-  napi_poll net/core/dev.c:6841 [inline]
-  net_rx_action+0xa5a/0x19b0 net/core/dev.c:6963
-  handle_softirqs+0x1ce/0x800 kernel/softirq.c:554
-  __do_softirq+0x14/0x1a kernel/softirq.c:588
+	-J
 
-Fixes: c8d7b98bec43 ("netfilter: move nf_send_resetX() code to nf_reject_ipvX modules")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv6/netfilter/nf_reject_ipv6.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
-
-diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
-index dedee264b8f6c8e5155074c6788c53fdf228ca3c..b9457473c176df7a797ae9d4dabd36bcfffaa2fd 100644
---- a/net/ipv6/netfilter/nf_reject_ipv6.c
-+++ b/net/ipv6/netfilter/nf_reject_ipv6.c
-@@ -223,33 +223,23 @@ void nf_reject_ip6_tcphdr_put(struct sk_buff *nskb,
- 			      const struct tcphdr *oth, unsigned int otcplen)
- {
- 	struct tcphdr *tcph;
--	int needs_ack;
- 
- 	skb_reset_transport_header(nskb);
--	tcph = skb_put(nskb, sizeof(struct tcphdr));
-+	tcph = skb_put_zero(nskb, sizeof(struct tcphdr));
- 	/* Truncate to length (no data) */
- 	tcph->doff = sizeof(struct tcphdr)/4;
- 	tcph->source = oth->dest;
- 	tcph->dest = oth->source;
- 
- 	if (oth->ack) {
--		needs_ack = 0;
- 		tcph->seq = oth->ack_seq;
--		tcph->ack_seq = 0;
- 	} else {
--		needs_ack = 1;
- 		tcph->ack_seq = htonl(ntohl(oth->seq) + oth->syn + oth->fin +
- 				      otcplen - (oth->doff<<2));
--		tcph->seq = 0;
-+		tcph->ack = 1;
- 	}
- 
--	/* Reset flags */
--	((u_int8_t *)tcph)[13] = 0;
- 	tcph->rst = 1;
--	tcph->ack = needs_ack;
--	tcph->window = 0;
--	tcph->urg_ptr = 0;
--	tcph->check = 0;
- 
- 	/* Adjust TCP checksum */
- 	tcph->check = csum_ipv6_magic(&ipv6_hdr(nskb)->saddr,
--- 
-2.46.0.662.g92d0881bb0-goog
+> I was also  trying with 'ifenslave'  to first
+>make secondary NIC active
+>and then remove primary NIC.
+>
+>   ifenslave -d bond0 enp1s0
+>
+>The interface changed to 'down', but immediately it came back up and
+>became active again.
+>I don't know why. The journal logs suggest my NetworkManager is
+>autoactivating it again :)
+>
+>Thanks a lot for your time again.
+>
+>- Suresh
+>
+>On Fri, Sep 13, 2024 at 5:36=E2=80=AFAM Jay Vosburgh <jv@jvosburgh.net> wr=
+ote:
+>>
+>> Suresh Kumar <suresh2514@gmail.com> wrote:
+>>
+>> >when bond_enslave() is called, it sets bond->force_primary to true
+>> >without checking if primary_reselect is set to 'failure' or 'better'.
+>> >This can result in primary becoming active again when link is back which
+>> >is not what we want when primary_reselect is set to 'failure'
+>>
+>>         The current behavior is by design, and is documented in
+>> Documentation/networking/bonding.rst:
+>>
+>>
+>>         The primary_reselect setting is ignored in two cases:
+>>
+>>                 If no slaves are active, the first slave to recover is
+>>                 made the active slave.
+>>
+>>                 When initially enslaved, the primary slave is always made
+>>                 the active slave.
+>>
+>>
+>>         Your proposed change would cause the primary to never be made
+>> the active interface when added to the bond for the primary_reselect
+>> "better" and "failure" settings, unless the primary interface is added
+>> to the bond first or all other interfaces are down.
+>>
+>>         Also, your description above and the test example below use the
+>> phrases "link is back" and "primary link failure" but the patch and test
+>> context suggest that the primary interface is being removed from the
+>> bond and then later added back to the bond, which is not the same thing
+>> as a link failure.
+>>
+>>         -J
+>>
+>> >Test
+>> >=3D=3D=3D=3D
+>> >Ethernet Channel Bonding Driver: v3.7.1 (April 27, 2011)
+>> >
+>> >Bonding Mode: fault-tolerance (active-backup)
+>> >Primary Slave: enp1s0 (primary_reselect failure)
+>> >Currently Active Slave: enp1s0
+>> >MII Status: up
+>> >MII Polling Interval (ms): 100
+>> >Up Delay (ms): 0
+>> >Down Delay (ms): 0
+>> >Peer Notification Delay (ms): 0
+>> >
+>> >Slave Interface: enp1s0
+>> >MII Status: up
+>> >Speed: 1000 Mbps
+>> >Duplex: full
+>> >Link Failure Count: 0
+>> >Permanent HW addr: 52:54:00:d7:a7:2a
+>> >Slave queue ID: 0
+>> >
+>> >Slave Interface: enp9s0
+>> >MII Status: up
+>> >Speed: 1000 Mbps
+>> >Duplex: full
+>> >Link Failure Count: 0
+>> >Permanent HW addr: 52:54:00:da:9a:f9
+>> >Slave queue ID: 0
+>> >
+>> >
+>> >After primary link failure:
+>> >
+>> >Bonding Mode: fault-tolerance (active-backup)
+>> >Primary Slave: None
+>> >Currently Active Slave: enp9s0 <---- secondary is active now
+>> >MII Status: up
+>> >MII Polling Interval (ms): 100
+>> >Up Delay (ms): 0
+>> >Down Delay (ms): 0
+>> >Peer Notification Delay (ms): 0
+>> >
+>> >Slave Interface: enp9s0
+>> >MII Status: up
+>> >Speed: 1000 Mbps
+>> >Duplex: full
+>> >Link Failure Count: 0
+>> >Permanent HW addr: 52:54:00:da:9a:f9
+>> >Slave queue ID: 0
+>> >
+>> >
+>> >Now add primary link back and check bond status:
+>> >
+>> >Bonding Mode: fault-tolerance (active-backup)
+>> >Primary Slave: enp1s0 (primary_reselect failure)
+>> >Currently Active Slave: enp1s0  <------------- primary is active again
+>> >MII Status: up
+>> >MII Polling Interval (ms): 100
+>> >Up Delay (ms): 0
+>> >Down Delay (ms): 0
+>> >Peer Notification Delay (ms): 0
+>> >
+>> >Slave Interface: enp9s0
+>> >MII Status: up
+>> >Speed: 1000 Mbps
+>> >Duplex: full
+>> >Link Failure Count: 0
+>> >Permanent HW addr: 52:54:00:da:9a:f9
+>> >Slave queue ID: 0
+>> >
+>> >Slave Interface: enp1s0
+>> >MII Status: up
+>> >Speed: 1000 Mbps
+>> >Duplex: full
+>> >Link Failure Count: 0
+>> >Permanent HW addr: 52:54:00:d7:a7:2a
+>> >Slave queue ID: 0
+>> >
+>> >Signed-off-by: Suresh Kumar <suresh2514@gmail.com>
+>> >---
+>> > drivers/net/bonding/bond_main.c | 4 +++-
+>> > 1 file changed, 3 insertions(+), 1 deletion(-)
+>> >
+>> >diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond=
+_main.c
+>> >index bb9c3d6ef435..731256fbb996 100644
+>> >--- a/drivers/net/bonding/bond_main.c
+>> >+++ b/drivers/net/bonding/bond_main.c
+>> >@@ -2146,7 +2146,9 @@ int bond_enslave(struct net_device *bond_dev, str=
+uct net_device *slave_dev,
+>> >               /* if there is a primary slave, remember it */
+>> >               if (strcmp(bond->params.primary, new_slave->dev->name) =
+=3D=3D 0) {
+>> >                       rcu_assign_pointer(bond->primary_slave, new_slav=
+e);
+>> >-                      bond->force_primary =3D true;
+>> >+            if (bond->params.primary_reselect !=3D BOND_PRI_RESELECT_F=
+AILURE  &&
+>> >+                bond->params.primary_reselect !=3D BOND_PRI_RESELECT_B=
+ETTER)
+>> >+                          bond->force_primary =3D true;
+>> >               }
+>> >       }
+>> >
+>> >--
+>> >2.43.0
+>> >
+>>
+>> ---
+>>         -Jay Vosburgh, jv@jvosburgh.net
 
 
