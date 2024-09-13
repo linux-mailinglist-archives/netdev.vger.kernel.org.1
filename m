@@ -1,66 +1,67 @@
-Return-Path: <netdev+bounces-128220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD15C9788D7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:22:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3369788E6
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:23:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72D81281A7C
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:22:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 709C4283ADB
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:23:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD7D145B01;
-	Fri, 13 Sep 2024 19:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBDA146D6E;
+	Fri, 13 Sep 2024 19:23:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="USrHQTI1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Fz33angr"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838B481ACA;
-	Fri, 13 Sep 2024 19:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2D212C54D;
+	Fri, 13 Sep 2024 19:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726255355; cv=none; b=aPDpt5vafuIt2lbqI6e5yCrFWdBRX/z60PfH1/y2Pc9vzC/Z1t/ibfkIqCzxACjtLAHVW2sJ/H7qLJyL32opi3WSUFN3ZEyzqt0XdGnjnJswugjKZ+ImlJOEpdFmZdrZVwS4xDHMhX5rZ3OWl7Y66TOxFO0UElZ2U40IDLabcPg=
+	t=1726255426; cv=none; b=Sxg2an8vQtvzHyNYEbj/D0SSWDQ+s61EuOlQ60vG7t44zglQRIt5i4HDJmc9qiGxs2t0C0Iuvz1/FZhj4UhPKknYOR1LZ01+APqGwR8m2t+rpisJ2WBwSUa6ZvzzBaw0QNIFBFJ3Xgf1i9HXJt4K8BEGxYjnjy79utBgNRCmavo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726255355; c=relaxed/simple;
-	bh=UhC9Wx94GdMSP1xhxtHlYToL70sJ3oyaQWnk2b+eu4M=;
+	s=arc-20240116; t=1726255426; c=relaxed/simple;
+	bh=LcnOMbh1qvm3zhdrSHVO6mUT+Z0nOqKVjH3uiOQkS7A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KMiJpRna/VFhqaK//lpOxn5UpVPRRK8nIL6ZX2el6vuNe07EAtW0CwnO+by0sgITrk2pjtfWkSXCNVJkSSXUGriGlJWPx9M/ByamFHHu9xVHF8IYi/jUmoE0olwXgzrgfxHOj7991SZUEjbkUg6uojGfeZHLlaRK4QjI6UAthdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=USrHQTI1; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=Lj/20hT1fbEbqfuXUYTZnnoIn58aQxQZGwFa+ktq7nI=; b=USrHQTI1gAhLcewwZyHVEmvH+2
-	TNfnavn0WmWrViQukWcWKUEDmPzjkL0xEn1n8BhzZwM9T+pwhTzsxu91hYIN57ewocp9cvGn/UA9h
-	nDPIR2H17TcSfPO62NYQFrX+48iHo8fHvr6GrMEtD8iooOIvFUsMxuKi87bCzAB34fqozCVoNjSNC
-	cpOr1cYF4oyo7BePpJi8MDiU+JbLFkyunDgG7G5HXPIm3h1euuqWGrhgPNe7+s9uz06ECd2yN2e2B
-	aBqS8T/VdHWgpwDvegaDqeaa/dxE/40oEXpmQ0ir9IEHYYp5g05SJG4iHMwNc/A4JtR8h5YehcBCc
-	O4d4pjaA==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1spBsC-0000000GuqH-2j63;
-	Fri, 13 Sep 2024 19:22:28 +0000
-Date: Fri, 13 Sep 2024 20:22:28 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Simon Horman <horms@kernel.org>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	LEROY Christophe <christophe.leroy2@cs-soprasteria.com>
-Subject: Re: [PATCH net-next v1] mm: fix build on powerpc with GCC 14
-Message-ID: <ZuSQ9BT9Vg7O2kXv@casper.infradead.org>
-References: <20240913192036.3289003-1-almasrymina@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=t8hYUIFXX4v5Z2I2U+jvf71a/kRzk5SAnLztCS9BbpP4oa3roYzIxJxcrO3K0LuNMAlovdiEUSRhmJ413j7EbOij1Dx6+xu0Qaub5ECuJxbcowe4pcsOSmxrue+xHXFqAktaEDmcGQW7M73kQzVi2gvRJ++8GZAPaT5NJF+obXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Fz33angr; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=8ehW2zOOXQpeUuabw+vDK6zCAezWgQxAYBOm2PkG7Hw=; b=Fz33angrn1YqfFcW+PLQzRKCNH
+	/3P0nU3j8biXCd/jXjjJthouDUlgeTuK5A2HB+5magrNifjvDmlLWvfHqH8mv5Pf9PkWlhkDGGY7L
+	kNAEEs1UVIvorKQWbkbzJ43bP6LpMpkUrY8psWNScx3vjj1FqCdJbjvoX7fDTnlulARY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1spBtG-007Pzj-LJ; Fri, 13 Sep 2024 21:23:34 +0200
+Date: Fri, 13 Sep 2024 21:23:34 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] dt-bindings: net: dsa: the adjacent DSA
+ port must appear first in "link" property
+Message-ID: <695c4ffb-5a68-41b1-8fef-8a356dfd57b5@lunn.ch>
+References: <20240913131507.2760966-1-vladimir.oltean@nxp.com>
+ <20240913131507.2760966-3-vladimir.oltean@nxp.com>
+ <20240913-estimate-badland-5ab577e69bab@spud>
+ <c2244d42-eda4-4bbc-9805-cc2c2ae38109@lunn.ch>
+ <20240913185053.rr23ym5otprgiphb@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,19 +70,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240913192036.3289003-1-almasrymina@google.com>
+In-Reply-To: <20240913185053.rr23ym5otprgiphb@skbuf>
 
-On Fri, Sep 13, 2024 at 07:20:36PM +0000, Mina Almasry wrote:
-> +++ b/include/linux/page-flags.h
-> @@ -239,8 +239,8 @@ static inline unsigned long _compound_head(const struct page *page)
->  {
->  	unsigned long head = READ_ONCE(page->compound_head);
->  
-> -	if (unlikely(head & 1))
-> -		return head - 1;
-> +	if (unlikely(head & 1UL))
-> +		return head & ~1UL;
->  	return (unsigned long)page_fixed_fake_head(page);
+> I have unpublished downstream patches which even make all the rest of
+> the "link = <...>" elements optional. Bottom line, only the direct
+> connection between ports (first element) represents hardware description.
+> The other reachable ports (the routing table, practically speaking) can be*
+> computed based on breadth-first search at DSA probe time. They are
+> listed in the device tree for "convenience".
 
-NAK, that pessimises compound_head().
+If you have this code, then i would actually go for a new property,
+maybe 'direct-link = <...>;', which only lists the direct
+relationship. Keep the current property with its current meaning, an
+unordered list. If the new property is present, use it to compute the
+table. If both sets of properties are present, ensure they result in
+the same table, otherwise -EINVAL.
+
+    Andrew
+
+
 
