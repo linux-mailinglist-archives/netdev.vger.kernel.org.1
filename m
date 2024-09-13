@@ -1,176 +1,126 @@
-Return-Path: <netdev+bounces-128055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E371977BB0
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:57:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 998BB977BE4
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 11:09:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E951C20F78
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 08:57:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF041B27ED1
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 09:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FAF1D67B4;
-	Fri, 13 Sep 2024 08:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20091D6DCD;
+	Fri, 13 Sep 2024 09:08:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="rA5SK0O1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dbapdw/V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D231D58B2;
-	Fri, 13 Sep 2024 08:57:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578A11BFE12
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 09:08:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726217867; cv=none; b=YLBEeVZAm/kEFuauFY4sp8kZ2fmF1zGGtv4TCX1acOW8ddgHC4crDkVaaxGelTQNK/neGye8c0D0BcdzE8RjUucYCPi4DmhibGMny1+OhlnvmYMQbgiZytmzVE1nxMndPKtNK7QjgnXDVCusBk5xl7POea2jezCRQod903YQQ1E=
+	t=1726218512; cv=none; b=DsLi9K9s0nmOIVRMwt9lU0CNPnqC68mSqymaHKIQVdWozmSsikj+qxx6diNa4NMgwnXDH6n8d3c78UfdoNPyVbaCP8WW4BPV/2yHnlLDnLAnvzb8zYpFpr+JT8AoYq3OPHMgBaWmSfB1eH4jUB4B3RHoIzXrqwCzw29VJnouIg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726217867; c=relaxed/simple;
-	bh=M5El9EyA9A0fefWeLaVcaVsb2FjaARGsqbpvDqpFzAo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YmbgyIT2drdIJsJaqVYvFhl158sLJKN597UBvBaTAYs1V7PpiOdOVJ7Pav1S2YB0mKzna0OzM9zZfmwm3NQqAzdFLThsflFd0pAb5l4CYEV24hkKuwyp31l+04CW2onOSz5wmEepEG626eSOM/iSEdkVdEv/L0dywTJ4lwEkvZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=rA5SK0O1; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1726217861;
-	bh=M5El9EyA9A0fefWeLaVcaVsb2FjaARGsqbpvDqpFzAo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=rA5SK0O1sLh8ZhNZX1jQIbZmA2PToy6epTTsj8CW9l1r4pw1Nvbf6FkucOQ9zQa+z
-	 N+N1Qfo2AK975ZnXLwxGLMgJ9RjDY3cp95T6FU5d6itglP7KT3xVu3XY1EwP29sX4H
-	 xDJ9msjaZFzLSZBYclBGpsioX4FyLbAY7qw6oUEUwWB74YYXDQ97UqLNBKnfiESc9Y
-	 wJjMyKnqIGct+rzwb0coEd22i9pZs9WAm8vHt3nZUD7qUfTrfckVULVtLUrQmk7JAy
-	 ummm/9xyCTvaJuPkLNig0BFonZOsDLViWZJ6TGg5i0Vm1gnr/EoFy10orssbVHXPEm
-	 oeNspWgu9kYUg==
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id DA61E60078;
-	Fri, 13 Sep 2024 08:57:40 +0000 (UTC)
-Received: by x201s (Postfix, from userid 1000)
-	id C08512018C7; Fri, 13 Sep 2024 08:56:11 +0000 (UTC)
-From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
-To: Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	David Ahern <dsahern@kernel.org>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] tools: ynl-gen: use big-endian netlink attribute types
-Date: Fri, 13 Sep 2024 08:55:54 +0000
-Message-ID: <20240913085555.134788-1-ast@fiberby.net>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1726218512; c=relaxed/simple;
+	bh=R+wc8evpmc4HT9aDiFp/1Wi2uhv80z4+DZFRw6CYiEM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fUokepIUg28amHAcArvKpmZI71HcX0Wdy8vQs45hRbAri80g9Zw1uZEZsmtQwGiDJHsRRw7H6Ylhhh/VBpZddxe79mZcbtIJly+wZIcKEQ7RbRSKoPTdC9r4tjaz3JUkFuMj5ycU2cnJ8ROtVhquxvEutKjRzmDtThIey9EHIx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Dbapdw/V; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726218509;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N/qu/Mi6P96nxbNpRLmW/hvyLUcdhuJ0IeIbk9BzPBs=;
+	b=Dbapdw/VIX4JgJNBkO8qbYx+A3AB4ycwKBazoiMPid02Gkq6pK/0kJenJsSjGZ2UFDGX+6
+	a5z4h4mo9KyOA9hRMPTHj46eTI+jful7YF6cVvkqS2xTu4JeZS2YWGiEY24C105Kc4xcKK
+	AUNzTAH202H2qJit4zp3j0yVo2d6RIA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-527-shxJzaobOWK8FaDAuTc7bw-1; Fri, 13 Sep 2024 05:08:28 -0400
+X-MC-Unique: shxJzaobOWK8FaDAuTc7bw-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3771b6da3ceso310742f8f.3
+        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 02:08:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726218507; x=1726823307;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N/qu/Mi6P96nxbNpRLmW/hvyLUcdhuJ0IeIbk9BzPBs=;
+        b=FYWz5Zup/Jjy2lZRg/8wwx2Y9JP5jgyd3rmFcRgfyAhZlPRLj5R7Erq3yrP9czqo7x
+         IurEJQPdta6umM8rFIyiq3IgREsUSP89yUKNuk0g4Bh/G+yYWNv7WB4JBzBLg4bb+JZq
+         QHinbin4B7eRPgxHR7G10G/LsCsDEvhkqSOZyazhtA2DfyDN5gAncJdjeOYkECTIzJh5
+         Iac+xAKNPLq2jPdYxf8dEJ8sr/dFBmuNSeTXu5SnciXQwTeWlnzfBmzkCaAAZMLT3Sko
+         nIg/Ex1M4Iip0bbwm0PIbeUpg7wwa2lucW0mrdWzgUhOQSLD4w62av1XqeJjgMsNldo3
+         OjAg==
+X-Forwarded-Encrypted: i=1; AJvYcCUj1gOHmQdQi/6At1Cp4WZj4BWP9OAq1bzgO8j3qNKcZCva+rsx7g3GtYMinCAibp86WBeu7a8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzu6VCe3I9vuH2jvwH+VQZDPd8rlefwXIvpopfIrSbuXHbYae9u
+	h09r+H7O96QXQJG/jCwJmjoebmp+9j7+5Ixf0H4hzsp4aN8byps3uF/fq+4MiTHhu38cD8pyDWo
+	M4OYZ6vfWbLvhr4hVHPqMpGBlSuuh5XKAeMXGZh28yKc/yRT3nA315A==
+X-Received: by 2002:adf:b197:0:b0:377:2df4:55f6 with SMTP id ffacd0b85a97d-378d61e2710mr999147f8f.17.1726218506865;
+        Fri, 13 Sep 2024 02:08:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGYpp0G2XEPwQQL2G5P5Kh9FZsdJniPGQziF4Dl1Aah6cU2OdRkxvRBB8oV8kLCyUEwA2lFYg==
+X-Received: by 2002:adf:b197:0:b0:377:2df4:55f6 with SMTP id ffacd0b85a97d-378d61e2710mr999107f8f.17.1726218505680;
+        Fri, 13 Sep 2024 02:08:25 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3789567625esm16331716f8f.64.2024.09.13.02.08.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Sep 2024 02:08:25 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id DE0EF152C68B; Fri, 13 Sep 2024 11:08:22 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Breno Leitao <leitao@debian.org>, kuba@kernel.org, bpf@vger.kernel.org,
+ Daniel Borkmann <daniel@iogearbox.net>, Nikolay Aleksandrov
+ <razor@blackwall.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: vadim.fedorenko@linux.dev, andrii@kernel.org, "open list:BPF [NETKIT]
+ (BPF-programmable network device)" <netdev@vger.kernel.org>, open list
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] netkit: Assign missing bpf_net_context
+In-Reply-To: <20240912155620.1334587-1-leitao@debian.org>
+References: <20240912155620.1334587-1-leitao@debian.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 13 Sep 2024 11:08:22 +0200
+Message-ID: <87ikuzc455.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Change ynl-gen-c.py to use NLA_BE16 and NLA_BE32 types to represent
-big-endian u16 and u32 ynl types.
+Breno Leitao <leitao@debian.org> writes:
 
-Doing this enables those attributes to have range checks applied, as
-the validator will then convert to host endianness prior to validation.
+> During the introduction of struct bpf_net_context handling for
+> XDP-redirect, the netkit driver has been missed, which also requires it
+> because NETKIT_REDIRECT invokes skb_do_redirect() which is accessing the
+> per-CPU variables. Otherwise we see the following crash:
+>
+> 	BUG: kernel NULL pointer dereference, address: 0000000000000038
+> 	bpf_redirect()
+> 	netkit_xmit()
+> 	dev_hard_start_xmit()
+>
+> Set the bpf_net_context before invoking netkit_xmit() program within the
+> netkit driver.
+>
+> Fixes: 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct on=
+ PREEMPT_RT.")
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+> Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-The autogenerated kernel/uapi code have been regenerated by running:
-  ./tools/net/ynl/ynl-regen.sh -f
-
-This changes the policy types of the following attributes:
-
-  FOU_ATTR_PORT (NLA_U16 -> NLA_BE16)
-  FOU_ATTR_PEER_PORT (NLA_U16 -> NLA_BE16)
-    These two are used with nla_get_be16/nla_put_be16().
-
-  MPTCP_PM_ADDR_ATTR_ADDR4 (NLA_U32 -> NLA_BE32)
-    This one is used with nla_get_in_addr/nla_put_in_addr(),
-    which uses nla_get_be32/nla_put_be32().
-
-IOWs the generated changes are AFAICT aligned with their implementations.
-
-The generated userspace code remains identical, and have been verified
-by comparing the output generated by the following command:
-  make -C tools/net/ynl/generated
-
-Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
----
- net/ipv4/fou_nl.c          | 4 ++--
- net/mptcp/mptcp_pm_gen.c   | 2 +-
- tools/net/ynl/ynl-gen-c.py | 6 +++++-
- 3 files changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/net/ipv4/fou_nl.c b/net/ipv4/fou_nl.c
-index 98b90107b5abc..3d9614609b2d3 100644
---- a/net/ipv4/fou_nl.c
-+++ b/net/ipv4/fou_nl.c
-@@ -12,7 +12,7 @@
- 
- /* Global operation policy for fou */
- const struct nla_policy fou_nl_policy[FOU_ATTR_IFINDEX + 1] = {
--	[FOU_ATTR_PORT] = { .type = NLA_U16, },
-+	[FOU_ATTR_PORT] = { .type = NLA_BE16, },
- 	[FOU_ATTR_AF] = { .type = NLA_U8, },
- 	[FOU_ATTR_IPPROTO] = { .type = NLA_U8, },
- 	[FOU_ATTR_TYPE] = { .type = NLA_U8, },
-@@ -21,7 +21,7 @@ const struct nla_policy fou_nl_policy[FOU_ATTR_IFINDEX + 1] = {
- 	[FOU_ATTR_LOCAL_V6] = { .len = 16, },
- 	[FOU_ATTR_PEER_V4] = { .type = NLA_U32, },
- 	[FOU_ATTR_PEER_V6] = { .len = 16, },
--	[FOU_ATTR_PEER_PORT] = { .type = NLA_U16, },
-+	[FOU_ATTR_PEER_PORT] = { .type = NLA_BE16, },
- 	[FOU_ATTR_IFINDEX] = { .type = NLA_S32, },
- };
- 
-diff --git a/net/mptcp/mptcp_pm_gen.c b/net/mptcp/mptcp_pm_gen.c
-index c30a2a90a1925..5a6b2b4510d37 100644
---- a/net/mptcp/mptcp_pm_gen.c
-+++ b/net/mptcp/mptcp_pm_gen.c
-@@ -14,7 +14,7 @@
- const struct nla_policy mptcp_pm_address_nl_policy[MPTCP_PM_ADDR_ATTR_IF_IDX + 1] = {
- 	[MPTCP_PM_ADDR_ATTR_FAMILY] = { .type = NLA_U16, },
- 	[MPTCP_PM_ADDR_ATTR_ID] = { .type = NLA_U8, },
--	[MPTCP_PM_ADDR_ATTR_ADDR4] = { .type = NLA_U32, },
-+	[MPTCP_PM_ADDR_ATTR_ADDR4] = { .type = NLA_BE32, },
- 	[MPTCP_PM_ADDR_ATTR_ADDR6] = NLA_POLICY_EXACT_LEN(16),
- 	[MPTCP_PM_ADDR_ATTR_PORT] = { .type = NLA_U16, },
- 	[MPTCP_PM_ADDR_ATTR_FLAGS] = { .type = NLA_U32, },
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 717530bc9c52e..e26f2c3c40891 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -48,6 +48,7 @@ class Type(SpecAttr):
-         self.attr = attr
-         self.attr_set = attr_set
-         self.type = attr['type']
-+        self.nla_type = self.type
-         self.checks = attr.get('checks', {})
- 
-         self.request = False
-@@ -157,7 +158,7 @@ class Type(SpecAttr):
-         return '{ .type = ' + policy + ', }'
- 
-     def attr_policy(self, cw):
--        policy = c_upper('nla-' + self.attr['type'])
-+        policy = c_upper('nla-' + self.nla_type)
- 
-         spec = self._attr_policy(policy)
-         cw.p(f"\t[{self.enum_name}] = {spec},")
-@@ -300,6 +301,9 @@ class TypeScalar(Type):
-         self.byte_order_comment = ''
-         if 'byte-order' in attr:
-             self.byte_order_comment = f" /* {attr['byte-order']} */"
-+            if self.attr['byte-order'] == 'big-endian':
-+                if self.type in {'u16', 'u32'}:
-+                    self.nla_type = f'be{self.type[1:]}'
- 
-         if 'enum' in self.attr:
-             enum = self.family.consts[self.attr['enum']]
--- 
-2.45.2
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
 
