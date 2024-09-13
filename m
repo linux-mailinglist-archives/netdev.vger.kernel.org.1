@@ -1,126 +1,104 @@
-Return-Path: <netdev+bounces-127985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-127986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D054C977693
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 03:53:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAECA9776C4
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 04:13:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F9421C2428F
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 01:53:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54C50B21A93
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 02:13:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C8A74A07;
-	Fri, 13 Sep 2024 01:53:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBE41D131C;
+	Fri, 13 Sep 2024 02:13:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="KP9Y2GX6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cK+WqHSB"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB9479CF;
-	Fri, 13 Sep 2024 01:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3048455886;
+	Fri, 13 Sep 2024 02:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726192424; cv=none; b=ousOehxpHZDSoXhO3UNITUfx01Bnz3JUc0iy4URg5259OBgN2NVVwjKDALZ7Nv9zxnUJFsxnomayvJmqulFPE2YDCA7XDbWyy3omcwFYT/9SIjx3lqZ9juwpKbLsaaqw5cRbHOopJEjc4IGJb07hlE8f0EsHMTxK76pwNwJ0OCc=
+	t=1726193589; cv=none; b=PqNHkRPSABcU2e6jTBSOG+tUUEmAqLWOdbDKO0SDP475VTrYJjwZrq7SW2qxYDZuixzYs9MXacjQSTYQiLPp9o++izJvt7Axs4SMWlgYG2HYCPcqKZ4Le+LNzAgVymO6LHZu8/YZW2Z4bpCMNl4slumJXW0JsIYWLWZc3HNPP7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726192424; c=relaxed/simple;
-	bh=xIWLX1KE6wRXK1a/clCuHOsxwaQitK01JBEzvWMrV7c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RCrUVhmYPc8Zkv+4+sHuNSMattjxvRXyQ1D2+EHhdpeCg67J/Q9RxOdFdZmMoqxknqIOFI2khrN7VKVkCqsu3oLHn6RcKy8Mj1tCDjvX3weDOcPnuLz6U8iOCXq1uU1zRiTUyZP/INTLH0rScraIV4jWyFD8ifGeovpKRGiNMbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=KP9Y2GX6; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=DMcHW
-	ox+TxQ+e6JzHkX6N9IOsAN2a72uEhLT05aIANQ=; b=KP9Y2GX6t6JkxNeVMIe7e
-	gA6/zi3iXHqH0Zzw3WRPJkai8IYPgVWHj6qLeeru5vJUICa51l7SF1qJWrBoM9XD
-	thKhqydaEZ7OgysuXXQ2jafJ27v1m844TDBTyoU3zwk+EbyPBl2FKsdF49s5yhht
-	k06UniyCxmm74Rh+NmcYFA=
-Received: from localhost.localdomain (unknown [58.243.42.99])
-	by gzga-smtp-mta-g2-3 (Coremail) with SMTP id _____wDHrUrvmuNmnSvrAg--.37498S2;
-	Fri, 13 Sep 2024 09:52:48 +0800 (CST)
-From: Qianqiang Liu <qianqiang.liu@163.com>
-To: kuba@kernel.org,
-	edumazet@google.com
-Cc: usama.anjum@collabora.com,
-	andrew@lunn.ch,
-	o.rempel@pengutronix.de,
-	rosenp@gmail.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Qianqiang Liu <qianqiang.liu@163.com>
-Subject: [PATCH v2] net: ag71xx: remove dead code path
-Date: Fri, 13 Sep 2024 09:47:32 +0800
-Message-Id: <20240913014731.149739-1-qianqiang.liu@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1726193589; c=relaxed/simple;
+	bh=TvUg8JpVDCWZbKxhwdcbMY2TgwsG2HjjEy20zkRhrEY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o/3WDCcZYezs/jwMgGj4V5rBQEWSnBVruTCa/YAfi+SsW9bQy8xwRdVwNDUgivdUjwjpkzrd8gDjMhfY9qXwkPgc/TmpAJWZD4OUxcixGoaCFXeRpv0LLiehPQ7opmkLsOAW08VWWlk8wkBC0JnWaatpXStdiXwgocEI/IZjhMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cK+WqHSB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35308C4CEC3;
+	Fri, 13 Sep 2024 02:13:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726193588;
+	bh=TvUg8JpVDCWZbKxhwdcbMY2TgwsG2HjjEy20zkRhrEY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cK+WqHSBFZgbtB9lKdv4jslrMn6pHtJAp7iETp8ZTBGu0w82I6LSsG1u0dVw0l2T/
+	 zVrcr+uWZUTjyiqJMOgjl5yqNnf0+/XTDZkiGfLdyW+6KNaeMRrftCjXyW3YYCLY3r
+	 5c0qj8d2gBlH4JRFu+VGOgUAJXv8mEAX6RqkcP8b+AjLrA8j/JUZSRfHdSOPz8wY1F
+	 OOjFnhjZvToj9yFnHk6FY4U4SlEUkllFF9SIYFuNQn/3GzGydDOsISAp81EoXaLIqJ
+	 McqU8LG6Y/hbqLi+Tdk9/nXh/2SvBQZMByRcu+1cLRNMOVziv/kBfa2WBV368x+6hO
+	 qrGZL43FN594g==
+Date: Thu, 12 Sep 2024 19:13:06 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mitchell Augustin <mitchell.augustin@canonical.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
+ <jiri@resnulli.us>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jacob Martin <jacob.martin@canonical.com>,
+ dann frazier <dann.frazier@canonical.com>
+Subject: Re: Namespaced network devices not cleaned up properly after
+ execution of pmtu.sh kernel selftest
+Message-ID: <20240912191306.0cf81ce3@kernel.org>
+In-Reply-To: <CAHTA-uZDaJ-71o+bo8a96TV4ck-8niimztQFaa=QoeNdUm-9wg@mail.gmail.com>
+References: <CAHTA-uZDaJ-71o+bo8a96TV4ck-8niimztQFaa=QoeNdUm-9wg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDHrUrvmuNmnSvrAg--.37498S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7KF48uw1DtF45CFW7uFy3Jwb_yoW8ArWDpF
-	43Kayvgr48Ar17JayDZrWIvF98KayvyrWagryfG3yFvF15Arn0qFyUK3yUKr1xurWkCanF
-	vw48C3W7AFsxJwUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UFg4hUUUUU=
-X-CM-SenderInfo: xtld01pldqwhxolxqiywtou0bp/1tbiYBJZamV4JNgodwAAs-
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The "err" is always zero, so the following branch can never be executed:
-if (err) {
-	ndev->stats.rx_dropped++;
-	kfree_skb(skb);
-}
-Therefore, the "if" statement can be removed.
+On Wed, 11 Sep 2024 17:20:29 -0500 Mitchell Augustin wrote:
+> We recently identified a bug still impacting upstream, triggered
+> occasionally by one of the kernel selftests (net/pmtu.sh) that
+> sometimes causes the following behavior:
+> * One of this tests's namespaced network devices does not get properly
+> cleaned up when the namespace is destroyed, evidenced by
+> `unregister_netdevice: waiting for veth_A-R1 to become free. Usage
+> count = 5` appearing in the dmesg output repeatedly
+> * Once we start to see the above `unregister_netdevice` message, an
+> un-cancelable hang will occur on subsequent attempts to run `modprobe
+> ip6_vti` or `rmmod ip6_vti`
 
-Use "ndev->stats.rx_errors" to count "napi_build_skb()" failure
+Thanks for the report! We have seen it in our CI as well, it happens
+maybe once a day. But as you say on x86 is quite hard to reproduce,
+and nothing obvious stood out as a culprit.
 
-Signed-off-by: Qianqiang Liu <qianqiang.liu@163.com>
----
-Changes since v1:
- - Use "ndev->stats.rx_errors" to count "napi_build_skb()" failure
----
- drivers/net/ethernet/atheros/ag71xx.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+> However, I can easily reproduce the issue on an Nvidia Grace/Hopper
+> machine (and other platforms with modern CPUs) with the performance
+> governor set by doing the following:
+> * Install/boot any affected kernel
+> * Clone the kernel tree just to get an older version of the test cases
+> without subtle timing changes that mask the issue (such as
+> https://git.launchpad.net/~ubuntu-kernel/ubuntu/+source/linux/+git/noble/tree/?h=Ubuntu-6.8.0-39.39)
+> * cd tools/testing/selftests/net
+> * while true; do sudo ./pmtu.sh pmtu_ipv6_ipv6_exception; done
 
-diff --git a/drivers/net/ethernet/atheros/ag71xx.c b/drivers/net/ethernet/atheros/ag71xx.c
-index 96a6189cc31e..9586b6894f7e 100644
---- a/drivers/net/ethernet/atheros/ag71xx.c
-+++ b/drivers/net/ethernet/atheros/ag71xx.c
-@@ -1616,7 +1616,6 @@ static int ag71xx_rx_packets(struct ag71xx *ag, int limit)
- 		unsigned int i = ring->curr & ring_mask;
- 		struct ag71xx_desc *desc = ag71xx_ring_desc(ring, i);
- 		int pktlen;
--		int err = 0;
- 
- 		if (ag71xx_desc_empty(desc))
- 			break;
-@@ -1639,6 +1638,7 @@ static int ag71xx_rx_packets(struct ag71xx *ag, int limit)
- 
- 		skb = napi_build_skb(ring->buf[i].rx.rx_buf, ag71xx_buffer_size(ag));
- 		if (!skb) {
-+			ndev->stats.rx_errors++;
- 			skb_free_frag(ring->buf[i].rx.rx_buf);
- 			goto next;
- 		}
-@@ -1646,14 +1646,9 @@ static int ag71xx_rx_packets(struct ag71xx *ag, int limit)
- 		skb_reserve(skb, offset);
- 		skb_put(skb, pktlen);
- 
--		if (err) {
--			ndev->stats.rx_dropped++;
--			kfree_skb(skb);
--		} else {
--			skb->dev = ndev;
--			skb->ip_summed = CHECKSUM_NONE;
--			list_add_tail(&skb->list, &rx_list);
--		}
-+		skb->dev = ndev;
-+		skb->ip_summed = CHECKSUM_NONE;
-+		list_add_tail(&skb->list, &rx_list);
- 
- next:
- 		ring->buf[i].rx.rx_buf = NULL;
--- 
-2.34.1
+That's exciting! Would you be able to try to cut down the test itself
+(is quite long and has a ton of sub-cases). Figure out which sub-cases
+trigger this? And maybe with an even quicker repro we'll bisect or
+someone will correctly guess the fix?
 
+Somewhat tangentially but if you'd be willing I wouldn't mind if you
+were to send patches to break this test up upstream, too. It takes
+1h23m to run with various debug kernel options enabled. If we split 
+it into multiple smaller tests each running 10min or 20min we can 
+then spawn multiple VMs and get the results faster.
 
