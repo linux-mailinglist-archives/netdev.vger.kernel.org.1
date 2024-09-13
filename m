@@ -1,97 +1,87 @@
-Return-Path: <netdev+bounces-128008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71B0697776E
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 05:40:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 439D1977774
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 05:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34750286318
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 03:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DEB11C245A4
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 03:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 147BC1AC88A;
-	Fri, 13 Sep 2024 03:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA791BAEFC;
+	Fri, 13 Sep 2024 03:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dkpNpq2w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQV1m+ie"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E422D3EA64
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 03:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325A574402;
+	Fri, 13 Sep 2024 03:44:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726198830; cv=none; b=tYrfe8vS2VgS3BCja8s+wt5pV5bu0bELygKUppQZVcRW0HIPG0pgU6+Y3nzK/LhyEFr3KGBgidbyDmhOY8RWDXmmHgPTGROFwT+OMpIoJC2US/WitPO5Gfx1Ioi2vyfV2EmD/MAq8pezAzIx/DUgQXbcP6YpULG7dMeRreiUrvA=
+	t=1726199081; cv=none; b=ai+HkUlzMDoZ2rNH5SP43ZO/s4aDAIGCrcwQbdtw2IyvEnl+LAixxnrRCEO/3L5fW71LuwdZXdHmLgjFgOJCmDJLceNTDTU1vfe+dhnQpIn/rHiPxTO3EX8OHMVp8v/FBep/IovELeVwFZIV6jq0hQx1xB/VJPtSbvhGcW161Rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726198830; c=relaxed/simple;
-	bh=2VucMICbkIVyQijdycmZgxAh/6GdY9E26T+2q86WOvs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ugL/tzrnNIVZF8sQo/gvVFBgLbLoEM/+uBTtgLNSwHlU+MlsC9TSV2K+ww6NV0FaBLdJ4naTTHKT4Rh+Mo7pL4bglmjz4oxsemXijqKfq9vOFN339vK4KJEMnljpNg6/j+J3PG/Xpz9In5bspmFWz8cmc8+dcOgMw3Hm1Fa04R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dkpNpq2w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 884BAC4CEC0;
-	Fri, 13 Sep 2024 03:40:28 +0000 (UTC)
+	s=arc-20240116; t=1726199081; c=relaxed/simple;
+	bh=14FYnHIpK2VkIZXi1OjsNSbKcix+CkvkwHGueSrvBr4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Be/4bnreYhZ31Bc+DT16pg9IH4xxE1y41dk+nhGWm14j4T4fxiy3HdXXrVYS0KhAJVUe9lK5CY97E/bAAoc55jM+bBaTWK+QzzY1WeDjSAMarwsOiwRgrh+c1FmScMmWF/9AdjkbkgLgmtvWmaYNl8CG1cQliA3RqbyQDTqysRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LQV1m+ie; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7829AC4CEC0;
+	Fri, 13 Sep 2024 03:44:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726198828;
-	bh=2VucMICbkIVyQijdycmZgxAh/6GdY9E26T+2q86WOvs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dkpNpq2w92vVp3FTKnO/a8QK2JLk4jac8S+OQlycKEkisrjFf1K8dxFvzN7hPBWxM
-	 VdhASP9tulotrUPwS5UyQsMwmAphMSEfMTfjktwn7nJgwN+QwOuoPTYnPmUgHmzKpp
-	 9HF6lGv9jbNI4Gh2NncrAH5TmWBC3m/wzgafAT426PopIdY5Jqerq6PH5LzCEyCXB2
-	 GETYJ6C1c9UjyayQi2XW59oyfjbULIYsYN6Vo2W54X6a0V5kpfcKvi4xKN15oJCV3P
-	 7zlxwDCV9fKKnG9s03QfJr1hWYT+GC11fz7vFr8g1lgH8G/ZkUKVgDkCMSbWRqhZ4y
-	 wT/4G0xdUTvxQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1823806644;
-	Fri, 13 Sep 2024 03:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1726199080;
+	bh=14FYnHIpK2VkIZXi1OjsNSbKcix+CkvkwHGueSrvBr4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LQV1m+ieF8kilr4Pc0TdiGeaW/6bp1yTGccJ+bcdgww2EymrUdh2PnmVKWx2PxBZa
+	 IK7ga/GcPhGlgnD10gZU63yrymwumSoN+EtgC4UY1V1GiBLN3NYeQQMg0eiMtkdScg
+	 0wx4RH5qZFSgdMNMHr3TJwciaP3CfFDvhP3eJtpHf6/fQ8Rhs9NJVu6EkYLs7zxATK
+	 3Iw+6SvDDhYLnCqgNG68+FXRXeYCcT//W6lpxI6kj3ynYtqXRwGs00HHF9TK8SQOpI
+	 C6zSp5lyb8321l9H4WAxJJyJtRYaZaicraOZ2KeCTra4SpL1w7i6NLhtXgJjV3FWPc
+	 bd3FcOYxJ6fOg==
+Date: Thu, 12 Sep 2024 20:44:38 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ linux-arm-kernel@lists.infradead.org, Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
+ <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
+ <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Nathan Chancellor <nathan@kernel.org>, Antoine Tenart
+ <atenart@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>, Dan Carpenter
+ <dan.carpenter@linaro.org>, Romain Gantois <romain.gantois@bootlin.com>,
+ syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
+Subject: Re: [PATCH net-next] net: ethtool: phy: Clear the netdev context
+ pointer for DUMP requests
+Message-ID: <20240912204438.629a3019@kernel.org>
+In-Reply-To: <20240911134623.1739633-1-maxime.chevallier@bootlin.com>
+References: <20240911134623.1739633-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/2] bareudp: Pull inner IP header on xmit/recv.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172619882977.1805230.18095072533580961094.git-patchwork-notify@kernel.org>
-Date: Fri, 13 Sep 2024 03:40:29 +0000
-References: <cover.1726046181.git.gnault@redhat.com>
-In-Reply-To: <cover.1726046181.git.gnault@redhat.com>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, martin.varghese@nokia.com,
- willemb@google.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 11 Sep 2024 15:46:21 +0200 Maxime Chevallier wrote:
+> +		/* Clear the context netdev pointer so avoid a netdev_put from
+> +		 * the .done() callback
+> +		 */
+> +		ctx->phy_req_info->base.dev = NULL;
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 11 Sep 2024 11:20:51 +0200 you wrote:
-> Bareudp accesses the inner IP header in its xmit and recv paths.
-> However it doesn't ensure that this header is part of skb->head.
-> 
-> Both vxlan and geneve have received fixes for similar problems in the
-> past. This series fixes bareudp using the same approach.
-> 
-> Guillaume Nault (2):
->   bareudp: Pull inner IP header in bareudp_udp_encap_recv().
->   bareudp: Pull inner IP header on xmit.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2,1/2] bareudp: Pull inner IP header in bareudp_udp_encap_recv().
-    https://git.kernel.org/netdev/net/c/45fa29c85117
-  - [net,v2,2/2] bareudp: Pull inner IP header on xmit.
-    https://git.kernel.org/netdev/net/c/c471236b2359
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Why do we assign to req_base.dev in the first place?
+req is for the parsed request in my mind, and I don't
+see anything in the PHY dump handlers actually using dev?
 
