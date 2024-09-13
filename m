@@ -1,87 +1,238 @@
-Return-Path: <netdev+bounces-128009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 439D1977774
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 05:44:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0626C977778
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 05:45:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DEB11C245A4
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 03:44:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26D551C24500
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 03:45:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA791BAEFC;
-	Fri, 13 Sep 2024 03:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F50C1B12F5;
+	Fri, 13 Sep 2024 03:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQV1m+ie"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="NQa5CTvS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325A574402;
-	Fri, 13 Sep 2024 03:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CFB1D4168;
+	Fri, 13 Sep 2024 03:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726199081; cv=none; b=ai+HkUlzMDoZ2rNH5SP43ZO/s4aDAIGCrcwQbdtw2IyvEnl+LAixxnrRCEO/3L5fW71LuwdZXdHmLgjFgOJCmDJLceNTDTU1vfe+dhnQpIn/rHiPxTO3EX8OHMVp8v/FBep/IovELeVwFZIV6jq0hQx1xB/VJPtSbvhGcW161Rc=
+	t=1726199110; cv=none; b=klB5ynanR4l/q3kFJVlJKhr64deJZ7BaZ4f8AypCtNZTz6iuIVAj1zCl+ms/5+8QRIgef1HGmjFQqcZ4ADq7psbsAXpU01HxeUDn1600wQR1HLxlmxJz84T58fuvVQ33bR4quGJpVKje9p4PEihyWJJ2pmOTuc205N1WPlDH/sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726199081; c=relaxed/simple;
-	bh=14FYnHIpK2VkIZXi1OjsNSbKcix+CkvkwHGueSrvBr4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Be/4bnreYhZ31Bc+DT16pg9IH4xxE1y41dk+nhGWm14j4T4fxiy3HdXXrVYS0KhAJVUe9lK5CY97E/bAAoc55jM+bBaTWK+QzzY1WeDjSAMarwsOiwRgrh+c1FmScMmWF/9AdjkbkgLgmtvWmaYNl8CG1cQliA3RqbyQDTqysRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LQV1m+ie; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7829AC4CEC0;
-	Fri, 13 Sep 2024 03:44:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726199080;
-	bh=14FYnHIpK2VkIZXi1OjsNSbKcix+CkvkwHGueSrvBr4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LQV1m+ieF8kilr4Pc0TdiGeaW/6bp1yTGccJ+bcdgww2EymrUdh2PnmVKWx2PxBZa
-	 IK7ga/GcPhGlgnD10gZU63yrymwumSoN+EtgC4UY1V1GiBLN3NYeQQMg0eiMtkdScg
-	 0wx4RH5qZFSgdMNMHr3TJwciaP3CfFDvhP3eJtpHf6/fQ8Rhs9NJVu6EkYLs7zxATK
-	 3Iw+6SvDDhYLnCqgNG68+FXRXeYCcT//W6lpxI6kj3ynYtqXRwGs00HHF9TK8SQOpI
-	 C6zSp5lyb8321l9H4WAxJJyJtRYaZaicraOZ2KeCTra4SpL1w7i6NLhtXgJjV3FWPc
-	 bd3FcOYxJ6fOg==
-Date: Thu, 12 Sep 2024 20:44:38 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
- <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Nathan Chancellor <nathan@kernel.org>, Antoine Tenart
- <atenart@kernel.org>, Marc Kleine-Budde <mkl@pengutronix.de>, Dan Carpenter
- <dan.carpenter@linaro.org>, Romain Gantois <romain.gantois@bootlin.com>,
- syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
-Subject: Re: [PATCH net-next] net: ethtool: phy: Clear the netdev context
- pointer for DUMP requests
-Message-ID: <20240912204438.629a3019@kernel.org>
-In-Reply-To: <20240911134623.1739633-1-maxime.chevallier@bootlin.com>
-References: <20240911134623.1739633-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1726199110; c=relaxed/simple;
+	bh=9az39iUzNwc2pSVtemtzDzPUYfaiOGkRsXpkQKAKe1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=upQTQHfrkHioEeqMwul44PFst/reeReIVkE0PfsOzBd1+GvkPT1iEnMNFz1ULgGu+8hZmqFhQ6TC0RzArJKnhlX29/eoD99z5JyRmmMAGH13qLCowAwYxqVb8sRpM3JO8GtdLxnJel2K90Z+rORfqPCYBkYdENOTMHwQP6d42iU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=NQa5CTvS; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1726199105;
+	bh=4YM0AjSQhKAmKD6VD/pyAmrY+sGhMsycC2Y66eXJZwo=;
+	h=Date:From:To:Cc:Subject:From;
+	b=NQa5CTvS5JMte/Mw+KejpZiCel4VlLH5CKBf/CjYn922XZ5DRxrzjraEr/nH2Sj8p
+	 AZO5gd3cUo9DzV/NZaMIvbCmlir6T8er6701pbjgY7RiY42nuymvKZQqGy8RdKTgXX
+	 AR7ZJgPeVAtZ8OocPidAMY7WOskR5YrTgJizfGUvpS6bcn6t4Fmwencp+xXqgd/Yli
+	 doo3T4aA7bbWgvZ1eCOLzaeB/UW7hNxmmn4AHyMmMub9AVplX1ujxkGyEQbsgO3urU
+	 OtCrWl3A2QPTNyaMXLA6KC0gfEknOU1jtJsyzc0LPdswclAYL1p0do75iuRu/JtxL2
+	 /xei7zrgKjtuQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X4gDd1KkJz4wy9;
+	Fri, 13 Sep 2024 13:45:05 +1000 (AEST)
+Date: Fri, 13 Sep 2024 13:45:04 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Christian Brauner
+ <brauner@kernel.org>
+Cc: Al Viro <viro@zeniv.linux.org.uk>, bpf <bpf@vger.kernel.org>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the bpf-next tree
+Message-ID: <20240913134504.37384c93@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/ymAgkt=IKxQlT3LACG=9wmO";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/ymAgkt=IKxQlT3LACG=9wmO
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 11 Sep 2024 15:46:21 +0200 Maxime Chevallier wrote:
-> +		/* Clear the context netdev pointer so avoid a netdev_put from
-> +		 * the .done() callback
-> +		 */
-> +		ctx->phy_req_info->base.dev = NULL;
+Hi all,
 
-Why do we assign to req_base.dev in the first place?
-req is for the parsed request in my mind, and I don't
-see anything in the PHY dump handlers actually using dev?
+After merging the bpf-next tree, today's linux-next build (powerpc
+ppc64_defconfig) failed like this:
+
+
+Caused by commit
+
+  1da91ea87aef ("introduce fd_file(), convert all accessors to it.")
+
+interacting with commits
+
+  1a61c9d6ec1d ("xattr: handle AT_EMPTY_PATH when setting xattrs")
+  278397b2c592 ("xattr: handle AT_EMPTY_PATH when getting xattrs")
+  5560ab7ee32e ("xattr: handle AT_EMPTY_PATH when listing xattrs")
+  33fce6444e7d ("xattr: handle AT_EMPTY_PATH when removing xattrs")
+
+I have applied the following patch for today.
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Fri, 13 Sep 2024 13:40:17 +1000
+Subject: [PATCH] fix up 2 for "introduce fd_file(), convert all accessors t=
+o it."
+
+interacting with commits
+
+  1a61c9d6ec1d ("xattr: handle AT_EMPTY_PATH when setting xattrs")
+  278397b2c592 ("xattr: handle AT_EMPTY_PATH when getting xattrs")
+  5560ab7ee32e ("xattr: handle AT_EMPTY_PATH when listing xattrs")
+  33fce6444e7d ("xattr: handle AT_EMPTY_PATH when removing xattrs")
+
+from the vfs-brauner tree.
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ fs/xattr.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/fs/xattr.c b/fs/xattr.c
+index fa992953fa78..f3559ed3279f 100644
+--- a/fs/xattr.c
++++ b/fs/xattr.c
+@@ -645,7 +645,7 @@ static int do_fsetxattr(int fd, const char __user *name,
+ 	int error;
+=20
+ 	CLASS(fd, f)(fd);
+-	if (!fd_file(f))
++	if (fd_empty(f))
+ 		return -EBADF;
+=20
+ 	audit_file(fd_file(f));
+@@ -829,10 +829,10 @@ static ssize_t path_getxattrat(int dfd, const char __=
+user *pathname,
+=20
+ 	if (at_flags & AT_EMPTY_PATH && vfs_empty_path(dfd, pathname)) {
+ 		CLASS(fd, f)(dfd);
+-		if (!f.file)
++		if (fd_empty(f))
+ 			return -EBADF;
+-		audit_file(f.file);
+-		return getxattr(file_mnt_idmap(f.file), file_dentry(f.file),
++		audit_file(fd_file(f));
++		return getxattr(file_mnt_idmap(fd_file(f)), file_dentry(fd_file(f)),
+ 				name, value, size);
+ 	}
+=20
+@@ -895,7 +895,7 @@ SYSCALL_DEFINE4(fgetxattr, int, fd, const char __user *=
+, name,
+ 	struct fd f =3D fdget(fd);
+ 	ssize_t error =3D -EBADF;
+=20
+-	if (!fd_file(f))
++	if (fd_empty(f))
+ 		return error;
+ 	audit_file(fd_file(f));
+ 	error =3D getxattr(file_mnt_idmap(fd_file(f)), fd_file(f)->f_path.dentry,
+@@ -949,10 +949,10 @@ static ssize_t path_listxattrat(int dfd, const char _=
+_user *pathname,
+=20
+ 	if (at_flags & AT_EMPTY_PATH && vfs_empty_path(dfd, pathname)) {
+ 		CLASS(fd, f)(dfd);
+-		if (!f.file)
++		if (fd_empty(f))
+ 			return -EBADF;
+-		audit_file(f.file);
+-		return listxattr(file_dentry(f.file), list, size);
++		audit_file(fd_file(f));
++		return listxattr(file_dentry(fd_file(f)), list, size);
+ 	}
+=20
+ 	lookup_flags =3D (at_flags & AT_SYMLINK_NOFOLLOW) ? 0 : LOOKUP_FOLLOW;
+@@ -993,7 +993,7 @@ SYSCALL_DEFINE3(flistxattr, int, fd, char __user *, lis=
+t, size_t, size)
+ 	struct fd f =3D fdget(fd);
+ 	ssize_t error =3D -EBADF;
+=20
+-	if (!fd_file(f))
++	if (fd_empty(f))
+ 		return error;
+ 	audit_file(fd_file(f));
+ 	error =3D listxattr(fd_file(f)->f_path.dentry, list, size);
+@@ -1018,9 +1018,9 @@ static int do_fremovexattr(int fd, const char __user =
+*name)
+ 	int error =3D -EBADF;
+=20
+ 	CLASS(fd, f)(fd);
+-	if (!f.file)
++	if (fd_empty(f))
+ 		return error;
+-	audit_file(f.file);
++	audit_file(fd_file(f));
+=20
+ 	error =3D strncpy_from_user(kname, name, sizeof(kname));
+ 	if (error =3D=3D 0 || error =3D=3D sizeof(kname))
+@@ -1028,11 +1028,11 @@ static int do_fremovexattr(int fd, const char __use=
+r *name)
+ 	if (error < 0)
+ 		return error;
+=20
+-	error =3D mnt_want_write_file(f.file);
++	error =3D mnt_want_write_file(fd_file(f));
+ 	if (!error) {
+-		error =3D removexattr(file_mnt_idmap(f.file),
+-				    f.file->f_path.dentry, kname);
+-		mnt_drop_write_file(f.file);
++		error =3D removexattr(file_mnt_idmap(fd_file(f)),
++				    fd_file(f)->f_path.dentry, kname);
++		mnt_drop_write_file(fd_file(f));
+ 	}
+ 	return error;
+ }
+@@ -1099,7 +1099,7 @@ SYSCALL_DEFINE2(fremovexattr, int, fd, const char __u=
+ser *, name)
+ 	char kname[XATTR_NAME_MAX + 1];
+ 	int error =3D -EBADF;
+=20
+-	if (!fd_file(f))
++	if (fd_empty(f))
+ 		return error;
+ 	audit_file(fd_file(f));
+=20
+--=20
+2.45.2
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/ymAgkt=IKxQlT3LACG=9wmO
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbjtUAACgkQAVBC80lX
+0GziIwf8C8tPIrJTuCttaL0u+tumNFBhWHcAFxdPfcD66l1dcjHTZzOQIjRxRoT6
+QYWZQkBUEp+Hel5SVPydnu17nK+W5xawGdGwZcR39cRO/gt7MaCZUAqk5f/HAjCN
+QJ6HRqqrJQrb9G01oBtYu6ZMNhMZ7JQQ1cGgItbNfF40eJgfIeWfEjB2w9OTCcN4
+ePzr8A8K76j1deEilDxGpXtMwRreOa5kdnsf1GRds16OUkxTs/5MZtF6OptiU+2Q
+Wy2DIbNhs1yuArfdpJwJhNKMtaWyJFK3cVtsEB6qgAyouaqzZGkoK+/WIjIwKhL4
+YekgHt68RSCYY1BslF9QvNDP+p0C3g==
+=4Qob
+-----END PGP SIGNATURE-----
+
+--Sig_/ymAgkt=IKxQlT3LACG=9wmO--
 
