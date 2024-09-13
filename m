@@ -1,127 +1,128 @@
-Return-Path: <netdev+bounces-128222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEE139788F3
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:27:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F38C978900
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84473289C5C
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:27:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9F9A1F2603B
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C4412FB0A;
-	Fri, 13 Sep 2024 19:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E055145B38;
+	Fri, 13 Sep 2024 19:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3s/5Lffk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gMrBm0T5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9483212C526;
-	Fri, 13 Sep 2024 19:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0CAE12DD90;
+	Fri, 13 Sep 2024 19:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726255667; cv=none; b=iIKC8oV1BL2eJe2er4cLrlGC+YvmnYRUPoAuV8qonwUIggd2ZOUcGjne3my5wyDSC2ZoTsqb5idKfpwG+DC4Urpcb3PxjohVEvKKWIMQqy5r3MFzuvP0zTQ1QGABiF47q4B6TZNTdrXEcTXWf8u6d8phQDx5iRZbSue7k59dh/Y=
+	t=1726256068; cv=none; b=YLuw2XpA+wOIeJb+Ni6v0RDmZk5mR0YnXVHEJ4ynEG2sbqTWqvWP6AhTEum+4MZQpNleTldAt6qgxwnsCW43w36mD70rHhhNq+Co3rKv1KDj7G/f/sy2I0kVeCUs4IgjNj+4xUsnrO1oQEC403jH0t5oNG89PFP1J7ngTybQJIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726255667; c=relaxed/simple;
-	bh=Uzy0WKo0zVSTsnIqoRl2P0vXxeopPBlGtqFbKaNB4x0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZsPRSfq06ABSxdwLqom9E0lhmG8gMnaSWvJ2oj4KcCLnouI6JlhAagZN0ZQrEqDSeootPs7FfEZLbVk/oh6QYjPYlWCvdnxVirem1R3K2F/1Y1LujwCQtlO7DDVLUmztqCuAVeB8Vv4SYNnmkG1LQEAE7S3mMxvkvpYRWgnKLt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3s/5Lffk; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=V/fJdEFiVV1xIWs3tBqysiFVv3X6oa6gDDk7YeJVw8s=; b=3s/5LffkanL6JgKJdCkpMVN4mA
-	gvWbJIwLXl8SJgWI2e05xTlPRuVo02f26hMdxNDCq1K/0UM+dKCgrnRS5RSztGn0G7endKpcSNkVK
-	CWv9lipO+ZXgG68QJje6llHwbX++Tsc8PqQgyr3rll+5m1jDJwpxUCuWUvea+uKXgiSU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1spBwx-007Q0o-Hv; Fri, 13 Sep 2024 21:27:23 +0200
-Date: Fri, 13 Sep 2024 21:27:23 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: "A. Sverdlin" <alexander.sverdlin@siemens.com>, netdev@vger.kernel.org,
-	=?iso-8859-1?Q?Ar1n=E7_=DCNAL?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	s=arc-20240116; t=1726256068; c=relaxed/simple;
+	bh=58xEeBUkLGAvA3YTBf8guodbomstYwW1DUFe8yFZ6EA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QM/kCRvwTzIYIsaYRMDjmZWYWciNNdbe5LbAmVBHw5DQo476pOPDL1EW9kKLsPI7xMkKrDVdcLHIPuiqhAtxaCJFSg979svhZLPwk8w/0xhxF9Idss6KcGqqbnlGS7D0aHPYuyKo18TXCzgcnlTFLiPIocTHCnYOhd4tVRWeCYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gMrBm0T5; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-718d91eef2eso1657803b3a.1;
+        Fri, 13 Sep 2024 12:34:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726256067; x=1726860867; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1LSaQHVbC+YpoJ3RozOP+5aECp20xDoqhwrpbiQ2wDM=;
+        b=gMrBm0T5BMl46tl008+sUJASKyGnEWt85VL/pbD1Zncf9hnP/yEQ7xBgXkFv1xdBmI
+         xNUIYuz/1wImJzjpdS2ZdEUYPzZopFWhYtn+GUSzlQ3TnmJ3zYsIBGGkgeav9VTWH30S
+         M8VrQSbmrcgX/SIKSFTrq9b9jAD0lrWMxH7VhtmF0O2Ek9Dn53qH5NhYZIHda7L/tKFA
+         O0SOdF/d2irTY7rbcczhhCmqdgEaCHocluJ97c/KXOUyRlXssai6yyCVob3BA/Czo5hK
+         IW649jMhWoOsWUvFwzA6493ue8CFqS31qVn+Klwg/yejuY47Kg0UJPdEFXxnXnbWRvlB
+         juTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726256067; x=1726860867;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1LSaQHVbC+YpoJ3RozOP+5aECp20xDoqhwrpbiQ2wDM=;
+        b=YF1t3HH6Q33M5h//jhU1RbixaUe/vfQ/H3CvyDAkiUWa3Pvg6/+oxHIV/W0rn4QetR
+         wvka7j0vo8fyQhJNyQyXkplniAxgFh9eGmaTQ68dugXCKR3FtCqs+T3hdpEiICPFUflb
+         EOJjSLQZdxg2AwDM5LCcvdX3EqkyuACJYOXbir68t55kazwI+GeVbDW72t17cKuJMICd
+         CTdscLFdM+N1ijDME8TF81pmMI57Ik8CMis9jfZxzSb/yjuPy4fzyRYLmkUxGTg2NmdS
+         R+dp1qHRq+6Aqme6vh7jO/vAxrXXI11xCFP8qh5DU+A6uViw6BybTmPyzgaRJKlLzCCt
+         yJrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVH7U+0XTtaLCbBQj9gXRPEyG0yvyh6izJtR2M6NZg55/RUhy8110zY8wYmA5IWbfLAPWHlDM5dXcA9HUA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdbSIy8Om8q3RftCpCZyU5fI0RPTfuUnsvO6IbLzrv+hNG/noK
+	FioHoTHiEeA5ILdfC54GID4Af+zX5kmlG5qQg7IePVpAIFyqOyrOilFzVABk
+X-Google-Smtp-Source: AGHT+IFfjtobqQPMkb9OKLlg1I5PWajndb+eLtuLMdvhxBWmOQ4JJ0fKh+2FCmn3asUIzAuiLIKtnw==
+X-Received: by 2002:a05:6a00:2d05:b0:706:aa39:d5c1 with SMTP id d2e1a72fcca58-719263eab2cmr11149885b3a.8.1726256066430;
+        Fri, 13 Sep 2024 12:34:26 -0700 (PDT)
+Received: from amenon-us-dl.hsd1.ca.comcast.net ([2601:646:a002:44b0:385b:1e44:bb9b:db08])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-719090d08a5sm6407832b3a.212.2024.09.13.12.34.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Sep 2024 12:34:25 -0700 (PDT)
+From: Aakash Menon <aakash.r.menon@gmail.com>
+X-Google-Original-From: Aakash Menon <aakash.menon@protempis.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	lars.povlsen@microchip.com,
+	Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com,
 	UNGLinuxDriver@microchip.com,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	linux-mediatek@lists.infradead.org, bridge@lists.linux.dev,
-	stable@vger.kernel.org
-Subject: Re: [PATCH 1/2] net: dsa: RCU-protect dsa_ptr in struct net_device
-Message-ID: <28d0a7a5-ead6-4ce0-801c-096038823259@lunn.ch>
-References: <20240910130321.337154-1-alexander.sverdlin@siemens.com>
- <20240910130321.337154-2-alexander.sverdlin@siemens.com>
- <20240913190326.xv5qkxt7b3sjuroz@skbuf>
+	aakash.menon@protempis.com,
+	horms@kernel.org,
+	horatiu.vultur@microchip.com
+Cc: netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] net: sparx5: Fix invalid timestamps
+Date: Fri, 13 Sep 2024 12:33:57 -0700
+Message-ID: <20240913193357.21899-1-aakash.menon@protempis.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240913190326.xv5qkxt7b3sjuroz@skbuf>
+Content-Transfer-Encoding: 8bit
 
-> >  drivers/net/dsa/mt7530.c                    |   3 +-
-> >  drivers/net/dsa/ocelot/felix.c              |   3 +-
-> >  drivers/net/dsa/qca/qca8k-8xxx.c            |   3 +-
-> >  drivers/net/ethernet/broadcom/bcmsysport.c  |   8 +-
-> >  drivers/net/ethernet/mediatek/airoha_eth.c  |   2 +-
-> >  drivers/net/ethernet/mediatek/mtk_eth_soc.c |  22 +++--
-> >  drivers/net/ethernet/mediatek/mtk_ppe.c     |  15 ++-
-> >  include/linux/netdevice.h                   |   2 +-
-> >  include/net/dsa.h                           |  36 +++++--
-> >  include/net/dsa_stubs.h                     |   6 +-
-> >  net/bridge/br_input.c                       |   2 +-
-> >  net/core/dev.c                              |   3 +-
-> >  net/core/flow_dissector.c                   |  19 ++--
-> >  net/dsa/conduit.c                           |  66 ++++++++-----
-> >  net/dsa/dsa.c                               |  19 ++--
-> >  net/dsa/port.c                              |   3 +-
-> >  net/dsa/tag.c                               |   3 +-
-> >  net/dsa/tag.h                               |  19 ++--
-> >  net/dsa/tag_8021q.c                         |  10 +-
-> >  net/dsa/tag_brcm.c                          |   2 +-
-> >  net/dsa/tag_dsa.c                           |   8 +-
-> >  net/dsa/tag_qca.c                           |  10 +-
-> >  net/dsa/tag_sja1105.c                       |  22 +++--
-> >  net/dsa/user.c                              | 104 +++++++++++---------
-> >  net/ethernet/eth.c                          |   2 +-
-> >  25 files changed, 240 insertions(+), 152 deletions(-)
-> 
-> Thank you for the patch, and I would like you to not give up on it, even
-> if we will go for a different bug fix for 'stable'.
-> 
-> It's just that it makes me a bit uneasy to have this as the bug fix.
+Bit 270-271 are occasionally unexpectedly set by the hardware.
 
-+1
+This issue was observed with 10G SFPs causing huge time errors (> 30ms) in PTP.
 
-We should try for a minimal fix for stable, and keep this for
-net-next, given its size.
+Only 30 bits are needed for the nanosecond part of the timestamp, clear 2 most significant bits before extracting timestamp from the internal frame header.
 
-https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+Signed-off-by: Aakash Menon <aakash.menon@protempis.com>
+---
+ drivers/net/ethernet/microchip/sparx5/sparx5_packet.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-* It must be obviously correct and tested.
-* It cannot be bigger than 100 lines, with context.
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+index f3f5fb420468..a05263488851 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+@@ -45,8 +45,12 @@ void sparx5_ifh_parse(u32 *ifh, struct frame_info *info)
+ 	fwd = (fwd >> 5);
+ 	info->src_port = FIELD_GET(GENMASK(7, 1), fwd);
+ 
++	/*
++	 * Bit 270-271 are occasionally unexpectedly set by the hardware,
++	 * clear bits before extracting timestamp
++	 */
+ 	info->timestamp =
+-		((u64)xtr_hdr[2] << 24) |
++		((u64)(xtr_hdr[2] & 0x3F) << 24) |
+ 		((u64)xtr_hdr[3] << 16) |
+ 		((u64)xtr_hdr[4] <<  8) |
+ 		((u64)xtr_hdr[5] <<  0);
+-- 
+2.46.0
 
-	Andrew
 
