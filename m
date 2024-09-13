@@ -1,211 +1,216 @@
-Return-Path: <netdev+bounces-128168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AED5978592
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:15:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 017D1978596
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:17:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72B481C224FB
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 16:15:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A30828BC01
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 16:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F324B34CD8;
-	Fri, 13 Sep 2024 16:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA97814A85;
+	Fri, 13 Sep 2024 16:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b="xqNHuS3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2071.outbound.protection.outlook.com [40.107.105.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C782D2E5;
-	Fri, 13 Sep 2024 16:15:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726244135; cv=none; b=ThMww8o1keB2vUrkOmTJKUof2GFDYnIEPgkw9Q67N88GSzwhxR49ESlLUi77RtVso3ioIDL0pQtdeyYKct7bJx5v4kO+1ItX6LaDiq2oyG9uos0fGwE6lKrMLt3hPiygdithARoSvlumtXJgbb6SlPanodBLrL8aWj7X9yFQHWg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726244135; c=relaxed/simple;
-	bh=/hADo25VOWxE6cDzncVwMHVnQ5/7gnWCFGFlhaWnpOg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Fxf8E/5FrhsdDRQM2vxB9xotJITOsdKLxR77QQjtPSJKe37ovVYAH0MyhMhINqlAYTgOtaWrW1rBuHMcl+PPJAYxZgYxd6UchBhoN44H4lfvecoz/GOZbPnZMGnbW40uR2eWZe+zWJih0PinubP5uC0ua25A93FXQkglCiSiJI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4X4zr40ryFzmVCX;
-	Sat, 14 Sep 2024 00:13:24 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id 23B49180106;
-	Sat, 14 Sep 2024 00:15:29 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 14 Sep 2024 00:15:25 +0800
-Message-ID: <2f07d52b-0273-b2d8-450b-db88a7f16042@huawei-partners.com>
-Date: Fri, 13 Sep 2024 19:15:20 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D714A21;
+	Fri, 13 Sep 2024 16:17:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.71
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726244226; cv=fail; b=anfLeDgqZy61UZ+qs5BTS/ed89VR4HPpjnQmyhIrnlySo5QzOAUppErTMjALguNBayoF7WspcdzOdoTrlC3M13bJF2iHQBNI2NuJDoGA8VnfRMpMXyE9sfu6uiwJiAsgCbDdnfU3BNlhxKv52w4ax/HLQtOc5NJgjpS/BUh+LJs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726244226; c=relaxed/simple;
+	bh=ojKNMPVQLAycQUIeSan8uALfsRsaYqxUnV45dnTKA9A=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=JMy21jKzqgDhhoxZWw+mgP/GL9mS8cmZWf7+KuKiAhQUcAOdoR0OTOjDrOwr72+FLmPMy+FifORSCTZc+LE0H3BULDXKqgSYL/uAupj6ErJce1ceehxGkIAm5jjVAw5EHC4o8kUh8RyX3CBMukp5cI1B9yGu5SS5N+m9ZILGEDw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=@siemens.com header.b=xqNHuS3w; arc=fail smtp.client-ip=40.107.105.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=siemens.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=K1ijSn2HPxONIgL+3ckbehMxz8bOUvoMRaTWwAnte3xx0QdzRDJX80lMAUSfQymkW1t3AZNQTgFaroXrv0FrIBkLFl42KxUYcwaNNqgNXgATe1Jn3IJmlzVOKDADWmKEHS8j4kgq/6G5iYQaNW4Q0DIlAD9UIK/L4BVoSdVX7QskIOez/ZriITiRyAb9of8qTEzzC28ZfIiVZ0Rmjwhs3ruj8y5RIEvfEw+CsBzQzqbaxjbigyCqaaoXpBaPYhfZPy7TnEoPX3jfpWFnm4l0IOkZ2NR6l4mejp3yGj9PCo2LJ/RKq3HmZzJdujoqqfb/kbzpiMwhSnFjnkjEOH6KIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ojKNMPVQLAycQUIeSan8uALfsRsaYqxUnV45dnTKA9A=;
+ b=B/7i3FJh79Pok1IFBOk8+tb2ldlanTn6Dq0iP2vhp3wj9dxDdCmIjxEqZzbaAAnjNjcSUCt7qNb+l+IXEvOY3RWHWHBTbdaELvam/IXqX9pFuJXzmT72nOX7WdvQJUIZnuCg5txyuqf8giABNJ38Hm5RdF0PAIcq4bi0zUOruR2yZQT530ePCaBlAwNWIvcEOH9uLfmvpqQ6bzZtdilCfFlP0L0JZLN3nUvHpIu+/p+aNRwacsupZKaTeD6TdYRKL5Rm67TphDcWm0+7NFDyi/SfeZW5JYrQefb+NnjrTgsf2VL706x5cjGhWbD8/ipJ1Jcvyt/SHLqLzctYwkzzWA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
+ dkim=pass header.d=siemens.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ojKNMPVQLAycQUIeSan8uALfsRsaYqxUnV45dnTKA9A=;
+ b=xqNHuS3wCyRzbpUY9LYP+We+EJ4FWY9CFA6XVGeqTORCUYTBA5hjp9j79vSvwVxOU4s5/UHrA0RgmLU+VG6W/HKKUCoYeWvnT4+lcev3jEzO7xtAsYmz7OweCexJbUA0fJXQXipjQtMj2wlCLIfYpMx/Dirs0+tvzIQQum9SiwYGxLflp/CPAo3+rAJkPKlBu1jVep7pPCZNjP3TwicU85IpBlp679vxRjbh5fVDqMgN39k4JqjF6q5E3YQdjKr5i+Y4pH3sucPKrvp9/Xmj3T5/h8n7dJywD7Cd1TXdqteF8yxO1TpyOZcAtsP/C8H/4gJa/H2GPetl5tEUyO2ugw==
+Received: from AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:5b6::22)
+ by AS2PR10MB6869.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:5f0::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.17; Fri, 13 Sep
+ 2024 16:16:57 +0000
+Received: from AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::baa6:3ada:fbe6:98f4]) by AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::baa6:3ada:fbe6:98f4%3]) with mapi id 15.20.7962.017; Fri, 13 Sep 2024
+ 16:16:57 +0000
+From: "Sverdlin, Alexander" <alexander.sverdlin@siemens.com>
+To: "olteanv@gmail.com" <olteanv@gmail.com>
+CC: "andrew@lunn.ch" <andrew@lunn.ch>, "davem@davemloft.net"
+	<davem@davemloft.net>, "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>, "edumazet@google.com"
+	<edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] net: dsa: lan9303: avoid dsa_switch_shutdown()
+Thread-Topic: [PATCH net] net: dsa: lan9303: avoid dsa_switch_shutdown()
+Thread-Index: AQHbBFjNdrluTsjNlkqTR6odzDTPnbJT8NEAgAH3MQA=
+Date: Fri, 13 Sep 2024 16:16:57 +0000
+Message-ID: <ae8d43993c2195925c9cbb4a9db565985709eaf8.camel@siemens.com>
+References: <20240911144006.48481-1-alexander.sverdlin@siemens.com>
+	 <20240912101556.tvlvf2rq5nmxz7ui@skbuf>
+In-Reply-To: <20240912101556.tvlvf2rq5nmxz7ui@skbuf>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=siemens.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AS8PR10MB6867:EE_|AS2PR10MB6869:EE_
+x-ms-office365-filtering-correlation-id: 93624741-c51a-42d2-83ce-08dcd40f7d73
+x-ms-exchange-atpmessageproperties: SA
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?Rkc1UWoyZHNDeEt4NGptdXRIU0Y5cU9JUm9nZ0t3SFA1SmRHMjd2UFIwOWsy?=
+ =?utf-8?B?R1lxSEl4VEhSa3VPUTN4SEdNNjNGZlhFTXVJL2owc1RRSWM2QnBEK3RuNUJT?=
+ =?utf-8?B?bWJXWWtXR0h0ZFVKaGNzS1E2bUFFMVdFV0V2dFNTTGwxYVNjdE9vRDFtZ1Ju?=
+ =?utf-8?B?WmF1UERTdWpJSUUzTnBlVDhFaU5ra1A4UUgzbjY1TS9Ra0xkMloxWnBvOG1z?=
+ =?utf-8?B?YlNKL2o2YUpPNW9zeENUSnZlVXJQbW9hbkdiZHBKTlBQWFBBNGRoeTNsSlhD?=
+ =?utf-8?B?SW5ORCs2T2E5dHQzODBDSkZuQy9Xa0E1VHFEbzEvbHNnNWxVTmI2WHQxUUt0?=
+ =?utf-8?B?S3QwbkRkYURsSDFQd2RUYmJqYklqSGcxWGhHUFArQXpjay9tNFRjY3BvbGpO?=
+ =?utf-8?B?SzFjWENPRjJhaTFIaFJFKzRwSW9ZOE5OdWtUdGN2clN0UDIydEgxM2ZQOGVD?=
+ =?utf-8?B?Y0ptcWUvaWRmQlNZK2JXVkNCMnpCUVR3Sk1Bc1p4SHZQVnA1OFZQQUxURzBK?=
+ =?utf-8?B?NUdaTWVlUkdpU1FrK2NkM2dQa0dCOEJQVkRsSXM0ckRRaDBmTmgwSThsMlFQ?=
+ =?utf-8?B?aFFza0hOejJUUWdIMkEwdE9zMThHVEorMGFPQ1hDZjNPMlhqUE9rNmdYWFVa?=
+ =?utf-8?B?Y0NGQzAxeGZNaVFiQ2tEbE11Q245L2dpdEtGcDNZdWVQdVVoU3NSa3ArcUg3?=
+ =?utf-8?B?SmZNRW5vb3I4dW8rUlhCUlRkTDJXU0N1TUpvekt2VFUwUHJPWW5lVTVlaGEw?=
+ =?utf-8?B?dm1jci83WUpLT0k5cWwyL3R2aGhRb3FJSzBVc1RnOWdlUlE4cHFJQ3ZwRHFr?=
+ =?utf-8?B?Ukl1TEdrNWttVmN2WTlZL0pVNGtDWHZuZ1BQaGM2YU52Q3dISmltQ2Z2MVJ1?=
+ =?utf-8?B?Uk9CbFdBK2pJNTV4WTdqS2xVZkt1eHV6a0Z3V1BIUnNSVk56Y1VQQk4yWStk?=
+ =?utf-8?B?eHdRMG13bDBNd2FPbmhvMVd0S01uRjdrMlgvZmpOQjBHVnd0WXJobHloMWlR?=
+ =?utf-8?B?V2VRa2tWTThlT1ZvVkRNSlNhUDRxR0cxSkg3TjN3YlhMYXJmR2NjWDhQa0h6?=
+ =?utf-8?B?YkdXcmpVVEJyNVVqVFJvd3VGR0JsekF5VzV0QjhKdVFCNEVnY0IyTDNRRWdG?=
+ =?utf-8?B?dVlBRVRKWEpUMUZhSVRVa2hMQzBQTlVLTnJCNDZueDQvRmZkQ0w5Tml2dzB4?=
+ =?utf-8?B?ZnF6NmhzQ2xSbFJFbm5aWUNkN0U1ZGU4eU5CWVphOFlNeVQxSXFRdEFmaUEz?=
+ =?utf-8?B?YVlBUFR2QjhwS1cyT2hYcnBRUjR2eXphcWE3enAraHIyUkMrckEyUHkrNndC?=
+ =?utf-8?B?dHB0Mi9BaVh6TTFnREZEUURYbDg5WnBTY1ZEdzFaYWJvMCtDdGhBcElHT0Vy?=
+ =?utf-8?B?bzk0dGxGems3YUtPREVYQlhaeWx0N1FUa1I4Y1BrczFwVU5VRkgvTTQ3bVJN?=
+ =?utf-8?B?eHFyMWNXL0xPQ1ZMbXdPTENZWDZVMzA3NndhWHZhOTBtTHRQNFJyN0xZcEx2?=
+ =?utf-8?B?dWlXL1h4TkpFaGwrb1ZJR1ZOb0prY3c5a01qcDV0NVpwTTE1eEFjS1NBZnVj?=
+ =?utf-8?B?ZHBiNXJpWWcyREVoUi9iVjRxZzV5ZlB0UnZHU3Z4a1ZvdEkvOTkzUDlhOUtr?=
+ =?utf-8?B?WnljRlFBakx0ZWlVd1lOV3VDa2JHZFJQS2lyNGRiSkQwNUVJdklMOXRRYWVV?=
+ =?utf-8?B?ajlibURxTTlQWW5VVXcwZEVCbkozNkxQRmhKZldDTkwxcDFYd29pWUpXekds?=
+ =?utf-8?B?L3JMSENZdlRmQytBYURnV3BFUW1UUnNDTTZjRkQ0cGdtdUR6YlNBdk93eEVs?=
+ =?utf-8?Q?4ouNm9QX8KyJXwpuYXM8WGqtd889Ni+pPbeXk=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?ZjIzaGhDZzdXYm41ZlpkN0ZDcWdLUUJCQW5OT2JTUmRIT3dTRW5kM2hSTmo5?=
+ =?utf-8?B?Z2tOT1RpbFl3cUliWmJ1ckExM3o5R2F3QkhCS3o1aWhSa1lHTVpsbE5RV3o4?=
+ =?utf-8?B?MGJBVVRhQ2FrREhkUzZxZi9ha3l4TXd3SG4wSk9WdlNyOE1aaUFEcExMcUNs?=
+ =?utf-8?B?dmFqREcwMDR0cHZld1BYRm55b2lHY2V5S0NHTFBINWxyMCt6ZmJsaTF2VFRp?=
+ =?utf-8?B?NWp1Y0pEa1BrZDYvM2Nhek5FdkNEd2owZCtaWHNRMEM2a1UxNVZ6NGtBWjhq?=
+ =?utf-8?B?V1dwVmRqMzFkbjhCNXFBWG9vcURkOHF2b242NWhvSzVwT2pYWTJNSGxxSWI0?=
+ =?utf-8?B?MWxnc0hRS2JTQThFa1B4Qk9pSG0wTkordzVUclEzS0kxVmN2WnY1c2xIdm5l?=
+ =?utf-8?B?TU1rQVJmTjFScUhVWndIQTZ4WnRBdTRHN1Y2d3JkQitCbmQyK0xwZ2NCcnZB?=
+ =?utf-8?B?RElyVW5hQWt3c2V2VmtjUlVLbUZJK2ZZaEV4RHZ5dU9mV0FqdERtdkVGcytr?=
+ =?utf-8?B?S1ZYTHZlZUl1VmhJcGJzeXdLWVNaSTBLYXJBWnMzOGsyVXpRakxqMFBLa0Rj?=
+ =?utf-8?B?aUJteCs4clVNNldocnp1aUFscC9rMDFTcEkzeDhoOXlJNWxwYmZ6amJvaEl2?=
+ =?utf-8?B?M2JHRVR6Y1hvL3Y4ek9CcjYvWThQTkVZOFdmVFdVV3VDV3dPeFN6bzh3VCtN?=
+ =?utf-8?B?YlRLL3hCck5oM2xQVmphWlRpZ2UvTWNXVDhVT0FzaVdUVFdjaS9mM3NXSjVY?=
+ =?utf-8?B?K1dRNkxtRE1EcUdmT3V3QjhRVnRQd3BCblFOY282QXZNKzk3aUtZYnB4RFli?=
+ =?utf-8?B?NzdoN2ErQnRJRHNRclNvRGI0NHpiTVV6SDBUUmQ0YUJmYm9WRkUvSUVrWXBU?=
+ =?utf-8?B?VzkzS1RMR1ZFdTdoODlnZm9rMGlYbXpUY1o1Rmt5a1M0UllxcWFNaTFmeVJL?=
+ =?utf-8?B?ZWdlME1yRVFSR1pzWm5xeGNPa3E5b3FveHM5Tm9kV3VXUWlyZzdLZU02QWdM?=
+ =?utf-8?B?SFRpNndxMjZSb2JGN1FQTEIzYWc1RXZrN3FNYzZjblBYamw2dWRqZnltYXI1?=
+ =?utf-8?B?eEQxc1JJczRqRG9LRnByZmVKUmcrVFZMUHdxNllmTWZlL3lkZnovSGU4L3Ru?=
+ =?utf-8?B?M3U2b3NOVEJaZzVlcmtUK1oxWkR2K3EveUd3Y2pqaThYUndGZVkrVDlOKzIr?=
+ =?utf-8?B?Nm9ZWHZoOThqU0ZSb1dYS2JLbFhYMFB0aGV0WWp2YytIdmxUTXg0aW91Ukx0?=
+ =?utf-8?B?S3BiKzRLS1RyWlZTL2RaQjBrRmg1MEJ1Vk01dW41VmllSUI5YTB2NUNOeFQ3?=
+ =?utf-8?B?MjNaVTJ1K2J4WXErUkJNSTFiWFBPNGk4UGtUVDVWVWZMVlE2alRxQndZMm9o?=
+ =?utf-8?B?TU1GaDRiTWhydkFVM2l6b053N3gzSTdadWIxbjYrMVp5MEhVb3BGbjhpZStv?=
+ =?utf-8?B?bElhN1JQRlJHZkQ4ODdVUFlhTm1tT3ovaVR2ZjVRRU93aDZVTHdlYUhWekJT?=
+ =?utf-8?B?b0NzZ2YvWUw1YXk4OFJSVTNnTVBMZ2d0ejhlVTVEaWpDa0xiczUxdFlxdjFy?=
+ =?utf-8?B?K3dla3FFTFp2T25haXVPM0NPRmJTeVd6SWJ0Z2dXMExXaFZXWTBWTzJCRU9M?=
+ =?utf-8?B?akZsTElLMU5kSG5obTBVVUYzTlBGSlpyd1VsYnpEeEFQTEdxNk9nRFJKdU5s?=
+ =?utf-8?B?emlTRTJqeDdBSnFCNGRRNkQ4Y1VSNm9pNjhVWmJkdE8ydGZldGp3MUpmSDBX?=
+ =?utf-8?B?aUgyNC9jaGdadDFRanpQQUkrTHFwbzBUejBpUUdSK3NSS1ZvR0tXTDJ0eUxD?=
+ =?utf-8?B?UVorbE9xVXRadUFYRVV5Uzk4ZXI0VHlmeWpWUnU1M2JiREJHZTJxbk12S2ov?=
+ =?utf-8?B?cXkwVXd2NlpCMW1LcjROV1oxR1hwWWxkQ0s3WEEwVGZSa0NLR203T0F1dWZU?=
+ =?utf-8?B?NllKUHlYUDRkWGtGRm9tM1JySkg3aCtjZTJiRVNYUlhLSWQ0YnhQQ3ErUS91?=
+ =?utf-8?B?M2t4aWNrRE9HSUNNUzhBbGlCSGJhM1ZXMHJnU3o3T09Ma1ZMRE9oZ0JzQndo?=
+ =?utf-8?B?VitWZmVOL05LOXc3akVqZi9YTGNxeFFiYVRwdk8vZE5FbE15bUJxRldWeE44?=
+ =?utf-8?B?ZTZ3aUZqVWFERitueDJtR3dNR3FCdGhoc0x5aStROEVWZ1Y0WDNjQ2V4bzJL?=
+ =?utf-8?Q?z2EQVL6jhfsGJmGtApLG/vM=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D888D0418F15644DBF29AA37B279FE8C@EURPRD10.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 06/19] selftests/landlock: Test adding a rule for
- unhandled access
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
- <20240904104824.1844082-7-ivanov.mikhail1@huawei-partners.com>
- <ZuAP8iSv_sjmlYIp@google.com>
- <fd6ef478-4d0b-03f2-78f6-8bfd0fc3a846@huawei-partners.com>
- <ZuRUagjolNjXsS3r@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZuRUagjolNjXsS3r@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- kwepemj200016.china.huawei.com (7.202.194.28)
+X-OriginatorOrg: siemens.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AS8PR10MB6867.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93624741-c51a-42d2-83ce-08dcd40f7d73
+X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2024 16:16:57.3992
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KLotbJEZ+WGxQ7XkniHxWVnxdTIdHCFqnGjjDQl6HSBw60tOWJSG5joCPbtghhK2dHPTZGNMiJq5Hckh+00wR2jfUoPFQ6zGEK2G/thESwk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR10MB6869
 
-On 9/13/2024 6:04 PM, Günther Noack wrote:
-> On Wed, Sep 11, 2024 at 11:19:48AM +0300, Mikhail Ivanov wrote:
->> On 9/10/2024 12:22 PM, Günther Noack wrote:
->>> Hi!
->>>
->>> On Wed, Sep 04, 2024 at 06:48:11PM +0800, Mikhail Ivanov wrote:
->>>> Add test that validates behaviour of Landlock after rule with
->>>> unhandled access is added.
->>>>
->>>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->>>> ---
->>>> Changes since v2:
->>>> * Replaces EXPECT_EQ with ASSERT_EQ for close().
->>>> * Refactors commit title and message.
->>>>
->>>> Changes since v1:
->>>> * Refactors commit message.
->>>> ---
->>>>    .../testing/selftests/landlock/socket_test.c  | 33 +++++++++++++++++++
->>>>    1 file changed, 33 insertions(+)
->>>>
->>>> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
->>>> index 811bdaa95a7a..d2fedfca7193 100644
->>>> --- a/tools/testing/selftests/landlock/socket_test.c
->>>> +++ b/tools/testing/selftests/landlock/socket_test.c
->>>> @@ -351,4 +351,37 @@ TEST_F(protocol, rule_with_unknown_access)
->>>>    	ASSERT_EQ(0, close(ruleset_fd));
->>>>    }
->>>> +TEST_F(protocol, rule_with_unhandled_access)
->>>> +{
->>>> +	struct landlock_ruleset_attr ruleset_attr = {
->>>> +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
->>>> +	};
->>>> +	struct landlock_socket_attr protocol = {
->>>> +		.family = self->prot.family,
->>>> +		.type = self->prot.type,
->>>> +	};
->>>> +	int ruleset_fd;
->>>> +	__u64 access;
->>>> +
->>>> +	ruleset_fd =
->>>> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
->>>> +	ASSERT_LE(0, ruleset_fd);
->>>> +
->>>> +	for (access = 1; access > 0; access <<= 1) {
->>>> +		int err;
->>>> +
->>>> +		protocol.allowed_access = access;
->>>> +		err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
->>>> +					&protocol, 0);
->>>> +		if (access == ruleset_attr.handled_access_socket) {
->>>> +			EXPECT_EQ(0, err);
->>>> +		} else {
->>>> +			EXPECT_EQ(-1, err);
->>>> +			EXPECT_EQ(EINVAL, errno);
->>>> +		}
->>>> +	}
->>>> +
->>>> +	ASSERT_EQ(0, close(ruleset_fd));
->>>> +}
->>>> +
->>>
->>> I should probably have noticed this on the first review round; you are not
->>> actually exercising any scenario here where a rule with unhandled access is
->>> added.
->>>
->>> To clarify, the notion of an access right being "unhandled" means that the
->>> access right was not listed at ruleset creation time in the ruleset_attr's
->>> .handled_access_* field where it would have belonged.  If that is the case,
->>> adding a ruleset with that access right is going to be denied.
->>>
->>> As an example:
->>> If the ruleset only handles LANDLOCK_ACCESS_FS_WRITE_FILE and nothing else,
->>> then, if the test tries to insert a rule for LANDLOCK_ACCESS_SOCKET_CREATE,
->>> that call is supposed to fail -- because the "socket creation" access right is
->>> not handled.
->>
->> This test was added to exercise adding a rule with future possible
->> "unhandled" access rights of "socket" type, but since this patch
->> implements only one, this test is really meaningless. Thank you for
->> this note!
->>
->>>
->>> IMHO the test would become more reasonable if it was more clearly "handling"
->>> something entirely unrelated at ruleset creation time, e.g. one of the file
->>> system access rights.  (And we could do the same for the "net" and "fs" tests as
->>> well.)
->>>
->>> Your test is a copy of the same test for the "net" rights, which in turn is a
->>> copy of teh same test for the "fs" rights.  When the "fs" test was written, the
->>> "fs" access rights were the only ones that could be used at all to create a
->>> ruleset, but this is not true any more.
->>
->> Good idea! Can I implement such test in the current patchset?
-> 
-> Yes, I think it would be a good idea.
-> 
-> I would, in fact, recommend to turn the rule_with_unhandled_access test into that test.
-> 
-> The test traces its roots clearly to
-> 
->    TEST_F(mini, rule_with_unhandled_access)  from net_test.c
-> 
-> and to
-> 
->    TEST_F_FORK(layout1, rule_with_unhandled_access)  from fs_test.c
-> 
-> 
-> and I think all three variants would better be advised to create a ruleset with
-> 
-> struct landlock_ruleset_attr ruleset_attr = {
-> 	.handled_access_something_entirely_different = LANDLOCK_ACCESS_WHATEVER,
-> }
-> 
-> and then check their corresponding fs, net and socket access rights using a
-> landlock_add_rule() call for the access rights that belong to the respective
-> module, so that it exercises the scenario where userspace attempts to use the
-> access right in a rule, but the surrounding ruleset did not restrict the same
-> access right (it was "unhandled").
-
-Agreed, thanks for the recommendation!
-
-> 
-> In spirit, it would be nicest if we could create a ruleset where nothing at all
-> is handled, but I believe in that case, the landlock_create_ruleset() call would
-> already fail.
-> 
-> —Günther
-> 
-> P.S.: I am starting to grow a bit uncomfortable with the amount of duplicated
-> test code that we start having across the different types of access rights.  If
-> you see a way to keep this more in check, while still keeping the tests
-> expressive and not over-frameworking them, let's try to move in that direction
-> if we can. :)
-
-Yeah, I really want to see patchset dedicated to tests refactoring. I'll
-try to finish the description of corresponding issue [1] ASAP.
-
-[1] https://github.com/landlock-lsm/linux/issues/34
+SGkgVmxhZGltaXIhDQoNClRoYW5rIHlvdSBmb3IgdGhlIHF1aWNrIGZpeCENCg0KT24gVGh1LCAy
+MDI0LTA5LTEyIGF0IDEzOjE1ICswMzAwLCBWbGFkaW1pciBPbHRlYW4gd3JvdGU6DQo+ID4gRnJv
+bTogQWxleGFuZGVyIFN2ZXJkbGluIDxhbGV4YW5kZXIuc3ZlcmRsaW5Ac2llbWVucy5jb20+DQo+
+ID4gDQo+ID4gZHNhX3N3aXRjaF9zaHV0ZG93bigpIGRvZXNuJ3QgYnJpbmcgZG93biBhbnkgcG9y
+dHMsIGJ1dCBvbmx5IGRpc2Nvbm5lY3RzDQo+ID4gc2xhdmVzIGZyb20gbWFzdGVyLiBQYWNrZXRz
+IHN0aWxsIGNvbWUgYWZ0ZXJ3YXJkcyBpbnRvIG1hc3RlciBwb3J0IGFuZCB0aGUNCj4gPiBwb3J0
+cyBhcmUgYmVpbmcgcG9sbGVkIGZvciBsaW5rIHN0YXR1cy4gVGhpcyBsZWFkcyB0byBjcmFzaGVz
+Og0KPiA+IA0KPiA+IFVuYWJsZSB0byBoYW5kbGUga2VybmVsIE5VTEwgcG9pbnRlciBkZXJlZmVy
+ZW5jZSBhdCB2aXJ0dWFsIGFkZHJlc3MgMDAwMDAwMDAwMDAwMDAwMA0KPiA+IENQVTogMCBQSUQ6
+IDQ0MiBDb21tOiBrd29ya2VyLzA6MyBUYWludGVkOiBHIE8gNi4xLjk5KyAjMQ0KPiA+IFdvcmtx
+dWV1ZTogZXZlbnRzX3Bvd2VyX2VmZmljaWVudCBwaHlfc3RhdGVfbWFjaGluZQ0KPiA+IHBjIDog
+bGFuOTMwM19tZGlvX3BoeV9yZWFkDQo+ID4gbHIgOiBsYW45MzAzX3BoeV9yZWFkDQo+ID4gQ2Fs
+bCB0cmFjZToNCj4gPiDCoCBsYW45MzAzX21kaW9fcGh5X3JlYWQNCj4gPiDCoCBsYW45MzAzX3Bo
+eV9yZWFkDQo+ID4gwqAgZHNhX3NsYXZlX3BoeV9yZWFkDQo+ID4gwqAgX19tZGlvYnVzX3JlYWQN
+Cj4gPiDCoCBtZGlvYnVzX3JlYWQNCj4gPiDCoCBnZW5waHlfdXBkYXRlX2xpbmsNCj4gPiDCoCBn
+ZW5waHlfcmVhZF9zdGF0dXMNCj4gPiDCoCBwaHlfY2hlY2tfbGlua19zdGF0dXMNCj4gPiDCoCBw
+aHlfc3RhdGVfbWFjaGluZQ0KPiA+IMKgIHByb2Nlc3Nfb25lX3dvcmsNCj4gPiDCoCB3b3JrZXJf
+dGhyZWFkDQo+ID4gDQo+ID4gQ2FsbCBsYW45MzAzX3JlbW92ZSgpIGluc3RlYWQgdG8gcmVhbGx5
+IHVucmVnaXN0ZXIgYWxsIHBvcnRzIGJlZm9yZSB6ZXJvaW5nDQo+ID4gZHJ2ZGF0YSBhbmQgZHNh
+X3B0ci4NCj4gPiANCj4gPiBGaXhlczogMDY1MGJmNTJiMzFmICgibmV0OiBkc2E6IGJlIGNvbXBh
+dGlibGUgd2l0aCBtYXN0ZXJzIHdoaWNoIHVucmVnaXN0ZXIgb24gc2h1dGRvd24iKQ0KDQpEbyB5
+b3UgdGhpbmsgaXQgd291bGQgbWFrZSBzZW5zZSB0byBhZGQgdGhlIHNhbWUgRml4ZXM6IHRhZyBh
+cyBhYm92ZT8NCihUaGF0J3MgdGhlIGVhcmxpZXIgb25lIG9mIHRoZSB0d28pDQoNCj4gPiBDYzog
+c3RhYmxlQHZnZXIua2VybmVsLm9yZw0KPiA+IFNpZ25lZC1vZmYtYnk6IEFsZXhhbmRlciBTdmVy
+ZGxpbiA8YWxleGFuZGVyLnN2ZXJkbGluQHNpZW1lbnMuY29tPg0KPiA+IC0tLQ0KPiANCj4gQ291
+bGQgeW91IHBsZWFzZSB0ZXN0IHRoaXMgYWx0ZXJuYXRpdmUgc29sdXRpb24gKHBhdGNoIGF0dGFj
+aGVkKSBmb3IgYm90aCByZXBvcnRlZCBwcm9ibGVtcz8NCg0KV2UgaGFkIHR3byBMQU45MzAzLWVx
+dWlwcGVkIHN5c3RlbXMgcnVubmluZyBvdmVybmlnaHQgd2l0aCBQUk9WRV9MT0NLSU5HK1BST1ZF
+X1JDVSBhbmQgd2l0aG91dCwNCmFuZCBJIGFsc28gcmFuIGNvdXBsZSBvZiByZWJvb3RzIHdpdGgg
+UFJPVkVfTE9DS0lORyBvbiBhIE1hcnZlbGwgbXY2eHh4IGVxdWlwcGVkIEhXLg0KQWxsIG9mIHRo
+ZSBhYm92ZSBmb3IgYSBiYWNrcG9ydCB0byB2Ni4xLCBidXQgdGhpcyBwYXJ0IHNob3VsZCBiZSBP
+SywgSSBiZWxpZXZlLg0KDQpPdmVyYWxsIGxvb2tzIHZlcnkgZ29vZCwgeW91IGNhbiBhZGQgbXkN
+ClJldmlld2VkLWJ5OiBBbGV4YW5kZXIgU3ZlcmRsaW4gPGFsZXhhbmRlci5zdmVyZGxpbkBzaWVt
+ZW5zLmNvbT4NClRlc3RlZC1ieTogQWxleGFuZGVyIFN2ZXJkbGluIDxhbGV4YW5kZXIuc3ZlcmRs
+aW5Ac2llbWVucy5jb20+IA0Kd2hlbiB5b3Ugb2ZmaWNpYWxseSBwdWJsaXNoIHRoZSBwYXRjaC4N
+Cg0KLS0gDQpBbGV4YW5kZXIgU3ZlcmRsaW4NClNpZW1lbnMgQUcNCnd3dy5zaWVtZW5zLmNvbQ0K
 
