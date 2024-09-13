@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-128221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D3369788E6
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:23:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEE139788F3
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:27:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 709C4283ADB
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:23:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84473289C5C
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BBDA146D6E;
-	Fri, 13 Sep 2024 19:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C4412FB0A;
+	Fri, 13 Sep 2024 19:27:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Fz33angr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3s/5Lffk"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B2D212C54D;
-	Fri, 13 Sep 2024 19:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9483212C526;
+	Fri, 13 Sep 2024 19:27:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726255426; cv=none; b=Sxg2an8vQtvzHyNYEbj/D0SSWDQ+s61EuOlQ60vG7t44zglQRIt5i4HDJmc9qiGxs2t0C0Iuvz1/FZhj4UhPKknYOR1LZ01+APqGwR8m2t+rpisJ2WBwSUa6ZvzzBaw0QNIFBFJ3Xgf1i9HXJt4K8BEGxYjnjy79utBgNRCmavo=
+	t=1726255667; cv=none; b=iIKC8oV1BL2eJe2er4cLrlGC+YvmnYRUPoAuV8qonwUIggd2ZOUcGjne3my5wyDSC2ZoTsqb5idKfpwG+DC4Urpcb3PxjohVEvKKWIMQqy5r3MFzuvP0zTQ1QGABiF47q4B6TZNTdrXEcTXWf8u6d8phQDx5iRZbSue7k59dh/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726255426; c=relaxed/simple;
-	bh=LcnOMbh1qvm3zhdrSHVO6mUT+Z0nOqKVjH3uiOQkS7A=;
+	s=arc-20240116; t=1726255667; c=relaxed/simple;
+	bh=Uzy0WKo0zVSTsnIqoRl2P0vXxeopPBlGtqFbKaNB4x0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t8hYUIFXX4v5Z2I2U+jvf71a/kRzk5SAnLztCS9BbpP4oa3roYzIxJxcrO3K0LuNMAlovdiEUSRhmJ413j7EbOij1Dx6+xu0Qaub5ECuJxbcowe4pcsOSmxrue+xHXFqAktaEDmcGQW7M73kQzVi2gvRJ++8GZAPaT5NJF+obXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Fz33angr; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZsPRSfq06ABSxdwLqom9E0lhmG8gMnaSWvJ2oj4KcCLnouI6JlhAagZN0ZQrEqDSeootPs7FfEZLbVk/oh6QYjPYlWCvdnxVirem1R3K2F/1Y1LujwCQtlO7DDVLUmztqCuAVeB8Vv4SYNnmkG1LQEAE7S3mMxvkvpYRWgnKLt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3s/5Lffk; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,32 +36,41 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8ehW2zOOXQpeUuabw+vDK6zCAezWgQxAYBOm2PkG7Hw=; b=Fz33angrn1YqfFcW+PLQzRKCNH
-	/3P0nU3j8biXCd/jXjjJthouDUlgeTuK5A2HB+5magrNifjvDmlLWvfHqH8mv5Pf9PkWlhkDGGY7L
-	kNAEEs1UVIvorKQWbkbzJ43bP6LpMpkUrY8psWNScx3vjj1FqCdJbjvoX7fDTnlulARY=;
+	bh=V/fJdEFiVV1xIWs3tBqysiFVv3X6oa6gDDk7YeJVw8s=; b=3s/5LffkanL6JgKJdCkpMVN4mA
+	gvWbJIwLXl8SJgWI2e05xTlPRuVo02f26hMdxNDCq1K/0UM+dKCgrnRS5RSztGn0G7endKpcSNkVK
+	CWv9lipO+ZXgG68QJje6llHwbX++Tsc8PqQgyr3rll+5m1jDJwpxUCuWUvea+uKXgiSU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1spBtG-007Pzj-LJ; Fri, 13 Sep 2024 21:23:34 +0200
-Date: Fri, 13 Sep 2024 21:23:34 +0200
+	id 1spBwx-007Q0o-Hv; Fri, 13 Sep 2024 21:27:23 +0200
+Date: Fri, 13 Sep 2024 21:27:23 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Conor Dooley <conor@kernel.org>, netdev@vger.kernel.org,
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: "A. Sverdlin" <alexander.sverdlin@siemens.com>, netdev@vger.kernel.org,
+	=?iso-8859-1?Q?Ar1n=E7_=DCNAL?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/4] dt-bindings: net: dsa: the adjacent DSA
- port must appear first in "link" property
-Message-ID: <695c4ffb-5a68-41b1-8fef-8a356dfd57b5@lunn.ch>
-References: <20240913131507.2760966-1-vladimir.oltean@nxp.com>
- <20240913131507.2760966-3-vladimir.oltean@nxp.com>
- <20240913-estimate-badland-5ab577e69bab@spud>
- <c2244d42-eda4-4bbc-9805-cc2c2ae38109@lunn.ch>
- <20240913185053.rr23ym5otprgiphb@skbuf>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	linux-mediatek@lists.infradead.org, bridge@lists.linux.dev,
+	stable@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: dsa: RCU-protect dsa_ptr in struct net_device
+Message-ID: <28d0a7a5-ead6-4ce0-801c-096038823259@lunn.ch>
+References: <20240910130321.337154-1-alexander.sverdlin@siemens.com>
+ <20240910130321.337154-2-alexander.sverdlin@siemens.com>
+ <20240913190326.xv5qkxt7b3sjuroz@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,23 +79,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240913185053.rr23ym5otprgiphb@skbuf>
+In-Reply-To: <20240913190326.xv5qkxt7b3sjuroz@skbuf>
 
-> I have unpublished downstream patches which even make all the rest of
-> the "link = <...>" elements optional. Bottom line, only the direct
-> connection between ports (first element) represents hardware description.
-> The other reachable ports (the routing table, practically speaking) can be*
-> computed based on breadth-first search at DSA probe time. They are
-> listed in the device tree for "convenience".
+> >  drivers/net/dsa/mt7530.c                    |   3 +-
+> >  drivers/net/dsa/ocelot/felix.c              |   3 +-
+> >  drivers/net/dsa/qca/qca8k-8xxx.c            |   3 +-
+> >  drivers/net/ethernet/broadcom/bcmsysport.c  |   8 +-
+> >  drivers/net/ethernet/mediatek/airoha_eth.c  |   2 +-
+> >  drivers/net/ethernet/mediatek/mtk_eth_soc.c |  22 +++--
+> >  drivers/net/ethernet/mediatek/mtk_ppe.c     |  15 ++-
+> >  include/linux/netdevice.h                   |   2 +-
+> >  include/net/dsa.h                           |  36 +++++--
+> >  include/net/dsa_stubs.h                     |   6 +-
+> >  net/bridge/br_input.c                       |   2 +-
+> >  net/core/dev.c                              |   3 +-
+> >  net/core/flow_dissector.c                   |  19 ++--
+> >  net/dsa/conduit.c                           |  66 ++++++++-----
+> >  net/dsa/dsa.c                               |  19 ++--
+> >  net/dsa/port.c                              |   3 +-
+> >  net/dsa/tag.c                               |   3 +-
+> >  net/dsa/tag.h                               |  19 ++--
+> >  net/dsa/tag_8021q.c                         |  10 +-
+> >  net/dsa/tag_brcm.c                          |   2 +-
+> >  net/dsa/tag_dsa.c                           |   8 +-
+> >  net/dsa/tag_qca.c                           |  10 +-
+> >  net/dsa/tag_sja1105.c                       |  22 +++--
+> >  net/dsa/user.c                              | 104 +++++++++++---------
+> >  net/ethernet/eth.c                          |   2 +-
+> >  25 files changed, 240 insertions(+), 152 deletions(-)
+> 
+> Thank you for the patch, and I would like you to not give up on it, even
+> if we will go for a different bug fix for 'stable'.
+> 
+> It's just that it makes me a bit uneasy to have this as the bug fix.
 
-If you have this code, then i would actually go for a new property,
-maybe 'direct-link = <...>;', which only lists the direct
-relationship. Keep the current property with its current meaning, an
-unordered list. If the new property is present, use it to compute the
-table. If both sets of properties are present, ensure they result in
-the same table, otherwise -EINVAL.
++1
 
-    Andrew
+We should try for a minimal fix for stable, and keep this for
+net-next, given its size.
 
+https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
 
+* It must be obviously correct and tested.
+* It cannot be bigger than 100 lines, with context.
+
+	Andrew
 
