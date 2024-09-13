@@ -1,237 +1,171 @@
-Return-Path: <netdev+bounces-128164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B32F9978579
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:08:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8184978582
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 18:12:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECBF21C21FB7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 16:08:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABE1B28A861
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 16:12:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54C0861FEA;
-	Fri, 13 Sep 2024 16:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E634D55898;
+	Fri, 13 Sep 2024 16:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="s1NldoRt"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="MMxCv4/t"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2052.outbound.protection.outlook.com [40.107.220.52])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1F24D502;
-	Fri, 13 Sep 2024 16:08:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726243694; cv=fail; b=S7cl4jp5fOKSXYOMDYVktquwMQ2MpM/Obt9T3WV2/TCgRhvKNoA87QZwCo6BULGZjx8wz66vE+5SGi3WJySx55+XQD1Ism/S22TmchMPaJJFukwEmGSlg1besjRIAxxMIzvlkp8R61kGvBaFKuOInbA0wMFtrfZo/EaqpzO+DcU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726243694; c=relaxed/simple;
-	bh=YiQJ+UZBx9Ap6k2seE7vxPQ2KOe1vZzLLM489pRE/0g=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FGTqwTLgPmSPVT67GdKPXMXEW9PqmcdPLjEG6HgYp3kFWiBN0u76gbMiWuuLBtmGv7g1BNf8V8gSmJPn1DnhQL/Gf7iGVSQprs46Y+hZUIyiVX34KimT32XyHcT8buIEsBqPaYXvzmNW5Gm5ohxQj6Hc0RBuT2NUOrOERngXY5o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=s1NldoRt; arc=fail smtp.client-ip=40.107.220.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Frr48OC72uE796Nn6zUctQFZDXUcb4I6oGGGulOLFmIe/u9YiysBDopA5I/34leCdZL8of09xFkSJIqdCZKygPJ1K6F1v1DJUFMWHwNTLc+pL8iJO1lhzD572uKOYZzV60Q9LSMrST1kXFh63rfaDXWw/Gevx5yBfb9CAWJIgG3U+m9mNgoBQWVNloH6BFMD4IyfW9IFx3bQyVcMdfy2GCG844T73beAH+e76yMIMHJW3txK3XeIJemigOv8jePvdRdL9skfW38gLxJgknnLLP2A+K1GEdiaEtDREyiwnzNee/dvT+4Wr8ObjKY7MjLoD6qbT2brYtLiApPO/Egybw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fGS0ygu8zZftqu2g5lYPOpHkzfU6XeJsTJMl04U7fSo=;
- b=uWaES1APWf8wD+RYDN/uIjHEJX2G2rNT2e1b92Knq0M51K79imJMbUFD0n79aN1hsAULtt3a/hrPDK/67bv6kXYoqFECAdb5oD9P0XKzVaI4zxw8QOXoDCxKhYrLljY1k894lbg/1KzsxfekPR37qVV80CwGjbmGIv+vvD2aE7w+CCLU1fNDGa+l2xIEaNpk6I5Zsh5cOzlAQ5zxxLLxwBA7lM8xYVzyJjT8wpgO96Hq6uR7zqboGbOMeQqZ7UNLL2FxNM19/yQkAnEI7Mrw8srBr0T7J5sBD9SizaGFgQN9ZO4ak6Fo4TJMK73cFl2fPCWX3g9KViQZVeDwNAlhFQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fGS0ygu8zZftqu2g5lYPOpHkzfU6XeJsTJMl04U7fSo=;
- b=s1NldoRt6IS0UUFj++GIgWTOvbqizg89REViNej4+wiK7dG+PcTBt/UUK65RzaCsmJ2yBomb6IjKR0aYd/5suaX5mTTi9INQYE9n5osIBEJvUBgBEHXwFSy+kuCp6w+lZIgiq6z5I2Nrbcd05nMkwE+QfQFWgJ3/gAxf3WtvkB8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by SA3PR12MB9197.namprd12.prod.outlook.com (2603:10b6:806:39e::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.18; Fri, 13 Sep
- 2024 16:08:10 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::bfd5:ffcf:f153:636a%3]) with mapi id 15.20.7962.016; Fri, 13 Sep 2024
- 16:08:10 +0000
-Message-ID: <53a6c904-161b-4665-a0c5-fda1cf838654@amd.com>
-Date: Fri, 13 Sep 2024 09:08:07 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: Handle threadirqs in __napi_schedule_irqoff
-To: Sean Anderson <sean.anderson@linux.dev>,
- Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Juri Lelli <juri.lelli@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- linux-kernel@vger.kernel.org
-References: <20240913150954.2287196-1-sean.anderson@linux.dev>
- <CANn89iL-fgyZo=NbyDFA5ebSn4nqvNASFyXq2GVGpCpH049+Lg@mail.gmail.com>
- <e127f072-e034-4d21-a71f-4b140102118f@linux.dev>
-Content-Language: en-US
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <e127f072-e034-4d21-a71f-4b140102118f@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0384.namprd03.prod.outlook.com
- (2603:10b6:a03:3a1::29) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24FA6D502;
+	Fri, 13 Sep 2024 16:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726243967; cv=none; b=hivM5JBfHC6hJfiKJj8b7thVjjUX83Hu3DCmHSJKr/JWF/uEsmJERcTgn3ZvLfgNWlLRTbpJ9dKxj6IxtuJpE+y4eqK3Sh5U6MpZ1HoajT+rIS5zrJljZ9qPF9rfuoM8K2UwVmsx17hVRi2Z0epFS8+xNtuUrtxuJuGKmwlhQwk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726243967; c=relaxed/simple;
+	bh=Kti/nI8A3Lc/CrgyzFVHC2w/El0YG7A+BYTtl2J2VpM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=MUgOj1okVsIClaZKyHZNLviRXu6fB+RTPKsYy3p9yY0WtMz9dBWB3Di8rzwAGHL0W2wBUygqbv68ky6Nxfe2LkQlrR5DEOWWSKgC/ukdi/Pt0HqsspoeVVbzFAiJ62/sBMNaVHjW1A7NEZ26iVqUkoPLPjLbB/Z14hU62ba0BUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=MMxCv4/t; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48DB8jCH015062;
+	Fri, 13 Sep 2024 16:12:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	t5oee7uEn3PUnJcnzaCB78a7q+lMeop7BAMpRYyFLGQ=; b=MMxCv4/tDpiMpC8v
+	TEGBkLj/w8VsRe0JX1mqjvnkd4ChkOd9ioAj73gTeKwt5kqAWl3eP1wRbUNfgCiP
+	EYzyLBYXwt8NertY2e07jdCeKjuwLk2rhMod6zrAgsNQD1FxeyIdyjsVpHwaaB0T
+	I/Y++78Jb0FRDI1x9kkYfN3hhB53W6qF34fXoeCM9I5t1dV/IiQsbg+knVbsiyaZ
+	i717ZCcvnhY5rt/coP7FTm6qIiPm9oe7vpQsnBPxvwuw8rhQnwMeaHAgkw70Px68
+	xPs9aGJXbcAOziUt371KJ2z3MH1AAO3pMGmcpDIc04dko9CLjcVkwf2DoAHT+pcM
+	p6sPpw==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41gy6t1g6n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 16:12:20 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48DGCJkl030700
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 13 Sep 2024 16:12:19 GMT
+Received: from [10.110.86.107] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 13 Sep
+ 2024 09:12:15 -0700
+Message-ID: <eb601920-c2ea-4ef6-939b-44aa18deed82@quicinc.com>
+Date: Fri, 13 Sep 2024 09:12:13 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|SA3PR12MB9197:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ed19585-6503-44b9-9386-08dcd40e4321
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Nkg4QnBTVFdWdE9qcTUzSnoxUm9MT29mL3BIVWpSanM4bnVnQmR2ckF6Vnkr?=
- =?utf-8?B?V3YraXBUMTc5YkxrZ2xHTVJha1pSSmFTWldrRGE2eGo1VzN1MVJuV0wzWTh3?=
- =?utf-8?B?YUtodXZTdDNiVkUvR0RBWjRjMUNXZDhWMWtIV0tFVGRyQ3g1RXltVXh1L1RZ?=
- =?utf-8?B?eVNNR3hCYmc4Y0k1ZTN0ZE9MbU12QmJIMFd4c2lwYXZsVzNHK1Qrb3ZmcHN1?=
- =?utf-8?B?WW5HdXlUTVN5RDZrblVhY2NjaU1OY214eWhxWGdPdWFaak1Va0U2RkI5WmRr?=
- =?utf-8?B?cEprSVZiNE1xYXh0dDkzdENDdDYwdzBYeUtIRjhhbDJpa3BEa3hIUzYyT3lO?=
- =?utf-8?B?Y0MwV3dYTzd0OWgrcGgvTndyMFdpOHdnMnVuSDA3MlZDOWlWbWUyVXhUcnVn?=
- =?utf-8?B?K2NwcUpyc25Jd1NYdEx0emdyTmNYbGZUNTA2NkpNMU1xdGV4eGNjMWhDTS9H?=
- =?utf-8?B?T04zbXQ2alRrYktadHBJN2lGaHhkMnIwb0laTkZ1SkhmVmxYazRCa2U5ZUN1?=
- =?utf-8?B?cWFkcDZ2VFlmM0hId2RFVFRIc0FsbWV6NnE0YTZPNzNxbDltZElVR2U3WWYy?=
- =?utf-8?B?Y24rMVkvNHdGZWIxZzFWRzMzcnBYdUlXRU1iTkJJSUQ5blZMcTNMTDhHdEFM?=
- =?utf-8?B?TEVRZlJ0VWd5Wk4xU29pTExzaXNLZ3VBNlJhNnI3ZVdhRCtsMmN5d09rQkgx?=
- =?utf-8?B?ZU8xZFVqTUtGc1d3UnZHNXhES0VlMG10cklwang1cyttL1dyaWFvNkxydWY3?=
- =?utf-8?B?c3d0Y0NXdlpDbWZzZ0Y2WUxRQlhlSndLQVFzNk1iK3RUUTNiWUZRZCt5SWg3?=
- =?utf-8?B?QlBGT3QwMUVuUE1QRTdsUjA5RnV3TlBvTGpCbzN4aDMyRTlUaGJlTWJoT0xO?=
- =?utf-8?B?TFZIeG5ndm5PTlAvN0V6VEp5cjNnakQrenVXL1Q2OGdySk5PVkp6TDN5d1hZ?=
- =?utf-8?B?RGdRTVV5K2lsZG55d0VBYmpxeDJrK3VNQUV0QjZ1cDBCWVk1QzdCOFh4MHRl?=
- =?utf-8?B?ZDZxbERKenpKTURlZ0R2Vnh1VWhxaURzTnJxbWl1WGpNWHArN1JzY2phWjBI?=
- =?utf-8?B?bThDbUxPdkkwTWRpN3RYNzBCdUNmcDdlTjNCUUNYMDhzTit1V3VUYUZVZEJM?=
- =?utf-8?B?SVl1aDJESW00c0ZyUFV3NFNFa2U4aDdjYkZVV2c0Q2ZxSmRLMzBHU0RBWmtQ?=
- =?utf-8?B?RXJLYSttK2FSZkVJT1AxQ1A5cHBrL3Vvejc4NWt3NlZzUmJiOE41ZGZzNm9L?=
- =?utf-8?B?bEJBZWNPUTJGY082cjlrNXQ0Ny95aHNyK1pRdGp3WTFUR1JxakR6ZkdIZEJU?=
- =?utf-8?B?dTFmTngvbFBwNkQ5RHFzcGk4NDRxS1IzczR0ZnFTQVgyZEZFQVBIZjdIVzBW?=
- =?utf-8?B?ejZBY3hNbWVJVGNoZm9GWTVSaE5hMU1kSnN0WW9aaGZVUnFuNnZnR29EZEpM?=
- =?utf-8?B?LzFoY01oQkJKVEJMY1RkMS9aNnBQaG9pNk9adWdTajYvRmxGOEhnQ2ExWVMy?=
- =?utf-8?B?cG0yZmdFdjZrZ0svbWg1TnZWc2xUTlBmdmxuT3lsaEdHem9JSjZzVGIxUncr?=
- =?utf-8?B?aFRuSTF3ZTJHUXBIOC84QnZ5S0lJSzYrYUdyYm40SzJpeE1VZC90eUVPZ1d1?=
- =?utf-8?B?WTdkeDN0ek1DSkJNYXByQ3pFUklGeTRNd1RUWXhoYTVpZkkxeE50MXNwRXJC?=
- =?utf-8?B?ZXpGQkNIQTVDZitmbExObkdKdXpEM29YVENxTkp3UitEWTdmT0tZbjdGVU1l?=
- =?utf-8?B?ZHluZDVoVWRTbkdsKzNDdDlST2ZOK3JuS0ZxdmpFcERvRzVmSjVYaW14azJK?=
- =?utf-8?B?Y2NoSlp2ck40QkQ1L3ZwZz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?V0g0TkpRT2Evd0l4WXZ1aU42dWt5R2VRUEtDb2NPekdhb1c5bkV3eGpNcElS?=
- =?utf-8?B?WjJUdGZhalgyYS9xejBDYjdrWnpjc3dxRVFQL3pPYmJzakM1SXZacTdlTmYy?=
- =?utf-8?B?U1NCRGpRekdGRGhkbzFqbGhpUDlSNDN6RXJieUhkbFBBQUhDTGJnd1N5ZVRM?=
- =?utf-8?B?STk5Ui8vNE9GMTJIU0RndEp1OEQrK0huVUZrclJXNkU2M1RUd0VWVWU5dEdm?=
- =?utf-8?B?NnlaRitCTHUxQVp4TVN3eGFoSFRLMWg2MXNhNUdDcFJjZXZCMFkzZHVNK1o5?=
- =?utf-8?B?QjFVNkU4VEttd1BoeTh4bjRlMFFINzZWTHVoMm1Kb3ZoZU5xN0NEdWFNYkRD?=
- =?utf-8?B?N0xBcmtmbk5wK0RJTFRvNXMwRUVvYmd1bDlKWWVSUVVsc1pTUTlDZldJT3hx?=
- =?utf-8?B?Y2R1cGJROWp1aTRJbE40Wm1makh4NUpQOVJ0enM1elo4MWpET29waFY1ZnZy?=
- =?utf-8?B?MG1KenloUlFpc3lsTmVMNHJYNnltYjAvRnY2SHlOV0RON0h0L2tjV3lrU0hO?=
- =?utf-8?B?Q2x6emg2dnFwNTc2WUgzOUdrMkxERm85c09XeHgyd0FqcCt1WXorSkluY0NT?=
- =?utf-8?B?RUFORUJNZktMY0U0bWlDMTluMmlud2FzWkV0Tytyai9DQnBZdlRtRzNYOEtD?=
- =?utf-8?B?MHQxQ2xkejQ5dEM2ZUY5dmVvRGFNbi9kZmFCWmVrK3BabU5BdTVXNzNWZURx?=
- =?utf-8?B?Y0s5ZUYwaUxQRXU5QVY1dmplV3RYOVplVHgrNXFJSjFrcmJXNndjQThVVDd0?=
- =?utf-8?B?U09uZWtJS1ZnWHF2eWtXQzlCbTBPOXQzRWs5Y3lKM29mRkpZZU9lS0pVc3FJ?=
- =?utf-8?B?VTlNQkZBSG14bEZZMzdhRFo3YlFzN0hqbXBhV1JJYSthdlNhMjNVMnAzVjdV?=
- =?utf-8?B?SGdFdkdpS2lGc2JqS3I1eEZhTDF4d1hjT0NVWnBXTnM2QlR5ZWtvQTEwc1Bn?=
- =?utf-8?B?SnFHRy9TUkNJcUxha3RkTVIzRWErRFR2VWVTMXlocnVBemxMcVV6ZWlNN0Jq?=
- =?utf-8?B?TFpuN2VBd2Q3QTIvcmUxeThoWUdDSCt0R0prVTBKeGVKcEpuRVdXYU5aK3ZE?=
- =?utf-8?B?TCtzSWZ4NmFkL2RqbDM3eXQvK3FsMVAyOUJVSEw3VTVvSjg3Z1k3dHdFQVBw?=
- =?utf-8?B?ZGcrcHdqL09OU2hBWk5Tbjl1S3d6ZUFzQ2R0eUk4YnhlYVA1bW1Dd0t5THpQ?=
- =?utf-8?B?ejBXNC94TXl4ck5FcUZ5dnJnLytKUHRaUWxXeFVyMkxIN0JxM3N2a3FES2lY?=
- =?utf-8?B?V0R4VEpxSktjUzBiSTVpL0lYL2pTYVVHT3JSY1B6MU9hMXhsRE9rQ0NCSnFx?=
- =?utf-8?B?c095dFlsZ0U5VzhxRzFwYUFDWHNBMzdRVDBjUGpESmpZd0dqajBtdEZPbVMz?=
- =?utf-8?B?RkpMNUFlSlN3akUxZzQ4TkNuWC9BYjlMOVI3SENHcU12QU4raDBJTFhYVzNW?=
- =?utf-8?B?U3VRc0Y3b0VmNjhQU29ITEpGOU40OUIzMkxsZDBzMnl4RDBSLzc4SWRCY3px?=
- =?utf-8?B?eS9wV2JVWG5PcTZHWUE1ZDR3M1pUYjBoS3lQbVB3dmRzZWxtalFoMkhoQlIx?=
- =?utf-8?B?MnlZZGRlRmxWVnFYa0RsQWN1S0piKzhxMyszWXZOMXduVWc0S2QvMS96QUps?=
- =?utf-8?B?SXZSbXhjSmt0ZWRTVzErNld3aEk5M2xYYlBlSG9Td0NYNTA5ZkVVSWhlTCtl?=
- =?utf-8?B?UlVaMy9ONEJkMjVQd3RHbU5ZZjRWY1pqY2wzclhYZFkvRXJJaThsaURFUDlD?=
- =?utf-8?B?Mlhtdzd3bVFPU1BBYytaam5XM0lvdmN1dkd3cStNUi9HZUdTMG1ZcGlsODB6?=
- =?utf-8?B?bWd1WDRrZ0xaaWcwdDZ5WDFvRDJPMEdpUmRMa2N1aHhnVC8xankxY2dobGdO?=
- =?utf-8?B?UWwzdjhCUmxQVHZhVzBKQ0xrQU5HSCtzVFYreXNydkFWcDFwVjFCVWZCVE95?=
- =?utf-8?B?aTBpSHg3dGRhZlpxY1R5YitrT1RBdUJvbDVDd2lvd0tRd2NhV0RuS3Jnc0V1?=
- =?utf-8?B?WFhKcG01TmpLVUJVMU1oaXA3Qnoxc3E5RVVxMWx0eGFhTG1BeU8xYzEvU0hG?=
- =?utf-8?B?ckdTbHB3cGJuKzNFWFB4ZElkK3RLcnFoVzRhNjN0WVFjY2lDd0w3REcyQ3pH?=
- =?utf-8?Q?ezQKif9aqTE3Ou/9wdmOHSz75?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ed19585-6503-44b9-9386-08dcd40e4321
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Sep 2024 16:08:10.1988
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: V0u6RMqPtev7xXYKspR2SOrA9MDAgIQb4K4L19IRyWMPuvZXu/kO9EW+CQRvyfyXsbDngH/w+Twl6MSH2kTd0g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9197
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net v1] net: phy: aquantia: Set phy speed to 2.5gbps
+ for AQR115c
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+CC: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
+        "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Andrew Lunn
+	<andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Bartosz Golaszewski
+	<bartosz.golaszewski@linaro.org>,
+        "linux-tegra@vger.kernel.org"
+	<linux-tegra@vger.kernel.org>,
+        Brad Griffis <bgriffis@nvidia.com>,
+        "Vladimir
+ Oltean" <vladimir.oltean@nxp.com>,
+        Jon Hunter <jonathanh@nvidia.com>, <kernel@quicinc.com>
+References: <20240913011635.1286027-1-quic_abchauha@quicinc.com>
+ <20240913100120.75f9d35c@fedora.home>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <20240913100120.75f9d35c@fedora.home>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: M13BG-6DXZiTpe_7g3xhUwcwd_VFZkTZ
+X-Proofpoint-ORIG-GUID: M13BG-6DXZiTpe_7g3xhUwcwd_VFZkTZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ suspectscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0 bulkscore=0
+ adultscore=0 clxscore=1011 priorityscore=1501 lowpriorityscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409130114
 
 
 
-On 9/13/2024 8:23 AM, Sean Anderson wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+On 9/13/2024 1:01 AM, Maxime Chevallier wrote:
+> Hi,
 > 
+> On Thu, 12 Sep 2024 18:16:35 -0700
+> Abhishek Chauhan <quic_abchauha@quicinc.com> wrote:
 > 
-> On 9/13/24 11:16, Eric Dumazet wrote:
->> On Fri, Sep 13, 2024 at 5:10 PM Sean Anderson <sean.anderson@linux.dev> wrote:
->>>
->>> The threadirqs kernel parameter can be used to force threaded IRQs even
->>> on non-PREEMPT_RT kernels. Use force_irqthreads to determine if we can
->>> skip disabling local interrupts. This defaults to false on regular
->>> kernels, and is always true on PREEMPT_RT kernels.
->>>
->>> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
->>> ---
->>>
->>>   net/core/dev.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/net/core/dev.c b/net/core/dev.c
->>> index 1e740faf9e78..112e871bc2b0 100644
->>> --- a/net/core/dev.c
->>> +++ b/net/core/dev.c
->>> @@ -6202,7 +6202,7 @@ EXPORT_SYMBOL(napi_schedule_prep);
->>>    */
->>>   void __napi_schedule_irqoff(struct napi_struct *n)
->>>   {
->>> -       if (!IS_ENABLED(CONFIG_PREEMPT_RT))
->>> +       if (!force_irqthreads())
->>>                  ____napi_schedule(this_cpu_ptr(&softnet_data), n);
->>>          else
->>>                  __napi_schedule(n);
->>> --
->>> 2.35.1.1320.gc452695387.dirty
->>>
+>> Recently we observed that aquantia AQR115c always comes up in
+>> 100Mbps mode. AQR115c aquantia chip supports max speed up to
+>> 2.5Gbps. Today the AQR115c configuration is done through
+>> aqr113c_config_init which internally calls aqr107_config_init.
+>> aqr113c and aqr107 are both capable of 10Gbps. Whereas AQR115c
+>> supprts max speed of 2.5Gbps only.
 >>
->> Seems reasonable, can you update the comment (kdoc) as well ?
+>> Fixes: 0ebc581f8a4b ("net: phy: aquantia: add support for aqr115c")
+>> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+>> ---
+>>  drivers/net/phy/aquantia/aquantia_main.c | 7 +++++++
+>>  1 file changed, 7 insertions(+)
 >>
->> It says :
->>
->>   * On PREEMPT_RT enabled kernels this maps to __napi_schedule()
->>   * because the interrupt disabled assumption might not be true
->>   * due to force-threaded interrupts and spinlock substitution.
+>> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+>> index e982e9ce44a5..9afc041dbb64 100644
+>> --- a/drivers/net/phy/aquantia/aquantia_main.c
+>> +++ b/drivers/net/phy/aquantia/aquantia_main.c
+>> @@ -499,6 +499,12 @@ static int aqr107_config_init(struct phy_device *phydev)
+>>  	if (!ret)
+>>  		aqr107_chip_info(phydev);
+>>  
+>> +	/* AQR115c supports speed up to 2.5Gbps */
+>> +	if (phydev->interface == PHY_INTERFACE_MODE_2500BASEX) {
+>> +		phy_set_max_speed(phydev, SPEED_2500);
+>> +		phydev->autoneg = AUTONEG_ENABLE;
+>> +	}
+>> +
 > 
-> OK
+> If I get your commit log right, the code above will also apply for
+> ASQR107, AQR113 and so on, don't you risk breaking these PHYs if they
+> are in 2500BASEX mode at boot?
 > 
->> Also always specify net or net-next for networking patches.
-> 
-> Ah, sorry. Should be net-next.
 
-Is this worthy for a fixes/net tag?
+I was thinking of the same. That this might break something here for other Phy chip. 
+As every phy shares the same config init. Hence the reason for RFC. 
 
-Thanks,
+> Besides that, if the PHY switches between SGMII and 2500BASEX
+> dynamically depending on the link speed, it could be that it's
+> configured by default in SGMII, hence this check will be missed.
+> 
+> Is the AQR115c in the same situation as AQR111 for example, where the
+> PMA capabilities reported are incorrect ? If so, you can take the same
+> approach as aqr111, which is to create a dedicated .config_init()
+> callback for the AQR115c, which sets the max speed, then call
+> aqr113c_config_init() from there ?
+> 
+I think the better way is to have AQR115c its own config_init which sets 
+the max speed to 2.5Gbps and then call aqr113c_config_init . 
+I will clean up the config_init and 
 
-Brett
-> 
-> --Sean
-> 
-> 
+Thanks for the review comments.
+
+> Maxime
 
