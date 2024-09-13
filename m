@@ -1,161 +1,178 @@
-Return-Path: <netdev+bounces-128237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4EF0978AC7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 23:44:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCD2978ADE
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 23:53:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 697211F214DC
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:44:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3AAB2B210E1
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 21:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540141714AA;
-	Fri, 13 Sep 2024 21:44:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6641214AD19;
+	Fri, 13 Sep 2024 21:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z5QNCBry"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hDSOPrNq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B065A7F460;
-	Fri, 13 Sep 2024 21:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3E26BFD4;
+	Fri, 13 Sep 2024 21:53:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726263852; cv=none; b=WD9FWz+WsQNXZuF2vjUVvr1g/e7JwZozFYnRNPIsjZtxsKHECRU2Sf52FIXa7hYEA7y/CZo+MjsPxWjLMsQLkiVZqqPsSfFjRUe0mXng43ZG6uTAWauR/yQfDOTrU3qO9wM3tLdvoe6JZO0vIhZ6+8YBMekc+DxLszmaNr8py7E=
+	t=1726264393; cv=none; b=fMlFytZTV2iFcdEk5k+JIpjRr/myDBoM58I0DKmhxqYff81sZfDAqrXsMfZSQ2j0bLpaQ9cbn2oJ2UUTq1kamdAp74HQpWhdTAvlVftTUX5xm3i3Ckv7N3OZ7/SZwWQyQhUznMf2vsnu8OwDoR+L6Mkspsk7Uu9C2GFztTcbqJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726263852; c=relaxed/simple;
-	bh=hNyvoxa3anpKEWE9B+/hF81CDNXxoDAwvMwv79zNG+A=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=fjnB+KMv/DdgYxF3rOswC8TFTud4FG+1yz4CWlF01z3WsrBHTK+LVR8hDGmPq7fmj99vue9pteu1nyweB/IR7lmzhqhDrislLEXSqN419ZtE8iKgq8In0sZc/Ms2ZWLZimZ0COV+QzOCwVdegSIoDYAw1L3/tytD01zT2Iy0qoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z5QNCBry; arc=none smtp.client-ip=209.85.222.174
+	s=arc-20240116; t=1726264393; c=relaxed/simple;
+	bh=bROgI7wiehG5a7VPcOWWp+q00U22ejHaEo6jyat/eM4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mXq9P3Aefd+YjT7ld136V8gbUWVXmheCZjKjBvjAELJrILMd0p44XMtsuSxHYZUkrkCIgMlgnCg+PV96Wv35DSa66nwqWtP4KMmb3PIZoXxfSeGrk7iY3gzQBPn4ZGlQyJY0rlfy3AqPhs6dD32RWJ8iYL9L+2K4W+RvgAloIFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hDSOPrNq; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7a9ad15d11bso210790685a.0;
-        Fri, 13 Sep 2024 14:44:09 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71781f42f75so2217390b3a.1;
+        Fri, 13 Sep 2024 14:53:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726263848; x=1726868648; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LMLeKw66M9m1AhtQ5lqJRpIeGoTSiq6qH4fFplYAkTQ=;
-        b=Z5QNCBrym40GVQ2/sD0LiKpPRtoPZMl+xXc5OIN25oeCHVv2fcCbpa2m1h+ofWCFNU
-         tT9hOe4nWg/1Fe4pMfWSVgLiwHJumkP6C2STEkZO3lDDAOgA8yOEmNnZyVrlQ0H7n8XH
-         AIXYm2WgfOObtPaWJ3c1nSXwwpXB7dGfxjzgychdNjRf1H9+aqa3xoGJv5FIbMQHlmXP
-         17vgQ+BhEVKbL8MseanRyld2E4Cc9diojMdgePf0knoj5f1iBNeSLW/XwUQH9LjpkIfD
-         9hAJVDwfsM46DhkH/vZO6BThSoB9eyVo7KqIEIGxebs4aghcAFNvhenBOxRvPKfJZ0/m
-         K+Jw==
+        d=gmail.com; s=20230601; t=1726264391; x=1726869191; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mo+N/W667eEINY143EiHKlaxZURxS+IB8LyZfXkFx1Q=;
+        b=hDSOPrNqWT5CdrNjt6YsC5sV9S6ODgJ8fa4R1+E8Sydh4VogVXAfcsPBTKZcSlX+cd
+         WsPuNMuQoalJk8hfkGZbCPmQsqjb0l0WzQ4s9S80Yj7XdQUJA4ONw0UWxr4JbZjsqH3+
+         FE+KtfUTh/qfMq9q5CXr7GJqs72QhlJSGRVyxj8HRUJTjG4mdXaB+Q8fAA1BjD8yWby3
+         KEEa5Mqj7vN3za2ngoemJCzYeF3VJS0mp1bTS1DWM4jqdT271atvPeVIvum/8estwzta
+         hUpRdd6CwercqlMvnlTUazvL2VDwWQLGe8OtaeG8Kzwttmls9NzFywWqKGFf+fwMnHUJ
+         j9aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726263848; x=1726868648;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=LMLeKw66M9m1AhtQ5lqJRpIeGoTSiq6qH4fFplYAkTQ=;
-        b=O+fWO3ikQXkPiM83wyr1MEQawMzJpbwdU2cJ2tvNHiFAncQ9L51t3mudFtvMFbJYta
-         har+zIKJSg3VHI3RFvJKGry07iNT72Eeoi4StMBDaadOhMKXAsXGxVyiErWUIues54Vz
-         5w4Jn4nqZaJtpd3CvvNjQHtz/oCo9UAHTy1UkXOVaXTxQivGlcQXFEVhOzNEYpINP99B
-         AspjlE2IQxdXhq4RzKQcPEn2j6l4CtFKZhxrdxEXyFE0BikISelTDNnNIgwStRVHhTcU
-         2MX6RFcp1SRJzTax7ignGPMLNJpjkHlBJv05x6LGo9gkEo8aJIwAqssV+sT9Xfs19XMI
-         ZU/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUj0njyLbSOjnDcsGodrRc5/5y8SYQlG4G8M19y1sATifSAHOhltpVMLDIEEictlsNofQRbc13AE1ryHVBO@vger.kernel.org, AJvYcCW/pYLZoGemHIUPorcVub4lQeArEB9BZadgIi4loMPIZn5St89J7V0v1G9cq917VMo6FX5AazyvjTM=@vger.kernel.org, AJvYcCWDX/jdZykVCbZFssezHIAYnZ/9+iuClWjtETLfiYHuQFxltkHqXhaUvqe9MaVUbX7EIuTJNo8E@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrHRtduBhDwvhzInT+2IUGsyz1OF8HE7qW+yyL5bUy/pJkGCYT
-	5q9x2R9aAFPXnyHtAxh/Tv1etBJ1zWwsxYmYH4kPd2Ii6r2USU+H
-X-Google-Smtp-Source: AGHT+IFebz0zvDKDAhsGeRE4WEblmqKZL3XP0bUChu0h1cXPwGrBz4bmSFyW7vRxCT7fsZElpXQG0Q==
-X-Received: by 2002:a05:620a:1a27:b0:7a9:afef:33bd with SMTP id af79cd13be357-7a9e5fba0e4mr1449546185a.58.1726263848065;
-        Fri, 13 Sep 2024 14:44:08 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ab3eb5792fsm5238385a.75.2024.09.13.14.44.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2024 14:44:07 -0700 (PDT)
-Date: Fri, 13 Sep 2024 17:44:07 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Joe Damato <jdamato@fastly.com>, 
- netdev@vger.kernel.org
-Cc: mkarsten@uwaterloo.ca, 
- kuba@kernel.org, 
- skhawaja@google.com, 
- sdf@fomichev.me, 
- bjorn@rivosinc.com, 
- amritha.nambiar@intel.com, 
- sridhar.samudrala@intel.com, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Jiri Pirko <jiri@resnulli.us>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- Lorenzo Bianconi <lorenzo@kernel.org>, 
- David Ahern <dsahern@kernel.org>, 
- Johannes Berg <johannes.berg@intel.com>, 
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
- open list <linux-kernel@vger.kernel.org>
-Message-ID: <66e4b22743592_19ec3c294db@willemb.c.googlers.com.notmuch>
-In-Reply-To: <ZuMC2fYPPtWggB2w@LQ3V64L9R2.homenet.telecomitalia.it>
-References: <20240912100738.16567-1-jdamato@fastly.com>
- <20240912100738.16567-6-jdamato@fastly.com>
- <ZuMC2fYPPtWggB2w@LQ3V64L9R2.homenet.telecomitalia.it>
-Subject: Re: [RFC net-next v3 5/9] net: napi: Add napi_config
+        d=1e100.net; s=20230601; t=1726264391; x=1726869191;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mo+N/W667eEINY143EiHKlaxZURxS+IB8LyZfXkFx1Q=;
+        b=Uuzwop/vyx5PUqmYWT1F3m5ez0yZqxb9OjY2kNStVnjDTkSb28SvPbu9P22BqVSc/0
+         9slCQ9wqWC4iffkhUtm/Xfl10H9EBQ0bu6/Tnp91t9p/HnczhHyhRDsLKAMRXuzr1c2r
+         UCg/BsyhXg+KYfeLDQtlQnizOlClhSs/ja4Ll+QK4s43R3CJ4ereZWKRcoHXjwtcGFAV
+         pafXH32h9WDP2Bj7svKC8zXwzltjjkikqW9QS5edgQhe9+GlDUIYGOn/G+nwhez3Zb7C
+         Th4X4ktAVMdMXbZtqKHoDPplSvKQL8jH0ACcYYRAD4CU8zBrLfUe0jyN6f3+yug5rbEr
+         jf6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVb4RZD5kzast1lVttJ6nO4eAZhDrhEJ1UiZSTgYMVtQsopb69JDUgOnASgzpIscpNVklXObCg9@vger.kernel.org, AJvYcCXFJwGP3KZvEuoURlIsv0TWcLQ8sbHCSDUy8nVEDFO0sUcOJ8S64QSeyS1OJvzLh6wXK/qDQGjZ7sJAE2o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5XU0PYKCBA565aR1WhlikTyN+zqtKt7inUrpJaLWSBqVEjLDq
+	eCynDWlsIhKjJn9JRs3TEF3ifQl/M2JW7h4bqn1fkf3UIo9zHcU6IkU9THVUztic1+3OCytwtfB
+	mbrW6nontRpHPfQyYxkXbzenajW8=
+X-Google-Smtp-Source: AGHT+IHIIM3s9b0RG6Ya8X+Wu2PmJfg8oj1TJs0N7c2FeMGYp8eNLPoyuwqlUB21hchDOIuZd1ZV1F3l8aSKlkOEF1Y=
+X-Received: by 2002:a05:6a00:a01:b0:70b:176e:b3bc with SMTP id
+ d2e1a72fcca58-71926213bb8mr11895426b3a.28.1726264390946; Fri, 13 Sep 2024
+ 14:53:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <CAHaCkmfFt1oP=r28DDYNWm3Xx5CEkzeu7NEstXPUV+BmG3F1_A@mail.gmail.com>
+ <CAHaCkmddrR+sx7wQeKh_8WhiYc0ymTyX5j1FB5kk__qTKe2z3Q@mail.gmail.com>
+ <20240912083746.34a7cd3b@kernel.org> <CAHaCkmekKtgdVhm7RFp0jo_mfjsJgAMY738wG0LPdgLZN6kq4A@mail.gmail.com>
+ <656a4613-9b31-d64b-fc78-32f6dfdc96e9@intel.com>
+In-Reply-To: <656a4613-9b31-d64b-fc78-32f6dfdc96e9@intel.com>
+From: Jesper Juhl <jesperjuhl76@gmail.com>
+Date: Fri, 13 Sep 2024 23:52:34 +0200
+Message-ID: <CAHaCkmfkD0GkT6OczjMVZ9x-Ucr9tS0Eo8t_edDgrrPk-ZNc-A@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] igc: Network failure, reboot required: igc:
+ Failed to read reg 0xc030!
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, intel-wired-lan@lists.osuosl.org, 
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 
-Joe Damato wrote:
-> Several comments on different things below for this patch that I just noticed.
-> 
-> On Thu, Sep 12, 2024 at 10:07:13AM +0000, Joe Damato wrote:
-> > Add a persistent NAPI config area for NAPI configuration to the core.
-> > Drivers opt-in to setting the storage for a NAPI by passing an index
-> > when calling netif_napi_add_storage.
-> > 
-> > napi_config is allocated in alloc_netdev_mqs, freed in free_netdev
-> > (after the NAPIs are deleted), and set to 0 when napi_enable is called.
-> 
-> Forgot to re-read all the commit messages. I will do that for rfcv4
-> and make sure they are all correct; this message is not correct.
->  
-> > Drivers which implement call netif_napi_add_storage will have persistent
-> > NAPI IDs.
-> > 
-> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+On Fri, 13 Sept 2024 at 09:02, Lifshits, Vitaly
+<vitaly.lifshits@intel.com> wrote:
+>
+> On 9/12/2024 10:45 PM, Jesper Juhl wrote:
+> >> Would you be able to decode the stack trace? It may be helpful
+> >> to figure out which line of code this is:
+> >>
+> >>   igc_update_stats+0x8a/0x6d0 [igc
+> >> 22e0a697bfd5a86bd5c20d279bfffd
+> >> 131de6bb32]
+> >
+> > Of course. Just tell me what to do.
+> >
+> > - Jesper
+> >
+> > On Thu, 12 Sept 2024 at 17:37, Jakub Kicinski <kuba@kernel.org> wrote:
+> >>
+> >> On Thu, 12 Sep 2024 15:03:14 +0200 Jesper Juhl wrote:
+> >>> It just happened again.
+> >>> Same error message, but different stacktrace:
+> >>
+> >> Hm, I wonder if it's power management related or the device just goes
+> >> sideways for other reasons. The crashes are in accessing statistics
+> >> and the relevant function doesn't resume the device. But then again,
+> >> it could just be that stats reading is the most common control path
+> >> operation.
+> >>
 
-> > @@ -11062,6 +11110,9 @@ struct net_device *alloc_netdev_mqs(int sizeof_priv, const char *name,
-> >  		return NULL;
-> >  	}
-> >  
-> > +	WARN_ON_ONCE(txqs != rxqs);
-> 
-> This warning triggers for me on boot every time with mlx5 NICs.
-> 
-> The code in mlx5 seems to get the rxq and txq maximums in:
->   drivers/net/ethernet/mellanox/mlx5/core/en_main.c
->     mlx5e_create_netdev
-> 
->   which does:
-> 
->     txqs = mlx5e_get_max_num_txqs(mdev, profile);
->     rxqs = mlx5e_get_max_num_rxqs(mdev, profile);
-> 
->     netdev = alloc_etherdev_mqs(sizeof(struct mlx5e_priv), txqs, rxqs);
-> 
-> In my case for my device, txqs: 760, rxqs: 63.
-> 
-> I would guess that this warning will trigger everytime for mlx5 NICs
-> and would be quite annoying.
-> 
-> We may just want to replace the allocation logic to allocate
-> txqs+rxqs, remove the WARN_ON_ONCE, and be OK with some wasted
-> space?
+I doubt it's related to power management since the machine is not idle
+when this happens.
 
-I was about to say that txqs == rxqs is not necessary.
+> >> Hopefully the Intel team can help.
+> >>
+> >> Would you be able to decode the stack trace? It may be helpful
+> >> to figure out which line of code this is:
+> >>
+> >>    igc_update_stats+0x8a/0x6d0 [igc
+> >> 22e0a697bfd5a86bd5c20d279bfffd131de6bb32]
+>
+I didn't manage to decode it with the distro kernel. I'll build a
+custom kernel straight from the git repo and wait for the problem to
+happen again, then I'll report back with a decoded trace.
 
-The number of napi config structs you want depends on whether the
-driver configures separate IRQs for Tx and Rx or not.
+> Hi Jasper,
+>
+> I agree with Kuba that it might be related to power management, and I
+> wonder if it can be related to PTM.
+> Anyway, can you please share the following information?
+>
+> 1. Is runtime D3 enabled? (you can check the value in
+> /sys/devices/pci:(pci SBDF)/power/control)
 
-Allocating the max of the two is perhaps sufficient for now.
+$ cat /sys/devices/pci0000\:00/power/control
+auto
+
+> 2. What is the NVM version that your NIC has? (ethtool -i eno1)
+
+$ sudo ethtool -i eno1
+driver: igc
+version: 6.10.9-arch1-2
+firmware-version: 1082:8770
+expansion-rom-version:
+bus-info: 0000:0c:00.0
+supports-statistics: yes
+supports-test: yes
+supports-eeprom-access: yes
+supports-register-dump: yes
+supports-priv-flags: yes
+
+> 3. Can you please elaborate on you bug?
+> Does it happen while the system is in idle state?
+
+I don't know. It might, but I've only ever observed it while actively
+using the machine. I usually notice the problem when watching a
+youtube video or playing an online game and suddenly the network
+connection dies.
+
+> Does it run any
+> traffic?
+
+Yes, there's usually always network traffic when the problem occurs.
+
+> What is the system's link partner (switch? other NIC?)
+
+It's a "tp-link" switch: TL-SG105-M2 5-Port 2.5G Multi-Gigabit Desktop Switch
+
+Kind regards
+ Jesper Juhl
 
