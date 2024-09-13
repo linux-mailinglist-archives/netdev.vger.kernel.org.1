@@ -1,154 +1,176 @@
-Return-Path: <netdev+bounces-128056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE9D7977BB7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:59:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E371977BB0
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 10:57:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05BF81C20C1B
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 08:59:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E951C20F78
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 08:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7980D1D6DDC;
-	Fri, 13 Sep 2024 08:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FAF1D67B4;
+	Fri, 13 Sep 2024 08:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EVUh3awF"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="rA5SK0O1"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A84E1D6C52;
-	Fri, 13 Sep 2024 08:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D231D58B2;
+	Fri, 13 Sep 2024 08:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726217920; cv=none; b=c8Aoe/gbWam1tr692eyoYNTxrJ3fLO3gsHxSoA+w7iSp985nzZpK82c94GQYjq/OeM+upzFfMQdDgKEbo3AQf8AsI4K+W5IokwtWnGwN77wTRkKPlktTbvmSp4qZpaxAOtOWSjoQ8e++e5kNUNNX7KIz899MfzzxMWX+Wkqlz3w=
+	t=1726217867; cv=none; b=YLBEeVZAm/kEFuauFY4sp8kZ2fmF1zGGtv4TCX1acOW8ddgHC4crDkVaaxGelTQNK/neGye8c0D0BcdzE8RjUucYCPi4DmhibGMny1+OhlnvmYMQbgiZytmzVE1nxMndPKtNK7QjgnXDVCusBk5xl7POea2jezCRQod903YQQ1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726217920; c=relaxed/simple;
-	bh=5Dl1QNldlIlDNbxg9s0OvAL2DSD5njuCRP7qF/7NheQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uSt4kBLqBmwBjujRxdlmNOVKlTWsJ12G+RUbs2yEyfYpJAtNy/UYtuRLk8fWFjHYG6TvV2xRsjVVn9sWuH5SmPMbHIr9RaeubR0fxyJrDrRJY3yiDNDGC6+EynwJRe8A0I9ear31JdCDK/mw/pvrySmYsk49qbkJXCC1ksj+fKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EVUh3awF; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1726217917; x=1757753917;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5Dl1QNldlIlDNbxg9s0OvAL2DSD5njuCRP7qF/7NheQ=;
-  b=EVUh3awFcmL+zTJ6BBRzNc6uStqWTs7XxaPoOeUgOZTHeWHBm3Gjn5GH
-   K6KA0Z7Qadsl7ZgAjqSIw2fcFL+iITdh/1WwldQzMgUWTXK/VhYzObLYN
-   Cho26nHF4IYlIFQa8kj/NRNMlHV0f8+7jSSubSSzlNgW9/xd34sf6J0JZ
-   jwYseO4hatZK800IaVqlpqWdS1RWXZ000c7bcs9r0hThXakKDzkWHe3ZY
-   eXxmkjrgCuwMWDo7gAkRDMp4ElbSpCh2zB+dQY7gpHgwDM6V/fACvHy4b
-   GfKjYt1s6DRzwx1TMkLSeG0Dsh33P4zfm7uOS2t34NJ3kecVm65vhR3kY
-   g==;
-X-CSE-ConnectionGUID: 9rjvo6qoSyKZdgJH0FKZdw==
-X-CSE-MsgGUID: 9ccq/p0aQc2RkArkkfEoVQ==
-X-IronPort-AV: E=Sophos;i="6.10,225,1719903600"; 
-   d="scan'208";a="31630117"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Sep 2024 01:58:36 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 13 Sep 2024 01:58:26 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Fri, 13 Sep 2024 01:58:25 -0700
-Date: Fri, 13 Sep 2024 14:24:35 +0530
-From: Raju Lakkaraju - I30499 <Raju.Lakkaraju@microchip.com>
-To: Ronnie Kunin - C21729 <Ronnie.Kunin@microchip.com>
-CC: Andrew Lunn <andrew@lunn.ch>, Raju Lakkaraju - I30499
-	<Raju.Lakkaraju@microchip.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "Bryan Whitehead
- - C21958" <Bryan.Whitehead@microchip.com>, UNGLinuxDriver
-	<UNGLinuxDriver@microchip.com>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "maxime.chevallier@bootlin.com"
-	<maxime.chevallier@bootlin.com>, "rdunlap@infradead.org"
-	<rdunlap@infradead.org>, Steen Hegelund - M31857
-	<Steen.Hegelund@microchip.com>, Daniel Machon - M70577
-	<Daniel.Machon@microchip.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next V2 4/5] net: lan743x: Implement phylink pcs
-Message-ID: <ZuP9y+5YntuUJNTe@HYD-DK-UNGSW21.microchip.com>
-References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
- <20240911161054.4494-5-Raju.Lakkaraju@microchip.com>
- <c6e36569-e3a8-4962-ac85-2fd7d35ab5d1@lunn.ch>
- <ZuKP6XcWTSk0SUn4@HYD-DK-UNGSW21.microchip.com>
- <cbc505ca-3df0-4139-87a1-db603f9f426a@lunn.ch>
- <PH8PR11MB79651A4A42D0492064F6541B95642@PH8PR11MB7965.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1726217867; c=relaxed/simple;
+	bh=M5El9EyA9A0fefWeLaVcaVsb2FjaARGsqbpvDqpFzAo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YmbgyIT2drdIJsJaqVYvFhl158sLJKN597UBvBaTAYs1V7PpiOdOVJ7Pav1S2YB0mKzna0OzM9zZfmwm3NQqAzdFLThsflFd0pAb5l4CYEV24hkKuwyp31l+04CW2onOSz5wmEepEG626eSOM/iSEdkVdEv/L0dywTJ4lwEkvZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=rA5SK0O1; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1726217861;
+	bh=M5El9EyA9A0fefWeLaVcaVsb2FjaARGsqbpvDqpFzAo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=rA5SK0O1sLh8ZhNZX1jQIbZmA2PToy6epTTsj8CW9l1r4pw1Nvbf6FkucOQ9zQa+z
+	 N+N1Qfo2AK975ZnXLwxGLMgJ9RjDY3cp95T6FU5d6itglP7KT3xVu3XY1EwP29sX4H
+	 xDJ9msjaZFzLSZBYclBGpsioX4FyLbAY7qw6oUEUwWB74YYXDQ97UqLNBKnfiESc9Y
+	 wJjMyKnqIGct+rzwb0coEd22i9pZs9WAm8vHt3nZUD7qUfTrfckVULVtLUrQmk7JAy
+	 ummm/9xyCTvaJuPkLNig0BFonZOsDLViWZJ6TGg5i0Vm1gnr/EoFy10orssbVHXPEm
+	 oeNspWgu9kYUg==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id DA61E60078;
+	Fri, 13 Sep 2024 08:57:40 +0000 (UTC)
+Received: by x201s (Postfix, from userid 1000)
+	id C08512018C7; Fri, 13 Sep 2024 08:56:11 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	David Ahern <dsahern@kernel.org>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] tools: ynl-gen: use big-endian netlink attribute types
+Date: Fri, 13 Sep 2024 08:55:54 +0000
+Message-ID: <20240913085555.134788-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <PH8PR11MB79651A4A42D0492064F6541B95642@PH8PR11MB7965.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew / Ronnie,
+Change ynl-gen-c.py to use NLA_BE16 and NLA_BE32 types to represent
+big-endian u16 and u32 ynl types.
 
-The 09/12/2024 16:04, Ronnie Kunin - C21729 wrote:
-> 
-> 
-> > -----Original Message-----
-> > From: Andrew Lunn <andrew@lunn.ch>
-> > Sent: Thursday, September 12, 2024 11:28 AM
-> > To: Raju Lakkaraju - I30499 <Raju.Lakkaraju@microchip.com>
-> > Cc: netdev@vger.kernel.org; davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > pabeni@redhat.com; Bryan Whitehead - C21958 <Bryan.Whitehead@microchip.com>; UNGLinuxDriver
-> > <UNGLinuxDriver@microchip.com>; linux@armlinux.org.uk; maxime.chevallier@bootlin.com;
-> > rdunlap@infradead.org; Steen Hegelund - M31857 <Steen.Hegelund@microchip.com>; Daniel Machon -
-> > M70577 <Daniel.Machon@microchip.com>; linux-kernel@vger.kernel.org
-> > Subject: Re: [PATCH net-next V2 4/5] net: lan743x: Implement phylink pcs
-> > 
-> > EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
-> > 
-> > > > Also, am i reading this correct. C22 transfers will go out a
-> > > > completely different bus to C45 transfers when there is an SFP?
-> > >
-> > > No. You are correct.
-> > > This LAN743x driver support following chips 1. LAN7430 - C22 only with
-> > > GMII/RGMII I/F 2. LAN7431 - C22 only with MII I/F
-> > 
-> > Fine, simple, not a problem.
-> > 
-> > > 3. PCI11010/PCI11414 - C45 with RGMII or SGMII/1000Base-X/2500Base-X
-> > >    If SFP enable, then XPCS's C45 PCS access
-> > >    If SGMII only enable, then SGMII (PCS) C45 access
-> > 
-> > Physically, there are two MDIO busses? There is an external MDIO bus with two pins along side the
-> > RGMII/SGMII pins? And internally, there is an MDIO bus to the PCS block?
-> > 
-> > Some designs do have only one bus, the internal PCS uses address X on the bus and you are simply not
-> > allowed to put an external device at that address.
-> > 
-> > But from my reading of the code, you have two MDIO busses, so you need two Linux MDIO busses.
-> > 
-> >         Andrew
-> 
-> Our PCI11x1x hardware has a single MDIO controller that gets used regardless of whether the chip interface is set to RGMII or to SGMII/BASE-X.
-> When we are using an SFP, the MDIO lines from our controller are not used / connected at all to the SFP.
-> 
-> Raju can probably explain this way better than me since the how all this interaction in the linux mdio/sfp/xpcs frameworks work honestly goes over my head. From what he told me even when we are not using our mdio controller lines, since there is indirect access to the PHY (the one inside of the SFP) via the I2C controller (which btw does not share any hardware pins with those used by the MDIO controller), he had to change the PHY management functions for that indirect access to be used when SFP is selected.
-> 
-> Ronnie
+Doing this enables those attributes to have range checks applied, as
+the validator will then convert to host endianness prior to validation.
 
-It's my mistake. We don't need 2 MDIO buses. 
-If SFP present, XPC's MDIO bus can use,
-If not sfp, LAN743x MDIO bus can use. 
+The autogenerated kernel/uapi code have been regenerated by running:
+  ./tools/net/ynl/ynl-regen.sh -f
 
-We will fix.
+This changes the policy types of the following attributes:
 
-> 
+  FOU_ATTR_PORT (NLA_U16 -> NLA_BE16)
+  FOU_ATTR_PEER_PORT (NLA_U16 -> NLA_BE16)
+    These two are used with nla_get_be16/nla_put_be16().
 
+  MPTCP_PM_ADDR_ATTR_ADDR4 (NLA_U32 -> NLA_BE32)
+    This one is used with nla_get_in_addr/nla_put_in_addr(),
+    which uses nla_get_be32/nla_put_be32().
+
+IOWs the generated changes are AFAICT aligned with their implementations.
+
+The generated userspace code remains identical, and have been verified
+by comparing the output generated by the following command:
+  make -C tools/net/ynl/generated
+
+Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+---
+ net/ipv4/fou_nl.c          | 4 ++--
+ net/mptcp/mptcp_pm_gen.c   | 2 +-
+ tools/net/ynl/ynl-gen-c.py | 6 +++++-
+ 3 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/net/ipv4/fou_nl.c b/net/ipv4/fou_nl.c
+index 98b90107b5abc..3d9614609b2d3 100644
+--- a/net/ipv4/fou_nl.c
++++ b/net/ipv4/fou_nl.c
+@@ -12,7 +12,7 @@
+ 
+ /* Global operation policy for fou */
+ const struct nla_policy fou_nl_policy[FOU_ATTR_IFINDEX + 1] = {
+-	[FOU_ATTR_PORT] = { .type = NLA_U16, },
++	[FOU_ATTR_PORT] = { .type = NLA_BE16, },
+ 	[FOU_ATTR_AF] = { .type = NLA_U8, },
+ 	[FOU_ATTR_IPPROTO] = { .type = NLA_U8, },
+ 	[FOU_ATTR_TYPE] = { .type = NLA_U8, },
+@@ -21,7 +21,7 @@ const struct nla_policy fou_nl_policy[FOU_ATTR_IFINDEX + 1] = {
+ 	[FOU_ATTR_LOCAL_V6] = { .len = 16, },
+ 	[FOU_ATTR_PEER_V4] = { .type = NLA_U32, },
+ 	[FOU_ATTR_PEER_V6] = { .len = 16, },
+-	[FOU_ATTR_PEER_PORT] = { .type = NLA_U16, },
++	[FOU_ATTR_PEER_PORT] = { .type = NLA_BE16, },
+ 	[FOU_ATTR_IFINDEX] = { .type = NLA_S32, },
+ };
+ 
+diff --git a/net/mptcp/mptcp_pm_gen.c b/net/mptcp/mptcp_pm_gen.c
+index c30a2a90a1925..5a6b2b4510d37 100644
+--- a/net/mptcp/mptcp_pm_gen.c
++++ b/net/mptcp/mptcp_pm_gen.c
+@@ -14,7 +14,7 @@
+ const struct nla_policy mptcp_pm_address_nl_policy[MPTCP_PM_ADDR_ATTR_IF_IDX + 1] = {
+ 	[MPTCP_PM_ADDR_ATTR_FAMILY] = { .type = NLA_U16, },
+ 	[MPTCP_PM_ADDR_ATTR_ID] = { .type = NLA_U8, },
+-	[MPTCP_PM_ADDR_ATTR_ADDR4] = { .type = NLA_U32, },
++	[MPTCP_PM_ADDR_ATTR_ADDR4] = { .type = NLA_BE32, },
+ 	[MPTCP_PM_ADDR_ATTR_ADDR6] = NLA_POLICY_EXACT_LEN(16),
+ 	[MPTCP_PM_ADDR_ATTR_PORT] = { .type = NLA_U16, },
+ 	[MPTCP_PM_ADDR_ATTR_FLAGS] = { .type = NLA_U32, },
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 717530bc9c52e..e26f2c3c40891 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -48,6 +48,7 @@ class Type(SpecAttr):
+         self.attr = attr
+         self.attr_set = attr_set
+         self.type = attr['type']
++        self.nla_type = self.type
+         self.checks = attr.get('checks', {})
+ 
+         self.request = False
+@@ -157,7 +158,7 @@ class Type(SpecAttr):
+         return '{ .type = ' + policy + ', }'
+ 
+     def attr_policy(self, cw):
+-        policy = c_upper('nla-' + self.attr['type'])
++        policy = c_upper('nla-' + self.nla_type)
+ 
+         spec = self._attr_policy(policy)
+         cw.p(f"\t[{self.enum_name}] = {spec},")
+@@ -300,6 +301,9 @@ class TypeScalar(Type):
+         self.byte_order_comment = ''
+         if 'byte-order' in attr:
+             self.byte_order_comment = f" /* {attr['byte-order']} */"
++            if self.attr['byte-order'] == 'big-endian':
++                if self.type in {'u16', 'u32'}:
++                    self.nla_type = f'be{self.type[1:]}'
+ 
+         if 'enum' in self.attr:
+             enum = self.family.consts[self.attr['enum']]
 -- 
-Thanks,                                                                         
-Raju
+2.45.2
+
 
