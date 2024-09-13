@@ -1,81 +1,141 @@
-Return-Path: <netdev+bounces-128179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2239978658
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:03:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEBBF97865C
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 19:04:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 26E09B20A8A
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:03:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 765AB1F2225D
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 17:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB419762DF;
-	Fri, 13 Sep 2024 17:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 621371EEE4;
+	Fri, 13 Sep 2024 17:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QeCjm9zW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kxin2TFY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D35457CBB;
-	Fri, 13 Sep 2024 17:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0CC7DA64;
+	Fri, 13 Sep 2024 17:04:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726246974; cv=none; b=PMXOj5RN1/IuNjZ7BYpQRzCi5L6yp9Vfzhz76vWoBr9DSAsWOcCUvekg6Mu1hCOw62ae8JPITIHsO7jxPI5r+YMfdFPkZpHU5UA1BAMAK06AHZDDN0+1F2vCIEzkuXXQ+2UgdQ1FG4xk6eyfooXObZ8YZRFf18yP6ULcY9f2HWg=
+	t=1726247062; cv=none; b=nr956Nvbbcc6+Y6SjilXfoGLWHleLsfBG+EnZzYDMHgptFi0AYx3u0H+odUuNoOC6WocrsBLFBoBUPjs4bE9PiVNjxAjmUO01WEY8zErzTdUc0O5k9fMmWWcZoz7y0col7R9lJJIQjzb7KDO7NBes8ONZYxFgpPbKGMhAEOea3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726246974; c=relaxed/simple;
-	bh=9hCxTYk9yAqwSOku5ekhshPSb4kkYyvIP5skQlEd55A=;
+	s=arc-20240116; t=1726247062; c=relaxed/simple;
+	bh=Bimw3teACghVaYDGbMFiMeYLIhGUrCaX5bh5RjG58O0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l/xX8OWjxOKwVxX3zY9lmUc/LK69ehkth1G1P21XrumYt+86RXVzd2toL9oi/dvxjyOreBVX3VxOyiRnhF/RwQnYFAMNIhTYhE4R95w3fml/PpEaPlFOGtOedr4Ne6EJFle+k8De1SQGBw+lV9IJ+RzvFKr38EOvbrILjmEwtXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QeCjm9zW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7zMlLZOcK1RQ4wrk+dCE2XdWF0J3wBrSzW6w7G6AQZQ=; b=QeCjm9zWACqkkRpr1lXanKKSOc
-	P6bv7x4mMn6S2gtOxJlV8g1iuP0oKVWvBp5f4UQsTZhssOxFybaWUaIQuMx6Y5a2rEfh1N0hUN7A9
-	kdPeZxcTuSjbAtpTNmxL5z2ow3DscexehQfDARGAIWC9XpdxXRHN5ufh38czZXKwtCVs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sp9gy-007PQX-PD; Fri, 13 Sep 2024 19:02:44 +0200
-Date: Fri, 13 Sep 2024 19:02:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Frank Sae <Frank.Sae@motor-comm.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, xiaogang.fan@motor-comm.com,
-	fei.zhang@motor-comm.com, hua.sun@motor-comm.com
-Subject: Re: [RFC] net:yt6801: Add Motorcomm yt6801 PCIe driver
-Message-ID: <9506d808-85b9-4f37-baee-76f3dee56182@lunn.ch>
-References: <20240913124113.9174-1-Frank.Sae@motor-comm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=KmQg5ut2GFL0eMz0DtXM8yT/LGdTwVOQ25HAHmWczRlbrav0ORRPIY7WNPpw9XYDVn2f+jaDJ60S6w/I5mJF8U9jf/k4TUM5RUOueZgrD7BEjDTr94yqE+EA7pz47jsx+1uwM1kLaByQWHawbyf+70kNRwInAaF4JVhX1gQlW2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kxin2TFY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A6ADC4CEC0;
+	Fri, 13 Sep 2024 17:04:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726247061;
+	bh=Bimw3teACghVaYDGbMFiMeYLIhGUrCaX5bh5RjG58O0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kxin2TFYdo2MpnoqN3/ru1HXkcRRgGB0aGiMC3+oI/dvsnotFUvxCMtQoPFpmLWvp
+	 42JQreaD/b26F7UepH93bp8GmZOfDc4wN7EZ3Bg+NTdgjnUOyaKulsSOlH5amgeWwX
+	 JJI3jHupE1s5neWUzhqNkYRCr0KAcI5V6nzAy71JqPFPEZvCtU6eXVYGTR2kMdC4sb
+	 1+zZ84ml2XFSO3tMSmzcs2os+2sX9Wd4HUTImpGtSXeQZzaKXuCGQ52O8ha2iM9/NW
+	 yW8ybh0rzwS1NZPOxcCNP+wTbin7+prMU7oAx1BiAK55l0smOaodlE6spWLfFPFxe4
+	 5evh8JodlF01Q==
+Date: Fri, 13 Sep 2024 18:04:17 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] dt-bindings: net: dsa: the adjacent DSA
+ port must appear first in "link" property
+Message-ID: <20240913-estimate-badland-5ab577e69bab@spud>
+References: <20240913131507.2760966-1-vladimir.oltean@nxp.com>
+ <20240913131507.2760966-3-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="erhZyKGbQwqN4Ufv"
+Content-Disposition: inline
+In-Reply-To: <20240913131507.2760966-3-vladimir.oltean@nxp.com>
+
+
+--erhZyKGbQwqN4Ufv
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240913124113.9174-1-Frank.Sae@motor-comm.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 13, 2024 at 09:00:04PM +0800, Frank Sae wrote:
-> This patch is to add the ethernet device driver for the PCIe interface of
-> Motorcomm YT6801 Gigabit Ethernet.
+On Fri, Sep 13, 2024 at 04:15:05PM +0300, Vladimir Oltean wrote:
+> If we don't add something along these lines, it is absolutely impossible
+> to know, for trees with 3 or more switches, which links represent direct
+> connections and which don't.
+>=20
+> I've studied existing mainline device trees, and it seems that the rule
+> has been respected thus far. I've actually tested such a 3-switch setup
+> with the Turris MOX.
 
-One 11,927 line patch?
+What about out of tree (so in u-boot or the likes)? Are there other
+users that we need to care about?
 
-Please look at how other Ethernet drivers are submitted. Please break
-this up. You should also look at the comments other drivers get when
-submitted. A quick look through suggests there is plenty of broken
-stuff in here which has been commented on before. You should not be
-repeating the errors of others.
+This doesn't really seem like an ABI change, if this is the established
+convention, but feels like a fixes tag and backports to stable etc are
+in order to me.
 
-FYI: All your PHY handling code needs throwing away and use phylink or
-phylib.
+>=20
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  Documentation/devicetree/bindings/net/dsa/dsa-port.yaml | 9 +++++----
+>  1 file changed, 5 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml b/Do=
+cumentation/devicetree/bindings/net/dsa/dsa-port.yaml
+> index 480120469953..307c61aadcbc 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/dsa-port.yaml
+> @@ -31,10 +31,11 @@ properties:
+> =20
+>    link:
+>      description:
+> -      Should be a list of phandles to other switch's DSA port. This
+> -      port is used as the outgoing port towards the phandle ports. The
+> -      full routing information must be given, not just the one hop
+> -      routes to neighbouring switches
+> +      Should be a list of phandles to other switch's DSA port. This port=
+ is
+> +      used as the outgoing port towards the phandle ports. In case of tr=
+ees
+> +      with more than 2 switches, the full routing information must be gi=
+ven.
+> +      The first element of the list must be the directly connected DSA p=
+ort
+> +      of the adjacent switch.
+>      $ref: /schemas/types.yaml#/definitions/phandle-array
+>      items:
+>        maxItems: 1
+> --=20
+> 2.34.1
+>=20
 
-	Andrew
+--erhZyKGbQwqN4Ufv
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZuRwkAAKCRB4tDGHoIJi
+0vfHAP9cFzroVB3GZuA91GabzA+2kn0YS6xgfGRCeLfS6kRX1QEA5gk62mEFp0mn
+yro855Nq9nioDWT9HBzDB0OgiW+rHAA=
+=W9Nn
+-----END PGP SIGNATURE-----
+
+--erhZyKGbQwqN4Ufv--
 
