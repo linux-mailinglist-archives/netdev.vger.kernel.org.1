@@ -1,140 +1,124 @@
-Return-Path: <netdev+bounces-128059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57268977BFD
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 11:13:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6DEE977C00
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 11:15:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01C9E1F22AC7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 09:13:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F0E01F2735B
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 09:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDBB1D67AB;
-	Fri, 13 Sep 2024 09:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD131D6C68;
+	Fri, 13 Sep 2024 09:15:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g1zDysS7"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="hcW6oCG7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f194.google.com (mail-yb1-f194.google.com [209.85.219.194])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F7A317BED3;
-	Fri, 13 Sep 2024 09:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D72118A6D6
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 09:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726218821; cv=none; b=AcVZqFV73T5LSkOtoSfe9iV/z5rLexBw+3lYRLMnvCm83sXsKs2USyce/omB8qKqfqqfqZQdAPQyDDrHWMAWISJkQyfT9lC6ozyA+3+usE7CGdAUfVxfed0q1CI2p3MNsb+NwJ+sI/kkz6VZrRAfpPZXqvgRiiyDmTD0IrRF+mU=
+	t=1726218938; cv=none; b=FzmHLW3gnpQ3Oh9EQu50Vjd1YotKX1o8Y1ZvHRfRsK0qcBrWBas+s+9rcLF+cvdAWBwkK9WdBJtiEQ7p0Rpb+Lsi1XWwdQuLLcD4eJ5IDUdp6rd7YJJ7C9KP7DSsajiBJElcMOM3SzkSQjqsDReKIZf4vmCouhD3ylWQbWWdASE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726218821; c=relaxed/simple;
-	bh=JI3m9LYyWSyk0jfVWwO1YfrWWHzbrvI0o8O2cO+Sucw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X6L2lsuTirEcjI+2lMZoS+0BRezhS15Kp3WBhWiWcygaUUecM+AMXeZBJvoxeIZY4nl2B4YEb06as0Lg3b+E145vMknkSEbKC3qbyz6/jcMQXrBYhOkNneP+TN4CFL3r0G3waDTvIn0nIIps0eTLCQu6u85GZ5wCqM57lApFpzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g1zDysS7; arc=none smtp.client-ip=209.85.219.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f194.google.com with SMTP id 3f1490d57ef6-e1a74ee4c75so652778276.3;
-        Fri, 13 Sep 2024 02:13:39 -0700 (PDT)
+	s=arc-20240116; t=1726218938; c=relaxed/simple;
+	bh=yjxj0FSJpzDqTDqbkb+Ys5lDxT533fcsCSKxOxLDXqE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=czNilRDgTFjEKZcI4ETJB5mb7c6LxmMQbVa3LzjeSuCwcOIi8WkU5MiLuJsVoS0+NDBptgYyGXnbNI4AEWuEdshkwWG7aTK7u1WTNWUpTi1uoDCgPwouhNkiH1K+kEK2bFZ2Efj2pAS0TynaJmy8rkIK6GmyKR2l0ciCKnDMNrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=hcW6oCG7; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c26311c6f0so2478740a12.3
+        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 02:15:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726218819; x=1726823619; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gyXxFHDnWBDDJlEOl6Xh69Gj8jXFozZBOH+5BBxE9Fk=;
-        b=g1zDysS7Rm0RmkIVkAnWOrRu2dhw0fFbaerqiJCPaBhHM2yFXSu7fd6ALcyKXofVqh
-         gfUQm+1m1WypYNCyUsemsp0fIHgpZoKBTFkasScHWhTva6D+8zgR0wM9lw+5+V16mR7E
-         kGQbgBGAEOrreGn4hdUDk4BWEFUn3xWNT4ed0W3dEK0qfclHX8xYc8aZYiZlOSFfUuNe
-         S+OJYusiVqVMaP1u2+PDmVNk/EvW2mqrZfcc2xfZxdJMoK6Hw0NLt7gA1fz+3qBoiSmR
-         IRmGYno75JXPJdM3ny/vifsUp0sTJFUKwvkgTTglHAhQmq/zMmxxOaZGMgBzw3Y8w39L
-         Hi+w==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1726218935; x=1726823735; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zP7o2lXiLqDCW/l4Y6N12juw+Nevs/iHS84Bz9Lspa0=;
+        b=hcW6oCG7UsWg8lqj1SfpbfEYgFYHzvc8MRSQFB/afVCmLbLYKL3MiCqkl0d2emVWYd
+         nvRqV4ojd/+Jau6JFuxvGJQ/zAcn/TBhb30ud/kQU0eMb7Syuge/REB/v+24vztNWFQf
+         oPaCyMD344Upcg6J8Hz/T0hGkfk0G423DJ6z3OEjZkU+UGNtPTgX8MxtjITkyWu8OByq
+         ZJSitXmGPA08O1Z+lpNt3Qfkew2x93D1PmszK16drxktOqGBp3kKx4CzlqY/3o44X35c
+         deotYhfUvTwHgmYn3VNqPtXGtRdfKuFoA6b/7OJ1O/aWJcJRNKrPSx1mVk/UtVnhEOF2
+         eB7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726218819; x=1726823619;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gyXxFHDnWBDDJlEOl6Xh69Gj8jXFozZBOH+5BBxE9Fk=;
-        b=XjyU5Dd0LUimviz/bLptscp2orymxV+6z4fcAcE71QgLuaOwVLEsuNEYAMyuuw0KUV
-         LkyXZS+M+KA2fDX6ASPfkYaiUVKPuGzQMcDifBBDIzTdhw0VH9y3JXbQgQfkL3epoxus
-         JxHVEbihvK1uNzywEjyeSS53JVWIwofVuaY2fvyMLvxomZ5wt6aUwn5Joco2hL9Y0AoT
-         lkYN8/mmnEhE6KFaHmaKIigPdnfIFhDOpqDOoFJSrcdBeS2lDnXmletAHXj/v1Y+0AlF
-         RhTIwUZwMBfCuCzO8jXVVTCqF2qx6QUjAdvCZTKTkn+jbGEcwil1rbkzyQK9QvlDSVi0
-         eKDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGGQBbxc/S5QLLSMOMLjEwzV04ivYFLEEiLaRv+jG4IfQBLBKDf21vzQUwECdOCsf6dDY2PDe0sZGJqyk=@vger.kernel.org, AJvYcCVEyMl9GS2iOaQCpefs4ah8kBrldRAmMuLntPI4b8gGdPJErVgNNPM5Cbch2PHYq+hgRNjtPk7J@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnQU8Zl6GbNZUHuf6VcKFIrbZOy4m3LRudQ06xQ9mk2UPgGAec
-	iT7cUzlHmRm8HQVQAmkXonk8Yw+YvTLW2kUm2/dS110tL4n/gRRUH9e15TkUX5YlgHu+ImJD8lk
-	edrOViKobB74xFd97j8YUwHIT8eY=
-X-Google-Smtp-Source: AGHT+IGTSx+nc+ZmzlzXLNrgq3ecoPsZXndDrY5v49iTDxEfSYxup4DdcsT7ch+4ToenP+w5LpUJqm5pZ41QSctqz8A=
-X-Received: by 2002:a05:6902:993:b0:e11:6eb3:833f with SMTP id
- 3f1490d57ef6-e1db00a735bmr1431100276.5.1726218818951; Fri, 13 Sep 2024
- 02:13:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726218935; x=1726823735;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zP7o2lXiLqDCW/l4Y6N12juw+Nevs/iHS84Bz9Lspa0=;
+        b=kspf40GYfPg9mWU7xvA6YUdfvidWOAz1LOkf0Adp1rFCCNsA5B7BTiY3E29W92TdDp
+         HooSx3MRCIQaGd23nWEqWdV3EetUoHPEz1Idn/zaE7/7Y1ew81YwVYqhIxrfOLHHBaYa
+         bRbXzvRRMwvNdhpxNB2ElrBWvUW4EInqT/KGT/69hokq6Wm66DfPziEJgoS8+5ffL5FV
+         0ILSoFtOgLuPUkbZWogiue6nyq8TmLvuIunixrMqIzeFSjd5iIQ0ocPCLdbKmyGTuz/D
+         9XR2UElFUodwDlyAfdZdO/cGlc2xLNgUEJSk4zMHGvfT0OGt4ZOcjYsu21DDacTV/afJ
+         GP6A==
+X-Forwarded-Encrypted: i=1; AJvYcCWGm2kdnWlxehSVrByglbhx4J5neUp89KRQbE4lH4+U1SSfUji5jrtQuKLCae0zXb7BQWeCa9Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOOTeD8xBusgnlN8hnsTngWGG5yyOKt4VwZIZa/t1eSlEwTPJ6
+	jEroz13e8rFHupmmg28OUvrMbWCTAPD3sohp08ozJKF2kMs+mm/FtBQDKq9zktc=
+X-Google-Smtp-Source: AGHT+IFVFni4KQY31tZpsekaGm1UaBb7ZpdiuaYbjs6baOy/7SSOoWK2lsopYFzaF0hFcAvrJOrKow==
+X-Received: by 2002:a17:907:3e1d:b0:a83:8591:7505 with SMTP id a640c23a62f3a-a902966f459mr584642266b.59.1726218933949;
+        Fri, 13 Sep 2024 02:15:33 -0700 (PDT)
+Received: from [192.168.0.148] ([93.93.8.5])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a8d25c72e9asm849536866b.115.2024.09.13.02.15.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 Sep 2024 02:15:33 -0700 (PDT)
+Message-ID: <8cf0b25f-2b7f-478e-af14-b0ebd5905a79@blackwall.org>
+Date: Fri, 13 Sep 2024 12:15:30 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240909071652.3349294-1-dongml2@chinatelecom.cn>
- <20240909071652.3349294-7-dongml2@chinatelecom.cn> <ZuFP9EAu4MxlY7k0@shredder.lan>
- <CADxym3ZUx7v38YU6DpAxLU_PSOqHTpvz3qyvE4B3UhSHR2K67w@mail.gmail.com>
-In-Reply-To: <CADxym3ZUx7v38YU6DpAxLU_PSOqHTpvz3qyvE4B3UhSHR2K67w@mail.gmail.com>
-From: Menglong Dong <menglong8.dong@gmail.com>
-Date: Fri, 13 Sep 2024 17:13:41 +0800
-Message-ID: <CADxym3ZriQCvHcJjCniJHxXFRo_VnVXg-dheym9UYSM-S=euBg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 06/12] net: vxlan: make vxlan_snoop() return
- drop reasons
-To: Ido Schimmel <idosch@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	dsahern@kernel.org, dongml2@chinatelecom.cn, amcohen@nvidia.com, 
-	gnault@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com, 
-	razor@blackwall.org, petrm@nvidia.com, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] netkit: Assign missing bpf_net_context
+To: Breno Leitao <leitao@debian.org>, kuba@kernel.org, bpf@vger.kernel.org,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: vadim.fedorenko@linux.dev, andrii@kernel.org,
+ "open list:BPF [NETKIT] (BPF-programmable network device)"
+ <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+References: <20240912155620.1334587-1-leitao@debian.org>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240912155620.1334587-1-leitao@debian.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 12, 2024 at 10:30=E2=80=AFAM Menglong Dong <menglong8.dong@gmai=
-l.com> wrote:
->
-> On Wed, Sep 11, 2024 at 4:08=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> =
-wrote:
-> >
-> > On Mon, Sep 09, 2024 at 03:16:46PM +0800, Menglong Dong wrote:
-> > > @@ -1447,7 +1448,7 @@ static bool vxlan_snoop(struct net_device *dev,
-> > >
-> > >       /* Ignore packets from invalid src-address */
-> > >       if (!is_valid_ether_addr(src_mac))
-> > > -             return true;
-> > > +             return SKB_DROP_REASON_VXLAN_INVALID_SMAC;
-> >
-> > [...]
-> >
-> > > diff --git a/include/net/dropreason-core.h b/include/net/dropreason-c=
-ore.h
-> > > index 98259d2b3e92..1b9ec4a49c38 100644
-> > > --- a/include/net/dropreason-core.h
-> > > +++ b/include/net/dropreason-core.h
-> > > @@ -94,6 +94,8 @@
-> > >       FN(TC_RECLASSIFY_LOOP)          \
-> > >       FN(VXLAN_INVALID_HDR)           \
-> > >       FN(VXLAN_VNI_NOT_FOUND)         \
-> > > +     FN(VXLAN_INVALID_SMAC)          \
-> >
-> > Since this is now part of the core reasons, why not name it
-> > "INVALID_SMAC" so that it could be reused outside of the VXLAN driver?
-> > For example, the bridge driver has the exact same check in its receive
-> > path (see br_handle_frame()).
-> >
->
-> Yeah, I checked the br_handle_frame() and it indeed does
-> the same check.
->
-> I'll rename it to INVALID_SMAC for general usage.
->
+On 9/12/24 18:56, Breno Leitao wrote:
+> During the introduction of struct bpf_net_context handling for
+> XDP-redirect, the netkit driver has been missed, which also requires it
+> because NETKIT_REDIRECT invokes skb_do_redirect() which is accessing the
+> per-CPU variables. Otherwise we see the following crash:
+> 
+> 	BUG: kernel NULL pointer dereference, address: 0000000000000038
+> 	bpf_redirect()
+> 	netkit_xmit()
+> 	dev_hard_start_xmit()
+> 
+> Set the bpf_net_context before invoking netkit_xmit() program within the
+> netkit driver.
+> 
+> Fixes: 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+> Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  drivers/net/netkit.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
 
-Hello, does anyone have more comments on this series before I
-send the next version?
 
-Thanks!
-Menglong Dong
-> > > +     FN(VXLAN_ENTRY_EXISTS)          \
-> > >       FN(IP_TUNNEL_ECN)               \
-> > >       FNe(MAX)
+Acked-by: Nikolay Aleksandrov <razor@blackwall.org>
+
+
 
