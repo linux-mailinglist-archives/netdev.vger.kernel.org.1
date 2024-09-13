@@ -1,120 +1,155 @@
-Return-Path: <netdev+bounces-128243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44E2A978B52
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:20:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E59978B58
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:22:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D83961F219E7
-	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 22:20:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D1972847E1
+	for <lists+netdev@lfdr.de>; Fri, 13 Sep 2024 22:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4055E155742;
-	Fri, 13 Sep 2024 22:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ABB616C6B7;
+	Fri, 13 Sep 2024 22:22:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ntrBb1f0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ipe4Y36K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C0E14A09F
-	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 22:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACAE2155A30
+	for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 22:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726266029; cv=none; b=A1Y9nmytbMtWQfVfw2J8Aa3LKGlWO8M51C5LGllchUz9uUDGv5kVv92MzrDXgMOVS3oLZ+lfJBRrpUNAuCZOgtQ6Ay9EDBrZ/mkcMvZY6uD6dQsW1223nIv7J533LehyEhClqs4xWOYkphorGQiGKZkAVNNWsO5yxVkAQ7t00ec=
+	t=1726266137; cv=none; b=PR9cUW3oy7bEQYyZGEEUvhspIsKeXvDDn5NRrzyZnv1EHuUfn0/JtcHjD1M/lffi3WXZQJ89GmNVYN0VJzHgms+sMoTfp5hHxRrOO944zf48X+fPq3RWwqSo7wBH0YVkecz27mLEoKLY5DFDghDFx1vfhWsXxRNE4Qzsuqu4txc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726266029; c=relaxed/simple;
-	bh=4ReVohtII5cSTlqN3wK0UiuPDbS9FDQk1WOSWLM7E9c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lpnifljwXEVx0m/opLnA1SjUoIFDIEpSG1TjssU2OTSDvwbUbvlVjMGbugeXZtKl7nzVmsAonc0xF81R5g3OV53xAISq4G3q4SH4ffCsoQBDQqFmOefxtyEiSiKvWq30lXoQuV2OekbfRSl5yDjzuHjjUsEZtIRe3r9gzz2N9+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ntrBb1f0; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4582b71df40so33581cf.1
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 15:20:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726266027; x=1726870827; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4ReVohtII5cSTlqN3wK0UiuPDbS9FDQk1WOSWLM7E9c=;
-        b=ntrBb1f0cbP22KFb+Rg20gIThFiP2ZI1+5mGlkt3myhcUIg/4pjdi+hQy7/CgKgrLn
-         ws6LkoGyoDK8sVUkhVrloM9cARVJzvhP26KouOSo2JZC+3u2FDJIZ9nAnNeIqd9PiXaM
-         rxM7zB07CsEO05I6Ri/dX4+Fg8J6ltnyMsFmlbtSUVV4Cgg6WfvXudTxBCdiRLlfDsuz
-         GPE40cG7cfE2/3CsHWsFT6mi6VISNj0hpHK8WNRSQMtsEoJJz9zVl97Ut7ImoHGljqcK
-         N7Pwgv22o0LwKCawht9ds005H9A4zcgsinTxTNcXM9xIuGEUjDkvHEQ6Vb6JGzswH6ru
-         j7kA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726266027; x=1726870827;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4ReVohtII5cSTlqN3wK0UiuPDbS9FDQk1WOSWLM7E9c=;
-        b=NOz/sf8PKPAtLtHxtm+qOgU22hbiRyz4LhilBMohHhAK2IViKYFpr8ohItfNpng3pK
-         ujrQFht8t/WfErJI9HJ9DQgxXicb6TRnKr7G3XcoaYV5G9cxWEP8M/n3RqapO7jESKuB
-         pkqgzaakrQmUWOdhsGlsei1qfrC46q/x/CLiE2y4YU1o+JFqcBFZ4fXrGefggCcKgV9p
-         DzFLkSYvt7Jlv1hfdSGqucIVj1uq4Vq7o/PVrcqrF8NHjP5BW8Wqsy/7KUzEh8xU7fP3
-         5ky4YoDPb409XtJswhM8bYBHbJdiG44lypr96FbwB/3g1sXFanurKylqPg4Libm/6oqs
-         l+8Q==
-X-Gm-Message-State: AOJu0YxCjISLpoHto8fS5OGc3g77DSPoKVnrKV4npwFLoX1I7RjqKJNl
-	1b3pB5nyNtFEPzh2NsCklblju2dSXUhDcJliaKIy6Dxfwn04BbWoVJ333w2T8SqLQ+PdvkSykpT
-	svy8q+0Kp4G3rvKSfxdejuL0RWZqmR1WtOlnn
-X-Google-Smtp-Source: AGHT+IE0fYJ1AUzgoxfB7Sh6DszZg8+4BX/1w2yCAl0s1N4rHnq7fstPs0A7Ok4hht+CAAz8/BHHwxzYdIYuFld+XbQ=
-X-Received: by 2002:ac8:5845:0:b0:453:5f2f:d5d2 with SMTP id
- d75a77b69052e-45864403792mr5623691cf.1.1726266026235; Fri, 13 Sep 2024
- 15:20:26 -0700 (PDT)
+	s=arc-20240116; t=1726266137; c=relaxed/simple;
+	bh=noINtl05AnaxJlcXICJMnSxhMo7Uk9YziGSVWFEaipM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E3tCv4PwTfY3Gn7hpk8E9a5qJMd+4yyR4LehDfUZ9qrgrYrkPSCpZBI+ozzLu6VwGXKF3S2/vUIZHPUSf/4zT6pwOQiAwloaZF8ItSS0J7rxLVtzriLPyWaloF2Vda3NEB+Bi/+xSFiuh5AjIP3pE62rf/db6LKRcC6TlB5eKZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ipe4Y36K; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <64df8d41-6cfb-45a9-8337-5cc04daedb60@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726266132;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0lJW6sFmgfQQpTvoEzsidtuTQ8v36dUp7qyMxSEEoMA=;
+	b=Ipe4Y36KeC6qdSlEa543Oe3Du9WAH1bd5CHRxuYmbfWRpIaWERYvP/5C7ZKYFZtdElvPEc
+	+SybDb6EldcjA07CfYPcmJBZEI7HD5BhS3gMTwuwPpNIC8KVZuBW9mr01RYPF9y1654kSB
+	KcZnbwN5qstImFdrMcUgKn9WvyKi3xI=
+Date: Fri, 13 Sep 2024 15:22:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240913213351.3537411-1-almasrymina@google.com> <ZuS0wKBUTSWvD_FZ@casper.infradead.org>
-In-Reply-To: <ZuS0wKBUTSWvD_FZ@casper.infradead.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 13 Sep 2024 15:20:13 -0700
-Message-ID: <CAHS8izMwQDQ9-JNBpvVeN+yFMzmG+UB-hJWVtz_-ty+NHUdyGA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] page_pool: fix build on powerpc with GCC 14
-To: Matthew Wilcox <willy@infradead.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stephen Rothwell <sfr@canb.auug.org.au>, Linux Next Mailing List <linux-next@vger.kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH bpf-next v2] selftests/bpf: convert test_xdp_features.sh
+ to test_progs
+To: =?UTF-8?Q?Alexis_Lothor=C3=A9_=28eBPF_Foundation=29?=
+ <alexis.lothore@bootlin.com>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, ebpf@linuxfoundation.org,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+References: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Sep 13, 2024 at 2:55=E2=80=AFPM Matthew Wilcox <willy@infradead.org=
-> wrote:
->
-> On Fri, Sep 13, 2024 at 09:33:51PM +0000, Mina Almasry wrote:
-> > Building net-next with powerpc with GCC 14 compiler results in this
-> > build error:
-> >
-> > /home/sfr/next/tmp/ccuSzwiR.s: Assembler messages:
-> > /home/sfr/next/tmp/ccuSzwiR.s:2579: Error: operand out of domain (39 is
-> > not a multiple of 4)
-> > make[5]: *** [/home/sfr/next/next/scripts/Makefile.build:229:
-> > net/core/page_pool.o] Error 1
-> >
-> > Root caused in this thread:
-> > https://lore.kernel.org/netdev/913e2fbd-d318-4c9b-aed2-4d333a1d5cf0@cs-=
-soprasteria.com/
->
-> It would be better to include a direct link to the GCC bugzilla.
->
+On 9/10/24 11:10 AM, Alexis Lothoré (eBPF Foundation) wrote:
+> test_xdp_features.sh is a shell script allowing to test that xdp features
+> advertised by an interface are indeed delivered. The test works by starting
+> two instance of the same program, both attaching specific xdp programs to
+> each side of a veth link, and then make those programs manage packets and
+> collect stats to check whether tested XDP feature is indeed delivered or
+> not. However this test is not integrated in test_progs framework and so can
+> not run automatically in CI.
+> 
+> Rewrite test_xdp_features to integrate it in test_progs so it can run
+> automatically in CI. The main changes brought by the rewrite are the
+> following:
+> - instead of running to separated processes (each one managing either the
+>    tester veth or the DUT vet), run a single process
+> - slightly change testing direction (v0 is the tester in local namespace,
+>    v1 is the Device Under Test in remote namespace)
+> - group all tests previously managed by test_xdp_features as subtests (one
+>    per tested XDP feature). As a consequence, run only once some steps
+>    instead of once per subtest (eg: starting/stopping the udp server). On
+>    the contrary, make sure that each subtest properly cleans up its state
+>    (ie detach xdp programs, reset test stats, etc)
+> - since there is now a single process, get rid of the "control" tcp channel
+>    used to configure DUT. Configuring the DUT now only consists in switching
+>    to DUT network namespace and run the relevant commands
+> - since there is no more control channel, get rid of TLVs, keep only the
+>    CMD_ECHO packet type, and set it as a magic
+> - simplify network setup: use only ipv6 instead of both ipv4 and ipv6,
+>    force static neighbours instead of waiting for autoconfiguration, do not
+>    force gro (fetch xdp features only once xdp programs are loaded instead)
+> 
+> The existing XDP programs are reused, with some minor changes:
+> - tester and dut stats maps are converted to global variables for easier
+>    usage
+> - programs do not use TLV struct anymore but the magic replacing the echo
+>    command
+> - avoid to accidentally make tests pass: drop packets instead of forwarding
+>    them to userspace when they do not match the expected payload
+> - make sure to perform host <-> network endianness conversion on constants
+>    rather than packet parts
+> 
+> Signed-off-by: Alexis Lothoré (eBPF Foundation) <alexis.lothore@bootlin.com>
+> ---
+> Changes in v2:
+> - fix endianness management in userspace packet parsing (call htonl on
+>    constant rather than packet part)
+> 
+> The xdp_features rewrite has been tested in a x86_64 qemu environment on my
+> machine and in CI. In my environment, the test takes a bit less than 2s to
+> execute.
+> 
+>    # ./test_progs -a xdp_features
+>    #561/1   xdp_features/XDP_PASS:OK
+>    #561/2   xdp_features/XDP_DROP:OK
+>    #561/3   xdp_features/XDP_ABORTED:OK
+>    #561/4   xdp_features/XDP_TX:OK
+>    #561/5   xdp_features/XDP_REDIRECT:OK
+>    #561/6   xdp_features/XDP_NDO_XMIT:OK
+>    #561     xdp_features:OK
+>    Summary: 1/6 PASSED, 0 SKIPPED, 0 FAILED
+> ---
+>   tools/testing/selftests/bpf/.gitignore             |   1 -
+>   tools/testing/selftests/bpf/Makefile               |  10 +-
+>   .../selftests/bpf/prog_tests/xdp_features.c        | 446 +++++++++++++
+>   tools/testing/selftests/bpf/progs/xdp_features.c   |  49 +-
+>   tools/testing/selftests/bpf/test_xdp_features.sh   | 107 ---
+>   tools/testing/selftests/bpf/xdp_features.c         | 718 ---------------------
 
-I have not reported the issue to GCC yet. From the build break thread
-it seemed a fix was urgent, so I posted the fix and was planning to
-report the issue after. If not, no problem, I'll report the issue and
-repost the fix with a GCC bugzilla link, waiting 24hr before reposts
-this time. I just need to go through the steps in
-https://gcc.gnu.org/bugs/, shouldn't be an issue.
+ From the initial commit message of xdp_features.c, its primary usage is to test 
+a physical network device that supports a certain XDP features.
 
---=20
-Thanks,
-Mina
+iiuc, test_xdp_features.sh only uses the veth and veth will also be the only 
+device tested after moving to prog_tests/xdp_features.c? It is a reasonable 
+addition to test_progs for an end-to-end xdp test by using veth. However, 
+test_progs will not be able to test the physical network device.
+
+Lorenzo, is the xdp_features.c still used for device testing?
+
 
