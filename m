@@ -1,137 +1,77 @@
-Return-Path: <netdev+bounces-128369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FC00979322
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 21:08:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8045979394
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 00:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F03F21F2207E
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 19:08:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B7FD1F2220C
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 22:07:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDE583CD9;
-	Sat, 14 Sep 2024 19:08:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="aA0kH9Kk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A1A13B588;
+	Sat, 14 Sep 2024 22:07:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0C65476B;
-	Sat, 14 Sep 2024 19:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006D56F066;
+	Sat, 14 Sep 2024 22:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726340921; cv=none; b=fOUmw+XVy6jwi3jZHs6StjukzVvbNdxGKhhSvuDqPPjhxLtg3lfCA3oYFb3y322wlxhKe3N8K/fb9yn+R1M+pipLO+vRpeCDyT4oyt/KuYVa2knLaeSFiSdTZjqNLwbjQT/fy1testXa2ynzGK6FOtXhDUUF4Tn76dIUWvYdk9U=
+	t=1726351669; cv=none; b=nE1DWyzLt98/PovmKGEGbWy38m2c+FspQ/eKRkx+qN+FQkbueI9jnlI1iX+gau3NGoOKZM9ll00fLm8+VDnsK8CGOBlYOP6hDTky30k66zV/HlF8I+1Fc1+noPtNt46qJvFMqroye77rsuqLJg9AR4uqJ4nu+vhUMb8up2Ltm7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726340921; c=relaxed/simple;
-	bh=igLWrUMalHNuo/JvrtqATze08C1+QPyMEMgPZKPU1nQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=k73/qRDwePGVRs9A6JtQI2NXhvEG85JwvYPQ5r7shM/uabAjmQ0QhbVh1oT+z1H7t3AEWrzurkq8YR0w1dlEEhrfQ4i0aA2rtudOyb9sKXYnlgS4dOC8krIa7jS6QraLRULk4K/Tu8NGfVhPTRBCo9bE6LiU9MY9N6du+NdfAv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=aA0kH9Kk; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=/RmgvQdkupwCieq+lND0mlPnkDQ+yuLauIg41h7E0Ng=; b=aA0kH9KkgT6DO/GaWr6zNx1nhr
-	VAL/WXFgBUW/zCe/1aQJm/mRDanqbfa4TwnCMR/c0YnQeQD10CQy1VWEzvKI4l/CCOON/wM0MRXqy
-	nnhxjbZX7VnlNCDLXjoW44A9+4Hw2tQAwHyTlEFd0v/ULr0mw5Z9EjNB+Y1lzRnTsENBsDmmxTMyO
-	cb0Rq+1Jav7Vyb9Ie9ckBbVrOvymY27DdjN+MHHEugbgHfxgzuHWEmRWtsRE5DYbscrOxitVz9Az8
-	jTKk2StKFat6v/NmxnjLfAuSgrDpb1ksrtTlGBq/jPP7B0DyV9N8q2bQSwQ93He2xCtwh9wWWVRjW
-	EfRPjg2Q==;
-Received: from sslproxy02.your-server.de ([78.47.166.47])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	s=arc-20240116; t=1726351669; c=relaxed/simple;
+	bh=8UYJTps9ziYwnwbXUxK+LWRqU6OAMrQVi8OKICgzcwU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O+G6o6HtWGLbogBGiSMG/KsbFdITkTS68Y4ukJ6ihSPIE2TLvbjjD1iNVEudEM8NZnHLcYaz+Pk1dTLTWq83FeAYRwN9bHBeTrWfiBTA3Bv4K3b9AHx9X2SpSx00nGRARVwr2XrnDdKmJB24lRotorverv3cC4/f4tlldCzCWNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=53302 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1spY8H-000P16-CT; Sat, 14 Sep 2024 21:08:33 +0200
-Received: from [85.1.206.226] (helo=linux-1.home)
-	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1spY8G-0008If-0Z;
-	Sat, 14 Sep 2024 21:08:32 +0200
-Subject: Re: [PATCH net] netkit: Ensure current->bpf_net_context is set in
- netkit_xmit()
-To: Jordan Rife <jrife@google.com>, Nikolay Aleksandrov
- <razor@blackwall.org>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Kees Cook <kees@kernel.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>, Alexei Starovoitov
- <ast@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
- bpf@vger.kernel.org, stable@vger.kernel.org
-References: <20240914184616.2916445-1-jrife@google.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <a8ed72fe-416f-d5ed-c59f-85ec59afcc40@iogearbox.net>
-Date: Sat, 14 Sep 2024 21:08:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	(envelope-from <pablo@gnumonks.org>)
+	id 1spavX-00CioL-9K; Sun, 15 Sep 2024 00:07:37 +0200
+Date: Sun, 15 Sep 2024 00:07:34 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] netfilter: nft_socket: Fix a NULL vs IS_ERR() bug in
+ nft_socket_cgroup_subtree_level()
+Message-ID: <ZuYJJonibwaFdpab@calendula>
+References: <bbc0c4e0-05cc-4f44-8797-2f4b3920a820@stanley.mountain>
+ <20240914111940.GA19902@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240914184616.2916445-1-jrife@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27398/Sat Sep 14 10:42:15 2024)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240914111940.GA19902@breakpoint.cc>
+X-Spam-Score: -1.9 (-)
 
-Hi Jordan,
+On Sat, Sep 14, 2024 at 01:19:40PM +0200, Florian Westphal wrote:
+> Dan Carpenter <dan.carpenter@linaro.org> wrote:
+> > The cgroup_get_from_path() function never returns NULL, it returns error
+> > pointers.  Update the error handling to match.
+> 
+> Good news, I will retire in the next few years so I don't send shit
+> patches anymore.
+> 
+> Acked-by: Florian Westphal <fw@strlen.de>
 
-On 9/14/24 8:46 PM, Jordan Rife wrote:
-> When operating Cilium in netkit mode with BPF-based host routing, calls
-> to bpf_redirect() cause a kernel panic.
-> 
-> [   52.247646] BUG: kernel NULL pointer dereference, address: 0000000000000038
-> ...
-> [   52.247727] RIP: 0010:bpf_redirect+0x18/0x80
-> ...
-[...]
-> Setting a breakpoint inside bpf_net_ctx_get_ri() confirms that
-> current->bpf_net_context is NULL right before the panic.
-> 
-> (gdb) p $lx_current().bpf_net_context
-> $4 = (struct bpf_net_context *) 0x0 <fixed_percpu_data>
-> (gdb) disassemble bpf_redirect
-> Dump of assembler code for function bpf_redirect:
->     0xffffffff81f085e0 <+0>:	nopl   0x0(%rax,%rax,1)
->     0xffffffff81f085e5 <+5>:	mov    %gs:0x7e12d593(%rip),%rax
->     0xffffffff81f085ed <+13>:	push   %rbp
->     0xffffffff81f085ee <+14>:	mov    0x23d0(%rax),%rax
-> => 0xffffffff81f085f5 <+21>:	mov    %rsp,%rbp
->     0xffffffff81f085f8 <+24>:	mov    0x38(%rax),%edx
-> ...
-> (gdb) continue
-> Continuing.
-> 
-> Thread 1 hit Breakpoint 1, panic ...
-> 288	{
-> (gdb)
-> 
-> commit 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct
-> on PREEMPT_RT.") recently moved bpf_redirect_info into bpf_net_context,
-> a new member of task_struct. Currently, current->bpf_net_context is set
-> and then cleared inside sch_handle_egress() where tcx_run() and tc_run()
-> execute, but it looks like netkit_xmit() was missed leaving
-> current->bpf_net_context uninitialized when it runs. This patch ensures
-> that current->bpf_net_context is initialized while running
-> netkit_xmit().
-> 
-> Signed-off-by: Jordan Rife <jrife@google.com>
-> Fixes: 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
+This is also my fault, I did not help to catch this error in any way:
 
-Thanks for the fix! Similar patch is however already in net tree :
-
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=157f29152b61ca41809dd7ead29f5733adeced19
-
-Best,
-Daniel
+Acked-by: Pablo Neira Ayuso <pablo@netfilter.org>
 
