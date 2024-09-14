@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-128275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EC38978D07
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 05:11:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 419AC978D09
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 05:11:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6DD8B25C7F
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 03:11:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BB94285C06
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 03:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35BAA28689;
-	Sat, 14 Sep 2024 03:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F31E3179A8;
+	Sat, 14 Sep 2024 03:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C52iS0AW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DiO15BHr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2A025622;
-	Sat, 14 Sep 2024 03:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8C9161FFC;
+	Sat, 14 Sep 2024 03:10:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726283436; cv=none; b=bxgian76oSSXjvBpHdAwok/kUrT+iSv8uGsXUD2v6BG6wFToHo7rLPjV1CvqwZYUmYv4kZNyCjCMDm0c1aw0KBstQVVnP0+yUkF1Vn3A8r8i/mL6fJWXyg1wY3LXcAnTojch7sWaxCVWehwuWk4Nn+3Xf4iAmda1f/h5OsHcuyk=
+	t=1726283439; cv=none; b=hlep2BgmwdxZua2FCgH/WRgIpcixHKq2Gki/N9IVvm5+FOftz9agN3kEyXg0jxPdJ5qgjbVedcI/z80yW3McLBsPvN+q3+Ow7SPqgJrdvL1OuG9/CCf61BhOp8rqp/9PFY5S7kSlktRiFImlCfmoERqS/5SoDn2+eJcb3bXJqo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726283436; c=relaxed/simple;
-	bh=Sdy2e+qHmazre0dUjOLj4xVHsL4E2phkUHBh8FfMcDA=;
+	s=arc-20240116; t=1726283439; c=relaxed/simple;
+	bh=eHQ44i+Gni5WUzeMWQtDPB/p0hd0eqry3TWWbC9OSuo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KjWVsIznuNzDSSmHT8jOsfMhItcZ5cNjGDuPBGi2xGz0+ib11uYFvd5mtxfj5XL/SZ/OGpyNAa/7++J1aSR/UFRXV+HGDH1Cepsjwj6VuC+59LqUaG4zFCiBPp8k8FAfb+qQ5ys6H0IeNU6Hyp30IcacRyQODsz/jhBn+RTT3WQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C52iS0AW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E101FC4CEC0;
-	Sat, 14 Sep 2024 03:10:35 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pNSjSUulHp61IMDnfHyvFcR7TwVwkMewqZ0IdN4udRDchbrxA34f6t1p0gg7MTofRfjQw12nQmEuerBhxSX2yUjN+gExf7erWMyA+HxaBrHMuy4QB6U2CPxlcIPAiuvU9G1g8M+QAZJvyB+dNtzhL2BXISPBDeVJyGB9XthAphg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DiO15BHr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6735FC4CEC0;
+	Sat, 14 Sep 2024 03:10:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726283435;
-	bh=Sdy2e+qHmazre0dUjOLj4xVHsL4E2phkUHBh8FfMcDA=;
+	s=k20201202; t=1726283439;
+	bh=eHQ44i+Gni5WUzeMWQtDPB/p0hd0eqry3TWWbC9OSuo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=C52iS0AWy9yoX5CqzzNtdy6WPOW4NXYrwzaXBAcLBYLijtL+Iaf0zZGRrH2vv7u7T
-	 jXOR8/l9pZJgZzLGCdmXHNK86kybySYaA+3NJH40Bf8oeGQwlZlnu+SshhG3CQQ9du
-	 mkWTBZbQF3M3KHa74URtbxymiU59zFO2wHVlPvZbqDT/dazNoDuPQbTpxK2+Sn+Wge
-	 Et/sqsWVSFUbj4anQwK8ZoVh+wzMvWiZFNXW7rJYQoy/Mw40hPUJJOHEqBo/ZTcy3o
-	 jd/h+tGtOug4A3ryScu3HaQ6CzhKOXX9KCQ0SxHSsYWseKUyiEta6o5zW8UZSje9L2
-	 LteEqqtY9dsig==
+	b=DiO15BHr7NLh5UFNaPTGOp70irNBf6EsVwwnArDtvmJtfgE7VT5sX83Y9PnhKJIRr
+	 hKfSnxiyKlqkvWFOvzJjOjiEWPVEIIfHHvQqk7tBhnjb3SLSROHpwQ2X06Do9xT+I9
+	 GnMjY+vk/kJTiamvjvYZEwpPksrqT5M3wBCTrimmXvKcnUYjbtZejOs/YxuTssx6qi
+	 ZqV9Qs3G6QHiQUm+2JJazxW/EHavrsU6qsmX/7FjNxiflSw/TlyqgFKySKsMFS3k1S
+	 pefdGZ0mVnTawIqY1hHSt2fdiRA1hDx7XlBueQBLVuAa0ZaAoSuSlmrn5g57HyBoN6
+	 LTeVbBoMoW1fA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D8F3806655;
-	Sat, 14 Sep 2024 03:10:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1D73806655;
+	Sat, 14 Sep 2024 03:10:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ipv6: rpl_iptunnel: Fix memory leak in rpl_input
+Subject: Re: [PATCH net-next v4] net: enetc: Replace ifdef with IS_ENABLED
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172628343700.2438539.13770490860202118869.git-patchwork-notify@kernel.org>
-Date: Sat, 14 Sep 2024 03:10:37 +0000
-References: <20240911174557.11536-1-justin.iurman@uliege.be>
-In-Reply-To: <20240911174557.11536-1-justin.iurman@uliege.be>
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ <172628344049.2438539.12184710803069184190.git-patchwork-notify@kernel.org>
+Date: Sat, 14 Sep 2024 03:10:40 +0000
+References: <20240912173742.484549-1-martyn.welch@collabora.com>
+In-Reply-To: <20240912173742.484549-1-martyn.welch@collabora.com>
+To: Martyn Welch <martyn.welch@collabora.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, davem@davemloft.net,
  edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, aahringo@redhat.com, alex.aring@gmail.com
+ kernel@collabora.com, vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 11 Sep 2024 19:45:57 +0200 you wrote:
-> Free the skb before returning from rpl_input when skb_cow_head() fails.
-> Use a "drop" label and goto instructions.
+On Thu, 12 Sep 2024 18:37:40 +0100 you wrote:
+> The enetc driver uses ifdefs when checking whether
+> CONFIG_FSL_ENETC_PTP_CLOCK is enabled in a number of places. This works
+> if the driver is built-in but fails if the driver is available as a
+> kernel module. Replace the instances of ifdef with use of the IS_ENABLED
+> macro, that will evaluate as true when this feature is built as a kernel
+> module and follows the kernel's coding style.
 > 
-> Fixes: a7a29f9c361f ("net: ipv6: add rpl sr tunnel")
-> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
-> ---
->  net/ipv6/rpl_iptunnel.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
+> [...]
 
 Here is the summary with links:
-  - [net] net: ipv6: rpl_iptunnel: Fix memory leak in rpl_input
-    https://git.kernel.org/netdev/net/c/2c84b0aa28b9
+  - [net-next,v4] net: enetc: Replace ifdef with IS_ENABLED
+    https://git.kernel.org/netdev/net-next/c/9c699a8f3b27
 
 You are awesome, thank you!
 -- 
