@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-128351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A740979188
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 16:40:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F82979192
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 16:44:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBE072845B2
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 14:40:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B06B61C211C4
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 14:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89C41CF7C5;
-	Sat, 14 Sep 2024 14:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F771CFECA;
+	Sat, 14 Sep 2024 14:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Z1X3kYY9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xHyE4JUX"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3665F1CF5E7;
-	Sat, 14 Sep 2024 14:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8711CDA13;
+	Sat, 14 Sep 2024 14:44:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726324803; cv=none; b=NbJ+7lidmYJ6ovtG4d+qDf9aKNtPHqN5Xjr5SQAOTnKSwsjaEpW+3JV4PXSmAa8Qty/XQhgD2qcy2t7azujsAK1tCJiCb7fUn+lSJFGwNXUcBljRNO72td+x9k05NfROSzW8CwLlqjmmWhHRdwbsBc07WUc6esYRXO55clLwy7c=
+	t=1726325045; cv=none; b=WU7DCQOd02x9XkiA4KaqR2mSOWMJ9cCOJISUb4R4r4I1pN7wlrJNBGD2P2EICbGrFN8Sbs+yk/whL6ekICbibw9kS0MpHu+OUda+3IL26OK9JHzj2K+wwUJENjrqcIblKf96peeVbwBnhe6R+2qC86gIgl9El3bmBhUsVrukAE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726324803; c=relaxed/simple;
-	bh=CtftJoEDizkOk1RNmYsC+zZozt9oPQCBYqbHu3YFQto=;
+	s=arc-20240116; t=1726325045; c=relaxed/simple;
+	bh=m7/vNDc6BrIdUxMl1jxXFI56CmFKYCzOe7GRPun8HfE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iRjdZWcdk/9J9vI1kxSQhbLE9LKhi7xWOWXYN1i/xFwUZiQjEw2YAyr9SQ7a+HVdTgyE4if5Z4JWebvaAHDQ3Na3aMQYVoFYQhSZveABBYnf4G147pcH9y8ZoN9E/GLnrw4hF4BcwXCkMu6h9Agc5CkLAFnAnVsxXfqv6ByiT3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Z1X3kYY9; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=DbWuwr/45ADRRQ5VRyDBiIFeEjhCDAxm0gKfwWs8Q+BYVHkbFwnRekL2Rri6N+IHN5bHBpSIducDEe/2oPPN/HtspOdqK8dSCHaLMO/x5r6b/ZG4IJWhMASh++WIPg8vW+l22Tub7rpChgowMMcGEeBO2GpZMYVdLRM+mLtFxhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xHyE4JUX; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,34 +36,32 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hGvbU8s6yeOosPbH2naPV/J2CC0GcYStYJhYjeb56BA=; b=Z1X3kYY9OD8RQZNsY/YFImJfa7
-	sTXlFzZzxxKlxXgn94i4LcIOM4NbpPt6LqaZmrNvJ/3EduNEaXAj01qhA5zsRGtAZTIgUL6FHrSpu
-	gw1chq3yarlv76wHVjZfUuBHwUt5uufD322gpt5t7TRcw1u9Xp5CNR84iTOIrChiF6PI=;
+	bh=XS0GztEDYymxun+Map2uQq9snP0hBhtV9K1Wn2Q+MnY=; b=xHyE4JUXlEWH5BSOscgQsl1ZYQ
+	duRG1NBaSiRaOs0w7aoMdY65ZezTMZakHU75Ry1WtoyNnsPn/JnQIj2wffhSNTZ2W8mhI3oXEP125
+	THtzJPJDzRFXpY9XjA60304KLm2AX8cyZc6SFR49sj2LhBFkd2m2nVncy4m0iy3JjeQ8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1spTw7-007Smz-Of; Sat, 14 Sep 2024 16:39:43 +0200
-Date: Sat, 14 Sep 2024 16:39:43 +0200
+	id 1spU06-007Snt-BD; Sat, 14 Sep 2024 16:43:50 +0200
+Date: Sat, 14 Sep 2024 16:43:50 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Ronnie.Kunin@microchip.com
-Cc: Raju.Lakkaraju@microchip.com, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Bryan.Whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
-	Steen.Hegelund@microchip.com, Daniel.Machon@microchip.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next V2 4/5] net: lan743x: Implement phylink pcs
-Message-ID: <7e999f47-b9e9-40e3-b6ac-538e06a63fc7@lunn.ch>
-References: <20240911161054.4494-5-Raju.Lakkaraju@microchip.com>
- <c6e36569-e3a8-4962-ac85-2fd7d35ab5d1@lunn.ch>
- <ZuKP6XcWTSk0SUn4@HYD-DK-UNGSW21.microchip.com>
- <cbc505ca-3df0-4139-87a1-db603f9f426a@lunn.ch>
- <PH8PR11MB79651A4A42D0492064F6541B95642@PH8PR11MB7965.namprd11.prod.outlook.com>
- <ZuP9y+5YntuUJNTe@HYD-DK-UNGSW21.microchip.com>
- <4559162d-5502-4fc3-9e46-65393e28e082@lunn.ch>
- <PH8PR11MB7965B1A0ABAF1AAD42C57F1A95652@PH8PR11MB7965.namprd11.prod.outlook.com>
- <867aadb8-6e48-4c7c-883b-6f88caefcaa6@lunn.ch>
- <PH8PR11MB7965462BB26287CB056A5EEB95652@PH8PR11MB7965.namprd11.prod.outlook.com>
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Stefan Eichenberger <eichest@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Dimitri Fedrau <dima.fedrau@gmail.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next 3/3] net: phy: marvell-88q2xxx: Enable auto
+ negotiation for mv88q2110
+Message-ID: <2ffd7cb6-3936-49f5-a57f-8eb26308f72f@lunn.ch>
+References: <20240906133951.3433788-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240906133951.3433788-4-niklas.soderlund+renesas@ragnatech.se>
+ <70b86181-7bcf-42d7-b5a8-d26ac0c4c573@lunn.ch>
+ <ZuWW4UOtOGI_KmSg@eichest-laptop>
+ <20240914142136.GC64607@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,27 +70,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <PH8PR11MB7965462BB26287CB056A5EEB95652@PH8PR11MB7965.namprd11.prod.outlook.com>
+In-Reply-To: <20240914142136.GC64607@ragnatech.se>
 
-> As I have mentioned before I am not (and will likely never be) a
-> Linux expert. I have just been advising Raju from the perspective of
-> how the chip hardware works, the drivers I have written for it for a
-> different OS, and what our customers have been requiring from us. I
-> wasn't advocating against instantiating a second MDIO bus or
-> whatever else makes sense in the Linux frameworks/environment,
-> specially if the overhead to implement it is low and allows for
-> richer or alternative use cases. I was just pointing out potential
-> problems based on my knowledge of our hardware and the information I
-> was told (now obviously misunderstood and/or incomplete) about these
-> newer Linux frameworks (phylink, xpcs, sfp) by Raju / was
-> understanding from your email.
+> > out
+> > of office again next week, afterwards I should be able to do some more
+> > testing again. I think being able to set fixed link speeds is a must for
+> > this PHY.
+> 
+> I'm also at LPC next week but I will do some more testing on this and 
+> see if I can reproduce your finding with a 100 speed link.
 
-Not a problem. That is partially why we do reviews, to make sure the
-architecture is correct. And there is a tendency for developers and
-drivers coming from other OSes to re-invent wheels, because some other
-OSes do not provide those wheels. With Linux you have a bigger API to
-understand, but less code to write.
+There is no real rush. netdev is not accepting patches at the moment,
+due to the merge window opening, and lots of developers travelling to
+LPC. So you have up to 8 weeks to sort this out.
 
 	Andrew
-
 
