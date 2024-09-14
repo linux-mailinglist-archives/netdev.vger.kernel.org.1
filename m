@@ -1,63 +1,60 @@
-Return-Path: <netdev+bounces-128354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 530699791C4
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 17:22:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2162B9791C8
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 17:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1A9E1F22555
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 15:22:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB4181F22578
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 15:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63571CFED0;
-	Sat, 14 Sep 2024 15:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018E11CFED3;
+	Sat, 14 Sep 2024 15:23:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nWaN+8jm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uw9Co81K"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B10DE179BF;
-	Sat, 14 Sep 2024 15:21:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF1591FB4;
+	Sat, 14 Sep 2024 15:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726327317; cv=none; b=KoS5xIFGW9CPEu3+WXKdcR/7qwRxR6iUaF2K8EA5cM/JWaJfEjM/N/RSd4i4ijK99PWG03GYQlSKvvE2ri6BLUmKdg8gQxJZemxS9UkeCRytafCZSxNqbdLArJ5Uw9XR3uABzTycfjYwYWzVwFhJu8fZHDkQxOWQb07EFgh9hNo=
+	t=1726327404; cv=none; b=Dsle9El6/Ikv61NZISDbejwFVs1Aquke3EXWUn8IcJXDNqDn7/pddmDJtEyAEtsygzuJl8marXODHqF3R/EK43GwR0s5C48Ju33Nj/v11R8wkD8HiDRzR1oqFXSCd3myGqqteieCDY1hyaSVbbuK1cEusR4W1lgoZ4X8rBxhlko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726327317; c=relaxed/simple;
-	bh=vVbuT2PkbiZL2oGC7T+8Tw6ga9ngmRsKtudtTJXUgnI=;
+	s=arc-20240116; t=1726327404; c=relaxed/simple;
+	bh=S3g2qFu+Tw39TPX2ZuDZ+NSMZfRiC87HxdyEsbWt7m4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qZxii28dCrJuJc5YgxUDSJTCap1iJZXVh3Q5AysvHAAIuhw26QHK1TAEpadGmNMNrTC/yk8Nu7Oga/IhAuDotFZpS/hSNvab+Vt0R7wAGffSWo5SvgwaDgWqGYeqtQDlFyqPpEbOWCOQEHNp+QIpdCBnCzPtXkTFCx8rWTM/K6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nWaN+8jm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1531C4CEC0;
-	Sat, 14 Sep 2024 15:21:54 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=t1vE1YloJot5RZmNWcbtdA8qeE5gqEJgY7TUk3mzCsa04AnOm3AR4bTxUiN1BamMuXEwFP6Vx4ekIiia9cFAEFkQ5hN3BDylqH3zba3Mdg5gJhNXrVtHgjtzx46wIisbLxVVCnA1sptb0MvTkJb5rTjw6vx7LSHNjv2rF/MZ4Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uw9Co81K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 551B1C4CEC0;
+	Sat, 14 Sep 2024 15:23:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726327317;
-	bh=vVbuT2PkbiZL2oGC7T+8Tw6ga9ngmRsKtudtTJXUgnI=;
+	s=k20201202; t=1726327404;
+	bh=S3g2qFu+Tw39TPX2ZuDZ+NSMZfRiC87HxdyEsbWt7m4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nWaN+8jmxXZQmoGzbOiKHglQ47GMu2Z+l01o1N+NukiwUTayXJ5sd+Gi9TDL4yml/
-	 HgzlD/r2qBF+9VXl5fL5/+PgrEqJqC8MbLzWbqzAHVReW2GzokoowdMcjiL+/f5jST
-	 jBtxb45SWFvstOK1YLrQUBI5Ov7Tbm8suYJaiS8wEtKBbZkEfXpUPTYpABCl3ZBwf0
-	 1v2s/ELNeaw+kELN5zq14BggtTGtnDMyDRocK4j0iKtehTGubfRGCZV9a9dRgbzTgH
-	 eSVpQUpPWQMsUhjn4ObnZRr56q51vAgDZIMYPWGMv0lxaXi4LoPiOMmEeVw9slms7M
-	 f8/EtKTLLt0AQ==
-Date: Sat, 14 Sep 2024 16:21:52 +0100
+	b=Uw9Co81KaNKxpj509CLQc1u43M3vuDDWThw8X5UDRJBsX9iA5Q553rIL5DF8F/skf
+	 uD+z2P5JQvVLwbLA1osqXLLoxERAP3awUiWJSAVQyzCnXprKqdfDqLJfdgXqSD37M9
+	 eYZP64aCzzLSxdA1zZNYU/bP2o1G+XIfAaa3hGh8tCklB5jgQxAoz12GfUkKCiXhDs
+	 2Nb5Rk+7MLgbLBQhuRB7FOUB0NfkLak5bSJLAgggCx4M3emRNUa+tomoD4Wvkcaawe
+	 odrzIiww0m3xVJX3NLks20c6v7qRcLiEuvxyOGVMsl6TEiMu6xhFvx93kbxVZCMuIL
+	 fQGL/viW1wBwg==
+Date: Sat, 14 Sep 2024 16:23:18 +0100
 From: Simon Horman <horms@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Dan Carpenter <dan.carpenter@linaro.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] netfilter: nft_socket: Fix a NULL vs IS_ERR() bug in
- nft_socket_cgroup_subtree_level()
-Message-ID: <20240914152152.GB11774@kernel.org>
-References: <bbc0c4e0-05cc-4f44-8797-2f4b3920a820@stanley.mountain>
- <20240914111940.GA19902@breakpoint.cc>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: bryan.whitehead@microchip.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, anna-maria@linutronix.de,
+	frederic@kernel.org, tglx@linutronix.de, richardcochran@gmail.com,
+	UNGLinuxDriver@microchip.com, mbenes@suse.cz, jstultz@google.com,
+	andrew@lunn.ch, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next v4 1/2] posix-clock: Check timespec64 before call
+ clock_settime()
+Message-ID: <20240914152318.GC11774@kernel.org>
+References: <20240914100625.414013-1-ruanjinjie@huawei.com>
+ <20240914100625.414013-2-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,17 +63,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240914111940.GA19902@breakpoint.cc>
+In-Reply-To: <20240914100625.414013-2-ruanjinjie@huawei.com>
 
-On Sat, Sep 14, 2024 at 01:19:40PM +0200, Florian Westphal wrote:
-> Dan Carpenter <dan.carpenter@linaro.org> wrote:
-> > The cgroup_get_from_path() function never returns NULL, it returns error
-> > pointers.  Update the error handling to match.
+On Sat, Sep 14, 2024 at 06:06:24PM +0800, Jinjie Ruan wrote:
+> As Andrew pointed out, it will make sense that the PTP core
+> checked timespec64 struct's tv_sec and tv_nsec range before calling
+> ptp->info->settime64().
 > 
-> Good news, I will retire in the next few years so I don't send shit
-> patches anymore.
-> 
-> Acked-by: Florian Westphal <fw@strlen.de>
+> As the man mannul of clock_settime() said, if tp.tv_sec is negative or
+> tp.tv_nsec is outside the range [0..999,999,999], it shuld return EINVAL,
 
-Everyone makes mistakes, don't be too hard on yourself :)
+nit: should
+
+Flagged by checkpatch.pl --codespell
+
+...
 
