@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-128323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08363978FAC
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 11:57:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370B1978FB8
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 11:58:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7FA01F21101
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 09:57:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00CCD288A35
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 09:58:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50CC31CE6F6;
-	Sat, 14 Sep 2024 09:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3391CEABF;
+	Sat, 14 Sep 2024 09:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R8cWZ7F+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xtft83Jm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BF9343149
-	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 09:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347C543149
+	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 09:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726307819; cv=none; b=JI2fbUpbSYXkJ001iNk7tHsJmzN+BZDQ9GIKhh74Me981ZOwLcJvr9MgAtR8pnBmzSNBFw6DnGtjUeOTBmPAnKpgbInED48xDtaqxL4wasMveKxk8+GjoyZG9bBPS5Xr0rkR768zARCST5VRZzp2rpoLYrbP12Dp7UdggkdRuJc=
+	t=1726307855; cv=none; b=IewLBT+s2D6sjxtadBJ6S4bpOw9LFKoJaKcqX8blIH6lvVWMVxKGn+RKcmQEqDGry2VmhTSJV1XgJHhFNDp0ZJkSbFsUbVBCv00znM2SzwJyvPbH9nTCG087Ln2zyBg1Sjik/VKjka08N3xx6yVvviaxYcG5hnKftyYcCSqK+Yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726307819; c=relaxed/simple;
-	bh=5/7xNgVMM5znzPlTwRdQPzrcGDt5NrLxOnLVL5Ox/kE=;
+	s=arc-20240116; t=1726307855; c=relaxed/simple;
+	bh=vC+gKpfOvOeBPrlQ1T7rQky/AseG1kthoailPrpBbtI=;
 	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=rQS4CazSs+ySWvqKEdhTU/JqDWN4FrRaMKaU/ZpfZAuG5LoB7p65jDUbp27y1mKZGr+ky7RQh95LgUnHufn+CW1pCdvW2tcDTNjo6Oro4FCCKPuLtiTmLbJLQ9ETnm3RxsJUBzgL6JLCqTgr+w7yq6b/0ueSvPPsL1Mb5hFicRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=R8cWZ7F+; arc=none smtp.client-ip=209.85.208.48
+	 Content-Disposition; b=S+hBtXVJa8cM58m+kPecQEIowyxlVCyuokDfvS73KlWpd1ym80GE5BEgoAJC8i93z+FR+T23INuXWQ8ycldujnYVY337wfEFf0P1p1xkEAd2zdrpya/+qj4+Wv7QAId2Ej3WktC39nkVVs/jxBC/OdZMNGGfyGIHinlXSV0m5cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xtft83Jm; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c260b19f71so3249350a12.1
-        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 02:56:57 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a8d2daa2262so191695166b.1
+        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 02:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1726307816; x=1726912616; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726307852; x=1726912652; darn=vger.kernel.org;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZkttiUwbZSAhIQr2HB1QpBV3Ynk91TOIcc4nZQ4D7J4=;
-        b=R8cWZ7F+VkvG5LxQGnbvRBxjNNGZwgSTiNCot7EAtRn3NT/CSfYnsNtRFDVthzLLXN
-         yL7OCrKefDQJUmXORQqDJjhS/v4pPiKFNQ6neWpCVfDa1eOPTMilUtPMGJi8EzWyMMpN
-         lkm355sn2DXTtYM0eTOcFraoP6Pw0a9597NreMz4Ea1B5qPqkHJzrLCW0Jb14ehbWeOO
-         LDG8l2sZtlyWPpqGVw9JhLdjzVug944wE6EywV1Uc4Jjxv/FdaBDt5Yin+Bh1damXJcV
-         AZ0cb22/ssFmhWTx018g1ByrGaaFYWcXm2SKRUOC6dwayKqrNVnhlsetb9k8b4PDZJUR
-         iU5Q==
+        bh=KE+o4GW15mD0lO9Q1MSUje0WFegNuMWBNx0d+tJV9y8=;
+        b=xtft83Jmdn/3yyvJxRBOhB4jxpUZT/Po/ywj7FZlDNXUnUZgUkMntbiDOwyRTHNyET
+         L82hYaMwSrzJnJFtm+0yJVaIMu/8Z68BPTAJKMARZIGnsm9loxfvU9jHBKBfiZsr8UWG
+         bV78oxw0CHFA8LbxwMYPkaj25ruvGUhkWsMiEyaMmwqf4YUAQdm0sUUxtbxH/GOIiocx
+         /a5CrqJCB0NX4trepv73UGKxJzdb6pgrqPRFwgC01Kh8m25r7sXPL3cbDkBi/CJYMM9p
+         vrlnvUoTN4xVPWasqqiqLtjYlxEEpxOurUj3SVZII0F/JTeZaJXICXZRZOn7OWuuIds4
+         HpzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726307816; x=1726912616;
+        d=1e100.net; s=20230601; t=1726307852; x=1726912652;
         h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZkttiUwbZSAhIQr2HB1QpBV3Ynk91TOIcc4nZQ4D7J4=;
-        b=VJzRzKkuV0CShGOPKp7pih8+afzs3ZoJGAA+keiEHVkMl1lKEZpZ1vK5JRcExORVEv
-         5bLpBHOeHIlL5RUQfBxFyUezPGP3a8SXiy9+j5qhm79ECE/fyQfJhIsrsBWyLOnMTcx7
-         VXrxXO0h9jn3mkha1tRLZUYK/Sh0IrMP9JvLXp75lgRxsIIz3t/lySwZ8/Sx/2DIBDXE
-         tDsOz4/13+hE3eKTP1QuO0Zm0/Qe9FZJvT7YlSKfL7hhwRomKsePzMeZvF9cagvQKpct
-         0UF+zk6CdRnYDka+boUdcWv+Lp/wGtP0VknWc6enWdTrva/UZcGTmNkDTVKzQqfsLQTn
-         wlzw==
-X-Forwarded-Encrypted: i=1; AJvYcCXC5LHBsdy+mgpOVhpTx/ut9JzEmSbBveaRpY0f7DOw0mdS+SwRulCFdph0W11hlfEfiVESwx4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQUumLnggOQsQZGijdU8gR4KuitrJbKGYa78MkNKf3Zo7flsSy
-	6J7+t4lVBSGn5E6P8leI4G6z2K64iFINqgG3K7otlVjDpbJC+BT4ofY2lNlmlRU=
-X-Google-Smtp-Source: AGHT+IHW72oX7a7JyqQYEvWLyhwpREGh2KNn57UUT6JYrRYTabD7lJwM/On03q66LCo0gYCNv4awyg==
-X-Received: by 2002:a05:6402:5108:b0:5c3:2440:856f with SMTP id 4fb4d7f45d1cf-5c413e4bd3fmr6660928a12.27.1726307815533;
-        Sat, 14 Sep 2024 02:56:55 -0700 (PDT)
+        bh=KE+o4GW15mD0lO9Q1MSUje0WFegNuMWBNx0d+tJV9y8=;
+        b=Y0kj9zt6EoXMpphtZadw6ApGOL9rLb2fHZ6IezMCqJwJNzN/H3NLCY07sXLYJ6kjU/
+         YMKDQq13DW6A79YjukYiTgrQn/9vTdgViiHKa1u77g8TwBqKY7twD/iN7VKJZr8grnPR
+         A1vmWPJg2DuIKuL5iXHFcGq9/o3zipUdoFd+69HIZKdPz5iKtY5LxjQz+Yr3lmnZK1jB
+         NsRnrRdeW22J+GWDGBbzxK6EgTUf8K3ZncC7oHWK0c22U4V8Robc3ke2AVbe+4sUvzW3
+         Nw/sah07eEt/eQyW+gRT6WxgKtRcJZvpwqL7fbLgOdFJU2RsdEItG1iDzDL0K1SKoaRV
+         EDSw==
+X-Forwarded-Encrypted: i=1; AJvYcCXLdOpaU1e1DQ3MsNC6a6/tZpq+m6Lf8CscITNP4TiChiyorUI1YcWgvbSq6avAPLMrnlMQE1A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx1SwxYz4oIXBrU3WAz8j2ajiAgsuZBX7xV0iKTQok2AU5UFi/C
+	f99jPapartw7juL/LqGFgVpOBcRYiuxTP4xkLs33OuaXzPCrxpoGhCrNrm8Yh+s=
+X-Google-Smtp-Source: AGHT+IEQayo62aQvlqZj9eNFA3UtGiSNdY1Nd2T98Zj0wlkmKEFR6sdcxKopa5NxgGNy9WPY2H8KdQ==
+X-Received: by 2002:a17:907:608d:b0:a86:79a2:ab15 with SMTP id a640c23a62f3a-a9048102110mr498501066b.40.1726307852548;
+        Sat, 14 Sep 2024 02:57:32 -0700 (PDT)
 Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c42bc88d82sm497729a12.81.2024.09.14.02.56.54
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9061096779sm61360966b.25.2024.09.14.02.57.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Sep 2024 02:56:54 -0700 (PDT)
-Date: Sat, 14 Sep 2024 12:56:51 +0300
+        Sat, 14 Sep 2024 02:57:32 -0700 (PDT)
+Date: Sat, 14 Sep 2024 12:57:28 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: [PATCH net] netfilter: nft_socket: Fix a NULL vs IS_ERR() bug in
- nft_socket_cgroup_subtree_level()
-Message-ID: <bbc0c4e0-05cc-4f44-8797-2f4b3920a820@stanley.mountain>
+	Simon Horman <horms@kernel.org>,
+	Wojciech Drewek <wojciech.drewek@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next] ice: Fix a couple NULL vs IS_ERR() bugs
+Message-ID: <7f7aeb91-8771-47b8-9275-9d9f64f947dd@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,30 +89,42 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 X-Mailer: git-send-email haha only kidding
 
-The cgroup_get_from_path() function never returns NULL, it returns error
-pointers.  Update the error handling to match.
+The ice_repr_create() function returns error pointers.  It never returns
+NULL.  Fix the callers to check for IS_ERR().
 
-Fixes: 7f3287db6543 ("netfilter: nft_socket: make cgroupsv2 matching work with namespaces")
+Fixes: 977514fb0fa8 ("ice: create port representor for SF")
+Fixes: 415db8399d06 ("ice: make representor code generic")
 Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
- net/netfilter/nft_socket.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_repr.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/netfilter/nft_socket.c b/net/netfilter/nft_socket.c
-index ac3c9e9cf0f3..f5da0c1775f2 100644
---- a/net/netfilter/nft_socket.c
-+++ b/net/netfilter/nft_socket.c
-@@ -61,8 +61,8 @@ static noinline int nft_socket_cgroup_subtree_level(void)
- 	struct cgroup *cgrp = cgroup_get_from_path("/");
- 	int level;
+diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
+index 00d4a9125dfa..970a99a52bf1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_repr.c
++++ b/drivers/net/ethernet/intel/ice/ice_repr.c
+@@ -452,8 +452,8 @@ struct ice_repr *ice_repr_create_vf(struct ice_vf *vf)
+ 		return ERR_PTR(-EINVAL);
  
--	if (!cgrp)
--		return -ENOENT;
-+	if (IS_ERR(cgrp))
-+		return PTR_ERR(cgrp);
+ 	repr = ice_repr_create(vsi);
+-	if (!repr)
+-		return ERR_PTR(-ENOMEM);
++	if (IS_ERR(repr))
++		return repr;
  
- 	level = cgrp->level;
+ 	repr->type = ICE_REPR_TYPE_VF;
+ 	repr->vf = vf;
+@@ -501,8 +501,8 @@ struct ice_repr *ice_repr_create_sf(struct ice_dynamic_port *sf)
+ {
+ 	struct ice_repr *repr = ice_repr_create(sf->vsi);
  
+-	if (!repr)
+-		return ERR_PTR(-ENOMEM);
++	if (IS_ERR(repr))
++		return repr;
+ 
+ 	repr->type = ICE_REPR_TYPE_SF;
+ 	repr->sf = sf;
 -- 
 2.45.2
 
