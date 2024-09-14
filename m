@@ -1,116 +1,84 @@
-Return-Path: <netdev+bounces-128255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBE36978C0C
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:11:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E60D978C14
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:17:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A71D1285E59
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:11:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C82F91F25C0F
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4276F38C;
-	Sat, 14 Sep 2024 00:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC031372;
+	Sat, 14 Sep 2024 00:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wI2qoVS3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mqYlJ2c6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25C191372
-	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 00:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9D6220E6;
+	Sat, 14 Sep 2024 00:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726272692; cv=none; b=BXvooESSYaK+z4HGzIyosBtoSJvisoc4lcT7I5X10mdZ+3uz/rbStyceTV85Odv5GR6upUrCc08VmwN0FOoQT+rlRpoN73QtT47rWSwCg4fb/EG5Temo/LtsJac7XTjeFVGyOlxe71MdFdCrEKg/LmWwGhc94AIaWp4U0AMCryQ=
+	t=1726273052; cv=none; b=iMD+lTkrIsk0UsRjf5O7LAIcJlb2G3ylE6g2d65a69XMBGltgzF5ebU6dJB04uUbvBG2yS3R0+0fEAk8YsIEnMZ6gRR8jRmKdaMAyL1r67xeT7oW/TOf0wmXhjv/BqNeq4rCZIYwAQdoD8HiJW4XmyX2mISORZ3tTOhfZh8lPL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726272692; c=relaxed/simple;
-	bh=k6AXiUShqFWnxWyumWyKNaJ9AtMfMG21fL87GVsnwjc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XUiUqEqNCxw9SPHzNbk56kMvEoH5A9jjpwuFpOy+OK7xkofyA4ET2rvD3SOFpO5TvgKNCqHMARekQMvGUae6uEu+/nJZLeNU9i21dfi2Lmv31sNgfVSXZYk72BGNUJ2cfS9uwd5uB1ZpDn7GY2nskZOtwZFx/wUBnjHL/A7zveI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wI2qoVS3; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <07c19c1a-a526-4307-be44-5abb312cc6d4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726272687;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=alJRYqj31UINifc+9zDFA1uwYd1fHAfT9abqylFnCv0=;
-	b=wI2qoVS3horHkaIWfNWXFpS4fT0pUSGPNSNprNYeuMy/M8wezSxElBzI8+aDikwS+cLPCi
-	QAo7N7m7k1gEvJJjt+SnSL5dKTQqjkx6H+mZ+rBKQXi/hRm0Djbv4kg0nRqJxm2VcPM9qM
-	RoiQyyifYZRJeZ/SjnSnbi8d9quBwNc=
-Date: Fri, 13 Sep 2024 17:11:17 -0700
+	s=arc-20240116; t=1726273052; c=relaxed/simple;
+	bh=ZHm1Lv5MbMyugHEz223tEbfFV1KRfoLFCN+vTWzHnmg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TmwK86R8USv9gZg3NjO4h3T6QEv7OvmJf+Bms81ub+4YpvuEJzAJ801N9zZXt7TpXBxbPDmF/AONsoZ8XaOPncmryECd8BRVY2jQeah3mS6hLeNKwL0WO4EdO9bibq613vSq3XX1OTNQL0PkuE566ge7JdVRAzGf8YjybwC9RIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mqYlJ2c6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19171C4CEC0;
+	Sat, 14 Sep 2024 00:17:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726273050;
+	bh=ZHm1Lv5MbMyugHEz223tEbfFV1KRfoLFCN+vTWzHnmg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mqYlJ2c60vfgMFnBKVwwF+uVAM7efmBHPfOcj9aG3XgSISiKTBvljCTmRcm7nlj3W
+	 vUExlayESGfIbxMrro/lk+6Lt9Fb6p3OwF1Kh1Fm80llxotXee+aeL8vvLN5NFZNKD
+	 SRvdG1FPXSlyK7VsZhwrMaA2PDTX0EhyaAvN7yZQCHCTPCf0O2A4ilDpAOSMMApXVE
+	 t1oFwB4Cn8UiZFPyKIE5tMyUlOtlBCmkFwMJ2/k5tXKqZY+jV++8CMAPPXR5UlWa2b
+	 5HnoQGs2YMdoA22oLv6JBjw8FVwC8dwxNEqLmVbpGczSKmmvviFLtts+A34Or37HCu
+	 oKu4m5XboH8og==
+Date: Fri, 13 Sep 2024 17:17:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stephen Rothwell
+ <sfr@canb.auug.org.au>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [PATCH net-next v2] page_pool: fix build on powerpc with GCC 14
+Message-ID: <20240913171729.6bf3de40@kernel.org>
+In-Reply-To: <CAHS8izMwQDQ9-JNBpvVeN+yFMzmG+UB-hJWVtz_-ty+NHUdyGA@mail.gmail.com>
+References: <20240913213351.3537411-1-almasrymina@google.com>
+	<ZuS0wKBUTSWvD_FZ@casper.infradead.org>
+	<CAHS8izMwQDQ9-JNBpvVeN+yFMzmG+UB-hJWVtz_-ty+NHUdyGA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next/net v6 2/3] selftests/bpf: Add getsockopt to
- inspect mptcp subflow
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
- Geliang Tang <geliang@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Mykola Lysenko <mykolal@fb.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Martin KaFai Lau <martin.lau@kernel.org>
-References: <20240911-upstream-bpf-next-20240506-mptcp-subflow-test-v6-0-7872294c466b@kernel.org>
- <20240911-upstream-bpf-next-20240506-mptcp-subflow-test-v6-2-7872294c466b@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240911-upstream-bpf-next-20240506-mptcp-subflow-test-v6-2-7872294c466b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 9/11/24 8:16 AM, Matthieu Baerts (NGI0) wrote:
-> diff --git a/tools/testing/selftests/bpf/progs/mptcp_bpf.h b/tools/testing/selftests/bpf/progs/mptcp_bpf.h
-> new file mode 100644
-> index 000000000000..179b74c1205f
-> --- /dev/null
-> +++ b/tools/testing/selftests/bpf/progs/mptcp_bpf.h
-> @@ -0,0 +1,42 @@
-> +/* SPDX-License-Identifier: (LGPL-2.1 OR BSD-2-Clause) */
-> +#ifndef __MPTCP_BPF_H__
-> +#define __MPTCP_BPF_H__
-> +
-> +#include "bpf_experimental.h"
-> +
-> +/* list helpers from include/linux/list.h */
-> +static inline int list_is_head(const struct list_head *list,
-> +			       const struct list_head *head)
-> +{
-> +	return list == head;
-> +}
-> +
-> +#define list_entry(ptr, type, member)					\
-> +	container_of(ptr, type, member)
-> +
-> +#define list_first_entry(ptr, type, member)				\
-> +	list_entry((ptr)->next, type, member)
-> +
-> +#define list_next_entry(pos, member)					\
-> +	list_entry((pos)->member.next, typeof(*(pos)), member)
-> +
-> +#define list_entry_is_head(pos, head, member)				\
-> +	list_is_head(&pos->member, (head))
-> +
-> +/* small difference: 'cond_break' has been added in the conditions */
-> +#define list_for_each_entry(pos, head, member)				\
-> +	for (pos = list_first_entry(head, typeof(*pos), member);	\
-> +	     cond_break, !list_entry_is_head(pos, head, member);	\
+On Fri, 13 Sep 2024 15:20:13 -0700 Mina Almasry wrote:
+> I have not reported the issue to GCC yet. From the build break thread
+> it seemed a fix was urgent, so I posted the fix and was planning to
+> report the issue after. If not, no problem, I'll report the issue and
+> repost the fix with a GCC bugzilla link, waiting 24hr before reposts
+> this time.
 
-It probably should use can_loop.
-See commit ba39486d2c43 ("bpf: make list_for_each_entry portable")
+I should have clarified, the "please post ASAP" applies
+to all devmem build fixes, ignore the cool down period :)
 
+> I just need to go through the steps in https://gcc.gnu.org/bugs/,
+> shouldn't be an issue.
+
+Just post the link here, I'll add it to the commit msg when applying.
 
