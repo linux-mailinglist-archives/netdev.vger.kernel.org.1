@@ -1,104 +1,110 @@
-Return-Path: <netdev+bounces-128314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E573D978F50
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 11:01:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 257AA978F55
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 11:02:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34853B245E2
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 09:00:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57BDC1C20A38
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 09:02:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914C61369BC;
-	Sat, 14 Sep 2024 09:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2D8D13B780;
+	Sat, 14 Sep 2024 09:02:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="JCUsxhlW"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from msa.smtpout.orange.fr (smtp-71.smtpout.orange.fr [80.12.242.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CE04C80;
-	Sat, 14 Sep 2024 09:00:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47C0313B280
+	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 09:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726304452; cv=none; b=AYPyJbJfWtLUzBmuAv7ZBC1rjQVLwwIQm4mIJPEEZ8owHK2Mx23vdWEI87lOuAS570L1YGP+MEa5yKYY3AlrfqUdtiSG94qpDIUF57RRUwGJ2wmlbd1QIMoy/qDXXvQhrHDUqwYFJ0dEp9LgpqFR3Zdyk7Q8XuLCMMeQyJYIfBA=
+	t=1726304523; cv=none; b=iWjbYR92o2aGbfuMvNRPoH9SE2liaNHQNjSf8HMWbvSpGw1Hpy4bxm2UxeVMotg7UoYxOCGsp2ebfLlHZ23+KXM0hzeqa/4V7IvTEx28vLdCDca0WbaHmfUnAbmmWssA7FJVrLNef+uhTk2YdHE0TWOndMni0YVz1OtiMk1satk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726304452; c=relaxed/simple;
-	bh=eKOQYWLXaPne6jFaVaOzWLjZsel1T4Pgwevi6Fg7Khg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=pMfqz/pVkjQrTDV+k5HlD8D9U+kHqBi1tXl3HeJT4OY2NS6br2mdWsASb708m8HWTOws2gmkvFfcooiRQ+KEEEnp1PqZfc0UV77uJYQJ9nqj82dmg6EAZkmzVYMkqZpq9UrLpqwnPxRJgavvcZ5P/+BKrq7b/CzJ559GkiuoIR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4X5Q7v2bRzzfc9N;
-	Sat, 14 Sep 2024 16:58:35 +0800 (CST)
-Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id 494F214035F;
-	Sat, 14 Sep 2024 17:00:47 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sat, 14 Sep 2024 17:00:46 +0800
-Message-ID: <315a63f5-712e-c6a0-c447-9dd70253e3aa@huawei.com>
-Date: Sat, 14 Sep 2024 17:00:45 +0800
+	s=arc-20240116; t=1726304523; c=relaxed/simple;
+	bh=RguIB3aGEfSWCgglIE1kYAFxeTfH5FygVmsAfzK51S4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FkmGsilamm1aLmOnRq4bA9ZcUbfR+A8AwITNqsmoZUX5iESY5wA1epE+rxvZkYXsX/9VaI9+3me1E+TYBXHO+hAh8eFz0oyzXV+amO8kGjrzQnUgxlJUefkhyDaimobYoX/YwBkm0xyHrg1RxCQCQ09Gn65Gx5Z1YXZPnezjBps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=JCUsxhlW; arc=none smtp.client-ip=80.12.242.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id pOfCshuFQv6ompOfCsZIYM; Sat, 14 Sep 2024 11:01:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1726304518;
+	bh=knYckm5aJnSchYoHGjtSQ5Mu9N8dnHyi0u0NUCdhg5k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=JCUsxhlWfnXYG7qqBlHRwqWbVdqUSsjgkQL6eUR58kbIeuUVtWohDGPbV5/s2q8Ee
+	 4TSYJVLz5jqr29u0eDWEUW4IbLK1xdclOTn/+c3sdiztY4zYW4r4FmWssPaOiPGkxd
+	 qRyk0A8vwwRLQnQcfRqCScBOLofMPnqZla4+sQTtxLXVZ+u7gpbUnuQ0ubJc4JtXZ7
+	 PvIXA2Y6oFzDf8jmElTU3OgoFNv5CyODjrReBzHeuebceWwtXjgjNs9Gj7fI4OTV1W
+	 w7OJ2fPASMTBKQDpp11+MMZJeuY/RIGb4o9kswfaRZOEh96zUxkZBK/jXewddbJz7I
+	 srteqXsdDNv8A==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Sat, 14 Sep 2024 11:01:58 +0200
+X-ME-IP: 90.11.132.44
+Message-ID: <484a980a-8ea4-490b-89b3-9fca3c471133@wanadoo.fr>
+Date: Sat, 14 Sep 2024 11:01:53 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH -next v3 1/2] posix-timers: Check timespec64 before call
- clock_set()
-Content-Language: en-US
-To: Thomas Gleixner <tglx@linutronix.de>, Richard Cochran
-	<richardcochran@gmail.com>
-CC: <bryan.whitehead@microchip.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<anna-maria@linutronix.de>, <frederic@kernel.org>,
-	<UNGLinuxDriver@microchip.com>, <mbenes@suse.cz>, <jstultz@google.com>,
-	<andrew@lunn.ch>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240909074124.964907-1-ruanjinjie@huawei.com>
- <20240909074124.964907-2-ruanjinjie@huawei.com>
- <Zt8SFUpFp7JDkNbM@hoboy.vegasvil.org>
- <ea351ea0-5095-d7ae-5592-ec3bd45c771c@huawei.com> <874j6l9ixk.ffs@tglx>
- <46efd1be-688e-ecd0-a9e1-cf5f69d0110f@huawei.com> <87v7yz96gr.ffs@tglx>
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-In-Reply-To: <87v7yz96gr.ffs@tglx>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemh500013.china.huawei.com (7.202.181.146)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: ethernet: fs_enet: Make the per clock
+ optional
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+ Pantelis Antoniou <pantelis.antoniou@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, thomas.petazzoni@bootlin.com,
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>
+References: <20240914081821.209130-1-maxime.chevallier@bootlin.com>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20240914081821.209130-1-maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+Le 14/09/2024 à 10:18, Maxime Chevallier a écrit :
+> Some platforms that use fs_enet don't have the PER register clock. This
+> optional dependency on the clock was incorrectly made mandatory when
+> switching to devm_ accessors.
+> 
+> Reported-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> Closes: https://lore.kernel.org/netdev/4e4defa9-ef2f-4ff1-95ca-6627c24db20c@wanadoo.fr/
+> Fixes: c614acf6e8e1 ("net: ethernet: fs_enet: simplify clock handling with devm accessors")
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+> This patch fixes a commit in net-next.
+> 
+>   drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> index d300b01859a1..3425c4a6abcb 100644
+> --- a/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> +++ b/drivers/net/ethernet/freescale/fs_enet/fs_enet-main.c
+> @@ -895,7 +895,7 @@ static int fs_enet_probe(struct platform_device *ofdev)
+>   	 * but require enable to succeed when a clock was specified/found,
+>   	 * keep a reference to the clock upon successful acquisition
+>   	 */
+> -	clk = devm_clk_get_enabled(&ofdev->dev, "per");
+> +	clk = devm_clk_get_optional_enabled(&ofdev->dev, "per");
+>   	if (IS_ERR(clk))
+>   		goto out_free_fpi;
+>   
 
+Reviewed-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
-On 2024/9/13 18:46, Thomas Gleixner wrote:
-> On Thu, Sep 12 2024 at 20:24, Jinjie Ruan wrote:
->> On 2024/9/12 20:04, Thomas Gleixner wrote:
->>> How does this code validate timespecs for clock_settime(clockid) where
->>> clockid != CLOCK_REALTIME?
->>
->> According to the man manual of clock_settime(), the other clockids are
->> not settable.
->>
->> And in Linux kernel code, except for CLOCK_REALTIME which is defined in
->> posix_clocks array, the clock_set() hooks are not defined and will
->> return -EINVAL in SYSCALL_DEFINE2(clock_settime), so the check is not
->> necessary.
-> 
-> You clearly understand the code you are modifying:
-> 
-> const struct k_clock clock_posix_dynamic = {
-> 	.clock_getres           = pc_clock_getres,
->         .clock_set              = pc_clock_settime, 
-> 
-> which is what PTP clocks use and that's what this is about, no?
-
-Yes, it uses the dynamic one rather than the static ones.
-
-> 
-> Thanks,
-> 
->         tglx
+Thanks
 
