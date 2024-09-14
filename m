@@ -1,142 +1,121 @@
-Return-Path: <netdev+bounces-128258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18C4C978C36
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:34:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02BCB978C40
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:43:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDE341F23D69
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:34:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DC0AB23577
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:43:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A3B4414;
-	Sat, 14 Sep 2024 00:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81CD4C80;
+	Sat, 14 Sep 2024 00:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HBvmLCVK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nPlzuzl0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88D5440C
-	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 00:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8C34C76
+	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 00:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726274080; cv=none; b=n9cPwOGPmVHVsNCzUEgo4ARooxCxShohStDhgwjYZYv4PEMdTzYV6vaBcDVVTn1wAZ6on/t1U0KQgjxk311cbvSEHcSaWq8uOYgtH1h7eLWQ5sWYqk9+fsP0CfNT9lEnFFZo/4VGNN6PCLmasklzpYQSAVSv2iie999enJy3D7I=
+	t=1726274623; cv=none; b=jp/UW38zXGioDT4vrDF9BpaiqDEbww7Q0rUqdQxjqQo7L06kjCIhs3+QeHnQQUzUX4e5YfSK2+lo+AxHwN9pNOHEQmUJAYyQuxlicWkUfiC4dXYGJyTXmWiDR2FHLtNQb42eOf8j0j3RaIZBt+MLpMSnw29HZAGqiXtRa4awxnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726274080; c=relaxed/simple;
-	bh=mzHLQrqSeQieg3UjlAKUaXdRI6j+XnCY5vAU6UlYWmc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M7q928OVfdET89xOv+8fExF6Ku15Ab3rasXqcoU3abHLrxsLjFIatoE5Gh0MGCAB7d4vk7/Ef6haB5pY+S6aUONG06gAnXy+uv+GDxj6atjnNQ7DOA/ly+AonKD96ORWyTzGV2EsDvYjBXbtoPoE8Iy/ymqQGhNDvHOLyFX8bDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HBvmLCVK; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fc47abc040so23820725ad.0
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 17:34:38 -0700 (PDT)
+	s=arc-20240116; t=1726274623; c=relaxed/simple;
+	bh=TUrY80ehNCka8U/7IMHBt62KZb3yd9vuXPbLAb87cq8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fQJA+hqQK+S7JvLaF4PybmlLpkzyShAR/GqSuIbSJ9+UuIoclt2ar1Yv6aaI9/TJx3p+874lgcEyY5j+lT4fwEYyWk/lAUi4sRQxBkk7Hk1yiuKyrW8GP8bgIBjXuIGXFwD5m1gnR+Ufr1q8UwFyn09AIM+Ye3xOc3HaWiVFz+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nPlzuzl0; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-39d2a107aebso112275ab.0
+        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 17:43:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726274078; x=1726878878; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jKNPb/025srgmjPIqCQe9c2UaJSrYB8BynH4jjtFvO0=;
-        b=HBvmLCVKKtbL6E+zNovFXrj/UJkoD0qGkPYdoeHWK3TVii6SsBfw6YlCmzI2dsFfiA
-         YodGXBQDlDq5xvvKKQ0uxiyC40+eLzQUUd6RpMUWXD9hIcM3+l6IDw0GzF09xQHc1pyC
-         +TYcKgpJ7ZhlPKrTpwYVVsd12CUac7L3RujWyhBg8u5lTO8n9yFIFcFoVdxu0oCP0GSz
-         ESxYEBissBu1UETF2mL60WSrG+MlgkW67aWuPKBQ93uBGyfs5XZBNlH+GUxB2cQBBEUq
-         ezbBB9aUcqYfDNmHRKyWeJUxJzWD6VkRMs/a/at62RBNBX0rTnbpS0APoZkhIN0ll8Zi
-         IqAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726274078; x=1726878878;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1726274621; x=1726879421; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jKNPb/025srgmjPIqCQe9c2UaJSrYB8BynH4jjtFvO0=;
-        b=aP4hFiwu5Gtu79y19w9voMv9u4CjctuvwEqG43zlSwafWP7algQyyYt4HFVPhigaMO
-         Fm9wKNOezoH5vVyCMdjvknJmkbKqET8HcdxQ8TAa7YxYLZdpDxWEwOintLsWy5wFmzzS
-         1y88NL0OUfbahKE/FUogbFkfDiTsqxZlxFp7Pl2fsAB3ZxwHkwJJ6hl0t7AUKeHa9xQq
-         I3YucyshfiXOy2meE6O7cZklV4GTBBFYMNJ+KbE9y9eOBUSIDih1KAUHKpnU/sXt1S/U
-         W/Hs5OwnpctF2iM2EDPUNQKRxg+X+3ytbO3ts/+DLUA1twQN3Kgs1nYBWPhIA02F/F0T
-         jKJA==
-X-Forwarded-Encrypted: i=1; AJvYcCX29iStJsfft/gkcvc1f9iJdTov4oRzzSG3gUA6dLo0mocRgyfz+M5tybIuy/3hftISAqVkg6g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy2956PAu8I7va+7tjVhnoHX8fS7SZyCzdsdZH8uk6Sc5tXQ6NH
-	iR8n7NmDg9aRwVAjT/zD5Q8QV9cEmbdxRknBhbrFFS6wKxvWMZZirwMmWIXx
-X-Google-Smtp-Source: AGHT+IHB0vVAfpGvoUbUUvR1MJiOCauzkmdjZxNwF7a59uTEd7FV9PuqR+IAJfdqmhK2IUUKxsXyQA==
-X-Received: by 2002:a17:902:e742:b0:206:a3a9:197c with SMTP id d9443c01a7336-2076e43d052mr115342455ad.49.1726274077793;
-        Fri, 13 Sep 2024 17:34:37 -0700 (PDT)
-Received: from localhost ([2601:647:6881:9060:97be:e4c7:7fc1:f125])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207947130bdsm1770485ad.231.2024.09.13.17.34.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2024 17:34:36 -0700 (PDT)
-Date: Fri, 13 Sep 2024 17:34:35 -0700
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: John Fastabend <john.fastabend@gmail.com>,
-	Jakub Sitnicki <jakub@cloudflare.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: Re: [PATCH RFC net] net: sockmap: avoid race between
- sock_map_destroy() and sk_psock_put()
-Message-ID: <ZuTaGwM/8bTdWx1h@pop-os.localdomain>
-References: <20240905064257.3870271-1-dmantipov@yandex.ru>
- <Zt3up5aOcu5icAUr@pop-os.localdomain>
- <5d23bd86-150f-40a3-ab43-a468b3133bc4@yandex.ru>
- <ZuEdeDBHKj1q9NlV@pop-os.localdomain>
- <1ae54555-0998-4c76-bbb3-60e9746f9688@yandex.ru>
- <ZuHJQitSaAYFRFNB@pop-os.localdomain>
- <9c8146a5-c7fc-40ae-81bb-37a2c12c2384@yandex.ru>
+        bh=TUrY80ehNCka8U/7IMHBt62KZb3yd9vuXPbLAb87cq8=;
+        b=nPlzuzl0Nc/X+2IaHPj1dbEl5Yce/9K8Swfnhzig9YV4I9dOASphObM/6QXZRvpTZI
+         F4TM4iYbmzDoGrRZstzc0fQFf26pcESRMwct5Wj4YGECDEU7v8TEyljDBekDItSWKw3A
+         gt9/l3u2ZDnS8szNqWiuiRhJTgtCUXK074P5GPQQrA7mYSRKZwaUd7mF825aSAaBA/RD
+         YvMiLvOy9dtcCtZ4ltFJ7kakn1wl4WCg+beHND1VV4YqPN2oaYnlEXiuReS21xaJLwup
+         c8z04yEfKemxmHhgpyo70Fl5C0eTNKthhBFyszTdXKo151Iu7cWpCmSpKbwUdB4G6nlz
+         iNHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726274621; x=1726879421;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TUrY80ehNCka8U/7IMHBt62KZb3yd9vuXPbLAb87cq8=;
+        b=FrhxlYiFQscjfm9gTcwgG/+BUG8bVleMDJ7+N59Y5g5H+l2VmOUF+7nVEmmhyIe76Y
+         YI0jHe73sGza4zfiOr+wuq3qPhjSZGOjyKyJWwK3BUxOYrDRg9WVgriMtmiPOYePKWqT
+         Ekl9Lw5KfC4BOlcJx8LWi0Y/oxlttFoehVkHjYZXvbpCtW1v3DUcXKvYRhPBZw5xO6n5
+         gxbg9U6NBhZgIXJPa3lz8mEHVMzZCDzyUqbcdUJ736/lT9oALVp2WPjc3Pu+6nk6Ruzl
+         n3nKRdUqRyq2lunOjE3URKE/wnK+fN7ueW7vcZA4cAKz4zC+gXTfvsBeZ+8AE43eCdvG
+         6iTA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKP+M3zbLThCvlf7qHn2sjohbqQqqtOKzRFF8dSlnx/phbG9CAK8Xh5+eImYDT/+jBU0EQWXg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyk2vgDu9IB6++UKPPmV1c7yDh6VrNKHH6FO5xUPX354ITtS999
+	NfTCnRfD/Jw1bgdYoQbr9a0DUiyn6cwX5WmgMJuDimu5KjRTCFdbn/con1hJZO1wAuZvNIp+CE0
+	QMCAW06u8jxIU8pz2IHvVZlCMoWOcsbnlhWC8
+X-Google-Smtp-Source: AGHT+IHSaLglF5wz9mRniAwttRxI65kTwctZxzJQBTwNtA0gsvJL1chvFzwE6pyoct9NSOfvWET8xaMujC2vxvEZXKc=
+X-Received: by 2002:a05:6e02:1c41:b0:39f:3778:c896 with SMTP id
+ e9e14a558f8ab-3a0856908e3mr10731525ab.5.1726274621421; Fri, 13 Sep 2024
+ 17:43:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9c8146a5-c7fc-40ae-81bb-37a2c12c2384@yandex.ru>
+References: <20240913213351.3537411-1-almasrymina@google.com>
+ <ZuS0wKBUTSWvD_FZ@casper.infradead.org> <CAHS8izMwQDQ9-JNBpvVeN+yFMzmG+UB-hJWVtz_-ty+NHUdyGA@mail.gmail.com>
+ <20240913171729.6bf3de40@kernel.org>
+In-Reply-To: <20240913171729.6bf3de40@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 13 Sep 2024 17:43:29 -0700
+Message-ID: <CAHS8izO+AgUQwMXQ_17bRvLetcgSUJCXhOeQre2Z49XDd8kdrQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] page_pool: fix build on powerpc with GCC 14
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stephen Rothwell <sfr@canb.auug.org.au>, Linux Next Mailing List <linux-next@vger.kernel.org>, 
+	Arnd Bergmann <arnd@arndb.de>, 
+	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 12, 2024 at 06:59:39PM +0300, Dmitry Antipov wrote:
-> On 9/11/24 7:45 PM, Cong Wang wrote:
-> 
-> > I guess you totally misunderstand my point. As a significant sockmap
-> > contributor, I am certainly aware of sockmap users. My point is that I
-> > needed to narrow down the problem to CONFIG_RDS when I was debugging it.
-> 
-> I've narrowed down the problem to possible race condition between two
-> functions. "Narrowing down" the problem to a 17.5Kloc-sized subsystem
-> is not too helpful.
+On Fri, Sep 13, 2024 at 5:17=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Fri, 13 Sep 2024 15:20:13 -0700 Mina Almasry wrote:
+> > I have not reported the issue to GCC yet. From the build break thread
+> > it seemed a fix was urgent, so I posted the fix and was planning to
+> > report the issue after. If not, no problem, I'll report the issue and
+> > repost the fix with a GCC bugzilla link, waiting 24hr before reposts
+> > this time.
+>
+> I should have clarified, the "please post ASAP" applies
+> to all devmem build fixes, ignore the cool down period :)
+>
+> > I just need to go through the steps in https://gcc.gnu.org/bugs/,
+> > shouldn't be an issue.
+>
+> Just post the link here, I'll add it to the commit msg when applying.
 
-Narrowing down from more 30 millions lines of code to 17.5K is already a huge
-win to me, maybe not for you. :)
+Ah, I need a GCC bugzilla account before I can file bugs there. I
+don't currently have one and creating an account involves emailing
+them and waiting 24hr. I've done that and am waiting for an account.
+I'll file the issue as soon as I get access and post the link here.
+I'm also poking to see if anyone around already has an account and can
+file the issue on my behalf.
 
-> 
-> > So, please let me know if you can still reproduce this after disabling
-> > CONFIG_RDS, because I could not reproduce it any more. If you can,
-> > please kindly share the stack trace without rds_* functions.
-> 
-> Yes, this issue requires CONFIG_RDS and CONFIG_RDS_TCP to reproduce. But
-> syzbot reproducer I'm working with doesn't create RDS sockets explicitly
-> (with 'socket(AF_RDS, ..., ...)' or so). When two options above are enabled,
-> the default network namespace has special kernel-space socket which is
-> created in 'rds_tcp_listen_init()' and (if my understanding of the namespaces
-> is correct) may be inherited with 'unshare(CLONE_NEWNET)'. So just enabling
-> these two options makes the kernel vulnerable.
-
-Thanks for confirming it.
-
-I did notice the RDS kernel socket, but, without my patch, we can still
-use sockops to hook TCP socket under the RDS socket and add it to a
-sockmap, hence the conflict of sock->sk->sk_user_data.
-
-My patch basically prevents such TCP socket under RDS socket from being
-added to any sockmap.
-
-> 
-> So I'm still gently asking you to check whether there is a race condition
-> I've talked about. Hopefully this shouldn't be too hard for a significant
-> sockmap contributor.
-
-If you can kindly explain why this race condition is not related to RDS
-despite the fact it only happens with CONFIG_RDS enabled, I'd happy to
-review it. Otherwise, I feel like you may head to a wrong direction.
-
-Thanks.
+--
+Thanks,
+Mina
 
