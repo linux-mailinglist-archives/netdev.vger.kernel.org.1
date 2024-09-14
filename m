@@ -1,126 +1,137 @@
-Return-Path: <netdev+bounces-128367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81354979318
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 21:03:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FC00979322
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 21:08:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3F721C21093
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 19:03:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F03F21F2207E
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 19:08:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A71D1B978;
-	Sat, 14 Sep 2024 19:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDE583CD9;
+	Sat, 14 Sep 2024 19:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Xwqc7nsf"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="aA0kH9Kk"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB53BBA49;
-	Sat, 14 Sep 2024 19:03:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0C65476B;
+	Sat, 14 Sep 2024 19:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726340632; cv=none; b=PgAosQpVMYACO90aoGbwzATnXGiRd3oHWHRYu3Hf3bd8DOKrrQaXlvw7Xjl2PpGGnwsTD9uYsnYfDCGWQLXSJTYhgo0NGrFaGRkX+8E5RowhAdjbOty9YopwDfiptyQhi435O/speXKNfk8VNC/aC+StRGdTnlwNfeaghklCXvs=
+	t=1726340921; cv=none; b=fOUmw+XVy6jwi3jZHs6StjukzVvbNdxGKhhSvuDqPPjhxLtg3lfCA3oYFb3y322wlxhKe3N8K/fb9yn+R1M+pipLO+vRpeCDyT4oyt/KuYVa2knLaeSFiSdTZjqNLwbjQT/fy1testXa2ynzGK6FOtXhDUUF4Tn76dIUWvYdk9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726340632; c=relaxed/simple;
-	bh=ME7sk2AmCoCHu/rkVug9j87MuQpxKkQkN3VLinh7z4I=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YZpzwrZOGm4gBfiYccOwQZOFDrmtsXyo1RWJyYVrp5Yo7WZJDcET/zAbGD2OBZ+w7470BFanyR56e2jON+xW+KIBg2M6fiNYKge7hCiyEx2uEzorpZaWz28NxsLsxAo7wp2/49Zr41i6B6lq0mDEW+XOJnYA+QDGxZWBBjib7P0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Xwqc7nsf; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1726340629; x=1757876629;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ME7sk2AmCoCHu/rkVug9j87MuQpxKkQkN3VLinh7z4I=;
-  b=Xwqc7nsfJQthU5DRJcfQwlLaHu7x5DfrQ8u0VU2CraqKXeOoykj3gOmj
-   dGr89t8nIfWthfoNIOe1KFNoSJLx8vvpbndc2J/aI+CYGnGTfQYOBtqDa
-   nzfAUjkfEVWgQfE9fVlNu784eFW9l1zODX7Rdg01N0TbQW2BnChU2/LDb
-   9XIhTAFrK4qlrcytdpN8m4ntoCVsTcOE5nHASP4lNulIvfLipabrrC7sE
-   PjmH5cVWsv69+OWI6H02Og/9TpAXqADzdFGnfFrj78qKhWgOkbZ9YTiCU
-   GNfFLcNEft3ggF0BQCi3BdueVH3VL1K63tc+XM77lbkD8eQAJAs38tuqV
-   Q==;
-X-CSE-ConnectionGUID: 7QGG7ucfREGEfXw/1IAUpw==
-X-CSE-MsgGUID: pg4eQ+CyQ6KPIJB9iSKGLg==
-X-IronPort-AV: E=Sophos;i="6.10,229,1719903600"; 
-   d="scan'208";a="31675481"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Sep 2024 12:03:48 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
- chn-vm-ex02.mchp-main.com (10.10.87.72) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sat, 14 Sep 2024 12:03:46 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
- (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Sat, 14 Sep 2024 12:03:44 -0700
-Date: Sat, 14 Sep 2024 19:03:43 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Aakash Menon <aakash.r.menon@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <lars.povlsen@microchip.com>,
-	<Steen.Hegelund@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<aakash.menon@protempis.com>, <horms@kernel.org>,
-	<horatiu.vultur@microchip.com>, <netdev@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: sparx5: Fix invalid timestamps
-Message-ID: <20240914190343.rq3fhgadxeuvc5qb@DEN-DL-M70577>
-References: <20240913193357.21899-1-aakash.menon@protempis.com>
+	s=arc-20240116; t=1726340921; c=relaxed/simple;
+	bh=igLWrUMalHNuo/JvrtqATze08C1+QPyMEMgPZKPU1nQ=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=k73/qRDwePGVRs9A6JtQI2NXhvEG85JwvYPQ5r7shM/uabAjmQ0QhbVh1oT+z1H7t3AEWrzurkq8YR0w1dlEEhrfQ4i0aA2rtudOyb9sKXYnlgS4dOC8krIa7jS6QraLRULk4K/Tu8NGfVhPTRBCo9bE6LiU9MY9N6du+NdfAv4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=aA0kH9Kk; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=/RmgvQdkupwCieq+lND0mlPnkDQ+yuLauIg41h7E0Ng=; b=aA0kH9KkgT6DO/GaWr6zNx1nhr
+	VAL/WXFgBUW/zCe/1aQJm/mRDanqbfa4TwnCMR/c0YnQeQD10CQy1VWEzvKI4l/CCOON/wM0MRXqy
+	nnhxjbZX7VnlNCDLXjoW44A9+4Hw2tQAwHyTlEFd0v/ULr0mw5Z9EjNB+Y1lzRnTsENBsDmmxTMyO
+	cb0Rq+1Jav7Vyb9Ie9ckBbVrOvymY27DdjN+MHHEugbgHfxgzuHWEmRWtsRE5DYbscrOxitVz9Az8
+	jTKk2StKFat6v/NmxnjLfAuSgrDpb1ksrtTlGBq/jPP7B0DyV9N8q2bQSwQ93He2xCtwh9wWWVRjW
+	EfRPjg2Q==;
+Received: from sslproxy02.your-server.de ([78.47.166.47])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1spY8H-000P16-CT; Sat, 14 Sep 2024 21:08:33 +0200
+Received: from [85.1.206.226] (helo=linux-1.home)
+	by sslproxy02.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1spY8G-0008If-0Z;
+	Sat, 14 Sep 2024 21:08:32 +0200
+Subject: Re: [PATCH net] netkit: Ensure current->bpf_net_context is set in
+ netkit_xmit()
+To: Jordan Rife <jrife@google.com>, Nikolay Aleksandrov
+ <razor@blackwall.org>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Kees Cook <kees@kernel.org>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, Alexei Starovoitov
+ <ast@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ =?UTF-8?Q?Toke_H=c3=b8iland-J=c3=b8rgensen?= <toke@redhat.com>,
+ bpf@vger.kernel.org, stable@vger.kernel.org
+References: <20240914184616.2916445-1-jrife@google.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <a8ed72fe-416f-d5ed-c59f-85ec59afcc40@iogearbox.net>
+Date: Sat, 14 Sep 2024 21:08:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240913193357.21899-1-aakash.menon@protempis.com>
+In-Reply-To: <20240914184616.2916445-1-jrife@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27398/Sat Sep 14 10:42:15 2024)
 
-> Bit 270-271 are occasionally unexpectedly set by the hardware.
+Hi Jordan,
+
+On 9/14/24 8:46 PM, Jordan Rife wrote:
+> When operating Cilium in netkit mode with BPF-based host routing, calls
+> to bpf_redirect() cause a kernel panic.
 > 
-> This issue was observed with 10G SFPs causing huge time errors (> 30ms) in PTP.
+> [   52.247646] BUG: kernel NULL pointer dereference, address: 0000000000000038
+> ...
+> [   52.247727] RIP: 0010:bpf_redirect+0x18/0x80
+> ...
+[...]
+> Setting a breakpoint inside bpf_net_ctx_get_ri() confirms that
+> current->bpf_net_context is NULL right before the panic.
 > 
-> Only 30 bits are needed for the nanosecond part of the timestamp, clear 2 most significant bits before extracting timestamp from the internal frame header.
+> (gdb) p $lx_current().bpf_net_context
+> $4 = (struct bpf_net_context *) 0x0 <fixed_percpu_data>
+> (gdb) disassemble bpf_redirect
+> Dump of assembler code for function bpf_redirect:
+>     0xffffffff81f085e0 <+0>:	nopl   0x0(%rax,%rax,1)
+>     0xffffffff81f085e5 <+5>:	mov    %gs:0x7e12d593(%rip),%rax
+>     0xffffffff81f085ed <+13>:	push   %rbp
+>     0xffffffff81f085ee <+14>:	mov    0x23d0(%rax),%rax
+> => 0xffffffff81f085f5 <+21>:	mov    %rsp,%rbp
+>     0xffffffff81f085f8 <+24>:	mov    0x38(%rax),%edx
+> ...
+> (gdb) continue
+> Continuing.
 > 
-> Signed-off-by: Aakash Menon <aakash.menon@protempis.com>
-> ---
->  drivers/net/ethernet/microchip/sparx5/sparx5_packet.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> Thread 1 hit Breakpoint 1, panic ...
+> 288	{
+> (gdb)
 > 
-> diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
-> index f3f5fb420468..a05263488851 100644
-> --- a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
-> +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
-> @@ -45,8 +45,12 @@ void sparx5_ifh_parse(u32 *ifh, struct frame_info *info)
->         fwd = (fwd >> 5);
->         info->src_port = FIELD_GET(GENMASK(7, 1), fwd);
+> commit 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct
+> on PREEMPT_RT.") recently moved bpf_redirect_info into bpf_net_context,
+> a new member of task_struct. Currently, current->bpf_net_context is set
+> and then cleared inside sch_handle_egress() where tcx_run() and tc_run()
+> execute, but it looks like netkit_xmit() was missed leaving
+> current->bpf_net_context uninitialized when it runs. This patch ensures
+> that current->bpf_net_context is initialized while running
+> netkit_xmit().
 > 
-> +       /*
-> +        * Bit 270-271 are occasionally unexpectedly set by the hardware,
-> +        * clear bits before extracting timestamp
-> +        */
->         info->timestamp =
-> -               ((u64)xtr_hdr[2] << 24) |
-> +               ((u64)(xtr_hdr[2] & 0x3F) << 24) |
->                 ((u64)xtr_hdr[3] << 16) |
->                 ((u64)xtr_hdr[4] <<  8) |
->                 ((u64)xtr_hdr[5] <<  0);
-> --
-> 2.46.0
->
+> Signed-off-by: Jordan Rife <jrife@google.com>
+> Fixes: 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
 
-Hi Aakash,
+Thanks for the fix! Similar patch is however already in net tree :
 
-I will (or somebody else) try to reproduce and test this at the
-beginning of the next week.
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=157f29152b61ca41809dd7ead29f5733adeced19
 
-Meanwhile, you can address the issues that Simon mentioned.
-
-Thanks.
-
-/Daniel
+Best,
+Daniel
 
