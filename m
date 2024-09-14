@@ -1,140 +1,262 @@
-Return-Path: <netdev+bounces-128364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 191259792C5
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 20:01:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 874DB9792F7
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 20:32:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 243C41C213C5
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 18:01:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A66731C2158E
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 18:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F35A1D0DF5;
-	Sat, 14 Sep 2024 18:01:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhMkeycc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250EA1D1311;
+	Sat, 14 Sep 2024 18:32:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291B225570;
-	Sat, 14 Sep 2024 18:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D36C1D04BA
+	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 18:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726336891; cv=none; b=RdgJo4w7VrKrWTGCzDSkB9mS7Vl6MrlA/dH+361ILs2tUdz+9hiD1qAwuy3Ab4sTw0eexdXl2M97fx23Kf2GppENjcLEkES3ths4WQ3armnn0tYkFLBNY3lnDAauBL4BCdEepZdL6oetRFmhHxcx1LSfkoKlfB74I4iwP+uj4Io=
+	t=1726338755; cv=none; b=WfjHWpJH3yMi2gS2blFL9t8smsHdilzUkjHubo29IkeR3EZa908MSeQOjSwE9qxMJC0zD6dxnFAbnY7rOKILtyFh3aTpyJX4JJLE5/mW93fzqD6BSeOmTdmykYVpcWiWoOYEZoNSW4XEvXVzJ9TGf13CIIyF/f5hqitCDwMbk2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726336891; c=relaxed/simple;
-	bh=EaXTg0fhYhKlMAhnjdqCWjgdbkEkdMiKi1ZpWRKVxaA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qaTfoq976QUGtKS+BeCA4mYGdrTQKDdMSPVMVsElqC1FX83pUkEVyl4eZZhQ77DjLtWbLXzLLaQBqgjO0v3LnC4jS9EgQOLzGnC6x3Zkh3jGpp3lTZEKb0fUz9fBR6pUQ/G90rE0cHWx5rduRkpf4SlFi2p+5TsV+wXYCaVsq+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhMkeycc; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7163489149eso1550163a12.1;
-        Sat, 14 Sep 2024 11:01:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726336889; x=1726941689; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XbSIPsNwM+GygjUQiHgIjZSdk5AT/foDOOu2Hhk5z6I=;
-        b=OhMkeyccSVN7+VO8S+c1s0m3nknZQKtv0R06RKh5G7BI9gbRh6Xyi0DR9NSyu6DJb+
-         KTXSGP735afaXG1AUP3QZv+ufVIe+5fdpPxP/mHMphKzywVNV7q6uL+Tixlrlkb3S9F8
-         /AH1lIxlaGUD27LUEtDcEQPUyiYS+6fFc5GaiBgTbmHDDkdNyOvDExSzOu4RAjxawETD
-         37pRFhgto25zEcLHVzC163sm857vplBtXfZx3wL+ERM7xX8byAic792agePQ75wo/LvJ
-         Sr7gShh1nTWEfQsDRf/7PwBITufyX8+Jva1+YHHe/PIbPwzesoWeqSEafbMJRK55P9MR
-         AH3g==
+	s=arc-20240116; t=1726338755; c=relaxed/simple;
+	bh=4NzyaYcFLyFdiwFlH1SF4vhTsrTJ+gOMxR6mOjJ10TY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PHQxlkPJeoI8ZrLuZX1zzCC5R8hFSEP4azTIb63uUqzyn61SVs0efopDGzeUMHc5SHmAQCUiZ59xfaKbVHGMsWIQt3/0hkMFNwWe8DAP1Jb//4WI9+Eq8hhzzZrEUAKtfU6nF5Qzt6lDBEh+85TkKTlaiJ+5tYvGb9e7dXnOTBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-82aa499f938so743039539f.0
+        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 11:32:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726336889; x=1726941689;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XbSIPsNwM+GygjUQiHgIjZSdk5AT/foDOOu2Hhk5z6I=;
-        b=AbIBprSOnJD/h0dbRxyQhmpRdsZTYEplx290sHdsW7jSshLJCrPzqlSgeB/75ZnkAZ
-         qL6OEazZ/swTCRpnTLncXASDBAA//y83fqu2YbMOl24kDeCWZwjPqUxZgB1T9blQLm7E
-         hgb1UHqPNbYfaPcYSf++kxkXoBL52So3uYdgxrDNLNTMtka0OADQ6MReDPVgz/4VjsbV
-         D9DT1NZaJB/4BgX6MRD8zNlARw6aliHptEArQJVT/KeMcBa4Rkl2bOeIDK4JNvqiAEhf
-         sd4iZO7v4zfGr/LmFR62qNhOfrP2xaia4uQaW+YzhFuD1N3lUIKPnnBoCfc6LUS4ADEz
-         tGCw==
-X-Forwarded-Encrypted: i=1; AJvYcCVZcSsWFCpeq4HZ50mCW27RjlA7cia0Q0SKNHwltP1ldpZd9CHpsJVnJ2WG8amSoKjQhmN1gRW9@vger.kernel.org, AJvYcCWI7msdbLChtM2yeHfqdlbGNlbiAZeLA9+QNqrSwVUQL6WY9G9bo7B+Hb8OnbMECYPOVNKtWPo89FPnvKU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz47aoqRadXrrxwaiI15/t6msJW9jRjhvrjU+dHnMREhA0/j0hu
-	nq+IHhpm6ia7mUmZA8qw+It1Xf1dCpHopa+ASfrdmj1REigQGv0=
-X-Google-Smtp-Source: AGHT+IE/XcI7dmdhav37V8UBI2gAzMbDfWaZbfgdeK883ntq5EiqWrStfVgr69CkXWeHsWldkIfB9Q==
-X-Received: by 2002:a17:90a:9a7:b0:2d3:c8e5:e548 with SMTP id 98e67ed59e1d1-2dbb9dfbddcmr9271957a91.13.1726336889217;
-        Sat, 14 Sep 2024 11:01:29 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbcfd09a72sm1830978a91.23.2024.09.14.11.01.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Sep 2024 11:01:28 -0700 (PDT)
-Date: Sat, 14 Sep 2024 11:01:27 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Qianqiang Liu <qianqiang.liu@163.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: check the return value of the copy_from_sockptr
-Message-ID: <ZuXPd-YlNhgRAhBW@mini-arch>
-References: <CANn89iKhbQ1wDq1aJyTiZ-yW1Hm-BrKq4V5ihafebEgvWvZe2w@mail.gmail.com>
- <ZuFTgawXgC4PgCLw@iZbp1asjb3cy8ks0srf007Z>
- <CANn89i+G-ycrV57nc-XrgToJhwJuhuCGtHpWtFsLvot7Wu9k+w@mail.gmail.com>
- <ZuHMHFovurDNkAIB@pop-os.localdomain>
- <CANn89iJkfT8=rt23LSp_WkoOibdAKf4pA0uybaWMbb0DJGRY5Q@mail.gmail.com>
- <ZuHU0mVCQJeFaQyF@pop-os.localdomain>
- <ZuHmPBpPV7BxKrxB@mini-arch>
- <ZuHz9lSFY4dWD/4W@pop-os.localdomain>
- <ZuH4B7STmaY0AI1m@mini-arch>
- <ZuTdhIZtw8Hc7LXP@pop-os.localdomain>
+        d=1e100.net; s=20230601; t=1726338752; x=1726943552;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vCk7m8bdTlsEaBcbvj4x/KUx6uyEvQuBhZ5cw+5b2WI=;
+        b=QJET73aaW2Jobf4fb6hy5NaXlYhX+2+SResjl8w2Y520n18t7ikjohP97khievcQ2M
+         XB9u/2yTAoQBxoSIC0ipMCkjFVOawY3zjqiZ/ksdJ41uJdX6OP3pPk/7eTKAE/xnFBYf
+         rkQeqAb7NEoSNh2m4LwFuN+o8NUy64QvCjf6PgFhfzNpXb8F7io5z9nMzQ5KlFgwIQWL
+         +b4M1x6MDCb+KIHIA6blmBFqqHn0vUTK4soN7exT/S7u7tbFvMnm7nZwIGDTTM9jul4N
+         0CKv1wY5I2fP3p9I8VEQuyUxtLs/h8grlT8Vms+jircYvOGts8Xm3nl1Bvq0JXGSbVtk
+         RfYg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9gv9Mx0mWAHtv8XwGSQ4yujRbu9NFJ6q0bjP4Tv1SZA0h1tRcsL5665kpqMlrB5KUiXZjWnA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSXAS5zHdIQAc7Bb/rLH0z2cAuuEcqNq58K3Bc3Z8QSsWYmco2
+	TtNysFnQXgWL2JP6WxbOfIw8CgJEffQvklr/pnu2ewzFPsnQdOu4p4x2wxZmZcqPU/D0BJ56mu3
+	YeM6aqpu64Qp6wIE3T/7rknM+wuBiBE3drKoN8ODeV1PeUanp3LiaVFk=
+X-Google-Smtp-Source: AGHT+IHxfv/r6206/lgRVgpCntlAQjD6LhnnFmcb01k6yxsxSfB4NczYR/dBfZGAaVKF2C2l3+Akv3WNu1DvjkO7Gq66zDDgSjMc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZuTdhIZtw8Hc7LXP@pop-os.localdomain>
+X-Received: by 2002:a05:6e02:1d88:b0:395:e85e:f2fa with SMTP id
+ e9e14a558f8ab-3a084611b38mr89973065ab.1.1726338752490; Sat, 14 Sep 2024
+ 11:32:32 -0700 (PDT)
+Date: Sat, 14 Sep 2024 11:32:32 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001abfb506221890b2@google.com>
+Subject: [syzbot] [hams?] possible deadlock in nr_rt_device_down (3)
+From: syzbot <syzbot+ccdfb85a561b973219c7@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, ralf@linux-mips.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 09/13, Cong Wang wrote:
-> On Wed, Sep 11, 2024 at 01:05:27PM -0700, Stanislav Fomichev wrote:
-> > On 09/11, Cong Wang wrote:
-> > > On Wed, Sep 11, 2024 at 11:49:32AM -0700, Stanislav Fomichev wrote:
-> > > > Can you explain what is not correct?
-> > > > 
-> > > > Calling BPF_CGROUP_RUN_PROG_GETSOCKOPT with max_optlen=0 should not be
-> > > > a problem I think? (the buffer simply won't be accessible to the bpf prog)
-> > > 
-> > > Sure. Sorry for not providing all the details.
-> > > 
-> > > If I understand the behavior of copy_from_user() correctly, it may
-> > > return partially copied data in case of error, which then leads to a
-> > > partially-copied 'max_optlen'.
-> > > 
-> > > So, do you expect a partially-copied max_optlen to be passed to the
-> > > eBPF program meanwhile the user still expects a complete one (since no
-> > > -EFAULT)?
-> > > 
-> > > Thanks.
-> > 
-> > Partial copy is basically the same as user giving us garbage input, right?
-> > That should still be handled correctly I think.
-> 
-> Not to me.
-> 
-> For explict garbage input, users (mostly syzbot) already expect it is a
-> garbage.
-> 
-> For partial copy, users expect either an error (like EFAULT) or a success
-> with the _original_ value.
-> 
-> It is all about expectation of the API.
-> 
-> Thanks.
+Hello,
 
-The best way to move this forward is for you to showcase what is exactly
-broken by adding a test case to one of the tools/testing/selftests/bpf/*sockopt*
-files.
+syzbot found the following issue on:
 
-We can then discuss whether it warrants the copy_from_sockptr check or
-some other remediation.
+HEAD commit:    4c8002277167 fou: fix initialization of grc
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=10513877980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=660f6eb11f9c7dc5
+dashboard link: https://syzkaller.appspot.com/bug?extid=ccdfb85a561b973219c7
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/9058e311cdd1/disk-4c800227.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1659255894d5/vmlinux-4c800227.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/04227ccb2e58/bzImage-4c800227.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ccdfb85a561b973219c7@syzkaller.appspotmail.com
+
+======================================================
+WARNING: possible circular locking dependency detected
+6.11.0-rc6-syzkaller-00180-g4c8002277167 #0 Not tainted
+------------------------------------------------------
+syz.1.4509/22182 is trying to acquire lock:
+ffffffff8fde86d8 (nr_node_list_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffffffff8fde86d8 (nr_node_list_lock){+...}-{2:2}, at: nr_rt_device_down+0xb5/0x7b0 net/netrom/nr_route.c:517
+
+but task is already holding lock:
+ffffffff8fde8678 (nr_neigh_list_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffffffff8fde8678 (nr_neigh_list_lock){+...}-{2:2}, at: nr_rt_device_down+0x28/0x7b0 net/netrom/nr_route.c:514
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (nr_neigh_list_lock){+...}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       nr_remove_neigh net/netrom/nr_route.c:307 [inline]
+       nr_dec_obs net/netrom/nr_route.c:472 [inline]
+       nr_rt_ioctl+0x398/0xfb0 net/netrom/nr_route.c:692
+       sock_do_ioctl+0x158/0x460 net/socket.c:1222
+       sock_ioctl+0x629/0x8e0 net/socket.c:1341
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:907 [inline]
+       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (&nr_node->node_lock){+...}-{2:2}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       nr_node_lock include/net/netrom.h:152 [inline]
+       nr_dec_obs net/netrom/nr_route.c:459 [inline]
+       nr_rt_ioctl+0x192/0xfb0 net/netrom/nr_route.c:692
+       sock_do_ioctl+0x158/0x460 net/socket.c:1222
+       sock_ioctl+0x629/0x8e0 net/socket.c:1341
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:907 [inline]
+       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (nr_node_list_lock){+...}-{2:2}:
+       check_prev_add kernel/locking/lockdep.c:3133 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3252 [inline]
+       validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3868
+       __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       nr_rt_device_down+0xb5/0x7b0 net/netrom/nr_route.c:517
+       nr_device_event+0x134/0x150 net/netrom/af_netrom.c:126
+       notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
+       call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
+       call_netdevice_notifiers net/core/dev.c:2046 [inline]
+       dev_close_many+0x33c/0x4c0 net/core/dev.c:1587
+       dev_close+0x1c0/0x2c0 net/core/dev.c:1609
+       bpq_device_event+0x372/0x8b0 drivers/net/hamradio/bpqether.c:547
+       notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
+       __dev_notify_flags+0x207/0x400
+       dev_change_flags+0xf0/0x1a0 net/core/dev.c:8915
+       dev_ifsioc+0x7c8/0xe70 net/core/dev_ioctl.c:527
+       dev_ioctl+0x719/0x1340 net/core/dev_ioctl.c:784
+       sock_do_ioctl+0x240/0x460 net/socket.c:1236
+       sock_ioctl+0x629/0x8e0 net/socket.c:1341
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:907 [inline]
+       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  nr_node_list_lock --> &nr_node->node_lock --> nr_neigh_list_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(nr_neigh_list_lock);
+                               lock(&nr_node->node_lock);
+                               lock(nr_neigh_list_lock);
+  lock(nr_node_list_lock);
+
+ *** DEADLOCK ***
+
+2 locks held by syz.1.4509/22182:
+ #0: ffffffff8fc8be48 (rtnl_mutex){+.+.}-{3:3}, at: dev_ioctl+0x706/0x1340 net/core/dev_ioctl.c:783
+ #1: ffffffff8fde8678 (nr_neigh_list_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ #1: ffffffff8fde8678 (nr_neigh_list_lock){+...}-{2:2}, at: nr_rt_device_down+0x28/0x7b0 net/netrom/nr_route.c:514
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 22182 Comm: syz.1.4509 Not tainted 6.11.0-rc6-syzkaller-00180-g4c8002277167 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:93 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
+ check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2186
+ check_prev_add kernel/locking/lockdep.c:3133 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3252 [inline]
+ validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3868
+ __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+ _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+ spin_lock_bh include/linux/spinlock.h:356 [inline]
+ nr_rt_device_down+0xb5/0x7b0 net/netrom/nr_route.c:517
+ nr_device_event+0x134/0x150 net/netrom/af_netrom.c:126
+ notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
+ call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
+ call_netdevice_notifiers net/core/dev.c:2046 [inline]
+ dev_close_many+0x33c/0x4c0 net/core/dev.c:1587
+ dev_close+0x1c0/0x2c0 net/core/dev.c:1609
+ bpq_device_event+0x372/0x8b0 drivers/net/hamradio/bpqether.c:547
+ notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
+ __dev_notify_flags+0x207/0x400
+ dev_change_flags+0xf0/0x1a0 net/core/dev.c:8915
+ dev_ifsioc+0x7c8/0xe70 net/core/dev_ioctl.c:527
+ dev_ioctl+0x719/0x1340 net/core/dev_ioctl.c:784
+ sock_do_ioctl+0x240/0x460 net/socket.c:1236
+ sock_ioctl+0x629/0x8e0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fdcda77def9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fdcdb4b4038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fdcda935f80 RCX: 00007fdcda77def9
+RDX: 0000000020000700 RSI: 0000000000008914 RDI: 000000000000000b
+RBP: 00007fdcda7f09f6 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007fdcda935f80 R15: 00007ffe2567ade8
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
