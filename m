@@ -1,90 +1,83 @@
-Return-Path: <netdev+bounces-128260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B1CD978C45
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:49:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE58978C49
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:53:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75B1E1C24B58
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:49:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9D4E2814CF
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 478E44C7D;
-	Sat, 14 Sep 2024 00:49:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DD646BA;
+	Sat, 14 Sep 2024 00:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPWqP5wL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e+by+I4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0884400;
-	Sat, 14 Sep 2024 00:49:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD354C8E
+	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 00:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726274952; cv=none; b=uXZca9aHHK4qH10ClvgL29RG/rMAPDXtr53ZvtVuwVci7tmEDnO+iIA9Tn/EJqoUF8htz1EaSsKoeI12AIwNbnfpv5IXFdZ4X8GVL4xEQ/SyukloHp26LdBGGXARCE9LsQQWrytonpcYO1HGSOdXZ1X4pfCntZUvORnODChQ9Jg=
+	t=1726275210; cv=none; b=kf4f7yG76HuLEtXldU9k6kVsgWI+jYL+97tq19I4/L+fLR3m6Vecv/YBplQn41jbUXm9gRhMkd2ZilxiL9bquVzo5+iJdWEnPloLI7kd4QuXazSfeKIfjOwiTqOVVJ0B/Y5Bg0CSrlVuvLRxR5PcTc3MLYt+eNZ/zMYnR9r1P+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726274952; c=relaxed/simple;
-	bh=K9xivYU0+hrTZwM4Ojyq18f8RFbDnzkF86AwTofRwrc=;
+	s=arc-20240116; t=1726275210; c=relaxed/simple;
+	bh=5SEHn6C90YfxDgg0/azqwx/m1HdFFCrvViucL9wVxSU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JSTvuvrG1llr9r4KBmD21GtAGumqHNiQ9KzCMoGqDhKF6zyuz1P8sFVNhPGtGIuUoJbrmy3P/XjK2PsO24/bmSPBX+yaRY5b67hKbkaDsZW4PP7ZCqdv6Rjzq6G+zAmTbtbuzI2C91J5ET5zW69+sj4GnAHDP1Cfuu/TT7nPi/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kPWqP5wL; arc=none smtp.client-ip=209.85.214.178
+	 Content-Type:Content-Disposition:In-Reply-To; b=I7+5aw5t7TC215VGaEvmj6XMn5DYtEeDSNQuZ9Ek/E3y++20bSopox6Fr98C46z411wtL9UWyYLddvVl/ix885GKSgMLVKtLbwtHj5XTH+Xx1qJ+ElJcVgHuXR5gFOYd7geoqgBxYGgoJ4I8taNr4Htrd/rVANqFecKWQbdwdj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e+by+I4J; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-206bd1c6ccdso13796015ad.3;
-        Fri, 13 Sep 2024 17:49:10 -0700 (PDT)
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2d8881850d9so2256999a91.3
+        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 17:53:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726274950; x=1726879750; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1726275208; x=1726880008; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eX+p74hRvbhEN0eluUV1sJA76UE/eCdpbwGeO4gkg1g=;
-        b=kPWqP5wL58YgH6svLUxbyxI4eEw8AL8yfjkrXjqafO+udy/JQOiQ+hBLo3V0YmdblY
-         92qLPpX+3M/5JzEQd3dlVc8YIpQtfCZVswSM63H7yjCNPefryJQEBXSEN1ZkJppmIv1B
-         EF9IqNTE4MMvHr0bKYTb5J2G40gwOE4oE/RtOOOy9yxVh0d8O2lLTFR48/dijntHu48s
-         r5oT5c6SwwWsrpVM2Hgbqoy7dWB1yDvXRGchOKwgEnaFjF7fGTnM4tjHGqA9fB87OcUq
-         otbF5Iyeln9RT5hS1Xghke2l82EjyuKtkR2aupk/8jY9t/yDi8yxmFE9hWQqeC6nTmnW
-         RCEA==
+        bh=gXya5W/TgWZMwzQBH0yK0R11mxbQLZ36Iap2aMKyS5g=;
+        b=e+by+I4JphuKL+5KHTxKDNRKHq7tH//EqxugUJ6+lirIKbzKgjoWUxXhLB74EexexG
+         K0RhiZk/NrSdfKaMvu0bipXge3qS7jmmaX96gSlnZ6csEpaTtmZGZHXNCcD8vOK4yOBl
+         2MyQhV/g9R0BR/qe5wIdJeLXpIvjBus/fPm7iGSkvmZXNCInDPU4XwLWUhn6FJwqtLVG
+         oFNPjpcyop/FuQZ+4Zwt9pkBmlMatnVz5bu8tDxMoCU65NyeSkoUyhIyTvsf232hzYlf
+         fgm48L5xzB9143s7P3YMBD28by6FCFhT0qH1Ff7EoU61jKUK9mtkxJVU5XwXoosRWlFi
+         hCNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726274950; x=1726879750;
+        d=1e100.net; s=20230601; t=1726275208; x=1726880008;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eX+p74hRvbhEN0eluUV1sJA76UE/eCdpbwGeO4gkg1g=;
-        b=loQliOwSbsw0zEKIUoRFNEjmE8UZZYcNnfCo8OoDwQr3383xQpU82AVcWpNJZA4JMy
-         op0dkpiiKVL1D5bxpaHTjpiA0FzNu2hwhU3sAUsLVC9GffEL7XthM0g3UtHBRHIqSPsE
-         9YygaiPO1mEvjghH/kEkpCNBWGLx1l5kx47cCb9onrLrbs9/r3yDyWA4DaVKjcDktKks
-         0df77gQ//fx5FZi7UKEFLgid076on5DKpbcwerMyQHGPFEhEjzwAOzfoXf46hbYKwyXL
-         6wx7BUQz39cCc3vADrdBu3utQ2LB9zlEGcBtcwGh++HwqsWiniB0lz7SWhgYmZPS3X0W
-         TnJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJ1a5jwEPC7ddah/AH6kt1HPcqvsV/DE4Fmybba2A2rfE/vikKl4itYXqSf0uClr6UVKHD+zG9@vger.kernel.org, AJvYcCWrYCAk2BsHdkkK8fLteKn68tAIv0v4iw+iSUeIpJ7PunR1mAS0Jpsz1JT3Ql/ALV1JEgT8GZiDYlZaHds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSdepV62VM3wTneohYmWEt3WOlLZR1DdJ4HpEBK3LQ5Erwuiyr
-	YUoBDviXwm05VX9Ej9thNUo3mf2zmF96l2/+6iarZ09KeTTwxBin
-X-Google-Smtp-Source: AGHT+IE0PtymA6lAtF1ZyDn+8ZVmXxiHgC1WVLOghFvoPybpDHssv1n4rE8Si2rwJ8H6jnvBhKSPYg==
-X-Received: by 2002:a17:903:183:b0:206:cbf0:3089 with SMTP id d9443c01a7336-20782b6942dmr65005575ad.54.1726274950060;
-        Fri, 13 Sep 2024 17:49:10 -0700 (PDT)
+        bh=gXya5W/TgWZMwzQBH0yK0R11mxbQLZ36Iap2aMKyS5g=;
+        b=hsU5KHrKjMUXq6UEwceNhAGjLsnxumyRchlDlOCu28fciT0pPFivlRIzpMvU4Uh0Oz
+         Yfqx7ZS5mvsjmD/h5rOh8JNvWg3xMKWNQLbgGEfJHwkq44isN1OOZEkgh24AuNwtAevZ
+         PMCtEHIYHc7VOhhVurJZWs25AX3cfmO4oY1GfeZNSMzW3ZGiISycOEAE6cs5bTCH5eqb
+         m+nCTlWoQvNw9WnX1OQsyHh7pgINej1foBnCCcYDKllxLOHMovi0b45GRyCFExU10cFB
+         0wRH7VQo9aRvR07EOA90U5pYJcb02010oXQ3OCdLPayCbAEBpSI4PJxfNeQDvvmnOTYB
+         FoXg==
+X-Gm-Message-State: AOJu0YzUr1jJWFcdN7n25zbzBGy2opc/PtxZ2aBuPCbwy2lMYgKYwPcJ
+	ryRcR0/pxGvs12b3Lp7pVTocjRWlhr/YPRtSb8+65MvI1LNivS2u
+X-Google-Smtp-Source: AGHT+IEINswoC7nfJ8LwWtowSzYDm/xYRon/V4fCEDhLWyZJvZHwDKXNJYn5oPGoUvISETBmsHBh1w==
+X-Received: by 2002:a17:90a:2dc6:b0:2c9:9f50:3f9d with SMTP id 98e67ed59e1d1-2db9ffa11abmr9611069a91.5.1726275208464;
+        Fri, 13 Sep 2024 17:53:28 -0700 (PDT)
 Received: from localhost ([2601:647:6881:9060:97be:e4c7:7fc1:f125])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20794714d8bsm1829995ad.201.2024.09.13.17.49.09
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbcfd9313fsm296951a91.44.2024.09.13.17.53.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2024 17:49:09 -0700 (PDT)
-Date: Fri, 13 Sep 2024 17:49:08 -0700
+        Fri, 13 Sep 2024 17:53:28 -0700 (PDT)
+Date: Fri, 13 Sep 2024 17:53:26 -0700
 From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Qianqiang Liu <qianqiang.liu@163.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: check the return value of the copy_from_sockptr
-Message-ID: <ZuTdhIZtw8Hc7LXP@pop-os.localdomain>
-References: <20240911050435.53156-1-qianqiang.liu@163.com>
- <CANn89iKhbQ1wDq1aJyTiZ-yW1Hm-BrKq4V5ihafebEgvWvZe2w@mail.gmail.com>
- <ZuFTgawXgC4PgCLw@iZbp1asjb3cy8ks0srf007Z>
- <CANn89i+G-ycrV57nc-XrgToJhwJuhuCGtHpWtFsLvot7Wu9k+w@mail.gmail.com>
- <ZuHMHFovurDNkAIB@pop-os.localdomain>
- <CANn89iJkfT8=rt23LSp_WkoOibdAKf4pA0uybaWMbb0DJGRY5Q@mail.gmail.com>
- <ZuHU0mVCQJeFaQyF@pop-os.localdomain>
- <ZuHmPBpPV7BxKrxB@mini-arch>
- <ZuHz9lSFY4dWD/4W@pop-os.localdomain>
- <ZuH4B7STmaY0AI1m@mini-arch>
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
+	syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>
+Subject: Re: [Patch net] smc: use RCU version of lower netdev searching
+Message-ID: <ZuTehlEoyi4PPmQA@pop-os.localdomain>
+References: <20240912000446.1025844-1-xiyou.wangcong@gmail.com>
+ <a054f2ef-c72f-4679-a123-003e0cf7839d@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,40 +86,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZuH4B7STmaY0AI1m@mini-arch>
+In-Reply-To: <a054f2ef-c72f-4679-a123-003e0cf7839d@linux.alibaba.com>
 
-On Wed, Sep 11, 2024 at 01:05:27PM -0700, Stanislav Fomichev wrote:
-> On 09/11, Cong Wang wrote:
-> > On Wed, Sep 11, 2024 at 11:49:32AM -0700, Stanislav Fomichev wrote:
-> > > Can you explain what is not correct?
-> > > 
-> > > Calling BPF_CGROUP_RUN_PROG_GETSOCKOPT with max_optlen=0 should not be
-> > > a problem I think? (the buffer simply won't be accessible to the bpf prog)
-> > 
-> > Sure. Sorry for not providing all the details.
-> > 
-> > If I understand the behavior of copy_from_user() correctly, it may
-> > return partially copied data in case of error, which then leads to a
-> > partially-copied 'max_optlen'.
-> > 
-> > So, do you expect a partially-copied max_optlen to be passed to the
-> > eBPF program meanwhile the user still expects a complete one (since no
-> > -EFAULT)?
-> > 
-> > Thanks.
+On Thu, Sep 12, 2024 at 02:20:47PM +0800, D. Wythe wrote:
 > 
-> Partial copy is basically the same as user giving us garbage input, right?
-> That should still be handled correctly I think.
+> 
+> On 9/12/24 8:04 AM, Cong Wang wrote:
+> > From: Cong Wang <cong.wang@bytedance.com>
+> > 
+> > Both netdev_walk_all_lower_dev() and netdev_lower_get_next() have a
+> > RCU version, which are netdev_walk_all_lower_dev_rcu() and
+> > netdev_next_lower_dev_rcu(). Switching to the RCU version would
+> > eliminate the need for RTL lock, thus could amend the deadlock
+> > complaints from syzbot. And it could also potentially speed up its
+> > callers like smc_connect().
+> > 
+> > Reported-by: syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f
+> > Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+> > Cc: Jan Karcher <jaka@linux.ibm.com>
+> > Cc: "D. Wythe" <alibuda@linux.alibaba.com>
+> > Cc: Tony Lu <tonylu@linux.alibaba.com>
+> > Cc: Wen Gu <guwen@linux.alibaba.com>
+> > Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> 
+> 
+> Haven't looked at your code yet, but the issue you fixed doesn't exist.
+> The real reason is that we lacks some lockdep annotations for
+> IPPROTO_SMC.
 
-Not to me.
+If you look at the code, it is not about sock lock annotations, it is
+about RTNL lock which of course has annotations.
 
-For explict garbage input, users (mostly syzbot) already expect it is a
-garbage.
-
-For partial copy, users expect either an error (like EFAULT) or a success
-with the _original_ value.
-
-It is all about expectation of the API.
+And you don't even need to bother sock lock annotations for this specific
+case at all (I can't say any other case).
 
 Thanks.
 
