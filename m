@@ -1,128 +1,140 @@
-Return-Path: <netdev+bounces-128363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1992D9792B1
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 19:37:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 191259792C5
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 20:01:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D08A1F222A0
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 17:37:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 243C41C213C5
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 18:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64DEF1D0DE7;
-	Sat, 14 Sep 2024 17:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F35A1D0DF5;
+	Sat, 14 Sep 2024 18:01:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="C/2KZaFu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhMkeycc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3291D094C;
-	Sat, 14 Sep 2024 17:37:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 291B225570;
+	Sat, 14 Sep 2024 18:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726335441; cv=none; b=BekDs8Vv4hR+hne2demPesfjlL/uRipm6fMNuxTJZsx8MYkC6ce8w0J7qllG89f3Rq1dOV2HSPqjECqwsqjWjvUlcoGFnBl+I61idoyE/wlM3cE/K7b9JI2+xa6Q4xCGWActwWdoQZ85Ur1lQSHUtmGwMcn3XdWuFFnhbGU8Oqw=
+	t=1726336891; cv=none; b=RdgJo4w7VrKrWTGCzDSkB9mS7Vl6MrlA/dH+361ILs2tUdz+9hiD1qAwuy3Ab4sTw0eexdXl2M97fx23Kf2GppENjcLEkES3ths4WQ3armnn0tYkFLBNY3lnDAauBL4BCdEepZdL6oetRFmhHxcx1LSfkoKlfB74I4iwP+uj4Io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726335441; c=relaxed/simple;
-	bh=bdeTaft8mZqRo5px+2z30ZmBbAywulCX2M/9l9QbDkA=;
+	s=arc-20240116; t=1726336891; c=relaxed/simple;
+	bh=EaXTg0fhYhKlMAhnjdqCWjgdbkEkdMiKi1ZpWRKVxaA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gsiA+6I7VwzovG+K4uK+w+hlJfQEpf+Lat1YIkL8lCXrZ8yyaXM2rskVG7ucWOfuRLRaYgBUZDUhQZ9E8NzBwwEq2osABb1ElxZMCgH7oS8TyRT9c2zGkdaOYVmkyvq6jT/jBzJ4I3amadYMoum+jKZBKwSaIilr6gLjxMdB7tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=C/2KZaFu; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726335437; x=1757871437;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bdeTaft8mZqRo5px+2z30ZmBbAywulCX2M/9l9QbDkA=;
-  b=C/2KZaFu8unzLrcbXzujMjPHPzjrJjWmTZPxT0HNQAhPIsML8Drf6Qwt
-   phOpZPQGBG6RKl2FPp3P4g3Fws7yTMlU5aC9bAnIZfe5Q3LvtPqkxJETO
-   aryfOaeoCEbk0XzRwtIzudpO5ncCXDdQ02Men3PVblb64UF+EGjqZnr0L
-   0+I4sc4kGaBivf3k2NnTNbyZxgysbRey5Fz1j0nVAzyDe572AjCxmhRIP
-   VRehYeilHs8KfyQbvhJ1K6jE7wB3QOChZ30sbYl8eb+aMNgAyhs9wCIes
-   sXY1CK2UWql2X6x5H3Hk4f1ihRZZ1lQuFaL/nDt+A7VTzIPFYyucwFjBC
-   w==;
-X-CSE-ConnectionGUID: zetyLbBWQjWWwMnq0BsUBQ==
-X-CSE-MsgGUID: Gj7oREftSyqp8Tk8j4VE5w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11195"; a="24758377"
-X-IronPort-AV: E=Sophos;i="6.10,229,1719903600"; 
-   d="scan'208";a="24758377"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2024 10:37:16 -0700
-X-CSE-ConnectionGUID: pZGSGrYJTAGuvs13gFzz1Q==
-X-CSE-MsgGUID: TUlD6Sg7SYOH5LMDPifvEw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,229,1719903600"; 
-   d="scan'208";a="68134716"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 14 Sep 2024 10:37:12 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1spWhq-000814-1w;
-	Sat, 14 Sep 2024 17:37:10 +0000
-Date: Sun, 15 Sep 2024 01:37:05 +0800
-From: kernel test robot <lkp@intel.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
-	andrew@lunn.ch, Steen.Hegelund@microchip.com,
-	Raju.Lakkaraju@microchip.com, daniel.machon@microchip.com,
+	 Content-Type:Content-Disposition:In-Reply-To; b=qaTfoq976QUGtKS+BeCA4mYGdrTQKDdMSPVMVsElqC1FX83pUkEVyl4eZZhQ77DjLtWbLXzLLaQBqgjO0v3LnC4jS9EgQOLzGnC6x3Zkh3jGpp3lTZEKb0fUz9fBR6pUQ/G90rE0cHWx5rduRkpf4SlFi2p+5TsV+wXYCaVsq+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OhMkeycc; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7163489149eso1550163a12.1;
+        Sat, 14 Sep 2024 11:01:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726336889; x=1726941689; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XbSIPsNwM+GygjUQiHgIjZSdk5AT/foDOOu2Hhk5z6I=;
+        b=OhMkeyccSVN7+VO8S+c1s0m3nknZQKtv0R06RKh5G7BI9gbRh6Xyi0DR9NSyu6DJb+
+         KTXSGP735afaXG1AUP3QZv+ufVIe+5fdpPxP/mHMphKzywVNV7q6uL+Tixlrlkb3S9F8
+         /AH1lIxlaGUD27LUEtDcEQPUyiYS+6fFc5GaiBgTbmHDDkdNyOvDExSzOu4RAjxawETD
+         37pRFhgto25zEcLHVzC163sm857vplBtXfZx3wL+ERM7xX8byAic792agePQ75wo/LvJ
+         Sr7gShh1nTWEfQsDRf/7PwBITufyX8+Jva1+YHHe/PIbPwzesoWeqSEafbMJRK55P9MR
+         AH3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726336889; x=1726941689;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XbSIPsNwM+GygjUQiHgIjZSdk5AT/foDOOu2Hhk5z6I=;
+        b=AbIBprSOnJD/h0dbRxyQhmpRdsZTYEplx290sHdsW7jSshLJCrPzqlSgeB/75ZnkAZ
+         qL6OEazZ/swTCRpnTLncXASDBAA//y83fqu2YbMOl24kDeCWZwjPqUxZgB1T9blQLm7E
+         hgb1UHqPNbYfaPcYSf++kxkXoBL52So3uYdgxrDNLNTMtka0OADQ6MReDPVgz/4VjsbV
+         D9DT1NZaJB/4BgX6MRD8zNlARw6aliHptEArQJVT/KeMcBa4Rkl2bOeIDK4JNvqiAEhf
+         sd4iZO7v4zfGr/LmFR62qNhOfrP2xaia4uQaW+YzhFuD1N3lUIKPnnBoCfc6LUS4ADEz
+         tGCw==
+X-Forwarded-Encrypted: i=1; AJvYcCVZcSsWFCpeq4HZ50mCW27RjlA7cia0Q0SKNHwltP1ldpZd9CHpsJVnJ2WG8amSoKjQhmN1gRW9@vger.kernel.org, AJvYcCWI7msdbLChtM2yeHfqdlbGNlbiAZeLA9+QNqrSwVUQL6WY9G9bo7B+Hb8OnbMECYPOVNKtWPo89FPnvKU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz47aoqRadXrrxwaiI15/t6msJW9jRjhvrjU+dHnMREhA0/j0hu
+	nq+IHhpm6ia7mUmZA8qw+It1Xf1dCpHopa+ASfrdmj1REigQGv0=
+X-Google-Smtp-Source: AGHT+IE/XcI7dmdhav37V8UBI2gAzMbDfWaZbfgdeK883ntq5EiqWrStfVgr69CkXWeHsWldkIfB9Q==
+X-Received: by 2002:a17:90a:9a7:b0:2d3:c8e5:e548 with SMTP id 98e67ed59e1d1-2dbb9dfbddcmr9271957a91.13.1726336889217;
+        Sat, 14 Sep 2024 11:01:29 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbcfd09a72sm1830978a91.23.2024.09.14.11.01.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 14 Sep 2024 11:01:28 -0700 (PDT)
+Date: Sat, 14 Sep 2024 11:01:27 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Qianqiang Liu <qianqiang.liu@163.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next V2 2/5] net: lan743x: Add support to
- software-nodes for sfp
-Message-ID: <202409150110.dSOZKgpK-lkp@intel.com>
-References: <20240911161054.4494-3-Raju.Lakkaraju@microchip.com>
+Subject: Re: [PATCH] net: check the return value of the copy_from_sockptr
+Message-ID: <ZuXPd-YlNhgRAhBW@mini-arch>
+References: <CANn89iKhbQ1wDq1aJyTiZ-yW1Hm-BrKq4V5ihafebEgvWvZe2w@mail.gmail.com>
+ <ZuFTgawXgC4PgCLw@iZbp1asjb3cy8ks0srf007Z>
+ <CANn89i+G-ycrV57nc-XrgToJhwJuhuCGtHpWtFsLvot7Wu9k+w@mail.gmail.com>
+ <ZuHMHFovurDNkAIB@pop-os.localdomain>
+ <CANn89iJkfT8=rt23LSp_WkoOibdAKf4pA0uybaWMbb0DJGRY5Q@mail.gmail.com>
+ <ZuHU0mVCQJeFaQyF@pop-os.localdomain>
+ <ZuHmPBpPV7BxKrxB@mini-arch>
+ <ZuHz9lSFY4dWD/4W@pop-os.localdomain>
+ <ZuH4B7STmaY0AI1m@mini-arch>
+ <ZuTdhIZtw8Hc7LXP@pop-os.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240911161054.4494-3-Raju.Lakkaraju@microchip.com>
+In-Reply-To: <ZuTdhIZtw8Hc7LXP@pop-os.localdomain>
 
-Hi Raju,
+On 09/13, Cong Wang wrote:
+> On Wed, Sep 11, 2024 at 01:05:27PM -0700, Stanislav Fomichev wrote:
+> > On 09/11, Cong Wang wrote:
+> > > On Wed, Sep 11, 2024 at 11:49:32AM -0700, Stanislav Fomichev wrote:
+> > > > Can you explain what is not correct?
+> > > > 
+> > > > Calling BPF_CGROUP_RUN_PROG_GETSOCKOPT with max_optlen=0 should not be
+> > > > a problem I think? (the buffer simply won't be accessible to the bpf prog)
+> > > 
+> > > Sure. Sorry for not providing all the details.
+> > > 
+> > > If I understand the behavior of copy_from_user() correctly, it may
+> > > return partially copied data in case of error, which then leads to a
+> > > partially-copied 'max_optlen'.
+> > > 
+> > > So, do you expect a partially-copied max_optlen to be passed to the
+> > > eBPF program meanwhile the user still expects a complete one (since no
+> > > -EFAULT)?
+> > > 
+> > > Thanks.
+> > 
+> > Partial copy is basically the same as user giving us garbage input, right?
+> > That should still be handled correctly I think.
+> 
+> Not to me.
+> 
+> For explict garbage input, users (mostly syzbot) already expect it is a
+> garbage.
+> 
+> For partial copy, users expect either an error (like EFAULT) or a success
+> with the _original_ value.
+> 
+> It is all about expectation of the API.
+> 
+> Thanks.
 
-kernel test robot noticed the following build errors:
+The best way to move this forward is for you to showcase what is exactly
+broken by adding a test case to one of the tools/testing/selftests/bpf/*sockopt*
+files.
 
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Lakkaraju/net-lan743x-Add-SFP-support-check-flag/20240912-002444
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240911161054.4494-3-Raju.Lakkaraju%40microchip.com
-patch subject: [PATCH net-next V2 2/5] net: lan743x: Add support to software-nodes for sfp
-config: x86_64-randconfig-003-20240914 (https://download.01.org/0day-ci/archive/20240915/202409150110.dSOZKgpK-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240915/202409150110.dSOZKgpK-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409150110.dSOZKgpK-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> ld.lld: error: undefined symbol: devm_i2c_add_adapter
-   >>> referenced by i2c-mchp-pci1xxxx.c:1182 (drivers/i2c/busses/i2c-mchp-pci1xxxx.c:1182)
-   >>>               drivers/i2c/busses/i2c-mchp-pci1xxxx.o:(pci1xxxx_i2c_probe_pci) in archive vmlinux.a
-
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for GP_PCI1XXXX
-   Depends on [n]: PCI [=y] && GPIOLIB [=y] && NVMEM_SYSFS [=n]
-   Selected by [y]:
-   - LAN743X [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
-   WARNING: unmet direct dependencies detected for I2C_PCI1XXXX
-   Depends on [m]: I2C [=m] && HAS_IOMEM [=y] && PCI [=y]
-   Selected by [y]:
-   - LAN743X [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+We can then discuss whether it warrants the copy_from_sockptr check or
+some other remediation.
 
