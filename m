@@ -1,134 +1,90 @@
-Return-Path: <netdev+bounces-128264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C568A978C88
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 04:02:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CF6A978CB5
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 04:12:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42DF9B2301E
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:02:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 890DC1F23B6D
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF7423DE;
-	Sat, 14 Sep 2024 02:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A03C2F2;
+	Sat, 14 Sep 2024 02:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="DH0dsbxR"
+	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="DtIrMPTT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DCD33E8;
-	Sat, 14 Sep 2024 02:02:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DA62F24;
+	Sat, 14 Sep 2024 02:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726279338; cv=none; b=AbfkPgjaRN+newIb0rtaTZwdoW0a30RtBfThcs6Dhv5GHj+UiGaHb2wyxOh0MO6PMx7muQtJLdLnrnlojX7aA9b1VKxW8i6E361gdzdFajNlFaO+Ip0aOhWa0VKp4iyMjvA1ebN/zF0b98ntieEFFGm6CQjz/z51niragC6wOQE=
+	t=1726279969; cv=none; b=RzrZBhkPd2WGFXDIocN0tWvoL7aUerr1mKy5/olwVe+TctY103r0MsIhE+8XCotMfvpoNBU1KtEW7SqgDEmMXjb5Wvlq+sMBQCorfmqlNc+V1G/wPf5NaWMLxBhX+P/7veqe/LfYsZgdguTVFrZkFBRY3gZG+fHSX2pD9kZhqfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726279338; c=relaxed/simple;
-	bh=KVQI4gRkAKlBL/HZnc2Jyu/Q+cbFZDKCOE64jrTo+js=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=trrMSUyg/k1ZDjupmM7Tda3v4yYSSyHEEe6jsIWuOrcuwy8k7nFE/vai4bt9NmLhby7/y+Xih0R+MT3B4VWvsfykQeBq7ebSRS1mGopNLTf0BvF8sfgp0q2im71mUSnqKM/5C5H0fzxTEo/Bfa2+rWOApXPuvXkCZkB8x7IUg8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=DH0dsbxR; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1726279332;
-	bh=/wsM4f9mZobOe68S738M7h2FcsJwRNVl7jUmuHE5wmY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=DH0dsbxRzHaIGZKdW/VAzQa6uKPKiQwb8xCnbJaXLX9IAec2jz1b/fzg6cAhA8ErS
-	 pB/HLkT+Chh7obMNzCGZjoOWTe/vD0JNDCM4Bk1nb264MmakqUKTgdIBJ2vYKocfIX
-	 TQFU167XMfXx/BQsIbkQmum5VaXobPpVYwGgo1VhMa4CtzPmjmlEkxQ80fw3po0b0D
-	 HtJ6eUTWVbxOb+AYQWVe+VAvYPaM3Togzjtar6Bx3JrukSCSxH/pAfJbln0hO7udza
-	 MN7MYow2a+b425Pd8snDmc6s2XJ5BK0WWvGoVetzAKhaADtomefCQYQLBwDN6OI2zp
-	 D2h9711DyUhjg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X5DvR1TfQz4xD3;
-	Sat, 14 Sep 2024 12:02:11 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Linux
- Next Mailing List <linux-next@vger.kernel.org>, Arnd Bergmann
- <arnd@arndb.de>, "linuxppc-dev@lists.ozlabs.org"
- <linuxppc-dev@lists.ozlabs.org>, Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH net-next v2] page_pool: fix build on powerpc with GCC 14
-In-Reply-To: <20240913213351.3537411-1-almasrymina@google.com>
-References: <20240913213351.3537411-1-almasrymina@google.com>
-Date: Sat, 14 Sep 2024 12:02:09 +1000
-Message-ID: <87jzffq9ge.fsf@mail.lhotse>
+	s=arc-20240116; t=1726279969; c=relaxed/simple;
+	bh=G0nJyBmj3VUsf2JzsWWPxhsSR7+cfwPdpD5U+nbh5CM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VmsZOZOFOi9fOw2SnzgwXkxJptlfZWyQkFgALXxISdZNUswCOtAeizoBjcqs2ws1iFerwjq+9Fk2ifLD6FXuJUcEd3IMjQS7weTVvrr73zDqkldFzT+NWXKsh+b0Ezmq4KRR+FcD0++8lMTQqL/rdf8a9fXiE2uDn1vS/qpg2Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=DtIrMPTT; arc=none smtp.client-ip=217.79.154.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
+X-Virus-Scanned: amavisd-new at emenem.pl
+Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
+	(authenticated bits=0)
+	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 48E2C2BX012622
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sat, 14 Sep 2024 04:12:04 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
+	t=1726279928; bh=G0IQjnC9Z4j5bgt24Uw21tvGgqTZhtqPZhCt0RIK0vI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=DtIrMPTTwZSkB4UwrYRvbhNocUQFDFgw2NWYME/JAdVKA+0jHPObl0KtkQMVfz/lj
+	 JCKf674oC/JahfuwaK8hEYWWYpJOfbxR29jHob75pD1XWtmNTABkScczjfKPMXlFCk
+	 jqxxRbn8kfxPhNul9HOGEG7sKecl3+BNgo5D+6xE=
+Message-ID: <6b979753-9f5a-410c-9fe3-d2366976e316@ans.pl>
+Date: Fri, 13 Sep 2024 19:12:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] mlx4/mlx5: {mlx4,mlx5e}_en_get_module_info
+ cleanup
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Ido Schimmel <idosch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        linux-rdma@vger.kernel.org
+References: <14a24f93-f8d6-4bc7-8b87-86489bcedb28@ans.pl>
+ <20240913135510.1c760f97@kernel.org>
+From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
+Content-Language: en-US
+In-Reply-To: <20240913135510.1c760f97@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Mina Almasry <almasrymina@google.com> writes:
-> Building net-next with powerpc with GCC 14 compiler results in this
-> build error:
->
-> /home/sfr/next/tmp/ccuSzwiR.s: Assembler messages:
-> /home/sfr/next/tmp/ccuSzwiR.s:2579: Error: operand out of domain (39 is
-> not a multiple of 4)
-> make[5]: *** [/home/sfr/next/next/scripts/Makefile.build:229:
-> net/core/page_pool.o] Error 1
->
-> Root caused in this thread:
-> https://lore.kernel.org/netdev/913e2fbd-d318-4c9b-aed2-4d333a1d5cf0@cs-soprasteria.com/
+On 13.09.2024 at 13:55, Jakub Kicinski wrote:
+> On Wed, 11 Sep 2024 23:38:45 -0700 Krzysztof Olędzki wrote:
+>> Use SFF8024 constants defined in linux/sfp.h instead of private ones.
+>>
+>> Make mlx4_en_get_module_info() and mlx5e_get_module_info() to look
+>> as close as possible to each other.
+>>
+>> Simplify the logic for selecting SFF_8436 vs SFF_8636.
+> 
+> Minor process suggestion, I think you may be sending the patches one by
+> one. It's best to format them into a new directory and send all at once
+> with git send-email. Add a cover letter, too.
+> 
 
-Sorry I'm late to this, the original report wasn't Cc'ed to linuxppc-dev :D
+Thanks, yes, will do for v2. I assume this needs to wait for about two weeks for net-next to re-open?
 
-I think this is a bug in the arch/powerpc inline asm constraints.
-
-Can you try the patch below, it fixes the build error for me.
-
-I'll run it through some boot tests and turn it into a proper patch over
-the weekend.
-
-cheers
-
-
-diff --git a/arch/powerpc/include/asm/atomic.h b/arch/powerpc/include/asm/atomic.h
-index 5bf6a4d49268..0e41c1da82dd 100644
---- a/arch/powerpc/include/asm/atomic.h
-+++ b/arch/powerpc/include/asm/atomic.h
-@@ -23,6 +23,12 @@
- #define __atomic_release_fence()					\
- 	__asm__ __volatile__(PPC_RELEASE_BARRIER "" : : : "memory")
- 
-+#ifdef CONFIG_CC_IS_CLANG
-+#define DS_FORM_CONSTRAINT "Z<>"
-+#else
-+#define DS_FORM_CONSTRAINT "YZ<>"
-+#endif
-+
- static __inline__ int arch_atomic_read(const atomic_t *v)
- {
- 	int t;
-@@ -197,7 +203,7 @@ static __inline__ s64 arch_atomic64_read(const atomic64_t *v)
- 	if (IS_ENABLED(CONFIG_PPC_KERNEL_PREFIXED))
- 		__asm__ __volatile__("ld %0,0(%1)" : "=r"(t) : "b"(&v->counter));
- 	else
--		__asm__ __volatile__("ld%U1%X1 %0,%1" : "=r"(t) : "m<>"(v->counter));
-+		__asm__ __volatile__("ld%U1%X1 %0,%1" : "=r"(t) : DS_FORM_CONSTRAINT (v->counter));
- 
- 	return t;
- }
-@@ -208,7 +214,7 @@ static __inline__ void arch_atomic64_set(atomic64_t *v, s64 i)
- 	if (IS_ENABLED(CONFIG_PPC_KERNEL_PREFIXED))
- 		__asm__ __volatile__("std %1,0(%2)" : "=m"(v->counter) : "r"(i), "b"(&v->counter));
- 	else
--		__asm__ __volatile__("std%U0%X0 %1,%0" : "=m<>"(v->counter) : "r"(i));
-+		__asm__ __volatile__("std%U0%X0 %1,%0" : "=" DS_FORM_CONSTRAINT (v->counter) : "r"(i));
- }
- 
- #define ATOMIC64_OP(op, asm_op)						\
+Krzysztof
 
