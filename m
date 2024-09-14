@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-128269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92CD1978CEB
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 05:00:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5117A978CEE
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 05:00:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D4E01F25764
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 03:00:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F11671F257A9
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 03:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D1233D1;
-	Sat, 14 Sep 2024 03:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 282E923CE;
+	Sat, 14 Sep 2024 03:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bykdCWQ/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RaojS8nG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72414168B7;
-	Sat, 14 Sep 2024 03:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F284318EA2;
+	Sat, 14 Sep 2024 03:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726282828; cv=none; b=R9BSw2qbwDTEQiZJ0tm/YpynyS5CONIHfbmDBgf7RgHbQ15XlMpBIUhwAyzOy1xUDNt/rwM2gtkf7Rzp7lPN0Rj07mDcuSZ3x4qlpaYg7QpKF9wzMf48tNogRFIxbUATVBWjZ1i+s59tCSGltUHOD5ghE18XA0YxGPRxR362aVM=
+	t=1726282835; cv=none; b=EMF0VjCPv9C7A2ysVXeomVoM27ehRYGDBRDJqr6uBMG90zCN+Xl4eT9sOgfbhgADmHeyTs3f5jgbpOTUqCZ9SVWA88WW+ttts67JuVtJ7uHMA+DU8PZeKtSRZ88syOR5yKlGQo+kq4NyN+Dqk0MlvGLvr9RVf65pw1Ln8cQ4eVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726282828; c=relaxed/simple;
-	bh=aiYZ1MG2GRMcyZjT/bTHZi/vKPgJxEab5GgBYsIlZdo=;
+	s=arc-20240116; t=1726282835; c=relaxed/simple;
+	bh=vdjolh7I7BGGXQqO/aOAeiLLTNhqGa31sBVBIzGf9vQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JEPgidI6wT4sa1m3BgZU/sz4eDscDXWXrn+0vmBedFdoRe0D/NVlYdtP/ex6l8Akk4PVP8UTxjuOaZNtUu0bSFICO6BF0HMjQGQuodIjkvjBwmBq1DYUoaCK4EAHDgkaxD6+7bH+Jti7coPhwJJP3yITJS8AmN5JSm9qXu0zMc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bykdCWQ/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5C5EC4CEC0;
-	Sat, 14 Sep 2024 03:00:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=iGqR5HaPkGtthYCYRR+LVTIE5U06PCaC+5SNSDPks5iegVgnV6DJTdtivArnUmSRBjGW1aXJqzqMjKiXznsrnHUuH2Sw9xxP0p+HxWlrUVNIWUPNyTAmOJQEMkznmwtvcOtplKIw/LMsL1tH2yxOlNJEB9jkh6Dlo1A/nUYE+lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RaojS8nG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0ACDC4CEC0;
+	Sat, 14 Sep 2024 03:00:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726282828;
-	bh=aiYZ1MG2GRMcyZjT/bTHZi/vKPgJxEab5GgBYsIlZdo=;
+	s=k20201202; t=1726282834;
+	bh=vdjolh7I7BGGXQqO/aOAeiLLTNhqGa31sBVBIzGf9vQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bykdCWQ/5HB+PUudUy60oL72mseFpHu12iC8RYpXmEA2vsjJ4rmxSpfLAMVeJ50cc
-	 zAa6bPCmgy/UH7pSGkM2+mc5me/v7p0zVmP3tweF6+9HYwCs03Ycc+Y2naq0EkBYZF
-	 ZeJJ4DN6rS1bdmYzlPlXYxacYwqY2U6RAXqVtg44x/KdoH3CbfjlIibsSpxs+IzToT
-	 ou73bupaAjDQ9qTQJGw0fowRlmSFTEi/DmrruKbbgOxQODAiBBWZ9Ixqo7VOOAdQuT
-	 24iI/+iZtN8b9k5JUTOoipmUhcuc+9JqVgt7K2aBfw1hNKTghQva8mwZJlPodzwaad
-	 nQYTjff7BDNTA==
+	b=RaojS8nGh8g6x7ounBShSkZAYPj8h0JutSvZxWxGp1B6R43OfhLzJuu72RoiUN7gH
+	 7QGzOG22LR26ryXGQGDUse0uOd3tutFio1M7lIwjVm4DA3ogHO4zfmO0kbSI9feIF8
+	 gfxhujXaxbixBQW0qN7oV0IoO8/3jVKpbGJt59Mrp/csqlfVWTNyKakZQpQ38+EUHd
+	 q7MEO459d4DkPkwi6CO9dLliGHRdAAuwUIXzg+yji1KfNiv8sPo2YPBUfOhIkrVkQD
+	 fhHDhNWJXXM1vc/msnPZzsvPGUCg5agibV6RoMbukXpOKDZBQm08isHtPhD7t1u8sp
+	 tEOlHcFk1OO9g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713F53806655;
-	Sat, 14 Sep 2024 03:00:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C333806655;
+	Sat, 14 Sep 2024 03:00:37 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] netkit: Assign missing bpf_net_context
+Subject: Re: pull request: bluetooth-next 2024-09-12
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172628282927.2435669.7391476062260025930.git-patchwork-notify@kernel.org>
-Date: Sat, 14 Sep 2024 03:00:29 +0000
-References: <20240912155620.1334587-1-leitao@debian.org>
-In-Reply-To: <20240912155620.1334587-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
- razor@blackwall.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, ast@kernel.org, toke@redhat.com, hawk@kernel.org,
- bigeasy@linutronix.de, vadim.fedorenko@linux.dev, andrii@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <172628283574.2435669.13261947732320394840.git-patchwork-notify@kernel.org>
+Date: Sat, 14 Sep 2024 03:00:35 +0000
+References: <20240912214317.3054060-1-luiz.dentz@gmail.com>
+In-Reply-To: <20240912214317.3054060-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This pull request was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 12 Sep 2024 08:56:19 -0700 you wrote:
-> During the introduction of struct bpf_net_context handling for
-> XDP-redirect, the netkit driver has been missed, which also requires it
-> because NETKIT_REDIRECT invokes skb_do_redirect() which is accessing the
-> per-CPU variables. Otherwise we see the following crash:
+On Thu, 12 Sep 2024 17:43:15 -0400 you wrote:
+> The following changes since commit 525034e2e2ee60d31519af0919e374b0032a70de:
 > 
-> 	BUG: kernel NULL pointer dereference, address: 0000000000000038
-> 	bpf_redirect()
-> 	netkit_xmit()
-> 	dev_hard_start_xmit()
+>   net: mdiobus: Debug print fwnode handle instead of raw pointer (2024-09-10 12:24:17 +0200)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2024-09-12
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] netkit: Assign missing bpf_net_context
-    https://git.kernel.org/netdev/net/c/157f29152b61
+  - pull request: bluetooth-next 2024-09-12
+    https://git.kernel.org/netdev/net-next/c/ef17c3d22cee
 
 You are awesome, thank you!
 -- 
