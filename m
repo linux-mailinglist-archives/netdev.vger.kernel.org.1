@@ -1,146 +1,104 @@
-Return-Path: <netdev+bounces-128313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21994978F4C
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 11:00:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E573D978F50
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 11:01:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C404E282917
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 09:00:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34853B245E2
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 09:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12FD4148FF7;
-	Sat, 14 Sep 2024 08:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A+5Sbrn9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914C61369BC;
+	Sat, 14 Sep 2024 09:00:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1F710E9;
-	Sat, 14 Sep 2024 08:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CE04C80;
+	Sat, 14 Sep 2024 09:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726304398; cv=none; b=OSRD5wUSQG2QkfHE6Mu/iX3DJNwvIvAn0E2+52zNG/0hZntrntq2g9o+E9xytw/Q8xmUefQSVCfwim1ol1IHhX0YWk991III6WTFyDJVNC5LaTfrUPThW2gvcerLWulgYNf1Ikv11GUUDnEzUN28IBW5bctPbRtXe4EIocDTEio=
+	t=1726304452; cv=none; b=AYPyJbJfWtLUzBmuAv7ZBC1rjQVLwwIQm4mIJPEEZ8owHK2Mx23vdWEI87lOuAS570L1YGP+MEa5yKYY3AlrfqUdtiSG94qpDIUF57RRUwGJ2wmlbd1QIMoy/qDXXvQhrHDUqwYFJ0dEp9LgpqFR3Zdyk7Q8XuLCMMeQyJYIfBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726304398; c=relaxed/simple;
-	bh=Lx4Uayf2bZvoedX3/yhCtCijyNoRRWxNLVzsgVEa+sU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mq/HqeFvCczP+A9g67m8JnMSbrm09xsuxXebZrAmwK7WF0eH43FNf7nR/RUm8yLh+hCqU6Y/9Qi0Xe+fyRT2svXau0FO3LJR6OQJdPBLmAdJb5uuoLKJ7/BwyWnIAbYk7Hvq4yckrcv6mVik48bu/noU4kdQlzV2hPJmYF3M1PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A+5Sbrn9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7420FC4CEC0;
-	Sat, 14 Sep 2024 08:59:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726304397;
-	bh=Lx4Uayf2bZvoedX3/yhCtCijyNoRRWxNLVzsgVEa+sU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A+5Sbrn9GRSU609E9s8t5X48RYczSb1qlH6knHFzSwzS/aKA/7aQE3FJFWRO6mbIB
-	 5O11H7pbI/yR4FI/vA+Tr3lR8y7CjA9q6WGW8eFeaouS90j7cnehlB0AzLOIhqKF1D
-	 +oLg8kp2ya62DPCFxVxj3pNstfOGfJVb7SdD9n7LUscORddDftDpfp6OFOGAVLIe8i
-	 bgfusueeOSH3HWZ2/vVPy1/jy+b0Z8qtk4pwwgIC89j0YYtK597GGkjYkEOyJ/9oww
-	 zh5NSo0GjoZlOdGnFWiWzwySzq7l28DndZWwWfDeXvJMr49KlKmi1loaptgdOTpt1+
-	 vdqQqWJSglP0g==
-Date: Sat, 14 Sep 2024 09:59:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: Tiago Lam <tiagolam@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Jakub Sitnicki <jakub@cloudflare.com>, kernel-team@cloudflare.com
-Subject: Re: [RFC PATCH 2/3] ipv6: Run a reverse sk_lookup on sendmsg.
-Message-ID: <20240914085950.GC12935@kernel.org>
-References: <20240913-reverse-sk-lookup-v1-0-e721ea003d4c@cloudflare.com>
- <20240913-reverse-sk-lookup-v1-2-e721ea003d4c@cloudflare.com>
+	s=arc-20240116; t=1726304452; c=relaxed/simple;
+	bh=eKOQYWLXaPne6jFaVaOzWLjZsel1T4Pgwevi6Fg7Khg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=pMfqz/pVkjQrTDV+k5HlD8D9U+kHqBi1tXl3HeJT4OY2NS6br2mdWsASb708m8HWTOws2gmkvFfcooiRQ+KEEEnp1PqZfc0UV77uJYQJ9nqj82dmg6EAZkmzVYMkqZpq9UrLpqwnPxRJgavvcZ5P/+BKrq7b/CzJ559GkiuoIR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4X5Q7v2bRzzfc9N;
+	Sat, 14 Sep 2024 16:58:35 +0800 (CST)
+Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
+	by mail.maildlp.com (Postfix) with ESMTPS id 494F214035F;
+	Sat, 14 Sep 2024 17:00:47 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sat, 14 Sep 2024 17:00:46 +0800
+Message-ID: <315a63f5-712e-c6a0-c447-9dd70253e3aa@huawei.com>
+Date: Sat, 14 Sep 2024 17:00:45 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240913-reverse-sk-lookup-v1-2-e721ea003d4c@cloudflare.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH -next v3 1/2] posix-timers: Check timespec64 before call
+ clock_set()
+Content-Language: en-US
+To: Thomas Gleixner <tglx@linutronix.de>, Richard Cochran
+	<richardcochran@gmail.com>
+CC: <bryan.whitehead@microchip.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<anna-maria@linutronix.de>, <frederic@kernel.org>,
+	<UNGLinuxDriver@microchip.com>, <mbenes@suse.cz>, <jstultz@google.com>,
+	<andrew@lunn.ch>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240909074124.964907-1-ruanjinjie@huawei.com>
+ <20240909074124.964907-2-ruanjinjie@huawei.com>
+ <Zt8SFUpFp7JDkNbM@hoboy.vegasvil.org>
+ <ea351ea0-5095-d7ae-5592-ec3bd45c771c@huawei.com> <874j6l9ixk.ffs@tglx>
+ <46efd1be-688e-ecd0-a9e1-cf5f69d0110f@huawei.com> <87v7yz96gr.ffs@tglx>
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+In-Reply-To: <87v7yz96gr.ffs@tglx>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemh500013.china.huawei.com (7.202.181.146)
 
-On Fri, Sep 13, 2024 at 10:39:20AM +0100, Tiago Lam wrote:
-> This follows the same rationale provided for the ipv4 counterpart, where
-> it now runs a reverse socket lookup when source addresses and/or ports
-> are changed, on sendmsg, to check whether egress traffic should be
-> allowed to go through or not.
+
+
+On 2024/9/13 18:46, Thomas Gleixner wrote:
+> On Thu, Sep 12 2024 at 20:24, Jinjie Ruan wrote:
+>> On 2024/9/12 20:04, Thomas Gleixner wrote:
+>>> How does this code validate timespecs for clock_settime(clockid) where
+>>> clockid != CLOCK_REALTIME?
+>>
+>> According to the man manual of clock_settime(), the other clockids are
+>> not settable.
+>>
+>> And in Linux kernel code, except for CLOCK_REALTIME which is defined in
+>> posix_clocks array, the clock_set() hooks are not defined and will
+>> return -EINVAL in SYSCALL_DEFINE2(clock_settime), so the check is not
+>> necessary.
 > 
-> As with ipv4, the ipv6 sendmsg path is also extended here to support the
-> IPV6_ORIGDSTADDR ancilliary message to be able to specify a source
-
-Hi Tiago Lam,
-
-Some minor nits from my side.
-
-ancilliary -> ancillary
-
-Likewise in patch 3/3.
-Flagged by checkpatch.pl --codespell
-
-> address/port.
+> You clearly understand the code you are modifying:
 > 
-> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
-> Signed-off-by: Tiago Lam <tiagolam@cloudflare.com>
-> ---
->  net/ipv6/datagram.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  net/ipv6/udp.c      |  8 ++++--
->  2 files changed, 82 insertions(+), 2 deletions(-)
+> const struct k_clock clock_posix_dynamic = {
+> 	.clock_getres           = pc_clock_getres,
+>         .clock_set              = pc_clock_settime, 
 > 
-> diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
-> index fff78496803d..4214dda1c320 100644
-> --- a/net/ipv6/datagram.c
-> +++ b/net/ipv6/datagram.c
-> @@ -756,6 +756,27 @@ void ip6_datagram_recv_ctl(struct sock *sk, struct msghdr *msg,
->  }
->  EXPORT_SYMBOL_GPL(ip6_datagram_recv_ctl);
->  
-> +static inline bool reverse_sk_lookup(struct flowi6 *fl6, struct sock *sk,
-> +				     struct in6_addr *saddr, __be16 sport)
-> +{
-> +	if (static_branch_unlikely(&bpf_sk_lookup_enabled) &&
-> +	    (saddr && sport) &&
-> +	    (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr, saddr) || inet_sk(sk)->inet_sport != sport)) {
+> which is what PTP clocks use and that's what this is about, no?
 
-Please consider, where it can trivially be achieved, limiting Networking
-code to 80 columns wide.
+Yes, it uses the dynamic one rather than the static ones.
 
-Checkpatch can be run with a flag to check for this.
-
-> +		struct sock *sk_egress;
-> +
-> +		bpf_sk_lookup_run_v6(sock_net(sk), IPPROTO_UDP, &fl6->daddr, fl6->fl6_dport,
-> +				     saddr, ntohs(sport), 0, &sk_egress);
-> +		if (!IS_ERR_OR_NULL(sk_egress) &&
-> +		    atomic64_read(&sk_egress->sk_cookie) == atomic64_read(&sk->sk_cookie))
-> +			return true;
-> +
-> +		net_info_ratelimited("No reverse socket lookup match for local addr %pI6:%d remote addr %pI6:%d\n",
-> +				     &saddr, ntohs(sport), &fl6->daddr, ntohs(fl6->fl6_dport));
-> +	}
-> +
-> +	return false;
-> +}
-> +
->  int ip6_datagram_send_ctl(struct net *net, struct sock *sk,
->  			  struct msghdr *msg, struct flowi6 *fl6,
->  			  struct ipcm6_cookie *ipc6)
-
-...
+> 
+> Thanks,
+> 
+>         tglx
 
