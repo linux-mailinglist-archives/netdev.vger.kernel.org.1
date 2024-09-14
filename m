@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-128296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9234D978D66
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 06:51:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9871978D67
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 06:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74178B2376E
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 04:51:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 088821C22933
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 04:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128262C181;
-	Sat, 14 Sep 2024 04:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B11C5464E;
+	Sat, 14 Sep 2024 04:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PBsPMek1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HeZTjmM0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF38036126;
-	Sat, 14 Sep 2024 04:50:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753D036126;
+	Sat, 14 Sep 2024 04:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726289447; cv=none; b=QzAEB/QvKVMW+s+LIRhCFZ51ZeuOy2NWIdyUPxxLNg4FJgHF3zF67qHo4aJoZS4aSsFJn/IC2n2d5BBz0Qoas2ZyBP+aen0KIAut4lAoFr4ixAybVHpYfitpCOyrUoH6wWjHZ5HCZdlO8wNmIn8FJhgDN2W/Ipuw8cI5qsQ7QT4=
+	t=1726289448; cv=none; b=NkhwHFC9xtnUJ/aeUSyTHB1OGbErh87T4XOxlcKqiTOEB4e/xGYatzIVThS5nlJ8ab9d/0ym+YK1eQsXg2i7KZLYXxnaVC9lNhAf04kp4sbgj+2f3vbs3HADJF8a5vVkqO2Cmp+u4iMMaGEBJikGZihvpY7tRw/X1GuDSuWoSls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726289447; c=relaxed/simple;
-	bh=oetWeAh9Ww091js+pKBSxPOY8rlt02pi65xfH8BIMQw=;
+	s=arc-20240116; t=1726289448; c=relaxed/simple;
+	bh=4g2Ub7xX6zwQqZApvM1OzhrXjzorZQEQHbyO5oAiJww=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ipptX6yC88yza4xnu8px4EPE4ujM65MWcGphsC9YO/fcq+JDw4vgn3ryJANkxccDmjMHQiSY+QLteFSQqzv3YaS6xLl9SzhqA7wS+RzVbIuGUg7EWjOrZsZwJZ6m0eeB5JOcsG1FUP7hJQXyGt/NI0+maAb4MRidQAvGYHJcaHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PBsPMek1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65E3BC4CEC0;
-	Sat, 14 Sep 2024 04:50:46 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=dbDry4P43tqV8E4+WXZuioevNxAeYSq96yHR+bKaJG8WnmZIEVeH6FZVXU7H7WlxzWp+0cnT5iEkUto4VNMNusU4JKUnccbMpan4IwVA+iixWNL5Xj72qIs4hI0xB0K3SokE+9uy5ZKJGSsZN6poXC3huKq1Y2aA+c21ZafGTn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HeZTjmM0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4AD7C4CEC0;
+	Sat, 14 Sep 2024 04:50:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726289446;
-	bh=oetWeAh9Ww091js+pKBSxPOY8rlt02pi65xfH8BIMQw=;
+	s=k20201202; t=1726289448;
+	bh=4g2Ub7xX6zwQqZApvM1OzhrXjzorZQEQHbyO5oAiJww=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PBsPMek1cmNGZsfDvgG522gpLBano4vhVOeqhAdFQjqA0BaZq8oZnvFTUc57Rwj+C
-	 vnDtFmQtbvHSoFvnq3kKRe5dqYKS4llCOBzMagUsCNSHxSW42jNMDQoXD1OT8OjZ5P
-	 UPShuN/nEupe8GZ3jCItsiHP+jvA/LpSIqfB0fMTZGKM0AJgRV0cvJL86PpoqJbR8Z
-	 wDyZwVQbx+lT4PoXTEEj3vp8riR7kNUmRNT7s/WXzWxcGGahePponC83N67QyGEo4O
-	 /W0C4vpj/vATuDQl2LPKzQIrMXXkFHT9KsLgZ7+e+sVVKVvCPJg1tuoy81gnKhmOm6
-	 S1S5TUDp+v0DQ==
+	b=HeZTjmM0BkQkVDK4beNIltF3zNoxtP/k874sUCMofKvMo0/TE3n9hG8TEWm1qn5nW
+	 Ex6bagp441WNatAvLEHFR9QwhQwuI4DBdr/e0OjYLeuTZdV8xxpu9O0FJ4Cne4maVo
+	 MmtT7u/3ZVm6JNWeWDcYQ6SVapS+uHY0fJTHxKfgaV9DNzcFDSJKRDWQGKnXiUWMOR
+	 Mxgci9n1g71bUnNj3vSr/pw/sQ1kG65wrcAD9Dhm3qugbjoTg6Oo/agBU3DIb6SqKD
+	 OZJsPVHOJKJYEBNjRrUvLrc9lnnxMQzS7DLNjMHDEUEPxX97fgZBFKUNFGhu55jPOv
+	 C10flC4qCc/Nw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1F83806655;
-	Sat, 14 Sep 2024 04:50:48 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 715833806655;
+	Sat, 14 Sep 2024 04:50:50 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/5] can: bcm: Clear bo->bcm_proc_read after
- remove_proc_entry().
+Subject: Re: [PATCH net-next] net: ethtool: phy: Don't set the context dev pointer
+ for unfiltered DUMP
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172628944750.2462238.16531658398450059250.git-patchwork-notify@kernel.org>
-Date: Sat, 14 Sep 2024 04:50:47 +0000
-References: <20240912075804.2825408-2-mkl@pengutronix.de>
-In-Reply-To: <20240912075804.2825408-2-mkl@pengutronix.de>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- linux-can@vger.kernel.org, kernel@pengutronix.de, kuniyu@amazon.com,
- syzbot+0532ac7a06fb1a03187e@syzkaller.appspotmail.com,
- mailhol.vincent@wanadoo.fr
+ <172628944900.2462238.3253064292823332158.git-patchwork-notify@kernel.org>
+Date: Sat, 14 Sep 2024 04:50:49 +0000
+References: <20240913100515.167341-1-maxime.chevallier@bootlin.com>
+In-Reply-To: <20240913100515.167341-1-maxime.chevallier@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, andrew@lunn.ch, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, linux@armlinux.org.uk,
+ linux-arm-kernel@lists.infradead.org, christophe.leroy@csgroup.eu,
+ herve.codina@bootlin.com, f.fainelli@gmail.com, hkallweit1@gmail.com,
+ vladimir.oltean@nxp.com, kory.maincent@bootlin.com, kabel@kernel.org,
+ piergiorgio.beruto@gmail.com, o.rempel@pengutronix.de, nicveronese@gmail.com,
+ horms@kernel.org, mwojtas@chromium.org, nathan@kernel.org,
+ atenart@kernel.org, mkl@pengutronix.de, dan.carpenter@linaro.org,
+ romain.gantois@bootlin.com,
+ syzbot+e9ed4e4368d450c8f9db@syzkaller.appspotmail.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Marc Kleine-Budde <mkl@pengutronix.de>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 12 Sep 2024 09:50:50 +0200 you wrote:
-> From: Kuniyuki Iwashima <kuniyu@amazon.com>
+On Fri, 13 Sep 2024 12:05:14 +0200 you wrote:
+> The context info allows continuing DUMP requests, shall they fill the
+> netlink buffer.
 > 
-> syzbot reported a warning in bcm_release(). [0]
+> In the case of filtered DUMP requests, a reference on the netdev is
+> grabbed in the .start() callback and release in .done().
 > 
-> The blamed change fixed another warning that is triggered when
-> connect() is issued again for a socket whose connect()ed device has
-> been unregistered.
+> Unfiltered DUMP request don't need the dev pointer to be set in the context
+> info, doing so will trigger an unwanted netdev_put() in .done().
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/5] can: bcm: Clear bo->bcm_proc_read after remove_proc_entry().
-    (no matching commit)
-  - [net,2/5] can: esd_usb: Remove CAN_CTRLMODE_3_SAMPLES for CAN-USB/3-FD
-    (no matching commit)
-  - [net,3/5] can: kvaser_pciefd: Enable 64-bit DMA addressing
-    (no matching commit)
-  - [net,5/5] can: m_can: m_can_close(): stop clocks after device has been shut down
-    (no matching commit)
-  - [net-next,4/5] can: rockchip_canfd: rkcanfd_timestamp_init(): rework delay calculation
-    https://git.kernel.org/netdev/net-next/c/cd0983c7f880
+  - [net-next] net: ethtool: phy: Don't set the context dev pointer for unfiltered DUMP
+    https://git.kernel.org/netdev/net-next/c/1ad84a151af7
 
 You are awesome, thank you!
 -- 
