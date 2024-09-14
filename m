@@ -1,262 +1,187 @@
-Return-Path: <netdev+bounces-128365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874DB9792F7
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 20:32:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EA6BF9792FF
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 20:46:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A66731C2158E
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 18:32:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A31B1C20E40
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 18:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250EA1D1311;
-	Sat, 14 Sep 2024 18:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0BE51D1737;
+	Sat, 14 Sep 2024 18:46:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fA18uvwv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D36C1D04BA
-	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 18:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DA41D12E7
+	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 18:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726338755; cv=none; b=WfjHWpJH3yMi2gS2blFL9t8smsHdilzUkjHubo29IkeR3EZa908MSeQOjSwE9qxMJC0zD6dxnFAbnY7rOKILtyFh3aTpyJX4JJLE5/mW93fzqD6BSeOmTdmykYVpcWiWoOYEZoNSW4XEvXVzJ9TGf13CIIyF/f5hqitCDwMbk2s=
+	t=1726339591; cv=none; b=SWQDHa/7UCd3FzAIJqo4+oBbcfxfVC3q5xbPasrxPAuUMF/fsvTmIREldDHi5nHHVFCXs5YbzPmZKo9RidBAOHdVdtEicv7qbnaQcbko88jg/3ZIxWUuiHLwYAW9lg66jeIeay9hSE3sL1pm29qk+EDqaJv3Ql38prf3vRyVmQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726338755; c=relaxed/simple;
-	bh=4NzyaYcFLyFdiwFlH1SF4vhTsrTJ+gOMxR6mOjJ10TY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PHQxlkPJeoI8ZrLuZX1zzCC5R8hFSEP4azTIb63uUqzyn61SVs0efopDGzeUMHc5SHmAQCUiZ59xfaKbVHGMsWIQt3/0hkMFNwWe8DAP1Jb//4WI9+Eq8hhzzZrEUAKtfU6nF5Qzt6lDBEh+85TkKTlaiJ+5tYvGb9e7dXnOTBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-82aa499f938so743039539f.0
-        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 11:32:33 -0700 (PDT)
+	s=arc-20240116; t=1726339591; c=relaxed/simple;
+	bh=3TrYZmah0tVKjvlUyufFLlqbwVLn2rqABbtR8U/v3K4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=R4F/aMUKie94s03/aAUo/4ZsB3Oev/YKHmg+H6w4wQx+6u7QmGOAWyNNfyVslOsK1cgAGyoHdvVz3wuhcVNkztiMpyRwNiQrwrfyj/FcE5y534YuzoHbz88WIons8yTSIihRRvGE/K8ojF795YYzNOggIb62xMJ48ZSJNvkapPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fA18uvwv; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2d87b7618d3so5263003a91.3
+        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 11:46:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726339589; x=1726944389; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4pwxOtdBqPNpG3ycs4skY+O3QKM4phnpDkbqjbyYSMQ=;
+        b=fA18uvwvFXmQA8HC58uZpWOnRhDzrYpRVeI32gqTToquUhDYGACLhahTj321qdHj6t
+         vBmM+ufR8RnsFyxfHGDPuVlpP1AaESJKlliP6HGoa4gIb4WswhRWgSW8qRnv4AEYR5qK
+         BSSBq1p0aXeBlIonoFozlQ4mP1omw6zR5FA/1d8gU9Aoe3SOpiuAtBcTmu9AWFbRcRWo
+         rt5agrF3iCB24hViJyXGsFllwFtRZ0Zl+Auv6EGNAoJqrQp7vh2TGsVB3Qn3SlLmFurw
+         k0LGMWco0B1ZSgmPrYenmjMJGktlOS9VygZDm1zbth0vIApdzLo025MNptf1bK2vd0b5
+         x+hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726338752; x=1726943552;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1726339589; x=1726944389;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=vCk7m8bdTlsEaBcbvj4x/KUx6uyEvQuBhZ5cw+5b2WI=;
-        b=QJET73aaW2Jobf4fb6hy5NaXlYhX+2+SResjl8w2Y520n18t7ikjohP97khievcQ2M
-         XB9u/2yTAoQBxoSIC0ipMCkjFVOawY3zjqiZ/ksdJ41uJdX6OP3pPk/7eTKAE/xnFBYf
-         rkQeqAb7NEoSNh2m4LwFuN+o8NUy64QvCjf6PgFhfzNpXb8F7io5z9nMzQ5KlFgwIQWL
-         +b4M1x6MDCb+KIHIA6blmBFqqHn0vUTK4soN7exT/S7u7tbFvMnm7nZwIGDTTM9jul4N
-         0CKv1wY5I2fP3p9I8VEQuyUxtLs/h8grlT8Vms+jircYvOGts8Xm3nl1Bvq0JXGSbVtk
-         RfYg==
-X-Forwarded-Encrypted: i=1; AJvYcCU9gv9Mx0mWAHtv8XwGSQ4yujRbu9NFJ6q0bjP4Tv1SZA0h1tRcsL5665kpqMlrB5KUiXZjWnA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSXAS5zHdIQAc7Bb/rLH0z2cAuuEcqNq58K3Bc3Z8QSsWYmco2
-	TtNysFnQXgWL2JP6WxbOfIw8CgJEffQvklr/pnu2ewzFPsnQdOu4p4x2wxZmZcqPU/D0BJ56mu3
-	YeM6aqpu64Qp6wIE3T/7rknM+wuBiBE3drKoN8ODeV1PeUanp3LiaVFk=
-X-Google-Smtp-Source: AGHT+IHxfv/r6206/lgRVgpCntlAQjD6LhnnFmcb01k6yxsxSfB4NczYR/dBfZGAaVKF2C2l3+Akv3WNu1DvjkO7Gq66zDDgSjMc
+        bh=4pwxOtdBqPNpG3ycs4skY+O3QKM4phnpDkbqjbyYSMQ=;
+        b=d0uno1uVdwaAkwlhFMgKDnkAog8mw1S1FXLIct9rKYZqvoqrV3UrOGsnDk6Rc2LSx1
+         9MRgfq6sE8qOHoRQV1f9wopxKSVbncmjlmFwIyf0T2jH1dSCx5daY0y+cvNSalgiG4t5
+         ArynbQ+a7IHikQwdvo24Vc/8k8xnwVph6bECZ5+hX/dzQ/hida2SUmf2W7vdbqUiAmEo
+         z2KS4NG9cBLVMgHwT/6Kyoyi7Cj7BDw1ZfyPFEOITdZ5EDrHw6Q1y6XWnco8IAasSgLt
+         6aCSvJqkp1nz/frlyWAbLcX8Bu7cf7aKM57i4vWqpJWxnyOJ0/E61vhoclJwGXeBmzO/
+         LKsg==
+X-Forwarded-Encrypted: i=1; AJvYcCVXeNOmtn+2czg2sIZeUYX0ht2Lt9uwb6qR8gDHTjfUZhfpjYpDGex0xRSq1o1yDNYpTyrKY9c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrBJSZ572dL/9faCNP3nKwbIQQUm2evXckGZHxUyR56vjEzL5A
+	H9kA3EVazZCqPm86Iw6vNlPdQ95K9i9iqjMtCBd7EkohcXY18jDN4UYyXKHmuBEYYBXY50zwmA=
+	=
+X-Google-Smtp-Source: AGHT+IGnH57+W2+X+BBOfkHlZCjThkeqQccuVRG5rt9hJj6St8tpjhNLCddTVRg7vyg7OiPeQzTwrPJa0w==
+X-Received: from jrife-kvm.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:63c1])
+ (user=jrife job=sendgmr) by 2002:a17:90a:9283:b0:2d8:92c9:70d with SMTP id
+ 98e67ed59e1d1-2dba0014c07mr21163a91.5.1726339589291; Sat, 14 Sep 2024
+ 11:46:29 -0700 (PDT)
+Date: Sat, 14 Sep 2024 18:46:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d88:b0:395:e85e:f2fa with SMTP id
- e9e14a558f8ab-3a084611b38mr89973065ab.1.1726338752490; Sat, 14 Sep 2024
- 11:32:32 -0700 (PDT)
-Date: Sat, 14 Sep 2024 11:32:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001abfb506221890b2@google.com>
-Subject: [syzbot] [hams?] possible deadlock in nr_rt_device_down (3)
-From: syzbot <syzbot+ccdfb85a561b973219c7@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, ralf@linux-mips.org, 
-	syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.662.g92d0881bb0-goog
+Message-ID: <20240914184616.2916445-1-jrife@google.com>
+Subject: [PATCH net] netkit: Ensure current->bpf_net_context is set in netkit_xmit()
+From: Jordan Rife <jrife@google.com>
+To: Daniel Borkmann <daniel@iogearbox.net>, Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org
+Cc: Jordan Rife <jrife@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, bpf@vger.kernel.org, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+When operating Cilium in netkit mode with BPF-based host routing, calls
+to bpf_redirect() cause a kernel panic.
 
-syzbot found the following issue on:
+[   52.247646] BUG: kernel NULL pointer dereference, address: 0000000000000038
+...
+[   52.247727] RIP: 0010:bpf_redirect+0x18/0x80
+...
+[   52.247986] Call Trace:
+[   52.247990]  <TASK>
+[   52.248002]  ? show_regs+0x6c/0x80
+[   52.248024]  ? __die+0x24/0x80
+[   52.248029]  ? page_fault_oops+0x155/0x570
+[   52.248047]  ? fib_rules_lookup+0x112/0x270
+[   52.248056]  ? do_user_addr_fault+0x4b2/0x870
+[   52.248063]  ? exc_page_fault+0x82/0x1b0
+[   52.248090]  ? asm_exc_page_fault+0x27/0x30
+[   52.248103]  ? bpf_redirect+0x18/0x80
+[   52.248109]  bpf_prog_f0698aabaf44c832_tail_handle_ipv4+0x173f/0x2707
+[   52.248119]  ? sbitmap_find_bit+0xe3/0x270
+[   52.248129]  netkit_xmit+0x177/0x3c0
+[   52.248139]  dev_hard_start_xmit+0x62/0x1d0
+[   52.248149]  __dev_queue_xmit+0x241/0xf30
+[   52.248155]  ? alloc_skb_with_frags+0x60/0x280
+[   52.248164]  ? __check_object_size+0x2a2/0x310
+[   52.248173]  ? ip_generic_getfrag+0x63/0x110
+[   52.248181]  ip_finish_output2+0x2cf/0x560
+[   52.248187]  __ip_finish_output+0xb6/0x180
+[   52.248193]  ip_finish_output+0x29/0x120
+[   52.248198]  ip_output+0x5f/0x100
+[   52.248204]  ? __pfx_ip_finish_output+0x10/0x10
+[   52.248210]  ip_send_skb+0x98/0xb0
+[   52.248215]  udp_send_skb+0x146/0x370
 
-HEAD commit:    4c8002277167 fou: fix initialization of grc
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=10513877980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=660f6eb11f9c7dc5
-dashboard link: https://syzkaller.appspot.com/bug?extid=ccdfb85a561b973219c7
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Setting a breakpoint inside bpf_net_ctx_get_ri() confirms that
+current->bpf_net_context is NULL right before the panic.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+(gdb) p $lx_current().bpf_net_context
+$4 = (struct bpf_net_context *) 0x0 <fixed_percpu_data>
+(gdb) disassemble bpf_redirect
+Dump of assembler code for function bpf_redirect:
+   0xffffffff81f085e0 <+0>:	nopl   0x0(%rax,%rax,1)
+   0xffffffff81f085e5 <+5>:	mov    %gs:0x7e12d593(%rip),%rax
+   0xffffffff81f085ed <+13>:	push   %rbp
+   0xffffffff81f085ee <+14>:	mov    0x23d0(%rax),%rax
+=> 0xffffffff81f085f5 <+21>:	mov    %rsp,%rbp
+   0xffffffff81f085f8 <+24>:	mov    0x38(%rax),%edx
+...
+(gdb) continue
+Continuing.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9058e311cdd1/disk-4c800227.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1659255894d5/vmlinux-4c800227.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/04227ccb2e58/bzImage-4c800227.xz
+Thread 1 hit Breakpoint 1, panic ...
+288	{
+(gdb)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ccdfb85a561b973219c7@syzkaller.appspotmail.com
+commit 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct
+on PREEMPT_RT.") recently moved bpf_redirect_info into bpf_net_context,
+a new member of task_struct. Currently, current->bpf_net_context is set
+and then cleared inside sch_handle_egress() where tcx_run() and tc_run()
+execute, but it looks like netkit_xmit() was missed leaving
+current->bpf_net_context uninitialized when it runs. This patch ensures
+that current->bpf_net_context is initialized while running
+netkit_xmit().
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.11.0-rc6-syzkaller-00180-g4c8002277167 #0 Not tainted
-------------------------------------------------------
-syz.1.4509/22182 is trying to acquire lock:
-ffffffff8fde86d8 (nr_node_list_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffffffff8fde86d8 (nr_node_list_lock){+...}-{2:2}, at: nr_rt_device_down+0xb5/0x7b0 net/netrom/nr_route.c:517
-
-but task is already holding lock:
-ffffffff8fde8678 (nr_neigh_list_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffffffff8fde8678 (nr_neigh_list_lock){+...}-{2:2}, at: nr_rt_device_down+0x28/0x7b0 net/netrom/nr_route.c:514
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (nr_neigh_list_lock){+...}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:356 [inline]
-       nr_remove_neigh net/netrom/nr_route.c:307 [inline]
-       nr_dec_obs net/netrom/nr_route.c:472 [inline]
-       nr_rt_ioctl+0x398/0xfb0 net/netrom/nr_route.c:692
-       sock_do_ioctl+0x158/0x460 net/socket.c:1222
-       sock_ioctl+0x629/0x8e0 net/socket.c:1341
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:907 [inline]
-       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #1 (&nr_node->node_lock){+...}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:356 [inline]
-       nr_node_lock include/net/netrom.h:152 [inline]
-       nr_dec_obs net/netrom/nr_route.c:459 [inline]
-       nr_rt_ioctl+0x192/0xfb0 net/netrom/nr_route.c:692
-       sock_do_ioctl+0x158/0x460 net/socket.c:1222
-       sock_ioctl+0x629/0x8e0 net/socket.c:1341
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:907 [inline]
-       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (nr_node_list_lock){+...}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3133 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3252 [inline]
-       validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3868
-       __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:356 [inline]
-       nr_rt_device_down+0xb5/0x7b0 net/netrom/nr_route.c:517
-       nr_device_event+0x134/0x150 net/netrom/af_netrom.c:126
-       notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
-       call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
-       call_netdevice_notifiers net/core/dev.c:2046 [inline]
-       dev_close_many+0x33c/0x4c0 net/core/dev.c:1587
-       dev_close+0x1c0/0x2c0 net/core/dev.c:1609
-       bpq_device_event+0x372/0x8b0 drivers/net/hamradio/bpqether.c:547
-       notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
-       __dev_notify_flags+0x207/0x400
-       dev_change_flags+0xf0/0x1a0 net/core/dev.c:8915
-       dev_ifsioc+0x7c8/0xe70 net/core/dev_ioctl.c:527
-       dev_ioctl+0x719/0x1340 net/core/dev_ioctl.c:784
-       sock_do_ioctl+0x240/0x460 net/socket.c:1236
-       sock_ioctl+0x629/0x8e0 net/socket.c:1341
-       vfs_ioctl fs/ioctl.c:51 [inline]
-       __do_sys_ioctl fs/ioctl.c:907 [inline]
-       __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  nr_node_list_lock --> &nr_node->node_lock --> nr_neigh_list_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(nr_neigh_list_lock);
-                               lock(&nr_node->node_lock);
-                               lock(nr_neigh_list_lock);
-  lock(nr_node_list_lock);
-
- *** DEADLOCK ***
-
-2 locks held by syz.1.4509/22182:
- #0: ffffffff8fc8be48 (rtnl_mutex){+.+.}-{3:3}, at: dev_ioctl+0x706/0x1340 net/core/dev_ioctl.c:783
- #1: ffffffff8fde8678 (nr_neigh_list_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
- #1: ffffffff8fde8678 (nr_neigh_list_lock){+...}-{2:2}, at: nr_rt_device_down+0x28/0x7b0 net/netrom/nr_route.c:514
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 22182 Comm: syz.1.4509 Not tainted 6.11.0-rc6-syzkaller-00180-g4c8002277167 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2186
- check_prev_add kernel/locking/lockdep.c:3133 [inline]
- check_prevs_add kernel/locking/lockdep.c:3252 [inline]
- validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3868
- __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- nr_rt_device_down+0xb5/0x7b0 net/netrom/nr_route.c:517
- nr_device_event+0x134/0x150 net/netrom/af_netrom.c:126
- notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
- call_netdevice_notifiers_extack net/core/dev.c:2032 [inline]
- call_netdevice_notifiers net/core/dev.c:2046 [inline]
- dev_close_many+0x33c/0x4c0 net/core/dev.c:1587
- dev_close+0x1c0/0x2c0 net/core/dev.c:1609
- bpq_device_event+0x372/0x8b0 drivers/net/hamradio/bpqether.c:547
- notifier_call_chain+0x19f/0x3e0 kernel/notifier.c:93
- __dev_notify_flags+0x207/0x400
- dev_change_flags+0xf0/0x1a0 net/core/dev.c:8915
- dev_ifsioc+0x7c8/0xe70 net/core/dev_ioctl.c:527
- dev_ioctl+0x719/0x1340 net/core/dev_ioctl.c:784
- sock_do_ioctl+0x240/0x460 net/socket.c:1236
- sock_ioctl+0x629/0x8e0 net/socket.c:1341
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fdcda77def9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fdcdb4b4038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007fdcda935f80 RCX: 00007fdcda77def9
-RDX: 0000000020000700 RSI: 0000000000008914 RDI: 000000000000000b
-RBP: 00007fdcda7f09f6 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fdcda935f80 R15: 00007ffe2567ade8
- </TASK>
-
-
+Signed-off-by: Jordan Rife <jrife@google.com>
+Fixes: 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
+Cc: stable@vger.kernel.org
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/netkit.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
+index d0036a856039..92ac0cb5a327 100644
+--- a/drivers/net/netkit.c
++++ b/drivers/net/netkit.c
+@@ -65,6 +65,7 @@ static struct netkit *netkit_priv(const struct net_device *dev)
+ 
+ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+ {
++	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
+ 	struct netkit *nk = netkit_priv(dev);
+ 	enum netkit_action ret = READ_ONCE(nk->policy);
+ 	netdev_tx_t ret_dev = NET_XMIT_SUCCESS;
+@@ -73,6 +74,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	int len = skb->len;
+ 
+ 	rcu_read_lock();
++	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+ 	peer = rcu_dereference(nk->peer);
+ 	if (unlikely(!peer || !(peer->flags & IFF_UP) ||
+ 		     !pskb_may_pull(skb, ETH_HLEN) ||
+@@ -109,6 +111,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		ret_dev = NET_XMIT_DROP;
+ 		break;
+ 	}
++	bpf_net_ctx_clear(bpf_net_ctx);
+ 	rcu_read_unlock();
+ 	return ret_dev;
+ }
+-- 
+2.46.0.662.g92d0881bb0-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
