@@ -1,147 +1,97 @@
-Return-Path: <netdev+bounces-128361-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC3889791EE
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 18:00:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6BA9979209
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 18:12:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 81D461F229C9
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 16:00:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ADD02821FF
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 16:12:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6065A1D049A;
-	Sat, 14 Sep 2024 16:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxzAka99"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECAF1D0DD9;
+	Sat, 14 Sep 2024 16:12:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D020B33E8;
-	Sat, 14 Sep 2024 16:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75F61D0952
+	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 16:12:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726329631; cv=none; b=T9mIW+tvUSWumdTmQohLwVkP4v68uUsFap4i8sGApV/wUgIAUoCoNcGz4X8LeGe/+TIOgWOmlmVHELVE6l1nouMnA2R/DRMOkzzDuqWpKf66e8T8CJEwIiqhdZOYPN0u3vsLRzNobfa8nNb3OwM2JYcXltDsQN6+JQ3LdX/tmMk=
+	t=1726330325; cv=none; b=Pw1WF+ozBkAvpyxHt2yQnwFqG6UYfyIv+uAQAFb/mYV6lHYctxsUilBKP91/iOmUV9fjDnzjCSRWPlL8kQ1rzbO8k0LDqpRWr/hT4M7pioLG748Ls1nHxgcomo+CzteY/gCQaPE9VkzxUvFaJUqc4LET4ezeEnGZjZCGDODCuwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726329631; c=relaxed/simple;
-	bh=gmhuqzvzoZsULPOnqM46R1nBOweiWnFl3W8Yd+keNgA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=np6PrY59tMm66oRLH7hdcjzgxNnr20QZX19g7F7qx5zUeI2SCQIZrocyQFPzB0j9x3DWUxn+ADKDoSbwNXJOKUT91+Qgx8iaSVsQSgzKafRcxdx5n+3UEswHTqXUaXdwvK+tDX5GbXU8LUon9AhDS/iGUvZYZuF6kg1o9CqU60I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hxzAka99; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dff1ccdc17bso3032527276.0;
-        Sat, 14 Sep 2024 09:00:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726329629; x=1726934429; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pw8obV4t7WvzYfzFMrurtyNaCLSHnDvfl6MF+sbwPeI=;
-        b=hxzAka99G5ZtRgaOD1V7WcUlVFk4yZil5ol2EJEDp3UUdheSmpsmBLpO389v1GGAr3
-         q4aE3tUM+kgyX0HsQBpVhML2HcAzCDiXcOyxHoOOgWMCbOl3REV2fMB9/R6t8HZgJnQd
-         SDqKaU0sv+yhofch03ktyBRzjKJ8h2EsfAtzZwnWBxJqeVn2tpFd9+R/lXNAq4MuOYw7
-         yyXszIgl1q2Ww6kx0mB/qEKX524ePIPzx8Yu+bQZgm0efyanUwtT2+QwPVLaQmi3oYiu
-         +3UpHLC4ScQi8+7ln2XcP4kCYhIvWkIYpOlOIzceBQNVBO/5VET6HAsZh2J9AJkWLpP3
-         m6Lw==
+	s=arc-20240116; t=1726330325; c=relaxed/simple;
+	bh=3/RaIZT7WdvooM9BNOa0osJLBSkrxtxxgxDPh4ZRNTU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=CZfYmjXZpow7HtZ/ukMAf47UTwHzWs6bOOwqwdu4sEx20RenS2Au5VDoPy56sSK6JgSqNi7NPmwojfV4JmhwFDh1GIx8xxumRmCV/Fijm2SYsLRJ5CWw2mu7cqWfCwYPXdX3yXy+GLM0M7RbMEUiOE9apPJdsjMvpBR+b9APihE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a093440d95so33750565ab.2
+        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 09:12:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726329629; x=1726934429;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pw8obV4t7WvzYfzFMrurtyNaCLSHnDvfl6MF+sbwPeI=;
-        b=TCE+K3agqf9KBGjx3dGVHFEyByJGhSR6VlipLrm0Sj5KrJ1y/pM1bYQnVoxcpr2LEy
-         3pv6VU8eDImcgkesI16HucPuALhnZRVuavZn5z+F+mlvKh9PCy14Am3Xxlj9rtez/ufW
-         WOUy9zsYA97KIunEu/5NbSUv0g3ivdwB3YyVMJg9tjgD6mT0ByPDqxOS8N7MkwuYhm9S
-         ljJoXvgBYY3WiWqBlpOH92oB1Po73ViJ3XplOnTlnqK558QaetGH7sCgsrNCzEZMVBZ2
-         8OA4smlLS2J0cYKrcPO0rtPesrjHo/4x8u1GjauvdjEF4bzp9cubHwgfrz/woRsgUg8N
-         gAWw==
-X-Forwarded-Encrypted: i=1; AJvYcCUpMQ/Sp87dDowuE48of0Hr5gdNSxZW/FspSRdR6/LCVAWdD8dH1t/u+FpvuaYE5uMyvRetqIYY14JX2Yc=@vger.kernel.org, AJvYcCWV66gI/GO5BRLo8uXQEVgEkbRu9H8T3gnUQVWBfMntd+BpceyN4iWvJCf1WLE9wDdzgeURRykqcJ/WWcnqRSUB@vger.kernel.org, AJvYcCXCTq+/o34XqSzh2oNItt6+0H5XDftc51+dmsRgZytOAVGG8LNEAaWGUcjxpJVBBtHI9aaJMr/A@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVEJbiGNRSOE20pc8mFE+dTGU3m0Syn/r8W4Oe2uQ2uWsZaelx
-	kejUaavU4JZZ6IINeaJPQqkGAmZOUg9GVXJsskUSJtTiNlNdFttLtMT5EA==
-X-Google-Smtp-Source: AGHT+IGFT+SYdQRRuCDaUGQGbIE6pE5mxpTXkPQVIUtM63s57kbgKD6W0SBd7MNUld8Cxw//MO5jGw==
-X-Received: by 2002:a05:690c:83:b0:6af:6762:eba1 with SMTP id 00721157ae682-6dbb6b35d38mr84461067b3.20.1726329627172;
-        Sat, 14 Sep 2024 09:00:27 -0700 (PDT)
-Received: from localhost ([2600:1700:6165:1c10:eecb:23b8:cac:4583])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6dbe2e25833sm2709327b3.59.2024.09.14.09.00.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Sep 2024 09:00:26 -0700 (PDT)
-From: David Hunter <david.hunter.linux@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org
-Cc: David Hunter <david.hunter.linux@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 1/1 V4] selftests: net: improve missing modules error message
-Date: Sat, 14 Sep 2024 12:00:04 -0400
-Message-ID: <20240914160007.62418-1-david.hunter.linux@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1726330322; x=1726935122;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=elLGdhu/N7XTEKaqxHm49lH0bwEsUUVJ3oDAKjdaD5Q=;
+        b=YgLD7KJgWVlW7Hh5EzDTJizYW/qHNWn+doKfGTbjcgIcbNz+tqquES0fgyGyfHseKb
+         TkwnTRi8rg7Y7/FVFHB9spNc0cruCjZNMWKCfBiCFnlZzDZ2V3BqhBfNpoVhxbut99mU
+         DkuKW8wDYe2jd2XSXm4cbPK4iKsAVT3bCopfZ91jULdHvQKp96kbLyrs4bplvRNlufX0
+         diOf3Jz73fgWvMi6wA6qvr9I2FuMsA3xkNanA5gHHB35njkpgJW53xzyc/4lRm/gfYqg
+         Q1EWS9qr03HDRT2uyC38w+CgUwwlzPzk7keNPipAqmFzODxgtNrHF5dqklFxQKjkovkh
+         lAeA==
+X-Forwarded-Encrypted: i=1; AJvYcCVLTWJDzMrY6nSXmHOcMeFum450bukMl+N+ZxdNEH/IYLSx8eYxHcU2fuAP/odpW22xNuvaWzQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmEDSqevddxqH4tc6X+8xhRUV7rcVaYSFgD/n1q1I9nhtcMeQl
+	4BbFxvsbpYxCyyty3iYuEUbE2tc6n8PrsBIwcZKGBYvNRKvrtNDJsDZu6tGMR/TUpnaW6j6K+SY
+	XPOB9Ik1m/xiesykGjhfvsRQ2DGRY+kuBkQB1b1m8KTlLfRS+7OacQ0Y=
+X-Google-Smtp-Source: AGHT+IEc++CMyi6bkWbEuObVzejUUGoJZN+8Kp9MFs8scQOh5Rafy+cL57mjP3DXHmucVMmExu3iETWNncLa6nd6JZ8MiIDzZQDF
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1a2e:b0:3a0:9d2c:b079 with SMTP id
+ e9e14a558f8ab-3a09d2cb143mr92265ab.19.1726330321813; Sat, 14 Sep 2024
+ 09:12:01 -0700 (PDT)
+Date: Sat, 14 Sep 2024 09:12:01 -0700
+In-Reply-To: <0000000000005c8e95060babfa0e@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <66e5b5d1.050a0220.115905.0008.GAE@google.com>
+Subject: Re: [syzbot] [virt?] [netfilter?] INFO: rcu detected stall in
+ ip_list_rcv (6)
+From: syzbot <syzbot+45b67ef6e09a39a2cbcd@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	jhs@mojatatu.com, jiri@resnulli.us, kadlec@netfilter.org, kuba@kernel.org, 
+	lenb@kernel.org, linux-acpi@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
+	pablo@netfilter.org, rjw@rjwysocki.net, syzkaller-bugs@googlegroups.com, 
+	vinicius.gomes@intel.com, virtualization@lists.linux.dev, 
+	vladimir.oltean@nxp.com, xiyou.wangcong@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
-The error message describing the required modules is inaccurate.
-Currently, only  "SKIP: Need act_mirred module" is printed when any of
-the modules are missing. As a result, users might only include that
-module; however, three modules are required.
+syzbot suspects this issue was fixed by commit:
 
-Fix the error message to show any/all modules needed for the script file
-to properly execute.
+commit e634134180885574d1fe7aa162777ba41e7fcd5b
+Author: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date:   Mon May 27 15:39:54 2024 +0000
 
-Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
----
+    net/sched: taprio: make q->picos_per_byte available to fill_sched_entry()
 
-V1 
-	- https://lore.kernel.org/all/20240820202116.6124-1-david.hunter.linux@gmail.com/
-V2
-	- https://lore.kernel.org/all/20240823054833.144612-1-david.hunter.linux@gmail.com/
-	- included subject prefixes
-	- split the patch into two separate patches (one for each issue)
-	- fixed typos in message body
-	- removed second, unnecessary for loop
-V3
-	- https://lore.kernel.org/all/20240827205629.51004-1-david.hunter.linux@gmail.com/#r
-	- fixed subject prefix (omit capitilization)
-	- fixed spelling mistake in commit message
-	- fixed coding style based on recommendations
----
- .../selftests/net/test_ingress_egress_chaining.sh    | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17264407980000
+start commit:   753c8608f3e5 Merge tag 'for-netdev' of https://git.kernel...
+git tree:       net-next
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f8715b6ede5c4b90
+dashboard link: https://syzkaller.appspot.com/bug?extid=45b67ef6e09a39a2cbcd
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15abc0e2e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10b0c7c2e80000
 
-diff --git a/tools/testing/selftests/net/test_ingress_egress_chaining.sh b/tools/testing/selftests/net/test_ingress_egress_chaining.sh
-index 08adff6bb3b6..007a5d04c3e1 100644
---- a/tools/testing/selftests/net/test_ingress_egress_chaining.sh
-+++ b/tools/testing/selftests/net/test_ingress_egress_chaining.sh
-@@ -13,10 +13,20 @@ if [ "$(id -u)" -ne 0 ];then
- fi
- 
- needed_mods="act_mirred cls_flower sch_ingress"
-+mods_missing=""
-+numb_mods_needed=0
-+
- for mod in $needed_mods; do
--	modinfo $mod &>/dev/null || { echo "SKIP: Need act_mirred module"; exit $ksft_skip; }
-+	modinfo $mod &>/dev/null && continue
-+	mods_missing="$mods_missing$mod "
-+	numb_mods_needed=$(expr $numb_mods_needed + 1)
- done
- 
-+if [ $numb_mods_needed -gt 0 ]; then
-+	echo "SKIP: $numb_mods_needed modules needed: $mods_missing"
-+	exit $ksft_skip
-+fi
-+
- ns="ns$((RANDOM%899+100))"
- veth1="veth1$((RANDOM%899+100))"
- veth2="veth2$((RANDOM%899+100))"
--- 
-2.43.0
+If the result looks correct, please mark the issue as fixed by replying with:
 
+#syz fix: net/sched: taprio: make q->picos_per_byte available to fill_sched_entry()
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
