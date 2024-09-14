@@ -1,86 +1,85 @@
-Return-Path: <netdev+bounces-128331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79A3B978FCD
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 12:02:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C993C978FD0
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 12:05:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E8831F20ECB
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 10:02:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBF181C21989
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 10:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058983032A;
-	Sat, 14 Sep 2024 10:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE221CDFD9;
+	Sat, 14 Sep 2024 10:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I4nK8NlM"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QXsLhkbd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896712BB09
-	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 10:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B5B76046
+	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 10:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726308127; cv=none; b=UAtSHCSH9B3Bplox+IpOuco0t63Fqfh1cBxE0SahtXL5yOx+LeG1hpzI2Wt2rlY/fvyQb/ymemaP8bk+WeYF+dfi47jD4ehe2KGspYn5baS6S+sMZqHjH+FEPnDAjsqn0tGFB3/jpOR8Vx5lo9gAFaqRsvW6zlWWTuYHJALVQF8=
+	t=1726308336; cv=none; b=Ys1K33dqQ1X+Hz2mSGR1oegtUSn+izQl2kZ8W94tqrCaLa/czhsslUg9JDuC4Z7YlHy4NmGow61jRyqOE2R99Po54b8PYozTysmMFIiVLIiPZLlYjwLOVa72f1oW6it+LtdOVQe65gCtIa9wKzpRFCYUEo/dQcw8DgDpWxw3qOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726308127; c=relaxed/simple;
-	bh=R8xOgR5VsugEe+y8yoOqZqzMHADQaOvJIWjkuqS4BfE=;
+	s=arc-20240116; t=1726308336; c=relaxed/simple;
+	bh=uyUo2fF7wfyuRfSxg2fJMYfWzcWgmdiUEo5RMmlO/3Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kiute3bJiPFvyUtP2ruBYpy4JoCmyicXm6R30P3aRlwYMI+3s+KZdIQGj81V3UDxZqHWCepsUpTCssIJtydYMLWvJf/ssK1yx+EU3NbErQrPsn/W/m1wYWZitciKJBHfrdiTtH7T4bbA2jpoC7wUimrwMOrjCD2Vs58uUWwLWpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I4nK8NlM; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-20551e2f1f8so19253745ad.2
-        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 03:02:06 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=mz/E2bpAG9N9cSHZfiA4PkkXFffsBe7dIOJzujUe8+wm3ZmgKh8AirpSD4Q2xScSY0J6Xm56LDJ3Uh5/ZFtZJ/tyAArg0qQbXowWty50zJ58bpRovcsvxUZkBaOHg4d97X482stnLS5OFo11IeOMz44IZk+WjUJ9NfyZOQ86ugY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QXsLhkbd; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a86e9db75b9so427039866b.1
+        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 03:05:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726308126; x=1726912926; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1726308333; x=1726913133; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5zmwLZDktvjILrPQJbKMJaQkPt6Y8bnfMAolJBb47Gg=;
-        b=I4nK8NlM1TXdxbPzl1s8cwcxUqyc7eJfc2ER3gEqZHWR7/8080QPykWn8EvWgUVNJM
-         IWLXImNyHnWAy/3MilLPmdMvcMum5KqrT4dzNkgf5bsT3U0/Z8CcC3Aou37qewwKqiGu
-         fuNv2LvpA5HFZyua+V4LRuAjRD687xm0n9l7N8Fck3+LFzSWursEnwNLTHBsNboH40Kj
-         2zIiMu0kND9OOnBiZVzxS6LThjl54jgh648qHl+hevCJg8Ewqd4DpyHrvqlwOcOc6jpc
-         gv049v7HMphnUxop5vghx4qqitNIkD+3WjXRsGAid10YND+K0Ipf8IK8MV/8DuJYUEb9
-         vQPg==
+        bh=VQaP07kUjh9Hh3Vx1aYpBskYDsvr/ETiwaom9aVLxSk=;
+        b=QXsLhkbdUv3OzkynxfeZvpleBXmyOxG55sl10ZgoZC6KcgEjo0cXvfKprt5kMCBcVf
+         W8yLamK04g+xLBsK0hrhEvGxWRnW0BvRMfp21Xv1kfMYOU7/onrZNl4HKwmN/A9Q0H12
+         saa5Ge5TWuMRYChA7wOW32FapGrIy/EOyUEd4G17AGQ7N3UYf2jr0+t5Y5uOttISSD0k
+         h4/LDQ+kus4J0/x9bNMIVGWZoy3QsxRtMRYxTa/bcPu5f9CW8oiou14RUDZJccqW5Zcd
+         JQ8rxask7Sr+ei7cY9Mt8ZHtJES1WYDrQkVdCyf+2BZblvBHYHJAetDN1fB7I40YRJKy
+         P6XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726308126; x=1726912926;
+        d=1e100.net; s=20230601; t=1726308333; x=1726913133;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5zmwLZDktvjILrPQJbKMJaQkPt6Y8bnfMAolJBb47Gg=;
-        b=nqX8UohwTKGiu7X83iFLzP/fd2tY9hnVwuoP4Y8rCgaE50AIR/g8djo0ig3YLyTuvQ
-         mPyTTzDk4ZmNF7QUvhftHlTUtlOlcOOR5GmaZOPzppw72WAipfQWit234eApvgSCLVq9
-         EUbQUb5hs1izWRahvC8lTcZBJVuv5QcnoPoCJN3eNs7L/ZMAB/hiihUQkBmfm54CKQdf
-         +NTY9JpFgsfqrjS3vwt0Tf8ADPVq21aQh37V3i/Bwxf0cp+FLEQXzT7cJDUWVfbcS/5+
-         xSu17c0kfoMHuWdI3WScXmNQ4DpBlbxLDW2Zq94dM6e4sSyaYDg7pFJRS6l38VdpXDNr
-         HmsQ==
-X-Gm-Message-State: AOJu0Yxc+sy9cklUn7MmWBpvZKuitoGAlsicmRuV14PlySryC0EH3C3u
-	SrvJk7gX5gi3VMXSGpIwZySxFln0qT9K8aj8DS9xToLYrvbFwU4r40/LccI1seYfMQ==
-X-Google-Smtp-Source: AGHT+IFYppUDLuVu/TE3driSmTQodwGxdURw29E4EibV/yHcKj8N/DPTz1uwppiHdKbgdecrxXY9Rw==
-X-Received: by 2002:a17:902:d481:b0:1f7:1b08:dda9 with SMTP id d9443c01a7336-20781b46d72mr85058665ad.8.1726308125483;
-        Sat, 14 Sep 2024 03:02:05 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207945dc51esm7267155ad.52.2024.09.14.03.02.00
+        bh=VQaP07kUjh9Hh3Vx1aYpBskYDsvr/ETiwaom9aVLxSk=;
+        b=qdfsbiuNnJJLxdRxsjUkxePPiEi7XV29AuDKy/zKJY8bzKHOELG08tS115cJJUWtrg
+         iy6FbZK9nei6HN3arZVbLOjM/5/UnqXa8kMnq/Z3Nu/p4xL3SlGm9Nq6ZQWy8JkDDEdb
+         ijOfuPO7u0fXSr+amCfa9hwcPUUqIQ0ANqulBQ7kYgDG+PBIIhmzC9pqmVQuiZH7MoxH
+         kmpMe2kcHbwazrH7CDVlSo373e/twFng3WKvBIlRM07wicCRlynb8kyCBnkxeOH369aX
+         wp/p8xj8USXtYpsKA6tsV0ECeJNV2X7EU0NIPun5kcbklvKiDfq4GEzoaVjMKeG7h31S
+         Qo9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWfTRJmVq9DGvou8PMzk4EB+nbJjcC8Dzg1lZujAZXZVEzyVff7JUE5694DF2ZlRFXwkRrv64M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNyBev/TFmTltkIO+3Njnx6xzTtGG+yEWnstNeRA4oKEVGG67o
+	A7QAl/kHsI1H64u7QYk7O0OHtS0iWAfggI8uUkOyL8ISIhZMBMy518Bjdq9x378=
+X-Google-Smtp-Source: AGHT+IFUGe/YZnTvrPrKTN9LdMp4s56tVPxGhPOwQHgiH6EffJdxr/Zlk+uPLUhxjZOYMNerF5RjBA==
+X-Received: by 2002:a17:906:478a:b0:a8a:8c04:ce9f with SMTP id a640c23a62f3a-a90296eabbemr942716766b.52.1726308333391;
+        Sat, 14 Sep 2024 03:05:33 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a906109676esm61912566b.33.2024.09.14.03.05.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 14 Sep 2024 03:02:04 -0700 (PDT)
-Date: Sat, 14 Sep 2024 10:01:57 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, Aaron Conole <aconole@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Adrian Moreno <amorenoz@redhat.com>,
-	Stanislas Faye <sfaye@redhat.com>
-Subject: Re: [Discuss] ARP monitor for OVS bridge over bonding
-Message-ID: <ZuVfFfCYK0NLPSFH@fedora>
-References: <ZuAcpIqvJYmCTFFK@fedora>
- <385751.1726158973@famine>
+        Sat, 14 Sep 2024 03:05:32 -0700 (PDT)
+Date: Sat, 14 Sep 2024 13:05:29 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Su Hui <suhui@nfschina.com>, jmaloy@redhat.com, ying.xue@windriver.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, nathan@kernel.org, ndesaulniers@google.com,
+	morbo@google.com, justinstitt@google.com,
+	tuong.t.lien@dektech.com.au, netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-next] net: tipc: avoid possible garbage value
+Message-ID: <f1279370-a127-4946-8c46-cc89fd2a90a6@stanley.mountain>
+References: <20240912110119.2025503-1-suhui@nfschina.com>
+ <20240914094244.GG12935@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,58 +88,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <385751.1726158973@famine>
+In-Reply-To: <20240914094244.GG12935@kernel.org>
 
-On Thu, Sep 12, 2024 at 09:36:13AM -0700, Jay Vosburgh wrote:
-> >
-> >The br-ex is not upper link of bond0. ovs-system, instead, is the master
-> >of bond0. This make us unable to make sure the br-ex and bond0 is in the
-> >same datapath.
+On Sat, Sep 14, 2024 at 10:42:44AM +0100, Simon Horman wrote:
+> On Thu, Sep 12, 2024 at 07:01:20PM +0800, Su Hui wrote:
+> > Clang static checker (scan-build) warning:
+> > net/tipc/bcast.c:305:4:
+> > The expression is an uninitialized value. The computed value will also
+> > be garbage [core.uninitialized.Assign]
+> >   305 |                         (*cong_link_cnt)++;
+> >       |                         ^~~~~~~~~~~~~~~~~~
+> > 
+> > tipc_rcast_xmit() will increase cong_link_cnt's value, but cong_link_cnt
+> > is uninitialized. Although it won't really cause a problem, it's better
+> > to fix it.
+> > 
+> > Fixes: dca4a17d24ee ("tipc: fix potential hanging after b/rcast changing")
+> > Signed-off-by: Su Hui <suhui@nfschina.com>
 > 
-> 	I'm guessing that this is in the context of an openstack
-> deployment, as "br-ex" and "br-int" are names commonly chosen for the
-> OVS bridges in openstack.
-
-It's on a OCP (OpenShift Container Platform) that build with OVN Kubernetes.
+> Hi Su Hui,
 > 
-> 	But, yes, OVS bridge configuration is very different from the
-> linux bridge, and the ARP monitor was not designed with OVS in mind.
+> This looks like a bug fix. If so it should be targeted at net rather than
+> net-next. If not, the Fixes tag should be dropped, and the commit can be
+> referenced in the patch description with some other text around:
 > 
-> 	I'll also point out that OVS has its own bonding, although it
-> does not implement functionality equivalent to the ARP monitor.
-> 
-> 	However, OVS does provide an implementation of RFC 5880 BFD
-> (Bidirectional Forwarding Detection).  The openstack deployments that
-> I'm familiar with typically use the kernel bonding in LACP mode along
-> with BFD.  Is there a reason that OVS + BFD is unsuitable for your
-> purposes?
 
-LACP need switch config. While arp monitor doesn't need any switch config.
 
-> 	A single "arp_src_iface" parameter won't scale if there are
-> multiple ARP targets, as each target might need a different
-> "arp_src_iface."
-> 
-> 	Also, the original purpose of bond_verify_device_path() is to
-> return VLAN tags in the device stack so that the ARP will be properly
-> tagged.
+It's one of those borderline things.  As the commit message says it doesn't
+really cause a problem because cong_link_cnt is never used.  I guess if you had
+UBSan turned on it would generate a runtime warning.  Still it also doesn't seem
+intentional so I would probably count it as a bugfix and target net like you
+suggest.
 
-Ah, yes, makes sense.
+regards,
+dan carpenter
 
-> 
-> 	I think what you're really asking for is a "I know what I'm
-> doing" option to bypass the checks in bond_arp_send_all().  That would
-> also skip the VLAN tag search, so it's not necessarily a perfect
-> solution.
 
-Yes.
- 
-> 	Before considering such a change, I'd like to know why OVS + BFD
-> over a kernel bond attached to the OVS bridge is unsuitable for your use
-> case, as that's a common configuration I've seen with OVS.
-
-As upper comment, this need switch config.
-
-Thanks
-Hangbin
 
