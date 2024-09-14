@@ -1,121 +1,132 @@
-Return-Path: <netdev+bounces-128259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02BCB978C40
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:43:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1CD978C45
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 02:49:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DC0AB23577
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:43:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75B1E1C24B58
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 00:49:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81CD4C80;
-	Sat, 14 Sep 2024 00:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 478E44C7D;
+	Sat, 14 Sep 2024 00:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nPlzuzl0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kPWqP5wL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8C34C76
-	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 00:43:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD0884400;
+	Sat, 14 Sep 2024 00:49:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726274623; cv=none; b=jp/UW38zXGioDT4vrDF9BpaiqDEbww7Q0rUqdQxjqQo7L06kjCIhs3+QeHnQQUzUX4e5YfSK2+lo+AxHwN9pNOHEQmUJAYyQuxlicWkUfiC4dXYGJyTXmWiDR2FHLtNQb42eOf8j0j3RaIZBt+MLpMSnw29HZAGqiXtRa4awxnE=
+	t=1726274952; cv=none; b=uXZca9aHHK4qH10ClvgL29RG/rMAPDXtr53ZvtVuwVci7tmEDnO+iIA9Tn/EJqoUF8htz1EaSsKoeI12AIwNbnfpv5IXFdZ4X8GVL4xEQ/SyukloHp26LdBGGXARCE9LsQQWrytonpcYO1HGSOdXZ1X4pfCntZUvORnODChQ9Jg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726274623; c=relaxed/simple;
-	bh=TUrY80ehNCka8U/7IMHBt62KZb3yd9vuXPbLAb87cq8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fQJA+hqQK+S7JvLaF4PybmlLpkzyShAR/GqSuIbSJ9+UuIoclt2ar1Yv6aaI9/TJx3p+874lgcEyY5j+lT4fwEYyWk/lAUi4sRQxBkk7Hk1yiuKyrW8GP8bgIBjXuIGXFwD5m1gnR+Ufr1q8UwFyn09AIM+Ye3xOc3HaWiVFz+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nPlzuzl0; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-39d2a107aebso112275ab.0
-        for <netdev@vger.kernel.org>; Fri, 13 Sep 2024 17:43:42 -0700 (PDT)
+	s=arc-20240116; t=1726274952; c=relaxed/simple;
+	bh=K9xivYU0+hrTZwM4Ojyq18f8RFbDnzkF86AwTofRwrc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JSTvuvrG1llr9r4KBmD21GtAGumqHNiQ9KzCMoGqDhKF6zyuz1P8sFVNhPGtGIuUoJbrmy3P/XjK2PsO24/bmSPBX+yaRY5b67hKbkaDsZW4PP7ZCqdv6Rjzq6G+zAmTbtbuzI2C91J5ET5zW69+sj4GnAHDP1Cfuu/TT7nPi/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kPWqP5wL; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-206bd1c6ccdso13796015ad.3;
+        Fri, 13 Sep 2024 17:49:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726274621; x=1726879421; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TUrY80ehNCka8U/7IMHBt62KZb3yd9vuXPbLAb87cq8=;
-        b=nPlzuzl0Nc/X+2IaHPj1dbEl5Yce/9K8Swfnhzig9YV4I9dOASphObM/6QXZRvpTZI
-         F4TM4iYbmzDoGrRZstzc0fQFf26pcESRMwct5Wj4YGECDEU7v8TEyljDBekDItSWKw3A
-         gt9/l3u2ZDnS8szNqWiuiRhJTgtCUXK074P5GPQQrA7mYSRKZwaUd7mF825aSAaBA/RD
-         YvMiLvOy9dtcCtZ4ltFJ7kakn1wl4WCg+beHND1VV4YqPN2oaYnlEXiuReS21xaJLwup
-         c8z04yEfKemxmHhgpyo70Fl5C0eTNKthhBFyszTdXKo151Iu7cWpCmSpKbwUdB4G6nlz
-         iNHQ==
+        d=gmail.com; s=20230601; t=1726274950; x=1726879750; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eX+p74hRvbhEN0eluUV1sJA76UE/eCdpbwGeO4gkg1g=;
+        b=kPWqP5wL58YgH6svLUxbyxI4eEw8AL8yfjkrXjqafO+udy/JQOiQ+hBLo3V0YmdblY
+         92qLPpX+3M/5JzEQd3dlVc8YIpQtfCZVswSM63H7yjCNPefryJQEBXSEN1ZkJppmIv1B
+         EF9IqNTE4MMvHr0bKYTb5J2G40gwOE4oE/RtOOOy9yxVh0d8O2lLTFR48/dijntHu48s
+         r5oT5c6SwwWsrpVM2Hgbqoy7dWB1yDvXRGchOKwgEnaFjF7fGTnM4tjHGqA9fB87OcUq
+         otbF5Iyeln9RT5hS1Xghke2l82EjyuKtkR2aupk/8jY9t/yDi8yxmFE9hWQqeC6nTmnW
+         RCEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726274621; x=1726879421;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TUrY80ehNCka8U/7IMHBt62KZb3yd9vuXPbLAb87cq8=;
-        b=FrhxlYiFQscjfm9gTcwgG/+BUG8bVleMDJ7+N59Y5g5H+l2VmOUF+7nVEmmhyIe76Y
-         YI0jHe73sGza4zfiOr+wuq3qPhjSZGOjyKyJWwK3BUxOYrDRg9WVgriMtmiPOYePKWqT
-         Ekl9Lw5KfC4BOlcJx8LWi0Y/oxlttFoehVkHjYZXvbpCtW1v3DUcXKvYRhPBZw5xO6n5
-         gxbg9U6NBhZgIXJPa3lz8mEHVMzZCDzyUqbcdUJ736/lT9oALVp2WPjc3Pu+6nk6Ruzl
-         n3nKRdUqRyq2lunOjE3URKE/wnK+fN7ueW7vcZA4cAKz4zC+gXTfvsBeZ+8AE43eCdvG
-         6iTA==
-X-Forwarded-Encrypted: i=1; AJvYcCXKP+M3zbLThCvlf7qHn2sjohbqQqqtOKzRFF8dSlnx/phbG9CAK8Xh5+eImYDT/+jBU0EQWXg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk2vgDu9IB6++UKPPmV1c7yDh6VrNKHH6FO5xUPX354ITtS999
-	NfTCnRfD/Jw1bgdYoQbr9a0DUiyn6cwX5WmgMJuDimu5KjRTCFdbn/con1hJZO1wAuZvNIp+CE0
-	QMCAW06u8jxIU8pz2IHvVZlCMoWOcsbnlhWC8
-X-Google-Smtp-Source: AGHT+IHSaLglF5wz9mRniAwttRxI65kTwctZxzJQBTwNtA0gsvJL1chvFzwE6pyoct9NSOfvWET8xaMujC2vxvEZXKc=
-X-Received: by 2002:a05:6e02:1c41:b0:39f:3778:c896 with SMTP id
- e9e14a558f8ab-3a0856908e3mr10731525ab.5.1726274621421; Fri, 13 Sep 2024
- 17:43:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726274950; x=1726879750;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eX+p74hRvbhEN0eluUV1sJA76UE/eCdpbwGeO4gkg1g=;
+        b=loQliOwSbsw0zEKIUoRFNEjmE8UZZYcNnfCo8OoDwQr3383xQpU82AVcWpNJZA4JMy
+         op0dkpiiKVL1D5bxpaHTjpiA0FzNu2hwhU3sAUsLVC9GffEL7XthM0g3UtHBRHIqSPsE
+         9YygaiPO1mEvjghH/kEkpCNBWGLx1l5kx47cCb9onrLrbs9/r3yDyWA4DaVKjcDktKks
+         0df77gQ//fx5FZi7UKEFLgid076on5DKpbcwerMyQHGPFEhEjzwAOzfoXf46hbYKwyXL
+         6wx7BUQz39cCc3vADrdBu3utQ2LB9zlEGcBtcwGh++HwqsWiniB0lz7SWhgYmZPS3X0W
+         TnJA==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ1a5jwEPC7ddah/AH6kt1HPcqvsV/DE4Fmybba2A2rfE/vikKl4itYXqSf0uClr6UVKHD+zG9@vger.kernel.org, AJvYcCWrYCAk2BsHdkkK8fLteKn68tAIv0v4iw+iSUeIpJ7PunR1mAS0Jpsz1JT3Ql/ALV1JEgT8GZiDYlZaHds=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSdepV62VM3wTneohYmWEt3WOlLZR1DdJ4HpEBK3LQ5Erwuiyr
+	YUoBDviXwm05VX9Ej9thNUo3mf2zmF96l2/+6iarZ09KeTTwxBin
+X-Google-Smtp-Source: AGHT+IE0PtymA6lAtF1ZyDn+8ZVmXxiHgC1WVLOghFvoPybpDHssv1n4rE8Si2rwJ8H6jnvBhKSPYg==
+X-Received: by 2002:a17:903:183:b0:206:cbf0:3089 with SMTP id d9443c01a7336-20782b6942dmr65005575ad.54.1726274950060;
+        Fri, 13 Sep 2024 17:49:10 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:97be:e4c7:7fc1:f125])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20794714d8bsm1829995ad.201.2024.09.13.17.49.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Sep 2024 17:49:09 -0700 (PDT)
+Date: Fri, 13 Sep 2024 17:49:08 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>,
+	Qianqiang Liu <qianqiang.liu@163.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: check the return value of the copy_from_sockptr
+Message-ID: <ZuTdhIZtw8Hc7LXP@pop-os.localdomain>
+References: <20240911050435.53156-1-qianqiang.liu@163.com>
+ <CANn89iKhbQ1wDq1aJyTiZ-yW1Hm-BrKq4V5ihafebEgvWvZe2w@mail.gmail.com>
+ <ZuFTgawXgC4PgCLw@iZbp1asjb3cy8ks0srf007Z>
+ <CANn89i+G-ycrV57nc-XrgToJhwJuhuCGtHpWtFsLvot7Wu9k+w@mail.gmail.com>
+ <ZuHMHFovurDNkAIB@pop-os.localdomain>
+ <CANn89iJkfT8=rt23LSp_WkoOibdAKf4pA0uybaWMbb0DJGRY5Q@mail.gmail.com>
+ <ZuHU0mVCQJeFaQyF@pop-os.localdomain>
+ <ZuHmPBpPV7BxKrxB@mini-arch>
+ <ZuHz9lSFY4dWD/4W@pop-os.localdomain>
+ <ZuH4B7STmaY0AI1m@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240913213351.3537411-1-almasrymina@google.com>
- <ZuS0wKBUTSWvD_FZ@casper.infradead.org> <CAHS8izMwQDQ9-JNBpvVeN+yFMzmG+UB-hJWVtz_-ty+NHUdyGA@mail.gmail.com>
- <20240913171729.6bf3de40@kernel.org>
-In-Reply-To: <20240913171729.6bf3de40@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 13 Sep 2024 17:43:29 -0700
-Message-ID: <CAHS8izO+AgUQwMXQ_17bRvLetcgSUJCXhOeQre2Z49XDd8kdrQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] page_pool: fix build on powerpc with GCC 14
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Matthew Wilcox <willy@infradead.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Stephen Rothwell <sfr@canb.auug.org.au>, Linux Next Mailing List <linux-next@vger.kernel.org>, 
-	Arnd Bergmann <arnd@arndb.de>, 
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZuH4B7STmaY0AI1m@mini-arch>
 
-On Fri, Sep 13, 2024 at 5:17=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Fri, 13 Sep 2024 15:20:13 -0700 Mina Almasry wrote:
-> > I have not reported the issue to GCC yet. From the build break thread
-> > it seemed a fix was urgent, so I posted the fix and was planning to
-> > report the issue after. If not, no problem, I'll report the issue and
-> > repost the fix with a GCC bugzilla link, waiting 24hr before reposts
-> > this time.
->
-> I should have clarified, the "please post ASAP" applies
-> to all devmem build fixes, ignore the cool down period :)
->
-> > I just need to go through the steps in https://gcc.gnu.org/bugs/,
-> > shouldn't be an issue.
->
-> Just post the link here, I'll add it to the commit msg when applying.
+On Wed, Sep 11, 2024 at 01:05:27PM -0700, Stanislav Fomichev wrote:
+> On 09/11, Cong Wang wrote:
+> > On Wed, Sep 11, 2024 at 11:49:32AM -0700, Stanislav Fomichev wrote:
+> > > Can you explain what is not correct?
+> > > 
+> > > Calling BPF_CGROUP_RUN_PROG_GETSOCKOPT with max_optlen=0 should not be
+> > > a problem I think? (the buffer simply won't be accessible to the bpf prog)
+> > 
+> > Sure. Sorry for not providing all the details.
+> > 
+> > If I understand the behavior of copy_from_user() correctly, it may
+> > return partially copied data in case of error, which then leads to a
+> > partially-copied 'max_optlen'.
+> > 
+> > So, do you expect a partially-copied max_optlen to be passed to the
+> > eBPF program meanwhile the user still expects a complete one (since no
+> > -EFAULT)?
+> > 
+> > Thanks.
+> 
+> Partial copy is basically the same as user giving us garbage input, right?
+> That should still be handled correctly I think.
 
-Ah, I need a GCC bugzilla account before I can file bugs there. I
-don't currently have one and creating an account involves emailing
-them and waiting 24hr. I've done that and am waiting for an account.
-I'll file the issue as soon as I get access and post the link here.
-I'm also poking to see if anyone around already has an account and can
-file the issue on my behalf.
+Not to me.
 
---
-Thanks,
-Mina
+For explict garbage input, users (mostly syzbot) already expect it is a
+garbage.
+
+For partial copy, users expect either an error (like EFAULT) or a success
+with the _original_ value.
+
+It is all about expectation of the API.
+
+Thanks.
 
