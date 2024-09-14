@@ -1,158 +1,218 @@
-Return-Path: <netdev+bounces-128318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A6A8978F5E
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 11:10:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF6EC978F76
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 11:25:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C35DB245A6
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 09:10:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9ADA71F21B64
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 09:25:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCABC1CCEFD;
-	Sat, 14 Sep 2024 09:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87E119DF9A;
+	Sat, 14 Sep 2024 09:25:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZLBvuI6w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBC043ABD
-	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 09:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A303A440C;
+	Sat, 14 Sep 2024 09:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726305034; cv=none; b=pH7lJGmi7K/KQbJiccEIyX7GtNHIPOZprrw7AXNw8B8JP4cfZ9L1wYsIzgDgaiapDoPAFuZmEDmfAAj1c3cHQZK68KiL6j+dv6utfd950uccpJ7AyQgryZstQXVAkQ2KZ2y4catwsnuuO7owZ7doEOqjRZFBbjrBxdAK0RvUcPs=
+	t=1726305951; cv=none; b=V1RgSiPaLGL3V/tfRSpNQGMm7FwzkgHHmxDtwynmNdrsNpQjuq2Uop4ZPMZJRIh7m6RCaGRuQfSRmgHjglj6O2lTV9OtP9X8SXR0CRM67lF/UGeQgt+zEUeS2/3xlb3RDsfeBmAa4iED5DF2Qd9FDD0AFlTXwFtKAdzy2NftH4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726305034; c=relaxed/simple;
-	bh=b8gbFcdPg4SgZiH7k5BD6CY0rDrAN0e4BOAbPqeX640=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FwWbH9Rz1NZsQBsoNQA2+O10wqL+P9YxSXPSP7HNMIE9cqB0NXKE9P+wn8FDdqzuhAIVp2zXKika0YHCufrL51xtDq3oVljJakx8AkzVfcl8zHkvDfEbiG5sI5mNyEXu66s6/yAfobFWrI+WTs2KC9qSJmDxn754Mt95o/8+tWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a04bf03b1aso59715325ab.1
-        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 02:10:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726305032; x=1726909832;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4ucFpJgZBDEvbayFGovsp4xwz0hvB2iTSA1f2jDtBTQ=;
-        b=GZt3I2n3mWq0iwzLKmKTxDfo7YoJS++HW9gq+Tb2FILGMcnS/qqojf2dWnUs5rvp9W
-         9S6G2lGM1eq2+u+2pky3e3BGsC7PmeyxYR9kmO1pNIHdqiUokhmr4dHJGYYssamQdi6c
-         KTSuxGfcxMHFe8X6RCCQM94I/KW0Vvyvn7oRPYhqAi32p63/woUY9QWat5AoQyredpkd
-         sHbG98893QffGow+IS7PehOI/CCutfbZ7xcKizF1cjfyaIyYB9ofKy+14/DU9v/d5mOH
-         4VVm5v4dv1NwNFI2Tysh8IsIIts+DXdaTz+gOPf2sauOqg1szSlkBWc8fHrexkdFS3X/
-         teTw==
-X-Forwarded-Encrypted: i=1; AJvYcCX9yjRMbfa2wpFNfRwN3UOWDdp3a1rGD6MBK7IMeogBOwLKBxipQBjO2Hm8crmYVZCaicELIFQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0+SBE7j36Nixe+FeWcXSDh+9X/3FhZFP5OVbyIp2mhKpcFiVa
-	xny998bxrSVh0qi83TuqBeOkG1+Nocfd/B0jSjZZ23WxL9uAupeFxLHKR2Lk/sG7wKby3S43pNw
-	mKXRWkDl9Fo322C51IAxfAKMLCHa7JgS5LGRwi8xOrXA13nOz6J0hsPk=
-X-Google-Smtp-Source: AGHT+IHHbna/iwJ27nJ6qU9seZDGQ6C8ywG3DkdgB2nAAawQLf9mITHYEvW3AZ2nT1GTszrXNx8LNXFWmcvSAb3WqjxyY//m2NjH
+	s=arc-20240116; t=1726305951; c=relaxed/simple;
+	bh=VfHrlgV7IZimZ56kwz6gkQcl8Qjv5fduKCR4vNPpZOk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N76rYFhy1F/WxbNP3Gn9A81YST3+KlJ7CPa5JnDHqp5n0hXp1/uM7dCz+lhVIRc/RgJF4B4hs9RtXGKFdcOc/bXzPTQ+7sK0s5qUKyP+fcKDJ+eN0RphUENZml9DmLjOEPOiUHNB5gMdxtDbDYEOMLGvWdhboDk18MWnCmZ1pko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZLBvuI6w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D681C4CEC0;
+	Sat, 14 Sep 2024 09:25:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726305950;
+	bh=VfHrlgV7IZimZ56kwz6gkQcl8Qjv5fduKCR4vNPpZOk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ZLBvuI6w/tDERjYsF4sIHkwDHLawEOLjnbDtD1YpxvDEcp6bo9UlGOYJ9XksvAISW
+	 CNC2Ez0pV97mPEDX2CgmhdEvI1BxcB4LXuiBBeCG66oUpX0OlZ1PSchh2He3EngnSy
+	 Jda10jjZQSOtz3/jFSOBytcfgok4ygBz9SK5ncAPlg0H2vf2rRVL1zbQQoEO8a1vSW
+	 WWoL3DhyfTQK9oTo8sQNWer+WAc2lvck+zgwkcYBjivlAXJHs2BzE0D/9ZT5YqBKhJ
+	 Md4XVARyWMd6K1t7hW+jwgShSS6cvkiYwVs8EDZ57Mz/7lIz5kEJ3KuULz/Iwg/K/p
+	 NIFNUtgcpsfyg==
+Date: Sat, 14 Sep 2024 11:25:47 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Alexis =?iso-8859-1?Q?Lothor=E9_=28eBPF_Foundation=29?= <alexis.lothore@bootlin.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	ebpf@linuxfoundation.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v2] selftests/bpf: convert test_xdp_features.sh
+ to test_progs
+Message-ID: <ZuVWmxoqXFI3qvVI@lore-desk>
+References: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
+ <64df8d41-6cfb-45a9-8337-5cc04daedb60@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:870a:0:b0:3a0:533e:3c0a with SMTP id
- e9e14a558f8ab-3a084902a10mr80045435ab.7.1726305032394; Sat, 14 Sep 2024
- 02:10:32 -0700 (PDT)
-Date: Sat, 14 Sep 2024 02:10:32 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66e55308.050a0220.1f4381.0004.GAE@google.com>
-Subject: [syzbot] [net?] BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low! (7)
-From: syzbot <syzbot+74f79df25c37437e4d5a@syzkaller.appspotmail.com>
-To: chao@kernel.org, jaegeuk@kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    5f5673607153 Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=141567c7980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dedbcb1ff4387972
-dashboard link: https://syzkaller.appspot.com/bug?extid=74f79df25c37437e4d5a
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/40172aed5414/disk-5f567360.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/58372f305e9d/vmlinux-5f567360.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d2aae6fa798f/Image-5f567360.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+74f79df25c37437e4d5a@syzkaller.appspotmail.com
-
-F2FS-fs (loop3): Disable nat_bits due to incorrect cp_ver (10241045589465957861, 39874397669)
-F2FS-fs (loop3): Try to recover 1th superblock, ret: 0
-F2FS-fs (loop3): Mounted with checkpoint version = 48b305e5
-BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
-turning off the locking correctness validator.
-CPU: 0 UID: 0 PID: 8464 Comm: syz.3.313 Not tainted 6.11.0-rc7-syzkaller-g5f5673607153 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:319
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:326
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:119
- dump_stack+0x1c/0x28 lib/dump_stack.c:128
- lookup_chain_cache_add kernel/locking/lockdep.c:3815 [inline]
- validate_chain kernel/locking/lockdep.c:3836 [inline]
- __lock_acquire+0x1fa0/0x779c kernel/locking/lockdep.c:5142
- lock_acquire+0x240/0x728 kernel/locking/lockdep.c:5759
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0x5c/0x7c kernel/locking/spinlock.c:162
- sb_mark_inode_writeback+0x80/0x47c fs/fs-writeback.c:1306
- __folio_start_writeback+0x630/0xac0 mm/page-writeback.c:3150
- set_page_writeback+0x5c/0x78 mm/folio-compat.c:45
- __write_node_page+0xa90/0x1ba0 fs/f2fs/node.c:1687
- f2fs_sync_node_pages+0x11ec/0x1a88 fs/f2fs/node.c:2057
- block_operations fs/f2fs/checkpoint.c:1290 [inline]
- f2fs_write_checkpoint+0xa5c/0x16f4 fs/f2fs/checkpoint.c:1665
- f2fs_issue_checkpoint+0x284/0x3b4
- f2fs_sync_fs+0x1f0/0x540 fs/f2fs/super.c:1708
- f2fs_create+0x3d8/0x494 fs/f2fs/namei.c:389
- lookup_open fs/namei.c:3578 [inline]
- open_last_lookups fs/namei.c:3647 [inline]
- path_openat+0xfb4/0x29f8 fs/namei.c:3883
- do_filp_open+0x1bc/0x3cc fs/namei.c:3913
- do_sys_openat2+0x124/0x1b8 fs/open.c:1416
- do_sys_open fs/open.c:1431 [inline]
- __do_sys_openat fs/open.c:1447 [inline]
- __se_sys_openat fs/open.c:1442 [inline]
- __arm64_sys_openat+0x1f0/0x240 fs/open.c:1442
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:712
- el0t_64_sync_handler+0x84/0xfc arch/arm64/kernel/entry-common.c:730
- el0t_64_sync+0x190/0x194 arch/arm64/kernel/entry.S:598
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="lrjavHNZyEh5dE4v"
+Content-Disposition: inline
+In-Reply-To: <64df8d41-6cfb-45a9-8337-5cc04daedb60@linux.dev>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+--lrjavHNZyEh5dE4v
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On Sep 13, Martin KaFai Lau wrote:
+> On 9/10/24 11:10 AM, Alexis Lothor=E9 (eBPF Foundation) wrote:
+> > test_xdp_features.sh is a shell script allowing to test that xdp featur=
+es
+> > advertised by an interface are indeed delivered. The test works by star=
+ting
+> > two instance of the same program, both attaching specific xdp programs =
+to
+> > each side of a veth link, and then make those programs manage packets a=
+nd
+> > collect stats to check whether tested XDP feature is indeed delivered or
+> > not. However this test is not integrated in test_progs framework and so=
+ can
+> > not run automatically in CI.
+> >=20
+> > Rewrite test_xdp_features to integrate it in test_progs so it can run
+> > automatically in CI. The main changes brought by the rewrite are the
+> > following:
+> > - instead of running to separated processes (each one managing either t=
+he
+> >    tester veth or the DUT vet), run a single process
+> > - slightly change testing direction (v0 is the tester in local namespac=
+e,
+> >    v1 is the Device Under Test in remote namespace)
+> > - group all tests previously managed by test_xdp_features as subtests (=
+one
+> >    per tested XDP feature). As a consequence, run only once some steps
+> >    instead of once per subtest (eg: starting/stopping the udp server). =
+On
+> >    the contrary, make sure that each subtest properly cleans up its sta=
+te
+> >    (ie detach xdp programs, reset test stats, etc)
+> > - since there is now a single process, get rid of the "control" tcp cha=
+nnel
+> >    used to configure DUT. Configuring the DUT now only consists in swit=
+ching
+> >    to DUT network namespace and run the relevant commands
+> > - since there is no more control channel, get rid of TLVs, keep only the
+> >    CMD_ECHO packet type, and set it as a magic
+> > - simplify network setup: use only ipv6 instead of both ipv4 and ipv6,
+> >    force static neighbours instead of waiting for autoconfiguration, do=
+ not
+> >    force gro (fetch xdp features only once xdp programs are loaded inst=
+ead)
+> >=20
+> > The existing XDP programs are reused, with some minor changes:
+> > - tester and dut stats maps are converted to global variables for easier
+> >    usage
+> > - programs do not use TLV struct anymore but the magic replacing the ec=
+ho
+> >    command
+> > - avoid to accidentally make tests pass: drop packets instead of forwar=
+ding
+> >    them to userspace when they do not match the expected payload
+> > - make sure to perform host <-> network endianness conversion on consta=
+nts
+> >    rather than packet parts
+> >=20
+> > Signed-off-by: Alexis Lothor=E9 (eBPF Foundation) <alexis.lothore@bootl=
+in.com>
+> > ---
+> > Changes in v2:
+> > - fix endianness management in userspace packet parsing (call htonl on
+> >    constant rather than packet part)
+> >=20
+> > The xdp_features rewrite has been tested in a x86_64 qemu environment o=
+n my
+> > machine and in CI. In my environment, the test takes a bit less than 2s=
+ to
+> > execute.
+> >=20
+> >    # ./test_progs -a xdp_features
+> >    #561/1   xdp_features/XDP_PASS:OK
+> >    #561/2   xdp_features/XDP_DROP:OK
+> >    #561/3   xdp_features/XDP_ABORTED:OK
+> >    #561/4   xdp_features/XDP_TX:OK
+> >    #561/5   xdp_features/XDP_REDIRECT:OK
+> >    #561/6   xdp_features/XDP_NDO_XMIT:OK
+> >    #561     xdp_features:OK
+> >    Summary: 1/6 PASSED, 0 SKIPPED, 0 FAILED
+> > ---
+> >   tools/testing/selftests/bpf/.gitignore             |   1 -
+> >   tools/testing/selftests/bpf/Makefile               |  10 +-
+> >   .../selftests/bpf/prog_tests/xdp_features.c        | 446 +++++++++++++
+> >   tools/testing/selftests/bpf/progs/xdp_features.c   |  49 +-
+> >   tools/testing/selftests/bpf/test_xdp_features.sh   | 107 ---
+> >   tools/testing/selftests/bpf/xdp_features.c         | 718 ------------=
+---------
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Hi Alexis.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+sorry for the late reply.
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+>=20
+> From the initial commit message of xdp_features.c, its primary usage is to
+> test a physical network device that supports a certain XDP features.
+>=20
+> iiuc, test_xdp_features.sh only uses the veth and veth will also be the o=
+nly
+> device tested after moving to prog_tests/xdp_features.c? It is a reasonab=
+le
+> addition to test_progs for an end-to-end xdp test by using veth. However,
+> test_progs will not be able to test the physical network device.
+>=20
+> Lorenzo, is the xdp_features.c still used for device testing?
+>=20
 
-If you want to undo deduplication, reply with:
-#syz undup
+correct, xdp_features.c is intended to test the real xdp features supported=
+ by
+the NIC under test (DUT), not just the advertised ones (iirc that was a
+requisite to add xdp kernel feature support). For this reason we need two
+separated processes running on the tester device and on the DUT (they are
+usually two different devices). test_xdp_features.sh was just a simple test
+script used to develop xdp_features.c.
+What about extending xdp_features.c to integrate it in the CI?
+
+Regards,
+Lorenzo
+
+--lrjavHNZyEh5dE4v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZuVWmwAKCRA6cBh0uS2t
+rBxhAQCLXMuPwqHagnF+4BNb6j5Gb3F5dygivRqlb51M0C2jUgEA2Nt5fMwbUPTb
+OjTyGMkGQQ1xM77odNea/pO+2yekgQQ=
+=Yjnh
+-----END PGP SIGNATURE-----
+
+--lrjavHNZyEh5dE4v--
 
