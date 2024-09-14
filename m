@@ -1,187 +1,135 @@
-Return-Path: <netdev+bounces-128366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA6BF9792FF
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 20:46:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4002F97931A
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 21:04:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A31B1C20E40
-	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 18:46:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3AE7B20E70
+	for <lists+netdev@lfdr.de>; Sat, 14 Sep 2024 19:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0BE51D1737;
-	Sat, 14 Sep 2024 18:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78AA25476B;
+	Sat, 14 Sep 2024 19:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fA18uvwv"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="VJYq0qRX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DA41D12E7
-	for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 18:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145604AEDA;
+	Sat, 14 Sep 2024 19:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726339591; cv=none; b=SWQDHa/7UCd3FzAIJqo4+oBbcfxfVC3q5xbPasrxPAuUMF/fsvTmIREldDHi5nHHVFCXs5YbzPmZKo9RidBAOHdVdtEicv7qbnaQcbko88jg/3ZIxWUuiHLwYAW9lg66jeIeay9hSE3sL1pm29qk+EDqaJv3Ql38prf3vRyVmQE=
+	t=1726340666; cv=none; b=ibtPWTbnLrNVT9UZwFHA/SN6oQBhioFaWBvaJpaafHP4bqWgiVizMf3EOu+/cWtxsQkMrwm6+CH/1CCcqwEagwtRrSPnZhRsEKp38KpvQ+LJEzZHpOxA9PgkyCVSbddbfLdsGCg6f6zJuKgcKnJNY2g7VsIw7IIF3U5zsZYLZTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726339591; c=relaxed/simple;
-	bh=3TrYZmah0tVKjvlUyufFLlqbwVLn2rqABbtR8U/v3K4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=R4F/aMUKie94s03/aAUo/4ZsB3Oev/YKHmg+H6w4wQx+6u7QmGOAWyNNfyVslOsK1cgAGyoHdvVz3wuhcVNkztiMpyRwNiQrwrfyj/FcE5y534YuzoHbz88WIons8yTSIihRRvGE/K8ojF795YYzNOggIb62xMJ48ZSJNvkapPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fA18uvwv; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2d87b7618d3so5263003a91.3
-        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 11:46:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726339589; x=1726944389; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4pwxOtdBqPNpG3ycs4skY+O3QKM4phnpDkbqjbyYSMQ=;
-        b=fA18uvwvFXmQA8HC58uZpWOnRhDzrYpRVeI32gqTToquUhDYGACLhahTj321qdHj6t
-         vBmM+ufR8RnsFyxfHGDPuVlpP1AaESJKlliP6HGoa4gIb4WswhRWgSW8qRnv4AEYR5qK
-         BSSBq1p0aXeBlIonoFozlQ4mP1omw6zR5FA/1d8gU9Aoe3SOpiuAtBcTmu9AWFbRcRWo
-         rt5agrF3iCB24hViJyXGsFllwFtRZ0Zl+Auv6EGNAoJqrQp7vh2TGsVB3Qn3SlLmFurw
-         k0LGMWco0B1ZSgmPrYenmjMJGktlOS9VygZDm1zbth0vIApdzLo025MNptf1bK2vd0b5
-         x+hQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726339589; x=1726944389;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4pwxOtdBqPNpG3ycs4skY+O3QKM4phnpDkbqjbyYSMQ=;
-        b=d0uno1uVdwaAkwlhFMgKDnkAog8mw1S1FXLIct9rKYZqvoqrV3UrOGsnDk6Rc2LSx1
-         9MRgfq6sE8qOHoRQV1f9wopxKSVbncmjlmFwIyf0T2jH1dSCx5daY0y+cvNSalgiG4t5
-         ArynbQ+a7IHikQwdvo24Vc/8k8xnwVph6bECZ5+hX/dzQ/hida2SUmf2W7vdbqUiAmEo
-         z2KS4NG9cBLVMgHwT/6Kyoyi7Cj7BDw1ZfyPFEOITdZ5EDrHw6Q1y6XWnco8IAasSgLt
-         6aCSvJqkp1nz/frlyWAbLcX8Bu7cf7aKM57i4vWqpJWxnyOJ0/E61vhoclJwGXeBmzO/
-         LKsg==
-X-Forwarded-Encrypted: i=1; AJvYcCVXeNOmtn+2czg2sIZeUYX0ht2Lt9uwb6qR8gDHTjfUZhfpjYpDGex0xRSq1o1yDNYpTyrKY9c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrBJSZ572dL/9faCNP3nKwbIQQUm2evXckGZHxUyR56vjEzL5A
-	H9kA3EVazZCqPm86Iw6vNlPdQ95K9i9iqjMtCBd7EkohcXY18jDN4UYyXKHmuBEYYBXY50zwmA=
-	=
-X-Google-Smtp-Source: AGHT+IGnH57+W2+X+BBOfkHlZCjThkeqQccuVRG5rt9hJj6St8tpjhNLCddTVRg7vyg7OiPeQzTwrPJa0w==
-X-Received: from jrife-kvm.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:63c1])
- (user=jrife job=sendgmr) by 2002:a17:90a:9283:b0:2d8:92c9:70d with SMTP id
- 98e67ed59e1d1-2dba0014c07mr21163a91.5.1726339589291; Sat, 14 Sep 2024
- 11:46:29 -0700 (PDT)
-Date: Sat, 14 Sep 2024 18:46:12 +0000
+	s=arc-20240116; t=1726340666; c=relaxed/simple;
+	bh=g1cqcvO9UV0eNS3Ui8Ko2I6PHkp3MC4MoNE310SXaME=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DTkLu8mbRlpAeKMyJF3h9nJ5GiHWEJ4rY1Iqln4DoL4g/56jPbwozFW8PtRnUBW/GWn8sxuj99DoMCsXnnw8Z9qQ1lQaZXKr0S1uRjHyBZ4wMlFXUtWjCK8IBbR0Ix9BXZaxKIMcYDoR6iRgsQoi7jeXsOkvKStmbYcKEde29I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=VJYq0qRX; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1726340654;
+	bh=g1cqcvO9UV0eNS3Ui8Ko2I6PHkp3MC4MoNE310SXaME=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=VJYq0qRXdNy7U2ig2BXGi4f8+OUfsQWRUycba6Bc26uqApjuDelY5LDkRoEK1sNkX
+	 7OlwzmshyVVL6FSBbFwyur1bBhR0kSHfWsmJ37wu8TVKgqwfA/h4xnbilVXiUeTjKM
+	 KxP8pwLqa0ekt/s/mMVIG0xJ0+7MnroVqY0aFEWn8hGlI3lO1qhwVmVkxf+Y6LtXJp
+	 cI6yYVPZfl6JJn6Le7GDGGaJfEMtRJZX9o3Gqa8/I+7OPJCoZkfEncSYYbZIzL/fIg
+	 qv9frc2K+hU0+wk/e1mYML3J2tRA6yOTjZ3SYAxCFqHJt52Pi9mcPlkpySOBJ8myc8
+	 KPyvvlWaPn8gA==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 4603160078;
+	Sat, 14 Sep 2024 19:04:14 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 9072D2009C4;
+	Sat, 14 Sep 2024 19:03:38 +0000 (UTC)
+Message-ID: <376db1bb-8a00-40e5-bf70-f8587d460372@fiberby.net>
+Date: Sat, 14 Sep 2024 19:03:38 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.46.0.662.g92d0881bb0-goog
-Message-ID: <20240914184616.2916445-1-jrife@google.com>
-Subject: [PATCH net] netkit: Ensure current->bpf_net_context is set in netkit_xmit()
-From: Jordan Rife <jrife@google.com>
-To: Daniel Borkmann <daniel@iogearbox.net>, Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org
-Cc: Jordan Rife <jrife@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
-	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, bpf@vger.kernel.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] tools: ynl-gen: use big-endian netlink attribute
+ types
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ David Ahern <dsahern@kernel.org>, Matthieu Baerts <matttbe@kernel.org>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>,
+ Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240913085555.134788-1-ast@fiberby.net>
+ <20240913213941.5b76c22e@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <20240913213941.5b76c22e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-When operating Cilium in netkit mode with BPF-based host routing, calls
-to bpf_redirect() cause a kernel panic.
+Hi Kuba,
 
-[   52.247646] BUG: kernel NULL pointer dereference, address: 0000000000000038
-...
-[   52.247727] RIP: 0010:bpf_redirect+0x18/0x80
-...
-[   52.247986] Call Trace:
-[   52.247990]  <TASK>
-[   52.248002]  ? show_regs+0x6c/0x80
-[   52.248024]  ? __die+0x24/0x80
-[   52.248029]  ? page_fault_oops+0x155/0x570
-[   52.248047]  ? fib_rules_lookup+0x112/0x270
-[   52.248056]  ? do_user_addr_fault+0x4b2/0x870
-[   52.248063]  ? exc_page_fault+0x82/0x1b0
-[   52.248090]  ? asm_exc_page_fault+0x27/0x30
-[   52.248103]  ? bpf_redirect+0x18/0x80
-[   52.248109]  bpf_prog_f0698aabaf44c832_tail_handle_ipv4+0x173f/0x2707
-[   52.248119]  ? sbitmap_find_bit+0xe3/0x270
-[   52.248129]  netkit_xmit+0x177/0x3c0
-[   52.248139]  dev_hard_start_xmit+0x62/0x1d0
-[   52.248149]  __dev_queue_xmit+0x241/0xf30
-[   52.248155]  ? alloc_skb_with_frags+0x60/0x280
-[   52.248164]  ? __check_object_size+0x2a2/0x310
-[   52.248173]  ? ip_generic_getfrag+0x63/0x110
-[   52.248181]  ip_finish_output2+0x2cf/0x560
-[   52.248187]  __ip_finish_output+0xb6/0x180
-[   52.248193]  ip_finish_output+0x29/0x120
-[   52.248198]  ip_output+0x5f/0x100
-[   52.248204]  ? __pfx_ip_finish_output+0x10/0x10
-[   52.248210]  ip_send_skb+0x98/0xb0
-[   52.248215]  udp_send_skb+0x146/0x370
+On 9/14/24 4:39 AM, Jakub Kicinski wrote:
+> Nice improvement! Since it technically missed net-next closing by a few
+> hours, let me nit pick a little..
 
-Setting a breakpoint inside bpf_net_ctx_get_ri() confirms that
-current->bpf_net_context is NULL right before the panic.
+Yeah, sorry about that, first realized that net-next had closed after posting.
+I had just waited for my net patch to make its way to net-next before posting, so
+MPTCP_PM_ADDR_ATTR_PORT wouldn't change to NLA_BE16.
 
-(gdb) p $lx_current().bpf_net_context
-$4 = (struct bpf_net_context *) 0x0 <fixed_percpu_data>
-(gdb) disassemble bpf_redirect
-Dump of assembler code for function bpf_redirect:
-   0xffffffff81f085e0 <+0>:	nopl   0x0(%rax,%rax,1)
-   0xffffffff81f085e5 <+5>:	mov    %gs:0x7e12d593(%rip),%rax
-   0xffffffff81f085ed <+13>:	push   %rbp
-   0xffffffff81f085ee <+14>:	mov    0x23d0(%rax),%rax
-=> 0xffffffff81f085f5 <+21>:	mov    %rsp,%rbp
-   0xffffffff81f085f8 <+24>:	mov    0x38(%rax),%edx
-...
-(gdb) continue
-Continuing.
+> On Fri, 13 Sep 2024 08:55:54 +0000 Asbjørn Sloth Tønnesen wrote:
+>> diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+>> index 717530bc9c52e..e26f2c3c40891 100755
+>> --- a/tools/net/ynl/ynl-gen-c.py
+>> +++ b/tools/net/ynl/ynl-gen-c.py
+>> @@ -48,6 +48,7 @@ class Type(SpecAttr):
+>>           self.attr = attr
+>>           self.attr_set = attr_set
+>>           self.type = attr['type']
+>> +        self.nla_type = self.type
+> 
+> is it worth introducing nla_type as Type attribute just for one user?
+> inside a netlink code generator meaning of nla_type may not be crystal
+> clear
 
-Thread 1 hit Breakpoint 1, panic ...
-288	{
-(gdb)
+Maybe not, I just took the same approach as byte_order_comment, and
+co-located it with the existing byte-order condition in TypeScalar.
 
-commit 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct
-on PREEMPT_RT.") recently moved bpf_redirect_info into bpf_net_context,
-a new member of task_struct. Currently, current->bpf_net_context is set
-and then cleared inside sch_handle_egress() where tcx_run() and tc_run()
-execute, but it looks like netkit_xmit() was missed leaving
-current->bpf_net_context uninitialized when it runs. This patch ensures
-that current->bpf_net_context is initialized while running
-netkit_xmit().
+>>           self.checks = attr.get('checks', {})
+>>   
+>>           self.request = False
+>> @@ -157,7 +158,7 @@ class Type(SpecAttr):
+>>           return '{ .type = ' + policy + ', }'
+>>   
+>>       def attr_policy(self, cw):
+>> -        policy = c_upper('nla-' + self.attr['type'])
+>> +        policy = c_upper('nla-' + self.nla_type)
+> 
+> We could just swap the type directly here?
 
-Signed-off-by: Jordan Rife <jrife@google.com>
-Fixes: 401cb7dae813 ("net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.")
-Cc: stable@vger.kernel.org
----
- drivers/net/netkit.c | 3 +++
- 1 file changed, 3 insertions(+)
+That could work too, WDYT?
 
-diff --git a/drivers/net/netkit.c b/drivers/net/netkit.c
-index d0036a856039..92ac0cb5a327 100644
---- a/drivers/net/netkit.c
-+++ b/drivers/net/netkit.c
-@@ -65,6 +65,7 @@ static struct netkit *netkit_priv(const struct net_device *dev)
- 
- static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
- {
-+	struct bpf_net_context __bpf_net_ctx, *bpf_net_ctx;
- 	struct netkit *nk = netkit_priv(dev);
- 	enum netkit_action ret = READ_ONCE(nk->policy);
- 	netdev_tx_t ret_dev = NET_XMIT_SUCCESS;
-@@ -73,6 +74,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
- 	int len = skb->len;
- 
- 	rcu_read_lock();
-+	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
- 	peer = rcu_dereference(nk->peer);
- 	if (unlikely(!peer || !(peer->flags & IFF_UP) ||
- 		     !pskb_may_pull(skb, ETH_HLEN) ||
-@@ -109,6 +111,7 @@ static netdev_tx_t netkit_xmit(struct sk_buff *skb, struct net_device *dev)
- 		ret_dev = NET_XMIT_DROP;
- 		break;
- 	}
-+	bpf_net_ctx_clear(bpf_net_ctx);
- 	rcu_read_unlock();
- 	return ret_dev;
- }
--- 
-2.46.0.662.g92d0881bb0-goog
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 717530bc9c52e..e8706f36e5e7b 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -157,7 +157,10 @@ class Type(SpecAttr):
+          return '{ .type = ' + policy + ', }'
+
+      def attr_policy(self, cw):
+-        policy = c_upper('nla-' + self.attr['type'])
++        policy = f'NLA_{c_upper(self.type)}'
++        if self.attr.get('byte-order', '') == 'big-endian':
++            if self.type in {'u16', 'u32'}:
++                policy = f'NLA_BE{self.type[1:]}'
+
+          spec = self._attr_policy(policy)
+          cw.p(f"\t[{self.enum_name}] = {spec},")
 
 
