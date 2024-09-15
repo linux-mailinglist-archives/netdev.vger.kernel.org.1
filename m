@@ -1,99 +1,113 @@
-Return-Path: <netdev+bounces-128402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4043E97973D
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 16:39:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41F0597974B
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 16:49:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF4A6B20DA8
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 14:39:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 742DF1C20AFB
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 14:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8560B1C6F54;
-	Sun, 15 Sep 2024 14:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89951C68BA;
+	Sun, 15 Sep 2024 14:49:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgbr1.qq.com (smtpbgbr1.qq.com [54.207.19.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8FC1EB31
-	for <netdev@vger.kernel.org>; Sun, 15 Sep 2024 14:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C32D1C6F6E;
+	Sun, 15 Sep 2024 14:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.19.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726411164; cv=none; b=eezhdNPfXQeYih2eQQK2F0XgvT/W+DbEVCdMuWxVNgkQDM4Ufw0mKkh7+15OFGQrZHdiSMNno5YBV4mJhDHyE2E1QRgHGoax4nDafe4IL+bGoqFxbUi5A2wlXGDpF2eltYLFlDnuksv9szEaiAZJAV+zcaw/wY/gjqJJVGUZJrc=
+	t=1726411797; cv=none; b=Y76SQuAzZhvB2k7yPm/Ou+stX/PdzdNIhTy+HM7H33sK9nJeXiUFj+G/KBSwrbgJfUfQKzBAg+4iOygY4BsBEuIIZzDQK1QCYgeUYUBzzIyqV6TgK0LzuLAdSWh+vo6gC0+BnPaz8Ha/h/m9kutR508ivGnZgX7msr0iAroCuwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726411164; c=relaxed/simple;
-	bh=sP4jgrmmfEBdugsBMtTm54HDqgh+RebnBva5M7bLO8k=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PmmqAYncISh8QhfUEiSJf0pDoflG+wx1H9Aa0yaz+KlaYhjNo+bcpeE9oIViquKqa68+uCkbWGqpSq9fS1Fqg6UdafLD2l8ehmGuUThG8kNfKI768Rz1ygDkwYo24GOgnW7vX+tLVDTiDwtkwKhwfUCfe900uCUqK8KQO3jacd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a049f9738fso68907025ab.3
-        for <netdev@vger.kernel.org>; Sun, 15 Sep 2024 07:39:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726411162; x=1727015962;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pRoQrrO88SaCzlahLfAtzhw8yyIVL+w80a86nD+hlh4=;
-        b=RkiutV2OmXsYr8z7vY+VL8Mho0EzgSZrcuXFJbIwAHSnJErGwSKn1BZkHxMwPXs2sx
-         ISBkYjEIDIIOI8YbXehOozHiNje/qUDxCp8njA0WI9QNKK1HLPrxsuKPJ8jFmMhcGY5r
-         hXFawNALuqyl4Pbowco6LcKzpQK0f9cZCBLgGGWXo7GuZbSUd0viAq0NHjKxV7PcpCgK
-         Ye5Udhb4onnMk83iAYdI/kD96R/9VSDWqp8IkyuZg/vUJ2c51y0Z7hSQPDZ/V2J5yAYL
-         hIk98hwl7+shHYLUaJb6RL1WRjH4bKrHM3r5ADLmb4qENgPYloLaD5cH2L8B53rzmgjk
-         +NCw==
-X-Forwarded-Encrypted: i=1; AJvYcCVsapr9cdRBfTWwtX7N8dUy1UNjtajcnIW6ETUShK5UHxH5LKCC2KPMlOD/kjkebZHVeRAWjoQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzHK1TpXkUd7rAN7j1K7jI5fBGoEUUFXBR6J4/2z14F2Kf9s3JI
-	S7wKlzOtIUnabIXbn0b/BH3ALjbbO3b3m+En9rVfdFzuPG21CYupmlze73/eerOvXmyQufFMOIG
-	ZT8kVCA1vG0wJjlO2pSat3PvUiJbPNZf8Jm+OnmNYqF5VwHnI9zZNOvk=
-X-Google-Smtp-Source: AGHT+IGmQKXv+bq140njVGpBEWOL2SN219VKri4+PIWgXDGb33Z1C7b6Xke3DzLHhzJod9BEerJISpoK8t5gpvnkw8OmJ2ay6r5n
+	s=arc-20240116; t=1726411797; c=relaxed/simple;
+	bh=QkyEFJBS3vifcGy0kSnIOT4GQR6Cs+7WvhnKDUpt/rU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nn00RtRYKt603BVHGRDz/+CMUcb+/Lf8DFLmnIXG6+VF3lu4vvrF6/nBmEJm+uG3VeLPjnlpIlY0IRVL59f5x/grgH3PhBLGwHGAeiGb+bE+Q+P10nuL6QTlJKVs2tCijHzDNIFh9hJmI/i/b/atKfeDKODgCp1+Na2GfH0LrfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn; spf=pass smtp.mailfrom=m.fudan.edu.cn; arc=none smtp.client-ip=54.207.19.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=m.fudan.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=m.fudan.edu.cn
+X-QQ-mid: bizesmtpip2t1726411645txvd65k
+X-QQ-Originating-IP: SOHRkuydfx4I6TjMUSremBpQBJlecf2ngxV/C3P6LDE=
+Received: from localhost.localdomain ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sun, 15 Sep 2024 22:47:21 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 14811978415710129958
+From: Kaixin Wang <kxwang23@m.fudan.edu.cn>
+To: davem@davemloft.net
+Cc: wtdeng24@m.fudan.edu.cn,
+	21210240012@m.fudan.edu.cn,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	przemyslaw.kitszel@intel.com,
+	pabeni@redhat.com,
+	Kaixin Wang <kxwang23@m.fudan.edu.cn>
+Subject: [PATCH net v2] net: seeq: Fix use after free vulnerability in ether3 Driver Due to Race Condition
+Date: Sun, 15 Sep 2024 22:40:46 +0800
+Message-Id: <20240915144045.451-1-kxwang23@m.fudan.edu.cn>
+X-Mailer: git-send-email 2.39.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1543:b0:3a0:4a91:224f with SMTP id
- e9e14a558f8ab-3a08b6f87edmr83293015ab.1.1726411162152; Sun, 15 Sep 2024
- 07:39:22 -0700 (PDT)
-Date: Sun, 15 Sep 2024 07:39:22 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000e9a0e0622296c4c@google.com>
-Subject: [syzbot] Monthly dccp report (Sep 2024)
-From: syzbot <syzbot+list8e7646c17f00ffb612e5@syzkaller.appspotmail.com>
-To: dccp@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:m.fudan.edu.cn:qybglogicsvrsz:qybglogicsvrsz4a-0
 
-Hello dccp maintainers/developers,
+In the ether3_probe function, a timer is initialized with a callback
+function ether3_ledoff, bound to &prev(dev)->timer. Once the timer is
+started, there is a risk of a race condition if the module or device
+is removed, triggering the ether3_remove function to perform cleanup.
+The sequence of operations that may lead to a UAF bug is as follows:
 
-This is a 31-day syzbot report for the dccp subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/dccp
+CPU0                                    CPU1
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 4 issues are still open and 7 have been fixed so far.
+                      |  ether3_ledoff
+ether3_remove         |
+  free_netdev(dev);   |
+  put_devic           |
+  kfree(dev);         |
+ |  ether3_outw(priv(dev)->regs.config2 |= CFG2_CTRLO, REG_CONFIG2);
+                      | // use dev
 
-Some of the still happening issues:
+Fix it by ensuring that the timer is canceled before proceeding with
+the cleanup in ether3_remove.
 
-Ref Crashes Repro Title
-<1> 107     Yes   KASAN: use-after-free Read in ccid2_hc_tx_packet_recv
-                  https://syzkaller.appspot.com/bug?extid=554ccde221001ab5479a
-<2> 57      Yes   BUG: "hc->tx_t_ipi == NUM" holds (exception!) at net/dccp/ccids/ccid3.c:LINE/ccid3_update_send_interval()
-                  https://syzkaller.appspot.com/bug?extid=94641ba6c1d768b1e35e
-<3> 17      Yes   BUG: stored value of X_recv is zero at net/dccp/ccids/ccid3.c:LINE/ccid3_first_li() (3)
-                  https://syzkaller.appspot.com/bug?extid=2ad8ef335371014d4dc7
-
+Fixes: 6fd9c53f7186 ("net: seeq: Convert timers to use timer_setup()")
+Signed-off-by: Kaixin Wang <kxwang23@m.fudan.edu.cn>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v2:
+- turn the LED off before delete the timer, suggested by Przemek
+- add Fixes tag
+- Link to v1: https://lore.kernel.org/r/20240909175821.2047-1-kxwang23@m.fudan.edu.cn
+---
+ drivers/net/ethernet/seeq/ether3.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+diff --git a/drivers/net/ethernet/seeq/ether3.c b/drivers/net/ethernet/seeq/ether3.c
+index c672f92d65e9..9319a2675e7b 100644
+--- a/drivers/net/ethernet/seeq/ether3.c
++++ b/drivers/net/ethernet/seeq/ether3.c
+@@ -847,9 +847,11 @@ static void ether3_remove(struct expansion_card *ec)
+ {
+ 	struct net_device *dev = ecard_get_drvdata(ec);
+ 
++	ether3_outw(priv(dev)->regs.config2 |= CFG2_CTRLO, REG_CONFIG2);
+ 	ecard_set_drvdata(ec, NULL);
+ 
+ 	unregister_netdev(dev);
++	del_timer_sync(&priv(dev)->timer);
+ 	free_netdev(dev);
+ 	ecard_release_resources(ec);
+ }
+-- 
+2.39.1.windows.1
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
