@@ -1,59 +1,65 @@
-Return-Path: <netdev+bounces-128428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84373979817
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 20:19:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 978AD979838
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 20:42:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C155281C6D
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 18:19:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F2B01F21CC6
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 18:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A2E1C7B83;
-	Sun, 15 Sep 2024 18:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DDC1C9DFB;
+	Sun, 15 Sep 2024 18:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ogYcisMM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QcjOzvSa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA091CA8D;
-	Sun, 15 Sep 2024 18:19:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C51752F4A;
+	Sun, 15 Sep 2024 18:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726424355; cv=none; b=cWDh6a4Rqx4jHByQsSuRITnhzYu7xBX5alf8esX0EeFw+RDooFh1YE7MbkUK7ao1nhSqqI3FBFJyka/dCjITaa5a17kVt+rP469RZs25S0OruMMQioaJLv3gV2/7vhLTE4UJenAy7XbJ9MV1Scy2jvE9VrC33Jx9TbJMCts4i98=
+	t=1726425728; cv=none; b=Yl0nTOhbHJpLWoOAGjZ8aTJ5V1ZW0vf4m6Hwfxl7+6jBYTkuz9JR2sFjirhy0ueAc+VRXE8ufaUxa+RBAqjzE9f3HqAND2kZRZYgoqWPebAy2y6fnmJ3EJsP5MpAe7iIIomW21Zvm2dH6uDcXhH0vguICqSjNpE3gOjUwJ3jr2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726424355; c=relaxed/simple;
-	bh=RpT1UNnZjn0Y2Aail0+MQdCQgNfhfA8IOCXVhXPeYEc=;
+	s=arc-20240116; t=1726425728; c=relaxed/simple;
+	bh=4WArnAgFZ1RsLIBejZ3FEo5KQ80z/6WM43E5FcPoh3M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t8Xrv9JPRnK/+a2lOAD44HTVct6RafyIWz49IZhdNHyhA3rs7PtLxhHA46kLnuUEx1SovVIhNAD1pysR9XEUYADYrufvg1MpuqYOInX8JwvcIk8sfpBEgx740qrM78RjAAFhiWF8STD09YcmK0z0vTTsJ33ffDHelioF6WYLek0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ogYcisMM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3325C4CEC3;
-	Sun, 15 Sep 2024 18:19:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726424355;
-	bh=RpT1UNnZjn0Y2Aail0+MQdCQgNfhfA8IOCXVhXPeYEc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ogYcisMMDT58z/t0v7UfBrQzEoNfi2a7x6oYVVGs48hdaeplrwJU951F3vfXQD4aA
-	 XOdZKaNKjDRur+KRoUDC6+PQSrlWd5pvSRCt/6Iluvjis8DDT/eZsBaXcEyC4YgDZ6
-	 WnwMn6V0YSCYNuMsJyzAqSEnQg4x7LHmJiYXu2vQwisov1y2GNQxO8eealTg5J/bbj
-	 l5X4pgbIjHUpQwHhPwaqk3wGQsjUbE+kQ4K+RKiPz8FvG43YYEOSQH0mnWC0rk1tD7
-	 7cg5cegCq1NIXySDzU9QPC2yaFiTvCSdU2HNn41XNKXU+9XwBLCJZENS19EyUyV/oB
-	 EDGJqweI9SsbA==
-Date: Sun, 15 Sep 2024 19:19:10 +0100
-From: Simon Horman <horms@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=I032N+lxwD/KBeLYg8P+oKQMfpBtoucCshGVkvIZRJ1CWSFzeWeLDati7jd3lcR6S++N3l9sQNUi53ICHPjLL33cOkBQDj+EhMtRCqpsMRPPsN1I7AQ2qblkjhBn+og3xrAXlgvgddyuE+C3QY8LvPJK5BdZw3n3gkDK/MVfovk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QcjOzvSa; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=U8/tbEdFoHXqOiG/YLXzy2LtmW2ImDT55zt0J4tQrQM=; b=QcjOzvSadaNeNzBskCn7dhZ30O
+	aYvA4v7g0XRZqhjidD50J7t0FL+6RzSOKWnrqGh9oF0wcqEdPSuRMxnOd/lPL0/toyoOAdJo+qgAA
+	ko9ZhRc1AHHJXSxDacCZf0R6w1hAlMTfWUhM2q+EWmuyIapTw6oYKvV9gYpH0sFLbyig=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1spuBq-007Vte-HA; Sun, 15 Sep 2024 20:41:42 +0200
+Date: Sun, 15 Sep 2024 20:41:42 +0200
+From: Andrew Lunn <andrew@lunn.ch>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, thepacketgeek@gmail.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	davej@codemonkey.org.uk, vlad.wing@gmail.com, max@kutsevol.com
-Subject: Re: [PATCH net-next v3 03/10] net: netconsole: separate fragmented
- message handling in send_ext_msg
-Message-ID: <20240915181910.GB167971@kernel.org>
-References: <20240910100410.2690012-1-leitao@debian.org>
- <20240910100410.2690012-4-leitao@debian.org>
- <20240915165806.2f6e36a8@kernel.org>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 0/2] net: phy: Support master-slave config
+ via device tree
+Message-ID: <5befa01e-f52d-44de-b356-bc7e1946777a@lunn.ch>
+References: <20240913084022.3343903-1-o.rempel@pengutronix.de>
+ <20240915180630.613433aa@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,17 +68,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240915165806.2f6e36a8@kernel.org>
+In-Reply-To: <20240915180630.613433aa@kernel.org>
 
-On Sun, Sep 15, 2024 at 04:58:06PM +0200, Jakub Kicinski wrote:
-> On Tue, 10 Sep 2024 03:03:58 -0700 Breno Leitao wrote:
-> > +	if (userdata)
-> > +		userdata_len = nt->userdata_length;
+On Sun, Sep 15, 2024 at 06:06:30PM +0200, Jakub Kicinski wrote:
+> On Fri, 13 Sep 2024 10:40:20 +0200 Oleksij Rempel wrote:
+> > This patch series adds support for configuring the master/slave role of
+> > PHYs via the device tree. A new `master-slave` property is introduced in
+> > the device tree bindings, allowing PHYs to be forced into either master
+> > or slave mode. This is particularly necessary for Single Pair Ethernet
+> > (SPE) PHYs (1000/100/10Base-T1), where hardware strap pins may not be
+> > available or correctly configured, but it is applicable to all PHY
+> > types.
 > 
-> I think this will case a transient build failure with
-> CONFIG_NETCONSOLE_DYNAMIC=n. kbuild bot probably didn't
-> notice because subsequent patch removes this line,
-> but we should avoid potentially breaking bisection.
+> I was hoping we'd see some acks here in time, but now Linus cut the 6.11
+> final so the 6.12 game is over now:
 
-FWIIW, I confirmed that is the case.
+The device tree binding is not decided on yet. So deferred is correct.
+
+    Andrew
 
