@@ -1,139 +1,160 @@
-Return-Path: <netdev+bounces-128383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42A65979442
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 03:36:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F002097945E
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 04:17:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75BA51C22BA4
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 01:36:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6908B1F230C8
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 02:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DAED1B85F6;
-	Sun, 15 Sep 2024 01:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BC11FDD;
+	Sun, 15 Sep 2024 02:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="sJoJ/7Jk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R7qhRKc7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E8D1C32
-	for <netdev@vger.kernel.org>; Sun, 15 Sep 2024 01:36:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA3418D;
+	Sun, 15 Sep 2024 02:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726364162; cv=none; b=Mdv+7JbJhlCryphbNMjeqqHV2fs0aLNkZi+YceFcBZucNQyuu9rV6lbJ88yZ5DCVqnPvO/vfnzLV+FevKUsRuUWMCZEdRCQ29YnZjyaX22IFog45/L0UBvAdbs26AJzO7xv4wIh+bkPtUnyFN8JS6CUUrMjpIZqRxezW4i64iHU=
+	t=1726366653; cv=none; b=qLJbsjXIal9wPgDKu0wmRiI/N3zTdcOvCrvBWiIOcV5vmLv3bXOJNNBxQAEJ01VafZm2JvnmMciEBE+BGtZxKrvyenRGpt3Vlsq22W2n0ZmvGWSVqR79SEWJUD0DLVze7O8ToBJSCtlWBDtpusbcLBI7LUBiWxt+6NKcpmSRpVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726364162; c=relaxed/simple;
-	bh=6HK5vKJd1Pz6CMRoia/S7R29gEpWsJ/Mfdgnkw8NhNA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=sVUWb3MVDlnqdwdmxEhGAthpIJj/T/UlgLGbIvPQdbYpY344oWiQCn2eNzbkMyGtaQZ8DHDY+v4Op2ec/F3ZThCwpYUs2KULxkIHdHQCQ/fCi+7G/tkTuMK1HM8tSyoixayBfFUCmzRdmLEHH0mJhwuBFJi7cvo7UyHdVdqJu+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=sJoJ/7Jk; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-206e614953aso34771615ad.1
-        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 18:36:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1726364161; x=1726968961; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=w8tj/CMN+xcHivHKfSr03LNWcdWKGkoKc1aDHjXGCyk=;
-        b=sJoJ/7JkzPGXOsvkoWQf5DqEcwV9mQ+dlalqgk759o7EZMM8ig2AeAL6c9Zgo89CYI
-         RTK/VvV+GDSEEKS4tf9sa8P8oPki2r+MJyss4I3fRiurc8xILsnAGKLDvxag9MDN6SVp
-         lTaATThqZnIR3QGB+OO+nvhDBL8kI0IsgMF0PzVHd9ShEkKPWOEgqqiatxNDCBOyhy2V
-         lzjqLtdDJtleKaGeby3aOsyfwflnStkDpkXLp7d96yeklijaxfWm0eb+wRQh9iv8kcz6
-         KUQqGbaFIoZT6iX6z6TOkPEbfpkWP4flJ+HUrDJTcPVkzZmvuxXP+hO1lcjw/OVOJrjf
-         4Etw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726364161; x=1726968961;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=w8tj/CMN+xcHivHKfSr03LNWcdWKGkoKc1aDHjXGCyk=;
-        b=L3XWLZXKagJlQ3B0UQxkxyPyXnxm9Vdv0Ydvg89wWjDYrTOTvYmeZyw/08f/xeBcfb
-         GZdwOsbZ1hM0IHmHQJoE2xX6GEFpROkxFJHMCSdHGZFc1Ly8eaxPNiak917f4EuQxPv6
-         x8KOdlYXDWi7tNj+xLsOFRSZKnNSjcj6aiD6yKvPpitOi2AaXnTn9n/yRn5V6xzNu1Jj
-         302neb35n6eD90KgzHnWLQp4fbNA9iL0RfVAI1Q4px1YWFeE5rSHbpfTb2sscsZK1MFp
-         cgaR0qxNoo4/ZH6qWGHlJkj7Y7b3r2+ICDAa/RY7L5ttz8G9/aD0vLTJHD2p5DpIIX/4
-         UmKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWtZI92grMuxekQ5pg/+l2P9ikGA+SUJ9DDgYGwVzieNT3Er7dHNlyCnkMWSz2w9Eiyi3a3gZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyADlwMflTlJuEZ86qbyy80R6sW4neNPQBoEzfU2S7ouTl0/4jq
-	PLnWq2w5NppjG1DYzF+IVyKVqgBMkHeuJ3IwqsXi7qZ5If4vY9axTjnnFzy34FLyc09b36wUZdB
-	7Gl0=
-X-Google-Smtp-Source: AGHT+IHOrSk7MZi+esiCMTfswJQ9NquBWUjlKkA2lu3eeEtyMYGJhosf6snJ4jwv1UvMxQMrmtnewA==
-X-Received: by 2002:a17:902:e742:b0:206:a3a9:197c with SMTP id d9443c01a7336-2076e43d052mr172274795ad.49.1726364160775;
-        Sat, 14 Sep 2024 18:36:00 -0700 (PDT)
-Received: from localhost ([210.160.217.68])
-        by smtp.gmail.com with UTF8SMTPSA id d9443c01a7336-20794605721sm14899215ad.111.2024.09.14.18.35.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 14 Sep 2024 18:36:00 -0700 (PDT)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Sun, 15 Sep 2024 10:35:53 +0900
-Subject: [PATCH] vhost/net: Set num_buffers for virtio 1.0
+	s=arc-20240116; t=1726366653; c=relaxed/simple;
+	bh=Cu9oogNUDp0JyK3aZ5kSKAt7MkSWd0QBhKX3Dlldovw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dR3Y9zAFF1Gvo+/c3mO8ZkMVTaLAop6sTLEILz+k6dIIKCwFdQ3Ucs6s6SniLF9CWCiAWJVF8+uwKYQjmzM7stLUrnQxxADMPORkXgyqElhlnYHw6+ZFvRuAW5M8OTYkNLYU0QArJSxh7Dcvw/Ppar681ZYqp82n/XcG5JEqxoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R7qhRKc7; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726366652; x=1757902652;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Cu9oogNUDp0JyK3aZ5kSKAt7MkSWd0QBhKX3Dlldovw=;
+  b=R7qhRKc7fpzgotfGvmFF4/GpZJHUB9vHbD/dH3TaPSqR/rrDu/AcVKm6
+   men4O8z5pUFXGp1WgLqfbwA9sAh5KUZKGh8IE/aO2lPnFRp75DMws5Vsf
+   1tbtE5+opeWJJnemEOMSGNqEL7E4PPQJ+Y+p/bDS6zNmyAx2TMX758O/n
+   Ss7MQSpeTgVaxtwhHslD6tXngIGmX5jxz94QdxmWSpYGs/57ihb119pSo
+   VP28M+4pSDRVwTDR+CbZVjNDHa5mbUUlpE1q9sPJCs0JcC1T7HbYXsgda
+   XKYlzeUw7P1EhCqvL1OV9g0Qi6oHFic+72QAMf4hXIeScKHCRtBgTuDXj
+   A==;
+X-CSE-ConnectionGUID: Wlv2Fn/PQA2EgP99glS2tA==
+X-CSE-MsgGUID: cfjUHxunSomgzani2vJIiA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11195"; a="25171852"
+X-IronPort-AV: E=Sophos;i="6.10,230,1719903600"; 
+   d="scan'208";a="25171852"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2024 19:17:31 -0700
+X-CSE-ConnectionGUID: yIV5O7oxSyCqb9SiViWT1Q==
+X-CSE-MsgGUID: f5nxJ5p8R02TjB12H+h/Ew==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,230,1719903600"; 
+   d="scan'208";a="68608885"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 14 Sep 2024 19:17:27 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1spepI-0008L0-30;
+	Sun, 15 Sep 2024 02:17:24 +0000
+Date: Sun, 15 Sep 2024 10:16:57 +0800
+From: kernel test robot <lkp@intel.com>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
+	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
+	andrew@lunn.ch, Steen.Hegelund@microchip.com,
+	Raju.Lakkaraju@microchip.com, daniel.machon@microchip.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next V2 3/5] net: lan743x: Register the platform
+ device for sfp pluggable module
+Message-ID: <202409151058.rOgbMAJJ-lkp@intel.com>
+References: <20240911161054.4494-4-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240915-v1-v1-1-f10d2cb5e759@daynix.com>
-X-B4-Tracking: v=1; b=H4sIAPg55mYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDIxMDSwML3TJDXUuDtGQL47Q0iyQDSyWgwoKi1LTMCrAh0bG1tQAopLCnVAA
- AAA==
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14-dev-fd6e3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240911161054.4494-4-Raju.Lakkaraju@microchip.com>
 
-The specification says the device MUST set num_buffers to 1 if
-VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+Hi Raju,
 
-Fixes: 41e3e42108bc ("vhost/net: enable virtio 1.0")
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- drivers/vhost/net.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+kernel test robot noticed the following build errors:
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index f16279351db5..d4d97fa9cc8f 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1107,6 +1107,7 @@ static void handle_rx(struct vhost_net *net)
- 	size_t vhost_hlen, sock_hlen;
- 	size_t vhost_len, sock_len;
- 	bool busyloop_intr = false;
-+	bool set_num_buffers;
- 	struct socket *sock;
- 	struct iov_iter fixup;
- 	__virtio16 num_buffers;
-@@ -1129,6 +1130,8 @@ static void handle_rx(struct vhost_net *net)
- 	vq_log = unlikely(vhost_has_feature(vq, VHOST_F_LOG_ALL)) ?
- 		vq->log : NULL;
- 	mergeable = vhost_has_feature(vq, VIRTIO_NET_F_MRG_RXBUF);
-+	set_num_buffers = mergeable ||
-+			  vhost_has_feature(vq, VIRTIO_F_VERSION_1);
- 
- 	do {
- 		sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
-@@ -1205,7 +1208,7 @@ static void handle_rx(struct vhost_net *net)
- 		/* TODO: Should check and handle checksum. */
- 
- 		num_buffers = cpu_to_vhost16(vq, headcount);
--		if (likely(mergeable) &&
-+		if (likely(set_num_buffers) &&
- 		    copy_to_iter(&num_buffers, sizeof num_buffers,
- 				 &fixup) != sizeof num_buffers) {
- 			vq_err(vq, "Failed num_buffers write");
+[auto build test ERROR on net-next/main]
 
----
-base-commit: 46a0057a5853cbdb58211c19e89ba7777dc6fd50
-change-id: 20240908-v1-90fc83ff8b09
+url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Lakkaraju/net-lan743x-Add-SFP-support-check-flag/20240912-002444
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240911161054.4494-4-Raju.Lakkaraju%40microchip.com
+patch subject: [PATCH net-next V2 3/5] net: lan743x: Register the platform device for sfp pluggable module
+config: x86_64-randconfig-003-20240914 (https://download.01.org/0day-ci/archive/20240915/202409151058.rOgbMAJJ-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240915/202409151058.rOgbMAJJ-lkp@intel.com/reproduce)
 
-Best regards,
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409151058.rOgbMAJJ-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+>> ld.lld: error: undefined symbol: i2c_get_adapter_by_fwnode
+   >>> referenced by sfp.c:2981 (drivers/net/phy/sfp.c:2981)
+   >>>               drivers/net/phy/sfp.o:(sfp_probe) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: i2c_put_adapter
+   >>> referenced by sfp.c:2989 (drivers/net/phy/sfp.c:2989)
+   >>>               drivers/net/phy/sfp.o:(sfp_probe) in archive vmlinux.a
+   >>> referenced by sfp.c:2965 (drivers/net/phy/sfp.c:2965)
+   >>>               drivers/net/phy/sfp.o:(sfp_cleanup) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: hwmon_device_unregister
+   >>> referenced by sfp.c:1640 (drivers/net/phy/sfp.c:1640)
+   >>>               drivers/net/phy/sfp.o:(__sfp_sm_event) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: mdio_i2c_alloc
+   >>> referenced by sfp.c:707 (drivers/net/phy/sfp.c:707)
+   >>>               drivers/net/phy/sfp.o:(__sfp_sm_event) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: hwmon_sanitize_name
+   >>> referenced by sfp.c:1611 (drivers/net/phy/sfp.c:1611)
+   >>>               drivers/net/phy/sfp.o:(sfp_hwmon_probe) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: hwmon_device_register_with_info
+   >>> referenced by sfp.c:1617 (drivers/net/phy/sfp.c:1617)
+   >>>               drivers/net/phy/sfp.o:(sfp_hwmon_probe) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: i2c_transfer
+   >>> referenced by sfp.c:648 (drivers/net/phy/sfp.c:648)
+   >>>               drivers/net/phy/sfp.o:(sfp_i2c_read) in archive vmlinux.a
+   >>> referenced by sfp.c:680 (drivers/net/phy/sfp.c:680)
+   >>>               drivers/net/phy/sfp.o:(sfp_i2c_write) in archive vmlinux.a
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for GP_PCI1XXXX
+   Depends on [n]: PCI [=y] && GPIOLIB [=y] && NVMEM_SYSFS [=n]
+   Selected by [y]:
+   - LAN743X [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
+   WARNING: unmet direct dependencies detected for SFP
+   Depends on [m]: NETDEVICES [=y] && PHYLIB [=y] && I2C [=m] && PHYLINK [=y] && (HWMON [=m] || HWMON [=m]=n [=n])
+   Selected by [y]:
+   - LAN743X [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
+   WARNING: unmet direct dependencies detected for I2C_PCI1XXXX
+   Depends on [m]: I2C [=m] && HAS_IOMEM [=y] && PCI [=y]
+   Selected by [y]:
+   - LAN743X [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
+
 -- 
-Akihiko Odaki <akihiko.odaki@daynix.com>
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
