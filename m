@@ -1,127 +1,89 @@
-Return-Path: <netdev+bounces-128411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C08EF979772
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 17:18:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D6BF97977A
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 17:23:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 789941F21373
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 15:18:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D04581C20E04
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 15:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042CE1C7B88;
-	Sun, 15 Sep 2024 15:18:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB1C1C7B88;
+	Sun, 15 Sep 2024 15:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AxLMbYBm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ou79OWhh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8CFDDDAB;
-	Sun, 15 Sep 2024 15:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD62818B04;
+	Sun, 15 Sep 2024 15:23:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726413532; cv=none; b=kghzeLixga/EQ/fyQl2gLhc55yCqyMh6gU1/aur4SWd/LFUr6SDwBriM1OyPcjifKsxhPBM/ndSLkQ4p38NiP8W66d+PBH9Ps7Ya3VCjPcCShTLAoeCEL5mKIbn42WXCUaYfREowo77YHsO8JixU+16VEvemyxU0rX84+bB7Yvw=
+	t=1726413793; cv=none; b=V5azN++hWp3Vfh1p0irRChoNnTlbO1juT3TMLXO8AXfE6tsxdfXmqDKNZoeF+Bs91XpffKftz0+KrFZd/OsJMWcwUR7PKS6tZMzAJVuLmc+zPcWw6ohHC7z7YVtkkXeDRebDBrtErKpcP4naHP4LQjyVm2rkeR6IBP2g4+WsLHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726413532; c=relaxed/simple;
-	bh=w+V1owSmOt7tIUFoiSiZjBRPgwwvWiamnXs3pgVPsRw=;
+	s=arc-20240116; t=1726413793; c=relaxed/simple;
+	bh=R/g4saXUaOYNd7GFwzwvAtexn0eOT+sQsDa86TyX4gU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YtrZ600D9Al1l5cKQugQq6FPEcrf1I9xCZhnsDAQ6E2Gr4UAcU77czea+qrAI9r75tG0nX3hKB70HMFeRcqF+4P7977oLbAn5rWNIgwVF3uIKScvYgVDJg4d++en5Kf2jMmOi6kNsbatk9qG7dVKCwbTA+XczuTbiybdY9tpCu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AxLMbYBm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED373C4CEC3;
-	Sun, 15 Sep 2024 15:18:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cNnikxT16a9Khhmeq/o+vlWySBXNvi9g08ZeGZZpBWFnLKe7dnj5KUksUbye1yd3iQI/+c3Y43kOZ5KVez6vyNzKOYeoAf0/hkUOXMbZfgcQNcS1UosE+DeoNNbMTq6v38LBqBNRFl+/PNCisYpAvYVczxs8J7n7R98KN9NTgcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ou79OWhh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91FF6C4CEC3;
+	Sun, 15 Sep 2024 15:23:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726413532;
-	bh=w+V1owSmOt7tIUFoiSiZjBRPgwwvWiamnXs3pgVPsRw=;
+	s=k20201202; t=1726413793;
+	bh=R/g4saXUaOYNd7GFwzwvAtexn0eOT+sQsDa86TyX4gU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AxLMbYBmk5A6sXn6Wl7ezRcDo10xlHXNsLkbInaKNGhUoy/N4KEhyMHPoSzRgucbo
-	 8fGoYXFa6K7vOyaUNzPWiw5iQbqq/sxNRz7FoNwwQj83WmjnAbrCVQ+9j2gXZKbdqt
-	 BJCRhPniQOnnbBnt461v95djELhZCOT5vKwCu8AAbSIuAD/5kT+6v7+szbyU2o5wVZ
-	 yQ83FUJ8pZj8v4Kdeu+fFoh0gEfL81nKxzXgUdjm3ywSz1s77QB4k4AWzErhRVKSWe
-	 ZyHDRw73rJ9XFA1L0yD4eiF2Q6E86sSm93O78LBFrSrvZwVUI+e5xfegmFxg6iH0cG
-	 L00qDwj96hMBw==
-Date: Sun, 15 Sep 2024 17:18:45 +0200
+	b=ou79OWhh/Wh1UekPhxZD0VuJjuiuAGCSaJ/Gyc/25IMKBR/wJ7mGskKBf5MTMG1rO
+	 6T4GL0eYpH0Q2Kj1AnKwncKPf69Mxk0xorp+LF9vSscizvlXODZZ8KG74fL+DTMkkk
+	 biNmL9EQ2S/V7y9CpF4vrbpNqGcZBV4sDtd2/EoafEle3+f3htuXs31rB22SNWZ+kh
+	 Sa8v1neYx7FUgc9dhJ/onmQ1xmsuAFBGNhje4QNin6PWCJ0Slsz9caSvcTnSk2LN+N
+	 iDldc42Lhi5et51xwrpg5oeoZBGq9ifLpYv8upIHVPe2p8UCjINzdhv8KwRqni//v7
+	 nWoaBkyslLWlg==
+Date: Sun, 15 Sep 2024 17:23:07 +0200
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <shenjian15@huawei.com>, <wangpeiyang1@huawei.com>,
- <liuyonglong@huawei.com>, <chenhao418@huawei.com>,
- <sudongming1@huawei.com>, <xujunsheng@huawei.com>,
- <shiyongbang@huawei.com>, <libaihan@huawei.com>, <andrew@lunn.ch>,
- <jdamato@fastly.com>, <horms@kernel.org>,
- <kalesh-anakkur.purayil@broadcom.com>, <jonathan.cameron@huawei.com>,
- <shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V10 net-next 07/10] net: hibmcge: Implement rx_poll
- function to receive packets
-Message-ID: <20240915171845.4f233a0c@kernel.org>
-In-Reply-To: <20240912025127.3912972-8-shaojijie@huawei.com>
-References: <20240912025127.3912972-1-shaojijie@huawei.com>
-	<20240912025127.3912972-8-shaojijie@huawei.com>
+To: =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?=
+ <ast@fiberby.net>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ David Ahern <dsahern@kernel.org>, Matthieu Baerts <matttbe@kernel.org>, Mat
+ Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Donald Hunter <donald.hunter@gmail.com>,
+ netdev@vger.kernel.org, mptcp@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] tools: ynl-gen: use big-endian netlink
+ attribute types
+Message-ID: <20240915172307.354caffd@kernel.org>
+In-Reply-To: <376db1bb-8a00-40e5-bf70-f8587d460372@fiberby.net>
+References: <20240913085555.134788-1-ast@fiberby.net>
+	<20240913213941.5b76c22e@kernel.org>
+	<376db1bb-8a00-40e5-bf70-f8587d460372@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 12 Sep 2024 10:51:24 +0800 Jijie Shao wrote:
-> +static int hbg_napi_rx_poll(struct napi_struct *napi, int budget)
-> +{
-> +	struct hbg_ring *ring = container_of(napi, struct hbg_ring, napi);
-> +	struct hbg_priv *priv = ring->priv;
-> +	struct hbg_rx_desc *rx_desc;
-> +	struct hbg_buffer *buffer;
-> +	u32 packet_done = 0;
-> +	u32 pkt_len;
-> +
-> +	while (packet_done < budget) {
-> +		if (unlikely(hbg_queue_is_empty(ring->ntc, ring->ntu, ring)))
-> +			break;
-> +
-> +		buffer = &ring->queue[ring->ntc];
-> +		if (unlikely(!buffer->skb))
-> +			goto next_buffer;
-> +
-> +		if (unlikely(!hbg_sync_data_from_hw(priv, buffer)))
-> +			break;
-> +
-> +		hbg_dma_unmap(buffer);
-> +
-> +		skb_reserve(buffer->skb, HBG_PACKET_HEAD_SIZE + NET_IP_ALIGN);
-> +
-> +		rx_desc = (struct hbg_rx_desc *)buffer->skb->data;
-> +		pkt_len = FIELD_GET(HBG_RX_DESC_W2_PKT_LEN_M, rx_desc->word2);
-> +		skb_put(buffer->skb, pkt_len);
-> +		buffer->skb->protocol = eth_type_trans(buffer->skb, priv->netdev);
-> +
-> +		dev_sw_netstats_rx_add(priv->netdev, pkt_len);
-> +		netif_receive_skb(buffer->skb);
+On Sat, 14 Sep 2024 19:03:38 +0000 Asbj=C3=B8rn Sloth T=C3=B8nnesen wrote:
+> > We could just swap the type directly here? =20
+>=20
+> That could work too, WDYT?
+>=20
+> diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+> index 717530bc9c52e..e8706f36e5e7b 100755
+> --- a/tools/net/ynl/ynl-gen-c.py
+> +++ b/tools/net/ynl/ynl-gen-c.py
+> @@ -157,7 +157,10 @@ class Type(SpecAttr):
+>           return '{ .type =3D ' + policy + ', }'
+>=20
+>       def attr_policy(self, cw):
+> -        policy =3D c_upper('nla-' + self.attr['type'])
+> +        policy =3D f'NLA_{c_upper(self.type)}'
+> +        if self.attr.get('byte-order', '') =3D=3D 'big-endian':
+> +            if self.type in {'u16', 'u32'}:
+> +                policy =3D f'NLA_BE{self.type[1:]}'
 
-why not napi_gro_receive() ?
-
-> +		buffer->skb = NULL;
-> +		hbg_rx_fill_one_buffer(priv);
-> +
-> +next_buffer:
-> +		hbg_queue_move_next(ntc, ring);
-> +		packet_done++;
-> +	}
-> +
-> +	hbg_rx_fill_buffers(priv);
-
-don't try to refill the buffers if budget is 0, if budget is 0 we
-should only do Tx processing (IOW this function should do nothing)
-
-> +	if (likely(napi_complete_done(napi, packet_done)))
-
-same comment as on Tx, don't call if not done
-
-> +		hbg_hw_irq_enable(priv, HBG_INT_MSK_RX_B, true);
-> +
-> +	return packet_done;
-> +}
+LGTM!
 
