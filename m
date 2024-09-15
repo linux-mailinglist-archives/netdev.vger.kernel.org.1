@@ -1,102 +1,132 @@
-Return-Path: <netdev+bounces-128392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C7CB97965A
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 12:45:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B089979675
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 13:42:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCF071F2193E
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 10:45:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B9DE1F21CB8
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 11:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6257A1C57A7;
-	Sun, 15 Sep 2024 10:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0761C3F36;
+	Sun, 15 Sep 2024 11:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oWxm+dE8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJtX8d58"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27A51C4629;
-	Sun, 15 Sep 2024 10:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9511625570;
+	Sun, 15 Sep 2024 11:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726397105; cv=none; b=kIkW8/nQGTFwG06yJUl0j5jcz90E0CDFJzbC6ppqbObvKnUGWYm2b6aCZ+SL4azoq18Wb1RipylWcAmTI0fSCgHDGDNNabDG0UbySZtpats1eXyrjG6O+aqegYADHqTzFMMol+h2qb3eboEnhbw+hHLkBe3+IfImkac/uO48HJw=
+	t=1726400566; cv=none; b=pegEnFMW+996AkUXLz6VmPZhXb3I6GGhyOy9QlWABUWw3jeSFztKBgdoWQHY0gnBBIhaJoljHvaedtNCsIIc1iDz8oWfWgFiI4+kv/F6YFZHXKtJE2AQuCtnXmBZiL5HZ3BF+A01Alg7BlK5TYuZ80k07wEXS2cpJ52857rASXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726397105; c=relaxed/simple;
-	bh=X4mG8EpX4HqvMXYAt/53K1k0A5KjSGQdsMrw3GWYxyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EIHscv4UcuXYnsx5CaFTIU6aNIKGK7Ss/CnKieHVHklx4pBAKT8YaaPmmnprCsERNqtGMYZLLa+AobWpmRrpnq93Cogw8VxK263YI6piLL+YhncoBGFBd2NseT4Yc0VsGAuwgM94iehfujN6wc56L6znlibqaT1OkS84eByErvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=oWxm+dE8; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=jqW6okUGofPnWuzoo94v770ZzhF41RU9ioXhQiBiADc=; b=oWxm+dE83ehjHDkC7vek7mEFiO
-	4Fd/ZzJSkXmdu7kWTjRE8XjS4Mor/2mmkjzLs16r29mC1r92/tXTUkDnya0gJCQrQfySHPtcBc3VE
-	l7MvfdVO0pZCawsjTrE/tEwuKoLdcNZrWs+a93Rt+C2kQCNHlzZ8ddxaAmNho+Lcf/4zJNvtAenBb
-	Ll8o/kItLA+lgBFsnay7as5MVqaZbWdhGBmWi3L+TlJ7BReAeIH1LW6INPmwMMTo9Jcbn+jT/ml0g
-	CuyvWXdC5NAO0YS+9Ehg1PhgeT9vEcO/d6Q6CqP3RY3F0jg/q7CDOyXYM73vTC//b9LyCXY95KMmW
-	6gmz3KrQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1spmkU-00000000ktC-1OaC;
-	Sun, 15 Sep 2024 10:44:58 +0000
-Date: Sun, 15 Sep 2024 11:44:58 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Simon Horman <horms@kernel.org>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
+	s=arc-20240116; t=1726400566; c=relaxed/simple;
+	bh=V7BSTAtZFlkGUrqoLYcf78IeSSWOtXpI74x9W4dHEEM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DQFTBStHxJMrdjIz3jitqd/rsajdC7TilTZslmxNm5CUken8XeV56KHQBzObo0CMa3ebAvO4Dcj+otxfo2+OVZkwvnVoSCTwlzGz/WfkGBc60N1c2kw18S1dkwawpQBPPAnJSdz8jja4WH6DnYFStI+7h62KuzIG9FJjagvwfio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AJtX8d58; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-42cc43454d5so18960425e9.3;
+        Sun, 15 Sep 2024 04:42:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726400563; x=1727005363; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lynL6C4hkouH3XP1yfEpNa/RXQ4liCR3A0iI32ucKD8=;
+        b=AJtX8d58X2P5P9ruP9Tu32dDnAn/MPLbvRAxqhJk2I8USZQhBgkO4TP2SQbhxZG/zW
+         ntWldP2/qV7Bkem2b+WKdQcrCMgsgKzqnIR4t2QRegt2clLIMMeF6f4MzinR5unwwo0D
+         j8xiYnA0ae3+dfvFpDzNw8MFauptmvujI+9KdDjAZyXIlSkrYkmy3xzohErkFmJwJfiN
+         7N9zn14/kU9Tgni4UkWUm1TwOL9NZomNIATCkr7b29rCDGM1FEZ2ygaPL2g3OlwOOKU8
+         8bRogtnOaBUzLf2pp07LwZBzuKoyREvzeyn39ctbq2iqWTKBuRi0AyNFU+9yVjhEBnR/
+         5NGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726400563; x=1727005363;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lynL6C4hkouH3XP1yfEpNa/RXQ4liCR3A0iI32ucKD8=;
+        b=g+/UFolut7qPg3d7XQNA8g5j8c0EwESoDUndB4VyKAJaHRdw9GSIRyTKNA6QKSNpgm
+         8yH+3IMUciDGV+A6ki4WSwr+aGI8ra/A7F5DOM6bcMzSDAx0XEadGofdgVZ9yz0WIKlD
+         eIlHTIBctNicef5sgpI30OsNxFwpiSOgtrhjslCnON8R2NHlaL8boSe2fcZiBz0fqMBy
+         X5aqf84mcrMcQwgKHy2ahtxwj3WDtHZX9ZNaxXPaRoFcphPGvGBA3aXZY72rXvnQcYON
+         4Q9Rxo87R0lzrPzhaNwAIIXXBKI0qwu+o+UEvAw+ksqDycROcXAL0aypxoW9ofHcj9PQ
+         zWVw==
+X-Forwarded-Encrypted: i=1; AJvYcCUEGLkkhKWTzxrpVpVI8U3dTNS+VK4qR1J4mT92YEIe0P/GcoPHZtGX3CUXlPtPXWrhud0ZgVUcuR60hHuL@vger.kernel.org, AJvYcCVy+AVOcIAutI3Rk2sanOvep4Ob6pMEqyamodpwk8jCiLDrSaWM7CT9UQVdoqm647qIEMLw4B/Efb+pxw==@vger.kernel.org, AJvYcCXFxpAHtAP0rOYFPlw1+9gCPdeqexKiMYrXqYWd1HhqgRVq9OgU9x0TxF1Kpfp7I7grNXWtYaH9UOegN95K/2U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRCD3vtLi7D70TjSUlmD+UBAsICXcW568EOSS2bckk8JCDWj3g
+	xmJ0QSxT3mNKrMsDtYIvL4PmjubK3WOVFxyiAqM4kfO074GBu71n
+X-Google-Smtp-Source: AGHT+IFc0ijcmTZXOGVPK+Zk6DrSX+Gw9wOVUakAcGKwQpuRuUvsUpbaTUw4X0AcNIyoG255bHioTQ==
+X-Received: by 2002:a05:600c:4447:b0:429:e6bb:a436 with SMTP id 5b1f17b1804b1-42d9081b3d6mr53676555e9.9.1726400561903;
+        Sun, 15 Sep 2024 04:42:41 -0700 (PDT)
+Received: from void.void ([141.226.169.213])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42cc137556esm174961325e9.1.2024.09.15.04.42.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Sep 2024 04:42:41 -0700 (PDT)
+From: Andrew Kreimer <algonell@gmail.com>
+To: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH net-next v1] mm: fix build on powerpc with GCC 14
-Message-ID: <Zua6qtUCG84236gp@casper.infradead.org>
-References: <20240913192036.3289003-1-almasrymina@google.com>
- <ZuSQ9BT9Vg7O2kXv@casper.infradead.org>
- <30e8dee7-e98e-42cb-aab3-6b75f1a6316d@csgroup.eu>
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Andrew Kreimer <algonell@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: [PATCH] net/mlx5: Fix typos
+Date: Sun, 15 Sep 2024 14:42:25 +0300
+Message-Id: <20240915114225.99680-1-algonell@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <30e8dee7-e98e-42cb-aab3-6b75f1a6316d@csgroup.eu>
 
-On Sat, Sep 14, 2024 at 08:50:46AM +0200, Christophe Leroy wrote:
-> Hi,
-> 
-> Le 13/09/2024 à 21:22, Matthew Wilcox a écrit :
-> > On Fri, Sep 13, 2024 at 07:20:36PM +0000, Mina Almasry wrote:
-> > > +++ b/include/linux/page-flags.h
-> > > @@ -239,8 +239,8 @@ static inline unsigned long _compound_head(const struct page *page)
-> > >   {
-> > >   	unsigned long head = READ_ONCE(page->compound_head);
-> > > -	if (unlikely(head & 1))
-> > > -		return head - 1;
-> > > +	if (unlikely(head & 1UL))
-> > > +		return head & ~1UL;
-> > >   	return (unsigned long)page_fixed_fake_head(page);
-> > 
-> > NAK, that pessimises compound_head().
-> > 
-> 
-> Can you please give more details on what the difference is ?
-> 
-> I can't see what it pessimises. In both cases, you test if the value is odd,
-> when it is odd you make it even.
+Fix typos in comments.
 
-On x86, for example, it is perfectly valid to load a 64-bit value from
-an offset of 0x2f relative to a pointer.  So there's no need to make it
-even.
+Reported-by: Matthew Wilcox <willy@infradead.org>
+Signed-off-by: Andrew Kreimer <algonell@gmail.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c | 2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/main.c         | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+index 1477db7f5307..4336ac98d85d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/irq_affinity.c
+@@ -80,7 +80,7 @@ irq_pool_request_irq(struct mlx5_irq_pool *pool, struct irq_affinity_desc *af_de
+  * isn't subset of req_mask, so we will skip it. irq1_mask is subset of req_mask,
+  * we don't skip it.
+  * If pool is sf_ctrl_pool, then all IRQs have the same mask, so any IRQ will
+- * fit. And since mask is subset of itself, we will pass the first if bellow.
++ * fit. And since mask is subset of itself, we will pass the first if below.
+  */
+ static struct mlx5_irq *
+ irq_pool_find_least_loaded(struct mlx5_irq_pool *pool, const struct cpumask *req_mask)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+index c6e951b8ebdb..a6bf3f975d52 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+@@ -1647,7 +1647,7 @@ void mlx5_unload_one(struct mlx5_core_dev *dev, bool suspend)
+ 	devl_unlock(devlink);
+ }
+ 
+-/* In case of light probe, we don't need a full query of hca_caps, but only the bellow caps.
++/* In case of light probe, we don't need a full query of hca_caps, but only the below caps.
+  * A full query of hca_caps will be done when the device will reload.
+  */
+ static int mlx5_query_hca_caps_light(struct mlx5_core_dev *dev)
+-- 
+2.39.5
+
 
