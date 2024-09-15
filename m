@@ -1,79 +1,80 @@
-Return-Path: <netdev+bounces-128387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 014639794DB
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 08:49:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 253E99794E2
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 08:51:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A12A11F21CDB
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 06:49:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4B881F22B6E
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 06:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710F41CA94;
-	Sun, 15 Sep 2024 06:49:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E43D225760;
+	Sun, 15 Sep 2024 06:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Om/r6H0p"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZzD03Pke"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44F71BC3F
-	for <netdev@vger.kernel.org>; Sun, 15 Sep 2024 06:49:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAD31A270
+	for <netdev@vger.kernel.org>; Sun, 15 Sep 2024 06:50:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726382961; cv=none; b=gdJNVmgxMZw2AJRSoP1RbxtyK35LUeJAj5rY30FIVJPn50ZDX90cBsy4tFnGdCfK73PPPb0Rmo5peEHLbq2wJf1vSX3rrYEgdW1H7j3IjRbVHemhj2jnhlV+MG2Og7+2W8kxQcTN+p/d5FQ6xMmWQs3VMkfTvzy57p3XgMuOBaI=
+	t=1726383054; cv=none; b=CAlYwoX2TyGNVSTPQu/wJJ0eSNs5zruqiX+hAkz0SYspQ6Dkk3OkwICQ4/A4883AApK13GeBd7OijjbWS3M9WX32Mqbk+8TThLtVmCsasFUzH2ERsSFI9/uib7XBfWHkdCYVEDa19WlJtgGtYotdhrYDhHq6zdOD6yQRC0MElLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726382961; c=relaxed/simple;
-	bh=UJ5k25ZV3lJdTTaM8tIb7kjVAGzanB8T92WEAesbG6o=;
+	s=arc-20240116; t=1726383054; c=relaxed/simple;
+	bh=rEmyIRyb8lQu1vOpOZTUou7zsVKMhNaTwYfuJI642tQ=;
 	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=Yfrj4sl0d4bbDRzH7b3///1s73KoCN7OdaNSHvkmBCxAzGauvvZPoazY0XByzKwxq/9Bk6yTMUzmTsnIIkHcXqdnsKAZNqdky5/kx6Xy/5nqxe/XhEcyELbMVQloz+pU7jTX1eYTZY1i097/ciwnGEQawBPyYW7e1ZRv0eoC1ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Om/r6H0p; arc=none smtp.client-ip=209.85.215.178
+	 MIME-Version:Content-Type; b=Cu92W9P4otVgn2CV9iy0KzSaCfi0g8g96VJ3VAK4yD33BfZaiArE4EgRJjr2BAsHuDzjLxx8Fm+3lyP87rIrSQmLplMrSlHmAmfNpYqGUibbtnHob4IujeAcdw8K4a/EGEnZqPB429m2Vto9aoMXTfMjzU0ix+r1div3F3huEJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZzD03Pke; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7db54269325so244557a12.2
-        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 23:49:18 -0700 (PDT)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-42cd46f3a26so17624085e9.2
+        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 23:50:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1726382958; x=1726987758; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1726383050; x=1726987850; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:user-agent
          :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kWfnMMz7l99gAM3XlLaOGRiADmU0oeZX94hUcKz22ns=;
-        b=Om/r6H0pEKLa5GFt2wbh6MvTrDhjT0jZILEHwKwtBvcodSea3ikjAcKpso0nGeJEUN
-         ABy1c6Ivjfy12JF4GhmhXbF4/00bftyOn1pdqW4MOOkEeDeWnXE5jqIdwBHF7V0Agl7I
-         Vt7UAwYKh6h7sS911lkWzxmShiABxPX17F6bc=
+        bh=ejmnS563WYTKFurKv1lXQZcHBOVkT0E+DS3cmoKMb24=;
+        b=ZzD03PkeIpvLEjRXj/m34K1air+8Xahcl0B6QMmVVRKkyElO3uKT8EdB7c0oj3almN
+         OfGQCbks4irLPrgxaKYwQGvA9A8QMc/CSn9UmwSoeOXAvqAdszvjd+DbNw+VL8IDwSiu
+         GpQf0exA1NYnpzSEwVIRyCYEpTzTpptJQe7nM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726382958; x=1726987758;
+        d=1e100.net; s=20230601; t=1726383050; x=1726987850;
         h=content-transfer-encoding:mime-version:subject:user-agent
          :references:in-reply-to:message-id:date:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kWfnMMz7l99gAM3XlLaOGRiADmU0oeZX94hUcKz22ns=;
-        b=PNZCIGYr9luwlUU6cXOSdcl37YUBRftmUiYXbQR2jDIp4iUIUZbqLA3SeVwvrxitFY
-         KNp7eLLBUJQX1Oqij/VqkFvk8pTUq+VyTfZbC7sVfYm93NOgHs5LSoKJIDRCw4uwYGgF
-         Ew/SrQGSAl2hVSgAcSvQ8nLDbqKkWg0NvplLM+fF0faQB1Q7CNFLqYyW6gVf8MYcgG4i
-         /FSvtYVrqlwNssMU8HFeHH7uhScGiiBVMPZTE3GlEf9/qtl+FVWt/J9A/+z/Rc7fj5Iy
-         JDJth5aFK243NDDhsQXBqrgQcbbblk3VxRHhnzdQVxboHyVlsW5tcmceYekzuKtAw6ic
-         bk0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXIO3aOMZyp5nlxz4N6W1bIfAxb97Zivtnn+2M+aMbD1naHn4ZbWBw2lP7EjI1Ke/RVIYB3PHM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy59EWz5LpaHp00OET4EDaIiuifKI6s/qNoBL+zp0sWOazMSZvv
-	mEAcfiLXMBcmuCd0R9Jmvy2WaFVtMBTUZlRbGqhcXRJ/2kd6ku2Uxb4RRbSmgw==
-X-Google-Smtp-Source: AGHT+IFE3Rw0RCxoDKs6dsS7IG+u5rzl9WSQMtzPPbskf+XeDvZ7pl7wwvVVMCZwzpDSVtxvmCYueA==
-X-Received: by 2002:a17:90b:4f91:b0:2d3:cd27:c480 with SMTP id 98e67ed59e1d1-2dbb9f7d558mr11323825a91.33.1726382957920;
-        Sat, 14 Sep 2024 23:49:17 -0700 (PDT)
-Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbcfcbb42fsm2576910a91.4.2024.09.14.23.49.11
+        bh=ejmnS563WYTKFurKv1lXQZcHBOVkT0E+DS3cmoKMb24=;
+        b=HLNLvcS1+Xi8OdooDzAluLdRFbpABObLDBb9fgft1Lua3cJfNzIGgbMzjpQ9F4WnHD
+         tJvRsylwbYjs7sASWm1SFExWj/rVQL6j9OodseegNng3i15i5xRyvgE48bxKJb7ZLUCl
+         jTtnX3USRVnBs5oXqNEQUiPFAO6G6PhKX2PLyNH1iImR8I679ds/izZ4eqQKloUeyZuh
+         cFIRbuM+O8xQOZZNDUFVA7jrKE9qlATGbZpRzSp1rM6x6yk9cMMT+mWNN5aM/TNhEYzB
+         PgPl48tVt5LdiyiH57ERYvfd/6Z6NiKD5d0/Z9p5vMnF6xdcbnFDBI2ltTymHOZ7vsL5
+         cs1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX6CU7N5lyQ/ZhrDYWKOlqPd92b6qD/lVtabXDBkpDLjAOQ2nDAbTGw7UrntFBMB2vjEJu9AiY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgGBtW54t8ksDUD1WKC/pgg8zvIgj9tUSumbjckXejicBP/X/R
+	EIVUlkP6WzYZZ5ZlkFX4znXVthODUPKrYHKx6thIXdtnNx3kMcsdf4t+/dfsAf3WgEWvXwyny8W
+	9Yw==
+X-Google-Smtp-Source: AGHT+IG0aRsTm0roi1/IpFCkRxMfzU7+pRgSHSnqGW1mXMvrSh6pQZImosBl0LPIOM0o8vJEQPGvMg==
+X-Received: by 2002:adf:ae5a:0:b0:371:8dbf:8c1b with SMTP id ffacd0b85a97d-378d61f16f2mr4146486f8f.34.1726383049620;
+        Sat, 14 Sep 2024 23:50:49 -0700 (PDT)
+Received: from [10.229.42.193] ([192.19.176.250])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e78044dfsm3887658f8f.94.2024.09.14.23.50.48
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 14 Sep 2024 23:49:17 -0700 (PDT)
+        Sat, 14 Sep 2024 23:50:49 -0700 (PDT)
 From: Arend Van Spriel <arend.vanspriel@broadcom.com>
 To: Jacobe Zang <jacobe.zang@wesion.com>, Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, van Spriel <arend@broadcom.com>
-CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>, <nick@khadas.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Sun, 15 Sep 2024 08:49:09 +0200
-Message-ID: <191f4714288.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
-In-Reply-To: <20240910-wireless-mainline-v14-2-9d80fea5326d@wesion.com>
+CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>, <nick@khadas.com>, Ondrej Jirman <megi@xff.cz>, Sai Krishna <saikrishnag@marvell.com>
+Date: Sun, 15 Sep 2024 08:50:47 +0200
+Message-ID: <191f472c158.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+In-Reply-To: <20240910-wireless-mainline-v14-3-9d80fea5326d@wesion.com>
 References: <20240910-wireless-mainline-v14-0-9d80fea5326d@wesion.com>
- <20240910-wireless-mainline-v14-2-9d80fea5326d@wesion.com>
+ <20240910-wireless-mainline-v14-3-9d80fea5326d@wesion.com>
 User-Agent: AquaMail/1.52.0 (build: 105200518)
-Subject: Re: [PATCH v14 2/4] dt-bindings: net: wireless: brcm4329-fmac: add clock description for AP6275P
+Subject: Re: [PATCH v14 3/4] wifi: brcmfmac: Add optional lpo clock enable support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,19 +84,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; format=flowed; charset="us-ascii"
 Content-Transfer-Encoding: 8bit
 
-On September 10, 2024 5:05:46 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
+On September 10, 2024 5:05:48 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
 
-> Not only AP6275P Wi-Fi device but also all Broadcom wireless devices allow
-> external low power clock input. In DTS the clock as an optional choice in
-> the absence of an internal clock.
+> WiFi modules often require 32kHz clock to function. Add support to
+> enable the clock to PCIe driver and move "brcm,bcm4329-fmac" check
+> to the top of brcmf_of_probe. Change function prototypes from void
+> to int and add appropriate errno's for return values that will be
+> send to bus when error occurred.
 >
-> Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
-> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Co-developed-by: Ondrej Jirman <megi@xff.cz>
+> Signed-off-by: Ondrej Jirman <megi@xff.cz>
+> Co-developed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> Signed-off-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> Reviewed-by: Sai Krishna <saikrishnag@marvell.com>
 Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
 > Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
 > ---
-> .../devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml       | 8 ++++++++
-> 1 file changed, 8 insertions(+)
+> .../wireless/broadcom/brcm80211/brcmfmac/bcmsdh.c  |  4 ++--
+> .../wireless/broadcom/brcm80211/brcmfmac/common.c  |  3 ++-
+> .../net/wireless/broadcom/brcm80211/brcmfmac/of.c  | 25 ++++++++++++++++------
+> .../net/wireless/broadcom/brcm80211/brcmfmac/of.h  |  9 ++++----
+> .../wireless/broadcom/brcm80211/brcmfmac/pcie.c    |  3 +++
+> .../wireless/broadcom/brcm80211/brcmfmac/sdio.c    | 22 ++++++++++++-------
+> .../net/wireless/broadcom/brcm80211/brcmfmac/usb.c |  3 +++
+> 7 files changed, 47 insertions(+), 22 deletions(-)
 
 
 
