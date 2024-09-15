@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-128409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E01397976A
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 17:14:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC14697976C
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 17:16:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 074CA1F213E9
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 15:14:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43A92B214FC
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 15:16:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F05E1C8FA8;
-	Sun, 15 Sep 2024 15:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794B11C463E;
+	Sun, 15 Sep 2024 15:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0GCNU8+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XBErMRyW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E181C3F14;
-	Sun, 15 Sep 2024 15:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 519FD1E481;
+	Sun, 15 Sep 2024 15:16:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726413258; cv=none; b=Cjgs4dR1HLX0Z+cUh4t55qqZG5EEgs0o8oeGXX+gFDqATDu+5q2GGHQu8OOiaJlTMWVHkUoFs1u3YsMukL4tYYCVWtdoNcoXQ3iwv73UK+7VwwEgmLRKC68gK+fYJCsrfqnb3wAcKmQ6eoG8BnBEWq9SiHSFr9lrfq3BpWpD2CI=
+	t=1726413390; cv=none; b=fuFSq7dJBTl3ZDt215aLRJViQLth+Xi5IqqMQ6OhHq6wwVcNiQEq147Gm038KtzJWw7msRCdHttWaM7qEyuq7si6tk7SoXBpiMBs0CY4Q4N3RdbpK2VdLjHHfhep7UEEmx+gxYgc6yQnyKNUmhAEPABwfihG7dtIlNGOszLB8CA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726413258; c=relaxed/simple;
-	bh=7H1Xca8D+hkNFzDab9q2m2rHYAo2OvW/IjvDV+FDevY=;
+	s=arc-20240116; t=1726413390; c=relaxed/simple;
+	bh=FceSn3rmvE0R4UnpyAIvfZLdh7gW3qd+dDkyl0yogQk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f2WWvECqAU3K8jrSXzed8FTyDciaoUqlRu1g70vBj9pGCPup+pqZGh+UBrxSPf3ytgDxc0ywouiIq5UV92Qa8RI6Y/XNBk30d9DjCU52AEhOgb4QlIZqk0iXATUrqop7MqBOB1YjdS9CHTcleB+VQCR3weNaivMYG+K++XpS/XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0GCNU8+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1BBDC4CEC3;
-	Sun, 15 Sep 2024 15:14:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CsJHkbug9Q9wUzWchdnuGp/8hoeI8WyXU+pPsFGZ8QnV+PRMDwtPHdVQ04/21MnnBUEvMgXGhSoZuX07VQFPMmfFiwhneg00foPtq6GR/zGjrGUJcc12dH7dkEk1Dlw55pRpA4h9zT6URgAaHl9HSw6CIcXoYhDRdLiXk3xySJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XBErMRyW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 714F1C4CEC3;
+	Sun, 15 Sep 2024 15:16:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726413258;
-	bh=7H1Xca8D+hkNFzDab9q2m2rHYAo2OvW/IjvDV+FDevY=;
+	s=k20201202; t=1726413389;
+	bh=FceSn3rmvE0R4UnpyAIvfZLdh7gW3qd+dDkyl0yogQk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D0GCNU8+ZlF3mOCzqJd7HWNilZxWNIQWEqD1+PG/ievHassnryUEszg4hIR1UnzmL
-	 u66y2GBe4qL6KaVV4FucYw5GL/UB96V9sxxoqgbVxXsMdS1RYfcKaR9vSB5NhI2KsE
-	 GTy5S6QdYNQPdgVSyEVI4VD1djJvkSCa2nz2Ju24CrUNhOdav4ol3zCWsc2BJer/T1
-	 HWWkRZZ0EaFsRIihDd+RdzwTu2zkWd6A3btrB+gXIkDsnTPFMKK7v3YqRoBuLV2Ljt
-	 IiwNpJuW5Lzr1hFxPqJEb5H9ZrmRzAIBKu8++YDSgPg9x+sj0ju4OM1M81fJjj8i0F
-	 Rxuz8K9a9MxQA==
-Date: Sun, 15 Sep 2024 17:14:10 +0200
+	b=XBErMRyWWPgcb5aW1hB9Ek+6jBq044NDSaISyQq+XLp9QNz3TJH4if2g3HICXAHsG
+	 /CM32b1rLQt1QrrFAcDDYT7D3PzLDIRQtB53Z+8vuPE++aWOVIiVHISRmsIVqXtJJE
+	 WfDYObxp16W7BHzSsGB98X9xxO7MjUHcoanmKookWaG1+oPH74N0g2WtpC3Znm7hHk
+	 tD9QOUvhYvbZX7wyfwJKFom9Q8kSfOuPEL0r3wHj0W+2oBice6qoKAKz3ztQzoSUiE
+	 C6tJ3IxntFzwt7HwhZMGX+PGOu9pl/0owIiosYh46V6ETiI65gVGCVfNdf4pXVFTrZ
+	 Ei6+L+Cq6rlZQ==
+Date: Sun, 15 Sep 2024 17:16:22 +0200
 From: Jakub Kicinski <kuba@kernel.org>
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -53,12 +53,12 @@ Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
  <kalesh-anakkur.purayil@broadcom.com>, <jonathan.cameron@huawei.com>,
  <shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
  <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V10 net-next 05/10] net: hibmcge: Implement some .ndo
- functions
-Message-ID: <20240915171410.2c4dc951@kernel.org>
-In-Reply-To: <20240912025127.3912972-6-shaojijie@huawei.com>
+Subject: Re: [PATCH V10 net-next 06/10] net: hibmcge: Implement
+ .ndo_start_xmit function
+Message-ID: <20240915171622.3ef8ff0e@kernel.org>
+In-Reply-To: <20240912025127.3912972-7-shaojijie@huawei.com>
 References: <20240912025127.3912972-1-shaojijie@huawei.com>
-	<20240912025127.3912972-6-shaojijie@huawei.com>
+	<20240912025127.3912972-7-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,24 +68,51 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 12 Sep 2024 10:51:22 +0800 Jijie Shao wrote:
-> +static int hbg_net_change_mtu(struct net_device *netdev, int new_mtu)
+On Thu, 12 Sep 2024 10:51:23 +0800 Jijie Shao wrote:
+> +static int hbg_napi_tx_recycle(struct napi_struct *napi, int budget)
 > +{
-> +	struct hbg_priv *priv = netdev_priv(netdev);
-> +	bool is_running = netif_running(netdev);
+> +	struct hbg_ring *ring = container_of(napi, struct hbg_ring, napi);
+> +	/* This smp_load_acquire() pairs with smp_store_release() in
+> +	 * hbg_start_xmit() called in xmit process.
+> +	 */
+> +	u32 ntu = smp_load_acquire(&ring->ntu);
+> +	struct hbg_priv *priv = ring->priv;
+> +	struct hbg_buffer *buffer;
+> +	u32 ntc = ring->ntc;
+> +	int packet_done = 0;
 > +
-> +	if (is_running)
-> +		hbg_net_stop(netdev);
-> +
-> +	hbg_change_mtu(priv, new_mtu);
-> +	WRITE_ONCE(netdev->mtu, new_mtu);
-> +
-> +	dev_dbg(&priv->pdev->dev,
-> +		"change mtu from %u to %u\n", netdev->mtu, new_mtu);
-> +	if (is_running)
-> +		hbg_net_open(netdev);
+> +	while (packet_done < budget) {
 
-What if open() fails? You either have to pre-allocate the new resources
-or find a way of resetting without reallocating memory. Or return -EBUSY
-if interface is running
+you should so some cleanup even if budget is 0
+in fact you can hardcode the amount of work Tx NAPI does to 128 and
+don't look at the budget as a limit. Per NAPI documentation budget
+is for Rx
+
+> +		if (unlikely(hbg_queue_is_empty(ntc, ntu, ring)))
+> +			break;
+> +
+> +		/* make sure HW write desc complete */
+> +		dma_rmb();
+> +
+> +		buffer = &ring->queue[ntc];
+> +		if (buffer->state != HBG_TX_STATE_COMPLETE)
+> +			break;
+> +
+> +		hbg_buffer_free(buffer);
+> +		ntc = hbg_queue_next_prt(ntc, ring);
+> +		packet_done++;
+> +	}
+> +
+> +	/* This smp_store_release() pairs with smp_load_acquire() in
+> +	 * hbg_start_xmit() called in xmit process.
+> +	 */
+> +	smp_store_release(&ring->ntc, ntc);
+> +	netif_wake_queue(priv->netdev);
+> +
+> +	if (likely(napi_complete_done(napi, packet_done)))
+
+if packet_done >= budget you should not call napi_complete_done()
+as you are not done
+
+> +		hbg_hw_irq_enable(priv, HBG_INT_MSK_TX_B, true);
 
