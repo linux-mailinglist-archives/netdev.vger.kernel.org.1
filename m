@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-128408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E7DD979767
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 17:10:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E01397976A
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 17:14:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1A89281FF5
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 15:10:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 074CA1F213E9
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 15:14:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B1671C7B87;
-	Sun, 15 Sep 2024 15:10:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F05E1C8FA8;
+	Sun, 15 Sep 2024 15:14:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fB2ck6LO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0GCNU8+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD3B1C57B8;
-	Sun, 15 Sep 2024 15:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E181C3F14;
+	Sun, 15 Sep 2024 15:14:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726413052; cv=none; b=Ybn8AAK+87ZdVNxxT+TRFLG92eKdskX23qDcTq4dxv/5TsEFfPk6aQQ4d4xRwkR021PvN6JrOXXruxqqtPeTdynUCQLqOHW7RrZ8Td1Y0xyzU2/BeBIjKrnao0SiSoYm81KoSD+E5fVMUH9zMAoY+vEnrEAb40QhyL+kLtqNRe4=
+	t=1726413258; cv=none; b=Cjgs4dR1HLX0Z+cUh4t55qqZG5EEgs0o8oeGXX+gFDqATDu+5q2GGHQu8OOiaJlTMWVHkUoFs1u3YsMukL4tYYCVWtdoNcoXQ3iwv73UK+7VwwEgmLRKC68gK+fYJCsrfqnb3wAcKmQ6eoG8BnBEWq9SiHSFr9lrfq3BpWpD2CI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726413052; c=relaxed/simple;
-	bh=hAljY3mqLmDyrRESMjPEfAlnjfcZQGA6TEo7XIMHy+8=;
+	s=arc-20240116; t=1726413258; c=relaxed/simple;
+	bh=7H1Xca8D+hkNFzDab9q2m2rHYAo2OvW/IjvDV+FDevY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d1gljs03ikpchHluCBvni/v9VpmPEVDUJ86JAuRF7kYenuABRgdu82bJEq5Nc8tWZ5T1yjTz0oi/CPJRhGny+MYIACM1YjM/1pwTJqo8buLfXLlhHCbBo/8adBCILQr6E0jqSeUwzVq5ijqf4FqD/jlMUZtSvkuBk4/mRtfauAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fB2ck6LO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66F52C4CEC3;
-	Sun, 15 Sep 2024 15:10:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=f2WWvECqAU3K8jrSXzed8FTyDciaoUqlRu1g70vBj9pGCPup+pqZGh+UBrxSPf3ytgDxc0ywouiIq5UV92Qa8RI6Y/XNBk30d9DjCU52AEhOgb4QlIZqk0iXATUrqop7MqBOB1YjdS9CHTcleB+VQCR3weNaivMYG+K++XpS/XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0GCNU8+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1BBDC4CEC3;
+	Sun, 15 Sep 2024 15:14:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726413051;
-	bh=hAljY3mqLmDyrRESMjPEfAlnjfcZQGA6TEo7XIMHy+8=;
+	s=k20201202; t=1726413258;
+	bh=7H1Xca8D+hkNFzDab9q2m2rHYAo2OvW/IjvDV+FDevY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=fB2ck6LOv9CeWE0OFLOfenosPxBvPQKW3H5z+yCvw4rFZs2K9PPbGqA9Z0qqtlK6s
-	 vIvDXFBiTVR9Pn+tss9ujnPrev2mE9DJddQ/48jrrsH+4tJyrLHzUDSiVY5egF6VLi
-	 LScCt+3fs1T2Jl0ui4gqszpozqwiU1emfK916o3/nNojoBbmam8afXsz5EFmTt4h9b
-	 Ayu+kHbxDWODVwkrstvhO3AKwLNPQqfWmVKw582XSkT9+YxIdPRh0whNwAsfkVQkpJ
-	 xGPszF7qoAPbr5J/N3HVoNJRn0X6OpDqUAnkdjt8wDsD2TqyCnDdKkhAqFHmezXMOg
-	 aOsbWn2bx+U+g==
-Date: Sun, 15 Sep 2024 17:10:44 +0200
+	b=D0GCNU8+ZlF3mOCzqJd7HWNilZxWNIQWEqD1+PG/ievHassnryUEszg4hIR1UnzmL
+	 u66y2GBe4qL6KaVV4FucYw5GL/UB96V9sxxoqgbVxXsMdS1RYfcKaR9vSB5NhI2KsE
+	 GTy5S6QdYNQPdgVSyEVI4VD1djJvkSCa2nz2Ju24CrUNhOdav4ol3zCWsc2BJer/T1
+	 HWWkRZZ0EaFsRIihDd+RdzwTu2zkWd6A3btrB+gXIkDsnTPFMKK7v3YqRoBuLV2Ljt
+	 IiwNpJuW5Lzr1hFxPqJEb5H9ZrmRzAIBKu8++YDSgPg9x+sj0ju4OM1M81fJjj8i0F
+	 Rxuz8K9a9MxQA==
+Date: Sun, 15 Sep 2024 17:14:10 +0200
 From: Jakub Kicinski <kuba@kernel.org>
 To: Jijie Shao <shaojijie@huawei.com>
 Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
@@ -53,12 +53,12 @@ Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
  <kalesh-anakkur.purayil@broadcom.com>, <jonathan.cameron@huawei.com>,
  <shameerali.kolothum.thodi@huawei.com>, <salil.mehta@huawei.com>,
  <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V10 net-next 01/10] net: hibmcge: Add pci table
- supported in this module
-Message-ID: <20240915171044.72aed6cd@kernel.org>
-In-Reply-To: <20240912025127.3912972-2-shaojijie@huawei.com>
+Subject: Re: [PATCH V10 net-next 05/10] net: hibmcge: Implement some .ndo
+ functions
+Message-ID: <20240915171410.2c4dc951@kernel.org>
+In-Reply-To: <20240912025127.3912972-6-shaojijie@huawei.com>
 References: <20240912025127.3912972-1-shaojijie@huawei.com>
-	<20240912025127.3912972-2-shaojijie@huawei.com>
+	<20240912025127.3912972-6-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,16 +68,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 12 Sep 2024 10:51:18 +0800 Jijie Shao wrote:
-> +	netdev->tstats = devm_netdev_alloc_pcpu_stats(&pdev->dev,
-> +						      struct pcpu_sw_netstats);
-> +	if (!netdev->tstats)
-> +		return -ENOMEM;
-> +	netdev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+On Thu, 12 Sep 2024 10:51:22 +0800 Jijie Shao wrote:
+> +static int hbg_net_change_mtu(struct net_device *netdev, int new_mtu)
+> +{
+> +	struct hbg_priv *priv = netdev_priv(netdev);
+> +	bool is_running = netif_running(netdev);
+> +
+> +	if (is_running)
+> +		hbg_net_stop(netdev);
+> +
+> +	hbg_change_mtu(priv, new_mtu);
+> +	WRITE_ONCE(netdev->mtu, new_mtu);
+> +
+> +	dev_dbg(&priv->pdev->dev,
+> +		"change mtu from %u to %u\n", netdev->mtu, new_mtu);
+> +	if (is_running)
+> +		hbg_net_open(netdev);
 
-take a look at how pcpu_stat_type is used in net/core/dev.c
-core will automatically allocate the stats for you and handle them in
-the ndo for reading stats
-your current code repeats what core already does so it will leak the
-memory and I think double count
+What if open() fails? You either have to pre-allocate the new resources
+or find a way of resetting without reallocating memory. Or return -EBUSY
+if interface is running
 
