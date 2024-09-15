@@ -1,94 +1,81 @@
-Return-Path: <netdev+bounces-128420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 012E49797B6
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 18:02:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEFE79797BA
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 18:06:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 109321C21155
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 16:02:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 737992819D4
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 16:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3684B1CB318;
-	Sun, 15 Sep 2024 16:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2EDE1C8FA1;
+	Sun, 15 Sep 2024 16:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NvjXp2kT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fCYZmgeZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0840E1CB30C;
-	Sun, 15 Sep 2024 16:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A407618B04;
+	Sun, 15 Sep 2024 16:06:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726416092; cv=none; b=HVW2O2d4dQw6H0ygKowBTeOF3uaebIEtJRBz5LN3Cpm0bvRmymW5DDIWciDVg+0H2QeBGycpDPIWHdN2/8x/wqPh0/V5eeg4tVJx9VtsbHYLynLjMR2wMfTsB4LVtl8K9+j8MhRdeXNH5X2ysqwN/kI3sko18FoWMcrzNNlgH2s=
+	t=1726416396; cv=none; b=uq8oc1q3qOONZUWce4AsLPD6nAwnPdNAx43yfyFpf9Jnm0+uHw4BgvwokFiQV43LES3rTp3qB62W7qtxD/Of9WtWeQUTFvJ40fhbFLfcwc9X15iTjULM/P5gEQ6FGcraPADyR9e0daOIFD5GnJny216O4r9b5rRFcn0h02z4qkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726416092; c=relaxed/simple;
-	bh=cibyBFGMS7msaw33cXdIprdo/qBLubbm15FuCFfyyIA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZSTgZyYBzZRrBoflzADtNPb4HuJ8FQZ1gCagzeIMWnl9xw02hFd9HFCIT18+DMexs+OVsXPPBNhzRnRW+4Q+Rh8XKCssKJ31HewAFTfRnNzOnzYB+fobEQEKFLN4mCpPcFuWtpjjDR3ZCnYuak76hgwiD7FpogqeihR1ysN8e3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NvjXp2kT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 844D8C4CEC3;
-	Sun, 15 Sep 2024 16:01:30 +0000 (UTC)
+	s=arc-20240116; t=1726416396; c=relaxed/simple;
+	bh=IhXv+HEHL3ZRhBh/UywVQJpr8sRjPxDy0LBFr2Du4PY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qqnCv2c7MpqvZschmU4hzMovowV8UsiJu5fw1AP6+JAdjBPLmVQrdyLZkdbRZhXuOqDCaqrCN8qfFyj5URUmno7pcJrcDmWd6WDDa5imc61kL2Ut23iWpesHP1DWcPLCeJrs1UV0lZY4R5R7LTgNf874GLMotZnifZ/pdd3uSGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fCYZmgeZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A816C4CEC3;
+	Sun, 15 Sep 2024 16:06:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726416090;
-	bh=cibyBFGMS7msaw33cXdIprdo/qBLubbm15FuCFfyyIA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NvjXp2kTkE+L1Uq0Nqp3UX7/d8YtuODyOIMvFmPxEMJM1hNQwDPeKrV6NJa8yVIMr
-	 hT35Wph/WaOF0lQpGonmsz8JEXef3ndFKuSABoQzXYc4G0VxIX+hjlR4WTMrufUyG2
-	 sM3WNORu2Kh54OIjjLnTNsqrGhJfjHiH12UNQN6B+h8iMe/Cdvie3sXxR1ZEnpKIX/
-	 wujnEvav5RpA/jaYgibeHzwNzOFl0NTsDwZAtSlDoDeKLRZVwqTFiM51lC0/XbGBuk
-	 Buk+2xixvtzq34BgE7e7/NoygefuhUr0ipkHvmaWK+keeMLWlwlQXnxziCq6mJsb6f
-	 1DrOV/K0NwDvA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EE23804C85;
-	Sun, 15 Sep 2024 16:01:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1726416396;
+	bh=IhXv+HEHL3ZRhBh/UywVQJpr8sRjPxDy0LBFr2Du4PY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fCYZmgeZeIEv19u1rzfJZ2xLSLleFV5GFU5pDcyDCNCvO7FU+5IWeZv1c0eN3N370
+	 BMsvb/tlXh+IRkYmJ3NAZ2AKMjh13EObA9L0kJufCHt1ewTD6B1KT+hEgIB+0U3YbW
+	 FvqUB1DNqrxtymKH7tcwwXDqk9k+SYXtMbJK/K58zgD86QaHWTJAc2zo1qTM2yx+dT
+	 78g0fR5bBQ63lJd5Ds3on+CeNP7op4IiKDpbwFrNbz8Z5ELESrwq9fARko2l9arsnf
+	 ApO3DimFnf2FC04ASMeid1QrU1/uUBw4dDOYt7iit6FlAuqQK/DJ86gpAfSCSBOYP9
+	 oO9SIHvEio8jA==
+Date: Sun, 15 Sep 2024 18:06:30 +0200
+From: Jakub Kicinski <kuba@kernel.org>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+ devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next v3 0/2] net: phy: Support master-slave config
+ via device tree
+Message-ID: <20240915180630.613433aa@kernel.org>
+In-Reply-To: <20240913084022.3343903-1-o.rempel@pengutronix.de>
+References: <20240913084022.3343903-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/mlx5: HWS, check the correct variable in
- hws_send_ring_alloc_sq()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172641609175.3111582.206406906140072030.git-patchwork-notify@kernel.org>
-Date: Sun, 15 Sep 2024 16:01:31 +0000
-References: <da822315-02b7-4f5b-9c86-0d5176c5069d@stanley.mountain>
-In-Reply-To: <da822315-02b7-4f5b-9c86-0d5176c5069d@stanley.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: kliteyn@nvidia.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- igozlan@nvidia.com, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 13 Sep 2024 10:40:20 +0200 Oleksij Rempel wrote:
+> This patch series adds support for configuring the master/slave role of
+> PHYs via the device tree. A new `master-slave` property is introduced in
+> the device tree bindings, allowing PHYs to be forced into either master
+> or slave mode. This is particularly necessary for Single Pair Ethernet
+> (SPE) PHYs (1000/100/10Base-T1), where hardware strap pins may not be
+> available or correctly configured, but it is applicable to all PHY
+> types.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sat, 14 Sep 2024 12:58:26 +0300 you wrote:
-> There is a copy and paste bug so this code checks "sq->dep_wqe" where
-> "sq->wr_priv" was intended.  It could result in a NULL pointer
-> dereference.
-> 
-> Fixes: 2ca62599aa0b ("net/mlx5: HWS, added send engine and context handling")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] net/mlx5: HWS, check the correct variable in hws_send_ring_alloc_sq()
-    https://git.kernel.org/netdev/net-next/c/be461814aa4c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I was hoping we'd see some acks here in time, but now Linus cut the 6.11
+final so the 6.12 game is over now:
+pw-bot: defer
 
