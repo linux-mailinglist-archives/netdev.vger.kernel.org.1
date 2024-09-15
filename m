@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-128419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ABA99797B3
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 18:02:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 012E49797B6
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 18:02:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60DBC28253F
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 16:02:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 109321C21155
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 16:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60D51CA699;
-	Sun, 15 Sep 2024 16:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3684B1CB318;
+	Sun, 15 Sep 2024 16:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GABdhnkG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NvjXp2kT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7926F1CA691;
-	Sun, 15 Sep 2024 16:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0840E1CB30C;
+	Sun, 15 Sep 2024 16:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726416089; cv=none; b=CXS9bFYEvCRDKfmZw0pFRylFGCFmIMKIpfdKuQGZRr0w5++qzBwEJYysietU7FKoFnRFlzDL7xtc52jqXfXGnkeXiaSzvNOHgedBr3J3ZzHAYjDSLYMjUGHWHe+0A0qaRjWBeKYUKueAysqCtJBNV4UhBBm/GHc0rc309O8VoDo=
+	t=1726416092; cv=none; b=HVW2O2d4dQw6H0ygKowBTeOF3uaebIEtJRBz5LN3Cpm0bvRmymW5DDIWciDVg+0H2QeBGycpDPIWHdN2/8x/wqPh0/V5eeg4tVJx9VtsbHYLynLjMR2wMfTsB4LVtl8K9+j8MhRdeXNH5X2ysqwN/kI3sko18FoWMcrzNNlgH2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726416089; c=relaxed/simple;
-	bh=x20z1uut2Av/47Ndzmv3VV1AWvA7tpBOUumR1sOmFNU=;
+	s=arc-20240116; t=1726416092; c=relaxed/simple;
+	bh=cibyBFGMS7msaw33cXdIprdo/qBLubbm15FuCFfyyIA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dnkgY1gMfIF6aQMnCEME58rl/4b4zt17tGhWxOqttheOqjXOOuPHefpkPogObctTeuB2xGTQnSZq5iwP2rC5MiwyiMpOmx7OgwysHRKAWF5PVosx+zzuWh1ato0VU5e3jTIExmkWWHheaZu23aR6R7idMiqWJwLslifNcjZKEMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GABdhnkG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07DD7C4CED0;
-	Sun, 15 Sep 2024 16:01:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ZSTgZyYBzZRrBoflzADtNPb4HuJ8FQZ1gCagzeIMWnl9xw02hFd9HFCIT18+DMexs+OVsXPPBNhzRnRW+4Q+Rh8XKCssKJ31HewAFTfRnNzOnzYB+fobEQEKFLN4mCpPcFuWtpjjDR3ZCnYuak76hgwiD7FpogqeihR1ysN8e3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NvjXp2kT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 844D8C4CEC3;
+	Sun, 15 Sep 2024 16:01:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726416089;
-	bh=x20z1uut2Av/47Ndzmv3VV1AWvA7tpBOUumR1sOmFNU=;
+	s=k20201202; t=1726416090;
+	bh=cibyBFGMS7msaw33cXdIprdo/qBLubbm15FuCFfyyIA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GABdhnkGIM3DwqQVfR+ZEerRt0iFtHYWmEM8U7s+D2zbL1hpd/DwMI74vD4fL2Loi
-	 2t0fFkLsFO4h60pZbTNi4eatqK6yU+Jl/U3o1oUDj9WGOjrYFZmcQWdIe0i0M2VYMp
-	 iiwFbRN5HL+jTUtJFsIbty64KHxNCdL/u1Pa50Uob8wKWCqrjPvnK4FxHXMpqSLC52
-	 OZyyDFaGZMBy34lK1U5U2JhAxBcnJu3uAv+D0NeyPBJ08yBoPQEAZ5Fizu3o66fLx7
-	 ypyTX1DGznA8RV+DxnfOLWRlANfdp25VqulIMDZhNT2dNgWJ0sCURh/f/jbtKCRk3f
-	 39jhKPhqMiXFA==
+	b=NvjXp2kTkE+L1Uq0Nqp3UX7/d8YtuODyOIMvFmPxEMJM1hNQwDPeKrV6NJa8yVIMr
+	 hT35Wph/WaOF0lQpGonmsz8JEXef3ndFKuSABoQzXYc4G0VxIX+hjlR4WTMrufUyG2
+	 sM3WNORu2Kh54OIjjLnTNsqrGhJfjHiH12UNQN6B+h8iMe/Cdvie3sXxR1ZEnpKIX/
+	 wujnEvav5RpA/jaYgibeHzwNzOFl0NTsDwZAtSlDoDeKLRZVwqTFiM51lC0/XbGBuk
+	 Buk+2xixvtzq34BgE7e7/NoygefuhUr0ipkHvmaWK+keeMLWlwlQXnxziCq6mJsb6f
+	 1DrOV/K0NwDvA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE2D93804C85;
-	Sun, 15 Sep 2024 16:01:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33EE23804C85;
+	Sun, 15 Sep 2024 16:01:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ice: Fix a NULL vs IS_ERR() check in probe()
+Subject: Re: [PATCH net-next] net/mlx5: HWS, check the correct variable in
+ hws_send_ring_alloc_sq()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <172641609027.3111582.15058524738519708008.git-patchwork-notify@kernel.org>
-Date: Sun, 15 Sep 2024 16:01:30 +0000
-References: <6951d217-ac06-4482-a35d-15d757fd90a3@stanley.mountain>
-In-Reply-To: <6951d217-ac06-4482-a35d-15d757fd90a3@stanley.mountain>
+ <172641609175.3111582.206406906140072030.git-patchwork-notify@kernel.org>
+Date: Sun, 15 Sep 2024 16:01:31 +0000
+References: <da822315-02b7-4f5b-9c86-0d5176c5069d@stanley.mountain>
+In-Reply-To: <da822315-02b7-4f5b-9c86-0d5176c5069d@stanley.mountain>
 To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: piotr.raczynski@intel.com, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jiri@resnulli.us,
- michal.swiatkowski@linux.intel.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-janitors@vger.kernel.org
+Cc: kliteyn@nvidia.com, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ igozlan@nvidia.com, netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 14 Sep 2024 12:57:56 +0300 you wrote:
-> The ice_allocate_sf() function returns error pointers on error.  It
-> doesn't return NULL.  Update the check to match.
+On Sat, 14 Sep 2024 12:58:26 +0300 you wrote:
+> There is a copy and paste bug so this code checks "sq->dep_wqe" where
+> "sq->wr_priv" was intended.  It could result in a NULL pointer
+> dereference.
 > 
-> Fixes: 177ef7f1e2a0 ("ice: base subfunction aux driver")
+> Fixes: 2ca62599aa0b ("net/mlx5: HWS, added send engine and context handling")
 > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  drivers/net/ethernet/intel/ice/ice_sf_eth.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] ice: Fix a NULL vs IS_ERR() check in probe()
-    https://git.kernel.org/netdev/net-next/c/472d455e7c6f
+  - [net-next] net/mlx5: HWS, check the correct variable in hws_send_ring_alloc_sq()
+    https://git.kernel.org/netdev/net-next/c/be461814aa4c
 
 You are awesome, thank you!
 -- 
