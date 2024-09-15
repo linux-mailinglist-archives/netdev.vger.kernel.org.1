@@ -1,52 +1,59 @@
-Return-Path: <netdev+bounces-128452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CDA6979920
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 23:08:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2133A979925
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 23:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E47D0282AD9
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 21:08:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BE621C21613
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 21:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B41D4965B;
-	Sun, 15 Sep 2024 21:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3545F4965C;
+	Sun, 15 Sep 2024 21:14:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFBFB4644E;
-	Sun, 15 Sep 2024 21:08:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2644B49627;
+	Sun, 15 Sep 2024 21:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726434484; cv=none; b=lsyaPm7fWMZLNpvKaWbnJMzqEJ8l0xn+iCREqLtpTIU3VZ2PLUwgem77StTUy94mFPFbg2MB5unARqaAWCrt6sTE1VV4aXWxckNN+GqjPdLayP9K5SKmaPiFVzBCQbSBbVtSa/E5IQN9vopRHnxwUD+MK8GBUVpNGqPUVXEhtAE=
+	t=1726434885; cv=none; b=KC7NZ6dbBzCh8hJE+TsZMO/XojMcVog+Iik6XYVamBZscvElsg/u5BVg7L0jdEmy94RlW7qBl4UNkjwHOI/ZQ7ia601oqXk+bPKeCFO0nLiAxEi6sBSmLzlWEaeRC0URlG+h8M7nxh6Tzkwebl0CsdZGn9ny84PxLCCbghcV1iE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726434484; c=relaxed/simple;
-	bh=3zgSFbu8PXX7ZYghpZqp4ia+Cb3a7UGY+xDKtliP2GE=;
+	s=arc-20240116; t=1726434885; c=relaxed/simple;
+	bh=3lJfMfpKsyd8hr0ZSbUAGDOe9KGdIjjzJZMvfavacew=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kk1ORKARiVdpDaRdC6UD8JD+POEa1rc2kKV90k8pbBarJ6RoI8bE5np49d2kcr9k+rIGU2qaLVjByfPXKlU7fapTVzUxbEBtlmDy4MpNghPbxSJw983ZrUMm63lfOI0FJL/pgzOevNPCsEkTCapNONGlqXwHz1jxGRfDY1sqCR4=
+	 Content-Type:Content-Disposition:In-Reply-To; b=JxfOrSrvXXRoItVBJSv/grVJTejV9wySehnp+HlrnOPm+Fr28yP8vFy24XCmo6rLtI0LWm4hh2u3qrBKUVagErYTUF670JEK7QLiEy2ls3V35gatd4/A1c8uPLEfqBKeGSauiZ1h2lsXi9gktzpEvXqrPXE7LiM+cwHwroyXD/E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=56300 helo=gnumonks.org)
+Received: from [78.30.37.63] (port=56434 helo=gnumonks.org)
 	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <pablo@gnumonks.org>)
-	id 1spwTM-00EIaN-HT; Sun, 15 Sep 2024 23:07:58 +0200
-Date: Sun, 15 Sep 2024 23:07:55 +0200
+	id 1spwZo-00EIyt-4J; Sun, 15 Sep 2024 23:14:38 +0200
+Date: Sun, 15 Sep 2024 23:14:35 +0200
 From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: fw@strlen.de, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, rbc@meta.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH nf-next v5 0/2] netfilter: Make IP_NF_IPTABLES_LEGACY
- selectable
-Message-ID: <ZudMq7TfC2CbNJyu@calendula>
-References: <20240909084620.3155679-1-leitao@debian.org>
- <20240911-weightless-maize-ferret-5c23e1@devvm32600>
- <ZuIVIDubGwLMh1RS@calendula>
- <20240912-omniscient-imposing-lynx-2bf5ac@leitao>
+To: Simon Horman <horms@kernel.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Felix Huettner <felix.huettner@mail.schwarz>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	llvm@lists.linux.dev, Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Subject: Re: [PATCH net-next v3 1/1] netfilter: conntrack: Guard possible
+ unused functions
+Message-ID: <ZudOO1chdsy5h6CX@calendula>
+References: <20240910083640.1485541-1-andriy.shevchenko@linux.intel.com>
+ <20240910132101.GC572255@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,27 +62,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240912-omniscient-imposing-lynx-2bf5ac@leitao>
+In-Reply-To: <20240910132101.GC572255@kernel.org>
 X-Spam-Score: -1.9 (-)
 
-On Thu, Sep 12, 2024 at 05:18:29AM -0700, Breno Leitao wrote:
-> On Thu, Sep 12, 2024 at 12:09:36AM +0200, Pablo Neira Ayuso wrote:
-> > On Wed, Sep 11, 2024 at 08:25:52AM -0700, Breno Leitao wrote:
-> > > Hello,
-> > > 
-> > > On Mon, Sep 09, 2024 at 01:46:17AM -0700, Breno Leitao wrote:
-> > > > These two patches make IP_NF_IPTABLES_LEGACY and IP6_NF_IPTABLES_LEGACY
-> > > > Kconfigs user selectable, avoiding creating an extra dependency by
-> > > > enabling some other config that would select IP{6}_NF_IPTABLES_LEGACY.
-> > > 
-> > > Any other feedback regarding this change? This is technically causing
-> > > user visible regression and blocks us from rolling out recent kernels.
+On Tue, Sep 10, 2024 at 02:21:01PM +0100, Simon Horman wrote:
+> On Tue, Sep 10, 2024 at 11:35:33AM +0300, Andy Shevchenko wrote:
+> > Some of the functions may be unused (CONFIG_NETFILTER_NETLINK_GLUE_CT=n
+> > and CONFIG_NF_CONNTRACK_EVENTS=n), it prevents kernel builds with clang,
+> > `make W=1` and CONFIG_WERROR=y:
 > > 
-> > What regressions? This patch comes with no Fixes: tag.
+> > net/netfilter/nf_conntrack_netlink.c:657:22: error: unused function 'ctnetlink_acct_size' [-Werror,-Wunused-function]
+> >   657 | static inline size_t ctnetlink_acct_size(const struct nf_conn *ct)
+> >       |                      ^~~~~~~~~~~~~~~~~~~
+> > net/netfilter/nf_conntrack_netlink.c:667:19: error: unused function 'ctnetlink_secctx_size' [-Werror,-Wunused-function]
+> >   667 | static inline int ctnetlink_secctx_size(const struct nf_conn *ct)
+> >       |                   ^~~~~~~~~~~~~~~~~~~~~
+> > net/netfilter/nf_conntrack_netlink.c:683:22: error: unused function 'ctnetlink_timestamp_size' [-Werror,-Wunused-function]
+> >   683 | static inline size_t ctnetlink_timestamp_size(const struct nf_conn *ct)
+> >       |                      ^~~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > Fix this by guarding possible unused functions with ifdeffery.
+> > 
+> > See also commit 6863f5643dd7 ("kbuild: allow Clang to find unused static
+> > inline functions for W=1 build").
+> > 
+> > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> > ---
+> > 
+> > v3: explicitly mentioned the configuration options that lead to issue (Simon)
+> > v2: fixed typo, dropped Fixes (Simon), optimised by reusing existing ifdeffery
 > 
-> Sorry, I should have said "This is technically causing user lack of
-> flexibility when configuring the kernel"
+> Thanks for the updates.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-Sure, to allow for in-kernel iptables compilation but extensions as
-modules? How in the world is that ever used, really?
+Applied to nf.git
 
