@@ -1,160 +1,123 @@
-Return-Path: <netdev+bounces-128384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F002097945E
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 04:17:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02F4E979465
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 04:22:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6908B1F230C8
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 02:17:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7E64285559
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 02:22:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BC11FDD;
-	Sun, 15 Sep 2024 02:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5BA51B85E3;
+	Sun, 15 Sep 2024 02:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R7qhRKc7"
+	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="ilEhHjem"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA3418D;
-	Sun, 15 Sep 2024 02:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487FFC8CE;
+	Sun, 15 Sep 2024 02:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726366653; cv=none; b=qLJbsjXIal9wPgDKu0wmRiI/N3zTdcOvCrvBWiIOcV5vmLv3bXOJNNBxQAEJ01VafZm2JvnmMciEBE+BGtZxKrvyenRGpt3Vlsq22W2n0ZmvGWSVqR79SEWJUD0DLVze7O8ToBJSCtlWBDtpusbcLBI7LUBiWxt+6NKcpmSRpVA=
+	t=1726366939; cv=none; b=owWq/MU7GWRKsPz+Ilix0BPD+stciEGOjEjyxfIRgpCtxf3GyJupRa7cd1Wqrh5CCJN7isMXN3/6aMEc1OwTDmePrK5BhUtvlm1Ie+Drh+DbtBLxz30pkFxRFliCPILDj7VcrlthLg+ETmaoXDeOZCalNx+ykrjgQMhQe3yFJ7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726366653; c=relaxed/simple;
-	bh=Cu9oogNUDp0JyK3aZ5kSKAt7MkSWd0QBhKX3Dlldovw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dR3Y9zAFF1Gvo+/c3mO8ZkMVTaLAop6sTLEILz+k6dIIKCwFdQ3Ucs6s6SniLF9CWCiAWJVF8+uwKYQjmzM7stLUrnQxxADMPORkXgyqElhlnYHw6+ZFvRuAW5M8OTYkNLYU0QArJSxh7Dcvw/Ppar681ZYqp82n/XcG5JEqxoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R7qhRKc7; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726366652; x=1757902652;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Cu9oogNUDp0JyK3aZ5kSKAt7MkSWd0QBhKX3Dlldovw=;
-  b=R7qhRKc7fpzgotfGvmFF4/GpZJHUB9vHbD/dH3TaPSqR/rrDu/AcVKm6
-   men4O8z5pUFXGp1WgLqfbwA9sAh5KUZKGh8IE/aO2lPnFRp75DMws5Vsf
-   1tbtE5+opeWJJnemEOMSGNqEL7E4PPQJ+Y+p/bDS6zNmyAx2TMX758O/n
-   Ss7MQSpeTgVaxtwhHslD6tXngIGmX5jxz94QdxmWSpYGs/57ihb119pSo
-   VP28M+4pSDRVwTDR+CbZVjNDHa5mbUUlpE1q9sPJCs0JcC1T7HbYXsgda
-   XKYlzeUw7P1EhCqvL1OV9g0Qi6oHFic+72QAMf4hXIeScKHCRtBgTuDXj
-   A==;
-X-CSE-ConnectionGUID: Wlv2Fn/PQA2EgP99glS2tA==
-X-CSE-MsgGUID: cfjUHxunSomgzani2vJIiA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11195"; a="25171852"
-X-IronPort-AV: E=Sophos;i="6.10,230,1719903600"; 
-   d="scan'208";a="25171852"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2024 19:17:31 -0700
-X-CSE-ConnectionGUID: yIV5O7oxSyCqb9SiViWT1Q==
-X-CSE-MsgGUID: f5nxJ5p8R02TjB12H+h/Ew==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,230,1719903600"; 
-   d="scan'208";a="68608885"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 14 Sep 2024 19:17:27 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1spepI-0008L0-30;
-	Sun, 15 Sep 2024 02:17:24 +0000
-Date: Sun, 15 Sep 2024 10:16:57 +0800
-From: kernel test robot <lkp@intel.com>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com, rdunlap@infradead.org,
-	andrew@lunn.ch, Steen.Hegelund@microchip.com,
-	Raju.Lakkaraju@microchip.com, daniel.machon@microchip.com,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next V2 3/5] net: lan743x: Register the platform
- device for sfp pluggable module
-Message-ID: <202409151058.rOgbMAJJ-lkp@intel.com>
-References: <20240911161054.4494-4-Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1726366939; c=relaxed/simple;
+	bh=Qhv9sjisXssLByDeTW4sElfpfjfZTcPFI8JsS5SNhZU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hWPxHgm5LmJ8CzlNIN9+SrqNRrDoxdrz/cNXcb/dgF8gBn79MMu99P9xSqXIEYkP5BbpxOMizhFUuaxXLbJzGKT1Q32bZnCkEOvp9SCX7zLiU+jjtY1heNFc3kpTE1RgYqmnLwkPbL+k7dykjoYLzVGWDsbcDOSSMoTZVaSb0ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=ilEhHjem; arc=none smtp.client-ip=217.79.154.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
+X-Virus-Scanned: amavisd-new at emenem.pl
+Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
+	(authenticated bits=0)
+	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 48F2LUOP000569
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
+	Sun, 15 Sep 2024 04:21:32 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
+	t=1726366896; bh=LR47unBQVogBjHIoDXQHW8rlU0C4v2wh3MS9cFAlQEY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=ilEhHjemej77iuafYA0UKbUucMwIgCuCNrbyn22efeLEkGMWQtWbrxJcYmxzQw5Cs
+	 KCgwX1e5KMI/iptY6PDZTA8+RSR8Yqjx8jPMtTCljA/hlXoD1X9p4W+nRMm4BUtkde
+	 6kdHpjisL7a8wahTQdp0q2eoslox4TkKuZHdUUIY=
+Message-ID: <528f30ca-5434-4f75-9587-c253c934bfc1@ans.pl>
+Date: Sat, 14 Sep 2024 19:21:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240911161054.4494-4-Raju.Lakkaraju@microchip.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] mlx4/mlx5: {mlx4,mlx5e}_en_get_module_info
+ cleanup
+To: Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Ido Schimmel <idosch@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+        Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        linux-rdma@vger.kernel.org
+References: <14a24f93-f8d6-4bc7-8b87-86489bcedb28@ans.pl>
+ <20240913135510.1c760f97@kernel.org>
+ <6b979753-9f5a-410c-9fe3-d2366976e316@ans.pl>
+ <20240913194808.43932def@kernel.org> <20240914082156.GB8319@kernel.org>
+From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
+Content-Language: en-US
+In-Reply-To: <20240914082156.GB8319@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Raju,
+On 14.09.2024 at 01:21, Simon Horman wrote:
+> On Fri, Sep 13, 2024 at 07:48:08PM -0700, Jakub Kicinski wrote:
+>> On Fri, 13 Sep 2024 19:12:01 -0700 Krzysztof Olędzki wrote:
+>>> On 13.09.2024 at 13:55, Jakub Kicinski wrote:
+>>>> On Wed, 11 Sep 2024 23:38:45 -0700 Krzysztof Olędzki wrote:  
+>>>>> Use SFF8024 constants defined in linux/sfp.h instead of private ones.
+>>>>>
+>>>>> Make mlx4_en_get_module_info() and mlx5e_get_module_info() to look
+>>>>> as close as possible to each other.
+>>>>>
+>>>>> Simplify the logic for selecting SFF_8436 vs SFF_8636.  
+>>>>
+>>>> Minor process suggestion, I think you may be sending the patches one by
+>>>> one. It's best to format them into a new directory and send all at once
+>>>> with git send-email. Add a cover letter, too.
+>>>>   
+>>>
+>>> Thanks, yes, will do for v2. I assume this needs to wait for about
+>>> two weeks for net-next to re-open?
+>>
+>> The cleanups - yes, but if patch 3 works you should make it independent
+>> and send as a fix (and trees never close for fixes).
+> 
+> Hi Krzysztof,
+> 
+> Just to expand on what Jakub wrote a little. In general fixes should have a
+> Fixes tag and be targeted at the net tree.
+> 
+> 	Subject: [PATCH net] ...
+> 
+> Link: https://docs.kernel.org/process/maintainer-netdev.html
 
-kernel test robot noticed the following build errors:
+Yes, thank you Simon for the additional feedback.
 
-[auto build test ERROR on net-next/main]
+I initially targeted net-next following Ido's request:
+ https://lore.kernel.org/netdev/Ztna8O1ZGUc4kvKJ@shredder.mtl.com/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Raju-Lakkaraju/net-lan743x-Add-SFP-support-check-flag/20240912-002444
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240911161054.4494-4-Raju.Lakkaraju%40microchip.com
-patch subject: [PATCH net-next V2 3/5] net: lan743x: Register the platform device for sfp pluggable module
-config: x86_64-randconfig-003-20240914 (https://download.01.org/0day-ci/archive/20240915/202409151058.rOgbMAJJ-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240915/202409151058.rOgbMAJJ-lkp@intel.com/reproduce)
+If we all believe "net" is the right target, I'm more than happy to update it and re-send that single
+patch now. Should I mark it as "v2" even if no difference because of the tree change?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409151058.rOgbMAJJ-lkp@intel.com/
+Also, I did include Fixes in that patch:
+ Fixes: f5826c8c9d57 ("net/mlx4_en: Fix wrong return value on ioctl EEPROM query failure")
+ Fixes: 32a173c7f9e9 ("net/mlx4_core: Introduce mlx4_get_module_info for cable module info reading")
 
-All errors (new ones prefixed by >>):
+See: https://lore.kernel.org/netdev/2aa0787e-a148-456e-b1b5-8f1e9785ed04@ans.pl/
 
->> ld.lld: error: undefined symbol: i2c_get_adapter_by_fwnode
-   >>> referenced by sfp.c:2981 (drivers/net/phy/sfp.c:2981)
-   >>>               drivers/net/phy/sfp.o:(sfp_probe) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: i2c_put_adapter
-   >>> referenced by sfp.c:2989 (drivers/net/phy/sfp.c:2989)
-   >>>               drivers/net/phy/sfp.o:(sfp_probe) in archive vmlinux.a
-   >>> referenced by sfp.c:2965 (drivers/net/phy/sfp.c:2965)
-   >>>               drivers/net/phy/sfp.o:(sfp_cleanup) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: hwmon_device_unregister
-   >>> referenced by sfp.c:1640 (drivers/net/phy/sfp.c:1640)
-   >>>               drivers/net/phy/sfp.o:(__sfp_sm_event) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: mdio_i2c_alloc
-   >>> referenced by sfp.c:707 (drivers/net/phy/sfp.c:707)
-   >>>               drivers/net/phy/sfp.o:(__sfp_sm_event) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: hwmon_sanitize_name
-   >>> referenced by sfp.c:1611 (drivers/net/phy/sfp.c:1611)
-   >>>               drivers/net/phy/sfp.o:(sfp_hwmon_probe) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: hwmon_device_register_with_info
-   >>> referenced by sfp.c:1617 (drivers/net/phy/sfp.c:1617)
-   >>>               drivers/net/phy/sfp.o:(sfp_hwmon_probe) in archive vmlinux.a
---
->> ld.lld: error: undefined symbol: i2c_transfer
-   >>> referenced by sfp.c:648 (drivers/net/phy/sfp.c:648)
-   >>>               drivers/net/phy/sfp.o:(sfp_i2c_read) in archive vmlinux.a
-   >>> referenced by sfp.c:680 (drivers/net/phy/sfp.c:680)
-   >>>               drivers/net/phy/sfp.o:(sfp_i2c_write) in archive vmlinux.a
-
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for GP_PCI1XXXX
-   Depends on [n]: PCI [=y] && GPIOLIB [=y] && NVMEM_SYSFS [=n]
-   Selected by [y]:
-   - LAN743X [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
-   WARNING: unmet direct dependencies detected for SFP
-   Depends on [m]: NETDEVICES [=y] && PHYLIB [=y] && I2C [=m] && PHYLINK [=y] && (HWMON [=m] || HWMON [=m]=n [=n])
-   Selected by [y]:
-   - LAN743X [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
-   WARNING: unmet direct dependencies detected for I2C_PCI1XXXX
-   Depends on [m]: I2C [=m] && HAS_IOMEM [=y] && PCI [=y]
-   Selected by [y]:
-   - LAN743X [=y] && NETDEVICES [=y] && ETHERNET [=y] && NET_VENDOR_MICROCHIP [=y] && PCI [=y] && PTP_1588_CLOCK_OPTIONAL [=y]
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks,
+ Krzysztof
 
