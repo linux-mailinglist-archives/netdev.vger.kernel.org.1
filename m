@@ -1,84 +1,180 @@
-Return-Path: <netdev+bounces-128455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36D6C97994E
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 00:00:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 195BB97997C
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 01:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D63BB1F229B0
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 22:00:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5A4A281D95
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 23:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122E7381B1;
-	Sun, 15 Sep 2024 22:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D258E8120C;
+	Sun, 15 Sep 2024 23:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CVHANUWE"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="fgCO3qvW"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FB64642D
-	for <netdev@vger.kernel.org>; Sun, 15 Sep 2024 22:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E350F2BCF5;
+	Sun, 15 Sep 2024 23:16:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726437631; cv=none; b=syYLueCFIFRUdeiaQRs81/oc5ByYA551F93IDLQuEbvQzMErbbr5M0Ea14mZzMcA/gPjs09MVL6I0t0fu0EFdAqxOh8uA2mgoYdmlvpDIDksWD7SmiJNpTYoVkqiumvbNVHaulBvT6f5EkQlNBanKApm0QWi4L2G9D+bwuE0njo=
+	t=1726442196; cv=none; b=UnWT6hOqITcB9sXTRjiRRU2Zjt92OaXHn7nmuG+Q3advoUT32/Pf1waIokgUl837HV8G3Gw3HhnmZg2TpNlOGt3GmuE+/C3JJTqKKt2iRaZSKP6hquFVi+LfuaPDoomBc0AOey8IXypjcFngGExKO0WhSHLW65HfSPtckZyl8Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726437631; c=relaxed/simple;
-	bh=hMcWLD+UudfVOmTJQXZuMZwCR9xHEWrIpj4fwh+ifPk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ul1P9vJdn8D2qNf1GsM3VM2YsNysXMBQTGQU13aMaXPebTiLnK4YyPwMEl7ZNpZ2WEhZrv+QA6zChfnBPmD3XZCDfPWOtHJ2PpHnZva39D3Qfqn0EFYX0FCgtu3/+QpkHR1bpjWAry7Vyv7/rwIBjtP9G+2KWbCTOLmY+Lm2ZkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CVHANUWE; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sW43ZRIHzYAXHAcXI1SBxcIE2kzz/W/8J10BUbSXTww=; b=CVHANUWEa3EpOC+JdUXL0nQhQ2
-	I/vA+W/f1kU83718vRrNcuMPFSwVqLwEsvbKWVtP6t0DBBHbZBcGRDXFX3SyGlyNnU11NWvr0PpVN
-	47ZSebAmZklgfPJ9D3Iqpp0Ef9AHkZH1qO5IUqJXmQzEzLXuWnQa+kjBr9xbjzTrLwh4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1spxI8-007WSX-GL; Mon, 16 Sep 2024 00:00:24 +0200
-Date: Mon, 16 Sep 2024 00:00:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Hans-Frieder Vogt <hfdevel@gmx.net>
-Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v2 0/7] net: tn40xx: add support for AQR105
- based cards
-Message-ID: <47aa78c1-4e31-49f9-8bfc-489927cb774a@lunn.ch>
-References: <trinity-602c050f-bc76-4557-9824-252b0de48659-1726429697171@3c-app-gmx-bap07>
- <c3bd51cc-fc8f-46b5-bfc3-ccb0fa1386e9@lunn.ch>
- <80d6ffff-fce0-4fa7-8042-249bfc368e65@gmx.net>
+	s=arc-20240116; t=1726442196; c=relaxed/simple;
+	bh=S98u6b+jnTKVchO45vkryN5wsioS5RnrF+zIsm6MueI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zt72E78Mi5i+GX2dldJMDgLJ7fhx0MgIpvCfTbR9SroiXDuhJ6iONvHcYGdXc22lz7sOYqplL3Oc85fhnkYJlCV8QNi/NQ4DOwOYaTfrhhCpYAQuTWaJvxiyLyXiWYRWxDTIcy+ttCcw7Xwiqem4DP4ETbVOPmiCGzYKY1dDK8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=fgCO3qvW; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1726442190;
+	bh=+YkVivKQKXh9KKj1Omgtn8LMDpfsrjbXlXEgwIeN1hE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fgCO3qvWOlr9OTwlOusdn8iUf0yu02AoLXYOivGbuBk24bZFEixS/E+KN76lga+SC
+	 2plihgbd/GqAxnBjdmR97NYPsHOZdSwYbRhO70zhneakfXKa7At3TySWusd87eNlbG
+	 hojE7jDQAZvSniNMO5pw8AeRdO0RYEJxUe2/ftklWw8fcn4lZndpG4TRmwm18+bBf5
+	 MbIYpYWwZ1P5rOWnNEYmG2WT5+mLw6eYesBEC6pxzMrIwt77FXYoOWLlHqdg6SZSYU
+	 OJUiHTYclSOszHBKzAm6lwIKEXeyoXfAIrYJ9B7wdFj2zzrXfvdxnenm5SgOkThmNt
+	 q2uoCWA22wDSQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X6P7H4RWKz4xCT;
+	Mon, 16 Sep 2024 09:16:27 +1000 (AEST)
+Date: Mon, 16 Sep 2024 09:16:27 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Linux Next Mailing List <linux-next@vger.kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>, <linuxppc-dev@lists.ozlabs.org>, Matthew
+ Wilcox <willy@infradead.org>
+Subject: Re: [PATCH net-next v2] page_pool: fix build on powerpc with GCC 14
+Message-ID: <20240916091627.7517d5b1@canb.auug.org.au>
+In-Reply-To: <87jzffq9ge.fsf@mail.lhotse>
+References: <20240913213351.3537411-1-almasrymina@google.com>
+	<87jzffq9ge.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <80d6ffff-fce0-4fa7-8042-249bfc368e65@gmx.net>
+Content-Type: multipart/signed; boundary="Sig_/wvWGET07=F0qHFq0Pov_C+c";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-> Sorry for the noise on the list.
-> Yes, I am a git beginner and have done all the e-mail submission part
-> manually. Which has been quite an effort.
-> I will resend the patch series as RFC.
+--Sig_/wvWGET07=F0qHFq0Pov_C+c
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-No need. Please just try to address these issues with the next version
-of the patchset.
+Hi all,
 
-With the merge window open at the moment, and the Linux Plumbers
-conference soon, it may take a while for you to get full review
-comments.
+On Sat, 14 Sep 2024 12:02:09 +1000 Michael Ellerman <mpe@ellerman.id.au> wr=
+ote:
+>
+> Mina Almasry <almasrymina@google.com> writes:
+> > Building net-next with powerpc with GCC 14 compiler results in this
+> > build error:
+> >
+> > /home/sfr/next/tmp/ccuSzwiR.s: Assembler messages:
+> > /home/sfr/next/tmp/ccuSzwiR.s:2579: Error: operand out of domain (39 is
+> > not a multiple of 4)
+> > make[5]: *** [/home/sfr/next/next/scripts/Makefile.build:229:
+> > net/core/page_pool.o] Error 1
+> >
+> > Root caused in this thread:
+> > https://lore.kernel.org/netdev/913e2fbd-d318-4c9b-aed2-4d333a1d5cf0@cs-=
+soprasteria.com/ =20
+>=20
+> Sorry I'm late to this, the original report wasn't Cc'ed to linuxppc-dev =
+:D
 
-	Andrew
+Yeah, sorry about that.
+
+> I think this is a bug in the arch/powerpc inline asm constraints.
+>=20
+> Can you try the patch below, it fixes the build error for me.
+>=20
+> I'll run it through some boot tests and turn it into a proper patch over
+> the weekend.
+>=20
+> cheers
+>=20
+>=20
+> diff --git a/arch/powerpc/include/asm/atomic.h b/arch/powerpc/include/asm=
+/atomic.h
+> index 5bf6a4d49268..0e41c1da82dd 100644
+> --- a/arch/powerpc/include/asm/atomic.h
+> +++ b/arch/powerpc/include/asm/atomic.h
+> @@ -23,6 +23,12 @@
+>  #define __atomic_release_fence()					\
+>  	__asm__ __volatile__(PPC_RELEASE_BARRIER "" : : : "memory")
+> =20
+> +#ifdef CONFIG_CC_IS_CLANG
+> +#define DS_FORM_CONSTRAINT "Z<>"
+> +#else
+> +#define DS_FORM_CONSTRAINT "YZ<>"
+> +#endif
+> +
+>  static __inline__ int arch_atomic_read(const atomic_t *v)
+>  {
+>  	int t;
+> @@ -197,7 +203,7 @@ static __inline__ s64 arch_atomic64_read(const atomic=
+64_t *v)
+>  	if (IS_ENABLED(CONFIG_PPC_KERNEL_PREFIXED))
+>  		__asm__ __volatile__("ld %0,0(%1)" : "=3Dr"(t) : "b"(&v->counter));
+>  	else
+> -		__asm__ __volatile__("ld%U1%X1 %0,%1" : "=3Dr"(t) : "m<>"(v->counter));
+> +		__asm__ __volatile__("ld%U1%X1 %0,%1" : "=3Dr"(t) : DS_FORM_CONSTRAINT=
+ (v->counter));
+> =20
+>  	return t;
+>  }
+> @@ -208,7 +214,7 @@ static __inline__ void arch_atomic64_set(atomic64_t *=
+v, s64 i)
+>  	if (IS_ENABLED(CONFIG_PPC_KERNEL_PREFIXED))
+>  		__asm__ __volatile__("std %1,0(%2)" : "=3Dm"(v->counter) : "r"(i), "b"=
+(&v->counter));
+>  	else
+> -		__asm__ __volatile__("std%U0%X0 %1,%0" : "=3Dm<>"(v->counter) : "r"(i)=
+);
+> +		__asm__ __volatile__("std%U0%X0 %1,%0" : "=3D" DS_FORM_CONSTRAINT (v->=
+counter) : "r"(i));
+>  }
+> =20
+>  #define ATOMIC64_OP(op, asm_op)						\
+
+I have applied this by hand to my fixes branch for today and will
+remove it when it (or something better) is applied somewhere appropriate.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/wvWGET07=F0qHFq0Pov_C+c
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbnassACgkQAVBC80lX
+0GwtGwgAjDVCZvPbYm3Kwv1z8+t74EffqYKMdcX5DcnmbMkaPV3rLXAKXr0KVymx
+/kggi6dj2sFS8NnsgSFbzQkIMF3Kh5iSCxiTzcGPpL29qOYI5S5r/qEV8SL70Ufd
+mMEPuZm5/xE4dHw9QUrZfPPdCrmLCMl17cLiVl2anqeS6WO2X6MC6sH+rIq5k4x6
+BpEMayzkSIoJrxSfBkj3kyWVzIrXJ2vnOzQr9/4eChhLBzt6BOqOHCyze6TIE+aV
+USLfDeVtJqO0PR0B7DajAkUUaAlBv2dqSFUY8PVlmCT+2XawhvUQp0s4xFag/mUX
+gVGPsrNGlnkqUmfk+nc88OS/JI4Bcg==
+=GsuB
+-----END PGP SIGNATURE-----
+
+--Sig_/wvWGET07=F0qHFq0Pov_C+c--
 
