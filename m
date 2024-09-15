@@ -1,124 +1,101 @@
-Return-Path: <netdev+bounces-128386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2024C9794A5
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 06:56:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 014639794DB
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 08:49:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 673F6B219B5
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 04:56:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A12A11F21CDB
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 06:49:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB2D168DC;
-	Sun, 15 Sep 2024 04:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710F41CA94;
+	Sun, 15 Sep 2024 06:49:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="W6Dd31fd"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Om/r6H0p"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73911B85CD;
-	Sun, 15 Sep 2024 04:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44F71BC3F
+	for <netdev@vger.kernel.org>; Sun, 15 Sep 2024 06:49:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726376187; cv=none; b=n5ywVrWrdZTvRTiSqpVXn4Li+lUAdvrveCj1Ki6xNcVLZZtMkA4cCx5oar6m4QPxajxRE5QsmZpx5Qtsv/Hm4V+20NODd5bxQx0RWrjHjp6grIlJVsRMlpzFmnCyFD6xRYZDkT4Cl13Ctaie7Vln9rgIRgXyqHTndqyCJhdDBUo=
+	t=1726382961; cv=none; b=gdJNVmgxMZw2AJRSoP1RbxtyK35LUeJAj5rY30FIVJPn50ZDX90cBsy4tFnGdCfK73PPPb0Rmo5peEHLbq2wJf1vSX3rrYEgdW1H7j3IjRbVHemhj2jnhlV+MG2Og7+2W8kxQcTN+p/d5FQ6xMmWQs3VMkfTvzy57p3XgMuOBaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726376187; c=relaxed/simple;
-	bh=9w30dChxYIMmPxhl67+/YhDv8UAzy02LRnlwADKHBNg=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=Tbt3iMr1STSbA9v2n5zE58Idlhf49eUqmUL2Ia6X53ixYpSsylOs/HhDex3pXXjTzaKv047kadHbXzmSIXHBeHJMG0//9iadOtMwAAacMqksnwgXNBcF4DsR4BbIeHORDIBCX5Sl4/i4Gm3BGnCGj94C1m/Y+xdHKR9RYZdUOsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=W6Dd31fd; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 2ED1D20C08A3; Sat, 14 Sep 2024 21:56:25 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2ED1D20C08A3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1726376185;
-	bh=N+lwgWnXJnJIv3ORmL8lZsGxIiQ/BGyrO1aZxWResDM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=W6Dd31fdlCYaoBHGnUNiNgYBg4SHFoHewSeoHayK7WCFR7ECh3Bfk+yRFdiI3D/++
-	 Je6I0S9nR6LcT6MrU8LyY/0/d4yHDuYCMe6a17I4Xp7vK6OuDtsX3iI+aETGDkUgP5
-	 UQRO3XlqkPP4bFxi2Xsa3Yj9xYEbLyeYjxuPafzw=
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>,
-	Simon Horman <horms@kernel.org>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erick Archer <erick.archer@outlook.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Colin Ian King <colin.i.king@gmail.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: [PATCH net-next] net: mana: Increase the DEF_RX_BUFFERS_PER_QUEUE to 1024
-Date: Sat, 14 Sep 2024 21:56:24 -0700
-Message-Id: <1726376184-14874-1-git-send-email-shradhagupta@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+	s=arc-20240116; t=1726382961; c=relaxed/simple;
+	bh=UJ5k25ZV3lJdTTaM8tIb7kjVAGzanB8T92WEAesbG6o=;
+	h=From:To:CC:Date:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=Yfrj4sl0d4bbDRzH7b3///1s73KoCN7OdaNSHvkmBCxAzGauvvZPoazY0XByzKwxq/9Bk6yTMUzmTsnIIkHcXqdnsKAZNqdky5/kx6Xy/5nqxe/XhEcyELbMVQloz+pU7jTX1eYTZY1i097/ciwnGEQawBPyYW7e1ZRv0eoC1ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Om/r6H0p; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7db54269325so244557a12.2
+        for <netdev@vger.kernel.org>; Sat, 14 Sep 2024 23:49:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1726382958; x=1726987758; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kWfnMMz7l99gAM3XlLaOGRiADmU0oeZX94hUcKz22ns=;
+        b=Om/r6H0pEKLa5GFt2wbh6MvTrDhjT0jZILEHwKwtBvcodSea3ikjAcKpso0nGeJEUN
+         ABy1c6Ivjfy12JF4GhmhXbF4/00bftyOn1pdqW4MOOkEeDeWnXE5jqIdwBHF7V0Agl7I
+         Vt7UAwYKh6h7sS911lkWzxmShiABxPX17F6bc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726382958; x=1726987758;
+        h=content-transfer-encoding:mime-version:subject:user-agent
+         :references:in-reply-to:message-id:date:cc:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kWfnMMz7l99gAM3XlLaOGRiADmU0oeZX94hUcKz22ns=;
+        b=PNZCIGYr9luwlUU6cXOSdcl37YUBRftmUiYXbQR2jDIp4iUIUZbqLA3SeVwvrxitFY
+         KNp7eLLBUJQX1Oqij/VqkFvk8pTUq+VyTfZbC7sVfYm93NOgHs5LSoKJIDRCw4uwYGgF
+         Ew/SrQGSAl2hVSgAcSvQ8nLDbqKkWg0NvplLM+fF0faQB1Q7CNFLqYyW6gVf8MYcgG4i
+         /FSvtYVrqlwNssMU8HFeHH7uhScGiiBVMPZTE3GlEf9/qtl+FVWt/J9A/+z/Rc7fj5Iy
+         JDJth5aFK243NDDhsQXBqrgQcbbblk3VxRHhnzdQVxboHyVlsW5tcmceYekzuKtAw6ic
+         bk0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXIO3aOMZyp5nlxz4N6W1bIfAxb97Zivtnn+2M+aMbD1naHn4ZbWBw2lP7EjI1Ke/RVIYB3PHM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy59EWz5LpaHp00OET4EDaIiuifKI6s/qNoBL+zp0sWOazMSZvv
+	mEAcfiLXMBcmuCd0R9Jmvy2WaFVtMBTUZlRbGqhcXRJ/2kd6ku2Uxb4RRbSmgw==
+X-Google-Smtp-Source: AGHT+IFE3Rw0RCxoDKs6dsS7IG+u5rzl9WSQMtzPPbskf+XeDvZ7pl7wwvVVMCZwzpDSVtxvmCYueA==
+X-Received: by 2002:a17:90b:4f91:b0:2d3:cd27:c480 with SMTP id 98e67ed59e1d1-2dbb9f7d558mr11323825a91.33.1726382957920;
+        Sat, 14 Sep 2024 23:49:17 -0700 (PDT)
+Received: from [192.168.178.38] (f215227.upc-f.chello.nl. [80.56.215.227])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbcfcbb42fsm2576910a91.4.2024.09.14.23.49.11
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 14 Sep 2024 23:49:17 -0700 (PDT)
+From: Arend Van Spriel <arend.vanspriel@broadcom.com>
+To: Jacobe Zang <jacobe.zang@wesion.com>, Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, van Spriel <arend@broadcom.com>
+CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <brcm80211@lists.linux.dev>, <brcm80211-dev-list.pdl@broadcom.com>, <nick@khadas.com>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Date: Sun, 15 Sep 2024 08:49:09 +0200
+Message-ID: <191f4714288.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+In-Reply-To: <20240910-wireless-mainline-v14-2-9d80fea5326d@wesion.com>
+References: <20240910-wireless-mainline-v14-0-9d80fea5326d@wesion.com>
+ <20240910-wireless-mainline-v14-2-9d80fea5326d@wesion.com>
+User-Agent: AquaMail/1.52.0 (build: 105200518)
+Subject: Re: [PATCH v14 2/4] dt-bindings: net: wireless: brcm4329-fmac: add clock description for AP6275P
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 
-Through some experiments, we found out that increasing the default
-RX buffers count from 512 to 1024, gives slightly better throughput
-and significantly reduces the no_wqe_rx errs on the receiver side.
-Along with these, other parameters like cpu usage, retrans seg etc
-also show some improvement with 1024 value.
+On September 10, 2024 5:05:46 AM Jacobe Zang <jacobe.zang@wesion.com> wrote:
 
-Following are some snippets from the experiments
+> Not only AP6275P Wi-Fi device but also all Broadcom wireless devices allow
+> external low power clock input. In DTS the clock as an optional choice in
+> the absence of an internal clock.
+>
+> Reviewed-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
+> ---
+> .../devicetree/bindings/net/wireless/brcm,bcm4329-fmac.yaml       | 8 ++++++++
+> 1 file changed, 8 insertions(+)
 
-ntttcp tests with 512 Rx buffers
----------------------------------------
-connections|  throughput|  no_wqe errs|
----------------------------------------
-1          |  40.93Gbps | 123,211     |
-16         | 180.15Gbps | 190,120
-128        | 180.20Gbps | 173,508     |
-256        | 180.27Gbps | 189,884     |
-
-ntttcp tests with 1024 Rx buffers
----------------------------------------
-connections|  throughput|  no_wqe errs|
----------------------------------------
-1          |  44.22Gbps | 19,864      |
-16         | 180.19Gbps | 4,430       |
-128        | 180.21Gbps | 2,560       |
-256        | 180.29Gbps | 1,529       |
-
-So, increasing the default RX buffers per queue count to 1024
-
-Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
----
- include/net/mana/mana.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index f2a5200d8a0f..9b0faa24b758 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -43,7 +43,7 @@ enum TRI_STATE {
-  * size beyond this value gets rejected by __alloc_page() call.
-  */
- #define MAX_RX_BUFFERS_PER_QUEUE 8192
--#define DEF_RX_BUFFERS_PER_QUEUE 512
-+#define DEF_RX_BUFFERS_PER_QUEUE 1024
- #define MIN_RX_BUFFERS_PER_QUEUE 128
- 
- /* This max value for TX buffers is derived as the maximum allocatable
--- 
-2.34.1
 
 
