@@ -1,111 +1,114 @@
-Return-Path: <netdev+bounces-128396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3DF0979692
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 14:20:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3695C9796A9
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 14:52:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DA66282111
-	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 12:20:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF283282A03
+	for <lists+netdev@lfdr.de>; Sun, 15 Sep 2024 12:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEDB21C57B7;
-	Sun, 15 Sep 2024 12:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5981C57A6;
+	Sun, 15 Sep 2024 12:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="I6iTjJPi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AL/Bsuj4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1063A1C3F38;
-	Sun, 15 Sep 2024 12:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB40184E;
+	Sun, 15 Sep 2024 12:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726402815; cv=none; b=DRzGF7hnVbqxVDooO51BolwtNBXfbEKI0wHbSijprcn7mqG6JfmPLmzc0QuEyRIQ5HFb9JmrUhg62S0m/grwxWi1pwerd4qebptCuBgAforo+nDkXQYwKZVoNaej2qe0oNKF3vH96O+n5iY3g9nJrbhUHf037YXD97WfmA/9nAk=
+	t=1726404740; cv=none; b=ntOWvgPtpPUR16cM5k2EMxd6GzZOeGhgVdxIOkzGXaALmj8o12ypUGRIyJTCB4SGe9smunHycFKMRRIkd6KnqoTHuESTrjRKM/vJMDzA/EW0vzLW8ZF8Lxf4YeyfevwxLgh3KpXZiSW6UVeCYTQvAAyJ7DjVgyGiOdZdljlpBo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726402815; c=relaxed/simple;
-	bh=Y9rDxiF0UiBCeEPN8lLxrJAUzoHXuLv/CJEpCJjpLvk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BE85gFYO0hgS2fw42ifpFFrUrzm3q+tvLUDRvHMaV+2+t24P5wUkSAjX48vUxfrr9kIUGasxOqKuON6wvSxSwo3OF+xY+W1oNbO9Xb34S847tRCK6aSrhQpZlrFG6+3Mot2PZVwn58dUx/ur9tX1wzT7axlm7Z/KfV3Amsuqh8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=I6iTjJPi; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1726402803;
-	bh=LcqIBVzHw0KnwXTko6FqDEVdGVv2zi2crglHm27G4d8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=I6iTjJPikupA477s76MI4hBQ6xsZn3ga+yalo4/iLaFuUS78Rj0BUT9N6AswrEcWT
-	 CDwMCJmusbYk6Ig8YpaBv5TvStzLHfR0phcE51BneSptcxhQVb8bv3K6hPrOBKlptG
-	 1UfGTiGjWzZFUZZLYMqNQW57tplBHAbAViNUfDkTIvlrnptU7I4eocj2KnCziNk0e7
-	 6IfgkTQIVGMzjExC5wmO7ZxNz3Y36+2ol2ZFq7bJg+HsE1vi4LhkzrdtnUbCjgOnuQ
-	 Nd3s3BtWeeQhGquc1UcaXLNsa+vwi8oiCdfS2d8yLNZue6Pfj0dUlHhqAsIDqnkza6
-	 L3vPXeZU7yhqQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X66Ys6GwTz4x8H;
-	Sun, 15 Sep 2024 22:20:00 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>, Mina Almasry
- <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stephen
- Rothwell <sfr@canb.auug.org.au>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, Matthew
- Wilcox <willy@infradead.org>
-Subject: Re: [PATCH net-next v2] page_pool: fix build on powerpc with GCC 14
-In-Reply-To: <498e7990-2c81-4779-83e6-1ff072796dbd@csgroup.eu>
-References: <20240913213351.3537411-1-almasrymina@google.com>
- <87jzffq9ge.fsf@mail.lhotse>
- <498e7990-2c81-4779-83e6-1ff072796dbd@csgroup.eu>
-Date: Sun, 15 Sep 2024 22:19:58 +1000
-Message-ID: <87h6ahqfbl.fsf@mail.lhotse>
+	s=arc-20240116; t=1726404740; c=relaxed/simple;
+	bh=UD+FaTe/XS6BZJvtZd3fLAHoxC9hPqHBX2elpi9dmww=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cBnH0/Nk3teVyQ+KWPXDdT4NBNoy5aUnHw/14zr0OZacbyz5TQaTqiVgcxRXiz3MSxe5411TCEKVsLHfy048WoGZEQflWtKhv2V+HdWeT3ef231ivLmpb44JAVouEhKWHdJa509iytu86mUmuiNGLYpBdhicvmeseiI7Xt4T9Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AL/Bsuj4; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-42cae4eb026so35001025e9.0;
+        Sun, 15 Sep 2024 05:52:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726404737; x=1727009537; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CSOs8W1FAJEI0MCh2EABTXHbZJkcnbnhZeBAaKLM7nU=;
+        b=AL/Bsuj4WZBFvn1JCdGLRDc+UAr7QcwT5XKWaFZle/ngOzKLOde/KXuuyFiihP520x
+         doGAbB0g1EJcOXWp2pcwy8Oqr4i9BYCo4Tm3Sxpwv71ONFMFS3kJpERCsxgoKEFBO57A
+         HGNfW9lJKdkpqGMFL7smP/Ms3ixJDBo6hQhKI7FQ4tJ3YKBb/6x/LGG1PZMLypaW9nj5
+         ZPBkv++ozwKNbmzIdN5Mxu0yIUQB9eLrJ2u1/243V8T929FgcEXJ7sY/Vo84nNwa3NZp
+         sWrYfJG2SfgYKE7GhY8QTmboalmDjEOStaplKmvNuaJPIDTPjobZ0jrDPrEAOPgraZD+
+         BFSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726404737; x=1727009537;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CSOs8W1FAJEI0MCh2EABTXHbZJkcnbnhZeBAaKLM7nU=;
+        b=rOhqxIzKnbt7KKYaUV6LXX77QB5wVNTJdO9O1pNFofw1H5mis9RgOCuqqH8q/fT8E7
+         vlsfBqEuJDC8J89+peVvGZhWQFNe1Tx47cKpiuKcN4o97cIlQc8/fkmchmT6c54NYebs
+         1NMn2txjFX154GhOK1NK6/mRUWJnPTklV+22fHNu057v4x1wecNHApsVl5AgSipndywN
+         IezdPOHvFtYmsg0xeqZBr40d99RE4/umxMKU0xJRMoCLjURfySPG0R+4gwIm17Cpqtv7
+         1hFJhezb2v7AsDWco22cmDNoU2rCCWVyL32jT7l8eQRBqLk2lsIOfqDVs1PUDlhtwaHz
+         lokw==
+X-Forwarded-Encrypted: i=1; AJvYcCVUkwD7h4N+fVBJbWaJvCCTrPFNsXnOSbe3JHEVRsFO2l6rpeEcgSVqs0vpQ3mAhlCEkKq1+KUc5Vj/Km2V@vger.kernel.org, AJvYcCWhD9G5iZ9kTZ5TGM5k1MB2msOlpLEOaxcujyw3IeubBuX+1AO3b9EKbjxUrjDK8J2r7xNoylY6X44ZLoCR9y0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8JO41VLFM6Xr5nrFMb/qm82sEHfBvR/C3DGHtQx0nkjg8YIUI
+	NTd1m+ENlkG1rYZCOw+oNXWtTIra2vlvbzIiLjlKxYMiIy7bsD4n
+X-Google-Smtp-Source: AGHT+IF8MKtgOrHnS3QqlOowMhjeIVw7D2zOA5gMTQlJio7smcc/kN3ZPm5lrm404ZVDP3NNZeAqeA==
+X-Received: by 2002:a05:600c:5489:b0:42c:bb41:a05a with SMTP id 5b1f17b1804b1-42cdb5789fcmr94458055e9.34.1726404736632;
+        Sun, 15 Sep 2024 05:52:16 -0700 (PDT)
+Received: from void.void ([141.226.169.213])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e73f99ebsm4622911f8f.63.2024.09.15.05.52.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 Sep 2024 05:52:16 -0700 (PDT)
+From: Andrew Kreimer <algonell@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Andrew Kreimer <algonell@gmail.com>,
+	Matthew Wilcox <willy@infradead.org>
+Subject: [PATCH] ethernet: chelsio: fix a typo
+Date: Sun, 15 Sep 2024 15:52:04 +0300
+Message-Id: <20240915125204.107241-1-algonell@gmail.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Christophe Leroy <christophe.leroy@csgroup.eu> writes:
-> Le 14/09/2024 =C3=A0 04:02, Michael Ellerman a =C3=A9crit=C2=A0:
-...
->>=20
->> diff --git a/arch/powerpc/include/asm/atomic.h b/arch/powerpc/include/as=
-m/atomic.h
->> index 5bf6a4d49268..0e41c1da82dd 100644
->> --- a/arch/powerpc/include/asm/atomic.h
->> +++ b/arch/powerpc/include/asm/atomic.h
->> @@ -23,6 +23,12 @@
->>   #define __atomic_release_fence()					\
->>   	__asm__ __volatile__(PPC_RELEASE_BARRIER "" : : : "memory")
->>=20=20=20
->> +#ifdef CONFIG_CC_IS_CLANG
->> +#define DS_FORM_CONSTRAINT "Z<>"
->> +#else
->> +#define DS_FORM_CONSTRAINT "YZ<>"
->> +#endif
->
-> I see we have the same in uaccess.h, added by commit 2d43cc701b96=20
-> ("powerpc/uaccess: Fix build errors seen with GCC 13/14")
+Fix a typo in comments.
 
-Yep.
+Reported-by: Matthew Wilcox <willy@infradead.org>
+Signed-off-by: Andrew Kreimer <algonell@gmail.com>
+---
+ drivers/net/ethernet/chelsio/cxgb/suni1x10gexp_regs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Should that go in a common header, maybe ppc_asm.h ?
+diff --git a/drivers/net/ethernet/chelsio/cxgb/suni1x10gexp_regs.h b/drivers/net/ethernet/chelsio/cxgb/suni1x10gexp_regs.h
+index 4c883170683b..ad82119db20b 100644
+--- a/drivers/net/ethernet/chelsio/cxgb/suni1x10gexp_regs.h
++++ b/drivers/net/ethernet/chelsio/cxgb/suni1x10gexp_regs.h
+@@ -49,7 +49,7 @@
+ /******************************************************************************/
+ /** S/UNI-1x10GE-XP REGISTER ADDRESS MAP                                     **/
+ /******************************************************************************/
+-/* Refer to the Register Bit Masks bellow for the naming of each register and */
++/* Refer to the Register Bit Masks below for the naming of each register and */
+ /* to the S/UNI-1x10GE-XP Data Sheet for the signification of each bit        */
+ /******************************************************************************/
+ 
+-- 
+2.39.5
 
-That would be the obvious place, but unfortunately including ppc_asm.h
-in atomic.h breaks the build due to header spaghetti.
-
-For now I've put the defines in asm-compat.h, which is not ideal but
-seems to work.
-
-cheers
 
