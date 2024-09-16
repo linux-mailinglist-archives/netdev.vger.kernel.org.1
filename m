@@ -1,197 +1,243 @@
-Return-Path: <netdev+bounces-128528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E72B597A22D
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 14:25:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38DA097A25A
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 14:32:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90EA9B25035
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:25:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B25A21F25D4C
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8341547FF;
-	Mon, 16 Sep 2024 12:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAFE146A79;
+	Mon, 16 Sep 2024 12:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eHZeGzGa"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0202C156F42;
-	Mon, 16 Sep 2024 12:24:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDDE19BBC;
+	Mon, 16 Sep 2024 12:32:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726489452; cv=none; b=mPCF1JnKVxnA8gqcoTh+O7qYYnV/Z8/hIN/wlNx3jd3TQHMulUKRVpxo1jDPS4SmduDI15AmhJUAcBDQVy/ew+gx3liJWC2Kt8ocjBNSkol9Ib0RtXL0WYea+ZVNt0ub1VIoQTazSxTM2BBC3o4ilCAF3S8AyyycPfqyLDszcBg=
+	t=1726489953; cv=none; b=OVLkmIPq5rTi33/xHoTNdePN//ZBPPSCYiJyfQaJ0Rd9PB6QGpVwa5Yipx7oL7SXXw5ya5qJBx2TSTJJUR1Ff03cbvMYG2pDn+obzfOYBHia8QuM7QcrDR2IgVEhMPbFGAVN1FkL3/Mg/3uKW4ilYI8I35bip+2sFCgBN6XUEN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726489452; c=relaxed/simple;
-	bh=ZuE0xGBM8KRxBFL/NYU+2UQ30BPaqFRmYRARfSX9Ymo=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iViUs/XPZefttnPiQMJ6kRmlp463sJcI47POb0h9hqvbHa38k1xDqybq1Z7AvwbSYxWcyNJ1nEniCFg1w92/39lrdSPzAmEzdpPqBkDsIbkLKtBIZ4kNKbZeBF8EFPGxkNQUm5TZqqD54bTfH68UX0+uFj0rxsQNO4tOGr7u3cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4X6kWF62HXz6K8yJ;
-	Mon, 16 Sep 2024 20:19:53 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 658F7140A90;
-	Mon, 16 Sep 2024 20:24:05 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 16 Sep
- 2024 14:24:04 +0200
-Date: Mon, 16 Sep 2024 13:24:03 +0100
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>,
-	<martin.habets@xilinx.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>
-Subject: Re: [PATCH v3 01/20] cxl: add type2 device basic support
-Message-ID: <20240916132403.0000342c@Huawei.com>
-In-Reply-To: <5e3337df-cb85-efbb-ceaf-a9d9808d981c@amd.com>
-References: <20240907081836.5801-1-alejandro.lucero-palau@amd.com>
-	<20240907081836.5801-2-alejandro.lucero-palau@amd.com>
-	<20240913174103.000034ee@Huawei.com>
-	<5e3337df-cb85-efbb-ceaf-a9d9808d981c@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1726489953; c=relaxed/simple;
+	bh=BBZ4oW2A9GpeSP/yb9umtm+fkmRQ9Bjb/uUApp3m0fk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XT4WX5AbpRUkEHXbAynSKXzANt2IZfphGIkdRX9UmRZ1jwBZoWlFKYWll4hQurHHEaY17wEc5sf9wZhWAZOccnnIjhxY75i+m/xquFnASSlfSGafdN0gU1TwLXGjNAVmAdGWBCSBnb4P+ODY1RoYlxtV3uxiJ3CAm3g2Dqe3qCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eHZeGzGa; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20551eeba95so27507705ad.2;
+        Mon, 16 Sep 2024 05:32:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726489951; x=1727094751; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oykc0XNUZ2U9di3dFTc+iIQRMLcm/D4KvDGsPvtFBVA=;
+        b=eHZeGzGadcNQAmCkB+x77UC8Ljzdiwlx90MfafshW3s6CQBs9tPMKvXk7NjgOm27JH
+         BsZ19oxcGQiDu0U299g0fcWmSSpm12L4kpCashSdHa5xnLYkCGTm2vZelNkZ7TMQVBKI
+         nDZRBAarXeZUBDD/CF8aeFswOxSsHF80tYB0xH9RDQUOCUCjqUZHTHeMUcz82FSf5iGD
+         8mmF1G2lYDpjJMFjdkWW7AHD153rc7J9dnSjV0N/tePfdKbpW+1jau7PpHSPKmb0N5j3
+         k08JR7qEOa36xHi+YobC54HvuSQpGhnHMC+Llmpl9TtU6L82SolO1eBv8eHDQLeYCzxB
+         fH/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726489951; x=1727094751;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oykc0XNUZ2U9di3dFTc+iIQRMLcm/D4KvDGsPvtFBVA=;
+        b=L1uihKEHk45NVcABMQ2IgdqJGF/vF1q9gLzb4XBQm7F6zkV+V1HtrUqJ1Q1L3fKuLP
+         2HswK7Uz/rU2DkB4raZZuIvF3NIBKZF4Tw2bq/e7T6XzMU0FA2P2AZ4jyMDLMVYq7wmL
+         KfXuJGvWKRCKLntkl7bPwtjL3G1tBZUXJ2rJyfzkgfH0fXEvT7XQLs/YdWmu1TlI0lXG
+         9GsPH7Py4k3tQlT7egBDfl9nPsq4jvDUgHINwy+Gw1rdNuKODSWUZJVLKq23CBxEIMqQ
+         ee+5ct3En6Ro1J3gGDHJyiV/uV+bwX0b8bjlnGAk2PWjXOApNOKHyE1814p1JgtvErJy
+         3swg==
+X-Forwarded-Encrypted: i=1; AJvYcCU76KQU590tCsEOSTrN9DYtzO7gpID94Y9LA4SvRfC6tKWbLL1KmUN/SF2kogLjOWXpqBV7pxcwLaeGY4U=@vger.kernel.org, AJvYcCV2cdlEqFDyIQWlYzZZwPbTzij+1KM0bGljx4r0YKfMATHB/BHAoqti2YxRDWaAoclQb75ucfPXPWn+zj1uFayP+FciXmeZ@vger.kernel.org, AJvYcCVjdXN/gkhEiKpFAfYT1wD+p/Uz9Y5oRZcWaxJM1Hfii4/F7psUjcqNfUfzNqd2x0Nia3VxVUYZ@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzq8XErB0dOnuRqE6bqIyIs8XQixS9Gai6u3/YIiSamS1A9m64f
+	ezRBLqMJJsTG5wtJTFujwB5MvObLdbzJRRlQIE0gk2PV0Nz+1QJw
+X-Google-Smtp-Source: AGHT+IFts4nnZqQTc5USJdj9JGXLmyuh67enW6i4PHhte5UX080Zn5yVqDdpBBdawrwHK8xCZGfQRQ==
+X-Received: by 2002:a17:90b:278b:b0:2cf:c9ab:e747 with SMTP id 98e67ed59e1d1-2dbb9dbd720mr14614413a91.1.1726489950395;
+        Mon, 16 Sep 2024 05:32:30 -0700 (PDT)
+Received: from tahera-OptiPlex-5000 ([136.159.49.123])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbb9cadb0bsm7164027a91.27.2024.09.16.05.32.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Sep 2024 05:32:29 -0700 (PDT)
+Date: Mon, 16 Sep 2024 06:32:27 -0600
+From: Tahera Fahimi <fahimitahera@gmail.com>
+To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
+Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com,
+	jmorris@namei.org, serge@hallyn.com,
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bjorn3_gh@protonmail.com, jannh@google.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v11 1/8] Landlock: Add abstract UNIX socket restriction
+Message-ID: <ZuglWy71qvgEhJQ4@tahera-OptiPlex-5000>
+References: <cover.1725494372.git.fahimitahera@gmail.com>
+ <5f7ad85243b78427242275b93481cfc7c127764b.1725494372.git.fahimitahera@gmail.com>
+ <20240913.AmeeLo0aeheD@digikod.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240913.AmeeLo0aeheD@digikod.net>
 
-On Mon, 16 Sep 2024 13:03:10 +0100
-Alejandro Lucero Palau <alucerop@amd.com> wrote:
-
-> On 9/13/24 17:41, Jonathan Cameron wrote:
-
-> >> Add SFC ethernet network driver as the client.  
-> > Minor thing (And others may disagree) but I'd split this to be nice
-> > to others who might want to backport the type2 support but not
-> > the sfc changes (as they are supporting some other hardware).  
-> 
-> 
-> Should I then send incremental sfc changes as well as the API is 
-> introduced or just a final patch with all of it?
-
-Given aim is to justify each step for this first user I think
-incremental sfc changes do make sense.
-
-
-> 
-> 
-> >> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> >> Co-developed-by: Dan Williams <dan.j.williams@intel.com>  
+On Fri, Sep 13, 2024 at 03:32:59PM +0200, Mickaël Salaün wrote:
+> On Wed, Sep 04, 2024 at 06:13:55PM -0600, Tahera Fahimi wrote:
+> > This patch introduces a new "scoped" attribute to the
+> > landlock_ruleset_attr that can specify
+> > "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" to scope abstract UNIX sockets
+> > from connecting to a process outside of the same Landlock domain. It
+> > implements two hooks, unix_stream_connect and unix_may_send to enforce
+> > this restriction.
+> > 
+> > Closes: https://github.com/landlock-lsm/linux/issues/7
+> > Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
+> > 
+> > ---
+> > v11:
+> > - For a connected abstract datagram socket, the hook_unix_may_send
+> >   allows the socket to send a data. (it is treated as a connected stream
+> >   socket)
+> > - Minor comment revision.
+> > v10:
+> > - Minor code improvement based on reviews on v9.
+> > v9:
+> > - Editting inline comments.
+> > - Major refactoring in domain_is_scoped() and is_abstract_socket
+> > v8:
+> > - Code refactoring (improve code readability, renaming variable, etc.)
+> >   based on reviews by Mickaël Salaün on version 7.
+> > - Adding warn_on_once to check (impossible) inconsistencies.
+> > - Adding inline comments.
+> > - Adding check_unix_address_format to check if the scoping socket is an
+> >   abstract UNIX sockets.
+> > v7:
+> > - Using socket's file credentials for both connected(STREAM) and
+> >   non-connected(DGRAM) sockets.
+> > - Adding "domain_sock_scope" instead of the domain scoping mechanism
+> >   used in ptrace ensures that if a server's domain is accessible from
+> >   the client's domain (where the client is more privileged than the
+> >   server), the client can connect to the server in all edge cases.
+> > - Removing debug codes.
+> > v6:
+> > - Removing curr_ruleset from landlock_hierarchy, and switching back to
+> >   use the same domain scoping as ptrace.
+> > - code clean up.
+> > v5:
+> > - Renaming "LANDLOCK_*_ACCESS_SCOPE" to "LANDLOCK_*_SCOPE"
+> > - Adding curr_ruleset to hierarachy_ruleset structure to have access
+> >   from landlock_hierarchy to its respective landlock_ruleset.
+> > - Using curr_ruleset to check if a domain is scoped while walking in the
+> >   hierarchy of domains.
+> > - Modifying inline comments.
+> > v4:
+> > - Rebased on Günther's Patch:
+> >   https://lore.kernel.org/all/20240610082115.1693267-1-gnoack@google.com/
+> >   so there is no need for "LANDLOCK_SHIFT_ACCESS_SCOPE", then it is
+> >   removed.
+> > - Adding get_scope_accesses function to check all scoped access masks in
+> >   a ruleset.
+> > - Using socket's file credentials instead of credentials stored in
+> >   peer_cred for datagram sockets. (see discussion in [1])
+> > - Modifying inline comments.
+> > V3:
+> > - Improving commit description.
+> > - Introducing "scoped" attribute to landlock_ruleset_attr for IPC
+> >   scoping purpose, and adding related functions.
+> > - Changing structure of ruleset based on "scoped".
+> > - Removing rcu lock and using unix_sk lock instead.
+> > - Introducing scoping for datagram sockets in unix_may_send.
+> > V2:
+> > - Removing wrapper functions
+> > 
+> > [1]https://lore.kernel.org/all/20240610.Aifee5ingugh@digikod.net/
+> > ---
+> >  include/uapi/linux/landlock.h                |  28 ++++
+> >  security/landlock/limits.h                   |   3 +
+> >  security/landlock/ruleset.c                  |   7 +-
+> >  security/landlock/ruleset.h                  |  24 +++-
+> >  security/landlock/syscalls.c                 |  17 ++-
+> >  security/landlock/task.c                     | 136 +++++++++++++++++++
+> >  tools/testing/selftests/landlock/base_test.c |   2 +-
+> >  7 files changed, 208 insertions(+), 9 deletions(-)
+> > 
+> > diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+> > index 2c8dbc74b955..dfd48d722834 100644
+> > --- a/include/uapi/linux/landlock.h
+> > +++ b/include/uapi/linux/landlock.h
+> > @@ -44,6 +44,12 @@ struct landlock_ruleset_attr {
+> >  	 * flags`_).
+> >  	 */
+> >  	__u64 handled_access_net;
+> > +	/**
+> > +	 * @scoped: Bitmask of scopes (cf. `Scope flags`_)
+> > +	 * restricting a Landlock domain from accessing outside
+> > +	 * resources(e.g. IPCs).
+> > +	 */
+> > +	__u64 scoped;
+> >  };
 > >  
-> >> +int cxl_set_resource(struct cxl_dev_state *cxlds, struct resource res,
-> >> +		     enum cxl_resource type)
-> >> +{
-> >> +	switch (type) {
-> >> +	case CXL_ACCEL_RES_DPA:
-> >> +		cxlds->dpa_res = res;
-> >> +		return 0;
-> >> +	case CXL_ACCEL_RES_RAM:
-> >> +		cxlds->ram_res = res;
-> >> +		return 0;
-> >> +	case CXL_ACCEL_RES_PMEM:
-> >> +		cxlds->pmem_res = res;
-> >> +		return 0;
-> >> +	default:
-> >> +		dev_err(cxlds->dev, "unknown resource type (%u)\n", type);  
-> > It's an enum, do we need the default?  Hence do we need the return value?
+> >  /*
+> > @@ -274,4 +280,26 @@ struct landlock_net_port_attr {
+> >  #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
+> >  #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
+> >  /* clang-format on */
+> > +
+> > +/**
+> > + * DOC: scope
+> > + *
+> > + * Scope flags
+> > + * ~~~~~~~~~~~
+> > + *
+> > + * These flags enable to restrict a sandboxed process from a set of IPC
+> > + * actions. Setting a flag for a ruleset will isolate the Landlock domain
+> > + * to forbid connections to resources outside the domain.
+> > + *
+> > + * IPCs with scoped actions:
+> > + *
+> > + * - %LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET: Restrict a sandboxed process
+> > + *   from connecting to an abstract unix socket created by a process
+> > + *   outside the related Landlock domain (e.g. a parent domain or a
+> > + *   non-sandboxed process).
+> > + */
+> > +/* clang-format off */
+> > +#define LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET		(1ULL << 0)
+> 
+> Thinking more about it, it makes more sense to rename it to
+> LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET (s/SCOPED/SCOPE/) because it
+> express a scope (not a "scoped") and it allign with the current
+> LANDLOCK_ACCESS_* and other internal variables such as
+> LANDLOCK_LAST_SCOPE...
+> 
+> However, it still makes sense to keep the "scoped" ruleset's field,
+> which is pretty similar to the "handled_*" semantic: it describes what
+> will be *scoped* by the ruleset.
+The proposed changes make sense. They are applied in commit
+[0b365024c726277eb73e461849709605d1819977]/next branch, and look good
+to me.
+
+> > +/* clang-format on*/
+> > +
+> >  #endif /* _UAPI_LINUX_LANDLOCK_H */
+> > diff --git a/security/landlock/limits.h b/security/landlock/limits.h
+> > index 4eb643077a2a..eb01d0fb2165 100644
+> > --- a/security/landlock/limits.h
+> > +++ b/security/landlock/limits.h
+> > @@ -26,6 +26,9 @@
+> >  #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
+> >  #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
 > >  
-> 
-> I think it does not harm and helps with extending the enum without 
-> silently failing if all the places where it is used are not properly 
-> updated.
-
-It won't silently fail.  The various build bots love to point out unhandled
-cases :)  Adding the default means that you'll only see the problem
-in runtime testing rather than at build time.
-
-> 
-> 
-> >> +		return -EINVAL;
-> >> +	}
-> >> +}
-> >> +EXPORT_SYMBOL_NS_GPL(cxl_set_resource, CXL);
-> >> +
-> >>   static int cxl_memdev_release_file(struct inode *inode, struct file *file)
-> >>   {
-> >>   	struct cxl_memdev *cxlmd =
-> >> +	if (!dvsec)
-> >>   		dev_warn(&pdev->dev,
-> >>   			 "Device DVSEC not present, skip CXL.mem init\n");
-> >> +	else
-> >> +		cxl_set_dvsec(cxlds, dvsec);  
-> > Set it unconditionally perhaps.  If it's NULL that's fine and then it corresponds
-> > directly to the previous  
-> 
-> 
-> OK. I guess keeping the dev_warn. Right?
-
-Absolutely.
-
-
-> >> diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
-> >> index 6f1a01ded7d4..3a7406aa950c 100644
-> >> --- a/drivers/net/ethernet/sfc/efx.c
-> >> +++ b/drivers/net/ethernet/sfc/efx.c
-
-> >> @@ -1109,6 +1113,15 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
-> >>   	if (rc)
-> >>   		goto fail2;
-> >>   
-> >> +	/* A successful cxl initialization implies a CXL region created to be
-> >> +	 * used for PIO buffers. If there is no CXL support, or initialization
-> >> +	 * fails, efx_cxl_pio_initialised wll be false and legacy PIO buffers
-> >> +	 * defined at specific PCI BAR regions will be used.
-> >> +	 */
-> >> +	rc = efx_cxl_init(efx);
-> >> +	if (rc)
-> >> +		pci_err(pci_dev, "CXL initialization failed with error %d\n", rc);  
-> > If you are carrying on anyway is pci_info() more appropriate?
-> > Personally I dislike muddling on in error cases, but understand
-> > it can be useful on occasion at the cost of more complex flows.
-> >
-> >  
-> 
-> Not sure. Note this is for the case something went wrong when the device 
-> has CXL support.
-> 
-> It is not fatal, but it is an error.
-
-Fair enough.  I don't care that much about this.
-> 
-> 
-> >> +
-> >>   	rc = efx_pci_probe_post_io(efx);
-> >>   	if (rc) {
-> >>   		/* On failure, retry once immediately.
-> >> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> >> new file mode 100644
-> >> index 000000000000..bba36cbbab22
-> >> --- /dev/null
-> >> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-
-> > //maybe also cxlds as then you can use __free() to handle the
-> > //cleanup paths for both allowing early returns instead
-> > //of gotos.  
-> 
-> 
-> Maybe, but using __free is discouraged in network code: 1.6.5 at
-> 
-> https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-Fair enough.  I've not been keeping up with networking maintainer
-preferences recently.
-
-Jonathan
-
+> > +#define LANDLOCK_LAST_SCOPE		LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET
+> > +#define LANDLOCK_MASK_SCOPE		((LANDLOCK_LAST_SCOPE << 1) - 1)
+> > +#define LANDLOCK_NUM_SCOPE		__const_hweight64(LANDLOCK_MASK_SCOPE)
+> >  /* clang-format on */
 
