@@ -1,181 +1,117 @@
-Return-Path: <netdev+bounces-128503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67F5F979EC2
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 11:51:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59FEF979EC5
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 11:52:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C7BC1C22F49
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 09:51:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D09F1F23C79
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 09:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9BA14BF8A;
-	Mon, 16 Sep 2024 09:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fck5qltM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C450514A0A3;
+	Mon, 16 Sep 2024 09:52:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561DC14B97D;
-	Mon, 16 Sep 2024 09:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6FBD14900B;
+	Mon, 16 Sep 2024 09:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726480244; cv=none; b=d4/+LUKqJl6XP+mZ7dUfNMB8KIjjWpcZFnMSeJ8w02dwPVrIX80vkjYM6/rsBfpHaNIn3bMIVm0Bn6a7CrRxkGiP5hJTgz/ezKbwt2nI483m5B0M8dyNietrlkaGD/2H9llE9TEf0nEgSV3aPVFHfZRcDXgz74vHy0iS4r/zaJw=
+	t=1726480326; cv=none; b=SrcVmuhheYenayJkZOlHmzBO1BYGku4/0YNgDyRd1U7x9bxpw+qxP7cDeot/9cylPsUG06YPBbay0/k0NCgVzbrvOPAYoSi1OQwu+DQfG/a1WLh5fPfL8HZBxM0MsQWatyCdXqfFvqOjHk8Y7T8P5H+SbaywxE9aYNzyZ0XVGig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726480244; c=relaxed/simple;
-	bh=HOoo8GgBBtI55/AwTvXOlcqvlg3QMeDP5VLTBW8tvhk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=I7P17vp+jegbSjEvQgQ122YPkDIY894izT0PSEcKLH72CLzAwtN2RWLWpMJyaiJdQKSI/6ucRNzaWSVDfHPxYUpEPudvd4BugTWn4GTCu3hGMSaQoqWIyopZV05uA8EFIzBBLEV+tE+aBPwIqZCzdFc7yvUsX1TISvLpLbAuTp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fck5qltM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEF44C4CECC;
-	Mon, 16 Sep 2024 09:50:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726480243;
-	bh=HOoo8GgBBtI55/AwTvXOlcqvlg3QMeDP5VLTBW8tvhk=;
-	h=From:Date:Subject:To:Cc:From;
-	b=Fck5qltMBpWO49cf9aOYG4k+P5vdIK4ujuHNKdditJGXXZVsGN6584FFYNLwcF4V0
-	 uVj1fO0nKnRDra8TwYNc8OTJ1iysQZw1Gy8b1rq6GPITZOeaDOGisBejla8D6LTn74
-	 l3ZtGwdpGbYix19NwurWeF5SQI0ma6IcUEtIUjjameF8OY0WjwEx8G6Nzj+sl0p9qP
-	 Xb6vNWKnY/grm7sdAAP9/6o89wIqnpxcr2doNt9TgTApSXlh1fleKuicAZl8bTmj/M
-	 FsLPCBVyp5SZiZ7W8Ei8l2n20cusKmUISTtG7F05aq0QUTj/FhXLGVqybL0AYiWLF5
-	 aWksh9lC0kHHA==
-From: Simon Horman <horms@kernel.org>
-Date: Mon, 16 Sep 2024 10:50:34 +0100
-Subject: [PATCH nf-next] netfilter: nf_reject: Fix build warning when
- CONFIG_BRIDGE_NETFILTER=n
+	s=arc-20240116; t=1726480326; c=relaxed/simple;
+	bh=X2icocNhBXEuMZHjuTgfDcq3XClpztmChHcpGvDoJXE=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=M6YSq1WDy4ANyUdfNMA4MWr7dlbFPM7R0QQrmCB4ttlJTxTAtgPuQSjUlxPsNtVGnJWhASslHFq0NTF93sLzVmMVFIpfKJ9/UMXrfiHEf0WnT2mJ9hhNf5wDv7N4XN43Tt7cuV852ijjgZ9EoJnZWoxI8M1U5NV/RjPE0obQIRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4X6gDX3jWYz67JQP;
+	Mon, 16 Sep 2024 17:51:56 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 346621400CB;
+	Mon, 16 Sep 2024 17:52:00 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 16 Sep
+ 2024 11:51:59 +0200
+Date: Mon, 16 Sep 2024 10:51:57 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Adam Young <admiyo@amperemail.onmicrosoft.com>
+CC: <admiyo@os.amperecomputing.com>, Sudeep Holla <sudeep.holla@arm.com>,
+	Jassi Brar <jassisinghbrar@gmail.com>, "Rafael J. Wysocki"
+	<rafael@kernel.org>, Len Brown <lenb@kernel.org>, Robert Moore
+	<robert.moore@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Jeremy Kerr <jk@codeconstruct.com.au>, "Matt
+ Johnston" <matt@codeconstruct.com.au>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Huisong Li
+	<lihuisong@huawei.com>
+Subject: Re: [PATCH v5 1/3] mctp pcc: Check before sending MCTP PCC response
+ ACK
+Message-ID: <20240916105157.00001204@Huawei.com>
+In-Reply-To: <a3f91c94-e829-4942-abde-193462769cba@amperemail.onmicrosoft.com>
+References: <20240712023626.1010559-1-admiyo@os.amperecomputing.com>
+	<20240712023626.1010559-2-admiyo@os.amperecomputing.com>
+	<20240801124126.00007a57@Huawei.com>
+	<a3f91c94-e829-4942-abde-193462769cba@amperemail.onmicrosoft.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240916-nf-reject-v1-1-24b6dd651c83@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAGn/52YC/x3MSwqAIBRG4a3EHSdkT2sr0SD0r24DC5UQpL0nD
- Q98nEQejuFpKhI5POz5sjlkWZA+VrtDsMlNdVW31Sh7YTfhcEIHMagOo5aNhDKU/e2wcfxfM2V
- mEQMt7/sBpmk9nGQAAAA=
-To: Pablo Neira Ayuso <pablo@netfilter.org>, 
- Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, netfilter-devel@vger.kernel.org, 
- coreteam@netfilter.org, netdev@vger.kernel.org
-X-Mailer: b4 0.14.0
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+X-ClientProxiedBy: lhrpeml500004.china.huawei.com (7.191.163.9) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-If CONFIG_BRIDGE_NETFILTER is not enabled, which is the case for x86_64
-defconfig, then building nf_reject_ipv4.c and nf_reject_ipv6.c with W=1
-using gcc-14 results in the following warnings, which are treated as
-errors:
+On Fri, 13 Sep 2024 17:21:06 -0400
+Adam Young <admiyo@amperemail.onmicrosoft.com> wrote:
 
-net/ipv4/netfilter/nf_reject_ipv4.c: In function 'nf_send_reset':
-net/ipv4/netfilter/nf_reject_ipv4.c:243:23: error: variable 'niph' set but not used [-Werror=unused-but-set-variable]
-  243 |         struct iphdr *niph;
-      |                       ^~~~
-cc1: all warnings being treated as errors
-net/ipv6/netfilter/nf_reject_ipv6.c: In function 'nf_send_reset6':
-net/ipv6/netfilter/nf_reject_ipv6.c:286:25: error: variable 'ip6h' set but not used [-Werror=unused-but-set-variable]
-  286 |         struct ipv6hdr *ip6h;
-      |                         ^~~~
-cc1: all warnings being treated as errors
+> >>+ * @shmem_base_addr: the virtual memory address of the shared buffer =
+=20
+>=20
+> >If you are only going to map this from this pointer for the
+> >initiator/responder shared memory region, maybe it would benefit
+> >from a more specific name? =20
+>=20
+>=20
+> I am not certain what would be more correct.
+>=20
+>=20
+> On 8/1/24 07:41, Jonathan Cameron wrote:
+>=20
+> >> +	pchan->shmem_base_addr =3D devm_ioremap(chan->mbox->dev,
+> >> +					      pchan->chan.shmem_base_addr,
+> >> +					      pchan->chan.shmem_size); =20
+> > devm doesn't seem appropriate here given we have manual management
+> > of other resources, so the ordering will be different in remove
+> > vs probe.
+> >
+> > So I'd handle release of this manually in mbox_free_channel() =20
+>=20
+>=20
+> How fixed are you on this?=A0 mbox_free_channel is the parent code, and=20
+> knows nothing about this resource.=A0 It does no specific resource cleanu=
+p.
 
-Address this by reducing the scope of these local variables to where
-they are used, which is code only compiled when CONFIG_BRIDGE_NETFILTER
-enabled.
 
-Compile tested and run through netfilter selftests.
+I've lost context on this unfortunately and don't have time to look
+back at it this week. Maybe right answer is a cleanup callback?
 
-Reported-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Closes: https://lore.kernel.org/netfilter-devel/20240906145513.567781-1-andriy.shevchenko@linux.intel.com/
-Signed-off-by: Simon Horman <horms@kernel.org>
-
---
-My feeling is that this is not a bug fix, as the build failure only shows up
-with W=1 builds. However, I can see the other side of that argument,
-and if you prefer to take these via nf or net, then I am happy with
-that.
-
-I believe the fixes tags would be those supplied by Andy at the cited
-Link above.
-
-Fixes: 8bfcdf6671b1 ("netfilter: nf_reject_ipv6: split nf_send_reset6() in smaller functions")
-Fixes: 052b9498eea5 ("netfilter: nf_reject_ipv4: split nf_send_reset() in smaller functions")
----
- net/ipv4/netfilter/nf_reject_ipv4.c | 10 ++++------
- net/ipv6/netfilter/nf_reject_ipv6.c |  5 ++---
- 2 files changed, 6 insertions(+), 9 deletions(-)
-
-diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
-index 04504b2b51df..87fd945a0d27 100644
---- a/net/ipv4/netfilter/nf_reject_ipv4.c
-+++ b/net/ipv4/netfilter/nf_reject_ipv4.c
-@@ -239,9 +239,8 @@ static int nf_reject_fill_skb_dst(struct sk_buff *skb_in)
- void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 		   int hook)
- {
--	struct sk_buff *nskb;
--	struct iphdr *niph;
- 	const struct tcphdr *oth;
-+	struct sk_buff *nskb;
- 	struct tcphdr _oth;
- 
- 	oth = nf_reject_ip_tcphdr_get(oldskb, &_oth, hook);
-@@ -266,14 +265,12 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	nskb->mark = IP4_REPLY_MARK(net, oldskb->mark);
- 
- 	skb_reserve(nskb, LL_MAX_HEADER);
--	niph = nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
--				   ip4_dst_hoplimit(skb_dst(nskb)));
-+	nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
-+			    ip4_dst_hoplimit(skb_dst(nskb)));
- 	nf_reject_ip_tcphdr_put(nskb, oldskb, oth);
- 	if (ip_route_me_harder(net, sk, nskb, RTN_UNSPEC))
- 		goto free_nskb;
- 
--	niph = ip_hdr(nskb);
--
- 	/* "Never happens" */
- 	if (nskb->len > dst_mtu(skb_dst(nskb)))
- 		goto free_nskb;
-@@ -290,6 +287,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	 */
- 	if (nf_bridge_info_exists(oldskb)) {
- 		struct ethhdr *oeth = eth_hdr(oldskb);
-+		struct iphdr *niph = ip_hdr(nskb);
- 		struct net_device *br_indev;
- 
- 		br_indev = nf_bridge_get_physindev(oldskb, net);
-diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
-index dedee264b8f6..69a78550261f 100644
---- a/net/ipv6/netfilter/nf_reject_ipv6.c
-+++ b/net/ipv6/netfilter/nf_reject_ipv6.c
-@@ -283,7 +283,6 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	const struct tcphdr *otcph;
- 	unsigned int otcplen, hh_len;
- 	const struct ipv6hdr *oip6h = ipv6_hdr(oldskb);
--	struct ipv6hdr *ip6h;
- 	struct dst_entry *dst = NULL;
- 	struct flowi6 fl6;
- 
-@@ -339,8 +338,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	nskb->mark = fl6.flowi6_mark;
- 
- 	skb_reserve(nskb, hh_len + dst->header_len);
--	ip6h = nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP,
--				    ip6_dst_hoplimit(dst));
-+	nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP, ip6_dst_hoplimit(dst));
- 	nf_reject_ip6_tcphdr_put(nskb, oldskb, otcph, otcplen);
- 
- 	nf_ct_attach(nskb, oldskb);
-@@ -355,6 +353,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
- 	 */
- 	if (nf_bridge_info_exists(oldskb)) {
- 		struct ethhdr *oeth = eth_hdr(oldskb);
-+		struct ipv6hdr *ip6h = ipv6_hdr(nskb);
- 		struct net_device *br_indev;
- 
- 		br_indev = nf_bridge_get_physindev(oldskb, net);
+>=20
+> The only place we could release it is in the pcc_mbox_free, but that is=20
+> essentially a call to the parent function.
+>=20
+> All other comments should be addressed in the next version.
+>=20
+>=20
 
 
