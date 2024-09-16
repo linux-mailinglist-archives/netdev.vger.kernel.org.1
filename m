@@ -1,152 +1,133 @@
-Return-Path: <netdev+bounces-128592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD27B97A7C9
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 21:26:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D76F297A7CD
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 21:31:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FA672863C7
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 19:26:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E85801C21D11
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 19:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6EAA2A1B2;
-	Mon, 16 Sep 2024 19:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155066A33A;
+	Mon, 16 Sep 2024 19:31:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="qI6k9pk0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0DXf8eai"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D08DE15C120
-	for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 19:26:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339A410A18;
+	Mon, 16 Sep 2024 19:31:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726514766; cv=none; b=UHM99+Qcv85wmgLDJrnNmpXdmAFkrRsb5UpipwH/xT+yQ0UXJC1Wgry0ayxX1aCoKInbssLDl8tjnBlFAvvg7ciezKq4lyKKOH2o9e8QfJEyWEZZKA5K5zzaX56JMD874552oQl5I8JTuMVbtqe0Yzrvl6EOaAizj+XzOQGl2tk=
+	t=1726515093; cv=none; b=KC+oQRV+5s6kI0vcsz+H8h8Sw+Nsx2AxSE70GjVjGFlk+ZSPNHW+Gkbxhs9qIr1zn1TqdaaLSkfz+N8qKLDvU89gCAhAaOdAA6Kg69qnZxzlWI3ljR8XZau5msgOyyZRk9kGN2CO9JtYekcNjJtxSW95Wl7hcW8DPBQWsyKP3Tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726514766; c=relaxed/simple;
-	bh=6hVSPTDjjuHtlG4ysrsJ7KI3PBSfKbhOd99YqQZc20I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IZgrUpy9zmdAhqD6145adnjaVgdOAEUWo1K/L9kj0PDpocS9gHrV/nJ3UN0lS9hpnxbbD37SP22CpvzgsEpdfqKWQrNtL9rpMPs5OPt2hyWp4r3/CDsi9qAsG/nnULQ4DfxR85VXRlzk38qqiI8OTHwdaUDQraxXnDpFZDgJtAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=qI6k9pk0; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com [209.85.167.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 4E4AB3F5F4
-	for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 19:26:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1726514762;
-	bh=6hVSPTDjjuHtlG4ysrsJ7KI3PBSfKbhOd99YqQZc20I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=qI6k9pk0PWOS7fNU7sihonwuuA+lLq93IrWIC/dJ5HJoJk6T4QhOLnmITR56IeLOC
-	 7HwBSAUbpJaq7TRjPyPlfPF+Vell1qyb1R/XE5bWhwXqwoTBHuR0QaTn8dhKuDdciA
-	 dA+ylewzwZe1F8GSIwN1svFK3nV0KqRWp4Jrcl//2FbN0bcT4hul40+9Rd2GK74YDU
-	 E5c+cmiSm1fkwCLysWfiYfrU42I95oZ0XpyXsBy1oBQtWMHHjB8BGQ/yQAY3nHCrcN
-	 ZpC+cd3m5l4+4Y1xeiyOjObOfaCtRjariwruWSycGxCxRRfXnfNVcqdCDKJNhwfoP4
-	 T4vQEFMDVD46g==
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5344b7df784so4066107e87.1
-        for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 12:26:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726514761; x=1727119561;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6hVSPTDjjuHtlG4ysrsJ7KI3PBSfKbhOd99YqQZc20I=;
-        b=dRN3LOA48Xi6ckwJAZFTjdNwTpcIiZQsFOzFv2ulOuhPU2W+7Bs4u90gW4NpuBuVHK
-         q8YSA9TKwmOlE4AgwM7/qEW/IrvMaGNAxHK1u1u1e0sjoB5XxopYVUkt4I4UPca8EFvm
-         HD6GCDLgPKdirbcpi7D+Snv6yDxKLLcUk+cUPovibQFH2ASxsAkZlXKBQZoZK9JywBCv
-         3k5H4ITbww5x3TP1RIf3VH9rgChkukk7adn+JADV9geoDIS5Aa0elI+M9e9YAyYa6/3u
-         U6uuF2uo9yJaDXjYW6pJz+7pJCnA+xvQAnADdwXJjE350q4h2A9aYC8hu8gYUvwokviZ
-         sYTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUUQ+M3E7VxkVv9gmXgI7oPiWnhFKBFbtQk5EYoWoh4VRvRczupyVRbVcNuvwdshJrfXgJufoI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxl2qu0TKm15jcz7p/P0KfXOzDXIfnaY6qZ1ExE5ewP6CnfQIDi
-	AhAf6o4LGrP1VFUe6AD1JWCCUJoGA4uaMxnBCUhMZK0CafzqM9jzVMJ6farNlJX1UbrfCtoou8b
-	GUQbDn1/+hQSXziWdiji3b9nNL5CXIngO+0eGuCL4+6EylEtRKs+hYjjetJFT67twiJLEb4nJE6
-	GfgU95H8V9e74y6FAtd6gJwGOJnsBN4uNjonDSfLly0wHN
-X-Received: by 2002:a05:6512:1193:b0:535:6cef:ffb8 with SMTP id 2adb3069b0e04-53678ff321bmr8869785e87.54.1726514761307;
-        Mon, 16 Sep 2024 12:26:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH9iFAn60gqVCh/eEOClq/2Ao2PKM9BHijjCnoTeeccANQO3dg8hkcL8qWA+1JKf+BkzHLG8xBIVMKN5qLCNCg=
-X-Received: by 2002:a05:6512:1193:b0:535:6cef:ffb8 with SMTP id
- 2adb3069b0e04-53678ff321bmr8869741e87.54.1726514760012; Mon, 16 Sep 2024
- 12:26:00 -0700 (PDT)
+	s=arc-20240116; t=1726515093; c=relaxed/simple;
+	bh=VGZ5UzmKkzEYQaRjK5SJlhiA/OLYN910/efsdTsxmIA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMfekRRr/4h3qVyAT6bH68+SZOkDCJT3XfZaZtCny9rviIE63GudzsT0AsLBAsH1f/pZMCpswKBYYh0ucgY8tN3QGtFHUkJ6WK9RL7yAh373PIDwcnPRx5MoXPn2SqgewzHiMB+WqkrDxKtggplaW/cs+RZBFo9UKCgzXap4Ing=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0DXf8eai; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=hK+swyLRKLV/AdJcmTvc0GeACDQuJQuPXvg921aARx0=; b=0DXf8eai1CfeLaytMhe1Wl2s+I
+	qiVFjHkBxp83TsaaNbKXmuRFwDQLa8AnZF2HH22oiEcd+Ox0sOGHpUcf9If2UrHVbWd94Ve24DMxr
+	Kzsh+FKd9DR0Wcfcs3RoGMGqrQ5h5NY0vakJtJz1fDjl0/Klaw/rvoQnHijaR3kpz4KcfDRjZMSd3
+	FIdo+Gh/AZsGiVt0gjA72UanRxyFEjRKEVqsd4UtZ+k1MGtBm8Ig0+qzQBZA67r7F+vCsm5Yup1pA
+	eZHgUeIKN4BpkfhLqpr6hftYmpppXbPGzYhn5e0h3unqBGCt7pcysx5ZOQAPziWsRrnPfpwqbG13X
+	3hXqA7tg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43604)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sqHRU-0006Jw-1B;
+	Mon, 16 Sep 2024 20:31:24 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sqHRO-0007Df-0o;
+	Mon, 16 Sep 2024 20:31:18 +0100
+Date: Mon, 16 Sep 2024 20:31:18 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, maxime.chevallier@bootlin.com,
+	rdunlap@infradead.org, andrew@lunn.ch, Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next V2 2/5] net: lan743x: Add support to
+ software-nodes for sfp
+Message-ID: <ZuiHhoxi05IOWphr@shell.armlinux.org.uk>
+References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
+ <20240911161054.4494-3-Raju.Lakkaraju@microchip.com>
+ <c93c4fe2-e3bb-4ee9-be17-ca8cb9206386@wanadoo.fr>
+ <ZuKLGYThw8xBKw7E@HYD-DK-UNGSW21.microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHTA-uZDaJ-71o+bo8a96TV4ck-8niimztQFaa=QoeNdUm-9wg@mail.gmail.com>
- <20240912191306.0cf81ce3@kernel.org> <CAHTA-uZvLg4aW7hMXMxkVwar7a3vL+yR=YOznW3Yresaq3Yd+A@mail.gmail.com>
- <20240913115124.2011ed88@kernel.org> <CAHTA-uYC2nw+BWq5f35yyfekZ6S8iRt=EYq4YaJSSPsTBbztzw@mail.gmail.com>
-In-Reply-To: <CAHTA-uYC2nw+BWq5f35yyfekZ6S8iRt=EYq4YaJSSPsTBbztzw@mail.gmail.com>
-From: Mitchell Augustin <mitchell.augustin@canonical.com>
-Date: Mon, 16 Sep 2024 14:25:49 -0500
-Message-ID: <CAHTA-uYxSzp8apoZhh_W=TLFA451uc=Eb+_X4VEEVVZNGHaGjw@mail.gmail.com>
-Subject: Re: Namespaced network devices not cleaned up properly after
- execution of pmtu.sh kernel selftest
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jacob Martin <jacob.martin@canonical.com>, dann frazier <dann.frazier@canonical.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZuKLGYThw8xBKw7E@HYD-DK-UNGSW21.microchip.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Linking in this thread as well - I submitted a patch to net-next with
-a reproducer for just this bug. It works reliably on Grace/Grace on
-v6.11 (and prior kernels already known to be affected), but I have not
-had a chance to test it on other platforms yet. Let me know if I need
-to adjust anything and whether it reproduces the bug on your machines.
+On Thu, Sep 12, 2024 at 12:02:57PM +0530, Raju Lakkaraju wrote:
+> Hi Christophe,
+> 
+> The 09/11/2024 18:54, Christophe JAILLET wrote:
+> > > +static int pci1xxxx_i2c_adapter_get(struct lan743x_adapter *adapter)
+> > > +{
+> > > +     struct pci1xxxx_i2c *i2c_drvdata;
+> > > +
+> > > +     i2c_drvdata = pci1xxxx_perif_drvdata_get(adapter, PCI1XXXX_PERIF_I2C_ID);
+> > > +     if (!i2c_drvdata)
+> > > +             return -EPROBE_DEFER;
+> > > +
+> > > +     adapter->i2c_adap = &i2c_drvdata->adap;
+> > > +     snprintf(adapter->nodes->i2c_name, sizeof(adapter->nodes->i2c_name),
+> > > +              adapter->i2c_adap->name);
+> > 
+> > strscpy() ?
+> > 
+> 
+> Accepted. I will fix.
+> Here snprintf( ) does not take any format string, we can use strscpy( ).
 
-Patch w/ reproducer:
-https://lore.kernel.org/all/20240916191857.1082092-1-mitchell.augustin@cano=
-nical.com/
+As a general tip for safe programming... never use snprintf() as a
+"short cut" for copying strings. It may do stuff that you don't
+expect!
 
-Thanks!
+For example, taking the above case, if "adapter->i2c_adap->name"
+contains any % characters, then, as you are passing it as the
+_format_ _string_, sprintf() will try to interpret those as printf
+escape sequences, and thus _can_ attempt to dereference arguments
+that were never passed to snprintf().
 
-On Fri, Sep 13, 2024 at 1:59=E2=80=AFPM Mitchell Augustin
-<mitchell.augustin@canonical.com> wrote:
->
-> > Sorry, I missed that you identified the test case.
->
-> All good!
->
-> I will still plan to turn the reproducer for this bug into its own
-> regression test. I think there would still be value in having an
-> individual case that can more reliably trigger this specific issue.
->
-> Thanks,
->
-> On Fri, Sep 13, 2024 at 1:51=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Fri, 13 Sep 2024 08:45:22 -0500 Mitchell Augustin wrote:
-> > > Executing ./pmtu.sh pmtu_ipv6_ipv6_exception manually will only
-> > > trigger the pmtu_ipv6_ipv6_exception sub-case
-> >
-> > Sorry, I missed that you identified the test case.
-> > The split of the test is quite tangential, then.
->
->
->
-> --
-> Mitchell Augustin
-> Software Engineer - Ubuntu Partner Engineering
-> Email:mitchell.augustin@canonical.com
-> Location:Illinois, United States of America
->
->
-> canonical.com
-> ubuntu.com
+If you really want to do this kind of thing, at least write it in
+a safe way...
 
+	snprintf(..., "%s", string);
 
+rather than:
 
---=20
-Mitchell Augustin
-Software Engineer - Ubuntu Partner Engineering
+	snprintf(..., string);
+
+so that "string" doesn't attempt to be escape-expanded.
+
+Of course, using proper string copying functions that do what you
+want in a cheap way is always more preferable to the printf related
+functions!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
