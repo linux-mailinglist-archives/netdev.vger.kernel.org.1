@@ -1,158 +1,445 @@
-Return-Path: <netdev+bounces-128613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 797F797A94E
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 00:47:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4BAB97A9A1
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 01:32:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C35E1C21204
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 22:47:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 156271C22DA6
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 23:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AA0A139578;
-	Mon, 16 Sep 2024 22:47:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79DBA14F9DD;
+	Mon, 16 Sep 2024 23:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IPyYuuwQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E935F1B85C1
-	for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 22:47:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B8C14A4D6
+	for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 23:32:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726526851; cv=none; b=T1ZDpNY0ccJzfslSZtJBraIwx6bwuedxTleBKQVL6lbV6xUZhKgB3oDzuuSvXar3s7TVbOT6GD5qlIegP5P8pMVYTwEpQxsoJdx8nBFQe1iLkCCc84kvpT7J+Hdlm17uwnbJC1F+IMc/jqvAmSECtE1MSvd3Hozo6v0ijsmuX2o=
+	t=1726529567; cv=none; b=U7LPU+jEH/lA4cb05O6LeoWDO56wXJNq0cDHg5gSUX2t9bjqoakyVYkxPALhB73YLZfYlrNWMXSptLJ2NMCbHUT2pE2qEfHuqZ5Vkx+H7w2oAL3tIfsizyvLEIgNgVCkHowNCBwCwxqmixz4ZI9+tbstJtNX6y8PHAzfp79VJvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726526851; c=relaxed/simple;
-	bh=41Ybt8dNS9KycTHyJBL1FKkrujB8ri1h9w/FQGcqRrg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PEfsZvmYFzZsevEZBJqq4A7kTltupL5kxqtMoLvz619RdMz3jwviF7nDaOcogVzz5jVRH8IYG7HkX1s6vCTU0/3CxrCaMG4YxVY+UugYITZc7+b+MQbCf9NijFEodxkvG9z5iSONz651LtKmLNXj7wYK76bwHQFrxRq5ElD5NM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a0ab3fe36dso9336725ab.0
-        for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 15:47:29 -0700 (PDT)
+	s=arc-20240116; t=1726529567; c=relaxed/simple;
+	bh=SPtdiIyfNANrl9FF5m1x7BfDT/+sAltGRKt9GKfd7Vo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=id3k4bYJyIjz4TjoBdZHMxFe8M7037U/aKKBpO4r1H5v03sPopqZEtkflkPP5aSquBoNeVR9cKKIDM5twZzYkJ31BfOU5PqgrKf8dUsLwM3oBmfdqEZmFyXneLyjtusBD6ycxxcjvzONmV/MNBXgaO+DX3WdK1dfdPZNCZ1stJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=IPyYuuwQ; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7c6b4222fe3so3224266a12.3
+        for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 16:32:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1726529565; x=1727134365; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z9mUVHMAavcUxKnLNiLYFc/iky/HnjZfCcQFKHlZayo=;
+        b=IPyYuuwQR365L4BnH1vgXap7IHeJYE+7kAcs1W1m5TgB4EYDNZn353fWGcJ5hC64Vv
+         oCWYDM3SkaEaivpjXa+f9fXzcuCHMo6Rfk8oFOe3tTcTw9Jtgq5pkunHc7uo2uw4WD7R
+         ni416nwiAi85DQZmnqaPTUmPbPZvIFXq5+zj0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726526849; x=1727131649;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+U/UV4SyzRkEESoWYzGS9RxixgPfLq0YizcwZSgxfNA=;
-        b=kRohH1rA+hmXMl3DU4fWAlUOarwySbg7qigRYEkwcEOFQQLPsWlBtP1b4dWl82O5YV
-         EM53HtXCbY/HpZWjg69cupTij5qDpkBaRTg9ZBELHbj21D+c4sFRKOKXtXEgu/uB7Vtm
-         rBzPAk3tWddRy6Dbk1hWhFMVUfqCym8C0KIoJ6yaxabnvMgs5UBJTSh8mH5znaIyVTh4
-         evHXwbbY/wE4BP2IQP9iIw/hVIHt166bq/cXIoY0wdb0teSgIpIezUcc84cXmkXeFKcp
-         H0YSpKrePEhQ3E5RS1EeFZwh6KwayL6PWpI5cG5MpmMVyRhyuBPlBkzX9CjFOXGh4d0p
-         ghvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWs462o8rAd9s7WIX5MaMQm5aknxQFCRUykj/eZ/ePEfjUnQh32tAXpWuD2XVELtko3Q3PK/ac=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWKpdc85cgoyIX5KWv0nC5Mdqri1D9a+4ggDkmzqAP4BPGMjb8
-	q/V5AaTAxzYUp/hFSBhBMbeaCl0DosB1g4C6T9Y+/WzpGf2mgIYRa/TSjinOGklHuc13cf3TFw/
-	apxBmiOsltSE/h+dvvx60ND7DL1RQkXsNtgV24Ue1RJiMAWy3AgTGsQ8=
-X-Google-Smtp-Source: AGHT+IFmTK6OY5rLLPTuEKv2PGFM2Vk+PG/0p9ljO5RS5zqaROfGKOD7zY3ghyhnr4nLWaVCSXor0PUVcHyw1/OEKyYVqoSNwDXe
+        d=1e100.net; s=20230601; t=1726529565; x=1727134365;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Z9mUVHMAavcUxKnLNiLYFc/iky/HnjZfCcQFKHlZayo=;
+        b=xCKVF15f+yZCJCVp2UI3KprNZcsTwEoTOLyV5hmRX9YPeSoUPh8rnFOln2qmBrxjs2
+         jZh1XS+cnH3CWZ426xP5c5j4zfIoGeWruAH2s5p5JYOQWnxuF6fLRz5C4X4W5gRw7yTX
+         eAFIu0uxhkuIqBWnfo9x1b9VabG/DvGf4uHCHIq4V20RbiGxGrkDJePbFSxMUCaUp8LY
+         fjQnavg/0nNzY7j2Gt48FQ6PQzkJ0afnqaLKcNq0PUVnESli40u9aESZyxpOh0BR3vhI
+         3SjRius0OfuHfwFlvQrAW/2ZDaCmF2woSQE6Yr0Jz1dyqZEW4Xlf3ZkzTqRLJXaqKwyZ
+         nmag==
+X-Gm-Message-State: AOJu0Ywq+4Ib9NMuxUdMc5ymTOLpW5pMPpJO6k2yi0XobkM4cTYcE05E
+	czQWmRIDFOf2vi/hPajU73Cp/yJtTiwWkNSGGFSRGJ0FFG3qLnI9Q9YtCYBn1Lh4ka+BNuvJdSg
+	gMmJ+KCckyidhperfgmVBVF1jdbCv/WuuDJHI
+X-Google-Smtp-Source: AGHT+IE72MFyllzN0ozCXMGgr1MGi103ntb9aa1icB+w7Su1bkHJaYgfDvvRt+ybuNJ1tdHngYO6KpJTNc4763XH4NM=
+X-Received: by 2002:a05:6a21:1707:b0:1cf:6c65:68d with SMTP id
+ adf61e73a8af0-1cf762382d3mr25137092637.46.1726529564812; Mon, 16 Sep 2024
+ 16:32:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d88:b0:395:e85e:f2fa with SMTP id
- e9e14a558f8ab-3a084611b38mr133380235ab.1.1726526849054; Mon, 16 Sep 2024
- 15:47:29 -0700 (PDT)
-Date: Mon, 16 Sep 2024 15:47:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000088906d0622445beb@google.com>
-Subject: [syzbot] [net?] UBSAN: shift-out-of-bounds in xfrm_selector_match (2)
-From: syzbot <syzbot+cc39f136925517aed571@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, steffen.klassert@secunet.com, 
-	syzkaller-bugs@googlegroups.com
+References: <20240904054815.1341712-1-jitendra.vegiraju@broadcom.com>
+ <20240904054815.1341712-3-jitendra.vegiraju@broadcom.com> <mhfssgiv7unjlpve45rznyzr72llvchcwzk4f7obnvp5edijqc@ilmxqr5gaktb>
+In-Reply-To: <mhfssgiv7unjlpve45rznyzr72llvchcwzk4f7obnvp5edijqc@ilmxqr5gaktb>
+From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Date: Mon, 16 Sep 2024 16:32:33 -0700
+Message-ID: <CAMdnO-+CcCAezDXLwTe7fEZPQH6_B1zLD2g1J6uWiKi12vOxzg@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/5] net: stmmac: Add basic dw25gmac support
+ in stmmac core
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
+	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, rmk+kernel@armlinux.org.uk, 
+	ahalaney@redhat.com, xiaolei.wang@windriver.com, rohan.g.thomas@intel.com, 
+	Jianheng.Zhang@synopsys.com, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
+	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hi Serge,
 
-syzbot found the following issue on:
+On Tue, Sep 10, 2024 at 12:25=E2=80=AFPM Serge Semin <fancer.lancer@gmail.c=
+om> wrote:
+>
+> > +static u32 decode_vdma_count(u32 regval)
+> > +{
+> > +     /* compressed encoding for vdma count
+> > +      * regval: VDMA count
+> > +      * 0-15  : 1 - 16
+> > +      * 16-19 : 20, 24, 28, 32
+> > +      * 20-23 : 40, 48, 56, 64
+> > +      * 24-27 : 80, 96, 112, 128
+> > +      */
+> > +     if (regval < 16)
+> > +             return regval + 1;
+> > +     return (4 << ((regval - 16) / 4)) * ((regval % 4) + 5);
+>
+> The shortest code isn't always the best one. This one gives me a
+> headache in trying to decipher whether it really matches to what is
+> described in the comment. What about just:
+>
+>         if (regval < 16) /* Direct mapping */
+>                 return regval + 1;
+>         else if (regval < 20) /* 20, 24, 28, 32 */
+>                 return 20 + (regval - 16) * 4;
+>         else if (regval < 24) /* 40, 48, 56, 64 */
+>                 return 40 + (regval - 20) * 8;
+>         else if (regval < 28) /* 80, 96, 112, 128 */
+>                 return 80 + (regval - 24) * 16;
+>
+> ?
+Couldn't agree more :)
+Thanks, I will replace it with your code, which is definitely more readable=
+.
 
-HEAD commit:    3561373114c8 Merge git://git.kernel.org/pub/scm/linux/kern..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=14a36a8b980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=be4832509d93a86b
-dashboard link: https://syzkaller.appspot.com/bug?extid=cc39f136925517aed571
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+>
+> > +}
+> > +
+> > +static void dw25gmac_read_hdma_limits(void __iomem *ioaddr,
+> > +                                   struct stmmac_hdma_cfg *hdma)
+> > +{
+> > +     u32 hw_cap;
+> > +
+> > +     /* Get VDMA/PDMA counts from HW */
+> > +     hw_cap =3D readl(ioaddr + XGMAC_HW_FEATURE2);
+>
+>
+> > +     hdma->tx_vdmas =3D decode_vdma_count(FIELD_GET(XXVGMAC_HWFEAT_VDM=
+A_TXCNT,
+> > +                                                  hw_cap));
+> > +     hdma->rx_vdmas =3D decode_vdma_count(FIELD_GET(XXVGMAC_HWFEAT_VDM=
+A_RXCNT,
+> > +                                                  hw_cap));
+> > +     hdma->tx_pdmas =3D FIELD_GET(XGMAC_HWFEAT_TXQCNT, hw_cap) + 1;
+> > +     hdma->rx_pdmas =3D FIELD_GET(XGMAC_HWFEAT_RXQCNT, hw_cap) + 1;
+>
+> Hmm, these are the Tx/Rx DMA-channels and Tx/Rx MTL-queues count
+> fields. Can't you just use the
+> dma_features::{number_tx_channel,number_tx_queues} and
+> dma_features::{number_rx_channel,number_rx_queues} fields to store the
+> retrieved data?
+>
+> Moreover why not to add the code above to the dwxgmac2_get_hw_feature() m=
+ethod?
+>
+Thanks, I missed the reuse of existing fields.
+However, since the VDMA count has a slightly bigger bitmask, we need to ext=
+ract
+VDMA channel count as per DW25GMAC spec.
+Instead of duplicating dwxgmac2_get_hw_feature(), should we add wrapper for
+dw25gmac, something like the following?
+dw25gmac_get_hw_feature(ioaddr, dma_cap)
+{
+    u32 hw_cap;
+    int rc;
+    rc =3D dwxgmac2_get_hw_feature(ioaddr, dma_cap);
+    /* Get VDMA counts from HW */
+    hw_cap =3D readl(ioaddr + XGMAC_HW_FEATURE2);
+   dma_cap->num_tx_channels =3D
+decode_vdma_count(FIELD_GET(XXVGMAC_HWFEAT_VDMA_TXCNT,
+     hw_cap));
+   dma_cap->num_rx_channels =3D
+decode_vdma_count(FIELD_GET(XXVGMAC_HWFEAT_VDMA_RXCNT,
+     hw_cap));
+   return rc;
+}
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> > +}
+> > +
+> > +int dw25gmac_hdma_cfg_init(struct stmmac_priv *priv)
+> > +{
+> > +     struct plat_stmmacenet_data *plat =3D priv->plat;
+> > +     struct device *dev =3D priv->device;
+> > +     struct stmmac_hdma_cfg *hdma;
+> > +     int i;
+> > +
+> > +     hdma =3D devm_kzalloc(dev,
+> > +                         sizeof(*plat->dma_cfg->hdma_cfg),
+> > +                         GFP_KERNEL);
+> > +     if (!hdma)
+> > +             return -ENOMEM;
+> > +
+> > +     dw25gmac_read_hdma_limits(priv->ioaddr, hdma);
+> > +
+> > +     hdma->tvdma_tc =3D devm_kzalloc(dev,
+> > +                                   sizeof(*hdma->tvdma_tc) * hdma->tx_=
+vdmas,
+> > +                                   GFP_KERNEL);
+> > +     if (!hdma->tvdma_tc)
+> > +             return -ENOMEM;
+> > +
+> > +     hdma->rvdma_tc =3D devm_kzalloc(dev,
+> > +                                   sizeof(*hdma->rvdma_tc) * hdma->rx_=
+vdmas,
+> > +                                   GFP_KERNEL);
+> > +     if (!hdma->rvdma_tc)
+> > +             return -ENOMEM;
+> > +
+> > +     hdma->tpdma_tc =3D devm_kzalloc(dev,
+> > +                                   sizeof(*hdma->tpdma_tc) * hdma->tx_=
+pdmas,
+> > +                                   GFP_KERNEL);
+> > +     if (!hdma->tpdma_tc)
+> > +             return -ENOMEM;
+> > +
+> > +     hdma->rpdma_tc =3D devm_kzalloc(dev,
+> > +                                   sizeof(*hdma->rpdma_tc) * hdma->rx_=
+pdmas,
+> > +                                   GFP_KERNEL);
+> > +     if (!hdma->rpdma_tc)
+> > +             return -ENOMEM;
+> > +
+>
+> > +     /* Initialize one-to-one mapping for each of the used queues */
+> > +     for (i =3D 0; i < plat->tx_queues_to_use; i++) {
+> > +             hdma->tvdma_tc[i] =3D i;
+> > +             hdma->tpdma_tc[i] =3D i;
+> > +     }
+> > +     for (i =3D 0; i < plat->rx_queues_to_use; i++) {
+> > +             hdma->rvdma_tc[i] =3D i;
+> > +             hdma->rpdma_tc[i] =3D i;
+> > +     }
+>
+> So the Traffic Class ID is initialized for the
+> tx_queues_to_use/rx_queues_to_use number of channels only, right? What
+> about the Virtual and Physical DMA-channels with numbers greater than
+> these values?
+>
+You have brought up a question that applies to remaining comments in
+this file as well.
+How the VDMA/PDMA mapping is used depends on the device/glue driver.
+For example in
+our SoC the remaining VDMAs are meant to be used with SRIOV virtual
+functions and not
+all of them are available for physical function.
+Since additional VDMAs/PDMAs remain unused in hardware I let them stay at t=
+heir
+default values. No traffic is expected to be mapped to unused V/PDMAs.
+ I couldn't think of a reason for it to be an issue from a driver perspecti=
+ve.
+Please let me know, if I am missing something or we need to address a
+use case with bigger scope.
+The responses for following comments also depend on what approach we take h=
+ere.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/494b5ef0e99e/disk-35613731.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/2ec90c91c7b4/vmlinux-35613731.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/59a0684dc747/bzImage-35613731.xz
+> > +     plat->dma_cfg->hdma_cfg =3D hdma;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +
+> > +void dw25gmac_dma_init(void __iomem *ioaddr,
+> > +                    struct stmmac_dma_cfg *dma_cfg)
+> > +{
+> > +     u32 value;
+> > +     u32 i;
+> > +
+> > +     value =3D readl(ioaddr + XGMAC_DMA_SYSBUS_MODE);
+> > +     value &=3D ~(XGMAC_AAL | XGMAC_EAME);
+> > +     if (dma_cfg->aal)
+> > +             value |=3D XGMAC_AAL;
+> > +     if (dma_cfg->eame)
+> > +             value |=3D XGMAC_EAME;
+> > +     writel(value, ioaddr + XGMAC_DMA_SYSBUS_MODE);
+> > +
+> > +     for (i =3D 0; i < dma_cfg->hdma_cfg->tx_vdmas; i++) {
+> > +             value =3D rd_dma_ch_ind(ioaddr, MODE_TXDESCCTRL, i);
+> > +             value &=3D ~XXVGMAC_TXDCSZ;
+> > +             value |=3D FIELD_PREP(XXVGMAC_TXDCSZ,
+> > +                                 XXVGMAC_TXDCSZ_256BYTES);
+> > +             value &=3D ~XXVGMAC_TDPS;
+> > +             value |=3D FIELD_PREP(XXVGMAC_TDPS, XXVGMAC_TDPS_HALF);
+> > +             wr_dma_ch_ind(ioaddr, MODE_TXDESCCTRL, i, value);
+> > +     }
+> > +
+> > +     for (i =3D 0; i < dma_cfg->hdma_cfg->rx_vdmas; i++) {
+> > +             value =3D rd_dma_ch_ind(ioaddr, MODE_RXDESCCTRL, i);
+> > +             value &=3D ~XXVGMAC_RXDCSZ;
+> > +             value |=3D FIELD_PREP(XXVGMAC_RXDCSZ,
+> > +                                 XXVGMAC_RXDCSZ_256BYTES);
+> > +             value &=3D ~XXVGMAC_RDPS;
+> > +             value |=3D FIELD_PREP(XXVGMAC_TDPS, XXVGMAC_RDPS_HALF);
+> > +             wr_dma_ch_ind(ioaddr, MODE_RXDESCCTRL, i, value);
+> > +     }
+> > +
+>
+> > +     for (i =3D 0; i < dma_cfg->hdma_cfg->tx_pdmas; i++) {
+> > +             value =3D rd_dma_ch_ind(ioaddr, MODE_TXEXTCFG, i);
+> > +             value &=3D ~(XXVGMAC_TXPBL | XXVGMAC_TPBLX8_MODE);
+> > +             if (dma_cfg->pblx8)
+> > +                     value |=3D XXVGMAC_TPBLX8_MODE;
+> > +             value |=3D FIELD_PREP(XXVGMAC_TXPBL, dma_cfg->pbl);
+> > +             wr_dma_ch_ind(ioaddr, MODE_TXEXTCFG, i, value);
+> > +             xgmac4_tp2tc_map(ioaddr, i, dma_cfg->hdma_cfg->tpdma_tc[i=
+]);
+> > +     }
+> > +
+> > +     for (i =3D 0; i < dma_cfg->hdma_cfg->rx_pdmas; i++) {
+> > +             value =3D rd_dma_ch_ind(ioaddr, MODE_RXEXTCFG, i);
+> > +             value &=3D ~(XXVGMAC_RXPBL | XXVGMAC_RPBLX8_MODE);
+> > +             if (dma_cfg->pblx8)
+> > +                     value |=3D XXVGMAC_RPBLX8_MODE;
+> > +             value |=3D FIELD_PREP(XXVGMAC_RXPBL, dma_cfg->pbl);
+> > +             wr_dma_ch_ind(ioaddr, MODE_RXEXTCFG, i, value);
+> > +             xgmac4_rp2tc_map(ioaddr, i, dma_cfg->hdma_cfg->rpdma_tc[i=
+]);
+>
+> What if tx_pdmas doesn't match plat_stmmacenet_data::tx_queues_to_use
+> and rx_pdmas doesn't match to plat_stmmacenet_data::rx_queues_to_use?
+>
+> If they don't then you'll get out of the initialized tpdma_tc/rpdma_tc
+> fields and these channels will be pre-initialized with the zero TC. Is
+> that what expected? I doubt so.
+>
+As mentioned in the previous response the remaining resources are unused
+and no traffic is mapped to those resources.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cc39f136925517aed571@syzkaller.appspotmail.com
+> > +     }
+> > +}
+> > +
+>
+> > +void dw25gmac_dma_init_tx_chan(struct stmmac_priv *priv,
+> > +                            void __iomem *ioaddr,
+> > +                            struct stmmac_dma_cfg *dma_cfg,
+> > +                            dma_addr_t dma_addr, u32 chan)
+> > +{
+> > +     u32 value;
+> > +
+>
+> > +     value =3D readl(ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
+> > +     value &=3D ~XXVGMAC_TVDMA2TCMP;
+> > +     value |=3D FIELD_PREP(XXVGMAC_TVDMA2TCMP,
+> > +                         dma_cfg->hdma_cfg->tvdma_tc[chan]);
+> > +     writel(value, ioaddr + XGMAC_DMA_CH_TX_CONTROL(chan));
+>
+> Please note this will have only first
+> plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use} VDMA
+> channels initialized. Don't you have much more than just 4 channels?
+>
+Yes, there are 32 VDMA channels on this device. In our application the
+additional channels are partitioned for use with SRIOV virtual functions.
+Similar to PDMA comment above, the additional VDMAs are not enabled,
+and left in default state.
+My thinking is, when another 25gmac device comes along that requires a
+different mapping we may need to add the ability to set the mapping in
+glue driver.
+We can support this by adding a check in dw25gmac_setup()
+@@ -1708,8 +1708,10 @@ int dw25gmac_setup(struct stmmac_priv *priv)
+        mac->mii.clk_csr_shift =3D 19;
+        mac->mii.clk_csr_mask =3D GENMASK(21, 19);
 
-------------[ cut here ]------------
-UBSAN: shift-out-of-bounds in ./include/net/xfrm.h:900:23
-shift exponent -96 is negative
-CPU: 1 UID: 0 PID: 12120 Comm: syz.1.1258 Not tainted 6.11.0-rc7-syzkaller-01543-g3561373114c8 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
- ubsan_epilogue lib/ubsan.c:231 [inline]
- __ubsan_handle_shift_out_of_bounds+0x3c8/0x420 lib/ubsan.c:468
- addr4_match include/net/xfrm.h:900 [inline]
- __xfrm4_selector_match net/xfrm/xfrm_policy.c:222 [inline]
- xfrm_selector_match+0xe9b/0x1030 net/xfrm/xfrm_policy.c:247
- xfrm_state_look_at+0xe8/0x480 net/xfrm/xfrm_state.c:1172
- xfrm_state_find+0x199f/0x4d70 net/xfrm/xfrm_state.c:1280
- xfrm_tmpl_resolve_one net/xfrm/xfrm_policy.c:2481 [inline]
- xfrm_tmpl_resolve net/xfrm/xfrm_policy.c:2532 [inline]
- xfrm_resolve_and_create_bundle+0x6d2/0x2c90 net/xfrm/xfrm_policy.c:2826
- xfrm_lookup_with_ifid+0x334/0x1ee0 net/xfrm/xfrm_policy.c:3160
- xfrm_lookup net/xfrm/xfrm_policy.c:3289 [inline]
- xfrm_lookup_route+0x3c/0x1c0 net/xfrm/xfrm_policy.c:3300
- ip_route_connect include/net/route.h:333 [inline]
- __ip4_datagram_connect+0x96c/0x1260 net/ipv4/datagram.c:49
- __ip6_datagram_connect+0x194/0x1230
- ip6_datagram_connect net/ipv6/datagram.c:279 [inline]
- ip6_datagram_connect_v6_only+0x63/0xa0 net/ipv6/datagram.c:291
- __sys_connect_file net/socket.c:2067 [inline]
- __sys_connect+0x2df/0x310 net/socket.c:2084
- __do_sys_connect net/socket.c:2094 [inline]
- __se_sys_connect net/socket.c:2091 [inline]
- __x64_sys_connect+0x7a/0x90 net/socket.c:2091
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fe6d677def9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fe6d751f038 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00007fe6d6936130 RCX: 00007fe6d677def9
-RDX: 000000000000001c RSI: 0000000020000000 RDI: 0000000000000007
-RBP: 00007fe6d67f0b76 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000001 R14: 00007fe6d6936130 R15: 00007ffcce438838
- </TASK>
----[ end trace ]---
+-       /* Allocate and initialize hdma mapping */
+-       return dw25gmac_hdma_cfg_init(priv);
++       /* Allocate and initialize hdma mapping, if not done by glue driver=
+. */
++       if (!priv->plat->dma_cfg->hdma_cfg)
++               return dw25gmac_hdma_cfg_init(priv);
++       return 0;
+ }
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> > +
+> > +     writel(upper_32_bits(dma_addr),
+> > +            ioaddr + XGMAC_DMA_CH_TxDESC_HADDR(chan));
+> > +     writel(lower_32_bits(dma_addr),
+> > +            ioaddr + XGMAC_DMA_CH_TxDESC_LADDR(chan));
+> > +}
+> > +
+> > +void dw25gmac_dma_init_rx_chan(struct stmmac_priv *priv,
+> > +                            void __iomem *ioaddr,
+> > +                            struct stmmac_dma_cfg *dma_cfg,
+> > +                            dma_addr_t dma_addr, u32 chan)
+> > +{
+> > +     u32 value;
+> > +
+>
+> > +     value =3D readl(ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
+> > +     value &=3D ~XXVGMAC_RVDMA2TCMP;
+> > +     value |=3D FIELD_PREP(XXVGMAC_RVDMA2TCMP,
+> > +                         dma_cfg->hdma_cfg->rvdma_tc[chan]);
+> > +     writel(value, ioaddr + XGMAC_DMA_CH_RX_CONTROL(chan));
+>
+> The same question.
+>
+> > +
+> > +     writel(upper_32_bits(dma_addr),
+> > +            ioaddr + XGMAC_DMA_CH_RxDESC_HADDR(chan));
+> > +     writel(lower_32_bits(dma_addr),
+> > +            ioaddr + XGMAC_DMA_CH_RxDESC_LADDR(chan));
+> > +}
+>
+> These methods are called for each
+> plat_stmmacenet_data::{tx_queues_to_use,rx_queues_to_use}
+> DMA-channel/Queue. The static mapping means you'll have each
+> PDMA/Queue assigned a static traffic class ID corresponding to the
+> channel ID. Meanwhile the VDMA channels are supposed to be initialized
+> with the TC ID corresponding to the matching PDMA ID.
+>
+> The TC ID in this case is passed as the DMA/Queue channel ID. Then the
+> Tx/Rx DMA-channels init methods can be converted to:
+>
+> dw25gmac_dma_init_Xx_chan(chan)
+> {
+>         /* Map each chan-th VDMA to the single chan PDMA by assigning
+>          * the static TC ID.
+>          */
+>         for (i =3D chan; i < Xx_vdmas; i +=3D (Xx_vdmas / Xx_queues_to_us=
+e)) {
+>                 /* Initialize VDMA channels */
+>                 XXVGMAC_TVDMA2TCMP =3D chan;
+>         }
+>
+>         /* Assign the static TC ID to the specified PDMA channel */
+>         xgmac4_rp2tc_map(chan, chan)
+> }
+>
+> , where X=3D{t,r}.
+>
+> Thus you can redistribute the loops implemented in dw25gmac_dma_init()
+> to the respective Tx/Rx DMA-channel init methods.
+>
+> Am I missing something?
+I think your visualization of HDMA may be going beyond the application
+I understand.
+We are allocating a VDMA for each of the TX/RX channels. The use of
+additional VDMAs
+depends on how the device is partitioned for virtualization.
+In the non-SRIOV case the remaining VDMAs will remain unused.
+Please let me know if I missed your question.
+>
+> -Serge()
+>
+> > [...]
 
