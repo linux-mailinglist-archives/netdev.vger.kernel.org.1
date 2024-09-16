@@ -1,168 +1,332 @@
-Return-Path: <netdev+bounces-128515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E59979F2E
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:22:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9E5979EAF
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 11:49:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 881971C220A6
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 10:22:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 172F3280E7C
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 09:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1828714EC5B;
-	Mon, 16 Sep 2024 10:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD96114A095;
+	Mon, 16 Sep 2024 09:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hrikar6A"
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2114.outbound.protection.partner.outlook.cn [139.219.17.114])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56AF13DB9F;
-	Mon, 16 Sep 2024 10:22:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.114
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726482156; cv=fail; b=C26DtRfw/jUwI7mrxyn3ocBivBjQ/KOCK6uK15yy9gWX5X/iK/mU7d44aN647BgP/01ujOHrbtp/2G3H+mOwIoC+sjLTvfMzthMPu6j3sCxJ/BXmQrqDCTo3II8CDd9mLZdaFE0KahPNGoa3iVQMZn+bfHIw5LiUdAmPXaox3qg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726482156; c=relaxed/simple;
-	bh=CElQV9Ih36pb2VQwMtg0wqN4+b3sc7xor/TKezH8NMo=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=mOxn0k329MmG4qPlBiny9GwJbvUhgoVlEEvm9dWTmgPCubJeke7tbdG2HwRi8y+3sKuHS98/Vb2SbaAveb+Iw/YToLGomD69AAeX8LTob45SSX8OfWpzqvFEikBkvkZUxaomipdl4l13RS0UuhMO6bIH/da29+yla7xHMbrXFjQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Dne6s/EqQfI8YOHw1j0f43fBeC1hTxV054AIGn0jsp21t68ELI4c8yJsw0GB7PxLsR2t6SLKQ3F70zxSLgD7dSSMLOuC64spfnSbhQpZzgs1IQ8Nood4j+ahBzNY3K/2UliE0IHCHxAd9HYsWQjGd8KwLLSJXeiV93o54jSLCo1AtXDzR4A3irXXzqVk7Zjoid+LmhFNoeyO4j+2b6BozsADEaEuVOwS834Rv+RYItksHxI6baltYNY9eSbE//BytPUnexU6CifCVv92IXHivObwiatc8hSgKcDkBSVyT+mKx55fn017z2GM5AriFeXjlNbwr/HiU4r6ixb70EPTHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GT59sCN5tWsnC3d4zLHfMDorsWWyWuyHMtbm2DPVUqQ=;
- b=DhJ5ryHCHcLy20QocQ6sNw+bv4H4nfyGPwdBvy5DgWAqvdkG4f/yB3u+pKX1AkkqRq55xHOIGmlEoZ64PFB78v4yiX6fRrqjTIJpK0gKng9VUe9pM2DpXXXX3ThTCazZehpGSrD5jD2R+9LO8xDslQb2LKzCSGqzIacsT4TAmA/agj/rdWe9zdKnc5pnl9RrN9jaKBRRhKpp0Stt8tsx2qDLTbQ4NX4Unr4UUu5R19QTqSKE74gJB81+vEjWQIGzSm31sXRdbYNPgcVu7iHFxQSso7cGNqzQM2pdVdMwkB5qfwvwtiFK+dCRz+wpUBT/CyIkO4jEdSJvkkxBO2fiuQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::15) by SHXPR01MB0814.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:24::22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.22; Mon, 16 Sep
- 2024 09:48:19 +0000
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- ([fe80::3f35:8db2:7fdf:9ffb]) by
- SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::3f35:8db2:7fdf:9ffb%6])
- with mapi id 15.20.7962.022; Mon, 16 Sep 2024 09:48:18 +0000
-From: Minda Chen <minda.chen@starfivetech.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007FE1CF83;
+	Mon, 16 Sep 2024 09:49:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726480168; cv=none; b=J/QY+ufMG6cLEuUY31N7KX3Opy9zaPQbyHJ7U6kR9km6fq2nxOiA+qbl7aRnNJb+HH1MxbtJA0p2KbztPTXElLzkhwl5FOcfjf0U3kR/haJrQveBCin/M9ALvpN2B/dLwMvsaEaWJOPWPYPbjrQhhksCAdQkvLo7I0EquwZAE2w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726480168; c=relaxed/simple;
+	bh=Fezmf/xSYYA+2Rp5prhtsDNAElh7xq591BRP3qfI9to=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rh71YsOSg2FY2mUDOtroVEWiFaGCPTQzTqnQs+4wTJAUuc18ERy3tLnIznPvpPPPaNKS+kvPHN8GVsAT57oN3/p3VfFg5hdHwhWWQMrrT0xe5I0hhqVe/DdbyoBGPkcuoc6f2J4lGgO/jrSbEjbsOKKgyLnXhjkxYQcv03qMFJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hrikar6A; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-206b9455460so31782885ad.0;
+        Mon, 16 Sep 2024 02:49:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726480166; x=1727084966; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=agEM9Bnjv/wIh4lqw0cG9MefC44dMCYZWQLQqTZdFTw=;
+        b=Hrikar6AtetL8V37gB9UKh6AuYi4VkHWt/+AJO54CG7JznowgcHImkB/vljr16kIOY
+         mvYBDPlw3TVGtimVFDHX8kHFAouBqVTIM2+/LyDSiURcMG3rXuqfvOQ4fPA5rHH1Iy9t
+         YFOLMmSYJ7Lm+Rm3Scm3G45ih+4ic8/wwckOKye6Ko8n5hEc7dXxh/bVqyC27h/N/Hhi
+         oKyC2YP4p1bAdg4txI5MryRLvokrCwj7L5PCIUQ4oriHqZydELh++sbcFi0y/Iyv/lti
+         ijdClJZg2gANkvSYAoymiWtQRg7cXeN/0ubi9Ap6LdeAKpc876JouTTcEMiqexrM0Hnb
+         bHOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726480166; x=1727084966;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=agEM9Bnjv/wIh4lqw0cG9MefC44dMCYZWQLQqTZdFTw=;
+        b=ouX7gCDzpuQkc8xb6Dl3PS8NRoRmIUG48bP79pC9c4iA2teT0O5+W+vRt/oXxCXU9W
+         WqtYSpJ0Lmh4wKSHxpO2leO9hzC6K36dNxqzxbEyFCcgrQKXSo8dwElWyJjkMme34EZD
+         i5GTtPazydCYEo05ZeEsKmnbYHK6Rk6Cy3AO7K7UIQYmGDQFDN38f2yVQWczw9agaPPv
+         MHmlAKPkmrbFTPjL+3/wwaSme2mMgLAki4J8HNZpNfu2qn6PU4ulXc3Gbab4isTM8sSb
+         po3OPOSkMBTXzcfaUaVMM8i+tqi+RsLEzZ7tPKBBLr6M5gGS5+SaibQ0VMGbWGSzPoxt
+         9qTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/zZFGhhzE+oPvwCVlhhIqxfKIG/UVc2oEJq2ZQtFPh5YNQC+eTxnpGiLsAEAPBZ81muIay5se@vger.kernel.org, AJvYcCVS/8vXWF6DlcskVzHmLH5cVZqw9GfE1Ta8e5ui2j4iK8c42zMuljtgkqMagGEFvYgEm4CIAA6DmY3vYUz3+Ghc@vger.kernel.org, AJvYcCWP970qUG6mAhStauRhL24gFQsaRr4VJS6XUukDGLejp7DglP3fSt9AQukG30lvfNV3WcFE83wIf5E5mls=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyxGZWTphXbQaWYQ5OUDQpkkg66z0XjaC04cgaFI1mAK2i4v3lF
+	M3QmK1XaeqTUdil1mda9g3cbXFDqSJB7hgZrs0rgqL75zb863732
+X-Google-Smtp-Source: AGHT+IF/8LADqxUJsInaUBiMLuBfWpa5XVS3tiDK6OKzHNTW5GsosmpZWdz0yIzhFtWEyhd9ltYzow==
+X-Received: by 2002:a17:902:d4ce:b0:1fd:96c7:24f5 with SMTP id d9443c01a7336-2074c5d2351mr264320415ad.5.1726480165906;
+        Mon, 16 Sep 2024 02:49:25 -0700 (PDT)
+Received: from localhost.localdomain ([159.196.197.79])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946fccc1sm33018905ad.214.2024.09.16.02.49.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Sep 2024 02:49:25 -0700 (PDT)
+From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: [PATCH v1] stmmac: mmc: dwmac4: Add ip payload error statistics
-Date: Mon, 16 Sep 2024 17:48:12 +0800
-Message-Id: <20240916094812.29804-1-minda.chen@starfivetech.com>
-X-Mailer: git-send-email 2.17.1
-Content-Type: text/plain
-X-ClientProxiedBy: SHXPR01CA0019.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:1b::28) To SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::15)
+	Shuah Khan <shuah@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>
+Cc: Jamie Bainbridge <jamie.bainbridge@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net v2] selftests: forwarding: Avoid false MDB delete/flush failures
+Date: Mon, 16 Sep 2024 19:49:05 +1000
+Message-Id: <c92569919307749f879b9482b0f3e125b7d9d2e3.1726480066.git.jamie.bainbridge@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SHXPR01MB0863:EE_|SHXPR01MB0814:EE_
-X-MS-Office365-Filtering-Correlation-Id: f8e13c74-7794-41cb-1176-08dcd634b14a
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|41320700013|366016|1800799024|52116014|7416014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	dDB53/qyRtRg9J1NevibhrRQa3CpZyY58jIUuDLfGjeiR8rQMSbO/H4Fi09py49P//IsDSYdDktwOH5Tt8KK/HSaUghlt3tdApFS5dtel7T6ME8llZ3JDiY68sGr3fHX3yzaL1E5gTVcLI9X/OyIIWV8UtbN56GjvYlUBzBnBLNDjgZ5LaZsWeN1tEEP7L6IMwhA3Ewi6le1f9L7fgyg+HBDXOwmei7Ejk8BGVDPI1UQ1IrOW7HbCp8Cf95qDAUCoEdUceRDdnWowMWzWErPWWbW6NN7rhRdetxdD0+rwvLlgJ6xKbNGTgkAVhBTsChjUX7s6zJh/CMGzZIJv7pP6prNFKvjfJ/XC3cWTxXjd6cf55yQW8N3sjslVO8MTcXxfh4qpZJyYLHcVYWIYe4vD8OYwzR1kUUB7lFKDfT17Csi93AEqETE0NH2hnLXnCmtO62dOaaBro5e5G7xakPq0NFWwmz8xspVao1KpC2/0l2tNZAXNfOJzuNT0zmB3cfWaC8DZ7ZXWvcDVC7qJXTA22UDvMf1clKv3UtZLOBq5NFjv7CDcd+gmmgJoK/B1rI7QlwrWHqJ2XSaRgvuc6qvt/usdxphKWg5489UadmJdzqQBGm078LSiLZRl3w1ZqTn
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(41320700013)(366016)(1800799024)(52116014)(7416014)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?n+1dkvMkZEi6P8elUNPfWEupiIN3/oX2b4x1Hxp+VZ8W0W8tebgyUW1V8oOD?=
- =?us-ascii?Q?2SWmXSytixa4CHbZ2NNfnUKyikkJ0fYOqGoWLDW8Zv1bYwF0f4Q5j65BSVyr?=
- =?us-ascii?Q?vvkc5KTU0MD4PQDLiiKzO6dRoFTHsZaN+XpMpjNUYxr7BKeoo/yi/llLWCS6?=
- =?us-ascii?Q?gJDWbFplvS1pLVU9oA7et1uMbfI9LSetfRntSP8pqYZNqFzmT5H29tUHrNE0?=
- =?us-ascii?Q?MdKF/mJLxku2uA2dQ5KiYPd/GoWSz/0Zg//ne2Lo6itH6o/WZPWZrmjZvogX?=
- =?us-ascii?Q?cUtrOXfsXEPrubSBA0RLufOVh7qcZgspjXhcITq/0OV9hMpsmnQcX68Dl4Bu?=
- =?us-ascii?Q?lWF76yrJLcKAZSDLqValmIACVsum89Fz83dvX4zLutkHzgypW8EsLE4WfVLP?=
- =?us-ascii?Q?R2NPS234S+cL/WhIidB0l7RT7BMZq85rD/bj9cysPj4tF6kncgFqVqXNwi65?=
- =?us-ascii?Q?4U0Ny5OCjVyxLL5kfwaDBUJ8gdIDcNa2fMfRA4hBPukANmMt5LyAi75RhDDR?=
- =?us-ascii?Q?/3Tq2qqtzpfBy+Yz1ZB9VbVRQO/PomgpLImFgSOVhrJilLFReZ8uqIkqiXDA?=
- =?us-ascii?Q?uYY4z0t473AzYbff+HRmL6vvY175Jk3l45djCBM9VezuL66sBWxR0QeUvDjK?=
- =?us-ascii?Q?CUPgDFY7kbt2yb6DjepxpHWMaXEokMgDUmHDwnea5Wf4BIEwq9a4wFoGKcPr?=
- =?us-ascii?Q?It7PHNuCzgOVccXxXscJbTlekS2ijC898Zg1qA1HCbbxjpYzt88XX8xeJde4?=
- =?us-ascii?Q?8YcvxvoaFKBS5Sv+Hi4ZgaSZSR2+G/0KAo4Da7jC08ET2CivB42e6YQSXSRK?=
- =?us-ascii?Q?JtAGgxDVYTDVk4FOMbrIzg4QBYcD4IeMmEWMqQUOtglCOcIQZHz3NzZXqicz?=
- =?us-ascii?Q?UJxG40Wm4G7VIN08fZBuCul4Qgse/3Zv93m40JTIlcnC7ynsoLem/Z1wsstw?=
- =?us-ascii?Q?1vAztOgxIWa/isVoNNNaeHkxXthFB47o/+T7GE5k9G8uxTospwdSVvPCrgf6?=
- =?us-ascii?Q?7b1uSqZ9Onr2sg2s8/RC00HQhtNyT1vgpSssL8RSfFCHNgg6gxSCqewXF4KJ?=
- =?us-ascii?Q?clZuy4EQ4Ou1NuPD+smat68djtCIe0IEfwTwS+5K72u75OuHrsM8efESVbVE?=
- =?us-ascii?Q?0QRLAzUq6PjRTGl56UgYptawnOWEw2VNbucAJuFedmiemUW2a7+pWCzNDn5q?=
- =?us-ascii?Q?2UwFnF6bTmpA+fPPMRJ7NmHdj2ZJhw21XkTHsnOl4l+9LCyADVbj3lAIe379?=
- =?us-ascii?Q?dJddVaf3uRWAt2DUMoxbV5JzfTKlc0o41LgY5emcznJlsMEnUVI2lcpksi+e?=
- =?us-ascii?Q?FeQhkf0pwvJg/8nlT2zrcXF58t5lKdFgc06xvcEw6MGJdUz4N5bOidY3LCwQ?=
- =?us-ascii?Q?kVLh0608cEDmgyyID8GqAD02nGfjpdIGrXrskhH4ou+oBOrDgyVPIc6DHqQL?=
- =?us-ascii?Q?38k985FPyetoHRfMimkEHNGzK+Ve1hTss07/64HNQ7XZHAC+AFGNroUbm9Il?=
- =?us-ascii?Q?Sn3jOuoj04co/3jMVTQU8d3VU0xrzDG+TumEb5NtnUgEAJs7DHb5TeV7JLu0?=
- =?us-ascii?Q?gXvziCeu2tljZVvw21x1t9n5dGjFKKw8/kUKo86Hf0t7QZFi4Z4EKIk3CpMA?=
- =?us-ascii?Q?VA=3D=3D?=
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8e13c74-7794-41cb-1176-08dcd634b14a
-X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2024 09:48:18.8017
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zJhRW/HDJkCW+wSPrf2lVPpqvWyPzlzCAlpoOsc1dmuc/aOR6p53Pk4CPLo1E7NzG8Gor+r0tayfa41v97XH4adeXDBzUL+zo7L0bqtO1NQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0814
+Content-Transfer-Encoding: 8bit
 
-Add dwmac4 ip payload error statistics, and rename discripter bit macro
-because latest version descriptor IPCE bit claims include ip checksum
-error and l4 segment length error.
+Running this test on a small system produces different failures every
+test checking deletions, and some flushes. From different test runs:
 
-Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
+TEST: Common host entries configuration tests (L2)                [FAIL]
+  Failed to delete L2 host entry
+
+TEST: Common port group entries configuration tests (IPv4 (S, G)) [FAIL]
+  IPv4 (S, G) entry with VLAN 10 not deleted when VLAN was not specified
+
+TEST: Common port group entries configuration tests (IPv6 (*, G)) [FAIL]
+  IPv6 (*, G) entry with VLAN 10 not deleted when VLAN was not specified
+
+TEST: Flush tests                                                 [FAIL]
+  Entry not flushed by specified VLAN ID
+
+TEST: Flush tests                                                 [FAIL]
+  IPv6 host entry not flushed by "nopermanent" state
+
+Add a short sleep after deletion and flush to resolve this.
+
+Create a delay variable just for this test to allow short sleep, the
+lib.sh WAIT_TIME of 5 seconds makes the test far longer than necessary.
+
+Tested on several weak systems with 0.1s delay:
+- Ivy Bridge Celeron netbook (2014 x86_64)
+- Raspberry Pi 3B (2016 aarch64)
+- Small KVM VM on Intel 10th gen (2020 x86_64)
+All these systems ran 25 test runs in a row with 100% pass OK.
+
+Fixes: b6d00da08610 ("selftests: forwarding: Add bridge MDB test")
+Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c | 2 ++
- drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+v2: Avoid false check failures as seen by Jakub Kicinski.
+---
+ .../selftests/net/forwarding/bridge_mdb.sh    | 28 +++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-index 1c5802e0d7f4..14d9ad146241 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.c
-@@ -118,6 +118,8 @@ static int dwmac4_wrback_get_rx_status(struct stmmac_extra_stats *x,
- 		x->ipv4_pkt_rcvd++;
- 	if (rdes1 & RDES1_IPV6_HEADER)
- 		x->ipv6_pkt_rcvd++;
-+	if (rdes1 & RDES1_IP_PAYLOAD_ERROR)
-+		x->ip_payload_err++;
+diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+index d9d587454d207931a539f59be15cbc63d471888f..49136279973d05d0e6b14237228ab58455554bb0 100755
+--- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
++++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+@@ -30,6 +30,9 @@ ALL_TESTS="
+ 	ctrl_test
+ "
  
- 	if (message_type == RDES_EXT_NO_PTP)
- 		x->no_ptp_rx_msg_type_ext++;
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h
-index 6da070ccd737..1ce6f43d545a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_descs.h
-@@ -95,7 +95,7 @@
- #define RDES1_IPV4_HEADER		BIT(4)
- #define RDES1_IPV6_HEADER		BIT(5)
- #define RDES1_IP_CSUM_BYPASSED		BIT(6)
--#define RDES1_IP_CSUM_ERROR		BIT(7)
-+#define RDES1_IP_PAYLOAD_ERROR		BIT(7)
- #define RDES1_PTP_MSG_TYPE_MASK		GENMASK(11, 8)
- #define RDES1_PTP_PACKET_TYPE		BIT(12)
- #define RDES1_PTP_VER			BIT(13)
++# time to wait for delete and flush to complete
++: "${SETTLE_DELAY:=0.1}"
++
+ NUM_NETIFS=4
+ source lib.sh
+ source tc_common.sh
+@@ -152,6 +155,7 @@ cfg_test_host_common()
+ 	check_fail $? "Managed to replace $name host entry"
+ 
+ 	bridge mdb del dev br0 port br0 grp $grp $state vid 10
++	sleep "$SETTLE_DELAY"
+ 	bridge mdb get dev br0 grp $grp vid 10 &> /dev/null
+ 	check_fail $? "Failed to delete $name host entry"
+ 
+@@ -208,6 +212,7 @@ cfg_test_port_common()
+ 	check_err $? "Failed to replace $name entry"
+ 
+ 	bridge mdb del dev br0 port $swp1 $grp_key permanent vid 10
++	sleep "$SETTLE_DELAY"
+ 	bridge mdb get dev br0 $grp_key vid 10 &> /dev/null
+ 	check_fail $? "Failed to delete $name entry"
+ 
+@@ -230,6 +235,7 @@ cfg_test_port_common()
+ 	check_err $? "$name entry with VLAN 20 not added when VLAN was not specified"
+ 
+ 	bridge mdb del dev br0 port $swp1 $grp_key permanent
++	sleep "$SETTLE_DELAY"
+ 	bridge mdb get dev br0 $grp_key vid 10 &> /dev/null
+ 	check_fail $? "$name entry with VLAN 10 not deleted when VLAN was not specified"
+ 	bridge mdb get dev br0 $grp_key vid 20 &> /dev/null
+@@ -310,6 +316,7 @@ __cfg_test_port_ip_star_g()
+ 	bridge -d mdb get dev br0 grp $grp src $src1 vid 10 &> /dev/null
+ 	check_err $? "(S, G) entry not created"
+ 	bridge mdb del dev br0 port $swp1 grp $grp vid 10
++	sleep "$SETTLE_DELAY"
+ 	bridge -d mdb get dev br0 grp $grp vid 10 &> /dev/null
+ 	check_fail $? "(*, G) entry not deleted"
+ 	bridge -d mdb get dev br0 grp $grp src $src1 vid 10 &> /dev/null
+@@ -828,6 +835,7 @@ cfg_test_flush()
+ 	bridge mdb add dev br0 port $swp1 grp 239.1.1.8 vid 10 temp
+ 
+ 	bridge mdb flush dev br0
++	sleep "$SETTLE_DELAY"
+ 	num_entries=$(bridge mdb show dev br0 | wc -l)
+ 	[[ $num_entries -eq 0 ]]
+ 	check_err $? 0 "Not all entries flushed after flush all"
+@@ -840,6 +848,7 @@ cfg_test_flush()
+ 	bridge mdb add dev br0 port br0 grp 239.1.1.1 vid 10
+ 
+ 	bridge mdb flush dev br0 port $swp1
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port $swp1"
+ 	check_fail $? "Entry not flushed by specified port"
+@@ -849,11 +858,13 @@ cfg_test_flush()
+ 	check_err $? "Host entry flushed by wrong port"
+ 
+ 	bridge mdb flush dev br0 port br0
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port br0"
+ 	check_fail $? "Host entry not flushed by specified port"
+ 
+ 	bridge mdb flush dev br0
++	sleep "$SETTLE_DELAY"
+ 
+ 	# Check that when flushing by VLAN ID only entries programmed with the
+ 	# specified VLAN ID are flushed and the rest are not.
+@@ -864,6 +875,7 @@ cfg_test_flush()
+ 	bridge mdb add dev br0 port $swp2 grp 239.1.1.1 vid 20
+ 
+ 	bridge mdb flush dev br0 vid 10
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 &> /dev/null
+ 	check_fail $? "Entry not flushed by specified VLAN ID"
+@@ -871,6 +883,7 @@ cfg_test_flush()
+ 	check_err $? "Entry flushed by wrong VLAN ID"
+ 
+ 	bridge mdb flush dev br0
++	sleep "$SETTLE_DELAY"
+ 
+ 	# Check that all permanent entries are flushed when "permanent" is
+ 	# specified and that temporary entries are not.
+@@ -879,6 +892,7 @@ cfg_test_flush()
+ 	bridge mdb add dev br0 port $swp2 grp 239.1.1.1 temp vid 10
+ 
+ 	bridge mdb flush dev br0 permanent
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port $swp1"
+ 	check_fail $? "Entry not flushed by \"permanent\" state"
+@@ -886,6 +900,7 @@ cfg_test_flush()
+ 	check_err $? "Entry flushed by wrong state (\"permanent\")"
+ 
+ 	bridge mdb flush dev br0
++	sleep "$SETTLE_DELAY"
+ 
+ 	# Check that all temporary entries are flushed when "nopermanent" is
+ 	# specified and that permanent entries are not.
+@@ -894,6 +909,7 @@ cfg_test_flush()
+ 	bridge mdb add dev br0 port $swp2 grp 239.1.1.1 temp vid 10
+ 
+ 	bridge mdb flush dev br0 nopermanent
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port $swp1"
+ 	check_err $? "Entry flushed by wrong state (\"nopermanent\")"
+@@ -901,6 +917,7 @@ cfg_test_flush()
+ 	check_fail $? "Entry not flushed by \"nopermanent\" state"
+ 
+ 	bridge mdb flush dev br0
++	sleep "$SETTLE_DELAY"
+ 
+ 	# Check that L2 host entries are not flushed when "nopermanent" is
+ 	# specified, but flushed when "permanent" is specified.
+@@ -908,16 +925,19 @@ cfg_test_flush()
+ 	bridge mdb add dev br0 port br0 grp 01:02:03:04:05:06 permanent vid 10
+ 
+ 	bridge mdb flush dev br0 nopermanent
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 01:02:03:04:05:06 vid 10 &> /dev/null
+ 	check_err $? "L2 host entry flushed by wrong state (\"nopermanent\")"
+ 
+ 	bridge mdb flush dev br0 permanent
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 01:02:03:04:05:06 vid 10 &> /dev/null
+ 	check_fail $? "L2 host entry not flushed by \"permanent\" state"
+ 
+ 	bridge mdb flush dev br0
++	sleep "$SETTLE_DELAY"
+ 
+ 	# Check that IPv4 host entries are not flushed when "permanent" is
+ 	# specified, but flushed when "nopermanent" is specified.
+@@ -925,16 +945,19 @@ cfg_test_flush()
+ 	bridge mdb add dev br0 port br0 grp 239.1.1.1 temp vid 10
+ 
+ 	bridge mdb flush dev br0 permanent
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 &> /dev/null
+ 	check_err $? "IPv4 host entry flushed by wrong state (\"permanent\")"
+ 
+ 	bridge mdb flush dev br0 nopermanent
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 &> /dev/null
+ 	check_fail $? "IPv4 host entry not flushed by \"nopermanent\" state"
+ 
+ 	bridge mdb flush dev br0
++	sleep "$SETTLE_DELAY"
+ 
+ 	# Check that IPv6 host entries are not flushed when "permanent" is
+ 	# specified, but flushed when "nopermanent" is specified.
+@@ -942,16 +965,19 @@ cfg_test_flush()
+ 	bridge mdb add dev br0 port br0 grp ff0e::1 temp vid 10
+ 
+ 	bridge mdb flush dev br0 permanent
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp ff0e::1 vid 10 &> /dev/null
+ 	check_err $? "IPv6 host entry flushed by wrong state (\"permanent\")"
+ 
+ 	bridge mdb flush dev br0 nopermanent
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp ff0e::1 vid 10 &> /dev/null
+ 	check_fail $? "IPv6 host entry not flushed by \"nopermanent\" state"
+ 
+ 	bridge mdb flush dev br0
++	sleep "$SETTLE_DELAY"
+ 
+ 	# Check that when flushing by routing protocol only entries programmed
+ 	# with the specified routing protocol are flushed and the rest are not.
+@@ -961,6 +987,7 @@ cfg_test_flush()
+ 	bridge mdb add dev br0 port br0 grp 239.1.1.1 vid 10
+ 
+ 	bridge mdb flush dev br0 proto bgp
++	sleep "$SETTLE_DELAY"
+ 
+ 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port $swp1"
+ 	check_fail $? "Entry not flushed by specified routing protocol"
+@@ -970,6 +997,7 @@ cfg_test_flush()
+ 	check_err $? "Host entry flushed by wrong routing protocol"
+ 
+ 	bridge mdb flush dev br0
++	sleep "$SETTLE_DELAY"
+ 
+ 	# Test that an error is returned when trying to flush using unsupported
+ 	# parameters.
 -- 
-2.17.1
+2.39.2
 
 
