@@ -1,110 +1,83 @@
-Return-Path: <netdev+bounces-128539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DAA597A296
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 14:56:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006A097A2DA
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 15:21:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4905C1F22CE7
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:56:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6880BB2460F
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 13:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22851152517;
-	Mon, 16 Sep 2024 12:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xZnierOp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384E013D2BC;
+	Mon, 16 Sep 2024 13:21:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 798FA175AD
-	for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 12:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13A831862;
+	Mon, 16 Sep 2024 13:21:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726491369; cv=none; b=bfHJR9mA7864INusvl/uNHDYPmpG17GCfvmfPiSxerkJH6HJeHHbUV/kN2Z+MIFMyDnAIo0aDXAs1gJbBfG/mkrt8QyRwsbyk54PRcnlRCiEbgskiAqPf3jvlXWlzPTUUbLsRRHlw7aymRFnKp7cLAdOGrGTDqIXMnAYgHD4TRs=
+	t=1726492902; cv=none; b=q/mz4/zw1UC7+zXebBprkbOUjc9gTPJbnOuXnWZdhjBc1FeAMsLDnF5RSR0cicuQ4CozccCGN8CGkQNrVCCL/x8M51mBx3WPfEjHXoU2WG4s3PN2DKaWMeB+v0qX5jShbFt3aNhH+sznfMXhGU29AqObaFmJQDW9s4L3YU8EL5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726491369; c=relaxed/simple;
-	bh=CXR0Aw/mKNiBjS8xTS9DIL/nVCBsiQ4wWbw7avaX9ts=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JrpBoXqM38Zy4/LSEd5MHj6esAvaLvKji6TsPmbY0munSTe7YBnBx1akriqrf7At8vQHOB12YLCtmOm/KIMVNgVSStYqJTq6HS+td4BaMsr+Tckm0w4mUslggLt1MMoHJRdaw4WLZkmTgrPHEk/VZ7y0o0MoO0PX6Q1oMtGpoik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xZnierOp; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2f66423686bso39435831fa.3
-        for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 05:56:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726491366; x=1727096166; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4NSeUiUFmKGhOq9pmPVcCeEzRIWXcgNUtDDtgQEPYlw=;
-        b=xZnierOpJme5Z4RvLOz1HE/fb1W/4UvhGScH3MFzUmBAANqxF4pLxZo5wpNqyhJvXH
-         lbc9e/QLlQ6wxw4DPM2Tvt2GjYSu+eCnxi4vu9vYt98yJ5rky7jfgMLrxVHii63AOuea
-         KrPLPZq6OO401nLQMXhfse/CWX7dyQZE5uquql1jLFw2xwD4GcroTMi+tMT2ewYxL8MM
-         5jvb7GKYv1Ca6t6TE2PN4Ou4ivhnpVFU4rBdG0FU9r+7OeSw2rA6EAhxVAEhuKPe0LNe
-         Cou3WTRqwpUateGKvBo//imI9EkxPp7nlFKbXqOgDRYXpxMJV0oHzQrjoNYUACiDjiua
-         VN2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726491366; x=1727096166;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4NSeUiUFmKGhOq9pmPVcCeEzRIWXcgNUtDDtgQEPYlw=;
-        b=eujeYYqGidefjykiBDB/lfJntZRpGLNioC4QHY2DmeUFJuD3q/cAqOR9fsIuQVg04t
-         h0OtYnR6TmxYVwdo1+sp1mGpyD4o9OoVTWHPNktzaZl+WhA6RYFFSBe3CITz8FeEWP1Z
-         gt7wmTtulYr8AbZGfIQZGnu9UFPRwo+UU69fnZg7Fm2Zdy+UY9Ha5mget/5rQ4U/Ctk4
-         MKC2T6QVYM+jpY92it4sZyWfGXWqDO34+0ypMhCazd6H34/i8smRUfK3A4Dzkfkiye6T
-         q2JCmbGpd37csl/JUUBh2dyTWwg1+0Aw2dL95owJDqoPhGAu8Wg2zDUbIM3gshTMmLts
-         DzmA==
-X-Forwarded-Encrypted: i=1; AJvYcCWI19E6rkYUSwyW9s1MhzpL9vd3bfeRYALKH69hih4vqWWm7iVEYRxQ6Ap2aQXWuvmT1qdU7XU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdeuJjCDkXL1pLTznPdNaFwEdMQShSscyRTXEPDGxlHILg0cIQ
-	f+gaMvyhwWtYLsKJzaYHFhbeRBFlW6ws7Yt1+n2rDtJOWAL1C6tolqB8guCPvikeckP/BV39mX4
-	18XZRcbYoPIWb7Al67rLe8BiNB5oANqhnKFcI
-X-Google-Smtp-Source: AGHT+IHsxgmFPsbk+zKV7E1FWylQDNwbKcBeZz6WaPyXeaqjmrVS2H0Awff6LDdt6poIRtEgVlSg/QBPvJCUWUSpa2c=
-X-Received: by 2002:a2e:9017:0:b0:2f5:c13:bd11 with SMTP id
- 38308e7fff4ca-2f787dcdaf0mr58662251fa.17.1726491365306; Mon, 16 Sep 2024
- 05:56:05 -0700 (PDT)
+	s=arc-20240116; t=1726492902; c=relaxed/simple;
+	bh=vbZ9iuQoqweKwCB9WJ/H1vDBsNFI3sMZ8JPCwVsEbKQ=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H30ee94VbkA5YJqO3vQO+vuJjTvQEj2D3UccbEvzm4wQ8vdJjEsB47dmLeKWaEs0+xsntBLRhFRdKLqn1BD4upHFjPwdpj3kJsEC+Ww+WkrZTS7uoIHf+HWyqeeKtJdHI9udVoAKYk3U3I4ssTHCf1/qcKMs8qInjOagb4VDz/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4X6ltN2958z67ww1;
+	Mon, 16 Sep 2024 21:21:32 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 714851400F4;
+	Mon, 16 Sep 2024 21:21:36 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 16 Sep
+ 2024 15:21:35 +0200
+Date: Mon, 16 Sep 2024 14:21:34 +0100
+From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To: Alejandro Lucero Palau <alucerop@amd.com>
+CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>,
+	<martin.habets@xilinx.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>
+Subject: Re: [PATCH v3 06/20] cxl: add functions for resource
+ request/release by a driver
+Message-ID: <20240916142134.00002f11@Huawei.com>
+In-Reply-To: <9c01c578-ea9d-bca6-2544-addd0225b003@amd.com>
+References: <20240907081836.5801-1-alejandro.lucero-palau@amd.com>
+	<20240907081836.5801-7-alejandro.lucero-palau@amd.com>
+	<20240913183520.000002be@Huawei.com>
+	<9c01c578-ea9d-bca6-2544-addd0225b003@amd.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000000ad94305f116ba53@google.com> <Y7A8r4Yo07BnDxYv@debian.me>
-In-Reply-To: <Y7A8r4Yo07BnDxYv@debian.me>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Mon, 16 Sep 2024 14:55:53 +0200
-Message-ID: <CACT4Y+YN8Hfj4SyaDQoWs8DNU9xGt=LawPdBCJhxZ8qkB17rHw@mail.gmail.com>
-Subject: Re: [syzbot] net build error (6)
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: syzbot <syzbot+4ca3ba1e3ae6ff5ae0f8@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Sat, 31 Dec 2022 at 14:44, Bagas Sanjaya <bagasdotme@gmail.com> wrote:
->
-> On Fri, Dec 30, 2022 at 06:46:36PM -0800, syzbot wrote:
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    d3805695fe1e net: ethernet: marvell: octeontx2: Fix uninit..
-> > git tree:       net
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=14f43b54480000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=8ca07260bb631fb4
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=4ca3ba1e3ae6ff5ae0f8
-> > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+4ca3ba1e3ae6ff5ae0f8@syzkaller.appspotmail.com
-> >
-> > failed to run ["make" "-j" "64" "ARCH=x86_64" "bzImage"]: exit status 2
-> >
->
-> I think the actual build warnings/errors should be listed here instead
-> of only dumping exit status and then having to click the log output.
 
-Agree. I've filed https://github.com/google/syzkaller/issues/5317 for this.
-Thanks for bringing this up.
+> 
+> >> +	default:
+> >> +		dev_err(cxlds->dev, "unknown resource type (%u)\n", type);  
+> > No unknown. We know exactly what it is (DPA) but we don't have it.
+> > Unexpected maybe?  
+> 
+> 
+> Is this not the same case that you brought in previously? Should I keep 
+> the default?
+
+Just change the message to "unsupported resource type..."
+
 
