@@ -1,191 +1,297 @@
-Return-Path: <netdev+bounces-128547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC4DF97A46A
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 16:47:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 399B097A41A
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 16:27:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61C5F281E2B
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 14:47:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1C77282E20
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 14:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC2A15854D;
-	Mon, 16 Sep 2024 14:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DF9155316;
+	Mon, 16 Sep 2024 14:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="mTewCl10"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="MJ9Ox2JH"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2076.outbound.protection.outlook.com [40.107.244.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9732717571;
-	Mon, 16 Sep 2024 14:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726498063; cv=none; b=gUJ4kbLOl9rmry0pIMMW4NspoWL+BLEpUkQaXZz0KpE5uPYpYzREA9wMYHPB8LP0LqJxTH+uYDVGv0pYS2YgYBxyvTKBLBatFTK4NVd9JD/n9g163itn1+IFmDZjliNIx0LIiVCh8q+QGBNBrBl5E15M94uFIg/PDQ0MPQkfUAQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726498063; c=relaxed/simple;
-	bh=DdXPtKASiB/Z1oqLYOog7mKuDd06mrWJKbbPksmbAxY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GyN6J1EBgf6AXr+u5diK6ert/srweTb1QUEIb9hvDnhUxXfMPDM0FKZYS0FpWnigRqsfkgeEvzySg5J6C1qGVZDRtu8qVX6yCRmI+3lFJR3g3xFqCMWKq/XflkZRSy2yuudUu1uCmi3nxkExGVNWpb1z1xQ7hGHTrlem/wP7cL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=mTewCl10; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 036BBA0F58;
-	Mon, 16 Sep 2024 16:37:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=mail; bh=EHqROyUJoru7508xp0hT
-	cD02iqc88j/P5NaR7xrfbYI=; b=mTewCl10SV4kGSP++0kvsSOkuLROL1INHS8M
-	ZrGDX6Bnnc5RIlLVz67zGAPCIa4V5CmkYpWz/N+m1KqxgqS5XwbR0w5X6CmGcRMp
-	VR1KNIRHxP0Q4LuncE4L4Exn+09KZzdT6s3LCcUDdbw2lMcFTqhgPUqHZqEeUTQs
-	ZOQMdEBXTh/caeq5P1D4pXFJChN2k1y16qJnN/KJ+siveeCcqjkM7iQINSBUWpWd
-	WWXiLbDF+8/HFETjLZ+qrOkv82uOwYfTbdGQafy3VLZFli5Yz8rrvzNmyISQkddC
-	Q+Xmh9ZymkQXXwZsTBOX1prpwtlr2N9gliWnE8PqU0iL2B6n/3ALbg99vziJ2CP+
-	U+4phsqAoZKTAxwqhn+deabwUG4RZElinL+hzwShMzuEckveoDEnq7SlY2JG5FNE
-	9gVbP9mV8MO2UXyYFaoUJQVBeHQjlfcRWDtEdNesZeK6norYSmLd3VZDSbfOW5Af
-	WdFfow28FPeEHJ83QeMNq/K8y8P9MQ6YszdWinmM1kD8I9xgNiJ3EklPyNipXnHZ
-	DMvZIacXRLESFGBCSYc8tS9D52B/9YGmOx21XfB+brdx4pI8roAfkIPCN/kRLyAl
-	82egyibGqZvFoQ4GlEHHxfb38eDodFAHx+sVF54aIRHxePJ4yEvNpwAynnI/dFWD
-	TzJA4Z0=
-From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
-To: <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, Wei Fang
-	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
-Subject: [PATCH 2/2] net: fec: Reload PTP registers after link-state change
-Date: Mon, 16 Sep 2024 16:19:31 +0200
-Message-ID: <20240916141931.742734-2-csokas.bence@prolan.hu>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240916141931.742734-1-csokas.bence@prolan.hu>
-References: <20240916141931.742734-1-csokas.bence@prolan.hu>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9564C156256;
+	Mon, 16 Sep 2024 14:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.76
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726496836; cv=fail; b=Zv/ab5Tb3fvavpBPMoNVVB459ni6BkAPMqLAh33xYmKgWDVbyCzBnAuVmTqiIlkmyy2CfZFH+WTFJqWOGISB/OzUboDUdguk8VNjiK8km0IqBaOU7R5obsYWruze4QKLYdYo8k+eb7VF3bh6LAZ04bVa/26SBNCFMjVlV8mb8tQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726496836; c=relaxed/simple;
+	bh=5J99kZ0x4xlClFnQtX3Aszv2Xqcywuy6xfVjz+0BNFg=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=I21OAcCVw4a4a+pTyF8tyG+MugAXwa6jglf7E1sg2P4LMOQbgMKg0clW1QAwJiHDgyFdAgTwmuu/Fgr/TBh1/BNOSMMZXtzJS62TLZRD7WHFQqzyJ2WBo6u0qQAfcS70RhI9brzu3457fzjAjXbhJGL4TS8GdFaDWldsarlwQus=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=MJ9Ox2JH; arc=fail smtp.client-ip=40.107.244.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=J2gFgZj7mjC0Z535ZksiUtwDSRwhp7/uAmwGJMNKuSAlfMM2OvHHKf/bJZAVD9BwGRWN0YugyVasZRfBPoZhM1QICG55CfHK1WqMxOIojg5ZJeWnA6CxX8PVA2FS5e4Nk3i4l+Hm1xpgXNgxIM9211bS3V5qaq33B9oSdMMxMwJFzHZbYKH6Wa7bRVq0EPvgxcFu5mgTP96vSMxXzzDlOafqkoFRN7N22AChuoJgTOs5O0JUfDKag3tkcMGCvRfPth7/HeH6z4nE48Dz+QXqg0abvGurS/UQswzfoe5U4bigLDwdW+ukTqV4ARXEr3PcwuKDv7BtO2k/neNLYh6c4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=I+PnW7zkj5mzBk9eOssyJM1O34DR67xKXQ8Su9zb+Pw=;
+ b=SyKV/wRe6LxfIludn5+dUdpiG9iqFV/xmc7tdoDerDGa24IwbqBEG3ZHdCM82ji7zYbzUwQIIZ3GGbo8FlqxmCqeOEGtIT9stsbh22ld0UUKjUwqxM1MnUje2vcjVMK71/oymvdfN42tLvWjvsA7DSE7/STAPm/bTzB3P6khVNrqs0ApVtLeUGRXQ6aDKX7R9r654hGXG4lvCZNEDNrTGs3z6ECieyu78QBR8gOUmnqF2BBoosHPr0JVXD6qSl25Z7E28/U9LiAN3ScB1VOb1U5kPCMMbvlpTMRvyXXwH7UeSPTQ7IlWH/2kk3/Ez8zQPQ2hdvsiplT8B8cdKQVf3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I+PnW7zkj5mzBk9eOssyJM1O34DR67xKXQ8Su9zb+Pw=;
+ b=MJ9Ox2JHjmP9M3gts/xlJCR3AT56DBc38m8iiksutEQCgjApO3TSJkdTkXzUrD9FZNGiXSByZyTFPREk6d8F4TnoBeJrhHW4Cp0BFhpgBOcd9tbcYncOxvypq/t8idLpmJKu3vtWvTL/KAubDRsE2Rci7ze6y///gJooNBGrkcw=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by CYYPR12MB8964.namprd12.prod.outlook.com (2603:10b6:930:bc::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.24; Mon, 16 Sep
+ 2024 14:27:12 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7962.022; Mon, 16 Sep 2024
+ 14:27:12 +0000
+Message-ID: <76860e75-d0b4-d47f-9051-43ba84d43bf1@amd.com>
+Date: Mon, 16 Sep 2024 15:26:07 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v3 13/20] cxl: define a driver interface for DPA
+ allocation
+Content-Language: en-US
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+References: <20240907081836.5801-1-alejandro.lucero-palau@amd.com>
+ <20240907081836.5801-14-alejandro.lucero-palau@amd.com>
+ <20240913185906.000008a2@Huawei.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20240913185906.000008a2@Huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DB9PR01CA0025.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:1d8::30) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1726497466;VERSION=7976;MC=1468624255;ID=72336;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29ACD948546D7162
-
-On link-state change, the controller gets reset,
-which clears all PTP registers, including PHC time,
-calibrated clock correction values etc. For correct
-IEEE 1588 operation we need to restore these after
-the reset.
-
-Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
----
- drivers/net/ethernet/freescale/fec.h      |  7 +++++
- drivers/net/ethernet/freescale/fec_main.c |  4 +++
- drivers/net/ethernet/freescale/fec_ptp.c  | 35 +++++++++++++++++++++++
- 3 files changed, 46 insertions(+)
-
-diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
-index afa0bfb974e6..efe770fe337d 100644
---- a/drivers/net/ethernet/freescale/fec.h
-+++ b/drivers/net/ethernet/freescale/fec.h
-@@ -691,11 +691,18 @@ struct fec_enet_private {
- 	/* XDP BPF Program */
- 	struct bpf_prog *xdp_prog;
- 
-+	struct {
-+		u64 ns_sys, ns_phc;
-+		u32 at_corr;
-+		u8 at_inc_corr;
-+	} ptp_saved_state;
-+
- 	u64 ethtool_stats[];
- };
- 
- void fec_ptp_init(struct platform_device *pdev, int irq_idx);
- void fec_ptp_restore_state(struct fec_enet_private *fep);
-+void fec_ptp_save_state(struct fec_enet_private *fep);
- void fec_ptp_stop(struct platform_device *pdev);
- void fec_ptp_start_cyclecounter(struct net_device *ndev);
- int fec_ptp_set(struct net_device *ndev, struct kernel_hwtstamp_config *config,
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 531b51091e7d..570f8a14d975 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -1077,6 +1077,8 @@ fec_restart(struct net_device *ndev)
- 	u32 rcntl = OPT_FRAME_SIZE | 0x04;
- 	u32 ecntl = FEC_ECR_ETHEREN;
- 
-+	fec_ptp_save_state(fep);
-+
- 	/* Whack a reset.  We should wait for this.
- 	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
- 	 * instead of reset MAC itself.
-@@ -1338,6 +1340,8 @@ fec_stop(struct net_device *ndev)
- 			netdev_err(ndev, "Graceful transmit stop did not complete!\n");
- 	}
- 
-+	fec_ptp_save_state(fep);
-+
- 	/* Whack a reset.  We should wait for this.
- 	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
- 	 * instead of reset MAC itself.
-diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
-index c5b89352373a..8011a6f3c4be 100644
---- a/drivers/net/ethernet/freescale/fec_ptp.c
-+++ b/drivers/net/ethernet/freescale/fec_ptp.c
-@@ -770,9 +770,44 @@ void fec_ptp_init(struct platform_device *pdev, int irq_idx)
- 	schedule_delayed_work(&fep->time_keep, HZ);
- }
- 
-+void fec_ptp_save_state(struct fec_enet_private *fep)
-+{
-+	unsigned long flags;
-+	u32 atime_inc_corr;
-+
-+	spin_lock_irqsave(&fep->tmreg_lock, flags);
-+
-+	fep->ptp_saved_state.ns_phc = timecounter_read(&fep->tc);
-+	fep->ptp_saved_state.ns_sys = ktime_get_ns();
-+
-+	fep->ptp_saved_state.at_corr = readl(fep->hwp + FEC_ATIME_CORR);
-+	atime_inc_corr = readl(fep->hwp + FEC_ATIME_INC) & FEC_T_INC_CORR_MASK;
-+	fep->ptp_saved_state.at_inc_corr = (u8)(atime_inc_corr >> FEC_T_INC_CORR_OFFSET);
-+
-+	spin_unlock_irqrestore(&fep->tmreg_lock, flags);
-+}
-+
- /* Restore PTP functionality after a reset */
- void fec_ptp_restore_state(struct fec_enet_private *fep)
- {
-+	u32 atime_inc = readl(fep->hwp + FEC_ATIME_INC) & FEC_T_INC_MASK;
-+	unsigned long flags;
-+	u32 counter;
-+	u64 ns;
-+
-+	spin_lock_irqsave(&fep->tmreg_lock, flags);
-+
-+	writel(fep->ptp_saved_state.at_corr, fep->hwp + FEC_ATIME_CORR);
-+	atime_inc |= ((u32)fep->ptp_saved_state.at_inc_corr) << FEC_T_INC_CORR_OFFSET;
-+	writel(atime_inc, fep->hwp + FEC_ATIME_INC);
-+
-+	ns = ktime_get_ns() - fep->ptp_saved_state.ns_sys + fep->ptp_saved_state.ns_phc;
-+	counter = ns & fep->cc.mask;
-+	writel(counter, fep->hwp + FEC_ATIME);
-+	timecounter_init(&fep->tc, &fep->cc, ns);
-+
-+	spin_unlock_irqrestore(&fep->tmreg_lock, flags);
-+
- 	/* Restart PPS if needed */
- 	if (fep->pps_enable) {
- 		/* Reset turned it off, so adjust our status flag */
--- 
-2.34.1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|CYYPR12MB8964:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61606f3a-2a76-4da6-a220-08dcd65ba74e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OXk2ZGwvbzA4RkM2TGZJaUFPbnk2WFoxdFovTmRvRmt4SCtiaUNCUHROUnBG?=
+ =?utf-8?B?cUVFOWgzM1lEUWJQM3hpbHU1bmY5L3pOL0lNTlRIbUx2Q1dxT21DYlJxMFhS?=
+ =?utf-8?B?UVZlV3pib2tScVdmWjVaeFRtaGVMK1hKYkhjQ0lMSnlreEtwVlR5dWFrV1JJ?=
+ =?utf-8?B?MHNNS094OXVPVWdaQlFxazNpZXhobElmYVg0cGlzcUdZMkVUOWdVYTBSOEFl?=
+ =?utf-8?B?TmtYUFRSRytPME4wSWhCZFluUnlUc2ZYb2gydWllbXdWTmdEUTdIeUJpeVBX?=
+ =?utf-8?B?d0dXM0drQThtcFBOUDlNbGhQVXVDU0l0YnVmaXZKKzc3NC9LMDIyY2w3NzEz?=
+ =?utf-8?B?ekk0VW1hbXpVcStBYmNsTzhPYWVMeGJ6RlVYVmNKajBqbCtBYm1leDNVOFkr?=
+ =?utf-8?B?SXV1a0FKZU9ocTNOT3YzamFuakZvc3NmWFNEbVZGVkM2MUwxUWxpM2FuUFNt?=
+ =?utf-8?B?Ym9UYWF2VGlXcVdHeWdxd1NPUVkyREVzd2l6TUxvdGMzMDBVMG4zWmoyR21t?=
+ =?utf-8?B?eDNSQ1ZPMlpqc3NPSFlNZzcvYkxUT0NoSUhOWjZjZFpmMFhoMEhGdFJaUnNY?=
+ =?utf-8?B?czVHdWZKMXNxQzZ0QnI4bEcwWmduNEREZ1pjUE1TOXFvbTgzTTFRMjB4dk9U?=
+ =?utf-8?B?UllWcDNLb2l3MmtxTjdSVUhPa09xMVJiYlFET2NrQ21EY2pVMWtyNEVrZ0x4?=
+ =?utf-8?B?SlFadUF3aFVwSFUwSEp2TTN5ZXF5NEtuS3h3ZjI3bGo5cHZnbHpta2FkbnFj?=
+ =?utf-8?B?Sm1yNTFNcFNIWGQ1emduUGgxUzM2UjBEK2lVRkIwOW82UHFUU2lueUZ5WFY5?=
+ =?utf-8?B?QzhYMUZGUVJ3Q2NsTDBSbzVQaFlFc3pDK0RRUGJSZ1dzMmlmY29yakFnRUMx?=
+ =?utf-8?B?M3QvVmtUc0dvcjhXSWdqenJHQUpvRlJKRGJ4OTFuY2F4cVl6RlpOSitqNC9F?=
+ =?utf-8?B?QU4wZTFWUjJHWXhhd3hvem1xbTRUMVpLeTlCNUtERzJyUElCVVYxSm1iVmdH?=
+ =?utf-8?B?RUMveVdRM0NVdWpaWEJUVHhoZGhjMmR2NzdsTTBWU3RJTGpzWFhQb2RKZ3Np?=
+ =?utf-8?B?WHJXQmpTNFpzRE9nNDl0VVNyeEdIeXpUMW9BeUM5S3NpY2g5c3lhZE5CcVJn?=
+ =?utf-8?B?VFdrMk1IQWhac3VFT3FaSys0S0NBVFVGelhVUjZZak5SeEZiOGZhSzhRaEg4?=
+ =?utf-8?B?bkpNKzdWN1VtUm50WCtuRzVIMHBCeWNjaDMyemE2Rm9HYURlZHpDWFBXYkcv?=
+ =?utf-8?B?YUxJNlNsQS8rUzJWMllkV3V2Q3dteExsbTNBUzI2eDR0K25vb0lKRGRNeTU4?=
+ =?utf-8?B?NW0vMnRqY0FHNklwTndYN211cFpoRGF6c1pZK2RHTkdMYmZzMmQxVHFEZHNB?=
+ =?utf-8?B?YU5WcVpGOWY0QjFONTJTSTRzOGlrNmZtdndPNTkrczRVajB2Q2E2OU1YNWox?=
+ =?utf-8?B?UFhSeDVZZElmc2dHcGRybVpWSmwxQkJhRXJPUVdIc2FoRlZLMEhLRnlCcWlt?=
+ =?utf-8?B?Ui9rUEdEejgzck9ueTc0bnluWjZUekJEWFZhQ01BNWZiMDlkY0pqWmw0MDgy?=
+ =?utf-8?B?ZS9hMnVmQjhGSW9LamlPYUVDMTRwd25ZNEdCYUMrdndlL1ZlTjV2YVFtQW8y?=
+ =?utf-8?B?TzJ5YUhNTjRGOHYrc0ZsbWVrWGQ1YzBtcm8vQ0J5cWZJMGJvZ29HMlhLbEEr?=
+ =?utf-8?B?VkVXYWkyNjhmaE81eVBieWlLOVVTSWhwRngxeFRXc0poUS9DQ1cyTGN0TUJm?=
+ =?utf-8?B?b0cxR1VTczRzSXU0NjNOWkJJYzh1Rm04UDEvUWxFVTdwZzZjSVY4M2Ryakwx?=
+ =?utf-8?Q?S6eebGvXRe0QA8FYxgWZgdid5xfE7+eDi/PCQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VUlTUHNJU1ZBNGJGdCtGMUJQL0RBdzJzVTNDaGxhSEJNRUdkeFV3b3dlSzJl?=
+ =?utf-8?B?MUh0M2dNazVZMWpCZXF4dVhkNVYyMHNLSUEwdlI5SnRVci80Mm54S21EVkZ1?=
+ =?utf-8?B?Q2tEdnF1cFc2SjErSGs3T0xSUzhGVGdYUWJ2bVRzd0EvK3paWDBxU0ZkOHpr?=
+ =?utf-8?B?SmNJeTNQT1BkcHdaVyt1KzBzbWR5TEpzWDlQalJSZFB3QjNmMnNGbUhUdEp0?=
+ =?utf-8?B?eTRkcTUzdGQ0OThhQjcxNEt4NnJRWjhhNFJBQjYzRVE0SnY2UjB1Rk1QQVRs?=
+ =?utf-8?B?bEtxSHlKNGdpb084RGFXVVJDR2czRC9WZWtZZWZ3TU1TdldNTDdmSnVWVmtU?=
+ =?utf-8?B?YnZDc294Z1c0S0xseGlkSVk5UkVvQ2NZcmlYWFVMNjdXMTFGNUZaK2Njenpv?=
+ =?utf-8?B?NjMwMC9na3pyYjI0cmpwdFFVQjZ6b29xclRSb29kVDltdXlzMWRZcFRsUlU4?=
+ =?utf-8?B?bktld2FtK0k0cXBha1hwbDcvRUNjSU5BTFcwU1phSnhUQzZGNTlZTml5N0RG?=
+ =?utf-8?B?RW0yN3lMWmplWjJETTlhZFpFWHZBbW0zaWdiZ1pFZHB1djlWNTdIOUFvdGl3?=
+ =?utf-8?B?WVJ5TXdnRG5ka1ZPR0YvT3ZJVWIrY0RHWGdLVmZVYUxGMGNRcHlxWGlHYnl6?=
+ =?utf-8?B?bC9zekNzSG5QWVBMYTdYUGYrQ1NoQk1lODFWWXhNWkhxc0VzVXJBZUd2UE1z?=
+ =?utf-8?B?bVJheWd6SlkvVFZPUHFLeVJYWnM5MlBGRDhiMzhKRE5xOGtZamJ4VndyT2sz?=
+ =?utf-8?B?YjZuWmFJMng5aG10YlNMTTVuam5mTTRaNFhFcnN3TGhEZXllZFpsMWpmRUZN?=
+ =?utf-8?B?UDNidkx1NXl1VEdWNXFUTG9iNXJLQmVvNnZEMzl6UXRJS0VyRTFEdkFCQi8y?=
+ =?utf-8?B?azFjd2JhRzZFam94R1JkWGMxQzZEZ1BwSGRTZGk2NytUT2x3b2lxazY2UU5H?=
+ =?utf-8?B?Z2NBVW90SnViZEwvMXdHR1pEK1BCSDhIOWJ6TnFpdk9qdHBUdGxWVnR2YTF0?=
+ =?utf-8?B?VVZWaG14eHpBUTdxMlFkTEYzaDhiK3lCRGJOUSticnNTeUwweFNaZGhCRU9k?=
+ =?utf-8?B?MW4rYUJDTmxNcFZyUTVNKzdhQ003VlEyRHlpbnlPcEFpVGdrTCsvQWUyaStQ?=
+ =?utf-8?B?WEVxcmJwZ2JDUHBRdEFxZ0dqYm1mR2crR05BSW1tTFlXTjBOdHZ6NkVFSC9z?=
+ =?utf-8?B?bVVvSEtKNHNKNW41WHU3eU1NalBKZUtqS1VjNGhpU0txSUNxTytOaUp5MmNr?=
+ =?utf-8?B?SDgvQWJLRGI1MjMyR2dHSUVsWU0zZlQ3dGc4N1ZWMm04L3ExNnhpdFhtUUVj?=
+ =?utf-8?B?akJMdncwU3ZlVm5VUUU5R0dlU3Fqa0pMSFlNRjRQeFpMY1hTaTdFbXJzRzdX?=
+ =?utf-8?B?dmFUbG1lVVowR2ZWZXhJbjliTlpjWUttcHpQNDJDMExuelR2aDFhZUdiSi9M?=
+ =?utf-8?B?dFc0RVFlRnR0NkZadzl4d244VlNxMlBiUWlvT29HWWVVdmpNNFk3SlRySWRI?=
+ =?utf-8?B?UzFzaHZWQk1Id2ZlNCt2bHNNUHg1NXAyZlo2d3JLbi9VczZQZjM4NGRxSW1m?=
+ =?utf-8?B?VzBoN0YvUGNWK0Vpcnk0dUl5YlhOVTJ2Q0lDL0E5ZWFwUGJpRFNGVk9NSVFr?=
+ =?utf-8?B?NzU4UERrQlc4ejhUcmhMcGloWVBXV3hoZUxWSmlwTDUvZUNQZjBuMUxaMmNz?=
+ =?utf-8?B?T244UTFwblpDZVNPMThCaURaZmlvUGRJVVl3SUZyOWVWa1ZqUTFsaGwva1dw?=
+ =?utf-8?B?V2t5NWozZDBGZG1BYXJPYUlCNEkvYUduN1ZxcDlGeHZBekhnaGpWNmRmWi9C?=
+ =?utf-8?B?Y29HWW5WcWY2eTNaMmo4ei9nSXUyL2lvTTNWU2J5VnlGRUJGOWlGaGJUdGE3?=
+ =?utf-8?B?eEx2QjRqd0hLTEZ0TUxmZmJaRE85OTJsR3U1cjNNb2VrMmlWajBYN2JUd0hB?=
+ =?utf-8?B?c3YyTkxmNGJ3WW5QdFdvYkpHdkE0SkVIalVIekQyWmg2a3AvOXh3cktMUTR2?=
+ =?utf-8?B?K1NwODFQQmZZM2Y5TkI5M1ExSTBDWndTUW9CeFhjeVBJWmFLaHhWSUlMUCtX?=
+ =?utf-8?B?bHRWbFJIb0pIbHoxc2xvbUczajRmaVNQajlBNmV1Q2V4L0hNcjJETUNnaXdU?=
+ =?utf-8?Q?ZRHI4zOPGhpzYAuOoAj0Qlmj2?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61606f3a-2a76-4da6-a220-08dcd65ba74e
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2024 14:27:11.9419
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ho/2SVsOqnzWuKW6VsPY8SnAt0xlRCzesUlOos0A7i4hVasrD5QbEyX8BDdOdciRyTNU2IyuNdjL8L4UmNoi2g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8964
 
 
+On 9/13/24 18:59, Jonathan Cameron wrote:
+> On Sat, 7 Sep 2024 09:18:29 +0100
+> alejandro.lucero-palau@amd.com wrote:
+>
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Region creation involves finding available DPA (device-physical-address)
+>> capacity to map into HPA (host-physical-address) space. Given the HPA
+>> capacity constraint, define an API, cxl_request_dpa(), that has the
+>> flexibility to  map the minimum amount of memory the driver needs to
+>> operate vs the total possible that can be mapped given HPA availability.
+>>
+>> Factor out the core of cxl_dpa_alloc, that does free space scanning,
+>> into a cxl_dpa_freespace() helper, and use that to balance the capacity
+>> available to map vs the @min and @max arguments to cxl_request_dpa.
+>>
+>> Based on https://lore.kernel.org/linux-cxl/168592158743.1948938.7622563891193802610.stgit@dwillia2-xfh.jf.intel.com/
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
+> Trivial comment below.
+>
+>
+>> +
+>> +/**
+>> + * cxl_request_dpa - search and reserve DPA given input constraints
+>> + * @endpoint: an endpoint port with available decoders
+>> + * @is_ram: DPA operation mode (ram vs pmem)
+>> + * @min: the minimum amount of capacity the call needs
+>> + * @max: extra capacity to allocate after min is satisfied
+>> + *
+>> + * Given that a region needs to allocate from limited HPA capacity it
+>> + * may be the case that a device has more mappable DPA capacity than
+>> + * available HPA. So, the expectation is that @min is a driver known
+>> + * value for how much capacity is needed, and @max is based the limit of
+>> + * how much HPA space is available for a new region.
+>> + *
+>> + * Returns a pinned cxl_decoder with at least @min bytes of capacity
+>> + * reserved, or an error pointer. The caller is also expected to own the
+>> + * lifetime of the memdev registration associated with the endpoint to
+>> + * pin the decoder registered as well.
+>> + */
+>> +struct cxl_endpoint_decoder *cxl_request_dpa(struct cxl_port *endpoint,
+>> +					     bool is_ram,
+>> +					     resource_size_t min,
+>> +					     resource_size_t max)
+>> +{
+>> +	struct cxl_endpoint_decoder *cxled;
+>> +	enum cxl_decoder_mode mode;
+>> +	struct device *cxled_dev;
+>> +	resource_size_t alloc;
+>> +	int rc;
+>> +
+>> +	if (!IS_ALIGNED(min | max, SZ_256M))
+>> +		return ERR_PTR(-EINVAL);
+>> +
+>> +	down_read(&cxl_dpa_rwsem);
+>> +
+>> +	cxled_dev = device_find_child(&endpoint->dev, NULL, find_free_decoder);
+>> +	if (!cxled_dev)
+>> +		cxled = ERR_PTR(-ENXIO);
+>> +	else
+>> +		cxled = to_cxl_endpoint_decoder(cxled_dev);
+> Does this need to be under the rwsem?  If not cleaner to just
+> check cxled_dev outside the lock and return the error directly.
+
+
+We got a get_device inside device_find_child, so it should be safe to 
+use to_cxl_endpoint_decoder without the sem.
+
+I'll follow your suggestion.
+
+
+> Also, in theory this could return NULL - in practice not but
+> checking it for IS_ERR() is perhaps going to lead to a bug
+> in the distant future.
+>
+
+Right. I'll fix it.
+
+Thanks
+
+
+>> +
+>> +	up_read(&cxl_dpa_rwsem);
+>> +
+>> +	if (IS_ERR(cxled))
+>> +		return cxled;
+>> +
+>> +	if (is_ram)
+>> +		mode = CXL_DECODER_RAM;
+>> +	else
+>> +		mode = CXL_DECODER_PMEM;
+>> +
+>> +	rc = cxl_dpa_set_mode(cxled, mode);
+>> +	if (rc)
+>> +		goto err;
+>> +
+>> +	down_read(&cxl_dpa_rwsem);
+>> +	alloc = cxl_dpa_freespace(cxled, NULL, NULL);
+>> +	up_read(&cxl_dpa_rwsem);
+>> +
+>> +	if (max)
+>> +		alloc = min(max, alloc);
+>> +	if (alloc < min) {
+>> +		rc = -ENOMEM;
+>> +		goto err;
+>> +	}
+>> +
+>> +	rc = cxl_dpa_alloc(cxled, alloc);
+>> +	if (rc)
+>> +		goto err;
+>> +
+>> +	return cxled;
+>> +err:
+>> +	put_device(cxled_dev);
+>> +	return ERR_PTR(rc);
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_request_dpa, CXL);
 
