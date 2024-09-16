@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-128524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B1897A219
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 14:23:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82A2C97A221
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 14:23:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D4ACB24279
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:23:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B070B24716
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:23:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E456E154BF5;
-	Mon, 16 Sep 2024 12:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B6B156222;
+	Mon, 16 Sep 2024 12:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b="bnS+h/EV"
+	dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b="opagS1JT"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx1.buffet.re (mx1.buffet.re [51.83.41.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F088E154423;
-	Mon, 16 Sep 2024 12:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 242EA155751;
+	Mon, 16 Sep 2024 12:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.83.41.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726489388; cv=none; b=JSQ4YQ2+1cVXYMaGOZv4oQf2ambndT+E+tfsbXnHy9LMANJJ95FDOuGnxGHewL/h5Ux8Bh+n3pw80WPDN66mOLqARTx/pWHjaP5HB7keflKINShLaZOT3IoNkjsniz+bGbYzSVpCfhH2S/HSgP6Rt8QtbKBE9OccMp95/xSAihU=
+	t=1726489409; cv=none; b=fg/LfY+V9s/LhNCLkZ2NSih0XQLV73a35PjBG3g81eSBJoLVD2fYcO6GDK1j1HCCJNgEqO6WN6TpLyg4q9XDtaBc+xywLOi39EShZ7BsWn35aMeBWmA3vkt0unLiMWsONvJF0LjhjB8j6SRFBJ8/R1CV5bwNdBfgkMB2y+tEK+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726489388; c=relaxed/simple;
-	bh=XhhH5JTAOwmpDbnqPFnomF2y96t11dWpqCZt2RjGRaU=;
+	s=arc-20240116; t=1726489409; c=relaxed/simple;
+	bh=CjTRx2HNWouo/bwM47cNCn6ksq2RYj1shLQSdSTGFC8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FL3wuAlW/uvX1EpVma1+RfI/ViuM5pKQlLJ6iBD7FZJP9Og6ug/W0pwIcCmsdqRNXcXRQ8B1U8Yf0NN4uaBMcinfpHhhWuK68MCsJRyjCCPiva4V/fdHp4K2KS6pHFwDZFCtpBRFMpTuLtCd5RNhB1OR1fEavwTxQCwU3aKa9oM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=bnS+h/EV; arc=none smtp.client-ip=51.83.41.69
+	 MIME-Version; b=PaY9FHEkHxwwYLJ8CLGugyuuEXcB39j2EtGWSA4VjcWY8qvnszQsQ4ioj7JbMfdkLyMQPz8nQInkQ8DB44P7kiLuxAW4WaKLTiQXjh9/lKenVbdceP/rtWmxD/0N8nsMYTmwo5fF4EAVOBE2iS99IaLngkDpk4tX8uRZNNz4Ou0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re; spf=pass smtp.mailfrom=buffet.re; dkim=pass (2048-bit key) header.d=buffet.re header.i=@buffet.re header.b=opagS1JT; arc=none smtp.client-ip=51.83.41.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=buffet.re
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=buffet.re
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=buffet.re; s=mx1;
-	t=1726489376; bh=XhhH5JTAOwmpDbnqPFnomF2y96t11dWpqCZt2RjGRaU=;
+	t=1726489399; bh=CjTRx2HNWouo/bwM47cNCn6ksq2RYj1shLQSdSTGFC8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bnS+h/EVDMCY4SceoEKBElQ2pd5WEklfXLLUkZtvXtsfLrsCJpLll3VbRw3nr+yTC
-	 4rNRfBOS7XD1stL8B10bk4iGnWp89p0WYmAetEFZyEtlIOXp/PXUgloYhlky7A7bTD
-	 I7xXMfwFIS60xoN6Hz0fx1HCSujwM6R+VQkIPXhwmiltJJeB4V4prmvMdBqPDwcpGu
-	 VemSFlDVH2XRp2lAEbfYyl+lZBGUDzVpz2SZVZpIybuaNkDcDkX38w0QRspqqAEV8Y
-	 f5t9GXZAMmk47QoiRllWvKKFtHlpvWOHxYr5J8+LHiTR5ZHF7A3dWtlMUEObKQhWHH
-	 LLuwCeQEf0hJw==
+	b=opagS1JTwYBaTM71XSxbhmdpgUXdHxTMAMTBCEcjUtWpm6/7r1aasjg9znB1YSYZO
+	 W92w1wiVXrhwCNLYdZf5OwevjTKAHj69bZqThv4iY7qY9oLuS7LacnWcJEo5vn0qkU
+	 KmrAHWRDtJ3xNvZyhPjcG1dB/wHye5zB9fanLttkhWB3jDLgNB32XSm+vZ74tNHVhc
+	 t2pyaNO2E4I+ByUMXiz4jb7AqXWGkoO8YQVg7USZJiadB0zMYgU2z2ptAV0xOuDXzB
+	 qt/2/cjzuw95qib1q0tRqnQ5qE2QAuC/r/2jThQNLBWgxfG/LuRlYj8rooQGEtMjKM
+	 wa5n3FEAQdHyQ==
 Received: from localhost.localdomain (unknown [10.0.1.3])
-	by mx1.buffet.re (Postfix) with ESMTPA id 24B6A1230C2;
-	Mon, 16 Sep 2024 14:22:56 +0200 (CEST)
+	by mx1.buffet.re (Postfix) with ESMTPA id 57FC91230C2;
+	Mon, 16 Sep 2024 14:23:19 +0200 (CEST)
 From: Matthieu Buffet <matthieu@buffet.re>
 To: =?UTF-8?q?Micka=C3=ABl=20Sala=C3=BCn?= <mic@digikod.net>
 Cc: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
@@ -53,9 +53,9 @@ Cc: =?UTF-8?q?G=C3=BCnther=20Noack?= <gnoack@google.com>,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Matthieu Buffet <matthieu@buffet.re>
-Subject: [RFC PATCH v1 1/7] samples/landlock: Fix port parsing in sandboxer
-Date: Mon, 16 Sep 2024 14:22:24 +0200
-Message-Id: <20240916122230.114800-2-matthieu@buffet.re>
+Subject: [RFC PATCH v1 2/7] samples/landlock: Clarify option parsing behaviour
+Date: Mon, 16 Sep 2024 14:22:25 +0200
+Message-Id: <20240916122230.114800-3-matthieu@buffet.re>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240916122230.114800-1-matthieu@buffet.re>
 References: <20240916122230.114800-1-matthieu@buffet.re>
@@ -67,63 +67,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Unlike LL_FS_RO and LL_FS_RW, LL_TCP_* are currently optional: either
-don't specify them and these access rights won't be in handled_accesses,
-or specify them and only the values passed are allowed.
-
-If you want to specify that no port can be bind()ed, you would think
-(looking at the code quickly) that setting LL_TCP_BIND="" would do it.
-Due to a quirk in the parsing logic and the use of atoi() returning 0 with
-no error checking for empty strings, you end up allowing bind(0) (which
-means bind to any ephemeral port) without realising it. The same occurred
-when leaving a trailing/leading colon (e.g. "80:").
-
-To reproduce:
-export LL_FS_RO="/" LL_FS_RW="" LL_TCP_BIND=""
-
----8<----- Before this patch:
-./sandboxer strace -e bind nc -n -vvv -l -p 0
-Executing the sandboxed command...
-bind(3, {sa_family=AF_INET, sin_port=htons(0),
-     sin_addr=inet_addr("0.0.0.0")}, 16) = 0
-Listening on 0.0.0.0 37629
-
----8<----- Expected:
-./sandboxer strace -e bind nc -n -vvv -l -p 0
-Executing the sandboxed command...
-bind(3, {sa_family=AF_INET, sin_port=htons(0),
-     sin_addr=inet_addr("0.0.0.0")}, 16) = -1 EACCES (Permission denied)
-nc: Permission denied
+- Clarify which environment variables are optional, which ones are
+  mandatory
+- Clarify the difference between unset variables and empty ones
+- Move the (larger) help message to a helper function
 
 Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
 ---
- samples/landlock/sandboxer.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ samples/landlock/sandboxer.c | 86 ++++++++++++++++++++----------------
+ 1 file changed, 48 insertions(+), 38 deletions(-)
 
 diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
-index e8223c3e781a..a84ae3a15482 100644
+index a84ae3a15482..08704504dc51 100644
 --- a/samples/landlock/sandboxer.c
 +++ b/samples/landlock/sandboxer.c
-@@ -168,7 +168,18 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
+@@ -221,6 +221,53 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
  
- 	env_port_name_next = env_port_name;
- 	while ((strport = strsep(&env_port_name_next, ENV_DELIMITER))) {
--		net_port.port = atoi(strport);
-+		char *strport_num_end = NULL;
+ #define LANDLOCK_ABI_LAST 5
+ 
++static void print_help(const char *prog)
++{
++	fprintf(stderr,
++		"usage: %s=\"...\" %s=\"...\" [other environment variables] %s "
++		"<cmd> [args]...\n\n",
++		ENV_FS_RO_NAME, ENV_FS_RW_NAME, prog);
++	fprintf(stderr,
++		"Execute a command in a restricted environment.\n\n");
++	fprintf(stderr,
++		"Environment variables containing paths and ports "
++		"can be multi-valued, with a colon delimiter.\n"
++		"\n"
++		"Mandatory settings:\n");
++	fprintf(stderr,
++		"* %s: list of paths allowed to be used in a read-only way.\n",
++		ENV_FS_RO_NAME);
++	fprintf(stderr,
++		"* %s: list of paths allowed to be used in a read-write way.\n",
++		ENV_FS_RW_NAME);
++	fprintf(stderr,
++		"\n"
++		"Optional settings (when not set, their associated access "
++		"check is always allowed) (for lists, an empty string means "
++		"to allow nothing, e.g. %s=\"\"):\n",
++		ENV_TCP_BIND_NAME);
++	fprintf(stderr,
++		"* %s: list of ports allowed to bind (server).\n",
++		ENV_TCP_BIND_NAME);
++	fprintf(stderr,
++		"* %s: list of ports allowed to connect (client).\n",
++		ENV_TCP_CONNECT_NAME);
++	fprintf(stderr,
++		"\n"
++		"Example:\n"
++		"%s=\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
++		"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
++		"%s=\"9418\" "
++		"%s=\"80:443\" "
++		"%s bash -i\n\n",
++		ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
++		ENV_TCP_CONNECT_NAME, prog);
++	fprintf(stderr,
++		"This sandboxer can use Landlock features "
++		"up to ABI version %d.\n",
++		LANDLOCK_ABI_LAST);
++}
 +
-+		if (strcmp(strport, "") == 0)
-+			continue;
-+
-+		errno = 0;
-+		net_port.port = strtol(strport, &strport_num_end, 0);
-+		if (errno != 0 || strport_num_end == strport) {
-+			fprintf(stderr,
-+				"Failed to parse port at \"%s\"\n", strport);
-+			goto out_free_name;
-+		}
- 		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
- 				      &net_port, 0)) {
- 			fprintf(stderr,
+ int main(const int argc, char *const argv[], char *const *const envp)
+ {
+ 	const char *cmd_path;
+@@ -237,44 +284,7 @@ int main(const int argc, char *const argv[], char *const *const envp)
+ 	};
+ 
+ 	if (argc < 2) {
+-		fprintf(stderr,
+-			"usage: %s=\"...\" %s=\"...\" %s=\"...\" %s=\"...\"%s "
+-			"<cmd> [args]...\n\n",
+-			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
+-			ENV_TCP_CONNECT_NAME, argv[0]);
+-		fprintf(stderr,
+-			"Execute a command in a restricted environment.\n\n");
+-		fprintf(stderr,
+-			"Environment variables containing paths and ports "
+-			"each separated by a colon:\n");
+-		fprintf(stderr,
+-			"* %s: list of paths allowed to be used in a read-only way.\n",
+-			ENV_FS_RO_NAME);
+-		fprintf(stderr,
+-			"* %s: list of paths allowed to be used in a read-write way.\n\n",
+-			ENV_FS_RW_NAME);
+-		fprintf(stderr,
+-			"Environment variables containing ports are optional "
+-			"and could be skipped.\n");
+-		fprintf(stderr,
+-			"* %s: list of ports allowed to bind (server).\n",
+-			ENV_TCP_BIND_NAME);
+-		fprintf(stderr,
+-			"* %s: list of ports allowed to connect (client).\n",
+-			ENV_TCP_CONNECT_NAME);
+-		fprintf(stderr,
+-			"\nexample:\n"
+-			"%s=\"${PATH}:/lib:/usr:/proc:/etc:/dev/urandom\" "
+-			"%s=\"/dev/null:/dev/full:/dev/zero:/dev/pts:/tmp\" "
+-			"%s=\"9418\" "
+-			"%s=\"80:443\" "
+-			"%s bash -i\n\n",
+-			ENV_FS_RO_NAME, ENV_FS_RW_NAME, ENV_TCP_BIND_NAME,
+-			ENV_TCP_CONNECT_NAME, argv[0]);
+-		fprintf(stderr,
+-			"This sandboxer can use Landlock features "
+-			"up to ABI version %d.\n",
+-			LANDLOCK_ABI_LAST);
++		print_help(argv[0]);
+ 		return 1;
+ 	}
+ 
 -- 
 2.39.5
 
