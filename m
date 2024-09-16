@@ -1,147 +1,147 @@
-Return-Path: <netdev+bounces-128491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9BED979D23
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 10:46:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D808E979D30
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 10:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A074F283861
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 08:46:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 160971C22CA4
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 08:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C66C81411EE;
-	Mon, 16 Sep 2024 08:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A658148310;
+	Mon, 16 Sep 2024 08:48:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="e/SPAnpC"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A88BEF9DA;
-	Mon, 16 Sep 2024 08:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E016D142905
+	for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 08:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726476402; cv=none; b=n9/j+XwlRNVU5e0D4KwHvLi9VX14vW93CkakfQVoLnCbadWMGTyPmfHLbgqannC7IYJ15pllVq/LEP2z97PrBF2gxs9mEd+vQMmx0zOy+aL0w+jdUQ9c+8kzBe8di5RnmjiirJ5/5We1in8JRsjq0TrQTScn91oy2lV6DQPnR+A=
+	t=1726476505; cv=none; b=jGrTZF+Dp9WuEX/+VcVzw1brzOD+DoHhSpkr5fpKlCPJqgxFZOubEMCTE4uw8/PCeQMNYxqznTdwE1orFpZNigwl4USJ0/L58UGrIEqLnpzcW6JLoUjyhuS+flLyDk+corGQb0FlZRxDteE0c3XDy7DJg0Kq2r4iSMI657stIBg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726476402; c=relaxed/simple;
-	bh=XM85QJ+Tc2CQ3IWFm1G1jTKIuhtI8vmRVh0zF/XCmnk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HTgQv70zSrGKOR9mFtl1kiu0d7zZ0mSrgkQ1j+ugyEj3te7p3pOtg98uI/an0eCSDwWltoZV/iVEUKd9moqZTfCyXUb4pJXP4FTiN69JAFX1dSwo85RposMNxQjupBSYsYvr+LH2P74O0w8QlMUBhY/OVn91o0mXct43+boULz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4X6dhr4KZ7z6L7DQ;
-	Mon, 16 Sep 2024 16:42:52 +0800 (CST)
-Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
-	by mail.maildlp.com (Postfix) with ESMTPS id 148FE140158;
-	Mon, 16 Sep 2024 16:46:37 +0800 (CST)
-Received: from china (10.221.233.88) by frapeml500005.china.huawei.com
- (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Mon, 16 Sep
- 2024 10:46:28 +0200
-From: <gur.stavi@huawei.com>
-To: <akihiko.odaki@daynix.com>
-CC: <andrew@daynix.com>, <corbet@lwn.net>, <davem@davemloft.net>,
-	<edumazet@google.com>, <jasowang@redhat.com>, <kuba@kernel.org>,
-	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<mst@redhat.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<shuah@kernel.org>, <virtualization@lists.linux-foundation.org>,
-	<willemdebruijn.kernel@gmail.com>, <xuanzhuo@linux.alibaba.com>,
-	<yuri.benditovich@daynix.com>
-Subject: [PATCH RFC v3 2/9] virtio_net: Add functions for hashing
-Date: Mon, 16 Sep 2024 11:46:18 +0300
-Message-ID: <20240916084619.581-1-gur.stavi@huawei.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240915-rss-v3-2-c630015db082@daynix.com>
-References: <20240915-rss-v3-2-c630015db082@daynix.com>
+	s=arc-20240116; t=1726476505; c=relaxed/simple;
+	bh=N6rcoqk3w12a/D9xPAqhs+KhOd/lJaMejZyWunxve+8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FVS9TndboJKkP/cbSlMWALjJNaFfjKUR9aoxAQBuv7eHrOVRP51BvH0fT+1lQ7t+xezIp9lKPIf/1XX6w7GthozIgBNE0HA7E6cVd1Av9UhG4tRrsZiwFcj6RRxBG26GK4+a6YnbrMhqFixXdEqi4wExc3uortAhJYa5Mgxu/ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=e/SPAnpC; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2f761461150so37857841fa.0
+        for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 01:48:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1726476500; x=1727081300; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UcC7h3PGjOK5d8NQXH0Z/MFEjZnprQptlNIQrkbo1Rw=;
+        b=e/SPAnpCnPdjtycKi+p43y9D3xh3N8HmLmH7OTAuIK99+MAZk1xE3jVwH4cSUiZV0h
+         jPmOUeD8a9CM1/e44TbR1+u3dotq8/QuXHifEFDMy9E0UaO5zD8n/bmj5dM8U6f/iQPy
+         HVrSEYJIrnylYB0IEYHwi0Ovp8uyXeU6mj+UFf4WKuXQXL0pq1cV8LUW6qkxSFzaa4RN
+         U2M0sW8nayfWv3GHNOozu6+NVewr9spWMLR9WngbCTiV4cBqgL4/QQaa3KXQjcOnraLn
+         6i4TXDXJpb4BSqLgHukx9Kupt8/77fax94kXDZ6SS0qcHNjClkCFMNnKsDhdxGDe2HCJ
+         pnTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726476500; x=1727081300;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UcC7h3PGjOK5d8NQXH0Z/MFEjZnprQptlNIQrkbo1Rw=;
+        b=pujvtSIry4GUsInGe9XBxlQO0klNIyRJqvDaNjkfKDHqHB/YO0iRMjvw7AFC5khHHG
+         HsR9m0xhLSxtaZeAcB1epkBXvd4FsV5gYvZxmBCU2C5OaqFkf/l11ZKNlY+J/1Z3MucR
+         Oec68z3HMf7cxfSGWwN95k7Us9w0wWYkmi04P3Rxtx4tok4XBF8jnI8XE7sIjwSoKGHR
+         WXq9z7ZF6dMoQlBxXpREyqB1MzAeS4ahV3bL8hjGEMdTi/Rz6sR0iIcB5GOjzFJuDRob
+         fEiPABCzQe6Xfa9YJWuDZse1bAKCuMXLncSo1n3vfWBPljcGyzaxcQVEM/t9NWPQM4TN
+         cqVA==
+X-Gm-Message-State: AOJu0YwxOvCMBihA7zITezNnt8pzhyrsNaTV32jjSIGnPuw8g6+JaBza
+	ORkDST5sOuFiGFtF3r9ScXBXtVMP5vfPg3KkW5j2ZpvTmLBqWTDulzJE9TNttCI=
+X-Google-Smtp-Source: AGHT+IHVgNEFXQLNwvsw20aIwYapcHuhPPJCKVRUE+fgg8Pdrhv4JmEgk+MAMUtXhhWb7XFi96kZ+A==
+X-Received: by 2002:a2e:e0a:0:b0:2f3:c384:71ee with SMTP id 38308e7fff4ca-2f791b597b0mr47751931fa.33.1726476498914;
+        Mon, 16 Sep 2024 01:48:18 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90610f43a4sm281315566b.83.2024.09.16.01.48.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Sep 2024 01:48:18 -0700 (PDT)
+Message-ID: <05707e9e-08ac-4ee1-b910-883f8b4b2636@blackwall.org>
+Date: Mon, 16 Sep 2024 11:48:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- frapeml500005.china.huawei.com (7.182.85.13)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] bondig: Add bond_xdp_check for bond_xdp_xmit in
+ bond_main.c
+To: Jiwon Kim <jiwonaid0@gmail.com>, jv@jvosburgh.net, andy@greyhouse.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, joamaki@gmail.com
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
+References: <20240916055011.16655-1-jiwonaid0@gmail.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240916055011.16655-1-jiwonaid0@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> +
-> +static inline bool virtio_net_hash_rss(const struct sk_buff *skb,
-> +				       u32 types, const __be32 *key,
-> +				       struct virtio_net_hash *hash)
+On 16/09/2024 08:50, Jiwon Kim wrote:
+> Add bond_xdp_check to ensure the bond interface is in a valid state.
+> 
+> syzbot reported WARNING in bond_xdp_get_xmit_slave.
+> In bond_xdp_get_xmit_slave, the comment says
+> /* Should never happen. Mode guarded by bond_xdp_check() */.
+> However, it does not check the status when entering bond_xdp_xmit.
+> 
+> Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=c187823a52ed505b2257
+> Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
+> Signed-off-by: Jiwon Kim <jiwonaid0@gmail.com>
+> ---
+>  drivers/net/bonding/bond_main.c | 33 ++++++++++++++++++---------------
+>  1 file changed, 18 insertions(+), 15 deletions(-)
+> 
 
-Based on the guidelines, this function seems imperative rather than
-predicate and should return an error-code integer.
+How did you figure the problem is there? Did you take any time to actually
+understand it? This patch doesn't fix anything, the warning can be easily
+triggered with it. The actual fix is to remove that WARN_ON() altogether
+and downgrade the netdev_err() to a ratelimited version. The reason is that
+we can always get to a state where at least 1 bond device has xdp program
+installed which increases bpf_master_redirect_enabled_key and another bond
+device which uses xdpgeneric, then install an ebpf program that simply
+returns ACT_TX on xdpgeneric bond's slave and voila - you get the warning.
 
-https://www.kernel.org/doc/html/latest/process/coding-style.html#function-return-values-and-names
+setup is[1]:
+ $ ip l add veth0 type veth peer veth1
+ $ ip l add veth3 type veth peer veth4
+ $ ip l add bond0 type bond mode 6 # <- transmit-alb mode, unsupported by xdp
+ $ ip l add bond1 type bond # <- rr mode by default, supported by xdp
+ $ ip l set veth0 master bond1
+ $ ip l set bond1 up
+ $ ip l set dev bond1 xdpdrv object tx_xdp.o section xdp_tx # <- we need xdpdrv program to increase the static key, more below
+ $ ip l set veth3 master bond0
+ $ ip l set bond0 up
+ $ ip l set veth4 up
+ $ ip l set veth3 xdpgeneric object tx_xdp.o section xdp_tx # <- now we'll hit the codepath we need after veth3 Rx's a packet
 
-> +{
-> +	u16 report;
-> +	struct virtio_net_toeplitz_state toeplitz_state = {
-> +		.key_buffer = be32_to_cpu(*key),
-> +		.key = key
-> +	};
-> +	struct flow_keys flow;
-> +
-> +	if (!skb_flow_dissect_flow_keys(skb, &flow, 0))
-> +		return false;
-> +
-> +	report = virtio_net_hash_report(types, flow.basic);
-> +
-> +	switch (report) {
-> +	case VIRTIO_NET_HASH_REPORT_IPv4:
-> +		virtio_net_toeplitz(&toeplitz_state,
-> +				    (__be32 *)&flow.addrs.v4addrs,
-> +				    sizeof(flow.addrs.v4addrs) / 4);
-> +		break;
-> +
-> +	case VIRTIO_NET_HASH_REPORT_TCPv4:
-> +		virtio_net_toeplitz(&toeplitz_state,
-> +				    (__be32 *)&flow.addrs.v4addrs,
-> +				    sizeof(flow.addrs.v4addrs) / 4);
-> +		virtio_net_toeplitz(&toeplitz_state, &flow.ports.ports,
-> +				    1);
-> +		break;
-> +
-> +	case VIRTIO_NET_HASH_REPORT_UDPv4:
-> +		virtio_net_toeplitz(&toeplitz_state,
-> +				    (__be32 *)&flow.addrs.v4addrs,
-> +				    sizeof(flow.addrs.v4addrs) / 4);
-> +		virtio_net_toeplitz(&toeplitz_state, &flow.ports.ports,
-> +				    1);
-> +		break;
-> +
-> +	case VIRTIO_NET_HASH_REPORT_IPv6:
-> +		virtio_net_toeplitz(&toeplitz_state,
-> +				    (__be32 *)&flow.addrs.v6addrs,
-> +				    sizeof(flow.addrs.v6addrs) / 4);
-> +		break;
-> +
-> +	case VIRTIO_NET_HASH_REPORT_TCPv6:
-> +		virtio_net_toeplitz(&toeplitz_state,
-> +				    (__be32 *)&flow.addrs.v6addrs,
-> +				    sizeof(flow.addrs.v6addrs) / 4);
-> +		virtio_net_toeplitz(&toeplitz_state, &flow.ports.ports,
-> +				    1);
-> +		break;
-> +
-> +	case VIRTIO_NET_HASH_REPORT_UDPv6:
-> +		virtio_net_toeplitz(&toeplitz_state,
-> +				    (__be32 *)&flow.addrs.v6addrs,
-> +				    sizeof(flow.addrs.v6addrs) / 4);
-> +		virtio_net_toeplitz(&toeplitz_state, &flow.ports.ports,
-> +				    1);
-> +		break;
-> +
-> +	default:
-> +		return false;
-> +	}
-> +
-> +	hash->value = toeplitz_state.hash;
-> +	hash->report = report;
-> +
-> +	return true;
-> +}
-> +
+
+If you take the time to look at the call stack and the actual code, you'll
+see it goes something like (for the xdpgeneric bond slave, veth3):
+...
+bpf_prog_run_generic_xdp() for veth3
+ -> bpf_prog_run_xdp() 
+   -> __bpf_prog_run() # return ACT_TX
+     -> xdp_master_redirect() # called because we have ACT_TX && netif_is_bond_slave(xdp->rxq->dev)
+       -> master->netdev_ops->ndo_xdp_get_xmit_slave(master, xdp); # and here we go, WARN_ON()
+
+I've had a patch for awhile now about this and have taken the time to look into it.
+I guess it's time to dust it off and send it out for review. :)
+
+Thanks,
+ Nik
 
