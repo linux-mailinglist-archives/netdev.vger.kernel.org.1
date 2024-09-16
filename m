@@ -1,317 +1,104 @@
-Return-Path: <netdev+bounces-128513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F877979F0F
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:14:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AFD5979F21
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:19:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E72A8281A2C
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 10:14:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D69F1C20FE5
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 10:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0B9152E0C;
-	Mon, 16 Sep 2024 10:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1CE14F9DD;
+	Mon, 16 Sep 2024 10:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BwQDjMi+"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="OsXs00T4";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="18QLzLTo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD0D7641E;
-	Mon, 16 Sep 2024 10:14:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C85314A60C;
+	Mon, 16 Sep 2024 10:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726481665; cv=none; b=lcDKlTuZlS2adVJJyl3gGONsviU4xVn9wsCaPsC0gfaqsEyIGu4YdyJ19Cl9W0Xj/Z7MNilXorkfM1GAvND52iUr6e9gBbE6lbimDv1GG4yuUrgTpw6cLZdemjeisU8+5UoFxizistcw9L7gOukzezKVCISO1yXepDdmHjeX/Ho=
+	t=1726481987; cv=none; b=Iq8zJGaxtMyfwqXf1rBAtFTx2tImUTIZupjdhYDYK7adzJ+sUlUPjU4HKTm84SddmQM6Up+7rJBs972ph5p80Nx0axhFrX+Ttj8J5BoK/2qMb/VHJTuKwhCkKTjOmMJUxXzvgmUf9lJOcZBpId+5JM815ynYJXGYNIvasV2UXEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726481665; c=relaxed/simple;
-	bh=+2DxlM4IvnRU/a01sOXUn8LypP6Ud4qDlfTF92jSVRk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=X/1i5VscFkA4Uh/VFj4/N4iHfrH8SodZxmLI4QS+Ro9VLx4lSBvk2iPxl90eBWRS5ZoKDFikbGpTwxDRGWTLAT43lMF3eMcjRRxrEjLqD04JIFqPvCzrXkTEMRTauGvKoSOEJorQgppXFjAKiqQk0T5Bvolb0vK8dNTbeRDj7Rc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BwQDjMi+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0B33C4CEC4;
-	Mon, 16 Sep 2024 10:14:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726481665;
-	bh=+2DxlM4IvnRU/a01sOXUn8LypP6Ud4qDlfTF92jSVRk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BwQDjMi+eTNW4g49OWnFT+AJfkWkmCQhDfBn0RA6TUC3qgewXbZx51t35iezdq0Vp
-	 YZnfYN3HASiBEiyWtiUtEroOoDRVOjwbMhsl1RRt/A/CxUntTt/Y1tQhAuJkG5LD6O
-	 kjnvxdLXuvxy7XIDsrYpoMcG0qsp8iPuv3Zey1Mt5kdMsP4R2JCJr04E2V6z2/XFtG
-	 FSgZ/GFUhQvzFGQftaZNhBYKdxdlhHlQowKmFncplbxkZT2pNBMNRNz6O6WiabBkFK
-	 OsDbDegUE2oNfeXFujd2BaDUmvvbe08kQebmkGFFKr+BAqhiGIvPaMH2ShqL2o1Xh2
-	 m9AKhtDrvgdWQ==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: bpf@vger.kernel.org
-Cc: kuba@kernel.org,
-	aleksander.lobakin@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	dxu@dxuuu.xyz,
-	john.fastabend@gmail.com,
-	hawk@kernel.org,
-	martin.lau@linux.dev,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	lorenzo.bianconi@redhat.com
-Subject: [RFC/RFT v2 3/3] bpf: cpumap: Add gro support
-Date: Mon, 16 Sep 2024 12:13:45 +0200
-Message-ID: <a6838fb8ea49162097ab16ef1946d83d370c05d1.1726480607.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <cover.1726480607.git.lorenzo@kernel.org>
-References: <cover.1726480607.git.lorenzo@kernel.org>
+	s=arc-20240116; t=1726481987; c=relaxed/simple;
+	bh=xEY4iXHQyxQ5TEy5yUB0lFoOwfozOkxuoIir1tq/NwA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=l9yvXHnO1zmD048NP71mQAgzHnrER6FoIiTHl6ggTXpAafmLr9GGKYBLKPkh8BeqDRXsi+2skfA0zgFPusP15URm/C+iXNHj9ymG/3OqjRtE7aGqJYTLlhdyB5ZX32X47T2IM1uVK+/7o70FVKBvnCKd/Xs1x9Pf0UTbNDMxv5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=OsXs00T4; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=18QLzLTo; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Mon, 16 Sep 2024 12:19:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1726481984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pZy5VfM0VgVYUQhNzkZHTWn2e+O6Pz/2EXmQN0vnal4=;
+	b=OsXs00T4j6uZTwh5uE8gFL9b8Tfkw1tWURw07F5Mzgy9887Pxa003jXbzAGuPMsIzWr9iC
+	CHfUNC46T+kqEDHyTt0QOGzpYa3di7AsWxqHZ5ML/AEzDsiepBiZdczFTVjhWqI2YqHjQu
+	708JyyZGT5HQGTggLQalBxjPpZ/vOjZFV6yP2rPpMv4IiotDsg70liisgAxxIWQbnBrBg3
+	k+WviKqiP4w71YIWlscmT/uUxWiiVpCfcffvwrJs6rJAaWXgHdsS3iDGOuA3uqXSkD/seb
+	K52AZlaK4EW/oBcu969XHh0mEwBRhA6+1YPouwy5W4S+DK4qM81NcgqPOXgnOA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1726481984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pZy5VfM0VgVYUQhNzkZHTWn2e+O6Pz/2EXmQN0vnal4=;
+	b=18QLzLTofgaZcyR16Y2UDAgkAFAHIFnQS+p09RQVOmSqhFHLDbMGe95vJN6PKD9MiWLciy
+	jGZM8bfK+d9KpDBA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Breno Leitao <leitao@debian.org>, Jakub Kicinski <kuba@kernel.org>,
+	razor@blackwall.org, andrii@kernel.org, ast@kernel.org,
+	syzbot <syzbot+08811615f0e17bc6708b@syzkaller.appspotmail.com>,
+	bpf@vger.kernel.org, davem@davemloft.net, eddyz87@gmail.com,
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com,
+	jolsa@kernel.org, kpsingh@kernel.org, linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
+	song@kernel.org, syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: Re: [PATCH net-net] tun: Assign missing bpf_net_context.
+Message-ID: <20240916101942.ZJP2h0NM@linutronix.de>
+References: <000000000000adb970061c354f06@google.com>
+ <20240702114026.1e1f72b7@kernel.org>
+ <20240703122758.i6lt_jii@linutronix.de>
+ <20240703120143.43cc1770@kernel.org>
+ <20240912-simple-fascinating-mackerel-8fe7c0@devvm32600>
+ <20240912122847.x70_LgN_@linutronix.de>
+ <20240912-hypnotic-messy-leopard-f1d2b0@leitao>
+ <ccd708bf-580a-3d24-e5be-4e7dc12e7b39@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ccd708bf-580a-3d24-e5be-4e7dc12e7b39@iogearbox.net>
 
-Introduce GRO support to cpumap codebase moving the cpu_map_entry
-kthread to a NAPI-kthread pinned on the selected cpu.
+On 2024-09-12 17:03:15 [+0200], Daniel Borkmann wrote:
+> 
+> Oh well, quite annoying that we need this context now everywhere also outside of XDP :(
+> Sebastian, do you see any way where this could be noop for !PREEMPT_RT?
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- kernel/bpf/cpumap.c | 123 +++++++++++++++++++-------------------------
- 1 file changed, 52 insertions(+), 71 deletions(-)
+This isn't related to XDP but to the redirect part of BPF which is (or
+was) using per-CPU variables.
+I don't know how much pain it causes here for you and how much of this
+is actually helping and not making anything worse:
+- If netkit::active is likely to be NULL you could limit assigning the
+  context only if it != NULL
 
-diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-index fbdf5a1aabfe4..3ec6739aec5ae 100644
---- a/kernel/bpf/cpumap.c
-+++ b/kernel/bpf/cpumap.c
-@@ -62,9 +62,11 @@ struct bpf_cpu_map_entry {
- 	/* XDP can run multiple RX-ring queues, need __percpu enqueue store */
- 	struct xdp_bulk_queue __percpu *bulkq;
- 
--	/* Queue with potential multi-producers, and single-consumer kthread */
-+	/* Queue with potential multi-producers, and single-consumer
-+	 * NAPI-kthread
-+	 */
- 	struct ptr_ring *queue;
--	struct task_struct *kthread;
-+	struct napi_struct napi;
- 
- 	struct bpf_cpumap_val value;
- 	struct bpf_prog *prog;
-@@ -261,58 +263,42 @@ static int cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
- 	return nframes;
- }
- 
--static int cpu_map_kthread_run(void *data)
-+static int cpu_map_poll(struct napi_struct *napi, int budget)
- {
--	struct bpf_cpu_map_entry *rcpu = data;
--	unsigned long last_qs = jiffies;
-+	struct xdp_cpumap_stats stats = {}; /* zero stats */
-+	unsigned int kmem_alloc_drops = 0;
-+	struct bpf_cpu_map_entry *rcpu;
-+	int done = 0;
- 
-+	rcu_read_lock();
-+	rcpu = container_of(napi, struct bpf_cpu_map_entry, napi);
- 	complete(&rcpu->kthread_running);
--	set_current_state(TASK_INTERRUPTIBLE);
- 
--	/* When kthread gives stop order, then rcpu have been disconnected
--	 * from map, thus no new packets can enter. Remaining in-flight
--	 * per CPU stored packets are flushed to this queue.  Wait honoring
--	 * kthread_stop signal until queue is empty.
--	 */
--	while (!kthread_should_stop() || !__ptr_ring_empty(rcpu->queue)) {
--		struct xdp_cpumap_stats stats = {}; /* zero stats */
--		unsigned int kmem_alloc_drops = 0, sched = 0;
-+	while (done < budget) {
- 		gfp_t gfp = __GFP_ZERO | GFP_ATOMIC;
--		int i, n, m, nframes, xdp_n;
-+		int n, i, m, xdp_n = 0, nframes;
- 		void *frames[CPUMAP_BATCH];
-+		struct sk_buff *skb, *tmp;
- 		void *skbs[CPUMAP_BATCH];
- 		LIST_HEAD(list);
- 
--		/* Release CPU reschedule checks */
--		if (__ptr_ring_empty(rcpu->queue)) {
--			set_current_state(TASK_INTERRUPTIBLE);
--			/* Recheck to avoid lost wake-up */
--			if (__ptr_ring_empty(rcpu->queue)) {
--				schedule();
--				sched = 1;
--				last_qs = jiffies;
--			} else {
--				__set_current_state(TASK_RUNNING);
--			}
--		} else {
--			rcu_softirq_qs_periodic(last_qs);
--			sched = cond_resched();
--		}
--
-+		if (__ptr_ring_empty(rcpu->queue))
-+			break;
- 		/*
- 		 * The bpf_cpu_map_entry is single consumer, with this
- 		 * kthread CPU pinned. Lockless access to ptr_ring
- 		 * consume side valid as no-resize allowed of queue.
- 		 */
--		n = __ptr_ring_consume_batched(rcpu->queue, frames,
--					       CPUMAP_BATCH);
--		for (i = 0, xdp_n = 0; i < n; i++) {
-+		n = min(budget -  done, CPUMAP_BATCH);
-+		n = __ptr_ring_consume_batched(rcpu->queue, frames, n);
-+		done += n;
-+
-+		for (i = 0; i < n; i++) {
- 			void *f = frames[i];
- 			struct page *page;
- 
- 			if (unlikely(__ptr_test_bit(0, &f))) {
--				struct sk_buff *skb = f;
--
-+				skb = f;
- 				__ptr_clear_bit(0, &skb);
- 				list_add_tail(&skb->list, &list);
- 				continue;
-@@ -340,12 +326,10 @@ static int cpu_map_kthread_run(void *data)
- 			}
- 		}
- 
--		local_bh_disable();
- 		for (i = 0; i < nframes; i++) {
- 			struct xdp_frame *xdpf = frames[i];
--			struct sk_buff *skb = skbs[i];
- 
--			skb = __xdp_build_skb_from_frame(xdpf, skb,
-+			skb = __xdp_build_skb_from_frame(xdpf, skbs[i],
- 							 xdpf->dev_rx);
- 			if (!skb) {
- 				xdp_return_frame(xdpf);
-@@ -354,17 +338,21 @@ static int cpu_map_kthread_run(void *data)
- 
- 			list_add_tail(&skb->list, &list);
- 		}
--		netif_receive_skb_list(&list);
--
--		/* Feedback loop via tracepoint */
--		trace_xdp_cpumap_kthread(rcpu->map_id, n, kmem_alloc_drops,
--					 sched, &stats);
- 
--		local_bh_enable(); /* resched point, may call do_softirq() */
-+		list_for_each_entry_safe(skb, tmp, &list, list) {
-+			skb_list_del_init(skb);
-+			napi_gro_receive(napi, skb);
-+		}
- 	}
--	__set_current_state(TASK_RUNNING);
- 
--	return 0;
-+	rcu_read_unlock();
-+	/* Feedback loop via tracepoint */
-+	trace_xdp_cpumap_kthread(rcpu->map_id, done, kmem_alloc_drops, 0,
-+				 &stats);
-+	if (done < budget)
-+		napi_complete(napi);
-+
-+	return done;
- }
- 
- static int __cpu_map_load_bpf_program(struct bpf_cpu_map_entry *rcpu,
-@@ -432,18 +420,19 @@ __cpu_map_entry_alloc(struct bpf_map *map, struct bpf_cpumap_val *value,
- 	if (fd > 0 && __cpu_map_load_bpf_program(rcpu, map, fd))
- 		goto free_ptr_ring;
- 
-+	napi_init_for_gro(NULL, &rcpu->napi, cpu_map_poll,
-+			  NAPI_POLL_WEIGHT);
-+	set_bit(NAPI_STATE_THREADED, &rcpu->napi.state);
-+
- 	/* Setup kthread */
- 	init_completion(&rcpu->kthread_running);
--	rcpu->kthread = kthread_create_on_node(cpu_map_kthread_run, rcpu, numa,
--					       "cpumap/%d/map:%d", cpu,
--					       map->id);
--	if (IS_ERR(rcpu->kthread))
-+	rcpu->napi.thread = kthread_run_on_cpu(napi_threaded_poll,
-+					       &rcpu->napi, cpu,
-+					       "cpumap-napi/%d");
-+	if (IS_ERR(rcpu->napi.thread))
- 		goto free_prog;
- 
--	/* Make sure kthread runs on a single CPU */
--	kthread_bind(rcpu->kthread, cpu);
--	wake_up_process(rcpu->kthread);
--
-+	napi_schedule(&rcpu->napi);
- 	/* Make sure kthread has been running, so kthread_stop() will not
- 	 * stop the kthread prematurely and all pending frames or skbs
- 	 * will be handled by the kthread before kthread_stop() returns.
-@@ -477,12 +466,8 @@ static void __cpu_map_entry_free(struct work_struct *work)
- 	 */
- 	rcpu = container_of(to_rcu_work(work), struct bpf_cpu_map_entry, free_work);
- 
--	/* kthread_stop will wake_up_process and wait for it to complete.
--	 * cpu_map_kthread_run() makes sure the pointer ring is empty
--	 * before exiting.
--	 */
--	kthread_stop(rcpu->kthread);
--
-+	napi_disable(&rcpu->napi);
-+	__netif_napi_del(&rcpu->napi);
- 	if (rcpu->prog)
- 		bpf_prog_put(rcpu->prog);
- 	/* The queue should be empty at this point */
-@@ -498,8 +483,8 @@ static void __cpu_map_entry_free(struct work_struct *work)
-  * __cpu_map_entry_free() in a separate workqueue after waiting for an RCU grace
-  * period. This means that (a) all pending enqueue and flush operations have
-  * completed (because of the RCU callback), and (b) we are in a workqueue
-- * context where we can stop the kthread and wait for it to exit before freeing
-- * everything.
-+ * context where we can stop the NAPI-kthread and wait for it to exit before
-+ * freeing everything.
-  */
- static void __cpu_map_entry_replace(struct bpf_cpu_map *cmap,
- 				    u32 key_cpu, struct bpf_cpu_map_entry *rcpu)
-@@ -579,9 +564,7 @@ static void cpu_map_free(struct bpf_map *map)
- 	 */
- 	synchronize_rcu();
- 
--	/* The only possible user of bpf_cpu_map_entry is
--	 * cpu_map_kthread_run().
--	 */
-+	/* The only possible user of bpf_cpu_map_entry is the NAPI-kthread. */
- 	for (i = 0; i < cmap->map.max_entries; i++) {
- 		struct bpf_cpu_map_entry *rcpu;
- 
-@@ -589,7 +572,7 @@ static void cpu_map_free(struct bpf_map *map)
- 		if (!rcpu)
- 			continue;
- 
--		/* Stop kthread and cleanup entry directly */
-+		/* Stop NAPI-kthread and cleanup entry directly */
- 		__cpu_map_entry_free(&rcpu->free_work.work);
- 	}
- 	bpf_map_area_free(cmap->cpu_map);
-@@ -753,7 +736,7 @@ int cpu_map_generic_redirect(struct bpf_cpu_map_entry *rcpu,
- 	if (ret < 0)
- 		goto trace;
- 
--	wake_up_process(rcpu->kthread);
-+	napi_schedule(&rcpu->napi);
- trace:
- 	trace_xdp_cpumap_enqueue(rcpu->map_id, !ret, !!ret, rcpu->cpu);
- 	return ret;
-@@ -765,8 +748,6 @@ void __cpu_map_flush(struct list_head *flush_list)
- 
- 	list_for_each_entry_safe(bq, tmp, flush_list, flush_node) {
- 		bq_flush_to_queue(bq);
--
--		/* If already running, costs spin_lock_irqsave + smb_mb */
--		wake_up_process(bq->obj->kthread);
-+		napi_schedule(&bq->obj->napi);
- 	}
- }
--- 
-2.46.0
+- If you can ensure (via verifier) that netkit_run() won't access the
+  redirect helper (such as bpf_redirect()) and won't return
+  NETKIT_REDIRECT (as a consequence) then the assignment could be
+  avoided in this case.
 
+Sebastian
 
