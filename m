@@ -1,199 +1,167 @@
-Return-Path: <netdev+bounces-128607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 358C197A885
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 22:53:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 045C697A888
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 22:54:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5988C1C21F8C
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 20:53:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC46328DE78
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 20:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F78416130B;
-	Mon, 16 Sep 2024 20:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6654A15C131;
+	Mon, 16 Sep 2024 20:54:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="VFYVwgoi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cN9SclyR"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2042.outbound.protection.outlook.com [40.107.237.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940EC15DBDD;
-	Mon, 16 Sep 2024 20:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726519947; cv=fail; b=ThS7IY+ZA3RGtXHt7/nqTQKKMgpaOlDC+HVHKUrsdA0FwhrN41/QOFGiTY9Z7nZXcOy90QHv+YZVQa+CMTbSnKFW29GXJ7qi1ZTwSBc3gdOPFhKauUmKNo1C9C8qsnuFrlQVvKM2SUTHTj+u00Mrw4o2HT8kH0eeGjuicuvQ3nQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726519947; c=relaxed/simple;
-	bh=+SHu1cz4TmSIS5szBMQrR2ftPjmoRxXWc04Tu5ERSM8=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DCVpKDC11oy8q92TDQNEmQu+geHaaf5XQ2hs447ZqRneZigXIeg6y6PtsM81C3T+/H4zXzoKy+5dXCGKwAy0T/e3ssOBiAdTs/xrD+DAQiKxJQpaJ0sqoCmDfwH5zRPB/El2BhX1+yRJYwT725XW6KASEswl2uELirZlab1ohek=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=VFYVwgoi; arc=fail smtp.client-ip=40.107.237.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BLI17whfhCg2+a2URYFw0/9mTxOr5GlcEcbLLM69Pn7JC6l+cBdddX4MBJMma/ql17y7bSIIrFzW1NkHvvCa4mN4JpY1cP1RJ5RAdCip0CVk8/OxL3WYihLsLRp6XlQbDoNOnB1HUI0axAZss3hhPWdrMf2Xvlp5QnZDRaTxrUt0tHDNG0RPiqZwMYow5D4mJu+B9/DOpA5BYZ8qAQjSR3gmb5qJIxL+TBlfbT5XnsJbBUDoipLOJgel13RzPlErBjQwxX6EeE0A6REzaowGQuRBG6Nawbj+PAN9yOuPdmUeQEEC/IAEIVduRYZqxlnO10xgGn7LS41CscV1FVo10A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NyNJGi/6ZYPbBp24yZ6fsr4GtEu6YRSWKr+SNRgzekI=;
- b=GRB+mYnPvAei9IDzyPDF0YsQb6PP42efYpZ/OCcPBieNNHZkVN6FaRfGnxTCHQnWtQc5xIRzDtJxScy7u6m4tSBTiQAPycnoqH3Z5TIJtxlwdwhl2DEkKXOK4+hvSqjOpOtslK08VvuSUYz2RJ3jZ/7vW3fm7uZVA2qsZIIyCRTRBF6PgI+tN8trXBeqNTXdW3BMK8PuoMV6+ii+/bqW1gzJ1bPvfsCRYr27gv6EqbS7+0LeTPcdK3LHZxO+yZm8XX0ydD2XEwZevB+4IzNTu+dI74FB707/1bF2JN7JMVQXakQ+NGGceXvzCBVwP4uInYFfekMYoZIU5fn0qrJpAg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NyNJGi/6ZYPbBp24yZ6fsr4GtEu6YRSWKr+SNRgzekI=;
- b=VFYVwgoixWh+WkmdaEJ3HtPt5NIlvNtLKSBavR2UpqvnO7krJ0wKs+RCbAGFzqTxI87dzfoHkPWWLGLrVxTfpc0WC1Y5ZnP6Q+ch1RMx1J+JGTP3Vu+vOw/8sb6gle+LNhaXCRXmLKKuPPbrECL9x5sHK6qnvZ+f3PiXhDJIXNI=
-Received: from BL0PR02CA0046.namprd02.prod.outlook.com (2603:10b6:207:3d::23)
- by MW3PR12MB4473.namprd12.prod.outlook.com (2603:10b6:303:56::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.24; Mon, 16 Sep
- 2024 20:52:20 +0000
-Received: from BL02EPF00021F68.namprd02.prod.outlook.com
- (2603:10b6:207:3d:cafe::c3) by BL0PR02CA0046.outlook.office365.com
- (2603:10b6:207:3d::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7939.24 via Frontend
- Transport; Mon, 16 Sep 2024 20:52:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF00021F68.mail.protection.outlook.com (10.167.249.4) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7918.13 via Frontend Transport; Mon, 16 Sep 2024 20:52:20 +0000
-Received: from weiserver.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 16 Sep
- 2024 15:52:18 -0500
-From: Wei Huang <wei.huang2@amd.com>
-To: <linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <netdev@vger.kernel.org>
-CC: <Jonathan.Cameron@Huawei.com>, <helgaas@kernel.org>, <corbet@lwn.net>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <alex.williamson@redhat.com>, <gospo@broadcom.com>,
-	<michael.chan@broadcom.com>, <ajit.khaparde@broadcom.com>,
-	<somnath.kotur@broadcom.com>, <andrew.gospodarek@broadcom.com>,
-	<manoj.panicker2@amd.com>, <Eric.VanTassell@amd.com>, <wei.huang2@amd.com>,
-	<vadim.fedorenko@linux.dev>, <horms@kernel.org>, <bagasdotme@gmail.com>,
-	<bhelgaas@google.com>, <lukas@wunner.de>, <paul.e.luse@intel.com>,
-	<jing2.liu@intel.com>
-Subject: [PATCH V5 5/5] bnxt_en: Pass NQ ID to the FW when allocating RX/RX AGG rings
-Date: Mon, 16 Sep 2024 15:51:03 -0500
-Message-ID: <20240916205103.3882081-6-wei.huang2@amd.com>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20240916205103.3882081-1-wei.huang2@amd.com>
-References: <20240916205103.3882081-1-wei.huang2@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD1E200A3;
+	Mon, 16 Sep 2024 20:54:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726520054; cv=none; b=EqzMVcXYySh6XWvWLYcCyQm8qc2psupZCMPbW9tzhF37zssm2stY7x877JsXI0VCLx+OXEqJsoiYKC+0OnQrTrtxlfcGWJPEcHdjBdvWGWH2FmZ2NzLlcJ28mMvavyDh6uoHRkdm0p3JeNKHuiCoKtnkLKNfpOxixxC/3mokQfc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726520054; c=relaxed/simple;
+	bh=Xxd2/QeYrhizxq4XTR1/ovg0e+NrKnQsX44DrCba2sI=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=fdqrpiPPgjYo2zRc4TWeFraIlzYq5vBu1JzyKtPSS1vlGmVulyIXPzoHHPyY+AMK4Yp5DwarcXw5wdrcJWjk/y8E5TUFaIckdRp9SoFI7AIgQPSiBXjRsvHCjy/F3FM3O145xrT2j0BdF5ki0jkt0vDV9DP0XcAWaLtZkAR7KmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cN9SclyR; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-6c524b4a3aeso39628016d6.3;
+        Mon, 16 Sep 2024 13:54:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726520051; x=1727124851; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1+xVEh/Fun30CfnS0s+qAjskdsNGiEH1QQx4TBqmgWA=;
+        b=cN9SclyRLLu1hUxoFd07vySw7dYdrTCueBcO9PYilAceaKl9+0kIGKq8og1g0Pzjtw
+         fSEIl6zgy0EOUUOImmXM17eTy+eIP52M7fJ5iidSP90jgI1fymlXYYQRPtXj9nn3DRmh
+         q1fMVStj9hjYiD1trWubNm8Vi48lauq/u/7RRNNesd+jzQyiQMS2PJsPhfD++rdl/fRx
+         WvFfIMp5NSrKh8XBkA9+z9AQm39l6mh2svM4ZpB9IaIx+RRv9S2tWIC20gnWFnxiSvr3
+         nBz1Ys0qFoYT295jrnFradD6nP2g66AgPLiFRqMNp7xULR/+huIYBHpHL9C1vrO80H1g
+         it/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726520051; x=1727124851;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=1+xVEh/Fun30CfnS0s+qAjskdsNGiEH1QQx4TBqmgWA=;
+        b=l32/7pC0aKI8k/RwexcdMHtf4DqFvD+9rfeD24JAN93u8yAUr96fAPjvK5frSYhBI7
+         Uc/0su0cdFnHxuxjU/JzOzYnWGm8Fh5r1CYBV9RdnFPafXJAdTbCvXyVPQrFl/JZ7EPl
+         12ZDblAxDA9WkaOLRQmivgPa46qQTVkvoYbKmX037be9povT5OyutRRXrl69agAPVr0H
+         lQ/Bbcc8GDsNtTdwEAMi02u4ZTgZflI04ISBlgKoONVG7oRKQyHjJtryUjEJ+pGRuJ70
+         M/ygkOoepIww7rdT7NaHnYheRWb7ENQjen+EHVX+ZT0Ihrc7Xuog8QFG3Awk7VUFVWfw
+         QNkw==
+X-Forwarded-Encrypted: i=1; AJvYcCULODtBegK4gURXPBFuS09NP0ecvjhAl7JkhtkpRkYQvqqgc2ANrvIl6YHcMLxobp3l8FNO+FSH@vger.kernel.org, AJvYcCWyJqlg6iTV2CTRh+A2uxQNLqOpsbTJzibkVAagx2gYrkmLaGQgos7G5DlGRJN0H0UacsK7MYVM7h8N0O7rmrQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTW+soTythdk5dqtjsNorb3p1BqbZwEYzwJaItV3dXPqPIvYOv
+	Fq4a13lENfTIsSXWdYWbC2bGVC+8FfcoTIM3Fpvqq/OA4dPH4hGz
+X-Google-Smtp-Source: AGHT+IHgECk6w7DBYPH0rHBywyHjQjb2oqc+jBVZgIBdLTU6TJsmW2Q85pOyUKkk6Ntb2slkXsqRdQ==
+X-Received: by 2002:a0c:f40c:0:b0:6c4:79df:a2e5 with SMTP id 6a1803df08f44-6c57351aa2amr279927166d6.20.1726520051414;
+        Mon, 16 Sep 2024 13:54:11 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c58c642265sm27788776d6.61.2024.09.16.13.54.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Sep 2024 13:54:10 -0700 (PDT)
+Date: Mon, 16 Sep 2024 16:54:10 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Matthieu Baerts <matttbe@kernel.org>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ ncardwell@google.com, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <66e89af24d4a3_23d205294e4@willemb.c.googlers.com.notmuch>
+In-Reply-To: <Zuhhe4-MQHd3EkfN@mini-arch>
+References: <20240912005317.1253001-1-willemdebruijn.kernel@gmail.com>
+ <ed54ad21-4a5b-4bbb-8f16-22fbfe1bd738@kernel.org>
+ <66e2da1b440cc_14a89129431@willemb.c.googlers.com.notmuch>
+ <Zuhhe4-MQHd3EkfN@mini-arch>
+Subject: Re: [PATCH net-next v2 0/3] selftests/net: packetdrill: netns and two
+ imports
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F68:EE_|MW3PR12MB4473:EE_
-X-MS-Office365-Filtering-Correlation-Id: 92bc06b9-004d-47a9-84c5-08dcd6917524
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|82310400026|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?1fnyGcQ+DdEE19cBLCzmf5XRItLxtSeQSNEi1aQrIKXxHZvs0LiUB6tMkHL9?=
- =?us-ascii?Q?lxewKzwbuqpanWfRY60aIVTxLTqQdzn9g62cOs8sNJ3kOtIQZxC73Xsgv3Fx?=
- =?us-ascii?Q?Vn3inzAJdMW+Ilt4CVTKu8lL6+KGlBje5ZMrHcLZVbcsDjD2KC+QJNeyvn9x?=
- =?us-ascii?Q?CHTEIkVaddS+lH9QWTTvAnLEHqOw/jPX1Ujrm0cnd5fVDXMr4Hj1EWfUVz1c?=
- =?us-ascii?Q?9jMVgOAmTjDZVQyh3azz5HvvIF9okDJgTDmiGYJpnc611lfNcOiBH+VMiX17?=
- =?us-ascii?Q?ueuV3AERBywr7m4PIpupPAV5LZ9y9zl4gD/AGPquSg9DE4o8Foka5cQkt3Hm?=
- =?us-ascii?Q?nJeugzN/SKpdxEgzGa4X2Cgm+5/o+1+7MCmE+jhlC929RMfadVfz4vVrIHiD?=
- =?us-ascii?Q?1S/f2BrzrFNt8XXPeqtEWY8MT5fxkFCvYOVEh8zv2ByqHbnreJdB3j7LJLmZ?=
- =?us-ascii?Q?Sx1VOZuagBYFVgWud1Fa+kwoukSBUgaJkJmkt5c9GHMS/qsHboY592bVj3OZ?=
- =?us-ascii?Q?a4igCxQAGhXTQEmA+eebT0sKkGd1ZEWHLxrnUeq++zz37oVUqhntsI3Z+JkC?=
- =?us-ascii?Q?RZ3ytEWoToeeXvuqGZSyEHmFx47drc9klhTYOeeh8Jv7Fy9vo1u3rBYdBYqK?=
- =?us-ascii?Q?qxTAW4wTMy9NzOt6Wuc1S9ggaQkRoeYLK6JGDodx+il3xClPMYNHzve+N5IV?=
- =?us-ascii?Q?JtbivFMAG0NzLwXRpgAz8iKjTUhomwOhJtRpJQ+G9e01/VnDgAflk25EysvN?=
- =?us-ascii?Q?MJmnHEGTYPpEZHm5MRcJjkq2mPBqh+SQgr1Eh55mI0uzNLq+a07YDoQMH+mz?=
- =?us-ascii?Q?mme8doHwpiab4YN3YWJx2SfJApm7GXWh+fqM03AK5jQZOeXZ2M47Y2DPyaEv?=
- =?us-ascii?Q?+innqZkmGUIaJUkUkL9Re8uh0jMcw+vvYYR2bJXVDhZCiySj2kNdCnHl3OJ+?=
- =?us-ascii?Q?+s9g6hvvdvRay9fWv9Z5zvbURiGr4evg5+cMPTNZ83sJ3TWH2uEvWdFLEYkC?=
- =?us-ascii?Q?5qsqnb/zQNwVHlYW7lD6LYWIWMIxnjbqs0DlxP/px/crU01trwKZgLRBBDPm?=
- =?us-ascii?Q?ukGwZEINd9M8kcPGdtN5T4tr7w8X8XK5kvvMZbvX7kD1JYbAGUFE6O3eJJh+?=
- =?us-ascii?Q?1lpC6g6CSoqrI16vordIublPaRR4dsy/9A8xvGiuhhUfjkBXxZjtiCY3QxpD?=
- =?us-ascii?Q?2X+ZXyvYiQNECJA5oURWn4AoJE3xU28p30NpZg68qJKQVp7JcWbpi8sXtfR1?=
- =?us-ascii?Q?3RXyhU0GNN+RKPXCvIXxOegfCMY5vra5mTKl1zgZa1N65xHLyaMCGO+nI9xs?=
- =?us-ascii?Q?lvQ2wU8yqFKQykrHVMdNippDuhcMskXhSN+wDQz5Qw1Yof8uWbfsDMINYi19?=
- =?us-ascii?Q?vxngDdy8G60NNNw0shAEFBnsQfClC/JgVq7Wi4bYAtJA/w26mP7+JZwqR4fY?=
- =?us-ascii?Q?VqICHkv/fwZLJeP7TqzIwYCUrGCdFakq?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2024 20:52:20.1197
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 92bc06b9-004d-47a9-84c5-08dcd6917524
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F68.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4473
 
-From: Michael Chan <michael.chan@broadcom.com>
+Stanislav Fomichev wrote:
+> On 09/12, Willem de Bruijn wrote:
+> > Matthieu Baerts wrote:
+> > > Hi Willem,
+> > > 
+> > > On 12/09/2024 02:52, Willem de Bruijn wrote:
+> > > > From: Willem de Bruijn <willemb@google.com>
+> > > > 
+> > > > 1/3: run in nets, as discussed, and add missing CONFIGs
+> > > > 2/3: import tcp/zerocopy
+> > > > 3/3: import tcp/slow_start
+> > > 
+> > > Thank you for the v2. This new version looks good to me:
+> > > 
+> > > Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> > > 
+> > > 
+> > > I didn't pay too much attention to the new tests, because they look
+> > > good, heavily tested I suppose, and I guess the goal is not to diverge
+> > > from the original ones for the moment. Still, please note that the CI
+> > > reported some timing issues with tcp_zerocopy_closed.pkt when using a
+> > > debug kernel config, e.g.
+> > > 
+> > > > tcp_zerocopy_closed.pkt:22: timing error: expected system call return at 0.100596 sec but happened at 0.109564 sec; tolerance 0.004000 sec
+> > > 
+> > > https://netdev.bots.linux.dev/contest.html?executor=vmksft-packetdrill-dbg&test=tcp-zerocopy-closed-pkt
+> > 
+> > Thanks Matthieu. I did not run the dbg variant often enough to observe
+> > that. Note to self to run more times before I submit.
+> > 
+> > It seems to fail 2/10 times on the dbg spinner. I don't have an
+> > explanation for the failure yet. The line itself has no expected delay
+> > 
+> > # script packet:  0.113203 S 0:0(0) <mss 1460,sackOK,TS val 0 ecr 0,nop,wscale 8>
+> > # actual packet:  0.107191 S 0:0(0) win 65535 <mss 1460,sackOK,TS val 0 ecr 0,nop,wscale 8>
+> > 
+> >    +0.1 recvmsg(4, {msg_name(...)=...,
+> >                     msg_iov(1)=[{...,0}],
+> >                     msg_flags=MSG_ERRQUEUE,
+> >                     msg_control=[]}, MSG_ERRQUEUE) = -1 EAGAIN (Resource temporarily unavailable)
+> > 
+> >    +0...0 connect(4, ..., ...) = 0
+> > 
+> >    +0 > S 0:0(0) <mss 1460,sackOK,TS val 0 ecr 0,nop,wscale 8>
+> > 
+> > I guess the expectation includes the +0.1 delay before calling recvmsg, and that
+> > timer fired a bit early.
+> > 
+> > I previously shared a draft patch to adjust --tolerance_usecs in dbg runs.
+> > May have to send that after all.
+> > 
+> > https://lore.kernel.org/netdev/66da5b8b27259_27bb41294c@willemb.c.googlers.com.notmuch/
+> 
+> Not sure you've seen, but tcp_slow_start_slow-start-after-win-update.pkt
+> also just popped up on the dashboard for dbg:
+> 
+> # tcp_slow_start_slow-start-after-win-update.pkt:39: error handling packet: timing error: expected outbound packet in relative time range +0.600000~+0.620000
+> 
+> https://netdev-3.bots.linux.dev/vmksft-packetdrill-dbg/results/774981/1-tcp-slow-start-slow-start-after-win-update-pkt/stdout
+> 
+> Do we want to follow up with that '--tolerance_usecs=10000' you've
+> mentioned above?
 
-Newer firmware can use the NQ ring ID associated with each RX/RX AGG
-ring to enable PCIe steering tag.  Older firmware will just ignore the
-information.
-
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-Signed-off-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Reviewed-by: Hongguang Gao <hongguang.gao@broadcom.com>
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index ea0bd25d1efb..48ca3095ef2e 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -6811,10 +6811,12 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
- 
- 			/* Association of rx ring with stats context */
- 			grp_info = &bp->grp_info[ring->grp_idx];
-+			req->nq_ring_id = cpu_to_le16(grp_info->cp_fw_ring_id);
- 			req->rx_buf_size = cpu_to_le16(bp->rx_buf_use_size);
- 			req->stat_ctx_id = cpu_to_le32(grp_info->fw_stats_ctx);
- 			req->enables |= cpu_to_le32(
--				RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID);
-+				RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID |
-+				RING_ALLOC_REQ_ENABLES_NQ_RING_ID_VALID);
- 			if (NET_IP_ALIGN == 2)
- 				flags = RING_ALLOC_REQ_FLAGS_RX_SOP_PAD;
- 			req->flags = cpu_to_le16(flags);
-@@ -6826,11 +6828,13 @@ static int hwrm_ring_alloc_send_msg(struct bnxt *bp,
- 			/* Association of agg ring with rx ring */
- 			grp_info = &bp->grp_info[ring->grp_idx];
- 			req->rx_ring_id = cpu_to_le16(grp_info->rx_fw_ring_id);
-+			req->nq_ring_id = cpu_to_le16(grp_info->cp_fw_ring_id);
- 			req->rx_buf_size = cpu_to_le16(BNXT_RX_PAGE_SIZE);
- 			req->stat_ctx_id = cpu_to_le32(grp_info->fw_stats_ctx);
- 			req->enables |= cpu_to_le32(
- 				RING_ALLOC_REQ_ENABLES_RX_RING_ID_VALID |
--				RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID);
-+				RING_ALLOC_REQ_ENABLES_RX_BUF_SIZE_VALID |
-+				RING_ALLOC_REQ_ENABLES_NQ_RING_ID_VALID);
- 		} else {
- 			req->ring_type = RING_ALLOC_REQ_RING_TYPE_RX;
- 		}
--- 
-2.45.1
-
+And more tests coming. Looks like it. I'll finish it up. Thanks for
+the pointer.
 
