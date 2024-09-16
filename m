@@ -1,139 +1,90 @@
-Return-Path: <netdev+bounces-128600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EB1F97A83A
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 22:20:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC5FB97A85D
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 22:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 353581F28BD3
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 20:20:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 914011F290A8
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 20:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52D9F15F308;
-	Mon, 16 Sep 2024 20:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8A81422D8;
+	Mon, 16 Sep 2024 20:38:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="QrriRmjV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="f40rVowA"
 X-Original-To: netdev@vger.kernel.org
-Received: from msa.smtpout.orange.fr (smtp-75.smtpout.orange.fr [80.12.242.75])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBDE815C144
-	for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 20:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.75
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFFE1107A0;
+	Mon, 16 Sep 2024 20:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726518035; cv=none; b=uAnWQOrIhODqvpDLqkjATL5hfBDk+2I6w54zMgVnUg/aObQUCWNXe24/Hbaz0xiNUF6wD4J2A/JRbZCeBtqg9GkAXAEErnY2tmIRH9Y/KM0wtZ1D1PlcmKXOCMOFifTrIAQVjHzivr18N+5Lo8MV+1h4DERh3vk4dHxG1TvuHLQ=
+	t=1726519089; cv=none; b=PzQsfAbHVH6Vbeh0UuAGm3YnF2opgBNxMaHCmQXWG2o9MhRvPHCeJVNubfZ0HroGpMWGvG/6QYIh/bCVIal4TJzVCUHC5TEEI3zf5hUMGli/k315go7iePz9iVuceva3CEmUoK2rRafMn/fs/15GNu6pOuMMhHE/i/3hl27ihFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726518035; c=relaxed/simple;
-	bh=AIia4lKEZbObyaFYhUbFcNZrhB13MUM4zPKIfR30Obo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j5yGw+JlVs/gNVUuNfqqbFgB9Eko6wUoJMsVxDHWvUBYaE112P+wG4UTeu+kh6/rA9/XsXEzpt5KOXVt2t7g88tGhg7NxQ95nY853w0VPQLxf5g/H4TpPNKRMUWfiIhHTyWU/gjca4Iga0Ep3n/D9uM7g+FoqnEb8sLBDp21cCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=QrriRmjV; arc=none smtp.client-ip=80.12.242.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id qICnsCJi7wFpSqICnsB9XJ; Mon, 16 Sep 2024 22:20:25 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1726518025;
-	bh=3Knrr3RbC4JV3H2uQiTkpSAIzSvcPBfz3YbMOwmqzNs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=QrriRmjVayvdZ9yvTrDorx9oh8DoqEJ9P43q3xnDcEZNreDtgqJE3mJ5HkFLby/Xx
-	 jyAeNmPyXwcG/0ceO29wqGO1fVfkmlk1m+a2ocC8mtq9sHA9PcQHat6bT7aUMIAPfu
-	 xyQzpH6ueoDHTTIWVUSR8dA3vMlIuJoP/Rrmxe3lVHgAJENm4GJBj6hLz3GeRvlfgW
-	 sQfLtTHbVfptWrMxz5esjpPqqVSHbo+NTWyg4ZzGQQHah8gi/ZidOtVZESucMZM+PV
-	 0Hrat1oFOHpBoWeQ5krLf+YsQelixQWf0T2GQqvdF2wNcVD388coEnvVe8JjJzYXeU
-	 E5ApLFFl6o2fQ==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Mon, 16 Sep 2024 22:20:25 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <c794b4a6-468d-4552-a6d6-8185f49339d3@wanadoo.fr>
-Date: Mon, 16 Sep 2024 22:20:15 +0200
+	s=arc-20240116; t=1726519089; c=relaxed/simple;
+	bh=q83pgDV47Qc7WSIKT4BqeRJMitDCo2e6t6YcampYFxE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dpw9QPExsSTdREXP9dK9UghWs/IL6Cr+AFp59E4FXNbudZ1fGN2B5uhJrtP7VvwFVlhzf1tnORAVbCRXxNw/K563h9Fjlom1AKoRHrdzD35yKxecgDia5+vARKw/O1/ZGtO6s+vHTO+D/PxkB/uCS0SKBgCUkiePtjuBaxnthEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=f40rVowA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=89CEOgVHqh6yYFL1GhUKj/NHWtr3/ma627UDSS+G7zY=; b=f40rVowAk0fnhNNqTO3VK6iLyO
+	saTjWfjIIHXQSoYQQuT0XzcIGFF+oueVCZxTpB1Aiyb9EUiprvm9lEErSGf7ZVosk7v61thbBsCoi
+	aE/SpyrWVyIfdWZ1y0nemK6YLD38Jc5AVyOpVdW4SDzIMnMRxjykvLjrAyUAy3G7dMy4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sqITY-007aiz-Ia; Mon, 16 Sep 2024 22:37:36 +0200
+Date: Mon, 16 Sep 2024 22:37:36 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, maxime.chevallier@bootlin.com,
+	rdunlap@infradead.org, Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next V2 2/5] net: lan743x: Add support to
+ software-nodes for sfp
+Message-ID: <ee5a5bf2-a014-448c-9e28-d4caea3f481e@lunn.ch>
+References: <20240911161054.4494-1-Raju.Lakkaraju@microchip.com>
+ <20240911161054.4494-3-Raju.Lakkaraju@microchip.com>
+ <c93c4fe2-e3bb-4ee9-be17-ca8cb9206386@wanadoo.fr>
+ <ZuKLGYThw8xBKw7E@HYD-DK-UNGSW21.microchip.com>
+ <ZuiHhoxi05IOWphr@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/15] timers: Cleanup delay/sleep related mess
-To: Frederic Weisbecker <frederic@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Jonathan Corbet <corbet@lwn.net>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Anna-Maria Behnsen <anna-maria@linutronix.de>,
- Andrew Morton <akpm@linux-foundation.org>, damon@lists.linux.dev,
- linux-mm@kvack.org, SeongJae Park <sj@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Andy Whitcroft <apw@canonical.com>,
- Joe Perches <joe@perches.com>, Dwaipayan Ray <dwaipayanray1@gmail.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, netdev@vger.kernel.org,
- linux-sound@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
- Nathan Lynch <nathanl@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org
-References: <20240911-devel-anna-maria-b4-timers-flseep-v2-0-b0d3f33ccfe0@linutronix.de>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20240911-devel-anna-maria-b4-timers-flseep-v2-0-b0d3f33ccfe0@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZuiHhoxi05IOWphr@shell.armlinux.org.uk>
 
-Le 11/09/2024 à 07:13, Anna-Maria Behnsen a écrit :
-> Hi,
+> If you really want to do this kind of thing, at least write it in
+> a safe way...
 > 
-> a question about which sleeping function should be used in acpi_os_sleep()
-> started a discussion and examination about the existing documentation and
-> implementation of functions which insert a sleep/delay.
+> 	snprintf(..., "%s", string);
 > 
-> The result of the discussion was, that the documentation is outdated and
-> the implemented fsleep() reflects the outdated documentation but doesn't
-> help to reflect reality which in turns leads to the queue which covers the
-> following things:
+> rather than:
 > 
-> - Split out all timeout and sleep related functions from hrtimer.c and timer.c
->    into a separate file
+> 	snprintf(..., string);
 > 
-> - Update function descriptions of sleep related functions
-> 
-> - Change fsleep() to reflect reality
-> 
-> - Rework all comments or users which obviously rely on the outdated
->    documentation as they reference "Documentation/timers/timers-howto.rst"
-> 
-> - Last but not least (as there are no more references): Update the outdated
->    documentation and move it into a file with a self explaining file name
-> 
-> The queue is available here and applies on top of tip/timers/core:
-> 
->    git://git.kernel.org/pub/scm/linux/kernel/git/anna-maria/linux-devel.git timers/misc
-> 
-> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+> so that "string" doesn't attempt to be escape-expanded.
 
-Hi,
+One of the static analysers is complaining about this danger, or it
+might be GCC itself if you up the warning level. The kernel hardening
+people are replacing all such bad cases, one by one. So we definitely
+don't want to add more.
 
-not directly related to your serie, but some time ago I sent a patch to 
-micro-optimize Optimize usleep_range(). (See [1])
-
-The idea is that the 2 parameters of usleep_range() are usually 
-constants and some code reordering could easily let the compiler compute 
-a few things at compilation time.
-
-There was consensus on the value of the change (see [2]), but as you are 
-touching things here, maybe it makes sense now to save a few cycles at 
-runtime and a few bytes of code?
-
-CJ
-
-[1]: 
-https://lore.kernel.org/all/f0361b83a0a0b549f8ec5ab8134905001a6f2509.1659126514.git.christophe.jaillet@wanadoo.fr/
-
-[2]: 
-https://lore.kernel.org/all/03c2bbe795fe4ddcab66eb852bae3715@AcuMS.aculab.com/
-
-
+	Andrew
 
