@@ -1,286 +1,332 @@
-Return-Path: <netdev+bounces-128518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6BFA979F8B
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:40:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 377ED97A00A
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 13:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 178B81C22DB0
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 10:40:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BA701C2221C
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 11:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B2814AD19;
-	Mon, 16 Sep 2024 10:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F983156646;
+	Mon, 16 Sep 2024 11:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qDPbopgt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QF4bat/B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8B938DC7;
-	Mon, 16 Sep 2024 10:40:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726483234; cv=none; b=SIO/2cgky2+6hMwYAW0xbHNyxYTWiyx7cIgeZ//D/M6r2tVzr7KPwA4jQln5yck4w1wkx60FmKxaIzjjlHJNIn4IoA4IWKldc1Lfa3dcqjwRqbw5xzXUhYqgPvi8nwyDHfV/SLi9byTPfEwmT9BSbbN77gA981FNdCzzc7ZYIVg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726483234; c=relaxed/simple;
-	bh=R/tv/PG/re9DMp/KexY3jtkuZR5gVexp5j+E1jOmrMw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DOnpijqrfODZlgt47ddyLnKivKTK5x57UWRO/vUrPVVYXAJCjJMR0APImd2hbrP3cerPF5XnROAyQhttQMMYcz0ujXqtXdis43zj6ltzUd+qTgqT7gLvguYzsnbVJ53nMrnUmAPXZRX+8i6nhlLnsvlk2Z+nslqKIXgUq9fGptg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qDPbopgt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4FF2C4CEC4;
-	Mon, 16 Sep 2024 10:40:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726483233;
-	bh=R/tv/PG/re9DMp/KexY3jtkuZR5gVexp5j+E1jOmrMw=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=qDPbopgt8GBjtyPaX0myPcxshk8F6qoq61DGlrLm4+qfpVv6/JZLQOtIYTja2x+bD
-	 d2UofwZadEuLQBaFfkgLQUt7DxEJAbsBeq8tIYBT3gulY3pBcq527JSEdJ6TlzG7kw
-	 k+BOp4ayeGmfx+aJjJkpQu7lvt3Frfq885Gw9sdpiCPIis/L6R7NQtTfF0K1R/87Q3
-	 AHLtAx2hfQG2mYGVUb7aRwi2Lc1aN2CzcDBdpfhHlvGQoDMYsSjWlVRiXRBrvz4qHp
-	 tptWZifsckyXRYYKPdb3C1i+T2uHFYKNxWKEOdXMixCyMUENgGw6zYatFI4mRVuexZ
-	 pUZ9Zq1MTRETw==
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2f75129b3a3so44678211fa.2;
-        Mon, 16 Sep 2024 03:40:33 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUpTe0nZesuTn3IrMoCy40dtMxEhHQoY+PbkjTo2hg1VMaHi0sqJO9lG51NOlj8IGq3036zFdplESmJYTWtX0E=@vger.kernel.org, AJvYcCVC/KwGr2HzcVaaTRApmmE2BYUsh6UH4bAgRBHEoBJfI1SKOlJX6dp9605mDvitpXStsrX56D+B@vger.kernel.org, AJvYcCWz//PO6cVtiUOElfps7irAov2BhrrpgGhjbZwgH/48HxlgM6Z80DBm1bR9qf6fO+Q1LjJXXysxOOb9uWit@vger.kernel.org, AJvYcCXHl9QlJGVNC1oeNiPkPN4Gj62JVD6ziCe6IIePQWgmnFH56VbMn2G51iCpz/yzf4LHRojy7jMCd1L/OLUOoSc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzV9U2jRaON53grjp9a1jT7URC8x6AykAFDg/iULau2qstNkxTk
-	zBmJUMSEEt5Xv+z4XwMdSDuOCkmanMORO1zy4JLvsyHBwQdGnSfJbDQVy+4DBA+rRvmD1LMuunw
-	o1B2WB/ykUQ/C+2mptFZXfcq5iec=
-X-Google-Smtp-Source: AGHT+IHci19v6eZ0KWibw+xJghDYZwwlDnzhLvraPYtksohn2YJy0L4iXMElJbEcseIs6dNQ418WSqyIYnSZTP2qqx4=
-X-Received: by 2002:a05:651c:2111:b0:2f6:6202:bfd5 with SMTP id
- 38308e7fff4ca-2f787f44772mr81255921fa.34.1726483232078; Mon, 16 Sep 2024
- 03:40:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE499158523
+	for <netdev@vger.kernel.org>; Mon, 16 Sep 2024 11:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726484975; cv=fail; b=M0avC4ewJhYNUOrIORa1s8hwvzVuj1nMWpO9ikrY+xuNvRIE8siUyruI3E1vV6mo8eSclPEh8H/5N3FMoXTqXpjNw+8j1lZlTGHSD8pWD0vMU8MtcdngVfPw4tgd52vdcNpHNDCvW+cRXtzrqFmoMSwBi8FfnoKHFeSqS+1AYxs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726484975; c=relaxed/simple;
+	bh=v4PInJV5RK7YAwyQFbJ0A/uiRaX0Z4oxSbyJB+K5Ufg=;
+	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=B8kAa1Y+6CbsgxNJF4jMV4qk2Iie+Gb7eD1ROnLQDMgwtgrDtvCbTTKiQeNDMAIEwH/grZAyEnnVgmqnyrgZvnXlQjOQTVOd5rgbtT2FgOEPKcH8yWU8FswPzesSSf+D4ttlxYfX1yARinJInuy5W6GZvo9M3Uq5W0Ik0R9q2cU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QF4bat/B; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726484973; x=1758020973;
+  h=message-id:date:subject:from:to:cc:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=v4PInJV5RK7YAwyQFbJ0A/uiRaX0Z4oxSbyJB+K5Ufg=;
+  b=QF4bat/BTW7XQOwe8xDT+33KCJj5DpH68dyeOQceUVOViU++ybbepAFZ
+   36DJwmn5EQ+YjYILaOyzTUNllnICX+xSuLibViueESB5BbtXUnYSeJcKy
+   NcqLym4uBAsRQAfhYhy/q6rb8/0RlVDV46zysfl6HZqE/Y2iKy6FmLaop
+   zYEylPkmyAlQMQ1dkzvJJxN1QelolQSd+z9yAEeud4BZJfwSm/GSafWRm
+   BkJ/B7ScSFaXwgS5lT7fUh4OwF1X4iYQPf/MgAUHejSuCY0j/6fw6RWSG
+   koup0OKApga398dVCzUUZV0l37h7Y0PLoZi4RnOQTKGvtpQc9lF6VuyIa
+   w==;
+X-CSE-ConnectionGUID: kDjaw1oJQ5q324siG6FeHQ==
+X-CSE-MsgGUID: tWSltMLkT0CrMLDCVR9lFg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11196"; a="13542004"
+X-IronPort-AV: E=Sophos;i="6.10,233,1719903600"; 
+   d="scan'208";a="13542004"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 04:09:32 -0700
+X-CSE-ConnectionGUID: cMX6Zm8lQdibWJmKz7vQNQ==
+X-CSE-MsgGUID: g5kzeAgiQ7+1GYY8rlfy2A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,233,1719903600"; 
+   d="scan'208";a="69603186"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Sep 2024 04:09:33 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 16 Sep 2024 04:09:31 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 16 Sep 2024 04:09:31 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.47) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 16 Sep 2024 04:09:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=SIBN85Q3A1e6laUfQZt4q86K/uE8vzYN8asIfW4gzwzcAPs2b3YYD3/YgOvjJChTFrP6hMucBSbyF0/EsNhRKAE72quoFRYP1Ku27Mf/bbtCmzaRNtk9P2gEgnDuTB/1sX6CBDkwtiTFGRYaruzDRtjGvStdDlCEUrZzKbyRYLu/XmHg5Y/pPxQdFjdXtMKuznooF5T0K9sh5w9aAlS761kxhsSjPosXtrUEc2CwoT3+oNPmDpDCgbfNDULcE9vkwptoeG/ee0ElRgVhMHhWqUs/A0Bc4zOyesxCNXnqXeFElvLBwfDhpxJxlEKuDl3n6mFkyMSXjzLhQVwC8Llfnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ICOofYaYLutqlMdEk8YuYzU4yh7NslRYdeDovfonGwE=;
+ b=jmB03DJUnvKNEELOOG7VqEMyxdcV7iOHsi7Bee1q+6OkohcpBGSseKEDCN9FfkvaAKY40QOz6T1Ete9DiakAH7l7k2oKDtmZcl0gz1fOfIUnRRSC+wUJDNJys25BsV6fYs6BecBR3GHfCAbrCd9FDg7IIp9GplUT7oC7rSW7Bk3/CvvzZ7HNsqzRRtcHn/kIAPXIs4GV/3BqnSlJeVw6i4w9tl3UNirPCqjmz6FclOEYxplbyCWpGm2gfHsPGM/EsHqFYWJYR26KzhzN04AAmwgq4e1cXwQUAHIUx5xK7C8tzw7k7tH13H1o/2rkpkJ/Uz2UfOQHpKRILoCSlsgt5A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com (2603:10b6:610:190::8)
+ by PH7PR11MB5767.namprd11.prod.outlook.com (2603:10b6:510:13a::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.23; Mon, 16 Sep
+ 2024 11:09:27 +0000
+Received: from CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3]) by CH0PR11MB8086.namprd11.prod.outlook.com
+ ([fe80::984b:141d:2923:8ae3%7]) with mapi id 15.20.7962.022; Mon, 16 Sep 2024
+ 11:09:26 +0000
+Message-ID: <3547078e-acdf-4189-9a1d-98f581896706@intel.com>
+Date: Mon, 16 Sep 2024 13:09:21 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: tcp_ack __list_del crash in 6.10.3+ hacks
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: Ben Greear <greearb@candelatech.com>
+CC: Jan Glaza <jan.glaza@intel.com>, Aleksandr Loktionov
+	<aleksandr.loktionov@intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, netdev <netdev@vger.kernel.org>
+References: <9ac75ea7-84de-477c-b586-5115ce844dc7@candelatech.com>
+ <b833aea6-b499-4b9c-90fe-aab31510544d@intel.com>
+Content-Language: en-US
+In-Reply-To: <b833aea6-b499-4b9c-90fe-aab31510544d@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: WA0P291CA0005.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1::13) To CH0PR11MB8086.namprd11.prod.outlook.com
+ (2603:10b6:610:190::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZrZrNfUZtUIqvbUI@cute>
-In-Reply-To: <ZrZrNfUZtUIqvbUI@cute>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Mon, 16 Sep 2024 12:40:20 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXGWV-S6Wec8LpEj9kvMufpn_Gjgqdybudxq4rnwjg3a+Q@mail.gmail.com>
-Message-ID: <CAMj1kXGWV-S6Wec8LpEj9kvMufpn_Gjgqdybudxq4rnwjg3a+Q@mail.gmail.com>
-Subject: Re: [PATCH][next] wifi: iwlwifi: mvm: Use __counted_by() and avoid
- -Wfamnae warnings
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Miri Korenblit <miriam.rachel.korenblit@intel.com>, Kalle Valo <kvalo@kernel.org>, 
-	Johannes Berg <johannes@sipsolutions.net>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-hardening@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH0PR11MB8086:EE_|PH7PR11MB5767:EE_
+X-MS-Office365-Filtering-Correlation-Id: 884bee68-0cca-4df5-60e2-08dcd6400715
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?aVlEKzd2NlkvUjd0eDVGL25PUi83THFaRmtCL3J4NnpHK2pTODZGNXdPZmJp?=
+ =?utf-8?B?c2E2WXRLRk94T3k5NVpEUERkRmZOQzVNcGJtMWVtbHU1b2QzWS9RWHJTcmlz?=
+ =?utf-8?B?cGp1bWpYNjdVRC9UaXNYaE5xNHhMcGZtbkZKNThOSnk3RnJTOXBBeFJ1YzRj?=
+ =?utf-8?B?V0RzeVpxMVBsN29aY240MW5DZ3F1WGc5QlI0Q1NvcUpoZk5HcHlHZXdhdk5W?=
+ =?utf-8?B?NFZMKzNYb3hZaWd5RmM1SGZsTEVCcFZ2bllhYnNnRFBTeEdybDIzMDJZNDQ1?=
+ =?utf-8?B?aWNVR1ZaY0NrNmI5UExtWGsrOVpzbTRSNmEySGxkNkxzRlNTTk1namVlYUUz?=
+ =?utf-8?B?bUNjaU00WElJUjdOWm9UNE5lcnl4b1hjZXl5aUhBUzVBQXpsNnpQMTBJWkhT?=
+ =?utf-8?B?c2t3Z2RWb3V4QktiYWQxbWNRTisxcUZyNUl6NjF1aHdLYmgwMHJsK29ZVGlW?=
+ =?utf-8?B?cDlHZXNGUUNKOURTUlVmcW1URERMWnpuSkdXNWs0TlgyYk9mMTNkdWlEVDEz?=
+ =?utf-8?B?dDM5MEcweE14dEM4K0hNS296Ykl0RDFJeDN4alViQ0xnQThQaG5CUGFFaUJ3?=
+ =?utf-8?B?SGxiMG5Ec3BwUHZHc1UvSzUvYXlSYUZab3FMNzJ5bkFiblNBOUUzWUVKQWxv?=
+ =?utf-8?B?Z0FlTS8wUE5iSUxuekhab0dzOUNRaDFkNjVraW9ZZWZieFBGbmZJZVFGdENj?=
+ =?utf-8?B?aWFRTkpmSG5hd1JncExuUjFnKzZkYnlYUHRGV0RjekdQbUpxSGRaQXhuUVFV?=
+ =?utf-8?B?K21UWUU2TmYyeTVsQWtRak9QdUZKTEtYU3JBMmJReExERDRKZWgvWFVadnRK?=
+ =?utf-8?B?cUswRUY1OHcrUWNxU01FcmVQcGhZNlczK0hvOFJWQWkxYVRGc3NxRDh3cWRT?=
+ =?utf-8?B?RDE3MXpYY2tERnFocTBJS2ZXcVFrNWlTU3pWRGg3THlMMlJjVVgxWWZGa014?=
+ =?utf-8?B?UUFENSt6cENhNjN5S01RWk9IVnVuK2NzUitPMlAzbHBXc0U2YkQ0YWJCTmRR?=
+ =?utf-8?B?Q0s2ZElhTG9pKzRaUHdKZnVYYjdHSUgxck5iK0podyt3bzZaQ25CcUFhWGQx?=
+ =?utf-8?B?Q3JnamZHMTBuWndONG9haUxyZVZHVXpaUklaQjU5VnkzS3ptMlY5MXBteHRB?=
+ =?utf-8?B?eHYvRElvbGFTUXJxQThmQWdOZUNwc1oxYUxoRXJYQVFYdmU3RkNxU3ZWVjlC?=
+ =?utf-8?B?WVBlMWVwcGJzclhpdFJqNTV5SmYvR2RhYlp2U3c4dVZQYWZ5YzdzR2U4bkxK?=
+ =?utf-8?B?MytnMDJ6RTF1enUwdUp3dkRRMzFTQldtWWJIRHhheVptSlpHekMxS3Z1ZFd5?=
+ =?utf-8?B?ak5meTVWVUIwRFFXWVJDeUNPcjlrVDc3OFgzckJxTDQ0ZWJsWWZ1cjZ1SXph?=
+ =?utf-8?B?cTcvRkxyYVlGMHRqTFZud0oybDlKUjVOTnlMaElNcHFsU3JjQzQ0dGJKdUgw?=
+ =?utf-8?B?NHVKL2d3Um9qdGZQN2lheDVpaUt5SWhuYy9QZmFIbmtWZFhFK0JOcEhPVHdq?=
+ =?utf-8?B?d3kvbmZkV3hZbVJuMEVyeHRDOEdhMUxUOXd4YTBjNkF0RGIxcFlxMW5VSHdE?=
+ =?utf-8?B?WFNkZ0s3cnc1UHNqS2QwdnZzSFVaTEpGOHRjTXJFNDFralNlTjN2WVFPSGwz?=
+ =?utf-8?B?ZDh6TGVHU050ckpNcVA3bktDSy9oQy9HTjVUdnRWL1cxWGhjSENjS1IvZ04z?=
+ =?utf-8?B?NEt1eWltMnI2c1U4dS9MYmZWSWpOcE9yNG11WmJVOERyd003U3pTWU9kVi9j?=
+ =?utf-8?B?SFdtODB0Nk9JLzJGUXRNV1hmWHRUNkxRS2tOY0NoVUdKWTJMRzFIaTcxTFJQ?=
+ =?utf-8?B?MzRGb0RYNWxXMmEvMzg0Zz09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR11MB8086.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bFF0Y1dXUXR4RkxvQzl4RkFJdjh3Ym9qemJkdUplcFJJLzJBQ1BRWmVCN1Q5?=
+ =?utf-8?B?TUdGZDhWVUdSZC9RdFVVVmZDQ1hDQmZjOURHeUZhN01BNm15NkhCQXhTQ3Yr?=
+ =?utf-8?B?cGdNcjZpc1N5NkxzOXE1QjZlcTk1OSsvNzZ4SmVUVXl3VTJ1T1d0NFdTR2Rz?=
+ =?utf-8?B?dVVoTEZrdG5OaThWdWFqRlRrTGlkWEwweUtNUCtsTFFEa1JUVE1rZHdPdnVR?=
+ =?utf-8?B?WjdHLzVVb3ZkemdlN3pSS2VQcVpHVWVIZi96cDJzVkJ3eDAySTZtdlduUThq?=
+ =?utf-8?B?UFNBK2VmT3BRTnM1YmFWaXNydUVPMXZJU0I0cC9GTVBoUkw5NCtoZXJCemdt?=
+ =?utf-8?B?WmFGR2ZnQzF6NkRYdERraHY4S0kzdDUwQTFyelM2V1RFNmgwVVNLMTdFWTVq?=
+ =?utf-8?B?ejU2aUVheHpGV0ZDbWRGNExaUE5xcGYxcXRWNkgyc0xhMzdSNEhTb1dqeC90?=
+ =?utf-8?B?MEk4R3lBMDJUc21Lb01XZUZJVUpaeEMyaENYN1pNbHZ4L0VSNDVPUkQ5OFN3?=
+ =?utf-8?B?WGhYeGpxbmVYMm5ZVzhGeW8reUo2QVVPVk0xTjZ2U01abXp3T2llMm5rcVZD?=
+ =?utf-8?B?TFB5K1Y5Vmc5Ym9SZWJrVVBJK3A3cjJ2cy9oc0NiNnVRbnJYL2R5MHFjVWFL?=
+ =?utf-8?B?L2JtbisvODBjYzl5cCtJdnI4UnUzdXF2LzRDS3VYblZoOHNXa2dWTy9PNG93?=
+ =?utf-8?B?UzVPOG5ZZVJ2TjJjUllnREYxMlRNWHRtbE1jUXdvSWp2Zk5CcFZ5M0ZCSSsy?=
+ =?utf-8?B?dTBOaGRsdHlubEhyZmFpRXhFM21hTktEamNCZ000QXRyaXMwSHc0MTZLTHM5?=
+ =?utf-8?B?aHpsaHhWd0xHdGV6OGZueFZKQ1E3K0VDU3RibzMwbXRJcGJWcmhKUE9rMEdj?=
+ =?utf-8?B?Z24vWTAyL013aEc1M0VKOU1pRlhWL3c0MGgvNDdOMm40MlhDeFRCTjdaV2Rv?=
+ =?utf-8?B?MGJzdzdBbzJSNmJHbEZIZGQ2ZXdKeEpRTzlpVUhvOUk1WEZadS9sUnpPUE9v?=
+ =?utf-8?B?VVVOb0NibzR6eHFlT1B2YXNyNkhzTUE2YTNOSzFtMFE4bmEzdm8zZEh1eU5D?=
+ =?utf-8?B?Q3VWNTFLdkU5b1dnVmlhYlRPYVdJcDJvd0NtZmY2dkFoZm5hZmg0MzJYcDI2?=
+ =?utf-8?B?K3piODhERFo4Rk1TKzMyVVY0K3JqM1B5MnNKdy81dVlaVkhFN2xubmdUck84?=
+ =?utf-8?B?TzZvTU05VG1reTE3VHRnYWR4NFZ6WkF3c3Z5a3VFdGJhZWNmZlA3anMzVisx?=
+ =?utf-8?B?TCtnUVpWYUxBdkdvWkZkdE5qT1lCcjdzcVBnL0IzSG5pV1MwNTk5SkFmTWpZ?=
+ =?utf-8?B?NEpXSjBjRFl1NVdGWVVDSnY0eFM1dTBSWWZ3a0ZJWkZmaTRiTy8ra2JKNmJ6?=
+ =?utf-8?B?ckRWZEJWQ0ZXaDUxS3FldzJlMnhkUTg5amVMRElaenBpem1jQTlPMnJsZ05Y?=
+ =?utf-8?B?S3BMVEp0QXZqeHFjV1IxSEtsZEtuRnFtRTJpN1BQcWlEMlVwR0tOWnBjaCtm?=
+ =?utf-8?B?SlB4ZHpqZks2eHpnYnBGVHNkY08xUGcxZDVoRENleFovT2F1WWVSUlc5RzJl?=
+ =?utf-8?B?VFZnZEx1QWxmcGN4cWtmVWVaWUowc2c0bjdqejNRWHJuREQrdVpkV0NqeGlV?=
+ =?utf-8?B?dEdBZEdiMjJCTExDN1RraFIyLzZkL3ZLSitGTW5pNG05K2kwWktXTFdGektv?=
+ =?utf-8?B?U25BdXR4WlhReElPR2N2WXNZeVlEMzdHZTJVLzQ4ZUtGZFg5MjJURU40clpL?=
+ =?utf-8?B?SDZlMnNsa2tPMkI5TmxNMHRrS0lzOSt0QlU0aU4xNDVDNzFEUkkzTEZBWnBk?=
+ =?utf-8?B?NTNuN0VlcitNb0czQTJSZ3RtUWRPMkpmWmpFczB3Qm15U3d2ekpxSmJ1U3F1?=
+ =?utf-8?B?QUUvcGVjN2Q0VkFYY2tqQ1o4QVpLM2ZnUjZmNFk2aHF5N0xJM1IyMG9vRGdO?=
+ =?utf-8?B?ZGYwZDZoY0JYNFRscUhRNHlCLzlYN1dOZnpWNllxUFJBRy9FS21kUktzZElx?=
+ =?utf-8?B?WkpJWDBUeHppdTFCbkZHaVJsYzJuZGkzZEp5VmJ4eUNSdXFoVUhHcTdteWFl?=
+ =?utf-8?B?a2JvR2Jnc2tFUThEdDhRT295aFNIQTdIdFY5V05adGxXUXBOcWFtUkdzZ3Iz?=
+ =?utf-8?B?eVJabmg3Q0tOZUl0enFWOVBTUVRYTDE4UzBaWWU4YS8vQmJuZzQ3b0Mxd2tN?=
+ =?utf-8?B?MkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 884bee68-0cca-4df5-60e2-08dcd6400715
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB8086.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2024 11:09:26.6321
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: szjdJSlwnLbNsmTC+QzbLIfSZ008Y8Y1VNO2vmKnOGEE76JokQEMwkp93IUZJ0IoUEatoucIF0CGAIqn7eG8Qry1e1M77ad+SJfQ09/aFN8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5767
+X-OriginatorOrg: intel.com
 
-On Fri, 9 Aug 2024 at 21:17, Gustavo A. R. Silva <gustavoars@kernel.org> wrote:
->
-> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-> getting ready to enable it, globally.
->
-> So, use the `DEFINE_FLEX()` helper for multiple on-stack definitions
-> of flexible structures where the size of their flexible-array members
-> are known at compile-time, and refactor the rest of the code,
-> accordingly.
->
-> In order to allow for the use of `DEFINE_FLEX()`, a couple of
-> structures were annotated with the `__counted_by()` attribute.
->
-> With these changes, fix the following warnings:
-> drivers/net/wireless/intel/iwlwifi/mvm/d3.c:124:52: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> drivers/net/wireless/intel/iwlwifi/mvm/d3.c:2053:51: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> drivers/net/wireless/intel/iwlwifi/mvm/d3.c:2148:43: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> drivers/net/wireless/intel/iwlwifi/mvm/d3.c:2211:43: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
->
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
->  .../net/wireless/intel/iwlwifi/fw/api/sta.h   |   2 +-
->  drivers/net/wireless/intel/iwlwifi/mvm/d3.c   | 126 ++++++++----------
->  drivers/net/wireless/intel/iwlwifi/mvm/sta.c  |   2 +-
->  include/net/mac80211.h                        |   2 +-
->  4 files changed, 61 insertions(+), 71 deletions(-)
->
-> diff --git a/drivers/net/wireless/intel/iwlwifi/fw/api/sta.h b/drivers/net/wireless/intel/iwlwifi/fw/api/sta.h
-> index d7f8a276b683..fe6bd34fefa3 100644
-> --- a/drivers/net/wireless/intel/iwlwifi/fw/api/sta.h
-> +++ b/drivers/net/wireless/intel/iwlwifi/fw/api/sta.h
-> @@ -479,7 +479,7 @@ struct iwl_mvm_wep_key_cmd {
->         u8 decryption_type;
->         u8 flags;
->         u8 reserved;
-> -       struct iwl_mvm_wep_key wep_key[];
-> +       struct iwl_mvm_wep_key wep_key[] __counted_by(num_keys);
->  } __packed; /* SEC_CURR_WEP_KEY_CMD_API_S_VER_2 */
->
->  /**
-> diff --git a/drivers/net/wireless/intel/iwlwifi/mvm/d3.c b/drivers/net/wireless/intel/iwlwifi/mvm/d3.c
-> index b4d650583ac2..b19579dd8de3 100644
-> --- a/drivers/net/wireless/intel/iwlwifi/mvm/d3.c
-> +++ b/drivers/net/wireless/intel/iwlwifi/mvm/d3.c
-> @@ -120,19 +120,15 @@ static void iwl_mvm_wowlan_program_keys(struct ieee80211_hw *hw,
->         switch (key->cipher) {
->         case WLAN_CIPHER_SUITE_WEP40:
->         case WLAN_CIPHER_SUITE_WEP104: { /* hack it for now */
-> -               struct {
-> -                       struct iwl_mvm_wep_key_cmd wep_key_cmd;
-> -                       struct iwl_mvm_wep_key wep_key;
-> -               } __packed wkc = {
-> -                       .wep_key_cmd.mac_id_n_color =
-> -                               cpu_to_le32(FW_CMD_ID_AND_COLOR(mvmvif->id,
-> -                                                               mvmvif->color)),
-> -                       .wep_key_cmd.num_keys = 1,
-> -                       /* firmware sets STA_KEY_FLG_WEP_13BYTES */
-> -                       .wep_key_cmd.decryption_type = STA_KEY_FLG_WEP,
-> -                       .wep_key.key_index = key->keyidx,
-> -                       .wep_key.key_size = key->keylen,
-> -               };
-> +               DEFINE_FLEX(struct iwl_mvm_wep_key_cmd, wkc, wep_key, num_keys, 1);
-> +
-> +               wkc->mac_id_n_color =
-> +                       cpu_to_le32(FW_CMD_ID_AND_COLOR(mvmvif->id,
-> +                                                       mvmvif->color));
-> +               /* firmware sets STA_KEY_FLG_WEP_13BYTES */
-> +               wkc->decryption_type = STA_KEY_FLG_WEP;
-> +               wkc->wep_key[0].key_index = key->keyidx;
-> +               wkc->wep_key[0].key_size = key->keylen;
->
->                 /*
->                  * This will fail -- the key functions don't set support
-> @@ -142,18 +138,18 @@ static void iwl_mvm_wowlan_program_keys(struct ieee80211_hw *hw,
->                 if (key->flags & IEEE80211_KEY_FLAG_PAIRWISE)
->                         break;
->
-> -               memcpy(&wkc.wep_key.key[3], key->key, key->keylen);
-> +               memcpy(&wkc->wep_key[0].key[3], key->key, key->keylen);
->                 if (key->keyidx == mvmvif->tx_key_idx) {
->                         /* TX key must be at offset 0 */
-> -                       wkc.wep_key.key_offset = 0;
-> +                       wkc->wep_key[0].key_offset = 0;
->                 } else {
->                         /* others start at 1 */
->                         data->wep_key_idx++;
-> -                       wkc.wep_key.key_offset = data->wep_key_idx;
-> +                       wkc->wep_key[0].key_offset = data->wep_key_idx;
->                 }
->
->                 mutex_lock(&mvm->mutex);
-> -               ret = iwl_mvm_send_cmd_pdu(mvm, WEP_KEY, 0, sizeof(wkc), &wkc);
-> +               ret = iwl_mvm_send_cmd_pdu(mvm, WEP_KEY, 0, __struct_size(wkc), wkc);
->                 data->error = ret != 0;
->
->                 mvm->ptk_ivlen = key->iv_len;
-> @@ -2049,10 +2045,8 @@ static bool iwl_mvm_mlo_gtk_rekey(struct iwl_wowlan_status_data *status,
->                 struct iwl_wowlan_mlo_gtk *mlo_key = &status->mlo_keys[i];
->                 struct ieee80211_key_conf *key, *old_key;
->                 struct ieee80211_key_seq seq;
-> -               struct {
-> -                       struct ieee80211_key_conf conf;
-> -                       u8 key[32];
-> -               } conf = {};
-> +               DEFINE_FLEX(struct ieee80211_key_conf, conf, key, keylen,
-> +                           WOWLAN_KEY_MAX_SIZE);
->                 u16 flags = le16_to_cpu(mlo_key->flags);
->                 int j, link_id, key_id, key_type;
->
-> @@ -2069,40 +2063,40 @@ static bool iwl_mvm_mlo_gtk_rekey(struct iwl_wowlan_status_data *status,
->                             key_type >= WOWLAN_MLO_GTK_KEY_NUM_TYPES))
->                         continue;
->
-> -               conf.conf.cipher = old_keys->cipher[link_id][key_type];
-> +               conf->cipher = old_keys->cipher[link_id][key_type];
->                 /* WARN_ON? */
-> -               if (!conf.conf.cipher)
-> +               if (!conf->cipher)
->                         continue;
->
-> -               conf.conf.keylen = 0;
-> -               switch (conf.conf.cipher) {
-> +               conf->keylen = 0;
-> +               switch (conf->cipher) {
->                 case WLAN_CIPHER_SUITE_CCMP:
->                 case WLAN_CIPHER_SUITE_GCMP:
-> -                       conf.conf.keylen = WLAN_KEY_LEN_CCMP;
-> +                       conf->keylen = WLAN_KEY_LEN_CCMP;
->                         break;
->                 case WLAN_CIPHER_SUITE_GCMP_256:
-> -                       conf.conf.keylen = WLAN_KEY_LEN_GCMP_256;
-> +                       conf->keylen = WLAN_KEY_LEN_GCMP_256;
->                         break;
->                 case WLAN_CIPHER_SUITE_BIP_GMAC_128:
-> -                       conf.conf.keylen = WLAN_KEY_LEN_BIP_GMAC_128;
-> +                       conf->keylen = WLAN_KEY_LEN_BIP_GMAC_128;
->                         break;
->                 case WLAN_CIPHER_SUITE_BIP_GMAC_256:
-> -                       conf.conf.keylen = WLAN_KEY_LEN_BIP_GMAC_256;
-> +                       conf->keylen = WLAN_KEY_LEN_BIP_GMAC_256;
->                         break;
->                 case WLAN_CIPHER_SUITE_AES_CMAC:
-> -                       conf.conf.keylen = WLAN_KEY_LEN_AES_CMAC;
-> +                       conf->keylen = WLAN_KEY_LEN_AES_CMAC;
->                         break;
->                 case WLAN_CIPHER_SUITE_BIP_CMAC_256:
-> -                       conf.conf.keylen = WLAN_KEY_LEN_BIP_CMAC_256;
-> +                       conf->keylen = WLAN_KEY_LEN_BIP_CMAC_256;
->                         break;
->                 }
->
-> -               if (WARN_ON(!conf.conf.keylen ||
-> -                           conf.conf.keylen > sizeof(conf.key)))
-> +               if (WARN_ON(!conf->keylen ||
-> +                           conf->keylen > WOWLAN_KEY_MAX_SIZE))
->                         continue;
->
-> -               memcpy(conf.conf.key, mlo_key->key, conf.conf.keylen);
-> -               conf.conf.keyidx = key_id;
-> +               memcpy(conf->key, mlo_key->key, conf->keylen);
-> +               conf->keyidx = key_id;
->
->                 old_key = old_keys->key[link_id][key_id];
->                 if (old_key) {
-> @@ -2114,7 +2108,7 @@ static bool iwl_mvm_mlo_gtk_rekey(struct iwl_wowlan_status_data *status,
->
->                 IWL_DEBUG_WOWLAN(mvm, "Add MLO key id %d, link id %d\n",
->                                  key_id, link_id);
-> -               key = ieee80211_gtk_rekey_add(vif, &conf.conf, link_id);
-> +               key = ieee80211_gtk_rekey_add(vif, conf, link_id);
->                 if (WARN_ON(IS_ERR(key))) {
->                         ret = false;
->                         goto out;
-> @@ -2144,30 +2138,28 @@ static bool iwl_mvm_gtk_rekey(struct iwl_wowlan_status_data *status,
->  {
->         int i, j;
->         struct ieee80211_key_conf *key;
-> -       struct {
-> -               struct ieee80211_key_conf conf;
-> -               u8 key[32];
-> -       } conf = {
-> -               .conf.cipher = gtk_cipher,
-> -       };
-> +       DEFINE_FLEX(struct ieee80211_key_conf, conf, key, keylen,
-> +                   WOWLAN_KEY_MAX_SIZE);
->         int link_id = vif->active_links ? __ffs(vif->active_links) : -1;
->
-> +       conf->cipher = gtk_cipher;
-> +
->         BUILD_BUG_ON(WLAN_KEY_LEN_CCMP != WLAN_KEY_LEN_GCMP);
-> -       BUILD_BUG_ON(sizeof(conf.key) < WLAN_KEY_LEN_CCMP);
-> -       BUILD_BUG_ON(sizeof(conf.key) < WLAN_KEY_LEN_GCMP_256);
-> -       BUILD_BUG_ON(sizeof(conf.key) < WLAN_KEY_LEN_TKIP);
-> -       BUILD_BUG_ON(sizeof(conf.key) < sizeof(status->gtk[0].key));
-> +       BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_CCMP);
-> +       BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_GCMP_256);
-> +       BUILD_BUG_ON(conf->keylen < WLAN_KEY_LEN_TKIP);
-> +       BUILD_BUG_ON(conf->keylen < sizeof(status->gtk[0].key));
->
+On 9/16/24 12:32, Przemek Kitszel wrote:
+> On 9/14/24 07:27, Ben Greear wrote:
+>> Hello,
+>>
+>> We found this during a long duration network test where we are using
+>> lots of wifi network devices in a single system, talking with
+> 
+> It will be really hard to repro for us. Still would like to help.
+> 
+>> an intel 10g
+> 
+> It's more likely to get Intel's help if you mail (also) to our IWL list
+> (CCed, +Aleksandr for ixgbe expertise).
+> 
+> 
+>> NIC in the same system (using vrfs and such).  The system ran around
+>> 7 hours before it crashed.  Seems to be a null pointer in a list, but
+>> I'm not having great luck understanding where exactly in the large 
+>> tcp_ack
+>> method this is happening.  Any suggestions for how to get more relevant
+>> info out of gdb?
 
-Even though the mystery re __ffs() has been solved, I wonder if these
-BUILD_BUG()s still make sense: their purpose appears to have been to
-ensure that the key[] member is of sufficient size, and this is now
-guaranteed. So I think we should just drop them.
+I would also enable kmemleak, lockdep, ubsan to get some easy helpers.
 
-In the general case, using BUILD_BUG() on a value of a local variable
-like this is always going to be fragile. Compilers are free to reorder
-code, and some function calls are implicit, or have global side
-effects that may prevent the compiler from making any assumptions
-about these values at the point of the BUILD_BUG() invocation.
+>>
+>> BUG: kernel NULL pointer dereference, address: 0000000000000008^M
+>> #PF: supervisor write access in kernel mode^M
+
+could you share your virtualization config?
+
+>> #PF: error_code(0x0002) - not-present page^M
+>> PGD 115855067 P4D 115855067 PUD 283ed3067 PMD 0 ^M
+>> Oops: Oops: 0002 [#1] PREEMPT SMP^M
+>> CPU: 6 PID: 115673 Comm: btserver Tainted: G           O       6.10.3+ 
+
+so, what hacks do you have? those are to aid debugging or to enable some
+of the wifi devices?
+
+I don't have any insightful comment unfortunately, sorry.
+
+>> #57^M
+>> Hardware name: Default string Default string/SKYBAY, BIOS 5.12 
+>> 08/04/2020^M
+>> RIP: 0010:tcp_ack+0x62e/0x1530^M
+>> Code: 9c 24 80 05 00 00 0f 84 56 09 00 00 49 39 9c 24 50 06 00 00 0f 
+>> 84 b2 04 00 00 48 8b 53 58 48 8b 43 60 48 89 df 48 8b 74 24 28 <48> 89 
+>> 42 08 48 89 10 48 c7 43 60 00 00 00 00 48 c7 43 58 00 00 00^M
+>> RSP: 0018:ffffc9000027c998 EFLAGS: 00010207^M
+>> RAX: 0000000000000000 RBX: ffff8881226a8800 RCX: ffff8881226abe01^M
+>> RDX: 0000000000000000 RSI: ffff888126a3d4c8 RDI: ffff8881226a8800^M
+>> RBP: ffffc9000027ca28 R08: 000000000005edf6 R09: 0000000000000000^M
+>> R10: 0000000000000008 R11: 0000000084d9074f R12: ffff888126a3d340^M
+>> R13: 0000000000000004 R14: ffff8881226aac00 R15: 0000000000000000^M
+>> FS:  00007efc82a2f7c0(0000) GS:ffff88845dd80000(0000) 
+>> knlGS:0000000000000000^M
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033^M
+>> CR2: 0000000000000008 CR3: 0000000125477006 CR4: 00000000003706f0^M
+>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000^M
+>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400^M
+>> Call Trace:^M
+>>   <IRQ>^M
+>>   ? __die+0x1a/0x60^M
+>>   ? page_fault_oops+0x150/0x500^M
+>>   ? exc_page_fault+0x6f/0x160^M
+>>   ? asm_exc_page_fault+0x22/0x30^M
+>>   ? tcp_ack+0x62e/0x1530^M
+>>   ? tcp_ack+0x5f1/0x1530^M
+>>   ? tcp_schedule_loss_probe+0x101/0x1d0^M
+>>   tcp_rcv_established+0x168/0x750^M
+>>   tcp_v4_do_rcv+0x13f/0x270^M
+>>   tcp_v4_rcv+0x1236/0x15f0^M
+>>   ? udp_lib_lport_inuse+0x100/0x100^M
+>>   ? raw_local_deliver+0xc8/0x250^M
+>>   ip_protocol_deliver_rcu+0x1b/0x290^M
+>>   ip_local_deliver_finish+0x6d/0x90^M
+>>   ip_sublist_rcv_finish+0x2d/0x40^M
+>>   ip_sublist_rcv+0x160/0x200^M
+>>   ? __netif_receive_skb_core.constprop.0+0x30d/0xf80^M
+>>   ip_list_rcv+0xca/0x120^M
+>>   __netif_receive_skb_list_core+0x17f/0x1e0^M
+>>   netif_receive_skb_list_internal+0x1c5/0x290^M
+>>   napi_complete_done+0x69/0x180^M
+>>   ixgbe_poll+0xd93/0x13d0 [ixgbe]^M
+>>   __napi_poll+0x20/0x1a0^M
+>>   net_rx_action+0x2af/0x310^M
+>>   handle_softirqs+0xc8/0x2b0^M
+>> __irq_exit_rcu+0x5f/0x80^M
+>>   common_interrupt+0x81/0xa0^M
+>>   </IRQ>^M
+>>
+>> (gdb) l *(tcp_ack+0x62e)
+>> 0xffffffff81c8601e is in tcp_ack (/home/greearb/git/linux-6.10.dev.y/ 
+>> include/linux/list.h:195).
+>> 190     * This is only for internal list manipulation where we know
+>> 191     * the prev/next entries already!
+>> 192     */
+>> 193    static inline void __list_del(struct list_head * prev, struct 
+>> list_head * next)
+>> 194    {
+>> 195        next->prev = prev;
+>> 196        WRITE_ONCE(prev->next, next);
+>> 197    }
+>> 198
+>> 199    /*
+>> (gdb) l *(tcp_rcv_established+0x168)
+>> 0xffffffff81c88b88 is in tcp_rcv_established (/home/greearb/git/ 
+>> linux-6.10.dev.y/net/ipv4/tcp_input.c:6209).
+>> 6204
+>> 6205        if (!tcp_validate_incoming(sk, skb, th, 1))
+>> 6206            return;
+>> 6207
+>> 6208    step5:
+>> 6209        reason = tcp_ack(sk, skb, FLAG_SLOWPATH | 
+>> FLAG_UPDATE_TS_RECENT);
+>> 6210        if ((int)reason < 0) {
+>> 6211            reason = -reason;
+>> 6212            goto discard;
+>> 6213        }
+>> (gdb)
+>>
+>> Thanks,
+>> Ben
+>>
+> 
+> 
+
 
