@@ -1,140 +1,154 @@
-Return-Path: <netdev+bounces-128574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1589797A625
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 18:38:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43B1697A636
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 18:49:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D08A6284354
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 16:38:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 672021C25B52
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 16:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53CCE158D80;
-	Mon, 16 Sep 2024 16:38:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B916415B97D;
+	Mon, 16 Sep 2024 16:49:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="hFGc+dBL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MEDwuiOx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05CAC158A1F;
-	Mon, 16 Sep 2024 16:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3466D15B57A;
+	Mon, 16 Sep 2024 16:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726504700; cv=none; b=IBZ2RS6wPXQfntCLPgURMULAi4Q+Ia2g11uqY8hEaea3YNmmq7iMAmxm6fA07BxwEzkm+Q1nJ3+mj2IsGaNKn68Jxw2vzS8MCxUfxkynKO/k0H63NT2N+zQrjRo6I48Yz93ovXjt3j11zGh4oCV3gSgXIg9OzrIA4NxUW6Ip4gY=
+	t=1726505342; cv=none; b=t2+ZioTohmISfteqG5V9l80PKgGm93KGHBO77bN7NBSQICGHjSYrsD0kcWC3F7CrR34XXzwbeBcanSH4Z3HtwJsk2E+8FKZgLzZG1Mylv8IlwDD3OAXVEQ2nJrXN680PquUTdXBDxVLxKODYkyRJcV2XpScgsceDPmxbGeRa/IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726504700; c=relaxed/simple;
-	bh=dGxTv2gaT3Q7xiDlFELyes8E7cC0oDablyL8Nh0Cba8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a1pZhYWrCFHIZrI0KoSY0ARb/LhriIRhiI/eV8d1jbLtucArWO4JzPuZS6EwhdPOo8ftvR/xfp+GXupU4Dy7MsIUzJ2mu+ksRR1V6g1ArcOOPFEkIwNXDNVjlCt7W9+0d70ErhCrvb/HYo7MfUK7BHHwzzoI7t9CK2KXLrP375g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=hFGc+dBL; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 48GGbYwA031093
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Mon, 16 Sep 2024 18:37:36 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1726504661; bh=HbubILUFQxsXkFofpq21I3CeytPToT3AZv0aCEpg4CU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=hFGc+dBLhWw89E2XetJ2n2nkO1mcO3d646Zezs6krqb72tXKyV5vMfrepFcwf7lUo
-	 O0TuBgne3cDx9iwzZ7OtF8OGgotSwGug68lcm5Ou4rIR/VhbGMbvMKP2aWBH0M7iXx
-	 6L3NfMJHozr66EuYVQHvmXSw4xeWw6L0bFFG7Ntc=
-Message-ID: <156f9ba7-7b85-46eb-9e70-606b0c4e0498@ans.pl>
-Date: Mon, 16 Sep 2024 09:37:33 -0700
+	s=arc-20240116; t=1726505342; c=relaxed/simple;
+	bh=iCifxO/L2Lc+9fPqxiadaaVsvhT7cN1M0jmxrRgVrYQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tgQxtotNKxN8FmdXb6LsyGnNMJjlVzsBdaIUiK35isyd9X5Fz8RlbuYg7qGw3ql9e7V/+5X0ETsuR5hn52Wz0wlRml7pZJJDNRYAOz7rPJSlg7il7Otki99bRr1efM5dWM/A014LYdcFNf+b6ILKXCyeiXuv5SGGkklI+y+WnyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MEDwuiOx; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20551e2f1f8so38457165ad.2;
+        Mon, 16 Sep 2024 09:49:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726505340; x=1727110140; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=M3njoMW9W06+zFFMF2oAAYOkQ8sptf+PvpVp1o1UipE=;
+        b=MEDwuiOxBQITR5HLbKRxo4RsVshpJO0xMVlMdF3/A01DVZFGybxECyw+1CidbvQTgy
+         OMLthaycMigY/jjaVTiuSJRCrVebjzfHBaWl+i9jc1tEoUbZf8TUpKcsObgbQsuoFx2e
+         Lo9ki6Vd/Td0b6LJiLhCd6ljfmLRIFuxK5cw2dWj/gO6HjurIgx4+HpPyLSQront+Y3H
+         ARalGKUAPT7YEydTBA0eKz7wW5ESfKfmjU9rMtPyxx3HSkCHR3Mcs548htOuMMENNz3v
+         jFE4myRtymfQ1K2uEKLxe0dn/i7KpjM0T4EaQsuCwsxcBxMzrFRiJvNiyllxMoLPfIl2
+         gJ+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726505340; x=1727110140;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M3njoMW9W06+zFFMF2oAAYOkQ8sptf+PvpVp1o1UipE=;
+        b=ay8svN6HeH5aKOMIUYJjWUBhYQ9wZsPKd/sl/yP8h/WNVz7IibIxFkF2VZvVufas6l
+         wgShVCnKgrDJ5eV4vKv1ufDEueeBCGZRzuPYpYvq9Y70Fn5HMMNL9+4rks5RjJWD38LK
+         sf4zkYvf8UQXriOCtW2X70Ju1zvOgfHIpr+jQ55xoQ+IdkPx4G9z7cL0TLWKGfdIu6De
+         uG5DNU7YDdtnJHFkrqtNnGa8R/GFdQouF44G3k+B9B66yJ5PrQ06fHYevbtDh6fhPWWc
+         a31kZnN6edej+V5O16oWUmlCSEOYEOW8xWp9j0Nb2D5os7sLBgXJyx8nQAfRITuZiym6
+         JSMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUET34wmyij9U5z9UPGBnkGY/Axj2AAm8eHD2Dn33xeWhUce4LGlJoz7RqzCoDV2Mfbj4nVTCyb@vger.kernel.org, AJvYcCW9zty1ycqNIZ47aFDn9bDaGyY+qCgn59cB8g7SpGVT9yiJWCynh+v6i3fshUmuKltkYJlzjwYwIs5JNHYzLXo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6rKn3frNMcfSzhs03NWKz5AmjKhxQ2PEx8dDj21UZc/TpfFui
+	e4mAw4mlMcOlR1IquqEezVcw4ku/31xT78jQLf2aLfz6HbsCx4A=
+X-Google-Smtp-Source: AGHT+IFtiIOWZ4mcKegzsvUdmQHpMCTsHsx3Oh70Mq637y2edVbZ80fvqYNEV9zCsyBD/BTRud5Vlg==
+X-Received: by 2002:a17:902:e54e:b0:1fd:791d:1437 with SMTP id d9443c01a7336-20781b476efmr186169645ad.6.1726505340292;
+        Mon, 16 Sep 2024 09:49:00 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946d64f5sm38109875ad.132.2024.09.16.09.48.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Sep 2024 09:48:59 -0700 (PDT)
+Date: Mon, 16 Sep 2024 09:48:59 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Matthieu Baerts <matttbe@kernel.org>, netdev@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, ncardwell@google.com, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net-next v2 0/3] selftests/net: packetdrill: netns and
+ two imports
+Message-ID: <Zuhhe4-MQHd3EkfN@mini-arch>
+References: <20240912005317.1253001-1-willemdebruijn.kernel@gmail.com>
+ <ed54ad21-4a5b-4bbb-8f16-22fbfe1bd738@kernel.org>
+ <66e2da1b440cc_14a89129431@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/4] mlx4: Do not mask failure accessing page A2h
- (0x51)
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-        Tariq Toukan <tariqt@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        linux-rdma@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Gal Pressman <gal@nvidia.com>,
-        Amir Vadai <amirv@mellanox.com>, Saeed Mahameed <saeedm@mellanox.com>
-References: <2aa0787e-a148-456e-b1b5-8f1e9785ed04@ans.pl>
- <8e5d257f-dc4e-44e9-96c8-7698451a71bb@intel.com>
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-Content-Language: en-US
-In-Reply-To: <8e5d257f-dc4e-44e9-96c8-7698451a71bb@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <66e2da1b440cc_14a89129431@willemb.c.googlers.com.notmuch>
 
-On 16.09.2024 at 02:44, Przemek Kitszel wrote:
-> On 9/12/24 08:41, Krzysztof Olędzki wrote:
->> Due to HW/FW limitation, page A2h (I2C 0x51) may not be available.
->> Do not mask the problem so the userspace can properly handle it.
->>
->> When returning the error to the userspace, use -EIO instead of
->> "err" because it holds MAD_STATUS.
->>
->> Fixes: f5826c8c9d57 ("net/mlx4_en: Fix wrong return value on ioctl EEPROM query failure")
->> Fixes: 32a173c7f9e9 ("net/mlx4_core: Introduce mlx4_get_module_info for cable module info reading")
->> Signed-off-by: Krzysztof Piotr Oledzki <ole@ans.pl>
->> ---
->>   drivers/net/ethernet/mellanox/mlx4/en_ethtool.c | 2 +-
->>   drivers/net/ethernet/mellanox/mlx4/port.c       | 9 +--------
->>   2 files changed, 2 insertions(+), 9 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
->> index 4c985d62af12..677917168bd5 100644
->> --- a/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
->> +++ b/drivers/net/ethernet/mellanox/mlx4/en_ethtool.c
->> @@ -2094,7 +2094,7 @@ static int mlx4_en_get_module_eeprom(struct net_device *dev,
->>   			en_err(priv,
->>   			       "mlx4_get_module_info i(%d) offset(%d) bytes_to_read(%d) - FAILED (0x%x)\n",
->>   			       i, offset, ee->len - i, ret);
->> -			return ret;
->> +			return -EIO;
+On 09/12, Willem de Bruijn wrote:
+> Matthieu Baerts wrote:
+> > Hi Willem,
+> > 
+> > On 12/09/2024 02:52, Willem de Bruijn wrote:
+> > > From: Willem de Bruijn <willemb@google.com>
+> > > 
+> > > 1/3: run in nets, as discussed, and add missing CONFIGs
+> > > 2/3: import tcp/zerocopy
+> > > 3/3: import tcp/slow_start
+> > 
+> > Thank you for the v2. This new version looks good to me:
+> > 
+> > Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> > 
+> > 
+> > I didn't pay too much attention to the new tests, because they look
+> > good, heavily tested I suppose, and I guess the goal is not to diverge
+> > from the original ones for the moment. Still, please note that the CI
+> > reported some timing issues with tcp_zerocopy_closed.pkt when using a
+> > debug kernel config, e.g.
+> > 
+> > > tcp_zerocopy_closed.pkt:22: timing error: expected system call return at 0.100596 sec but happened at 0.109564 sec; tolerance 0.004000 sec
+> > 
+> > https://netdev.bots.linux.dev/contest.html?executor=vmksft-packetdrill-dbg&test=tcp-zerocopy-closed-pkt
 > 
-> here you are masking also all other explicit error paths of
-> mlx4_get_module_info(), what is not good in general, I would instead
-> mask below (see next comment)
-
-I agree, for this reason mlx4_get_module_info() seems to be a much better choice.
-Will update, thanks!
-
+> Thanks Matthieu. I did not run the dbg variant often enough to observe
+> that. Note to self to run more times before I submit.
 > 
->>   		}
->>   
->>   		i += ret;
->> diff --git a/drivers/net/ethernet/mellanox/mlx4/port.c b/drivers/net/ethernet/mellanox/mlx4/port.c
->> index 1ebd459d1d21..8c2a384404f9 100644
->> --- a/drivers/net/ethernet/mellanox/mlx4/port.c
->> +++ b/drivers/net/ethernet/mellanox/mlx4/port.c
->> @@ -2198,14 +2198,7 @@ int mlx4_get_module_info(struct mlx4_dev *dev, u8 port,
->>   			  MLX4_ATTR_CABLE_INFO, port, i2c_addr, offset, size,
->>   			  ret, cable_info_mad_err_str(ret));
->>   
->> -		if (i2c_addr == I2C_ADDR_HIGH &&
->> -		    MAD_STATUS_2_CABLE_ERR(ret) == CABLE_INF_I2C_ADDR)
->> -			/* Some SFP cables do not support i2c slave
->> -			 * address 0x51 (high page), abort silently.
->> -			 */
->> -			ret = 0;
->> -		else
->> -			ret = -ret;
->> +		ret = -ret;
+> It seems to fail 2/10 times on the dbg spinner. I don't have an
+> explanation for the failure yet. The line itself has no expected delay
 > 
-> this is the only place that mlx4_get_module_info() returns non standard
-> error code so, I believe, it's here where we want to overwrite with -EIO
+> # script packet:  0.113203 S 0:0(0) <mss 1460,sackOK,TS val 0 ecr 0,nop,wscale 8>
+> # actual packet:  0.107191 S 0:0(0) win 65535 <mss 1460,sackOK,TS val 0 ecr 0,nop,wscale 8>
 > 
-> then you could limit to just a single Fixes: tag (the second one)
+>    +0.1 recvmsg(4, {msg_name(...)=...,
+>                     msg_iov(1)=[{...,0}],
+>                     msg_flags=MSG_ERRQUEUE,
+>                     msg_control=[]}, MSG_ERRQUEUE) = -1 EAGAIN (Resource temporarily unavailable)
+> 
+>    +0...0 connect(4, ..., ...) = 0
+> 
+>    +0 > S 0:0(0) <mss 1460,sackOK,TS val 0 ecr 0,nop,wscale 8>
+> 
+> I guess the expectation includes the +0.1 delay before calling recvmsg, and that
+> timer fired a bit early.
+> 
+> I previously shared a draft patch to adjust --tolerance_usecs in dbg runs.
+> May have to send that after all.
+> 
+> https://lore.kernel.org/netdev/66da5b8b27259_27bb41294c@willemb.c.googlers.com.notmuch/
 
-Sure, I can handle it in mlx4_get_module_info(). I will also need to
-cover the return from the call to mlx4_get_module_id() however.
+Not sure you've seen, but tcp_slow_start_slow-start-after-win-update.pkt
+also just popped up on the dashboard for dbg:
 
-Thanks,
- Krzysztof
+# tcp_slow_start_slow-start-after-win-update.pkt:39: error handling packet: timing error: expected outbound packet in relative time range +0.600000~+0.620000
 
+https://netdev-3.bots.linux.dev/vmksft-packetdrill-dbg/results/774981/1-tcp-slow-start-slow-start-after-win-update-pkt/stdout
+
+Do we want to follow up with that '--tolerance_usecs=10000' you've
+mentioned above?
 
