@@ -1,60 +1,85 @@
-Return-Path: <netdev+bounces-128558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8788097A53A
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 17:23:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D08697A551
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 17:29:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 480BA28D711
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 15:23:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26E682822B4
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 15:29:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80ED815853E;
-	Mon, 16 Sep 2024 15:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29607158DC2;
+	Mon, 16 Sep 2024 15:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tN5W6ce9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TJX5wm9J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B73314EC47;
-	Mon, 16 Sep 2024 15:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5781586DB;
+	Mon, 16 Sep 2024 15:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726500210; cv=none; b=L/gJZd5Am4rLSl3N8XzpS6TekiHfViWGKT6KkZhnotSNOg+Z97dMbjuFSejvW9OM+qdsQOCdllla97xJ11AkvJD6LEzTGeoJWRI1OwR4nFNAvu1JtjFOc+TcScKQyf38yJo+jYd6NLrroXNcq2T9NsF2VJcmo/L+VXHNtowke4E=
+	t=1726500594; cv=none; b=mUGusZvEjkpcjRXLwVE525P+8HRGQM1eVYQcjA78nz3M/0hzPg9J9zXt1X6t+Tk+B3cWWt8iST4cYPUPY9h9PFS2sy1ECM2SdTo+wceTIPu6piduj8/oUpNA+Be0b4ddGBt6bOfcy0MIC7UDOZK2iLUAE36xnfH8kJ8twCsfSHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726500210; c=relaxed/simple;
-	bh=FF+mkLhhU8uH27RYqeySVdh6+IQVVTSZXcZ1I8HSanQ=;
+	s=arc-20240116; t=1726500594; c=relaxed/simple;
+	bh=MlnJdle5JwKPzYjLf3phw0YvyewBny+20yGfy84n/EI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QLrj8/TbXDDroCEirMrx/bEgYoRkvXS3H7/kNWVoDhQUajlWF+SHmriEduPQ6p0u6jspr7Uq2rOCQT20oiWDn+l0bKFpTYTwaf2FCfIVzXKy1mRwKE7vcB/YQrSXnIr4LombR6rhOVZeu+EDDjCgk/shqpR2GT7zvXqzOWcm/+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tN5W6ce9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD772C4CEC4;
-	Mon, 16 Sep 2024 15:23:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726500210;
-	bh=FF+mkLhhU8uH27RYqeySVdh6+IQVVTSZXcZ1I8HSanQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tN5W6ce94XXmdEQVD13WHFfzJPNTD2CJVS4cq5vSuxLAU2owRauPYKfQ5j2RVNfui
-	 LO8dSwTZG4LBSySzF4pxdpqg3soXomuYxFf7kUctuVEGWs7kYEcEV3+n9IBx7kp7AK
-	 wKmuJkMsx3EtB6ueC3R5MItUEd1svpOGgRpS4lj3pQ1Y9S0iTGuvCuf9oMhVKtJ1Gl
-	 nOy3kxGdoODuX5O9nj1HwA+68GU6+kviJBwhocOYUXeFKXa/X59KEAJBCm52Ndagm1
-	 OSr2EthyHoI0zCWijCb14abvGBjL1pIJuy9rZXyCjb9smAUQL9qzgJzUhFhSUv8YuP
-	 vGw9QwExaNJug==
-Date: Mon, 16 Sep 2024 16:23:25 +0100
-From: Simon Horman <horms@kernel.org>
-To: Minda Chen <minda.chen@starfivetech.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=cmSgRAhD9iu62HQove6DI/8NcIraLzOvLjmqto+sGawWlWOTc0FDSRa+3NOAQJ5h1eX6i0E0Y9pydMRyO28Vtu1/06T8hJJZkeq3ip//NUCedqAmDvo1R4k99q9j45SQ0aaALVWCnh/F2qjpElHeVcHBW8Jcu8sJOAJ+/8tVKpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TJX5wm9J; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726500592; x=1758036592;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MlnJdle5JwKPzYjLf3phw0YvyewBny+20yGfy84n/EI=;
+  b=TJX5wm9JVddMpmUtMtcYS3YncCO2JSU0aGoILVua3bZA5w035vKnufp4
+   OrvU9IUJDbnx1aj3P1lmv4Ey6nrhu5zm91KVC+ZtCqA/h9tzfG8QknAAT
+   FNnJgnMNC0rpwAtyR1nROZvyf0+h3f1VIO6zH4Ch4kTAzjJyES8d7g4O5
+   GPmPYRJRrid6UDDdAfqgpeJimc+rMcCKOkAF89ySbPsVzY940tsZPKviN
+   8NvQ/CeW6TNWKpDyKEdGYa25Qnnr026o2Qspew8LvT5LdSreu99p2uvwa
+   NV9pwWtT3SyDCaezx+GwjmWBq+dogO3y2rZ8XhYzf9O9r1KktHlL+rc/E
+   A==;
+X-CSE-ConnectionGUID: uNqZllVZTyungdDHAfA5Pg==
+X-CSE-MsgGUID: lI4yKvhnQziKcCsBEZoatw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11197"; a="24812896"
+X-IronPort-AV: E=Sophos;i="6.10,233,1719903600"; 
+   d="scan'208";a="24812896"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 08:29:52 -0700
+X-CSE-ConnectionGUID: MF6XvnWnTKWSy4D6QideRA==
+X-CSE-MsgGUID: eqncptBnTvKZCtJUhIJFtQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,233,1719903600"; 
+   d="scan'208";a="73729904"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 08:29:48 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.98)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1sqDfd-00000009VX1-1xi6;
+	Mon, 16 Sep 2024 18:29:45 +0300
+Date: Mon, 16 Sep 2024 18:29:45 +0300
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH v1] stmmac: mmc: dwmac4: Add ip payload error statistics
-Message-ID: <20240916152325.GB396300@kernel.org>
-References: <20240916094812.29804-1-minda.chen@starfivetech.com>
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH nf-next 0/2] netfilter: conntrack: label helpers
+ conditional compilation updates
+Message-ID: <ZuhO6XRAS0Qq3A1g@smile.fi.intel.com>
+References: <20240916-ct-ifdef-v1-0-81ef1798143b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,38 +88,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240916094812.29804-1-minda.chen@starfivetech.com>
+In-Reply-To: <20240916-ct-ifdef-v1-0-81ef1798143b@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Mon, Sep 16, 2024 at 05:48:12PM +0800, Minda Chen wrote:
-> Add dwmac4 ip payload error statistics, and rename discripter bit macro
-> because latest version descriptor IPCE bit claims include ip checksum
-> error and l4 segment length error.
+On Mon, Sep 16, 2024 at 04:14:40PM +0100, Simon Horman wrote:
+> Hi,
 > 
-> Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
+> This short series updates conditional compilation of label helpers to:
+> 
+> 1) Compile them regardless of if CONFIG_NF_CONNTRACK_LABELS is enabled
+>    or not. It is safe to do so as the functions will always return 0 if
+>    CONFIG_NF_CONNTRACK_LABELS is not enabled.  And the compiler should
+>    optimise waway the code.  Which is the desired behaviour.
+> 
+> 2) Only compile ctnetlink_label_size if CONFIG_NF_CONNTRACK_EVENTS is
+>    enabled.  This addresses a warning about this function being unused
+>    in this case.
 
-Hi Minda,
-
-Some feedback on process.
-
-net-next is currently closed for the v6.12 merge window.
-Please consider reposting this patch once it re-opens,
-after v6.12-rc1 is released, likely about two weeks from now.
-
-RFC patches, and fixes for net are, OTOH, welcome any time.
-
-Also, when posting patches for net-next, please explicitly
-target them as such.
-
-	Subject: [PATCH net-next] ...
-
-Link: https://docs.kernel.org/process/maintainer-netdev.html
-
-And lastly, I don't think 'mmc: ' belongs in the patch prefix.
-This is an Ethernet driver, right? Looking over git history,
-it seems that 'net: stmmac: ' is appropriate here.
-
-	Subject: [PATCH net-next] net: stmmac: ...
+Both make sense to me, FWIW,
+Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 
 -- 
-pw-bot: defer
+With Best Regards,
+Andy Shevchenko
+
+
 
