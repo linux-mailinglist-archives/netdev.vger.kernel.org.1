@@ -1,243 +1,305 @@
-Return-Path: <netdev+bounces-128534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38DA097A25A
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 14:32:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D051797A25E
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 14:34:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B25A21F25D4C
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:32:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0005B1C23087
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 12:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAFE146A79;
-	Mon, 16 Sep 2024 12:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ACA9142E77;
+	Mon, 16 Sep 2024 12:34:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eHZeGzGa"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NvXs++ZG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2051.outbound.protection.outlook.com [40.107.94.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDDE19BBC;
-	Mon, 16 Sep 2024 12:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726489953; cv=none; b=OVLkmIPq5rTi33/xHoTNdePN//ZBPPSCYiJyfQaJ0Rd9PB6QGpVwa5Yipx7oL7SXXw5ya5qJBx2TSTJJUR1Ff03cbvMYG2pDn+obzfOYBHia8QuM7QcrDR2IgVEhMPbFGAVN1FkL3/Mg/3uKW4ilYI8I35bip+2sFCgBN6XUEN4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726489953; c=relaxed/simple;
-	bh=BBZ4oW2A9GpeSP/yb9umtm+fkmRQ9Bjb/uUApp3m0fk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XT4WX5AbpRUkEHXbAynSKXzANt2IZfphGIkdRX9UmRZ1jwBZoWlFKYWll4hQurHHEaY17wEc5sf9wZhWAZOccnnIjhxY75i+m/xquFnASSlfSGafdN0gU1TwLXGjNAVmAdGWBCSBnb4P+ODY1RoYlxtV3uxiJ3CAm3g2Dqe3qCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eHZeGzGa; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20551eeba95so27507705ad.2;
-        Mon, 16 Sep 2024 05:32:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726489951; x=1727094751; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oykc0XNUZ2U9di3dFTc+iIQRMLcm/D4KvDGsPvtFBVA=;
-        b=eHZeGzGadcNQAmCkB+x77UC8Ljzdiwlx90MfafshW3s6CQBs9tPMKvXk7NjgOm27JH
-         BsZ19oxcGQiDu0U299g0fcWmSSpm12L4kpCashSdHa5xnLYkCGTm2vZelNkZ7TMQVBKI
-         nDZRBAarXeZUBDD/CF8aeFswOxSsHF80tYB0xH9RDQUOCUCjqUZHTHeMUcz82FSf5iGD
-         8mmF1G2lYDpjJMFjdkWW7AHD153rc7J9dnSjV0N/tePfdKbpW+1jau7PpHSPKmb0N5j3
-         k08JR7qEOa36xHi+YobC54HvuSQpGhnHMC+Llmpl9TtU6L82SolO1eBv8eHDQLeYCzxB
-         fH/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726489951; x=1727094751;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oykc0XNUZ2U9di3dFTc+iIQRMLcm/D4KvDGsPvtFBVA=;
-        b=L1uihKEHk45NVcABMQ2IgdqJGF/vF1q9gLzb4XBQm7F6zkV+V1HtrUqJ1Q1L3fKuLP
-         2HswK7Uz/rU2DkB4raZZuIvF3NIBKZF4Tw2bq/e7T6XzMU0FA2P2AZ4jyMDLMVYq7wmL
-         KfXuJGvWKRCKLntkl7bPwtjL3G1tBZUXJ2rJyfzkgfH0fXEvT7XQLs/YdWmu1TlI0lXG
-         9GsPH7Py4k3tQlT7egBDfl9nPsq4jvDUgHINwy+Gw1rdNuKODSWUZJVLKq23CBxEIMqQ
-         ee+5ct3En6Ro1J3gGDHJyiV/uV+bwX0b8bjlnGAk2PWjXOApNOKHyE1814p1JgtvErJy
-         3swg==
-X-Forwarded-Encrypted: i=1; AJvYcCU76KQU590tCsEOSTrN9DYtzO7gpID94Y9LA4SvRfC6tKWbLL1KmUN/SF2kogLjOWXpqBV7pxcwLaeGY4U=@vger.kernel.org, AJvYcCV2cdlEqFDyIQWlYzZZwPbTzij+1KM0bGljx4r0YKfMATHB/BHAoqti2YxRDWaAoclQb75ucfPXPWn+zj1uFayP+FciXmeZ@vger.kernel.org, AJvYcCVjdXN/gkhEiKpFAfYT1wD+p/Uz9Y5oRZcWaxJM1Hfii4/F7psUjcqNfUfzNqd2x0Nia3VxVUYZ@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzq8XErB0dOnuRqE6bqIyIs8XQixS9Gai6u3/YIiSamS1A9m64f
-	ezRBLqMJJsTG5wtJTFujwB5MvObLdbzJRRlQIE0gk2PV0Nz+1QJw
-X-Google-Smtp-Source: AGHT+IFts4nnZqQTc5USJdj9JGXLmyuh67enW6i4PHhte5UX080Zn5yVqDdpBBdawrwHK8xCZGfQRQ==
-X-Received: by 2002:a17:90b:278b:b0:2cf:c9ab:e747 with SMTP id 98e67ed59e1d1-2dbb9dbd720mr14614413a91.1.1726489950395;
-        Mon, 16 Sep 2024 05:32:30 -0700 (PDT)
-Received: from tahera-OptiPlex-5000 ([136.159.49.123])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbb9cadb0bsm7164027a91.27.2024.09.16.05.32.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2024 05:32:29 -0700 (PDT)
-Date: Mon, 16 Sep 2024 06:32:27 -0600
-From: Tahera Fahimi <fahimitahera@gmail.com>
-To: =?iso-8859-1?Q?Micka=EBl_Sala=FCn?= <mic@digikod.net>
-Cc: outreachy@lists.linux.dev, gnoack@google.com, paul@paul-moore.com,
-	jmorris@namei.org, serge@hallyn.com,
-	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bjorn3_gh@protonmail.com, jannh@google.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v11 1/8] Landlock: Add abstract UNIX socket restriction
-Message-ID: <ZuglWy71qvgEhJQ4@tahera-OptiPlex-5000>
-References: <cover.1725494372.git.fahimitahera@gmail.com>
- <5f7ad85243b78427242275b93481cfc7c127764b.1725494372.git.fahimitahera@gmail.com>
- <20240913.AmeeLo0aeheD@digikod.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB84E47A62;
+	Mon, 16 Sep 2024 12:34:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726490081; cv=fail; b=kZqe6Qnme2ja6fHKpbbNZZ/Uj2SuFH5XDeuINK2gTd+LsfFSHeeawh7Aiisf93bDSXrPVfqZPiZ4jeCNsbxWVAO+OplWdMLwn+pBbowETQTIMLHvyTIT6VRekk0bMvDKfBpzAC3GhuAVIJxBEb7vOsKmZvgHns0DIB01m2tvRdk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726490081; c=relaxed/simple;
+	bh=njLC9ZweuxiG/nLF/0cdiAoVn8Z2KxG0z/tlhwUo0zI=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oXWsuks8E7q4FwMqOtk2H36D7AKhhp3nQoy8bJ3pqctb+yQNwnkhAxEwIJY0ep1uqOiXHDegPBDq5ByvIXdrseTBSpY0DtB8mJ8ThTsgq/q9IQeixd/NpMW3EStlnsacajOC/Nt3EQRS4BIMu8MtKC85dyJuop/bVS8ezrO/LVo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NvXs++ZG; arc=fail smtp.client-ip=40.107.94.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=c7MfJxZUlL+2EESTG+83e5hg4/H+3zEj/8T5xpzfef5wN0PZ+bVDpSndgYe1Jgih5KSX13mtxwj7gAP378UWSIi5vxe0L22/Zl8u8U6VLnwbfAa2g3PmO5ewOpMmwHz0b7tItm4PdXqd5k6UKG3qbgUX6cAOvKb2WY2HKw0DNWKzIFBFYPdCPvolCBunLeEFquc1r7DAxGKaKmUR+w+m3aATJJiwITLQAcsGe35Z2isQBDZjjBG/IuJ8pzK9PoY5jsw4MYW7JHPg/AK3HPLHfWpoTcTmdgR2TkyZAVKULoPNWJz3f8cxRySFFoObIpofQhWYibaa7W+sAHlfevO9tg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZsYALxN7MbZxvSxmkDoENFBl4L0+dPUG1fQE1sP+Ig8=;
+ b=c0tE0/VW0IeR0ncqts5ufETfNjqUToSUoVzaS1wHejhRxEc5eGLDItYG3ZdThkxGYUCYtHQ7/3IM+B3lyB4nX87ozndBKYPc3bMY16hHYgYz9nTAn6ZV47XwU7++XtjqFZUcRQsZ1Cd90u4VRDCg0xnUQMNi/d0gPt8JxKQF0SPq0wBVK7kLFUpCdpW5QLhr9pqa4e3VdkLI+fX0a2HWtIAqUJZ7Ssw9f90UpIjF3cnYfjqKYQ0Nm5c2ysmU5wPibs6lS4gQC5JY27lXj2KFVa7y2mLVHE6M4/N/73EffXRuDjjZjvNPtO5eMoR6ut+ir1z+2aAzntHFWrB6d0/f2A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZsYALxN7MbZxvSxmkDoENFBl4L0+dPUG1fQE1sP+Ig8=;
+ b=NvXs++ZG+vMj/DtilFzxIqybuwyDFfZZ9SmuTm64yDhNoa2JhZmzJHCv1KDSUuwUv317AxbrNfDssy3g2oEUOslDv4sDc/0t0pdpL3jD1ciL1OlsBk8AuP00y6UlDiaLoNwjCHJbCNjcrpWwf+/PC6NcUUGP0CbBhSrxqycfXi4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by DM6PR12MB4267.namprd12.prod.outlook.com (2603:10b6:5:21e::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.23; Mon, 16 Sep
+ 2024 12:34:34 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%4]) with mapi id 15.20.7962.022; Mon, 16 Sep 2024
+ 12:34:34 +0000
+Message-ID: <9c01c578-ea9d-bca6-2544-addd0225b003@amd.com>
+Date: Mon, 16 Sep 2024 13:33:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v3 06/20] cxl: add functions for resource request/release
+ by a driver
+Content-Language: en-US
+To: Jonathan Cameron <Jonathan.Cameron@Huawei.com>,
+ alejandro.lucero-palau@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+ dan.j.williams@intel.com, martin.habets@xilinx.com, edward.cree@amd.com,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+References: <20240907081836.5801-1-alejandro.lucero-palau@amd.com>
+ <20240907081836.5801-7-alejandro.lucero-palau@amd.com>
+ <20240913183520.000002be@Huawei.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <20240913183520.000002be@Huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO2P265CA0384.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:a3::36) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240913.AmeeLo0aeheD@digikod.net>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|DM6PR12MB4267:EE_
+X-MS-Office365-Filtering-Correlation-Id: 54275492-fa50-4e77-1c29-08dcd64beba2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?ZnhmVGVIOVdiWHZGQjNaRTBjVjBva0llVHd0ZGw3SkNxdVdPYkZSa0tSL1BK?=
+ =?utf-8?B?K2dVZWtkbHNWUVd3RWdIb1c4cmNKa01yRzVEVXdyL0VtakN4dHE3UmN0czdN?=
+ =?utf-8?B?QlBVS0lkUFJDNGVJa3N6c3JCWDhjakFNcHFwL01ZdGhYWFd1U05BRDBTTmJR?=
+ =?utf-8?B?aExqaERFS0d1blpPcUdYSzJVVXlZeFZuamxsbXN5dDNCc0J0MHFINmE1NzA2?=
+ =?utf-8?B?ZjRmcTl6Mml1aGlDWmtXYjFPV3JKUGh5STlPWFNiS0x0MWxaK3FNemZFcHE4?=
+ =?utf-8?B?K29tUGtMbVdyejM1TW9MZ3NBcGxGMFhFQU9nUC8xM285dmo3dHozTUxzbHh6?=
+ =?utf-8?B?NnNQbldXaDlhNFRFTDNIUmdXYjdQdWdrV1ZHaU05eFZNc21BcjZyWnBRUnFs?=
+ =?utf-8?B?c2k1VCtXL3ArdE5QYW5nQTJXaGx1clVzNnNOOWs3eDRhSk1JYktDWElnMzls?=
+ =?utf-8?B?Nnc2clpMZ1RDZU9TQWhkUEk5Y3U2V2xxTEZjRnc1NFh2djBNRUJJek5YcFBl?=
+ =?utf-8?B?Y3RIZHBMRXhOY1Y4QWlteFJFUGlkeGhFUlBEMUYzUGU0S1FxNlZOckQzNzZk?=
+ =?utf-8?B?R3g2ZUxkcHpiOEluUkk4NnhhRjMrWmx1VzRaWWhlSldmWTlNZWlkZnBaS09S?=
+ =?utf-8?B?TVJpOVFPRzdCU0dLdEJ1MGlKVTBoN2hDZXZZUUc4N0JyK29ISG0wOVZzMjc5?=
+ =?utf-8?B?SUJKdlRFaHB4UnBJd3o2R1hqT0FVODZXSy9ubjgvODlPOFZ3cSsvb2xHbVdR?=
+ =?utf-8?B?Tzhja0xLWkIrYkN4MjlWbDFkUGtkVVo0VU5Hd1NUWGd3bHZYN1FwQVlxdkR0?=
+ =?utf-8?B?OHRWSmMxVHpXS0Q1TGhBMmtaTytxd29MTEJ6UU9tM1hQY0dpelByNSt4aERV?=
+ =?utf-8?B?L2J3dHI3NFBPakhNeWRoT3EvUEhRcEJlbURlQTJiZHlqZTBVSlY5U25sQm9n?=
+ =?utf-8?B?bjJmbFc2bzlJeXhiaTkrQnBEdHNmcW5nR0o1MmdXQjU2NDhxRlhIQ2d4UFZw?=
+ =?utf-8?B?c2NxKythd0VHb2o1dW1kWTZuZ0dLRC9CZWZmYUI2ODNQRlU2U0VuMVViUkxs?=
+ =?utf-8?B?QWt0Mk9OSTdUVHUyeXIzdGREV1NrWE4xdlBOU1VoV0l3VE9PMUJ6V2ZQcFdi?=
+ =?utf-8?B?Um5lZVJvSFJ2ZEhWcjRYanFpWDVEN09GZW9WVmdrNGxzOUtsbFVrZkZ4dVB4?=
+ =?utf-8?B?OXQ3TWk4ZzZ6K0hOclRDQVhaRFdDTkhYOG5rYXM1Z2ZrRlJoNWFHSkc1L3pX?=
+ =?utf-8?B?N2FYWkx5V3hoa3AvdmRaeUEyeVlLaitYS2lyUitWMTJQOE5pVE9ySitVLzd1?=
+ =?utf-8?B?Ynk3dDhQTG8yZXNaejg0OWU2THFIT0RZU3prOUR3dzFGVnNEdWMzV3gyY3N4?=
+ =?utf-8?B?amhYSHdUZEVRbDJtaVc3OFAwUzJ1VlUra1pOcW1yUmNtT1dNTlNyRXlWdlFm?=
+ =?utf-8?B?M3dzZTZjVGpsbHgrWHI4K0QybjR6S293MlBRZjltNm9VNHEvNnlHVjZzWmpz?=
+ =?utf-8?B?aHl4ZWNnZ1ZISHozS0RDcjcra0ZibHdXYzlKcUs4MGhZaGtpYWUxbVZwRGJD?=
+ =?utf-8?B?VEJFVUo4aHd1blllbHRLTENzR05mYUZGZTVmWDNXaEsySGhvQldndmF3a1lz?=
+ =?utf-8?B?bjQwWXN4b1RzcENOdmZ1OVlGdksxSnNLZzJoNkk2c0N5VkVqWXRCU0pBblBr?=
+ =?utf-8?B?bmpFcU9nQ25rL3RUNDEzS3ZxZldPN00yT0dmUGZ2amx5ZS9mT3FIWkJ1aDlS?=
+ =?utf-8?B?MmNIM0o2UkR6MVp1VXlwbVRvYVh3KzJJakJEN1hybWEvNVlCMDRKTDBiVjZx?=
+ =?utf-8?B?dE1DelhZejY2clpSYWlWUT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?cHlEVW9Qa05meWZJSFp5UGtEdzBLdGhFNTVBVHNzU2QwOHJyTkRManB4UnVa?=
+ =?utf-8?B?YUNYeTJtc2dZSjFIdW5PUS9Sb2xyMFhFcHpydHcxeXR6S2E3OVpVQ2lxUHNI?=
+ =?utf-8?B?TXd2K0tDendRTDFid2R6R29qenpVOXlsRXdlai9YWFdrYXMrMkxtTGtyNEtp?=
+ =?utf-8?B?bzM2cVk0bnlwbm1tcC9KeDlXZDNLeFF2ZHBYSkpsdjNKcTdzLzZyMEVIMnlF?=
+ =?utf-8?B?eVY2ZXZ0cEd6T3pCTURLMDcrLy9sdjFmc0Y5TnRVN2hUb0lWcHEzSzQ2RzZp?=
+ =?utf-8?B?TVE0RjJSTXhBQlJkOVBzL2NxQU4wUFJJa1NDK29yVllHS0NVdDN3b0lBR202?=
+ =?utf-8?B?WTJiejY3d3BKZ1EzM1NkeTJadE9RQUtGSml3Yk5LbDdZb2NXT3cvUmRsbDlU?=
+ =?utf-8?B?RkU0ZWJCK3ZEWlZsR1Q3N1V4b05sdWRGdE9FTnJUQmVLUkQ0R29pQzNWVVI2?=
+ =?utf-8?B?Y0l0MlRKK1p1Z3pwRXFGN2V5ZUpwb2luQXBVL1VhQysvc2RINWRwZ1ZWdERX?=
+ =?utf-8?B?SlhMQVBhN29xUUlLaTdOMk9KSTJvWW5UZktHOVhDUHdCVHYxUUtVdW5tTHZs?=
+ =?utf-8?B?UFQvQlNCRVZ6VmdENm5UOXl0SWVHREcxS1M1UG1lazZHYWdkYTdKZW9sdG5v?=
+ =?utf-8?B?Q05RQk1pOU9RZHhCaTM5MkNDRDZ1Q0JwNk8xcm5DQWpkRm1JUG1TclFoY0RQ?=
+ =?utf-8?B?Z0UrU01PMHFGWFZaeXJabXBHYUFlRUIrSVEyT2k3OG5wWnNxcHFsQk9tSjI0?=
+ =?utf-8?B?N1VuQ3o0WkRJbDBYZkNiSDlBOUNEZW5yNGFDNHdmVjhuK2pGM2FDSEkvdzVo?=
+ =?utf-8?B?UkNQTzR3K2V5UXdMWExoam5qUTZtWlc2aVZjbE5Ua1JFT3FEenZ6WVlwN3NV?=
+ =?utf-8?B?YXhIZ0tQOFA1RkFaR05renlCeDEwUFFNNkl4RWEwd2E4UnRuWU9Cbzdyajdp?=
+ =?utf-8?B?L2kxYndMSUFqTkFkSnl1WGZmcGkvb1dEQkt3Q0o4bllZV2dVZnJ4Tm12S1pW?=
+ =?utf-8?B?dHJJQVh1bGlobVV1MHNYMkx4L2pOVGFTNG9WSTNXMi9ac1RoUzF5RUtDZUxn?=
+ =?utf-8?B?a0hRWFBIZjRpWlpNNzJNU2VQZU9Xa1loNCtpNWQzcnJrNUlBRCs4QnVEWGk3?=
+ =?utf-8?B?QUdwb0tzeUhXTGtpTXFlN1N6RWpwK1JrV1U2eXNZVXVRZXhrQlN6V3d4NzRW?=
+ =?utf-8?B?TnpYNjBrOG1ncTBMZU1Ub0RVTkp4WmtuOHA4VHBJUk1KSmpMMmFVeklrQXRy?=
+ =?utf-8?B?eUt4bFVieWI0TlVyVnVpZHF6Z3FMSWZ3TDRHUlZ5K0o0alRCbUY1a1FZNDdw?=
+ =?utf-8?B?ZEl0S1I2ODgyZkVUSXVxeXBqVVJTOXBoM0xkTnRhTXRRaDNSV1J2MnVxZm5t?=
+ =?utf-8?B?THpBSHM3NDNiUG16YTVvN0I3d3IwLy8zMnNZdmhmWlFQeDA2b0M0b3ZOcnI4?=
+ =?utf-8?B?RlVaUE0rZXg2YXJ2WFlEeTRlRmdXOG9kRHFCZUNSaE5oMWZhWUZnODllUHoz?=
+ =?utf-8?B?clJsWWNVUStUS1JkblNYRXovMlFjOXlHRDBCcktaRkNnd3VFcCtHbUZnd29u?=
+ =?utf-8?B?ZlJjUHNDOXdaVk5DUXFSZnhTV0doWEhmbndTSldVZlN0eWkyVnVwc2llbGdY?=
+ =?utf-8?B?ZW9mRUVVQW1zZE5YNVdyd0RGblNxQmc5WUEyZFBoZWdHTkFFUW1vbVNLaUFL?=
+ =?utf-8?B?YjRkeVNlelNzL1NQTjFiaEV2N3VXc2I1dVB1SCtBRS9BdjJvdnBPNHVXeTQw?=
+ =?utf-8?B?Y0ZjTWkyWWpvMmtLTFB3UmxmSkkrWEVseEErUS9jWUg0RXE2SFllQXdCZGp5?=
+ =?utf-8?B?V3hQdnVXOHJXYmNxVkdEc3FzVE4wNWdiNFltZzUyQW56YWFEMFR4V0ZiN1Ft?=
+ =?utf-8?B?Y2NZcUY4K0JvVFd6TzNwWkx1em02NDVOSlF5ZDNSMWtwWTQ2Q1p6U1dFZE9N?=
+ =?utf-8?B?MXpyd3FleU16UGl1U01xM3lrUklsWFU2TDBreU10cURtQmlKWTVFYWhtS1lT?=
+ =?utf-8?B?UVQvcVdKSkk4dTVDVW5vSGV4RWxGZDVGNjFKUEZuZHlRVHRVdW1IMEFkaTJl?=
+ =?utf-8?B?U3U3K0hHQm9VZHJuSStGaUQ4Y2ppdEUzeXA4NjZuK1luZ2c5cHJyUWx1MXBG?=
+ =?utf-8?Q?+IsWSYbFk+OB6yqUsI83s2ZGw?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 54275492-fa50-4e77-1c29-08dcd64beba2
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2024 12:34:34.7453
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MmjPhbBa9zxRGCHVNKQ2RNq9+Q5/jarqwBXvEIJp87SYaas4vYSOh6vCG3K10HeCVar8X22NjuuPdD8FToC9+w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4267
 
-On Fri, Sep 13, 2024 at 03:32:59PM +0200, Mickaël Salaün wrote:
-> On Wed, Sep 04, 2024 at 06:13:55PM -0600, Tahera Fahimi wrote:
-> > This patch introduces a new "scoped" attribute to the
-> > landlock_ruleset_attr that can specify
-> > "LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET" to scope abstract UNIX sockets
-> > from connecting to a process outside of the same Landlock domain. It
-> > implements two hooks, unix_stream_connect and unix_may_send to enforce
-> > this restriction.
-> > 
-> > Closes: https://github.com/landlock-lsm/linux/issues/7
-> > Signed-off-by: Tahera Fahimi <fahimitahera@gmail.com>
-> > 
-> > ---
-> > v11:
-> > - For a connected abstract datagram socket, the hook_unix_may_send
-> >   allows the socket to send a data. (it is treated as a connected stream
-> >   socket)
-> > - Minor comment revision.
-> > v10:
-> > - Minor code improvement based on reviews on v9.
-> > v9:
-> > - Editting inline comments.
-> > - Major refactoring in domain_is_scoped() and is_abstract_socket
-> > v8:
-> > - Code refactoring (improve code readability, renaming variable, etc.)
-> >   based on reviews by Mickaël Salaün on version 7.
-> > - Adding warn_on_once to check (impossible) inconsistencies.
-> > - Adding inline comments.
-> > - Adding check_unix_address_format to check if the scoping socket is an
-> >   abstract UNIX sockets.
-> > v7:
-> > - Using socket's file credentials for both connected(STREAM) and
-> >   non-connected(DGRAM) sockets.
-> > - Adding "domain_sock_scope" instead of the domain scoping mechanism
-> >   used in ptrace ensures that if a server's domain is accessible from
-> >   the client's domain (where the client is more privileged than the
-> >   server), the client can connect to the server in all edge cases.
-> > - Removing debug codes.
-> > v6:
-> > - Removing curr_ruleset from landlock_hierarchy, and switching back to
-> >   use the same domain scoping as ptrace.
-> > - code clean up.
-> > v5:
-> > - Renaming "LANDLOCK_*_ACCESS_SCOPE" to "LANDLOCK_*_SCOPE"
-> > - Adding curr_ruleset to hierarachy_ruleset structure to have access
-> >   from landlock_hierarchy to its respective landlock_ruleset.
-> > - Using curr_ruleset to check if a domain is scoped while walking in the
-> >   hierarchy of domains.
-> > - Modifying inline comments.
-> > v4:
-> > - Rebased on Günther's Patch:
-> >   https://lore.kernel.org/all/20240610082115.1693267-1-gnoack@google.com/
-> >   so there is no need for "LANDLOCK_SHIFT_ACCESS_SCOPE", then it is
-> >   removed.
-> > - Adding get_scope_accesses function to check all scoped access masks in
-> >   a ruleset.
-> > - Using socket's file credentials instead of credentials stored in
-> >   peer_cred for datagram sockets. (see discussion in [1])
-> > - Modifying inline comments.
-> > V3:
-> > - Improving commit description.
-> > - Introducing "scoped" attribute to landlock_ruleset_attr for IPC
-> >   scoping purpose, and adding related functions.
-> > - Changing structure of ruleset based on "scoped".
-> > - Removing rcu lock and using unix_sk lock instead.
-> > - Introducing scoping for datagram sockets in unix_may_send.
-> > V2:
-> > - Removing wrapper functions
-> > 
-> > [1]https://lore.kernel.org/all/20240610.Aifee5ingugh@digikod.net/
-> > ---
-> >  include/uapi/linux/landlock.h                |  28 ++++
-> >  security/landlock/limits.h                   |   3 +
-> >  security/landlock/ruleset.c                  |   7 +-
-> >  security/landlock/ruleset.h                  |  24 +++-
-> >  security/landlock/syscalls.c                 |  17 ++-
-> >  security/landlock/task.c                     | 136 +++++++++++++++++++
-> >  tools/testing/selftests/landlock/base_test.c |   2 +-
-> >  7 files changed, 208 insertions(+), 9 deletions(-)
-> > 
-> > diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-> > index 2c8dbc74b955..dfd48d722834 100644
-> > --- a/include/uapi/linux/landlock.h
-> > +++ b/include/uapi/linux/landlock.h
-> > @@ -44,6 +44,12 @@ struct landlock_ruleset_attr {
-> >  	 * flags`_).
-> >  	 */
-> >  	__u64 handled_access_net;
-> > +	/**
-> > +	 * @scoped: Bitmask of scopes (cf. `Scope flags`_)
-> > +	 * restricting a Landlock domain from accessing outside
-> > +	 * resources(e.g. IPCs).
-> > +	 */
-> > +	__u64 scoped;
-> >  };
-> >  
-> >  /*
-> > @@ -274,4 +280,26 @@ struct landlock_net_port_attr {
-> >  #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
-> >  #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
-> >  /* clang-format on */
-> > +
-> > +/**
-> > + * DOC: scope
-> > + *
-> > + * Scope flags
-> > + * ~~~~~~~~~~~
-> > + *
-> > + * These flags enable to restrict a sandboxed process from a set of IPC
-> > + * actions. Setting a flag for a ruleset will isolate the Landlock domain
-> > + * to forbid connections to resources outside the domain.
-> > + *
-> > + * IPCs with scoped actions:
-> > + *
-> > + * - %LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET: Restrict a sandboxed process
-> > + *   from connecting to an abstract unix socket created by a process
-> > + *   outside the related Landlock domain (e.g. a parent domain or a
-> > + *   non-sandboxed process).
-> > + */
-> > +/* clang-format off */
-> > +#define LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET		(1ULL << 0)
-> 
-> Thinking more about it, it makes more sense to rename it to
-> LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET (s/SCOPED/SCOPE/) because it
-> express a scope (not a "scoped") and it allign with the current
-> LANDLOCK_ACCESS_* and other internal variables such as
-> LANDLOCK_LAST_SCOPE...
-> 
-> However, it still makes sense to keep the "scoped" ruleset's field,
-> which is pretty similar to the "handled_*" semantic: it describes what
-> will be *scoped* by the ruleset.
-The proposed changes make sense. They are applied in commit
-[0b365024c726277eb73e461849709605d1819977]/next branch, and look good
-to me.
 
-> > +/* clang-format on*/
-> > +
-> >  #endif /* _UAPI_LINUX_LANDLOCK_H */
-> > diff --git a/security/landlock/limits.h b/security/landlock/limits.h
-> > index 4eb643077a2a..eb01d0fb2165 100644
-> > --- a/security/landlock/limits.h
-> > +++ b/security/landlock/limits.h
-> > @@ -26,6 +26,9 @@
-> >  #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
-> >  #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
-> >  
-> > +#define LANDLOCK_LAST_SCOPE		LANDLOCK_SCOPED_ABSTRACT_UNIX_SOCKET
-> > +#define LANDLOCK_MASK_SCOPE		((LANDLOCK_LAST_SCOPE << 1) - 1)
-> > +#define LANDLOCK_NUM_SCOPE		__const_hweight64(LANDLOCK_MASK_SCOPE)
-> >  /* clang-format on */
+On 9/13/24 18:35, Jonathan Cameron wrote:
+> On Sat, 7 Sep 2024 09:18:22 +0100
+> alejandro.lucero-palau@amd.com wrote:
+>
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> Create accessors for an accel driver requesting and
+>> releaseing a resource.
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> ---
+>>   drivers/cxl/core/memdev.c          | 40 ++++++++++++++++++++++++++++++
+>>   drivers/net/ethernet/sfc/efx_cxl.c |  7 ++++++
+>>   include/linux/cxl/cxl.h            |  2 ++
+>>   3 files changed, 49 insertions(+)
+>>
+>> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+>> index 10c0a6990f9a..a7d8daf4a59b 100644
+>> --- a/drivers/cxl/core/memdev.c
+>> +++ b/drivers/cxl/core/memdev.c
+>> @@ -744,6 +744,46 @@ int cxl_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+>>   }
+>>   EXPORT_SYMBOL_NS_GPL(cxl_set_resource, CXL);
+>>   
+>> +int cxl_request_resource(struct cxl_dev_state *cxlds, enum cxl_resource type)
+>> +{
+>> +	int rc;
+>> +
+>> +	switch (type) {
+>> +	case CXL_ACCEL_RES_RAM:
+>> +		rc = request_resource(&cxlds->dpa_res, &cxlds->ram_res);
+>> +		break;
+>> +	case CXL_ACCEL_RES_PMEM:
+>> +		rc = request_resource(&cxlds->dpa_res, &cxlds->pmem_res);
+>> +		break;
+> return request_resource()
+
+
+Yes.
+
+
+>> +	default:
+>> +		dev_err(cxlds->dev, "unknown resource type (%u)\n", type);
+> No unknown. We know exactly what it is (DPA) but we don't have it.
+> Unexpected maybe?
+
+
+Is this not the same case that you brought in previously? Should I keep 
+the default?
+
+
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	return rc;
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_request_resource, CXL);
+>> +
+>> +int cxl_release_resource(struct cxl_dev_state *cxlds, enum cxl_resource type)
+>> +{
+>> +	int rc;
+>> +
+>> +	switch (type) {
+>> +	case CXL_ACCEL_RES_RAM:
+>> +		rc = release_resource(&cxlds->ram_res);
+>> +		break;
+>> +	case CXL_ACCEL_RES_PMEM:
+>> +		rc = release_resource(&cxlds->pmem_res);
+> return ..
+
+
+Sure.
+
+Thanks
+
+
+>> +		break;
+>> +	default:
+>> +		dev_err(cxlds->dev, "unknown resource type (%u)\n", type);
+> As above. Probably know what we got, it it unexpected not unknown.
+>
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	return rc;
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_release_resource, CXL);
+>> +
+>>   static int cxl_memdev_release_file(struct inode *inode, struct file *file)
+>>   {
+>>   	struct cxl_memdev *cxlmd =
+>> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+>> index fee143e94c1f..80259c8317fd 100644
+>> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+>> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+>> @@ -72,6 +72,12 @@ int efx_cxl_init(struct efx_nic *efx)
+>>   		goto err;
+>>   	}
+>>   
+>> +	rc = cxl_request_resource(cxl->cxlds, CXL_ACCEL_RES_RAM);
+>> +	if (rc) {
+>> +		pci_err(pci_dev, "CXL request resource failed");
+>> +		goto err;
+>> +	}
+>> +
+>>   	return 0;
+>>   err:
+>>   	kfree(cxl->cxlds);
+>> @@ -84,6 +90,7 @@ int efx_cxl_init(struct efx_nic *efx)
+>>   void efx_cxl_exit(struct efx_nic *efx)
+>>   {
+>>   	if (efx->cxl) {
+>> +		cxl_release_resource(efx->cxl->cxlds, CXL_ACCEL_RES_RAM);
+>>   		kfree(efx->cxl->cxlds);
+>>   		kfree(efx->cxl);
+>>   	}
+>> diff --git a/include/linux/cxl/cxl.h b/include/linux/cxl/cxl.h
+>> index f2dcba6cdc22..22912b2d9bb2 100644
+>> --- a/include/linux/cxl/cxl.h
+>> +++ b/include/linux/cxl/cxl.h
+>> @@ -52,4 +52,6 @@ int cxl_set_resource(struct cxl_dev_state *cxlds, struct resource res,
+>>   bool cxl_pci_check_caps(struct cxl_dev_state *cxlds, u32 expected_caps,
+>>   			u32 *current_caps);
+>>   int cxl_pci_accel_setup_regs(struct pci_dev *pdev, struct cxl_dev_state *cxlds);
+>> +int cxl_request_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
+>> +int cxl_release_resource(struct cxl_dev_state *cxlds, enum cxl_resource type);
+>>   #endif
 
