@@ -1,238 +1,529 @@
-Return-Path: <netdev+bounces-128553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B13497A501
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 17:13:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 532F397A4EB
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 17:11:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E4EC1C21AFE
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 15:13:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6F6C1F22117
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 15:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83FA3158536;
-	Mon, 16 Sep 2024 15:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D961586FE;
+	Mon, 16 Sep 2024 15:11:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OLdzBrwt"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="mCpE0/ch"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B231615747A;
-	Mon, 16 Sep 2024 15:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726499626; cv=fail; b=Z4tqRzPCOOJhwaRFvWFq6HNxK/pSlFKtJBE+miHMqOxxX1YTatEw6lTPosHpGYl5xyauT4Nq2sqDU2Ti2a4zGqNs+ppHei/6+ns2QXoQA0TUOtJXlAEafwONn+JoPeYcncOF+PqZBQ9FmGQNHU5t23X5B5ea/6cUrZ/FeAG+2Tk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726499626; c=relaxed/simple;
-	bh=Kyt9Oo6TXYzGlg6lCKWSG9T3p+HUhM+nub21ejdwEuc=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=tVDsVoF6zPd8OkSGaVRwlFNAKJKUIf/8MZ4eJfQxgIp9gKIKgA4ZWmGO8+RGkARXk8lZ+SpKAQrSjSJwCyJvj0uTtxF+7RVuhtdBXqtx/YO387t31PB6lC1pqCbPISCx5UNUjshNk/NRcKrzDzxSTeOs2QgwQfp/VT+GUJNBs9E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OLdzBrwt; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726499625; x=1758035625;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Kyt9Oo6TXYzGlg6lCKWSG9T3p+HUhM+nub21ejdwEuc=;
-  b=OLdzBrwts+fab7T1iIN58X0TXAQKmi2bIGCagg5qhMMR7fXb1PY1Vpyr
-   QHEnHGx472eibqkFTwS+NwC8mz8dWOQ8fUPDiiGhBTLFqKW2KWM5N6wez
-   qRpNz6OKJoLVNfqy4sdM5FjRVX/Q/uXmgrjOLRo5kZJSBbx/6ialrAkLg
-   Z6V/537B66ONF9n6WeXiTjELX15/hfj4k741LmFNshjtLZB11U2Zoxeog
-   zDfAl4NAsLWZ4XyarAxc5x4rwXaEBLtkAubv8s/qGjdsNlUE+TTqAsdRb
-   n2rMgYhx4sZ34lS3/vOlL94AkL6s0q3NPJsdZlKiv6k0dnIwhDVQv48pr
-   w==;
-X-CSE-ConnectionGUID: GATTpOuVS4WNQMvcs7A7cg==
-X-CSE-MsgGUID: lKkmsYt8Tjq6E4ZxUNjFaw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11197"; a="28241343"
-X-IronPort-AV: E=Sophos;i="6.10,233,1719903600"; 
-   d="scan'208";a="28241343"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Sep 2024 08:13:43 -0700
-X-CSE-ConnectionGUID: 3WBHoEzpR7miOvDwAl2dIA==
-X-CSE-MsgGUID: daxkdDlmSN6eO/Bo6JHl6Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,233,1719903600"; 
-   d="scan'208";a="68864436"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Sep 2024 08:13:43 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 16 Sep 2024 08:13:42 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 16 Sep 2024 08:13:42 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 16 Sep 2024 08:13:42 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.173)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B01155CBA;
+	Mon, 16 Sep 2024 15:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726499506; cv=none; b=LfThMp+eRMURWLymWDAoYT38I32hFt9MjvLg6zpeDq59S42xd47gcKQguRk6tHzeHsfL/Q5UEUNA+n07VAF/YTKrc862KKhjeKToZ53e0YJUJ+Nm0I7YJAlIg/j3br4+88iKk0sHGH3jnZRR270D0GSRDywsqGunNPMii4UbZZo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726499506; c=relaxed/simple;
+	bh=b0LpIh78dqaVAHzT0umzWmGAIf4ajVxr3uSak2WeWQs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ayHpweBWVE7Bub4Hkat78PNZfmg1XvvZIr+tyg1v0BI37SmzEiaOs97yx+w8A3/XIOaRjw0GYoB2XPBT5A6fVi6Ah2d0dqnrpZuObHFlU43MNNZx7dB02dwQG9bsEnpgXMpqCGZ6XxpNaf3zdqnFX4JSUhp/GE0jU4HtqkfuBoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=mCpE0/ch; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: f84b99c0743d11ef8b96093e013ec31c-20240916
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=xcskHFxLDIkN1JrKF+fMeKDI1I7CcJzTiRWoScdXaQ8=;
+	b=mCpE0/chiyF8e2AWD4PUNSJtwc0wqf1GXNEkm75FHjLNqYamR0D/tcfK3h/yxigamQSvs/kGmW13hJNNXvFAtlVp/qv01OyVibjlmYRpEiYqxLYBorMYNPofg0vbIi/ITD/+B/1TjxYMvgKjX3gkNHzwSQUQ6ux/oeQVFwCKMZA=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:bc7bc906-6133-4cb0-a810-7848505ff24c,IP:0,U
+	RL:25,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:25
+X-CID-META: VersionHash:6dc6a47,CLOUDID:c3774ad0-7921-4900-88a1-3aef019a55ce,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: f84b99c0743d11ef8b96093e013ec31c-20240916
+Received: from mtkmbs14n1.mediatek.inc [(172.21.101.75)] by mailgw02.mediatek.com
+	(envelope-from <macpaul.lin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1787753468; Mon, 16 Sep 2024 23:11:37 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 16 Sep 2024 08:13:41 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=N8/x4KP4ajRQO21/074DGHA8m5RZ62wb1uuU+ggHFrmAeJxIZtskJnMybk/38IzzXercLjz83kz90NgDJDEWYbQJiPt9mWP2OEnuqYpll3NNdFdCDjZhj5HX+Os+5XyNA/lg7Bbrbtm8KbjEj6ch7Z5dM4VAgHtauOfogq/sbEfBqEoTT1RCHUxGXoD5mWXNHjaT2dTjpXAbWLl4RlYNL2kwgrgSEHBTwjMmA0/C8IcYV1L4QynEAp+GQuyuoI627N1g2q+Dbdp3A2xKZ50Reu76+wo/arow5hOTKxMU/PPhpCch3a6V9RGQpC0/PLg5wIJ0iFAYWJJvZF7OL+eu9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zgpApaTn9/A/Aq4QmFxrB29/9uUd8iNFTjiturUbjeY=;
- b=KkbEJ7gsJ9YRj5+DT5w/OUwpfH/w5k/9ETPVNZBBt4DfqnAhCH1mvSbxdz4+l0bx+amxgItykxo7rMiIbME35JNitmiqYQ5NCc+swvNi9Lv0wH+1LLZmXqHUI91ShgCRgeABup6EZtG0R1CJgreQHNLKna6G5LdRj797fnmHAXNd5Za1deL8N30pl9rx9RKG21BCXq6Hr7hrwgRdsxnGpumUHiVxG15M/DpKCKtarv+DF5qvwjC9uks2l2L8e5Qfuq3a5Y9RbIYhiDhWiWa7mlilB+MGbbwSEPWN/pbtldIrFobNIz2lhaeG2CENN56H7saZ7r1dJ14vD08fLWOU9g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by MW4PR11MB5823.namprd11.prod.outlook.com (2603:10b6:303:186::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.24; Mon, 16 Sep
- 2024 15:13:38 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7962.022; Mon, 16 Sep 2024
- 15:13:37 +0000
-Message-ID: <c5977a24-ba1e-4089-a74e-4b94ca239d36@intel.com>
-Date: Mon, 16 Sep 2024 17:10:49 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC/RFT v2 0/3] Introduce GRO support to cpumap codebase
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-CC: <bpf@vger.kernel.org>, <kuba@kernel.org>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <andrii@kernel.org>, <dxu@dxuuu.xyz>,
-	<john.fastabend@gmail.com>, <hawk@kernel.org>, <martin.lau@linux.dev>,
-	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <lorenzo.bianconi@redhat.com>
-References: <cover.1726480607.git.lorenzo@kernel.org>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <cover.1726480607.git.lorenzo@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR2P278CA0078.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:65::13) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+ 15.2.1118.26; Mon, 16 Sep 2024 23:11:36 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Mon, 16 Sep 2024 23:11:36 +0800
+From: Macpaul Lin <macpaul.lin@mediatek.com>
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Liam
+ Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Sean Wang
+	<sean.wang@mediatek.com>, Sen Chu <sen.chu@mediatek.com>, Macpaul Lin
+	<macpaul.lin@mediatek.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>, Pavel Machek <pavel@ucw.cz>, Lee
+ Jones <lee@kernel.org>, Sebastian Reichel <sre@kernel.org>, Alexandre Belloni
+	<alexandre.belloni@bootlin.com>, Chen Zhong <chen.zhong@mediatek.com>,
+	<linux-input@vger.kernel.org>, <linux-leds@vger.kernel.org>,
+	<linux-pm@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
+	<linux-sound@vger.kernel.org>, Alexandre Mergnat <amergnat@baylibre.com>
+CC: Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
+	Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
+	MediaTek Chromebook Upstream
+	<Project_Global_Chrome_Upstream_Group@mediatek.com>, Chen-Yu Tsai
+	<wenst@chromium.org>
+Subject: [PATCH v5 1/3] regulator: dt-bindings: mt6323: Convert to DT schema
+Date: Mon, 16 Sep 2024 23:11:30 +0800
+Message-ID: <20240916151132.32321-1-macpaul.lin@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MW4PR11MB5823:EE_
-X-MS-Office365-Filtering-Correlation-Id: 328036c5-b599-4c81-9bec-08dcd66223df
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?eE5UZmVqbDg3OTVYSTdmVzd3Ri84SXBmQjc0RkY5cjNzZ1A5TFRCOVY4bTBz?=
- =?utf-8?B?SFVteklBSldYcTB0TkZnWXR1cUR1TitJMFBRMkFvZXlCcXhtTDR6WWl3eUQw?=
- =?utf-8?B?Z0o4QzI4K2hTa3RMTWhudEN3dWlVMTQ2QzFabWNoT05LTXRMVVhzRGk1N280?=
- =?utf-8?B?bDZReDFvTEN2YVpvRno1MjlKSmJTMm8zVHlRTjArajA0SXM0QzJlTXVjdFVy?=
- =?utf-8?B?MW9VOEcrTjdPYTRLK1NXc3Rlb0Qvdno4TWpleVhnTzV4ZFVvRWUzQkROZUdm?=
- =?utf-8?B?bTA3ZndobXlNVE0zTXJqR0tLSXFteEptSkNJZndqcjFxZjdUcWlsSkxlYUM5?=
- =?utf-8?B?bUhsWkRXc2hqQWxkZVJFanEyTEc4d1lGUUt3NjFVQ29tMHRqamlIV25jNk4z?=
- =?utf-8?B?ck55dmg4djA1cC9SSzVJN2ZHMmJjTEhWUWwwKzhvZDV0Z09GbG9JUHhrKytx?=
- =?utf-8?B?SWpaeUhFeGoxRjdhSEZmTkJDRUsrUlo2THV0VkVyaW1jS1NIUW8zclpTQ2ly?=
- =?utf-8?B?dGUwSWZKaG9XZWdHQ3dlR2IzVXlxS0ljRHA5ZTBhZXc1QUJsZ3Q4R05NWnpF?=
- =?utf-8?B?ZlhoUk5MRUljRDFKcDB4Ulh3UUZ4YmtvU3FwaDA3YlMzOTUxYzIwK1hOd1FY?=
- =?utf-8?B?Qk9NT0dVTmRINFlmSmJyYUZtNytveERJK1FtU3NKN2orUDh1ZEgxMmtISW0r?=
- =?utf-8?B?VWFhaVF1SWR5eWFwd0RrenY1KzdDMlg1YXVsZm42cDgvRHdtQ09WZWc1eTFj?=
- =?utf-8?B?Wi9pSHlmYXhidU50aUhwYVhiYTlzZ003Z1V3VE1aUU9IYTM0a24rcThqQ0tZ?=
- =?utf-8?B?Q2xwM3RHV2oxUkM2UzZySG9Jd3pycEhpdGMzdDdUOVAzYTBnN242Vk9FYyty?=
- =?utf-8?B?cmpYWG9lUE9oNVN5SnkwVUl4VUEvMFVzRlh0d0NxZmVkeWpUTWUzVmxIOWw4?=
- =?utf-8?B?eTN5aHpHZFhjME15d2xqdFhiKzdDeXdXak1YRVJDUDlyVlR6dFFZT1JzbTZB?=
- =?utf-8?B?QzYyQkdlQWdXeTNqTm83aWM2R0hvem9UMjhCQ3NGQlBHK2xBUTFOcFdHUVQz?=
- =?utf-8?B?N2wzWjU3T0J4aG9yVW1pRGl5enRqdnhBWFZHVkxJOFl5M1ZSdDFpMlphUE9h?=
- =?utf-8?B?NDlxWHhIQVkrc290S2N1elliOE95Z05wMUZIZDQxQmlCS0VobW9EYzBKTUdo?=
- =?utf-8?B?YWFzSDFQR055bXVVN3o4OU1yQW5jUmZmS1JtcmxyTm42UWZlV3p6QVNVNjB3?=
- =?utf-8?B?L1dUWkJyYkJkUzgwbkl1aFlLQjdRV0RQM2MwU2RmeFhlMk02NnY4QnBOdkVD?=
- =?utf-8?B?Zmp4eHhGSXBFWVcrL2hmL3VjRDUrdXdXQXBUUDVRRzQweU5IV1BtTDFRWlQ4?=
- =?utf-8?B?eW1VREhZRVEydkJnaHFHejdRVmxXQVo0K3k2TGsrRDhCUXpZMUMyRFpGcGNW?=
- =?utf-8?B?WWQzWGIrNEFPVXdobExLbEFDV0xPRGxiZVhQdkhBdndIbmZYazZNZXIwbCsr?=
- =?utf-8?B?UXRyd253K3J0WXBxdnBBWGxhS2JSNnM3QkVYTzFYYndBR2Z4cmQ4TnlYalpB?=
- =?utf-8?B?ajlKUm9FM1o1UlloTTRRY3N5S2hyODllTldPbDVNVVFhLzZLa0lIWVE0ekdy?=
- =?utf-8?B?aGxpUFZqUjE5cWhaejNHU1NyRHNqbGtYZ0dKajlLT2kyMGZTd01KcDVQd0NW?=
- =?utf-8?B?ODBYOUxHMUFNYWFQVmdJWmxaN2ttUjREb0t5OXRnOGJWVWJkWnBYYU9XQkVT?=
- =?utf-8?B?RUZORTMzOHBNMGtjRDN6ZkNNQ1F2ZWV5a1ZkcVNtUFhZTDFkQWZMOVI3WTRV?=
- =?utf-8?B?UXlxRHJxVmowRXhVV3dpUT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eTVNVzhCdUJCRzRJeDBOYUJaQU4yM3hBTnZHSWNscm5KZ3ZLQkJ3dys0UmZs?=
- =?utf-8?B?WWd4WElhTVpuTWJPcGg0ZFViQ1NDb1paamNaNDlKNUpDM1VEMnQrS3Ztemxu?=
- =?utf-8?B?ME1lTEpFbHpOcHBNYk1JU1VVM1kycldINmNZZnVUdUpCM2dFbE9Zeis1dUQ0?=
- =?utf-8?B?YmZWVnB1ckxtSFlJWjM0MFV5azh3SmtLL2lrODVDWWhiQkY0QU1lM2ZXNWxr?=
- =?utf-8?B?WWE4OUgzNmxxNlpleG1kcnR6SHRRYUlsUldhUHNFTnlLZ2tMaHJFQTM0VHg1?=
- =?utf-8?B?bVBDWDArQmVRYVhlYWFoTU9sU0ZJcUlUejdKSmxzaURZdGh5cFE2WENBdlV4?=
- =?utf-8?B?c0Y1YVI4VVEyWUlydUVKUm9zQ2QvTUdDMnViWTRUdkw0VkZ3Z3Y1dDMyUU9J?=
- =?utf-8?B?ZnM2VktTNVZJcWFscU5LSXdpQytXT0puanhya1pwVi83SGF6b25jZDROVUZu?=
- =?utf-8?B?ajEvbDRydEE5ek10M2tOZWlBUThRYmVzWlhHUUZwMzBkMWJzYTlDeUl0M2tt?=
- =?utf-8?B?U0E1bUNaWTVhYnVPeHR0bFc5eFhQTDdWbndremE0emxBMmhyQ0E2MGpXL3Y4?=
- =?utf-8?B?YXplYjhqeXJUUzV1UlVkYjhRMWMvWjdRWVBzYk5qdXhTVk1FSGVsUS9mdENp?=
- =?utf-8?B?Z05OUHArWTF3REUxZkhtYW05YTU5Z3JvS0FnZFVLdHJhcE9WZ29pS1BGLzRY?=
- =?utf-8?B?am96MU5SYThwbGVyNkllbUdlSkhycFo3VlIyNngxNWMwcGJsQzRzajZKT3pE?=
- =?utf-8?B?NkVhVUoreDhMVkpLZWFkeFFrUmhuK0JJSlhJYVlqa3hYREFzSldyTWVSalVz?=
- =?utf-8?B?R20vWXg3SXBMdVpGMEsyLy9URWgvVDZSOWQ4K254bmdMcGhTTUliME1MLzdx?=
- =?utf-8?B?YWszdXVaREVrSTU3Q1YwZkRFampwT1IvRTZGNzlwcnhCWjlmNE5CdW5hamdI?=
- =?utf-8?B?M2J5NkFNeGxUZGFrR2dYNFdWbFJlcEo3OVY0WStVN1orQlpoSWxLM21nN1Fi?=
- =?utf-8?B?Rm8zNkgxbGZiMEg4WWc4M3RRQVpSbG9GZ0srRmFYSHJoK1Q0SllPQStla2lR?=
- =?utf-8?B?c29McEtHUVpYNVd6YklwdHpNZEI3cEdjaXFYT1ExaUJjaGxlVXNNYXk1TnZn?=
- =?utf-8?B?QWMwU0hObDlXTlhTdWluWmlId0kzMkgvLzRvcTBhaStXWFpDbnZBMEMwSENZ?=
- =?utf-8?B?NXFkYXF6emtkcWYvYzd5Ni9vdUFyWWt1ajBvNWI4Wm1rOFQ3b0xQWHNSRk9r?=
- =?utf-8?B?M3UvMW5qWUhLV0VFL3ltVk1yNXJ6TXdETjBQcU5qUVpwWFZDcEZQbFFGdDBt?=
- =?utf-8?B?SE5UN3lwaTJKZ0p4WVM4YWRTMEFqNVo3eEFZSkRTb21Tdk5RL1VVN2ZDczZ5?=
- =?utf-8?B?QTREVjFMMWVBVzJDd2ZNMEhsMFUyREE2MzVsSlRUL3hGYWg2OVJkME56V1VL?=
- =?utf-8?B?RWwzOVFZMmJwYlRHdDVyRVZXbEV3TElqQlhWUHdUdUFZR0gzTjBuamJNYm4v?=
- =?utf-8?B?Mmk5bjlndUFQa2s3VUZ6bXhDMnVzU2ozUE9RZUx5ei93TkIwNTB5aStIQkRV?=
- =?utf-8?B?TkpJcGFLWmlNRFFObHIwZGt3MW1LMGdiSkQvU1pURWxmdDQyVGo3N3Q2STVT?=
- =?utf-8?B?UEVKQXN1WHVpSXpZNm1ERWpUcTd5Sk82UTc3VitYVmtGcVR6c24veHk4L1li?=
- =?utf-8?B?RTJNemZ6ZU5TeG11ZTJRV1d0YUt2aGlmVDJBWURGVjdPTTZzMFNJQ3JJWjZL?=
- =?utf-8?B?eWxkUjZFSldlUzRaZkxWVkl6Y3AxMjkzb3E0cUZMWHZBS3ErWUtad3JHVFE0?=
- =?utf-8?B?NTRLazdBdS9OV1hVaHN1RmN2WVlSc21KMDRJb2hoWlNUWnFpejVuK3JlZ1Fo?=
- =?utf-8?B?Mk4wUnJRSmxUS0k2SXlPZDJ2SHdVVzNHYm03V045aUg1bTRpUEJsYVJUV3h6?=
- =?utf-8?B?eWt1Y25pcno4S01iZTcwbTdTSFpnMnllSzhJQlVHa3NCUWt3SmRTc3Bvd3pO?=
- =?utf-8?B?SmNuNVFvZUhDZmZZTUxEUWJEeXQ5b001L3d1SzN6YUdVYmJtSlc0ZkUwYnRE?=
- =?utf-8?B?T1FQSVI5SmR3YVpKTVV2VWhNeVZVaWtmbmlmWHYwanRJN1Z6ZmFGVU9JMUIr?=
- =?utf-8?B?amloWG13QzJWbGNac1ZuWDJ6dDlmL1h2WTVWUUtORlc2S1FlZzFoQ05YR0h1?=
- =?utf-8?B?RFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 328036c5-b599-4c81-9bec-08dcd66223df
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Sep 2024 15:13:37.8130
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rpkS7nN7FdQcfpnzNFXQEkbYFKCA0jGCQRAQ8S86Ne9bHCaJtGmeTd9l6fx0QfkRNN+tTqrbQxEuQTmWuOz2fGAxy9EaVrJy6jjMGzyuslA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5823
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-MTK: N
 
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Mon, 16 Sep 2024 12:13:42 +0200
+Convert the MT6323 regulator binding from the old text-based format to
+the new DT schema style. The property "regulator-name" has been added
+as required property to reflect current usage in mt6323.dtsi.
 
-> Add GRO support to cpumap codebase moving the cpu_map_entry kthread to a
-> NAPI-kthread pinned on the selected cpu.
-> 
-> Changes in rfc v2:
-> - get rid of dummy netdev dependency
-> 
-> Lorenzo Bianconi (3):
->   net: Add napi_init_for_gro routine
->   net: add napi_threaded_poll to netdevice.h
->   bpf: cpumap: Add gro support
+Examples have been streamlined and relocated to the parent schema file:
+  mfd/mediatek,mt6397.yaml.
 
-Oh okay, so it's still uses a NAPI.
-When I'm back from the conferences (next week), I might rebase and send
-the solution where I only use the GRO part of it, i.e. no
-napi_schedule()/poll()/napi_complete() logics.
+Update maintainer and submitter information with new entries from MediaTek.
 
-> 
->  include/linux/netdevice.h |   3 +
->  kernel/bpf/cpumap.c       | 123 ++++++++++++++++----------------------
->  net/core/dev.c            |  27 ++++++---
->  3 files changed, 73 insertions(+), 80 deletions(-)
+The reference document cited in "mediatek,mt7530.yaml" has been updated
+to point to this new DT schema file
 
-Thanks,
-Olek
+Signed-off-by: Sen Chu <sen.chu@mediatek.com>
+Signed-off-by: Macpaul Lin <macpaul.lin@mediatek.com>
+Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ .../bindings/net/dsa/mediatek,mt7530.yaml     |   4 +-
+ .../regulator/mediatek,mt6323-regulator.yaml  | 119 +++++++++
+ .../bindings/regulator/mt6323-regulator.txt   | 237 ------------------
+ 3 files changed, 121 insertions(+), 239 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml
+ delete mode 100644 Documentation/devicetree/bindings/regulator/mt6323-regulator.txt
+
+Changes for v1 and v2:
+ - This is the first version of converting mt6323-regulator.
+   This is because converting mt6323-regulator together
+   with mfd/mediatek,mt6397.yaml, so we've create a patch set
+   instead of single patch for each skydives.
+ - This patch has been made base on linux-next/master git repo.
+
+Changes for v3:
+ - Rebased on linux-next/master git repo near next-20240906.
+ - Added 'regulator-name' to 'requried' property to reflect current usage.
+ - replace ^(buck_)? and ^(ldo_)? to ^buck_ and ^ldo_ prefix.
+ - Update file name of 'mediatek,mt6323-regulator.yaml' in
+   'mediatek,mt7530.yaml'
+
+Changes for v4:
+ - No change.
+
+Changes for v5:
+ - Add "Reviewed-by" in commit message. Thanks for the review!
+ - Remove a blank line at EOF whcih causes whitespace warning
+   when 'git am' the patch.
+
+diff --git a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+index ea979bc..413db38 100644
+--- a/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/mediatek,mt7530.yaml
+@@ -129,8 +129,8 @@ properties:
+   io-supply:
+     description: |
+       Phandle to the regulator node necessary for the I/O power.
+-      See Documentation/devicetree/bindings/regulator/mt6323-regulator.txt for
+-      details for the regulator setup on these boards.
++      See Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml
++      for details for the regulator setup on these boards.
+ 
+   mediatek,mcm:
+     type: boolean
+diff --git a/Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml b/Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml
+new file mode 100644
+index 0000000..9bc9aa9a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/regulator/mediatek,mt6323-regulator.yaml
+@@ -0,0 +1,119 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/regulator/mediatek,mt6323-regulator.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: MediaTek MT6323 Regulator
++
++maintainers:
++  - John Crispin <john@phrozen.org>
++  - Sen Chu <sen.chu@mediatek.com>
++  - Macpaul Lin <macpaul.lin@mediatek.com>
++
++description: |
++  Regulator node of the PMIC. This node should under the PMIC's device node.
++  All voltage regulators provided by the PMIC are described as sub-nodes of
++  this node.
++
++properties:
++  compatible:
++    items:
++      - const: mediatek,mt6323-regulator
++
++patternProperties:
++  "^buck_v(pa|proc|sys)$":
++    description: Buck regulators
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(camio|cn18)$":
++    description: LDO with fixed 1.8V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v((io|rf)18)$":
++    description: LDOs with fixed 1.825V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(a|rtc|tcxo|(cn|io)28)$":
++    description: LDOs with fixed 2.8V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(usb)$":
++    description: LDOs with fixed 3.3V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(cn33_(bt|wifi))$":
++    description: LDOs with variable 3.3V output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++  "^ldo_v(cama|camaf|camd|emc3v3|gp[123]|ibr|m|mc|mch|sim[12])$":
++    description: LDOs with variable output and 0~100/10mV tuning
++    type: object
++    $ref: regulator.yaml#
++
++    properties:
++      regulator-allowed-modes: false
++
++    unevaluatedProperties: false
++
++    required:
++      - regulator-name
++
++required:
++  - compatible
++
++additionalProperties: false
+diff --git a/Documentation/devicetree/bindings/regulator/mt6323-regulator.txt b/Documentation/devicetree/bindings/regulator/mt6323-regulator.txt
+deleted file mode 100644
+index a48749d..0000000
+--- a/Documentation/devicetree/bindings/regulator/mt6323-regulator.txt
++++ /dev/null
+@@ -1,237 +0,0 @@
+-Mediatek MT6323 Regulator
+-
+-All voltage regulators are defined as subnodes of the regulators node. A list
+-of regulators provided by this controller are defined as subnodes of the
+-PMIC's node. Each regulator is named according to its regulator type,
+-buck_<name> and ldo_<name>. The definition for each of these nodes is defined
+-using the standard binding for regulators at
+-Documentation/devicetree/bindings/regulator/regulator.txt.
+-
+-The valid names for regulators are::
+-BUCK:
+-  buck_vproc, buck_vsys, buck_vpa
+-LDO:
+-  ldo_vtcxo, ldo_vcn28, ldo_vcn33_bt, ldo_vcn33_wifi, ldo_va, ldo_vcama,
+-  ldo_vio28, ldo_vusb, ldo_vmc, ldo_vmch, ldo_vemc3v3, ldo_vgp1, ldo_vgp2,
+-  ldo_vgp3, ldo_vcn18, ldo_vsim1, ldo_vsim2, ldo_vrtc, ldo_vcamaf, ldo_vibr,
+-  ldo_vrf18, ldo_vm, ldo_vio18, ldo_vcamd, ldo_vcamio
+-
+-Example:
+-
+-	pmic: mt6323 {
+-		mt6323regulator: regulators {
+-			mt6323_vproc_reg: buck_vproc{
+-				regulator-name = "vproc";
+-				regulator-min-microvolt = < 700000>;
+-				regulator-max-microvolt = <1350000>;
+-				regulator-ramp-delay = <12500>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vsys_reg: buck_vsys{
+-				regulator-name = "vsys";
+-				regulator-min-microvolt = <1400000>;
+-				regulator-max-microvolt = <2987500>;
+-				regulator-ramp-delay = <25000>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vpa_reg: buck_vpa{
+-				regulator-name = "vpa";
+-				regulator-min-microvolt = < 500000>;
+-				regulator-max-microvolt = <3650000>;
+-			};
+-
+-			mt6323_vtcxo_reg: ldo_vtcxo{
+-				regulator-name = "vtcxo";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <90>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vcn28_reg: ldo_vcn28{
+-				regulator-name = "vcn28";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <185>;
+-			};
+-
+-			mt6323_vcn33_bt_reg: ldo_vcn33_bt{
+-				regulator-name = "vcn33_bt";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3600000>;
+-				regulator-enable-ramp-delay = <185>;
+-			};
+-
+-			mt6323_vcn33_wifi_reg: ldo_vcn33_wifi{
+-				regulator-name = "vcn33_wifi";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3600000>;
+-				regulator-enable-ramp-delay = <185>;
+-			};
+-
+-			mt6323_va_reg: ldo_va{
+-				regulator-name = "va";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vcama_reg: ldo_vcama{
+-				regulator-name = "vcama";
+-				regulator-min-microvolt = <1500000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vio28_reg: ldo_vio28{
+-				regulator-name = "vio28";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vusb_reg: ldo_vusb{
+-				regulator-name = "vusb";
+-				regulator-min-microvolt = <3300000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vmc_reg: ldo_vmc{
+-				regulator-name = "vmc";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <36>;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vmch_reg: ldo_vmch{
+-				regulator-name = "vmch";
+-				regulator-min-microvolt = <3000000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <36>;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vemc3v3_reg: ldo_vemc3v3{
+-				regulator-name = "vemc3v3";
+-				regulator-min-microvolt = <3000000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <36>;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vgp1_reg: ldo_vgp1{
+-				regulator-name = "vgp1";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vgp2_reg: ldo_vgp2{
+-				regulator-name = "vgp2";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <3000000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vgp3_reg: ldo_vgp3{
+-				regulator-name = "vgp3";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vcn18_reg: ldo_vcn18{
+-				regulator-name = "vcn18";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vsim1_reg: ldo_vsim1{
+-				regulator-name = "vsim1";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <3000000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vsim2_reg: ldo_vsim2{
+-				regulator-name = "vsim2";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <3000000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vrtc_reg: ldo_vrtc{
+-				regulator-name = "vrtc";
+-				regulator-min-microvolt = <2800000>;
+-				regulator-max-microvolt = <2800000>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vcamaf_reg: ldo_vcamaf{
+-				regulator-name = "vcamaf";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vibr_reg: ldo_vibr{
+-				regulator-name = "vibr";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <3300000>;
+-				regulator-enable-ramp-delay = <36>;
+-			};
+-
+-			mt6323_vrf18_reg: ldo_vrf18{
+-				regulator-name = "vrf18";
+-				regulator-min-microvolt = <1825000>;
+-				regulator-max-microvolt = <1825000>;
+-				regulator-enable-ramp-delay = <187>;
+-			};
+-
+-			mt6323_vm_reg: ldo_vm{
+-				regulator-name = "vm";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vio18_reg: ldo_vio18{
+-				regulator-name = "vio18";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-				regulator-always-on;
+-				regulator-boot-on;
+-			};
+-
+-			mt6323_vcamd_reg: ldo_vcamd{
+-				regulator-name = "vcamd";
+-				regulator-min-microvolt = <1200000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-
+-			mt6323_vcamio_reg: ldo_vcamio{
+-				regulator-name = "vcamio";
+-				regulator-min-microvolt = <1800000>;
+-				regulator-max-microvolt = <1800000>;
+-				regulator-enable-ramp-delay = <216>;
+-			};
+-		};
+-	};
+-- 
+2.45.2
+
 
