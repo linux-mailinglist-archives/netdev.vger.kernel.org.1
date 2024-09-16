@@ -1,332 +1,181 @@
-Return-Path: <netdev+bounces-128502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B9E5979EAF
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 11:49:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67F5F979EC2
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 11:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 172F3280E7C
-	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 09:49:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C7BC1C22F49
+	for <lists+netdev@lfdr.de>; Mon, 16 Sep 2024 09:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD96114A095;
-	Mon, 16 Sep 2024 09:49:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9BA14BF8A;
+	Mon, 16 Sep 2024 09:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hrikar6A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fck5qltM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 007FE1CF83;
-	Mon, 16 Sep 2024 09:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 561DC14B97D;
+	Mon, 16 Sep 2024 09:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726480168; cv=none; b=J/QY+ufMG6cLEuUY31N7KX3Opy9zaPQbyHJ7U6kR9km6fq2nxOiA+qbl7aRnNJb+HH1MxbtJA0p2KbztPTXElLzkhwl5FOcfjf0U3kR/haJrQveBCin/M9ALvpN2B/dLwMvsaEaWJOPWPYPbjrQhhksCAdQkvLo7I0EquwZAE2w=
+	t=1726480244; cv=none; b=d4/+LUKqJl6XP+mZ7dUfNMB8KIjjWpcZFnMSeJ8w02dwPVrIX80vkjYM6/rsBfpHaNIn3bMIVm0Bn6a7CrRxkGiP5hJTgz/ezKbwt2nI483m5B0M8dyNietrlkaGD/2H9llE9TEf0nEgSV3aPVFHfZRcDXgz74vHy0iS4r/zaJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726480168; c=relaxed/simple;
-	bh=Fezmf/xSYYA+2Rp5prhtsDNAElh7xq591BRP3qfI9to=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rh71YsOSg2FY2mUDOtroVEWiFaGCPTQzTqnQs+4wTJAUuc18ERy3tLnIznPvpPPPaNKS+kvPHN8GVsAT57oN3/p3VfFg5hdHwhWWQMrrT0xe5I0hhqVe/DdbyoBGPkcuoc6f2J4lGgO/jrSbEjbsOKKgyLnXhjkxYQcv03qMFJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hrikar6A; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-206b9455460so31782885ad.0;
-        Mon, 16 Sep 2024 02:49:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726480166; x=1727084966; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=agEM9Bnjv/wIh4lqw0cG9MefC44dMCYZWQLQqTZdFTw=;
-        b=Hrikar6AtetL8V37gB9UKh6AuYi4VkHWt/+AJO54CG7JznowgcHImkB/vljr16kIOY
-         mvYBDPlw3TVGtimVFDHX8kHFAouBqVTIM2+/LyDSiURcMG3rXuqfvOQ4fPA5rHH1Iy9t
-         YFOLMmSYJ7Lm+Rm3Scm3G45ih+4ic8/wwckOKye6Ko8n5hEc7dXxh/bVqyC27h/N/Hhi
-         oKyC2YP4p1bAdg4txI5MryRLvokrCwj7L5PCIUQ4oriHqZydELh++sbcFi0y/Iyv/lti
-         ijdClJZg2gANkvSYAoymiWtQRg7cXeN/0ubi9Ap6LdeAKpc876JouTTcEMiqexrM0Hnb
-         bHOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726480166; x=1727084966;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=agEM9Bnjv/wIh4lqw0cG9MefC44dMCYZWQLQqTZdFTw=;
-        b=ouX7gCDzpuQkc8xb6Dl3PS8NRoRmIUG48bP79pC9c4iA2teT0O5+W+vRt/oXxCXU9W
-         WqtYSpJ0Lmh4wKSHxpO2leO9hzC6K36dNxqzxbEyFCcgrQKXSo8dwElWyJjkMme34EZD
-         i5GTtPazydCYEo05ZeEsKmnbYHK6Rk6Cy3AO7K7UIQYmGDQFDN38f2yVQWczw9agaPPv
-         MHmlAKPkmrbFTPjL+3/wwaSme2mMgLAki4J8HNZpNfu2qn6PU4ulXc3Gbab4isTM8sSb
-         po3OPOSkMBTXzcfaUaVMM8i+tqi+RsLEzZ7tPKBBLr6M5gGS5+SaibQ0VMGbWGSzPoxt
-         9qTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV/zZFGhhzE+oPvwCVlhhIqxfKIG/UVc2oEJq2ZQtFPh5YNQC+eTxnpGiLsAEAPBZ81muIay5se@vger.kernel.org, AJvYcCVS/8vXWF6DlcskVzHmLH5cVZqw9GfE1Ta8e5ui2j4iK8c42zMuljtgkqMagGEFvYgEm4CIAA6DmY3vYUz3+Ghc@vger.kernel.org, AJvYcCWP970qUG6mAhStauRhL24gFQsaRr4VJS6XUukDGLejp7DglP3fSt9AQukG30lvfNV3WcFE83wIf5E5mls=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxGZWTphXbQaWYQ5OUDQpkkg66z0XjaC04cgaFI1mAK2i4v3lF
-	M3QmK1XaeqTUdil1mda9g3cbXFDqSJB7hgZrs0rgqL75zb863732
-X-Google-Smtp-Source: AGHT+IF/8LADqxUJsInaUBiMLuBfWpa5XVS3tiDK6OKzHNTW5GsosmpZWdz0yIzhFtWEyhd9ltYzow==
-X-Received: by 2002:a17:902:d4ce:b0:1fd:96c7:24f5 with SMTP id d9443c01a7336-2074c5d2351mr264320415ad.5.1726480165906;
-        Mon, 16 Sep 2024 02:49:25 -0700 (PDT)
-Received: from localhost.localdomain ([159.196.197.79])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946fccc1sm33018905ad.214.2024.09.16.02.49.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2024 02:49:25 -0700 (PDT)
-From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>
-Cc: Jamie Bainbridge <jamie.bainbridge@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] selftests: forwarding: Avoid false MDB delete/flush failures
-Date: Mon, 16 Sep 2024 19:49:05 +1000
-Message-Id: <c92569919307749f879b9482b0f3e125b7d9d2e3.1726480066.git.jamie.bainbridge@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1726480244; c=relaxed/simple;
+	bh=HOoo8GgBBtI55/AwTvXOlcqvlg3QMeDP5VLTBW8tvhk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=I7P17vp+jegbSjEvQgQ122YPkDIY894izT0PSEcKLH72CLzAwtN2RWLWpMJyaiJdQKSI/6ucRNzaWSVDfHPxYUpEPudvd4BugTWn4GTCu3hGMSaQoqWIyopZV05uA8EFIzBBLEV+tE+aBPwIqZCzdFc7yvUsX1TISvLpLbAuTp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fck5qltM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEF44C4CECC;
+	Mon, 16 Sep 2024 09:50:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726480243;
+	bh=HOoo8GgBBtI55/AwTvXOlcqvlg3QMeDP5VLTBW8tvhk=;
+	h=From:Date:Subject:To:Cc:From;
+	b=Fck5qltMBpWO49cf9aOYG4k+P5vdIK4ujuHNKdditJGXXZVsGN6584FFYNLwcF4V0
+	 uVj1fO0nKnRDra8TwYNc8OTJ1iysQZw1Gy8b1rq6GPITZOeaDOGisBejla8D6LTn74
+	 l3ZtGwdpGbYix19NwurWeF5SQI0ma6IcUEtIUjjameF8OY0WjwEx8G6Nzj+sl0p9qP
+	 Xb6vNWKnY/grm7sdAAP9/6o89wIqnpxcr2doNt9TgTApSXlh1fleKuicAZl8bTmj/M
+	 FsLPCBVyp5SZiZ7W8Ei8l2n20cusKmUISTtG7F05aq0QUTj/FhXLGVqybL0AYiWLF5
+	 aWksh9lC0kHHA==
+From: Simon Horman <horms@kernel.org>
+Date: Mon, 16 Sep 2024 10:50:34 +0100
+Subject: [PATCH nf-next] netfilter: nf_reject: Fix build warning when
+ CONFIG_BRIDGE_NETFILTER=n
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240916-nf-reject-v1-1-24b6dd651c83@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAGn/52YC/x3MSwqAIBRG4a3EHSdkT2sr0SD0r24DC5UQpL0nD
+ Q98nEQejuFpKhI5POz5sjlkWZA+VrtDsMlNdVW31Sh7YTfhcEIHMagOo5aNhDKU/e2wcfxfM2V
+ mEQMt7/sBpmk9nGQAAAA=
+To: Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, 
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, netfilter-devel@vger.kernel.org, 
+ coreteam@netfilter.org, netdev@vger.kernel.org
+X-Mailer: b4 0.14.0
 
-Running this test on a small system produces different failures every
-test checking deletions, and some flushes. From different test runs:
+If CONFIG_BRIDGE_NETFILTER is not enabled, which is the case for x86_64
+defconfig, then building nf_reject_ipv4.c and nf_reject_ipv6.c with W=1
+using gcc-14 results in the following warnings, which are treated as
+errors:
 
-TEST: Common host entries configuration tests (L2)                [FAIL]
-  Failed to delete L2 host entry
+net/ipv4/netfilter/nf_reject_ipv4.c: In function 'nf_send_reset':
+net/ipv4/netfilter/nf_reject_ipv4.c:243:23: error: variable 'niph' set but not used [-Werror=unused-but-set-variable]
+  243 |         struct iphdr *niph;
+      |                       ^~~~
+cc1: all warnings being treated as errors
+net/ipv6/netfilter/nf_reject_ipv6.c: In function 'nf_send_reset6':
+net/ipv6/netfilter/nf_reject_ipv6.c:286:25: error: variable 'ip6h' set but not used [-Werror=unused-but-set-variable]
+  286 |         struct ipv6hdr *ip6h;
+      |                         ^~~~
+cc1: all warnings being treated as errors
 
-TEST: Common port group entries configuration tests (IPv4 (S, G)) [FAIL]
-  IPv4 (S, G) entry with VLAN 10 not deleted when VLAN was not specified
+Address this by reducing the scope of these local variables to where
+they are used, which is code only compiled when CONFIG_BRIDGE_NETFILTER
+enabled.
 
-TEST: Common port group entries configuration tests (IPv6 (*, G)) [FAIL]
-  IPv6 (*, G) entry with VLAN 10 not deleted when VLAN was not specified
+Compile tested and run through netfilter selftests.
 
-TEST: Flush tests                                                 [FAIL]
-  Entry not flushed by specified VLAN ID
+Reported-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Closes: https://lore.kernel.org/netfilter-devel/20240906145513.567781-1-andriy.shevchenko@linux.intel.com/
+Signed-off-by: Simon Horman <horms@kernel.org>
 
-TEST: Flush tests                                                 [FAIL]
-  IPv6 host entry not flushed by "nopermanent" state
+--
+My feeling is that this is not a bug fix, as the build failure only shows up
+with W=1 builds. However, I can see the other side of that argument,
+and if you prefer to take these via nf or net, then I am happy with
+that.
 
-Add a short sleep after deletion and flush to resolve this.
+I believe the fixes tags would be those supplied by Andy at the cited
+Link above.
 
-Create a delay variable just for this test to allow short sleep, the
-lib.sh WAIT_TIME of 5 seconds makes the test far longer than necessary.
-
-Tested on several weak systems with 0.1s delay:
-- Ivy Bridge Celeron netbook (2014 x86_64)
-- Raspberry Pi 3B (2016 aarch64)
-- Small KVM VM on Intel 10th gen (2020 x86_64)
-All these systems ran 25 test runs in a row with 100% pass OK.
-
-Fixes: b6d00da08610 ("selftests: forwarding: Add bridge MDB test")
-Signed-off-by: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Fixes: 8bfcdf6671b1 ("netfilter: nf_reject_ipv6: split nf_send_reset6() in smaller functions")
+Fixes: 052b9498eea5 ("netfilter: nf_reject_ipv4: split nf_send_reset() in smaller functions")
 ---
-v2: Avoid false check failures as seen by Jakub Kicinski.
----
- .../selftests/net/forwarding/bridge_mdb.sh    | 28 +++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ net/ipv4/netfilter/nf_reject_ipv4.c | 10 ++++------
+ net/ipv6/netfilter/nf_reject_ipv6.c |  5 ++---
+ 2 files changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
-index d9d587454d207931a539f59be15cbc63d471888f..49136279973d05d0e6b14237228ab58455554bb0 100755
---- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
-+++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
-@@ -30,6 +30,9 @@ ALL_TESTS="
- 	ctrl_test
- "
+diff --git a/net/ipv4/netfilter/nf_reject_ipv4.c b/net/ipv4/netfilter/nf_reject_ipv4.c
+index 04504b2b51df..87fd945a0d27 100644
+--- a/net/ipv4/netfilter/nf_reject_ipv4.c
++++ b/net/ipv4/netfilter/nf_reject_ipv4.c
+@@ -239,9 +239,8 @@ static int nf_reject_fill_skb_dst(struct sk_buff *skb_in)
+ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 		   int hook)
+ {
+-	struct sk_buff *nskb;
+-	struct iphdr *niph;
+ 	const struct tcphdr *oth;
++	struct sk_buff *nskb;
+ 	struct tcphdr _oth;
  
-+# time to wait for delete and flush to complete
-+: "${SETTLE_DELAY:=0.1}"
-+
- NUM_NETIFS=4
- source lib.sh
- source tc_common.sh
-@@ -152,6 +155,7 @@ cfg_test_host_common()
- 	check_fail $? "Managed to replace $name host entry"
+ 	oth = nf_reject_ip_tcphdr_get(oldskb, &_oth, hook);
+@@ -266,14 +265,12 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	nskb->mark = IP4_REPLY_MARK(net, oldskb->mark);
  
- 	bridge mdb del dev br0 port br0 grp $grp $state vid 10
-+	sleep "$SETTLE_DELAY"
- 	bridge mdb get dev br0 grp $grp vid 10 &> /dev/null
- 	check_fail $? "Failed to delete $name host entry"
+ 	skb_reserve(nskb, LL_MAX_HEADER);
+-	niph = nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
+-				   ip4_dst_hoplimit(skb_dst(nskb)));
++	nf_reject_iphdr_put(nskb, oldskb, IPPROTO_TCP,
++			    ip4_dst_hoplimit(skb_dst(nskb)));
+ 	nf_reject_ip_tcphdr_put(nskb, oldskb, oth);
+ 	if (ip_route_me_harder(net, sk, nskb, RTN_UNSPEC))
+ 		goto free_nskb;
  
-@@ -208,6 +212,7 @@ cfg_test_port_common()
- 	check_err $? "Failed to replace $name entry"
+-	niph = ip_hdr(nskb);
+-
+ 	/* "Never happens" */
+ 	if (nskb->len > dst_mtu(skb_dst(nskb)))
+ 		goto free_nskb;
+@@ -290,6 +287,7 @@ void nf_send_reset(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	 */
+ 	if (nf_bridge_info_exists(oldskb)) {
+ 		struct ethhdr *oeth = eth_hdr(oldskb);
++		struct iphdr *niph = ip_hdr(nskb);
+ 		struct net_device *br_indev;
  
- 	bridge mdb del dev br0 port $swp1 $grp_key permanent vid 10
-+	sleep "$SETTLE_DELAY"
- 	bridge mdb get dev br0 $grp_key vid 10 &> /dev/null
- 	check_fail $? "Failed to delete $name entry"
+ 		br_indev = nf_bridge_get_physindev(oldskb, net);
+diff --git a/net/ipv6/netfilter/nf_reject_ipv6.c b/net/ipv6/netfilter/nf_reject_ipv6.c
+index dedee264b8f6..69a78550261f 100644
+--- a/net/ipv6/netfilter/nf_reject_ipv6.c
++++ b/net/ipv6/netfilter/nf_reject_ipv6.c
+@@ -283,7 +283,6 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	const struct tcphdr *otcph;
+ 	unsigned int otcplen, hh_len;
+ 	const struct ipv6hdr *oip6h = ipv6_hdr(oldskb);
+-	struct ipv6hdr *ip6h;
+ 	struct dst_entry *dst = NULL;
+ 	struct flowi6 fl6;
  
-@@ -230,6 +235,7 @@ cfg_test_port_common()
- 	check_err $? "$name entry with VLAN 20 not added when VLAN was not specified"
+@@ -339,8 +338,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	nskb->mark = fl6.flowi6_mark;
  
- 	bridge mdb del dev br0 port $swp1 $grp_key permanent
-+	sleep "$SETTLE_DELAY"
- 	bridge mdb get dev br0 $grp_key vid 10 &> /dev/null
- 	check_fail $? "$name entry with VLAN 10 not deleted when VLAN was not specified"
- 	bridge mdb get dev br0 $grp_key vid 20 &> /dev/null
-@@ -310,6 +316,7 @@ __cfg_test_port_ip_star_g()
- 	bridge -d mdb get dev br0 grp $grp src $src1 vid 10 &> /dev/null
- 	check_err $? "(S, G) entry not created"
- 	bridge mdb del dev br0 port $swp1 grp $grp vid 10
-+	sleep "$SETTLE_DELAY"
- 	bridge -d mdb get dev br0 grp $grp vid 10 &> /dev/null
- 	check_fail $? "(*, G) entry not deleted"
- 	bridge -d mdb get dev br0 grp $grp src $src1 vid 10 &> /dev/null
-@@ -828,6 +835,7 @@ cfg_test_flush()
- 	bridge mdb add dev br0 port $swp1 grp 239.1.1.8 vid 10 temp
+ 	skb_reserve(nskb, hh_len + dst->header_len);
+-	ip6h = nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP,
+-				    ip6_dst_hoplimit(dst));
++	nf_reject_ip6hdr_put(nskb, oldskb, IPPROTO_TCP, ip6_dst_hoplimit(dst));
+ 	nf_reject_ip6_tcphdr_put(nskb, oldskb, otcph, otcplen);
  
- 	bridge mdb flush dev br0
-+	sleep "$SETTLE_DELAY"
- 	num_entries=$(bridge mdb show dev br0 | wc -l)
- 	[[ $num_entries -eq 0 ]]
- 	check_err $? 0 "Not all entries flushed after flush all"
-@@ -840,6 +848,7 @@ cfg_test_flush()
- 	bridge mdb add dev br0 port br0 grp 239.1.1.1 vid 10
+ 	nf_ct_attach(nskb, oldskb);
+@@ -355,6 +353,7 @@ void nf_send_reset6(struct net *net, struct sock *sk, struct sk_buff *oldskb,
+ 	 */
+ 	if (nf_bridge_info_exists(oldskb)) {
+ 		struct ethhdr *oeth = eth_hdr(oldskb);
++		struct ipv6hdr *ip6h = ipv6_hdr(nskb);
+ 		struct net_device *br_indev;
  
- 	bridge mdb flush dev br0 port $swp1
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port $swp1"
- 	check_fail $? "Entry not flushed by specified port"
-@@ -849,11 +858,13 @@ cfg_test_flush()
- 	check_err $? "Host entry flushed by wrong port"
- 
- 	bridge mdb flush dev br0 port br0
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port br0"
- 	check_fail $? "Host entry not flushed by specified port"
- 
- 	bridge mdb flush dev br0
-+	sleep "$SETTLE_DELAY"
- 
- 	# Check that when flushing by VLAN ID only entries programmed with the
- 	# specified VLAN ID are flushed and the rest are not.
-@@ -864,6 +875,7 @@ cfg_test_flush()
- 	bridge mdb add dev br0 port $swp2 grp 239.1.1.1 vid 20
- 
- 	bridge mdb flush dev br0 vid 10
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 &> /dev/null
- 	check_fail $? "Entry not flushed by specified VLAN ID"
-@@ -871,6 +883,7 @@ cfg_test_flush()
- 	check_err $? "Entry flushed by wrong VLAN ID"
- 
- 	bridge mdb flush dev br0
-+	sleep "$SETTLE_DELAY"
- 
- 	# Check that all permanent entries are flushed when "permanent" is
- 	# specified and that temporary entries are not.
-@@ -879,6 +892,7 @@ cfg_test_flush()
- 	bridge mdb add dev br0 port $swp2 grp 239.1.1.1 temp vid 10
- 
- 	bridge mdb flush dev br0 permanent
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port $swp1"
- 	check_fail $? "Entry not flushed by \"permanent\" state"
-@@ -886,6 +900,7 @@ cfg_test_flush()
- 	check_err $? "Entry flushed by wrong state (\"permanent\")"
- 
- 	bridge mdb flush dev br0
-+	sleep "$SETTLE_DELAY"
- 
- 	# Check that all temporary entries are flushed when "nopermanent" is
- 	# specified and that permanent entries are not.
-@@ -894,6 +909,7 @@ cfg_test_flush()
- 	bridge mdb add dev br0 port $swp2 grp 239.1.1.1 temp vid 10
- 
- 	bridge mdb flush dev br0 nopermanent
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port $swp1"
- 	check_err $? "Entry flushed by wrong state (\"nopermanent\")"
-@@ -901,6 +917,7 @@ cfg_test_flush()
- 	check_fail $? "Entry not flushed by \"nopermanent\" state"
- 
- 	bridge mdb flush dev br0
-+	sleep "$SETTLE_DELAY"
- 
- 	# Check that L2 host entries are not flushed when "nopermanent" is
- 	# specified, but flushed when "permanent" is specified.
-@@ -908,16 +925,19 @@ cfg_test_flush()
- 	bridge mdb add dev br0 port br0 grp 01:02:03:04:05:06 permanent vid 10
- 
- 	bridge mdb flush dev br0 nopermanent
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 01:02:03:04:05:06 vid 10 &> /dev/null
- 	check_err $? "L2 host entry flushed by wrong state (\"nopermanent\")"
- 
- 	bridge mdb flush dev br0 permanent
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 01:02:03:04:05:06 vid 10 &> /dev/null
- 	check_fail $? "L2 host entry not flushed by \"permanent\" state"
- 
- 	bridge mdb flush dev br0
-+	sleep "$SETTLE_DELAY"
- 
- 	# Check that IPv4 host entries are not flushed when "permanent" is
- 	# specified, but flushed when "nopermanent" is specified.
-@@ -925,16 +945,19 @@ cfg_test_flush()
- 	bridge mdb add dev br0 port br0 grp 239.1.1.1 temp vid 10
- 
- 	bridge mdb flush dev br0 permanent
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 &> /dev/null
- 	check_err $? "IPv4 host entry flushed by wrong state (\"permanent\")"
- 
- 	bridge mdb flush dev br0 nopermanent
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 &> /dev/null
- 	check_fail $? "IPv4 host entry not flushed by \"nopermanent\" state"
- 
- 	bridge mdb flush dev br0
-+	sleep "$SETTLE_DELAY"
- 
- 	# Check that IPv6 host entries are not flushed when "permanent" is
- 	# specified, but flushed when "nopermanent" is specified.
-@@ -942,16 +965,19 @@ cfg_test_flush()
- 	bridge mdb add dev br0 port br0 grp ff0e::1 temp vid 10
- 
- 	bridge mdb flush dev br0 permanent
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp ff0e::1 vid 10 &> /dev/null
- 	check_err $? "IPv6 host entry flushed by wrong state (\"permanent\")"
- 
- 	bridge mdb flush dev br0 nopermanent
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp ff0e::1 vid 10 &> /dev/null
- 	check_fail $? "IPv6 host entry not flushed by \"nopermanent\" state"
- 
- 	bridge mdb flush dev br0
-+	sleep "$SETTLE_DELAY"
- 
- 	# Check that when flushing by routing protocol only entries programmed
- 	# with the specified routing protocol are flushed and the rest are not.
-@@ -961,6 +987,7 @@ cfg_test_flush()
- 	bridge mdb add dev br0 port br0 grp 239.1.1.1 vid 10
- 
- 	bridge mdb flush dev br0 proto bgp
-+	sleep "$SETTLE_DELAY"
- 
- 	bridge mdb get dev br0 grp 239.1.1.1 vid 10 | grep -q "port $swp1"
- 	check_fail $? "Entry not flushed by specified routing protocol"
-@@ -970,6 +997,7 @@ cfg_test_flush()
- 	check_err $? "Host entry flushed by wrong routing protocol"
- 
- 	bridge mdb flush dev br0
-+	sleep "$SETTLE_DELAY"
- 
- 	# Test that an error is returned when trying to flush using unsupported
- 	# parameters.
--- 
-2.39.2
+ 		br_indev = nf_bridge_get_physindev(oldskb, net);
 
 
