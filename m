@@ -1,66 +1,57 @@
-Return-Path: <netdev+bounces-128704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4CDA97B1D8
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 17:34:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65C0397B1E3
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 17:35:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 820921F2595D
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 15:34:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9910D1C233E0
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 15:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3BF19FA9C;
-	Tue, 17 Sep 2024 15:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A6071A08BC;
+	Tue, 17 Sep 2024 15:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eVB63rQ1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M0i2z9oJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F026D19754A;
-	Tue, 17 Sep 2024 15:04:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662FB1A08BA
+	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 15:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726585453; cv=none; b=aVzNSymoM+aLvELSlGPKIQjmd60NjeptXIZfku4SwTK90fYg9zFXZ3lGtxRsITfu8BppinK9+vb8pUj5CqTYWAleDLzANdDUTinCVRPId2REvwTFOvh5MJmyUk4Za62CzBdANPJ0ciutlVoESW6xrXr4MtmmHk3bJTVpyZm2Yi0=
+	t=1726585827; cv=none; b=iJOfAiaEKN4I8cOUeYRY9aCaUVZ+tkfmYPk+i0FcYGr9ymoHpCXooEZq7n7mf2FzN7cCwnClrcTph+RmC6X86hCMX2oJff4W/kYggQ7P0i4Y08v2lGijKZ4qR9Ao+tG8i68ojv2UB6HkVggxAYdftVhPAtHppp3OoKVeq2pjQC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726585453; c=relaxed/simple;
-	bh=zXsoH+o4A35ndDJgHDjG0rrx13JWwVadVhEYJGQjNyA=;
+	s=arc-20240116; t=1726585827; c=relaxed/simple;
+	bh=zvSlv1a/AKpIl3lLRPp+jlFr+bJSkT6qaU2dFq/1Y3w=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ahob3qoOKwjgKpxPkCH/6j2hbDzuybHiH85OClNWeoRZn5YG50L96rICybS5DkczJ5QwJmNTfEqeuI7My6WVpFyiGvrh+D2rCR/wYdVmsoFjNsSmgkot+w5MkI963l3980Bwy4zYo2SkNlke36EI9tAe2JJ4WZQtnXH9F6K0mPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eVB63rQ1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB286C4CEC5;
-	Tue, 17 Sep 2024 15:04:09 +0000 (UTC)
+	 MIME-Version:Content-Type; b=D+iFkXw/M/VTYdL7QpiE+7kd/m6HC2TARCvS7VBoqp2D7Xu9TV/BtW0cUbww1KIWQVRBgPdRuLAkVnGcVJBXiz3gKv1wKQGLwHmuMgSi4pVP6rJavz0w42W+pQauqrU1qR6qkqdYGyokH08JXaaHuSdctNRV4PA9hrr4BYJYmeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M0i2z9oJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB7BEC4CEC5;
+	Tue, 17 Sep 2024 15:10:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726585452;
-	bh=zXsoH+o4A35ndDJgHDjG0rrx13JWwVadVhEYJGQjNyA=;
+	s=k20201202; t=1726585826;
+	bh=zvSlv1a/AKpIl3lLRPp+jlFr+bJSkT6qaU2dFq/1Y3w=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eVB63rQ1H6gY/409ooHvZcIBSj64srzmEJffbHpBGzPJR4f2uVpt6g7dMcZ4K/ymM
-	 qLmfg0ocYmWMxZysoUiRh32xQa39NwGBNk/e/ajgi33qdEz9MCGk0IhO/40K+1QTCS
-	 5AHq/mqcONpGKfHGGs0hfJJfKTvYfcQSxEFzS6px1aRzn0zlH7woGjholmBE13v2yS
-	 dSlMUbCOagn7LytppTUXpfpe+5fmN8nWVDTq+skykHCmDtgckyQ6FItXukH6RXF98B
-	 1Ott+XMrVvoR0bKyy8NRN1l7GGE/xrk4oNPRoRAcmLtwhAwmcBsl/XksgJd3hCqmsX
-	 Jj3qWS3KDKDgA==
-Date: Tue, 17 Sep 2024 17:04:06 +0200
+	b=M0i2z9oJz1huPOQHu21cKIwvEVThHqT15sbAiPRJXSzhvE/8qtrT7pzHYViRiycsK
+	 LHPuefZ/xWWRxMojSTSSI1qYrwhipY0arxaJfU9EOSBEoVdSJWoFM3o3tcLHX3vQSI
+	 oY07/mDJrQMSp7hxf3+3f5bNvotN97RJhbyH6AAcqMKcIruC05GY4DULR7MjSJC/qA
+	 0ghjieETxHfKKLsWFhVtKILXRk0iFrt5YRF1nVOPPSawfas6TC6UFcwA8ZtNTBR3Ny
+	 SyIezepNPfvpRxmtD03US9Ddv4L3LBp3j8M8vGmlyVARCHHheNFbFKJUUxe9cTRlPI
+	 V5b+dMsNNwcEg==
+Date: Tue, 17 Sep 2024 17:10:21 +0200
 From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, KY Srinivasan
- <kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "shradhagupta@linux.microsoft.com"
- <shradhagupta@linux.microsoft.com>, "ahmed.zaki@intel.com"
- <ahmed.zaki@intel.com>, "colin.i.king@gmail.com" <colin.i.king@gmail.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: mana: Add get_link and get_link_ksettings in
- ethtool
-Message-ID: <20240917170406.6a9d6e27@kernel.org>
-In-Reply-To: <PH7PR21MB3260F88970A04FDB9C0ACCC4CA612@PH7PR21MB3260.namprd21.prod.outlook.com>
-References: <1726127083-28538-1-git-send-email-ernis@linux.microsoft.com>
-	<20240913202347.2b74f75e@kernel.org>
-	<PH7PR21MB3260F88970A04FDB9C0ACCC4CA612@PH7PR21MB3260.namprd21.prod.outlook.com>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org,
+ Sudheer Mogilappagari <sudheer.mogilappagari@intel.com>
+Subject: Re: [PATCH ethtool] netlink: rss: retrieve ring count using
+ ETHTOOL_GRXRINGS ioctl
+Message-ID: <20240917171021.1b7bce2f@kernel.org>
+In-Reply-To: <2fsnu2mhk4x5j3bh33pugjfs4e34ys72hmzahdlbctxolfagxj@obbdtitbnax3>
+References: <20240913093828.2549217-1-vladimir.oltean@nxp.com>
+	<2fsnu2mhk4x5j3bh33pugjfs4e34ys72hmzahdlbctxolfagxj@obbdtitbnax3>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,18 +61,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 17 Sep 2024 14:35:21 +0000 Haiyang Zhang wrote:
-> > Any reason why? Sometimes people add this callback for virtual
-> > devices to expose some approximate speed, but you're not reporting
-> > speed, so I'm curious.  
-> Speed info isn't available from the HW yet. But we are requesting 
-> that from HW team. For now, we just add some minimal info, like 
-> duplex, etc.
+On Mon, 16 Sep 2024 21:38:14 +0200 Michal Kubecek wrote:
+> I have asked this multiple times but I never got a direct answer: is
+> this only a formal terminology problem or is there an actual difference
+> between the two? In particular: is someone aware of an example of
+> a driver and device where these two counts differ? Or is there a reason
+> to expect such device either exists or will exist in the future?
+> 
+> (Actually, I seem to remember that the first time I asked, the general
+> consensus was that combined + rx is indeed the value we need here -
+> which is what current code does. But it has been few years so I would
+> have to look it up to be sure.)
 
-Unless I'm misreading I don't see the answer to the "why?" in your
-reply.
-
-What benefit does reporting duplex on a virtual device bring?
-What kind of SW need this current patch?
-etc.
+The change in perspective comes from the potential for dynamic queue
+allocation in the future. We don't have the exact details but it's
+possible that we'd choose to treat "channels" as NAPI instances rather
+than queues. And more queues can be dynamically opened by the
+applications and attached to the existing channels.
 
