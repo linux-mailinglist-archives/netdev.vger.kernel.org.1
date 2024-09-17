@@ -1,221 +1,265 @@
-Return-Path: <netdev+bounces-128700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 690C497B17F
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:36:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84AEF97B185
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:40:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E962B29914
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 14:36:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42089285513
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 14:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AB66179967;
-	Tue, 17 Sep 2024 14:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11B45166F3A;
+	Tue, 17 Sep 2024 14:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="gE7dhgyG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fMlqe6Uo"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11020103.outbound.protection.outlook.com [52.101.61.103])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E7E5171099;
-	Tue, 17 Sep 2024 14:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.103
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726583727; cv=fail; b=Dno8BRbANi+KyhhtJBh02LWl5pulj5NcAQFRQ6XWcOwWtCC9tVLbJMyScymzo+X5B/qix2H9OaYF89SWVdY3567G5/jBAr+CO6v8KtOY8SnOJ4WCraoibjVbgFnsoLi4w6lSCzCUdb+ipeihFiJ6OsAuMmdl+F0rNfkTufYgH1w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726583727; c=relaxed/simple;
-	bh=xZ/wepqkaXLZxuDxO2wZ/VLQGhSiMzNg3APiJDS1kDg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=hJwied7WwwHhkP/wkWYB3KvVLTgD6SO/n6i+qJMlqOj8pp1T79cmlGG44vsMVX4Th5jmxkic9vdBlzV2vWPVBHtTkpNRBrvBWXeXK7pW2UPiJ3A3QwIvDl926l2JITG5/SdstuvGp7HCW1LlreGDGuZgYVJmgueV1avOTGVuX5c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=gE7dhgyG; arc=fail smtp.client-ip=52.101.61.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gFZWL3BW4WViiSX4/oNG14XJVcHmHCO2h5H3Miqw+/MicOL673eWAozcS0pVKo46Dv7TSJJJ9mJKD/veaCjxhpVIBMwHJ5HKMrf+ggnJv014V6SAmMqZlOOfmayj08gLw/yJOQ4B/07CJeuNf/YVR/QZRHfEw1yxsqpzAnf/QYZOuFf7/9mHKDzRhWPqs5fEF6nJUb7YuUU1I5nl4llyDy5WxMmgHduQCMwA8hwPgGqa/sx0o+rn6Ezy8lcyGUn6QFvHoanQoM7yJ1GpN3+q9E/TWjmI11QTR2fWX3f//Ayh5cERHkrzQ9uq/6znAsp+SCOAg+cY5mwnyjjpX2gKhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MLAVh3jBZxFzWHhKNW4XIA1ZGwiDduVz/SvSIEsb6cI=;
- b=aRnSdNI/UEvgP0MvtJExIY8jVlzIltOuGHMCWGadsBmyeo5Dr2hTdyN+TRwskyqLlPCDE6nmH+ygcGls1QHh+2xrwgPyKxBz25cI35dj4WaDsp5mL9zT8TC5e8CE1/AsovxwoN3wQ3uWxNrHqZQVij1x30QhKwNUM7pzPBnuFV0/VmiuqyuUyu289RTmVp59irf2vZTZd5Vq1gN05/TaoVF+0j573l7XHaI/KnfPvpNEUGt8tNNj5bUelqwCo7DQaiPPRJ5FR4yXfg1YdI2+5vthsTnAhPjU9dyiH2zkLjE3Mqg6u/ymdjvjHWT1P9A/J3wWsSuUINPYMdfVOUhhfQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MLAVh3jBZxFzWHhKNW4XIA1ZGwiDduVz/SvSIEsb6cI=;
- b=gE7dhgyGIYCrsQMjL0nmUELHrkJTK+wNKkyJ7zuucwpwsk+yCKH0J2AbzTr2xsxHRr0ylgN3tZfhU99dwBl5zUnrSSWDIzUlNaGk86DnErMDKQ9VGYifQZYSS3Hg6mv/evO7jACPPut9DJ3fCzBre/9LerqZkU1pKDl95aNRA7Q=
-Received: from PH7PR21MB3260.namprd21.prod.outlook.com (2603:10b6:510:1d8::15)
- by MN0PR21MB3510.namprd21.prod.outlook.com (2603:10b6:208:3d1::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8005.6; Tue, 17 Sep
- 2024 14:35:21 +0000
-Received: from PH7PR21MB3260.namprd21.prod.outlook.com
- ([fe80::a4dd:601a:6a96:9ef0]) by PH7PR21MB3260.namprd21.prod.outlook.com
- ([fe80::a4dd:601a:6a96:9ef0%3]) with mapi id 15.20.8005.001; Tue, 17 Sep 2024
- 14:35:21 +0000
-From: Haiyang Zhang <haiyangz@microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>, Erni Sri Satya Vennela
-	<ernis@linux.microsoft.com>
-CC: KY Srinivasan <kys@microsoft.com>, "wei.liu@kernel.org"
-	<wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "shradhagupta@linux.microsoft.com"
-	<shradhagupta@linux.microsoft.com>, "ahmed.zaki@intel.com"
-	<ahmed.zaki@intel.com>, "colin.i.king@gmail.com" <colin.i.king@gmail.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] net: mana: Add get_link and get_link_ksettings in ethtool
-Thread-Topic: [PATCH] net: mana: Add get_link and get_link_ksettings in
- ethtool
-Thread-Index: AQHbBOeybZTViwmNu0ClIJxwZ4fwXrJWoTWAgAVwXIA=
-Date: Tue, 17 Sep 2024 14:35:21 +0000
-Message-ID:
- <PH7PR21MB3260F88970A04FDB9C0ACCC4CA612@PH7PR21MB3260.namprd21.prod.outlook.com>
-References: <1726127083-28538-1-git-send-email-ernis@linux.microsoft.com>
- <20240913202347.2b74f75e@kernel.org>
-In-Reply-To: <20240913202347.2b74f75e@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=490717f5-3f4c-43bc-b835-32d71e7fd4e3;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-09-17T14:27:13Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH7PR21MB3260:EE_|MN0PR21MB3510:EE_
-x-ms-office365-filtering-correlation-id: 37ebe5c1-51da-4eb1-8d87-08dcd725f5aa
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|7416014|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?MH/WdvlF7iAKweKvMBIvrSEozNQ14ugFZucIyN5V5XHQzh9YXu1E8FT6evkS?=
- =?us-ascii?Q?op+lXPLPc+FRtc57UrFCS+ciDRTXqFHZr9jQJXVtUsnE2zStsR9+P9FS+OLX?=
- =?us-ascii?Q?mKa5KBnP3Qup4TCTj4r4sT3Sn2D0TGhkWbaXWHC27QSD/82hX1xrWkSAzAb5?=
- =?us-ascii?Q?te99T3DR7BqfaT5hnSbt6Jhem5EdUqsFLCSDSY+zt7FSR3hv/w8/i4xIJDJ6?=
- =?us-ascii?Q?j66IlSNX2+fuylNroJ2Qw7jMqMv+w/vDcfjIxJprk59FBxFhXHefH7wGLgPk?=
- =?us-ascii?Q?qtccFFQyi3JM24gEia+s4k1ZHv0cMO8sHOSaAh8MEe6kSQ2HKsA/l5NlC/YT?=
- =?us-ascii?Q?wYHbCzPd50BBz0I8PsT2Gzf9XLCOslIbVIci1FtyorB2gQT2y8TMuj7Sk7Cb?=
- =?us-ascii?Q?bCNofi7xT2ZvOf8lkxFJm1NFj282cvQrgdcjB4KICX3nsDGMe08TOP1yC4Wk?=
- =?us-ascii?Q?5WYwkOkKjxX4YGeifCyhY9iOdLS0p4AgkrMDz7GeHfkDSkvHNooGFXdSNszU?=
- =?us-ascii?Q?FsaHTG0nJSTstLBYOWSxk/uIMRD5EwOc1HbiuRhKvJZd60Fzk38KsAiGtzjd?=
- =?us-ascii?Q?QgkOdRJTrn0LkdtZAejCADiWZAZG2xtyJ9D5Gfp+f69O5uAAZrFXJCMXy2tk?=
- =?us-ascii?Q?Xhryw5ztBfA8CKB3iI1KS8plmAjc09RfLohwxdpioZqWOStpOZwfSSfd+x2m?=
- =?us-ascii?Q?blfElqc6306SIrLyOzQ1Zt7Gpq7Y4YC/I40WXwDvIN5uPESd0+9q8zQ1lIPY?=
- =?us-ascii?Q?nE2wt0sBZ8+bu4+/e0kxUTi6+7UfMk1mH2RJNlZ+EMRO3XQZSfedeuGTx46c?=
- =?us-ascii?Q?JyHjO3kopJnc8FYNHVbbO/SFSKHdpi2FvrT2Qvsp0kJ/oxNvWXMj1OWx2/vR?=
- =?us-ascii?Q?Amlu+WEoA8RYZnsM5mH9TlYRUiFffbF/2YHGLatdW2d696JUreEAhSB8XCmd?=
- =?us-ascii?Q?royp8VdNAmRlNCLDRjRx1gP8kcCWQaDP1wdFIkaU+Ez2OXRU7+Vl06dQD2JU?=
- =?us-ascii?Q?7QwHiphEPyeCDOnjfPfsSSDrybJm3EdSGLrfC2Nxm9POaHtYXjEjJ+5VmzIp?=
- =?us-ascii?Q?TVi/PpdhTWAIT6vLEewiJHGRMOgXiKEhp6Y3S5+7FRViCIZDiRDv0Je1HScU?=
- =?us-ascii?Q?+CAJRrM3Vyz/RQHF+Tq4Q/L7BwQKD385S+qr6lv28kDEO/Gejq6+qKyiC59s?=
- =?us-ascii?Q?QKAqkP0bnT5QCuue3wLxbBVM3Pn2PRzvjBWeQmftH8RLsKTHmxUqizYEIe9Z?=
- =?us-ascii?Q?CzCxFq9/VN7Xe/dRzp0bjLrs11BofAu3pBTDxwHIhkU83ZlqIE718PranoOU?=
- =?us-ascii?Q?v1XZTLlEUZL363GHMA0T7CGJ?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR21MB3260.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?sqswGb+TP8i9CnVBvtDW+RiODqMuCHC9Q04FntV0wBK0NdO2aaM6fsRSIDyH?=
- =?us-ascii?Q?pGtd2jxrODrNcJbwFHdep8MWg5hhP9Hu4htBAVk4cEL4LriTa97cL3aTCsCy?=
- =?us-ascii?Q?OnblrHEAuOU4i83nidlXovfF64ixqfcCtWGPkLMFBABrMfZgimD+jAI3sLTA?=
- =?us-ascii?Q?XrnwoR5YySIZO0X7EYTZrnJbfIXCGtFbNtVTNiFDYrcLFZB3opgm/h/R32fU?=
- =?us-ascii?Q?J4sz5BYz1rMhVSm1VIsrWBQaM/TpGN85qbrXWSp6sxwMrt19nBGiJrKpnr7A?=
- =?us-ascii?Q?U0l4JuAkKD7NPeCx1R2XAlel/nAJoBtv1jYQRev8HsyJ3dqvRxiCn/Mdd069?=
- =?us-ascii?Q?47lmTGHOIYmKVhKVqVWMaQUcalr294E3CA4pssPG9VdkQK/d1iRu1qWKy7fe?=
- =?us-ascii?Q?AMKpWSb+lPWJOJG1wDDXUAnFBeh9h0zZpY1fzQtt1USWkcA+BCS1Vv4ylap2?=
- =?us-ascii?Q?Xm/j0yvAVYAsozf1262e2my7hVRlM3OF11c2hsHME6zjlNzATScr85vvy0Ly?=
- =?us-ascii?Q?qgG1H0RDyDxeIWUzdeItXTvWDq7WQ0UTcp9MVcEnNEkyRe/Y/nHu7NUyYCXg?=
- =?us-ascii?Q?Y1kvkGHDE/VZsnnne7EB4BZGg7m4EHhQ7m+ZUeJo5eEhSAc1n/VHAJwVC+LV?=
- =?us-ascii?Q?ilkQkej/+2M4krUHkWO9k64foqIBySRB0dX+3X8dzaA0s4rROH8Wf0nvX6fl?=
- =?us-ascii?Q?0egnYuO+w16bb/uJbCo6ULmvBEQDRlj4TKmQYN/8O1JOvS2dY7qGziMTc6fM?=
- =?us-ascii?Q?+k96g/Hu5X/MXXGK/IEzaIjdn42sdhXFWbBEdebG3XuwFFG6XNjWg4it1gam?=
- =?us-ascii?Q?FKqrJ/8QkjhMJvTD/Y9urZCIvIy2XzULzRCQMrFWC/o+4qSdND3N6VEfxiGv?=
- =?us-ascii?Q?UZVxHs52IO9HIMtVSxZgKrG6jhngKlnZxoeV1Arv0WxjfLmDJdMmftethFsu?=
- =?us-ascii?Q?uMFTqAmbxRT07n6p7pVL8RYQOwgN8izgt9xoj7v91us9sby+vq31Y21IqIC3?=
- =?us-ascii?Q?ITRGkJ7jgGRVJLikMMVz/FGXqTUZ1HKe/v81VKrZnBZhX78GkZILu3gzMU3C?=
- =?us-ascii?Q?6cf4Fm/Yrz5tKUZONUwyvgxpwoL6r1bP9Qm1FaZE0VRHkyUSbRSE2Y5rZ05d?=
- =?us-ascii?Q?UpOthsHhvuR5pJ5b7YjwqcgvDjxsM/f7WjqiFngel1Ogb/Nt5mXQB8v3ey+V?=
- =?us-ascii?Q?eV9A70NfJr94AAxzdwFuGfzODbpG6cYhtwipaR+KPwVjgl6udB++bsi35z4j?=
- =?us-ascii?Q?dmW0+kDnvoaPfo/vXdkk2ZhwRy7io44pXxanokXi4JuL7RzmeKkwVTjTtF1d?=
- =?us-ascii?Q?rI7Su9OKZm0Ty0Iuet9EBm8KpStriaMIYlarEvkpJW6LJqCl2w7AJW4wbUkW?=
- =?us-ascii?Q?aMf2hoQMqH8JkoCGDd4gK9KrQXqVbtUyaj5lfo0r27aL6mts6eY7sKX0vZIw?=
- =?us-ascii?Q?NUR74siNpi20JEd30eXPUP+JoSWA10wPjeUTxFY6aGBqNGw7sh/nQpboQETU?=
- =?us-ascii?Q?v8lKWgRPxJWslBa5SQMfsx3Br6xpVNohjauzHLwUgmlO/QGeikyCecKZNlGM?=
- =?us-ascii?Q?8YV/yJ3h3Hz6DvkVUJy7athESbMpXPdPWmr397QX?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3488518E2A
+	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 14:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726584012; cv=none; b=K8ttx0K0+e+4a3qG4s33aEa4F55ypk/QlETTevloMXnoi0Z+EkibiRwaBeUpMjKitxcvZpGAje5yD8UOJWXILvirFxQMdOu/ASZPjZCg71te+SUAoYujHSR7fGho6ZqFpAdKyGIWyq/Oup98z5CSB9SggoyKbFXVNSQHNSNz2sg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726584012; c=relaxed/simple;
+	bh=RP2pZiROi2Xkjh0+oIpXPf8pK71JrhY3aO0KpWXee9E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I2cJ0vrTO8YuVqq15oYaNBylu+xkxcp78vmIgCWdDplf1GOdU6YugsduoBQKtFOorBejMeHkoAiyEMgAYPxJ+zGwHQfDkRjirwtNvw3szdhXhL/utaBLUnfmGtk9eazIhmIJd4RcD0NzC7AXqgSqjahOBFK1w5ZdsZx0vxCpBZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fMlqe6Uo; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a55b2705-aace-439f-bbb5-9ee483b06af5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726584006;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eegGBaAygOaLYVZ73ZF+hWGW4jgAbW8mG7UbsMPO9lk=;
+	b=fMlqe6UovSHDQgQlE/peSO0nS0gcO78vwnJyWtqMM6kHKAp0yAmnh55GhWNN1ys2ZrYVle
+	tpKJgONyriZ0F+oY1VsLgTG9mRCPdDAEqrq3GepCpSqKbCKz+4mf+/6UOkOT2ToQ9wl3KR
+	QerS/mywNCBU2yn787sVFp6rXL+Otv0=
+Date: Tue, 17 Sep 2024 10:40:00 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH7PR21MB3260.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 37ebe5c1-51da-4eb1-8d87-08dcd725f5aa
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Sep 2024 14:35:21.5084
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: AdEBaaHqUUgn0GBFKVNmSsqGqSKxUeiwlEygEzXfjzrLVTF4GimG2OzCGf/jMp1AebDN8BDHbwzogOA6luvhhg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR21MB3510
+Subject: Re: [PATCH net v2] net: xilinx: axienet: Fix IRQ coalescing packet
+ count overflow
+To: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "Gupta, Suraj" <Suraj.Gupta2@amd.com>,
+ "Katakam, Harini" <harini.katakam@amd.com>
+Cc: Andy Chiu <andy.chiu@sifive.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Simon Horman <horms@kernel.org>, Ariane Keller
+ <ariane.keller@tik.ee.ethz.ch>, Daniel Borkmann <daniel@iogearbox.net>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "Simek, Michal"
+ <michal.simek@amd.com>
+References: <20240909230908.1319982-1-sean.anderson@linux.dev>
+ <MN0PR12MB5953E38D1EEBF3F83172E2EEB79B2@MN0PR12MB5953.namprd12.prod.outlook.com>
+ <b26be717-a67e-4ee1-9393-3de6147b9c2e@linux.dev>
+ <MN0PR12MB59535B22AA0E0CA115E94202B7642@MN0PR12MB5953.namprd12.prod.outlook.com>
+ <MN0PR12MB5953CAF05CE80ECBE9494709B7612@MN0PR12MB5953.namprd12.prod.outlook.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Sean Anderson <sean.anderson@linux.dev>
+In-Reply-To: <MN0PR12MB5953CAF05CE80ECBE9494709B7612@MN0PR12MB5953.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
+On 9/17/24 07:24, Pandey, Radhey Shyam wrote:
+>> -----Original Message-----
+>> From: Pandey, Radhey Shyam
+>> Sent: Thursday, September 12, 2024 8:05 PM
+>> To: Sean Anderson <sean.anderson@linux.dev>; David S . Miller
+>> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski
+>> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; netdev@vger.kernel.org;
+>> Gupta, Suraj <Suraj.Gupta2@amd.com>; Katakam, Harini
+>> <harini.katakam@amd.com>
+>> Cc: Andy Chiu <andy.chiu@sifive.com>; linux-kernel@vger.kernel.org; Simon
+>> Horman <horms@kernel.org>; Ariane Keller <ariane.keller@tik.ee.ethz.ch>; Daniel
+>> Borkmann <daniel@iogearbox.net>; linux-arm-kernel@lists.infradead.org; Simek,
+>> Michal <michal.simek@amd.com>
+>> Subject: RE: [PATCH net v2] net: xilinx: axienet: Fix IRQ coalescing packet count
+>> overflow
+>> 
+>> > -----Original Message-----
+>> > From: Sean Anderson <sean.anderson@linux.dev>
+>> > Sent: Thursday, September 12, 2024 8:01 PM
+>> > To: Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>; David S . Miller
+>> > <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
+>> Kicinski
+>> > <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
+>> netdev@vger.kernel.org;
+>> > Gupta, Suraj <Suraj.Gupta2@amd.com>; Katakam, Harini
+>> > <harini.katakam@amd.com>
+>> > Cc: Andy Chiu <andy.chiu@sifive.com>; linux-kernel@vger.kernel.org; Simon
+>> > Horman <horms@kernel.org>; Ariane Keller <ariane.keller@tik.ee.ethz.ch>;
+>> Daniel
+>> > Borkmann <daniel@iogearbox.net>; linux-arm-kernel@lists.infradead.org; Simek,
+>> > Michal <michal.simek@amd.com>
+>> > Subject: Re: [PATCH net v2] net: xilinx: axienet: Fix IRQ coalescing packet count
+>> > overflow
+>> >
+>> > On 9/11/24 03:01, Pandey, Radhey Shyam wrote:
+>> > >> -----Original Message-----
+>> > >> From: Sean Anderson <sean.anderson@linux.dev>
+>> > >> Sent: Tuesday, September 10, 2024 4:39 AM
+>> > >> To: Pandey, Radhey Shyam <radhey.shyam.pandey@amd.com>; David S .
+>> > >> Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>;
+>> > >> Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>;
+>> > >> netdev@vger.kernel.org
+>> > >> Cc: Andy Chiu <andy.chiu@sifive.com>; linux-kernel@vger.kernel.org; Simon
+>> > >> Horman <horms@kernel.org>; Ariane Keller <ariane.keller@tik.ee.ethz.ch>;
+>> > >> Daniel Borkmann <daniel@iogearbox.net>; linux-arm-
+>> > >> kernel@lists.infradead.org; Simek, Michal <michal.simek@amd.com>; Sean
+>> > >> Anderson <sean.anderson@linux.dev>
+>> > >> Subject: [PATCH net v2] net: xilinx: axienet: Fix IRQ coalescing packet count
+>> > >> overflow
+>> > >>
+>> > >> If coalece_count is greater than 255 it will not fit in the register and
+>> > >> will overflow. This can be reproduced by running
+>> > >>
+>> > >>     # ethtool -C ethX rx-frames 256
+>> > >>
+>> > >> which will result in a timeout of 0us instead. Fix this by clamping the
+>> > >> counts to the maximum value.
+>> > > After this fix - what is o/p we get on rx-frames read? I think silent clamping is not
+>> a
+>> > great
+>> > > idea and user won't know about it.  One alternative is to add check in
+>> set_coalesc
+>> > > count for valid range? (Similar to axienet_ethtools_set_ringparam so that user is
+>> > notified
+>> > > for incorrect range)
+>> >
+>> > The value reported will be unclamped. In [1] I improve the driver to
+>> > return the actual (clamped) value.
+>> >
+>> > Remember that without this commit, we have silent wraparound instead. I
+>> > think clamping is much friendlier, since you at least get something
+>> > close to the rx-frames value, instead of zero!
+>> >
+>> > This commit is just a fix for the overflow issue. To ensure it is
+>> > appropriate for backporting I have omitted any other
+>> > changes/improvements.
+>> 
+>> But the point is the fix also can be to avoid setting coalesce count
+>> to invalid (or not supported range) value - like done in existing
+>> axienet_ethtools_set_ringparam() implementation.
+> 
+> Sean: I think above comment got missed out, so I am bringing it again
+> to discuss and close on it.
 
+I am investigating whether this will work within the broader context of
+the changes I want to make. I will reply when I have had a chance to work
+on it.
 
-> -----Original Message-----
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Friday, September 13, 2024 11:24 PM
-> To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> Cc: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
-> <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-> <decui@microsoft.com>; davem@davemloft.net; edumazet@google.com;
-> pabeni@redhat.com; shradhagupta@linux.microsoft.com;
-> ahmed.zaki@intel.com; colin.i.king@gmail.com; linux-
-> hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org
-> Subject: Re: [PATCH] net: mana: Add get_link and get_link_ksettings in
-> ethtool
->=20
-> On Thu, 12 Sep 2024 00:44:43 -0700 Erni Sri Satya Vennela wrote:
-> > Add support for the ethtool get_link and get_link_ksettings
-> > operations. Display standard port information using ethtool.
->=20
-> Any reason why? Sometimes people add this callback for virtual
-> devices to expose some approximate speed, but you're not reporting
-> speed, so I'm curious.
-Speed info isn't available from the HW yet. But we are requesting=20
-that from HW team. For now, we just add some minimal info, like=20
-duplex, etc.
+--Sean
 
->=20
-> > +static int mana_get_link_ksettings(struct net_device *ndev,
-> > +				   struct ethtool_link_ksettings *cmd)
-> > +{
-> > +	cmd->base.duplex =3D DUPLEX_FULL;
->=20
-> make sense
->=20
-> > +	cmd->base.autoneg =3D AUTONEG_ENABLE;
->=20
-> what's the point of autoneg if we show no link info?
-> DISABLE seems more suitable
-We don't have strong opinion on this one.
-@Vennela, you may remove the 3 items related to autoneg.
-
->=20
-> > +	cmd->base.port =3D PORT_DA;
->=20
-> Any reason why DA? I'd think PORT_OTHER may be better?
-I'm OK with PORT_OTHER too :)
-
-Thanks,
-- Haiyang
+>> 
+>> And we don't clamp on every dma_start().
+>> 
+>> >
+>> > --Sean
+>> >
+>> > [1] https://lore.kernel.org/netdev/20240909235208.1331065-6-
+>> > sean.anderson@linux.dev/
+>> >
+>> > >>
+>> > >> Signed-off-by: Sean Anderson <sean.anderson@linux.dev>
+>> > >> Fixes: 8a3b7a252dca ("drivers/net/ethernet/xilinx: added Xilinx AXI Ethernet
+>> > >> driver")
+>> > >> ---
+>> > >>
+>> > >> Changes in v2:
+>> > >> - Use FIELD_MAX to extract the max value from the mask
+>> > >> - Expand the commit message with an example on how to reproduce this
+>> > >>   issue
+>> > >>
+>> > >>  drivers/net/ethernet/xilinx/xilinx_axienet.h      | 5 ++---
+>> > >>  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 8 ++++++--
+>> > >>  2 files changed, 8 insertions(+), 5 deletions(-)
+>> > >>
+>> > >> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h
+>> > >> b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+>> > >> index 1223fcc1a8da..54db69893565 100644
+>> > >> --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
+>> > >> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+>> > >> @@ -109,11 +109,10 @@
+>> > >>  #define XAXIDMA_BD_CTRL_TXEOF_MASK	0x04000000 /* Last tx packet
+>> > >> */
+>> > >>  #define XAXIDMA_BD_CTRL_ALL_MASK	0x0C000000 /* All control bits
+>> > >> */
+>> > >>
+>> > >> -#define XAXIDMA_DELAY_MASK		0xFF000000 /* Delay timeout
+>> > >> counter */
+>> > >> -#define XAXIDMA_COALESCE_MASK		0x00FF0000 /* Coalesce
+>> > >> counter */
+>> > >> +#define XAXIDMA_DELAY_MASK		((u32)0xFF000000) /* Delay
+>> > >> timeout counter */
+>> > >
+>> > > Adding typecast here looks odd. Any reason for it?
+>> > > If needed we do it in specific case where it is required.
+>> > >
+>> > >> +#define XAXIDMA_COALESCE_MASK		((u32)0x00FF0000) /*
+>> > >> Coalesce counter */
+>> > >>
+>> > >>  #define XAXIDMA_DELAY_SHIFT		24
+>> > >> -#define XAXIDMA_COALESCE_SHIFT		16
+>> > >>
+>> > >>  #define XAXIDMA_IRQ_IOC_MASK		0x00001000 /* Completion
+>> > >> intr */
+>> > >>  #define XAXIDMA_IRQ_DELAY_MASK		0x00002000 /* Delay
+>> > >> interrupt */
+>> > >> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> > >> b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> > >> index 9eb300fc3590..89b63695293d 100644
+>> > >> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> > >> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+>> > >> @@ -252,7 +252,9 @@ static u32 axienet_usec_to_timer(struct axienet_local
+>> > >> *lp, u32 coalesce_usec)
+>> > >>  static void axienet_dma_start(struct axienet_local *lp)
+>> > >>  {
+>> > >>  	/* Start updating the Rx channel control register */
+>> > >> -	lp->rx_dma_cr = (lp->coalesce_count_rx <<
+>> > >> XAXIDMA_COALESCE_SHIFT) |
+>> > >> +	lp->rx_dma_cr = FIELD_PREP(XAXIDMA_COALESCE_MASK,
+>> > >> +				   min(lp->coalesce_count_rx,
+>> > >> +
+>> > >> FIELD_MAX(XAXIDMA_COALESCE_MASK))) |
+>> > >>  			XAXIDMA_IRQ_IOC_MASK |
+>> > >> XAXIDMA_IRQ_ERROR_MASK;
+>> > >>  	/* Only set interrupt delay timer if not generating an interrupt on
+>> > >>  	 * the first RX packet. Otherwise leave at 0 to disable delay interrupt.
+>> > >> @@ -264,7 +266,9 @@ static void axienet_dma_start(struct axienet_local
+>> > >> *lp)
+>> > >>  	axienet_dma_out32(lp, XAXIDMA_RX_CR_OFFSET, lp->rx_dma_cr);
+>> > >>
+>> > >>  	/* Start updating the Tx channel control register */
+>> > >> -	lp->tx_dma_cr = (lp->coalesce_count_tx <<
+>> > >> XAXIDMA_COALESCE_SHIFT) |
+>> > >> +	lp->tx_dma_cr = FIELD_PREP(XAXIDMA_COALESCE_MASK,
+>> > >> +				   min(lp->coalesce_count_tx,
+>> > >> +
+>> > >> FIELD_MAX(XAXIDMA_COALESCE_MASK))) |
+>> > >>  			XAXIDMA_IRQ_IOC_MASK |
+>> > >> XAXIDMA_IRQ_ERROR_MASK;
+>> > >>  	/* Only set interrupt delay timer if not generating an interrupt on
+>> > >>  	 * the first TX packet. Otherwise leave at 0 to disable delay interrupt.
+>> > >> --
+>> > >> 2.35.1.1320.gc452695387.dirty
+>> > >
 
 
