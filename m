@@ -1,134 +1,154 @@
-Return-Path: <netdev+bounces-128651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9588897AAF1
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 07:19:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8A6297AAF8
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 07:22:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FFD41F23FEB
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 05:19:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 282351C22DA6
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 05:22:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86C083A8F7;
-	Tue, 17 Sep 2024 05:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69301292CE;
+	Tue, 17 Sep 2024 05:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DhgY7Zi8"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="uE7YHFnc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from msa.smtpout.orange.fr (smtp-68.smtpout.orange.fr [80.12.242.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07D002628C;
-	Tue, 17 Sep 2024 05:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F14D4D8CB
+	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 05:22:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726550343; cv=none; b=bxX+ccS4Gexo6j6Mxo1tCsbEkBmX3WmuAOGiC3Ju3oFMinpl5wQzxwFEfaTS+c9HC7+NFSgFZj9m7LGQ+hj/yTCnDJi37UBWY2tDRv8wIDN6GPFn/3CZhgFpUzJs7th5CfEoiRIkEyNavW3hUMnPQvKgXgaEHdpHa3auj+WaDoI=
+	t=1726550538; cv=none; b=UACrIM25Cad1IQE8OPqhAqx/0HYnztMl4Ver/olQmUk7ExJICASs0Ie7gMxhG/si0O/OepSF7ZBIr2dNZGv+dJfLb1XPCebfqFN+Y5FNW6jhCoVWlTccyNgGqQU/T1c1iJvaN9tsJ7iYg8w1oyDHTY/DHGZJ3o2mxE1/VEt5ndU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726550343; c=relaxed/simple;
-	bh=M4vuMj7CLYT3Z8oQXAVcPG0QTJn48rt6NBlRQWqyZWY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=juJrMZweb6SHAT5dyf614gQeiNsq+bq1ZDimviMVh17/r0+FD56AzSr0QJb0bMtTCy1qHYXsPdHNcfiyX7BYaqR3jZi+d9jy3Ft4cftkUxFyv5ZwLQmQEcjZcMNq2Cy/Dw6Pzf0B42YqKZ35LHQO4URanskv101aZPnohuMqJEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DhgY7Zi8; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2d88c5d76eeso2746228a91.2;
-        Mon, 16 Sep 2024 22:19:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726550341; x=1727155141; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WRybB9wxP64p2CF/sxwLTas0ioD5kY3JDod4yC46o3Q=;
-        b=DhgY7Zi8H73Lbvy9xFo2wwoESkxRXuaPIFI6nbqA5VYa4dDHuQ0ssZYUuoWlnDFxno
-         PboLIPaA7mos0s0OfZzL8JL0udyZcrfacJqDTCQNwjfecpoV31ClO9Sq1nxBYe1meQF0
-         h2zQ/aE+AsAKtJMiWofy5mNRGL23sIxKeDXl589zuvf/0tA5+dPIc65CXm8231KOH0a+
-         FbUFaMV4K56E26wTYNI+bExLAwon6cja03FNhVY34+/AQh+Otl7p8gmijaT1rofglsK0
-         g3ktCq2BLu3z7h+y9AXYVxbgGEqVd4YleVUGJ23FmYjt9xIUVImZC3vYxk1jU/ym//yk
-         FSaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726550341; x=1727155141;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WRybB9wxP64p2CF/sxwLTas0ioD5kY3JDod4yC46o3Q=;
-        b=wN04MPBL8abbNFyjbRjXnSRoxsrlY+NNdNpOWF5zjdsGHw3bjIUpJO28fvqlsnWDif
-         iITQQj0V3CqD6NUeURg+N/rMkHxkv8Bgxu+B5ODOuB069RurVDjabGH3p6vO1CWValgh
-         olx+buuV+2uap7+r36n5DZG3TcCrdqPam7dIqK3YV6wMjCmzVphUCnrqV0Qgfw1/CfCG
-         faQhuRafljheP/A6KkdXAUDABLWXU530c4O93s/jXK6RPzVq1Y9qaG8z9uLs8EC8a0pV
-         4scgob990QaBSxSXIURcVEbnKSQYERV1Ju0HN83n9D7RtDD3k1qsF3j7r/G4vLA1czwC
-         +YIg==
-X-Forwarded-Encrypted: i=1; AJvYcCU09nYcwa0XpUPgI0jaOH5MdnnRFz3EOC33vHVa+GgQWEK0qDQshPuTJJ4U1yX6wbggR9WYeUNFLCstdNE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwruC4cjbFTorfb+1eYVnJjzGMMvlvJNE2OoV8jGC3W5Q3O3D+H
-	pTnADk1IMGoKLPDUgo6kFDbaJr9GDbVI7YMqRE9aID9wveOb0j8l
-X-Google-Smtp-Source: AGHT+IH51uSUbdMQ9iCrRl2QRy9eX4aXfLw9P5cCMHdLWzhxrn4FSJyPmohY2Oyu5NtEd1wLer9ijg==
-X-Received: by 2002:a17:90a:68ce:b0:2c9:61ad:dcd9 with SMTP id 98e67ed59e1d1-2dbb9ee0450mr17054190a91.27.1726550340871;
-        Mon, 16 Sep 2024 22:19:00 -0700 (PDT)
-Received: from amenon-us-dl.hsd1.ca.comcast.net ([2601:646:a002:44b0:14db:b6fb:c5a7:2dd7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dbb9d95b42sm8382324a91.48.2024.09.16.22.18.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Sep 2024 22:19:00 -0700 (PDT)
-From: Aakash Menon <aakash.r.menon@gmail.com>
-X-Google-Original-From: Aakash Menon <aakash.menon@protempis.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	lars.povlsen@microchip.com,
-	Steen.Hegelund@microchip.com,
-	daniel.machon@microchip.com,
-	UNGLinuxDriver@microchip.com,
-	aakash.menon@protempis.com,
-	horms@kernel.org,
-	horatiu.vultur@microchip.com
-Cc: netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net: sparx5: Fix invalid timestamps
-Date: Mon, 16 Sep 2024 22:18:29 -0700
-Message-ID: <20240917051829.7235-1-aakash.menon@protempis.com>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1726550538; c=relaxed/simple;
+	bh=FROrw0IXlzItQSfhHRHUvjIOTBu4ABMZqIMKJtQffAE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=BtadYQCUYOYGqWlTYn9BGxpKuog4ezH7ZAgJuJ+6FRpzumlmM1FKQCyXilUmlr6HgthRiUZwcOEdRBvtWvk242+7isv8VYBkja4FzH8hv5Xf1tFyY+8uTZej6QKkZbxbG6ELCrR725UsnlaOd/Bxlg1vwmr2ZEXrGkJzAslsGq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=uE7YHFnc; arc=none smtp.client-ip=80.12.242.68
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id qQf2sEuii3ZMyqQf2s4PfP; Tue, 17 Sep 2024 07:22:08 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1726550528;
+	bh=ox/BUEVjGvecYqicoCV10v4Q9kXMIsRKDm9TgbacwPA=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To;
+	b=uE7YHFncSbIkns75ceMLvKBWR2lLESwDluJGLQhQBCQV5lrcOaRwCaTNTSOfcQpVq
+	 HJm+j7e1uOEsx+GUZ7TkF+WOOqssb6mQ20ALFlGIaRf9KYFvSjIxmC0ctChK9RKjkP
+	 VHegYqJfxnmpTt+hhya69OXSYxRcdh4NY3Nx4ludydVSWdFFHnCuY48Vq5d4BGuFHH
+	 iIBCrqPhkEWoNiBUDqoomBPmojMFvpSGzksiXevYTJzesiUhHvUmNIIDj1if0WR1dK
+	 bCJHsDM4ZJQSKYDiq97zSpNKRY9B+XwVjxgT8qhAE/jWfxA728uT22uHSOZu+Yfgmr
+	 KFRvY0tmnJyeg==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Tue, 17 Sep 2024 07:22:08 +0200
+X-ME-IP: 90.11.132.44
+Message-ID: <6cbedd50-c2d5-4ad7-8133-774eebd9d2f1@wanadoo.fr>
+Date: Tue, 17 Sep 2024 07:22:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH v2 00/15] timers: Cleanup delay/sleep related mess
+To: Anna-Maria Behnsen <anna-maria@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Andrew Morton <akpm@linux-foundation.org>, damon@lists.linux.dev,
+ linux-mm@kvack.org, SeongJae Park <sj@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Andy Whitcroft <apw@canonical.com>,
+ Joe Perches <joe@perches.com>, Dwaipayan Ray <dwaipayanray1@gmail.com>,
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, netdev@vger.kernel.org,
+ linux-sound@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
+ Nathan Lynch <nathanl@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org,
+ Frederic Weisbecker <frederic@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Jonathan Corbet <corbet@lwn.net>
+References: <20240911-devel-anna-maria-b4-timers-flseep-v2-0-b0d3f33ccfe0@linutronix.de>
+ <c794b4a6-468d-4552-a6d6-8185f49339d3@wanadoo.fr>
+Content-Language: en-US, fr-FR
+In-Reply-To: <c794b4a6-468d-4552-a6d6-8185f49339d3@wanadoo.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Bit 270-271 are occasionally unexpectedly set by the hardware. This issue
-was observed with 10G SFPs causing huge time errors (> 30ms) in PTP. Only
-30 bits are needed for the nanosecond part of the timestamp, clear 2 most
-significant bits before extracting timestamp from the internal frame
-header.
 
-Fixes: 70dfe25cd866 ("net: sparx5: Update extraction/injection for timestamping")
-Signed-off-by: Aakash Menon <aakash.menon@protempis.com>
----
-v2:
-- Wrap patch descriptions at 75 characters wide.
-- Use GENMASK(5,0) instead of masking with 0x3F
-- Update Fixes tag to be on the same line
-- Link to v1 -https://lore.kernel.org/r/20240913193357.21899-1-aakash.menon@protempis.com
-drivers/net/ethernet/microchip/sparx5/sparx5_packet.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
-index f3f5fb420468..70427643f777 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
-@@ -45,8 +45,12 @@ void sparx5_ifh_parse(u32 *ifh, struct frame_info *info)
- 	fwd = (fwd >> 5);
- 	info->src_port = FIELD_GET(GENMASK(7, 1), fwd);
- 
-+	/*
-+	 * Bit 270-271 are occasionally unexpectedly set by the hardware,
-+	 * clear bits before extracting timestamp
-+	 */
- 	info->timestamp =
--		((u64)xtr_hdr[2] << 24) |
-+		((u64)(xtr_hdr[2] & GENMASK(5, 0)) << 24) |
- 		((u64)xtr_hdr[3] << 16) |
- 		((u64)xtr_hdr[4] <<  8) |
- 		((u64)xtr_hdr[5] <<  0);
--- 
-2.46.0
+Le 16/09/2024 à 22:20, Christophe JAILLET a écrit :
+> Le 11/09/2024 à 07:13, Anna-Maria Behnsen a écrit :
+>> Hi,
+>>
+>> a question about which sleeping function should be used in 
+>> acpi_os_sleep()
+>> started a discussion and examination about the existing documentation and
+>> implementation of functions which insert a sleep/delay.
+>>
+>> The result of the discussion was, that the documentation is outdated and
+>> the implemented fsleep() reflects the outdated documentation but doesn't
+>> help to reflect reality which in turns leads to the queue which covers 
+>> the
+>> following things:
+>>
+>> - Split out all timeout and sleep related functions from hrtimer.c and 
+>> timer.c
+>>    into a separate file
+>>
+>> - Update function descriptions of sleep related functions
+>>
+>> - Change fsleep() to reflect reality
+>>
+>> - Rework all comments or users which obviously rely on the outdated
+>>    documentation as they reference "Documentation/timers/timers- 
+>> howto.rst"
+>>
+>> - Last but not least (as there are no more references): Update the 
+>> outdated
+>>    documentation and move it into a file with a self explaining file name
+>>
+>> The queue is available here and applies on top of tip/timers/core:
+>>
+>>    git://git.kernel.org/pub/scm/linux/kernel/git/anna-maria/linux- 
+>> devel.git timers/misc
+>>
+>> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
+> 
+> Hi,
+> 
+> not directly related to your serie, but some time ago I sent a patch to 
+> micro-optimize Optimize usleep_range(). (See [1])
+> 
+> The idea is that the 2 parameters of usleep_range() are usually 
+> constants and some code reordering could easily let the compiler compute 
+> a few things at compilation time.
+> 
+> There was consensus on the value of the change (see [2]), but as you are 
+
+Typo: there was *no* consensus...
+
+> touching things here, maybe it makes sense now to save a few cycles at 
+> runtime and a few bytes of code?
+> 
+> CJ
+> 
+> [1]: https://lore.kernel.org/all/ 
+> f0361b83a0a0b549f8ec5ab8134905001a6f2509.1659126514.git.christophe.jaillet@wanadoo.fr/
+> 
+> [2]: https://lore.kernel.org/ 
+> all/03c2bbe795fe4ddcab66eb852bae3715@AcuMS.aculab.com/
+> 
+> 
+> 
+> 
 
 
