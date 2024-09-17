@@ -1,160 +1,169 @@
-Return-Path: <netdev+bounces-128720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D16897B29D
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 18:06:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72C9797B2A7
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 18:10:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50D3B281CE8
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:06:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBB78B2611D
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1128176AC2;
-	Tue, 17 Sep 2024 16:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9C9185939;
+	Tue, 17 Sep 2024 16:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Btj9KYxV"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="j3rggOBm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67A31607BD
-	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 16:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57849142621;
+	Tue, 17 Sep 2024 16:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726589181; cv=none; b=oQlGgFwjNlZHRsD597FSqQZ8sv34swgh5QSJQvlaHzvtMWZB/IZeI/yX0G3kHZTmmXwFcWmxBx7UMdy7M+RV+/QHVJ2BcoNJnGP48TBYaBfrrZvBEpHWhPiV0EqBX+DDa3UA40yUyMWQDu5jR8W1oxj4YYwAYYTDG6OQmAN4LMs=
+	t=1726589438; cv=none; b=VRH0dA/+9OaNj46/1cPpVXyMUngATn/gNLnddJ9Jjv1WHCWpABpiPPUnfrS9KTte1kFrSYWnq29Xz+GuH5URNluJpRLGMs/JQ679YexBFu/FQqYIm/LxFRH5VWO8hjVFXuTvIPzghnfH/Xdc6WWAxTuLA9G+c1MrNtY6uQrXsx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726589181; c=relaxed/simple;
-	bh=32AEDX9cCv9RsZHT9wdTvhGXqMlN0xLTW5QkFMjL/4o=;
+	s=arc-20240116; t=1726589438; c=relaxed/simple;
+	bh=ZDmo0+T1bXvG/blZ6IAC87t006UqSstW5d+MXp4X1pw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UzMs2xngGuj9vLcpFLG+ezsFA05lHzwENd/DN8Qq7ZTsB9TchL+cOA6vh7DbRjESH5vTbF+BtDtAQG0xqqYJRe+FDKX5r7Oj/ayVb2BezHOgvfxeFuiEskBSbCf3riMV/xAE41TEbq7ZwCwJJAM5XcOZUoqYZHqGzAo+yD2dDl0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Btj9KYxV; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-374c7e64b60so3482718f8f.2
-        for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 09:06:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1726589178; x=1727193978; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C3wWVmY11x7twX+QLzZLt+655E3mj9zAVsD71Ldt/Ac=;
-        b=Btj9KYxVw2j9NpKleB/T4folXDUm1hDLKUOF5p0UP0rZmRW2zo9kKiUcb4zFCbI0HH
-         6DSW1IUTCDDH6VWtfXz0WH3NhmVcbyV/iVYT0lXpFgiysn5nRfnPokS8WJZJ1bpuldDJ
-         usBcdZhn6U3VR6hG//rwzv6qNn1mlhSUP1mMZmGEECdbnLyPQvbY+Zg2oQ4o2RZKI2pj
-         mLOXrXarn9A8BBN95HQTDi/FNFBlTSHIXTg5vXCW36ggChLGOrR0cDzqkQYrimAVoBwK
-         TWbSSy8B5M46b/bGT6pj3puG6ytURDoRQ2hNtmFxWgUzNOVW22NSRdS/dG4l6Xo295gp
-         pykQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726589178; x=1727193978;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C3wWVmY11x7twX+QLzZLt+655E3mj9zAVsD71Ldt/Ac=;
-        b=BQrHwuiOm2pr10r/LHiPavVobFeyACwUCrhXEWYNLbuCRmuGgZIaX+mQGiq588fQbR
-         nUa/9PCmd3jX4V/Y6KiUn27H5MhWaM+/fbXS1PwsuQghfGfUuyKbOeyH1S8FG7/BiVpl
-         U3xr31hbcmHl+DkjMSOD4gi1Lwwt71IDtlQsxG/qITDQ4XqIQ/ta+mGWHir3hH+Y9OF8
-         z+gIPy3JSeESIJPGhRWYQRrV1mzDIgYiBsiOmjhL6fY0r1AfcoDLQGG6oEED89DuoDCm
-         A1xo0N+iG37TFOas3Abdgy/wx8lfTGeormmm/kZYtHHSjPRWov1F+OSGkFLvlgCDbNAS
-         r5vg==
-X-Forwarded-Encrypted: i=1; AJvYcCU9IBnVCVTa0s12obp336cstjTP7IPAKyexUq8W6AbjtL6ODLSsE/Qpi15+oycWZ+dUtlcvKgQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwpOwO/Zs+GIKKovPFGeuppVwKrYHqqXUK7zuRmerUk+YKmwZ2S
-	FUmh/L0gQDi8Nh5c4CGRhEOzpsfVQCNXhXM8A75h7jOhlI8j179M/mUxZcAzKL4=
-X-Google-Smtp-Source: AGHT+IFBa6LORWITRw1wV+KPnnRiX0GK6peQ486VSUGuguJIiXw3h4Apf2WbrzFK92EDTfdpTnDLRA==
-X-Received: by 2002:adf:a45d:0:b0:374:c847:848 with SMTP id ffacd0b85a97d-378c2d5a70dmr9566997f8f.36.1726589177899;
-        Tue, 17 Sep 2024 09:06:17 -0700 (PDT)
-Received: from GHGHG14 ([2a09:bac5:50ca:432::6b:83])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e7800138sm9857539f8f.68.2024.09.17.09.06.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Sep 2024 09:06:17 -0700 (PDT)
-Date: Tue, 17 Sep 2024 17:06:14 +0100
-From: Tiago Lam <tiagolam@cloudflare.com>
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=lw6B++3c9+9r6XX3DBJZjTO0Nul3jzyeNjvb8evrtNicL6J0F2SmLduG7ktUI1dNQQrEa5GhXeXkBQG1SQrtaLG3/+LbB3ct0SfwIlCSxI6v+da2GGauy+VYBB+aEC3B9FrM38+/NY2rElEk08NS5JhnSurAlb8Wq60WxK5VUwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=j3rggOBm; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=c26lBn6pUaz2NthNDDdAGNn1PHwZrOoIZP0kg2YBzU8=; b=j3rggOBmZj4voxIF3xhcHhtWSo
+	7ChmXLGLCi9bxrlKChgr1OQ7/TNv094A6rmcYJ+XdeenuNGQin/ZzViIuoHoB1Eain8/qF/9j3TDN
+	b8WGEPLpl9Z579/34uZmO8Zx6lXqzjfEpSZW8l5USMenSX734I+pcJC9goMKs6I5VPelaiTHcrOXe
+	YmGK5ORUKUYIlUQNRz2spm/1YT46OT/Z+LbrevaTZdQy9KIBY1ogqrdEvgjWtgTF5bTOW0/6Dt3mh
+	gK6B2RVHipcW62/0UCPj/O9KUpcomawwqPhqrXBjG5ereeGyQPHfC1rx1+befLNs70RAiyMBHW2Ti
+	XYm+eP7w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:40424)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sqamZ-00075m-30;
+	Tue, 17 Sep 2024 17:10:27 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sqamW-00087P-2Q;
+	Tue, 17 Sep 2024 17:10:24 +0100
+Date: Tue, 17 Sep 2024 17:10:24 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Jakub Sitnicki <jakub@cloudflare.com>, kernel-team@cloudflare.com
-Subject: Re: [RFC PATCH 2/3] ipv6: Run a reverse sk_lookup on sendmsg.
-Message-ID: <Zumo9rNztx4PJgRP@GHGHG14>
-References: <20240913-reverse-sk-lookup-v1-0-e721ea003d4c@cloudflare.com>
- <20240913-reverse-sk-lookup-v1-2-e721ea003d4c@cloudflare.com>
- <20240914085950.GC12935@kernel.org>
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next 2/2] net: phy: Fallback to C22 access if needed in
+ phy_mii_ioctl()
+Message-ID: <Zump8Hmlxt3uqVFE@shell.armlinux.org.uk>
+References: <20240906093955.3083245-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240906093955.3083245-3-niklas.soderlund+renesas@ragnatech.se>
+ <365313cb-c767-414a-8b4b-97882854e9b6@lunn.ch>
+ <20240906213608.GY3708622@fsdn.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240914085950.GC12935@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240906213608.GY3708622@fsdn.se>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Sat, Sep 14, 2024 at 09:59:50AM +0100, Simon Horman wrote:
-> On Fri, Sep 13, 2024 at 10:39:20AM +0100, Tiago Lam wrote:
-> > This follows the same rationale provided for the ipv4 counterpart, where
-> > it now runs a reverse socket lookup when source addresses and/or ports
-> > are changed, on sendmsg, to check whether egress traffic should be
-> > allowed to go through or not.
+On Fri, Sep 06, 2024 at 11:36:08PM +0200, Niklas Söderlund wrote:
+> On 2024-09-06 23:04:50 +0200, Andrew Lunn wrote:
+> > On Fri, Sep 06, 2024 at 11:39:55AM +0200, Niklas Söderlund wrote:
+> > > If a C45 only PHY is attached to a driver that only knows how to talk
+> > > C22 phylib will fallback and use indirect access. This frees the driver
+> > > from having to implement this themself.
+> > > 
+> > > The IOCTL implementation for SIOCGMIIREG and SIOCSMIIREG do not use
+> > > these convenience functions and instead fail if a C45 PHY is used
+> > > together with a driver that only knows how to speak C22.
+> > > 
+> > > Fix this by using the two convince functions that knows when to fallback
+> > > to indirect access to read/write to the MDIO bus when needed.
+> > > 
+> > > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> > > ---
+> > >  drivers/net/phy/phy.c | 18 ++++++++++++------
+> > >  1 file changed, 12 insertions(+), 6 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
+> > > index 4f3e742907cb..89f52bb123aa 100644
+> > > --- a/drivers/net/phy/phy.c
+> > > +++ b/drivers/net/phy/phy.c
+> > > @@ -342,9 +342,12 @@ int phy_mii_ioctl(struct phy_device *phydev, struct ifreq *ifr, int cmd)
+> > >  		if (mdio_phy_id_is_c45(mii_data->phy_id)) {
+> > >  			prtad = mdio_phy_id_prtad(mii_data->phy_id);
+> > >  			devad = mdio_phy_id_devad(mii_data->phy_id);
+> > > -			ret = mdiobus_c45_read(phydev->mdio.bus, prtad, devad,
+> > > -					       mii_data->reg_num);
+> > >  
+> > > +			mutex_lock(&phydev->mdio.bus->mdio_lock);
+> > > +			ret = mmd_phy_read(phydev->mdio.bus, prtad,
+> > > +					   phydev->is_c45, devad,
 > > 
-> > As with ipv4, the ipv6 sendmsg path is also extended here to support the
-> > IPV6_ORIGDSTADDR ancilliary message to be able to specify a source
-> 
-> Hi Tiago Lam,
-> 
-> Some minor nits from my side.
-> 
-> ancilliary -> ancillary
-> 
-> Likewise in patch 3/3.
-> Flagged by checkpatch.pl --codespell
-> 
-> > address/port.
+> > Using phydev->is_c45 is probably wrong.
 > > 
-> > Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
-> > Signed-off-by: Tiago Lam <tiagolam@cloudflare.com>
-> > ---
-> >  net/ipv6/datagram.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  net/ipv6/udp.c      |  8 ++++--
-> >  2 files changed, 82 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
-> > index fff78496803d..4214dda1c320 100644
-> > --- a/net/ipv6/datagram.c
-> > +++ b/net/ipv6/datagram.c
-> > @@ -756,6 +756,27 @@ void ip6_datagram_recv_ctl(struct sock *sk, struct msghdr *msg,
-> >  }
-> >  EXPORT_SYMBOL_GPL(ip6_datagram_recv_ctl);
-> >  
-> > +static inline bool reverse_sk_lookup(struct flowi6 *fl6, struct sock *sk,
-> > +				     struct in6_addr *saddr, __be16 sport)
-> > +{
-> > +	if (static_branch_unlikely(&bpf_sk_lookup_enabled) &&
-> > +	    (saddr && sport) &&
-> > +	    (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr, saddr) || inet_sk(sk)->inet_sport != sport)) {
+> > mii_data->phy_id is the device on the bus you want to access. It does
+> > not need to be the same device as the MAC is using. Just because the
+> > device the MAC is using is a c45 device does not mean the device you
+> > are trying to access is.
 > 
-> Please consider, where it can trivially be achieved, limiting Networking
-> code to 80 columns wide.
-> 
-> Checkpatch can be run with a flag to check for this.
-> 
+> I think phydev->is_c45. The outer if clause is checking if the PHY I 
+> want to talk to is C45, or not. The phydev->is_c45 just express if the 
+> MAC can talk C45, or if it only supports C22. This is the variable 
+> mmd_phy_read() uses to determine if it shall fallback to indirect C45.
 
-Thanks for the hints here, I've addressed these and will include the
-changes into the next revision. I use b4 which takes care of some of
-this checks, but I'll make sure I change my settings to use
-`--max-line-length=80` as well.
+Nevertheless, this is wrong for two reasons:
 
-Tiago.
+1) the MII access API is a raw bus access debugging API, so its up to
+userspace to do the necessary accesses. Yes, it's racy... it isn't
+supposed to be used for production purposes.
+
+2) the MII access API gives access to any MDIO device on the bus that
+the _associated_ PHY is attached to. This includes non-PHY devices.
+Just because the PHY that is attached to the netdev *might* support
+C45-over-C22 (not every PHY does), this is unique to PHYs and is not
+true of every MDIO device. So "upgrading" a C45 access to a
+C45-over-C22 could end up corrupting other devices on the bus.
+
+So, I'm afraid that I disagree with your change.
+
+> I agree it's not the best. But is it not better to have the IOCTLs 
+> working as they already exists, rather then have it function depending 
+> on the combination of if the MAC and PHY both speak C22 or C45?
+
+If the bus supports C22, and userspace asks for a C22 transaction, a
+C22 transaction will happen on the bus.
+
+If the bus supports C45, and userspace asks for a C45 transaction, a
+C45 transaction will happen on the bus.
+
+Otherwise, an error is returned.
+
+Just because PHYs have this special C45-over-C22 thing, does not mean
+that the low level debugging API should use C45-over-C22 for C45
+transactions when the bus does not support C45.
+
+I re-iterate, the MII bus access ioctls provide access to any device
+on the the bus not specifically the PHY that you have attached to
+the netdev. Using the properties of the attached PHY is meaningless
+here.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
