@@ -1,135 +1,170 @@
-Return-Path: <netdev+bounces-128713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDDA297B26B
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 17:54:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C795197B26F
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 17:56:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B2101F26C29
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 15:54:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C745B2CA7A
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 15:56:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4646116087B;
-	Tue, 17 Sep 2024 15:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0EF117335E;
+	Tue, 17 Sep 2024 15:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LhfZjrW0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="I4U91Ttz"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41100535DC;
-	Tue, 17 Sep 2024 15:53:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C200A16FF26;
+	Tue, 17 Sep 2024 15:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726588441; cv=none; b=Jspef/DDOaWyB1cF7kPDOmpK7UR8ByUuAUxB3pSYcJe3GzLMJ7AxPO43c2bCVzNApwruwKPi4y/w5AOsJYr/6ueadFTLWOms6ACJKg+W1KnnqrMZV5wcbtc3Q4xA+NVdVmE1hxnOVRaf0Q4W7t9e0InDvJUl5yjBVLu8iE67wo0=
+	t=1726588584; cv=none; b=eBsTKnd/e5rsFoDpvU/LHAVjVOIzwyI7C5Vss8hRt0Rk2PNgZJO06T+7TwlYDU81ffqmof8Kr68gD1QBSGjjWTgs3FJma8G6veapggih0gwAjJfRzp6UQD8hgIijcc/aOdWsEAjBMe4cCBZbt6g4ZqpKhzPDJkbSD7siME8Ag5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726588441; c=relaxed/simple;
-	bh=uhkLZUSOLUZBz7idZogLg/DtfL6K0Zm3Tmj3xebr5MQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SuiavwvKq0M0LT0VR0MHQWgkfkV+EGsrFVyr2HCiUpt6F2iyU75yK7rbGrSiyy3Q6OhHHQF9a4Kox2TUH7PsdgWtPVU5U9lndgSz1kJeEuJaqC46r4pBpcIZ0A9BiqQmvIoExJ2YWWkcl2bmJp4NvQaXhYPMBXY54/4/uKDIXyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LhfZjrW0; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 73D7960003;
-	Tue, 17 Sep 2024 15:53:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1726588436;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uhkLZUSOLUZBz7idZogLg/DtfL6K0Zm3Tmj3xebr5MQ=;
-	b=LhfZjrW0DxZ3THj4hDMF5sfVmHbnyidqSx0ZtgKlwonI88NvIEkQ2et3LU04onUzk2A/ML
-	RY6p9wtBmeeXKeu9kf2g16Y4yHI6QGcgFO2oiuu6wZNUaqj0aZpkQ6y72mCrs0ZX/cUD/S
-	qQtI81Ngfk+z+IHtHFPUxN4akXrIrd6UzLJw3Rqwnw1Fx88pib+ET6I7S0K5P43oqh+sY1
-	OSVqawWOA50sH9NNnA7tMBmqcYo+sEOwCQQ8vUTxC9aLfWnBEpOHHTOvO0wibhuRH7ODIi
-	Ui5RR8ruwfgKXcvfuUs9GyhHJ6mte7u7rV6vY6C7oIBNxedpBJK1zeRC1/tl1w==
-Date: Tue, 17 Sep 2024 17:53:47 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Daniel Golle <daniel@makrotopia.org>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Heiner Kallweit
- <hkallweit1@gmail.com>, Kory Maincent <kory.maincent@bootlin.com>, Edward
- Cree <ecree.xilinx@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S.
- Miller" <davem@davemloft.net>, John Crispin <john@phrozen.org>
-Subject: Re: ethtool settings and SFP modules with PHYs
-Message-ID: <20240917175347.5ad207da@fedora>
-In-Reply-To: <ZuhsQxHA+SJFPa5S@shell.armlinux.org.uk>
-References: <ZuhQjx2137ZC_DCz@makrotopia.org>
-	<ebfeeabd-7f4a-4a80-ba76-561711a9d776@lunn.ch>
-	<ZuhsQxHA+SJFPa5S@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1726588584; c=relaxed/simple;
+	bh=Jo2eKSgQ0IqppsjldOTNLFaP8k2leUetI4DMHIRZGLw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oBU8KOfu4gql8R5jP8gKoIdIsxaqqPTGHuGTgAc71jKEMHeWXao90OQYdjd4W2jOxLuQ/XzcC8ux9BzUz7fd3Fm+Zy0mFdL8x7Ut7xLxxosdgf36Hi44RCPaiba7Caoe36E3PxLNP3JImpdUMGpL7oeasVqgWDtyIIJPIVok5CM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=I4U91Ttz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=lCw6BM9+RLcntSOeMSifj0iIlStXDWnH9nlDvO169Z4=; b=I4
+	U91Ttzldev8b5wRW/67cAObRApvurAVfPJZV07m7wwfNWYSnWUX4VnisNm6VMFw7vPk0W5+tX9ziv
+	mT34Hwzh8Tdvh0ELQ8oGxYFSaTucim5WnmMmgjlotUUgBlaj8YXgzpNr3J5v5qRS4Rx05tPo5f+6A
+	7QrdpaN2YjjV748=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sqaYr-007eRo-E1; Tue, 17 Sep 2024 17:56:17 +0200
+Date: Tue, 17 Sep 2024 17:56:17 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mohan Prasad J <mohan.prasad@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	horms@kernel.org, brett.creeley@amd.com, rosenp@gmail.com,
+	UNGLinuxDriver@microchip.com, willemb@google.com
+Subject: Re: [PATCH net-next v2 1/3] selftests: nic_basic_tests: Add selftest
+ file for basic tests of NIC
+Message-ID: <1ad4656f-eb3f-4ecb-9e5d-5846f4f6c3e6@lunn.ch>
+References: <20240917023525.2571082-1-mohan.prasad@microchip.com>
+ <20240917023525.2571082-2-mohan.prasad@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240917023525.2571082-2-mohan.prasad@microchip.com>
 
-Hi,
+On Tue, Sep 17, 2024 at 08:04:07AM +0530, Mohan Prasad J wrote:
+> Add selftest file to test basic features of a NIC driver.
+> Tests for link modes, auto-negotiation are placed.
+> Selftest makes use of ksft modules and ethtool.
+> Add selftest file in the Makefile.
+> 
+> Signed-off-by: Mohan Prasad J <mohan.prasad@microchip.com>
+> ---
+>  .../testing/selftests/drivers/net/hw/Makefile |   1 +
+>  .../drivers/net/hw/nic_basic_tests.py         | 145 ++++++++++++++++++
+>  2 files changed, 146 insertions(+)
+>  create mode 100644 tools/testing/selftests/drivers/net/hw/nic_basic_tests.py
+> 
+> diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+> index c9f2f48fc..9f105227c 100644
+> --- a/tools/testing/selftests/drivers/net/hw/Makefile
+> +++ b/tools/testing/selftests/drivers/net/hw/Makefile
+> @@ -10,6 +10,7 @@ TEST_PROGS = \
+>  	hw_stats_l3.sh \
+>  	hw_stats_l3_gre.sh \
+>  	loopback.sh \
+> +	nic_basic_tests.py \
+>  	pp_alloc_fail.py \
+>  	rss_ctx.py \
+>  	#
+> diff --git a/tools/testing/selftests/drivers/net/hw/nic_basic_tests.py b/tools/testing/selftests/drivers/net/hw/nic_basic_tests.py
+> new file mode 100644
+> index 000000000..27f780032
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/hw/nic_basic_tests.py
+> @@ -0,0 +1,145 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +#Introduction:
+> +#This file has basic tests for generic NIC drivers.
+> +#The test comprises of auto-negotiation, speed and duplex checks.
+> +#Also has tests to check the throughput
+> +#
+> +#Setup:
+> +#Connect the DUT PC with NIC card to partner pc back via ethernet medium of your choice(RJ45, T1)
+> +#
+> +#        DUT PC                                              Partner PC
+> +#┌───────────────────────┐                         ┌──────────────────────────┐
+> +#│                       │                         │                          │
+> +#│                       │                         │                          │
+> +#│           ┌───────────┐                         │                          │
+> +#│           │DUT NIC    │         Eth             │                          │
+> +#│           │Interface ─┼─────────────────────────┼─    any eth Interface    │
+> +#│           └───────────┘                         │                          │
+> +#│                       │                         │                          │
+> +#│                       │                         │                          │
+> +#└───────────────────────┘                         └──────────────────────────┘
+> +#
+> +#Configurations:
+> +# Change the below configuration based on your hw needs.
+> +# """Default values"""
+> +sleep_time = 5 #time taken to wait for transitions to happen, in seconds.
+> +test_duration = 5  #performance test duration for the throughput check, in seconds.
+> +throughput_threshold = 0.8 #percentage of throughput required to pass the throughput
+> +
+> +import time
+> +import os
+> +import re
+> +import configparser
+> +import json
+> +from lib.py import ksft_run, ksft_exit, ksft_pr, ksft_eq
+> +from lib.py import KsftFailEx, KsftSkipEx
+> +from lib.py import NetDrvEpEnv
+> +from lib.py import cmd
+> +from lib.py import ethtool
+> +
+> +"""Global variables"""
+> +common_link_modes = []
 
-On Mon, 16 Sep 2024 18:34:59 +0100
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+Software engineers have a dislike for global variables. In this patch,
+it is not even used. Please consider replacing it by passing it as a
+parameter, or turn the code into a class and make it part of self.
 
-[...]
+> +def test_link_modes(cfg) -> None:
+> +    global common_link_modes
+> +    link_modes = get_ethtool_content(cfg.ifname, "Supported link modes:")
+> +    partner_link_modes = get_ethtool_content(cfg.ifname, "Link partner advertised link modes:")
+> +
+> +    if link_modes and partner_link_modes:
+> +        for idx1 in range(len(link_modes)):
+> +            for idx2 in range(len(partner_link_modes)):
+> +                if link_modes[idx1] == partner_link_modes[idx2]:
+> +                    common_link_modes.append(link_modes[idx1])
 
-> The best place to decide to notify userspace would be at the
-> module_start() callback - this happens when a module is present,
-> and the netdev has been brought up. Note that this call will happen
-> each and every time the netdev is brought up.
+You can use the power of python here.
 
-As we are brainstorming, may I suggest an alternative approach ?
+        "supported-link-modes": [ "10baseT/Half","10baseT/Full","100baseT/Half","100baseT/Full","1000baseT/Full" ],
+	"link-partner-modes": [ "10baseT/Half","10baseT/Full","100baseT/Half","100baseT/Full","1000baseT/Full" ],
 
-I'm currently working on getting some way of providing userspace with a
-representation of the front-facing ports of a netdev. This would
-include SFP module ports, RJ45/8P8C/BaseT ports, BaseT1 ports, you name
-it.
+convert the list into a set, and then use 'and'.
 
-This would allow to represent with a bit more clarity use-cases such as
-the MCBin's ports controlled by the 88x3310, the combo RJ45 / SFP ports.
+	common_modes = set(josn['supported-link-modes']) and set(json['link-partner-modes'])
 
-The other case would be devices which have several PHYs in parallel.
-
-The way I see it for now, is that we would have internal kernel objects
-with a name such as "phy_port" or "phy_mdi" or just "mdi" (I'm bad at
-naming), instanciated by PHY drivers (or phylib through generic helpers
-in most simple case for single-port PHYs), as well as the SFP
-subsystem, but also by NICs that have a front-facing port that's driven
-neither through SFPs nor PHYs (through a firmware of some sort).
-
-These phy_port would have a set of callback ops to get their
-ethtool_ksettings linkmodes and could be added/removed dynamically, in
-the case of SFP module insertion for example.
-
-The notification I would imagine would be "there's a change on the
-front-facing port" or "there's a new one, here's what it can do" in the
-case of module insertion.
-
-I already have some code for that, and I will talk about this exact
-topic tomorrow morning at the networking track of LPC [1]
-
-For the SFP case, the notification would trigger indeed at the
-module_start/module_remove step.
-
-All of that is still WIP, but I think it would reply to that exact need
-of "notifying users when something happens to the ports", including SFP
-module insertion.
-
-I plan to submit an RFC shortly after LPC, I still need to iron some
-things out, and I think that RFC will itself trigger a lot of
-discussions, but do you see that this kind of work could help resolving
-the issue faced by Daniel as well as the need for SFP-event
-notifications ?
-
-Thanks,
-
-Maxime
-
-[1] : https://lpc.events/event/18/contributions/1964/
+	Andrew
 
