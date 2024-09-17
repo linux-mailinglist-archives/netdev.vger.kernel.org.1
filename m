@@ -1,209 +1,124 @@
-Return-Path: <netdev+bounces-128688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C80EC97AFBD
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 13:35:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D43CB97AFC4
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 13:40:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D569B22A2D
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 11:35:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 127761C220F7
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 11:40:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179E415E5DC;
-	Tue, 17 Sep 2024 11:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFD2C165EE4;
+	Tue, 17 Sep 2024 11:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jhwOnf9Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665B6156C6F
-	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 11:35:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8903515F308;
+	Tue, 17 Sep 2024 11:40:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726572925; cv=none; b=baexE4rseKJcirvei91aETt56Ux7toIwc5S/KuHF0I/1lRsHU5NaljVyJgSO/DdU65Y9HkVFUtbnoteNUlYyCRS2IvadMSGrpupyymvxORlUUshkx4S2/MIhePRoJfE/S3eniJOZooISBWWtdU21qyr2RqYxh/+O1AhuihUp+iM=
+	t=1726573201; cv=none; b=X47dOoVlSJQmv9V19mCjtwzOR3Q7w8eYoDczZuAi+RZFUtjNQvy7qMXgdfFkbQMbCSP41ODlBz6zHnJuMRljAmDKUwEjhwrz3MhRrxhqtyzDxt5vLTqakIIPIUIEiMAYGc+eZNIU7RhzGOnAEhOMYS+7xaOT6ehAK6k1pkC9nD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726572925; c=relaxed/simple;
-	bh=UI3GdVf/nuU+X++Nux6qrFODU6Wg+Bu8YYz2116wATQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Idvfu+nFYoyh9dFkaf61SeytzeOSvP2teU+yMvAZ88gcqI95CFnTzTLxjYHYNgMVD6UnP+vDoVbCYtrlgJCdCqovuhw8MuHUPghThSK9E0j6jkRDkmKseGxAfB6f1xurkoUYsQp28TFeoHgQx39vpNZxb66zYoYzizZyCRmaB5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a04bf03b1aso108637075ab.1
-        for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 04:35:23 -0700 (PDT)
+	s=arc-20240116; t=1726573201; c=relaxed/simple;
+	bh=ecEGHgyhHCw7IfP+WwTd7Ywh0L4XyrtJjcE9jri8+XY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G6IHOs9T65oySPyUenAMJM8PWKsQ+uKyAeqfls16m4wFtUxacKMO5u4qi/s30GWdEZUXnACidWx4z+bcoZT+p2GZYhKYz5QLX5zGUExllW5SDsfginSdLa6r4Bp+A/TF32jTCmF28ablAss2BnyHCNL7kPUe653Tl5hYeWYX5no=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jhwOnf9Q; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7191f58054aso4514408b3a.0;
+        Tue, 17 Sep 2024 04:40:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726573200; x=1727178000; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ecEGHgyhHCw7IfP+WwTd7Ywh0L4XyrtJjcE9jri8+XY=;
+        b=jhwOnf9QJn6ibWg3ispil1MnMmSjK8pak/Zg1WZbzBSn3BZJOx8Ws2/EO8TZwqamsY
+         Q863aFpp/LkiNSfESGM/4G0hIuApQkvKR1B3Da1uFLXO8QewHdJ04rqI3wpKT89pSXiW
+         Unh6reoS70mlgN09adnwHqjJpawTi/5uB3vpe5vR0PDpWGLMNAG0Y1USde1QGTm1ZHoo
+         UIcrbilKUdBhDRaANF2UcU73T2onwlSaHMXbr5oDzQqx5wRqudAIRs3+6eT8Yo3SjPqT
+         LbMJs/L2D+H3CxB/C6VFnqhR7WODn/+71l2Qq/TaG4vFgkUVCNXu4uKCB9BMMelWITp8
+         XgFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726572922; x=1727177722;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SzNEFOkwKTRRCubcdErJpo02u95pu5bJoNvb21H3/Cg=;
-        b=VohOjSppRv4x9Is/e7vQUmYVKUK8uuoBScBkSeC9S5Ihgns5os0lJ7DGVHi+EgkCWu
-         WB51R/csjDHzjee+5xD8PG/ICa9IXDbxsbW48YZnXGax5YgDW2kVs4fVIw3V551glZvo
-         ImJgqV0j76cyaPzXfHGhgxx0+gHWSTVheYc6DbE7L9+6pDRUx9ymTDxL7nrj6h/SNehq
-         RT/JYBotH/ZLZf9xxQWD9M8PBbkeM5nGgwgUiJ8p0DDzdC66WRZwa4Szd0ChmmkWHOiN
-         9j/fxbg+4Lq8x5GMyvU6EYciRMeemXpmj3+OtH4Jtka7ItL2ob+MzaMVKxWEzi0dY67o
-         uCCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVChPjvZpjXUawAXWD4hnsC/Se+CH5ui9e5YcxHS3OZFAZLUZdQp3H1lU1NwKCfuey/He1v21c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZZuvGlnBWacTXm6eLIKjrcQFT3ti56+aD7ace7SLGvBi0Zwbt
-	T0qIHeFoRp9Lm3D/0ztezMKus2Vwpf+ems3au6OS2oKj1S9KWPA2xpLKaaqexITb125V7dnsCQD
-	V3GUI6NC+cWb9NkchV0oA8744lEJ554amciFBk5oBmNoTo5owxDPZhE8=
-X-Google-Smtp-Source: AGHT+IHS++gqkOoTkEjWkqIehIfIt9V+h/1Ceq67kFyZ9Vwzx9LkDxLLtGxGfagBfDgu41gNoIX0xOL0HHrHEYccUKocJQQQ0KgA
+        d=1e100.net; s=20230601; t=1726573200; x=1727178000;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ecEGHgyhHCw7IfP+WwTd7Ywh0L4XyrtJjcE9jri8+XY=;
+        b=oJNXFtTGt1xgEcGS1bgA9iJYWJ+/vjPmrK8us7/nu3SPGOLC8kCVdf5QXcqkPeOlyl
+         e3l0+GZFFreoyRDZfP+zvOjzHJFz1BKQKhyqal21Yq0rhCDAYcvhTVHKpPwR2xKin1W4
+         c/n87T+lcsstRH9FgedJzs0F1Kya2NyNeuDTwElVsdzLgzaKgjoguObKwZ818nC42SL2
+         SPQQDVGucmjq9iqUqY9I7ttBRHkyBNo3dnHbqEgvWPCWmgAtWZhQx3GbPHZQgK/e1MrU
+         zF3+KearvqcFvRrjO4zqwGbZeoExoglosM6mKZ5Hr7QVFqxz7aHvymeD2BsrHYYy2sOh
+         KiRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUoBoeImy+BdwLZRRrTBCezQQpgSPGYEPvC1M00x7kHps+3A9f1UpFemLo4tNAUzL3MDDXdd5xQ6U2Xw7E=@vger.kernel.org, AJvYcCVigD8b7INBU8ByVJwVXAZdDekHfdyMbnBQlXFke2qFyX8HB+nWSR4qc+M1c9rg1wP4gcurVJy6@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFRFDBUQF1g/QAFmpUWlNtp1e4txnmow2fDX4qkqbp7FEK75Dw
+	pIgXATeMRoNeUPoOudclMzUMfMMbmuWEnyxFCoNGCG5tiYQqcNhlNgTKZUUE8b9YoPZLQools6F
+	qWhMhy60luzWBFLBb5IvvfJzE1Sk=
+X-Google-Smtp-Source: AGHT+IHCMSs5WXFsoCgcNfwmckmR2l9g1Zpnl0GggwToNMhM5h5CcrQFTEe88Wn/ywZnZoFeosxT6h5vlyJjHf6q9GU=
+X-Received: by 2002:a05:6a00:2d15:b0:717:8dd1:c309 with SMTP id
+ d2e1a72fcca58-7192606d3c1mr24904345b3a.9.1726573199759; Tue, 17 Sep 2024
+ 04:39:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d11:b0:3a0:9c2d:f441 with SMTP id
- e9e14a558f8ab-3a09c2dfb33mr70460615ab.24.1726572922030; Tue, 17 Sep 2024
- 04:35:22 -0700 (PDT)
-Date: Tue, 17 Sep 2024 04:35:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66e96979.050a0220.252d9a.000a.GAE@google.com>
-Subject: [syzbot] [mm?] INFO: rcu detected stall in sys_execve (6)
-From: syzbot <syzbot+8bb3e2bee8a429cc76dd@syzkaller.appspotmail.com>
-To: Liam.Howlett@oracle.com, akpm@linux-foundation.org, bp@alien8.de, 
-	davem@davemloft.net, hpa@zytor.com, jhs@mojatatu.com, jiri@resnulli.us, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	lorenzo.stoakes@oracle.com, mingo@redhat.com, netdev@vger.kernel.org, 
-	pbonzini@redhat.com, rkrcmar@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, vbabka@suse.cz, vinicius.gomes@intel.com, x86@kernel.org, 
-	xiyou.wangcong@gmail.com
+References: <CAHaCkmfFt1oP=r28DDYNWm3Xx5CEkzeu7NEstXPUV+BmG3F1_A@mail.gmail.com>
+ <CAHaCkmddrR+sx7wQeKh_8WhiYc0ymTyX5j1FB5kk__qTKe2z3Q@mail.gmail.com>
+ <20240912083746.34a7cd3b@kernel.org> <CAHaCkmekKtgdVhm7RFp0jo_mfjsJgAMY738wG0LPdgLZN6kq4A@mail.gmail.com>
+ <656a4613-9b31-d64b-fc78-32f6dfdc96e9@intel.com> <CAHaCkmfkD0GkT6OczjMVZ9x-Ucr9tS0Eo8t_edDgrrPk-ZNc-A@mail.gmail.com>
+ <534406c8-80d3-4978-702a-afa2f33573f7@intel.com>
+In-Reply-To: <534406c8-80d3-4978-702a-afa2f33573f7@intel.com>
+From: Jesper Juhl <jesperjuhl76@gmail.com>
+Date: Tue, 17 Sep 2024 13:39:23 +0200
+Message-ID: <CAHaCkmcZ6tqj8zJjLERO6Ze4SrKNHBpGL8aOLwt6CsX8b4TSFA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] igc: Network failure, reboot required: igc:
+ Failed to read reg 0xc030!
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, intel-wired-lan@lists.osuosl.org, 
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+On Sun, 15 Sept 2024 at 09:03, Lifshits, Vitaly
+<vitaly.lifshits@intel.com> wrote:
+>
+> >
+> >> 2. What is the NVM version that your NIC has? (ethtool -i eno1)
+> > $ sudo ethtool -i eno1
+> > driver: igc
+> > version: 6.10.9-arch1-2
+> > firmware-version: 1082:8770
+> > expansion-rom-version:
+> > bus-info: 0000:0c:00.0
+> > supports-statistics: yes
+> > supports-test: yes
+> > supports-eeprom-access: yes
+> > supports-register-dump: yes
+> > supports-priv-flags: yes
+>
+> I see that you have an old NVM version, 1.82.
+>
+> In the recent versions, some power and stability bug fixes were
+> introduced to the NVM.
+>
+> These fixes in the NVM might resolve completely your issue.
+>
+> Therefore, I'd like to ask you to contact your board vendor, Asus, to
+> update the NVM to the latest version.
+>
+I'll get in touch with them and see if I can manage to get the
+firmware updated. I'll reply back what happens and whether or not it
+seems to fix the issue (after a while) - thank you for the
+information.
 
-syzbot found the following issue on:
-
-HEAD commit:    46ae4d0a4897 Merge git://git.kernel.org/pub/scm/linux/kern..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=106a549f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3e10d80c64e440c0
-dashboard link: https://syzkaller.appspot.com/bug?extid=8bb3e2bee8a429cc76dd
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=144e27c7980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c16ef5753326/disk-46ae4d0a.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4a3a038d0ccf/vmlinux-46ae4d0a.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/244ada956332/bzImage-46ae4d0a.xz
-
-The issue was bisected to:
-
-commit 5a781ccbd19e4664babcbe4b4ead7aa2b9283d22
-Author: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Date:   Sat Sep 29 00:59:43 2018 +0000
-
-    tc: Add support for configuring the taprio scheduler
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10311900580000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=12311900580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=14311900580000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8bb3e2bee8a429cc76dd@syzkaller.appspotmail.com
-Fixes: 5a781ccbd19e ("tc: Add support for configuring the taprio scheduler")
-
-rcu: INFO: rcu_preempt detected expedited stalls on CPUs/tasks: { 0-...D } 2685 jiffies s: 3289 root: 0x1/.
-rcu: blocking rcu_node structures (internal RCU debug):
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 UID: 0 PID: 5444 Comm: syz-executor Not tainted 6.11.0-rc7-syzkaller-01396-g46ae4d0a4897 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-RIP: 0010:taprio_set_budgets+0x116/0x370 net/sched/sch_taprio.c:666
-Code: 44 24 10 4c 89 74 24 18 4d 89 f5 45 31 ff 48 89 5c 24 08 bf 10 00 00 00 4c 89 fe e8 74 8f d2 f7 49 83 ff 0f 0f 87 63 01 00 00 <4c> 89 e8 48 c1 e8 03 48 b9 00 00 00 00 00 fc ff df 80 3c 08 00 74
-RSP: 0018:ffffc90000007c30 EFLAGS: 00000093
-RAX: 0000000000010000 RBX: ffff888028fdb130 RCX: ffff888030aada00
-RDX: 0000000000010000 RSI: 0000000000000001 RDI: 0000000000000010
-RBP: 0000000000000000 R08: ffffffff89c1021c R09: 1ffff110051cea10
-R10: dffffc0000000000 R11: ffffed10051cea11 R12: 0000000000000004
-R13: ffff888028e75008 R14: ffff888028e75000 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff8880b8800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fb58963cff8 CR3: 00000000311f6000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <IRQ>
- advance_sched+0x98d/0xca0 net/sched/sch_taprio.c:977
- __run_hrtimer kernel/time/hrtimer.c:1689 [inline]
- __hrtimer_run_queues+0x59b/0xd50 kernel/time/hrtimer.c:1753
- hrtimer_interrupt+0x396/0x990 kernel/time/hrtimer.c:1815
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
- __sysvec_apic_timer_interrupt+0x110/0x3f0 arch/x86/kernel/apic/apic.c:1049
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
- sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1043
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:unwind_next_frame+0x9/0x2a00 arch/x86/kernel/unwind_orc.c:469
-Code: 4c 89 f7 e8 69 ad b9 00 e9 53 ff ff ff 0f 1f 40 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 55 41 57 41 56 <41> 55 41 54 53 48 81 ec a0 00 00 00 48 89 fd 49 bd 00 00 00 00 00
-RSP: 0018:ffffc9000422f120 EFLAGS: 00000202
-RAX: 0000000000000001 RBX: ffffffff820edaf2 RCX: ffff888030aada00
-RDX: dffffc0000000000 RSI: ffffffff820edaf2 RDI: ffffc9000422f140
-RBP: ffffc9000422f1d0 R08: 000000000000000a R09: ffffc9000422f230
-R10: 0000000000000003 R11: ffffffff817f2f80 R12: ffff888030aada00
-R13: ffffffff817f2f80 R14: ffffc9000422f220 R15: ffffc9000422f140
- arch_stack_walk+0x151/0x1b0 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
- kasan_save_stack+0x3f/0x60 mm/kasan/common.c:47
- __kasan_record_aux_stack+0xac/0xc0 mm/kasan/generic.c:541
- __call_rcu_common kernel/rcu/tree.c:3106 [inline]
- call_rcu+0x167/0xa70 kernel/rcu/tree.c:3210
- remove_vma mm/mmap.c:189 [inline]
- remove_mt mm/mmap.c:2415 [inline]
- do_vmi_align_munmap+0x155c/0x18c0 mm/mmap.c:2758
- do_vmi_munmap+0x261/0x2f0 mm/mmap.c:2830
- __vm_munmap+0x1fc/0x400 mm/mmap.c:3109
- elf_map fs/binfmt_elf.c:383 [inline]
- elf_load+0x2d8/0x6f0 fs/binfmt_elf.c:408
- load_elf_binary+0xeba/0x2680 fs/binfmt_elf.c:1141
- search_binary_handler fs/exec.c:1827 [inline]
- exec_binprm fs/exec.c:1869 [inline]
- bprm_execve+0xaf8/0x1770 fs/exec.c:1920
- do_execveat_common+0x55f/0x6f0 fs/exec.c:2027
- do_execve fs/exec.c:2101 [inline]
- __do_sys_execve fs/exec.c:2177 [inline]
- __se_sys_execve fs/exec.c:2172 [inline]
- __x64_sys_execve+0x92/0xb0 fs/exec.c:2172
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fb5887b0df7
-Code: Unable to access opcode bytes at 0x7fb5887b0dcd.
-RSP: 002b:00007fb58963ce78 EFLAGS: 00000246 ORIG_RAX: 000000000000003b
-RAX: ffffffffffffffda RBX: 00007fb588815ef0 RCX: 00007fb5887b0df7
-RDX: 00007ffedbc5b9b0 RSI: 00007ffedbc5bbf0 RDI: 00007ffedbc5cef5
-RBP: 00007ffedbc5ba20 R08: 00007fb58963cf20 R09: 0000000000000000
-R10: 0000000000000008 R11: 0000000000000246 R12: 000055558020fa80
-R13: 0000000000000100 R14: 00007ffedbc5b9d0 R15: 00007ffedbc5b780
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+- Jesper Juhl
 
