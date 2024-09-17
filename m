@@ -1,61 +1,51 @@
-Return-Path: <netdev+bounces-128675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA4FF97ADB7
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 11:17:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E4D797ADE5
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 11:30:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEEC41C211A4
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 09:17:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4930F283F2A
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 09:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD05E155382;
-	Tue, 17 Sep 2024 09:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pyiRW+Mc"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10E6615D5C5;
+	Tue, 17 Sep 2024 09:29:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0DF136351;
-	Tue, 17 Sep 2024 09:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D8F15A853
+	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 09:29:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726564653; cv=none; b=lePWAKf++9QNFOlYquy/WCBf72IaMl2x/gd5DYosmZi0y3LhnPqFz/lEsUdvM6MJF2dEBUz6OYIeLDac0PN208d413GtDvQJi59by7UqNwf6IwB5QV8CZChA1/57EluTzKsX/LiSokkBjPGlJU9ZSMS/rlRETeo4ACpbIxYocGk=
+	t=1726565394; cv=none; b=ENsnvduCn2s1ciHqEa/bWxG1I0pGF5vDV05i8RTCRomKa34/2ec6rBqBngLdME0voJdpyZ2V0xbG4XpdhlMCTRM3/eZvkswCxf5nSPAW4dg1QJPIM8B1erudV1+lqjCCs0fTutf6blVB579s0G9iMiO2Z8oEG+EN1hG+jdQ1nHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726564653; c=relaxed/simple;
-	bh=DG6fdDDcI5Cyq+nRTSK7X26r2gaWYB/ijo48VPl0dww=;
+	s=arc-20240116; t=1726565394; c=relaxed/simple;
+	bh=6z3ylPcsDoxYnF3RvsW/5CW6s7kXk7w3W/c+LA7gHfg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SpEKgRTYfSRJFG+DBQN0O7s26UMk5mi6C7zfDpEmwu2EOQqP1/Es/fIrTFawTUm6cphaCj+ZPByWrhjEArOxU9agqStYLGrMX4L0yR0TQcPXkfGRS7keSnkgSynRWPzU/j3lPv0zldhI2voH9g6T19YgStuWi3UMd6BdRk+DdYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pyiRW+Mc; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=u1XtYv1oP8kEWubxjLTRw4ZnVypnBzNGZPdqFGQZ/Zs=; b=pyiRW+McJKSzuq/HMDwua8u2/S
-	8BzgpuXJeOo47eM8C2OjPZvN031lWeogAhraIulYkI3GqDYirk5p9e7nrHXhZvMBMhR8HXWrqP/I8
-	lC0WQOVlnrmjKoCBczJJLGN8n8adYym++lj/LjiYFyKiI3wf8l2TAZAils11j2EjvRe38MQ3ffgt4
-	pmJIrwVBINMgJE3GAPY1QxW5NJpchOwAAcP3Qbai0FF0+hiedtuwZpy3bDL3fYruTiV9MdeWrCMr6
-	tjUjUaXnv85+E70ZB5OCCWvj+f72PqiLUseLJy8H2vcKKbbPvGdj1bshU7DBhk/fWCQXplPh4Nq3H
-	FTScWuOA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33412)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sqUKl-0006mf-0N;
-	Tue, 17 Sep 2024 10:17:18 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sqUKj-0007rN-0k;
-	Tue, 17 Sep 2024 10:17:17 +0100
-Date: Tue, 17 Sep 2024 10:17:17 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dWXEn8s/33g7lBDLfHf6MEWLz1VEkxcU/VB+Va5ZEvXUEiKqSbS4nduJcYPdbsEOI2H4rn6XwnScn/XZx+ZxkHNHA6gwCCLWkU6en6aIaLaVI59yU+fD5qr6Pv2Bblvc5Bk+mLlnz60fS3LOPTFaksBRGBKrzABuS7ZGV4mlQO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sqUW5-00028y-I5; Tue, 17 Sep 2024 11:29:01 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sqUW3-008XC0-Rd; Tue, 17 Sep 2024 11:28:59 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sqUW3-00DCdr-2P;
+	Tue, 17 Sep 2024 11:28:59 +0200
+Date: Tue, 17 Sep 2024 11:28:59 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -66,36 +56,61 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Florian Fainelli <f.fainelli@gmail.com>, kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
 	devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/2] net: phy: Add support for PHY
- timing-role configuration via device tree
-Message-ID: <ZulJHVuku8OPlXke@shell.armlinux.org.uk>
+Subject: Re: [PATCH net-next v3 1/2] dt-bindings: net: ethernet-phy: Add
+ timing-role role property for ethernet PHYs
+Message-ID: <ZulL2w0s6m7BnqV6@pengutronix.de>
 References: <20240913084022.3343903-1-o.rempel@pengutronix.de>
- <20240913084022.3343903-3-o.rempel@pengutronix.de>
+ <20240913084022.3343903-2-o.rempel@pengutronix.de>
+ <ZulHp9IBvptenuRa@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240913084022.3343903-3-o.rempel@pengutronix.de>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <ZulHp9IBvptenuRa@shell.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, Sep 13, 2024 at 10:40:22AM +0200, Oleksij Rempel wrote:
-> Introduce support for configuring the master/slave role of PHYs based on
-> the `timing-role` property in the device tree. While this functionality
-> is necessary for Single Pair Ethernet (SPE) PHYs (1000/100/10Base-T1)
-> where hardware strap pins may be unavailable or incorrectly set, it
-> works for any PHY type.
+On Tue, Sep 17, 2024 at 10:11:03AM +0100, Russell King (Oracle) wrote:
+> On Fri, Sep 13, 2024 at 10:40:21AM +0200, Oleksij Rempel wrote:
+> > This patch introduces a new `timing-role` property in the device tree
+> > bindings for configuring the master/slave role of PHYs. This is
+> > essential for scenarios where hardware strap pins are unavailable or
+> > incorrectly configured.
+> > 
+> > The `timing-role` property supports the following values:
+> > - `force-master`: Forces the PHY to operate as a master (clock source).
+> > - `force-slave`: Forces the PHY to operate as a slave (clock receiver).
+> > - `prefer-master`: Prefers the PHY to be master but allows negotiation.
+> > - `prefer-slave`: Prefers the PHY to be slave but allows negotiation.
+> > 
+> > The terms "master" and "slave" are retained in this context to align
+> > with the IEEE 802.3 standards, where they are used to describe the roles
+> > of PHY devices in managing clock signals for data transmission. In
+> > particular, the terms are used in specifications for 1000Base-T and
+> > MultiGBASE-T PHYs, among others. Although there is an effort to adopt
+> > more inclusive terminology, replacing these terms could create
+> > discrepancies between the Linux kernel and the established standards,
+> > documentation, and existing hardware interfaces.
 > 
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Does this provide the boot-time default that userspace is subsequently
+> allowed to change through ethtool, or does it provide a fixed
+> configuration?
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Thanks!
+It provides the boot-time default.
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
