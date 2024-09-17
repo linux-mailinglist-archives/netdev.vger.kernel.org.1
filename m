@@ -1,71 +1,97 @@
-Return-Path: <netdev+bounces-128716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BADF97B275
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 17:59:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EF697B279
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 18:00:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D122728896A
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 15:59:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E7811C21CDB
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6BCE170A0B;
-	Tue, 17 Sep 2024 15:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA33178368;
+	Tue, 17 Sep 2024 16:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="sHPH5Pj/"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="SJZb3PBs"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251D41607BD;
-	Tue, 17 Sep 2024 15:59:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D60FD175D56
+	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 16:00:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726588758; cv=none; b=qgKJPKB/5e0VZwGQXKmmn/9MmS99frYJPQ5xGwQCocWvKHvyKq1rGgnZP5SdVY6yMl7pktMX6B0tLIMnK9XQstZqKmfhjX47FuuQWjFeEZF5gXLAzWFzAOPdqyWqfBe1i17FSixJCbBvFsbdy1e3n5PLyX9MzSdv3xvTJjJcLio=
+	t=1726588833; cv=none; b=TKjkrI1/md8/t+jMdMf/n1FIq3E9kXTi2eLAN028RrQvjPq0YyIfhtZy91TrUmOD++ntARux3zv4kUmQlg2gZGx8wewuBm530oU4r8c9/sEa3mNgLk2ox3S15+eGnE5ENf0zQQPIa5QZlErC/gCwQM10cVK9IFOWcy1cBBSs/cQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726588758; c=relaxed/simple;
-	bh=vVe1DsfC752Y7/CCfeP5jLWQ9L1GBOX1daAtayOPRMU=;
+	s=arc-20240116; t=1726588833; c=relaxed/simple;
+	bh=iwhaIuE2h6sVer3uexfprQjPfDuKxTFnO2orokxvbjk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iM33vUlzcMmtLI77SHTnPLe6bw0H6vEz4KunWVNI5wk3muZXvc5z4UX78l3+IKsyk9qfZpe3max/sd+D0CogXzSb/GkzgcWrh6fhk68aDV9eHzJKQJ5xyqJ4+1/HIlSc6VTqqL4wCpLxFBIBAxHhZ9Cy8wni3x5Dc/dRm9/iMcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=sHPH5Pj/; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+76ZtTTIrevT3SE9ibJTcm4S3lTOZCUnPzEaiQSo0V4=; b=sHPH5Pj/c40k83t4U98O4PTvEN
-	fTTM6pOhAZ6yWFbKOiLmWPGi0JH1KI8hBW2fnr+/8dksebCopR/EA33XAZTfXghk7S3PA9UsK5YfD
-	GyvMcFjBg/s3MFVSrd/T38glmpMQ3QrYpegHWe0zHQ4CoHjphiHv0Juh1NH9TABgDRfPzvLfnKyQ9
-	qhBi+nIvBnWWBOHuS1diQj88G9kHOhaAaSr35irZy6JlOYgvKorNqIJlvReOUaPzgpUQRsFqY79Gx
-	r1FVWCPQH7X2ud6VlHV7yOVFTtEtjTOQga72aToPLWcAJNhhHHanjA2st1+7+lGGoEU/PHbyC8OqR
-	0xvygMiA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39366)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sqabc-00075A-2W;
-	Tue, 17 Sep 2024 16:59:08 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sqabW-00086R-2w;
-	Tue, 17 Sep 2024 16:59:02 +0100
-Date: Tue, 17 Sep 2024 16:59:02 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	andrew@lunn.ch, hkallweit1@gmail.com, richardcochran@gmail.com,
-	rdunlap@infradead.org, bryan.whitehead@microchip.com,
-	edumazet@google.com, pabeni@redhat.com,
-	maxime.chevallier@bootlin.com, linux-kernel@vger.kernel.org,
-	horms@kernel.org, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next V6 4/5] net: lan743x: Migrate phylib to phylink
-Message-ID: <ZumnRtZYBLIyI/Gm@shell.armlinux.org.uk>
-References: <20240906103511.28416-1-Raju.Lakkaraju@microchip.com>
- <20240906103511.28416-5-Raju.Lakkaraju@microchip.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=usAw9do0PrrRDbim0k09S/w/dWGOkuVSJa+ZsCNl1Xjo7SwqUZGRUhNiVYJObivZQwEDWsCR54oe5y4aD+Qw41DeceObZKIFcP+WssxQpQGNeYDBEzH/WAi0bL5V+4IqY/8ylRkEmzxeA8piT0u2rPqN1BqKRx3OyStlCRTkoAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=SJZb3PBs; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-374bfc395a5so3768043f8f.0
+        for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 09:00:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1726588829; x=1727193629; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=GzdDM52YJ5QqZgf2ijfzw5JmBHoLQaTemNy6F79uMx8=;
+        b=SJZb3PBsuGonG+ptKeQS2P6ofza9yIldqBv/W2aHahEbvr8Ax0OC0TQqd4hW5ldwAR
+         SlCSgGLAcVZ3YIgjWr5MKKPLM4IJpxMskTgy7i84fxIltuF+SsEROKEpD3P0/iE9YV8y
+         v3PtU6Ey05X0IuD6KwzAx2kBdF1ctEI6Z/Ha5bE66H+Ua/7NHl69J+CwPFpnomWC476z
+         U3TE9mFVbIUdPXgGlUDq6DsuSTpIClbURudeOszlONHKnpb+BUE53uGH+IWO4wkvVzRj
+         phbNyZEt6SxWK8cT23m6uv4D59hOZzXds791pPBsV0eHCNgEN20XoR4UbnQhDHtNvpss
+         AtAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726588829; x=1727193629;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GzdDM52YJ5QqZgf2ijfzw5JmBHoLQaTemNy6F79uMx8=;
+        b=HxJGfJ12FskdBbi95fsWwzE3eAwULnTV8QYi6ad6V1xCSKTQ/3YH64zu1FVOTdkUpp
+         sbABgpDswVLfFsYwKXUyWjI+28v73ieGMZQJYf0er4+St6tElX8tMZrPGULnTo4Jxt02
+         y5yXm/99Dkr1kVF0qmabOj2Hw6gDMKse5CKc/Ce6wmdVmeYUw5O52G0zoJUUXiYBvSXL
+         1z09N0RHMwkmh59UrrSC0DtQjiDbsQt1VvmPv4YjSLAJykgWWMT7QTY2QLVSMe/nlZJi
+         TMJC6QF8G0bZL86yElS1EqiR99d0we6xuALPTaQj/Bai84dKE0XLjgVvItpm+72R5vI9
+         jhYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWs839R5kp8iYXeg478Ygd/pbWsWH/WXjMyJVwa7zafJd2FS5soHX2J7WJSCDdeJ6mlWmz3RTs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKqiuSchbVMTAQ4iViUcRbcmr55CDNWVzxjzKhrB0G4cBo4FD1
+	IdstHeERFYiDLuw/joGlaE5kM9NdaEw11c+kOu6s1e1EVJJR3Sja0gfrFKCnIV0=
+X-Google-Smtp-Source: AGHT+IGiLZWARlLw1w001NS+/MT9IxxbVcl3J2mqD02KxtsHkKPX5hJJBnZPHFNkpPuN3Vvo5pqZSw==
+X-Received: by 2002:a05:6000:bc7:b0:374:b6e4:16a7 with SMTP id ffacd0b85a97d-378a8a0b864mr12922145f8f.8.1726588828834;
+        Tue, 17 Sep 2024 09:00:28 -0700 (PDT)
+Received: from GHGHG14 ([2a09:bac5:50ca:432::6b:83])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42d9b19493bsm141491855e9.45.2024.09.17.09.00.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Sep 2024 09:00:28 -0700 (PDT)
+Date: Tue, 17 Sep 2024 17:00:19 +0100
+From: Tiago Lam <tiagolam@cloudflare.com>
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Jakub Sitnicki <jakub@cloudflare.com>, kernel-team@cloudflare.com
+Subject: Re: [RFC PATCH 3/3] bpf: Add sk_lookup test to use ORIGDSTADDR cmsg.
+Message-ID: <Zumnk3MEqINMnTf6@GHGHG14>
+References: <20240913-reverse-sk-lookup-v1-0-e721ea003d4c@cloudflare.com>
+ <20240913-reverse-sk-lookup-v1-3-e721ea003d4c@cloudflare.com>
+ <8d5469d2-7525-420b-b506-8de2ecf04734@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,100 +100,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240906103511.28416-5-Raju.Lakkaraju@microchip.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <8d5469d2-7525-420b-b506-8de2ecf04734@linux.alibaba.com>
 
-Hi,
+On Fri, Sep 13, 2024 at 08:10:24PM +0800, Philo Lu wrote:
+> Hi Tiago,
+> 
+> On 2024/9/13 17:39, Tiago Lam wrote:
+> > This patch reuses the framework already in place for sk_lookup, allowing
+> > it now to send a reply from the server fd directly, instead of having to
+> > create a socket bound to the original destination address and reply from
+> > there. It does this by passing the source address and port from where to
+> > reply from in a IP_ORIGDSTADDR ancilliary message passed in sendmsg.
+> > 
+> > Signed-off-by: Tiago Lam <tiagolam@cloudflare.com>
+> > ---
+> >   tools/testing/selftests/bpf/prog_tests/sk_lookup.c | 70 +++++++++++++++-------
+> >   1 file changed, 48 insertions(+), 22 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/sk_lookup.c b/tools/testing/selftests/bpf/prog_tests/sk_lookup.c
+> > index ae87c00867ba..b99aff2e3976 100644
+> > --- a/tools/testing/selftests/bpf/prog_tests/sk_lookup.c
+> > +++ b/tools/testing/selftests/bpf/prog_tests/sk_lookup.c
+> > @@ -75,6 +75,7 @@ struct test {
+> >   	struct inet_addr listen_at;
+> >   	enum server accept_on;
+> >   	bool reuseport_has_conns; /* Add a connected socket to reuseport group */
+> > +	bool dont_bind_reply; /* Don't bind, send direct from server fd. */
+> >   };
+> >   struct cb_opts {
+> > @@ -363,7 +364,7 @@ static void v4_to_v6(struct sockaddr_storage *ss)
+> >   	memset(&v6->sin6_addr.s6_addr[0], 0, 10);
+> >   }
+> > -static int udp_recv_send(int server_fd)
+> > +static int udp_recv_send(int server_fd, bool dont_bind_reply)
+> >   {
+> >   	char cmsg_buf[CMSG_SPACE(sizeof(struct sockaddr_storage))];
+> >   	struct sockaddr_storage _src_addr = { 0 };
+> > @@ -415,26 +416,41 @@ static int udp_recv_send(int server_fd)
+> >   		v4_to_v6(dst_addr);
+> >   	}
+> > -	/* Reply from original destination address. */
+> > -	fd = start_server_addr(SOCK_DGRAM, dst_addr, sizeof(*dst_addr), NULL);
+> > -	if (!ASSERT_OK_FD(fd, "start_server_addr")) {
+> > -		log_err("failed to create tx socket");
+> > -		return -1;
+> > -	}
+> > +	if (dont_bind_reply) {
+> > +		/* Reply directly from server fd, specifying the source address and/or
+> > +		 * port in struct msghdr.
+> > +		 */
+> > +		n = sendmsg(server_fd, &msg, 0);
+> > +		if (CHECK(n <= 0, "sendmsg", "failed\n")) {
+> > +			log_err("failed to send echo reply");
+> > +			return -1;
+> > +		}
+> > +	} else {
+> > +		/* Reply from original destination address. */
+> > +		fd = socket(dst_addr->ss_family, SOCK_DGRAM, 0);
+> > +		if (CHECK(fd < 0, "socket", "failed\n")) {
+> > +			log_err("failed to create tx socket");
+> > +			return -1;
+> > +		}
+> Just curious, why not use start_server_addr() here like before?
+> 
 
-A couple of niggles. I know that the patches have already been merged
-while I wasn't able to review, but maybe you can address these points.
+Thanks, you're right. Initially I rebased this on commit
+e3d332aaf898ed755b29c8cdf59be2cfba1cac4b (v6.6.31), which didn't have
+start_server_addr(), and used bind() instead. I must have messed up the
+rebased.
 
-On Fri, Sep 06, 2024 at 04:05:10PM +0530, Raju Lakkaraju wrote:
-> +static void lan743x_phylink_mac_link_up(struct phylink_config *config,
-> +					struct phy_device *phydev,
-> +					unsigned int link_an_mode,
-> +					phy_interface_t interface,
-> +					int speed, int duplex,
-> +					bool tx_pause, bool rx_pause)
-> +{
-> +	struct net_device *netdev = to_net_dev(config->dev);
-> +	struct lan743x_adapter *adapter = netdev_priv(netdev);
-> +	int mac_cr;
-> +	u8 cap;
-> +
-> +	mac_cr = lan743x_csr_read(adapter, MAC_CR);
-> +	/* Pre-initialize register bits.
-> +	 * Resulting value corresponds to SPEED_10
-> +	 */
-> +	mac_cr &= ~(MAC_CR_CFG_H_ | MAC_CR_CFG_L_);
-> +	if (speed == SPEED_2500)
-> +		mac_cr |= MAC_CR_CFG_H_ | MAC_CR_CFG_L_;
-> +	else if (speed == SPEED_1000)
-> +		mac_cr |= MAC_CR_CFG_H_;
-> +	else if (speed == SPEED_100)
-> +		mac_cr |= MAC_CR_CFG_L_;
-> +
-> +	lan743x_csr_write(adapter, MAC_CR, mac_cr);
-> +
-> +	lan743x_ptp_update_latency(adapter, speed);
-> +
-> +	/* Flow Control operation */
-> +	cap = 0;
-> +	if (tx_pause)
-> +		cap |= FLOW_CTRL_TX;
-> +	if (rx_pause)
-> +		cap |= FLOW_CTRL_RX;
-> +
-> +	lan743x_mac_flow_ctrl_set_enables(adapter,
-> +					  cap & FLOW_CTRL_TX,
-> +					  cap & FLOW_CTRL_RX);
+I've fixed this and included your other suggestion in the patch below
+and will fold it into the next revision.
 
-I'm wondeing about this, which looks to me to be over-complex code.
-
-void lan743x_mac_flow_ctrl_set_enables(struct lan743x_adapter *adapter,
-                                       bool tx_enable, bool rx_enable)
-
-This function takes two booleans. You're passing cap & FLOW_CTRL_TX
-and cap & FLOW_CTRL_RX to this function for these. However, you are
-setting these bits in "cap" immediately above from a pair of booleans
-and nowhere else. So why not:
-
-	lan743x_mac_flow_ctrl_set_enables(adapter, tx_pause, rx_pause);
-
-?
-
-> @@ -3115,13 +3217,13 @@ static int lan743x_netdev_open(struct net_device *netdev)
->  	if (ret)
->  		goto close_intr;
->  
-> -	ret = lan743x_phy_open(adapter);
-> +	ret = lan743x_phylink_connect(adapter);
->  	if (ret)
->  		goto close_mac;
->  
->  	ret = lan743x_ptp_open(adapter);
->  	if (ret)
-> -		goto close_phy;
-> +		goto close_mac;
->  
->  	lan743x_rfe_open(adapter);
->  
-> @@ -3161,9 +3263,8 @@ static int lan743x_netdev_open(struct net_device *netdev)
->  			lan743x_rx_close(&adapter->rx[index]);
->  	}
->  	lan743x_ptp_close(adapter);
-> -
-> -close_phy:
-> -	lan743x_phy_close(adapter);
-> +	if (adapter->phylink)
-> +		lan743x_phylink_disconnect(adapter);
-
-I'm not sure why this is conditional on adapter->phylink. Surely this
-test will always be true?
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+diff --git a/tools/testing/selftests/bpf/prog_tests/sk_lookup.c b/tools/testing/selftests/bpf/prog_tests/sk_lookup.c
+index b99aff2e3976..0628a67681c5 100644
+--- a/tools/testing/selftests/bpf/prog_tests/sk_lookup.c
++++ b/tools/testing/selftests/bpf/prog_tests/sk_lookup.c
+@@ -374,7 +374,7 @@ static int udp_recv_send(int server_fd, bool dont_bind_reply)
+        struct iovec iov = { 0 };
+        struct cmsghdr *cm;
+        char buf[1];
+-       int ret, fd;
++       int fd;
+        ssize_t n;
+ 
+        iov.iov_base = buf;
+@@ -427,19 +427,12 @@ static int udp_recv_send(int server_fd, bool dont_bind_reply)
+                }
+        } else {
+                /* Reply from original destination address. */
+-               fd = socket(dst_addr->ss_family, SOCK_DGRAM, 0);
+-               if (CHECK(fd < 0, "socket", "failed\n")) {
++               fd = start_server_addr(SOCK_DGRAM, dst_addr, sizeof(*dst_addr), NULL);
++               if (!ASSERT_OK_FD(fd, "start_server_addr")) {
+                        log_err("failed to create tx socket");
+                        return -1;
+                }
+ 
+-               ret = bind(fd, (struct sockaddr *)dst_addr, sizeof(*dst_addr));
+-               if (CHECK(ret, "bind", "failed\n")) {
+-                       log_err("failed to bind tx socket");
+-                       close(fd);
+-                       return ret;
+-               }
+-
+                msg.msg_control = NULL;
+                msg.msg_controllen = 0;
+                n = sendmsg(fd, &msg, 0);
+@@ -451,6 +444,8 @@ static int udp_recv_send(int server_fd, bool dont_bind_reply)
+ 
+                close(fd);
+        }
++
++       return 0;
+ }
+ 
+ static int tcp_echo_test(int client_fd, int server_fd)
 
