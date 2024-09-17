@@ -1,138 +1,226 @@
-Return-Path: <netdev+bounces-128732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E153B97B43E
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 21:04:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5B6497B44A
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 21:10:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6166D281724
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 19:04:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BBB61F23CFB
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 19:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2A8188CB0;
-	Tue, 17 Sep 2024 19:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1078F18BC10;
+	Tue, 17 Sep 2024 19:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GXYeyebo"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LP6KHqIB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F711165F13
-	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 19:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726599876; cv=none; b=RhyKT5Jm/Q0JD8PauZaYQo8yNbwkmqJJwA6/uz8Ya+Ynlnu6TtTfvtOc5ak6FK67ZBrBwSGDOyOFKYZKM2FH0/tdWco+TDEHs8RNiu7YNXI6cL2r/qOct4Bd+zDF+xjbCU34weHnfoBHoRskdTKh6cdbkUdhO0I3VznkWpyVxNc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726599876; c=relaxed/simple;
-	bh=/T/wYacxPbGQElSY0wpDTroRlXLPyMVSqBZGcLXADTk=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=HwYkUOas4uOGw6jrNRrG0RpXixc+18w9fkq9hg2CjoPB/h4lM9K0kjbzOGRavashMxFeu93NEWYg3PcGpJyxNuy2Y0AzOVJnDYLdWzgfX0HVrR1o+sGfFk9iUTN6Al91G4Sc08RgtuOL0SlitNCEtjpV+T+axpdHgLWEfYkysCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GXYeyebo; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c3d209db94so784136a12.3
-        for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 12:04:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726599873; x=1727204673; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/T/wYacxPbGQElSY0wpDTroRlXLPyMVSqBZGcLXADTk=;
-        b=GXYeyeboN+W+qpVbt2rFScE7tg4OqKFx27l/b2qQFOIRDBlR4jFix6l4yLSyCkxoRW
-         q19B2cE0xC0vk08XYKYKWZA2GySnCWQc2eMcTYT4y8wtO0d3TCxwA3z5PSF7lhpRVQyo
-         YvBwhBAVNGub8Qua4R06JILhZExP3rbtxFNlyFP0n37WERXqbUTvmsvz12VufqJ59mzc
-         Zf+i1GibygE4K8vviiVdXkDpq7FVNXRtvCVRfA+66jEplJOmjaiqRdx2iI8637m0L0yE
-         T9eFgqq5VktKL+18ToEMbPWI/8ONS6ZHKeTh/d8FLuB4XMVa1U44Kw7J80EMftJn1JGW
-         u9Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726599873; x=1727204673;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/T/wYacxPbGQElSY0wpDTroRlXLPyMVSqBZGcLXADTk=;
-        b=gkNdqkjmIl4t7D91TsJjCsl+X3ifSU1MrvalrcyBA//41FfjaVVAYQkrEFJfMqED1U
-         dAYzWR+q2oHrfRl75uQoxKrhSTa1j25xuZifT12YRuyOlw3fQRvLh1Zw8DFpUpcfB1zj
-         Gyh4XUQjGehB5nnqjNUbN4VuGx2Bu8OFvZ1+4ESf/zOgp2uMJ9mphUfszKfOaLJsPPtf
-         7z2yTel20/4UbGhl4LwIGOQZGqU+6eEb1+Kt+Q+RQfbZ3fwBy8Tj0t8bXnGue4xIBvhz
-         9D0qRUkZTYE76RFR2/3FshaTC9unyZ5xNJkaw7fCUr5zgq+rBjmHRx1Bb/5f8cmphOt+
-         RCSw==
-X-Forwarded-Encrypted: i=1; AJvYcCXPL4U/sX42vpWj360KGuBAvFhWHy+54i5k8Kw3CmsFx2Z64dJMeXqKJLzWfCr5AK31Kh1NzTk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmVu7Q+dfaglBWQpfVfqaoZCvZl5GrtZu8aizFs22LpK1dy/H5
-	7gT/Gwb6afJm7YiHFCJW+p5lJ2e0qnr+VRx1C9abxKS29JJe1sDr
-X-Google-Smtp-Source: AGHT+IFiZlzmQoy0PdrXcsZeQOYu+NWK9q7XzKl76DUKR8DZxkjQ8rAgu73+gU6992dn65+BPSsbLA==
-X-Received: by 2002:a17:907:1b13:b0:a8a:78bb:1e2 with SMTP id a640c23a62f3a-a90293b15e6mr2372417566b.6.1726599872533;
-        Tue, 17 Sep 2024 12:04:32 -0700 (PDT)
-Received: from [127.0.0.1] ([193.252.226.10])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90612b3f62sm480715266b.137.2024.09.17.12.04.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2024 12:04:31 -0700 (PDT)
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-Message-ID: <e261cce8-bd41-4f7b-b035-2480fe0e36c5@orange.com>
-Date: Tue, 17 Sep 2024 21:04:30 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216DF18A6CC
+	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 19:10:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726600241; cv=fail; b=qpw+NBH82JQpd/RE1Hohy4Wytld7hE0MFbYXe8aFwLpFKHQl6+ZVmRncN86crEEXVeII66I3Tm/j4qSW0qShutvDKO16yjnOIsehZ/7Or8gLaP0rZ3MaxtD9wVxCC+YDM0rp406Ira+U62xbOi+dF6sy4Ow81WjqrdcEwDvHsdA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726600241; c=relaxed/simple;
+	bh=/mEDDrTXK+IopIxIY3dLvGPJ2PCJwKDWGultIuCwvHY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=jRJTtp9hwn/3SzM60BiyF3HXTu7oBOp+7t9yJpHbT8t/pNWGoM885LjO98U0AOBoQ99Ogse7qa69UPiTsVvff1ke5a1Xi4DbwHA2ueQlkMc5p4c9vQ22XMm7Exs3bR+6tocxNgiGgnWYf8hb3VXZ9ResMcVR/uVDMTzqOZz+JsY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LP6KHqIB; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726600239; x=1758136239;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/mEDDrTXK+IopIxIY3dLvGPJ2PCJwKDWGultIuCwvHY=;
+  b=LP6KHqIBuOqoQmSFvR5xVDUVlV/xSor321I5gUJpnS+3HvDfiF9rNLTt
+   AXndVyVmvd0/gFfXA8FtY5WftGLvUCcAU0XozC3ZBKF5SiQRADNDAGtGy
+   rPwJwEp/A34gdQzC1m/AoGNLYy2Qe0QUPet4LtgGcgYxsKANfFjFhN1cF
+   6lRfcxPDYyQypnUPL+inb6jmej9JoMl1wqPjSQ9mAt31Ms7KP0XRsC+St
+   o57dqQu+dVSP9iFFxXZdnX/wVDoEtvW2gbbnsOTpmTS/VvEgsJoz5phDi
+   WmvopSiQC4iudfOvioq7OOrq4CR1uG98qB+TWVOccxcly8/uS5QS8PLeX
+   Q==;
+X-CSE-ConnectionGUID: U2H5l1GYRK265MwSxYFuGw==
+X-CSE-MsgGUID: qQZrwXS4TNGSGRRaLrby4Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11198"; a="47989664"
+X-IronPort-AV: E=Sophos;i="6.10,235,1719903600"; 
+   d="scan'208";a="47989664"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2024 12:10:39 -0700
+X-CSE-ConnectionGUID: ZtviLbRGQgSz1mbvu/cHMw==
+X-CSE-MsgGUID: h88E6LbQT++MFMY84Gk+Xg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,235,1719903600"; 
+   d="scan'208";a="73651900"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Sep 2024 12:10:38 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 17 Sep 2024 12:10:37 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 17 Sep 2024 12:10:37 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.170)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 17 Sep 2024 12:10:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kWHiywrJNKzLNdLLUIDCXOkoR0x2qlQNQwDEoTPF4qUDS+fb3eByskHRiXWWU9WtEsWKwol/usO0dT77zp+2koOOGXPbrONorxCtAkweadc8axIqGvL/rNDXmRW5cCxcSe+aOhI21eqpGxdm/bsJq1TabFUpKcjhvaKam/mGMZaRkt4aM7lcQLMq7rzDt6X+Lt3r3xu2vCjCu+q6hTw3db6VetnRRvQhvnHGuyIHt05wnPZyrHZpZ6eZcbDXuuX22QTMkBema6cniGCjVNm0GR5onCUIx297ZIntIA2TaMHOgMtnlkLtCbIbMmzTTcPDmQ279HafHiTiUncH1NkPWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c243d0np5VOoWffNyMGJLCSIUUlMuMXcf4bqek2b2SE=;
+ b=K759y4ry6+bc+9hmlf6WFvnHMVQuYhZRedK6heZ1ITVR/lri70+5541CsPA8HQ+liwWDncJOk5RRWm2XfKuClAtKiYWJAXmY7Cdh6R+EWUR210eg0o5a7nAEqrAcg9MbfEaTBt4BlxhXz/Ji6Qp1ptQfGlwtMWAVG8sXjH+hLo1SMDIngRXkyJVYF8qjTLC+Fk/xFZb092bO/0iOaH3QttG8H2qCBYocOV/d+GerlSIGxwXtL7VmKxtCyI97D+/znfVhG2bHwyNho7i9/pyd+0Ay3OGgWAlT+QzXH215KRASsACXu75RxBRqDjvADBbUhD14eChSy8gKVK+cT4YkLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5144.namprd11.prod.outlook.com (2603:10b6:510:3e::20)
+ by MW3PR11MB4570.namprd11.prod.outlook.com (2603:10b6:303:5f::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.16; Tue, 17 Sep
+ 2024 19:10:35 +0000
+Received: from PH0PR11MB5144.namprd11.prod.outlook.com
+ ([fe80::5889:7208:6024:bbcf]) by PH0PR11MB5144.namprd11.prod.outlook.com
+ ([fe80::5889:7208:6024:bbcf%6]) with mapi id 15.20.7962.022; Tue, 17 Sep 2024
+ 19:10:35 +0000
+From: "Kuruvinakunnel, George" <george.kuruvinakunnel@intel.com>
+To: Hongbo Li <lihongbo22@huawei.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>
+CC: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH net-next] ice: Make use of assign_bit()
+ API
+Thread-Topic: [Intel-wired-lan] [PATCH net-next] ice: Make use of assign_bit()
+ API
+Thread-Index: AQHa/hJoommR+TKEz0a60udWYf362rJcbHPg
+Date: Tue, 17 Sep 2024 19:10:35 +0000
+Message-ID: <PH0PR11MB51447E4D5D2D7194EBB1B1A0E2612@PH0PR11MB5144.namprd11.prod.outlook.com>
+References: <20240902131407.3087903-1-lihongbo22@huawei.com>
+In-Reply-To: <20240902131407.3087903-1-lihongbo22@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5144:EE_|MW3PR11MB4570:EE_
+x-ms-office365-filtering-correlation-id: ea754535-19a9-4988-7778-08dcd74c68c3
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?u5ZF7XO3t3zfPizbgye7Cx6wfijJeUVxR9+PCU01OtfDq5svoNt1eiQc7bsi?=
+ =?us-ascii?Q?cm2y6ZPC0VHLunG32sUZvNMS5fWR+eBHIDV8+L4mivPxQs8MkdR/+uVORdWE?=
+ =?us-ascii?Q?ppvzO2J1YvhHv2/anaTFkMUu7QyExTw/hj5aK7P9HWSPrzmNeH5P/jGyrUSI?=
+ =?us-ascii?Q?R35uyNapfe0wHN6EXlszUfV52MopP82jHxv5lo6pFzWY4Xg8t6e0hHBD+wMF?=
+ =?us-ascii?Q?Nl4jIQNxYIyIzGd8Rdeuconfxznt6mNI+wLiVI/9jQZTh6IHzqj1CTJtE80k?=
+ =?us-ascii?Q?2ufpLni9eFJg5b8K67s67KfT06PW9qlnAB/ujDOqGir8pnX58gFo8N88Qsm7?=
+ =?us-ascii?Q?448IIht3jvg+fRvD89xiy/KI1IDmyG3BJ06eKb2wc9P5Q96ooW19sgOfJC0+?=
+ =?us-ascii?Q?Iusv1ULv64YOqBzsuwi9mmRR0M7roaS+OLwklI7IW9ijSAAAaJMbLhYeO+Ci?=
+ =?us-ascii?Q?kabm5os5s1+SYZCPOKk267e8GeENStYw8C+ZiPEZEqKGFp2QjzDOGjrMS0kP?=
+ =?us-ascii?Q?ytnnOr8ce4GlO2Uqcdlq+MA9VkRzPPzyoF5ASZQb4H/Z7CKuPu28ezWO9qeJ?=
+ =?us-ascii?Q?Wbof0FqFNRu8eG8ehZ8m3CMzf/c/raNo7ayUipQ2QHhoVHH995EZo8nBiUnB?=
+ =?us-ascii?Q?3t0Si+d1i0HjpTCmDaE01isRfRGincVEsfb1Oc8Iq0M5yLDOLRquHRN6IQlm?=
+ =?us-ascii?Q?qdiJ1DRnM06qKfknuvvzmuFQ9w5U+vQNh7nL0EvP7Aw0UThnFd+z8CADhkPV?=
+ =?us-ascii?Q?xiH1KneSEaFVPi3xSiCjp/HO+37uwudxm/jDF69OrgqSPDRKhoKSUjVbmM4s?=
+ =?us-ascii?Q?JwTtwFJNC8j8ckDlHYMPaLruBNv7tGj06v5QzUnkr+YVpBPLgFSDGaP24i2N?=
+ =?us-ascii?Q?SlJUD2kouw3aqjAjC1pZwyOdDV9dvMZ8k+/ycMkZcuqFLmJb494Zd3qZ/E2h?=
+ =?us-ascii?Q?BIgNS4z+iWncUIRsMtlqNv4UkgDE8zQjFH/a7PS/YfnujDzGIZ1hD/ygKh5X?=
+ =?us-ascii?Q?nn7HP2k3CyfPaamb6yRUxH5xSDg3+MsZsZBGwzlPJT3DWpQgiTbXoSM3r9et?=
+ =?us-ascii?Q?+8w1hxJOKYWwcHmsSG1vJbSfkw07WcbV9UmMqAWGBwhIkEz+HADi4HCVal1m?=
+ =?us-ascii?Q?dvrz3GmqiMCKIUZ86Nd3Wdfgf2Sphya3ZsufAd4TaYLO1mjL1dQ7c8VTXPMV?=
+ =?us-ascii?Q?o5d0UEuYRc8rEmWB7frMItxG4FdmORHEm140EYVNKj/JQLY8A3xQ3k6KTqsd?=
+ =?us-ascii?Q?Sl43lQT4+P6cOxZ5J6vQP25dpCeqgNi6o8yIKqupdgTzzRwxUQ+f9HngdmhF?=
+ =?us-ascii?Q?AXrQJeOupUTvBYtz5BgjMBir6iZxeBDEbJqeVC3CN1RL2XA2D0FrYhNljeGd?=
+ =?us-ascii?Q?xOQKGacceRLXv1pFda2NEAkTqBavnhlpQhV9vNSQQzEECLMuIw=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5144.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?AoFwvbDFz84yJ/hVEG0HibiD2DrDRPnUFNjeliR5MZ5e2flJRQPEEbuQkC9J?=
+ =?us-ascii?Q?wKEVWuvrsqoC0e9aJuuA9DY/bG1QTtJs9EQC4NDeb3LmtssYYxEeE+rFiq6V?=
+ =?us-ascii?Q?witRKXHYxbFlhMjLQP4OKKsqT7+MGlAFvHRI0l7N7TjcpZOfTAheVL8VOvuH?=
+ =?us-ascii?Q?6ilTrUlxkJgfIIwVZN/OYB3YkYmLoYvaPqnugHoKk/0Lg587Kk4DuSdvGeeu?=
+ =?us-ascii?Q?e726Rqo3fPsT3TVdAcvka0LDg1+3sD1QKDLipmPJOSD7UqJt0oHLFUYKpBcu?=
+ =?us-ascii?Q?MdzmUzlLhai+IL/Yda41YZ5fQ/oXTHEZZ7o/iM3ZXnp0JdDu08SGPGoM3ief?=
+ =?us-ascii?Q?AOfMjLKNFLga9mmMDeWMsMU8S9nCErL4wNq9J5IOnfr9tnQaSB4rhSfcRI0Z?=
+ =?us-ascii?Q?IUkSeXIqOaHay+MCHpdydnFO+AIsx91gBLOlRuc5W+/ZfP89EL9uOXZVtEZg?=
+ =?us-ascii?Q?yph1+1GfKwWBXgT4qn1AYtFMHoacGi5aUAoDV0nJt0kzD914iDvhT/+4OahX?=
+ =?us-ascii?Q?gtaNPiPOx/4mUARHlAaBq3FmgQOBrev0iwCwXAaEBkYAA6Db/486uaLYDkuK?=
+ =?us-ascii?Q?n9lS/uj9KZ+ORGAYAjzgrjBxlQIRp/pG+JQS7LZr9SW3S+UKhQ+RDUlQS58h?=
+ =?us-ascii?Q?Qg3gcYx+qJjGWOXBmHyIQU+inMjvTmBtLotlfu66gPFMY/RsDHGz+C6J69F8?=
+ =?us-ascii?Q?0NTgio0sAmavcwhYmoU1Btww6hk3NTc6QcOg8jJuuZ/XduFnG27n6BLJrZZp?=
+ =?us-ascii?Q?GNewApnBzx7l2igYq83nst2YvUoOtlNm5KZEU23EA5Ricx9xm+7XifT+H8P5?=
+ =?us-ascii?Q?EIIcKudYARSBk8Q/zoUHjOoMZ4bRSDinHx8qNrVfdEAEsc72Z1a8p0sKjrYg?=
+ =?us-ascii?Q?D2p+661Jpnv6Ger7+zzG6n1sNSy12S/JMWq6tH6z6H+cd9iZgO9hSKIHsIGl?=
+ =?us-ascii?Q?P0xGkmQW92XuMeUnjysvNnm8CS8wWQfBoH+jIAXlmwxW+Pc2puqewBV243Kp?=
+ =?us-ascii?Q?9wcZQ0JQfh3++Oo0s0j1idiRmnDg7t0zzjWviyz/lNnxyf1Qbe9gQHs7DQSj?=
+ =?us-ascii?Q?/O8CNyH3xZNDbKLU8aGzxEhaFVkydKW6VTM9h0qNOz9g+QLSUZx1AsYXM6+4?=
+ =?us-ascii?Q?pw2AKx2ZR0rReySE1b31Qkqc9Fek5IOaflKHxikhrJKaASydKmU9ClvrnHO0?=
+ =?us-ascii?Q?PJu9Uep532Tm6UwKbajz3cNDUhm+IDKs2h4u9wXNEKRGq2I42NXamU/wnV3o?=
+ =?us-ascii?Q?AHrx1od7hiNFyl5OHxSjCIT+MMABl8yuHmYDiJLO/M7RD2/5/ehK/LF8M50n?=
+ =?us-ascii?Q?7wcBsbvih66e7ekOwDJj5C30C7mgNXpk9yRBgnD1fa8r4W72NervvWKIS2+l?=
+ =?us-ascii?Q?a9O3ckKuj9WhoRLWT8sEjnq0qmlBs15VFpXNxF9rgaaoFKc9p3qdyLearb7k?=
+ =?us-ascii?Q?6ytdtmf9HZvL5nOz7IdZu1ClvqRhZpjjZ2RAVhhnPYYZDzA/k3aFS+FttnK+?=
+ =?us-ascii?Q?CEgrxmrZXyhoeQp+lsbdYsNrp+jL8Yzx8418lpCsLAMUZd3LwknaJXJBMXgF?=
+ =?us-ascii?Q?q7PLxOnwwLzgRewFkxvNcB9dWXEPArxk+fSrvFuxXBa/t0ElRmakwqXpyixa?=
+ =?us-ascii?Q?Hw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Linux)
-Subject: Re: [PATCH iproute2] iplink: fix fd leak when playing with netns
-To: nicolas.dichtel@6wind.com, Stephen Hemminger <stephen@networkplumber.org>
-Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org
-References: <20240917065158.2828026-1-nicolas.dichtel@6wind.com>
- <20240917081102.4c00792f@hermes.local>
- <bfe6f4f8-b7a3-4ea1-886b-9929c7bf366f@6wind.com>
-Content-Language: fr, en-US
-Organization: Orange
-In-Reply-To: <bfe6f4f8-b7a3-4ea1-886b-9929c7bf366f@6wind.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5144.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea754535-19a9-4988-7778-08dcd74c68c3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Sep 2024 19:10:35.4321
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: lmwsWZGjmKRhOlGe5fFZnGcVH1+7NgrkTTpro+mxnM6ln/blyJ/0OMDN2G+jeSVkRsfqaRxEBlkwgsHSWdwko1DyzFWtFYMeU88B6MK/S2Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR11MB4570
+X-OriginatorOrg: intel.com
 
-On 17/09/2024 17:17, Nicolas Dichtel wrote:
-> Le 17/09/2024 =C3=A0 17:11, Stephen Hemminger a =C3=A9crit=C2=A0:
->> On Tue, 17 Sep 2024 08:51:58 +0200
->> Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
->>=20
->>> The command 'ip link set foo netns mynetns' opens a file descriptor t=
-o fill
->>> the netlink attribute IFLA_NET_NS_FD. This file descriptor is never c=
-losed.
->>> When batch mode is used, the number of file descriptor may grow great=
-ly and
->>> reach the maximum file descriptor number that can be opened.
->>>
->>> This fd can be closed only after the netlink answer. Let's pass a new=
-
->>> argument to iplink_parse() to remember this fd and close it.
->>>
->>> Fixes: 0dc34c7713bb ("iproute2: Add processless network namespace sup=
-port")
->>> Reported-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
->>> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
->>> Tested-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
->>> ---
->>=20
->> Maybe netns_fd should be a global variable rather than having to pass
->> to change all the unrelated function calls.
-> I hesitated with this option. I don't have any strong opinion on this.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of H=
+ongbo
+> Li
+> Sent: Monday, September 2, 2024 6:14 AM
+> To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>
+> Cc: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; edumazet@google.c=
+om;
+> intel-wired-lan@lists.osuosl.org; lihongbo22@huawei.com; netdev@vger.kern=
+el.org;
+> kuba@kernel.org; pabeni@redhat.com; davem@davemloft.net
+> Subject: [Intel-wired-lan] [PATCH net-next] ice: Make use of assign_bit()=
+ API
 >=20
-> Note that two variables are needed, because the link_util->parse_opt ma=
-y call
-> again iplink_parse().
+> We have for some time the assign_bit() API to replace open coded
 >=20
-> Another note that I forgot to mention: I didn't fix devlink which has t=
-he same
-> problem. I was waiting for the conclusion of this fix first.
+>     if (foo)
+>             set_bit(n, bar);
+>     else
+>             clear_bit(n, bar);
+>=20
+> Use this API to clean the code. No functional change intended.
+>=20
+> Signed-off-by: Hongbo Li <lihongbo22@huawei.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_main.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>=20
 
-Another option would be to append "cleanup tasks" (a function pointer and=
- a
-single arg) to a global linked list; and call the chain at the end of the=
-
-execution of each single batch command. This allows for as many fds as ar=
-e
-needed, and other cleanups as well.
-
-My $.02 ;)
+Tested-by: George Kuruvinakunnel <george.kuruvinakunnel@intel.com>
 
