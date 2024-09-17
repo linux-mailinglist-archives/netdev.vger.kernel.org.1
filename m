@@ -1,177 +1,168 @@
-Return-Path: <netdev+bounces-128660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92EA197ABE3
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 09:14:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C646997AC30
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 09:34:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56FD728C960
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 07:14:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46EA91F25693
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 07:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF04A1494C2;
-	Tue, 17 Sep 2024 07:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB47165EE2;
+	Tue, 17 Sep 2024 07:32:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="sahROmNx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MS6EJ24y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35A33E47B
-	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 07:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B33A16193C;
+	Tue, 17 Sep 2024 07:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726557295; cv=none; b=OKln3ZWZQxc6oODGTPpLkl8pPUvtF8ILzYQ2/UuAq7knb6tZF8WsXsoH4UCso6iGZKddd63Q3YfZ1jZiiA8Kcgymknd6J9qkKnt4rabmUEzgqA6vIPJiIVaBN7JP8pWiFtAW2JVMbEW3waQIjfGaJYcjRTmu5GxzTkX1mXpjDjo=
+	t=1726558343; cv=none; b=SgZluajj2APtTop52b7qo3DSuSLkiA3jUMYI78/TKCDIKbupYiu6TLGKBH1Q+Z2p7EWwdz0mVRpdhS29nWIpNoza5nYLZyItGErZcCXteCj6TXtawDnh+CDDdEcKwpGIjEkbO381Fut5r10etBMWUddiwXwD8TDega+fqpDLwd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726557295; c=relaxed/simple;
-	bh=XZkdS4sglS03WS7qFAlqRer07G+wd0agSmv2vWg0pEs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jRW/6k/p141pQ8UnUaLtIp6MkqTV/M7DwN1HlO9gJ3Jo0sEEgKywRCStqg2Tq7ZUH1+vC1XCwXNjfj5qu+XnP8b92pm3SiQdNvHOx5zUyyaNzJV2eFtPOn14BWAEcZPqGgHdxXxrldnpp4vB4vzPncom9hqwrjduieiqYm4wpec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=sahROmNx; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a8d0d82e76aso878987366b.3
-        for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 00:14:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1726557292; x=1727162092; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2IV5aTo5kvdtk0fRESSTVce5a8XDqbnMuhig/5mCEvc=;
-        b=sahROmNx/xt6QdMJ35q6Lmpju+G7WKngCwoXSIitxRFZMQqcE7xF9VNOvR2OVfx8y1
-         tdBIr1+LcvXWFz3ne2jk7e6Hznl2mLHxh9rVs99Zb6CGhRlBoJurpIc/F5ad9Sd9+MvR
-         +exHJ7iNh/MQ7GdTrdsLbD5i+i1KNk1CVwhZpZy8h8wwfqglimVRhEQ/n6BY1YGn/Znh
-         KOYkS3fen0+MGBLhNP8fX7e5Ua5HfJXsPIw8JC2gvX/I23pXInnc/SyLGUkovZGzLi+B
-         oyIyiWorkGQOsEithqc9yjA+BnqvyUfcra03x71vdhHsRJaFL7R7AZuOEBEWAjoFFzff
-         EClQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726557292; x=1727162092;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2IV5aTo5kvdtk0fRESSTVce5a8XDqbnMuhig/5mCEvc=;
-        b=AeI0Cy8teVgDwzQlXPRhIEB3RzwKJRael43Yg0zlKPFbM/20VduQIgPzaJuHjFLBX1
-         rJ/6X8Ajp32tkMxQszpa9szLMdzxR/yZRryPBB5biPuyFw19SjcKf4JH4W5XRDLKcn7u
-         E3BWRAUHkLH3uQXJpOppi1arkyarrc7l0GOS8xMdtG7eVNxYrJyXjsyqcv7FMgS/MTM8
-         bGng0qgu0voKzhU5qrb52B5frjMKc/oq94M6HtC/b6R7p0LUzQWSjd4Wh6BBjGrt/EuY
-         UXOsecoaKItqEx99PNxH3eR9HwgEpQDkI1CcQBwTZmoJ7j1LkWpm6jpltV4eIgiSdlKI
-         NiYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXXyjfaSfS3iHEMn5eeIlUiMGSMfFxLru/n4ChWIVpDFSOtfEgtz90C8rRhebRrKZYGlim2A0c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx2tSmgvsOGR+WSH18lqL2DnPF33p2mWoIC+fKkDfrK4xWlrXLU
-	kr0/Tq24CjSVk8w9s2s9TazB0eIn47s31itLyg89iIu0LCcGSDv2mj2qe+31rKO1GbukhOx5hX3
-	9
-X-Google-Smtp-Source: AGHT+IGBsf/rOxMDH3CzdmsY7IaraXAMa6zukbA6KH9fLPxjOJlX9gVT+ac9GHFPhiOql64k7bJEIA==
-X-Received: by 2002:a17:906:f5a7:b0:a86:a56a:3596 with SMTP id a640c23a62f3a-a9029678cbemr2016921066b.60.1726557292151;
-        Tue, 17 Sep 2024 00:14:52 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90610966aasm408733866b.26.2024.09.17.00.14.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Sep 2024 00:14:51 -0700 (PDT)
-Message-ID: <2609348a-a70f-4dba-853f-e5163c99e1a8@blackwall.org>
-Date: Tue, 17 Sep 2024 10:14:50 +0300
+	s=arc-20240116; t=1726558343; c=relaxed/simple;
+	bh=7Hwfh6nn+H/Twj0M/m3ZP/p1nsY1WaGzgv9vCVQ8AIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h5TL49fk3f+9eiFuj+tTSVvsccQ3Dd14P70IXFfjQoMDMPkFjdA+UcEiaHRBjiG1bd10NxWeI7PLNhebHrfKuk0t60qigB0TRy1i8/qI1p9ow9GoU0HY/l3QlaW8B0QXLK1lEp2jcoDHByAuQde4HVNh1uDA3p1qJc0JEJ1pzg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MS6EJ24y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3611C4CEC7;
+	Tue, 17 Sep 2024 07:32:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726558342;
+	bh=7Hwfh6nn+H/Twj0M/m3ZP/p1nsY1WaGzgv9vCVQ8AIU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MS6EJ24yFiZUzotIPLx2ItHcWVuE6SmgpHu5EHKBoZvZvmH97MgabzDFD4vhlOrVh
+	 oUtjNODTpOUma8LbNsu1ThwciMEyjwW8tRLuu8HsYhIg+s/qKAPuf47iPC5j46efAG
+	 7JXCU8FO8USMPYmwqGUBGKY76TnIpPcJ5/rEKqCvDaj2tBxDFc3gWEzzynRv28oRjN
+	 DQihrB5caChEERV5git0IROmNZ/2ryT+JT9NQEXnn5u5uHnw4nRcwBjjqU606Q8ECU
+	 bcihVHkRbYlt3kVR5Eo9jaX9GgQBcsOqSNrdfFhmQFXjF4eWdNqfxh00jNJKSGTQxY
+	 fYl1THonV9hUw==
+Date: Tue, 17 Sep 2024 08:32:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, bagasdotme@gmail.com,
+	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
+	jing2.liu@intel.com
+Subject: Re: [PATCH V5 2/5] PCI/TPH: Add Steering Tag support
+Message-ID: <20240917073215.GH167971@kernel.org>
+References: <20240916205103.3882081-1-wei.huang2@amd.com>
+ <20240916205103.3882081-3-wei.huang2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] bondig: Add bond_xdp_check for bond_xdp_xmit in
- bond_main.c
-To: =?UTF-8?B?6rmA7KeA7JuQ?= <jiwonaid0@gmail.com>
-Cc: jv@jvosburgh.net, andy@greyhouse.net, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- joamaki@gmail.com, netdev@vger.kernel.org, bpf@vger.kernel.org,
- syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
-References: <20240916055011.16655-1-jiwonaid0@gmail.com>
- <05707e9e-08ac-4ee1-b910-883f8b4b2636@blackwall.org>
- <CAKaoOqc4PMobrxo-Sz5-1RTG-Qkf+GjDnqyp0zbEUmyDtFu5Zw@mail.gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <CAKaoOqc4PMobrxo-Sz5-1RTG-Qkf+GjDnqyp0zbEUmyDtFu5Zw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240916205103.3882081-3-wei.huang2@amd.com>
 
-On 17/09/2024 07:26, 김지원 wrote:
-> On Mon, Sep 16, 2024 at 5:48 PM Nikolay Aleksandrov <razor@blackwall.org> wrote:
->>
->> On 16/09/2024 08:50, Jiwon Kim wrote:
->>> Add bond_xdp_check to ensure the bond interface is in a valid state.
->>>
->>> syzbot reported WARNING in bond_xdp_get_xmit_slave.
->>> In bond_xdp_get_xmit_slave, the comment says
->>> /* Should never happen. Mode guarded by bond_xdp_check() */.
->>> However, it does not check the status when entering bond_xdp_xmit.
->>>
->>> Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
->>> Closes: https://syzkaller.appspot.com/bug?extid=c187823a52ed505b2257
->>> Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
->>> Signed-off-by: Jiwon Kim <jiwonaid0@gmail.com>
->>> ---
->>>  drivers/net/bonding/bond_main.c | 33 ++++++++++++++++++---------------
->>>  1 file changed, 18 insertions(+), 15 deletions(-)
->>>
->>
->> How did you figure the problem is there? Did you take any time to actually
->> understand it? This patch doesn't fix anything, the warning can be easily
->> triggered with it. The actual fix is to remove that WARN_ON() altogether
->> and downgrade the netdev_err() to a ratelimited version. The reason is that
->> we can always get to a state where at least 1 bond device has xdp program
->> installed which increases bpf_master_redirect_enabled_key and another bond
->> device which uses xdpgeneric, then install an ebpf program that simply
->> returns ACT_TX on xdpgeneric bond's slave and voila - you get the warning.
->>
->> setup is[1]:
->>  $ ip l add veth0 type veth peer veth1
->>  $ ip l add veth3 type veth peer veth4
->>  $ ip l add bond0 type bond mode 6 # <- transmit-alb mode, unsupported by xdp
->>  $ ip l add bond1 type bond # <- rr mode by default, supported by xdp
->>  $ ip l set veth0 master bond1
->>  $ ip l set bond1 up
->>  $ ip l set dev bond1 xdpdrv object tx_xdp.o section xdp_tx # <- we need xdpdrv program to increase the static key, more below
->>  $ ip l set veth3 master bond0
->>  $ ip l set bond0 up
->>  $ ip l set veth4 up
->>  $ ip l set veth3 xdpgeneric object tx_xdp.o section xdp_tx # <- now we'll hit the codepath we need after veth3 Rx's a packet
->>
->>
->> If you take the time to look at the call stack and the actual code, you'll
->> see it goes something like (for the xdpgeneric bond slave, veth3):
->> ...
->> bpf_prog_run_generic_xdp() for veth3
->>  -> bpf_prog_run_xdp()
->>    -> __bpf_prog_run() # return ACT_TX
->>      -> xdp_master_redirect() # called because we have ACT_TX && netif_is_bond_slave(xdp->rxq->dev)
->>        -> master->netdev_ops->ndo_xdp_get_xmit_slave(master, xdp); # and here we go, WARN_ON()
->>
->> I've had a patch for awhile now about this and have taken the time to look into it.
->> I guess it's time to dust it off and send it out for review. :)
->>
->> Thanks,
->>  Nik
+On Mon, Sep 16, 2024 at 03:51:00PM -0500, Wei Huang wrote:
+> pcie_tph_get_cpu_st() is added to allow a caller to retrieve Steering Tags
+> for a target memory that is associated with a specific CPU. The ST tag is
+> retrieved by invoking ACPI _DSM of the device's Root Port device.
 > 
-> Hi Nikolay,
+> pcie_tph_set_st_entry() is added to support updating the device's Steering
+> Tags. The tags will be written into the device's MSI-X table or the ST
+> table located in the TPH Extended Capability space.
 > 
-> Thank you for taking the time to provide a detailed setup and call
-> stack analysis.
-> Would you be handling the new patch? If you don't mind, may I revise
-> this patch to
-> 
-> - Replace with net_ratelimit()
-> - Remove the WARN_ON()
-> - Update the comment appropriately
-> 
-> Thanks again for your insights and patience.
-> 
-> Sincerely,
-> 
-> Jiwon Kim
+> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
+> Signed-off-by: Wei Huang <wei.huang2@amd.com>
+> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
+> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
+> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 
-sure, I don't mind, change the patch and I'll review the new one
+...
 
-Cheers,
- Nik
+> @@ -45,6 +201,163 @@ static u8 get_rp_completer_type(struct pci_dev *pdev)
+>  	return FIELD_GET(PCI_EXP_DEVCAP2_TPH_COMP_MASK, reg);
+>  }
+>  
+> +/* Write ST to MSI-X vector control reg - Return 0 if OK, otherwise -errno */
+> +static int write_tag_to_msix(struct pci_dev *pdev, int msix_idx, u16 tag)
+> +{
+> +	struct msi_desc *msi_desc = NULL;
+> +	void __iomem *vec_ctrl;
+> +	u32 val, mask;
+> +	int err = 0;
+> +
+> +	msi_lock_descs(&pdev->dev);
+> +
+> +	/* Find the msi_desc entry with matching msix_idx */
+> +	msi_for_each_desc(msi_desc, &pdev->dev, MSI_DESC_ASSOCIATED) {
+> +		if (msi_desc->msi_index == msix_idx)
+> +			break;
+> +	}
+> +
+> +	if (!msi_desc) {
+> +		err = -ENXIO;
+> +		goto err_out;
+> +	}
+> +
+> +	/* Get the vector control register (offset 0xc) pointed by msix_idx */
+> +	vec_ctrl = pdev->msix_base + msix_idx * PCI_MSIX_ENTRY_SIZE;
+> +	vec_ctrl += PCI_MSIX_ENTRY_VECTOR_CTRL;
+> +
+> +	val = readl(vec_ctrl);
+> +	mask = PCI_MSIX_ENTRY_CTRL_ST_LOWER | PCI_MSIX_ENTRY_CTRL_ST_UPPER;
+> +	val &= ~mask;
+> +	val |= FIELD_PREP(mask, (u32)tag);
 
+Hi Wei Huang,
+
+Unfortunately clang-18 (x86_64, allmodconfig, W=1, when applied to net-next)
+complains about this.  I think it is because it expects FIELD_PREP to be
+used with a mask that is a built-in constant.
+
+drivers/pci/pcie/tph.c:232:9: warning: result of comparison of constant 18446744073709551615 with expression of type 'typeof (_Generic((mask), char: (unsigned char)0, unsigned char: (unsigned char)0, signed char: (unsigned char)0, unsigned short: (unsigned short)0, short: (unsigned short)0, unsigned int: (unsigned int)0, int: (unsigned int)0, unsigned long: (unsigned long)0, long: (unsigned long)0, unsigned long long: (unsigned long long)0, long long: (unsigned long long)0, default: (mask)))' (aka 'unsigned int') is always false [-Wtautological-constant-out-of-range-compare]
+  232 |         val |= FIELD_PREP(mask, (u32)tag);
+      |                ^~~~~~~~~~~~~~~~~~~~~~~~~~
+./include/linux/bitfield.h:115:3: note: expanded from macro 'FIELD_PREP'
+  115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./include/linux/bitfield.h:72:53: note: expanded from macro '__BF_FIELD_CHECK'
+   72 |                 BUILD_BUG_ON_MSG(__bf_cast_unsigned(_mask, _mask) >     \
+      |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
+   73 |                                  __bf_cast_unsigned(_reg, ~0ull),       \
+      |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   74 |                                  _pfx "type of reg too small for mask"); \
+      |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+./include/linux/build_bug.h:39:58: note: expanded from macro 'BUILD_BUG_ON_MSG'
+   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+      |                                     ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
+././include/linux/compiler_types.h:510:22: note: expanded from macro 'compiletime_assert'
+  510 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+      |         ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+././include/linux/compiler_types.h:498:23: note: expanded from macro '_compiletime_assert'
+  498 |         __compiletime_assert(condition, msg, prefix, suffix)
+      |         ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+././include/linux/compiler_types.h:490:9: note: expanded from macro '__compiletime_assert'
+  490 |                 if (!(condition))                                       \
+      |                       ^~~~~~~~~
+1 warning generated.
+
+> +	writel(val, vec_ctrl);
+> +
+> +	/* Read back to flush the update */
+> +	val = readl(vec_ctrl);
+> +
+> +err_out:
+> +	msi_unlock_descs(&pdev->dev);
+> +	return err;
+> +}
+
+...
 
