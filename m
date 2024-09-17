@@ -1,154 +1,130 @@
-Return-Path: <netdev+bounces-128652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8A6297AAF8
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 07:22:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C09DF97AB4D
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 08:14:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 282351C22DA6
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 05:22:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43664B243CF
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 06:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69301292CE;
-	Tue, 17 Sep 2024 05:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ADC94594D;
+	Tue, 17 Sep 2024 06:14:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="uE7YHFnc"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="zboyY7Q8"
 X-Original-To: netdev@vger.kernel.org
-Received: from msa.smtpout.orange.fr (smtp-68.smtpout.orange.fr [80.12.242.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F14D4D8CB
-	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 05:22:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B131B5AA;
+	Tue, 17 Sep 2024 06:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726550538; cv=none; b=UACrIM25Cad1IQE8OPqhAqx/0HYnztMl4Ver/olQmUk7ExJICASs0Ie7gMxhG/si0O/OepSF7ZBIr2dNZGv+dJfLb1XPCebfqFN+Y5FNW6jhCoVWlTccyNgGqQU/T1c1iJvaN9tsJ7iYg8w1oyDHTY/DHGZJ3o2mxE1/VEt5ndU=
+	t=1726553645; cv=none; b=cBIzmzMSGccP7pXD0HjoqE60QmlRA0fKZV8YSfomBbSVfL16pI9Q181TobYd5Me5y17FBFRXhcGu4Zb/m499fv5bPJav8gepgFTJt3YaLOa2kr23N/aZVCV7LU7v2NWM/oAhyU0j+4B2T0D3xVZKr14NZuSkS4TiyfAI4klQix0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726550538; c=relaxed/simple;
-	bh=FROrw0IXlzItQSfhHRHUvjIOTBu4ABMZqIMKJtQffAE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=BtadYQCUYOYGqWlTYn9BGxpKuog4ezH7ZAgJuJ+6FRpzumlmM1FKQCyXilUmlr6HgthRiUZwcOEdRBvtWvk242+7isv8VYBkja4FzH8hv5Xf1tFyY+8uTZej6QKkZbxbG6ELCrR725UsnlaOd/Bxlg1vwmr2ZEXrGkJzAslsGq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=uE7YHFnc; arc=none smtp.client-ip=80.12.242.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id qQf2sEuii3ZMyqQf2s4PfP; Tue, 17 Sep 2024 07:22:08 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1726550528;
-	bh=ox/BUEVjGvecYqicoCV10v4Q9kXMIsRKDm9TgbacwPA=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To;
-	b=uE7YHFncSbIkns75ceMLvKBWR2lLESwDluJGLQhQBCQV5lrcOaRwCaTNTSOfcQpVq
-	 HJm+j7e1uOEsx+GUZ7TkF+WOOqssb6mQ20ALFlGIaRf9KYFvSjIxmC0ctChK9RKjkP
-	 VHegYqJfxnmpTt+hhya69OXSYxRcdh4NY3Nx4ludydVSWdFFHnCuY48Vq5d4BGuFHH
-	 iIBCrqPhkEWoNiBUDqoomBPmojMFvpSGzksiXevYTJzesiUhHvUmNIIDj1if0WR1dK
-	 bCJHsDM4ZJQSKYDiq97zSpNKRY9B+XwVjxgT8qhAE/jWfxA728uT22uHSOZu+Yfgmr
-	 KFRvY0tmnJyeg==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Tue, 17 Sep 2024 07:22:08 +0200
-X-ME-IP: 90.11.132.44
-Message-ID: <6cbedd50-c2d5-4ad7-8133-774eebd9d2f1@wanadoo.fr>
-Date: Tue, 17 Sep 2024 07:22:00 +0200
+	s=arc-20240116; t=1726553645; c=relaxed/simple;
+	bh=1UhkNKfUndxWsU+go6ytaT8csVNZ5E84V18UPAAE3r0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F95BDNvrSsWoRXeGYc2AXNFqgBvnanG975Xqjho3eEODASGtjmoPWxFEAls2xL5EkE78UYCFSQjho6VRXJ3rzmcJXxHUTR85P168S78CJfvIjg1xDvzEkWojmbiotuF+ZS9l5fMDBwwH99IjP8/1v/Td78nOIJLmlnj/OVV6wUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=zboyY7Q8; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1726553643; x=1758089643;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1UhkNKfUndxWsU+go6ytaT8csVNZ5E84V18UPAAE3r0=;
+  b=zboyY7Q8rVCYev39XGHs3n9oFsJ26bCQjaLy6NcCzlun22bY3BZNNnsm
+   DF5NxnzXbXEVWC5s/NW0/ZeS62Cs2Rfnx/Qh2Muin6IkMUVguVAQ6WB/8
+   qsGkAwvRVxwenhkPZllOohF0aP2NAeTTYYpMT0jFVAgAgLxgKuJiw0XbO
+   sbSbFbAxY0UhtIXcsWlo7ZulGzlFnD3teIfZW9KiAmooOX1OiL2igmLTG
+   OUYYkgVeSYvJMG/fG112jXsdjFnkxOoHERZ5Me0xRiqqmdQ3fRDUxyseJ
+   6C/G16g8zRKllcimin4p19ugzu8ujiiMNWzW0rY5KiyU4+cETz0Ze7W2y
+   g==;
+X-CSE-ConnectionGUID: s7NP2PV/RvGiT0Z8I2cSNg==
+X-CSE-MsgGUID: 699qZaIpR3OgmeWprxqujA==
+X-IronPort-AV: E=Sophos;i="6.10,234,1719903600"; 
+   d="scan'208";a="262873114"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Sep 2024 23:14:02 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 16 Sep 2024 23:13:41 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Mon, 16 Sep 2024 23:13:41 -0700
+Date: Tue, 17 Sep 2024 08:13:05 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Aakash Menon <aakash.r.menon@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <lars.povlsen@microchip.com>,
+	<Steen.Hegelund@microchip.com>, <daniel.machon@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <aakash.menon@protempis.com>,
+	<horms@kernel.org>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v2] net: sparx5: Fix invalid timestamps
+Message-ID: <20240917061305.47x26cdfv3fr7rzh@DEN-DL-M31836.microchip.com>
+References: <20240917051829.7235-1-aakash.menon@protempis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [PATCH v2 00/15] timers: Cleanup delay/sleep related mess
-To: Anna-Maria Behnsen <anna-maria@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- Andrew Morton <akpm@linux-foundation.org>, damon@lists.linux.dev,
- linux-mm@kvack.org, SeongJae Park <sj@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Andy Whitcroft <apw@canonical.com>,
- Joe Perches <joe@perches.com>, Dwaipayan Ray <dwaipayanray1@gmail.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, netdev@vger.kernel.org,
- linux-sound@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>,
- Nathan Lynch <nathanl@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
- Mauro Carvalho Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org,
- Frederic Weisbecker <frederic@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Jonathan Corbet <corbet@lwn.net>
-References: <20240911-devel-anna-maria-b4-timers-flseep-v2-0-b0d3f33ccfe0@linutronix.de>
- <c794b4a6-468d-4552-a6d6-8185f49339d3@wanadoo.fr>
-Content-Language: en-US, fr-FR
-In-Reply-To: <c794b4a6-468d-4552-a6d6-8185f49339d3@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20240917051829.7235-1-aakash.menon@protempis.com>
 
+The 09/16/2024 22:18, Aakash Menon wrote:
+> 
+> Bit 270-271 are occasionally unexpectedly set by the hardware. This issue
+> was observed with 10G SFPs causing huge time errors (> 30ms) in PTP. Only
+> 30 bits are needed for the nanosecond part of the timestamp, clear 2 most
+> significant bits before extracting timestamp from the internal frame
+> header.
 
+Thanks for changes. I think it look good.
+Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 
-Le 16/09/2024 à 22:20, Christophe JAILLET a écrit :
-> Le 11/09/2024 à 07:13, Anna-Maria Behnsen a écrit :
->> Hi,
->>
->> a question about which sleeping function should be used in 
->> acpi_os_sleep()
->> started a discussion and examination about the existing documentation and
->> implementation of functions which insert a sleep/delay.
->>
->> The result of the discussion was, that the documentation is outdated and
->> the implemented fsleep() reflects the outdated documentation but doesn't
->> help to reflect reality which in turns leads to the queue which covers 
->> the
->> following things:
->>
->> - Split out all timeout and sleep related functions from hrtimer.c and 
->> timer.c
->>    into a separate file
->>
->> - Update function descriptions of sleep related functions
->>
->> - Change fsleep() to reflect reality
->>
->> - Rework all comments or users which obviously rely on the outdated
->>    documentation as they reference "Documentation/timers/timers- 
->> howto.rst"
->>
->> - Last but not least (as there are no more references): Update the 
->> outdated
->>    documentation and move it into a file with a self explaining file name
->>
->> The queue is available here and applies on top of tip/timers/core:
->>
->>    git://git.kernel.org/pub/scm/linux/kernel/git/anna-maria/linux- 
->> devel.git timers/misc
->>
->> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
 > 
-> Hi,
+> Fixes: 70dfe25cd866 ("net: sparx5: Update extraction/injection for timestamping")
+> Signed-off-by: Aakash Menon <aakash.menon@protempis.com>
+> ---
+> v2:
+> - Wrap patch descriptions at 75 characters wide.
+> - Use GENMASK(5,0) instead of masking with 0x3F
+> - Update Fixes tag to be on the same line
+> - Link to v1 -https://lore.kernel.org/r/20240913193357.21899-1-aakash.menon@protempis.com
+> drivers/net/ethernet/microchip/sparx5/sparx5_packet.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> not directly related to your serie, but some time ago I sent a patch to 
-> micro-optimize Optimize usleep_range(). (See [1])
+> diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+> index f3f5fb420468..70427643f777 100644
+> --- a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+> +++ b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+> @@ -45,8 +45,12 @@ void sparx5_ifh_parse(u32 *ifh, struct frame_info *info)
+>         fwd = (fwd >> 5);
+>         info->src_port = FIELD_GET(GENMASK(7, 1), fwd);
 > 
-> The idea is that the 2 parameters of usleep_range() are usually 
-> constants and some code reordering could easily let the compiler compute 
-> a few things at compilation time.
-> 
-> There was consensus on the value of the change (see [2]), but as you are 
-
-Typo: there was *no* consensus...
-
-> touching things here, maybe it makes sense now to save a few cycles at 
-> runtime and a few bytes of code?
-> 
-> CJ
-> 
-> [1]: https://lore.kernel.org/all/ 
-> f0361b83a0a0b549f8ec5ab8134905001a6f2509.1659126514.git.christophe.jaillet@wanadoo.fr/
-> 
-> [2]: https://lore.kernel.org/ 
-> all/03c2bbe795fe4ddcab66eb852bae3715@AcuMS.aculab.com/
-> 
-> 
-> 
+> +       /*
+> +        * Bit 270-271 are occasionally unexpectedly set by the hardware,
+> +        * clear bits before extracting timestamp
+> +        */
+>         info->timestamp =
+> -               ((u64)xtr_hdr[2] << 24) |
+> +               ((u64)(xtr_hdr[2] & GENMASK(5, 0)) << 24) |
+>                 ((u64)xtr_hdr[3] << 16) |
+>                 ((u64)xtr_hdr[4] <<  8) |
+>                 ((u64)xtr_hdr[5] <<  0);
+> --
+> 2.46.0
 > 
 
+-- 
+/Horatiu
 
