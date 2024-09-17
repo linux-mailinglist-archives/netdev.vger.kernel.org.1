@@ -1,67 +1,76 @@
-Return-Path: <netdev+bounces-128727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D20097B2F5
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 18:25:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC11A97B30C
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 18:38:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D919BB23CE4
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:24:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0D671C2194C
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4273317A5B5;
-	Tue, 17 Sep 2024 16:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B03DC171E76;
+	Tue, 17 Sep 2024 16:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R3yUgbQt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="X2DrIT6n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBD1175D5C;
-	Tue, 17 Sep 2024 16:24:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0299B15B54F;
+	Tue, 17 Sep 2024 16:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726590291; cv=none; b=b4wv9qfeLYWcxf7OOi2kga4tQNpi7x19dcy1ayrMoMYirDH7L54xfnKA4+edRIRgV/lY7N1Lnj5wm0Qab/71S56YwUr3P6KCl731BqEvw9QgLlnJ+PGsEHmnkuho66ZGnKyHTzpdhRi7MOvHMnOnhU9jYsEZ95aksCkTGWiWGC0=
+	t=1726591133; cv=none; b=krHSxcrQ8tfF37SgB3lt6VsNJ1cAwwXTU3CMQwUOXoT4eJ76ifgdvW6PtHPuTFmDs9BwKZvWJyP0TICBq1g3hEWihCyUVUlnkGxkjnWdL72s4vfsOnzyZsAPON1D7S2vcZ548LCiXr16VlgMN1LSRlt9ctZfi5Oa6ycbnn3TRVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726590291; c=relaxed/simple;
-	bh=FSJzYyebJu6EW3JtLhOKiicsMZb4Rpff6c5JHt6r/Uc=;
+	s=arc-20240116; t=1726591133; c=relaxed/simple;
+	bh=MKHgmO+3Xifkepbel/1AoIncpVt48s/BSwXlmUgmVs8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YNAMRzAgRcaCYw1Scm+b6MYbdlddlAVz2zyUDmWJwZAIOJXNkmkDYwtSJBijlwKKRws5ts7o5jNxs/B5W8iXBZIcmhV7j241IQgkUssh95w+jooYfmNE3MCDh3Pq69Imn2v7RjuDPX/CX9mDT10KuATUi7GvF/oWhmJd1HkvArY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R3yUgbQt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6831FC4CEC5;
-	Tue, 17 Sep 2024 16:24:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726590290;
-	bh=FSJzYyebJu6EW3JtLhOKiicsMZb4Rpff6c5JHt6r/Uc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=R3yUgbQtV8tokG1/kV8PQm0MbBIf4yGJMYzMOVqL3YftanW05+prjHe//G1Pu3B9d
-	 bDcevZBzWinn4BdwWbpwDmt2ipSyNaM5+a/ZojefTgf1tKpFIRRLHDS2KMnaPHNxPg
-	 stRxN03aOiXPGDwijZuM2+wRNTi20wk4teUNIMSFKGntJBbMshkDG1utS2XDCivZU0
-	 iafMUy3dIE5przpHhFh5p/e4kJoYGGZkKOgOGJIlCWsLdZ0MmBcLg/2QokpFGHendm
-	 1B91XwDCuvTlYWhhgWMRAX0GRvLVZHY+ZAVjAg6id5VhPleH0Q78wxWcQtPdApgI2l
-	 /FGI00YRFKXJQ==
-Date: Tue, 17 Sep 2024 17:24:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, bagasdotme@gmail.com,
-	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
-	jing2.liu@intel.com
-Subject: Re: [PATCH V5 2/5] PCI/TPH: Add Steering Tag support
-Message-ID: <20240917162443.GQ167971@kernel.org>
-References: <20240916205103.3882081-1-wei.huang2@amd.com>
- <20240916205103.3882081-3-wei.huang2@amd.com>
- <20240917073215.GH167971@kernel.org>
- <6efc219d-29e1-4169-8393-c7e4610347cc@amd.com>
- <20240917161410.GP167971@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=S83JgGCQzfpI4F6iKv3oCW3LwWa7F565hfIRELVtomakDoSiPx6h4usaaEkbRSzzlF+pUuqMpNeHz8xXg66JljPoHBG93Ek435GFK6GQF5LFMoRz1yQ6KTd9JwOESEXZ0aCjcIWrMdwCOkQZmg3KAtM/hjbFYyftzkHWXSaCF8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=X2DrIT6n; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2gF1vA5L6EE6G2YZmnsgM9pMh8U9Q+ZRL07Ag2QVU7g=; b=X2DrIT6nooiFloPCuupd15LCFm
+	0U8LQuOX7HazGti2EdvdEkdWPzkbSthF7Jpp/GIb64gDnJox5JSmgejp17FH2WpvlZFlek59pzI4Y
+	so0/9+meRzNRoI6+t9VtSS03jnZyWMKQHwf2quLw/nd/RQwgKqg4dIGik1jsMbzvauf06wNneuqf8
+	MjWSqS5dEFAYAB3tmvSvZD1BajIhG6t8sr+XDJxTFwqxzcl+lMm7Iv6JpqAv7ds30msJQj7ErswZW
+	LpUDp5fE/ZBPlPXPfxyxoxj2lQ6+e95P040/Dst7h89fHdKRITGizhGuy9zS2A7gV4o7I3F2qco8b
+	r4/+IedA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42554)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1sqbDx-00077q-12;
+	Tue, 17 Sep 2024 17:38:44 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1sqbDr-00087u-36;
+	Tue, 17 Sep 2024 17:38:39 +0100
+Date: Tue, 17 Sep 2024 17:38:39 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Daniel Golle <daniel@makrotopia.org>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	John Crispin <john@phrozen.org>
+Subject: Re: ethtool settings and SFP modules with PHYs
+Message-ID: <ZumwjxMVpoJ+cqvH@shell.armlinux.org.uk>
+References: <ZuhQjx2137ZC_DCz@makrotopia.org>
+ <ebfeeabd-7f4a-4a80-ba76-561711a9d776@lunn.ch>
+ <ZuhsQxHA+SJFPa5S@shell.armlinux.org.uk>
+ <20240917175347.5ad207da@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,36 +79,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240917161410.GP167971@kernel.org>
+In-Reply-To: <20240917175347.5ad207da@fedora>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Sep 17, 2024 at 05:14:10PM +0100, Simon Horman wrote:
-> On Tue, Sep 17, 2024 at 09:31:00AM -0500, Wei Huang wrote:
-> > 
-> > 
-> > On 9/17/24 02:32, Simon Horman wrote:
-> > > On Mon, Sep 16, 2024 at 03:51:00PM -0500, Wei Huang wrote:
-> > ...
-> > >> +	val = readl(vec_ctrl);
-> > >> +	mask = PCI_MSIX_ENTRY_CTRL_ST_LOWER | PCI_MSIX_ENTRY_CTRL_ST_UPPER;
-> > >> +	val &= ~mask;
-> > >> +	val |= FIELD_PREP(mask, (u32)tag);
-> > > 
-> > > Hi Wei Huang,
-> > > 
-> > > Unfortunately clang-18 (x86_64, allmodconfig, W=1, when applied to net-next)
-> > > complains about this.  I think it is because it expects FIELD_PREP to be
-> > > used with a mask that is a built-in constant.
-> > 
-> > I thought I fixed it, but apparently not enough for clang-18. I will
-> > address this problem, along with other comments from you and Bjorn (if any).
-> > 
-> > BTW there is another code in drivers/gpu/drm/ using a similar approach.
-> 
-> Thanks,
-> 
-> I will run some checks over drivers/gpu/drm/ and let you know if they find
-> anything.
+On Tue, Sep 17, 2024 at 05:53:47PM +0200, Maxime Chevallier wrote:
+> For the SFP case, the notification would trigger indeed at the
+> module_start/module_remove step.
 
-FWIIW, I did try compiling all the .c files under drivers/gpu/drm/ with
-clang-18, and it did not flag this problem.
+This (the confusion of module_remove being the opposite of
+module_start)...
+
+> 
+> All of that is still WIP, but I think it would reply to that exact need
+> of "notifying users when something happens to the ports", including SFP
+> module insertion.
+
+and talking here about module insertion here, leads me to believe that
+you haven't grasped the problem with SFPs, where we don't know what
+the module supports at _insertion_ time.
+
+If we're after giving userspace a notification so it can make decisions
+about what to do after examining capabilities, then insertion time is
+too early.
+
+If we're after giving userspace a notification e.g. that a SFP was
+inserted, so please bring up the network interface, then that may be
+useful, but userspace needs to understand that SFPs are special and
+they can't go configuring the link at this point if it's a SFP.
+
+Honestly, I do not want to expose to userspace this kind of complexity
+that's specific to SFPs. It _will_ get it wrong. I also think that it
+will tie our hands when working around module problems if we have to
+change the way module capabilities are handled - and I don't wish to
+be tied by "but that change you made to make module XYZ work breaks
+my userspace!" because someone's using these events to do some weirdo
+configuration.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
