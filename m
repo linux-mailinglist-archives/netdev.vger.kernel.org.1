@@ -1,103 +1,100 @@
-Return-Path: <netdev+bounces-128723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 501CA97B2AD
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 18:12:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E997697B2B0
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 18:14:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CEF04B2AF39
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:12:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 282131C216C1
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:14:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78304176AD7;
-	Tue, 17 Sep 2024 16:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF75170822;
+	Tue, 17 Sep 2024 16:14:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QL0dA5AP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iae1q3la"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7E317C7A5;
-	Tue, 17 Sep 2024 16:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87C8615ECDF;
+	Tue, 17 Sep 2024 16:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726589547; cv=none; b=sdpUUvdpeO/bOn86dqMQXf4qqGnRO3vDbHy2n+AKR1g4Izr5sVFHCrxkDeK6JaAd9HWIfmu7tf/2mDNUQbqstOlM9qgw3yryqHD6mcLcPa9fJ8XyAuRDohYMGnPVB0FfvBF5BnfTDyiLP+8uyk/LZq6oWXkXBHs5M3ZGzwQ/ENE=
+	t=1726589658; cv=none; b=MCgYJLHYhupbC2gvHLKFH4iWvNj6eJD2mk6rJ1ah0XkY6lfeV6W7JvrVfCIfxZemHZHX4ikzzoKNOZT88bguSjw/vfpd68WfaWyRUmmWGdRYurLIFgHpoAzODRSSAPWfaITiK25KibNsmfQOvxqbO/5pWblJm3yzDhMO1ptzEMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726589547; c=relaxed/simple;
-	bh=u5AchXwuslXX+oDasqsEBgEsAFc0KriYzHu09KIatkI=;
+	s=arc-20240116; t=1726589658; c=relaxed/simple;
+	bh=3lCP1YC5khIp5O163b0+ZzDWXW18sWQ7tlhhSqHtjWM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nAlfcX48ZPjWO6ovOUzI2A6URy29CYFoXRbWm0RKMsjhRG9hSJu9B1qpttRQw/VhhX4TO9Dc6Ur6vVNS8idKvL9lgjySbvAX2SmaEgMZpjZp+/SaR+7waKBUpYU/IoYrw3vIypwrhq4gRj97WvipEJfUWtEDu2iXkaIo6gV5zhA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QL0dA5AP; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9MPR3Gi0E1mG7bQNnZXLbKzyWypXfL2V4986c7Vv+8g=; b=QL0dA5APyxQIQQqWDvf3CMPpLR
-	1HFOwqRdsm+UzasktwzvhfnfpX+TL9ck/1QwACRdqhaDxfEgRMX5c6M5/7A6luCpJdTtuDsQ9HKCI
-	kGGm8JTx9o6OzsWZBSQ6gAxjvusmf1hQtjhf9TQokz1142d7FIPdvKYeTRkOs+EFpnA6CVgdHjSH7
-	vrtWvHjonFYTO2FdG/+D8BSgqMbhChxJbnam50UBwPh77Smq/d2Fw0DAHXhLjMNxhWDpC+7xsyBAV
-	14I8sSyGM22mQiG6aB7VbT2bNTIL8zgYAiBi3G4622nGFAfYRuWD6zk62Ee0vLIwTW8uRbY2AIVgm
-	qzZrrlAA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36908)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sqaoL-00075z-2r;
-	Tue, 17 Sep 2024 17:12:17 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sqaoJ-00087X-2p;
-	Tue, 17 Sep 2024 17:12:15 +0100
-Date: Tue, 17 Sep 2024 17:12:15 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next 1/2] net: phy: Expose the direct mdiobus access
- functions
-Message-ID: <ZumqX50wtlmC4TRR@shell.armlinux.org.uk>
-References: <20240906093955.3083245-1-niklas.soderlund+renesas@ragnatech.se>
- <20240906093955.3083245-2-niklas.soderlund+renesas@ragnatech.se>
- <20240910161934.7fafc5b3@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=B3pcRXcsf+04P7CAM5I07Yi7UygSRAUZiT5z0QtVSWRQE8Ijqlt3r9LVVVjeF9YUHUhsU4N//aDC+2TaBzwf5uHT1IvNgcwvi5emkVLrpXxdFeXE1JoQrqP9TUtRjv1FVXyds0CA2gDiuHi0149F6JRnBVsh6ea5eCS/bE0E5Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iae1q3la; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF213C4CEC7;
+	Tue, 17 Sep 2024 16:14:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726589658;
+	bh=3lCP1YC5khIp5O163b0+ZzDWXW18sWQ7tlhhSqHtjWM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iae1q3laGEwD9iNrY7PeMB6RqQWVQOoPS+YM1yL+SrvEiyvwqZo+IIe1ZZzR2tsy/
+	 F0GUKy0f+Lg1w5jy+Gdx8EPG6L12cU5yWn5frLfAOT+TZHlbx4r4nPNCSz1EcqDxa1
+	 qjcu83hVqFyceeZUouBMH1DYF/Jsb9oE29Q15AE37ibesTwtIHuuIyO2mGrryWd35X
+	 vvMVXQdmmoV3RzDZSlhGzrv2tLf3ls7cWaph4NZ/7wUam+LgeposREFL27n3vKfGG6
+	 PKUjhk8GNO7YSCrAFHO5CgsIHit6Ngkv5rcxNWjnD//ofYBt/vHZxicqmT7e9DJalm
+	 KADkZ5TUQb92w==
+Date: Tue, 17 Sep 2024 17:14:10 +0100
+From: Simon Horman <horms@kernel.org>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, bagasdotme@gmail.com,
+	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
+	jing2.liu@intel.com
+Subject: Re: [PATCH V5 2/5] PCI/TPH: Add Steering Tag support
+Message-ID: <20240917161410.GP167971@kernel.org>
+References: <20240916205103.3882081-1-wei.huang2@amd.com>
+ <20240916205103.3882081-3-wei.huang2@amd.com>
+ <20240917073215.GH167971@kernel.org>
+ <6efc219d-29e1-4169-8393-c7e4610347cc@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240910161934.7fafc5b3@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <6efc219d-29e1-4169-8393-c7e4610347cc@amd.com>
 
-On Tue, Sep 10, 2024 at 04:19:34PM -0700, Jakub Kicinski wrote:
-> On Fri,  6 Sep 2024 11:39:54 +0200 Niklas Söderlund wrote:
-> > Expose the direct mdiobus read and write functions. These will be needed
-> > to refactor the SIOCGMIIREG and SIOCSMIIREG IOCTLs to fallback to
-> > indirect C45 access if needed.
+On Tue, Sep 17, 2024 at 09:31:00AM -0500, Wei Huang wrote:
 > 
-> I'm not sure Andrew is convinced in the sub-thread on patch 2, but also
-> I don't understand why you need patch 1 at all. The callers and callees
-> are in the same module are you're adding non-GPL exports, or am I
-> misreading?
+> 
+> On 9/17/24 02:32, Simon Horman wrote:
+> > On Mon, Sep 16, 2024 at 03:51:00PM -0500, Wei Huang wrote:
+> ...
+> >> +	val = readl(vec_ctrl);
+> >> +	mask = PCI_MSIX_ENTRY_CTRL_ST_LOWER | PCI_MSIX_ENTRY_CTRL_ST_UPPER;
+> >> +	val &= ~mask;
+> >> +	val |= FIELD_PREP(mask, (u32)tag);
+> > 
+> > Hi Wei Huang,
+> > 
+> > Unfortunately clang-18 (x86_64, allmodconfig, W=1, when applied to net-next)
+> > complains about this.  I think it is because it expects FIELD_PREP to be
+> > used with a mask that is a built-in constant.
+> 
+> I thought I fixed it, but apparently not enough for clang-18. I will
+> address this problem, along with other comments from you and Bjorn (if any).
+> 
+> BTW there is another code in drivers/gpu/drm/ using a similar approach.
 
-I don't think any of this is required, or even desirable, and I am
-of the opinion that falling back to indirect C45 accesses is a bad
-thing when this API can be used to access devices other than the
-attached PHY that is being used for that decision making.
+Thanks,
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I will run some checks over drivers/gpu/drm/ and let you know if they find
+anything.
 
