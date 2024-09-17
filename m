@@ -1,141 +1,94 @@
-Return-Path: <netdev+bounces-128662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B50597AC3D
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 09:35:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0B2D97ACA0
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 10:11:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D5752890D3
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 07:35:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EDC528C88D
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 08:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A8D1494AD;
-	Tue, 17 Sep 2024 07:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gi92DjyY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB5F15699D;
+	Tue, 17 Sep 2024 08:11:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D949A10F4;
-	Tue, 17 Sep 2024 07:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from gate.crashing.org (gate.crashing.org [63.228.1.57])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB3C61FCE;
+	Tue, 17 Sep 2024 08:11:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=63.228.1.57
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726558543; cv=none; b=SpJsohLufi2fJDndneP4Gs2x43H/GlvXK+2zgeHA6by5Pr/AHhKWna+Jn4FihHS7R6dxNTYFc+gwnV3aMV5kYiupkiy2hm5Wt6QCNZdk8hdJUDQaxMx1MDQmh00xkRkbEUWEXH8VXUpgrQMG7ab97fazN1a5jmq6CDyj8RQAc7Q=
+	t=1726560701; cv=none; b=GCE9ac1OGJhgL3Yn4uLkVndAt9/0r9cXGezYBNuMvqWq4mAHyZmcMrgxRQ3UEfb0yimAt4s58rekbVfynvftZTkDzyWfcGJWfVSQGaOA6wUQz+w2W3Q9/rZT/h29dJIZ2MRCm3ka5ZIxbhVtr6cjBEoWdKSes+bblDP84fFF+vg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726558543; c=relaxed/simple;
-	bh=b769VKDrIsyHYUFOuBuTXdEnM2V0sH0E/dspVqolmlQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=omwgMN87edbHGunnh/6TJACC9GTSUdkJOyF4ypCwl/MuXMMIVCEX+UC6kSDcq+FaKbIk9oyGfkBME9PlQWQhrgdmXUWe7w938CHFvAi7gJVRlH79vr6TFzGWBN5Pg229taCZF1psaHQZEyGeMbm1tuT5fOHq0MWZUgi2LYEukJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gi92DjyY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BAED7C4CECE;
-	Tue, 17 Sep 2024 07:35:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726558542;
-	bh=b769VKDrIsyHYUFOuBuTXdEnM2V0sH0E/dspVqolmlQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Gi92DjyYRGcKjng7ij/KzLsSrFPg9hxnsJP99zw56qAsWOEIA7b7xRguEzzR3qSR1
-	 L3PTIBJISJwJ18Q/HTyY5y/KgI7iEH2SusokCjlw95hgJZmcaKxX2qnSMtKJ10lEJK
-	 BqKdun/n5TRnVDRaz+PTxLnLYSNxVMTdgESyZFm0G7m9eqfBsWp/7rM80MKBNKOYwT
-	 E1I0MLDyXBAOGNNmp3lv8KguyTv5lSGcyyQe8k4Mu5RPBKjQB4L35DARUteTDjQ7yu
-	 Pk9ZNk5lw1ZsKcouWV94XPPypM3c8Tr6h582TZQ0Y0lbty3A2+favXieso1m96onKd
-	 iwxezRgIE5IXw==
-Date: Tue, 17 Sep 2024 08:35:35 +0100
-From: Simon Horman <horms@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, bagasdotme@gmail.com,
-	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
-	jing2.liu@intel.com
-Subject: Re: [PATCH V5 4/5] bnxt_en: Add TPH support in BNXT driver
-Message-ID: <20240917073535.GI167971@kernel.org>
-References: <20240916205103.3882081-1-wei.huang2@amd.com>
- <20240916205103.3882081-5-wei.huang2@amd.com>
+	s=arc-20240116; t=1726560701; c=relaxed/simple;
+	bh=AyfUySwOi7sTbJtZyiiODBIT8ZblI+EL8ThHaGv2Qic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Mime-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OcxxSv1i34csHoB9Ij5/ftm6xBIMQxwDgmPIHHmpu2byREyup44x1x7GOk558AIyU81ap6+8A7A01XNdvSEFlH/3AaWXvfiLQlaHRC9OaNdpinslMnWYpPJi1dye7J6viEIjwPwIShcb48MOiW2vqcf8uvVEPbuNCmwCrQfLEX4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org; spf=pass smtp.mailfrom=kernel.crashing.org; arc=none smtp.client-ip=63.228.1.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.crashing.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.crashing.org
+Received: from gate.crashing.org (localhost.localdomain [127.0.0.1])
+	by gate.crashing.org (8.14.1/8.14.1) with ESMTP id 48H7bs3P021626;
+	Tue, 17 Sep 2024 02:37:54 -0500
+Received: (from segher@localhost)
+	by gate.crashing.org (8.14.1/8.14.1/Submit) id 48H7bpcE021625;
+	Tue, 17 Sep 2024 02:37:51 -0500
+X-Authentication-Warning: gate.crashing.org: segher set sender to segher@kernel.crashing.org using -f
+Date: Tue, 17 Sep 2024 02:37:50 -0500
+From: Segher Boessenkool <segher@kernel.crashing.org>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: linuxppc-dev@lists.ozlabs.org, christophe.leroy@csgroup.eu,
+        sfr@canb.auug.org.au, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, almasrymina@google.com, kuba@kernel.org
+Subject: Re: [PATCH] powerpc/atomic: Use YZ constraints for DS-form instructions
+Message-ID: <20240917073750.GZ29862@gate.crashing.org>
+References: <20240916120510.2017749-1-mpe@ellerman.id.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240916205103.3882081-5-wei.huang2@amd.com>
+In-Reply-To: <20240916120510.2017749-1-mpe@ellerman.id.au>
+User-Agent: Mutt/1.4.2.3i
 
-On Mon, Sep 16, 2024 at 03:51:02PM -0500, Wei Huang wrote:
-> From: Manoj Panicker <manoj.panicker2@amd.com>
+Hi!
+
+On Mon, Sep 16, 2024 at 10:05:10PM +1000, Michael Ellerman wrote:
+> The 'ld' and 'std' instructions require a 4-byte aligned displacement
+> because they are DS-form instructions. But the "m" asm constraint
+> doesn't enforce that.
 > 
-> Implement TPH support in Broadcom BNXT device driver. The driver uses TPH
-> functions to retrieve and configure the device's Steering Tags when its
-> interrupt affinity is being changed. With appropriate firmware, we see
-> sustancial memory bandwidth savings and other benefits using real network
-> benchmarks.
+> That can lead to build errors if the compiler chooses a non-aligned
+> displacement, as seen with GCC 14:
 > 
-> Co-developed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Co-developed-by: Wei Huang <wei.huang2@amd.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-> Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
-> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 85 +++++++++++++++++++++++
->  drivers/net/ethernet/broadcom/bnxt/bnxt.h |  7 ++
->  net/core/netdev_rx_queue.c                |  1 +
->  3 files changed, 93 insertions(+)
+>   /tmp/ccuSzwiR.s: Assembler messages:
+>   /tmp/ccuSzwiR.s:2579: Error: operand out of domain (39 is not a multiple of 4)
+>   make[5]: *** [scripts/Makefile.build:229: net/core/page_pool.o] Error 1
 > 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> Dumping the generated assembler shows:
+> 
+>   ld 8,39(8)       # MEM[(const struct atomic64_t *)_29].counter, t
+> 
+> Use the YZ constraints to tell the compiler either to generate a DS-form
+> displacement, or use an X-form instruction, either of which prevents the
+> build error.
 
-...
+Great explanation text, a perfect commit!  :-)
 
-> @@ -10865,6 +10867,63 @@ int bnxt_reserve_rings(struct bnxt *bp, bool irq_re_init)
->  	return 0;
->  }
->  
-> +static void __bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
-> +				       const cpumask_t *mask)
-> +{
-> +	struct bnxt_rx_ring_info *rxr;
+> See commit 2d43cc701b96 ("powerpc/uaccess: Fix build errors seen with
+> GCC 13/14") for more details on the constraint letters.
+> 
+> Fixes: 9f0cbea0d8cc ("[POWERPC] Implement atomic{, 64}_{read, write}() without volatile")
+> Cc: stable@vger.kernel.org # v2.6.24+
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Closes: https://lore.kernel.org/all/20240913125302.0a06b4c7@canb.auug.org.au
+> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
 
-Hi Wei Huang,
+Reviewed-By: Segher Boessenkool <segher@kernel.crashing.org>
 
-A minor nit from my side:
 
-rxr is set but otherwise unused in this function.
-
-Flagged by x86_64 W=1 builds with gcc-14 and clang-18.
-
-> +	struct bnxt_irq *irq;
-> +	u16 tag;
-> +	int err;
-> +
-> +	irq = container_of(notify, struct bnxt_irq, affinity_notify);
-> +	cpumask_copy(irq->cpu_mask, mask);
-> +
-> +	if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
-> +				cpumask_first(irq->cpu_mask), &tag))
-> +		return;
-> +
-> +	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag))
-> +		return;
-> +
-> +	if (netif_running(irq->bp->dev)) {
-> +		rxr = &irq->bp->rx_ring[irq->ring_nr];
-> +		rtnl_lock();
-> +		err = netdev_rx_queue_restart(irq->bp->dev, irq->ring_nr);
-> +		if (err)
-> +			netdev_err(irq->bp->dev,
-> +				   "rx queue restart failed: err=%d\n", err);
-> +		rtnl_unlock();
-> +	}
-> +}
-
-...
+Segher
 
