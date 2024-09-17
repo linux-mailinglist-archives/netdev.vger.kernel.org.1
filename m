@@ -1,749 +1,337 @@
-Return-Path: <netdev+bounces-128748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F2A197B649
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 01:52:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D565797B65F
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 01:54:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 407E7287440
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 23:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 059C41C23EDD
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 23:54:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D1F3192B86;
-	Tue, 17 Sep 2024 23:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E37190675;
+	Tue, 17 Sep 2024 23:54:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="DaOBpihI"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="b1rEiM0m"
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic305-28.consmr.mail.ne1.yahoo.com (sonic305-28.consmr.mail.ne1.yahoo.com [66.163.185.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2086.outbound.protection.outlook.com [40.107.102.86])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F21F18BC15
-	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 23:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.185.154
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726617139; cv=none; b=EJlOF2XVWv6p76rzYZpkQCj08ewytGdWH5+9qSnBlvJICrKc+JcL52PPhLvAQmNJdISGHcUgcQ9zUXcSS8CNrdYP7ke6Q9pCR2NEwTZpUc+w3sUFedH5VWeazPEzADoNG0FXdW5jxnXZhvxx2zNIqtvWDmLhIQmqHsaXKxMSAoE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726617139; c=relaxed/simple;
-	bh=pou8xUe0C7VTTiS9qE5Y569/pWfKE9WiY5Fqfo6ibco=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rg/4IFSxuSN0HccBDnUpUhZvg09+WuLdggmKX/NwkftU9qB8tUWe0vl50ncw0gGY52VEZTeKGMCZZ9Q9w2Vy2/MQxT9ZN5BwYx6rSWh782RZ+R6dARAIGAOJUzXOWH7ZmEz8uPdrwKZu7aW+SM8O7pCfxdCrL00hS7niL2rrHD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com; spf=none smtp.mailfrom=schaufler-ca.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=DaOBpihI; arc=none smtp.client-ip=66.163.185.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=schaufler-ca.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=schaufler-ca.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1726617130; bh=BGWO/pKS2OfUbZ0HvCCtljkvg31m71b2sydeASh6V04=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=DaOBpihI/7OoGbqzNbej6A1Wx33NC9jsSFSvrzjylv1AYLlN6cUjl8H9hTwpGVPwKKwVcuFl8qiD1zWrFaAjKyQst0ZcWMGVKk8nCbgq3WEXOJc729qRGcuzlcM5QzZ7ExqPYPooSjs22uTuYmeyaUmMvnF7Wvs/vQ5/yX7Knx1jXn4RrKKNq1gdWGwe72NzWBg6oox2/tdicA3pwMZ1Zkcz1s83PEez5RpWZP2G1xeJqSWN7b2mxR+rmB5WGE2Tm/UJ7KV+gupLKicR041i99d0mKBo0EGBFC4Hmh1FM/PwERegXZWteGQBRqeQ6cCFvdPOdiKZBj1BGUqI6++HDg==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1726617130; bh=sZe524PhSk8Okdcd66JU/NWJPnN2y/nKpMp9nkw8iNX=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=kQHrnJ6O8NSOHSU1uDl/VGMnTq55v0Kzl5jqN5ZDAyZHSA2x8LgdLfk0jBbm7PowV0sK1BlAEQCIJBJcYn7zvLibWdPTEeW4V4A1R47VsXUZS+HlbqWQvG+UMS9xrB+SlE0/CSTSX3WyqIM3aZUbnF69hX90ayf4YcU7CkzH6pVnb0wDQZBotJuNf5zIBtduBBXIAS4dQCwr0wGo8Q4mzA8Q8CpzhnCs2QMsI5YoJIR5U7boK/QlCPT5YH7OgPxQbUAEl+HeNq1XPZWXNLNDUaHO/kWx8f8GkK+qJG/AqTYtspO362m6EOpcYf/16nCVkoMu7P1UW311qGwuixGbcA==
-X-YMail-OSG: rwP75fsVM1naRvjTGTUmAJGPatOYKoTxJjyR0reRf4sxmgxexndYDRvGO16l5S6
- pbhM4Vd8Ld.qugLu_2dNGGQzUpZc0xU62wvItpy91JsLMaljQqvlDUHXbYRK_0xMyH_LdwKU2JkM
- EKA7dsHVpAAwJLCQmFQvtq0kRtq2wBiEIo138nDTP0Qzk3tcdNqwGbAAhMWTQN3HtootvcuQc4br
- o9aDaX6pCZhiTuh6LuANzE9FQMwW7RtuwCiwXZI_3BDvPRSUxrAZ33X0zwiSzasS5iBVb1KtA._A
- awpCSHTODKqhO46aHHy8xgkgoEWM1Zacnpyh_e3hpUdVUwdVWUs3bsWpaZvYBi2F8323NN6re5lt
- NA2eaf4_d.W4KY0sTbLYhMQxTdejd_e1N0.VshP6ohWuukxL1KNTbnqEfXMFpvRqh.taHRAMlOf.
- VG76Dvr5HO4a6.f69yPwKhs..SGcbE8xDQ5hwxWUdA8y4UwAwQpdzw2XADLiKWvlWo8w9Q4v3zM2
- i5qly0cSMWLXIPsqhE7IAxprIu4SyPTKo8SkVE2i3oGG18u87MDyb6IpJkpMJYlOd7m4pFz7OjsC
- xmzppbeBDu499347Jfi.oOY4kEgWSYvi4UajwAy4KjV7.RPqa1RfaYz9oovtsqWqgH06QMYzfzHy
- qpJGbBr.B5oD5qvH6F0iulxBClWn.qkrRH_2apvhdhdSttexh0C.2IyHRAuGw4tuJPFJENkn9vc1
- 0UqKwfWYN7eMFNJLL5F82TJ4E62kBZjDnsupLxB3jMI23VBTQZFlzp5vEVvh.M6jHVopKah31SE5
- JxTiRGMpa4ktTf_nK8hCQ42DREJMz0GuVy5ve0RkdGTvEgV8onojQpkb_pUBM__0vMjyKNCuNokL
- e708iI1C21ZTbJBlSI4XZKPfvhOMAzOMVMEFb1T.JqmYCmSs3aftA10Cps4i3XAig.SLNrbvMOyf
- 4nQJPPf0kal5fdWoceWTffhHOD0BjJjDyFrzqAQh6GK9bft4khXbiu5kMKxhQ4wHKgZom78JTXcp
- 9pAj_5HYI7axKLpVfiGAtiNh2zI5pmVz1Me03h44Z5F0sRqLtim4I71ATs_Vom6jZOgwrwhDStNV
- UrM6q6NdYRGwZkBmO2lXazvlnf1bTzW5N13VSdDl8wp3BvJGrcjn17Ujz99_H9bv3nGr_07mSJxJ
- X8hwouUlBaRWjyK8pu0gzigb34rGNWa.g6HPhFLSYPsPeMOpJK1EdgV7s3xEKGX7QoZ63gp0di0l
- L0erfEh5_ofsC4i_8GIrvQstOIVCogwpAeEhljs4w.htrPTC4s4f_1beOQTPOqJ7MMPL2JZ2mFmg
- 5OT_B9pKqp8O3pRDb3P2iKH0xDcMS1tGz_zPE5JQOo0Qsg7e29yfZc6MX3JLtQ2Re5gpSu_D5wMV
- RDLy2A4ihx3YQlfc5khJaLrGT89JK9fCpr6UCznkeOf4rwQdQSQJqizv.ONS.R9RUT5D1FuB9wU0
- 8uo5Y076bagB22Re4S5wMpAyl7hl2Gxd55AIEFgVk_vKWGt2jHahyE11u8lPJJtBB0MnpOKbxT7U
- RIGVw51TER952LVLprvwv_nNFd6omoltrBv.zQc7SiBOG.dfmHET1imd9bHSR0ZpOupvTvpO4nMw
- h7hc_uDV6SWYNYvwUWGGY7DSakEWoh_aXHJbyMFrAHV2tFkoWs4TZvXtKBWTNT0wyNpIhzwgFlqa
- AV31jtNNq9pyCazd2.47BRp6kBjtg2gbTmfOpGJSCf1.bSj2LxToAIqAQrT7qRU_gWBepSMVJnNa
- PtOvbGcwKHnQO6UVi1xHFwGoyp.nD5w7KGc.4QyEgGSSIuVrTh6KvCxsHOCz_BRFt9GeRfLec8ET
- x2l43PGP6QwXqFkX7hNWffHhFyoOpky.v7Z_pfJhwQe5yz8d1iE.8JPALyePPEmuGYZ_XT36S3ym
- BmC..grdQxXOSk0BYW9QwmbpnR6WSGfl3TBm0jB99OQKWjPqPWRqNWJryz3QQVJ_sNETXwKe98n7
- ds9Y3L4IHMqdNuSLn4huP5lZz5GfMCOV6hk2akoJt13TQHzJJOu0RjfJNM2tJZ.62UN3jg259fi5
- 3KbQ6DN0QuXF6pdtG66.P7024h8urlHVXWubERRp81uosa8bivdm8X0g3KG_R6GxZZJh142HGrdd
- WiGclDGTHtAdb3za2t7KF57_rwD5ZbBiE3C0aQMmkTUckkAZMLCnucImDOtQzh8cKFhgJcR6o_sp
- gxg8yxOI_fk02P4A7srwM8705iW63dnX6KoJLE7DzbGaHFsZTipDv9oPDQBdE
-X-Sonic-MF: <casey@schaufler-ca.com>
-X-Sonic-ID: 8bb36148-d7b7-4cec-9731-341893fb31fc
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic305.consmr.mail.ne1.yahoo.com with HTTP; Tue, 17 Sep 2024 23:52:10 +0000
-Received: by hermes--production-gq1-5d95dc458-vkwd9 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 2b3a84955471b9061a763fb967f12395;
-          Tue, 17 Sep 2024 23:52:06 +0000 (UTC)
-From: Casey Schaufler <casey@schaufler-ca.com>
-To: casey@schaufler-ca.com,
-	paul@paul-moore.com,
-	linux-security-module@vger.kernel.org
-Cc: jmorris@namei.org,
-	serge@hallyn.com,
-	keescook@chromium.org,
-	john.johansen@canonical.com,
-	penguin-kernel@i-love.sakura.ne.jp,
-	stephen.smalley.work@gmail.com,
-	linux-kernel@vger.kernel.org,
-	selinux@vger.kernel.org,
-	mic@digikod.net,
-	netdev@vger.kernel.org,
-	audit@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	Todd Kjos <tkjos@google.com>
-Subject: [PATCH 1/5] LSM: Replace context+len with lsm_context
-Date: Tue, 17 Sep 2024 16:51:58 -0700
-Message-ID: <20240917235202.32578-2-casey@schaufler-ca.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <20240917235202.32578-1-casey@schaufler-ca.com>
-References: <20240917235202.32578-1-casey@schaufler-ca.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AA71607B2;
+	Tue, 17 Sep 2024 23:54:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.86
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726617261; cv=fail; b=tTaMbk7NACRv49u14sRer5bGFgU7X3Su0XkV1eWiegxF4pqYPIF5fN9F5o1xnM7nZvrvE1xiW4u6oA1jp8dPyKvSx8lSjAbVQTTAuI6uJJzU+qRf1foUKTDLdrUBZnlx6AFfnRbsFGOyLfoAajCtqpzc7xZ7wvhLBqHMlyI5wZ4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726617261; c=relaxed/simple;
+	bh=XM06tuZmkcT8n3nGQr1UXrxGFMYHn1f1sQxlUGNTSgk=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=eveVNCY1O9dqFmzgpd3teIYW5YdodYfTQeH6M0HtwHSlNeMgPovEvj+Zxxxn5En1akOwdPoFY1DtUBw63UHn1Mc3Et+RsRYUlaFx+2nyeLtU/dmszE8uMVtGI9Pcjzmqepx+U6BgbNhu85fBuXfGPKtNUyidQ1dGWfR0C3wmhDk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=b1rEiM0m; arc=fail smtp.client-ip=40.107.102.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=owl7UttC7CzwR6dKtJTfzZREPxg6qsfVMyxCs6fJAP3iA++epDS6cd//PfsDvgFFN7dPWI2hNdozX5orjd/regHCfMntwzWvNuBe/BYUrZl4Vl5ab3NjFkDjxVpe4519M5PBI9BXZrusd00YPgS0/a2kIUpyjj6L1e42lqb4ap+n3YfWQcPABbTGNM4ytrugWpojwy1r23lFt3/1+BMEHxxesNGTdQFwzt9qk3x3UJeg3jcdWDV/2Y7aPap2bzDSe7rwDH2tz1JacDFjKd4Jki2CjxS/YPh/gMZavRK8TG8d3UiK6B5Cr1tDVsH+t1vb4oBeOvAFwSaZtGrceymBVg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VO9CpxyMDKeQrGmBStDGxHs/MpQt/07Q/+W5jK1SEF0=;
+ b=SDSIg6pDVsxgkitLu+TGKHoEI1O9WG26E0a/Dw6PXNpoZSCooD1lUvBjnsmEGlNwfTpZqbAqM5xtU8do8qaDhEqMy732bx640bTIWeuiPHNZbGd9W6NKHYP4EVxa1J2ATJSRHJkEecx/1UJz7HcKSYfthTN1io36r504UdhBU+fK7tOGvsHxmca7RuN4leDM4J9d4VEuDudvNN6ofooNZeuUiTobD2oOoytLwzRDCJceA6rVXCwAVrk1vB0Snbtnq/IVT1QTe0oy/i4EbyoX7uQNLS+wq5ErVWZ2j6tFnT9pnp7OvjWC6c4x+fYWx+7a25hmTDyIm5lRUSZ2yioHag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VO9CpxyMDKeQrGmBStDGxHs/MpQt/07Q/+W5jK1SEF0=;
+ b=b1rEiM0mhx5svZXAFeY87o/WRBLaUkw1wvnwUaQbb1NODcxauaTBpXlWp0r3GraErz8ycWNfmounoOD7qpzr7FCvkyfg1FBF2JklbWMATnVUWXg//kwVMCkUprzWe5Q+fJKqirFeVQ+4GiLFDjgn4mQ1TxoZg4wX3kTrWN2UT4g=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
+ CH2PR12MB4296.namprd12.prod.outlook.com (2603:10b6:610:af::10) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7962.24; Tue, 17 Sep 2024 23:54:16 +0000
+Received: from DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb]) by DS0PR12MB6583.namprd12.prod.outlook.com
+ ([fe80::c8a9:4b0d:e1c7:aecb%6]) with mapi id 15.20.7962.022; Tue, 17 Sep 2024
+ 23:54:16 +0000
+Message-ID: <49131e14-fb4c-4176-9e55-f50d69bc9bdf@amd.com>
+Date: Tue, 17 Sep 2024 16:54:13 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] e1000e: makes e1000_watchdog_task use queue_delayed_work
+To: Dmitrii Ermakov <demonihin@gmail.com>, davem@davemloft.net
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ przemyslaw.kitszel@intel.com, anthony.l.nguyen@intel.com,
+ netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ linux-kernel@vger.kernel.org
+References: <20240915070334.1267-1-demonihin@gmail.com>
+Content-Language: en-US
+From: "Nelson, Shannon" <shannon.nelson@amd.com>
+In-Reply-To: <20240915070334.1267-1-demonihin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BY5PR16CA0014.namprd16.prod.outlook.com
+ (2603:10b6:a03:1a0::27) To DS0PR12MB6583.namprd12.prod.outlook.com
+ (2603:10b6:8:d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CH2PR12MB4296:EE_
+X-MS-Office365-Filtering-Correlation-Id: f82a6fed-a617-4cfd-773d-08dcd77409b3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VDNDNDN6dDE1M2lGa0V3WEJSRU9EYjVodVBTeFJYREo3ZUtFU3ZPSEJPUWlr?=
+ =?utf-8?B?bWRmVEFUbEs4Sk5uc3RvM05RMGNpbWlCelRtb1ByNDk5WDA5Q1p5R1JxaE9D?=
+ =?utf-8?B?U01icFRXVkV3M0htMnREMUU4MndvN2FMK25sNi95dWIvRVNKS1pJZ3UwWis2?=
+ =?utf-8?B?RnFpUEJzNXQ2Rzdzc0ZaaFBNZlJwdHBKOFFPWTJ5UmMveitNamFjWHJKK3M1?=
+ =?utf-8?B?ZXBtTEIvYjdMTXd0Uld5NlhicTdacWNPSm11U2g1VlA1VVZUMGdnbi9KWnNL?=
+ =?utf-8?B?R1o5azJEaGxJZjd5bEJpLzBrbXlyWkFYU0djVitNWWFGVXljTUMrcUZDWnNV?=
+ =?utf-8?B?M1pKZDlmQzdVNHpTMkorSEZyZmNBU2tBZmFpYlRqMEZmYUN2cG4vU01KNGNl?=
+ =?utf-8?B?Q2w2M3JXb2ZPU1JBbXhJbXV4Nk5JTUdvbnplMVNqQ0IrODJtK21YN2xBd0dH?=
+ =?utf-8?B?ZzB0OUU1TGIvSVpaQXZMWmRJR25PWnRaYmNWZjQ2bGMvaUoraW5DRGlPZklY?=
+ =?utf-8?B?ZGNtcGFsZzhXQkRpWXNVSUR0SG9uaXpBVkJVV3lkNzVIL2RidWcxbFIyRTBG?=
+ =?utf-8?B?Q21CZkptS2Z2Tmp1UGt4YWt4andIRjBHTmNwZHlrcWpUUjE4K05RRkVvWVVG?=
+ =?utf-8?B?ZzA5TlY3Z1h0YmdmM3ArNHlvanM4TGRRejRicHJrU2tuR3d1Y0lDRjFHMk9s?=
+ =?utf-8?B?YVdTbnF1Y0RzUmYzRFRTdWtHaGQ1VEtJYmRXNnZxMzRMcDZTcmZIQW5IeXdp?=
+ =?utf-8?B?c1U2NUpvVU5tbU4zK1YzUzJhYXlOdEluVThPcHpPVjVIVXpldHM0bEJIUnRn?=
+ =?utf-8?B?a0M2VlpJTHF4b0Q0bzVqWGVRajJmN2NPWTNZM25GR2hkREk1b094Rzl1eGNH?=
+ =?utf-8?B?WEd0SkpnblVxeUo2Y2ZKbGJnNmc3Q084UitMYW5oSVJJVERBMUhsT2hZZkdr?=
+ =?utf-8?B?cFpGR3MwRGl5T215cUFPL3FsTTY5ejVkSGNUY0dCMGNJR1VmekU2bUlMdlQ5?=
+ =?utf-8?B?T1ZLeDY5N1RNRS9XTEkzNUZUYVBUeWIzbFoxcmdnQ0VtaGZYdHB5V3BWeTky?=
+ =?utf-8?B?anUwby9Hc2VBeTJEN3hmRGNIejJpVnVWazJmTTk0aXBUYmsrSUdPc0dHaFUz?=
+ =?utf-8?B?RElqN0RIR2ZlWHJldTNNemRhT1pNbzBJbkEzTXdmT2xMMDB6OFMwMERrU0xw?=
+ =?utf-8?B?ejdxb3NGK3BiR1k0eENKeTQyMEVHbFZQNEh0WThjVXZUeUdoWk1wNFo2NDRm?=
+ =?utf-8?B?V2NnSTNWV1ZqL1BpekwyRkxCWG4vaFpVU3JzQmc1cDBuNWJXR29Uc2FOV2Ur?=
+ =?utf-8?B?dkprQXVyKzhHU3Bwc05xRXU4TzYrelRMbExCM2NrMm9YUFdsOXNSM2l2MWZG?=
+ =?utf-8?B?WFN0Q0lzUXBHc1ZqY0JwbktWVzRnYlBYZ3hsN0YwWmdpZ2plRUMrWFUyM2ow?=
+ =?utf-8?B?a1FDTWYrT1VOOW91MHYxeXNyV0gvTmlPZW9pVUNOekxYOFJrZ21vdHZlRnJs?=
+ =?utf-8?B?NXdlckFIQ1VnaVprSE1VaFlidjVFb2hrVzk3Y3JGWjFvekMvczA3N0lqc0ZU?=
+ =?utf-8?B?YmFKSklZbTJONzNyQ2s1a2tqYTNDRzUzKzUyTU94blpZZXdZSHIrS3pNL25v?=
+ =?utf-8?B?NXhTUExCWDVNLzhGaXF6WndmS2xsdTVoWHpUaG85emprOWltenVhc2pramJJ?=
+ =?utf-8?B?SXBLWDhRNzBnMml2cDlGSW1rUnc3aGNzYkVCUkx6alZFRnUyck9abC9wR1Zi?=
+ =?utf-8?B?SURrUU9MeWtZOGRnOVFFbmlUOVNacmtrUGZZSkFzL1pJL1BUQVE4LzRPbHlk?=
+ =?utf-8?B?RDYwbFl4dElBclVpaVFOZz09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?YjdnNmc1NUh3WU05SFBnODhhbWpkdmxnUi9aQ0FOd0hCRTdubXZDT1VEK2xI?=
+ =?utf-8?B?ZjlVaVA4YUVENU1CMHhuSnIwb1l2U1B6SGlUbDhlVmVCZzBpMjlvS09adkZ2?=
+ =?utf-8?B?UE9sNGFwQmhwelBpWjFHV3VJZjYreUIzR05IYkVBckd4R3pXeEVPZUVrTHRL?=
+ =?utf-8?B?cCs5bE5TN2Zkc3g2T3B5NkQzU3U2aFVwSGg1OFhtYjZuSDczMlRkT3Erblhw?=
+ =?utf-8?B?ZFdFWkR6djJ5eU1SS2k4dFc3NFByV3BJUDg2eXhoWU5jOU1BRXRNV1R4d2Fa?=
+ =?utf-8?B?aEFiVzFxbTB0cDJpS0dsVHh1SW5PT2ZpL0JPZTVKV1ZWTDczTFBWZzd4TzdI?=
+ =?utf-8?B?cjQyUjhvYWlodHBuNCs5SytmRURJYWJTSW9aUS9WUEVTdUZ5dDFRY05SSjRE?=
+ =?utf-8?B?eW4wSHRnaUhKUTJQRUVROEhCN0hNSGpqc0tSZVN5dml2aGpsbEpCU3pNZmtm?=
+ =?utf-8?B?OTZDYk96QUVUY2hDQzVzSmJkVFVaazVLL0FwNy9aUjZhU3ZKTXorNzBuNmU4?=
+ =?utf-8?B?dzc5aFZPOGZZcUpUNlI2ZU01bkxwTGt3OFRtT3g1VVNzbkZPVnY5ODVNOWlN?=
+ =?utf-8?B?cUg1b292MVhFTVpLc1dJR2VNbkcyU0VOekg1L3AyOXpvakhhclp0Nkc4a0w1?=
+ =?utf-8?B?aFpFazZyVG93OXd5L0oyYndJTWgxOUIxalNJR1d5UHkwSVRIaWZ1cEl6bzNO?=
+ =?utf-8?B?bTNOZGovaVhUSHM4dzdLM1A1MVpselZwOWdIOUR0VVJTa0NSWDhQbXljYW56?=
+ =?utf-8?B?dUZ2WkhOeXU4TENERmhwL2NlUDQ4Mk96VzR5czlkNWRHbHNmZU9OUDdaVko2?=
+ =?utf-8?B?K1lIS0xVNlo3YVpMbkh3YVo5UFFUamZBbS92dFBwNE1EcThNREowcGlzRC82?=
+ =?utf-8?B?ZHRaSXpVWUpyOElVZ3FGUXJpUnNhaHh3SnBXb1ZhMm0zWFlMOHVyRTZ6bGZL?=
+ =?utf-8?B?UGdFQWRWdnhPRC9aWFhGZWlxQTJPeHhDcjZ0MnYrcmM3OXFHd3ZvVTNLMHJL?=
+ =?utf-8?B?ZXZuTTVVeEtqQkJwMlkxQ2o0SG1KekZ1UmpZMDErQmpWdi92SXhCVlVLeFlq?=
+ =?utf-8?B?L1dkT01NMGVpUGxUV05NTE56L0tINDdJN24yWWtmZ2k4dVdUOUZ2RkdhZDlv?=
+ =?utf-8?B?QkdlYTM3MlZneUhOb0liQmJrZGlLVG5XMUNXNFdNMmRFd3J5N21vbzdOWCtS?=
+ =?utf-8?B?VlllK2pheXBYRmNpVXpFcGViSlN3d1VZRzV0ejV6OHpmVXAzSEpzZWJoTnNZ?=
+ =?utf-8?B?dmNoMnlJVnUwVFlsNWRhOHYwUWRiRDV1VlYvOTI5cEd3enVhMFRRWnkwaWxX?=
+ =?utf-8?B?c3FLM2ZDWFUwdmN0NzN1a0VWenVhampCRnpYM2RCL1dmaGdON2RhWkJHakZz?=
+ =?utf-8?B?U3ZHWlpwODFRZGRTQkF1TGs5R0Jnd0xxM2szZnZ2SHdJVmtRcFpDdG1EMk1a?=
+ =?utf-8?B?THFsWEcvQ21UVUxqeS9veTJmR3B3eUdtVEdML3RaTzFudG94QmR0TE90K0ow?=
+ =?utf-8?B?K1pxcDVrak5PdmFJMTFIL1hERURvcmpNQVpHZzltakNJS1ovZHhLRW52N3pK?=
+ =?utf-8?B?ZndmczhHaTF0cktKYkxCQ0daY01qaksxNDMwYTA2VjZNaUJzOG91c0g2NVVI?=
+ =?utf-8?B?dnQyTHpjenBOdzUzZ05OUUUvVUVFQXlMVnN2RnZtbENGTExmclI0Q01LWlNw?=
+ =?utf-8?B?dWdHRmFHT1ZSSjh4UURjMEg3NUtFYXdIVFBhYkNzUm1oVDRuazRxeEo0eUxD?=
+ =?utf-8?B?UWx5ZUY4M3BwN1JvUVlOOS9hSm0vU3ZORmoyc2hKWXBJZmRzc1RaZFJWdEYy?=
+ =?utf-8?B?WmhoQUJMd2xXTW41UlZrdXprV28xMTZiWWJkdzU0WDV2UjlsTUJqdEFvM1RT?=
+ =?utf-8?B?T2RTSzc1OE5oUkwzQXdoZ3ByTFlRTklqd2t3ZzRFMGd2T1VSbVlFNWtCeFQy?=
+ =?utf-8?B?MjIxUVdCd0YwV2sxcytPeGVkaHRQSGp1K1BnK2cxblRYMWhseFBaTngvMTVz?=
+ =?utf-8?B?K04rMnBLZy9lT2dsbW1vTHozRlJBdGViYkVkN0tNRkp0WXVFT1JUUFVKR3lj?=
+ =?utf-8?B?Y3gvQ2lPU0tuKzZXV3ZBaWh4QXRKTGx3eDYyYWcyUnFtMHhqL2ExbDJHNG45?=
+ =?utf-8?Q?TXYAY/eTNJg7M9TfUxSU/hi4W?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f82a6fed-a617-4cfd-773d-08dcd77409b3
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Sep 2024 23:54:15.9983
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sV3G8oyar8Bfb1ph0U4IbI/u5FNFj3vRSiVeyW89ju5FbdZbPJR1C3Yr84AYxzM4uMavjftaCCJcQih2kWci0w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4296
 
-Replace the (secctx,seclen) pointer pair with a single
-lsm_context pointer to allow return of the LSM identifier
-along with the context and context length. This allows
-security_release_secctx() to know how to release the
-context. Callers have been modified to use or save the
-returned data from the new structure.
+On 9/15/2024 12:03 AM, Dmitrii Ermakov wrote:
+> 
+> Replaces watchdog timer with delayed_work as advised
+> in the driver's TODO comment.
+> 
+> Signed-off-by: Dmitrii Ermakov <demonihin@gmail.com>
 
-security_secid_to_secctx() and security_lsmproc_to_secctx()
-will now return the length value on success instead of 0.
+The Subject should identify which tree to go to, net or net-next.  This 
+should be for net-next, e.g. [PATCH net-next].
 
-Signed-off-by: Casey Schaufler <casey@schaufler-ca.com>
-Cc: netdev@vger.kernel.org
-Cc: audit@vger.kernel.org
-Cc: netfilter-devel@vger.kernel.org
-Cc: Todd Kjos <tkjos@google.com>
----
- drivers/android/binder.c                |  5 ++-
- include/linux/lsm_hook_defs.h           |  5 ++-
- include/linux/security.h                |  9 +++---
- include/net/scm.h                       |  5 ++-
- kernel/audit.c                          |  9 +++---
- kernel/auditsc.c                        | 16 ++++------
- net/ipv4/ip_sockglue.c                  |  4 +--
- net/netfilter/nf_conntrack_netlink.c    |  8 ++---
- net/netfilter/nf_conntrack_standalone.c |  4 +--
- net/netfilter/nfnetlink_queue.c         | 27 +++++++---------
- net/netlabel/netlabel_unlabeled.c       | 13 +++-----
- net/netlabel/netlabel_user.c            |  3 +-
- security/apparmor/include/secid.h       |  5 ++-
- security/apparmor/secid.c               | 26 +++++++--------
- security/security.c                     | 34 +++++++++-----------
- security/selinux/hooks.c                | 23 +++++++++++---
- security/smack/smack_lsm.c              | 42 +++++++++++++++----------
- 17 files changed, 118 insertions(+), 120 deletions(-)
+But be aware that net-next tree is closed during the merge window, so 
+you'll need to wait a week or two before reposting.
 
-diff --git a/drivers/android/binder.c b/drivers/android/binder.c
-index b32416f8f9cd..59081edb3370 100644
---- a/drivers/android/binder.c
-+++ b/drivers/android/binder.c
-@@ -3289,9 +3289,8 @@ static void binder_transaction(struct binder_proc *proc,
- 		size_t added_size;
- 
- 		security_cred_getsecid(proc->cred, &secid);
--		ret = security_secid_to_secctx(secid, &lsmctx.context,
--					       &lsmctx.len);
--		if (ret) {
-+		ret = security_secid_to_secctx(secid, &lsmctx);
-+		if (ret < 0) {
- 			binder_txn_error("%d:%d failed to get security context\n",
- 				thread->pid, proc->pid);
- 			return_error = BR_FAILED_REPLY;
-diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
-index 418611f21831..95c7640919ba 100644
---- a/include/linux/lsm_hook_defs.h
-+++ b/include/linux/lsm_hook_defs.h
-@@ -292,10 +292,9 @@ LSM_HOOK(int, -EINVAL, getprocattr, struct task_struct *p, const char *name,
- 	 char **value)
- LSM_HOOK(int, -EINVAL, setprocattr, const char *name, void *value, size_t size)
- LSM_HOOK(int, 0, ismaclabel, const char *name)
--LSM_HOOK(int, -EOPNOTSUPP, secid_to_secctx, u32 secid, char **secdata,
--	 u32 *seclen)
-+LSM_HOOK(int, -EOPNOTSUPP, secid_to_secctx, u32 secid, struct lsm_context *cp)
- LSM_HOOK(int, -EOPNOTSUPP, lsmprop_to_secctx, struct lsm_prop *prop,
--	 char **secdata, u32 *seclen)
-+	 struct lsm_context *cp)
- LSM_HOOK(int, 0, secctx_to_secid, const char *secdata, u32 seclen, u32 *secid)
- LSM_HOOK(void, LSM_RET_VOID, release_secctx, struct lsm_context *cp)
- LSM_HOOK(void, LSM_RET_VOID, inode_invalidate_secctx, struct inode *inode)
-diff --git a/include/linux/security.h b/include/linux/security.h
-index 432bd4763703..2604ea16cd6d 100644
---- a/include/linux/security.h
-+++ b/include/linux/security.h
-@@ -569,8 +569,8 @@ int security_getprocattr(struct task_struct *p, int lsmid, const char *name,
- int security_setprocattr(int lsmid, const char *name, void *value, size_t size);
- int security_netlink_send(struct sock *sk, struct sk_buff *skb);
- int security_ismaclabel(const char *name);
--int security_secid_to_secctx(u32 secid, char **secdata, u32 *seclen);
--int security_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata, u32 *seclen);
-+int security_secid_to_secctx(u32 secid, struct lsm_context *cp);
-+int security_lsmprop_to_secctx(struct lsm_prop *prop, struct lsm_context *cp);
- int security_secctx_to_secid(const char *secdata, u32 seclen, u32 *secid);
- void security_release_secctx(struct lsm_context *cp);
- void security_inode_invalidate_secctx(struct inode *inode);
-@@ -1530,14 +1530,13 @@ static inline int security_ismaclabel(const char *name)
- 	return 0;
- }
- 
--static inline int security_secid_to_secctx(u32 secid, char **secdata,
--					   u32 *seclen)
-+static inline int security_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
- 	return -EOPNOTSUPP;
- }
- 
- static inline int security_lsmprop_to_secctx(struct lsm_prop *prop,
--					     char **secdata, u32 *seclen)
-+					     struct lsm_context *cp)
- {
- 	return -EOPNOTSUPP;
- }
-diff --git a/include/net/scm.h b/include/net/scm.h
-index f75449e1d876..22bb49589fde 100644
---- a/include/net/scm.h
-+++ b/include/net/scm.h
-@@ -109,10 +109,9 @@ static inline void scm_passec(struct socket *sock, struct msghdr *msg, struct sc
- 	int err;
- 
- 	if (test_bit(SOCK_PASSSEC, &sock->flags)) {
--		err = security_secid_to_secctx(scm->secid, &ctx.context,
--					       &ctx.len);
-+		err = security_secid_to_secctx(scm->secid, &ctx);
- 
--		if (!err) {
-+		if (err >= 0) {
- 			put_cmsg(msg, SOL_SOCKET, SCM_SECURITY, ctx.len,
- 				 ctx.context);
- 			security_release_secctx(&ctx);
-diff --git a/kernel/audit.c b/kernel/audit.c
-index 32a9864c648b..5ae0b26e5d92 100644
---- a/kernel/audit.c
-+++ b/kernel/audit.c
-@@ -1473,9 +1473,8 @@ static int audit_receive_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	case AUDIT_SIGNAL_INFO:
- 		if (lsmprop_is_set(&audit_sig_lsm)) {
- 			err = security_lsmprop_to_secctx(&audit_sig_lsm,
--							 &lsmctx.context,
--							 &lsmctx.len);
--			if (err)
-+							 &lsmctx);
-+			if (err < 0)
- 				return err;
- 		}
- 		sig_data = kmalloc(struct_size(sig_data, ctx, lsmctx.len),
-@@ -2188,8 +2187,8 @@ int audit_log_task_context(struct audit_buffer *ab)
- 	if (!lsmprop_is_set(&prop))
- 		return 0;
- 
--	error = security_lsmprop_to_secctx(&prop, &ctx.context, &ctx.len);
--	if (error) {
-+	error = security_lsmprop_to_secctx(&prop, &ctx);
-+	if (error < 0) {
- 		if (error != -EINVAL)
- 			goto error_path;
- 		return 0;
-diff --git a/kernel/auditsc.c b/kernel/auditsc.c
-index f2fed7a37e22..268117628a2c 100644
---- a/kernel/auditsc.c
-+++ b/kernel/auditsc.c
-@@ -1109,7 +1109,7 @@ static int audit_log_pid_context(struct audit_context *context, pid_t pid,
- 			 from_kuid(&init_user_ns, auid),
- 			 from_kuid(&init_user_ns, uid), sessionid);
- 	if (lsmprop_is_set(prop)) {
--		if (security_lsmprop_to_secctx(prop, &ctx.context, &ctx.len)) {
-+		if (security_lsmprop_to_secctx(prop, &ctx) < 0) {
- 			audit_log_format(ab, " obj=(none)");
- 			rc = 1;
- 		} else {
-@@ -1370,7 +1370,6 @@ static void audit_log_time(struct audit_context *context, struct audit_buffer **
- 
- static void show_special(struct audit_context *context, int *call_panic)
- {
--	struct lsm_context lsmcxt;
- 	struct audit_buffer *ab;
- 	int i;
- 
-@@ -1393,16 +1392,14 @@ static void show_special(struct audit_context *context, int *call_panic)
- 				 from_kgid(&init_user_ns, context->ipc.gid),
- 				 context->ipc.mode);
- 		if (lsmprop_is_set(&context->ipc.oprop)) {
--			char *ctx = NULL;
--			u32 len;
-+			struct lsm_context lsmctx;
- 
- 			if (security_lsmprop_to_secctx(&context->ipc.oprop,
--						       &ctx, &len)) {
-+						       &lsmctx) < 0) {
- 				*call_panic = 1;
- 			} else {
--				audit_log_format(ab, " obj=%s", ctx);
--				lsmcontext_init(&lsmcxt, ctx, len, 0);
--				security_release_secctx(&lsmcxt);
-+				audit_log_format(ab, " obj=%s", lsmctx.context);
-+				security_release_secctx(&lsmctx);
- 			}
- 		}
- 		if (context->ipc.has_perm) {
-@@ -1563,8 +1560,7 @@ static void audit_log_name(struct audit_context *context, struct audit_names *n,
- 	if (lsmprop_is_set(&n->oprop)) {
- 		struct lsm_context ctx;
- 
--		if (security_lsmprop_to_secctx(&n->oprop, &ctx.context,
--					       &ctx.len)) {
-+		if (security_lsmprop_to_secctx(&n->oprop, &ctx) < 0) {
- 			if (call_panic)
- 				*call_panic = 2;
- 		} else {
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index a8180dcc2a32..dadbf619b20f 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -136,8 +136,8 @@ static void ip_cmsg_recv_security(struct msghdr *msg, struct sk_buff *skb)
- 	if (err)
- 		return;
- 
--	err = security_secid_to_secctx(secid, &ctx.context, &ctx.len);
--	if (err)
-+	err = security_secid_to_secctx(secid, &ctx);
-+	if (err < 0)
- 		return;
- 
- 	put_cmsg(msg, SOL_IP, SCM_SECURITY, ctx.len, ctx.context);
-diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
-index e02e088b8794..5a93804e5cdb 100644
---- a/net/netfilter/nf_conntrack_netlink.c
-+++ b/net/netfilter/nf_conntrack_netlink.c
-@@ -360,8 +360,8 @@ static int ctnetlink_dump_secctx(struct sk_buff *skb, const struct nf_conn *ct)
- 	struct lsm_context ctx;
- 	int ret;
- 
--	ret = security_secid_to_secctx(ct->secmark, &ctx.context, &ctx.len);
--	if (ret)
-+	ret = security_secid_to_secctx(ct->secmark, &ctx);
-+	if (ret < 0)
- 		return 0;
- 
- 	ret = -1;
-@@ -669,8 +669,8 @@ static inline int ctnetlink_secctx_size(const struct nf_conn *ct)
- #ifdef CONFIG_NF_CONNTRACK_SECMARK
- 	int len, ret;
- 
--	ret = security_secid_to_secctx(ct->secmark, NULL, &len);
--	if (ret)
-+	ret = security_secid_to_secctx(ct->secmark, NULL);
-+	if (ret < 0)
- 		return 0;
- 
- 	return nla_total_size(0) /* CTA_SECCTX */
-diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
-index 5f7fd23b7afe..502cf10aab41 100644
---- a/net/netfilter/nf_conntrack_standalone.c
-+++ b/net/netfilter/nf_conntrack_standalone.c
-@@ -175,8 +175,8 @@ static void ct_show_secctx(struct seq_file *s, const struct nf_conn *ct)
- 	struct lsm_context ctx;
- 	int ret;
- 
--	ret = security_secid_to_secctx(ct->secmark, &ctx.context, &ctx.len);
--	if (ret)
-+	ret = security_secid_to_secctx(ct->secmark, &ctx);
-+	if (ret < 0)
- 		return;
- 
- 	seq_printf(s, "secctx=%s ", ctx.context);
-diff --git a/net/netfilter/nfnetlink_queue.c b/net/netfilter/nfnetlink_queue.c
-index aaf54900de3c..e43767c35930 100644
---- a/net/netfilter/nfnetlink_queue.c
-+++ b/net/netfilter/nfnetlink_queue.c
-@@ -470,18 +470,18 @@ static int nfqnl_put_sk_classid(struct sk_buff *skb, struct sock *sk)
- 	return 0;
- }
- 
--static u32 nfqnl_get_sk_secctx(struct sk_buff *skb, char **secdata)
-+static u32 nfqnl_get_sk_secctx(struct sk_buff *skb, struct lsm_context *ctx)
- {
- 	u32 seclen = 0;
- #if IS_ENABLED(CONFIG_NETWORK_SECMARK)
-+
- 	if (!skb || !sk_fullsock(skb->sk))
- 		return 0;
- 
- 	read_lock_bh(&skb->sk->sk_callback_lock);
- 
- 	if (skb->secmark)
--		security_secid_to_secctx(skb->secmark, secdata, &seclen);
--
-+		seclen = security_secid_to_secctx(skb->secmark, ctx);
- 	read_unlock_bh(&skb->sk->sk_callback_lock);
- #endif
- 	return seclen;
-@@ -559,8 +559,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	enum ip_conntrack_info ctinfo = 0;
- 	const struct nfnl_ct_hook *nfnl_ct;
- 	bool csum_verify;
--	struct lsm_context scaff; /* scaffolding */
--	char *secdata = NULL;
-+	struct lsm_context ctx;
- 	u32 seclen = 0;
- 	ktime_t tstamp;
- 
-@@ -635,8 +634,8 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	}
- 
- 	if ((queue->flags & NFQA_CFG_F_SECCTX) && entskb->sk) {
--		seclen = nfqnl_get_sk_secctx(entskb, &secdata);
--		if (seclen)
-+		seclen = nfqnl_get_sk_secctx(entskb, &ctx);
-+		if (seclen >= 0)
- 			size += nla_total_size(seclen);
- 	}
- 
-@@ -775,7 +774,7 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	if (nfqnl_put_sk_classid(skb, entskb->sk) < 0)
- 		goto nla_put_failure;
- 
--	if (seclen && nla_put(skb, NFQA_SECCTX, seclen, secdata))
-+	if (seclen && nla_put(skb, NFQA_SECCTX, ctx.len, ctx.context))
- 		goto nla_put_failure;
- 
- 	if (ct && nfnl_ct->build(skb, ct, ctinfo, NFQA_CT, NFQA_CT_INFO) < 0)
-@@ -803,10 +802,8 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	}
- 
- 	nlh->nlmsg_len = skb->len;
--	if (seclen) {
--		lsmcontext_init(&scaff, secdata, seclen, 0);
--		security_release_secctx(&scaff);
--	}
-+	if (seclen >= 0)
-+		security_release_secctx(&ctx);
- 	return skb;
- 
- nla_put_failure:
-@@ -814,10 +811,8 @@ nfqnl_build_packet_message(struct net *net, struct nfqnl_instance *queue,
- 	kfree_skb(skb);
- 	net_err_ratelimited("nf_queue: error creating packet message\n");
- nlmsg_failure:
--	if (seclen) {
--		lsmcontext_init(&scaff, secdata, seclen, 0);
--		security_release_secctx(&scaff);
--	}
-+	if (seclen >= 0)
-+		security_release_secctx(&ctx);
- 	return NULL;
- }
- 
-diff --git a/net/netlabel/netlabel_unlabeled.c b/net/netlabel/netlabel_unlabeled.c
-index 8303bbcfc543..dfda9ea61971 100644
---- a/net/netlabel/netlabel_unlabeled.c
-+++ b/net/netlabel/netlabel_unlabeled.c
-@@ -437,8 +437,7 @@ int netlbl_unlhsh_add(struct net *net,
- unlhsh_add_return:
- 	rcu_read_unlock();
- 	if (audit_buf != NULL) {
--		if (security_secid_to_secctx(secid, &ctx.context,
--					     &ctx.len) == 0) {
-+		if (security_secid_to_secctx(secid, &ctx) >= 0) {
- 			audit_log_format(audit_buf, " sec_obj=%s", ctx.context);
- 			security_release_secctx(&ctx);
- 		}
-@@ -491,8 +490,7 @@ static int netlbl_unlhsh_remove_addr4(struct net *net,
- 					  addr->s_addr, mask->s_addr);
- 		dev_put(dev);
- 		if (entry != NULL &&
--		    security_secid_to_secctx(entry->secid, &ctx.context,
--					     &ctx.len) == 0) {
-+		    security_secid_to_secctx(entry->secid, &ctx) >= 0) {
- 			audit_log_format(audit_buf, " sec_obj=%s", ctx.context);
- 			security_release_secctx(&ctx);
- 		}
-@@ -550,8 +548,7 @@ static int netlbl_unlhsh_remove_addr6(struct net *net,
- 					  addr, mask);
- 		dev_put(dev);
- 		if (entry != NULL &&
--		    security_secid_to_secctx(entry->secid, &ctx.context,
--					     &ctx.len) == 0) {
-+		    security_secid_to_secctx(entry->secid, &ctx) >= 0) {
- 			audit_log_format(audit_buf, " sec_obj=%s", ctx.context);
- 			security_release_secctx(&ctx);
- 		}
-@@ -1122,8 +1119,8 @@ static int netlbl_unlabel_staticlist_gen(u32 cmd,
- 		secid = addr6->secid;
- 	}
- 
--	ret_val = security_secid_to_secctx(secid, &ctx.context, &ctx.len);
--	if (ret_val != 0)
-+	ret_val = security_secid_to_secctx(secid, &ctx);
-+	if (ret_val < 0)
- 		goto list_cb_failure;
- 	ret_val = nla_put(cb_arg->skb,
- 			  NLBL_UNLABEL_A_SECCTX,
-diff --git a/net/netlabel/netlabel_user.c b/net/netlabel/netlabel_user.c
-index f5e7a9919df1..0d04d23aafe7 100644
---- a/net/netlabel/netlabel_user.c
-+++ b/net/netlabel/netlabel_user.c
-@@ -98,8 +98,7 @@ struct audit_buffer *netlbl_audit_start_common(int type,
- 			 audit_info->sessionid);
- 
- 	if (lsmprop_is_set(&audit_info->prop) &&
--	    security_lsmprop_to_secctx(&audit_info->prop, &ctx.context,
--				       &ctx.len) == 0) {
-+	    security_lsmprop_to_secctx(&audit_info->prop, &ctx) > 0) {
- 		audit_log_format(audit_buf, " subj=%s", ctx.context);
- 		security_release_secctx(&ctx);
- 	}
-diff --git a/security/apparmor/include/secid.h b/security/apparmor/include/secid.h
-index 8b92f90b6921..550a8d3ed527 100644
---- a/security/apparmor/include/secid.h
-+++ b/security/apparmor/include/secid.h
-@@ -25,9 +25,8 @@ struct aa_label;
- extern int apparmor_display_secid_mode;
- 
- struct aa_label *aa_secid_to_label(u32 secid);
--int apparmor_secid_to_secctx(u32 secid, char **secdata, u32 *seclen);
--int apparmor_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--			       u32 *seclen);
-+int apparmor_secid_to_secctx(u32 secid, struct lsm_context *cp);
-+int apparmor_lsmprop_to_secctx(struct lsm_prop *prop, struct lsm_context *cp);
- int apparmor_secctx_to_secid(const char *secdata, u32 seclen, u32 *secid);
- void apparmor_release_secctx(struct lsm_context *cp);
- 
-diff --git a/security/apparmor/secid.c b/security/apparmor/secid.c
-index 8d9ced8cdffd..5d92fc3ab8b4 100644
---- a/security/apparmor/secid.c
-+++ b/security/apparmor/secid.c
-@@ -61,23 +61,21 @@ struct aa_label *aa_secid_to_label(u32 secid)
- 	return xa_load(&aa_secids, secid);
- }
- 
--static int apparmor_label_to_secctx(struct aa_label *label, char **secdata,
--				    u32 *seclen)
-+static int apparmor_label_to_secctx(struct aa_label *label,
-+				    struct lsm_context *cp)
- {
- 	/* TODO: cache secctx and ref count so we don't have to recreate */
- 	int flags = FLAG_VIEW_SUBNS | FLAG_HIDDEN_UNCONFINED | FLAG_ABS_ROOT;
- 	int len;
- 
--	AA_BUG(!seclen);
--
- 	if (!label)
- 		return -EINVAL;
- 
- 	if (apparmor_display_secid_mode)
- 		flags |= FLAG_SHOW_MODE;
- 
--	if (secdata)
--		len = aa_label_asxprint(secdata, root_ns, label,
-+	if (cp)
-+		len = aa_label_asxprint(&cp->context, root_ns, label,
- 					flags, GFP_ATOMIC);
- 	else
- 		len = aa_label_snxprint(NULL, 0, root_ns, label, flags);
-@@ -85,26 +83,28 @@ static int apparmor_label_to_secctx(struct aa_label *label, char **secdata,
- 	if (len < 0)
- 		return -ENOMEM;
- 
--	*seclen = len;
-+	if (cp) {
-+		cp->len = len;
-+		cp->id = LSM_ID_APPARMOR;
-+	}
- 
--	return 0;
-+	return len;
- }
- 
--int apparmor_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-+int apparmor_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
- 	struct aa_label *label = aa_secid_to_label(secid);
- 
--	return apparmor_label_to_secctx(label, secdata, seclen);
-+	return apparmor_label_to_secctx(label, cp);
- }
- 
--int apparmor_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--			       u32 *seclen)
-+int apparmor_lsmprop_to_secctx(struct lsm_prop *prop, struct lsm_context *cp)
- {
- 	struct aa_label *label;
- 
- 	label = prop->apparmor.label;
- 
--	return apparmor_label_to_secctx(label, secdata, seclen);
-+	return apparmor_label_to_secctx(label, cp);
- }
- 
- int apparmor_secctx_to_secid(const char *secdata, u32 seclen, u32 *secid)
-diff --git a/security/security.c b/security/security.c
-index 4f73cc52ad5d..58f5fe1eb6c0 100644
---- a/security/security.c
-+++ b/security/security.c
-@@ -4190,40 +4190,36 @@ EXPORT_SYMBOL(security_ismaclabel);
- /**
-  * security_secid_to_secctx() - Convert a secid to a secctx
-  * @secid: secid
-- * @secdata: secctx
-- * @seclen: secctx length
-+ * @cp: the LSM context
-  *
-- * Convert secid to security context.  If @secdata is NULL the length of the
-- * result will be returned in @seclen, but no @secdata will be returned.  This
-+ * Convert secid to security context.  If @cp is NULL the length of the
-+ * result will be returned, but no data will be returned.  This
-  * does mean that the length could change between calls to check the length and
-- * the next call which actually allocates and returns the @secdata.
-+ * the next call which actually allocates and returns the data.
-  *
-- * Return: Return 0 on success, error on failure.
-+ * Return: Return length of data on success, error on failure.
-  */
--int security_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-+int security_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
--	return call_int_hook(secid_to_secctx, secid, secdata, seclen);
-+	return call_int_hook(secid_to_secctx, secid, cp);
- }
- EXPORT_SYMBOL(security_secid_to_secctx);
- 
- /**
-  * security_lsmprop_to_secctx() - Convert a lsm_prop to a secctx
-  * @prop: lsm specific information
-- * @secdata: secctx
-- * @seclen: secctx length
-+ * @cp: the LSM context
-  *
-- * Convert a @prop entry to security context.  If @secdata is NULL the
-- * length of the result will be returned in @seclen, but no @secdata
-- * will be returned.  This does mean that the length could change between
-- * calls to check the length and the next call which actually allocates
-- * and returns the @secdata.
-+ * Convert a @prop entry to security context.  If @cp is NULL the
-+ * length of the result will be returned. This does mean that the
-+ * length could change between calls to check the length and the
-+ * next call which actually allocates and returns the @cp.
-  *
-- * Return: Return 0 on success, error on failure.
-+ * Return: Return length of data on success, error on failure.
-  */
--int security_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--			       u32 *seclen)
-+int security_lsmprop_to_secctx(struct lsm_prop *prop, struct lsm_context *cp)
- {
--	return call_int_hook(lsmprop_to_secctx, prop, secdata, seclen);
-+	return call_int_hook(lsmprop_to_secctx, prop, cp);
- }
- EXPORT_SYMBOL(security_lsmprop_to_secctx);
- 
-diff --git a/security/selinux/hooks.c b/security/selinux/hooks.c
-index 2b027c08168f..01e44a14d3d4 100644
---- a/security/selinux/hooks.c
-+++ b/security/selinux/hooks.c
-@@ -6616,15 +6616,28 @@ static int selinux_ismaclabel(const char *name)
- 	return (strcmp(name, XATTR_SELINUX_SUFFIX) == 0);
- }
- 
--static int selinux_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-+static int selinux_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
--	return security_sid_to_context(secid, secdata, seclen);
-+	u32 seclen;
-+	u32 ret;
-+
-+	if (cp) {
-+		cp->id = LSM_ID_SELINUX;
-+		ret = security_sid_to_context(secid, &cp->context, &cp->len);
-+		if (ret < 0)
-+			return ret;
-+		return cp->len;
-+	}
-+	ret = security_sid_to_context(secid, NULL, &seclen);
-+	if (ret < 0)
-+		return ret;
-+	return seclen;
- }
- 
--static int selinux_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--				     u32 *seclen)
-+static int selinux_lsmprop_to_secctx(struct lsm_prop *prop,
-+				     struct lsm_context *cp)
- {
--	return selinux_secid_to_secctx(prop->selinux.secid, secdata, seclen);
-+	return selinux_secid_to_secctx(prop->selinux.secid, cp);
- }
- 
- static int selinux_secctx_to_secid(const char *secdata, u32 seclen, u32 *secid)
-diff --git a/security/smack/smack_lsm.c b/security/smack/smack_lsm.c
-index e5b47342c274..e85efe894ac3 100644
---- a/security/smack/smack_lsm.c
-+++ b/security/smack/smack_lsm.c
-@@ -4836,22 +4836,35 @@ static int smack_ismaclabel(const char *name)
- 	return (strcmp(name, XATTR_SMACK_SUFFIX) == 0);
- }
- 
-+/**
-+ * smack_to_secctx - fill a lsm_context
-+ * @skp: Smack label
-+ * @cp: destination
-+ *
-+ * Fill the passed @cp and return the length of the string
-+ */
-+static int smack_to_secctx(struct smack_known *skp, struct lsm_context *cp)
-+{
-+	int len = strlen(skp->smk_known);
-+
-+	if (cp) {
-+		cp->context = skp->smk_known;
-+		cp->len = len;
-+		cp->id = LSM_ID_SMACK;
-+	}
-+	return len;
-+}
-+
- /**
-  * smack_secid_to_secctx - return the smack label for a secid
-  * @secid: incoming integer
-- * @secdata: destination
-- * @seclen: how long it is
-+ * @cp: destination
-  *
-  * Exists for networking code.
-  */
--static int smack_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-+static int smack_secid_to_secctx(u32 secid, struct lsm_context *cp)
- {
--	struct smack_known *skp = smack_from_secid(secid);
--
--	if (secdata)
--		*secdata = skp->smk_known;
--	*seclen = strlen(skp->smk_known);
--	return 0;
-+	return smack_to_secctx(smack_from_secid(secid), cp);
- }
- 
- /**
-@@ -4862,15 +4875,10 @@ static int smack_secid_to_secctx(u32 secid, char **secdata, u32 *seclen)
-  *
-  * Exists for audit code.
-  */
--static int smack_lsmprop_to_secctx(struct lsm_prop *prop, char **secdata,
--				   u32 *seclen)
-+static int smack_lsmprop_to_secctx(struct lsm_prop *prop,
-+				   struct lsm_context *cp)
- {
--	struct smack_known *skp = prop->smack.skp;
--
--	if (secdata)
--		*secdata = skp->smk_known;
--	*seclen = strlen(skp->smk_known);
--	return 0;
-+	return smack_to_secctx(prop->smack.skp, cp);
- }
- 
- /**
--- 
-2.46.0
 
+> ---
+>   drivers/net/ethernet/intel/e1000e/e1000.h  |  4 +-
+>   drivers/net/ethernet/intel/e1000e/netdev.c | 43 ++++++++--------------
+>   2 files changed, 18 insertions(+), 29 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
+> index ba9c19e6994c..5a60372d2158 100644
+> --- a/drivers/net/ethernet/intel/e1000e/e1000.h
+> +++ b/drivers/net/ethernet/intel/e1000e/e1000.h
+> @@ -189,12 +189,12 @@ struct e1000_phy_regs {
+> 
+>   /* board specific private data structure */
+>   struct e1000_adapter {
+> -       struct timer_list watchdog_timer;
+>          struct timer_list phy_info_timer;
+>          struct timer_list blink_timer;
+> 
+> +       struct delayed_work watchdog_work;
+> +
+>          struct work_struct reset_task;
+> -       struct work_struct watchdog_task;
+> 
+>          const struct e1000_info *ei;
+> 
+> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+> index 360ee26557f7..5b7a3a1423ed 100644
+> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
+> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+> @@ -1778,7 +1778,8 @@ static irqreturn_t e1000_intr_msi(int __always_unused irq, void *data)
+>                  }
+>                  /* guard against interrupt when we're going down */
+>                  if (!test_bit(__E1000_DOWN, &adapter->state))
+> -                       mod_timer(&adapter->watchdog_timer, jiffies + 1);
+> +                       queue_delayed_work(system_wq, &adapter->watchdog_work,
+> +                                          1);
+
+This is not worth the line wrap, keep it one line.
+
+>          }
+> 
+>          /* Reset on uncorrectable ECC error */
+> @@ -1857,7 +1858,8 @@ static irqreturn_t e1000_intr(int __always_unused irq, void *data)
+>                  }
+>                  /* guard against interrupt when we're going down */
+>                  if (!test_bit(__E1000_DOWN, &adapter->state))
+> -                       mod_timer(&adapter->watchdog_timer, jiffies + 1);
+> +                       queue_delayed_work(system_wq, &adapter->watchdog_work,
+> +                                          1);
+
+ditto
+
+>          }
+> 
+>          /* Reset on uncorrectable ECC error */
+> @@ -1901,7 +1903,8 @@ static irqreturn_t e1000_msix_other(int __always_unused irq, void *data)
+>                  hw->mac.get_link_status = true;
+>                  /* guard against interrupt when we're going down */
+>                  if (!test_bit(__E1000_DOWN, &adapter->state))
+> -                       mod_timer(&adapter->watchdog_timer, jiffies + 1);
+> +                       queue_delayed_work(system_wq, &adapter->watchdog_work,
+> +                                          1);
+
+ditto
+
+>          }
+> 
+>          if (!test_bit(__E1000_DOWN, &adapter->state))
+> @@ -4293,7 +4296,8 @@ void e1000e_down(struct e1000_adapter *adapter, bool reset)
+> 
+>          napi_synchronize(&adapter->napi);
+> 
+> -       del_timer_sync(&adapter->watchdog_timer);
+> +       cancel_delayed_work_sync(&adapter->watchdog_work);
+> +
+>          del_timer_sync(&adapter->phy_info_timer);
+> 
+>          spin_lock(&adapter->stats64_lock);
+> @@ -5164,25 +5168,12 @@ static void e1000e_check_82574_phy_workaround(struct e1000_adapter *adapter)
+>          }
+>   }
+> 
+> -/**
+> - * e1000_watchdog - Timer Call-back
+> - * @t: pointer to timer_list containing private info adapter
+> - **/
+> -static void e1000_watchdog(struct timer_list *t)
+> -{
+> -       struct e1000_adapter *adapter = from_timer(adapter, t, watchdog_timer);
+> -
+> -       /* Do the rest outside of interrupt context */
+> -       schedule_work(&adapter->watchdog_task);
+> -
+> -       /* TODO: make this use queue_delayed_work() */
+> -}
+> -
+>   static void e1000_watchdog_task(struct work_struct *work)
+
+In keeping with the theme, this could be changed to e1000_watchdog_work()
+
+>   {
+> -       struct e1000_adapter *adapter = container_of(work,
+> -                                                    struct e1000_adapter,
+> -                                                    watchdog_task);
+> +       struct delayed_work *dwork =
+> +               container_of(work, struct delayed_work, work);
+> +       struct e1000_adapter *adapter =
+> +               container_of(dwork, struct e1000_adapter, watchdog_work);
+>          struct net_device *netdev = adapter->netdev;
+>          struct e1000_mac_info *mac = &adapter->hw.mac;
+>          struct e1000_phy_info *phy = &adapter->hw.phy;
+> @@ -5411,8 +5402,8 @@ static void e1000_watchdog_task(struct work_struct *work)
+> 
+>          /* Reset the timer */
+>          if (!test_bit(__E1000_DOWN, &adapter->state))
+> -               mod_timer(&adapter->watchdog_timer,
+> -                         round_jiffies(jiffies + 2 * HZ));
+> +               queue_delayed_work(system_wq, &adapter->watchdog_work,
+> +                                  round_jiffies(2 * HZ));
+>   }
+> 
+>   #define E1000_TX_FLAGS_CSUM            0x00000001
+> @@ -7588,11 +7579,10 @@ static int e1000_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+>                  goto err_eeprom;
+>          }
+> 
+> -       timer_setup(&adapter->watchdog_timer, e1000_watchdog, 0);
+>          timer_setup(&adapter->phy_info_timer, e1000_update_phy_info, 0);
+> +       INIT_DELAYED_WORK(&adapter->watchdog_work, e1000_watchdog_task);
+> 
+>          INIT_WORK(&adapter->reset_task, e1000_reset_task);
+> -       INIT_WORK(&adapter->watchdog_task, e1000_watchdog_task);
+>          INIT_WORK(&adapter->downshift_task, e1000e_downshift_workaround);
+>          INIT_WORK(&adapter->update_phy_task, e1000e_update_phy_task);
+>          INIT_WORK(&adapter->print_hang_task, e1000_print_hw_hang);
+> @@ -7733,11 +7723,10 @@ static void e1000_remove(struct pci_dev *pdev)
+>           * from being rescheduled.
+>           */
+>          set_bit(__E1000_DOWN, &adapter->state);
+> -       del_timer_sync(&adapter->watchdog_timer);
+> +       cancel_delayed_work_sync(&adapter->watchdog_work);
+>          del_timer_sync(&adapter->phy_info_timer);
+> 
+>          cancel_work_sync(&adapter->reset_task);
+> -       cancel_work_sync(&adapter->watchdog_task);
+>          cancel_work_sync(&adapter->downshift_task);
+>          cancel_work_sync(&adapter->update_phy_task);
+>          cancel_work_sync(&adapter->print_hang_task);
+> --
+> 2.45.2
+> 
+> 
 
