@@ -1,186 +1,116 @@
-Return-Path: <netdev+bounces-128663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D35997AC44
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 09:38:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF3C97AC6F
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 09:53:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 24CE41C21BCC
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 07:38:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF47F1C20EDB
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 07:53:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D088014A0A0;
-	Tue, 17 Sep 2024 07:38:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A703A61FCE;
+	Tue, 17 Sep 2024 07:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XKj5ky0R"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="F5UuLDUk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD8F7F477;
-	Tue, 17 Sep 2024 07:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56D3847B;
+	Tue, 17 Sep 2024 07:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726558711; cv=none; b=YygJjqjUdK/5VOx4BQFLbn/hD48OzzOF1wHdLl2bw7YEs6trq7YJrvRpFN6Aqqg43miNY/eLfMCyhUgZE1d2qaj5ovOLRlIRpsWw89QIk/rFhZ3rTlLbpdW1kaLQdz/s7vi1Jzktf0nAys5CnVPZl4psjMGVM422+o5hRaUkdvw=
+	t=1726559593; cv=none; b=O0RshdjYF2s8Mxz5IwSi7srIGNCvTn3ui77opzZGR6w++I8wUCgnezKiliwhmqdqqunn0fQGSDxoFrVJX/SbVwaJ9QNnIUvZVTvkWX4XcooUVam6IgUa0mJQEGUl/216hb9vPExq82C38xi+76qtAdiGTWpf2aHrU4ilUi8vAxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726558711; c=relaxed/simple;
-	bh=W9FGfW3WwX5TvvthiroecfgwLNT2pwNbL4OeKD5b7GA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LnyBO/hUvT1xCYhewq0fmSvWO4OdnYyoE4DuxtQQ9182rHA+1VUCG8xkMZlvvUcGO4N/AnRTi0Xst2X/TwRDM+tgt39i0BJ4JlMe0+B1YDutZiDeie4TsOMzWpbNiHCqSyksDcBrFq/gWVj9412xYjTtPNLMV6j6+5Ldo/mE9h8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XKj5ky0R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D565C4CECE;
-	Tue, 17 Sep 2024 07:38:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726558711;
-	bh=W9FGfW3WwX5TvvthiroecfgwLNT2pwNbL4OeKD5b7GA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XKj5ky0RMiLXrrPB/xPe5xRerlV2/ArPrqisvhkNlrLz+KlGKurcuZnUY0U6XrDpL
-	 JAzWEOaEq22x89QfKEMdEigAxRySjFEfLbL29a1lJgVgrfu65rC5b3z9zbYC9c7mss
-	 g4vAAZpcLBLIapuT3KJ/qr7bnaxnmT8CXsj/vNd/ANZngjDVjzZNAxFPWDttUgsmsK
-	 o+o5JUs3y95ZXh3deyIys66IBEKiEacJQLPEaI/jQukb0NCWpEh/+jTTc/k97LyImk
-	 HD9hpy1NfGZYg5yRGk1mb9KUabxKKbHoAVhYjxhM4Fhj3nEIVTZGQ4A6KyUmOklHwv
-	 mDD1iNdKJBjtw==
-Date: Tue, 17 Sep 2024 08:38:24 +0100
-From: Simon Horman <horms@kernel.org>
-To: Wei Huang <wei.huang2@amd.com>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	vadim.fedorenko@linux.dev, bagasdotme@gmail.com,
-	bhelgaas@google.com, lukas@wunner.de, paul.e.luse@intel.com,
-	jing2.liu@intel.com
-Subject: Re: [PATCH V5 1/5] PCI: Add TLP Processing Hints (TPH) support
-Message-ID: <20240917073824.GJ167971@kernel.org>
-References: <20240916205103.3882081-1-wei.huang2@amd.com>
- <20240916205103.3882081-2-wei.huang2@amd.com>
+	s=arc-20240116; t=1726559593; c=relaxed/simple;
+	bh=Se4Ox4FdYkwXYp/fPyNavBt76V4zzgnJl2LUMhEtcx4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ZP2C/+zErKZnol0jrePZ4OKAnw2apKPxTg0SAh4Kl4KFm0Zhmrc4crx6t5efo3/W8/W2CGHHFkJ4u8e0HahD3StUg0VdtAHrB/fiJ1fobXTVjYuJU8ziWQmUmZAtorRmWees+eYhLqc87/wwevxjpvR480hpwd1iF9aVmhW57PA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=F5UuLDUk; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 70E90A05EC;
+	Tue, 17 Sep 2024 09:53:08 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=hWDsT5EXBtwnRc38qFl6
+	l7996Q0pdajQg2k4m4ObVyM=; b=F5UuLDUksSYX6OEMczNeP058BfWKqveL83e6
+	NRONq2tfTpdJaYCw0DOu81MywWbq2Ws/ze5Po5HVjeWzNl21OcVdWsHueinofmrn
+	BM1lUCAgBXLfcY0Mmh/4kKyHOQD0C06om9htPxEEGHdM1ad4upj5AVr9eEpGMrWT
+	xlZT/3jY5NgG+uDjU8HuM4/2yvz7pkl3KrICi10sS7CQK+Q/GXstAi3Z52yxfmda
+	gVY2xQm6Bfz3zRx7ZZy5zV8bKQNq6UY72n5KKgYhZkJAQRCfZYrrN96GyhdjVSH6
+	yOH2lq4UDO8FcigHVYlaAFcYSpQaEX4SSk9JedwDvUa5X0I/pLKQ8j4ToLreFkmd
+	Ms8WE+20Faxt3gZkptgNxu7VKUe9ti+W6bZU5R3LBPWQkgOVkIinSGrSUx6c8goJ
+	3VDKsOkzGFmprbT4y9i4+5D33pUBph9OKQFk/Sm8SJv80jedKRMo4cJMzL8g/xSq
+	xs0gvZQny2bN38VLU4MxFS283KCynzmvBKMKTZCHRTr2CNuNdIJSJZI5UFLBnjGP
+	PQy1WDK/sqBSMn9j+pUyRd2yxTJqsVhC8dQQAFHREZL4+tnlB54KhCuIK2v0CQxD
+	n2x1GQCyUHKQ3DNYZCfoqqCpZ9j4PTaHGA9COWeApvr3LdyEQzaWXwmHNpxQz4v7
+	ubmuW88=
+Message-ID: <c70a049b-cef8-4b9d-8fd6-e9d8ec0270cc@prolan.hu>
+Date: Tue, 17 Sep 2024 09:53:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240916205103.3882081-2-wei.huang2@amd.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] net: fec: Reload PTP registers after link-state
+ change
+To: Frank Li <Frank.li@nxp.com>
+CC: <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
+	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+	<richardcochran@gmail.com>
+References: <20240916141931.742734-1-csokas.bence@prolan.hu>
+ <20240916141931.742734-2-csokas.bence@prolan.hu>
+ <ZuhJJ5BEgu9q6vaj@lizhi-Precision-Tower-5810>
+Content-Language: en-US
+From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
+In-Reply-To: <ZuhJJ5BEgu9q6vaj@lizhi-Precision-Tower-5810>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
+ ATLAS.intranet.prolan.hu (10.254.0.229)
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2980D948546D716A
 
-On Mon, Sep 16, 2024 at 03:50:59PM -0500, Wei Huang wrote:
-> Add support for PCIe TLP Processing Hints (TPH) support (see PCIe r6.2,
-> sec 6.17).
+Hi!
+
+On 9/16/24 17:05, Frank Li wrote:
+> On Mon, Sep 16, 2024 at 04:19:31PM +0200, Csókás, Bence wrote:
+>> On link-state change, the controller gets reset,
+>> which clears all PTP registers, including PHC time,
+>> calibrated clock correction values etc. For correct
+>> IEEE 1588 operation we need to restore these after
+>> the reset.
 > 
-> Add missing TPH register definitions in pci_regs.h, including the TPH
-> Requester capability register, TPH Requester control register, TPH
-> Completer capability, and the ST fields of MSI-X entry.
+> I am not sure if it necessary. timer will be big offset after reset. ptpd
+> should set_time then do clock frequency adjust, supposed just few ms, ptp
+> time will get resync.
 > 
-> Introduce pcie_enable_tph() and pcie_disable_tph(), enabling drivers to
-> toggle TPH support and configure specific ST mode as needed. Also add a
-> new kernel parameter, "pci=notph", allowing users to disable TPH support
-> across the entire system.
+> of course, restore these value may reduce the resync time.
 > 
-> Co-developed-by: Jing Liu <jing2.liu@intel.com>
-> Signed-off-by: Jing Liu <jing2.liu@intel.com>
-> Co-developed-by: Paul Luse <paul.e.luse@linux.intel.com>
-> Signed-off-by: Paul Luse <paul.e.luse@linux.intel.com>
-> Co-developed-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Eric Van Tassell <Eric.VanTassell@amd.com>
-> Signed-off-by: Wei Huang <wei.huang2@amd.com>
-> Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Reviewed-by: Lukas Wunner <lukas@wunner.de>
+> Frank
 
-...
+There's 3 problems with that:
+1. ATCORR, ATINC and ATPER will not be restored, therefore precision 
+will be immediately lost.
+2. ptpd does NOT set the time, only once, on startup. Currently, on 
+link-down, ptpd tries to correct for the missing 54 years by making the 
+PHC tick 3% faster (therefore the PPS signal will have a frequency error 
+as well), which will never get it there. One work-around is to 
+periodically re-start ptpd, but this is obviously sub-optimal.
+3. If the PTP server goes away, there's no way to restore the time. 
+Whereas if you save and reload it, you can continue, although with 
+degraded precision.
 
-> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
+Bence
 
-...
-
-> +/**
-> + * pcie_enable_tph - Enable TPH support for device using a specific ST mode
-> + * @pdev: PCI device
-> + * @mode: ST mode to enable. Current supported modes include:
-> + *
-> + *   - PCI_TPH_ST_NS_MODE: NO ST Mode
-> + *   - PCI_TPH_ST_IV_MODE: Interrupt Vector Mode
-> + *   - PCI_TPH_ST_DS_MODE: Device Specific Mode
-> + *
-> + * Checks whether the mode is actually supported by the device before enabling
-> + * and returns an error if not. Additionally determines what types of requests,
-> + * TPH or extended TPH, can be issued by the device based on its TPH requester
-> + * capability and the Root Port's completer capability.
-> + *
-> + * Return: 0 on success, otherwise negative value (-errno)
-> + */
-> +int pcie_enable_tph(struct pci_dev *pdev, int mode)
-> +{
-> +	u32 reg;
-> +	u8 dev_modes;
-> +	u8 rp_req_type;
-> +
-> +	/* Honor "notph" kernel parameter */
-> +	if (pci_tph_disabled)
-> +		return -EINVAL;
-> +
-> +	if (!pdev->tph_cap)
-> +		return -EINVAL;
-> +
-> +	if (pdev->tph_enabled)
-> +		return -EBUSY;
-> +
-> +	/* Sanitize and check ST mode comptability */
-
-Hi Wei Huang, all,
-
-Another minor nit from my side (the last one, I think):
-
-comptability -> compatibility
-
-Flagged by checkpatch.pl --codespell
-
-> +	mode &= PCI_TPH_CTRL_MODE_SEL_MASK;
-> +	dev_modes = get_st_modes(pdev);
-> +	if (!((1 << mode) & dev_modes))
-> +		return -EINVAL;
-> +
-> +	pdev->tph_mode = mode;
-> +
-> +	/* Get req_type supported by device and its Root Port */
-> +	pci_read_config_dword(pdev, pdev->tph_cap + PCI_TPH_CAP, &reg);
-> +	if (FIELD_GET(PCI_TPH_CAP_EXT_TPH, reg))
-> +		pdev->tph_req_type = PCI_TPH_REQ_EXT_TPH;
-> +	else
-> +		pdev->tph_req_type = PCI_TPH_REQ_TPH_ONLY;
-> +
-> +	rp_req_type = get_rp_completer_type(pdev);
-> +
-> +	/* Final req_type is the smallest value of two */
-> +	pdev->tph_req_type = min(pdev->tph_req_type, rp_req_type);
-> +
-> +	if (pdev->tph_req_type == PCI_TPH_REQ_DISABLE)
-> +		return -EINVAL;
-> +
-> +	/* Write them into TPH control register */
-> +	pci_read_config_dword(pdev, pdev->tph_cap + PCI_TPH_CTRL, &reg);
-> +
-> +	reg &= ~PCI_TPH_CTRL_MODE_SEL_MASK;
-> +	reg |= FIELD_PREP(PCI_TPH_CTRL_MODE_SEL_MASK, pdev->tph_mode);
-> +
-> +	reg &= ~PCI_TPH_CTRL_REQ_EN_MASK;
-> +	reg |= FIELD_PREP(PCI_TPH_CTRL_REQ_EN_MASK, pdev->tph_req_type);
-> +
-> +	pci_write_config_dword(pdev, pdev->tph_cap + PCI_TPH_CTRL, reg);
-> +
-> +	pdev->tph_enabled = 1;
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL(pcie_enable_tph);
-
-...
 
