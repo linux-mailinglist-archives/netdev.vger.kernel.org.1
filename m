@@ -1,520 +1,298 @@
-Return-Path: <netdev+bounces-128690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D49B297AFCB
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 13:45:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0029097AFE7
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 14:02:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B1901C212BC
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 11:45:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7672C1F24D27
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 12:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7518B16BE39;
-	Tue, 17 Sep 2024 11:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F619170A3F;
+	Tue, 17 Sep 2024 12:02:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="tIvPlhCx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB549173320
-	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 11:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD08E57D;
+	Tue, 17 Sep 2024 12:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726573530; cv=none; b=LGuys/g4JfWIoyUrkQVDCkVePT1A9kgvSsFMI3UDW6V2P7eZnu5Rsj7OYx3DL0t7zQugkfi6P2hFXL4szi6FGU62rIPfSqXSD3FkcaKC5QVcyiZ0ZyHTlni/bgC1FGIJWKOxEUFqqzqVxbW0Mt6mXvvb8uzGQNyuO4HYUEiCfag=
+	t=1726574556; cv=none; b=sBlvaZm6D6yCj106xnsvZ6JK3mYNiOFNT623bwj544Y3Y6g6BB9J/xf4yWSNaqexsqnxt6L09ud4F516BNuUrV6EPYe0/r2tuZI2BtaoKx3ZF2cfeAhEP8La7VY6xd7DVjEiu6TN5thWdUihmLqUphXKCeOKXvJPNX6MmoY68Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726573530; c=relaxed/simple;
-	bh=9RzaOPTjQ+wKsWYRbZCgyV42ffkPMTl6J9tvGBYqCCg=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=q7WQ9EdkIqYy//49W8aMvS949WTzNoQiyKY1nU+POSkYrPCICpIiY177CqPmvAkGY8JzWUVaa1vhH7+e1HP4PzAARctdLZomldPHe6KDXmMp5RaWxPWg25/aAdghcsAAqhDzi5moqjtEN5obes0PXFHbE9Z7mlR0214ijWtbQBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a0a08aa0f1so28453535ab.0
-        for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 04:45:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726573521; x=1727178321;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=L5/CndsbPhhuj99heJXhpSJ/CLurEKeBsAhBHAODaYg=;
-        b=Ys7eL4yjJrs3rClQcLWiK4K8hBtJz79uvXhj+ywqBi/ThmCeybqaaNMLNRU4yp+4d/
-         qeZcWdit9bRssag2+HSlGUyt+jCUJ5890/k31V5s940+s/U5lkH34LnRgfWrhR2mQ75y
-         3y5wWB3xomA4PHbk//BoEUi0/YorXX0x2kKRgUVoNbAOJKnp9uvfpyDxo/zmVl0AYQxJ
-         nzsKU5iIQn7/28mYlNuaMq588Ou5mi3179nHNYwHOYjfyel/jyxjC9vY5wX2k4kV/t0k
-         de3gvW5nvzIp7TjxaDh8ibD+mDTeYmdFkpWqOx0vbeZTKZ/T+J7jNEH2PzyWIx8xUFPL
-         81JA==
-X-Forwarded-Encrypted: i=1; AJvYcCX5Yd7sG6fQMZdKLZ0rImc/tB/gAboIFqzOeKG3Fq8PyZYwRWvAyGg/UjSVN2zTSAXQQVmH4r4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNw90zE/Gn73gOsN5gRd5CDvb2QG47aEiYfX6m1B9MORxN48TN
-	dhk5g1zLxo3SAAV8NeiP2Lvt96arNLBJ0c4nCwABvqwS+s7vM5wBOQtzSNTHUo38ipAnjz8Q8q7
-	KRX3rUfQyxGDZTFFW7NgCIpzsmarWb1EN8KfWrYAQ6pTSlZpcKZPahKk=
-X-Google-Smtp-Source: AGHT+IGFTd18OnOeTSAQ9ekPYgpxd9hmlpiD/lBOBlBj2YCfD49rZ4WG0x8286aGhkJgJoQfoiBS7qs1K+QQsvdqhA94iijHs5Ns
+	s=arc-20240116; t=1726574556; c=relaxed/simple;
+	bh=luqxYTH6BUDwfFwhpgXXrSF9yuT8UjjLcfN5E5jNujg=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZWCGtOAKVh753vRhHaKVZfprUHoF9Jeck8tr9beHuVucIeX0iL6zet7dHG66O9Dw8OVfmlrPHx5EFOYVrdZg8ZmzliHfjgBYrPZd0h7GdIUvwTcj9eptQi+4bRTYlOhvzQ6AlxkZF/dArN8SpjakS5lw1a65l/TkiuafY6eJ2/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=tIvPlhCx; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1726574553; x=1758110553;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=luqxYTH6BUDwfFwhpgXXrSF9yuT8UjjLcfN5E5jNujg=;
+  b=tIvPlhCxrwKOgiavZANkjKK+N85lTqoWtTjoWQgnxmMMmJ3RJl/Og7c3
+   ebe1tsS3+lypcVokbfFRgShHO1A3Q2D7GBYPek+g9mFuGR3hf9dmDhwVk
+   Jz0hd49GTvLDy03ZvEBVYlHi++0TWQQgvmjsLukde9KXkYcbIcBVtjUpt
+   DcEJbFJ0OeM2ZWmMlDDTcbSg09ZcCBmkAhnAazJIdeFSB/ppRwHgqjzDl
+   uLGKH00QpAN+BZ6QBPGwHcfHezWXNI+IxrjJFGOqBKzkcw9Kg+h5mVqAl
+   y/sQFoLpYBjD0xIdHgQO4XSLSlTbDJsD/a3THZavnKgaSBpxpoRgb2sbr
+   Q==;
+X-CSE-ConnectionGUID: ZbeW3DQISYCZ2DnmZ/K/oA==
+X-CSE-MsgGUID: A/6RSKm8Q4SGgHiCZOqTbQ==
+X-IronPort-AV: E=Sophos;i="6.10,235,1719903600"; 
+   d="scan'208";a="35073308"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 17 Sep 2024 05:02:30 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 17 Sep 2024 05:01:49 -0700
+Received: from HYD-DK-UNGSW20.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Tue, 17 Sep 2024 05:01:46 -0700
+From: Tarun Alle <tarun.alle@microchip.com>
+To: <arun.ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next V4] net: phy: microchip_t1: SQI support for LAN887x
+Date: Tue, 17 Sep 2024 17:26:57 +0530
+Message-ID: <20240917115657.51041-1-tarun.alle@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a42:b0:3a0:9a32:dedc with SMTP id
- e9e14a558f8ab-3a09a32e23bmr82899795ab.6.1726573521341; Tue, 17 Sep 2024
- 04:45:21 -0700 (PDT)
-Date: Tue, 17 Sep 2024 04:45:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006b23e606224f39cd@google.com>
-Subject: [syzbot] [ppp?] possible deadlock in ppp_input
-From: syzbot <syzbot+38ad8c7c6638c5381a47@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hello,
+From: Tarun Alle <Tarun.Alle@microchip.com>
 
-syzbot found the following issue on:
+Add support for measuring Signal Quality Index for LAN887x T1 PHY.
+Signal Quality Index (SQI) is measure of Link Channel Quality from
+0 to 7, with 7 as the best. By default, a link loss event shall
+indicate an SQI of 0.
 
-HEAD commit:    d42f7708e27c Merge tag 'for-linus-6.11' of git://git.kerne..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17d057c7980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=61d235cb8d15001c
-dashboard link: https://syzkaller.appspot.com/bug?extid=38ad8c7c6638c5381a47
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a36d838567fc/disk-d42f7708.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/84e3541e98ef/vmlinux-d42f7708.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1186c70ee3e0/bzImage-d42f7708.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+38ad8c7c6638c5381a47@syzkaller.appspotmail.com
-
-=====================================================
-WARNING: SOFTIRQ-READ-safe -> SOFTIRQ-READ-unsafe lock order detected
-6.11.0-rc7-syzkaller-00151-gd42f7708e27c #0 Not tainted
------------------------------------------------------
-syz.2.1597/12167 [HC0[0]:SC0[8]:HE1:SE0] is trying to acquire:
-ffff8880635c39e0 (&pch->downl){+.+.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff8880635c39e0 (&pch->downl){+.+.}-{2:2}, at: ppp_connect_channel+0x194/0x650 drivers/net/ppp/ppp_generic.c:3485
-
-and this task is already holding:
-ffff888078e3ee10 (&ppp->rlock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff888078e3ee10 (&ppp->rlock){+...}-{2:2}, at: ppp_connect_channel+0x185/0x650 drivers/net/ppp/ppp_generic.c:3484
-which would create a new lock dependency:
- (&ppp->rlock){+...}-{2:2} -> (&pch->downl){+.+.}-{2:2}
-
-but this new dependency connects a SOFTIRQ-READ-irq-safe lock:
- (&pch->upl){++.-}-{2:2}
-
-... which became SOFTIRQ-READ-irq-safe at:
-  lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-  __raw_read_lock_bh include/linux/rwlock_api_smp.h:176 [inline]
-  _raw_read_lock_bh+0x3d/0x50 kernel/locking/spinlock.c:252
-  ppp_input+0x3dc/0xa10 drivers/net/ppp/ppp_generic.c:2307
-  ppp_sync_process+0x71/0x160 drivers/net/ppp/ppp_synctty.c:490
-  tasklet_action_common+0x323/0x4d0 kernel/softirq.c:785
-  handle_softirqs+0x2c6/0x970 kernel/softirq.c:554
-  run_ksoftirqd+0xca/0x130 kernel/softirq.c:928
-  smpboot_thread_fn+0x546/0xa30 kernel/smpboot.c:164
-  kthread+0x2f2/0x390 kernel/kthread.c:389
-  ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-to a SOFTIRQ-READ-irq-unsafe lock:
- (&pch->downl){+.+.}-{2:2}
-
-... which became SOFTIRQ-READ-irq-unsafe at:
-...
-  lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-  _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-  spin_lock include/linux/spinlock.h:351 [inline]
-  ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2272 [inline]
-  ppp_input+0x18b/0xa10 drivers/net/ppp/ppp_generic.c:2304
-  pppoe_rcv_core+0x117/0x310 drivers/net/ppp/pppoe.c:379
-  sk_backlog_rcv include/net/sock.h:1111 [inline]
-  __release_sock+0x245/0x350 net/core/sock.c:3004
-  release_sock+0x61/0x1f0 net/core/sock.c:3558
-  pppoe_sendmsg+0xd5/0x750 drivers/net/ppp/pppoe.c:903
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg+0x223/0x270 net/socket.c:745
-  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
-  ___sys_sendmsg net/socket.c:2651 [inline]
-  __sys_sendmmsg+0x3b2/0x740 net/socket.c:2737
-  __do_sys_sendmmsg net/socket.c:2766 [inline]
-  __se_sys_sendmmsg net/socket.c:2763 [inline]
-  __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2763
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &pch->upl --> &ppp->rlock --> &pch->downl
-
- Possible interrupt unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&pch->downl);
-                               local_irq_disable();
-                               lock(&pch->upl);
-                               lock(&ppp->rlock);
-  <Interrupt>
-    lock(&pch->upl);
-
- *** DEADLOCK ***
-
-5 locks held by syz.2.1597/12167:
- #0: ffffffff8f4700a8 (ppp_mutex){+.+.}-{3:3}, at: ppp_ioctl+0x112/0x1cd0 drivers/net/ppp/ppp_generic.c:729
- #1: ffff888057470cc0 (&pn->all_ppp_mutex){+.+.}-{3:3}, at: ppp_connect_channel+0x5e/0x650 drivers/net/ppp/ppp_generic.c:3474
- #2: ffff8880635c3a48 (&pch->upl){++.-}-{2:2}, at: ppp_connect_channel+0x87/0x650 drivers/net/ppp/ppp_generic.c:3478
- #3: ffff888078e3ee50 (&ppp->wlock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
- #3: ffff888078e3ee50 (&ppp->wlock){+...}-{2:2}, at: ppp_connect_channel+0x174/0x650 drivers/net/ppp/ppp_generic.c:3484
- #4: ffff888078e3ee10 (&ppp->rlock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
- #4: ffff888078e3ee10 (&ppp->rlock){+...}-{2:2}, at: ppp_connect_channel+0x185/0x650 drivers/net/ppp/ppp_generic.c:3484
-
-the dependencies between SOFTIRQ-READ-irq-safe lock and the holding lock:
-  -> (&pch->upl){++.-}-{2:2} {
-     HARDIRQ-ON-W at:
-                        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                        __raw_write_lock_bh include/linux/rwlock_api_smp.h:202 [inline]
-                        _raw_write_lock_bh+0x35/0x50 kernel/locking/spinlock.c:334
-                        ppp_disconnect_channel+0x2f/0x2d0 drivers/net/ppp/ppp_generic.c:3522
-                        ppp_unregister_channel+0xb9/0x300 drivers/net/ppp/ppp_generic.c:2996
-                        pppox_unbind_sock+0x5c/0xb0 drivers/net/ppp/pppox.c:58
-                        pppol2tp_release+0x99/0x340 net/l2tp/l2tp_ppp.c:438
-                        __sock_release net/socket.c:659 [inline]
-                        sock_close+0xbe/0x240 net/socket.c:1421
-                        __fput+0x24c/0x8a0 fs/file_table.c:422
-                        task_work_run+0x251/0x310 kernel/task_work.c:228
-                        resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-                        exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
-                        exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
-                        __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
-                        syscall_exit_to_user_mode+0x168/0x370 kernel/entry/common.c:218
-                        do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
-                        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-     HARDIRQ-ON-R at:
-                        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                        __raw_read_lock_bh include/linux/rwlock_api_smp.h:176 [inline]
-                        _raw_read_lock_bh+0x3d/0x50 kernel/locking/spinlock.c:252
-                        ppp_channel_push+0x2c/0x220 drivers/net/ppp/ppp_generic.c:2186
-                        ppp_write+0x2b3/0x3f0 drivers/net/ppp/ppp_generic.c:540
-                        vfs_write+0x2a4/0xc90 fs/read_write.c:588
-                        ksys_write+0x1a0/0x2c0 fs/read_write.c:643
-                        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-                        do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-                        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-     IN-SOFTIRQ-R at:
-                        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                        __raw_read_lock_bh include/linux/rwlock_api_smp.h:176 [inline]
-                        _raw_read_lock_bh+0x3d/0x50 kernel/locking/spinlock.c:252
-                        ppp_input+0x3dc/0xa10 drivers/net/ppp/ppp_generic.c:2307
-                        ppp_sync_process+0x71/0x160 drivers/net/ppp/ppp_synctty.c:490
-                        tasklet_action_common+0x323/0x4d0 kernel/softirq.c:785
-                        handle_softirqs+0x2c6/0x970 kernel/softirq.c:554
-                        run_ksoftirqd+0xca/0x130 kernel/softirq.c:928
-                        smpboot_thread_fn+0x546/0xa30 kernel/smpboot.c:164
-                        kthread+0x2f2/0x390 kernel/kthread.c:389
-                        ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
-                        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-     INITIAL USE at:
-                       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                       __raw_write_lock_bh include/linux/rwlock_api_smp.h:202 [inline]
-                       _raw_write_lock_bh+0x35/0x50 kernel/locking/spinlock.c:334
-                       ppp_disconnect_channel+0x2f/0x2d0 drivers/net/ppp/ppp_generic.c:3522
-                       ppp_unregister_channel+0xb9/0x300 drivers/net/ppp/ppp_generic.c:2996
-                       pppox_unbind_sock+0x5c/0xb0 drivers/net/ppp/pppox.c:58
-                       pppol2tp_release+0x99/0x340 net/l2tp/l2tp_ppp.c:438
-                       __sock_release net/socket.c:659 [inline]
-                       sock_close+0xbe/0x240 net/socket.c:1421
-                       __fput+0x24c/0x8a0 fs/file_table.c:422
-                       task_work_run+0x251/0x310 kernel/task_work.c:228
-                       resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-                       exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
-                       exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
-                       __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
-                       syscall_exit_to_user_mode+0x168/0x370 kernel/entry/common.c:218
-                       do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
-                       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-     INITIAL READ USE at:
-                            lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                            __raw_read_lock_bh include/linux/rwlock_api_smp.h:176 [inline]
-                            _raw_read_lock_bh+0x3d/0x50 kernel/locking/spinlock.c:252
-                            ppp_channel_push+0x2c/0x220 drivers/net/ppp/ppp_generic.c:2186
-                            ppp_write+0x2b3/0x3f0 drivers/net/ppp/ppp_generic.c:540
-                            vfs_write+0x2a4/0xc90 fs/read_write.c:588
-                            ksys_write+0x1a0/0x2c0 fs/read_write.c:643
-                            do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-                            do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-                            entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   }
-   ... key      at: [<ffffffff9a68b1a0>] ppp_register_net_channel.__key.3+0x0/0x20
- -> (&ppp->wlock){+...}-{2:2} {
-    HARDIRQ-ON-W at:
-                      lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                      __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                      _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                      spin_lock_bh include/linux/spinlock.h:356 [inline]
-                      ppp_get_stats64+0xc3/0x290 drivers/net/ppp/ppp_generic.c:1539
-                      dev_get_stats+0xaf/0xa00 net/core/dev.c:10894
-                      rtnl_fill_stats+0x47/0x880 net/core/rtnetlink.c:1268
-                      rtnl_fill_ifinfo+0x18da/0x2270 net/core/rtnetlink.c:1909
-                      rtmsg_ifinfo_build_skb+0x18a/0x260 net/core/rtnetlink.c:4079
-                      rtmsg_ifinfo_event net/core/rtnetlink.c:4113 [inline]
-                      rtmsg_ifinfo+0x91/0x1b0 net/core/rtnetlink.c:4122
-                      register_netdevice+0x1774/0x1b00 net/core/dev.c:10491
-                      ppp_unit_register drivers/net/ppp/ppp_generic.c:1219 [inline]
-                      ppp_dev_configure+0x883/0xb10 drivers/net/ppp/ppp_generic.c:1275
-                      ppp_create_interface drivers/net/ppp/ppp_generic.c:3348 [inline]
-                      ppp_unattached_ioctl drivers/net/ppp/ppp_generic.c:1060 [inline]
-                      ppp_ioctl+0x799/0x1cd0 drivers/net/ppp/ppp_generic.c:733
-                      vfs_ioctl fs/ioctl.c:51 [inline]
-                      __do_sys_ioctl fs/ioctl.c:907 [inline]
-                      __se_sys_ioctl+0xfe/0x170 fs/ioctl.c:893
-                      do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-                      do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-                      entry_SYSCALL_64_after_hwframe+0x77/0x7f
-    INITIAL USE at:
-                     lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                     __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                     _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                     spin_lock_bh include/linux/spinlock.h:356 [inline]
-                     ppp_get_stats64+0xc3/0x290 drivers/net/ppp/ppp_generic.c:1539
-                     dev_get_stats+0xaf/0xa00 net/core/dev.c:10894
-                     rtnl_fill_stats+0x47/0x880 net/core/rtnetlink.c:1268
-                     rtnl_fill_ifinfo+0x18da/0x2270 net/core/rtnetlink.c:1909
-                     rtmsg_ifinfo_build_skb+0x18a/0x260 net/core/rtnetlink.c:4079
-                     rtmsg_ifinfo_event net/core/rtnetlink.c:4113 [inline]
-                     rtmsg_ifinfo+0x91/0x1b0 net/core/rtnetlink.c:4122
-                     register_netdevice+0x1774/0x1b00 net/core/dev.c:10491
-                     ppp_unit_register drivers/net/ppp/ppp_generic.c:1219 [inline]
-                     ppp_dev_configure+0x883/0xb10 drivers/net/ppp/ppp_generic.c:1275
-                     ppp_create_interface drivers/net/ppp/ppp_generic.c:3348 [inline]
-                     ppp_unattached_ioctl drivers/net/ppp/ppp_generic.c:1060 [inline]
-                     ppp_ioctl+0x799/0x1cd0 drivers/net/ppp/ppp_generic.c:733
-                     vfs_ioctl fs/ioctl.c:51 [inline]
-                     __do_sys_ioctl fs/ioctl.c:907 [inline]
-                     __se_sys_ioctl+0xfe/0x170 fs/ioctl.c:893
-                     do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-                     do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-                     entry_SYSCALL_64_after_hwframe+0x77/0x7f
-  }
-  ... key      at: [<ffffffff9a68b2c0>] ppp_dev_configure.__key.67+0x0/0x20
-  ... acquired at:
-   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-   spin_lock_bh include/linux/spinlock.h:356 [inline]
-   ppp_connect_channel+0x174/0x650 drivers/net/ppp/ppp_generic.c:3484
-   ppp_ioctl+0xdd6/0x1cd0 drivers/net/ppp/ppp_generic.c:761
-   vfs_ioctl fs/ioctl.c:51 [inline]
-   __do_sys_ioctl fs/ioctl.c:907 [inline]
-   __se_sys_ioctl+0xfe/0x170 fs/ioctl.c:893
-   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> (&ppp->rlock){+...}-{2:2} {
-   HARDIRQ-ON-W at:
-                    lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                    __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                    _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                    spin_lock_bh include/linux/spinlock.h:356 [inline]
-                    ppp_get_stats64+0x33/0x290 drivers/net/ppp/ppp_generic.c:1534
-                    dev_get_stats+0xaf/0xa00 net/core/dev.c:10894
-                    rtnl_fill_stats+0x47/0x880 net/core/rtnetlink.c:1268
-                    rtnl_fill_ifinfo+0x18da/0x2270 net/core/rtnetlink.c:1909
-                    rtmsg_ifinfo_build_skb+0x18a/0x260 net/core/rtnetlink.c:4079
-                    rtmsg_ifinfo_event net/core/rtnetlink.c:4113 [inline]
-                    rtmsg_ifinfo+0x91/0x1b0 net/core/rtnetlink.c:4122
-                    register_netdevice+0x1774/0x1b00 net/core/dev.c:10491
-                    ppp_unit_register drivers/net/ppp/ppp_generic.c:1219 [inline]
-                    ppp_dev_configure+0x883/0xb10 drivers/net/ppp/ppp_generic.c:1275
-                    ppp_create_interface drivers/net/ppp/ppp_generic.c:3348 [inline]
-                    ppp_unattached_ioctl drivers/net/ppp/ppp_generic.c:1060 [inline]
-                    ppp_ioctl+0x799/0x1cd0 drivers/net/ppp/ppp_generic.c:733
-                    vfs_ioctl fs/ioctl.c:51 [inline]
-                    __do_sys_ioctl fs/ioctl.c:907 [inline]
-                    __se_sys_ioctl+0xfe/0x170 fs/ioctl.c:893
-                    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-                    do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-                    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   INITIAL USE at:
-                   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                   spin_lock_bh include/linux/spinlock.h:356 [inline]
-                   ppp_get_stats64+0x33/0x290 drivers/net/ppp/ppp_generic.c:1534
-                   dev_get_stats+0xaf/0xa00 net/core/dev.c:10894
-                   rtnl_fill_stats+0x47/0x880 net/core/rtnetlink.c:1268
-                   rtnl_fill_ifinfo+0x18da/0x2270 net/core/rtnetlink.c:1909
-                   rtmsg_ifinfo_build_skb+0x18a/0x260 net/core/rtnetlink.c:4079
-                   rtmsg_ifinfo_event net/core/rtnetlink.c:4113 [inline]
-                   rtmsg_ifinfo+0x91/0x1b0 net/core/rtnetlink.c:4122
-                   register_netdevice+0x1774/0x1b00 net/core/dev.c:10491
-                   ppp_unit_register drivers/net/ppp/ppp_generic.c:1219 [inline]
-                   ppp_dev_configure+0x883/0xb10 drivers/net/ppp/ppp_generic.c:1275
-                   ppp_create_interface drivers/net/ppp/ppp_generic.c:3348 [inline]
-                   ppp_unattached_ioctl drivers/net/ppp/ppp_generic.c:1060 [inline]
-                   ppp_ioctl+0x799/0x1cd0 drivers/net/ppp/ppp_generic.c:733
-                   vfs_ioctl fs/ioctl.c:51 [inline]
-                   __do_sys_ioctl fs/ioctl.c:907 [inline]
-                   __se_sys_ioctl+0xfe/0x170 fs/ioctl.c:893
-                   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-                   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-                   entry_SYSCALL_64_after_hwframe+0x77/0x7f
- }
- ... key      at: [<ffffffff9a68b2a0>] ppp_dev_configure.__key+0x0/0x20
- ... acquired at:
-   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-   spin_lock_bh include/linux/spinlock.h:356 [inline]
-   ppp_ioctl+0x121b/0x1cd0 drivers/net/ppp/ppp_generic.c:944
-   vfs_ioctl fs/ioctl.c:51 [inline]
-   __do_sys_ioctl fs/ioctl.c:907 [inline]
-   __se_sys_ioctl+0xfe/0x170 fs/ioctl.c:893
-   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-
-the dependencies between the lock to be acquired
- and SOFTIRQ-READ-irq-unsafe lock:
--> (&pch->downl){+.+.}-{2:2} {
-   HARDIRQ-ON-W at:
-                    lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                    __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                    _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                    spin_lock_bh include/linux/spinlock.h:356 [inline]
-                    ppp_unregister_channel+0x7c/0x300 drivers/net/ppp/ppp_generic.c:2992
-                    pppox_unbind_sock+0x5c/0xb0 drivers/net/ppp/pppox.c:58
-                    pppol2tp_release+0x99/0x340 net/l2tp/l2tp_ppp.c:438
-                    __sock_release net/socket.c:659 [inline]
-                    sock_close+0xbe/0x240 net/socket.c:1421
-                    __fput+0x24c/0x8a0 fs/file_table.c:422
-                    task_work_run+0x251/0x310 kernel/task_work.c:228
-                    resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-                    exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
-                    exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
-                    __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
-                    syscall_exit_to_user_mode+0x168/0x370 kernel/entry/common.c:218
-                    do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
-                    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   SOFTIRQ-ON-W at:
-                    lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                    __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-                    _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-                    spin_lock include/linux/spinlock.h:351 [inline]
-                    ppp_channel_bridge_input drivers/net/ppp/ppp_generic.c:2272 [inline]
-                    ppp_input+0x18b/0xa10 drivers/net/ppp/ppp_generic.c:2304
-                    pppoe_rcv_core+0x117/0x310 drivers/net/ppp/pppoe.c:379
-                    sk_backlog_rcv include/net/sock.h:1111 [inline]
-                    __release_sock+0x245/0x350 net/core/sock.c:3004
-                    release_sock+0x61/0x1f0 net/core/sock.c:3558
-                    pppoe_sendmsg+0xd5/0x750 drivers/net/ppp/pppoe.c:903
-                    sock_sendmsg_nosec net/socket.c:730 [inline]
-                    __sock_sendmsg+0x223/0x270 net/socket.c:745
-                    ____sys_sendmsg+0x525/0x7d0 net/socket.c:2597
-                    ___sys_sendmsg net/socket.c:2651 [inline]
-                    __sys_sendmmsg+0x3b2/0x740 net/socket.c:2737
-                    __do_sys_sendmmsg net/socket.c:2766 [inline]
-                    __se_sys_sendmmsg net/socket.c:2763 [inline]
-                    __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2763
-                    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-                    do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-                    entry_SYSCALL_64_after_hwframe+0x77/0x7f
-   INITIAL USE at:
-                   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-                   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                   spin_lock_bh include/linux/spinlock.h:356 [inline]
-                   ppp_unregister_channel+0x7c/0x300 drivers/net/ppp/ppp_generic.c:2992
-                   pppox_unbind_sock+0x5c/0xb0 drivers/net/ppp/pppox.c:58
-                   pppol2tp_release+0x99/0x340 net/l2tp/l2tp_ppp.c:438
-                   __sock_release net/socket.c:659 [inline]
-                   sock_close+0xbe/0x240 net/socket.c:1421
-                   __fput+0x24c/0x8a0 fs/file_table.c:422
-                   task_work_run+0x251/0x310 kernel/task_work.c:228
-                   resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
-                   exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
-                   exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
-                   __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
-                   syscall_exit_to_user_mode+0x168/0x370 kernel/entry/common.c:218
-                   do_syscall_64+0x100/0x230 arch/x86/entry/common.c:89
-                   entry_SYSCALL_64_after_hwframe+0x77/0x7f
- }
- ... key      at: [<ffffffff9a68b180>] ppp_register_net_channel.__key.1+0x0/0x20
- ... acquired at:
-   lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
-   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-   spin_lock_bh include/linux/spinlock.h:356 [inline]
-   ppp_connect_channel+0x194/0x650 drivers/net/ppp/ppp_generic.c:3485
-   ppp_ioctl+0xdd6/0x1cd0 drivers/net/ppp/ppp_generic.c:761
-   vfs_ioctl fs/ioctl.c:51 [inline]
-   __do_sys_ioctl fs/ioctl.c:907 [inline]
-   __se_sys_ioctl+0xfe/0x170 fs/ioctl.c:893
-   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-   entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 12167 Comm: syz.2.1597 Not tainted 6.11.0-rc7-syzkaller-00151-gd42f7708e27c #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
- print_bad_irq_dependency kernel/locking/lockdep.c:2625 [inline]
- check_irq_usage kernel/locking/lockdep.c:2864 [inline]
- check_prev_add kernel/locking/lockdep.c:3137 [inline]
- check_prevs_add kernel/locking/lockdep.c:3252 [inline]
- validate_chain+0x4de0/0x5900 kernel/locking/lockdep.c:3868
- __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- ppp_connect_channel+0x194/0x650 drivers/net/ppp/ppp_generic.c:3485
- ppp_ioctl+0xdd6/0x1cd0 drivers/net/ppp/ppp_generic.c:761
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl+0xfe/0x170 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f8e1bb7def9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f8e1c9fd038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f8e1bd36208 RCX: 00007f8e1bb7def9
-RDX: 0000000020000300 RSI: 000000004004743a RDI: 0000000000000005
-RBP: 00007f8e1bbf0b76 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000001 R14: 00007f8e1bd36208 R15: 00007ffee62b5158
- </TASK>
-
-
+Signed-off-by: Tarun Alle <Tarun.Alle@microchip.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+v3 -> v4
+- Added check to handle invalid samples.
+- Added macro for ARRAY_SIZE(rawtable).
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+v2 -> v3
+- Replaced hard-coded values with ARRAY_SIZE(rawtable).
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+v1 -> v2
+- Replaced hard-coded 200 with ARRAY_SIZE(rawtable).
+- Replaced return value -EINVAL with -ENETDOWN.
+- Changed link checks.
+---
+ drivers/net/phy/microchip_t1.c | 161 +++++++++++++++++++++++++++++++++
+ 1 file changed, 161 insertions(+)
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+diff --git a/drivers/net/phy/microchip_t1.c b/drivers/net/phy/microchip_t1.c
+index a5ef8fe50704..e5cc4c8b2265 100644
+--- a/drivers/net/phy/microchip_t1.c
++++ b/drivers/net/phy/microchip_t1.c
+@@ -6,6 +6,7 @@
+ #include <linux/delay.h>
+ #include <linux/mii.h>
+ #include <linux/phy.h>
++#include <linux/sort.h>
+ #include <linux/ethtool.h>
+ #include <linux/ethtool_netlink.h>
+ #include <linux/bitfield.h>
+@@ -226,6 +227,22 @@
+ #define MICROCHIP_CABLE_MAX_TIME_DIFF	\
+ 	(MICROCHIP_CABLE_MIN_TIME_DIFF + MICROCHIP_CABLE_TIME_MARGIN)
+ 
++#define LAN887X_COEFF_PWR_DN_CONFIG_100		0x0404
++#define LAN887X_COEFF_PWR_DN_CONFIG_100_V	0x16d6
++#define LAN887X_SQI_CONFIG_100			0x042e
++#define LAN887X_SQI_CONFIG_100_V		0x9572
++#define LAN887X_SQI_MSE_100			0x483
++
++#define LAN887X_POKE_PEEK_100			0x040d
++#define LAN887X_POKE_PEEK_100_EN		BIT(0)
++
++#define LAN887X_COEFF_MOD_CONFIG		0x080d
++#define LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN	BIT(8)
++
++#define LAN887X_DCQ_SQI_STATUS			0x08b2
++
++#define SQI100M_SAMPLE_INIT(x, t)	(ARRAY_SIZE(t) / (x))
++
+ #define DRIVER_AUTHOR	"Nisar Sayed <nisar.sayed@microchip.com>"
+ #define DRIVER_DESC	"Microchip LAN87XX/LAN937x/LAN887x T1 PHY driver"
+ 
+@@ -1830,6 +1847,148 @@ static int lan887x_cable_test_get_status(struct phy_device *phydev,
+ 	return lan887x_cable_test_report(phydev);
+ }
+ 
++/* Compare block to sort in ascending order */
++static int data_compare(const void *a, const void *b)
++{
++	return  *(u16 *)a - *(u16 *)b;
++}
++
++static int lan887x_get_sqi_100M(struct phy_device *phydev)
++{
++	u16 rawtable[200];
++	u32 sqiavg = 0;
++	u8 sqinum = 0;
++	int rc;
++
++	/* Configuration of SQI 100M */
++	rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
++			   LAN887X_COEFF_PWR_DN_CONFIG_100,
++			   LAN887X_COEFF_PWR_DN_CONFIG_100_V);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_write_mmd(phydev, MDIO_MMD_VEND1, LAN887X_SQI_CONFIG_100,
++			   LAN887X_SQI_CONFIG_100_V);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_SQI_CONFIG_100);
++	if (rc != LAN887X_SQI_CONFIG_100_V)
++		return -EINVAL;
++
++	rc = phy_modify_mmd(phydev, MDIO_MMD_VEND1, LAN887X_POKE_PEEK_100,
++			    LAN887X_POKE_PEEK_100_EN,
++			    LAN887X_POKE_PEEK_100_EN);
++	if (rc < 0)
++		return rc;
++
++	/* Required before reading register
++	 * otherwise it will return high value
++	 */
++	msleep(50);
++
++	/* Link check before raw readings */
++	rc = genphy_c45_read_link(phydev);
++	if (rc < 0)
++		return rc;
++
++	if (!phydev->link)
++		return -ENETDOWN;
++
++	/* Get 200 SQI raw readings */
++	for (int i = 0; i < ARRAY_SIZE(rawtable); i++) {
++		rc = phy_write_mmd(phydev, MDIO_MMD_VEND1,
++				   LAN887X_POKE_PEEK_100,
++				   LAN887X_POKE_PEEK_100_EN);
++		if (rc < 0)
++			return rc;
++
++		rc = phy_read_mmd(phydev, MDIO_MMD_VEND1,
++				  LAN887X_SQI_MSE_100);
++		if (rc < 0)
++			return rc;
++
++		rawtable[i] = (u16)rc;
++	}
++
++	/* Link check after raw readings */
++	rc = genphy_c45_read_link(phydev);
++	if (rc < 0)
++		return rc;
++
++	if (!phydev->link)
++		return -ENETDOWN;
++
++	/* Sort SQI raw readings in ascending order */
++	sort(rawtable, ARRAY_SIZE(rawtable), sizeof(u16), data_compare, NULL);
++
++	/* Keep inliers and discard outliers */
++	for (int i = SQI100M_SAMPLE_INIT(5, rawtable);
++	     i < SQI100M_SAMPLE_INIT(5, rawtable) * 4; i++)
++		sqiavg += rawtable[i];
++
++	/* Handle invalid samples */
++	if (sqiavg != 0) {
++		/* Get SQI average */
++		sqiavg /= SQI100M_SAMPLE_INIT(5, rawtable) * 4 -
++				SQI100M_SAMPLE_INIT(5, rawtable);
++
++		if (sqiavg < 75)
++			sqinum = 7;
++		else if (sqiavg < 94)
++			sqinum = 6;
++		else if (sqiavg < 119)
++			sqinum = 5;
++		else if (sqiavg < 150)
++			sqinum = 4;
++		else if (sqiavg < 189)
++			sqinum = 3;
++		else if (sqiavg < 237)
++			sqinum = 2;
++		else if (sqiavg < 299)
++			sqinum = 1;
++		else
++			sqinum = 0;
++	}
++
++	return sqinum;
++}
++
++static int lan887x_get_sqi(struct phy_device *phydev)
++{
++	int rc, val;
++
++	if (phydev->speed != SPEED_1000 &&
++	    phydev->speed != SPEED_100) {
++		return -ENETDOWN;
++	}
++
++	if (phydev->speed == SPEED_100)
++		return lan887x_get_sqi_100M(phydev);
++
++	/* Writing DCQ_COEFF_EN to trigger a SQI read */
++	rc = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1,
++			      LAN887X_COEFF_MOD_CONFIG,
++			      LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN);
++	if (rc < 0)
++		return rc;
++
++	/* Wait for DCQ done */
++	rc = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
++				       LAN887X_COEFF_MOD_CONFIG, val, ((val &
++				       LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN) !=
++				       LAN887X_COEFF_MOD_CONFIG_DCQ_COEFF_EN),
++				       10, 200, true);
++	if (rc < 0)
++		return rc;
++
++	rc = phy_read_mmd(phydev, MDIO_MMD_VEND1, LAN887X_DCQ_SQI_STATUS);
++	if (rc < 0)
++		return rc;
++
++	return FIELD_GET(T1_DCQ_SQI_MSK, rc);
++}
++
+ static struct phy_driver microchip_t1_phy_driver[] = {
+ 	{
+ 		PHY_ID_MATCH_MODEL(PHY_ID_LAN87XX),
+@@ -1881,6 +2040,8 @@ static struct phy_driver microchip_t1_phy_driver[] = {
+ 		.read_status	= genphy_c45_read_status,
+ 		.cable_test_start = lan887x_cable_test_start,
+ 		.cable_test_get_status = lan887x_cable_test_get_status,
++		.get_sqi	= lan887x_get_sqi,
++		.get_sqi_max	= lan87xx_get_sqi_max,
+ 	}
+ };
+ 
+-- 
+2.34.1
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
