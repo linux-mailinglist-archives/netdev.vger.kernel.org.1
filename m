@@ -1,239 +1,175 @@
-Return-Path: <netdev+bounces-128646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00A6997AAB8
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 06:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E65C397AABB
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 06:27:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE00A1F2752D
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 04:20:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 889DF1F275A6
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 04:27:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397A427473;
-	Tue, 17 Sep 2024 04:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CFA381D5;
+	Tue, 17 Sep 2024 04:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b="JPVMFEZX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kAUrAFcU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.emenem.pl (cmyk.emenem.pl [217.79.154.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F6E20EB;
-	Tue, 17 Sep 2024 04:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.79.154.63
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82E2E2905;
+	Tue, 17 Sep 2024 04:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726546806; cv=none; b=TN4MFsnhy8dX5Bc5+riOZMHg58s7IEA1bJ0UMgZppkeGxcUF8dkluY2IwsOHuLK7WLVo/z8JfTym6u5B6j9SorEdL8ZicUhQYeQfx0PZzIRIC3o76tTg7rLZHAncFxcb9pjknchdggctZ2B2Uwsu1M0p1ie2D049Izypyabv8cs=
+	t=1726547215; cv=none; b=VAmOI/oj5m/o77R1nMOlzKphIWowIfhG9iz4ntZPAHBISWqzbSFN51tKuGoZdkeFC8JLrbV19Ksz9KFOPkziQEv/IzuhXd/N2xzPg7dxfkuofezOd39dniBYxuIMWaYjufezSCFF+zl1QLASfEaiNTdRF9eK2h2fXDkwI9I9FeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726546806; c=relaxed/simple;
-	bh=NNruu2rRJmBusbp23E3Jox6mmHkmpuxQt3+youoOL4o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uv6Knbv1Z7a+e9pXOGr+0/h4lToWSP6KAqVQ4aSSLav5W2xumGDYIa4nS2oUn/j6KDSDSRZizfFbwxz8hznkVEz0WQw08tPdUypWo4/61qeAZQ5w9mUHQUQPeiDmSF/SvT8I0UOEA7ID+D1jaMFWdEz0N064hXFXBgjOU31vnls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl; spf=none smtp.mailfrom=ans.pl; dkim=pass (1024-bit key) header.d=ans.pl header.i=@ans.pl header.b=JPVMFEZX; arc=none smtp.client-ip=217.79.154.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ans.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ans.pl
-X-Virus-Scanned: amavisd-new at emenem.pl
-Received: from [192.168.1.10] (c-98-45-176-131.hsd1.ca.comcast.net [98.45.176.131])
-	(authenticated bits=0)
-	by cmyk.emenem.pl (8.17.1.9/8.17.1.9) with ESMTPSA id 48H4JWgC003995
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-	Tue, 17 Sep 2024 06:19:33 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ans.pl; s=20190507;
-	t=1726546778; bh=ih6ilAYP6GVlay1n2G2rK3g/+S5tedQG2u0VH6+8pzQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=JPVMFEZXuwvGGEsEjluS8Fm6PcXe6sNWBO/uNHhNnG6dCZ497dLKfhoE+4A+keCpG
-	 xWazE2UtguJHvBIk5lkqy4oty22T1AsT+Ys3s1sjjly1IlVqA4wZxOQYl4QtuVEDaD
-	 a+puGurjj2YqGEtjj7AjMz5YRBNGGLgD5kumnbIY=
-Message-ID: <1ad0402c-9c6a-44bc-9776-cb02c8e55a87@ans.pl>
-Date: Mon, 16 Sep 2024 21:19:29 -0700
+	s=arc-20240116; t=1726547215; c=relaxed/simple;
+	bh=4ZFZc9C2fBPRpspSfYhuXwhE6eMkHz2Vj8rrsEUo4c8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S62ZEjHCHLd2LbtRfSztvE5aMJG1hpVDR8gFHsreWvEOce8zq1xUy+BbhGVa/f4czijiUjY3xpxrsRJPmwE/xDjX6r4HEWGAabYoZVAU59UB6YiOUjGSF+EhsxcqUJcODaKLDNOkbctvuOPem9Nkvdy9HrZ1D4tWwrpOQ/Vuhcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kAUrAFcU; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-6ddcce88701so17092407b3.1;
+        Mon, 16 Sep 2024 21:26:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726547212; x=1727152012; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HK5OvXUfL0mdyUzKxKKdl/JIXJEJP8SVVNlRoZdQOtU=;
+        b=kAUrAFcUYeBWvsZXsWVx5U6jjCwzS+I+q/tdXVTJ9d1eeT+ONcF7TJXHdAIifnB3CY
+         TI5gmwWFa6Y5VvBupCI9KReju0JS8xg1cS3dJNm5Nw1xGbWnM91ZC8y6Kb7ARmYHNsZV
+         99fR2ngAYQuVWklSSRSmgfZdQBHF3YdE2MUe7i3MHqMwGebgT262YQ17HhcasOByIWaz
+         WbBfZ0vz+Pqas8RAJ0o6vfm+c7yW5Kees7Uka49N99bmDUzPtqF6pO2Da1F2rJ81MJCP
+         bz80JtY9+t2RAN5z0YZomlhcQIsVL+6tg5gYXOp6V92dCrNSQYwAmLxhJYMz87m5N2i0
+         ZuyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726547212; x=1727152012;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HK5OvXUfL0mdyUzKxKKdl/JIXJEJP8SVVNlRoZdQOtU=;
+        b=Tz+PJ+FRdCQbmymOruJQQ942ktTr8ddPEy4F3qcBJK2OS2eFFbJTDRKM+Hl4/PbLMJ
+         WkP9twG8URzZLuHmEzVhOlo/fCmlqYyJqW2RyNSszx8Alag9n/v2giw3OU8LuSOh/V/g
+         OqDvL+DaQ4/IXLfydXYIU9Jtj8CYkhv59vnU6Ubm58J6NF5IIDPA9oJJXRy/NFLNaTm1
+         iGXQRKcfqosuQFibJQYOyEqnXMVdlQT9/EHpOj+HfP0a/iT7iDwDluXh17x01DYOPqUO
+         k7QgHjJXxhjUJsdCcfNH6QUZaV4ibBUiQRsGEY4FmrsUXRKQXSM9HNssDWWwB+i1tWs9
+         p1sg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZMrU3ZACrhNwnjGNdp17HgvWXf21mUwJ39kDr4jY5LpoF4SNpSQa3OpCz6LwXI81LRiQ=@vger.kernel.org, AJvYcCVrtIso5qMwi/vuoLH47c1FlyNlLXBDO86Shzt6H+I47VsvfgOdjaVRDUUSQv5yKKUrigu3hLxc@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPxmNbmdrCqfIbI84yH78sJjLc7OvkaFP/5j+Qh/x/8uL+3/km
+	Fsb0r0HStiuVndTyTEFWTPS0zE4bYwMvnlWxSCc/09aVuEfzr2OqkZhr09qLHvklkixpXUDTMOq
+	mkAWBP1S5j7UQvs3h2cr5a1kq/jI=
+X-Google-Smtp-Source: AGHT+IFJujNJfsjLdz6+oDqP3asNL9dMW4qhf/8p2vrP5kxp98FHHFuPjoA9KaoacJeuj5iIMjIOBLfYuummjOALWrk=
+X-Received: by 2002:a05:690c:6904:b0:6dd:ba98:5c3d with SMTP id
+ 00721157ae682-6ddba985da6mr69383937b3.14.1726547212198; Mon, 16 Sep 2024
+ 21:26:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/4] mlx4/mlx5: {mlx4,mlx5e}_en_get_module_info
- cleanup
-To: Gal Pressman <gal@nvidia.com>, Ido Schimmel <idosch@nvidia.com>,
-        Tariq Toukan <tariqt@nvidia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>, Yishai Hadas <yishaih@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        linux-rdma@vger.kernel.org
-References: <14a24f93-f8d6-4bc7-8b87-86489bcedb28@ans.pl>
- <12092059-4212-44c5-9b13-dc7698933f76@nvidia.com>
- <8a0c724e-d2fb-4ae6-bf5d-74bbd0a7581b@ans.pl>
- <55ffb761-170b-4a1c-8565-7e6f531d423c@nvidia.com>
-From: =?UTF-8?Q?Krzysztof_Ol=C4=99dzki?= <ole@ans.pl>
-Content-Language: en-US
-In-Reply-To: <55ffb761-170b-4a1c-8565-7e6f531d423c@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240916055011.16655-1-jiwonaid0@gmail.com> <05707e9e-08ac-4ee1-b910-883f8b4b2636@blackwall.org>
+In-Reply-To: <05707e9e-08ac-4ee1-b910-883f8b4b2636@blackwall.org>
+From: =?UTF-8?B?6rmA7KeA7JuQ?= <jiwonaid0@gmail.com>
+Date: Tue, 17 Sep 2024 13:26:41 +0900
+Message-ID: <CAKaoOqc4PMobrxo-Sz5-1RTG-Qkf+GjDnqyp0zbEUmyDtFu5Zw@mail.gmail.com>
+Subject: Re: [PATCH net] bondig: Add bond_xdp_check for bond_xdp_xmit in bond_main.c
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: jv@jvosburgh.net, andy@greyhouse.net, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
+	joamaki@gmail.com, netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 16.09.2024 at 01:44, Gal Pressman wrote:
-> On 16/09/2024 10:30, Krzysztof Olędzki wrote:
->> On 16.09.2024 at 00:16, Gal Pressman wrote:
->>> Hi Krzysztof,
->>
->> Hi Gal,
->>
->> Thank you so much for your prompt review!
->>
->>> On 12/09/2024 9:38, Krzysztof Olędzki wrote:
->>>> Use SFF8024 constants defined in linux/sfp.h instead of private ones.
->>>>
->>>> Make mlx4_en_get_module_info() and mlx5e_get_module_info() to look
->>>> as close as possible to each other.
-> 
-> mlx4 and mlx5 don't necessarily have to be similar to each other.
+On Mon, Sep 16, 2024 at 5:48=E2=80=AFPM Nikolay Aleksandrov <razor@blackwal=
+l.org> wrote:
+>
+> On 16/09/2024 08:50, Jiwon Kim wrote:
+> > Add bond_xdp_check to ensure the bond interface is in a valid state.
+> >
+> > syzbot reported WARNING in bond_xdp_get_xmit_slave.
+> > In bond_xdp_get_xmit_slave, the comment says
+> > /* Should never happen. Mode guarded by bond_xdp_check() */.
+> > However, it does not check the status when entering bond_xdp_xmit.
+> >
+> > Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=3Dc187823a52ed505b2257
+> > Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driv=
+er")
+> > Signed-off-by: Jiwon Kim <jiwonaid0@gmail.com>
+> > ---
+> >  drivers/net/bonding/bond_main.c | 33 ++++++++++++++++++---------------
+> >  1 file changed, 18 insertions(+), 15 deletions(-)
+> >
+>
+> How did you figure the problem is there? Did you take any time to actuall=
+y
+> understand it? This patch doesn't fix anything, the warning can be easily
+> triggered with it. The actual fix is to remove that WARN_ON() altogether
+> and downgrade the netdev_err() to a ratelimited version. The reason is th=
+at
+> we can always get to a state where at least 1 bond device has xdp program
+> installed which increases bpf_master_redirect_enabled_key and another bon=
+d
+> device which uses xdpgeneric, then install an ebpf program that simply
+> returns ACT_TX on xdpgeneric bond's slave and voila - you get the warning=
+.
+>
+> setup is[1]:
+>  $ ip l add veth0 type veth peer veth1
+>  $ ip l add veth3 type veth peer veth4
+>  $ ip l add bond0 type bond mode 6 # <- transmit-alb mode, unsupported by=
+ xdp
+>  $ ip l add bond1 type bond # <- rr mode by default, supported by xdp
+>  $ ip l set veth0 master bond1
+>  $ ip l set bond1 up
+>  $ ip l set dev bond1 xdpdrv object tx_xdp.o section xdp_tx # <- we need =
+xdpdrv program to increase the static key, more below
+>  $ ip l set veth3 master bond0
+>  $ ip l set bond0 up
+>  $ ip l set veth4 up
+>  $ ip l set veth3 xdpgeneric object tx_xdp.o section xdp_tx # <- now we'l=
+l hit the codepath we need after veth3 Rx's a packet
+>
+>
+> If you take the time to look at the call stack and the actual code, you'l=
+l
+> see it goes something like (for the xdpgeneric bond slave, veth3):
+> ...
+> bpf_prog_run_generic_xdp() for veth3
+>  -> bpf_prog_run_xdp()
+>    -> __bpf_prog_run() # return ACT_TX
+>      -> xdp_master_redirect() # called because we have ACT_TX && netif_is=
+_bond_slave(xdp->rxq->dev)
+>        -> master->netdev_ops->ndo_xdp_get_xmit_slave(master, xdp); # and =
+here we go, WARN_ON()
+>
+> I've had a patch for awhile now about this and have taken the time to loo=
+k into it.
+> I guess it's time to dust it off and send it out for review. :)
+>
+> Thanks,
+>  Nik
 
-Agreed, however it was not a random goal. My motivation was that since
-the functions are doing exactly the same thing, it would be beneficial
-for them to look the same, so if more changes are needed in the future,
-it should be easier to make them.
+Hi Nikolay,
 
-Here is BTW the diff between them after all the changes:
+Thank you for taking the time to provide a detailed setup and call
+stack analysis.
+Would you be handling the new patch? If you don't mind, may I revise
+this patch to
 
--static int mlx4_en_get_module_info(struct net_device *dev,
--                                  struct ethtool_modinfo *modinfo)
-+static int mlx5e_get_module_info(struct net_device *netdev,
-+                                struct ethtool_modinfo *modinfo)
- {
--       struct mlx4_en_priv *priv = netdev_priv(dev);
--       struct mlx4_en_dev *mdev = priv->mdev;
-+       struct mlx5e_priv *priv = netdev_priv(netdev);
-+       struct mlx5_core_dev *dev = priv->mdev;
-        int ret;
--       u8 data[4];
-+       u8 data[4] = {0};
+- Replace with net_ratelimit()
+- Remove the WARN_ON()
+- Update the comment appropriately
 
-        /* Read first 2 bytes to get Module & REV ID */
--       ret = mlx4_get_module_info(mdev->dev, priv->port,
--                                  0 /*offset*/, 2 /*size*/, data);
-+       ret = mlx5_query_module_eeprom(dev,
-+                                      0 /*offset*/, 2 /*size*/, data);
-        if (ret < 2)
-                return -EIO;
+Thanks again for your insights and patience.
 
-@@ -2057,7 +1932,7 @@
-                modinfo->eeprom_len = ETH_MODULE_SFF_8472_LEN;
-                break;
-        default:
--               netdev_err(dev, "%s: cable type not recognized: 0x%x\n",
-+               netdev_err(priv->netdev, "%s: cable type not recognized: 0x%x\n",
-                           __func__, data[0]);
-                return -EINVAL;
-        }
-@@ -2065,113 +1940,715 @@
-        return 0;
- }
+Sincerely,
 
-
-> 
->>>> Simplify the logic for selecting SFF_8436 vs SFF_8636.
-> 
-> This commit message reflects my main issue with this patch, patches
-> should be concise, this patch tries to achieve (at least) three
-> different things in one.
-
-Fair. So, what we really have here:
- 1. Use SFF8024 constants defined in linux/sfp.h instead of private ones.
- 2. Simplify the logic for selecting SFF_8436 vs SFF_8636
- 3. Improving coding style
- 4. Adding extra logging in mlx4_en_get_module_info(), which is also what mlx5e_get_module_info() does.
- 5. Make mlx4_en_get_module_info() and mlx5e_get_module_info() to look as close as possible to each other.
-
-As requested, I'm splitting mlx4 vs mlx5 changes into separate patches
-Could you please advise if it is OK for them to cover all of the above
-*as long as I correctly capture this in the description*, or should
-I split them even more?
-
-Perhaps 1+2 (x2: mlx4+mlx5), 4, 3+5 (mlx4+mlx5) - so 5 total?
- 
->>>>
->>>> Signed-off-by: Krzysztof Piotr Oledzki <ole@ans.pl>
->>>> @@ -2029,33 +2030,35 @@ static int mlx4_en_get_module_info(struct net_device *dev,
->>>>  
->>>>  	/* Read first 2 bytes to get Module & REV ID */
->>>>  	ret = mlx4_get_module_info(mdev->dev, priv->port,
->>>> -				   0/*offset*/, 2/*size*/, data);
->>>> +				   0 /*offset*/, 2 /*size*/, data);
->>>
->>> Why?
->>
->> I tried to be consistent with the other places, some examples:
->> fw.c:   err = mlx4_cmd(dev, mailbox->dma, 0x01 /* subn mgmt class */,
->> en_tx.c:                                                0, 0 /* Non-NAPI caller */);
->>
->> Would you like me to drop this part of the change?
-> 
-> I didn't see the commit message mention anything about changing coding
-> style.
-
-My bad. I assumed it was a minor thing that would be fine to be just added there and
-does not require additional comments. Will address in v2.
-
->>
->>>
->>>>  	if (ret < 2)
->>>>  		return -EIO;
->>>>  
->>>> -	switch (data[0] /* identifier */) {
->>>> -	case MLX4_MODULE_ID_QSFP:
->>>> -		modinfo->type = ETH_MODULE_SFF_8436;
->>>> +	/* data[0] = identifier byte */
->>>> +	switch (data[0]) {
->>>> +	case SFF8024_ID_QSFP_8438:
->>>> +		modinfo->type       = ETH_MODULE_SFF_8436;
->>>>  		modinfo->eeprom_len = ETH_MODULE_SFF_8436_MAX_LEN;
->>>>  		break;
->>>> -	case MLX4_MODULE_ID_QSFP_PLUS:
->>>> -		if (data[1] >= 0x3) { /* revision id */
->>>> -			modinfo->type = ETH_MODULE_SFF_8636;
->>>> -			modinfo->eeprom_len = ETH_MODULE_SFF_8636_MAX_LEN;
->>>> -		} else {
->>>> -			modinfo->type = ETH_MODULE_SFF_8436;
->>>> +	case SFF8024_ID_QSFP_8436_8636:
->>>> +		/* data[1] = revision id */
->>>> +		if (data[1] < 0x3) {
->>>> +			modinfo->type       = ETH_MODULE_SFF_8436;
->>>>  			modinfo->eeprom_len = ETH_MODULE_SFF_8436_MAX_LEN;
->>>> +			break;
->>>>  		}
->>>> -		break;
->>>> -	case MLX4_MODULE_ID_QSFP28:
->>>> -		modinfo->type = ETH_MODULE_SFF_8636;
->>>> +		fallthrough;
->>>> +	case SFF8024_ID_QSFP28_8636:
->>>> +		modinfo->type       = ETH_MODULE_SFF_8636;
->>>>  		modinfo->eeprom_len = ETH_MODULE_SFF_8636_MAX_LEN;
->>>>  		break;
->>>> -	case MLX4_MODULE_ID_SFP:
->>>> -		modinfo->type = ETH_MODULE_SFF_8472;
->>>> +	case SFF8024_ID_SFP:
->>>> +		modinfo->type       = ETH_MODULE_SFF_8472;
->>>>  		modinfo->eeprom_len = ETH_MODULE_SFF_8472_LEN;
->>>>  		break;
->>>>  	default:
->>>> +		netdev_err(dev, "%s: cable type not recognized: 0x%x\n",
->>>> +			   __func__, data[0]);
->>>
->>> 0x%x -> %#x.
->>
->> Ah, sure.
-> 
-> Continuing my previous comment, I didn't see the commit message mention
-> anything about adding new prints.
-
-Right, will also fix in v2. My [apparently incorrect] assumption was that since
-we have it in mlx5e_get_module_info(), simply saying "Make mlx4_en_get_module_info() and
-mlx5e_get_module_info() to look as close as possible to each other." would be sufficient.
-
-I agree I should have called it explicitly.
-
-Thanks,
- Krzysztof
-
+Jiwon Kim
 
