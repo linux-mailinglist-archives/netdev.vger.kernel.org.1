@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-128745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F6CC97B5CF
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 00:33:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B0F97B603
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 01:15:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 057C1B2A0E7
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 22:33:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B14311F24FD3
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 23:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC38318DF78;
-	Tue, 17 Sep 2024 22:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA80174EFA;
+	Tue, 17 Sep 2024 23:15:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EX-PRD-EDGE02.vmware.com (EX-PRD-EDGE02.vmware.com [208.91.3.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69CA4166F0C
-	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 22:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CA57158D6A;
+	Tue, 17 Sep 2024 23:15:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=208.91.3.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726612264; cv=none; b=cSwJmuOA92x6zkEc29ykEKCbbTz0hLKlugBbRY0YZMqg/2v5hZSFrq+sOHJ6oOX4ToWhP3mBmDgakR6uY/+2vFTEg1TwPSA/O6CvseMD5qV3JWib7SrHW17+dm5Edu0KY4x8XgGOZ7lfP7Mxjam4xrlpy4bi+unSJ7Q4MIBNLUo=
+	t=1726614912; cv=none; b=Y6Z9sfJhmtYD+K1A2r+dIcgl0tya5m5lrkUI+DFHmpFEAVhoowCFY67VIyxQhJzHIAUAQ3jMDi2RzDG2bPgN/Us4bO3S5qDN8wuWG03ooXfW5fm6P5VuJA0l9HOOl2CAd4nmO7+5jxvArUes1WNRdUjGkOvSjt21X5t19Eq6ypQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726612264; c=relaxed/simple;
-	bh=aIHRx1WAh0Ssb9wQuea37MU+hqs16wu6+clcJa0mIeM=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=TDtmPYYzTtURg+2zS5m8pJ6nn5CgbjIiimAlOf0jMi3xdNWvvcKUIvGO7tC9/JuHF8BG/dxFHlA537wxkVIma2OW5HaKS7+jhEBdNo/IG7gjSBtEo7rcg7bkkk0l2TBi/6izlh/EqVoKRenEbQCxX0d0j2fAJkq/8dUVQfgr5lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a04bf03b1aso116418995ab.1
-        for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 15:31:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726612262; x=1727217062;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mxXvBeV1O30goxwxHgQ2uBduCiUKOZu0aee0Uy9tPlo=;
-        b=B5Jfyne713vicMUcRaI6UphDaQ5EIjoQDXV7IEomDJK49wJFGKBpr1/ZWdQNNkEIrT
-         S40rhygPRGiGehJKrPFF0bQ9kKgIQhNVXZQ05b9yvNMyrSg3sz/AX0RnaJffllwO0PEC
-         75vItJnCaiXSJWJ2aVPxmPE0Z4DlxuBKUhJPDFCyt/Y0jQ9hI3RwyBcYGO9FV9IcgaZ7
-         ugTAh7PnQqEQB4sXpb2xYXKQ2BQm5n44NHzcqfPYo/hHFX8rR8AeWNYu0qNPdpfXw7ZS
-         ZJVbfeltanhOxBSDg6icpPgmV+kEdjCoYpv3BT30G4zE9dt6N8hWp3NTDy5xni8+uPt0
-         ATPw==
-X-Forwarded-Encrypted: i=1; AJvYcCWwZyYM+vJAADFwl6D1h85OgGOnUnPvtL9qJpwFQLc1nqJSgOFwBTZv1AZOPR+fqxb2grRBcKs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7hstxbIFFrgyL4o4aQ2xDaDFyp4CpjHQB0qnwRkPb+o+im2AZ
-	wLWcT50Fv5Z5W7f4KCsEKd4vGKQUDhFa3NG+vz7PFovnKAMUAh26jowo1vBHMnQf+eGCH5WzCJA
-	ysygZaGXyslN8MNYLfuONopD2weUugvwXmRyFPrzn83sXSnmxYVMmbXU=
-X-Google-Smtp-Source: AGHT+IEJ/nUo7tEQDiIzKno+FsLEiL+0en6penJAx5m1i+GqtzIkl07/dRJl99OHLrggknVdei9JpWrBGxV2bbnM0LmLn4Hu/72o
+	s=arc-20240116; t=1726614912; c=relaxed/simple;
+	bh=j7/oWfb/LNMvzAvE1sJqEkfjlf4b9qxffkaD5ATBRJ0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ImTsOl7nXKRD7SYCYLvPhejDz3fLcSR0zfDp+sSWFj54W6E0D+0eN0iNFuz5E8VqHvlNg8pOcr7vAmcRGwVnwU4YbYVpGiAzFc1ESP8iIxULPdLbqYHcCjUHTXblR1TvUAanWzEZkdVD8tK798CjqAtkutoLrq4ZcKvu/TwXFEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; arc=none smtp.client-ip=208.91.3.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from sc9-mailhost1.vmware.com (10.113.161.71) by
+ EX-PRD-EDGE02.vmware.com (10.188.245.7) with Microsoft SMTP Server id
+ 15.1.2375.34; Tue, 17 Sep 2024 15:59:06 -0700
+Received: from htb-1n-eng-dhcp122.eng.vmware.com (unknown [10.172.6.252])
+	by sc9-mailhost1.vmware.com (Postfix) with ESMTP id C8A0B20346;
+	Tue, 17 Sep 2024 15:59:50 -0700 (PDT)
+From: Ronak Doshi <ronak.doshi@broadcom.com>
+To: <netdev@vger.kernel.org>
+CC: Ronak Doshi <ronak.doshi@broadcom.com>, Broadcom internal kernel review
+ list <bcm-kernel-feedback-list@broadcom.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, open list
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net-next] vmxnet3: support higher link speeds from vmxnet3 v9
+Date: Tue, 17 Sep 2024 15:59:46 -0700
+Message-ID: <20240917225947.23742-1-ronak.doshi@broadcom.com>
+X-Mailer: git-send-email 2.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1c8b:b0:3a0:9013:83f0 with SMTP id
- e9e14a558f8ab-3a09013878amr126859565ab.3.1726612262547; Tue, 17 Sep 2024
- 15:31:02 -0700 (PDT)
-Date: Tue, 17 Sep 2024 15:31:02 -0700
-In-Reply-To: <aa2b8eb7-a60c-43cf-ae70-9569dd7b9e85@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000093078f0622583e6e@google.com>
-Subject: Re: [syzbot] [net?] possible deadlock in do_ip_setsockopt (4)
-From: syzbot <syzbot+e4c27043b9315839452d@syzkaller.appspotmail.com>
-To: alibuda@linux.alibaba.com, davem@davemloft.net, dsahern@kernel.org, 
-	dust.li@linux.alibaba.com, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	schnelle@linux.ibm.com, srikarananta01@gmail.com, 
-	syzkaller-bugs@googlegroups.com, wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+Received-SPF: SoftFail (EX-PRD-EDGE02.vmware.com: domain of transitioning
+ ronak.doshi@broadcom.com discourages use of 10.113.161.71 as permitted
+ sender)
 
-Hello,
+Until now, vmxnet3 was default reporting 10Gbps as link speed.
+Vmxnet3 v9 adds support for user to configure higher link speeds.
+User can configure the link speed via VMs advanced parameters options
+in VCenter. This speed is reported in gbps by hypervisor.
 
-syzbot tried to test the proposed patch but the build/boot failed:
+This patch adds support for vmxnet3 to report higher link speeds and
+converts it to mbps as expected by Linux stack.
 
-failed to apply patch:
-checking file net/ipv4/ip_sockglue.c
-patch: **** unexpected end of file in patch
+Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
+Acked-by: Guolin Yang <guolin.yang@broadcom.com>
+---
+ drivers/net/vmxnet3/vmxnet3_drv.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-
-
-Tested on:
-
-commit:         2f27fce6 Merge tag 'sound-6.12-rc1' of git://git.kerne..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4fc2afd52fd008bb
-dashboard link: https://syzkaller.appspot.com/bug?extid=e4c27043b9315839452d
-compiler:       
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=152784a9980000
+diff --git a/drivers/net/vmxnet3/vmxnet3_drv.c b/drivers/net/vmxnet3/vmxnet3_drv.c
+index b70654c7ad34..bb514b72c8b5 100644
+--- a/drivers/net/vmxnet3/vmxnet3_drv.c
++++ b/drivers/net/vmxnet3/vmxnet3_drv.c
+@@ -201,6 +201,8 @@ vmxnet3_check_link(struct vmxnet3_adapter *adapter, bool affectTxQueue)
+ 
+ 	adapter->link_speed = ret >> 16;
+ 	if (ret & 1) { /* Link is up. */
++		if (VMXNET3_VERSION_GE_9(adapter) && adapter->link_speed < 10000)
++			adapter->link_speed = adapter->link_speed * 1000;
+ 		netdev_info(adapter->netdev, "NIC Link is Up %d Mbps\n",
+ 			    adapter->link_speed);
+ 		netif_carrier_on(adapter->netdev);
+-- 
+2.11.0
 
 
