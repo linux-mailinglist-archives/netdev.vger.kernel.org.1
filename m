@@ -1,105 +1,171 @@
-Return-Path: <netdev+bounces-128725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F2EA97B2BB
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 18:15:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B729997B2C3
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 18:15:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 051D81F21953
-	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:15:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C611F28338A
+	for <lists+netdev@lfdr.de>; Tue, 17 Sep 2024 16:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90146168491;
-	Tue, 17 Sep 2024 16:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06BF918757D;
+	Tue, 17 Sep 2024 16:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q7EiURbz"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PE1ylMnU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300F0142621;
-	Tue, 17 Sep 2024 16:14:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3B0186E37
+	for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 16:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726589695; cv=none; b=VrSvPZ89lnv5REpsraoLInhiPdWajndb7iSm5yMtokXKd3Hh2SjGyCfVSUnHk2Ssp3vfltJ1/3o7oxIXMBsRZ7EHZCb3NJXUHtQ9/1mkBZUB+RhFUuq82o1wVwehbrWhB31A0RM53EgJbi4xQxxjD3yCcs42vKNa9VqMnFcwApQ=
+	t=1726589708; cv=none; b=W+G3bRJE8pfbcS867Z6Pl2euofHgylI2Un26kTdd+lxeK31vP8T++wWEvONOaIovOy4hGgCpR1Rbou/lWbBYd7tzRJJAJM7vW39VsZ5ixHnVfk7R+beo2AO8nIlRwTCayk2/5GIxLc4NmUVZbsCTqR5++rVIch6lhgl7hfLlJNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726589695; c=relaxed/simple;
-	bh=+u2RJleW7OosPIezCRO5B0gsnBqFgz+H5aixrVCNud4=;
+	s=arc-20240116; t=1726589708; c=relaxed/simple;
+	bh=lwnXZapTso/O0BB5NasLPLapI5PqZ2TTupYriBm2dn0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H7URslX5IJCbDGQ5e8rJC0oCsXvwvUWBmq1gY62ezWhqBJWbxHknQfPk8pbb5j5io8h4dYH4p0ewJbC3pCFxfIgrGt4/0ul8ECWLAsl8cRNy4qrGD1mr6rljtMZoHDzR40U6yRDtZaGTi32bNp88UcV52RTXe+aaI67j1cOct8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q7EiURbz; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-206e614953aso58846465ad.1;
-        Tue, 17 Sep 2024 09:14:53 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=OZhKBPtofl25g7MT5MLWm/OOgBCRFcYHVfBY5la7/0czePKu7afMQjmvzfTo6PEnZ3CUvDv69vpMIrCINQy7D0nleIgoXZ/ulbYY3ZdYGRkcn2dB/lwt4ak/eF7Bmh/LX2AYAt7E1AgZMCYqvH+YBHcecND2AqndJEmoAciI5FA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PE1ylMnU; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42cbface8d6so60688365e9.3
+        for <netdev@vger.kernel.org>; Tue, 17 Sep 2024 09:15:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726589693; x=1727194493; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1726589705; x=1727194505; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wo0qb/nMmiuLtTdnX5Rf3I7jGGV05/OqWpK1YrlbbxY=;
-        b=Q7EiURbz0JU4o8fb+MRbHgBRIfzAwbXizS0/8AYqoc9OPDhtC4iOvVREuPn0MbBV3H
-         OZoO51H1IboYIGN3E3xtzTna+nSPJJGr8EDPMzNXEszx2ol9GeC8awsAX2gWcezQPaTo
-         pgStyoye5rkghKfZ5i5ufpDTbMx6NRN5R60zsoxghcKAfcVpQ0p1xJCNBwCjwmHiR0TW
-         uG3EwqNNthEtFqr3a5avpNbh3PNng9sCBR4qgyZHOp4pOOPecNxwMIQxd0RPzQQHq/DR
-         ZAKuN90gaKWZsjyRIN7adA2lVwW5LzaUdQS6D3WknqmBS45KDJ+ho4OEY1Z7SyJK0nXx
-         c3Tg==
+        bh=1vb3ZNNoM2z4eN/JSIKdMJgAcjYjqjC/0wPV4rSBWMg=;
+        b=PE1ylMnUxQfJXYtybN1/OkpaeMHZ3d27y9ibVSrmRJVjGH+pThz2CBKTGzehClMe0c
+         EWeLj5XfEypfo4aBV05o7qHYfqLqrkqjTcw6WOGT+7qYKTVoPG0sQDNzf70fgibrNnDh
+         G4SVZhuYWfz+f0KbziGuV++KYK6qJ5A98hBj0cnVuDcM/X5SYTNrSoWq1806xuZijaY8
+         J9nDEc914hbxGxX4FXgLbn0tayg5J39UyzbzYE/cGsVzLHANdCkQ9XqCrfMYAkTgycvu
+         sb/2U5xdzPUMja28ZBtTcsDKdUoI5bADl4tM8drfRvtaLXyWRaWBxodR4i+2GtxOPiQZ
+         sfBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726589693; x=1727194493;
+        d=1e100.net; s=20230601; t=1726589705; x=1727194505;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wo0qb/nMmiuLtTdnX5Rf3I7jGGV05/OqWpK1YrlbbxY=;
-        b=QoyQ18ZtMoiEG48rFJTWogyq4P4Qx5nKU5TCsT7pb7ZzxVfSFcpSY5pu7TXvJDnpB2
-         TkoZLt/cg8QfFEsr6awsW8ywZbVEvMqhcSpCygZzHCS5k2mw80UZ75Ybq3U4gPBn2yOa
-         AOoQ4L6I4pziDHLr82nMkwy4Aqj6ic6wiiEs69bXXdqBY/7xh0T0a9cdzruI3F66QBsw
-         2om18jE3wmiyFF7GUOCXaqXD7JsSW/gEwR4P/CpU+jq42Dsa9HqjnfgAb9YEEei8EmX2
-         YxUoq4PDmqIKWb4IBThYNI/UieYzP3i7e04kcePr2kcSkIFxX/f15+zoSKxvpr/96fyJ
-         Oe2A==
-X-Forwarded-Encrypted: i=1; AJvYcCUkKfx8t+ysE/GE6G8hoR8GDfT+Qu4Atp2KrL8kgqoXhNWE0KzsaxIUr1MISfEn9D8ikuUuGypCa6DozQs=@vger.kernel.org, AJvYcCVbIvTEiSq2219jgddIdjlK8wP3/zYvEAtoOOUfb0OryMKeWIHGOH12ubx5IyrvleDbmzGls/SJ@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCXi+8YpehWJifWDQ4P1oC/d+aGDupg+25oeRewBNYe1eL1bTv
-	SAXcCyyoIIeNLHoMbInP9voGGTli6sBXqACouB12IQ8es9agQgs=
-X-Google-Smtp-Source: AGHT+IGoQX3Bw1vVKlCgZNNh843NpLvAVYG/428YjYeyjrq289lY+FxTU4k8bBiwudl5/WX/n5vgGQ==
-X-Received: by 2002:a17:903:1cd:b0:207:20e3:c693 with SMTP id d9443c01a7336-2076e4129efmr269372655ad.43.1726589693262;
-        Tue, 17 Sep 2024 09:14:53 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946d291csm51999745ad.143.2024.09.17.09.14.52
+        bh=1vb3ZNNoM2z4eN/JSIKdMJgAcjYjqjC/0wPV4rSBWMg=;
+        b=gscRzfvB9bSJYnusbrtCIf5Urvy338j9ixtkynJWtUdqW6TcpiddGxJO09vy/Lm3Cw
+         VtHjQ3lmDvXIh5ppfvrleVp3+wi2xadZbTinlNHA3ex7Cl0wuRv6qlftUxEhv3puXL58
+         JzPutpQCKjzG2oC4wuCav1LkCxgS47j1g0j0gCHBa2hBtIVsoEwlz5Q6bTF01NxuYO5q
+         BV4Xz0z/tQiiwhREb+4BcEzjClUK/797lwEeL8xww/bLwxAAqSUqcAFT7EEy2rMEZJWQ
+         SY8lIMDuhAmgHKLYkehm3YMzwAs0ok4a5bmaKVrvwaWVeClzmf3tsVMk8ZP5xIhPU1oG
+         TvfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVjQQcfFaWv8AUOMORY+ACE3ETq2AE3y41Sz1kFpLTlpUqUviraKLOQSqiuo7TqYr4kcajntmg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzibn/3hnI/QOjo+tMefwjIiz0jl68dseGU6xPS5ycMqXqakPDV
+	72m1GR0c4xw+2zSjrWvr6vaobDELekFHK9RQAsR1BUryet18d0UXBhupHtNpIY8=
+X-Google-Smtp-Source: AGHT+IGyYTKKVcEirSlpO0KfCBQX0iPAUMySvChTbbgc8k0xkQsZ1583R2aJKwp5Qb1gsjn326NdDA==
+X-Received: by 2002:a05:600c:354a:b0:42c:c8be:4215 with SMTP id 5b1f17b1804b1-42d9070b2eamr137076455e9.4.1726589704576;
+        Tue, 17 Sep 2024 09:15:04 -0700 (PDT)
+Received: from GHGHG14 ([2a09:bac5:50ca:432::6b:83])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42d9b1947cfsm141094715e9.42.2024.09.17.09.15.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Sep 2024 09:14:52 -0700 (PDT)
-Date: Tue, 17 Sep 2024 09:14:52 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Zach Walton <me@zach.us>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
+        Tue, 17 Sep 2024 09:15:04 -0700 (PDT)
+Date: Tue, 17 Sep 2024 17:15:00 +0100
+From: Tiago Lam <tiagolam@cloudflare.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: Allow ioctl TUNSETIFF without CAP_NET_ADMIN via seccomp?
-Message-ID: <Zumq_CxJZ9hWuJIk@mini-arch>
-References: <CABQG4PHGcZggTbDytM4Qq_zk2r3GPGAXEKPiFf9htjFpp+ouKg@mail.gmail.com>
- <66e9419c6c8f9_2561f32947d@willemb.c.googlers.com.notmuch>
- <CABQG4PF+xeeAckkop5oas0zjE4aKM1Y=fSLRAHt5WiZOhJMGtA@mail.gmail.com>
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Jakub Sitnicki <jakub@cloudflare.com>, kernel-team@cloudflare.com
+Subject: Re: [RFC PATCH 2/3] ipv6: Run a reverse sk_lookup on sendmsg.
+Message-ID: <ZumrBKAkZX0RZrgm@GHGHG14>
+References: <20240913-reverse-sk-lookup-v1-0-e721ea003d4c@cloudflare.com>
+ <20240913-reverse-sk-lookup-v1-2-e721ea003d4c@cloudflare.com>
+ <d17da5b6-6273-4c2c-abd7-99378723866e@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CABQG4PF+xeeAckkop5oas0zjE4aKM1Y=fSLRAHt5WiZOhJMGtA@mail.gmail.com>
+In-Reply-To: <d17da5b6-6273-4c2c-abd7-99378723866e@linux.dev>
 
-On 09/17, Zach Walton wrote:
-> Thanks, I think this might have been a misunderstanding on my part;
-> seccomp is meant to restrict, not expand, permissions. I spent some
-> time looking for prior art and see nothing like it.
+On Fri, Sep 13, 2024 at 11:24:09AM -0700, Martin KaFai Lau wrote:
+> On 9/13/24 2:39 AM, Tiago Lam wrote:
+> > This follows the same rationale provided for the ipv4 counterpart, where
+> > it now runs a reverse socket lookup when source addresses and/or ports
+> > are changed, on sendmsg, to check whether egress traffic should be
+> > allowed to go through or not.
+> > 
+> > As with ipv4, the ipv6 sendmsg path is also extended here to support the
+> > IPV6_ORIGDSTADDR ancilliary message to be able to specify a source
+> > address/port.
+> > 
+> > Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+> > Signed-off-by: Tiago Lam <tiagolam@cloudflare.com>
+> > ---
+> >   net/ipv6/datagram.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >   net/ipv6/udp.c      |  8 ++++--
+> >   2 files changed, 82 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
+> > index fff78496803d..4214dda1c320 100644
+> > --- a/net/ipv6/datagram.c
+> > +++ b/net/ipv6/datagram.c
+> > @@ -756,6 +756,27 @@ void ip6_datagram_recv_ctl(struct sock *sk, struct msghdr *msg,
+> >   }
+> >   EXPORT_SYMBOL_GPL(ip6_datagram_recv_ctl);
+> > +static inline bool reverse_sk_lookup(struct flowi6 *fl6, struct sock *sk,
+> > +				     struct in6_addr *saddr, __be16 sport)
+> > +{
+> > +	if (static_branch_unlikely(&bpf_sk_lookup_enabled) &&
+> > +	    (saddr && sport) &&
+> > +	    (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr, saddr) || inet_sk(sk)->inet_sport != sport)) {
+> > +		struct sock *sk_egress;
+> > +
+> > +		bpf_sk_lookup_run_v6(sock_net(sk), IPPROTO_UDP, &fl6->daddr, fl6->fl6_dport,
+> > +				     saddr, ntohs(sport), 0, &sk_egress);
 > 
-> I will look into alternatives like AppArmor/eBPF. Appreciate the response.
+> iirc, in the ingress path, the sk could also be selected by a tc bpf prog
+> doing bpf_sk_assign. Then this re-run on sk_lookup may give an incorrect
+> result?
+> 
 
-There is a bit of "expand capabilities" prior art in the bind cgroup hooks:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/include/linux/bpf.h#n2075
+If it does give the incorrect result, we still fallback to the normal
+egress path.
 
-The BPF program can return special value to ask kernel to not apply
-CAP_NET_BIND_SERVICE. But this eBPF hook, not a seccomp..
+> In general, is it necessary to rerun any bpf prog if the user space has
+> specified the IP[v6]_ORIGDSTADDR.
+> 
+
+More generally, wouldn't that also be the case if someone calls
+bpf_sk_assign() in both TC and sk_lookup on ingress? It can lead to some
+interference between the two.
+
+It seems like the interesting cases are:
+1. Calling bpf_sk_assign() on both TC and sk_lookup ingress: if this
+happens sk_lookup on egress should match the correct socket when doing
+the reverse lookup;
+2. Calling bpf_sk_assign() only on ingress TC: in this case it will
+depend if an sk_lookup program is attached or not:
+  a. If not, there's no reverse lookup on egress either;
+  b. But if yes, although the reverse sk_lookup here won't match the
+  initial socket assigned at ingress TC, the packets will still fallback
+  to the normal egress path;
+
+You're right in that case 2b above will continue with the same
+restrictions as before.
+
+Tiago.
 
