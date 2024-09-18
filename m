@@ -1,162 +1,136 @@
-Return-Path: <netdev+bounces-128838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F6F97BE47
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 16:58:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1662197BE4C
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 17:03:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0FDD81C2108C
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:58:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4057F1C20C9A
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 15:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79A5D1C3F13;
-	Wed, 18 Sep 2024 14:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G2ULJver"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92D818A6C5;
+	Wed, 18 Sep 2024 15:03:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C07CF1C5791
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 14:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463151C8FBA
+	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 15:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726671514; cv=none; b=iAtMdzFWkOZkMvXeWURGP0xM5goAICDmhgiVTeHtvuqlVQ8clohYdRPHmIJm16unzUfgztUnWcpfiUfOSjvke3jnPhvNLs6EwDz8T9Si+F47wnYn0ygLygu6s6sJ8uOq7v1kDOwwiAUhbWYnJdaVAXtpPz+3gIR7VLApZZOlVAw=
+	t=1726671806; cv=none; b=c+uz/PXyyBYoKXxDRxsw80r3HNIhQ2j7l+Y9ipzyOzkaZydvNdkTM+LB0f3mAcuBWAMEOIq+frJal2Wq3+VpeX9xw6kP5/xMQz/54UFosj8et+0qh535vOe6L3je1t+Q8I8r/mSQhr1wBoVj0MnEU69zpEKLKTqkn4q6yc6BT1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726671514; c=relaxed/simple;
-	bh=QM+WRIrqOf/VG+tDwYImunOT5LIH7QRSSR3sO1/hKqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mqS0MQd9eq9vrE/LgxTKDnaRqaGJC3cW3nT6DDwz6iHnRMD9eVvHZu9As7Gt/7qPX6KNBtYntfYgCwaqpfSgqpcRlPML3pHBzTslHURhoFqpzqdbcsB10Nocjx0Tdrzyb2fC4a0+LcwpJFo/Rb57+Mty/UJ6YWMXjRtKFznuXDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G2ULJver; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726671511;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MAwqY9vnRPc9YnB7fd6OqxXe5O2u5mpoyMN36Na6yP8=;
-	b=G2ULJver9frtc59JaKphGZAQq8y+BVsYSKbE38K3AeYiMPZRzkAGr6Vtx/RaMKxh1+NLJi
-	Ti4juDOqBztkDeNoVC1d7JXiMtGUFWttOf6XvHSYlE/l85QeoUyD/ZhYR43T1XI8tKxRww
-	isl6MVO9WxYzJhRp7GcjEtoZEDwqQM0=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-402-uNELa10eP8S3MsfjwIkqeg-1; Wed, 18 Sep 2024 10:58:30 -0400
-X-MC-Unique: uNELa10eP8S3MsfjwIkqeg-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-5c24c92db25so1192370a12.0
-        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 07:58:30 -0700 (PDT)
+	s=arc-20240116; t=1726671806; c=relaxed/simple;
+	bh=BhzpLIq6Vxfl5iUIGMXzekYXB+e52TdqSnfp5qidmWE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Ldz4EPJTxtgY3U0l9d3ughKHf6P93yCe3154BaPsYuZMwDdyx3lta+rhD8QSPGt1wpkOuPdBWQ6oSmRkyjMqqji+kmkGXisOM7pxXq2JrFB0E3axIGsQRuSwsMG0vDtW9vz1U8nC1VTbar8ZiieoSQUGep+xvbjMzmyMYlT34fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a045e7ed57so110755015ab.2
+        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 08:03:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726671509; x=1727276309;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MAwqY9vnRPc9YnB7fd6OqxXe5O2u5mpoyMN36Na6yP8=;
-        b=ZL5ueVcO2CWmZQzmdWfD5XKi4H/Q2JZ63QFznaRibLK0smw7YrQlO7TwXcGDePCmiS
-         g1XnIH5F0YOJ8GfBNQZxYMRYT6VCxT6rynhRPqJmON9lpp5OFwHU31X/NrNJR0ZDEy0X
-         yVB90SfXqotDLIU/S4mwssCUqod5wm3hrZ3gvBM6g4YMRQEj4f4MkgNWXUQWMuwDvJQg
-         fkRs32HFO4VJ7mEhBqEZnmX0KEUwSq6SbpZ1dEzOW33pR+N45B/GYSLhWZlmEIexLwUG
-         bGDWLFTcv5rFTd7de2a1S9B9pSuEReqoud4MOK9W3/1b843yNd9xOcyS/9b+KzRcHM0m
-         Z9fw==
-X-Forwarded-Encrypted: i=1; AJvYcCW7voU0/j+uT3anIdpBvURliPN0aEIWj8zxQeaZPwhWbopmi/+oZK6ohB6IDZAb9UlJZv+iqo0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJTO1Vew1stCdrAHX4gxVo4avXP4E3yGZocsKhBHIBiMllUPpg
-	LrJjNRROHePTvmCYrD6prgkxHGjzhb+YvLEFA1rb+8i8gVExqWqzVCeK+jy+nRMTHa+zVnj0/Wi
-	6MomRHC/Apr/kFftiBNnRZCUAAETVyHUYUS7SfZL/WoMreGC6vmt2KA==
-X-Received: by 2002:a05:6402:5c8:b0:5c2:5254:cdc4 with SMTP id 4fb4d7f45d1cf-5c4143874bdmr25722273a12.17.1726671509310;
-        Wed, 18 Sep 2024 07:58:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEzH5nuqNle+ILuHyENqVhBvmZFotgEz0rqz8hkG1mCshcHdFnBkW5waH+k3AXJut3JW5zwew==
-X-Received: by 2002:a05:6402:5c8:b0:5c2:5254:cdc4 with SMTP id 4fb4d7f45d1cf-5c4143874bdmr25722237a12.17.1726671508527;
-        Wed, 18 Sep 2024 07:58:28 -0700 (PDT)
-Received: from redhat.com ([83.68.141.146])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c42bb5e83asm5178794a12.40.2024.09.18.07.58.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Sep 2024 07:58:26 -0700 (PDT)
-Date: Wed, 18 Sep 2024 10:58:23 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Wenbo Li <liwenbo.martin@bytedance.com>
-Cc: jasowang@redhat.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jiahui Cen <cenjiahui@bytedance.com>,
-	Ying Fang <fangying.tommy@bytedance.com>
-Subject: Re: [PATCH v3] virtio_net: Fix mismatched buf address when unmapping
- for small packets
-Message-ID: <20240918105803-mutt-send-email-mst@kernel.org>
-References: <20240918132005.31174-1-liwenbo.martin@bytedance.com>
+        d=1e100.net; s=20230601; t=1726671804; x=1727276604;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+UC6Mc3Avq1l/u0KK21V2/bnbzcYLVONph6/3dO9HTk=;
+        b=Jn2ts8yyuXhliBIkvj3g85/mzkzB/AICsl8G/vAj0hD/04vMpRgxxe4vdhARSn18Kh
+         hXAGZbIqeXbsrDBwR0PsaIqsjzcbHOvOOFuEn59KUvsbkYOHsp0JU6QcDFPQv46FMpZw
+         ojlY64LAjEohJC9Ovn7/PfUVaXcWhCzee17J4uFlqqisYWoY/rRbBSWQIdOg8bzT+Crt
+         GFfud3iNcHmh4ERs7LRlDhhgbIwKRIANG/mElbtSuErw1nZH5pscL8g0KKXcPzAzew7f
+         ZW1SUkJJGx3P1hVYUKlOV2Mi1KJkVoVhjB5a1C2JUDhB+HzbrV2EZcbtUygRSwEciRJD
+         EiVw==
+X-Forwarded-Encrypted: i=1; AJvYcCUcPkdKQ5iQjypp08g6EzHCwf9F/xfSZLetgjuo6scTVohJz0t3WE/0ZiooM74vcrY4oeFTPLs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5IjP+zDD0OKV1db3jMmhGVqZla5ygQDZmpmnjgRp2MbfYYl/r
+	DH1BVWoN3nhAqqsT3b2y6iRWG5MmE6Wv4U6L73ztxa4TuzNE4IFXGGHBAKQAYYjvxGnAmSyOYqI
+	L+ZIPcTXUE8BD5KNxMNzo03a/7mBgvpYsmLzdsQGgtnmUtnk9fn9U3uQ=
+X-Google-Smtp-Source: AGHT+IGhaa35gFQtE7Vu6kAqFod34bDr20BPHRMrc2dgJZosDloT+LS7bv0hMwlqO3aSKOat4cDUUzLJfcHG+Xzj1r6MMSb7kWtL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240918132005.31174-1-liwenbo.martin@bytedance.com>
+X-Received: by 2002:a05:6e02:5a9:b0:3a0:8c68:7705 with SMTP id
+ e9e14a558f8ab-3a08c6877c6mr146178425ab.21.1726671804203; Wed, 18 Sep 2024
+ 08:03:24 -0700 (PDT)
+Date: Wed, 18 Sep 2024 08:03:24 -0700
+In-Reply-To: <66e55308.050a0220.1f4381.0004.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <66eaebbc.050a0220.252d9a.0015.GAE@google.com>
+Subject: Re: [syzbot] [btrfs?] BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low! (7)
+From: syzbot <syzbot+74f79df25c37437e4d5a@syzkaller.appspotmail.com>
+To: chao@kernel.org, clm@fb.com, dsterba@suse.com, jaegeuk@kernel.org, 
+	josef@toxicpanda.com, linux-btrfs@vger.kernel.org, 
+	linux-f2fs-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Sep 18, 2024 at 09:20:05PM +0800, Wenbo Li wrote:
-> Currently, the virtio-net driver will perform a pre-dma-mapping for
-> small or mergeable RX buffer. But for small packets, a mismatched address
-> without VIRTNET_RX_PAD and xdp_headroom is used for unmapping.
-> 
-> That will result in unsynchronized buffers when SWIOTLB is enabled, for
-> example, when running as a TDX guest.
-> 
-> This patch unifies the address passed to the virtio core into the address of
-> the virtnet header and fixes the mismatched buffer address.
-> 
-> Changes from v2: unify the buf that passed to the virtio core in small
-> and merge mode.
-> Changes from v1: Use ctx to get xdp_headroom.
-> 
-> Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-> Signed-off-by: Wenbo Li <liwenbo.martin@bytedance.com>
-> Signed-off-by: Jiahui Cen <cenjiahui@bytedance.com>
-> Signed-off-by: Ying Fang <fangying.tommy@bytedance.com>
+syzbot has found a reproducer for the following issue on:
 
-OK but can you please adhere to the kernel coding style?
+HEAD commit:    5f5673607153 Merge branch 'for-next/core' into for-kernelci
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=137fc69f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=dedbcb1ff4387972
+dashboard link: https://syzkaller.appspot.com/bug?extid=74f79df25c37437e4d5a
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b8f500580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10dbc4a9980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/40172aed5414/disk-5f567360.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/58372f305e9d/vmlinux-5f567360.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d2aae6fa798f/Image-5f567360.gz.xz
+mounted in repro: https://storage.googleapis.com/syzbot-assets/e4b8f51425ac/mount_0.gz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+74f79df25c37437e4d5a@syzkaller.appspotmail.com
+
+BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
+turning off the locking correctness validator.
+CPU: 0 UID: 0 PID: 137 Comm: kworker/u8:4 Not tainted 6.11.0-rc7-syzkaller-g5f5673607153 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+Workqueue: btrfs-endio-write btrfs_work_helper
+Call trace:
+ dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:319
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:326
+ __dump_stack lib/dump_stack.c:93 [inline]
+ dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:119
+ dump_stack+0x1c/0x28 lib/dump_stack.c:128
+ lookup_chain_cache_add kernel/locking/lockdep.c:3815 [inline]
+ validate_chain kernel/locking/lockdep.c:3836 [inline]
+ __lock_acquire+0x1fa0/0x779c kernel/locking/lockdep.c:5142
+ lock_acquire+0x240/0x728 kernel/locking/lockdep.c:5759
+ __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+ _raw_spin_lock+0x48/0x60 kernel/locking/spinlock.c:154
+ spin_lock include/linux/spinlock.h:351 [inline]
+ btrfs_block_rsv_size fs/btrfs/block-rsv.h:136 [inline]
+ btrfs_use_block_rsv+0x184/0x73c fs/btrfs/block-rsv.c:495
+ btrfs_alloc_tree_block+0x16c/0x12d4 fs/btrfs/extent-tree.c:5130
+ btrfs_force_cow_block+0x4e4/0x1c9c fs/btrfs/ctree.c:573
+ btrfs_cow_block+0x318/0xa28 fs/btrfs/ctree.c:754
+ btrfs_search_slot+0xba0/0x2a08
+ btrfs_lookup_file_extent+0x124/0x1bc fs/btrfs/file-item.c:267
+ btrfs_drop_extents+0x370/0x2ad8 fs/btrfs/file.c:251
+ insert_reserved_file_extent+0x2b4/0xa6c fs/btrfs/inode.c:2911
+ insert_ordered_extent_file_extent+0x348/0x508 fs/btrfs/inode.c:3016
+ btrfs_finish_one_ordered+0x6a0/0x129c fs/btrfs/inode.c:3124
+ btrfs_finish_ordered_io+0x120/0x134 fs/btrfs/inode.c:3266
+ finish_ordered_fn+0x20/0x30 fs/btrfs/ordered-data.c:331
+ btrfs_work_helper+0x340/0xd28 fs/btrfs/async-thread.c:314
+ process_one_work+0x79c/0x15b8 kernel/workqueue.c:3231
+ process_scheduled_works kernel/workqueue.c:3312 [inline]
+ worker_thread+0x978/0xec4 kernel/workqueue.c:3389
+ kthread+0x288/0x310 kernel/kthread.c:389
+ ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
 
 
-
-> ---
->  drivers/net/virtio_net.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 6f4781ec2b36..9446666c84aa 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1804,9 +1804,15 @@ static struct sk_buff *receive_small(struct net_device *dev,
->  				     struct virtnet_rq_stats *stats)
->  {
->  	unsigned int xdp_headroom = (unsigned long)ctx;
-> -	struct page *page = virt_to_head_page(buf);
-> +	struct page *page;
->  	struct sk_buff *skb;
->  
-> +	// We passed the address of virtnet header to virtio-core,
-> +	// so truncate the padding.
-> +	buf -= VIRTNET_RX_PAD + xdp_headroom;
-> +
-> +	page = virt_to_head_page(buf);
-> +
->  	len -= vi->hdr_len;
->  	u64_stats_add(&stats->bytes, len);
->  
-> @@ -2422,8 +2428,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
->  	if (unlikely(!buf))
->  		return -ENOMEM;
->  
-> -	virtnet_rq_init_one_sg(rq, buf + VIRTNET_RX_PAD + xdp_headroom,
-> -			       vi->hdr_len + GOOD_PACKET_LEN);
-> +	buf += VIRTNET_RX_PAD + xdp_headroom;
-> +
-> +	virtnet_rq_init_one_sg(rq, buf, vi->hdr_len + GOOD_PACKET_LEN);
->  
->  	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
->  	if (err < 0) {
-> -- 
-> 2.20.1
-
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
