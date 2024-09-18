@@ -1,136 +1,162 @@
-Return-Path: <netdev+bounces-128839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1662197BE4C
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 17:03:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 477D597BECB
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 17:43:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4057F1C20C9A
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 15:03:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 690A51F21AB9
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 15:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92D818A6C5;
-	Wed, 18 Sep 2024 15:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469DF18A6AE;
+	Wed, 18 Sep 2024 15:43:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="R0mEqYIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward501b.mail.yandex.net (forward501b.mail.yandex.net [178.154.239.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 463151C8FBA
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 15:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F60E2AEEE
+	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 15:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726671806; cv=none; b=c+uz/PXyyBYoKXxDRxsw80r3HNIhQ2j7l+Y9ipzyOzkaZydvNdkTM+LB0f3mAcuBWAMEOIq+frJal2Wq3+VpeX9xw6kP5/xMQz/54UFosj8et+0qh535vOe6L3je1t+Q8I8r/mSQhr1wBoVj0MnEU69zpEKLKTqkn4q6yc6BT1w=
+	t=1726674186; cv=none; b=a8ojx+QchZVtdO0/nv1tYL+viiQg6CL5/wdDOcUF3j158LSj2FQxovNMBdF2HllbIkl6nBmAigBjm6uP6uA5HhUIPx8+le2v/N7P4zFMm/wMZm1C0Ra01GSR13SzSNO7R3HC3N58Ve+adfEnPgD1tnX6LVwwNlC/xU0Bjs1Yp1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726671806; c=relaxed/simple;
-	bh=BhzpLIq6Vxfl5iUIGMXzekYXB+e52TdqSnfp5qidmWE=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Ldz4EPJTxtgY3U0l9d3ughKHf6P93yCe3154BaPsYuZMwDdyx3lta+rhD8QSPGt1wpkOuPdBWQ6oSmRkyjMqqji+kmkGXisOM7pxXq2JrFB0E3axIGsQRuSwsMG0vDtW9vz1U8nC1VTbar8ZiieoSQUGep+xvbjMzmyMYlT34fA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a045e7ed57so110755015ab.2
-        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 08:03:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726671804; x=1727276604;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+UC6Mc3Avq1l/u0KK21V2/bnbzcYLVONph6/3dO9HTk=;
-        b=Jn2ts8yyuXhliBIkvj3g85/mzkzB/AICsl8G/vAj0hD/04vMpRgxxe4vdhARSn18Kh
-         hXAGZbIqeXbsrDBwR0PsaIqsjzcbHOvOOFuEn59KUvsbkYOHsp0JU6QcDFPQv46FMpZw
-         ojlY64LAjEohJC9Ovn7/PfUVaXcWhCzee17J4uFlqqisYWoY/rRbBSWQIdOg8bzT+Crt
-         GFfud3iNcHmh4ERs7LRlDhhgbIwKRIANG/mElbtSuErw1nZH5pscL8g0KKXcPzAzew7f
-         ZW1SUkJJGx3P1hVYUKlOV2Mi1KJkVoVhjB5a1C2JUDhB+HzbrV2EZcbtUygRSwEciRJD
-         EiVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUcPkdKQ5iQjypp08g6EzHCwf9F/xfSZLetgjuo6scTVohJz0t3WE/0ZiooM74vcrY4oeFTPLs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5IjP+zDD0OKV1db3jMmhGVqZla5ygQDZmpmnjgRp2MbfYYl/r
-	DH1BVWoN3nhAqqsT3b2y6iRWG5MmE6Wv4U6L73ztxa4TuzNE4IFXGGHBAKQAYYjvxGnAmSyOYqI
-	L+ZIPcTXUE8BD5KNxMNzo03a/7mBgvpYsmLzdsQGgtnmUtnk9fn9U3uQ=
-X-Google-Smtp-Source: AGHT+IGhaa35gFQtE7Vu6kAqFod34bDr20BPHRMrc2dgJZosDloT+LS7bv0hMwlqO3aSKOat4cDUUzLJfcHG+Xzj1r6MMSb7kWtL
+	s=arc-20240116; t=1726674186; c=relaxed/simple;
+	bh=ugdjfkGVfPSYNdwgNA1Mxd/mWen0l5L081PvLX6r0uY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n76DVp8APaiCvfE8GGz8ppLxHzhTo38ZEa56hs1GWBT69PPp/Z2bukdt2CbRSTqRkKzUZ8mph3FARcD+F9JWzkvmKnCcNEMgVMPe8enf4SaxNdctmelx2X+qtsNh9qkNwOgDM244fx8jaN5lJJ/xnK7eKDUh23k39IWi+Tjseio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=R0mEqYIW; arc=none smtp.client-ip=178.154.239.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net [IPv6:2a02:6b8:c14:3483:0:640:1715:0])
+	by forward501b.mail.yandex.net (Yandex) with ESMTPS id 4024560D3A;
+	Wed, 18 Sep 2024 18:42:54 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id qgP9AJ9oGuQ0-o31xOhqP;
+	Wed, 18 Sep 2024 18:42:53 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1726674173; bh=+db3sYT+9aqvCEG+ywQNHRMxo5XRJkMHMg0vKv7/Xl0=;
+	h=In-Reply-To:To:From:Cc:Date:References:Subject:Message-ID;
+	b=R0mEqYIW5aWweVP/NO898RN/27x9BBGt+w0KrGP2u6fyz31XHnXyJrC9D/pdhqUwm
+	 w6YVFrhVZvCorz2ND5dVGjfre2LZqzuMlk7YpyeUYkC7LwCK8IjLbxavN4zSrl9weK
+	 zM8bhOMvy6z27n9EroWb0/iwOU8ag9W67lAUI6KE=
+Authentication-Results: mail-nwsmtp-smtp-production-canary-88.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <37597ead-9c2e-44d4-9c72-ee0bf1d2a946@yandex.ru>
+Date: Wed, 18 Sep 2024 18:42:52 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:5a9:b0:3a0:8c68:7705 with SMTP id
- e9e14a558f8ab-3a08c6877c6mr146178425ab.21.1726671804203; Wed, 18 Sep 2024
- 08:03:24 -0700 (PDT)
-Date: Wed, 18 Sep 2024 08:03:24 -0700
-In-Reply-To: <66e55308.050a0220.1f4381.0004.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66eaebbc.050a0220.252d9a.0015.GAE@google.com>
-Subject: Re: [syzbot] [btrfs?] BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low! (7)
-From: syzbot <syzbot+74f79df25c37437e4d5a@syzkaller.appspotmail.com>
-To: chao@kernel.org, clm@fb.com, dsterba@suse.com, jaegeuk@kernel.org, 
-	josef@toxicpanda.com, linux-btrfs@vger.kernel.org, 
-	linux-f2fs-devel@lists.sourceforge.net, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net] net: sockmap: avoid race between
+ sock_map_destroy() and sk_psock_put()
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ lvc-project@linuxtesting.org,
+ Allison Henderson <allison.henderson@oracle.com>
+References: <20240905064257.3870271-1-dmantipov@yandex.ru>
+ <Zt3up5aOcu5icAUr@pop-os.localdomain>
+ <5d23bd86-150f-40a3-ab43-a468b3133bc4@yandex.ru>
+ <ZuEdeDBHKj1q9NlV@pop-os.localdomain>
+ <1ae54555-0998-4c76-bbb3-60e9746f9688@yandex.ru>
+ <ZuHJQitSaAYFRFNB@pop-os.localdomain>
+ <9c8146a5-c7fc-40ae-81bb-37a2c12c2384@yandex.ru>
+ <ZuTaGwM/8bTdWx1h@pop-os.localdomain>
+Content-Language: en-US
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Autocrypt: addr=dmantipov@yandex.ru; keydata=
+ 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
+ A/UwwXBRuvydGV0=
+In-Reply-To: <ZuTaGwM/8bTdWx1h@pop-os.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot has found a reproducer for the following issue on:
++CC Allison
 
-HEAD commit:    5f5673607153 Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=137fc69f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dedbcb1ff4387972
-dashboard link: https://syzkaller.appspot.com/bug?extid=74f79df25c37437e4d5a
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b8f500580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10dbc4a9980000
+On 9/14/24 3:34 AM, Cong Wang wrote:
+> On Thu, Sep 12, 2024 at 06:59:39PM +0300, Dmitry Antipov wrote:
+>> On 9/11/24 7:45 PM, Cong Wang wrote:
+>>
+>>> I guess you totally misunderstand my point. As a significant sockmap
+>>> contributor, I am certainly aware of sockmap users. My point is that I
+>>> needed to narrow down the problem to CONFIG_RDS when I was debugging it.
+>>
+>> I've narrowed down the problem to possible race condition between two
+>> functions. "Narrowing down" the problem to a 17.5Kloc-sized subsystem
+>> is not too helpful.
+> 
+> Narrowing down from more 30 millions lines of code to 17.5K is already a huge
+> win to me, maybe not for you. :)
+> 
+>>
+>>> So, please let me know if you can still reproduce this after disabling
+>>> CONFIG_RDS, because I could not reproduce it any more. If you can,
+>>> please kindly share the stack trace without rds_* functions.
+>>
+>> Yes, this issue requires CONFIG_RDS and CONFIG_RDS_TCP to reproduce. But
+>> syzbot reproducer I'm working with doesn't create RDS sockets explicitly
+>> (with 'socket(AF_RDS, ..., ...)' or so). When two options above are enabled,
+>> the default network namespace has special kernel-space socket which is
+>> created in 'rds_tcp_listen_init()' and (if my understanding of the namespaces
+>> is correct) may be inherited with 'unshare(CLONE_NEWNET)'. So just enabling
+>> these two options makes the kernel vulnerable.
+> 
+> Thanks for confirming it.
+> 
+> I did notice the RDS kernel socket, but, without my patch, we can still
+> use sockops to hook TCP socket under the RDS socket and add it to a
+> sockmap, hence the conflict of sock->sk->sk_user_data.
+> 
+> My patch basically prevents such TCP socket under RDS socket from being
+> added to any sockmap.
+> 
+>>
+>> So I'm still gently asking you to check whether there is a race condition
+>> I've talked about. Hopefully this shouldn't be too hard for a significant
+>> sockmap contributor.
+> 
+> If you can kindly explain why this race condition is not related to RDS
+> despite the fact it only happens with CONFIG_RDS enabled, I'd happy to
+> review it. Otherwise, I feel like you may head to a wrong direction.
+> 
+> Thanks.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/40172aed5414/disk-5f567360.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/58372f305e9d/vmlinux-5f567360.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d2aae6fa798f/Image-5f567360.gz.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/e4b8f51425ac/mount_0.gz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+74f79df25c37437e4d5a@syzkaller.appspotmail.com
-
-BUG: MAX_LOCKDEP_CHAIN_HLOCKS too low!
-turning off the locking correctness validator.
-CPU: 0 UID: 0 PID: 137 Comm: kworker/u8:4 Not tainted 6.11.0-rc7-syzkaller-g5f5673607153 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-Workqueue: btrfs-endio-write btrfs_work_helper
-Call trace:
- dump_backtrace+0x1b8/0x1e4 arch/arm64/kernel/stacktrace.c:319
- show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:326
- __dump_stack lib/dump_stack.c:93 [inline]
- dump_stack_lvl+0xe4/0x150 lib/dump_stack.c:119
- dump_stack+0x1c/0x28 lib/dump_stack.c:128
- lookup_chain_cache_add kernel/locking/lockdep.c:3815 [inline]
- validate_chain kernel/locking/lockdep.c:3836 [inline]
- __lock_acquire+0x1fa0/0x779c kernel/locking/lockdep.c:5142
- lock_acquire+0x240/0x728 kernel/locking/lockdep.c:5759
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x48/0x60 kernel/locking/spinlock.c:154
- spin_lock include/linux/spinlock.h:351 [inline]
- btrfs_block_rsv_size fs/btrfs/block-rsv.h:136 [inline]
- btrfs_use_block_rsv+0x184/0x73c fs/btrfs/block-rsv.c:495
- btrfs_alloc_tree_block+0x16c/0x12d4 fs/btrfs/extent-tree.c:5130
- btrfs_force_cow_block+0x4e4/0x1c9c fs/btrfs/ctree.c:573
- btrfs_cow_block+0x318/0xa28 fs/btrfs/ctree.c:754
- btrfs_search_slot+0xba0/0x2a08
- btrfs_lookup_file_extent+0x124/0x1bc fs/btrfs/file-item.c:267
- btrfs_drop_extents+0x370/0x2ad8 fs/btrfs/file.c:251
- insert_reserved_file_extent+0x2b4/0xa6c fs/btrfs/inode.c:2911
- insert_ordered_extent_file_extent+0x348/0x508 fs/btrfs/inode.c:3016
- btrfs_finish_one_ordered+0x6a0/0x129c fs/btrfs/inode.c:3124
- btrfs_finish_ordered_io+0x120/0x134 fs/btrfs/inode.c:3266
- finish_ordered_fn+0x20/0x30 fs/btrfs/ordered-data.c:331
- btrfs_work_helper+0x340/0xd28 fs/btrfs/async-thread.c:314
- process_one_work+0x79c/0x15b8 kernel/workqueue.c:3231
- process_scheduled_works kernel/workqueue.c:3312 [inline]
- worker_thread+0x978/0xec4 kernel/workqueue.c:3389
- kthread+0x288/0x310 kernel/kthread.c:389
- ret_from_fork+0x10/0x20 arch/arm64/kernel/entry.S:860
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
