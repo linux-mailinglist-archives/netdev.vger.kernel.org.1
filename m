@@ -1,155 +1,260 @@
-Return-Path: <netdev+bounces-128776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2361A97BA57
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 11:51:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D133D97BA92
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:08:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 955541F23264
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 09:51:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21499B273ED
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 10:08:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02FD17920E;
-	Wed, 18 Sep 2024 09:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E70817994F;
+	Wed, 18 Sep 2024 10:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="js5NuPoK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ekBf09+t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D406176FA0
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 09:51:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40752175D54
+	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 10:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726653071; cv=none; b=IRdJMADL6NG0ADMUyrESgYghwF5M2Kc664Yxr9zUIQ2r+03JAlKw2VsQ8lcu4cOdN97VdWsC5354Kk0/grJmW6x4Yw7iin3LwmwmP9fSZEUnGRIuYCQmieAcDfg6vxvGEqF3PHL1vAIYT4UUGF+sIvI6sVpbYpx+FiGw6UBWUpY=
+	t=1726654071; cv=none; b=TXjkNKTXGREoNmM1dBEq6aTcJZERagm9c9Qqtp3SAF0J1CQA+XBXuRamYcfRHYn2zZ3ZJXnPto0WqNWkU7w3uIA1U9z7/mLYQbhx264ibxpqhezavHJtejCNMB4yR7QawPzodKvwC3Uxg2h5HDt2ncsIbPJzlqAC5uOtGvErqQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726653071; c=relaxed/simple;
-	bh=YYveKDNyLV/O+GuIZezG/H+dg/pEIjQTXZMwxfSjq/M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NfcY9aXzlF+dRww3+CDu8YRg8M/Y3WCfqIlGqyueUsiKqnuXjLz/+W5WX6+KTO4z9l2lTIXg2EYkW6vwE9XyClQanE6+Pyu1yXcfeHbX6MNgu+wc3aiOKPWVvGISqYKPy+s0kGfjbpHNw4WCCjzhgmdA3oi4/Tvznm+R1BxYIsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=js5NuPoK; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a8a7596b7dfso102666866b.0
-        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 02:51:09 -0700 (PDT)
+	s=arc-20240116; t=1726654071; c=relaxed/simple;
+	bh=BcFQzMacYPncnCQjV8GlFDHy5qbYhhTmB5Qzsnnwln4=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=MNY9mKo5Hx4CDxLluMuw0hneHmpC3Got+jcZr3G2frUH3LOpRrdVk7F1eIT4IDDa1GWVUuKLGfXMotK3j0v28tHZCTyZ6OQapUsntaDy2AVIK5/yJMRhY0on6gujHqG6gSqZ+jz+2af2kuYocwylNW6xns2pqHqUX/5n84F/Qrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ekBf09+t; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42cae4eb026so64719535e9.0
+        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 03:07:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1726653068; x=1727257868; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=U5Lz1QWVFmZd2N1NR4+boEn5JCoZBGXe5wWgia0cON4=;
-        b=js5NuPoKWQ3/7Er/hcnJ06/MjTq1CnwJN0fwvs/Wtell0wWMwxV5iaJDLb3gcroNKj
-         ZJ7sp9EWEhWHfZG9wAuDNeOMUn5UninPRsjKJzL4u8RGacMfsV0dRLQaGeIvlRJfLiSl
-         OrZopnQPbGCK5MtP+YcAAqPP50RmOUOXwCCLfsT1cMmm0OFMg/l9aB3oJpXyamXHeJPw
-         JqvVcQ9q6kZ/hqM1DGrXahR2ZeE90O+Cfz8QlGRMpSiNe5A6eNmdIIc4fgtO38m4a2bl
-         Xx+oP0oB9B416DZnj3VY0uOGodn2k9t+XH1+CvuAqrYSQrL23cS0Rg5maAxbbbmwbIia
-         LmNg==
+        d=gmail.com; s=20230601; t=1726654067; x=1727258867; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9gszga9xFCv9CjVSfKw0ve8HTp+6D09ex0SaaFgmd1Q=;
+        b=ekBf09+tDmnoVk+x8R8NCo3RTkI3VEmE7pZEbLVp9FTvQ+h8W5NSlLzQzBk0euRnU7
+         pOb0NzO9/iEwiWkMPUANkn1DBwc+GOdpk1VyshE/QSAckH6iN70daYXy2JImg91Uyhqy
+         w7ITwDPioHaz6teQqxAarptgRtlI9uUm4TwArhUchZlnaQ40ViY5rue0w+XLofUKVsyL
+         SS70L64QQTc7oA928W4GtredFzb7tYArMPPEfRpukam6R6Z7RSXfmMv41XA3yQuSwvgp
+         vdWl8yerODOTCK9ErahP86y8Xe4rgs9EwUYIiOXK5ubA0Pd/G8ck6cDZlDK9kqxB6gbv
+         itaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726653068; x=1727257868;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U5Lz1QWVFmZd2N1NR4+boEn5JCoZBGXe5wWgia0cON4=;
-        b=aItYU5/DJeF5wEHc9kGRGt31M2JrvlpGSVR9zGE0tP6wMvv+d39brsazUd3jLumxMa
-         RVwp/InmDgWqzNJnf1q1h8+CNpJNW5V3LAo0JgZdW5ekyq7pqqrdEJ52VjqPtRQg+eD7
-         sWwx4BDJHqVVOE1VpFSGxnZWij7O+RVLDZ1YOTMXuQxNJihi8PiJeomRxbkwbI/vWKqD
-         4pq4XTDoJ/cx6U0j96x01DV+s2P7JsSD0jWsU64+H4JyHry0ZA5XtikkE8NVuK+OP4P6
-         XBAEopXXb6hYKMcICBogPJSrrfgIN2Sl65FODh31KXlzkxVqDiD4Dt17JsDGNb6lio4+
-         2wOQ==
-X-Gm-Message-State: AOJu0YwmlxHXw+pet6k2fqlkETdNLlKAVXnfFrOOlwHZZxz1V94MLbnP
-	z6dHaPK8iQrKNYbC7jMJrZTR4hGc3NsGmF4gTfRIEpGepbJSgehkX7BYKI+b4pg=
-X-Google-Smtp-Source: AGHT+IGh+5daTFsNyDKlbll7KebWFSlnclyKmAwqiRqpM+wguKxxuLaiVoIA7Zfzj5R3BOYGBvdN6A==
-X-Received: by 2002:a17:907:3f91:b0:a8d:5f69:c839 with SMTP id a640c23a62f3a-a8ffabbcc0cmr2879337466b.15.1726653068106;
-        Wed, 18 Sep 2024 02:51:08 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90612df75csm568606066b.149.2024.09.18.02.51.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Sep 2024 02:51:07 -0700 (PDT)
-Message-ID: <ebef9a36-d060-4df3-b139-3dda4a84484a@blackwall.org>
-Date: Wed, 18 Sep 2024 12:51:06 +0300
+        d=1e100.net; s=20230601; t=1726654067; x=1727258867;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9gszga9xFCv9CjVSfKw0ve8HTp+6D09ex0SaaFgmd1Q=;
+        b=uEUqRZIiREdlOqszIJAZA+iAgwjZNZRWI3H8+b1C15/qwIk5JxYxgzTf5rkv9pNSJg
+         /CvjUd54nam9WNRg64sUayi10euQebiSJ7itoUtBc3xendGLYta6qYXVvcrv2Vo7Ierh
+         wjedwQ4QE0Q51yCfVmGIQd3Ed3F9EkH2ATmZq1qgWbs+WC4mKvmAIWmn3mijSAgBjGFI
+         l9F8Od5uYhW8MexTAmKl7HeL+YrNJI8eXbnxuuTb0zKOHQTkIg23xyvWr703Mc/yxIR/
+         ifdMRsiVMVEKYxOKynIoqWvDkLHOJm3n9GJ1d4F9lKoLMq8v46ak3U7M2mgmbO3Wozli
+         WWDg==
+X-Gm-Message-State: AOJu0YwFy7oSbrs7/M8kQ6EtyXnnhgAmdsd6M8z1wQjctygaAH3OQLz1
+	BhzF73XvQSVjPalLMR7FMgojSQlUSjPfjjOwWdU9i5T0qjbnPqk6
+X-Google-Smtp-Source: AGHT+IGLjQSsowOz/0lao5kIwdKFRBPGmj4tNdMdW633Utw5l1siVH+MMoYZLwCYIhmU4ezYTV+ysQ==
+X-Received: by 2002:a05:600c:450a:b0:42c:b4a2:a1aa with SMTP id 5b1f17b1804b1-42cdb54784cmr179653505e9.17.1726654067003;
+        Wed, 18 Sep 2024 03:07:47 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:f935:1e63:6c8b:667c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e70536bd2sm12639055e9.48.2024.09.18.03.07.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Sep 2024 03:07:46 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org,  kuba@kernel.org,  pabeni@redhat.com,
+  ryazanov.s.a@gmail.com,  edumazet@google.com,  andrew@lunn.ch,
+  sd@queasysnail.net
+Subject: Re: [PATCH net-next v7 04/25] ovpn: add basic netlink support
+In-Reply-To: <99028055-f440-45e8-8fb1-ec4e19e0cafa@openvpn.net> (Antonio
+	Quartulli's message of "Tue, 17 Sep 2024 23:28:41 +0200")
+Date: Wed, 18 Sep 2024 11:07:09 +0100
+Message-ID: <m2o74lb7hu.fsf@gmail.com>
+References: <20240917010734.1905-1-antonio@openvpn.net>
+	<20240917010734.1905-5-antonio@openvpn.net> <m2wmjabehc.fsf@gmail.com>
+	<99028055-f440-45e8-8fb1-ec4e19e0cafa@openvpn.net>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] bonding: Add net_ratelimit for
- bond_xdp_get_xmit_slave in bond_main.c
-To: Jiwon Kim <jiwonaid0@gmail.com>, jv@jvosburgh.net, andy@greyhouse.net,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
- john.fastabend@gmail.com, joamaki@gmail.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
-References: <20240918083545.9591-1-jiwonaid0@gmail.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240918083545.9591-1-jiwonaid0@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 18/09/2024 11:35, Jiwon Kim wrote:
-> Add net_ratelimit to reduce warnings and logs.
-> This addresses the WARNING in bond_xdp_get_xmit_slave reported by syzbot.
-> 
+Antonio Quartulli <antonio@openvpn.net> writes:
+>>> +      -
+>>> +        name: local-ip
+>>> +        type: binary
+>>> +        doc: The local IP to be used to send packets to the peer (UDP only)
+>>> +        checks:
+>>> +          max-len: 16
+>> It might be better to have separate attrs fopr local-ipv4 and
+>> local-ipv6, to be consistent with vpn-ipv4 / vpn-ipv6
+>
+> while it is possible for a peer to be dual stack and have both an IPv4 and IPv6 address assigned
+> to the VPN tunnel, the local transport endpoint can only be one (either v4 or v6).
+> This is why we have only one local_ip.
+> Does it make sense?
 
-This commit message is severely lacking. I did the heavy lifting and gave you
-detailed analysis of the problem, please describe the actual issue and why
-this is ok to do. Also the subject is confusing, it should give a concise
-summary of what the patch is trying to do and please don't include filenames in it.
-You can take a look at other commits for examples.
+I was thinking that the two attributes would be mutually exclusive. You
+could accept local-ipv4 OR local-ipv6. If both are provided then you can
+report an extack error.
 
-> Setup:
->     # Need xdp_tx_prog with return XDP_TX;
->     ip l add veth0 type veth peer veth1
->     ip l add veth3 type veth peer veth4
->     ip l add bond0 type bond mode 6 # <- BOND_MODE_ALB, unsupported by xdp
->     ip l add bond1 type bond # <- BOND_MODE_ROUNDROBIN by default
->     ip l set veth0 master bond1
->     ip l set bond1 up
->     ip l set dev bond1 xdpdrv object tx_xdp.o section xdp_tx
->     ip l set veth3 master bond0
->     ip l set bond0 up
->     ip l set veth4 up
->     ip l set veth3 xdpgeneric object tx_xdp.o section xdp_tx
+>>
+>>> +      -
+>>> +        name: keyconf
+>>> +        type: nest
+>>> +        doc: Peer specific cipher configuration
+>>> +        nested-attributes: keyconf
+>> Perhaps keyconf should just be used as a top-level attribute-set. The
+>> only attr you'd need to duplicate would be peer-id? There are separate
+>> ops for setting peers and for key configuration, right?
+>
+> This is indeed a good point.
+> Yes, SET_PEER and SET_KEY are separate ops.
+>
+> I could go with SET_PEER only, and let the user specify a keyconf within a peer (like now).
+>
+> Or I could keep to SET_KEY, but then do as you suggest and move KEYCONF to the root level.
+>
+> Is there any preferred approach?
 
-Care to explain why this setup would trigger anything?
+I liked the separate ops for key management because the sematics are
+explicit and it is very obvious that there is no op for reading keys. If
+you also keep keyconf attrs separate from the peer attrs then it would be
+obvious that the peer ops would never expose any keyconf attrs.
 
-> 
-> Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=c187823a52ed505b2257
-> Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
-> Signed-off-by: Jiwon Kim <jiwonaid0@gmail.com>
-> ---
-> v2: Change the patch to fix bond_xdp_get_xmit_slave
-> ---
->  drivers/net/bonding/bond_main.c | 9 ++++++---
->  1 file changed, 6 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index b560644ee1b1..91b9cbdcf274 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -5610,9 +5610,12 @@ bond_xdp_get_xmit_slave(struct net_device *bond_dev, struct xdp_buff *xdp)
->  		break;
->  
->  	default:
-> -		/* Should never happen. Mode guarded by bond_xdp_check() */
-> -		netdev_err(bond_dev, "Unknown bonding mode %d for xdp xmit\n", BOND_MODE(bond));
-> -		WARN_ON_ONCE(1);
-> +		/* This might occur when a bond device increases bpf_master_redirect_enabled_key,
-> +		 * and another bond device with XDP_TX and bond slave.
-> +		 */
+>>
+>>> +    -
+>>> +      name: del-peer
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Delete existing remote peer
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>> I think you need to add an op for 'del-peer-notify' to specify the
+>> notification, not reuse the 'del-peer' command.
+>
+> my idea was to use CMD_DEL_PEER and then send back a very very short PEER object.
+> I took inspiration from nl80211 that sends CMD_NEW_STATION and CMD_DEL_STATION when a wifi host
+> connects or disconnect. In that case the full STATION object is also delivered (maybe I should
+> do the same?)
+>
+> Or is there some other technical reason for not reusing CMD_DEL_PEER?
 
-The comment is confusing and needs to be reworded or dropped altogether.
+nl80211 is maybe not a good example to follow because it predates the
+ynl specs and code generation. The netdev.yaml spec is a good example of
+a modern genetlink spec. It specifies ops for 'dev-add-ntf' and
+'dev-del-ntf' that both reuse the definition from 'dev-get' with the
+'notify: dev-get' attribute:
 
-> +		if (net_ratelimit())
-> +			netdev_err(bond_dev, "Unknown bonding mode %d for xdp xmit\n",
-> +				   BOND_MODE(bond));
->  		return NULL;
->  	}
->  
+    -
+      name: dev-get
+      doc: Get / dump information about a netdev.
+      attribute-set: dev
+      do:
+        request:
+          attributes:
+            - ifindex
+        reply: &dev-all
+          attributes:
+            - ifindex
+            - xdp-features
+            - xdp-zc-max-segs
+            - xdp-rx-metadata-features
+            - xsk-features
+      dump:
+        reply: *dev-all
+    -
+      name: dev-add-ntf
+      doc: Notification about device appearing.
+      notify: dev-get
+      mcgrp: mgmt
+    -
+      name: dev-del-ntf
+      doc: Notification about device disappearing.
+      notify: dev-get
+      mcgrp: mgmt
 
+The notify ops get distinct ids so they should never be confused with
+normal command responses.
+
+>> 
+>>> +    -
+>>> +      name: set-key
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Add or modify a cipher key for a specific peer
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>>> +    -
+>>> +      name: swap-keys
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Swap primary and secondary session keys for a specific peer
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>> Same for swap-keys notifications.
+>
+> Yeah, here I can understand. My rationale was: tell userspace that now we truly need a
+> SWAP_KEYS. Do you think this can create problems/confusion?
+
+Right, so this is a notification to user space that it is time to swap
+keys, not that a swap-keys operation has happened? If the payload is
+unique to this notification then you should probably use the 'event' op
+format. For example:
+
+    -
+      name: swap-keys-ntf
+      doc: Notify user space that a swap-keys op is due.
+      attribute-set: ovpn
+      event:
+        attributes:
+          - ifindex
+          - peer
+      mcgrp: peers
+
+>> 
+>>> +    -
+>>> +      name: del-key
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Delete cipher key for a specific peer
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>>> +
+>>> +mcast-groups:
+>>> +  list:
+>>> +    -
+>>> +      name: peers
+>
+> Thanks a lot for your comments, Donald!
+>
+> Regards,
 
