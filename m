@@ -1,146 +1,150 @@
-Return-Path: <netdev+bounces-128807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CCFB97BC6C
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:44:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06F3D97BC6D
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:45:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C027D1C218FE
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:44:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD6B12811B9
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F576189900;
-	Wed, 18 Sep 2024 12:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08EAE189901;
+	Wed, 18 Sep 2024 12:45:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="foWdHXDZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bnOu8vOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f74.google.com (mail-ed1-f74.google.com [209.85.208.74])
+Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C9218952A
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 12:44:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8001E52D;
+	Wed, 18 Sep 2024 12:45:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726663478; cv=none; b=WNiRJKM9lErKSHZLK9pSJHY1QTor+79mZ2TidxHxMTFhH7tHBbApTAo3yGAmHhEdaN77bzxVWvdji1cst93Ut9Vve1Mz0pj/v8XmbKsK3jxD9EjHNgce3dYJ/e/Np5/X2bFUPFXvYymFigTAX7anx3j7nc0KLX8icyDpLHpXOsc=
+	t=1726663526; cv=none; b=KDnx74WMT5DEMq3GCw1OLQNXWhBrNIipAEaVAKJw9PZenI1ZuRtvtKlo2fQDUDaSZDgcYPsQrk8EWaCbSehJ7sevOqdeYbk5zYIA33xeKRQpAmIQMf0kAF48gwE0V51oQg2rJDdFbOIZIQfAXz4HKMjcAsMWjgSmKGP9Gt4nz8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726663478; c=relaxed/simple;
-	bh=jyJkxVM6sAS/3tT3j5iaZDDXjdnQJ6Ydv1cWnP0Sa98=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kiJkENbDLR7nwNonvACtd5ZqyYd7smrVwS9gZ7+w1kHUbSaSWWoWRb7TwmO7CrESLg/rTt1VMdnvgfZWPsJIThY2oAKVIKAoe/ThqUWyDBJxYiHl8fCypDfOWBRTVwsADC0S3kns+qmQch8Yot7KtzLW0CDasY48qR580g9RQ/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=foWdHXDZ; arc=none smtp.client-ip=209.85.208.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-ed1-f74.google.com with SMTP id 4fb4d7f45d1cf-5c421ae1c7aso3050187a12.2
-        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 05:44:35 -0700 (PDT)
+	s=arc-20240116; t=1726663526; c=relaxed/simple;
+	bh=gJimK4u+OdYhTWerVC6/E+iKASyTSilv+ssIfa6bYhQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=RpOTMre+r+KO8nf1eE6Zq7POrnC/YPuliIWcKBv5lqve7pabVREjPmfApfeIlg8smkyeNWntY0CBX5CiDQ12Zu6RBYcOvKYOlWyOcxgtBGMLy9mkggwwmcuJ9Zlqf/5Q6CFELYw0V5F6WAlyc36c8sAQm/lRbOGUHMi48CEbM0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bnOu8vOI; arc=none smtp.client-ip=209.85.222.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7a99fde9f1dso582358885a.2;
+        Wed, 18 Sep 2024 05:45:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726663474; x=1727268274; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xIwyfI4/DdUEaRJiUtONmUR4y8m0f8u2TdK+52Bbk1Y=;
-        b=foWdHXDZ6r9lGWFC7vbT6+7PGHfQ3zkOoP5MuV7khcbH3GbNh3WsHO/RrNSPsmsH7W
-         rWVLU/CQQWJ4gfXEJwRoO+Ct2AXqcsYS3kbKz1ZhuTH1xffypDY1Mq86WrnfnkNuqlfn
-         ScN3EWC1sCqAxxmBNYhkZEFsuqVqjCIt3Xe8Pub5CgkXVgS7CDKPZpI977+Fzen2jYEh
-         08diuszlKSpKUSV/+weyy6qXXUlRPGxGLBX+kwL6OTxdGdor8x4sajYYd1wpFtFXJI6q
-         ufu3lE2cpPgFSSpAGMVfTakbkQJjPAaiArZMz89Ud+zVrHTssjj2uBYGpVpfiu0mk5UB
-         NBTQ==
+        d=gmail.com; s=20230601; t=1726663524; x=1727268324; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kb0czGNo2LUTVTshHsi9BPWPL/WT/rjZrenDHrVx5k8=;
+        b=bnOu8vOIrCgjcQkPLUHdbqw3bSFeyCLkhnDJ/X6JozyL5Npj3lr3VPVPj9+KDsWeVH
+         HrtPVSOBaGwPtZg0qovvOk8UFPv64WbMJ6TyqY+PFNN8F+b/QMgGasUQKkaKdoP385sg
+         w5WDSxT+9GIcxW/ZknTYk7LUSEWuVmUAKmmSoicfbCQezo7sKBPpEReLM76GmoBaHcGW
+         TQbAML7bRznkhuOb4TxRKPPnUGuse3j7u14OfuiPEuip/1KE3leG/ef6D2wcYnNiNf5+
+         cA0tGNyMv4InfYcfR16PdNNm327+3j4WVlJDk0oO+jjDKvnX4BT2epvoYUCNcXFTbnwo
+         6iGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726663474; x=1727268274;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xIwyfI4/DdUEaRJiUtONmUR4y8m0f8u2TdK+52Bbk1Y=;
-        b=bzztWDR34/KVDxRu03PUnWnV+4OBqH1J4QiWJ+W3vBBzq4gFJggeeAGKTGjTLEubLM
-         aK6CAf8mDSQt6tV10RqQdEAD+FuP2J5oAJXp4cwv4yzeyI9rgv1x7GjLIuBHc5BhHt3w
-         UYUY6vBXt6oWXV2D6HydFRMkqnmqSm39N1YGUBSthLHe1xEGbCXtlCbz/fNfB04seJzl
-         89KvSDydQHFy14poGz42mTRx12P2mT8q2Q7TPZCTsmlJ5WNNW3+RZ54y4/YNqJWCg6qv
-         fTp/yrocTExb2lAt+b0PcZusZnq3CUKRPn1M8KDsZ15G9RUpf6FXEt39YBkxSlLuaU+Y
-         88UA==
-X-Forwarded-Encrypted: i=1; AJvYcCUe2VOJ3C3511T7Ys/yFS5yss5OhQUEa3OHrgPfpaMStc4jTLemHltmwkiBRl4wlCCqMNEGxww=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcmMafxPmqNlMiZEEUDjOIGXN4YFkw2g2vI2B5VQ3CDE2UO2OX
-	6eEsVq/sVhk4i7JERhvD/oTqpz7EmT8UROFM1PJBzRZ50D85nuVZZvAY7Ystm/X0zGkrujiOFkr
-	U7A==
-X-Google-Smtp-Source: AGHT+IEWfqwFAH1gT3bjvwsq5qPRyPUo8YazJWN1VHnOslXH4YppMhSKjdh9NHPPxOHvjw24Fuj/C7wQTHo=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a05:6402:320c:b0:5c4:2278:28b0 with SMTP id
- 4fb4d7f45d1cf-5c422782cb8mr9821a12.5.1726663474364; Wed, 18 Sep 2024 05:44:34
- -0700 (PDT)
-Date: Wed, 18 Sep 2024 14:44:32 +0200
-In-Reply-To: <20240904104824.1844082-10-ivanov.mikhail1@huawei-partners.com>
+        d=1e100.net; s=20230601; t=1726663524; x=1727268324;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=kb0czGNo2LUTVTshHsi9BPWPL/WT/rjZrenDHrVx5k8=;
+        b=n9DLcO8vQAmiz9ayfvBfo8xSVcOP6mavqnSDhkJQ+snU9KHjz7pKHU4Yv3KvkVJsGD
+         D+yW1G54WUpq+vD+/orGf/nXKyQ82kogSV/CkBFkQku4ew7G7JZ4xXZMi46IsjOZ2bC3
+         2rjbwsS9xge4e0ZYdN8wS7bHWe3xhA7lsphq8CMxWjHq4Qld5dekSgJfCBAVyYVWJSgh
+         eek25dJDrT3dTzVdd/Xe/Hkf0EPuaDQpeJKZozZZnrvJxtCLnomZpFxyaujdi3VvNzth
+         kDDWw0sBR7cCnVJLZBJGNP7YRjmyistHpq3+knFwY+DQtO4gx+cx4bh38XfF9Yx8CbFV
+         fqsw==
+X-Forwarded-Encrypted: i=1; AJvYcCUK8wqAZIb1uG+6kIa+PBima/71gJchsLxtVOG7waCas5RFfaOoSRGf4oWKB7ftnE6MiNQ0upIIOGX2QOiEybS7@vger.kernel.org, AJvYcCUUzoya7TpRnZc7YoXayZtD0URRpo/aoU1Wp0N3wS+oXR/sQuZGoRVPANrYYT2jWhVR6BDO3zwlNiD5Kx3L@vger.kernel.org, AJvYcCUnFTJQQMdnVTn0sPGdUZAWi1pqzQAG5BmKzkkcJLELujXGRk2ZdI8pmTLJx/c2eIglLvw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5+hHzyaB6DowIAOGQ5ojEckO67+hO6uuAapt6rNEOLnQXtXGG
+	eBxeaIS2MKPS7xc7kqp5Id9lrzhdtwWBlADYm4OckweDw2sPfsqV
+X-Google-Smtp-Source: AGHT+IEh6UyP2aN3CnMsNnG7FafI5FXjQHchefKtOgI9tdTf6facLpuLgwYrgSTl68bWYDC86xtx9w==
+X-Received: by 2002:a0c:ed2c:0:b0:6c5:73b1:700a with SMTP id 6a1803df08f44-6c573b17119mr289463676d6.46.1726663524109;
+        Wed, 18 Sep 2024 05:45:24 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c58c69190asm44082076d6.84.2024.09.18.05.45.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Sep 2024 05:45:23 -0700 (PDT)
+Date: Wed, 18 Sep 2024 08:45:23 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Tiago Lam <tiagolam@cloudflare.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ Mykola Lysenko <mykolal@fb.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ Jakub Sitnicki <jakub@cloudflare.com>, 
+ Tiago Lam <tiagolam@cloudflare.com>, 
+ kernel-team@cloudflare.com
+Message-ID: <66eacb6317540_29b986294b5@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240913-reverse-sk-lookup-v1-1-e721ea003d4c@cloudflare.com>
+References: <20240913-reverse-sk-lookup-v1-0-e721ea003d4c@cloudflare.com>
+ <20240913-reverse-sk-lookup-v1-1-e721ea003d4c@cloudflare.com>
+Subject: Re: [RFC PATCH 1/3] ipv4: Run a reverse sk_lookup on sendmsg.
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com> <20240904104824.1844082-10-ivanov.mikhail1@huawei-partners.com>
-Message-ID: <ZurLMFiskkMjcsx_@google.com>
-Subject: Re: [RFC PATCH v3 09/19] selftests/landlock: Test creating a ruleset
- with unknown access
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 04, 2024 at 06:48:14PM +0800, Mikhail Ivanov wrote:
-> Add test that validates behaviour of Landlock after ruleset with
-> unknown access is created.
->=20
-> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> ---
-> Changes since v2:
-> * Removes fixture `mini`. Network namespace is not used, so this
->   fixture has become useless.
-> * Changes commit title and message.
->=20
-> Changes since v1:
-> * Refactors commit message.
-> ---
->  tools/testing/selftests/landlock/socket_test.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
->=20
-> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testi=
-ng/selftests/landlock/socket_test.c
-> index e7b4165a85cd..dee676c11227 100644
-> --- a/tools/testing/selftests/landlock/socket_test.c
-> +++ b/tools/testing/selftests/landlock/socket_test.c
-> @@ -463,4 +463,20 @@ TEST_F(protocol, ruleset_overlap)
->  	EXPECT_EQ(EACCES, test_socket_variant(&self->prot));
->  }
-> =20
-> +TEST(ruleset_with_unknown_access)
-> +{
-> +	__u64 access_mask;
-> +
-> +	for (access_mask =3D 1ULL << 63; access_mask !=3D ACCESS_LAST;
-> +	     access_mask >>=3D 1) {
-> +		const struct landlock_ruleset_attr ruleset_attr =3D {
-> +			.handled_access_socket =3D access_mask,
-> +		};
-> +
-> +		EXPECT_EQ(-1, landlock_create_ruleset(&ruleset_attr,
-> +						      sizeof(ruleset_attr), 0));
-> +		EXPECT_EQ(EINVAL, errno);
-> +	}
-> +}
-> +
->  TEST_HARNESS_MAIN
-> --=20
-> 2.34.1
->=20
+Tiago Lam wrote:
+> In order to check if egress traffic should be allowed through, we run a
+> reverse socket lookup (i.e. normal socket lookup with the src/dst
+> addresses and ports reversed) to check if the corresponding ingress
+> traffic is allowed in.
 
-Another one of the tests which is almost an exact duplicate of the same tes=
-t in
-net_test.c, but should be fine given that these tests are exercising a stab=
-le
-API (and therefore should not need to change much).  If you see a good way =
-to
-reduce the duplication, I'd be interested though :)
+The subject and this description makes it sound that the change always
+runs a reverse sk_lookup on sendmsg.
 
-Reviewed-by: G=C3=BCnther Noack <gnoack@google.com>
+It also focuses on the mechanism, rather than the purpose.
+
+The feature here adds IP_ORIGDSTADDR as a way to respond from a
+user configured address. With the sk_lookup limited to this new
+special case, as a safety to allow it.
+
+If I read this correctly, I suggest rewording the cover letter and
+commit to make this intent and behavior more explicit.
+
+> Thus, if there's a sk_lookup reverse call
+> returns a socket that matches the egress socket, we also let the egress
+> traffic through - following the principle of, allowing return traffic to
+> proceed if ingress traffic is allowed in.  The reverse lookup is only
+> performed in case an sk_lookup ebpf program is attached and the source
+> address and/or port for the return traffic have been modified.
+> 
+> The src address and port can be modified by using ancilliary messages.
+> Up until now, it was possible to specify a different source address to
+> sendmsg by providing it in an IP_PKTINFO anciliarry message, but there's
+> no way to change the source port. This patch also extends the ancilliary
+> messages supported by sendmsg to support the IP_ORIGDSTADDR ancilliary
+> message, reusing the same cmsg and struct used in recvmsg - which
+> already supports specifying a port.
+> 
+> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+> Signed-off-by: Tiago Lam <tiagolam@cloudflare.com>
 
