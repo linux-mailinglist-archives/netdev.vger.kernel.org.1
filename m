@@ -1,179 +1,150 @@
-Return-Path: <netdev+bounces-128831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 169FE97BDAA
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 16:07:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3A8197BDE1
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 16:19:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACCE31F216BA
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:07:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FF531C20EC9
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B72A818A95C;
-	Wed, 18 Sep 2024 14:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96551097B;
+	Wed, 18 Sep 2024 14:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HMedvZJR"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="PWN3ix7O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6D118A6DB;
-	Wed, 18 Sep 2024 14:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC72B641;
+	Wed, 18 Sep 2024 14:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726668458; cv=none; b=OQ1ph/K01g9gXEEBiIyMqnS3inQMi2jn8PztEQJInPr3dNY1qe5Z7UwXS9rHXt4zhYbrRDDHNjsm74ZtTeHNx0d4ajEP8d6xYKi6DDaD6PdoDkeN0A1BErNITE8ChbS4Uhd2+7S94wminwaGECoBpF7z2kY0MNhroex9wagz5Xc=
+	t=1726669144; cv=none; b=e/thD/vad9g4EpCAz/hLJIoLFPcB8IQAy4OO1UKbKo0qHrJAaNxd5tje5kQijNNJ9TvKzKr9n6T1WQT7PKJQ6j3Rp7D6ztrqY8S47jqE/sKFVJGsGihAgfDLjEojagv9wcaJVwBPmlitcfs+MwD6ROf7pR+DOQqn87f//L0nLJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726668458; c=relaxed/simple;
-	bh=0VL0a3WZNBu3lnikVkXDU/US1Zxg3JW7usdy+pnkQys=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s5DBLZKZtRfiP3M1EjDzi0MhWTEF42em2I++TighCZwScGExuS6SD1JSvEqM6lcA+q+7w+AZ5H8BxtNgVGykEX6Blqu145NyU/z5MJP6RKaMp1R+JGMSc4BjOT8swW/2xVCrsG5yggX8JuySSp7qs+L2ZRR/Wxg2puK7R5kFHts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HMedvZJR; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6b747f2e2b7so54835087b3.3;
-        Wed, 18 Sep 2024 07:07:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726668456; x=1727273256; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0jghMkTEcbjlD4OE1ywGj7BxBKpwmV/lECXNj48rxHA=;
-        b=HMedvZJRJjwZYgQSDOlMh3VXVk3AIMEfVAX7ygyZL84jr0dwCEdNe5KcohILtFhvGL
-         GGer+KpvS6hZIAQhnIWnIsbNHO0+G8u6VCt0KdJ7+nLJ2wXXPaRgFZ7HHVriA5/b1ZHS
-         sYvfU3Ja8iE4yIIF7mzFr/4TT44jABFi8jjUEC7zf+IgEOyFoXF+rqm8qxv7rZRJ2d4I
-         RPMNHYQaxOVZdC3casEtNw0S0aoMOp93Rqo0Kfjz/c0pQS57/ONiRHJtt9X44aR5jRn+
-         h2jqFJ5XR9IsXCcecen3U/RiRUOINQBVLhPctE4IBMa/VkKtgPxO/plLXyIezHolS0rM
-         9/xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726668456; x=1727273256;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0jghMkTEcbjlD4OE1ywGj7BxBKpwmV/lECXNj48rxHA=;
-        b=O85VlNMmKbdGWVPp2+y9V8vQt6sjyGo6ai98wPSE28pO8HwaLMFHbzRwY8ygNBPLIU
-         4m1xfJm29kwcngNJTaE7PgjTZTQM4wT4w9MGE+04rbhEh+RDqtgL9zE2R6y+cOsLCtsP
-         fqPVeVjX/y3VeMNoDjhu17hHiTx9TnzxtVGV/g8G6pe3qdp6VtO5kP9F8XLIeXdkGIk1
-         dOKCJ1Sw1EwA5Yl5RS630jUC1QVTN/0XokiFLJ5vZsXzSO3v5CJV69pK+QP9M03PYrpf
-         RPBkcAx3Yty9Q8LZJ/3nKktFWpGKxNgIsqKd1jq47eCEitA84zjuNwCiR4yHlkqB+xIF
-         w78w==
-X-Forwarded-Encrypted: i=1; AJvYcCV4OoKonqTkl077m0wQF1rVv155Tak17hlCqxTUYvxM6THVDY3HF9/ANdsjZl8ZGH08aSE=@vger.kernel.org, AJvYcCWJTNAPNYB2hXInEh9k/OcziqAYLxll5lbVS4PKmkQXO8beYx27Ucd2ijXDtAIhdR9RFEU21PD1l4Uuqvop@vger.kernel.org, AJvYcCWqFpmee7xHRYduMOYZuVwv5To4et/An5ouL3U2LPiJNBSbUx35aDFRyjXcsk2gSR83CKfqi4sV@vger.kernel.org
-X-Gm-Message-State: AOJu0YzkxbEdlepiW4+Hcgk4kB7tVfVeqFSVGRKHuJ+yi5ggLUyu/lA9
-	L1TA6haVh0I1cyokK3n/5Jkqag6f72nNFiCJ3ggEAYqWrFyfka/66tH6EVgJiRHV692EZhBN3G7
-	pNsaQmJz8jXzzlxwIsdA6pobaQX1lC268
-X-Google-Smtp-Source: AGHT+IEPYZ/AGU3WeOEb8yIO/jp0/diGMF4lCbfcmFw62ZeScK7svyOFn5uIVh2cTML4YNoOIYkBwlfIF/cW4XgHBGE=
-X-Received: by 2002:a05:690c:6305:b0:6db:e213:580b with SMTP id
- 00721157ae682-6dbe21359camr105883427b3.36.1726668455897; Wed, 18 Sep 2024
- 07:07:35 -0700 (PDT)
+	s=arc-20240116; t=1726669144; c=relaxed/simple;
+	bh=kuIhVaH/sURzbeGtq9u4Yf7ANcaLs1U8dtZXXJxlLBQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ARSQtCXl6avL3YXfdq5mgtOTJl0IesUr4vFdzSWDKtScVyyqSWVCyMeR6sT/fTu4lxHbjXkvmtObBHhbc62JP2XFY+gcqNSGsrxe74RMmhotR6LYnvKAe3kH+I3ArHek/R2Z5ZSg3hSg9WUlT1L12f1o6zfVPg5ZZ0OAmVkVXkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=PWN3ix7O; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: ef94acd675c811efb66947d174671e26-20240918
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:CC:To:Subject:MIME-Version:Date:Message-ID; bh=XjEmjEbDr/iItb5rfSlsNht1UeFeXXltkTGmpbSrD10=;
+	b=PWN3ix7ONh+a4y/lAHDm8uxzSpLOvc219I9YQm1apLkUem5WUHwLxBhqYpE0FoJ/4dCroS3KfyvqxLhR8uNYorbOLG/88bs7sgHFsEBrTuv97D/bXHa40aTLPfHvdZQCEr5uBtd+iEPQ3aZ8agtidVv0uvlxXbCA53GbvdyV0Z4=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.41,REQID:9493faad-fd0d-4bd8-80c4-877a3bb65f8b,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6dc6a47,CLOUDID:7a3225c0-d7af-4351-93aa-42531abf0c7b,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|-5,EDM:-3,IP:ni
+	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: ef94acd675c811efb66947d174671e26-20240918
+Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
+	(envelope-from <macpaul.lin@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 906312236; Wed, 18 Sep 2024 22:18:54 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 18 Sep 2024 22:18:51 +0800
+Received: from [172.21.84.99] (172.21.84.99) by mtkmbs13n1.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.2.1118.26 via Frontend
+ Transport; Wed, 18 Sep 2024 22:18:51 +0800
+Message-ID: <2af0621d-14ac-b7f3-b28d-2df698931121@mediatek.com>
+Date: Wed, 18 Sep 2024 22:18:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240918083545.9591-1-jiwonaid0@gmail.com> <ebef9a36-d060-4df3-b139-3dda4a84484a@blackwall.org>
-In-Reply-To: <ebef9a36-d060-4df3-b139-3dda4a84484a@blackwall.org>
-From: Jiwon Kim <jiwonaid0@gmail.com>
-Date: Wed, 18 Sep 2024 23:07:24 +0900
-Message-ID: <CAKaoOqdCh41iBbzuZjx3mJpOXBh0aaLmBRd7Pz9jjwBFLqAifg@mail.gmail.com>
-Subject: Re: [PATCH net v2] bonding: Add net_ratelimit for bond_xdp_get_xmit_slave
- in bond_main.c
-To: Nikolay Aleksandrov <razor@blackwall.org>
-Cc: jv@jvosburgh.net, andy@greyhouse.net, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	joamaki@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org, syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH v6 2/2] dt-bindings: mfd: mediatek: mt6397: Convert to DT
+ schema format
+Content-Language: en-US
+To: Alexandre Belloni <alexandre.belloni@bootlin.com>
+CC: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Liam
+ Girdwood" <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Sean Wang
+	<sean.wang@mediatek.com>, Sen Chu <sen.chu@mediatek.com>,
+	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, Dmitry Torokhov
+	<dmitry.torokhov@gmail.com>, Pavel Machek <pavel@ucw.cz>, Lee Jones
+	<lee@kernel.org>, Sebastian Reichel <sre@kernel.org>, Chen Zhong
+	<chen.zhong@mediatek.com>, <linux-input@vger.kernel.org>,
+	<linux-leds@vger.kernel.org>, <linux-pm@vger.kernel.org>,
+	<linux-rtc@vger.kernel.org>, <linux-sound@vger.kernel.org>, Alexandre Mergnat
+	<amergnat@baylibre.com>, Bear Wang <bear.wang@mediatek.com>, Pablo Sun
+	<pablo.sun@mediatek.com>, Macpaul Lin <macpaul@gmail.com>, Chris-qj chen
+	<chris-qj.chen@mediatek.com>, MediaTek Chromebook Upstream
+	<Project_Global_Chrome_Upstream_Group@mediatek.com>, Chen-Yu Tsai
+	<wenst@chromium.org>
+References: <20240918064955.6518-1-macpaul.lin@mediatek.com>
+ <20240918064955.6518-2-macpaul.lin@mediatek.com>
+ <20240918115151c896f33f@mail.local> <20240918115651c1475d36@mail.local>
+From: Macpaul Lin <macpaul.lin@mediatek.com>
+In-Reply-To: <20240918115651c1475d36@mail.local>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--8.691800-8.000000
+X-TMASE-MatchedRID: oTBA/+sdKaYOwH4pD14DsPHkpkyUphL9MVx/3ZYby79qv/+QKNcPLjC0
+	pJIQUiJOGseg1yShYPHih/b1HlnM9Q5G/b6aSGR8XP5rFAucBUG4vBuE2X0HlWCD5SM8YvVFrEc
+	1eeVEldxaYyc8H6RJsjyKeJLvd5yKS33cD/vC1hvMZk86HxFjjpxfK35V7okVhfNq6/87jDJYjc
+	VS5TZhCWHcSGagcNcdZy7lMbj3gjVQswgj0HOv3OYAh37ZsBDCfS0Ip2eEHny+qryzYw2E8Jkw8
+	KdMzN86KrauXd3MZDWUeK0fD/v8dvjqHGyLezS3oy0lljZZZ2v5QaKF1q8tByZGO6z8Y6YfwL6S
+	xPpr1/I=
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--8.691800-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP: 50E6DB0D564377DBBA495A7680F8C29ABE43384A3C6FFA277C2A8BBD86BA24502000:8
 
-On Wed, Sep 18, 2024 at 6:51=E2=80=AFPM Nikolay Aleksandrov <razor@blackwal=
-l.org> wrote:
->
-> On 18/09/2024 11:35, Jiwon Kim wrote:
-> > Add net_ratelimit to reduce warnings and logs.
-> > This addresses the WARNING in bond_xdp_get_xmit_slave reported by syzbo=
-t.
-> >
->
-> This commit message is severely lacking. I did the heavy lifting and gave=
- you
-> detailed analysis of the problem, please describe the actual issue and wh=
-y
-> this is ok to do. Also the subject is confusing, it should give a concise
-> summary of what the patch is trying to do and please don't include filena=
-mes in it.
-> You can take a look at other commits for examples.
->
-> > Setup:
-> >     # Need xdp_tx_prog with return XDP_TX;
-> >     ip l add veth0 type veth peer veth1
-> >     ip l add veth3 type veth peer veth4
-> >     ip l add bond0 type bond mode 6 # <- BOND_MODE_ALB, unsupported by =
-xdp
-> >     ip l add bond1 type bond # <- BOND_MODE_ROUNDROBIN by default
-> >     ip l set veth0 master bond1
-> >     ip l set bond1 up
-> >     ip l set dev bond1 xdpdrv object tx_xdp.o section xdp_tx
-> >     ip l set veth3 master bond0
-> >     ip l set bond0 up
-> >     ip l set veth4 up
-> >     ip l set veth3 xdpgeneric object tx_xdp.o section xdp_tx
->
-> Care to explain why this setup would trigger anything?
->
-> >
-> > Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=3Dc187823a52ed505b2257
-> > Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driv=
-er")
-> > Signed-off-by: Jiwon Kim <jiwonaid0@gmail.com>
-> > ---
-> > v2: Change the patch to fix bond_xdp_get_xmit_slave
-> > ---
-> >  drivers/net/bonding/bond_main.c | 9 ++++++---
-> >  1 file changed, 6 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond=
-_main.c
-> > index b560644ee1b1..91b9cbdcf274 100644
-> > --- a/drivers/net/bonding/bond_main.c
-> > +++ b/drivers/net/bonding/bond_main.c
-> > @@ -5610,9 +5610,12 @@ bond_xdp_get_xmit_slave(struct net_device *bond_=
-dev, struct xdp_buff *xdp)
-> >               break;
-> >
-> >       default:
-> > -             /* Should never happen. Mode guarded by bond_xdp_check() =
-*/
-> > -             netdev_err(bond_dev, "Unknown bonding mode %d for xdp xmi=
-t\n", BOND_MODE(bond));
-> > -             WARN_ON_ONCE(1);
-> > +             /* This might occur when a bond device increases bpf_mast=
-er_redirect_enabled_key,
-> > +              * and another bond device with XDP_TX and bond slave.
-> > +              */
->
-> The comment is confusing and needs to be reworded or dropped altogether.
->
-> > +             if (net_ratelimit())
-> > +                     netdev_err(bond_dev, "Unknown bonding mode %d for=
- xdp xmit\n",
-> > +                                BOND_MODE(bond));
-> >               return NULL;
-> >       }
-> >
->
 
-Hi Nikolay,
+On 9/18/24 19:56, Alexandre Belloni wrote:
+> 
+> On 18/09/2024 13:51:51+0200, Alexandre Belloni wrote:
+>> > Changes for v4:
+>> >  - Remove "mediatek,mt6357" from PMIC's compatible string since there is a
+>> >    seperated DT schema for PMIC mt6357.
+>> > 
+>> > Changes for v5:
+>> >  - Rebase to next-20240913 (linux-next/master).
+>> >  - Fix the "title" (device type) of mfd/mediatek,mt6397.yaml to "PMIC".
+>> >  - RTC:
+>> >   - Drop "start-year"
+>> 
+>> Maybe, instead of dropping the property, you should add support in the
+>> driver by setting range_min and range_max.
+> 
+> Looking at this even more, the driver can probably be simplified by
+> setting start_year in probe and dropping RTC_MIN_YEAR_OFFSET.
 
-I have taken the time to review your feedback and have sent [PATCH net
-v3] for your consideration.
-Please take a look when you have a moment.
+Thank you for pointing out where and how the driver should be changed.
+However, I'm wondering if this should be a fix with a separated
+patchset (bindings and the driver)? The board or SoC's device trees
+should be reviewed as well. I'll need to get someone's help (permission) 
+inside MediaTek to check those dts and construct the patch for RTC driver.
+That will take sometime.
 
-Thank you so much!
+[snip]
 
-Sincerely,
-
-Jiwon Kim
+Thanks.
+Best Regards,
+Macpaul Lin
 
