@@ -1,114 +1,96 @@
-Return-Path: <netdev+bounces-128824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AF6297BD49
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 15:47:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADEEE97BD61
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 15:54:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07E45284D9D
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 13:47:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B5901F2154D
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 13:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC3F18950C;
-	Wed, 18 Sep 2024 13:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B2018A95C;
+	Wed, 18 Sep 2024 13:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gWooirFS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nw6LNRz8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D476618A959
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 13:47:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CE6189B98;
+	Wed, 18 Sep 2024 13:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726667260; cv=none; b=f1X49Mk0TeJQxxe2cIOB7z2pUdHwz5DID3WodZzStD97o4DZ+LJoVE/bVtJxIQTPRCtIcb3yI25nAwE/+ZeykvAJy21n7Pl9quRUX30dEXm78RHWfx3Ox9oGyBevk+H4+PAnGpphv833SL/QK2biUCjBBWGoel9qBgl16Se6SYk=
+	t=1726667656; cv=none; b=O2Kl/ntghPBKR08kf4FDBG60LrpJPWDSlRQrsRyLSWzBYg/qUBLvKbt1i4zIEbyiDrqZhZkE4d/pJj/gld7wI00LkyPXdiD7m3XhTJIuFapMk56vkJtoDI6C0j1tlvPT8RinQQOseEBL/UvQ+PdkZ9WFQlSawtA//dyw0pHVSpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726667260; c=relaxed/simple;
-	bh=WgumiD65fo5l17857WWRaf6jznU5Ga6baT32V7gaWwU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k76S0D2gSZxDXr7nflJbifmF4/HtznRBSavSvZFYusu/tWjrf/nUOVTCck85URBAdN+ATV7ocUhqio7OY5LcDhJgTMR4mNqhollznbCiFTm87iFD7LO1Xr6hN8feZHe59Dqn1LS9cpp0s6FyrzcbeC09aaD60BX0Th6h6t3DeFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gWooirFS; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tL5pwoEKmQ61U3KKwHmXXF1v9nlBX/dOvsaCbKOKrSY=; b=gWooirFSNCjJYu4Sqkj7EoeJgh
-	cqkCcDWlOtCTD4brRQ1aZ7nP3GpBbZ2YuWhfR+yQb83aWlrnL2tRgRV6vtD2UWUfbecQ7/HJhnMQy
-	RkZhTGfEEDCREE7GMNdBfFrPwKcgJ/h4iqhcDrV5MEwPP9ZZr8+Gp0qtUOI/yZVrgRraetOVHBORK
-	DjQf7C47+XwpgKOBxbNI8Npoaiqca8lQLPZKFV7yRdz1nyCTpCLtBEtlSj7lzSYwC/q1zilkUBGMx
-	jWMQ4C4S/8qWL0yyeEq6mDUOs66CQOXQ3d71Xsp27VHYL6diTR5MlNPn8m4x8hzI73OY/nhEyTsZZ
-	jxSNVY9g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56748)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1sqv1o-000802-2Y;
-	Wed, 18 Sep 2024 14:47:32 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1sqv1m-0000bQ-1D;
-	Wed, 18 Sep 2024 14:47:30 +0100
-Date: Wed, 18 Sep 2024 14:47:30 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Saravana Kannan <saravanak@google.com>, netdev@vger.kernel.org
-Subject: Re: Component API not right for DSA?
-Message-ID: <ZurZ8sj4N9b0yUtx@shell.armlinux.org.uk>
-References: <20240918111008.uzvzkcjg7wfj5foa@skbuf>
+	s=arc-20240116; t=1726667656; c=relaxed/simple;
+	bh=+Zh+djR7AX48cdY3rFqnD3jZEZXXjC49iXCG8eZYSeQ=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
+	 Cc:Message-ID:Date; b=no1CqK+8l58doy63KWB+Rpm5RlEBGtABr6pqrwzZlBGj6wZm8wO/Kek0Foz8xIFncVnqAHkb+iVfTi7Fd7K8reS1pSSq7wLN4JVfLyVy8st0mVPX0LYO0EHVwxPhXYeFfKmCnYJ99dhZOHbTN2b32M7PetcqvLlbK0xYgYCckvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nw6LNRz8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5BB6C4CEC3;
+	Wed, 18 Sep 2024 13:54:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726667655;
+	bh=+Zh+djR7AX48cdY3rFqnD3jZEZXXjC49iXCG8eZYSeQ=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=nw6LNRz8J9W64qF/DfXUhAyHwC28qLffJN9zKZfGnAB/+4WgMSB8qZrvvUi/i0qR5
+	 KyDVMXk3Mq8AkJNhbZh3zGmKCjXvecm+dEHDWypua9YjTdxAedFiKd8kxsGc4vXt3Z
+	 VGeQsGAfQjdQYmfaoAF2lDlYOO/WorjYtPuwN6GVsgwDvSRXLt8sRZPD1LdgpvwQej
+	 /7nygbP4u7B9ijApHNJu6TkMKqs7XMuHvexhh9T5TbvQ6PRYOJaRhAVew5GJKiQO5n
+	 ELHYaXMykWl2r1VLrofuyR6jDYO8fdrSOhx5Pw50WNKAErP+RNn9y6L19IkGjl3Qsv
+	 vUn+Jja8xj+ZA==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240918111008.uzvzkcjg7wfj5foa@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v14 1/4] dt-bindings: net: wireless: brcm4329-fmac: add
+ pci14e4,449d
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20240910-wireless-mainline-v14-1-9d80fea5326d@wesion.com>
+References: <20240910-wireless-mainline-v14-1-9d80fea5326d@wesion.com>
+To: Jacobe Zang <jacobe.zang@wesion.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>,
+ van Spriel <arend@broadcom.com>,
+ Arend van Spriel <arend.vanspriel@broadcom.com>,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ brcm80211@lists.linux.dev, brcm80211-dev-list.pdl@broadcom.com,
+ nick@khadas.com, Jacobe Zang <jacobe.zang@wesion.com>,
+ Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <172666764990.3996465.9327030359445823508.kvalo@kernel.org>
+Date: Wed, 18 Sep 2024 13:54:11 +0000 (UTC)
 
-On Wed, Sep 18, 2024 at 02:10:08PM +0300, Vladimir Oltean wrote:
-> This is all great, but then I realized that, for addressing issue #2,
-> it is no better than what we currently have. Namely, by default the tree
-> looks like this:
-> 
-...
-> 
-> but after this operation:
-> 
-> $ echo d0032004.mdio-mii:11 > /sys/bus/mdio_bus/devices/d0032004.mdio-mii\:11/driver/unbind
-> $ cat /sys/kernel/debug/device_component/dsa_tree.0.auto
-> aggregate_device name                                  status
-> -------------------------------------------------------------
-> dsa_tree.0.auto                                     not bound
-> 
-> device name                                            status
-> -------------------------------------------------------------
-> (unknown)                                      not registered
-> d0032004.mdio-mii:10                                not bound
-> d0032004.mdio-mii:12                                not bound
-> 
-> the tree (component master) is unbound, its unbind() method calls
-> component_unbind_all(), and this also unbinds the other switches.
+Jacobe Zang <jacobe.zang@wesion.com> wrote:
 
-Correct. As author of the component helper... The component helper was
-designed for an overall device that is made up of multiple component
-devices that are themselves drivers, and _all_ need to be present in
-order for the overall device to be functional. It is not intended to
-address cases where an overall device has optional components.
+> It's the device id used by AP6275P which is the Wi-Fi module
+> used by Rockchip's RK3588 evaluation board and also used in
+> some other RK3588 boards.
+> 
+> Acked-by: Arend van Spriel <arend.vanspriel@broadcom.com>
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Signed-off-by: Jacobe Zang <jacobe.zang@wesion.com>
+> Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.com>
 
-The helper was originally written to address that problem for the
-Freescale i.MX IPU, which had been sitting in staging for considerable
-time, and was blocked from being moved out because of issues with this
-that weren't solvable at the time (we didn't have device links back
-then, which probably could've been used instead.)
+4 patches applied to wireless-next.git, thanks.
+
+97cb465ee6c1 dt-bindings: net: wireless: brcm4329-fmac: add pci14e4,449d
+7ca3fac19541 dt-bindings: net: wireless: brcm4329-fmac: add clock description for AP6275P
+0ff0843310b7 wifi: brcmfmac: Add optional lpo clock enable support
+ea11a89c3ac6 wifi: brcmfmac: add flag for random seed during firmware download
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+https://patchwork.kernel.org/project/linux-wireless/patch/20240910-wireless-mainline-v14-1-9d80fea5326d@wesion.com/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+
 
