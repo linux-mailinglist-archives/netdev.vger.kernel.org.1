@@ -1,130 +1,154 @@
-Return-Path: <netdev+bounces-128826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1ACC97BD6C
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 15:55:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3344797BD79
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 15:58:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99F2F28183A
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 13:55:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0178288FD0
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 13:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E192818A944;
-	Wed, 18 Sep 2024 13:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4163F18CC09;
+	Wed, 18 Sep 2024 13:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V5+KC3Bi"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="HBllCe5s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A47818952B;
-	Wed, 18 Sep 2024 13:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5168D18C010
+	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 13:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726667723; cv=none; b=mq2bK4xVozdF6LmlDhPRX3BsRZLnWvTBthzXiC+v0yhSN7qfSdku1rHztxhDnQpCP1cqHELcA45UuLnIBasNjqzKhEPzNuXd4BvcmwrVU1etsQRwNDL7/wsk+Id8i9zXjvhUWDzZVvoASSCwuMsn/MUkUbAam1fy9ibjA7TQZsQ=
+	t=1726667897; cv=none; b=TCA9475FS0PheqDEyoRcXm6GEsecVJssDA1S9m+dU+p195aS5sRWLxO9RbVOGDKtafRssh3R9M3wP6SvAMVG+YCRq/8KCKomQ4U257pVuci0yTDHVaGEUVyyCIrWSuizfw/cCxWptR/EjVEkbWHKe68QauPnolBjSPm6OXrNoIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726667723; c=relaxed/simple;
-	bh=86vDqK2x0ER6NDvUrKKmlLDQ0tfjJ5Et5if/AV9scEY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gk0TyS/23xHHl/A+cAYB5/ZzRgz6PPxqXoPj/hfdl92KjEeLuMKdcLGOQeL5Y4tPtOMGeki7oov7xPmIaSJ4q+27FE3Bl9cUb7A2OtYmd/TD8v1EZaZGZjtGgUu14Zj86W1VlXFl27XwWlIJcJni/5fUqMMMUA5HV2U33drWtzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V5+KC3Bi; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726667722; x=1758203722;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=86vDqK2x0ER6NDvUrKKmlLDQ0tfjJ5Et5if/AV9scEY=;
-  b=V5+KC3BiRSJT7L5q/964K573A4Fmu8z7nwFWRVj1CDZiIke0lodx3Yd0
-   4LjCTQAgEkRkHW5rtfOTvkme2Y5EyigMJ964HZrgBBCZCWFXthdLvCj4P
-   2trt/J6Ernnn4oxBsW75eW+suwdxshReUlfP4vrLDuL7OkObUT6x/3Nbw
-   /SV5pBcEbN3LKLBDdSVF/DXM0QLo65JAQLzN4iFxVG/Lb9d7qBgstLg+q
-   WUoUbaYgaq+/wlq27SNlxjZj2iGVWBKB/WHydkuEIOBu3q6B/3Q/TRLtM
-   hBipHS06U5vdzLCPAcqa5rCndHDC2YTzN5Don8wi94HPEi1IkSte484Lw
-   g==;
-X-CSE-ConnectionGUID: VsA44QOWRQGT79VD+Ci2hw==
-X-CSE-MsgGUID: avt3SzbpTXin3YKcEKKS9g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11199"; a="36940749"
-X-IronPort-AV: E=Sophos;i="6.10,238,1719903600"; 
-   d="scan'208";a="36940749"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 06:55:21 -0700
-X-CSE-ConnectionGUID: UHPVH35YSSuP8YZSa0yZEw==
-X-CSE-MsgGUID: zsjxup1lSJSosZTWEJl6PA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,238,1719903600"; 
-   d="scan'208";a="100402367"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 06:55:18 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1sqv9H-0000000ACEi-2vDZ;
-	Wed, 18 Sep 2024 16:55:15 +0300
-Date: Wed, 18 Sep 2024 16:55:15 +0300
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Simon Horman <horms@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	s=arc-20240116; t=1726667897; c=relaxed/simple;
+	bh=uRjf76+ialIXRhrRcRnhdzxrLmruMKeJXsltkA5bYqY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=T+RLS1/hDlqkgrFKRJEAuYCeEtiAldUHjSA6edb9lhaYQCi6fjrlQ94qa860H3j+emCGPYGwDkLfVwUHV+pr3BsTdVyyyf1NnpHrlpcLEaWkY4OB6jpsbEfgirbtbsF/adwOPqME1n28/WGE6sOCV2Zn1VU28XGG/y/87/fpOkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=HBllCe5s; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a8d0d0aea3cso940766366b.3
+        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 06:58:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1726667893; x=1727272693; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=SPn7NyA8EvFtDI+rj2RU3nMqRoNcoHgRdtft+sybg/g=;
+        b=HBllCe5sMkM5IkvbFss4nozGoq+z9jbUC079gOJYxhnSsUQt+OQip/BoTa4wzIXAXP
+         3wEZfA65XYUsTvCXshf+hWSPrhKU3KRAvsXmz7f9eSM1v+fhReDoZmD2ewoQzouc4MC0
+         qC7UVRAJt37KNI9a8HDtTlGoOWTqi1H/3F8Y0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726667893; x=1727272693;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SPn7NyA8EvFtDI+rj2RU3nMqRoNcoHgRdtft+sybg/g=;
+        b=LreSRJW2zC8XEWuW1kXJp9hebGs7uoJooQRwmfZxjr6vF5F/3ZRSLPrH9zHKxa0dTQ
+         owsW3jY2rER7xsgKdX8T4CeUidsamdPDBehK8Ofuo5bTo58y3eeSrrmup/7dGqPkQxi1
+         yp6GC/X1SbUyM04UaFCazAHTSzWw/KplI2CkshOSkUeLHIG8zGS8ei1ijoHmtI92hN0Y
+         io8vhEXf9bPJajx5bFuHMI2wndmx6FMzQOYGaK1r+8NJBiHUrB2R9xe+AEoJdK6rUDAv
+         5CJHkl49MP02EyJtSUDYYGjPSolrJJOAIXpQQcXo5cIzZ3dK33xJrA03kIt3p0HGSTXs
+         MxBg==
+X-Gm-Message-State: AOJu0YzmZJwTOb6cZOat6R5JaVslMcd+MamuclvuGjl4uKhLvXtHqoRT
+	jkIZmSqxGZR1zwoKuofTrMvWNjdIXq8IYKq7MBKEjYOGegUyHhry+juBHPxa2uNfVzfEFnSia0y
+	aSV9qjYcUfgpbjSK+iudunA0BcboQBrUKww0obTFlS4tSVsvVhiJvb6DsNhjH08O3aN8iYjiJQ5
+	UaQ7jpIN9TOVYE/TL6TX/ot94m/gcnU/Pze/g4rA==
+X-Google-Smtp-Source: AGHT+IFmawmX5JiRVgNf/0L0WpQV3DqIK1N/ZTMHGP5g/mV8702xqodsE7+50nL/fybsbo9t4AkL1Q==
+X-Received: by 2002:a17:906:6a14:b0:a90:4199:2a73 with SMTP id a640c23a62f3a-a9041992ae5mr2018156266b.5.1726667893278;
+        Wed, 18 Sep 2024 06:58:13 -0700 (PDT)
+Received: from localhost.localdomain ([83.68.141.146])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90613315d8sm595283466b.214.2024.09.18.06.58.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Sep 2024 06:58:13 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: Joe Damato <jdamato@fastly.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH nf-next 0/2] netfilter: conntrack: label helpers
- conditional compilation updates
-Message-ID: <Zurbw1-Fl0EfdC0l@smile.fi.intel.com>
-References: <20240916-ct-ifdef-v1-0-81ef1798143b@kernel.org>
- <Zuq-7kULeAMPRmFg@calendula>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [RFC net-next] e1000e: link NAPI instances to queues and IRQs
+Date: Wed, 18 Sep 2024 13:57:26 +0000
+Message-Id: <20240918135726.1330-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zuq-7kULeAMPRmFg@calendula>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 18, 2024 at 01:52:14PM +0200, Pablo Neira Ayuso wrote:
-> On Mon, Sep 16, 2024 at 04:14:40PM +0100, Simon Horman wrote:
-> > Hi,
-> > 
-> > This short series updates conditional compilation of label helpers to:
-> > 
-> > 1) Compile them regardless of if CONFIG_NF_CONNTRACK_LABELS is enabled
-> >    or not. It is safe to do so as the functions will always return 0 if
-> >    CONFIG_NF_CONNTRACK_LABELS is not enabled.  And the compiler should
-> >    optimise waway the code.  Which is the desired behaviour.
-> > 
-> > 2) Only compile ctnetlink_label_size if CONFIG_NF_CONNTRACK_EVENTS is
-> >    enabled.  This addresses a warning about this function being unused
-> >    in this case.
-> 
-> Patch 1)
-> 
-> -#ifdef CONFIG_NF_CONNTRACK_LABELS
->  static inline int ctnetlink_label_size(const struct nf_conn *ct)
-> 
-> Patch 2)
-> 
-> +#ifdef CONFIG_NF_CONNTRACK_EVENTS
->  static inline int ctnetlink_label_size(const struct nf_conn *ct)
-> 
-> They both refer to ctnetlink_label_size(), #ifdef check is not
-> correct.
+Make e1000e compatible with the newly added netdev-genl APIs.
 
-But the first one touches more, no?
+$ cat /proc/interrupts | grep ens | cut -f1 --delimiter=':'
+ 50
+ 51
+ 52
 
+While e1000e allocates 3 IRQs (RX, TX, and other), it looks like e1000e
+only has a single NAPI, so I've associated the NAPI with the RX IRQ (50
+on my system, seen above):
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                       --dump napi-get --json='{"ifindex": 2}'
+[{'id': 145, 'ifindex': 2, 'irq': 50}]
+
+$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+                       --dump queue-get --json='{"ifindex": 2}'
+[{'id': 0, 'ifindex': 2, 'napi-id': 145, 'type': 'rx'},
+ {'id': 0, 'ifindex': 2, 'napi-id': 145, 'type': 'tx'}]
+
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+ drivers/net/ethernet/intel/e1000e/netdev.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index f103249b12fa..b527642c3a82 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -4613,6 +4613,7 @@ int e1000e_open(struct net_device *netdev)
+ 	struct e1000_hw *hw = &adapter->hw;
+ 	struct pci_dev *pdev = adapter->pdev;
+ 	int err;
++	int irq;
+ 
+ 	/* disallow open during test */
+ 	if (test_bit(__E1000_TESTING, &adapter->state))
+@@ -4676,7 +4677,15 @@ int e1000e_open(struct net_device *netdev)
+ 	/* From here on the code is the same as e1000e_up() */
+ 	clear_bit(__E1000_DOWN, &adapter->state);
+ 
++	if (adapter->int_mode == E1000E_INT_MODE_MSIX)
++		irq = adapter->msix_entries[0].vector;
++	else
++		irq = adapter->pdev->irq;
++
++	netif_napi_set_irq(&adapter->napi, irq);
+ 	napi_enable(&adapter->napi);
++	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_RX, &adapter->napi);
++	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_TX, &adapter->napi);
+ 
+ 	e1000_irq_enable(adapter);
+ 
+@@ -4735,6 +4744,8 @@ int e1000e_close(struct net_device *netdev)
+ 		netdev_info(netdev, "NIC Link is Down\n");
+ 	}
+ 
++	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_RX, NULL);
++	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_TX, NULL);
+ 	napi_disable(&adapter->napi);
+ 
+ 	e1000e_free_tx_resources(adapter->tx_ring);
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.34.1
 
 
