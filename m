@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-128775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 133D097BA37
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 11:40:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2361A97BA57
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 11:51:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E41D5280FCB
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 09:40:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 955541F23264
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 09:51:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E929178363;
-	Wed, 18 Sep 2024 09:40:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02FD17920E;
+	Wed, 18 Sep 2024 09:51:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="nACpbfgo"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="js5NuPoK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFDC21304BA
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 09:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D406176FA0
+	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 09:51:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726652432; cv=none; b=CSQ/vQcxkzDqUX+zA4CjAH7RNSc9UcIJusMCeQ534n3R+m3j/7p27eYPJSOKRfYkvi5yj/wucxX2hB4DlavuVf/C928aLVo6XQU3DxXaX8nsKeksldbVr4a4Kl0DRpxTbdzUuGr2faJKhGR3d6lmM8Hg1PAmPxLholIMMGLeAXU=
+	t=1726653071; cv=none; b=IRdJMADL6NG0ADMUyrESgYghwF5M2Kc664Yxr9zUIQ2r+03JAlKw2VsQ8lcu4cOdN97VdWsC5354Kk0/grJmW6x4Yw7iin3LwmwmP9fSZEUnGRIuYCQmieAcDfg6vxvGEqF3PHL1vAIYT4UUGF+sIvI6sVpbYpx+FiGw6UBWUpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726652432; c=relaxed/simple;
-	bh=sa/Z3gBxGkduZ21tgEojAUz0JuOfKH3xqjWZecw5e8E=;
+	s=arc-20240116; t=1726653071; c=relaxed/simple;
+	bh=YYveKDNyLV/O+GuIZezG/H+dg/pEIjQTXZMwxfSjq/M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r7SNavH5y/dHUW4KHwJGcipvxKWcefFXcaVrFUUthyI9kyvhldmwwAVIYfXzjL3xGBC1P7AALPxqO5N2tC5I6VZE8PaTf3DbCZs+l2cO+eU42JVVY8tHBr2EdTdHLgN7JcNJ+IihWAo9tD2cXU/r7/tRmETRkZEjMAOYlFnLAZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=nACpbfgo; arc=none smtp.client-ip=209.85.218.41
+	 In-Reply-To:Content-Type; b=NfcY9aXzlF+dRww3+CDu8YRg8M/Y3WCfqIlGqyueUsiKqnuXjLz/+W5WX6+KTO4z9l2lTIXg2EYkW6vwE9XyClQanE6+Pyu1yXcfeHbX6MNgu+wc3aiOKPWVvGISqYKPy+s0kGfjbpHNw4WCCjzhgmdA3oi4/Tvznm+R1BxYIsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=js5NuPoK; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a86e9db75b9so1023624166b.1
-        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 02:40:30 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a8a7596b7dfso102666866b.0
+        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 02:51:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1726652429; x=1727257229; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1726653068; x=1727257868; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=lecaVNcmA2JjtTGwgjFCKRgWjf3SejBL7F1D6E+FvJw=;
-        b=nACpbfgoyN/D0eHZdEPaDPBpOMk5p5HbZsnX7ddI64OIh+bPGl4W13mpuSyFFNZzJx
-         fq3XnxCghcqldsLkC+2hwj/iDOvxyQMgXVXqTJZLa6D4HOxQLnxuM8jzz9BmE4EvCkqJ
-         0HbdE/Q+MtZaCcqbzxaVaWJzNNTTJENw2EZaq/+dY3MXKyijqgF7y9215tInT2z1nw+f
-         yHaiCgikubbrDgKPlLlUWSGFKSCpAGLlERCmctjd4ONCXudWGR0Z7Vv/qfnA3ZJQjeIp
-         WgE8RrjPai89DJVCbn6QmtOqXiorCAI8WooUiyR9kPlgJRlXFLi0HUdLS9GuztOoZBUD
-         DQ0A==
+        bh=U5Lz1QWVFmZd2N1NR4+boEn5JCoZBGXe5wWgia0cON4=;
+        b=js5NuPoKWQ3/7Er/hcnJ06/MjTq1CnwJN0fwvs/Wtell0wWMwxV5iaJDLb3gcroNKj
+         ZJ7sp9EWEhWHfZG9wAuDNeOMUn5UninPRsjKJzL4u8RGacMfsV0dRLQaGeIvlRJfLiSl
+         OrZopnQPbGCK5MtP+YcAAqPP50RmOUOXwCCLfsT1cMmm0OFMg/l9aB3oJpXyamXHeJPw
+         JqvVcQ9q6kZ/hqM1DGrXahR2ZeE90O+Cfz8QlGRMpSiNe5A6eNmdIIc4fgtO38m4a2bl
+         Xx+oP0oB9B416DZnj3VY0uOGodn2k9t+XH1+CvuAqrYSQrL23cS0Rg5maAxbbbmwbIia
+         LmNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726652429; x=1727257229;
+        d=1e100.net; s=20230601; t=1726653068; x=1727257868;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lecaVNcmA2JjtTGwgjFCKRgWjf3SejBL7F1D6E+FvJw=;
-        b=wUDU2+sjgZOuSINiyG4tK0+Rvi2AQ0J8wJhqIyDDQ0viSdExfKLEpZth/eZOrEh+Kv
-         LNxy95CEsXvcvQHvTC7FXEdCWKSM7LnAyQ+Df+BmJA1CMhyJzVOkRtQtnW0ZnLRHscxb
-         FsFpsdBff9+d7XkGJTAugmgsmsxhVSz+r15WEc8kvcwIYCGOAyVdnqbR9Y/kIMNcQjCt
-         A5F2Dxk2MR4sKxW8FiDqRfqtf0Vy1fEBKSGrGblplGuNhWJ0KHgTX+eY9DlpYAnAwI6b
-         jSLPo0k7ICmD+rv81qCt3UlA2bnkjGXjUu+MwJ3F0WtEXTMKB7lCJikntfOC29pwxuKF
-         CxYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUx8K/nSm2wx/D8HF8Ooq+c8AatkbCTgbM+B4n2Iuq2k1g93J6R6y6InwzuDpvNrCiPbubvgOU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSyzQLk0eqsDc99rACuYXDP06l0E5cVX/Tm2fI5dM2kLRnq9/q
-	wJ9S1bUTMDu3UqFvdxzSQl4ABEnPWQoOE4r/Px4eowGQWKaR18qWTkvSby3ILZY=
-X-Google-Smtp-Source: AGHT+IEiDtpcBMns4eThOyjvY7vmtUnEvrsljknDy5RtOY/mIovMESzUzkgE3/KMjtr9ngXAVkLERA==
-X-Received: by 2002:a17:906:cadc:b0:a8a:7501:de21 with SMTP id a640c23a62f3a-a90294ab552mr2114018966b.12.1726652428674;
-        Wed, 18 Sep 2024 02:40:28 -0700 (PDT)
+        bh=U5Lz1QWVFmZd2N1NR4+boEn5JCoZBGXe5wWgia0cON4=;
+        b=aItYU5/DJeF5wEHc9kGRGt31M2JrvlpGSVR9zGE0tP6wMvv+d39brsazUd3jLumxMa
+         RVwp/InmDgWqzNJnf1q1h8+CNpJNW5V3LAo0JgZdW5ekyq7pqqrdEJ52VjqPtRQg+eD7
+         sWwx4BDJHqVVOE1VpFSGxnZWij7O+RVLDZ1YOTMXuQxNJihi8PiJeomRxbkwbI/vWKqD
+         4pq4XTDoJ/cx6U0j96x01DV+s2P7JsSD0jWsU64+H4JyHry0ZA5XtikkE8NVuK+OP4P6
+         XBAEopXXb6hYKMcICBogPJSrrfgIN2Sl65FODh31KXlzkxVqDiD4Dt17JsDGNb6lio4+
+         2wOQ==
+X-Gm-Message-State: AOJu0YwmlxHXw+pet6k2fqlkETdNLlKAVXnfFrOOlwHZZxz1V94MLbnP
+	z6dHaPK8iQrKNYbC7jMJrZTR4hGc3NsGmF4gTfRIEpGepbJSgehkX7BYKI+b4pg=
+X-Google-Smtp-Source: AGHT+IGh+5daTFsNyDKlbll7KebWFSlnclyKmAwqiRqpM+wguKxxuLaiVoIA7Zfzj5R3BOYGBvdN6A==
+X-Received: by 2002:a17:907:3f91:b0:a8d:5f69:c839 with SMTP id a640c23a62f3a-a8ffabbcc0cmr2879337466b.15.1726653068106;
+        Wed, 18 Sep 2024 02:51:08 -0700 (PDT)
 Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90612e5675sm560870066b.169.2024.09.18.02.40.27
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90612df75csm568606066b.149.2024.09.18.02.51.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 Sep 2024 02:40:28 -0700 (PDT)
-Message-ID: <a475dfac-3bd7-4877-bab4-3c08259501c2@blackwall.org>
-Date: Wed, 18 Sep 2024 12:40:27 +0300
+        Wed, 18 Sep 2024 02:51:07 -0700 (PDT)
+Message-ID: <ebef9a36-d060-4df3-b139-3dda4a84484a@blackwall.org>
+Date: Wed, 18 Sep 2024 12:51:06 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,82 +75,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] Bonding: update bond device XFRM features based on
- current active slave
-To: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, Andy Gospodarek <andy@greyhouse.net>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jarod Wilson <jarod@redhat.com>, Simon Horman <horms@kernel.org>,
- linux-kernel@vger.kernel.org
-References: <20240918083533.21093-1-liuhangbin@gmail.com>
+Subject: Re: [PATCH net v2] bonding: Add net_ratelimit for
+ bond_xdp_get_xmit_slave in bond_main.c
+To: Jiwon Kim <jiwonaid0@gmail.com>, jv@jvosburgh.net, andy@greyhouse.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, joamaki@gmail.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
+References: <20240918083545.9591-1-jiwonaid0@gmail.com>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240918083533.21093-1-liuhangbin@gmail.com>
+In-Reply-To: <20240918083545.9591-1-jiwonaid0@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 18/09/2024 11:35, Hangbin Liu wrote:
-> XFRM offload is supported in active-backup mode. However, if the current
-> active slave does not support it, we should disable it on bond device.
-> Otherwise, ESP traffic may fail due to the downlink not supporting the
-> feature.
+On 18/09/2024 11:35, Jiwon Kim wrote:
+> Add net_ratelimit to reduce warnings and logs.
+> This addresses the WARNING in bond_xdp_get_xmit_slave reported by syzbot.
 > 
-> Reproducer:
->   # ip link add bond0 type bond
->   # ip link add type veth
->   # ip link set bond0 type bond mode 1 miimon 100
->   # ip link set veth0 master bond0
->   # ethtool -k veth0 | grep esp
->   tx-esp-segmentation: off [fixed]
->   esp-hw-offload: off [fixed]
->   esp-tx-csum-hw-offload: off [fixed]
->   # ethtool -k bond0 | grep esp
->   tx-esp-segmentation: on
->   esp-hw-offload: on
->   esp-tx-csum-hw-offload: on
+
+This commit message is severely lacking. I did the heavy lifting and gave you
+detailed analysis of the problem, please describe the actual issue and why
+this is ok to do. Also the subject is confusing, it should give a concise
+summary of what the patch is trying to do and please don't include filenames in it.
+You can take a look at other commits for examples.
+
+> Setup:
+>     # Need xdp_tx_prog with return XDP_TX;
+>     ip l add veth0 type veth peer veth1
+>     ip l add veth3 type veth peer veth4
+>     ip l add bond0 type bond mode 6 # <- BOND_MODE_ALB, unsupported by xdp
+>     ip l add bond1 type bond # <- BOND_MODE_ROUNDROBIN by default
+>     ip l set veth0 master bond1
+>     ip l set bond1 up
+>     ip l set dev bond1 xdpdrv object tx_xdp.o section xdp_tx
+>     ip l set veth3 master bond0
+>     ip l set bond0 up
+>     ip l set veth4 up
+>     ip l set veth3 xdpgeneric object tx_xdp.o section xdp_tx
+
+Care to explain why this setup would trigger anything?
+
 > 
-> After fix:
->   # ethtool -k bond0 | grep esp
->   tx-esp-segmentation: off [requested on]
->   esp-hw-offload: off [requested on]
->   esp-tx-csum-hw-offload: off [requested on]
-> 
-> Fixes: a3b658cfb664 ("bonding: allow xfrm offload setup post-module-load")
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=c187823a52ed505b2257
+> Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
+> Signed-off-by: Jiwon Kim <jiwonaid0@gmail.com>
 > ---
->  drivers/net/bonding/bond_main.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> v2: Change the patch to fix bond_xdp_get_xmit_slave
+> ---
+>  drivers/net/bonding/bond_main.c | 9 ++++++---
+>  1 file changed, 6 insertions(+), 3 deletions(-)
 > 
 > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index b560644ee1b1..33f7fde15c65 100644
+> index b560644ee1b1..91b9cbdcf274 100644
 > --- a/drivers/net/bonding/bond_main.c
 > +++ b/drivers/net/bonding/bond_main.c
-> @@ -1353,6 +1353,10 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
->  				call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
->  							 bond->dev);
->  			}
-> +
-> +#ifdef CONFIG_XFRM_OFFLOAD
-> +			netdev_update_features(bond->dev);
-> +#endif /* CONFIG_XFRM_OFFLOAD */
->  		}
->  	}
+> @@ -5610,9 +5610,12 @@ bond_xdp_get_xmit_slave(struct net_device *bond_dev, struct xdp_buff *xdp)
+>  		break;
 >  
-> @@ -1524,6 +1528,11 @@ static netdev_features_t bond_fix_features(struct net_device *dev,
->  		features = netdev_increment_features(features,
->  						     slave->dev->features,
->  						     mask);
-> +#ifdef CONFIG_XFRM_OFFLOAD
-> +		if (BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP &&
-> +		    slave == rtnl_dereference(bond->curr_active_slave))
-> +			features &= slave->dev->features & BOND_XFRM_FEATURES;
-> +#endif /* CONFIG_XFRM_OFFLOAD */
->  	}
->  	features = netdev_add_tso_features(features, mask);
->  
+>  	default:
+> -		/* Should never happen. Mode guarded by bond_xdp_check() */
+> -		netdev_err(bond_dev, "Unknown bonding mode %d for xdp xmit\n", BOND_MODE(bond));
+> -		WARN_ON_ONCE(1);
+> +		/* This might occur when a bond device increases bpf_master_redirect_enabled_key,
+> +		 * and another bond device with XDP_TX and bond slave.
+> +		 */
 
-Nice catch,
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+The comment is confusing and needs to be reworded or dropped altogether.
+
+> +		if (net_ratelimit())
+> +			netdev_err(bond_dev, "Unknown bonding mode %d for xdp xmit\n",
+> +				   BOND_MODE(bond));
+>  		return NULL;
+>  	}
+>  
 
 
