@@ -1,46 +1,68 @@
-Return-Path: <netdev+bounces-128751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2982C97B6C9
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 04:23:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A684697B6CD
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 04:27:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4A73281767
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 02:23:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D721B24D91
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 02:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5323627442;
-	Wed, 18 Sep 2024 02:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9E074C08;
+	Wed, 18 Sep 2024 02:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sVKy+wKc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RxgkEqYJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3996D3D8E
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 02:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D1C3D8E;
+	Wed, 18 Sep 2024 02:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726626232; cv=none; b=g0g9Ef4KETiuaD9vhifGMIyJQj/xrfaO+ohXAWHC2bTZFRQh8XWH+YDEymSsexZ4uwlrcc/IJkb/PCRSpIaZrLmwHXsf/lbUaB7eIRIDykpqjLUhgWlsPTpZXSCZCGzghQtX+NHuMA9GFP1XzgadynWbdO5GeIKNV3RU3H3X+LM=
+	t=1726626457; cv=none; b=iPFqdWvZPFJmJ56Y3VmWIILGRiXi5tWWgZeKC8W7clY72sY1yXxke70K/K7zHGU2fH/wxfD1Unj50z90DgsT8vhm6WihWjskx2qHPnTe9hzq/2IFGkz+EV6sotkyEM2i/+si+ecQ3FTJ55fbrnma3FG0uOJBCtuUi9CgVMcZxt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726626232; c=relaxed/simple;
-	bh=ABT6rGN8TOPww8BfAd+4FFFiZKORE5iCUenViiN7gEg=;
+	s=arc-20240116; t=1726626457; c=relaxed/simple;
+	bh=uS2YFxRvMGKdY4hVYbzDLw3B0Hjyf+pk1jbICas5hRA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LruoHlEqO/MAYdEPiY2sE7eAz3nSatFO8cWTDWgX+gRo0AQ+amzlKOCD4kC5O5PjgUOroiyMrdU7Mq6NlBFGPqJZF9CjPoER7jTSOnXFAijcTZmBwblNtxBKaGQHWr8QQppxT7CTpLcM9pAALUYc49yPjfiFYUd+xFdkC6xQF2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sVKy+wKc; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1726626226; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=JSGTfA6HBaAWlNaTQITKIfrl5ekOusFd9DdvS+ZqM4A=;
-	b=sVKy+wKcJyTXU1h+46KN+gvlh8NULHBhWDcLVJBmvNVMbzllIYvZduwM5+b+DnQ4QvllT7FPlp7iDrc4LxjvhWIHs1iINxzQ3/g69VOi6PiZYZbQtLlUTV4BGSF/Cva5eBrh7awyQAvpB7MWBHD2z7Zbt4eHDxlHx6/vuLFdkMU=
-Received: from 30.15.236.110(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WFCRkQz_1726626225)
-          by smtp.aliyun-inc.com;
-          Wed, 18 Sep 2024 10:23:46 +0800
-Message-ID: <ad8da8d1-4ae4-41e2-a047-e4adc4c044f5@linux.alibaba.com>
-Date: Wed, 18 Sep 2024 10:23:45 +0800
+	 In-Reply-To:Content-Type; b=hVIOydGAUJLG0v0EQg0xqxj7kF70KPFCGhmIb7LyUFlP0IVFbZIWxFR33CVUoJEhjEaUH/60TDOs6t69vKV1ute/UtA9xB4JmkImApRP3ngR5YYGGdaKw3f0ddcN72Su1iorGqq8UY5f0Q8zKT+y4kugWnWnbCFrqNYFKzlGzUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RxgkEqYJ; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726626456; x=1758162456;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=uS2YFxRvMGKdY4hVYbzDLw3B0Hjyf+pk1jbICas5hRA=;
+  b=RxgkEqYJJz5s+vJWFhWtPXfr/3J3SH5x1jbzCbFB7yFUwgOAw0hD5yx7
+   ZtULDonxP9VmmyEtsXydS7Dw8xxXe34m7g36QoFC3Dd6qu0nI5eE+FkOu
+   oQErzT6+HB+ahU3LiuqrYp2a96lBbr9nWioTeBp5Au5QSP2pECKIp4gBT
+   9IJbmhT4NQFU60UNIjfgZ5JMS2nM11HftbrpQqR/p6J3jaWbvNK7qIhmq
+   7tIEq7LZ9uuOb2vkw2wcQpCPQPRxL2Qpmy9o66D524C6+8K6G8veSNjm8
+   p8MY4C24gBlMnUsWEcd1Q1AQFb3Au1pDuMKcCsyQ0W03C6q2yQ912di+G
+   Q==;
+X-CSE-ConnectionGUID: lQ5RqSp3QiCkhEVx03LHRA==
+X-CSE-MsgGUID: I1Xbma5mR0aLUBQGNi8deg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11198"; a="48029180"
+X-IronPort-AV: E=Sophos;i="6.10,235,1719903600"; 
+   d="scan'208";a="48029180"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2024 19:27:36 -0700
+X-CSE-ConnectionGUID: YftceeTmRu+lZhiPv3An2g==
+X-CSE-MsgGUID: JqmCe4dtQyCA8IDnL3KVMA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,235,1719903600"; 
+   d="scan'208";a="74221109"
+Received: from linux.intel.com ([10.54.29.200])
+  by orviesa005.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Sep 2024 19:27:35 -0700
+Received: from [10.208.96.32] (unknown [10.208.96.32])
+	by linux.intel.com (Postfix) with ESMTP id B0B2320CFEE5;
+	Tue, 17 Sep 2024 19:27:31 -0700 (PDT)
+Message-ID: <7b6283e8-9a8d-4daf-9e99-f32dd55bcea5@linux.intel.com>
+Date: Wed, 18 Sep 2024 10:27:29 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,94 +70,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch net] smc: use RCU version of lower netdev searching
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
- syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com,
- Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
- Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>
-References: <20240912000446.1025844-1-xiyou.wangcong@gmail.com>
- <a054f2ef-c72f-4679-a123-003e0cf7839d@linux.alibaba.com>
- <ZuTehlEoyi4PPmQA@pop-os.localdomain>
- <e0842025-5e21-4755-8e60-1832e9cfe672@linux.alibaba.com>
- <ZuUDv8PLR4FHg+oC@pop-os.localdomain>
+Subject: Re: [PATCH net 1/1] net: stmmac: Fix zero-division error when
+ disabling tc cbs
+To: Simon Horman <horms@kernel.org>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Xiaolei Wang <xiaolei.wang@windriver.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org,
+ Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+ Tan Khai Wen <khai.wen.tan@intel.com>
+References: <20240912015541.363600-1-khai.wen.tan@linux.intel.com>
+ <20240912153730.GN572255@kernel.org> <20240912153913.GO572255@kernel.org>
 Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <ZuUDv8PLR4FHg+oC@pop-os.localdomain>
+From: "Tan, Khai Wen" <khai.wen.tan@linux.intel.com>
+In-Reply-To: <20240912153913.GO572255@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-
-
-On 9/14/24 11:32 AM, Cong Wang wrote:
-> On Sat, Sep 14, 2024 at 10:28:15AM +0800, D. Wythe wrote:
->>
->>
->> On 9/14/24 8:53 AM, Cong Wang wrote:
->>> On Thu, Sep 12, 2024 at 02:20:47PM +0800, D. Wythe wrote:
->>>>
->>>>
->>>> On 9/12/24 8:04 AM, Cong Wang wrote:
->>>>> From: Cong Wang <cong.wang@bytedance.com>
->>>>>
->>>>> Both netdev_walk_all_lower_dev() and netdev_lower_get_next() have a
->>>>> RCU version, which are netdev_walk_all_lower_dev_rcu() and
->>>>> netdev_next_lower_dev_rcu(). Switching to the RCU version would
->>>>> eliminate the need for RTL lock, thus could amend the deadlock
->>>>> complaints from syzbot. And it could also potentially speed up its
->>>>> callers like smc_connect().
->>>>>
->>>>> Reported-by: syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com
->>>>> Closes: https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f
->>>>> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
->>>>> Cc: Jan Karcher <jaka@linux.ibm.com>
->>>>> Cc: "D. Wythe" <alibuda@linux.alibaba.com>
->>>>> Cc: Tony Lu <tonylu@linux.alibaba.com>
->>>>> Cc: Wen Gu <guwen@linux.alibaba.com>
->>>>> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
->>>>
->>>>
->>>> Haven't looked at your code yet, but the issue you fixed doesn't exist.
->>>> The real reason is that we lacks some lockdep annotations for
->>>> IPPROTO_SMC.
+On 12/9/2024 11:39 pm, Simon Horman wrote:
+> On Thu, Sep 12, 2024 at 04:37:30PM +0100, Simon Horman wrote:
+>> On Thu, Sep 12, 2024 at 09:55:41AM +0800, KhaiWenTan wrote:
+>>> The commit b8c43360f6e4 ("net: stmmac: No need to calculate speed divider
+>>> when offload is disabled") allows the "port_transmit_rate_kbps" to be
+>>> set to a value of 0, which is then passed to the "div_s64" function when
+>>> tc-cbs is disabled. This leads to a zero-division error.
 >>>
->>> If you look at the code, it is not about sock lock annotations, it is
->>> about RTNL lock which of course has annotations.
+>>> When tc-cbs is disabled, the idleslope, sendslope, and credit values the
+>>> credit values are not required to be configured. Therefore, adding a return
+>>> statement after setting the txQ mode to DCB when tc-cbs is disabled would
+>>> prevent a zero-division error.
 >>>
->>
->> If so, please explain the deadlock issue mentioned in sysbot and
->> how it triggers deadlocks.
-> 
-> Sure, but what questions do you have here? To me, the lockdep output is
-> self-explained. Please kindly let me know if you have any troubles
-> understanding it, I am always happy to help.
-> 
-> Thanks.
+>>> Fixes: b8c43360f6e4 ("net: stmmac: No need to calculate speed divider when offload is disabled")
+>>> Cc: <stable@vger.kernel.org>
+>>> Co-developed-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+>>> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+>>> Signed-off-by: KhaiWenTan <khai.wen.tan@linux.intel.com>
+> ...
+>
+> One more thing, if you do post an updated patch, please
+> be sure to wait until 24h after the original patch was posted.
+>
+> https://docs.kernel.org/process/maintainer-netdev.html
 
-Just explain (https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f)
+Hi Simon,
 
--> #1 (sk_lock-AF_INET6){+.+.}-{0:0}:
-        lock_sock_nested+0x3a/0xf0 net/core/sock.c:3543
-        lock_sock include/net/sock.h:1607 [inline]
-        sockopt_lock_sock net/core/sock.c:1061 [inline]
-        sockopt_lock_sock+0x54/0x70 net/core/sock.c:1052
-        do_ipv6_setsockopt+0x216a/0x47b0 net/ipv6/ipv6_sockglue.c:567
-        ipv6_setsockopt+0xe3/0x1a0 net/ipv6/ipv6_sockglue.c:993
-        udpv6_setsockopt+0x7d/0xd0 net/ipv6/udp.c:1702
-        do_sock_setsockopt+0x222/0x480 net/socket.c:2324
-        __sys_setsockopt+0x1a4/0x270 net/socket.c:2347
-        __do_sys_setsockopt net/socket.c:2356 [inline]
-        __se_sys_setsockopt net/socket.c:2353 [inline]
-        __x64_sys_setsockopt+0xbd/0x160 net/socket.c:2353
-        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-        do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Why is that udpv6_setsockopt was reported here.
-
-D.
-
-
-
+Thanks for the clarification. Will be updating a version 2 for this patch.
 
 
