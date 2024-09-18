@@ -1,113 +1,188 @@
-Return-Path: <netdev+bounces-128795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A052397BC20
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:21:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AB8997BC58
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:38:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CE41B22242
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:21:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06865283A04
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:38:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD18189F33;
-	Wed, 18 Sep 2024 12:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382CF188CC5;
+	Wed, 18 Sep 2024 12:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="j3dIOswL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIyueVcm"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B354189917;
-	Wed, 18 Sep 2024 12:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89FB6176FA7;
+	Wed, 18 Sep 2024 12:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726662056; cv=none; b=LhZ6sMxsT5NBwR02FM5hkWYja80u2zEakG2cnQG5T5sGm/w85FUKcmlVKq4t/hxQKgGQiiKxRA5aiqiZz0HAJm0kqdseTFMJCgj5HU1TLmwnM82xJOjDYQyAzHfE50zbgxT7jgxpBjeMNNzvlSVGn3OOimlfajEOMEVjFywsquk=
+	t=1726663086; cv=none; b=qohVYSsTiuYsk7qJmV/GPKeiZYE+0gXlv+frLMleo7bvnyd87tbxXhAIVDjZWAL1oOan7/ClyzbXVPyp7HN5OqNXZUmO1qqEHJOMupexGdnLdRw4n7VgzhyJmdnL3IlX3K2YtcsS1FwGnFQW1oNY1oU2u8P7rqi+ncVqqxoA52c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726662056; c=relaxed/simple;
-	bh=uaxBNQZ24wHxZDGsXGGXNTCgB5EtT70uYStd4gW0wOk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TcIM1C7JZCXRq9YPuMKXrkx0BP/W03cnMz750Rat+o0ye4T2joruF0ERqrcs7fSFX8MXyQ4t2bNCJL93dDG06fM3BmSbfYn5EoSG5RJyOMdSbRTvv1p0WnOQpFAmuzcY3NF9PWyMMs8mkXjRu9jWlHDQVDQouk1Ja67GlpBE9sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=j3dIOswL; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1726662052;
-	bh=uaxBNQZ24wHxZDGsXGGXNTCgB5EtT70uYStd4gW0wOk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=j3dIOswL54bm/9LAze3PRBWNFol9hYTAT134274Q3r30vSryX1KOYWO3iVZ1JUIOG
-	 7VoW4DcAgaLnF1DxFmXQhHWjVzlbGhPpPOjEGIyqUCTk+xhNNJTzkpbguxEYzX4qT+
-	 +gjGxQLLSUMqzVj7DbMYZ3NxkmVSSkiE0ABQwCDaHjKYHjtT/xi9d39PfmhNNDyXIX
-	 D5zz/21TwPkt6WBbH/QlMqGeExQN9Qrb9M4F1cbp76LU2qFFAMTIGqDd3WvkLzsGwl
-	 F0xWYXFWHO+tB/pnZpsDjgvNpB2wyzjSdXS8wNBSxqbaxPsRcRWNf5IlfzSl6Qd50X
-	 ZEp2/etwzf6VQ==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id EBE7917E12D6;
-	Wed, 18 Sep 2024 14:20:50 +0200 (CEST)
-Message-ID: <bb82f7df-daf3-4162-a85d-0255b0f1cd0d@collabora.com>
-Date: Wed, 18 Sep 2024 14:20:50 +0200
+	s=arc-20240116; t=1726663086; c=relaxed/simple;
+	bh=+pVQCjrOS+WDHSyf9VTvTerWzJQfOhje9X0hpJLbZ2w=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=gI8UZV1kXFaatWih7x0dfofTZ3G1ZYBJzCfeolYWirisb6EBt9syXlGqiqa8V/c44TBOUyPFH1/tUaPCyZCCKwWi0nwbvnPwClPN58o5qkEKIoihT3v0dk3glxawkmvGmU3N3j7UvVieQSEsV/jcjv1lNESakZLE5Y4a6OlJFCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lIyueVcm; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7a95efbaf49so396362485a.3;
+        Wed, 18 Sep 2024 05:38:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726663083; x=1727267883; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zKhOII2wzPiXj1Ja0YUua2iCV4SCufJIEwdhDjh9HSM=;
+        b=lIyueVcmYLXVsEP3wf3puUWk6vPqg8VlxBbrkag8vgF/xNkA7LNrETKRpnw3GE919Y
+         8MBHrnYA+kHOPkDh/4gnP1Bk0K3+HhjoVu3GZ71qsQHa8oqvxcE9KwwXg128BNA2wL/6
+         irTBfUxcGJ0HHFgwaTcqq+NjC0gBJl7JFmTj+JH9b4fNGaGWtQ28jo75s0Zuw6JzBSm8
+         M9xJmQIbjOjAWzvAMviBKa73Wl/VSvVf77KXWX7ApmzU/+Q0bGeHbtAPF/VDnt0phjNL
+         TjujbcKZSntFqF67vh/4mAu3XzVZI6DV83l+971PBYhcf2rLxa2b+G4q3W6gZUc62NJ1
+         c7bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726663083; x=1727267883;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zKhOII2wzPiXj1Ja0YUua2iCV4SCufJIEwdhDjh9HSM=;
+        b=E64KFiHVJSxaUrJXPBihrAg6SydaPWY9g4nSIed6rtB5CvKrC9SdWQB/sQ0l/b+DnP
+         vGMbchelZA9nMSvfa6LXv0wvA8LCNaLYcw0lS9MQ6V+P5B7I62Uf9KSHqZIkxeoPxSHD
+         5DacxsT9mxicvPAE8vIbP/Wv2cYlxzeZP3vFKHhF1Lb54Zm3kU2/ysRTpp/WLuXmtYbD
+         8KETkCvneOJvgDeAuUsB0miPffBuGAQg3BpEq5DxdPATLz3VEnhOBB8BoZWBwcYq7O1c
+         MvyTUcqulyv66hQxR4p60kkAxgnVN53GNPjCwwa/3GeVVeWAmPp6NKQXxIYyCJBu8kQR
+         ti9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWKaAz+g0BiJx65rg131VXXn7QhcI3YSKVaw90ZFh7wE87eag3K3Q38ZSB79pgUPzr13F6ktEHwDJ7N73A=@vger.kernel.org, AJvYcCWvF43mSeAxU490pOVrroXYDWxMRYKXW7FpSiCXsxIAudpX8u0SB5TlRHUpiCAbPXO0TvYd3MiTTDhTtl655cMJ@vger.kernel.org, AJvYcCXYyfrWky8cMnSMMuKPHO+jXjIBvetkpJen5YzYHRjLK2/AIn50piYoZdzAkW4KFdfJfxTGmgTB@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvGe+KQQsO05N4qx0lgOzyYU9ic4huNENJctf7cnRQs5AEKVVD
+	Hkct5lvry7yZ3XrpwxZWl07j5aPqIiKDl8wXGmlMC/nEXk8gcu+3
+X-Google-Smtp-Source: AGHT+IHgv89Lim0gQxfDI9Ug/kDaYNwzLbOzetDB4QbKuZuFTirvlUtsTj3cfbE9+qdkVlNN9l0lIg==
+X-Received: by 2002:a05:620a:24d5:b0:7a9:b9c6:ab62 with SMTP id af79cd13be357-7ab30d349c3mr2681807185a.28.1726663083232;
+        Wed, 18 Sep 2024 05:38:03 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7ab3e95bcaasm450628485a.5.2024.09.18.05.38.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Sep 2024 05:38:02 -0700 (PDT)
+Date: Wed, 18 Sep 2024 08:38:01 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Mohan Prasad J <mohan.prasad@microchip.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ andrew@lunn.ch
+Cc: edumazet@google.com, 
+ pabeni@redhat.com, 
+ shuah@kernel.org, 
+ mohan.prasad@microchip.com, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ horms@kernel.org, 
+ brett.creeley@amd.com, 
+ rosenp@gmail.com, 
+ UNGLinuxDriver@microchip.com, 
+ willemb@google.com
+Message-ID: <66eac9a9e3e22_29b986294c7@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240917023525.2571082-3-mohan.prasad@microchip.com>
+References: <20240917023525.2571082-1-mohan.prasad@microchip.com>
+ <20240917023525.2571082-3-mohan.prasad@microchip.com>
+Subject: Re: [PATCH net-next v2 2/3] selftests: nic_basic_tests: Add selftest
+ case for speed and duplex state checks
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 1/2] regulator: dt-bindings: mt6323: Convert to DT
- schema
-To: Macpaul Lin <macpaul.lin@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Sean Wang <sean.wang@mediatek.com>, Sen Chu <sen.chu@mediatek.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, Pavel Machek <pavel@ucw.cz>,
- Lee Jones <lee@kernel.org>, Sebastian Reichel <sre@kernel.org>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- Chen Zhong <chen.zhong@mediatek.com>, linux-input@vger.kernel.org,
- linux-leds@vger.kernel.org, linux-pm@vger.kernel.org,
- linux-rtc@vger.kernel.org, linux-sound@vger.kernel.org,
- Alexandre Mergnat <amergnat@baylibre.com>
-Cc: Bear Wang <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
- Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
- MediaTek Chromebook Upstream
- <Project_Global_Chrome_Upstream_Group@mediatek.com>,
- Chen-Yu Tsai <wenst@chromium.org>
-References: <20240918064955.6518-1-macpaul.lin@mediatek.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <20240918064955.6518-1-macpaul.lin@mediatek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Il 18/09/24 08:49, Macpaul Lin ha scritto:
-> Convert the MT6323 regulator binding from the old text-based format to
-> the new DT schema style. The property "regulator-name" has been added
-> as required property to reflect current usage in mt6323.dtsi.
+Mohan Prasad J wrote:
+> Add selftest case for testing the speed and duplex state of
+> local NIC driver and the partner based on the supported
+> link modes obtained from the ethtool. Speed and duplex states
+> are varied and verified using ethtool.
 > 
-> Examples have been streamlined and relocated to the parent schema file:
->    mfd/mediatek,mt6397.yaml.
+> Signed-off-by: Mohan Prasad J <mohan.prasad@microchip.com>
+> ---
+>  .../drivers/net/hw/nic_basic_tests.py         | 46 +++++++++++++++++++
+>  1 file changed, 46 insertions(+)
 > 
-> Update maintainer and submitter information with new entries from MediaTek.
-> 
-> The reference document cited in "mediatek,mt7530.yaml" has been updated
-> to point to this new DT schema file
-> 
-> Signed-off-by: Sen Chu <sen.chu@mediatek.com>
-> Signed-off-by: Macpaul Lin <macpaul.lin@mediatek.com>
-> Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
+> diff --git a/tools/testing/selftests/drivers/net/hw/nic_basic_tests.py b/tools/testing/selftests/drivers/net/hw/nic_basic_tests.py
+> index 27f780032..ff46f2406 100644
+> --- a/tools/testing/selftests/drivers/net/hw/nic_basic_tests.py
+> +++ b/tools/testing/selftests/drivers/net/hw/nic_basic_tests.py
+> @@ -42,6 +42,14 @@ from lib.py import ethtool
+>  """Global variables"""
+>  common_link_modes = []
+>  
+> +def check_autonegotiation(ifname: str) -> None:
+> +    autoneg = get_ethtool_content(ifname, "Supports auto-negotiation:")
+> +    partner_autoneg = get_ethtool_content(ifname, "Link partner advertised auto-negotiation:")
+> +
+> +    """Check if auto-neg supported by local and partner NIC"""
+> +    if autoneg[0] != "Yes" or partner_autoneg[0] != "Yes":
+> +        raise KsftSkipEx(f"Interface {ifname} or partner does not support auto-negotiation")
+> +
+>  def get_ethtool_content(ifname: str, field: str):
+>      capture = False
+>      content = []
+> @@ -112,6 +120,25 @@ def verify_autonegotiation(ifname: str, expected_state: str) -> None:
+>  
+>      ksft_eq(actual_state, expected_state)
+>  
+> +def set_speed_and_duplex(ifname: str, speed: str, duplex: str) -> None:
+> +    """Set the speed and duplex state for the interface"""
+> +    process = ethtool(f"--change {ifname} speed {speed} duplex {duplex} autoneg on")
+> +
+> +    if process.ret != 0:
+> +        raise KsftFailEx(f"Not able to set speed and duplex parameters for {ifname}")
+> +    ksft_pr(f"Speed: {speed} Mbps, Duplex: {duplex} set for Interface: {ifname}")
+> +
+> +def verify_speed_and_duplex(ifname: str, expected_speed: str, expected_duplex: str) -> None:
+> +    verify_link_up(ifname)
+> +    """Verifying the speed and duplex state for the interface"""
+> +    with open(f"/sys/class/net/{ifname}/speed", "r") as fp:
+> +        actual_speed = fp.read().strip()
+> +    with open(f"/sys/class/net/{ifname}/duplex", "r") as fp:
+> +        actual_duplex = fp.read().strip()
+> +
+> +    ksft_eq(actual_speed, expected_speed)
+> +    ksft_eq(actual_duplex, expected_duplex)
+> +
+>  def test_link_modes(cfg) -> None:
+>      global common_link_modes
+>      link_modes = get_ethtool_content(cfg.ifname, "Supported link modes:")
+> @@ -136,6 +163,25 @@ def test_autonegotiation(cfg) -> None:
+>      else:
+>          raise KsftSkipEx(f"Auto-Negotiation is not supported for interface {cfg.ifname}")
+>  
+> +def test_network_speed(cfg) -> None:
+> +    check_autonegotiation(cfg.ifname)
+> +    if not common_link_modes:
+> +        KsftSkipEx("No common link modes exist")
+> +    speeds, duplex_modes = get_speed_duplex(common_link_modes)
+> +
+> +    if speeds and duplex_modes and len(speeds) == len(duplex_modes):
+> +        for idx in range(len(speeds)):
+> +            speed = speeds[idx]
+> +            duplex = duplex_modes[idx]
+> +            set_speed_and_duplex(cfg.ifname, speed, duplex)
+> +            time.sleep(sleep_time)
+> +            verify_speed_and_duplex(cfg.ifname, speed, duplex)
+> +    else:
+> +        if not speeds or not duplex_modes:
+> +            KsftSkipEx(f"No supported speeds or duplex modes found for interface {cfg.ifname}")
+> +        else:
+> +            KsftSkipEx("Mismatch in the number of speeds and duplex modes")
+> +
 
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Do these tests reset configuration to their original state?
 
-
+More high level: basic test is not very descriptive. Can they have a
+more precise name? Perhaps link layer operations or link layer config?
 
