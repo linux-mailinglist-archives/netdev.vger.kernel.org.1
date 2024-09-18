@@ -1,84 +1,148 @@
-Return-Path: <netdev+bounces-128794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F3197BC01
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:11:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F5A797BC22
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:21:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B32491F22DE1
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:11:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 711E9B221FF
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3E4186E3E;
-	Wed, 18 Sep 2024 12:11:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 509DF189F5D;
+	Wed, 18 Sep 2024 12:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ddJsP2Z+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EkEtjXCN"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1574C178381;
-	Wed, 18 Sep 2024 12:11:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD16189B8A
+	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 12:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726661510; cv=none; b=hrxPtL9mSnZMt53ziz5v/dhzjRCniqcSsQieTlTiLvR5zhGR3gwTor56WpXqtpB3E7HECQAQ6pW7Nb2MnzX0I6Z3std6OYDj4tIlXM8StbJIr8+wfxK6iFCXCFOm7yewQ1slpzKAgGf+ptMxOzWYFWVci5dXpkWOaa0c+i1raQg=
+	t=1726662057; cv=none; b=jltkdYSpvO6thd2Rx9kxzCAF/abdQXDQ7S+a/qdFo982cxZLgfRIStAVcecq0dlE8ULC29xWpsL1Vvf18zXzNcdxYTrSj/RHSwo/DDzU+N9miQFjXyIrDR8DxjfQsrGC1ECjCqh9VrRFlFbRUKRnnTHyJ2BhoihYQsc1afJoZFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726661510; c=relaxed/simple;
-	bh=/QsTjJoYenShG9PJNSPFQ4FfJIi56Ky0k8jSlUse4mY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oWMLFehqh+J1AX7il2NuTX0Ip9oUQIafE1lk58nLTyWZqDG+wQIG2xpD5wQFHOZ51097v2WwEolG6dPJn1YcJZry3ak8IMA5RUdFLH8P9T2X/1rFnYVTBuLOoX/5OMbBjgYnUi/m0sFUUdKPqwVWbLFy3M6c19yRvrC9ESPcXN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ddJsP2Z+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=UpUYg/WfCwK7y06BoIrQ4fudX6e5dL/vUjmnreainso=; b=ddJsP2Z+i5igVirSeQgYSDwzjH
-	3IidX4Qcm4qxQlAvFaHUEjYjWNRHHjy+7MhM3KPdzHzRKsvt4vjzzk6j7o+inCymgxOIyDhv8bQKS
-	SlK8KWl6KdX/zsAe4r1Ynj/jt6CjXRHC36PsUD0c8ru7GqWpaPmV94owZCo/wdg0liVU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sqtX5-007iFr-11; Wed, 18 Sep 2024 14:11:43 +0200
-Date: Wed, 18 Sep 2024 14:11:43 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Mohan.Prasad@microchip.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	horms@kernel.org, brett.creeley@amd.com, rosenp@gmail.com,
-	UNGLinuxDriver@microchip.com, willemb@google.com
-Subject: Re: [PATCH net-next v2 1/3] selftests: nic_basic_tests: Add selftest
- file for basic tests of NIC
-Message-ID: <7dd8fada-0079-4429-89c0-4949302dbac4@lunn.ch>
-References: <20240917023525.2571082-1-mohan.prasad@microchip.com>
- <20240917023525.2571082-2-mohan.prasad@microchip.com>
- <0dd4130e-b06e-42e1-8f36-2589c18c4762@lunn.ch>
- <DM6PR11MB4236FE8CEF8EC610B2525EF283622@DM6PR11MB4236.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1726662057; c=relaxed/simple;
+	bh=lJ78Iy+0jAEhk978rmTHFMofgR3SD6splpg+FTdIEG4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Il1XlTxXk71PX/K7lEp4rnxhCKcBr5v61SjxUIWJc/TzYJUb2zUo6w41gVy3/MOOaMhwHvl1I6f4tIakU7Jmg7rEKye37jhILyzDmHzAkI4OuAVtfKcnW/vI1Xs86wge/+A3JONdWeixHXMYZ35eVVJrHn7tDEbBUD+pZ8qayXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EkEtjXCN; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726662056; x=1758198056;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lJ78Iy+0jAEhk978rmTHFMofgR3SD6splpg+FTdIEG4=;
+  b=EkEtjXCNsj0vq8KNayBluNp0SAHvYRKNnzhd/9x1ohuxSWR4v//BQXRU
+   zV4hL0ibGvw6b73WhD7t/J7MW7EgBrEEK7v51A8CtUOtjDJNMFHMQrFMl
+   xjjgd8NZcwLiUBPHEmAusTbURKvk0JPoWJuuyuNaynqG1TwiDsHhUcbly
+   w/tgDaUYkvZNY53aKy5H4T4ABINpmi2AJhrQyciXdNx3ZFZyUBVTlry+d
+   QDhV6NYu0dLs85cQ8vZ5CmzKPaln4devErOJoB23QWZZHyH62C2wmRthC
+   AoRCwmjCALjYCdWbq/SM/f4rm8mgfYNqEWWXFxiDczE0eg/ew8HaJ+Y6X
+   A==;
+X-CSE-ConnectionGUID: n7dzuWtGT7uiMFO2W5Gutw==
+X-CSE-MsgGUID: WrwECftnSU69AyvvA8cnNA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11198"; a="25689203"
+X-IronPort-AV: E=Sophos;i="6.10,238,1719903600"; 
+   d="scan'208";a="25689203"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 05:20:55 -0700
+X-CSE-ConnectionGUID: nTQcHm95TCuZ54+uIiDAWg==
+X-CSE-MsgGUID: Pgt1I0SUQCC7gOpBtdrNvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,238,1719903600"; 
+   d="scan'208";a="69636425"
+Received: from kkolacin-desk1.igk.intel.com ([10.217.160.108])
+  by fmviesa008.fm.intel.com with ESMTP; 18 Sep 2024 05:20:52 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v11 iwl-next 0/7] ice: Implement PTP support for E830 devices
+Date: Wed, 18 Sep 2024 14:12:28 +0200
+Message-ID: <20240918122048.1554692-9-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB4236FE8CEF8EC610B2525EF283622@DM6PR11MB4236.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-> > So i don't think this is a valid test. To really test autoneg off, you need to
-> > configure both ends of the link.
-> 
-> I will change the implementation to configure both the ends of the link appropriately in the next version.
+Add specific functions and definitions for E830 devices to enable
+PTP support.
 
-That would be good, but it does make the test and the test setup a lot
-more complex. I would suggest keeping such two target tests
-separate. Also, look to see if there are other such tests using two
-targets, and keep the basic configuration the same, IP address
-configuration, how to SSH between them etc. I'm not too familiar with
-the test framework. Maybe this is all a solved problem and there are
-helpers to use?
+Refactor processing of timestamping interrupt, cross timestamping, and
+remove usage of ice_is_e8xx() functions to avoid code redundancy.
 
-	Andrew
+Refactor GNSS presence check to be able to remove ice_is_e8xx()
+functions.
+
+Jacob Keller (1):
+  ice: Add unified ice_capture_crosststamp
+
+Karol Kolacinski (5):
+  ice: Don't check device type when checking GNSS presence
+  ice: Remove unncecessary ice_is_e8xx() functions
+  ice: Use FIELD_PREP for timestamp values
+  ice: Process TSYN IRQ in a separate function
+  ice: Refactor ice_ptp_init_tx_*
+
+Michal Michalik (1):
+  ice: Implement PTP support for E830 devices
+
+ drivers/net/ethernet/intel/Kconfig            |   2 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   5 -
+ drivers/net/ethernet/intel/ice/ice_common.c   | 210 ++++----
+ drivers/net/ethernet/intel/ice/ice_common.h   |   7 +-
+ drivers/net/ethernet/intel/ice/ice_ddp.c      |   4 +-
+ drivers/net/ethernet/intel/ice/ice_gnss.c     |  29 +-
+ drivers/net/ethernet/intel/ice/ice_gnss.h     |   4 +-
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |  12 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  27 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 509 ++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |   9 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 407 ++++++++------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  41 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   9 -
+ 15 files changed, 734 insertions(+), 543 deletions(-)
+
+V10 -> V11: Fixed adjustments not working on E830 in "ice: Implement PTP support
+            for E830 devices"
+V9 -> V10: Fixed E825C MAC condition in caps and and enabled
+           ICE_FLAG_PTP_SUPPORTED for E830
+V8 -> V9: Fixed compilation issue introduced after rebase in "ice: Remove
+          unncecessary ice_is_e8xx()"
+V7 -> V8: - reordered patches to have all E830 changes in "ice: Implement PTP
+            support for E830 devices"
+          - added "ice: Don't check device type when checking GNSS presence",
+            which removes GNSS related changes from "ice: Remove unncecessary
+            ice_is_e8xx() functions"
+          - reworded commit messages
+V6 -> V7: Fixed timestamp acquisition in "ice: Implement PTP support for
+          E830 devices"
+V5 -> V6: Fixed minor compilation issue in "ice: Use FIELD_PREP for timestamp
+          values"
+V4 -> V5: Added 2 patches: "ice: Remove unncecessary ice_is_e8xx()
+          functions" and "ice: Use FIELD_PREP for timestamp values".
+          Edited return values "ice: Implement PTP support for E830
+          devices".
+V3 -> V4: Further kdoc fixes in "ice: Implement PTP support for
+          E830 devices"
+V2 -> V3: Rebased and fixed kdoc in "ice: Implement PTP support for
+          E830 devices"
+V1 -> V2: Fixed compilation issue in "ice: Implement PTP support for
+          E830 devices"
+
+base-commit: abc6944428c5cf8d3ad3fb6de03939ec12289e14
+-- 
+2.46.0
+
 
