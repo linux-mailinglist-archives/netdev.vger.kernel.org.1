@@ -1,150 +1,153 @@
-Return-Path: <netdev+bounces-128832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3A8197BDE1
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 16:19:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1801897BDEB
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 16:24:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FF531C20EC9
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:19:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B64C91F21351
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96551097B;
-	Wed, 18 Sep 2024 14:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D21118C350;
+	Wed, 18 Sep 2024 14:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="PWN3ix7O"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="G1tnGi/R";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="IB//NBFE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC72B641;
-	Wed, 18 Sep 2024 14:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95D218C035;
+	Wed, 18 Sep 2024 14:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726669144; cv=none; b=e/thD/vad9g4EpCAz/hLJIoLFPcB8IQAy4OO1UKbKo0qHrJAaNxd5tje5kQijNNJ9TvKzKr9n6T1WQT7PKJQ6j3Rp7D6ztrqY8S47jqE/sKFVJGsGihAgfDLjEojagv9wcaJVwBPmlitcfs+MwD6ROf7pR+DOQqn87f//L0nLJU=
+	t=1726669460; cv=none; b=iOahaNa02PYTso0sVFoVdAZciiiTSU3EBFUKnhS3Ftd/ctnOANL1xXxbHSV6at7uNdq09jZ524nXZsBZOvQrW/xIIV39xtzLajvyxkJAjjgNHEiCNGOpgE3mK4PWLlNPwmUJ0D1XzkW211pqLgR5eNYX7zXt8pDMP7QfDEvdF0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726669144; c=relaxed/simple;
-	bh=kuIhVaH/sURzbeGtq9u4Yf7ANcaLs1U8dtZXXJxlLBQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ARSQtCXl6avL3YXfdq5mgtOTJl0IesUr4vFdzSWDKtScVyyqSWVCyMeR6sT/fTu4lxHbjXkvmtObBHhbc62JP2XFY+gcqNSGsrxe74RMmhotR6LYnvKAe3kH+I3ArHek/R2Z5ZSg3hSg9WUlT1L12f1o6zfVPg5ZZ0OAmVkVXkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=PWN3ix7O; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: ef94acd675c811efb66947d174671e26-20240918
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:CC:To:Subject:MIME-Version:Date:Message-ID; bh=XjEmjEbDr/iItb5rfSlsNht1UeFeXXltkTGmpbSrD10=;
-	b=PWN3ix7ONh+a4y/lAHDm8uxzSpLOvc219I9YQm1apLkUem5WUHwLxBhqYpE0FoJ/4dCroS3KfyvqxLhR8uNYorbOLG/88bs7sgHFsEBrTuv97D/bXHa40aTLPfHvdZQCEr5uBtd+iEPQ3aZ8agtidVv0uvlxXbCA53GbvdyV0Z4=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.41,REQID:9493faad-fd0d-4bd8-80c4-877a3bb65f8b,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:6dc6a47,CLOUDID:7a3225c0-d7af-4351-93aa-42531abf0c7b,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0|-5,EDM:-3,IP:ni
-	l,URL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: ef94acd675c811efb66947d174671e26-20240918
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
-	(envelope-from <macpaul.lin@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 906312236; Wed, 18 Sep 2024 22:18:54 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 18 Sep 2024 22:18:51 +0800
-Received: from [172.21.84.99] (172.21.84.99) by mtkmbs13n1.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.2.1118.26 via Frontend
- Transport; Wed, 18 Sep 2024 22:18:51 +0800
-Message-ID: <2af0621d-14ac-b7f3-b28d-2df698931121@mediatek.com>
-Date: Wed, 18 Sep 2024 22:18:49 +0800
+	s=arc-20240116; t=1726669460; c=relaxed/simple;
+	bh=WZdd6qkbAcrCiFk9WqvM25UJJzbrmYQT1Q/03zMr3oE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WkE4P2VBVMy9WmDkOD+IYdqZqdsqQyLRDgNr7n8Df/twhwnsQRuzmlmxsjtBlx77QjA0KIDJCGC3juYWCEs57YCr8+6/bdWphFph2ZNVMCjl3Wy3/FpB9oRFpcnMIbOHxYyO135Tlph+em8LAcJ6+qgq9oVDAoeYkb8YvNT+7+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=G1tnGi/R; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=IB//NBFE reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1726669456; x=1758205456;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=YPP7c19jIEYTnTACbt4kKLTlfycxs9Nav34JXprnn1I=;
+  b=G1tnGi/RAR0j3L2lPaA0MEOb0k4pcbWHuM11RslFPJ5Gv2eB0oeUQh+X
+   hb56qYj269Llx3TYK/KURztsTZa8+Nlgjv/Y2nOILfvYhlFnjODYzs/bt
+   Iu7T9+2NGKux0YZ+Kra30X9YPIDa160Saf0eSFsKi5w5embP8zWDolT9e
+   wlbjW0EpCqPIRImk7KP1nEl4LNQzvPFTal1VED3dmtAd9YD+9gOY/X0Zm
+   pbabCTa+cd+7d7TQFM48P0R4jUCk+S74teD6TXu+i1Q/jUkP6uv2ZZFU2
+   Xw1ebJGTeX+LrywW0GqQBcmjXVmN4oGlk2jukB26VDfyB74vbCAYIG+wC
+   g==;
+X-CSE-ConnectionGUID: l8qH4+vXTFuL7l2KpHOd7w==
+X-CSE-MsgGUID: 7gpAiLU5QpW+u2+zsI/XrQ==
+X-IronPort-AV: E=Sophos;i="6.10,239,1719871200"; 
+   d="scan'208";a="39006264"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 18 Sep 2024 16:23:04 +0200
+X-CheckPoint: {66EAE248-F-5FF8EC80-F6CEE9F8}
+X-MAIL-CPID: F253FEB8238044BC080F49D137CE35E5_0
+X-Control-Analysis: str=0001.0A782F17.66EAE248.00F4,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BCAA316A3F3;
+	Wed, 18 Sep 2024 16:22:55 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1726669379;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=YPP7c19jIEYTnTACbt4kKLTlfycxs9Nav34JXprnn1I=;
+	b=IB//NBFEDxvBbaEaebiPwvgvQLUI4yiV6Rfh27er2H1VPMffgz3Fz/Vf2r5ENcDKWBo9Po
+	89RqU4ccvly0YKv3Zasc1EaFVeCT3Rs8P0UcP1IVtCerqU7gR1CCuaml11gUJtXKe5/mR4
+	TBRFvH8mZMS2510iXEV+wdNYB2IWlODyaKb5CpPCrDm7U1VfrBHTLwNz9TayQukQePPCJb
+	ysr1E1RiY16N5VSSwH5Km+rLCqFEd21EiFmVnKN1twVSTOBgfZ000DcSqrkcsBJsxy3ZkH
+	HrChCDJcjKBCTtHAqGurZa3z/z17cWNa+j0WC6Cnsmfj3bd2aECc7frJWgT19w==
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>,
+	Markus Schneider-Pargmann <msp@baylibre.com>,
+	"Felipe Balbi (Intel)" <balbi@kernel.org>,
+	Raymond Tan <raymond.tan@intel.com>,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@ew.tq-group.com,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Subject: [PATCH 1/2] can: m_can: set init flag earlier in probe
+Date: Wed, 18 Sep 2024 16:21:53 +0200
+Message-ID: <ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726669005.git.matthias.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v6 2/2] dt-bindings: mfd: mediatek: mt6397: Convert to DT
- schema format
-Content-Language: en-US
-To: Alexandre Belloni <alexandre.belloni@bootlin.com>
-CC: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Liam
- Girdwood" <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Sean Wang
-	<sean.wang@mediatek.com>, Sen Chu <sen.chu@mediatek.com>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, Dmitry Torokhov
-	<dmitry.torokhov@gmail.com>, Pavel Machek <pavel@ucw.cz>, Lee Jones
-	<lee@kernel.org>, Sebastian Reichel <sre@kernel.org>, Chen Zhong
-	<chen.zhong@mediatek.com>, <linux-input@vger.kernel.org>,
-	<linux-leds@vger.kernel.org>, <linux-pm@vger.kernel.org>,
-	<linux-rtc@vger.kernel.org>, <linux-sound@vger.kernel.org>, Alexandre Mergnat
-	<amergnat@baylibre.com>, Bear Wang <bear.wang@mediatek.com>, Pablo Sun
-	<pablo.sun@mediatek.com>, Macpaul Lin <macpaul@gmail.com>, Chris-qj chen
-	<chris-qj.chen@mediatek.com>, MediaTek Chromebook Upstream
-	<Project_Global_Chrome_Upstream_Group@mediatek.com>, Chen-Yu Tsai
-	<wenst@chromium.org>
-References: <20240918064955.6518-1-macpaul.lin@mediatek.com>
- <20240918064955.6518-2-macpaul.lin@mediatek.com>
- <20240918115151c896f33f@mail.local> <20240918115651c1475d36@mail.local>
-From: Macpaul Lin <macpaul.lin@mediatek.com>
-In-Reply-To: <20240918115651c1475d36@mail.local>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--8.691800-8.000000
-X-TMASE-MatchedRID: oTBA/+sdKaYOwH4pD14DsPHkpkyUphL9MVx/3ZYby79qv/+QKNcPLjC0
-	pJIQUiJOGseg1yShYPHih/b1HlnM9Q5G/b6aSGR8XP5rFAucBUG4vBuE2X0HlWCD5SM8YvVFrEc
-	1eeVEldxaYyc8H6RJsjyKeJLvd5yKS33cD/vC1hvMZk86HxFjjpxfK35V7okVhfNq6/87jDJYjc
-	VS5TZhCWHcSGagcNcdZy7lMbj3gjVQswgj0HOv3OYAh37ZsBDCfS0Ip2eEHny+qryzYw2E8Jkw8
-	KdMzN86KrauXd3MZDWUeK0fD/v8dvjqHGyLezS3oy0lljZZZ2v5QaKF1q8tByZGO6z8Y6YfwL6S
-	xPpr1/I=
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--8.691800-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP: 50E6DB0D564377DBBA495A7680F8C29ABE43384A3C6FFA277C2A8BBD86BA24502000:8
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
+While an m_can controller usually already has the init flag from a
+hardware reset, no such reset happens on the integrated m_can_pci of the
+Intel Elkhart Lake. If the CAN controller is found in an active state,
+m_can_dev_setup() would fail because m_can_niso_supported() calls
+m_can_cccr_update_bits(), which refuses to modify any other configuration
+bits when CCCR_INIT is not set.
 
-On 9/18/24 19:56, Alexandre Belloni wrote:
-> 
-> On 18/09/2024 13:51:51+0200, Alexandre Belloni wrote:
->> > Changes for v4:
->> >  - Remove "mediatek,mt6357" from PMIC's compatible string since there is a
->> >    seperated DT schema for PMIC mt6357.
->> > 
->> > Changes for v5:
->> >  - Rebase to next-20240913 (linux-next/master).
->> >  - Fix the "title" (device type) of mfd/mediatek,mt6397.yaml to "PMIC".
->> >  - RTC:
->> >   - Drop "start-year"
->> 
->> Maybe, instead of dropping the property, you should add support in the
->> driver by setting range_min and range_max.
-> 
-> Looking at this even more, the driver can probably be simplified by
-> setting start_year in probe and dropping RTC_MIN_YEAR_OFFSET.
+To avoid this issue, set CCCR_INIT before attempting to modify any other
+configuration flags.
 
-Thank you for pointing out where and how the driver should be changed.
-However, I'm wondering if this should be a fix with a separated
-patchset (bindings and the driver)? The board or SoC's device trees
-should be reviewed as well. I'll need to get someone's help (permission) 
-inside MediaTek to check those dts and construct the patch for RTC driver.
-That will take sometime.
+Fixes: cd5a46ce6fa6 ("can: m_can: don't enable transceiver when probing")
+Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+---
+ drivers/net/can/m_can/m_can.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
-[snip]
+diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+index 012c3d22b01dd..47481afb9add3 100644
+--- a/drivers/net/can/m_can/m_can.c
++++ b/drivers/net/can/m_can/m_can.c
+@@ -1681,6 +1681,14 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
+ 		return -EINVAL;
+ 	}
+ 
++	/* Forcing standby mode should be redundant, as the chip should be in
++	 * standby after a reset. Write the INIT bit anyways, should the chip
++	 * be configured by previous stage.
++	 */
++	err = m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
++	if (err)
++		return err;
++
+ 	if (!cdev->is_peripheral)
+ 		netif_napi_add(dev, &cdev->napi, m_can_poll);
+ 
+@@ -1732,11 +1740,7 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
+ 		return -EINVAL;
+ 	}
+ 
+-	/* Forcing standby mode should be redundant, as the chip should be in
+-	 * standby after a reset. Write the INIT bit anyways, should the chip
+-	 * be configured by previous stage.
+-	 */
+-	return m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
++	return 0;
+ }
+ 
+ static void m_can_stop(struct net_device *dev)
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
 
-Thanks.
-Best Regards,
-Macpaul Lin
 
