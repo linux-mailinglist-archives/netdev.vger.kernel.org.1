@@ -1,260 +1,246 @@
-Return-Path: <netdev+bounces-128777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D133D97BA92
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:08:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CD4E97BA95
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:10:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21499B273ED
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 10:08:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EC761C224FA
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 10:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E70817994F;
-	Wed, 18 Sep 2024 10:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA8E176ADA;
+	Wed, 18 Sep 2024 10:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ekBf09+t"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ghp2YblM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40752175D54
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 10:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90BD5EACD;
+	Wed, 18 Sep 2024 10:10:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726654071; cv=none; b=TXjkNKTXGREoNmM1dBEq6aTcJZERagm9c9Qqtp3SAF0J1CQA+XBXuRamYcfRHYn2zZ3ZJXnPto0WqNWkU7w3uIA1U9z7/mLYQbhx264ibxpqhezavHJtejCNMB4yR7QawPzodKvwC3Uxg2h5HDt2ncsIbPJzlqAC5uOtGvErqQU=
+	t=1726654215; cv=none; b=S5g3CH5uGWLhcHxaSiUKgBsjrq9bailW+YN55ccAtLbrC3Ktm1jt2OAaeFjU2WLyJ2Oo0eMu1kwyF8252ij0MruKUWhUvW/fq4BR4g2NFmIG93zXy0CAM9gRPXIKEwozKGITCJB6HlawIutAWD+hqOIg7njQG9q9Ln0q9MKkshk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726654071; c=relaxed/simple;
-	bh=BcFQzMacYPncnCQjV8GlFDHy5qbYhhTmB5Qzsnnwln4=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=MNY9mKo5Hx4CDxLluMuw0hneHmpC3Got+jcZr3G2frUH3LOpRrdVk7F1eIT4IDDa1GWVUuKLGfXMotK3j0v28tHZCTyZ6OQapUsntaDy2AVIK5/yJMRhY0on6gujHqG6gSqZ+jz+2af2kuYocwylNW6xns2pqHqUX/5n84F/Qrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ekBf09+t; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-42cae4eb026so64719535e9.0
-        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 03:07:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726654067; x=1727258867; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9gszga9xFCv9CjVSfKw0ve8HTp+6D09ex0SaaFgmd1Q=;
-        b=ekBf09+tDmnoVk+x8R8NCo3RTkI3VEmE7pZEbLVp9FTvQ+h8W5NSlLzQzBk0euRnU7
-         pOb0NzO9/iEwiWkMPUANkn1DBwc+GOdpk1VyshE/QSAckH6iN70daYXy2JImg91Uyhqy
-         w7ITwDPioHaz6teQqxAarptgRtlI9uUm4TwArhUchZlnaQ40ViY5rue0w+XLofUKVsyL
-         SS70L64QQTc7oA928W4GtredFzb7tYArMPPEfRpukam6R6Z7RSXfmMv41XA3yQuSwvgp
-         vdWl8yerODOTCK9ErahP86y8Xe4rgs9EwUYIiOXK5ubA0Pd/G8ck6cDZlDK9kqxB6gbv
-         itaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726654067; x=1727258867;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9gszga9xFCv9CjVSfKw0ve8HTp+6D09ex0SaaFgmd1Q=;
-        b=uEUqRZIiREdlOqszIJAZA+iAgwjZNZRWI3H8+b1C15/qwIk5JxYxgzTf5rkv9pNSJg
-         /CvjUd54nam9WNRg64sUayi10euQebiSJ7itoUtBc3xendGLYta6qYXVvcrv2Vo7Ierh
-         wjedwQ4QE0Q51yCfVmGIQd3Ed3F9EkH2ATmZq1qgWbs+WC4mKvmAIWmn3mijSAgBjGFI
-         l9F8Od5uYhW8MexTAmKl7HeL+YrNJI8eXbnxuuTb0zKOHQTkIg23xyvWr703Mc/yxIR/
-         ifdMRsiVMVEKYxOKynIoqWvDkLHOJm3n9GJ1d4F9lKoLMq8v46ak3U7M2mgmbO3Wozli
-         WWDg==
-X-Gm-Message-State: AOJu0YwFy7oSbrs7/M8kQ6EtyXnnhgAmdsd6M8z1wQjctygaAH3OQLz1
-	BhzF73XvQSVjPalLMR7FMgojSQlUSjPfjjOwWdU9i5T0qjbnPqk6
-X-Google-Smtp-Source: AGHT+IGLjQSsowOz/0lao5kIwdKFRBPGmj4tNdMdW633Utw5l1siVH+MMoYZLwCYIhmU4ezYTV+ysQ==
-X-Received: by 2002:a05:600c:450a:b0:42c:b4a2:a1aa with SMTP id 5b1f17b1804b1-42cdb54784cmr179653505e9.17.1726654067003;
-        Wed, 18 Sep 2024 03:07:47 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:f935:1e63:6c8b:667c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e70536bd2sm12639055e9.48.2024.09.18.03.07.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Sep 2024 03:07:46 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org,  kuba@kernel.org,  pabeni@redhat.com,
-  ryazanov.s.a@gmail.com,  edumazet@google.com,  andrew@lunn.ch,
-  sd@queasysnail.net
-Subject: Re: [PATCH net-next v7 04/25] ovpn: add basic netlink support
-In-Reply-To: <99028055-f440-45e8-8fb1-ec4e19e0cafa@openvpn.net> (Antonio
-	Quartulli's message of "Tue, 17 Sep 2024 23:28:41 +0200")
-Date: Wed, 18 Sep 2024 11:07:09 +0100
-Message-ID: <m2o74lb7hu.fsf@gmail.com>
-References: <20240917010734.1905-1-antonio@openvpn.net>
-	<20240917010734.1905-5-antonio@openvpn.net> <m2wmjabehc.fsf@gmail.com>
-	<99028055-f440-45e8-8fb1-ec4e19e0cafa@openvpn.net>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1726654215; c=relaxed/simple;
+	bh=j3uHUw8hZJe9e65FGbFo4XsUUmBgZynKAOmtydmKK64=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=AIawzdMLy8+MtLs5kHw2DRVvpAOAiHNQOXSUdQdLDbT8OG9gCv59/XjgcY3SBjob28putybzLaPa7Wvg/KaV7Y4FU8RALgYJw+Ajpj/JeFFVXuPAo6OIJ693ixrQ2SB7nfdttTf/8AWUqYqGApzpV9HY3f5opMMoi6NyGRwDIgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ghp2YblM; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1726654208; h=From:To:Subject:Date:Message-Id;
+	bh=OIaeQekPFzr0Twj4nwSV1xS3+7dgPbM9J97vdUwshuQ=;
+	b=ghp2YblMswD01z0zeMK+J/AOdYkF7dgd/rHePImRxGMLWb2Rv3J96qajSye53hLjIUdrrTPRphHD2anpo83vDHDuPKpeF3BpEOW520xs+XQpie1FxsWOnwSGRSE5gSz2yjh1zgqnG7AvPJmX5GfIRVsNCyU0Zw7Jy5kZPzX3hww=
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WFDs-zd_1726654204)
+          by smtp.aliyun-inc.com;
+          Wed, 18 Sep 2024 18:10:08 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: kgraul@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	jaka@linux.ibm.com,
+	wintera@linux.ibm.com,
+	guwen@linux.alibaba.com
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	tonylu@linux.alibaba.com,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	bpf@vger.kernel.org
+Subject: [RFC PATCH net-next] net/smc: Introduce a hook to modify syn_smc at runtime
+Date: Wed, 18 Sep 2024 18:10:04 +0800
+Message-Id: <1726654204-61655-1-git-send-email-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
 
-Antonio Quartulli <antonio@openvpn.net> writes:
->>> +      -
->>> +        name: local-ip
->>> +        type: binary
->>> +        doc: The local IP to be used to send packets to the peer (UDP only)
->>> +        checks:
->>> +          max-len: 16
->> It might be better to have separate attrs fopr local-ipv4 and
->> local-ipv6, to be consistent with vpn-ipv4 / vpn-ipv6
->
-> while it is possible for a peer to be dual stack and have both an IPv4 and IPv6 address assigned
-> to the VPN tunnel, the local transport endpoint can only be one (either v4 or v6).
-> This is why we have only one local_ip.
-> Does it make sense?
+From: "D. Wythe" <alibuda@linux.alibaba.com>
 
-I was thinking that the two attributes would be mutually exclusive. You
-could accept local-ipv4 OR local-ipv6. If both are provided then you can
-report an extack error.
+The introduction of IPPROTO_SMC enables eBPF programs to determine
+whether to use SMC based on the context of socket creation, such as
+network namespaces, PID and comm name, etc.
 
->>
->>> +      -
->>> +        name: keyconf
->>> +        type: nest
->>> +        doc: Peer specific cipher configuration
->>> +        nested-attributes: keyconf
->> Perhaps keyconf should just be used as a top-level attribute-set. The
->> only attr you'd need to duplicate would be peer-id? There are separate
->> ops for setting peers and for key configuration, right?
->
-> This is indeed a good point.
-> Yes, SET_PEER and SET_KEY are separate ops.
->
-> I could go with SET_PEER only, and let the user specify a keyconf within a peer (like now).
->
-> Or I could keep to SET_KEY, but then do as you suggest and move KEYCONF to the root level.
->
-> Is there any preferred approach?
+As a subsequent enhancement, this patch introduces a new hook for eBPF
+programs that allows decisions on whether to use SMC or not at runtime,
+including but not limited to local/remote IP address or ports. In
+simpler words, this feature allows modifications to syn_smc through eBPF
+programs before the TCP three-way handshake got established.
 
-I liked the separate ops for key management because the sematics are
-explicit and it is very obvious that there is no op for reading keys. If
-you also keep keyconf attrs separate from the peer attrs then it would be
-obvious that the peer ops would never expose any keyconf attrs.
+Thanks to kfunc for making it easier for us to implement this feature in
+SMC.
 
->>
->>> +    -
->>> +      name: del-peer
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Delete existing remote peer
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->> I think you need to add an op for 'del-peer-notify' to specify the
->> notification, not reuse the 'del-peer' command.
->
-> my idea was to use CMD_DEL_PEER and then send back a very very short PEER object.
-> I took inspiration from nl80211 that sends CMD_NEW_STATION and CMD_DEL_STATION when a wifi host
-> connects or disconnect. In that case the full STATION object is also delivered (maybe I should
-> do the same?)
->
-> Or is there some other technical reason for not reusing CMD_DEL_PEER?
+Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+---
+ include/linux/tcp.h  |  4 ++-
+ net/ipv4/tcp_input.c |  4 +--
+ net/smc/af_smc.c     | 69 ++++++++++++++++++++++++++++++++++++++++++++++------
+ 3 files changed, 66 insertions(+), 11 deletions(-)
 
-nl80211 is maybe not a good example to follow because it predates the
-ynl specs and code generation. The netdev.yaml spec is a good example of
-a modern genetlink spec. It specifies ops for 'dev-add-ntf' and
-'dev-del-ntf' that both reuse the definition from 'dev-get' with the
-'notify: dev-get' attribute:
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index 6a5e08b..d028d76 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -478,7 +478,9 @@ struct tcp_sock {
+ #endif
+ #if IS_ENABLED(CONFIG_SMC)
+ 	bool	syn_smc;	/* SYN includes SMC */
+-	bool	(*smc_hs_congested)(const struct sock *sk);
++	void	(*smc_openreq_init)(struct request_sock *req,
++			     const struct tcp_options_received *rx_opt,
++			     struct sk_buff *skb, const struct sock *sk);
+ #endif
+ 
+ #if defined(CONFIG_TCP_MD5SIG) || defined(CONFIG_TCP_AO)
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index e37488d..e33e2a0 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -7029,8 +7029,8 @@ static void tcp_openreq_init(struct request_sock *req,
+ 	ireq->ir_num = ntohs(tcp_hdr(skb)->dest);
+ 	ireq->ir_mark = inet_request_mark(sk, skb);
+ #if IS_ENABLED(CONFIG_SMC)
+-	ireq->smc_ok = rx_opt->smc_ok && !(tcp_sk(sk)->smc_hs_congested &&
+-			tcp_sk(sk)->smc_hs_congested(sk));
++	if (ireq->smc_ok && tcp_sk(sk)->smc_openreq_init)
++		tcp_sk(sk)->smc_openreq_init(req, rx_opt, skb, sk);
+ #endif
+ }
+ 
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 0316217..003b2ac 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -70,6 +70,15 @@
+ static void smc_tcp_listen_work(struct work_struct *);
+ static void smc_connect_work(struct work_struct *);
+ 
++__bpf_hook_start();
++
++__weak noinline int select_syn_smc(const struct sock *sk, struct sockaddr *peer)
++{
++	return 1;
++}
++
++__bpf_hook_end();
++
+ int smc_nl_dump_hs_limitation(struct sk_buff *skb, struct netlink_callback *cb)
+ {
+ 	struct smc_nl_dmp_ctx *cb_ctx = smc_nl_dmp_ctx(cb);
+@@ -156,19 +165,41 @@ static struct sock *smc_tcp_syn_recv_sock(const struct sock *sk,
+ 	return NULL;
+ }
+ 
+-static bool smc_hs_congested(const struct sock *sk)
++static void smc_openreq_init(struct request_sock *req,
++			     const struct tcp_options_received *rx_opt,
++			     struct sk_buff *skb, const struct sock *sk)
+ {
++	struct inet_request_sock *ireq = inet_rsk(req);
++	struct sockaddr_storage rmt_sockaddr = {0};
+ 	const struct smc_sock *smc;
+ 
+ 	smc = smc_clcsock_user_data(sk);
+ 
+ 	if (!smc)
+-		return true;
++		return;
+ 
+-	if (workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
+-		return true;
++	if (smc->limit_smc_hs && workqueue_congested(WORK_CPU_UNBOUND, smc_hs_wq))
++		goto out_no_smc;
+ 
+-	return false;
++	rmt_sockaddr.ss_family = sk->sk_family;
++
++	if (rmt_sockaddr.ss_family == AF_INET) {
++		struct sockaddr_in *rmt4_sockaddr =  (struct sockaddr_in *)&rmt_sockaddr;
++
++		rmt4_sockaddr->sin_addr.s_addr = ireq->ir_rmt_addr;
++		rmt4_sockaddr->sin_port	= ireq->ir_rmt_port;
++	} else {
++		struct sockaddr_in6 *rmt6_sockaddr =  (struct sockaddr_in6 *)&rmt_sockaddr;
++
++		rmt6_sockaddr->sin6_addr = ireq->ir_v6_rmt_addr;
++		rmt6_sockaddr->sin6_port = ireq->ir_rmt_port;
++	}
++
++	ireq->smc_ok = select_syn_smc(sk, (struct sockaddr *)&rmt_sockaddr);
++	return;
++out_no_smc:
++	ireq->smc_ok = 0;
++	return;
+ }
+ 
+ struct smc_hashinfo smc_v4_hashinfo = {
+@@ -1671,7 +1702,7 @@ int smc_connect(struct socket *sock, struct sockaddr *addr,
+ 	}
+ 
+ 	smc_copy_sock_settings_to_clc(smc);
+-	tcp_sk(smc->clcsock->sk)->syn_smc = 1;
++	tcp_sk(smc->clcsock->sk)->syn_smc = select_syn_smc(sk, addr);
+ 	if (smc->connect_nonblock) {
+ 		rc = -EALREADY;
+ 		goto out;
+@@ -2650,8 +2681,7 @@ int smc_listen(struct socket *sock, int backlog)
+ 
+ 	inet_csk(smc->clcsock->sk)->icsk_af_ops = &smc->af_ops;
+ 
+-	if (smc->limit_smc_hs)
+-		tcp_sk(smc->clcsock->sk)->smc_hs_congested = smc_hs_congested;
++	tcp_sk(smc->clcsock->sk)->smc_openreq_init = smc_openreq_init;
+ 
+ 	rc = kernel_listen(smc->clcsock, backlog);
+ 	if (rc) {
+@@ -3475,6 +3505,20 @@ static void __net_exit smc_net_stat_exit(struct net *net)
+ 	.exit = smc_net_stat_exit,
+ };
+ 
++BTF_SET8_START(bpf_smc_fmodret_ids)
++BTF_ID_FLAGS(func, select_syn_smc)
++BTF_SET8_END(bpf_smc_fmodret_ids)
++
++static const struct btf_kfunc_id_set bpf_smc_fmodret_set = {
++	.owner = THIS_MODULE,
++	.set   = &bpf_smc_fmodret_ids,
++};
++
++static int __init bpf_smc_kfunc_init(void)
++{
++	return register_btf_fmodret_id_set(&bpf_smc_fmodret_set);
++}
++
+ static int __init smc_init(void)
+ {
+ 	int rc;
+@@ -3574,8 +3618,17 @@ static int __init smc_init(void)
+ 		pr_err("%s: smc_inet_init fails with %d\n", __func__, rc);
+ 		goto out_ulp;
+ 	}
++
++	rc = bpf_smc_kfunc_init();
++	if (rc) {
++		pr_err("%s: bpf_smc_kfunc_init fails with %d\n", __func__, rc);
++		goto out_inet;
++	}
++
+ 	static_branch_enable(&tcp_have_smc);
+ 	return 0;
++out_inet:
++	smc_inet_exit();
+ out_ulp:
+ 	tcp_unregister_ulp(&smc_ulp_ops);
+ out_lo:
+-- 
+1.8.3.1
 
-    -
-      name: dev-get
-      doc: Get / dump information about a netdev.
-      attribute-set: dev
-      do:
-        request:
-          attributes:
-            - ifindex
-        reply: &dev-all
-          attributes:
-            - ifindex
-            - xdp-features
-            - xdp-zc-max-segs
-            - xdp-rx-metadata-features
-            - xsk-features
-      dump:
-        reply: *dev-all
-    -
-      name: dev-add-ntf
-      doc: Notification about device appearing.
-      notify: dev-get
-      mcgrp: mgmt
-    -
-      name: dev-del-ntf
-      doc: Notification about device disappearing.
-      notify: dev-get
-      mcgrp: mgmt
-
-The notify ops get distinct ids so they should never be confused with
-normal command responses.
-
->> 
->>> +    -
->>> +      name: set-key
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Add or modify a cipher key for a specific peer
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->>> +    -
->>> +      name: swap-keys
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Swap primary and secondary session keys for a specific peer
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->> Same for swap-keys notifications.
->
-> Yeah, here I can understand. My rationale was: tell userspace that now we truly need a
-> SWAP_KEYS. Do you think this can create problems/confusion?
-
-Right, so this is a notification to user space that it is time to swap
-keys, not that a swap-keys operation has happened? If the payload is
-unique to this notification then you should probably use the 'event' op
-format. For example:
-
-    -
-      name: swap-keys-ntf
-      doc: Notify user space that a swap-keys op is due.
-      attribute-set: ovpn
-      event:
-        attributes:
-          - ifindex
-          - peer
-      mcgrp: peers
-
->> 
->>> +    -
->>> +      name: del-key
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Delete cipher key for a specific peer
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->>> +
->>> +mcast-groups:
->>> +  list:
->>> +    -
->>> +      name: peers
->
-> Thanks a lot for your comments, Donald!
->
-> Regards,
 
