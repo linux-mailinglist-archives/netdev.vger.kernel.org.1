@@ -1,148 +1,111 @@
-Return-Path: <netdev+bounces-128773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3259B97B973
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 10:37:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B40B397B96C
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 10:36:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A695AB22D96
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 08:37:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 184761F23E11
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 08:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74FE2175D48;
-	Wed, 18 Sep 2024 08:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C871741C3;
+	Wed, 18 Sep 2024 08:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NksrWxyJ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lH/May/h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E43EF158219;
-	Wed, 18 Sep 2024 08:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3A9F14D6E6;
+	Wed, 18 Sep 2024 08:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726648600; cv=none; b=dyQdB/k9CT36CU8v06H8VSmf37wN3m9VDymdv+R7tRJzYzFgjRl+rpfvn8qEm7k0sO820l/3BQJKNV0csgmVpPuKlyW8ZcdBzDLnfPbmvw0XzqEEiYBYyc9ikaWQ6Oe9LDsRD3NP5PGdMJyWevTOxkL/311Cu+7Q/Mc1+hWpzX8=
+	t=1726648571; cv=none; b=Hespwo7uJ4i1JrPcXbTz3c1qOgQlHq9CWxJ4aFdKTGmgTrivhoHXtMkDzc0RJ3ZZGaGFOaiEDpITKc98/DO7NC5czjdzx4EbwLDpCeIY1USp5UVmkCIl2PBf3Qv1pQJmCr+Vv1xOG/nHDXXSI41dZ4COf+vRwAauREpVT22JG7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726648600; c=relaxed/simple;
-	bh=+BvdcA7N3oWm/rFWp0F01Ovcl0C0ZJEKyZ8sByaQsCs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QZn7+pWjllCR3IGjpb3tEljnDMehW8xih9bZDUFPZf2nAkhksSc6jrHaw8XR/mmSvifuz63cKfqjEQz9WN/8bkGLU8BDmoGoOq+pbUd52+AfOeZiryIGGakOAR8cMXdnD3vi7SVRsJTxc2CufgroZtLLn0AVfiLAnoPKDuln93k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NksrWxyJ; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2d877dab61fso3733289a91.3;
-        Wed, 18 Sep 2024 01:36:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726648598; x=1727253398; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BZYcU6f7wuA9gDX+7U65UlNJOooHT7Qe+YlnGFdw5Mk=;
-        b=NksrWxyJTvvUcsTw0mOX02zUi0YcniGfyN8XzlMKJpVqDGCUCDkPX2sp0kTuT3Qq2F
-         RH95h+6QoEE1qhY9Xt+31lIQQYSlsFm5hOa8imX9XSuA2Ik8Rm/fARf/8pHlI0AXknvy
-         fbHa9cRo/vQwFp6FylEFDzCw9kO4CO4nnoXFFP5rsMRHLaYpr0T9xvsbB7GtLlwzW+91
-         r5HYFIV5qC0gCEOyNTA+pOHPDhhbgDStdcCdgfP9qsxp+4Ztkd9il/2vkovHngEXeKrw
-         1nRSvELn5Ay4p1MibUrHQIcPzVMish1KttzluU4XUvjTegbcNWz2WgntyBzxJJXqsYYn
-         nU/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726648598; x=1727253398;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BZYcU6f7wuA9gDX+7U65UlNJOooHT7Qe+YlnGFdw5Mk=;
-        b=ZndWVJON5yiP5kgaEduk0/LmxQtq8Vd4jK8FQsvcmpTkLmYWAci+DaAbxwEO3PHuYL
-         MUpjKKSQw1tOTvvfvx4TloQz566RsTD6ztJkj8gKzdplnJvNE18VqAh1tV8x+pQiCNKI
-         PsLFw0J081Hk2wP2RJHtaaGBm2lfeyEAF6Gz1Izk/AhYz1xgh+B+G4Ijufe7rPv5RtGM
-         Bl9Sx+JzTSuSo6BfC2unS2N8jf8b6PHttqem9JCWr2BkEKTKFYEYCrSDb3S+epgzHHvV
-         QvWhvfOyLXT6hz85FvXZmVL/Lvr4J0B/3078q0WdkQj/P3JbSoCSLH1vHpPo/OVUgYg2
-         fdZw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfb8jLIfhk4nGtMYQgIfYvZr6MRObiXWW5gHWd2MTTptqglFSchjX0EuilB7XU8GeMzdwTb4eDRSTPP4TT@vger.kernel.org, AJvYcCXqlIv2QB285LkdAwMcHzh8Q5IDef/jxTBOkP/xVa40UaMWKO7f59uYHUgV+ngSTPkNnEY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRKioEzi0rNMYzrKvLpEJk8kFZQaS3AP9y8FB1PwPQRsOGKZHa
-	Lb0Qto9iHqQl2Q40HZVsAvENT1NIAtdcHGOrl+RxoCLCO5JtYm53
-X-Google-Smtp-Source: AGHT+IFmM475h14LR5+NPyjV6+a35WUwMgJKqqhtMh2Hz3bAYVqTMyW8PK7FP8yWz4ukbjDjuNVGuQ==
-X-Received: by 2002:a17:90b:4a45:b0:2d8:da35:b4d6 with SMTP id 98e67ed59e1d1-2dbb9df6581mr25294388a91.14.1726648597881;
-        Wed, 18 Sep 2024 01:36:37 -0700 (PDT)
-Received: from x64.ju1vahqoe01uzkzduuiatpjzgc.syx.internal.cloudapp.net ([52.231.91.142])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dd60951c8bsm966036a91.56.2024.09.18.01.36.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Sep 2024 01:36:37 -0700 (PDT)
-From: Jiwon Kim <jiwonaid0@gmail.com>
-To: razor@blackwall.org,
-	jv@jvosburgh.net,
-	andy@greyhouse.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	joamaki@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	Jiwon Kim <jiwonaid0@gmail.com>,
-	syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
-Subject: [PATCH net v2] bonding: Add net_ratelimit for bond_xdp_get_xmit_slave in bond_main.c
-Date: Wed, 18 Sep 2024 08:35:45 +0000
-Message-ID: <20240918083545.9591-1-jiwonaid0@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1726648571; c=relaxed/simple;
+	bh=dfSnH0Yclqt/UhS8gXqBY0B33tPXDhXZ/PpPQRDjFjk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eEon27dvodQX579Y8jIfNLqR0Uc1vNFZtgrLHHe4hGFd1I8o3pYfDRFRllhl0gJp3fKq6sFo5ydGsre+6dgIi39AhTQP6qaOL64cdAyDxAbWhZYnc/EddPVASw/iD15GC/hZuswmv4zkIY6P0/OIkiUYjYqg7pC9cmaEqrV1u6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lH/May/h; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48I7tfcD012633;
+	Wed, 18 Sep 2024 08:35:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type
+	:content-transfer-encoding; s=corp-2023-11-20; bh=txkwLOI4wL6wdg
+	kEojth4TMSyAyDul66S+5Qvppat+4=; b=lH/May/hTkNANBJa/jX/smac6dbQue
+	BsUTDvRFfKUJ/asY5N355r1TKEZgMxseABTNvKJ19MZHs1uO2RGXa/r1Txj13SHj
+	32sCYkEXytM3hyQcCl1Mj5dVCt/yQipSOtasQeGgT2qhd5vq9Q13GQBdgp+MOvmS
+	G3e83DBXOOFKRbyCsemZuFRGoA3CtOyPyZz45E6lEPEyaOKLyWPrwTMyDfcW47D/
+	vKlNEBSzqEftCKKdJp9I4mS6TOkf1+OAKEofG+1qav1zBXLe3ftKBiTxzBG1UToC
+	YjPAKjRenO+ffHV8ZP8cNU//zPTg2zbBoBqkMmhPRwCAi5IoZzZgEVLA==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 41n3pdrdhk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Sep 2024 08:35:57 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 48I8W3xF011242;
+	Wed, 18 Sep 2024 08:35:56 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 41nyb7ysy4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 18 Sep 2024 08:35:56 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 48I8Zu45022467;
+	Wed, 18 Sep 2024 08:35:56 GMT
+Received: from lab61.no.oracle.com (lab61.no.oracle.com [10.172.144.82])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 41nyb7ystx-1;
+	Wed, 18 Sep 2024 08:35:56 +0000
+From: =?UTF-8?q?H=C3=A5kon=20Bugge?= <haakon.bugge@oracle.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+        Allison Henderson <allison.henderson@oracle.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com
+Subject: [MAINLINE 0/2] Enable DIM for legacy ULPs and use it in RDS
+Date: Wed, 18 Sep 2024 10:35:50 +0200
+Message-ID: <20240918083552.77531-1-haakon.bugge@oracle.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-18_06,2024-09-16_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=513 bulkscore=0
+ adultscore=0 malwarescore=0 suspectscore=0 phishscore=0 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2408220000 definitions=main-2409180053
+X-Proofpoint-GUID: muVxEvSj4GGiDQq0Str0D8K6DEwSQLes
+X-Proofpoint-ORIG-GUID: muVxEvSj4GGiDQq0Str0D8K6DEwSQLes
 
-Add net_ratelimit to reduce warnings and logs.
-This addresses the WARNING in bond_xdp_get_xmit_slave reported by syzbot.
+The Dynamic Interrupt Moderation mechanism can only be used by ULPs
+using ib_alloc_cq() and family. We extend DIM to also cover legacy
+ULPs using ib_create_cq(). The last commit takes advantage of this end
+uses DIM in RDS.
 
-Setup:
-    # Need xdp_tx_prog with return XDP_TX;
-    ip l add veth0 type veth peer veth1
-    ip l add veth3 type veth peer veth4
-    ip l add bond0 type bond mode 6 # <- BOND_MODE_ALB, unsupported by xdp
-    ip l add bond1 type bond # <- BOND_MODE_ROUNDROBIN by default
-    ip l set veth0 master bond1
-    ip l set bond1 up
-    ip l set dev bond1 xdpdrv object tx_xdp.o section xdp_tx
-    ip l set veth3 master bond0
-    ip l set bond0 up
-    ip l set veth4 up
-    ip l set veth3 xdpgeneric object tx_xdp.o section xdp_tx
+Håkon Bugge (2):
+  RDMA/core: Enable legacy ULPs to use RDMA DIM
+  rds: ib: Add Dynamic Interrupt Moderation to CQs
 
-Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=c187823a52ed505b2257
-Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
-Signed-off-by: Jiwon Kim <jiwonaid0@gmail.com>
----
-v2: Change the patch to fix bond_xdp_get_xmit_slave
----
- drivers/net/bonding/bond_main.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/infiniband/core/cq.c    |  7 +++++--
+ drivers/infiniband/core/cq.h    | 16 ++++++++++++++++
+ drivers/infiniband/core/verbs.c |  6 ++++++
+ net/rds/ib_cm.c                 | 10 ++++++++++
+ 4 files changed, 37 insertions(+), 2 deletions(-)
+ create mode 100644 drivers/infiniband/core/cq.h
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index b560644ee1b1..91b9cbdcf274 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -5610,9 +5610,12 @@ bond_xdp_get_xmit_slave(struct net_device *bond_dev, struct xdp_buff *xdp)
- 		break;
- 
- 	default:
--		/* Should never happen. Mode guarded by bond_xdp_check() */
--		netdev_err(bond_dev, "Unknown bonding mode %d for xdp xmit\n", BOND_MODE(bond));
--		WARN_ON_ONCE(1);
-+		/* This might occur when a bond device increases bpf_master_redirect_enabled_key,
-+		 * and another bond device with XDP_TX and bond slave.
-+		 */
-+		if (net_ratelimit())
-+			netdev_err(bond_dev, "Unknown bonding mode %d for xdp xmit\n",
-+				   BOND_MODE(bond));
- 		return NULL;
- 	}
- 
--- 
-2.43.0
+--
+2.43.5
 
 
