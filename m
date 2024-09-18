@@ -1,117 +1,134 @@
-Return-Path: <netdev+bounces-128760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC38297B886
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 09:29:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE8897B8A7
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 09:45:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43E78B21816
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 07:29:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B54E21C20F37
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 07:45:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859BF165F04;
-	Wed, 18 Sep 2024 07:29:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A4F16BE39;
+	Wed, 18 Sep 2024 07:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OFG6JUTG"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="OinEsvUR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D850273DC;
-	Wed, 18 Sep 2024 07:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CB4224F0
+	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 07:45:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726644553; cv=none; b=Op9cflTGvgKj3M5nf3LvnLl1MY+tzMPEM3G1KFuj9SZOSyQzk/P4nTt+1LAv+SnmXrC51S8+xgGLPskGBB6TkqnuLz/hOoexrQa+N7hxrIGcU6rxETru0wrXaery4q9UgVuqpgtC6Bo0e4eTcTFwUtv/ztuAZut99Ldpw4XAtLI=
+	t=1726645540; cv=none; b=SyJupbbGxonhn5i9zOwPgnpBkn4HrB4XYru1h0HpLvKtlXt2M0NxrfMNVUrGcQDBSB9RW2PBqNpUXWgzLqImSUd7fcG+lngTV2/tEivxoIrcsdNZIHU4vqurL9aXG6lUTk5pU9rC6Samv7BgsJeT/E+4HX/Dpc8aPqqRDS7rX9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726644553; c=relaxed/simple;
-	bh=Qzi8RKheJD4aU+pdRmw0bFCBZCU+kkF86nWPHdYqM2s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CyM8bYW0YyCEmF/30+cQJ8Ad7dJwSAYA+M12Ry9IuQL7X+iPzZMKTFNpuJer8wmi3VaQTuUUTW3uSueJBlxzVbQWYWbXg6wKg9QUCOPvayNYsokEpYp8T5fJxbttTwJx+/KP8+Ol603vkbqENj4dV/kLpnpar5RWSTxKkMCQgvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OFG6JUTG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28D26C4CECD;
-	Wed, 18 Sep 2024 07:29:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726644552;
-	bh=Qzi8RKheJD4aU+pdRmw0bFCBZCU+kkF86nWPHdYqM2s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OFG6JUTGTqJsIde723lJVYUq1IBodLCwPwckCGqvRK2yvYBRpSnO8Oaa9H2l+8k4L
-	 K5bQS2V0VT+C7/XbsGSWe+LjPBjmXenY4kbxdan2h+LkbJBfXTg1AriTkFaIfTgOqQ
-	 nqv4YGQeMjD8F7cf8117O7Lv6d8Su07pvE2gFho6PExz3b6GvQrkVBd9OZp6mDwodI
-	 IYPHpO1XYAMgcRrOn8T2LDCTFXATodvCzOOar3WZ4gj+BeJmlVjRanD3WSsOyraVla
-	 HDt0pgWDuUDO0+gTOMr7HHmk7IHCccTspTpJC7Xek44gtoFSwuvUIS4fKmnE6xponf
-	 aZIGyOR5k2lJQ==
-Date: Wed, 18 Sep 2024 08:29:09 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ronak Doshi <ronak.doshi@broadcom.com>
+	s=arc-20240116; t=1726645540; c=relaxed/simple;
+	bh=8cbZTCDd4mL+ru6kg5Gf3qUptfO0w/oF9SJAxiqHGio=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=p1upr7RNPFSQW2fNRyd5ExgIoP3zBGnFIgv6b3hbmyeD7hst/rktZQSakp8t7ZoHL5AlnIHMrV1PStKDzGX7/l31cw0h/ES9ZEDBQTTBuO46wE47k9JWimt7DWKhhYqn5sUDvt5enhZDO5ur4NbFR2ibq3w/nCxzfwdmH5M5ONM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=OinEsvUR; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20792913262so47989685ad.3
+        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 00:45:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1726645538; x=1727250338; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+I7dUgrSuHMQdwaXopkdXCgHbnd+bfTOM+bzbwYhISo=;
+        b=OinEsvUR0ZuftFGWF7ydpG/DYZM77aYld2BTT/0RyB3Goa7YtZNqlBV4S/VC6n6TIP
+         +YBfao6n/EFRllA4w6LGNEgGjafW+EZXDyJQ9qBdY4laL5tvw05GfJSHtrYGx2Cb5nxu
+         FEeKerguC46ur/RGfwQ2Jh8hywu1QHpGdicbX4Khxu2gwtnyaranvRuW6l61dcvhpbU+
+         nABMOHBEQ6DjCyYLbOskA7rDSftrXSi8//lCCfujxpg6M+9y4Dj5LbRAkAlkCuVS4u8V
+         EW/nXW0o7uijBmI7Tgf31GdHFIkOq67Kb1aAKczX6qAuRDZapzIEgvP1DzgJ6shXgnhx
+         N6eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726645538; x=1727250338;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+I7dUgrSuHMQdwaXopkdXCgHbnd+bfTOM+bzbwYhISo=;
+        b=u4ftiFwhd8gNojKmxIFuaQX+dylpSGlcwkiTzjQjKEWVooU152/cI2v6TDSKeh/SuV
+         7TI3zuO8hIMIPlP2gccQh357akLw18u2xExKyqRTt1Zi26Pke8Akhb133/GzN7QiJRHk
+         l4Y+8tH7ehkN/wUBlMR1kPVLH/K5TTt1xzvtq095yEs7AJ/KUsdg2rlO1EXtxdZacVFx
+         tBbuQlCdflzAIpxy4ZeoCFsJ6P8HJ9QNoOIbvKAfCEb4TCKdccK9JEc2ivOI78XHwh0O
+         YvI2JiwHN22vzT2MPmGFwmrqwG0K3Y6vydFLbIgUKcO9x+mwVVP2NVtgnbrGkwVWUWdQ
+         M9HQ==
+X-Gm-Message-State: AOJu0Yw+JiunApck6en5MWWGRTgth09vYyFyezWFAWo3y5b0tm4JiZFh
+	pC04em+JpTWDnlOnhe4T4jtdwYO5HbPn1CeB41FcrrwCKMQ0/p/27UkziD1uUqo=
+X-Google-Smtp-Source: AGHT+IFpSIeGa39ByCsIFwY+HDxOIoRC8C0L3buusq68sEAHO+OkhE4RObZ1rPjsBZYe0iYf4cPzmQ==
+X-Received: by 2002:a17:902:ec85:b0:205:82d5:2368 with SMTP id d9443c01a7336-20782b7c5f3mr358418875ad.49.1726645537888;
+        Wed, 18 Sep 2024 00:45:37 -0700 (PDT)
+Received: from C02F52LSML85.bytedance.net ([203.208.167.149])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20794747379sm60412995ad.288.2024.09.18.00.45.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Sep 2024 00:45:37 -0700 (PDT)
+From: Feng zhou <zhoufeng.zf@bytedance.com>
+To: martin.lau@linux.dev,
+	daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	ast@kernel.org,
+	andrii@kernel.org,
+	eddyz87@gmail.com,
+	song@kernel.org,
+	yonghong.song@linux.dev,
+	kpsingh@kernel.org,
+	sdf@fomichev.me,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mykolal@fb.com,
+	shuah@kernel.org,
+	geliang@kernel.org,
+	laoar.shao@gmail.com
 Cc: netdev@vger.kernel.org,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] vmxnet3: support higher link speeds from
- vmxnet3 v9
-Message-ID: <20240918072909.GT167971@kernel.org>
-References: <20240917225947.23742-1-ronak.doshi@broadcom.com>
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com,
+	zhoufeng.zf@bytedance.com
+Subject: [PATCH bpf-next v2 0/2] Cgroup skb add helper to get net_cls's classid
+Date: Wed, 18 Sep 2024 15:45:13 +0800
+Message-Id: <20240918074516.5697-1-zhoufeng.zf@bytedance.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240917225947.23742-1-ronak.doshi@broadcom.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 17, 2024 at 03:59:46PM -0700, Ronak Doshi wrote:
-> Until now, vmxnet3 was default reporting 10Gbps as link speed.
-> Vmxnet3 v9 adds support for user to configure higher link speeds.
-> User can configure the link speed via VMs advanced parameters options
-> in VCenter. This speed is reported in gbps by hypervisor.
-> 
-> This patch adds support for vmxnet3 to report higher link speeds and
-> converts it to mbps as expected by Linux stack.
-> 
-> Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
-> Acked-by: Guolin Yang <guolin.yang@broadcom.com>
-> ---
->  drivers/net/vmxnet3/vmxnet3_drv.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/vmxnet3/vmxnet3_drv.c b/drivers/net/vmxnet3/vmxnet3_drv.c
-> index b70654c7ad34..bb514b72c8b5 100644
-> --- a/drivers/net/vmxnet3/vmxnet3_drv.c
-> +++ b/drivers/net/vmxnet3/vmxnet3_drv.c
-> @@ -201,6 +201,8 @@ vmxnet3_check_link(struct vmxnet3_adapter *adapter, bool affectTxQueue)
->  
->  	adapter->link_speed = ret >> 16;
->  	if (ret & 1) { /* Link is up. */
+From: Feng Zhou <zhoufeng.zf@bytedance.com>
 
-Hi Ronak,
+0001: Cgroup skb add bpf_skb_cgroup_classid_proto.
+0002: Add a testcase for it.
 
-I think it would be nice to add a comment regarding the logic added below,
-particularly the inequality.  It took me more than one reading to
-understand it in the presence of the patch description. I expected may have
-remained a mystery without some accompanying text.
+Feng Zhou (2):
+  bpf: cg_skb add get classid helper
+  bpf, selftests: Add test case for cgroup skb to get net_cls classid
+    helpers
 
-> +		if (VMXNET3_VERSION_GE_9(adapter) && adapter->link_speed < 10000)
+Changelog:
+v1->v2: Addressed comments from Martin KaFai Lau
+- Just bpf_skb_cgroup_classid_proto.
+- Add a testcase.
+Details in here:
+https://lore.kernel.org/lkml/20240814095038.64523-1-zhoufeng.zf@bytedance.com/T/
 
-Please consider limiting Networking code to 80 columns wide where it
-can trivially be achieved, as appears to be the case here.
-
-checkpatch can be run with an option to flag this.
-
-> +			adapter->link_speed = adapter->link_speed * 1000;
-
->  		netdev_info(adapter->netdev, "NIC Link is Up %d Mbps\n",
->  			    adapter->link_speed);
->  		netif_carrier_on(adapter->netdev);
-
-net-next is currently closed for the v6.12 merge window.
-Please repost this patch after it reopens, which will be after
-v6.12-rc1 is released, most likely a little under two weeks from now.
+ net/core/filter.c                             |  4 +
+ .../bpf/prog_tests/cg_skb_get_classid.c       | 87 +++++++++++++++++++
+ .../selftests/bpf/progs/cg_skb_get_classid.c  | 19 ++++
+ 3 files changed, 110 insertions(+)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/cg_skb_get_classid.c
+ create mode 100644 tools/testing/selftests/bpf/progs/cg_skb_get_classid.c
 
 -- 
-pw-bot: changes-requested
+2.30.2
+
 
