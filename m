@@ -1,172 +1,141 @@
-Return-Path: <netdev+bounces-128750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31D7B97B69E
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 03:48:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2982C97B6C9
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 04:23:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 279B42852A4
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 01:48:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4A73281767
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 02:23:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41F396FCC;
-	Wed, 18 Sep 2024 01:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5323627442;
+	Wed, 18 Sep 2024 02:23:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sVKy+wKc"
 X-Original-To: netdev@vger.kernel.org
-Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2097.outbound.protection.partner.outlook.cn [139.219.17.97])
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BCB6D299;
-	Wed, 18 Sep 2024 01:48:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.97
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726624086; cv=fail; b=AMcXWA6E45N4ck+Oi2fbaxEODdleGWq4KgNyJXZSIOHfita0a5j4qekXB0r8h3N4Rso65vrKr0+TKuHzCp0ntbQ9iNZAKiy1n1KEHuNSYXkqsIhHloE48lA9IvwXCJPkDC6wzaFYF0HqD2/DWFFVquLwVlxFUJynkMo1V7bAIlc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726624086; c=relaxed/simple;
-	bh=v941vaBwqsSji5ILT7d8CpKyb9MZ9P4C2mmCOh8zPO8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=CeJCTxLekrEWFkDyuCDX2OwvJx0ozazMTTmqD1c5ptKfVJbElyq947JnAm9Pwi/k60yGrfY2RYfomRvhcsfqd82nszCyC37lEPYN9kPppFV9Avq+OSzpH9XN4xhThemROb6RW3CBAN1jEkGikh7bHJbBtymHfcOQpWvVAz2B0UY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dNgkq2j9ATKgdWcGeDZJbiS2ArpvqSoUHb/8+bbAh+BSkoy7IwrTzmHVPci3qPO8w2WOhboIzFdNW1jjDS0IPrbFNaSqwsKBM9xrTE7lS/YsLeYyl4dwj67yWiXyqshFwYg/dFshLV4gC39/9mAIVt26wI2vd7qDOlXn3FVWvMmNwUkZd34S018lFVXE6c/lv2Ul+/skQhGpclHaH8DoMIMkPWxstFl+4YdF9DkYBACa/1BNpu2x+EACJf4hcQmkIxn9RElu8S16at0EGK1hHykjzmZUpYzkYMZChhIyPkmTYnnNcNefXVta1GSG3BkFnoj514dD9J228wby7gblsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0+ipgbcmYBwqiqty7qanJ9jeT3tvGo5u3mreL/UGAKM=;
- b=QYbFHtJ0vdh2xQee1aQnhwbVOGqQvdT4XrbvX3MLAU6FqJWsoSqckT3AxR8pcjn2NL47IXcXMvsCiRUxZH3hf1Sy9cq+XkpcBZzaKh1Nqn+nKTFQGwBFgOzSJ4O/W1nR1JM6tJkMLlnjrkftRhCXtZklq3ayMpfafJKJCVRkud4pErmymX/TyAHeRbP5MOpzxaAHPTcxrEkW5mfhldlBioMZ8+K+EfZrYK5tEibP6XGL4JLX7Apf/yXsqu/tSpdT7GVef+r37NkmS10aAjvKFIRtRIey7kOJAhFlXP0Bse5dTxez9C9KOKAFd3FWocqfKsY+7CWThI9HooVXFqfkjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=starfivetech.com; dmarc=pass action=none
- header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:25::15) by SHXPR01MB0640.CHNPR01.prod.partner.outlook.cn
- (2406:e500:c311:1e::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.19; Wed, 18 Sep
- 2024 01:15:20 +0000
-Received: from SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
- ([fe80::3f35:8db2:7fdf:9ffb]) by
- SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn ([fe80::3f35:8db2:7fdf:9ffb%6])
- with mapi id 15.20.7962.022; Wed, 18 Sep 2024 01:15:19 +0000
-From: Minda Chen <minda.chen@starfivetech.com>
-To: Simon Horman <horms@kernel.org>
-CC: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>
-Subject: Re: [PATCH v1] stmmac: mmc: dwmac4: Add ip payload error statistics
-Thread-Topic: [PATCH v1] stmmac: mmc: dwmac4: Add ip payload error statistics
-Thread-Index: AQHbCB2PHZuINr2cHk6mAhsoMuUPOLJaiIOAgAI3tVA=
-Date: Wed, 18 Sep 2024 01:15:19 +0000
-Message-ID:
- <SHXPR01MB0863621A177B2919B51A5694E6622@SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn>
-References: <20240916094812.29804-1-minda.chen@starfivetech.com>
- <20240916152325.GB396300@kernel.org>
-In-Reply-To: <20240916152325.GB396300@kernel.org>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=starfivetech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SHXPR01MB0863:EE_|SHXPR01MB0640:EE_
-x-ms-office365-filtering-correlation-id: c287f8ae-28bc-424b-7ba3-08dcd77f5ceb
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam:
- BCL:0;ARA:13230040|10070799003|1800799024|7416014|41320700013|366016|38070700018;
-x-microsoft-antispam-message-info:
- 5mWFn4/UbqxAVQVLyauBidRMAYeeP6x4OAXyo1hAtMUmdyVDDJ4hZ2wvUzThxIac/tRhZ9b/YcgWr8Oo0UAlwD1YnSk+1/x8BPWPRTvwQsQrcTW7iU7gEVy4xkMtUUYmKFUbOaHnJNlGOtmThezHH7YDUVLQSgF5+/pGPVmzFyLMzeFNflR4hH6WwtJ8Iq7tcE3LrxNp1IdlIR1me9ywTMqwZVFLCcwGOKJJ0QKueKQr2l6Jm12uQ9gsTcGgO3g/gJUXx2nsMUSKf1OoC24h3ioLqLEi9Hvse5Sme93nikNlnFsYq8fxgSDt+cI52+0j8U7UIQd8lm9eGebkMYoyGzXCYJ/w1u6OgTZbkywBykDjzDxqIpqPj6hh3kjTwCFfehe/0OkNn3Bhp/g5F7yAMqK+biaf5s2FUMDUH+ib1zSLkOK9pg/8xnRw9QPcOk4Lb8KfqJs6dI/IFGhGgfx2alaTZ9IfcbAAwXJSLk7x2ZAiK0/DP0L564n5bX8YcgMMb0dpUbF8oHunbVPJrkjNccHnA4moqlTdkiFXHotxWqXM2ISw+uFb4D105PH1KgWDQ5/8JePpdzO7BlBM/4momDCFfs78Fwpq5y41Q3r1Za6KadP5ZETlHzDMAq2jO0Fu
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(10070799003)(1800799024)(7416014)(41320700013)(366016)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?PN+XiZDFlhr4kcaOcycfA78jqx+O/pJgjUAK1BqNlzQMZpcYAyU8GkEqssq3?=
- =?us-ascii?Q?BXTLtjyeOriizf5x9allosthkMBJHAcopcEuj28MTH8weQ750GEgQoD5mzXy?=
- =?us-ascii?Q?NWd3M2WDq3L49LXLU+hvUEAF+frUxnQ24tZ1RlfdC2KrdS9Ru40wLjH20Dn6?=
- =?us-ascii?Q?aNfjlQ0A+lEO33LlVMDwqLAKK6QCwVEeQaMw+/cIKxvU9zgp9Ug+WLLkkbFO?=
- =?us-ascii?Q?6Vh4NR45b4D8UVRKSG02uZjCRqVXVcWDoH2FNYCCziJq39Jr6Pw1GdZIBqBB?=
- =?us-ascii?Q?9EU00JW8pvk6PsCAjsCZgqdN/siiq+HLcr8uE7o3lgpeojbVd1IiMMyFkj+g?=
- =?us-ascii?Q?iykFsmT0+2EScgCPjtLMzzks2W6ao3ZaUWnlYdAYbMbqA0/SOhiP2cD4jrqU?=
- =?us-ascii?Q?f8DzqzWeCb7GBI9yCZLU0Q19+WnurmTtD3GaDod9DCyibFDbewcS/YrvLCtt?=
- =?us-ascii?Q?TTcC49bNMReiCHKNU2r7xM2ETo/RoylBc+5cvSzhQ8uDsT8MCaBA7yy0FPeJ?=
- =?us-ascii?Q?vaJO4MJLHhY+RiGN6xiJxI0TQbFIY2NudyM04kyV0uIR3yDBSVLVNuR/k4Ib?=
- =?us-ascii?Q?JY35DiJjfLY8xCC+EgivoZOz02fRGxDXUlZUbPD97sK+Pxc890iWjm+nQhtd?=
- =?us-ascii?Q?w2BcbxA+GUCKPB3kH4CHcGGiPhkD3GeqqtkZgDeVTFsnpC4zvctt+8FBa/dX?=
- =?us-ascii?Q?euxUjPMc3cYLgr6pEEO/cRAivIPeeXPS/WhMmUP/u3De4TtuqiRssjPvGRIo?=
- =?us-ascii?Q?O3YmN9A02kN8mrDtX/A2FMlnr/771A1b2m3TtNm03NRPGjQd2weC5p7o3VLU?=
- =?us-ascii?Q?NLJJmuRD48z+k1/F6zi+C20WKKYIm5xRKE9wL6j0onDMNhbpnaf/+2+zFulc?=
- =?us-ascii?Q?dFlz1KaNgL626OP1e873H4yJNy1gcAC9x++ouWAevtU+lVSKRxJpGgrDh2Hq?=
- =?us-ascii?Q?Pvi/EawcTO3THk3OgS0zRLGLSCvrv+A5DnmyhlmNQV7peN1JmFVGPUN9o/hs?=
- =?us-ascii?Q?IAcGbcB84zW5wDvksubfGqX0J0YLk2aCs1QBPJ+issj/YuFbdFG0hyuh75nt?=
- =?us-ascii?Q?VZ8opNyaM7Cg9ksTGvdeOxnLqI9lEx/k3u5K6eerpVcfYhj/TA2FiJ1RZYbR?=
- =?us-ascii?Q?UoPBc3QSYNNsnTy6i4z1aDksMaMvhZtM5PgwpVn77X9X0p/LN81bYptcJlo8?=
- =?us-ascii?Q?GGYxq0O2okWng27GQfmBJu6pkUH/7MLAwc0A5uH9Mh0nIquOHbs+frsdfg33?=
- =?us-ascii?Q?cQEqakOyv8TDIhPpzZp7tk1piMuFdEMR7Xz79h0cj5+GBxJalCD0dHs8ztWu?=
- =?us-ascii?Q?kQC1cmQR44mr9zDQJbuxx1UfZXz3G0K7qxwd0/zn+dcAWkfM4UlDKw5Uz95W?=
- =?us-ascii?Q?5MKuFJ+7D+r/T1cT6yzAtXBcZauM4214yKmyvM7hrXu5f0lXP7qXGDpEgO2t?=
- =?us-ascii?Q?Zo+oMVqJZfUOV0XoHLddBnJapI0mVhUs/zkOv8P84noQmaWNmqdnX5+yDU+J?=
- =?us-ascii?Q?F1dk+3KAWJGSNiOpR9gFQ8ceh0IGmtnkS9kHhrSYHzv5Wwg4R3b+bEgC9GUD?=
- =?us-ascii?Q?bdYG/F1KPvaGMRKEg7I=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3996D3D8E
+	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 02:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726626232; cv=none; b=g0g9Ef4KETiuaD9vhifGMIyJQj/xrfaO+ohXAWHC2bTZFRQh8XWH+YDEymSsexZ4uwlrcc/IJkb/PCRSpIaZrLmwHXsf/lbUaB7eIRIDykpqjLUhgWlsPTpZXSCZCGzghQtX+NHuMA9GFP1XzgadynWbdO5GeIKNV3RU3H3X+LM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726626232; c=relaxed/simple;
+	bh=ABT6rGN8TOPww8BfAd+4FFFiZKORE5iCUenViiN7gEg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LruoHlEqO/MAYdEPiY2sE7eAz3nSatFO8cWTDWgX+gRo0AQ+amzlKOCD4kC5O5PjgUOroiyMrdU7Mq6NlBFGPqJZF9CjPoER7jTSOnXFAijcTZmBwblNtxBKaGQHWr8QQppxT7CTpLcM9pAALUYc49yPjfiFYUd+xFdkC6xQF2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sVKy+wKc; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1726626226; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=JSGTfA6HBaAWlNaTQITKIfrl5ekOusFd9DdvS+ZqM4A=;
+	b=sVKy+wKcJyTXU1h+46KN+gvlh8NULHBhWDcLVJBmvNVMbzllIYvZduwM5+b+DnQ4QvllT7FPlp7iDrc4LxjvhWIHs1iINxzQ3/g69VOi6PiZYZbQtLlUTV4BGSF/Cva5eBrh7awyQAvpB7MWBHD2z7Zbt4eHDxlHx6/vuLFdkMU=
+Received: from 30.15.236.110(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WFCRkQz_1726626225)
+          by smtp.aliyun-inc.com;
+          Wed, 18 Sep 2024 10:23:46 +0800
+Message-ID: <ad8da8d1-4ae4-41e2-a047-e4adc4c044f5@linux.alibaba.com>
+Date: Wed, 18 Sep 2024 10:23:45 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: starfivetech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SHXPR01MB0863.CHNPR01.prod.partner.outlook.cn
-X-MS-Exchange-CrossTenant-Network-Message-Id: c287f8ae-28bc-424b-7ba3-08dcd77f5ceb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Sep 2024 01:15:19.9302
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qFRETBxrJmxKppWzXxaDS+CJ8Oez47wFRzUWapYzArFLHSUIjyG+9BeoNFcKQxkV94NgR0guxDh3bJdot+fpcQ4bNiKpyZR9giJE9WZ2dpY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SHXPR01MB0640
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch net] smc: use RCU version of lower netdev searching
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
+ syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com,
+ Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+ Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>
+References: <20240912000446.1025844-1-xiyou.wangcong@gmail.com>
+ <a054f2ef-c72f-4679-a123-003e0cf7839d@linux.alibaba.com>
+ <ZuTehlEoyi4PPmQA@pop-os.localdomain>
+ <e0842025-5e21-4755-8e60-1832e9cfe672@linux.alibaba.com>
+ <ZuUDv8PLR4FHg+oC@pop-os.localdomain>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <ZuUDv8PLR4FHg+oC@pop-os.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
->=20
-> On Mon, Sep 16, 2024 at 05:48:12PM +0800, Minda Chen wrote:
-> > Add dwmac4 ip payload error statistics, and rename discripter bit
-> > macro because latest version descriptor IPCE bit claims include ip
-> > checksum error and l4 segment length error.
-> >
-> > Signed-off-by: Minda Chen <minda.chen@starfivetech.com>
->=20
-> Hi Minda,
->=20
-> Some feedback on process.
->=20
-> net-next is currently closed for the v6.12 merge window.
-> Please consider reposting this patch once it re-opens, after v6.12-rc1 is=
- released,
-> likely about two weeks from now.
->=20
-> RFC patches, and fixes for net are, OTOH, welcome any time.
->=20
-> Also, when posting patches for net-next, please explicitly target them as=
- such.
->=20
-> 	Subject: [PATCH net-next] ...
->=20
-> Link: https://docs.kernel.org/process/maintainer-netdev.html
->=20
-> And lastly, I don't think 'mmc: ' belongs in the patch prefix.
-> This is an Ethernet driver, right? Looking over git history, it seems tha=
-t 'net:
-> stmmac: ' is appropriate here.
->=20
-> 	Subject: [PATCH net-next] net: stmmac: ...
->=20
-> --
-> pw-bot: defer
-Okay, I will resend this on 6.12-rc1
+
+On 9/14/24 11:32 AM, Cong Wang wrote:
+> On Sat, Sep 14, 2024 at 10:28:15AM +0800, D. Wythe wrote:
+>>
+>>
+>> On 9/14/24 8:53 AM, Cong Wang wrote:
+>>> On Thu, Sep 12, 2024 at 02:20:47PM +0800, D. Wythe wrote:
+>>>>
+>>>>
+>>>> On 9/12/24 8:04 AM, Cong Wang wrote:
+>>>>> From: Cong Wang <cong.wang@bytedance.com>
+>>>>>
+>>>>> Both netdev_walk_all_lower_dev() and netdev_lower_get_next() have a
+>>>>> RCU version, which are netdev_walk_all_lower_dev_rcu() and
+>>>>> netdev_next_lower_dev_rcu(). Switching to the RCU version would
+>>>>> eliminate the need for RTL lock, thus could amend the deadlock
+>>>>> complaints from syzbot. And it could also potentially speed up its
+>>>>> callers like smc_connect().
+>>>>>
+>>>>> Reported-by: syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com
+>>>>> Closes: https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f
+>>>>> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+>>>>> Cc: Jan Karcher <jaka@linux.ibm.com>
+>>>>> Cc: "D. Wythe" <alibuda@linux.alibaba.com>
+>>>>> Cc: Tony Lu <tonylu@linux.alibaba.com>
+>>>>> Cc: Wen Gu <guwen@linux.alibaba.com>
+>>>>> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+>>>>
+>>>>
+>>>> Haven't looked at your code yet, but the issue you fixed doesn't exist.
+>>>> The real reason is that we lacks some lockdep annotations for
+>>>> IPPROTO_SMC.
+>>>
+>>> If you look at the code, it is not about sock lock annotations, it is
+>>> about RTNL lock which of course has annotations.
+>>>
+>>
+>> If so, please explain the deadlock issue mentioned in sysbot and
+>> how it triggers deadlocks.
+> 
+> Sure, but what questions do you have here? To me, the lockdep output is
+> self-explained. Please kindly let me know if you have any troubles
+> understanding it, I am always happy to help.
+> 
+> Thanks.
+
+Just explain (https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f)
+
+-> #1 (sk_lock-AF_INET6){+.+.}-{0:0}:
+        lock_sock_nested+0x3a/0xf0 net/core/sock.c:3543
+        lock_sock include/net/sock.h:1607 [inline]
+        sockopt_lock_sock net/core/sock.c:1061 [inline]
+        sockopt_lock_sock+0x54/0x70 net/core/sock.c:1052
+        do_ipv6_setsockopt+0x216a/0x47b0 net/ipv6/ipv6_sockglue.c:567
+        ipv6_setsockopt+0xe3/0x1a0 net/ipv6/ipv6_sockglue.c:993
+        udpv6_setsockopt+0x7d/0xd0 net/ipv6/udp.c:1702
+        do_sock_setsockopt+0x222/0x480 net/socket.c:2324
+        __sys_setsockopt+0x1a4/0x270 net/socket.c:2347
+        __do_sys_setsockopt net/socket.c:2356 [inline]
+        __se_sys_setsockopt net/socket.c:2353 [inline]
+        __x64_sys_setsockopt+0xbd/0x160 net/socket.c:2353
+        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+        do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Why is that udpv6_setsockopt was reported here.
+
+D.
+
+
+
+
 
