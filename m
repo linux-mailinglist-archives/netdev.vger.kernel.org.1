@@ -1,73 +1,72 @@
-Return-Path: <netdev+bounces-128799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50E3797BC25
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:21:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C49D897BC26
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10180284AFA
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:21:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E93C81C21679
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 12:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D56A18A93C;
-	Wed, 18 Sep 2024 12:21:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A7F118A92B;
+	Wed, 18 Sep 2024 12:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UT2Riora"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aDDYQWRm"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC1818A92B
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 12:20:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A594218A6DC
+	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 12:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726662060; cv=none; b=r0AxGqkoKM4CguMy9uhDyPS0Yx5e/zdtnJzrqBtVIz/Y0QJnAehV7UuDhdt0biM0EdBvJILM10aA+K1YqIq7BtgmihdSwIHYbQpYlhBse3GySsN14u+XwQjuXhBrpZjS9fzCMDrzeqMcetGeHypYJ7lZZkW4pFGVCekOov2Zjhc=
+	t=1726662062; cv=none; b=c8vKfwa72jTQ1NXBpLBIbp8obdrhxFg9FfWys4Ubc23BREkp5MXQr/RZxqn1eOsyID+15TIyVj+B5Luxx9E5uMecGrT/r5bCBhhMztGrEXyDIv48+2w1c/0MdfkOkx6lfDeOzEti2g/s9fWmzWgE8O4tZQJ2R2kFJnaEFsdkmyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726662060; c=relaxed/simple;
-	bh=F3a1J2Wnut0KCExr728UdIQgzs7ZdC2IsmfQUmp9RbY=;
+	s=arc-20240116; t=1726662062; c=relaxed/simple;
+	bh=pk6GsxJ8ssKzMmExcjykp3LKo5UmUTXNp183mNaSciI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LT+Vr4rMhR2QJrOspJ8kG1e5eygADy/0pA1KybCGmP0YMcVjoSkXbS9zdF7rQslN+UuNRBgUcKPaVUO/6APgPC8SB2ala7y2HJNxuAHbB3h3I5s6T9sp/myPgU1glq/9qGlUB9gAjJf4Isl6nVSKM1iV2DpL+ImIJAkzxb/A31U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UT2Riora; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=rqOn5lffjrsOFnEv1CY9DlHtDwX5urldVmf0zRXvtLZH8nHEK0EFnUb/ZjmDkNUP08O4gbp8BJcCP+S3MBiuW/T1zGBq8E2v7NAcOHuUmuhf5dQPDXD2tY2nXoaCscUBbASArs+KV9Flm1GUIITKt7KDZ4uoJ503vJSrclsWfKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aDDYQWRm; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726662060; x=1758198060;
+  t=1726662061; x=1758198061;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=F3a1J2Wnut0KCExr728UdIQgzs7ZdC2IsmfQUmp9RbY=;
-  b=UT2RioralzoCq4q5mcyO2MCJP5CzQMz8S8fjWCzm0ch92vlQJzGZzHlQ
-   BqjURiRKnhKyht3B1yctjUSUxJgKpl0oTsR5xZsS25VMB8tD+LUW2nN/k
-   ujt0uoEIF9BdkxCdv9wNTRmrw3qgBDdfH50+Kasp04tcbePn8jSacg857
-   yNiCgp19DtkAKh+ucaxBERzqTAwc2m5zcJNGAHAfoDNUShbsaq+x8Ispd
-   kd7qvwUvbGVD1X5+/A4ib434S/NzBPX+IEMw44NyPYcm4o1o5w+rtqmwG
-   dM0XhLEwnDsfBWfTiaE/R1V+Ka4U6pBZFT3OD827HDZwG95bwnWtQFaLq
-   g==;
-X-CSE-ConnectionGUID: 1uk3aiwoQJeRAmJIJN1PWA==
-X-CSE-MsgGUID: SVzcbuFSR1arnvuVwQ3XDQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11198"; a="25689219"
+  bh=pk6GsxJ8ssKzMmExcjykp3LKo5UmUTXNp183mNaSciI=;
+  b=aDDYQWRmv/E1kdYW4nd4cNVwf0LXcbYPEdpUQcyJzBsRpNWrRgCIi0al
+   IvdDehb5j1jO/jXgm+adW/WjH4DHDdK8I+0+1Ph9pmcfmPVEUeleWHU7G
+   W5Kkfa6Y7Qa4SUWKmljiVXvkHPBOQE7vrQQSrhID6/K5Qu0kjE2TxJzYM
+   +maWQeWMG+ZpZ0OOrF4WJhbCzYY7+0eYWB3i5jM/L8Uwt2JkQS0jLCUES
+   HRsAGwFZaTYuMcLQ1tWtgs4G7Edz5p3C5n7juWprNeoEDUfPBOT981TUz
+   vF23bLTtx4PfguB7cE17Xr1Q6tbvSptz6JNqH/ffQR8Z1lKkDiWB1j5yu
+   w==;
+X-CSE-ConnectionGUID: FWuHombhQs+B3pulXvme0Q==
+X-CSE-MsgGUID: vUYrCHstQ3+Lp2SgK5Y1JQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11198"; a="25689223"
 X-IronPort-AV: E=Sophos;i="6.10,238,1719903600"; 
-   d="scan'208";a="25689219"
+   d="scan'208";a="25689223"
 Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 05:21:00 -0700
-X-CSE-ConnectionGUID: X7OFJhRUSCy+u0Emnc+8nA==
-X-CSE-MsgGUID: At/EFmbESjyvcsUMlE4AVA==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Sep 2024 05:21:01 -0700
+X-CSE-ConnectionGUID: zLqSQNz/QD2vqID4VXBx3w==
+X-CSE-MsgGUID: 1ibbCRCISN6wT+MaWfUKjg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.10,238,1719903600"; 
-   d="scan'208";a="69636450"
+   d="scan'208";a="69636454"
 Received: from kkolacin-desk1.igk.intel.com ([10.217.160.108])
-  by fmviesa008.fm.intel.com with ESMTP; 18 Sep 2024 05:20:57 -0700
+  by fmviesa008.fm.intel.com with ESMTP; 18 Sep 2024 05:20:59 -0700
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com,
 	przemyslaw.kitszel@intel.com,
-	Karol Kolacinski <karol.kolacinski@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v11 iwl-next 3/7] ice: Use FIELD_PREP for timestamp values
-Date: Wed, 18 Sep 2024 14:12:31 +0200
-Message-ID: <20240918122048.1554692-12-karol.kolacinski@intel.com>
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v11 iwl-next 4/7] ice: Process TSYN IRQ in a separate function
+Date: Wed, 18 Sep 2024 14:12:32 +0200
+Message-ID: <20240918122048.1554692-13-karol.kolacinski@intel.com>
 X-Mailer: git-send-email 2.46.0
 In-Reply-To: <20240918122048.1554692-9-karol.kolacinski@intel.com>
 References: <20240918122048.1554692-9-karol.kolacinski@intel.com>
@@ -79,77 +78,137 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Instead of using shifts and casts, use FIELD_PREP after reading 40b
-timestamp values.
+Simplify TSYN IRQ processing by moving it to a separate function and
+having appropriate behavior per PHY model, instead of multiple
+conditions not related to HW, but to specific timestamping modes.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+When PTP is not enabled in the kernel, don't process timestamps and
+return IRQ_HANDLED.
+
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 ---
-V5 -> V6: Replaced removed macros with the new ones
+V7 -> V8: Moved E830 timestamp handling to "ice: Implement PTP support for E830
+          devices"
 
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c |  9 ++++++---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 13 +++++--------
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_main.c | 18 +--------
+ drivers/net/ethernet/intel/ice/ice_ptp.c  | 49 +++++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_ptp.h  |  6 +++
+ 3 files changed, 57 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 0fc4092fd261..65a66225797e 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -1520,7 +1520,8 @@ static int ice_read_ptp_tstamp_eth56g(struct ice_hw *hw, u8 port, u8 idx,
- 	 * lower 8 bits in the low register, and the upper 32 bits in the high
- 	 * register.
- 	 */
--	*tstamp = ((u64)hi) << TS_PHY_HIGH_S | ((u64)lo & TS_PHY_LOW_M);
-+	*tstamp = FIELD_PREP(PHY_40B_HIGH_M, hi) |
-+		  FIELD_PREP(PHY_40B_LOW_M, lo);
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index dc1a085d413c..3c3818d0b33f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -3288,22 +3288,8 @@ static irqreturn_t ice_misc_intr(int __always_unused irq, void *data)
  
- 	return 0;
- }
-@@ -3199,7 +3200,8 @@ ice_read_phy_tstamp_e82x(struct ice_hw *hw, u8 quad, u8 idx, u64 *tstamp)
- 	 * lower 8 bits in the low register, and the upper 32 bits in the high
- 	 * register.
- 	 */
--	*tstamp = FIELD_PREP(TS_PHY_HIGH_M, hi) | FIELD_PREP(TS_PHY_LOW_M, lo);
-+	*tstamp = FIELD_PREP(PHY_40B_HIGH_M, hi) |
-+		  FIELD_PREP(PHY_40B_LOW_M, lo);
- 
- 	return 0;
- }
-@@ -4952,7 +4954,8 @@ ice_read_phy_tstamp_e810(struct ice_hw *hw, u8 lport, u8 idx, u64 *tstamp)
- 	/* For E810 devices, the timestamp is reported with the lower 32 bits
- 	 * in the low register, and the upper 8 bits in the high register.
- 	 */
--	*tstamp = ((u64)hi) << TS_HIGH_S | ((u64)lo & TS_LOW_M);
-+	*tstamp = FIELD_PREP(PHY_EXT_40B_HIGH_M, hi) |
-+		  FIELD_PREP(PHY_EXT_40B_LOW_M, lo);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 62bd8dafe19c..6328c0bbddd6 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -674,15 +674,12 @@ static inline bool ice_is_dual(struct ice_hw *hw)
- /* Source timer incval macros */
- #define INCVAL_HIGH_M			0xFF
- 
--/* Timestamp block macros */
-+/* PHY 40b registers macros */
-+#define PHY_EXT_40B_LOW_M		GENMASK(31, 0)
-+#define PHY_EXT_40B_HIGH_M		GENMASK_ULL(39, 32)
-+#define PHY_40B_LOW_M			GENMASK(7, 0)
-+#define PHY_40B_HIGH_M			GENMASK_ULL(39, 8)
- #define TS_VALID			BIT(0)
--#define TS_LOW_M			0xFFFFFFFF
--#define TS_HIGH_M			0xFF
--#define TS_HIGH_S			32
+ 	if (oicr & PFINT_OICR_TSYN_TX_M) {
+ 		ena_mask &= ~PFINT_OICR_TSYN_TX_M;
+-		if (ice_pf_state_is_nominal(pf) &&
+-		    pf->hw.dev_caps.ts_dev_info.ts_ll_int_read) {
+-			struct ice_ptp_tx *tx = &pf->ptp.port.tx;
+-			unsigned long flags;
+-			u8 idx;
 -
--#define TS_PHY_LOW_M			0xFF
--#define TS_PHY_HIGH_M			0xFFFFFFFF
--#define TS_PHY_HIGH_S			8
+-			spin_lock_irqsave(&tx->lock, flags);
+-			idx = find_next_bit_wrap(tx->in_use, tx->len,
+-						 tx->last_ll_ts_idx_read + 1);
+-			if (idx != tx->len)
+-				ice_ptp_req_tx_single_tstamp(tx, idx);
+-			spin_unlock_irqrestore(&tx->lock, flags);
+-		} else if (ice_ptp_pf_handles_tx_interrupt(pf)) {
+-			set_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread);
+-			ret = IRQ_WAKE_THREAD;
+-		}
++
++		ret = ice_ptp_ts_irq(pf);
+ 	}
  
- #define BYTES_PER_IDX_ADDR_L_U		8
- #define BYTES_PER_IDX_ADDR_L		4
+ 	if (oicr & PFINT_OICR_TSYN_EVNT_M) {
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 46988640a6c6..4913f8f060f7 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2733,6 +2733,55 @@ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf)
+ 	}
+ }
+ 
++/**
++ * ice_ptp_ts_irq - Process the PTP Tx timestamps in IRQ context
++ * @pf: Board private structure
++ *
++ * Return: IRQ_WAKE_THREAD if Tx timestamp read has to be handled in the bottom
++ *         half of the interrupt and IRQ_HANDLED otherwise.
++ */
++irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
++{
++	struct ice_hw *hw = &pf->hw;
++
++	switch (hw->mac_type) {
++	case ICE_MAC_E810:
++		/* E810 capable of low latency timestamping with interrupt can
++		 * request a single timestamp in the top half and wait for
++		 * a second LL TS interrupt from the FW when it's ready.
++		 */
++		if (hw->dev_caps.ts_dev_info.ts_ll_int_read) {
++			struct ice_ptp_tx *tx = &pf->ptp.port.tx;
++			u8 idx;
++
++			if (!ice_pf_state_is_nominal(pf))
++				return IRQ_HANDLED;
++
++			spin_lock(&tx->lock);
++			idx = find_next_bit_wrap(tx->in_use, tx->len,
++						 tx->last_ll_ts_idx_read + 1);
++			if (idx != tx->len)
++				ice_ptp_req_tx_single_tstamp(tx, idx);
++			spin_unlock(&tx->lock);
++
++			return IRQ_HANDLED;
++		}
++		fallthrough; /* non-LL_TS E810 */
++	case ICE_MAC_GENERIC:
++	case ICE_MAC_GENERIC_3K_E825:
++		/* All other devices process timestamps in the bottom half due
++		 * to sleeping or polling.
++		 */
++		if (!ice_ptp_pf_handles_tx_interrupt(pf))
++			return IRQ_HANDLED;
++
++		set_bit(ICE_MISC_THREAD_TX_TSTAMP, pf->misc_thread);
++		return IRQ_WAKE_THREAD;
++	default:
++		return IRQ_HANDLED;
++	}
++}
++
+ /**
+  * ice_ptp_maybe_trigger_tx_interrupt - Trigger Tx timstamp interrupt
+  * @pf: Board private structure
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
+index 824e73b677a4..acee46ad793a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
+@@ -302,6 +302,7 @@ s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb);
+ void ice_ptp_req_tx_single_tstamp(struct ice_ptp_tx *tx, u8 idx);
+ void ice_ptp_complete_tx_single_tstamp(struct ice_ptp_tx *tx);
+ enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf);
++irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf);
+ 
+ u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
+ 			const struct ice_pkt_ctx *pkt_ctx);
+@@ -340,6 +341,11 @@ static inline bool ice_ptp_process_ts(struct ice_pf *pf)
+ 	return true;
+ }
+ 
++static inline irqreturn_t ice_ptp_ts_irq(struct ice_pf *pf)
++{
++	return IRQ_HANDLED;
++}
++
+ static inline u64
+ ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
+ 		    const struct ice_pkt_ctx *pkt_ctx)
 -- 
 2.46.0
 
