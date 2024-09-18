@@ -1,154 +1,206 @@
-Return-Path: <netdev+bounces-128828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3344797BD79
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 15:58:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 728EB97BD89
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 16:02:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0178288FD0
-	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 13:58:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7FB31F25991
+	for <lists+netdev@lfdr.de>; Wed, 18 Sep 2024 14:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4163F18CC09;
-	Wed, 18 Sep 2024 13:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="HBllCe5s"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 452041F16B;
+	Wed, 18 Sep 2024 14:01:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5168D18C010
-	for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 13:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBE218B47D;
+	Wed, 18 Sep 2024 14:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726667897; cv=none; b=TCA9475FS0PheqDEyoRcXm6GEsecVJssDA1S9m+dU+p195aS5sRWLxO9RbVOGDKtafRssh3R9M3wP6SvAMVG+YCRq/8KCKomQ4U257pVuci0yTDHVaGEUVyyCIrWSuizfw/cCxWptR/EjVEkbWHKe68QauPnolBjSPm6OXrNoIE=
+	t=1726668109; cv=none; b=BpAfwbPDHWuPHMGQFs6d1qwJJjWIB+SIDYJcU1xFqX6X3zzr+3f8b6TGJtrkns9FUxODrsdoK11Okn7vbhS5AZu4sB6ysNUYwvw2M+KgDAxpBA89s4pcKsGuzrGBbI58bze6k3a3cakryVnBO9jOrey46nlADm8FUqht9kwzxpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726667897; c=relaxed/simple;
-	bh=uRjf76+ialIXRhrRcRnhdzxrLmruMKeJXsltkA5bYqY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=T+RLS1/hDlqkgrFKRJEAuYCeEtiAldUHjSA6edb9lhaYQCi6fjrlQ94qa860H3j+emCGPYGwDkLfVwUHV+pr3BsTdVyyyf1NnpHrlpcLEaWkY4OB6jpsbEfgirbtbsF/adwOPqME1n28/WGE6sOCV2Zn1VU28XGG/y/87/fpOkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=HBllCe5s; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a8d0d0aea3cso940766366b.3
-        for <netdev@vger.kernel.org>; Wed, 18 Sep 2024 06:58:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1726667893; x=1727272693; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=SPn7NyA8EvFtDI+rj2RU3nMqRoNcoHgRdtft+sybg/g=;
-        b=HBllCe5sMkM5IkvbFss4nozGoq+z9jbUC079gOJYxhnSsUQt+OQip/BoTa4wzIXAXP
-         3wEZfA65XYUsTvCXshf+hWSPrhKU3KRAvsXmz7f9eSM1v+fhReDoZmD2ewoQzouc4MC0
-         qC7UVRAJt37KNI9a8HDtTlGoOWTqi1H/3F8Y0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726667893; x=1727272693;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SPn7NyA8EvFtDI+rj2RU3nMqRoNcoHgRdtft+sybg/g=;
-        b=LreSRJW2zC8XEWuW1kXJp9hebGs7uoJooQRwmfZxjr6vF5F/3ZRSLPrH9zHKxa0dTQ
-         owsW3jY2rER7xsgKdX8T4CeUidsamdPDBehK8Ofuo5bTo58y3eeSrrmup/7dGqPkQxi1
-         yp6GC/X1SbUyM04UaFCazAHTSzWw/KplI2CkshOSkUeLHIG8zGS8ei1ijoHmtI92hN0Y
-         io8vhEXf9bPJajx5bFuHMI2wndmx6FMzQOYGaK1r+8NJBiHUrB2R9xe+AEoJdK6rUDAv
-         5CJHkl49MP02EyJtSUDYYGjPSolrJJOAIXpQQcXo5cIzZ3dK33xJrA03kIt3p0HGSTXs
-         MxBg==
-X-Gm-Message-State: AOJu0YzmZJwTOb6cZOat6R5JaVslMcd+MamuclvuGjl4uKhLvXtHqoRT
-	jkIZmSqxGZR1zwoKuofTrMvWNjdIXq8IYKq7MBKEjYOGegUyHhry+juBHPxa2uNfVzfEFnSia0y
-	aSV9qjYcUfgpbjSK+iudunA0BcboQBrUKww0obTFlS4tSVsvVhiJvb6DsNhjH08O3aN8iYjiJQ5
-	UaQ7jpIN9TOVYE/TL6TX/ot94m/gcnU/Pze/g4rA==
-X-Google-Smtp-Source: AGHT+IFmawmX5JiRVgNf/0L0WpQV3DqIK1N/ZTMHGP5g/mV8702xqodsE7+50nL/fybsbo9t4AkL1Q==
-X-Received: by 2002:a17:906:6a14:b0:a90:4199:2a73 with SMTP id a640c23a62f3a-a9041992ae5mr2018156266b.5.1726667893278;
-        Wed, 18 Sep 2024 06:58:13 -0700 (PDT)
-Received: from localhost.localdomain ([83.68.141.146])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90613315d8sm595283466b.214.2024.09.18.06.58.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Sep 2024 06:58:13 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: Joe Damato <jdamato@fastly.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [RFC net-next] e1000e: link NAPI instances to queues and IRQs
-Date: Wed, 18 Sep 2024 13:57:26 +0000
-Message-Id: <20240918135726.1330-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1726668109; c=relaxed/simple;
+	bh=0aqOgRl7qZHjrDJjX8+gvKikr2K+R8PiehTfS7v77qk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=UGAg88/WRptydAX9DVG1+kkzzN4APRl8g+FkHtzHZ3WWL5qh8AJUfXTms1JfU71q4Y65P7+nb01SPJZ3wAziG8XP8O7Q1s421ujHCt/3r0nwaizANygqgfBiZPAp6Gi7AUXE4H9qB5vBTOjdZU7BkI2PoJbakROZ0SUmljg5gR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4X80g42SMwz2QTxR;
+	Wed, 18 Sep 2024 22:01:04 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id A5A7D140138;
+	Wed, 18 Sep 2024 22:01:42 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 18 Sep 2024 22:01:38 +0800
+Message-ID: <f4d4db55-2bb3-3a53-8d64-dec0fe5ce6d3@huawei-partners.com>
+Date: Wed, 18 Sep 2024 17:01:34 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v3 13/19] selftests/landlock: Test packet protocol
+ alias
+Content-Language: ru
+To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
+CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
+	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>
+References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
+ <20240904104824.1844082-14-ivanov.mikhail1@huawei-partners.com>
+ <ZurWqFq_dGWOsgUU@google.com>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <ZurWqFq_dGWOsgUU@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-Make e1000e compatible with the newly added netdev-genl APIs.
+On 9/18/2024 4:33 PM, Günther Noack wrote:
+> On Wed, Sep 04, 2024 at 06:48:18PM +0800, Mikhail Ivanov wrote:
+>> (AF_INET, SOCK_PACKET) is an alias for (AF_PACKET, SOCK_PACKET)
+>> (Cf. __sock_create). Landlock shouldn't restrict one pair if the other
+>> was allowed. Add `packet_protocol` fixture and test to
+>> validate these scenarios.
+>>
+>> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+>> ---
+>>   .../testing/selftests/landlock/socket_test.c  | 75 ++++++++++++++++++-
+>>   1 file changed, 74 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
+>> index 23698b8c2f4d..8fc507bf902a 100644
+>> --- a/tools/testing/selftests/landlock/socket_test.c
+>> +++ b/tools/testing/selftests/landlock/socket_test.c
+>> @@ -7,7 +7,7 @@
+>>   
+>>   #define _GNU_SOURCE
+>>   
+>> -#include "landlock.h"
+>> +#include <linux/landlock.h>
+>>   #include <linux/pfkeyv2.h>
+>>   #include <linux/kcm.h>
+>>   #include <linux/can.h>
+>> @@ -665,4 +665,77 @@ TEST(kernel_socket)
+>>   	EXPECT_EQ(0, test_socket(AF_SMC, SOCK_STREAM, 0));
+>>   }
+>>   
+>> +FIXTURE(packet_protocol)
+>> +{
+>> +	struct protocol_variant prot_allowed, prot_tested;
+>> +};
+>> +
+>> +FIXTURE_VARIANT(packet_protocol)
+>> +{
+>> +	bool packet;
+>> +};
+>> +
+>> +FIXTURE_SETUP(packet_protocol)
+>> +{
+>> +	self->prot_allowed.type = self->prot_tested.type = SOCK_PACKET;
+>> +
+>> +	self->prot_allowed.family = variant->packet ? AF_PACKET : AF_INET;
+>> +	self->prot_tested.family = variant->packet ? AF_INET : AF_PACKET;
+> 
+> Nit: You might as well write these resulting prot_allowed and prot_tested struct
+> values out in the two fixture variants.  It's one layer of indirection less and
+> clarity trumps deduplication in tests, IMHO.  Fine either way though.
 
-$ cat /proc/interrupts | grep ens | cut -f1 --delimiter=':'
- 50
- 51
- 52
+Agreed, thanks!
 
-While e1000e allocates 3 IRQs (RX, TX, and other), it looks like e1000e
-only has a single NAPI, so I've associated the NAPI with the RX IRQ (50
-on my system, seen above):
+> 
+> 
+>> +
+>> +	/* Packet protocol requires NET_RAW to be set (Cf. packet_create). */
+>> +	set_cap(_metadata, CAP_NET_RAW);
+>> +};
+>> +
+>> +FIXTURE_TEARDOWN(packet_protocol)
+>> +{
+>> +	clear_cap(_metadata, CAP_NET_RAW);
+>> +}
+>> +
+>> +/* clang-format off */
+>> +FIXTURE_VARIANT_ADD(packet_protocol, packet_allows_inet) {
+>> +	/* clang-format on */
+>> +	.packet = true,
+>> +};
+>> +
+>> +/* clang-format off */
+>> +FIXTURE_VARIANT_ADD(packet_protocol, inet_allows_packet) {
+>> +	/* clang-format on */
+>> +	.packet = false,
+>> +};
+>> +
+>> +TEST_F(packet_protocol, alias_restriction)
+>> +{
+>> +	const struct landlock_ruleset_attr ruleset_attr = {
+>> +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> +	};
+>> +	struct landlock_socket_attr packet_socket_create = {
+>> +		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>> +		.family = self->prot_allowed.family,
+>> +		.type = self->prot_allowed.type,
+>> +	};
+>> +	int ruleset_fd;
+>> +
+>> +	/*
+>> +	 * Checks that packet socket is created sucessfuly without
+> 
+> Typo nit: "successfully"
+> 
+> Please also check in other locations, I might well have missed some ;-)
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                       --dump napi-get --json='{"ifindex": 2}'
-[{'id': 145, 'ifindex': 2, 'irq': 50}]
+Of course, sorry for that)
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                       --dump queue-get --json='{"ifindex": 2}'
-[{'id': 0, 'ifindex': 2, 'napi-id': 145, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'napi-id': 145, 'type': 'tx'}]
+> 
+>> +	 * landlock restrictions.
+>> +	 */
+>> +	ASSERT_EQ(0, test_socket_variant(&self->prot_tested));
+>> +
+>> +	ruleset_fd =
+>> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
+>> +	ASSERT_LE(0, ruleset_fd);
+>> +
+>> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
+>> +				       &packet_socket_create, 0));
+>> +	enforce_ruleset(_metadata, ruleset_fd);
+>> +	ASSERT_EQ(0, close(ruleset_fd));
+>> +
+>> +	/*
+>> +	 * (AF_INET, SOCK_PACKET) is an alias for the (AF_PACKET, SOCK_PACKET)
+>> +	 * (Cf. __sock_create). Checks that Landlock does not restrict one pair
+>> +	 * if the other was allowed.
+>> +	 */
+>> +	EXPECT_EQ(0, test_socket_variant(&self->prot_tested));
+> 
+> Why not check both AF_INET and AF_PACKET in both fixtures?
+> Since they are synonymous, they should both work, no matter which
+> of the two variants was used in the rule.
+> 
+> It would be slightly more comprehensive and make the fixture smaller.
+> WDYT?
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/ethernet/intel/e1000e/netdev.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Agreed, prot_tested should be removed.
 
-diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-index f103249b12fa..b527642c3a82 100644
---- a/drivers/net/ethernet/intel/e1000e/netdev.c
-+++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-@@ -4613,6 +4613,7 @@ int e1000e_open(struct net_device *netdev)
- 	struct e1000_hw *hw = &adapter->hw;
- 	struct pci_dev *pdev = adapter->pdev;
- 	int err;
-+	int irq;
- 
- 	/* disallow open during test */
- 	if (test_bit(__E1000_TESTING, &adapter->state))
-@@ -4676,7 +4677,15 @@ int e1000e_open(struct net_device *netdev)
- 	/* From here on the code is the same as e1000e_up() */
- 	clear_bit(__E1000_DOWN, &adapter->state);
- 
-+	if (adapter->int_mode == E1000E_INT_MODE_MSIX)
-+		irq = adapter->msix_entries[0].vector;
-+	else
-+		irq = adapter->pdev->irq;
-+
-+	netif_napi_set_irq(&adapter->napi, irq);
- 	napi_enable(&adapter->napi);
-+	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_RX, &adapter->napi);
-+	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_TX, &adapter->napi);
- 
- 	e1000_irq_enable(adapter);
- 
-@@ -4735,6 +4744,8 @@ int e1000e_close(struct net_device *netdev)
- 		netdev_info(netdev, "NIC Link is Down\n");
- 	}
- 
-+	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_RX, NULL);
-+	netif_queue_set_napi(netdev, 0, NETDEV_QUEUE_TYPE_TX, NULL);
- 	napi_disable(&adapter->napi);
- 
- 	e1000e_free_tx_resources(adapter->tx_ring);
--- 
-2.34.1
-
+> 
+>> +}
+>> +
+>>   TEST_HARNESS_MAIN
+>> -- 
+>> 2.34.1
+>>
+> 
+> —Günther
 
