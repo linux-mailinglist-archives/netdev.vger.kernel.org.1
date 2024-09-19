@@ -1,144 +1,102 @@
-Return-Path: <netdev+bounces-128882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34ABF97C4C4
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:19:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D89CF97C4CB
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:22:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6362D1C2222B
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 07:19:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59800B213C6
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 07:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700911925A9;
-	Thu, 19 Sep 2024 07:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dw7d2xBj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A0F41922DF;
+	Thu, 19 Sep 2024 07:22:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA94192593;
-	Thu, 19 Sep 2024 07:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E3A722098
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 07:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726730383; cv=none; b=nuSkFZSdz19hrPbedooaXZtlnv9qDGB01f96ou6mmMoM9gX3zTLgZwPBGpaW5OucbAAE19fGGJOQZC79Q53sJ2KH6pY8UxycqNY7gYbRl6VFFPmKB7cT9xgcY3CaADiLyhILpUiDElRpiGjIjftL6H4TmGXqA4U2CNuwb5MxF48=
+	t=1726730551; cv=none; b=Pz8e2VzjObEIzOzhgA98dAMgiv0fAmwHmrIgbmqZFvThrLqJvNzm9IpS0ztVxDEnD1I0Yqga+S1TrLBNkiyYb/+YJEiGLAdaPRt5gAecMreG5WPBNOT0MHsHZSo+Tp4g/bWRQeFbb+7bx374u2OOCl4vStWyjTuBgvpw9Hnp1Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726730383; c=relaxed/simple;
-	bh=xgA8G3nc0J2EPhpNgAx9tM/joMRB8dT/O5HDpx8HPF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qsNdRW6dLOGW9I5mUgwuB3cYMui1+FpjCVy6ZSdSzIFl4oqH296U3vXQxUZ062UgDzzVb5eQeQC+iixXpBSJILIwFLulCNJHHxhVbV4rDU37HB9WTHLzIp9dmzZJOfW7LFJqfRKj40HD2ISr2R8xinsb4udKlJU5WkoHN+AHwWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dw7d2xBj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1A2FC4CEC4;
-	Thu, 19 Sep 2024 07:19:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726730383;
-	bh=xgA8G3nc0J2EPhpNgAx9tM/joMRB8dT/O5HDpx8HPF0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Dw7d2xBjuSX4iOelZBZQZmOM4JstPWpzT3oHmacEbGJDdVpncG3rVqW4PFstCQcyt
-	 mjisC4T6hhcD67cXSKEc2c3vQeUUykp2fcyEpG/nZXDzWIQ5PCIwYIR4akmHrXxNY9
-	 jOJmNLdCm5PWNla7dvswtFqjNSrMhYM/mItZpN86DyVW90JYepGkNVdpjGZyEGHnr7
-	 HNi8kBsiGIG0a5n25/Af0HhtpqhietiCu33U+347y47kfiYfb2eSJfPWsi0vuzq6uk
-	 n2xt9RTaFdjZ23zbIyx66u/VaBy5pTKBswaSuMSprYvCdH7vTG+40nF1W6119H8Mul
-	 e9z9UrZjVFInA==
-Date: Thu, 19 Sep 2024 08:19:37 +0100
-From: Simon Horman <horms@kernel.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH nf-next 0/2] netfilter: conntrack: label helpers
- conditional compilation updates
-Message-ID: <20240919071801.GB1044577@kernel.org>
-References: <20240916-ct-ifdef-v1-0-81ef1798143b@kernel.org>
- <Zuq-7kULeAMPRmFg@calendula>
- <Zurbw1-Fl0EfdC0l@smile.fi.intel.com>
- <Zurjur431P7DqifB@calendula>
- <ZusHYUGYPADO1SgY@smile.fi.intel.com>
- <ZutMf_f0tQwQZFzH@calendula>
+	s=arc-20240116; t=1726730551; c=relaxed/simple;
+	bh=k/u3oo65fD534gkdUGpk8YrYHrLidiMaY1KBvybQwF0=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=P4gR4l7jXX0TPJcnvajcv0lOfiyCplKzEJ4i+anIFYeFGhjgOjHttkRVGyNNOd52FWe1gSTVZ+EVBiI9B8navcU4ruwHfE/BTA9wR6v2hgDjpYoTTY2rgkeWW7U5lh1lBlDSy9WEGKqxB/P9QtpAlf2/BH9+T3pyQ3lKuwQLGf4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4X8Rmc1kcgz1ym26;
+	Thu, 19 Sep 2024 15:22:24 +0800 (CST)
+Received: from kwepemm000019.china.huawei.com (unknown [7.193.23.135])
+	by mail.maildlp.com (Postfix) with ESMTPS id D51A214022F;
+	Thu, 19 Sep 2024 15:22:23 +0800 (CST)
+Received: from kwepemm000018.china.huawei.com (7.193.23.4) by
+ kwepemm000019.china.huawei.com (7.193.23.135) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 19 Sep 2024 15:22:23 +0800
+Received: from kwepemm000018.china.huawei.com ([7.193.23.4]) by
+ kwepemm000018.china.huawei.com ([7.193.23.4]) with mapi id 15.01.2507.039;
+ Thu, 19 Sep 2024 15:22:23 +0800
+From: chengyechun <chengyechun1@huawei.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: Jay Vosburgh <j.vosburgh@gmail.com>, =?gb2312?B?o6xBbmR5IEdvc3BvZGFyZWs=?=
+	<andy@greyhouse.net>
+Subject: [Discuss]Questions about active slave select in bonding 8023ad
+Thread-Topic: [Discuss]Questions about active slave select in bonding 8023ad
+Thread-Index: AdsKZKjErjnqndRMTZCIcmgDUhEG9g==
+Date: Thu, 19 Sep 2024 07:22:23 +0000
+Message-ID: <c464627d07434469b363134ad10e3b4c@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZutMf_f0tQwQZFzH@calendula>
 
-On Wed, Sep 18, 2024 at 11:56:24PM +0200, Pablo Neira Ayuso wrote:
-> On Wed, Sep 18, 2024 at 08:01:21PM +0300, Andy Shevchenko wrote:
-> > On Wed, Sep 18, 2024 at 04:29:14PM +0200, Pablo Neira Ayuso wrote:
-> > > On Wed, Sep 18, 2024 at 04:55:15PM +0300, Andy Shevchenko wrote:
-> > > > On Wed, Sep 18, 2024 at 01:52:14PM +0200, Pablo Neira Ayuso wrote:
-> > > > > On Mon, Sep 16, 2024 at 04:14:40PM +0100, Simon Horman wrote:
-> > > > > > Hi,
-> > > > > > 
-> > > > > > This short series updates conditional compilation of label helpers to:
-> > > > > > 
-> > > > > > 1) Compile them regardless of if CONFIG_NF_CONNTRACK_LABELS is enabled
-> > > > > >    or not. It is safe to do so as the functions will always return 0 if
-> > > > > >    CONFIG_NF_CONNTRACK_LABELS is not enabled.  And the compiler should
-> > > > > >    optimise waway the code.  Which is the desired behaviour.
-> > > > > > 
-> > > > > > 2) Only compile ctnetlink_label_size if CONFIG_NF_CONNTRACK_EVENTS is
-> > > > > >    enabled.  This addresses a warning about this function being unused
-> > > > > >    in this case.
-> > > > > 
-> > > > > Patch 1)
-> > > > > 
-> > > > > -#ifdef CONFIG_NF_CONNTRACK_LABELS
-> > > > >  static inline int ctnetlink_label_size(const struct nf_conn *ct)
-> > > > > 
-> > > > > Patch 2)
-> > > > > 
-> > > > > +#ifdef CONFIG_NF_CONNTRACK_EVENTS
-> > > > >  static inline int ctnetlink_label_size(const struct nf_conn *ct)
-> > > > > 
-> > > > > They both refer to ctnetlink_label_size(), #ifdef check is not
-> > > > > correct.
-> > > > 
-> > > > But the first one touches more, no?
-> > > 
-> > > Yes, it also remove a #define ctnetlink_label_size() macro in patch #1.
-> > > I am fine with this series as is.
-> > 
-> > What I meant is that the original patch 1 takes care about definitions of
-> > two functions. Not just a single one.
-> 
-> My understanding is that #ifdef CONFIG_NF_CONNTRACK_LABELS that wraps
-> ctnetlink_label_size() is not correct (patch 1), instead
-> CONFIG_NF_CONNTRACK_EVENTS should be used (patch 2).
-> 
-> Then, as a side effect this goes away (patch 1):
-> 
-> -#else
-> -#define ctnetlink_dump_labels(a, b) (0)
-> -#define ctnetlink_label_size(a)     (0)
-> -#endif
-> 
-> that is why I am proposing to coaleasce these two patches in one.
-
-Thanks,
-
-Just to clarify. I did think there is value in separating the two changes.
-But that was a subjective judgement on my part.
-
-Your understanding of the overall change is correct.
-And if it is preferred to have a single patch - as seems to be the case -
-then that is fine by me.
-
-Going forward, I'll try to remember not to split-up patches for netfilter
-so much.
-
-Kind regards,
-Simon
+SGkgYWxsLA0KUmVjZW50bHmjrEknbSBoYXZpbmcgYSBwcm9ibGVtIHN0YXJ0aW5nIGJvbmQuIEl0
+J3MgYW4gb2NjYXNpb25hbCBwcm9ibGVtLg0KQWZ0ZXIgdGhlIHNsYXZlIGFuZCBib25kIGFyZSBj
+b25maWd1cmVkLCB0aGUgbmV0d29yayBmYWlscyB0byBiZSByZXN0YXJ0ZWQuIFRoZSBmYWlsdXJl
+IGNhdXNlIGlzIGFzIGZvbGxvd3M6DQqhsC9ldGMvc3lzY29uZmlnL25ldHdvcmstc2NyaXB0cy9p
+ZnVwLWV0aFsyNzQ3MTI5XTogRXJyb3IsIHNvbWUgb3RoZXIgaG9zdCAoKSBhbHJlYWR5IHVzZXMg
+YWRkcmVzcyAxLjEuMS4zOS6hsQ0KV2hlbiB0aGUgbmV0d29yayB1c2VzIGFycGluZyB0byBjaGVj
+ayB3aGV0aGVyIGFuIElQIGFkZHJlc3MgY29uZmxpY3Qgb2NjdXJzLCBhbiBlcnJvciBvY2N1cnMs
+IGJ1dCB0aGUgSVAgYWRkcmVzcyBjb25mbGljdCBpcyBub3QgY2F1c2VkLiB0aGlzIGlzIHZlcnkg
+c3RyYW5nZS4NClRoZSBrZXJuZWwgdmVyc2lvbiA1LjEwIGlzIHVzZWQuIFRoZSBib25kIGNvbmZp
+Z3VyYXRpb24gaXMgYXMgZm9sbG93czoNCg0KQk9ORElOR19PUFRTPSdtb2RlPTQgbWlpbW9uPTEw
+MCBsYWNwX3JhdGU9ZmFzdCB4bWl0X2hhc2hfcG9saWN5PWxheWVyMys0Jw0KVFlQRT1Cb25kDQpC
+T05ESU5HX01BU1RFUj15ZXMNCkJPT1RQUk9UTz1zdGF0aWMNCk5NX0NPTlRST0xMRUQ9bm8NCklQ
+VjRfRkFJTFVSRV9GQVRBTD1ubw0KSVBWNklOSVQ9eWVzDQpJUFY2X0FVVE9DT05GPXllcw0KSVBW
+Nl9ERUZST1VURT15ZXMNCklQVjZfRkFJTFVSRV9GQVRBTD1ubw0KSVBWNl9BRERSX0dFTl9NT0RF
+PXN0YWJsZS1wcml2YWN5DQpOQU1FPWJvbmQwDQpERVZJQ0U9Ym9uZDANCk9OQk9PVD15ZXMNCklQ
+QUREUj0xLjEuMS4zOA0KTkVUTUFTSz0yNTUuMjU1LjAuMA0KSVBWNkFERFI9MToxOjE6OjM5LzY0
+DQoNClRoZSBzbGF2ZSBjb25maWd1cmF0aW9uIGlzIGFzIGZvbGxvd3M6IGFuZCBJIGhhdmUgZm91
+ciBzaW1pbGFyIHNsYXZlcyBlbnAxM3MwLGVucDE0czAsZW5wMTVzMA0KDQpOQU1FPWVucDEyczAN
+CkRFVklDRT1lbnAxMnMwDQpCT09UUFJPVE89bm9uZQ0KT05CT09UPXllcw0KVVNFUkNUTD1ubw0K
+Tk1fQ09OVFJPTExFRD1ubw0KTUFTVEVSPWJvbmQwDQpTTEFWRT15ZXMNCklQVjZJTklUPXllcw0K
+SVBWNl9BVVRPQ09ORj15ZXMNCklQVjZfREVGUk9VVEU9eWVzDQpJUFY2X0ZBSUxVUkVfRkFUQUw9
+bm8NCg0KQWZ0ZXIgSSBkaXNjb3ZlcmVkIHRoaXMgcHJvYmxlbSwgSSByZXN0YXJ0ZWQgdGhlIG5l
+dHdvcmsgbXVsdGlwbGUgdGltZXMgYW5kIGl0IGFsd2F5cyBoYXBwZW5lZCBvbmNlIG9yIHR3aWNl
+Lg0KQWZ0ZXIgc29tZSBkZWJ1Z2dpbmcsIGl0IGlzIGZvdW5kIHRoYXQgdGhlIGJvbmQgaW50ZXJm
+YWNlIGRvZXMgbm90IGhhdmUgYW4gYXZhaWxhYmxlIHNsYXZlIHdoZW4gdGhlIGFycGluZyBwYWNr
+ZXQgaXMgc2VudC4gQXMgYSByZXN1bHQsIHRoZSBhcnBpbmcgcGFja2V0IGZhaWxzIHRvIGJlIHNl
+bnQuDQpXaGVuIHRoZSBwcm9ibGVtIG9jY3VycywgdGhlIGFjdGl2ZSBzbGF2ZSBub2RlIGlzIHN3
+aXRjaGVkIGZyb20gZW5wMTJzMCB0byBlbnAxM3MwLiBIb3dldmVyLCB0aGUgYmFja3VwIG9mIGVu
+cDEzczAgaXMgbm90IGNoYW5nZWQgZnJvbSAxIHRvIDAgaW1tZWRpYXRlbHkgYWZ0ZXIgdGhlIHN3
+aXRjaG92ZXIgaXMgY29tcGxldGUuIFRoaXMgaXMgYSBtZWNoYW5pc20gb3IgYnVnPw0KDQpBZnRl
+ciB0aGlua2luZyBhYm91dCBpdCwgSSBoYXZlIGEgZG91YnQgYWJvdXQgdGhlIHNlbGVjdCBvZiBh
+Y3RpdmUgc2xhdmUuIEluIHRoZSBhZF9hZ2dfc2VsZWN0aW9uX3Rlc3QgZnVuY3Rpb24sIGlmIGNv
+bmRpdGlvbiAzYSBpcyBtZXQsIHRoYXQgaXMsIGlmIChfX2FnZ19oYXNfcGFydG5lcihjdXJyKSAm
+JiAhX19hZ2dfaGFzX3BhcnRuZXIoYmVzdCkpo6xhbmQgYWZ0ZXIgdGhlIGFjdGl2ZSBzbGF2ZSBz
+d2l0Y2ggaXMgc3VjY2Vzc2Z1bCwgd2h5IG5vdCBlbmFibGVfcG9ydCB0aGUgYmVzdCBzbGF2ZSBp
+biBhZF9hZ2dfc2VsZWN0aW9uX2xvZ2ljPw0K
 
