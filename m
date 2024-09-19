@@ -1,125 +1,156 @@
-Return-Path: <netdev+bounces-128947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB64F97C896
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 13:27:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A77C397C89B
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 13:28:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0818D1C2378C
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 11:27:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EF33B2306A
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 11:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1131019D089;
-	Thu, 19 Sep 2024 11:27:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E4719D08C;
+	Thu, 19 Sep 2024 11:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b="D1Tb7bJu"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="gS1o+2uJ";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="sUyvtQi8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pv50p00im-ztdg10021101.me.com (pv50p00im-ztdg10021101.me.com [17.58.6.44])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAA019D075
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 11:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.58.6.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A70C0199FD0;
+	Thu, 19 Sep 2024 11:27:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726745237; cv=none; b=IY3Uz8GXvfdd/C7UanIXKFVrVJbTgS2xKxKfpCEZEZaig3XFiRX2FpnJH8aM/mWTavpZmcDcGBry3XVOYBaZNXrpLiUh7yDSqteickjpO/0jJgwhwPVDau5Q6cMHOMRs9+Ea55QfhDDjpk+/nY+AM8gdrluqnLz1ztWkApMBk8Q=
+	t=1726745282; cv=none; b=moOB6m9twgRtG3XzLbRIlrllqnSpw0AXEDf+FzTVc3RYRUHhUmOe0KYsh8o/lz8YNiOeZ7YkcVHQewvQduUyBJGk6uCZmAjYmgg65rkxAZJ5hRnHyeQOHV4FLyUtoypQPwrtXHwPoqxWuU0tC1zBlyQdyuUGslYGv7PHE+OPJvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726745237; c=relaxed/simple;
-	bh=fgVpUcAySeIBeP8k8gsO91t2btH/xXxOVxiOXuh+m1k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sCB3njv+EuK7NMqX9gT2+kI5NLOKH05wu/wDD5ob/dkAJIaOGpGLSuNH7eBct2CgmaTNcjRR3s5cZ9YZv9OkWFt/1YXk3v9mZXyqPwJB7HRw2vewgrFbN5gQpYMXBMBLbfjsMdojm00JEcTmY1zuJ5oU0yhrnVdWvhq/mlJV6RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com; spf=pass smtp.mailfrom=icloud.com; dkim=pass (2048-bit key) header.d=icloud.com header.i=@icloud.com header.b=D1Tb7bJu; arc=none smtp.client-ip=17.58.6.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=icloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=icloud.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=icloud.com;
-	s=1a1hai; t=1726745235;
-	bh=KdTvDYdRoGxP0L4oFQjsqH/WGJexNKEo7pYA5j9xk5E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	b=D1Tb7bJu98fN+lzZqsHWZHZzF4uly7VEXIjKR+QB6Koljsz6pVl4XVP2TVn1jvvaK
-	 OedVePhQ01AmvUXM8IKlq7nqcVYec5mn6ftTUsljra5n3MFBXRKYq16gw6hx+8dzxR
-	 KArX3A/0/Qw2PyzOlo1SmHQQAcr+4OweDcwEpZSPsAZ4n6RN8f4QhusISYIqeEiXJj
-	 TKViU8my938iLuUZbKNkmSAgC/1+iFSD9IRN8I2U348kB61d8RCaBbcsFWTfeCztiy
-	 HIv39jKSCCRlIL+nzkkEE+G8kcjO+lIv+PXJuHQNDqENLpmsWFYHhdX5XMQP5KLAw2
-	 AuOvNOJBsIixw==
-Received: from [192.168.1.26] (pv50p00im-dlb-asmtp-mailmevip.me.com [17.56.9.10])
-	by pv50p00im-ztdg10021101.me.com (Postfix) with ESMTPSA id E4C75D0032F;
-	Thu, 19 Sep 2024 11:27:09 +0000 (UTC)
-Message-ID: <f70ca3a8-2fe8-404c-8ead-7e7bc5417f52@icloud.com>
-Date: Thu, 19 Sep 2024 19:27:00 +0800
+	s=arc-20240116; t=1726745282; c=relaxed/simple;
+	bh=YBXzMq+t9SmI+2Czr9UYejhXeY1g5J7XoznuPVgx0vQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=s8NGtJdwvyXuZ4/RghFj/mw9kz8GbppD2MmaujJlxsxZ1UnDH7O9ZEjvb2T+24x7Jja3O4UflqFPxDpUdFeW+3PsSNMAmZoig4dwVanSzJcPqDIk3NIFhE3vypsIn8MBBpWuLyLLTCCua3VopwSzZunEZEkrKyHj8kaLVk0iLgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=gS1o+2uJ; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=sUyvtQi8 reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1726745279; x=1758281279;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=CzE9ykpUdDz8aAMAjQQwVPCItKYM0lPcbiDeepD5YKI=;
+  b=gS1o+2uJwFXHR5I8bvoVmLSz768bWYMdTJBf3Ly2wUDcA/Wrm6bZ8lK1
+   c2Jkrit0dN7HzlcCnAqiQUgOQqDu4tzSmHIymjzFElH2ojghA2VrT3nQf
+   a699tx006/Zf0JthlBU/Rg9DS3DXAR4HAX/zmvAeuvVZogZlOuiIY3jjA
+   kbqRQEag0hBQOcpaL6whmGLfbMJz9yi/pbLMroxqcnHTdFnbE3/H2wS/Q
+   22TxXHSPeoJcE6g/lPDVMKl2gDcNiblxyXRz7whfk/P67vncbOUZ/w8ix
+   1YoQDQhyu2ZlSEFDiz0uRxypMtHebjTobTWzTyYDhgnnvkU8m4qw/4MGZ
+   w==;
+X-CSE-ConnectionGUID: sAC9dt4QRd6/T3OTiNSz3Q==
+X-CSE-MsgGUID: Jrh/ttjSRmWKVLSKMkQAFA==
+X-IronPort-AV: E=Sophos;i="6.10,241,1719871200"; 
+   d="scan'208";a="39024125"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 19 Sep 2024 13:27:56 +0200
+X-CheckPoint: {66EC0ABB-24-E520F13A-D17B83D9}
+X-MAIL-CPID: 8D00C0C6F25B9C3A6D8E8E4FB426A0F5_2
+X-Control-Analysis: str=0001.0A682F21.66EC0ABC.0076,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5F15016CB31;
+	Thu, 19 Sep 2024 13:27:46 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1726745271;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=CzE9ykpUdDz8aAMAjQQwVPCItKYM0lPcbiDeepD5YKI=;
+	b=sUyvtQi8M9djNkuhWu14s0Kkv7AJiwNJvp9CGlmmojXJWmZiKnprUtAD7HJ5UyHl8Zpe3S
+	11M3mnnIwFPHQKd/I1fFW0tuy3yEBEHy7bB2pXv0aPyDooWkN8mNn8cuj+F0+yRPXGwixW
+	iM2YKCzQeH+5wOADa9KOwbiVoCKoCPYVEQApM08fOGb767dhq0b88E8f2AKoJZ2WghmFip
+	BS7Xswaj0u5U5fMah7A8BEzN9AWaN6WwFQLF/wzf/KTFYvRnx1h1Q3TEnBhorCKdbzXz8f
+	hUMQP8DgLxJShKc4EfGrTctZ/v7ZgdK9Jeod5tMrSalGzUMk5kNzcwoeqyLN1g==
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Martin=20Hundeb=C3=B8ll?= <martin@geanix.com>,
+	Markus Schneider-Pargmann <msp@baylibre.com>,
+	"Felipe Balbi (Intel)" <balbi@kernel.org>,
+	Raymond Tan <raymond.tan@intel.com>,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@ew.tq-group.com,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Subject: [PATCH v2 1/2] can: m_can: set init flag earlier in probe
+Date: Thu, 19 Sep 2024 13:27:27 +0200
+Message-ID: <ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726745009.git.matthias.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5] net: qcom/emac: Find sgmii_ops by
- device_for_each_child()
-To: Paolo Abeni <pabeni@redhat.com>, Timur Tabi <timur@kernel.org>,
- "David S. Miller" <davem@davemloft.net>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Zijun Hu <quic_zijuhu@quicinc.com>
-References: <20240917-qcom_emac_fix-v5-1-526bb2aa0034@quicinc.com>
- <9b668881-b933-4bae-a0da-a107d2b531e9@redhat.com>
-Content-Language: en-US
-From: Zijun Hu <zijun_hu@icloud.com>
-In-Reply-To: <9b668881-b933-4bae-a0da-a107d2b531e9@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: HNOrW86dCj3dHNWGypTol5F5ngsr9IqW
-X-Proofpoint-ORIG-GUID: HNOrW86dCj3dHNWGypTol5F5ngsr9IqW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-19_08,2024-09-18_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 spamscore=0
- bulkscore=0 clxscore=1015 suspectscore=0 phishscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2409190074
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 2024/9/19 16:26, Paolo Abeni wrote:
-> On 9/17/24 03:57, Zijun Hu wrote:
->> From: Zijun Hu <quic_zijuhu@quicinc.com>
->>
->> To prepare for constifying the following old driver core API:
->>
->> struct device *device_find_child(struct device *dev, void *data,
->>         int (*match)(struct device *dev, void *data));
->> to new:
->> struct device *device_find_child(struct device *dev, const void *data,
->>         int (*match)(struct device *dev, const void *data));
->>
->> The new API does not allow its match function (*match)() to modify
->> caller's match data @*data, but emac_sgmii_acpi_match(), as the old
->> API's match function, indeed modifies relevant match data, so it is
->> not suitable for the new API any more, solved by implementing the same
->> finding sgmii_ops function by correcting the function and using it
->> as parameter of device_for_each_child() instead of device_find_child().
->>
->> By the way, this commit does not change any existing logic.
->>
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> 
-> ## Form letter - net-next-closed
-> 
-> The merge window for v6.12 and therefore net-next is closed for new
-> drivers, features, code refactoring and optimizations. We are currently
-> accepting bug fixes only.
-> 
-> Please repost when net-next reopens after Sept 30th.
-> 
-> RFC patches sent for review only are obviously welcome at any time.
->
+While an m_can controller usually already has the init flag from a
+hardware reset, no such reset happens on the integrated m_can_pci of the
+Intel Elkhart Lake. If the CAN controller is found in an active state,
+m_can_dev_setup() would fail because m_can_niso_supported() calls
+m_can_cccr_update_bits(), which refuses to modify any other configuration
+bits when CCCR_INIT is not set.
 
-thanks for your remainder. will post it after merge window is opened again.
+To avoid this issue, set CCCR_INIT before attempting to modify any other
+configuration flags.
 
-and always welcome code reviewers to give comments before that.
+Fixes: cd5a46ce6fa6 ("can: m_can: don't enable transceiver when probing")
+Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+---
 
-(^^).
+v2: no changes
 
-> See:
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+ drivers/net/can/m_can/m_can.c | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+index 012c3d22b01dd..47481afb9add3 100644
+--- a/drivers/net/can/m_can/m_can.c
++++ b/drivers/net/can/m_can/m_can.c
+@@ -1681,6 +1681,14 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
+ 		return -EINVAL;
+ 	}
+ 
++	/* Forcing standby mode should be redundant, as the chip should be in
++	 * standby after a reset. Write the INIT bit anyways, should the chip
++	 * be configured by previous stage.
++	 */
++	err = m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
++	if (err)
++		return err;
++
+ 	if (!cdev->is_peripheral)
+ 		netif_napi_add(dev, &cdev->napi, m_can_poll);
+ 
+@@ -1732,11 +1740,7 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
+ 		return -EINVAL;
+ 	}
+ 
+-	/* Forcing standby mode should be redundant, as the chip should be in
+-	 * standby after a reset. Write the INIT bit anyways, should the chip
+-	 * be configured by previous stage.
+-	 */
+-	return m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
++	return 0;
+ }
+ 
+ static void m_can_stop(struct net_device *dev)
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
 
 
