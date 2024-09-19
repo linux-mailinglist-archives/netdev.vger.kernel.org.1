@@ -1,341 +1,343 @@
-Return-Path: <netdev+bounces-128951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238BC97C8DB
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:04:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2814197C8E0
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:10:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4880A1C20947
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:04:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D237E283402
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A598C1993AD;
-	Thu, 19 Sep 2024 12:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952AD199FCD;
+	Thu, 19 Sep 2024 12:10:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="DK6Wnnlo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7zLqgXy"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2057.outbound.protection.outlook.com [40.107.243.57])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A311990CF;
-	Thu, 19 Sep 2024 12:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.57
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726747487; cv=fail; b=rLcE6qs84v+Hz0p46PrPENMmmcghI5BlwW535o6lfApQIyFxxNGBtd5cnZLkEXr7Udh/mS90A65eC3gDWN0UyAOKIBS2kDlqaW7mAQu/hxIYMLozeCPR+3vBTMEjR1Ho9KTsjvjEumNBAwnVTUu1BhcASNjIBeTNVGNafZ3vF3Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726747487; c=relaxed/simple;
-	bh=kzO2LScQwigT7a7nqNxTaR779vYeHC1Tx/nC41bvMM8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=lLSjfK0NEUzmM3XEcUqTpD95pvwT2GWowhyNA3PV5hqjCRnn8a++bNqrNi7M0u/Wc6eHxQXf1xkT7I6eR+PYImx/5wXGjauGbXLdBFjAxRIuQySIlSu7jhmBpoQqv8dKvlFyjMEk1CVXWo1AVt8FSSrgImkqlrospoA6TtUNSZ8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=DK6Wnnlo; arc=fail smtp.client-ip=40.107.243.57
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Uqi8pRL0K5T4jlAdPnv8Qpqu8D76sN/6bC8KgV2G/gbhr9m2bVS8kxQ7H4qLi7pbTH6rrBJg8LUv+UbZx/Kbf/Htpo0kyRXtQS6uzjwkDzfDH56EfuNSMROdnu4p/w8I7StvG24jicZunQ6Xl/AQIjdoEAGYVeuvFnRjiXJqfIm5yLN78URfVpkeScWSGKo17PBzIxhmDVOLypJ1AxZoMV/I95TEbdn6blpiLOxLZd6hMKYMN21XEIrYpOHkUxRS7mrofF8vN65FcXV5Gdb4krHjRCOQ8XXr8NZvfYUfTY6dor5t4pe5CnEAQpl1jGIwnwwzMeU67vmfET/6EAXm9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tgrtSqSl4hIHEV309MXMDaZHAgAfEtnyJH6qoOqpcao=;
- b=QvHQda15HRgP9vzBIZkCLbYhvzJ27jUz7LPYTrMWZPP2NDoZhJ+RYRbH9kMFP6BWK8LJKQIUF7ts0CvI9doxbMiIz047Ipfa6/xRl+3gJ2q2vthwvtrcqxyGNetY3MHyIMKls7/CBo9qDp8Yx1FIhcoF9LwOA6Pkvw5Qa7JNTMpLLbf6r9HWlvBR4rVox2SFuQMioD5V218L5lU8R/0g4qb0ehksOTS/kW41PFz8VLjvk+H4bxNN+j9stKBfNZzTEzNpsB79xpi+NMiBcOJUrhMttNVghtYJ6S43rbmNrz9GiIlaAKE4abKMJRyvplFp+Qkyv+VxqZrAKuqivBMldA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tgrtSqSl4hIHEV309MXMDaZHAgAfEtnyJH6qoOqpcao=;
- b=DK6WnnloMkbaxmCRv51u9Ty0fnPq8jcfovY8pRX4NDNpxUVlbWclCtJNvzsMVww1x1MBIzsnflNlR2p2hu1PIi6dXSg9/EOUv3r3FFzQ6up72S3hRHFstwZfk+6AKe2N834fVEdb31blgSq5zKjFJQpcllwa26RW0jFTNLedURiUSq7SB6oBGVbAxVf5HeRiifqK9m2Q8OhBNWvbOuabAstLkZoG6QW783yFSTzk+HaHgzZGJ2BPAgqgF2pf8RiL1dpwZ1Udsq0Ho050SKnE1bB+csW2r8wF6PB5t1zntnoHvTx5JmFD/KAMPa9twwndYI0kiny6t1V6Wioi413qDA==
-Received: from DM4PR11MB6239.namprd11.prod.outlook.com (2603:10b6:8:a7::20) by
- BY1PR11MB8006.namprd11.prod.outlook.com (2603:10b6:a03:52d::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.17; Thu, 19 Sep
- 2024 12:04:38 +0000
-Received: from DM4PR11MB6239.namprd11.prod.outlook.com
- ([fe80::244e:154d:1b0b:5eb5]) by DM4PR11MB6239.namprd11.prod.outlook.com
- ([fe80::244e:154d:1b0b:5eb5%3]) with mapi id 15.20.7982.012; Thu, 19 Sep 2024
- 12:04:38 +0000
-From: <Tarun.Alle@microchip.com>
-To: <linux@armlinux.org.uk>
-CC: <Arun.Ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next V4] net: phy: microchip_t1: SQI support for
- LAN887x
-Thread-Topic: [PATCH net-next V4] net: phy: microchip_t1: SQI support for
- LAN887x
-Thread-Index: AQHbCPloJPya9IPhQki3fxOwbliPerJcCemAgAL7zUA=
-Date: Thu, 19 Sep 2024 12:04:38 +0000
-Message-ID:
- <DM4PR11MB623907EC9F1C76CC7F14D3588B632@DM4PR11MB6239.namprd11.prod.outlook.com>
-References: <20240917115657.51041-1-tarun.alle@microchip.com>
- <ZumSKSI6vMfR61wP@shell.armlinux.org.uk>
-In-Reply-To: <ZumSKSI6vMfR61wP@shell.armlinux.org.uk>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM4PR11MB6239:EE_|BY1PR11MB8006:EE_
-x-ms-office365-filtering-correlation-id: fc2dfb44-a161-4917-2ad9-08dcd8a33c48
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6239.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?cvoGEZOU++a7l0pqCCy7tdFxuQfmDx/yDOYlfsvdCiOQfDrhxystjfNbSLbH?=
- =?us-ascii?Q?NV+Sv6gCfsTvSrDw4vWciByczxX9sa7lLNUIafXuodpLNOfLXXgJz+O01jO4?=
- =?us-ascii?Q?KOShFLDbv+JSvqxHz9WyjifPgB63vW9g0rSnhWvYWjhRTYqviXOoV3w+Zc9S?=
- =?us-ascii?Q?Q8RCRcfJlaYFApk/q0DM9NJUPCJ/4Ikr66VZ60MbUJfj3W7/6/PfG1RhcawP?=
- =?us-ascii?Q?mz/4yhsY7SxNCm8qPyvJnnHDVuRi+D2eZsEASQYrJ7V+Oro6i2IyUx75cbFu?=
- =?us-ascii?Q?yfX7IUIhsFi91nnB0z41AU5Zi0+4gG9malvaqgOh63cKengIyPwgW12BqDOW?=
- =?us-ascii?Q?ipzDQyXf4+SYfBxSbYk7mF1fLiK+VCYZ3frQqXkLZ7gNuxavE4N6lkwPzu4a?=
- =?us-ascii?Q?Qxg7wAPsT+BR7HSWcuqrl755Jb6KF6mzS033fQmh9PZ/+/oJgAzgEfZBAvSc?=
- =?us-ascii?Q?Z1GNLG1xxYjU92wEC3cRIea52naJw+QuyXmYFU56JVw1EG7JSviDGq8OPFFK?=
- =?us-ascii?Q?SBGSeEAkNYO9A/+hHKo2iJhkXCh73ZbTWFvOiwdaXZHJ/a7l5QRLVlx/epPB?=
- =?us-ascii?Q?WSifqOOGsjnZ25LbKOqp0BApZTQhtxt8tgNBNzOox5EwpaaBbQnDEJ1IvqIv?=
- =?us-ascii?Q?g32G9YGOb9QyCy7np21K6YuUefLtrDSoI0TfCR/soATR9bEqIOx4pJb7y1C4?=
- =?us-ascii?Q?MXIX60KNTvtwQyYxGwsT3KZb+C/SRaCXVyNqd4DelIf4+xaS01tcgW8crni4?=
- =?us-ascii?Q?Nu43RvSoP/sSUxieGGu6/ifAxiALZrUr7ElOYeWqhCJBxf8ZWgjRw8T06VLj?=
- =?us-ascii?Q?UxJ+6z49xX7G8c4OEplvBgB8wxpzSMtShSDVSpVzVR9Pj1jwBxgU2OM19l+f?=
- =?us-ascii?Q?vGAUYzSHbHpOxIHT1tHMTtrL//1LFniFy081ilWGHSn2ilo9dKBPcVVvecdF?=
- =?us-ascii?Q?rGFXZBJiI2le9CvRbG6mzzNdLjXVk8mHTUTGp1KpdKXO8TK3sI3q6Ld2kTVi?=
- =?us-ascii?Q?pC5ZsGzrnKkD17HF+o12gVGQxqSyMaUe+UoOFE0y7HV/Vh0eU8pTJCwi6vbk?=
- =?us-ascii?Q?p7X7RW4eM2ZoVy5FrEzRXoSF1+TJEZVKSicEsS50hGdkOw3UmNcjp2oLoEn1?=
- =?us-ascii?Q?mPw86nGGn5ZTNkG0zTAbUvQvbrQb/d7SOehuqZmbRHgRs3GelKZZbrumwIcB?=
- =?us-ascii?Q?bRj4U5uFc2qtW2/aSudRlcwWNu5x1453ckg/w7e5RZ/wJGRXrSCzRT/4xF8k?=
- =?us-ascii?Q?n7rcjJQWLwOfBD1mEvoll3ATLUaA1DP21F7BUjVLVxuK1t/lt0kEnqUMZ8sD?=
- =?us-ascii?Q?JBr+8nX/v0Bqf1Xt4adwE4pWZnVNuCK2KZZXSf6pxQDS6FQzdGg4st2VgRWD?=
- =?us-ascii?Q?JxvRcWo=3D?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?awOsy0uNwaevo5E209HxJvLw3eKvhJPKTjUtHDP71zN8o/bOsj7bYH5GHYb8?=
- =?us-ascii?Q?wLter8YYElv+mvQmC4f2HowLOkwZY7OAkZTGE0JfA0XQCSd+cSfjU1r5EW+K?=
- =?us-ascii?Q?4wy5MSKCUHm6ps4oJm1IOvvGVwWf146MQwG9ZU52ISfPtl7DjQPfy7hrejWL?=
- =?us-ascii?Q?nh47ztdKGkkiSEytWlecZjyN8oqiDDQV5y5uAu1w1gZYXDKACWNqFgRseG59?=
- =?us-ascii?Q?P0AoR1CpT/olEavFJrJAMEtbHpx+Y5j/N7XV5lvdOTl8Z8R390WoXlpcDtPB?=
- =?us-ascii?Q?/XAUD3x+vaNzmXcKMHL6+VYTxjchFPH1hmNWFKhDma3TIRgd8+/gk8rQtvr4?=
- =?us-ascii?Q?VLVE3Ex/cUaV/6oSxjdEZB86kJu4DZapUqBnj943NZbafVs64PMpAfAugvIB?=
- =?us-ascii?Q?GvEl8HCt2ncVnN1WgH3WtgDyGoo0gkJR6rHkzc293aHmw1ZScKtyzUXnAqtr?=
- =?us-ascii?Q?VChpogYqPGLUTVM/4Im3AvbZneW/o5tzslUzM6Re7Tpx0+KeKisnF+My7cxV?=
- =?us-ascii?Q?km/PAaN9kdChmGI0lV3a7WHA+SMaN0OwaASVuXbl4GdTxFI7cV7KJtJkv0AT?=
- =?us-ascii?Q?6CSiaQG1xC4RbtOCzVXAG0w7lKle66QAw5GN+762x/9A0tMeE6fLOD1zDoxi?=
- =?us-ascii?Q?S7lie2Xot5GOjsmtCIMzcKIUDJySw59R6/bCx1QPu57yxqYMH3jQHtrVK8cM?=
- =?us-ascii?Q?jPrqn88ZNLsBKy/B5h9gs8y8S8GMgBq87cPPYT4MEWwUDUnGS7DmUMfGl3jQ?=
- =?us-ascii?Q?h1PEasumZA44bwqStnllfwj6hzpUAx16s1IQFbgfcxhbqMANh870uw8XAujJ?=
- =?us-ascii?Q?Qrrd1XJ701g+9qyAOqy5LVoGdQgzG7ZXc3lpbvYdbdr1nNhIZSt/t/7ZoXnf?=
- =?us-ascii?Q?QMt32vdkJPv9EncdQqKQfXnb4LUjN/pFeYBfgVxWRY+0PG2kYyYgWqbPn3Pj?=
- =?us-ascii?Q?MiyIM6nawcmGiWdS44wR+79IyOTEHjoJ/PYHtpyVf/XsGiXDaV2J2W9XppIK?=
- =?us-ascii?Q?qh0d57qg6r8KI6dJbthUWKDg1iPEIp9fPvVp90/KK+sQwzoxqVKQio0VwWu5?=
- =?us-ascii?Q?TAqzeFfRlVKhM4UsiUf6wAZRM+gDVn70CPPNWj/48oulIRvW1TGwI1qu2cWi?=
- =?us-ascii?Q?bq/odbIfr9vHyvW+H5EqLv54+lfVMFKIC9eJYFWA3/iHDMz/dtZl2EfS0RR5?=
- =?us-ascii?Q?BmXnjGX+acdCeOotWvjXn0nrkOXcmOG3+JOUlVMGbO9+7jll6aaKxoErHlpm?=
- =?us-ascii?Q?RKYSXhpGXQ6LDBDjWyHUMqT7MS2sXi0b9DNRApc1NLnlBjz18MC6UOrDiius?=
- =?us-ascii?Q?xS/K6NqtEuJcqVRZEb6OhsnmJ3pRSpFVMfU3UAUWpvy5KMNk2OeQPy7qexaO?=
- =?us-ascii?Q?PPO0ieA0cnU4Pnx0biDtCaOi1KMq+4oNzaBZ6S5xn4dLdbfpGBaU3RCjAybU?=
- =?us-ascii?Q?RJNAgqpRzaeaaGGy8HhEvdV96PuzZ0+IXIwWr1pdWt+Xo/rbdDoFoIlf6+aY?=
- =?us-ascii?Q?ZekqNrpJlICZj0fk9ANCNafycvVyYF7WA9ZEhZUPpC178ibnMINn2WvCyd3V?=
- =?us-ascii?Q?bxiMTiSkK786LpX+59kVIGBGgfGj/fbnlNR76kDY?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B450738DD6
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 12:10:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726747809; cv=none; b=ntGznb9WeVdn+F9vLC4rJ7CcTWmgVJjyQs3pdQtafRCOXaZESXUE882gwXg8Yb9YQgQSDf8sOBKBsZc6htVkGUQ3OFcoNQnaaGrp5vLI+bEf2OiXMheFWJ9Zw2yw4cQx8lQemAD2u/VvQ6XVO5qMVizWDiAUlv5EoJ31JjPFj7U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726747809; c=relaxed/simple;
+	bh=O8h0BeVrL411f5pRhP1ZQHEAW7+UfECIXXKjK8f/bhE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=BN9frLBpMQ8zvkWaEQOkTIUk3ikZ0XPkyYYcGV1jrqRtv18FB+8lesVxEbh3iM9mcXVIkKG1LYN1n+cUsMok24i+BaX8YPub/IHKqcp9K4wy4yjXusEpaW5awC7ac22CLhEdQsSqdCD9zCgF3HHJZnbGTPbj3ox+g3XxJQYlpK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b7zLqgXy; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6c35b72f943so6745836d6.0
+        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 05:10:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726747807; x=1727352607; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M4qTwz6Pf8ccLEBdOAmqOSmKBsr6pnHLytiJdUIQ518=;
+        b=b7zLqgXyFR/ldcIdQs1xHhJ5iQQ+Z3wguLM/5/sdOlrZM7etByDOCxf1W/2tudh/by
+         A7Qwph5C8oTMCBR/acNgkfhN1UBj9kFLW/pxlEnh1vENlpK2kVGHcnaMY7c6wNByPWRJ
+         D77Ir82sunzm5nHAQVzbSxLk7Zcf4J2VR1SvSQo7bY4J9VLrSwUEWDuoko1OG0bScmdO
+         4JqxjHaJHdY/EtcJ6IW5tnaD27pD2UojLb+LG4k1C7S4SraQXXBmPZ/fv9qLfbt3lp0B
+         1ASa00TUqWeIc9Mt4NRPM5x3L1roPI9Ep/R+D93ZOW7o888yRH9vK15q4z6bBwlmPyMV
+         JTKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726747807; x=1727352607;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=M4qTwz6Pf8ccLEBdOAmqOSmKBsr6pnHLytiJdUIQ518=;
+        b=N1w1kPRA30ehE2Cl065C5lW7ftg8L/NPyvilEcnlW5BMarmydLKJxjcrnHIV3hQu9c
+         YIe0PnkV6YRdHHiaa6SPFXyNinldV+7F9CW/Ol2CuxRcqGOBsT8f895P9OVBXqPJT04B
+         jnqahbqOa/EGBI4YvhNLdliqyqxMSw2cZk/C4clmxYO5QU/vO9aR6dBrWaGM92HHsNzf
+         Tmezsb9FcN8VxX4PPcB6vwmt8VzVcpXbCr4u+p4ShLWWSAC+lvOTWcz7Y7HhUOZvfEF9
+         ZxuUDROx7P2GopLRKuj0JXPMvSDQwoLzRSkgv1N0c8uHpmkFYAet424DLdAhqF2Wr4Eo
+         64gA==
+X-Forwarded-Encrypted: i=1; AJvYcCXwNx/QgrNoGQT4zpB9C/5/nKpetusyBoRJQlyDgvEfbe4IAlZbkx+wD0FHS9PFQzw630zlF6Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXmVoW41wQTNYokgBk5QCZOJFXCMjC9B7phwKmBF80FKltc6aR
+	X88QP4OoBmr1labWo+PeQiIJJsOyYTs3hqRFmmgLyyiunLH3Qftq
+X-Google-Smtp-Source: AGHT+IGEQQjdjXPNpEFWsx6yFIkJGC1jeui9L5yZElfx1HIgINb1QXrW2maBKLWxILJQbgJsVlyQBw==
+X-Received: by 2002:a05:6214:3a0a:b0:6c3:3efe:3fac with SMTP id 6a1803df08f44-6c67997fe18mr52970166d6.3.1726747806532;
+        Thu, 19 Sep 2024 05:10:06 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c75e44c0bcsm7031526d6.5.2024.09.19.05.10.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Sep 2024 05:10:06 -0700 (PDT)
+Date: Thu, 19 Sep 2024 08:10:05 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: greearb@candelatech.com, 
+ netdev@vger.kernel.org
+Cc: Ben Greear <greearb@candelatech.com>
+Message-ID: <66ec149daf042_2deb5229470@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240918205719.64214-1-greearb@candelatech.com>
+References: <20240918205719.64214-1-greearb@candelatech.com>
+Subject: Re: [PATCH] af_packet:  Fix softirq mismatch in tpacket_rcv
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: microchip.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6239.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fc2dfb44-a161-4917-2ad9-08dcd8a33c48
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2024 12:04:38.2063
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: G1f03q5Ku8UYleRCkP8P/a1LJgNIxeYAm8K6jhVtfqv+1B9u891fgK1RZTdKz2wd+RJ9SwqdX26F1TU8M+vivMOT7nDcP3/CCIVNKSbC3E8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB8006
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Russell,
-Thanks for your review comments. Will fix in the next version.
+greearb@ wrote:
+> From: Ben Greear <greearb@candelatech.com>
+> 
+> tpacket_rcv can be called from softirq context on input
+> path from NIC to stack.  And also called on transmit path
+> when sniffing is enabled.  So, use _bh locks to allow this
+> to function properly.
 
-> -----Original Message-----
-> From: Russell King <linux@armlinux.org.uk>
-> Sent: Tuesday, September 17, 2024 7:59 PM
-> To: Tarun Alle - I68638 <Tarun.Alle@microchip.com>
-> Cc: Arun Ramadoss - I17769 <Arun.Ramadoss@microchip.com>;
-> UNGLinuxDriver <UNGLinuxDriver@microchip.com>; andrew@lunn.ch;
-> hkallweit1@gmail.com; davem@davemloft.net; edumazet@google.com;
-> kuba@kernel.org; pabeni@redhat.com; netdev@vger.kernel.org; linux-
-> kernel@vger.kernel.org
-> Subject: Re: [PATCH net-next V4] net: phy: microchip_t1: SQI support for
-> LAN887x
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e
-> content is safe
->=20
-> On Tue, Sep 17, 2024 at 05:26:57PM +0530, Tarun Alle wrote:
-> > From: Tarun Alle <Tarun.Alle@microchip.com>
-> >
-> > Add support for measuring Signal Quality Index for LAN887x T1 PHY.
-> > Signal Quality Index (SQI) is measure of Link Channel Quality from
-> > 0 to 7, with 7 as the best. By default, a link loss event shall
-> > indicate an SQI of 0.
-> >
-> > Signed-off-by: Tarun Alle <Tarun.Alle@microchip.com>
->=20
-> Please note that the merge window is open, which means that net-next is
-> currently closed. Thus, patches should be submitted as RFC.
->=20
-> > ---
-> > v3 -> v4
-> > - Added check to handle invalid samples.
-> > - Added macro for ARRAY_SIZE(rawtable).
-> >
-> > v2 -> v3
-> > - Replaced hard-coded values with ARRAY_SIZE(rawtable).
-> >
-> > v1 -> v2
-> > - Replaced hard-coded 200 with ARRAY_SIZE(rawtable).
->=20
-> Hmm. We've been through several iterations trying to clean this up into
-> something more easily readable, but I fear there'll be another iteration.
->=20
-> Maybe the following would be nicer:
->=20
-> enum {
->         SQI_SAMPLES =3D 200,
->         /* Look at samples of the middle 60% */
->         SQI_INLIERS_NUM =3D SQI_SAMPLES * 60 / 100,
->         SQI_INLIERS_START =3D (SQI_SAMPLES - SQI_INLIERS_NUM) / 2,
->         SQI_INLIERS_END =3D SQI_INLIERS_START + SQI_INLIERS_NUM, };
->=20
-> > +static int lan887x_get_sqi_100M(struct phy_device *phydev) {
-> > +     u16 rawtable[200];
->=20
->         u16 rawtable[SQI_SAMPLES];
->=20
-> > +     u32 sqiavg =3D 0;
-> > +     u8 sqinum =3D 0;
-> > +     int rc;
->=20
-> Since you use "i" multiple times, declare it at the beginning of the func=
-tion
-> rather than in each for loop.
->=20
->         int i;
->=20
-> > +
-> > +     /* Configuration of SQI 100M */
-> > +     rc =3D phy_write_mmd(phydev, MDIO_MMD_VEND1,
-> > +                        LAN887X_COEFF_PWR_DN_CONFIG_100,
-> > +                        LAN887X_COEFF_PWR_DN_CONFIG_100_V);
-> > +     if (rc < 0)
-> > +             return rc;
-> > +
-> > +     rc =3D phy_write_mmd(phydev, MDIO_MMD_VEND1,
-> LAN887X_SQI_CONFIG_100,
-> > +                        LAN887X_SQI_CONFIG_100_V);
-> > +     if (rc < 0)
-> > +             return rc;
-> > +
-> > +     rc =3D phy_read_mmd(phydev, MDIO_MMD_VEND1,
-> LAN887X_SQI_CONFIG_100);
-> > +     if (rc !=3D LAN887X_SQI_CONFIG_100_V)
-> > +             return -EINVAL;
-> > +
-> > +     rc =3D phy_modify_mmd(phydev, MDIO_MMD_VEND1,
-> LAN887X_POKE_PEEK_100,
-> > +                         LAN887X_POKE_PEEK_100_EN,
-> > +                         LAN887X_POKE_PEEK_100_EN);
-> > +     if (rc < 0)
-> > +             return rc;
-> > +
-> > +     /* Required before reading register
-> > +      * otherwise it will return high value
-> > +      */
-> > +     msleep(50);
-> > +
-> > +     /* Link check before raw readings */
-> > +     rc =3D genphy_c45_read_link(phydev);
-> > +     if (rc < 0)
-> > +             return rc;
-> > +
-> > +     if (!phydev->link)
-> > +             return -ENETDOWN;
-> > +
-> > +     /* Get 200 SQI raw readings */
-> > +     for (int i =3D 0; i < ARRAY_SIZE(rawtable); i++) {
->=20
->         for (i =3D 0; i < SQI_SAMPLES; i++) {
->=20
-> > +             rc =3D phy_write_mmd(phydev, MDIO_MMD_VEND1,
-> > +                                LAN887X_POKE_PEEK_100,
-> > +                                LAN887X_POKE_PEEK_100_EN);
-> > +             if (rc < 0)
-> > +                     return rc;
-> > +
-> > +             rc =3D phy_read_mmd(phydev, MDIO_MMD_VEND1,
-> > +                               LAN887X_SQI_MSE_100);
-> > +             if (rc < 0)
-> > +                     return rc;
-> > +
-> > +             rawtable[i] =3D (u16)rc;
-> > +     }
-> > +
-> > +     /* Link check after raw readings */
-> > +     rc =3D genphy_c45_read_link(phydev);
-> > +     if (rc < 0)
-> > +             return rc;
-> > +
-> > +     if (!phydev->link)
-> > +             return -ENETDOWN;
-> > +
-> > +     /* Sort SQI raw readings in ascending order */
-> > +     sort(rawtable, ARRAY_SIZE(rawtable), sizeof(u16), data_compare,
-> > + NULL);
->=20
->         sort(rawtable, SQI_SAMPLES, sizeof(u16), data_compare, NULL);
->=20
-> Although renaming data_compare to sqi_compare would be even more
-> descriptive of what it's doing.
->=20
-> > +
-> > +     /* Keep inliers and discard outliers */
-> > +     for (int i =3D SQI100M_SAMPLE_INIT(5, rawtable);
-> > +          i < SQI100M_SAMPLE_INIT(5, rawtable) * 4; i++)
->=20
->         for (i =3D SQI_INLIERS_START; i < SQI_INLIERS_END; i++)
->=20
-> > +             sqiavg +=3D rawtable[i];
-> > +
-> > +     /* Handle invalid samples */
-> > +     if (sqiavg !=3D 0) {
-> > +             /* Get SQI average */
-> > +             sqiavg /=3D SQI100M_SAMPLE_INIT(5, rawtable) * 4 -
-> > +                             SQI100M_SAMPLE_INIT(5, rawtable);
->=20
->                 sqiavg /=3D SQI_INLIERS_NUM;
->=20
-> Overall, I think this is better rather than the SQI100M_SAMPLE_INIT() mac=
-ro...
-> for which I'm not sure what the _INIT() bit actually means.
->=20
-> I think my suggestion has the advantage that it makes it clear what these
-> various calculations are doing, because the result of the calculations is
-> described in the enum name.
->=20
-> Thanks.
->=20
-> --
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+It cannot be as straightforward as that, or we would have seen this
+much earlier.
 
-Thanks,
-Tarun Alle.
+On transmit, packet sockets are intercepted by dev_queue_xmit_nit.
+Which is called from __dev_queue_xmit with bottom halfs already
+disabled:
+
+        /* Disable soft irqs for various locks below. Also
+         * stops preemption for RCU.
+         */
+        rcu_read_lock_bh();
+
+Also, if this proves a real issue on the socket lock, then it would
+apply to packet_rcv and tpacket_rcv equally.
+
+Will need to read up a bit more closely on IN-SOFTIRQ-W vs
+SOFTIRQ-ON-W unless someone beats me to it.
+
+But likely this is either a false positive, or something specific to
+that tpacket_v3 blk_fill_in_prog_lock. Which does get called also
+from a timer.
+
+
+> Thanks to Johannes Berg for providing some explanation of the cryptic
+> lockdep output.
+> 
+> ================================
+> WARNING: inconsistent lock state
+> 6.11.0 #1 Tainted: G        W
+> --------------------------------
+> inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+> btserver/134819 [HC0[0]:SC0[0]:HE1:SE1] takes:
+> ffff8882da30c118 (rlock-AF_PACKET){+.?.}-{2:2}, at: tpacket_rcv+0x863/0x3b30
+> {IN-SOFTIRQ-W} state was registered at:
+>   lock_acquire+0x19a/0x4f0
+>   _raw_spin_lock+0x27/0x40
+>   packet_rcv+0xa33/0x1320
+>   __netif_receive_skb_core.constprop.0+0xcb0/0x3a90
+>   __netif_receive_skb_list_core+0x2c9/0x890
+>   netif_receive_skb_list_internal+0x610/0xcc0
+>   napi_complete_done+0x1c0/0x7c0
+>   igb_poll+0x1dbb/0x57e0 [igb]
+>   __napi_poll.constprop.0+0x99/0x430
+>   net_rx_action+0x8e7/0xe10
+>   handle_softirqs+0x1b7/0x800
+>   __irq_exit_rcu+0x91/0xc0
+>   irq_exit_rcu+0x5/0x10
+>   common_interrupt+0x7f/0xa0
+>   asm_common_interrupt+0x22/0x40
+>   cpuidle_enter_state+0x289/0x320
+>   cpuidle_enter+0x45/0xa0
+>   do_idle+0x2fe/0x3e0
+>   cpu_startup_entry+0x4b/0x60
+>   start_secondary+0x201/0x280
+>   common_startup_64+0x13e/0x148
+> irq event stamp: 467094363
+> hardirqs last  enabled at (467094363): [<ffffffff83dc794b>] _raw_spin_unlock_irqrestore+0x2b/0x50
+> hardirqs last disabled at (467094362): [<ffffffff83dc7753>] _raw_spin_lock_irqsave+0x53/0x60
+> softirqs last  enabled at (467094360): [<ffffffff83481213>] skb_attempt_defer_free+0x303/0x4e0
+> softirqs last disabled at (467094358): [<ffffffff83481188>] skb_attempt_defer_free+0x278/0x4e0
+> 
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+> 
+>        CPU0
+>        ----
+>   lock(rlock-AF_PACKET);
+>   <Interrupt>
+>     lock(rlock-AF_PACKET);
+> 
+>  *** DEADLOCK ***
+> 
+> 3 locks held by btserver/134819:
+>  #0: ffff888136a3bf98 (sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_recvmsg+0xc7/0x4e0
+>  #1: ffffffff84e4bc20 (rcu_read_lock){....}-{1:2}, at: __ip_queue_xmit+0x59/0x1e20
+>  #2: ffffffff84e4bc20 (rcu_read_lock){....}-{1:2}, at: dev_queue_xmit_nit+0x2a/0xa40
+> 
+> stack backtrace:
+> CPU: 2 UID: 0 PID: 134819 Comm: btserver Tainted: G        W          6.11.0 #1
+> Tainted: [W]=WARN
+> Hardware name: Default string Default string/SKYBAY, BIOS 5.12 08/04/2020
+> Call Trace:
+>  <TASK>
+>  dump_stack_lvl+0x73/0xa0
+>  mark_lock+0x102e/0x16b0
+>  ? print_usage_bug.part.0+0x600/0x600
+>  ? print_usage_bug.part.0+0x600/0x600
+>  ? print_usage_bug.part.0+0x600/0x600
+>  ? lock_acquire+0x19a/0x4f0
+>  ? find_held_lock+0x2d/0x110
+>  __lock_acquire+0x9ae/0x6170
+>  ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
+>  ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
+>  lock_acquire+0x19a/0x4f0
+>  ? tpacket_rcv+0x863/0x3b30
+>  ? run_filter+0x131/0x300
+>  ? lock_sync+0x170/0x170
+>  ? do_syscall_64+0x69/0x160
+>  ? entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>  ? lock_is_held_type+0xa5/0x110
+>  _raw_spin_lock+0x27/0x40
+>  ? tpacket_rcv+0x863/0x3b30
+>  tpacket_rcv+0x863/0x3b30
+>  ? packet_recvmsg+0x1340/0x1340
+>  ? __asan_memcpy+0x38/0x60
+>  ? __skb_clone+0x547/0x730
+>  ? packet_recvmsg+0x1340/0x1340
+>  dev_queue_xmit_nit+0x709/0xa40
+>  ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
+>  vrf_finish_direct+0x26e/0x340 [vrf]
+>  ? vrf_ip_local_out+0x570/0x570 [vrf]
+>  vrf_l3_out+0x5f4/0xe80 [vrf]
+>  __ip_local_out+0x51e/0x7a0
+>  ? __ip_append_data+0x3d00/0x3d00
+>  ? __lock_acquire+0x1b57/0x6170
+>  ? ipv4_dst_check+0xd6/0x150
+>  ? lock_is_held_type+0xa5/0x110
+>  __ip_queue_xmit+0x7ff/0x1e20
+>  __tcp_transmit_skb+0x1699/0x3850
+>  ? __tcp_select_window+0xfb0/0xfb0
+>  ? __build_skb_around+0x22f/0x330
+>  ? __alloc_skb+0x13d/0x2c0
+>  ? __napi_build_skb+0x40/0x40
+>  ? __tcp_send_ack.part.0+0x5f/0x690
+>  ? skb_attempt_defer_free+0x303/0x4e0
+>  tcp_recvmsg_locked+0xdd1/0x23e0
+>  ? tcp_recvmsg+0xc7/0x4e0
+>  ? tcp_update_recv_tstamps+0x1c0/0x1c0
+>  tcp_recvmsg+0xe5/0x4e0
+>  ? tcp_recv_timestamp+0x6c0/0x6c0
+>  inet_recvmsg+0xf0/0x4b0
+>  ? inet_splice_eof+0xa0/0xa0
+>  ? inet_splice_eof+0xa0/0xa0
+>  sock_recvmsg+0xc8/0x150
+>  ? poll_schedule_timeout.constprop.0+0xe0/0xe0
+>  sock_read_iter+0x258/0x380
+>  ? poll_schedule_timeout.constprop.0+0xe0/0xe0
+>  ? sock_recvmsg+0x150/0x150
+>  ? rw_verify_area+0x64/0x590
+>  vfs_read+0x8d5/0xc20
+>  ? poll_schedule_timeout.constprop.0+0xe0/0xe0
+>  ? kernel_read+0x50/0x50
+>  ? __asan_memset+0x1f/0x40
+>  ? ktime_get_ts64+0x85/0x210
+>  ? __fget_light+0x4d/0x1d0
+>  ksys_read+0x166/0x1c0
+>  ? __ia32_sys_pwrite64+0x1d0/0x1d0
+>  ? __ia32_sys_poll+0x3e0/0x3e0
+>  do_syscall_64+0x69/0x160
+>  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+> RIP: 0033:0x7f6909b01b92
+> 
+> Signed-off-by: Ben Greear <greearb@candelatech.com>
+> ---
+>  net/packet/af_packet.c | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> index 4692a9ef110b..17f9e2efdf25 100644
+> --- a/net/packet/af_packet.c
+> +++ b/net/packet/af_packet.c
+> @@ -760,8 +760,8 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
+>  	 */
+>  	if (BLOCK_NUM_PKTS(pbd)) {
+>  		/* Waiting for skb_copy_bits to finish... */
+> -		write_lock(&pkc->blk_fill_in_prog_lock);
+> -		write_unlock(&pkc->blk_fill_in_prog_lock);
+> +		write_lock_bh(&pkc->blk_fill_in_prog_lock);
+> +		write_unlock_bh(&pkc->blk_fill_in_prog_lock);
+>  	}
+>  
+>  	if (pkc->last_kactive_blk_num == pkc->kactive_blk_num) {
+> @@ -1021,8 +1021,8 @@ static void prb_retire_current_block(struct tpacket_kbdq_core *pkc,
+>  		 */
+>  		if (!(status & TP_STATUS_BLK_TMO)) {
+>  			/* Waiting for skb_copy_bits to finish... */
+> -			write_lock(&pkc->blk_fill_in_prog_lock);
+> -			write_unlock(&pkc->blk_fill_in_prog_lock);
+> +			write_lock_bh(&pkc->blk_fill_in_prog_lock);
+> +			write_unlock_bh(&pkc->blk_fill_in_prog_lock);
+>  		}
+>  		prb_close_block(pkc, pbd, po, status);
+>  		return;
+> @@ -1044,7 +1044,7 @@ static void prb_clear_blk_fill_status(struct packet_ring_buffer *rb)
+>  {
+>  	struct tpacket_kbdq_core *pkc  = GET_PBDQC_FROM_RB(rb);
+>  
+> -	read_unlock(&pkc->blk_fill_in_prog_lock);
+> +	read_unlock_bh(&pkc->blk_fill_in_prog_lock);
+>  }
+>  
+>  static void prb_fill_rxhash(struct tpacket_kbdq_core *pkc,
+> @@ -1105,7 +1105,7 @@ static void prb_fill_curr_block(char *curr,
+>  	pkc->nxt_offset += TOTAL_PKT_LEN_INCL_ALIGN(len);
+>  	BLOCK_LEN(pbd) += TOTAL_PKT_LEN_INCL_ALIGN(len);
+>  	BLOCK_NUM_PKTS(pbd) += 1;
+> -	read_lock(&pkc->blk_fill_in_prog_lock);
+> +	read_lock_bh(&pkc->blk_fill_in_prog_lock);
+>  	prb_run_all_ft_ops(pkc, ppd);
+>  }
+>  
+> @@ -2413,7 +2413,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>  			vnet_hdr_sz = 0;
+>  		}
+>  	}
+> -	spin_lock(&sk->sk_receive_queue.lock);
+> +	spin_lock_bh(&sk->sk_receive_queue.lock);
+>  	h.raw = packet_current_rx_frame(po, skb,
+>  					TP_STATUS_KERNEL, (macoff+snaplen));
+>  	if (!h.raw)
+> @@ -2453,7 +2453,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>  		skb_clear_delivery_time(copy_skb);
+>  		__skb_queue_tail(&sk->sk_receive_queue, copy_skb);
+>  	}
+> -	spin_unlock(&sk->sk_receive_queue.lock);
+> +	spin_unlock_bh(&sk->sk_receive_queue.lock);
+>  
+>  	skb_copy_bits(skb, 0, h.raw + macoff, snaplen);
+>  
+> @@ -2546,10 +2546,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>  #endif
+>  
+>  	if (po->tp_version <= TPACKET_V2) {
+> -		spin_lock(&sk->sk_receive_queue.lock);
+> +		spin_lock_bh(&sk->sk_receive_queue.lock);
+>  		__packet_set_status(po, h.raw, status);
+>  		__clear_bit(slot_id, po->rx_ring.rx_owner_map);
+> -		spin_unlock(&sk->sk_receive_queue.lock);
+> +		spin_unlock_bh(&sk->sk_receive_queue.lock);
+>  		sk->sk_data_ready(sk);
+>  	} else if (po->tp_version == TPACKET_V3) {
+>  		prb_clear_blk_fill_status(&po->rx_ring);
+> @@ -2565,7 +2565,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>  	return 0;
+>  
+>  drop_n_account:
+> -	spin_unlock(&sk->sk_receive_queue.lock);
+> +	spin_unlock_bh(&sk->sk_receive_queue.lock);
+>  	atomic_inc(&po->tp_drops);
+>  	drop_reason = SKB_DROP_REASON_PACKET_SOCK_ERROR;
+>  
+> -- 
+> 2.42.0
+> 
+
+
 
