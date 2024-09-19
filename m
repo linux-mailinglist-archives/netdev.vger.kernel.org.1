@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-128937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01D5C97C83B
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:54:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7787597C840
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:54:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB17228883A
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:54:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D05BB22EDB
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:54:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0153219AD8C;
-	Thu, 19 Sep 2024 10:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC7A19C57B;
+	Thu, 19 Sep 2024 10:54:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89D01566A;
-	Thu, 19 Sep 2024 10:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175F81991BB;
+	Thu, 19 Sep 2024 10:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726743250; cv=none; b=jBPvi8JmDlqyzzxJI7dpFte54fK+2F5M8rPbquutJ7a5csNijW4hPWozmmaQ0k2TAw0T5DZCk3he7u0c8BaYjBpMaLAqsczI5jPgtTZgb4tXJsGJmcVy0DNnIYd05wCY8dyGAOPRDAbmcR0mjSLExR21Vi71zKIeoM2pJ7AxijM=
+	t=1726743272; cv=none; b=P+BklievmXXGgd9IOlxw2dH5f/iGfJEjChqOMzi6oJjwkBL+i2A3FjCO2e25x9rtRWQZCS0k3cBC9bPHSpLSfjnxAg3EDKFnMsjVIFu1hlmi864K5Si3OgGiTsTKqW1TJc5OjEShF/nDNovvRnXukjYYPdphKgCzwGFVp/K9V7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726743250; c=relaxed/simple;
-	bh=BsGDiCA1AlGAx1BMc5uiXmAshSyBwXv5Xg827sUD5S4=;
+	s=arc-20240116; t=1726743272; c=relaxed/simple;
+	bh=179KZODs82XAGe7kcRGJWGjFsfPBODprwgHk3DQ83L8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=EXE7ufvZqhfJvr8+PgkSCyGGK86yLVDwpsD0RL6IrrjmafILBsJDCl9lgnXwCkAniCw6BaYDve4V9OfFIt3HvxK6mU9xg0d7IgcPilJj+vU+eqcPfkB0EXgb0e8Te885C19Vu76k41vmZma8fq1E02QqyeAAEWnsWpCv+Sj2SRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4X8XSX1JpPz20p7N;
-	Thu, 19 Sep 2024 18:53:48 +0800 (CST)
-Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
-	by mail.maildlp.com (Postfix) with ESMTPS id E179314010C;
-	Thu, 19 Sep 2024 18:54:02 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+	 In-Reply-To:Content-Type; b=U2TGW+WLqLUKmA1q4H/QVtGIyz+YucwdW1uHxuMJF3jdaX4JRVBq6FNDr+OtgqgQFjw4YNQYAZB/qaXAFsTtW/+xPwCVS+y3S5LMNpbxJ3kA8AoMkmjyG7UY9OSduYd055WPS6Bz30tyDygdPg7GGW6WsZNmhT1ON2Bu8/1oPhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4X8XQv3YptzmYlT;
+	Thu, 19 Sep 2024 18:52:23 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5515E140390;
+	Thu, 19 Sep 2024 18:54:27 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 19 Sep 2024 18:53:58 +0800
-Message-ID: <614b4c36-e0a1-1fc2-cec3-017a7d2bcebb@huawei-partners.com>
-Date: Thu, 19 Sep 2024 13:53:54 +0300
+ 15.2.1544.11; Thu, 19 Sep 2024 18:54:26 +0800
+Message-ID: <50a463d5-a5a1-422f-a4f7-d3587b12c265@huawei.com>
+Date: Thu, 19 Sep 2024 18:54:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,116 +48,130 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 12/19] selftests/landlock: Test that kernel space
- sockets are not restricted
-Content-Language: ru
-To: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>
-CC: <mic@digikod.net>, <willemdebruijn.kernel@gmail.com>,
-	<gnoack3000@gmail.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>
-References: <20240904104824.1844082-1-ivanov.mikhail1@huawei-partners.com>
- <20240904104824.1844082-13-ivanov.mikhail1@huawei-partners.com>
- <ZurPAMch78Mmylt5@google.com>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <ZurPAMch78Mmylt5@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
- kwepemj200016.china.huawei.com (7.202.194.28)
+Subject: Re: [PATCH net 2/2] page_pool: fix IOMMU crash when driver has
+ already unbound
+To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<liuyonglong@huawei.com>, <fanghaiqing@huawei.com>, <zhangkun09@huawei.com>,
+	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
+	<alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Wei Fang
+	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, Eric Dumazet <edumazet@google.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Saeed
+ Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
+	<tariqt@nvidia.com>, Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi
+	<lorenzo@kernel.org>, Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen
+	<shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, Kalle Valo
+	<kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Andrew
+ Morton <akpm@linux-foundation.org>, <imx@lists.linux.dev>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<intel-wired-lan@lists.osuosl.org>, <bpf@vger.kernel.org>,
+	<linux-rdma@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
+	<linux-mm@kvack.org>
+References: <20240918111826.863596-1-linyunsheng@huawei.com>
+ <20240918111826.863596-3-linyunsheng@huawei.com>
+ <CAC_iWjK=G7Oo5=pN2QunhasgDC6NyC1L+96jigX7u9ad+PbYng@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CAC_iWjK=G7Oo5=pN2QunhasgDC6NyC1L+96jigX7u9ad+PbYng@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 9/18/2024 4:00 PM, Günther Noack wrote:
-> This is a good way to test this, IMHO. Good find.
-> The comment at the bottom is really valuable. :)
+On 2024/9/19 1:06, Ilias Apalodimas wrote:
+> Hi Yunsheng,
 > 
-> Out of curiosity: I suspect that a selftest with NFS or another network-backed
-> filesystem might be too complicated?  Have you tried that manually, by any
-> chance?
-
-I haven't, just ran through a code a little bit. I think that testing
-NFS is possible, but it depends on which scenario we want to test.
-Simple creation of a server may require only to mount NFS with the
-appropriate parameters. Anyway, I don't see any reason for implementing
-such test if restriction of kernel sockets is already tested with SMC
-socket creation.
-
+> Thanks for looking into this!
 > 
-> 
-> On Wed, Sep 04, 2024 at 06:48:17PM +0800, Mikhail Ivanov wrote:
->> Add test validating that Landlock provides restriction of user space
->> sockets only.
+> On Wed, 18 Sept 2024 at 14:24, Yunsheng Lin <linyunsheng@huawei.com> wrote:
 >>
->> Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
->> ---
->>   .../testing/selftests/landlock/socket_test.c  | 39 ++++++++++++++++++-
->>   1 file changed, 38 insertions(+), 1 deletion(-)
->>
->> diff --git a/tools/testing/selftests/landlock/socket_test.c b/tools/testing/selftests/landlock/socket_test.c
->> index ff5ace711697..23698b8c2f4d 100644
->> --- a/tools/testing/selftests/landlock/socket_test.c
->> +++ b/tools/testing/selftests/landlock/socket_test.c
->> @@ -7,7 +7,7 @@
->>   
->>   #define _GNU_SOURCE
->>   
->> -#include <linux/landlock.h>
->> +#include "landlock.h"
->>   #include <linux/pfkeyv2.h>
->>   #include <linux/kcm.h>
->>   #include <linux/can.h>
->> @@ -628,4 +628,41 @@ TEST(unsupported_af_and_prot)
->>   	EXPECT_EQ(ESOCKTNOSUPPORT, test_socket(AF_UNIX, SOCK_PACKET, 0));
->>   }
->>   
->> +TEST(kernel_socket)
->> +{
->> +	const struct landlock_ruleset_attr ruleset_attr = {
->> +		.handled_access_socket = LANDLOCK_ACCESS_SOCKET_CREATE,
->> +	};
->> +	struct landlock_socket_attr smc_socket_create = {
->> +		.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->> +		.family = AF_SMC,
->> +		.type = SOCK_STREAM,
->> +	};
->> +	int ruleset_fd;
->> +
->> +	/*
->> +	 * Checks that SMC socket is created sucessfuly without
+>> Networking driver with page_pool support may hand over page
+>> still with dma mapping to network stack and try to reuse that
+>> page after network stack is done with it and passes it back
+>> to page_pool to avoid the penalty of dma mapping/unmapping.
 > 
-> Typo nit: "successfully"
->               ^^     ^^
+> I think you can shorten this to "If recycling and DMA mapping are
+> enabled during the pool creation"
 
-Thanks, will be fixed.
+I am not sure if I understand the 'recycling' part here. Is the
+'recycling' part referring to whether skb_mark_for_recycle() is
+called to enable recycling for the skb? Is there still any driver
+with page_pool support but doesn't call skb_mark_for_recycle()
+when handing over page to network stack?
+
+For the 'DMA mapping' part, as there is no space in 'struct
+page' to track the inflight pages, so 'pp' in 'struct page'
+is renamed to 'pp_item' to enable the tracking of inflight
+page. I tried shortening this for 'pool->dma_map being false'
+when coding, but it seems differentiating the same field in
+'struct page' doesn't make much sense according to 'pool->dma_map'
+as it means we might need to add an union in 'struct page' for
+that to work and add additional checking to decide if it is 'pp'
+or 'pp_item'.
 
 > 
->> +	 * landlock restrictions.
->> +	 */
->> +	ASSERT_EQ(0, test_socket(AF_SMC, SOCK_STREAM, 0));
->> +
->> +	ruleset_fd =
->> +		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
->> +	ASSERT_LE(0, ruleset_fd);
->> +
->> +	ASSERT_EQ(0, landlock_add_rule(ruleset_fd, LANDLOCK_RULE_SOCKET,
->> +				       &smc_socket_create, 0));
->> +	enforce_ruleset(_metadata, ruleset_fd);
->> +	ASSERT_EQ(0, close(ruleset_fd));
->> +
->> +	/*
->> +	 * During the creation of an SMC socket, an internal service TCP socket
->> +	 * is also created (Cf. smc_create_clcsk).
->> +	 *
->> +	 * Checks that Landlock does not restrict creation of the kernel space
->> +	 * socket.
->> +	 */
->> +	EXPECT_EQ(0, test_socket(AF_SMC, SOCK_STREAM, 0));
->> +}
->> +
->>   TEST_HARNESS_MAIN
->> -- 
->> 2.34.1
+>> With all the caching in the network stack, some pages may be
+>> held in the network stack without returning to the page_pool
+>> soon enough, and with VF disable causing the driver unbound,
+>> the page_pool does not stop the driver from doing it's
+>> unbounding work, instead page_pool uses workqueue to check
+>> if there is some pages coming back from the network stack
+>> periodically, if there is any, it will do the dma unmmapping
+>> related cleanup work.
 >>
+>> As mentioned in [1], attempting DMA unmaps after the driver
+>> has already unbound may leak resources or at worst corrupt
+>> memory. Fundamentally, the page pool code cannot allow DMA
+>> mappings to outlive the driver they belong to.
+>>
+>> Currently it seems there are at least two cases that the page
+>> is not released fast enough causing dma unmmapping done after
+>> driver has already unbound:
+>> 1. ipv4 packet defragmentation timeout: this seems to cause
+>>    delay up to 30 secs:
+>>
+>> 2. skb_defer_free_flush(): this may cause infinite delay if
+>>    there is no triggering for net_rx_action().
+>>
+>> In order not to do the dma unmmapping after driver has already
+>> unbound and stall the unloading of the networking driver, add
+>> the pool->items array to record all the pages including the ones
+>> which are handed over to network stack, so the page_pool can
+>> do the dma unmmapping for those pages when page_pool_destroy()
+>> is called.
 > 
-> Reviewed-by: Günther Noack <gnoack@google.com>
+> So, I was thinking of a very similar idea. But what do you mean by
+> "all"? The pages that are still in caches (slow or fast) of the pool
+> will be unmapped during page_pool_destroy().
+
+Yes, it includes the one in pool->alloc and pool->ring.
+
+> Don't we 'just' need a list of the inflight packets and their pages or
+> fragments? What we could do is go through that list and unmap these
+> pages during page_pool_destroy().
+
+The main reason for that is to avoid the overhead of page_pool_item_del()
+and page_pool_item_add() when allocing/freeing page from/to pool->alloc
+and pool->ring.
+
+Yes, including the pages in pool->ring seems to make the pool->ring
+somewhat duplicated, maybe we can remove pool->ring if we can make
+and prove 'pool->items' is performing better than pool->ring in the
+future?
+
+> 
+> I'll have a closer look at the patch tomorrow
+
+Thanks for the reviewing.
+
+> 
+> Thanks!
+> /Ilias
+> 
 
