@@ -1,231 +1,131 @@
-Return-Path: <netdev+bounces-128909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 046A897C66E
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:59:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D5B97C674
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:59:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 889F81F25F1F
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 08:59:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7B54282E34
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 08:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AAB31991BB;
-	Thu, 19 Sep 2024 08:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29D3919922A;
+	Thu, 19 Sep 2024 08:59:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="muRV6Lg+";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="gt8ZO/bt"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="wSOpN+V8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0845C28EA;
-	Thu, 19 Sep 2024 08:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCEF1990C3
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 08:59:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726736343; cv=none; b=Od9rO3r48YKyCLin4uJA244CcXci6KkHjAt9Y8A972FGrvhIVWIKL2LEDD/Fw1DGHOGxr2VqE590l9P8CZEC9GVNy7qvGaBOul0m1eDIb1/wUN3F30xWN72bMsXGSqgF6zXebeMTqctUrFADGXsPYxOB+6hbOXXvDhqfMkCmTfs=
+	t=1726736362; cv=none; b=MspxVpPlGikFjpxPTOq1xndJvhNJk7YnvRjDcE7hny3i9/rWgq2IJ9PELJ16OkauPu4agtbOKDrk8rknVeTCA/ph049muHR/WXzIMFgKTQJSFFJxfXhHxI4PuRWy6hM29+sOpF7wHym77xghWgpYIe6sABXcN1vmZjkSuKjn/Ek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726736343; c=relaxed/simple;
-	bh=myyO3TIX6AVGOwynSAzRpK1M+t0Hfdzns9f0eUnl4FI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JpeurPAUBLUcZrbvif2FxUfmZ5KYOV5hVxoLjmaj83GLYUeA5VU3uPsqj/tYpWTIpQyJDz+WwLfMkDkH1i6YVCtE99J7jnlQULRlMKfkXEgOcoDpOeyB1TaHoy4fUL7TO3htWwTeJQ6twFI6ysz6JuvDZF3FGpqr9ecgiYfQcKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=muRV6Lg+; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=gt8ZO/bt reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+	s=arc-20240116; t=1726736362; c=relaxed/simple;
+	bh=gELVqvyqcJInyr8E7hFzpzkNi+tcnEM+7zPPHqXS8a4=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eRy32Onvwf6A2xt3BhLvVpR6PozEeT3ECLyrDiXs4XtlAwUspzRWLTuLuokkvC+CfHdtQsLhi9gl8XiJa4sr4vxRtplHyOg43Ci+DXvnawCF7nLXFYhDKYDS3i83hCPIJplBrsUaX705b6nq7IfMUWKweB5sOU2+nHoKMzEOu80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=wSOpN+V8; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-718d8d6af8fso416676b3a.3
+        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 01:59:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1726736339; x=1758272339;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=zslu8pDmiOlZUz8CHGNQsNG0CBKhz/IHbX6/HCWvCKk=;
-  b=muRV6Lg+oXDW0ou8uJPqNZj6YvLG8cSUDzJB00NIg1E6/L299jPIB69b
-   kv03FnENgbSWtVezhgCtLCMW/xrNrqenVBrVlXEmtNqnWMungqGaMUfYU
-   JftUrjZjt9wAJ2j3016gQIB56vxVrMrKu1NYUJWZzQS6OolYwtOSFRQxa
-   BbWGu2b0RA36HWUAkJ+pIOCeUP0gWmRDiOeQEPppJ+yJhl578L1+GsKtJ
-   DcGLq03fAdLUBTqhTrEMWd7nxWFtWvE1yxzx7iACmKSEJI3TOxEf1FfYG
-   27MJLirDLHe1s354gVok+oX4IiJ1rcfxUyk8irh1dpjAwHYyTX0CbfZab
-   w==;
-X-CSE-ConnectionGUID: b9nf3hCZS6eIi1hzZEenMg==
-X-CSE-MsgGUID: m1cnnc2bSMWrHjdb7Gl+YQ==
-X-IronPort-AV: E=Sophos;i="6.10,241,1719871200"; 
-   d="scan'208";a="39020246"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 19 Sep 2024 10:58:55 +0200
-X-CheckPoint: {66EBE7D0-D-E520F13A-D17B83D9}
-X-MAIL-CPID: EE31EAD2D0AEFA7880AB6BB5E3B931F4_2
-X-Control-Analysis: str=0001.0A682F16.66EBE7D0.0151,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EE92A16CB35;
-	Thu, 19 Sep 2024 10:58:46 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1726736331;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=zslu8pDmiOlZUz8CHGNQsNG0CBKhz/IHbX6/HCWvCKk=;
-	b=gt8ZO/btYHIuyBadKm5TSjL8OWEBwbaltfLOjbdn37uNYLqytix8PZkkmM91jElx2SBCDk
-	CwDUxt6IqkJ69vVmerBV6UZx/5FuUpLM6uGn1+5AdCHGRmKBBJZpCRtOfVDYHU8ilh9dln
-	goS8uOIb6yVLuMxbtRh9cKCbn6n0XUbB+jigpsoclhapd19JK77DxXUUvfk5oJv2u3a3ge
-	9dXjAyOfFiNfWp2nHeo2ZQzF+XxoR9Snl7saI2g822TY5gtLl7Qi/vDc11SX0A78VZpUco
-	MJZHBr3fJvIZnoOKsiPgVZdS4jyoJydhz3PCuVF/9EA+AqRw3Yvv1t3c8gzC2Q==
-Message-ID: <0ebdf87729fba276b1ff4a06a5f4dad4a3768e8a.camel@ew.tq-group.com>
-Subject: Re: [PATCH 2/2] can: m_can: fix missed interrupts with m_can_pci
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Vincent Mailhol
- <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,  Martin =?ISO-8859-1?Q?Hundeb=F8ll?=
- <martin@geanix.com>, Markus Schneider-Pargmann <msp@baylibre.com>, "Felipe
- Balbi (Intel)" <balbi@kernel.org>, Raymond Tan <raymond.tan@intel.com>,
- Jarkko Nikula <jarkko.nikula@linux.intel.com>, linux-can@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux@ew.tq-group.com
-Date: Thu, 19 Sep 2024 10:58:46 +0200
-In-Reply-To: <20240919-tourmaline-jaguar-of-reverence-4875d2-mkl@pengutronix.de>
-References: 
-	<ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726669005.git.matthias.schiffer@ew.tq-group.com>
-	 <f6155510fbea33b0e18030a147b87c04395f7394.1726669005.git.matthias.schiffer@ew.tq-group.com>
-	 <20240919-tourmaline-jaguar-of-reverence-4875d2-mkl@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1726736360; x=1727341160; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gELVqvyqcJInyr8E7hFzpzkNi+tcnEM+7zPPHqXS8a4=;
+        b=wSOpN+V8gFi0Mpkzw8xCb9Tl4fqma9+DcfEjcswbq9RGnuj6HGZbqLYYuBZBpL3wnb
+         mP2GH1M9z908073TNINTI3TGxKDRbQLU63ju35/sWymUoCXeZokQVjWRcqrAmBvGyrBU
+         93rN32wfNi71qrJMQqAtt0hx248gV4us+zofHmJbvbvLUGxwuZcJ8Ye9vIwaxN2anHaq
+         qm8V9zVPaYQOV5yRj5Ir34mzIxpO3GzxNZf6bHjkibph+WeTXSYNyIVDzyL9Rbd0coNi
+         Xn6rOSn/AWKm0OFfENgVSQ1xWNEqtIywmWP4+oI8GvMUDBtOrW/SiToQkpAadwmhZqpJ
+         y5jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726736360; x=1727341160;
+        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gELVqvyqcJInyr8E7hFzpzkNi+tcnEM+7zPPHqXS8a4=;
+        b=RGDhw1RdO7qJDPe2kHgkJMNtQO+9euxjxsrWHLm2Ky4NDdQ1UXC7dgH/rCADzidAkJ
+         qYcOauowY2MpTtcEgPwVvWMehxC/fVgkYslLUcUSiwF+c8Tc/1pgIVElUYEs2tiuf1ut
+         cBttvJJY4O0e8Re4LUQhYpU/ta2+edjeYkqhXi5sbPifmRPU555O5Qm6RqaLiEqb/nnJ
+         78gvZGMVDDOOVE33MVQ7i6smSpyEIjPiirYmFh6WW7bF+a+7Zt0viR0acZNzghF0VLg4
+         prW3zdC22CV9ZrgNXtZOMdCeCkaWBAPG1e6xbybX+Bt3pECQoNljz2zm+kTkQEGbSfvd
+         TG9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWzjXbZb0uVOZb99Q14F9hnh73IBL3TMvRg4mExvn60l1YtWaQPe50nzrzBfQ3j0Fsvko6uNjw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9HpgJtktJtihsmNt1HyqoxaMmsex7N+ArjYXH4hiDHhCF1Dd1
+	FXH7AUOqwzM0TBpqh+zxkEjgL6MfwV4mW3+Ko+JoHPPGMHF6pRjBqDKOpc3qFwIaIfxhWZeRHM0
+	os5wt08WY5X65UbQMMCkOzg4P0/uQ6N6UJ18T9w==
+X-Google-Smtp-Source: AGHT+IGvZKhZ+sgK1EVS1v43hs165nAjaXCVBqA4ql8mlkaKawbV4Lhi2ui4b5YR+NQKc/pd5URgnIZnstCpvwceHIs=
+X-Received: by 2002:a05:6a00:c88:b0:717:fd98:4a6 with SMTP id
+ d2e1a72fcca58-71926082587mr37728842b3a.11.1726736359963; Thu, 19 Sep 2024
+ 01:59:19 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Thu, 19 Sep 2024 03:59:17 -0500
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+In-Reply-To: <87msk49j8m.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20240814082301.8091-1-brgl@bgdev.pl> <83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org>
+ <87msk49j8m.fsf@kernel.org>
+Date: Thu, 19 Sep 2024 03:59:17 -0500
+Message-ID: <CAMRc=McEWWm8N++4a5LMCAa0GWsQdi0KuSpj3ZuS_he=H0LP+w@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
+ of the ath11k on WCN6855
+To: Kalle Valo <kvalo@kernel.org>, Arnd Bergmann <arnd@arndb.de>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Krzysztof Kozlowski <krzk@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 2024-09-19 at 10:47 +0200, Marc Kleine-Budde wrote:
-> On 18.09.2024 16:21:54, Matthias Schiffer wrote:
-> > The interrupt line of PCI devices is interpreted as edge-triggered,
-> > however the interrupt signal of the m_can controller integrated in Inte=
-l
-> > Elkhart Lake CPUs appears to be generated level-triggered.
-> >=20
-> > Consider the following sequence of events:
-> >=20
-> > - IR register is read, interrupt X is set
-> > - A new interrupt Y is triggered in the m_can controller
-> > - IR register is written to acknowledge interrupt X. Y remains set in I=
-R
-> >=20
-> > As at no point in this sequence no interrupt flag is set in IR, the
-> > m_can interrupt line will never become deasserted, and no edge will eve=
-r
-> > be observed to trigger another run of the ISR. This was observed to
-> > result in the TX queue of the EHL m_can to get stuck under high load,
-> > because frames were queued to the hardware in m_can_start_xmit(), but
-> > m_can_finish_tx() was never run to account for their successful
-> > transmission.
-> >=20
-> > To fix the issue, repeatedly read and acknowledge interrupts at the
-> > start of the ISR until no interrupt flags are set, so the next incoming
-> > interrupt will also result in an edge on the interrupt line.
-> >=20
-> > Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkhart=
- Lake")
-> > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> > ---
-> >  drivers/net/can/m_can/m_can.c | 18 +++++++++++++-----
-> >  1 file changed, 13 insertions(+), 5 deletions(-)
-> >=20
-> > diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_ca=
-n.c
-> > index 47481afb9add3..363732517c3c5 100644
-> > --- a/drivers/net/can/m_can/m_can.c
-> > +++ b/drivers/net/can/m_can/m_can.c
-> > @@ -1207,20 +1207,28 @@ static void m_can_coalescing_update(struct m_ca=
-n_classdev *cdev, u32 ir)
-> >  static int m_can_interrupt_handler(struct m_can_classdev *cdev)
-> >  {
-> >  	struct net_device *dev =3D cdev->net;
-> > -	u32 ir;
-> > +	u32 ir =3D 0, ir_read;
-> >  	int ret;
-> > =20
-> >  	if (pm_runtime_suspended(cdev->dev))
-> >  		return IRQ_NONE;
-> > =20
-> > -	ir =3D m_can_read(cdev, M_CAN_IR);
-> > +	/* For m_can_pci, the interrupt line is interpreted as edge-triggered=
-,
-> > +	 * but the m_can controller generates them as level-triggered. We mus=
-t
-> > +	 * observe that IR is 0 at least once to be sure that the next
-> > +	 * interrupt will generate an edge.
-> > +	 */
-> > +	while ((ir_read =3D m_can_read(cdev, M_CAN_IR)) !=3D 0) {
-> > +		ir |=3D ir_read;
-> > +
-> > +		/* ACK all irqs */
-> > +		m_can_write(cdev, M_CAN_IR, ir);
-> > +	}
->=20
-> This probably causes a measurable overhead on peripheral devices, think
-> about limiting this to !peripheral devices or introduce a new quirk that
-> is only set for the PCI devices.
->=20
-> Marc
+On Thu, 19 Sep 2024 09:48:41 +0200, Kalle Valo <kvalo@kernel.org> said:
+> Krzysztof Kozlowski <krzk@kernel.org> writes:
+>
+>> On 14/08/2024 10:23, Bartosz Golaszewski wrote:
+>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>
+>>> Describe the inputs from the PMU of the ath11k module on WCN6855.
+>>>
+>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>> ---
+>>> v1 -> v2:
+>>> - update the example
+>>
+>> I don't understand why this patch is no being picked up. The code
+>> correct represents the piece of hardware. The supplies should be
+>> required, because this one particular device - the one described in this
+>> binding - cannot work without them.
+>
+> I have already explained the situation. With supplies changed to
+> optional I'm happy take the patch.
+>
 
-Hi Marc,
+No, silent NAKing and needless stalling is what you're doing. I responded to
+your last email with extensive clarifications. You're being told by the
+experts on the subject matter (Krzysztof and Conor) that the change is correct.
 
-I did consider introducing a flag like that, but is the overhead really sig=
-nificant? In the regular
-case (where no new interrupt comes in between reading, writing and re-readi=
-ng IR), the only added
-overhead is one additional register read. On m_can_pci, I've seen the race =
-condition that causes a
-second loop iteration to be taken only once in several 100k frames on avara=
-ge.
+The change has no functional impact on the driver code. It's also in line with
+commit 71839a929d9e ("dt-bindings: net: wireless: qcom,ath11k: describe the
+ath11k on QCA6390") under which we had literally the same discussion and that
+you ended up picking up after all.
 
-Or are register reads and writes that much slower on peripheral devices tha=
-t it is more likely to
-receive a new interrupt inbetween? If that is the case, it would indeed mak=
-e sense to limit this to
-instances with edge-triggered IRQ.
+Arnd: I've added you here to bring this to your attention because it's somewhat
+related to what we discussed yesterday. It's a change that is very much
+SoC-specific, that has trouble getting upstream due to the driver's maintainer
+unwilingness to accept it. Is this a case where a change to DT bindings should
+go through the SoC rather than the driver tree?
 
-Matthias
-
-
-
->=20
-> > +
-> >  	m_can_coalescing_update(cdev, ir);
-> >  	if (!ir)
-> >  		return IRQ_NONE;
-> > =20
-> > -	/* ACK all irqs */
-> > -	m_can_write(cdev, M_CAN_IR, ir);
-> > -
-> >  	if (cdev->ops->clear_interrupts)
-> >  		cdev->ops->clear_interrupts(cdev);
-> > =20
-> > --=20
-> > TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, =
-Germany
-> > Amtsgericht M=C3=BCnchen, HRB 105018
-> > Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan=
- Schneider
-> > https://www.tq-group.com/
-> >=20
-> >=20
-> >=20
->=20
-> Achtung externe E-Mail:=C2=A0=C3=96ffnen Sie Anh=C3=A4nge und Links nur, =
-wenn Sie wissen, dass diese aus einer sicheren Quelle stammen und sicher si=
-nd. Leiten Sie die E-Mail im Zweifelsfall zur Pr=C3=BCfung an den IT-Helpde=
-sk weiter.
->   Attention external email:=C2=A0Open attachments and links only if you k=
-now that they are from a secure source and are safe. In doubt forward the e=
-mail to the IT-Helpdesk to check it.
->=20
-> =C2=A0
-
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+Best Regards,
+Bartosz Golaszewski
 
