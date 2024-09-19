@@ -1,146 +1,210 @@
-Return-Path: <netdev+bounces-128915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 060D997C6AC
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 11:13:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5862D97C6C0
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 11:17:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2B191F278D7
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:13:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 148742840A6
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:17:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975D5199E82;
-	Thu, 19 Sep 2024 09:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zh/+xn3G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD024199930;
+	Thu, 19 Sep 2024 09:17:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12AF619994B
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 09:12:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02F96199253
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 09:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726737135; cv=none; b=CvoBy7bMcdkTsb4xsrht8XAUg7ZhlOISgP3SKF9abaBGDwr6YdDQHg3z+knU4pegkvUgN2jjiAE2vJFH5IsiudwPcZEFo9SqZ/1asFxC2Qj2oddtky0eIoJi6rE9g1eJOtF7SyRulZBFA9mqutkAsw0dxklsESVzWEXq45ZRuBA=
+	t=1726737454; cv=none; b=a3TYMGZhlwgw/mhKDrLp9BypaSeRMzVTmi7nAGh9l5BuFeCaSUAgm0nMXSotyBfVu1XdujhAdVNwh4YxDnzWeKM3EQycpEK7IO+oXH/Siqb8iXIyUkLOIXXkDaELk7qzUIfvz89APRTudJogFUrKRdwpjcNR1e1fDrT6WICQQjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726737135; c=relaxed/simple;
-	bh=GVQ0O2R1uWNT+xiUn1NlNaE8AFa47yPX2wZPeJVfj+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b/Xd+l3aiKaLDdXJlyfAfgkSidXIGZ/iHScdJh1HSb1BibhB2U4Yn8pyaB66q+r8BL6F84SmH6SX/RcQPwha20peD2ooNWabCcofPawKeCH0EOIKaJZLVP/hLmUJj+8qrYnKizB/XMuGILy8SNEU95iKRVIOcATogjPvhlrI77I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zh/+xn3G; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726737132;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LCElEKBH0phTZF2fIQuSy/+s0JOFGaYopSCTxfI0dVI=;
-	b=Zh/+xn3GrA294Ko9zsGph91Djs6j8hcLToH6UCkeQkrM/l7myAm0H0P+tjCYz6CS/A2sbA
-	qe29Z8nghyTQNU/wRibZU+YsjDeRDsqOdRBJubBIskcw01ViG3GNZkioOPaac0G5FqEHTF
-	bu6ehkDg3xFloTF5jMc9KSs7iRG/Oco=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-662-JeCEQrFoMGecuPburjRqIg-1; Thu, 19 Sep 2024 05:12:10 -0400
-X-MC-Unique: JeCEQrFoMGecuPburjRqIg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3789c3541e9so229315f8f.2
-        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 02:12:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726737129; x=1727341929;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LCElEKBH0phTZF2fIQuSy/+s0JOFGaYopSCTxfI0dVI=;
-        b=OmOsNIvMMdZOErwa+wRwng6dhufS3FPGwx0MbgrURZiKITWto21B/pj8Iqx0ruPKd2
-         IoPw+zJgRg6AuwxJqCIV3yxrjYhHEQ4WBcFRrvH/+RmQg5leU0x1hNGhQrssEPtLFdO2
-         ScDNjUzonO7YhWle8erRaSFRCdtmp8Mo/tkm7k/p0wE1muXXIM8+KN+Z37uIlkZEx/OT
-         edle0wOxg+mvwiw+sXqOIrwQuwUidW4QX3OIL2wZRuDb3AUpMfhsb2n5Qy9IOFSovnRO
-         7SckJ9KOPpFnwVrFnE6dqz17lwmud8i46oP16P5xfulzDTBct+XiHbD/FVoiGXhg2XY9
-         f2+w==
-X-Gm-Message-State: AOJu0Yx9nYoB/X8AVc/ErV3fi0tsL65pqahLPUobre2WgoJ6Nxy/CTw6
-	PXvTF7jGJ5LxDgATgX3K6LN1vkGkFIQxHqxFmrtc/TfnspZzrkd4n3kYDFktWzhBWaS9AsnyDSi
-	8fkQO5KHzJpBEBzTxourczpADeXbq6lVmRSyQSsMf7bYijHXnYzqUAA==
-X-Received: by 2002:a05:6000:1815:b0:368:65ad:529 with SMTP id ffacd0b85a97d-378c2d06172mr13926642f8f.17.1726737128714;
-        Thu, 19 Sep 2024 02:12:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHiP7Zyv2OHT77WQZsp/MpXZUyd+Js26zDK1QxecEwwjKk/DBBeqSWHEiTWMF4+k3n/zDLpFw==
-X-Received: by 2002:a05:6000:1815:b0:368:65ad:529 with SMTP id ffacd0b85a97d-378c2d06172mr13926622f8f.17.1726737128263;
-        Thu, 19 Sep 2024 02:12:08 -0700 (PDT)
-Received: from [192.168.88.100] (146-241-67-136.dyn.eolo.it. [146.241.67.136])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e75468765sm16452365e9.44.2024.09.19.02.12.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Sep 2024 02:12:07 -0700 (PDT)
-Message-ID: <dd84c2d8-1571-41e9-8562-a4db232fbc38@redhat.com>
-Date: Thu, 19 Sep 2024 11:12:04 +0200
+	s=arc-20240116; t=1726737454; c=relaxed/simple;
+	bh=6rJ+Y1F5oXqTCG6kXlPKCP+27zvwmWQfn63Zo0OlV2Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k8jz2is5dI1833tAyagt5AU9ihNdqr/3C2rsZtumDeewX7vJOkAPC9yDGaRwsSgyzwpgqyK3iioODqnEQNPNnfyVV2Ex0QjaN3hkdPEUUDW5wwmMdTH5Th/g77WtvHebkRtVshMfalAIpDtv4t+efNRUwppKHtjgQEaN1WXvkhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1srDHg-0003W6-RT; Thu, 19 Sep 2024 11:17:08 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1srDHe-0091Cd-24; Thu, 19 Sep 2024 11:17:06 +0200
+Received: from pengutronix.de (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 3606733F5C2;
+	Thu, 19 Sep 2024 09:17:05 +0000 (UTC)
+Date: Thu, 19 Sep 2024 11:17:04 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>, 
+	Markus Schneider-Pargmann <msp@baylibre.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, 
+	Raymond Tan <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux@ew.tq-group.com
+Subject: Re: [PATCH 2/2] can: m_can: fix missed interrupts with m_can_pci
+Message-ID: <20240919-colorful-gorilla-of-defense-3c2da3-mkl@pengutronix.de>
+References: <ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726669005.git.matthias.schiffer@ew.tq-group.com>
+ <f6155510fbea33b0e18030a147b87c04395f7394.1726669005.git.matthias.schiffer@ew.tq-group.com>
+ <20240919-tourmaline-jaguar-of-reverence-4875d2-mkl@pengutronix.de>
+ <0ebdf87729fba276b1ff4a06a5f4dad4a3768e8a.camel@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4 0/2] bpf: devmap: provide rxq after redirect
-To: Florian Kauer <florian.kauer@linutronix.de>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- David Ahern <dsahern@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <brouer@redhat.com>,
- linux-kselftest@vger.kernel.org
-References: <20240911-devel-koalo-fix-ingress-ifindex-v4-0-5c643ae10258@linutronix.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240911-devel-koalo-fix-ingress-ifindex-v4-0-5c643ae10258@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="xjxmyvj32vfads4c"
+Content-Disposition: inline
+In-Reply-To: <0ebdf87729fba276b1ff4a06a5f4dad4a3768e8a.camel@ew.tq-group.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 9/11/24 10:41, Florian Kauer wrote:
-> rxq contains a pointer to the device from where
-> the redirect happened. Currently, the BPF program
-> that was executed after a redirect via BPF_MAP_TYPE_DEVMAP*
-> does not have it set.
-> 
-> Add bugfix and related selftest.
-> 
-> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
-> ---
-> Changes in v4:
-> - return -> goto out_close, thanks Toke
-> - Link to v3: https://lore.kernel.org/r/20240909-devel-koalo-fix-ingress-ifindex-v3-0-66218191ecca@linutronix.de
-> 
-> Changes in v3:
-> - initialize skel to NULL, thanks Stanislav
-> - Link to v2: https://lore.kernel.org/r/20240906-devel-koalo-fix-ingress-ifindex-v2-0-4caa12c644b4@linutronix.de
-> 
-> Changes in v2:
-> - changed fixes tag
-> - added selftest
-> - Link to v1: https://lore.kernel.org/r/20240905-devel-koalo-fix-ingress-ifindex-v1-1-d12a0d74c29c@linutronix.de
-> 
-> ---
-> Florian Kauer (2):
->        bpf: devmap: provide rxq after redirect
->        bpf: selftests: send packet to devmap redirect XDP
-> 
->   kernel/bpf/devmap.c                                |  11 +-
->   .../selftests/bpf/prog_tests/xdp_devmap_attach.c   | 114 +++++++++++++++++++--
->   2 files changed, 115 insertions(+), 10 deletions(-)
 
-Alex, Daniel: this will go directly via the bpf tree, right?
+--xjxmyvj32vfads4c
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
+On 19.09.2024 10:58:46, Matthias Schiffer wrote:
+> On Thu, 2024-09-19 at 10:47 +0200, Marc Kleine-Budde wrote:
+> > On 18.09.2024 16:21:54, Matthias Schiffer wrote:
+> > > The interrupt line of PCI devices is interpreted as edge-triggered,
+> > > however the interrupt signal of the m_can controller integrated in In=
+tel
+> > > Elkhart Lake CPUs appears to be generated level-triggered.
+> > >=20
+> > > Consider the following sequence of events:
+> > >=20
+> > > - IR register is read, interrupt X is set
+> > > - A new interrupt Y is triggered in the m_can controller
+> > > - IR register is written to acknowledge interrupt X. Y remains set in=
+ IR
+> > >=20
+> > > As at no point in this sequence no interrupt flag is set in IR, the
+> > > m_can interrupt line will never become deasserted, and no edge will e=
+ver
+> > > be observed to trigger another run of the ISR. This was observed to
+> > > result in the TX queue of the EHL m_can to get stuck under high load,
+> > > because frames were queued to the hardware in m_can_start_xmit(), but
+> > > m_can_finish_tx() was never run to account for their successful
+> > > transmission.
+> > >=20
+> > > To fix the issue, repeatedly read and acknowledge interrupts at the
+> > > start of the ISR until no interrupt flags are set, so the next incomi=
+ng
+> > > interrupt will also result in an edge on the interrupt line.
+> > >=20
+> > > Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkha=
+rt Lake")
+> > > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> > > ---
+> > >  drivers/net/can/m_can/m_can.c | 18 +++++++++++++-----
+> > >  1 file changed, 13 insertions(+), 5 deletions(-)
+> > >=20
+> > > diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_=
+can.c
+> > > index 47481afb9add3..363732517c3c5 100644
+> > > --- a/drivers/net/can/m_can/m_can.c
+> > > +++ b/drivers/net/can/m_can/m_can.c
+> > > @@ -1207,20 +1207,28 @@ static void m_can_coalescing_update(struct m_=
+can_classdev *cdev, u32 ir)
+> > >  static int m_can_interrupt_handler(struct m_can_classdev *cdev)
+> > >  {
+> > >  	struct net_device *dev =3D cdev->net;
+> > > -	u32 ir;
+> > > +	u32 ir =3D 0, ir_read;
+> > >  	int ret;
+> > > =20
+> > >  	if (pm_runtime_suspended(cdev->dev))
+> > >  		return IRQ_NONE;
+> > > =20
+> > > -	ir =3D m_can_read(cdev, M_CAN_IR);
+> > > +	/* For m_can_pci, the interrupt line is interpreted as edge-trigger=
+ed,
+> > > +	 * but the m_can controller generates them as level-triggered. We m=
+ust
+> > > +	 * observe that IR is 0 at least once to be sure that the next
+> > > +	 * interrupt will generate an edge.
+> > > +	 */
+> > > +	while ((ir_read =3D m_can_read(cdev, M_CAN_IR)) !=3D 0) {
+> > > +		ir |=3D ir_read;
+> > > +
+> > > +		/* ACK all irqs */
+> > > +		m_can_write(cdev, M_CAN_IR, ir);
+> > > +	}
+> >=20
+> > This probably causes a measurable overhead on peripheral devices, think
+> > about limiting this to !peripheral devices or introduce a new quirk that
+> > is only set for the PCI devices.
 
-Paolo
+> I did consider introducing a flag like that, but is the overhead
+> really significant? In the regular case (where no new interrupt comes
+> in between reading, writing and re-reading IR), the only added
+> overhead is one additional register read. On m_can_pci, I've seen the
+> race condition that causes a second loop iteration to be taken only
+> once in several 100k frames on avarage.
 
+A register read via SPI is quite costly compared to mmio. And Marcus has
+optimized the peripheral case quite good, and I don't want any
+performance regressions.
+
+> Or are register reads and writes that much slower on peripheral
+> devices that it is more likely to receive a new interrupt inbetween?
+> If that is the case, it would indeed make sense to limit this to
+> instances with edge-triggered IRQ.
+
+The mcp251xfd driver actually loops [1] the whole handling until there
+are no IRQ pending:
+
+https://elixir.bootlin.com/linux/v6.11/source/drivers/net/can/spi/mcp251xfd=
+/mcp251xfd-core.c#L1466
+
+But the m_can driver doesn't.
+
+[1] I don't have measurements how often the driver actually loops.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--xjxmyvj32vfads4c
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbr7A0ACgkQKDiiPnot
+vG+P7wf/bY5m4qLcECs+4hJbJAyLo63e2qk3wRpv2w78Tyxxy588C2apyme79dDE
+izqcomSc2J++eWqZTfF3Yg87PupRIUUuiiHoaiut1+YWYw55B7eTfvEe8ASLLTd6
+JtDPbolQ5LOAyLllu1tMx4KRB7vI21DPsRtkaJrexl3U3aNl8knR8tPkHnuCtwxW
+qJIerMS0stYvA4lNGkPOeUBH1gYIGrPQRgSdV7GwDpprZ88UlIM148jLj8H1CX4Y
+bKlKBw2oF4uCsKgOG79VMfqat/HHFZEc8iFg6NDZ9MTi9QRT+KYMB2U8k2OZFDwM
+Gkniox4gMne7atjgnffhTqX+PbqQ5g==
+=ft3C
+-----END PGP SIGNATURE-----
+
+--xjxmyvj32vfads4c--
 
