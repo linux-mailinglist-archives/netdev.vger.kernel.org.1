@@ -1,83 +1,81 @@
-Return-Path: <netdev+bounces-128972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0500797CA8D
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 15:56:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 527FE97CAD7
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 16:17:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E9331F21E4A
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 13:56:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 834971C22650
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:17:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8382B19F13C;
-	Thu, 19 Sep 2024 13:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CBD19D098;
+	Thu, 19 Sep 2024 14:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMgjs/+u"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3fa7bGMC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0F919EEC6;
-	Thu, 19 Sep 2024 13:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E7E420B04;
+	Thu, 19 Sep 2024 14:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726754162; cv=none; b=rYoxLbFi+LqmIvasHvF+Gre8X0dDtGGdKzgkVl4JyyWSM0kfQgxMLfxpEVISYRn/dyqpHhtJB2wTs9QyAZftuGoEs5pxyg9wVuB19LDXVQk+s5EYC3IgvETos/mHeev0Sfv2g9EIG7eITYmDyOWVro3md/7QqUaj6Sc4D2ww8WM=
+	t=1726755461; cv=none; b=EOWRuhC3WuVru2YlNYTcsduXzB6M7QSIOM7xt1NF2SyFRxn6BXxd8cgjr8xszfZlfZhbpoQozK+HzjZKEEtGftXqAuTH2092AbPNpXiNRPpjo80kPOTBE0xhYtdosxkMcPB6L+IZQuJRnPAhpirYHviiGHtE4/lGIzXtcq5eHC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726754162; c=relaxed/simple;
-	bh=FUIoneVuELrqS1CNv63Jdafju3cgq3W0v0AThpJiRqs=;
+	s=arc-20240116; t=1726755461; c=relaxed/simple;
+	bh=vRsq37cyFsnMCRJWk08SutfAhz42ipMp2Yw5nEOlxaw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hI/L1qG+mEsR+OHrcxQegjVN76uDGnE87JosjbvrDYEwaAXKgLOtFtDO+G0PIFWyzXYaDhAdStrbgFDrY/skPLlcZGWx0Hb9yRcQQHKTmGoKQq+aUgq432z1xSjPuVS2pFzW1dzsu0c2P0lxGyV5GM6ivPyXJltHi0NXgDhtezs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMgjs/+u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3432C4CEC4;
-	Thu, 19 Sep 2024 13:55:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726754161;
-	bh=FUIoneVuELrqS1CNv63Jdafju3cgq3W0v0AThpJiRqs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JMgjs/+uxiqe8HQ/PbmcxxRE00miX9ymA1Xs2crx+F3HcFAKpQe/WxggkN7ZbKT1j
-	 U9+9hUpTf4EflnjwiUoKrT2iXr4woDwln8r/BmLZhL2fs9+S7bqbP+Autl9T/DNH25
-	 ow/E27sjLuStpq7L5D8rKZB+5k8dWDobaEOPK2+uVnBi/ZvaMqGCOkqnRBD1elPE7O
-	 Cn3XmCMxexLgMKeySdgp6Mbcmj1B0HSMZkZzQITGfnu5g8VWlA4pb3MgmJIwZd6CHY
-	 7bw+S7hfuj0HQtfq27M0W7pxyBhEBfmKbH00sDh8eGb7AHicmU7/j331N+Rcny1gqn
-	 dtp/MoD4fDzxw==
-Date: Thu, 19 Sep 2024 14:55:57 +0100
-From: Simon Horman <horms@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	edumazet@google.com, pabeni@redhat.com, sdf@fomichev.me,
-	matttbe@kernel.org, linux-kselftest@vger.kernel.org,
-	Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net] selftests/net: packetdrill: increase timing
- tolerance in debug mode
-Message-ID: <20240919135557.GD1571683@kernel.org>
-References: <20240919124412.3014326-1-willemdebruijn.kernel@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BF8Cq5S3KxbIHOe3ldjHhW5quBh0gOIBFw8WisIZV23ui8qayxE910gMuwtsEcazsry175lOFAkGdAB7d3F/VqwuFw2O1S6O/1zhaV9mKbk/uaFNQCbGMR7fNMWQjq1HNLk3EW4RxXFOExFJq6I94QCSvBFyqMheW0IJXusOShU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3fa7bGMC; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+	:Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=vRsq37cyFsnMCRJWk08SutfAhz42ipMp2Yw5nEOlxaw=; b=3fa7bGMC4PvUTU5hEXpH7tFiZ/
+	F003lTIjZNWpChSRjQZ07bBk54UxrKOMGMeXEGDpRg/QOOakXjryc703OYvHMeC36AISjSLzfpqD+
+	cm9vKilNvw4IErn56QRmet9iMyDphEan4n2dWEMmL/JNBRhm+Gt8uTZQFAswHuXEwPP4G18wlCqu3
+	RHCOAYygRsTwGG0zGICHpJwA3Vi4f2dlKOB61JAIaKF4XyEnh5i511BncKWgr9QPW9WXv2h9URw+t
+	gnU/uMFQTYTDhwJHRqa1xr2Sqp/qGs9VmSJ0ajUnjhLcbC7WdviMT0MfeMhpZDMQdxCWQGXPRIdN6
+	dryUqQJQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1srHyR-0000000AQfa-3oDX;
+	Thu, 19 Sep 2024 14:17:35 +0000
+Date: Thu, 19 Sep 2024 07:17:35 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: =?iso-8859-1?Q?H=E5kon?= Bugge <haakon.bugge@oracle.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Allison Henderson <allison.henderson@oracle.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, rds-devel@oss.oracle.com
+Subject: Re: [MAINLINE 0/2] Enable DIM for legacy ULPs and use it in RDS
+Message-ID: <Zuwyf0N_6E6Alx-H@infradead.org>
+References: <20240918083552.77531-1-haakon.bugge@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240919124412.3014326-1-willemdebruijn.kernel@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240918083552.77531-1-haakon.bugge@oracle.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Sep 19, 2024 at 08:43:42AM -0400, Willem de Bruijn wrote:
-> From: Willem de Bruijn <willemb@google.com>
-> 
-> Some packetdrill tests are flaky in debug mode. As discussed, increase
-> tolerance.
-> 
-> We have been doing this for debug builds outside ksft too.
-> 
-> Previous setting was 10000. A manual 50 runs in virtme-ng showed two
-> failures that needed 12000. To be on the safe side, Increase to 14000.
-> 
-> Link: https://lore.kernel.org/netdev/Zuhhe4-MQHd3EkfN@mini-arch/
-> Fixes: 1e42f73fd3c2 ("selftests/net: packetdrill: import tcp/zerocopy")
-> Reported-by: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
+On Wed, Sep 18, 2024 at 10:35:50AM +0200, Håkon Bugge wrote:
+> The Dynamic Interrupt Moderation mechanism can only be used by ULPs
+> using ib_alloc_cq() and family. We extend DIM to also cover legacy
+> ULPs using ib_create_cq(). The last commit takes advantage of this end
+> uses DIM in RDS.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+I would much prefer if you could move RDS off that horrible API finally
+instead of investing more effort into it and making it more complicated.
 
 
