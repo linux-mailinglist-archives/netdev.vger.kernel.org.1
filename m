@@ -1,138 +1,144 @@
-Return-Path: <netdev+bounces-128886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17AAD97C4D7
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:27:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34ABF97C4C4
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:19:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8BF31F217FC
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 07:27:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6362D1C2222B
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 07:19:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987C5193425;
-	Thu, 19 Sep 2024 07:27:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700911925A9;
+	Thu, 19 Sep 2024 07:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="vuPv0Wcw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dw7d2xBj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA72D193418;
-	Thu, 19 Sep 2024 07:27:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA94192593;
+	Thu, 19 Sep 2024 07:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726730857; cv=none; b=YXQRSCRZcxKUOEY/okTTzijZGtriuM4rv43+S5dfOhVKDTOE3oz0ZVC6IhnT0U+AOoVnGJYj4w9R6tHWgAqqSBbwSDnSxn9Jfca7xHxiuReIjIEhSl2Qau5bFAkz5XrIHCuVTmnLHc7jA4kRg6H0gXOV9yYsU5tL+6Jlla5ECHw=
+	t=1726730383; cv=none; b=nuSkFZSdz19hrPbedooaXZtlnv9qDGB01f96ou6mmMoM9gX3zTLgZwPBGpaW5OucbAAE19fGGJOQZC79Q53sJ2KH6pY8UxycqNY7gYbRl6VFFPmKB7cT9xgcY3CaADiLyhILpUiDElRpiGjIjftL6H4TmGXqA4U2CNuwb5MxF48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726730857; c=relaxed/simple;
-	bh=GVjuTIwkdsz4YHVBTRhSWjHQ/dDR05dJ+3peEJosjgg=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=I4hoOjAsFaRR0vFfaKMTvz0OcQgF0CWm5RgKXyzsPLyl5K63qGIe6jFu+WLRlR6VGDCHCu7Q3dnQ8I20t72NErsq3S/Ep9vU4Hzehw59qjuC6iBKO31pj8y7/lmbEoq3ypoCQUZrggPitswV9B7inuupeZ9yfDTROxaLq6ycfwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=vuPv0Wcw; arc=none smtp.client-ip=162.62.57.252
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1726730543;
-	bh=WVNu8AiV9G8393mFYa1TtjTVMD7rCrQTbszT2HczlEQ=;
-	h=From:To:Cc:Subject:Date;
-	b=vuPv0Wcwdoicp14iTbyOB1Yeubc/2Qizga93E+w3BphIoIpvQORRDeKc5AkGXnqtT
-	 Vymia5XPMcCbqebGTO/y/iQ7GFx9iJsWPnAMhxpSiCDND/zrEUY/v/R8m1U7LvH1C+
-	 KqiU9Bh9QksY5Ze4dQQMWz96rbRlyPOgVrQXoVMQ=
-Received: from localhost.localdomain ([114.246.200.160])
-	by newxmesmtplogicsvrsza15-1.qq.com (NewEsmtp) with SMTP
-	id 4093144F; Thu, 19 Sep 2024 15:16:09 +0800
-X-QQ-mid: xmsmtpt1726730169t92x1i33o
-Message-ID: <tencent_24586A9E52F56C5C12E9535AD3F243C98B06@qq.com>
-X-QQ-XMAILINFO: M4wVjRC01ue09gv8wxMJnKV3gXmV+vNnebMTHEZ2/+ALg1OBD+uHWsDyqihdMH
-	 T25+DQJk2dnTCYuw37iaRXzDqvx36WUNqqJQG1YWiCU++8nALikm3nBq+cBwTSmxFCcXS+EkMZ+v
-	 w+7lnJhhvMoANmSL+QvJ2cGB7BYVWe8l/vlDElE3k2en0M+CfqmWT+qax3H3yJY/4zwNrqw6MmYb
-	 Ns3O01phe7+GRzX++6Sis71rnusRDjcbGaOHhiwqNsMxUpcvO2SzPeJl/wb1kATvDxVMo9uqfxum
-	 baNubbIz74GA4CVi6OK2UsQEKRPvKabjr/JJaPvmMBF78rf/iQvRdsMv6N1ei91U9RW57e7wsATc
-	 RkbURfVSpA+ce7VsJmd/k3LItbgagmL5qa+gMxCWFokVhtDThPzjc4SlDJAJHtSzMniEaAquTHnX
-	 IFXop4/TIpAM0L1w+Ll9FDR0zUWYCx0ieYvAtlzZR69xg2vNnAwt3rGPLH/GGsbNsNVxbWh6hRGZ
-	 FqjXFvlquUBBsR/uyXosWOdXUjmu8bN07xJ3gXb2xICdlrqZAGLvmIdSdNh5+88XO/1G1M/tygvg
-	 eT7Ca8ymoz5+s5tl7stk+U8H5TVZZNSejHCHqVmbyVLw9duhxtii1W6QOv8OspVK9RIjqndd6M1W
-	 E/gyx69dJD1aFxa2XbK1pwb4qDbbvhQkAboJUl0VoowyAyxWpYsNJk5OED0Mg/Eh/aLe3wAN9ilx
-	 k+g5LMZU1SstF5Gu1yfmnfvKrIEM/qJELJaSZco6TViv94ZLooqiv67G0cZTNEmxJib3JigUdFJP
-	 4dfHXmiHQFhFIaG849E5QWceZL7r47/KUoPKjfTue+DzqAyJsCpzYFoLkhaYwJfBtzKcYo/TPySu
-	 F3N1UBruL8lBcf555z0Wk1LoT0qHOji3PQFR/VOpb57XpXZQlcQWT3glvxCmiAzrutygymxCzZRs
-	 77ZwUM90LL7iltzaKdvHsCfsen/DWNXTKGUl4+HA0AtvVFA7/d6eAGRVCpwjxHTb54wIp+iVsvbL
-	 viXSbbSjUMNEZzQWsYuuCf3YIRtLBZkZXZBNgakn5rkm8hQjK1KdE1awlxIr8=
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Jiawei Ye <jiawei.ye@foxmail.com>
-To: alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	david.girault@qorvo.com
-Cc: linux-wpan@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] mac802154: Fix potential RCU dereference issue in mac802154_scan_worker
-Date: Thu, 19 Sep 2024 07:16:09 +0000
-X-OQ-MSGID: <20240919071609.985069-1-jiawei.ye@foxmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1726730383; c=relaxed/simple;
+	bh=xgA8G3nc0J2EPhpNgAx9tM/joMRB8dT/O5HDpx8HPF0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qsNdRW6dLOGW9I5mUgwuB3cYMui1+FpjCVy6ZSdSzIFl4oqH296U3vXQxUZ062UgDzzVb5eQeQC+iixXpBSJILIwFLulCNJHHxhVbV4rDU37HB9WTHLzIp9dmzZJOfW7LFJqfRKj40HD2ISr2R8xinsb4udKlJU5WkoHN+AHwWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dw7d2xBj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1A2FC4CEC4;
+	Thu, 19 Sep 2024 07:19:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726730383;
+	bh=xgA8G3nc0J2EPhpNgAx9tM/joMRB8dT/O5HDpx8HPF0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Dw7d2xBjuSX4iOelZBZQZmOM4JstPWpzT3oHmacEbGJDdVpncG3rVqW4PFstCQcyt
+	 mjisC4T6hhcD67cXSKEc2c3vQeUUykp2fcyEpG/nZXDzWIQ5PCIwYIR4akmHrXxNY9
+	 jOJmNLdCm5PWNla7dvswtFqjNSrMhYM/mItZpN86DyVW90JYepGkNVdpjGZyEGHnr7
+	 HNi8kBsiGIG0a5n25/Af0HhtpqhietiCu33U+347y47kfiYfb2eSJfPWsi0vuzq6uk
+	 n2xt9RTaFdjZ23zbIyx66u/VaBy5pTKBswaSuMSprYvCdH7vTG+40nF1W6119H8Mul
+	 e9z9UrZjVFInA==
+Date: Thu, 19 Sep 2024 08:19:37 +0100
+From: Simon Horman <horms@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH nf-next 0/2] netfilter: conntrack: label helpers
+ conditional compilation updates
+Message-ID: <20240919071801.GB1044577@kernel.org>
+References: <20240916-ct-ifdef-v1-0-81ef1798143b@kernel.org>
+ <Zuq-7kULeAMPRmFg@calendula>
+ <Zurbw1-Fl0EfdC0l@smile.fi.intel.com>
+ <Zurjur431P7DqifB@calendula>
+ <ZusHYUGYPADO1SgY@smile.fi.intel.com>
+ <ZutMf_f0tQwQZFzH@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZutMf_f0tQwQZFzH@calendula>
 
-In the `mac802154_scan_worker` function, the `scan_req->type` field was
-accessed after the RCU read-side critical section was unlocked. According
-to RCU usage rules, this is illegal and can lead to unpredictable
-behavior, such as accessing memory that has been updated or causing
-use-after-free issues.
+On Wed, Sep 18, 2024 at 11:56:24PM +0200, Pablo Neira Ayuso wrote:
+> On Wed, Sep 18, 2024 at 08:01:21PM +0300, Andy Shevchenko wrote:
+> > On Wed, Sep 18, 2024 at 04:29:14PM +0200, Pablo Neira Ayuso wrote:
+> > > On Wed, Sep 18, 2024 at 04:55:15PM +0300, Andy Shevchenko wrote:
+> > > > On Wed, Sep 18, 2024 at 01:52:14PM +0200, Pablo Neira Ayuso wrote:
+> > > > > On Mon, Sep 16, 2024 at 04:14:40PM +0100, Simon Horman wrote:
+> > > > > > Hi,
+> > > > > > 
+> > > > > > This short series updates conditional compilation of label helpers to:
+> > > > > > 
+> > > > > > 1) Compile them regardless of if CONFIG_NF_CONNTRACK_LABELS is enabled
+> > > > > >    or not. It is safe to do so as the functions will always return 0 if
+> > > > > >    CONFIG_NF_CONNTRACK_LABELS is not enabled.  And the compiler should
+> > > > > >    optimise waway the code.  Which is the desired behaviour.
+> > > > > > 
+> > > > > > 2) Only compile ctnetlink_label_size if CONFIG_NF_CONNTRACK_EVENTS is
+> > > > > >    enabled.  This addresses a warning about this function being unused
+> > > > > >    in this case.
+> > > > > 
+> > > > > Patch 1)
+> > > > > 
+> > > > > -#ifdef CONFIG_NF_CONNTRACK_LABELS
+> > > > >  static inline int ctnetlink_label_size(const struct nf_conn *ct)
+> > > > > 
+> > > > > Patch 2)
+> > > > > 
+> > > > > +#ifdef CONFIG_NF_CONNTRACK_EVENTS
+> > > > >  static inline int ctnetlink_label_size(const struct nf_conn *ct)
+> > > > > 
+> > > > > They both refer to ctnetlink_label_size(), #ifdef check is not
+> > > > > correct.
+> > > > 
+> > > > But the first one touches more, no?
+> > > 
+> > > Yes, it also remove a #define ctnetlink_label_size() macro in patch #1.
+> > > I am fine with this series as is.
+> > 
+> > What I meant is that the original patch 1 takes care about definitions of
+> > two functions. Not just a single one.
+> 
+> My understanding is that #ifdef CONFIG_NF_CONNTRACK_LABELS that wraps
+> ctnetlink_label_size() is not correct (patch 1), instead
+> CONFIG_NF_CONNTRACK_EVENTS should be used (patch 2).
+> 
+> Then, as a side effect this goes away (patch 1):
+> 
+> -#else
+> -#define ctnetlink_dump_labels(a, b) (0)
+> -#define ctnetlink_label_size(a)     (0)
+> -#endif
+> 
+> that is why I am proposing to coaleasce these two patches in one.
 
-This possible bug was identified using a static analysis tool developed
-by myself, specifically designed to detect RCU-related issues.
+Thanks,
 
-To address this, the `scan_req->type` value is now stored in a local
-variable `scan_req_type` while still within the RCU read-side critical
-section. The `scan_req_type` is then used after the RCU lock is released,
-ensuring that the type value is safely accessed without violating RCU
-rules.
+Just to clarify. I did think there is value in separating the two changes.
+But that was a subjective judgement on my part.
 
-Fixes: e2c3e6f53a7a ("mac802154: Handle active scanning")
-Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
----
- net/mac802154/scan.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Your understanding of the overall change is correct.
+And if it is preferred to have a single patch - as seems to be the case -
+then that is fine by me.
 
-diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-index 1c0eeaa76560..29cd84c9f69c 100644
---- a/net/mac802154/scan.c
-+++ b/net/mac802154/scan.c
-@@ -180,6 +180,7 @@ void mac802154_scan_worker(struct work_struct *work)
- 	unsigned int scan_duration = 0;
- 	struct wpan_phy *wpan_phy;
- 	u8 scan_req_duration;
-+	enum nl802154_scan_types scan_req_type;
- 	u8 page, channel;
- 	int ret;
- 
-@@ -210,6 +211,7 @@ void mac802154_scan_worker(struct work_struct *work)
- 
- 	wpan_phy = scan_req->wpan_phy;
- 	scan_req_duration = scan_req->duration;
-+	scan_req_type = scan_req->type;
- 
- 	/* Look for the next valid chan */
- 	page = local->scan_page;
-@@ -246,7 +248,7 @@ void mac802154_scan_worker(struct work_struct *work)
- 		goto end_scan;
- 	}
- 
--	if (scan_req->type == NL802154_SCAN_ACTIVE) {
-+	if (scan_req_type == NL802154_SCAN_ACTIVE) {
- 		ret = mac802154_transmit_beacon_req(local, sdata);
- 		if (ret)
- 			dev_err(&sdata->dev->dev,
--- 
-2.34.1
+Going forward, I'll try to remember not to split-up patches for netfilter
+so much.
 
+Kind regards,
+Simon
 
