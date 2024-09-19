@@ -1,85 +1,82 @@
-Return-Path: <netdev+bounces-128955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74B6597C937
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:31:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8140E97C948
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:35:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A79C51C212F0
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:31:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB861F237C7
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:35:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E491F19AD8D;
-	Thu, 19 Sep 2024 12:31:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15D1419D8BB;
+	Thu, 19 Sep 2024 12:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="xyDzsdw2"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="CxgGwm8n";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="Ir6SVbs6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-221-149.mail.qq.com (out203-205-221-149.mail.qq.com [203.205.221.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1620C19B3C5;
-	Thu, 19 Sep 2024 12:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E923F1EB2F;
+	Thu, 19 Sep 2024 12:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726749093; cv=none; b=BOs54p1jUE4CQTaXwYYd632uJ44+T2K+ICOMiISxUDQ6Ohq3p4bjm5+msGPG1Mtr3NXPu44M3snewmmMemVPmoKLHfDiPxF/TQm2evx6G5l429zZvekiSmSPgZd0ZGXApi81EWMVoUD3a8VbHIuOQDn4InUdkV+Hyr8tLAEuuvo=
+	t=1726749333; cv=none; b=MbRk1/84iiI5BKRO4YYGdIiivUkRx/PjM2yN2V902LX2fDCfH8YOha9/afajmmockPrQJl8K71ENu2JeROlBqLYiMuPMasu6edKc5Taf/5BA7PHqMfL8+0u3ViWxNV5imTUYIpbb1mdsu7QexjX6AFQGVB71skd6fpPdLJnpwIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726749093; c=relaxed/simple;
-	bh=V+T0Pu2P42+FAOgyBvdWJNXdBMvCqGs3O9XO4cJXROk=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=goD7s9UOZTKJchDFYiAmOwJ/dD9beuVYLbKDweA6W1M0eOAd0Q8AztA+4v2ffDGzLEKqaXa3DOcqlucTYe2lXyE8Dk/mXLkPluCerbi7BSbtd90wF3ZXxFCgtOcaQW5oWYPdBnoHoGbB3/dtMGWFJeftjw4MfxNSbbmWGwYkQa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=xyDzsdw2; arc=none smtp.client-ip=203.205.221.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1726748781;
-	bh=Ugf04+8SH5clAs9zJB1Rtjp8akqAeiWsHmjBZsQxOh8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=xyDzsdw2RNezgXbpb8Vx3CdYNcdvcW4Shk0pwOdY6LX2tf4OV0kwU8JbcedTb1VpO
-	 91Wk//OIgZMNdNSaqR7wjr83daZvTu00Bkhzx4NNZ6TM5pqo5zsjhlYfWd1hUuqxJj
-	 7eaTjPFVTwLC/z5O39d8z5AO5M1RT4/8lfU5B6vw=
-Received: from localhost.localdomain ([114.246.200.160])
-	by newxmesmtplogicsvrsza15-1.qq.com (NewEsmtp) with SMTP
-	id 69205012; Thu, 19 Sep 2024 20:26:18 +0800
-X-QQ-mid: xmsmtpt1726748778tiu3ik25l
-Message-ID: <tencent_8C653C3534893CF0BC88A43A2831CDA2260A@qq.com>
-X-QQ-XMAILINFO: NA8WCMn5GQiMadq4APsyVXge7vikEiAl3jr0qOtnpDBMuNQJ+ZbuMqXIuW2m3H
-	 ER1FQ2M7I/+VDzgxrkXACFvVyrWc7NM9Z14uepgwGPefC1ZH7AEI/Zhizsp60JWO4+FRvCDQi8QK
-	 uy7sGLbsCbiHTxdeLkE8E93FuayyiYVVc0LO68AtzxdiReJZzUrA9LIFjtnbVF3ktqFFLugWuLL/
-	 7jZ8SMMydnC0gHQrZut4lf13xDQMftQqX1lSr0rx9UR5A5eELqGtsKhrihloNBJmwsXRvcOVhdvz
-	 iZOuKN2laS+nPlntMe0nXWAnoAmpvSKO348ZIQ+sIH1xASzttzc5XZ6ViidkFw/UaqYB53960Nc9
-	 RQNZ3slH0swhCxfZn6S2xqV8F+DWkqTMXE3IEpp2nQw9FjTMKAvDakAIQlSRlJo0vSNp7hrlhnHj
-	 YXGhTTkRBYn0CxK01d/y9S7tT5w2tky5s5+lpwBnk/5WcoabuFMv/qG4hCMBTl4imY0IFw7eBV9O
-	 ypP/xQHypRnWa5yEeVHOVaRtgvc9y2LLd+GG+TDMN/NZDZsfpqHGYQgMaLm4uqnGlAJ5wAhw+5yU
-	 FedszXGKJ9HmzUpsATJchdYo1ANXSHhlpY1CW6gWjg/MdeoK8AxA/R31QlY9EqEHIyNUqv3SnpFl
-	 X+0h7kBPwKR6Ju4B+ibUiybaGV3bVB2l0wUD3/XmsklyCAKgTiyW6b10XWSHUdscHmKoIs4/FIsK
-	 5ZPC2Szrkh7zveexzliLUrMNZ/apTGOnKv2FAB2B1kWtO4VsVbRYxp7Z0t9CigU5zs++MB4E55cl
-	 KksHkRz3BZuHF6MLUVrTAUT3T31ghDHVYeGhaT0JoJWsDM78KxgvcSzVU044+9Geb70Nmdp2B5h6
-	 Q835+fLgXTHFx2kgY3vQJSweJ3odaWzZrU15F4CagKPbTvZBvWwX+/DoVP43TJJ2yA/Ojrx7jfTI
-	 AgqyoK58GvYZRYdRZpoQUOGFr2PgZ56jovIGLLIk+vn2oFqJ551EqLzq3D3Ja2q+gt1fScARbdEw
-	 vWbfqJS2oQNsrF+lDxb/H6WaE2MIESMvRTKT62SCScSWLoafLYt48H1Jd3Z8IFeOeqa0ig/3E9bM
-	 NcTeFDvptQDND5gtxXya9A6y3uzw==
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-From: Jiawei Ye <jiawei.ye@foxmail.com>
-To: przemyslaw.kitszel@intel.com
-Cc: alex.aring@gmail.com,
-	davem@davemloft.net,
-	david.girault@qorvo.com,
+	s=arc-20240116; t=1726749333; c=relaxed/simple;
+	bh=C0qiYBjh7+JNE6dSxlKxI/K2eGBbcQXB5lUFPJMb3nw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sx4LO1WhO9Bnp+bcwRLn+goIYbzhsFLT0pbfPjgN5W3DEog/CByvVqyjRP3XDwToTFxUhDc/2IlS+8AmVh5gux8qAuok74nS54BKd/GAoUHLQujWsgh5FWgN3R4tlV0d6QdAp9pyohL8ojAP5SdSRPig+f/PZSvbqRIElxVcj1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=CxgGwm8n; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=Ir6SVbs6; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D1D24338D2;
+	Thu, 19 Sep 2024 12:35:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1726749329; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=03iIXrm2d6dZ3mz5HP9AK7PKZOvrRHH8k/30bsSSODc=;
+	b=CxgGwm8nkJYm6CYU6iU5ojIwjv22TMnywi+UwUX9DXbFQcGx7GyI2HWP8XtA/Va//dfqCE
+	Oy27u7aWmDIrr/yOjee0yxRFjMlvlEO5KF4VYFw7ONf+VL7G3Z+CsUAufo7Qh+SmqM6lko
+	+mORCRUoHAkahsrpyp/flJHqmIdPgKI=
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.com header.s=susede1 header.b=Ir6SVbs6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1726749328; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=03iIXrm2d6dZ3mz5HP9AK7PKZOvrRHH8k/30bsSSODc=;
+	b=Ir6SVbs6Gq/S2XQPoEb/UJFdcLES5VQxult3+ncWDxzDEzG7e07FnwBzWGQw6POGjAkykW
+	tpFjoSr3VnXCgs+2cu719G0EBDhupHssvKD4/dRo3hpM6+rE0VVwOOmSapMw4uuRh4XIFT
+	ZlS0DevOVM3iwwGOwHkdtIAo0KmMiZE=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9649913A5F;
+	Thu, 19 Sep 2024 12:35:28 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id okdEI5Aa7GblLAAAD6G6ig
+	(envelope-from <oneukum@suse.com>); Thu, 19 Sep 2024 12:35:28 +0000
+From: Oliver Neukum <oneukum@suse.com>
+To: davem@davemloft.net,
 	edumazet@google.com,
-	jiawei.ye@foxmail.com,
 	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	miquel.raynal@bootlin.com,
-	netdev@vger.kernel.org,
 	pabeni@redhat.com,
-	stefan@datenfreihafen.org
-Subject: Re: [PATCH] Fix the RCU usage in mac802154_scan_worker
-Date: Thu, 19 Sep 2024 12:26:17 +0000
-X-OQ-MSGID: <20240919122617.1169865-1-jiawei.ye@foxmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <f3c26426-7ebb-4b8b-9443-f604292a53a9@intel.com>
-References: <f3c26426-7ebb-4b8b-9443-f604292a53a9@intel.com>
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Oliver Neukum <oneukum@suse.com>,
+	stable@vger.kernel.org
+Subject: [PATCHv3] usbnet: fix cyclical race on disconnect with work queue
+Date: Thu, 19 Sep 2024 14:33:42 +0200
+Message-ID: <20240919123525.688065-1-oneukum@suse.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,80 +84,174 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: D1D24338D2
+X-Spam-Score: -5.01
+X-Rspamd-Action: no action
+X-Spamd-Result: default: False [-5.01 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	DWL_DNSWL_MED(-2.00)[suse.com:dkim];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FROM_HAS_DN(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:dkim,suse.com:mid,suse.com:email,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DKIM_TRACE(0.00)[suse.com:+]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On 9/19/24 17:01, Przemek Kitszel wrote:
-> > In the `mac802154_scan_worker` function, the `scan_req->type` field was
-> > accessed after the RCU read-side critical section was unlocked. According
-> > to RCU usage rules, this is illegal and can lead to unpredictable
-> > behavior, such as accessing memory that has been updated or causing
-> > use-after-free issues.
-> > 
-> > This possible bug was identified using a static analysis tool developed
-> > by myself, specifically designed to detect RCU-related issues.
-> > 
-> > To address this, the `scan_req->type` value is now stored in a local
-> > variable `scan_req_type` while still within the RCU read-side critical
-> > section. The `scan_req_type` is then used after the RCU lock is released,
-> > ensuring that the type value is safely accessed without violating RCU
-> > rules.
-> > 
-> > Fixes: e2c3e6f53a7a ("mac802154: Handle active scanning")
-> > Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
-> > ---
-> >   net/mac802154/scan.c | 4 +++-
-> >   1 file changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
-> > index 1c0eeaa76560..29cd84c9f69c 100644
-> > --- a/net/mac802154/scan.c
-> > +++ b/net/mac802154/scan.c
-> > @@ -180,6 +180,7 @@ void mac802154_scan_worker(struct work_struct *work)
-> >   	unsigned int scan_duration = 0;
-> >   	struct wpan_phy *wpan_phy;
-> >   	u8 scan_req_duration;
-> > +	enum nl802154_scan_types scan_req_type;
-> 
-> this line violates the reverse X-mass tree rule of code formatting
+The work can submit URBs and the URBs can schedule the work.
+This cycle needs to be broken, when a device is to be stopped.
+Use a flag to do so.
+This is a design issue as old as the driver.
 
-Thank you for pointing out the concern regarding the violation of the
-reverse Christmas tree rule. I will adjust the placement of 
-`enum nl802154_scan_types scan_req_type` to be between 
-`struct cfg802154_scan_request *scan_req` and 
-`struct ieee802154_sub_if_data *sdata`. If this change is suitable,
-should I resend the patch as a v2 patch?
+Signed-off-by: Oliver Neukum <oneukum@suse.com>
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+CC: stable@vger.kernel.org
+---
 
-> 
-> >   	u8 page, channel;
-> >   	int ret;
-> >   
-> > @@ -210,6 +211,7 @@ void mac802154_scan_worker(struct work_struct *work)
-> >   
-> >   	wpan_phy = scan_req->wpan_phy;
-> 
-> this line (not yours) just saves the first level of pointer, but then
-> accesses wpan_phy->... outside of the rcu_read_lock() section, for me
-> it's very similar case to what you are fixing here
-> 
+v2: fix PM reference issue
+v3: drop unneeded memory ordering primitives
 
-According to the RCU usage rules, the value returned by `rcu_dereference()`
-should be safely dereferenced only within the RCU read-side critical
-section. It is important to note that `wpan_phy` is not obtained through
-`rcu_dereference()`, so in this context, it may not be sufficient to infer
-whether it is protected by RCU.
+ drivers/net/usb/usbnet.c   | 37 ++++++++++++++++++++++++++++---------
+ include/linux/usb/usbnet.h | 15 +++++++++++++++
+ 2 files changed, 43 insertions(+), 9 deletions(-)
 
-> >   	scan_req_duration = scan_req->duration;
-> > +	scan_req_type = scan_req->type;
-> >   
-> >   	/* Look for the next valid chan */
-> >   	page = local->scan_page;
-> > @@ -246,7 +248,7 @@ void mac802154_scan_worker(struct work_struct *work)
-> >   		goto end_scan;
-> >   	}
-> >   
-> > -	if (scan_req->type == NL802154_SCAN_ACTIVE) {
-> > +	if (scan_req_type == NL802154_SCAN_ACTIVE) {
-> >   		ret = mac802154_transmit_beacon_req(local, sdata);
-> >   		if (ret)
-> >   			dev_err(&sdata->dev->dev,
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index 18eb5ba436df..2506aa8c603e 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -464,10 +464,15 @@ static enum skb_state defer_bh(struct usbnet *dev, struct sk_buff *skb,
+ void usbnet_defer_kevent (struct usbnet *dev, int work)
+ {
+ 	set_bit (work, &dev->flags);
+-	if (!schedule_work (&dev->kevent))
+-		netdev_dbg(dev->net, "kevent %s may have been dropped\n", usbnet_event_names[work]);
+-	else
+-		netdev_dbg(dev->net, "kevent %s scheduled\n", usbnet_event_names[work]);
++	if (!usbnet_going_away(dev)) {
++		if (!schedule_work(&dev->kevent))
++			netdev_dbg(dev->net,
++				   "kevent %s may have been dropped\n",
++				   usbnet_event_names[work]);
++		else
++			netdev_dbg(dev->net,
++				   "kevent %s scheduled\n", usbnet_event_names[work]);
++	}
+ }
+ EXPORT_SYMBOL_GPL(usbnet_defer_kevent);
+ 
+@@ -535,7 +540,8 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
+ 			tasklet_schedule (&dev->bh);
+ 			break;
+ 		case 0:
+-			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
++			if (!usbnet_going_away(dev))
++				__usbnet_queue_skb(&dev->rxq, skb, rx_start);
+ 		}
+ 	} else {
+ 		netif_dbg(dev, ifdown, dev->net, "rx: stopped\n");
+@@ -843,9 +849,18 @@ int usbnet_stop (struct net_device *net)
+ 
+ 	/* deferred work (timer, softirq, task) must also stop */
+ 	dev->flags = 0;
+-	del_timer_sync (&dev->delay);
+-	tasklet_kill (&dev->bh);
++	del_timer_sync(&dev->delay);
++	tasklet_kill(&dev->bh);
+ 	cancel_work_sync(&dev->kevent);
++
++	/* We have cyclic dependencies. Those calls are needed
++	 * to break a cycle. We cannot fall into the gaps because
++	 * we have a flag
++	 */
++	tasklet_kill(&dev->bh);
++	del_timer_sync(&dev->delay);
++	cancel_work_sync(&dev->kevent);
++
+ 	if (!pm)
+ 		usb_autopm_put_interface(dev->intf);
+ 
+@@ -1171,7 +1186,8 @@ usbnet_deferred_kevent (struct work_struct *work)
+ 					   status);
+ 		} else {
+ 			clear_bit (EVENT_RX_HALT, &dev->flags);
+-			tasklet_schedule (&dev->bh);
++			if (!usbnet_going_away(dev))
++				tasklet_schedule(&dev->bh);
+ 		}
+ 	}
+ 
+@@ -1196,7 +1212,8 @@ usbnet_deferred_kevent (struct work_struct *work)
+ 			usb_autopm_put_interface(dev->intf);
+ fail_lowmem:
+ 			if (resched)
+-				tasklet_schedule (&dev->bh);
++				if (!usbnet_going_away(dev))
++					tasklet_schedule(&dev->bh);
+ 		}
+ 	}
+ 
+@@ -1559,6 +1576,7 @@ static void usbnet_bh (struct timer_list *t)
+ 	} else if (netif_running (dev->net) &&
+ 		   netif_device_present (dev->net) &&
+ 		   netif_carrier_ok(dev->net) &&
++		   !usbnet_going_away(dev) &&
+ 		   !timer_pending(&dev->delay) &&
+ 		   !test_bit(EVENT_RX_PAUSED, &dev->flags) &&
+ 		   !test_bit(EVENT_RX_HALT, &dev->flags)) {
+@@ -1606,6 +1624,7 @@ void usbnet_disconnect (struct usb_interface *intf)
+ 	usb_set_intfdata(intf, NULL);
+ 	if (!dev)
+ 		return;
++	usbnet_mark_going_away(dev);
+ 
+ 	xdev = interface_to_usbdev (intf);
+ 
+diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
+index 9f08a584d707..0b9f1e598e3a 100644
+--- a/include/linux/usb/usbnet.h
++++ b/include/linux/usb/usbnet.h
+@@ -76,8 +76,23 @@ struct usbnet {
+ #		define EVENT_LINK_CHANGE	11
+ #		define EVENT_SET_RX_MODE	12
+ #		define EVENT_NO_IP_ALIGN	13
++/* This one is special, as it indicates that the device is going away
++ * there are cyclic dependencies between tasklet, timer and bh
++ * that must be broken
++ */
++#		define EVENT_UNPLUG		31
+ };
+ 
++static inline bool usbnet_going_away(struct usbnet *ubn)
++{
++	return test_bit(EVENT_UNPLUG, &ubn->flags);
++}
++
++static inline void usbnet_mark_going_away(struct usbnet *ubn)
++{
++	set_bit(EVENT_UNPLUG, &ubn->flags);
++}
++
+ static inline struct usb_driver *driver_of(struct usb_interface *intf)
+ {
+ 	return to_usb_driver(intf->dev.driver);
+-- 
+2.46.0
 
 
