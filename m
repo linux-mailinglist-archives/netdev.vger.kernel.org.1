@@ -1,343 +1,134 @@
-Return-Path: <netdev+bounces-128952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2814197C8E0
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:10:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F01B97C8E1
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:11:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D237E283402
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:10:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F7E01C21A7D
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952AD199FCD;
-	Thu, 19 Sep 2024 12:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 065BE19D074;
+	Thu, 19 Sep 2024 12:10:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b7zLqgXy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BvxYye7o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B450738DD6
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 12:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B26A38DD6;
+	Thu, 19 Sep 2024 12:10:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726747809; cv=none; b=ntGznb9WeVdn+F9vLC4rJ7CcTWmgVJjyQs3pdQtafRCOXaZESXUE882gwXg8Yb9YQgQSDf8sOBKBsZc6htVkGUQ3OFcoNQnaaGrp5vLI+bEf2OiXMheFWJ9Zw2yw4cQx8lQemAD2u/VvQ6XVO5qMVizWDiAUlv5EoJ31JjPFj7U=
+	t=1726747856; cv=none; b=sb3QfF+MPIrorlGEgPzQxOXL6tBl7WLW0VhkCDQtEWeNNxlXmmwkhbyJMjHSD3QdbAvlc/qdOvqU24J5sI58dcorzJMogHdV/7VcniuRmW8J1fb25+XgAQhOp3yGhiRh3kgEJmgu2zVPfX4lrE5bcrK4zAB4oWtRg4TjUmDMLrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726747809; c=relaxed/simple;
-	bh=O8h0BeVrL411f5pRhP1ZQHEAW7+UfECIXXKjK8f/bhE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=BN9frLBpMQ8zvkWaEQOkTIUk3ikZ0XPkyYYcGV1jrqRtv18FB+8lesVxEbh3iM9mcXVIkKG1LYN1n+cUsMok24i+BaX8YPub/IHKqcp9K4wy4yjXusEpaW5awC7ac22CLhEdQsSqdCD9zCgF3HHJZnbGTPbj3ox+g3XxJQYlpK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b7zLqgXy; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1726747856; c=relaxed/simple;
+	bh=fbD60ODl32TKXvojAtsP1tfik+n0hoD0w4wsFhDC2Zk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HbPFqgjyuulF3eXBNqvtqiRF2psS/jmXPB9kCSMzKplxBzddx7boErNPg7ysfVoMbED4AnMQl5BAPh/HD/RQHB6nheGRr78j8LRCLK2+1jvUxNy/oywN1g4rCrHPkI95zVN0C1zeI4WPGLLDOFMkLFzvXq1rQpsDTsG/7CB+0bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BvxYye7o; arc=none smtp.client-ip=209.85.214.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6c35b72f943so6745836d6.0
-        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 05:10:07 -0700 (PDT)
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-2057835395aso9577135ad.3;
+        Thu, 19 Sep 2024 05:10:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726747807; x=1727352607; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M4qTwz6Pf8ccLEBdOAmqOSmKBsr6pnHLytiJdUIQ518=;
-        b=b7zLqgXyFR/ldcIdQs1xHhJ5iQQ+Z3wguLM/5/sdOlrZM7etByDOCxf1W/2tudh/by
-         A7Qwph5C8oTMCBR/acNgkfhN1UBj9kFLW/pxlEnh1vENlpK2kVGHcnaMY7c6wNByPWRJ
-         D77Ir82sunzm5nHAQVzbSxLk7Zcf4J2VR1SvSQo7bY4J9VLrSwUEWDuoko1OG0bScmdO
-         4JqxjHaJHdY/EtcJ6IW5tnaD27pD2UojLb+LG4k1C7S4SraQXXBmPZ/fv9qLfbt3lp0B
-         1ASa00TUqWeIc9Mt4NRPM5x3L1roPI9Ep/R+D93ZOW7o888yRH9vK15q4z6bBwlmPyMV
-         JTKA==
+        d=gmail.com; s=20230601; t=1726747855; x=1727352655; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=o32/nc+Dqjrsv+Sp5j6ph6epltryoYejvMuSKLYsEsQ=;
+        b=BvxYye7o1BqGqcxEJlgUyZv31+IGLYEf0LQZK7Ou7gi2ABsN8oeM7/G2nQxEieAv9m
+         Tzt+/SZPY9o8gq5jIaU3c9Wuut72lCA9/TUjT4yx0mbJKvY69Lxaqd9g6Wv2BmawOvYK
+         /H27qhQyPe8ZMWX3PnnzCd0+zRMrejiwk6vFh0+BCxY6XdY1qQ+gM1UXB4KRTEm6wXb2
+         Bk9i5vQnt20DZGcOU+R7zAaU2wd/Va6WV5c9T8kG64z3e50AjzBcSTx58bNmXHENQc02
+         S5wXxMGyDItwPuQPn/1rJhEh1HTvgo71PYfKGkxq+93A6ctvhANgKO2HZpFSNQkXxo8l
+         FXzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726747807; x=1727352607;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=M4qTwz6Pf8ccLEBdOAmqOSmKBsr6pnHLytiJdUIQ518=;
-        b=N1w1kPRA30ehE2Cl065C5lW7ftg8L/NPyvilEcnlW5BMarmydLKJxjcrnHIV3hQu9c
-         YIe0PnkV6YRdHHiaa6SPFXyNinldV+7F9CW/Ol2CuxRcqGOBsT8f895P9OVBXqPJT04B
-         jnqahbqOa/EGBI4YvhNLdliqyqxMSw2cZk/C4clmxYO5QU/vO9aR6dBrWaGM92HHsNzf
-         Tmezsb9FcN8VxX4PPcB6vwmt8VzVcpXbCr4u+p4ShLWWSAC+lvOTWcz7Y7HhUOZvfEF9
-         ZxuUDROx7P2GopLRKuj0JXPMvSDQwoLzRSkgv1N0c8uHpmkFYAet424DLdAhqF2Wr4Eo
-         64gA==
-X-Forwarded-Encrypted: i=1; AJvYcCXwNx/QgrNoGQT4zpB9C/5/nKpetusyBoRJQlyDgvEfbe4IAlZbkx+wD0FHS9PFQzw630zlF6Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXmVoW41wQTNYokgBk5QCZOJFXCMjC9B7phwKmBF80FKltc6aR
-	X88QP4OoBmr1labWo+PeQiIJJsOyYTs3hqRFmmgLyyiunLH3Qftq
-X-Google-Smtp-Source: AGHT+IGEQQjdjXPNpEFWsx6yFIkJGC1jeui9L5yZElfx1HIgINb1QXrW2maBKLWxILJQbgJsVlyQBw==
-X-Received: by 2002:a05:6214:3a0a:b0:6c3:3efe:3fac with SMTP id 6a1803df08f44-6c67997fe18mr52970166d6.3.1726747806532;
-        Thu, 19 Sep 2024 05:10:06 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c75e44c0bcsm7031526d6.5.2024.09.19.05.10.06
+        d=1e100.net; s=20230601; t=1726747855; x=1727352655;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o32/nc+Dqjrsv+Sp5j6ph6epltryoYejvMuSKLYsEsQ=;
+        b=RvPV7WSJ50ul7VQj2H6Q5/9YNIZSC8arwZD8ZxvLv8sPLIwDrRGuhCs+poMCgW+E0l
+         D3mR7MoFxv/bVknbgvQXaxm7r4rs4EhDOGSI2nJeAcX/M1b1owGCnKdG7q+8OwVSoPWt
+         FSkj0kH2v9BbqmrsmkmtvE4Q0+SQsOZdAcLQ9zD0ufqzgePS4ZAZTUw+EjLoq9kYvAz2
+         Jjhm0/mcEvarVOdiSaYI1sFXBforCHzEIRqXdJCC+DTTj0958HJ2wEwhiTqZve1ROhea
+         ksJjXHR70Ax1GWH7W7l6rDMmKhU+gwYMaG/1KNxbaAmIESo6CqROPGP84HnhI3f13TVa
+         yG1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUWAN1GDNcK2tileDmEZZTclxNrHJPZD/UWCP5GwoX2dBpk2ezsR9mKBMBntDEKsKxIZzirz9v0CukUYJo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDxKTyhVchONv7NLE8Txb984GWWMOLrbwFB4rCb2Cmhk7HlY9E
+	0NVXbnZQwb68eTu/5ikq8Jg/gxvmykQN3giHIRkc49lp9XMRB7L7
+X-Google-Smtp-Source: AGHT+IGZREsj4SQwgdJITtOEHoTSJHe60c5soOhc/Mx1CbgeWx979RO8pm0n67220rUA8Tpw/0tJSQ==
+X-Received: by 2002:a17:902:f54c:b0:1fb:a1cb:cb25 with SMTP id d9443c01a7336-2076e3eaabcmr356890015ad.40.1726747854563;
+        Thu, 19 Sep 2024 05:10:54 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2079460327bsm78691445ad.103.2024.09.19.05.10.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Sep 2024 05:10:06 -0700 (PDT)
-Date: Thu, 19 Sep 2024 08:10:05 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: greearb@candelatech.com, 
- netdev@vger.kernel.org
-Cc: Ben Greear <greearb@candelatech.com>
-Message-ID: <66ec149daf042_2deb5229470@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240918205719.64214-1-greearb@candelatech.com>
-References: <20240918205719.64214-1-greearb@candelatech.com>
-Subject: Re: [PATCH] af_packet:  Fix softirq mismatch in tpacket_rcv
+        Thu, 19 Sep 2024 05:10:54 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: Ong Boon Leong <boon.leong.ong@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>
+Cc: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	rmk+kernel@armlinux.org.uk,
+	linux@armlinux.org.uk,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net v2] net: stmmac: set PP_FLAG_DMA_SYNC_DEV only if XDP is enabled
+Date: Thu, 19 Sep 2024 20:10:28 +0800
+Message-Id: <20240919121028.1348023-1-0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-greearb@ wrote:
-> From: Ben Greear <greearb@candelatech.com>
-> 
-> tpacket_rcv can be called from softirq context on input
-> path from NIC to stack.  And also called on transmit path
-> when sniffing is enabled.  So, use _bh locks to allow this
-> to function properly.
+Commit 5fabb01207a2 ("net: stmmac: Add initial XDP support") sets
+PP_FLAG_DMA_SYNC_DEV flag for page_pool unconditionally,
+page_pool_recycle_direct() will call page_pool_dma_sync_for_device()
+on every page even the page is not going to be reused by XDP program.
 
-It cannot be as straightforward as that, or we would have seen this
-much earlier.
+When XDP is not enabled, the page which holds the received buffer
+will be recycled once the buffer is copied into new SKB by
+skb_copy_to_linear_data(), then the MAC core will never reuse this
+page any longer. Always setting PP_FLAG_DMA_SYNC_DEV wastes CPU cycles
+on unnecessary calling of page_pool_dma_sync_for_device().
 
-On transmit, packet sockets are intercepted by dev_queue_xmit_nit.
-Which is called from __dev_queue_xmit with bottom halfs already
-disabled:
+After this patch, up to 9% noticeable performance improvement was observed
+on certain platforms.
 
-        /* Disable soft irqs for various locks below. Also
-         * stops preemption for RCU.
-         */
-        rcu_read_lock_bh();
+Fixes: 5fabb01207a2 ("net: stmmac: Add initial XDP support")
+Signed-off-by: Furong Xu <0x1207@gmail.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Also, if this proves a real issue on the socket lock, then it would
-apply to packet_rcv and tpacket_rcv equally.
-
-Will need to read up a bit more closely on IN-SOFTIRQ-W vs
-SOFTIRQ-ON-W unless someone beats me to it.
-
-But likely this is either a false positive, or something specific to
-that tpacket_v3 blk_fill_in_prog_lock. Which does get called also
-from a timer.
-
-
-> Thanks to Johannes Berg for providing some explanation of the cryptic
-> lockdep output.
-> 
-> ================================
-> WARNING: inconsistent lock state
-> 6.11.0 #1 Tainted: G        W
-> --------------------------------
-> inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
-> btserver/134819 [HC0[0]:SC0[0]:HE1:SE1] takes:
-> ffff8882da30c118 (rlock-AF_PACKET){+.?.}-{2:2}, at: tpacket_rcv+0x863/0x3b30
-> {IN-SOFTIRQ-W} state was registered at:
->   lock_acquire+0x19a/0x4f0
->   _raw_spin_lock+0x27/0x40
->   packet_rcv+0xa33/0x1320
->   __netif_receive_skb_core.constprop.0+0xcb0/0x3a90
->   __netif_receive_skb_list_core+0x2c9/0x890
->   netif_receive_skb_list_internal+0x610/0xcc0
->   napi_complete_done+0x1c0/0x7c0
->   igb_poll+0x1dbb/0x57e0 [igb]
->   __napi_poll.constprop.0+0x99/0x430
->   net_rx_action+0x8e7/0xe10
->   handle_softirqs+0x1b7/0x800
->   __irq_exit_rcu+0x91/0xc0
->   irq_exit_rcu+0x5/0x10
->   common_interrupt+0x7f/0xa0
->   asm_common_interrupt+0x22/0x40
->   cpuidle_enter_state+0x289/0x320
->   cpuidle_enter+0x45/0xa0
->   do_idle+0x2fe/0x3e0
->   cpu_startup_entry+0x4b/0x60
->   start_secondary+0x201/0x280
->   common_startup_64+0x13e/0x148
-> irq event stamp: 467094363
-> hardirqs last  enabled at (467094363): [<ffffffff83dc794b>] _raw_spin_unlock_irqrestore+0x2b/0x50
-> hardirqs last disabled at (467094362): [<ffffffff83dc7753>] _raw_spin_lock_irqsave+0x53/0x60
-> softirqs last  enabled at (467094360): [<ffffffff83481213>] skb_attempt_defer_free+0x303/0x4e0
-> softirqs last disabled at (467094358): [<ffffffff83481188>] skb_attempt_defer_free+0x278/0x4e0
-> 
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
-> 
->        CPU0
->        ----
->   lock(rlock-AF_PACKET);
->   <Interrupt>
->     lock(rlock-AF_PACKET);
-> 
->  *** DEADLOCK ***
-> 
-> 3 locks held by btserver/134819:
->  #0: ffff888136a3bf98 (sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_recvmsg+0xc7/0x4e0
->  #1: ffffffff84e4bc20 (rcu_read_lock){....}-{1:2}, at: __ip_queue_xmit+0x59/0x1e20
->  #2: ffffffff84e4bc20 (rcu_read_lock){....}-{1:2}, at: dev_queue_xmit_nit+0x2a/0xa40
-> 
-> stack backtrace:
-> CPU: 2 UID: 0 PID: 134819 Comm: btserver Tainted: G        W          6.11.0 #1
-> Tainted: [W]=WARN
-> Hardware name: Default string Default string/SKYBAY, BIOS 5.12 08/04/2020
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x73/0xa0
->  mark_lock+0x102e/0x16b0
->  ? print_usage_bug.part.0+0x600/0x600
->  ? print_usage_bug.part.0+0x600/0x600
->  ? print_usage_bug.part.0+0x600/0x600
->  ? lock_acquire+0x19a/0x4f0
->  ? find_held_lock+0x2d/0x110
->  __lock_acquire+0x9ae/0x6170
->  ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
->  ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
->  lock_acquire+0x19a/0x4f0
->  ? tpacket_rcv+0x863/0x3b30
->  ? run_filter+0x131/0x300
->  ? lock_sync+0x170/0x170
->  ? do_syscall_64+0x69/0x160
->  ? entry_SYSCALL_64_after_hwframe+0x4b/0x53
->  ? lock_is_held_type+0xa5/0x110
->  _raw_spin_lock+0x27/0x40
->  ? tpacket_rcv+0x863/0x3b30
->  tpacket_rcv+0x863/0x3b30
->  ? packet_recvmsg+0x1340/0x1340
->  ? __asan_memcpy+0x38/0x60
->  ? __skb_clone+0x547/0x730
->  ? packet_recvmsg+0x1340/0x1340
->  dev_queue_xmit_nit+0x709/0xa40
->  ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
->  vrf_finish_direct+0x26e/0x340 [vrf]
->  ? vrf_ip_local_out+0x570/0x570 [vrf]
->  vrf_l3_out+0x5f4/0xe80 [vrf]
->  __ip_local_out+0x51e/0x7a0
->  ? __ip_append_data+0x3d00/0x3d00
->  ? __lock_acquire+0x1b57/0x6170
->  ? ipv4_dst_check+0xd6/0x150
->  ? lock_is_held_type+0xa5/0x110
->  __ip_queue_xmit+0x7ff/0x1e20
->  __tcp_transmit_skb+0x1699/0x3850
->  ? __tcp_select_window+0xfb0/0xfb0
->  ? __build_skb_around+0x22f/0x330
->  ? __alloc_skb+0x13d/0x2c0
->  ? __napi_build_skb+0x40/0x40
->  ? __tcp_send_ack.part.0+0x5f/0x690
->  ? skb_attempt_defer_free+0x303/0x4e0
->  tcp_recvmsg_locked+0xdd1/0x23e0
->  ? tcp_recvmsg+0xc7/0x4e0
->  ? tcp_update_recv_tstamps+0x1c0/0x1c0
->  tcp_recvmsg+0xe5/0x4e0
->  ? tcp_recv_timestamp+0x6c0/0x6c0
->  inet_recvmsg+0xf0/0x4b0
->  ? inet_splice_eof+0xa0/0xa0
->  ? inet_splice_eof+0xa0/0xa0
->  sock_recvmsg+0xc8/0x150
->  ? poll_schedule_timeout.constprop.0+0xe0/0xe0
->  sock_read_iter+0x258/0x380
->  ? poll_schedule_timeout.constprop.0+0xe0/0xe0
->  ? sock_recvmsg+0x150/0x150
->  ? rw_verify_area+0x64/0x590
->  vfs_read+0x8d5/0xc20
->  ? poll_schedule_timeout.constprop.0+0xe0/0xe0
->  ? kernel_read+0x50/0x50
->  ? __asan_memset+0x1f/0x40
->  ? ktime_get_ts64+0x85/0x210
->  ? __fget_light+0x4d/0x1d0
->  ksys_read+0x166/0x1c0
->  ? __ia32_sys_pwrite64+0x1d0/0x1d0
->  ? __ia32_sys_poll+0x3e0/0x3e0
->  do_syscall_64+0x69/0x160
->  entry_SYSCALL_64_after_hwframe+0x4b/0x53
-> RIP: 0033:0x7f6909b01b92
-> 
-> Signed-off-by: Ben Greear <greearb@candelatech.com>
-> ---
->  net/packet/af_packet.c | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
-> 
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> index 4692a9ef110b..17f9e2efdf25 100644
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -760,8 +760,8 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
->  	 */
->  	if (BLOCK_NUM_PKTS(pbd)) {
->  		/* Waiting for skb_copy_bits to finish... */
-> -		write_lock(&pkc->blk_fill_in_prog_lock);
-> -		write_unlock(&pkc->blk_fill_in_prog_lock);
-> +		write_lock_bh(&pkc->blk_fill_in_prog_lock);
-> +		write_unlock_bh(&pkc->blk_fill_in_prog_lock);
->  	}
->  
->  	if (pkc->last_kactive_blk_num == pkc->kactive_blk_num) {
-> @@ -1021,8 +1021,8 @@ static void prb_retire_current_block(struct tpacket_kbdq_core *pkc,
->  		 */
->  		if (!(status & TP_STATUS_BLK_TMO)) {
->  			/* Waiting for skb_copy_bits to finish... */
-> -			write_lock(&pkc->blk_fill_in_prog_lock);
-> -			write_unlock(&pkc->blk_fill_in_prog_lock);
-> +			write_lock_bh(&pkc->blk_fill_in_prog_lock);
-> +			write_unlock_bh(&pkc->blk_fill_in_prog_lock);
->  		}
->  		prb_close_block(pkc, pbd, po, status);
->  		return;
-> @@ -1044,7 +1044,7 @@ static void prb_clear_blk_fill_status(struct packet_ring_buffer *rb)
->  {
->  	struct tpacket_kbdq_core *pkc  = GET_PBDQC_FROM_RB(rb);
->  
-> -	read_unlock(&pkc->blk_fill_in_prog_lock);
-> +	read_unlock_bh(&pkc->blk_fill_in_prog_lock);
->  }
->  
->  static void prb_fill_rxhash(struct tpacket_kbdq_core *pkc,
-> @@ -1105,7 +1105,7 @@ static void prb_fill_curr_block(char *curr,
->  	pkc->nxt_offset += TOTAL_PKT_LEN_INCL_ALIGN(len);
->  	BLOCK_LEN(pbd) += TOTAL_PKT_LEN_INCL_ALIGN(len);
->  	BLOCK_NUM_PKTS(pbd) += 1;
-> -	read_lock(&pkc->blk_fill_in_prog_lock);
-> +	read_lock_bh(&pkc->blk_fill_in_prog_lock);
->  	prb_run_all_ft_ops(pkc, ppd);
->  }
->  
-> @@ -2413,7 +2413,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->  			vnet_hdr_sz = 0;
->  		}
->  	}
-> -	spin_lock(&sk->sk_receive_queue.lock);
-> +	spin_lock_bh(&sk->sk_receive_queue.lock);
->  	h.raw = packet_current_rx_frame(po, skb,
->  					TP_STATUS_KERNEL, (macoff+snaplen));
->  	if (!h.raw)
-> @@ -2453,7 +2453,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->  		skb_clear_delivery_time(copy_skb);
->  		__skb_queue_tail(&sk->sk_receive_queue, copy_skb);
->  	}
-> -	spin_unlock(&sk->sk_receive_queue.lock);
-> +	spin_unlock_bh(&sk->sk_receive_queue.lock);
->  
->  	skb_copy_bits(skb, 0, h.raw + macoff, snaplen);
->  
-> @@ -2546,10 +2546,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->  #endif
->  
->  	if (po->tp_version <= TPACKET_V2) {
-> -		spin_lock(&sk->sk_receive_queue.lock);
-> +		spin_lock_bh(&sk->sk_receive_queue.lock);
->  		__packet_set_status(po, h.raw, status);
->  		__clear_bit(slot_id, po->rx_ring.rx_owner_map);
-> -		spin_unlock(&sk->sk_receive_queue.lock);
-> +		spin_unlock_bh(&sk->sk_receive_queue.lock);
->  		sk->sk_data_ready(sk);
->  	} else if (po->tp_version == TPACKET_V3) {
->  		prb_clear_blk_fill_status(&po->rx_ring);
-> @@ -2565,7 +2565,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
->  	return 0;
->  
->  drop_n_account:
-> -	spin_unlock(&sk->sk_receive_queue.lock);
-> +	spin_unlock_bh(&sk->sk_receive_queue.lock);
->  	atomic_inc(&po->tp_drops);
->  	drop_reason = SKB_DROP_REASON_PACKET_SOCK_ERROR;
->  
-> -- 
-> 2.42.0
-> 
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index f3a1b179aaea..95d3d1081727 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -2022,7 +2022,7 @@ static int __alloc_dma_rx_desc_resources(struct stmmac_priv *priv,
+ 	rx_q->queue_index = queue;
+ 	rx_q->priv_data = priv;
+ 
+-	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
++	pp_params.flags = PP_FLAG_DMA_MAP | (xdp_prog ? PP_FLAG_DMA_SYNC_DEV : 0);
+ 	pp_params.pool_size = dma_conf->dma_rx_size;
+ 	num_pages = DIV_ROUND_UP(dma_conf->dma_buf_sz, PAGE_SIZE);
+ 	pp_params.order = ilog2(num_pages);
+-- 
+2.34.1
 
 
