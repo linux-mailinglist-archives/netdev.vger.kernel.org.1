@@ -1,305 +1,341 @@
-Return-Path: <netdev+bounces-128950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64EFA97C8C7
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 13:58:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238BC97C8DB
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:04:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E90E71F23708
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 11:57:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4880A1C20947
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:04:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F7419D06B;
-	Thu, 19 Sep 2024 11:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A598C1993AD;
+	Thu, 19 Sep 2024 12:04:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Fy/IkPJf"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="DK6Wnnlo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2057.outbound.protection.outlook.com [40.107.243.57])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB99119C57B
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 11:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726747076; cv=none; b=VwD+3rrRfIXUjsRXtx0IXIj9qpWSyLJi9UlichBM0g0rIVBIfCmLSNoup5fknStOGiDys+hPTZ/DaztmsZzeiD8v1VkJBDiWkAsaAhNVuAeAWqUGQjxA11iaqZUDIYpncnT7gzzkTr9sWDmT+JD4JYdKjnb2xq9H61IjLBsqRWM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726747076; c=relaxed/simple;
-	bh=tUSAApJsR6bjbekHWxd0HmaGyhBk+7hBy4H/bL9w1tA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eCd7PSMlkQU8IrcvqviVrRWILJOb+XDk1VVKPHTm5MgR85VMkxvbephNiM+/rwAsCZ9jqIMtYYoKKHiNOQ+VXevtxfF21P40HHezTbDAtGzMwyHIsmHdHjEcvRLdCLVuxGU1DgFrNLn8Dry3d0vsLNUlmdBBo9aXLUbACAruhIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Fy/IkPJf; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a83562f9be9so83852866b.0
-        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 04:57:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1726747072; x=1727351872; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=zwrW2Lc8dlR//tvccpuLEE6Q8LzaBUraS8Mxjz75Chc=;
-        b=Fy/IkPJfnXoOx1keJR/SZoJpYt0cIYOkDF+OHMhSRXmUwf5dc+dZNHo5Oa9+jhnt2s
-         SLX5+TPQtjkqqFtjkaaaUh3RuZ1Aj5AGVfsnl/HXCxWMenD1DPuO+nQn4ne26/ymjHjX
-         C50UV2eUFFnXzCcm9HQB90ZpiEaXXqeKWDg+mCL+XxUzuObHB1xIYZtJEgeljg8et3H/
-         MnDIMgGH+bAjDaIzy8VTLGNJzfsqMjXDl6iz+id+eISR3pZMi/z35OWgGeK+LLPJ50EF
-         nQbt8Wv+sXOVuLKfCeMgyMpK7ekPDiGYFf/9p/+MT2s09d6/jGSCU0kqKwlSndDAiFsT
-         KTOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726747072; x=1727351872;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zwrW2Lc8dlR//tvccpuLEE6Q8LzaBUraS8Mxjz75Chc=;
-        b=WB9Hh4DJNq25dtuCRUr/LyHNVQkYf5TvkG9IxVLi0LOoiDBuPtIEvb2SkM7BqRMO7p
-         Ri50o2BOEwblg4PVULrA7TLmWwqqn6JA/M4z9uVLmX1s+MvKfg79dLBy+3wzY1s2yqMf
-         oDKWVx+dZTMJvEOtn2H9d7POj4XSxqSP/eAc56V9aUQbuRw/E577cBybu09JDZU6EtPz
-         U+lZiBKNdP74ITOdal6HJiG/H/3QFrLIR4FrFKJYnqgwLjBaV7M1/8px4iA0gBNLGkOd
-         6iSR4phIKpJNo/WrjMMERXeCo6SI+hSBJAVjSr96QqDrmJRsS+XES/o4JDbfaefx5ifz
-         o9Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCUoJTE3QhpavzsLT1122/7qo6u8C780wpJW8ZZc6dP642h533HUOQmtKeU/Xi5r2FEAOKgYUNU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmYq+rdgP/Ew1icKASfUOdjI678rimtJMnfq1lT9T4d0jw404N
-	Sjm6DwET3W7JxNskVvxhCHeAt4QOAGs/AH2c4d06Hgw+rD0lacHc9GN4idh1r3I=
-X-Google-Smtp-Source: AGHT+IHQpQzHc1cIXN31U3ZoomqTuQNLNx77DCvWceGy2dZ0tN3IaP9KotCwGRWYaqVtQj58XgSiSA==
-X-Received: by 2002:a17:907:2cc5:b0:a8d:55ce:fb86 with SMTP id a640c23a62f3a-a902966f593mr2423044066b.57.1726747072099;
-        Thu, 19 Sep 2024 04:57:52 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:fece:3c82:bfdf:c36f? ([2001:67c:2fbc:1:fece:3c82:bfdf:c36f])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90610f4438sm712756666b.51.2024.09.19.04.57.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Sep 2024 04:57:51 -0700 (PDT)
-Message-ID: <a10dcebf-b8f1-4d9b-b417-cca7d0330e52@openvpn.net>
-Date: Thu, 19 Sep 2024 13:57:51 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A311990CF;
+	Thu, 19 Sep 2024 12:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726747487; cv=fail; b=rLcE6qs84v+Hz0p46PrPENMmmcghI5BlwW535o6lfApQIyFxxNGBtd5cnZLkEXr7Udh/mS90A65eC3gDWN0UyAOKIBS2kDlqaW7mAQu/hxIYMLozeCPR+3vBTMEjR1Ho9KTsjvjEumNBAwnVTUu1BhcASNjIBeTNVGNafZ3vF3Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726747487; c=relaxed/simple;
+	bh=kzO2LScQwigT7a7nqNxTaR779vYeHC1Tx/nC41bvMM8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=lLSjfK0NEUzmM3XEcUqTpD95pvwT2GWowhyNA3PV5hqjCRnn8a++bNqrNi7M0u/Wc6eHxQXf1xkT7I6eR+PYImx/5wXGjauGbXLdBFjAxRIuQySIlSu7jhmBpoQqv8dKvlFyjMEk1CVXWo1AVt8FSSrgImkqlrospoA6TtUNSZ8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=DK6Wnnlo; arc=fail smtp.client-ip=40.107.243.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Uqi8pRL0K5T4jlAdPnv8Qpqu8D76sN/6bC8KgV2G/gbhr9m2bVS8kxQ7H4qLi7pbTH6rrBJg8LUv+UbZx/Kbf/Htpo0kyRXtQS6uzjwkDzfDH56EfuNSMROdnu4p/w8I7StvG24jicZunQ6Xl/AQIjdoEAGYVeuvFnRjiXJqfIm5yLN78URfVpkeScWSGKo17PBzIxhmDVOLypJ1AxZoMV/I95TEbdn6blpiLOxLZd6hMKYMN21XEIrYpOHkUxRS7mrofF8vN65FcXV5Gdb4krHjRCOQ8XXr8NZvfYUfTY6dor5t4pe5CnEAQpl1jGIwnwwzMeU67vmfET/6EAXm9Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tgrtSqSl4hIHEV309MXMDaZHAgAfEtnyJH6qoOqpcao=;
+ b=QvHQda15HRgP9vzBIZkCLbYhvzJ27jUz7LPYTrMWZPP2NDoZhJ+RYRbH9kMFP6BWK8LJKQIUF7ts0CvI9doxbMiIz047Ipfa6/xRl+3gJ2q2vthwvtrcqxyGNetY3MHyIMKls7/CBo9qDp8Yx1FIhcoF9LwOA6Pkvw5Qa7JNTMpLLbf6r9HWlvBR4rVox2SFuQMioD5V218L5lU8R/0g4qb0ehksOTS/kW41PFz8VLjvk+H4bxNN+j9stKBfNZzTEzNpsB79xpi+NMiBcOJUrhMttNVghtYJ6S43rbmNrz9GiIlaAKE4abKMJRyvplFp+Qkyv+VxqZrAKuqivBMldA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tgrtSqSl4hIHEV309MXMDaZHAgAfEtnyJH6qoOqpcao=;
+ b=DK6WnnloMkbaxmCRv51u9Ty0fnPq8jcfovY8pRX4NDNpxUVlbWclCtJNvzsMVww1x1MBIzsnflNlR2p2hu1PIi6dXSg9/EOUv3r3FFzQ6up72S3hRHFstwZfk+6AKe2N834fVEdb31blgSq5zKjFJQpcllwa26RW0jFTNLedURiUSq7SB6oBGVbAxVf5HeRiifqK9m2Q8OhBNWvbOuabAstLkZoG6QW783yFSTzk+HaHgzZGJ2BPAgqgF2pf8RiL1dpwZ1Udsq0Ho050SKnE1bB+csW2r8wF6PB5t1zntnoHvTx5JmFD/KAMPa9twwndYI0kiny6t1V6Wioi413qDA==
+Received: from DM4PR11MB6239.namprd11.prod.outlook.com (2603:10b6:8:a7::20) by
+ BY1PR11MB8006.namprd11.prod.outlook.com (2603:10b6:a03:52d::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.17; Thu, 19 Sep
+ 2024 12:04:38 +0000
+Received: from DM4PR11MB6239.namprd11.prod.outlook.com
+ ([fe80::244e:154d:1b0b:5eb5]) by DM4PR11MB6239.namprd11.prod.outlook.com
+ ([fe80::244e:154d:1b0b:5eb5%3]) with mapi id 15.20.7982.012; Thu, 19 Sep 2024
+ 12:04:38 +0000
+From: <Tarun.Alle@microchip.com>
+To: <linux@armlinux.org.uk>
+CC: <Arun.Ramadoss@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net-next V4] net: phy: microchip_t1: SQI support for
+ LAN887x
+Thread-Topic: [PATCH net-next V4] net: phy: microchip_t1: SQI support for
+ LAN887x
+Thread-Index: AQHbCPloJPya9IPhQki3fxOwbliPerJcCemAgAL7zUA=
+Date: Thu, 19 Sep 2024 12:04:38 +0000
+Message-ID:
+ <DM4PR11MB623907EC9F1C76CC7F14D3588B632@DM4PR11MB6239.namprd11.prod.outlook.com>
+References: <20240917115657.51041-1-tarun.alle@microchip.com>
+ <ZumSKSI6vMfR61wP@shell.armlinux.org.uk>
+In-Reply-To: <ZumSKSI6vMfR61wP@shell.armlinux.org.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM4PR11MB6239:EE_|BY1PR11MB8006:EE_
+x-ms-office365-filtering-correlation-id: fc2dfb44-a161-4917-2ad9-08dcd8a33c48
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6239.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?cvoGEZOU++a7l0pqCCy7tdFxuQfmDx/yDOYlfsvdCiOQfDrhxystjfNbSLbH?=
+ =?us-ascii?Q?NV+Sv6gCfsTvSrDw4vWciByczxX9sa7lLNUIafXuodpLNOfLXXgJz+O01jO4?=
+ =?us-ascii?Q?KOShFLDbv+JSvqxHz9WyjifPgB63vW9g0rSnhWvYWjhRTYqviXOoV3w+Zc9S?=
+ =?us-ascii?Q?Q8RCRcfJlaYFApk/q0DM9NJUPCJ/4Ikr66VZ60MbUJfj3W7/6/PfG1RhcawP?=
+ =?us-ascii?Q?mz/4yhsY7SxNCm8qPyvJnnHDVuRi+D2eZsEASQYrJ7V+Oro6i2IyUx75cbFu?=
+ =?us-ascii?Q?yfX7IUIhsFi91nnB0z41AU5Zi0+4gG9malvaqgOh63cKengIyPwgW12BqDOW?=
+ =?us-ascii?Q?ipzDQyXf4+SYfBxSbYk7mF1fLiK+VCYZ3frQqXkLZ7gNuxavE4N6lkwPzu4a?=
+ =?us-ascii?Q?Qxg7wAPsT+BR7HSWcuqrl755Jb6KF6mzS033fQmh9PZ/+/oJgAzgEfZBAvSc?=
+ =?us-ascii?Q?Z1GNLG1xxYjU92wEC3cRIea52naJw+QuyXmYFU56JVw1EG7JSviDGq8OPFFK?=
+ =?us-ascii?Q?SBGSeEAkNYO9A/+hHKo2iJhkXCh73ZbTWFvOiwdaXZHJ/a7l5QRLVlx/epPB?=
+ =?us-ascii?Q?WSifqOOGsjnZ25LbKOqp0BApZTQhtxt8tgNBNzOox5EwpaaBbQnDEJ1IvqIv?=
+ =?us-ascii?Q?g32G9YGOb9QyCy7np21K6YuUefLtrDSoI0TfCR/soATR9bEqIOx4pJb7y1C4?=
+ =?us-ascii?Q?MXIX60KNTvtwQyYxGwsT3KZb+C/SRaCXVyNqd4DelIf4+xaS01tcgW8crni4?=
+ =?us-ascii?Q?Nu43RvSoP/sSUxieGGu6/ifAxiALZrUr7ElOYeWqhCJBxf8ZWgjRw8T06VLj?=
+ =?us-ascii?Q?UxJ+6z49xX7G8c4OEplvBgB8wxpzSMtShSDVSpVzVR9Pj1jwBxgU2OM19l+f?=
+ =?us-ascii?Q?vGAUYzSHbHpOxIHT1tHMTtrL//1LFniFy081ilWGHSn2ilo9dKBPcVVvecdF?=
+ =?us-ascii?Q?rGFXZBJiI2le9CvRbG6mzzNdLjXVk8mHTUTGp1KpdKXO8TK3sI3q6Ld2kTVi?=
+ =?us-ascii?Q?pC5ZsGzrnKkD17HF+o12gVGQxqSyMaUe+UoOFE0y7HV/Vh0eU8pTJCwi6vbk?=
+ =?us-ascii?Q?p7X7RW4eM2ZoVy5FrEzRXoSF1+TJEZVKSicEsS50hGdkOw3UmNcjp2oLoEn1?=
+ =?us-ascii?Q?mPw86nGGn5ZTNkG0zTAbUvQvbrQb/d7SOehuqZmbRHgRs3GelKZZbrumwIcB?=
+ =?us-ascii?Q?bRj4U5uFc2qtW2/aSudRlcwWNu5x1453ckg/w7e5RZ/wJGRXrSCzRT/4xF8k?=
+ =?us-ascii?Q?n7rcjJQWLwOfBD1mEvoll3ATLUaA1DP21F7BUjVLVxuK1t/lt0kEnqUMZ8sD?=
+ =?us-ascii?Q?JBr+8nX/v0Bqf1Xt4adwE4pWZnVNuCK2KZZXSf6pxQDS6FQzdGg4st2VgRWD?=
+ =?us-ascii?Q?JxvRcWo=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?awOsy0uNwaevo5E209HxJvLw3eKvhJPKTjUtHDP71zN8o/bOsj7bYH5GHYb8?=
+ =?us-ascii?Q?wLter8YYElv+mvQmC4f2HowLOkwZY7OAkZTGE0JfA0XQCSd+cSfjU1r5EW+K?=
+ =?us-ascii?Q?4wy5MSKCUHm6ps4oJm1IOvvGVwWf146MQwG9ZU52ISfPtl7DjQPfy7hrejWL?=
+ =?us-ascii?Q?nh47ztdKGkkiSEytWlecZjyN8oqiDDQV5y5uAu1w1gZYXDKACWNqFgRseG59?=
+ =?us-ascii?Q?P0AoR1CpT/olEavFJrJAMEtbHpx+Y5j/N7XV5lvdOTl8Z8R390WoXlpcDtPB?=
+ =?us-ascii?Q?/XAUD3x+vaNzmXcKMHL6+VYTxjchFPH1hmNWFKhDma3TIRgd8+/gk8rQtvr4?=
+ =?us-ascii?Q?VLVE3Ex/cUaV/6oSxjdEZB86kJu4DZapUqBnj943NZbafVs64PMpAfAugvIB?=
+ =?us-ascii?Q?GvEl8HCt2ncVnN1WgH3WtgDyGoo0gkJR6rHkzc293aHmw1ZScKtyzUXnAqtr?=
+ =?us-ascii?Q?VChpogYqPGLUTVM/4Im3AvbZneW/o5tzslUzM6Re7Tpx0+KeKisnF+My7cxV?=
+ =?us-ascii?Q?km/PAaN9kdChmGI0lV3a7WHA+SMaN0OwaASVuXbl4GdTxFI7cV7KJtJkv0AT?=
+ =?us-ascii?Q?6CSiaQG1xC4RbtOCzVXAG0w7lKle66QAw5GN+762x/9A0tMeE6fLOD1zDoxi?=
+ =?us-ascii?Q?S7lie2Xot5GOjsmtCIMzcKIUDJySw59R6/bCx1QPu57yxqYMH3jQHtrVK8cM?=
+ =?us-ascii?Q?jPrqn88ZNLsBKy/B5h9gs8y8S8GMgBq87cPPYT4MEWwUDUnGS7DmUMfGl3jQ?=
+ =?us-ascii?Q?h1PEasumZA44bwqStnllfwj6hzpUAx16s1IQFbgfcxhbqMANh870uw8XAujJ?=
+ =?us-ascii?Q?Qrrd1XJ701g+9qyAOqy5LVoGdQgzG7ZXc3lpbvYdbdr1nNhIZSt/t/7ZoXnf?=
+ =?us-ascii?Q?QMt32vdkJPv9EncdQqKQfXnb4LUjN/pFeYBfgVxWRY+0PG2kYyYgWqbPn3Pj?=
+ =?us-ascii?Q?MiyIM6nawcmGiWdS44wR+79IyOTEHjoJ/PYHtpyVf/XsGiXDaV2J2W9XppIK?=
+ =?us-ascii?Q?qh0d57qg6r8KI6dJbthUWKDg1iPEIp9fPvVp90/KK+sQwzoxqVKQio0VwWu5?=
+ =?us-ascii?Q?TAqzeFfRlVKhM4UsiUf6wAZRM+gDVn70CPPNWj/48oulIRvW1TGwI1qu2cWi?=
+ =?us-ascii?Q?bq/odbIfr9vHyvW+H5EqLv54+lfVMFKIC9eJYFWA3/iHDMz/dtZl2EfS0RR5?=
+ =?us-ascii?Q?BmXnjGX+acdCeOotWvjXn0nrkOXcmOG3+JOUlVMGbO9+7jll6aaKxoErHlpm?=
+ =?us-ascii?Q?RKYSXhpGXQ6LDBDjWyHUMqT7MS2sXi0b9DNRApc1NLnlBjz18MC6UOrDiius?=
+ =?us-ascii?Q?xS/K6NqtEuJcqVRZEb6OhsnmJ3pRSpFVMfU3UAUWpvy5KMNk2OeQPy7qexaO?=
+ =?us-ascii?Q?PPO0ieA0cnU4Pnx0biDtCaOi1KMq+4oNzaBZ6S5xn4dLdbfpGBaU3RCjAybU?=
+ =?us-ascii?Q?RJNAgqpRzaeaaGGy8HhEvdV96PuzZ0+IXIwWr1pdWt+Xo/rbdDoFoIlf6+aY?=
+ =?us-ascii?Q?ZekqNrpJlICZj0fk9ANCNafycvVyYF7WA9ZEhZUPpC178ibnMINn2WvCyd3V?=
+ =?us-ascii?Q?bxiMTiSkK786LpX+59kVIGBGgfGj/fbnlNR76kDY?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 03/25] net: introduce OpenVPN Data Channel
- Offload (ovpn)
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrew@lunn.ch, antony.antony@secunet.com, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- ryazanov.s.a@gmail.com, sd@queasysnail.net, steffen.klassert@secunet.com
-References: <20240917010734.1905-4-antonio@openvpn.net>
- <20240919055259.17622-1-kuniyu@amazon.com>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <20240919055259.17622-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6239.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fc2dfb44-a161-4917-2ad9-08dcd8a33c48
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2024 12:04:38.2063
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: G1f03q5Ku8UYleRCkP8P/a1LJgNIxeYAm8K6jhVtfqv+1B9u891fgK1RZTdKz2wd+RJ9SwqdX26F1TU8M+vivMOT7nDcP3/CCIVNKSbC3E8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR11MB8006
 
-Hi Kuniyuki and thank you for chiming in.
+Hi Russell,
+Thanks for your review comments. Will fix in the next version.
 
-On 19/09/2024 07:52, Kuniyuki Iwashima wrote:
-> From: Antonio Quartulli <antonio@openvpn.net>
-> Date: Tue, 17 Sep 2024 03:07:12 +0200
->> +/* we register with rtnl to let core know that ovpn is a virtual driver and
->> + * therefore ifaces should be destroyed when exiting a netns
->> + */
->> +static struct rtnl_link_ops ovpn_link_ops = {
->> +};
-> 
-> This looks like abusing rtnl_link_ops.
+> -----Original Message-----
+> From: Russell King <linux@armlinux.org.uk>
+> Sent: Tuesday, September 17, 2024 7:59 PM
+> To: Tarun Alle - I68638 <Tarun.Alle@microchip.com>
+> Cc: Arun Ramadoss - I17769 <Arun.Ramadoss@microchip.com>;
+> UNGLinuxDriver <UNGLinuxDriver@microchip.com>; andrew@lunn.ch;
+> hkallweit1@gmail.com; davem@davemloft.net; edumazet@google.com;
+> kuba@kernel.org; pabeni@redhat.com; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org
+> Subject: Re: [PATCH net-next V4] net: phy: microchip_t1: SQI support for
+> LAN887x
+>=20
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e
+> content is safe
+>=20
+> On Tue, Sep 17, 2024 at 05:26:57PM +0530, Tarun Alle wrote:
+> > From: Tarun Alle <Tarun.Alle@microchip.com>
+> >
+> > Add support for measuring Signal Quality Index for LAN887x T1 PHY.
+> > Signal Quality Index (SQI) is measure of Link Channel Quality from
+> > 0 to 7, with 7 as the best. By default, a link loss event shall
+> > indicate an SQI of 0.
+> >
+> > Signed-off-by: Tarun Alle <Tarun.Alle@microchip.com>
+>=20
+> Please note that the merge window is open, which means that net-next is
+> currently closed. Thus, patches should be submitted as RFC.
+>=20
+> > ---
+> > v3 -> v4
+> > - Added check to handle invalid samples.
+> > - Added macro for ARRAY_SIZE(rawtable).
+> >
+> > v2 -> v3
+> > - Replaced hard-coded values with ARRAY_SIZE(rawtable).
+> >
+> > v1 -> v2
+> > - Replaced hard-coded 200 with ARRAY_SIZE(rawtable).
+>=20
+> Hmm. We've been through several iterations trying to clean this up into
+> something more easily readable, but I fear there'll be another iteration.
+>=20
+> Maybe the following would be nicer:
+>=20
+> enum {
+>         SQI_SAMPLES =3D 200,
+>         /* Look at samples of the middle 60% */
+>         SQI_INLIERS_NUM =3D SQI_SAMPLES * 60 / 100,
+>         SQI_INLIERS_START =3D (SQI_SAMPLES - SQI_INLIERS_NUM) / 2,
+>         SQI_INLIERS_END =3D SQI_INLIERS_START + SQI_INLIERS_NUM, };
+>=20
+> > +static int lan887x_get_sqi_100M(struct phy_device *phydev) {
+> > +     u16 rawtable[200];
+>=20
+>         u16 rawtable[SQI_SAMPLES];
+>=20
+> > +     u32 sqiavg =3D 0;
+> > +     u8 sqinum =3D 0;
+> > +     int rc;
+>=20
+> Since you use "i" multiple times, declare it at the beginning of the func=
+tion
+> rather than in each for loop.
+>=20
+>         int i;
+>=20
+> > +
+> > +     /* Configuration of SQI 100M */
+> > +     rc =3D phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> > +                        LAN887X_COEFF_PWR_DN_CONFIG_100,
+> > +                        LAN887X_COEFF_PWR_DN_CONFIG_100_V);
+> > +     if (rc < 0)
+> > +             return rc;
+> > +
+> > +     rc =3D phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> LAN887X_SQI_CONFIG_100,
+> > +                        LAN887X_SQI_CONFIG_100_V);
+> > +     if (rc < 0)
+> > +             return rc;
+> > +
+> > +     rc =3D phy_read_mmd(phydev, MDIO_MMD_VEND1,
+> LAN887X_SQI_CONFIG_100);
+> > +     if (rc !=3D LAN887X_SQI_CONFIG_100_V)
+> > +             return -EINVAL;
+> > +
+> > +     rc =3D phy_modify_mmd(phydev, MDIO_MMD_VEND1,
+> LAN887X_POKE_PEEK_100,
+> > +                         LAN887X_POKE_PEEK_100_EN,
+> > +                         LAN887X_POKE_PEEK_100_EN);
+> > +     if (rc < 0)
+> > +             return rc;
+> > +
+> > +     /* Required before reading register
+> > +      * otherwise it will return high value
+> > +      */
+> > +     msleep(50);
+> > +
+> > +     /* Link check before raw readings */
+> > +     rc =3D genphy_c45_read_link(phydev);
+> > +     if (rc < 0)
+> > +             return rc;
+> > +
+> > +     if (!phydev->link)
+> > +             return -ENETDOWN;
+> > +
+> > +     /* Get 200 SQI raw readings */
+> > +     for (int i =3D 0; i < ARRAY_SIZE(rawtable); i++) {
+>=20
+>         for (i =3D 0; i < SQI_SAMPLES; i++) {
+>=20
+> > +             rc =3D phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> > +                                LAN887X_POKE_PEEK_100,
+> > +                                LAN887X_POKE_PEEK_100_EN);
+> > +             if (rc < 0)
+> > +                     return rc;
+> > +
+> > +             rc =3D phy_read_mmd(phydev, MDIO_MMD_VEND1,
+> > +                               LAN887X_SQI_MSE_100);
+> > +             if (rc < 0)
+> > +                     return rc;
+> > +
+> > +             rawtable[i] =3D (u16)rc;
+> > +     }
+> > +
+> > +     /* Link check after raw readings */
+> > +     rc =3D genphy_c45_read_link(phydev);
+> > +     if (rc < 0)
+> > +             return rc;
+> > +
+> > +     if (!phydev->link)
+> > +             return -ENETDOWN;
+> > +
+> > +     /* Sort SQI raw readings in ascending order */
+> > +     sort(rawtable, ARRAY_SIZE(rawtable), sizeof(u16), data_compare,
+> > + NULL);
+>=20
+>         sort(rawtable, SQI_SAMPLES, sizeof(u16), data_compare, NULL);
+>=20
+> Although renaming data_compare to sqi_compare would be even more
+> descriptive of what it's doing.
+>=20
+> > +
+> > +     /* Keep inliers and discard outliers */
+> > +     for (int i =3D SQI100M_SAMPLE_INIT(5, rawtable);
+> > +          i < SQI100M_SAMPLE_INIT(5, rawtable) * 4; i++)
+>=20
+>         for (i =3D SQI_INLIERS_START; i < SQI_INLIERS_END; i++)
+>=20
+> > +             sqiavg +=3D rawtable[i];
+> > +
+> > +     /* Handle invalid samples */
+> > +     if (sqiavg !=3D 0) {
+> > +             /* Get SQI average */
+> > +             sqiavg /=3D SQI100M_SAMPLE_INIT(5, rawtable) * 4 -
+> > +                             SQI100M_SAMPLE_INIT(5, rawtable);
+>=20
+>                 sqiavg /=3D SQI_INLIERS_NUM;
+>=20
+> Overall, I think this is better rather than the SQI100M_SAMPLE_INIT() mac=
+ro...
+> for which I'm not sure what the _INIT() bit actually means.
+>=20
+> I think my suggestion has the advantage that it makes it clear what these
+> various calculations are doing, because the result of the calculations is
+> described in the enum name.
+>=20
+> Thanks.
+>=20
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
-In some way, the inspiration came from
-5b9e7e160795 ("openvswitch: introduce rtnl ops stub")
-
-[which just reminded me that I wanted to fill the .kind field, but I 
-forgot to do so]
-
-The reason for taking this approach was to avoid handling the iface 
-destruction upon netns exit inside the driver, when the core already has 
-all the code for taking care of this for us.
-
-Originally I implemented pernet_operations.pre_exit, but Sabrina 
-suggested that letting the core handle the destruction was cleaner (and 
-I agreed).
-
-However, after I removed the pre_exit implementation, we realized that 
-default_device_exit_batch/default_device_exit_net thought that an ovpn 
-device is a real NIC and was moving it to the global netns rather than 
-killing it.
-
-One way to fix the above was to register rtnl_link_ops with netns_fund = 
-false (so the ops object you see in this patch is not truly "empty").
-
-However, I then hit the bug which required patch 2 to get fixed.
-
-Does it make sense to you?
-Or you still think this is an rtnl_link_ops abuse?
-
-The alternative was to change 
-default_device_exit_batch/default_device_exit_net to read some new 
-netdevice flag which would tell if the interface should be killed or 
-moved to global upon netns exit.
-
-Regards,
-
-> 
-> Instead of a hack to rely on default_device_exit_batch()
-> and rtnl_link_unregister(), this should be implemented as
-> struct pernet_operations.exit_batch_rtnl().
-> 
-> Then, the patch 2 is not needed, which is confusing for
-> all other rtnl_link_ops users.
-> 
-> If we want to avoid extra RTNL in default_device_exit_batch(),
-> I can post this patch after merge window.
-> 
-> ---8<---
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 1e740faf9e78..eacf6f5a6ace 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -11916,7 +11916,8 @@ static void __net_exit default_device_exit_net(struct net *net)
->   	}
->   }
->   
-> -static void __net_exit default_device_exit_batch(struct list_head *net_list)
-> +void __net_exit default_device_exit_batch(struct list_head *net_list,
-> +					  struct list_head *dev_kill_list)
->   {
->   	/* At exit all network devices most be removed from a network
->   	 * namespace.  Do this in the reverse order of registration.
-> @@ -11925,9 +11926,7 @@ static void __net_exit default_device_exit_batch(struct list_head *net_list)
->   	 */
->   	struct net_device *dev;
->   	struct net *net;
-> -	LIST_HEAD(dev_kill_list);
->   
-> -	rtnl_lock();
->   	list_for_each_entry(net, net_list, exit_list) {
->   		default_device_exit_net(net);
->   		cond_resched();
-> @@ -11936,19 +11935,13 @@ static void __net_exit default_device_exit_batch(struct list_head *net_list)
->   	list_for_each_entry(net, net_list, exit_list) {
->   		for_each_netdev_reverse(net, dev) {
->   			if (dev->rtnl_link_ops && dev->rtnl_link_ops->dellink)
-> -				dev->rtnl_link_ops->dellink(dev, &dev_kill_list);
-> +				dev->rtnl_link_ops->dellink(dev, dev_kill_list);
->   			else
-> -				unregister_netdevice_queue(dev, &dev_kill_list);
-> +				unregister_netdevice_queue(dev, dev_kill_list);
->   		}
->   	}
-> -	unregister_netdevice_many(&dev_kill_list);
-> -	rtnl_unlock();
->   }
->   
-> -static struct pernet_operations __net_initdata default_device_ops = {
-> -	.exit_batch = default_device_exit_batch,
-> -};
-> -
->   static void __init net_dev_struct_check(void)
->   {
->   	/* TX read-mostly hotpath */
-> @@ -12140,9 +12133,6 @@ static int __init net_dev_init(void)
->   	if (register_pernet_device(&loopback_net_ops))
->   		goto out;
->   
-> -	if (register_pernet_device(&default_device_ops))
-> -		goto out;
-> -
->   	open_softirq(NET_TX_SOFTIRQ, net_tx_action);
->   	open_softirq(NET_RX_SOFTIRQ, net_rx_action);
->   
-> diff --git a/net/core/dev.h b/net/core/dev.h
-> index 5654325c5b71..d1feecab9c4a 100644
-> --- a/net/core/dev.h
-> +++ b/net/core/dev.h
-> @@ -99,6 +99,9 @@ void __dev_notify_flags(struct net_device *dev, unsigned int old_flags,
->   void unregister_netdevice_many_notify(struct list_head *head,
->   				      u32 portid, const struct nlmsghdr *nlh);
->   
-> +void default_device_exit_batch(struct list_head *net_list,
-> +			       struct list_head *dev_kill_list);
-> +
->   static inline void netif_set_gso_max_size(struct net_device *dev,
->   					  unsigned int size)
->   {
-> diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-> index 11e4dd4f09ed..0a9bce599d54 100644
-> --- a/net/core/net_namespace.c
-> +++ b/net/core/net_namespace.c
-> @@ -27,6 +27,8 @@
->   #include <net/net_namespace.h>
->   #include <net/netns/generic.h>
->   
-> +#include "dev.h"
-> +
->   /*
->    *	Our network namespace constructor/destructor lists
->    */
-> @@ -380,6 +382,7 @@ static __net_init int setup_net(struct net *net)
->   		if (ops->exit_batch_rtnl)
->   			ops->exit_batch_rtnl(&net_exit_list, &dev_kill_list);
->   	}
-> +	default_device_exit_batch(&net_exit_list, &dev_kill_list);
->   	unregister_netdevice_many(&dev_kill_list);
->   	rtnl_unlock();
->   
-> @@ -618,6 +621,7 @@ static void cleanup_net(struct work_struct *work)
->   		if (ops->exit_batch_rtnl)
->   			ops->exit_batch_rtnl(&net_exit_list, &dev_kill_list);
->   	}
-> +	default_device_exit_batch(&net_exit_list, &dev_kill_list);
->   	unregister_netdevice_many(&dev_kill_list);
->   	rtnl_unlock();
->   
-> @@ -1214,6 +1218,7 @@ static void free_exit_list(struct pernet_operations *ops, struct list_head *net_
->   
->   		rtnl_lock();
->   		ops->exit_batch_rtnl(net_exit_list, &dev_kill_list);
-> +		default_device_exit_batch(net_exit_list, &dev_kill_list);
->   		unregister_netdevice_many(&dev_kill_list);
->   		rtnl_unlock();
->   	}
-> ---8<---
-
--- 
-Antonio Quartulli
-OpenVPN Inc.
+Thanks,
+Tarun Alle.
 
