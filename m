@@ -1,128 +1,126 @@
-Return-Path: <netdev+bounces-128961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8427A97C998
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:58:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DF2097C9BB
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 15:07:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39B261F2439E
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:58:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 14F271F2420A
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 13:07:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D66E19E7D3;
-	Thu, 19 Sep 2024 12:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A80019EEDB;
+	Thu, 19 Sep 2024 13:05:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MaM+65IT"
+	dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b="thVROKO8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0879519E7CF
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 12:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB35C19E7D1;
+	Thu, 19 Sep 2024 13:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726750698; cv=none; b=VS1bwo4CtVORVZIZ21nKPko0BfyzYdZ87Xf6KeVZ9utHJR1LF4NWiaCqZ/KwA42bJ/V/1mtFZtBDuRxjToUgzoefzks6EYdxzaW+74uffhCNUCYTxi7G5IwRm4YcEd0Tz6OzIMR/bpaBGSAytqOXmhh44jNfE7v5cJ62cyNmH7A=
+	t=1726751141; cv=none; b=N4xmuM/CW6kxzd1dMUiXtdzon5KQU95z2eNktFh0B4LK7AWNGUMcOUNvRE+W/NwJtts49URN7PebRD118W9mUCX6J2sRTRkq5Mk64i/MW5h8H9SpEKf7fgPW16u4gm1iMldL421KZFOAfCxUvZGJbdLdask54OKQM6DhCBGcSHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726750698; c=relaxed/simple;
-	bh=W5rW+UOPbgjcmK4qV+KS2eF5X3h1ICmUe1mF7wcNqpo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PAGDWvIxUzjEkU4Xn0Jx44COZAwD6Grfm6QX6K9TPXJ11zduYwYIkNmJPxtERu8mJO7AQZcxJh9KpoAuPh4y7M4pO3qwTZIhZ2lVvdRd7/F9ysFr/74zxzm41no02Tcb1xU60Cus78ompCUhCg69x+FCPwW/RzWnw1M6BUNkrZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MaM+65IT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 423B9C4CECD;
-	Thu, 19 Sep 2024 12:58:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726750697;
-	bh=W5rW+UOPbgjcmK4qV+KS2eF5X3h1ICmUe1mF7wcNqpo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MaM+65ITLgexVSOBdzMZzDe3/k/CsQ+DLdB9VYYcYmA/rsIelll8GkISXbDsR2Wvf
-	 ANhxMttVF97HY7ulw62NTY7XjoBUFxlDME52Yl06iIQFNlihlBs4HDPKqzl+1f84mJ
-	 KDJuWgN5j6VWB/eAuhmNs/S/XFB2xwr0GYY3B8PSP9tz/2UwsLOi+sdUJB7Dqy1221
-	 rqKfcNvfL08zMas2mrPTBij9L5LNt01frBQ19lqO364Lf7bACOLRwcT2SkqPbdyQqe
-	 R6ugVXHG/R17LzRMtJpWjIO2oxBda/ViPK7lwdy4g7LlcPkPzPiywFFgCHtS2pNXZM
-	 sRBaDd9yy1aeA==
-Date: Thu, 19 Sep 2024 14:58:15 +0200
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	upstream@airoha.com, Sayantan Nandy <sayantan.nandy@airoha.com>
-Subject: Re: [PATCH net] net: airoha: fix PSE memory configuration in
- airoha_fe_pse_ports_init()
-Message-ID: <Zuwf57d09WBYKtSS@lore-desk>
-References: <20240918-airoha-eth-pse-fix-v1-1-7b61f26cd2fd@kernel.org>
- <20240919074210.GE1044577@kernel.org>
+	s=arc-20240116; t=1726751141; c=relaxed/simple;
+	bh=FiGre3xQQE6hhmjM+oLWLYutnnKrJlKisaObM0PtP1w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=in0TLhMLyRTruLHgyWV0cPDf5e7zXbGYzf7r8y5tTOsWKAbjnWXVqmouf4JRY+DBq31KJQs9zH/NLfckoFWcrYgDpSKUyBDF+ydaUo03SapCwwss0H2ocx0v4r0wNur0v3+yHhFcptDG0lQ318TWefEIIa8veFT7lzwS3iP0ZZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; dkim=pass (2048-bit key) header.d=datenfreihafen.org header.i=@datenfreihafen.org header.b=thVROKO8; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from [10.136.2.92] (unknown [83.68.141.146])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@datenfreihafen.org)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id 22EF4C00E0;
+	Thu, 19 Sep 2024 15:05:27 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=datenfreihafen.org;
+	s=2021; t=1726751127;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5Y57BPJyLA/lM4BrWgu/heI5PAlRBELA1lH/W+055F4=;
+	b=thVROKO8bl3415p4kWDD4FfRfBV8q2SfH3d2AeaHinRNwf3p/LaOfWuoQoH1YmkPuFTv4p
+	66Uwz2KutqGzYr31lUdxqbv8BtWwI4ADGzqmHRrL5xM+z6EhZtt9QRkA2CopjjPton0LOZ
+	L/1NgQ3vGWKfyl4OWyoVgiL4kwJSfNzYq9JMVK0E3kLL396aX5773kat/SXASLV8HXEyfh
+	52CqEprWVKQGenlKPs899uQ4Oe6sgpgY9fhj0uM4g7bnDiYPTZsKygbMcJZVWZ0ViAL3RE
+	bW6JUzSBuRLX+QHZNI515/jkWPy2hpWNWL1nRaOd6SqfuL63bDH8y/a9ImdHNg==
+Message-ID: <11239363-1608-44a4-bfab-d188f6e0934e@datenfreihafen.org>
+Date: Thu, 19 Sep 2024 15:05:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="MUSAIOmjrs55SWjh"
-Content-Disposition: inline
-In-Reply-To: <20240919074210.GE1044577@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] Fix the RCU usage in mac802154_scan_worker
+To: Jiawei Ye <jiawei.ye@foxmail.com>, przemyslaw.kitszel@intel.com
+Cc: alex.aring@gmail.com, davem@davemloft.net, david.girault@qorvo.com,
+ edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
+References: <f3c26426-7ebb-4b8b-9443-f604292a53a9@intel.com>
+ <tencent_8C653C3534893CF0BC88A43A2831CDA2260A@qq.com>
+Content-Language: en-US
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+In-Reply-To: <tencent_8C653C3534893CF0BC88A43A2831CDA2260A@qq.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+Hello Jiawei,
 
---MUSAIOmjrs55SWjh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 9/19/24 14:26, Jiawei Ye wrote:
+> On 9/19/24 17:01, Przemek Kitszel wrote:
+>>> In the `mac802154_scan_worker` function, the `scan_req->type` field was
+>>> accessed after the RCU read-side critical section was unlocked. According
+>>> to RCU usage rules, this is illegal and can lead to unpredictable
+>>> behavior, such as accessing memory that has been updated or causing
+>>> use-after-free issues.
+>>>
+>>> This possible bug was identified using a static analysis tool developed
+>>> by myself, specifically designed to detect RCU-related issues.
+>>>
+>>> To address this, the `scan_req->type` value is now stored in a local
+>>> variable `scan_req_type` while still within the RCU read-side critical
+>>> section. The `scan_req_type` is then used after the RCU lock is released,
+>>> ensuring that the type value is safely accessed without violating RCU
+>>> rules.
+>>>
+>>> Fixes: e2c3e6f53a7a ("mac802154: Handle active scanning")
+>>> Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
+>>> ---
+>>>    net/mac802154/scan.c | 4 +++-
+>>>    1 file changed, 3 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+>>> index 1c0eeaa76560..29cd84c9f69c 100644
+>>> --- a/net/mac802154/scan.c
+>>> +++ b/net/mac802154/scan.c
+>>> @@ -180,6 +180,7 @@ void mac802154_scan_worker(struct work_struct *work)
+>>>    	unsigned int scan_duration = 0;
+>>>    	struct wpan_phy *wpan_phy;
+>>>    	u8 scan_req_duration;
+>>> +	enum nl802154_scan_types scan_req_type;
+>>
+>> this line violates the reverse X-mass tree rule of code formatting
+> 
+> Thank you for pointing out the concern regarding the violation of the
+> reverse Christmas tree rule. I will adjust the placement of
+> `enum nl802154_scan_types scan_req_type` to be between
+> `struct cfg802154_scan_request *scan_req` and
+> `struct ieee802154_sub_if_data *sdata`. If this change is suitable,
+> should I resend the patch as a v2 patch?
 
-> On Wed, Sep 18, 2024 at 04:37:30PM +0200, Lorenzo Bianconi wrote:
-> > Align PSE memory configuration to vendor SDK. In particular, increase
-> > initial value of PSE reserved memory in airoha_fe_pse_ports_init()
-> > routine by the value used for the second Packet Processor Engine (PPE2)
-> > and do not overwrite the default value.
-> > Moreover, store the initial value for PSE reserved memory in orig_val
-> > before running airoha_fe_set_pse_queue_rsv_pages() in
-> > airoha_fe_set_pse_oq_rsv routine.
->=20
-> Hi Lorenzo,
+Yes, please always increase the version whenever you change something 
+and re-send. Also a ChangeLog of the changes makes it a lot easier for 
+the reviewer.
 
-Hi Simon,
-
->=20
-> This patch seems to be addressing two issues, perhaps it would be best
-> to split it into two patches?
-
-ack, I will do.
-
->=20
-> And as a fix (or fixes) I think it would be best to describe the
-> problem, typically a user-visible bug, that is being addressed.
-
-This is not a user-visible bug, do you think it is better to post it to
-net-next (when it is open)?
-
-Regards,
-Lorenzo
-
->=20
-> > Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN758=
-1 SoC")
-> > Tested-by: Sayantan Nandy <sayantan.nandy@airoha.com>
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-> ...
-
---MUSAIOmjrs55SWjh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZuwf5wAKCRA6cBh0uS2t
-rPFPAP9xnrw2/lCkRgHlcVpazfjalAUsglQFFQuurdgduIO1QwEAyTuv1gpeDlEd
-h2YB6NlhlOtRJUuPIiVFTpAZ2jED4w0=
-=ppxr
------END PGP SIGNATURE-----
-
---MUSAIOmjrs55SWjh--
+regards
+Stefan Schmidt
 
