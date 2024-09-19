@@ -1,88 +1,96 @@
-Return-Path: <netdev+bounces-128888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0E797C50C
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:46:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0268F97C545
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:49:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C7AA1C21CE6
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 07:46:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99ABE1F226DC
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 07:49:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE5E18E353;
-	Thu, 19 Sep 2024 07:46:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE28198827;
+	Thu, 19 Sep 2024 07:48:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IrFsYpbx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lc4q2SML"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB5C23A6;
-	Thu, 19 Sep 2024 07:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C68F198822;
+	Thu, 19 Sep 2024 07:48:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726731960; cv=none; b=InTYMOPzPOgzJdcSlrTAqaKLy96hKI5ux6ay3YcU6OSwpBRifgU8jP2peA2mTQc5dpoV1wIbuf39o1u4Z6VHTTBzwquxVjjYgGXdhUjlu7wa3A9Y9NrKB92i2uRdizfM/UnJ8EnVUDRFIROhSuYUrnxXbnSG/glQ7ib0ZOfnER8=
+	t=1726732127; cv=none; b=jA7v/LC4Dm5iKZ7KSQd9ftPZ/I+JJyftGevx8dkbfqbZR3K2WwVbKHb46te0k4ltp7S1cYFVuM3YEcb3o3gGIHaAdNVj2SHr5kEBtKTsbGJdo6+yLIZ3XTxq/5qxB7zNybcCjHLo32ehnPBZJXbc1JELO8jCzkNLa9OvCy1nBOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726731960; c=relaxed/simple;
-	bh=qEMMGKMY3GETYdqOm3V9vI9ZoJfC7eDMAGarWiM29K0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=srjoNCKNKN8yYenunSXKIkiXbnZY15e/ojWo111s8UYQhbsbZ4iDvGuAyAlQCFGbegvKTCd9b4iNIkX/MIpseEdBh2/MQpjv417sayoAl9D0QtraqsswOhRQejpDtrtbdvYMJWXEWbpjpNLuXLn1AIbyoh1twErt8VRaQRQdiO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IrFsYpbx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76CE3C4CEC4;
-	Thu, 19 Sep 2024 07:45:56 +0000 (UTC)
+	s=arc-20240116; t=1726732127; c=relaxed/simple;
+	bh=5i1YXeZcMX46ZW9/4GfFPwm8EbpuGNMp3b6EfmSvDeI=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=r7eLI3tm3PauXAkUZIdnVVu3ZcEj55VF+UXgbuXPTU82v4d8z5Ua1tQZ+QpZi7X0CGuKK4PNo6Ru2T6360K+F7wxHNt+frIVRBHIxqY34Ogu+x0FrvG6n6CB/CEhvT0W9Zj2HvHm51ioXtp+rHWlrxgGOYzNRwUd9kCKrgAn3wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lc4q2SML; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B63F6C4CECF;
+	Thu, 19 Sep 2024 07:48:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726731959;
-	bh=qEMMGKMY3GETYdqOm3V9vI9ZoJfC7eDMAGarWiM29K0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IrFsYpbxMy35Es+LTwzPeFkyDIKQDOdt/OXY31hQbpdLFUjFb+ctXB7lpotvh6XwO
-	 0w0KBhgdIfVoGWksf6+T6/Ir+8cbFslQ52gqKckjrH81M8zVCoN6YFz8spLBeOdhY6
-	 eBkbMHfs0/CxTUMUWCjQTOgpBuuUaXakWrffOcqVyhKC/6NARq4gQs5jwxDFYasQLx
-	 rekX1hcOgQPZieCIZESLlXdzQcaS/Ken9/eXLHs08mgCTwKvVfB9omdGgMLx+GKPeO
-	 M9ySPvzTLNDFZBMaKae5lkfBcRzUu+EFx/xStfFTs+sUjikqW5wx+cmXKaiIHC0t56
-	 Ogv/O1zvWR2Fw==
-Date: Thu, 19 Sep 2024 09:45:53 +0200
-From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Erni Sri Satya Vennela <ernis@linux.microsoft.com>, KY Srinivasan
- <kys@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "shradhagupta@linux.microsoft.com"
- <shradhagupta@linux.microsoft.com>, "ahmed.zaki@intel.com"
- <ahmed.zaki@intel.com>, "colin.i.king@gmail.com" <colin.i.king@gmail.com>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: mana: Add get_link and get_link_ksettings in
- ethtool
-Message-ID: <20240919094553.1ee7776c@kernel.org>
-In-Reply-To: <PH7PR21MB32606C49F796ED9E7AD0E5ABCA612@PH7PR21MB3260.namprd21.prod.outlook.com>
-References: <1726127083-28538-1-git-send-email-ernis@linux.microsoft.com>
-	<20240913202347.2b74f75e@kernel.org>
-	<PH7PR21MB3260F88970A04FDB9C0ACCC4CA612@PH7PR21MB3260.namprd21.prod.outlook.com>
-	<20240917170406.6a9d6e27@kernel.org>
-	<PH7PR21MB32606C49F796ED9E7AD0E5ABCA612@PH7PR21MB3260.namprd21.prod.outlook.com>
+	s=k20201202; t=1726732126;
+	bh=5i1YXeZcMX46ZW9/4GfFPwm8EbpuGNMp3b6EfmSvDeI=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=Lc4q2SMLW7byQ3nu3pq6Ke7JkI84zZIi5tgrvBMxTozrFDt/cprQepzOCsji+dKY9
+	 X7FyF7gee3j75ZnwvleP4p7AJxqDfI5/iMRbU23K/BikE66k1aX3rqwsCsYlUEWKdQ
+	 FyywpazeYqTz0t/lxgtfKq4Rj4Lk0K0nxAhdIvaSvZwy10qd932Sh3NZ8Cxt+J72Mw
+	 PPLvqFAi+fKRXfD+8ZuW/rNiFX+ShQIMCmrO2w5VcAjO99l+w0Y0P5x0YYE2rHPM9e
+	 PkmPPfwmMjtOxmqu7mKEZe4b8FtFWeYCtTljKmoYnE1NMvDh3x7qsH7Q7PFTz+aOSS
+	 4wzKxa5YYqEAg==
+From: Kalle Valo <kvalo@kernel.org>
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>,  "David S . Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
+ <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
+ Dooley <conor+dt@kernel.org>,  Jeff Johnson <jjohnson@kernel.org>,
+  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
+  devicetree@vger.kernel.org,  ath11k@lists.infradead.org,
+  linux-kernel@vger.kernel.org,  Bartosz Golaszewski
+ <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the
+ inputs of the ath11k on WCN6855
+References: <20240814082301.8091-1-brgl@bgdev.pl>
+	<83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org>
+Date: Thu, 19 Sep 2024 10:48:41 +0300
+In-Reply-To: <83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org> (Krzysztof
+	Kozlowski's message of "Thu, 19 Sep 2024 08:55:36 +0200")
+Message-ID: <87msk49j8m.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On Tue, 17 Sep 2024 20:34:40 +0000 Haiyang Zhang wrote:
-> > Unless I'm misreading I don't see the answer to the "why?" in your
-> > reply.
-> > 
-> > What benefit does reporting duplex on a virtual device bring?
-> > What kind of SW need this current patch?
-> > etc.  
-> 
-> I'm not aware of any SW has such requirement either.
-> We just want the "ethtool <nic>" cmd can output something we already know.
-> Is this acceptable?
+Krzysztof Kozlowski <krzk@kernel.org> writes:
 
-Yeah, that's fine, I was just curious. 
+> On 14/08/2024 10:23, Bartosz Golaszewski wrote:
+>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>> 
+>> Describe the inputs from the PMU of the ath11k module on WCN6855.
+>> 
+>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>> ---
+>> v1 -> v2:
+>> - update the example
+>
+> I don't understand why this patch is no being picked up. The code
+> correct represents the piece of hardware. The supplies should be
+> required, because this one particular device - the one described in this
+> binding - cannot work without them.
+
+I have already explained the situation. With supplies changed to
+optional I'm happy take the patch.
+
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
