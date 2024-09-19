@@ -1,125 +1,148 @@
-Return-Path: <netdev+bounces-128894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE66497C591
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:10:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2681197C5A6
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:14:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60E1E1F21D55
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 08:10:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABEC81F236FB
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 08:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3DDA198A30;
-	Thu, 19 Sep 2024 08:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24777198A37;
+	Thu, 19 Sep 2024 08:14:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O3Ld/OtS"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="OIrIXV4z"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B1C192591
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 08:10:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3041957F8
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 08:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726733429; cv=none; b=VlVN+nzP5Dfc2FzBFrDDGOMk1T4gU0QkuMgL3LlNtVcN2n33lukY4kWMzeZv1nIaUGuFcEolBb3RUxcqZanMfvbL86In7uSZSfGz1dcmpUASSaWyjm1JG73ab+Zw/Fex0TdZ4Nsx6Jq3IAb2OUH/cfz3UQQF0le4N+ykhWdL6z8=
+	t=1726733641; cv=none; b=QSgRj0rdmYDZ0z1lHZn25Za8NmwnI87+iJjd1xISGF0gzZAv7AqqERNEbaRlFYn8PxxDywUuTjzxljsy1DQk/ezSm2rVF8ZRQ7HqmEYTOucwRUaUfuEQT9ImXULonFUyfOscTdJVBmvLGK2PelHDZwBQZnKZV5yVcmyLPBt+o9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726733429; c=relaxed/simple;
-	bh=IMr2sDS7aX2NzKbeHBTrELWlyEAyJZIdbUt1cIwyPF0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WeXZQMgT8OLhYnNy6+ynYex1buyn3T3d42BeKvd0OH7lulp3HoRtbZQ8q7Zi3wRGfhuMPzFymuxEdFoK1qKGQlWcBNFOZwuDBdSIYh9Ce0qtnH1QKOnooCTMoDPmHJ6xhJV2g+qdq8Bb/PhQwXAA8JHHI84eLU8YEmu8xFxrGJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=O3Ld/OtS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726733427;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OOfIv+eOnxovUFA0Wsmzc627m/UT75AgIdbcTXT1OWo=;
-	b=O3Ld/OtStTik1LuYxCLS05n6T417zGb+ZYvEGXKUB4hrOopE/2E658aB0TtzMZMP+MIV9d
-	rYw51VDa0q3/dQ/AlaeaGpritwVncEE0p9veUZvmRRbix+GtHn9lKpeGphwps+coFnyTE+
-	6CW5kEQeGhZiVwcxlpcuqGuf0OPhIbc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-530-ohYLuhalOc67Ui2Rok1sQg-1; Thu, 19 Sep 2024 04:10:26 -0400
-X-MC-Unique: ohYLuhalOc67Ui2Rok1sQg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42cb6dc3365so3869885e9.2
-        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 01:10:25 -0700 (PDT)
+	s=arc-20240116; t=1726733641; c=relaxed/simple;
+	bh=obPizuvNjntWiaeSWyWHSSnIyiXDkzWD/VemLy1LTHk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DFGGxNMFhiPSUg4F0b2SP60u0jpPB4VC3dCVMSh5PQzcGLzHCscEBlxuEtzQHDEAoe/JADO4uSx9Zwe2YdHOnHRW22WehEBrnTSCoGMHSCBE5w01Mz2ZqQ4VGgGPCg+fCogBA5A9eMYvZHBbP2IWbSMVfRSoatw90ytnQBOIUcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=OIrIXV4z; arc=none smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3e03974b6a5so277587b6e.3
+        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 01:13:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1726733638; x=1727338438; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=/dmixfEFYfutwhSv2UHLcy5Vr3qDSZZFKkZiBqJtRic=;
+        b=OIrIXV4z1pYVVJfNXsRgEqaOv33YKzaD37SnwiyYNvpQu9f7ggjsieTbQgVLsm81fI
+         iveriqlFhuiAmWrw2ttjkX/v90T5D4nW0o+2GO1w7oVCaU1y30J6Bmkpq6Qc9O9xDhx2
+         V/eseJ1k3evNzwcUAimfUoU/Hx8WnLMdz2hTDGTFXR1w3ziGf4BWZDdmVFrF7TuWf3Qz
+         eoss3GfC/6wuvK6hCiOybWddZjQkk7esuE0AICPIfNiIN95Xe2ycLkeHN5xbWd+nWmIV
+         H9uTAkzcgESRinZCS8jsa2VSlCUPGD29UO+yHdOU3Vpo+YoWyz3el0HvBL4NwqW2HU1K
+         E04A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726733424; x=1727338224;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OOfIv+eOnxovUFA0Wsmzc627m/UT75AgIdbcTXT1OWo=;
-        b=Pa6xSiJdG+B3Gc7AXGRrCCajFZsz1Fj4LLAQJ+BZO52EIPuT0J9e8Jfb31MLlse5uP
-         4qd7Yl2EB5YTKG6tNiBZ45t8MK997cQw798PKWlg3Gb60/f1jfRho5fhIBqc2sA+6jtw
-         kG8xSio/BAn19bzgnOiBpc/7jizInXgqu2nbjD65ORo0Qhun2vnnZfpMNe3yC4552mvQ
-         n6CoPgi2LDOskx/2QghQudyCsItSJlT4CLTNvREehpsZkm6ZOyLo/BDD4tWjn4TirvnN
-         0K4AxffCaKhzSOQ5tR3vrb9YYj8NExvTFBwP7K2sWsSEcoltJpUHq2ZP1AlAkHLlnp+s
-         cMpA==
-X-Gm-Message-State: AOJu0Yz5RBdNIIHpBe+MzMPgTToj2CyX9XLyznJzDuJAgpykW1xACJwH
-	sZyTkRUn9Ytwz/XmooxqjUiqwLdxRzrJDa7qflwDjbuIBJ8+ryZ1JhJO2xtrPvy7XA4+DKJGI0E
-	SQjUpzN3WW3/WWw8gMllmzz0eAvWXdWYOlt+CI01M3HXZAK7muw5lqKfHXgQDfuxMxCA=
-X-Received: by 2002:a05:600c:4f82:b0:42c:b1ee:4b04 with SMTP id 5b1f17b1804b1-42cdb586defmr203453125e9.28.1726733424217;
-        Thu, 19 Sep 2024 01:10:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEGT0SwgVzRIkY/MUx4n23L9SMHSHNhM8DLpk/EIjcBzZveCWuxQ4pMW0o7cv6mXWtvyMK74A==
-X-Received: by 2002:a05:600c:4f82:b0:42c:b1ee:4b04 with SMTP id 5b1f17b1804b1-42cdb586defmr203452865e9.28.1726733423826;
-        Thu, 19 Sep 2024 01:10:23 -0700 (PDT)
-Received: from [192.168.88.100] (146-241-67-136.dyn.eolo.it. [146.241.67.136])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e75408abasm15477015e9.6.2024.09.19.01.10.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Sep 2024 01:10:23 -0700 (PDT)
-Message-ID: <a2462a8d-97b1-4494-8bc4-c5a09eee7d1b@redhat.com>
-Date: Thu, 19 Sep 2024 10:10:19 +0200
+        d=1e100.net; s=20230601; t=1726733638; x=1727338438;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/dmixfEFYfutwhSv2UHLcy5Vr3qDSZZFKkZiBqJtRic=;
+        b=KmgPJIBFceW6jwmZQPF/pUBBCdmBnkE4WxWmfVyOsRQM5Bq1exXMsRqncusj09ZlbH
+         qUw5DOX1iyDMdRlG9Nb+6VIELDQJ1tMNt/R80mzizalHcAQxzsSADPHUIaJUpPbBccYi
+         mF60GZJY+YPlHGZ6ZqFO32l42DMhWAF9mdleGfCS9T2TER/tZXjaUmmqyGAmkKKP6dgk
+         qzEw0TS8HMcbQc9i8s5BYwltcTYOeNGhdOq+4SEHqzXYxR36fTUlV86DQitG0f5NYS1o
+         FzEi3+2IC8ecmokiBalZdrB9ipmh/pXSU2g79iogvbYsHOfNeDMaEEgQ+STj8Tr4FHFN
+         wa1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUAldTYGHhGNCB7i3U7bS2ri2NviHhc+ZRB6ok1Ii0tw/wevN4DfnHa6CSDV3rVIAyClI5jMP0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGZFXaUEOfZjffOiG8UZHjx7Rp0dTavlySUp1TcPdDGttmWuBZ
+	3XE59Y1BCMUnfNffZZRczBCA4P8jVXOMDvx1gGDFlfoM4afZOHthQSE9o7CCPUQ=
+X-Google-Smtp-Source: AGHT+IHrrnzRxSY4w/ZqyCFd4PYtjfrKVDqkWH8qTW+OmjOTvxBIUj5ZqO1lp38Ok8sq4NeMIAkHWQ==
+X-Received: by 2002:a05:6808:2292:b0:3e2:5b9a:d43 with SMTP id 5614622812f47-3e25b9a0f53mr7459331b6e.34.1726733638252;
+        Thu, 19 Sep 2024 01:13:58 -0700 (PDT)
+Received: from LRW1FYT73J.bytedance.net ([2408:8642:893:ac37:a1db:b4af:9e2e:2d1c])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7db498fb8f4sm7544306a12.32.2024.09.19.01.13.54
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Thu, 19 Sep 2024 01:13:57 -0700 (PDT)
+From: Wenbo Li <liwenbo.martin@bytedance.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Wenbo Li <liwenbo.martin@bytedance.com>,
+	Jiahui Cen <cenjiahui@bytedance.com>,
+	Ying Fang <fangying.tommy@bytedance.com>
+Subject: [RESEND PATCH v3] virtio_net: Fix mismatched buf address when unmapping for small packets
+Date: Thu, 19 Sep 2024 16:13:51 +0800
+Message-Id: <20240919081351.51772-1-liwenbo.martin@bytedance.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1 V4] selftests: net: improve missing modules error
- message
-To: David Hunter <david.hunter.linux@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, shuah@kernel.org
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240914160007.62418-1-david.hunter.linux@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240914160007.62418-1-david.hunter.linux@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Currently, the virtio-net driver will perform a pre-dma-mapping for
+small or mergeable RX buffer. But for small packets, a mismatched address
+without VIRTNET_RX_PAD and xdp_headroom is used for unmapping.
 
+That will result in unsynchronized buffers when SWIOTLB is enabled, for
+example, when running as a TDX guest.
 
-On 9/14/24 18:00, David Hunter wrote:
-> The error message describing the required modules is inaccurate.
-> Currently, only  "SKIP: Need act_mirred module" is printed when any of
-> the modules are missing. As a result, users might only include that
-> module; however, three modules are required.
-> 
-> Fix the error message to show any/all modules needed for the script file
-> to properly execute.
-> 
-> Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
+This patch unifies the address passed to the virtio core as the address of
+the virtnet header and fixes the mismatched buffer address.
 
-## Form letter - net-next-closed
+Changes from v2: unify the buf that passed to the virtio core in small
+and merge mode.
+Changes from v1: Use ctx to get xdp_headroom.
 
-The merge window for v6.11 and therefore net-next is closed for new
-drivers, features, code refactoring and optimizations. We are currently
-accepting bug fixes only.
+Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
+Signed-off-by: Wenbo Li <liwenbo.martin@bytedance.com>
+Signed-off-by: Jiahui Cen <cenjiahui@bytedance.com>
+Signed-off-by: Ying Fang <fangying.tommy@bytedance.com>
+---
+ drivers/net/virtio_net.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-Please repost when net-next reopens after Sept 30th.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 6f4781ec2b36..f8131f92a392 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -1807,6 +1807,11 @@ static struct sk_buff *receive_small(struct net_device *dev,
+ 	struct page *page = virt_to_head_page(buf);
+ 	struct sk_buff *skb;
+ 
++	/* We passed the address of virtnet header to virtio-core,
++	 * so truncate the padding.
++	 */
++	buf -= VIRTNET_RX_PAD + xdp_headroom;
++
+ 	len -= vi->hdr_len;
+ 	u64_stats_add(&stats->bytes, len);
+ 
+@@ -2422,8 +2427,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+ 	if (unlikely(!buf))
+ 		return -ENOMEM;
+ 
+-	virtnet_rq_init_one_sg(rq, buf + VIRTNET_RX_PAD + xdp_headroom,
+-			       vi->hdr_len + GOOD_PACKET_LEN);
++	buf += VIRTNET_RX_PAD + xdp_headroom;
++
++	virtnet_rq_init_one_sg(rq, buf, vi->hdr_len + GOOD_PACKET_LEN);
+ 
+ 	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
+ 	if (err < 0) {
 -- 
-pw-bot: defer
+2.20.1
 
 
