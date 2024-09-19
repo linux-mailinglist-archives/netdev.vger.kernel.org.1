@@ -1,184 +1,149 @@
-Return-Path: <netdev+bounces-128994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDBE997CCF0
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 19:16:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE4B397CD01
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 19:24:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2E5F1C22023
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 17:16:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A28CA2851E8
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 17:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E76019F469;
-	Thu, 19 Sep 2024 17:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333B81A0BC4;
+	Thu, 19 Sep 2024 17:24:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="XtvPqpAu"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dJV4egmH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA7319D083;
-	Thu, 19 Sep 2024 17:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3C51A00D3
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 17:24:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726766158; cv=none; b=On5CgW2qJ8kC2yVEqBpwrBaacOV5yplZXosTm10j78er1jmscttcMY43MXUdYrtkBU5vs0nfmq1jWO/HhGOew8lo3xaA8pZET4AW7obF9UGP2vuDMGlbYE2D3ZFWs+4UbNvP84A9nj3dgfh1rn9Eman0ib2HDhnPiYcqP7j671Q=
+	t=1726766660; cv=none; b=sIoD40kL9a1XWLoGquOBpx+TZgZPmZLY7XC4qg8EFYuQ+h6ielwxGf56m4AyBvl+ztRYt1D0wGlkRQgFIjafE7jg/W20LQf0kzx6NpT+NF8gVfV+RHpXEBAMBD7uCoeQCUcBM0uHSleHHljci1wlhOE/d3nwUDzKrs+1K6qfsVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726766158; c=relaxed/simple;
-	bh=hF9gkHSrgxODmGVWe8tfUQ8BeJFehhjmUpoKEAcnOb4=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=ZKB9e5t41opjjbDVwxziCWXoAQ31CR/HZBgZC6jnVDtvFn2bPlUESSCd361ghYGrWuj6bifdnd09t/QEMDXYk5oAQ3d6hbDICTJGB5blz3ZYr/xGq7Vp1GxzfkPCfHaMNctRIT1d9FEWfyFQDBSdmc19DMGGan5XW5rvJQmp/v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=XtvPqpAu; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1726766133; x=1727370933; i=markus.elfring@web.de;
-	bh=SHG7ITXdkdUtwHX00Je/W7DpVa2A2aCxRVlxKDTmrM4=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
-	 Subject:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=XtvPqpAuXLXMGq9NkOjI+s4WSuXqrPiIUZ0CtXWQDe0lXqwY3HUs4zQKm+dQZjOA
-	 CeY2KuOGKqkpselkCfp3roY128a4xirckhNP1tvoaBNU7AjstXutB2K+O7RttfUqU
-	 LRUYR7g78B7x2Qv5n4ZaK/MEj3KI6LAYNZMgtTOKRc7lZ4Hz9WSZ6iSa//qTF1Y5g
-	 BucHyskN1EBkvotHwPygPyaUOivsfQxlTgC9tVUZObvjVlR5qEGxny+YbdW1vKtLq
-	 nMyQaE4Ay7PytUQWkuNOojkP6Kk4SwSbuoB9XYMpIQ0I1ix7AapZ2vhlEqP5sLoM9
-	 5kHSNF6qtbFVY/WAKg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MPaIK-1sebJu3RX0-00NJov; Thu, 19
- Sep 2024 19:15:32 +0200
-Message-ID: <f3a2dbaf-a280-40c8-bacf-b4f0c9b0b7fe@web.de>
-Date: Thu, 19 Sep 2024 19:15:28 +0200
+	s=arc-20240116; t=1726766660; c=relaxed/simple;
+	bh=9UPuffiJEpTMQNa/RgZa0HUXQrmRq+s6vEz5epvuDDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PFxZiLQdmkx2FGvbcit5RgiYhZ/UXtOHpg4CPZLPGskDoGQXadf5FsSk6/Dz+pKLL8hepSSbZfcL8vxRhWr82qsXtY4+wHyI2l37g8D2fCZaNyGx7Fl609U20nOR7qiBuX5axS61RpMEl13Uvt4XcRchXrTGf+ias9Vp+IxntTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dJV4egmH; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-206bd1c6ccdso12075325ad.3
+        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 10:24:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1726766657; x=1727371457; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=CNbiO/82DP9u2sWzbvovvrFbtPlTZFQedx6KNu76pJM=;
+        b=dJV4egmHLlbQy+NSqL3cQ3Y4tDnFtWPd2q65mYmVVOZISRDzjoDfMvWdl4ov4xXTjD
+         vIzLieHmCrB9q5t+7shCsKJeLNkFqZOZ+y7ngExJUkiKzD48fkUDjfM4iOS1Rx/++pbc
+         Y72AFHiIy+PDuMTmwgLIA34CVK76cCRXAPI4B4LFdRz31o2SsciFsywGwGVvKP4VEZ7I
+         pY3D0i3abSPJhHOEwtfGdDr9rDhLzQrglsonSANfMYom2RrY5OENikIzkcG/bLv6Nl0P
+         NMas6EkDxDcGHkhyjL/LfXrmkz515avu/UoFv/fM287Tc86nqs/a0Qnv4kiH4DGwi9W1
+         nguA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726766657; x=1727371457;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CNbiO/82DP9u2sWzbvovvrFbtPlTZFQedx6KNu76pJM=;
+        b=X5QPMLkuJvU6/+iN12ZOtosZwRZc/U9q0Oun0CuXdWPSHFEZRFIn1yZTqCQuOaCFFG
+         SW1w9FSRjZDllUm+b8j2EGNezKmMMcN8bfp5/IF4dbOhbhTPj/fSzTVWUtAQ60EVk5Vi
+         /mhOIPFSCzjHDM3W7HnVXTiw50nL3h/s7fal0I9m09BHbPW4CwxFkKl8CAZxGOOwNgMy
+         kU4tz7BZY1rKZP0IuCvpvbPb1uk0mD9LuSev5zcYJVGUw9qltGtwQbh6yG+UEfYmBRs7
+         fiNgGjVmib+qhDJUpm++EtugFK0LLzpUC2jIbTqT1GJhvP9C53ac65wyqjZ4X0Gczrmw
+         CM+w==
+X-Forwarded-Encrypted: i=1; AJvYcCWSZ0I8Jv6yDNzkTxF2kAlS31Byia8yqJ6RBFSGV4gn3LullyzQsiuPqwxmCdi9ghQuZOKDDO8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrrNJm303mffmPW6Vil9ZUgw6O1Kie50QkLpj4N+2v67hI0RcX
+	wlgoBPXUa8KLMz5nPNhsobtY4zgTyDUeeYP+z3/+jQCTdngatjKfnkknXnLlSsM=
+X-Google-Smtp-Source: AGHT+IHPfY4TEkVvMUVnLR9vZZuyYLKJtFhdGuuG5hbLTNkoQGtK2vgWZ0VNokhT+DVllzTi43tO6w==
+X-Received: by 2002:a17:902:ecc1:b0:206:9519:1821 with SMTP id d9443c01a7336-208d8397bf2mr1158685ad.14.1726766657486;
+        Thu, 19 Sep 2024 10:24:17 -0700 (PDT)
+Received: from medusa.lab.kspace.sh ([208.88.152.253])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-207a09593f6sm73088405ad.220.2024.09.19.10.24.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Sep 2024 10:24:16 -0700 (PDT)
+Date: Thu, 19 Sep 2024 10:24:14 -0700
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Moshe Shemesh <moshe@nvidia.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, yzhong@purestorage.com,
+	Shay Drori <shayd@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [PATCH v2 0/1] net/mlx5: Added cond_resched() to crdump
+ collection
+Message-ID: <ZuxePhq3V4ag8WTz@apollo.purestorage.com>
+References: <20240829213856.77619-1-mkhalfella@purestorage.com>
+ <ZtELQ3MjZeFqguxE@apollo.purestorage.com>
+ <43e7d936-f3c6-425a-b2ff-487c88905a0f@intel.com>
+ <36b5d976-1fcb-45b9-97dd-19f048997588@nvidia.com>
+ <ZtknozCovDvK7-bL@ceto>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
- Karol Kolacinski <karol.kolacinski@intel.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-Content-Language: en-GB
-Cc: LKML <linux-kernel@vger.kernel.org>
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] ice: Use common error handling code in two functions
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:gMNfraoF6fnRh6XZ9B0roLh11scolJMqzwhmHZOQ214ud0NACJd
- IkpkpEgDENC0uUCHlak9b7WaLqEeShJfiCNDFruc6HQ7Ahk5oPcYvQS4Nt3JUXPIU0claBH
- mc1BCkAdDkqT39s18InKj5jFr6YScqnMcYYwxGtTTCeaoxae/BzURPHSsu9LOsYXc1fbju9
- 8cruhrqp9ll38U2VKIE7w==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:kTn2p+qB1f4=;PtSZqJbk1axhMX5YnG8jpvXVWB/
- 0wX3ULRchyO7xJ8emL0RzwVuFKdGSRlEV9HpOwmKZRKQ9hO0l6oCL8jRGJ/jg4myBWLBuMUET
- XXZQE6Ye3CZEjGJDBpK9Gw7CawJfWjsaAlg4ocbZqzkivXF7omyLkyeGsNcQ6bvlzjXwuxmqp
- LCdcQ8/BjxiaQNozlvu52OFyTFfl++rDmFh9qO/Yi53ciGE8K+wyliXfaYwAGIIOkJp6W+k5g
- AeoVC8zCni7Fla6R3JqMSkmvamX7SypGa/6mMg/gFbDuM+/E1ulqqRk5F7Mbfl5OeiC4w9Ngm
- FLSuRDMRIS6g2wXUeRHR2KsT6/gELsFAUF2ep3tymfbsIUpyhtHnZvIHDTqm7ddSo/m9TpdNo
- k5BQ83GUXpEzhzocCHHj/Dr02hVGMRdGg0BWpdIn7zOcZlqwoy50XSpsDtG3BMr27ED4UdJjl
- JyQt+WhIW9c1ePmZy0P2e+26e6bBv7m9Yn9beRk/jVrGVdz7RJOQui56nLQDMEeSWAc0WUUSg
- f2lgxKCQfSt/Oo1NN/o3htN6LLX5xAQCQrKoejpMHqs0a0TXIBGZpUSr290Q1udGmImnowX5L
- ndLXVTCojx3n+bfXLNMBWEv8vb5MJf6ywFUgplMC5bg4reJrjBe6c4shm+vqSQlGnI+cVPkLO
- qxQnWyaAqhbJjzoxBWnD/RB0zzOPhVzXVDa0mlZGStJfmFLJSuzojslfKI3ccG9na61akPY46
- fUlW2pkU7t5c/uDpJlLZ7gqGbT3VpUsxROGY1tWFugx83QI0Y7D71OcSH+/xwouA1Nij87Xa2
- Tp401BxjbB2RCMBnR+ZAx/MA==
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZtknozCovDvK7-bL@ceto>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Thu, 19 Sep 2024 19:00:25 +0200
+On 2024-09-04 20:38:13 -0700, Mohamed Khalfella wrote:
+> On 2024-08-30 12:51:43 +0300, Moshe Shemesh wrote:
+> > 
+> > 
+> > On 8/30/2024 10:08 AM, Przemek Kitszel wrote:
+> > 
+> > > 
+> > > On 8/30/24 01:58, Mohamed Khalfella wrote:
+> > >> On 2024-08-29 15:38:55 -0600, Mohamed Khalfella wrote:
+> > >>> Changes in v2:
+> > >>> - Removed cond_resched() in mlx5_vsc_wait_on_flag(). The idea is that
+> > >>>    usleep_range() should be enough.
+> > >>> - Updated cond_resched() in mlx5_vsc_gw_read_block_fast every 128
+> > >>>    iterations.
+> > >>>
+> > >>> v1: 
+> > >>> https://lore.kernel.org/all/20240819214259.38259-1-mkhalfella@purestorage.com/
+> > >>>
+> > >>> Mohamed Khalfella (1):
+> > >>>    net/mlx5: Added cond_resched() to crdump collection
+> > >>>
+> > >>>   drivers/net/ethernet/mellanox/mlx5/core/lib/pci_vsc.c | 4 ++++
+> > >>>   1 file changed, 4 insertions(+)
+> > >>>
+> > >>> -- 
+> > >>> 2.45.2
+> > >>>
+> > >>
+> > >> Some how I missed to add reviewers were on v1 of this patch.
+> > >>
+> > > 
+> > > You did it right, there is need to provide explicit tag, just engaging
+> > > in the discussion is not enough. v2 is fine, so:
+> > > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > 
+> > Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+> > And fixes tag should be:
+> > Fixes: 8b9d8baae1de ("net/mlx5: Add Crdump support")
+> 
+> Will add the tag in v3.
 
-Add jump targets so that a bit of exception handling can be better reused
-at the end of two function implementations.
+A quick follow up on this patch. I posted v3 [1] of this patch with
+minor changes. There are no functional differences between v2 and v3 of
+this patch. The commit messsage on v3 has information why call
+cond_resched() every 128 iterations, so that could be useful to add.
 
-This issue was detected by using the Coccinelle software.
+Is there anything I need to do to get v2 or v3 of this patch merged?
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/net/ethernet/intel/ice/ice_ptp.c | 32 ++++++++++++------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethern=
-et/intel/ice/ice_ptp.c
-index ef2e858f49bb..c445ae80094b 100644
-=2D-- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2813,10 +2813,8 @@ static int ice_ptp_rebuild_owner(struct ice_pf *pf)
-
- 	/* Write the increment time value to PHY and LAN */
- 	err =3D ice_ptp_write_incval(hw, ice_base_incval(pf));
--	if (err) {
--		ice_ptp_unlock(hw);
--		return err;
--	}
-+	if (err)
-+		goto err_unlock;
-
- 	/* Write the initial Time value to PHY and LAN using the cached PHC
- 	 * time before the reset and time difference between stopping and
-@@ -2829,10 +2827,8 @@ static int ice_ptp_rebuild_owner(struct ice_pf *pf)
- 		ts =3D ktime_to_timespec64(ktime_get_real());
- 	}
- 	err =3D ice_ptp_write_init(pf, &ts);
--	if (err) {
--		ice_ptp_unlock(hw);
--		return err;
--	}
-+	if (err)
-+		goto err_unlock;
-
- 	/* Release the global hardware lock */
- 	ice_ptp_unlock(hw);
-@@ -2856,6 +2852,10 @@ static int ice_ptp_rebuild_owner(struct ice_pf *pf)
- 	ice_ptp_enable_all_extts(pf);
-
- 	return 0;
-+
-+err_unlock:
-+	ice_ptp_unlock(hw);
-+	return err;
- }
-
- /**
-@@ -3129,18 +3129,14 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
-
- 	/* Write the increment time value to PHY and LAN */
- 	err =3D ice_ptp_write_incval(hw, ice_base_incval(pf));
--	if (err) {
--		ice_ptp_unlock(hw);
--		goto err_exit;
--	}
-+	if (err)
-+		goto err_unlock;
-
- 	ts =3D ktime_to_timespec64(ktime_get_real());
- 	/* Write the initial Time value to PHY and LAN */
- 	err =3D ice_ptp_write_init(pf, &ts);
--	if (err) {
--		ice_ptp_unlock(hw);
--		goto err_exit;
--	}
-+	if (err)
-+		goto err_unlock;
-
- 	/* Release the global hardware lock */
- 	ice_ptp_unlock(hw);
-@@ -3168,6 +3164,10 @@ static int ice_ptp_init_owner(struct ice_pf *pf)
- 	pf->ptp.clock =3D NULL;
- err_exit:
- 	return err;
-+
-+err_unlock:
-+	ice_ptp_unlock(hw);
-+	return err;
- }
-
- /**
-=2D-
-2.46.0
-
+[1] https://lore.kernel.org/all/20240905040249.91241-1-mkhalfella@purestorage.com/
 
