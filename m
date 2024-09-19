@@ -1,194 +1,165 @@
-Return-Path: <netdev+bounces-128903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8D9197C62C
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:48:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10E6697C645
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:52:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB7011C20D77
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 08:48:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 966AE1F26D3D
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 08:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE5F199395;
-	Thu, 19 Sep 2024 08:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352FC1991B8;
+	Thu, 19 Sep 2024 08:51:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X48BFeQf"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D99199243
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 08:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824801991B1
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 08:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726735668; cv=none; b=PMZjw2pMjYhbQyOCqmGVTfwtYnOhgfwTjoNbogo0jLPYjjlKm5WoEkg4hg0653lYFs8L9z+pVOQ55wOE4lBOk7pddB9d5gPqu+FaoC0qTySNH4+/NhwoqMqOCFDrrbvLJthSinsvyCDAKsJgdqSDyJZEvT0K7Uf/MJKKqlc4ZJI=
+	t=1726735918; cv=none; b=REIWm6YgdX0x2G1Df9+4thEVwFV65xrV/HzHfrEFG6FYf7hSrbZYWganjkv1ftRreIboTXErWvV4pa6blzL4TuWU7ikVhgemKHEk30iBisEdkxHlifMPOb3soBmWL8iiQU4YqdQrEV/aPOCvH2uQ/CFsJLPOMRcM7oOXK7z6QUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726735668; c=relaxed/simple;
-	bh=TnRMX5yJakpY8P+dQ6zqeHJ/lVmJygHLklt+pllkci0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lJch65ohwgRPI/aoKOu6K8r0aZBl7/vSRYgEV3LDggWVe/f4SfsOVV67eeyKeCxnfv7BO1E1LfBRxFKR8ZNtstnf6Iz7K2II10IS/6iIrNELOPMODoyutG7cIPpjiNwkSwRiJc7FeW3nA57c8mKea/d0VEfemEWS52oStcJEQK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1srCoh-0006Y7-9E; Thu, 19 Sep 2024 10:47:11 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1srCod-0090ny-RA; Thu, 19 Sep 2024 10:47:07 +0200
-Received: from pengutronix.de (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 38DD733F566;
-	Thu, 19 Sep 2024 08:47:07 +0000 (UTC)
-Date: Thu, 19 Sep 2024 10:47:06 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>, 
-	Markus Schneider-Pargmann <msp@baylibre.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, 
-	Raymond Tan <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux@ew.tq-group.com
-Subject: Re: [PATCH 2/2] can: m_can: fix missed interrupts with m_can_pci
-Message-ID: <20240919-tourmaline-jaguar-of-reverence-4875d2-mkl@pengutronix.de>
-References: <ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726669005.git.matthias.schiffer@ew.tq-group.com>
- <f6155510fbea33b0e18030a147b87c04395f7394.1726669005.git.matthias.schiffer@ew.tq-group.com>
+	s=arc-20240116; t=1726735918; c=relaxed/simple;
+	bh=ac44HsuMIlHv6sXDiEGfaSFoRkPBfY3p1K0W8klzEis=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GURpFtpUaheE1n4GJs21qQf793GVrs223pJzcGN5liaIdW6nTTTrAy80gP7NqOBwd0cXH2CTp7l0xUPO8RuTIwj5Mr/6MEJ1fkXxy+SkhZn4p/oEpmuUZ398/DxC+YK1dEEWzxukqv8zrBaUl5kIv4O0rHGxsL+/xEMAMh+FEVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X48BFeQf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726735915;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0mGbTc92iDLbuR64u0hcpPUr0Vs7L0L/GoG+HX39BQ0=;
+	b=X48BFeQfdzMylQgwmS+vbqKGDrlMT4Ka8pQqQ6xB7CATpW1QPDRjRZ9vUCFHHHut0eSiVR
+	MQWsHl0y7Ie20ZBPT7lR6XlpCRWbZ+WY/Lz+WR0M67vHS1E5cxjilymONUCI/UpPT6LXLv
+	Kh08kbBq1sp4Qj92eWSaolfry2Brnpc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-672-X4mXq79RNR-siemhIpeFjA-1; Thu, 19 Sep 2024 04:51:54 -0400
+X-MC-Unique: X4mXq79RNR-siemhIpeFjA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-374c54e188dso829139f8f.1
+        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 01:51:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726735913; x=1727340713;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0mGbTc92iDLbuR64u0hcpPUr0Vs7L0L/GoG+HX39BQ0=;
+        b=R5CeRWW1lGraiuofiyI9uH71JGmdm5nSaW8vRpLpS5p2mdYae6uEST1gsVrHiMGWg2
+         FQeH5vVpEYOgUbFGRf7evq1WOTMwp2po5yRB8BAH/QCQg3p+ICZixEcB/Gkuy2D9fVrX
+         S9zcv51fS1Uxd4RBi9OyWUumGx0E7cwD2UtlAGWD3X2Le2Zj8a8pqzRD7Wci7z0+FrtX
+         ZrkJGvlBE1gWdHGe+m0H/BABSdv7gmD41MGGlc0FqXxrCDEqqDcuPREw89OYdtLiYOFz
+         1FpZLlBT+dPy59X7SpKPc/rZ9i5subFGWNu/NekwwcAiYNTCy31b93v2n2pLT/AXrgtt
+         uH7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUsUZEDgDJl5CcrIaQYZ035DdRBr20xbm1AYhmtWN1jCA/uKvEQRMV5J3DmibHe5wwjTjoq5wI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoZN0/1A+f5ADrlHkhuO/WBqQ8RRWFWssQXtcAcbM/Qs6Ov0ul
+	O6KZa+YgwAQpPm2jtfyMIGeyHzR3yJDJC92KBpv429Lx61Az2wn8DkIhxmat+8muTufFuXe5+bc
+	bBAnZhU0vUhXvyom9gx2MrLG7V6XBgYyE8XoXZlqQVAX/4lhPZfSMaw==
+X-Received: by 2002:a05:6000:1fa3:b0:374:c7cd:8818 with SMTP id ffacd0b85a97d-379a86030f4mr1563156f8f.22.1726735912803;
+        Thu, 19 Sep 2024 01:51:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHI85oI+5O1Om0cQoxzqcY76JOI0fNOGA3ZII/PFCYk/Jr9j5EdGPS4arHddtcl3zYCc7SICQ==
+X-Received: by 2002:a05:6000:1fa3:b0:374:c7cd:8818 with SMTP id ffacd0b85a97d-379a86030f4mr1563138f8f.22.1726735912311;
+        Thu, 19 Sep 2024 01:51:52 -0700 (PDT)
+Received: from [192.168.88.100] (146-241-67-136.dyn.eolo.it. [146.241.67.136])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e75426d14sm16097745e9.19.2024.09.19.01.51.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Sep 2024 01:51:51 -0700 (PDT)
+Message-ID: <1940b2ab-2678-45cf-bac8-9e8858a7b2ee@redhat.com>
+Date: Thu, 19 Sep 2024 10:51:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="znxmzativoaydeg7"
-Content-Disposition: inline
-In-Reply-To: <f6155510fbea33b0e18030a147b87c04395f7394.1726669005.git.matthias.schiffer@ew.tq-group.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2] net: sockmap: avoid race between
+ sock_map_destroy() and sk_psock_put()
+To: Dmitry Antipov <dmantipov@yandex.ru>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Jakub Sitnicki <jakub@cloudflare.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, lvc-project@linuxtesting.org,
+ syzbot+f363afac6b0ace576f45@syzkaller.appspotmail.com
+References: <20240910114354.14283-1-dmantipov@yandex.ru>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240910114354.14283-1-dmantipov@yandex.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 9/10/24 13:43, Dmitry Antipov wrote:
+> Syzbot has triggered the following race condition:
+> 
+> On CPU0, 'sk_psock_drop()' (most likely scheduled from 'sock_map_unref()'
+> called by 'sock_map_update_common()') is running at [1]:
+> 
+> void sk_psock_drop(struct sock *sk, struct sk_psock *psock)
+> {
+>          write_lock_bh(&sk->sk_callback_lock);
+>          sk_psock_restore_proto(sk, psock);                              [1]
+>          rcu_assign_sk_user_data(sk, NULL);                              [2]
+>          ...
+> }
+> 
+> If 'sock_map_destroy()' is scheduled on CPU1 at the same time, psock is
+> always NULL at [3]. But, since [1] may be is in progress during [4], the
+> value of 'saved_destroy' at this point is undefined:
+> 
+> void sock_map_destroy(struct sock *sk)
+> {
+>          void (*saved_destroy)(struct sock *sk);
+>          struct sk_psock *psock;
+> 
+>          rcu_read_lock();
+>          psock = sk_psock_get(sk);                                       [3]
+>          if (unlikely(!psock)) {
+>                  rcu_read_unlock();
+>                  saved_destroy = READ_ONCE(sk->sk_prot)->destroy;        [4]
+>          } else {
+>                  saved_destroy = psock->saved_destroy;                   [5]
+>                  sock_map_remove_links(sk, psock);
+>                  rcu_read_unlock();
+>                  sk_psock_stop(psock);
+>                  sk_psock_put(sk, psock);
+>          }
+>          if (WARN_ON_ONCE(saved_destroy == sock_map_destroy))
+>                  return;
+>          if (saved_destroy)
+>                  saved_destroy(sk);
+> }
+> 
+> Fix this issue in 3 steps:
+> 
+> 1. Prefer 'sk_psock()' over 'sk_psock_get()' at [3]. Since zero
+>     refcount is ignored, 'psock' is non-NULL until [2] is completed.
+> 
+> 2. Add read lock around [5], to make sure that [1] is not in progress
+>     when the former is executed.
+> 
+> 3. Since 'sk_psock()' does not adjust reference counting, drop
+>     'sk_psock_put()' and redundant 'sk_psock_stop()' (which is
+>     executed by 'sk_psock_drop()' anyway).
+> 
+> Fixes: 5b4a79ba65a1 ("bpf, sockmap: Don't let sock_map_{close,destroy,unhash} call itself")
+> Reported-by: syzbot+f363afac6b0ace576f45@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=f363afac6b0ace576f45
+> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 
---znxmzativoaydeg7
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I think there is still Cong question pending: why this could not/ should 
+not be addressed instead in the RDS code.
 
-On 18.09.2024 16:21:54, Matthias Schiffer wrote:
-> The interrupt line of PCI devices is interpreted as edge-triggered,
-> however the interrupt signal of the m_can controller integrated in Intel
-> Elkhart Lake CPUs appears to be generated level-triggered.
->=20
-> Consider the following sequence of events:
->=20
-> - IR register is read, interrupt X is set
-> - A new interrupt Y is triggered in the m_can controller
-> - IR register is written to acknowledge interrupt X. Y remains set in IR
->=20
-> As at no point in this sequence no interrupt flag is set in IR, the
-> m_can interrupt line will never become deasserted, and no edge will ever
-> be observed to trigger another run of the ISR. This was observed to
-> result in the TX queue of the EHL m_can to get stuck under high load,
-> because frames were queued to the hardware in m_can_start_xmit(), but
-> m_can_finish_tx() was never run to account for their successful
-> transmission.
->=20
-> To fix the issue, repeatedly read and acknowledge interrupts at the
-> start of the ISR until no interrupt flags are set, so the next incoming
-> interrupt will also result in an edge on the interrupt line.
->=20
-> Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkhart L=
-ake")
-> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-> ---
->  drivers/net/can/m_can/m_can.c | 18 +++++++++++++-----
->  1 file changed, 13 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-> index 47481afb9add3..363732517c3c5 100644
-> --- a/drivers/net/can/m_can/m_can.c
-> +++ b/drivers/net/can/m_can/m_can.c
-> @@ -1207,20 +1207,28 @@ static void m_can_coalescing_update(struct m_can_=
-classdev *cdev, u32 ir)
->  static int m_can_interrupt_handler(struct m_can_classdev *cdev)
->  {
->  	struct net_device *dev =3D cdev->net;
-> -	u32 ir;
-> +	u32 ir =3D 0, ir_read;
->  	int ret;
-> =20
->  	if (pm_runtime_suspended(cdev->dev))
->  		return IRQ_NONE;
-> =20
-> -	ir =3D m_can_read(cdev, M_CAN_IR);
-> +	/* For m_can_pci, the interrupt line is interpreted as edge-triggered,
-> +	 * but the m_can controller generates them as level-triggered. We must
-> +	 * observe that IR is 0 at least once to be sure that the next
-> +	 * interrupt will generate an edge.
-> +	 */
-> +	while ((ir_read =3D m_can_read(cdev, M_CAN_IR)) !=3D 0) {
-> +		ir |=3D ir_read;
-> +
-> +		/* ACK all irqs */
-> +		m_can_write(cdev, M_CAN_IR, ir);
-> +	}
+Thanks,
 
-This probably causes a measurable overhead on peripheral devices, think
-about limiting this to !peripheral devices or introduce a new quirk that
-is only set for the PCI devices.
+Paolo
 
-Marc
-
-> +
->  	m_can_coalescing_update(cdev, ir);
->  	if (!ir)
->  		return IRQ_NONE;
-> =20
-> -	/* ACK all irqs */
-> -	m_can_write(cdev, M_CAN_IR, ir);
-> -
->  	if (cdev->ops->clear_interrupts)
->  		cdev->ops->clear_interrupts(cdev);
-> =20
-> --=20
-> TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Ge=
-rmany
-> Amtsgericht M=C3=BCnchen, HRB 105018
-> Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan S=
-chneider
-> https://www.tq-group.com/
->=20
->=20
->=20
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---znxmzativoaydeg7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbr5QcACgkQKDiiPnot
-vG+OZwf/c88bKRbuevnUCUCzn6Eot1L8rix8rbMXHOwiY50+e07UK+ux/Z50J94y
-1xBVkCAD1MZu9/ftH13Ye/gWrMlBv49LzDScetl0vZy7A+kbmg3/+l3wGTqo3zQS
-NUqSxKlzFZP8b7vDPOjm/HxrAhx4WQbf28BcrcQ/AQA26+EH/nq6Z1agJBUV0s14
-3vOi0zwIm/plTKxEBR5Mu+4RUofHWa7wwwopDuQcgGEzWaBwr1Zxfe/sllmGcxQw
-Nd+Gs7XXYKQETfkHJ49bqYq8gxFwFztZBjAyfenuCOYQG0W21pxQn6EyAB05VTmC
-6VevDqOIWuvRdNdCaUVoEPXdnNl7eg==
-=iUnT
------END PGP SIGNATURE-----
-
---znxmzativoaydeg7--
 
