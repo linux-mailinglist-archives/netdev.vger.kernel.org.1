@@ -1,126 +1,222 @@
-Return-Path: <netdev+bounces-128935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BA5497C802
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:33:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C866997C825
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:44:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EEADB25B62
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:33:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06B481C243E1
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:44:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925CD19ABB4;
-	Thu, 19 Sep 2024 10:33:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C0519ABCB;
+	Thu, 19 Sep 2024 10:44:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="mZsO4AGi"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="QHe4IO+g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2054.outbound.protection.outlook.com [40.107.94.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D8B198E99
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 10:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726742009; cv=none; b=grnRNHRi9jfWtsxSEcuYiFUuELZMPnAnOsIve+BFPm9pI1LCUjBfKNQ372rv+pCKfHjJ2Cuc9Irk1ahmlOqxkwymbgl5SJLiOlZva7SpNIFQYHE173oJOsAUuQargXtrPlyUE/obRzDGc+gPEs1zouFlk84IlUO8GcCXrs1Q2P8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726742009; c=relaxed/simple;
-	bh=V1YPdfqmajIEnriwvuftpiMyY/DSrs4cUIhXE5P3RNQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MyIgOz9aj40OxBySt//b/YdbkfNj6r5UYcHGqAhjo9dj3GWMr+ko4bSueZuj3E9gn3gTKh89GodoBCw5hvXJ0FGJQYCuTTV7X9z/wkUVEIG0x/FApBdsyHGzQEEmH+WieJpgqS7vgh0lYVY9FLyE1+CPR+JmXnbkO098BxE2Mrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=mZsO4AGi; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c3cdba33b0so917079a12.1
-        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 03:33:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1726742005; x=1727346805; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6ElPw2rkqJxy3GrSWwEzcQxJQL1TZQOW7P03usn2dqU=;
-        b=mZsO4AGinb40OfWru/ps8zvUfk+S+Sv18uHs3qO9gXqbkfZo6jyvxT/Re/ywXFoZxH
-         mOU4itu+K9yI6guIlP54rl5nsTVEjlTf+PBJsy+Pp0775yFdo/YdmDaEE6FEYJp0zzGb
-         L4tjX/8QrNrhZB833AZSgYQaJ5r3jqpMyU8m/gXYyl0ovs0orSbAfqDCyGr2m5qZMWp6
-         bD5uQGmmXt3cjmloTyigVPG6KgjLmdAV4LpG/8tr7cGBE6Jv4bKhG+pj3wCKFXKuodIV
-         otjD0mgd+IxlBI12HGph2/UyYiYjhPodkuup+KdgTKf25eP5W3QJwWX/1o9at5TXgoZ7
-         hwTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726742005; x=1727346805;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ElPw2rkqJxy3GrSWwEzcQxJQL1TZQOW7P03usn2dqU=;
-        b=SOQqh/C8W0xM19KwVZtQdLwGYQNvnksNErjG4PtTvrETf2BZeup8KWfXyxI8ey+3uv
-         6Qma/8L4ljLnxzu0rNM2J28F1VbTh1JYOMU4vHAR1xkCuG6w8KczHVRsfwLiH275x33n
-         qM3jQR29VMgvcMrlST8wBSmVROcRP6JN/c7HRnkUtEFcGpkZhRacW7oIEetRcAcqFIWU
-         x0EaRKgSV3gI3KRDT4Tx0OejwmpinPBtWyTx12kI8oKLucg/MCq+BSrLjK7cS3SySt3m
-         LNZ3iipemGcvsqd+YO6LF8Upc0Zlt6Ji1Bb4cpazl7QO/XyIbs/0b5TlcU2x31Ll41q6
-         AULg==
-X-Forwarded-Encrypted: i=1; AJvYcCWKgscI0Bb1WV3/AJNWsaZLmWXJahl3gUuGWsdnlye+zv3UlhCA68ee22wxKDir3qn0J2gYK5I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS2xr6bWG15fyOgVb1t/T0UkgMcztMbzkMSleJ2kP+/7ZddYRU
-	CajxmAP7CFS77gDZpTfhXinUxM3kNi1LBlZXKXyqi4fZau0wYB4/4PR+Y3e2RZU=
-X-Google-Smtp-Source: AGHT+IH5FaHwIy/HpPwgYVmO7IWOIFZ4wz7dkZfK70jhdOMRpGV6GaHoSjwhSDN9QfGUWFQLWu83lA==
-X-Received: by 2002:a17:907:efde:b0:a8a:8d81:97a8 with SMTP id a640c23a62f3a-a902941ff90mr2191026166b.1.1726742004941;
-        Thu, 19 Sep 2024 03:33:24 -0700 (PDT)
-Received: from [192.168.51.243] ([78.128.78.220])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90612e5696sm710812966b.172.2024.09.19.03.33.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Sep 2024 03:33:24 -0700 (PDT)
-Message-ID: <934bf1f6-3f1c-4de4-be91-ba1913d1cb0e@blackwall.org>
-Date: Thu, 19 Sep 2024 13:33:22 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB0E335A7;
+	Thu, 19 Sep 2024 10:44:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726742664; cv=fail; b=TKJLjsVKtm1ku/F63XoJbAtUBN0lirddlJMI+l/Z7OtkiRA3uFBVvXcHDTI06oSYxTpU13O8fQDtYkYizTe+m7RrDGvH0o1O1AWDRBQ9QCOgNPybbV9Jj4qQdie9u8bz3S/CTalHIvXkBvD9lhCddkK+fpJpUb3/32CkMaIpRzY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726742664; c=relaxed/simple;
+	bh=NFt2mjNZYXTMYGrAw3+OxmaV3J30royZjOwpYz207hQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=O3iyuoTNeiVZYYmkQRmN5e1+tLgYImF2lDcRVcbM/DW+9qW5fREjMOfn3plpp+y7M/YDe3/GAYWBddT8JW3l16KzITCmZ7IMw2hs6vaQVWhtv/gB+fo+Knzr9mgFng9DfOQvtXs243kqxoTqRFCnqrUeA5HVSiykFygx0cDcEBQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=QHe4IO+g; arc=fail smtp.client-ip=40.107.94.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Igq77FJ9XJiwz2wQ6ubc5LFmevQN+Y6UIIqk/bNyYTGa6Towo6+G0CE8OIK/Uh5tpXG6mSFquBunPkEVJWlentZaMD3ZESmZho2Ns1MAinUhadLxpxJHfZAL6WiBbpIHA7jmB8rvFujoOn0BbIniaWO4WrvIaC098co1PLDiDg/o5fOxlZbtZe9w/psT3yrBATMesr0E/ueNa+tmgWyY334JEd0Zxx25U/F5n2XHySsBvWRgTtIKd0ZbflJ1BsOYlQmleb7W/MzDDgnkuLry3RBT2ko7rtNQFDqtSWJIFfgignSQuaiWYgay75IEJK5d/5b7RRW+a93mCmDTbmbhVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AuwLYHXSGNNYTXlop6yu8fw7EVRXlK002eZNcbtWWBc=;
+ b=Z/G7T/AGvt3g8CjaK3c+Rabz2TJX6EZMoCafjIvEyvqqQyIZMGcgviY3qMMs+eWEFcGp/MurAdI8C6W4a4z9iapcIQtFQHc2jCVzrv0L9nxcYYfmmfJPw0mW0Ha/H32S6etcBBV5w2g5PT1JobyrxOIvWailcNcDbnTKD7P0NLg/73CbuTHkQ0l6U/ZxmKI2t7PYkV5WFSKj3wDlc3gYL+64lmGpjua2c0Yn/0arAYLN4Jugo9/+MxBe0z7YUPGUXlK1kYjiRqfyMO4f4bBSsGdlhP2UWCJStEGYEGvxjM2rkq+5X7yUQsy6iJQJXbbLJrUH7qYymri0voZ24HnqjQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AuwLYHXSGNNYTXlop6yu8fw7EVRXlK002eZNcbtWWBc=;
+ b=QHe4IO+gXJpMBBNzFLp5MUYrjICI50ad7/6aF7kH+NYHT20rLwKKdqMr/pV8PVwW2DbRpXi5F3lmzBKyQa0SIS/zrCg0O0f6fmfolXro+HkH/zSVKvW+h2dzDyBoL3Uk+D7RKdnj8rdFCAyEOdEBgD61PlnKSAEW4ENlJ5kaIKOVgFqqNWD0DsF6698QHqc0WONeu9v3a1hCFCwWjQ1Z8YOWJP/z2us64dqgxN7TR7izd+vIxVP7h9b5buPFe0jB2Z+g4v5JsYWbTWHKezHjCANXvwmweGjq4eqHI/VwnTKET8hSGEZQLDuVQW9GGBBEJVh0nzSFyeoszgDFPGmlmw==
+Received: from DM6PR11MB4236.namprd11.prod.outlook.com (2603:10b6:5:1d9::20)
+ by IA0PR11MB7282.namprd11.prod.outlook.com (2603:10b6:208:43a::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.21; Thu, 19 Sep
+ 2024 10:44:17 +0000
+Received: from DM6PR11MB4236.namprd11.prod.outlook.com
+ ([fe80::ea6a:8f25:ead5:8dfb]) by DM6PR11MB4236.namprd11.prod.outlook.com
+ ([fe80::ea6a:8f25:ead5:8dfb%6]) with mapi id 15.20.7962.027; Thu, 19 Sep 2024
+ 10:44:11 +0000
+From: <Mohan.Prasad@microchip.com>
+To: <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <shuah@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<horms@kernel.org>, <brett.creeley@amd.com>, <rosenp@gmail.com>,
+	<UNGLinuxDriver@microchip.com>, <willemb@google.com>
+Subject: RE: [PATCH net-next v2 1/3] selftests: nic_basic_tests: Add selftest
+ file for basic tests of NIC
+Thread-Topic: [PATCH net-next v2 1/3] selftests: nic_basic_tests: Add selftest
+ file for basic tests of NIC
+Thread-Index: AQHbCOSaqY6jyq2GfkWTIKzaGCAXv7JcHLYAgAE51PCAAB3OAIABevAg
+Date: Thu, 19 Sep 2024 10:44:11 +0000
+Message-ID:
+ <DM6PR11MB42363E9DC481B09277369B5A83632@DM6PR11MB4236.namprd11.prod.outlook.com>
+References: <20240917023525.2571082-1-mohan.prasad@microchip.com>
+ <20240917023525.2571082-2-mohan.prasad@microchip.com>
+ <5c8779db-31c4-4b93-986a-bd489720fa4b@lunn.ch>
+ <DM6PR11MB4236AE79E97B4CBBA1A9812F83622@DM6PR11MB4236.namprd11.prod.outlook.com>
+ <0d6c225e-358b-401e-a4aa-a1f7ea0f2652@lunn.ch>
+In-Reply-To: <0d6c225e-358b-401e-a4aa-a1f7ea0f2652@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4236:EE_|IA0PR11MB7282:EE_
+x-ms-office365-filtering-correlation-id: 10a987bd-8ea2-4beb-da21-08dcd897ff1b
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4236.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(7416014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|366016|7416014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?NXELm9sCa+FpDtmQQtUA1bFT3sPHw4fHO0zS4eHJCtUod6aNLnTLytS3YJT6?=
+ =?us-ascii?Q?1rV5JbW5tVOjUUukMHzkdDg9g0YDWsQHc42tt7tqAh69JGHkMC07fXkpkjWH?=
+ =?us-ascii?Q?1KhOGGvVVw1w+XG9Nh0+p6X0RDU1MZQvBe6b2Zo5puWJiJi3Q7qAjwQaumcK?=
+ =?us-ascii?Q?mWp2r3r94eU4+UFGrCjG4qSk0K1FeLMZfxuc9VKQl+9j0HwgYxKzaooWYwwA?=
+ =?us-ascii?Q?wrikk4qgH53NwTKZI0i9wkz+OpPznvgHlDb91cSISF+M4Nha5jHL2m2qo6bt?=
+ =?us-ascii?Q?3cCTBOUITLyQK92JeonOcHr+LQbCxjErrocHuVgRvMUa8Thu44hFsetaldjP?=
+ =?us-ascii?Q?KIq2Z/bHvafHLdjvylUpzhtzxFuhxlXdpcLK6bvbFQNWXQHt36cCY1hHGZOl?=
+ =?us-ascii?Q?ErKNJGVVUbhaW8un1fHUsTz5bqMU/sJrqjYb591/q/Zcc/QEjjQHzDOcwlGy?=
+ =?us-ascii?Q?CszUV6UKe8n4fRRpE8aOQEdWCC+re9Gslsshs5LL4oV9oHQE8tctSgANkbkA?=
+ =?us-ascii?Q?ocyk9UCA1zigkn1ajswxyBzcdqXXwFp9Sne71rrwhswv1DzOiB4J1tzSiCeO?=
+ =?us-ascii?Q?Xf8SLI76g4UXhS3XhJWVvv6nrJNAWu28scP3vtwBfB/BwanKs3msWkOZ2YHA?=
+ =?us-ascii?Q?CsS6X3JM3TkRpsUsjMxRZsPFKC+T0O2rI2OT5ZGH57AyRdVk0Kt4cNjbzCd2?=
+ =?us-ascii?Q?LKr/Cu+dXwxXH5k4L59PYa2mJFxXBruL8q14wR0lCTfHhu3/m2+l/1tuwAmF?=
+ =?us-ascii?Q?COQpsyOPgtKP6ZwNz5PPX07XUMZVXhZmNV3vFlzJzKaSxhePBZa9Ob2zqHXP?=
+ =?us-ascii?Q?w7D0yTmI17q9LPb6SD1AyvZFezy56KjHHA9A4eS4c/6tcrP4mrrFgaz2nnpr?=
+ =?us-ascii?Q?kg/qKwGmytSEcn0Y7/rKwMllQFsf2bEly48IxBL0Li8YwcjM0ewPYB/4IOgc?=
+ =?us-ascii?Q?03X8zZQolKzPUgeUt4ehyIN/Q+jY5AJlxevl7/1V2fq4+L3wN8+yYyvJmAXD?=
+ =?us-ascii?Q?bv/eF+INV4+JP+rUsZl7W/QM2eYBRxiLaUDOh0iJ2fIFqIvIelbrxP7aPplB?=
+ =?us-ascii?Q?01Z+IGeTmrit0JAfjeu0WJ7rik/5V0XYiLUejttBzdj8n6pI9TlRDZ4VQnFi?=
+ =?us-ascii?Q?0fvA1Q+8b/UWFJVR+T25w9kwqMFsqXiHt2ZZ7lgciHwp0Z3icNiMSa/6BwVC?=
+ =?us-ascii?Q?8kBVowsle2Kyterggg1Ekzd4dkfk2SX/K58yXoW7N3hm9192yJJV2g8iKzGu?=
+ =?us-ascii?Q?uSxdIFUZH7iBEv6AJ3OGPzi2U8oiDOcqMGnG7GXsaKtzZeJCB9Vaay8oeOmy?=
+ =?us-ascii?Q?8gy/orZEa8LODtzg/OYR8nzJxbPc+ZV62iot26pvBM+3o6WcG1WbftGWJNfC?=
+ =?us-ascii?Q?XRkqYQsRd3JuAnx9NAfrOQam5NGqtj7NdJ1VpQgRUSPSufHf7Q=3D=3D?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?qjcIGOGX+U+kv8n5vdfFEs1xNvoKNqCgWpJIS1IOXzGsg5v2Xb8zPgG+pcZE?=
+ =?us-ascii?Q?VJT8zOpiyoM6bdHViKy33FL6fONOMQaNUuQCKHIoNmIRWqbDHa5I5BV/uS3L?=
+ =?us-ascii?Q?ZZogc9iKHrQuC81jofUyci41zkwHNNbVZAFZMgrgGXsPdtm30tNZjJDRFGz7?=
+ =?us-ascii?Q?oLznIDFEdPYtC0xo3cMVaYoXoAJzqD1NAxgP8ue62I2SO6OFlk+fLFiNcA1N?=
+ =?us-ascii?Q?U4qfdSCTgZrhGFcHkvqtrbzz56+z4X94/7jcjVlMqEF4tPlePoGeh0HqyRBI?=
+ =?us-ascii?Q?t4gtm60hTox8X62GKHDTX4nxJmmK64IXF5phSiST/PyZSURKErtaD5VS/Qsn?=
+ =?us-ascii?Q?6B/Xs+QWrpxmt2GsVx9FqviRKjONd6N7tMbcZ5l+P7J0mJXHJtv8Fxcl1pUd?=
+ =?us-ascii?Q?ekB5i8eR1jo+o3bhXq1ExBgRXVNl5pxXaVxeoZ7Tz/ZIyWFOUJUNZZorGN8N?=
+ =?us-ascii?Q?A5LRz4FzTrKkzaQVXQm/bmX/kcHBfE4Q1G28FT+mjtZI1DjGZ2b7EgCoDtx1?=
+ =?us-ascii?Q?db+BLKG6KbzhB83e41joYJFpHUnwTCrVgZF4W1emTPBZvxpS4zfSjQIo3sN5?=
+ =?us-ascii?Q?3xSrhFINsoyjmw0J48ltTvuWy91pPPRYtLQoVFDTxv6nGiNb9m503KBJAzPd?=
+ =?us-ascii?Q?W66cQnnZlg/jfKl+DCq1CRUJzgFn7uUAf84xO1BdP4Lk/gRrR8LijkFar7lT?=
+ =?us-ascii?Q?P2fcouG8eDweahFwY6mGZMryKBvG8jqzKmMFgLtbemIypLoWA02LjM4rIC12?=
+ =?us-ascii?Q?D6eYShjS45mb2VR5zGl/CAOgRMx/FIf3lAjm/L9j8YrEJymWyAQkR1F+m8ih?=
+ =?us-ascii?Q?o3LNyiyMG/wDhcf8SZX0iqgANRZtCmWXr+dqQ9CiT7wKM998Lq4WJ1H0Z5E7?=
+ =?us-ascii?Q?lQ/+5lHXwrnb1Q3YHKtX49QK8GZSVA11NiPqAE7hjx1B2c3cROqIqb6NumO2?=
+ =?us-ascii?Q?91dm23VT9o0C486fE5vOVOebsMST34Fk8DyOWxEsFxZ1B4Vb7dISb78hQn+z?=
+ =?us-ascii?Q?+nv8FbEbInuOAl7Ic+DSez9CfvBxptkWV4ZlYDt4kfw6sGBz0BXA4BuGNI94?=
+ =?us-ascii?Q?XR4ntD0GRG1GGy3JNsh6h2Uy+PQp0fR9eLS7h5ipehTPG3mbfWTPo1xEtm++?=
+ =?us-ascii?Q?JPCSNrdvOas3y8v3SrzwwfBygvmv7sjDU/lAPjKh5x20DpZgArhcrxiwqv3+?=
+ =?us-ascii?Q?XC/9TzR2M9QQb9L3nu10gSW9ZN9EiuoJYozxLX9AraHw6Xs94dFwoxcf/T6f?=
+ =?us-ascii?Q?6Z+1/aWKHhsmQVgh//oY81lZ+EG/OKFgnnlFdYc0DVPmBbcJuzWF4WEPOSO2?=
+ =?us-ascii?Q?myU7UMSRQ88wRx2RPtiteAncCGHSVsSWvVgE0s2Fcg2R7yCgeKQ1iVCAIzzL?=
+ =?us-ascii?Q?BuWaQeqXtPQqPRhJaKKTFsxdKmoU5uHBNfBsOOmhLk0+zAzuc4yjYoYVJ/Lt?=
+ =?us-ascii?Q?NScFfbV/mVCmm0xM4k0Tohjs3MxTL5wPiTh6SvLCEdg9WKKaW3aQZBTM1vLU?=
+ =?us-ascii?Q?4NxXuxw6DiGrBQiAazKI96lcTaxOHENDeK/oXuNkkeJre/qWdGHSLuWN11tM?=
+ =?us-ascii?Q?wyyQe22ak/b3t/97HXmUwR3e3ul2+ycOAyqyfWFa?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next] net: bridge: drop packets with a local
- source
-To: 20240911125820.471469-1-tmartitz-oss@avm.de,
- Roopa Prabhu <roopa@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Johannes Nixdorf <jnixdorf-oss@avm.de>,
- Thomas Martitz <tmartitz-oss@avm.de>, bridge@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240919085803.105430-1-tmartitz-oss@avm.de>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20240919085803.105430-1-tmartitz-oss@avm.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4236.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 10a987bd-8ea2-4beb-da21-08dcd897ff1b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2024 10:44:11.1088
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 9kWg83KIqb6fp+e2qh9Wv+PapoZDdz8hOTrMxPNq56LxJDiE8SA2ETR2HOCMJIWiV1IRsVM6FzbwBpjjSxFHW5jg4244RBIJi67D5o4PqeM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7282
 
-On 19/09/2024 11:58, Thomas Martitz wrote:
-> Currently, there is only a warning if a packet enters the bridge
-> that has the bridge's or one port's MAC address as source.
-> 
-> Clearly this indicates a network loop (or even spoofing) so we
-> generally do not want to process the packet. Therefore, move the check
-> already done for 802.1x scenarios up and do it unconditionally.
-> 
-> For example, a common scenario we see in the field:
-> In a accidental network loop scenario, if an IGMP join
-> loops back to us, it would cause mdb entries to stay indefinitely
-> even if there's no actual join from the outside. Therefore
-> this change can effectively prevent multicast storms, at least
-> for simple loops.
-> 
-> Signed-off-by: Thomas Martitz <tmartitz-oss@avm.de>
-> ---
->   net/bridge/br_fdb.c   |  4 +---
->   net/bridge/br_input.c | 17 ++++++++++-------
->   2 files changed, 11 insertions(+), 10 deletions(-)
-> 
+Hello Andrew,
 
-Absolutely not, I'm sorry but we're not all going to take a performance hit
-of an additional lookup because you want to filter src address. You can filter
-it in many ways that won't affect others and don't require kernel changes
-(ebpf, netfilter etc). To a lesser extent there is also the issue where we might
-break some (admittedly weird) setup.
+Thank you for the suggestion.
 
-Cheers,
-  Nik
+> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
+e
+> content is safe
+>=20
+> > > Since you have batteries included python:
+> > >
+> > > ethtool --json enp2s0
+> > > [sudo] password for andrew:
+> > > [ {
+> > >         "ifname": "enp2s0",
+> > >         "supported-ports": [ "TP","MII" ],
+> > >         "supported-link-modes": [
+> > > "10baseT/Half","10baseT/Full","100baseT/Half","100baseT/Full","1000b
+> > > aseT/
+> > > Full" ],
+> > >         "supported-pause-frame-use": "Symmetric Receive-only",
+> > >         "supports-auto-negotiation": true,
+> > >         "supported-fec-modes": [ ],
+> > >         "advertised-link-modes": [
+> > > "10baseT/Half","10baseT/Full","100baseT/Half","100baseT/Full","1000b
+> > > aseT/
+> > > Full" ],
+> > >         "advertised-pause-frame-use": "Symmetric Receive-only",
+> > >         "advertised-auto-negotiation": true,
+> > >         "advertised-fec-modes": [ ],
+> > >         "auto-negotiation": false,
+> > >         "master-slave-cfg": "preferred slave",
+> > >         "master-slave-status": "unknown",
+> > >         "port": "Twisted Pair",
+> > >         "phyad": 0,
+> > >         "transceiver": "external",
+> > >         "supports-wake-on": "pumbg",
+> > >         "wake-on": "d",
+> > >         "link-detected": false
+> > >     } ]
+> > >
+> > > You can use a json library to do all the parsing for you.
+> >
+> > I tried running the --json option with the ethtool ("ethtool --json enp=
+9s0"),
+> however I am not getting the above output.
+> > Instead it always throws "ethtool: bad command line argument(s)"
+> > I am figuring out what might be missing (or any suggestions would be
+> helpful).
+>=20
+> Are you using real ethtool, or busybox? What version of ethtool? I'm usin=
+g
+> 6.10, but it looks like JSON support was added somewhere around 5.10.
 
+I have been using ethtool 6.7, updating to ethtool 6.10 solved the problem.
 
