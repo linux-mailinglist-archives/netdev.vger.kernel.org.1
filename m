@@ -1,48 +1,80 @@
-Return-Path: <netdev+bounces-128931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D710D97C7A1
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:01:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D3E297C7AE
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB9991C28F53
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:01:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2397B28EC24
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822B51957E7;
-	Thu, 19 Sep 2024 10:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398571957E7;
+	Thu, 19 Sep 2024 10:06:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZvIStKvS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hOZRppXG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474DE18A6C5;
-	Thu, 19 Sep 2024 10:00:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F87E168BD
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 10:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726740059; cv=none; b=VOjWynXozuX65yoE+TQ2uOSCyDRIqkvUTzVVaB+59JXD8OSELa8pk83XBnxLDQjtbwTAsiMWMKnGuofk1wW12CTs3Febvs+PUHlP+jBfARjLc5xdt5AB1uxTfNTk5lhccwMjkIw64hloQAr5aofIDSP9z88uOdiAcPJBg5eJSEc=
+	t=1726740370; cv=none; b=sGrxEPSp2vS/7tFpyxtE5WA/Hr+CNJXRfi67jjTtIAKPWmXjHoFyFiTQIiN1GKaZKgMbnXHnbQ29dfPkLWlRyW/jYg0Au9uCzL4quFwGApcgvBLl5WSeCk5sQRiWOS6CEXXAW2EU3MM9GtCKpbPiOAGxXl8PmrWIXqd/VzpekUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726740059; c=relaxed/simple;
-	bh=vXvW7MnCo/+EZQZ4PbmZTj1XR3D+SwmpjrH1EkwAtfA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gIQOSkNrRwV6bzcs+UuBGGFnJL0I34oVbzNC6z8Agt+/s+RzifpK5GEIf6TWOLGUUYVdBj4ulk4DGn9tujtKN+31MdJDlaMwIPdxNyaOb+FROqHI1SvMpGbTva1gmBD7OOQtJqgCDsPt/SbyKDL1WjlLT6pMKjcNrO69m/ML/nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZvIStKvS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66565C4CECD;
-	Thu, 19 Sep 2024 10:00:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726740059;
-	bh=vXvW7MnCo/+EZQZ4PbmZTj1XR3D+SwmpjrH1EkwAtfA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZvIStKvSsi8xJ4NDi52MPo4ITXf6GKYOh9DaDih954gI0FtCLAifkRiInvGSfy5mr
-	 atHot5+8ljM52in3XRxvUSCkSz3T2EauvLekm/Y/OBm+wNMhGGby8+TGUOEYEj0pZv
-	 td8PZH46EEsBX8GaGQlt1bydSxD/2Zx+ZQXRvcTWAb3ZO7aTwJ8U3LQRP0zh2cFX9G
-	 YokszxY0G3ri9cgFJbfAPiRxCF0x+zSbr/wkf7zvdqlNPy4Et/6536wwJR9XE5Sn9b
-	 +ExNnqmY9+yMh4CERNaMg80doU49qObvhw75DecrTZ4xtdkFcGuiwRUPb4AHGqk33g
-	 qwvPlDpjNJDWA==
-Message-ID: <ed6aceb6-4954-43ad-b631-6c6fda209411@kernel.org>
-Date: Thu, 19 Sep 2024 12:00:53 +0200
+	s=arc-20240116; t=1726740370; c=relaxed/simple;
+	bh=XCSshaxJzznqVzATTj4/9h1+YuItLrY1TyGGv+lOYiQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=nPrXEKiVfHN6yALGfzotnCWMqiBVt7UFWOFj5dO11JC0OXtccW/jjhC9tZ/jAkMtWR29JsLUZ7sFQqlxdLt8S/0/WaTQc8FThCY4xiROqoHqKFpYBeUQcwgiIA8rGb2xJcJCiLjP0PwIVL+8TfLoqnEVwSatXO5TJbrQsJ228i8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hOZRppXG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726740367;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=j8sw9chzh6V0ldGfmUwBiAZ2jnRMPFw7mVDSc3g8Bgc=;
+	b=hOZRppXG9tmrJQW+4jf8MbgAtTildR1aheXZOulgxFI0xI+bpNxLA/eoUyG7h0W5FZ5GX0
+	q07/m80KyzQ2U9g4fhgnQub4kzEqonRFcGoUzsVomxn1r5TCxovkw4eEb1OGsXETg7oERS
+	dTYAmkKAQqkORh3/vBqgPRloBVV0hug=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-632--GnKdZYsPMe4jP7thSb7uw-1; Thu, 19 Sep 2024 06:06:06 -0400
+X-MC-Unique: -GnKdZYsPMe4jP7thSb7uw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42cb6dc3365so4688715e9.2
+        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 03:06:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726740365; x=1727345165;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j8sw9chzh6V0ldGfmUwBiAZ2jnRMPFw7mVDSc3g8Bgc=;
+        b=KR85RtRrE44bwnGTXsqWSgckS/99vneSHHxuDEfh5MAvtQLC9mEkiC4gnOyYJefUx8
+         70Y3cnJ0b4W3+XJg63m9GuokCF8GeZ6Fnwkr3HNiQQkeoSTvWtf5EfRAWR7FwqFI8uaU
+         PXpIdD9aDO8+p4riuZyqzu6WgoQIOPcHjE8BMljbXicXybSvjeziVgmsOWVV74AAwHmE
+         R76smt6twwr4Ro/jYfHpcRTQgjtRPfmz1ag8mVQTd/25UPe36PF4cWniUow1sOuHxR/c
+         TC+stS50EGmkaAihjlLR5h0Orta0CLx6VB+dmuMgXRs8lfc0s+bEt8RvpEzZAwwmLUu0
+         6dvA==
+X-Forwarded-Encrypted: i=1; AJvYcCUm5YeR3Z+R9iiDqp9XaVSbjbplEBxnfOy572C7S99FAaNUmFLPT+IVG5cYQ7q6mKytXkpOXlE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwdP6Dfm7iz4ZH5Lug4kCUWxaX/rRhIFa04WIP3iTlqN/dOcLO5
+	ozFiqBbWc8awrT1cVyKPcmfp0xwgqFN6h6Ic66GzPuHRYUxLQnZ7w8HdmN4FtdvseAAhTmgGaC9
+	RjOaxDaBt6dXDeKteOYK88NjVivivoo/a9kh/HQYsiHe78ogD9oK76Q==
+X-Received: by 2002:a05:600c:45ce:b0:428:18d9:9963 with SMTP id 5b1f17b1804b1-42cdb586d9fmr198605145e9.22.1726740364769;
+        Thu, 19 Sep 2024 03:06:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGCQb+yDIF3c7yHLOLlyuOP1obKRz9WHSVtK0x+cI/W3HDiqwFW29UxH0o8W4i4Ib8pkExQlw==
+X-Received: by 2002:a05:600c:45ce:b0:428:18d9:9963 with SMTP id 5b1f17b1804b1-42cdb586d9fmr198604895e9.22.1726740364282;
+        Thu, 19 Sep 2024 03:06:04 -0700 (PDT)
+Received: from [192.168.88.100] (146-241-67-136.dyn.eolo.it. [146.241.67.136])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e754256c8sm17803525e9.14.2024.09.19.03.06.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Sep 2024 03:06:03 -0700 (PDT)
+Message-ID: <49d32698-e226-46b5-bee8-46e9aad5754b@redhat.com>
+Date: Thu, 19 Sep 2024 12:06:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,95 +82,87 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
- of the ath11k on WCN6855
-To: Kalle Valo <kvalo@kernel.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Jeff Johnson <jjohnson@kernel.org>,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, ath11k@lists.infradead.org,
- linux-kernel@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-References: <20240814082301.8091-1-brgl@bgdev.pl>
- <83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org> <87msk49j8m.fsf@kernel.org>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net] net:ipv4:ip_route_input_slow: Change behaviour of
+ routing decision when IP router alert option is present
+To: Guy Avraham <guyavrah1986@gmail.com>, davem@davemloft.net,
+ dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240912141440.314005-1-guyavrah1986@gmail.com>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <87msk49j8m.fsf@kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20240912141440.314005-1-guyavrah1986@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 19/09/2024 09:48, Kalle Valo wrote:
-> Krzysztof Kozlowski <krzk@kernel.org> writes:
-> 
->> On 14/08/2024 10:23, Bartosz Golaszewski wrote:
->>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>>
->>> Describe the inputs from the PMU of the ath11k module on WCN6855.
->>>
->>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>> ---
->>> v1 -> v2:
->>> - update the example
->>
->> I don't understand why this patch is no being picked up. The code
->> correct represents the piece of hardware. The supplies should be
->> required, because this one particular device - the one described in this
->> binding - cannot work without them.
-> 
-> I have already explained the situation. With supplies changed to
-> optional I'm happy take the patch.
+Hi,
 
-You did not provide any relevant argument to this case. Your concerns
-described quite different case and are no applicable to DT based platforms.
+On 9/12/24 16:14, Guy Avraham wrote:
+> When an IP packet with the IP router alert (RFC 2113) field arrives
+> to some host who is not the destination of that packet (i.e - non of
+> its interfaces is the address in the destination IP address field of that
+> packet) and, for whatever reason, it does not have a route to this
+> destination address, it drops this packet during the "routing decision"
+> flow even though it should potentially pass it to the relevant
+> application(s) that are interested in this packet's content - which happens
+> in the "forwarding decision" flow. The suggested fix changes this behaviour
+> by setting the ip_forward as the next "step" in the flow of the packet,
+> just before it (previously was) is dropped, so that later the ip_forward,
+> as usual, will pass it on to its relevant recipient (socket), by
+> invoking the ip_call_ra_chain.
+> 
+> Signed-off-by: Guy Avraham <guyavrah1986@gmail.com>
+> ---
+> The fix was tested and verified on Linux hosts that act as routers in which
+> there are kerenls 3.10 and 5.2. The verification was done by simulating
+> a scenario in which an RSVP (RFC 2205) Path message (that has the IP
+> router alert option set) arrives to a transit RSVP node, and this host
+> passes on the RSVP Path message to the relevant socket (of the RSVP
+> deamon) even though upon arrival of this packet it does NOT have route
+> to the destination IP address of the IP packet (that encapsulates the
+> RSVP Path message).
+> 
+>   net/ipv4/route.c | 8 ++++++--
+>   1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+> index 13c0f1d455f3..7c416eca84f8 100644
+> --- a/net/ipv4/route.c
+> +++ b/net/ipv4/route.c
+> @@ -2360,8 +2360,12 @@ out:	return err;
+>   
+>   	RT_CACHE_STAT_INC(in_slow_tot);
+>   	if (res->type == RTN_UNREACHABLE) {
+> -		rth->dst.input= ip_error;
+> -		rth->dst.error= -err;
+> +		if (IPCB(skb)->opt.router_alert)
+> +			rth->dst.input = ip_forward;
+> +		else
+> +			rth->dst.input = ip_error;
+> +
+> +		rth->dst.error = -err;
+>   		rth->rt_flags	&= ~RTCF_LOCAL;
+>   	}
+>   
 
-Best regards,
-Krzysztof
+I think this is not the correct solution. At very least you should check 
+the host is actually a router (forwarding is enabled) and someone has 
+registered to receive router alerts. At that point you will be better 
+off processing the router alert in place directly calling 
+ip_call_ra_chain().
+
+However I'm unsure all the above is actually required. It can be argued 
+your host has a bad configuration.
+
+If it's a AS border router, and there is no route for the destination, 
+the packet not matching any route is invalid and should be indeed 
+dropped/not processed.
+
+Otherwise you should have/add a catch-up default route - at very least 
+to handle this cases. If you really want to forward packets only to 
+known destination, you could make such route as blackhole one.
+
+Cheers,
+
+Paolo
 
 
