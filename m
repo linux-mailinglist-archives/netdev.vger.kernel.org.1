@@ -1,157 +1,161 @@
-Return-Path: <netdev+bounces-128868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777EC97C2A9
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 03:43:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D6897C2CF
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 04:17:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F37801F21CAA
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 01:43:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B9C71F22002
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 02:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C4212E48;
-	Thu, 19 Sep 2024 01:43:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA5D171A7;
+	Thu, 19 Sep 2024 02:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="MyfKdzkH"
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="DSQTFGX+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9031CD1F
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 01:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.147.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D806F3C0C
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 02:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=148.163.143.35
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726710234; cv=fail; b=t1wvX3qxPs2uzRvjMVeog/pZ5N2sXHhzsQKSPIq36dLlHKcvyWBLsrc9sra4RwbIwzfVYrA0tzLEFtsSxdNHul1cqHHT//PgdPBKBaUqOxkFi1ml+PHIwPoFFuaaIvBexWbvNehcff/Uo56XIxpjkTHMFnUcUn6E564WxdRDytM=
+	t=1726712219; cv=fail; b=tWHWUK0K7x83b/7Ap5Q6a3NLFy2CCA+VXW5J/XNf2HmLMiIxcJynjuoACblSoLkF9504cwEI67bsjY+oWgvrgPaB3FT1mAxCDcgjg86xRzIvSM5gsQVaAULMtYXzUydb/nDZySmqLG6pwBTvEze/IFVly9EoQUIFSYNtR93hC+E=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726710234; c=relaxed/simple;
-	bh=oCYZ+n0sqJhce3F4wK4shlxbhieAIkDVLi2qBF80X/s=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=o2I4NeC9IdDZfjq5AT/j01FfDHNxAcCYl1v6SdLFcCt0MwWbrPyC3NwqwnNqY5Awp42f3XGlzcezFURO/HQ6C4uE3npjlmY2wdE0R8LtWylJ367QCvXn5zIsDLM7td6P2ExX081RY7TJTW4VxzHDNWBXBQlhx14eTYyIN3LzmQE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=MyfKdzkH; arc=fail smtp.client-ip=148.163.147.86
+	s=arc-20240116; t=1726712219; c=relaxed/simple;
+	bh=q2NISQHcQxOQLreJV7QG0WW3k53wZ7DKpUKW9YtpbsY=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=RyyTP/Idp/WJ/8dmd9VBRf2tDbNkIP2M/vSYllLa24MkORWVorASSdtQz6e2uQtGtINy7+nNxhlNZo1BVpbHl/wDo+kv+yOgizvh006tYCR+yITeKdr3UTj5CSiETAHbGjTTYGSXF6/JHgJj85osyqs/Ep/PzsfzSw9lF8LB3PA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=DSQTFGX+; arc=fail smtp.client-ip=148.163.143.35
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
-Received: from pps.filterd (m0134422.ppops.net [127.0.0.1])
-	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48J02qRB018672
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 01:43:39 GMT
+Received: from pps.filterd (m0134424.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48IHnJPT026369
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 02:16:51 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=from
-	:to:subject:date:message-id:content-type
-	:content-transfer-encoding:mime-version; s=pps0720; bh=SWuuA6HYH
-	GTwXDzx+iZfXHiXE4Ylg3X8FKH4+lbt+UI=; b=MyfKdzkHzQ4x6rS8LZj4iuRFL
-	7oafc+c29d8BVrhmyWu3WBPtbLO++EKTRL+FR/pXAJjGtrLbmMfruI+8eh3+Oivk
-	voxYtB6sp0X68k8U8xkp+wnlAvpv33mnxt5NZBUTiQ2VDtOVvnyX40RGMKWFdh1X
-	g2fss8/fBtX1T0XXZAerBaKPaMUvNB2EQLTXcXzQwIRWyu+cwF8sRKDcXqpk14qC
-	MnwJb6fBy5/3hwk/6rZcu4H5R6kSyPyAJyl+WL3Anr2vuAcmeNIhkEXi4Tw/0l19
-	RlwAFRhS5b7mXFi1tX9bSqhdSItxhtJy0glXVrcVUgexJkhcIqMyue4uCqCmA==
-Received: from p1lg14881.it.hpe.com ([16.230.97.202])
-	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 41r2q7jsju-1
+	:to:subject:date:message-id:references:in-reply-to:content-type
+	:content-transfer-encoding:mime-version; s=pps0720; bh=D+LKVTuph
+	KoonZVsimuSonBk4N1xSI8RDYmyvWLuisU=; b=DSQTFGX+uiArqqKYQZIQD39ld
+	uAi0u8SjtS3X/zGKv8RJPRJ0UfaJha6T20ExrhVddaVJhvDhkxmwTnZ1lj0V7Yic
+	rnhEqaSKuaUzNVwsz/5+C0MhPj7uBHeUTsAkRx7/YU8zXjH7BtQ5/YP9kzZ0pvjg
+	AGZZOCg3yqC3w/SaQbtgL+xD4qH7VqlG6Ga1sntNYQqMwoU2DOVOVuZmIbV0w/bC
+	suFhpY3j8Hl/+ECBbfxJ94mLe2OU3Ut1dEGdBwJFE9X7UIwFZzKSgWYIDzH5KiiY
+	E6tevcmEFLHQWt0Thk3uaACscK5HB2s9wLAafB835kK1yJ9g1LwxpOreytQ0A==
+Received: from p1lg14878.it.hpe.com ([16.230.97.204])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 41qxjgp1e1-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 01:43:39 +0000 (GMT)
-Received: from p1wg14926.americas.hpqcorp.net (unknown [10.119.18.115])
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 02:16:51 +0000 (GMT)
+Received: from p1wg14923.americas.hpqcorp.net (unknown [10.119.18.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by p1lg14881.it.hpe.com (Postfix) with ESMTPS id EADE0806B5E
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 01:43:38 +0000 (UTC)
-Received: from p1wg14927.americas.hpqcorp.net (10.119.18.117) by
- p1wg14926.americas.hpqcorp.net (10.119.18.115) with Microsoft SMTP Server
+	by p1lg14878.it.hpe.com (Postfix) with ESMTPS id BCFBDD298
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 02:16:50 +0000 (UTC)
+Received: from p1wg14924.americas.hpqcorp.net (10.119.18.113) by
+ p1wg14923.americas.hpqcorp.net (10.119.18.111) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Wed, 18 Sep 2024 13:43:04 -1200
-Received: from p1wg14919.americas.hpqcorp.net (16.230.19.122) by
- p1wg14927.americas.hpqcorp.net (10.119.18.117) with Microsoft SMTP Server
+ 15.2.986.42; Wed, 18 Sep 2024 14:16:50 -1200
+Received: from P1WG14918.americas.hpqcorp.net (16.230.19.121) by
+ p1wg14924.americas.hpqcorp.net (10.119.18.113) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.42
- via Frontend Transport; Wed, 18 Sep 2024 13:43:02 -1200
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (192.58.206.35)
- by edge.it.hpe.com (16.230.19.122) with Microsoft SMTP Server
+ via Frontend Transport; Wed, 18 Sep 2024 14:16:46 -1200
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (192.58.206.38)
+ by edge.it.hpe.com (16.230.19.121) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Wed, 18 Sep 2024 13:43:05 -1200
+ 15.2.986.42; Thu, 19 Sep 2024 02:16:50 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=t3Ci4zSfV3FwVA1Il4OyU6u6h+Q+j8b0RvQVgC6ylwr9aFTmjH+mMvaiftwHUadgVjvUaveV/ng9tfch1ES9HbB6pBuZRoZYsPe5hQYPlMQd3Wz9xgyTjT6f2ckPwZHeh416hd09/pATaVOaXj+28nEF1f6Z2n5FEIJkYfgL855nm7etn9pFXqqt8v6oDZSREe95aG3kRq03dUfOB4/rY8jNzjvB/8q8rVqDsToX0IZVuUKE0eUt5r0d7byrbT+2vf82gUN9a2p6n9bsmj9dOcswLF95eJ5K1rGvYXVUlBw2pJY29g577Hq1CssnL6gQNCLBMaO19XO4uQFIhwDejg==
+ b=zIOvBHlWlTUQvualy2HzW+LRgCD96y8QmjY3ZpsrDQqbqRa3pRXHCAk5XYeuCBhW4JJg3Vaflf7zQIjKl+eXq2DM4wb+MQ8csdu5yE5tmo7rmJL1TW7d5/Y8aAyCZZl8iq94dCTj1ATkN91Pgo1kHhqAoc/AT171nXBpOnxdQfTrQfGxFknrFzDWH4Xuzfae9DPu/dzFuz4ugKe1KIepNz+pEwx8INNPSY+rJR7lto2Tf0nRFcZeYQdWaziua5w3mbhrwIzWZY/s3nf+H2BcKC8Fk4yE8F5IAuWsxOrQVZZm9BHVGNstT5nROCijJEM17cmagKq63JF8zIp+8NXecg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SWuuA6HYHGTwXDzx+iZfXHiXE4Ylg3X8FKH4+lbt+UI=;
- b=L51NuEEAc05If+0lDAb7oDxgS6QUUbO2BP/7pSt/HjvH75dZV6K6pff3bt/EO6VZxrU1+D4ghWFn9wNgH36jZpeA0DGceuxCgZRQTPvIpp36kKcgoPVtzmiJiOCjtZy0P4RsO8FEiZc3xkaUlh5PMoEOZf4IgZxbQgjZ/gUTVFo5GFYIWrq6/fupWfiIq/OVt7Z7TNALQJh94Sd/CDGCgGz2PAR4pVNL4gqulNG7KhsvtzLLo1nH+B0FNpc6jdLYwnbwyzR91/NQGTPMdon67ytMLxwU7yZu152W0njpkYIt0qYFa9DDD9zNXucoFgyI83/aOKKHBJBdz/wSOKbfvg==
+ bh=D+LKVTuphKoonZVsimuSonBk4N1xSI8RDYmyvWLuisU=;
+ b=sT9j54u5BYypgFh9Mk/dk+qubQK+46wyLpoHlXqYBc/7YQ7TnyxHq+PkoiqitSCoXCCfWB1BRLZAYxl2+KjyV1tEgOzsR8oYM8NIefrVP4UqDnwQaRUyG3/7X0m4rCG53xWODHoupPGgAmPhSNN4uBXYAWHvYeU+yCKUGTb46/YzZ7qpz2YzWRdsuyRu8rmJbHbvvoM9vVZMRDpmw7vdZLzlMLIOZKFVMOlhsNA85TvTJK8AsBljXZwCtsdMNX6/9sHs+gHt7kdTJD4TazUSFdQubea42mBb6BkU1n0hkuWrFiQ2K3A5RPq8RUC75MKnQJphJpvqHKQ7eu7XmdOZ0w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=hpe.com; dmarc=pass action=none header.from=hpe.com; dkim=pass
  header.d=hpe.com; arc=none
 Received: from SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:a03:437::8)
- by PH7PR84MB3551.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:510:303::20) with
+ by SA1PR84MB3960.NAMPRD84.PROD.OUTLOOK.COM (2603:10b6:806:3e7::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.17; Thu, 19 Sep
- 2024 01:43:03 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.24; Thu, 19 Sep
+ 2024 02:16:47 +0000
 Received: from SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM
  ([fe80::8cc2:658d:eae8:3d8d]) by SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM
  ([fe80::8cc2:658d:eae8:3d8d%5]) with mapi id 15.20.7982.012; Thu, 19 Sep 2024
- 01:43:03 +0000
+ 02:16:47 +0000
 From: "Muggeridge, Matt" <matt.muggeridge2@hpe.com>
 To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: [PATCH net-next] Netlink flag for creating IPv6 Default Routes
-Thread-Topic: [PATCH net-next] Netlink flag for creating IPv6 Default Routes
-Thread-Index: AdsKNUF2liaLoaBwThKLit56B1cdyQ==
-Date: Thu, 19 Sep 2024 01:43:03 +0000
-Message-ID: <SJ0PR84MB2088B1B93C75A4AAC5B90490D8632@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
+Subject: [PATCH net-next v2] Netlink flag for creating IPv6 Default Routes
+Thread-Topic: [PATCH net-next v2] Netlink flag for creating IPv6 Default
+ Routes
+Thread-Index: AQHbCjn6L1n2M7jxVE2iZhYySkkRWA==
+Date: Thu, 19 Sep 2024 02:16:47 +0000
+Message-ID: <SJ0PR84MB2088F2BCD76D3E4758E6128FD8632@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
+References: <SJ0PR84MB2088B1B93C75A4AAC5B90490D8632@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
+In-Reply-To: <SJ0PR84MB2088B1B93C75A4AAC5B90490D8632@SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR84MB2088:EE_|PH7PR84MB3551:EE_
-x-ms-office365-filtering-correlation-id: ffed73d7-58db-4376-738e-08dcd84c66f2
+x-ms-traffictypediagnostic: SJ0PR84MB2088:EE_|SA1PR84MB3960:EE_
+x-ms-office365-filtering-correlation-id: 2a517045-2334-411b-198f-08dcd8511d17
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?zPU/d8WuqQaaRPw0s1xL4zKKjHUAMQWt8iDeSg28W09aqtLFPOlOJr87rXoQ?=
- =?us-ascii?Q?QtgQNRbifS7shFiMIMdH5YFEIHTeb54honsPC5E7Pu+61F0Op3M4986qK4LM?=
- =?us-ascii?Q?dPtje9WW8rRJ5DPn2fWLBrBVtT50w5q+Wdu4V15E6Fhh2doQCVamjk3Srm0N?=
- =?us-ascii?Q?6zWakgRksNVhRsA3L2EBXjVrQ1czajir1ZxDy4iLEiwG7z36N7rKH/yW+4ET?=
- =?us-ascii?Q?IT/vJ3sXc8MUs202+dcmqNOFkoCpnoN8agXua5ilMvO/0N0R7VsIqdXf6ahG?=
- =?us-ascii?Q?d3xqVuWSgeKKEz2nKlTyZPFMB8lWmIYHHvPQRFZhXLa0gY0x5LOfh5Lotn3H?=
- =?us-ascii?Q?EOYkvvU+YgPMytEVdeEuc7bVY5gx0Z7NirMfCx3TK3DZaAcpGhkcMI9UQr4U?=
- =?us-ascii?Q?n5Qy7Zm0n13eLFNDrwp+nQ4R0UYGnUBaqhdmkGL6bpYoexzWFgX2/P2DvLIm?=
- =?us-ascii?Q?yCZXNuiAqW3ke+AW7aah/8S+3IvgpsAFgn1WoEnnpU5yK1bSvfQGQbSC5SBi?=
- =?us-ascii?Q?e1exZx7NetJy2i95+nhckDyaPEkfhz5mmsS7F/wPH/wd8yhJJid7c/XUNOxU?=
- =?us-ascii?Q?4ItuZovpUjpQyhdU5UGKIAZTm1+PLr6eVODyTS81B9vCWTzNJ77Up+/V9xgM?=
- =?us-ascii?Q?rmRi8r9zdY/rOeCdtEBzuwntO2kVIDatmhcW5DFpJ+8HBRzCKzI314AMIpn7?=
- =?us-ascii?Q?wDwII4+kFVWFguqZrk+LWxLtqK8Z6lOIuyMJcir4hhxIOdYy9zsYy5IKuVcr?=
- =?us-ascii?Q?zMH6iWAgGaPEfIMTOFUWVmfW+krYKaPBLz6J6V4yszel/lb9y3UjQnAm1jA4?=
- =?us-ascii?Q?beVmTYhSq6C4No5x069UhLZBtJDghyIbrGhS0LUCJV/Tc4pQthMAusZO7KD7?=
- =?us-ascii?Q?i4rV/LfkUbkuxM88yhjZUqYSJicIm1WeynSdSnPD0/wm1SjJLUuNjE+qrpKG?=
- =?us-ascii?Q?wOZsK9Vv3ILAfIN0iF1K+DiXykMCaiRczYf0bbe7DuYGUeByMVLMMMk8lKxk?=
- =?us-ascii?Q?p/b091gx5iRrJ0EvdPot/ElmA2AcyYI4aAqFpJ1zGZjmSkKTDOuNl0PvnujU?=
- =?us-ascii?Q?AK2+2rrDr8WO5h+H9QCbpAI1/cdEyakytzwid8wINm+qDP6mQO8yMsxFxQbC?=
- =?us-ascii?Q?Ywhv8USIrpZ1zfmIATqjzNBX0ijNqGv8j3t+ds1DZxXF3LTADRIZo6o46vIO?=
- =?us-ascii?Q?/U0d+uFNggjltMUWpAyrpbFTJ10g11UD99upoDl1IAG4uqrFZZEs9MXD2/lo?=
- =?us-ascii?Q?3xWcXUaKapOrKeFMTWQFUrpzBLLZ8kVMkOSDRncQ2Bundbn2Ji2XKGOxyxMX?=
- =?us-ascii?Q?Rht+xJ/AO+J7hDAVeYcXJBpdzi/35/t/lOK+WZYDdMoIM2bsDYD5gpf2af7C?=
- =?us-ascii?Q?sQkXcIiKi5me7xzV3iQ7TbUR20xr1/Ks+xbVGd96XnXot3jVtQ=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?weXnPh4sY8sXspFYtYKHHelxKZfGweh7U7PmYam6iqeFVE0N8SC9EwsY8n/R?=
+ =?us-ascii?Q?8oGY/lAt0/ruL4LAO4F1hk/G6KFkSx1q62jKaRtnezdPKC+eaEzSBzkpf3Ik?=
+ =?us-ascii?Q?yCz1ZKA5S5v3PpUOYRCRPFpQeggDkfagqFh+rOJkNQrlEuAl9nBJWuHeTxDS?=
+ =?us-ascii?Q?IM4MkcTMvly8CiRWDyoJOMr8ViEXYfq111+vcrky37uG/C0Q97G/hYv5i9CV?=
+ =?us-ascii?Q?BYjikbNcdGISZmRsG1BMenwPjVYF7E9Dr+GYTQXMCpTGpaebIYUnaKNgkBDx?=
+ =?us-ascii?Q?3Nl0H3cuyQSEKML2fD+lggfi4c3hzLlZNfPl8jKOIGZjxS3osef4hHRliLdQ?=
+ =?us-ascii?Q?5w3w6C/LCeFrVje66jbuC4kkLiH1c8b+DhDYsP6LdYoM2GPTnAh5m4YAVPsU?=
+ =?us-ascii?Q?WU4PwJImLDdRFxaV4IwuYIWBHGdYG3ltfE4eytmVUCIwkefCCcQvX+3IyxCP?=
+ =?us-ascii?Q?7ADKlQnIStDUNtvYQgKbPKD9SH3u6RaAi4Aif3hiy9SqsV+046fEDyL4qbUx?=
+ =?us-ascii?Q?R2ivBVpHuMsk51jkLbb7HbmO6GXBdBbOQ2BTvFs6Nqamer0V/rbVBWwSylB8?=
+ =?us-ascii?Q?jR5EaSmVvwhL0q7sd/rsCQ8B4u/X5yBa06g9aPufw0UR7YtNyJ4q9kdOVmky?=
+ =?us-ascii?Q?RxhbyogDVeGw87lsz3Ea4ByRS+7PtyJ9q4iPzMhmspA+4QZi6HjV3pxhn5/1?=
+ =?us-ascii?Q?dbJMHHc+xqg8pxGbIIF7J6Tev5unJg+cwQwDLFM9gBPlMsXfhGGO5zey/zBG?=
+ =?us-ascii?Q?G/eLsKxfezaAfGPcB3mE5jQL65BNy5x5F7DL9z0Ot5A2ws/IJlGY9AvVZR8x?=
+ =?us-ascii?Q?qdfNqthf0fObIO1+a/snUi5J09FSUZ4hut4XK54SE6HEjdv13DeIx6sEnW35?=
+ =?us-ascii?Q?LWxY2N2E+sO8mfa6wl7jCHprwAEkk2q/7JtQ9XEEsvlkRWRdB+qgL/15PEtl?=
+ =?us-ascii?Q?Ezj3JVW7NcVNe+5MZZgPJJTDlrOgCTikzJdsvtl6OymdXGIG6vw3jkHZfqkV?=
+ =?us-ascii?Q?Op2+WN78pnaP8K4jlOUEHXFQIFrdEj/Y4sCSuqaTncGmZBehwH+TBX2ACOKQ?=
+ =?us-ascii?Q?XpbXGLSOh5cmYAq8Ppzpsg5U5+xtNsmfgmDVnOUWEvNX5ojyLFl/YDUAEi/c?=
+ =?us-ascii?Q?myPneL+E7ifEqV6Ts28kz2sc37sEhIhHDPmXiNaH7uYiKTztjUVC1K2Lop55?=
+ =?us-ascii?Q?IClcBPMKmGWaEdSdw2Xzx8q0WiL3FQGWnRN2Z4E3omqtLbGEVe0FjPORBYZV?=
+ =?us-ascii?Q?uhqcah8OyulTNh11qh/valtetZZ97+u+lpXzy87wadcFuZgO2lX1BfH4SnoP?=
+ =?us-ascii?Q?jBshwOqwyg+4zpZBbRM4cp47V8vpU4vvn66R2rB1x8nEXMruKe1u2FZb1oe8?=
+ =?us-ascii?Q?DM18dpp83xy58LlqMD75gjhVANpPlckhtI9yBv9Cro75CyKZdg=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?gBOBGUXewJ9iAWzu6k4si5+/TxP4t152E1meQ894v/ZfeKhgwHRWbCj2cugz?=
- =?us-ascii?Q?HnzX1Rr8tGvmE7rO/x9sEkyKO/xGfntvkAyecYT//nX049NUc0xo7X+eVOZf?=
- =?us-ascii?Q?F3++qxJHuRM0j2E268pp3Eob3Lh2Om/x12FxKcrBJh2CW8nGvC3rson0Tn7C?=
- =?us-ascii?Q?z+bKO4iYSAEJlZHlyeA0hqMmLE9Lo/3Wuz6XCrMPU9Zp5khaC28ykpeMH3SZ?=
- =?us-ascii?Q?GfniZui776sLLX+BkDjTngo02AcdZwOonEejRYb/vk9BZFN0Cx2yt/nOuA1V?=
- =?us-ascii?Q?qZAwSJUlJB4K5vez8KWb02HjXEyCx7OLWkYZxcfrPIcFAxKTlYCS6y/Ygf4D?=
- =?us-ascii?Q?TSSYbZ5jVcv1e/wVvUFPKwj0iA1toI/NtNczE/J63PDAPI8jH3uwiKju83xp?=
- =?us-ascii?Q?q5o0iH5CNJynBw7CJNkwakPMymDraup/3OeQbQm+lISdKBUN8HiW0VcAOK3J?=
- =?us-ascii?Q?Fx6gVRNkSjtYpn3lUpc5/KDU6ZdBGt6pbiB0o9kdg0Zx1OM/qgDl0RwnQJnL?=
- =?us-ascii?Q?Z59aEFfu6pJ06p39xmvA/RFVpQYHvlu7n6gfCbXIeGqzvJUhrJi3JYNTw8Ck?=
- =?us-ascii?Q?T1oeINpLGAXVlPa28IyDDSk4yqnB8et7ycvXUf1IJhQtj8iBgzr2XjylF42A?=
- =?us-ascii?Q?N9SlwhWUJeOxeXQi63K2qGoozJFyQR/uu1jtprTwZP0y1rOIxtdXK02xNOv/?=
- =?us-ascii?Q?NklUy8jxzPT62DaUyeQ68S1bjZhEkGdROFRGbuRXQD/VFxvCKoDDGpG4Ug9E?=
- =?us-ascii?Q?/b/psfFzNEf0qpAj3Jtc2XFnQoQz5DT7QXKbRjB4M545X1z2RI8pfUFE9xsC?=
- =?us-ascii?Q?WdAFDX4jI0wt86d/O7OaiEbSU4O0REgJHsJ6qhmtOHVDWIAk4EFdFGsU+M53?=
- =?us-ascii?Q?j87LKPBktHBkXHFy/pIP7iUPrvMVHSTRubythq5Wc01EhPT7sYLKT6e8UTJu?=
- =?us-ascii?Q?K0Fr1CtYxSVMdhk4rQMPFuPSzBQdtreOABUqZ0H17T4pUVemSHnVZou+/9h1?=
- =?us-ascii?Q?a+pRgydTXbUHaoUY78s5NJAEfAwQtyOYsF+KRFg4z1x/scHC+ZeNO8cz2x1E?=
- =?us-ascii?Q?AuNejKDdlo1ZrNtozKNlRke1tNXnpD1hX8zp6oahAO/iLBwJmOCkAMCGrCJb?=
- =?us-ascii?Q?b17XCd1F4MpH96F9e5modUtwEg1zsbUbGMKTUccQyGuW6p5utiE0MzxSB0zq?=
- =?us-ascii?Q?m/TJzZbENr984qPZdlycINaiMUE8s1+M7yk2Xbiw+vGy5S/AjbArHi7/16kb?=
- =?us-ascii?Q?bVYRzuyOOQsY2GAj8flkYrwdNyzB7vm+qlNmZTbnDUY/Mq31NKDN3Kt9ZcMh?=
- =?us-ascii?Q?nBTt4qcr0mvtc7Kg9mwrJ5mEm//XOc5FEgv4W4DnUL8vrsPXpNE/0+INKQ6o?=
- =?us-ascii?Q?B3cyucunB2IhmeXm0wRfZpMqEZsGzUQ6D1VeAvgSiR2zOEllJAWL34m5w0UZ?=
- =?us-ascii?Q?A9oA22e4p4j+C/Kx39f3KHdATXejICmROMovsgq7Qzp4rY0bI9j6Xy9pBeHb?=
- =?us-ascii?Q?SYhlFwN+XP1j26wRWmCjZr+vOXYJi8025P/c1ybfyvhQpGPHXS0hVKhrzxfD?=
- =?us-ascii?Q?mwk9TiapWp76AKcUl2qMYveG9sjlMsjQtMjCtn+0?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?SIXn/26ruqyb/vUMMeJ7tVf3DGZM2C4n0tY3b/7FIZFVIckjMQZt4OXqkkqW?=
+ =?us-ascii?Q?p1oJurGMu66onJbY0XvgOLv95dfBS55XYeDFVToc+b4eExkxttleAVXYPymV?=
+ =?us-ascii?Q?USufv8uGOq8jWCgcNh2ygtfM7DbfjhYDJxgjrKcZY25IehKjSnPvqQAjKHoF?=
+ =?us-ascii?Q?UIJm3sSzSzRlgc249JRLqtHSQ17vf38KaitZ8W+FyBYWnWLsa5OLjG9+FAj/?=
+ =?us-ascii?Q?irylHFEpJRgfO9gGsTeC0C5YnE0NM/0zvivFiOA6z50fYKTvv/MAToG37b2b?=
+ =?us-ascii?Q?uUL5cKVsI+BLEvn2ijuB5Vd+0eQOFHYG5pbChoylc2rbjNdQgYp3L4gEL8hU?=
+ =?us-ascii?Q?gDt1e4Qj1py7ASQ50Uwdpv6VJq+O4Ggv77TbuWS9ukawF3+dWexvMBBsKpDD?=
+ =?us-ascii?Q?wSRbTOpeDyJiABQVjvxeFw+vEgi7NwT2Z+b/9hsjr0TI70JrLfQ4AA53D6BD?=
+ =?us-ascii?Q?20PWsW9J45ex6uo/cRLsSWrVYTPDbjtPhWRKaKb4BsZwQ0Wr7IFhuYqLh1SI?=
+ =?us-ascii?Q?EUTwxws1P6RjEbcUx36JKibZHPMl8pO5xJdJ2f0BXwe9RKZ0jIrDHf0JqDHg?=
+ =?us-ascii?Q?OVlji92/L+WxACdxEFAVIBNaL1cEF4oH4hJHn1UNXPpZvwvbzq8/MbWfQsCT?=
+ =?us-ascii?Q?jilr2z/eOLv0sWd/aW13SnR2+bmUm6ix6Woo6XIiVa78G6D15Y9H/WUM4jqD?=
+ =?us-ascii?Q?IpWl2SIC85RwstWVSIHH57LTyQ+fhhG2vtvSyAXWuepR08qD6CHxbm/uiI51?=
+ =?us-ascii?Q?1IxTeysheg6KvoDAqASgH1n0JWBctq9pSX/TaFlEPVLXdaKsrmAgIry4GvVo?=
+ =?us-ascii?Q?DopQHSK/cKMQRUKgUhXb0uzq//9pXUEJOI4TB94BXJlwJzrJw1BYsC5GhgC+?=
+ =?us-ascii?Q?ewP97e85vtZP38/vkk0m4QSnfEUN4vHlAtKNj3N4DxVyxOxhyzu6axn3L1pn?=
+ =?us-ascii?Q?u3IOBGYFWdPc5sMRwwxRQSStrEJxAsCc7CPryeREtSVlpBqrVv8EQi4Ux4jX?=
+ =?us-ascii?Q?CuTXpZRxqtIqJmnDsDWEpymT4bcVI26qPHoO+o1c+p1utrG8cd/LkoXhBTsg?=
+ =?us-ascii?Q?PqeS7V5AhER0oS4NhbQO4+MFwvXopHlpKOVeauZfvRXZlRoDHOUvae1b0m0Z?=
+ =?us-ascii?Q?ER5Fpycz4y7c7xQGEbOJ6T8mROijubbESfLxNGvlKBY1c/neyUKvxuJxJpJd?=
+ =?us-ascii?Q?nDPvc7lnibnYMZFHJ2F66x9pbCMjVWw47UG6Qn7fV6e1Bgx/2sdn+GeTuyfx?=
+ =?us-ascii?Q?uwcTeVgxIXlKSghdEWi5v+NDJbo1DcaFxlFrcXZNdLM9eMgF+VKHu0cxf/rs?=
+ =?us-ascii?Q?h+V8wXorjJ/3cc2YoVYsOrHejyvuZCPcSRlZGcXx+Pl0U/8woRRU8HyTRUvN?=
+ =?us-ascii?Q?R1jExPpuGXUdVcPBGmxS7LmSgdWJZtJPX0AmHCz2Zu5PTj1skZIrBT92tzId?=
+ =?us-ascii?Q?TOxJtLqQ6PUuYLqBgnq+G/sf6RcFIdIyDFGzFq5JpHN0nqr4lZ2/WH5r6mAz?=
+ =?us-ascii?Q?/CzlN/adJ2wo7eZY21JFHBuAbLxF5OCKzrZIeP+PpHYOVFzEPrAlNfqW47PJ?=
+ =?us-ascii?Q?1jt8ppbix5/ZbKd7UCFnrsq+cWXDo/7NSrPmgZyY?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -162,95 +166,92 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: SJ0PR84MB2088.NAMPRD84.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: ffed73d7-58db-4376-738e-08dcd84c66f2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2024 01:43:03.5551
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2a517045-2334-411b-198f-08dcd8511d17
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Sep 2024 02:16:47.1467
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 105b2061-b669-4b31-92ac-24d304d195dc
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VVsBtDUkWlSemFGdpb56FqZ5Nb+4RSZMREnnctGpYthKvoZemHQE0LFqGlCSQ8hPetxC3UDUSswp7i6VzG1QKFUhQs2ovAcLk1NYBlQ0Yew=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR84MB3551
+X-MS-Exchange-CrossTenant-userprincipalname: mS+dfvBb8RzwlX7Dy9csNe31H7qweEKsLWkcf6IQPv2QJWUqaSbXkOAqTiBu/H51evVNdwT9SLUmwf5xKT/iyR0T5/Y66uwnDpFbij860Y0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR84MB3960
 X-OriginatorOrg: hpe.com
-X-Proofpoint-GUID: CB-NLEEvkeWb9eYfICo0qxUczzTenue5
-X-Proofpoint-ORIG-GUID: CB-NLEEvkeWb9eYfICo0qxUczzTenue5
+X-Proofpoint-GUID: i6ahzGzqbpTvhMyxEnAiYG7FPVUooUZ1
+X-Proofpoint-ORIG-GUID: i6ahzGzqbpTvhMyxEnAiYG7FPVUooUZ1
 X-HPE-SCL: -1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-18_14,2024-09-18_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- adultscore=0 impostorscore=0 suspectscore=0 priorityscore=1501
- clxscore=1011 mlxlogscore=999 spamscore=0 malwarescore=0
- lowpriorityscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2408220000 definitions=main-2409190010
+ definitions=2024-09-19_01,2024-09-18_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ bulkscore=0 malwarescore=0 impostorscore=0 lowpriorityscore=0 phishscore=0
+ clxscore=1015 spamscore=0 mlxlogscore=999 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409190014
 
 From 95c6e5c898d3eef3e6b37e9b6e238bf6b65cc57b Mon Sep 17 00:00:00 2001
 From: Matt Muggeridge <Matt.Muggeridge@hpe.com>
 Date: Wed, 18 Sep 2024 21:29:31 -0400
 Subject: [PATCH net-next] Netlink flag for creating IPv6 Default Routes
 
-For IPv6, there is an issue where a netlink client is unable to create
-default routes in the same manner as the kernel. This led to failures
-when there are multiple default routers, as they were being coalesced
-into a single ECMP route. When one of the ECMP default routers becomes
-UNREACHABLE, it was still being selected as the nexthop.
+For IPv6, there is an issue where a netlink client is unable to create defa=
+ult routes in the same manner as the kernel. This led to failures when ther=
+e are multiple default routers, as they were being coalesced into a single =
+ECMP route. When one of the ECMP default routers becomes UNREACHABLE, it wa=
+s still being selected as the nexthop.
 
-When the kernel processes the RAs from multiple default routers, it sets
-the fib6_flags: RTF_ADDRCONF | RTF_DEFAULT. The RTF_ADDRCONF flag is
-checked by rt6_qualify_for_ecmp(), which returns false when ADDRCONF is
-set. As such, the kernel creates separate default routes.
+When the kernel processes the RAs from multiple default routers, it sets th=
+e fib6_flags: RTF_ADDRCONF | RTF_DEFAULT. The RTF_ADDRCONF flag is checked =
+by rt6_qualify_for_ecmp(), which returns false when ADDRCONF is set. As suc=
+h, the kernel creates separate default routes.
 
-E.g. compare the routing tables when RAs are processed by the kernel
-versus a netlink client (systemd-networkd in my case).
+E.g. compare the routing tables when RAs are processed by the kernel versus=
+ a netlink client (systemd-networkd in my case).
 
-1) RA Processed by kernel (accept_ra =3D 2)
-$ ip -6 route
+1) RA Processed by kernel (accept_ra =3D 2) $ ip -6 route
 2001:2:0:1000::/64 dev enp0s9 proto kernel metric 256 expires 65531sec pref=
  medium
-fe80::/64 dev enp0s9 proto kernel metric 256 pref medium
-default via fe80::200:10ff:fe10:1060 dev enp0s9 proto ra metric 1024 expire=
-s 595sec hoplimit 64 pref medium
-default via fe80::200:10ff:fe10:1061 dev enp0s9 proto ra metric 1024 expire=
-s 596sec hoplimit 64 pref medium
+fe80::/64 dev enp0s9 proto kernel metric 256 pref medium default via fe80::=
+200:10ff:fe10:1060 dev enp0s9 proto ra metric 1024 expires 595sec hoplimit =
+64 pref medium default via fe80::200:10ff:fe10:1061 dev enp0s9 proto ra met=
+ric 1024 expires 596sec hoplimit 64 pref medium
 
-2) RA Processed by netlink client (accept_ra =3D 0)
-$ ip -6 route
+2) RA Processed by netlink client (accept_ra =3D 0) $ ip -6 route
 2001:2:0:1000::/64 dev enp0s9 proto ra metric 1024 expires 65531sec pref me=
 dium
 fe80::/64 dev enp0s3 proto kernel metric 256 pref medium
-fe80::/64 dev enp0s9 proto kernel metric 256 pref medium
-default proto ra metric 1024 expires 595sec pref medium
+fe80::/64 dev enp0s9 proto kernel metric 256 pref medium default proto ra m=
+etric 1024 expires 595sec pref medium
 	nexthop via fe80::200:10ff:fe10:1060 dev enp0s9 weight 1
 	nexthop via fe80::200:10ff:fe10:1061 dev enp0s9 weight 1
 
-IPv6 Netlink clients need a mechanism to identify a route as coming from
-an RA. i.e. a netlink client needs a method to set the kernel flags:
+IPv6 Netlink clients need a mechanism to identify a route as coming from an=
+ RA. i.e. a netlink client needs a method to set the kernel flags:
 
     RTF_ADDRCONF | RTF_DEFAULT
 
-This is needed when there are multiple default routers that each send
-an RA. Setting the RTF_ADDRCONF flag ensures their fib entries do not
-qualify for ECMP routes, see rt6_qualify_for_ecmp().
+This is needed when there are multiple default routers that each send an RA=
+. Setting the RTF_ADDRCONF flag ensures their fib entries do not qualify fo=
+r ECMP routes, see rt6_qualify_for_ecmp().
 
-To achieve this, introduced a user-level flag RTM_F_RA_ROUTER that a
-netlink client can pass to the kernel.
+To achieve this, introduced a user-level flag RTM_F_RA_ROUTER that a netlin=
+k client can pass to the kernel.
 
-A Netlink user-level network manager, such as systemd-networkd, may set
-the RTM_F_RA_ROUTER flag in the Netlink RTM_NEWROUTE rtmsg. When set,
-the kernel sets RTF_RA_ROUTER in the fib6_config fc_flags. This causes a
-default route to be created in the same way as if the kernel processed
-the RA, via rt6add_dflt_router().
+A Netlink user-level network manager, such as systemd-networkd, may set the=
+ RTM_F_RA_ROUTER flag in the Netlink RTM_NEWROUTE rtmsg. When set, the kern=
+el sets RTF_RA_ROUTER in the fib6_config fc_flags. This causes a default ro=
+ute to be created in the same way as if the kernel processed the RA, via rt=
+6add_dflt_router().
 
-This is needed by user-level network managers, like systemd-networkd,
-that prefer to do the RA processing themselves. ie. they disable the
-kernel's RA processing by setting net.ipv6.conf.<intf>.accept_ra=3D0.
+This is needed by user-level network managers, like systemd-networkd, that =
+prefer to do the RA processing themselves. ie. they disable the kernel's RA=
+ processing by setting net.ipv6.conf.<intf>.accept_ra=3D0.
 
-Without this flag, when there are mutliple default routers, the kernel
-coalesces multiple default routes into an ECMP route. The ECMP route
-ignores per-route REACHABILITY information. If one of the default
-routers is unresponsive, with a Neighbor Cache entry of INCOMPLETE, then
-it can still be selected as the nexthop for outgoing packets. This
-results in an inability to communicate with remote hosts, even though
-one of the default routers remains REACHABLE. This violates RFC4861
+Without this flag, when there are mutliple default routers, the kernel coal=
+esces multiple default routes into an ECMP route. The ECMP route ignores pe=
+r-route REACHABILITY information. If one of the default routers is unrespon=
+sive, with a Neighbor Cache entry of INCOMPLETE, then it can still be selec=
+ted as the nexthop for outgoing packets. This results in an inability to co=
+mmunicate with remote hosts, even though one of the default routers remains=
+ REACHABLE. This violates RFC4861
 6.3.6 bullet 1.
 
 Extract from RFC4861 6.3.6 bullet 1:
@@ -261,8 +262,8 @@ Extract from RFC4861 6.3.6 bullet 1:
         Further implementation hints on default router selection when
         multiple equivalent routers are available are discussed in
 
-This fixes the IPv6 Logo conformance test v6LC_2_2_11, and others that
-test witth multiple default routers. Also see systemd issue #33470:
+This fixes the IPv6 Logo conformance test v6LC_2_2_11, and others that test=
+ witth multiple default routers. Also see systemd issue #33470:
 https://github.com/systemd/systemd/issues/33470.
 ---
  include/uapi/linux/rtnetlink.h | 1 +
@@ -270,8 +271,7 @@ https://github.com/systemd/systemd/issues/33470.
  2 files changed, 4 insertions(+)
 
 diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.=
-h
-index 3b687d20c9ed..9d80926316b3 100644
+h index 3b687d20c9ed..9d80926316b3 100644
 --- a/include/uapi/linux/rtnetlink.h
 +++ b/include/uapi/linux/rtnetlink.h
 @@ -336,6 +336,7 @@ enum rt_scope_t {
@@ -283,8 +283,8 @@ index 3b687d20c9ed..9d80926316b3 100644
 e
  					    * is chosen to avoid conflicts with
  					    * other flags defined in
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index b4251915585f..5b0c16422720 100644
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c index b4251915585f..5b0c16=
+422720 100644
 --- a/net/ipv6/route.c
 +++ b/net/ipv6/route.c
 @@ -5055,6 +5055,9 @@ static int rtm_to_fib6_config(struct sk_buff *skb, st=
@@ -298,7 +298,8 @@ ruct nlmsghdr *nlh,
  	cfg->fc_flags |=3D (rtm->rtm_flags & RTNH_F_ONLINK);
 =20
  	if (tb[RTA_NH_ID]) {
---=20
+
+--
 2.35.3
 
 
