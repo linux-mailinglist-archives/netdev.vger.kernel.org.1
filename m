@@ -1,138 +1,141 @@
-Return-Path: <netdev+bounces-128891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 568D297C56E
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:58:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC37797C58A
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:05:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E75F8B2262F
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 07:58:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC6031C239C4
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 08:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3334198E6F;
-	Thu, 19 Sep 2024 07:57:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eXRP77Lv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DEA0191F94;
+	Thu, 19 Sep 2024 08:05:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A754E198A3E
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 07:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B74C36134;
+	Thu, 19 Sep 2024 08:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726732673; cv=none; b=CiLiTKR1Za3ht1k2LRDdxVeJO5IzJwtXNExKYP3G2OW3tEuxNPslT3dRZVYXCVknZz2mFAXpJMs8z5uBlEeXJkUcTqxnbVEWLtGkMv6i13oFsUlLS0MIh4EKeQjktPVH9xoo7FkAVBcfBwEL5K7tDQfDbMFANDrCy6q0BwFpBt8=
+	t=1726733121; cv=none; b=oN54t+cJAlEod5+dXmQK3hXXbtV0QP6iNGt0B+Szy8IaAB420uuwZrbxZM1IsXfwBuENGAkLfta2CnwWCwEYb7HlADP21rGSXCy+c3t1OajlqHB29Cft9csh/Rcl6jDZS0NO4qqsu29iIl+4iUWhABut9KNxjJcjevYOAkhHj7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726732673; c=relaxed/simple;
-	bh=WjTR5Fl9rB5SyxIdjvbDVCUkIESWrZgHawZRIoKkHas=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FLsZqR3wE6WWwth3bOcGxyibplCPrMKLJfLSUxZfLDpJD+kLysrUtmW7sMBktw4cQpdWkOlvVG5NhwqOWIao2tKu4c1Fm0QA4LBR8xP1eN0Vaf7vmrvJFLVSB9cW0VL20cIUP8wTcHE4zMtdHuGErnoPVf1/ujE1joVgIPKWh8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eXRP77Lv; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726732670;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BveYqjoEFbQN7A9EhNP5LD7TmPQnn8rjTb0WXfJDJ+s=;
-	b=eXRP77Lvs5hRHL9a930oqUoetSVZ+qVpFq2WFn21OtvqwBIbpWvg80XP0gLDenh8OMSzJi
-	DnmVi4gHD6RoJeEA6aip/iCHb9YUAFFF9MGOrXr1JTQ2KwiN05kNBRzQ6kaEwkDPvTb20d
-	Ra3FAk0klK0DQfHh3YSv9SJgcBQwRqg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-ajA0SOF7MKu1VyTAW26fVw-1; Thu, 19 Sep 2024 03:57:49 -0400
-X-MC-Unique: ajA0SOF7MKu1VyTAW26fVw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cb635b108so3365595e9.2
-        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 00:57:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726732668; x=1727337468;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BveYqjoEFbQN7A9EhNP5LD7TmPQnn8rjTb0WXfJDJ+s=;
-        b=BeCotiyH1DbH2xy7oQJB8jecHj73r15nsgVWaVBYD+3lyj/4JA46vzpO/aiX3yHBEy
-         j+g1LyF/gu3oZ/X5xNnxcYUEGStJCMZIWuwd4SIllz0xhZdNx5QP19bYnE3mFibQiUbW
-         46U1ssdLfhZ4Y1XpWY2GOuTMdtCA1UYP4v+7WJMDSU7/akVo7wY9nBelDS6ZPIDErYio
-         3jhCe2ZFz4vdgqn1Lj5YvzPZZYeEsNf+t/evOa0cre97YVCjQM82Yok21CYHUaHFshvq
-         TlVbTzKjJove1KWlHgKuVPuLyDE/Xm/RB8ib8T9mnFK9pb0b7dfvNLT+0LtFBpEy9cvn
-         83zw==
-X-Forwarded-Encrypted: i=1; AJvYcCW4RqlgPKc75g/6D8h6P+ZAP+1nHiScy7JhbbxWXvWNIok3rq++tU/eZTuhZyA+KHOkFK3ABH8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyklpZVtiiQkaaOHbeNddAsRlF78CZQO9uSEQRTz68pvs2foUaO
-	dHws/yZXXdfm/P9DIgT9vHMYC424LX801ZGE/O6nhaL0+rTBcWIbvZEOhg3baDxbs69M93gqOTy
-	ZbLmKYMqR5McVGW/AkRHfukgpN7fEyREyMy85muTkurM5oE1U69n0jA==
-X-Received: by 2002:a05:6000:18c2:b0:374:ce15:998c with SMTP id ffacd0b85a97d-378c2d1345dmr12838603f8f.30.1726732668059;
-        Thu, 19 Sep 2024 00:57:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFjcuNBkqYHoctjpvy9L9izSMqtg504D/BPyWJE0SJlP13gf5PTW3zCH/yMLyXpqgIpClOBOg==
-X-Received: by 2002:a05:6000:18c2:b0:374:ce15:998c with SMTP id ffacd0b85a97d-378c2d1345dmr12838590f8f.30.1726732667646;
-        Thu, 19 Sep 2024 00:57:47 -0700 (PDT)
-Received: from [192.168.88.100] (146-241-67-136.dyn.eolo.it. [146.241.67.136])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e71f0529sm14653556f8f.6.2024.09.19.00.57.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Sep 2024 00:57:47 -0700 (PDT)
-Message-ID: <bbeb8c77-1772-45a2-8626-a4e064ab7c54@redhat.com>
-Date: Thu, 19 Sep 2024 09:57:45 +0200
+	s=arc-20240116; t=1726733121; c=relaxed/simple;
+	bh=J4/fauLV6t8SnFlTfOhiWZq/Z5FluaUtuMvMOJIrX2U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gYD4zPW7CVxatFJ65KPkeu1Xz55gH4d1x9lSqrESoV5LHd8RoWJMDAUEhE6c+vHkXcU+G880aXQetuGVgDGOFf4G8ch+Dn0qDzVbVnbL+fxZil1hXQqiTfXdBsMbPlhCvjHHqHcTKpL4/n8oQm3b3ZXNuiGgEWBi3k8Ka+p/MAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=39738 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1srC9x-002slU-Db; Thu, 19 Sep 2024 10:05:07 +0200
+Date: Thu, 19 Sep 2024 10:05:04 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH nf-next 0/2] netfilter: conntrack: label helpers
+ conditional compilation updates
+Message-ID: <ZuvbMF_1cX16GDoz@calendula>
+References: <20240916-ct-ifdef-v1-0-81ef1798143b@kernel.org>
+ <Zuq-7kULeAMPRmFg@calendula>
+ <Zurbw1-Fl0EfdC0l@smile.fi.intel.com>
+ <Zurjur431P7DqifB@calendula>
+ <ZusHYUGYPADO1SgY@smile.fi.intel.com>
+ <ZutMf_f0tQwQZFzH@calendula>
+ <20240919071801.GB1044577@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests: net: ioam: add tunsrc support
-To: Justin Iurman <justin.iurman@uliege.be>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- shuah@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20240907164245.89627-1-justin.iurman@uliege.be>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20240907164245.89627-1-justin.iurman@uliege.be>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240919071801.GB1044577@kernel.org>
+X-Spam-Score: -1.9 (-)
 
-On 9/7/24 18:42, Justin Iurman wrote:
-> TL;DR This patch comes from a discussion we had with Jakub and Paolo.
+On Thu, Sep 19, 2024 at 08:19:37AM +0100, Simon Horman wrote:
+> On Wed, Sep 18, 2024 at 11:56:24PM +0200, Pablo Neira Ayuso wrote:
+> > On Wed, Sep 18, 2024 at 08:01:21PM +0300, Andy Shevchenko wrote:
+> > > On Wed, Sep 18, 2024 at 04:29:14PM +0200, Pablo Neira Ayuso wrote:
+> > > > On Wed, Sep 18, 2024 at 04:55:15PM +0300, Andy Shevchenko wrote:
+> > > > > On Wed, Sep 18, 2024 at 01:52:14PM +0200, Pablo Neira Ayuso wrote:
+> > > > > > On Mon, Sep 16, 2024 at 04:14:40PM +0100, Simon Horman wrote:
+> > > > > > > Hi,
+> > > > > > > 
+> > > > > > > This short series updates conditional compilation of label helpers to:
+> > > > > > > 
+> > > > > > > 1) Compile them regardless of if CONFIG_NF_CONNTRACK_LABELS is enabled
+> > > > > > >    or not. It is safe to do so as the functions will always return 0 if
+> > > > > > >    CONFIG_NF_CONNTRACK_LABELS is not enabled.  And the compiler should
+> > > > > > >    optimise waway the code.  Which is the desired behaviour.
+> > > > > > > 
+> > > > > > > 2) Only compile ctnetlink_label_size if CONFIG_NF_CONNTRACK_EVENTS is
+> > > > > > >    enabled.  This addresses a warning about this function being unused
+> > > > > > >    in this case.
+> > > > > > 
+> > > > > > Patch 1)
+> > > > > > 
+> > > > > > -#ifdef CONFIG_NF_CONNTRACK_LABELS
+> > > > > >  static inline int ctnetlink_label_size(const struct nf_conn *ct)
+> > > > > > 
+> > > > > > Patch 2)
+> > > > > > 
+> > > > > > +#ifdef CONFIG_NF_CONNTRACK_EVENTS
+> > > > > >  static inline int ctnetlink_label_size(const struct nf_conn *ct)
+> > > > > > 
+> > > > > > They both refer to ctnetlink_label_size(), #ifdef check is not
+> > > > > > correct.
+> > > > > 
+> > > > > But the first one touches more, no?
+> > > > 
+> > > > Yes, it also remove a #define ctnetlink_label_size() macro in patch #1.
+> > > > I am fine with this series as is.
+> > > 
+> > > What I meant is that the original patch 1 takes care about definitions of
+> > > two functions. Not just a single one.
+> > 
+> > My understanding is that #ifdef CONFIG_NF_CONNTRACK_LABELS that wraps
+> > ctnetlink_label_size() is not correct (patch 1), instead
+> > CONFIG_NF_CONNTRACK_EVENTS should be used (patch 2).
+> > 
+> > Then, as a side effect this goes away (patch 1):
+> > 
+> > -#else
+> > -#define ctnetlink_dump_labels(a, b) (0)
+> > -#define ctnetlink_label_size(a)     (0)
+> > -#endif
+> > 
+> > that is why I am proposing to coaleasce these two patches in one.
 > 
-> This patch updates the IOAM selftests to support the new "tunsrc"
-> feature of IOAM. As a consequence, some changes were required. For
-> example, the IPv6 header must be accessed to check some fields (i.e.,
-> the source address for the "tunsrc" feature), which is not possible
-> AFAIK with IPv6 raw sockets. The latter is currently used with
-> IPV6_RECVHOPOPTS and was introduced by commit 187bbb6968af ("selftests:
-> ioam: refactoring to align with the fix") to fix an issue. But, we
-> really need packet sockets actually... which is one of the changes in
-> this patch (see the description of the topology at the top of ioam6.sh
-> for explanations). Another change is that all IPv6 addresses used in the
-> topology are now based on the documentation prefix (2001:db8::/32).
-> Also, the tests have been improved and there are now many more of them.
-> Overall, the script is more robust.
+> Thanks,
 > 
-> The diff is kind of a mess. Since it's "just" a selftests patch, I
-> didn't bother having a series of two patches (one to remove it, one to
-> add the new one back). Let me know if you think it's necessary for
-> readability.
+> Just to clarify. I did think there is value in separating the two changes.
+> But that was a subjective judgement on my part.
 > 
-> Note: this patch needs this [1] iproute2-next patch to be merged
-> (waiting for David to do so, should be done soon).
+> Your understanding of the overall change is correct.
+> And if it is preferred to have a single patch - as seems to be the case -
+> then that is fine by me.
 > 
->    [1] https://patchwork.kernel.org/project/netdevbpf/list/?series=884653
-> 
-> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
+> Going forward, I'll try to remember not to split-up patches for netfilter
+> so much.
 
-Unfortunatelly we was unable to process this patch before the merge 
-window and net-next is currently closed. You will need to repost it is ~2w.
+Never mind too much, your splitting helps for reviewing.
 
-Strictly speaking about the patch contents, any chance you could 
-refactor the change in a more 'incremental' way?
-The current format is very hard to review, and even self-tests patches 
-deserve some love ;)
-
-Thanks,
-
-Paolo
-
+This is also subjective judgement on my side.
 
