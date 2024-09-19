@@ -1,98 +1,135 @@
-Return-Path: <netdev+bounces-128958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C82B97C969
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:43:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5AA197C972
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:44:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 909DFB213C0
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:43:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2425E1C21ADE
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 12:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1505119DF82;
-	Thu, 19 Sep 2024 12:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FFAF19DF76;
+	Thu, 19 Sep 2024 12:44:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="WmVYim2V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YWrAna5P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9A319D09A;
-	Thu, 19 Sep 2024 12:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF78619D08C;
+	Thu, 19 Sep 2024 12:44:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726749798; cv=none; b=SluN+MhAgtN0NXPoOCljQwd2Y5HieaqiGPhLBH+qIjfzOMmOBm6tMFWVGQKRByMDA5UENKL73qpnbR6oPEKIulA/OXmQ9nzqTN19ykuI0bmQJdElumnf0BhJc8jillWvp5qBvNvguhpwibXoAUTfxxBok0cUYJb3gxcWf9YijHU=
+	t=1726749859; cv=none; b=M965+VFofJvjYUroAH7DfA3taDEJ3G/I6libWVxIX7Td8jJif8fihYsSXa5DtDDoADkCsrS0gEilgrVYOF0jAoIuMQGUKfj2r7JwfHE4/znWKMXEh4yt18/59BG5F5WbJnuOq6v3/7uU1GVWpqAbYGlSNakSKcXLGbRM6XHMVe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726749798; c=relaxed/simple;
-	bh=vkh4Ay1zTY0iiLAWWorMyVZYwhLbNU2d8zepOPEOkaI=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=G399hoLVcyzUUzmSxBs922DhGoewfiHq95I4uO9p3kTESQZ8Tv9dOI/+m+YzdrmJpsv7EIaArk6DIPNoDqsewSkTeG8Y07YUrMp8gHfIahz8LWgWfEokT+h0CLiHsCJwsNgQBuenjDR5iCQYO+9+fioYatqwJUx8/p+IQTXFAKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=WmVYim2V; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1726749791;
-	bh=+4ltGAVEzrHoagPXKaFdfBj/AJkWKcAhVfPM62hcyyQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=WmVYim2V/4PUaKRq9MRgUC5zdyhXQ7tSQ76it7dTsMSEQUwtKtK/WvohX6DyAmMcN
-	 D1GaGr5ck9B/RLLLjojYdILfGiwUkiAc42xY31sJVuIgu1iCDSB5Ne8WoV0jLCqI8d
-	 zrQVH2/E8wHrzeL472ZLIgKvcRebtNP0/pDHSIeMrOMs1K3UHnNiSWWyaDfov92n6B
-	 nX+72Kkyna45gtpiXraRHWX8dA2MM2VAD3/mATghE5+9YSoGPDZR+jxbVLBJfj7SYt
-	 +PZlFeirujvDyDFZLcpTy+hpNAk8k+YbLWlsrFQSPy8kfZwx9aUoN4J9MxpblfUpCb
-	 Cm5dILFZG65Ug==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4X8Ztl2z32z4wb5;
-	Thu, 19 Sep 2024 22:43:11 +1000 (AEST)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Segher Boessenkool <segher@kernel.crashing.org>
-Cc: linuxppc-dev@lists.ozlabs.org, christophe.leroy@csgroup.eu,
- sfr@canb.auug.org.au, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, almasrymina@google.com, kuba@kernel.org
-Subject: Re: [PATCH] powerpc/atomic: Use YZ constraints for DS-form
- instructions
-In-Reply-To: <20240917073750.GZ29862@gate.crashing.org>
-References: <20240916120510.2017749-1-mpe@ellerman.id.au>
- <20240917073750.GZ29862@gate.crashing.org>
-Date: Thu, 19 Sep 2024 22:43:10 +1000
-Message-ID: <87o74jrezl.fsf@mail.lhotse>
+	s=arc-20240116; t=1726749859; c=relaxed/simple;
+	bh=m7uoFWX/UlEJrIzmzKde9Axz0fo13HUh+VGEZG1CACY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OHtxKI3Olvr6aRtjgBdC8n0zr74Z2R3KeR8ZZBX5803cK3Xc6SNAtNtpoMrKOPyOb/WczDYEnraPQtQ795eNupwKDuNO9XE/0ewrN/gv+WNc/nbSeLo6JDRMNgS5zVPaAC4ZMv65bGwixqbyYou6BhfQdeJiP/lwWYBa4Ossxp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YWrAna5P; arc=none smtp.client-ip=209.85.160.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-457e153cbdcso7036901cf.2;
+        Thu, 19 Sep 2024 05:44:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726749856; x=1727354656; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=f8ojNp82anMY4plClHiU9t1AUJZlRm2SyZbGYfRBoIo=;
+        b=YWrAna5PsKdxUClobkfI75/CiEACyBLqaCtrh200xTEvaO5JRbRPE9Bk1wvfy2axjU
+         b4y8TYPe4Q7DyujI7pnVlZp9oJ7Gpr3WvG4QA1qUVJOX9jNxElFUwaOI37ijqpuAEdmL
+         V91AeOQGnuylWO0J04UWoDQdUw+ZGVMBhwJk/PaUEwfy6m0+83yV6Or/JiT/aSS+55kY
+         lbkeI7JtkPAExX99gQS6yQYM0y7s2OSsFgtRIHrs5r48p8hW9hejvzpNrpgHOrvqVA8v
+         akPfRCMy9Pn7viNfNRX3uB6t3+/mR3p96ifaU+NF+xqkMDb2Cegpbw/4j3BciNFDTEt9
+         fWoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726749856; x=1727354656;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=f8ojNp82anMY4plClHiU9t1AUJZlRm2SyZbGYfRBoIo=;
+        b=oIvEUMZN/4Xq2aNTMs9XPen8X2G2V84K7gTgJuQkEABtxgMYT1zltWtEBkXqPJUEGP
+         FWrAtyP7VgWAIEvZNbDEoAPprYyvmwMeg6wv6PDY5yQu1AcjPRl9ateC9SL0d0p6FMv2
+         SjBTKrm6Ikd/Zj/TO2hZ9VbF4s/yaF57BOrNvjh+5DngKr0giD9AJ7cpWSpiuo2n48bG
+         vpMCbB6ELN/ScFsHTMGlawtAhhGxz/iRcZeqCCP/I1Kl34X+ai+5uc7EQs/Mig6tNzNT
+         58EC0MQocAt5CxLMksOr++KUR0ydJqjYv01a6zOurP9D4WvT5iK5ACwIdkoFAZI8VZFq
+         UTfg==
+X-Forwarded-Encrypted: i=1; AJvYcCVCT7pMgLUYyr6xTkQ+oTSiiVtUDMpHouGkspwY/RyW/51Lrs39vDdhhKYu9jIi/fGgbLrzahf0gX5nqOprooA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8KAHrsjHEg3WsqpXWC1+fR199Ds49lNYghrCMnH6YzsevPU41
+	bYIKKivKJ09XwJijvlAzESUANgFv01dljjxDzX/nZ1Oa7M5DGpBfn+qb7bVG
+X-Google-Smtp-Source: AGHT+IE/V6Hg2IZppFFuNCPC7XEaedNfaNyWWEileiDSoZX1E7QU0a7FnuvLwgbQcELWfSo4cglkKA==
+X-Received: by 2002:a05:622a:38e:b0:458:1dd3:e3a6 with SMTP id d75a77b69052e-4586030033dmr343391781cf.23.1726749856416;
+        Thu, 19 Sep 2024 05:44:16 -0700 (PDT)
+Received: from willemb.c.googlers.com.com (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45b17878e25sm7155861cf.36.2024.09.19.05.44.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Sep 2024 05:44:15 -0700 (PDT)
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	sdf@fomichev.me,
+	matttbe@kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net] selftests/net: packetdrill: increase timing tolerance in debug mode
+Date: Thu, 19 Sep 2024 08:43:42 -0400
+Message-ID: <20240919124412.3014326-1-willemdebruijn.kernel@gmail.com>
+X-Mailer: git-send-email 2.46.0.662.g92d0881bb0-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Segher Boessenkool <segher@kernel.crashing.org> writes:
-> Hi!
->
-> On Mon, Sep 16, 2024 at 10:05:10PM +1000, Michael Ellerman wrote:
->> The 'ld' and 'std' instructions require a 4-byte aligned displacement
->> because they are DS-form instructions. But the "m" asm constraint
->> doesn't enforce that.
->> 
->> That can lead to build errors if the compiler chooses a non-aligned
->> displacement, as seen with GCC 14:
->> 
->>   /tmp/ccuSzwiR.s: Assembler messages:
->>   /tmp/ccuSzwiR.s:2579: Error: operand out of domain (39 is not a multiple of 4)
->>   make[5]: *** [scripts/Makefile.build:229: net/core/page_pool.o] Error 1
->> 
->> Dumping the generated assembler shows:
->> 
->>   ld 8,39(8)       # MEM[(const struct atomic64_t *)_29].counter, t
->> 
->> Use the YZ constraints to tell the compiler either to generate a DS-form
->> displacement, or use an X-form instruction, either of which prevents the
->> build error.
->
-> Great explanation text, a perfect commit!  :-)
+From: Willem de Bruijn <willemb@google.com>
 
-Thanks - I'm sure there's something that could be better, but I do try :)
+Some packetdrill tests are flaky in debug mode. As discussed, increase
+tolerance.
 
-cheers
+We have been doing this for debug builds outside ksft too.
+
+Previous setting was 10000. A manual 50 runs in virtme-ng showed two
+failures that needed 12000. To be on the safe side, Increase to 14000.
+
+Link: https://lore.kernel.org/netdev/Zuhhe4-MQHd3EkfN@mini-arch/
+Fixes: 1e42f73fd3c2 ("selftests/net: packetdrill: import tcp/zerocopy")
+Reported-by: Stanislav Fomichev <sdf@fomichev.me>
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+---
+ tools/testing/selftests/net/packetdrill/ksft_runner.sh | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/packetdrill/ksft_runner.sh b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+index 7478c0c0c9aa..4071c133f29e 100755
+--- a/tools/testing/selftests/net/packetdrill/ksft_runner.sh
++++ b/tools/testing/selftests/net/packetdrill/ksft_runner.sh
+@@ -30,12 +30,17 @@ if [ -z "$(which packetdrill)" ]; then
+ 	exit "$KSFT_SKIP"
+ fi
+ 
++declare -a optargs
++if [[ -n "${KSFT_MACHINE_SLOW}" ]]; then
++	optargs+=('--tolerance_usecs=14000')
++fi
++
+ ktap_print_header
+ ktap_set_plan 2
+ 
+-unshare -n packetdrill ${ipv4_args[@]} $(basename $script) > /dev/null \
++unshare -n packetdrill ${ipv4_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
+ 	&& ktap_test_pass "ipv4" || ktap_test_fail "ipv4"
+-unshare -n packetdrill ${ipv6_args[@]} $(basename $script) > /dev/null \
++unshare -n packetdrill ${ipv6_args[@]} ${optargs[@]} $(basename $script) > /dev/null \
+ 	&& ktap_test_pass "ipv6" || ktap_test_fail "ipv6"
+ 
+ ktap_finished
+-- 
+2.46.0.662.g92d0881bb0-goog
+
 
