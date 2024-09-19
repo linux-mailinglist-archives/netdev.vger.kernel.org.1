@@ -1,96 +1,353 @@
-Return-Path: <netdev+bounces-128980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B1E97CB35
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 16:56:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E0C197CB4A
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 17:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 475F11F22BC6
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:56:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 005A21F239EC
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 15:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F4B41A01B4;
-	Thu, 19 Sep 2024 14:56:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0C591E522;
+	Thu, 19 Sep 2024 15:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E5BD6+zJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ii5bPKcy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A8E1A01A9;
-	Thu, 19 Sep 2024 14:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2DF81DDC9
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 15:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726757774; cv=none; b=BwQN50afh41eeGzBJR2sE0Tne+eNKu2UYJIPHr4XND16wZX41ZRzGCH97rj1VD+tNQqOgeeNA/8Jv7uj0Nb1PR4zKH4gjsVROfSekvNBjhWIYQBULJOCdk5S47xEQlZYKPVlEQTRsy9M3lLk8iXQSJnDzl6ykjLWlTPD+UnF0cc=
+	t=1726758170; cv=none; b=NhUL6M3DsJLE3WLFtRlEG1LPQJ/xS3gEEGiWoGTmCRoKwuuRJpWfUADJWXC8xpN+1MRAnS0CgxwBHiIGQ5ZSGQymgBanIBjcYaNsDNjvhQmKy8IbFzUZzkLg7oknI2txJUXEZJG/5ILI2tGXCRjAzDxH2Jysbjytt5b57A4IjOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726757774; c=relaxed/simple;
-	bh=QtIZeX0lLZcer6NTnJA8KxK4g0xGghJRzcuUPpkb0bA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kWYDksEG93mcaFAKFKYuhWrB/3n5PPLfU2ZOWor8PAJj8I1GKYx0jvVdmKDjy7gIgSoYSL1vCQ0TV2XeUfu2+hCSBTNS63YkIBwkD3fZft6hrQPQ0gcYLjUUKF8mWwf8//DgMxVgwtjNxic6J5UZzyupslA8SItWpx2HxfMSABY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E5BD6+zJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C4FBC4CEC6;
-	Thu, 19 Sep 2024 14:56:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726757773;
-	bh=QtIZeX0lLZcer6NTnJA8KxK4g0xGghJRzcuUPpkb0bA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=E5BD6+zJkxJRQkR4uhMeXTb5xDFvbc49U+UBAnb/rpWkm7Ps7hzIWTDItvKk68Ok4
-	 z/3gu9GSAb4OpVvncmFYcUDrrPBaMKOxGWFJZfSH/Izu0obJ9fp/4Apak7wky5a7Jw
-	 kkYs8OCz9Xlc76fmK0cd4Trm6XjxGtcJmqvC4cjbhpUZxmpZChtIXy0ICRfu2rf163
-	 U68HEgkGUuMCzlFSOKoQMHRU2L8181tlrYzEP84ZGLe8wCGw/u2of92IFdoc7xVUnw
-	 hZ8Zs+f8qbBEo53PlJfgBCt5JdfR3mjNK3a7xPqcUHxFteRHfcM1rmfoz1X9PICxxV
-	 b6yuOkWfYFT2A==
-Date: Thu, 19 Sep 2024 15:56:09 +0100
-From: Simon Horman <horms@kernel.org>
-To: Moon Yeounsu <yyyynoom@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: add inline annotation to fix the build warning
-Message-ID: <20240919145609.GF1571683@kernel.org>
-References: <20240919142149.282175-1-yyyynoom@gmail.com>
+	s=arc-20240116; t=1726758170; c=relaxed/simple;
+	bh=4afg3sxFCn7JVAcO4vFSxphepXkg1SzA8MGgB/7e7kA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mvd8WMiLRYbskdvUC5pL/iWFH/8YtjSHUnjF/WT2zQDFVNcA+XGTpxu/yUru9g5Ecz+rjj9tx/4R/HJ7CgW5yngQBX8pMcIRAvzQ4H8B9jzXnVht0AmO0hDWouWlQj6gQ1lpthoBVsTP4jY+KQryRFyyxNHSlWH7gU9UaDRU5ts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ii5bPKcy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726758167;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rR04I4vXAf8dSZ/n+gOw2z191cw8Cqwx3LD8QAhBSG0=;
+	b=ii5bPKcy56sX3F3aPiTgQdSK8iplu6bkiNyEOGKnwL/oS19vHuAWnuF7H1bImsRDJ9x6Vw
+	+CdnJEO7znWtfylE0gLNo3mg2qj3zmddVS4t9ntD/vA17qaB2PIyUMVUh+DdoWQ4GT/5i+
+	Oq1VMubtVxr1VVVQxq69eXbc4T8ibf0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-368-NHkn3R11MKOjIDLSe3bJkg-1; Thu, 19 Sep 2024 11:02:45 -0400
+X-MC-Unique: NHkn3R11MKOjIDLSe3bJkg-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cb33e6299so6078375e9.2
+        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 08:02:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726758164; x=1727362964;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rR04I4vXAf8dSZ/n+gOw2z191cw8Cqwx3LD8QAhBSG0=;
+        b=p7TGmU987OogPQE5S4RMFgwQ7sx0YOcH+K0Bwrsrspoh5NENdWV0OQABy2KW9vf7qy
+         0QyIJB6Ro1AbqnFChVHaFZKxvuyCAoaOo39fGGQ0A+rGMQszSm95IOy1dAyl+haW5tBz
+         mQV/cOQeOiQGR9IKEXy3ArwIyAC6RzsHYGxcSWvnE8SeKi0xgSz8j5kltwsRVKDgJ28x
+         IC8ub8/N2V0XlM+hdokzWNb8f4XOGqisz9jYmro2WAA62chfG0Fa3Evxb/SXX9/bP1Wm
+         hv+A6VzKGwz3opIOlWv8MqBPTpIEGOYraTLVYyBldlDSY31D6KRvVJ8la6tmUi6mdD6s
+         LGDA==
+X-Gm-Message-State: AOJu0YxnobJzQrkrztrZO70zCOy0P0j6y0PmjIhn1n9eXQLTKZ2qqY20
+	rnoUKi0UV6jlgVipUoFvyxcheZempVYfzxkdd0fxyVI2a9viKcx+sBf0ZLnEa716OWM46L0e2m7
+	AfytdG+rk/ntTsSehyhyj0BZWJU0End1AcBs6erW+PURcSqFHejasEQ==
+X-Received: by 2002:a05:600c:6c8d:b0:42c:b7e2:3bc3 with SMTP id 5b1f17b1804b1-42cdb54d638mr176609545e9.19.1726758164070;
+        Thu, 19 Sep 2024 08:02:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFF3E3QwCR7nOyeWC6gf3m1WCJqB1LKUGzO3MSQD3S5cwbAHn26CviuB1RjbuOPlAOpI0RQXA==
+X-Received: by 2002:a05:600c:6c8d:b0:42c:b7e2:3bc3 with SMTP id 5b1f17b1804b1-42cdb54d638mr176608885e9.19.1726758163363;
+        Thu, 19 Sep 2024 08:02:43 -0700 (PDT)
+Received: from [192.168.88.100] (146-241-67-136.dyn.eolo.it. [146.241.67.136])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e7540e4f9sm23997595e9.1.2024.09.19.08.02.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Sep 2024 08:02:42 -0700 (PDT)
+Message-ID: <79484b47-3eb7-439e-b95e-6844233c8b8a@redhat.com>
+Date: Thu, 19 Sep 2024 17:02:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240919142149.282175-1-yyyynoom@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 net-next 11/15] testing: net-drv: add basic shaper test
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+ Jiri Pirko <jiri@resnulli.us>, Madhu Chittim <madhu.chittim@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Simon Horman <horms@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Donald Hunter
+ <donald.hunter@gmail.com>, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
+ edumazet@google.com
+References: <cover.1725919039.git.pabeni@redhat.com>
+ <5f17d61004db141808b15d50485d0ccb69cbfa12.1725919039.git.pabeni@redhat.com>
+ <ZuC9H5uABXA0-SYo@mini-arch>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <ZuC9H5uABXA0-SYo@mini-arch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Sep 19, 2024 at 11:21:49PM +0900, Moon Yeounsu wrote:
-> This patch fixes two sparse warnings (`make C=1`):
-> net/ipv6/icmp.c:103:20: warning: context imbalance in 'icmpv6_xmit_lock' - wrong count at exit
-> net/ipv6/icmp.c:119:13: warning: context imbalance in 'icmpv6_xmit_unlock' - unexpected unlock
+On 9/10/24 23:41, Stanislav Fomichev wrote:
+> On 09/10, Paolo Abeni wrote:
+>> Leverage a basic/dummy netdevsim implementation to do functional
+>> coverage for NL interface.
+>>
+>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>> ---
+>> v5 -> v6:
+>>    - additional test-cases for delegation and queue reconf
+>>
+>> v4 -> v5:
+>>    - updated to new driver API
+>>    - more consistent indentation
+>>
+>> rfc v1 -> v2:
+>>    - added more test-cases WRT nesting and grouping
+>> ---
+>>   drivers/net/Kconfig                           |   1 +
+>>   drivers/net/netdevsim/ethtool.c               |   2 +
+>>   drivers/net/netdevsim/netdev.c                |  39 ++
+>>   tools/testing/selftests/drivers/net/Makefile  |   1 +
+>>   tools/testing/selftests/drivers/net/shaper.py | 457 ++++++++++++++++++
+>>   .../testing/selftests/net/lib/py/__init__.py  |   1 +
+>>   tools/testing/selftests/net/lib/py/ynl.py     |   5 +
+>>   7 files changed, 506 insertions(+)
+>>   create mode 100755 tools/testing/selftests/drivers/net/shaper.py
+>>
+>> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+>> index 9920b3a68ed1..1fd5acdc73c6 100644
+>> --- a/drivers/net/Kconfig
+>> +++ b/drivers/net/Kconfig
+>> @@ -641,6 +641,7 @@ config NETDEVSIM
+>>   	depends on PTP_1588_CLOCK_MOCK || PTP_1588_CLOCK_MOCK=n
+>>   	select NET_DEVLINK
+>>   	select PAGE_POOL
+>> +	select NET_SHAPER
+>>   	help
+>>   	  This driver is a developer testing tool and software model that can
+>>   	  be used to test various control path networking APIs, especially
+>> diff --git a/drivers/net/netdevsim/ethtool.c b/drivers/net/netdevsim/ethtool.c
+>> index 1436905bc106..5fe1eaef99b5 100644
+>> --- a/drivers/net/netdevsim/ethtool.c
+>> +++ b/drivers/net/netdevsim/ethtool.c
+>> @@ -103,8 +103,10 @@ nsim_set_channels(struct net_device *dev, struct ethtool_channels *ch)
+>>   	struct netdevsim *ns = netdev_priv(dev);
+>>   	int err;
+>>   
+>> +	mutex_lock(&dev->lock);
+>>   	err = netif_set_real_num_queues(dev, ch->combined_count,
+>>   					ch->combined_count);
+>> +	mutex_unlock(&dev->lock);
+>>   	if (err)
+>>   		return err;
+>>   
+>> diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.c
+>> index 017a6102be0a..cad85bb0cf54 100644
+>> --- a/drivers/net/netdevsim/netdev.c
+>> +++ b/drivers/net/netdevsim/netdev.c
+>> @@ -22,6 +22,7 @@
+>>   #include <net/netdev_queues.h>
+>>   #include <net/page_pool/helpers.h>
+>>   #include <net/netlink.h>
+>> +#include <net/net_shaper.h>
+>>   #include <net/pkt_cls.h>
+>>   #include <net/rtnetlink.h>
+>>   #include <net/udp_tunnel.h>
+>> @@ -475,6 +476,43 @@ static int nsim_stop(struct net_device *dev)
+>>   	return 0;
+>>   }
+>>   
+>> +static int nsim_shaper_set(struct net_shaper_binding *binding,
+>> +			   const struct net_shaper *shaper,
+>> +			   struct netlink_ext_ack *extack)
+>> +{
+>> +	return 0;
+>> +}
+>> +
+>> +static int nsim_shaper_del(struct net_shaper_binding *binding,
+>> +			   const struct net_shaper_handle *handle,
+>> +			   struct netlink_ext_ack *extack)
+>> +{
+>> +	return 0;
+>> +}
+>> +
+>> +static int nsim_shaper_group(struct net_shaper_binding *binding,
+>> +			     int leaves_count,
+>> +			     const struct net_shaper *leaves,
+>> +			     const struct net_shaper *root,
+>> +			     struct netlink_ext_ack *extack)
+>> +{
+>> +	return 0;
+>> +}
+>> +
+>> +static void nsim_shaper_cap(struct net_shaper_binding *binding,
+>> +			    enum net_shaper_scope scope,
+>> +			    unsigned long *flags)
+>> +{
+>> +	*flags = ULONG_MAX;
+>> +}
+>> +
+>> +static const struct net_shaper_ops nsim_shaper_ops = {
+>> +	.set			= nsim_shaper_set,
+>> +	.delete			= nsim_shaper_del,
+>> +	.group			= nsim_shaper_group,
+>> +	.capabilities		= nsim_shaper_cap,
+>> +};
+>> +
+>>   static const struct net_device_ops nsim_netdev_ops = {
+>>   	.ndo_start_xmit		= nsim_start_xmit,
+>>   	.ndo_set_rx_mode	= nsim_set_rx_mode,
+>> @@ -496,6 +534,7 @@ static const struct net_device_ops nsim_netdev_ops = {
+>>   	.ndo_bpf		= nsim_bpf,
+>>   	.ndo_open		= nsim_open,
+>>   	.ndo_stop		= nsim_stop,
+>> +	.net_shaper_ops		= &nsim_shaper_ops,
+>>   };
+>>   
+>>   static const struct net_device_ops nsim_vf_netdev_ops = {
+>> diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+>> index 39fb97a8c1df..25aec5c081df 100644
+>> --- a/tools/testing/selftests/drivers/net/Makefile
+>> +++ b/tools/testing/selftests/drivers/net/Makefile
+>> @@ -9,6 +9,7 @@ TEST_PROGS := \
+>>   	ping.py \
+>>   	queues.py \
+>>   	stats.py \
+>> +	shaper.py
+>>   # end of TEST_PROGS
+>>   
+>>   include ../../lib.mk
+>> diff --git a/tools/testing/selftests/drivers/net/shaper.py b/tools/testing/selftests/drivers/net/shaper.py
+>> new file mode 100755
+>> index 000000000000..3504d51985bc
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/drivers/net/shaper.py
+>> @@ -0,0 +1,457 @@
+>> +#!/usr/bin/env python3
+>> +# SPDX-License-Identifier: GPL-2.0
+>> +
+>> +from lib.py import ksft_run, ksft_exit, ksft_eq, ksft_true, KsftSkipEx
+>> +from lib.py import EthtoolFamily, NetshaperFamily
+>> +from lib.py import NetDrvEnv
+>> +from lib.py import NlError
+>> +from lib.py import cmd
+>> +
+>> +def get_shapers(cfg, nl_shaper) -> None:
+>> +    try:
+>> +        shapers = nl_shaper.get({'ifindex': cfg.ifindex}, dump=True)
+>> +    except NlError as e:
+>> +        if e.error == 95:
+>> +            raise KsftSkipEx("shapers not supported by the device")
+>> +        raise
+>> +
+>> +    # Default configuration: no shapers configured.
+>> +    ksft_eq(len(shapers), 0)
+>> +
+>> +def get_caps(cfg, nl_shaper) -> None:
+>> +    try:
+>> +        caps = nl_shaper.cap_get({'ifindex': cfg.ifindex}, dump=True)
+>> +    except NlError as e:
+>> +        if e.error == 95:
+>> +            raise KsftSkipEx("shapers not supported by the device")
+>> +        raise
+>> +
+>> +    # Each device implementing shaper support must support some
+>> +    # features in at least a scope.
+>> +    ksft_true(len(caps)> 0)
+>> +
+>> +def set_qshapers(cfg, nl_shaper) -> None:
+>> +    try:
+>> +        caps = nl_shaper.cap_get({'ifindex': cfg.ifindex,
+>> +                                 'scope':'queue'})
+>> +    except NlError as e:
+>> +        if e.error == 95:
+>> +            raise KsftSkipEx("shapers not supported by the device")
+>> +        raise
+>> +    if not 'support-bw-max' in caps or not 'support-metric-bps' in caps:
+>> +        raise KsftSkipEx("device does not support queue scope shapers with bw_max and metric bps")
+>> +
+>> +    cfg.queues = True;
+>> +    netnl = EthtoolFamily()
+>> +    channels = netnl.channels_get({'header': {'dev-index': cfg.ifindex}})
+>> +    if channels['combined-count'] == 0:
+>> +        cfg.rx_type = 'rx'
+>> +        cfg.nr_queues = channels['rx-count']
+>> +    else:
+>> +        cfg.rx_type = 'combined'
+>> +        cfg.nr_queues = channels['combined-count']
+>> +    if cfg.nr_queues < 3:
+>> +        raise KsftSkipEx("device does not support enough queues min 3 found {cfg.nr_queues}")
+>> +
+>> +    nl_shaper.set({'ifindex': cfg.ifindex,
+>> +                   'handle': {'scope': 'queue', 'id': 1},
+>> +                   'metric': 'bps',
+>> +                   'bw-max': 10000})
+>> +    nl_shaper.set({'ifindex': cfg.ifindex,
+>> +                   'handle': {'scope': 'queue', 'id': 2},
+>> +                   'metric': 'bps',
+>> +                   'bw-max': 20000})
+>> +
+>> +    # Querying a specific shaper not yet configured must fail.
+>> +    raised = False
+>> +    try:
+>> +        shaper_q0 = nl_shaper.get({'ifindex': cfg.ifindex,
+>> +                                   'handle': {'scope': 'queue', 'id': 0}})
+>> +    except (NlError):
+>> +        raised = True
+>> +    ksft_eq(raised, True)
+>> +
+>> +    shaper_q1 = nl_shaper.get({'ifindex': cfg.ifindex,
+>> +                              'handle': {'scope': 'queue', 'id': 1}})
 > 
-> Since `icmp6_xmit_lock()` and `icmp6_xmit_unlock()` are designed as they
-> are named, entering/returning the function without lock/unlock doesn't
-> matter.
+> [..]
 > 
-> Signed-off-by: Moon Yeounsu <yyyynoom@gmail.com>
+>> +    ksft_eq(shaper_q1, {'ifindex': cfg.ifindex,
+>> +                        'parent': {'scope': 'netdev'},
+>> +                        'handle': {'scope': 'queue', 'id': 1},
+>> +                        'metric': 'bps',
+>> +                        'bw-max': 10000})
+>> +
+> 
+> Before comparison, you probably need to drop some fields that are not
+> expected?
+> 
+> # # Check failed {'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 1}, 'metric': 'bps', 'bw-min': 517778718638633216, 'bw-max': 10000, 'burst': 18446683600580769792, 'priority': 60858368, 'weight': 4294936704} != {'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 1}, 'metric': 'bps', 'bw-max': 10000}
+> # # Check| At /home/virtme/testing-18/tools/testing/selftests/drivers/net/./shaper.py, line 83, in set_qshapers:
+> # # Check|     ksft_eq(shapers, [{'ifindex': cfg.ifindex,
+> # # Check failed [{'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 1}, 'metric': 'bps', 'bw-min': 517778718638633216, 'bw-max': 10000, 'burst': 18446683600580769792, 'priority': 60858368, 'weight': 4294936704}, {'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 2}, 'metric': 'bps', 'bw-min': 517778718638633216, 'bw-max': 20000, 'burst': 18446683600580769792, 'priority': 60858368, 'weight': 4294936704}] != [{'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 1}, 'metric': 'bps', 'bw-max': 10000}, {'ifindex': 8, 'parent': {'scope': 'netdev'}, 'handle': {'scope': 'queue', 'id': 2}, 'metric': 'bps', 'bw-max': 20000}]
+> 
+> https://netdev-3.bots.linux.dev/vmksft-net-drv-dbg/results/766702/4-shaper-py/stdout
+> 
+> Debug builds are also reporting a UBSAN error:
+> 
+> https://netdev-3.bots.linux.dev/vmksft-net-drv-dbg/results/766702/4-shaper-py/stderr
 
-Hi Moon,
+Thanks for the feedback, and sorry for the late reply, I was traveling.
 
-Without this patch applied I see the warnings cited above.
+It looks like the root cause is the same, a couple of stack allocated 
+structs are not zeroed before usage.
 
-However, with this patch applied, I see the following.
-So I think this needs more work.
+For the record I could not reproduce the issue locally, because I 
+probably miss some debug kconf.
 
-net/ipv6/icmp.c: note: in included file (through include/linux/sched.h, include/linux/percpu.h, arch/x86/include/asm/msr.h, arch/x86/include/asm/tsc.h, arch/x86/include/asm/timex.h, include/linux/timex.h, ...):
-./include/linux/spinlock.h:361:16: warning: context imbalance in 'icmpv6_xmit_lock' - different lock contexts for basic block
-net/ipv6/icmp.c: note: in included file (through include/linux/spinlock.h, include/linux/sched.h, include/linux/percpu.h, arch/x86/include/asm/msr.h, arch/x86/include/asm/tsc.h, arch/x86/include/asm/timex.h, ...):
-./include/linux/bottom_half.h:33:30: warning: context imbalance in 'icmp6_send' - different lock contexts for basic block
-./include/linux/bottom_half.h:33:30: warning: context imbalance in 'icmpv6_echo_reply' - different lock contexts for basic block
+I'll address the issue in the next iteration.
 
-Also, It is my feeling that addressing warnings of this nature
-is not a fix for net, but rather but rather an enhancement for net-next.
+Thanks!
 
-net-next is currently closed for the v6.12 merge windows, so non-RFC,
-patches should not be posted for net-next until it re-opens once v6.12-rc1
-has been released, most likely during the week of 30th September.
+Paolo
 
--- 
-pw-bot: changes-requested
 
