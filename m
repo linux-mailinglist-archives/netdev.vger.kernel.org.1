@@ -1,134 +1,138 @@
-Return-Path: <netdev+bounces-128881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3120497C4BD
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:17:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17AAD97C4D7
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 09:27:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6392C1C22871
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 07:17:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8BF31F217FC
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 07:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1901922EA;
-	Thu, 19 Sep 2024 07:17:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987C5193425;
+	Thu, 19 Sep 2024 07:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="v7ggCbi7"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="vuPv0Wcw"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from out162-62-57-252.mail.qq.com (out162-62-57-252.mail.qq.com [162.62.57.252])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42CF820314;
-	Thu, 19 Sep 2024 07:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA72D193418;
+	Thu, 19 Sep 2024 07:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.252
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726730229; cv=none; b=E+YtoQo9+puZzQ8e89X/fuizxi+0+p+CBmZRD4/EN8Y4pdXOB3msqSC1uc0yb53uOKy456LeJgVyjoQgra3xTrhZjK/8GignL2t1raUU9n/wGM0bOG2eDAEYSrDGFS/yarv5M5HPTfEDfjnbz+lJXEdVsM+7JFnwf1Fx97Lznxg=
+	t=1726730857; cv=none; b=YXQRSCRZcxKUOEY/okTTzijZGtriuM4rv43+S5dfOhVKDTOE3oz0ZVC6IhnT0U+AOoVnGJYj4w9R6tHWgAqqSBbwSDnSxn9Jfca7xHxiuReIjIEhSl2Qau5bFAkz5XrIHCuVTmnLHc7jA4kRg6H0gXOV9yYsU5tL+6Jlla5ECHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726730229; c=relaxed/simple;
-	bh=xcjpsMKI13u3WcKGB0N9zGs0tG0CLFvOvo1y6POEmoI=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=ln6gVQqo0wiWp40gcv8j3+NwTTPep/NecIUEkCSlcxZiy3Iq4UnROe4AzSlsFOhcKapHj0RfdBw5PUOxd9bHRW9RyDn6svMjIUByaUFxJFP5u+KKGq6/xKvrnNduRd+IpuiMMD/adLtL5qJIJd9LEsZ2py3Nu85yrcJS2LssPw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=v7ggCbi7; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1726730224; h=Message-ID:Subject:Date:From:To;
-	bh=ssL8UI9+cmR3eancWEz3OVmCqRIhQMFqE23fxOHlFWk=;
-	b=v7ggCbi7ClIqsz8NhNfwwlBMpsJ6Zji4gWjGfVX4XI/rlIW5C5HUyLDnNIuudwNaLvVMOIbDl7RskQgYr1ZzHDDiu3qFxyRjXrUUSeGebPYBElZD5Mn3v0hS47Ys4xMaBqgQxg/07b7JUFJV7iJiJhF5yu9JqgENthVZhCMGo4c=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WFGjrnj_1726729904)
-          by smtp.aliyun-inc.com;
-          Thu, 19 Sep 2024 15:11:45 +0800
-Message-ID: <1726729783.1689022-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [RESEND PATCH v3] virtio_net: Fix mismatched buf address when unmapping for small packets
-Date: Thu, 19 Sep 2024 15:09:43 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Wenbo Li <liwenbo.martin@bytedance.com>
-Cc: virtualization@lists.linux.dev,
- netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Wenbo Li <liwenbo.martin@bytedance.com>,
- Jiahui Cen <cenjiahui@bytedance.com>,
- Ying Fang <fangying.tommy@bytedance.com>,
- mst@redhat.com,
- jasowang@redhat.com,
- eperezma@redhat.com,
- davem@davemloft.net,
- edumazet@google.com,
- kuba@kernel.org,
- pabeni@redhat.com
-References: <20240919035214.41805-1-liwenbo.martin@bytedance.com>
-In-Reply-To: <20240919035214.41805-1-liwenbo.martin@bytedance.com>
+	s=arc-20240116; t=1726730857; c=relaxed/simple;
+	bh=GVjuTIwkdsz4YHVBTRhSWjHQ/dDR05dJ+3peEJosjgg=;
+	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=I4hoOjAsFaRR0vFfaKMTvz0OcQgF0CWm5RgKXyzsPLyl5K63qGIe6jFu+WLRlR6VGDCHCu7Q3dnQ8I20t72NErsq3S/Ep9vU4Hzehw59qjuC6iBKO31pj8y7/lmbEoq3ypoCQUZrggPitswV9B7inuupeZ9yfDTROxaLq6ycfwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=vuPv0Wcw; arc=none smtp.client-ip=162.62.57.252
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1726730543;
+	bh=WVNu8AiV9G8393mFYa1TtjTVMD7rCrQTbszT2HczlEQ=;
+	h=From:To:Cc:Subject:Date;
+	b=vuPv0Wcwdoicp14iTbyOB1Yeubc/2Qizga93E+w3BphIoIpvQORRDeKc5AkGXnqtT
+	 Vymia5XPMcCbqebGTO/y/iQ7GFx9iJsWPnAMhxpSiCDND/zrEUY/v/R8m1U7LvH1C+
+	 KqiU9Bh9QksY5Ze4dQQMWz96rbRlyPOgVrQXoVMQ=
+Received: from localhost.localdomain ([114.246.200.160])
+	by newxmesmtplogicsvrsza15-1.qq.com (NewEsmtp) with SMTP
+	id 4093144F; Thu, 19 Sep 2024 15:16:09 +0800
+X-QQ-mid: xmsmtpt1726730169t92x1i33o
+Message-ID: <tencent_24586A9E52F56C5C12E9535AD3F243C98B06@qq.com>
+X-QQ-XMAILINFO: M4wVjRC01ue09gv8wxMJnKV3gXmV+vNnebMTHEZ2/+ALg1OBD+uHWsDyqihdMH
+	 T25+DQJk2dnTCYuw37iaRXzDqvx36WUNqqJQG1YWiCU++8nALikm3nBq+cBwTSmxFCcXS+EkMZ+v
+	 w+7lnJhhvMoANmSL+QvJ2cGB7BYVWe8l/vlDElE3k2en0M+CfqmWT+qax3H3yJY/4zwNrqw6MmYb
+	 Ns3O01phe7+GRzX++6Sis71rnusRDjcbGaOHhiwqNsMxUpcvO2SzPeJl/wb1kATvDxVMo9uqfxum
+	 baNubbIz74GA4CVi6OK2UsQEKRPvKabjr/JJaPvmMBF78rf/iQvRdsMv6N1ei91U9RW57e7wsATc
+	 RkbURfVSpA+ce7VsJmd/k3LItbgagmL5qa+gMxCWFokVhtDThPzjc4SlDJAJHtSzMniEaAquTHnX
+	 IFXop4/TIpAM0L1w+Ll9FDR0zUWYCx0ieYvAtlzZR69xg2vNnAwt3rGPLH/GGsbNsNVxbWh6hRGZ
+	 FqjXFvlquUBBsR/uyXosWOdXUjmu8bN07xJ3gXb2xICdlrqZAGLvmIdSdNh5+88XO/1G1M/tygvg
+	 eT7Ca8ymoz5+s5tl7stk+U8H5TVZZNSejHCHqVmbyVLw9duhxtii1W6QOv8OspVK9RIjqndd6M1W
+	 E/gyx69dJD1aFxa2XbK1pwb4qDbbvhQkAboJUl0VoowyAyxWpYsNJk5OED0Mg/Eh/aLe3wAN9ilx
+	 k+g5LMZU1SstF5Gu1yfmnfvKrIEM/qJELJaSZco6TViv94ZLooqiv67G0cZTNEmxJib3JigUdFJP
+	 4dfHXmiHQFhFIaG849E5QWceZL7r47/KUoPKjfTue+DzqAyJsCpzYFoLkhaYwJfBtzKcYo/TPySu
+	 F3N1UBruL8lBcf555z0Wk1LoT0qHOji3PQFR/VOpb57XpXZQlcQWT3glvxCmiAzrutygymxCzZRs
+	 77ZwUM90LL7iltzaKdvHsCfsen/DWNXTKGUl4+HA0AtvVFA7/d6eAGRVCpwjxHTb54wIp+iVsvbL
+	 viXSbbSjUMNEZzQWsYuuCf3YIRtLBZkZXZBNgakn5rkm8hQjK1KdE1awlxIr8=
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Jiawei Ye <jiawei.ye@foxmail.com>
+To: alex.aring@gmail.com,
+	stefan@datenfreihafen.org,
+	miquel.raynal@bootlin.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	david.girault@qorvo.com
+Cc: linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] mac802154: Fix potential RCU dereference issue in mac802154_scan_worker
+Date: Thu, 19 Sep 2024 07:16:09 +0000
+X-OQ-MSGID: <20240919071609.985069-1-jiawei.ye@foxmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Thu, 19 Sep 2024 11:52:14 +0800, Wenbo Li <liwenbo.martin@bytedance.com> wrote:
-> Currently, the virtio-net driver will perform a pre-dma-mapping for
-> small or mergeable RX buffer. But for small packets, a mismatched address
-> without VIRTNET_RX_PAD and xdp_headroom is used for unmapping.
->
-> That will result in unsynchronized buffers when SWIOTLB is enabled, for
-> example, when running as a TDX guest.
->
-> This patch unifies the address passed to the virtio core into the address
-> of the virtnet header and fixes the mismatched buffer address.
->
-> Changes from v2: unify the buf that passed to the virtio core in small
-> and merge mode.
-> Changes from v1: Use ctx to get xdp_headroom.
->
-> Fixes: 295525e29a5b ("virtio_net: merge dma operations when filling mergeable buffers")
-> Signed-off-by: Wenbo Li <liwenbo.martin@bytedance.com>
-> Signed-off-by: Jiahui Cen <cenjiahui@bytedance.com>
-> Signed-off-by: Ying Fang <fangying.tommy@bytedance.com>
-> ---
->  drivers/net/virtio_net.c | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 6f4781ec2b36..9446666c84aa 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -1804,9 +1804,15 @@ static struct sk_buff *receive_small(struct net_device *dev,
->  				     struct virtnet_rq_stats *stats)
->  {
->  	unsigned int xdp_headroom = (unsigned long)ctx;
-> -	struct page *page = virt_to_head_page(buf);
-> +	struct page *page;
+In the `mac802154_scan_worker` function, the `scan_req->type` field was
+accessed after the RCU read-side critical section was unlocked. According
+to RCU usage rules, this is illegal and can lead to unpredictable
+behavior, such as accessing memory that has been updated or causing
+use-after-free issues.
 
-Because that here is head page, so you can keep the original code.
+This possible bug was identified using a static analysis tool developed
+by myself, specifically designed to detect RCU-related issues.
 
->  	struct sk_buff *skb;
->
-> +	// We passed the address of virtnet header to virtio-core,
-> +	// so truncate the padding.
+To address this, the `scan_req->type` value is now stored in a local
+variable `scan_req_type` while still within the RCU read-side critical
+section. The `scan_req_type` is then used after the RCU lock is released,
+ensuring that the type value is safely accessed without violating RCU
+rules.
 
-Please check the kernel code style.
+Fixes: e2c3e6f53a7a ("mac802154: Handle active scanning")
+Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
+---
+ net/mac802154/scan.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Thanks.
+diff --git a/net/mac802154/scan.c b/net/mac802154/scan.c
+index 1c0eeaa76560..29cd84c9f69c 100644
+--- a/net/mac802154/scan.c
++++ b/net/mac802154/scan.c
+@@ -180,6 +180,7 @@ void mac802154_scan_worker(struct work_struct *work)
+ 	unsigned int scan_duration = 0;
+ 	struct wpan_phy *wpan_phy;
+ 	u8 scan_req_duration;
++	enum nl802154_scan_types scan_req_type;
+ 	u8 page, channel;
+ 	int ret;
+ 
+@@ -210,6 +211,7 @@ void mac802154_scan_worker(struct work_struct *work)
+ 
+ 	wpan_phy = scan_req->wpan_phy;
+ 	scan_req_duration = scan_req->duration;
++	scan_req_type = scan_req->type;
+ 
+ 	/* Look for the next valid chan */
+ 	page = local->scan_page;
+@@ -246,7 +248,7 @@ void mac802154_scan_worker(struct work_struct *work)
+ 		goto end_scan;
+ 	}
+ 
+-	if (scan_req->type == NL802154_SCAN_ACTIVE) {
++	if (scan_req_type == NL802154_SCAN_ACTIVE) {
+ 		ret = mac802154_transmit_beacon_req(local, sdata);
+ 		if (ret)
+ 			dev_err(&sdata->dev->dev,
+-- 
+2.34.1
 
-> +	buf -= VIRTNET_RX_PAD + xdp_headroom;
-> +
-> +	page = virt_to_head_page(buf);
-> +
->  	len -= vi->hdr_len;
->  	u64_stats_add(&stats->bytes, len);
->
-> @@ -2422,8 +2428,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
->  	if (unlikely(!buf))
->  		return -ENOMEM;
->
-> -	virtnet_rq_init_one_sg(rq, buf + VIRTNET_RX_PAD + xdp_headroom,
-> -			       vi->hdr_len + GOOD_PACKET_LEN);
-> +	buf += VIRTNET_RX_PAD + xdp_headroom;
-> +
-> +	virtnet_rq_init_one_sg(rq, buf, vi->hdr_len + GOOD_PACKET_LEN);
->
->  	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
->  	if (err < 0) {
-> --
-> 2.20.1
->
 
