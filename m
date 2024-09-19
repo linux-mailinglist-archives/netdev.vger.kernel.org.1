@@ -1,185 +1,94 @@
-Return-Path: <netdev+bounces-128987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2108A97CBB3
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 17:46:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E5B097CC10
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 18:10:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F5491C21C26
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 15:46:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 610721C2154D
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 16:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63091DFF8;
-	Thu, 19 Sep 2024 15:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440B01EA85;
+	Thu, 19 Sep 2024 16:10:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="VD7PEkSA"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="26pvBbD4"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DF3933D8
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 15:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B6519CC13
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 16:10:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726760799; cv=none; b=mNkU0YRP2oH7sM3DNjsJKocTSp8MQ42pc1mYGzuoloh0V64p71yJPFLgle/f3W5PVe8INH9Wb4WgkensgyZx5islAImEnhmvL2aCjbUqRwubJfN5O6CBndf/4gr8KhfV509OPsGDTThfTLY+1dxPzvna2KQcePK3g+LS/+bdCSc=
+	t=1726762251; cv=none; b=FI82WKxEfi362eq9ytGN1/QnhXcaXanhgWC0qlW34ufQraYxNyEa0YNhqvd+FjB/C7GyT43sWwSQPCwsTckW2TE1N4Ozi1vW8pRE2F15ZFp+U5CODMUKffql3vynSGVhNKeg24/fV5Db0U/iMtsr4NH1gBDV7c1Jcpqnx9BfNss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726760799; c=relaxed/simple;
-	bh=tnALQgMa2q+Hvhklc3SBadnuNhliLdTlAIZ67rcDRyo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y11QAnSOaVFx1HSw5AP9uUd2rSFS45ZFTnPZU3QYsfO+A1FbNRlB5Osm53l/+TF20TJg2ibmunE2FgoiGP0r48NNx8GS5JMfvV39MxQ+hm0RAPENn5ISV59jfj/oVR7OOdh//YTTfLxNHd9z+b7503aSq5nljFxNvjuqLBmOnJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=VD7PEkSA; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1726760788; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=CnMemErj8nH1CjbXobJv1oUFnHQI4SxCdrGR6yW5rIc=;
-	b=VD7PEkSAUL38XhiHpmQB1b8g0imVuEJjppNlJri43QSaOKwQwHNZr/Hccmrn57lZaJnk9sxoDjZVhMaRAViBmbixIGtq1NBpM+o1xRj+tK+zK44/zby3aBoXsQIMI/vD/bMSOaGd5Ha/lq+B01TCFvlkVUHOw6UB9p/BKnqqHiU=
-Received: from 192.168.50.173(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WFI0nhO_1726760786)
-          by smtp.aliyun-inc.com;
-          Thu, 19 Sep 2024 23:46:27 +0800
-Message-ID: <c0e266d6-3421-4d48-a3fc-7757bfddf0fa@linux.alibaba.com>
-Date: Thu, 19 Sep 2024 23:46:26 +0800
+	s=arc-20240116; t=1726762251; c=relaxed/simple;
+	bh=Xfkj6lfBhiTLHS2sVkNs2RP8tZuX6iIjwjxRiKtUx3A=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=qVE6onjKK+9w8Q2BDFMfqfm2Wx9A8hsM1urKM/2ybFj7NyxsZ6YNwqHZaVkKTHVGat9BGOvLmEe6mlkU/77mteGmx0zfYuNccpMzF2M+r9MLz4BMgpgarWGUexUPKJ34ZmrGxZGoYLedBMgCF1P4YXFP8Lx7aMM/zW78hgVASuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=26pvBbD4; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2d8a54f1250so786757a91.0
+        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 09:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1726762248; x=1727367048; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yQbZPqzPtMKI722MB+ApBN1z0j12hjBaSfYZZDBWTCg=;
+        b=26pvBbD4CAOJu7ohFDxmoZ9HYUtmmkyxDkv7RPKVRhzrWpKTDMxtbWpgs2V/x1wXa3
+         nEZu515twWy6XNirn+IxCFI5+V4qcwOI1MvN9NT4Cn6c4ZN1xBs/VhVv/VgSZ2be4RYn
+         FLVjlqJZEZHNHCsf2hVO9F1mZ0QRPNRyix6QuZGILAMCYNDrayIl0TGkMCKgCmazCZBj
+         K5XiaUZefvBEeUVFyoP4Fx91Id0MBEu5fGPjlqaM44ammzR6SJUHGw/3+m17dDoIPwvp
+         kgn0VsJcNI6AfsCG3z7r4iF4MRFDpQ9JnUx/4TSK00tUASXTpH7jENHQZr/TZ6N1aaZk
+         VRaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726762248; x=1727367048;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yQbZPqzPtMKI722MB+ApBN1z0j12hjBaSfYZZDBWTCg=;
+        b=hVOL3clDYA2A43LOC9QEHjmLt1UXmNLC2ygbdqwPsiSxuY10Gapb0CBL9TEfPYofjV
+         O9br2J21wZkUkBAku56onDsHc3na2/WU7FlTx2EvkoIz7BwWpEhzm2G7vX9di77q+TYm
+         bXKtF5faUOyhS7oR7ubI7CHmiRz/DMdOa1vqNiBzSHDWm36dG8dS+FdQKL+9AALS0cfv
+         33lBCN5cl/xLX6JfkAppd1q6ra/RfU+fYK01JdlM24f3ZGXv8LioM4CiZMil/khbNvL6
+         ybuanc7prt/53pNY79SXiPHfJeBWPcLmOBDOKs1PaQZfdreSlO7I5PXkhwl7TSlxycMK
+         SbHw==
+X-Gm-Message-State: AOJu0YwZ8gfU3skOldkjyCAOS2DSxQMouXOvHu0FKwaWmIhevPn3Mlb5
+	WvPM33uNgPWis7K5wGzLv/qGYZTZ/2EmT3ITSjXIacug2azd9W3uRm9eUwE7gNwVNJYXqgRpGoo
+	C
+X-Google-Smtp-Source: AGHT+IG+hvHAruIhWiGuSiyNtj/3NRAiKH6lsb0e4Opn0lGxFOHDF4qVbXLd78drtgSyAHpt2w6bqw==
+X-Received: by 2002:a17:90a:d507:b0:2d3:b8d6:d041 with SMTP id 98e67ed59e1d1-2dba0064f94mr27753465a91.32.1726762248310;
+        Thu, 19 Sep 2024 09:10:48 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dd6eec7b36sm2082602a91.30.2024.09.19.09.10.47
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Sep 2024 09:10:48 -0700 (PDT)
+Date: Thu, 19 Sep 2024 09:10:46 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: Dealing with bugzilla
+Message-ID: <20240919091046.64cb49b6@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Patch net] smc: use RCU version of lower netdev searching
-To: Paolo Abeni <pabeni@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
- syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com,
- Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
- Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>
-References: <20240912000446.1025844-1-xiyou.wangcong@gmail.com>
- <a054f2ef-c72f-4679-a123-003e0cf7839d@linux.alibaba.com>
- <ZuTehlEoyi4PPmQA@pop-os.localdomain>
- <e0842025-5e21-4755-8e60-1832e9cfe672@linux.alibaba.com>
- <ZuUDv8PLR4FHg+oC@pop-os.localdomain>
- <ad8da8d1-4ae4-41e2-a047-e4adc4c044f5@linux.alibaba.com>
- <027597ba-4dc8-4837-975a-be23babb710b@redhat.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <027597ba-4dc8-4837-975a-be23babb710b@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+Up until now, I have been the volunteer screener of networking related bugzilla bugs.
+I would like to get out of doing that.
 
+The alternatives are:
+   1. Change the bugzilla forwarding to netdev@vger.kernel.org (ie no screening)
+   2. Get a new volunteer to screen
+   3. Make a new mailing list target on vger (ie netdev-bugs@vger.kernel.org)
+   4. Find someone to make a bot to use get_maintainer somehow to forward
+   5. Blackhole the bugzilla reports.
+   6. Bounce all the bugzilla reports somehow.
 
-On 9/19/24 5:30 PM, Paolo Abeni wrote:
-> Hi,
-> On 9/18/24 04:23, D. Wythe wrote:
->> On 9/14/24 11:32 AM, Cong Wang wrote:
->>> On Sat, Sep 14, 2024 at 10:28:15AM +0800, D. Wythe wrote:
->>>>
->>>>
->>>> On 9/14/24 8:53 AM, Cong Wang wrote:
->>>>> On Thu, Sep 12, 2024 at 02:20:47PM +0800, D. Wythe wrote:
->>>>>>
->>>>>>
->>>>>> On 9/12/24 8:04 AM, Cong Wang wrote:
->>>>>>> From: Cong Wang <cong.wang@bytedance.com>
->>>>>>>
->>>>>>> Both netdev_walk_all_lower_dev() and netdev_lower_get_next() have a
->>>>>>> RCU version, which are netdev_walk_all_lower_dev_rcu() and
->>>>>>> netdev_next_lower_dev_rcu(). Switching to the RCU version would
->>>>>>> eliminate the need for RTL lock, thus could amend the deadlock
->>>>>>> complaints from syzbot. And it could also potentially speed up its
->>>>>>> callers like smc_connect().
->>>>>>>
->>>>>>> Reported-by: syzbot+c75d1de73d3b8b76272f@syzkaller.appspotmail.com
->>>>>>> Closes: https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f
->>>>>>> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
->>>>>>> Cc: Jan Karcher <jaka@linux.ibm.com>
->>>>>>> Cc: "D. Wythe" <alibuda@linux.alibaba.com>
->>>>>>> Cc: Tony Lu <tonylu@linux.alibaba.com>
->>>>>>> Cc: Wen Gu <guwen@linux.alibaba.com>
->>>>>>> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
->>>>>>
->>>>>>
->>>>>> Haven't looked at your code yet, but the issue you fixed doesn't exist.
->>>>>> The real reason is that we lacks some lockdep annotations for
->>>>>> IPPROTO_SMC.
->>>>>
->>>>> If you look at the code, it is not about sock lock annotations, it is
->>>>> about RTNL lock which of course has annotations.
->>>>>
->>>>
->>>> If so, please explain the deadlock issue mentioned in sysbot and
->>>> how it triggers deadlocks.
->>>
->>> Sure, but what questions do you have here? To me, the lockdep output is
->>> self-explained. Please kindly let me know if you have any troubles
->>> understanding it, I am always happy to help.
->>>
->>> Thanks.
->>
->> Just explain (https://syzkaller.appspot.com/bug?extid=c75d1de73d3b8b76272f)
->>
->> -> #1 (sk_lock-AF_INET6){+.+.}-{0:0}:
->>          lock_sock_nested+0x3a/0xf0 net/core/sock.c:3543
->>          lock_sock include/net/sock.h:1607 [inline]
->>          sockopt_lock_sock net/core/sock.c:1061 [inline]
->>          sockopt_lock_sock+0x54/0x70 net/core/sock.c:1052
->>          do_ipv6_setsockopt+0x216a/0x47b0 net/ipv6/ipv6_sockglue.c:567
->>          ipv6_setsockopt+0xe3/0x1a0 net/ipv6/ipv6_sockglue.c:993
->>          udpv6_setsockopt+0x7d/0xd0 net/ipv6/udp.c:1702
->>          do_sock_setsockopt+0x222/0x480 net/socket.c:2324
->>          __sys_setsockopt+0x1a4/0x270 net/socket.c:2347
->>          __do_sys_setsockopt net/socket.c:2356 [inline]
->>          __se_sys_setsockopt net/socket.c:2353 [inline]
->>          __x64_sys_setsockopt+0xbd/0x160 net/socket.c:2353
->>          do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->>          do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
->>          entry_SYSCALL_64_after_hwframe+0x77/0x7f
->>
->> Why is that udpv6_setsockopt was reported here.
-> 
-> If I read correctly, your doubt is somewhat alike the following: the SMC code does not call UDP 
-> sockopt-related function, so the above stacktrace refers to a non SMC socket and the reported splat 
-> is really harmless, as no deadlock will really happens (UDP sockets do not acquire nested rtnl lock, 
-> smc does not acquire nested socket lock).
-> 
-> Still the splat happens we need - or at least we should - address it, because this splat prevents 
-> syzkaller from finding other possibly more significant issues.
-> 
-> One way for addressing the splat would be adding the proper annotation to the socket lock. Another 
-> way is the present patch, which looks legit to me and should give performances benefit (every time 
-> we don't need to acquire the rtnl lock is a win!)
-> 
-> @Wythe: does the above clarify a bit?
-> 
-> Thanks!
-> 
-> Paolo
-
-
-Hi Paolo,
-
-Thanks for your explanation. I did not question the value of this patch,
-I just think that it did not fix a deadlock issue as it described. What it really does
-is to avoid a false position from syzbot, and also has brought potential performance
-benefits, which I totally agree with.
-
-
-Last week, we also discussed this issue with Eric. In fact, we already have a patch
-that addresses this problem by modifying the lockdep class of IPPROTO_SMC. However,
-I'm not entirely satisfied with this change because I prefer that IPPROTO_SMC socks remain 
-consistent with other AF_INET socks. So, it appears that this patch is the best solution now.
-
-Anyway, I support this patch now. But I believe the description needs to be more accurate.
-
-Thanks,
-D. Wythe
-
-
-
-
-
-
-
-
+Any suggestions welcome.
 
