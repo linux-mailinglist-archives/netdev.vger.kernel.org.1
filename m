@@ -1,207 +1,350 @@
-Return-Path: <netdev+bounces-128979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E836A97CB33
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 16:56:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1598897CB38
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 16:56:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D0FA1C22104
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:56:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 957791F23320
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 14:56:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E80C19F49F;
-	Thu, 19 Sep 2024 14:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E951A0712;
+	Thu, 19 Sep 2024 14:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ii4TYruJ"
+	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="TFbtrbYK"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2050.outbound.protection.outlook.com [40.107.237.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387A61EA85;
-	Thu, 19 Sep 2024 14:56:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726757772; cv=fail; b=jYmaHiaHmGXThpYxlTJQkiM64Oujaxf2IqvzkkLh13OaVrQVMQT54gpq/6cokEG4GNWNJnCdOa1MWrQmoD2nx+9Ga6BZikE65KOAP+S1PWGuo78xGw5XttZLv1TevGBGhABsrYr3b+6ByrcbjBxRUaNm4xzOsdiRuQDZ7/rcAis=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726757772; c=relaxed/simple;
-	bh=oHEPRtsClnGKIiIRMaYMsiJG54y5GOshYUJ2l9kvUg8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Vy0lFSDdd2ApwU579WiZ74P32vMdzS9WPfJijJUnPJGQOMqB1a4ba/QCsg8mt6f+fytG/XppXWuMkchEh6vAod4Hv2CDRLvrceIYBsRq5NxSPvt0KKlWD2oAJxtddufZrNP6bjSZ4C/H5XsS6ktPy0DIAG3RPqtW622u75voGTg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Ii4TYruJ; arc=fail smtp.client-ip=40.107.237.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mTNqQA6i9IEAtesksV7PAQPHeXiw2FGiYi+7ltESGs5xQyJlYse+lnSjKRmShJGwyzqllktBEZ+0j/7ZwWzpTIoGaINr3YdITEXwzAFQoADhmunASUwnb9MneZsHBdqhjra2KkcxncpNvYXOVXSlSIqykIYkx+oHhvxjkhgBtzMccFAH+0G+BtP3j5mT7X0y0r8KJBl/QNOH9HgxH7VpGYeyXoXVwv6hy2/FH8vefUBomODW09AAxCcaU0qSPsyTvY3B1kPZRDTexMtrIsi3dYdfxiSvlBdux7nzJMNY02cdN7Ob0WXDx8IPX+8y2JMT02hzgKhBCjtIQywbSkzdNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/l4+wXQgwzqGKTNSqs9zWZIFka18Fe5xHWD7AK04KPk=;
- b=XyjizJzHWVHFf0ByF/jq130ScS1J/yukIVRykZ6tkoFuNBqZl21w+r9uWUlN1PwiemkGh5NlPIuDr3Thv4A8sU1Gwm+Ag+jrRll1PkNJEkkVwfpV6iY5kDHEm8VdSgQFzOmiQ8hfhNKV+IZ2YDFk71kK+mseNS4kFEaBE5HEaSoWW84qjT2PbF/JCDbPoA02v/MTg4zQ7ASbbmbQcwW75svzOES9yYmH249Dcyr3qo3MEWtLSTf3T8DAbxZ2PAkMNHGVNBng11xlkVpt49H+dOAz8fmkR0q+Gc/gAt648exj1YUzxZdU0L6oFAeBOzpY/ojNpNf2w4jzrppa8j8TIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/l4+wXQgwzqGKTNSqs9zWZIFka18Fe5xHWD7AK04KPk=;
- b=Ii4TYruJAFm3JeZNmlkxSsPQ1lPiL1P9cQGUAp1iXbKziQ/nU24AlDAuwEu8cR7CtivmytnOYbHtmQknljqIpNNDB5is2G47ILZni5f7dtKiWW0VqOEgtpiOCHe/DFbul9z7RaVx4xQl1kSq8FG9uOPCrfXcPs1haK78S/U72ijTEImG6jcVHzB54F3CVAWQpL748gi7kt1O99SjxHYi1A8hmioHRJBMB5It3RKZKLeWJFHbAjByCGDQ0Joj08KZ3+XSKkb2Ocx16UMjLZz2ho4CSoAKAnRbzemfEyw6HxF+K71B+W9KwieKsU2WpoI09Eh0PUUd0+mCPgidW7LBng==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
- by BL3PR12MB6474.namprd12.prod.outlook.com (2603:10b6:208:3ba::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7962.25; Thu, 19 Sep
- 2024 14:56:04 +0000
-Received: from SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
- ([fe80::66fc:f8a2:1bfb:6de8%6]) with mapi id 15.20.7982.018; Thu, 19 Sep 2024
- 14:56:04 +0000
-Date: Thu, 19 Sep 2024 17:55:51 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] selftests: forwarding: Avoid false MDB
- delete/flush failures
-Message-ID: <Zuw7d9eRGo4wdVP3@shredder.mtl.com>
-References: <c92569919307749f879b9482b0f3e125b7d9d2e3.1726480066.git.jamie.bainbridge@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c92569919307749f879b9482b0f3e125b7d9d2e3.1726480066.git.jamie.bainbridge@gmail.com>
-X-ClientProxiedBy: FR3P281CA0017.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:1d::20) To SA3PR12MB7901.namprd12.prod.outlook.com
- (2603:10b6:806:306::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBB31A00D0
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 14:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726757775; cv=none; b=Oqdua+G354FHLehIxv7OlVUNWY+jkp9NI4exYVJfOAZ9TAheWyktWPmHGNnMPWFRBV9S76t6DiOXOdAmTdG3aj0PZ/NmwsC82yGhkYbPLgbYMqz6aJkKQnh0/HpaMdRAZcKWwcw1LYq8mtLXmQxQwcm26VGrH9E5ZgdQ8oS5kiQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726757775; c=relaxed/simple;
+	bh=qiQggod+BH+PiOZ9MBdxFiV5USki6+kf5kxRWPinAiI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=qsQCk3pCEO2cPzCCtdBpDBnIpCoKb1E7AQCLFwCQ1VeIz/vJ7HFqE3q7Fw8OguFBr6tPP2xxvpQE7kTjY72EksfDvjn/7ooa/aUW4gFRe4yqi4IFrF7tutka6TgFsVMuSH/jabCCNygfQOVjWkD34x3QTSctoJWeyMuBznVjkOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=TFbtrbYK; arc=none smtp.client-ip=148.163.129.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
+	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id B920F280081;
+	Thu, 19 Sep 2024 14:56:03 +0000 (UTC)
+Received: from [192.168.1.23] (unknown [98.97.44.217])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail3.candelatech.com (Postfix) with ESMTPSA id 260E113C2B0;
+	Thu, 19 Sep 2024 07:56:02 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 260E113C2B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
+	s=default; t=1726757762;
+	bh=qiQggod+BH+PiOZ9MBdxFiV5USki6+kf5kxRWPinAiI=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=TFbtrbYKGWg30pgPVo15/x1yD0c12il2IrBEJZC886EJQPyCqmSJKj1SiII4Qv61V
+	 /ZM0LEk0SvoRzAQQsJGP92cXwb7V6IKZzSb8KzT5+F8aLj8p7E3DCToHNlQmPah5Su
+	 rKH8kSO1BkGMA9i5eAc+NNShytvm+xkXxQ7ov/R0=
+Message-ID: <0bbcd0f2-42e1-4fdc-a9bd-49dd3506c7f4@candelatech.com>
+Date: Thu, 19 Sep 2024 07:56:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|BL3PR12MB6474:EE_
-X-MS-Office365-Filtering-Correlation-Id: 57f3b510-b959-4ea1-9da7-08dcd8bb2f3f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?REAaWeDkD9UIWRhctx2Z52V0nDZtPBNBETVK1od0goGVTmXb/Rg04ZzIdAWC?=
- =?us-ascii?Q?8hE5BOMXfJx2ZKs1iK6X6cvTbH7G4kfGL/ozTVkz4ggh/pSeST2l/BlkkRoN?=
- =?us-ascii?Q?TWmBxZQxxOpLop03qN7Vh5C12WqmLR9QM/uDNZrmlTGt4E+QHfMGsbLmx5FO?=
- =?us-ascii?Q?Lch01OoXzD/qxQcvoT8DNH+vUFuz5Imbu5Rq+cLCSACyudDLXopn6i/O9ee3?=
- =?us-ascii?Q?Vd59O0Wyx13gQK/nzZa7mjq04YNhlNO9BytDpVTTL3lzEEnnvgznd/Nvx1C6?=
- =?us-ascii?Q?qyXKkUXD9tQaFAWS3LVrTl9OYeXvNTXN2ubFhRb+5o0eBuLtaVbl3uQ+WrD8?=
- =?us-ascii?Q?Gb/8e+6Iw87v8AuovIXoV0FymIh/OzcAxkshqhVxgC+7skdQLLzz8ZGOuUnU?=
- =?us-ascii?Q?gKhNSssAKMi9wdFFZ/kj/9LqDgRy96ykJiXeeuDjM020AsUoVYklbmHHnWnK?=
- =?us-ascii?Q?nDZ3tzMFmoxkkwjjqQD7RUhhXSlIaB7/LqrU8mk66w0r8hAp1RG8gGi03+XJ?=
- =?us-ascii?Q?Wy4IwbkOEukSEgs7XZ2rCVlkOMT5hbDwyqIyMIL7qBkXnD6XyqsD0z/K6aFq?=
- =?us-ascii?Q?wrSkujvbnd5P4z4nXPE68ZKI7IoG44AMYE3Qsnrbb1uyzHkO3TCEk9ghymUS?=
- =?us-ascii?Q?66yHM2nz3hvoy66qhBdzZ7vlKvXWnO/H1PGwD66dgBQBilmgwM8WqkKCkJDz?=
- =?us-ascii?Q?lJJgKItFoDTv6XvpBLSkF+hJ3O/KSKxRRbD+2Q6kM4ZSCuSX+gvYfO8g0nuq?=
- =?us-ascii?Q?ZJMTy78RnFTgjjFRYegjcZpPj7geR3h4DRzOYMilralIvWGNPSs2glitaS44?=
- =?us-ascii?Q?C6mS9xZUdlsgaN8eRYqkpbRam3ycBKRUpncpyoMoVV6M3n/B157uVC0UvGpG?=
- =?us-ascii?Q?pHnwrr8YgWHTCnJoPTrpJ//J0tN2rKS/G9Ro/FvMcnwWNTXdyi9Z5350Pktn?=
- =?us-ascii?Q?sg0QBZq8UyipKUxdJOSb/ckkIYsp/wNFUZu4Vc5UBKb7USf6QyjtfIAyTurD?=
- =?us-ascii?Q?451b34LtNRU0lbTFbiReMLBW5xyOOHdQLwIoUTxd/7WMawZi5RO9XeW1tfNK?=
- =?us-ascii?Q?b0PfkWyuExnKub70ZXuZp7dp52Y7U20zJ9aRdw/TQGD8AB9V6USJOjwopn/O?=
- =?us-ascii?Q?AEj6k1ewgXE99vbPF+A1aMVqnVa5bYtcPZJANnmXGpQgFM+NZsRr8eV6d4Op?=
- =?us-ascii?Q?33pWYyS6KfESYdRQvEe2mEOQAoWLdoHjKbCBl+b3LWtpP+sC6zrrpboP1bVi?=
- =?us-ascii?Q?2t3OVJScErgw6M/gAXokQSBkcer/qFBI1XJWLEXzZ/tSKiBxbxccUXl5vQUN?=
- =?us-ascii?Q?eJPjDUE2rKG4rTB1qeqzPqD3tHUYCfyMNcjmQ+mIIlUIcg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?/hwkMXGHzmOpB07yaJPlSez/H+0OkrEhDi0D7AgnFBxUsDl52RIvr0YJiC+p?=
- =?us-ascii?Q?ag6ri7i04R6+3a0YpXCCtg53RAO1ozC9Tz9Ebaj4FQzPHoADgI9s86ubFjX8?=
- =?us-ascii?Q?3l+2PY+IRywWYeNvDzVLBtfUJSFnMIfssqDJk74FIyuA1EcXwSJMEcfE2Q/R?=
- =?us-ascii?Q?wDXaLEp8sMdux8SmOQlHlcLHVjcDt3TRHpUZFi96xFbLTePWGE3UiFKs+Sdh?=
- =?us-ascii?Q?i3W+Q7wLmqYf+QUxNaZAt19z2w6ovlpFfe2WzvPvGDyLzB0wNEOSegePCgXK?=
- =?us-ascii?Q?xX49de+y0Pc4v/WSgOPuBNkGoTtcK3obqBGNGe9+iuNCsJRU4D3VEMeiiAJ2?=
- =?us-ascii?Q?Fv05GRxaMvlsummF2GEdgWzypamJdGYyx6CuhVGFk2hVyYSkSFQvPdKZmTNV?=
- =?us-ascii?Q?N9/eYSmSZ6n9aUgALx5o8XpKcl18L+lsdM8CA6462PuBPUMJ+OVPPxIfM5CT?=
- =?us-ascii?Q?IHbQQvH+M7Pj8p8wntE/Fu1pzShqbW7ZItplsSgk+fMJElrVQGlkgI5H39LV?=
- =?us-ascii?Q?J9tBArI+beP4BOmuhyO2ouOf1l7ChDa3Tipo1twVBcGHtSlE55Zag59iAteO?=
- =?us-ascii?Q?1k2HxgtSev0LgeWW1ztf3DqTdT4tQxcXAjh/lF5ukul6qIltyRn818iT2xvS?=
- =?us-ascii?Q?MeUHMJ3GtXks6U2cXwyRZZvjIEwZpo3gJveEoFUxdov0D6N2KlzskqWgiqyY?=
- =?us-ascii?Q?4UAgwTXmMPGTMu3EQiNLYivC3kAcIBO6XdireGH2sgJr2c1PxQyZof57z4Lz?=
- =?us-ascii?Q?yRqpJi41OUDY8MbY5ylXC+UrQrbazJ28+YyBWo8Mtq/pCCQC8dmmpDuDl6OD?=
- =?us-ascii?Q?kITR3Fj8lMAXKHfCXhzCd7gN4eO5gVO1pk6KQnvAZHcm/gpKW23te1YOHNKT?=
- =?us-ascii?Q?bBOQt+CYQBPnNDY1WbwUS1BKIoZwaw/iZ6ks7vJmv1UtJAGRefozQaQdTHIA?=
- =?us-ascii?Q?aLlVwnq758rsP3t5EksWd3Zz7dE9TtqH/cc/uMVmJ+44ylgk+to+i78l+aOE?=
- =?us-ascii?Q?vHB7MSyhpBbqsl5UAAUjur2/iFIx0ZV6pIKY3giirvcmEG00C+l+1f3cqExn?=
- =?us-ascii?Q?5Ey6se8m/PAQLOKlZm8xGszOKNkesIUarJQjB7gBS4PoWEXlwWX6HL8xvE25?=
- =?us-ascii?Q?TV3HI1Chpq/83nK6J3fYV2MrcK7ZeGwa7y1+9HO+klx6o93ZfvmnzLJEB/SR?=
- =?us-ascii?Q?ArbpghXX7DpA7Y8iyNejReANZuZ1yGFX2wVs91Gqcjk4gNfpHDZkbai39E2r?=
- =?us-ascii?Q?ZTLvBTjSTo707qUBYJYw09pXaC3wqkA8CvgI9xQkSI4IMbPNYoJeZDUUpXH4?=
- =?us-ascii?Q?XFQK5ugqyv8sVLmE8/jqPTVzfLDRibabFlNM5ELM3SlEnyURB5nNuVQArqz7?=
- =?us-ascii?Q?c68VWJo07ZLnCyASaK/nzMFMd0vYwnfV/wEEWSKwnMNaiGvfziQq+xrufaoZ?=
- =?us-ascii?Q?pI1vBu23+5Q0tnxfj8hqaHBNg/Vw4mpsBqO4VjKH6DUvOh36pUNwGLf//uHE?=
- =?us-ascii?Q?0/Teae7Zv4WKTlMaOTOikNW8d5bOjIZ7AH+ddP3z0H1j4dJi89P0JPSmF6Hk?=
- =?us-ascii?Q?++15hgaZ4iGrK462u4nsF7c7mzhv2C10U8RaRPL4?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 57f3b510-b959-4ea1-9da7-08dcd8bb2f3f
-X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Sep 2024 14:56:04.4366
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mZOsuwMLuSlA/9G6Mw6losD+4mlRHzJkSjwQWX8KAsa0ZYpcn2YwvWxqWIgkClGpdm3MnJxrNhcGFq2sBz6mVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6474
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] af_packet: Fix softirq mismatch in tpacket_rcv
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+References: <20240918205719.64214-1-greearb@candelatech.com>
+ <66ec149daf042_2deb5229470@willemb.c.googlers.com.notmuch>
+Content-Language: en-MW
+From: Ben Greear <greearb@candelatech.com>
+Organization: Candela Technologies
+In-Reply-To: <66ec149daf042_2deb5229470@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-MDID: 1726757764-TpaOh2TssKxJ
+X-MDID-O:
+ us5;ut7;1726757764;TpaOh2TssKxJ;<greearb@candelatech.com>;2f43c458b1d402e5e75c1bcf06c3ca94
 
-Hi,
-
-Thanks for the patch and sorry for the late reply (was OOO).
-
-On Mon, Sep 16, 2024 at 07:49:05PM +1000, Jamie Bainbridge wrote:
-> Running this test on a small system produces different failures every
-> test checking deletions, and some flushes. From different test runs:
+On 9/19/24 05:10, Willem de Bruijn wrote:
+> greearb@ wrote:
+>> From: Ben Greear <greearb@candelatech.com>
+>>
+>> tpacket_rcv can be called from softirq context on input
+>> path from NIC to stack.  And also called on transmit path
+>> when sniffing is enabled.  So, use _bh locks to allow this
+>> to function properly.
 > 
-> TEST: Common host entries configuration tests (L2)                [FAIL]
->   Failed to delete L2 host entry
+> It cannot be as straightforward as that, or we would have seen this
+> much earlier.
 > 
-> TEST: Common port group entries configuration tests (IPv4 (S, G)) [FAIL]
->   IPv4 (S, G) entry with VLAN 10 not deleted when VLAN was not specified
+> On transmit, packet sockets are intercepted by dev_queue_xmit_nit.
+> Which is called from __dev_queue_xmit with bottom halfs already
+> disabled:
 > 
-> TEST: Common port group entries configuration tests (IPv6 (*, G)) [FAIL]
->   IPv6 (*, G) entry with VLAN 10 not deleted when VLAN was not specified
-> 
-> TEST: Flush tests                                                 [FAIL]
->   Entry not flushed by specified VLAN ID
-> 
-> TEST: Flush tests                                                 [FAIL]
->   IPv6 host entry not flushed by "nopermanent" state
-> 
-> Add a short sleep after deletion and flush to resolve this.
+>          /* Disable soft irqs for various locks below. Also
+>           * stops preemption for RCU.
+>           */
+>          rcu_read_lock_bh();
 
-The port group entry is removed from MDB entry's list synchronously, but
-the MDB entry itself is removed from the hash table asynchronously and
-the MDB get query will only return an error if an entry was not found
-there.
+dev_queue_xmit_nit is also called directly from vrf xmit logic,
+maybe that is the issue?  You can see it in the call flow
+that lockdep shows in the second backtrace below.
 
-IOW, I think that when you do get a response after deletion, the entry
-you get is empty.
+> 
+> Also, if this proves a real issue on the socket lock, then it would
+> apply to packet_rcv and tpacket_rcv equally.
+> 
+> Will need to read up a bit more closely on IN-SOFTIRQ-W vs
+> SOFTIRQ-ON-W unless someone beats me to it.
+> 
+> But likely this is either a false positive, or something specific to
+> that tpacket_v3 blk_fill_in_prog_lock. Which does get called also
+> from a timer.
 
-Can you please test the following patch [1] (w/o yours, obviously)?
+We see OS lockup, as well as lockdep splats.  Possibly the root
+cause exists elsewhere, we are still testing...
 
-[1]
-diff --git a/net/bridge/br_mdb.c b/net/bridge/br_mdb.c
-index bc37e47ad829..1a52a0bca086 100644
---- a/net/bridge/br_mdb.c
-+++ b/net/bridge/br_mdb.c
-@@ -1674,7 +1674,7 @@ int br_mdb_get(struct net_device *dev, struct nlattr *tb[], u32 portid, u32 seq,
-        spin_lock_bh(&br->multicast_lock);
- 
-        mp = br_mdb_ip_get(br, &group);
--       if (!mp) {
-+       if (!mp || (!mp->ports && !mp->host_joined)) {
-                NL_SET_ERR_MSG_MOD(extack, "MDB entry not found");
-                err = -ENOENT;
-                goto unlock;
+To reproduce the problem, run traffic across a network device in
+a VRF, then open sniffer on the vrf interface.
+
+Thanks,
+Ben
+
+> 
+> 
+>> Thanks to Johannes Berg for providing some explanation of the cryptic
+>> lockdep output.
+>>
+>> ================================
+>> WARNING: inconsistent lock state
+>> 6.11.0 #1 Tainted: G        W
+>> --------------------------------
+>> inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+>> btserver/134819 [HC0[0]:SC0[0]:HE1:SE1] takes:
+>> ffff8882da30c118 (rlock-AF_PACKET){+.?.}-{2:2}, at: tpacket_rcv+0x863/0x3b30
+>> {IN-SOFTIRQ-W} state was registered at:
+>>    lock_acquire+0x19a/0x4f0
+>>    _raw_spin_lock+0x27/0x40
+>>    packet_rcv+0xa33/0x1320
+>>    __netif_receive_skb_core.constprop.0+0xcb0/0x3a90
+>>    __netif_receive_skb_list_core+0x2c9/0x890
+>>    netif_receive_skb_list_internal+0x610/0xcc0
+>>    napi_complete_done+0x1c0/0x7c0
+>>    igb_poll+0x1dbb/0x57e0 [igb]
+>>    __napi_poll.constprop.0+0x99/0x430
+>>    net_rx_action+0x8e7/0xe10
+>>    handle_softirqs+0x1b7/0x800
+>>    __irq_exit_rcu+0x91/0xc0
+>>    irq_exit_rcu+0x5/0x10
+>>    common_interrupt+0x7f/0xa0
+>>    asm_common_interrupt+0x22/0x40
+>>    cpuidle_enter_state+0x289/0x320
+>>    cpuidle_enter+0x45/0xa0
+>>    do_idle+0x2fe/0x3e0
+>>    cpu_startup_entry+0x4b/0x60
+>>    start_secondary+0x201/0x280
+>>    common_startup_64+0x13e/0x148
+>> irq event stamp: 467094363
+>> hardirqs last  enabled at (467094363): [<ffffffff83dc794b>] _raw_spin_unlock_irqrestore+0x2b/0x50
+>> hardirqs last disabled at (467094362): [<ffffffff83dc7753>] _raw_spin_lock_irqsave+0x53/0x60
+>> softirqs last  enabled at (467094360): [<ffffffff83481213>] skb_attempt_defer_free+0x303/0x4e0
+>> softirqs last disabled at (467094358): [<ffffffff83481188>] skb_attempt_defer_free+0x278/0x4e0
+>>
+>> other info that might help us debug this:
+>>   Possible unsafe locking scenario:
+>>
+>>         CPU0
+>>         ----
+>>    lock(rlock-AF_PACKET);
+>>    <Interrupt>
+>>      lock(rlock-AF_PACKET);
+>>
+>>   *** DEADLOCK ***
+>>
+>> 3 locks held by btserver/134819:
+>>   #0: ffff888136a3bf98 (sk_lock-AF_INET){+.+.}-{0:0}, at: tcp_recvmsg+0xc7/0x4e0
+>>   #1: ffffffff84e4bc20 (rcu_read_lock){....}-{1:2}, at: __ip_queue_xmit+0x59/0x1e20
+>>   #2: ffffffff84e4bc20 (rcu_read_lock){....}-{1:2}, at: dev_queue_xmit_nit+0x2a/0xa40
+>>
+>> stack backtrace:
+>> CPU: 2 UID: 0 PID: 134819 Comm: btserver Tainted: G        W          6.11.0 #1
+>> Tainted: [W]=WARN
+>> Hardware name: Default string Default string/SKYBAY, BIOS 5.12 08/04/2020
+>> Call Trace:
+>>   <TASK>
+>>   dump_stack_lvl+0x73/0xa0
+>>   mark_lock+0x102e/0x16b0
+>>   ? print_usage_bug.part.0+0x600/0x600
+>>   ? print_usage_bug.part.0+0x600/0x600
+>>   ? print_usage_bug.part.0+0x600/0x600
+>>   ? lock_acquire+0x19a/0x4f0
+>>   ? find_held_lock+0x2d/0x110
+>>   __lock_acquire+0x9ae/0x6170
+>>   ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
+>>   ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
+>>   lock_acquire+0x19a/0x4f0
+>>   ? tpacket_rcv+0x863/0x3b30
+>>   ? run_filter+0x131/0x300
+>>   ? lock_sync+0x170/0x170
+>>   ? do_syscall_64+0x69/0x160
+>>   ? entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>>   ? lock_is_held_type+0xa5/0x110
+>>   _raw_spin_lock+0x27/0x40
+>>   ? tpacket_rcv+0x863/0x3b30
+>>   tpacket_rcv+0x863/0x3b30
+>>   ? packet_recvmsg+0x1340/0x1340
+>>   ? __asan_memcpy+0x38/0x60
+>>   ? __skb_clone+0x547/0x730
+>>   ? packet_recvmsg+0x1340/0x1340
+>>   dev_queue_xmit_nit+0x709/0xa40
+>>   ? lockdep_hardirqs_on_prepare+0x3e0/0x3e0
+>>   vrf_finish_direct+0x26e/0x340 [vrf]
+>>   ? vrf_ip_local_out+0x570/0x570 [vrf]
+>>   vrf_l3_out+0x5f4/0xe80 [vrf]
+>>   __ip_local_out+0x51e/0x7a0
+>>   ? __ip_append_data+0x3d00/0x3d00
+>>   ? __lock_acquire+0x1b57/0x6170
+>>   ? ipv4_dst_check+0xd6/0x150
+>>   ? lock_is_held_type+0xa5/0x110
+>>   __ip_queue_xmit+0x7ff/0x1e20
+>>   __tcp_transmit_skb+0x1699/0x3850
+>>   ? __tcp_select_window+0xfb0/0xfb0
+>>   ? __build_skb_around+0x22f/0x330
+>>   ? __alloc_skb+0x13d/0x2c0
+>>   ? __napi_build_skb+0x40/0x40
+>>   ? __tcp_send_ack.part.0+0x5f/0x690
+>>   ? skb_attempt_defer_free+0x303/0x4e0
+>>   tcp_recvmsg_locked+0xdd1/0x23e0
+>>   ? tcp_recvmsg+0xc7/0x4e0
+>>   ? tcp_update_recv_tstamps+0x1c0/0x1c0
+>>   tcp_recvmsg+0xe5/0x4e0
+>>   ? tcp_recv_timestamp+0x6c0/0x6c0
+>>   inet_recvmsg+0xf0/0x4b0
+>>   ? inet_splice_eof+0xa0/0xa0
+>>   ? inet_splice_eof+0xa0/0xa0
+>>   sock_recvmsg+0xc8/0x150
+>>   ? poll_schedule_timeout.constprop.0+0xe0/0xe0
+>>   sock_read_iter+0x258/0x380
+>>   ? poll_schedule_timeout.constprop.0+0xe0/0xe0
+>>   ? sock_recvmsg+0x150/0x150
+>>   ? rw_verify_area+0x64/0x590
+>>   vfs_read+0x8d5/0xc20
+>>   ? poll_schedule_timeout.constprop.0+0xe0/0xe0
+>>   ? kernel_read+0x50/0x50
+>>   ? __asan_memset+0x1f/0x40
+>>   ? ktime_get_ts64+0x85/0x210
+>>   ? __fget_light+0x4d/0x1d0
+>>   ksys_read+0x166/0x1c0
+>>   ? __ia32_sys_pwrite64+0x1d0/0x1d0
+>>   ? __ia32_sys_poll+0x3e0/0x3e0
+>>   do_syscall_64+0x69/0x160
+>>   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+>> RIP: 0033:0x7f6909b01b92
+>>
+>> Signed-off-by: Ben Greear <greearb@candelatech.com>
+>> ---
+>>   net/packet/af_packet.c | 22 +++++++++++-----------
+>>   1 file changed, 11 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+>> index 4692a9ef110b..17f9e2efdf25 100644
+>> --- a/net/packet/af_packet.c
+>> +++ b/net/packet/af_packet.c
+>> @@ -760,8 +760,8 @@ static void prb_retire_rx_blk_timer_expired(struct timer_list *t)
+>>   	 */
+>>   	if (BLOCK_NUM_PKTS(pbd)) {
+>>   		/* Waiting for skb_copy_bits to finish... */
+>> -		write_lock(&pkc->blk_fill_in_prog_lock);
+>> -		write_unlock(&pkc->blk_fill_in_prog_lock);
+>> +		write_lock_bh(&pkc->blk_fill_in_prog_lock);
+>> +		write_unlock_bh(&pkc->blk_fill_in_prog_lock);
+>>   	}
+>>   
+>>   	if (pkc->last_kactive_blk_num == pkc->kactive_blk_num) {
+>> @@ -1021,8 +1021,8 @@ static void prb_retire_current_block(struct tpacket_kbdq_core *pkc,
+>>   		 */
+>>   		if (!(status & TP_STATUS_BLK_TMO)) {
+>>   			/* Waiting for skb_copy_bits to finish... */
+>> -			write_lock(&pkc->blk_fill_in_prog_lock);
+>> -			write_unlock(&pkc->blk_fill_in_prog_lock);
+>> +			write_lock_bh(&pkc->blk_fill_in_prog_lock);
+>> +			write_unlock_bh(&pkc->blk_fill_in_prog_lock);
+>>   		}
+>>   		prb_close_block(pkc, pbd, po, status);
+>>   		return;
+>> @@ -1044,7 +1044,7 @@ static void prb_clear_blk_fill_status(struct packet_ring_buffer *rb)
+>>   {
+>>   	struct tpacket_kbdq_core *pkc  = GET_PBDQC_FROM_RB(rb);
+>>   
+>> -	read_unlock(&pkc->blk_fill_in_prog_lock);
+>> +	read_unlock_bh(&pkc->blk_fill_in_prog_lock);
+>>   }
+>>   
+>>   static void prb_fill_rxhash(struct tpacket_kbdq_core *pkc,
+>> @@ -1105,7 +1105,7 @@ static void prb_fill_curr_block(char *curr,
+>>   	pkc->nxt_offset += TOTAL_PKT_LEN_INCL_ALIGN(len);
+>>   	BLOCK_LEN(pbd) += TOTAL_PKT_LEN_INCL_ALIGN(len);
+>>   	BLOCK_NUM_PKTS(pbd) += 1;
+>> -	read_lock(&pkc->blk_fill_in_prog_lock);
+>> +	read_lock_bh(&pkc->blk_fill_in_prog_lock);
+>>   	prb_run_all_ft_ops(pkc, ppd);
+>>   }
+>>   
+>> @@ -2413,7 +2413,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>>   			vnet_hdr_sz = 0;
+>>   		}
+>>   	}
+>> -	spin_lock(&sk->sk_receive_queue.lock);
+>> +	spin_lock_bh(&sk->sk_receive_queue.lock);
+>>   	h.raw = packet_current_rx_frame(po, skb,
+>>   					TP_STATUS_KERNEL, (macoff+snaplen));
+>>   	if (!h.raw)
+>> @@ -2453,7 +2453,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>>   		skb_clear_delivery_time(copy_skb);
+>>   		__skb_queue_tail(&sk->sk_receive_queue, copy_skb);
+>>   	}
+>> -	spin_unlock(&sk->sk_receive_queue.lock);
+>> +	spin_unlock_bh(&sk->sk_receive_queue.lock);
+>>   
+>>   	skb_copy_bits(skb, 0, h.raw + macoff, snaplen);
+>>   
+>> @@ -2546,10 +2546,10 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>>   #endif
+>>   
+>>   	if (po->tp_version <= TPACKET_V2) {
+>> -		spin_lock(&sk->sk_receive_queue.lock);
+>> +		spin_lock_bh(&sk->sk_receive_queue.lock);
+>>   		__packet_set_status(po, h.raw, status);
+>>   		__clear_bit(slot_id, po->rx_ring.rx_owner_map);
+>> -		spin_unlock(&sk->sk_receive_queue.lock);
+>> +		spin_unlock_bh(&sk->sk_receive_queue.lock);
+>>   		sk->sk_data_ready(sk);
+>>   	} else if (po->tp_version == TPACKET_V3) {
+>>   		prb_clear_blk_fill_status(&po->rx_ring);
+>> @@ -2565,7 +2565,7 @@ static int tpacket_rcv(struct sk_buff *skb, struct net_device *dev,
+>>   	return 0;
+>>   
+>>   drop_n_account:
+>> -	spin_unlock(&sk->sk_receive_queue.lock);
+>> +	spin_unlock_bh(&sk->sk_receive_queue.lock);
+>>   	atomic_inc(&po->tp_drops);
+>>   	drop_reason = SKB_DROP_REASON_PACKET_SOCK_ERROR;
+>>   
+>> -- 
+>> 2.42.0
+>>
+> 
+> 
+> 
+
+-- 
+Ben Greear <greearb@candelatech.com>
+Candela Technologies Inc  http://www.candelatech.com
+
 
