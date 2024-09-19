@@ -1,124 +1,194 @@
-Return-Path: <netdev+bounces-128902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 530D697C615
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:42:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8D9197C62C
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 10:48:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EF27281E8C
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 08:42:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB7011C20D77
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 08:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CC881991D0;
-	Thu, 19 Sep 2024 08:42:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EE5F199395;
+	Thu, 19 Sep 2024 08:47:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E79E1990C1
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 08:42:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D99199243
+	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 08:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726735367; cv=none; b=oXRwLgnnH70vnbkHvnzfLqvSVsNM8JPW5vzMry6b22oCIXcZ+w3XqRiZw8griw7t/eLvM/z2azJCG4w/88/niCdCbWhNa+AFrVKZ98nGmv1U2WkdD7LjevimkBts2GN82n+/4Tn6N3Wj8pNyBgDxBGQvHfH6OF8p5xbhdtjPrBk=
+	t=1726735668; cv=none; b=PMZjw2pMjYhbQyOCqmGVTfwtYnOhgfwTjoNbogo0jLPYjjlKm5WoEkg4hg0653lYFs8L9z+pVOQ55wOE4lBOk7pddB9d5gPqu+FaoC0qTySNH4+/NhwoqMqOCFDrrbvLJthSinsvyCDAKsJgdqSDyJZEvT0K7Uf/MJKKqlc4ZJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726735367; c=relaxed/simple;
-	bh=YvVRopY5m2rLxyTiLQzQUKKHIUlbSWq4wZLpxmiPzR0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=oJH47gijf5nkGneUOkEmcECnBpO8XcPyah2IeXrm/Aazo9Iay9112K34xBj6VDX1IETDsd/JuvTX2/Hpjb3raS5kquWmNpRL4V+1L88jHB66EHbq/bxmWj5FXj10QzNrI7ZW9KkdzMuB0FjJG6IV+3HfsTHSqwcB8yfplitFL7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4X8TXS721Wz2QTwS;
-	Thu, 19 Sep 2024 16:42:00 +0800 (CST)
-Received: from kwepemm600020.china.huawei.com (unknown [7.193.23.147])
-	by mail.maildlp.com (Postfix) with ESMTPS id 501001402DE;
-	Thu, 19 Sep 2024 16:42:40 +0800 (CST)
-Received: from kwepemm000018.china.huawei.com (7.193.23.4) by
- kwepemm600020.china.huawei.com (7.193.23.147) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 19 Sep 2024 16:42:39 +0800
-Received: from kwepemm000018.china.huawei.com ([7.193.23.4]) by
- kwepemm000018.china.huawei.com ([7.193.23.4]) with mapi id 15.01.2507.039;
- Thu, 19 Sep 2024 16:42:39 +0800
-From: chengyechun <chengyechun1@huawei.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: Jay Vosburgh <j.vosburgh@gmail.com>, =?gb2312?B?o6xBbmR5IEdvc3BvZGFyZWs=?=
-	<andy@greyhouse.net>
-Subject: =?gb2312?B?tPC4tDogW0Rpc2N1c3NdUXVlc3Rpb25zIGFib3V0IGFjdGl2ZSBzbGF2ZSBz?=
- =?gb2312?Q?elect_in_bonding_8023ad?=
-Thread-Topic: [Discuss]Questions about active slave select in bonding 8023ad
-Thread-Index: AdsKZKjErjnqndRMTZCIcmgDUhEG9gACy1PA
-Date: Thu, 19 Sep 2024 08:42:39 +0000
-Message-ID: <b2785db6fbe9421ca6510ca92ddfa650@huawei.com>
-References: <c464627d07434469b363134ad10e3b4c@huawei.com>
-In-Reply-To: <c464627d07434469b363134ad10e3b4c@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1726735668; c=relaxed/simple;
+	bh=TnRMX5yJakpY8P+dQ6zqeHJ/lVmJygHLklt+pllkci0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lJch65ohwgRPI/aoKOu6K8r0aZBl7/vSRYgEV3LDggWVe/f4SfsOVV67eeyKeCxnfv7BO1E1LfBRxFKR8ZNtstnf6Iz7K2II10IS/6iIrNELOPMODoyutG7cIPpjiNwkSwRiJc7FeW3nA57c8mKea/d0VEfemEWS52oStcJEQK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1srCoh-0006Y7-9E; Thu, 19 Sep 2024 10:47:11 +0200
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1srCod-0090ny-RA; Thu, 19 Sep 2024 10:47:07 +0200
+Received: from pengutronix.de (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 38DD733F566;
+	Thu, 19 Sep 2024 08:47:07 +0000 (UTC)
+Date: Thu, 19 Sep 2024 10:47:06 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>, 
+	Markus Schneider-Pargmann <msp@baylibre.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, 
+	Raymond Tan <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux@ew.tq-group.com
+Subject: Re: [PATCH 2/2] can: m_can: fix missed interrupts with m_can_pci
+Message-ID: <20240919-tourmaline-jaguar-of-reverence-4875d2-mkl@pengutronix.de>
+References: <ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726669005.git.matthias.schiffer@ew.tq-group.com>
+ <f6155510fbea33b0e18030a147b87c04395f7394.1726669005.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="znxmzativoaydeg7"
+Content-Disposition: inline
+In-Reply-To: <f6155510fbea33b0e18030a147b87c04395f7394.1726669005.git.matthias.schiffer@ew.tq-group.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-SGVyZSBpcyBwYXRjaDoNCg0KU3ViamVjdDogW1BBVENIXSBib25kaW5nOiBlbmFibGUgYmVzdCBz
-bGF2ZSBhZnRlciBzd2l0Y2ggdW5kZXIgY29uZGl0aW9uIDNhDQotLS0NCmRyaXZlcnMvbmV0L2Jv
-bmRpbmcvYm9uZF8zYWQuYyB8IDIgKysNCjEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKykN
-Cg0KZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L2JvbmRpbmcvYm9uZF8zYWQuYyBiL2RyaXZlcnMv
-bmV0L2JvbmRpbmcvYm9uZF8zYWQuYw0KaW5kZXggYWUwMzkzZGZmLi44NDk0NDIwZWQgMTAwNjQ0
-DQotLS0gYS9kcml2ZXJzL25ldC9ib25kaW5nL2JvbmRfM2FkLmMNCisrKyBiL2RyaXZlcnMvbmV0
-L2JvbmRpbmcvYm9uZF8zYWQuYw0KQEAgLTE4MTksNiArMTgxOSw4IEBAIHN0YXRpYyB2b2lkIGFk
-X2FnZ19zZWxlY3Rpb25fbG9naWMoc3RydWN0IGFnZ3JlZ2F0b3IgKmFnZywNCiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgX19kaXNhYmxlX3BvcnQocG9ydCk7DQogICAgICAgICAgICAg
-ICAgICAgICAgICB9DQogICAgICAgICAgICAgICAgfQ0KKyAgICAgICAgICAgICAgIHBvcnQgPSBi
-ZXN0LT5sYWdfcG9ydHM7DQorICAgICAgICAgICAgICAgX19lbmJhbGVfcG9ydChwb3J0KTsNCiAg
-ICAgICAgICAgICAgICAvKiBTbGF2ZSBhcnJheSBuZWVkcyB1cGRhdGUuICovDQogICAgICAgICAg
-ICAgICAgKnVwZGF0ZV9zbGF2ZV9hcnIgPSB0cnVlOw0KICAgICAgICB9DQotLQ0KDQotLS0tLdPK
-vP7Urbz+LS0tLS0NCreivP7IyzogY2hlbmd5ZWNodW4gDQq3osvNyrG85DogMjAyNMTqOdTCMTnI
-1SAxNToyMg0KytW8/sjLOiAnbmV0ZGV2QHZnZXIua2VybmVsLm9yZycgPG5ldGRldkB2Z2VyLmtl
-cm5lbC5vcmc+DQqzrcvNOiAnSmF5IFZvc2J1cmdoJyA8ai52b3NidXJnaEBnbWFpbC5jb20+OyAn
-o6xBbmR5IEdvc3BvZGFyZWsnIDxhbmR5QGdyZXlob3VzZS5uZXQ+DQrW98ziOiBbRGlzY3Vzc11R
-dWVzdGlvbnMgYWJvdXQgYWN0aXZlIHNsYXZlIHNlbGVjdCBpbiBib25kaW5nIDgwMjNhZA0KDQpI
-aSBhbGwsDQpSZWNlbnRseaOsSSdtIGhhdmluZyBhIHByb2JsZW0gc3RhcnRpbmcgYm9uZC4gSXQn
-cyBhbiBvY2Nhc2lvbmFsIHByb2JsZW0uDQpBZnRlciB0aGUgc2xhdmUgYW5kIGJvbmQgYXJlIGNv
-bmZpZ3VyZWQsIHRoZSBuZXR3b3JrIGZhaWxzIHRvIGJlIHJlc3RhcnRlZC4gVGhlIGZhaWx1cmUg
-Y2F1c2UgaXMgYXMgZm9sbG93czoNCqGwL2V0Yy9zeXNjb25maWcvbmV0d29yay1zY3JpcHRzL2lm
-dXAtZXRoWzI3NDcxMjldOiBFcnJvciwgc29tZSBvdGhlciBob3N0ICgpIGFscmVhZHkgdXNlcyBh
-ZGRyZXNzIDEuMS4xLjM5LqGxDQpXaGVuIHRoZSBuZXR3b3JrIHVzZXMgYXJwaW5nIHRvIGNoZWNr
-IHdoZXRoZXIgYW4gSVAgYWRkcmVzcyBjb25mbGljdCBvY2N1cnMsIGFuIGVycm9yIG9jY3Vycywg
-YnV0IHRoZSBJUCBhZGRyZXNzIGNvbmZsaWN0IGlzIG5vdCBjYXVzZWQuIHRoaXMgaXMgdmVyeSBz
-dHJhbmdlLg0KVGhlIGtlcm5lbCB2ZXJzaW9uIDUuMTAgaXMgdXNlZC4gVGhlIGJvbmQgY29uZmln
-dXJhdGlvbiBpcyBhcyBmb2xsb3dzOg0KDQpCT05ESU5HX09QVFM9J21vZGU9NCBtaWltb249MTAw
-IGxhY3BfcmF0ZT1mYXN0IHhtaXRfaGFzaF9wb2xpY3k9bGF5ZXIzKzQnDQpUWVBFPUJvbmQNCkJP
-TkRJTkdfTUFTVEVSPXllcw0KQk9PVFBST1RPPXN0YXRpYw0KTk1fQ09OVFJPTExFRD1ubw0KSVBW
-NF9GQUlMVVJFX0ZBVEFMPW5vDQpJUFY2SU5JVD15ZXMNCklQVjZfQVVUT0NPTkY9eWVzDQpJUFY2
-X0RFRlJPVVRFPXllcw0KSVBWNl9GQUlMVVJFX0ZBVEFMPW5vDQpJUFY2X0FERFJfR0VOX01PREU9
-c3RhYmxlLXByaXZhY3kNCk5BTUU9Ym9uZDANCkRFVklDRT1ib25kMA0KT05CT09UPXllcw0KSVBB
-RERSPTEuMS4xLjM4DQpORVRNQVNLPTI1NS4yNTUuMC4wDQpJUFY2QUREUj0xOjE6MTo6MzkvNjQN
-Cg0KVGhlIHNsYXZlIGNvbmZpZ3VyYXRpb24gaXMgYXMgZm9sbG93czogYW5kIEkgaGF2ZSBmb3Vy
-IHNpbWlsYXIgc2xhdmVzIGVucDEzczAsZW5wMTRzMCxlbnAxNXMwDQoNCk5BTUU9ZW5wMTJzMA0K
-REVWSUNFPWVucDEyczANCkJPT1RQUk9UTz1ub25lDQpPTkJPT1Q9eWVzDQpVU0VSQ1RMPW5vDQpO
-TV9DT05UUk9MTEVEPW5vDQpNQVNURVI9Ym9uZDANClNMQVZFPXllcw0KSVBWNklOSVQ9eWVzDQpJ
-UFY2X0FVVE9DT05GPXllcw0KSVBWNl9ERUZST1VURT15ZXMNCklQVjZfRkFJTFVSRV9GQVRBTD1u
-bw0KDQpBZnRlciBJIGRpc2NvdmVyZWQgdGhpcyBwcm9ibGVtLCBJIHJlc3RhcnRlZCB0aGUgbmV0
-d29yayBtdWx0aXBsZSB0aW1lcyBhbmQgaXQgYWx3YXlzIGhhcHBlbmVkIG9uY2Ugb3IgdHdpY2Uu
-DQpBZnRlciBzb21lIGRlYnVnZ2luZywgaXQgaXMgZm91bmQgdGhhdCB0aGUgYm9uZCBpbnRlcmZh
-Y2UgZG9lcyBub3QgaGF2ZSBhbiBhdmFpbGFibGUgc2xhdmUgd2hlbiB0aGUgYXJwaW5nIHBhY2tl
-dCBpcyBzZW50LiBBcyBhIHJlc3VsdCwgdGhlIGFycGluZyBwYWNrZXQgZmFpbHMgdG8gYmUgc2Vu
-dC4NCldoZW4gdGhlIHByb2JsZW0gb2NjdXJzLCB0aGUgYWN0aXZlIHNsYXZlIG5vZGUgaXMgc3dp
-dGNoZWQgZnJvbSBlbnAxMnMwIHRvIGVucDEzczAuIEhvd2V2ZXIsIHRoZSBiYWNrdXAgb2YgZW5w
-MTNzMCBpcyBub3QgY2hhbmdlZCBmcm9tIDEgdG8gMCBpbW1lZGlhdGVseSBhZnRlciB0aGUgc3dp
-dGNob3ZlciBpcyBjb21wbGV0ZS4gVGhpcyBpcyBhIG1lY2hhbmlzbSBvciBidWc/DQoNCkFmdGVy
-IHRoaW5raW5nIGFib3V0IGl0LCBJIGhhdmUgYSBkb3VidCBhYm91dCB0aGUgc2VsZWN0IG9mIGFj
-dGl2ZSBzbGF2ZS4gSW4gdGhlIGFkX2FnZ19zZWxlY3Rpb25fdGVzdCBmdW5jdGlvbiwgaWYgY29u
-ZGl0aW9uIDNhIGlzIG1ldCwgdGhhdCBpcywgaWYgKF9fYWdnX2hhc19wYXJ0bmVyKGN1cnIpICYm
-ICFfX2FnZ19oYXNfcGFydG5lcihiZXN0KSmjrGFuZCBhZnRlciB0aGUgYWN0aXZlIHNsYXZlIHN3
-aXRjaCBpcyBzdWNjZXNzZnVsLCB3aHkgbm90IGVuYWJsZV9wb3J0IHRoZSBiZXN0IHNsYXZlIGlu
-IGFkX2FnZ19zZWxlY3Rpb25fbG9naWM/DQo=
+
+--znxmzativoaydeg7
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On 18.09.2024 16:21:54, Matthias Schiffer wrote:
+> The interrupt line of PCI devices is interpreted as edge-triggered,
+> however the interrupt signal of the m_can controller integrated in Intel
+> Elkhart Lake CPUs appears to be generated level-triggered.
+>=20
+> Consider the following sequence of events:
+>=20
+> - IR register is read, interrupt X is set
+> - A new interrupt Y is triggered in the m_can controller
+> - IR register is written to acknowledge interrupt X. Y remains set in IR
+>=20
+> As at no point in this sequence no interrupt flag is set in IR, the
+> m_can interrupt line will never become deasserted, and no edge will ever
+> be observed to trigger another run of the ISR. This was observed to
+> result in the TX queue of the EHL m_can to get stuck under high load,
+> because frames were queued to the hardware in m_can_start_xmit(), but
+> m_can_finish_tx() was never run to account for their successful
+> transmission.
+>=20
+> To fix the issue, repeatedly read and acknowledge interrupts at the
+> start of the ISR until no interrupt flags are set, so the next incoming
+> interrupt will also result in an edge on the interrupt line.
+>=20
+> Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkhart L=
+ake")
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> ---
+>  drivers/net/can/m_can/m_can.c | 18 +++++++++++++-----
+>  1 file changed, 13 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+> index 47481afb9add3..363732517c3c5 100644
+> --- a/drivers/net/can/m_can/m_can.c
+> +++ b/drivers/net/can/m_can/m_can.c
+> @@ -1207,20 +1207,28 @@ static void m_can_coalescing_update(struct m_can_=
+classdev *cdev, u32 ir)
+>  static int m_can_interrupt_handler(struct m_can_classdev *cdev)
+>  {
+>  	struct net_device *dev =3D cdev->net;
+> -	u32 ir;
+> +	u32 ir =3D 0, ir_read;
+>  	int ret;
+> =20
+>  	if (pm_runtime_suspended(cdev->dev))
+>  		return IRQ_NONE;
+> =20
+> -	ir =3D m_can_read(cdev, M_CAN_IR);
+> +	/* For m_can_pci, the interrupt line is interpreted as edge-triggered,
+> +	 * but the m_can controller generates them as level-triggered. We must
+> +	 * observe that IR is 0 at least once to be sure that the next
+> +	 * interrupt will generate an edge.
+> +	 */
+> +	while ((ir_read =3D m_can_read(cdev, M_CAN_IR)) !=3D 0) {
+> +		ir |=3D ir_read;
+> +
+> +		/* ACK all irqs */
+> +		m_can_write(cdev, M_CAN_IR, ir);
+> +	}
+
+This probably causes a measurable overhead on peripheral devices, think
+about limiting this to !peripheral devices or introduce a new quirk that
+is only set for the PCI devices.
+
+Marc
+
+> +
+>  	m_can_coalescing_update(cdev, ir);
+>  	if (!ir)
+>  		return IRQ_NONE;
+> =20
+> -	/* ACK all irqs */
+> -	m_can_write(cdev, M_CAN_IR, ir);
+> -
+>  	if (cdev->ops->clear_interrupts)
+>  		cdev->ops->clear_interrupts(cdev);
+> =20
+> --=20
+> TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Ge=
+rmany
+> Amtsgericht M=C3=BCnchen, HRB 105018
+> Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan S=
+chneider
+> https://www.tq-group.com/
+>=20
+>=20
+>=20
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--znxmzativoaydeg7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbr5QcACgkQKDiiPnot
+vG+OZwf/c88bKRbuevnUCUCzn6Eot1L8rix8rbMXHOwiY50+e07UK+ux/Z50J94y
+1xBVkCAD1MZu9/ftH13Ye/gWrMlBv49LzDScetl0vZy7A+kbmg3/+l3wGTqo3zQS
+NUqSxKlzFZP8b7vDPOjm/HxrAhx4WQbf28BcrcQ/AQA26+EH/nq6Z1agJBUV0s14
+3vOi0zwIm/plTKxEBR5Mu+4RUofHWa7wwwopDuQcgGEzWaBwr1Zxfe/sllmGcxQw
+Nd+Gs7XXYKQETfkHJ49bqYq8gxFwFztZBjAyfenuCOYQG0W21pxQn6EyAB05VTmC
+6VevDqOIWuvRdNdCaUVoEPXdnNl7eg==
+=iUnT
+-----END PGP SIGNATURE-----
+
+--znxmzativoaydeg7--
 
