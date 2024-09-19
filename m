@@ -1,110 +1,156 @@
-Return-Path: <netdev+bounces-128966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-128967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2728D97CA26
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 15:25:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9088997CA33
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 15:36:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2ABC284152
-	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 13:25:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2776528304E
+	for <lists+netdev@lfdr.de>; Thu, 19 Sep 2024 13:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6D119EEC0;
-	Thu, 19 Sep 2024 13:25:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B78A19DFB5;
+	Thu, 19 Sep 2024 13:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="OFjqm9A2"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="V/QU4oHR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73AE418893D
-	for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 13:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26EE19D8BB;
+	Thu, 19 Sep 2024 13:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726752305; cv=none; b=R8dFHLxIUhlVPJ82r+laoqpB+V2DQCu1tSoe2Sfqq0rOV3FRCwW4g5NPbCdQAvov63D7VR1NYG4bHmaOhXqD9Sy3MI2Uq/JtaBx5ffQWIAP6Z/lPmGrS1Z3Ym7QdlOdKGt2vsL6NGjXRS4VYFGSy5L/p3eT//MtIIelP3NzF7cM=
+	t=1726752984; cv=none; b=dJ6wdpxYkTFqfCBka8+mxyxD02G+AiulAPpEksyrduFxc4Y4kTXegTabGiEheQVgBnbgERkZFrrrX2YrkHXOI8LS7N0/7yKg63sYl2yR0TtMfTEPq5L19PFF9rm5ZmBK728vdaNsyQXMww7OUos2RRXlnOsuj/ogNtr3mH5Jexk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726752305; c=relaxed/simple;
-	bh=PHPevfpJk+NzNSKAui3Hgt7JUYg7sSL+k7we0NX6b2I=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mle+bSu08baJ93MAc7OzuoB+j3036WxJXrIU/fkmZiK/GtJa8i0o8y94fGzRckOu3wfq2SSrrlfKXCASXDBq8keZ2RSzqEBLUK4bhkdCATu2mMJDQ2/SqG0gllw8m/xI56LObbxW4uqeXzg2cuADW2F2Le/2fOysEdRviMuBuL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com; spf=pass smtp.mailfrom=amarulasolutions.com; dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b=OFjqm9A2; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amarulasolutions.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5c4146c7d5dso1198899a12.3
-        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 06:25:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amarulasolutions.com; s=google; t=1726752301; x=1727357101; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jXKyj9QfU6TS4dahNlEkSbG4SpYUyfzDDNO0f4/oKhE=;
-        b=OFjqm9A2nBwK07IwSzUnUf9CGeY32GEAPh+A4jHiNR+MA+8MKZ4BH2sdWl+r5j4SUY
-         yrbZ32mQBPVT6Jy0P0EhMACT9Wowyyog5KNCekv/tPeHHFFqK4jhU03It0DKlgCbtakd
-         1Rd1r/r3vZAQfuQEERhUDR+810BYhFRb/ygOY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726752301; x=1727357101;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jXKyj9QfU6TS4dahNlEkSbG4SpYUyfzDDNO0f4/oKhE=;
-        b=pBOEed6kMFxpYic5/GS2Q779emAN6181pkSLKSxGusbnppf+or/CvCXJjIK0pdChbk
-         isSKBFwwlRkPDh6SPW6uA0kJeRIWJvos013kg6mc4YXoyCV/iXzPqkabMn62nItTWMAM
-         QpxOyAnIx14B3QEqSJ/0cfOb5w50SVuRoj6t2DbGzN8aJZE4+Nel1sE/QeV6mwrFlF0w
-         piwGLslSGzgSUFR1+GIw9O8xv3vonPE4jw1BHCfQ+vTpyp9dMBmwZzX6HDJTyGVJvrjh
-         yfOu1DsYMQaTQElz9iRhtYd6EEVRQEQAS5IlznY8usLg91zJuEx9sP8n3z7mexeAdOgU
-         VzJw==
-X-Gm-Message-State: AOJu0YzGnEGgZ4BEa2CbAtt2QxZHetAB6PonoibBrY2OStIdhd445XJ0
-	4T0s4DzXCjOo+LxLasK30S1tghBUc9nbqUgAL6F85lOcw4+64jtLupnUjigysXytndp7xaHTTrX
-	hv63oHw==
-X-Google-Smtp-Source: AGHT+IGw6MEqtPQG/0Y84X4e/vyi8aWsDVGP0TBOK26zSIp+11f6AsGoaS/RRyo6b1lvU8/RPLFnXQ==
-X-Received: by 2002:a05:6402:2549:b0:5c2:6090:4047 with SMTP id 4fb4d7f45d1cf-5c41e093ecamr20754133a12.8.1726752301492;
-        Thu, 19 Sep 2024 06:25:01 -0700 (PDT)
-Received: from dario-ThinkPad-T14s-Gen-2i.homenet.telecomitalia.it ([79.20.102.52])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c42bb89c4esm5971812a12.61.2024.09.19.06.25.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Sep 2024 06:25:00 -0700 (PDT)
-From: Dario Binacchi <dario.binacchi@amarulasolutions.com>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Dario Binacchi <dario.binacchi@amarulasolutions.com>
-Subject: [PATCH 2/2] arpd: drop useless initializers
-Date: Thu, 19 Sep 2024 15:24:54 +0200
-Message-ID: <20240919132454.7394-2-dario.binacchi@amarulasolutions.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240919132454.7394-1-dario.binacchi@amarulasolutions.com>
-References: <20240919132454.7394-1-dario.binacchi@amarulasolutions.com>
+	s=arc-20240116; t=1726752984; c=relaxed/simple;
+	bh=hstUX21KBEtHjopCnXqSKNOH0rFQhohY/fxyASPML4Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=NI7b75PY4C30srmu+Rd6nknv1yRTm1/XqW/lj7PYccEKOi5JgKVilMyXD/pBq7q381WgTct2LayAh4OeXPj/BSSLx1qpZxQ63eg0yn//+10dV/tmfZ5Gw+XPFqoxDshifNPiiT+9U1tuWl1k9tZZYH/+PKT4J55D1QjI+BY3IXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=V/QU4oHR; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48J9HtOY022628;
+	Thu, 19 Sep 2024 13:35:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	i0RZIuHqgGGeJbkftCBmHHwAA9PfN547xTAQddzFrBI=; b=V/QU4oHRko2W1e3Y
+	VogWqSBC9xUG7qgWeQI7HAV5HGi9vm9pC3slCBTgoh/C6epJOo7Vj9zHAuxmRBDc
+	hdBj/g7D/C1l7Jn9niqMSb53E9Pzh7QBWemB+lxX0UTOBP0z8ZBW5qMnhe4Msdlr
+	gbZPu0ZvERchypJjP8NQB1bx8tcBShFpiys90u3hmI4N5QEfSLCNo3KQv7/FoBgu
+	YwYj2RQ/E69LObVpFgf28ob4PDPcXbR66JHed8TxGquLD6mu9hvrMWaiGFoAE2kf
+	HZMXVuXplxuT2uDfV4Rnx+sd1HdCfLOXHkocFnqxwAUTZOu9fJSXDQzIjBY5gSMJ
+	yrccYQ==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41n4jdwjnt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Sep 2024 13:35:58 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48JDZvvU009093
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 19 Sep 2024 13:35:57 GMT
+Received: from [10.111.137.190] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 19 Sep
+ 2024 06:35:53 -0700
+Message-ID: <9e23310b-c165-446f-9e99-c1bf61fe3e83@quicinc.com>
+Date: Thu, 19 Sep 2024 06:35:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: qrtr: Update packets cloning when broadcasting
+To: Youssef Samir <quic_yabdulra@quicinc.com>, <mani@kernel.org>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <andersson@kernel.org>
+CC: <quic_jhugo@quicinc.com>, <linux-arm-msm@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Carl Vanderlip
+	<quic_carlv@quicinc.com>
+References: <20240916170858.2382247-1-quic_yabdulra@quicinc.com>
+ <a3abd3f6-6247-4933-9b8e-df2241a3ec75@quicinc.com>
+ <00293616-d738-48eb-becc-981a6ad86493@quicinc.com>
+Content-Language: en-US
+From: Chris Lew <quic_clew@quicinc.com>
+In-Reply-To: <00293616-d738-48eb-becc-981a6ad86493@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: lgauoKmTQ6gnsZlkv_UkUxUfM7LDBiCJ
+X-Proofpoint-GUID: lgauoKmTQ6gnsZlkv_UkUxUfM7LDBiCJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ clxscore=1015 adultscore=0 mlxscore=0 suspectscore=0 malwarescore=0
+ priorityscore=1501 spamscore=0 bulkscore=0 lowpriorityscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409190089
 
-It is useless to initialize the fields of a structure to their default
-values. This patch keeps the initialization only for those fields that
-are not set to their default values.
 
-Signed-off-by: Dario Binacchi <dario.binacchi@amarulasolutions.com>
----
- misc/arpd.c | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/misc/arpd.c b/misc/arpd.c
-index b4935c23eebb..a2ae76a41f8d 100644
---- a/misc/arpd.c
-+++ b/misc/arpd.c
-@@ -439,8 +439,6 @@ static void get_kern_msg(void)
- 	struct msghdr msg = {
- 		.msg_name = &nladdr, .msg_namelen = sizeof(nladdr),
- 		.msg_iov = &iov, .msg_iovlen = 1,
--		.msg_control = (void *)NULL, .msg_controllen = 0,
--		.msg_flags = 0
- 	};
- 
- 	iov.iov_base = buf;
--- 
-2.43.0
+On 9/17/2024 10:25 AM, Youssef Samir wrote:
+> Hi Chris,
+> 
+> On 9/17/2024 3:59 PM, Chris Lew wrote:
+>> Hi Youssef,
+>>
+>> On 9/16/2024 10:08 AM, Youssef Samir wrote:
+>>> When broadcasting data to multiple nodes via MHI, using skb_clone()
+>>> causes all nodes to receive the same header data. This can result in
+>>> packets being discarded by endpoints, leading to lost data.
+>>>
+>>> This issue occurs when a socket is closed, and a QRTR_TYPE_DEL_CLIENT
+>>> packet is broadcasted. All nodes receive the same destination node ID,
+>>> causing the node connected to the client to discard the packet and
+>>> remain unaware of the client's deletion.
+>>>
+>>
+>> I guess this never happens for the SMD/RPMSG transport because the skb is consumed within the context of qrtr_node_enqueue where as MHI queues the skb to be transmitted later.
+>>
+>> Does the duplicate destination node ID match the last node in the qrtr_all_nodes list?
+> 
+> Yes, it always matches the last node in the qrtr_all_nodes list.
+> 
 
+Thanks for the confirmation, we haven't seen this before since most of 
+our platforms usually only use one MHI qrtr node.
+
+Reviewed-by: Chris Lew <quic_clew@quicinc.com>
+
+>>
+>>
+>>> Replace skb_clone() with pskb_copy(), to create a separate copy of
+>>> the header for each sk_buff.
+>>>
+>>> Fixes: bdabad3e363d ("net: Add Qualcomm IPC router")
+>>> Signed-off-by: Youssef Samir <quic_yabdulra@quicinc.com>
+>>> Reviewed-by: Jeffery Hugo <quic_jhugo@quicinc.com>
+>>> Reviewed-by: Carl Vanderlip <quic_carlv@quicinc.com>
+>>> ---
+>>>    net/qrtr/af_qrtr.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/net/qrtr/af_qrtr.c b/net/qrtr/af_qrtr.c
+>>> index 41ece61eb57a..00c51cf693f3 100644
+>>> --- a/net/qrtr/af_qrtr.c
+>>> +++ b/net/qrtr/af_qrtr.c
+>>> @@ -884,7 +884,7 @@ static int qrtr_bcast_enqueue(struct qrtr_node *node, struct sk_buff *skb,
+>>>          mutex_lock(&qrtr_node_lock);
+>>>        list_for_each_entry(node, &qrtr_all_nodes, item) {
+>>> -        skbn = skb_clone(skb, GFP_KERNEL);
+>>> +        skbn = pskb_copy(skb, GFP_KERNEL);
+>>>            if (!skbn)
+>>>                break;
+>>>            skb_set_owner_w(skbn, skb->sk);
+> 
 
