@@ -1,85 +1,81 @@
-Return-Path: <netdev+bounces-129060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 747C997D465
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 12:40:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 727C497D46B
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 12:48:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99D811C21733
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 10:40:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A37871C21FCE
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 10:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 204B914A097;
-	Fri, 20 Sep 2024 10:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB35413C3EE;
+	Fri, 20 Sep 2024 10:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TaGt3r1c"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cEHYrjde"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E95313F42A;
-	Fri, 20 Sep 2024 10:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D979455887
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 10:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726828792; cv=none; b=Wbdoizvx+2b21YtLo831SCLS8N/hZfwGWzxMUD1yWDx98qenmjil/QZR6+fFJzxk781z5behoWSmDUHTziWkJ9DOdeug28IMU/67MkSwHMEH9c417V0YQ/Ux4GwhhWTgVRYtFZx48OBzfT/b6ccV6u92TcfPIrcUgsW315twUaE=
+	t=1726829302; cv=none; b=ooIw6Gr+cWJRWxbdSnYo9XILvKzCL4M44dEpjHgRHf/XMolZb8wyB264ttyRcD7HiEFOkecQYEbMsrebt9EgMUHOj0H8qb9AyINin8KlhD95t6s2WkZr4jI+TJXMCQGfvkgxjeAI0vlLiIxzjPxtIR14/1Z1x21bOqrIWUJclu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726828792; c=relaxed/simple;
-	bh=Xl/B9fsLp01cGiBdnirAFhj8EJziPZNE0c5sXznYMu8=;
+	s=arc-20240116; t=1726829302; c=relaxed/simple;
+	bh=etFf4qTBVZ/vq0hx3z2kleY01er8ESytRExqWIN/Hrk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UQ6wP6/o+2D6K5E1QmpkHXR0gx7qvsUbnPKM2ZD4hpenzRpHka8HVhWFZlObDaaLKAZlF+BWWVexhVo54vKZEuezytLPEP1wr6vv79++Pv4cMx/8w/CJVcbLyniUvFJCtLzkg2Dq0vUGPo8DvHMkV6slFNCZqrZPwTWdthJ9Yks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TaGt3r1c; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726828791; x=1758364791;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Xl/B9fsLp01cGiBdnirAFhj8EJziPZNE0c5sXznYMu8=;
-  b=TaGt3r1c2IeNllxqfyxKuKhSv821Y0Fyc/3vxZxBfvm3ydPX/RPF72ar
-   0OL3rA7H4eHxC1fswzox0/Fn3QWEvELCpsey8dihcutJXYqQvf7XeVSej
-   K8wFBDF1+xfdgA1ZRwzVS8QoPHgt6e5lBgM2w3SQptiinkjAj1uK4K4hv
-   +9tOfV4phqADK/ms5BGi26AE+AQRORvzufDPG4CtTcWE6y2HGHyXlgOMa
-   8Q8P4fqKb0Hw+rcWEflzgxmDa1SjXkJulL7Xak4ae24CiNt/8gr36XnSc
-   SZtDBbnpJONhKB5ACf132cvFQ3oeOfiL7NQ8vj7rZ6vxji53DZVPtCdsb
-   w==;
-X-CSE-ConnectionGUID: RvxVcXrGR92MzkqYDhqwHw==
-X-CSE-MsgGUID: bqSDbQFYSq+2fzorL+ciXA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11200"; a="25702682"
-X-IronPort-AV: E=Sophos;i="6.10,244,1719903600"; 
-   d="scan'208";a="25702682"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2024 03:39:48 -0700
-X-CSE-ConnectionGUID: UIg4HKJhTa6t7iVSuuM0+g==
-X-CSE-MsgGUID: ivzM5L1VQEeTzHuii7+ayg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,244,1719903600"; 
-   d="scan'208";a="75214262"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 20 Sep 2024 03:39:41 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1srb34-000EHt-2o;
-	Fri, 20 Sep 2024 10:39:38 +0000
-Date: Fri, 20 Sep 2024 18:38:56 +0800
-From: kernel test robot <lkp@intel.com>
-To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
-	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
-	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
-	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
-	wei.huang2@amd.com, vadim.fedorenko@linux.dev, horms@kernel.org,
-	bagasdotme@gmail.com, bhelgaas@google.com, lukas@wunner.de,
-	paul.e.luse@intel.com, jing2.liu@intel.com
-Subject: Re: [PATCH V5 2/5] PCI/TPH: Add Steering Tag support
-Message-ID: <202409201840.tDMBEi4q-lkp@intel.com>
-References: <20240916205103.3882081-3-wei.huang2@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HE4P5dW5M8w+qa0UBJ2zw92O+9OP3W/F+IZ7kufFnRQ1EigkMuKnh3egp2FXlWywh8BlxgjtrDwn6LzT9PBxFnnn/c4buOpZUAwH7de8t012oRlbDhUItuJYrTw/osRhZxZRVPWuyPCYFZkYTWm8FBNCuc98RuRYoCNj5pe8IpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cEHYrjde; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5365b71a6bdso2253044e87.2
+        for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 03:48:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1726829299; x=1727434099; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=d0wX2HgJsGjDVHhStjJhEGEpLyVcLkj6YKdYCnWWVDw=;
+        b=cEHYrjdejRNLAQBYFJhQFP7Vm3N5d3j1XHnC0Wl2fYPdX1peB+rZo4myxDc3PA1q8S
+         9ZQakl1bvDAl7Q0skalxEPVJbOf+UQ/N7pCzG/6ZMxIKM4+6kaHilUl1czqHE6/sdqrr
+         jQv1a/87i2RClqOZEHsfMwvAhfcB0qNH9ju1cZsAqMupyLS4TdiT8VKAwCa0vbiO7Dk9
+         ul3YERk0UROxHjhW+7V/A3ru52gLe1Bnl3o7Vgl+/Os9rgDlsYo0f9r+XsUoc4o6NTRQ
+         4K2stap0VHl3POd802Vsnk234hzMUQc4K7UXOTXM7bvvdWSgmwdBKBTT1xebdlv3/tmO
+         eohA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726829299; x=1727434099;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d0wX2HgJsGjDVHhStjJhEGEpLyVcLkj6YKdYCnWWVDw=;
+        b=nmuJ0fSFMsUivHYnAi5/hd/+zAO7ge3VJXSIGoC3lMWxtURXQF5Bco/mN3IRKI4ap0
+         /tDyimv66QDU2hZN/UCEZ64UFbcGPcySAL9JHrrmQKTrlsJ+IpGmMcyzhWmvlD+pmT3S
+         lyJZr++ouF3qIADlKRMkFzhFZMqLUpHkFcOMvOHF7nhKnBXKix8Uc11gLJndqwkJzpOU
+         PTbg6cgEuqPpjgt+KXqWIR+30AjJGtoXyuM0cEdIBcPdGvjgVeQrCBHyqPljoVOJedWY
+         qDTe1E6HvNCcpjKu6rkPhknAlSct+++D0XeC1zmEbvN8o4vEWbHHh2wxLyu3tMay/n71
+         cC/w==
+X-Forwarded-Encrypted: i=1; AJvYcCX+umeJHRCRuXjWAk26q4UV+BNcq4E6Yiy0/iU2owxV85DXq7nYp64zQcGlxQad359ljGK2W7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIZxMKMUIZmwXfKtCsgEwyKWMoj0Gi8PBnxOUDr3vEbAKhkmpg
+	hyy00qwOnIrJRtn434DVOG715EKXtPOXiqxCMaKE1vRV7YPMMZ0E42S3mYdsNpY=
+X-Google-Smtp-Source: AGHT+IE0YX9FHsU+6bvH0oBSe1wloxjPMmlH/cCbWXoHTmT7BpXouXLIrHoZol8sfO4CBI02grA25g==
+X-Received: by 2002:ac2:4f03:0:b0:533:d3e:16fe with SMTP id 2adb3069b0e04-536ac32f114mr1511695e87.38.1726829298938;
+        Fri, 20 Sep 2024 03:48:18 -0700 (PDT)
+Received: from eriador.lumag.spb.ru (2001-14ba-a0c3-3a00--7a1.rev.dnainternet.fi. [2001:14ba:a0c3:3a00::7a1])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-536870965a7sm2129787e87.172.2024.09.20.03.48.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Sep 2024 03:48:17 -0700 (PDT)
+Date: Fri, 20 Sep 2024 13:48:15 +0300
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: stephan@gerhold.net, loic.poulain@linaro.org, ryazanov.s.a@gmail.com, 
+	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH] net: wwan: qcom_bam_dmux: Fix missing
+ pm_runtime_disable()
+Message-ID: <lqj3jfaelgeecf5yynpjxza6h4eblhzumx6rif3lgivfqhb4nk@xeft7zplc2xb>
+References: <20240920100711.2744120-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,106 +84,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240916205103.3882081-3-wei.huang2@amd.com>
+In-Reply-To: <20240920100711.2744120-1-ruanjinjie@huawei.com>
 
-Hi Wei,
+On Fri, Sep 20, 2024 at 06:07:11PM GMT, Jinjie Ruan wrote:
+> It's important to undo pm_runtime_use_autosuspend() with
+> pm_runtime_dont_use_autosuspend() at driver exit time.
+> 
+> But the pm_runtime_disable() and pm_runtime_dont_use_autosuspend()
+> is missing in the error path for bam_dmux_probe(). So add it.
 
-kernel test robot noticed the following build warnings:
+Please use devm_pm_runtime_enable(), which handles autosuspend.
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.11 next-20240920]
-[cannot apply to pci/next pci/for-linus]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Also please provide details of the platform on which you have tested
+your patch.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Wei-Huang/PCI-Add-TLP-Processing-Hints-TPH-support/20240917-045345
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20240916205103.3882081-3-wei.huang2%40amd.com
-patch subject: [PATCH V5 2/5] PCI/TPH: Add Steering Tag support
-config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20240920/202409201840.tDMBEi4q-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240920/202409201840.tDMBEi4q-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409201840.tDMBEi4q-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/pci/pcie/tph.c:232:9: warning: result of comparison of constant 18446744073709551615 with expression of type 'typeof (_Generic((mask), char: (unsigned char)0, unsigned char: (unsigned char)0, signed char: (unsigned char)0, unsigned short: (unsigned short)0, short: (unsigned short)0, unsigned int: (unsigned int)0, int: (unsigned int)0, unsigned long: (unsigned long)0, long: (unsigned long)0, unsigned long long: (unsigned long long)0, long long: (unsigned long long)0, default: (mask)))' (aka 'unsigned int') is always false [-Wtautological-constant-out-of-range-compare]
-     232 |         val |= FIELD_PREP(mask, (u32)tag);
-         |                ^~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/bitfield.h:115:3: note: expanded from macro 'FIELD_PREP'
-     115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP: ");    \
-         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/bitfield.h:72:53: note: expanded from macro '__BF_FIELD_CHECK'
-      72 |                 BUILD_BUG_ON_MSG(__bf_cast_unsigned(_mask, _mask) >     \
-         |                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~
-      73 |                                  __bf_cast_unsigned(_reg, ~0ull),       \
-         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      74 |                                  _pfx "type of reg too small for mask"); \
-         |                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/build_bug.h:39:58: note: expanded from macro 'BUILD_BUG_ON_MSG'
-      39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-         |                                     ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
-   include/linux/compiler_types.h:510:22: note: expanded from macro 'compiletime_assert'
-     510 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
-         |         ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/compiler_types.h:498:23: note: expanded from macro '_compiletime_assert'
-     498 |         __compiletime_assert(condition, msg, prefix, suffix)
-         |         ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/compiler_types.h:490:9: note: expanded from macro '__compiletime_assert'
-     490 |                 if (!(condition))                                       \
-         |                       ^~~~~~~~~
-   1 warning generated.
-
-
-vim +232 drivers/pci/pcie/tph.c
-
-   203	
-   204	/* Write ST to MSI-X vector control reg - Return 0 if OK, otherwise -errno */
-   205	static int write_tag_to_msix(struct pci_dev *pdev, int msix_idx, u16 tag)
-   206	{
-   207		struct msi_desc *msi_desc = NULL;
-   208		void __iomem *vec_ctrl;
-   209		u32 val, mask;
-   210		int err = 0;
-   211	
-   212		msi_lock_descs(&pdev->dev);
-   213	
-   214		/* Find the msi_desc entry with matching msix_idx */
-   215		msi_for_each_desc(msi_desc, &pdev->dev, MSI_DESC_ASSOCIATED) {
-   216			if (msi_desc->msi_index == msix_idx)
-   217				break;
-   218		}
-   219	
-   220		if (!msi_desc) {
-   221			err = -ENXIO;
-   222			goto err_out;
-   223		}
-   224	
-   225		/* Get the vector control register (offset 0xc) pointed by msix_idx */
-   226		vec_ctrl = pdev->msix_base + msix_idx * PCI_MSIX_ENTRY_SIZE;
-   227		vec_ctrl += PCI_MSIX_ENTRY_VECTOR_CTRL;
-   228	
-   229		val = readl(vec_ctrl);
-   230		mask = PCI_MSIX_ENTRY_CTRL_ST_LOWER | PCI_MSIX_ENTRY_CTRL_ST_UPPER;
-   231		val &= ~mask;
- > 232		val |= FIELD_PREP(mask, (u32)tag);
-   233		writel(val, vec_ctrl);
-   234	
-   235		/* Read back to flush the update */
-   236		val = readl(vec_ctrl);
-   237	
-   238	err_out:
-   239		msi_unlock_descs(&pdev->dev);
-   240		return err;
-   241	}
-   242	
+> 
+> Fixes: 21a0ffd9b38c ("net: wwan: Add Qualcomm BAM-DMUX WWAN network driver")
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> ---
+>  drivers/net/wwan/qcom_bam_dmux.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+With best wishes
+Dmitry
 
