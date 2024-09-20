@@ -1,140 +1,98 @@
-Return-Path: <netdev+bounces-129053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2A6297D3A7
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 11:33:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9793697D3B5
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 11:36:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 687FAB24847
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 09:33:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 442801F255D9
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 09:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35DB213B5A9;
-	Fri, 20 Sep 2024 09:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="ZJJKOAwV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6358136658;
+	Fri, 20 Sep 2024 09:35:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F2B813AA3F
-	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 09:32:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2713D7E107;
+	Fri, 20 Sep 2024 09:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726824778; cv=none; b=p2YAB/iVKSEGXzE6zmJaf0BeEuUARB4ZaO0NvMc7kbS5kz1W9esZcl/yyPAyZ/6lZUTjuiCH6IsYVdcv644T1mHzwPqhTlmRQq5cd9tx0HDzIbX5ysQdy5vZnDWcAkspYKdUUKuEy/J2Pitu95GtKw1GadC6dGs2vDcgS08h2dk=
+	t=1726824958; cv=none; b=ACNa2otJhhaq4dYJnwp+E2b3PFdCmS3FyZ/nHh55eJSukflH1PVdG3wtvR+GUEz4KSV+SxKwV8Idi3L6iay9iI1cdmTb/AJl6H2E+rQOMcYD2Fl5tCNXO0HmeUaGDYLzW2P8hVp96FDNTOBYu3/WOHnjZGzAKN56M/jo8ZjWs5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726824778; c=relaxed/simple;
-	bh=I9dhLtSXEvmlIWYEYser1c807olsUVp/skBDoxd2mFA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jfH6xL1X94ShAX6Ix46a8YOE8VHgF0jCZo2QltrVn57ai4cxHBYo2TXOxzaee+JxqjlRjZ20lANwt4dIpc22ak76GmZ1fkW4BMAaHYg6SLA5DmSLejc+tUs9BwFbp3bZdOA6RXX6D4OvwFhqa++HBSbnxW1hnmqM77qT0469Vrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=ZJJKOAwV; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1726824777; x=1758360777;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=QKLDz0heWIM+VCaAEhYedaui5JDmYRErGsztJ7XqYm4=;
-  b=ZJJKOAwVNYU4ZTmRp2Kp/TDU1KeFvBhWJh4LjxlssV7vBSB/zZnT9L9m
-   7AAqb8fv261Qx8+xMES+iOLRtCCd/CIhh90fvbQn9S5J4Sx1H+E+HgUe4
-   6zL57CMfiLE5dSdkxC6MOaKMhMrY0YTZf9oniOhTmd1+QattGPhV/P8v0
-   U=;
-X-IronPort-AV: E=Sophos;i="6.10,244,1719878400"; 
-   d="scan'208";a="456092711"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2024 09:32:50 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:39381]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.37.209:2525] with esmtp (Farcaster)
- id a33904f0-ee91-4027-bc62-bf84e58f85bd; Fri, 20 Sep 2024 09:32:49 +0000 (UTC)
-X-Farcaster-Flow-ID: a33904f0-ee91-4027-bc62-bf84e58f85bd
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 20 Sep 2024 09:32:49 +0000
-Received: from 88665a182662.ant.amazon.com (10.1.213.27) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 20 Sep 2024 09:32:44 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <antonio@openvpn.net>
-CC: <andrew@lunn.ch>, <antony.antony@secunet.com>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <ryazanov.s.a@gmail.com>, <sd@queasysnail.net>,
-	<steffen.klassert@secunet.com>
-Subject: Re: [PATCH net-next v7 03/25] net: introduce OpenVPN Data Channel Offload (ovpn)
-Date: Fri, 20 Sep 2024 11:32:34 +0200
-Message-ID: <20240920093234.15620-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <a10dcebf-b8f1-4d9b-b417-cca7d0330e52@openvpn.net>
-References: <a10dcebf-b8f1-4d9b-b417-cca7d0330e52@openvpn.net>
+	s=arc-20240116; t=1726824958; c=relaxed/simple;
+	bh=i0xqeoqAvHXB5qmRqkvEbbm+QoU0HBOXjF/kNH1c/4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sDGKG1e4s7ebhMkA99BSAwVY993x3Kz4wx9hl717JvDlTL7zG0oTGLpptoAiY6sY22I7vjgqhZcu+7mthLFt/Qv8T1qjN6jJUNJTCn7LJfTpWazzYAXQokZZxiYPTmELSRiL49LeYNIfn/T9v4oZidPaMBlDzC2XqoBDriX5dNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1sra39-0002Ub-OH; Fri, 20 Sep 2024 11:35:39 +0200
+Date: Fri, 20 Sep 2024 11:35:39 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Jiawei Ye <jiawei.ye@foxmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: Fix potential RCU dereference issue in
+ tcp_assign_congestion_control
+Message-ID: <20240920093539.GA8490@breakpoint.cc>
+References: <tencent_2A17499A4FFA4D830F7D2F72A95A4ADAB308@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_2A17499A4FFA4D830F7D2F72A95A4ADAB308@qq.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-From: Antonio Quartulli <antonio@openvpn.net>
-Date: Thu, 19 Sep 2024 13:57:51 +0200
-> Hi Kuniyuki and thank you for chiming in.
+Jiawei Ye <jiawei.ye@foxmail.com> wrote:
+> In the `tcp_assign_congestion_control` function, the `ca->flags` is
+> accessed after the RCU read-side critical section is unlocked. According
+> to RCU usage rules, this is illegal. Reusing this pointer can lead to
+> unpredictable behavior, including accessing memory that has been updated
+> or causing use-after-free issues.
 > 
-> On 19/09/2024 07:52, Kuniyuki Iwashima wrote:
-> > From: Antonio Quartulli <antonio@openvpn.net>
-> > Date: Tue, 17 Sep 2024 03:07:12 +0200
-> >> +/* we register with rtnl to let core know that ovpn is a virtual driver and
-> >> + * therefore ifaces should be destroyed when exiting a netns
-> >> + */
-> >> +static struct rtnl_link_ops ovpn_link_ops = {
-> >> +};
-> > 
-> > This looks like abusing rtnl_link_ops.
+> This possible bug was identified using a static analysis tool developed
+> by myself, specifically designed to detect RCU-related issues.
 > 
-> In some way, the inspiration came from
-> 5b9e7e160795 ("openvswitch: introduce rtnl ops stub")
+> To resolve this issue, the `rcu_read_unlock` call has been moved to the
+> end of the function.
 > 
-> [which just reminded me that I wanted to fill the .kind field, but I 
-> forgot to do so]
+> Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
+> ---
+> In another part of the file, `tcp_set_congestion_control` calls
+> `tcp_reinit_congestion_control`, ensuring that the congestion control
+> reinitialization process is protected by RCU. The
+> `tcp_reinit_congestion_control` function contains operations almost
+> identical to those in `tcp_assign_congestion_control`, but the former
+> operates under full RCU protection, whereas the latter is only partially
+> protected. The differing protection strategies between the two may
+> warrant further unification.
+> ---
+>  net/ipv4/tcp_cong.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> The reason for taking this approach was to avoid handling the iface 
-> destruction upon netns exit inside the driver, when the core already has 
-> all the code for taking care of this for us.
-> 
-> Originally I implemented pernet_operations.pre_exit, but Sabrina 
-> suggested that letting the core handle the destruction was cleaner (and 
-> I agreed).
-> 
-> However, after I removed the pre_exit implementation, we realized that 
-> default_device_exit_batch/default_device_exit_net thought that an ovpn 
-> device is a real NIC and was moving it to the global netns rather than 
-> killing it.
-> 
-> One way to fix the above was to register rtnl_link_ops with netns_fund = 
-> false (so the ops object you see in this patch is not truly "empty").
-> 
-> However, I then hit the bug which required patch 2 to get fixed.
-> 
-> Does it make sense to you?
-> Or you still think this is an rtnl_link_ops abuse?
+> diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
+> index 0306d257fa64..356a59d316e3 100644
+> --- a/net/ipv4/tcp_cong.c
+> +++ b/net/ipv4/tcp_cong.c
+> @@ -223,13 +223,13 @@ void tcp_assign_congestion_control(struct sock *sk)
+>  	if (unlikely(!bpf_try_module_get(ca, ca->owner)))
+>  		ca = &tcp_reno;
 
-The use of .kind makes sense, and the change should be in this patch.
+After this, ca either has module refcount incremented, so it can't
+go away anymore, or reno fallback was enabled (always bultin).
 
-For the patch 2 and dellink(), is the device not expected to be removed
-by ip link del ?  Setting unregister_netdevice_queue() to dellink() will
-support RTM_DELLINK, but otherwise -EOPNOTSUPP is returned.
+>  	icsk->icsk_ca_ops = ca;
+> -	rcu_read_unlock();
 
-
-> 
-> The alternative was to change 
-> default_device_exit_batch/default_device_exit_net to read some new 
-> netdevice flag which would tell if the interface should be killed or 
-> moved to global upon netns exit.
-> 
-> Regards,
-> 
+Therefore its ok to rcu unlock here.
 
