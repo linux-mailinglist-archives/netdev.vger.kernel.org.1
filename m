@@ -1,121 +1,143 @@
-Return-Path: <netdev+bounces-129106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C193F97D82A
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 18:17:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F23FE97D82D
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 18:17:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3D521C20E24
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 16:17:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5EEA1F224DC
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 16:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A3617DFE3;
-	Fri, 20 Sep 2024 16:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD87617E008;
+	Fri, 20 Sep 2024 16:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="eMUG0YVa"
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3540C18005B;
-	Fri, 20 Sep 2024 16:16:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B86236F2F3
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 16:17:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726849001; cv=none; b=UcRrzqAQVioPzlheYEjNhPSva1lpfFBwoST6mjBLzDMTwNtZ9ab/2JMLHARtnnXDo68UZlUULBycB0GMEDG4nVdXj2x54I0V7gs6euVX8FTPpTiQIkFyu/vv7OTGSax+yE61D0gjFyDyMup1ZENktAr1tT2+iFNNWCq70t/2y+M=
+	t=1726849022; cv=none; b=lur/LqTqOxTPuFn9t9daY8Gt+wzUkoTRnWEG24N6PlUE3XI5Be1hAuZvFGQ/bkV2SyU0x7qPBN4KTK5FgATzAOGtwmGDxp0MboTldtxtWhVwKk/pT14rON2EPxxqgFffSGq2CTPe5c78i73pyrMRqhx43Qi4vneOanRw4gtDzo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726849001; c=relaxed/simple;
-	bh=5hFXnoW6ooKL6vv2N9VsYM6DZuuYE8fcOIy2YKi8hMw=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ERjkFKDMSfrgCQOyoRZze8AHFFkoOZAKP3cMSnM/lHEKA0jbASD997QUGExXfv3sgcOq3uIKu0ynz/AeBjP3/2Deu0FMHgxJU6wy+rruGzrJKqSpvO2lL/Yrt/nV/ORyC0N3169SBnhHZr/tatg4/MGMlBtkzA7U5taVHpsfEKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Fri, 20 Sep
- 2024 19:16:28 +0300
-Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Fri, 20 Sep
- 2024 19:16:27 +0300
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-To: <stable@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Ping-Ke Shih
-	<pkshih@realtek.com>, Kalle Valo <kvalo@codeaurora.org>, "David S. Miller"
-	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Dan Carpenter
-	<dan.carpenter@oracle.com>, <linux-wireless@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH 5.10 1/1] rtlwifi: rtl8192de: fix ofdm power compensation
-Date: Fri, 20 Sep 2024 09:16:18 -0700
-Message-ID: <20240920161618.21780-2-n.zhandarovich@fintech.ru>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240920161618.21780-1-n.zhandarovich@fintech.ru>
-References: <20240920161618.21780-1-n.zhandarovich@fintech.ru>
+	s=arc-20240116; t=1726849022; c=relaxed/simple;
+	bh=f/8UTt09XOiV8x1XDiwztEOYb3lYZxxZMduFUecgdy8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=PvPDNhU6oVgSY4zuSPQC9eHWDqhmuqg7mtVi0BUwEaNSX1RukeV857GL+xpHVMb6kP0zrfw12PKnuP+7MYckmn1TimQZVfNNuuY5EFxdsqouM2yPXYN6E0yf0pCEF/JP3pehvA1CaUizp3us5cRtNMWh5U5RdEYSb467lyJQw6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=eMUG0YVa; arc=none smtp.client-ip=148.163.129.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
+	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id DD6A7C006E;
+	Fri, 20 Sep 2024 16:16:52 +0000 (UTC)
+Received: from [192.168.100.159] (unknown [50.251.239.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail3.candelatech.com (Postfix) with ESMTPSA id 6985813C2B0;
+	Fri, 20 Sep 2024 09:16:52 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 6985813C2B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
+	s=default; t=1726849012;
+	bh=f/8UTt09XOiV8x1XDiwztEOYb3lYZxxZMduFUecgdy8=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=eMUG0YVaN/mbOQYA0cNSSgDXk1xcMrk2cr3Cb4D8Troev8xoLK2/hZvEvqnOfqUSw
+	 GdYxZKYmliePEjrNZpVcjr1aK8565mfWsHi3SnSEqyLmhhqWmGlwBDNYs5/JjYsqeY
+	 C4vANQdRRQdH+Br3a5xnztWvREJIhkVKZYngPI0A=
+Message-ID: <2c72e9ad-657b-a498-0fe5-1224a4b3dc1a@candelatech.com>
+Date: Fri, 20 Sep 2024 09:16:52 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH] af_packet: Fix softirq mismatch in tpacket_rcv
+Content-Language: en-US
+To: David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org,
+ Ido Schimmel <idosch@nvidia.com>
+References: <20240918205719.64214-1-greearb@candelatech.com>
+ <66ec149daf042_2deb5229470@willemb.c.googlers.com.notmuch>
+ <0bbcd0f2-42e1-4fdc-a9bd-49dd3506c7f4@candelatech.com>
+ <66ec5500c3b26_2e963829496@willemb.c.googlers.com.notmuch>
+ <05371e60-fe62-4499-b640-11c0635a5186@kernel.org>
+ <05765015-f727-2f30-58da-2ad6fa7ea99f@candelatech.com>
+ <66ed3904738bb_3136a8294eb@willemb.c.googlers.com.notmuch>
+ <daa7deb0-8412-4aa3-ab76-a2244995c3f3@kernel.org>
+From: Ben Greear <greearb@candelatech.com>
+Organization: Candela Technologies
+In-Reply-To: <daa7deb0-8412-4aa3-ab76-a2244995c3f3@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-MDID: 1726849013-oaxHj3_3yA9d
+X-MDID-O:
+ us5;ut7;1726849013;oaxHj3_3yA9d;<greearb@candelatech.com>;7f5d7a0772171613f08844d6b95fd3b5
 
-From: Ping-Ke Shih <pkshih@realtek.com>
+On 9/20/24 08:01, David Ahern wrote:
+> On 9/20/24 2:57 AM, Willem de Bruijn wrote:
+>> Ben Greear wrote:
+>>> On 9/19/24 13:00, David Ahern wrote:
+>>>> On 9/19/24 10:44 AM, Willem de Bruijn wrote:
+>>>>> Yes, it seems that VRF calls dev_queue_xmit_nit without the same BH
+>>>>> protections that it expects.
+>>>>>
+>>>>> I suspect that the fix is in VRF, to disable BH the same way that
+>>>>> __dev_queue_xmit does, before calling dev_queue_xmit_nit.
+>>>>>
+>>>>
+>>>> commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853 removed the bh around
+>>>> dev_queue_xmit_nit:
+>>>>
+>>>> diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+>>>> index 6043e63b42f9..43f374444684 100644
+>>>> --- a/drivers/net/vrf.c
+>>>> +++ b/drivers/net/vrf.c
+>>>> @@ -638,9 +638,7 @@ static void vrf_finish_direct(struct sk_buff *skb)
+>>>>                   eth_zero_addr(eth->h_dest);
+>>>>                   eth->h_proto = skb->protocol;
+>>>>
+>>>> -               rcu_read_lock_bh();
+>>>>                   dev_queue_xmit_nit(skb, vrf_dev);
+>>>> -               rcu_read_unlock_bh();
+>>>>
+>>>>                   skb_pull(skb, ETH_HLEN);
+>>>>           }
+>>>
+>>> So I guess we should revert this?
+>>
+>> Looks like it to me.
+>>
+>> In which case good to not just revert, but explain why, and probably
+>> copy the comment that is present in __dev_queue_xmit.
+>>
+> 
+> Ben: does it resolve the problem you were investigating?
+> 
+> It would be good to add a selftest that sets up a VRF, attaches tcpdump
+> and then sends a few seconds of iperf3 traffic through it. That should
+> be similar to the use case here and I expect it to create a similar
+> crash. That should help prevent a regression in addition to the comment.
 
-commit 3f79e541593fecc2a90687eb7162e15a499caa33 upstream.
+We'll test in next day or two and let you know, but at least the patch
+I posted previously 'fixed' things, so likely the revert will as well.
 
-ofdm_index[] is used to indicate how many power compensation is needed to
-current thermal value. For internal PA module or 2.4G band, the min_index
-is different from other cases.
+And, I think you need a 'real' eth port in the VRF, as original likely broken
+commit claimed to test with veth and tcpdump successfully, probably because
+veth rcv path is not in soft-irq or something?
 
-This issue originally is reported by Dan. He found the size of ofdm_index[]
-is 2, but access index 'i' may be equal to 2 if 'rf' is 2 in case of
-'is2t'.
+Thanks,
+Ben
 
-In fact, the chunk of code is added to wrong place, so move it back to
-proper place, and then power compensation and buffer overflow are fixed.
-
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Ping-Ke Shih <pkshih@realtek.com>
-Signed-off-by: Kalle Valo <kvalo@codeaurora.org>
-Link: https://lore.kernel.org/r/20201207031903.7599-1-pkshih@realtek.com
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
----
- drivers/net/wireless/realtek/rtlwifi/rtl8192de/dm.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/dm.c b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/dm.c
-index b3f25a228532..6cc9c7649eda 100644
---- a/drivers/net/wireless/realtek/rtlwifi/rtl8192de/dm.c
-+++ b/drivers/net/wireless/realtek/rtlwifi/rtl8192de/dm.c
-@@ -986,18 +986,19 @@ static void rtl92d_dm_txpower_tracking_callback_thermalmeter(
- 			rtlpriv->dm.cck_index);
- 	}
- 	for (i = 0; i < rf; i++) {
--		if (ofdm_index[i] > OFDM_TABLE_SIZE_92D - 1)
-+		if (ofdm_index[i] > OFDM_TABLE_SIZE_92D - 1) {
- 			ofdm_index[i] = OFDM_TABLE_SIZE_92D - 1;
--		else if (ofdm_index[i] < ofdm_min_index)
-+		} else if (internal_pa ||
-+			   rtlhal->current_bandtype == BAND_ON_2_4G) {
-+			if (ofdm_index[i] < ofdm_min_index_internal_pa)
-+				ofdm_index[i] = ofdm_min_index_internal_pa;
-+		} else if (ofdm_index[i] < ofdm_min_index) {
- 			ofdm_index[i] = ofdm_min_index;
-+		}
- 	}
- 	if (rtlhal->current_bandtype == BAND_ON_2_4G) {
- 		if (cck_index > CCK_TABLE_SIZE - 1) {
- 			cck_index = CCK_TABLE_SIZE - 1;
--		} else if (internal_pa ||
--			   rtlhal->current_bandtype == BAND_ON_2_4G) {
--			if (ofdm_index[i] < ofdm_min_index_internal_pa)
--				ofdm_index[i] = ofdm_min_index_internal_pa;
- 		} else if (cck_index < 0) {
- 			cck_index = 0;
- 		}
 -- 
-2.25.1
+Ben Greear <greearb@candelatech.com>
+Candela Technologies Inc  http://www.candelatech.com
+
 
 
