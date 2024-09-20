@@ -1,138 +1,119 @@
-Return-Path: <netdev+bounces-129040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDD9E97D152
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 08:46:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6695197D17A
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 09:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 814401C22F68
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 06:46:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29A092838DC
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 07:05:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C64A364BA;
-	Fri, 20 Sep 2024 06:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A07B83BB50;
+	Fri, 20 Sep 2024 07:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="txVSHtHW"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="SApjxW/C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393442D638;
-	Fri, 20 Sep 2024 06:46:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB4E41C72;
+	Fri, 20 Sep 2024 07:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726814762; cv=none; b=oUN1Y+6Q2cmRkdlDYL5a2iXC5gowGbvBgG2CvIQdGBrxBDcxC7j9CF5tAIqRKSLknfG8RZp72sr+rEU1gaadP8Z4ff0aCa2Oy3udK7OaB6Ecg7IA6KhwHC6D80d9fh71RT+M3gh/DrDAsfOdGKnLEyZ1CmWsANbPfLSDDqasykI=
+	t=1726815950; cv=none; b=FVrnN1MTpgOt+TBFNwEb45Iks02ikGrlvkKwYIVcv9GANVitaCdGqReNdvX7vNRoj+Ow/ZB0yNCqoR008WPYfigupkcXa3jV0Pi2oEfIxJDKOGcJ6bE9sfiI/F3TqIxakyYRsy1SX+QUnCScV4p93+r1exdREeMALzsMdXI1PDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726814762; c=relaxed/simple;
-	bh=apoiTdulUgf1Pl+6yC/F2xPSZOBOVYh4QJeaPl07Enw=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Ezju5U0cQJvXoVtpcYxsHdTUhWRXH10BvXPerxwdIlop0fVsrj+IBMNb+j8omCs99XbJfDUR7h0ubiUx4jS052OeLZEVk8mTrbtA9nG+mFunKbS54yAUvj7j3lPyhelEsDCj1ooyqlZOh7NxBd3MTZ0V5nrrFt9FteKridBM/f8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=txVSHtHW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22086C4CEC3;
-	Fri, 20 Sep 2024 06:45:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726814761;
-	bh=apoiTdulUgf1Pl+6yC/F2xPSZOBOVYh4QJeaPl07Enw=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=txVSHtHWAOcsqSlJ41k9P8WYFLd56Z7Nyfv4Wo4jLHODXkLcZKMSFSQq60z6YuqnL
-	 yLAYbsJBkz/rcIThUmchQr7C/xzmgTWA91csEKbrOovBWmBX0WV7tr9E6dM1B49zm3
-	 Qojk8vJqpv5pEXTbYZZzcYgEdJMfo/QFfrB32/oofPBNTg4uuErfjZAiPYZGI9hVzG
-	 qIZRnUfwKOQBmAisGoaBEiYwkInUNZardAmfsLZ5u+sX4YFH4Zh4AHJmeaZf/sIXPI
-	 fgiAqfaz85hyK0lX5fo+YjoMGm1Sk/qxby17zdYrc1X0fdutV4Mp0GY37V1JjkKF0f
-	 dZxnyHwDiXYOA==
-From: Kalle Valo <kvalo@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Bartosz Golaszewski <brgl@bgdev.pl>,  "David S . Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
- <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
- Dooley <conor+dt@kernel.org>,  Jeff Johnson <jjohnson@kernel.org>,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  ath11k@lists.infradead.org,
-  linux-kernel@vger.kernel.org,  Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>,
-    Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the
- inputs of the ath11k on WCN6855
-References: <20240814082301.8091-1-brgl@bgdev.pl>
-	<83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org>
-	<87msk49j8m.fsf@kernel.org>
-	<ed6aceb6-4954-43ad-b631-6c6fda209411@kernel.org>
-Date: Fri, 20 Sep 2024 09:45:56 +0300
-In-Reply-To: <ed6aceb6-4954-43ad-b631-6c6fda209411@kernel.org> (Krzysztof
-	Kozlowski's message of "Thu, 19 Sep 2024 12:00:53 +0200")
-Message-ID: <87a5g2bz6j.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1726815950; c=relaxed/simple;
+	bh=MV/wpg0Bwi6atxzF0D3C6K0NvrRxaGQGgCsav+39h1g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cOMRux3MQqkQruyh/tTjGhM7YJUeRGxURle2SxiFieoYeoAsNl4TjuwJTQe7vc/Jo2qGqN7g2FgYGshhiasSMEI9MhTMV6NzKlBAmix1euitQZsc39gIP9ysoKKyZqrcO8KElHoODnpLVb4xDO9gvnB92KBlWyG2CTStDtitgzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=SApjxW/C; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1726815914; x=1727420714; i=markus.elfring@web.de;
+	bh=IxTvS8Re1mH+yLe3me+r4ZHkYxfcUhZvllapA26y+nk=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=SApjxW/Cz9i3W3OXAasOVa6gJalKbDJTGX1wEclbCJTJKsAGjVQfrklparT7RF4F
+	 /9l1twIGMgV1QRDQvGtGfIGoOPWruGFBJqI+xNvztCRsCvRRaWb4h/UJDezOHXMvn
+	 F4U7q8Wotxy2VGgpkFvh0EdUe8yICtWJRcreB7LwifJTZieckRa6Twt+YX0Rbl7qL
+	 edTf5eZPurIP/G0CTYFEf0Vvm5j4Xik/ouF7aMuVwjqh1yNXvhkl9qOiPqBlo2NPB
+	 5N5JUCeFMeyXmVi+OKtSzHLwjvUGU/e8j5bJOoRRnLIIdxEHUqjM6P8jttkForP/c
+	 R54InfEhpPuuod1lrw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N62ua-1ruMR00XQe-00shO0; Fri, 20
+ Sep 2024 09:05:14 +0200
+Message-ID: <d9ee8571-208a-45cb-ad51-61926ce23d62@web.de>
+Date: Fri, 20 Sep 2024 09:05:11 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: ice: Use common error handling code in two functions
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+ Karol Kolacinski <karol.kolacinski@intel.com>,
+ Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+References: <f3a2dbaf-a280-40c8-bacf-b4f0c9b0b7fe@web.de>
+ <58d38533-bccd-4e0e-8c7a-4f7a122ce0d1@intel.com>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <58d38533-bccd-4e0e-8c7a-4f7a122ce0d1@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:okDhtZGdxOeK6rH3CHh40dnLehZXd0mSL2Q2FsgR28JsAvdHXvT
+ HomrVNaQ06MtYvCmmHSBEW2YCS4yu1BfWbWbBV9deckg/VQ1utE8seNT5rOb859jETZjMtb
+ ekuuL/ifwq49XNI9twz2QjAOwTTLrldZFa0fuUmfa0FhUo5YnGgulnEAET3Afiqk5CTug4c
+ 1mInlO/A4x2K1CVD6cZYQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:6yrI3HDK5U0=;RIpq8Kdfqk0jdX1PIKjCnlVDPSF
+ 9V5y7/9DTAVbAW8DUUE+IVMXzcDKKvsZR1EUWf4D1tbnAQ5GJbykO8RSY0Yc+vQcgKNXILIxT
+ oOHuniAavuCd/BV9BwMB/f83ZV8JyxCRPPk4Ve/MGVYAu7r6B5ASpJJVKWAVUNb7S8ir/nn0t
+ kima4eWn1RazZCvGizut7pPmnbt800FK2O1VcMm8CoBLUL8mTWcTjFENokpwU+dtjGxYzvFec
+ K3sKUALB02GjoMzBQ9hWfmmRUCXfqH+kQeCbG7xwhGXpz73U9FHwZPblX15k+p++BxujaYcTW
+ GgMgxytxJ2ytooiXN020cTBsHZ40KMvTSYaLY9LzjldZuV1OFS5pYH9PXMnCD2l2vLxRUx6PL
+ tPRH8XQWqgKPSaIQtq6YEfyYJJxwhePYU+vHE0XB0rW9f3kEZ5gr9ZaiOGY2rZkQFBh4R2nXU
+ htCixzc4z3C/WCnaRnkUfrkF6R+imW5ioRAyD/nHkDAziJDek8LGejymq5wbYOyKuL3vTQPMx
+ riwWnwckLeegcO9/SK8B4itus1Jats0HHx6XiDfIfNx5DL0fLgLIb1f4JLlpSaLrBRqWYFw35
+ Mik40Nmh4t1FcnFhb3KBETRt4OAzQhBuVhDRh4GgFRExE13ZKWFyvlC10YYd8hgxpxo1HQc+9
+ weEyY9vHBoE/4/e4y7Ep2+Z3J2TaUpY04KZEUsv0zP45bfEBepJIpnQgM3t2dKgwdFbWxAg7q
+ gEA74pKDHe2lEjv+KTak8LtCpzkA883tg3qUrJ05F0YkT2XfXUgEEbtdlKjItCkUlg336EkHG
+ yajyQ3JdprSndiU0jklvEbQg==
 
-Krzysztof Kozlowski <krzk@kernel.org> writes:
-
-> On 19/09/2024 09:48, Kalle Valo wrote:
->> Krzysztof Kozlowski <krzk@kernel.org> writes:
->> 
->>> On 14/08/2024 10:23, Bartosz Golaszewski wrote:
->>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>>>
->>>> Describe the inputs from the PMU of the ath11k module on WCN6855.
->>>>
->>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>>> ---
->>>> v1 -> v2:
->>>> - update the example
->>>
->>> I don't understand why this patch is no being picked up. The code
->>> correct represents the piece of hardware. The supplies should be
->>> required, because this one particular device - the one described in this
->>> binding - cannot work without them.
->> 
->> I have already explained the situation. With supplies changed to
->> optional I'm happy take the patch.
+>> Add jump targets so that a bit of exception handling can be better reus=
+ed
+>> at the end of two function implementations.
 >
-> You did not provide any relevant argument to this case. Your concerns
-> described quite different case and are no applicable to DT based platforms.
+> Thank you for contribution, the change is fine,
 
-Ok, I'll try to explain my concerns one more time. I'll try to be
-thorough so will be a longer mail.
+Thanks for this positive feedback.
 
-In ath11k we have board files, it's basically board/product specific
-calibration data which is combined with the calibration data from chip's
-OTP. Choosing the correct board file is essential as otherwise the
-performance can be bad or the device doesn't work at all.
 
-The board files are stored in board-2.bin file in /lib/firmware. ath11k
-chooses the correct board file based on the information provided by the
-ath11k firmware and then transfers the board file to firmware. From
-board-2.bin the correct board file is search based on strings like this:
+>                                                 but not as a bugfix.
 
-bus=pci,vendor=17cb,device=1103,subsystem-vendor=105b,subsystem-device=e0ca,qmi-chip-id=2,qmi-board-id=255
-bus=pci,vendor=17cb,device=1103,subsystem-vendor=105b,subsystem-device=e0ca,qmi-chip-id=2,qmi-board-id=255,variant=HO_BNM
+Would you like to qualify my update suggestion as a correction for
+a coding style issue?
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/coding-style.rst?h=3Dv6.11#n526
 
-But the firmware does not always provide unique enough information for
-choosing the correct board file and that's why we added the variant
-property (the second example above). This variant property gives us the
-means to name the board files uniquely and not have any conflicts. In
-x86 systems we retrieve it from SMBIOS and in DT systems using
-qcom,ath11k-calibration-variant property.
 
-If WCN6855 supplies are marked as required, it means that we cannot use
-qcom,ath11k-calibration-variant DT property anymore with WCN6855 M.2
-boards. So if we have devices which don't provide unique information
-then for those devices it's impossible to automatically to choose the
-correct board file.
+> Please send as a [iwl-next], when the submission window opens.
 
-So based on this, to me the correct solution here is to make the
-supplies optional so that qcom,ath11k-calibration-variant DT property
-can continue to be used with WCN6855 M.2 boards.
+Will a patch resend really be needed for the proposed adjustment?
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Regards,
+Markus
 
