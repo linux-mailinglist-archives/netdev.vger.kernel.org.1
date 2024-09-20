@@ -1,175 +1,136 @@
-Return-Path: <netdev+bounces-129097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE22797D6E5
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 16:29:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B51497D6F5
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 16:33:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1AE0288DB8
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 14:29:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9C2F1F24F54
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 14:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C625C17BEA2;
-	Fri, 20 Sep 2024 14:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E408C17C215;
+	Fri, 20 Sep 2024 14:33:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Jr5DSFeO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OYpgZDmR"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2078.outbound.protection.outlook.com [40.107.21.78])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB33117BB21;
-	Fri, 20 Sep 2024 14:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.78
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726842582; cv=fail; b=OtZwSqQFWwN/9bXVePGETBEYzCj5U4hxc+zabDaNTa09OwyhZ2uP9vW5TiBAY/KdDi/TElCmddGqNXrZUYfhuOI8xHi3NJ2pZW00twJ77nVYYympQB6rdp//OF7HF1HAjfMMTmSrtSAyc57fcxuR7+TtzRdhPv6WKG6b1MZe+qI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726842582; c=relaxed/simple;
-	bh=uRDQrtqmDrseNr3xa1d0zffDcVsh39vBZAwCJVu+1Ao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Bc9yoLMjWgwS/7YZxUTADFTmPPdurVYacTg5dX+NS26JLyjlLXJoBXtCVhwViJxn2zSGJNn3Fu9VN98nmODkFO+l/VZd1GrKLe/Z1pwg1u5ctsdT/tyQz2sQDSbGxTQENs17oLErrFtRmgUuIqfzWXFRImGPbAct5TmLCqfmhQY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Jr5DSFeO; arc=fail smtp.client-ip=40.107.21.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AU5cZSPQZ/j7SdYnxmhfbXO570Gf38U9v7kasGxOE4vbOX8xLaxujbtxFE/HzE7kPpoQZC62n/U5GdjhMWFRmzf6Rh2AYyM4XW1ZB1SlLu0MYhqCcowu3iByZbjx9n1HCuK81bBgPTBrCtyRWwFn0yiLBNBQZ5H8ZELatmgj7Ec68z29lYTf5Eh9qZd5DbFbjS59W/krnor3RIzCF6J+ob5kUwvfghYMWR2u5DsHdwlSRLXEF0HBUvdN01cx7s0rkOoYi2kvy0Gp/tjh1avX/2dSZJWO0WHEnNiD6RetAYb8OjZSjbbQ6A9RlL90EKPBcqk+MNyHNcDJUEPrWeFCNg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uRDQrtqmDrseNr3xa1d0zffDcVsh39vBZAwCJVu+1Ao=;
- b=XsHf8JuWHCpK3jgxXd5ZaHUPQSclzUU8/+RmBlNGNUImZAnB+M/IXpF8O8+g+w00KlLf4oU/aMCGsTINQkUT5+tO6MeQ85oxzTZVH2qHXHKuEvfeh7kjynJDfYHeUIuCZOaUIJ8fJwPiCXjC98RQECW+pCIE0xcfZY6rE4G4oe0bJ4ZBegG2InG8k5labVd1HTDTcgKlc08LwYvtbIwINB0UtsERQqOt77DmkYNhMDVDf1ySCrqMXvtdV5Oipq4oWmeXPXFiaSfKAIRXF1seM18+Wmg0avvts71GCiRe//WCL6CA7VBODmNBfwh3wHTtLlpwgbkDjt/NTbLLW5OH4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uRDQrtqmDrseNr3xa1d0zffDcVsh39vBZAwCJVu+1Ao=;
- b=Jr5DSFeOO870u/uCy/WRMJEXbqdHy+VZzgEEAzUtYn1L1Nmyrl32U+ESdS56+gg9Z4bzaWKQdxMkcBmLVXl1ns/ct1g1WblB7ZxXPfST31mxA6oLuB3LFjAOxBf3YvLA9huAQpezR4WMF9gVaV+tdwxsZNf4+d38M1En2usDqUobQKL4pCj5UiRrfnWfblYlhnsbyhENBDQM8IhqWZen+0YTxNfWQjx//vV/7UY7oXdqjzFO1auzFIuJ8vq7mu3/jVnR79AcYjkVSr3OOEYzuGmgX+zklLii12kGC2hznECFGDFRYIoaOyWvg62vrgvVi/BwEUL8rN8ZIxut9BRGAg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AM7PR04MB7142.eurprd04.prod.outlook.com (2603:10a6:20b:113::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.18; Fri, 20 Sep
- 2024 14:29:37 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.7982.012; Fri, 20 Sep 2024
- 14:29:37 +0000
-Date: Fri, 20 Sep 2024 17:29:30 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	"ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>,
-	"hawk@kernel.org" <hawk@kernel.org>,
-	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>
-Subject: Re: [PATCH net 3/3] net: enetc: reset xdp_tx_in_flight when updating
- bpf program
-Message-ID: <20240920142930.qo2m7pvxwpgcpkei@skbuf>
-References: <20240919084104.661180-1-wei.fang@nxp.com>
- <20240919084104.661180-4-wei.fang@nxp.com>
- <Zu1y8DNQWdYI38VA@boxer>
- <PAXPR04MB85101DE84124D424264BB4FD886C2@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20240920142511.aph5wpmiczcsxfgr@skbuf>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240920142511.aph5wpmiczcsxfgr@skbuf>
-X-ClientProxiedBy: VE1PR03CA0041.eurprd03.prod.outlook.com
- (2603:10a6:803:118::30) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A5A17BB06
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 14:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726842824; cv=none; b=Pk04YKOw1zM+CIO7asSAT0jnyCTy3pXkIC6J/gWriLGP6zNSGBfu3w7tqI3jNEqAAk/FHlrMOs9JrjOc2jcD/1rvj1TsiTpMbL9E0iAagDOCTS0Pd5jH1koIbk5Ts0TPKAwPXR1XNQ8dqkb+2044b8QOzP1NHiznkWreZHAcLr0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726842824; c=relaxed/simple;
+	bh=tUfgUOq49WrEDpN5pdgY6D/0Qk7FtO9dpv32vCJn3IU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hLdHhVdR4n1ZcYuUQ0p+SoKs/CQ/sTEZcwLmn7Finbi28PY2f2ujg0h8IgvvNzrFqE55zRAmpe02TpIHaB3fzBTf/tqf7nxXgwGT17I6YTdVAozNzHGYE9NVSqWOLx6SbNY6lJGGDpKToU18sXJ4y8HQ0zj7y38uXOVccKrLgnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OYpgZDmR; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726842822;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nh73bzW1xNMFfeehNCkHV0pz1FHPuovA0JZeAor5wJM=;
+	b=OYpgZDmRwiXVEnZW//1CjqZgdskRbpR7jPmmt/TnE9CWvSm6MAmdqJgtN+OlFQHyKLWAcZ
+	t6knyZEO2z7DW8Dpexz3m62wDCkFVRc6YAvxWmuVA1kmieqtcYY0C1uxfb+NCBLIxpT+3e
+	2mj8Et2VEAOeJLWBHK3Hzpw/OqAO0XA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-EwyHvo2mOleUHrUDu8qtmQ-1; Fri, 20 Sep 2024 10:33:40 -0400
+X-MC-Unique: EwyHvo2mOleUHrUDu8qtmQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-42caca7215dso13770905e9.2
+        for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 07:33:40 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726842818; x=1727447618;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nh73bzW1xNMFfeehNCkHV0pz1FHPuovA0JZeAor5wJM=;
+        b=LmJaXNbURcpF5QFwZGmdZIUG40rAb+h5wgMkI26m4XkCPgxgPWwnusuBrZMVg2GiE1
+         glEzLW0x37Qq/Lw0g/lQ1ARSoI1w0ezPfzn3bzrdgslo54o0hsszuFoDt5wEDfogzlFt
+         OxhgXxN7zacKs6gRTsKbvDlwKFbuB/CLl+qhUjJMA37FfVmWdFeH8goEIjM6sVYhtni2
+         wcRVxY4Ixk+bN2WHlnCAl73S6v8Iqy232O6mv6W7CqMeX0C3qtGg5pXxLg7WOUvKxMd0
+         Nk2l3Xto6WvGL7LYhEiopL6KXjqflg0AvgQfDHfBbVPfl8pr38UFkEzPvcjgRqHsh1e3
+         HBig==
+X-Gm-Message-State: AOJu0YyuyGb8IYovR2BIvv9Ndwn94bukt89MAI+nklYejjpcLZUvZg7W
+	um2LyodTqbxY/ar/vMODZu6H0Xw4OFQ25bYv0vpF7st74fAjzmv2lsr7nUuDkkVXdYhorL2fIJi
+	VsfDspNQR9eLKRukVzaGKmyU01Ajf41OEmsN6W606mxyTT9S6O3ax+X2TVBlQaEGCSPWScM5GC4
+	gBlK1UoeRfpa9ofNYfDZt8kJPERqTFSVezI8k=
+X-Received: by 2002:a05:600c:1913:b0:42b:ac80:52ea with SMTP id 5b1f17b1804b1-42e7c15b463mr17788095e9.6.1726842817909;
+        Fri, 20 Sep 2024 07:33:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEd1vVMqqhTQymkaT07xRTWXVi5ZjKJWcWsXMiOmQS35B7J37IDcfa/8i4iM26zXTYmInNzAQ==
+X-Received: by 2002:a05:600c:1913:b0:42b:ac80:52ea with SMTP id 5b1f17b1804b1-42e7c15b463mr17787815e9.6.1726842817465;
+        Fri, 20 Sep 2024 07:33:37 -0700 (PDT)
+Received: from rh.fritz.box (p200300e16705d800cb8281343aec4007.dip0.t-ipconnect.de. [2003:e1:6705:d800:cb82:8134:3aec:4007])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e73e85ccsm17749784f8f.42.2024.09.20.07.33.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Sep 2024 07:33:37 -0700 (PDT)
+From: Sebastian Ott <sebott@redhat.com>
+To: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH] net/mlx5: unique names for per device caches
+Date: Fri, 20 Sep 2024 16:33:35 +0200
+Message-ID: <20240920143335.25237-1-sebott@redhat.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AM7PR04MB7142:EE_
-X-MS-Office365-Filtering-Correlation-Id: afa69a6b-07fc-4869-c03e-08dcd980a59b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?zGxRKC36+0bgQBZI+Hy+AG7Yz0SHVk0N5GJUowxzcN5MS7jJX1DKrzHhBqIJ?=
- =?us-ascii?Q?CLnycKljPPxjw4dJKbrWojylrVPyY+5qLadOZTmU1ed5tU+qeX8LHQ5vBa+H?=
- =?us-ascii?Q?596CcsMbehfM68E36MMXnzHscMC2MdARfbz6k1HFuGbuBczL7etBbjENcBLU?=
- =?us-ascii?Q?37+sJESqo1VlkvxDryH2rl7e6vq/l1rAnKGwWhwBMzMs1p4KkGU10d3zkk9r?=
- =?us-ascii?Q?ug9tBHZrQWWs111s6Ocb3BbAjMvPTkyb1wZT5RgKkCk3WAG668E7YbLqWCpR?=
- =?us-ascii?Q?Wy7KRe0zL2US2p71EXu7DqiLeLosUM3o4oj2Ny1wrPClgM8RxwEbagzrA6eH?=
- =?us-ascii?Q?s2oCVbNPBpYuI9sENxTRXVQFc2MzK7AfRi3HCFYdPtvmuwd7EU55uQo5IKS4?=
- =?us-ascii?Q?9r05oA4j3skF7BoSNVv24RRuf3K0H1hhWlMYxa8CYW9i6zX/XSGXiaOwlwMs?=
- =?us-ascii?Q?/ubmKQPF5zI+2xnVBiSnp6jQv1EOSH7G0FEvfirG67WQbi36vFRg1Njas83l?=
- =?us-ascii?Q?u1GgKj6GKmxnme3ZS94QjdxV4aD9IQNNyU2y51scbuNt9E3HtMV9YeUwdu3M?=
- =?us-ascii?Q?29BNFuLygJa35JOUj3ebJhgdd/2WHFsXyDr+O8gRfIB/3nXTBJsVVztxoVRa?=
- =?us-ascii?Q?Vd8MGg4k5jF4Salv12uk4BvcMoQnhE0gU09rEu8PitafXn08IzOHcEyfm6ua?=
- =?us-ascii?Q?68E9+cm7/9V5pqmsuav1n93YcE2+Cw6VxrEfa4DrKdNi9UCvizEh52Ury8QL?=
- =?us-ascii?Q?mLjmy3cFiEN77lHTeuaLOy4sG5bzSt4YfDScIdBNDvu4QlrEaBfXCZeuyJ/9?=
- =?us-ascii?Q?3hvhhXwWrPzWKeDUmSM/GZ2MnYoX8j8mjEC4rZEYPOFUX0Zzw06T59XMXK3D?=
- =?us-ascii?Q?vvdBz5nkBw3jUm/Ys8vUbqbtRhGlUnr2E4ndfGDN+vH/jYZbXcgeQhEl+YfC?=
- =?us-ascii?Q?rkZHrPK2dxaTruD0adxVwjZ1LXsbLWK3Lzg1Plk5yiVxR8B1MeEEXNfNGge2?=
- =?us-ascii?Q?uItGivEXu/5ltmS31GuXm8/zgpGTV2TVMuV4JLIO4A/FVGMtkO2JiSDym0Q8?=
- =?us-ascii?Q?6XoCWgaW3QniBSMFBld2HIoEpigysBW6l6RgF1EMbM7p/fqyaqtN4tXcM4Je?=
- =?us-ascii?Q?f62U1K47aKt8BtMG4d9EksvQ0SHS4Z+P233iskPk4hqE7WeqAbqjib5N9g/O?=
- =?us-ascii?Q?DsIBXs4kCKvM6c22lsMTbEzi08axUmNsjebDTsreDhBPOIC9JfvB6JLYXl62?=
- =?us-ascii?Q?bOpeUJ7glAV61/CKTL2eK5Z8XqiMRcYcVQBOdnM+kzv3bNkczJvxpYcKHzYP?=
- =?us-ascii?Q?jGImU1H9BFe1J1nMsYzLfsIrLetKe6z2/6BpXoTtzWGy6A=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?aKfY6A6H8KDO0ZsujWkFCukBdTfwSrzBljP2RvIGPFNSBR1b1HnEelx/yfJD?=
- =?us-ascii?Q?iAdcFNTP//ivDMXM9eJABmI6M2IC8p+RcMjKCMh8CkZoQuQWP3eKgGz8i3iF?=
- =?us-ascii?Q?fa/skCE5n7Nh1UR9iyTa8Pn4drJLSd4KTw6+5jU8+aLlVgjO4uVBDSdMQDmS?=
- =?us-ascii?Q?PMbpP+0T7J6QxM5v0T3wllu8iUdSkxhQNBxBwI5qJmukh8IhjZ2YoD0mF8+o?=
- =?us-ascii?Q?F1GZffQFzRk463j9QxZAqddaF5irXCUaQM6XC8t8bAT6FD5vOxAhvHxYlVzt?=
- =?us-ascii?Q?MCYOkmoBp6P8mJnPgTjonFD8GeVMaMoc9vjB8FG3Lqw7GaJWPGUlyFegTvqz?=
- =?us-ascii?Q?/0F2S1iJyOFNtMyLrqJ+0UQjo3HHikS1Tig5zRdeDXJ19yTUPJJaEmjd/jUd?=
- =?us-ascii?Q?DoIaPWT/DRRShdsFqdRWyKZwkFzACuDV5k0PJ482yjkvT75Ec8FtjJpH+t3H?=
- =?us-ascii?Q?iHkb16oriEaA/cdROdCTPjcIe/fSRVuKJZ0M2F2IjKMwOxQk+OP7wWyMzUHe?=
- =?us-ascii?Q?NVwMubTmBXM5K2cJXsis61nQM8JKOdD/99apDG2IhlrNuayGX9iTjyWw7u+v?=
- =?us-ascii?Q?Cfe+VGULbwj1Q0IB2CHXepTBFxeMcdM2ltMj1koQ1p+shpgS44oXAJAUGKUo?=
- =?us-ascii?Q?SUyCttqbyh+G87J4RP0I2A6h09yXh3TUiJmfD5YS5ul0SPHV2yxJ564EYfhN?=
- =?us-ascii?Q?o5EAtDzhvJqsM14P7myPb5OWyNCOXQBO0ONoTtx8R9RTd0wEjxEPIXaEyjr8?=
- =?us-ascii?Q?fxyIeCewA+R9jpaTNRtMTP+C4kjUSfYmd6cZvre6tX9o4mfZQ2+AHwiXytsF?=
- =?us-ascii?Q?KqG93uV9bDzEycq450M5gp06/qR3A2g/JZvzqDcYxjDwH2yBvSgSOxVJQOWn?=
- =?us-ascii?Q?ikiZPYYOFjb4vMPAdedD7I5t/qry0tZ6GQf0jv/R/pR6mUxUB7C6t+IDJxJp?=
- =?us-ascii?Q?DkfgJWkbh/lBFJmwUKt2HO5JUOcBeRpJBan578vLCN1gxa/XntNXww5uiPm+?=
- =?us-ascii?Q?Vch2cc2AV5kfe0O0VAPy+P6Grye+5g0RkQi9ip29Z8AWh8BG928WMy71B1NR?=
- =?us-ascii?Q?Dw120/UjjBrl0UD79mEg2BeVl3WWiSgjQfGptQVWTXVFIiHGmkO6buQwTsMG?=
- =?us-ascii?Q?mmSjTsN/0cTlUJpRU56NG7QQRSPG5x0hXfTWRd+BCH8z9M9kiKrmWHy295FK?=
- =?us-ascii?Q?5w3pztqggyNyTOPUOIjfXFd6sk4xVlOF03v67t3FY18AUmlVOb13DYr3OEXr?=
- =?us-ascii?Q?cIee8qbf8z2fWCqT/iOKSpip8Q8mYFqA+LgYUHPe3/RVDvU9xDan52R3e2U2?=
- =?us-ascii?Q?SPbfxrmHEPBkZFJA6iwkH4+TL5RooWuNEx+0uVLZLQpqK+6O+XhsncWmzyBp?=
- =?us-ascii?Q?aNFU+HChhFF4GJ+CD+Vy6Hujnk1INzhHAK7w0IP0AOObdqo1cBrRO0QB31TY?=
- =?us-ascii?Q?pJ351ocsUh6LB5PAEoNaiCh3FLzuJ9U2WdvbQ4FUFZghDWGNN9mz42Qr+p1A?=
- =?us-ascii?Q?1kUhmj2gy4P6n+K+xHwaxrIdMq//DkrHA8X8FD8kuHMy/J3IB5QKhXbey1ul?=
- =?us-ascii?Q?3pqH5mv/a+9bdgmrNcp6rguNMEylrrev9L1UoJd5Ezfxt4o1pNoJrGTxmKfq?=
- =?us-ascii?Q?0g=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: afa69a6b-07fc-4869-c03e-08dcd980a59b
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Sep 2024 14:29:37.0348
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KCY8IK9IJM/Hg2LSgTXM5OcjUs/t620jdkuFlMM1QrWrGphNECiw2eR/m8l38Kx4DAkp9B8bEgjCWjTtCV7kCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB7142
+Content-Transfer-Encoding: 8bit
 
-On Fri, Sep 20, 2024 at 05:25:11PM +0300, Vladimir Oltean wrote:
-> That's when we started rushing the NAPI poll routing to finish.
+Add the pci device name to the per device kmem_cache names
+to ensure their uniqueness. This fixes warnings like this:
+"kmem_cache of name 'mlx5_fs_fgs' already exists".
 
-routine*
+Signed-off-by: Sebastian Ott <sebott@redhat.com>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
+index 8505d5e241e1..5d54386a5669 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
+@@ -3689,6 +3689,7 @@ void mlx5_fs_core_free(struct mlx5_core_dev *dev)
+ int mlx5_fs_core_alloc(struct mlx5_core_dev *dev)
+ {
+ 	struct mlx5_flow_steering *steering;
++	char name[80];
+ 	int err = 0;
+ 
+ 	err = mlx5_init_fc_stats(dev);
+@@ -3713,10 +3714,12 @@ int mlx5_fs_core_alloc(struct mlx5_core_dev *dev)
+ 	else
+ 		steering->mode = MLX5_FLOW_STEERING_MODE_DMFS;
+ 
+-	steering->fgs_cache = kmem_cache_create("mlx5_fs_fgs",
++	snprintf(name, sizeof(name), "%s-mlx5_fs_fgs", pci_name(dev->pdev));
++	steering->fgs_cache = kmem_cache_create(name,
+ 						sizeof(struct mlx5_flow_group), 0,
+ 						0, NULL);
+-	steering->ftes_cache = kmem_cache_create("mlx5_fs_ftes", sizeof(struct fs_fte), 0,
++	snprintf(name, sizeof(name), "%s-mlx5_fs_ftes", pci_name(dev->pdev));
++	steering->ftes_cache = kmem_cache_create(name, sizeof(struct fs_fte), 0,
+ 						 0, NULL);
+ 	if (!steering->ftes_cache || !steering->fgs_cache) {
+ 		err = -ENOMEM;
+-- 
+2.42.0
+
 
