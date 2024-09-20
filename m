@@ -1,184 +1,227 @@
-Return-Path: <netdev+bounces-129127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC2F297DA16
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 22:32:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D748C97DA2A
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 23:03:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B27E1C20B35
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 20:32:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A7C21F21E38
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 21:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E053038DF2;
-	Fri, 20 Sep 2024 20:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3612817C9A9;
+	Fri, 20 Sep 2024 21:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="nu93tajL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E31B15E97
-	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 20:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1738BEBE;
+	Fri, 20 Sep 2024 21:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726864344; cv=none; b=pVPwiEK0CGihcrTt51/CulhJkAKh+Lv4I43DQY43++wpQlA+64LhK7QROfu7KuI4NDkwYpDuwd4EBYIi7AViJ4mF02lN5VOTLrFJnrwRyIz8fQwt9q91K4vZXuJXdc8z5g5R30l0SqXLZ1EuT+5ct6OlEyL0eNm9jYMGDS+D6iE=
+	t=1726866192; cv=none; b=T71h7Nklr+y1fUFhzEOiinsolMcmT7skPBQLXQ9EM7dM6caFyZLz7x2+cIKWx+SuY+zRwjQhx1ajGdByar36fZ9rVm4h9H1Z8l9GiG5NEOdaAmWGoydzduLYMYyIpIrixfiyUrwgwlf7KznHNGP0iLRuYNCT4ZyqrqcHkBd1GeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726864344; c=relaxed/simple;
-	bh=mEneWP1qBGs0CnJElUkcKJfUKMxN8NqiBW+1XFVnoRQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=dzmrLWotoLs1RnZ7qQiTCzNoVVDUjOrK8USIFxso7+AKYDYZsLsE08dgUPt9uH/329lvIkNJrhzu7yLM39cq9mxaXlAzzJwT6MfoTxtpQ2vnapOrKHPlwuq/Z7dVcjKItq7jDLY8ujqZqYt8IR5WhN2CMk6D7NwIdEhQscluJpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-82aa4678394so391428439f.3
-        for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 13:32:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726864342; x=1727469142;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zH4CGun5FdXs5sVSKWrYadSnvsfpjmcreRzHvorZMe8=;
-        b=tvJWt8WlHKmbTbnIPubXLym63k1eHKyrr1kdHFFOkO22ewuOMOvybLBoqjuP1RyHsB
-         fi4sveSBs/WOG6lSgSebUfmU6267SzS04byHmCQhesV/hp5Fe7ehCLUKgRnV/7un8/2L
-         T6cB6Z9wLqUMtrDHdGlhDRdJy8E21YE8jxzZmsMVnakoxY+xFtNtuatwJvZwz/RkFaUQ
-         fwSs/oXeTrxCqaSxG2J1yMyWnCJJxcSxPAFN9LMRaaWw4hDTu/vWNfeUZuOd0szB33Gh
-         CQZyqaJFkFUs64L+sQc6+bnirx8wnCFpKO4Pce418bg9KVamQRzv46kNEhUulXKZ6n4Y
-         oRuw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMUEgx8+oum2p+UzyQF8QcdhoMWkf+fRc9k5eDjzNBc3hQYD5aZCP2uKB1xcP11NPAIB4UQpo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy1cIslRV5EOkv3yCBBi/CRQXsoGUHF6Vs+zHGvwF5CZkCbjBS9
-	QjQLrOzUcleoP4PYNT7jIV0eDiP/v7kKn76mYtgtmU1SRG0hzTBebkEGs+O4ilstIXoP4Xanlis
-	wXPmN4wJCavwRw75fpEqcUHWLdKu4ZhZesj98JYW1HhJXMi22la+xxwM=
-X-Google-Smtp-Source: AGHT+IGLD46nYhdO8KHMYv0/RE/yy1oHfRbkBTtWpimknnuvwzEg3rHsq6LbvOBKgnMU+J5M4eoVj8xQFtv5zM7LILo+KGKbk+Vf
+	s=arc-20240116; t=1726866192; c=relaxed/simple;
+	bh=To8EsQs4C3f6m/gBBaaZms93pIspdDdKgL2SmZRBnL0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=BU0TDBIQky5//dM5yf8Iobz0sOODbAJircCb9BBWsO7KtwZF3hohZlwCS3qqw+TfPUHN92TNpUas5Ft+BX91B2V+ugp4LLiBCYw7eQWscPhemZrkvOStRZF6LGiPOro76vpEH7MzZPXk2sWtZp6mdoIuSHQITL4CdJnxhn/OJmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=nu93tajL; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48KKfhIK021838;
+	Fri, 20 Sep 2024 21:02:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	HPvH/KPFI9cFs02tKe4xQrHmrpWIDZy+NVAg7DBI6Hg=; b=nu93tajLBCkg+R+c
+	B4qjmmfYtTyocAmggLNlaP8hRdjLcWVFh1Ruj8h2vUi7SuWN8vUhd9NZO3Gt87/u
+	92Q5oCdKY+Yx5XZNG/Fo6bjXrdlUe/LHxraDaWD6AC3ViNus/ctcjg97SP+cvXSi
+	F3t+OZ17fvL9uiFG4788huCGYcJgD5f6ZNMAJiVOW1PoD7V0tQ+mcZZWdR7fIEas
+	NrT50GiMnlOLeAYnvP/js1Te8imxSMFDXZUUDb7fojIF93mI3mT7giAHr4Nh7gvT
+	MtymmO4Bn1TubZPB477Fl8dLBWUvhJWgnMqOSRlKW4slAYG2fMKB6XbhP2gwnHOn
+	ybhMMA==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41n4hfafb6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Sep 2024 21:02:54 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48KL2qBS008927
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 20 Sep 2024 21:02:53 GMT
+Received: from [10.111.182.77] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 20 Sep
+ 2024 14:02:52 -0700
+Message-ID: <b7fdafd6-5029-4b80-b264-11943740b354@quicinc.com>
+Date: Fri, 20 Sep 2024 14:02:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a0e:b0:3a0:922f:8e9a with SMTP id
- e9e14a558f8ab-3a0c9d6f2ffmr42851735ab.17.1726864342460; Fri, 20 Sep 2024
- 13:32:22 -0700 (PDT)
-Date: Fri, 20 Sep 2024 13:32:22 -0700
-In-Reply-To: <000000000000ce6fdb061cc7e5b2@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66eddbd6.050a0220.3195df.0013.GAE@google.com>
-Subject: Re: [syzbot] [netfilter] BUG: soft lockup in batadv_iv_send_outstanding_bat_ogm_packet
-From: syzbot <syzbot+572f6e36bc6ee6f16762@syzkaller.appspotmail.com>
-To: a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org, davem@davemloft.net, 
-	edumazet@google.com, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, mareklindner@neomailbox.ch, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pabeni@redhat.com, 
-	pablo@netfilter.org, sven@narfation.org, sw@simonwunderlich.de, 
-	syzkaller-bugs@googlegroups.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
+ of the ath11k on WCN6855
+To: Bartosz Golaszewski <brgl@bgdev.pl>, Kalle Valo <kvalo@kernel.org>
+CC: Krzysztof Kozlowski <krzk@kernel.org>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Jeff Johnson <jjohnson@kernel.org>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <ath11k@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        Bartosz Golaszewski
+	<bartosz.golaszewski@linaro.org>,
+        Arnd Bergmann <arnd@arndb.de>
+References: <20240814082301.8091-1-brgl@bgdev.pl>
+ <83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org> <87msk49j8m.fsf@kernel.org>
+ <ed6aceb6-4954-43ad-b631-6c6fda209411@kernel.org> <87a5g2bz6j.fsf@kernel.org>
+ <CAMRc=MeLick_+Czy5MhkX=SxVvR4WCmUZ8CQ5hQBVTe2fscCPg@mail.gmail.com>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Content-Language: en-US
+In-Reply-To: <CAMRc=MeLick_+Czy5MhkX=SxVvR4WCmUZ8CQ5hQBVTe2fscCPg@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: uWrwlgWhzSafXP1o32PKT16s7q-E5LRi
+X-Proofpoint-GUID: uWrwlgWhzSafXP1o32PKT16s7q-E5LRi
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ suspectscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015
+ mlxlogscore=999 adultscore=0 malwarescore=0 phishscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2408220000
+ definitions=main-2409200153
 
-syzbot has found a reproducer for the following issue on:
+On 9/20/2024 1:22 AM, Bartosz Golaszewski wrote:
+> On Fri, 20 Sep 2024 08:45:56 +0200, Kalle Valo <kvalo@kernel.org> said:
+>> Krzysztof Kozlowski <krzk@kernel.org> writes:
+>>
+>>> On 19/09/2024 09:48, Kalle Valo wrote:
+>>>> Krzysztof Kozlowski <krzk@kernel.org> writes:
+>>>>
+>>>>> On 14/08/2024 10:23, Bartosz Golaszewski wrote:
+>>>>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>>>
+>>>>>> Describe the inputs from the PMU of the ath11k module on WCN6855.
+>>>>>>
+>>>>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>>> ---
+>>>>>> v1 -> v2:
+>>>>>> - update the example
+>>>>>
+>>>>> I don't understand why this patch is no being picked up. The code
+>>>>> correct represents the piece of hardware. The supplies should be
+>>>>> required, because this one particular device - the one described in this
+>>>>> binding - cannot work without them.
+>>>>
+>>>> I have already explained the situation. With supplies changed to
+>>>> optional I'm happy take the patch.
+>>>
+>>> You did not provide any relevant argument to this case. Your concerns
+>>> described quite different case and are no applicable to DT based platforms.
+>>
+>> Ok, I'll try to explain my concerns one more time. I'll try to be
+>> thorough so will be a longer mail.
+>>
+>> In ath11k we have board files, it's basically board/product specific
+>> calibration data which is combined with the calibration data from chip's
+>> OTP. Choosing the correct board file is essential as otherwise the
+>> performance can be bad or the device doesn't work at all.
+>>
+>> The board files are stored in board-2.bin file in /lib/firmware. ath11k
+>> chooses the correct board file based on the information provided by the
+>> ath11k firmware and then transfers the board file to firmware. From
+>> board-2.bin the correct board file is search based on strings like this:
+>>
+>> bus=pci,vendor=17cb,device=1103,subsystem-vendor=105b,subsystem-device=e0ca,qmi-chip-id=2,qmi-board-id=255
+>> bus=pci,vendor=17cb,device=1103,subsystem-vendor=105b,subsystem-device=e0ca,qmi-chip-id=2,qmi-board-id=255,variant=HO_BNM
+>>
+>> But the firmware does not always provide unique enough information for
+>> choosing the correct board file and that's why we added the variant
+>> property (the second example above). This variant property gives us the
+>> means to name the board files uniquely and not have any conflicts. In
+>> x86 systems we retrieve it from SMBIOS and in DT systems using
+>> qcom,ath11k-calibration-variant property.
+>>
+> 
+> No issues here.
+> 
+>> If WCN6855 supplies are marked as required, it means that we cannot use
+>> qcom,ath11k-calibration-variant DT property anymore with WCN6855 M.2
+>> boards. So if we have devices which don't provide unique information
+>> then for those devices it's impossible to automatically to choose the
+>> correct board file.
+>>
+> 
+> What you're really trying to say is: we cannot use the following snippet of
+> DTS anymore:
+> 
+> 	&pcie4_port0 {
+> 		wifi@0 {
+> 			compatible = "pci17cb,1103";
+> 			reg = <0x10000 0x0 0x0 0x0 0x0>;
+> 
+> 			qcom,ath11k-calibration-variant = "LE_X13S";
+> 		};
+> 	};
+> 
+> First: it's not true. We are not allowed to break existing device-tree sources
+> and a change to the schema has no power to do so anyway. You will however no
+> longer be able to upstream just this as it will not pass make dtbs_check
+> anymore.
+> 
+> Second: this bit is incomplete even if the WCN6855 package is on a detachable
+> M.2 card. When a DT property is defined as optional in schema, it doesn't
+> mean: "the driver will work fine without it". It means: "the *hardware* does
+> not actually need it to function". That's a huge difference. DTS is not a
+> configuration file for your convenience.
+> 
+>> So based on this, to me the correct solution here is to make the
+>> supplies optional so that qcom,ath11k-calibration-variant DT property
+>> can continue to be used with WCN6855 M.2 boards.
+>>
+> 
+> No, this is the convenient solution. The *correct* solution is to say how the
+> ath11k inside the WCN6855 package is really supplied. The dt-bindings should
+> define the correct representation, not the convenient one.
+> 
+> Let me give you an analogy: we don't really need to have always-on, fixed
+> regulators in DTS. The drivers don't really need them. We do it for
+> completeness of the HW description.
 
-HEAD commit:    a430d95c5efa Merge tag 'lsm-pr-20240911' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17e87f00580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=44d46e514184cd24
-dashboard link: https://syzkaller.appspot.com/bug?extid=572f6e36bc6ee6f16762
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1481cca9980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14929607980000
+Again, since I'm a DT n00b:
+Just to make sure I understand, you are saying that with this change any
+existing .dts/.dtb files will still work with an updated driver, so the new
+properties are not required to be populated on existing devices.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/bdf130384fad/disk-a430d95c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c62ff195641a/vmlinux-a430d95c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4069702199e2/bzImage-a430d95c.xz
+However a new driver with support for these properties will utilize them when
+they are present, and the current ath11k .dts files will need to be updated to
+include these properties for pci17cb,1103, i.e. the following needs updating:
+arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
+&pcie4_port0 {
+	wifi@0 {
+		compatible = "pci17cb,1103";
+		reg = <0x10000 0x0 0x0 0x0 0x0>;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+572f6e36bc6ee6f16762@syzkaller.appspotmail.com
-
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	Tasks blocked on level-0 rcu_node (CPUs 0-1): P1119/1:b..l
-rcu: 	(detected by 0, t=10503 jiffies, g=23913, q=347 ncpus=2)
-task:kworker/u8:6    state:R  running task     stack:24576 pid:1119  tgid:1119  ppid:2      flags:0x00004000
-Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5188 [inline]
- __schedule+0xe37/0x5490 kernel/sched/core.c:6529
- preempt_schedule_irq+0x51/0x90 kernel/sched/core.c:6851
- irqentry_exit+0x36/0x90 kernel/entry/common.c:354
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0010:lock_acquire+0x1f2/0x560 kernel/locking/lockdep.c:5727
-Code: c1 05 ea b0 98 7e 83 f8 01 0f 85 ea 02 00 00 9c 58 f6 c4 02 0f 85 d5 02 00 00 48 85 ed 74 01 fb 48 b8 00 00 00 00 00 fc ff df <48> 01 c3 48 c7 03 00 00 00 00 48 c7 43 08 00 00 00 00 48 8b 84 24
-RSP: 0018:ffffc900045b7a70 EFLAGS: 00000206
-RAX: dffffc0000000000 RBX: 1ffff920008b6f50 RCX: 0000000000000001
-RDX: 0000000000000001 RSI: ffffffff8b4cddc0 RDI: ffffffff8bb118a0
-RBP: 0000000000000200 R08: 0000000000000000 R09: fffffbfff2d39ae0
-R10: ffffffff969cd707 R11: 0000000000000000 R12: 0000000000000000
-R13: 0000000000000000 R14: ffffffff8ddba6a0 R15: 0000000000000000
- rcu_lock_acquire include/linux/rcupdate.h:326 [inline]
- rcu_read_lock include/linux/rcupdate.h:838 [inline]
- batadv_iv_ogm_slide_own_bcast_window net/batman-adv/bat_iv_ogm.c:754 [inline]
- batadv_iv_ogm_schedule_buff+0x5ac/0x14d0 net/batman-adv/bat_iv_ogm.c:825
- batadv_iv_ogm_schedule net/batman-adv/bat_iv_ogm.c:868 [inline]
- batadv_iv_ogm_schedule net/batman-adv/bat_iv_ogm.c:861 [inline]
- batadv_iv_send_outstanding_bat_ogm_packet+0x31e/0x8d0 net/batman-adv/bat_iv_ogm.c:1712
- process_one_work+0x9c5/0x1b40 kernel/workqueue.c:3231
- process_scheduled_works kernel/workqueue.c:3312 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3393
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-rcu: rcu_preempt kthread starved for 10529 jiffies! g23913 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=0
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:27680 pid:17    tgid:17    ppid:2      flags:0x00004000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5188 [inline]
- __schedule+0xe37/0x5490 kernel/sched/core.c:6529
- __schedule_loop kernel/sched/core.c:6606 [inline]
- schedule+0xe7/0x350 kernel/sched/core.c:6621
- schedule_timeout+0x136/0x2a0 kernel/time/timer.c:2581
- rcu_gp_fqs_loop+0x1eb/0xb00 kernel/rcu/tree.c:2034
- rcu_gp_kthread+0x271/0x380 kernel/rcu/tree.c:2236
- kthread+0x2c1/0x3a0 kernel/kthread.c:389
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.11.0-syzkaller-02574-ga430d95c5efa #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-RIP: 0010:native_irq_disable arch/x86/include/asm/irqflags.h:37 [inline]
-RIP: 0010:arch_local_irq_disable arch/x86/include/asm/irqflags.h:92 [inline]
-RIP: 0010:acpi_safe_halt+0x1a/0x20 drivers/acpi/processor_idle.c:112
-Code: 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 65 48 8b 05 78 a2 eb 74 48 8b 00 a8 08 75 0c 66 90 0f 00 2d 68 56 a4 00 fb f4 <fa> c3 cc cc cc cc 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffffff8da07d70 EFLAGS: 00000246
-RAX: 0000000000004000 RBX: 0000000000000001 RCX: ffffffff8b181979
-RDX: 0000000000000001 RSI: ffff8880212b3000 RDI: ffff8880212b3064
-RBP: ffff8880212b3064 R08: 0000000000000001 R09: ffffed1017106fd9
-R10: ffff8880b8837ecb R11: 0000000000000000 R12: ffff8880212be800
-R13: ffffffff8e9faa20 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b8800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ff2dde0dd58 CR3: 000000002ad40000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- </IRQ>
- <TASK>
- acpi_idle_enter+0xc5/0x160 drivers/acpi/processor_idle.c:702
- cpuidle_enter_state+0xaa/0x4f0 drivers/cpuidle/cpuidle.c:264
- cpuidle_enter+0x4e/0xa0 drivers/cpuidle/cpuidle.c:385
- cpuidle_idle_call kernel/sched/idle.c:230 [inline]
- do_idle+0x313/0x3f0 kernel/sched/idle.c:326
- cpu_startup_entry+0x4f/0x60 kernel/sched/idle.c:424
- rest_init+0x16b/0x2b0 init/main.c:747
- start_kernel+0x3e4/0x4d0 init/main.c:1105
- x86_64_start_reservations+0x18/0x30 arch/x86/kernel/head64.c:507
- x86_64_start_kernel+0xb2/0xc0 arch/x86/kernel/head64.c:488
- common_startup_64+0x13e/0x148
- </TASK>
+		qcom,ath11k-calibration-variant = "LE_X13S";
+	};
+};
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
