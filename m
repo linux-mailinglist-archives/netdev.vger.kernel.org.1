@@ -1,128 +1,85 @@
-Return-Path: <netdev+bounces-129089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D2E97D670
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 15:45:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EAEF97D676
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 15:51:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4665AB2282B
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 13:45:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7427B1C20D55
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 13:51:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C88A17B4FF;
-	Fri, 20 Sep 2024 13:45:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 524EC17ADE8;
+	Fri, 20 Sep 2024 13:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="plXYD0uO"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="haTLp1z9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-bc0a.mail.infomaniak.ch (smtp-bc0a.mail.infomaniak.ch [45.157.188.10])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20BB17995E
-	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 13:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E793BBC1;
+	Fri, 20 Sep 2024 13:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726839915; cv=none; b=acR7hNGU9aR/CLwqSe55yitKngRuSonAixPvLKKtTOonccHuCKXpKRMGe3IMefIXLAkxbm8Yph+JwECDoBDLBPbruoQQNLJljTgc5o42N2FMClVz1sVzhEFemkPmQkLcvWAwxHMWXuejP3G9I5vatZuXXUdnbqP/pNRCp/s+wY8=
+	t=1726840288; cv=none; b=Ic1ppeLoc1yf4NY/SeXw4NruN0NZM8lN+wk/kowfiM03PzLClrZghemgCyvMkRZeJfInUnpKHmmcO3PN6VDxy5THKpFBayvZLIVfj2gYf9mCFefwoFbhaNXCKSKFtjyXalDXQ/k3BkK9C7pI9T/t2CnlvWbJTCqahFuOVuWcxOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726839915; c=relaxed/simple;
-	bh=fPDSelq1zxnLLqtV4shJ+E+iQsItEMSqurwY6B8OgZU=;
+	s=arc-20240116; t=1726840288; c=relaxed/simple;
+	bh=dJlrmLJJ+XTvZyR+7WXzCkoqDjLucWi2ChOyY2CCacg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YWlQ2rRZZdn+jxRhj3hcmSNludZmZ50/AFus0RXii8Z9TFAS+uX2lxrmJsUsV1TBJel0COEv8MuOU/DVmdX+CI3fAXaEW01wsIYsX2MY1lDro3eRNsfc804+DKZ+En1xD0eF4c/2I/vkssoc6hfM4h7sNuTNUacALBeWwxSOZ4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=plXYD0uO; arc=none smtp.client-ip=45.157.188.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4X9D5B0Z1lztGl;
-	Fri, 20 Sep 2024 15:39:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1726839565;
-	bh=dr5nU5SlKLcmYNUhEmWx1GhyOTVcH7v2oOWucrZayZ8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=plXYD0uO14RitumnKe9wVcc2UmZvU+vtIoq8BHSOXK4+Kv3zZ5vOOhOjVdpTvdcbL
-	 AXfCgPNYRiwMpTIXlF/EeyMLjlSxhcqV/v/l4hZwhHVo/ZG891BUOX1n5Pu6Gt8YpZ
-	 Mjano6zo/E+dCyiZnUCiRKJI4ZN/IqEbfJ6qlNIE=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4X9D591f76zYxC;
-	Fri, 20 Sep 2024 15:39:25 +0200 (CEST)
-Date: Fri, 20 Sep 2024 15:39:17 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Matthieu Buffet <matthieu@buffet.re>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
-	"Serge E . Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>, Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Subject: Re: [RFC PATCH v1 3/7] landlock: Add UDP bind+connect access control
-Message-ID: <20240920.choPhoa8ahp8@digikod.net>
-References: <20240916122230.114800-1-matthieu@buffet.re>
- <20240916122230.114800-4-matthieu@buffet.re>
+	 Content-Type:Content-Disposition:In-Reply-To; b=oks1qOr/00ZsvAx4pJC8CdZ4ZLyDlQC1oCXdRyKPDA7m00RVwTZfTyJwIR0vBzP+S8Ie6a101DOS/EYItk0B2tLBjs8+mhZTOxTvwTEEsixchrXEWnk6D8JsGmzs2YgEH/qsDrQoLVqxzb+ZB1cuDeJcQjcGhSGmTzxDTNl+HDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=haTLp1z9; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=gzS3M5c49Wetw6cHAPp6rxdhttAiRwa4AerwdaEEnSI=; b=haTLp1z9Ak//iXP34KC7DaGFO5
+	80mBhdViGj4y7UmysI58KvsnKJ1LQHM5vuRADy4bqDha50I+a54nVtdxqINJ+qSTIYtgY/xQVHUry
+	I+riyYmpIvA73u8nHY87ydJAoByIJpOwidd46Rafp0ufLwSD6mJqYQ3gYW0ts/GzcW2Z2TKD5pNkE
+	cxdq0bvht3odzfKaN1asqVkt73+gBKmB80IZ0ol8k2uTmcjSuWC8fCpbYyDzFWSFtj9TdcoL01jdi
+	kurVftURG1N9T7Jtd3OZa2ABWnj/46m8f++hOk7arzVXzMvJwrTnzhe+udb46mb2qm0mA+Ufc44gD
+	EdakA+2g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
+	id 1sre2Y-0000000CIu4-3Eke;
+	Fri, 20 Sep 2024 13:51:18 +0000
+Date: Fri, 20 Sep 2024 06:51:18 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Haakon Bugge <haakon.bugge@oracle.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Allison Henderson <allison.henderson@oracle.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	OFED mailing list <linux-rdma@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>
+Subject: Re: [MAINLINE 0/2] Enable DIM for legacy ULPs and use it in RDS
+Message-ID: <Zu191hsvJmvBlJ4J@infradead.org>
+References: <20240918083552.77531-1-haakon.bugge@oracle.com>
+ <Zuwyf0N_6E6Alx-H@infradead.org>
+ <C00EA178-ED20-4D56-B6F2-200AC72F3A39@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240916122230.114800-4-matthieu@buffet.re>
-X-Infomaniak-Routing: alpha
+In-Reply-To: <C00EA178-ED20-4D56-B6F2-200AC72F3A39@oracle.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Mon, Sep 16, 2024 at 02:22:26PM +0200, Matthieu Buffet wrote:
-> Add support for two more access rights:
+On Fri, Sep 20, 2024 at 09:46:06AM +0000, Haakon Bugge wrote:
+> > I would much prefer if you could move RDS off that horrible API finally
+> > instead of investing more effort into it and making it more complicated.
 > 
-> - LANDLOCK_ACCESS_NET_CONNECT_UDP, to gate the possibility to connect()
->   an inet SOCK_DGRAM socket. This will be used by some client applications
->   (those who want to avoid specifying a destination for each datagram in
->   sendmsg), and for a few servers (those creating a socket per-client, who
->   want to only receive traffic from each client on these sockets)
-> 
-> - LANDLOCK_ACCESS_NET_BIND_UDP, to gate the possibility to bind() an
->   inet SOCK_DGRAM socket. This will be required for most server
->   applications (to start listening for datagrams on a non-ephemeral
->   port) and can be useful for some client applications (to set the
->   source port of future datagrams)
-> 
-> Also bump the ABI version from 5 to 6 so that userland can detect
-> whether these rights are supported and actually use them.
-> 
+> ib_alloc_cq() and family does not support arming the CQ with the IB_CQ_SOLICITED flag, which RDS uses.
 
-Closes: https://github.com/landlock-lsm/linux/issues/10
+Then work on supporting it.  RDS and SMC are the only users, so one
+of the maintainers needs to drive it.
 
-> Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
-> ---
->  include/uapi/linux/landlock.h | 48 +++++++++++++++++++++++--------
->  security/landlock/limits.h    |  2 +-
->  security/landlock/net.c       | 54 ++++++++++++++++++++++++++---------
->  security/landlock/syscalls.c  |  2 +-
->  4 files changed, 79 insertions(+), 27 deletions(-)
-> 
-> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
-> index 2c8dbc74b955..7f9aa1cd2912 100644
-> --- a/include/uapi/linux/landlock.h
-> +++ b/include/uapi/linux/landlock.h
-> @@ -113,12 +113,15 @@ struct landlock_net_port_attr {
->  	 *
->  	 * It should be noted that port 0 passed to :manpage:`bind(2)` will bind
->  	 * to an available port from the ephemeral port range.  This can be
-> -	 * configured with the ``/proc/sys/net/ipv4/ip_local_port_range`` sysctl
-> -	 * (also used for IPv6).
-> +	 * configured globally with the
-> +	 * ``/proc/sys/net/ipv4/ip_local_port_range`` sysctl (also used for
-> +	 * IPv6), and on a per-socket basis using
-> +	 * ``setsockopt(IP_LOCAL_PORT_RANGE)``.
-
-Interesting... setsockopt(IP_LOCAL_PORT_RANGE) can always be set
-independant of the sysctl, but fortunately it is only taken into account
-if it fits into the sysctl range (see inet_sk_get_local_port_range),
-which makes sense.
-
->  	 *
->  	 * A Landlock rule with port 0 and the ``LANDLOCK_ACCESS_NET_BIND_TCP``
-> -	 * right means that requesting to bind on port 0 is allowed and it will
-> -	 * automatically translate to binding on the related port range.
-> +	 * or ``LANDLOCK_ACCESS_NET_BIND_UDP`` right means that requesting to
-> +	 * bind on port 0 is allowed and it will automatically translate to
-> +	 * binding on the related port range.
->  	 */
->  	__u64 port;
->  };
 
