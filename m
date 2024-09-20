@@ -1,131 +1,121 @@
-Return-Path: <netdev+bounces-129034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6092397D117
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 08:22:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D9B997D11F
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 08:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 155551F22D6C
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 06:22:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CF464B20EB3
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 06:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3D238F9C;
-	Fri, 20 Sep 2024 06:22:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745BC3A1C9;
+	Fri, 20 Sep 2024 06:24:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5fVjqgB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VlzjYcTL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f194.google.com (mail-yb1-f194.google.com [209.85.219.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FF2833986;
-	Fri, 20 Sep 2024 06:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB9533986;
+	Fri, 20 Sep 2024 06:24:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726813342; cv=none; b=KBZ7NlHa7DLIdsJv3+XkOwXktuXzWHscEccU35A0FZFkQNDLqpA7mOFEgEG1iG+Y/LS/OFQijd8YM3a8UQ5eY7gHfxEboGB3tA+uWxuMzrMDOV5C4ab3g8p8fwCUfqpnF8DezclTXs4gsXqgq0beFI5mxxA5YM+v2K0nrZJTFgw=
+	t=1726813497; cv=none; b=ORFtaFIMChEJSbYd0nnlZUJlekHPaiypGsYFt6Ur3gOmOxcWOdWPKQtJardSS1lwSUr8Qb9EWL1Zs7tixOGAApLn+21j7fhWFx0/CIPpAR6j4mTMJM3VD5szMxQG6VRPhT1zjuqKCgxmKDx/ysm4Rj0tsEcs7/fIfd9YvuGaWDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726813342; c=relaxed/simple;
-	bh=+jAirL1/oeAkkDpgdQtrPbO8kpNl79De0V9vN6W6MbM=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=bcNHSDdj36G+E9lFQ7JrJyZsOc3dpHedi0RrAc2ZeTUJoVXO0Zsl57yua4heDEm49QPUEu0RrHAFiOYES4j/vfYPqG8EK5Dnz0lHIgNJsqyjamY1O4dy2TUC/531aI4CkhmHnaJ2+wzqE6rOJbQZphl6sJdYYhfMoRJuoLuQWZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b5fVjqgB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36798C4CEC3;
-	Fri, 20 Sep 2024 06:22:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726813341;
-	bh=+jAirL1/oeAkkDpgdQtrPbO8kpNl79De0V9vN6W6MbM=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=b5fVjqgBli9C8jpCq2u03zWPjW/REQgQXeNkVT/QXCSqO2Ith8qnm+/Zz9eKOyAfC
-	 4a42udKV8uWCIrB4IRBUO/3qJDMSnadIqgDKZk/BF21eZCoA2jiZNAnvBava0QydWJ
-	 3LRcNz/Z0siGhNYFQibbhDnUzJaly8rsGt4GeI7ar+DeGupHMJqCm+vjAw7aJxlWc2
-	 AeaM+Q0N06b5lOFgN8yZRLeLLSEBH22mwbNEXTUVthgBgPRtEvzVzBb+Z5u/33PO1+
-	 6/jjt+FxTJC/bIfMUBVKAwFZ1zmxGLyctrX3gcg1xRZcAKClsE07C7lf0jH7YRRsmV
-	 8U7i25yy2cBIA==
-From: Kalle Valo <kvalo@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Arnd Bergmann <arnd@arndb.de>,  "David S . Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  Rob Herring
- <robh@kernel.org>,  Krzysztof Kozlowski <krzk+dt@kernel.org>,  Conor
- Dooley <conor+dt@kernel.org>,  Jeff Johnson <jjohnson@kernel.org>,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  ath11k@lists.infradead.org,
-  linux-kernel@vger.kernel.org,  Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>,  Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the
- inputs of the ath11k on WCN6855
-References: <20240814082301.8091-1-brgl@bgdev.pl>
-	<83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org>
-	<87msk49j8m.fsf@kernel.org>
-	<CAMRc=McEWWm8N++4a5LMCAa0GWsQdi0KuSpj3ZuS_he=H0LP+w@mail.gmail.com>
-Date: Fri, 20 Sep 2024 09:22:16 +0300
-In-Reply-To: <CAMRc=McEWWm8N++4a5LMCAa0GWsQdi0KuSpj3ZuS_he=H0LP+w@mail.gmail.com>
-	(Bartosz Golaszewski's message of "Thu, 19 Sep 2024 03:59:17 -0500")
-Message-ID: <87ed5ec09z.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1726813497; c=relaxed/simple;
+	bh=iD9Y/yL3aGBC4s25B9LW2jfyRhLf6HUvOzzHXciOMQc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Fs4K8y54TPnuf73FvOeaOS3jdgni8+y9cdJ+7ytv/Xt54epVV4XMbV08NLt2Thfw8h+P2elvj0fr0jJvp5bdOIGYm7OWzSkEURt3Ugz6kIQgvMimaDGVp8dRgXjQ3TH2VoMuyDRSpd9HgaDvW9wuLDT12HO+8cMYrAOwR3lG4Hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VlzjYcTL; arc=none smtp.client-ip=209.85.219.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f194.google.com with SMTP id 3f1490d57ef6-e116d2f5f7fso2105242276.1;
+        Thu, 19 Sep 2024 23:24:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726813495; x=1727418295; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TgqpZk0zb0KFhIlK9zMKs0gaQ1N2DEGxcvt+Bmmy4CE=;
+        b=VlzjYcTLmsy/nfUES2VDZaLAiZg0nlXY10k9No1ZuULe60GFDPZYNXt4PReAmj/Usv
+         iW1iQce2z/6lLeP8fXWxg4qXj0f+PEJLKQ08LHRUnmOWx13SV6ahyhvOBX9MpM6DP1wg
+         obpzTFHV0xNASPfUCpohKXnvNy0pgWSCqYKzZ7WpI3L5vZItjbgFOA3tZaYFl7kXKgCX
+         ZBGB9ZqYudC5WOv1jbJWDI94ww5WHMb9ukaVXQIRg4a78E/paA/a0hX//Yg5ZoAUqzeQ
+         sYu+J7d/Ujinz7qt26ExIS3hUC51Ts6Mcyui6e3HOcRQEZaevTJPzt0/xSoMMOFzaQhd
+         qSDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726813495; x=1727418295;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TgqpZk0zb0KFhIlK9zMKs0gaQ1N2DEGxcvt+Bmmy4CE=;
+        b=Lpzee4LgAVB071AqV1lXceqiuQhNiQJQA2urV37gWXG8/QBekTCo49iL7E8D+AdVQS
+         9Gk02y2d+e86qRm2PmJUwl6S6Ndb/nRBxu0sUBZHXdUIY/oiHaJLyxADrc8DuDZwkhqH
+         z5dMdAdw4pfyT9+1uj0K1Qex2NSm+iMovvuKMeQDf34xfadxxAFieEr1deUMvHNLEyhs
+         0ze8H51AEY5aJEBA1LYPpfZQGUGVtU21OwrmpQVcKl6py+3++cbnp4n/k9tzAih+kn7y
+         SiMTk1dVCOsfrxzErIe1n39JYCLCFyNocC7p/WenGv1P1cOLe2zDVtJOgorIYktPs5Pw
+         iF8g==
+X-Forwarded-Encrypted: i=1; AJvYcCVnLG76ql+vkEQG9D2eeqDPtvr29Y8EnU34lGWUjJrzaaQwoBZsBaGyTEi0ZiyF2819hqU=@vger.kernel.org, AJvYcCWNBTLt1IjUZVBbtV7y/ae2AlvcUDPUTDF6bAP5VMQ9YqfwmXrJWtCcas1Vxik5qcP9ACopyXkZUAHEL9YS@vger.kernel.org, AJvYcCXuHEuv5Sur4gtyRcjJpJCvXHUxjoTJUB6zLGylRYztjkD9ZgmGOgmWY7tyB6WNfd7ngYgfawjJ@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOF0q1qXznTWnZdXAClSfED70Zg62/uTyv5O5lbmA5vcJlrIvO
+	FyG400f438kihZ3SMjuHVizs4c0vgGT7NmI0KjCt9j9ene1f/IHDpUgOfL6/KjYhe3/tCsvFsGP
+	9RVQzqHU01KLrG3HmYIA/cReji88=
+X-Google-Smtp-Source: AGHT+IHdHEDu9iVviJIaLKebjeZmOxgrndjdGZEqYT1kcilR+yz/IuUXG6kkMnfFclNjTnZgJ6fyn3bilFGup5BuIRA=
+X-Received: by 2002:a05:6902:1202:b0:e03:5505:5b5b with SMTP id
+ 3f1490d57ef6-e22506b14ffmr1735324276.0.1726813494894; Thu, 19 Sep 2024
+ 23:24:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240919094147.328737-1-dongml2@chinatelecom.cn>
+ <20240919094147.328737-5-dongml2@chinatelecom.cn> <172675702580.6616.12370018117434278479@kwain.local>
+In-Reply-To: <172675702580.6616.12370018117434278479@kwain.local>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Fri, 20 Sep 2024 14:25:12 +0800
+Message-ID: <CADxym3Z-5rEinjiFVhnQuKKa8AhDJ+KuiYw=9RMkKg3FgRmSEQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 4/7] net: ip: make fib_validate_source()
+ return drop reason
+To: Antoine Tenart <atenart@kernel.org>
+Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, steffen.klassert@secunet.com, 
+	herbert@gondor.apana.org.au, dongml2@chinatelecom.cn, bigeasy@linutronix.de, 
+	toke@redhat.com, idosch@nvidia.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Bartosz Golaszewski <brgl@bgdev.pl> writes:
-
-> On Thu, 19 Sep 2024 09:48:41 +0200, Kalle Valo <kvalo@kernel.org> said:
->> Krzysztof Kozlowski <krzk@kernel.org> writes:
->>
->>> On 14/08/2024 10:23, Bartosz Golaszewski wrote:
->>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>>>
->>>> Describe the inputs from the PMU of the ath11k module on WCN6855.
->>>>
->>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->>>> ---
->>>> v1 -> v2:
->>>> - update the example
->>>
->>> I don't understand why this patch is no being picked up. The code
->>> correct represents the piece of hardware. The supplies should be
->>> required, because this one particular device - the one described in this
->>> binding - cannot work without them.
->>
->> I have already explained the situation. With supplies changed to
->> optional I'm happy take the patch.
->>
+On Thu, Sep 19, 2024 at 10:43=E2=80=AFPM Antoine Tenart <atenart@kernel.org=
+> wrote:
 >
-> No, silent NAKing and needless stalling is what you're doing. I responded to
-> your last email with extensive clarifications. You're being told by the
-> experts on the subject matter (Krzysztof and Conor) that the change is correct.
+> Quoting Menglong Dong (2024-09-19 11:41:44)
+> >
+> > @@ -2339,8 +2345,11 @@ static int ip_route_input_slow(struct sk_buff *s=
+kb, __be32 daddr, __be32 saddr,
+> >         if (!ipv4_is_zeronet(saddr)) {
+> >                 err =3D fib_validate_source(skb, saddr, 0, tos, 0, dev,
+> >                                           in_dev, &itag);
+> > -               if (err < 0)
+> > +               if (err < 0) {
+> > +                       err =3D -EINVAL;
+> > +                       __reason =3D -err;
 >
-> The change has no functional impact on the driver code.
+> That should be:
+>
+>     __reason =3D -err;
+>     err =3D -EINVAL;
 
-Until now it was possible to use qcom,ath11k-calibration-variant DT
-property with M.2 devices. If your patch is applied that's not possible
-anymore.
+Oops, my mistake!
 
-> It's also in line with commit 71839a929d9e ("dt-bindings: net:
-> wireless: qcom,ath11k: describe the ath11k on QCA6390") under which we
-> had literally the same discussion and that you ended up picking up
-> after all.
+>
+>
+> Also this patch should take care of the fib_validate_source call in
+> ip_mc_validate_source.
 
-I don't care about QCA6390 as it's not really used anywhere anymore. I
-picked up 71839a929d9e, even though I considered it to be wrong, so that
-your pwrseq subsystem is not delayed. But WCN6855 is a different matter
-as it's more widely used.
+Yeah, I should do the same thing in ip_mc_validate_source().
 
-> Arnd: I've added you here to bring this to your attention because it's somewhat
-> related to what we discussed yesterday. It's a change that is very much
-> SoC-specific, that has trouble getting upstream due to the driver's maintainer
-> unwilingness to accept it. Is this a case where a change to DT bindings should
-> go through the SoC rather than the driver tree?
-
-Like I have said, I'm happy to take the patch if the supplies are
-optional. Why can't we do that?
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Thanks!
 
