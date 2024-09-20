@@ -1,107 +1,115 @@
-Return-Path: <netdev+bounces-129066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C610B97D4CD
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 13:26:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC7A297D4F4
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 13:52:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 609CAB22124
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 11:26:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82C50285A54
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 11:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C33143738;
-	Fri, 20 Sep 2024 11:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C440F143888;
+	Fri, 20 Sep 2024 11:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="sqL4adBu"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QlJ9d9iz"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04101422D3
-	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 11:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F70514386D
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 11:52:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726831592; cv=none; b=MS8AIj/QH2k3Jj8XkjwOyDKuqcZ83oUVr/Ay1ZffGI4Xt6F/G+sYa/14ng0+P2Nlwd+WJhZ5y9E6xBIEfkJyrZX9/EGU71D7ITFrs0707vbCvtrWHe28GHHM1zLOb0UIWqtrKdFSEkzBCA8AX+UlPcPC0YV2tXF2AQq2gpR7TP0=
+	t=1726833142; cv=none; b=dsrJO9jMfnVrscSk/w/IPql/hdg4LzwzQdQL95CNPcqOQsJAAJJkRihWRHVQU/zl7MHQ0MqWbqOWfqXy7nyPlDTAkT91qmkPk/A5IVUbPdHEQPfL8skjqPcgOkH8wly3Q9Kzzbb95APycJF5yTS+Irs7VbIZpn2vmjnZz86VmeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726831592; c=relaxed/simple;
-	bh=ypaKHctEX9fgrItsYNSVNA1/+alOChFA1XGDJgVaOSY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CmUIFigoDM49Eo+aoGc1kgG9tu9sdu3HSYRXkTCpEpnuh5yQ5jxzFhd+L+8MqWBmQnOWpRIstUpq9XF9YWBjpHnJPglYvhbLBb3k3ZpTf/vxkDS3Q2UdVsMko45Nz853YTYGqdi/yYSn/x/oBlZyLGDm1ZgvakzeWm4owyPvc80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=sqL4adBu; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 48KBQGFf045466;
-	Fri, 20 Sep 2024 06:26:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1726831576;
-	bh=wc6ounJ0L3a7+Jl1lhdKkoB0bwTcukkbr16QNFYjtJs=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=sqL4adBu55uQNYcQB3ZENkEv8lAKyRQQ8ZJ6uKmfKPNkLgAvNpFXkInyeBw61yeLQ
-	 s6MQ2cvkImL84QhMCeQCdG6QOWnDjzzQlQKko4NXrecLeTVrUmhqDw88CNNKGye98J
-	 rej47IccmXla9eF/GNh6hMmgOiLszBPBuIA1yapc=
-Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 48KBQGuk079901
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 20 Sep 2024 06:26:16 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
- Sep 2024 06:26:16 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 20 Sep 2024 06:26:16 -0500
-Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 48KBQGDs071175;
-	Fri, 20 Sep 2024 06:26:16 -0500
-Date: Fri, 20 Sep 2024 06:26:16 -0500
-From: Nishanth Menon <nm@ti.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "Alvaro (Al-vuh-roe) Reyes" <a-reyes1@ti.com>, <netdev@vger.kernel.org>,
-        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-        <maxime.chevallier@bootlin.com>, <o.rempel@pengutronix.de>,
-        <spatton@ti.com>, <r-kommineni@ti.com>, <e-mayhew@ti.com>,
-        <praneeth@ti.com>, <p-varis@ti.com>, <d-qiu@ti.com>
-Subject: Re: [PATCH 5/5] net: phy: dp83tg720: fixed Linux coding standards
- issues
-Message-ID: <20240920112616.7bz3uwuehenbczxi@reconvene>
-References: <cover.1726263095.git.a-reyes1@ti.com>
- <dcf72baf9ff9a82799edd40f06c8d255f5c71b1c.1726263095.git.a-reyes1@ti.com>
- <25904339-bc6c-4ace-988c-cc6e832a18f2@lunn.ch>
+	s=arc-20240116; t=1726833142; c=relaxed/simple;
+	bh=RiozRk7VfjzRUIe3LI7qPJXH9LFjSxqMrA5xS4AOpsc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pqWxx6eEJSgYuzUdhQOA7oOaTnngGJX1VOnMbHoShYOfRFKgu+Vo9T6mO/6S2uzkwn8EM3/tkL3zPBXleMUmYMBKAjintgoVlN5IEd7feJZ54+L/JsvYnJYGjgk9Lv/LPZg1rrDeZrh3FnVBnoH2KcOczWd3H4knMmd/QdmzVbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QlJ9d9iz; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726833142; x=1758369142;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=RiozRk7VfjzRUIe3LI7qPJXH9LFjSxqMrA5xS4AOpsc=;
+  b=QlJ9d9iz8SesvX/wIKP9i7aisW8+uuFaO1mVMxzVEeMGsT5k2hw9hi6n
+   +fmBAhdmygWehhB0u0DoiF08mLV8k4BH6nVU4zrXmMD5DvgEWH5kizGKW
+   W/V3M6lqI8yKbP/spDLpodMq35a3ZcRoqIADqyHWmJDnw32fOPW85KlSe
+   GHFF+LQq+UaQ3I0dLAmYzLmitiCGECTA3pLScesThzKuDjW9L/nwmyQK5
+   HQVCa5kmK1XL9ihnBWn+u+TwJGCfAvN1EkgfGyDwjSmF01uRZb6f1g9+t
+   jDuXE8QGlhbehYMAyTBN9JwvXtjIwpnHxm1EA0WdKAD82Q7tjxAr+1hfg
+   A==;
+X-CSE-ConnectionGUID: uGBn3CLuQj+gzUy3LabnPA==
+X-CSE-MsgGUID: Y9+CpP6cRj6r8V73lIoeVQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11200"; a="25708348"
+X-IronPort-AV: E=Sophos;i="6.10,244,1719903600"; 
+   d="scan'208";a="25708348"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2024 04:52:21 -0700
+X-CSE-ConnectionGUID: PJIy/0DTTCOTr2fGBf7pzA==
+X-CSE-MsgGUID: poA2NL46RGSmRtsboYKHBQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,244,1719903600"; 
+   d="scan'208";a="75046032"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa003.jf.intel.com with ESMTP; 20 Sep 2024 04:52:19 -0700
+Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2345127BB0;
+	Fri, 20 Sep 2024 12:52:18 +0100 (IST)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	mateusz.polchlopek@intel.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net 1/2] ice: Fix entering Safe Mode
+Date: Fri, 20 Sep 2024 13:55:09 +0200
+Message-ID: <20240920115508.3168-3-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <25904339-bc6c-4ace-988c-cc6e832a18f2@lunn.ch>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: 8bit
 
-On 23:47-20240919, Andrew Lunn wrote:
-> On Thu, Sep 19, 2024 at 02:01:19PM -0700, Alvaro (Al-vuh-roe) Reyes wrote:
-> > Driver patches was checked against the linux coding standards using scripts/checkpatch.pl.
-> > 
-> > This patch meets the standards checked by the script.
-> 
-> This patch should be first, to cleanup any existing issues. New code
-> you add should already be checkpatch clean as you add it.
-> 
-> These patches need quite a lot of work. Maybe you can find somebody
-> inside TI who can mentor you and point out issues before posting to
-> the list.
+If DDP package is missing or corrupted, the driver should enter Safe Mode.
+Instead, an error is returned and probe fails.
 
+Don't check return value of ice_init_ddp_config() to fix this.
 
-Sorry about that Andrew. I will work with the team and try and
-straighten this out.
+Repro:
+* Remove or rename DDP package (/lib/firmware/intel/ice/ddp/ice.pkg)
+* Load ice
 
-Thank you for your patience.
+Fixes: cc5776fe1832 ("ice: Enable switching default Tx scheduler topology")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 0f5c9d347806..7b6725d652e1 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4748,9 +4748,7 @@ int ice_init_dev(struct ice_pf *pf)
+ 
+ 	ice_init_feature_support(pf);
+ 
+-	err = ice_init_ddp_config(hw, pf);
+-	if (err)
+-		return err;
++	ice_init_ddp_config(hw, pf);
+ 
+ 	/* if ice_init_ddp_config fails, ICE_FLAG_ADV_FEATURES bit won't be
+ 	 * set in pf->state, which will cause ice_is_safe_mode to return
 -- 
-Regards,
-Nishanth Menon
-Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
+2.45.0
+
 
