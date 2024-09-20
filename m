@@ -1,203 +1,147 @@
-Return-Path: <netdev+bounces-129078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 081FC97D5D3
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 14:51:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17A2E97D5DC
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 14:54:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86C331F2235D
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 12:51:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BC0D1C21B89
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 12:54:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DFC216EB4B;
-	Fri, 20 Sep 2024 12:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0241616F0CF;
+	Fri, 20 Sep 2024 12:54:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="NN/OszTa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TMU34yql"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21DF7166F00
-	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 12:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8A716A94F;
+	Fri, 20 Sep 2024 12:54:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726836679; cv=none; b=Q88dsd5KL4Hmf9ftepK6F+ZyToEaOBmQJaZiUZlaAMzoYsKpyupShgh9p4GyaWYtLg+NmOLjRNQoRgdVe+5jQZE6kZJytpSKqbwpSldHkQFVqO521gu5MfLIpWXM9dX8lmtPfDUuSt1Y1A8Eij1RCCb5esCuy/egXCii3SiXrTs=
+	t=1726836884; cv=none; b=BXxf7Ni1nrVhAvwGafSuQ3paYGPsCOapSIQX+1ioSnYalIsC1RG5bAMYCy4mW7Z2CCNalyXuQysJ3fmJsaLGzwqdB32on5SWWqeZg+NRKlUGEFL/ZC5zxQeM1R4UAwfXuQs6LejaA2isNHW/k54tyTsB7zELQAgX6k+nXRvCBF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726836679; c=relaxed/simple;
-	bh=lZz/D0yQlTmVoZ9F0DI0OokR9dxgJE3Vt4L76O2x4A4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TxvG5qYehuIWBGhQPOPZalPxYb6krhSeLYaRYTKvn+b8yv2BUtFlcWZZTH+LadjNCZ1GYNOq+xAdE3AtUHjC1A2gmBJaH/UcToWRSEnok97JtSy1HmAPfVgx82dUb1UyFgxRgwJOj1QuSdfQoGTW1rTdEJIhCqs810K4Iq5svjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=NN/OszTa; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d86ba879-874c-45e3-8158-64d3abdcb317@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726836674;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BJSv3jfp3fGjVx0COe7tr+nr24AFeC9YXQj5U90zPNk=;
-	b=NN/OszTaDwlhTgvlN5sZkk7QgGLCKIFTpyYXYyEhVGMNbaW1FZlKyDpnjb/0nojAAjB2m7
-	GhafgqBBUOI6jf9k6W6jFF6RGY2wApBMAxXgCWsOdGF5+1K/1TU6Vxv4pTC9HqUSkOQ6cl
-	e/C44JTkGG6wwQbCDFob8wlBxeY2IYQ=
-Date: Fri, 20 Sep 2024 20:51:02 +0800
+	s=arc-20240116; t=1726836884; c=relaxed/simple;
+	bh=9/XbiXvNtfo9Ahhxyxq6laPOnKE8m8Kp8tFx/t2A8HU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IYZmgn1afhG0pIuOneISwQmeZIeCTWAKT5nAKrTxDvYmeVmxGwHpa8iyGfw42orAVymnktCDTlhMcRPugQZIeVYwVRo9+kXui4Z8otGBTuewGt0zHJqiSNOkz0D+peTjNNdiZzIV9nK7vIN0t1aDefoy5QJGmKDro0Eip0KnA+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TMU34yql; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a8d2b24b7a8so563676666b.1;
+        Fri, 20 Sep 2024 05:54:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726836881; x=1727441681; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RpseacMxjUgxJQCQ0p8XO6h9OmRZt38JJp1qVkqe51w=;
+        b=TMU34yql4hRf5Xae89m4gKygnh9tPT4rFGTWxIhra3qMQSfEbEovbATlU6ArvpigF8
+         x1KuU/uXkYSdkEzV4Z0ILaFScNgyHHThtG030/9vZdioAf7qUK/LqjteE6gTvOvIzaVH
+         EnZ0r1pB1R2By3IltUcwFBfkrDRe/9dqxocwQ5tbrZjWOIUFGknf8pkwrv5uO4SCtOxV
+         rB3R7Dff+31wvOlpbVm1h6ciUgswjuP9B/HxXpfH8BZC4a8CRogtOpBHZMmxV4hAHAWf
+         TTZG0uBm5lKtAzLvPJnYPquhKuhV+Cd1v2Na+8m42JoZKtOQ+czwafBI9kFzkR60hP5x
+         gIVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726836881; x=1727441681;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RpseacMxjUgxJQCQ0p8XO6h9OmRZt38JJp1qVkqe51w=;
+        b=myEt3++IZ/CgaTzHk8lO+nSNkEsUGB0NKw+2XfZIgXFVMBae5sL2COmw9a+y1JvYvK
+         dDB8BZ7lFX9bbvyrLiTSClWrgeJAENFgUrjPJnJRrw+iIg8Ts5D9GRBW0nC93nhiUQoW
+         65g50RXRJwuLSmabqMhN9d1YyhyVP1NzZFUQNs7qDFqw/J2HNdwsnyxN4CIw4S38on08
+         fjkYx5JWNe7K90GiSFe/SBPZIZi34aDXB9S9eU7t/5S8Gw13spIOPgwIlQWfUM6wecZR
+         8MNbf5LyRiQEhyrpZ/3Y917buzeo10713NkWNuK+dyCI65CGqJB964tDk0bUNUxaSutg
+         11NQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvm43/Vt26Bnktef7BOUmjSSsLPlX6f5wNi0lCJ2ZvGng3ZbW1n3rjGM/es1DYWSeMVXSXBlo2UrYHujjilg23@vger.kernel.org, AJvYcCW+9bK2AUk0CdPmVzVJMzJFS8868WoaDtLZy26GNENHhOW+4v5xlMVaLNG+wCToBlasMkC0JCsE@vger.kernel.org, AJvYcCXlKIAqTCWVb2v+Nx0SQ520L2Cen+6wKvWnYsi35QFnYD8oAw4JTQKjeLdzJnFXmKSSmdGfxTOsKSsh9Ds=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweMQCVzISXeUD9hxfK7UVjVBARV16YEE3pyQaLo7XBLcgVT160
+	xQu5LfEePpOfF/XlqAKg14kcqqqb2MtBF1CNRFfzZgI7VLoLngDe209EUE4M5Ds/grJGb3aLlYG
+	Dk0IDx2xBGsNTzA2KnmIgah0GxJIetV7l+WngaQ==
+X-Google-Smtp-Source: AGHT+IFNG7eWZ0hTCSU9dnVSqE4S90H/FnkxsBpn+k7zYe1p9qup8+dfLEzF2OhL+u23ShqmAAZopTPFI7IK4WbqJI8=
+X-Received: by 2002:a17:907:94cf:b0:a77:c051:36a9 with SMTP id
+ a640c23a62f3a-a90d35107d9mr296404166b.9.1726836881397; Fri, 20 Sep 2024
+ 05:54:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [MAINLINE 2/2] rds: ib: Add Dynamic Interrupt Moderation to CQs
-To: Haakon Bugge <haakon.bugge@oracle.com>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Allison Henderson <allison.henderson@oracle.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- OFED mailing list <linux-rdma@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
- "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>
-References: <20240918083552.77531-1-haakon.bugge@oracle.com>
- <20240918083552.77531-3-haakon.bugge@oracle.com>
- <6971720d-3639-4a80-a17b-48489bfadb0a@linux.dev>
- <AAE98F7B-F556-4C9E-BB3B-3907790D801B@oracle.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <AAE98F7B-F556-4C9E-BB3B-3907790D801B@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <c92569919307749f879b9482b0f3e125b7d9d2e3.1726480066.git.jamie.bainbridge@gmail.com>
+ <Zuw7d9eRGo4wdVP3@shredder.mtl.com>
+In-Reply-To: <Zuw7d9eRGo4wdVP3@shredder.mtl.com>
+From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
+Date: Fri, 20 Sep 2024 22:54:29 +1000
+Message-ID: <CAAvyFNiAXb7wuDMi6tRVuzHUwkSwtCtJOzM7LGxk5nDEtaqgyQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] selftests: forwarding: Avoid false MDB
+ delete/flush failures
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-在 2024/9/20 17:42, Haakon Bugge 写道:
-> 
-> 
->> On 20 Sep 2024, at 09:47, Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
->>
->> 在 2024/9/18 16:35, Håkon Bugge 写道:
->>> With the support from ib_core to use Dynamic Interrupt Moderation
->>> (DIM) from legacy ULPs, which uses ib_create_cq(), we enable that
->>> feature for the receive and send CQs in RDS.
->>
->> Hi, Haakon
->>
->> I am interested in this patch series. I just wonder if the performance of rds is increased after DIM is used in legacy ULPs?
->> That is, is there any benefit to legacy ULPs after DIM is used?
->>
->> Do you have any test results about this DIM?
-> 
-> Yes, please see the cover letter of this commit.
+On Fri, 20 Sept 2024 at 00:56, Ido Schimmel <idosch@nvidia.com> wrote:
+>
+> Hi,
+>
+> Thanks for the patch and sorry for the late reply (was OOO).
+>
+> On Mon, Sep 16, 2024 at 07:49:05PM +1000, Jamie Bainbridge wrote:
+> > Running this test on a small system produces different failures every
+> > test checking deletions, and some flushes. From different test runs:
+> >
+> > TEST: Common host entries configuration tests (L2)                [FAIL]
+> >   Failed to delete L2 host entry
+> >
+> > TEST: Common port group entries configuration tests (IPv4 (S, G)) [FAIL]
+> >   IPv4 (S, G) entry with VLAN 10 not deleted when VLAN was not specified
+> >
+> > TEST: Common port group entries configuration tests (IPv6 (*, G)) [FAIL]
+> >   IPv6 (*, G) entry with VLAN 10 not deleted when VLAN was not specified
+> >
+> > TEST: Flush tests                                                 [FAIL]
+> >   Entry not flushed by specified VLAN ID
+> >
+> > TEST: Flush tests                                                 [FAIL]
+> >   IPv6 host entry not flushed by "nopermanent" state
+> >
+> > Add a short sleep after deletion and flush to resolve this.
+>
+> The port group entry is removed from MDB entry's list synchronously, but
+> the MDB entry itself is removed from the hash table asynchronously and
+> the MDB get query will only return an error if an entry was not found
+> there.
+>
+> IOW, I think that when you do get a response after deletion, the entry
+> you get is empty.
+>
+> Can you please test the following patch [1] (w/o yours, obviously)?
+>
+> [1]
+> diff --git a/net/bridge/br_mdb.c b/net/bridge/br_mdb.c
+> index bc37e47ad829..1a52a0bca086 100644
+> --- a/net/bridge/br_mdb.c
+> +++ b/net/bridge/br_mdb.c
+> @@ -1674,7 +1674,7 @@ int br_mdb_get(struct net_device *dev, struct nlattr *tb[], u32 portid, u32 seq,
+>         spin_lock_bh(&br->multicast_lock);
+>
+>         mp = br_mdb_ip_get(br, &group);
+> -       if (!mp) {
+> +       if (!mp || (!mp->ports && !mp->host_joined)) {
+>                 NL_SET_ERR_MSG_MOD(extack, "MDB entry not found");
+>                 err = -ENOENT;
+>                 goto unlock;
 
-Which Oracle Linux distro includes this feature?
-And what is the kernel version?
+This works perfectly for me. Previously I would get at least 2
+failures in 10. Without my patch and with the above patch, 100 tests
+pass without any failure.
 
-Zhu Yanjun
+Many thanks for looking at this!
 
-> 
-> 
-> Thxs, Håkon
-> 
->>
->> Thanks,
->> Zhu Yanjun
->>
->>> A set of rds-stress runs have been done. bcopy read + write for
->>> payload 8448 and 16640 bytes and ack/req of 256 bytes. Number of QPs
->>> varies from 8 to 128, number of threads (i.e. rds-stress processes)
->>> from one to 16 and a depth of four. A limit has been applied such that
->>> the number of processes times the number of QPs never exceeds 128. All
->>> in all, 61 rds-stress runs.
->>> For brevity, only the rows showing a +/- 3% deviation or larger from
->>> base is listed. The geometric mean of the ratios (IOPS_test /
->>> IOPS_base) is calculated for all 61 runs, and that gives the best
->>> possible "average" impact of the commits.
->>> In the following, "base" is v6.11-rc7. "test" is the same
->>> kernel with the following two commits:
->>>         * rds: ib: Add Dynamic Interrupt Moderation to CQs (this commit)
->>>         * RDMA/core: Enable legacy ULPs to use RDMA DIM
->>> This is executed between two X8-2 with CX-5 using fw 16.35.3502. These
->>> BM systems were instantiated with one VF, which were used for the
->>> test:
->>>                                   base     test
->>>     ACK    REQ  QPS  THR  DEP     IOPS     IOPS  Percent
->>>     256   8448    8    1    4   634463   658162      3.7
->>>     256   8448    8    2    4   862648   997358     15.6
->>>     256   8448    8    4    4   950458  1113991     17.2
->>>     256   8448    8    8    4   932120  1127024     20.9
->>>     256   8448    8   16    4   944977  1133885     20.0
->>>    8448    256    8    2    4   858663   975563     13.6
->>>    8448    256    8    4    4   934884  1098854     17.5
->>>    8448    256    8    8    4   928247  1116015     20.2
->>>    8448    256    8   16    4   938864  1123455     19.7
->>>     256   8448   64    1    4   965985   918445     -4.9
->>>    8448    256   64    1    4   963280   918239     -4.7
->>>     256  16640    8    2    4   544670   582330      6.9
->>>     256  16640    8    4    4   554873   597553      7.7
->>>     256  16640    8    8    4   551799   597479      8.3
->>>     256  16640    8   16    4   553041   597898      8.1
->>>   16640    256    8    2    4   544644   578331      6.2
->>>   16640    256    8    4    4   553944   594627      7.3
->>>   16640    256    8    8    4   551388   594737      7.9
->>>   16640    256    8   16    4   552986   596581      7.9
->>> Geometric mean of ratios: 1.03
->>> Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
->>> ---
->>>   net/rds/ib_cm.c | 10 ++++++++++
->>>   1 file changed, 10 insertions(+)
->>> diff --git a/net/rds/ib_cm.c b/net/rds/ib_cm.c
->>> index 26b069e1999df..79603d86b6c02 100644
->>> --- a/net/rds/ib_cm.c
->>> +++ b/net/rds/ib_cm.c
->>> @@ -259,6 +259,7 @@ static void rds_ib_cq_comp_handler_recv(struct ib_cq *cq, void *context)
->>>   static void poll_scq(struct rds_ib_connection *ic, struct ib_cq *cq,
->>>        struct ib_wc *wcs)
->>>   {
->>> + int ncompleted = 0;
->>>    int nr, i;
->>>    struct ib_wc *wc;
->>>   @@ -276,7 +277,10 @@ static void poll_scq(struct rds_ib_connection *ic, struct ib_cq *cq,
->>>    rds_ib_mr_cqe_handler(ic, wc);
->>>      }
->>> + ncompleted += nr;
->>>    }
->>> + if (cq->dim)
->>> + rdma_dim(cq->dim, ncompleted);
->>>   }
->>>     static void rds_ib_tasklet_fn_send(unsigned long data)
->>> @@ -304,6 +308,7 @@ static void poll_rcq(struct rds_ib_connection *ic, struct ib_cq *cq,
->>>        struct ib_wc *wcs,
->>>        struct rds_ib_ack_state *ack_state)
->>>   {
->>> + int ncompleted = 0;
->>>    int nr, i;
->>>    struct ib_wc *wc;
->>>   @@ -316,7 +321,10 @@ static void poll_rcq(struct rds_ib_connection *ic, struct ib_cq *cq,
->>>      rds_ib_recv_cqe_handler(ic, wc, ack_state);
->>>    }
->>> + ncompleted += nr;
->>>    }
->>> + if (cq->dim)
->>> + rdma_dim(cq->dim, ncompleted);
->>>   }
->>>     static void rds_ib_tasklet_fn_recv(unsigned long data)
->>> @@ -542,6 +550,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
->>>    ic->i_scq_vector = ibdev_get_unused_vector(rds_ibdev);
->>>    cq_attr.cqe = ic->i_send_ring.w_nr + fr_queue_space + 1;
->>>    cq_attr.comp_vector = ic->i_scq_vector;
->>> + cq_attr.flags |= IB_CQ_MODERATE;
->>>    ic->i_send_cq = ib_create_cq(dev, rds_ib_cq_comp_handler_send,
->>>        rds_ib_cq_event_handler, conn,
->>>        &cq_attr);
->>> @@ -556,6 +565,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
->>>    ic->i_rcq_vector = ibdev_get_unused_vector(rds_ibdev);
->>>    cq_attr.cqe = ic->i_recv_ring.w_nr;
->>>    cq_attr.comp_vector = ic->i_rcq_vector;
->>> + cq_attr.flags |= IB_CQ_MODERATE;
->>>    ic->i_recv_cq = ib_create_cq(dev, rds_ib_cq_comp_handler_recv,
->>>        rds_ib_cq_event_handler, conn,
->>>        &cq_attr);
->>
-> 
-
+Jamie
 
