@@ -1,141 +1,124 @@
-Return-Path: <netdev+bounces-129119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7202297D980
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 20:11:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74EC397D9A5
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 20:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDBDCB211FF
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 18:11:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14EC52846CD
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 18:45:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589C617E918;
-	Fri, 20 Sep 2024 18:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1A817C7BD;
+	Fri, 20 Sep 2024 18:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IyGr+YIu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fkU15YLr"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5770F22331
-	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 18:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DAA117B402
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 18:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726855902; cv=none; b=o/Di/TtB+qOjVQ24kvMkIKZNuWnkejHO+ghkDUqTu41kR5mmNIDZbpV3AwvJYvxLatw5qaY9tZdLQls4J7AX9Gj0ZkyAseGqvr9pGsjAssqLcLE13eTqR0hDsQV4Aasuf64xsHiOHaSKMT/uinzcbaYEFosgCwLyYWn2CG352eI=
+	t=1726857900; cv=none; b=FyU4TiVYSK8/6UpjZn96UYl1jNd5Wn/KBs3FkMlJddEqSpi+kanGaYbiZW5VnV1YqWrLn455Wg42Q+MZMeuEI8v9+D8r7TjhCEv1KBERr47z/3l8uUKCz7EfpSIb9KA+JnFkKjP/pAoUEY8O+LAORO8ZjHhc4xzee9kwJemWNjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726855902; c=relaxed/simple;
-	bh=QBJtY3q03Hr/PpRhpzA994iX75ZkzJVz9Fy5vr8eskc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sMpBfhVjknRsCEK6MtwjSQUYzJricITlnFN4bQVK6OAJlJnzqhgJ2yTa3R6Dh0lzm9d10YNsna3arHUWMo0lOlEn8dTKV0IX8rrNo7OIa2IX8Rqkuma8JezzmZ1Km6JN5s8mv2BPHgI0PuazbmwDt8OUIxHs5GYngRRXY7X13lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IyGr+YIu; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1726857900; c=relaxed/simple;
+	bh=OtF6VKrg03zgPhVwWw7oJZrm/D8p5dfiYhMJYMK9XQA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HGMj4Lhs++NxJczuMHo3/MkTG0OnjoZDZAsXHairZoGRuXPDIk2XR9wTHdCe/f5Fd+vrglnenZ7p8GJRNJDhOy3fbOudyhubYD6Mkg/OqgOpAUiE+GRMwS+qF6GvnV3cs2xehGFMzUhSu2aeufSuyxL/n1IG4mxNPiaa2XmF7m0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fkU15YLr; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1726855899;
+	s=mimecast20190719; t=1726857897;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=j9YI0Mx5SgwWvTuwt/Zk6J43Azxd9r7yYf/eWhY2wBY=;
-	b=IyGr+YIuXnO1jtWk9qQz66rbcMlnyzhVvB2JvbxoDXEDPd9nPpF7eQIfLO61jA1paDMwV+
-	sKByx3t4cSB2Mw6GhvR2QWi3XSBPT5hdgjgQV6v7fvxR5ihpMOohnAUHquWf9Nkw59qW7F
-	Tx8SFD/7nA7cg9I5dou0/r9Lk5kYUUY=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-407-9T-wUBGhM0KmKEkV66Jopg-1; Fri, 20 Sep 2024 14:11:38 -0400
-X-MC-Unique: 9T-wUBGhM0KmKEkV66Jopg-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-374c32158d0so1340278f8f.1
-        for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 11:11:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726855897; x=1727460697;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j9YI0Mx5SgwWvTuwt/Zk6J43Azxd9r7yYf/eWhY2wBY=;
-        b=t6wnfQdqQGKKwV0wrYyX877cFR17iG2YIAWxzquBZ0LjFfXp+eyZkQJ3P1g8TtTx/v
-         bXBRqLBglwDpnr/zUmulAxR0NTmC9M7WYdvNOWzqrviUN+IS/Dztoy3uMJy8pflSb0fC
-         zkTlBaIN20iev5xYu99Z0Dmgbq5hF3zeoyv7fPzcqEOlUI5DpCMJrZ0y5XJbebFpepxW
-         w4aYr6CPuUChCH3fSCWo3Q0eY1kb2r7XTzA+Aqes7B1qVhBOZ9jB9onHTtwpn1TDQQfR
-         PLiyxtTCyZZrcQUQpZzYg6TWUMaaaDa6Kn+uYOYVrK3ZkprhBJZrnkvR/4/fvjJ8U98v
-         LNFw==
-X-Gm-Message-State: AOJu0YzMqOw7lpA/r3arF/tmOWjmXQqa18OcdD7V4RKd78n8pUEbcXHv
-	2duxSMlCLhw/Czh+CxdXKxaoU4UTP51iex3MHHcIShEBAxYSqjA0BmUx65EsJQIa8Js6Zrzi5X6
-	bSomUIjuZAjSp6EhPmy4L7B8AN/XKlP6qCUtBVX8pMV8dQa7tArikD3Tv6g+MbgKV6U7dBZzoPb
-	i4cq9TuERzjCbtYu/2ijJJbpuzxOtKeyveA8U=
-X-Received: by 2002:a5d:58e4:0:b0:368:64e:a7dd with SMTP id ffacd0b85a97d-37a42386bc8mr2199129f8f.53.1726855896670;
-        Fri, 20 Sep 2024 11:11:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEBcxtJ3sS5JJFgcJgBZHUw8G5EqMXIrri2f+A56fBjGFG9X4lsHzRKtM9Z31wcMlAPyWoT3w==
-X-Received: by 2002:a5d:58e4:0:b0:368:64e:a7dd with SMTP id ffacd0b85a97d-37a42386bc8mr2199107f8f.53.1726855896231;
-        Fri, 20 Sep 2024 11:11:36 -0700 (PDT)
-Received: from rh.fritz.box (p200300e16705d800cb8281343aec4007.dip0.t-ipconnect.de. [2003:e1:6705:d800:cb82:8134:3aec:4007])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e7afbfa1asm29450025e9.21.2024.09.20.11.11.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Sep 2024 11:11:35 -0700 (PDT)
-From: Sebastian Ott <sebott@redhat.com>
-To: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Parav Pandit <parav@nvidia.com>
-Subject: [PATCH v2] net/mlx5: unique names for per device caches
-Date: Fri, 20 Sep 2024 20:11:29 +0200
-Message-ID: <20240920181129.37156-1-sebott@redhat.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <IA0PR12MB8713EC167DC79275451864BADC6C2@IA0PR12MB8713.namprd12.prod.outlook.com>
-References: <IA0PR12MB8713EC167DC79275451864BADC6C2@IA0PR12MB8713.namprd12.prod.outlook.com>
+	bh=OtF6VKrg03zgPhVwWw7oJZrm/D8p5dfiYhMJYMK9XQA=;
+	b=fkU15YLrGsaeSFl0WneTFtMMLbCANwfsb/2Yd1UOsA+b8yCW0uCPHuh7zN9++k1QQiU2R/
+	UDW81XZSNyPTOUVE4+ZZR7nGGRyUg8Pv7kdV6eBxzoNTTXooEbjCgotDcU8HjEwfNUxq+s
+	pldhQZMBGnC50Q7cBA9JYecIY2KwwLg=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-103--qs-qLPXNyyFv5sqglakNw-1; Fri,
+ 20 Sep 2024 14:44:54 -0400
+X-MC-Unique: -qs-qLPXNyyFv5sqglakNw-1
+Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1972F1933B79;
+	Fri, 20 Sep 2024 18:44:52 +0000 (UTC)
+Received: from dhcp-27-174.brq.redhat.com (unknown [10.45.224.115])
+	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with SMTP id 829671956086;
+	Fri, 20 Sep 2024 18:44:44 +0000 (UTC)
+Received: by dhcp-27-174.brq.redhat.com (nbSMTP-1.00) for uid 1000
+	oleg@redhat.com; Fri, 20 Sep 2024 20:44:39 +0200 (CEST)
+Date: Fri, 20 Sep 2024 20:44:31 +0200
+From: Oleg Nesterov <oleg@redhat.com>
+To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	Liam Howlett <liam.howlett@oracle.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"brauner@kernel.org" <brauner@kernel.org>,
+	"mhocko@suse.com" <mhocko@suse.com>,
+	"alexjlzheng@tencent.com" <alexjlzheng@tencent.com>,
+	"willy@infradead.org" <willy@infradead.org>,
+	Michael Christie <michael.christie@oracle.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"shuah@kernel.org" <shuah@kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	Pei Li <peili.io@oracle.com>,
+	"Eric W. Biederman" <ebiederm@xmission.com>
+Subject: Re: [PATCH net-next 1/2] connector/cn_proc: Handle threads for proc
+ connector
+Message-ID: <20240920184430.GB20847@redhat.com>
+References: <20240920000933.185090-1-anjali.k.kulkarni@oracle.com>
+ <20240920000933.185090-2-anjali.k.kulkarni@oracle.com>
+ <20240920110022.GA15795@redhat.com>
+ <72426AB7-DAF9-4779-A29E-EA5FF8816695@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <72426AB7-DAF9-4779-A29E-EA5FF8816695@oracle.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
 
-Add the device name to the per device kmem_cache names to
-ensure their uniqueness. This fixes warnings like this:
-"kmem_cache of name 'mlx5_fs_fgs' already exists".
+On 09/20, Anjali Kulkarni wrote:
+>
+> > On Sep 20, 2024, at 4:00 AM, Oleg Nesterov <oleg@redhat.com> wrote:
+> >
+> > I don't think you can use task_struct->exit_code. If this task is ptraced,
+> > it can be changed/cleared in, say, ptrace_stop() after PROC_CN_MCAST_NOTIFY.
+> >
+>
+> Thank you, that’s a good point! However, the use case of ptrace, which I assume
+> is for mostly debug and tracing, is exclusive of the use case I am using it for
 
-Signed-off-by: Sebastian Ott <sebott@redhat.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/fs_core.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Well. I don't understand your use-case. Or any other use-case for drivers/connector/
+that I know nothing about. But this is irrelevant.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-index 8505d5e241e1..c2db0a1c132b 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-@@ -3689,6 +3689,7 @@ void mlx5_fs_core_free(struct mlx5_core_dev *dev)
- int mlx5_fs_core_alloc(struct mlx5_core_dev *dev)
- {
- 	struct mlx5_flow_steering *steering;
-+	char name[80];
- 	int err = 0;
- 
- 	err = mlx5_init_fc_stats(dev);
-@@ -3713,10 +3714,12 @@ int mlx5_fs_core_alloc(struct mlx5_core_dev *dev)
- 	else
- 		steering->mode = MLX5_FLOW_STEERING_MODE_DMFS;
- 
--	steering->fgs_cache = kmem_cache_create("mlx5_fs_fgs",
-+	snprintf(name, sizeof(name), "%s-mlx5_fs_fgs", dev_name(dev->device));
-+	steering->fgs_cache = kmem_cache_create(name,
- 						sizeof(struct mlx5_flow_group), 0,
- 						0, NULL);
--	steering->ftes_cache = kmem_cache_create("mlx5_fs_ftes", sizeof(struct fs_fte), 0,
-+	snprintf(name, sizeof(name), "%s-mlx5_fs_ftes", dev_name(dev->device));
-+	steering->ftes_cache = kmem_cache_create(name, sizeof(struct fs_fte), 0,
- 						 0, NULL);
- 	if (!steering->ftes_cache || !steering->fgs_cache) {
- 		err = -ENOMEM;
--- 
-2.42.0
+The new PROC_CN_MCAST_NOTIFY functionality you propose should work regardless of
+whether this task is ptraced or not. But it doesn't because the usage of ->exit_code
+in your patch conflicts with the current usage of this field.
+
+So, NACK, sorry.
+
+Oleg.
 
 
