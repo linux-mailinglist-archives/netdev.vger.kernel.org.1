@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-129038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0282D97D148
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 08:42:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5422C97D14A
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 08:43:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FABAB21E1B
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 06:42:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C89CE1F23BA3
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 06:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4682743155;
-	Fri, 20 Sep 2024 06:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C7973FB1B;
+	Fri, 20 Sep 2024 06:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="d2cyRI9D"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="QB/yFY1M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BC8E3BB21
-	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 06:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA23979C2
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 06:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726814549; cv=none; b=tpktbrJFVmTvvcvFlGrhUiXGo0bg0sjZNhiF896tHtEjRYn7I/5VO5foQPei0PI22Hsvw6ElC1Y3FioEH9W12LKGsJHRHH/00xAj1mwEodQPwooI3EaTnVtQLLQ+AZXe1vDY6JGXCBpcWNZXLc5BGDlMrzVw71Xh3SBJswUaG48=
+	t=1726814623; cv=none; b=VfYqnZgSEP4yYpMfLBDQeYadzjp0NAQNGnLthrFcLWfTuj3e9FP/nj0pIJrxfx5QFsV12u0yZHBl3sh0DOppDTTW1v1L2Sj87nHwysABCFjKqNW2bl5jmuXrxcuWs2ED/Yu4TV1lhJOcuuHa1urdwKj5DhGv+O5GEBF56aE++A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726814549; c=relaxed/simple;
-	bh=Hb2b/+q+hToRh61WxWnw+lJdABcYLPuii7nIFRD9qsU=;
+	s=arc-20240116; t=1726814623; c=relaxed/simple;
+	bh=sOxxjmVIf9DK1JAPwTVAbAeOHGayuH0y2cxXhJoEjJs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aoZfRT9I6mT6rzyqF+NPdgB+VlnulLohtbTBHRDeBu5onvOH2J71npbRBBMasOm4p5r+sft+hBs16U9QcAUlfb2wWxkfEkP816L0pQFgP0KUk1QVzxhjYUWbQMARAxlT2F0EHCOJvXJRbqyjrtZ/bkHKh9AQMVCpVj6TdtyeqDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=d2cyRI9D; arc=none smtp.client-ip=209.85.218.53
+	 In-Reply-To:Content-Type; b=Cu37r9jKn0CwQs4RqIEdXYSasLIWkz6SPqrcGBjKaM+5CsEWbThlwCUMTpC4TCRlgwXQ6bp0quKCLnFYSieY/bk4+pINHZtp5aoad1HrY69x0Qg8xRoX06B/YmDMUoB/7RtOxYgPQz3qpjjozZdhkYzxbDrRsu8WiBA2p0cEPhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=QB/yFY1M; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a8d4093722bso229845666b.0
-        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 23:42:26 -0700 (PDT)
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5366fd6fdf1so2019129e87.0
+        for <netdev@vger.kernel.org>; Thu, 19 Sep 2024 23:43:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1726814545; x=1727419345; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1726814620; x=1727419420; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=98uSNXWBdtIj2loX7w9P5NmjIJ5+wZsoyxlrEw5OdHs=;
-        b=d2cyRI9DpNUsiiiwbwqNaVc8IDC83X/gjCOLiQYqWNOfpJvci0X1/KAomOY9kOfd5+
-         xP7KuzxA+7cQ3QBc+ORnS71nq+y9/GP4JCe4aUqZ+vDAs5bju2hMhcuY4xXom+qR16NZ
-         myoEudhNOGQ706QDUHhqorUZy9jFTyzi4694O/2BKJ3W0qtvyxwZ9Hml0HPgVSVXwEBn
-         IIgxqHNTu+pth+nopXdxRvH9qq800ISDzG9yDp+gf0MlBE89l2jsEGjIhakAw0B4DbHI
-         7lIpoOhrLDk0AAxCJczpd2vZE8BRuQHcAikU1dBFXZ/T1qX7syJeR/KQ/sDySYjX30+4
-         PQSg==
+        bh=LLaE4A8HWomqnZxKIsBh6iXXcm0J13/3tg8Vb7IGkgU=;
+        b=QB/yFY1M86Pyo+0JMY2IrcKxjNPPaV/JKUA4jYV5ZDhiKcc2IeNxoGiAfPqIuVWmju
+         zA3edRbxcLfJ3H3wtl28mU9XT8YvVsz9wD36eCwHqiujbDaKuIGzdGUlvGn9TRDu+1Eg
+         3SCr+3IO1nzr1er4GN3DOxQbApbRzVjyRYcXx3/Y/KBPZc/wgyv4979jgEM79oVehAUQ
+         e/UDKp4/L7B1hmywYE8V6Cu5dXwqNOwv0aSxZWYKThUy0Zc1+L8JS/prv8kAixQw7t1Q
+         Oyn1hoM5Ar5pc30bHM+zLzhLYBR2YAkTXMz4hzgU0mVoPxKSdeH5YAD6FkCJddhREEf4
+         6m5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726814545; x=1727419345;
+        d=1e100.net; s=20230601; t=1726814620; x=1727419420;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=98uSNXWBdtIj2loX7w9P5NmjIJ5+wZsoyxlrEw5OdHs=;
-        b=AE6YI/u7pFOG0fVAc1Z0aGtbdWrP9dRTQM7fT9RU+fxIImKU9iPPXprylm4rMjFZN6
-         oLlZFYzW5CXVWk6Ldk1ygtqxadXKXurH4CNp3p6iY8dkb8JVrAo60cwFxh4g0grAlzHi
-         TnP49TaHRZhSwv1aO0AbMIEjNkWX/MleVTyQIsir292/lwfnaNG0rSf/voCEez1FYG4q
-         Eb/MwcYYqTL+Mgu9v4C9xSCMbsrwxh79EnfPZ5+DeO4bhTqUrxE6Ud0AK6VTgGRkT7tL
-         l0nRNOAf0XZJAhncsLmy6qgCYP7mdVRmPzVYxpBvavGjG8wMM5KMk13Fx/zjK13Hl6xD
-         2ziA==
-X-Forwarded-Encrypted: i=1; AJvYcCVShdwWilNJH62hp42dczgKUuBJCoz8tAhnJdBhde69ihSXs+LZh4wqrGQBMkft6LUUw4iAEpQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCqqKtY/zL80IVyNB0Fh7f59QjuUANuOFK+SiGSrKWkBFgrq0n
-	HXfnzhoM3u2kNVZ/WTTC+axSz0CmlPykWKSa0gp8Jq889vsq9UlRmcS7SPySa/E=
-X-Google-Smtp-Source: AGHT+IFK3LECOgNL2LQB34zytpe20wT+mFRQaW0BYumib9GiIXC7awb6RQOknCMw9j46sSiKv4IBmw==
-X-Received: by 2002:a17:907:e6de:b0:a86:68a1:6a08 with SMTP id a640c23a62f3a-a90d56b44a3mr138829566b.29.1726814544477;
-        Thu, 19 Sep 2024 23:42:24 -0700 (PDT)
+        bh=LLaE4A8HWomqnZxKIsBh6iXXcm0J13/3tg8Vb7IGkgU=;
+        b=rwS8jQDMrbwkTrAIC6Eg4e6SjoETxy9ZJ4pqi+jSxbQ8UA3LHvXDMPomxmAxDYIEb/
+         xFBZYDlnBrHfzYkZtKgE9tsKBkGyLJUvMvmx8EOMcTQleM+W/rd6A956IGaQxltcgRT1
+         8X7IFpoEBwI4ug8jTVDVkHylJ+30dP0e2TPME/rlRQgM8SFgFyYrruftQj6bIYaiq8x9
+         4J1vhROSqvf77fK7WLp1H1A+FBFo7Egi2L71sQfKQc/5zYJdI0xYr5UHyADI+oUv78O6
+         I/heSBf6uE+5VZRrZE97naZo/G6b9Lneso1fpSKl/oU3cXSd4VCqXR7gZPvVvDY//VvO
+         YGvg==
+X-Gm-Message-State: AOJu0YwJA0/W8KdgZPOyElBOkrQtgJY2XEZFbOuzstm91VZ85QL6x55l
+	dHVpaatXtqyeeGBFVw17TOlRLBWkBOPZWMCG+0gCo9SrrWiTIbi0vAXsCr+2bK7yYmgaC0o3Nrp
+	C6/8=
+X-Google-Smtp-Source: AGHT+IFYc/zDgQiOV93CNO/o/R1jy+aordDFcbQRV8R86JE7XcZO4DTMEjkiBq8Mwj3Lv/fNs3rUBg==
+X-Received: by 2002:a05:6512:39c4:b0:536:581c:9d9f with SMTP id 2adb3069b0e04-536ad16b327mr692425e87.24.1726814619733;
+        Thu, 19 Sep 2024 23:43:39 -0700 (PDT)
 Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90d21bc502sm76613066b.25.2024.09.19.23.42.23
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90613304dasm797860266b.197.2024.09.19.23.43.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Sep 2024 23:42:24 -0700 (PDT)
-Message-ID: <34a42cfa-9f72-4a66-be63-e6179e04f86e@blackwall.org>
-Date: Fri, 20 Sep 2024 09:42:22 +0300
+        Thu, 19 Sep 2024 23:43:39 -0700 (PDT)
+Message-ID: <8dfc3125-b4fd-4209-89c5-a5a85a1d65a6@blackwall.org>
+Date: Fri, 20 Sep 2024 09:43:37 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,110 +76,76 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next] net: bridge: drop packets with a local
- source
-To: Thomas Martitz <tmartitz-oss@avm.de>, Roopa Prabhu <roopa@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Johannes Nixdorf <jnixdorf-oss@avm.de>, bridge@lists.linux.dev,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240919085803.105430-1-tmartitz-oss@avm.de>
- <934bf1f6-3f1c-4de4-be91-ba1913d1cb0e@blackwall.org>
- <7aa4c66e-d0dc-452f-aebd-eb02a1b15a44@avm.de>
+Subject: Re: [PATCH net v3] bonding: Fix unnecessary warnings and logs from
+ bond_xdp_get_xmit_slave()
+To: Jiwon Kim <jiwonaid0@gmail.com>, jv@jvosburgh.net, andy@greyhouse.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
+ john.fastabend@gmail.com, joamaki@gmail.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
+References: <20240918140602.18644-1-jiwonaid0@gmail.com>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <7aa4c66e-d0dc-452f-aebd-eb02a1b15a44@avm.de>
+In-Reply-To: <20240918140602.18644-1-jiwonaid0@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 19/09/2024 14:13, Thomas Martitz wrote:
-> Am 19.09.24 um 12:33 schrieb Nikolay Aleksandrov:
->> On 19/09/2024 11:58, Thomas Martitz wrote:
->>> Currently, there is only a warning if a packet enters the bridge
->>> that has the bridge's or one port's MAC address as source.
->>>
->>> Clearly this indicates a network loop (or even spoofing) so we
->>> generally do not want to process the packet. Therefore, move the check
->>> already done for 802.1x scenarios up and do it unconditionally.
->>>
->>> For example, a common scenario we see in the field:
->>> In a accidental network loop scenario, if an IGMP join
->>> loops back to us, it would cause mdb entries to stay indefinitely
->>> even if there's no actual join from the outside. Therefore
->>> this change can effectively prevent multicast storms, at least
->>> for simple loops.
->>>
->>> Signed-off-by: Thomas Martitz <tmartitz-oss@avm.de>
->>> ---
->>>   net/bridge/br_fdb.c   |  4 +---
->>>   net/bridge/br_input.c | 17 ++++++++++-------
->>>   2 files changed, 11 insertions(+), 10 deletions(-)
->>>
->>
->> Absolutely not, I'm sorry but we're not all going to take a performance hit
->> of an additional lookup because you want to filter src address. You can filter
->> it in many ways that won't affect others and don't require kernel changes
->> (ebpf, netfilter etc). To a lesser extent there is also the issue where we might
->> break some (admittedly weird) setup.
->>
+On 18/09/2024 17:06, Jiwon Kim wrote:
+> syzbot reported a WARNING in bond_xdp_get_xmit_slave. To reproduce
+> this[1], one bond device (bond1) has xdpdrv, which increases
+> bpf_master_redirect_enabled_key. Another bond device (bond0) which is
+> unsupported by XDP but its slave (veth3) has xdpgeneric that returns
+> XDP_TX. This triggers WARN_ON_ONCE() from the xdp_master_redirect().
+> To reduce unnecessary warnings and improve log management, we need to
+> delete the WARN_ON_ONCE() and add ratelimit to the netdev_err().
 > 
-> Hello Nikolay,
+> [1] Steps to reproduce:
+>     # Needs tx_xdp with return XDP_TX;
+>     ip l add veth0 type veth peer veth1
+>     ip l add veth3 type veth peer veth4
+>     ip l add bond0 type bond mode 6 # BOND_MODE_ALB, unsupported by XDP
+>     ip l add bond1 type bond # BOND_MODE_ROUNDROBIN by default
+>     ip l set veth0 master bond1
+>     ip l set bond1 up
+>     # Increases bpf_master_redirect_enabled_key
+>     ip l set dev bond1 xdpdrv object tx_xdp.o section xdp_tx
+>     ip l set veth3 master bond0
+>     ip l set bond0 up
+>     ip l set veth4 up
+>     # Triggers WARN_ON_ONCE() from the xdp_master_redirect()
+>     ip l set veth3 xdpgeneric object tx_xdp.o section xdp_tx
 > 
-> thanks for taking a look at the patch. I expected concerns, therefore the RFC state.
+> Reported-by: syzbot+c187823a52ed505b2257@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=c187823a52ed505b2257
+> Fixes: 9e2ee5c7e7c3 ("net, bonding: Add XDP support to the bonding driver")
+> Signed-off-by: Jiwon Kim <jiwonaid0@gmail.com>
+> ---
+> v3: Fix subject and description
+> v2: Change the patch to fix bond_xdp_get_xmit_slave
+> ---
+>  drivers/net/bonding/bond_main.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> So I understand that performance is your main concern. Some users might
-> be willing to pay for that cost, however, in exchange for increased
-> system robustness. May I suggest per-bridge or even per-port flags to
-> opt-in to this behavior? We'd set this from our userspace. This would
-> also address the concern to not break weird, existing setups.
-> 
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index b560644ee1b1..b1bffd8e9a95 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -5610,9 +5610,9 @@ bond_xdp_get_xmit_slave(struct net_device *bond_dev, struct xdp_buff *xdp)
+>  		break;
+>  
+>  	default:
+> -		/* Should never happen. Mode guarded by bond_xdp_check() */
+> -		netdev_err(bond_dev, "Unknown bonding mode %d for xdp xmit\n", BOND_MODE(bond));
+> -		WARN_ON_ONCE(1);
+> +		if (net_ratelimit())
+> +			netdev_err(bond_dev, "Unknown bonding mode %d for xdp xmit\n",
+> +				   BOND_MODE(bond));
+>  		return NULL;
+>  	}
+>  
 
-That is the usual way these things are added, as opt-in. A flag sounds good
-to me, if you're going to make it per-bridge take a look at the bridge bool
-opts, they were added for such cases.
-
-> This would be analogous to the check added for MAB in 2022
-> (commit a35ec8e38cdd "bridge: Add MAC Authentication Bypass (MAB) support").
-> 
-> While there are maybe other methods, only in the bridge code I may
-> access the resulting FDB to test for the BR_FDB_LOCAL flag. There's
-> typically not only a single MAC adress to check for, but such a local
-> FDB is maintained for the enslaved port's MACs as well. Replicating
-> the check outside of the bridge receive code would be orders more
-> complex. For example, you need to update the filter each time a port is
-> added or removed from the bridge.
-> 
-
-That is not entirely true, you can make a solution that dynamically compares
-the mac addresses of net devices with src mac of incoming frames, you may need
-to keep a list of the ports themselves or use ebpf though. It isn't complicated
-at all, you just need to keep that list updated when adding/removing ports
-you can even do it with a simple ip monitor and a bash script as a poc, there's nothing
-complicated about it and we won't have to maintain another bridge option forever.
-
-> Since a very similar check exists already using a per-port opt-in flag,
-> would a similar approach acceptable for you? If yes, I'd send a
-> follow-up shortly.
-> 
-
-Yeah, that would work although I try to limit the new options as the bridge
-has already too many options.
-
-> PS: I haven't spottet you, but in case you're at LPC in Vienna we can
-> chat in person about it, I'm here.
-> 
-
-That would've been nice, but unfortunately I couldn't make it this year.
-
-Cheers,
- Nik
-
-> Best regards.
-> 
-> 
->> Cheers,
->>   Nik
->>
-> 
+Looks good to me, but next time wait 1 day before reposting another version.
+Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
