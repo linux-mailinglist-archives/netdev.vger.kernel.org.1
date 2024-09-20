@@ -1,119 +1,104 @@
-Return-Path: <netdev+bounces-129041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6695197D17A
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 09:05:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 699BC97D1B5
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 09:27:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29A092838DC
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 07:05:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3196D2833D9
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 07:27:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A07B83BB50;
-	Fri, 20 Sep 2024 07:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 857EC26AE8;
+	Fri, 20 Sep 2024 07:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="SApjxW/C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CsnIQRpN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB4E41C72;
-	Fri, 20 Sep 2024 07:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0890D55887;
+	Fri, 20 Sep 2024 07:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726815950; cv=none; b=FVrnN1MTpgOt+TBFNwEb45Iks02ikGrlvkKwYIVcv9GANVitaCdGqReNdvX7vNRoj+Ow/ZB0yNCqoR008WPYfigupkcXa3jV0Pi2oEfIxJDKOGcJ6bE9sfiI/F3TqIxakyYRsy1SX+QUnCScV4p93+r1exdREeMALzsMdXI1PDA=
+	t=1726817247; cv=none; b=VnoL9VhiEgv7i5B9H4RXaWztAVSwPJ/zGWgr1QQ8gZVZc0YJfjFPXe3/l4V71DnKbr37jWgELAVbjXFXS3G7Y0IJJajKqW8ISfypIPadN3+zLFGJtHfJjbDV9cD3kc+Y22XEaNxJXqz+WUsobAEc2eCGKJhkr6/NS1Aa8MbUL7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726815950; c=relaxed/simple;
-	bh=MV/wpg0Bwi6atxzF0D3C6K0NvrRxaGQGgCsav+39h1g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cOMRux3MQqkQruyh/tTjGhM7YJUeRGxURle2SxiFieoYeoAsNl4TjuwJTQe7vc/Jo2qGqN7g2FgYGshhiasSMEI9MhTMV6NzKlBAmix1euitQZsc39gIP9ysoKKyZqrcO8KElHoODnpLVb4xDO9gvnB92KBlWyG2CTStDtitgzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=SApjxW/C; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1726815914; x=1727420714; i=markus.elfring@web.de;
-	bh=IxTvS8Re1mH+yLe3me+r4ZHkYxfcUhZvllapA26y+nk=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=SApjxW/Cz9i3W3OXAasOVa6gJalKbDJTGX1wEclbCJTJKsAGjVQfrklparT7RF4F
-	 /9l1twIGMgV1QRDQvGtGfIGoOPWruGFBJqI+xNvztCRsCvRRaWb4h/UJDezOHXMvn
-	 F4U7q8Wotxy2VGgpkFvh0EdUe8yICtWJRcreB7LwifJTZieckRa6Twt+YX0Rbl7qL
-	 edTf5eZPurIP/G0CTYFEf0Vvm5j4Xik/ouF7aMuVwjqh1yNXvhkl9qOiPqBlo2NPB
-	 5N5JUCeFMeyXmVi+OKtSzHLwjvUGU/e8j5bJOoRRnLIIdxEHUqjM6P8jttkForP/c
-	 R54InfEhpPuuod1lrw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1N62ua-1ruMR00XQe-00shO0; Fri, 20
- Sep 2024 09:05:14 +0200
-Message-ID: <d9ee8571-208a-45cb-ad51-61926ce23d62@web.de>
-Date: Fri, 20 Sep 2024 09:05:11 +0200
+	s=arc-20240116; t=1726817247; c=relaxed/simple;
+	bh=MZlGKaVHHez6qS5kEyhcLN0JjdWKG50+esMk2Rg17mQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U5i+mY7ssldX/e7VMwLoThLSxZTpzHlnOuAWH6VBwLI3GcWXPZCvelMlaNYWwE6o2DAgTOTtL2dgZ8KpjL0mAYoDHvzpmctAZoU1oJ1llTdYwFm7eMrKDJBfmfyWmwbYMsedBBEFrHsOSmPMXhQwrVdelmb6s8l0Hi0y2lLGUc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CsnIQRpN; arc=none smtp.client-ip=209.85.219.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6c35427935eso9128806d6.3;
+        Fri, 20 Sep 2024 00:27:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726817245; x=1727422045; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MZlGKaVHHez6qS5kEyhcLN0JjdWKG50+esMk2Rg17mQ=;
+        b=CsnIQRpNL3pFf8Iwq5ogixtiBZaasIHT120wbQeDuant2NKsTcFYoI6facj6beHKHk
+         wV5l6o4UzcUU+/LuL+iCwpiE/MP9pL2+fq2Il3RW3jjWIVDf7zLaejqoIYS+XkKy0x2q
+         Uj4jMtg6ZmEH84Y5L9CPj6esrCqtTWJP9fACDlsxoZgsobo8XCv7/a7BI9RTDcGB1aBi
+         6kt73WI+MC3I2IZHyIE1Cqmst1onNcq2cYvoKcEXBA1mUUaO5CMC2U/J3R9s6ZDamTzG
+         VfjpeCE+XFMjbXmDCIYi1HvDN/GPrOvnAavNq1Cd9dPysV/3HyhyS2q2A8XQtoHh74QV
+         K4Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726817245; x=1727422045;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MZlGKaVHHez6qS5kEyhcLN0JjdWKG50+esMk2Rg17mQ=;
+        b=qVwyGhpqr71crUDgYp0R9Y6FT9r+xxECu+yWRgEs8NGGe0WeaK3NNuZQ4BUVRQyKvy
+         YQepQJv/i0hYPi5PdqJ6Ouw0/TXITkaeUtUdQptVVOBlA6pJo+pefr+sKelE785tEeYQ
+         EBG5ujpbvTBpXGYMyOzh796UI51OfuBmLcR3Dz+DYtsRzQmaMzjVPWcc1qTeyHELwPoy
+         /yy6WgY7BqHMwc/rKSvOjpW5qwYAA91K+O0e3oQRMQFbUFr36XGdOOpSC+i9/n72IZWJ
+         Rs7O0Lm6TndeBlQeLm8F6VXTAIgpPbby5SZr8Bfqi0pqNDe33wSsp5daSwCw0KuEUNbB
+         s3Kw==
+X-Forwarded-Encrypted: i=1; AJvYcCWx1OdSO7eNlA3qmHCwZlkdd6BULQyeX8LdeNrvJZynlkz0JIJgIR/79xQ15/Osrii8jIU0Np3o5SokbJY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBrSFLS031yoenU5hzn7l4pmqESyvUQuNXLIBG5WgUGhLRX4rn
+	xF2gwZoNHA//RnS/SbuqAC0Pl5YKjyB2FXyAqBw9p00Crq/oRik/A+8l9l9Fa5H9lWpdPvsqIJb
+	u4CgvJfVllG2Aq6nJPQXcymXRX6M=
+X-Google-Smtp-Source: AGHT+IEodLpDLNCLAZ214FMIY/ZpxKFDa31hRkHoWZjaY3f+6FzzN2bDnn7OxHF2bmy64U7Mkbpsr/2M6MHJ3ToqQ2E=
+X-Received: by 2002:a05:6214:310c:b0:6c5:517a:56d0 with SMTP id
+ 6a1803df08f44-6c7bd4c8d45mr26801766d6.13.1726817244831; Fri, 20 Sep 2024
+ 00:27:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ice: Use common error handling code in two functions
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
- Karol Kolacinski <karol.kolacinski@intel.com>,
- Paolo Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-References: <f3a2dbaf-a280-40c8-bacf-b4f0c9b0b7fe@web.de>
- <58d38533-bccd-4e0e-8c7a-4f7a122ce0d1@intel.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <58d38533-bccd-4e0e-8c7a-4f7a122ce0d1@intel.com>
-Content-Type: text/plain; charset=UTF-8
+References: <20240919142149.282175-1-yyyynoom@gmail.com> <20240919145609.GF1571683@kernel.org>
+In-Reply-To: <20240919145609.GF1571683@kernel.org>
+From: Moon Yeounsu <yyyynoom@gmail.com>
+Date: Fri, 20 Sep 2024 16:27:13 +0900
+Message-ID: <CAAjsZQyruuyN6VC5T=xQHFVWeOLhz4D3H0vBrwTRoqQHDbtsEg@mail.gmail.com>
+Subject: Re: [PATCH net] net: add inline annotation to fix the build warning
+To: Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:okDhtZGdxOeK6rH3CHh40dnLehZXd0mSL2Q2FsgR28JsAvdHXvT
- HomrVNaQ06MtYvCmmHSBEW2YCS4yu1BfWbWbBV9deckg/VQ1utE8seNT5rOb859jETZjMtb
- ekuuL/ifwq49XNI9twz2QjAOwTTLrldZFa0fuUmfa0FhUo5YnGgulnEAET3Afiqk5CTug4c
- 1mInlO/A4x2K1CVD6cZYQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:6yrI3HDK5U0=;RIpq8Kdfqk0jdX1PIKjCnlVDPSF
- 9V5y7/9DTAVbAW8DUUE+IVMXzcDKKvsZR1EUWf4D1tbnAQ5GJbykO8RSY0Yc+vQcgKNXILIxT
- oOHuniAavuCd/BV9BwMB/f83ZV8JyxCRPPk4Ve/MGVYAu7r6B5ASpJJVKWAVUNb7S8ir/nn0t
- kima4eWn1RazZCvGizut7pPmnbt800FK2O1VcMm8CoBLUL8mTWcTjFENokpwU+dtjGxYzvFec
- K3sKUALB02GjoMzBQ9hWfmmRUCXfqH+kQeCbG7xwhGXpz73U9FHwZPblX15k+p++BxujaYcTW
- GgMgxytxJ2ytooiXN020cTBsHZ40KMvTSYaLY9LzjldZuV1OFS5pYH9PXMnCD2l2vLxRUx6PL
- tPRH8XQWqgKPSaIQtq6YEfyYJJxwhePYU+vHE0XB0rW9f3kEZ5gr9ZaiOGY2rZkQFBh4R2nXU
- htCixzc4z3C/WCnaRnkUfrkF6R+imW5ioRAyD/nHkDAziJDek8LGejymq5wbYOyKuL3vTQPMx
- riwWnwckLeegcO9/SK8B4itus1Jats0HHx6XiDfIfNx5DL0fLgLIb1f4JLlpSaLrBRqWYFw35
- Mik40Nmh4t1FcnFhb3KBETRt4OAzQhBuVhDRh4GgFRExE13ZKWFyvlC10YYd8hgxpxo1HQc+9
- weEyY9vHBoE/4/e4y7Ep2+Z3J2TaUpY04KZEUsv0zP45bfEBepJIpnQgM3t2dKgwdFbWxAg7q
- gEA74pKDHe2lEjv+KTak8LtCpzkA883tg3qUrJ05F0YkT2XfXUgEEbtdlKjItCkUlg336EkHG
- yajyQ3JdprSndiU0jklvEbQg==
 
->> Add jump targets so that a bit of exception handling can be better reus=
-ed
->> at the end of two function implementations.
+On Thu, Sep 19, 2024 at 11:56=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
+
+> Hi Moon,
 >
-> Thank you for contribution, the change is fine,
+> Without this patch applied I see the warnings cited above.
+>
+> However, with this patch applied, I see the following.
+> So I think this needs more work.
+Okay, I'll fix and update. (Of course, patch after release `-rc1`)
 
-Thanks for this positive feedback.
+> net-next is currently closed for the v6.12 merge windows, so non-RFC,
+> patches should not be posted for net-next until it re-opens once v6.12-rc=
+1
+> has been released, most likely during the week of 30th September.
+Thank you for letting me know : )
+During this time, I'll read patches, docs, and code to increase my sense.
 
-
->                                                 but not as a bugfix.
-
-Would you like to qualify my update suggestion as a correction for
-a coding style issue?
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/coding-style.rst?h=3Dv6.11#n526
-
-
-> Please send as a [iwl-next], when the submission window opens.
-
-Will a patch resend really be needed for the proposed adjustment?
-
-Regards,
-Markus
+I appreciate you reviewing my patch!
 
