@@ -1,147 +1,201 @@
-Return-Path: <netdev+bounces-129079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17A2E97D5DC
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 14:54:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 072EA97D5E2
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 14:57:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BC0D1C21B89
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 12:54:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85F1B1F24400
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 12:57:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0241616F0CF;
-	Fri, 20 Sep 2024 12:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 833BA16F8E5;
+	Fri, 20 Sep 2024 12:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TMU34yql"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U40cPoLM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C8A716A94F;
-	Fri, 20 Sep 2024 12:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9076316F27F
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 12:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726836884; cv=none; b=BXxf7Ni1nrVhAvwGafSuQ3paYGPsCOapSIQX+1ioSnYalIsC1RG5bAMYCy4mW7Z2CCNalyXuQysJ3fmJsaLGzwqdB32on5SWWqeZg+NRKlUGEFL/ZC5zxQeM1R4UAwfXuQs6LejaA2isNHW/k54tyTsB7zELQAgX6k+nXRvCBF8=
+	t=1726837052; cv=none; b=peNdp1fI1a/xHEKcJ7NY+3l/DWaD5slYEL9JU9g2lhRx7TKrzWpvtdBmzYOMIV6FlmN7L+1j/Hhh+Srewubc2gXkwjtUmkdvMJhK1F5eQbdXJaO0VJf9pD2hC6dxxIjRd5FzWXypcpAl1blf4B4CcuXqpnfRIxW+otkWHWrtpCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726836884; c=relaxed/simple;
-	bh=9/XbiXvNtfo9Ahhxyxq6laPOnKE8m8Kp8tFx/t2A8HU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IYZmgn1afhG0pIuOneISwQmeZIeCTWAKT5nAKrTxDvYmeVmxGwHpa8iyGfw42orAVymnktCDTlhMcRPugQZIeVYwVRo9+kXui4Z8otGBTuewGt0zHJqiSNOkz0D+peTjNNdiZzIV9nK7vIN0t1aDefoy5QJGmKDro0Eip0KnA+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TMU34yql; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a8d2b24b7a8so563676666b.1;
-        Fri, 20 Sep 2024 05:54:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726836881; x=1727441681; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RpseacMxjUgxJQCQ0p8XO6h9OmRZt38JJp1qVkqe51w=;
-        b=TMU34yql4hRf5Xae89m4gKygnh9tPT4rFGTWxIhra3qMQSfEbEovbATlU6ArvpigF8
-         x1KuU/uXkYSdkEzV4Z0ILaFScNgyHHThtG030/9vZdioAf7qUK/LqjteE6gTvOvIzaVH
-         EnZ0r1pB1R2By3IltUcwFBfkrDRe/9dqxocwQ5tbrZjWOIUFGknf8pkwrv5uO4SCtOxV
-         rB3R7Dff+31wvOlpbVm1h6ciUgswjuP9B/HxXpfH8BZC4a8CRogtOpBHZMmxV4hAHAWf
-         TTZG0uBm5lKtAzLvPJnYPquhKuhV+Cd1v2Na+8m42JoZKtOQ+czwafBI9kFzkR60hP5x
-         gIVQ==
+	s=arc-20240116; t=1726837052; c=relaxed/simple;
+	bh=xKtYWOatAl4NW6Od9qmSBkopKZrvnS3lX/F7cz3KyHI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jlsNLcw2eBxBKs3z3ZXxc6uuPrpiWH0sLH82M7hpG83xIAlBKxbnD7BPDuhHOug3vYHtr1OeIQ6oWOYE0+cpJuNoIHirJeX3rmjDsDfDCMk6vzCCInaCUSZ8Cnk4ixhwz1OTa0+2ytH6wkQNMaZd70AVvW2jRmNkPMEIEntFkAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U40cPoLM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726837049;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=6i/9M3LbVt71Tb/A7QJ4KQU38DN0T1TDp4hoySNoTi4=;
+	b=U40cPoLM0J4QIhrLuabosPkvHFekUO/0861Mn2kkAEju58zCjX/px2+cW0Xd6NSYASrLfs
+	USlVOz4m2WPbF6KUTa41C6TftQ1oaEJt61TNYjNsrw5DwRDPcssvQwFF9fHI7kpz7U4sj5
+	9iYOQMTJmcJVB69ozqJ8yUbkNUPB+tQ=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-282-93eMm35YPo22ZrQpe2Q-0g-1; Fri, 20 Sep 2024 08:57:28 -0400
+X-MC-Unique: 93eMm35YPo22ZrQpe2Q-0g-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42cb0b0514bso16332695e9.1
+        for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 05:57:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726836881; x=1727441681;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1726837047; x=1727441847;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=RpseacMxjUgxJQCQ0p8XO6h9OmRZt38JJp1qVkqe51w=;
-        b=myEt3++IZ/CgaTzHk8lO+nSNkEsUGB0NKw+2XfZIgXFVMBae5sL2COmw9a+y1JvYvK
-         dDB8BZ7lFX9bbvyrLiTSClWrgeJAENFgUrjPJnJRrw+iIg8Ts5D9GRBW0nC93nhiUQoW
-         65g50RXRJwuLSmabqMhN9d1YyhyVP1NzZFUQNs7qDFqw/J2HNdwsnyxN4CIw4S38on08
-         fjkYx5JWNe7K90GiSFe/SBPZIZi34aDXB9S9eU7t/5S8Gw13spIOPgwIlQWfUM6wecZR
-         8MNbf5LyRiQEhyrpZ/3Y917buzeo10713NkWNuK+dyCI65CGqJB964tDk0bUNUxaSutg
-         11NQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvm43/Vt26Bnktef7BOUmjSSsLPlX6f5wNi0lCJ2ZvGng3ZbW1n3rjGM/es1DYWSeMVXSXBlo2UrYHujjilg23@vger.kernel.org, AJvYcCW+9bK2AUk0CdPmVzVJMzJFS8868WoaDtLZy26GNENHhOW+4v5xlMVaLNG+wCToBlasMkC0JCsE@vger.kernel.org, AJvYcCXlKIAqTCWVb2v+Nx0SQ520L2Cen+6wKvWnYsi35QFnYD8oAw4JTQKjeLdzJnFXmKSSmdGfxTOsKSsh9Ds=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweMQCVzISXeUD9hxfK7UVjVBARV16YEE3pyQaLo7XBLcgVT160
-	xQu5LfEePpOfF/XlqAKg14kcqqqb2MtBF1CNRFfzZgI7VLoLngDe209EUE4M5Ds/grJGb3aLlYG
-	Dk0IDx2xBGsNTzA2KnmIgah0GxJIetV7l+WngaQ==
-X-Google-Smtp-Source: AGHT+IFNG7eWZ0hTCSU9dnVSqE4S90H/FnkxsBpn+k7zYe1p9qup8+dfLEzF2OhL+u23ShqmAAZopTPFI7IK4WbqJI8=
-X-Received: by 2002:a17:907:94cf:b0:a77:c051:36a9 with SMTP id
- a640c23a62f3a-a90d35107d9mr296404166b.9.1726836881397; Fri, 20 Sep 2024
- 05:54:41 -0700 (PDT)
+        bh=6i/9M3LbVt71Tb/A7QJ4KQU38DN0T1TDp4hoySNoTi4=;
+        b=l+1aJgLYYkbKXmqmoEykn/SRR3Dz0LRne0OzC6cmnC+eyUUfHNYiatyJIEi/5ROsWi
+         CgeHWRVMB1YmirgTW5wQDwqr9EXawh8dGqmG/1x35UsWjA9dX+G7bXNBKCb1c4Fh6fVX
+         902dd5AIyL9fAp1vA/oc/Bl2Ce6bo3cp4SBNCiDOy9WIg/Bf7yM4gftxLd47C0SG2P2r
+         fEwX3b0+672y3W+fFLns7wIOBVtXULPbLuYhBWJBITXpGBj2NQTwGWS9brBpnQlTJcbo
+         mCAcdlmT+fwPGoGT3wl9IAsQzXBDYOGvFT1IexSGkWWKGmr+LMPLYCyu9no7NZUxWogV
+         DEWA==
+X-Forwarded-Encrypted: i=1; AJvYcCWK82Rpt5dJZlVa+wBd4rwwlxeizHFKqOQozSiumHL8gL3JCj3ODSYAuPzFgzf+3QD0jZRcPVs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJRDayxcaHsnfTkUmRVz9FDNMsuBaTJoWohMv05+dPm+x3+dNn
+	jhpzIGowJ5MdBFnE+hUTjLCn/Joj9tUQkttvCuGEAGgL/wy3NytKN4W7lqBxaWlv/c0OyKUVogu
+	tJD58cFf02SEN0lF94jcQJPAbZYTDofyr8SKl/kaf03VuSYAuQkVgdA==
+X-Received: by 2002:a05:600c:8718:b0:42c:b4f2:7c30 with SMTP id 5b1f17b1804b1-42e7c1a2e78mr17300435e9.23.1726837046747;
+        Fri, 20 Sep 2024 05:57:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHI14L31WVOCS238ru+pUtkvSQV/+o+7OZ8oLg0y8OhRSCpRsbneC4YG6z8S4WcNdbsfzoOIg==
+X-Received: by 2002:a05:600c:8718:b0:42c:b4f2:7c30 with SMTP id 5b1f17b1804b1-42e7c1a2e78mr17300195e9.23.1726837046243;
+        Fri, 20 Sep 2024 05:57:26 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e7afa9fffsm22165745e9.19.2024.09.20.05.57.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Sep 2024 05:57:25 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 8AFB0157F7E6; Fri, 20 Sep 2024 14:57:24 +0200 (CEST)
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf-next] bpf: Make sure internal and UAPI bpf_redirect flags don't overlap
+Date: Fri, 20 Sep 2024 14:56:24 +0200
+Message-ID: <20240920125625.59465-1-toke@redhat.com>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <c92569919307749f879b9482b0f3e125b7d9d2e3.1726480066.git.jamie.bainbridge@gmail.com>
- <Zuw7d9eRGo4wdVP3@shredder.mtl.com>
-In-Reply-To: <Zuw7d9eRGo4wdVP3@shredder.mtl.com>
-From: Jamie Bainbridge <jamie.bainbridge@gmail.com>
-Date: Fri, 20 Sep 2024 22:54:29 +1000
-Message-ID: <CAAvyFNiAXb7wuDMi6tRVuzHUwkSwtCtJOzM7LGxk5nDEtaqgyQ@mail.gmail.com>
-Subject: Re: [PATCH net v2] selftests: forwarding: Avoid false MDB
- delete/flush failures
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, 20 Sept 2024 at 00:56, Ido Schimmel <idosch@nvidia.com> wrote:
->
-> Hi,
->
-> Thanks for the patch and sorry for the late reply (was OOO).
->
-> On Mon, Sep 16, 2024 at 07:49:05PM +1000, Jamie Bainbridge wrote:
-> > Running this test on a small system produces different failures every
-> > test checking deletions, and some flushes. From different test runs:
-> >
-> > TEST: Common host entries configuration tests (L2)                [FAIL]
-> >   Failed to delete L2 host entry
-> >
-> > TEST: Common port group entries configuration tests (IPv4 (S, G)) [FAIL]
-> >   IPv4 (S, G) entry with VLAN 10 not deleted when VLAN was not specified
-> >
-> > TEST: Common port group entries configuration tests (IPv6 (*, G)) [FAIL]
-> >   IPv6 (*, G) entry with VLAN 10 not deleted when VLAN was not specified
-> >
-> > TEST: Flush tests                                                 [FAIL]
-> >   Entry not flushed by specified VLAN ID
-> >
-> > TEST: Flush tests                                                 [FAIL]
-> >   IPv6 host entry not flushed by "nopermanent" state
-> >
-> > Add a short sleep after deletion and flush to resolve this.
->
-> The port group entry is removed from MDB entry's list synchronously, but
-> the MDB entry itself is removed from the hash table asynchronously and
-> the MDB get query will only return an error if an entry was not found
-> there.
->
-> IOW, I think that when you do get a response after deletion, the entry
-> you get is empty.
->
-> Can you please test the following patch [1] (w/o yours, obviously)?
->
-> [1]
-> diff --git a/net/bridge/br_mdb.c b/net/bridge/br_mdb.c
-> index bc37e47ad829..1a52a0bca086 100644
-> --- a/net/bridge/br_mdb.c
-> +++ b/net/bridge/br_mdb.c
-> @@ -1674,7 +1674,7 @@ int br_mdb_get(struct net_device *dev, struct nlattr *tb[], u32 portid, u32 seq,
->         spin_lock_bh(&br->multicast_lock);
->
->         mp = br_mdb_ip_get(br, &group);
-> -       if (!mp) {
-> +       if (!mp || (!mp->ports && !mp->host_joined)) {
->                 NL_SET_ERR_MSG_MOD(extack, "MDB entry not found");
->                 err = -ENOENT;
->                 goto unlock;
+The bpf_redirect_info is shared between the SKB and XDP redirect paths,
+and the two paths use the same numeric flag values in the ri->flags
+field (specifically, BPF_F_BROADCAST == BPF_F_NEXTHOP). This means that
+if skb bpf_redirect_neigh() is used with a non-NULL params argument and,
+subsequently, an XDP redirect is performed using the same
+bpf_redirect_info struct, the XDP path will get confused and end up
+crashing, which syzbot managed to trigger.
 
-This works perfectly for me. Previously I would get at least 2
-failures in 10. Without my patch and with the above patch, 100 tests
-pass without any failure.
+With the stack-allocated bpf_redirect_info, the structure is no longer
+shared between the SKB and XDP paths, so the crash doesn't happen
+anymore. However, different code paths using identically-numbered flag
+values in the same struct field still seems like a bit of a mess, so
+this patch cleans that up by moving the flag definitions together and
+redefining the three flags in BPF_F_REDIRECT_INTERNAL to not overlap
+with the flags used for XDP. It also adds a BUILD_BUG_ON() check to make
+sure the overlap is not re-introduced by mistake.
 
-Many thanks for looking at this!
+Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast support")
+Reported-by: syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+ include/uapi/linux/bpf.h | 14 ++++++--------
+ net/core/filter.c        |  8 +++++---
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-Jamie
+diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+index c3a5728db115..0c6154272ab3 100644
+--- a/include/uapi/linux/bpf.h
++++ b/include/uapi/linux/bpf.h
+@@ -6047,11 +6047,6 @@ enum {
+ 	BPF_F_MARK_ENFORCE		= (1ULL << 6),
+ };
+ 
+-/* BPF_FUNC_clone_redirect and BPF_FUNC_redirect flags. */
+-enum {
+-	BPF_F_INGRESS			= (1ULL << 0),
+-};
+-
+ /* BPF_FUNC_skb_set_tunnel_key and BPF_FUNC_skb_get_tunnel_key flags. */
+ enum {
+ 	BPF_F_TUNINFO_IPV6		= (1ULL << 0),
+@@ -6198,11 +6193,14 @@ enum {
+ 	BPF_F_BPRM_SECUREEXEC	= (1ULL << 0),
+ };
+ 
+-/* Flags for bpf_redirect_map helper */
++/* Flags for bpf_redirect and bpf_redirect_map helpers */
+ enum {
+-	BPF_F_BROADCAST		= (1ULL << 3),
+-	BPF_F_EXCLUDE_INGRESS	= (1ULL << 4),
++	BPF_F_INGRESS		= (1ULL << 0), /* used for skb path */
++	BPF_F_BROADCAST		= (1ULL << 3), /* used for XDP path */
++	BPF_F_EXCLUDE_INGRESS	= (1ULL << 4), /* used for XDP path */
+ };
++#define BPF_F_REDIRECT_ALL_FLAGS (BPF_F_INGRESS | BPF_F_BROADCAST | BPF_F_EXCLUDE_INGRESS)
++
+ 
+ #define __bpf_md_ptr(type, name)	\
+ union {					\
+diff --git a/net/core/filter.c b/net/core/filter.c
+index e4a4454df5f9..db99f2b38e06 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2437,9 +2437,9 @@ static int __bpf_redirect_neigh(struct sk_buff *skb, struct net_device *dev,
+ 
+ /* Internal, non-exposed redirect flags. */
+ enum {
+-	BPF_F_NEIGH	= (1ULL << 1),
+-	BPF_F_PEER	= (1ULL << 2),
+-	BPF_F_NEXTHOP	= (1ULL << 3),
++	BPF_F_NEIGH	= (1ULL << 16),
++	BPF_F_PEER	= (1ULL << 17),
++	BPF_F_NEXTHOP	= (1ULL << 18),
+ #define BPF_F_REDIRECT_INTERNAL	(BPF_F_NEIGH | BPF_F_PEER | BPF_F_NEXTHOP)
+ };
+ 
+@@ -2449,6 +2449,8 @@ BPF_CALL_3(bpf_clone_redirect, struct sk_buff *, skb, u32, ifindex, u64, flags)
+ 	struct sk_buff *clone;
+ 	int ret;
+ 
++	BUILD_BUG_ON(BPF_F_REDIRECT_INTERNAL & BPF_F_REDIRECT_ALL_FLAGS);
++
+ 	if (unlikely(flags & (~(BPF_F_INGRESS) | BPF_F_REDIRECT_INTERNAL)))
+ 		return -EINVAL;
+ 
+-- 
+2.46.1
+
 
