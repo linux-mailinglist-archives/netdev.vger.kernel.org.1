@@ -1,135 +1,158 @@
-Return-Path: <netdev+bounces-129112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 585A897D8B9
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 18:57:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFAAC97D8A1
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 18:56:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A6F91C20E35
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 16:57:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AE8E2815D2
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 16:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9DAB17E016;
-	Fri, 20 Sep 2024 16:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893DA17BEC6;
+	Fri, 20 Sep 2024 16:56:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="PgEzo1fx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WcTsNHUL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4305B17E005
-	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 16:57:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB19D79C0
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 16:56:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726851469; cv=none; b=LS93eK5BanBJyAzwXGJXMCTVprvwuBCjnPaFw5fuFs3TSTWL7fXqbvEQwfiC31WeGfGPf4Ya7F7SGX6ajlY+wAaa4ZJbPEsD0A6MhWCUqXTLV2MNg9L8ltxDszPbpR500EVaoTBfDOQOE5i4GqL7oOsCJvy9enVJnB2/2Jzs4tU=
+	t=1726851397; cv=none; b=j5it6I65x10ZTZKjWvbVbXYjxlxhqMnlNUXnLGmZPDs/xWp6S20jz1c3eJHpqrQisHe/gRRVPxgAutv2lzZfpn3icAGWX34Jzyhrau9aewr85YBbS6oOIiu3KeIChNRvmn0AOB7akPPppRk/CWMq1BPf/0qJ/pWGp5BC3lRj4eI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726851469; c=relaxed/simple;
-	bh=0VndrB7wUbmZML5AQ3UnMNv6I2BM2u35xkfH2xKB9Z8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HCAGkfpX/0tnKX1S2gFm52T7ixATDue6KpcDsIPd/d18iTG0s3q9Xzg0pqZ9MYyZsHe/8MafCJAm5OF2fgVB5wY00KsTaR493MP8GhD9AqgsUOpy+LyOSPuODO70ErA7duMwm5kp1VYTkurwQcft3LgnQb+cbmPGdn6SfA38Fbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=PgEzo1fx; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-42e5e758093so19943975e9.1
-        for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 09:57:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1726851467; x=1727456267; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cPGcaGILxwhfTJ1AkidUV1js05svfUGNV2qC8S2ASMs=;
-        b=PgEzo1fxKw4erEqJdbvBYawafZOkdTH18IloSozw2Iy9pqg1BPRShq9mFLy9c2F1Z/
-         RecKBiQizOtl7ydTCGfUrX7i1gRYmMQX6AqjeSnrzeSUgrYdRzPI4TV+pHQP98EtiFNS
-         ywdHeYpvy5mvUT7gspf+cqYFwah/s5hlD41JHZIlldzNFluurbU7TDAdfXpFW8Ac92EU
-         UIiJmA/vA9HQDKuz37IWqBd1ogrYCagskMwk+O8/6yZPWR44+/1MCDS+DaE4KslIBK07
-         1Q3l9j9PWEps+9V58AvrwoEQkEatjMo18o0q4vH/oNrY3OA3zz0MmJnjjLgI6i6vMoMP
-         As0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726851467; x=1727456267;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cPGcaGILxwhfTJ1AkidUV1js05svfUGNV2qC8S2ASMs=;
-        b=MF6AxcDGkCSInnp9W6GYJ9d9dYQ6KlB+1FeD110ZzIzHZNZadRNQKSHeQ4oP3P1f8b
-         QG/XjxLTdEoD13GHdGz5yvw9xhBIfGxdajybtCwyFdFynjXZ4sAIYHBXlHHDmPg9UbZZ
-         IB3MVSuUATGsvoJFe/LQXTs9M45mROxKH1wTnZ/cbO9UHtFXDU0Wu2EBDX2lBWD73oCr
-         hIGOYOokry9eTfxxJIAWqrgtqOb0Zrah07Ey9iZWCYAQTinPBFNBW5/Lue/hBPw7xC3l
-         Y3tLob+e6Pw1ZDhklf2iAcegU9M9Dc+0geY4fHuL8fO4GSmWlPCjz0Hcd9MchQ8tgBrx
-         NBJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWZTrbj8843OG6i/pelnbPJOhJSQ3NS5xiRoOnDrC48Vsdew3gnuy+Uk4Vw9mccRrmsG2sQcxM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwahTUBK6qj8VE5RGGCC8p5lgxvGEsaqZFHexXnXId5z1ZXZGPZ
-	uGOmsWp7lMoTnmNH3CU6frRhxcpNMV70jhVj3q8KYs4hnu7LAYtg29WEuw0kHcU=
-X-Google-Smtp-Source: AGHT+IH47FhS6BitJFEObpSEKWNYV6OlALdb/YS1wlurIrhxIx0joR4JwIU0GtIJDWKAkg4lShG/Ig==
-X-Received: by 2002:a05:600c:1e25:b0:42c:b6e4:e3ac with SMTP id 5b1f17b1804b1-42e7abe228fmr29196115e9.3.1726851465308;
-        Fri, 20 Sep 2024 09:57:45 -0700 (PDT)
-Received: from GHGHG14 ([2a09:bac5:50ca:432::6b:72])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e7540e464sm54855295e9.4.2024.09.20.09.57.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Sep 2024 09:57:44 -0700 (PDT)
-Date: Fri, 20 Sep 2024 17:57:30 +0100
-From: Tiago Lam <tiagolam@cloudflare.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Jakub Sitnicki <jakub@cloudflare.com>, kernel-team@cloudflare.com
-Subject: Re: [RFC PATCH 1/3] ipv4: Run a reverse sk_lookup on sendmsg.
-Message-ID: <Zu2pev10zUAEnbYm@GHGHG14>
-References: <20240913-reverse-sk-lookup-v1-0-e721ea003d4c@cloudflare.com>
- <20240913-reverse-sk-lookup-v1-1-e721ea003d4c@cloudflare.com>
- <66eacb6317540_29b986294b5@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1726851397; c=relaxed/simple;
+	bh=OMRGaYWcJ8kuLjSDdQXJDwBIFRal6V100eD6nlGYOb4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KECupwpMZ3gTMWYO662ub6O84ew727Q8o/BbHVVv0QpAj34aBt9m3ZlS2Xzuwk5VuxMsnSS1lRKaPTQZD7t76t7hRd/+RNt/SkibnaU02bNf9CTiSodi1ZFT2fwrQ5nAVbk4yCosclyhqu23nhQJLFB8ZMknp0CvVp7WJYN1nyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WcTsNHUL; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726851396; x=1758387396;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=OMRGaYWcJ8kuLjSDdQXJDwBIFRal6V100eD6nlGYOb4=;
+  b=WcTsNHULz5KI59QopBtJhsG+SxbAmB3ySVyht1PxeBBuy3QzLfS6sw+a
+   3k9mBh+y/iyohRBe6zd4XhhSxz+HjL95C1+3PA/JzLP4f3POroxKxSgU+
+   D4j9xwdfbTHUYV/lQJ+ZlCRGbgvE9FA7cd0g7ETZeqie/PqJxR6PATwTO
+   c59s5L3aCNKFshU9vUHDnKzFxHKUFTcdcXCov3iIQs1rYgj0NHoBicEEZ
+   sJyvHs4a6SJmRqEaCjwlq71p4oBBfOKB/5g66QxIvmbdgOPidKQJckiUj
+   tsQKYB7GnX9GrstD6kpQGPXNjC1+b0x/K7qNur+VzgVSV5cHPBhyHHt9E
+   Q==;
+X-CSE-ConnectionGUID: p1blepoLSOuTpNCF7INufw==
+X-CSE-MsgGUID: kbrWcykOQ5afQOGJMtbNmA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11201"; a="25813929"
+X-IronPort-AV: E=Sophos;i="6.10,244,1719903600"; 
+   d="scan'208";a="25813929"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Sep 2024 09:56:35 -0700
+X-CSE-ConnectionGUID: SinkSpCxTFibPAGvZs2uFA==
+X-CSE-MsgGUID: rCWWVavxQhmflfXx0cBKsA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,244,1719903600"; 
+   d="scan'208";a="101100621"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa002.jf.intel.com with ESMTP; 20 Sep 2024 09:56:34 -0700
+Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id B28F32F1E;
+	Fri, 20 Sep 2024 17:56:32 +0100 (IST)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	mateusz.polchlopek@intel.com,
+	maciej.fijalkowski@intel.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net v2 1/2] ice: Fix entering Safe Mode
+Date: Fri, 20 Sep 2024 18:59:17 +0200
+Message-ID: <20240920165916.9592-3-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <66eacb6317540_29b986294b5@willemb.c.googlers.com.notmuch>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Sep 18, 2024 at 08:45:23AM -0400, Willem de Bruijn wrote:
-> Tiago Lam wrote:
-> > In order to check if egress traffic should be allowed through, we run a
-> > reverse socket lookup (i.e. normal socket lookup with the src/dst
-> > addresses and ports reversed) to check if the corresponding ingress
-> > traffic is allowed in.
-> 
-> The subject and this description makes it sound that the change always
-> runs a reverse sk_lookup on sendmsg.
-> 
-> It also focuses on the mechanism, rather than the purpose.
-> 
-> The feature here adds IP_ORIGDSTADDR as a way to respond from a
-> user configured address. With the sk_lookup limited to this new
-> special case, as a safety to allow it.
-> 
-> If I read this correctly, I suggest rewording the cover letter and
-> commit to make this intent and behavior more explicit.
-> 
+If DDP package is missing or corrupted, the driver should enter Safe Mode.
+Instead, an error is returned and probe fails.
 
-I think that makes sense, given this is really about two things:
-1. Allowing users to use IP_ORIGDSTADDR to set src address and/or port
-on sendmsg();
-2. When they do, allow for that return traffic to exit without any extra
-configuration, thus limiting how users can take advantage of this new
-functionality.
+Don't check return value of ice_init_ddp_config() to fix this.
 
-I've made a few changes which hopefully makes that clearer in v2, which
-I'm sending shortly. Thanks for these suggestions!
+Change ice_init_ddp_config() type to void, as now its return is never
+checked.
 
-Tiago.
+Repro:
+* Remove or rename DDP package (/lib/firmware/intel/ice/ddp/ice.pkg)
+* Load ice
+
+Fixes: cc5776fe1832 ("ice: Enable switching default Tx scheduler topology")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+---
+v2: Change ice_init_ddp_config() type to void
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 15 +++------------
+ 1 file changed, 3 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 0f5c9d347806..aeebf4ae25ae 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4548,34 +4548,27 @@ ice_init_tx_topology(struct ice_hw *hw, const struct firmware *firmware)
+  *
+  * This function loads DDP file from the disk, then initializes Tx
+  * topology. At the end DDP package is loaded on the card.
+- *
+- * Return: zero when init was successful, negative values otherwise.
+  */
+-static int ice_init_ddp_config(struct ice_hw *hw, struct ice_pf *pf)
++static void ice_init_ddp_config(struct ice_hw *hw, struct ice_pf *pf)
+ {
+ 	struct device *dev = ice_pf_to_dev(pf);
+ 	const struct firmware *firmware = NULL;
+ 	int err;
+ 
+ 	err = ice_request_fw(pf, &firmware);
+-	if (err) {
++	if (err)
+ 		dev_err(dev, "Fail during requesting FW: %d\n", err);
+-		return err;
+-	}
+ 
+ 	err = ice_init_tx_topology(hw, firmware);
+ 	if (err) {
+ 		dev_err(dev, "Fail during initialization of Tx topology: %d\n",
+ 			err);
+ 		release_firmware(firmware);
+-		return err;
+ 	}
+ 
+ 	/* Download firmware to device */
+ 	ice_load_pkg(firmware, pf);
+ 	release_firmware(firmware);
+-
+-	return 0;
+ }
+ 
+ /**
+@@ -4748,9 +4741,7 @@ int ice_init_dev(struct ice_pf *pf)
+ 
+ 	ice_init_feature_support(pf);
+ 
+-	err = ice_init_ddp_config(hw, pf);
+-	if (err)
+-		return err;
++	ice_init_ddp_config(hw, pf);
+ 
+ 	/* if ice_init_ddp_config fails, ICE_FLAG_ADV_FEATURES bit won't be
+ 	 * set in pf->state, which will cause ice_is_safe_mode to return
+-- 
+2.45.0
+
 
