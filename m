@@ -1,196 +1,164 @@
-Return-Path: <netdev+bounces-129044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35FA497D1FB
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 09:48:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF58597D219
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 09:58:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A65301F2107E
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 07:48:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B6C62863E1
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 07:58:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F1F43AAE;
-	Fri, 20 Sep 2024 07:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 566C155C3E;
+	Fri, 20 Sep 2024 07:58:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KYGodaCf"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="PNr44RVR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38041C69D;
-	Fri, 20 Sep 2024 07:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A77B5475C
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 07:58:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726818479; cv=none; b=jyW7Qg+QSs0ieBZNANZUEC7DrtWGJZQXMhO632aqlmynbYm+faTtj3+Op+Ly8/W/VQ6AqmtLfrhl4OFcDy+SqSCkQl3ohXeDv2AgSDs2lMwDARz4Q0Czuv6Tp6fZrMnnmjZJhrNoKdF9CONb4yY8esN28v+4fiJm+pZH7Cl6HX0=
+	t=1726819130; cv=none; b=frZxlsHrjwtNOFnCfVtUYOgtpF4Q5c1nOaPeDsFZcgTU1Pg9HnlZY8aSxbYVIkrn9OvHsUFHRp8X+1hcSMnAJNM+os/DyfMXNXxeS+e6Jlu1xqpBrf5KCqYpOAyDcCHtT/UJgNYkqZLAk2dD71dbR1y9ZG3ty+yoqBgHrSnOQP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726818479; c=relaxed/simple;
-	bh=CLcNs5kqxdJgt6qP0MB0cAqrax1hjoWqC8oMfdnbPjI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SS5vj8qNXX7C3d0fw4knuChV3wh2erOzbCaHSFFKW8ZQDmQ1F6EL4DdeoH2oqnBFHS6YMohWrprQ50d1+J1sYpu9QmdWovtJbpCutLtWLtGdGw3Gf6CgJDkrrmhoGBQRSKmbua1wg8qefvpmMWJfi65CcPVq5ekc0JsrpKlHWUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KYGodaCf; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <6971720d-3639-4a80-a17b-48489bfadb0a@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1726818473;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uC/xou3pHrirAtgbyCjJ2O1AHcinEj0qAI+WR7A8lTc=;
-	b=KYGodaCffMFwqwLEfA4IqIH3uk/AnNk6I2VQtOvd++oA2wUT3KPdcVbDa6mY4Qk/lPSzJC
-	86DpiFjAfgoyIdJK0xIV2AEBLy3SGxJ8xBeFl6vjg+wCUCMomZv1TZmO95cOIuyhWL33YP
-	x3S890mP2ZKOQQfmFYc5+Nq2htVhZS0=
-Date: Fri, 20 Sep 2024 15:47:19 +0800
+	s=arc-20240116; t=1726819130; c=relaxed/simple;
+	bh=G8gaXS3CKvy6upathpVQhGzsGg8TbragSm/BWYuq5gs=;
+	h=From:In-Reply-To:MIME-Version:References:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NDqzE+oEV3IqdIhq0et0T4Ku7eceWXmOkJYDZJHickM63066tkrdo07gKJFFUoVJHFCAZfT6PCZ08VCH/VrfQegGXYFhQwYnIbIwXg4PmXD7ws3SY76D6rA3IThsOe+3oHF6h7KGPfRN7xVWjWahln739TK+N1yMRLDNVIdBrXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=PNr44RVR; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5365aec6fc1so2101507e87.3
+        for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 00:58:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1726819126; x=1727423926; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=G8gaXS3CKvy6upathpVQhGzsGg8TbragSm/BWYuq5gs=;
+        b=PNr44RVRfDF/5JPhE+/WmZjTczCrusm+oDep7dkLfajMf9tLjDyn2MW+/lfwweM/mZ
+         oQWqIsZPKQ5u7C0UjIFz2uzF2Hx9mXZRY08gHKcvp3n3s5e/OYN4T5tTiRjUI74rbs5X
+         /cEIp+cwcUmIDQPPTjwahf4RPWGNlhJziEeGn/2HVsRJvSiYolJI1wsOXgClVGxVwoCo
+         +00q/SqJ9GiaFYnQ7UjbRgXqW7GGh+zA6l2H7j+KmRi6EYZaMJO1cZblSTxRMbcmNUDm
+         Lz9+DatKGNccZqDvKVpWllnlu/TsevTujp0715iCiL9qcxObyzaFdRbxrKJq2XdggtiT
+         JV0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726819126; x=1727423926;
+        h=cc:to:subject:message-id:date:references:mime-version:in-reply-to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=G8gaXS3CKvy6upathpVQhGzsGg8TbragSm/BWYuq5gs=;
+        b=pl3m1xGxDyV6sqIHItjSQH+dv5qfSUzbVCFDR647wdbhdlEDc8ABGvSCmethtzLucZ
+         qHEuoSHQScNaxffuWJ1wNeS9gDzRdsuZZpcVBqKK6I0YiyGHLVsRSaudEIfyWVqzfw6w
+         LpxVXLMfpPxgxa2EjV2386e+r7p6F+aE78e8lfaY9wU2/0YMOUXrcPgnm0aO5X1D/C5e
+         /D1RYSZokU3cleOvbByCEmbUSx/yyJzKlaaMhTHUQ8TPmDeaJIzKy5KyGyejTIJlZAxj
+         MALIVflyaWfEanW2+YCU4UQ2jI+37JBt6ElMUrL/oS805Quvidp7GNvgKiv6+WzjqVkL
+         n8Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCXXULDsYrqJjt2KxIodqOU6yuQ9/S42CRyEhw2IrhThukA9yzjHjfdlP110jKuNsv8iNOWqBHE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbjBSUbLiXSw4bq42bC9JzGDuXXQX6UZxpzmmHJpyAD0yjWVh3
+	Fw8yGmHln7zZIxbcFfY54AGMTYpe3w3PLlX6+jxPKdHY99CefIjMSANNs1syaLgrNBw8qL6I4gG
+	BC6b9SoprGHL4drxJ8Ed68ZDAjVbuuEJK9TbvAQ==
+X-Google-Smtp-Source: AGHT+IFWhG3CUQa9G9CqIMZPY+ykvt6XfSEiCGRn8+DLsrcQfk28XzMJQ1zmPWWX6CXejRPycjDQwRCnYNST7lawdRc=
+X-Received: by 2002:a05:6512:12cc:b0:52f:368:5018 with SMTP id
+ 2adb3069b0e04-536ac32e5d5mr1155885e87.43.1726819126421; Fri, 20 Sep 2024
+ 00:58:46 -0700 (PDT)
+Received: from 969154062570 named unknown by gmailapi.google.com with
+ HTTPREST; Fri, 20 Sep 2024 00:58:45 -0700
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+In-Reply-To: <87ed5ec09z.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [MAINLINE 2/2] rds: ib: Add Dynamic Interrupt Moderation to CQs
-To: =?UTF-8?Q?H=C3=A5kon_Bugge?= <haakon.bugge@oracle.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Allison Henderson <allison.henderson@oracle.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, rds-devel@oss.oracle.com
-References: <20240918083552.77531-1-haakon.bugge@oracle.com>
- <20240918083552.77531-3-haakon.bugge@oracle.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zhu Yanjun <yanjun.zhu@linux.dev>
-In-Reply-To: <20240918083552.77531-3-haakon.bugge@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240814082301.8091-1-brgl@bgdev.pl> <83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org>
+ <87msk49j8m.fsf@kernel.org> <CAMRc=McEWWm8N++4a5LMCAa0GWsQdi0KuSpj3ZuS_he=H0LP+w@mail.gmail.com>
+ <87ed5ec09z.fsf@kernel.org>
+Date: Fri, 20 Sep 2024 00:58:45 -0700
+Message-ID: <CAMRc=MdyHx72o=6Kf0AM69tQBLjuvRVepN0UNjt+Kf4LX3PaMA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
+ of the ath11k on WCN6855
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	Bartosz Golaszewski <brgl@bgdev.pl>
+Content-Type: text/plain; charset="UTF-8"
 
-在 2024/9/18 16:35, Håkon Bugge 写道:
-> With the support from ib_core to use Dynamic Interrupt Moderation
-> (DIM) from legacy ULPs, which uses ib_create_cq(), we enable that
-> feature for the receive and send CQs in RDS.
+On Fri, 20 Sep 2024 08:22:16 +0200, Kalle Valo <kvalo@kernel.org> said:
+> Bartosz Golaszewski <brgl@bgdev.pl> writes:
+>
+>> On Thu, 19 Sep 2024 09:48:41 +0200, Kalle Valo <kvalo@kernel.org> said:
+>>> Krzysztof Kozlowski <krzk@kernel.org> writes:
+>>>
+>>>> On 14/08/2024 10:23, Bartosz Golaszewski wrote:
+>>>>> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>>
+>>>>> Describe the inputs from the PMU of the ath11k module on WCN6855.
+>>>>>
+>>>>> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>>>>> ---
+>>>>> v1 -> v2:
+>>>>> - update the example
+>>>>
+>>>> I don't understand why this patch is no being picked up. The code
+>>>> correct represents the piece of hardware. The supplies should be
+>>>> required, because this one particular device - the one described in this
+>>>> binding - cannot work without them.
+>>>
+>>> I have already explained the situation. With supplies changed to
+>>> optional I'm happy take the patch.
+>>>
+>>
+>> No, silent NAKing and needless stalling is what you're doing. I responded to
+>> your last email with extensive clarifications. You're being told by the
+>> experts on the subject matter (Krzysztof and Conor) that the change is correct.
+>>
+>> The change has no functional impact on the driver code.
+>
+> Until now it was possible to use qcom,ath11k-calibration-variant DT
+> property with M.2 devices. If your patch is applied that's not possible
+> anymore.
+>
 
-Hi, Haakon
+This is incorrect, why do you keep repeating it? What will be impossible is
+upstreaming DT sources which don't take these supplies - which is what we want.
 
-I am interested in this patch series. I just wonder if the performance 
-of rds is increased after DIM is used in legacy ULPs?
-That is, is there any benefit to legacy ULPs after DIM is used?
 
-Do you have any test results about this DIM?
+>> It's also in line with commit 71839a929d9e ("dt-bindings: net:
+>> wireless: qcom,ath11k: describe the ath11k on QCA6390") under which we
+>> had literally the same discussion and that you ended up picking up
+>> after all.
+>
+> I don't care about QCA6390 as it's not really used anywhere anymore. I
+> picked up 71839a929d9e, even though I considered it to be wrong, so that
+> your pwrseq subsystem is not delayed. But WCN6855 is a different matter
+> as it's more widely used.
+>
 
-Thanks,
-Zhu Yanjun
+In upstream sources, it's only used in X13s and I added a node for it to
+sc8280xp-crd but that's not upstream yet. Am I missing anything? As I said
+several times: for out-of-tree DTS, this change does *not* matter.
 
-> 
-> A set of rds-stress runs have been done. bcopy read + write for
-> payload 8448 and 16640 bytes and ack/req of 256 bytes. Number of QPs
-> varies from 8 to 128, number of threads (i.e. rds-stress processes)
-> from one to 16 and a depth of four. A limit has been applied such that
-> the number of processes times the number of QPs never exceeds 128. All
-> in all, 61 rds-stress runs.
-> 
-> For brevity, only the rows showing a +/- 3% deviation or larger from
-> base is listed. The geometric mean of the ratios (IOPS_test /
-> IOPS_base) is calculated for all 61 runs, and that gives the best
-> possible "average" impact of the commits.
-> 
-> In the following, "base" is v6.11-rc7. "test" is the same
-> kernel with the following two commits:
-> 
->         * rds: ib: Add Dynamic Interrupt Moderation to CQs (this commit)
->         * RDMA/core: Enable legacy ULPs to use RDMA DIM
-> 
-> This is executed between two X8-2 with CX-5 using fw 16.35.3502. These
-> BM systems were instantiated with one VF, which were used for the
-> test:
-> 
->                                   base     test
->     ACK    REQ  QPS  THR  DEP     IOPS     IOPS  Percent
->     256   8448    8    1    4   634463   658162      3.7
->     256   8448    8    2    4   862648   997358     15.6
->     256   8448    8    4    4   950458  1113991     17.2
->     256   8448    8    8    4   932120  1127024     20.9
->     256   8448    8   16    4   944977  1133885     20.0
->    8448    256    8    2    4   858663   975563     13.6
->    8448    256    8    4    4   934884  1098854     17.5
->    8448    256    8    8    4   928247  1116015     20.2
->    8448    256    8   16    4   938864  1123455     19.7
->     256   8448   64    1    4   965985   918445     -4.9
->    8448    256   64    1    4   963280   918239     -4.7
->     256  16640    8    2    4   544670   582330      6.9
->     256  16640    8    4    4   554873   597553      7.7
->     256  16640    8    8    4   551799   597479      8.3
->     256  16640    8   16    4   553041   597898      8.1
->   16640    256    8    2    4   544644   578331      6.2
->   16640    256    8    4    4   553944   594627      7.3
->   16640    256    8    8    4   551388   594737      7.9
->   16640    256    8   16    4   552986   596581      7.9
-> Geometric mean of ratios: 1.03
-> 
-> Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
-> ---
->   net/rds/ib_cm.c | 10 ++++++++++
->   1 file changed, 10 insertions(+)
-> 
-> diff --git a/net/rds/ib_cm.c b/net/rds/ib_cm.c
-> index 26b069e1999df..79603d86b6c02 100644
-> --- a/net/rds/ib_cm.c
-> +++ b/net/rds/ib_cm.c
-> @@ -259,6 +259,7 @@ static void rds_ib_cq_comp_handler_recv(struct ib_cq *cq, void *context)
->   static void poll_scq(struct rds_ib_connection *ic, struct ib_cq *cq,
->   		     struct ib_wc *wcs)
->   {
-> +	int ncompleted = 0;
->   	int nr, i;
->   	struct ib_wc *wc;
->   
-> @@ -276,7 +277,10 @@ static void poll_scq(struct rds_ib_connection *ic, struct ib_cq *cq,
->   				rds_ib_mr_cqe_handler(ic, wc);
->   
->   		}
-> +		ncompleted += nr;
->   	}
-> +	if (cq->dim)
-> +		rdma_dim(cq->dim, ncompleted);
->   }
->   
->   static void rds_ib_tasklet_fn_send(unsigned long data)
-> @@ -304,6 +308,7 @@ static void poll_rcq(struct rds_ib_connection *ic, struct ib_cq *cq,
->   		     struct ib_wc *wcs,
->   		     struct rds_ib_ack_state *ack_state)
->   {
-> +	int ncompleted = 0;
->   	int nr, i;
->   	struct ib_wc *wc;
->   
-> @@ -316,7 +321,10 @@ static void poll_rcq(struct rds_ib_connection *ic, struct ib_cq *cq,
->   
->   			rds_ib_recv_cqe_handler(ic, wc, ack_state);
->   		}
-> +		ncompleted += nr;
->   	}
-> +	if (cq->dim)
-> +		rdma_dim(cq->dim, ncompleted);
->   }
->   
->   static void rds_ib_tasklet_fn_recv(unsigned long data)
-> @@ -542,6 +550,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
->   	ic->i_scq_vector = ibdev_get_unused_vector(rds_ibdev);
->   	cq_attr.cqe = ic->i_send_ring.w_nr + fr_queue_space + 1;
->   	cq_attr.comp_vector = ic->i_scq_vector;
-> +	cq_attr.flags |= IB_CQ_MODERATE;
->   	ic->i_send_cq = ib_create_cq(dev, rds_ib_cq_comp_handler_send,
->   				     rds_ib_cq_event_handler, conn,
->   				     &cq_attr);
-> @@ -556,6 +565,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
->   	ic->i_rcq_vector = ibdev_get_unused_vector(rds_ibdev);
->   	cq_attr.cqe = ic->i_recv_ring.w_nr;
->   	cq_attr.comp_vector = ic->i_rcq_vector;
-> +	cq_attr.flags |= IB_CQ_MODERATE;
->   	ic->i_recv_cq = ib_create_cq(dev, rds_ib_cq_comp_handler_recv,
->   				     rds_ib_cq_event_handler, conn,
->   				     &cq_attr);
+>> Arnd: I've added you here to bring this to your attention because it's somewhat
+>> related to what we discussed yesterday. It's a change that is very much
+>> SoC-specific, that has trouble getting upstream due to the driver's maintainer
+>> unwilingness to accept it. Is this a case where a change to DT bindings should
+>> go through the SoC rather than the driver tree?
+>
+> Like I have said, I'm happy to take the patch if the supplies are
+> optional. Why can't we do that?
+>
 
+Because this patch reflects the reality of the chipset. And device-tree is
+supposed to model the reality. It's not there to configure your firmware
+loader.
+
+Bartosz
 
