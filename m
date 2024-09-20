@@ -1,142 +1,196 @@
-Return-Path: <netdev+bounces-129043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78AE397D1BC
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 09:31:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35FA497D1FB
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 09:48:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 426152847F0
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 07:31:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A65301F2107E
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 07:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837034502B;
-	Fri, 20 Sep 2024 07:31:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F1F43AAE;
+	Fri, 20 Sep 2024 07:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="P8CfZv+B"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="KYGodaCf"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB695475C;
-	Fri, 20 Sep 2024 07:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38041C69D;
+	Fri, 20 Sep 2024 07:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726817490; cv=none; b=TBXXTKbJgmBbC0kyb6rN6gQ/RyXqBgbRdvT7q0YlIzqeffEtHeWExizowV/NgmifBYaOoPzBRmoAf9phVNaojbvhPMrcSI021T+Xn7uNo5iUI6zkUjvWuigE91H3bUMACdbrOcI7j74yyEnm/4Jv3GRYjL26TNcAEwUe6gUoQ6c=
+	t=1726818479; cv=none; b=jyW7Qg+QSs0ieBZNANZUEC7DrtWGJZQXMhO632aqlmynbYm+faTtj3+Op+Ly8/W/VQ6AqmtLfrhl4OFcDy+SqSCkQl3ohXeDv2AgSDs2lMwDARz4Q0Czuv6Tp6fZrMnnmjZJhrNoKdF9CONb4yY8esN28v+4fiJm+pZH7Cl6HX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726817490; c=relaxed/simple;
-	bh=m7PBRT27J+9/iK8yrsDqlPtfv2hVtsUYjoWCit4BGLc=;
+	s=arc-20240116; t=1726818479; c=relaxed/simple;
+	bh=CLcNs5kqxdJgt6qP0MB0cAqrax1hjoWqC8oMfdnbPjI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mMiJ0b5JB7+pAaBOpF0bkNPCY5a8VX0S1xvyz77/Iwm+tMEse8l7f5cn5TQJYm9Pi8WNPJZdoCujRURlyNA9xQwPjX4qaQXbBt2RtZN+A2TU/BnKIoT2XWSQSUMQyxjXBtPCNPd0eGIpM3cSFNT7UPMCulz+uaalL63Ejac+9FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=P8CfZv+B; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1726817486;
-	bh=m7PBRT27J+9/iK8yrsDqlPtfv2hVtsUYjoWCit4BGLc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=P8CfZv+B3eGpCJ6fpLODZfBGZCJWTI4cOrnApghRY3jVfi84T+nQzcj8rOR4gcUUB
-	 nKX2/r0oUGaHQn/nbzXlBITh5PnqeeukhXfeXKAUvWFwDcDUxl5tlVmDnYbNENK+kt
-	 BofNtmpzl8+c7X3ccNRMruofrXHcSUP6RWQ5SK3hQ00OtP3hAOGCeiketBOKsnAoFU
-	 Kt6J7db/Ra9Vcl+1Xn+M6rQJ3JWKl3q2jQR2V3+KPoXOx8Lx0Y9yXT0CGJCpSiU5Cs
-	 KMPjJLOuAdIOppfsMayex80G2njTULEIJZXWsiQwCftKasWAtxOrLIu/32bD83qXgE
-	 3Xgj9sibirUVQ==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 0D81017E0FD6;
-	Fri, 20 Sep 2024 09:31:25 +0200 (CEST)
-Message-ID: <d8b90ddf-efbc-4434-9ad0-4be6942d51a5@collabora.com>
-Date: Fri, 20 Sep 2024 09:31:24 +0200
+	 In-Reply-To:Content-Type; b=SS5vj8qNXX7C3d0fw4knuChV3wh2erOzbCaHSFFKW8ZQDmQ1F6EL4DdeoH2oqnBFHS6YMohWrprQ50d1+J1sYpu9QmdWovtJbpCutLtWLtGdGw3Gf6CgJDkrrmhoGBQRSKmbua1wg8qefvpmMWJfi65CcPVq5ekc0JsrpKlHWUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=KYGodaCf; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6971720d-3639-4a80-a17b-48489bfadb0a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726818473;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uC/xou3pHrirAtgbyCjJ2O1AHcinEj0qAI+WR7A8lTc=;
+	b=KYGodaCffMFwqwLEfA4IqIH3uk/AnNk6I2VQtOvd++oA2wUT3KPdcVbDa6mY4Qk/lPSzJC
+	86DpiFjAfgoyIdJK0xIV2AEBLy3SGxJ8xBeFl6vjg+wCUCMomZv1TZmO95cOIuyhWL33YP
+	x3S890mP2ZKOQQfmFYc5+Nq2htVhZS0=
+Date: Fri, 20 Sep 2024 15:47:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/2] dt-bindings: mfd: mediatek: mt6397: Convert to DT
- schema format
-To: Macpaul Lin <macpaul.lin@mediatek.com>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Sean Wang <sean.wang@mediatek.com>,
- Sen Chu <sen.chu@mediatek.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, Pavel Machek <pavel@ucw.cz>,
- Lee Jones <lee@kernel.org>, Sebastian Reichel <sre@kernel.org>,
- Chen Zhong <chen.zhong@mediatek.com>, linux-input@vger.kernel.org,
- linux-leds@vger.kernel.org, linux-pm@vger.kernel.org,
- linux-rtc@vger.kernel.org, linux-sound@vger.kernel.org,
- Alexandre Mergnat <amergnat@baylibre.com>, Bear Wang
- <bear.wang@mediatek.com>, Pablo Sun <pablo.sun@mediatek.com>,
- Macpaul Lin <macpaul@gmail.com>, Chris-qj chen <chris-qj.chen@mediatek.com>,
- MediaTek Chromebook Upstream
- <Project_Global_Chrome_Upstream_Group@mediatek.com>,
- Chen-Yu Tsai <wenst@chromium.org>
-References: <20240918064955.6518-1-macpaul.lin@mediatek.com>
- <20240918064955.6518-2-macpaul.lin@mediatek.com>
- <20240918115151c896f33f@mail.local> <20240918115651c1475d36@mail.local>
- <2af0621d-14ac-b7f3-b28d-2df698931121@mediatek.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <2af0621d-14ac-b7f3-b28d-2df698931121@mediatek.com>
+Subject: Re: [MAINLINE 2/2] rds: ib: Add Dynamic Interrupt Moderation to CQs
+To: =?UTF-8?Q?H=C3=A5kon_Bugge?= <haakon.bugge@oracle.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Allison Henderson <allison.henderson@oracle.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, rds-devel@oss.oracle.com
+References: <20240918083552.77531-1-haakon.bugge@oracle.com>
+ <20240918083552.77531-3-haakon.bugge@oracle.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20240918083552.77531-3-haakon.bugge@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Il 18/09/24 16:18, Macpaul Lin ha scritto:
+在 2024/9/18 16:35, Håkon Bugge 写道:
+> With the support from ib_core to use Dynamic Interrupt Moderation
+> (DIM) from legacy ULPs, which uses ib_create_cq(), we enable that
+> feature for the receive and send CQs in RDS.
+
+Hi, Haakon
+
+I am interested in this patch series. I just wonder if the performance 
+of rds is increased after DIM is used in legacy ULPs?
+That is, is there any benefit to legacy ULPs after DIM is used?
+
+Do you have any test results about this DIM?
+
+Thanks,
+Zhu Yanjun
+
 > 
-> On 9/18/24 19:56, Alexandre Belloni wrote:
->>
->> On 18/09/2024 13:51:51+0200, Alexandre Belloni wrote:
->>> > Changes for v4:
->>> >  - Remove "mediatek,mt6357" from PMIC's compatible string since there is a
->>> >    seperated DT schema for PMIC mt6357.
->>> > > Changes for v5:
->>> >  - Rebase to next-20240913 (linux-next/master).
->>> >  - Fix the "title" (device type) of mfd/mediatek,mt6397.yaml to "PMIC".
->>> >  - RTC:
->>> >   - Drop "start-year"
->>>
->>> Maybe, instead of dropping the property, you should add support in the
->>> driver by setting range_min and range_max.
->>
->> Looking at this even more, the driver can probably be simplified by
->> setting start_year in probe and dropping RTC_MIN_YEAR_OFFSET.
+> A set of rds-stress runs have been done. bcopy read + write for
+> payload 8448 and 16640 bytes and ack/req of 256 bytes. Number of QPs
+> varies from 8 to 128, number of threads (i.e. rds-stress processes)
+> from one to 16 and a depth of four. A limit has been applied such that
+> the number of processes times the number of QPs never exceeds 128. All
+> in all, 61 rds-stress runs.
 > 
-> Thank you for pointing out where and how the driver should be changed.
-> However, I'm wondering if this should be a fix with a separated
-> patchset (bindings and the driver)? The board or SoC's device trees
-> should be reviewed as well. I'll need to get someone's help (permission) inside 
-> MediaTek to check those dts and construct the patch for RTC driver.
-> That will take sometime.
+> For brevity, only the rows showing a +/- 3% deviation or larger from
+> base is listed. The geometric mean of the ratios (IOPS_test /
+> IOPS_base) is calculated for all 61 runs, and that gives the best
+> possible "average" impact of the commits.
 > 
+> In the following, "base" is v6.11-rc7. "test" is the same
+> kernel with the following two commits:
+> 
+>         * rds: ib: Add Dynamic Interrupt Moderation to CQs (this commit)
+>         * RDMA/core: Enable legacy ULPs to use RDMA DIM
+> 
+> This is executed between two X8-2 with CX-5 using fw 16.35.3502. These
+> BM systems were instantiated with one VF, which were used for the
+> test:
+> 
+>                                   base     test
+>     ACK    REQ  QPS  THR  DEP     IOPS     IOPS  Percent
+>     256   8448    8    1    4   634463   658162      3.7
+>     256   8448    8    2    4   862648   997358     15.6
+>     256   8448    8    4    4   950458  1113991     17.2
+>     256   8448    8    8    4   932120  1127024     20.9
+>     256   8448    8   16    4   944977  1133885     20.0
+>    8448    256    8    2    4   858663   975563     13.6
+>    8448    256    8    4    4   934884  1098854     17.5
+>    8448    256    8    8    4   928247  1116015     20.2
+>    8448    256    8   16    4   938864  1123455     19.7
+>     256   8448   64    1    4   965985   918445     -4.9
+>    8448    256   64    1    4   963280   918239     -4.7
+>     256  16640    8    2    4   544670   582330      6.9
+>     256  16640    8    4    4   554873   597553      7.7
+>     256  16640    8    8    4   551799   597479      8.3
+>     256  16640    8   16    4   553041   597898      8.1
+>   16640    256    8    2    4   544644   578331      6.2
+>   16640    256    8    4    4   553944   594627      7.3
+>   16640    256    8    8    4   551388   594737      7.9
+>   16640    256    8   16    4   552986   596581      7.9
+> Geometric mean of ratios: 1.03
+> 
+> Signed-off-by: Håkon Bugge <haakon.bugge@oracle.com>
+> ---
+>   net/rds/ib_cm.c | 10 ++++++++++
+>   1 file changed, 10 insertions(+)
+> 
+> diff --git a/net/rds/ib_cm.c b/net/rds/ib_cm.c
+> index 26b069e1999df..79603d86b6c02 100644
+> --- a/net/rds/ib_cm.c
+> +++ b/net/rds/ib_cm.c
+> @@ -259,6 +259,7 @@ static void rds_ib_cq_comp_handler_recv(struct ib_cq *cq, void *context)
+>   static void poll_scq(struct rds_ib_connection *ic, struct ib_cq *cq,
+>   		     struct ib_wc *wcs)
+>   {
+> +	int ncompleted = 0;
+>   	int nr, i;
+>   	struct ib_wc *wc;
+>   
+> @@ -276,7 +277,10 @@ static void poll_scq(struct rds_ib_connection *ic, struct ib_cq *cq,
+>   				rds_ib_mr_cqe_handler(ic, wc);
+>   
+>   		}
+> +		ncompleted += nr;
+>   	}
+> +	if (cq->dim)
+> +		rdma_dim(cq->dim, ncompleted);
+>   }
+>   
+>   static void rds_ib_tasklet_fn_send(unsigned long data)
+> @@ -304,6 +308,7 @@ static void poll_rcq(struct rds_ib_connection *ic, struct ib_cq *cq,
+>   		     struct ib_wc *wcs,
+>   		     struct rds_ib_ack_state *ack_state)
+>   {
+> +	int ncompleted = 0;
+>   	int nr, i;
+>   	struct ib_wc *wc;
+>   
+> @@ -316,7 +321,10 @@ static void poll_rcq(struct rds_ib_connection *ic, struct ib_cq *cq,
+>   
+>   			rds_ib_recv_cqe_handler(ic, wc, ack_state);
+>   		}
+> +		ncompleted += nr;
+>   	}
+> +	if (cq->dim)
+> +		rdma_dim(cq->dim, ncompleted);
+>   }
+>   
+>   static void rds_ib_tasklet_fn_recv(unsigned long data)
+> @@ -542,6 +550,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
+>   	ic->i_scq_vector = ibdev_get_unused_vector(rds_ibdev);
+>   	cq_attr.cqe = ic->i_send_ring.w_nr + fr_queue_space + 1;
+>   	cq_attr.comp_vector = ic->i_scq_vector;
+> +	cq_attr.flags |= IB_CQ_MODERATE;
+>   	ic->i_send_cq = ib_create_cq(dev, rds_ib_cq_comp_handler_send,
+>   				     rds_ib_cq_event_handler, conn,
+>   				     &cq_attr);
+> @@ -556,6 +565,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
+>   	ic->i_rcq_vector = ibdev_get_unused_vector(rds_ibdev);
+>   	cq_attr.cqe = ic->i_recv_ring.w_nr;
+>   	cq_attr.comp_vector = ic->i_rcq_vector;
+> +	cq_attr.flags |= IB_CQ_MODERATE;
+>   	ic->i_recv_cq = ib_create_cq(dev, rds_ib_cq_comp_handler_recv,
+>   				     rds_ib_cq_event_handler, conn,
+>   				     &cq_attr);
 
-Alexandre, I definitely agree with you on the fact that the MTK PMIC RTC driver
-can (and needs to) be improved, and that it can make use of some nice cleanup...
-
-... but!
-
-This series performs a conversion to schema, and the previous txt file didn't
-say anything about the start-year property - which was not mandatory to support
-at that time (nor now, afaik?), so adding support for that is out of scope for
-this series.
-
-Eventually, that can come as a series on top, adding support for that in the
-binding (and, of course, in the driver).
-
-I should be able to tackle that... most probably next week - but still, the
-improvements would come as a series on top of this one.
-
-Cheers,
-Angelo
 
