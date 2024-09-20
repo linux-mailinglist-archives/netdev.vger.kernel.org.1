@@ -1,144 +1,146 @@
-Return-Path: <netdev+bounces-129063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 628D797D480
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 13:02:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8525897D4B0
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 13:19:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 262F228402A
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 11:02:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAE691C2235C
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 11:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83DEA13C3F6;
-	Fri, 20 Sep 2024 11:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D6B113A268;
+	Fri, 20 Sep 2024 11:19:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Cv5twCDS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aBPd6Q+F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.17.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199237DA76;
-	Fri, 20 Sep 2024 11:02:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69A2414D6F9
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 11:19:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726830162; cv=none; b=EKkChH7BNxj4jOBa6odkuMmOW1eTZsjhqOlcfG3q4qrKUFirY2x669SBTBSMpEFD4PwV2nVRDIvwm7CpTUriceZQBv36nfnb5WNbS79Ua7k2ewqYeZdkVgddfWVyLxk5n5Emvrk02W6FaBMEPDqKwTrN0YmWzXHYSRdoF/9uIdE=
+	t=1726831142; cv=none; b=hUY2WBXrTjMHAap/cOF7V0GYZl+iEwIcdQBm/O4UgWGa/2cEC2hCpldCICWMMMvT8M9nWFGcX3wqdDb9hk6+Tb5RF3olM/lX04pPzhe+Y8461vsMZHdq8+RzwcvQ81zwjwD1qwhomGF4Jl1mv7KEFVGgOAfgOPu4kNMRhuMkf2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726830162; c=relaxed/simple;
-	bh=zFLPkV5XjB0qkCSNYvCEWZU0VCFSWNUkhb7OzTGfOUg=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=kqeJTslne7p2cqJ1nqcQz8Y+64D5n7uEc+TCFzxnW5T3BnDpl9Jsex1LeVgAumIqzRgX1VCZGcINhjwzDBHTitohVC6KGo0iUU6OJcOeqHJZrrnXgox4vyFtwTGDbC8IIBciFI6bpsvf4TUEw1kEIAtTajhaXFb0XvNQksRMyU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Cv5twCDS; arc=none smtp.client-ip=212.227.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1726830110; x=1727434910; i=markus.elfring@web.de;
-	bh=5lLOSFSG9mhzZCxoUT9gqo2ko2jbykdEX5ZMcrTCqqA=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
-	 Subject:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=Cv5twCDSbYPidcGkWUgi7bInQ6Fxt8KoL3KQsfc7TucWyrukC64G2E1K2fPwvAeB
-	 bR8OTIhXmvamJJyols/2+trVzLgswsmgiyKRZ+uOi9NG8k1J4fYBH0PNWsNnJSEA6
-	 TcwKc+Wnwq0XYB/oKFfpe6oW+2/hshpdSrCm9AaEInmHUhCWoAyqBey0v3dcoSBsq
-	 gUxAPjNFTnVXiWUWEvRNz+PsDZozCuUFGGoMAQkuCTehADlFg/6n6+i+hTdV9SoVN
-	 bYZ0OJg6NI6MqoyJJCqHEYC7MjcuuDyVO3qoNQqMq5tTSsE2bbjS3yYnxuUMgm8ur
-	 ZUgaQK7208TDb49VOQ==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.91.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N30ZL-1roXaK4B7l-00xQV9; Fri, 20
- Sep 2024 13:01:50 +0200
-Message-ID: <330c2b9e-9a15-4442-8288-07f66760f856@web.de>
-Date: Fri, 20 Sep 2024 13:01:45 +0200
+	s=arc-20240116; t=1726831142; c=relaxed/simple;
+	bh=YmmdShIqKaT2yeZj5698K3XwhwhdWq1wQAnhjNAgSoQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=CQVb/jO0Mqb5nFjXdBcRaVzs5MN3BU89rCZ8rejtHHQaCXrkw+S98MUwMOzO+IO7VKYRySnK0A0BzMGENi6klgE/ePxpGuKFwKlfdcMm2hfXcj5l5OaANJrJdf4XVWcXb1HJV4De0f8HogIpHDWX5XtLgE+vdfUa5nc4kUBuUNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aBPd6Q+F; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726831139;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cxgxgQuUGZxly+q+gkXNqzmcxuR4gi3wEXVTHNlpL88=;
+	b=aBPd6Q+Fa2lUg5KThfL/Gj6/g1Dmn+s2pTHbGxN37fPjP94P3jFqAsy3oTsyWWIAYYw24W
+	Wtr/xrSkZe3MPKYMBR280r6HEmRHbMnkuOI0eLO47eqWDdBhX4AVvrN5+5PcqxpQ5oyHnY
+	TICnbL1JI0eBNumJx0bhv4Tayddc3ts=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-194-V4yGMrPmMXi_PcvMW9xIWw-1; Fri, 20 Sep 2024 07:18:58 -0400
+X-MC-Unique: V4yGMrPmMXi_PcvMW9xIWw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42cb2c9027dso14744595e9.1
+        for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 04:18:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726831137; x=1727435937;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cxgxgQuUGZxly+q+gkXNqzmcxuR4gi3wEXVTHNlpL88=;
+        b=eZma/lqtRLouhthujNIrzwyH9p/yBjIwM8bPSajGt2OFJlPODm7nFyHpf7R6n8iqYl
+         VDA/bmnoxzgS8cOHbhsic1MJ98Kw6vZ9jlCRmvQ+r+szO2RixCyNWvK40ZgTqyE3d121
+         ddg99JDAD5QFmHiD7NqMcrUULVFRt7qyWzk+mfc3n8plY0VQsdRrab5f9pNtZSEpColz
+         1ImYlxK2aKh62s7ArB71AJXncUP6LaqJTYGSUAsYpV/kv0udXivdJw4QwVfGXEvywBTd
+         aTt5UWWlm3SFuSGWqurLkiN6H3HXqFCwVNEIeA9zn5595Wf6gHA3opZgLH2O/0MGEj6v
+         0DzQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXLIYJDQDmEjC3ujXLyTlaC0QIKECuRiXG1u0s09xO3KRgbyhKwVfDEnAQiMp84sZS1D9FZ/wg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yww68zEl6edFMpZw/PRRgu4YJ+tE3Glz1EPHozWuziMmBbCkBho
+	yA4MzHtXntmjnhrVIuPMrWAa+ZuWjqDtyJYyeWTZoYqIjUeSaJXmemv1lw05euWqxhfu72J1E6R
+	zTWB9y36tfwQJOMR3OXAG+HVAHMQ4bzwWD2ID2y0SaZBKtD9Tm2N5OA==
+X-Received: by 2002:a05:600c:458d:b0:42c:a8cb:6a75 with SMTP id 5b1f17b1804b1-42e7ac35e0fmr21768655e9.17.1726831136859;
+        Fri, 20 Sep 2024 04:18:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGXXwA+/Lq7Qwx1kLgvjWo7woGE50UmLK6Xj0kazKJTf8V2gCF2e1kojmPEmHDGLe0sv5hiCQ==
+X-Received: by 2002:a05:600c:458d:b0:42c:a8cb:6a75 with SMTP id 5b1f17b1804b1-42e7ac35e0fmr21768345e9.17.1726831136470;
+        Fri, 20 Sep 2024 04:18:56 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e754516e7sm46430025e9.27.2024.09.20.04.18.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Sep 2024 04:18:55 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id C14DA157F76D; Fri, 20 Sep 2024 13:18:53 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, syzbot
+ <syzbot+cca39e6e84a367a7e6f6@syzkaller.appspotmail.com>
+Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org,
+ bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
+ john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+ michal.switala@infogain.com, netdev@vger.kernel.org, revest@google.com,
+ sdf@fomichev.me, sdf@google.com, song@kernel.org,
+ syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in
+ dev_map_enqueue (2)
+In-Reply-To: <20240902080232.wnhtxiWK@linutronix.de>
+References: <00000000000099cf25061964d113@google.com>
+ <000000000000ebe92a062100eb94@google.com>
+ <20240902080232.wnhtxiWK@linutronix.de>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 20 Sep 2024 13:18:53 +0200
+Message-ID: <874j6aindu.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Clayton Rayment <clayton.rayment@xilinx.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Michal Simek <michal.simek@amd.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-Content-Language: en-GB
-Cc: LKML <linux-kernel@vger.kernel.org>, Julia Lawall <julia.lawall@inria.fr>
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] net: xilinx: axienet: Use common error handling code in
- axienet_mdio_write()
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:XSLuD600Eg4etH3tvnH0Z216mHgPuhqWJhqAUwh8thyKuaNPK7b
- 7hKHWQcJoMgZz25PixI9t6PfNYQv1UrER3UAwJ6KbZuU0L0Lr91Idfim20U3hyL2mmrPVs+
- uuMizDENCkPTp2KU+o2f1GuEks1LUhQggcB1QVqxjkHq0U6PoeiGPF4Vv2nE+K7nzuHb7IJ
- t5BO7XyJ4qy4V5W6u64wQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Hubf6ZAdFMA=;He1VW0lUejwFHQ4NrAyPLsRNwEY
- ygVjG2gIdm+zMr/WlfqNMIP9d5/vGSIuB5lNf/o3HO8OMtDhtMoclcheYq4CI7XW9QuA4CyLC
- QT4jUWdErG7p2Fr5RveylqrD0uIR7zL4ZYbOpJrYVqt2t0KWQ3UaUFiEPq57evnKC8DWp4aDw
- Iukf/aFLPjVkPnuMwaa3oQg3gnuhYQYa8tKu10j+MN7WpADrQg8w0f8nYkQdPrpAjXzZUmlEV
- ZzAMwL1+JsfiFhq9zoXQU3gK4iomGTWh+FBYQUmSW02Uj3FDKr2gDJbAPslztmYG2tDA4jdFY
- HIfPHxn5fTETb/a8jjVfMaoKzAtgB79BC1NsWGwO6SJNdd+U/bHDGI8V7gGHRmvzL8eFKUZ6o
- 3FxoUIUiM16C+zUs9PEJuR5MsNexRAPnQPRiHYf0scXRmtfVLkGsNpMYi+lBN7VFvrtzip4DF
- /FukX580jzbbjwqjxHlt3GuOHAcAt1X5ffTjIGwJGPsgov0Pi/wSMv5aZ4ztBdPWVWr2zbsTH
- QkBCuHdx0x5E88CYi/I4o2Gc/D30/pEEMcLfsrohxO/kDO56MFBVtC0UnAa35qm1yQdoeJPkm
- wvjRjomnWrBc+s2Qz7IwAbICGkGeT62GTe+hFvQ10Vel6YGta0q09Cdoxzyr03xA9akbQBGWT
- RPe3wMp74rxZoQwGhHPui2q3VZwjHAmUgrkstcHxbYareIYtjAtBsKH/n3l+QNbdCQIyHogS0
- 26sy2B3AWLFTUzsaMScNOeBMsFG58B8US9kZ9DP7vcLMKMYPF7faDQzDh0W7+gHhLb22AVI77
- gi3H2clcwOeL7mcRGVAnnHXQ==
+Content-Type: text/plain
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Fri, 20 Sep 2024 12:43:39 +0200
-Subject: [PATCH] net: xilinx: axienet: Use common error handling code in a=
-xienet_mdio_write()
+Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
 
-Add a label so that a bit of exception handling can be better reused
-at the end of this function implementation.
+> On 2024-08-31 13:55:02 [-0700], syzbot wrote:
+>> syzbot suspects this issue was fixed by commit:
+>> 
+>> commit 401cb7dae8130fd34eb84648e02ab4c506df7d5e
+>> Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+>> Date:   Thu Jun 20 13:22:04 2024 +0000
+>> 
+>>     net: Reference bpf_redirect_info via task_struct on PREEMPT_RT.
+>> 
+>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12597c63980000
+>> start commit:   36534d3c5453 tcp: use signed arithmetic in tcp_rtx_probe0_..
+>> git tree:       bpf
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=333ebe38d43c42e2
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=cca39e6e84a367a7e6f6
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13390aea980000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10948741980000
+>
+> This looks like ri->tgt_value is a NULL pointer (dst in
+> dev_map_enqueue()). The commit referenced by syz should not have fixed
+> that.
+> It is possible that there were leftovers in bpf_redirect_info (from a
+> previous invocation) which were memset(,0,) during the switch from
+> per-CPU to stack usage and now it does not trigger anymore.
 
-This issue was detected by using the Coccinelle software.
+Yes, I believe you are right. AFAICT, the original issue stems from the
+SKB path and XDP path using the same numeric flag values in the
+ri->flags field (specifically, BPF_F_BROADCAST == BPF_F_NEXTHOP). So if
+bpf_redirect_neigh() was used and subsequently, an XDP redirect was
+performed using the same bpf_redirect_info struct, the XDP path would
+get confused and end up crashing. Now, with the stack-allocated
+bpf_redirect_info, this sharing can no longer happen, so the crash
+doesn't happen anymore.
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/net/ethernet/xilinx/xilinx_axienet_mdio.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+However, different code paths using identically-numbered flag values
+in the same struct field still seems like a bit of a mess, so I'll send
+a patch to fix this just to be safe in case we ever move back to sharing
+this data structure.
 
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_mdio.c b/drivers/n=
-et/ethernet/xilinx/xilinx_axienet_mdio.c
-index 9ca2643c921e..0c7b931b2e66 100644
-=2D-- a/drivers/net/ethernet/xilinx/xilinx_axienet_mdio.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_mdio.c
-@@ -138,10 +138,8 @@ static int axienet_mdio_write(struct mii_bus *bus, in=
-t phy_id, int reg,
- 	axienet_mdio_mdc_enable(lp);
-
- 	ret =3D axienet_mdio_wait_until_ready(lp);
--	if (ret < 0) {
--		axienet_mdio_mdc_disable(lp);
--		return ret;
--	}
-+	if (ret < 0)
-+		goto disable_mdc;
-
- 	axienet_iow(lp, XAE_MDIO_MWD_OFFSET, (u32)val);
- 	axienet_iow(lp, XAE_MDIO_MCR_OFFSET,
-@@ -153,12 +151,9 @@ static int axienet_mdio_write(struct mii_bus *bus, in=
-t phy_id, int reg,
- 		     XAE_MDIO_MCR_OP_WRITE_MASK));
-
- 	ret =3D axienet_mdio_wait_until_ready(lp);
--	if (ret < 0) {
--		axienet_mdio_mdc_disable(lp);
--		return ret;
--	}
-+disable_mdc:
- 	axienet_mdio_mdc_disable(lp);
--	return 0;
-+	return ret;
- }
-
- /**
-=2D-
-2.46.0
+-Toke
 
 
