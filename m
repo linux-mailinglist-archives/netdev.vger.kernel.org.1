@@ -1,111 +1,107 @@
-Return-Path: <netdev+bounces-129065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0AB397D4BE
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 13:21:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C610B97D4CD
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 13:26:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1EA95B22A3C
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 11:21:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 609CAB22124
+	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 11:26:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF44C13E020;
-	Fri, 20 Sep 2024 11:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8C33143738;
+	Fri, 20 Sep 2024 11:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MelgKL6t"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="sqL4adBu"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110567DA76;
-	Fri, 20 Sep 2024 11:21:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04101422D3
+	for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 11:26:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726831300; cv=none; b=YY0ETDOUyn50lKfHV3Sy818Fc+R/YpYCqjmfeuuKISe3joo4lSAaLXaRXeohjIDYIDN/COrnDf6XT1ui7t4ZZwSBzez3PrbVORtWDrlyQcg/vSQKU6FwWjuOj1VTGBak9vho7wYGyPt63fIRMHuXzT2cFZwLXikGNzUCpc725qU=
+	t=1726831592; cv=none; b=MS8AIj/QH2k3Jj8XkjwOyDKuqcZ83oUVr/Ay1ZffGI4Xt6F/G+sYa/14ng0+P2Nlwd+WJhZ5y9E6xBIEfkJyrZX9/EGU71D7ITFrs0707vbCvtrWHe28GHHM1zLOb0UIWqtrKdFSEkzBCA8AX+UlPcPC0YV2tXF2AQq2gpR7TP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726831300; c=relaxed/simple;
-	bh=bxKEtC5qNY3zXEqd9y537CZSdz2DNen+N/WtzqreB2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uxk5xU5gnUBQicX6ekIs3prpJgBi7p4jJvtivLQzF25Obt003A5pvTZB5SpVHdUqWkUsmliu6boY8YV6cmBCkId5atoHmICcmWZ7oALdMy5+P5wBOY2E+jDKdt1g3EpuSp7xvGPh7XyAgzaENrecIWVZ8bUjln6cs/EvbciYHio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MelgKL6t; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 89F51E0008;
-	Fri, 20 Sep 2024 11:21:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1726831296;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bxKEtC5qNY3zXEqd9y537CZSdz2DNen+N/WtzqreB2o=;
-	b=MelgKL6tLbVlCpObozi14FKQTJ6qZaJN3mRyPjBiVPNQzwaz9LREICMpoYfqKAoq+Xn08J
-	ioImy9WpCg7Xujh/gGhA+anPd2UQaEhPgamnYjVnHaidRuuK92JBJHsob9pRvBm+NcUvpG
-	Cq6K89ZmRuUeqRqd3gdzzlY77ITOJciVjXuD0CDEnKuvNZGsGpxK3/jZeulkb3IHknkcrp
-	5CTNUvcmDUX09bTvkOEqj6dzM98m0aFwutY4ePlcNxUjlYaypM2FRhToTPBRqgZX3pkpyi
-	bRTrR5K5n/m6nlTUqBcf6GaQBA8kP7/2C42bVuqkoYc3BrKxGWH6Lt2yWtmcQg==
-Date: Fri, 20 Sep 2024 13:21:31 +0200
-From: Miquel Raynal <miquel.raynal@bootlin.com>
-To: Jiawei Ye <jiawei.ye@foxmail.com>
-Cc: przemyslaw.kitszel@intel.com, alex.aring@gmail.com,
- stefan@datenfreihafen.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, david.girault@qorvo.com,
- linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] mac802154: Fix potential RCU dereference issue in
- mac802154_scan_worker
-Message-ID: <20240920132131.466e5636@xps-13>
-In-Reply-To: <tencent_3D3535F93CE8BC48A50E29D1CF7A25E93D0A@qq.com>
-References: <tencent_3D3535F93CE8BC48A50E29D1CF7A25E93D0A@qq.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1726831592; c=relaxed/simple;
+	bh=ypaKHctEX9fgrItsYNSVNA1/+alOChFA1XGDJgVaOSY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CmUIFigoDM49Eo+aoGc1kgG9tu9sdu3HSYRXkTCpEpnuh5yQ5jxzFhd+L+8MqWBmQnOWpRIstUpq9XF9YWBjpHnJPglYvhbLBb3k3ZpTf/vxkDS3Q2UdVsMko45Nz853YTYGqdi/yYSn/x/oBlZyLGDm1ZgvakzeWm4owyPvc80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=sqL4adBu; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 48KBQGFf045466;
+	Fri, 20 Sep 2024 06:26:16 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1726831576;
+	bh=wc6ounJ0L3a7+Jl1lhdKkoB0bwTcukkbr16QNFYjtJs=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To;
+	b=sqL4adBu55uQNYcQB3ZENkEv8lAKyRQQ8ZJ6uKmfKPNkLgAvNpFXkInyeBw61yeLQ
+	 s6MQ2cvkImL84QhMCeQCdG6QOWnDjzzQlQKko4NXrecLeTVrUmhqDw88CNNKGye98J
+	 rej47IccmXla9eF/GNh6hMmgOiLszBPBuIA1yapc=
+Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 48KBQGuk079901
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 20 Sep 2024 06:26:16 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 20
+ Sep 2024 06:26:16 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 20 Sep 2024 06:26:16 -0500
+Received: from localhost (uda0133052.dhcp.ti.com [128.247.81.232])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 48KBQGDs071175;
+	Fri, 20 Sep 2024 06:26:16 -0500
+Date: Fri, 20 Sep 2024 06:26:16 -0500
+From: Nishanth Menon <nm@ti.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "Alvaro (Al-vuh-roe) Reyes" <a-reyes1@ti.com>, <netdev@vger.kernel.org>,
+        <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+        <maxime.chevallier@bootlin.com>, <o.rempel@pengutronix.de>,
+        <spatton@ti.com>, <r-kommineni@ti.com>, <e-mayhew@ti.com>,
+        <praneeth@ti.com>, <p-varis@ti.com>, <d-qiu@ti.com>
+Subject: Re: [PATCH 5/5] net: phy: dp83tg720: fixed Linux coding standards
+ issues
+Message-ID: <20240920112616.7bz3uwuehenbczxi@reconvene>
+References: <cover.1726263095.git.a-reyes1@ti.com>
+ <dcf72baf9ff9a82799edd40f06c8d255f5c71b1c.1726263095.git.a-reyes1@ti.com>
+ <25904339-bc6c-4ace-988c-cc6e832a18f2@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: miquel.raynal@bootlin.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <25904339-bc6c-4ace-988c-cc6e832a18f2@lunn.ch>
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hi Jiawei,
+On 23:47-20240919, Andrew Lunn wrote:
+> On Thu, Sep 19, 2024 at 02:01:19PM -0700, Alvaro (Al-vuh-roe) Reyes wrote:
+> > Driver patches was checked against the linux coding standards using scripts/checkpatch.pl.
+> > 
+> > This patch meets the standards checked by the script.
+> 
+> This patch should be first, to cleanup any existing issues. New code
+> you add should already be checkpatch clean as you add it.
+> 
+> These patches need quite a lot of work. Maybe you can find somebody
+> inside TI who can mentor you and point out issues before posting to
+> the list.
 
-jiawei.ye@foxmail.com wrote on Fri, 20 Sep 2024 04:03:32 +0000:
 
-> In the `mac802154_scan_worker` function, the `scan_req->type` field was
-> accessed after the RCU read-side critical section was unlocked. According
-> to RCU usage rules, this is illegal and can lead to unpredictable
-> behavior, such as accessing memory that has been updated or causing
-> use-after-free issues.
->=20
-> This possible bug was identified using a static analysis tool developed
-> by myself, specifically designed to detect RCU-related issues.
->=20
-> To address this, the `scan_req->type` value is now stored in a local
-> variable `scan_req_type` while still within the RCU read-side critical
-> section. The `scan_req_type` is then used after the RCU lock is released,
-> ensuring that the type value is safely accessed without violating RCU
-> rules.
->=20
-> Fixes: e2c3e6f53a7a ("mac802154: Handle active scanning")
-> Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
+Sorry about that Andrew. I will work with the team and try and
+straighten this out.
 
-I think net maintainers now expect the Cc: stable tag to be put here
-when there is a reason to backport, which I believe is the case here.
-So please add this line here.
+Thank you for your patience.
 
->=20
-
-Please delete this blank line as well.
-
-And with that you can add my:
-
-Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
-
-> ---
-
-Thanks,
-Miqu=C3=A8l
+-- 
+Regards,
+Nishanth Menon
+Key (0xDDB5849D1736249D) / Fingerprint: F8A2 8693 54EB 8232 17A3  1A34 DDB5 849D 1736 249D
 
