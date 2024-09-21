@@ -1,112 +1,147 @@
-Return-Path: <netdev+bounces-129135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5025597DBB9
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 07:05:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB99797DBC2
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 07:34:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED648283B99
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 05:05:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC75A1C20E29
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 05:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5AD518EBF;
-	Sat, 21 Sep 2024 05:05:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D425535894;
+	Sat, 21 Sep 2024 05:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CWq+ZD6u"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="ltTj6hOA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out162-62-57-49.mail.qq.com (out162-62-57-49.mail.qq.com [162.62.57.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DCD179A3;
-	Sat, 21 Sep 2024 05:05:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E821208D0;
+	Sat, 21 Sep 2024 05:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726895143; cv=none; b=DcnUXPDKQrLm5DQAcj5tmMZb6tXvUEbV1/ZN0QLIuOx2aQi7RiQI+77lzmVg7PluCS+J7vBWiE3GcOuRYxW0n/oKBo4YPCNtMqZxW2mFY4sc/agm4X6j/8WdD7nnNLap3NuNqI2wYKRbXYtOEr0v+ziPzJjrATb2leT557i8OPM=
+	t=1726896856; cv=none; b=DQE/mtlCy7geIHb9q20/yjxItK5mDGukmCtHC3PIQEsuyA9Qz/puhwwAfjgSeig7fwkafLGZ1mwbXxCIcDC+XvpSHLPZPfjDnhLF1EJERiMmeA2dagMTTz37HV3ipHePGTjqj3wyi4q+uGeYQmdGpA3jtvMbY/weilYW8SFq1XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726895143; c=relaxed/simple;
-	bh=MJJOjLobciSf5OU//tAZSwvxztioLgpdYZiMckGPjxA=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=qmN9kHXYhSTZtQDjOp9O3F9LfFqDndCq31F4e/7AI8lwX9qg0t2iIW6ioDphDA3zKFa8vxyjX/dj5Ql6FOdRzJxmo+FUw3vVF5cotHGgwtbmr7t02rt9pZIt2/qkWgnX3o1al7cE//zm7QgtsS05CLkpwYhql9/9XuBz1GMlrT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CWq+ZD6u; arc=none smtp.client-ip=209.85.216.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-2db89fb53f9so1892716a91.3;
-        Fri, 20 Sep 2024 22:05:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726895141; x=1727499941; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=MJJOjLobciSf5OU//tAZSwvxztioLgpdYZiMckGPjxA=;
-        b=CWq+ZD6uXUv1pF/rHuoJiJ48JjG9x6Y4jGiusBmia7bUCjFF1SIGBdRRSRARTuFX6F
-         H63dK5czCoyFiuQtUiDVYTZvKmTTv0zxtA36Uj6GmzdodZKuWEI8xFNkFAiwpFDVPwVR
-         NZqXYQwPdx5Uf0wtv5/ONpgH0df5JmRn1HBPO6Vp6hIAmej2PRQ3tCasRKBZNBTqFkV7
-         LeHsZvfncbxVlMCGLEGXASC/9tf8ROzitJ9nmin91G3/UkFTeZ5oXlOlLHbH4d6miifO
-         15hFgznxuNop1AybwlT9hvDLuFAftf53d/DoGqgt8OAgBd8om2WJ0FzLY/mGg7E0Ms74
-         JRdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726895141; x=1727499941;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MJJOjLobciSf5OU//tAZSwvxztioLgpdYZiMckGPjxA=;
-        b=Jpw6obVnddPNNMsvx0uekbhP6F3IzdfpuUV96ifu/yL1GVNCp7kQPUut0dpPKsyfPI
-         G3P2qRt4YIJmsHBZCQxg35NtfnKilPh8TOEF8YR9ggPrf0odJSK7GbfLmTmbx+RgpLy2
-         vSzdIj3y/nWm5MPxl+Unv1xs7MDdnkgh/sxos8FukQoi7DmjOKhGy0Mg7wUPzzqIR5go
-         SxOaSJzMTY9CqMXmIfgD1IfIGS6mFW0WUDSLaOjampQfGBAd7ObJs5U87LwZj2ehoipx
-         TvqUtcY9ObySLJ9cXkLRZ2LyAJP+ce6sAACleBh3oOoNJDFIfcw9kdzDleSg/I+nwrAD
-         W5Ow==
-X-Forwarded-Encrypted: i=1; AJvYcCU17ZJUm2zYQXJbU0cfAgaPF15GIjULM550VXhXzZeD87axUU5+WIrkbmkas1LPNIyOaIT/yTl9LOXgzhKQ/g4=@vger.kernel.org, AJvYcCVJbfd/K54qEZBHLSfugWhhqWWQ2/RzIiyedPKXtF3614Pi7MW5Oghv/eSGHGUkovqNVGFIz1k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweMvEdFZbf4/PSTiHurLNVKLP19vAxW2+z5j8CAfZGQJZreIV7
-	+Ixi1R1jlGbeN3MUPV2qQAmKLrqUvZnExNtE7P8QQxANMIPd+eBx
-X-Google-Smtp-Source: AGHT+IHS+bJFZFbjMl2kDriagOkFv/ORdVTiPbT2GR91UJ5zX0oFfywoMtaVt+pC5uoFm0N4IBuJfg==
-X-Received: by 2002:a17:90b:3b50:b0:2d8:7a3b:730d with SMTP id 98e67ed59e1d1-2dd80c4da68mr5363941a91.21.1726895141372;
-        Fri, 20 Sep 2024 22:05:41 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dd6ee984f0sm5124550a91.19.2024.09.20.22.05.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Sep 2024 22:05:40 -0700 (PDT)
-Date: Sat, 21 Sep 2024 05:05:37 +0000 (UTC)
-Message-Id: <20240921.050537.1209337185316346637.fujita.tomonori@gmail.com>
-To: tmgross@umich.edu
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, lkp@intel.com
-Subject: Re: [PATCH net] net: phy: qt2025: Fix warning: unused import
- DeviceId
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CALNs47sKXVrMdC-vraJG3gt-b6yDWvFTOvfrL6+G=j6-1Y-BYQ@mail.gmail.com>
-References: <20240919043707.206400-1-fujita.tomonori@gmail.com>
-	<CALNs47sKXVrMdC-vraJG3gt-b6yDWvFTOvfrL6+G=j6-1Y-BYQ@mail.gmail.com>
+	s=arc-20240116; t=1726896856; c=relaxed/simple;
+	bh=3FZABDyrH3jSYvk21qabLqPxXVeuvpt2j06Mn3yPzoQ=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AQNKsJ6KlQb//iEKS6s0/1dZsUm18dVGxTRf3gX5Azn0f8Fokto0jH1pMeMqDEyJCLaIUadR06ok5R2cbeoCB6VmOBWqm7JD5WY0J+ldkZ8RNQwPgHO8SNfSDU9Ga2Gx6hb1FcRA07poYPw5pc9wKYLxmYNPi6ggEbgoXR4UyRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=ltTj6hOA; arc=none smtp.client-ip=162.62.57.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1726896547;
+	bh=bYRV2wnJ3CUDym9ZHBOkFYYV9lkxtJ1zt2t6FLcsLNQ=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=ltTj6hOA69oJ6j2+OzFMUK1GUioPgSGjrX6yiTuov94IAtRoiwY9xY/jAorDLAgNZ
+	 OuqlPYGloVEHnsnxtwAyHkapzeNgNuyrIUkNEBNUnOSID0l/dRXQL3QixcrjitPp+5
+	 UCYTykCOvjJx19UCC1cAmwbkdac90whApdN1sshw=
+Received: from localhost.localdomain ([114.246.200.160])
+	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
+	id 5B0B604D; Sat, 21 Sep 2024 13:22:48 +0800
+X-QQ-mid: xmsmtpt1726896168tsf0h70fw
+Message-ID: <tencent_51492FE7A9204AE5B3DC49FA4F144D310F08@qq.com>
+X-QQ-XMAILINFO: N8ZpjUAx43dLkhxkD+DGecE3uZmnEGJC+r7MEtKp5GqsygRKPTDfF3AZ2zEDUd
+	 dzeDUFUHvGS3q6MlCu6mF9Lbt6+oBV3vxQ6EwNyO4TvFjK79qnJKNeAo0CF3Y1YjXot99rMrhZH1
+	 SDGXDIW6urnsD/MVVIafjhB6tvvKSUnJ+ekmpqVv1kmKHF3QFBLA5SHwqf+EnopCGvtxzsIm/QWN
+	 yBoHrohAruTkJKY9RhIlncf4fcKPcbiD76OrPLasUUb/ZCvxbnZsUrDSIwbVpJGQJ/t5YHc7YJQe
+	 yDwyUr3V+9UfRJ1B2VsKIToGbMQibxX3MVlrvpRJXJ8Mlso7VjVfqzxVSRJND1uABBrjip2HHYk1
+	 1/XcU+tiiWXtdMBTI4PWb7W8APYvEyh7D8UkhB1NuTc0IoDviMe/Y8qeC9XCQioNcmUNAi9d8Qg2
+	 rwg/E0/LCox9bRBIo4tdOoq69jYfSrQL41sIlXvM6tEB5BGUjZ1bG7iHYnSqyBxlVRNq5x3D+3kR
+	 RKiXyYza8Y1yvdLWkUZB+2pk78ddyqC0BFRfj0EdvW2nA+CEORiWC6cLaaNGDcXk+Y/M0HZNqy8l
+	 DsAP6r0BFuujPQytcI/W0LVdwO7yhpDLqPy+q1U+finUwhcCCAkY4aV6jeCaCaDuS4PKmcZgQ+HJ
+	 SHkc9dEeINkCmIbAjWy9I0PvJFFUwHQmChDo1BfJIWU/y1mFC63gWVFhX0vshv0dJD6nDC8+FaFg
+	 Hwresam1C96g/Z6GsHHTTtlHxn3y+OHuuGhVx2YcSopWn9tTEK+69wIiaFPvFb1kpCqkyvlbZfRt
+	 v3dyoK1DAwmVtTLD8OnDx1zq5Lnv7G4UrwPk5TCiB5s8wYIOf2rCCuDQuXwCvm5avOJsaL4je3vK
+	 dVJeeVoSMdeWqxGSvioMW2wCRS2W7nQj7KR93Yd+DPJypzwLTPvtAjX7LvaAgz6DhJ0q2Nvk7m58
+	 ijOAN6peXT/Mcj81vKiR7MXJPqvoZdrX70jlCiA7fAzBXK5g2kbNf/8HixsaxHTT0emvdinLrr7s
+	 dAsemUH+kWRO8R7nNnEyHWX5KX5Hnrh0iF1KDWOIvSKz2mqffFW3MS2NTVXNgCFqRBOwH/1G3+tW
+	 yT9tVSI+qf72XHUWeF7BiP/2q1jTESRfSsz33r1nFxkvgQir2f6+f3qOusrCGNCLVafHh0oDcZoR
+	 +ttbE1BEqAJinCJQ==
+X-QQ-XMRINFO: Nq+8W0+stu50PRdwbJxPCL0=
+From: Jiawei Ye <jiawei.ye@foxmail.com>
+To: miquel.raynal@bootlin.com
+Cc: alex.aring@gmail.com,
+	davem@davemloft.net,
+	david.girault@qorvo.com,
+	edumazet@google.com,
+	jiawei.ye@foxmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com,
+	stefan@datenfreihafen.org
+Subject: Re: [PATCH v2] mac802154: Fix potential RCU dereference issue in mac802154_scan_worker
+Date: Sat, 21 Sep 2024 05:22:48 +0000
+X-OQ-MSGID: <20240921052248.3386758-1-jiawei.ye@foxmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240920132131.466e5636@xps-13>
+References: <20240920132131.466e5636@xps-13>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=utf-8
-Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-T24gRnJpLCAyMCBTZXAgMjAyNCAxNzo0MjoxMCArMDIwMA0KVHJldm9yIEdyb3NzIDx0bWdyb3Nz
-QHVtaWNoLmVkdT4gd3JvdGU6DQoNCj4gT24gVGh1LCBTZXAgMTksIDIwMjQgYXQgNjozOeKAr0FN
-IEZVSklUQSBUb21vbm9yaQ0KPiA8ZnVqaXRhLnRvbW9ub3JpQGdtYWlsLmNvbT4gd3JvdGU6DQo+
-Pg0KPj4gRml4IHRoZSBmb2xsb3dpbmcgd2FybmluZyB3aGVuIHRoZSBkcml2ZXIgaXMgY29tcGls
-ZWQgYXMgYnVpbHQtaW46DQo+Pg0KPj4gPj4gd2FybmluZzogdW51c2VkIGltcG9ydDogYERldmlj
-ZUlkYA0KPj4gICAgLS0+IGRyaXZlcnMvbmV0L3BoeS9xdDIwMjUucnM6MTg6NQ0KPj4gICAgfA0K
-Pj4gICAgMTggfCAgICAgRGV2aWNlSWQsIERyaXZlciwNCj4+ICAgIHwgICAgIF5eXl5eXl5eDQo+
-PiAgICB8DQo+PiAgICA9IG5vdGU6IGAjW3dhcm4odW51c2VkX2ltcG9ydHMpXWAgb24gYnkgZGVm
-YXVsdA0KPiANCj4gVGhlID4+IHNob3dzIHVwIGFzIGEgcXVvdGUgb24gbG9yZS4gU2hvdWxkIHRo
-aXMgZW50aXJlIGJsb2NrIGJlIGluZGVudGVkPw0KDQpBaCwgSSBqdXN0IGNvcHkgYW5kIHBhc3Rl
-IHRoZSBvcmlnaW5hbCBtYWlsIHdpdGhvdXQgdGhpbmtpbmcuIEknbGwNCmRyb3AgIj4+Ii4NCg0K
-Pj4gZGV2aWNlX3RhYmxlIGluIG1vZHVsZV9waHlfZHJpdmVyIG1hY3JvIGlzIGRlZmluZWQgb25s
-eSB3aGVuIHRoZQ0KPj4gZHJpdmVyIGlzIGJ1aWx0IGFzIG1vZHVsZS4gVXNlIGFuIGFic29sdXRl
-IG1vZHVsZSBwYXRoIGluIHRoZSBtYWNybw0KPiANCj4gbml0OiAiYXMgbW9kdWxlIiAtPiAiYXMg
-YSBtb2R1bGUiDQoNCk9vcHMsIEknbGwgdXBkYXRlIHRoZSBjb21taXQgbG9nIGFuZCBzZW5kIHYy
-Lg0KDQo+PiBpbnN0ZWFkIG9mIGltcG9ydGluZyBgRGV2aWNlSWRgLg0KPj4NCj4+IFJlcG9ydGVk
-LWJ5OiBrZXJuZWwgdGVzdCByb2JvdCA8bGtwQGludGVsLmNvbT4NCj4+IENsb3NlczogaHR0cHM6
-Ly9sb3JlLmtlcm5lbC5vcmcvb2Uta2J1aWxkLWFsbC8yMDI0MDkxOTA3MTcuaTEzNXJmVm8tbGtw
-QGludGVsLmNvbS8NCj4+IFNpZ25lZC1vZmYtYnk6IEZVSklUQSBUb21vbm9yaSA8ZnVqaXRhLnRv
-bW9ub3JpQGdtYWlsLmNvbT4NCj4+IC0tLQ0KPiANCj4gRWFzeSBlbm91Z2ggZml4LCB0aGFua3Mg
-Zm9yIGJlaW5nIG9uIHRvcCBvZiBpdC4NCj4gDQo+IFJldmlld2VkLWJ5OiBUcmV2b3IgR3Jvc3Mg
-PHRtZ3Jvc3NAdW1pY2guZWR1Pg0KDQpUaGFua3MhDQo=
+Hi Miquèl,
+
+I'm sorry for the accidental email sent while testing my email setup. Please disregard the previous message.
+
+On 9/20/24 19:21, Miquel Raynal wrote:
+> Hi Jiawei,
+> 
+> jiawei.ye@foxmail.com wrote on Fri, 20 Sep 2024 04:03:32 +0000:
+> 
+> > In the `mac802154_scan_worker` function, the `scan_req->type` field was
+> > accessed after the RCU read-side critical section was unlocked. According
+> > to RCU usage rules, this is illegal and can lead to unpredictable
+> > behavior, such as accessing memory that has been updated or causing
+> > use-after-free issues.
+> > 
+> > This possible bug was identified using a static analysis tool developed
+> > by myself, specifically designed to detect RCU-related issues.
+> > 
+> > To address this, the `scan_req->type` value is now stored in a local
+> > variable `scan_req_type` while still within the RCU read-side critical
+> > section. The `scan_req_type` is then used after the RCU lock is released,
+> > ensuring that the type value is safely accessed without violating RCU
+> > rules.
+> > 
+> > Fixes: e2c3e6f53a7a ("mac802154: Handle active scanning")
+> > Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
+> 
+> I think net maintainers now expect the Cc: stable tag to be put here
+> when there is a reason to backport, which I believe is the case here.
+> So please add this line here.
+> 
+
+Does this mean I should use Cc: stable@vger.kernel.org? I am not familiar with this procedure.
+
+> > 
+> 
+> Please delete this blank line as well.
+> 
+> And with that you can add my:
+> 
+> Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
+> 
+> > ---
+> 
+> Thanks,
+> Miquèl
+
+Do I need to resend patch v2 with the "Resend" label?
+
+Thank you for your assistance.
+
+Best regards,
+Jiawei Ye
+
 
