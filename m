@@ -1,79 +1,93 @@
-Return-Path: <netdev+bounces-129152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C225A97DE0A
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 19:13:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44DB297DE9D
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 21:45:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBD511C2109B
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 17:13:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE72D282185
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 19:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6C3175D29;
-	Sat, 21 Sep 2024 17:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4B33B7AC;
+	Sat, 21 Sep 2024 19:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TvLcu5xp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pCp2+m4H"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0735A219F3;
-	Sat, 21 Sep 2024 17:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915382207A;
+	Sat, 21 Sep 2024 19:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726938832; cv=none; b=aZndHmrDchyJdcv+qU1Tsu6GOsNpjfS5TAg7bvEVbmLrgqjeoah5TfmV2Bd/MIuuCX+D8PRtYYaeZdVP3RUf1mh8qX6mH9G6PDvVqtJKdWeWClIzj+Y87AjSz1KRMtFvi3HFrAAiRAVNKkDOITyb1Va+Rnj4DvAEb4XtIByNkr4=
+	t=1726947935; cv=none; b=iOdoVhEsWEz+xaiDLotsgY3uMzxDf7RszwBLOHVO9MUKZCxEicUw/QxsHScGNwiHHwRLQqLj3egTbyagBatyqUGh7r53ekUF/T0LrFy/N+rmWANQwpv0UQE5erD35h4oahnZ4GmnFvfSFsFdH71BSluyIIm7h6R+Gu4YMykq4tY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726938832; c=relaxed/simple;
-	bh=74UaiF3AOXpiI4E+J3cEkwQO2P9RvdIXhhGIqzzrbns=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=pqpp0i9wSQCEWfptGQ1g/5Erwt27e6OqiFlZBM3YOsoADhiE6DKbvhGANAHYzeUfjk5MsyeSBmtbhbwpa1KBSbHpp6D8kHJqb4ZK0I71D/w2F20/WgHzC/svB6QbhNLZdJa6dSiI8yjiRNLCG4VHgd6vTXJWHoF8tdbTFVBA2Gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TvLcu5xp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C70DC4CEC2;
-	Sat, 21 Sep 2024 17:13:51 +0000 (UTC)
+	s=arc-20240116; t=1726947935; c=relaxed/simple;
+	bh=nCqqyCLO0S+UDUkhYsOhcZf34yHao1FK2ajIQUP1tEc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bmg819QWTeWyA8X9N71A2NNRzGKzafDgcy8qAjfY/HEsjD5xFWuHY3glp3uZ7Oc0jWaU1ICH0rTY7b2o/cH151RsRk6ZbRAk5zm2YILY516iDm5lbIqj1Bhg0d/0KXRDwyTizcg1jI1XpeTbp9+cFVVu+wRFKORIULx0UT/CKa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pCp2+m4H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22C02C4CEC2;
+	Sat, 21 Sep 2024 19:45:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726938831;
-	bh=74UaiF3AOXpiI4E+J3cEkwQO2P9RvdIXhhGIqzzrbns=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=TvLcu5xpbJ2jBKMIFCseIX3AMYV94KEE/V+6Kjrjdt3hgJ19l/q/07A0hwU3y+Ish
-	 oY81GkxDc1ZujOLxPXVGmineC9Ehefqyt5emptYAOIXXRqtIUS0h/rs2S+wIJuRVQU
-	 4cRw0JGSGV9lbExGgl8MnSjAfrJJvSfEV57cX9LALQKuC4/CSxy4JJr6M4aXu6mV6E
-	 CFkd0bpWP2TsgaKrfCFLV6t/ryFceBzoM0HLGRL1tTpdflagyJgNo4ZCxwmJcYt1UM
-	 lmO/0wQal5a2A3ZW/xlGGpIAae31FjB5r0xURWxFqsKodPCMP80kYN1DBbzLMFK4t/
-	 68ZSmdEE0D8vQ==
+	s=k20201202; t=1726947935;
+	bh=nCqqyCLO0S+UDUkhYsOhcZf34yHao1FK2ajIQUP1tEc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pCp2+m4HRiS9pl5qjPJrWNGSCERSFbsXxCsWg5hmiszunYkLcrx/kuzG9zh7i9oko
+	 v3mu25eaVw+uUw8vs6IbFXkgkq30C3AQGZBVBDk39trjAe35NH33NWWTa9DTSf18WY
+	 J3Sr9mxBvFcNbs2aetGJHIGfKNXuLwet3I1Eo7VgNBKZEBZG5m4mtbAwKfoDESuJ2x
+	 8+SLXqhl0eroIS9qPV2oFZ/xbFC7++n8tyVEkhmWj7JbP+ZG+UQqDPpx7dnixJjg6M
+	 vcz9EVuLLUMlq2rw+SMciKwHA2SDymh8HcqWlkf8aOOWy5mc8k1fV9YOg0D6Jki5oc
+	 vd7GI6rTBYYcw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDCD3806655;
-	Sat, 21 Sep 2024 17:13:54 +0000 (UTC)
-Subject: Re: [GIT PULL] BPF changes for v6.12
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240914155810.15758-1-alexei.starovoitov@gmail.com>
-References: <20240914155810.15758-1-alexei.starovoitov@gmail.com>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240914155810.15758-1-alexei.starovoitov@gmail.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/bpf-next-6.12
-X-PR-Tracked-Commit-Id: 5277d130947ba8c0d54c16eed89eb97f0b6d2e5a
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 440b65232829fad69947b8de983c13a525cc8871
-Message-Id: <172693883326.2537618.8513134307356112874.pr-tracker-bot@kernel.org>
-Date: Sat, 21 Sep 2024 17:13:53 +0000
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, bpf@vger.kernel.org, netdev@vger.kernel.org, daniel@iogearbox.net, andrii@kernel.org, martin.lau@kernel.org
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EA03806655;
+	Sat, 21 Sep 2024 19:45:38 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] BPF changes for v6.12
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172694793729.2561812.3449583125426725924.git-patchwork-notify@kernel.org>
+Date: Sat, 21 Sep 2024 19:45:37 +0000
+References: <20240914155810.15758-1-alexei.starovoitov@gmail.com>
+In-Reply-To: <20240914155810.15758-1-alexei.starovoitov@gmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: torvalds@linux-foundation.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@kernel.org
 
-The pull request you sent on Sat, 14 Sep 2024 08:58:10 -0700:
+Hello:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/bpf-next-6.12
+This pull request was applied to bpf/bpf-next.git (master)
+by Linus Torvalds <torvalds@linux-foundation.org>:
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/440b65232829fad69947b8de983c13a525cc8871
+On Sat, 14 Sep 2024 08:58:10 -0700 you wrote:
+> Hi Linus,
+> 
+> The following changes since commit 872cf28b8df9c5c3a1e71a88ee750df7c2513971:
+> 
+>   Merge tag 'platform-drivers-x86-v6.11-4' of git://git.kernel.org/pub/scm/linux/kernel/git/pdx86/platform-drivers-x86 (2024-08-22 06:34:27 +0800)
+> 
+> are available in the Git repository at:
+> 
+> [...]
 
-Thank you!
+Here is the summary with links:
+  - [GIT,PULL] BPF changes for v6.12
+    https://git.kernel.org/bpf/bpf-next/c/440b65232829
 
+You are awesome, thank you!
 -- 
 Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
