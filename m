@@ -1,242 +1,146 @@
-Return-Path: <netdev+bounces-129154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129155-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9959397DEBF
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 22:17:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3749797DEDC
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 22:48:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F27DC1F216EC
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 20:17:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 042AE28132D
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 20:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76164D8B9;
-	Sat, 21 Sep 2024 20:17:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D63B126BF6;
+	Sat, 21 Sep 2024 20:47:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M2nq3wVU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hKg+nXU1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4F07273FC;
-	Sat, 21 Sep 2024 20:17:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726949845; cv=fail; b=Lg2GHhKvZz2H68mMTt+agAKP5pL+qRP+gVmy33L1HdMt41Rs5z4SZv2RAfNXokS/DeO9314MdmlOMqEJL27/ip9vAanykT6gY9ykldSxIU8AxwM+dSfV5RdhgEKJ7pjtvyVNXbk6Bq6OwiYfsN+EAWYocgEDT7BL25822cYZnDs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726949845; c=relaxed/simple;
-	bh=aA8yewiK4mCAz5y5HemF8PD2oU2le9TJ4vQRDiUNmo4=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=TNp/Mwev/Po9/tsy8V8VYRLCTAIv3umTLtMgQqkI3lZtRrqKv4s9H+w/wYrrquNDoxb/T12ROWSLJM55BuA5l6chhJkd9aWxTECWberTYnANf3sQxXVv7Esi8awLTGG+gZjTQmbi/0BCio7bmvl4RQw047DKq/kDUArsnMmSsK8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M2nq3wVU; arc=fail smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1726949843; x=1758485843;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=aA8yewiK4mCAz5y5HemF8PD2oU2le9TJ4vQRDiUNmo4=;
-  b=M2nq3wVUTcdcMdcNmIytxR2//5aJY5qlH3X7wxPaP4wV6thgn1hPHACe
-   gsnW8dngmUKjFyI3XdVOTSYSwHvu34rwxGaYnkbrh9viczpZ1Hc89F03G
-   fI1nmU3LQJjP0FYrRq9zLjHgbPoOj99Kn2crpbLf2h9JCumX+xXQOqM1H
-   asCf9dcEj5uN+jbALPlb4UndrciSPbOZvMt4DMONJ3ZIyIkZaN8BQp1PZ
-   VPVcLoSVCGANFS0aYysfRrYzNYLu56msn9QQH/Y8s1w+qTYZ2C0uV3Gb4
-   zHRcF3SXTMzI1LE5nfTcHAO91f3vcpv1zvT/JecwUeRVhJuylEtSyri+W
-   A==;
-X-CSE-ConnectionGUID: gRx5R7y5Sv2fYrYskcOK8w==
-X-CSE-MsgGUID: WDEDcZGbRuuPFw6brHq2kQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11202"; a="29660874"
-X-IronPort-AV: E=Sophos;i="6.10,247,1719903600"; 
-   d="scan'208";a="29660874"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2024 13:17:23 -0700
-X-CSE-ConnectionGUID: YR8fh8wBRe6wgL3NjyoZ0Q==
-X-CSE-MsgGUID: QbQ0jq2GQy6ANBPE6dtmqQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,247,1719903600"; 
-   d="scan'208";a="75041857"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Sep 2024 13:17:22 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Sat, 21 Sep 2024 13:17:21 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Sat, 21 Sep 2024 13:17:21 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Sat, 21 Sep 2024 13:17:21 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xvbUAdpa0eVkFUATK94hJj8gfyDmI+tYoegy107ruLni8fnnaqPJjrTcc4ynRWkxyU4Rq5kDRS/tSZzD4wxp9xvZmVzbKEuIERbylYV9zxCE+4V6+os38oJYzdYSBYLsrsBaVQDLC0c/MZl16Ie4+h/BLfyQ0oKiUSwZAztIjsZMiMqaiBCyNS8xBdC2hV7d0Fwqot9Xz7vnbpjH2reyjx1ElVegW9++dVADVmx72/vxyMRwk4MBkkcscCktI/wcPhcbp5ektJT7PITmKRJeAW67hYkNbPF8y1blUccSdJZT9yMZg2zth52sHN9SEBPkXocyadhB6qAJxQk6l44ctg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6LBWWoOOcIx5+yMzTXP0iQvnUFdX+1w+Jback0fz1yw=;
- b=iJcs3dHaJnmnY8BcgpFr1bEfakkUxoZRSBv9aoPOwFLvj/pUZ1+mT1/I2y2+dHAdICTZiqc0mWzoEoCiQGDxlVhIT3npWGZQPW6VBKihRCrkMRd7RKjLBxVefPRLR5jcSgGL6WcAhC9GK2PWI8OPEEUlDPUzv0NG2hac5GYT+Mn+rOqCDVDn/NB6wqHMOl1rEk66WKE9RUyywUWl2xWOpeYYmDBzTkmC161Jt2l8G7WsZjHHpbqpIbjBUbWW2OdwVTUfOmpfCe0zrPPiwhrFJheDn7YVqm0aYvXhs1crv/FWInQ+Kb9cD8wxOp7Ea1maLO/vNSMVEkWg9B/UhPvkJg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by CYYPR11MB8329.namprd11.prod.outlook.com (2603:10b6:930:c7::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.23; Sat, 21 Sep
- 2024 20:17:16 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.7982.022; Sat, 21 Sep 2024
- 20:17:16 +0000
-Message-ID: <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
-Date: Sat, 21 Sep 2024 22:17:08 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-To: Lorenzo Bianconi <lorenzo@kernel.org>,
-	=?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-CC: <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<hawk@kernel.org>, <john.fastabend@gmail.com>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <lorenzo.bianconi@redhat.com>, <toke@toke.dk>,
-	<sdf@google.com>, <tariqt@nvidia.com>, <saeedm@nvidia.com>,
-	<anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <mst@redhat.com>, <jasowang@redhat.com>,
-	<mcoquelin.stm32@gmail.com>, <alexandre.torgue@foss.st.com>
-References: <cover.1726935917.git.lorenzo@kernel.org>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <cover.1726935917.git.lorenzo@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI2P293CA0015.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:45::9) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C7963B9;
+	Sat, 21 Sep 2024 20:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726951672; cv=none; b=ALvg/0ER+gVokWnq42VYW95imXBU5ONyfSN26u2cfnBr7c/ni2tKlGXMrkR3owQB/N7QZETqu71ws6BZJPTnssKIXdeUd6P4r6pFSoBSULiVYuWUoMTJVHTlMXTr8keAiTge6+9ckB0MfhoTPNJLgeUEMS02CmjdTl4NYoKjEXQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726951672; c=relaxed/simple;
+	bh=rH7Dd3F/dN69MjOyihHAnz5rb6ZghANW3/Yr+QCK5vc=;
+	h=Message-ID:Content-Type:MIME-Version:In-Reply-To:References:
+	 Subject:From:Cc:To:Date; b=YqzpRQeoUUzQQmlbFzEKSvSaXJ2jYCI0+sya/ESKeZ1QINjmjXk5f+/4MHdiDaxiQcjajn7A8sJOl+Nm4Luwp/ftu8A/YdjLY2kW9yp5jC6W8tLZ7pH/3n2pTg5fEkJPwRlyatFhfcBGx09RN77mP7E0rDEcUBEWtMb7AwdHTvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hKg+nXU1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50464C4CEC2;
+	Sat, 21 Sep 2024 20:47:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1726951671;
+	bh=rH7Dd3F/dN69MjOyihHAnz5rb6ZghANW3/Yr+QCK5vc=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=hKg+nXU1aYxGePNWhTIE8dsBsIfsAqTtDNnuthtmAZE5rUruPkUtzAK/P7Y3jQpuQ
+	 0iGCWRteM1b38mWRKlI34PpfmUlGmdTSd7QlDzcgjq9JZdFvvxOEAd+jdR3dMVBd1P
+	 wPl8X5jzLfN06q+FcQjH+qv7C0dZeZ2AYlhyqfqbbCZ/vFNhnoMFNHYPfpfWiqUdgs
+	 UFkeDAV5K358rvaQRFHISVEuA2fvulH7az9mxmh854UFfTCXoQnDa6qvW6Z0lwSB6M
+	 IxSoNEPk488RziMwMnaB5dfkgmKSPJiJRz4qg76SVbMLimGtlmNT27GradvHf7Da9k
+	 S857xSA9cfrFg==
+Message-ID: <d87530b846d0dc9e78789234cfcb602a.sboyd@kernel.org>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CYYPR11MB8329:EE_
-X-MS-Office365-Filtering-Correlation-Id: d0754e17-ed32-495b-abe0-08dcda7a62dc
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?RkgzdmR0VFZ4R1VXT3l5d05RZ09YN2NQS1ZXUVFjV3VLdHhIcGVmaUdhM3Q4?=
- =?utf-8?B?SngrcEVYMmJDUVljMnplRGpqaGM5cGlTOTRHVVlPb002ZzFidHlnY1RMSUc0?=
- =?utf-8?B?aDl6WnJlbjJUTlA2OUZrVU40OU1BRHJ1MG9RZVVKY0I0eHdnY0hVOUNzREs4?=
- =?utf-8?B?Z2hlNWJPajJVK2duUnBnT3V5dnM3ZFVaNU5lSXBDODdBbE1Dc1VOTG1Wb2Na?=
- =?utf-8?B?Ri9Dd0VXVnM3a3VtQ2dwaE1pNGVndVI2aE4vYXFoVk0rL0NDMEJXbzFCWVBB?=
- =?utf-8?B?dzJIU3NycjgvUWpxL3poMXNiQ05kc2pGZVRvTFFUVE5uLzl2ZWdlZWRZUVNk?=
- =?utf-8?B?R0h0STZjOFRvWnBDalQxcTRNZXJvc0xtWE1iV3I0eU5ITkthWVZQM2VSd3M2?=
- =?utf-8?B?ZDBqTzhuRTBtQVVyS3VldjlaVURPZXplQ0pNTmt0YzRtdko5QVU4REc4Uzhv?=
- =?utf-8?B?dkorNlFmQjZ5RCtvRFY0eDhsMHNhVVY1aWVqRmowakhtQVk5OFhJNFFjeE1a?=
- =?utf-8?B?NHNydWMzd3UvMXZqQ2F6U2FxV2hoRUJTQzVoN1k0Y1ZNdzRsaHVsaGs0WSsz?=
- =?utf-8?B?dnN5OXZabVUvZEs3MjNLcjlDV3FCUEJZV1U1N3Z4NHhMcWlSQ2RBQlNQVm9T?=
- =?utf-8?B?Y0VYcmFQdFB0V1A4WUx6VTBLalJ2RkkxOGhSWi9HTkU1N3VjTkFIZ2tKUUw5?=
- =?utf-8?B?WmNKM0dDSFRnS3YvU3F4QnI0ZHhXajlEWFBkdHdkWnhhTmd5VEdsZm9yazlD?=
- =?utf-8?B?S1ljMG94amtzcG5pL0JoQnlTN05TU2p0Qlh2d2tiN2UzTlpFbDlvSzRtSFVE?=
- =?utf-8?B?WWRWRGI5VlloOWdYam9XbzdWL1IyVytUQ3k5Yk05ZGdsaWdjdnBiS3Q3T04y?=
- =?utf-8?B?bFMyS3dBcm0rZXFZM25ubWsyNHFmdXVwWUphWGtlN3I0TXJOaGExdHFwOXJi?=
- =?utf-8?B?WERnZzJMZXV0ZUYvTWJQTy9rbTl5TEk3cFZaUFFKZGxYb1FSdW5GcEZRSGZU?=
- =?utf-8?B?ZkVDd04vTW1IRVhpU3pvMFVaUnkwS1o3SU5xZk5JNWdJc3g4bnQ3WmRyaXh0?=
- =?utf-8?B?QWlTOE1jT1YrQytoZXR6cWlCMEswUnVtc3lVaUhFc0ZGeHhHV01MNXpmYk01?=
- =?utf-8?B?UFdjMGRGUmo3RWtLeXBtNlVlaFFla2NzdEh3UkY4ZnhRTGIyYzVJTGRvaFhv?=
- =?utf-8?B?R3o0MDhOdTUvNXpJZ3BYVTNOcDNSNmw0YTBRNkwvOUE3WlRqVVF5dWlSWVZi?=
- =?utf-8?B?VUFRQXAydzJsam5sRFZYaHFQUkthUzZuMi9NREFCQlJidUdmL1JkSWlBdDhW?=
- =?utf-8?B?YzVtNGl1a2FyMCtRUjlidXlReUpMUXBJMDBPTVRBQkhOeDVteEFpaHpqM0Zs?=
- =?utf-8?B?aDJTUkloejAxYVc3bkJlazE3ZlE1cllBOHJXeW1XaXVXMkxIVDNZMHNqQlYx?=
- =?utf-8?B?Nm9HeGZsN3JTczdZZlVlRm1IOW9BRFNQLytITW5kbXQ4ZzZZaUZ3Wnp2UWJk?=
- =?utf-8?B?eVpmTEI0bHdxZ2RtMElja21PNU5OK2RaRTVoaUxrWEJCcjZ5M1VSMEdxQ25Z?=
- =?utf-8?B?VlFqemtnV3UwL3hYemFiZWQwTTV3MTBQQWVoU0tlSDJGMkFWMHBRUGNsYmFE?=
- =?utf-8?B?WVdyaFFFc3UzQnBucWFuMmRRQ3ZwZ0ZqMW1mRVFHT1VHa3VFb3ZiWHMxMUNi?=
- =?utf-8?B?WmVFTytjcDdkZjNpSXR3MU1wNzJEL2Z4ZzRhME8vNndOc2dlTEQxSEd3PT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MDNQYnFwOTNIbitXWDNmZ3VMLy9yMWQ1TnZRWnJMUGU5QUtzdG9sQ2Y4NU9y?=
- =?utf-8?B?amlwV2hxdlJRa3lDR0IzZDc2MGh1Nm1RQThFbFRlMlNRQXM2Y0NXcmlsbWh2?=
- =?utf-8?B?bDVPamxyUmNiUFlObmQyOXdMbXQ4WXhaWC84aGZobkRpRTlpM2hQNE4wYllG?=
- =?utf-8?B?bFFTOWpQcFNUWjNodlh5VEpvbFh1S3JxWHc5YWEvS3RsQkRnY0REOGpWSTRh?=
- =?utf-8?B?RDNzK1BaNzRSa0VOcnZFMDhLQk5LYWswTjYwZlJEcjRHYXhJZ2themVzREdl?=
- =?utf-8?B?aXBrWlBEblY4QWQ4Ky82MHhTYUNNMVU3dUFuWElkY0ZVR2RPR0hKeWJEb0Jm?=
- =?utf-8?B?UnczdHRhNjRJVm00bmpBS2hDOGYzUU9OdlloNWRQdU83QTlNbkMzbHBGVnRs?=
- =?utf-8?B?TllZV0Q4cnNpUlgrRlZaVTFOQWFBWktuQXVQTlgwcjVTaC94dE9HUzlLamJo?=
- =?utf-8?B?QU1maEE2UmNGYXdjWFhYYzR5Q0ppT2VyNWhGODR0UzVzUmFSdFhuaHBaQmlh?=
- =?utf-8?B?LzA0c1VvQ01IWXVoSzAzMHBubDlDamJoa3BpRUU2VXh2aUE1T3gyRlc4YVo4?=
- =?utf-8?B?dWNKb1lDbmVzNnhUcDlES20wMDY5ekZBVTBDTkY2SytRNWlENnVYcFY2SE5h?=
- =?utf-8?B?dmVpUllONVFXdHFxWWV5VmJCWHVuMElmemtPU0lMMit4ZWdjckRhcFFkTHRO?=
- =?utf-8?B?eWRpdjE4NHE5aFRVdzFuRDM4YmkyQ1lZTmFlUW41VXpML1NhUW85WG5oVHFT?=
- =?utf-8?B?MW1xQXQzQVpsTVBSWGJaVTNORG9lcFQ4eE84TTJFelhnTVFVR0k1VEN6SmpV?=
- =?utf-8?B?dFZhZDhyMGRSeDAyeE1rL3ZEK285MExocWQ1ajRaQkpLWTdXcW5pY1JtZ2tP?=
- =?utf-8?B?V1NCTG9CYUkrdXBiOTZTNVVUeVJ4QVJtVzF2SWRNUVkwdjBEMVp4WjI2Z09p?=
- =?utf-8?B?ODdHZGdrYUhmTHIzT0RQdlhpaE1jTnczRERNQlVzZ3VIMDgyUGVtcU5QNXgr?=
- =?utf-8?B?aU5lbGRuVlIxNVdVcmN0dHI5YXBteCs2Wk1jbk1sYnl4dnVlQkUvVWhMUHJM?=
- =?utf-8?B?bC9mNUdxYlVXaWpGcnVMQjdQTXdCYWtEamhOVUkzY3VoS0ZBNzI1bStjY2Vk?=
- =?utf-8?B?M0dpWDBqRmczd0RManl6N1kzMHFzVUwyQnFKamRMK1BTSTZkREZPZ3FVRHdy?=
- =?utf-8?B?bUdaaXRpUHFpckhVcWl5UFl6V0Qwb2JHaEJMUUM4NnFIZkRIbXhsa2ZkeUsy?=
- =?utf-8?B?bG1OcTJFSzl2VFo1N2dTV29XREZuZHQzMGFHS2duVXVLUzZDbWtHdUNvYnVP?=
- =?utf-8?B?dHd1bWpabzdpS2x5NGY4cXdSQmhjWEtyT0MyNDZSUW5LR3I3UWxWMmVpZStU?=
- =?utf-8?B?QWRuc2FvclFGNEVVUEUraVhjc0lDWCtZOTVmYUxOUUdHdWliR3JScFR4YXJs?=
- =?utf-8?B?U2JlQ0RuM1VyNVh2cGoxSXdCN1ZGY0FLZ0JtMWJ5emoxRTBucE9VSFVZeHU2?=
- =?utf-8?B?WFlHckF1TWxlK2I1UHE4eFgzUFk0MEt6amMwVVhNcmN2RmFGYXA5NCtZQVA2?=
- =?utf-8?B?dVZBOFh3TWhyTkM5RDQyNVVHY08zeWZPRSthOUlIMUpZMVlJK0hQR21NblIy?=
- =?utf-8?B?a0dBWUpLR0hUaENGRUZBQ1JxUUEzaENxZ05LdlA0eXRHelpRWnliRWFZMnhk?=
- =?utf-8?B?dEppbTdqeFhyMi9WdXNKVjlqdktXYllwUnJjRmNVeFNVemx6SXhDYUVwS2t4?=
- =?utf-8?B?RkFyZlcrYVJTN2xZOThVL0xtUmo2bVdOVkx6REFXUnN0T1pBdXdWWW5lQlM5?=
- =?utf-8?B?L3lXYzI1WlNaSTJ1QzlrNC9YenlEbUdGVStPdmxtZ1ZEZXI4U1lHQ3ovUXgv?=
- =?utf-8?B?dVJIWmV4OC9xSXE2bGw3OWI4YTczYWwva09vU1doTERNbnNxSFgwd1RWNXJq?=
- =?utf-8?B?eUZxNVhxWDBDNnlMTzlhTHpnWDF0bHFLbWtPSmlkVDYwWndpbnB1VFVKM1Bp?=
- =?utf-8?B?RlROOU82dzZ2c2pZVEtJekZsWXR3ME5neUdhcVkxNHZVbzhSdUJOWlZLZ2Jz?=
- =?utf-8?B?amIvVDdleEVjTHFUYWlSdWRscWxrQmVERE83SGdXMWYvdk1KZWc4MXNSa1BH?=
- =?utf-8?B?OXVIKzdMOUc2MHhITkJTYjk3TjFqUzIxNGsvRUtwRnBJWkIwMUhKV054ZjQ2?=
- =?utf-8?B?ZlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0754e17-ed32-495b-abe0-08dcda7a62dc
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Sep 2024 20:17:16.1845
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7/ZDRR8NslWfOrC4KhGJVPS/NqJKclaKXzu6yXgwnZ9g2f8MTueZdLnqqUATVyD056RDIEvMBEtT3JgRZOpgkKZw5xYFwm1ZLntYl9QV2t4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8329
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <ZtcBHvI9JxgH9iFT@apocalypse>
+References: <cover.1724159867.git.andrea.porta@suse.com> <12d0909b1612fb6d2caa42b4fda5e5ae63d623a3.1724159867.git.andrea.porta@suse.com> <2113b8df52164733a0ee3860bb793d6e.sboyd@kernel.org> <ZtcBHvI9JxgH9iFT@apocalypse>
+Subject: Re: [PATCH 05/11] vmlinux.lds.h: Preserve DTB sections from being discarded after init
+From: Stephen Boyd <sboyd@kernel.org>
+Cc: Andrea della Porta <andrea.porta@suse.com>, Andrew Lunn <andrew@lunn.ch>, Arnd Bergmann <arnd@arndb.de>, Bjorn Helgaas <bhelgaas@google.com>, Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Catalin Marinas <catalin.marinas@arm.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley <conor+dt@kernel.org>, David S. Miller <davem@davemloft.net>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic <dragan.cvetic@amd.com>, Eric Dumazet <edumazet@google.com>, Florian Fainelli <florian.fainelli@broadcom.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Michael Turquette <mturquette@baylibre.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Stefan Wahren <wahrenst@gmx.net>, Will Deacon <will@kernel.o
+ rg>, devicetree@vger.kernel.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Andrea della Porta <andrea.porta@suse.com>, Masahiro Yamada <masahiroy@kernel.org>
+Date: Sat, 21 Sep 2024 13:47:49 -0700
+User-Agent: alot/0.10
 
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sat, 21 Sep 2024 18:52:56 +0200
+Quoting Andrea della Porta (2024-09-03 05:29:18)
+> On 12:46 Fri 30 Aug     , Stephen Boyd wrote:
+> > Quoting Andrea della Porta (2024-08-20 07:36:07)
+> > > diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/=
+vmlinux.lds.h
+> > > index ad6afc5c4918..3ae9097774b0 100644
+> > > --- a/include/asm-generic/vmlinux.lds.h
+> > > +++ b/include/asm-generic/vmlinux.lds.h
+> >=20
+> > It would be nice to keep the initdata properties when this isn't used
+> > after init as well. Perhaps we need another macro and/or filename to
+> > indicate that the DTB{O} can be thrown away after init/module init.
+>=20
+> We can certainly add some more filename extension that would place the
+> relevant data in a droppable section.=20
+> Throwing away the dtb/o after init is like the actual KERNEL_DTB macro th=
+at
+> is adding teh data to section .init.data, but this would mean t would be
+> useful only at very early init stage, just like for CONFIG_OF_UNITTEST.
+> Throwing after module init could be more difficult though, I think,
+> for example we're not sure when to discard the section in case of deferred
+> modules probe.
+>=20
 
-> This series introduces the xdp_rx_meta struct in the xdp_buff/xdp_frame
+This patch can fix a modpost warning seen in linux-next because I have
+added DT overlays from KUnit tests while kbuild has properly marked the
+overlay as initdata that is discarded. See [1] for details. In KUnit I
+doubt this really matters because most everything runs from __init code
+(even if it isn't marked that way).
 
-&xdp_buff is on the stack.
-&xdp_frame consumes headroom.
+I'm thinking that we need to make dtbo Makefile target put the blob in
+the rodata section so it doesn't get thrown away and leave the builtin
+DTB as part of init.rodata. Did you already do that? I see the kbuild
+tree has removed the commit that caused the warning, but I suspect this
+may still be a problem. See [2] for the next series where overlays
+applied in the test happen from driver probe so __ref is added.
 
-IOW they're size-sensitive and putting metadata directly there might
-play bad; if not now, then later.
+If we simply copy the wrap command and make it so that overlays always
+go to the .rodata section we should be good. Maybe there's some way to
+figure out what is being wrapped so we don't have to copy the whole
+thing.
 
-Our idea (me + Toke) was as follows:
+Finally, it's unfortunate that the DTBO is copied when an overlay is
+applied. We'll waste memory after this patch, so of_overlay_fdt_apply()
+could be taught to reuse the blob passed in instead of copying it.
 
-- new BPF kfunc to build generic meta. If called, the driver builds a
-  generic meta with hash, csum etc., in the data_meta area.
-  Yes, this also consumes headroom, but only when the corresponding func
-  is called. Introducing new fields like you're doing will consume it
-  unconditionally;
-- when &xdp_frame gets converted to sk_buff, the function checks whether
-  data_meta contains a generic structure filled with hints.
+-----8<----
+diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
+index 55998b878e54..070e08082cd3 100644
+--- a/scripts/Makefile.dtbs
++++ b/scripts/Makefile.dtbs
+@@ -51,11 +51,25 @@ quiet_cmd_wrap_S_dtb =3D WRAP    $@
+ 		echo '.balign STRUCT_ALIGNMENT';					\
+ 	} > $@
+=20
++quiet_cmd_wrap_S_dtbo =3D WRAP    $@
++      cmd_wrap_S_dtbo =3D {								\
++		symbase=3D__$(patsubst .%,%,$(suffix $<))_$(subst -,_,$(notdir $*));	\
++		echo '\#include <asm-generic/vmlinux.lds.h>';				\
++		echo '.section .rodata,"a"';						\
++		echo '.balign STRUCT_ALIGNMENT';					\
++		echo ".global $${symbase}_begin";					\
++		echo "$${symbase}_begin:";						\
++		echo '.incbin "$<" ';							\
++		echo ".global $${symbase}_end";						\
++		echo "$${symbase}_end:";						\
++		echo '.balign STRUCT_ALIGNMENT';					\
++	} > $@
++
+ $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
+ 	$(call if_changed,wrap_S_dtb)
+=20
+ $(obj)/%.dtbo.S: $(obj)/%.dtbo FORCE
+-	$(call if_changed,wrap_S_dtb)
++	$(call if_changed,wrap_S_dtbo)
+=20
+ # Schema check
+ # ------------------------------------------------------------------------=
+---
 
-We also thought about &skb_shared_info, but it's also size-sensitive as
-it consumes tailroom.
-
-> one as a container to store the already supported xdp rx hw hints (rx_hash
-> and rx_vlan, rx_timestamp will be stored in skb_shared_info area) when the
-> eBPF program running on the nic performs XDP_REDIRECT. Doing so, we are able
-> to set the skb metadata converting the xdp_buff/xdp_frame to a skb.
-
-Thanks,
-Olek
+[1] https://lore.kernel.org/all/20240909112728.30a9bd35@canb.auug.org.au/
+[2] https://lore.kernel.org/all/20240910094459.352572-1-masahiroy@kernel.or=
+g/
 
