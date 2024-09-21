@@ -1,156 +1,140 @@
-Return-Path: <netdev+bounces-129156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3CEA97DF19
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 23:37:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 022D197DF28
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 23:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4F611C209C2
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 21:37:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B12831F215FE
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 21:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD78914E2D6;
-	Sat, 21 Sep 2024 21:37:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96921154C07;
+	Sat, 21 Sep 2024 21:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q6bE5Ggw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKcNHr2o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B57257B;
-	Sat, 21 Sep 2024 21:37:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DBE282FB;
+	Sat, 21 Sep 2024 21:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726954621; cv=none; b=knNIdleRNXnYnygv6HGJzvTtgKkrwdk6ST0EMYlT1enKyi1BRIFJi7DbI/LsiRYRDqVTvPSDPdZwTuq5nLdDyxA35H0ZmzgziqSS0XQO48m/ZF/uk6pNpNgFLzMHK4biRbBtrkcrlglUzUWy0HzlZf7eYoDWToxOee80GDbFAss=
+	t=1726955724; cv=none; b=aWyoq84PkaLKHxWt4pwf9QR0XFghKvYlDZNVlivY7ML+AtTXSq6uDpuEyBSmRrBzzQHCAPDhjb+e+Tbknf3SyP3e+BAQxxKCyLBh2Jxz6voJimuZj8V/LGRShda2NYsI7dPu5/j1ltclE1q1Z+F+Vmubjoo9s72Z1zrIdSBn63I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726954621; c=relaxed/simple;
-	bh=Cz/rB1tfpIcjVKvJ0kABbjer56WE7Iki57K7hUdDn94=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c2EwScVXhbmuWhI7BUZYNEi/Qon5tyCTduRJbJ62BTFmwDJODpE+eT0JhYEcN5IAuXK9rLIC0eT03gW4UIbdTPJRgGck5BhK1ZdlZOiMtQXZscslkM78NuKC2iBzACP6MRpofFD+4ZWLDcVHS4zTkWNlckZ7DrLByMK/M6jAAAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q6bE5Ggw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BBDBC4CEC2;
-	Sat, 21 Sep 2024 21:36:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726954621;
-	bh=Cz/rB1tfpIcjVKvJ0kABbjer56WE7Iki57K7hUdDn94=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Q6bE5Ggwl5v3ct+ug5zFyt/0bzFy5s1cFkfCfT3WROGt/FJcwaBFONP2PxVDLvegm
-	 tTdQyN/Fl4adzefPlGHX0gba5NGCzEiCqty+bSAWuW7R6z45HwJGscHsrZT6Mf9+SC
-	 TtYCwozu0Bs4PcjFQnrCadbOUyz8VsXOVRvaqNlnDFrpv9LnFPmtAZ1umWrJQUpKam
-	 gVoCxKZ/1kw5CV+b4WlWlmqua60oY4mGlHTPh+iyzD/KM4f17pPzVhV1CbGJysjAVM
-	 EuaVu0ydjIVomSR3Zgj454AFffuqbqKXQwpdQ1VFQOsS4KzQ4m1qYMUqSDL2M9oZFo
-	 /Y6wFjLp+HIog==
-Message-ID: <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
-Date: Sat, 21 Sep 2024 23:36:54 +0200
+	s=arc-20240116; t=1726955724; c=relaxed/simple;
+	bh=M7rzspFpNHiw0JHMriMhB/4WhesrZv5SnNHM7+eIVaU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oXjBNqTcPOpdqpgWxsp5RwS2s+3nXjcD06XgrinKbwHZUSpGNSIb59hmiUAwOr7UNPPMYl5aV+wO/faExQoikMElG0tHP3A0nEt8DS3+DSbBvvI+eLdXEHeu/lW5uLOQahfcU71Ahm391bgShewjgh8hWY9ArWXQFlxaAj5QBrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKcNHr2o; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5365cf5de24so3964915e87.1;
+        Sat, 21 Sep 2024 14:55:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726955720; x=1727560520; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=aQnjiul16NJW8ioc7z7DKN4GAxwl3Hiyi8Nik5GXGq8=;
+        b=PKcNHr2oNP0xxAGofsqUFiJVUxSJRAhg1ak8Z5vuAXFp6SMfYnTMK16up7tK1BjgY8
+         FqtmFJyimATYp1vesuS9Lu2ve3s770rosS1HyONl7hYsXlqC9um0p9Zu/LLFbRFnNCC/
+         QIIivcFUx/gFX1PltXDWk6WXDDG1d781OhFQ3s+d0AMocs7WFhrgwF2PqW8jQgndPt7V
+         LfAMfBY+DWy8nKCqAMLhiIakLWaXXzf1icutQDfx7CLlbrKT5KygUe2gwD++ZDIz71gK
+         dF0g6S61bmmsvrnkla0Lj+Mkfl1V63Sa1VvRTwVSqWMVAhQkCwgNFqPr3/M9uja55faS
+         sayA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726955720; x=1727560520;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aQnjiul16NJW8ioc7z7DKN4GAxwl3Hiyi8Nik5GXGq8=;
+        b=L8yFTad6oMgEAd1GVQwb7JJjF0q4InKu+3BSfUhMcDFDb0NjZ1tuCCl/SLrmj+PpvZ
+         yzoAiqyFx/8RtNr5JN9eBvNId5j5tg/f4ooNwkzVftmxvwzrvcLf3t5CCl+WkLvxZaWu
+         9BUBimw7GHHmXE1Eac838bTtTF+ZXadAq2lwMVObV377SEXH/WNanLsXgBEqxxigwNHg
+         F3/tixm/ivtUEMEy57DM5p+Tp5KJbg1fVWFrvLglb0wb5q9H4FZgVFZiva0i7W+q9oWn
+         COKYV4PVDBpH5qsRcpghqF7PRs8LKeSklIGn84zybgt6oiL1D4nth/1IYtZaTsIVYVv+
+         dFQg==
+X-Forwarded-Encrypted: i=1; AJvYcCWbeYXjo2J2lZiCJJ9ahts9VGerKuJXK1BcEs/ei1SxCNgOfCtIq7Gyz8mWGMg8USlcxnOMaHAg5pe6CuA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynANl9KQJgMETs+UuqgPsh5JWKO/P6kQSysygVX8cZx4hRVN25
+	xZrrq6t1X5YPfJEH/Kb1E1JN/7y5y4sEBDx0pnO57uLJxLZP4/YcJYetxEGemxA=
+X-Google-Smtp-Source: AGHT+IEDAImrve36sPYrWHGEjLLO2d/w0swTfPqqskrj4mxtrHVyQmJ/44pO1NU15tg0YaISYjUHPw==
+X-Received: by 2002:a05:6512:3043:b0:535:6892:3be3 with SMTP id 2adb3069b0e04-536ad3d7281mr3708035e87.41.1726955720236;
+        Sat, 21 Sep 2024 14:55:20 -0700 (PDT)
+Received: from dau-work-pc.zonatelecom.ru ([185.149.163.197])
+        by smtp.googlemail.com with ESMTPSA id 2adb3069b0e04-536870467d8sm2730819e87.43.2024.09.21.14.55.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 21 Sep 2024 14:55:19 -0700 (PDT)
+From: Anton Danilov <littlesmilingcloud@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Anton Danilov <littlesmilingcloud@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Suman Ghosh <sumang@marvell.com>,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH net] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
+Date: Sun, 22 Sep 2024 00:54:11 +0300
+Message-Id: <20240921215410.638664-1-littlesmilingcloud@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
- john.fastabend@gmail.com, edumazet@google.com, pabeni@redhat.com,
- lorenzo.bianconi@redhat.com, toke@toke.dk, sdf@google.com,
- tariqt@nvidia.com, saeedm@nvidia.com, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
- mst@redhat.com, jasowang@redhat.com, mcoquelin.stm32@gmail.com,
- alexandre.torgue@foss.st.com, kernel-team <kernel-team@cloudflare.com>,
- Yan Zhai <yan@cloudflare.com>
-References: <cover.1726935917.git.lorenzo@kernel.org>
- <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Regression Description:
 
+Depending on the GRE tunnel device options, small packets are being
+dropped. This occurs because the pskb_network_may_pull function fails due
+to insufficient space in the network header. For example, if only the key
+option is specified for the tunnel device, packets of sizes up to 27
+(including the IPv4 header itself) will be dropped. This affects both
+locally originated and forwarded packets.
 
-On 21/09/2024 22.17, Alexander Lobakin wrote:
-> From: Lorenzo Bianconi <lorenzo@kernel.org>
-> Date: Sat, 21 Sep 2024 18:52:56 +0200
-> 
->> This series introduces the xdp_rx_meta struct in the xdp_buff/xdp_frame
-> 
-> &xdp_buff is on the stack.
-> &xdp_frame consumes headroom.
-> 
-> IOW they're size-sensitive and putting metadata directly there might
-> play bad; if not now, then later.
-> 
-> Our idea (me + Toke) was as follows:
-> 
-> - new BPF kfunc to build generic meta. If called, the driver builds a
->    generic meta with hash, csum etc., in the data_meta area.
+How to reproduce (for local originated packets):
 
-I do agree that it should be the XDP prog (via a new BPF kfunc) that
-decide if xdp_frame should be updated to contain a generic meta struct.
-*BUT* I think we should use the xdp_frame area, and not the
-xdp->data_meta area.
+  ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
+          local <your-ip> remote <any-ip>
 
-A details is that I think this kfunc should write data directly into
-xdp_frame area, even then we are only operating on the xdp_buff, as we
-do have access to the area xdp_frame will be created in.
+  ip link set mtu 1400 dev gre1
+  ip link set up dev gre1
+  ip address add 192.168.13.1/24 dev gre1
+  ping -s 1374 -c 10 192.168.13.2
+  tcpdump -vni gre1
+  tcpdump -vni <your-ext-iface> 'ip proto 47'
+  ip -s -s -d link show dev gre1
 
+Solution:
 
-When using data_meta area, then netstack encap/decap needs to move the
-data_meta area (extra cycles).  The xdp_frame area (live in top) don't
-have this issue.
+Use the pskb_may_pull function instead the pskb_network_may_pull.
 
-It is easier to allow xdp_frame area to survive longer together with the
-SKB. Today we "release" this xdp_frame area to be used by SKB for extra
-headroom (see xdp_scrub_frame).  I can imagine that we can move SKB
-fields to this area, and reduce the size of the SKB alloc. (This then
-becomes the mini-SKB we discussed a couple of years ago).
+Fixes: 80d875cfc9d3 ("ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmit()")
 
+Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
+---
+ net/ipv4/ip_gre.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->    Yes, this also consumes headroom, but only when the corresponding func
->    is called. Introducing new fields like you're doing will consume it
->    unconditionally;
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index 5f6fd382af38..115272ba2726 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -664,7 +664,7 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
+ 
+ 		tnl_params = (const struct iphdr *)skb->data;
+ 
+-		if (!pskb_network_may_pull(skb, pull_len))
++		if (!pskb_may_pull(skb, pull_len))
+ 			goto free_skb;
+ 
+ 		/* ip_tunnel_xmit() needs skb->data pointing to gre header. */
+-- 
+2.39.2
 
-We agree on the kfunc call marks area as consumed/in-use.  We can extend
-xdp_frame statically like Lorenzo does (with struct xdp_rx_meta), but
-xdp_frame->flags can be used for marking this area as used or not.
-
-
-> - when &xdp_frame gets converted to sk_buff, the function checks whether
->    data_meta contains a generic structure filled with hints.
-> 
-
-Agree, but take data from xdp_frame->xdp_rx_meta.
-
-When XDP returns XDP_PASS, then I also want to see this data applied to
-the SKB. In patchset[1] Yan called this xdp_frame_fixup_skb_offloading()
-and xdp_buff_fixup_skb_offloading(). (Perhaps "fixup" isn't the right
-term, "apply" is perhaps better).  Having this generic-name allow us to
-extend with newer offloads, and eventually move members out of SKB.
-
-We called it "fixup", because our use-case is that our XDP load-balancer
-(Unimog) XDP_TX bounce packets with in GRE header encap, and on the
-receiving NIC (due to encap) we lost the HW hash/csum, which we want to
-transfer from the original NIC, decap in XDP and apply the original HW
-hash/csum via this "fixup" call.
-
---Jesper
-
-[1] https://lore.kernel.org/all/cover.1718919473.git.yan@cloudflare.com/
-
-> We also thought about &skb_shared_info, but it's also size-sensitive as
-> it consumes tailroom.
-> 
->> one as a container to store the already supported xdp rx hw hints (rx_hash
->> and rx_vlan, rx_timestamp will be stored in skb_shared_info area) when the
->> eBPF program running on the nic performs XDP_REDIRECT. Doing so, we are able
->> to set the skb metadata converting the xdp_buff/xdp_frame to a skb.
-> 
-> Thanks,
-> Olek
 
