@@ -1,270 +1,480 @@
-Return-Path: <netdev+bounces-129139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE1497DC54
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 11:13:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB6E97DCD2
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 12:23:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73CC51F219FE
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 09:13:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BACC62823DA
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 10:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFD915572B;
-	Sat, 21 Sep 2024 09:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73094150997;
+	Sat, 21 Sep 2024 10:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W7SIN0Nq"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="anjPekdZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-190b.mail.infomaniak.ch (smtp-190b.mail.infomaniak.ch [185.125.25.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38F413C9C4;
-	Sat, 21 Sep 2024 09:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FD6250EC
+	for <netdev@vger.kernel.org>; Sat, 21 Sep 2024 10:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726910022; cv=none; b=Sc9o1tgiczRZTv4erkBkrQEV78lsGyyimeHRSChLXWr9ozInewulfAmxIU1KIcNRvQm8gVSjd5wIgwelXz8U9yKdRXTU4pT8msv1OU2i8getD4w+gjoUdjEB7A85c++zdpnrKsVZV5J+V9aMi4xD/UDlqvoaBb+zxWkV7V1Z4Ws=
+	t=1726914228; cv=none; b=KMAKmuzUJgIDfBGZLDjuvz+9SV0dNWgvqUlr2Yf5cXF3UTCtTY73JEveF9w7+TPQP1Spwlfe1mr537BJjf77n/DVzEbcjiqlaFRmFr4cbBHt9/JFtZeGSCFpivyped5Ulo+BwsaTr4p3bPOeIYWkO0NpBFWQ2PHoxRcQ+/1lcns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726910022; c=relaxed/simple;
-	bh=0lKnfMrh40S/BdEY1w2XE167YH6Wt7ukklJf59v95fU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=DqIyIkgNFS3aFHy/7ckwU62lViYmJQko7RNTG8WWeoRyR9rgQTDVyzyQHRgMcXYtqGRJsZgtQgKNrtEOu3HUHQJF489j2VgU7hUTJAUOXEvHpyddEi9lGWHQ5Y+rnzUfawcuVFru0bu0Dxmkqb1LzIbW53gJQOjPRuLazH9tf+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W7SIN0Nq; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6c524b4f8b9so24185106d6.3;
-        Sat, 21 Sep 2024 02:13:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726910020; x=1727514820; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iZAjg/ZpbipRoqw7eaS6np9oufeeMoV+12K+DbXxSII=;
-        b=W7SIN0NqmwyT+5x5TeiGoKcy4m8NSOO0s8iRqKTrW7oSwXS3Xh077OSVxnddYqQskA
-         yWJJaEbzIdJrPTfhocHL9ftwkpc5cF+Yl01Sye/z15GV1zsWdhvg5Jcf33bdZioLPinO
-         ObvclFmbFxMpEWzTr6Az3M9UHTgLlMYzGlgQ3uV5c169gvJpmidtJYNEYey9iHYLpvur
-         ecq2VmyxSynhm7In5p16CnGjUbOTcYvGyBxOfj5A8xdofPBem64Hmwe81eOZW1wksvxf
-         gWUFdG7psUiyk4wqV/suewNMTkRwUQ27Hc8a6FMOuPDhUSdfBVb8YgTZP2p2cAR3aPBN
-         mkAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726910020; x=1727514820;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=iZAjg/ZpbipRoqw7eaS6np9oufeeMoV+12K+DbXxSII=;
-        b=LdN+9gxFF8J1e9DszYvsZK/y7bEDctHlN9sXxYgLwam9dPDE2TzyNA6UZuJNKgJo/q
-         1uccIkP/lgrEVmWTOCn1kMNpt+NRbs+R5IeNkaJLh3UQrs4n2qsvER4bTjXTvPxMBXeT
-         y6SQKS32NsbATgRoqWe/k6/1WFTAa8vDYxDknhuorUGS2T2HV1PANkeugIcFL8HilGvD
-         WR7/zQFMW1OvUh/xWIkpBSZN+itvZt8RcXOB8yZD3jT8BreD+nnOwxKMTpUB78QKSv5l
-         mZc4u+XpAh1CjCq7OX+bcdn46dMlKQNClRgsSDq4/tafMIZP/Dlod+A+Sqg83GZ6A+g2
-         UG3g==
-X-Forwarded-Encrypted: i=1; AJvYcCURdhOhmSx0G1vnTV/6sFTPOMHDN6hy04dCljy3pnEG7FCRfcUctDH8bciqg1Qz6TxEJfzRFhUnTUOEQu2r@vger.kernel.org, AJvYcCWgm8+hVRwcxcJac3SaoA9dccFc01qmKiOJ5TzjWkG766IYw+70FsrVc/M8KIvIXDceoB9xWwMJKXOF2apWhCNf@vger.kernel.org, AJvYcCX4irzkoZq9XBzQ2HvHDT27P2tiq1uDxX6/9j17zQng05v41gPINa/VyzqzbUihdq5yNVA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsQYsHjd7D2lD38lG9PECKMtpcnRifQWGP6yyQZDJa+ZYfuGyB
-	H+Zf8YfqczkwUHz0Jdvc5nJ3ucdubYAnAA6IKC9gdkT9K5RTq02s
-X-Google-Smtp-Source: AGHT+IGFwgh51uMZmQBeufabPqToSbZ4o/zFM8A/geYfD8AsxK6q+fbUID7WnZk0hlH5aoJi1oK+Vw==
-X-Received: by 2002:a05:6214:281:b0:6c7:c034:f732 with SMTP id 6a1803df08f44-6c7c034f749mr58331746d6.21.1726910019659;
-        Sat, 21 Sep 2024 02:13:39 -0700 (PDT)
-Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6c75e4614fdsm27001446d6.37.2024.09.21.02.13.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Sep 2024 02:13:39 -0700 (PDT)
-Date: Sat, 21 Sep 2024 05:13:38 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Tiago Lam <tiagolam@cloudflare.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, 
- KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Mykola Lysenko <mykolal@fb.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- Jakub Sitnicki <jakub@cloudflare.com>, 
- Tiago Lam <tiagolam@cloudflare.com>, 
- kernel-team@cloudflare.com
-Message-ID: <66ee8e42a8744_35dcb1294a0@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240920-reverse-sk-lookup-v2-2-916a48c47d56@cloudflare.com>
-References: <20240920-reverse-sk-lookup-v2-0-916a48c47d56@cloudflare.com>
- <20240920-reverse-sk-lookup-v2-2-916a48c47d56@cloudflare.com>
-Subject: Re: [RFC PATCH v2 2/3] ipv6: Support setting src port in sendmsg().
+	s=arc-20240116; t=1726914228; c=relaxed/simple;
+	bh=VvG/JRhYD+YgwYNiBZbB03QIasBYS3NIaLOyfWg3Yr8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=llIZSqkDOq6Mxer+tQ5EAmNmyQnyZbImgwy0YSpr9BM24urIt7dAeSdRn8YXBsfr6zf3xC/P/GKRd/uHApTOOYwZ18kc5h6+fccQ+Du+haDXVinNRdp4f7FJSSPfz3wy5s2FvLqcVcS8NdIMpoKVW3SBSw/x+OBl7du00fEFDQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=anjPekdZ; arc=none smtp.client-ip=185.125.25.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
+	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4X9lhm3PK8zld2;
+	Sat, 21 Sep 2024 12:23:36 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
+	s=20191114; t=1726914216;
+	bh=YwcGMU98XB5r3e3xk8Pb31K7iMPEMOYw4NZzCKRMdrE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=anjPekdZsMQ78Xcf8WkBjOTrA63uZKWDiAx8Pl0ldNY/xBwuJ5fs7d9ruxvdUXvQi
+	 u1z4/4fQCINYqFiAkevZtlr6ylt/anwzCeKmDXbcc5m1+oV6O3WEe4zg8V9F2rsAmR
+	 mt+3YiM5fLiViTkmhcZtVy63awKzB06GsptgHmTs=
+Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4X9lhk2lqsz8Q1;
+	Sat, 21 Sep 2024 12:23:34 +0200 (CEST)
+Date: Sat, 21 Sep 2024 12:23:22 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Matthieu Buffet <matthieu@buffet.re>
+Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, 
+	"Serge E . Hallyn" <serge@hallyn.com>, linux-security-module@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Konstantin Meskhidze <konstantin.meskhidze@huawei.com>, Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
+Subject: Re: [RFC PATCH v1 4/7] landlock: Add UDP send+recv access control
+Message-ID: <20240921.ohCheQuoh1eu@digikod.net>
+References: <20240916122230.114800-1-matthieu@buffet.re>
+ <20240916122230.114800-5-matthieu@buffet.re>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240916122230.114800-5-matthieu@buffet.re>
+X-Infomaniak-Routing: alpha
 
-Tiago Lam wrote:
-> This follows the same rationale provided for the ipv4 counterpart, where
-> the sendmsg() path is also extended here to support the IPV6_ORIGDSTADDR
-> ancillary message to be able to specify a source address/port. This
-> allows users to configure the source address and/or port egress traffic
-> should be sent from.
+On Mon, Sep 16, 2024 at 02:22:27PM +0200, Matthieu Buffet wrote:
+> Add support for two UDP access rights, complementing the two previous
+> LANDLOCK_ACCESS_NET_CONNECT_UDP and LANDLOCK_ACCESS_NET_BIND_UDP:
 > 
-> To limit its usage, a reverse socket lookup is performed to check if the
-> configured egress source address and/or port have any ingress sk_lookup
-> match. If it does, traffic is allowed to proceed, otherwise it falls
-> back to the regular egress path.
+> - LANDLOCK_ACCESS_NET_RECVMSG_UDP: to prevent a process from receiving
+
+I'm wondering what would make the most sense between NET_RECVMSG_UDP and
+NET_RECVFROM_UDP.  Is one more known or understood than the other?  Same
+for sendmsg vs. sendto.
+
+>   datagrams. Just removing LANDLOCK_ACCESS_NET_BIND_UDP is not enough:
+>   it can just send a first datagram or call connect() and get an
+>   ephemeral port assigned, without ever calling bind(). This access right
+>   allows blocking a process from receiving UDP datagrams, without
+>   preventing them to bind() (which may be required to set source ports);
 > 
-> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
-> Signed-off-by: Tiago Lam <tiagolam@cloudflare.com>
+> - LANDLOCK_ACCESS_NET_SENDMSG_UDP: to prevent a process from sending
+>   datagrams. Just removing LANDLOCK_ACCESS_NET_CONNECT_UDP is not enough:
+>   the process can call sendmsg() with an unconnected socket and an
+>   arbitrary destination address.
+> 
+> Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
 > ---
->  net/ipv6/datagram.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  net/ipv6/udp.c      |  8 ++++--
->  2 files changed, 85 insertions(+), 2 deletions(-)
+>  include/uapi/linux/landlock.h |  18 ++-
+>  security/landlock/limits.h    |   2 +-
+>  security/landlock/net.c       | 205 +++++++++++++++++++++++++++++-----
+>  3 files changed, 193 insertions(+), 32 deletions(-)
 > 
-> diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
-> index fff78496803d..369c64a478ec 100644
-> --- a/net/ipv6/datagram.c
-> +++ b/net/ipv6/datagram.c
-> @@ -756,6 +756,29 @@ void ip6_datagram_recv_ctl(struct sock *sk, struct msghdr *msg,
->  }
->  EXPORT_SYMBOL_GPL(ip6_datagram_recv_ctl);
+> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+> index 7f9aa1cd2912..7ea3d1adb8c3 100644
+> --- a/include/uapi/linux/landlock.h
+> +++ b/include/uapi/linux/landlock.h
+> @@ -287,15 +287,25 @@ struct landlock_net_port_attr {
+>   *   receive datagrams from (if you create a client-specific socket for a
+>   *   client-specific process, e.g. using the established-over-unconnected
+>   *   method)
+> - *
+> - * Note that ``bind(0)`` means binding to an ephemeral kernel-assigned port,
+> - * in the range configured in ``/proc/sys/net/ipv4/ip_local_port_range``
+> - * globally (or on a per-socket basis with ``setsockopt(IP_LOCAL_PORT_RANGE)``).
+> + * - %LANDLOCK_ACCESS_NET_RECVMSG_UDP: receive datagrams on the given local port
+> + *   (this is a distinct right from %LANDLOCK_ACCESS_NET_BIND_UDP, because you
+> + *   may want to allow a process to set its datagrams source port using bind()
+> + *   but not be able to receive datagrams)
+> + * - %LANDLOCK_ACCESS_NET_SENDMSG_UDP: send datagrams to the given remote port
+> + *   (this is a distinct right from %LANDLOCK_ACCESS_NET_CONNECT_UDP, because
+> + *   you may want to allow a process to set which client it wants to receive
+> + *   datagrams from using connect(), and not be able to send datagrams)
+> + *
+> + * Note that ``bind(0)`` has special semantics, meaning bind on any port in the
+> + * range configured in ``/proc/sys/net/ipv4/ip_local_port_range`` globally (or
+> + * on a per-socket basis with ``setsockopt(IP_LOCAL_PORT_RANGE)``).
+>   */
+>  /* clang-format off */
+>  #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
+>  #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
+>  #define LANDLOCK_ACCESS_NET_BIND_UDP			(1ULL << 2)
+>  #define LANDLOCK_ACCESS_NET_CONNECT_UDP			(1ULL << 3)
+> +#define LANDLOCK_ACCESS_NET_RECVMSG_UDP			(1ULL << 4)
+> +#define LANDLOCK_ACCESS_NET_SENDMSG_UDP			(1ULL << 5)
+>  /* clang-format on */
+>  #endif /* _UAPI_LINUX_LANDLOCK_H */
+> diff --git a/security/landlock/limits.h b/security/landlock/limits.h
+> index 182b6a8d2976..e2697348310c 100644
+> --- a/security/landlock/limits.h
+> +++ b/security/landlock/limits.h
+> @@ -22,7 +22,7 @@
+>  #define LANDLOCK_MASK_ACCESS_FS		((LANDLOCK_LAST_ACCESS_FS << 1) - 1)
+>  #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
 >  
-> +static inline bool reverse_sk_lookup(struct flowi6 *fl6, struct sock *sk,
-> +				     struct in6_addr *saddr, __be16 sport)
+> -#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_UDP
+> +#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_SENDMSG_UDP
+>  #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
+>  #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
+>  
+> diff --git a/security/landlock/net.c b/security/landlock/net.c
+> index becc62c02cc9..9a3c44ad3f26 100644
+> --- a/security/landlock/net.c
+> +++ b/security/landlock/net.c
+> @@ -10,6 +10,8 @@
+>  #include <linux/net.h>
+>  #include <linux/socket.h>
+>  #include <net/ipv6.h>
+> +#include <net/transp_v6.h>
+> +#include <net/ip.h>
+>  
+>  #include "common.h"
+>  #include "cred.h"
+> @@ -61,6 +63,45 @@ static const struct landlock_ruleset *get_current_net_domain(void)
+>  	return dom;
+>  }
+>  
+> +static int get_addr_port(const struct sockaddr *address, int addrlen,
+> +			 bool in_udpv6_sendmsg_ctx, __be16 *port)
 > +{
-> +	if (static_branch_unlikely(&bpf_sk_lookup_enabled) &&
-> +	    (saddr && sport) &&
-> +	    (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr, saddr) ||
-> +	    inet_sk(sk)->inet_sport != sport)) {
-> +		struct sock *sk_egress;
+> +	/* Checks for minimal header length to safely read sa_family. */
+> +	if (addrlen < offsetofend(typeof(*address), sa_family))
+> +		return -EINVAL;
 > +
-> +		bpf_sk_lookup_run_v6(sock_net(sk), IPPROTO_UDP, &fl6->daddr,
-> +				     fl6->fl6_dport, saddr, ntohs(sport), 0,
-> +				     &sk_egress);
-> +		if (!IS_ERR_OR_NULL(sk_egress) && sk_egress == sk)
-> +			return true;
-> +
-> +		net_info_ratelimited("No reverse socket lookup match for local addr %pI6:%d remote addr %pI6:%d\n",
-> +				     &saddr, ntohs(sport), &fl6->daddr,
-> +				     ntohs(fl6->fl6_dport));
+> +	switch (address->sa_family) {
+> +	case AF_UNSPEC:
+
+Please create a simple patch refactoring this code, but without any
+semantic change, and then include the UDP specific part in the patch
+adding support for UDP control.  This helps verify (and test) what is
+the code refactoring and what is the actual change, and it could also
+help for backports.  Moving this code to a standalone helper should then
+be the first patch of this series.
+
+> +		/*
+> +		 * Backward compatibility games: AF_UNSPEC is mapped to AF_INET
+> +		 * by `bind` (v4+v6), `connect` (v4) and `sendmsg` (v4), but
+
+Instead of backticks, just name these syscalls as functions: bind(),
+connect()...
+
+> +		 * interpreted as "no address" by `sendmsg` (v6). In that case
+> +		 * this call must succeed (even if `address` is shorter than a
+> +		 * `struct sockaddr_in`), and caller must check for this
+> +		 * condition.
+
+Weird dance, but good catch.
+
+> +		 */
+> +		if (in_udpv6_sendmsg_ctx) {
+> +			*port = 0;
+
+Why set the port to zero?  In udp_sendmsg(), it looks like such a port
+would return -EINVAL right?
+
+And in this case, why ignoring the following addrlen check?
+
+Couldn't we just remove this in_udpv6_sendmsg_ctx argument, extract the
+port as long as we can, and only deal with the in_udpv6_sendmsg case in
+hook_socket_sendmsg()
+
+> +			return 0;
+> +		}
+> +		fallthrough;
+> +	case AF_INET:
+> +		if (addrlen < sizeof(struct sockaddr_in))
+> +			return -EINVAL;
+> +		*port = ((struct sockaddr_in *)address)->sin_port;
+> +		return 0;
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +	case AF_INET6:
+> +		if (addrlen < SIN6_LEN_RFC2133)
+> +			return -EINVAL;
+> +		*port = ((struct sockaddr_in6 *)address)->sin6_port;
+> +		return 0;
+> +#endif /* IS_ENABLED(CONFIG_IPV6) */
 > +	}
 > +
-> +	return false;
+> +	return -EAFNOSUPPORT;
 > +}
 > +
->  int ip6_datagram_send_ctl(struct net *net, struct sock *sk,
->  			  struct msghdr *msg, struct flowi6 *fl6,
->  			  struct ipcm6_cookie *ipc6)
-> @@ -844,7 +867,63 @@ int ip6_datagram_send_ctl(struct net *net, struct sock *sk,
+>  static int current_check_access_socket(struct socket *const sock,
+>  				       struct sockaddr *const address,
+>  				       const int addrlen,
+> @@ -73,39 +114,18 @@ static int current_check_access_socket(struct socket *const sock,
+>  		.type = LANDLOCK_KEY_NET_PORT,
+>  	};
+>  	const struct landlock_ruleset *const dom = get_current_net_domain();
+> +	int err;
 >  
->  			break;
->  		    }
-> +		case IPV6_ORIGDSTADDR:
-> +			{
-> +			struct sockaddr_in6 *sockaddr_in;
-> +			struct net_device *dev = NULL;
-> +
-> +			if (cmsg->cmsg_len < CMSG_LEN(sizeof(struct sockaddr_in6))) {
-> +				err = -EINVAL;
-> +				goto exit_f;
-> +			}
-> +
-> +			sockaddr_in = (struct sockaddr_in6 *)CMSG_DATA(cmsg);
-> +
-> +			addr_type = __ipv6_addr_type(&sockaddr_in->sin6_addr);
-> +
-> +			if (addr_type & IPV6_ADDR_LINKLOCAL)
-> +				return -EINVAL;
-> +
-> +			/* If we're egressing with a different source address
-> +			 * and/or port, we perform a reverse socket lookup. The
-> +			 * rationale behind this is that we can allow return
-> +			 * UDP traffic that has ingressed through sk_lookup to
-> +			 * also egress correctly. In case the reverse lookup
-> +			 * fails, we continue with the normal path.
-> +			 *
-> +			 * The lookup is performed if either source address
-> +			 * and/or port changed, and neither is "0".
-> +			 */
-> +			if (reverse_sk_lookup(fl6, sk, &sockaddr_in->sin6_addr,
-> +					      sockaddr_in->sin6_port)) {
-> +				/* Override the source port and address to use
-> +				 * with the one we got in cmsg and bail early.
-> +				 */
-> +				fl6->saddr = sockaddr_in->sin6_addr;
-> +				fl6->fl6_sport = sockaddr_in->sin6_port;
-> +				break;
-> +			}
+>  	if (!dom)
+>  		return 0;
+>  	if (WARN_ON_ONCE(dom->num_layers < 1))
+>  		return -EACCES;
 >  
-> +			if (addr_type != IPV6_ADDR_ANY) {
-> +				int strict = __ipv6_addr_src_scope(addr_type) <= IPV6_ADDR_SCOPE_LINKLOCAL;
-> +
-> +				if (!ipv6_can_nonlocal_bind(net, inet_sk(sk)) &&
-> +				    !ipv6_chk_addr_and_flags(net,
-> +							     &sockaddr_in->sin6_addr,
-> +							     dev, !strict, 0,
-> +							     IFA_F_TENTATIVE) &&
-> +				    !ipv6_chk_acast_addr_src(net, dev,
-> +							     &sockaddr_in->sin6_addr))
-> +					err = -EINVAL;
-> +				else
-> +					fl6->saddr = sockaddr_in->sin6_addr;
-> +			}
-> +
-> +			if (err)
-> +				goto exit_f;
-> +
-> +			break;
-> +			}
+> -	/* Checks if it's a (potential) UDP or TCP socket. */
+> -	if (sock->type != SOCK_STREAM && sock->type != SOCK_DGRAM)
+> -		return 0;
+> -
+> -	/* Checks for minimal header length to safely read sa_family. */
+> -	if (addrlen < offsetofend(typeof(*address), sa_family))
+> -		return -EINVAL;
+> -
+> -	switch (address->sa_family) {
+> -	case AF_UNSPEC:
+> -	case AF_INET:
+> -		if (addrlen < sizeof(struct sockaddr_in))
+> -			return -EINVAL;
+> -		port = ((struct sockaddr_in *)address)->sin_port;
+> -		break;
+> -
+> -#if IS_ENABLED(CONFIG_IPV6)
+> -	case AF_INET6:
+> -		if (addrlen < SIN6_LEN_RFC2133)
+> -			return -EINVAL;
+> -		port = ((struct sockaddr_in6 *)address)->sin6_port;
+> -		break;
+> -#endif /* IS_ENABLED(CONFIG_IPV6) */
+> -
+> -	default:
+> -		return 0;
+> -	}
+> +	err = get_addr_port(address, addrlen, false, &port);
+> +	if (err == -EAFNOSUPPORT)
+> +		return 0; // restrictions are not applicable to this socket family
 
-How come IPv6 runs the check in the cmsg handler, but ipv4 in sendmsg
-directly? Can the two be symmetric?
+Comments need to be /* Like this and before the commented code. */
+See https://docs.kernel.org/process/maintainer-tip.html#comment-style
 
->  		case IPV6_FLOWINFO:
->  			if (cmsg->cmsg_len < CMSG_LEN(4)) {
->  				err = -EINVAL;
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 6602a2e9cdb5..6121cbb71ad3 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -1476,6 +1476,12 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+> +	else if (err != 0)
+> +		return err;
 >  
->  	fl6->flowi6_uid = sk->sk_uid;
+>  	/* Specific AF_UNSPEC handling. */
+>  	if (address->sa_family == AF_UNSPEC) {
+> @@ -174,6 +194,27 @@ static int current_check_access_socket(struct socket *const sock,
+>  	return -EACCES;
+>  }
 >  
-> +	/* We use fl6's daddr and fl6_sport in the reverse sk_lookup done
-> +	 * within ip6_datagram_send_ctl() now.
+> +static int check_access_port(const struct landlock_ruleset *const dom,
+> +			     access_mask_t access_request, __be16 port)
+> +{
+> +	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_NET] = {};
+> +	const struct landlock_rule *rule;
+> +	const struct landlock_id id = {
+> +		.key.data = (__force uintptr_t)port,
+> +		.type = LANDLOCK_KEY_NET_PORT,
+> +	};
+> +	BUILD_BUG_ON(sizeof(port) > sizeof(id.key.data));
+> +
+> +	rule = landlock_find_rule(dom, id);
+> +	access_request = landlock_init_layer_masks(
+> +		dom, access_request, &layer_masks, LANDLOCK_KEY_NET_PORT);
+> +	if (landlock_unmask_layers(rule, access_request, &layer_masks,
+> +				   ARRAY_SIZE(layer_masks)))
+> +		return 0;
+> +
+> +	return -EACCES;
+> +}
+> +
+>  static int hook_socket_bind(struct socket *const sock,
+>  			    struct sockaddr *const address, const int addrlen)
+>  {
+> @@ -215,9 +256,119 @@ static int hook_socket_connect(struct socket *const sock,
+>  					   access_request);
+>  }
+>  
+> +static int hook_socket_sendmsg(struct socket *const sock,
+> +			       struct msghdr *const msg, const int size)
+
+We can probably constify these references.
+
+> +{
+> +	const struct landlock_ruleset *const dom = get_current_net_domain();
+> +	const struct sockaddr *address = (const struct sockaddr *)msg->msg_name;
+> +	int err;
+> +	__be16 port;
+> +
+> +	if (sock->type != SOCK_DGRAM)
+> +		return 0;
+> +	if (sock->sk->sk_protocol != IPPROTO_UDP)
+> +		return 0;
+> +	if (!dom)
+> +		return 0;
+
+I'd prefer this !dom check to be the first (like for most other hooks)
+because it makes it clear that Landlock doesn't mess with not sandboxed
+tasks.  Moreover in this case it would avoid two pointer dereferences.
+
+> +	if (WARN_ON_ONCE(dom->num_layers < 1))
+> +		return -EACCES;
+
+This num_layers check can stay just after to the dom check though.
+
+> +
+> +	/*
+> +	 * Don't mimic all checks udp_sendmsg() and udpv6_sendmsg() do. Just
+> +	 * read what we need for access control, and fail if we can't (e.g.
+> +	 * because the input buffer is too short) with the same error codes as
+> +	 * they do. Selftests enforce that these error codes do not diverge
+> +	 * with the actual implementation's ones.
 > +	 */
-> +	fl6->daddr = *daddr;
-> +	fl6->fl6_sport = inet->inet_sport;
 > +
->  	if (msg->msg_controllen) {
->  		opt = &opt_space;
->  		memset(opt, 0, sizeof(struct ipv6_txoptions));
-> @@ -1511,10 +1517,8 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+> +	/*
+> +	 * If there is a more specific address in the message, it will take
+> +	 * precedence over any connect()ed address. Base our access check on it.
+> +	 */
+> +	if (address) {
+> +		const bool in_udpv6_sendmsg =
+> +			(sock->sk->sk_prot == &udpv6_prot);
+> +
+> +		err = get_addr_port(address, msg->msg_namelen, in_udpv6_sendmsg,
+> +				    &port);
+> +		if (err != 0)
+> +			return err;
+> +
+> +		/*
+> +		 * In `udpv6_sendmsg`, AF_UNSPEC is interpreted as "no address".
+> +		 * In that case, the call above will succeed but without
+> +		 * returning a port.
+> +		 */
+> +		if (in_udpv6_sendmsg && address->sa_family == AF_UNSPEC)
+> +			address = NULL;
+> +	}
+> +
+> +	/*
+> +	 * Without a message-specific destination address, the socket must be
+> +	 * connect()ed to an address, base our access check on that one.
+> +	 */
+> +	if (!address) {
+
+If the address is not specified, I think we should just allow the
+request and let the network stack handle the rest.  The advantage of
+this approach would be that if the socket was previously allowed to be
+connected, the check is only done once and they will be almost no
+performance impact when calling sendto/write/recvfrom/read on this
+"connected" socket.
+
+> +		/*
+> +		 * We could let this through and count on `udp_sendmsg` and
+> +		 * `udpv6_sendmsg` to error out, but they could change in the
+> +		 * future and open a hole here without knowing. Enforce an
+> +		 * error, and enforce in selftests that we don't diverge in
+> +		 * behaviours compared to them.
+
+This is a good approach for this patch, but if we allow connected
+sockets to be freely used when the address is not specified, this check
+should not be required because we would allow such action anyway and the
+network stack would handle the other error cases.
+
+> +		 */
+> +		if (sock->sk->sk_state != TCP_ESTABLISHED)
+> +			return -EDESTADDRREQ;
+> +
+> +		port = inet_sk(sock->sk)->inet_dport;
+> +	}
+> +
+> +	return check_access_port(dom, LANDLOCK_ACCESS_NET_SENDMSG_UDP, port);
+
+
+What about something like this (with the appropriate comments)?
+
+if (!address)
+	return 0;
+
+if (address->sa_family == AF_UNSPEC && sock->sk->sk_prot == &udpv6_prot)
+	return 0;
+
+err = get_addr_port(address, msg->msg_namelen, &port);
+if (err)
+	return err;
+
+return check_access_port(dom, LANDLOCK_ACCESS_NET_SENDMSG_UDP, port);
+
+> +}
+> +
+> +static int hook_socket_recvmsg(struct socket *const sock,
+> +			       struct msghdr *const msg, const int size,
+> +			       const int flags)
+> +{
+> +	const struct landlock_ruleset *const dom = get_current_net_domain();
+> +	struct sock *sk = sock->sk;
+> +	int err;
+> +	__be16 port_bigendian;
+> +	int ephemeral_low;
+> +	int ephemeral_high;
+> +	__u16 port_hostendian;
+> +
+> +	if (sk->sk_protocol != IPPROTO_UDP)
+> +		return 0;
+
+ditto
+
+> +	if (!dom)
+> +		return 0;
+> +	if (WARN_ON_ONCE(dom->num_layers < 1))
+> +		return -EACCES;
+> +
+> +	/* "fast" path: socket is bound to an explicitly allowed port */
+> +	port_bigendian = inet_sk(sk)->inet_sport;
+> +	err = check_access_port(dom, LANDLOCK_ACCESS_NET_RECVMSG_UDP,
+> +				port_bigendian);
+> +	if (err != -EACCES)
+> +		return err;
+
+We should be able to follow the same policy for "connected" sockets.
+
+> +
+> +	/*
+> +	 * Slow path: socket is bound to an ephemeral port. Need a second check
+> +	 * on port 0 with different semantics ("any ephemeral port").
+> +	 */
+> +	inet_sk_get_local_port_range(sk, &ephemeral_low, &ephemeral_high);
+
+Is it to handle recvmsg(with port 0)?
+
+> +	port_hostendian = ntohs(port_bigendian);
+> +	if (ephemeral_low <= port_hostendian &&
+> +	    port_hostendian <= ephemeral_high)
+> +		return check_access_port(dom, LANDLOCK_ACCESS_NET_RECVMSG_UDP,
+> +					 0);
+> +
+> +	return -EACCES;
+> +}
+> +
+>  static struct security_hook_list landlock_hooks[] __ro_after_init = {
+>  	LSM_HOOK_INIT(socket_bind, hook_socket_bind),
+>  	LSM_HOOK_INIT(socket_connect, hook_socket_connect),
+> +	LSM_HOOK_INIT(socket_sendmsg, hook_socket_sendmsg),
+> +	LSM_HOOK_INIT(socket_recvmsg, hook_socket_recvmsg),
+>  };
 >  
->  	fl6->flowi6_proto = sk->sk_protocol;
->  	fl6->flowi6_mark = ipc6.sockc.mark;
-> -	fl6->daddr = *daddr;
->  	if (ipv6_addr_any(&fl6->saddr) && !ipv6_addr_any(&np->saddr))
->  		fl6->saddr = np->saddr;
-> -	fl6->fl6_sport = inet->inet_sport;
->  
->  	if (cgroup_bpf_enabled(CGROUP_UDP6_SENDMSG) && !connected) {
->  		err = BPF_CGROUP_RUN_PROG_UDP6_SENDMSG_LOCK(sk,
-> 
+>  __init void landlock_add_net_hooks(void)
 > -- 
-> 2.34.1
+> 2.39.5
 > 
-
-
+> 
 
