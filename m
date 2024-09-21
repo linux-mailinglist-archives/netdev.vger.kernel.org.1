@@ -1,90 +1,91 @@
-Return-Path: <netdev+bounces-129131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA95C97DAC6
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 01:23:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80A4A97DB75
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 04:29:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C4392838ED
-	for <lists+netdev@lfdr.de>; Fri, 20 Sep 2024 23:23:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96FC71C21411
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 02:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBD93187331;
-	Fri, 20 Sep 2024 23:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC566FBF;
+	Sat, 21 Sep 2024 02:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="VTGVcK6/"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pFjd9xMe"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C9D61531E1;
-	Fri, 20 Sep 2024 23:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF74179A3
+	for <netdev@vger.kernel.org>; Sat, 21 Sep 2024 02:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726874577; cv=none; b=XQpaEPY+ntGzDLiAkLR1GLzY6QtHgomnc2khkq7exa35pCEjRQz7H4tMW+D1ALZLo/Hco/ABPK5gydpmeXDB6F/wGnRaT3WwddXPiLmsEuT5o8O194VXmArKHEGBIz5VSKth+FlhbBh8FsjCrNqLrmhkzeaE3tJC09IRf77lo5Y=
+	t=1726885749; cv=none; b=Tw6FpYChIKxYuF8CAqZUygAOdhs+JZv5FoZqz3BS9yj0UytiooG4F0QVjGzGdbYS7du+9lvm93sUyzJtYAlMG+nDKG2FnuEx30h6qzdeiJ9mAe4MGTrl0ULAhdTuBysA2SGXtMN2qBf2bdhuRogmd6OPn874h0BhdO/C6g/zMLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726874577; c=relaxed/simple;
-	bh=M8wjtrpNrvCnP385XjaEF5STK8Qo/y9Z5rIxlYHEl54=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ocyiS94dTWU4yRlO2z8Nz0xR6TZAecz8Rxu3Q9FG2M4Et8N+ajRelaiYcT2ABqtuOzp2Me9f5T7bQvcQW3l9+YoNfBsaipTenlcQQLQbpbjthrUwen2z3CWWJazq9SDO9KJEDD1KhVoIN2ZsLBSd/IWPitDZrtQCl7rX1F+Isd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=VTGVcK6/; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5+TVLbYfVRT8NLkF05JjoAdiCr5BuJ0yliYxVMsjdUQ=; b=VTGVcK6/s809xWxyOplbott3br
-	YdF47TjYOJiA+bTOilXXRNsgZaiYYl6KYDu24oe66F1SZUWbU0N0lWtNNLFhIjKF0DT+JmQZ4NGmJ
-	mUy98QdEh54+cVK2vmGPlyRp0MEhVwxt5PH6M6J25BWUnGbNJBIK1BVYkwum8jLa+05c=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1srmxY-007xhe-VT; Sat, 21 Sep 2024 01:22:44 +0200
-Date: Sat, 21 Sep 2024 01:22:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Frank Sae <Frank.Sae@motor-comm.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	xiaogang.fan@motor-comm.com, fei.zhang@motor-comm.com,
-	hua.sun@motor-comm.com
-Subject: Re: [RFC] net:yt6801: Add Motorcomm yt6801 PCIe driver
-Message-ID: <8dad36e2-88c0-4c10-a629-be032353fac2@lunn.ch>
-References: <20240913124113.9174-1-Frank.Sae@motor-comm.com>
- <20240920230534.GA1071655@bhelgaas>
+	s=arc-20240116; t=1726885749; c=relaxed/simple;
+	bh=Q+9ubO9p6FjOwXPy94zOE+C1TH3tXKwjSOieBL6q5d0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ip1T5ZFzCQkIC2o3pC76EPlnSDj9MEYHd8m9TI8E93uS6gN2rOtAcfz+MVq2VdOxUzaMl1ToWA/okIB9OmYxG5pLI7a91huWLZeK+y4NqMghP5Utt2Lf7ubd62DW+d+qTGUrk0/5IWjcPIuns+E/oTI/gPmpMLffYG0IfynUCMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pFjd9xMe; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <525e9a31-31ee-4acf-a25c-8bf3a617283f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1726885745;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JCscfEp+Ym80CC3dMZxCPMQuoLupJ/Y+JmyiHw8Mmfc=;
+	b=pFjd9xMejfPGUiSPhej4ygvK6DHI8WPs35hiuMloySd7XfpzfajQ/DuYhuCSPhCqICam4K
+	jy7xzDksghJnNR4DgyUNZY3/9K99LBzpP57mDq9u8EkD+dhUsrwNzR/pfYpp6o/NAn/4wO
+	6nPWjXq9X60wQzoyVHPgUKC4zX2mFwY=
+Date: Sat, 21 Sep 2024 10:28:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240920230534.GA1071655@bhelgaas>
+Subject: Re: [MAINLINE 0/2] Enable DIM for legacy ULPs and use it in RDS
+To: Christoph Hellwig <hch@infradead.org>,
+ Haakon Bugge <haakon.bugge@oracle.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ Allison Henderson <allison.henderson@oracle.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ OFED mailing list <linux-rdma@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>
+References: <20240918083552.77531-1-haakon.bugge@oracle.com>
+ <Zuwyf0N_6E6Alx-H@infradead.org>
+ <C00EA178-ED20-4D56-B6F2-200AC72F3A39@oracle.com>
+ <Zu191hsvJmvBlJ4J@infradead.org>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <Zu191hsvJmvBlJ4J@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-> > +static int fxgmac_change_mtu(struct net_device *netdev, int mtu)
-> > +{
-> > +	struct fxgmac_pdata *pdata = netdev_priv(netdev);
-> > +	int old_mtu = netdev->mtu;
-> > +	int ret, max_mtu;
-> > +
-> > +	max_mtu = FXGMAC_JUMBO_PACKET_MTU - ETH_HLEN;
-> > +	if (mtu > max_mtu) {
-> > +		yt_err(pdata, "MTU exceeds maximum supported value\n");
+在 2024/9/20 21:51, Christoph Hellwig 写道:
+> On Fri, Sep 20, 2024 at 09:46:06AM +0000, Haakon Bugge wrote:
+>>> I would much prefer if you could move RDS off that horrible API finally
+>>> instead of investing more effort into it and making it more complicated.
+>>
+>> ib_alloc_cq() and family does not support arming the CQ with the IB_CQ_SOLICITED flag, which RDS uses.
 > 
-> Always nice to include the offending value (mtu) instead of just a
-> constant string with no real information other than "we were here".
+> Then work on supporting it.  RDS and SMC are the only users, so one
 
-This is actually pointless, the core will do this check and never
-actually call this function if the MTU is out of range.
+Some other open source projects are also the users.
 
-FYI: Networking people have not taken any sort of serious look at the
-code, it needs breaking up into smaller patches.
+Zhu Yanjun
 
-Feel free to review PCI parts, but i suggest you ignore networking
-for the moment.
+> of the maintainers needs to drive it.
+> 
 
-	Andrew
 
