@@ -1,146 +1,156 @@
-Return-Path: <netdev+bounces-129155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3749797DEDC
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 22:48:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3CEA97DF19
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 23:37:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 042AE28132D
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 20:48:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4F611C209C2
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 21:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D63B126BF6;
-	Sat, 21 Sep 2024 20:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD78914E2D6;
+	Sat, 21 Sep 2024 21:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hKg+nXU1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q6bE5Ggw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C7963B9;
-	Sat, 21 Sep 2024 20:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B57257B;
+	Sat, 21 Sep 2024 21:37:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726951672; cv=none; b=ALvg/0ER+gVokWnq42VYW95imXBU5ONyfSN26u2cfnBr7c/ni2tKlGXMrkR3owQB/N7QZETqu71ws6BZJPTnssKIXdeUd6P4r6pFSoBSULiVYuWUoMTJVHTlMXTr8keAiTge6+9ckB0MfhoTPNJLgeUEMS02CmjdTl4NYoKjEXQ=
+	t=1726954621; cv=none; b=knNIdleRNXnYnygv6HGJzvTtgKkrwdk6ST0EMYlT1enKyi1BRIFJi7DbI/LsiRYRDqVTvPSDPdZwTuq5nLdDyxA35H0ZmzgziqSS0XQO48m/ZF/uk6pNpNgFLzMHK4biRbBtrkcrlglUzUWy0HzlZf7eYoDWToxOee80GDbFAss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726951672; c=relaxed/simple;
-	bh=rH7Dd3F/dN69MjOyihHAnz5rb6ZghANW3/Yr+QCK5vc=;
-	h=Message-ID:Content-Type:MIME-Version:In-Reply-To:References:
-	 Subject:From:Cc:To:Date; b=YqzpRQeoUUzQQmlbFzEKSvSaXJ2jYCI0+sya/ESKeZ1QINjmjXk5f+/4MHdiDaxiQcjajn7A8sJOl+Nm4Luwp/ftu8A/YdjLY2kW9yp5jC6W8tLZ7pH/3n2pTg5fEkJPwRlyatFhfcBGx09RN77mP7E0rDEcUBEWtMb7AwdHTvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hKg+nXU1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50464C4CEC2;
-	Sat, 21 Sep 2024 20:47:51 +0000 (UTC)
+	s=arc-20240116; t=1726954621; c=relaxed/simple;
+	bh=Cz/rB1tfpIcjVKvJ0kABbjer56WE7Iki57K7hUdDn94=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c2EwScVXhbmuWhI7BUZYNEi/Qon5tyCTduRJbJ62BTFmwDJODpE+eT0JhYEcN5IAuXK9rLIC0eT03gW4UIbdTPJRgGck5BhK1ZdlZOiMtQXZscslkM78NuKC2iBzACP6MRpofFD+4ZWLDcVHS4zTkWNlckZ7DrLByMK/M6jAAAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q6bE5Ggw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6BBDBC4CEC2;
+	Sat, 21 Sep 2024 21:36:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726951671;
-	bh=rH7Dd3F/dN69MjOyihHAnz5rb6ZghANW3/Yr+QCK5vc=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=hKg+nXU1aYxGePNWhTIE8dsBsIfsAqTtDNnuthtmAZE5rUruPkUtzAK/P7Y3jQpuQ
-	 0iGCWRteM1b38mWRKlI34PpfmUlGmdTSd7QlDzcgjq9JZdFvvxOEAd+jdR3dMVBd1P
-	 wPl8X5jzLfN06q+FcQjH+qv7C0dZeZ2AYlhyqfqbbCZ/vFNhnoMFNHYPfpfWiqUdgs
-	 UFkeDAV5K358rvaQRFHISVEuA2fvulH7az9mxmh854UFfTCXoQnDa6qvW6Z0lwSB6M
-	 IxSoNEPk488RziMwMnaB5dfkgmKSPJiJRz4qg76SVbMLimGtlmNT27GradvHf7Da9k
-	 S857xSA9cfrFg==
-Message-ID: <d87530b846d0dc9e78789234cfcb602a.sboyd@kernel.org>
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1726954621;
+	bh=Cz/rB1tfpIcjVKvJ0kABbjer56WE7Iki57K7hUdDn94=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Q6bE5Ggwl5v3ct+ug5zFyt/0bzFy5s1cFkfCfT3WROGt/FJcwaBFONP2PxVDLvegm
+	 tTdQyN/Fl4adzefPlGHX0gba5NGCzEiCqty+bSAWuW7R6z45HwJGscHsrZT6Mf9+SC
+	 TtYCwozu0Bs4PcjFQnrCadbOUyz8VsXOVRvaqNlnDFrpv9LnFPmtAZ1umWrJQUpKam
+	 gVoCxKZ/1kw5CV+b4WlWlmqua60oY4mGlHTPh+iyzD/KM4f17pPzVhV1CbGJysjAVM
+	 EuaVu0ydjIVomSR3Zgj454AFffuqbqKXQwpdQ1VFQOsS4KzQ4m1qYMUqSDL2M9oZFo
+	 /Y6wFjLp+HIog==
+Message-ID: <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
+Date: Sat, 21 Sep 2024 23:36:54 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <ZtcBHvI9JxgH9iFT@apocalypse>
-References: <cover.1724159867.git.andrea.porta@suse.com> <12d0909b1612fb6d2caa42b4fda5e5ae63d623a3.1724159867.git.andrea.porta@suse.com> <2113b8df52164733a0ee3860bb793d6e.sboyd@kernel.org> <ZtcBHvI9JxgH9iFT@apocalypse>
-Subject: Re: [PATCH 05/11] vmlinux.lds.h: Preserve DTB sections from being discarded after init
-From: Stephen Boyd <sboyd@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>, Andrew Lunn <andrew@lunn.ch>, Arnd Bergmann <arnd@arndb.de>, Bjorn Helgaas <bhelgaas@google.com>, Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Catalin Marinas <catalin.marinas@arm.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, Conor Dooley <conor+dt@kernel.org>, David S. Miller <davem@davemloft.net>, Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic <dragan.cvetic@amd.com>, Eric Dumazet <edumazet@google.com>, Florian Fainelli <florian.fainelli@broadcom.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Lee Jones <lee@kernel.org>, Linus Walleij <linus.walleij@linaro.org>, Michael Turquette <mturquette@baylibre.com>, Nicolas Ferre <nicolas.ferre@microchip.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Stefan Wahren <wahrenst@gmx.net>, Will Deacon <will@kernel.o
- rg>, devicetree@vger.kernel.org, linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
-To: Andrea della Porta <andrea.porta@suse.com>, Masahiro Yamada <masahiroy@kernel.org>
-Date: Sat, 21 Sep 2024 13:47:49 -0700
-User-Agent: alot/0.10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
+ XDP_REDIRECT
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+ john.fastabend@gmail.com, edumazet@google.com, pabeni@redhat.com,
+ lorenzo.bianconi@redhat.com, toke@toke.dk, sdf@google.com,
+ tariqt@nvidia.com, saeedm@nvidia.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
+ mst@redhat.com, jasowang@redhat.com, mcoquelin.stm32@gmail.com,
+ alexandre.torgue@foss.st.com, kernel-team <kernel-team@cloudflare.com>,
+ Yan Zhai <yan@cloudflare.com>
+References: <cover.1726935917.git.lorenzo@kernel.org>
+ <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Quoting Andrea della Porta (2024-09-03 05:29:18)
-> On 12:46 Fri 30 Aug     , Stephen Boyd wrote:
-> > Quoting Andrea della Porta (2024-08-20 07:36:07)
-> > > diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/=
-vmlinux.lds.h
-> > > index ad6afc5c4918..3ae9097774b0 100644
-> > > --- a/include/asm-generic/vmlinux.lds.h
-> > > +++ b/include/asm-generic/vmlinux.lds.h
-> >=20
-> > It would be nice to keep the initdata properties when this isn't used
-> > after init as well. Perhaps we need another macro and/or filename to
-> > indicate that the DTB{O} can be thrown away after init/module init.
->=20
-> We can certainly add some more filename extension that would place the
-> relevant data in a droppable section.=20
-> Throwing away the dtb/o after init is like the actual KERNEL_DTB macro th=
-at
-> is adding teh data to section .init.data, but this would mean t would be
-> useful only at very early init stage, just like for CONFIG_OF_UNITTEST.
-> Throwing after module init could be more difficult though, I think,
-> for example we're not sure when to discard the section in case of deferred
-> modules probe.
->=20
 
-This patch can fix a modpost warning seen in linux-next because I have
-added DT overlays from KUnit tests while kbuild has properly marked the
-overlay as initdata that is discarded. See [1] for details. In KUnit I
-doubt this really matters because most everything runs from __init code
-(even if it isn't marked that way).
 
-I'm thinking that we need to make dtbo Makefile target put the blob in
-the rodata section so it doesn't get thrown away and leave the builtin
-DTB as part of init.rodata. Did you already do that? I see the kbuild
-tree has removed the commit that caused the warning, but I suspect this
-may still be a problem. See [2] for the next series where overlays
-applied in the test happen from driver probe so __ref is added.
+On 21/09/2024 22.17, Alexander Lobakin wrote:
+> From: Lorenzo Bianconi <lorenzo@kernel.org>
+> Date: Sat, 21 Sep 2024 18:52:56 +0200
+> 
+>> This series introduces the xdp_rx_meta struct in the xdp_buff/xdp_frame
+> 
+> &xdp_buff is on the stack.
+> &xdp_frame consumes headroom.
+> 
+> IOW they're size-sensitive and putting metadata directly there might
+> play bad; if not now, then later.
+> 
+> Our idea (me + Toke) was as follows:
+> 
+> - new BPF kfunc to build generic meta. If called, the driver builds a
+>    generic meta with hash, csum etc., in the data_meta area.
 
-If we simply copy the wrap command and make it so that overlays always
-go to the .rodata section we should be good. Maybe there's some way to
-figure out what is being wrapped so we don't have to copy the whole
-thing.
+I do agree that it should be the XDP prog (via a new BPF kfunc) that
+decide if xdp_frame should be updated to contain a generic meta struct.
+*BUT* I think we should use the xdp_frame area, and not the
+xdp->data_meta area.
 
-Finally, it's unfortunate that the DTBO is copied when an overlay is
-applied. We'll waste memory after this patch, so of_overlay_fdt_apply()
-could be taught to reuse the blob passed in instead of copying it.
+A details is that I think this kfunc should write data directly into
+xdp_frame area, even then we are only operating on the xdp_buff, as we
+do have access to the area xdp_frame will be created in.
 
------8<----
-diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
-index 55998b878e54..070e08082cd3 100644
---- a/scripts/Makefile.dtbs
-+++ b/scripts/Makefile.dtbs
-@@ -51,11 +51,25 @@ quiet_cmd_wrap_S_dtb =3D WRAP    $@
- 		echo '.balign STRUCT_ALIGNMENT';					\
- 	} > $@
-=20
-+quiet_cmd_wrap_S_dtbo =3D WRAP    $@
-+      cmd_wrap_S_dtbo =3D {								\
-+		symbase=3D__$(patsubst .%,%,$(suffix $<))_$(subst -,_,$(notdir $*));	\
-+		echo '\#include <asm-generic/vmlinux.lds.h>';				\
-+		echo '.section .rodata,"a"';						\
-+		echo '.balign STRUCT_ALIGNMENT';					\
-+		echo ".global $${symbase}_begin";					\
-+		echo "$${symbase}_begin:";						\
-+		echo '.incbin "$<" ';							\
-+		echo ".global $${symbase}_end";						\
-+		echo "$${symbase}_end:";						\
-+		echo '.balign STRUCT_ALIGNMENT';					\
-+	} > $@
-+
- $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
- 	$(call if_changed,wrap_S_dtb)
-=20
- $(obj)/%.dtbo.S: $(obj)/%.dtbo FORCE
--	$(call if_changed,wrap_S_dtb)
-+	$(call if_changed,wrap_S_dtbo)
-=20
- # Schema check
- # ------------------------------------------------------------------------=
----
 
-[1] https://lore.kernel.org/all/20240909112728.30a9bd35@canb.auug.org.au/
-[2] https://lore.kernel.org/all/20240910094459.352572-1-masahiroy@kernel.or=
-g/
+When using data_meta area, then netstack encap/decap needs to move the
+data_meta area (extra cycles).  The xdp_frame area (live in top) don't
+have this issue.
+
+It is easier to allow xdp_frame area to survive longer together with the
+SKB. Today we "release" this xdp_frame area to be used by SKB for extra
+headroom (see xdp_scrub_frame).  I can imagine that we can move SKB
+fields to this area, and reduce the size of the SKB alloc. (This then
+becomes the mini-SKB we discussed a couple of years ago).
+
+
+>    Yes, this also consumes headroom, but only when the corresponding func
+>    is called. Introducing new fields like you're doing will consume it
+>    unconditionally;
+
+We agree on the kfunc call marks area as consumed/in-use.  We can extend
+xdp_frame statically like Lorenzo does (with struct xdp_rx_meta), but
+xdp_frame->flags can be used for marking this area as used or not.
+
+
+> - when &xdp_frame gets converted to sk_buff, the function checks whether
+>    data_meta contains a generic structure filled with hints.
+> 
+
+Agree, but take data from xdp_frame->xdp_rx_meta.
+
+When XDP returns XDP_PASS, then I also want to see this data applied to
+the SKB. In patchset[1] Yan called this xdp_frame_fixup_skb_offloading()
+and xdp_buff_fixup_skb_offloading(). (Perhaps "fixup" isn't the right
+term, "apply" is perhaps better).  Having this generic-name allow us to
+extend with newer offloads, and eventually move members out of SKB.
+
+We called it "fixup", because our use-case is that our XDP load-balancer
+(Unimog) XDP_TX bounce packets with in GRE header encap, and on the
+receiving NIC (due to encap) we lost the HW hash/csum, which we want to
+transfer from the original NIC, decap in XDP and apply the original HW
+hash/csum via this "fixup" call.
+
+--Jesper
+
+[1] https://lore.kernel.org/all/cover.1718919473.git.yan@cloudflare.com/
+
+> We also thought about &skb_shared_info, but it's also size-sensitive as
+> it consumes tailroom.
+> 
+>> one as a container to store the already supported xdp rx hw hints (rx_hash
+>> and rx_vlan, rx_timestamp will be stored in skb_shared_info area) when the
+>> eBPF program running on the nic performs XDP_REDIRECT. Doing so, we are able
+>> to set the skb metadata converting the xdp_buff/xdp_frame to a skb.
+> 
+> Thanks,
+> Olek
 
