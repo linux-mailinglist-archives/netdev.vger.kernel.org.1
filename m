@@ -1,115 +1,130 @@
-Return-Path: <netdev+bounces-129133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BB1597DB9C
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 06:14:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B0D597DBB6
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 06:56:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 795171F21B6B
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 04:14:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C5621C210AE
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 04:56:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A542FF9DF;
-	Sat, 21 Sep 2024 04:14:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6CD61F957;
+	Sat, 21 Sep 2024 04:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZQRORDp1"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="tmZPrOlQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F1528F4;
-	Sat, 21 Sep 2024 04:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137F31AACA
+	for <netdev@vger.kernel.org>; Sat, 21 Sep 2024 04:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726892093; cv=none; b=dTi0/CmolJ0AUbcQGw7iEcYuLN+j1z7YkQwFt4jxHUujpyRfNgQURDWoHZ37QszHy9OkfVRv2vf7j80IpZa6e/TnYK55D37URPbkgN0r+1bmoYQ+/HgBtPtmwCusiKca950OE+c1CggwmRFSAgaDm+7qgcc+BUCsFyQJh21+Ar0=
+	t=1726894580; cv=none; b=LRb0twZxmLy7/ABmPGp4WpbC7BkyVnKXGag302G28pcZUpgGWewf1p1nO2DXdofh6HD8sk2RmxeITKMrXpC4gqXPM2NAuCEGdFu/JHEd7FHA31/Xvx+20YN1CpFT4jhFBfYQ6vjdB3cySPje9/8OeuW230NCmzAhlqk3FFWUUxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726892093; c=relaxed/simple;
-	bh=5mz3J8HgPZdEt8atOj9qdhB4LJ9kcYeI4/c9xCFQRWk=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=rN0IaxEPWKx7u8di1+TiEHzgzPywwagInz+fHHTvD8BJRaW9V1eQHrjECnztsPI/DiFKZ5RMLHrPUEjlb+CHNx2fjQoXMhH79BZhoWnzi4LAU0xNoplQd9WkQPCoW5oXvCCJUBCZdUOu6Bw0w5soLxj+9nd+VX6vL251kk4a1VE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZQRORDp1; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-718e6299191so1479184b3a.2;
-        Fri, 20 Sep 2024 21:14:52 -0700 (PDT)
+	s=arc-20240116; t=1726894580; c=relaxed/simple;
+	bh=Hn4fReQotENKNmRSfo2n2nLfnja9kCI0SETHuXmadRw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iri7HDfWr5hjQbpsQUhFVJ87x15QPyDVvBGLZA4dlqU8rzK2mrnPgmS19cRGmDHjGQ1iGQHmvu8OeB/40F+ZFrIGNoDCQ1bAypkiLkUsHsW45YjKfw2Zhwdy0T61rdK4Cr53icwweKL/sYRANook9KHNFmlFnZBO6btUXfJCJ7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=tmZPrOlQ; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5365cf5de24so3474089e87.1
+        for <netdev@vger.kernel.org>; Fri, 20 Sep 2024 21:56:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726892091; x=1727496891; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PxxOvx1Izrm7TAV/LRYGtGBqjv3Qq70hbPsIrfhRUBg=;
-        b=ZQRORDp1F1Z4CMEptv+KpRcNa/sGn2acElQMmmxtwcTqHo28o7Czk/r/4FtuIjrjFq
-         kGuoh4lEgSbi2MosfQUULhT3HuNVDqAdnGfC3hrRQahk3psGNuWVFokXr8Vq1y6muSpZ
-         iur6DmFOF4fMlUmmuSw+JnWZckQj7l2BRiyzFKrjnu6xrjTz/2YylokgnyH6up/oFBFe
-         WZPoWY8/8QWRJXpJXkptBrT2g3jy32jlO9qP386Z8E7+gFLyjQazWhgxjiQgKKTazKi9
-         towkMKnPYJkHs8/01t1jnB620H+6VPKnujXmbwmBFD0jUANad1IA+TMLk/t+sVchQEc5
-         6KiA==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1726894577; x=1727499377; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hn4fReQotENKNmRSfo2n2nLfnja9kCI0SETHuXmadRw=;
+        b=tmZPrOlQ0qV/sAovR6H7NfVaU3693v2U6zrkzJvotvmnFeKCrPkIOOaPnN6gIBQuyV
+         xFq6+hX9SDh/grUAjhh7LaPt1qLqmSfa4BJJButZwzVobcVKBMBkw/t/XYJw9QAFihQj
+         jACngkda70jLOl/vH+A844P08cz2AgE5GlB4fFlOre96nj74w24Xj8cdlEJvXx0MRi1S
+         FKG5q5azo7NDmuurujbiuaI1Zh6t8wga3SH53S5SRM6EIoDibFRuJgjYueIABWfc4c8V
+         IzVmdWEk4Or0r5smfynbJravtmFkg5ZljLvi/7YGoV6Sd6CFApKIiuhnL8IOkjnXXz+W
+         3VkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726892091; x=1727496891;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=PxxOvx1Izrm7TAV/LRYGtGBqjv3Qq70hbPsIrfhRUBg=;
-        b=f1v04NDLkbMWTe0wgk5DtYjYAynx5x6Plr5SGVLt140c/0tcfQJeS4ESP2gFPYMDVg
-         xZUWiQfZrqdtr2TMPk3Qiao/sNGfPKmh7nzIgFNF6Dvi5eOfzAxuk411UH9xPM9SWz5b
-         MKixUAHMa/A9rw3QbvyTf3eyn1IPp/SHjgDVbc6AInDQAh8fKv7YVbXEuhpzeRuOq55/
-         4b6weCnkLfBc+PvPsnbEwEZP/6McdI5JO257tSn4dmA6FnVpVJuJrywQk55RDiJufdYV
-         Yz8BlDZL1bn04P+q6xg6pW6WxcTwWn+mHcKZ26bTphkUT1iZlTq2qLopTFgr0/jSip9u
-         Yehw==
-X-Forwarded-Encrypted: i=1; AJvYcCUMNHICpcw7rQTIbsiA02kQbLwEEsPnojr5rEApZ7/oUH4Ch3zkKD6HcSQ8sKZ1ZciKGW3lupLi3WtHOQL+PAc=@vger.kernel.org, AJvYcCXMD2DNH8D7C1QGJk4r4GdFpF3F57MJjPbmDBXJzwH2tQLAcM8uHyHGRc/58wmpmCfikLWKE64=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUo0+sxIq2HNIuqhTlGdQQINUIk6YLKLsTMBJres25FRmgdYeq
-	Fr0v/1m3pbTK8MO8llzBYSOW5YZ2VuCDBKRvqeqwEpYW6gqf2lll
-X-Google-Smtp-Source: AGHT+IFCeCAdMQwitdC0D1/dsbY+KJQWOvIXdlUdOHHMYwTuKyU/nVPqR34caAn5DgEC9/GDWic1bg==
-X-Received: by 2002:a05:6a20:9f93:b0:1cf:49a6:9933 with SMTP id adf61e73a8af0-1d30c9e89e6mr6081195637.20.1726892091467;
-        Fri, 20 Sep 2024 21:14:51 -0700 (PDT)
-Received: from localhost (p4468007-ipxg23001hodogaya.kanagawa.ocn.ne.jp. [153.204.200.7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e5650424a8sm1324221a12.84.2024.09.20.21.14.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Sep 2024 21:14:51 -0700 (PDT)
-Date: Sat, 21 Sep 2024 04:14:37 +0000 (UTC)
-Message-Id: <20240921.041437.1044172886569379842.fujita.tomonori@gmail.com>
-To: aliceryhl@google.com, tmgross@umich.edu
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, lkp@intel.com
-Subject: Re: [PATCH net] net: phy: qt2025: Fix warning: unused import
- DeviceId
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CAH5fLggzkjHE+NY_gLzcmwSeQ5MFYXMYU-nqX7=R7RF4WLosug@mail.gmail.com>
-References: <CAH5fLgiJyvSztvCDz8KZ4kF0--a0mqi7M4WowB==CCs2FmVk8A@mail.gmail.com>
-	<20240920.135339.42277957091918023.fujita.tomonori@gmail.com>
-	<CAH5fLggzkjHE+NY_gLzcmwSeQ5MFYXMYU-nqX7=R7RF4WLosug@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1726894577; x=1727499377;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Hn4fReQotENKNmRSfo2n2nLfnja9kCI0SETHuXmadRw=;
+        b=urEnDs/5LjYEwv3N+soMlEWCm2ZyimgBUj0Eyc0gr6QKg9pZJIcxEKytgqmdnEolQX
+         zuUeDH94R7qobYjyF9SJrWV4X4+kpPmzv3qWeWKLZ9ZPmvVrfKs+BRCFqmrnVT1d0wGS
+         Je2UiAsu1ctQeeOJKg94/pQCRS2yEI6majLXXF++P94hiutSSi5ve/P61Jlwb5N7lJ0T
+         E5z8tEtReA79ivjuSUMT1tfxXexUNA3ObZlF1I8fQMSnGG4oCmXwCDKw5taZY9dUSGcc
+         Ot/pYroH6UO5TZRuXGsz6HIXS03BtKw972vwfL3fOzOLvXWLC9F8zAo6yAc56iyYn5P1
+         LywA==
+X-Forwarded-Encrypted: i=1; AJvYcCUJu3zlTftk+B6KkV+acsVKH2c0rXxE+ST75RpYD/MUxtutkt5rcA8RspAtBHoMqew4QvmXzCE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFNEjD5lgqp0mBGuUXXE4isvsw2DXvEZ49TZwGxk3ad5LmRuVh
+	1JJXyRz+SvFVBAYPf29PzCvtYzQ9QXcxS9RmuROTDzag5o7QDIE8kVLU72O0jReTV9wKAxKq3SO
+	/BCudB1GWGteES5dW7R4jRZNjIqYM1H1MoSfFzQ==
+X-Google-Smtp-Source: AGHT+IGA+v7LGeKCraVVm2W3WnYjYpCsEiYRqZiZBxxc6iUgx4AERJeZIH1YVuoDb+oq4aKfLjDqUP1XyHd4Vib/la0=
+X-Received: by 2002:a05:6512:158e:b0:52e:fdeb:9381 with SMTP id
+ 2adb3069b0e04-536ad3d72c9mr2962459e87.43.1726894576446; Fri, 20 Sep 2024
+ 21:56:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240814082301.8091-1-brgl@bgdev.pl> <83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org>
+ <87msk49j8m.fsf@kernel.org> <ed6aceb6-4954-43ad-b631-6c6fda209411@kernel.org>
+ <87a5g2bz6j.fsf@kernel.org> <CAMRc=MeLick_+Czy5MhkX=SxVvR4WCmUZ8CQ5hQBVTe2fscCPg@mail.gmail.com>
+ <b7fdafd6-5029-4b80-b264-11943740b354@quicinc.com>
+In-Reply-To: <b7fdafd6-5029-4b80-b264-11943740b354@quicinc.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Sat, 21 Sep 2024 06:56:05 +0200
+Message-ID: <CAMRc=Mc2sbTrORZr4K4NgdyofNTipR1-QEqNK9mmNT=sd1myHQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
+ of the ath11k on WCN6855
+To: Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: Kalle Valo <kvalo@kernel.org>, Krzysztof Kozlowski <krzk@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 20 Sep 2024 18:00:56 +0200
-Alice Ryhl <aliceryhl@google.com> wrote:
+On Fri, Sep 20, 2024 at 11:02=E2=80=AFPM Jeff Johnson <quic_jjohnson@quicin=
+c.com> wrote:
+>
+> >
+> > Let me give you an analogy: we don't really need to have always-on, fix=
+ed
+> > regulators in DTS. The drivers don't really need them. We do it for
+> > completeness of the HW description.
+>
+> Again, since I'm a DT n00b:
+> Just to make sure I understand, you are saying that with this change any
+> existing .dts/.dtb files will still work with an updated driver, so the n=
+ew
+> properties are not required to be populated on existing devices.
+>
 
-> Put it in a const. That way it doesn't end up in the image if unused.
-> 
-> const _TABLE_INIT: [::kernel::bindings::mdio_device_id; 2] = [
->     ::kernel::bindings::mdio_device_id {
->         phy_id: 0x00000001,
->         phy_id_mask: 0xffffffff,
->     },
->     ::kernel::bindings::mdio_device_id {
->         phy_id: 0,
->         phy_id_mask: 0,
->     },
-> ];
-> 
-> #[cfg(MODULE)]
-> #[no_mangle]
-> static __mod_mdio__phydev_device_table:
-> [::kernel::bindings::mdio_device_id; 2] = _TABLE_INIT;
+There are no driver updates. No functional change.
 
-Yeah, `const` works!
+> However a new driver with support for these properties will utilize them =
+when
+> they are present, and the current ath11k .dts files will need to be updat=
+ed to
+> include these properties for pci17cb,1103, i.e. the following needs updat=
+ing:
+> arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts
 
-Thanks a lot guys! I'll send this change for the next merge window.
+What new driver? The dts is being updated in a separate series[1]. It
+makes this platform use the new power sequencing subsystem for
+wcn6855. All other changes required to make it work are already
+upstream. There's no change to ath11k.
+
+Bart
+
+[1] https://lore.kernel.org/all/20240905122023.47251-1-brgl@bgdev.pl/
 
