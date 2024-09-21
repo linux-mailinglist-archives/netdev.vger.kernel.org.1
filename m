@@ -1,85 +1,62 @@
-Return-Path: <netdev+bounces-129157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 022D197DF28
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 23:55:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED56C97DF88
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 01:16:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B12831F215FE
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 21:55:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 294571C20AEC
+	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 23:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96921154C07;
-	Sat, 21 Sep 2024 21:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8977E14F9D0;
+	Sat, 21 Sep 2024 23:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKcNHr2o"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="ZQq7YhIY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DBE282FB;
-	Sat, 21 Sep 2024 21:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E98623D7;
+	Sat, 21 Sep 2024 23:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726955724; cv=none; b=aWyoq84PkaLKHxWt4pwf9QR0XFghKvYlDZNVlivY7ML+AtTXSq6uDpuEyBSmRrBzzQHCAPDhjb+e+Tbknf3SyP3e+BAQxxKCyLBh2Jxz6voJimuZj8V/LGRShda2NYsI7dPu5/j1ltclE1q1Z+F+Vmubjoo9s72Z1zrIdSBn63I=
+	t=1726960570; cv=none; b=qyaUkpYBd96MvhHOlhvepQHI+QcMZ2LI0tme3TL0yM9a5PXH560YVNq78hxrB2Xw+BLlRVtTzKYQEPVSlHScl6nAsetQ4DUa2Jk5jPONwm090Zid4YShsRi5W1ajuF6HmT8NbWFyIMN+AfNzjXEaKZG4xqnVQ5aDQNVZpYqB5Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726955724; c=relaxed/simple;
-	bh=M7rzspFpNHiw0JHMriMhB/4WhesrZv5SnNHM7+eIVaU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oXjBNqTcPOpdqpgWxsp5RwS2s+3nXjcD06XgrinKbwHZUSpGNSIb59hmiUAwOr7UNPPMYl5aV+wO/faExQoikMElG0tHP3A0nEt8DS3+DSbBvvI+eLdXEHeu/lW5uLOQahfcU71Ahm391bgShewjgh8hWY9ArWXQFlxaAj5QBrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKcNHr2o; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5365cf5de24so3964915e87.1;
-        Sat, 21 Sep 2024 14:55:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726955720; x=1727560520; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=aQnjiul16NJW8ioc7z7DKN4GAxwl3Hiyi8Nik5GXGq8=;
-        b=PKcNHr2oNP0xxAGofsqUFiJVUxSJRAhg1ak8Z5vuAXFp6SMfYnTMK16up7tK1BjgY8
-         FqtmFJyimATYp1vesuS9Lu2ve3s770rosS1HyONl7hYsXlqC9um0p9Zu/LLFbRFnNCC/
-         QIIivcFUx/gFX1PltXDWk6WXDDG1d781OhFQ3s+d0AMocs7WFhrgwF2PqW8jQgndPt7V
-         LfAMfBY+DWy8nKCqAMLhiIakLWaXXzf1icutQDfx7CLlbrKT5KygUe2gwD++ZDIz71gK
-         dF0g6S61bmmsvrnkla0Lj+Mkfl1V63Sa1VvRTwVSqWMVAhQkCwgNFqPr3/M9uja55faS
-         sayA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726955720; x=1727560520;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=aQnjiul16NJW8ioc7z7DKN4GAxwl3Hiyi8Nik5GXGq8=;
-        b=L8yFTad6oMgEAd1GVQwb7JJjF0q4InKu+3BSfUhMcDFDb0NjZ1tuCCl/SLrmj+PpvZ
-         yzoAiqyFx/8RtNr5JN9eBvNId5j5tg/f4ooNwkzVftmxvwzrvcLf3t5CCl+WkLvxZaWu
-         9BUBimw7GHHmXE1Eac838bTtTF+ZXadAq2lwMVObV377SEXH/WNanLsXgBEqxxigwNHg
-         F3/tixm/ivtUEMEy57DM5p+Tp5KJbg1fVWFrvLglb0wb5q9H4FZgVFZiva0i7W+q9oWn
-         COKYV4PVDBpH5qsRcpghqF7PRs8LKeSklIGn84zybgt6oiL1D4nth/1IYtZaTsIVYVv+
-         dFQg==
-X-Forwarded-Encrypted: i=1; AJvYcCWbeYXjo2J2lZiCJJ9ahts9VGerKuJXK1BcEs/ei1SxCNgOfCtIq7Gyz8mWGMg8USlcxnOMaHAg5pe6CuA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynANl9KQJgMETs+UuqgPsh5JWKO/P6kQSysygVX8cZx4hRVN25
-	xZrrq6t1X5YPfJEH/Kb1E1JN/7y5y4sEBDx0pnO57uLJxLZP4/YcJYetxEGemxA=
-X-Google-Smtp-Source: AGHT+IEDAImrve36sPYrWHGEjLLO2d/w0swTfPqqskrj4mxtrHVyQmJ/44pO1NU15tg0YaISYjUHPw==
-X-Received: by 2002:a05:6512:3043:b0:535:6892:3be3 with SMTP id 2adb3069b0e04-536ad3d7281mr3708035e87.41.1726955720236;
-        Sat, 21 Sep 2024 14:55:20 -0700 (PDT)
-Received: from dau-work-pc.zonatelecom.ru ([185.149.163.197])
-        by smtp.googlemail.com with ESMTPSA id 2adb3069b0e04-536870467d8sm2730819e87.43.2024.09.21.14.55.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Sep 2024 14:55:19 -0700 (PDT)
-From: Anton Danilov <littlesmilingcloud@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Anton Danilov <littlesmilingcloud@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Suman Ghosh <sumang@marvell.com>,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
-Date: Sun, 22 Sep 2024 00:54:11 +0300
-Message-Id: <20240921215410.638664-1-littlesmilingcloud@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1726960570; c=relaxed/simple;
+	bh=2IJ/1fp+irLU94isem+0S4oGECWv/8jutgHjbNmMBks=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R489jXnaVIinCGIGaEs4l0N1HSNiQilMRnELxSne1Cim6h/vdJBOlcOYDq/PQ1GqaB7YGcquK1gPabQvtEf1LumtWVkjqzM1VC+EbSFRMrLf0AW2xspQ+zw9MFFhPKsNjj43av2r8CNhEc0LiaQwIyccdzX4FnZaM6rD3T78N9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=ZQq7YhIY; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=g8kKxL7ZKl4uUi3v4aBjQ6Q74kbULsjNPVGjKjNgz/s=; b=ZQq7YhIY5fg//8tZ
+	c2oknXF+nHsadwp41JfA9YYTV8MuN9K34X/hly/msDtiPs7P0B2tX41QW0qvuphZ81c+1Z8YtWE3r
+	HaBRCK/KguoUhfyemh8E9Pgqf6NxVwpXQn3jmPTFY+fO1UsTwDFVhie/puFzYhCtZCxNY35I5TiQr
+	QHyeFIrMOhPhPzScjjr+IC3TdykAereQQTuyyG7uAyL/C2a2bFaoGUSq8IjrWsiouWTbSYzVQbOya
+	B2LOLMxSE3xso43qeiqXVX1yppLLx6Vj66RDb6K8W95/N69yKBdCG+5+SDj3sl8lBwhgukRe3/zb4
+	LbtBZX4TR3JwKx6gYQ==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1ss9KT-006fhC-30;
+	Sat, 21 Sep 2024 23:15:53 +0000
+From: linux@treblig.org
+To: willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [RFC net-next] appletalk: Remove deadcode
+Date: Sun, 22 Sep 2024 00:15:50 +0100
+Message-ID: <20240921231550.297535-1-linux@treblig.org>
+X-Mailer: git-send-email 2.46.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,53 +65,119 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Regression Description:
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Depending on the GRE tunnel device options, small packets are being
-dropped. This occurs because the pskb_network_may_pull function fails due
-to insufficient space in the network header. For example, if only the key
-option is specified for the tunnel device, packets of sizes up to 27
-(including the IPv4 header itself) will be dropped. This affects both
-locally originated and forwarded packets.
+alloc_ltalkdev in net/appletalk/dev.c is dead since
+commit 00f3696f7555 ("net: appletalk: remove cops support")
 
-How to reproduce (for local originated packets):
+Removing it (and it's helper) leaves dev.c and if_ltalk.h empty;
+remove them and the Makefile entry.
 
-  ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
-          local <your-ip> remote <any-ip>
+tun.c was including that if_ltalk.h but actually wanted
+the uapi version for LTALK_ALEN, fix up the path.
 
-  ip link set mtu 1400 dev gre1
-  ip link set up dev gre1
-  ip address add 192.168.13.1/24 dev gre1
-  ping -s 1374 -c 10 192.168.13.2
-  tcpdump -vni gre1
-  tcpdump -vni <your-ext-iface> 'ip proto 47'
-  ip -s -s -d link show dev gre1
-
-Solution:
-
-Use the pskb_may_pull function instead the pskb_network_may_pull.
-
-Fixes: 80d875cfc9d3 ("ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmit()")
-
-Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- net/ipv4/ip_gre.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/tun.c        |  2 +-
+ include/linux/if_ltalk.h |  8 -------
+ net/appletalk/Makefile   |  2 +-
+ net/appletalk/dev.c      | 46 ----------------------------------------
+ 4 files changed, 2 insertions(+), 56 deletions(-)
+ delete mode 100644 include/linux/if_ltalk.h
+ delete mode 100644 net/appletalk/dev.c
 
-diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
-index 5f6fd382af38..115272ba2726 100644
---- a/net/ipv4/ip_gre.c
-+++ b/net/ipv4/ip_gre.c
-@@ -664,7 +664,7 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 5f77faef0ff1..82abe79c98fa 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -71,7 +71,7 @@
+ #include <linux/bpf_trace.h>
+ #include <linux/mutex.h>
+ #include <linux/ieee802154.h>
+-#include <linux/if_ltalk.h>
++#include <uapi/linux/if_ltalk.h>
+ #include <uapi/linux/if_fddi.h>
+ #include <uapi/linux/if_hippi.h>
+ #include <uapi/linux/if_fc.h>
+diff --git a/include/linux/if_ltalk.h b/include/linux/if_ltalk.h
+deleted file mode 100644
+index 4cc1c0b77870..000000000000
+--- a/include/linux/if_ltalk.h
++++ /dev/null
+@@ -1,8 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef __LINUX_LTALK_H
+-#define __LINUX_LTALK_H
+-
+-#include <uapi/linux/if_ltalk.h>
+-
+-extern struct net_device *alloc_ltalkdev(int sizeof_priv);
+-#endif
+diff --git a/net/appletalk/Makefile b/net/appletalk/Makefile
+index 33164d972d37..152312a15180 100644
+--- a/net/appletalk/Makefile
++++ b/net/appletalk/Makefile
+@@ -5,6 +5,6 @@
  
- 		tnl_params = (const struct iphdr *)skb->data;
+ obj-$(CONFIG_ATALK) += appletalk.o
  
--		if (!pskb_network_may_pull(skb, pull_len))
-+		if (!pskb_may_pull(skb, pull_len))
- 			goto free_skb;
- 
- 		/* ip_tunnel_xmit() needs skb->data pointing to gre header. */
+-appletalk-y			:= aarp.o ddp.o dev.o
++appletalk-y			:= aarp.o ddp.o
+ appletalk-$(CONFIG_PROC_FS)	+= atalk_proc.o
+ appletalk-$(CONFIG_SYSCTL)	+= sysctl_net_atalk.o
+diff --git a/net/appletalk/dev.c b/net/appletalk/dev.c
+deleted file mode 100644
+index 284c8e585533..000000000000
+--- a/net/appletalk/dev.c
++++ /dev/null
+@@ -1,46 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/*
+- * Moved here from drivers/net/net_init.c, which is:
+- *	Written 1993,1994,1995 by Donald Becker.
+- */
+-
+-#include <linux/errno.h>
+-#include <linux/module.h>
+-#include <linux/netdevice.h>
+-#include <linux/if_arp.h>
+-#include <linux/if_ltalk.h>
+-
+-static void ltalk_setup(struct net_device *dev)
+-{
+-	/* Fill in the fields of the device structure with localtalk-generic values. */
+-
+-	dev->type		= ARPHRD_LOCALTLK;
+-	dev->hard_header_len 	= LTALK_HLEN;
+-	dev->mtu		= LTALK_MTU;
+-	dev->addr_len		= LTALK_ALEN;
+-	dev->tx_queue_len	= 10;
+-
+-	dev->broadcast[0]	= 0xFF;
+-
+-	dev->flags		= IFF_BROADCAST|IFF_MULTICAST|IFF_NOARP;
+-}
+-
+-/**
+- * alloc_ltalkdev - Allocates and sets up an localtalk device
+- * @sizeof_priv: Size of additional driver-private structure to be allocated
+- *	for this localtalk device
+- *
+- * Fill in the fields of the device structure with localtalk-generic
+- * values. Basically does everything except registering the device.
+- *
+- * Constructs a new net device, complete with a private data area of
+- * size @sizeof_priv.  A 32-byte (not bit) alignment is enforced for
+- * this private data area.
+- */
+-
+-struct net_device *alloc_ltalkdev(int sizeof_priv)
+-{
+-	return alloc_netdev(sizeof_priv, "lt%d", NET_NAME_UNKNOWN,
+-			    ltalk_setup);
+-}
+-EXPORT_SYMBOL(alloc_ltalkdev);
 -- 
-2.39.2
+2.46.1
 
 
