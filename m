@@ -1,242 +1,222 @@
-Return-Path: <netdev+bounces-129159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B01597DFB8
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 03:11:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6215997DFBE
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 03:24:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8AA281876
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 01:11:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B74328124F
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 01:24:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C211917E5;
-	Sun, 22 Sep 2024 01:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD5F192B61;
+	Sun, 22 Sep 2024 01:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iD17Jsmn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LJc/fCo6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375141917CB
-	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 01:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726967501; cv=none; b=mM2PKpKw5XkOfTCBgARm769N6ZAn2on6g6NrG0g48NgdCldhDpdJrYujACqrtacrVA88uJoGaQ9pyBcsQL4/9qipJWVhKl5hEHY5BDG/lQ3+OqjghHnk/NWzJ1v6Qz4KEJ9kPSogGYY9t0VGHuqvnyG4RUqYbZoiykHFEjWtZYY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726967501; c=relaxed/simple;
-	bh=mkPZTZ4+7X6YfRtxtJvsGondZDr3cT+dPb4FafRwtlc=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=pfMYrF0towSWvckSoFD9QmcEmriZcMahv0MwVDbyNQYT7/bESxMf8Xlo8057F7FBOHuOuhnJ1VfuSDvzjFkKKBxnVO+Ebu2mKryUI4RPgCFShmXYR/f3JOO/Y6KLHffYDCVoBjPDbKHowWxVN6kZ3m/UAT+IPLKEayaK+IUE6Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iD17Jsmn; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c247dd0899so2810a12.1
-        for <netdev@vger.kernel.org>; Sat, 21 Sep 2024 18:11:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1726967497; x=1727572297; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2KUuVhA2iLT4DM8BXrMGBBR4oEH2j4WLFiTg/43RbgU=;
-        b=iD17JsmnF63TWL61UBkCOk+f84qtZUYIeuK3yrghPIiJuXNAGzAu+g4RkSCi73pYXo
-         0FjSJONUGguXFtJQ5zCrHDtsKMn9uEAJOLOHkGODSSoctFoiaEsZEJGoe3gViEc6KiZy
-         QuG1r1z4wZX7k2T+OPk6JD9Dle/Wc1lP41GTML4fuivfbTOTCD5p0wYG4VUI/y9B7nJw
-         clvC0PcsIY1mvkb0aKPTXAnFLaAvajFPyjfiW3yvvWcN3SIh4XxvGMJCmdvebjWJWntj
-         ANIgfu9yycWFyuphNvDa+C4eYW65TL0Aa0VS1cpE9n4T4HBWWz360GD7mHRPoCCS3JRb
-         XIiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726967497; x=1727572297;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2KUuVhA2iLT4DM8BXrMGBBR4oEH2j4WLFiTg/43RbgU=;
-        b=ojPql6O+nr1aUdE5hp+xamB3whWEFs8zLrcFYVSo31mCCwOZUGc5TkoyQhkH2EdTp1
-         yBIKoHPvVe3lGUU0KQix3p/6ujnUzgMQz7v6UpcMAYG/EO+R9Pe+sexM9UaRk4oBoUZm
-         QwdiYTcfdUZGsRosQ7Zctu6UXeRn5kbKZoK9aUqgRZJp3OAPnzR9xQ4CojfoycGDtBr4
-         5SQtxknREzIlMg7IKCe5Ql5fmbzTIAIO/s/RI32A8/ZdcsqvvjaG8VVI0asQ7/n1JDWo
-         viTXmeHPam3SCfIeTLBMtXQUk5Y9tTnqGKcUWJw0XMU5acZZaUqdw6NbYSDLs0qX7Sjs
-         OhAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVENcqXdD1lsN0gy9T1a1nag/w6qPLnF+O8E1aiHqVUaiFwx2A6wnFakdg2wFoHR40nwckWmGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyi3+WOBpFeZVbOR1CsEzucuAjML2BQwPZULmRq7AbYftnTTZD1
-	WrCL9efVp8i9NDqEqFPnef0BOEbFysm83HUARHkcoiRTIRMyf9qR+PHVZ1GxEcJnIosIwmF2w1W
-	x73QTAHO6t6LRIttn+d7vEXJMIo8XlwRIm1ez
-X-Google-Smtp-Source: AGHT+IGDmCMq0c04L7WDXF6pJrRZIraPcPIIO/dV9PrR/c2TmXM8wUqd7VfSgbRwDhKV1hUl4eLr7f40znDL+x9wu5o=
-X-Received: by 2002:a05:6402:26c2:b0:5c4:6376:bb68 with SMTP id
- 4fb4d7f45d1cf-5c5b846d1aemr39682a12.3.1726967496849; Sat, 21 Sep 2024
- 18:11:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABF718784B;
+	Sun, 22 Sep 2024 01:23:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1726968237; cv=fail; b=O8FU70sZ3UGBc0mAnwFGDRw3+S2V+wNtQy8+jl8yiUqjf+NVaFCExPpMwrt4qkwWCUjjBI6U0qTyUJWbriMQY5wGWpn4gqDSixisr5gIoe9TXMueMRuYf48M8nNr+QtKJ/+HE5Fyexdath8eTUkdRskF3jBoWZOoAMHczj2yBNU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1726968237; c=relaxed/simple;
+	bh=LZw9cqAC8qK2PXsE/5wpXXkcVB18E+SUnUFMJ8F9URo=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=PCa53e1X32H74LWlsX5x1Thv0p+mhicNYVYX00mHx8NCLgqo6MQQf5IKVgLP0cZAoe23epynR7z1jng0RvJ5klSXSiqB1gpshyYCBajlMVjrtJOX6rXXfGn5zWMle9R7Xhje+SUgJSaLA0qpJnokfFdAb6k78d6WtFGrM5EEEMw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LJc/fCo6; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1726968236; x=1758504236;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   mime-version;
+  bh=LZw9cqAC8qK2PXsE/5wpXXkcVB18E+SUnUFMJ8F9URo=;
+  b=LJc/fCo6Qm4BnO6Gn0GdsYsggVH+kkMc7Bq95j1ysdd7zLsDDaYHgpQL
+   6/wmWyjzMUqDkJFCqXT8l3lNf7lwo9k/XG+N1i6l8zrL5HfCZ/YzmHnyy
+   09GSRWexVzvCcErlN44XqDTLLFmt9TXbUXUqJ9DV2N393IFLTxd7McRdZ
+   lO9ogVohbtetp9BVNlLTij8MoOnN+qfhEhMDAufqYEhHbidotYslYF6Yt
+   SBRvXOROYgQIqr6UO+YzsUHfnHLFo2Uv6Ge0huAam4fR0MoVNIj21YFEo
+   5MlgYO+0ZsRsv/eMnDCVJ8poLGjIgKqpCEbVN4jmPzXNvi9xMfsa+O+dn
+   A==;
+X-CSE-ConnectionGUID: k90hipTiTK+KRooBQkfQIQ==
+X-CSE-MsgGUID: 3LTO76NtSourYadu9ppdew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11202"; a="29730713"
+X-IronPort-AV: E=Sophos;i="6.10,248,1719903600"; 
+   d="scan'208";a="29730713"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Sep 2024 18:23:55 -0700
+X-CSE-ConnectionGUID: PQyzGPrsQ+CAzWZFtEaetg==
+X-CSE-MsgGUID: 4ycem8GIRdWAAO8OGOvKRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,248,1719903600"; 
+   d="scan'208";a="101413914"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Sep 2024 18:23:55 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Sat, 21 Sep 2024 18:23:54 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Sat, 21 Sep 2024 18:23:54 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Sat, 21 Sep 2024 18:23:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HGpk0p0hNqCEKXsHFJab7ny0B9rYZtJICesmWaPHPdg+6xvyEi/BSG13ADMCDbZRG9QLENWnwi3/QJGnKOM2Wu82f1eX1JVSMzEvm5U8jRGiXubR4xyv23iPLyj3iDc/N2TUJfMfKGUofPfoMGjrfSXkoXtCufTcu1VfIONBBJ7kFCzOauHuz59qV+S9eLRzK3fuawVAWPpnQSodtUjqtT0WiZcMNxF9x1fxXwQCqpfasWFgwErTDctyhhRkauhKGzahDTnNWw5NwXHm2G5uB8GQad/MaQHGghDxTnmciia004I5nD6oO3oVBIB33n4wTjCNd1+NARiBPqscbN1aPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eRNq4kY7g9ZFt5dec5I/7U4dRZUTxiWyenDsgCgn8Hc=;
+ b=GOmjSJTXyqjVyA8uLxy0+Zpr+5EJKYGGY++qb/OnvBUwHa2Ge+/XfYOW20H3FW0PIDXvWfffR7m4ROuEzRsxHNt9nBJB0fuz8d7G5L6wNKFYgisuQd6qm0HSP/yt068bRXOL5oZ5bjrw9KohdbGI8qQec5ASqgzKwJaFAQcslA9lm/tUpVvC1Solja6rKQLFOxBEN0YqU22IW9CsoOrYynn8vIqtxtf78a3gsU2I8CoRsfPCW3p/OUW1puZK+HO+u3z4bUy7KlGuSdeAb+GWM6mP6+46i5A6q5OnT3TLumm3kB11npnCSqvCeTW+DI5Yyw/4OFhT7ZJ+a1M6k0Bqrg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB5423.namprd11.prod.outlook.com (2603:10b6:5:39b::20)
+ by SN7PR11MB6945.namprd11.prod.outlook.com (2603:10b6:806:2a8::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.24; Sun, 22 Sep
+ 2024 01:23:51 +0000
+Received: from DM4PR11MB5423.namprd11.prod.outlook.com
+ ([fe80::dffa:e0c8:dbf1:c82e]) by DM4PR11MB5423.namprd11.prod.outlook.com
+ ([fe80::dffa:e0c8:dbf1:c82e%3]) with mapi id 15.20.7982.022; Sun, 22 Sep 2024
+ 01:23:51 +0000
+Date: Sun, 22 Sep 2024 09:23:38 +0800
+From: kernel test robot <lkp@intel.com>
+To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>, <davem@davemloft.net>,
+	<Liam.Howlett@oracle.com>
+CC: <oe-kbuild-all@lists.linux.dev>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <oleg@redhat.com>, <akpm@linux-foundation.org>,
+	<axboe@kernel.dk>, <brauner@kernel.org>, <mhocko@suse.com>,
+	<alexjlzheng@tencent.com>, <willy@infradead.org>,
+	<michael.christie@oracle.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <shuah@kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <anjali.k.kulkarni@oracle.com>,
+	<peili.io@oracle.com>
+Subject: Re: [PATCH net-next 2/2] connector/cn_proc: Selftest for threads case
+Message-ID: <Zu9xmkQYUkRhSx9k@rli9-mobl>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240920000933.185090-3-anjali.k.kulkarni@oracle.com>
+X-ClientProxiedBy: SG2PR04CA0161.apcprd04.prod.outlook.com (2603:1096:4::23)
+ To DM4PR11MB5423.namprd11.prod.outlook.com (2603:10b6:5:39b::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Jann Horn <jannh@google.com>
-Date: Sun, 22 Sep 2024 03:10:59 +0200
-Message-ID: <CAG48ez1xYXWfvTy4N7Ut9MAs2+GGWNOwYgQb6zToRpJfQEacfg@mail.gmail.com>
-Subject: lockdep detected circular locking between rtnl_mutex and
- pm_chain_head.rwsem [wireguard and r8152]
-To: "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>, 
-	"Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-pm@vger.kernel.org, wireguard@lists.zx2c4.com, 
-	Network Development <netdev@vger.kernel.org>, USB list <linux-usb@vger.kernel.org>, 
-	kernel list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB5423:EE_|SN7PR11MB6945:EE_
+X-MS-Office365-Filtering-Correlation-Id: 46dfbf60-1a52-45ea-05fb-08dcdaa53759
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Z6J41HcguVMp5A758tGc2y2lk0vuUPCUsYTxyukhg8FHSD3QH4pHsqxzVapG?=
+ =?us-ascii?Q?RjWBkeeOPllEov4NYt9p2NQsp1xnOH2MtSGOw2fevgiQ5inb9/CBm1mKqw7A?=
+ =?us-ascii?Q?CA+ycfxIz2K6zLFqgLJIn2CoYRxpzjGBJTxFY1+aeRQJUXvk/cJO6K1IS5Rs?=
+ =?us-ascii?Q?dh8BE1Qzralc9z08GmI9vr1lDkRt8hsF/pJVWO8lzZl44NuuBHcg5qcHIDyg?=
+ =?us-ascii?Q?A6w2QuRsshz5JTz/pNgJdX/+jicEIw3HktAgaVNuKLP41LQLE9A5BjQoLDo8?=
+ =?us-ascii?Q?BWhWV5xpZZhftP0DrNHCDQis8Us7+OgCg/wiDMI1R70Iwt9TpOSspcMhG7ca?=
+ =?us-ascii?Q?vUK7K3z0ijrDbPrNAOWXLBE3iIBCAEzRaw0eamjs1Yurleejhe9XHXLBQ6vS?=
+ =?us-ascii?Q?Yv7qTpsy6M0LTUmr01PN35i1Y1b8jEYCBS0UdP7fAQwDEZsCAH70Ys/mqfHy?=
+ =?us-ascii?Q?+pKBy5fc4JahBHd6MYrZcb4IySrTObPb1FdQl7GZwjXSiwdl8GHFgNZ6VPpT?=
+ =?us-ascii?Q?JjNfcXxJDFfOUxT2zDafUBzv/1OYP/pxndbzeoenWbhjJJ7L61aCoJoeMMAO?=
+ =?us-ascii?Q?DyDzDVj7ZwDq7StRInfy8nKbIlt+LMwnRqbydQ22ZsaCyRMOJstKLbsae8lb?=
+ =?us-ascii?Q?6Hy6cpFxmHgt1HRkpv5N+DqRk7AXAStbrDxaU2OYd0NxsUCfGr/wWerbfCRU?=
+ =?us-ascii?Q?4/LLxDMCSr283wg3zbQTfdnqeySaTqooTOUguZc8o6sumjO7asLBFHDxXB/C?=
+ =?us-ascii?Q?uNIrqqJ8lGMygy5vdsmHXjOOLezEqkGyriR8MHpSIETQ4VPd7FdYBfnnH/gj?=
+ =?us-ascii?Q?/WHEljmduv9U4K4/q+EXVnQmceuJFfpiIEg9wjI9yvEHUqNqywJoCJ+VDBtC?=
+ =?us-ascii?Q?qATwP9u+2SwSk9lz2epbWlMM/ib2TrnEyGHp2zxaCcZWM3JTszW/d45uJ+Y0?=
+ =?us-ascii?Q?ygeLBrtbt8VjL86cqYDnL0Tux9E1MgZKvnLcoFwrGGeQG8i85lN0noHI/Eqg?=
+ =?us-ascii?Q?YVxTBp31Sl0dxXYF4awvdCFgdGSbN3Xl4uQ1rjPevv2HoLofo/e3FxQy/+rG?=
+ =?us-ascii?Q?Urd/t+R7+tIk5DMOUoYZLGqCzAGOAKrLgXKj0Gb7sG0ddZ5VzMwJTeWb1mil?=
+ =?us-ascii?Q?IlgyNvI6oE9RdOa9WOz362G81tyqWXL72JmhVp7eJUgg5Lf/ttnbvZcunnMC?=
+ =?us-ascii?Q?rd9OphOMFaFKazsqS2JgTlT5otRfwSAaA3Jbk1nZtTmR+0yG7tQAsWEvn/zm?=
+ =?us-ascii?Q?CRcAYFqBO/VlhqZWiojP1KvmJv6KZcDZm8oRvMLiM/cqk4/qsqbwfYb/4BbK?=
+ =?us-ascii?Q?hc4=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB5423.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oHNQLH6Jz0rizU65j74RDiz3Fbl3VhH+NUiW8tMR4dl6kELjxkF9arC/U97R?=
+ =?us-ascii?Q?JQRIUxyWPeQtUQr7MQ0jkTVJwUW7IMMSgr1nOICRwzWQo9EXpickwqCEHnxk?=
+ =?us-ascii?Q?lbpxRLL/rVlcJoFAD7HLgTMmqG29TtsOUgfe8RV3SzrQHnSj7V0gNyvyXkIa?=
+ =?us-ascii?Q?ek56VrqlBTBUyyV254c66uvlMrYhYIak56rO5DSVXEy6J56g+lpcu48zH9X2?=
+ =?us-ascii?Q?rJZWvb58cMNRNtzmchjrk5/KSfoezwRCaFohk0f6Anxx6QDWfEbUKdMXwaQS?=
+ =?us-ascii?Q?K4EWpqTaLqGhYnndB4np/s3DaX8ztlohyuc0ekqam7XGyWPcwdHc9Ay+YPHA?=
+ =?us-ascii?Q?chCuAodoCSYkFSkPVrDTcmEvyNTjDbSLjwD5lbMIBO6E6X/E8D1Yt0FqCtjb?=
+ =?us-ascii?Q?YsJosKlRMHOAVCc2UGHpvG/XqfcYnWzXqi4XJIGwtqvf2lgzV/+i5PkBxUrM?=
+ =?us-ascii?Q?8YnVztPiqgVvo89yEsub9s692uwN7SfIZCE3+t6FicUF3cYb2SCIV4eM/oXZ?=
+ =?us-ascii?Q?7Xb/XDmEFmBInIJupJTL1cVdQGAr1vSXBOkZw7IOBXMcHxwM84oe2F+jB7pv?=
+ =?us-ascii?Q?JGOyngBesO6frL4dwnmxhRQF0wkc4iBvgwS87SwXK+bwb56dQ9eX6nqY83PD?=
+ =?us-ascii?Q?wVonJjp4m/yvXhjRxasSOS65rYO32FyQQiVFjfn64fBDb1HPOnDQKIlxTS15?=
+ =?us-ascii?Q?BVQbfBlvzFl5x0n3eQ1s1VP81zqoxJniTjcYYmKLxMNtgsyt5G8oTPSoPo/Y?=
+ =?us-ascii?Q?eBpP7S4sY3HoTKcH/RQ0H5RiGVi5cQTGN8yYDU/vhJlt1pILWoBTKV1XAW29?=
+ =?us-ascii?Q?bYaNb8wN0n1IT5FZUDxPNA6Tc19k2NYMFnfDfMHmUmd5a2TNrcyxhqGN1tyP?=
+ =?us-ascii?Q?MGIBqNQ9MRq3RDN+ApZxP5UIOfeFy4RWhGx/EM16rZKIli93h+xQg+RFijNT?=
+ =?us-ascii?Q?uScE2pggF9nPMRA96hYSsjX0bDTaro3NfunO1TtVKkreL9im7LxXMLoQIZVl?=
+ =?us-ascii?Q?DZhz31OR+PRqF1yu65PhA4kuMGEAXGGb8qElg3ZFMPEYw5A+Su5ErczAP7Se?=
+ =?us-ascii?Q?7mPK1XC7/qagwY/9BMtZhITgzku5P7NrnF5PB1QL8D84oEem07PbqNP9tGgT?=
+ =?us-ascii?Q?CPOf6ngIcvhJqhjI3wOQM8xNgTNDlxlaZQmN0Pkt6BC4fpC7slBaLF1EfCO2?=
+ =?us-ascii?Q?5jBRmFuDLXxvwUGgDR9km8KMSZxkubkaRki827/IUCCP1iDAdt5wmfIvkxlk?=
+ =?us-ascii?Q?BY0FlMD62DQ6IJ58c3BlR/Gt4hl2gDVERG/OyQ3v/JaXNF46yu8A3Ou5BJoZ?=
+ =?us-ascii?Q?w2sr9d9JdVrBXAGroG/eN70LhYdU3XYTSd8w9km+FNDuFyTQGdNc94vHwwpW?=
+ =?us-ascii?Q?lsUBjCirhk+bmNeSDvacwr+p9eCMNpHqCf4KGo9UCxblRIWecWtEuCnPowgM?=
+ =?us-ascii?Q?Pb8qzI+AEGoSeYFxao3vYeet7tFaWI2CIHgxKkG6YqNV12YLLeW2Zi1przyA?=
+ =?us-ascii?Q?k6o2WhiVjys5NPLWEZwyAvGc6N6yLsv+xbabJ5b7r8LBc9HmKI90gMEE2vg1?=
+ =?us-ascii?Q?knRA0ICePrZPSPZ52AAOC72b7NH30In9X9HlDZIv?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46dfbf60-1a52-45ea-05fb-08dcdaa53759
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB5423.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Sep 2024 01:23:51.6939
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NEmXz31vJjwlDv/ixBYiMoi6YY6ctF8OVwXRbgu432DtSNtFYv3qQxJXqclaj3SEe0G1mG/BXCYu9SO7Gw+7iQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6945
+X-OriginatorOrg: intel.com
 
-Hi!
+Hi Anjali,
 
-While trying out a kernel at commit
-88264981f2082248e892a706b2c5004650faac54 (latest mainline) with
-lockdep enabled, I hit a lockdep warning - it looks like wireguard
-takes the rtnl_lock in a PM callback (meaning pm_chain_head.rwsem is
-already held), while r8152 registers a PM callback in a context where
-the rtnl_lock is held, and this makes lockdep unhappy. But I don't
-know enough about the PM code to know which of those is the problem or
-whether this race could even occur. I'm also not sure whether this is
-a regression - I don't usually run lockdep kernels on this machine.
+kernel test robot noticed the following build warnings:
 
+[auto build test WARNING on net-next/main]
 
-[ 1749.181131] PM: suspend entry (s2idle)
-[ 1749.209736] Filesystems sync: 0.028 seconds
+url:    https://github.com/intel-lab-lkp/linux/commits/Anjali-Kulkarni/connector-cn_proc-Handle-threads-for-proc-connector/20240920-081249
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240920000933.185090-3-anjali.k.kulkarni%40oracle.com
+patch subject: [PATCH net-next 2/2] connector/cn_proc: Selftest for threads case
+:::::: branch date: 2 days ago
+:::::: commit date: 2 days ago
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240921/202409212201.l94GHFkW-lkp@intel.com/reproduce)
 
-[ 1749.220240] ======================================================
-[ 1749.220242] WARNING: possible circular locking dependency detected
-[ 1749.220244] 6.11.0-slowkasan+ #140 Not tainted
-[ 1749.220247] ------------------------------------------------------
-[ 1749.220249] systemd-sleep/5239 is trying to acquire lock:
-[ 1749.220252] ffffffffb1156c88 (rtnl_mutex){+.+.}-{3:3}, at:
-wg_pm_notification (drivers/net/wireguard/device.c:81
-drivers/net/wireguard/device.c:64)
-[ 1749.220265]
-but task is already holding lock:
-[ 1749.220267] ffffffffb077e170 ((pm_chain_head).rwsem){++++}-{3:3},
-at: blocking_notifier_call_chain_robust (kernel/notifier.c:128
-kernel/notifier.c:353 kernel/notifier.c:341)
-[ 1749.220277]
-which lock already depends on the new lock.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/r/202409212201.l94GHFkW-lkp@intel.com/
 
-[ 1749.220279]
-the existing dependency chain (in reverse order) is:
-[ 1749.220281]
--> #1 ((pm_chain_head).rwsem){++++}-{3:3}:
-[ 1749.220287] down_write (./arch/x86/include/asm/preempt.h:79
-kernel/locking/rwsem.c:1304 kernel/locking/rwsem.c:1315
-kernel/locking/rwsem.c:1580)
-[ 1749.220292] blocking_notifier_chain_register (kernel/notifier.c:272
-kernel/notifier.c:290)
-[ 1749.220295] rtl8152_open (drivers/net/usb/r8152.c:6994)
-[ 1749.220300] __dev_open (net/core/dev.c:1476)
-[ 1749.220304] __dev_change_flags (net/core/dev.c:8837)
-[ 1749.220308] dev_change_flags (net/core/dev.c:8909)
-[ 1749.220311] do_setlink (net/core/rtnetlink.c:2900)
-[ 1749.220315] __rtnl_newlink (net/core/rtnetlink.c:3696)
-[ 1749.220318] rtnl_newlink (net/core/rtnetlink.c:3744)
-[ 1749.220322] rtnetlink_rcv_msg (net/core/rtnetlink.c:6646)
-[ 1749.220325] netlink_rcv_skb (net/netlink/af_netlink.c:2550)
-[ 1749.220329] netlink_unicast (net/netlink/af_netlink.c:1331
-net/netlink/af_netlink.c:1357)
-[ 1749.220332] netlink_sendmsg (net/netlink/af_netlink.c:1901)
-[ 1749.220335] ____sys_sendmsg (net/socket.c:730 net/socket.c:745
-net/socket.c:2603)
-[ 1749.220339] ___sys_sendmsg (net/socket.c:2659)
-[ 1749.220342] __sys_sendmsg (net/socket.c:2686)
-[ 1749.220344] do_syscall_64 (arch/x86/entry/common.c:52
-arch/x86/entry/common.c:83)
-[ 1749.220348] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-[ 1749.220352]
--> #0 (rtnl_mutex){+.+.}-{3:3}:
-[ 1749.220357] __lock_acquire (kernel/locking/lockdep.c:3159
-kernel/locking/lockdep.c:3277 kernel/locking/lockdep.c:3901
-kernel/locking/lockdep.c:5199)
-[ 1749.220362] lock_acquire (kernel/locking/lockdep.c:467
-kernel/locking/lockdep.c:5824 kernel/locking/lockdep.c:5787)
-[ 1749.220365] __mutex_lock (kernel/locking/mutex.c:610
-kernel/locking/mutex.c:752)
-[ 1749.220369] wg_pm_notification (drivers/net/wireguard/device.c:81
-drivers/net/wireguard/device.c:64)
-[ 1749.220372] notifier_call_chain (kernel/notifier.c:93)
-[ 1749.220375] blocking_notifier_call_chain_robust
-(kernel/notifier.c:129 kernel/notifier.c:353 kernel/notifier.c:341)
-[ 1749.220378] pm_notifier_call_chain_robust
-(./include/linux/notifier.h:207 kernel/power/main.c:104)
-[ 1749.220382] pm_suspend (kernel/power/suspend.c:367
-kernel/power/suspend.c:588 kernel/power/suspend.c:625)
-[ 1749.220386] state_store (kernel/power/main.c:746)
-[ 1749.220389] kernfs_fop_write_iter (fs/kernfs/file.c:334)
-[ 1749.220393] vfs_write (fs/read_write.c:590 fs/read_write.c:683)
-[ 1749.220397] ksys_write (fs/read_write.c:736)
-[ 1749.220399] do_syscall_64 (arch/x86/entry/common.c:52
-arch/x86/entry/common.c:83)
-[ 1749.220402] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-[ 1749.220406]
-other info that might help us debug this:
+All warnings (new ones prefixed by >>):
 
-[ 1749.220408]  Possible unsafe locking scenario:
+   In file included from ../../../../include/uapi/linux/netlink.h:7,
+                    from proc_filter.c:11:
+>> ../../../../include/uapi/linux/types.h:10:2: warning: #warning "Attempt to use kernel headers from user space, see https://kernelnewbies.org/KernelHeaders" [-Wcpp]
+      10 | #warning "Attempt to use kernel headers from user space, see https://kernelnewbies.org/KernelHeaders"
+         |  ^~~~~~~
 
-[ 1749.220409]        CPU0                    CPU1
-[ 1749.220411]        ----                    ----
-[ 1749.220413]   rlock((pm_chain_head).rwsem);
-[ 1749.220416]                                lock(rtnl_mutex);
-[ 1749.220420]                                lock((pm_chain_head).rwsem);
-[ 1749.220423]   lock(rtnl_mutex);
-[ 1749.220426]
-*** DEADLOCK ***
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
-[ 1749.220428] 5 locks held by systemd-sleep/5239:
-[ 1749.220430] #0: ffff888125d2e3f8 (sb_writers#6){.+.+}-{0:0}, at:
-ksys_write (fs/read_write.c:736)
-[ 1749.220439] #1: ffff8881e5cb9888 (&of->mutex){+.+.}-{3:3}, at:
-kernfs_fop_write_iter (fs/kernfs/file.c:326)
-[ 1749.220447] #2: ffff888460aee2d8 (kn->active#166){.+.+}-{0:0}, at:
-kernfs_fop_write_iter (fs/kernfs/file.c:326)
-[ 1749.220455] #3: ffffffffb0757008
-(system_transition_mutex){+.+.}-{3:3}, at: pm_suspend
-(kernel/power/suspend.c:574 kernel/power/suspend.c:625)
-[ 1749.220463] #4: ffffffffb077e170
-((pm_chain_head).rwsem){++++}-{3:3}, at:
-blocking_notifier_call_chain_robust (kernel/notifier.c:128
-kernel/notifier.c:353 kernel/notifier.c:341)
-[ 1749.220471]
-stack backtrace:
-[ 1749.220474] CPU: 1 UID: 0 PID: 5239 Comm: systemd-sleep Not tainted
-6.11.0-slowkasan+ #140
-[ 1749.220478] Hardware name: [...]
-[ 1749.220480] Call Trace:
-[ 1749.220483]  <TASK>
-[ 1749.220485] dump_stack_lvl (lib/dump_stack.c:124)
-[ 1749.220491] print_circular_bug (kernel/locking/lockdep.c:2077)
-[ 1749.220496] check_noncircular (kernel/locking/lockdep.c:2203)
-[...]
-[ 1749.220519] __lock_acquire (kernel/locking/lockdep.c:3159
-kernel/locking/lockdep.c:3277 kernel/locking/lockdep.c:3901
-kernel/locking/lockdep.c:5199)
-[...]
-[ 1749.220546] lock_acquire (kernel/locking/lockdep.c:467
-kernel/locking/lockdep.c:5824 kernel/locking/lockdep.c:5787)
-[...]
-[ 1749.220577] __mutex_lock (kernel/locking/mutex.c:610
-kernel/locking/mutex.c:752)
-[...]
-[ 1749.220627] wg_pm_notification (drivers/net/wireguard/device.c:81
-drivers/net/wireguard/device.c:64)
-[ 1749.220631] notifier_call_chain (kernel/notifier.c:93)
-[ 1749.220636] blocking_notifier_call_chain_robust
-(kernel/notifier.c:129 kernel/notifier.c:353 kernel/notifier.c:341)
-[...]
-[ 1749.220649] pm_notifier_call_chain_robust
-(./include/linux/notifier.h:207 kernel/power/main.c:104)
-[ 1749.220652] pm_suspend (kernel/power/suspend.c:367
-kernel/power/suspend.c:588 kernel/power/suspend.c:625)
-[ 1749.220656] state_store (kernel/power/main.c:746)
-[ 1749.220661] kernfs_fop_write_iter (fs/kernfs/file.c:334)
-[ 1749.220665] vfs_write (fs/read_write.c:590 fs/read_write.c:683)
-[...]
-[ 1749.220693] ksys_write (fs/read_write.c:736)
-[...]
-[ 1749.220701] do_syscall_64 (arch/x86/entry/common.c:52
-arch/x86/entry/common.c:83)
-[ 1749.220704] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
-[ 1749.220708] RIP: 0033:0x7fe2e2917240
-[...]
-[ 1749.220735]  </TASK>
-[ 1749.223599] Freezing user space processes
-[ 1749.226307] Freezing user space processes completed (elapsed 0.002 seconds)
 
