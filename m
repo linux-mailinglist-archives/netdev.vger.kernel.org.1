@@ -1,229 +1,151 @@
-Return-Path: <netdev+bounces-129161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B317597E08B
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 10:14:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A012997E0A5
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 11:05:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD2F61C208FB
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 08:14:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D805C28114F
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 09:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F6E19309D;
-	Sun, 22 Sep 2024 08:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB01C126BF7;
+	Sun, 22 Sep 2024 09:05:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BJVKgGiG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fisVST3e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542672C6A3;
-	Sun, 22 Sep 2024 08:14:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D937726AFB;
+	Sun, 22 Sep 2024 09:05:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726992891; cv=none; b=fVzr3cTR31rxlom8+gAi4SPtpVJXadMY+ejMv8rhXdtCEgWGpZHSmEFLMnzSywJWe5fN14K8QECvIhrR18Ti5oAAADBzw7/b8l0KslP4T4FYKjqjHQfFZ9GkCQZD0mWP/voOIOpLqbx5j7oglwT1ZJX/798so4wbjAcolRoUn/E=
+	t=1726995905; cv=none; b=NAJu8LhhyZQjak+ZY5MG5xZ57b9l/ktx6jGxRo9QHBFsvc7qwtNwgrw5FLjCec0h+HFA6Lsu7qPzV0EcoGCUYH7XhbCpJuKescYowJHi9xZH3ajwRHwlGY/hYogAcyuxjC4TlkCRItJ33kJbgohuHeBfZ/PkjVA5pp+Sab0Jur8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726992891; c=relaxed/simple;
-	bh=daVW5nkkXHXbUa28cwr4Mm6p9F17c5lXuRDCLv5wpyM=;
+	s=arc-20240116; t=1726995905; c=relaxed/simple;
+	bh=9ZNP7TFHAZc3BRVw8xuCm3iEcUlVEkdaSYKgk/Cad8Q=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZjYjn5RPaCLIyu736UpVBys6GGHwJIXOM72Q9Sxxq14K4FC2JngESBkXVCNxPbwN4+oIBwKepbUfqn+4bQBZGAdXnO8vtmQHoepLaNvdGjlSUFw289G8iMi/60FVq3hHKkBb57+9te/sp19m9qwYxbcH6csJvDMXQWx7TPPFzhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BJVKgGiG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC6E6C4CED0;
-	Sun, 22 Sep 2024 08:14:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1726992890;
-	bh=daVW5nkkXHXbUa28cwr4Mm6p9F17c5lXuRDCLv5wpyM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=BJVKgGiGR7tSchChAfCiRfZd6kgnYLQJM8Q16qEF1dlbLiaT8aHW7pUbJVSz7d742
-	 nfyGL1SuA0Ir2P2+Vucx+dRS3ejAvBt10hmGq+vpDenAVSL7Mu9tE8BkLcKX655v+E
-	 M0YIx325UYT7E2dmSHZ2Pjpf+IiVNJNRuN3INM5+X5RgP/Y73vYdS+EU1pG/txMyfA
-	 uXhpkmzVJwvwpPkFaVuSxHi6hmK6oeJ25u+1rNplzqKuCoZk8iID6kux2G72mGe/Cz
-	 17bU021Nh4eXF+cc61SNXlvkCyCowmHTJmonwMyp4/2rTLO3PMZSBYTiEFHUiEmi7z
-	 1yCUWajynF+fA==
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5365cf5de24so4171532e87.1;
-        Sun, 22 Sep 2024 01:14:50 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCU3z8ktaVsLUNTKJXKMzK9cI8CAcZKfzV01rXYpHsCrqeCsncKmumcx2vAqsS5w8VzbY9eAmgXxeI3c1Q==@vger.kernel.org, AJvYcCUJY83GPPbwWypCvG1NidtE1Gxim9PjLVRKB8NNksgkTchHhT9H2cO+DSbXPlVA+2OYQ1yN32gyh/mhWA==@vger.kernel.org, AJvYcCVdF4ahk5Cc434JV6yE7XXYFAziAj2qYfhcj2Bl07bx1923rAFB5ZdU6ul3kLywlrEposZP4W+4qdOMQRoS@vger.kernel.org, AJvYcCVioPEDm0PcVQ9dETExaiYWHKWvNaoaSBV4S/eSl/cU++YVMrijgorqRnEEdgMOTYjesTuKSc5UXdr/@vger.kernel.org, AJvYcCX3X23/+KRucze82lXBGXe0OiSgWK9ISEVhMOgdHrmsf4wC6mv/K9c6qIsC/L5IsHVYU0+u0W8hvJUV@vger.kernel.org, AJvYcCX5aTa5pE0KKMfdtAaEMFITxln5W/iJ5UGmcJcV+7o60iuBweAnXLyhz7FDMorJ6GklOQ5VzqSsMHNo@vger.kernel.org, AJvYcCXUJWtK0/sqAUU0zPCYEJVBDEmkUITHZgOLT8PUoez/0KvLIQmwojOpezKW5TbKgxgwng/PdLh9AavKqlRW@vger.kernel.org, AJvYcCXvhwT8aC6UCEH2gl1tKAu/C6Knqlf3HnZRovAk5TeYf+Y9CsmWbii/8DUDv5XFWLzThB3XZ+Sz@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxm38pquwDnzp64QIRpZnEe0GdIqiSur1c4R6OzrYCwMKR+2iSx
-	GA+nqMi3bgu6QSJ+abz050gyqwnTO6vRJIKV0tUlS6gaD3Ycp0tzpP24Fv0R/QYFC3iWvZIht9X
-	kcwtGEF/tfcLvFOCJyLoDTsX1H8M=
-X-Google-Smtp-Source: AGHT+IEkGHmluJPYdY5Kkg0y6DLMIw/ocbENg+Gy+OgcetK1Xjl0OGvt1ds6StzBsAWxCQ0BMMYkAc8LLyrnCJUG5uk=
-X-Received: by 2002:a05:6512:281c:b0:533:44a3:21b9 with SMTP id
- 2adb3069b0e04-536acf6abdemr3884035e87.1.1726992889297; Sun, 22 Sep 2024
- 01:14:49 -0700 (PDT)
+	 To:Cc:Content-Type; b=T3sJjY0CZ6r1gZEOxsZR46Uq/9BJJdtIOc7uzUSauAbwA85PBtyOHpcoahztLBUOZUqQ011PphBPAM32U/XP6SNyErYx3DmgGvONsOXvSEU8r6kN5S7yfszUy/1GHzfnJQ+rIK/txau9zG94Sg/mtdiCcAcCeQcPRIz3/zduoA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fisVST3e; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f759688444so27088111fa.1;
+        Sun, 22 Sep 2024 02:05:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1726995902; x=1727600702; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IyCSaKvDj6Ef0oZyW1GXq3YNjZVJNRSaQyvNjHyvEw8=;
+        b=fisVST3eKRZ4UrHUqWkADcGyaCAe0Lz2OSxnKp/wXYxWa9J71OzAaD9WabLPP8cuEX
+         d5olDI77ZqFSRwPVX3Paa/JZ5FDVrWi51mCzjlemvwop0lV1Pk3+RBx6GRaDr7LgBDdL
+         psD4mm/r9lXFUTrIHzgAxDsm1chgRLEevlTzSl4yAxs+NNrkbA3y3ygs6WKJX4qQnKoE
+         npdwskUyR71QJanp8Ov5emrvx/Tw7No0hRp3nR3FDmZpgAbEGWoBJJjibtuH1ZEkOAPC
+         bYAwhGvpobHvtubu9LG1GoZKWJZ9Fv/x4q2YAh2cP0JHgIcPPytZDPxHF51lvfrbAHwJ
+         BVZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726995902; x=1727600702;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IyCSaKvDj6Ef0oZyW1GXq3YNjZVJNRSaQyvNjHyvEw8=;
+        b=bHIJVnpi2x8V5XsJeO+srgGb93mS/CZDeHuvR2ZuZDkrqqa1lv3E/ZPdmbZUJDahky
+         +tuKKVpXbyEBLelq/BxnFPANOwWVm3YcV+FxOiigUnre4oTTXfVoiDisk32EFBBOQ5Hp
+         BoTxFSQT8Bb8DrJUJ2XNfdqvIckbR3V3Ws+GGiq7HvfGRY2jfPQnA8Ym4qDnoXlMVP2b
+         gvnfsb9qPNix340H3cOKT22Db8CyxZ+iKBx5NFU5Saqd/pJwWucPpKeFhfJbHzhzh2ZH
+         rNF5UgzPg76U3FbzBOYJjnLoxxRrSbyu1CFlJWlkquzHR0CelNbQ0KtOuF+bosXGtRYf
+         mHmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWVmoaFXpFRZiMbvPwhKD8H/68JXOto3nmmuk/sWh0I+CGDvGibzpqXeXpA4LaPP5DzdwI4NUlx@vger.kernel.org, AJvYcCXHAQC7rSu11UtJq43ECQSPH16dtuWxOF6mdw8BCbPW+MKUd/6+wDzdKT4GIvXGPxn/zQCwuzUhVbE+f+Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw542mzuiaB/BI26Yx1M+pxm0W8XLrAe+VbqeDnJ8By5Ubuibv6
+	OdMhH7B3t6NQKRHdTx+zbJNjAHFBCoGUHS5UWAw3857zBfrqf4658A4oykBAteaYiR9CUBGJswQ
+	i5ZVLqPjKRW69S9c2GhTb9rmu9+w=
+X-Google-Smtp-Source: AGHT+IGm4zJHHGFfR6x4MQzoJiQIvx7ANR+hP2qGj10bxej/hKm3MdCZmaZZIj8EF2P8+RsapeoKaI8fGBxoZD2WQJA=
+X-Received: by 2002:a2e:b8c2:0:b0:2ef:2638:48cd with SMTP id
+ 38308e7fff4ca-2f7cb335ea2mr44468641fa.30.1726995901662; Sun, 22 Sep 2024
+ 02:05:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1724159867.git.andrea.porta@suse.com> <12d0909b1612fb6d2caa42b4fda5e5ae63d623a3.1724159867.git.andrea.porta@suse.com>
- <2113b8df52164733a0ee3860bb793d6e.sboyd@kernel.org> <ZtcBHvI9JxgH9iFT@apocalypse>
- <d87530b846d0dc9e78789234cfcb602a.sboyd@kernel.org>
-In-Reply-To: <d87530b846d0dc9e78789234cfcb602a.sboyd@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Sun, 22 Sep 2024 17:14:12 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQEx52BYMYfNu+xj8sNmdtH9XfPapdhJDrsbDo43aD3Dg@mail.gmail.com>
-Message-ID: <CAK7LNAQEx52BYMYfNu+xj8sNmdtH9XfPapdhJDrsbDo43aD3Dg@mail.gmail.com>
-Subject: Re: [PATCH 05/11] vmlinux.lds.h: Preserve DTB sections from being
- discarded after init
-To: Stephen Boyd <sboyd@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>, Andrew Lunn <andrew@lunn.ch>, Arnd Bergmann <arnd@arndb.de>, 
-	Bjorn Helgaas <bhelgaas@google.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic <dragan.cvetic@amd.com>, 
-	Eric Dumazet <edumazet@google.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Lee Jones <lee@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Stefan Wahren <wahrenst@gmx.net>, 
-	Will Deacon <will@kernel.org>, devicetree@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, 
-	netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+References: <20240829154739.16691-1-ubizjak@gmail.com> <Ztc16pw4r3Tf_U7h@calendula>
+In-Reply-To: <Ztc16pw4r3Tf_U7h@calendula>
+From: Uros Bizjak <ubizjak@gmail.com>
+Date: Sun, 22 Sep 2024 11:04:56 +0200
+Message-ID: <CAFULd4bUoeviAnomH38rGRa55KSkz3_L49Jqw3Tit4UCdywpnQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] netfilter: nf_tables: Fix percpu address space
+ issues in nf_tables_api.c
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Sep 22, 2024 at 5:47=E2=80=AFAM Stephen Boyd <sboyd@kernel.org> wro=
-te:
+On Tue, Sep 3, 2024 at 6:14=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.o=
+rg> wrote:
 >
-> Quoting Andrea della Porta (2024-09-03 05:29:18)
-> > On 12:46 Fri 30 Aug     , Stephen Boyd wrote:
-> > > Quoting Andrea della Porta (2024-08-20 07:36:07)
-> > > > diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generi=
-c/vmlinux.lds.h
-> > > > index ad6afc5c4918..3ae9097774b0 100644
-> > > > --- a/include/asm-generic/vmlinux.lds.h
-> > > > +++ b/include/asm-generic/vmlinux.lds.h
-> > >
-> > > It would be nice to keep the initdata properties when this isn't used
-> > > after init as well. Perhaps we need another macro and/or filename to
-> > > indicate that the DTB{O} can be thrown away after init/module init.
+> Hi,
+>
+> On Thu, Aug 29, 2024 at 05:29:30PM +0200, Uros Bizjak wrote:
+> > Use {ERR_PTR,IS_ERR,PTR_ERR}_PCPU() macros when crossing between generi=
+c
+> > and percpu address spaces and add __percpu annotation to *stats pointer
+> > to fix percpu address space issues.
+>
+> IIRC, you submitted patch 1/2 in this series to the mm tree.
+>
+> Let us know if this patch gets upstreamed via MM tree (if mm
+> maintainers are fine with it) or maybe MM maintainers prefer an
+> alternative path for this.
+
+Dear maintainers,
+
+I would just like to inform you that patch 1/2 got mainlined [1] as
+commit a759e37fb467.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3Da759e37fb46708029c9c3c56c3b62e6f24d85cf5
+
+Best regards,
+Uros.
+
+> Thanks.
+>
+> > NOTE: The patch depends on a patch that introduces *_PCPU() macros [1]
+> > that is on the way to mainline through the mm tree. For convience, the
+> > patch is included in this patch series, so CI tester is able to test
+> > the second patch without compile failures.
 > >
-> > We can certainly add some more filename extension that would place the
-> > relevant data in a droppable section.
-> > Throwing away the dtb/o after init is like the actual KERNEL_DTB macro =
-that
-> > is adding teh data to section .init.data, but this would mean t would b=
-e
-> > useful only at very early init stage, just like for CONFIG_OF_UNITTEST.
-> > Throwing after module init could be more difficult though, I think,
-> > for example we're not sure when to discard the section in case of defer=
-red
-> > modules probe.
+> > [1] https://lore.kernel.org/lkml/20240818210235.33481-1-ubizjak@gmail.c=
+om/
 > >
->
-> This patch can fix a modpost warning seen in linux-next because I have
-> added DT overlays from KUnit tests while kbuild has properly marked the
-> overlay as initdata that is discarded. See [1] for details. In KUnit I
-> doubt this really matters because most everything runs from __init code
-> (even if it isn't marked that way).
->
-> I'm thinking that we need to make dtbo Makefile target put the blob in
-> the rodata section so it doesn't get thrown away and leave the builtin
-> DTB as part of init.rodata. Did you already do that? I see the kbuild
-> tree has removed the commit that caused the warning, but I suspect this
-> may still be a problem. See [2] for the next series where overlays
-> applied in the test happen from driver probe so __ref is added.
->
-> If we simply copy the wrap command and make it so that overlays always
-> go to the .rodata section we should be good. Maybe there's some way to
-> figure out what is being wrapped so we don't have to copy the whole
-> thing.
->
-> Finally, it's unfortunate that the DTBO is copied when an overlay is
-> applied. We'll waste memory after this patch, so of_overlay_fdt_apply()
-> could be taught to reuse the blob passed in instead of copying it.
->
-> -----8<----
-> diff --git a/scripts/Makefile.dtbs b/scripts/Makefile.dtbs
-> index 55998b878e54..070e08082cd3 100644
-> --- a/scripts/Makefile.dtbs
-> +++ b/scripts/Makefile.dtbs
-> @@ -51,11 +51,25 @@ quiet_cmd_wrap_S_dtb =3D WRAP    $@
->                 echo '.balign STRUCT_ALIGNMENT';                         =
-               \
->         } > $@
->
-> +quiet_cmd_wrap_S_dtbo =3D WRAP    $@
-> +      cmd_wrap_S_dtbo =3D {                                             =
-                 \
-> +               symbase=3D__$(patsubst .%,%,$(suffix $<))_$(subst -,_,$(n=
-otdir $*));      \
-> +               echo '\#include <asm-generic/vmlinux.lds.h>';            =
-               \
-> +               echo '.section .rodata,"a"';                             =
-               \
-> +               echo '.balign STRUCT_ALIGNMENT';                         =
-               \
-> +               echo ".global $${symbase}_begin";                        =
-               \
-> +               echo "$${symbase}_begin:";                               =
-               \
-> +               echo '.incbin "$<" ';                                    =
-               \
-> +               echo ".global $${symbase}_end";                          =
-               \
-> +               echo "$${symbase}_end:";                                 =
-               \
-> +               echo '.balign STRUCT_ALIGNMENT';                         =
-               \
-> +       } > $@
-> +
->  $(obj)/%.dtb.S: $(obj)/%.dtb FORCE
->         $(call if_changed,wrap_S_dtb)
->
->  $(obj)/%.dtbo.S: $(obj)/%.dtbo FORCE
-> -       $(call if_changed,wrap_S_dtb)
-> +       $(call if_changed,wrap_S_dtbo)
->
->  # Schema check
->  # ----------------------------------------------------------------------=
------
->
-> [1] https://lore.kernel.org/all/20240909112728.30a9bd35@canb.auug.org.au/
-> [2] https://lore.kernel.org/all/20240910094459.352572-1-masahiroy@kernel.=
-org/
-
-
-
-
-
-
-
-Rather, I'd modify my patch as follows:
-
-
-
---- a/scripts/Makefile.dtbs
-+++ b/scripts/Makefile.dtbs
-@@ -34,12 +34,14 @@ $(obj)/dtbs-list: $(dtb-y) FORCE
- # Assembly file to wrap dtb(o)
- # ------------------------------------------------------------------------=
----
-
-+builtin-dtb-section =3D $(if $(filter arch/%, $(obj)),.dtb.init.rodata,.ro=
-data)
-+
- # Generate an assembly file to wrap the output of the device tree compiler
- quiet_cmd_wrap_S_dtb =3D WRAP    $@
-       cmd_wrap_S_dtb =3D { \
-  symbase=3D__$(patsubst .%,%,$(suffix $<))_$(subst -,_,$(notdir $*)); \
-  echo '\#include <asm-generic/vmlinux.lds.h>'; \
-- echo '.section .dtb.init.rodata,"a"'; \
-+ echo '.section $(builtin-dtb-section),"a"'; \
-  echo '.balign STRUCT_ALIGNMENT'; \
-  echo ".global $${symbase}_begin"; \
-  echo "$${symbase}_begin:"; \
-
-
-
-
---=20
-Best Regards
-Masahiro Yamada
+> > The netfilter patch obsoletes patch [2].
+> >
+> > [2] https://patchwork.ozlabs.org/project/netfilter-devel/patch/20240806=
+102808.804619-1-ubizjak@gmail.com/
+> >
+> > Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> > Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> >
+> > Uros Bizjak (2):
+> >   err.h: Add ERR_PTR_PCPU(), PTR_ERR_PCPU() and IS_ERR_PCPU() macros
+> >   netfilter: nf_tables: Fix percpu address space issues in
+> >     nf_tables_api.c
+> >
+> >  include/linux/err.h           |  9 +++++++++
+> >  net/netfilter/nf_tables_api.c | 16 ++++++++--------
+> >  2 files changed, 17 insertions(+), 8 deletions(-)
+> >
+> > --
+> > 2.42.0
+> >
 
