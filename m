@@ -1,133 +1,157 @@
-Return-Path: <netdev+bounces-129185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA2097E273
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 18:23:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7293797E27A
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 18:34:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CFCE1C20D94
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 16:23:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2258B281262
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 16:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0B51F5FE;
-	Sun, 22 Sep 2024 16:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCF6219E4;
+	Sun, 22 Sep 2024 16:34:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PFyb9MGT"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jm9nwVxc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE95ABA2E;
-	Sun, 22 Sep 2024 16:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3502581;
+	Sun, 22 Sep 2024 16:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727022214; cv=none; b=e2pmoAcJ6Jg0XhkOgnhFJu2oCD4H54nSyCA45CaQTL5NxJhgoHcTLCyUmjiiP+VC3d8m4VvsYlkPv5vcz4N7AFd7NwmCiMJZ0w+T780ytyPYpTm+6hpAFKzLXLhYSYqkf8TzP09QG8/tvBBSvMDjqpYfemDwpeOjUVGe+dmXnYw=
+	t=1727022861; cv=none; b=oKX8gcT5F4l4gZz4NARRQ9gFVMDjuZJ4Duo9dvur6sXRPizjqBiAJFZNAiDRHmH7QKV6gwvMYW6bnvtQtbejg0cCpfR08oJ+ISMslhQdAkgYKWL3HfsnDNP8ypgtj0h9ygmbnVTWudNZ6qcdnBXspqxhMJqkfqW2KIVTusiXhHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727022214; c=relaxed/simple;
-	bh=dgbk0GepYMfUAgep3wFQBc6FfyQBzJrgxVP1kPHTNks=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AtQ14gCjziQr9+D3769c11hb5izrYtcgzbX3JxIgqvkgLW8NaJ2dDt1IVfAltAy4VMVURFy7YKpNYf0QA524+gmIvJClpArvAIeykTNc8knZvk1s/NGi8nzaGZq4Q3E0qLChJQeo+TgrGjosOOifE52S5j5hWaPILcBPuB16nxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PFyb9MGT; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e1a819488e3so2777366276.3;
-        Sun, 22 Sep 2024 09:23:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727022211; x=1727627011; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wEHQZ7aV2v97Y8TR3PMXm+WQO/EG3K5hYw1BGfIK/c4=;
-        b=PFyb9MGTGQCVlFSmFzEDKsVu7QugHHEql6MGbr9FHZsWgT7AGW9AzUxcydY2H3JTz0
-         T7y9RG7Ly/7cp8LN3e9LxKyH3FCVOHtoftcssiYBeKEDRH7yWb74TPUtelZQ16mqi+yx
-         rXOVwuXmyklDL2vJkyi3w5PFcfwnkuvEhQmc4vHhpm7NUS7IOgCRqLIVgy1MOg8WurWC
-         jskL4Z4hkn3vxrvcARWP/GtA4LTLr05295cPBE3J0Ia4G+YFibSCm0QGaPT72JoWbOsB
-         6j0x2Mmdn2w203Lds0LsxqBZZJ4fZFUf8ciiPocJk/6lKsBrLK4WGTXB7tcBVP5mT5Sm
-         XjyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727022211; x=1727627011;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wEHQZ7aV2v97Y8TR3PMXm+WQO/EG3K5hYw1BGfIK/c4=;
-        b=UQE8fum0RcGQ/O2+M9quIRoIRy0+NQjaPRoexO/MTkQdSX5f8xIT3ncub1KzK4YFvJ
-         t/UannrelNYQ+CPhDMlvxbqzZnnaSSqICNKECtsQi+v+QZsH4NhgEhWqGV75Zet9YnnP
-         zCvlqkfDoI7kshdVPYnn+3R8NsATEOxJPDPQNV2Mas/2JY3fD5toOFoRRKRvxShvxVRo
-         hceKH/Bug6FGoiSUMD8bU9B3RGf8BvrgIb+rx6C4nsx2f8yMNWnDwpkv3Ec6jXMlihY+
-         QyG8NGtdm6QsVTVFJE2K+WhfJciVtIA6qv1gFLIyh60BpbtjRdQzxjwN50EzZJpfeW8x
-         17/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVi3sKTSk6FMlDc1eUG34OOO5r8uYLln24vy8E1iXrDZRY6SZKUnmEexwFVCeXslFCv4jrlB2foC6pG46z2VQEn@vger.kernel.org, AJvYcCVjg9iRK7g3wbX2TyAxX80bI549omt7JkPYcv3irGjVyGBp3JWkdVTjib5gLf5u6YG/Vrhk2pjzqAzpQcQq@vger.kernel.org, AJvYcCW2UKJxY4W/Dj35v8wFfCoJNyeWC1fgaSfBTd/k6T3O8W/KGUOkOTDCakI6bVNLRFG2KW4WMKmV@vger.kernel.org, AJvYcCWYXpaTClPBpycVFLzVpnnhwfku3/7dvqhqU5jBa4mELJWz4yPYQMrocGaNWS0AXvTYdKw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymI5l2EsgISGdjAdU/4ikDK58b038RXTenoiTDze/IO2TbyrQs
-	n41XlVfMyVRktSVgjIQ19NrQMz+SNN81PcJHqmY+GCJOmJ2NnqWFf1uakIFYEfLvvl+X2+PP72H
-	Z3zmmYu+qJk/evLKVHHVCQBlCj50=
-X-Google-Smtp-Source: AGHT+IF0UyOWjybQXZgWQIKE9WssLRn86JYKnQHBctQJAEy/AvR8IQWn2xGNT5sKqRgFleUnd1kKm56erKflXFLSF9k=
-X-Received: by 2002:a05:6902:2609:b0:e1d:1746:52da with SMTP id
- 3f1490d57ef6-e2252f34709mr5427596276.21.1727022210713; Sun, 22 Sep 2024
- 09:23:30 -0700 (PDT)
+	s=arc-20240116; t=1727022861; c=relaxed/simple;
+	bh=gFlVSCJab296RK5+Ai1YxYQl2rv5hxg3BElMeprdRII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nl7GyWkI58iZSBwCNs5P8kT0I3tYIQKouCyI/4eih/teDDZHV+SPs+RKOqM0maKBQld2nswJFavS3W3pmrnYqHHwvxT6w3h++ov1E/WgizF3uljXG0OyH5c14Y5H9jG8su2BeMppu9kM2rPRYRXm0CGdivblKe6LUQnNfEtvTug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jm9nwVxc; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xGmipcPUvSFvCq++6VT9S82wVCnPIsh0kZdD2tTzbJM=; b=jm9nwVxcMCmtyeT6Oyx1bwlk5b
+	QIt2JFKDn8FmrZFoi10orj33aeO2dLGY8ksjWgFZyWxgHm2j5wid8ZzC7QJ6anDx2t82kwpN088uc
+	UjC91LJRO9zSM2MqYEf+s8dMNGJvEaYn9PgvYMghtzhOHXHeEou9YBad//2eQ5BdVrek=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ssPX3-0084MO-6x; Sun, 22 Sep 2024 18:33:57 +0200
+Date: Sun, 22 Sep 2024 18:33:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Hal Feng <hal.feng@starfivetech.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+	William Qiu <william.qiu@starfivetech.com>,
+	devicetree@vger.kernel.org, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 3/4] can: Add driver for CAST CAN Bus Controller
+Message-ID: <cf17f15b-cbd7-4692-b3b2-065e549cb21e@lunn.ch>
+References: <20240922145151.130999-1-hal.feng@starfivetech.com>
+ <20240922145151.130999-4-hal.feng@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240920-reverse-sk-lookup-v2-0-916a48c47d56@cloudflare.com> <20240920-reverse-sk-lookup-v2-1-916a48c47d56@cloudflare.com>
-In-Reply-To: <20240920-reverse-sk-lookup-v2-1-916a48c47d56@cloudflare.com>
-From: ericnetdev dumazet <erdnetdev@gmail.com>
-Date: Sun, 22 Sep 2024 18:23:19 +0200
-Message-ID: <CAHTyZGwm4pHZg1eSdF6bbk7_WcJ4k25YzWtRKbfWNC_e6gUNVQ@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 1/3] ipv4: Support setting src port in sendmsg().
-To: Tiago Lam <tiagolam@cloudflare.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, Jakub Sitnicki <jakub@cloudflare.com>, 
-	kernel-team@cloudflare.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240922145151.130999-4-hal.feng@starfivetech.com>
 
-Le ven. 20 sept. 2024 =C3=A0 19:03, Tiago Lam <tiagolam@cloudflare.com> a =
-=C3=A9crit :
->
-> sendmsg() doesn't currently allow users to set the src port from which
-> egress traffic should be sent from. This is possible if a user wants to
-> configure the src address from which egress traffic should be sent from
-> - with the IP_PKTINFO ancillary message, a user is currently able to
->   specify a source address to egress from when calling sendmsg().
-> However, this still requires the user to set the IP_TRANSPARENT flag
-> using setsockopt(), which happens to require special privileges in the
-> case of IPv4.
->
-> To support users setting the src port for egress traffic when using
-> sendmsg(), this patch extends the ancillary messages supported by
-> sendmsg() to support the IP_ORIGDSTADDR ancillary message, reusing the
-> same cmsg and struct used in recvmsg() - which already supports
-> specifying a port.
->
-> Additionally, to avoid having to have special configurations, such as
-> IP_TRANSPARENT, this patch allows egress traffic that's been configured
-> using (the newly added) IP_ORIGDSTADDR to proceed if there's an ingress
-> socket lookup (sk_lookup) that matches that traffic - by performing a
-> reserve sk_lookup. Thus, if the sk_lookup reverse call returns a socket
-> that matches the egress socket, we also let the egress traffic through -
-> following the principle of, allowing return traffic to proceed if
-> ingress traffic is allowed in. In case no match is found in the reverse
-> sk_lookup, traffic falls back to the regular egress path.
->
-> This reverse lookup is only performed in case an sk_lookup ebpf program
-> is attached and the source address and/or port for the return traffic
-> have been modified using the (newly added) IP_ORIGDSTADDR in sendmsg.
+> +static inline u32 ccan_read_reg(const struct ccan_priv *priv, u8 reg)
+> +{
+> +	return ioread32(priv->reg_base + reg);
+> +}
+> +
+> +static inline void ccan_write_reg(const struct ccan_priv *priv, u8 reg, u32 value)
+> +{
+> +	iowrite32(value, priv->reg_base + reg);
+> +}
 
-Is it compatible with SO_REUSEPORT ?
+No inline functions in .c files please. Let the compiler decide.
 
-Most heavy duty UDP servers use SO_REUSEPORT to spread incoming
-packets to multiple sockets.
+> +static inline u8 ccan_read_reg_8bit(const struct ccan_priv *priv,
+> +				    enum ccan_reg reg)
+> +{
+> +	u8 reg_down;
+> +	union val {
+> +		u8 val_8[4];
+> +		u32 val_32;
+> +	} val;
+> +
+> +	reg_down = ALIGN_DOWN(reg, 4);
+> +	val.val_32 = ccan_read_reg(priv, reg_down);
+> +	return val.val_8[reg - reg_down];
 
-How is the reverse lookup going to choose the 'right' socket ?
+There is an ioread8(). Is it invalid to do a byte read for this
+hardware? If so, it is probably worth a comment.
+
+> +static int ccan_bittime_configuration(struct net_device *ndev)
+> +{
+> +	struct ccan_priv *priv = netdev_priv(ndev);
+> +	struct can_bittiming *bt = &priv->can.bittiming;
+> +	struct can_bittiming *dbt = &priv->can.data_bittiming;
+> +	u32 bittiming, data_bittiming;
+> +	u8 reset_test;
+> +
+> +	reset_test = ccan_read_reg_8bit(priv, CCAN_CFG_STAT);
+> +
+> +	if (!(reset_test & CCAN_RST_MASK)) {
+> +		netdev_alert(ndev, "Not in reset mode, cannot set bit timing\n");
+> +		return -EPERM;
+> +	}
+
+
+You don't see nedev_alert() used very often. If this is fatal then
+netdev_err().
+
+Also, EPERM? man 3 errno say:
+
+       EPERM           Operation not permitted (POSIX.1-2001).
+
+Why is this a permission issue?
+
+> +static void ccan_tx_interrupt(struct net_device *ndev, u8 isr)
+> +{
+> +	struct ccan_priv *priv = netdev_priv(ndev);
+> +
+> +	/* wait till transmission of the PTB or STB finished */
+> +	while (isr & (CCAN_TPIF_MASK | CCAN_TSIF_MASK)) {
+> +		if (isr & CCAN_TPIF_MASK)
+> +			ccan_reg_set_bits(priv, CCAN_RTIF, CCAN_TPIF_MASK);
+> +
+> +		if (isr & CCAN_TSIF_MASK)
+> +			ccan_reg_set_bits(priv, CCAN_RTIF, CCAN_TSIF_MASK);
+> +
+> +		isr = ccan_read_reg_8bit(priv, CCAN_RTIF);
+> +	}
+
+Potentially endless loops like this are a bad idea. If the firmware
+crashes, you are never getting out of here. Please use one of the
+macros from iopoll.h
+
+> +static irqreturn_t ccan_interrupt(int irq, void *dev_id)
+> +{
+> +	struct net_device *ndev = (struct net_device *)dev_id;
+
+dev_id is a void *, so you don't need the cast.
+
+	Andrew
 
