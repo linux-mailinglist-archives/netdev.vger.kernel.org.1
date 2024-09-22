@@ -1,126 +1,133 @@
-Return-Path: <netdev+bounces-129184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9CA297E264
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 18:12:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FA2097E273
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 18:23:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AE2C2811AA
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 16:12:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CFCE1C20D94
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 16:23:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D371426C;
-	Sun, 22 Sep 2024 16:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0B51F5FE;
+	Sun, 22 Sep 2024 16:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TTi9smHS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PFyb9MGT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC0DEEDB
-	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 16:12:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE95ABA2E;
+	Sun, 22 Sep 2024 16:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727021526; cv=none; b=Hi5Npb2ccWLEa/izm8pe2qjBl6/RFmXG2vX1L0s/UgOMCPW4BYtT2jscOH2nLPw+FUt2RcwL8+1f7zFQy2TQjY1htHa+70rsFR+61Ua4D6Dx1Ngs45PwFFzsU4MsL5ZGq6wq59TMj3imxF6MVYhIgZLtO/eA7eQh5xUjIQkDuDs=
+	t=1727022214; cv=none; b=e2pmoAcJ6Jg0XhkOgnhFJu2oCD4H54nSyCA45CaQTL5NxJhgoHcTLCyUmjiiP+VC3d8m4VvsYlkPv5vcz4N7AFd7NwmCiMJZ0w+T780ytyPYpTm+6hpAFKzLXLhYSYqkf8TzP09QG8/tvBBSvMDjqpYfemDwpeOjUVGe+dmXnYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727021526; c=relaxed/simple;
-	bh=51l6XNUexh8/qlbrJv3BrjdxPtewTYNWQkCT5YXc6iM=;
+	s=arc-20240116; t=1727022214; c=relaxed/simple;
+	bh=dgbk0GepYMfUAgep3wFQBc6FfyQBzJrgxVP1kPHTNks=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LB1ptQ7h0IRJfdYoo5Ucuv4hLokPZiYHZLPh3H8wAbA7sSueMnKvf9Azdlbo0W15B98SINTCr8dBgbCP/4dGBJ7BVFWUD4FrI/R0bk9FoqRPt1jVL8v/arrCsP49u6LEg4PcS92XQRF8L8n5D1K/7BkKbuTx2A+iU41WfJJwcpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TTi9smHS; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c26a52cf82so2284242a12.2
-        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 09:12:03 -0700 (PDT)
+	 To:Cc:Content-Type; b=AtQ14gCjziQr9+D3769c11hb5izrYtcgzbX3JxIgqvkgLW8NaJ2dDt1IVfAltAy4VMVURFy7YKpNYf0QA524+gmIvJClpArvAIeykTNc8knZvk1s/NGi8nzaGZq4Q3E0qLChJQeo+TgrGjosOOifE52S5j5hWaPILcBPuB16nxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PFyb9MGT; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e1a819488e3so2777366276.3;
+        Sun, 22 Sep 2024 09:23:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727021522; x=1727626322; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727022211; x=1727627011; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZScRIIj0rv/9Bd3qE2ut3bquV/pUYAID0m18B2cH0Hg=;
-        b=TTi9smHSOI3d0KgHXQw24VWzFEjgnJ4iC8rFmYn+wCChH1PG5ZEOCo0lH/IGa53o/H
-         6GhEF+4MFnCixcgYj8juZGMTSJeI0nIMfbzr/pSKBRRyoHPySE3B0P/9g4bEIcamKIpB
-         TV1TpawWCjz1SG4Uqh/fsrODQ8nZn2fdUuSWZpE1FvZ91yHEplLIkHof4UTvwAhBvxZG
-         TPMWCqbl2IlMiUr7c39//PrPjvNOQzhKCJf5mnT7EWPe9biEgNJG2qJU6j4mwn86ed1v
-         Y0rc76N/diPFYUyvXM/Bf0ttF/wBK5QmG7+eWclTRnz+1STv8oPFoaT2n3Fx8CpCWfRo
-         3iyg==
+        bh=wEHQZ7aV2v97Y8TR3PMXm+WQO/EG3K5hYw1BGfIK/c4=;
+        b=PFyb9MGTGQCVlFSmFzEDKsVu7QugHHEql6MGbr9FHZsWgT7AGW9AzUxcydY2H3JTz0
+         T7y9RG7Ly/7cp8LN3e9LxKyH3FCVOHtoftcssiYBeKEDRH7yWb74TPUtelZQ16mqi+yx
+         rXOVwuXmyklDL2vJkyi3w5PFcfwnkuvEhQmc4vHhpm7NUS7IOgCRqLIVgy1MOg8WurWC
+         jskL4Z4hkn3vxrvcARWP/GtA4LTLr05295cPBE3J0Ia4G+YFibSCm0QGaPT72JoWbOsB
+         6j0x2Mmdn2w203Lds0LsxqBZZJ4fZFUf8ciiPocJk/6lKsBrLK4WGTXB7tcBVP5mT5Sm
+         XjyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727021522; x=1727626322;
+        d=1e100.net; s=20230601; t=1727022211; x=1727627011;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZScRIIj0rv/9Bd3qE2ut3bquV/pUYAID0m18B2cH0Hg=;
-        b=BasHhRXp0mWiskkFRe2lNsthEswnir6WRAZoj07qrTcNAUJlYp9OyM7eYOMD/mEToB
-         Vp6zaMtFUK9sEIT9o5QSlYNbu+oWKgMXpPAMwADehy2BsXh8hyBeO+JZJj39o6Ir8DMj
-         c5WRBkTPNCwHlqTyXrY/usFY4KZZHcxSgXFxG+0DzNogTcWyGJKX1tdAiLi73De5Gpp+
-         INrtBejoU8yH8+il1EFTwhfmvN3dZ+UOvmAb3rV+g5WS5piqbSDRIl8RYwAylzAGgS7S
-         F1z0XbZHKYGXEsMY/nvuhDa90j7dmxRDRVLFtCdevhkOEstomUYe+pVbDLFNiLReURoe
-         ccng==
-X-Forwarded-Encrypted: i=1; AJvYcCVbWUgDhSIVeIK+3Is5SsHezHd+qVaLZW2ZPPKDLPfB1wr385gzlLhObUIlJZOmhDmX9+6diKc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxzuz9k69PUmdC0mnEQULH/MBnp2gXl8R4kKjO1nCJc0rpLb0iw
-	bDHk8fCDR5CUmtz6j0hklIz0+7GBoPbIKEqdUAkNTUpB9NNy2Sd57nVoL2Lx1Kn74wpPX06G7zJ
-	kthFPRUm05OzIUf1bdoaQs27Rbrdq1rqYh/Y3
-X-Google-Smtp-Source: AGHT+IEBBDd+e0s02cZWTCvVhg7H+5VDYTZaKO61q87uG4FaCjGDfAIb7LhgHE9AxU07Dhj1hFuBN+HkH88jWhjYRK0=
-X-Received: by 2002:a05:6402:348c:b0:5c4:14ff:8a7 with SMTP id
- 4fb4d7f45d1cf-5c464a3d154mr11335828a12.14.1727021522189; Sun, 22 Sep 2024
- 09:12:02 -0700 (PDT)
+        bh=wEHQZ7aV2v97Y8TR3PMXm+WQO/EG3K5hYw1BGfIK/c4=;
+        b=UQE8fum0RcGQ/O2+M9quIRoIRy0+NQjaPRoexO/MTkQdSX5f8xIT3ncub1KzK4YFvJ
+         t/UannrelNYQ+CPhDMlvxbqzZnnaSSqICNKECtsQi+v+QZsH4NhgEhWqGV75Zet9YnnP
+         zCvlqkfDoI7kshdVPYnn+3R8NsATEOxJPDPQNV2Mas/2JY3fD5toOFoRRKRvxShvxVRo
+         hceKH/Bug6FGoiSUMD8bU9B3RGf8BvrgIb+rx6C4nsx2f8yMNWnDwpkv3Ec6jXMlihY+
+         QyG8NGtdm6QsVTVFJE2K+WhfJciVtIA6qv1gFLIyh60BpbtjRdQzxjwN50EzZJpfeW8x
+         17/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVi3sKTSk6FMlDc1eUG34OOO5r8uYLln24vy8E1iXrDZRY6SZKUnmEexwFVCeXslFCv4jrlB2foC6pG46z2VQEn@vger.kernel.org, AJvYcCVjg9iRK7g3wbX2TyAxX80bI549omt7JkPYcv3irGjVyGBp3JWkdVTjib5gLf5u6YG/Vrhk2pjzqAzpQcQq@vger.kernel.org, AJvYcCW2UKJxY4W/Dj35v8wFfCoJNyeWC1fgaSfBTd/k6T3O8W/KGUOkOTDCakI6bVNLRFG2KW4WMKmV@vger.kernel.org, AJvYcCWYXpaTClPBpycVFLzVpnnhwfku3/7dvqhqU5jBa4mELJWz4yPYQMrocGaNWS0AXvTYdKw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymI5l2EsgISGdjAdU/4ikDK58b038RXTenoiTDze/IO2TbyrQs
+	n41XlVfMyVRktSVgjIQ19NrQMz+SNN81PcJHqmY+GCJOmJ2NnqWFf1uakIFYEfLvvl+X2+PP72H
+	Z3zmmYu+qJk/evLKVHHVCQBlCj50=
+X-Google-Smtp-Source: AGHT+IF0UyOWjybQXZgWQIKE9WssLRn86JYKnQHBctQJAEy/AvR8IQWn2xGNT5sKqRgFleUnd1kKm56erKflXFLSF9k=
+X-Received: by 2002:a05:6902:2609:b0:e1d:1746:52da with SMTP id
+ 3f1490d57ef6-e2252f34709mr5427596276.21.1727022210713; Sun, 22 Sep 2024
+ 09:23:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <00000000000055b6570622575dba@google.com> <20240917235027.218692-2-srikarananta01@gmail.com>
-In-Reply-To: <20240917235027.218692-2-srikarananta01@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 22 Sep 2024 18:11:48 +0200
-Message-ID: <CANn89iLxa6V7BZSzmj5A979M2ZObj-CcDD_izeKqtRCZj-+pmQ@mail.gmail.com>
-Subject: Re: [PATCH] net/ipv4: Fix circular deadlock in do_ip_setsockop
-To: AnantaSrikar <srikarananta01@gmail.com>
-Cc: syzbot+e4c27043b9315839452d@syzkaller.appspotmail.com, 
-	alibuda@linux.alibaba.com, davem@davemloft.net, dsahern@kernel.org, 
-	dust.li@linux.alibaba.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, schnelle@linux.ibm.com, 
-	syzkaller-bugs@googlegroups.com, wenjia@linux.ibm.com
+References: <20240920-reverse-sk-lookup-v2-0-916a48c47d56@cloudflare.com> <20240920-reverse-sk-lookup-v2-1-916a48c47d56@cloudflare.com>
+In-Reply-To: <20240920-reverse-sk-lookup-v2-1-916a48c47d56@cloudflare.com>
+From: ericnetdev dumazet <erdnetdev@gmail.com>
+Date: Sun, 22 Sep 2024 18:23:19 +0200
+Message-ID: <CAHTyZGwm4pHZg1eSdF6bbk7_WcJ4k25YzWtRKbfWNC_e6gUNVQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v2 1/3] ipv4: Support setting src port in sendmsg().
+To: Tiago Lam <tiagolam@cloudflare.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Jakub Sitnicki <jakub@cloudflare.com>, 
+	kernel-team@cloudflare.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 18, 2024 at 1:51=E2=80=AFAM AnantaSrikar <srikarananta01@gmail.=
-com> wrote:
+Le ven. 20 sept. 2024 =C3=A0 19:03, Tiago Lam <tiagolam@cloudflare.com> a =
+=C3=A9crit :
 >
-> Fixed the circular lock dependency reported by syzkaller.
+> sendmsg() doesn't currently allow users to set the src port from which
+> egress traffic should be sent from. This is possible if a user wants to
+> configure the src address from which egress traffic should be sent from
+> - with the IP_PKTINFO ancillary message, a user is currently able to
+>   specify a source address to egress from when calling sendmsg().
+> However, this still requires the user to set the IP_TRANSPARENT flag
+> using setsockopt(), which happens to require special privileges in the
+> case of IPv4.
 >
-> Signed-off-by: AnantaSrikar <srikarananta01@gmail.com>
-> Reported-by: syzbot+e4c27043b9315839452d@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3De4c27043b9315839452d
-> Fixes: d2bafcf224f3 ("Merge tag 'cgroup-for-6.11-rc4-fixes' of git://git.=
-kernel.org/pub/scm/linux/kernel/git/tj/cgroup")
-> ---
->  net/ipv4/ip_sockglue.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+> To support users setting the src port for egress traffic when using
+> sendmsg(), this patch extends the ancillary messages supported by
+> sendmsg() to support the IP_ORIGDSTADDR ancillary message, reusing the
+> same cmsg and struct used in recvmsg() - which already supports
+> specifying a port.
 >
-> diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-> index cf377377b52d..a8f46d1ba62b 100644
-> --- a/net/ipv4/ip_sockglue.c
-> +++ b/net/ipv4/ip_sockglue.c
-> @@ -1073,9 +1073,11 @@ int do_ip_setsockopt(struct sock *sk, int level, i=
-nt optname,
->         }
+> Additionally, to avoid having to have special configurations, such as
+> IP_TRANSPARENT, this patch allows egress traffic that's been configured
+> using (the newly added) IP_ORIGDSTADDR to proceed if there's an ingress
+> socket lookup (sk_lookup) that matches that traffic - by performing a
+> reserve sk_lookup. Thus, if the sk_lookup reverse call returns a socket
+> that matches the egress socket, we also let the egress traffic through -
+> following the principle of, allowing return traffic to proceed if
+> ingress traffic is allowed in. In case no match is found in the reverse
+> sk_lookup, traffic falls back to the regular egress path.
 >
->         err =3D 0;
-> +
-> +       sockopt_lock_sock(sk);
-> +
->         if (needs_rtnl)
->                 rtnl_lock();
-> -       sockopt_lock_sock(sk);
->
->         switch (optname) {
->         case IP_OPTIONS:
+> This reverse lookup is only performed in case an sk_lookup ebpf program
+> is attached and the source address and/or port for the return traffic
+> have been modified using the (newly added) IP_ORIGDSTADDR in sendmsg.
 
-I think you missed an earlier conversation about SMC being at fault here.
+Is it compatible with SO_REUSEPORT ?
 
-https://lore.kernel.org/netdev/CANn89iKcWmufo83xy-SwSrXYt6UpL2Pb+5pWuzyYjMv=
-a5F8bBQ@mail.gmail.com/
+Most heavy duty UDP servers use SO_REUSEPORT to spread incoming
+packets to multiple sockets.
+
+How is the reverse lookup going to choose the 'right' socket ?
 
