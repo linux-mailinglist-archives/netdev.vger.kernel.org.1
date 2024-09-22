@@ -1,183 +1,242 @@
-Return-Path: <netdev+bounces-129158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED56C97DF88
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 01:16:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B01597DFB8
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 03:11:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 294571C20AEC
-	for <lists+netdev@lfdr.de>; Sat, 21 Sep 2024 23:16:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8AA281876
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 01:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8977E14F9D0;
-	Sat, 21 Sep 2024 23:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C211917E5;
+	Sun, 22 Sep 2024 01:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="ZQq7YhIY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iD17Jsmn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E98623D7;
-	Sat, 21 Sep 2024 23:16:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375141917CB
+	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 01:11:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726960570; cv=none; b=qyaUkpYBd96MvhHOlhvepQHI+QcMZ2LI0tme3TL0yM9a5PXH560YVNq78hxrB2Xw+BLlRVtTzKYQEPVSlHScl6nAsetQ4DUa2Jk5jPONwm090Zid4YShsRi5W1ajuF6HmT8NbWFyIMN+AfNzjXEaKZG4xqnVQ5aDQNVZpYqB5Ao=
+	t=1726967501; cv=none; b=mM2PKpKw5XkOfTCBgARm769N6ZAn2on6g6NrG0g48NgdCldhDpdJrYujACqrtacrVA88uJoGaQ9pyBcsQL4/9qipJWVhKl5hEHY5BDG/lQ3+OqjghHnk/NWzJ1v6Qz4KEJ9kPSogGYY9t0VGHuqvnyG4RUqYbZoiykHFEjWtZYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726960570; c=relaxed/simple;
-	bh=2IJ/1fp+irLU94isem+0S4oGECWv/8jutgHjbNmMBks=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=R489jXnaVIinCGIGaEs4l0N1HSNiQilMRnELxSne1Cim6h/vdJBOlcOYDq/PQ1GqaB7YGcquK1gPabQvtEf1LumtWVkjqzM1VC+EbSFRMrLf0AW2xspQ+zw9MFFhPKsNjj43av2r8CNhEc0LiaQwIyccdzX4FnZaM6rD3T78N9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=ZQq7YhIY; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=g8kKxL7ZKl4uUi3v4aBjQ6Q74kbULsjNPVGjKjNgz/s=; b=ZQq7YhIY5fg//8tZ
-	c2oknXF+nHsadwp41JfA9YYTV8MuN9K34X/hly/msDtiPs7P0B2tX41QW0qvuphZ81c+1Z8YtWE3r
-	HaBRCK/KguoUhfyemh8E9Pgqf6NxVwpXQn3jmPTFY+fO1UsTwDFVhie/puFzYhCtZCxNY35I5TiQr
-	QHyeFIrMOhPhPzScjjr+IC3TdykAereQQTuyyG7uAyL/C2a2bFaoGUSq8IjrWsiouWTbSYzVQbOya
-	B2LOLMxSE3xso43qeiqXVX1yppLLx6Vj66RDb6K8W95/N69yKBdCG+5+SDj3sl8lBwhgukRe3/zb4
-	LbtBZX4TR3JwKx6gYQ==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1ss9KT-006fhC-30;
-	Sat, 21 Sep 2024 23:15:53 +0000
-From: linux@treblig.org
-To: willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [RFC net-next] appletalk: Remove deadcode
-Date: Sun, 22 Sep 2024 00:15:50 +0100
-Message-ID: <20240921231550.297535-1-linux@treblig.org>
-X-Mailer: git-send-email 2.46.1
+	s=arc-20240116; t=1726967501; c=relaxed/simple;
+	bh=mkPZTZ4+7X6YfRtxtJvsGondZDr3cT+dPb4FafRwtlc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=pfMYrF0towSWvckSoFD9QmcEmriZcMahv0MwVDbyNQYT7/bESxMf8Xlo8057F7FBOHuOuhnJ1VfuSDvzjFkKKBxnVO+Ebu2mKryUI4RPgCFShmXYR/f3JOO/Y6KLHffYDCVoBjPDbKHowWxVN6kZ3m/UAT+IPLKEayaK+IUE6Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iD17Jsmn; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5c247dd0899so2810a12.1
+        for <netdev@vger.kernel.org>; Sat, 21 Sep 2024 18:11:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1726967497; x=1727572297; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=2KUuVhA2iLT4DM8BXrMGBBR4oEH2j4WLFiTg/43RbgU=;
+        b=iD17JsmnF63TWL61UBkCOk+f84qtZUYIeuK3yrghPIiJuXNAGzAu+g4RkSCi73pYXo
+         0FjSJONUGguXFtJQ5zCrHDtsKMn9uEAJOLOHkGODSSoctFoiaEsZEJGoe3gViEc6KiZy
+         QuG1r1z4wZX7k2T+OPk6JD9Dle/Wc1lP41GTML4fuivfbTOTCD5p0wYG4VUI/y9B7nJw
+         clvC0PcsIY1mvkb0aKPTXAnFLaAvajFPyjfiW3yvvWcN3SIh4XxvGMJCmdvebjWJWntj
+         ANIgfu9yycWFyuphNvDa+C4eYW65TL0Aa0VS1cpE9n4T4HBWWz360GD7mHRPoCCS3JRb
+         XIiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1726967497; x=1727572297;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2KUuVhA2iLT4DM8BXrMGBBR4oEH2j4WLFiTg/43RbgU=;
+        b=ojPql6O+nr1aUdE5hp+xamB3whWEFs8zLrcFYVSo31mCCwOZUGc5TkoyQhkH2EdTp1
+         yBIKoHPvVe3lGUU0KQix3p/6ujnUzgMQz7v6UpcMAYG/EO+R9Pe+sexM9UaRk4oBoUZm
+         QwdiYTcfdUZGsRosQ7Zctu6UXeRn5kbKZoK9aUqgRZJp3OAPnzR9xQ4CojfoycGDtBr4
+         5SQtxknREzIlMg7IKCe5Ql5fmbzTIAIO/s/RI32A8/ZdcsqvvjaG8VVI0asQ7/n1JDWo
+         viTXmeHPam3SCfIeTLBMtXQUk5Y9tTnqGKcUWJw0XMU5acZZaUqdw6NbYSDLs0qX7Sjs
+         OhAQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVENcqXdD1lsN0gy9T1a1nag/w6qPLnF+O8E1aiHqVUaiFwx2A6wnFakdg2wFoHR40nwckWmGQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyi3+WOBpFeZVbOR1CsEzucuAjML2BQwPZULmRq7AbYftnTTZD1
+	WrCL9efVp8i9NDqEqFPnef0BOEbFysm83HUARHkcoiRTIRMyf9qR+PHVZ1GxEcJnIosIwmF2w1W
+	x73QTAHO6t6LRIttn+d7vEXJMIo8XlwRIm1ez
+X-Google-Smtp-Source: AGHT+IGDmCMq0c04L7WDXF6pJrRZIraPcPIIO/dV9PrR/c2TmXM8wUqd7VfSgbRwDhKV1hUl4eLr7f40znDL+x9wu5o=
+X-Received: by 2002:a05:6402:26c2:b0:5c4:6376:bb68 with SMTP id
+ 4fb4d7f45d1cf-5c5b846d1aemr39682a12.3.1726967496849; Sat, 21 Sep 2024
+ 18:11:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From: Jann Horn <jannh@google.com>
+Date: Sun, 22 Sep 2024 03:10:59 +0200
+Message-ID: <CAG48ez1xYXWfvTy4N7Ut9MAs2+GGWNOwYgQb6zToRpJfQEacfg@mail.gmail.com>
+Subject: lockdep detected circular locking between rtnl_mutex and
+ pm_chain_head.rwsem [wireguard and r8152]
+To: "Rafael J. Wysocki" <rafael@kernel.org>, Pavel Machek <pavel@ucw.cz>, 
+	"Jason A. Donenfeld" <Jason@zx2c4.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-pm@vger.kernel.org, wireguard@lists.zx2c4.com, 
+	Network Development <netdev@vger.kernel.org>, USB list <linux-usb@vger.kernel.org>, 
+	kernel list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+Hi!
 
-alloc_ltalkdev in net/appletalk/dev.c is dead since
-commit 00f3696f7555 ("net: appletalk: remove cops support")
+While trying out a kernel at commit
+88264981f2082248e892a706b2c5004650faac54 (latest mainline) with
+lockdep enabled, I hit a lockdep warning - it looks like wireguard
+takes the rtnl_lock in a PM callback (meaning pm_chain_head.rwsem is
+already held), while r8152 registers a PM callback in a context where
+the rtnl_lock is held, and this makes lockdep unhappy. But I don't
+know enough about the PM code to know which of those is the problem or
+whether this race could even occur. I'm also not sure whether this is
+a regression - I don't usually run lockdep kernels on this machine.
 
-Removing it (and it's helper) leaves dev.c and if_ltalk.h empty;
-remove them and the Makefile entry.
 
-tun.c was including that if_ltalk.h but actually wanted
-the uapi version for LTALK_ALEN, fix up the path.
+[ 1749.181131] PM: suspend entry (s2idle)
+[ 1749.209736] Filesystems sync: 0.028 seconds
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
----
- drivers/net/tun.c        |  2 +-
- include/linux/if_ltalk.h |  8 -------
- net/appletalk/Makefile   |  2 +-
- net/appletalk/dev.c      | 46 ----------------------------------------
- 4 files changed, 2 insertions(+), 56 deletions(-)
- delete mode 100644 include/linux/if_ltalk.h
- delete mode 100644 net/appletalk/dev.c
+[ 1749.220240] ======================================================
+[ 1749.220242] WARNING: possible circular locking dependency detected
+[ 1749.220244] 6.11.0-slowkasan+ #140 Not tainted
+[ 1749.220247] ------------------------------------------------------
+[ 1749.220249] systemd-sleep/5239 is trying to acquire lock:
+[ 1749.220252] ffffffffb1156c88 (rtnl_mutex){+.+.}-{3:3}, at:
+wg_pm_notification (drivers/net/wireguard/device.c:81
+drivers/net/wireguard/device.c:64)
+[ 1749.220265]
+but task is already holding lock:
+[ 1749.220267] ffffffffb077e170 ((pm_chain_head).rwsem){++++}-{3:3},
+at: blocking_notifier_call_chain_robust (kernel/notifier.c:128
+kernel/notifier.c:353 kernel/notifier.c:341)
+[ 1749.220277]
+which lock already depends on the new lock.
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 5f77faef0ff1..82abe79c98fa 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -71,7 +71,7 @@
- #include <linux/bpf_trace.h>
- #include <linux/mutex.h>
- #include <linux/ieee802154.h>
--#include <linux/if_ltalk.h>
-+#include <uapi/linux/if_ltalk.h>
- #include <uapi/linux/if_fddi.h>
- #include <uapi/linux/if_hippi.h>
- #include <uapi/linux/if_fc.h>
-diff --git a/include/linux/if_ltalk.h b/include/linux/if_ltalk.h
-deleted file mode 100644
-index 4cc1c0b77870..000000000000
---- a/include/linux/if_ltalk.h
-+++ /dev/null
-@@ -1,8 +0,0 @@
--/* SPDX-License-Identifier: GPL-2.0 */
--#ifndef __LINUX_LTALK_H
--#define __LINUX_LTALK_H
--
--#include <uapi/linux/if_ltalk.h>
--
--extern struct net_device *alloc_ltalkdev(int sizeof_priv);
--#endif
-diff --git a/net/appletalk/Makefile b/net/appletalk/Makefile
-index 33164d972d37..152312a15180 100644
---- a/net/appletalk/Makefile
-+++ b/net/appletalk/Makefile
-@@ -5,6 +5,6 @@
- 
- obj-$(CONFIG_ATALK) += appletalk.o
- 
--appletalk-y			:= aarp.o ddp.o dev.o
-+appletalk-y			:= aarp.o ddp.o
- appletalk-$(CONFIG_PROC_FS)	+= atalk_proc.o
- appletalk-$(CONFIG_SYSCTL)	+= sysctl_net_atalk.o
-diff --git a/net/appletalk/dev.c b/net/appletalk/dev.c
-deleted file mode 100644
-index 284c8e585533..000000000000
---- a/net/appletalk/dev.c
-+++ /dev/null
-@@ -1,46 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--/*
-- * Moved here from drivers/net/net_init.c, which is:
-- *	Written 1993,1994,1995 by Donald Becker.
-- */
--
--#include <linux/errno.h>
--#include <linux/module.h>
--#include <linux/netdevice.h>
--#include <linux/if_arp.h>
--#include <linux/if_ltalk.h>
--
--static void ltalk_setup(struct net_device *dev)
--{
--	/* Fill in the fields of the device structure with localtalk-generic values. */
--
--	dev->type		= ARPHRD_LOCALTLK;
--	dev->hard_header_len 	= LTALK_HLEN;
--	dev->mtu		= LTALK_MTU;
--	dev->addr_len		= LTALK_ALEN;
--	dev->tx_queue_len	= 10;
--
--	dev->broadcast[0]	= 0xFF;
--
--	dev->flags		= IFF_BROADCAST|IFF_MULTICAST|IFF_NOARP;
--}
--
--/**
-- * alloc_ltalkdev - Allocates and sets up an localtalk device
-- * @sizeof_priv: Size of additional driver-private structure to be allocated
-- *	for this localtalk device
-- *
-- * Fill in the fields of the device structure with localtalk-generic
-- * values. Basically does everything except registering the device.
-- *
-- * Constructs a new net device, complete with a private data area of
-- * size @sizeof_priv.  A 32-byte (not bit) alignment is enforced for
-- * this private data area.
-- */
--
--struct net_device *alloc_ltalkdev(int sizeof_priv)
--{
--	return alloc_netdev(sizeof_priv, "lt%d", NET_NAME_UNKNOWN,
--			    ltalk_setup);
--}
--EXPORT_SYMBOL(alloc_ltalkdev);
--- 
-2.46.1
+[ 1749.220279]
+the existing dependency chain (in reverse order) is:
+[ 1749.220281]
+-> #1 ((pm_chain_head).rwsem){++++}-{3:3}:
+[ 1749.220287] down_write (./arch/x86/include/asm/preempt.h:79
+kernel/locking/rwsem.c:1304 kernel/locking/rwsem.c:1315
+kernel/locking/rwsem.c:1580)
+[ 1749.220292] blocking_notifier_chain_register (kernel/notifier.c:272
+kernel/notifier.c:290)
+[ 1749.220295] rtl8152_open (drivers/net/usb/r8152.c:6994)
+[ 1749.220300] __dev_open (net/core/dev.c:1476)
+[ 1749.220304] __dev_change_flags (net/core/dev.c:8837)
+[ 1749.220308] dev_change_flags (net/core/dev.c:8909)
+[ 1749.220311] do_setlink (net/core/rtnetlink.c:2900)
+[ 1749.220315] __rtnl_newlink (net/core/rtnetlink.c:3696)
+[ 1749.220318] rtnl_newlink (net/core/rtnetlink.c:3744)
+[ 1749.220322] rtnetlink_rcv_msg (net/core/rtnetlink.c:6646)
+[ 1749.220325] netlink_rcv_skb (net/netlink/af_netlink.c:2550)
+[ 1749.220329] netlink_unicast (net/netlink/af_netlink.c:1331
+net/netlink/af_netlink.c:1357)
+[ 1749.220332] netlink_sendmsg (net/netlink/af_netlink.c:1901)
+[ 1749.220335] ____sys_sendmsg (net/socket.c:730 net/socket.c:745
+net/socket.c:2603)
+[ 1749.220339] ___sys_sendmsg (net/socket.c:2659)
+[ 1749.220342] __sys_sendmsg (net/socket.c:2686)
+[ 1749.220344] do_syscall_64 (arch/x86/entry/common.c:52
+arch/x86/entry/common.c:83)
+[ 1749.220348] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+[ 1749.220352]
+-> #0 (rtnl_mutex){+.+.}-{3:3}:
+[ 1749.220357] __lock_acquire (kernel/locking/lockdep.c:3159
+kernel/locking/lockdep.c:3277 kernel/locking/lockdep.c:3901
+kernel/locking/lockdep.c:5199)
+[ 1749.220362] lock_acquire (kernel/locking/lockdep.c:467
+kernel/locking/lockdep.c:5824 kernel/locking/lockdep.c:5787)
+[ 1749.220365] __mutex_lock (kernel/locking/mutex.c:610
+kernel/locking/mutex.c:752)
+[ 1749.220369] wg_pm_notification (drivers/net/wireguard/device.c:81
+drivers/net/wireguard/device.c:64)
+[ 1749.220372] notifier_call_chain (kernel/notifier.c:93)
+[ 1749.220375] blocking_notifier_call_chain_robust
+(kernel/notifier.c:129 kernel/notifier.c:353 kernel/notifier.c:341)
+[ 1749.220378] pm_notifier_call_chain_robust
+(./include/linux/notifier.h:207 kernel/power/main.c:104)
+[ 1749.220382] pm_suspend (kernel/power/suspend.c:367
+kernel/power/suspend.c:588 kernel/power/suspend.c:625)
+[ 1749.220386] state_store (kernel/power/main.c:746)
+[ 1749.220389] kernfs_fop_write_iter (fs/kernfs/file.c:334)
+[ 1749.220393] vfs_write (fs/read_write.c:590 fs/read_write.c:683)
+[ 1749.220397] ksys_write (fs/read_write.c:736)
+[ 1749.220399] do_syscall_64 (arch/x86/entry/common.c:52
+arch/x86/entry/common.c:83)
+[ 1749.220402] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+[ 1749.220406]
+other info that might help us debug this:
 
+[ 1749.220408]  Possible unsafe locking scenario:
+
+[ 1749.220409]        CPU0                    CPU1
+[ 1749.220411]        ----                    ----
+[ 1749.220413]   rlock((pm_chain_head).rwsem);
+[ 1749.220416]                                lock(rtnl_mutex);
+[ 1749.220420]                                lock((pm_chain_head).rwsem);
+[ 1749.220423]   lock(rtnl_mutex);
+[ 1749.220426]
+*** DEADLOCK ***
+
+[ 1749.220428] 5 locks held by systemd-sleep/5239:
+[ 1749.220430] #0: ffff888125d2e3f8 (sb_writers#6){.+.+}-{0:0}, at:
+ksys_write (fs/read_write.c:736)
+[ 1749.220439] #1: ffff8881e5cb9888 (&of->mutex){+.+.}-{3:3}, at:
+kernfs_fop_write_iter (fs/kernfs/file.c:326)
+[ 1749.220447] #2: ffff888460aee2d8 (kn->active#166){.+.+}-{0:0}, at:
+kernfs_fop_write_iter (fs/kernfs/file.c:326)
+[ 1749.220455] #3: ffffffffb0757008
+(system_transition_mutex){+.+.}-{3:3}, at: pm_suspend
+(kernel/power/suspend.c:574 kernel/power/suspend.c:625)
+[ 1749.220463] #4: ffffffffb077e170
+((pm_chain_head).rwsem){++++}-{3:3}, at:
+blocking_notifier_call_chain_robust (kernel/notifier.c:128
+kernel/notifier.c:353 kernel/notifier.c:341)
+[ 1749.220471]
+stack backtrace:
+[ 1749.220474] CPU: 1 UID: 0 PID: 5239 Comm: systemd-sleep Not tainted
+6.11.0-slowkasan+ #140
+[ 1749.220478] Hardware name: [...]
+[ 1749.220480] Call Trace:
+[ 1749.220483]  <TASK>
+[ 1749.220485] dump_stack_lvl (lib/dump_stack.c:124)
+[ 1749.220491] print_circular_bug (kernel/locking/lockdep.c:2077)
+[ 1749.220496] check_noncircular (kernel/locking/lockdep.c:2203)
+[...]
+[ 1749.220519] __lock_acquire (kernel/locking/lockdep.c:3159
+kernel/locking/lockdep.c:3277 kernel/locking/lockdep.c:3901
+kernel/locking/lockdep.c:5199)
+[...]
+[ 1749.220546] lock_acquire (kernel/locking/lockdep.c:467
+kernel/locking/lockdep.c:5824 kernel/locking/lockdep.c:5787)
+[...]
+[ 1749.220577] __mutex_lock (kernel/locking/mutex.c:610
+kernel/locking/mutex.c:752)
+[...]
+[ 1749.220627] wg_pm_notification (drivers/net/wireguard/device.c:81
+drivers/net/wireguard/device.c:64)
+[ 1749.220631] notifier_call_chain (kernel/notifier.c:93)
+[ 1749.220636] blocking_notifier_call_chain_robust
+(kernel/notifier.c:129 kernel/notifier.c:353 kernel/notifier.c:341)
+[...]
+[ 1749.220649] pm_notifier_call_chain_robust
+(./include/linux/notifier.h:207 kernel/power/main.c:104)
+[ 1749.220652] pm_suspend (kernel/power/suspend.c:367
+kernel/power/suspend.c:588 kernel/power/suspend.c:625)
+[ 1749.220656] state_store (kernel/power/main.c:746)
+[ 1749.220661] kernfs_fop_write_iter (fs/kernfs/file.c:334)
+[ 1749.220665] vfs_write (fs/read_write.c:590 fs/read_write.c:683)
+[...]
+[ 1749.220693] ksys_write (fs/read_write.c:736)
+[...]
+[ 1749.220701] do_syscall_64 (arch/x86/entry/common.c:52
+arch/x86/entry/common.c:83)
+[ 1749.220704] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+[ 1749.220708] RIP: 0033:0x7fe2e2917240
+[...]
+[ 1749.220735]  </TASK>
+[ 1749.223599] Freezing user space processes
+[ 1749.226307] Freezing user space processes completed (elapsed 0.002 seconds)
 
