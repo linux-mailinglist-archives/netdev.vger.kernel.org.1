@@ -1,319 +1,128 @@
-Return-Path: <netdev+bounces-129168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFE2597E10A
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 13:13:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D78F97E10D
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 13:15:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 279BE1C209F8
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 11:13:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D55B281356
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 11:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED9771547CD;
-	Sun, 22 Sep 2024 11:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2961813E41A;
+	Sun, 22 Sep 2024 11:15:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SUsdjS2c"
+	dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b="Zfw/N6WP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A597DA7D
-	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 11:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA8661FCF
+	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 11:15:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727003580; cv=none; b=ex1MY/A0a87HP0HcPZ4uq793lU+Ulns0rRJ9rz3Dqgpg40uMp5zxFY6IzBUuukyZnbH67xVzoENnWdIIoJ3f6968hCyKv35uNcqn6jSyU5f6lU7R5Nezb2gtjVZnKSyA2rDnbcPcduCUDzRMeEpaB25f2bbf20VQDfUUHWDkA04=
+	t=1727003754; cv=none; b=ENhw+E2h8rwxrRENVTOy9chdI64vFCwKe4PLI1wiI05ief+sIsNCmB0/HymfV6Kl+gVJQfHKrxsEp1LGiVgFuGgThaTaVoxOzbWJZ9rxHxZ8B9y/wMFfpuQM6HvGrsR6erUfWJKaLNNEAZZZl6ejpAKCigcpHj1aZgnd1MqtCdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727003580; c=relaxed/simple;
-	bh=+dnOGf2jNKhOuBP2Vs118vVAnQueKIe8GELlsD8XP8w=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=WRjBIfjC39Lz36rphAHYfPaC75Qt2WmO0OO4dbaM2qFmzlwbH8TJ7110HHx1crWdZYpR4SStAPKmAQvk4jugcHAC0CxdqrzJo8PUtcklLDu7tVDyV5sBIppHTlkB8U1VqEPMusfzxnv/mLolKboJ8EwV1YlWWZGpZ2vzuOSQe3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SUsdjS2c; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727003578;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=3GbIg/W7PN6QRKq8OkNaoprJd23O4LShI0s3EFhauIE=;
-	b=SUsdjS2c4kZqDpYyzPQjAI60gIKFEB5Ul8cTW9RiOzIqwrxRk6XtE3edXXdaQhv4GvUMOb
-	Nw823FiePgTpxg9JsCiq4Nchwl3U9cY2AVKHUC3QokjIMooOR4FXUzrqP2booQ6fhvQbTx
-	tJbuPeY42DKb2J0i9ikNrJtjkEjTu24=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-689-A9qR0vuEMyKDbjzsGo-O1Q-1; Sun, 22 Sep 2024 07:12:56 -0400
-X-MC-Unique: A9qR0vuEMyKDbjzsGo-O1Q-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a8d10954458so245292566b.3
-        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 04:12:56 -0700 (PDT)
+	s=arc-20240116; t=1727003754; c=relaxed/simple;
+	bh=4/dScP+2VQqp9NFo5BKqQJm+LB0XzWQueMyqbRCUJGs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NVD5awLFfLpQ5fA5YGUDn+DaXTvjW+zWFHi+OLWYOP19WL5GcC739yLxU0MCACIJJ9KJBoR8yQb64uiADGi9UaZSafbKvh+QlE/IciRvevn8F5WLh3JXDh2OOcWXt8iCVLuKAhAOPzumzzuiLNmGAFkRaRqJrrTtGlIw8AFTDuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info; spf=pass smtp.mailfrom=shenghaoyang.info; dkim=pass (2048-bit key) header.d=shenghaoyang.info header.i=@shenghaoyang.info header.b=Zfw/N6WP; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=shenghaoyang.info
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=shenghaoyang.info
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71829963767so555353b3a.1
+        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 04:15:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=shenghaoyang.info; s=google; t=1727003752; x=1727608552; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3kV9jAwUKEZ+8tKEPZlUQ5QDr08hfJQBG5o5GR2sFVE=;
+        b=Zfw/N6WP1vrOuuhWlXVhj4TecuFveVcd3W/fsBuebjzb35Kffjc2jNbDnJH/UJGRIy
+         jW2tECZp25YAxDaH07bHBE4hcknCBB7H3Qux2xnqiIUuqOXAfED6oZK4nkr943e/jSwI
+         5PeASC5l4Evln1XEtrqKqPUmvvzs1gIXXRw/yV8X5yKzQBD36RNVn0yedIkFnsj2MUZI
+         lUPCucXOHzaDb/Syem4Yv6YpvG8oWE8tm7EOnQ3MAr05d9ioVR8em0f29Lz383zCGtxP
+         wu1H8Tjbhbu9j7SswonivzrgqSx3B4XEqoBGa5M9AWvg5GKaoIOvcXfJ70qbclbLonoO
+         162Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727003576; x=1727608376;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3GbIg/W7PN6QRKq8OkNaoprJd23O4LShI0s3EFhauIE=;
-        b=TmrFyr8PTkt2P1RaKfqvlykXvO2oNdgQeIS+h6gcsjEYjYv22JMD2IgPRJW7ZHd8RZ
-         tciowIA4Ko9nxzSb+n1O4ynABfPpV2vgWt5P7l9Y9755fS2xr+Z2fpvz5iRGRCRP6H1W
-         pPZayhrVh8cjj0GF/gv7F85MDCvxMNwPKfvby3SnMEBeTUOtfC7JmB6TTnWPXgLAlHv6
-         lHgTCXwtL33g0BCBUXlPr/WG4hMWXSBNMsa9wyd2f7uWd3/Qn54k+S5chjDwB0wdXjuR
-         i/9K24PKB0c5LFyznpRvHDZOmELBVOafnW1KleKM2z3r+fiim3z1pYzCdiPEXjwaE/JE
-         wFDg==
-X-Forwarded-Encrypted: i=1; AJvYcCVTlNym/cvcqFGKvLmQAdNXIe20FEkWvAYNQsDR1DM9XJm3QDzDVD75lUQ9tmNLaPbhUU6+xyg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywske0rkHCaDZ4GbntYkv84fqlAWs1tImE3PgsbimUPsssj6mQF
-	j3FufvttUm2pTqt5z+P+WrULT0k9DfFP+aY5mihysYRaO0wb+YqFpgtVJteIFxOpxSjYImLET12
-	BHxg5a5A5jFrTbnW6465coz1kZTL4Ksyjfu7rQgK+pRU4jCjQOvelkQ==
-X-Received: by 2002:a17:907:928a:b0:a86:78fd:1df0 with SMTP id a640c23a62f3a-a90d562206bmr870729366b.34.1727003575430;
-        Sun, 22 Sep 2024 04:12:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFYhXGcTRkbaV5483odfYCMi2PaOl6gjAcqkLrOEgNokoh/A2poiFUcWQyHrsAHvnxxdBc9+A==
-X-Received: by 2002:a17:907:928a:b0:a86:78fd:1df0 with SMTP id a640c23a62f3a-a90d562206bmr870725566b.34.1727003574855;
-        Sun, 22 Sep 2024 04:12:54 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90610f44fasm1070152966b.79.2024.09.22.04.12.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Sep 2024 04:12:53 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id A3600157F92A; Sun, 22 Sep 2024 13:12:51 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Arthur Fabre <afabre@cloudflare.com>, Jakub Sitnicki
- <jakub@cloudflare.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- kuba@kernel.org, john.fastabend@gmail.com, edumazet@google.com,
- pabeni@redhat.com, sdf@fomichev.me, tariqt@nvidia.com, saeedm@nvidia.com,
- anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- intel-wired-lan@lists.osuosl.org, mst@redhat.com, jasowang@redhat.com,
- mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com, kernel-team
- <kernel-team@cloudflare.com>, Yan Zhai <yan@cloudflare.com>
-Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
- XDP_REDIRECT
-In-Reply-To: <Zu_gvkXe4RYjJXtq@lore-desk>
-References: <cover.1726935917.git.lorenzo@kernel.org>
- <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
- <09657be6-b5e2-4b5a-96b6-d34174aadd0a@kernel.org>
- <Zu_gvkXe4RYjJXtq@lore-desk>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Sun, 22 Sep 2024 13:12:51 +0200
-Message-ID: <87ldzkndqk.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1727003752; x=1727608552;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3kV9jAwUKEZ+8tKEPZlUQ5QDr08hfJQBG5o5GR2sFVE=;
+        b=m+fs/U9Vd+Tvz9zjkpcbB8c/jlS6fsRcIoJH8/KZzHkAnfFI9rE3LGeOGK4+6zdP/z
+         6o2MbDaXY8NyuYRLng/Xma8H16VifJk774g+9NjS3z5gYJr0B1uvOZoXA7DJRT04xeUt
+         5ECqsoidrPF+EUi5/TJsuvOGb4ap6P0D3e0jZiszIbK9HrXc586uTEAZALR+F51bfcvC
+         5fhGZWdAa3xqTEm4EQogiKkCSZ0Vyjl32z05g4BKHRDIY8b1i3mN8lwOToN2V26QMT8N
+         kxjrTJqu4qwogVsES0uqdWRMmP/fA9XGd/hpjyTnmXOECO0FYy+506ytXAydzBHqtUVI
+         C0+g==
+X-Gm-Message-State: AOJu0Yw7unUVJz7hebcSMo8drmqqehZw7FU10LcM8aiMrlPf8QzP0LgJ
+	7nyBZRzh18UY7dI5/g31LScRuLW4+5MTqzGE8KP7dfcu953XBx0C/dXgQA20isI=
+X-Google-Smtp-Source: AGHT+IE5MjTVYzrl2d8pU+oadwG+bK6ciogNKH4nYOjHCfD0YV6tB1eRzdMqfGZePYuIyMKLOORTYQ==
+X-Received: by 2002:a17:90b:538e:b0:2db:60b:eec with SMTP id 98e67ed59e1d1-2dd7f6db764mr4222811a91.7.1727003750258;
+        Sun, 22 Sep 2024 04:15:50 -0700 (PDT)
+Received: from [10.0.0.211] ([132.147.84.99])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dd7f7ba647sm5283445a91.11.2024.09.22.04.15.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Sep 2024 04:15:49 -0700 (PDT)
+Message-ID: <890714d7-bc6a-45b2-854b-d1b431f8a0eb@shenghaoyang.info>
+Date: Sun, 22 Sep 2024 19:15:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [RFC PATCH] net: dsa: mv88e6xxx: correct CC scale factor for
+ 88E6393X
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, f.fainelli@gmail.com, olteanv@gmail.com,
+ pavana.sharma@digi.com, ashkan.boldaji@digi.com, kabel@kernel.org
+References: <b940ddf9-745f-4f2a-a29e-d6efe64de9a8@shenghaoyang.info>
+ <d6622575-bf1b-445a-b08f-2739e3642aae@lunn.ch>
+Content-Language: en-US
+From: Shenghao Yang <me@shenghaoyang.info>
+In-Reply-To: <d6622575-bf1b-445a-b08f-2739e3642aae@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Lorenzo Bianconi <lorenzo.bianconi@redhat.com> writes:
+On 16/9/24 03:14, Andrew Lunn wrote:
+> On Sun, Sep 15, 2024 at 07:57:27PM +0800, Shenghao Yang wrote:
+>> Sending this as an RFC: no datasheet access - this
+>> scaling factor may not be correct for all boards if this
+>> 4ns vs 8ns discrepancy is down to physical design.
+>>
+>> If the counter is truly spec'd to always count at
+>> 250MHz other chips in the same family may need
+>> correction too.
+> 
+> This sort of text should be placed below the --- marker so it is not
+> part of the commit message which actually get merged.
 
->> 
->> 
->> On 21/09/2024 22.17, Alexander Lobakin wrote:
->> > From: Lorenzo Bianconi <lorenzo@kernel.org>
->> > Date: Sat, 21 Sep 2024 18:52:56 +0200
->> > 
->> > > This series introduces the xdp_rx_meta struct in the xdp_buff/xdp_frame
->> > 
->> > &xdp_buff is on the stack.
->> > &xdp_frame consumes headroom.
->> > 
->> > IOW they're size-sensitive and putting metadata directly there might
->> > play bad; if not now, then later.
->> > 
->> > Our idea (me + Toke) was as follows:
->> > 
->> > - new BPF kfunc to build generic meta. If called, the driver builds a
->> >    generic meta with hash, csum etc., in the data_meta area.
->> 
->> I do agree that it should be the XDP prog (via a new BPF kfunc) that
->> decide if xdp_frame should be updated to contain a generic meta struct.
->> *BUT* I think we should use the xdp_frame area, and not the
->> xdp->data_meta area.
->
-> ack, I will add a new kfunc for it.
->
->> 
->> A details is that I think this kfunc should write data directly into
->> xdp_frame area, even then we are only operating on the xdp_buff, as we
->> do have access to the area xdp_frame will be created in.
->
-> this would avoid to copy it when we convert from xdp_buff to xdp_frame, nice :)
->
->> 
->> 
->> When using data_meta area, then netstack encap/decap needs to move the
->> data_meta area (extra cycles).  The xdp_frame area (live in top) don't
->> have this issue.
->> 
->> It is easier to allow xdp_frame area to survive longer together with the
->> SKB. Today we "release" this xdp_frame area to be used by SKB for extra
->> headroom (see xdp_scrub_frame).  I can imagine that we can move SKB
->> fields to this area, and reduce the size of the SKB alloc. (This then
->> becomes the mini-SKB we discussed a couple of years ago).
->> 
->> 
->> >    Yes, this also consumes headroom, but only when the corresponding func
->> >    is called. Introducing new fields like you're doing will consume it
->> >    unconditionally;
->> 
->> We agree on the kfunc call marks area as consumed/in-use.  We can extend
->> xdp_frame statically like Lorenzo does (with struct xdp_rx_meta), but
->> xdp_frame->flags can be used for marking this area as used or not.
->
-> the only downside with respect to a TLV approach would be to consume all the
-> xdp_rx_meta as soon as we set a single xdp rx hw hint in it, right?
-> The upside is it is easier and it requires less instructions.
+Hi Andrew,
 
-FYI, we also had a discussion related to this at LPC on Friday, in this
-session: https://lpc.events/event/18/contributions/1935/
+Gotcha - I'll move things around in the future.
 
-The context here was that Arthur and Jakub want to also support extended
-rich metadata all the way through the SKB path, and are looking at the
-same area used for XDP metadata to store it. So there's a need to manage
-both the kernel's own usage of that area, and userspace/BPF usage of it.
+> There is a register MV88E6XXX_TAI_CLOCK_PERIOD which indicates the
+> period of one clock tick. It probably defaults to 0x0FA0, or 4000
+> decimal which should be correct for the internal clock. But if an
+> external clock is being used, it needs to be set to 0x1F40, or 8000
+> decimal. It would be good if you could read it out and see if it is
+> correct by default.
 
-I'll try to summarise some of the points of that discussion (all
-interpretations are my own, of course):
+Thanks! The register appears to contain the correct value on this
+device - 4000ps using the 250MHz internal clock.
 
-- We want something that can be carried with a frame all the way from
-  the XDP layer, through all SKB layers and to userspace (to replace the
-  use of skb->mark for this purpose).
+Would you happen to know if that register is valid for all the
+families currently supported? 
 
-- We want different applications running on the system (of which the
-  kernel itself if one, cf this discussion) to be able to share this
-  field, without having to have an out of band registry (like a Github
-  repository where applications can agree on which bits to use). Which
-  probably means that the kernel needs to be in the loop somehow to
-  explicitly allocate space in the metadata area and track offsets.
+I'm preparing a few patches to read off that register in 
+mv88e6xxx_ptp_setup() and choose a correct set of cycle counter
+coefficients to avoid introducing more device-specific handling.
 
-- Having an explicit API to access this from userspace, without having
-  to go through BPF (i.e., a socket- or CMSG-based API) would be useful.
+If that sounds reasonable I'll send them for net - would you also be
+okay with a Suggested-By?
 
-
-The TLV format was one of the suggestions in Arthur and Jakub's talk,
-but AFAICT, there was not a lot of enthusiasm about this in the room
-(myself included), because of the parsing overhead and complexity. I
-believe the alternative that was seen as most favourable was a map
-lookup-style API, where applications can request a metadata area of
-arbitrary size and get an ID assigned that they can then use to set/get
-values in the data path.
-
-So, sketching this out, this could be realised by something like:
-
-/* could be called from BPF, or through netlink or sysfs; may fail, if
- * there is no more space
- */
-int metadata_id = register_packet_metadata_field(sizeof(struct my_meta));
-
-The ID is just an opaque identifier that can then be passed to
-getter/setter functions (for both SKB and XDP), like:
-
-ret = bpf_set_packet_metadata_field(pkt, metadata_id,
-                                    &my_meta_value, sizeof(my_meta_value))
-
-ret = bpf_get_packet_metadata_field(pkt, metadata_id,
-                                    &my_meta_value, sizeof(my_meta_value))
-
-
-On the kernel side, the implementation would track registered fields in
-a global structure somewhere, say:
-
-struct pkt_metadata_entry {
-  int id;
-  u8 sz;
-  u8 offset;
-  u8 bit;
-};
-
-struct pkt_metadata_registry { /* allocated as a system-wide global */
-  u8 num_entries;
-  u8 total_size;
-  struct pkt_metadata_entry entries[MAX_ENTRIES];
-};
-
-struct xdp_rx_meta { /* at then end of xdp_frame */
-  u8 sz; /* set to pkt_metadata_registry->total_size on alloc */
-  u8 fields_set; /* bitmap of fields that have been set, see below */
-  u8 data[];
-};
-
-int register_packet_metadata_field(u8 size) {
-  struct pkt_metadata_registry *reg = get_global_registry();
-  struct pkt_metadata_entry *entry;
-
-  if (size + reg->total_size > MAX_METADATA_SIZE)
-    return -ENOSPC;
-
-  entry = &reg->entries[reg->num_entries++];
-  entry->id = assign_id();
-  entry->sz = size;
-  entry->offset = reg->total_size;
-  entry->bit = reg->num_entries - 1;
-  reg->total_size += size;
-
-  return entry->id;
-}
-
-int bpf_set_packet_metadata_field(struct xdp_frame *frm, int id, void
-                                  *value, size_t sz)
-{
-  struct pkt_metadata_entry *entry = get_metadata_entry_by_id(id);
-
-  if (!entry)
-    return -ENOENT;
-
-  if (entry->sz != sz)
-    return -EINVAL; /* user error */
-
-  if (frm->rx_meta.sz < entry->offset + sz)
-    return -EFAULT; /* entry allocated after xdp_frame was initialised */
-
-  memcpy(&frm->rx_meta.data + entry->offset, value, sz);
-  frm->rx_meta.fields_set |= BIT(entry->bit);
-
-  return 0;
-}
-
-int bpf_get_packet_metadata_field(struct xdp_frame *frm, int id, void
-                                  *value, size_t sz)
-{
-  struct pkt_metadata_entry *entry = get_metadata_entry_by_id(id);
-
-  if (!entry)
-    return -ENOENT;
-
-  if (entry->sz != sz)
-    return -EINVAL;
-
-if (frm->rx_meta.sz < entry->offset + sz)
-    return -EFAULT; /* entry allocated after xdp_frame was initialised */
-
-  if (!(frm->rx_meta.fields_set & BIT(entry->bit)))
-    return -ENOENT;
-
-  memcpy(value, &frm->rx_meta.data + entry->offset, sz);
-
-  return 0;
-}
-
-I'm hinting at some complications here (with the EFAULT return) that
-needs to be resolved: there is no guarantee that a given packet will be
-in sync with the current status of the registered metadata, so we need
-explicit checks for this. If metadata entries are de-registered again
-this also means dealing with holes and/or reshuffling the metadata
-layout to reuse the released space (incidentally, this is the one place
-where a TLV format would have advantages).
-
-The nice thing about an API like this, though, is that it's extensible,
-and the kernel itself can be just another consumer of it for the
-metadata fields Lorenzo is adding in this series. I.e., we could just
-pre-define some IDs for metadata vlan, timestamp etc, and use the same
-functions as above from within the kernel to set and get those values;
-using the registry, there could even be an option to turn those off if
-an application wants more space for its own usage. Or, alternatively, we
-could keep the kernel-internal IDs hardcoded and always allocated, and
-just use the getter/setter functions as the BPF API for accessing them.
-
--Toke
-
+Shenghao
 
