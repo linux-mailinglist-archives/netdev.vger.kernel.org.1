@@ -1,147 +1,118 @@
-Return-Path: <netdev+bounces-129166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23EC397E0D3
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 12:05:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8CBA97E0DB
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 12:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BFDA2813DC
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 10:05:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DB3A1F211E7
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 10:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3981413BAEE;
-	Sun, 22 Sep 2024 10:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB1C142E76;
+	Sun, 22 Sep 2024 10:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dA4av/9V"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ATmmYZs4"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DEB273FC;
-	Sun, 22 Sep 2024 10:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76698320E
+	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 10:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726999516; cv=none; b=fQeno6hJrMbG8Yx6BUzd5e286VPdOarlWlfLmKB3kzfLX26UoqaeibNhmOa/QMoNVAi19vdbPX8iP3sQvAfv9nxXZWGn/MbaeykkTsb6pmoR4Cqwzm9XNMhv3Uz/bjVKpy9vBRTRrT9JXWfOG/z59YTj8/8kTD97UTSLaNm/i4o=
+	t=1727000420; cv=none; b=u1jv+wYY17Nm6rqPxRny/OSKohDUrpfeDcwg2yGNARE+rapszK/YHbMUnCVmiADEWf/10upSiOz3ZRdr9zTG9PIAKbn83GnxGCP0FhsDo7MJiM5mCaXVUMZySlyXrZVZFha3J6wv9bBf1gPxtd6IPHD0IJhBWK06ttigc3our9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726999516; c=relaxed/simple;
-	bh=YnLtsOfTjT9EQgqTzxpvhc1dEV1mk5RAxzYv6QT3UG4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bUe14GlKJDhsM5dr85ghT1UVa7manf4dQo1h41GOX35rcrMTcAEl3UB+PlUVNaT/rycxDIODEQlfcOu7fzJtWB2/Kf3DU6ucEREHLZuO0eJ/sck/Jf8lPHUVBrd3oll5oEqTmqjYBp7brYe7er/ev3SqC19NoYl1sUs486NYr6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dA4av/9V; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 10B8F20003;
-	Sun, 22 Sep 2024 10:05:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1726999505;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jFkKQu0XpPY3Dq9x7D5aT3zWAuzC7LNnMPNJnHsb9us=;
-	b=dA4av/9V/GIHM6T9ynpPQ38492Fr3lu6VVV0wKCRvbDcCaP8rNHaN/fV7dCrpCv8dGFxsF
-	AB1Q3BKtgMNT81jn8SLcLTnYXpifv+KXhYyiimv25049cNHx4KXD7qFr8zWxsT4T88zHbO
-	Zs6/9dAtYnO2QZRT5cqoqxYukKuknNdIwCZETNKfjxmrA1DFwPf+AOYwT7ZrTLMNji2+Zu
-	Io+/I6XwOS7t2Kc87SlBiFKj6byykbfy+bklMfrCUVZTkZGcl5UtFEWwJL1/CSPpGwMza2
-	Ppbho/ka7lzjzIENcOrl9j3/yLcwEPZkdyt3sz0J9Mxq+XpUXNjlN1Iqx+HACQ==
-Message-ID: <464e0ae0-d6e3-4da4-a157-f74260f96275@bootlin.com>
-Date: Sun, 22 Sep 2024 12:04:59 +0200
+	s=arc-20240116; t=1727000420; c=relaxed/simple;
+	bh=bsgIG2b9IRaNGZrcciakwDpWqVLlObEUtHNnOW34j7Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XekVaTfXCUVFSrI7h0yQgIYtLw8ShiiaXtJOitllcUhTVf9K5EMUz3XCfCZe9kzceihnHkNV5RUeXRlTe75UlhWsfPjRE/WtxgQ4RcHzx3ZFc6lORqVBrR4ryhIOjzw12d63/SmC1Ql5/sEDJ/6q3PhLQejXgvFa4Pvpb4+nhpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ATmmYZs4; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c26311c6f0so4730628a12.3
+        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 03:20:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727000417; x=1727605217; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YaGWABS4I7HUh6XY4HJVhFxlD56Ov8UWk8EJPDWLQro=;
+        b=ATmmYZs4i5U+sG5FGYnC1yUdo665OD/zbXHrZ3IKirmQzaCzLQOjurLjDLIWOR9hE7
+         uT+MvgSQFsM71fSlS1uo2F/bkiAiIrEH2Sh5oskfg83OSaJ4sNdGlijft39C/qPGBTJJ
+         4GzIe1XpvQ6e416GrpazW+ps3AOkJDmSuBQQq02ZN1HZKftWE3oWnZXCKjOLx4KXTZB5
+         m86aQRlin69DUiTduNWzy/jnPe+o6+PAJCmY/H24IZQuH9xL3nHiq4/QtAkNaUnEM8z7
+         6vAjMwXyN18UMXd4QgJboDadYsnPiOxqJJhjjXXQU6vAElUkpyi1vwcFaXU5NyNW+JH0
+         aAAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727000417; x=1727605217;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YaGWABS4I7HUh6XY4HJVhFxlD56Ov8UWk8EJPDWLQro=;
+        b=L0Iba9GaOILneRttcCd4Eh1KuyfvRcH0V4JKTCcq8PF/vr26IdKvhYNZFtfDl1cIKz
+         2iXFDmd0nM3GwozdDsqsYc2392FqCTi5HSsv8qxyJFZ+vSAazEfDUDxxQZg/C8orzqlB
+         22sr6toNdwhzEnhybvuXy1Ljhenb+CUr5pbSgFNhNIEkNWjQL+M92HbAIZFdZzFb8JSH
+         toS0R4dehe4bXTG0wdD1+n4jdJCtP9/vvcz10Oi5+5jpY+h0CZhOlEoUPO3monJdu++F
+         57CgA6e4lRo4688vsAucc+u1SWuW2BtYsYtuk1VKSFH8WBz/88itoDJMQS0YTtu9ww75
+         ZQJQ==
+X-Gm-Message-State: AOJu0Yz0ECZwYERvKcGR2IeFW185m4W1IUTq2jbd9Mfqbd/SgMNf0EJv
+	qj5pW7maXRzYEacCeyFA8V6cCLEsqVxkVqOaAGmZbNpUiih/NMQL0+Itwy9z4f8JbXab2/ADjke
+	g5TweZkprCpQAHLRqV/s8CNvqG5VRGWMPonmFn95OAUn6iCnWbjKH
+X-Google-Smtp-Source: AGHT+IEsDNb2+DSRGbnVAWrPEHMyZYRrt+/s/KOa5w1WX+cAVNqKX9U41iAi4BHvg6ueilq/iDLR8iPZC1+UnEZ76HI=
+X-Received: by 2002:a05:6402:40c8:b0:5c0:ab6f:652a with SMTP id
+ 4fb4d7f45d1cf-5c464663952mr7784640a12.3.1727000416555; Sun, 22 Sep 2024
+ 03:20:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v2] selftests/bpf: convert test_xdp_features.sh
- to test_progs
-To: Jakub Kicinski <kuba@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, ebpf@linuxfoundation.org,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-References: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
- <64df8d41-6cfb-45a9-8337-5cc04daedb60@linux.dev> <ZuVWmxoqXFI3qvVI@lore-desk>
- <20240914063828.7bd73c5e@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
-In-Reply-To: <20240914063828.7bd73c5e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alexis.lothore@bootlin.com
+References: <20240921215410.638664-1-littlesmilingcloud@gmail.com>
+In-Reply-To: <20240921215410.638664-1-littlesmilingcloud@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 22 Sep 2024 12:20:03 +0200
+Message-ID: <CANn89iKP3VPExdyZt+eLFk3rE5=6yRckTPySfh5MvcEqPNm6aA@mail.gmail.com>
+Subject: Re: [RFC PATCH net] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
+To: Anton Danilov <littlesmilingcloud@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Suman Ghosh <sumang@marvell.com>, Shigeru Yoshida <syoshida@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello all, sorry for the slow feedback, I have been off last week.
+On Sat, Sep 21, 2024 at 11:55=E2=80=AFPM Anton Danilov
+<littlesmilingcloud@gmail.com> wrote:
+>
+> Regression Description:
+>
+> Depending on the GRE tunnel device options, small packets are being
+> dropped. This occurs because the pskb_network_may_pull function fails due
+> to insufficient space in the network header. For example, if only the key
+> option is specified for the tunnel device, packets of sizes up to 27
+> (including the IPv4 header itself) will be dropped. This affects both
+> locally originated and forwarded packets.
+>
+> How to reproduce (for local originated packets):
+>
+>   ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
+>           local <your-ip> remote <any-ip>
+>
+>   ip link set mtu 1400 dev gre1
+>   ip link set up dev gre1
+>   ip address add 192.168.13.1/24 dev gre1
+>   ping -s 1374 -c 10 192.168.13.2
 
-On 9/14/24 15:38, Jakub Kicinski wrote:
-> On Sat, 14 Sep 2024 11:25:47 +0200 Lorenzo Bianconi wrote:
->> On Sep 13, Martin KaFai Lau wrote:
->>> test a physical network device that supports a certain XDP features.
->>>
->>> iiuc, test_xdp_features.sh only uses the veth and veth will also be the only
->>> device tested after moving to prog_tests/xdp_features.c? It is a reasonable
->>> addition to test_progs for an end-to-end xdp test by using veth. However,
->>> test_progs will not be able to test the physical network device.
->>>
->>> Lorenzo, is the xdp_features.c still used for device testing?
->>
->> correct, xdp_features.c is intended to test the real xdp features supported by
->> the NIC under test (DUT), not just the advertised ones (iirc that was a
->> requisite to add xdp kernel feature support). For this reason we need two
->> separated processes running on the tester device and on the DUT (they are
->> usually two different devices). test_xdp_features.sh was just a simple test
->> script used to develop xdp_features.c.
->> What about extending xdp_features.c to integrate it in the CI?
+This size does not match the changelog ? (packets of sizes up to 27...)
 
-So IIUC Lorenzo's answer, we _need_ to keep the possibility to run this test on
-real hardware, and so we _need_ to still be able to run two processes, possibly
-on two different machines. If that's so, indeed my rework breaks this. I have
-then multiple questions/doubts before being able to rework this:
-- the main goal of this rework is to be able to automatically run this test in
-CI, and the resulting constraint is that it must integrate in a standalone,
-already-existing c program (test_progs). I guess I can preserve the standalone
-xdp_features program as it is, and make test_progs just start  it twice (on two
-different veths). It would involve the following changes:
-  - keep a dedicated build step for this small, standalone xdp_features.c, and
-add a "controller" part in test_progs (instead of fully migrating xdp_features
-program into test_progs, which  is what the current series revision does)
-  - simply make the controller part create the testing network in CI, fork/start
-the xdp_features program on both veths, and check return codes.
-My main concern is about the possible flakiness of this whole setup (multiple
-processes and tcp/udp channels involved), but if keeping the standalone version
-is really needed, I can give a try. Does it sound reasonable ?
-- one part of my overall goal is to clean up the tools/testing/selftests/bpf
-directory from anything that is not tested automatically. What should we do with
-the wrapping shell script (test_xdp_features.sh) ? Since test_progs will
-automate the test with veths, I guess it is still ok to just remove it ?
+>   tcpdump -vni gre1
+>   tcpdump -vni <your-ext-iface> 'ip proto 47'
+>   ip -s -s -d link show dev gre1
 
-> No preference but just to raise awareness - drivers/net's NetDrvEpEnv
-> class provides the setup for running tests with an endpoint.
-> XDP tests intended for HW would fit there pretty well.
-
-Thanks for the hint. If we want to keep some tooling for real hw xdp features
-testing, maybe we could add a small part in tools/testing/selftests/drivers/net
-and make it use this NetDrvEpEnv ? Or it is a bigger hint that the whole test
-about xdp features could be moved there (and then tested by net kselftests
-rather than by ebpf ci specifically) ? @Lorenzo and eBPF tests maintainers, any
-opinion ?
-
-Thanks,
-
-Alexis
-
--- 
-Alexis Lothoré, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
+Please provide a real selftest, because in this particular example,
+the path taken by the packets should not reach the
+pskb_network_may_pull(skb, pull_len)),
+because dev->header_ops should be NULL ?
 
