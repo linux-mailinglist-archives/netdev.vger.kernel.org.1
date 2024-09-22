@@ -1,121 +1,326 @@
-Return-Path: <netdev+bounces-129195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6813B97E2B2
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 19:21:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5D9997E2C4
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 19:39:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07BB71F21790
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 17:21:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04A3A1C20826
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 17:39:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4552AE9F;
-	Sun, 22 Sep 2024 17:21:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FD02AEFC;
+	Sun, 22 Sep 2024 17:39:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nb+9EgtL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eBBj+mpu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBD917C64;
-	Sun, 22 Sep 2024 17:21:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9785626AC1
+	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 17:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727025709; cv=none; b=EMPyE7jazQDLuEhAFJ7KGJSOHFTbWgu6XfRqXaRT6AK1FnNF/rma4cuMMxELcJw6hZ+zWvUB8/Y2A/8nQyZyo/YTfu6LewedadEk17mZMgtO0ot0cOJvEAZvdXd0wm4c9edAuuJh2K3ABhbXwEdyZwSrP5Tbviyk5TW1VpdTWag=
+	t=1727026773; cv=none; b=KFQ/lst5qlrfq4T3imMTfxmZVehLPxzMCCHDfLOpsQyVPMhOrpsr2lzPlbunFPAPupPaK1DLimuZSXEwZpkU9Bv0VMz6eMabmFE8fgI4u86Tr1IYwgD2fhrXCy+gCiU/Aq+jRpBM8EAjJu9w/8AkK0fhvpcSWQi6XFLp4T5KQls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727025709; c=relaxed/simple;
-	bh=7pKcc7GpsW8tmnEy7weHXD0ST3IevhpacWw79bD/TYo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DQlU1QU4w4r5BK8WxBv8yLRn8gBR9RjwffjC829rIBhQmRN3L2UwjSVkju65j8EhViK6tgzcQHBHtpMGwUfEEUA/Gf8ZnlC1/MXImUPZge7Lxyumf5nUj21PKVCH5nM4R7g5xnpl3YIUUsGfe4LYV9aah3T8EAp2VNG80MwRrkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nb+9EgtL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACECEC4CEC3;
-	Sun, 22 Sep 2024 17:21:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727025709;
-	bh=7pKcc7GpsW8tmnEy7weHXD0ST3IevhpacWw79bD/TYo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nb+9EgtL43OXnf6rYLrlo/HWfZ14nOLLmY4iua7TvMO387RLLJQ8wRNtFcfxyNtsV
-	 s+3nsZVC7j6OWB+URexMvupe6yRubJZO/3tHIiuLVPzCJOX3J1BiEJyzzXUdS5QAoF
-	 /32UJvFA1rALzHP8s2ddlvUV5JF2OBFHSVb5AvJeQHKErtfpOXOPOW4WQBLtcYxRIV
-	 P6Jy11o6jvqOH6KFiIn/Wbzwz2viTzBxREwPOazWjUKyPd1NGGk8dphqTD4zJzlzkc
-	 JU0LDRSU+uyWQVpJGTgxcCwu0BxT/0Sx4TNIj+RmtNW10pJKRwsgslpi32v9J4gcfT
-	 8eSUgT8e1Kzzg==
-Date: Sun, 22 Sep 2024 18:21:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	shradhagupta@linux.microsoft.com, ahmed.zaki@intel.com,
-	leon@kernel.org, colin.i.king@gmail.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, ernis@microsoft.com
-Subject: Re: [PATCH v2] net: mana: Add get_link and get_link_ksettings in
- ethtool
-Message-ID: <20240922172143.GF3426578@kernel.org>
-References: <1726867103-19295-1-git-send-email-ernis@linux.microsoft.com>
+	s=arc-20240116; t=1727026773; c=relaxed/simple;
+	bh=O1lotOYrmxqxROlwXz44VaBG2u/73HB6scPqwKg4AkY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cVQMSZRf18XOF6GlQdHtT0HVUeflyPHnfLzDKNag+jm7Y6yCKHvpixZ7wUyTkAKITv8nVFh45ukL5+OtQFrOlDe07GtMa21GPJFAqNzAO4pTnH75I2e5hC6Z7QNLKzLkm4WPpNOsD0EzBpMD2YfDfPCrGRK6oBEH4hOXz/EJSS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eBBj+mpu; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c255e3c327so3647352a12.1
+        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 10:39:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727026770; x=1727631570; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BpGAB+CE62FRMTTUXNO0uAcJsLoHQPKChAlcetMB+aU=;
+        b=eBBj+mpui6UZvZo+c5MUQY40C5gJRpWl2/DfYCHkk1tQ8FteEgUv+g7TGTEkkX6CIx
+         R7TD/9aFgSpDbdLMOD5EWfbpZBFVXJ9JpRYwA3/wvQ+118nFektS5rNi/DJyQZiPp65x
+         E4GD7cNl7XpSqrejPZQrAoCMeogD1RD45+5Q1hjYaNYHOO7b6b2JXJoo7gJAoWo6xu4P
+         Nwha9sE8K04ZyfttNBlxODAlCbVRn2q93HvFQXkCZNcF4IA8ER0BT601F/48JxZ33+5l
+         9s9jbddRzLhkVy5fV0zqP2K3k/SFGRkNMj7siT+0znuaGTdiX/eDX3+BdlnCUh4svy+0
+         voyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727026770; x=1727631570;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BpGAB+CE62FRMTTUXNO0uAcJsLoHQPKChAlcetMB+aU=;
+        b=OZ57mrqEFL/7xVDSRFrfngu9SykuawwWQEjqBAAFTm9E1nQB9zcbquJrG/76Gpyld2
+         +cwcFJ3fuRIu8j78ef3LBpSv1JCwsm5tpcoRB7EXWr8YqoKVC7LYrwWxaCt8GjKsKna4
+         Lrw9JhGHeRetwbsul+9P1Yw194yWIKdxe+uiOVrRL4JAIGH97KVVHdf0Ch8zAKCgHMTX
+         HNpf7oXapUvIITN0j4hkVdQ7pDF+IeP6hvO1d/ZB4r05Ab4BS84C/MTIc6Nof0MaFPTp
+         VYZn08ZsUkTz0pURAgs6iyETY4NLdfS1o0SFOcmG/TgL/7puKObehA4XPoG1EF4P+0fx
+         yegg==
+X-Forwarded-Encrypted: i=1; AJvYcCWlEeCpgdpVOMb6Dq60NHGRIrvHy3wHRr1O55V5Z30GoaTMeM7ERpGWC3s5nqWKKBg77/GFMsw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHnDwW+TuPEYwi79ItVNWw2oCcOD9vYIC3l8F/hB/6BeEPCdgM
+	2HJKFIBNOeKDf2Qo9fzb1np2mJOjzU3MaZUZcZGybGdBVCpJcApoUrZVexGZoh5qa391uE+R0no
+	0A4PQ1exYPqtkPuH+oSqfLwNu87TA3LXnPA32
+X-Google-Smtp-Source: AGHT+IEnPr5vqUgfk5C1HQbuqZp/7fOYioCcZbjCxTrQu4/Fo45MYW2Fl8uHhs6poJBrUpPZxjRXGk9KE1XbEdnfV+E=
+X-Received: by 2002:a05:6402:4489:b0:5c5:5493:7570 with SMTP id
+ 4fb4d7f45d1cf-5c55493766emr6447964a12.21.1727026769586; Sun, 22 Sep 2024
+ 10:39:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1726867103-19295-1-git-send-email-ernis@linux.microsoft.com>
+References: <20240322122407.1329861-1-edumazet@google.com> <171111663201.19374.16295682760005551863.git-patchwork-notify@kernel.org>
+ <CAADnVQJy+0=6ZuAz-7dwOPK3sN2QrPiAcxhtojh8p65j0TRNhg@mail.gmail.com>
+ <CANn89iLSOeFGNogYMHbeLRC5kOwwArMz3d5_2hZmBn6fibyUhw@mail.gmail.com>
+ <CAADnVQ+OhsBetPT0avuNVsEwru13UtMjX1U_6_u6xROXBBn-Yg@mail.gmail.com>
+ <ZgGmQu09Z9xN7eOD@google.com> <d9531955-06ad-ccdd-d3d0-4779400090ba@iogearbox.net>
+ <CANn89iJFOR5ucef0bH=BTKrLOAGsUtF8tM=cYNDTg+=gHDntvw@mail.gmail.com>
+ <CANn89iKZ0126qzvpm0bPP7O+M95hcGWKp_HPg+M7vgdDHr0u0A@mail.gmail.com>
+ <3050c54d-3b3c-53b0-6004-fa11caca27b6@iogearbox.net> <CANn89iK25-UnBaz_=15SCZKzAmh2-vgMhfStv5GqFg=95VJE+A@mail.gmail.com>
+In-Reply-To: <CANn89iK25-UnBaz_=15SCZKzAmh2-vgMhfStv5GqFg=95VJE+A@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 22 Sep 2024 19:39:16 +0200
+Message-ID: <CANn89iK3M7W1PJKCyH65JePkmEd7r0UeymNqA9N1bMR4UAe_Nw@mail.gmail.com>
+Subject: Re: [PATCH net] bpf: Don't redirect too small packets
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Stanislav Fomichev <sdf@google.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Guillaume Nault <gnault@redhat.com>, patchwork-bot+netdevbpf@kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Andrii Nakryiko <andrii@kernel.org>, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Eric Dumazet <eric.dumazet@gmail.com>, 
+	syzbot+9e27778c0edc62cb97d8@syzkaller.appspotmail.com, 
+	Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Sep 20, 2024 at 02:18:23PM -0700, Erni Sri Satya Vennela wrote:
-> Add support for the ethtool get_link and get_link_ksettings
-> operations. Display standard port information using ethtool.
-> 
-> Before the change:
-> $ethtool enP30832s1
-> > No data available
-> 
-> After the change:
-> $ethtool enP30832s1
-> > Settings for enP30832s1:
->         Supported ports: [  ]
->         Supported link modes:   Not reported
->         Supported pause frame use: No
->         Supports auto-negotiation: No
->         Supported FEC modes: Not reported
->         Advertised link modes:  Not reported
->         Advertised pause frame use: No
->         Advertised auto-negotiation: No
->         Advertised FEC modes: Not reported
->         Speed: Unknown!
->         Duplex: Full
->         Auto-negotiation: off
->         Port: Other
->         PHYAD: 0
->         Transceiver: internal
->         Link detected: yes
-> 
-> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> ---
-> Changes in v2:
-> * Remove support for displaying auto-negotiation details
-> * Change PORT_DA to PORT_OTHER
+On Tue, Mar 26, 2024 at 7:08=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Mar 26, 2024 at 6:57=E2=80=AFPM Daniel Borkmann <daniel@iogearbox=
+.net> wrote:
+> >
+> > On 3/26/24 2:38 PM, Eric Dumazet wrote:
+> > > On Tue, Mar 26, 2024 at 2:37=E2=80=AFPM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > >> On Tue, Mar 26, 2024 at 1:46=E2=80=AFPM Daniel Borkmann <daniel@ioge=
+arbox.net> wrote:
+> > >>> On 3/25/24 5:28 PM, Stanislav Fomichev wrote:
+> > >>>> On 03/25, Alexei Starovoitov wrote:
+> > >>>>> On Mon, Mar 25, 2024 at 6:33=E2=80=AFAM Eric Dumazet <edumazet@go=
+ogle.com> wrote:
+> > >>>>>> On Sat, Mar 23, 2024 at 4:02=E2=80=AFAM Alexei Starovoitov
+> > >>>>>> <alexei.starovoitov@gmail.com> wrote:
+> > >>>>>>> On Fri, Mar 22, 2024 at 7:10=E2=80=AFAM <patchwork-bot+netdevbp=
+f@kernel.org> wrote:
+> > >>>>>>>>
+> > >>>>>>>> Hello:
+> > >>>>>>>>
+> > >>>>>>>> This patch was applied to bpf/bpf.git (master)
+> > >>>>>>>> by Daniel Borkmann <daniel@iogearbox.net>:
+> > >>>>>>>>
+> > >>>>>>>> On Fri, 22 Mar 2024 12:24:07 +0000 you wrote:
+> > >>>>>>>>> Some drivers ndo_start_xmit() expect a minimal size, as shown
+> > >>>>>>>>> by various syzbot reports [1].
+> > >>>>>>>>>
+> > >>>>>>>>> Willem added in commit 217e6fa24ce2 ("net: introduce device m=
+in_header_len")
+> > >>>>>>>>> the missing attribute that can be used by upper layers.
+> > >>>>>>>>>
+> > >>>>>>>>> We need to use it in __bpf_redirect_common().
+> > >>>>>>>
+> > >>>>>>> This patch broke empty_skb test:
+> > >>>>>>> $ test_progs -t empty_skb
+> > >>>>>>>
+> > >>>>>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
+> > >>>>>>> [redirect_ingress] unexpected ret: veth ETH_HLEN+1 packet ingre=
+ss
+> > >>>>>>> [redirect_ingress]: actual -34 !=3D expected 0
+> > >>>>>>> test_empty_skb:PASS:err: veth ETH_HLEN+1 packet ingress [redire=
+ct_egress] 0 nsec
+> > >>>>>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
+> > >>>>>>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingres=
+s
+> > >>>>>>> [redirect_egress]: actual -34 !=3D expected 1
+> > >>>>>>>
+> > >>>>>>> And looking at the test I think it's not a test issue.
+> > >>>>>>> This check
+> > >>>>>>> if (unlikely(skb->len < dev->min_header_len))
+> > >>>>>>> is rejecting more than it should.
+> > >>>>>>>
+> > >>>>>>> So I reverted this patch for now.
+> > >>>>>>
+> > >>>>>> OK, it seems I missed __bpf_rx_skb() vs __bpf_tx_skb(), but even=
+ if I
+> > >>>>>> move my sanity test in __bpf_tx_skb(),
+> > >>>>>> the bpf test program still fails, I am suspecting the test needs=
+ to be adjusted.
+> > >>>>>>
+> > >>>>>> diff --git a/net/core/filter.c b/net/core/filter.c
+> > >>>>>> index 745697c08acb3a74721d26ee93389efa81e973a0..e9c0e2087a08f1d8=
+afd2c3e8e7871ddc9231b76d
+> > >>>>>> 100644
+> > >>>>>> --- a/net/core/filter.c
+> > >>>>>> +++ b/net/core/filter.c
+> > >>>>>> @@ -2128,6 +2128,12 @@ static inline int __bpf_tx_skb(struct
+> > >>>>>> net_device *dev, struct sk_buff *skb)
+> > >>>>>>                   return -ENETDOWN;
+> > >>>>>>           }
+> > >>>>>>
+> > >>>>>> +       if (unlikely(skb->len < dev->min_header_len)) {
+> > >>>>>> +               pr_err_once("__bpf_tx_skb skb->len=3D%u <
+> > >>>>>> dev(%s)->min_header_len(%u)\n", skb->len, dev->name,
+> > >>>>>> dev->min_header_len);
+> > >>>>>> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
+> > >>>>>> +               kfree_skb(skb);
+> > >>>>>> +               return -ERANGE;
+> > >>>>>> +       } // Note: this is before we change skb->dev
+> > >>>>>>           skb->dev =3D dev;
+> > >>>>>>           skb_set_redirected_noclear(skb, skb_at_tc_ingress(skb)=
+);
+> > >>>>>>           skb_clear_tstamp(skb);
+> > >>>>>>
+> > >>>>>>
+> > >>>>>> -->
+> > >>>>>>
+> > >>>>>>
+> > >>>>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
+> > >>>>>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
+> > >>>>>> [redirect_egress]: actual -34 !=3D expected 1
+> > >>>>>>
+> > >>>>>> [   58.382051] __bpf_tx_skb skb->len=3D1 < dev(veth0)->min_heade=
+r_len(14)
+> > >>>>>> [   58.382778] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D=
+113
+> > >>>>>>                  mac=3D(64,14) net=3D(78,-1) trans=3D-1
+> > >>>>>>                  shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 ty=
+pe=3D0 segs=3D0))
+> > >>>>>>                  csum(0x0 ip_summed=3D0 complete_sw=3D0 valid=3D=
+0 level=3D0)
+> > >>>>>>                  hash(0x0 sw=3D0 l4=3D0) proto=3D0x7f00 pkttype=
+=3D0 iif=3D0
+> > >>>>>
+> > >>>>> Hmm. Something is off.
+> > >>>>> That test creates 15 byte skb.
+> > >>>>> It's not obvious to me how it got reduced to 1.
+> > >>>>> Something stripped L2 header and the prog is trying to redirect
+> > >>>>> such skb into veth that expects skb with L2 ?
+> > >>>>>
+> > >>>>> Stan,
+> > >>>>> please take a look.
+> > >>>>> Since you wrote that test.
+> > >>>>
+> > >>>> Sure. Daniel wants to take a look on a separate thread, so we can =
+sync
+> > >>>> up. Tentatively, seems like the failure is in the lwt path that do=
+es
+> > >>>> indeed drop the l2.
+> > >>>
+> > >>> If we'd change the test into the below, the tc and empty_skb tests =
+pass.
+> > >>> run_lwt_bpf() calls into skb_do_redirect() which has L2 stripped, a=
+nd thus
+> > >>> skb->len is 1 in this test. We do use skb_mac_header_len() also in =
+other
+> > >>> tc BPF helpers, so perhaps s/skb->len/skb_mac_header_len(skb)/ is t=
+he best
+> > >>> way forward..
+> > >>>
+> > >>> static int __bpf_redirect_common(struct sk_buff *skb, struct net_de=
+vice *dev,
+> > >>>                                    u32 flags)
+> > >>> {
+> > >>>           /* Verify that a link layer header is carried */
+> > >>>           if (unlikely(skb->mac_header >=3D skb->network_header || =
+skb->len =3D=3D 0)) {
+> > >>>                   kfree_skb(skb);
+> > >>>                   return -ERANGE;
+> > >>>           }
+> > >>>
+> > >>>           if (unlikely(skb_mac_header_len(skb) < dev->min_header_le=
+n)) {
+> > >>
+> > >> Unfortunately this will not prevent frames with skb->len =3D=3D 1 to=
+ reach
+> > >> an Ethernet driver ndo_start_xmit()
+> > >>
+> > >> At ndo_start_xmit(), we do not look where the MAC header supposedly
+> > >> starts in the skb, we only use skb->data
+> > >>
+> > >> I have a syzbot repro using team driver, so I added the following pa=
+rt in team :
+> > >>
+> > >> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+> > >> index 0a44bbdcfb7b9f30a0c27b700246501c5eba322f..75e5ef585a8f05b35cfd=
+dbae0bfc377864e6e38c
+> > >> 100644
+> > >> --- a/drivers/net/team/team.c
+> > >> +++ b/drivers/net/team/team.c
+> > >> @@ -1714,6 +1714,11 @@ static netdev_tx_t team_xmit(struct sk_buff
+> > >> *skb, struct net_device *dev)
+> > >>          bool tx_success;
+> > >>          unsigned int len =3D skb->len;
+> > >>
+> > >> +       if (len < 14) {
+> > >> +               pr_err_once("team_xmit(len=3D%u)\n", len);
+> > >> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
+> > >> +               WARN_ON_ONCE(1);
+> > >> +       }
+> > >>          tx_success =3D team_queue_override_transmit(team, skb);
+> > >>          if (!tx_success)
+> > >>                  tx_success =3D team->ops.transmit(team, skb);
+> > >>
+> > >>
+> > >> And I get (with your suggestion instead of skb->len)
+> > >
+> > > Missing part in my copy/paste :
+> > >
+> > > [   41.123829] team_xmit(len=3D1)
+> > > [   41.124335] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D113
+> > >
+> > >> mac=3D(78,0) net=3D(78,-1) trans=3D-1
+> >
+> > Interesting.
+> >
+> > Could you also dump dev->type and/or dev->min_header_len? I suspect
+> > this case may not be ARPHRD_ETHER in team.
+> >
+> > Above says mac=3D(78,0), so mac len is 0 and the check against the
+> > dev->min_header_len should have dropped it if it went that branch.
+>
+> mac header is reset in __dev_queue_xmit() :
+>
+>          skb_reset_mac_header(skb);
+>
+> So when the bpf code ran, skb_mac_header_len(skb) was 14,
+> but later the MAC header was set (to skb->data)
+>
+> >
+> > I wonder, is team driver missing sth like :
+> >
+> > diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+> > index 0a44bbdcfb7b..6256f0d2f565 100644
+> > --- a/drivers/net/team/team.c
+> > +++ b/drivers/net/team/team.c
+> > @@ -2124,6 +2124,7 @@ static void team_setup_by_port(struct net_device =
+*dev,
+> >          dev->type =3D port_dev->type;
+> >          dev->hard_header_len =3D port_dev->hard_header_len;
+> >          dev->needed_headroom =3D port_dev->needed_headroom;
+> > +       dev->min_header_len =3D port_dev->min_header_len;
+> >          dev->addr_len =3D port_dev->addr_len;
+> >          dev->mtu =3D port_dev->mtu;
+> >          memcpy(dev->broadcast, port_dev->broadcast, port_dev->addr_len=
+);
+> >
+>
+>
+> I have confirmed that team min_header_len is 14, nothing seems to be
+> missing I think.
+>
+> team_xmit(dev team0, skb->len=3D1, dev->min_header_len=3D14)
 
-Hi Erni, Haiyang, all
-
-Thanks for the update, it looks like it addresses the review of v1 by Jakub.
-However, I am assuming that as a non-bug-fix, this is targeted at net-next.
-And net-next is currently closed for the v6.12 merge window.  Please
-consider reposting this patch once net-next reopens.  That will occur after
-v6.12-rc1 has been released.  Which I expect to be about a week from now.
-
-Also, for networking patches please tag non-bug fixes for
-net-next (and bug fixes for net, being sure to include a Fixes tag).
-
-	Subject: [PATCH net-next] ...
-
-Please see https://docs.kernel.org/process/maintainer-netdev.html
-
--- 
-pw-bot: defer
+FYI, I am releasing today a syzbot report with the same problem.
 
