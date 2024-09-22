@@ -1,159 +1,203 @@
-Return-Path: <netdev+bounces-129214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 328D897E40E
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 00:24:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD58797E420
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 01:08:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58E501C20C41
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 22:24:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E33CB2810F4
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 23:08:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E90F74063;
-	Sun, 22 Sep 2024 22:24:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HK2KGgtg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3EC7711B;
+	Sun, 22 Sep 2024 23:08:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D779BA27
-	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 22:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E327F535D4
+	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 23:08:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727043860; cv=none; b=WVMKE1MSFZ+CCyYkvskSwHdw6LsEWuCployrbFuJdQ3HernLrghM3bPvfCuBeorWG/EuLaBP4RdGjzremGFLofSwv7aUuOEeu7FZIhnjPqGHDTF+DYnNeLq7ImKMKGs8XgC3494jG9nN/YV9K9u6FumLGdDgtpecgePqVN5rb74=
+	t=1727046503; cv=none; b=aFsiyTheHxhqQC/HmYKQogjvxJCxCg5bRInvlilnV12D0a5OJkBgMR7SydUOeEEnZphwk8t4TvuvBC85AWvYcVsDK/WtzFbYYbSkNXASLIpZCHNPSJaPQbClOhmc4YvyLTeG1tkRttKSL2qsYf0nTPKevS/S4RpNmGLbllBie/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727043860; c=relaxed/simple;
-	bh=3U2iMJndTOUXN068tQELfCE09th6zQydQ0ESnvkdj7A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YjItR3TS9qDZ5eSicO1tkKP098hFTIKIUSgeNTW2g3olXoGCEebEhd+0KBSaFphvKWmT5WIsvO+2keVLGnHic/wPOH+PKJzTNH/f1aeq2ErJDFwLfbwR+HiTinGspVJfrL2ZY7wHEAu56F9IabEzY/Nn9UuBCL1/G005RIlr1qk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HK2KGgtg; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-42ca6ba750eso23286275e9.0
-        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 15:24:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727043857; x=1727648657; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Du3hNak9h6BGqgpjqudfrCzAlifwkfHE2sHybutD6Es=;
-        b=HK2KGgtgeWLdNgLhf0rl4GdBnQ3mXQShIW75TvGWWo961DfB/Rlu1qV4eKq5G6y/5P
-         mGh7rjP4PUi2PG7Z0rXp2kqN6dLjIx0z1VBQ3HV6rEiAkQc1DF7UYS90ESMfEf1UWy9M
-         fKV6/jEqsk520xyWE3+3xEAzp210/FG7W2amc0mAcOflEAkPlDvpYr12JortIC6x64bu
-         e+4a46vTkZAp+clgCOHxbV6ZxxVrxzvHiEufHhwzL92WnBmu27szC7S2TNORHsM0PnDS
-         rWeYB7NrbhhcXb6btkMspN8Iyol1nmHuawmtooQ3M1/75CnWoPHUxyaxMPHvRGRAaeXI
-         Ka4w==
+	s=arc-20240116; t=1727046503; c=relaxed/simple;
+	bh=VEMKNRhtM8106fxnnmEHNXFe77uEvoQwoECzdjmjkBw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=OBmrPMBBWD9je/fEFeUyUCQDKUABq3jvEFycl7aQxbsY5cto+Z51pYjtRgIrB33PoxOL/D0ckE5XTDHHTWX4J6DayBNx8avnj+qRmTcRQBfyig2HUmdj5zblnezh0LqQPJz2LmgjKQD3qvRn9Az7xAT6VCyXYYkPD7diddn50Nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-39f5605c674so60792875ab.3
+        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 16:08:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727043857; x=1727648657;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Du3hNak9h6BGqgpjqudfrCzAlifwkfHE2sHybutD6Es=;
-        b=q+ZcENM3x14qvIiiU3IoXhEDtHq4EvZZMbD5u9viXrCkifp7BY5dA5F3dX3vPOOoHH
-         RIvOWoGxX5/xtkRZN301gYmBWXWsl1gp+UoPMRIHEeOGr8q0uNkQQzH7QnZvnCnTradA
-         nXB7nfuUMGsuuYtq8zN/FeFcNpsV3x5yoMQwXMT5TkBtARLxXohIl6QpLUCYv6OevdU2
-         h9+cwQLorfeVlgJ5bppyzNYJm6gEadnZmgbXnee+paFW/lXVQJlvWi5vGcMAkLEOXe8w
-         HC7fa+u54+qIhYQgc8g+ENj8LB/Gfm4wSII3WCruJNnBTmYqTVBh87aY0GVt911tn2te
-         CUyQ==
-X-Gm-Message-State: AOJu0YwrytzOw6ktqzpjk515rA9cxPiYs9rGaCYa84ilNJtE99eSjVTd
-	whBS2DItdrD/raD380gV7lV5+SgaMIwRq8KCNP3bLAvCngWrNQVS
-X-Google-Smtp-Source: AGHT+IFo+IWHteaKb47ytpHati03m08mocCqj+kW3jZJivUWd/ziHro7sS4iyg2Xl+7fWJMlrnOL5A==
-X-Received: by 2002:a05:600c:154d:b0:42c:b2a2:af3a with SMTP id 5b1f17b1804b1-42e744279b1mr84074365e9.9.1727043856556;
-        Sun, 22 Sep 2024 15:24:16 -0700 (PDT)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e73e8340sm22889870f8f.46.2024.09.22.15.24.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Sep 2024 15:24:15 -0700 (PDT)
-Message-ID: <782b53e2-58ef-47a7-b392-c18d807d3e72@gmail.com>
-Date: Mon, 23 Sep 2024 01:24:32 +0300
+        d=1e100.net; s=20230601; t=1727046501; x=1727651301;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EKzSJ/WaGJM/ku5gQoaoOIrRJShwWPCCrXWi3XodAHg=;
+        b=NWrJDC1E5m8oUxwkpJj/QBvqI2UyswVB+3yZw2diCTEfTMjtbdmAVSHT2XRlOyORmT
+         NRhdo5zzw7bpjO6bG6qgFyQ9cL7nJi5fszqB2xiWgLO0AH9c32si7eQ34fOYAMRQoFcy
+         s3g62BMynvSfYfd8sn6MFlnq0kfwjMSpv7l0mw4CLFXfkk286jd3rnpGmt4SsMzxS9Ra
+         AfyWFZDqWLYzvdFdiq9h1gukRR2aAsuiXv6iQMbZBAz2JAAGOrPqbTqkjQR1wqChaiGi
+         hFjcj7PiEMWBNkevDvdVGo0G6G/JW+xSSmiNKYeJlzbZK+5Qulr2sVriZJ/zPu7XbHY4
+         dD9w==
+X-Forwarded-Encrypted: i=1; AJvYcCVp5la/tkKXFqLd7WLJglJUDTIITwRfo8t8kgPZxCVR2BvuO1OJaHWtS88/nxdCreSApSBaORU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yys6GZmkOt4C0C06WnOGv8z7xT/HvGoHGn8YcG8Rmbt68S4aHnn
+	LGnvgReIB9qi5gBkbLY6PoaW/7Bjjp3/8Qhuuph3ZD61QdAwGnfrc5CWtAOI7t+ukHi9tG//dHQ
+	WAmg+16GvA7d/XPdPJDlpFyD26zAtWw1UVAGI0wYaeR3NJ4NGfhqqxyU=
+X-Google-Smtp-Source: AGHT+IHLDjB33A3pCGradFc/31YGrEYQVjlq9w3rRdYgCR6dbgkKL+Q/KSRP1Azpj/pA/wl8TmwEnkv/vrmlh+E/PEOVEYYYUZ44
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 04/25] ovpn: add basic netlink support
-To: Antonio Quartulli <antonio@openvpn.net>,
- Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew@lunn.ch, sd@queasysnail.net
-References: <20240917010734.1905-1-antonio@openvpn.net>
- <20240917010734.1905-5-antonio@openvpn.net> <m2wmjabehc.fsf@gmail.com>
- <99028055-f440-45e8-8fb1-ec4e19e0cafa@openvpn.net> <m2o74lb7hu.fsf@gmail.com>
- <63c452f7-041e-4a28-96ba-c37ea8170dfd@openvpn.net>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <63c452f7-041e-4a28-96ba-c37ea8170dfd@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:c544:0:b0:3a0:91e7:67cc with SMTP id
+ e9e14a558f8ab-3a0c8ceecd2mr85137885ab.13.1727046501203; Sun, 22 Sep 2024
+ 16:08:21 -0700 (PDT)
+Date: Sun, 22 Sep 2024 16:08:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <66f0a365.050a0220.a27de.000a.GAE@google.com>
+Subject: [syzbot] [wireless?] KMSAN: uninit-value in ath9k_hif_usb_reg_in_cb
+From: syzbot <syzbot+e5388ea6d2de83957e35@syzkaller.appspotmail.com>
+To: kvalo@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, toke@toke.dk
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Antonio, Donald,
+Hello,
 
-On 18.09.2024 14:16, Antonio Quartulli wrote:
-> On 18/09/2024 12:07, Donald Hunter wrote:
->> Antonio Quartulli <antonio@openvpn.net> writes:
->>>>> +      -
->>>>> +        name: local-ip
->>>>> +        type: binary
->>>>> +        doc: The local IP to be used to send packets to the peer 
->>>>> (UDP only)
->>>>> +        checks:
->>>>> +          max-len: 16
->>>> It might be better to have separate attrs fopr local-ipv4 and
->>>> local-ipv6, to be consistent with vpn-ipv4 / vpn-ipv6
->>>
->>> while it is possible for a peer to be dual stack and have both an 
->>> IPv4 and IPv6 address assigned
->>> to the VPN tunnel, the local transport endpoint can only be one 
->>> (either v4 or v6).
->>> This is why we have only one local_ip.
->>> Does it make sense?
->>
->> I was thinking that the two attributes would be mutually exclusive. You
->> could accept local-ipv4 OR local-ipv6. If both are provided then you can
->> report an extack error.
-> 
-> Ok then, I'll split the local-ip in two attrs.
-> 
-> It also gets cleaner as we have an explicit type definition, while right 
-> now we infer the type from the data length.
-> 
->>
->>>>
->>>>> +      -
->>>>> +        name: keyconf
->>>>> +        type: nest
->>>>> +        doc: Peer specific cipher configuration
->>>>> +        nested-attributes: keyconf
->>>> Perhaps keyconf should just be used as a top-level attribute-set. The
->>>> only attr you'd need to duplicate would be peer-id? There are separate
->>>> ops for setting peers and for key configuration, right?
->>>
->>> This is indeed a good point.
->>> Yes, SET_PEER and SET_KEY are separate ops.
->>>
->>> I could go with SET_PEER only, and let the user specify a keyconf 
->>> within a peer (like now).
->>>
->>> Or I could keep to SET_KEY, but then do as you suggest and move 
->>> KEYCONF to the root level.
->>>
->>> Is there any preferred approach?
->>
->> I liked the separate ops for key management because the sematics are
->> explicit and it is very obvious that there is no op for reading keys. If
->> you also keep keyconf attrs separate from the peer attrs then it would be
->> obvious that the peer ops would never expose any keyconf attrs.
-> 
-> Ok, will move KEYCONF to the root level and will duplicate the PEER_ID.
+syzbot found the following issue on:
 
-Nice idea! A was about to suggest the same. Besides making semantic 
-simple, what somehow subjective, it should make parsing way simple. Two 
-nested attributes parsing calls will be saved.
+HEAD commit:    bdf56c7580d2 Merge tag 'slab-for-6.12' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=131524a9980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b82e97dfbc92f0
+dashboard link: https://syzkaller.appspot.com/bug?extid=e5388ea6d2de83957e35
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
---
-Sergey
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/b415ca186bb1/disk-bdf56c75.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4ce89ea52bab/vmlinux-bdf56c75.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9f99c9bf1bec/bzImage-bdf56c75.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e5388ea6d2de83957e35@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in __skb_set_length include/linux/skbuff.h:3190 [inline]
+BUG: KMSAN: uninit-value in ath9k_hif_usb_reg_in_cb+0x84d/0x9b0 drivers/net/wireless/ath/ath9k/hif_usb.c:756
+ __skb_set_length include/linux/skbuff.h:3190 [inline]
+ ath9k_hif_usb_reg_in_cb+0x84d/0x9b0 drivers/net/wireless/ath/ath9k/hif_usb.c:756
+ __usb_hcd_giveback_urb+0x572/0x840 drivers/usb/core/hcd.c:1650
+ usb_hcd_giveback_urb+0x157/0x720 drivers/usb/core/hcd.c:1734
+ dummy_timer+0xd3f/0x6aa0 drivers/usb/gadget/udc/dummy_hcd.c:1987
+ __run_hrtimer kernel/time/hrtimer.c:1691 [inline]
+ __hrtimer_run_queues+0x564/0xe40 kernel/time/hrtimer.c:1755
+ hrtimer_interrupt+0x3ab/0x1490 kernel/time/hrtimer.c:1817
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1026 [inline]
+ __sysvec_apic_timer_interrupt+0xa6/0x3a0 arch/x86/kernel/apic/apic.c:1043
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1037 [inline]
+ sysvec_apic_timer_interrupt+0x7e/0x90 arch/x86/kernel/apic/apic.c:1037
+ asm_sysvec_apic_timer_interrupt+0x1f/0x30 arch/x86/include/asm/idtentry.h:702
+ __preempt_count_dec_and_test arch/x86/include/asm/preempt.h:94 [inline]
+ __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
+ _raw_spin_unlock_irqrestore+0x33/0x60 kernel/locking/spinlock.c:194
+ spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
+ dummy_pullup+0x273/0x320 drivers/usb/gadget/udc/dummy_hcd.c:924
+ usb_gadget_disconnect_locked+0x1f8/0x5b0 drivers/usb/gadget/udc/core.c:777
+ gadget_unbind_driver+0xe6/0x5f0 drivers/usb/gadget/udc/core.c:1666
+ device_remove drivers/base/dd.c:566 [inline]
+ __device_release_driver drivers/base/dd.c:1272 [inline]
+ device_release_driver_internal+0x58a/0x990 drivers/base/dd.c:1295
+ driver_detach+0x360/0x540 drivers/base/dd.c:1358
+ bus_remove_driver+0x465/0x500 drivers/base/bus.c:742
+ driver_unregister+0x8d/0x100 drivers/base/driver.c:274
+ usb_gadget_unregister_driver+0x55/0xa0 drivers/usb/gadget/udc/core.c:1731
+ raw_release+0x1bc/0x400 drivers/usb/gadget/legacy/raw_gadget.c:462
+ __fput+0x32c/0x1120 fs/file_table.c:431
+ ____fput+0x25/0x30 fs/file_table.c:459
+ task_work_run+0x268/0x310 kernel/task_work.c:228
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0xce/0x170 kernel/entry/common.c:218
+ do_syscall_64+0xda/0x1e0 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ __alloc_pages_noprof+0x9d6/0xe70 mm/page_alloc.c:4725
+ alloc_pages_mpol_noprof+0x299/0x990 mm/mempolicy.c:2263
+ alloc_pages_noprof+0x1bf/0x1e0 mm/mempolicy.c:2343
+ alloc_slab_page mm/slub.c:2413 [inline]
+ allocate_slab+0x320/0x12c0 mm/slub.c:2579
+ new_slab mm/slub.c:2632 [inline]
+ ___slab_alloc+0x12ef/0x35e0 mm/slub.c:3819
+ __slab_alloc mm/slub.c:3909 [inline]
+ __slab_alloc_node mm/slub.c:3962 [inline]
+ slab_alloc_node mm/slub.c:4123 [inline]
+ kmem_cache_alloc_noprof+0x57a/0xb20 mm/slub.c:4142
+ skb_clone+0x303/0x550 net/core/skbuff.c:2084
+ dev_queue_xmit_nit+0x4d0/0x12a0 net/core/dev.c:2315
+ xmit_one net/core/dev.c:3584 [inline]
+ dev_hard_start_xmit+0x17d/0xa20 net/core/dev.c:3604
+ __dev_queue_xmit+0x3576/0x55e0 net/core/dev.c:4424
+ dev_queue_xmit include/linux/netdevice.h:3094 [inline]
+ neigh_connected_output+0x5a0/0x690 net/core/neighbour.c:1594
+ neigh_output include/net/neighbour.h:542 [inline]
+ ip6_finish_output2+0x2347/0x2ba0 net/ipv6/ip6_output.c:141
+ __ip6_finish_output net/ipv6/ip6_output.c:215 [inline]
+ ip6_finish_output+0xbb8/0x14b0 net/ipv6/ip6_output.c:226
+ NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+ ip6_output+0x356/0x620 net/ipv6/ip6_output.c:247
+ dst_output include/net/dst.h:450 [inline]
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ndisc_send_skb+0xb9f/0x14c0 net/ipv6/ndisc.c:511
+ ndisc_send_rs+0x97e/0xae0 net/ipv6/ndisc.c:721
+ addrconf_rs_timer+0x488/0x6f0 net/ipv6/addrconf.c:4042
+ call_timer_fn+0x49/0x580 kernel/time/timer.c:1794
+ expire_timers kernel/time/timer.c:1845 [inline]
+ __run_timers kernel/time/timer.c:2419 [inline]
+ __run_timer_base+0x84e/0xe90 kernel/time/timer.c:2430
+ run_timer_base kernel/time/timer.c:2439 [inline]
+ run_timer_softirq+0x3a/0x70 kernel/time/timer.c:2449
+ handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0x68/0x120 kernel/softirq.c:637
+ irq_exit_rcu+0x12/0x20 kernel/softirq.c:649
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1037 [inline]
+ sysvec_apic_timer_interrupt+0x83/0x90 arch/x86/kernel/apic/apic.c:1037
+ asm_sysvec_apic_timer_interrupt+0x1f/0x30 arch/x86/include/asm/idtentry.h:702
+
+CPU: 0 UID: 0 PID: 7385 Comm: syz.1.489 Tainted: G        W          6.11.0-syzkaller-04744-gbdf56c7580d2 #0
+Tainted: [W]=WARN
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
