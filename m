@@ -1,122 +1,179 @@
-Return-Path: <netdev+bounces-129271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE66197E992
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 12:10:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA9F497E3E9
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 00:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED0D31C217CD
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 10:10:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD6901C20A51
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 22:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09BB819922D;
-	Mon, 23 Sep 2024 10:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6837B770E4;
+	Sun, 22 Sep 2024 22:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VoyYEIpv"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57D3194A54
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 10:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F27B1A28D
+	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 22:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727086133; cv=none; b=jyhxMq3lzgcqEibqWx6+Vump9HiIa+aVm7gN1x7v+qaTW+HeI8paR3upeGoa3kQM3eVTMmxFY/SfOuLUbWycc7ZGguj7bL0/2QUPD90xCG4AsUHebXGKpcWlsIi4V6MthwGclC9W2u8sa+dd42D6VpJFB/nz3pOoBsQC6G8tH8c=
+	t=1727043476; cv=none; b=QoKhnrKj6Q+Msv0PzHy4AVO4KX07rimLj1zL8ZEXQf75/RNlSnFwP/7bJyzjPSIduMW2A/kt2OTajKvDERH4Wk0xs2SeSi98BpPEOiXyy9avtq/EOY13VAffEQgDEULs9JITRmabwn4uE3mX+z9tNdYQowFIYeRwAfgozQCwWhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727086133; c=relaxed/simple;
-	bh=wAxj4X47rwpfE8DME5JjC/KFI3GHmOUUJeEabElbU5c=;
+	s=arc-20240116; t=1727043476; c=relaxed/simple;
+	bh=+VWjUNRxUp+RfG26z07hsVE/vm58zscjICTwSUp5dFw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ba7jhBm3pkaijpVl9+G1zB5CfwmxpiXdlHqnnc1kkdaDi0sl9z9i2F2BmAj3N0g1C070yghvbvBz378fQVNBfupVOFy2kGCfyOPeC8MIKckZkt6+iqgBmaNVhJMyvWzTRVUUmbbEO2GRSmhXuhffAPVDBcrKELIdQT7r3J2le3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ssfzS-00006g-IR; Mon, 23 Sep 2024 12:08:22 +0200
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1ssfzN-000vje-Rt; Mon, 23 Sep 2024 12:08:17 +0200
-Received: from pengutronix.de (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 6D6CE340BDC;
-	Sun, 22 Sep 2024 21:13:45 +0000 (UTC)
-Date: Sun, 22 Sep 2024 23:13:44 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Hal Feng <hal.feng@starfivetech.com>
-Cc: Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S . Miller" <davem@davemloft.net>, 
+	 Content-Type:Content-Disposition:In-Reply-To; b=gOT4Pv/rlmxFglcth6NRVZONDrY1C9nto2XezKcH45MPK3i3z3iujeNlBnZZL6AA9ecsoIeponF9CJC2Otzt+rj5FcMB0UBtyZxneSR+xH30+4RYPn59k5pC4kK/uW5W5SzZbMC9QYpUZUDuUdRuimw4OJJMYsd8uTyC70mnLoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VoyYEIpv; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-536562739baso3467130e87.1
+        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 15:17:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727043473; x=1727648273; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=T+z+sTMVisDVFfvjkFFbu8DDWbPGrFSf17/aPoR5w2s=;
+        b=VoyYEIpvAoz97Z/EpCV4D0bHfjktTqqKR5N+FfoODtreI7q0xi4X8w44WWVT0amDvv
+         iqW3uT2dsw/g4rsO+MdOYsqzOuZDp1da7u+ZVuhw3HgCWeyOsH97QAXEbE2X2w8R0ay2
+         Zdjav31E1C8Tt8u6hSoilwSNBTx39ADOj3xNlFnyRkgHQcs40oxZzsuVebaz9AiSkHt7
+         taUv8pnw9+2rXslvQ/jhA85N6HLPxpndKfo+asa3K3jaDhhAJVLHjgNuGmzXtFhRgplo
+         y3I+Ejnmq24Tv0h/RXiIrCH/uZmvm6tA7I3id7RI57/Gx7LXZi7XerWlKwZnYw0liiHK
+         N1Xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727043473; x=1727648273;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=T+z+sTMVisDVFfvjkFFbu8DDWbPGrFSf17/aPoR5w2s=;
+        b=KuIULBNpM5n8QymTCq+hfWYI6Ln0//OEJFPjwvqcuKWWx6OBW8xTIIzQXZBBidWw+Z
+         iGJkh5Ztvj2YmmLPqConNMODgQvcBPFDrtFrR+o4ljaTE4tQquRztjyLpDVeOL5RN5H8
+         QEli9jTcoBUztjP7olFkmbQ/9FfuXeAw6o8J9tXu4xO754HQ0BlGws6nuuusLcdItGEp
+         +siSs3RJWtQ6iPQFPVi4GKbt0OhEg+UwhfgETWfppbbM0Pwy1r17zKQBSG6JhSx6gNql
+         hdvSRNpRrTcoYLuAmNBd+kntyLHxRX2HClQnBxUpoLM8spohNAHhbw1LZzieJuZsYIq4
+         1C9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXyA39ZIu3N90PnagPAqXJ8Wb/Xmtq2/4vC22t5QQL0Oxt1xf8T8TQgl5CH4DIqpDDS4nT/n7A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6VBVx1sBOB/V2sXh1ySwhq73XHwX7sk8+0NeRi7v97riMhedS
+	qQaRvn1f4etIP2ABVsY8aQBANkmQG+/Q3OjyG0pazM99tuNqo8UN
+X-Google-Smtp-Source: AGHT+IHxU+MGElA+QsRzR7T/maHHhNlCIFzzXDBhrpK7Lmg8bAMOit3g7+vHOKt093dToxEIMGOyfQ==
+X-Received: by 2002:a05:6512:158c:b0:534:36bf:b622 with SMTP id 2adb3069b0e04-536ac34649dmr4068777e87.61.1727043472449;
+        Sun, 22 Sep 2024 15:17:52 -0700 (PDT)
+Received: from mobilestation ([95.79.225.241])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-536870966f6sm3081871e87.151.2024.09.22.15.17.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Sep 2024 15:17:51 -0700 (PDT)
+Date: Mon, 23 Sep 2024 01:17:49 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Shenwei Wang <shenwei.wang@nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
-	William Qiu <william.qiu@starfivetech.com>, devicetree@vger.kernel.org, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] can: Add driver for CAST CAN Bus Controller
-Message-ID: <20240922-inquisitive-stingray-of-philosophy-b725d3-mkl@pengutronix.de>
-References: <20240922145151.130999-1-hal.feng@starfivetech.com>
- <20240922145151.130999-4-hal.feng@starfivetech.com>
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, horms@kernel.org, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Ong Boon Leong <boon.leong.ong@intel.com>, Wong Vee Khee <vee.khee.wong@intel.com>, 
+	Chuah Kim Tatt <kim.tatt.chuah@intel.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, imx@lists.linux.dev, linux-imx@nxp.com
+Subject: Re: [PATCH v2 net] net: stmmac: dwmac4: extend timeout for VLAN Tag
+ register busy bit check
+Message-ID: <yzyezokrtcj5pnby4ak5lzrrnqu3y3k45kaibtklwrjn4ivzel@hwf6bgssykna>
+References: <20240918193452.417115-1-shenwei.wang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ynvekyrzzuwpg3ly"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240922145151.130999-4-hal.feng@starfivetech.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240918193452.417115-1-shenwei.wang@nxp.com>
 
+On Wed, Sep 18, 2024 at 02:34:52PM -0500, Shenwei Wang wrote:
+> Increase the timeout for checking the busy bit of the VLAN Tag register
+> from 10µs to 500ms. This change is necessary to accommodate scenarios
+> where Energy Efficient Ethernet (EEE) is enabled.
+> 
+> Overnight testing revealed that when EEE is active, the busy bit can
+> remain set for up to approximately 300ms. The new 500ms timeout provides
+> a safety margin.
+> 
+> Fixes: ed64639bc1e0 ("net: stmmac: Add support for VLAN Rx filtering")
+> Signed-off-by: Shenwei Wang <shenwei.wang@nxp.com>
+> ---
+> Changes in v2:
+>  - replace the udelay with readl_poll_timeout per Simon's review.
+> 
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> index a1858f083eef..a0cfa2eaebb4 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
+> @@ -14,6 +14,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/ethtool.h>
+>  #include <linux/io.h>
+> +#include <linux/iopoll.h>
+>  #include "stmmac.h"
+>  #include "stmmac_pcs.h"
+>  #include "dwmac4.h"
+> @@ -471,7 +472,7 @@ static int dwmac4_write_vlan_filter(struct net_device *dev,
+>  				    u8 index, u32 data)
+>  {
+>  	void __iomem *ioaddr = (void __iomem *)dev->base_addr;
+> -	int i, timeout = 10;
+> +	int ret, timeout = 500000; //500ms
+>  	u32 val;
+> 
+>  	if (index >= hw->num_vlan)
+> @@ -487,12 +488,11 @@ static int dwmac4_write_vlan_filter(struct net_device *dev,
+> 
+>  	writel(val, ioaddr + GMAC_VLAN_TAG);
+> 
+> -	for (i = 0; i < timeout; i++) {
+> -		val = readl(ioaddr + GMAC_VLAN_TAG);
+> -		if (!(val & GMAC_VLAN_TAG_CTRL_OB))
+> -			return 0;
+> -		udelay(1);
+> -	}
 
---ynvekyrzzuwpg3ly
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +	ret = readl_poll_timeout(ioaddr + GMAC_VLAN_TAG, val,
+> +				 !(val & GMAC_VLAN_TAG_CTRL_OB),
+> +				 1000, timeout);
+> +	if (!ret)
+> +		return 0;
+> 
+>  	netdev_err(dev, "Timeout accessing MAC_VLAN_Tag_Filter\n");
 
-On 22.09.2024 22:51:49, Hal Feng wrote:
-> From: William Qiu <william.qiu@starfivetech.com>
->=20
-> Add driver for CAST CAN Bus Controller used on
-> StarFive JH7110 SoC.
+1. Just drop the timeout local variable and use the 500000 literal
+directly. There is no point in such parametrization especially you
+have already added the delay as is.
 
-Have you read me review of the v1 of this series?
+2. A more traditional, readable and maintainable pattern is the
+error-check statement after the call. So seeing you are changing this
+part of the method anyway, let's convert it to:
 
-https://lore.kernel.org/all/20240129-zone-defame-c5580e596f72-mkl@pengutron=
-ix.de/
++	ret = readl_poll_timeout(ioaddr + GMAC_VLAN_TAG, val,
++				 !(val & GMAC_VLAN_TAG_CTRL_OB),
++				 1000, timeout);
++	if (ret) {
++		netdev_err(dev, "Timeout accessing MAC_VLAN_Tag_Filter\n");
++		return ret;
++	}
++
++	return 0;
 
-regards,
-Marc
+-Serge(y)
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---ynvekyrzzuwpg3ly
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmbwiIUACgkQKDiiPnot
-vG+1cAf+JRa6qiL+McRGaVYbwDK+5KafGW3568LC7Fz2J4e36IgRjTNWrK3zGdwR
-lUQekR2f2bapcH5T72+S0KDjjyI0v28jzRcWZR/A1/FsKY+xFTeNzOG+6ODx2VRV
-YMxZ58ZM2telOVS0SUtaGiLpXBrayzpz5nCOUxyymt1SdjjkdaVifDayKJI5vwvh
-IT4lXhvNRgPy3Guw9C9YcSk0OyIZ/TFOosTB3Db3j4M9SxdL8HgIc2H5NkV1+4Tz
-UmEmWzNKgZS0XDRPtpMe6DqR+zkm4IVm+9NNk6+0XRQ8aEZr77W7LQq946qSd/1O
-EgLfQi6D50XAsIef/NFxmgOk9EUKAQ==
-=udGo
------END PGP SIGNATURE-----
-
---ynvekyrzzuwpg3ly--
+> 
+> --
+> 2.34.1
+> 
+> 
 
