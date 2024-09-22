@@ -1,326 +1,219 @@
-Return-Path: <netdev+bounces-129196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5D9997E2C4
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 19:39:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D615A97E2D0
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 19:46:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04A3A1C20826
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 17:39:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53AFF1F215C9
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 17:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FD02AEFC;
-	Sun, 22 Sep 2024 17:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eBBj+mpu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E4462B9C6;
+	Sun, 22 Sep 2024 17:46:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9785626AC1
-	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 17:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CAA533F7
+	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 17:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727026773; cv=none; b=KFQ/lst5qlrfq4T3imMTfxmZVehLPxzMCCHDfLOpsQyVPMhOrpsr2lzPlbunFPAPupPaK1DLimuZSXEwZpkU9Bv0VMz6eMabmFE8fgI4u86Tr1IYwgD2fhrXCy+gCiU/Aq+jRpBM8EAjJu9w/8AkK0fhvpcSWQi6XFLp4T5KQls=
+	t=1727027182; cv=none; b=uAa/RwcpmCIaoM+SujtbleOufe4edw6KcdIQFYbJ/uTZRa/yE9qh1/c9B5m9FXzuAoRRMgqYCl70iluJe6jayoXzIM/tnS90zqRZYW+yXyh2z6uhV+xSBuCVlKnYhM2GhQtbElmeTdeViqI9G7+yoOs1yxCYG7OPc1979kqMG7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727026773; c=relaxed/simple;
-	bh=O1lotOYrmxqxROlwXz44VaBG2u/73HB6scPqwKg4AkY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cVQMSZRf18XOF6GlQdHtT0HVUeflyPHnfLzDKNag+jm7Y6yCKHvpixZ7wUyTkAKITv8nVFh45ukL5+OtQFrOlDe07GtMa21GPJFAqNzAO4pTnH75I2e5hC6Z7QNLKzLkm4WPpNOsD0EzBpMD2YfDfPCrGRK6oBEH4hOXz/EJSS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eBBj+mpu; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c255e3c327so3647352a12.1
-        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 10:39:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727026770; x=1727631570; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BpGAB+CE62FRMTTUXNO0uAcJsLoHQPKChAlcetMB+aU=;
-        b=eBBj+mpui6UZvZo+c5MUQY40C5gJRpWl2/DfYCHkk1tQ8FteEgUv+g7TGTEkkX6CIx
-         R7TD/9aFgSpDbdLMOD5EWfbpZBFVXJ9JpRYwA3/wvQ+118nFektS5rNi/DJyQZiPp65x
-         E4GD7cNl7XpSqrejPZQrAoCMeogD1RD45+5Q1hjYaNYHOO7b6b2JXJoo7gJAoWo6xu4P
-         Nwha9sE8K04ZyfttNBlxODAlCbVRn2q93HvFQXkCZNcF4IA8ER0BT601F/48JxZ33+5l
-         9s9jbddRzLhkVy5fV0zqP2K3k/SFGRkNMj7siT+0znuaGTdiX/eDX3+BdlnCUh4svy+0
-         voyQ==
+	s=arc-20240116; t=1727027182; c=relaxed/simple;
+	bh=Q+bddzHwkK2Nu9MCTXdGS7cq3kWB67sECu1dEG+PJ1U=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=l/5/TWK3uJH6xBySVBGhAnHY4TtHSpIGvxJP7zz1Qk3v9D1r9S0cvKu+l+NNIyj+mJICqbuTjkKk5IqxxwV/Nnt329SndF9AXDSlrJjHhPJ87T61IhwCfb7aLRi08qVeUSS9Hhye8+7/R+mL4DZEOauPuxqYrFLCtSZ6jU0xIN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-82cdb4971b9so375183639f.2
+        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 10:46:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727026770; x=1727631570;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BpGAB+CE62FRMTTUXNO0uAcJsLoHQPKChAlcetMB+aU=;
-        b=OZ57mrqEFL/7xVDSRFrfngu9SykuawwWQEjqBAAFTm9E1nQB9zcbquJrG/76Gpyld2
-         +cwcFJ3fuRIu8j78ef3LBpSv1JCwsm5tpcoRB7EXWr8YqoKVC7LYrwWxaCt8GjKsKna4
-         Lrw9JhGHeRetwbsul+9P1Yw194yWIKdxe+uiOVrRL4JAIGH97KVVHdf0Ch8zAKCgHMTX
-         HNpf7oXapUvIITN0j4hkVdQ7pDF+IeP6hvO1d/ZB4r05Ab4BS84C/MTIc6Nof0MaFPTp
-         VYZn08ZsUkTz0pURAgs6iyETY4NLdfS1o0SFOcmG/TgL/7puKObehA4XPoG1EF4P+0fx
-         yegg==
-X-Forwarded-Encrypted: i=1; AJvYcCWlEeCpgdpVOMb6Dq60NHGRIrvHy3wHRr1O55V5Z30GoaTMeM7ERpGWC3s5nqWKKBg77/GFMsw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHnDwW+TuPEYwi79ItVNWw2oCcOD9vYIC3l8F/hB/6BeEPCdgM
-	2HJKFIBNOeKDf2Qo9fzb1np2mJOjzU3MaZUZcZGybGdBVCpJcApoUrZVexGZoh5qa391uE+R0no
-	0A4PQ1exYPqtkPuH+oSqfLwNu87TA3LXnPA32
-X-Google-Smtp-Source: AGHT+IEnPr5vqUgfk5C1HQbuqZp/7fOYioCcZbjCxTrQu4/Fo45MYW2Fl8uHhs6poJBrUpPZxjRXGk9KE1XbEdnfV+E=
-X-Received: by 2002:a05:6402:4489:b0:5c5:5493:7570 with SMTP id
- 4fb4d7f45d1cf-5c55493766emr6447964a12.21.1727026769586; Sun, 22 Sep 2024
- 10:39:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727027179; x=1727631979;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2GZGILpo84C84oDf7lkUCqjURmbaY/I1uZq6HFexLnc=;
+        b=lElWEypjclh1QgpVvk7QJcVNenchpXBqcQKW0MRaJ/zherYJV4Fqt2X177srQ7XVYv
+         UvG3zeVHvjlzxp6ykR95s2buCbTt8kPIAiHnNnTxVLkcBSe6PeOwpVuWpzi1PaqwuT9g
+         0Qy2jZ91ZQBiMDhcoGuyo5e+9Tqyi4pqthcbIsIsrczVOR3sxZwFl3Y2i1uZ21gqv1Xg
+         JiPnBoUAm41n2Q2n9eXU+UqU6aWNvkBEW1wJz+7pyWrfErWWPy0aUi+8mOTvOOAlAo0R
+         1MBbujN34Lqi0YE2VLGDC/+DnW7fmS2T/PNgSt1FroVDkcgopqTzTZHilAhHrZhbya24
+         EiIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVcuakYv5yc3M15RTs579OiH7YutHlEMO3m9Po5AuscvfXYzeYUm6fuC0dwav2T1CUt552dwyY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8hTC0tVXGBk8mhjZgJtaN2z7xg87d2kfLJJQvJbaOUpjrbs/a
+	YhEA5iemEicOxFvU7be15+jOmLQ3rwb1/NvGCsXjyiu6rBc+PxdWc2PVhB1gmYfXf13GkFshEqZ
+	mHHUhryt68UR7C2XER7KTU28kN+xFj1C+f8awIA3iaC9GzqubRlWD/aw=
+X-Google-Smtp-Source: AGHT+IFcOunlSgil0zRZA616kW6EiJ6VF1dWpASBC+DfN7Xk2mvbx2FjMY46Q68DrtilSDAJsZYv+GIdnhU33JEJ7FYAJ2GevKys
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240322122407.1329861-1-edumazet@google.com> <171111663201.19374.16295682760005551863.git-patchwork-notify@kernel.org>
- <CAADnVQJy+0=6ZuAz-7dwOPK3sN2QrPiAcxhtojh8p65j0TRNhg@mail.gmail.com>
- <CANn89iLSOeFGNogYMHbeLRC5kOwwArMz3d5_2hZmBn6fibyUhw@mail.gmail.com>
- <CAADnVQ+OhsBetPT0avuNVsEwru13UtMjX1U_6_u6xROXBBn-Yg@mail.gmail.com>
- <ZgGmQu09Z9xN7eOD@google.com> <d9531955-06ad-ccdd-d3d0-4779400090ba@iogearbox.net>
- <CANn89iJFOR5ucef0bH=BTKrLOAGsUtF8tM=cYNDTg+=gHDntvw@mail.gmail.com>
- <CANn89iKZ0126qzvpm0bPP7O+M95hcGWKp_HPg+M7vgdDHr0u0A@mail.gmail.com>
- <3050c54d-3b3c-53b0-6004-fa11caca27b6@iogearbox.net> <CANn89iK25-UnBaz_=15SCZKzAmh2-vgMhfStv5GqFg=95VJE+A@mail.gmail.com>
-In-Reply-To: <CANn89iK25-UnBaz_=15SCZKzAmh2-vgMhfStv5GqFg=95VJE+A@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sun, 22 Sep 2024 19:39:16 +0200
-Message-ID: <CANn89iK3M7W1PJKCyH65JePkmEd7r0UeymNqA9N1bMR4UAe_Nw@mail.gmail.com>
-Subject: Re: [PATCH net] bpf: Don't redirect too small packets
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Stanislav Fomichev <sdf@google.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
-	Guillaume Nault <gnault@redhat.com>, patchwork-bot+netdevbpf@kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Andrii Nakryiko <andrii@kernel.org>, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Eric Dumazet <eric.dumazet@gmail.com>, 
-	syzbot+9e27778c0edc62cb97d8@syzkaller.appspotmail.com, 
-	Willem de Bruijn <willemb@google.com>
+X-Received: by 2002:a05:6e02:1522:b0:3a0:98ab:7957 with SMTP id
+ e9e14a558f8ab-3a0c8d29354mr62490705ab.24.1727027179595; Sun, 22 Sep 2024
+ 10:46:19 -0700 (PDT)
+Date: Sun, 22 Sep 2024 10:46:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <66f057eb.050a0220.a27de.0004.GAE@google.com>
+Subject: [syzbot] [net?] KMSAN: kernel-infoleak in move_addr_to_user (7)
+From: syzbot <syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, willemdebruijn.kernel@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 26, 2024 at 7:08=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Mar 26, 2024 at 6:57=E2=80=AFPM Daniel Borkmann <daniel@iogearbox=
-.net> wrote:
-> >
-> > On 3/26/24 2:38 PM, Eric Dumazet wrote:
-> > > On Tue, Mar 26, 2024 at 2:37=E2=80=AFPM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > >> On Tue, Mar 26, 2024 at 1:46=E2=80=AFPM Daniel Borkmann <daniel@ioge=
-arbox.net> wrote:
-> > >>> On 3/25/24 5:28 PM, Stanislav Fomichev wrote:
-> > >>>> On 03/25, Alexei Starovoitov wrote:
-> > >>>>> On Mon, Mar 25, 2024 at 6:33=E2=80=AFAM Eric Dumazet <edumazet@go=
-ogle.com> wrote:
-> > >>>>>> On Sat, Mar 23, 2024 at 4:02=E2=80=AFAM Alexei Starovoitov
-> > >>>>>> <alexei.starovoitov@gmail.com> wrote:
-> > >>>>>>> On Fri, Mar 22, 2024 at 7:10=E2=80=AFAM <patchwork-bot+netdevbp=
-f@kernel.org> wrote:
-> > >>>>>>>>
-> > >>>>>>>> Hello:
-> > >>>>>>>>
-> > >>>>>>>> This patch was applied to bpf/bpf.git (master)
-> > >>>>>>>> by Daniel Borkmann <daniel@iogearbox.net>:
-> > >>>>>>>>
-> > >>>>>>>> On Fri, 22 Mar 2024 12:24:07 +0000 you wrote:
-> > >>>>>>>>> Some drivers ndo_start_xmit() expect a minimal size, as shown
-> > >>>>>>>>> by various syzbot reports [1].
-> > >>>>>>>>>
-> > >>>>>>>>> Willem added in commit 217e6fa24ce2 ("net: introduce device m=
-in_header_len")
-> > >>>>>>>>> the missing attribute that can be used by upper layers.
-> > >>>>>>>>>
-> > >>>>>>>>> We need to use it in __bpf_redirect_common().
-> > >>>>>>>
-> > >>>>>>> This patch broke empty_skb test:
-> > >>>>>>> $ test_progs -t empty_skb
-> > >>>>>>>
-> > >>>>>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-> > >>>>>>> [redirect_ingress] unexpected ret: veth ETH_HLEN+1 packet ingre=
-ss
-> > >>>>>>> [redirect_ingress]: actual -34 !=3D expected 0
-> > >>>>>>> test_empty_skb:PASS:err: veth ETH_HLEN+1 packet ingress [redire=
-ct_egress] 0 nsec
-> > >>>>>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-> > >>>>>>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingres=
-s
-> > >>>>>>> [redirect_egress]: actual -34 !=3D expected 1
-> > >>>>>>>
-> > >>>>>>> And looking at the test I think it's not a test issue.
-> > >>>>>>> This check
-> > >>>>>>> if (unlikely(skb->len < dev->min_header_len))
-> > >>>>>>> is rejecting more than it should.
-> > >>>>>>>
-> > >>>>>>> So I reverted this patch for now.
-> > >>>>>>
-> > >>>>>> OK, it seems I missed __bpf_rx_skb() vs __bpf_tx_skb(), but even=
- if I
-> > >>>>>> move my sanity test in __bpf_tx_skb(),
-> > >>>>>> the bpf test program still fails, I am suspecting the test needs=
- to be adjusted.
-> > >>>>>>
-> > >>>>>> diff --git a/net/core/filter.c b/net/core/filter.c
-> > >>>>>> index 745697c08acb3a74721d26ee93389efa81e973a0..e9c0e2087a08f1d8=
-afd2c3e8e7871ddc9231b76d
-> > >>>>>> 100644
-> > >>>>>> --- a/net/core/filter.c
-> > >>>>>> +++ b/net/core/filter.c
-> > >>>>>> @@ -2128,6 +2128,12 @@ static inline int __bpf_tx_skb(struct
-> > >>>>>> net_device *dev, struct sk_buff *skb)
-> > >>>>>>                   return -ENETDOWN;
-> > >>>>>>           }
-> > >>>>>>
-> > >>>>>> +       if (unlikely(skb->len < dev->min_header_len)) {
-> > >>>>>> +               pr_err_once("__bpf_tx_skb skb->len=3D%u <
-> > >>>>>> dev(%s)->min_header_len(%u)\n", skb->len, dev->name,
-> > >>>>>> dev->min_header_len);
-> > >>>>>> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
-> > >>>>>> +               kfree_skb(skb);
-> > >>>>>> +               return -ERANGE;
-> > >>>>>> +       } // Note: this is before we change skb->dev
-> > >>>>>>           skb->dev =3D dev;
-> > >>>>>>           skb_set_redirected_noclear(skb, skb_at_tc_ingress(skb)=
-);
-> > >>>>>>           skb_clear_tstamp(skb);
-> > >>>>>>
-> > >>>>>>
-> > >>>>>> -->
-> > >>>>>>
-> > >>>>>>
-> > >>>>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-> > >>>>>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
-> > >>>>>> [redirect_egress]: actual -34 !=3D expected 1
-> > >>>>>>
-> > >>>>>> [   58.382051] __bpf_tx_skb skb->len=3D1 < dev(veth0)->min_heade=
-r_len(14)
-> > >>>>>> [   58.382778] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D=
-113
-> > >>>>>>                  mac=3D(64,14) net=3D(78,-1) trans=3D-1
-> > >>>>>>                  shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 ty=
-pe=3D0 segs=3D0))
-> > >>>>>>                  csum(0x0 ip_summed=3D0 complete_sw=3D0 valid=3D=
-0 level=3D0)
-> > >>>>>>                  hash(0x0 sw=3D0 l4=3D0) proto=3D0x7f00 pkttype=
-=3D0 iif=3D0
-> > >>>>>
-> > >>>>> Hmm. Something is off.
-> > >>>>> That test creates 15 byte skb.
-> > >>>>> It's not obvious to me how it got reduced to 1.
-> > >>>>> Something stripped L2 header and the prog is trying to redirect
-> > >>>>> such skb into veth that expects skb with L2 ?
-> > >>>>>
-> > >>>>> Stan,
-> > >>>>> please take a look.
-> > >>>>> Since you wrote that test.
-> > >>>>
-> > >>>> Sure. Daniel wants to take a look on a separate thread, so we can =
-sync
-> > >>>> up. Tentatively, seems like the failure is in the lwt path that do=
-es
-> > >>>> indeed drop the l2.
-> > >>>
-> > >>> If we'd change the test into the below, the tc and empty_skb tests =
-pass.
-> > >>> run_lwt_bpf() calls into skb_do_redirect() which has L2 stripped, a=
-nd thus
-> > >>> skb->len is 1 in this test. We do use skb_mac_header_len() also in =
-other
-> > >>> tc BPF helpers, so perhaps s/skb->len/skb_mac_header_len(skb)/ is t=
-he best
-> > >>> way forward..
-> > >>>
-> > >>> static int __bpf_redirect_common(struct sk_buff *skb, struct net_de=
-vice *dev,
-> > >>>                                    u32 flags)
-> > >>> {
-> > >>>           /* Verify that a link layer header is carried */
-> > >>>           if (unlikely(skb->mac_header >=3D skb->network_header || =
-skb->len =3D=3D 0)) {
-> > >>>                   kfree_skb(skb);
-> > >>>                   return -ERANGE;
-> > >>>           }
-> > >>>
-> > >>>           if (unlikely(skb_mac_header_len(skb) < dev->min_header_le=
-n)) {
-> > >>
-> > >> Unfortunately this will not prevent frames with skb->len =3D=3D 1 to=
- reach
-> > >> an Ethernet driver ndo_start_xmit()
-> > >>
-> > >> At ndo_start_xmit(), we do not look where the MAC header supposedly
-> > >> starts in the skb, we only use skb->data
-> > >>
-> > >> I have a syzbot repro using team driver, so I added the following pa=
-rt in team :
-> > >>
-> > >> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-> > >> index 0a44bbdcfb7b9f30a0c27b700246501c5eba322f..75e5ef585a8f05b35cfd=
-dbae0bfc377864e6e38c
-> > >> 100644
-> > >> --- a/drivers/net/team/team.c
-> > >> +++ b/drivers/net/team/team.c
-> > >> @@ -1714,6 +1714,11 @@ static netdev_tx_t team_xmit(struct sk_buff
-> > >> *skb, struct net_device *dev)
-> > >>          bool tx_success;
-> > >>          unsigned int len =3D skb->len;
-> > >>
-> > >> +       if (len < 14) {
-> > >> +               pr_err_once("team_xmit(len=3D%u)\n", len);
-> > >> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
-> > >> +               WARN_ON_ONCE(1);
-> > >> +       }
-> > >>          tx_success =3D team_queue_override_transmit(team, skb);
-> > >>          if (!tx_success)
-> > >>                  tx_success =3D team->ops.transmit(team, skb);
-> > >>
-> > >>
-> > >> And I get (with your suggestion instead of skb->len)
-> > >
-> > > Missing part in my copy/paste :
-> > >
-> > > [   41.123829] team_xmit(len=3D1)
-> > > [   41.124335] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D113
-> > >
-> > >> mac=3D(78,0) net=3D(78,-1) trans=3D-1
-> >
-> > Interesting.
-> >
-> > Could you also dump dev->type and/or dev->min_header_len? I suspect
-> > this case may not be ARPHRD_ETHER in team.
-> >
-> > Above says mac=3D(78,0), so mac len is 0 and the check against the
-> > dev->min_header_len should have dropped it if it went that branch.
->
-> mac header is reset in __dev_queue_xmit() :
->
->          skb_reset_mac_header(skb);
->
-> So when the bpf code ran, skb_mac_header_len(skb) was 14,
-> but later the MAC header was set (to skb->data)
->
-> >
-> > I wonder, is team driver missing sth like :
-> >
-> > diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-> > index 0a44bbdcfb7b..6256f0d2f565 100644
-> > --- a/drivers/net/team/team.c
-> > +++ b/drivers/net/team/team.c
-> > @@ -2124,6 +2124,7 @@ static void team_setup_by_port(struct net_device =
-*dev,
-> >          dev->type =3D port_dev->type;
-> >          dev->hard_header_len =3D port_dev->hard_header_len;
-> >          dev->needed_headroom =3D port_dev->needed_headroom;
-> > +       dev->min_header_len =3D port_dev->min_header_len;
-> >          dev->addr_len =3D port_dev->addr_len;
-> >          dev->mtu =3D port_dev->mtu;
-> >          memcpy(dev->broadcast, port_dev->broadcast, port_dev->addr_len=
-);
-> >
->
->
-> I have confirmed that team min_header_len is 14, nothing seems to be
-> missing I think.
->
-> team_xmit(dev team0, skb->len=3D1, dev->min_header_len=3D14)
+Hello,
 
-FYI, I am releasing today a syzbot report with the same problem.
+syzbot found the following issue on:
+
+HEAD commit:    88264981f208 Merge tag 'sched_ext-for-6.12' of git://git.k..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=172c4107980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=547de13ee0a4d284
+dashboard link: https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12d7c19f980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14c81c27980000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d83fc781c223/disk-88264981.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1ed4c5969fba/vmlinux-88264981.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/76a67bd894be/bzImage-88264981.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+BUG: KMSAN: kernel-infoleak in _inline_copy_to_user include/linux/uaccess.h:180 [inline]
+BUG: KMSAN: kernel-infoleak in _copy_to_user+0xbc/0x110 lib/usercopy.c:26
+ instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+ _inline_copy_to_user include/linux/uaccess.h:180 [inline]
+ _copy_to_user+0xbc/0x110 lib/usercopy.c:26
+ copy_to_user include/linux/uaccess.h:209 [inline]
+ move_addr_to_user+0x28b/0x400 net/socket.c:292
+ ____sys_recvmsg+0x232/0x620 net/socket.c:2829
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2864
+ do_recvmmsg+0x4f6/0xfd0 net/socket.c:2958
+ __sys_recvmmsg net/socket.c:3037 [inline]
+ __do_sys_recvmmsg net/socket.c:3060 [inline]
+ __se_sys_recvmmsg net/socket.c:3053 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3053
+ x64_sys_call+0x2e5d/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:300
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ packet_recvmsg+0x176a/0x2500 net/packet/af_packet.c:3585
+ sock_recvmsg_nosec+0x22f/0x2b0 net/socket.c:1052
+ ____sys_recvmsg+0x541/0x620 net/socket.c:2820
+ ___sys_recvmsg+0x223/0x840 net/socket.c:2864
+ do_recvmmsg+0x4f6/0xfd0 net/socket.c:2958
+ __sys_recvmmsg net/socket.c:3037 [inline]
+ __do_sys_recvmmsg net/socket.c:3060 [inline]
+ __se_sys_recvmmsg net/socket.c:3053 [inline]
+ __x64_sys_recvmmsg+0x397/0x490 net/socket.c:3053
+ x64_sys_call+0x2e5d/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:300
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was stored to memory at:
+ eth_header_parse+0xb8/0x110 net/ethernet/eth.c:204
+ dev_parse_header include/linux/netdevice.h:3158 [inline]
+ packet_rcv+0xefc/0x2050 net/packet/af_packet.c:2253
+ dev_queue_xmit_nit+0x114b/0x12a0 net/core/dev.c:2347
+ xmit_one net/core/dev.c:3584 [inline]
+ dev_hard_start_xmit+0x17d/0xa20 net/core/dev.c:3604
+ __dev_queue_xmit+0x3576/0x55e0 net/core/dev.c:4424
+ dev_queue_xmit include/linux/netdevice.h:3094 [inline]
+ __bpf_tx_skb net/core/filter.c:2152 [inline]
+ __bpf_redirect_common net/core/filter.c:2196 [inline]
+ __bpf_redirect+0x148c/0x1610 net/core/filter.c:2203
+ ____bpf_clone_redirect net/core/filter.c:2475 [inline]
+ bpf_clone_redirect+0x37e/0x500 net/core/filter.c:2447
+ ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:2010
+ __bpf_prog_run512+0xc5/0xf0 kernel/bpf/core.c:2253
+ bpf_dispatcher_nop_func include/linux/bpf.h:1257 [inline]
+ __bpf_prog_run include/linux/filter.h:701 [inline]
+ bpf_prog_run include/linux/filter.h:708 [inline]
+ bpf_test_run+0x546/0xd20 net/bpf/test_run.c:433
+ bpf_prog_test_run_skb+0x182f/0x24d0 net/bpf/test_run.c:1094
+ bpf_prog_test_run+0x6b1/0xac0 kernel/bpf/syscall.c:4320
+ __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5735
+ __do_sys_bpf kernel/bpf/syscall.c:5824 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5822 [inline]
+ __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5822
+ x64_sys_call+0x2cce/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:322
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4092 [inline]
+ slab_alloc_node mm/slub.c:4135 [inline]
+ kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4187
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
+ pskb_expand_head+0x226/0x1a60 net/core/skbuff.c:2275
+ skb_ensure_writable+0x496/0x520 net/core/skbuff.c:6214
+ __bpf_try_make_writable net/core/filter.c:1677 [inline]
+ bpf_try_make_writable net/core/filter.c:1683 [inline]
+ bpf_try_make_head_writable net/core/filter.c:1691 [inline]
+ ____bpf_clone_redirect net/core/filter.c:2469 [inline]
+ bpf_clone_redirect+0x1c5/0x500 net/core/filter.c:2447
+ ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:2010
+ __bpf_prog_run512+0xc5/0xf0 kernel/bpf/core.c:2253
+ bpf_dispatcher_nop_func include/linux/bpf.h:1257 [inline]
+ __bpf_prog_run include/linux/filter.h:701 [inline]
+ bpf_prog_run include/linux/filter.h:708 [inline]
+ bpf_test_run+0x546/0xd20 net/bpf/test_run.c:433
+ bpf_prog_test_run_skb+0x182f/0x24d0 net/bpf/test_run.c:1094
+ bpf_prog_test_run+0x6b1/0xac0 kernel/bpf/syscall.c:4320
+ __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5735
+ __do_sys_bpf kernel/bpf/syscall.c:5824 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5822 [inline]
+ __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5822
+ x64_sys_call+0x2cce/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:322
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Bytes 12-17 of 20 are uninitialized
+Memory access of size 20 starts at ffff88812112fa48
+Data copied to user address 0000000020000ac0
+
+CPU: 0 UID: 0 PID: 5234 Comm: syz-executor312 Not tainted 6.11.0-syzkaller-08481-g88264981f208 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
