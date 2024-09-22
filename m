@@ -1,203 +1,465 @@
-Return-Path: <netdev+bounces-129215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD58797E420
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 01:08:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 650A297E42C
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 01:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E33CB2810F4
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 23:08:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 254262811A1
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 23:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3EC7711B;
-	Sun, 22 Sep 2024 23:08:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F8D7581A;
+	Sun, 22 Sep 2024 23:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gAHI37el"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E327F535D4
-	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 23:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EA776F1B
+	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 23:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727046503; cv=none; b=aFsiyTheHxhqQC/HmYKQogjvxJCxCg5bRInvlilnV12D0a5OJkBgMR7SydUOeEEnZphwk8t4TvuvBC85AWvYcVsDK/WtzFbYYbSkNXASLIpZCHNPSJaPQbClOhmc4YvyLTeG1tkRttKSL2qsYf0nTPKevS/S4RpNmGLbllBie/I=
+	t=1727047196; cv=none; b=umFLmcCb0VdlnoYXTWQDTAc0qv6H88pFW0ryKkDcTSY6y6x6x45Bmj9Zk/QexA9QdyHE7W4GYrptxZwrNpfSfQLAXMUcGAF4aeBinuJQtEeNorXR6aoXIXhPdckqApGBQod5QsMX1evfYH4mGpiZIuDiZl+3lylIR/8yln++RRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727046503; c=relaxed/simple;
-	bh=VEMKNRhtM8106fxnnmEHNXFe77uEvoQwoECzdjmjkBw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=OBmrPMBBWD9je/fEFeUyUCQDKUABq3jvEFycl7aQxbsY5cto+Z51pYjtRgIrB33PoxOL/D0ckE5XTDHHTWX4J6DayBNx8avnj+qRmTcRQBfyig2HUmdj5zblnezh0LqQPJz2LmgjKQD3qvRn9Az7xAT6VCyXYYkPD7diddn50Nc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-39f5605c674so60792875ab.3
-        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 16:08:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727046501; x=1727651301;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1727047196; c=relaxed/simple;
+	bh=3olj92bJ2bCslqRhKQdnjTb1yIH3qkSjwpnmWB2DMMY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SkURKTVdT8BLi8lNOA1g7zkop8zu9m+hd9yiIg5p22UUXD+lhxs1tWEcOldMmr2q02ny/AADeT5Z2zpM6g9vtoze1f5fDJ/pyxfDrr8FyPOA6F32a6GPJmaYWnZ9CSF66O024u5GJNTYQchiaFMjx73NhgumpqWKLdV7eCIqRQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gAHI37el; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-375e5c12042so1966610f8f.3
+        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 16:19:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727047193; x=1727651993; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=EKzSJ/WaGJM/ku5gQoaoOIrRJShwWPCCrXWi3XodAHg=;
-        b=NWrJDC1E5m8oUxwkpJj/QBvqI2UyswVB+3yZw2diCTEfTMjtbdmAVSHT2XRlOyORmT
-         NRhdo5zzw7bpjO6bG6qgFyQ9cL7nJi5fszqB2xiWgLO0AH9c32si7eQ34fOYAMRQoFcy
-         s3g62BMynvSfYfd8sn6MFlnq0kfwjMSpv7l0mw4CLFXfkk286jd3rnpGmt4SsMzxS9Ra
-         AfyWFZDqWLYzvdFdiq9h1gukRR2aAsuiXv6iQMbZBAz2JAAGOrPqbTqkjQR1wqChaiGi
-         hFjcj7PiEMWBNkevDvdVGo0G6G/JW+xSSmiNKYeJlzbZK+5Qulr2sVriZJ/zPu7XbHY4
-         dD9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVp5la/tkKXFqLd7WLJglJUDTIITwRfo8t8kgPZxCVR2BvuO1OJaHWtS88/nxdCreSApSBaORU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yys6GZmkOt4C0C06WnOGv8z7xT/HvGoHGn8YcG8Rmbt68S4aHnn
-	LGnvgReIB9qi5gBkbLY6PoaW/7Bjjp3/8Qhuuph3ZD61QdAwGnfrc5CWtAOI7t+ukHi9tG//dHQ
-	WAmg+16GvA7d/XPdPJDlpFyD26zAtWw1UVAGI0wYaeR3NJ4NGfhqqxyU=
-X-Google-Smtp-Source: AGHT+IHLDjB33A3pCGradFc/31YGrEYQVjlq9w3rRdYgCR6dbgkKL+Q/KSRP1Azpj/pA/wl8TmwEnkv/vrmlh+E/PEOVEYYYUZ44
+        bh=hGdGs3e/Hrp6hU/UR8rne3kZini8nEp5djPiuGRKrFo=;
+        b=gAHI37elz8QO/DJI6CFL4fYbycVMvMpFRJ1YT4l+rLc8V7KydyBa0OM3WiTsHtJ+l7
+         VrC3uHQmvyA+VglNu3ufwtI3YOhS5jH16U7pNBSTq7J2UOYGYVTFcHmw0feV06bTajht
+         aN0UreM5pgDvQFDztLlNi+qln50ldNYZKe2VwoXnakCqXMe67MG+Mk+xBALXydF2AV5a
+         j04/OO8uPjh7nqAgG8ooUUGwf9e4Vjxvs7ApWP/XWjNvKQmRsBbeLlHjpVi5LwZatUfG
+         lzEBez8H9R3xTIlM9kmDkyt2D4yHIm/yzuE5UfTMGVQ+zKANNwsiDN2CAqczQ69Xg5nF
+         BOFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727047193; x=1727651993;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hGdGs3e/Hrp6hU/UR8rne3kZini8nEp5djPiuGRKrFo=;
+        b=j4hhTkfVJrdFdaKPLOkLAwYAVF7C6TO3eA2VbLsA/cLDgr/w0WSc6UHLdllF5SK+Mt
+         oKG0dgfSmt5iO0tMdybEHF2C8JMtxy8+BhlSsi61JEpckI0B2E+NQRfXSbLChVUcBLSs
+         XPcDU8RtV0LmcraAf4F/HcVNI6RHej8VzTxXdDyk/E0d1GOnpe0PPpKCRMi02nt1M+WU
+         lHSN+NUdmOQxTR8gGl6U5v2lTQeAEStqFcsZrkrgugcF/xUeos2C+L0IHEV2rkmmhPo1
+         LyvD3LSTgijun2eDVp+LN6thoVfsQtIc0IigImV4pY/w79CbfQXCVb3726E4UBtBMvzh
+         jNgg==
+X-Gm-Message-State: AOJu0YxK2EXsdySLtSe5w70dWzQiOspGs0f5I/d4Tay0Lf0WOx4sQC+x
+	rX/iyDAv2ocMNHCzyXfjq/Lk+6rII98chixbrgpfvqFFF/b3vLXo
+X-Google-Smtp-Source: AGHT+IEcV8o904j6w80ZZOxKF9VBgO0q4YSDp2bfFgfm+FGZCM6h7imY/3DSjfQA355BwVoZwGv56w==
+X-Received: by 2002:a5d:6d0b:0:b0:378:c2f3:defd with SMTP id ffacd0b85a97d-37a4226bbd5mr6281107f8f.13.1727047192299;
+        Sun, 22 Sep 2024 16:19:52 -0700 (PDT)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e73f649dsm22991425f8f.53.2024.09.22.16.19.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 Sep 2024 16:19:51 -0700 (PDT)
+Message-ID: <70952b00-ec86-4317-8a6d-c73e884d119f@gmail.com>
+Date: Mon, 23 Sep 2024 02:20:07 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:c544:0:b0:3a0:91e7:67cc with SMTP id
- e9e14a558f8ab-3a0c8ceecd2mr85137885ab.13.1727046501203; Sun, 22 Sep 2024
- 16:08:21 -0700 (PDT)
-Date: Sun, 22 Sep 2024 16:08:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66f0a365.050a0220.a27de.000a.GAE@google.com>
-Subject: [syzbot] [wireless?] KMSAN: uninit-value in ath9k_hif_usb_reg_in_cb
-From: syzbot <syzbot+e5388ea6d2de83957e35@syzkaller.appspotmail.com>
-To: kvalo@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com, toke@toke.dk
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 04/25] ovpn: add basic netlink support
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew@lunn.ch, sd@queasysnail.net,
+ donald.hunter@gmail.com
+References: <20240917010734.1905-1-antonio@openvpn.net>
+ <20240917010734.1905-5-antonio@openvpn.net>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20240917010734.1905-5-antonio@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 17.09.2024 04:07, Antonio Quartulli wrote:
+> This commit introduces basic netlink support with family
+> registration/unregistration functionalities and stub pre/post-doit.
+> 
+> More importantly it introduces the YAML uAPI description along
+> with its auto-generated files:
+> - include/uapi/linux/ovpn.h
+> - drivers/net/ovpn/netlink-gen.c
+> - drivers/net/ovpn/netlink-gen.h
+> 
+> Cc: donald.hunter@gmail.com
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+> ---
+>   Documentation/netlink/specs/ovpn.yaml | 328 ++++++++++++++++++++++++++
+>   MAINTAINERS                           |   1 +
+>   drivers/net/ovpn/Makefile             |   2 +
+>   drivers/net/ovpn/main.c               |  14 ++
+>   drivers/net/ovpn/netlink-gen.c        | 206 ++++++++++++++++
+>   drivers/net/ovpn/netlink-gen.h        |  41 ++++
+>   drivers/net/ovpn/netlink.c            | 153 ++++++++++++
+>   drivers/net/ovpn/netlink.h            |  15 ++
+>   drivers/net/ovpn/ovpnstruct.h         |  21 ++
+>   include/uapi/linux/ovpn.h             | 108 +++++++++
+>   10 files changed, 889 insertions(+)
+>   create mode 100644 Documentation/netlink/specs/ovpn.yaml
+>   create mode 100644 drivers/net/ovpn/netlink-gen.c
+>   create mode 100644 drivers/net/ovpn/netlink-gen.h
+>   create mode 100644 drivers/net/ovpn/netlink.c
+>   create mode 100644 drivers/net/ovpn/netlink.h
+>   create mode 100644 drivers/net/ovpn/ovpnstruct.h
+>   create mode 100644 include/uapi/linux/ovpn.h
+> 
+> diff --git a/Documentation/netlink/specs/ovpn.yaml b/Documentation/netlink/specs/ovpn.yaml
+> new file mode 100644
+> index 000000000000..456ac3747d27
+> --- /dev/null
+> +++ b/Documentation/netlink/specs/ovpn.yaml
+> @@ -0,0 +1,328 @@
+> +# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
+> +#
+> +# Author: Antonio Quartulli <antonio@openvpn.net>
+> +#
+> +# Copyright (c) 2024, OpenVPN Inc.
+> +#
+> +
+> +name: ovpn
+> +
+> +protocol: genetlink
+> +
+> +doc: Netlink protocol to control OpenVPN network devices
+> +
+> +definitions:
+> +  -
+> +    type: const
+> +    name: nonce-tail-size
+> +    value: 8
+> +  -
+> +    type: enum
+> +    name: cipher-alg
+> +    value-start: 0
+> +    entries: [ none, aes-gcm, chacha20_poly1305 ]
+> +  -
+> +    type: enum
+> +    name: del-peer_reason
+> +    value-start: 0
+> +    entries: [ teardown, userspace, expired, transport-error, transport_disconnect ]
+> +  -
+> +    type: enum
+> +    name: key-slot
+> +    value-start: 0
+> +    entries: [ primary, secondary ]
+> +  -
+> +    type: enum
+> +    name: mode
+> +    value-start: 0
+> +    entries: [ p2p, mp ]
+> +
+> +attribute-sets:
+> +  -
+> +    name: peer
+> +    attributes:
+> +      -
+> +        name: id
+> +        type: u32
+> +        doc: |
+> +          The unique Id of the peer. To be used to identify peers during
+> +          operations
+> +        checks:
+> +          max: 0xFFFFFF
+> +      -
+> +        name: sockaddr-remote
+> +        type: binary
+> +        doc: |
+> +          The sockaddr_in/in6 object identifying the remote address/port of the
+> +          peer
+> +      -
+> +        name: socket
+> +        type: u32
+> +        doc: The socket to be used to communicate with the peer
+> +      -
+> +        name: vpn-ipv4
+> +        type: u32
+> +        doc: The IPv4 assigned to the peer by the server
+> +        display-hint: ipv4
+> +      -
+> +        name: vpn-ipv6
+> +        type: binary
+> +        doc: The IPv6 assigned to the peer by the server
+> +        display-hint: ipv6
+> +        checks:
+> +          exact-len: 16
+> +      -
+> +        name: local-ip
+> +        type: binary
+> +        doc: The local IP to be used to send packets to the peer (UDP only)
+> +        checks:
+> +          max-len: 16
+> +      -
+> +        name: local-port
+> +        type: u32
+> +        doc: The local port to be used to send packets to the peer (UDP only)
+> +        checks:
+> +          min: 1
+> +          max: u16-max
+> +      -
+> +        name: keepalive-interval
+> +        type: u32
+> +        doc: |
+> +          The number of seconds after which a keep alive message is sent to the
+> +          peer
+> +      -
+> +        name: keepalive-timeout
+> +        type: u32
+> +        doc: |
+> +          The number of seconds from the last activity after which the peer is
+> +          assumed dead
+> +      -
+> +        name: del-reason
+> +        type: u32
+> +        doc: The reason why a peer was deleted
+> +        enum: del-peer_reason
+> +      -
+> +        name: keyconf
+> +        type: nest
+> +        doc: Peer specific cipher configuration
+> +        nested-attributes: keyconf
+> +      -
+> +        name: vpn-rx_bytes
+> +        type: uint
+> +        doc: Number of bytes received over the tunnel
+> +      -
+> +        name: vpn-tx_bytes
+> +        type: uint
+> +        doc: Number of bytes transmitted over the tunnel
+> +      -
+> +        name: vpn-rx_packets
+> +        type: uint
+> +        doc: Number of packets received over the tunnel
+> +      -
+> +        name: vpn-tx_packets
+> +        type: uint
+> +        doc: Number of packets transmitted over the tunnel
+> +      -
+> +        name: link-rx_bytes
+> +        type: uint
+> +        doc: Number of bytes received at the transport level
+> +      -
+> +        name: link-tx_bytes
+> +        type: uint
+> +        doc: Number of bytes transmitted at the transport level
+> +      -
+> +        name: link-rx_packets
+> +        type: u32
+> +        doc: Number of packets received at the transport level
+> +      -
+> +        name: link-tx_packets
+> +        type: u32
+> +        doc: Number of packets transmitted at the transport level
+> +  -
+> +    name: keyconf
+> +    attributes:
+> +      -
+> +        name: slot
+> +        type: u32
+> +        doc: The slot where the key should be stored
+> +        enum: key-slot
+> +      -
+> +        name: key-id
+> +        doc: |
+> +          The unique ID for the key. Used to fetch the correct key upon
+> +          decryption
+> +        type: u32
+> +        checks:
+> +          max: 7
+> +      -
+> +        name: cipher-alg
+> +        type: u32
+> +        doc: The cipher to be used when communicating with the peer
+> +        enum: cipher-alg
+> +      -
+> +        name: encrypt-dir
+> +        type: nest
+> +        doc: Key material for encrypt direction
+> +        nested-attributes: keydir
+> +      -
+> +        name: decrypt-dir
+> +        type: nest
+> +        doc: Key material for decrypt direction
+> +        nested-attributes: keydir
+> +  -
+> +    name: keydir
+> +    attributes:
+> +      -
+> +        name: cipher-key
+> +        type: binary
+> +        doc: The actual key to be used by the cipher
+> +        checks:
+> +         max-len: 256
+> +      -
+> +        name: nonce-tail
+> +        type: binary
+> +        doc: |
+> +          Random nonce to be concatenated to the packet ID, in order to
+> +          obtain the actua cipher IV
+> +        checks:
+> +         exact-len: nonce-tail-size
+> +  -
+> +    name: ovpn
+> +    attributes:
+> +      -
+> +        name: ifindex
+> +        type: u32
+> +        doc: Index of the ovpn interface to operate on
+> +      -
+> +        name: ifname
+> +        type: string
+> +        doc: Name of the ovpn interface that is being created
+> +      -
+> +        name: mode
+> +        type: u32
+> +        enum: mode
+> +        doc: |
+> +          Oper mode instructing an interface to act as Point2Point or
+> +          MultiPoint
+> +      -
+> +        name: peer
+> +        type: nest
+> +        doc: |
+> +          The peer object containing the attributed of interest for the specific
+> +          operation
+> +        nested-attributes: peer
+> +
+> +operations:
+> +  list:
+> +    -
+> +      name: new-iface
+> +      attribute-set: ovpn
+> +      flags: [ admin-perm ]
+> +      doc: Create a new interface
+> +      do:
+> +        request:
+> +          attributes:
+> +            - ifname
+> +            - mode
+> +        reply:
+> +          attributes:
+> +            - ifname
+> +            - ifindex
+> +    -
+> +      name: del-iface
+> +      attribute-set: ovpn
+> +      flags: [ admin-perm ]
+> +      doc: Delete existing interface
+> +      do:
+> +        pre: ovpn-nl-pre-doit
+> +        post: ovpn-nl-post-doit
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +    -
+> +      name: set-peer
+> +      attribute-set: ovpn
+> +      flags: [ admin-perm ]
+> +      doc: Add or modify a remote peer
 
-syzbot found the following issue on:
+As Donald already mentioned, the typical approach to manage objects via 
+Netlink is to provide an interface with four commands: New, Set, Get, 
+Del. Here, peer created implicitely using the "set" comand. Out of 
+curiosity, what the reason to create peers in the such way?
 
-HEAD commit:    bdf56c7580d2 Merge tag 'slab-for-6.12' of git://git.kernel..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=131524a9980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b82e97dfbc92f0
-dashboard link: https://syzkaller.appspot.com/bug?extid=e5388ea6d2de83957e35
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Is the reason to create keys also implicitly same?
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> +      do:
+> +        pre: ovpn-nl-pre-doit
+> +        post: ovpn-nl-post-doit
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - peer
+> +    -
+> +      name: get-peer
+> +      attribute-set: ovpn
+> +      flags: [ admin-perm ]
+> +      doc: Retrieve data about existing remote peers (or a specific one)
+> +      do:
+> +        pre: ovpn-nl-pre-doit
+> +        post: ovpn-nl-post-doit
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - peer
+> +        reply:
+> +          attributes:
+> +            - peer
+> +      dump:
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +        reply:
+> +          attributes:
+> +            - peer
+> +    -
+> +      name: del-peer
+> +      attribute-set: ovpn
+> +      flags: [ admin-perm ]
+> +      doc: Delete existing remote peer
+> +      do:
+> +        pre: ovpn-nl-pre-doit
+> +        post: ovpn-nl-post-doit
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - peer
+> +    -
+> +      name: set-key
+> +      attribute-set: ovpn
+> +      flags: [ admin-perm ]
+> +      doc: Add or modify a cipher key for a specific peer
+> +      do:
+> +        pre: ovpn-nl-pre-doit
+> +        post: ovpn-nl-post-doit
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - peer
+> +    -
+> +      name: swap-keys
+> +      attribute-set: ovpn
+> +      flags: [ admin-perm ]
+> +      doc: Swap primary and secondary session keys for a specific peer
+> +      do:
+> +        pre: ovpn-nl-pre-doit
+> +        post: ovpn-nl-post-doit
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - peer
+> +    -
+> +      name: del-key
+> +      attribute-set: ovpn
+> +      flags: [ admin-perm ]
+> +      doc: Delete cipher key for a specific peer
+> +      do:
+> +        pre: ovpn-nl-pre-doit
+> +        post: ovpn-nl-post-doit
+> +        request:
+> +          attributes:
+> +            - ifindex
+> +            - peer
+> +
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b415ca186bb1/disk-bdf56c75.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4ce89ea52bab/vmlinux-bdf56c75.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9f99c9bf1bec/bzImage-bdf56c75.xz
+--
+Sergey
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e5388ea6d2de83957e35@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in __skb_set_length include/linux/skbuff.h:3190 [inline]
-BUG: KMSAN: uninit-value in ath9k_hif_usb_reg_in_cb+0x84d/0x9b0 drivers/net/wireless/ath/ath9k/hif_usb.c:756
- __skb_set_length include/linux/skbuff.h:3190 [inline]
- ath9k_hif_usb_reg_in_cb+0x84d/0x9b0 drivers/net/wireless/ath/ath9k/hif_usb.c:756
- __usb_hcd_giveback_urb+0x572/0x840 drivers/usb/core/hcd.c:1650
- usb_hcd_giveback_urb+0x157/0x720 drivers/usb/core/hcd.c:1734
- dummy_timer+0xd3f/0x6aa0 drivers/usb/gadget/udc/dummy_hcd.c:1987
- __run_hrtimer kernel/time/hrtimer.c:1691 [inline]
- __hrtimer_run_queues+0x564/0xe40 kernel/time/hrtimer.c:1755
- hrtimer_interrupt+0x3ab/0x1490 kernel/time/hrtimer.c:1817
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1026 [inline]
- __sysvec_apic_timer_interrupt+0xa6/0x3a0 arch/x86/kernel/apic/apic.c:1043
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1037 [inline]
- sysvec_apic_timer_interrupt+0x7e/0x90 arch/x86/kernel/apic/apic.c:1037
- asm_sysvec_apic_timer_interrupt+0x1f/0x30 arch/x86/include/asm/idtentry.h:702
- __preempt_count_dec_and_test arch/x86/include/asm/preempt.h:94 [inline]
- __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
- _raw_spin_unlock_irqrestore+0x33/0x60 kernel/locking/spinlock.c:194
- spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
- dummy_pullup+0x273/0x320 drivers/usb/gadget/udc/dummy_hcd.c:924
- usb_gadget_disconnect_locked+0x1f8/0x5b0 drivers/usb/gadget/udc/core.c:777
- gadget_unbind_driver+0xe6/0x5f0 drivers/usb/gadget/udc/core.c:1666
- device_remove drivers/base/dd.c:566 [inline]
- __device_release_driver drivers/base/dd.c:1272 [inline]
- device_release_driver_internal+0x58a/0x990 drivers/base/dd.c:1295
- driver_detach+0x360/0x540 drivers/base/dd.c:1358
- bus_remove_driver+0x465/0x500 drivers/base/bus.c:742
- driver_unregister+0x8d/0x100 drivers/base/driver.c:274
- usb_gadget_unregister_driver+0x55/0xa0 drivers/usb/gadget/udc/core.c:1731
- raw_release+0x1bc/0x400 drivers/usb/gadget/legacy/raw_gadget.c:462
- __fput+0x32c/0x1120 fs/file_table.c:431
- ____fput+0x25/0x30 fs/file_table.c:459
- task_work_run+0x268/0x310 kernel/task_work.c:228
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
- syscall_exit_to_user_mode+0xce/0x170 kernel/entry/common.c:218
- do_syscall_64+0xda/0x1e0 arch/x86/entry/common.c:89
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was created at:
- __alloc_pages_noprof+0x9d6/0xe70 mm/page_alloc.c:4725
- alloc_pages_mpol_noprof+0x299/0x990 mm/mempolicy.c:2263
- alloc_pages_noprof+0x1bf/0x1e0 mm/mempolicy.c:2343
- alloc_slab_page mm/slub.c:2413 [inline]
- allocate_slab+0x320/0x12c0 mm/slub.c:2579
- new_slab mm/slub.c:2632 [inline]
- ___slab_alloc+0x12ef/0x35e0 mm/slub.c:3819
- __slab_alloc mm/slub.c:3909 [inline]
- __slab_alloc_node mm/slub.c:3962 [inline]
- slab_alloc_node mm/slub.c:4123 [inline]
- kmem_cache_alloc_noprof+0x57a/0xb20 mm/slub.c:4142
- skb_clone+0x303/0x550 net/core/skbuff.c:2084
- dev_queue_xmit_nit+0x4d0/0x12a0 net/core/dev.c:2315
- xmit_one net/core/dev.c:3584 [inline]
- dev_hard_start_xmit+0x17d/0xa20 net/core/dev.c:3604
- __dev_queue_xmit+0x3576/0x55e0 net/core/dev.c:4424
- dev_queue_xmit include/linux/netdevice.h:3094 [inline]
- neigh_connected_output+0x5a0/0x690 net/core/neighbour.c:1594
- neigh_output include/net/neighbour.h:542 [inline]
- ip6_finish_output2+0x2347/0x2ba0 net/ipv6/ip6_output.c:141
- __ip6_finish_output net/ipv6/ip6_output.c:215 [inline]
- ip6_finish_output+0xbb8/0x14b0 net/ipv6/ip6_output.c:226
- NF_HOOK_COND include/linux/netfilter.h:303 [inline]
- ip6_output+0x356/0x620 net/ipv6/ip6_output.c:247
- dst_output include/net/dst.h:450 [inline]
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ndisc_send_skb+0xb9f/0x14c0 net/ipv6/ndisc.c:511
- ndisc_send_rs+0x97e/0xae0 net/ipv6/ndisc.c:721
- addrconf_rs_timer+0x488/0x6f0 net/ipv6/addrconf.c:4042
- call_timer_fn+0x49/0x580 kernel/time/timer.c:1794
- expire_timers kernel/time/timer.c:1845 [inline]
- __run_timers kernel/time/timer.c:2419 [inline]
- __run_timer_base+0x84e/0xe90 kernel/time/timer.c:2430
- run_timer_base kernel/time/timer.c:2439 [inline]
- run_timer_softirq+0x3a/0x70 kernel/time/timer.c:2449
- handle_softirqs+0x1a0/0x7c0 kernel/softirq.c:554
- __do_softirq kernel/softirq.c:588 [inline]
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu+0x68/0x120 kernel/softirq.c:637
- irq_exit_rcu+0x12/0x20 kernel/softirq.c:649
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1037 [inline]
- sysvec_apic_timer_interrupt+0x83/0x90 arch/x86/kernel/apic/apic.c:1037
- asm_sysvec_apic_timer_interrupt+0x1f/0x30 arch/x86/include/asm/idtentry.h:702
-
-CPU: 0 UID: 0 PID: 7385 Comm: syz.1.489 Tainted: G        W          6.11.0-syzkaller-04744-gbdf56c7580d2 #0
-Tainted: [W]=WARN
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
