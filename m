@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-129209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4958C97E37D
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 22:51:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 634CD97E399
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 23:04:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 698001C2042F
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 20:51:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B8E9B20D45
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 21:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D4F96F2F9;
-	Sun, 22 Sep 2024 20:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805A374429;
+	Sun, 22 Sep 2024 21:04:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nbRclzC5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JwBha2NW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932341E885
-	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 20:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC708C07;
+	Sun, 22 Sep 2024 21:04:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727038296; cv=none; b=I6K34VOy+y+M0dHe19d5w+XdcCj+nmm4hn3qw41OT5U7kYpRBkFk2F3oZc3cWP6UNaCN4oZuG/9GlB/rDiZdCRsXVXohUHEMvPzkqGUZWQ255gH2gpYJxkgo5XfyrB3M/7yIxXZrXdB2QEDfqH9RCdKlF904K+WBqDn7AphbLd8=
+	t=1727039066; cv=none; b=Itwr2h4kwMAQFoqp2STvYgDQIBPLRWlxiEiFpykn4b2bUQri1m0qJ3KjOiUUXdE5QnfrjKjJzhxMJEs5KZl8drS3xPXiNN2ulrg4BNePJYPUPYV/xfUb+upwS7kIAl9BkP3LtR857GIR+Hw6f140kVyFR9oRlKKa35SbE61kWPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727038296; c=relaxed/simple;
-	bh=EXYI4FXdl8FHyfjjpvzO/5LQxPPFW37EquwIX9xsVYQ=;
+	s=arc-20240116; t=1727039066; c=relaxed/simple;
+	bh=biAARFvH1GibeXEvxfSGDsj4N5w0YpZ5Rsb1ExkxDd8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jU2uVYbZ4/MjJx7rFqFJBRRT5jWHxPK0/+tTH4BxlQ/QtUF9pU8HleISitCMj7tZ4ELhjWWRTRsZQ37QMK6LoPM9x0RYBzI7kuaNnVYPEDHXy/pHmps0y56a0WuhWPZpVBVfhV8G/Vq/od/VvQ3u7RxvNljFfqkzn92rw7WwJY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nbRclzC5; arc=none smtp.client-ip=209.85.128.45
+	 In-Reply-To:Content-Type; b=dlETyiLUnsVHCr9UvrEH2tJN7/cPh++UGDpI/DWMoka9z+t2Z/eo3PR+iYP7T8mVgrcggZLC3ZDWNiBh0qnU7zViWxw3XPNH7lAAuk7inxADHPSlEGCLGHirq5Sogqb4FW70AXwqkcfILdiMMufjg3t6xaMYKWgBmfU3KfQe7kI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JwBha2NW; arc=none smtp.client-ip=209.85.219.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42e5e758093so31165005e9.1
-        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 13:51:34 -0700 (PDT)
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e1a819488e3so2848141276.3;
+        Sun, 22 Sep 2024 14:04:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727038293; x=1727643093; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727039064; x=1727643864; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gI9UWGl7XMJt/2E9deqz6qtBQi24UIAr7zZh6aHiWRk=;
-        b=nbRclzC5rD/b5jn9nQfETENu5t3tOBq50y4SjdUVAm+DMH/fkgfeObWLOXRBHhMihP
-         +kammsFrUFrI5xSVySMSZcjxkZ7N/4A2kq3wb39bSbjgfQb45u+j4OXYWAmBZjICHVhE
-         fXiPv/PepRh0sNtS2RQB6kyWrlYmyqs4h9EuVXCSuuQL+tzWLuyle170LBS/6pm4GQck
-         ZXq8Q9cnu4UgiK2H05yKbjhhhZtNhJzYss/63JZueVr1Cv7S5EmGT3oOgqiGmiNvFOIj
-         /YfE2Zj+aJZfSshcvO4XdOM2YjEyTQAzYgStrpKMPcLUnt9RUw5x/lfhp0rYqq0/ye1t
-         Jg+A==
+        bh=9sLL1YRqiZUoWwvJdj6ouIVhIgSLLyYmmYz/rdh46/s=;
+        b=JwBha2NWnSfpX6l1KdolhJkSKMqsQh68apRLkgJ4msje9Qybqs+JccEvNNEn3Ur0Wn
+         GTyu1OYCpQKu6+yYatXLF0R1NFKXuusTf1nQj/wlJliORz3U4ugziHvTcgjuVMbSG+RE
+         QtCK5EoOprkw5EgX75bJQ8fNZipWnBPZYsACQ3LEhCtvJqt7nPH7Ilz2RS2ObHkqStBT
+         Cl29/aTpnsRQtgR1vpq6sH3b97h5Ja//KA7i2Yon/Fr5Rv8ZViELUnb6DGtA6LHlRNXD
+         CJQcbMrLhAkL4BTD+5O3KFjYciiDgBTZokoppYSFi5gObGU7OFUzitallhTUP9voMc91
+         kBbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727038293; x=1727643093;
+        d=1e100.net; s=20230601; t=1727039064; x=1727643864;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gI9UWGl7XMJt/2E9deqz6qtBQi24UIAr7zZh6aHiWRk=;
-        b=SAMI40CnP9H1sULsYmiLeIygf1UEy2X5T2mnYmXtuadK3bcCdD9SWEwNMOVXEBNBIa
-         vIqsIAAOtJdKjE3dsS1FuhEa71/7cImMuDBTTwyvS+5VeUXNqxG3ZOLNNBam5nLX52u5
-         bc3/Hm5c5y0Mrt/s/xE5yxglammBo64BhljDwH0xunVzeqONJkjezGqdsD45CADL+LgG
-         LxK7lk3vt+HzdyqgixGbc/u1onDfh6cuTid44m746WLGaQ82yLN3rRN/cU13JyCfgDme
-         dOV3aHpLLJxl/PQUY4wXJYYIMfMgjdZP1Jc7JdXEKYEZikXDo5ztTyR+sQVGssbDk5nA
-         Bj2w==
-X-Forwarded-Encrypted: i=1; AJvYcCXwQuiBj43bZi2G08aTdVDPuBUcOlAQCPuGfeUpKvKpFQYeu1ZLLIGIVnhdW9YA+vZEmfLfIB8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFAAz8Dgqecxyslt9c/dIRGE2pqJiUlPu7x1jRW7L71SVoUAaq
-	UtShI5xke0HfDQ0X1zH7kKw1Zm3O9nmqDyh4FwOKM3dHaxcE2qOd
-X-Google-Smtp-Source: AGHT+IEfrAC2uRCz6Sz7t2TMc5GBNYaHCmrIFQOIpVQiRmFZfLneiSoQEiCbiAK1SVCTeFpLmEkVSA==
-X-Received: by 2002:a05:600c:4ed0:b0:426:64a2:5362 with SMTP id 5b1f17b1804b1-42e7abeda5amr76229825e9.8.1727038292635;
-        Sun, 22 Sep 2024 13:51:32 -0700 (PDT)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e7affa701sm84068815e9.43.2024.09.22.13.51.30
+        bh=9sLL1YRqiZUoWwvJdj6ouIVhIgSLLyYmmYz/rdh46/s=;
+        b=c1BeIvLnOJ4MOSAO9A7eBmxQ/8L2U4mw3Z7H/Xn00UUGI6MWoCKKRDm6OZLAdj8dT0
+         u8+GeIT2+F2SRlCTWKaSBVABw5189/STi6nQ6Nc6SUfQ9chWQU7sVmfhe+Y9JFhZ309I
+         68Dh998oCDWX3xNTeLoUwGFdHKKqTj3wOFU5tUuU/o6E5XTfj3rrHtb8B/XKxMakujtW
+         iTxdBfNKtiIMzrLkkzRrZGynbZu6kc23lruMIzpdbiCDTVqIATBHe56ACEgdy3JJN2Y+
+         n/8jlw0siYnareKlYsOQsrk4D7wvJmjaMF2SW+Df1URWcEHVL2b9vl6QhpPSqPDzXo/m
+         Tzpg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBfxx3DPDwny1meYFxvzoIi2bSGSGLs6pMrhNT5EQoeVTsfbx/t/BUEwsqiZRD15pm/OfAII4RZmsqdFE=@vger.kernel.org, AJvYcCVPIRBAUtemGPql1YDzZBYQYOfshDkASuGeMUG7+Cwf1UYVmlx4c06vLN44em/l2WhMD9X1wwXp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yygl9e1i1l+5kPr2fIIZmiB+kLAurdodq4r16mlM94yiJWXih3k
+	9m/hU5iWY/A89WUBPUr6Y7ZTOVpvBKy0/lyIGUSgHWJeLuTefW+S
+X-Google-Smtp-Source: AGHT+IHWLg2skq46AMW9oHhq6uebUn442VU8dWAyqkW+88qG1CuzJ8QBvzKysLL3nnX9jJQMezHw8A==
+X-Received: by 2002:a05:6902:dca:b0:e0e:7fb3:cf88 with SMTP id 3f1490d57ef6-e2252fc700fmr4616915276.57.1727039063956;
+        Sun, 22 Sep 2024 14:04:23 -0700 (PDT)
+Received: from [10.0.1.200] (c-71-56-174-87.hsd1.va.comcast.net. [71.56.174.87])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e202537629bsm1615176276.11.2024.09.22.14.04.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 Sep 2024 13:51:32 -0700 (PDT)
-Message-ID: <cbd97c96-4972-4b4d-a5a5-d43968c1a2d0@gmail.com>
-Date: Sun, 22 Sep 2024 23:51:48 +0300
+        Sun, 22 Sep 2024 14:04:23 -0700 (PDT)
+Message-ID: <ef4422fd-f4aa-44dd-b1ff-350761db59d5@gmail.com>
+Date: Sun, 22 Sep 2024 17:04:22 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,104 +76,32 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 03/25] net: introduce OpenVPN Data Channel
- Offload (ovpn)
-To: Antonio Quartulli <antonio@openvpn.net>,
- Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrew@lunn.ch, antony.antony@secunet.com, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- sd@queasysnail.net, steffen.klassert@secunet.com
-References: <a10dcebf-b8f1-4d9b-b417-cca7d0330e52@openvpn.net>
- <20240920093234.15620-1-kuniyu@amazon.com>
- <02420241-98a9-47dc-97a7-d3c1fad76573@openvpn.net>
+Subject: Re: [PATCH] net/ipv4: Fix circular deadlock in do_ip_setsockop
+To: Eric Dumazet <edumazet@google.com>
+Cc: syzbot+e4c27043b9315839452d@syzkaller.appspotmail.com,
+ alibuda@linux.alibaba.com, davem@davemloft.net, dsahern@kernel.org,
+ dust.li@linux.alibaba.com, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, schnelle@linux.ibm.com,
+ syzkaller-bugs@googlegroups.com, wenjia@linux.ibm.com
+References: <00000000000055b6570622575dba@google.com>
+ <20240917235027.218692-2-srikarananta01@gmail.com>
+ <CANn89iLxa6V7BZSzmj5A979M2ZObj-CcDD_izeKqtRCZj-+pmQ@mail.gmail.com>
 Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <02420241-98a9-47dc-97a7-d3c1fad76573@openvpn.net>
+From: Ananta Srikar Puranam <srikarananta01@gmail.com>
+In-Reply-To: <CANn89iLxa6V7BZSzmj5A979M2ZObj-CcDD_izeKqtRCZj-+pmQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Hello Antonio, Kuniyuki,
+On 22/09/24 12:11 pm, Eric Dumazet wrote:
+> I think you missed an earlier conversation about SMC being at fault here.
 
-On 20.09.2024 12:46, Antonio Quartulli wrote:
-> Hi,
-> 
-> On 20/09/2024 11:32, Kuniyuki Iwashima wrote:
->> From: Antonio Quartulli <antonio@openvpn.net>
->> Date: Thu, 19 Sep 2024 13:57:51 +0200
->>> Hi Kuniyuki and thank you for chiming in.
->>>
->>> On 19/09/2024 07:52, Kuniyuki Iwashima wrote:
->>>> From: Antonio Quartulli <antonio@openvpn.net>
->>>> Date: Tue, 17 Sep 2024 03:07:12 +0200
->>>>> +/* we register with rtnl to let core know that ovpn is a virtual 
->>>>> driver and
->>>>> + * therefore ifaces should be destroyed when exiting a netns
->>>>> + */
->>>>> +static struct rtnl_link_ops ovpn_link_ops = {
->>>>> +};
->>>>
->>>> This looks like abusing rtnl_link_ops.
->>>
->>> In some way, the inspiration came from
->>> 5b9e7e160795 ("openvswitch: introduce rtnl ops stub")
->>>
->>> [which just reminded me that I wanted to fill the .kind field, but I
->>> forgot to do so]
->>>
->>> The reason for taking this approach was to avoid handling the iface
->>> destruction upon netns exit inside the driver, when the core already has
->>> all the code for taking care of this for us.
->>>
->>> Originally I implemented pernet_operations.pre_exit, but Sabrina
->>> suggested that letting the core handle the destruction was cleaner (and
->>> I agreed).
->>>
->>> However, after I removed the pre_exit implementation, we realized that
->>> default_device_exit_batch/default_device_exit_net thought that an ovpn
->>> device is a real NIC and was moving it to the global netns rather than
->>> killing it.
->>>
->>> One way to fix the above was to register rtnl_link_ops with netns_fund =
->>> false (so the ops object you see in this patch is not truly "empty").
->>>
->>> However, I then hit the bug which required patch 2 to get fixed.
->>>
->>> Does it make sense to you?
->>> Or you still think this is an rtnl_link_ops abuse?
->>
->> The use of .kind makes sense, and the change should be in this patch.
-> 
-> Ok, will add it here and I will also add an explicit .netns_fund = false 
-> to highlight the fact that we need this attribute to avoid moving the 
-> iface to the global netns.
-> 
->>
->> For the patch 2 and dellink(), is the device not expected to be removed
->> by ip link del ?  Setting unregister_netdevice_queue() to dellink() will
->> support RTM_DELLINK, but otherwise -EOPNOTSUPP is returned.
-> 
-> For the time being I decided that it would make sense to add and delete 
-> ovpn interfaces via netlink API only.
-> 
-> But there are already discussions about implementing the RTNL 
-> add/dellink() too.
-> Therefore I think it makes sense to set dellink to 
-> unregister_netdevice_queue() in this patch and thus avoid patch 2 at all.
+You're right, I missed the earlier discussion about SMC. I apologize for 
+the oversight and thank you for pointing it out. As a first-time 
+contributor, I'll be more diligent in researching existing discussions 
+before submitting patches in the future.
 
-I should make a confession :) It was me who proposed and pushed the idea 
-of the RTNL ops removing. I was too concerned about uselessness of 
-addlink operation so I did not clearly mention that dellink is useful 
-operation. Especially when it comes to namespace destruction. My bad.
+Best regards,
+Srikar
 
-So yeah, providing the dellink operation make sense for namespace 
-destruction handling and for user to manually cleanup reminding network 
-interfaces after a forceful user application killing or crash.
 
->>> The alternative was to change
->>> default_device_exit_batch/default_device_exit_net to read some new
->>> netdevice flag which would tell if the interface should be killed or
->>> moved to global upon netns exit.
-
---
-Sergey
 
