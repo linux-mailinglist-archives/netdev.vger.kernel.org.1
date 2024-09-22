@@ -1,151 +1,200 @@
-Return-Path: <netdev+bounces-129162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A012997E0A5
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 11:05:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4D6197E0AA
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 11:08:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D805C28114F
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 09:05:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83A8528143B
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 09:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB01C126BF7;
-	Sun, 22 Sep 2024 09:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6ADC193412;
+	Sun, 22 Sep 2024 09:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fisVST3e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GgQm9laz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D937726AFB;
-	Sun, 22 Sep 2024 09:05:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA597DA83
+	for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 09:08:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1726995905; cv=none; b=NAJu8LhhyZQjak+ZY5MG5xZ57b9l/ktx6jGxRo9QHBFsvc7qwtNwgrw5FLjCec0h+HFA6Lsu7qPzV0EcoGCUYH7XhbCpJuKescYowJHi9xZH3ajwRHwlGY/hYogAcyuxjC4TlkCRItJ33kJbgohuHeBfZ/PkjVA5pp+Sab0Jur8=
+	t=1726996108; cv=none; b=Q7egME5nBDsH4CjHoaQdnMHZi1AzlLo4PF6KxX6V05HejU83F4peQkrWQeEWeJqlM6fry7S0EnsCNfjon0c6XApOJAKFgI8y9Oes2PiFv5v2qkmpEqXSKaV1HMeXs8h55kTOSJmAfXq62ztRFLAhVmJ8dFRqMBBgweP7vMWV+bI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1726995905; c=relaxed/simple;
-	bh=9ZNP7TFHAZc3BRVw8xuCm3iEcUlVEkdaSYKgk/Cad8Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T3sJjY0CZ6r1gZEOxsZR46Uq/9BJJdtIOc7uzUSauAbwA85PBtyOHpcoahztLBUOZUqQ011PphBPAM32U/XP6SNyErYx3DmgGvONsOXvSEU8r6kN5S7yfszUy/1GHzfnJQ+rIK/txau9zG94Sg/mtdiCcAcCeQcPRIz3/zduoA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fisVST3e; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2f759688444so27088111fa.1;
-        Sun, 22 Sep 2024 02:05:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1726995902; x=1727600702; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IyCSaKvDj6Ef0oZyW1GXq3YNjZVJNRSaQyvNjHyvEw8=;
-        b=fisVST3eKRZ4UrHUqWkADcGyaCAe0Lz2OSxnKp/wXYxWa9J71OzAaD9WabLPP8cuEX
-         d5olDI77ZqFSRwPVX3Paa/JZ5FDVrWi51mCzjlemvwop0lV1Pk3+RBx6GRaDr7LgBDdL
-         psD4mm/r9lXFUTrIHzgAxDsm1chgRLEevlTzSl4yAxs+NNrkbA3y3ygs6WKJX4qQnKoE
-         npdwskUyR71QJanp8Ov5emrvx/Tw7No0hRp3nR3FDmZpgAbEGWoBJJjibtuH1ZEkOAPC
-         bYAwhGvpobHvtubu9LG1GoZKWJZ9Fv/x4q2YAh2cP0JHgIcPPytZDPxHF51lvfrbAHwJ
-         BVZw==
+	s=arc-20240116; t=1726996108; c=relaxed/simple;
+	bh=1HXtPzRt9nLzfCZCLMBt52X//n1f7S7R+U2+wChVizk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p95FNyzj50RpdBnWCR0NipF5qJAy5sfxT3fH8k8t9Yi0ZbM7Qhbyn3R6eacj9sILSKszeiakAv4hY6wdqqDeWhpFjwqsW1Aq0vKY3SKl3lpX4lUYE0jMkJ2Bemfji4o8O+kNgSxPUv9n2JTEFkmNTTQzceC0MJtNfc9eMmh+zU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GgQm9laz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1726996106;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1VHLsfNfIqLcFZ23vrbINoBQfbbGCd6neqC+brlrwbA=;
+	b=GgQm9lazDwqcikBRMAvcbrznxXrfI2sLeAe4pu/gWSrFAHcmjfzYNdQOMJNYIJ0r7LbsdW
+	1JJa1TAcvXN1jHbWAvrKOnLhZ9IsDxZ/gvRfdPDSM09HWTteh6sjI+5HxWSSMXwkYW1CPr
+	xOEjewR/hHrNTjHPH1TfvzdgtIZIyys=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-689-Tnq2PZtOMlWZxVTEaK1A_g-1; Sun, 22 Sep 2024 05:08:22 -0400
+X-MC-Unique: Tnq2PZtOMlWZxVTEaK1A_g-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-374c79bf194so1671277f8f.0
+        for <netdev@vger.kernel.org>; Sun, 22 Sep 2024 02:08:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1726995902; x=1727600702;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IyCSaKvDj6Ef0oZyW1GXq3YNjZVJNRSaQyvNjHyvEw8=;
-        b=bHIJVnpi2x8V5XsJeO+srgGb93mS/CZDeHuvR2ZuZDkrqqa1lv3E/ZPdmbZUJDahky
-         +tuKKVpXbyEBLelq/BxnFPANOwWVm3YcV+FxOiigUnre4oTTXfVoiDisk32EFBBOQ5Hp
-         BoTxFSQT8Bb8DrJUJ2XNfdqvIckbR3V3Ws+GGiq7HvfGRY2jfPQnA8Ym4qDnoXlMVP2b
-         gvnfsb9qPNix340H3cOKT22Db8CyxZ+iKBx5NFU5Saqd/pJwWucPpKeFhfJbHzhzh2ZH
-         rNF5UgzPg76U3FbzBOYJjnLoxxRrSbyu1CFlJWlkquzHR0CelNbQ0KtOuF+bosXGtRYf
-         mHmQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWVmoaFXpFRZiMbvPwhKD8H/68JXOto3nmmuk/sWh0I+CGDvGibzpqXeXpA4LaPP5DzdwI4NUlx@vger.kernel.org, AJvYcCXHAQC7rSu11UtJq43ECQSPH16dtuWxOF6mdw8BCbPW+MKUd/6+wDzdKT4GIvXGPxn/zQCwuzUhVbE+f+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw542mzuiaB/BI26Yx1M+pxm0W8XLrAe+VbqeDnJ8By5Ubuibv6
-	OdMhH7B3t6NQKRHdTx+zbJNjAHFBCoGUHS5UWAw3857zBfrqf4658A4oykBAteaYiR9CUBGJswQ
-	i5ZVLqPjKRW69S9c2GhTb9rmu9+w=
-X-Google-Smtp-Source: AGHT+IGm4zJHHGFfR6x4MQzoJiQIvx7ANR+hP2qGj10bxej/hKm3MdCZmaZZIj8EF2P8+RsapeoKaI8fGBxoZD2WQJA=
-X-Received: by 2002:a2e:b8c2:0:b0:2ef:2638:48cd with SMTP id
- 38308e7fff4ca-2f7cb335ea2mr44468641fa.30.1726995901662; Sun, 22 Sep 2024
- 02:05:01 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1726996101; x=1727600901;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1VHLsfNfIqLcFZ23vrbINoBQfbbGCd6neqC+brlrwbA=;
+        b=ldOiBnYxEJ4qCQSBGpxeRr/wOSx2dC8LnCTRN31FiB+zVfAG0PCYsqHzexz/JgKW0F
+         haeCtM/f4CILmqzZ3G+xGmXrBwBL47HEatDC3iGABIkZBOBaufbGiMjlaGdnHekvZrPO
+         ZTup/BypcQsNPA3Sku3tZ/txtnr9ykpb0p/+iFDEXzYJcem5yMR6BZyyiiYVgK/UKrev
+         ltcEDeEmle5eZYVE4MCSnrB5uEMyjE0lFusQ2/ECZ0DBXCnL4VMdAoXMxnjWTktIg5JP
+         2k2RrZIeH93QREVSP7JZge/OunQJiDWWV+at8UAdnrNMuo6H31wC/uBfEYXPsnMmAxES
+         2mnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVU0pmZ8ZrBmyIZ0AHcaGmEbLJwEYVjcxZgPZavmwBs0p6qKjpRL5bLuOWwmvNq+U6cojQymqY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJv1VRv5fqHpdC/l4/JXZDjUvfs4coMmLI81Wsr2sRBX7/bI+R
+	IbhP4s8IA6NFrgHhWtPfJHTbvtv2KLOQRu3ylX8qWipUBxxpLN60GgDLMHha5HNmFYsUi98rNZX
+	yjbPwo/5mzNsVGl6V/viRtRalQPlRXIh4RNfkFOEEaZE1Dy6YISDv5g==
+X-Received: by 2002:a05:6000:1375:b0:374:b675:6213 with SMTP id ffacd0b85a97d-37a4235a0d5mr4342834f8f.45.1726996100960;
+        Sun, 22 Sep 2024 02:08:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJ792wGCd1MWhimTqAIbkaAYTvIoSbeWFq1FnVJvLvLdsklUapLCXxGhVVkH7LlMYgJ6lmNA==
+X-Received: by 2002:a05:6000:1375:b0:374:b675:6213 with SMTP id ffacd0b85a97d-37a4235a0d5mr4342805f8f.45.1726996100388;
+        Sun, 22 Sep 2024 02:08:20 -0700 (PDT)
+Received: from localhost (net-93-146-37-148.cust.vodafonedsl.it. [93.146.37.148])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e73e80c5sm21507653f8f.39.2024.09.22.02.08.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Sep 2024 02:08:19 -0700 (PDT)
+Date: Sun, 22 Sep 2024 11:08:18 +0200
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@kernel.org>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org,
+	hawk@kernel.org, john.fastabend@gmail.com, edumazet@google.com,
+	pabeni@redhat.com, toke@toke.dk, sdf@fomichev.me, tariqt@nvidia.com,
+	saeedm@nvidia.com, anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com, intel-wired-lan@lists.osuosl.org,
+	mst@redhat.com, jasowang@redhat.com, mcoquelin.stm32@gmail.com,
+	alexandre.torgue@foss.st.com
+Subject: Re: [RFC bpf-next 0/4] Add XDP rx hw hints support performing
+ XDP_REDIRECT
+Message-ID: <Zu_eghZAEoYBkThM@lore-desk>
+References: <cover.1726935917.git.lorenzo@kernel.org>
+ <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240829154739.16691-1-ubizjak@gmail.com> <Ztc16pw4r3Tf_U7h@calendula>
-In-Reply-To: <Ztc16pw4r3Tf_U7h@calendula>
-From: Uros Bizjak <ubizjak@gmail.com>
-Date: Sun, 22 Sep 2024 11:04:56 +0200
-Message-ID: <CAFULd4bUoeviAnomH38rGRa55KSkz3_L49Jqw3Tit4UCdywpnQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] netfilter: nf_tables: Fix percpu address space
- issues in nf_tables_api.c
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jozsef Kadlecsik <kadlec@netfilter.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pFkQmBWfCOwm/HFL"
+Content-Disposition: inline
+In-Reply-To: <1f53cd74-6c1e-4a1c-838b-4acc8c5e22c1@intel.com>
+
+
+--pFkQmBWfCOwm/HFL
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 3, 2024 at 6:14=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.o=
-rg> wrote:
->
-> Hi,
->
-> On Thu, Aug 29, 2024 at 05:29:30PM +0200, Uros Bizjak wrote:
-> > Use {ERR_PTR,IS_ERR,PTR_ERR}_PCPU() macros when crossing between generi=
-c
-> > and percpu address spaces and add __percpu annotation to *stats pointer
-> > to fix percpu address space issues.
->
-> IIRC, you submitted patch 1/2 in this series to the mm tree.
->
-> Let us know if this patch gets upstreamed via MM tree (if mm
-> maintainers are fine with it) or maybe MM maintainers prefer an
-> alternative path for this.
+> From: Lorenzo Bianconi <lorenzo@kernel.org>
+> Date: Sat, 21 Sep 2024 18:52:56 +0200
+>=20
+> > This series introduces the xdp_rx_meta struct in the xdp_buff/xdp_frame
+>=20
+> &xdp_buff is on the stack.
+> &xdp_frame consumes headroom.
 
-Dear maintainers,
+ack, right.
 
-I would just like to inform you that patch 1/2 got mainlined [1] as
-commit a759e37fb467.
+>=20
+> IOW they're size-sensitive and putting metadata directly there might
+> play bad; if not now, then later.
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3Da759e37fb46708029c9c3c56c3b62e6f24d85cf5
+I was thinking to use a TLV approach for it (so a variable struct), but then
+I decided to implement the simplest solution for the moment since, using TL=
+V,
+we would need to add parsing logic and waste at least 2B for each meta info
+to store the type and length. Moreover, with XDP we have 256B available for
+headeroom and for xdp_frame we would use the same cacheline of the current
+implementation:
 
-Best regards,
-Uros.
+struct xdp_frame {
+	void *                     data;                 /*     0     8 */
+	u16                        len;                  /*     8     2 */
+	u16                        headroom;             /*    10     2 */
+	u32                        metasize;             /*    12     4 */
+	struct xdp_mem_info        mem;                  /*    16     8 */
+	struct net_device *        dev_rx;               /*    24     8 */
+	u32                        frame_sz;             /*    32     4 */
+	u32                        flags;                /*    36     4 */
+	struct xdp_rx_meta         rx_meta;              /*    40    12 */
 
-> Thanks.
->
-> > NOTE: The patch depends on a patch that introduces *_PCPU() macros [1]
-> > that is on the way to mainline through the mm tree. For convience, the
-> > patch is included in this patch series, so CI tester is able to test
-> > the second patch without compile failures.
-> >
-> > [1] https://lore.kernel.org/lkml/20240818210235.33481-1-ubizjak@gmail.c=
-om/
-> >
-> > The netfilter patch obsoletes patch [2].
-> >
-> > [2] https://patchwork.ozlabs.org/project/netfilter-devel/patch/20240806=
-102808.804619-1-ubizjak@gmail.com/
-> >
-> > Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-> > Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: Eric Dumazet <edumazet@google.com>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Paolo Abeni <pabeni@redhat.com>
-> >
-> > Uros Bizjak (2):
-> >   err.h: Add ERR_PTR_PCPU(), PTR_ERR_PCPU() and IS_ERR_PCPU() macros
-> >   netfilter: nf_tables: Fix percpu address space issues in
-> >     nf_tables_api.c
-> >
-> >  include/linux/err.h           |  9 +++++++++
-> >  net/netfilter/nf_tables_api.c | 16 ++++++++--------
-> >  2 files changed, 17 insertions(+), 8 deletions(-)
-> >
-> > --
-> > 2.42.0
-> >
+	/* size: 56, cachelines: 1, members: 9 */
+	/* padding: 4 */
+	/* last cacheline: 56 bytes */
+};
+
+Anyway I do not have a strong opinion about it and I am fine to covert the
+current implementation to a TLV one if we agree on it.
+
+>=20
+> Our idea (me + Toke) was as follows:
+>=20
+> - new BPF kfunc to build generic meta. If called, the driver builds a
+>   generic meta with hash, csum etc., in the data_meta area.
+>   Yes, this also consumes headroom, but only when the corresponding func
+>   is called. Introducing new fields like you're doing will consume it
+>   unconditionally;
+
+ack, I am currently reusing the kfuncs added by Stanislav but I agree it is
+better to add a new one to store the rx hw hints info, I will work on it.
+
+> - when &xdp_frame gets converted to sk_buff, the function checks whether
+>   data_meta contains a generic structure filled with hints.
+>=20
+> We also thought about &skb_shared_info, but it's also size-sensitive as
+> it consumes tailroom.
+
+for rx_timestamp we can reuse the field available in the skb_shared_info.
+
+Regards,
+Lorenzo
+
+>=20
+> > one as a container to store the already supported xdp rx hw hints (rx_h=
+ash
+> > and rx_vlan, rx_timestamp will be stored in skb_shared_info area) when =
+the
+> > eBPF program running on the nic performs XDP_REDIRECT. Doing so, we are=
+ able
+> > to set the skb metadata converting the xdp_buff/xdp_frame to a skb.
+>=20
+> Thanks,
+> Olek
+>=20
+
+--pFkQmBWfCOwm/HFL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZu/eggAKCRA6cBh0uS2t
+rIdLAP0R/dGPCXgseg1Iy65MrQgRuHzAgV36/bG2Weac6f4WwQEA8KXcwzorG0oU
+nZx4Agc2TmA8ZFiQyO3aR9f63sZWrAA=
+=hB8l
+-----END PGP SIGNATURE-----
+
+--pFkQmBWfCOwm/HFL--
+
 
