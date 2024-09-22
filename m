@@ -1,66 +1,60 @@
-Return-Path: <netdev+bounces-129194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2D7897E2A7
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 19:08:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6813B97E2B2
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 19:21:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62B26B21166
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 17:08:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07BB71F21790
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 17:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0392B9A1;
-	Sun, 22 Sep 2024 17:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4552AE9F;
+	Sun, 22 Sep 2024 17:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bjezbULS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nb+9EgtL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 828B92AEFC;
-	Sun, 22 Sep 2024 17:08:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBD917C64;
+	Sun, 22 Sep 2024 17:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727024899; cv=none; b=IYi+L+eApRRWMimK0S5TNY1yNyla+/ymT6/Wme+7SUXZvPq/4BVvIFaOHbSNx57SYQ0n1O30Yeym9Y9f5b26BI9rokU/8zdkka6qYqjm4qeexZvLdtRbRZSjn6+KukpIbBI6VpeG5ZudLBydRqtgM1YdngPhdmV1KBodwxTudks=
+	t=1727025709; cv=none; b=EMPyE7jazQDLuEhAFJ7KGJSOHFTbWgu6XfRqXaRT6AK1FnNF/rma4cuMMxELcJw6hZ+zWvUB8/Y2A/8nQyZyo/YTfu6LewedadEk17mZMgtO0ot0cOJvEAZvdXd0wm4c9edAuuJh2K3ABhbXwEdyZwSrP5Tbviyk5TW1VpdTWag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727024899; c=relaxed/simple;
-	bh=kadefyW4xflqn3+lS+RNRI2zmfP1nPl+qO/iqN2/xcw=;
+	s=arc-20240116; t=1727025709; c=relaxed/simple;
+	bh=7pKcc7GpsW8tmnEy7weHXD0ST3IevhpacWw79bD/TYo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nK6OVRuYO1y8T2kNRoVi3S+DtXBDZZ6Wm0Yh53z8ymyZ6MYg/XGQUpSO61XLi3V84Y/5wJcAq4a2NR1A4mQmwMmRQEiVgkPQjpphOB/lREx7xLeijunZxMAVmi8hKsaJFt+eXjdj1zXqfNselEoh4S1srkgv2a8yQJNEGv+AMD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bjezbULS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF8BDC4CEC3;
-	Sun, 22 Sep 2024 17:08:15 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=DQlU1QU4w4r5BK8WxBv8yLRn8gBR9RjwffjC829rIBhQmRN3L2UwjSVkju65j8EhViK6tgzcQHBHtpMGwUfEEUA/Gf8ZnlC1/MXImUPZge7Lxyumf5nUj21PKVCH5nM4R7g5xnpl3YIUUsGfe4LYV9aah3T8EAp2VNG80MwRrkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nb+9EgtL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACECEC4CEC3;
+	Sun, 22 Sep 2024 17:21:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727024899;
-	bh=kadefyW4xflqn3+lS+RNRI2zmfP1nPl+qO/iqN2/xcw=;
+	s=k20201202; t=1727025709;
+	bh=7pKcc7GpsW8tmnEy7weHXD0ST3IevhpacWw79bD/TYo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bjezbULS1wB/4SSlIDBN25u70vDwPdKTT/f5jD/vGrDOv7BApMqCTeUrBQTlnKu/C
-	 sIc2KGV1QEGTPRgnALMZXOGHxgUnvYa/WIndbYH68CQ6aN6JooCSi55b9ORFKhr8F4
-	 HV06P9w6djaE6yuZpKFchgMoXMIMWpKdhVsaJDnvXZS27701B/3rYUpoSqiiA+ClXL
-	 +SubP87Owne6PQtjb9GK6/SQYPZvBwQ7aKotKsof+daX6D4rU+YR+T//e4UprFNAaH
-	 YZGeXikpq9UZGt4dGOYOQYVrUiozCd0xQPF26lVXFmeFh2L+5G/n6RxA8j231cSpY+
-	 gJBTxawEiniEA==
-Date: Sun, 22 Sep 2024 18:08:11 +0100
+	b=nb+9EgtL43OXnf6rYLrlo/HWfZ14nOLLmY4iua7TvMO387RLLJQ8wRNtFcfxyNtsV
+	 s+3nsZVC7j6OWB+URexMvupe6yRubJZO/3tHIiuLVPzCJOX3J1BiEJyzzXUdS5QAoF
+	 /32UJvFA1rALzHP8s2ddlvUV5JF2OBFHSVb5AvJeQHKErtfpOXOPOW4WQBLtcYxRIV
+	 P6Jy11o6jvqOH6KFiIn/Wbzwz2viTzBxREwPOazWjUKyPd1NGGk8dphqTD4zJzlzkc
+	 JU0LDRSU+uyWQVpJGTgxcCwu0BxT/0Sx4TNIj+RmtNW10pJKRwsgslpi32v9J4gcfT
+	 8eSUgT8e1Kzzg==
+Date: Sun, 22 Sep 2024 18:21:43 +0100
 From: Simon Horman <horms@kernel.org>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: netdev@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Nick Child <nnac123@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	Taku Izumi <izumi.taku@jp.fujitsu.com>,
-	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
-	Yasuaki Ishimatsu <isimatu.yasuaki@jp.fujitsu.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Julia Lawall <julia.lawall@inria.fr>,
-	Yasuaki Ishimatsu <yasu.isimatu@gmail.com>
-Subject: Re: [PATCH] net: fjes: Refactor a string comparison in
- is_extended_socket_device()
-Message-ID: <20240922170811.GE3426578@kernel.org>
-References: <9ec752a8-49e9-40fd-8ed9-fed29d53f37b@web.de>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	shradhagupta@linux.microsoft.com, ahmed.zaki@intel.com,
+	leon@kernel.org, colin.i.king@gmail.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, ernis@microsoft.com
+Subject: Re: [PATCH v2] net: mana: Add get_link and get_link_ksettings in
+ ethtool
+Message-ID: <20240922172143.GF3426578@kernel.org>
+References: <1726867103-19295-1-git-send-email-ernis@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,28 +63,59 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9ec752a8-49e9-40fd-8ed9-fed29d53f37b@web.de>
+In-Reply-To: <1726867103-19295-1-git-send-email-ernis@linux.microsoft.com>
 
-On Fri, Sep 20, 2024 at 02:24:50PM +0200, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Fri, 20 Sep 2024 13:56:44 +0200
+On Fri, Sep 20, 2024 at 02:18:23PM -0700, Erni Sri Satya Vennela wrote:
+> Add support for the ethtool get_link and get_link_ksettings
+> operations. Display standard port information using ethtool.
 > 
-> Assign the return value from a strncmp() call to a local variable
-> so that an if statement can be omitted accordingly.
+> Before the change:
+> $ethtool enP30832s1
+> > No data available
 > 
-> This issue was detected by using the Coccinelle software.
+> After the change:
+> $ethtool enP30832s1
+> > Settings for enP30832s1:
+>         Supported ports: [  ]
+>         Supported link modes:   Not reported
+>         Supported pause frame use: No
+>         Supports auto-negotiation: No
+>         Supported FEC modes: Not reported
+>         Advertised link modes:  Not reported
+>         Advertised pause frame use: No
+>         Advertised auto-negotiation: No
+>         Advertised FEC modes: Not reported
+>         Speed: Unknown!
+>         Duplex: Full
+>         Auto-negotiation: off
+>         Port: Other
+>         PHYAD: 0
+>         Transceiver: internal
+>         Link detected: yes
 > 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> Signed-off-by: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+> Reviewed-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> ---
+> Changes in v2:
+> * Remove support for displaying auto-negotiation details
+> * Change PORT_DA to PORT_OTHER
 
-Hi Markus,
+Hi Erni, Haiyang, all
 
-This is an old driver, that doesn't appear to have been under active
-development for quite some time.  And I don't think that clean-ups of this
-nature are worth the risk of regressions they might introduce.
+Thanks for the update, it looks like it addresses the review of v1 by Jakub.
+However, I am assuming that as a non-bug-fix, this is targeted at net-next.
+And net-next is currently closed for the v6.12 merge window.  Please
+consider reposting this patch once net-next reopens.  That will occur after
+v6.12-rc1 has been released.  Which I expect to be about a week from now.
 
-If we can see bugs, let's fix them.
-Else, let's leave it be.
+Also, for networking patches please tag non-bug fixes for
+net-next (and bug fixes for net, being sure to include a Fixes tag).
+
+	Subject: [PATCH net-next] ...
+
+Please see https://docs.kernel.org/process/maintainer-netdev.html
 
 -- 
-pw-bot: rejected
+pw-bot: defer
 
