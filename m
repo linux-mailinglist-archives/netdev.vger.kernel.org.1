@@ -1,157 +1,226 @@
-Return-Path: <netdev+bounces-129186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7293797E27A
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 18:34:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2026997E27F
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 18:37:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2258B281262
-	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 16:34:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DF0AB20B00
+	for <lists+netdev@lfdr.de>; Sun, 22 Sep 2024 16:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCF6219E4;
-	Sun, 22 Sep 2024 16:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5202224CF;
+	Sun, 22 Sep 2024 16:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jm9nwVxc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fscYTD1a"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3502581;
-	Sun, 22 Sep 2024 16:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C351A276;
+	Sun, 22 Sep 2024 16:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727022861; cv=none; b=oKX8gcT5F4l4gZz4NARRQ9gFVMDjuZJ4Duo9dvur6sXRPizjqBiAJFZNAiDRHmH7QKV6gwvMYW6bnvtQtbejg0cCpfR08oJ+ISMslhQdAkgYKWL3HfsnDNP8ypgtj0h9ygmbnVTWudNZ6qcdnBXspqxhMJqkfqW2KIVTusiXhHk=
+	t=1727023030; cv=none; b=eg0UDlCTDBD+SNAWpjnT79fa7b0G38pWJTR/al48UIzc0wsXKF4eTK7pltcctutZeItM+6EeZzP9Q+Xx2ltpnBFeITHwZukGXpb2hMbUGO55MCNv0ib6SoDGJXVZnZ02GMdKfh3S+dHI1zNCDyJoEwefCCDbMLBaAV2la19e9p4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727022861; c=relaxed/simple;
-	bh=gFlVSCJab296RK5+Ai1YxYQl2rv5hxg3BElMeprdRII=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nl7GyWkI58iZSBwCNs5P8kT0I3tYIQKouCyI/4eih/teDDZHV+SPs+RKOqM0maKBQld2nswJFavS3W3pmrnYqHHwvxT6w3h++ov1E/WgizF3uljXG0OyH5c14Y5H9jG8su2BeMppu9kM2rPRYRXm0CGdivblKe6LUQnNfEtvTug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jm9nwVxc; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xGmipcPUvSFvCq++6VT9S82wVCnPIsh0kZdD2tTzbJM=; b=jm9nwVxcMCmtyeT6Oyx1bwlk5b
-	QIt2JFKDn8FmrZFoi10orj33aeO2dLGY8ksjWgFZyWxgHm2j5wid8ZzC7QJ6anDx2t82kwpN088uc
-	UjC91LJRO9zSM2MqYEf+s8dMNGJvEaYn9PgvYMghtzhOHXHeEou9YBad//2eQ5BdVrek=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ssPX3-0084MO-6x; Sun, 22 Sep 2024 18:33:57 +0200
-Date: Sun, 22 Sep 2024 18:33:57 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Hal Feng <hal.feng@starfivetech.com>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	William Qiu <william.qiu@starfivetech.com>,
-	devicetree@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 3/4] can: Add driver for CAST CAN Bus Controller
-Message-ID: <cf17f15b-cbd7-4692-b3b2-065e549cb21e@lunn.ch>
-References: <20240922145151.130999-1-hal.feng@starfivetech.com>
- <20240922145151.130999-4-hal.feng@starfivetech.com>
+	s=arc-20240116; t=1727023030; c=relaxed/simple;
+	bh=2h3ei6zftQuBmQ0I+E0cKBnkAQjaBy7aTusBzbkRH6Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eFvAMYpy7TH4hn1JSWNHcEIaZGs+y8vbjfacWTM37AFWastSDwVcs3SV2/JfIIXO+pm1SwtWVWOk9rTkpMQFmtbu8xMg0sL50e4voYMEgV7/aJL5x+WVT2HEW6SnynzJLScUbhyrgBtMs7G0IryuAVos67HmlkKx4TaOQLj9mlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fscYTD1a; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6dfff346a83so14845697b3.2;
+        Sun, 22 Sep 2024 09:37:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727023028; x=1727627828; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dk4nn0/HyHG6Gk+EntBjrDOYb01okZCkmJxS19ZjQ9I=;
+        b=fscYTD1a2Z0EPxdprCev/g3ALhc2hfQBCHZBZ+KlwkIzE3AeIajkfBKnsSoZutvUDC
+         qjvI4N1tDkVPFo/nzuzylzodttQ2zDXdt+qwtRa6j7ATJYA0MfoH79CVvVyY41JX6ZrT
+         KstdA9YwNXZ3o2l3uWpT0VcFFeN3663N3NhxeWiuVuF9n+pX35+9XwWTzc1ycc1Mdq0/
+         t93ac2WdXsL0rrIzv0dGaEdudmQrlUhKDgi4e5NaWNtdxbk9Y0yKfGZUHpjwMVlADCAE
+         gSM4M4caqnNyfHUvHw3v0T2vt26IPx2lcgAqeGivrKeLiN6410YvGbd66wEDRXYQH12o
+         ngag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727023028; x=1727627828;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dk4nn0/HyHG6Gk+EntBjrDOYb01okZCkmJxS19ZjQ9I=;
+        b=wtRr4kfVFSubaS92T5F79RuffCx4XhwpD4NX2+b8+7hZeAIf/gwmH/8l2eoGQr/Y63
+         yDCCjdWOecS4Eu05CKH1Mzhiskmm2qrXVF7S2WGJt4pAE8nb4EW+zN10aBam/H/qPNdg
+         yoOqmq5EflYtbexeycf62qgaG3WUyn+BGE7hSEoan2YxWq0wptznUl/rWdVwzVuIszDO
+         n2vzt9kG4uHZlEbaVk3iY6CRPaXutGsmmtRrUD4A/PnbbEiVj7EctUturRKG24OJNPhN
+         alKgW+y83UZS9fiRwnqobddYbIOaB9dPVra5fMJ54qvVNMPxbRTZgq7bOC6X/t4Ywfd5
+         tf6A==
+X-Forwarded-Encrypted: i=1; AJvYcCWENyl9bUBdLgfjI4I5XTtNX/aDRfilLSEqE+/UZNBi7UNxxGK0Li4/umQsTGBm4HyDtWui/sA3@vger.kernel.org, AJvYcCWQOhhHtQwPvNyBzf35rr76cXZ9iopvflC6S/nLtkFSl4FH5BHxT1D+V283jObrRC48fIxPQdgZMgkJSGg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz7XuZDppbOm0gBAHZqGymONvs9TKN//q1xhohgiLeKl/dk5U4s
+	fTID/2l2eq+/YiRwqNFjKZCmq+mro+rqSeqPwO4kmL5yYY/4zeqpZQjiUu6mmuCbJiufn3MWqOn
+	pPAI8VQ5jV1fW6bej/wAbSalkh3A=
+X-Google-Smtp-Source: AGHT+IFqnHGUJF1Nyj7wVZKVezpjSeBoZSQx/lJIE7+rg0Kzv64e+g2HfXTZUtL+YChlO08/yKNgu/v1cjlr2KxGx+0=
+X-Received: by 2002:a05:6902:2e0d:b0:e1a:8857:96dd with SMTP id
+ 3f1490d57ef6-e2250c47473mr6815609276.31.1727023027888; Sun, 22 Sep 2024
+ 09:37:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240922145151.130999-4-hal.feng@starfivetech.com>
+References: <20240912141440.314005-1-guyavrah1986@gmail.com> <49d32698-e226-46b5-bee8-46e9aad5754b@redhat.com>
+In-Reply-To: <49d32698-e226-46b5-bee8-46e9aad5754b@redhat.com>
+From: Guy Avraham <guyavrah1986@gmail.com>
+Date: Sun, 22 Sep 2024 19:36:57 +0300
+Message-ID: <CAM95viENqpHeyVmTZ9TgBZgw7eG7Ox8GE6ybARny659+PVPPmw@mail.gmail.com>
+Subject: Re: [PATCH net] net:ipv4:ip_route_input_slow: Change behaviour of
+ routing decision when IP router alert option is present
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +static inline u32 ccan_read_reg(const struct ccan_priv *priv, u8 reg)
-> +{
-> +	return ioread32(priv->reg_base + reg);
-> +}
-> +
-> +static inline void ccan_write_reg(const struct ccan_priv *priv, u8 reg, u32 value)
-> +{
-> +	iowrite32(value, priv->reg_base + reg);
-> +}
+Hi Paolo,
 
-No inline functions in .c files please. Let the compiler decide.
+Thanks for your response and inputs!
 
-> +static inline u8 ccan_read_reg_8bit(const struct ccan_priv *priv,
-> +				    enum ccan_reg reg)
-> +{
-> +	u8 reg_down;
-> +	union val {
-> +		u8 val_8[4];
-> +		u32 val_32;
-> +	} val;
-> +
-> +	reg_down = ALIGN_DOWN(reg, 4);
-> +	val.val_32 = ccan_read_reg(priv, reg_down);
-> +	return val.val_8[reg - reg_down];
+Please consider the following:
 
-There is an ioread8(). Is it invalid to do a byte read for this
-hardware? If so, it is probably worth a comment.
+1. Regarding the  check  of IP forwarding enabled - totally agree, I
+forgot to add it.
 
-> +static int ccan_bittime_configuration(struct net_device *ndev)
-> +{
-> +	struct ccan_priv *priv = netdev_priv(ndev);
-> +	struct can_bittiming *bt = &priv->can.bittiming;
-> +	struct can_bittiming *dbt = &priv->can.data_bittiming;
-> +	u32 bittiming, data_bittiming;
-> +	u8 reset_test;
-> +
-> +	reset_test = ccan_read_reg_8bit(priv, CCAN_CFG_STAT);
-> +
-> +	if (!(reset_test & CCAN_RST_MASK)) {
-> +		netdev_alert(ndev, "Not in reset mode, cannot set bit timing\n");
-> +		return -EPERM;
-> +	}
+2. About the validation that someone has registered to receive router
+alerts - as
+far as I understand, this check is done in the ip_call_ra_chain
+function - if indeed
+there is no one interested in receiving IP packets with the IP router
+alert option, then
+this function will return false (and do nothing essentially), so
+calling it directly should
+be OK.
+
+3. About calling the ip_call_ra_chain function directly in place - I
+also agree but what
+I am missing is how to set the rth->dst.input in this case?
+- ip_forward is not relevant (we eliminated, wisely, the need to call
+it once the ip_call_ra_chain
+is to be invoked directly).
+- ip_local_deliver is not needed (the packet was already
+consumed by the relevant recipient - the socket that registered for
+the IP router alert).
+- ip_error is also not needed because sending an ICMP error packet is
+not exactly what is needed in this case (at least not for the use case
+I refer to in which the IP packet holds an RSVP message).
+It leaves the "option" of (whether or not the ip_call_ra_chain was
+successful or not, i.e. -
+it returned true/false) returning NET_RX_DROP --> this way when the
+flow unfolds all the
+way back to the ip_rcv_finish function, the dst.input function pointer
+won't be invoked (in the line
+ret =3D dst_input(skb);)
+One thing about it, is whether or not it is "fine" for the function
+further back in the flow
+of the packet reception (netif_rx,etc...) to receive this value
+(NET_RX_DROP and not NET_RX_SUCCESS), even though the packet was
+consumed eventually.
+
+4. In the specific use case I am talking about the host is a router
+which is not an AS border router.
+About the blackhole - it is not what I need to achieve. In my case I
+do wish that the IP packet will
+arrive to the relevant socket (of the RSVP daemon), but because the
+host that received the IP packet with the IP router alert does not
+have a route to the destination IP, the flow terminates without going
+through the ip_call_ra_chain (which is done only in the ip_forward
+function later on).
+I can elaborate more on this specific use case if needed (it has to do
+with the way OSPF and RSVP work).
+
+Appreciate your response,
+Guy.
 
 
-You don't see nedev_alert() used very often. If this is fatal then
-netdev_err().
-
-Also, EPERM? man 3 errno say:
-
-       EPERM           Operation not permitted (POSIX.1-2001).
-
-Why is this a permission issue?
-
-> +static void ccan_tx_interrupt(struct net_device *ndev, u8 isr)
-> +{
-> +	struct ccan_priv *priv = netdev_priv(ndev);
-> +
-> +	/* wait till transmission of the PTB or STB finished */
-> +	while (isr & (CCAN_TPIF_MASK | CCAN_TSIF_MASK)) {
-> +		if (isr & CCAN_TPIF_MASK)
-> +			ccan_reg_set_bits(priv, CCAN_RTIF, CCAN_TPIF_MASK);
-> +
-> +		if (isr & CCAN_TSIF_MASK)
-> +			ccan_reg_set_bits(priv, CCAN_RTIF, CCAN_TSIF_MASK);
-> +
-> +		isr = ccan_read_reg_8bit(priv, CCAN_RTIF);
-> +	}
-
-Potentially endless loops like this are a bad idea. If the firmware
-crashes, you are never getting out of here. Please use one of the
-macros from iopoll.h
-
-> +static irqreturn_t ccan_interrupt(int irq, void *dev_id)
-> +{
-> +	struct net_device *ndev = (struct net_device *)dev_id;
-
-dev_id is a void *, so you don't need the cast.
-
-	Andrew
+On Thu, Sep 19, 2024 at 1:06=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> Hi,
+>
+> On 9/12/24 16:14, Guy Avraham wrote:
+> > When an IP packet with the IP router alert (RFC 2113) field arrives
+> > to some host who is not the destination of that packet (i.e - non of
+> > its interfaces is the address in the destination IP address field of th=
+at
+> > packet) and, for whatever reason, it does not have a route to this
+> > destination address, it drops this packet during the "routing decision"
+> > flow even though it should potentially pass it to the relevant
+> > application(s) that are interested in this packet's content - which hap=
+pens
+> > in the "forwarding decision" flow. The suggested fix changes this behav=
+iour
+> > by setting the ip_forward as the next "step" in the flow of the packet,
+> > just before it (previously was) is dropped, so that later the ip_forwar=
+d,
+> > as usual, will pass it on to its relevant recipient (socket), by
+> > invoking the ip_call_ra_chain.
+> >
+> > Signed-off-by: Guy Avraham <guyavrah1986@gmail.com>
+> > ---
+> > The fix was tested and verified on Linux hosts that act as routers in w=
+hich
+> > there are kerenls 3.10 and 5.2. The verification was done by simulating
+> > a scenario in which an RSVP (RFC 2205) Path message (that has the IP
+> > router alert option set) arrives to a transit RSVP node, and this host
+> > passes on the RSVP Path message to the relevant socket (of the RSVP
+> > deamon) even though upon arrival of this packet it does NOT have route
+> > to the destination IP address of the IP packet (that encapsulates the
+> > RSVP Path message).
+> >
+> >   net/ipv4/route.c | 8 ++++++--
+> >   1 file changed, 6 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+> > index 13c0f1d455f3..7c416eca84f8 100644
+> > --- a/net/ipv4/route.c
+> > +++ b/net/ipv4/route.c
+> > @@ -2360,8 +2360,12 @@ out:   return err;
+> >
+> >       RT_CACHE_STAT_INC(in_slow_tot);
+> >       if (res->type =3D=3D RTN_UNREACHABLE) {
+> > -             rth->dst.input=3D ip_error;
+> > -             rth->dst.error=3D -err;
+> > +             if (IPCB(skb)->opt.router_alert)
+> > +                     rth->dst.input =3D ip_forward;
+> > +             else
+> > +                     rth->dst.input =3D ip_error;
+> > +
+> > +             rth->dst.error =3D -err;
+> >               rth->rt_flags   &=3D ~RTCF_LOCAL;
+> >       }
+> >
+>
+> I think this is not the correct solution. At very least you should check
+> the host is actually a router (forwarding is enabled) and someone has
+> registered to receive router alerts. At that point you will be better
+> off processing the router alert in place directly calling
+> ip_call_ra_chain().
+>
+> However I'm unsure all the above is actually required. It can be argued
+> your host has a bad configuration.
+>
+> If it's a AS border router, and there is no route for the destination,
+> the packet not matching any route is invalid and should be indeed
+> dropped/not processed.
+>
+> Otherwise you should have/add a catch-up default route - at very least
+> to handle this cases. If you really want to forward packets only to
+> known destination, you could make such route as blackhole one.
+>
+> Cheers,
+>
+> Paolo
+>
 
