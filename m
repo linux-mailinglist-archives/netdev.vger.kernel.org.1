@@ -1,176 +1,215 @@
-Return-Path: <netdev+bounces-129345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91B8497EF5E
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 18:39:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4E1E97EF6B
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 18:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB9F51C20B78
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:39:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 664DD1F2218D
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9950519E974;
-	Mon, 23 Sep 2024 16:39:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445DC19F11A;
+	Mon, 23 Sep 2024 16:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aWWpgdA0"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="daVkDwpz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CED19D063;
-	Mon, 23 Sep 2024 16:39:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2E319EEB7
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 16:44:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727109574; cv=none; b=Tg3fYtGTJWP+9x7fXYErTYeVEwhMJfCPYJl8Xv+NdWEiBl5aLf6+ULP6qESwUQa2x6bsRwRcYBVOZmMJmYhRCH2TvYEjxhodjFnmV/otKaeHdwvhKqR1ncLXgBhD0wex8KkF2pwr+ImKXVuNrQQY9SvO+wymWC5mGtLNiy8N0yM=
+	t=1727109851; cv=none; b=EauwNjyht2dDzjE8hk+WbzlwFleXdxrHXtlAu7t3utlwq2FB2tOxfzr8C3R4qyUQ5SgKv6MShzLXhDRP2m2XT7SfG1ysx5A9NcAmlrtXCyzzn8qLrge/7Mjy6nSttxv8a+cIgc+btZbx1DAIM6qCKxX7+ElIRKY6HLXzL2Dp0VU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727109574; c=relaxed/simple;
-	bh=BtWWh5uKfJUmSyiqbRGzOA9W9l+8x+M2nfsETg8eh+8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dln/3Onb7E0hfdZgdNj4sqrN7pqDCBtaKAURqlCiAAq/6gutn44D5vt68Ti154WeWkZncYuciEbFDjto0AnZmDERy/7N7xg34x4hVkTlj3bl76SPV/sqsx/6Ib7f25b9AtCv2jRAyzu+v1dB6WgYAcyStIbEYBKzBifM7y5PW5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aWWpgdA0; arc=none smtp.client-ip=209.85.221.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-500fcf0b32fso1029464e0c.1;
-        Mon, 23 Sep 2024 09:39:30 -0700 (PDT)
+	s=arc-20240116; t=1727109851; c=relaxed/simple;
+	bh=Tj+rFNp3RUciTXesDUXO/T3ijZS2swiWrnOzdR/3ZKU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tKoiClbbY86svbUBYGzl+fPpr4OGBdQ2mYZ9C3Jvw7BAHpsNxJmj6DF2P7mhfh2tMYciBXDgxazVwBjdQF+4vhQ+MTzd8XRGzS6JwF4Oa0VDbrb4AAZ7qzHg3uP17BlTf61JS63ciDBkQBjCqUt2a60969R8W54wR7ulWBCfX/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=daVkDwpz; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f75c0b78fbso45113071fa.1
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 09:44:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727109570; x=1727714370; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/FTITcrdxHCLcbS1+Ae4moEr/IuUBgyh4KWOkQoZo4g=;
-        b=aWWpgdA0Q75WSkp5qTGQCl7DpM9HLVsgqWFke5n2uVoxg1Z0Fqz9UaNoPnwPeX4a04
-         kRl/BP5OCDOa38gYp2EJsVc2PYZPqjSmsUl/5VhlHIlAtp+VEr2I2tWfKmTZ4ScKFQyx
-         Elkew+BP6bgwArSCp4M0EZxoijJDHpJcPaF938LhuxeqsL+2t4iAZRwz5Yanqn3/xz/n
-         bDMXp0lBeIfB3q5YDVF59gu6XJtfS0FVqB0CQkEH1sU6Bs8DNPpJrEuE9kqIrjHly3YD
-         GBBtDcWEagbojORGELdUBxSLxUhZtkUvJqJNYyLvFss4QfORg0Fe2+D/naaGD042/7yI
-         JgAg==
+        d=cloudflare.com; s=google09082023; t=1727109847; x=1727714647; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7hXi1VEpOam7nRQRtm5F/Kvp+UglOEaCxtSWG+fjmik=;
+        b=daVkDwpz3QLTSVUSRzhDXYYUc5IEyvk6XBEYW7MYoZwdhLTkqWo8QPxcFtwiPGIy91
+         Rr0j/I4FLTBXO8QG8hCbXZcqmYPkeT6qEvdILvrpVxEZgBSiY2cm9DRpLYkqBc58Y8oy
+         HHUf9Q2TK7ZklJTsNGUSmFd+eWwA26QOqLQi1dI/91w2m4wDgCD4YGHCU5Lpu16xDAAM
+         OMQjW92SBPYk+xhRGbgA1MQyziE6hv3WH6aYf2PL2FQYDtE9q1JpxjXuH4mtfdARYpy0
+         saJK5FqzgLwprT7p5yC4rOS4GSb4QcvQ8rmBeuZdTebImEpAeSMKA86+k+OnNwCjZ5ZJ
+         kUTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727109570; x=1727714370;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/FTITcrdxHCLcbS1+Ae4moEr/IuUBgyh4KWOkQoZo4g=;
-        b=qhnxdnsDzeaiIHjNS+JuVQLEts+gIAzO3k6y8cCaH8Qwp8bwLdiKJ70ih5ie2QeshT
-         tPXqgsHHZx/ptMJznRpSNYg4ea1AkOSmohKBgkAoQT1hCG7LaONSrpneHSTcAICDRS2B
-         jkYfS35A5oiZuZ1DMR4sj7i4C09oauNqYj1z+oRD4ysi7x57nxBTkpKjWIvPDIytZ2IJ
-         EnPCSSKoR960agfTUIv7KBSQL7S4a/OnBN2PnvZe42rRIBsSEMGfuQIKnHj6aqY7v/jc
-         z1tAhtKy//VJuhMpF3rcsTA2IJ5a3r1UTYXKYQD+UH1O1NvTArkOkdggSglsnirY/RCm
-         uKZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWIFtgwsAnzosceCxPrp83KscNaPc8MZqXPv+B8DlQ4LF2Fcge/JAGyEh8wMN/XGIcuzkiDo6pa+W7zunE=@vger.kernel.org, AJvYcCWKzRpqn2LOAqnmXOL4rakeYz0CClYgCX3r229au7BDa5wWhuN7O1N8TDt1D0zxJOKCjh77Gqs3@vger.kernel.org
-X-Gm-Message-State: AOJu0YyI8EtEjg7RQtx6u2CrGpDOclAoAnJdtW3ev47b9f51iKhCUpNe
-	9J5/LSkxTz+5WE7ixJ6uWbR7xDDqw3XJUEfZBAUuQYz0vjy+3vNi9sJL/FFkWpidt/yxjxc3s/C
-	3yxPcTr2BSOM1qBI7wfABcdxc4YOKoFb8
-X-Google-Smtp-Source: AGHT+IElx0s9IV3YPyUgWmF6Ksl4pU39a6ROGQqn5NUxh7Z3Ne28ZUwbLafd4PaCUqIBb3wvxHDY0/TbyqHvxs9hG1Y=
-X-Received: by 2002:a05:6122:3197:b0:4fe:bce9:8f4f with SMTP id
- 71dfb90a1353d-503e41a8025mr6812497e0c.9.1727109569634; Mon, 23 Sep 2024
- 09:39:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727109847; x=1727714647;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7hXi1VEpOam7nRQRtm5F/Kvp+UglOEaCxtSWG+fjmik=;
+        b=vGG5OGr0wTHglG7ZAMlQ9RWaiaCP1rVJ1zSeq3sSwP0p64ovi87/VjLUk+nzF8bU25
+         pMPFCr4K18SgosJ6MuNj4GPqIOEpVdS/VAl9M9Pe2CbVT54CyX/f/WoTxmLo8eOLZtnP
+         wZNn4vxGX/Rn8+zMZoq1ju04WPjq/QlybwBrWO5zBv+8P2mu+IdO0nIW3MjpiDzqZ3U4
+         qZ/oCC7nZl3su9ptPfOMO0kRZgWKgSnrXdwpQN/Wu36zAOSCu+96DO3ZdofPaf6scxxR
+         ZN9Hx1w1vW8ZEZIog1InqeEYtjXFOvTeWVTKzJ/OxZdc/EvYhCwBqsMEgyn59Xns2El/
+         hFlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWaxaiv2WQZ4izLy0MLaZ6RzmeaKHuYolyJXagiUfci2ePdXjHQRdNYk5DvIWHN6Qlxk56nVLc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKhlcg33eZ637uHt9OMbOxLjCiJsfgfCpPMitFWWX63bSzDYae
+	3ZRg9HrZsmDqdFAq6rsK0wqN4Sh5ln6OK4s7v1v1VJ1z7q2MdC/GFAzkLt6TaJo=
+X-Google-Smtp-Source: AGHT+IGlbMKRBwW56/ddt0TnX1I2vjFVhxMgqZqw8MiUMLPOYvNyOV111a+PrQFKMaiXrHW/JzfNmQ==
+X-Received: by 2002:a05:651c:547:b0:2ef:2344:deec with SMTP id 38308e7fff4ca-2f7cb385ddfmr56631961fa.45.1727109847473;
+        Mon, 23 Sep 2024 09:44:07 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:5a])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c42bb535eesm10506299a12.29.2024.09.23.09.44.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 09:44:06 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: David Laight <David.Laight@ACULAB.COM>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>,  'Tiago Lam'
+ <tiagolam@cloudflare.com>,  Eric Dumazet <edumazet@google.com>,  Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>,  "David S. Miller"
+ <davem@davemloft.net>,  David Ahern <dsahern@kernel.org>,  Jakub Kicinski
+ <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,  "Alexei Starovoitov"
+ <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,  "Andrii
+ Nakryiko" <andrii@kernel.org>,  Eduard Zingerman <eddyz87@gmail.com>,
+  Song Liu <song@kernel.org>,  Yonghong Song <yonghong.song@linux.dev>,
+  John Fastabend <john.fastabend@gmail.com>,  KP Singh
+ <kpsingh@kernel.org>,  Stanislav Fomichev <sdf@fomichev.me>,  Hao Luo
+ <haoluo@google.com>,  Jiri Olsa <jolsa@kernel.org>,  Mykola Lysenko
+ <mykolal@fb.com>,  Shuah Khan <shuah@kernel.org>,
+  "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+  "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+  "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+  "kernel-team@cloudflare.com" <kernel-team@cloudflare.com>
+Subject: Re: [RFC PATCH v2 2/3] ipv6: Support setting src port in sendmsg().
+In-Reply-To: <29fea23839cf489488f9228a44e79d21@AcuMS.aculab.com> (David
+	Laight's message of "Mon, 23 Sep 2024 15:45:27 +0000")
+References: <20240920-reverse-sk-lookup-v2-0-916a48c47d56@cloudflare.com>
+	<20240920-reverse-sk-lookup-v2-2-916a48c47d56@cloudflare.com>
+	<855fc71343a149479c7da96438bf9e32@AcuMS.aculab.com>
+	<87r09a771t.fsf@cloudflare.com>
+	<29fea23839cf489488f9228a44e79d21@AcuMS.aculab.com>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Mon, 23 Sep 2024 18:44:04 +0200
+Message-ID: <87msjy7223.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240923053900.1310-1-kdipendra88@gmail.com> <20240923161942.GK3426578@kernel.org>
-In-Reply-To: <20240923161942.GK3426578@kernel.org>
-From: Dipendra Khadka <kdipendra88@gmail.com>
-Date: Mon, 23 Sep 2024 22:24:18 +0545
-Message-ID: <CAEKBCKPkJ7DSku0w1injh55yd2HJdK0S3KPqWM_dUPQBAQD3pw@mail.gmail.com>
-Subject: Re: [PATCH v2 net] net: Add error pointer check in bcmsysport.c
-To: Simon Horman <horms@kernel.org>
-Cc: andrew@lunn.ch, florian.fainelli@broadcom.com, davem@davemloft.net, 
-	edumazet@google.com, bcm-kernel-feedback-list@broadcom.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hi Simon,
+On Mon, Sep 23, 2024 at 03:45 PM GMT, David Laight wrote:
+> From: Jakub Sitnicki
+>> Sent: 23 September 2024 15:56
+>> 
+>> On Mon, Sep 23, 2024 at 01:08 PM GMT, David Laight wrote:
+>> > From: Tiago Lam <tiagolam@cloudflare.com>
+>> 
+>> [...]
+>> 
+>> >> To limit its usage, a reverse socket lookup is performed to check if the
+>> >> configured egress source address and/or port have any ingress sk_lookup
+>> >> match. If it does, traffic is allowed to proceed, otherwise it falls
+>> >> back to the regular egress path.
+>> >
+>> > Is that really useful/necessary?
+>> 
+>> We've been asking ourselves the same question during Plumbers with
+>> Martin.
+>> 
+>> Unprivileges processes can already source UDP traffic from (almost) any
+>> IP & port by binding a socket to the desired source port and passing
+>> IP_PKTINFO. So perhaps having a reverse socket lookup is an overkill.
+>
+> Traditionally you'd need to bind to the source port on any local IP
+> (or the wildcard IP) that didn't have another socket bound to that port.
 
-On Mon, 23 Sept 2024 at 22:04, Simon Horman <horms@kernel.org> wrote:
->
-> On Mon, Sep 23, 2024 at 05:38:58AM +0000, Dipendra Khadka wrote:
-> > Add error pointer checks in bcm_sysport_map_queues() and
-> > bcm_sysport_unmap_queues() before deferencing 'dp'.
->
-> nit: dereferencing
->
->      Flagged by checkpatch.pl --codespell
->
-> >
-> > Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
->
-> This patch does not compile.
-> Please take care to make sure your paches compile.
->
-> And, moroever, please slow down a bit.  Please take some time to learn the
-> process by getting one patch accepted. Rather going through that process
-> with several patches simultaneously.
->
-> > ---
-> > v2:
-> >   - Change the subject of the patch to net
->
-> I'm sorry to say that the subject is still not correct.
->
-> Looking over the git history for this file, I would go for
-> a prefix of 'net: systemport: '. I would also pass on mentioning
-> the filename in the subject. Maybe:
->
->         Subject: [PATCH v3 net] net: systemport: correct error pointer handling
->
-> Also, I think that it would be better, although more verbose,
-> to update these functions so that the assignment of dp occurs
-> just before it is checked.
->
-> In the case of bcm_sysport_map_queues(), that would look something like this
-> (completely untested!):
->
-> diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-> index c9faa8540859..7411f69a8806 100644
-> --- a/drivers/net/ethernet/broadcom/bcmsysport.c
-> +++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-> @@ -2331,11 +2331,15 @@ static const struct net_device_ops bcm_sysport_netdev_ops = {
->  static int bcm_sysport_map_queues(struct net_device *dev,
->                                   struct net_device *slave_dev)
->  {
-> -       struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
->         struct bcm_sysport_priv *priv = netdev_priv(dev);
->         struct bcm_sysport_tx_ring *ring;
->         unsigned int num_tx_queues;
->         unsigned int q, qp, port;
-> +       struct dsa_port *dp;
-> +
-> +       dp = dsa_port_from_netdev(slave_dev);
-> +       if (IS_ERR(dp))
-> +               return PTR_ERR(dp);
->
->
->         /* We can't be setting up queue inspection for non directly attached
->          * switches
->
->
-> This patch is now targeted at 'net'. Which means that you believe
-> it is a bug fix. I'd say that is reasonable, though it does seem to
-> be somewhat theoretical. But in any case, a bug fix should
-> have a Fixes tag, which describes the commit that added the bug.
->
-> Alternatively, if it is not a bug fix, then it should be targeted at
-> net-next (and not have a Fixes tag). Please note that net-next is currently
-> closed for the v6.12 merge window. It shold re-open after v6.12-rc1 has
-> been released, which I expect to occur about a week for now. You should
-> wait for net-next to re-open before posting non-RFC patches for it.
->
-> Lastly, when reposting patches, please note the 24h rule.
-> https://docs.kernel.org/process/maintainer-netdev.html
->
+Right. Linux IP_PKTINFO extension relaxes this requirement. You can bind
+to some local IP (whichever is free, plently to choose from in 127/8
+local subnet), and specify the source address to use OOB at sendmsg()
+time (as long as the address is local to the host, otherwise you need
+additional capabilities).
 
-Thank you so much for the response and the suggestions. I will follow
-everything you have said and whatever I have to.
-I was just hurrying to see my patch accepted.
-
-> --
-> pw-bot: changes-requested
+> Modern Linux might have more restrictions and SO_REUSADDR muddies things.
 >
->
+> And I don't think you can do a connect() on an unbound UDP socket to
+> set the source port at the same time as the destination IP+port.
+> (That would actually be useful.)
 
-Best Regards,
-Dipendra Khadka
+You can. It's somewhat recent (v6.3+) [1]:
+
+https://manpages.debian.org/unstable/manpages/ip.7.en.html#IP_LOCAL_PORT_RANGE
+
+It's not on par with TCP when it comes to local port sharing because we
+hash UDP sockets only by 2-tuple. Though, some effort to improve that is
+taking place I see.
+
+The recipe is:
+
+1. delay the auto-bind until connect() time with IP_BIND_ADDRESS_NO_PORT
+   socket option, and
+2. tell the udp stack to consider only a single local port during the
+   free port search with IP_LOCAL_PORT_RANGE option.
+
+That amounts to something like (in pseudocode):
+
+  s = socket(AF_INET, SOCK_DGRAM)
+  s.setsockopt(SOL_IP, IP_BIND_ADDRESS_NO_PORT, 1)
+  s.setsockopt(SOL_IP, IP_LOCAL_PORT_RANGE, 44_444 << 16 | 44_444)
+  s.bind(("192.0.2.42", 0))
+  s.connect(("1.1.1.1", 53))
+
+You can combine it with SO_REUSEADDR to share the local address between
+sockets, but you have to ensure manually that you don't run into
+conflicts between sockets (two sockets using the same 4-tuple). That's
+something we're hoping to improve in the future.
+
+> OTOH if you just want to send a UDP message you can just use another
+> system on the same network.
+> You might need to spoof the source mac - but that isn't hard (although
+> it might confuse any ethernet switches).
+>
+>> We should probably respect net.ipv4.ip_local_reserved_ports and
+>> net.ipv4.ip_unprivileged_port_start system settings, though, or check
+>> for relevant caps.
+>
+> True.
+>
+>> Open question if it is acceptable to disregard exclusive UDP port
+>> ownership by sockets binding to a wildcard address without SO_REUSEADDR?
+>
+> We've often suffered from the opposite - a program binds to the wildcard
+> IP and everything works until something else binds to the same port and
+> a specific local IP.
+
+Let me see if I understand - what would happen today for UDP is:
+
+app #1 - bind(("0.0.0.0", 53)) -> OK
+app #2 - bind(("192.0.2.1", 53)) -> EADDRINUSE
+
+... unless both are setting SO_REUSEADDR (or SO_REUSEPORT and run under
+same UID).
+
+That is why if we allow selecting the source port at sendmsg() time, we
+would be relaxing the existing UDP port ownership guarantees for
+wildcard binds.
+
+Perhaps this merits a sysctl, so the admin can decide if it is an
+acceptable trade-off in their environment.
+
+> I'm sure this is grief some on both TCP and UDP - especially since you
+> often need to set SO_REUSADDR to stop other things breaking.
+>
+> 	David
+>  
+>
+> -
+> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+> Registration No: 1397386 (Wales)
 
