@@ -1,198 +1,159 @@
-Return-Path: <netdev+bounces-129301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF0B597EC08
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 15:09:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49E8697EC0F
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 15:12:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23790B21AAB
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 13:09:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A5AF1C2132C
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 13:12:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936A81991D7;
-	Mon, 23 Sep 2024 13:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C56319923F;
+	Mon, 23 Sep 2024 13:12:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VMte35bR"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A801990B5
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 13:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBE82197A7F
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 13:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727096976; cv=none; b=mRSYMgh4DORrl7hN7Meu4wv01eMMcoz3f2D/aBrUe2Z8DBCkT199gjxBtK7v0OyHNbkz4q/bqUP2Btb/TUQzXhLWtrKZeudY1CHkNrHUTyp28xCZKcENZtNuqaR3T4XBj72O2TGtt/hOBfUgYdbVlNGbwiOwKvM5/sBQd6x3lak=
+	t=1727097123; cv=none; b=kiF7v9WfLQJw4MFcmcoZWJ6s4TdjoS2D1IN1yGnC0e6Kt683pg+zQSSrENRPBLpPYZN+vHqv7t6KO3Yznyodkoag95HJfihNsWP4XAG3OayH+hRrxXJsll2y4gc/ugHz1RBaxLAU2ulKc1aicQHZO6lXB6ZkfYNsAy7YeR2LorM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727096976; c=relaxed/simple;
-	bh=smBylhCLWUs3r4SgOLnGihzxFt122ylK4943d3CNycY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=IQmD2NOnY3d3VqKdnebpb08mE1V2Yp2a/RnoIdgU1+4NFvqbdgefO7DEtA/vSIjBpEz4Ka7zaBl3YgVrrUbPo1tueygkP3d0owI2ZV9RlE5+WykHBiS6aglW4lVNxt4havmcWZ0XiMnlJpnAh8ceozuFpOiFYnBuaHH/kHGf7ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-12-F9kUYeWRMymPJiBx8nV4uA-1; Mon, 23 Sep 2024 14:09:31 +0100
-X-MC-Unique: F9kUYeWRMymPJiBx8nV4uA-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 23 Sep
- 2024 14:08:36 +0100
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Mon, 23 Sep 2024 14:08:36 +0100
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Tiago Lam' <tiagolam@cloudflare.com>, "David S. Miller"
-	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, "Yonghong
- Song" <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>,
-	"KP Singh" <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao
- Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko
-	<mykolal@fb.com>, Shuah Khan <shuah@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, "Jakub
- Sitnicki" <jakub@cloudflare.com>, "kernel-team@cloudflare.com"
-	<kernel-team@cloudflare.com>
-Subject: RE: [RFC PATCH v2 2/3] ipv6: Support setting src port in sendmsg().
-Thread-Topic: [RFC PATCH v2 2/3] ipv6: Support setting src port in sendmsg().
-Thread-Index: AQHbC37mOgyMoKtrJE6wBcqRmpwTjbJlWLTg
-Date: Mon, 23 Sep 2024 13:08:36 +0000
-Message-ID: <855fc71343a149479c7da96438bf9e32@AcuMS.aculab.com>
-References: <20240920-reverse-sk-lookup-v2-0-916a48c47d56@cloudflare.com>
- <20240920-reverse-sk-lookup-v2-2-916a48c47d56@cloudflare.com>
-In-Reply-To: <20240920-reverse-sk-lookup-v2-2-916a48c47d56@cloudflare.com>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1727097123; c=relaxed/simple;
+	bh=PVko/03uJhOuekVNS68hKjs7Zi++mtXcGg9D0OwjVCE=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=X2RMftrDxPKBJgHNCxvMoSLtJiFSU2KRBHCZwt0QUbcfiM92IHAcqzjn0HM27/SXHEkQMo4ICr7sr8IZrqYcy7mjxvF16OkdZKq9DhSjOmfc2uL3kcLNqfJyUafxHZ2l99cTo+DbAKMh/gOZVsI583y4SeZe+53u229gbXB7VYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VMte35bR; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2d883286bd2so319677a91.2
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 06:12:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727097121; x=1727701921; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7YsCYE29OlECVOjROSH9S9XssuhzXXNiKT0BJorJu7M=;
+        b=VMte35bRS99UTR7RFPYPj7bfBVvwJCYgSUZXxu/w+rzbmFE2yxtAkZCBfAHt3n29W2
+         9hfmp7gjICeBtq0eFSeQQuGDawpXG12g/N/YyHy5e1VuYlEwipIcSDfDtz4cYtUH/z6k
+         tW0be/QWKbDHE6Fs+LVrGYT7BUDWqCGq13q4pyJvibi5o7UTqTQkKef5qdKUR7gn4K18
+         I3FkKHw0L8RIkT1+WC6jUWTa6zu6fH/8oxOlzJbcuomSTV4CwO7F21huaxcqqx6n+54f
+         mN76uJOCiyBgJbkDMcs3IZRICWFtMYmnCIAj1URiFzLlLF6IdpaVn8K0DPjznK274rRN
+         oOFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727097121; x=1727701921;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7YsCYE29OlECVOjROSH9S9XssuhzXXNiKT0BJorJu7M=;
+        b=w4GbjrbYTQMMqem6jwAuwRvplrVpp/+fLABSqLvH0ENLygdNImA/ES92q3KSR4quIP
+         57vJS+s314C0s3Y6Cx+OM5LBLhh8fQHOVNutW3nR9CvMHo8o8pDlIuG8TvinMANGTb3q
+         QAcXw0PCF560dnlu8Bj4pjneM8dAZU3K6MG9RQ7TTRUAAKlOf7pl7w3cF0gty4u/PY16
+         UJlJ6/89DJGQsSVRhNtbm4xFBROx9ADGnx1ymyTHhdxcPv1YHJ1giLYOdZFBNyDKZ6Ic
+         wxMv7jhW1ddxx7hVDTQ5iEmbmwpXBchGZTQm89ATmQKsuOWoHAo80nIxk3kmgRVXgcK6
+         kXXQ==
+X-Gm-Message-State: AOJu0YyqNfZ8/3i/uWUMLnjYBEmGVZguJ57H/Oxx+92EOfhMKQPSOmdj
+	ELd21nKJGLjTFdSV7/S9idXvEq4qmiSqXhi0elmnHDh19Pa+Xcbc
+X-Google-Smtp-Source: AGHT+IHRD+JnD4rDliR/9PKxpFYluB7R4ukm+m8cMT7kTitDaCCNfKKiFszPw+RE+6kyYuoCtN/iBg==
+X-Received: by 2002:a17:90b:3a8e:b0:2d8:9ce8:f4e0 with SMTP id 98e67ed59e1d1-2dd7f7008c5mr5570084a91.5.1727097120746;
+        Mon, 23 Sep 2024 06:12:00 -0700 (PDT)
+Received: from smtpclient.apple (v133-130-115-230.a046.g.tyo1.static.cnode.io. [133.130.115.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2dd7f7b9e80sm7231763a91.10.2024.09.23.06.11.57
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 23 Sep 2024 06:12:00 -0700 (PDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3818.100.11.1.3\))
+Subject: Re: [BUG Report] hns3: tx_timeout on high memory pressure
+From: Miao Wang <shankerwangmiao@gmail.com>
+In-Reply-To: <56bbcfbd-149f-4f78-ae73-3bba3bbdd146@huawei.com>
+Date: Mon, 23 Sep 2024 21:11:42 +0800
+Cc: netdev@vger.kernel.org,
+ =?utf-8?B?6ZmI5pmf56W6?= <harry-chen@outlook.com>,
+ =?utf-8?B?5byg5a6H57+U?= <zz593141477@gmail.com>,
+ =?utf-8?B?6ZmI5ZiJ5p2w?= <jiegec@qq.com>,
+ Mirror Admin Tuna <mirroradmin@tuna.tsinghua.edu.cn>,
+ Salil Mehta <salil.mehta@huawei.com>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F90EE18D-1B5D-4FB2-ADEB-EF02A2922B7F@gmail.com>
+References: <4068C110-62E5-4EAA-937C-D298805C56AE@gmail.com>
+ <56bbcfbd-149f-4f78-ae73-3bba3bbdd146@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+X-Mailer: Apple Mail (2.3818.100.11.1.3)
 
-RnJvbTogVGlhZ28gTGFtIDx0aWFnb2xhbUBjbG91ZGZsYXJlLmNvbT4NCj4gU2VudDogMjAgU2Vw
-dGVtYmVyIDIwMjQgMTg6MDINCj4gDQo+IFRoaXMgZm9sbG93cyB0aGUgc2FtZSByYXRpb25hbGUg
-cHJvdmlkZWQgZm9yIHRoZSBpcHY0IGNvdW50ZXJwYXJ0LCB3aGVyZQ0KPiB0aGUgc2VuZG1zZygp
-IHBhdGggaXMgYWxzbyBleHRlbmRlZCBoZXJlIHRvIHN1cHBvcnQgdGhlIElQVjZfT1JJR0RTVEFE
-RFINCj4gYW5jaWxsYXJ5IG1lc3NhZ2UgdG8gYmUgYWJsZSB0byBzcGVjaWZ5IGEgc291cmNlIGFk
-ZHJlc3MvcG9ydC4gVGhpcw0KPiBhbGxvd3MgdXNlcnMgdG8gY29uZmlndXJlIHRoZSBzb3VyY2Ug
-YWRkcmVzcyBhbmQvb3IgcG9ydCBlZ3Jlc3MgdHJhZmZpYw0KPiBzaG91bGQgYmUgc2VudCBmcm9t
-Lg0KDQpJJ2QgbWlzc2VkIHRoYXQgYmVpbmcgYWRkZWQgLSBjb3VsZCBzYXZlIHVzIHRoZSBob3Jy
-aWQgcHJvYmxlbSBvZiBnZXR0aW5nDQp0aGUgVURQIGNoZWNrc3VtIGNvcnJlY3Qgd2hlbiBzZW5k
-aW5nIFVEUCBvdmVyIGEgcmF3IHNvY2tldC4NCihUaGF0IGlzbid0IGEgcHJvYmxlbSBmb3IgSVB2
-Ni4pDQoNCj4gVG8gbGltaXQgaXRzIHVzYWdlLCBhIHJldmVyc2Ugc29ja2V0IGxvb2t1cCBpcyBw
-ZXJmb3JtZWQgdG8gY2hlY2sgaWYgdGhlDQo+IGNvbmZpZ3VyZWQgZWdyZXNzIHNvdXJjZSBhZGRy
-ZXNzIGFuZC9vciBwb3J0IGhhdmUgYW55IGluZ3Jlc3Mgc2tfbG9va3VwDQo+IG1hdGNoLiBJZiBp
-dCBkb2VzLCB0cmFmZmljIGlzIGFsbG93ZWQgdG8gcHJvY2VlZCwgb3RoZXJ3aXNlIGl0IGZhbGxz
-DQo+IGJhY2sgdG8gdGhlIHJlZ3VsYXIgZWdyZXNzIHBhdGguDQoNCklzIHRoYXQgcmVhbGx5IHVz
-ZWZ1bC9uZWNlc3Nhcnk/DQpUaGUgY2hlY2sgKGJ1dCBub3QgdGhlIGNvbW1pdCBtZXNzYWdlKSBp
-bXBsaWVzIHRoYXQgc29tZSAnYnBmIHRoaW5neScNCmFsc28gbmVlZHMgdG8gYmUgZW5hYmxlZC4N
-CkFueSBjaGVjayB3b3VsZCBuZWVkIHRvIGluY2x1ZGUgdGhlIHRlc3QgdGhhdCB0aGUgcHJvZ3Jh
-bSBzZW5kaW5nIHRoZSBwYWNrZXQNCmhhcyB0aGUgYWJpbGl0eSB0byBzZW5kIGEgcGFja2V0IHRo
-cm91Z2ggdGhlIGluZ3Jlc3Mgc29ja2V0Lg0KQWRkaXRpb25hbGx5IGEgY2hlY2sgZm9yIHRoZSBz
-ZW5kaW5nIHByb2Nlc3MgaGF2aW5nIChJSVJDKSBDQVBfTkVUX0FETUlODQood2hpY2ggd291bGQg
-bGV0IHRoZSBwcm9jZXNzIHNlbmQgdGhlIG1lc3NhZ2UgYnkgb3RoZXIgbWVhbnMpIHdvdWxkIHNh
-dmUgdGhlDQpzbG93IHBhdGguDQoNClRoZSBjb2RlIHdlIGhhdmUgc2VuZHMgYSBsb3Qgb2YgVURQ
-IFJUUCAodHlwaWNhbGx5IDE2MCBieXRlcyBvZiBhdWRpbyBldmVyeSAyMG1zKS4NClRoZXJlIGlz
-IGFjdHVhbGx5IG5vIHJlYXNvbiBmb3IgdGhlcmUgdG8gYmUgYSB2YWxpZCBtYXRjaGluZyBpbmdy
-ZXNzIHBhdGguDQooVGhhdCBjb2RlIHdvdWxkIGJlbmVmaXQgZnJvbSBiZWluZyBhYmxlIHRvIGJp
-bmQgYSBsb3Qgb2YgcG9ydHMgdG8gdGhlIHNhbWUNClVEUCBzb2NrZXQuKQ0KDQoJRGF2aWQNCg0K
-PiANCj4gU3VnZ2VzdGVkLWJ5OiBKYWt1YiBTaXRuaWNraSA8amFrdWJAY2xvdWRmbGFyZS5jb20+
-DQo+IFNpZ25lZC1vZmYtYnk6IFRpYWdvIExhbSA8dGlhZ29sYW1AY2xvdWRmbGFyZS5jb20+DQo+
-IC0tLQ0KPiAgbmV0L2lwdjYvZGF0YWdyYW0uYyB8IDc5ICsrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICBuZXQvaXB2Ni91ZHAuYyAgICAgIHwg
-IDggKysrKy0tDQo+ICAyIGZpbGVzIGNoYW5nZWQsIDg1IGluc2VydGlvbnMoKyksIDIgZGVsZXRp
-b25zKC0pDQo+IA0KPiBkaWZmIC0tZ2l0IGEvbmV0L2lwdjYvZGF0YWdyYW0uYyBiL25ldC9pcHY2
-L2RhdGFncmFtLmMNCj4gaW5kZXggZmZmNzg0OTY4MDNkLi4zNjljNjRhNDc4ZWMgMTAwNjQ0DQo+
-IC0tLSBhL25ldC9pcHY2L2RhdGFncmFtLmMNCj4gKysrIGIvbmV0L2lwdjYvZGF0YWdyYW0uYw0K
-PiBAQCAtNzU2LDYgKzc1NiwyOSBAQCB2b2lkIGlwNl9kYXRhZ3JhbV9yZWN2X2N0bChzdHJ1Y3Qg
-c29jayAqc2ssIHN0cnVjdCBtc2doZHIgKm1zZywNCj4gIH0NCj4gIEVYUE9SVF9TWU1CT0xfR1BM
-KGlwNl9kYXRhZ3JhbV9yZWN2X2N0bCk7DQo+IA0KPiArc3RhdGljIGlubGluZSBib29sIHJldmVy
-c2Vfc2tfbG9va3VwKHN0cnVjdCBmbG93aTYgKmZsNiwgc3RydWN0IHNvY2sgKnNrLA0KPiArCQkJ
-CSAgICAgc3RydWN0IGluNl9hZGRyICpzYWRkciwgX19iZTE2IHNwb3J0KQ0KPiArew0KPiArCWlm
-IChzdGF0aWNfYnJhbmNoX3VubGlrZWx5KCZicGZfc2tfbG9va3VwX2VuYWJsZWQpICYmDQo+ICsJ
-ICAgIChzYWRkciAmJiBzcG9ydCkgJiYNCj4gKwkgICAgKGlwdjZfYWRkcl9jbXAoJnNrLT5za192
-Nl9yY3Zfc2FkZHIsIHNhZGRyKSB8fA0KPiArCSAgICBpbmV0X3NrKHNrKS0+aW5ldF9zcG9ydCAh
-PSBzcG9ydCkpIHsNCj4gKwkJc3RydWN0IHNvY2sgKnNrX2VncmVzczsNCj4gKw0KPiArCQlicGZf
-c2tfbG9va3VwX3J1bl92Nihzb2NrX25ldChzayksIElQUFJPVE9fVURQLCAmZmw2LT5kYWRkciwN
-Cj4gKwkJCQkgICAgIGZsNi0+Zmw2X2Rwb3J0LCBzYWRkciwgbnRvaHMoc3BvcnQpLCAwLA0KPiAr
-CQkJCSAgICAgJnNrX2VncmVzcyk7DQo+ICsJCWlmICghSVNfRVJSX09SX05VTEwoc2tfZWdyZXNz
-KSAmJiBza19lZ3Jlc3MgPT0gc2spDQo+ICsJCQlyZXR1cm4gdHJ1ZTsNCj4gKw0KPiArCQluZXRf
-aW5mb19yYXRlbGltaXRlZCgiTm8gcmV2ZXJzZSBzb2NrZXQgbG9va3VwIG1hdGNoIGZvciBsb2Nh
-bCBhZGRyICVwSTY6JWQgcmVtb3RlIGFkZHINCj4gJXBJNjolZFxuIiwNCj4gKwkJCQkgICAgICZz
-YWRkciwgbnRvaHMoc3BvcnQpLCAmZmw2LT5kYWRkciwNCj4gKwkJCQkgICAgIG50b2hzKGZsNi0+
-Zmw2X2Rwb3J0KSk7DQo+ICsJfQ0KPiArDQo+ICsJcmV0dXJuIGZhbHNlOw0KPiArfQ0KPiArDQo+
-ICBpbnQgaXA2X2RhdGFncmFtX3NlbmRfY3RsKHN0cnVjdCBuZXQgKm5ldCwgc3RydWN0IHNvY2sg
-KnNrLA0KPiAgCQkJICBzdHJ1Y3QgbXNnaGRyICptc2csIHN0cnVjdCBmbG93aTYgKmZsNiwNCj4g
-IAkJCSAgc3RydWN0IGlwY202X2Nvb2tpZSAqaXBjNikNCj4gQEAgLTg0NCw3ICs4NjcsNjMgQEAg
-aW50IGlwNl9kYXRhZ3JhbV9zZW5kX2N0bChzdHJ1Y3QgbmV0ICpuZXQsIHN0cnVjdCBzb2NrICpz
-aywNCj4gDQo+ICAJCQlicmVhazsNCj4gIAkJICAgIH0NCj4gKwkJY2FzZSBJUFY2X09SSUdEU1RB
-RERSOg0KPiArCQkJew0KPiArCQkJc3RydWN0IHNvY2thZGRyX2luNiAqc29ja2FkZHJfaW47DQo+
-ICsJCQlzdHJ1Y3QgbmV0X2RldmljZSAqZGV2ID0gTlVMTDsNCj4gKw0KPiArCQkJaWYgKGNtc2ct
-PmNtc2dfbGVuIDwgQ01TR19MRU4oc2l6ZW9mKHN0cnVjdCBzb2NrYWRkcl9pbjYpKSkgew0KPiAr
-CQkJCWVyciA9IC1FSU5WQUw7DQo+ICsJCQkJZ290byBleGl0X2Y7DQo+ICsJCQl9DQo+ICsNCj4g
-KwkJCXNvY2thZGRyX2luID0gKHN0cnVjdCBzb2NrYWRkcl9pbjYgKilDTVNHX0RBVEEoY21zZyk7
-DQo+ICsNCj4gKwkJCWFkZHJfdHlwZSA9IF9faXB2Nl9hZGRyX3R5cGUoJnNvY2thZGRyX2luLT5z
-aW42X2FkZHIpOw0KPiArDQo+ICsJCQlpZiAoYWRkcl90eXBlICYgSVBWNl9BRERSX0xJTktMT0NB
-TCkNCj4gKwkJCQlyZXR1cm4gLUVJTlZBTDsNCj4gKw0KPiArCQkJLyogSWYgd2UncmUgZWdyZXNz
-aW5nIHdpdGggYSBkaWZmZXJlbnQgc291cmNlIGFkZHJlc3MNCj4gKwkJCSAqIGFuZC9vciBwb3J0
-LCB3ZSBwZXJmb3JtIGEgcmV2ZXJzZSBzb2NrZXQgbG9va3VwLiBUaGUNCj4gKwkJCSAqIHJhdGlv
-bmFsZSBiZWhpbmQgdGhpcyBpcyB0aGF0IHdlIGNhbiBhbGxvdyByZXR1cm4NCj4gKwkJCSAqIFVE
-UCB0cmFmZmljIHRoYXQgaGFzIGluZ3Jlc3NlZCB0aHJvdWdoIHNrX2xvb2t1cCB0bw0KPiArCQkJ
-ICogYWxzbyBlZ3Jlc3MgY29ycmVjdGx5LiBJbiBjYXNlIHRoZSByZXZlcnNlIGxvb2t1cA0KPiAr
-CQkJICogZmFpbHMsIHdlIGNvbnRpbnVlIHdpdGggdGhlIG5vcm1hbCBwYXRoLg0KPiArCQkJICoN
-Cj4gKwkJCSAqIFRoZSBsb29rdXAgaXMgcGVyZm9ybWVkIGlmIGVpdGhlciBzb3VyY2UgYWRkcmVz
-cw0KPiArCQkJICogYW5kL29yIHBvcnQgY2hhbmdlZCwgYW5kIG5laXRoZXIgaXMgIjAiLg0KPiAr
-CQkJICovDQo+ICsJCQlpZiAocmV2ZXJzZV9za19sb29rdXAoZmw2LCBzaywgJnNvY2thZGRyX2lu
-LT5zaW42X2FkZHIsDQo+ICsJCQkJCSAgICAgIHNvY2thZGRyX2luLT5zaW42X3BvcnQpKSB7DQo+
-ICsJCQkJLyogT3ZlcnJpZGUgdGhlIHNvdXJjZSBwb3J0IGFuZCBhZGRyZXNzIHRvIHVzZQ0KPiAr
-CQkJCSAqIHdpdGggdGhlIG9uZSB3ZSBnb3QgaW4gY21zZyBhbmQgYmFpbCBlYXJseS4NCj4gKwkJ
-CQkgKi8NCj4gKwkJCQlmbDYtPnNhZGRyID0gc29ja2FkZHJfaW4tPnNpbjZfYWRkcjsNCj4gKwkJ
-CQlmbDYtPmZsNl9zcG9ydCA9IHNvY2thZGRyX2luLT5zaW42X3BvcnQ7DQo+ICsJCQkJYnJlYWs7
-DQo+ICsJCQl9DQo+IA0KPiArCQkJaWYgKGFkZHJfdHlwZSAhPSBJUFY2X0FERFJfQU5ZKSB7DQo+
-ICsJCQkJaW50IHN0cmljdCA9IF9faXB2Nl9hZGRyX3NyY19zY29wZShhZGRyX3R5cGUpIDw9IElQ
-VjZfQUREUl9TQ09QRV9MSU5LTE9DQUw7DQo+ICsNCj4gKwkJCQlpZiAoIWlwdjZfY2FuX25vbmxv
-Y2FsX2JpbmQobmV0LCBpbmV0X3NrKHNrKSkgJiYNCj4gKwkJCQkgICAgIWlwdjZfY2hrX2FkZHJf
-YW5kX2ZsYWdzKG5ldCwNCj4gKwkJCQkJCQkgICAgICZzb2NrYWRkcl9pbi0+c2luNl9hZGRyLA0K
-PiArCQkJCQkJCSAgICAgZGV2LCAhc3RyaWN0LCAwLA0KPiArCQkJCQkJCSAgICAgSUZBX0ZfVEVO
-VEFUSVZFKSAmJg0KPiArCQkJCSAgICAhaXB2Nl9jaGtfYWNhc3RfYWRkcl9zcmMobmV0LCBkZXYs
-DQo+ICsJCQkJCQkJICAgICAmc29ja2FkZHJfaW4tPnNpbjZfYWRkcikpDQo+ICsJCQkJCWVyciA9
-IC1FSU5WQUw7DQo+ICsJCQkJZWxzZQ0KPiArCQkJCQlmbDYtPnNhZGRyID0gc29ja2FkZHJfaW4t
-PnNpbjZfYWRkcjsNCj4gKwkJCX0NCj4gKw0KPiArCQkJaWYgKGVycikNCj4gKwkJCQlnb3RvIGV4
-aXRfZjsNCj4gKw0KPiArCQkJYnJlYWs7DQo+ICsJCQl9DQo+ICAJCWNhc2UgSVBWNl9GTE9XSU5G
-TzoNCj4gIAkJCWlmIChjbXNnLT5jbXNnX2xlbiA8IENNU0dfTEVOKDQpKSB7DQo+ICAJCQkJZXJy
-ID0gLUVJTlZBTDsNCj4gZGlmZiAtLWdpdCBhL25ldC9pcHY2L3VkcC5jIGIvbmV0L2lwdjYvdWRw
-LmMNCj4gaW5kZXggNjYwMmEyZTljZGI1Li42MTIxY2JiNzFhZDMgMTAwNjQ0DQo+IC0tLSBhL25l
-dC9pcHY2L3VkcC5jDQo+ICsrKyBiL25ldC9pcHY2L3VkcC5jDQo+IEBAIC0xNDc2LDYgKzE0NzYs
-MTIgQEAgaW50IHVkcHY2X3NlbmRtc2coc3RydWN0IHNvY2sgKnNrLCBzdHJ1Y3QgbXNnaGRyICpt
-c2csIHNpemVfdCBsZW4pDQo+IA0KPiAgCWZsNi0+Zmxvd2k2X3VpZCA9IHNrLT5za191aWQ7DQo+
-IA0KPiArCS8qIFdlIHVzZSBmbDYncyBkYWRkciBhbmQgZmw2X3Nwb3J0IGluIHRoZSByZXZlcnNl
-IHNrX2xvb2t1cCBkb25lDQo+ICsJICogd2l0aGluIGlwNl9kYXRhZ3JhbV9zZW5kX2N0bCgpIG5v
-dy4NCj4gKwkgKi8NCj4gKwlmbDYtPmRhZGRyID0gKmRhZGRyOw0KPiArCWZsNi0+Zmw2X3Nwb3J0
-ID0gaW5ldC0+aW5ldF9zcG9ydDsNCj4gKw0KPiAgCWlmIChtc2ctPm1zZ19jb250cm9sbGVuKSB7
-DQo+ICAJCW9wdCA9ICZvcHRfc3BhY2U7DQo+ICAJCW1lbXNldChvcHQsIDAsIHNpemVvZihzdHJ1
-Y3QgaXB2Nl90eG9wdGlvbnMpKTsNCj4gQEAgLTE1MTEsMTAgKzE1MTcsOCBAQCBpbnQgdWRwdjZf
-c2VuZG1zZyhzdHJ1Y3Qgc29jayAqc2ssIHN0cnVjdCBtc2doZHIgKm1zZywgc2l6ZV90IGxlbikN
-Cj4gDQo+ICAJZmw2LT5mbG93aTZfcHJvdG8gPSBzay0+c2tfcHJvdG9jb2w7DQo+ICAJZmw2LT5m
-bG93aTZfbWFyayA9IGlwYzYuc29ja2MubWFyazsNCj4gLQlmbDYtPmRhZGRyID0gKmRhZGRyOw0K
-PiAgCWlmIChpcHY2X2FkZHJfYW55KCZmbDYtPnNhZGRyKSAmJiAhaXB2Nl9hZGRyX2FueSgmbnAt
-PnNhZGRyKSkNCj4gIAkJZmw2LT5zYWRkciA9IG5wLT5zYWRkcjsNCj4gLQlmbDYtPmZsNl9zcG9y
-dCA9IGluZXQtPmluZXRfc3BvcnQ7DQo+IA0KPiAgCWlmIChjZ3JvdXBfYnBmX2VuYWJsZWQoQ0dS
-T1VQX1VEUDZfU0VORE1TRykgJiYgIWNvbm5lY3RlZCkgew0KPiAgCQllcnIgPSBCUEZfQ0dST1VQ
-X1JVTl9QUk9HX1VEUDZfU0VORE1TR19MT0NLKHNrLA0KPiANCj4gLS0NCj4gMi4zNC4xDQo+IA0K
-DQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFy
-bSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAo
-V2FsZXMpDQo=
 
+
+> 2024=E5=B9=B49=E6=9C=8823=E6=97=A5 20:58=EF=BC=8CJijie Shao =
+<shaojijie@huawei.com> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+>=20
+> on 2024/9/23 0:38, Miao Wang wrote:
+>> It seems that hns3 driver is trying to allocating 16 continuous pages =
+of memory
+>> when initializing, which could fail when the system is under high =
+memory
+>> pressure.
+>>=20
+>> I have two questions about this:
+>>=20
+>> 1. Is it expected that tx timeout really related to the high memory =
+pressure,
+>>    or the driver does not work properly under such condition?
+>>=20
+>> 2. Can allocating continuous pages of memory on initialization can be =
+avoided?
+>>    I previously met similar problem on the veth driver, which was =
+latter fixed
+>>    by commit  1ce7d306ea63 ("veth: try harder when allocating queue =
+memory"),
+>>    where the memory allocating was changed to kvcalloc() to reduces =
+the
+>>    possibility of allocation failure. I wonder if similar changes can =
+be applied
+>>    to hns3 when allocating memory regions for non-DMA usage.
+>>   =20
+>=20
+> Hi:
+>=20
+> in dmesg, we can see:
+> tx_timeout count: 35, queue id: 1, SW_NTU: 0x346, SW_NTC: 0x334, napi =
+state: 17
+> BD_NUM: 0x7f HW_HEAD: 0x346, HW_TAIL: 0x346, BD_ERR: 0x0, INT: 0x0
+>=20
+> Because HW_HEAD=3D=3DHW_TAIL, the hardware has sent all the packets.
+> napi state: 17, Therefore, the TX interrupt is received and npai =
+scheduling is triggered.
+> However, napi scheduling is not complete, Maybe napi.poll() is not =
+executed.
+> Is npai not scheduled in time due to high CPU load in the environment?
+
+Thanks for your analysis. I wonder how can I verify the scheduling of =
+NAPI.
+
+>=20
+> To solve the memory allocating failure problem,
+> you can use kvcalloc to prevent continuous page memory allocating and
+> reduce the probability of failure in OOM.
+
+I'm not so familiar with the hns3 driver. I can see several places of =
+memory
+allocations and I have no idea which can be replaced and which is =
+required to
+be continuous physically. I'll be very happy to test if you can propose =
+a patch.
+
+Cheers,
+
+Miao Wang=
 
