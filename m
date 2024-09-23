@@ -1,170 +1,149 @@
-Return-Path: <netdev+bounces-129239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85C7597E6B2
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 09:36:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1A5D97E6EB
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 09:54:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 480BA280ABF
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 07:36:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E46C1C210C0
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 07:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0592928689;
-	Mon, 23 Sep 2024 07:36:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qlQx42b6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5B347772;
+	Mon, 23 Sep 2024 07:54:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8B86219FF
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 07:36:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAD7D328B6;
+	Mon, 23 Sep 2024 07:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727076977; cv=none; b=LwTZ88a9v0KeiykZ7KC631/7XiC5bmkN5JFgEHVEQsfOeHb20bTLFqnYQNL2YE1gPn3nJV83FqIkvWkJqRcuQgTLln+1FTrAzBG8AI789jfDsQh+sw12zfuQNKvqF3Vv+kuMs2w6BlTCuTP0rmf+CMjSVOoIbjvO/jjfE70BZNA=
+	t=1727078081; cv=none; b=tvQCQkpAZuJjb6NwVaLchplSeLQ0QgYLarSnjSZtw1gu1xIipqY/KJyZSbFp/j9nxSkKeSiX9Sb4vYg6+Eovv87sxZwF3cfq8dVYgJ+qC0Qbli3smPTRU5pDbDHe08r93EmFpNB+oBWEYG8UsMhmdUe3gWaSLZYjKV1P53R7S1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727076977; c=relaxed/simple;
-	bh=kQg/bIxkfShKQ2LpuH9c+oGZ7+UA+asKQty0tzUxO5E=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L/uWUmTdK6MR/HCSupF2TfU7E/LxRjDP1X1wZQIR3QMgie0zS8X+q3I/H6Ehp/YIC+pmyTdhmtKlrr/0yAekyT72cdSxVDS/wGlB6U9B2HueKhk13yWHEb7XsinBHcBVsa8IjBPTUyuZkoNZjUxq9xCmtbC0l37AUUycqB5IVzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qlQx42b6; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c26815e174so5148749a12.0
-        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 00:36:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727076974; x=1727681774; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hUafDmzTE59pshRj6K2wvxptZ8QfeEvDyUTeHQcSvZE=;
-        b=qlQx42b6qwzKmGD8UDpqdu9l3I5F1qN+TsEP3SSiUCmtIziCEqMLYUH1wZeEoGuvHP
-         eOA3cBILhhV5A/FolZXlx7djSxhbELAjvrc0re+oWJx6HrQLAGn6og00Gt8iutK4JBYq
-         WiwozU6GbEhNrw0Z0dM3FQ0WpqooCv3mjHYxX0Wg4gm8J8QOIGpERwkVWV/r9fFCc3vA
-         TY0e5Qrrq8LQfl53XHlLie8tP1Wu9vTO+dud2ZS1ar8pDEclkttCKa5QlgeKObxclzGu
-         YJlz4TsKcoPEldO5/mr3maPNIL+MqpW2ix3nstKZhLYF2zSA0onKiwOiFSDbZTlwzDB3
-         di3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727076974; x=1727681774;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hUafDmzTE59pshRj6K2wvxptZ8QfeEvDyUTeHQcSvZE=;
-        b=oFEThTnmiPBnsyU30STFthA5OIau7slkYljcN33KMNPzusE7K3AQ2PJ+KJh38+DSIJ
-         HOnux8BG/E+TXhWf5EVBT068vhTt2j6Zgc3ZOYwuThHQK4Bh3k+M+v6YSiRP1qkKDpRP
-         IESJG/bSQhQ5FAmN645gTutrph5omZ8JOcXBK55hA2Q5397+MIbhD1EY456ItjTiGi9+
-         FEPqdb97u7PJlAEeRjdDse4w5kpmFmmKqp3cSjKLfl9rP+rzjU9TAy60JxypIHdmK7b7
-         y9Ojd9u0Tothkvj250N7Gpgh/aCgBvrfxJu/ONBQWZSQ4sNsm3lxy9LveO3pCfCa5msb
-         eUMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXngRHbGIXImySWeUpNv0AHBGO8ZPizpRjhS2giIxcLB/qR9x9TXg0xwdEozdY7EpAtpVHeopY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzA8k9BYvVAo8UQ26tWQaTSn1r0VdrhvCcn0BgJhGgn8748PIi4
-	zFe6KfRcYTPrFRQqr9wrpsO5Q7uyLTW/1EtxNFtMvSbvEw9RR39a3F/Ta3HBiL/T1x8fFlmx+xn
-	Y6+2zBW6g/bKqU+uDTF9Juoxs/pNv4hvn00xw
-X-Google-Smtp-Source: AGHT+IG1qWhmqvdo54rXWyaLb0rt1Uj8mGUFvgvYK7yEBLPcKqPlZf1Gr2FTl8POfwioIPSDcX1uCOBBYTtCl8nyMPg=
-X-Received: by 2002:a05:6402:28c7:b0:5c2:6e51:9d11 with SMTP id
- 4fb4d7f45d1cf-5c464a586f8mr9471007a12.27.1727076973748; Mon, 23 Sep 2024
- 00:36:13 -0700 (PDT)
+	s=arc-20240116; t=1727078081; c=relaxed/simple;
+	bh=QxXIxc+0eslzVUrsut9gNNpsLrYacQ4/TUMBkZGoA+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VPKDtjalLIy+eOBan5mV2mSSjkQchyMKaQRSOOIc8OLisKqQwD3H9E3RXi7Djn1pmPuOo1ZdKMVw+m4OMg2L+Bfk0+D8Z9pWyYNRAUXlDFeBXmQ5aEQmFhyOePOduXbv366lHZfhAK++ozIHFKWIs4eeV8sHlKPPrrI/No03p2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout3.hostsharing.net (Postfix) with ESMTPS id A8B64100FC269;
+	Mon, 23 Sep 2024 09:43:00 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 6E1303972D4; Mon, 23 Sep 2024 09:43:00 +0200 (CEST)
+Date: Mon, 23 Sep 2024 09:43:00 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Wei Huang <wei.huang2@amd.com>
+Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+	michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+	somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+	manoj.panicker2@amd.com, Eric.VanTassell@amd.com,
+	vadim.fedorenko@linux.dev, horms@kernel.org, bagasdotme@gmail.com,
+	bhelgaas@google.com, paul.e.luse@intel.com, jing2.liu@intel.com
+Subject: Re: [PATCH V5 1/5] PCI: Add TLP Processing Hints (TPH) support
+Message-ID: <ZvEcBLGqlJMj3MHA@wunner.de>
+References: <20240916205103.3882081-1-wei.huang2@amd.com>
+ <20240916205103.3882081-2-wei.huang2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89i+E4RP+gJghHZujmKUJbCgYY_L20ssVmvmRUT4a8FvunQ@mail.gmail.com>
- <tencent_AB92549E869AAA1F1E5EF653439554675109@qq.com>
-In-Reply-To: <tencent_AB92549E869AAA1F1E5EF653439554675109@qq.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 23 Sep 2024 09:36:00 +0200
-Message-ID: <CANn89iLMVTgM4+GWfYO8ue2aV34qVx=p-uGQVQY4yQV6fv_rLg@mail.gmail.com>
-Subject: Re: [PATCH] net: Fix potential RCU dereference issue in tcp_assign_congestion_control
-To: Jiawei Ye <jiawei.ye@foxmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, fw@strlen.de, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240916205103.3882081-2-wei.huang2@amd.com>
 
-On Mon, Sep 23, 2024 at 5:16=E2=80=AFAM Jiawei Ye <jiawei.ye@foxmail.com> w=
-rote:
->
-> Thank you very much for your feedback, Florian Westphal and Eric Dumazet.
->
-> On 9/20/24 22:11, Eric Dumazet wrote
-> >
-> > On Fri, Sep 20, 2024 at 11:35=E2=80=AFAM Florian Westphal <fw@strlen.de=
-> wrote:
-> > >
-> > > Jiawei Ye <jiawei.ye@foxmail.com> wrote:
-> > > > In the `tcp_assign_congestion_control` function, the `ca->flags` is
-> > > > accessed after the RCU read-side critical section is unlocked. Acco=
-rding
-> > > > to RCU usage rules, this is illegal. Reusing this pointer can lead =
-to
-> > > > unpredictable behavior, including accessing memory that has been up=
-dated
-> > > > or causing use-after-free issues.
-> > > >
-> > > > This possible bug was identified using a static analysis tool devel=
-oped
-> > > > by myself, specifically designed to detect RCU-related issues.
-> > > >
-> > > > To resolve this issue, the `rcu_read_unlock` call has been moved to=
- the
-> > > > end of the function.
-> > > >
-> > > > Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
-> > > > ---
-> > > > In another part of the file, `tcp_set_congestion_control` calls
-> > > > `tcp_reinit_congestion_control`, ensuring that the congestion contr=
-ol
-> > > > reinitialization process is protected by RCU. The
-> > > > `tcp_reinit_congestion_control` function contains operations almost
-> > > > identical to those in `tcp_assign_congestion_control`, but the form=
-er
-> > > > operates under full RCU protection, whereas the latter is only part=
-ially
-> > > > protected. The differing protection strategies between the two may
-> > > > warrant further unification.
-> > > > ---
-> > > >  net/ipv4/tcp_cong.c | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
-> > > > index 0306d257fa64..356a59d316e3 100644
-> > > > --- a/net/ipv4/tcp_cong.c
-> > > > +++ b/net/ipv4/tcp_cong.c
-> > > > @@ -223,13 +223,13 @@ void tcp_assign_congestion_control(struct soc=
-k *sk)
-> > > >       if (unlikely(!bpf_try_module_get(ca, ca->owner)))
-> > > >               ca =3D &tcp_reno;
-> > >
-> > > After this, ca either has module refcount incremented, so it can't
-> > > go away anymore, or reno fallback was enabled (always bultin).
-> > >
-> > > >       icsk->icsk_ca_ops =3D ca;
-> > > > -     rcu_read_unlock();
-> > >
-> > > Therefore its ok to rcu unlock here.
-> >
-> > I agree, there is no bug here.
-> >
-> > Jiawei Ye, I guess your static analysis tool is not ready yet.
->
-> Yes, the static analysis tool is still under development and debugging.
->
-> While I've collected and analyzed some relevant RCU commits from
-> associated repositories, designing an effective static detection tool
-> remains challenging.
->
-> It's quite difficult without the assistance of experienced developers. If
-> you have any suggestions or examples, I would greatly appreciate your
-> help.
->
+On Mon, Sep 16, 2024 at 03:50:59PM -0500, Wei Huang wrote:
+> --- a/drivers/pci/pci.c
+> +++ b/drivers/pci/pci.c
+> @@ -1813,6 +1813,7 @@ int pci_save_state(struct pci_dev *dev)
+>  	pci_save_dpc_state(dev);
+>  	pci_save_aer_state(dev);
+>  	pci_save_ptm_state(dev);
+> +	pci_save_tph_state(dev);
+>  	return pci_save_vc_state(dev);
+>  }
+>  EXPORT_SYMBOL(pci_save_state);
+> @@ -1917,6 +1918,7 @@ void pci_restore_state(struct pci_dev *dev)
+>  	pci_restore_vc_state(dev);
+>  	pci_restore_rebar_state(dev);
+>  	pci_restore_dpc_state(dev);
+> +	pci_restore_tph_state(dev);
+>  	pci_restore_ptm_state(dev);
+>  
+>  	pci_aer_clear_status(dev);
 
-This case is explained in Documentation/RCU/rcuref.rst
+I'm wondering if there's a reason to use a different order on save versus
+restore?  E.g. does PTM need to be restored last?
 
-line 61 : search_and_reference()
 
-For congestion control modules, we call try_module_get() which calls
-atomic_inc_not_zero(&module->refcnt)
+> --- a/drivers/pci/pcie/Kconfig
+> +++ b/drivers/pci/pcie/Kconfig
+> @@ -155,3 +155,14 @@ config PCIE_EDR
+>  	  the PCI Firmware Specification r3.2.  Enable this if you want to
+>  	  support hybrid DPC model which uses both firmware and OS to
+>  	  implement DPC.
+> +
+> +config PCIE_TPH
+> +	bool "TLP Processing Hints"
+> +	depends on ACPI
+
+TPH isn't really an ACPI-specific feature, it could exist on
+devicetree-based platforms as well.  I think there could be valid
+use cases for enabling TPH support on such platforms:
+
+E.g. the platform firmware or bootloader might set up the TPH Extended
+Capability in a specific way and the kernel would have to save/restore
+it on system sleep.
+
+So I'd recommend removing this dependency.
+
+Note that there's a static inline for acpi_check_dsm() which returns
+false if CONFIG_ACPI=n, so tph_invoke_dsm() returns AE_ERROR and
+pcie_tph_get_cpu_st() returns -EINVAL.  It thus looks like you may not
+even need an #ifdef.
+
+
+> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
+> new file mode 100644
+
+The PCIe features added most recently (such as DOE) have been placed
+directly in drivers/pci/ instead of the pcie/ subdirectory.
+The pcie/ subdirectory mostly deals with port drivers.
+So perhaps tph.c should likewise be placed in drivers/pci/ ?
+
+
+> --- /dev/null
+> +++ b/drivers/pci/pcie/tph.c
+> @@ -0,0 +1,199 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * TPH (TLP Processing Hints) support
+> + *
+> + * Copyright (C) 2024 Advanced Micro Devices, Inc.
+> + *     Eric Van Tassell <Eric.VanTassell@amd.com>
+> + *     Wei Huang <wei.huang2@amd.com>
+> + */
+> +#include <linux/pci.h>
+> +#include <linux/pci-acpi.h>
+
+This patch doesn't seem to use any of the symbols defined in pci-acpi.h,
+or did I miss anything?  I'd move the inclusion of pci-acpi.h to the patch
+that actually uses its symbols.
+
+Thanks,
+
+Lukas
 
