@@ -1,147 +1,138 @@
-Return-Path: <netdev+bounces-129231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B4E197E605
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 08:33:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 017A697E61F
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 08:42:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B59DE1C203F5
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 06:33:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9826D1F212C4
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 06:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3779B1759F;
-	Mon, 23 Sep 2024 06:33:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jBf0ECyK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F7112E5B;
+	Mon, 23 Sep 2024 06:42:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A3E1FBA;
-	Mon, 23 Sep 2024 06:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C664A1FDA
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 06:42:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727073213; cv=none; b=H+tFv7C7lqx7hkR2JY5/pq9zyS153ksnyRUAEsqMRn9jQW3OIUCH1IfQbxlGBDw/HlZM5XOVO6UAfD69WHWymdQPmabagE3HcfBK+kYduo+0mOHQvyl0M0PsNSIE+tdwuiZadpZ0BhYMMWLih+wDLRtd3dgeFnHLP4e9lVRqwJ8=
+	t=1727073751; cv=none; b=QmKrc2wAFdsJCQlc1B78KMr6niqz9XCuvyEO90uYTv6zhwDwp8Ceh9RODPN7Gn4GRdEuZ1O1+/9RpmUYigyOfLauD1qlbCl4VglfwX/DqAaXJHKQBaFbOfr/fCFXORfW5E1U0Bg/W5ixeZAh5fotv3ZhhNsqvAZFVqiTXyxoKgI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727073213; c=relaxed/simple;
-	bh=HoqH35/uhLHu6YQQgMWBupbXqYpXpJ7jqqANl3QxUNE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tg1HGicLLolxELZzoD0z98oZPVqVdSdtCvRNe5YXjFmeQy4xI+cTpp9kKbqUtv9kt8srchnnnn1bGb59K3PjA3Dfy2A9jjupDi0cWNQjgbfFBsNiuwqe9yiOZLw6pJ2QIhGsZOyT7BLvfVZNGLU7P4s+VgWtUInb73okvs+2uDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jBf0ECyK; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-71781f42f75so3801777b3a.1;
-        Sun, 22 Sep 2024 23:33:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727073211; x=1727678011; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fUNAWChZzn63ZWt73jGOo9/03BQgMS0LVs0hv21VT9A=;
-        b=jBf0ECyKvOOGsTAdo8D0BY+hOjg2MlbvlQRV5bOUD71Tl9h9GL1m39AA40UpbQZIMt
-         W2GF7XhcfudxGj5oUOff4YunFI0zogueBGIXl6RZL0GupCs+xfxeCjF/2m8A2A4oHq95
-         3boJh1XsMnkuPt9pIe6HHydOcMZdECQhki71325tuIqUekxqZsOyCtUPsTOkFMVpNwDV
-         F+t8sMNOfNDT8GELaDzIsULAbcskig4h3LqzSiw0BjRKUGMTqAEPE5n+igefBWDbIHGx
-         yD+4XpMdIEE8dr/5FhA8NboY1NQVw8GgcB6JrcF+/XIyF04Xho97ymytg09XEPCt86BD
-         pB2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727073211; x=1727678011;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fUNAWChZzn63ZWt73jGOo9/03BQgMS0LVs0hv21VT9A=;
-        b=fGEMJFNLyXK4yjAhPFQ35kxvME0G6eItHQcotIH9Qao4X2H+HeklGpZ596ECCCeCf7
-         WSD6CNBFq//+8zji71y0nvY0GywHXzDXnkNhxs0ji9YGVPqUZIx+AGlKGpUUn2+xZ3he
-         nFa8QQIm7oTvGl/dPeY3pXzS+gG+Luxn0whdHBpfSkWewVUe3+8mMwVcVWIr+hkzPjWf
-         Q8g8rJpHpY7NsFDbHJntp/7U+W82e+TpfazZdsGH3abA1yIygnkaAJg/gDcRp25/9Bbs
-         N5dJ8UQyRXIhvNpUEPs9vjFZdq7K26xaKmWG5pb2q3TzrrDvjTttxRf9l04wQFSSaAjE
-         UCkw==
-X-Forwarded-Encrypted: i=1; AJvYcCUUJsXGCG3cT6vjpBg0NISSy0iUTPAkH37sQt685zlgtF9sNjA4u9H6BZoGHCCBne38aaLnavFK@vger.kernel.org, AJvYcCXe+GWEsW4cHcDf4Zp3iORNihcwFUA9HK/0sihSL3VRaUJ4pL1KatYccp9ssglOte6DSnGEtc4I+lwFldo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPEzmM7dn0R+shBhta5z1lOo00EKMzK5Yg/NE8rA0RA4f5jiP/
-	gtoG6VaC1XAIAVSlU+RtL7eBKP6tauKBrMzOMIdBN5GopnT8OSIY
-X-Google-Smtp-Source: AGHT+IHpr3/+5anyPSGDpDUjVQqA7orBqpYHMdacDq9TPV+nYsjdiRnqo7YZkIN1PXzrlzYTo4ofbw==
-X-Received: by 2002:a05:6a00:2ea8:b0:714:2069:d90e with SMTP id d2e1a72fcca58-7199ce40a7amr16058208b3a.26.1727073210953;
-        Sun, 22 Sep 2024 23:33:30 -0700 (PDT)
-Received: from ubuntu.. ([27.34.65.190])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944ae04afsm13643812b3a.95.2024.09.22.23.33.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 22 Sep 2024 23:33:30 -0700 (PDT)
-From: Dipendra Khadka <kdipendra88@gmail.com>
-To: sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	hkelam@marvell.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: Dipendra Khadka <kdipendra88@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 net] net: Add error pointer check in otx2_flows.c
-Date: Mon, 23 Sep 2024 06:33:22 +0000
-Message-ID: <20240923063323.1935-1-kdipendra88@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1727073751; c=relaxed/simple;
+	bh=9TfQP7r8bFExRQSoNyVHySCgA9kQi3rUtJopcrGcRik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oH6OZMbkz8sJ5WNCOrDX+yoEAoZgYAC0qHQ5xe4LT5vebm4N0IMxquPuT49jUcYOiZvc6vfmXaHUxI04ppwhO9OsEAX4q/bmRYhwZB0dyXbM/9wylh4UVv6byYsVlfqFIYYzQTX4X/67g+ZghzfnLiMuQnHwSeGJEF+baeMRPR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sscm7-0007Yc-8S; Mon, 23 Sep 2024 08:42:23 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sscm5-000tYj-Jf; Mon, 23 Sep 2024 08:42:21 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1sscm5-007Q5K-1e;
+	Mon, 23 Sep 2024 08:42:21 +0200
+Date: Mon, 23 Sep 2024 08:42:21 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Alvaro (Al-vuh-roe) Reyes" <a-reyes1@ti.com>, netdev@vger.kernel.org,
+	hkallweit1@gmail.com, linux@armlinux.org.uk,
+	maxime.chevallier@bootlin.com, spatton@ti.com, r-kommineni@ti.com,
+	e-mayhew@ti.com, praneeth@ti.com, p-varis@ti.com, d-qiu@ti.com
+Subject: Re: [PATCH 3/5] net: phy: dp83tg720: Extending support to DP83TG721
+ PHY
+Message-ID: <ZvENzUBT7ni32-Lh@pengutronix.de>
+References: <cover.1726263095.git.a-reyes1@ti.com>
+ <d75b772038e37452f262b6c2d87796966f92a18e.1726263095.git.a-reyes1@ti.com>
+ <0092fd9d-22e4-458a-8227-618fc56f5459@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <0092fd9d-22e4-458a-8227-618fc56f5459@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Adding error pointer check after calling otx2_mbox_get_rsp().
+On Thu, Sep 19, 2024 at 11:26:49PM +0200, Andrew Lunn wrote:
+> On Thu, Sep 19, 2024 at 02:01:17PM -0700, Alvaro (Al-vuh-roe) Reyes wrote:
+> > The DP83TG721 is the next revision of the DP83TG720 and will share the
+> > same driver. Added PHY_ID and probe funtion to check which version is
+> > being loaded.=20
+>=20
+> Please don't mix whitespace changes with real code changes. It makes
+> it harder to see the real changes which need reviewing.
+>=20
+> > +enum DP83TG720_chip_type {
+> > +	DP83TG720_CS1_1,
+> > +	DP83TG721_CS1,
+> > +};
+> > +
+> > +struct DP83TG720_private {
+> > +	int chip;
+>=20
+> I _think_ this should be enum DP83TG720_chip_type chip;
+>=20
+> > +	bool is_master;
+>=20
+> I think this can be removed and replaced with
+> phydev->master_slave_set. You probably want to mirror it into
+> phydev->master_slave_get.
+>=20
+> phydev->master_slave_state normally contains the result of auto-neg,
+> but i expect this PHY forces it, so again, you probably want to mirror
+> it here as well. Test it out with ethtool and make sure it reports
+> what you expect.
 
-Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
----
-v2:
- - Changed the subject to net
- - Changed the typo of the vairable from bfvp to pfvf
-v1: https://lore.kernel.org/all/20240922185235.50413-1-kdipendra88@gmail.com/
- .../ethernet/marvell/octeontx2/nic/otx2_flows.c   | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+And we will have device-tree based overwrites for the timing role soon,
+so there is no reason to store this values in the priv.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-index 98c31a16c70b..8a67c124b524 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-@@ -120,6 +120,11 @@ int otx2_alloc_mcam_entries(struct otx2_nic *pfvf, u16 count)
- 		rsp = (struct npc_mcam_alloc_entry_rsp *)otx2_mbox_get_rsp
- 			(&pfvf->mbox.mbox, 0, &req->hdr);
- 
-+		if (IS_ERR(rsp)) {
-+			mutex_unlock(&pfvf->mbox.lock);
-+			return PTR_ERR(rsp);
-+		}
-+
- 		for (ent = 0; ent < rsp->count; ent++)
- 			flow_cfg->flow_ent[ent + allocated] = rsp->entry_list[ent];
- 
-@@ -198,6 +203,11 @@ int otx2_mcam_entry_init(struct otx2_nic *pfvf)
- 	rsp = (struct npc_mcam_alloc_entry_rsp *)otx2_mbox_get_rsp
- 	       (&pfvf->mbox.mbox, 0, &req->hdr);
- 
-+	if (IS_ERR(rsp)) {
-+		mutex_unlock(&pfvf->mbox.lock);
-+		return PTR_ERR(rsp);
-+	}
-+
- 	if (rsp->count != req->count) {
- 		netdev_info(pfvf->netdev,
- 			    "Unable to allocate MCAM entries for ucast, vlan and vf_vlan\n");
-@@ -233,6 +243,11 @@ int otx2_mcam_entry_init(struct otx2_nic *pfvf)
- 	frsp = (struct npc_get_field_status_rsp *)otx2_mbox_get_rsp
- 	       (&pfvf->mbox.mbox, 0, &freq->hdr);
- 
-+	if (IS_ERR(frsp)) {
-+		mutex_unlock(&pfvf->mbox.lock);
-+		return PTR_ERR(frsp);
-+	}
-+
- 	if (frsp->enable) {
- 		pfvf->flags |= OTX2_FLAG_RX_VLAN_SUPPORT;
- 		pfvf->flags |= OTX2_FLAG_VF_VLAN_SUPPORT;
--- 
-2.43.0
+Same for RGMII and SGMII modes, DT is already overwriting it with the
+phy-mode property.
 
+> > +	struct DP83TG720_private *DP83TG720;
+>=20
+> Upper case is very unusual in mainline. It is generally only used for
+> CPP macros.
+>=20
+> > +static struct phy_driver dp83tg720_driver[] =3D {
+> > +    DP83TG720_PHY_DRIVER(DP83TG720_CS_1_1_PHY_ID, "TI DP83TG720CS1.1"),
+> > +	DP83TG720_PHY_DRIVER(DP83TG721_CS_1_0_PHY_ID, "TI DP83TG721CS1.0"),
+> > +};
+
+I would prefer not to have DP83TG720_PHY_DRIVER() macros. This devices
+are not identical. For example: DP83TG721 have HW time stamping,
+DP83TG720 don't. As soon as some one will start implementing it, this
+macro will be obsolete.
+
+About names: TI DP83TG720CS1.1 and TI DP83TG721CS1.0 are not known
+anywhere outside of TI. If you really won't to use this names, please
+add comment describing which final products use core variants
+
+--=20
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
