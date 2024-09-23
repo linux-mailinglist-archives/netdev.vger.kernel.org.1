@@ -1,173 +1,159 @@
-Return-Path: <netdev+bounces-129244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE60797E734
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 10:08:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A1D97E74E
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 10:12:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 719A02812F6
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 08:07:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D1281F21220
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 08:12:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF9442AAA;
-	Mon, 23 Sep 2024 08:07:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704F07604F;
+	Mon, 23 Sep 2024 08:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="WQrAzPj4"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="ioPB8iUO"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DDD2C9D;
-	Mon, 23 Sep 2024 08:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31145FB95
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 08:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727078876; cv=none; b=m3oNkbCpxtDm/TuzE9wtLWkXgx4lFchKd58ADDFxaYdJk1ok7uI8WqTlOwlgwfdxydTJh8iGY+GWijS02k6mvM5cpg8rrGWWngLlq9KRY9a8BWOVLUtmORZAVngmI0b6GzBx9qL1+uGf2CrBgBA8xYoeOkyVZgPM2/yXOKbNwJQ=
+	t=1727079128; cv=none; b=JmjV8k+nBMtoJJLyHUzjtA/iNQN/yOmQzhrWd41S14T/pNWeqhViXdgmyvhREtfLDeeyj/CZdv3pG35iUxD89WUeMhZHLZQwB8V8/61DkPq3Z72YUYnqFvJC1riJ0d62bmzKWDUFKPIGXa0VHSb3n+Xk8mqXI87+CGAjVUEstTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727078876; c=relaxed/simple;
-	bh=+xNIs7NL1cMhJrrc3GEC3hYmwQtCfinotKNOG960J80=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AuFsF/+bZejewxn1lyAT819wdNWrD2sB5fUvGpN31d0UqQZhLpGbXf+Ku8bMfkiXc5e3uI7CFPuSkcorf8TZUjMfDTDXYVNJEN+lc6a40hLeSEcedH5WzmYGf/34bdr528Bn+lgkjtm+sSAZzdInINpcLza5tcJyQ0Iw5YNyUB0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=WQrAzPj4; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C0FCD60008;
-	Mon, 23 Sep 2024 08:07:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727078864;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mp+vix4e0GRedVNRVnn4wq8Rqo0AYrHWnXPkwqpJzbo=;
-	b=WQrAzPj4rX6JXOJLKL4blGIs6606JDbweq3NLEDWNM7fS+H98K/tMldauoHFUggVIylRoI
-	dQbMTmobwYjaSrRRt3b2fq/pwlujj9iLx3Rekoh1kLdLgmAd+335MEIR3LrnXl5hJJWpbA
-	Z0fUrzMuPWw4mY18V1+xci5BT+9RLwyqFUnGs/dc4JOJRcsN20M4ud64KROIqlijgoAiWO
-	hK3Kee0I/NLRF+FFIK0ZK6Ts/KYH9KLpO6ntlZ0j19ilXoGL8Fd8lTxgbmfdV/ne7TPDvO
-	VSBXZDWlEtADLI2sxPH/y9NJGWqDI2ZiMX819xMtcMmqcoGQ9krFmk88Oq36YQ==
-Date: Mon, 23 Sep 2024 10:07:41 +0200
-From: Herve Codina <herve.codina@bootlin.com>
-To: Lee Jones <lee@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Steen
- Hegelund <Steen.Hegelund@microchip.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Andy Shevchenko
- <andy.shevchenko@gmail.com>, Simon Horman <horms@kernel.org>, Derek Kiernan
- <derek.kiernan@amd.com>, Dragan Cvetic <dragan.cvetic@amd.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Bjorn Helgaas
- <bhelgaas@google.com>, Philipp Zabel <p.zabel@pengutronix.de>, Lars Povlsen
- <lars.povlsen@microchip.com>, Daniel Machon <daniel.machon@microchip.com>,
- UNGLinuxDriver@microchip.com, Rob Herring <robh@kernel.org>, Saravana
- Kannan <saravanak@google.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- Andrew Lunn <andrew@lunn.ch>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, Allan
- Nielsen <allan.nielsen@microchip.com>, Luca Ceresoli
- <luca.ceresoli@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
- <clement.leger@bootlin.com>
-Subject: Re: [PATCH v5 3/8] mfd: syscon: Add reference counting and device
- managed support
-Message-ID: <20240923100741.11277439@bootlin.com>
-In-Reply-To: <20240912143740.GD24460@google.com>
-References: <20240808154658.247873-1-herve.codina@bootlin.com>
-	<20240808154658.247873-4-herve.codina@bootlin.com>
-	<20240903153839.GB6858@google.com>
-	<20240903180116.717a499b@bootlin.com>
-	<20240909095203.3d6effdb@bootlin.com>
-	<20240912143740.GD24460@google.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1727079128; c=relaxed/simple;
+	bh=AiGF/8OSi083BWf/+PHyVvxx5NeIHzd+1QlsFeZZvwM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TQd5jHFoBg5sOZ24CEXsA9lRFI82HSlLU5cKIwAXkFXaKwFSeNalYSe6UWx0uB2BFrgseBzkkJYjzD013O/X+7fXl0nHzMAC/Q7wtIud18qHEKY8OBqVUoQrPH/P9NqTK5H7fumSeMULpm8a0g1Y019rngmzn413HreAzeaLD+I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=ioPB8iUO; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-42ca4e0299eso31522845e9.2
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 01:12:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727079123; x=1727683923; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3gjbHPJoKqedubSBXHd39Fm+ElqRQN46xlLk23QoYic=;
+        b=ioPB8iUO4+ltjiuEUiU59nNxVhEFomooLfMRRmMh0+v07ULSd36wE0TGwAtF1IRRD7
+         c4vPodGddYbPGFMckuhGmsBDgFWh8Ka0lbnk+6pPqZPhK7H7qyjxkK3W1ApLOR/BJwMs
+         ReqmqCfKQjCjwsWOCX82fNsbm/y6NC3Z0MIs3dSEh86ppU2NQDXcVzMhtqxpouksJiEk
+         gcFYd6hbYPX5gYlxR3hY9iWNjVhlRYsf+f2G3m07dEfw7Hg3kcb3XaTRQtTXSbei3XWQ
+         His4TZnKjq7ayRtS/LvSfF3Sr2MyO+R4Wk95Vs+Vbvnxq8zId28sKaJo5m6lR++DpqSJ
+         /LAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727079123; x=1727683923;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3gjbHPJoKqedubSBXHd39Fm+ElqRQN46xlLk23QoYic=;
+        b=jz2JO6qBIE8UCKBEkotgMpS7pZMXyfN9kENwASDN07pvQIuHc9vR3rAWrBANiDM66E
+         yYMGoaN2U9eoM1SPMwCa9+3sg1oP737DFoUSSxG+GkmQKeZ5ep5d6MaRbnDjiKsHL4Vo
+         loyTDFjZkJ8BW9FU5bLHfn1UjsOu3Zkr1jUuhi9a8j6cTUFuIJ7X2eCd/RVQOOxrYUMi
+         qdpuh3vDIEM3Mo4iDlR0qb5ZwGTatyUbH4UQfEFkZiWGWvHzebs1Yejf60FpzkR4hsrE
+         OpIhnWMwDUg0q9NZnjgcrsGTne/8Wrc3dAFI6wHVv+lfIXB3a0IPtvXNjxkewUYa+aZ2
+         /w5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUfJGugxQzjt62dZ9yrWqAVGtRjTJJNt6DXLpCQxlAVxdh4zk/8QlDHZOkfKvon5jNJRTAdYkQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzV6tvOlmeDHz4pxMicqXun8qRiS5/I/EyrKPd6h8CBzZ53fokh
+	i4paLVMxsfGhkSUjofAaOQE8B1YRSyehE6FSWtcw8j+SL/ztq1s50ets2J+M+VA=
+X-Google-Smtp-Source: AGHT+IFCTMzSYCRN9wyg4jJGEvRCfYk8ba3b68pLdJTZ5C4ZJFE06ZrWNcTI6lqNc3I+z/+RmQf/lA==
+X-Received: by 2002:a05:600c:1c95:b0:42c:de2f:da27 with SMTP id 5b1f17b1804b1-42e7c15b393mr79858795e9.2.1727079122928;
+        Mon, 23 Sep 2024 01:12:02 -0700 (PDT)
+Received: from blmsp ([2001:4091:a245:8155:f78b:11e0:5100:a478])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e71f06a4sm23718726f8f.23.2024.09.23.01.12.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 01:12:02 -0700 (PDT)
+Date: Mon, 23 Sep 2024 10:12:01 +0200
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, 
+	Raymond Tan <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux@ew.tq-group.com
+Subject: Re: [PATCH v2 1/2] can: m_can: set init flag earlier in probe
+Message-ID: <zqk3dsg6qdr7nvul34cv5qygtrcq3h2kpwojr7e4nsbgvo2i6a@xbmfcgtb3uad>
+References: <ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726745009.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+In-Reply-To: <ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726745009.git.matthias.schiffer@ew.tq-group.com>
 
-Hi,
-
-On Thu, 12 Sep 2024 15:37:40 +0100
-Lee Jones <lee@kernel.org> wrote:
-
-> On Mon, 09 Sep 2024, Herve Codina wrote:
+On Thu, Sep 19, 2024 at 01:27:27PM GMT, Matthias Schiffer wrote:
+> While an m_can controller usually already has the init flag from a
+> hardware reset, no such reset happens on the integrated m_can_pci of the
+> Intel Elkhart Lake. If the CAN controller is found in an active state,
+> m_can_dev_setup() would fail because m_can_niso_supported() calls
+> m_can_cccr_update_bits(), which refuses to modify any other configuration
+> bits when CCCR_INIT is not set.
 > 
-> > Hi Lee, Arnd,
-> > 
-> > On Tue, 3 Sep 2024 18:01:16 +0200
-> > Herve Codina <herve.codina@bootlin.com> wrote:
-> >   
-> > > Hi Lee,
-> > > 
-> > > On Tue, 3 Sep 2024 16:38:39 +0100
-> > > Lee Jones <lee@kernel.org> wrote:
-> > >   
-> > > > On Thu, 08 Aug 2024, Herve Codina wrote:
-> > > >     
-> > > > > From: Clément Léger <clement.leger@bootlin.com>
-> > > > > 
-> > > > > Syscon releasing is not supported.
-> > > > > Without release function, unbinding a driver that uses syscon whether
-> > > > > explicitly or due to a module removal left the used syscon in a in-use
-> > > > > state.
-> > > > > 
-> > > > > For instance a syscon_node_to_regmap() call from a consumer retrieves a
-> > > > > syscon regmap instance. Internally, syscon_node_to_regmap() can create
-> > > > > syscon instance and add it to the existing syscon list. No API is
-> > > > > available to release this syscon instance, remove it from the list and
-> > > > > free it when it is not used anymore.
-> > > > > 
-> > > > > Introduce reference counting in syscon in order to keep track of syscon
-> > > > > usage using syscon_{get,put}() and add a device managed version of
-> > > > > syscon_regmap_lookup_by_phandle(), to automatically release the syscon
-> > > > > instance on the consumer removal.
-> > > > > 
-> > > > > Signed-off-by: Clément Léger <clement.leger@bootlin.com>
-> > > > > Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> > > > > ---
-> > > > >  drivers/mfd/syscon.c       | 138 ++++++++++++++++++++++++++++++++++---
-> > > > >  include/linux/mfd/syscon.h |  16 +++++
-> > > > >  2 files changed, 144 insertions(+), 10 deletions(-)      
-> > > > 
-> > > > This doesn't look very popular.
-> > > > 
-> > > > What are the potential ramifications for existing users?
-> > > >     
-> > > 
-> > > Existing user don't use devm_syscon_regmap_lookup_by_phandle() nor
-> > > syscon_put_regmap().
-> > > 
-> > > So refcount is incremented but never decremented. syscon is never
-> > > released. Exactly the same as current implementation.
-> > > Nothing change for existing users.
-> > > 
-> > > Best regards,
-> > > Hervé  
-> > 
-> > I hope I answered to Lee's question related to possible impacts on
-> > existing drivers.
-> > 
-> > Is there anything else that blocks this patch from being applied ?  
+> To avoid this issue, set CCCR_INIT before attempting to modify any other
+> configuration flags.
 > 
-> Arnd usually takes care of Syscon reviews.
+> Fixes: cd5a46ce6fa6 ("can: m_can: don't enable transceiver when probing")
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> ---
 > 
-> Perhaps he's out on vacation.
+> v2: no changes
 > 
-> Let's wait a little longer, since it's too late for this cycle anyway.
+>  drivers/net/can/m_can/m_can.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
 > 
+> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+> index 012c3d22b01dd..47481afb9add3 100644
+> --- a/drivers/net/can/m_can/m_can.c
+> +++ b/drivers/net/can/m_can/m_can.c
+> @@ -1681,6 +1681,14 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
+>  		return -EINVAL;
+>  	}
+>  
+> +	/* Forcing standby mode should be redundant, as the chip should be in
+> +	 * standby after a reset. Write the INIT bit anyways, should the chip
+> +	 * be configured by previous stage.
+> +	 */
 
-Discussed the topic with Arnd Bergmann at Linux Plumbers Conference.
-Adding ref-counting and support for removal in syscon is rejected by Arnd.
+Could you please update the comment to reflect your findings?
 
-For my LAN966x use case (syscon is used only by the reset controller), the
-solution is to remove the syscon device and handle directly the reset protect
-register in the reset controller itself.
+Best
+Markus
 
-I will propose modifications in that way in the next iteration.
-
-Regards,
-Hervé
+> +	err = m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
+> +	if (err)
+> +		return err;
+> +
+>  	if (!cdev->is_peripheral)
+>  		netif_napi_add(dev, &cdev->napi, m_can_poll);
+>  
+> @@ -1732,11 +1740,7 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
+>  		return -EINVAL;
+>  	}
+>  
+> -	/* Forcing standby mode should be redundant, as the chip should be in
+> -	 * standby after a reset. Write the INIT bit anyways, should the chip
+> -	 * be configured by previous stage.
+> -	 */
+> -	return m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
+> +	return 0;
+>  }
+>  
+>  static void m_can_stop(struct net_device *dev)
+> -- 
+> TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+> Amtsgericht München, HRB 105018
+> Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+> https://www.tq-group.com/
+> 
 
