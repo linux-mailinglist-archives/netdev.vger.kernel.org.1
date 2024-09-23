@@ -1,173 +1,115 @@
-Return-Path: <netdev+bounces-129368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32F3497F0D6
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 20:47:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A449997F0F3
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 21:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 634671C20C4D
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 18:47:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02028B21A2A
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 19:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E62D1862F;
-	Mon, 23 Sep 2024 18:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493971A256A;
+	Mon, 23 Sep 2024 19:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EP0qpPWE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eLPYjr2+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A53A15E88
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 18:46:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979BC1A0BDE
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 19:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727117221; cv=none; b=mRAsM0iRCrP1TecPPt86oEEw9/c+VY2DJJ3Hv3PNrh87lopEIW8thcCfBiKWUZzBUQgUngPWlUfB9p6ZcxtJ4gQuPLHRWGxxL/J41jTL2s0WuhduweaOCOhlfZ1cG41RFuiqyONRSfj7+zW94oqRN0SkLeaQ+PCOavKtjunbWp8=
+	t=1727118031; cv=none; b=QzyOgLdzbcyUQBgMYmZ3q3N/xf7U+NSVpwWRyQm7F3ZZmq5+5fGXbCzLdRSBqbmqcmbDcG+FVSBW4jGqqt8ngvOFS6aIcBhyYEk9LzAdj73Equf+o3f/duq52ecVoMr3nbxBHqNqDRgGH/KeBWf+8pxY3KGLq81allIR1jONnLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727117221; c=relaxed/simple;
-	bh=DtQ+HnhI8KP8gv+zLVSZ4exfL0ZJE1UvPYQYsjLzcMI=;
+	s=arc-20240116; t=1727118031; c=relaxed/simple;
+	bh=KAaix+v1Nmt80SgIqm4r/9G89wehkqX0YwhcE1WNplE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SBb9WJVa3wXxyu1BM65gG//UzS08Bjx3j6iXOvluROx2OajMuT03POSX7FF3/gLywCVzjZH3rg3iLOVri7DTfFy1EBfNg4QAZXtD2oVf8rdS+46qrm1SyLvUWpG9yyI88G+BbS0B4tx2PyoLWTjCIvtWRM2/Qrq/IQF/70sPNmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EP0qpPWE; arc=none smtp.client-ip=209.85.167.44
+	 To:Cc:Content-Type; b=L3VwbVRa1aKAcOfU0HduDy2zRVHD/cZ2NPbN7oIblea+ttVJZ8Q/Kj3wObOuji8qsEsEftrje07deoFxmSYG02dkRpmmgrOVv01JOrlhO4NhOnDwQgvyfLcHlmV7eDmw6B76d9KAE1C4jNBdVEcCu6qZ9Sh9HcLZ572DazIohnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eLPYjr2+; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-5365b71a6bdso5259349e87.2
-        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 11:46:59 -0700 (PDT)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c26311c6f0so6378687a12.3
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 12:00:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727117217; x=1727722017; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727118028; x=1727722828; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=o9SxBKtVnKUNRcU2l8i9+tr7LGseNTvA1HmjIgiJZ6c=;
-        b=EP0qpPWE3N8IbfBZZl0xdJMm3jeG6lrEsGpjWgr+dLSY+HGnDHEzxDj0T5LmJNnENi
-         WNeZf9TXc6uU+P8fm18eHjPyrIi3oMVXd0Mu+tTSAPIA4XCOXiMGhTrRArUOWEIG6BNM
-         x6mw1SBweKtBWw6Uo9OPRTi+X/vM+/XicdrBiKzvKro/ECKg8cdj3wyoWbmmxFWEWYUp
-         jNRAOc7FBnTHyiEuH4crztb/9HsW5c/1JOdCeIpd0YFrJXqBRisAH5LB4Y7oVBBqAMIt
-         hL3yw1/QjVfDyjkujp0vxw4RTbDrrblw9hOE7Zv+/nm8wWPCHgORBp60Hs5lQfuJwfuR
-         LI+Q==
+        bh=KAaix+v1Nmt80SgIqm4r/9G89wehkqX0YwhcE1WNplE=;
+        b=eLPYjr2+B11LsaauIL/OvOHnrZCJCuos6sdiCHRsOLA/8FhLszAVhoSmPso8FLlQ2T
+         A6Sj1bIfcOw2W0+6Yu6Vo9EMp3f+JpmFRyjVB26f4HV/r3MyRlNxTMn76DDNAuGgeffl
+         wzzJsBYslSwIWIF0HZn2MTUlg4TYF108TiKDjiMpi/RcTjmCJsG7Go2fm7PNmV34+Gmw
+         gJuWjQbcTfYuPNf+ySNyC/y7KqqKFruXQgMwhoF19/wEMA9WDM/zVNP05PxT3UZBkU3z
+         e74LSnU7/oI1f5c1RLw/+qeLdWxc2FNjmaaSkSA1uhPSTzRK+bVrvGvhaHqGk3R6r8CB
+         vBew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727117217; x=1727722017;
+        d=1e100.net; s=20230601; t=1727118028; x=1727722828;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=o9SxBKtVnKUNRcU2l8i9+tr7LGseNTvA1HmjIgiJZ6c=;
-        b=av4mPrRFkeTI3DQ5lQYBScli7T743RAwVKXn2PyheX7x6Dhe49qBfIpWxh3QygFHTt
-         z3dpbDge7Wj50eTUpvVv2UbNSrwduRmZ5LEjidHQ/EmdGDLDK+EHC8aWTZNx8QQF/LtB
-         KQ3d4jLbeXLhcs/e63yt8Ghf/rg8v5PLfVyU+NBLlov5IMxSICOhBebJvoUPAsvsoc9y
-         Om+SulSVszfcu94dJ8PuyPLSwCboo/yX9/kQeB9x0IqCecXuUwK5KhEccrkWKPAf8PeF
-         hgL2EDxoWIIk0dxof0DnfVbLxLmBMytZY3/U3iWeG4Aw4DgcTrZhGg39WXenHpBJf+LB
-         48LQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUtuO5Qaq4TEk5/uUoYpRv+y2l/M3UgQhtXpkfm9b4IqK3RpIQ56yhjyGb6jDvIaly3ijjDaOQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuSfd+QFaZUtaWxGj0NgckMCaXgUGzChWzzuo6awtRwdTHglMB
-	VwMdVGvspunCV+Dxv1tfqz2miepGC4tEDOXDGwFS+U97Pm24B3Hho/6okb2rq1FsOVLOQGBIy7l
-	xR3guxnhzZ5R72rSuFec24AyuqF5GyHkLEA9O
-X-Google-Smtp-Source: AGHT+IEdUO93R9RfshiaEfkPtfC8Xl5uT3xw9/r+1yE0jsL1ViaO/11BK3hy0Now0uX6vpEhuQza2skF49C4GNi/gfc=
-X-Received: by 2002:a05:6512:1293:b0:535:82eb:21d1 with SMTP id
- 2adb3069b0e04-536ac34094fmr5590163e87.57.1727117217312; Mon, 23 Sep 2024
- 11:46:57 -0700 (PDT)
+        bh=KAaix+v1Nmt80SgIqm4r/9G89wehkqX0YwhcE1WNplE=;
+        b=v4Dwlnuf6OlKo7l12PCTFfkfZ3vC5AS3QUZ5aoP/Vs8MtkX9JxA2a1uYr+mZ6tEfgE
+         U2WEBFbyE3vW9MUPtUxQxaWc6V9to3dkyTDM35oCy2ryKZ4dzC3b1/3Emma2hBOvR6dz
+         2u4mo9EnkmEGlQFzfUdrhIq+v1IsCSWu+587t1iF4mHRCg5QELHe+7vE1hB0icz5y7km
+         ZY9973PH02Rbdeyq2W+fj8BY/huAl0BEw2zVzitjivJFyTWye1jgwRRUQMRFv0+jbW/x
+         xS9kFNyCPXBick7hWZx1uyYQ2VaouD8Fq5b51zEbSOWbpF3HsTTvsAKgDXHvRQJCz/qs
+         FbAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVs+0Hd9D9O9UCzRWZHTlxg6NCoO037t2lLACluem3kMs6rG4AsmmCQdePUoxZL9M+EizP+LPI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4QxyCEfxCda4JvNyrORBSIsJxSBuPi8yHYPnwpgZwVT91Z6Iq
+	pVyMn6Ciph4huREMtPTIJzkw2XAnOd9+E14HmOs52BDWweHg7PeE/740JevtnBE0kix2sCYbiCU
+	jmFdAuuTAF3pUGZyZ9wJFs+mUsyuFAYf1XOi/
+X-Google-Smtp-Source: AGHT+IG9uvgkc7X2OG17Cu1QPn9Bc8J8r2Ll+iEJKAeFhDcwaXtWGop4ONOS9mnGDNrJ97x0HZLTBiwZCnl8ZD7Wnoc=
+X-Received: by 2002:a05:6402:510b:b0:5be:fa43:8017 with SMTP id
+ 4fb4d7f45d1cf-5c464a3f568mr10793810a12.16.1727118027711; Mon, 23 Sep 2024
+ 12:00:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALrw=nGoSW=M-SApcvkP4cfYwWRj=z7WonKi6fEksWjMZTs81A@mail.gmail.com>
-In-Reply-To: <CALrw=nGoSW=M-SApcvkP4cfYwWRj=z7WonKi6fEksWjMZTs81A@mail.gmail.com>
+References: <20240923170322.535940-1-sahandevs@gmail.com> <CADKFtnS7JRHz1eg8M3V52MAcJUW3bVch2siaoqQSqMPW7ZrfUg@mail.gmail.com>
+ <CANn89i+asgFpSSAxavvLe22TW897VaEdyYzMJ_s0JpH+2_RzUA@mail.gmail.com> <93d71681-1a3e-4802-a95b-4156fa3847fb@gmail.com>
+In-Reply-To: <93d71681-1a3e-4802-a95b-4156fa3847fb@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 23 Sep 2024 20:46:44 +0200
-Message-ID: <CANn89iJRoJQ5XXZxbC4mA=-N2sHyY8QNG-ftyQZT7w3RUw-g6w@mail.gmail.com>
-Subject: Re: wireguard/napi stuck in napi_disable
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: Jason@zx2c4.com, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, wireguard@lists.zx2c4.com, 
-	netdev <netdev@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, jiri@resnulli.us, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>, 
-	kernel-team <kernel-team@cloudflare.com>
+Date: Mon, 23 Sep 2024 21:00:16 +0200
+Message-ID: <CANn89i+PnFohFa3Q0DhcVS129u8NVbtnNkUvgCFRKocgP2Ekrw@mail.gmail.com>
+Subject: Re: [PATCH] net: expose __sock_sendmsg() symbol
+To: Sahand Akbarzadeh <sahandevs@gmail.com>
+Cc: Jordan Rife <jrife@google.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 23, 2024 at 8:23=E2=80=AFPM Ignat Korchagin <ignat@cloudflare.c=
-om> wrote:
+On Mon, Sep 23, 2024 at 8:45=E2=80=AFPM Sahand Akbarzadeh <sahandevs@gmail.=
+com> wrote:
 >
-> Hello,
+> Yes, existing program still need some modification in order to work and
+> are already broken (from kernel 6.8 to master branch) for some time. The =
+issue
+> here is there is no direct probe equivalent one could use to update those=
+ scripts.
 >
-> We run calico on our Kubernetes cluster, which uses Wireguard to
-> encrypt in-cluster traffic [1]. Recently we tried to improve the
-> throughput of the cluster and eliminate some packet drops we=E2=80=99re s=
-eeing
-> by switching on threaded NAPI [2] on these managed Wireguard
-> interfaces. However, our Kubernetes hosts started to lock up once in a
-> while.
+> By adding `__sock_sendmsg`, one could attach based on kernel version or d=
+o something
+> like this:
 >
-> Analyzing one stuck host with drgn we were able to confirm that the
-> code is just waiting in this loop [3] for the NAPI_STATE_SCHED bit to
-> be cleared for the Wireguard peer napi instance, but that never
-> happens for some reason. For context the full state of the stuck napi
-> instance is 0b100110111. What makes things worse - this happens when
-> calico removes a Wireguard peer, which happens while holding the
-> global rtnl_mutex, so all the other tasks requiring that mutex get
-> stuck as well.
+> sudo bpftrace -e 'kprobe:sock_sendmsg,kprobe:__sock_sendmsg {}'
 >
-> Full stacktrace of the =E2=80=9Clooping=E2=80=9D task:
+> which only throws a warning if it can't find the `__sock_sendmsg`
 >
-> #0  context_switch (linux/kernel/sched/core.c:5380:2)
-> #1  __schedule (linux/kernel/sched/core.c:6698:8)
-> #2  schedule (linux/kernel/sched/core.c:6772:3)
-> #3  schedule_hrtimeout_range_clock (linux/kernel/time/hrtimer.c:2311:3)
-> #4  usleep_range_state (linux/kernel/time/timer.c:2363:8)
-> #5  usleep_range (linux/include/linux/delay.h:68:2)
-> #6  napi_disable (linux/net/core/dev.c:6477:4)
-> #7  peer_remove_after_dead (linux/drivers/net/wireguard/peer.c:120:2)
-> #8  set_peer (linux/drivers/net/wireguard/netlink.c:425:3)
-> #9  wg_set_device (linux/drivers/net/wireguard/netlink.c:592:10)
-> #10 genl_family_rcv_msg_doit (linux/net/netlink/genetlink.c:971:8)
-> #11 genl_family_rcv_msg (linux/net/netlink/genetlink.c:1051:10)
-> #12 genl_rcv_msg (linux/net/netlink/genetlink.c:1066:8)
-> #13 netlink_rcv_skb (linux/net/netlink/af_netlink.c:2545:9)
-> #14 genl_rcv (linux/net/netlink/genetlink.c:1075:2)
-> #15 netlink_unicast_kernel (linux/net/netlink/af_netlink.c:1342:3)
-> #16 netlink_unicast (linux/net/netlink/af_netlink.c:1368:10)
-> #17 netlink_sendmsg (linux/net/netlink/af_netlink.c:1910:8)
-> #18 sock_sendmsg_nosec (linux/net/socket.c:730:12)
-> #19 __sock_sendmsg (linux/net/socket.c:745:16)
-> #20 ____sys_sendmsg (linux/net/socket.c:2560:8)
-> #21 ___sys_sendmsg (linux/net/socket.c:2614:8)
-> #22 __sys_sendmsg (linux/net/socket.c:2643:8)
-> #23 do_syscall_x64 (linux/arch/x86/entry/common.c:51:14)
-> #24 do_syscall_64 (linux/arch/x86/entry/common.c:81:7)
-> #25 entry_SYSCALL_64+0x9c/0x184 (linux/arch/x86/entry/entry_64.S:121)
->
-> We have also noticed that a similar issue is observed, when we switch
-> Wireguard threaded NAPI back to off: removing a Wireguard peer task
-> may still spend a considerable amount of time in the above loop (and
-> hold rtnl_mutex), however the host eventually recovers from this
-> state.
->
-> So the questions are:
-> 1. Any ideas why NAPI_STATE_SCHED bit never gets cleared for the
-> threaded NAPI case in Wireguard?
-> 2. Is it generally a good idea for Wireguard to loop for an
-> indeterminate amount of time, while holding the rtnl_mutex? Or can it
-> be refactored?
->
-> We have observed the problem on Linux 6.6.47 and 6.6.48. We did try to
-> downgrade the kernel a couple of patch revisions, but it did not help
-> and our logs indicate that at least the non-threaded prolonged holding
-> of the rtnl_mutex is happening for a while now.
->
-> [1]: https://docs.tigera.io/calico/latest/network-policy/encrypt-cluster-=
-pod-traffic
-> [2]: https://docs.kernel.org/networking/napi.html#threaded
-> [3]: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tre=
-e/net/core/dev.c?h=3Dv6.6.48#n6476
+> - Sahand
 
-Somehow wireguard continuously feeds packets without checking it
-should not (IFF_UP or some other bit)
+Convention on netdev mailing list is to not top post.
 
-napi_schedule() detects NAPIF_STATE_DISABLE, and
-napi_disable_pending() is also used
-from __napi_poll() to avoid adding back the napi if the whole budget
-was consumed.
+Removing the static is not enough, a compiler and linker can
+completely inline / delete this function.
 
-Not sure, more debugging might be needed.
+Anyway, I do not think sock_sendmsg() was part of any ABI.
+
+If it was ABI, we would have to reinstate sock_sendmsg(), not making
+__sock_sendmsg() visible.
 
