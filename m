@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-129295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C122F97EBB2
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:49:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33A1297EBB6
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:51:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B967F1C20D5F
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 12:49:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62BBF1C20F2D
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 12:51:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D88196C86;
-	Mon, 23 Sep 2024 12:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835FE197A7F;
+	Mon, 23 Sep 2024 12:51:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="HJsPzt3V"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="XVyThmct"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A039D38DF9
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 12:48:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4216019755E
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 12:51:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727095741; cv=none; b=oyo7LiN4zylwUQqrSvqa+1Nl07frQfcpbZAIvqqSpupKQ8DqqZlhxQN8zpWnJZZi3qDGJufv+0yufdNAFqZQW97UL1A0VWv35mHyRfjyetG9JZQ+6oIUKSxKNdXqlJqxs+WyfzHLdfS2kph8QDw8LL5TADmcJeWWnrqSVmytack=
+	t=1727095900; cv=none; b=QHYZCR2bitQThZ+txiUy+Q5giy2C1ea5jL3nykXe9/tVg/93Awifzu6tZSh6eFFJBvlIVGHyKzqjB3Vsp3x8qoENNhIm8ktP5nPPnntIodg6bjvq3kJ+pal6Jb6arzmW/rG0dwqjiZvAzYDuJbWg9cTNp+YPQZzI5sALA2HudCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727095741; c=relaxed/simple;
-	bh=oyx7qHNoZeOSskUiKCizhdlbSaTUHs85p8cqDl/yy5o=;
+	s=arc-20240116; t=1727095900; c=relaxed/simple;
+	bh=tkzEugAXyfx/FJo3iGs/diZSVUkc1Pnx6ncCdeSF/qc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CPQwfHUZrYScTHY0L6iwIiBLDM0DWh6tSsnwZVHjpvI1Fn398muyDOhgV903xxhL+aDcb9E9kp+LzjEE+z9VejpwdLLpNmqD26hrwAS3S+a5jen5I1pZZMBcTx9O/4PchU8p30NSb7sYu57gNSMp8036JpwBw9iHYsnXSyjYceQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=HJsPzt3V; arc=none smtp.client-ip=209.85.221.50
+	 In-Reply-To:Content-Type; b=SgNyuJpqahnG6/y18oUFG7syu7ul755A2ewjLDV+Pjf9Sa7/w5jBuKI9aM+SWk2ATiv0UgxjxGkDPjmqNLrk+IxzGSUOwum3pNzMJQCgA7tRbixkSGMJ+lcK+2NnwJJTZ7mj/WeC3d9DVIbJJfLKu7ni49CMjrbStqByemHxlp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=XVyThmct; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-374c4c6cb29so4297541f8f.3
-        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 05:48:58 -0700 (PDT)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-374c3eef39eso2755662f8f.0
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 05:51:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1727095737; x=1727700537; darn=vger.kernel.org;
+        d=openvpn.net; s=google; t=1727095896; x=1727700696; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=EOxzSZs59Nzwv1O1EjkhrAB+iir4+L/w8mJk/itG6uo=;
-        b=HJsPzt3VmOgy8ANPsZaLny715U7JnZ4wKzTrPFw/TUE771sYOR6CiP0FQJHfgHtavi
-         x14CeTiOgMUUJv3x86NiQOvnxzXAenk9RAIyFxzYBabG1dM1dg2fa+yKnqZr6DGeDfR9
-         LromQJ2nJ4R8sLBsYpE8I2x+Cu5z3JLDb9bQVjShfRYOLfheUrwBPLaM4Qoh+LCvoVrQ
-         h5Gv+7BQcFe1zwW1T8ko/uicJe2o9hRKC6ipYz8BqQwi/fJiETltqtES4kTW2wdGu/ln
-         t+o06x7ALteB73xgDs2pIJ7b+IffOHnp29bMfSKRUcNHYIdoONVRX2F9qFL/jkxS+xej
-         HbzQ==
+        bh=ybSgKG2dnasSS05vAvz232MWRc/EvjGFbNpMoctKcYY=;
+        b=XVyThmct6oOWjBco2s7A52ebG9zQhCXepQBNBcnt2aACic9gpzTq1LzI4PRQGf+2A7
+         bM+mDHp61gTm+NiCZ7ngCrOuUe+3rO/i/IzZSJmYcqIKRWW7UmU1yGIBwBC6PCr1xcYA
+         LaTsdfMcaYcuzB1iDs6lTdO8bJqpNvjaf3bk+br1rTjjDvYwObMQuQnpdAAmOpAMXqBY
+         EnN7mJcfkk6Uak8gTchaIyweVRb138SAVkvzlczkCqJci5HSRdr1ZwvqeGPpmMohtI0l
+         LsZYqlB89s/yKds2JkzGgHfio1JPcqHS3gnA2GFx+NtIgnoYdA0gvIleCfHBNNJNrfvj
+         fV1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727095737; x=1727700537;
+        d=1e100.net; s=20230601; t=1727095896; x=1727700696;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EOxzSZs59Nzwv1O1EjkhrAB+iir4+L/w8mJk/itG6uo=;
-        b=jYqFq8bY0SOX09kVeQF/LlGHPpex8ocYSg6ctQk6GrKFgYOq3ecIKZbXsdCkMRPom1
-         bFtt815FzC9q1uGa36h1l2weXfAAlyRftuWvYID41h5iR8d5L6GXqeVgcyQKwcdt/+hf
-         NeWMlJz3TXqaJe+qL1fxNzdUeca+XohjlE4tXEjozHNRJY/8s9qhhnT4wEVzfkcPA5Xg
-         i3IAvurjXsksnuU5IQUBQNvvdpM88IsCFxv6SOQeoGVwTZZgozDzpsj3Irf+ESal2/WD
-         Y/0CPbtVp8dkJQzphzXrpypPFxsLOPD844wXozGHEx68HvEqppz8XRWxe/BPIWglQlxz
-         FEyw==
-X-Gm-Message-State: AOJu0Yw16agX92KHikc2ptMKORjuXqimbVmkjYPqJ8ZzKUMtTUwLKNLj
-	Tyw5qLZJLXLz5x44p36E5DYQqv7fGDd9JLANY+2FkcQwqLwikQy8DofNk3sL24k=
-X-Google-Smtp-Source: AGHT+IFZoi6kAs9VZOOhHAQMw21APCmvTbP3/ppkAYHBNtfphG13V8vUG/3onRk1VATKHmpKrgMHvA==
-X-Received: by 2002:adf:e8c6:0:b0:374:c69b:5a24 with SMTP id ffacd0b85a97d-37a4238c819mr9612997f8f.51.1727095736825;
-        Mon, 23 Sep 2024 05:48:56 -0700 (PDT)
+        bh=ybSgKG2dnasSS05vAvz232MWRc/EvjGFbNpMoctKcYY=;
+        b=TJSkwYWCmFLERukgRAo/+McTxuiU/M6ZKSDXS0uumn/ijWK2kQiENQjE0wZNcq8Wzk
+         5mAmFb0MtoC9WR2XjsAcLa8LgeojsHJrqp9bFtZu9AzblvtI+veZm1HyEjwNaDMG8RBz
+         nlchr017jChuqF+3J+YCM6VVhmsu8REksKPpy7Fvxe8jKyxhpcM8HQm0pBCksCSnvj5w
+         8flmDMALA9lskbLYD/i6eCAn1b9gqOH71czo+Ws45alT/hqHLpgeGXrEvVf0mNNJenlW
+         hUN4S7/twFnc6Weu+6XM2MlfjJAhSYddCFIyWMesEJOu08YgRSwX0nmlCgS04V75Zwoo
+         emHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUBqg73OuOSaybKCrydM6TxiOT7Akv0WSNGSNyz0ARnfwmPoXKGTeq+F0J41u9yxxfH0nxGouQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvK52TBL89GXHeEyR7JJjaQpG+JajtZyF+bdPiktJLLZ1Rh6wR
+	7H0Yl2sFZguqqcOpFQ0sEYitUj8c5T9w6BK+Rjlm9W+bQ3URrbIQBpvubavO0rY=
+X-Google-Smtp-Source: AGHT+IFGH2Y8tAiZJbC43mENzWURzUCLqpzLHaKKLlVHtZ8MqpaFhQi5WFvjEe92STyx3YQV/bMwfw==
+X-Received: by 2002:adf:ed0a:0:b0:374:c8e5:d568 with SMTP id ffacd0b85a97d-37a422bf206mr6039818f8f.29.1727095896383;
+        Mon, 23 Sep 2024 05:51:36 -0700 (PDT)
 Received: from ?IPV6:2001:67c:2fbc:1:8a3e:77dd:5f67:bbfc? ([2001:67c:2fbc:1:8a3e:77dd:5f67:bbfc])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37a47c1e18asm7049551f8f.55.2024.09.23.05.48.55
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e7800152sm24509706f8f.74.2024.09.23.05.51.35
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Sep 2024 05:48:56 -0700 (PDT)
-Message-ID: <e682cf5c-f94d-4200-a747-bb249f85bf41@openvpn.net>
-Date: Mon, 23 Sep 2024 14:48:57 +0200
+        Mon, 23 Sep 2024 05:51:35 -0700 (PDT)
+Message-ID: <0c5daaf7-24b3-42ed-935e-05dd7d69edd9@openvpn.net>
+Date: Mon, 23 Sep 2024 14:51:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,18 +77,17 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 12/25] ovpn: implement packet processing
+Subject: Re: [PATCH net-next v7 03/25] net: introduce OpenVPN Data Channel
+ Offload (ovpn)
 To: Sergey Ryazanov <ryazanov.s.a@gmail.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew@lunn.ch
-References: <20240827120805.13681-1-antonio@openvpn.net>
- <20240827120805.13681-13-antonio@openvpn.net> <ZtXOw-NcL9lvwWa8@hog>
- <ae23ac0f-2ff9-4396-9033-617dc60221eb@openvpn.net> <Zth2Trqbn73QDnLn@hog>
- <9ab97386-b83d-484e-8e6d-9f67a325669d@openvpn.net> <ZuBD7TWOQ7huO7_7@hog>
- <af164160-6402-45f9-8ef3-d5a3ffd43452@openvpn.net> <ZuGbZTinqmoBsc6C@hog>
- <1f17e2c5-c844-44a4-8970-64618c6295fb@openvpn.net>
- <f1ba8d14-d157-48d1-8bd2-2dea6e1ecd40@gmail.com>
+ Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: andrew@lunn.ch, antony.antony@secunet.com, edumazet@google.com,
+ kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ sd@queasysnail.net, steffen.klassert@secunet.com
+References: <a10dcebf-b8f1-4d9b-b417-cca7d0330e52@openvpn.net>
+ <20240920093234.15620-1-kuniyu@amazon.com>
+ <02420241-98a9-47dc-97a7-d3c1fad76573@openvpn.net>
+ <cbd97c96-4972-4b4d-a5a5-d43968c1a2d0@gmail.com>
 Content-Language: en-US
 From: Antonio Quartulli <antonio@openvpn.net>
 Autocrypt: addr=antonio@openvpn.net; keydata=
@@ -130,262 +130,113 @@ Autocrypt: addr=antonio@openvpn.net; keydata=
  BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
  +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
 Organization: OpenVPN Inc.
-In-Reply-To: <f1ba8d14-d157-48d1-8bd2-2dea6e1ecd40@gmail.com>
+In-Reply-To: <cbd97c96-4972-4b4d-a5a5-d43968c1a2d0@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Hi,
-
-On 22/09/2024 21:51, Sergey Ryazanov wrote:
-> Hello Antonio, Sabrina,
+On 22/09/2024 22:51, Sergey Ryazanov wrote:
+> Hello Antonio, Kuniyuki,
 > 
-> let me join the key management design discussion and put my 2 cents in. 
-> Please find my comment below.
-> 
-> On 12.09.2024 11:33, Antonio Quartulli wrote:
->> On 11/09/2024 15:30, Sabrina Dubroca wrote:
->>> 2024-09-11, 14:52:10 +0200, Antonio Quartulli wrote:
->>>> On 10/09/2024 15:04, Sabrina Dubroca wrote:
->>>>> 2024-09-06, 15:19:08 +0200, Antonio Quartulli wrote:
->>>>>> Therefore, how about having an array large enough to store all key 
->>>>>> IDs (max
->>>>>> ID is 7):
->>>>>
->>>>> Right, I forgot about that. For 8 keys, sure, array sounds ok. MACsec
->>>>> has only 4 and I also implemented it as an array
->>>>> (include/net/macsec.h: macsec_{tx,rx}_sc, sa array).
->>>>
->>>> thanks for the pointer!
->>>>
->>>>>
->>>>>> * array index is the key ID (fast lookup on RX);
->>>>>> * upon SET_KEY we store the provided keys and erase the rest;
->>>>>
->>>>> I'm not sure about erasing the rest. If you're installing the
->>>>> secondary ("next primary") key, you can't just erase the current
->>>>> primary? ("erase the rest" also means you'd only ever have one key in
->>>>> the array, which contradicts your last item in this list)
->>>> Yeah, my point is wrong.
->>>> I fooled myself assuming SET_KEY would install two keys each time, 
->>>> but this
->>>> is not the case, so we can't "erase everything else".
->>>>
->>>> What we can do is:
->>>> * if SET_KEY wants to install a key in PRIMARY, then we erase the 
->>>> key marked
->>>> as "primary" and we mark the new one as such
->>>> * if SET_KEY wants to install a key in SECONDARY, then we erase the key
->>>> without any mark.
->>>
->>> Ok, then the DEL_KEY op would not really be needed.
+> On 20.09.2024 12:46, Antonio Quartulli wrote:
+>> Hi,
 >>
->> It would be needed only when we want to kick an old key without 
->> installing a new one.
->> IMHO something that should not truly happen during the normal 
->> lifecycle of a peer, but there might be some corner cases where 
->> userspace may still want to do that (I am checking userspace to 
->> understand when this can truly happen, if at all)
+>> On 20/09/2024 11:32, Kuniyuki Iwashima wrote:
+>>> From: Antonio Quartulli <antonio@openvpn.net>
+>>> Date: Thu, 19 Sep 2024 13:57:51 +0200
+>>>> Hi Kuniyuki and thank you for chiming in.
+>>>>
+>>>> On 19/09/2024 07:52, Kuniyuki Iwashima wrote:
+>>>>> From: Antonio Quartulli <antonio@openvpn.net>
+>>>>> Date: Tue, 17 Sep 2024 03:07:12 +0200
+>>>>>> +/* we register with rtnl to let core know that ovpn is a virtual 
+>>>>>> driver and
+>>>>>> + * therefore ifaces should be destroyed when exiting a netns
+>>>>>> + */
+>>>>>> +static struct rtnl_link_ops ovpn_link_ops = {
+>>>>>> +};
+>>>>>
+>>>>> This looks like abusing rtnl_link_ops.
+>>>>
+>>>> In some way, the inspiration came from
+>>>> 5b9e7e160795 ("openvswitch: introduce rtnl ops stub")
+>>>>
+>>>> [which just reminded me that I wanted to fill the .kind field, but I
+>>>> forgot to do so]
+>>>>
+>>>> The reason for taking this approach was to avoid handling the iface
+>>>> destruction upon netns exit inside the driver, when the core already 
+>>>> has
+>>>> all the code for taking care of this for us.
+>>>>
+>>>> Originally I implemented pernet_operations.pre_exit, but Sabrina
+>>>> suggested that letting the core handle the destruction was cleaner (and
+>>>> I agreed).
+>>>>
+>>>> However, after I removed the pre_exit implementation, we realized that
+>>>> default_device_exit_batch/default_device_exit_net thought that an ovpn
+>>>> device is a real NIC and was moving it to the global netns rather than
+>>>> killing it.
+>>>>
+>>>> One way to fix the above was to register rtnl_link_ops with 
+>>>> netns_fund =
+>>>> false (so the ops object you see in this patch is not truly "empty").
+>>>>
+>>>> However, I then hit the bug which required patch 2 to get fixed.
+>>>>
+>>>> Does it make sense to you?
+>>>> Or you still think this is an rtnl_link_ops abuse?
+>>>
+>>> The use of .kind makes sense, and the change should be in this patch.
 >>
->>>
->>>>
->>>> This way we simulate writing into slots.
->>>>
->>>>>
->>>>>> * upon SET_KEY we store in a new field the index/ID of the PRIMARY 
->>>>>> (fast
->>>>>> lookup on TX), namely primary_id;
->>>>
->>>> FTR: this is what "marking as primary" means
->>>>
->>>>>> * upon SWAP we just save in primary_id the "other" index/ID;
->>>>>
->>>>> I'm confused by these two. Both SET_KEY and SWAP modify the 
->>>>> primary_id?
->>>>
->>>> Yes.
->>>> SET_KEY may want to install a key in the primary slot: in that case 
->>>> the new
->>>> key has to be marked as primary immediately.
->>>> This normally happens only upon first SET_KEY after connection, when no
->>>> other key exists.
->>>>
->>>> SWAP will switch primary_id to the other key ID.
->>>>
->>>> makes sense?
->>>
->>> Yes, thanks, that fixes up all my confusion around setting primary_id.
->>>
->>>>>> * at any given time we will have only two keys in the array.
->>>>>
->>>>> This needs to be enforced in the SET_KEY implementation, otherwise
->>>>> SWAP will have inconsistent effects.
->>>>
->>>> yap. I hope what I wrote above about SET_KEY helps clarifying this 
->>>> part.
->>>>
->>>>>
->>>>>
->>>>>> It's pretty much like your option 1 and 2, but using an array
->>>>>> indexed by key ID.
->>>>>
->>>>> Are you decoupling TX and RX keys (so that they can be installed
->>>>> independently) in this proposal? I can't really tell, the array could
->>>>> be key pairs or separate.
->>>>
->>>> I would not decouple TX and RX keys.
->>>> Each array item should be the same as what we are now storing into 
->>>> each slot
->>>> (struct ovpn_crypto_key_slot *).
->>>> I could use two arrays, instead of an array of slots, but that means
->>>> changing way more logic and I don't see the benefit.
->>>
->>> Avoid changing both keys every time when a link has very asymmetric
->>> traffic. And the concept of a primary/secondary key makes no sense on
->>> receive, all you need is keyids, and there's no need to swap slots,
->>> which avoids the "key not available during SWAP" issue
->>> entirely. Primary key only makes sense on TX.
->>>
->>> But I'm guessing the keypair concept is also baked deep into openvpn.
->>
->> Correct. Both keys are recomputed upon each renegotiation, even if one 
->> key was still usable.
+>> Ok, will add it here and I will also add an explicit .netns_fund = 
+>> false to highlight the fact that we need this attribute to avoid 
+>> moving the iface to the global netns.
 >>
 >>>
->>>
->>>>>> The concept of slot is a bit lost, but it is not important as long 
->>>>>> as we can
->>>>>> keep the API and its semantics the same.
->>>>>
->>>>> Would it be a problem for userspace to keep track of key IDs, and use
->>>>> that (instead of slots) to communicate with the kernel? Make
->>>>> setkey/delkey be based on keyid, and replace swap with a set_tx
->>>>> operation which updates the current keyid for TX. That would seem like
->>>>> a better API, especially for the per-ID array you're proposing
->>>>> here. The concept of slots would be almost completely lost (only
->>>>> "current tx key" is left, which is similar to the "primary slot").
->>>>> (it becomes almost identical to the way MACsec does things, except
->>>>> possibly that in MACsec the TX and RX keys are not paired at all, so
->>>>> you can install/delete a TX key without touching any RX key)
->>>>>
->>>>
->>>> unfortunately changing userspace that way is not currently viable.
->>>> There are more components (and documentation) that attach to this slot
->>>> abstraction.
->>>
->>> I thought that might be the case. Too bad, it means we have to keep
->>> the slots API and the kernel will be stuck with it forever (even if
->>> some day userspace can manage key ids instead of slots).
+>>> For the patch 2 and dellink(), is the device not expected to be removed
+>>> by ip link del ?  Setting unregister_netdevice_queue() to dellink() will
+>>> support RTM_DELLINK, but otherwise -EOPNOTSUPP is returned.
 >>
->> Yap, but I think there won't be any change like that in the near future.
+>> For the time being I decided that it would make sense to add and 
+>> delete ovpn interfaces via netlink API only.
+>>
+>> But there are already discussions about implementing the RTNL 
+>> add/dellink() too.
+>> Therefore I think it makes sense to set dellink to 
+>> unregister_netdevice_queue() in this patch and thus avoid patch 2 at all.
 > 
-> As far as I understand the conclusion of the discussion, the best 
-> practice for the keys management is to keep keys discrete including the 
-> Tx/Rx keys separation. On the other hand, from the OpenVPN protocol 
-> perspective, keys are grouped into slots and peers perform so called key 
-> slots swapping.
+> I should make a confession :) It was me who proposed and pushed the idea 
+> of the RTNL ops removing. I was too concerned about uselessness of 
+> addlink operation so I did not clearly mention that dellink is useful 
+> operation. Especially when it comes to namespace destruction. My bad.
+
+It helped getting where we are now :)
+
 > 
-> As I can see, we have two options to adjust userspace application and 
-> kernel to each other:
-> 1) implement "key slots" abstraction in Netlink API to keep kernel 
-> interface similar to the current OpenVPN protocol;
-> 2) implement "discrete" keys management via Netlink API and move "slots" 
-> abstraction to the userspace application.
-> 
-> Sabrina already mentioned that kernel will stuck with the slots 
-> abstraction forever. This is due to the rule that user's API should not 
-> be changed.
-> 
-> Antonio, can we consider implementing the slot abstraction in the 
-> userspace application? It will move complexity from the kernel to the 
-> userspace, where it can be easy debugged and maintained.
-> 
-> And since the keys management is part of the control plane. Keeping 
-> abstraction closer to the control plane implementation will allow any 
-> protocol modification, while keeping the kernel forward compatible.
+> So yeah, providing the dellink operation make sense for namespace 
+> destruction handling and for user to manually cleanup reminding network 
+> interfaces after a forceful user application killing or crash.
 
-Thanks for chiming in!
+For this specific case (i.e. crash) I am planning to add a netlink 
+notifier that detects when the process having created the interface goes 
+away and then kill the interface from within the kernel.
 
-Right now the implementation is already pretty simple IMHO, there is not 
-much complexity to move to userspace.
-And that's because ovpn in kernelspace "thinks" in terms of slots like 
-userspace.
+This way we have some sort of self cleanup and avoid leaving the system 
+in a bogus state. (For those specific use cases where you want to create 
+a "persistent" interface, I think we will provide a flag. But this is 
+for a later patch..)
 
-If we want to go with a different approach, we have to add the 
-"complexity" of converting abstraction from slots to anything being 
-proposed here.
-
-I presume you're advocating about moving from slots to key IDs (and 
-separate keys for TX and RX)?
-
-How do you see it working in detail?
-I.e. how many keys should we store and when should we purge them?
-(right now we just keep 2 pair of keys - aka slots - and the lifecycle 
-is simply done)
-And why do you think it is simpler?
-
-One more advantage I see about using slots is that it's easy to match 
-the user and kernel space states: at any point in time userspace can say 
-"these are the pairs I have in my two slots" and kernelspace will just 
-mirror that, without having to care about old IDs.
-
-Don't you think this approach is already pretty simple and less error 
-prone with respect to going through an abstraction conversion?
-
-Thanks!
 
 Cheers,
 
 > 
->>>> Hence my proposal to keep the API the same, but rework the internal for
->>>> better implementation.
->>>
->>> Yeah, that makes sense if you have that constraint imposed by the
->>> existing userspace.
->>>
->>>>
->>>>>
->>>>> Maybe you can also rework the current code to look a bit like this
->>>>> array-based proposal, and not give up the notion of slots, if that's
->>>>> something strongly built into the core of openvpn:
->>>>>
->>>>> - primary/secondary in ovpn_crypto_state become slots[2]
->>>>> - add a one-bit "primary" reference, used to look into the slots array
->>>>> - swap just flips that "primary" bit
->>>>> - TX uses slots[primary]
->>>>> - RX keeps inspecting both slots (now slot[0] and slot[1] instead of
->>>>>     primary/secondary) looking for the correct keyid
->>>>> - setkey/delkey still operate on primary/secondary, but need to figure
->>>>>     out whether slot[0] or slot[1] is primary/secondary based on
->>>>>     ->primary
->>>>>
->>>>> It's almost identical to the current code (and API), except you don't
->>>>> need to reassign any pointers to swap keys, so it should avoid the
->>>>> rekey issue.
->>>>
->>>> This approach sounds very close to what I was aiming for, but simpler
->>>> because we have slots[2] instead of slots[8] (which means that 
->>>> primary_id
->>>> can be just 'one-bit').
->>>
->>> Yes.
->>>
->>>> The only downside is that upon RX we have to check both keys.
->>>> However I don't think this is an issue as we have just 2 keys at most.
->>>>
->>>> I could even optimize the lookup by starting always from the primary 
->>>> key, as
->>>> that's the one being used most of the time by the sender.
->>>
->>> Nice.
->>>
->>>> Ok, I will go with this approach you summarized here at the end.
->>>
->>> Ok. I think it should be a pretty minimal set of changes on top of the
->>> existing code, especially if you hide the primary/secondary accesses
->>> in inline helpers.
->>
->> I think so to - working on it.
+>>>> The alternative was to change
+>>>> default_device_exit_batch/default_device_exit_net to read some new
+>>>> netdevice flag which would tell if the interface should be killed or
+>>>> moved to global upon netns exit.
 > 
+> -- 
+> Sergey
 
 -- 
 Antonio Quartulli
