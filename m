@@ -1,211 +1,176 @@
-Return-Path: <netdev+bounces-129385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCC30982606
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 23:14:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0787798390C
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 23:22:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B23611C20E8A
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 21:14:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 293951C20E07
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 21:22:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6303E824A1;
-	Mon, 23 Sep 2024 21:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B94E839EB;
+	Mon, 23 Sep 2024 21:22:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SmYslcXY"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="UhZWKx+7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE68177103;
-	Mon, 23 Sep 2024 21:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE22E43AA4
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 21:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727126041; cv=none; b=A/4TTymljYqNH9ylWiIqiOQYdMsz3mBWB9PU12bAWbBgavq6ooycsv2bs2fHxJfMT6FUdtg3Qv9RToifzVdq1p8Q3St2fvbKjdABsclYgNxyWfX5nPU7n8Y1HVVpfy4btxOfeW80x8ZKA8MxsoPfgLop91WzIBdFj993aNnoAWI=
+	t=1727126551; cv=none; b=KCo9r/qgsqGB61UC2RYcVb91Q5q76jhPiJtoV+jsEGiBxrnQ+QF1l09V2sFKcnXy2EzpiroM1NUAXcq/xIglodwyQZ7JwTE4BbEn3ubfaJDN2BETnQFVPmwThqYRCrTN9JKYrUB3pEb14/paRMdjb6xMgxbF+snWOBWdMHnROO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727126041; c=relaxed/simple;
-	bh=MiwbVUI+875lhjAtIuwhzEJNCWQ4HTqGbr0KOUhu2xo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=NjVUASYSkbV7dewkIGeMZm/+9RIRq1wijEk9Iaz/47Ih2mKHKfw3Itoxz5X5b5n0LGoqr82ShTgY+Q5Hp/Bn7uNjhFSpGkyF/s9VaPN7zit18ZZGBAeterVLE0AkFrHzysNTXpfTh8AxXMUiiFYztZqsZTNGkfuu3GzHoqg4AV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SmYslcXY; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7b0c9bbddb4so3251907a12.3;
-        Mon, 23 Sep 2024 14:13:59 -0700 (PDT)
+	s=arc-20240116; t=1727126551; c=relaxed/simple;
+	bh=TI4UgBvUHxOCfeXggK9U9HOkmwYk1b6eVpu5+BTF+Hc=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=QzLh/MEWE4pyIUqRtxXFG8eHDUdH7+8tAxIDRnvKWRPwQtpcdSd0U+knD6UL3LqJQA8dR77yYShbfNptGpwiYrmjzlSvDsUY7S1b04NffAetVsila7McRCets6CfUqK9mdCAfW+CQ2zalKjIIWyPaIJPSX2NrYXpFkb5qNpvB3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=UhZWKx+7; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-71798a15ce5so4074797b3a.0
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 14:22:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727126039; x=1727730839; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pO/6d/gDXXUTcDXUJlrlfTdrh2B/Xbl+JiNfLlhN/5M=;
-        b=SmYslcXY71Rd5TrLk8BA92Y9QH7Ylhf9PtQPkLgMUV6TO7o4jSY+jguiUPbujUOrOr
-         kf8xkuenwApVZiDjlcf8UH98HRDMZIzDp2iolzoQdBdv0XtY7q9wtdxjDXiXen4raOPA
-         pjUSW1d1x6sVGfqgRu5OnlSZRdc2TJgYMna9xUft/ILH6IBTIjoclH9ImbMHa5b0OoFg
-         HP4usBXVYBmiaZnpTxXgmYcw+CyARCy63v+K9POogu+MbRKDnjLFUsExI5erUvktopHU
-         3AKbVe13LhNXAWNGSUxfJT1TnoIoVAewcFVaHyzR2G6Ho7mLiMSqHx3cGGJ0H0WOJW/X
-         LXQg==
+        d=purestorage.com; s=google2022; t=1727126548; x=1727731348; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8eV4Vklmlj8bqBkSf+z2gjD9tas8DcH2sV0AiX6LOJs=;
+        b=UhZWKx+7O8Ifr0Z2oPxbOpORjn5I2J/kHYjUbFBk3XbYnG0FI1p+smKJHQKD0S52iB
+         7GJM3/zZHsBZhvXsYDQsvFSonMJWin9nzLwBj5TqzdgrlILj/dR99CK7AVbmPSJM+M4O
+         theyonqtF4l8GMLPwb569qSa+bjW+ViONlVJSJ44fvjvXpE867exj/+32CyAJJFhn6kO
+         qZASgU2gSB9q+SRBHnqMEuvZMNsGRLlxcUX1EetlvjcCF9k8GyeOsTFZanvhcM8W2eUL
+         J7QwAlOg/O3EuH2ri8V3BWx/jbvTtCJrMDoL/DC3JXi1DceBUI4vHtO2bRwVm3iSRYnN
+         Q9RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727126039; x=1727730839;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pO/6d/gDXXUTcDXUJlrlfTdrh2B/Xbl+JiNfLlhN/5M=;
-        b=duz2ow9434WRRXd2NCjXu2O2e9CGcYu5dBIwJmjlMxsZZXPwQ3cN15RirHgmhYACLb
-         R4OWQ6SOnLX+L6dos04IpN1KY51avgw00KMOqfnxJ5QeLrNkU0TThTNvnPzzT8bg/XEd
-         5laodE1QpKb2fNVoZ1wzhPVKVdnXepat1Fta2EKaK2ORRXQ6OlOzcbFm3fyLdA5xKkZO
-         1OlJyMd+FuNjaK3QLM2YzFICbhQpSdYPmwOw53fd7YdwpYo92yvC6VOJr+6nE5ozgU7k
-         KQgufS0kjys1OphXID5HCrR2UCsw7mdkwAic9FsffJrFLLaGhvtJxVb9Q9RLweOE7rT9
-         SqDA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBS8c7O9P36YK95p1wiJrsr3BxHMauGfyTAOSy9RW4/ARIS2PhADKBaoY2lhGFmyaHMiCaYdg/@vger.kernel.org, AJvYcCX8/dEPFyiJucLccAp2lAWLVZqSTwctXiF1UkXIGwJDRxVq1yxOHuBdJSy2QglPe5KUOxJCEkNpUiUuJ1E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzvAMh10xn7vo/mf6NcpSOivYJUhLanMSsTFJo+E6VxC8VES9iB
-	M018kuw2jq0v5jIr/BpoGkENTgzjFXI9qXoQGMg1IDf6fogW08qf
-X-Google-Smtp-Source: AGHT+IEAnW7yN6qCtrsyo7BIQtrP3+Vy4EfhwZQvPPu/0xGPuycMmFaz2h8wFToO40DI/Ee+ma6LCQ==
-X-Received: by 2002:a05:6a20:9d8f:b0:1cf:1251:9a47 with SMTP id adf61e73a8af0-1d30a9bcf0amr16966274637.31.1727126038988;
-        Mon, 23 Sep 2024 14:13:58 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71afc9c67d7sm55473b3a.187.2024.09.23.14.13.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Sep 2024 14:13:58 -0700 (PDT)
-Message-ID: <ec046bcf-06ce-4abe-b0ea-b6741c9ff004@gmail.com>
-Date: Mon, 23 Sep 2024 14:13:56 -0700
+        d=1e100.net; s=20230601; t=1727126548; x=1727731348;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8eV4Vklmlj8bqBkSf+z2gjD9tas8DcH2sV0AiX6LOJs=;
+        b=cI7fueyNL41AoSbEQ07sFMZNXryZ/BlZRY+B6erUD3TTUQtxxwqUjI1/52FRC98+ni
+         +gGhmImdArtV4gOXw1MJqvhdmi2gD/ZlrICWTKrOBlgjyPfJDo5sGEUO54h0q4I/XI2g
+         0LTSs9AtsR0bC7jL1oyzitQsyo3n7FLtoggKqRqAWLXBri/lLTKlLk6R/CSnXeALskwQ
+         BPCJPqLd1wWDsE3j1xF164giyVN+qKRFm7WeYYSXBQoiZmPaRbiO4oFO0a1QSmtjC5gz
+         Sl2hnTX80JH4INdrQPC/XNidzRlR3clUKkokhwLbNy4w1cCAdrCrICuG8LD8I7792SEH
+         RMXA==
+X-Forwarded-Encrypted: i=1; AJvYcCURrS0MGZR5Ym7N5hjgpdLhd6VV7+SjQZq1ePTkdzvq8/8JXaDdap6A8S/kN0Hsp7msX6HzJd8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG9Et0CbKEDkvsK+AdYyuBBZtiOPt1hTam9EaPAwWLZ9k8McZ/
+	AJ58+zXDYIw9MYzsVo5Nd7/vm5OryqjPpA0Yq3U9+TTIv5Xl+aBQUNYwI+JRDAU=
+X-Google-Smtp-Source: AGHT+IHyxfMvPUsr9LZzOLYIagUPDr6zEE6tUUXhw4z3fyt80Nvtp1XMDHbKB4CNrD3CfGDt7Umkbw==
+X-Received: by 2002:a05:6a21:1346:b0:1d2:e8f6:7f3 with SMTP id adf61e73a8af0-1d343c5645amr1626287637.11.1727126547871;
+        Mon, 23 Sep 2024 14:22:27 -0700 (PDT)
+Received: from dev-mkhalfella2.dev.purestorage.com ([208.88.159.129])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-71afc847924sm66047b3a.58.2024.09.23.14.22.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 14:22:27 -0700 (PDT)
+From: Mohamed Khalfella <mkhalfella@purestorage.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yuanyuan Zhong <yzhong@purestorage.com>,
+	Jeff Garzik <jgarzik@redhat.com>,
+	Auke Kok <auke-jan.h.kok@intel.com>,
+	Mohamed Khalfella <mkhalfella@purestorage.com>,
+	Simon Horman <horms@kernel.org>,
+	Ying Hsu <yinghsu@chromium.org>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] igb: Do not bring the device up after non-fatal error
+Date: Mon, 23 Sep 2024 15:22:12 -0600
+Message-Id: <20240923212218.116979-1-mkhalfella@purestorage.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 1/1] net: ethernet: lantiq_etop: fix memory
- disclosure
-To: Aleksander Jan Bajkowski <olek2@wp.pl>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- jacob.e.keller@intel.com, andrew@lunn.ch, horms@kernel.org,
- john@phrozen.org, ralph.hempel@lantiq.com, ralf@linux-mips.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240921105801.14578-1-olek2@wp.pl>
- <20240921105801.14578-2-olek2@wp.pl>
- <0a9830fe-790d-4ccd-bec9-3fbb32f18aa8@gmail.com>
- <991dc2b6-12ef-458d-b37f-562c15a73a07@wp.pl>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <991dc2b6-12ef-458d-b37f-562c15a73a07@wp.pl>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-On 9/23/24 14:08, Aleksander Jan Bajkowski wrote:
-> Hi Florian,
-> 
-> 
-> On 23.09.2024 20:21, Florian Fainelli wrote:
->> On 9/21/24 03:58, Aleksander Jan Bajkowski wrote:
->>> When applying padding, the buffer is not zeroed, which results in memory
->>> disclosure. The mentioned data is observed on the wire. This patch uses
->>> skb_put_padto() to pad Ethernet frames properly. The mentioned function
->>> zeroes the expanded buffer.
->>>
->>> In case the packet cannot be padded it is silently dropped. Statistics
->>> are also not incremented. This driver does not support statistics in the
->>> old 32-bit format or the new 64-bit format. These will be added in the
->>> future. In its current form, the patch should be easily backported to
->>> stable versions.
->>>
->>> Ethernet MACs on Amazon-SE and Danube cannot do padding of the packets
->>> in hardware, so software padding must be applied.
->>>
->>> Fixes: 504d4721ee8e ("MIPS: Lantiq: Add ethernet driver")
->>> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
->>> ---
->>>   drivers/net/ethernet/lantiq_etop.c | 11 ++++++-----
->>>   1 file changed, 6 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/lantiq_etop.c b/drivers/net/ 
->>> ethernet/lantiq_etop.c
->>> index 3c289bfe0a09..36f1e3c93ca5 100644
->>> --- a/drivers/net/ethernet/lantiq_etop.c
->>> +++ b/drivers/net/ethernet/lantiq_etop.c
->>> @@ -477,11 +477,11 @@ ltq_etop_tx(struct sk_buff *skb, struct 
->>> net_device *dev)
->>>       struct ltq_etop_priv *priv = netdev_priv(dev);
->>>       struct ltq_etop_chan *ch = &priv->ch[(queue << 1) | 1];
->>>       struct ltq_dma_desc *desc = &ch->dma.desc_base[ch->dma.desc];
->>> -    int len;
->>>       unsigned long flags;
->>>       u32 byte_offset;
->>>   -    len = skb->len < ETH_ZLEN ? ETH_ZLEN : skb->len;
->>> +    if (skb_put_padto(skb, ETH_ZLEN))
->>> +        return NETDEV_TX_OK;
->>
->> You should consider continuing to use the temporary variable 'len' 
->> here, and just re-assign it after the call to skb_put_padto() and 
->> avoid introducing potential user-after-free near the point where you 
->> program the buffer length into the HW. This also minimizes the amount 
->> of lines to review.
-> 
-> To the best of my knowledge, the skb is not released until the DMA 
-> finishes the transfer.
-> Then the ltq_etop_poll_tx() function is called, which releases the skb. 
-> Can you explain
-> what sequence of events can lead to a use-after-free error?
+Commit 004d25060c78 ("igb: Fix igb_down hung on surprise removal")
+changed igb_io_error_detected() to ignore non-fatal pcie errors in order
+to avoid hung task that can happen when igb_down() is called multiple
+times. This caused an issue when processing transient non-fatal errors.
+igb_io_resume(), which is called after igb_io_error_detected(), assumes
+that device is brought down by igb_io_error_detected() if the interface
+is up. This resulted in panic with stacktrace below.
 
-There is none right now, but assuming you might add byte queue limits in 
-the future, or just re-structure the code, reading from skb->len is 
-error prone and is better left avoided, especially since this will 
-result in few lines being changed in your case.
+[ T3256] igb 0000:09:00.0 haeth0: igb: haeth0 NIC Link is Down
+[  T292] pcieport 0000:00:1c.5: AER: Uncorrected (Non-Fatal) error received: 0000:09:00.0
+[  T292] igb 0000:09:00.0: PCIe Bus Error: severity=Uncorrected (Non-Fatal), type=Transaction Layer, (Requester ID)
+[  T292] igb 0000:09:00.0:   device [8086:1537] error status/mask=00004000/00000000
+[  T292] igb 0000:09:00.0:    [14] CmpltTO [  200.105524,009][  T292] igb 0000:09:00.0: AER:   TLP Header: 00000000 00000000 00000000 00000000
+[  T292] pcieport 0000:00:1c.5: AER: broadcast error_detected message
+[  T292] igb 0000:09:00.0: Non-correctable non-fatal error reported.
+[  T292] pcieport 0000:00:1c.5: AER: broadcast mmio_enabled message
+[  T292] pcieport 0000:00:1c.5: AER: broadcast resume message
+[  T292] ------------[ cut here ]------------
+[  T292] kernel BUG at net/core/dev.c:6539!
+[  T292] invalid opcode: 0000 [#1] PREEMPT SMP
+[  T292] RIP: 0010:napi_enable+0x37/0x40
+[  T292] Call Trace:
+[  T292]  <TASK>
+[  T292]  ? die+0x33/0x90
+[  T292]  ? do_trap+0xdc/0x110
+[  T292]  ? napi_enable+0x37/0x40
+[  T292]  ? do_error_trap+0x70/0xb0
+[  T292]  ? napi_enable+0x37/0x40
+[  T292]  ? napi_enable+0x37/0x40
+[  T292]  ? exc_invalid_op+0x4e/0x70
+[  T292]  ? napi_enable+0x37/0x40
+[  T292]  ? asm_exc_invalid_op+0x16/0x20
+[  T292]  ? napi_enable+0x37/0x40
+[  T292]  igb_up+0x41/0x150
+[  T292]  igb_io_resume+0x25/0x70
+[  T292]  report_resume+0x54/0x70
+[  T292]  ? report_frozen_detected+0x20/0x20
+[  T292]  pci_walk_bus+0x6c/0x90
+[  T292]  ? aer_print_port_info+0xa0/0xa0
+[  T292]  pcie_do_recovery+0x22f/0x380
+[  T292]  aer_process_err_devices+0x110/0x160
+[  T292]  aer_isr+0x1c1/0x1e0
+[  T292]  ? disable_irq_nosync+0x10/0x10
+[  T292]  irq_thread_fn+0x1a/0x60
+[  T292]  irq_thread+0xe3/0x1a0
+[  T292]  ? irq_set_affinity_notifier+0x120/0x120
+[  T292]  ? irq_affinity_notify+0x100/0x100
+[  T292]  kthread+0xe2/0x110
+[  T292]  ? kthread_complete_and_exit+0x20/0x20
+[  T292]  ret_from_fork+0x2d/0x50
+[  T292]  ? kthread_complete_and_exit+0x20/0x20
+[  T292]  ret_from_fork_asm+0x11/0x20
+[  T292]  </TASK>
 
-> 
-> -->ltq_etop_tx()
->       |
->       | (dma irq fires)
->       |
->       -->ltq_etop_dma_irq()
->            |
->            | (napi task schedule)
->            |
->            -->ltq_etop_poll_tx()
->                 |
->                 |
->                 |
->                 -->dev_kfree_skb_any()
-> 
-> Regards
-> 
+To fix this issue igb_io_resume() checks if the interface is running and
+the device is not down this means igb_io_error_detected() did not bring
+the device down and there is no need to bring it up.
 
+Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
+Reviewed-by: Yuanyuan Zhong<yzhong@purestorage.com>
+Fixes: 004d25060c78 ("igb: Fix igb_down hung on surprise removal")
+---
+ drivers/net/ethernet/intel/igb/igb_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 1ef4cb871452..8c6bc3db9a3d 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -9651,6 +9651,10 @@ static void igb_io_resume(struct pci_dev *pdev)
+ 	struct igb_adapter *adapter = netdev_priv(netdev);
+ 
+ 	if (netif_running(netdev)) {
++		if (!test_bit(__IGB_DOWN, &adapter->state)) {
++			dev_info(&pdev->dev, "Resuming from non-fatal error, do nothing.\n");
++			return;
++		}
+ 		if (igb_up(adapter)) {
+ 			dev_err(&pdev->dev, "igb_up failed after reset\n");
+ 			return;
 -- 
-Florian
+2.45.2
+
 
