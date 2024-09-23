@@ -1,160 +1,179 @@
-Return-Path: <netdev+bounces-129317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32B797ECC2
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:02:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDA1B97ECD3
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:07:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D1681F2225F
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:02:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 409311F22269
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A654119DF7D;
-	Mon, 23 Sep 2024 14:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C4019CC27;
+	Mon, 23 Sep 2024 14:07:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wGe9GIK1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZVhPECaM"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C44419D098
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 14:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0D3319CC15;
+	Mon, 23 Sep 2024 14:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727100121; cv=none; b=HgIIVMoLcGHFlwUpDQxLAY/GvMjKHaZ9eZtcgX5aupbyO6DjS0+oGosN2UQKBqn+iRdbD3kebWV4itR36jQaOmcjmGasCw73Q7ZUDyoRhx/PNA+zenbXmAXaUy/7NOtAnas6fpaUucbAwD021B61RdRAXBZbDwCl27CEB9W0DZQ=
+	t=1727100422; cv=none; b=BFBPwG598pq0nkMKBMhRN6OEnqhQ6509nGzFkANvqSy6z/A+5JmXOr2SWA3PJ0zVyZzFjiWrTSg36MpmuKVVLhrra/Jy7Rvj1PihOfz1hK+f5Xgds+qybX4k5y+QkRGvdTvjdaRO37NXfFhb5UQvzQnAeGPe1LLukupxQC8y0XU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727100121; c=relaxed/simple;
-	bh=53KOB7Rz0K8CZNMQtowYdfJyOc0kVU6V5c11QdTU3I0=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=PIwV/1Q2zLhP/2MKj4I/lhTXGdMXcrUEri50R21MLIqpAvpbpQJG8pO/lFFS+8IHdp5AUCmcR9cUYua+BvkcKD2nwuysds1NZYVxLYrq8382sMGPEfV+a8UZwMaNLqIOc2l/kBgHn/SMHckm9IUm5PpNvgej2ZUzQM6yt1iTpHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wGe9GIK1; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bY3z2RcnlrW6NZx3SjF3mc/qDdc0FOQ37w3w0FJ6+a4=; b=wGe9GIK1sV6Ljq2Gau4H9zeNbT
-	tlTnAJLU87GjtZgejJky7K6jNwNX5CwVvCXFL41KyzTIJJ+xEKbgkr8ePpB0XBzECzsYvu2SOzCTE
-	35nXUfQYwGKDtIcX+xMizyebX8MIetBGcFmUNfqXdqu5sjDsnBUECKijeg2z2BTUaJF7QLL8KeOLY
-	Z9HGz0r6te/rucQFkwVUsDOH+Xer/qP+rGEu1kSnnU4+Q2wosdZNTGTsuOMhxqclVAIn03DXY6jBe
-	/nQuyvqRNIOAsOncvomnBnCLk40iWuL3la2j9TO3xYAM5RDG8smipALG1d2J14qNimYNgfTMbCGRQ
-	vmUL4Yaw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:34902 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1ssjdM-0004Jb-2R;
-	Mon, 23 Sep 2024 15:01:48 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1ssjdJ-005NsX-S8; Mon, 23 Sep 2024 15:01:45 +0100
-In-Reply-To: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
-References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH RFC net-next 10/10] net: pcs: xpcs: make xpcs_do_config() and
- xpcs_link_up() internal
+	s=arc-20240116; t=1727100422; c=relaxed/simple;
+	bh=kAhkFOZRzpqpdAPuuKV5YZkv/119rUuKLhWUmcZLwCM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=b7C+0SDV3qDejlUH6B1DxKYXKgCVKUzm5AVSR8/xSHVp8AEFWnvwz8f4elpdgeGGRUfym0FdPmp4RnK4AFINGxsN8glz0OBlidIHbDvEe13j3N3fWqJOL4Bq7A67wq/sILSflZZdLjrJ7pw0SiyTf2Fin9/UE5xUbId+lkeWH0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZVhPECaM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4667C4CEC4;
+	Mon, 23 Sep 2024 14:06:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727100422;
+	bh=kAhkFOZRzpqpdAPuuKV5YZkv/119rUuKLhWUmcZLwCM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZVhPECaMceyeaFxgYxfHSJDrWpi3BtHICiUSQ+8mosAzrH3pxFeM+TfPMtR/wxPMC
+	 7exCHZPOJ4JF6i7H7OQEh6LwpJOMmrLkXpM1IqK5U24GtPKxar0DrhNOGprBKRVf19
+	 WlzbpOWKcTUXgYpMjWLEgP3o5BaizCH8BkT+9UZ1+81uVGPDvCo8F+/qBJD0BWt2p7
+	 +mZ0+fZA62i63cc3oYQwfvmYgLTW+EaWD6z5FC93AYzW1aeEDxX7LZC1Lv3RSbnCHQ
+	 umu0McA3VJZCd8z7LaKhumGi84S9qzSmyudsZ3VR8QzAAsD1ZSSfhrByAENfcrGPFR
+	 ZnVfwTCNnOlog==
+Message-ID: <42b347ec-df8e-44b8-ba19-150ebaf04771@kernel.org>
+Date: Mon, 23 Sep 2024 17:06:55 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 3/6] net: ethernet: ti: cpsw_ale: use
+ regfields for number of Entries and Policers
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Julien Panis <jpanis@baylibre.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Joe Damato <jdamato@fastly.com>, srk@ti.com,
+ vigneshr@ti.com, danishanwar@ti.com, pekka Varis <p-varis@ti.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-omap@vger.kernel.org, bpf@vger.kernel.org
+References: <20240910-am65-cpsw-multi-rx-v4-0-077fa6403043@kernel.org>
+ <20240910-am65-cpsw-multi-rx-v4-3-077fa6403043@kernel.org>
+ <CAMuHMdUf-tKRDzkz2_m8qdFTFutefddU0NTratVrEjRTzA3yQQ@mail.gmail.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <CAMuHMdUf-tKRDzkz2_m8qdFTFutefddU0NTratVrEjRTzA3yQQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1ssjdJ-005NsX-S8@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 23 Sep 2024 15:01:45 +0100
 
-As nothing outside pcs-xpcs.c calls neither xpcs_do_config() nor
-xpcs_link_up(), remove their exports and prototypes.
+Hi Geert,
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/pcs/pcs-xpcs.c   | 11 +++++------
- include/linux/pcs/pcs-xpcs.h |  4 ----
- 2 files changed, 5 insertions(+), 10 deletions(-)
+On 23/09/2024 16:41, Geert Uytterhoeven wrote:
+> Hi Roger,
+> 
+> On Tue, Sep 10, 2024 at 11:25 AM Roger Quadros <rogerq@kernel.org> wrote:
+>> Use regfields for number of ALE Entries and Policers.
+>>
+>> The variants that support Policers/Classifiers have the number
+>> of policers encoded in the ALE_STATUS register.
+>>
+>> Use that and show the number of Policers in the ALE info message.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+>> Reviewed-by: Simon Horman <horms@kernel.org>
+>> ---
+>> Changelog:
+>> v4:
+>> - reverse Xmas tree declaration order fixes
+> 
+> Thanks for your patch, which is now commit 11cbcfeaa79e5c76 ("net:
+> ethernet: ti: cpsw_ale: use regfields for number of Entries
+> and Policers").
+> 
+> This is causing the following warning on BeagleBone Black:
+> 
+>     WARNING: CPU: 0 PID: 34 at drivers/base/regmap/regmap.c:1208
+> devm_regmap_field_alloc+0xac/0xc8
+>     invalid empty mask defined
+>     CPU: 0 UID: 0 PID: 34 Comm: kworker/u4:3 Not tainted
+> 6.11.0-rc7-boneblack-01443-g11cbcfeaa79e #152
+>     Hardware name: Generic AM33XX (Flattened Device Tree)
+>     Workqueue: events_unbound deferred_probe_work_func
+>     Call trace:
+>      unwind_backtrace from show_stack+0x10/0x14
+>      show_stack from dump_stack_lvl+0x68/0x88
+>      dump_stack_lvl from __warn+0x6c/0x1a8
+>      __warn from warn_slowpath_fmt+0x1bc/0x1d0
+>      warn_slowpath_fmt from devm_regmap_field_alloc+0xac/0xc8
+>      devm_regmap_field_alloc from cpsw_ale_create+0x10c/0x36c
+>      cpsw_ale_create from cpsw_init_common+0x1fc/0x310
+> 
+>> --- a/drivers/net/ethernet/ti/cpsw_ale.c
+>> +++ b/drivers/net/ethernet/ti/cpsw_ale.c
+>> @@ -1303,6 +1303,9 @@ static const struct reg_field ale_fields_cpsw_nu[] = {
+>>         /* CPSW_ALE_IDVER_REG */
+>>         [MINOR_VER]     = REG_FIELD(ALE_IDVER, 0, 7),
+>>         [MAJOR_VER]     = REG_FIELD(ALE_IDVER, 8, 10),
+>> +       /* CPSW_ALE_STATUS_REG */
+>> +       [ALE_ENTRIES]   = REG_FIELD(ALE_STATUS, 0, 7),
+>> +       [ALE_POLICERS]  = REG_FIELD(ALE_STATUS, 8, 15),
+> 
+> You are adding these entries only to ale_fields_cpsw_nu[], not
+> to ale_fields_cpsw[], while cpsw_ale_regfield_init() loops over
+> ALE_FIELDS_MAX entries, whether they are valid or not:
+> 
+>     static int cpsw_ale_regfield_init(struct cpsw_ale *ale)
+>     {
+>             const struct reg_field *reg_fields = ale->params.reg_fields;
+>             struct device *dev = ale->params.dev;
+>             struct regmap *regmap = ale->regmap;
+>             int i;
+> 
+>             for (i = 0; i < ALE_FIELDS_MAX; i++) {
+>                     ale->fields[i] = devm_regmap_field_alloc(dev, regmap,
+>                                                              reg_fields[i]);
+> 
+>                     [...]
+>             }
+> 
+>             return 0;
+>     }
+> 
+> I tried fixing this by skipping entries where all of .reg, .lsb,
+> and .msb are zero, but that doesn't work as that runs beyond the
+> end of ale_fields_cpsw[], thus operating on random data.
+> I think you do have to store the size of the array, instead of assuming
+> ALE_FIELDS_MAX entries everywhere.
 
-diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index f25e7afdfdf5..0a01c552f591 100644
---- a/drivers/net/pcs/pcs-xpcs.c
-+++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -851,8 +851,9 @@ static int xpcs_config_2500basex(struct dw_xpcs *xpcs)
- 	return xpcs_write(xpcs, MDIO_MMD_VEND2, DW_VR_MII_MMD_CTRL, ret);
- }
- 
--int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
--		   const unsigned long *advertising, unsigned int neg_mode)
-+static int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
-+			  const unsigned long *advertising,
-+			  unsigned int neg_mode)
- {
- 	const struct dw_xpcs_compat *compat;
- 	int ret;
-@@ -905,7 +906,6 @@ int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
- 
- 	return 0;
- }
--EXPORT_SYMBOL_GPL(xpcs_do_config);
- 
- static int xpcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
- 		       phy_interface_t interface,
-@@ -1207,8 +1207,8 @@ static void xpcs_link_up_1000basex(struct dw_xpcs *xpcs, unsigned int neg_mode,
- 		pr_err("%s: xpcs_write returned %pe\n", __func__, ERR_PTR(ret));
- }
- 
--void xpcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
--		  phy_interface_t interface, int speed, int duplex)
-+static void xpcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
-+			 phy_interface_t interface, int speed, int duplex)
- {
- 	struct dw_xpcs *xpcs = phylink_pcs_to_xpcs(pcs);
- 
-@@ -1219,7 +1219,6 @@ void xpcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
- 	if (interface == PHY_INTERFACE_MODE_1000BASEX)
- 		return xpcs_link_up_1000basex(xpcs, neg_mode, speed, duplex);
- }
--EXPORT_SYMBOL_GPL(xpcs_link_up);
- 
- static void xpcs_an_restart(struct phylink_pcs *pcs)
- {
-diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
-index 758daabb76c7..abda475111d1 100644
---- a/include/linux/pcs/pcs-xpcs.h
-+++ b/include/linux/pcs/pcs-xpcs.h
-@@ -65,10 +65,6 @@ struct dw_xpcs {
- };
- 
- int xpcs_get_an_mode(struct dw_xpcs *xpcs, phy_interface_t interface);
--void xpcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
--		  phy_interface_t interface, int speed, int duplex);
--int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
--		   const unsigned long *advertising, unsigned int neg_mode);
- void xpcs_get_interfaces(struct dw_xpcs *xpcs, unsigned long *interfaces);
- int xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns,
- 		    int enable);
+Thanks for the report and suggestion. I will send a fix soon.
+
+> 
+>> --- a/drivers/net/ethernet/ti/cpsw_ale.h
+>> +++ b/drivers/net/ethernet/ti/cpsw_ale.h
+>> @@ -33,6 +34,8 @@ struct regmap;
+>>  enum ale_fields {
+>>         MINOR_VER,
+>>         MAJOR_VER,
+>> +       ALE_ENTRIES,
+>> +       ALE_POLICERS,
+>>         /* terminator */
+>>         ALE_FIELDS_MAX,
+>>  };
+>>
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
+
 -- 
-2.30.2
-
+cheers,
+-roger
 
