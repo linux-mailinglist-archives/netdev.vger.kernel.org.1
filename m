@@ -1,118 +1,163 @@
-Return-Path: <netdev+bounces-129282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF73D97EA70
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 13:06:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1147297EA72
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 13:07:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EC891F21C92
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 11:06:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BA7B1C2148B
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 11:07:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F0F196C86;
-	Mon, 23 Sep 2024 11:06:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F277E197A97;
+	Mon, 23 Sep 2024 11:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="URInqhho"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="pe2CRJTt";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="Yf8oDo8X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C941957E4
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 11:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 588E1197549;
+	Mon, 23 Sep 2024 11:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727089601; cv=none; b=NpJh4aFg+2/lkpNMYchvqIWOHLm5a/CgSAx0nk/Jca2nIn0gYHdlQY0vflyQcsY3UBQlSOvxY/dgWel3QKtZWGjB0Ey47xnvlQt9hFowWMxHrZKSsdMRAsgVctP8CilbjtewGsHEwRStmcwyvY5yJDpaNq1VUkRPss7g/uOQr/o=
+	t=1727089616; cv=none; b=WhCe6zrSeXKQDjl+R/9xuohwZpKnerE83TsymbOrOpGeclxug3IXkS27gSILK0oNwa2Wn6z1ExZ5DFxejuzHxYSkzRTLCoCyfE+m46wh2gTPwKXg0vqakO1KNe1vS8ghLF5RCGgMmVidqHBD/zIYiGlELBcZrs79awPrKVTfdW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727089601; c=relaxed/simple;
-	bh=Tee7zcVwoDDsEJIzgUEMvpzrHJcWSDnh18M21vR5cSo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iH5fr7yC3wfpcc4loGVJVUxYpv55/9z0Z0mBuL+trWY+Wd7WUyOm1rt6wIU44Dpc4o+fJ3lV+3PabNYWVYJYOujRE7IrUNcHe3k+v5WxwcTbpNPYKEjYjqPaiI2SSjHQPF/GeMqE2CIK/lR9XmA4yQOzvPKcdbVr0whSKCVRJU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=URInqhho; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-207397d1000so39265545ad.0;
-        Mon, 23 Sep 2024 04:06:40 -0700 (PDT)
+	s=arc-20240116; t=1727089616; c=relaxed/simple;
+	bh=NUwoXVjP0DXzj/mDS2AXKUKlXgpn964UGAmMJ+Er5nw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=DWImxx5j5bb0pV92Kp8BMZriHlEj0Q50Txn+tHicjKTjheGmHjVthdAFuwDdiiV6jxpx0ZGE3rfgO9vkIkshqiQipu/dOwVw+DMCApYac8tiwV9StlfhS1hYUko3Fise/zNqSy3X7u4fGWfGkhROc2m1bTNwhlr7ABJ2TfNM1UQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=pe2CRJTt; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=Yf8oDo8X reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727089600; x=1727694400; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ALzMIsr9C6wb+tUWEyDPK1xwWfwpXF6BlrUcpniHhvc=;
-        b=URInqhhojAItSQJBokw85VApdbPGACHXBJEXp3WkBjt/9Iw5w4pZgTRhC4PLsHYjTq
-         b02KEGiSyaUuqNPddD6MgKzItmHRq+YMArw+orI7eQVP3/o1jzF8vq8UOWUOJGm8vdrF
-         040nXBtR4ecJizPGsbKFSSK/CG9MC+MbfXg02YJlTjoKzasg2r6BEGPPyjMxqqMVtqCm
-         sa+Kr1MkYzByzxsOLOMR/tKv9Nl0aXh9HGAENRkO7uX4HnkPW8YX43ewqDyg0w+l+S8d
-         uBXU4m3JOTHuyRJMH0a26wGRulkbu5RGCzetjFVcsDtP+AZV6fxa3JFhT5sP1EOvbAyA
-         PABQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727089600; x=1727694400;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ALzMIsr9C6wb+tUWEyDPK1xwWfwpXF6BlrUcpniHhvc=;
-        b=QldnCDIKeT0cAGyEjvU1djj+9Nts8FrCkYyePDmVdasNyq1/2+ruIoyt4BE0OMiAvl
-         GXftTBhQ3uw797x6oXeQcbcIwaPknlBAyoh5zDsmUXoYQuRC+KJchcelyZqEdpyASxfU
-         lwwQ5AOt5IXjCIMDPXjZFdIk5e2bFn1fDzSQgcSBdNI4ULLfrGSrRWwgsX/Jc648ftY9
-         o4xsgd0YuflM00AFGhflrO9dZ9U3hAtHqQgy/mrMI9SS3AFVxgn95REQXVlBpIRxCk0X
-         AspIaWU7fIMPqqkpBOykcmd/RXoeB/LcZlRoSX9TvsgFmQ1ZAIHfRJmvKVt3AWR7Jumh
-         k4Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCXCUzL/3I+xgYLi0BnAh9hQrnmScPsoiHiwzG+p0GDmdhLnrmrs2rKKPUlEJrY4XBgxKTFY86nY@vger.kernel.org, AJvYcCXUG0OdhiDuj6f2j2Jo9OOR2vxhI9DvU/pmC4I2aivwXLaVebm1ZDKBQuAe+PHfC7dFIqHsXgjOyhUqJ3/n/qM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvwIyHlwpp0Wsr4x/J7C1WlOrIz4GdHptpQLP5lKEL2AIBBbI+
-	NqvhapmI0AQbpJkp/qklC/uCqR+6tlLIF8IS5h76SkJNdul6EhCx
-X-Google-Smtp-Source: AGHT+IGgaNI3FZCvsMmYHm8OCxmiHznfU823OH1g3vQ9GLPhgRHEv7jiKqwPhRM8VNMfNoJZZW7gSQ==
-X-Received: by 2002:a17:903:11c4:b0:205:656d:5f46 with SMTP id d9443c01a7336-208cb912140mr228403525ad.28.1727089599779;
-        Mon, 23 Sep 2024 04:06:39 -0700 (PDT)
-Received: from ubuntu.. ([27.34.65.190])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-207946fcb50sm130885485ad.204.2024.09.23.04.06.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2024 04:06:39 -0700 (PDT)
-From: Dipendra Khadka <kdipendra88@gmail.com>
-To: sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	hkelam@marvell.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: Dipendra Khadka <kdipendra88@gmail.com>,
-	netdev@vger.kernel.org,
-	cc=linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: ethernet: marvell: octeontx2: nic: Add error pointer check in otx2_common.c
-Date: Mon, 23 Sep 2024 11:06:32 +0000
-Message-ID: <20240923110633.3782-1-kdipendra88@gmail.com>
-X-Mailer: git-send-email 2.43.0
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1727089613; x=1758625613;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=NUwoXVjP0DXzj/mDS2AXKUKlXgpn964UGAmMJ+Er5nw=;
+  b=pe2CRJTte7f/VCjw6BdbfRzKGyHJhDg24L2AiGacg6P4Ip+gD2P4vvlz
+   kyOjyexJSe7UbLWzsyyFr3VMFZBNsLWwHqYXmNjJouWoescEtgBfTFxsn
+   OHcnvqz0X3kRBloXjiE1gIQwTV1mY03QF4dA3GlUIbF0zDlzMrLNZV/KI
+   0SVg7x9PjUa5MtchXO4JYxMqiGm0dhWaA8zKo1jl2++gheuQYGD2pu1Ob
+   OFh8M0nacTXZMaLnmRuCmA+0MQ2zqPxKLCCaKTgU7xc22iAA1PZXKFpiV
+   KjC5u88EANjOvYVdsnBsKzwHBoAD/xmLJL2sf2B+1PWMM3J0C/asx7jI7
+   A==;
+X-CSE-ConnectionGUID: reDRXPcsSJGf7t0wixE+Dw==
+X-CSE-MsgGUID: UEsOEtLhSXGYx8/hZv8Zvg==
+X-IronPort-AV: E=Sophos;i="6.10,251,1719871200"; 
+   d="scan'208";a="39069132"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 23 Sep 2024 13:06:49 +0200
+X-CheckPoint: {66F14BC9-17-B8661266-C8AC785A}
+X-MAIL-CPID: 0B579DCDA0D8C38CD81507ADAA3CE170_5
+X-Control-Analysis: str=0001.0A682F1C.66F14BC9.0111,ss=1,re=0.000,recu=0.000,reip=0.000,cl=1,cld=1,fgs=0
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8C31B16E7EF;
+	Mon, 23 Sep 2024 13:06:40 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1727089605;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=NUwoXVjP0DXzj/mDS2AXKUKlXgpn964UGAmMJ+Er5nw=;
+	b=Yf8oDo8XZNQEaRxj1OBNGDDUQYlV4z2sW4F5kPdkOsIGXLANM5GTfd4BB662Q7KLb4tYhg
+	RTYg/uVvgWCXedRgnwPsw6x9yh9fH/iX3CfulL28TX94mDieZTXM5FKKlqs5vi3GUdE62a
+	kaWb+c2hKrl8WjBi1bZZGYHfrF+CrO6J2RhXLhRbakxUl3LHPC1E6oB3JtCvACfXAgIbvX
+	wBSiecQINJpWXSG4R4nSDpBOuLQmE1bfOZL42i7Mzt1PqJXn89ddTkG8aXh74GBN9Hn+DT
+	T7AOliK3et0fJPOGF0QMWAnXgf4l3Sa/VYZmNmLH8MtdrlscIo6AX098t15iWg==
+Message-ID: <28314c36f464e1d39f71c0a60997c38fd6775172.camel@ew.tq-group.com>
+Subject: Re: [PATCH v2 2/2] can: m_can: fix missed interrupts with m_can_pci
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, Vincent Mailhol
+ <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,  Martin =?ISO-8859-1?Q?Hundeb=F8ll?=
+ <martin@geanix.com>, Markus Schneider-Pargmann <msp@baylibre.com>, "Felipe
+ Balbi (Intel)" <balbi@kernel.org>, Raymond Tan <raymond.tan@intel.com>,
+ Jarkko Nikula <jarkko.nikula@linux.intel.com>, linux-can@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux@ew.tq-group.com,  lst@pengutronix.de
+Date: Mon, 23 Sep 2024 13:06:40 +0200
+In-Reply-To: <20240923-honored-ant-of-ecstasy-f7edae-mkl@pengutronix.de>
+References: 
+	<ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726745009.git.matthias.schiffer@ew.tq-group.com>
+	 <861164dfe6d95fd69ab2f82528306db6be94351a.1726745009.git.matthias.schiffer@ew.tq-group.com>
+	 <20240923-honored-ant-of-ecstasy-f7edae-mkl@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Add error pointer check after calling otx2_mbox_get_rsp().
+On Mon, 2024-09-23 at 12:17 +0200, Marc Kleine-Budde wrote:
+> On 19.09.2024 13:27:28, Matthias Schiffer wrote:
+> > The interrupt line of PCI devices is interpreted as edge-triggered,
+> > however the interrupt signal of the m_can controller integrated in Inte=
+l
+> > Elkhart Lake CPUs appears to be generated level-triggered.
+> >=20
+> > Consider the following sequence of events:
+> >=20
+> > - IR register is read, interrupt X is set
+> > - A new interrupt Y is triggered in the m_can controller
+> > - IR register is written to acknowledge interrupt X. Y remains set in I=
+R
+> >=20
+> > As at no point in this sequence no interrupt flag is set in IR, the
+> > m_can interrupt line will never become deasserted, and no edge will eve=
+r
+> > be observed to trigger another run of the ISR. This was observed to
+> > result in the TX queue of the EHL m_can to get stuck under high load,
+> > because frames were queued to the hardware in m_can_start_xmit(), but
+> > m_can_finish_tx() was never run to account for their successful
+> > transmission.
+> >=20
+> > To fix the issue, repeatedly read and acknowledge interrupts at the
+> > start of the ISR until no interrupt flags are set, so the next incoming
+> > interrupt will also result in an edge on the interrupt line.
+> >=20
+> > Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkhart=
+ Lake")
+> > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+>=20
+> My coworker Lucas pointed me to:
+>=20
+> > https://wiki.linuxfoundation.org/networking/napi#non-level_sensitive_ir=
+qs
+>=20
 
-Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
----
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 5 +++++
- 1 file changed, 5 insertions(+)
+Thanks. I don't think this is directly applicable here - in our case the lo=
+st TX complete interrupts
+were the issue, not (only) the RX interrupts.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 87d5776e3b88..6e5f1b2e8c52 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -1838,6 +1838,11 @@ u16 otx2_get_max_mtu(struct otx2_nic *pfvf)
- 		rsp = (struct nix_hw_info *)
- 		       otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
- 
-+		if (IS_ERR(rsp)) {
-+			mutex_unlock(&pfvf->mbox.lock);
-+			return PTR_ERR(rsp);
-+		}
-+
- 		/* HW counts VLAN insertion bytes (8 for double tag)
- 		 * irrespective of whether SQE is requesting to insert VLAN
- 		 * in the packet or not. Hence these 8 bytes have to be
--- 
-2.43.0
+Matthias
 
+
+> On the other hand, I would also like to convert the !peripteral part of
+> the driver to rx-offload. However, I am still looking for potential
+> customers for this task. I have talked to some TI and ST people at LPC,
+> maybe they are interested.
+>=20
+> I think let's first fix edge sensitive IRQs, then rework the driver to
+> rx-offload.
+>=20
+> regards,
+> Marc
+>=20
+> =C2=A0
+
+--=20
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
