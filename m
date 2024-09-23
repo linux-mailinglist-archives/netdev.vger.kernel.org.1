@@ -1,195 +1,280 @@
-Return-Path: <netdev+bounces-129269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 074FB97E958
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 12:06:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D79897E988
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 12:09:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88EEF1F21C0B
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 10:06:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4A15B218D3
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 10:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C8E19580A;
-	Mon, 23 Sep 2024 10:06:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2014A19882E;
+	Mon, 23 Sep 2024 10:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="iwf/esCn"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="iCGVjlWF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9492195809;
-	Mon, 23 Sep 2024 10:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A0E197A7C
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 10:07:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727085972; cv=none; b=Kc/eRQC0UkRnn6mYY5198r7yPY0+Cz/cTlZ61hjDOWDCmRrTQnyCrv1UeXyLMWlH9wPiAZUMvf26pLPJSrBibixiMtiBwZE1XBQLKTF2C41t4PqZIjW8J4pyrNXYs3SAzgqT1fEGCuOT3IX/lB1ieuy/6UhDmq2nXvbCO7h2NQA=
+	t=1727086061; cv=none; b=g7dPfsQ7LrmDcqDVJV2r610P/8ohGGtRa8k2f6V8cMq+MrNYq7zw4onVu7Pw5x79RBRVyKP8xCnSGd+L3c/61+mmoubKoQGdUkPfO6BTAy5sCQETBbvda53Ydj/X9CpyQJWVtaIVTm9cVEZo2CtdKNaiZKIvGtC11E6gcQWBVPQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727085972; c=relaxed/simple;
-	bh=5++EG5YPR8G36zcQsH8ZUeN+eishUBKNaNN9MgfrI14=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=phH3bgzDhAuv8BGVMremvHOapV+7wNPI0hcSPZm5joYyHDeouUpeA7233lzjNdvNOa09Qg705H4FXd5Zs3lW1qi6+UGAlqHD2cwh3M3w4z0aVJxmu0fjrntotZampWToJYYfTvjIdNY0bcG/25p195x6QZqrxItzq/aa+Sunang=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=iwf/esCn; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1727085955;
-	bh=BBFkSpdkqkXzOv7hw0jDfkWRq2N7z6ltN378fMvMfd0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=iwf/esCnQY0IUxVjZWI/Opzdqdj9jhNpRukqQTwpttbJmi1dGHp1KaSGbbD+bGf7k
-	 FfJW8EDcJR3Nr13ZsTvI1fnn7d0JejMLsVZGKmTmU47T5knByQhO0x8OJ0HFRASnkp
-	 SvqqF1oMFEHV5zKIMzYGAfpS+RpoOQVEdeEpS62s=
-X-QQ-mid: bizesmtpsz13t1727085952teleyq
-X-QQ-Originating-IP: DWjoYKT1vymwUPdyRIsvl3RwFkVa8GXG3DpnfPbDnkg=
-Received: from [10.20.254.18] ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 23 Sep 2024 18:05:50 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 13227385092718996023
-Message-ID: <80515DEDE931DC2A+7fa48c7a-2955-4afb-821f-a0108a72009f@uniontech.com>
-Date: Mon, 23 Sep 2024 18:05:51 +0800
+	s=arc-20240116; t=1727086061; c=relaxed/simple;
+	bh=QsMsDmyiALAm+LrdRvzojuyqNJiiSNMEO/DCrSy/Uf4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VLe+TRv3K2KTTKrqlggQUrl9RZoYWPI4HKP2Dj/46MbFFVbw3kIAbYKwhQQb4OAqgVpc+SajSmumgNj3Cr9Zg0sNXMAaa+rkvmaP9QG5/me6DMQrNPxJQDT5PZeGMMsJ+EEuuRyudyLMHOt37mD32LGlbRFGqzL6A1KFE7qJb/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=iCGVjlWF; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-374c6187b6eso2298176f8f.0
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 03:07:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727086056; x=1727690856; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=B8OS6LmHmUAzTZatG8DjSyLyLvnQ2975LqfhjuOdjIQ=;
+        b=iCGVjlWFuQJFSXQKbvfqIRnBorOkY+9qwV7Jns+a+1r4FpKqm6bqkxu7U3oKLJecN6
+         CiIlSHPt23JcBnTWTxoJSHL8MGZTRAVA3zTBm0FrdO31HAQwpilcOMfmuycvgAFQ4N9d
+         0Sc6SrwAMagMJ9WKtU5wa5n3CDiK6iQPeGJ4lCteUrOCsi0sww0VtLZ/s8Jwmu67oZKN
+         oItB+jjqAQJqKJjegReK/axQrfP6vct9A2cc9DcXhRNk7vk2wsEdcaOOEgwtP9gVNIz3
+         isctILvc57pPXQWJ73n/lC8qVz4B4/OpYaTOA1wHSL3ZHpjDPgPoR0Hv3oNiF907ZFLI
+         Kr6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727086056; x=1727690856;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B8OS6LmHmUAzTZatG8DjSyLyLvnQ2975LqfhjuOdjIQ=;
+        b=wsBJKGPX+GywREA2g7LEqgdAKS9WvHTXpNlKMdE+ckyevLT49srom7SAGTC/7Vq/mZ
+         5XeQdmgRgNJcPNUmJe9Pm8pYpPxZpZRZ5pg4arwBIFt48FJRPjwOkL1fdFR68mfCBlLv
+         uwU75CET1+Eb/nEr7gf0tKTF/t4Bgr3QMvKiEUncXNfvtIBxtPRNyRFjE90Snscqxw/K
+         ssMjPUjrklE6ycBcWU7H1wUdzQGIpIzX04pObkEBwm6uNfjuRMYlzIKbBbIxrugCuzfd
+         mmcoZI8FdEA+Y9mAO3MPpl8jix5/ZI+eu6DXCQZSDhTVO6c1ZQ2dpoW5oZjScfhy9/RO
+         t9/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVL/JMwuizFZw8Huz9X2UqvZvXn1nxD5BoUFJ8EEZEcFmY6z5gYCrDqac80ExMJZNw4MAzPhkY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlmotjPi+5YbfNQDHnO1wm+CtWV1SQvY/jhm6YGHZ/zyOQNGiB
+	E+BdmkSYu91heTQSJ729xdQaRjnPIwGXdJZ7mwcqgzn5rFQ4uc9rjtS3TquPako=
+X-Google-Smtp-Source: AGHT+IGH6k1JLZysJokdZSUimpuHYOXbPaIWWOwnxtcyHYccscLPpevP70WI6JG6/Yz8WETvftOzcA==
+X-Received: by 2002:a5d:6889:0:b0:374:c15a:8556 with SMTP id ffacd0b85a97d-37a431be67amr5696522f8f.50.1727086055387;
+        Mon, 23 Sep 2024 03:07:35 -0700 (PDT)
+Received: from blmsp ([2001:4091:a245:8155:f78b:11e0:5100:a478])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e78002a4sm24275961f8f.78.2024.09.23.03.07.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 03:07:34 -0700 (PDT)
+Date: Mon, 23 Sep 2024 12:07:33 +0200
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, 
+	Raymond Tan <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux@ew.tq-group.com
+Subject: Re: [PATCH v2 2/2] can: m_can: fix missed interrupts with m_can_pci
+Message-ID: <coaa4yade2fwwfuk6xt6rqdxatuejft2wpuvuzw3dwpskjft7f@miabhan3ddgi>
+References: <ac8c49fffac582176ba1899a85db84e0f5d5c7a6.1726745009.git.matthias.schiffer@ew.tq-group.com>
+ <861164dfe6d95fd69ab2f82528306db6be94351a.1726745009.git.matthias.schiffer@ew.tq-group.com>
+ <lfxoixj52ip25ys5ndhsn4jhoruucpavstwvwzygsvkmld2vxw@d7yiwmz3jb4y>
+ <cc14312b391c17443a04129ae7871ae6aba43c20.camel@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/bridge: Optimizing read-write locks in ebtables.c
-To: Eric Dumazet <edumazet@google.com>
-Cc: pablo@netfilter.org, kadlec@netfilter.org, roopa@nvidia.com,
- razor@blackwall.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- bridge@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <EC5AC714C75A855E+20240923091535.77865-1-yushengjin@uniontech.com>
- <CANn89i+4wbef3k6at_Kf+8MBmU4HhE9nxMRvROR_OxsZptffjA@mail.gmail.com>
-From: yushengjin <yushengjin@uniontech.com>
-In-Reply-To: <CANn89i+4wbef3k6at_Kf+8MBmU4HhE9nxMRvROR_OxsZptffjA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+In-Reply-To: <cc14312b391c17443a04129ae7871ae6aba43c20.camel@ew.tq-group.com>
 
+On Mon, Sep 23, 2024 at 11:32:49AM GMT, Matthias Schiffer wrote:
+> On Mon, 2024-09-23 at 10:03 +0200, Markus Schneider-Pargmann wrote:
+> > Hi Matthias,
+> > 
+> > On Thu, Sep 19, 2024 at 01:27:28PM GMT, Matthias Schiffer wrote:
+> > > The interrupt line of PCI devices is interpreted as edge-triggered,
+> > > however the interrupt signal of the m_can controller integrated in Intel
+> > 
+> > I have a similar patch though for a different setup (I didn't send it
+> > yet). I have a tcan chip wired to a pin that is only capable of edge
+> > interrupts.
+> 
+> Should I also change the Fixes tag to something else then?
 
-在 23/9/2024 下午5:29, Eric Dumazet 写道:
-> On Mon, Sep 23, 2024 at 11:16 AM yushengjin <yushengjin@uniontech.com> wrote:
->> When conducting WRK testing, the CPU usage rate of the testing machine was
->> 100%. forwarding through a bridge, if the network load is too high, it may
->> cause abnormal load on the ebt_do_table of the kernel ebtable module, leading
->> to excessive soft interrupts and sometimes even directly causing CPU soft
->> deadlocks.
->>
->> After analysis, it was found that the code of ebtables had not been optimized
->> for a long time, and the read-write locks inside still existed. However, other
->> arp/ip/ip6 tables had already been optimized a lot, and performance bottlenecks
->> in read-write locks had been discovered a long time ago.
->>
->> Ref link: https://lore.kernel.org/lkml/20090428092411.5331c4a1@nehalam/
->>
->> So I referred to arp/ip/ip6 modification methods to optimize the read-write
->> lock in ebtables.c.
->>
->> test method:
->> 1) Test machine creates bridge :
->> ``` bash
->> brctl addbr br-a
->> brctl addbr br-b
->> brctl addif br-a enp1s0f0 enp1s0f1
->> brctl addif br-b enp130s0f0 enp130s0f1
->> ifconfig br-a up
->> ifconfig br-b up
->> ```
->> 2) Testing with another machine:
->> ``` bash
->> ulimit -n 2048
->> ./wrk -t48 -c2000 -d6000 -R10000 -s request.lua http://4.4.4.2:80/4k.html &
->> ./wrk -t48 -c2000 -d6000 -R10000 -s request.lua http://5.5.5.2:80/4k.html &
->> ```
->>
->> Signed-off-by: yushengjin <yushengjin@uniontech.com>
->> ---
->>   include/linux/netfilter_bridge/ebtables.h |  47 +++++++-
->>   net/bridge/netfilter/ebtables.c           | 132 ++++++++++++++++------
->>   2 files changed, 145 insertions(+), 34 deletions(-)
->>
->> diff --git a/include/linux/netfilter_bridge/ebtables.h b/include/linux/netfilter_bridge/ebtables.h
->> index fd533552a062..dd52dea20fb8 100644
->> --- a/include/linux/netfilter_bridge/ebtables.h
->> +++ b/include/linux/netfilter_bridge/ebtables.h
->> @@ -93,7 +93,6 @@ struct ebt_table {
->>          char name[EBT_TABLE_MAXNAMELEN];
->>          struct ebt_replace_kernel *table;
->>          unsigned int valid_hooks;
->> -       rwlock_t lock;
->>          /* the data used by the kernel */
->>          struct ebt_table_info *private;
->>          struct nf_hook_ops *ops;
->> @@ -124,4 +123,50 @@ static inline bool ebt_invalid_target(int target)
->>
->>   int ebt_register_template(const struct ebt_table *t, int(*table_init)(struct net *net));
->>   void ebt_unregister_template(const struct ebt_table *t);
->> +
->> +/**
->> + * ebt_recseq - recursive seqcount for netfilter use
->> + *
->> + * Packet processing changes the seqcount only if no recursion happened
->> + * get_counters() can use read_seqcount_begin()/read_seqcount_retry(),
->> + * because we use the normal seqcount convention :
->> + * Low order bit set to 1 if a writer is active.
->> + */
->> +DECLARE_PER_CPU(seqcount_t, ebt_recseq);
->> +
->> +/**
->> + * ebt_write_recseq_begin - start of a write section
->> + *
->> + * Begin packet processing : all readers must wait the end
->> + * 1) Must be called with preemption disabled
->> + * 2) softirqs must be disabled too (or we should use this_cpu_add())
->> + * Returns :
->> + *  1 if no recursion on this cpu
->> + *  0 if recursion detected
->> + */
->> +static inline unsigned int ebt_write_recseq_begin(void)
->> +{
->> +       unsigned int addend;
->> +
->> +       addend = (__this_cpu_read(ebt_recseq.sequence) + 1) & 1;
->> +
->> +       __this_cpu_add(ebt_recseq.sequence, addend);
->> +       smp_mb();
->> +
->> +       return addend;
->> +}
->> +
->> +/**
->> + * ebt_write_recseq_end - end of a write section
->> + * @addend: return value from previous ebt_write_recseq_begin()
->> + *
->> + * End packet processing : all readers can proceed
->> + * 1) Must be called with preemption disabled
->> + * 2) softirqs must be disabled too (or we should use this_cpu_add())
->> + */
->> +static inline void ebt_write_recseq_end(unsigned int addend)
->> +{
->> +       smp_wmb();
->> +       __this_cpu_add(ebt_recseq.sequence, addend);
->> +}
-> Why not reusing xt_recseq, xt_write_recseq_begin(), xt_write_recseq_end(),
-> instead of copy/pasting them ?
->
-> This was added in
->
-> commit 7f5c6d4f665bb57a19a34ce1fb16cc708c04f219    netfilter: get rid
-> of atomic ops in fast path
-They used different seqcounts, I'm worried it might have an impact.
->
-> If this is an include mess, just move them in a separate include file.
+No, my use-case wasn't explicitly supported before, so I don't consider
+it to be a fix but a new feature supporting edge triggered tcan.
 
-Can i copy  ebt_write_recseq_begin(), ebt_write_recseq_endend to
-include/linux/netfilter/x_tables.h ?
+> 
+> > 
+> > > Elkhart Lake CPUs appears to be generated level-triggered.
+> > > 
+> > > Consider the following sequence of events:
+> > > 
+> > > - IR register is read, interrupt X is set
+> > > - A new interrupt Y is triggered in the m_can controller
+> > > - IR register is written to acknowledge interrupt X. Y remains set in IR
+> > > 
+> > > As at no point in this sequence no interrupt flag is set in IR, the
+> > > m_can interrupt line will never become deasserted, and no edge will ever
+> > > be observed to trigger another run of the ISR. This was observed to
+> > > result in the TX queue of the EHL m_can to get stuck under high load,
+> > > because frames were queued to the hardware in m_can_start_xmit(), but
+> > > m_can_finish_tx() was never run to account for their successful
+> > > transmission.
+> > > 
+> > > To fix the issue, repeatedly read and acknowledge interrupts at the
+> > > start of the ISR until no interrupt flags are set, so the next incoming
+> > > interrupt will also result in an edge on the interrupt line.
+> > > 
+> > > Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkhart Lake")
+> > > Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> > > ---
+> > > 
+> > > v2: introduce flag is_edge_triggered, so we can avoid the loop on !m_can_pci
+> > > 
+> > >  drivers/net/can/m_can/m_can.c     | 21 ++++++++++++++++-----
+> > >  drivers/net/can/m_can/m_can.h     |  1 +
+> > >  drivers/net/can/m_can/m_can_pci.c |  1 +
+> > >  3 files changed, 18 insertions(+), 5 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+> > > index 47481afb9add3..2e182c3c98fed 100644
+> > > --- a/drivers/net/can/m_can/m_can.c
+> > > +++ b/drivers/net/can/m_can/m_can.c
+> > > @@ -1207,20 +1207,31 @@ static void m_can_coalescing_update(struct m_can_classdev *cdev, u32 ir)
+> > >  static int m_can_interrupt_handler(struct m_can_classdev *cdev)
+> > >  {
+> > >  	struct net_device *dev = cdev->net;
+> > > -	u32 ir;
+> > > +	u32 ir = 0, ir_read;
+> > >  	int ret;
+> > >  
+> > >  	if (pm_runtime_suspended(cdev->dev))
+> > >  		return IRQ_NONE;
+> > >  
+> > > -	ir = m_can_read(cdev, M_CAN_IR);
+> > > +	/* For m_can_pci, the interrupt line is interpreted as edge-triggered,
+> > > +	 * but the m_can controller generates them as level-triggered. We must
+> > > +	 * observe that IR is 0 at least once to be sure that the next
+> > > +	 * interrupt will generate an edge.
+> > > +	 */
+> > 
+> > Could you please remove this hardware specific comment? As mentioned
+> > above this will be independent of any specific hardware.
+> 
+> Ok.
+> 
+> 
+> > 
+> > > +	while ((ir_read = m_can_read(cdev, M_CAN_IR)) != 0) {
+> > > +		ir |= ir_read;
+> > > +
+> > > +		/* ACK all irqs */
+> > > +		m_can_write(cdev, M_CAN_IR, ir);
+> > > +
+> > > +		if (!cdev->is_edge_triggered)
+> > > +			break;
+> > > +	}
+> > > +
+> > >  	m_can_coalescing_update(cdev, ir);
+> > >  	if (!ir)
+> > >  		return IRQ_NONE;
+> > >  
+> > > -	/* ACK all irqs */
+> > > -	m_can_write(cdev, M_CAN_IR, ir);
+> > > -
+> > >  	if (cdev->ops->clear_interrupts)
+> > >  		cdev->ops->clear_interrupts(cdev);
+> > >  
+> > > diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
+> > > index 92b2bd8628e6b..8c17eb94d2f98 100644
+> > > --- a/drivers/net/can/m_can/m_can.h
+> > > +++ b/drivers/net/can/m_can/m_can.h
+> > > @@ -99,6 +99,7 @@ struct m_can_classdev {
+> > >  	int pm_clock_support;
+> > >  	int pm_wake_source;
+> > >  	int is_peripheral;
+> > > +	bool is_edge_triggered;
+> > 
+> > To avoid confusion could you rename it to irq_edge_triggered or
+> > something similar, to make clear that it is not about the chip but the
+> > way the interrupt line is connected?
+> 
+> Will do.
+> 
+> > 
+> > Also I am not sure it is possible, but could you use
+> > irq_get_trigger_type() to see if it is a level or edge based interrupt?
+> > Then we wouldn't need this additional parameter at all and could just
+> > detect it in m_can.c.
+> 
+> Unfortunately that doesn't seem to work. irq_get_trigger_type() only returns a meaningful value
+> after the IRQ has been requested. I thought about requesting the IRQ with IRQF_NO_AUTOEN and then
+> filling in the irq_edge_triggered field before enabling the IRQ, but IRQF_NO_AUTOEN is incompatible
+> with IRQF_SHARED.
 
-Or add a parameter in xt_write_recseq_begin() , xt_write_recseq_end()  to
-clarify whether it is xt_recseq or ebt_recseq.
+The mentioned function works for me on ARM and DT even before
+irq_request_threaded_irq() was called.
 
+Also I am probably missing something here. Afer requesting the irq, the
+interrupts are not enabled yet right? So can't you just request it and
+check the triggertype immediately afterwards?
 
+> 
+> Of course there are ways around this - checking irq_get_trigger_type() from the ISR itself, or
+> adding more locking, but neither seems quite worthwhile to me. Would you agree with this?
+> 
+> Maybe there is some other way to find out the trigger type that would be set when the IRQ is
+> requested? I don't know what that would be however - so I'd just keep setting the flag statically
+> for m_can_pci and leave a dynamic solution for future improvement.
+
+No if it doesn't work easily the parameter is probably the best option.
+
+Best
+Markus
+
+> 
+> Matthias
+> 
+> 
+> 
+> > 
+> > Best
+> > Markus
+> > 
+> > >  
+> > >  	// Cached M_CAN_IE register content
+> > >  	u32 active_interrupts;
+> > > diff --git a/drivers/net/can/m_can/m_can_pci.c b/drivers/net/can/m_can/m_can_pci.c
+> > > index d72fe771dfc7a..f98527981402a 100644
+> > > --- a/drivers/net/can/m_can/m_can_pci.c
+> > > +++ b/drivers/net/can/m_can/m_can_pci.c
+> > > @@ -127,6 +127,7 @@ static int m_can_pci_probe(struct pci_dev *pci, const struct pci_device_id *id)
+> > >  	mcan_class->pm_clock_support = 1;
+> > >  	mcan_class->pm_wake_source = 0;
+> > >  	mcan_class->can.clock.freq = id->driver_data;
+> > > +	mcan_class->is_edge_triggered = true;
+> > >  	mcan_class->ops = &m_can_pci_ops;
+> > >  
+> > >  	pci_set_drvdata(pci, mcan_class);
+> > > -- 
+> > > TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+> > > Amtsgericht München, HRB 105018
+> > > Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+> > > https://www.tq-group.com/
+> > > 
+> 
+> -- 
+> TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+> Amtsgericht München, HRB 105018
+> Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+> https://www.tq-group.com/
 
