@@ -1,130 +1,94 @@
-Return-Path: <netdev+bounces-129258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F34C97E862
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 11:17:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE5497E869
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 11:18:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE6D31F21A58
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 09:17:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C465B207BF
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 09:18:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AED31946B9;
-	Mon, 23 Sep 2024 09:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BF51946A4;
+	Mon, 23 Sep 2024 09:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LkUkPBKJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C904B7641D;
-	Mon, 23 Sep 2024 09:16:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F96A50271
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 09:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727083017; cv=none; b=PikHXqlIkc1a9r1aOTpYvVnEfxQdN+/BdvZogEDG98w/9fGyISCHzxmrb0dD6hH3EZM1zx8z2JNXZa517SQ0wAASsFQJRnU7X6v6O1F1Sb6UeDS/h7QXwgGvr4So/FuT5dsVWM0TYrQtUsloUVAhxmVD+EgB3nxbF4czLXA5jhA=
+	t=1727083127; cv=none; b=j84jrsmBqEK0qvIMBQeZvKS/xME65AhnBW9c2uVo6m3nd/IQxO28eSHjiGeaWu0UWl8M76gGSFIY+uF/epAOvRfDBUi+7XdlnRtp6pnpaWqJKczvskTEkLu/hgY5iSvs6CyuVUK552lG3SWrWapRvc1EUESLH9/3CR9jIVJX6Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727083017; c=relaxed/simple;
-	bh=wz17lKT5s3cGnLvfBBpvGC9XZNd4l5pCoHzuPmwBMkE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=emkYRt7Zd36Na/bx5AA5rZEMFhgc1w84ArfpnEwxtggpqTI70UdsFo/oXP4VG4kkNo9sHyMjVMGKBegZdUt6Kg3sV6yU3TjAoNMh093Z78gBugMUX+EbDzvaqZmMGLzVwk9vQO/WV3ANGm1TTZG/jy4PSYqgqBuKx0t0No8qCSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XBy2R4t1Cz1HKgD;
-	Mon, 23 Sep 2024 17:13:03 +0800 (CST)
-Received: from kwepemh500013.china.huawei.com (unknown [7.202.181.146])
-	by mail.maildlp.com (Postfix) with ESMTPS id DFF9E1A0188;
-	Mon, 23 Sep 2024 17:16:51 +0800 (CST)
-Received: from [10.67.109.254] (10.67.109.254) by
- kwepemh500013.china.huawei.com (7.202.181.146) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 23 Sep 2024 17:16:51 +0800
-Message-ID: <9bcfefda-2cff-f41e-53b9-5104227e2c7a@huawei.com>
-Date: Mon, 23 Sep 2024 17:16:50 +0800
+	s=arc-20240116; t=1727083127; c=relaxed/simple;
+	bh=ZBMjAUrVmUz4k0uWFuuTUxfNF2FkuZ922UrTseo5G0M=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=RYBSrKvfcca7j4JCqoIYjXR7yEraabOSpOnWijVDyjhERaXWx9Z0Y8cxsTQQNInFJZjHdrNYYOK566T32hyTG2UERiePp6wIUGLZla4Bl2JTKBDiecpV3tUkgBJkCl3HIOSvs8kvCx3jPjE6YygFhhomdhvHVD5cHcS2ItUrl4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LkUkPBKJ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4AjFsHjV87EgGlQb4MGpKgCFjon/l3tzLRlflfUOgEs=; b=LkUkPBKJkVZrgfGKzJGCJrhH07
+	MB2kORPfKdtT8xnDgDlo3vNG5qtQvRkjDToXWaWnasoQA0CJikMRcoKeeeWfYPJNjsxhdK5efeifp
+	TwMU6SVCPPS7bsjrJWUY6xRVk9IiyIFs+JOSxctuF0bbYZHxWPjIsXPnWoR1Krze3WL7ahczi18rg
+	XHH7o8pA1EVEFD6UoD8fQ3Q83WteavJMx8xtoQVntEM/TGuFiqZo8px1WU8wpk112Vf8Wj6hHHsmX
+	FLR8gghILTmU5NTPsyvNsp7zhUci/MJWYOhXg3VrLcO9dyVuYQ9olQtMrTQuWwW0jTyredT9CmzNN
+	0UCUCtdg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35914)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ssfDE-00042Q-1i;
+	Mon, 23 Sep 2024 10:18:32 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ssfDB-0005I5-0E;
+	Mon, 23 Sep 2024 10:18:29 +0100
+Date: Mon, 23 Sep 2024 10:18:28 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org
+Subject: Bug? xpcs-wx: read-modify-write to different registers?
+Message-ID: <ZvEyZGKt5elazWfj@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH] net: wwan: qcom_bam_dmux: Fix missing
- pm_runtime_disable()
-Content-Language: en-US
-To: Stephan Gerhold <stephan.gerhold@linaro.org>
-CC: <stephan@gerhold.net>, <loic.poulain@linaro.org>,
-	<ryazanov.s.a@gmail.com>, <johannes@sipsolutions.net>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>
-References: <20240920100711.2744120-1-ruanjinjie@huawei.com>
- <Zu1ugT3cYptfeUaa@linaro.org>
-From: Jinjie Ruan <ruanjinjie@huawei.com>
-In-Reply-To: <Zu1ugT3cYptfeUaa@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemh500013.china.huawei.com (7.202.181.146)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+Hi,
 
+While making some cleanups to the XPCS driver, I spotted the following
+in pcs-xpcs-wx.c:
 
-On 2024/9/20 20:45, Stephan Gerhold wrote:
-> On Fri, Sep 20, 2024 at 06:07:11PM +0800, Jinjie Ruan wrote:
->> It's important to undo pm_runtime_use_autosuspend() with
->> pm_runtime_dont_use_autosuspend() at driver exit time.
->>
->> But the pm_runtime_disable() and pm_runtime_dont_use_autosuspend()
->> is missing in the error path for bam_dmux_probe(). So add it.
->>
->> Fixes: 21a0ffd9b38c ("net: wwan: Add Qualcomm BAM-DMUX WWAN network driver")
->> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
->> ---
->>  drivers/net/wwan/qcom_bam_dmux.c | 12 +++++++++---
->>  1 file changed, 9 insertions(+), 3 deletions(-)
->>
->> diff --git a/drivers/net/wwan/qcom_bam_dmux.c b/drivers/net/wwan/qcom_bam_dmux.c
->> index 26ca719fa0de..34a4e8095161 100644
->> --- a/drivers/net/wwan/qcom_bam_dmux.c
->> +++ b/drivers/net/wwan/qcom_bam_dmux.c
->> @@ -823,17 +823,17 @@ static int bam_dmux_probe(struct platform_device *pdev)
->>  	ret = devm_request_threaded_irq(dev, pc_ack_irq, NULL, bam_dmux_pc_ack_irq,
->>  					IRQF_ONESHOT, NULL, dmux);
->>  	if (ret)
->> -		return ret;
->> +		goto err_disable_pm;
->>  
->>  	ret = devm_request_threaded_irq(dev, dmux->pc_irq, NULL, bam_dmux_pc_irq,
->>  					IRQF_ONESHOT, NULL, dmux);
->>  	if (ret)
->> -		return ret;
->> +		goto err_disable_pm;
->>  
->>  	ret = irq_get_irqchip_state(dmux->pc_irq, IRQCHIP_STATE_LINE_LEVEL,
->>  				    &dmux->pc_state);
->>  	if (ret)
->> -		return ret;
->> +		goto err_disable_pm;
->>  
->>  	/* Check if remote finished initialization before us */
->>  	if (dmux->pc_state) {
->> @@ -844,6 +844,12 @@ static int bam_dmux_probe(struct platform_device *pdev)
->>  	}
->>  
->>  	return 0;
->> +
->> +err_disable_pm:
->> +	pm_runtime_disable(dev);
->> +	pm_runtime_dont_use_autosuspend(dev);
->> +	pm_runtime_set_suspended(dev);
-> 
-> Please drop the pm_runtime_set_suspended(dev); line, it should be
-> unneeded since runtime PM documentation says:
-> 
-> 	the initial runtime PM status of all devices is ‘suspended’
+        val = txgbe_read_pma(xpcs, TXGBE_RX_GEN_CTL3);
+        val = u16_replace_bits(val, 0x4, TXGBE_RX_GEN_CTL3_LOS_TRSHLD0);
+        txgbe_write_pma(xpcs, TXGBE_RX_EQ_ATTN_CTL, val);
 
-Thank you!
+This reads from the TXGBE_RX_GEN_CTL3 register, changes a value in a
+field, and then writes it back to a different register,
+TXGBE_RX_EQ_ATTN_CTL. This doesn't look correct.
 
-> 
-> Thanks,
-> Stephan
+Please check whether this code is correct, if not please submit a fix.
+
+Thanks.
+
+Russell.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
