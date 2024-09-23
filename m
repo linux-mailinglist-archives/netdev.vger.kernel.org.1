@@ -1,94 +1,83 @@
-Return-Path: <netdev+bounces-129323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B212797ED8D
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 17:02:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5016D97ED92
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 17:05:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B5D5281CB4
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 15:02:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E9ADA1F21BFC
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 15:05:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD85481749;
-	Mon, 23 Sep 2024 15:02:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZBlSltin"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7992619D8B5;
+	Mon, 23 Sep 2024 15:05:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5980D1CA84
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 15:02:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DB136BFC7;
+	Mon, 23 Sep 2024 15:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727103767; cv=none; b=i8FOt3I4hHa6GtQCwZ+qW3XbMxkoBbVLEaKPMAF7azYk0wrfaS2hQyeW9+4LLt+xEL4bpT2r2WdTrftHOBeC3rOyqlhFFQwsDRJ1rLzGnhYpQXRwcZGbArKNki2IIAYmgxItaZgmwYyma3hdkQjzrPvyAXv277wYFhMPGQjGPTE=
+	t=1727103931; cv=none; b=FUUync9bDJq84KZmnr4Cb0saGMQXeO7213goSWMXDafy/XhiDdZfG3zIcTIKXejgdF1W0mY5MQ5S6HdVvkHHtDvirA1ZjsAYjuDRnp0DdIcLfbNM9GYs8vZv8eBo/IBs5mT+IMBV08VYEl1Svq2o+CO+sCeIa4eirR8gM1FXtCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727103767; c=relaxed/simple;
-	bh=Vu0qZ487BLK9YGNzTsWJhWdNot/byiIn/Rlq9Lr4OwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fjv0UBh3pDM+NeOiCWXC9d8BC2LqCtZTERyPr+a8bQ5XgGC1nCFSGK83+dgLv4C5f+MUpLKXCauPHWC875f9gxlZZc1Jnc/BcQ99BjN9BZu3xmxscMocecZ379N+ckubN+XtvukSZ3EgM/xOkCidkaUeW08MkysfQVwaUB6x3IE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZBlSltin; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id AE3151BF203;
-	Mon, 23 Sep 2024 15:02:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1727103763;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R+ydyGmUsv6CKlgCdcUxLShZ5R58rZaOXUnePmMbVbM=;
-	b=ZBlSltin2yU9Kt/xsqkUDtayEVikt1r3Pmnd2M/0l/vLWP3k5BaTiOB76k6lkLfO5jKK5Z
-	IMdZaD1EF9TzutwoRyGvs97ON2WEXApuUBPu7GhPSrL97yixjU4rCj1BGgQpin6Hi8w93x
-	SnvM01pvFfnP9mqBdw2LZFZpuwEPVesygppRGAyKbcLbQLZzn4Eq1Wq8OzymhtvamOJgDk
-	KK2rQKmERU1/+wySSdMORxNSWPz/AYhHlICmMzrRuKVDSP76k0/zqbCsyeZMgs68Tz8X75
-	+AOZ/dM1jBn2/ur3r3OCUk0xOtDXbKtl0NGcMmgX8BbAZIzBjB3DCakmNNRFxg==
-Date: Mon, 23 Sep 2024 17:02:39 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Florian Fainelli
- <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Jiawen Wu
- <jiawenwu@trustnetic.com>, Jose Abreu <joabreu@synopsys.com>, Jose Abreu
- <Jose.Abreu@synopsys.com>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com, Maxime Coquelin
- <mcoquelin.stm32@gmail.com>, Mengyuan Lou <mengyuanlou@net-swift.com>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean
- <olteanv@gmail.com>
-Subject: Re: [PATCH RFC 00/10] net: pcs: xpcs: cleanups batch 1
-Message-ID: <20240923170239.5c1bcfc7@fedora.home>
-In-Reply-To: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
-References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1727103931; c=relaxed/simple;
+	bh=kcwURsfs+4HqgkiR2fGs+ShStw7nDn6N5z+9REMEdBE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=D7St12ed15FHreowa4vm8ccLgdQspZcjZLsIfA6+BhjF9NyR/yg3jOOMkoiFZ/vXrKPQGuPwPAChdXN2eyvzyZGgm+tdVrXSboXF48w7J6m0VI4fw33mcOc+3tGNq9NLvI3smcn5rJDNnvIR7SS7ZLdItg7MikvmPSpj4Fpu8Ms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XC5mc72pDz1HK3k;
+	Mon, 23 Sep 2024 23:01:36 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7753A1400F4;
+	Mon, 23 Sep 2024 23:05:25 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 23 Sep 2024 23:05:22 +0800
+Message-ID: <2567b018-c536-0bb9-9b2d-fb0ffb2b5ae8@huawei-partners.com>
+Date: Mon, 23 Sep 2024 18:05:18 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 0/4] Implement performance impact measurement tool
+Content-Language: ru
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+To: <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
+References: <20240816005943.1832694-1-ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240816005943.1832694-1-ivanov.mikhail1@huawei-partners.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-Hi Russell,
-
-On Mon, 23 Sep 2024 15:00:26 +0100
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
-
-> Hi,
+On 8/16/2024 3:59 AM, Mikhail Ivanov wrote:
+> Hello! This is v1 RFC patch dedicated to Landlock performance measurement.
 > 
-> First, sorry for the bland series subject - this is the first in a
-> number of cleanup series to the XPCS driver. This series has some
-> functional changes beyond merely cleanups, notably the first patch.
+> Landlock LSM hooks are executed with many operations on Linux internal
+> objects (files, sockets). This hooks can noticeably affect performance
+> of such operations as it was demonstrated in the filesystem caching
+> patchset [1]. Having ability to calculate Landlock performance overhead
+> allows to compare kernel changes and estimate the acceptability
+> of new features (e.g. [2], [3], [4]).
 
-FWIW I've reviewed the whole series, to the best of my knowledge this
-looks fine, nice improvements. I don't have any means to test however.
+Hello! Kindly reminder about this patchset. UDP-dedicated RFC v1 [1]
+patchset was published and this patchset can be useful to benchmark
+sendmsg/recvmsg hooks. But it would probably be better to apply other
+network patches first. WDYT?
 
-Thanks,
-
-Maxime
+[1] 
+https://lore.kernel.org/all/20240916122230.114800-1-matthieu@buffet.re/#t
 
