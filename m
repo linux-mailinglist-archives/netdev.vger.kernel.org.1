@@ -1,122 +1,190 @@
-Return-Path: <netdev+bounces-129292-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1689797EB7B
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:26:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BC6A97EB92
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:35:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC6E1281B15
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 12:26:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D03C1F21B62
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 12:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C4C198836;
-	Mon, 23 Sep 2024 12:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cSdABqor"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07A661714DF;
+	Mon, 23 Sep 2024 12:35:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [67.231.154.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11B31974FA;
-	Mon, 23 Sep 2024 12:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727094365; cv=none; b=MBsU+NB0N3FWTKTfQHE9ru73k0gNrn2bvQEaD3HZgONmd+RI8wANi1Tqg465/M1llC6yMUk30ewTKp2aSwUHekfVk5zQBgk9S1vdV3SdGVl8INzlZ/IPHSqu5K95Q763HhJ1LtkoUtcR6NuxmVmwQO0LBRJW53+I6Fpm+yezmWc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727094365; c=relaxed/simple;
-	bh=thO8VxYyImI2w80Ebuc+yVZ/26dy78mwPgP8fx3duWk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=j46ugJllgt7mwztOkfpj5RQXz2CBGiajCXExGR/vCYsK7UxL4AeSsFgiWo4colNTHgOSrE2GfSE6eCSzkkKDgbH00leAt6lhKKKzSKmUzzdWUwUwSHYVH6Jo1JG33VYLiEOOPfkWnPSxumBfZDkDr4BwCISSlGFOrNS1LNexNTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cSdABqor; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a7aa086b077so562319766b.0;
-        Mon, 23 Sep 2024 05:26:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727094362; x=1727699162; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jwuvqk2hbesNOUF+iNF8ZM1z2+Ejv+9It9RNoru66Uo=;
-        b=cSdABqorAEuS6XjZRNvNfbLUJUksUs8iVwQPRvdsJhu14q0g/hW3qyYsd+24CtPglC
-         1O3YTLQDgGSvdiaa/vuIEp78EhgcvKgGEOzpmrawMeFJGQLv/koSFmHSiyaUwtx+HYV0
-         t3ONWLhE9HoDZCZ+BNkj6Kp+lOxWDSSyXFSFTrm0ddPmKxUBi3Irrel7ic8uOhw+oNUa
-         5qZiLwndMckOtN/WyMBxkQYo9XW+zghA8p+KRnc+8NtD20ig9SDfGlwMiASVcAH+TNmK
-         d9ZD7nN+cyZxQmNnGS9b4dRgSTaIjc5qi+JWVkfNuF0Xdr64t3p0hIaBMvrzocvjaw3l
-         SZcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727094362; x=1727699162;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jwuvqk2hbesNOUF+iNF8ZM1z2+Ejv+9It9RNoru66Uo=;
-        b=XEBnxDDZaMo//AHmh9d5jvhn3stTvqvOMscSiWF9C0cvcgi0YepKkuXxx9SMjp91wz
-         WhTsifeN1b67MLxgKcuQAldJYe6SetaGhfshAye4Kd75jdIAD3ws0IVZx/PHFXG3tdOA
-         X92GzUVGBpnFIgfTMvW26XDN9EXEzjo/db2tPzES0KPsByR72xJJeHiCEhSO5BZBmMl3
-         /9wrZLpUF0A4ooBzdIZF422keS+xXQ2RRkD1FEa2nZHVSmafJ59X5fvOdpvvlmcDDaV1
-         394l6xeE+FfI4jHxyfB61AEJHddct+XvaKZUzo+8Vgk3Q2AY4UhQHRz2zJgcfDrtggev
-         Gt3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVPUfRNg7zD3El8IUxuysUnJ59g8qLQaocJA8D4H3sXnPKPu/bAxVkc2BFJ3NZk6yLvs1aeSJVv@vger.kernel.org, AJvYcCVoiXlxVCBPYgNghwz/UBNLrQe8vvMjWOAfjIWBDQPhR5LZC+/CRwB9bHzZd/pep/O8L8KnYvqfMPc3/Rs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoB6LHEl+x0RNAoFN7o3j8e2/yYhPaMKu0OZhIKnLEXUSSgFsq
-	dkjGFqeq0bwUB4u3BGKGVrbr4NyDuQSnuxz2awoTRBnaGnQqcx9sEbxbyT4S
-X-Google-Smtp-Source: AGHT+IHzOxGWgS4dSxMN2FQb39/d+5oUhTTL14UvFAX0MomqmfsHtiyL6nrH5PKtJ0BG80q5d6Wugg==
-X-Received: by 2002:a17:907:d2d3:b0:a8d:4f8e:f669 with SMTP id a640c23a62f3a-a90d4fdf439mr1117254266b.2.1727094361886;
-        Mon, 23 Sep 2024 05:26:01 -0700 (PDT)
-Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a90612b3833sm1217175866b.128.2024.09.23.05.26.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2024 05:26:01 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Potnuri Bharat Teja <bharat@chelsio.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] cxgb4: clip_tbl: Fix spelling mistake "wont" -> "won't"
-Date: Mon, 23 Sep 2024 13:26:00 +0100
-Message-Id: <20240923122600.838346-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A01E1E502
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 12:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.154.184
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727094938; cv=fail; b=GbP9IXcz5D+U10SbALAAXI2THcj9fgSCLV41D8TMZ+bkDSqMA8bjK7Q62nxKejZ7IVRSn69bNyJTOSr7U3T0C+FoJLsjah7shzhM0WapP+Y/9WI2m6er/wbiJ8C76JpEpO4u3Jxx7Wbo+hb9goDoxbRKUsEYcivg9VKsaRFbNZY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727094938; c=relaxed/simple;
+	bh=Dq/Ea3my0wJy6i+RL9CMFSS6Eh4DgcVO1TGDYA604xM=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=B+gDT3mzGRUbCMSjqqMvd3ifTv7OaUzGkn6YCUYcvFuPY0OquSzcjg35BGqehTaaE0EnXJ7Kb+n+LE39TQAqvUnrGN6mJkuTIH+ZR10AngLQ8v7AkkPRhHghUe9fHkM6BSw+Wwug6yGUQZdTAbHHDoLNGpLUSw1GKZTEgclQuv8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=educatalysthub.tech; spf=pass smtp.mailfrom=educatalysthub.tech; arc=fail smtp.client-ip=67.231.154.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=educatalysthub.tech
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=educatalysthub.tech
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from IND01-MAX-obe.outbound.protection.outlook.com (mail-maxind01lp2177.outbound.protection.outlook.com [104.47.74.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTPS id 44B5E94007F
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 12:35:29 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=KDMHia79trG0n49nU3uLwwwCXMnF+9rWr2nmWU1WOwPNyl8Zdl8gv0B92ld+5LM0RdpHqhtiUhyYa5XuTP78p00ejMdVxbCoil6aHFvFHhaZu/b/+pDLh3PH1OElEQgwikRV1ZPZJ7xUp6NWzgj4ZGVGrutwGCurYxzAfE2zRTwF/uebz6nhP9nqIG4X1YQUH4fEeaeswe5OTwFF1qGzeS+uOti3V+XbjBc37yDB38z14G5yeWuFudT+mC4cMnZFgAC8w5stS/PL2trr5pVPHnDTmzF0EIAd1jHMYXbRMeXAZUD31P4FVc5VH8VJ9vNHRVgLiua2T3lQbzvJmIq7mQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iSusEUBMhKGx0wHye1aQchXQ6ve4FHMwcnwKqPfdPL4=;
+ b=gvB2q2S+T49wZagzFMIlvKtCzzMZKGUfjKH7D8WFUnM9bphqR8FdY9eRyEjSAVbOifjB5OxblxtYvZ09CEBisJgOkkTAo/Rk8O2UFRnV+5mhmv7vdYM+b4CDts8B2EthtdimY4MY8UkHjhp3Yi3HNo5p37br+JESdX4s7K9+FED3OdnBjW+m5BAwESPEmw2ngrcRZAD6fCHa26m6u/4E7usBIyKvm0WisxeRBN29FQsCKs8Fidz5ko9bi/UJLkkg+g5RFYEOlSlS/T/sFe4jLLwNpWpV0NHknAss1GOkiXtmnBWRCRtZs5Ky+RBqE+hXrW6aoPxKSrDO9HCOUwyrSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=educatalysthub.tech; dmarc=pass action=none
+ header.from=educatalysthub.tech; dkim=pass header.d=educatalysthub.tech;
+ arc=none
+Received: from PN3P287MB2845.INDP287.PROD.OUTLOOK.COM (2603:1096:c01:20f::13)
+ by PN3P287MB1135.INDP287.PROD.OUTLOOK.COM (2603:1096:c01:173::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.25; Mon, 23 Sep
+ 2024 12:35:21 +0000
+Received: from PN3P287MB2845.INDP287.PROD.OUTLOOK.COM
+ ([fe80::568c:6557:ed67:d933]) by PN3P287MB2845.INDP287.PROD.OUTLOOK.COM
+ ([fe80::568c:6557:ed67:d933%5]) with mapi id 15.20.7982.022; Mon, 23 Sep 2024
+ 12:35:21 +0000
+From: Lily Green <lily.green@educatalysthub.tech>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re_School Contacts List 2024
+Thread-Topic: Re_School Contacts List 2024
+Thread-Index: AdsNryrb9vJwxliXgk6yqrGN3Fo48Q==
+Disposition-Notification-To: Lily Green <lily.green@educatalysthub.tech>
+Date: Mon, 23 Sep 2024 12:35:21 +0000
+Message-ID:
+ <PN3P287MB28459CEF653D6FB5B691B310856F2@PN3P287MB2845.INDP287.PROD.OUTLOOK.COM>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=educatalysthub.tech;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PN3P287MB2845:EE_|PN3P287MB1135:EE_
+x-ms-office365-filtering-correlation-id: 257f9619-8bfc-4557-00ac-08dcdbcc3098
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|1800799024|366016|376014|10070799003|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?F4RB3AdDb+TKaQ9VPKcwfPilL3v665qy4EUmS9Qzaq5OPYEIhqpay80DRRKp?=
+ =?us-ascii?Q?QuNzDhryA56KAgk8QboaxsyBB6qA3w8SHMIu/lPKpmOwsY2uCMbuJbWXC6XI?=
+ =?us-ascii?Q?DkQbV5q3peK9bJf760M1kOoDbIQYcpxJNGDmHcbuimfzuUbRXU/XHj+EWqbh?=
+ =?us-ascii?Q?FzbYm3O5J4xdLfRk2uorpTz1YT3dD3w3cYlg69r1e1fdSaRGsnbzdKK59xdm?=
+ =?us-ascii?Q?g0dpygiBI9Xv0M/24CzXK3L2EoKqp9GM8f7WNcDayPy4WhKzAnmWOLMieKi4?=
+ =?us-ascii?Q?sMB8OyAZxZYOtdjTEgGM2tRKkREDG1Mg+8+hiNdmzk5QZ/Ct5CCSb5pJopMH?=
+ =?us-ascii?Q?AXwwh9Yef7xJjXOwSs/mIPaJ2c6PHSTksk7p6ANOcHrQl7BJq17iGxbDhHgQ?=
+ =?us-ascii?Q?bFtJeBpij204AvJzzoVDhvC9TquN4IJGtr2QQIbHAr1FUIjZRdvpOFsCWvwn?=
+ =?us-ascii?Q?WVvJ5d3diBiJWa8g9x6WDg9GU+2s+fgUsAELTcb+NoRznS/Bawcsb9wiwC7q?=
+ =?us-ascii?Q?R77dM5+5oZ0spOqKy8iiISsMkumJFKMpWBB363OpVc+eFi4HWmcGrm/ce4DE?=
+ =?us-ascii?Q?mfGtlTTembrb3ztJsbRPg2fAoRQcLFX0Mp52ke++/nL0b0yRpbajqMPTY6Hn?=
+ =?us-ascii?Q?jpmocrBUxKbSxdXIzFKcM+hEFSKU5Szx6YuSoiy7c12lA8o4pQeAeXER1g52?=
+ =?us-ascii?Q?TApKeDfbMmEGUuaRHy0lMvYXk+gYV577mp3Gx3MDfYXaxeryC6le9ySxbUnr?=
+ =?us-ascii?Q?51q9GCaNHdVIe/++XK+wcd3hX9wSf8GeZFdaYXSCD91TP9oWaoqfb+ouClgj?=
+ =?us-ascii?Q?bm6Os4SXScBrXlxUE1zHfDo+AVfN1JFTMthRYDuMgUZ7YP+X78BYVN+Y8ISK?=
+ =?us-ascii?Q?GlkNvO7nhyX5hY46p/S5Xn5ykcD8j8FghwaDnErJDLsMB1Cq8ZCgCOCEsl+W?=
+ =?us-ascii?Q?LphYQy0RxhSZ7nN0qh0ayxo+28NjgXN9IK7FXggEq3nFHXttuQ+N2HrHeQkt?=
+ =?us-ascii?Q?oXm5oIHm3NjYVS7/e2k5E0YxzKvctvakP0yWcwnrh48jKJaajOhRoxUidnOd?=
+ =?us-ascii?Q?ypom4QxyWy/LobTLkOYg4NJHVcrXJ8bvz//kEaQ1bBO8DX8QN28xeKWI+zT7?=
+ =?us-ascii?Q?LORwqszupkH7ZfcjaxGjRA2T+Cp+kFo8Ax0PtKqcnBC95QBbg9PFXt3Dq/7i?=
+ =?us-ascii?Q?d0yi3uVoqseorMTRaRgD+ThWeZ2W8SWQxs/2PYfH3hVpLrRN2Bjx0JOCVVDg?=
+ =?us-ascii?Q?au/Uc8XqQ1zFenccLP06mrXmYirFNRkuNyWfKwjKVR/F2DOSKTLOPYMP/VTj?=
+ =?us-ascii?Q?nNABECBvv5bBVQhTlc4gOMX+QyLgB9KAM0KQXNyh/kLsSA=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PN3P287MB2845.INDP287.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(10070799003)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Uc4cM8rjWSJMs3xTWgXFZaSMyTLvOxoxa/vM/zxqczVtud59hZgFM3r+wwQD?=
+ =?us-ascii?Q?QngbMcrmhEkqoWa9k2fR4izNUnKkrOYD2WmE6i6N8qKhMnm8D02mLrUQjxy9?=
+ =?us-ascii?Q?ad53Qfw2RCYcgsmdSDseEbQ6b3gRjOUZ5RnKCNwLXnId9KvvS2n/m46ankAD?=
+ =?us-ascii?Q?uTiFBLapcqA9OUBbpZCBYSi3ND1LMneFZY7B169ndqei7FxMOfDCSb6pV0IR?=
+ =?us-ascii?Q?ozoH1+hQ7H4IgPeZ10GWVZpkRsaWjwpbdhJ565GlO+DlFSKSKYF3eXuw3JrC?=
+ =?us-ascii?Q?/9bse+a+bmlYDVh94h+eHzs39giYK1H51ez5FmTetk9VuX+vYmeZdyCsB7Fq?=
+ =?us-ascii?Q?rOx0JUyI7GzCnHj0QwMtjzar4Dm3iJnJbsdby47F5oaxA3jCWzuau4SzfQzK?=
+ =?us-ascii?Q?05tmLX7cOROqFj7zQqdb7w5EVWudw/jTiGKCN1jvtq04TR0iEeAVmiVP3DIN?=
+ =?us-ascii?Q?W4Xyke/yrk+tbOem5aHLSyID8xId7hNcAkTfY/MSVT3N16EhpwmXMz/imChU?=
+ =?us-ascii?Q?YV1RgUJNfrl3Rc1A5q8IulSXjdrdlwqmpkgM+7IlhD9cAnu3K9nOBT6RygUv?=
+ =?us-ascii?Q?FRhJsqeADggQrxvjoMdCtOGljUaP5oOLM+JJ7U58v1x01OjlVWWtgCNuGyjD?=
+ =?us-ascii?Q?b15bYNw8kj/U0dOj0jwJhyPQXSi76UDl10sICxBwyvf1su0L9AXZLgNYLP/B?=
+ =?us-ascii?Q?1tDYqnp4MW92fDXJLKcz0zD7G+DCgU89KZXuk43fIvmzAx3FOqH6Y3DDuKgi?=
+ =?us-ascii?Q?mO3nVkHoF76MctUzqExJhzDNxtqmWYcIQnW9l8XijHRI+9NQXN3Pf5PRThTR?=
+ =?us-ascii?Q?WAvMjkeWZFzrPIvK++tJPZkGa+8zOwVC/R+xfXeHYC1zaTFepeniSetZVktc?=
+ =?us-ascii?Q?tOVUaG+48gaBUfEpQ2MQbszpwFv4l1ohv+A2zl9E+fyFCd7hAjlE43n93Pz/?=
+ =?us-ascii?Q?131dDF0IJwUzNcZNNm85ojZdCdaQBTPkJjl8vgbMiKUOTCx9l6QzJGXLV/5Z?=
+ =?us-ascii?Q?HpkSPmN0vX5M8AyG+81N4GVLqjYJ5FXhH5h2ewXruGfA6pBZYJN398cyW0Da?=
+ =?us-ascii?Q?Z8HvKd9RsMb4Z7CDI+IOkOSkcl3OukWKtY6FRC906RN7rh1T6cBCxsNSzbrK?=
+ =?us-ascii?Q?ONcQjo7Nwlb5xROpBQfM4QuTra6QI6fl5+8NFbOzB6SJsOb5LtCwHl7/pLf2?=
+ =?us-ascii?Q?FEygkPOCATMNeBm1DlCY0CDFqxw5U6vhc6W1S2+CB79MKi+iW3pfBoEmDoTF?=
+ =?us-ascii?Q?Es6x6uDQXVfBquGtpqHLXQGxz2TiInGpaFfpY4n5yPcQksAahIAX5d+o/X6X?=
+ =?us-ascii?Q?BxNFPxh1pt93epa1jdzT5MjEmZFdvQAaWBPQ7K7oTKPxGgZuTXyDku8HzQGG?=
+ =?us-ascii?Q?aZE/bXdDC/8TTh6g39Jio4oC2+KyWn5CHD795cCmQ4l4jd5QL0byfihb64Y/?=
+ =?us-ascii?Q?JmaZ7PKknIzdLDnoEAqK6srop1b8DwLs8vu51aEEtONrqwmwjdxiet7LIWTl?=
+ =?us-ascii?Q?I1RX8vj+pz6T0CSgYK5+VP/DFlkIq3aGFm/1MnMk6t/zGRvmVu0vJXtfLK59?=
+ =?us-ascii?Q?0D53GbwCpeqFi5ZEOEWc+uhQWwA+iR1v2PuN6Yl27ZbBiEvakHHN2kK6Zxu+?=
+ =?us-ascii?Q?JmB2ZsWIxyTd/D+VRrtvzphi5dFKKTYq/H0xuP4qE5DIW4OtAMwOPq6C/teB?=
+ =?us-ascii?Q?UhXWPA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
+	cjXPstuZOLlHOUfB+FgojWEgTpTnNeUl1USXYvGvs6z1v3WxEVh3XVVzIu5r0qYojb4R3R9/9qgQa2fKBuZbkC12MQlBmLw7eN8kAiWUrcxH6w3FAptIZk+ebQF4GpU2yFzVs4SzgZLf8TQ2r3zpEtqbamSI8AxjNiIQQWmxOmWWKBGt0ldRublEDPU4/5uIkgKuGUJA8ntBWUoPYKQcDDHSl9m6pdj5uXca9ZvpODfeJd4ih5xAzKb+PXGyDZcFMEoZ/BaX3aLBF8wkMwfxNUJmI6aqcHrtA/J4yiCZAaWnDVPGR1DlKfKjDGp/lzfH+mD3QMYnppE4ITivqHmf777mFMwXFzfq+/K2mwYi7oGEpsS8OTkDUh6+x6f7w8MhgsHPpgkoyGJe6s56bFaUK90TJC4rNNfJCp68lhTtoU0ss2oVHGCnnjjzLT9+41i9siJo1blimFIBpS72S8ytrWtnsv7OG93c3KEJ+fzteoaSADTDIg4lOhYcKxkDSGMNI/ZCUwj8/35dro4wm/Mj8o5F8a7y+fux5fJoG4NReW384m5oHfdfyxee5ES9gFzSRaFqcT6zMow6CUwodqVwnaiTlS6xlF4V8OiDfhfAIVs=
+X-OriginatorOrg: educatalysthub.tech
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PN3P287MB2845.INDP287.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: 257f9619-8bfc-4557-00ac-08dcdbcc3098
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Sep 2024 12:35:21.4256
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: e365ff34-85ca-4d9e-869a-17889878f5ae
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 2UqkbPmcYDD8bMcIKHFPWMLatENLX6v4RMZXpXZbhorJ6vZsYl8hTN8XVSZv/rrzSTHlUVqNMiUEYN3drfQlIGmREtf2+uHjJojrRRWMjy0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PN3P287MB1135
+X-MDID: 1727094930-nrU3W2SA-Zc8
+X-MDID-O:
+ us4;at1;1727094930;nrU3W2SA-Zc8;<lily.green@educatalysthub.tech>;0590461a9946a11a9d6965a08c2b2857
 
-There are spelling mistakes in dev_err and dev_info messages. Fix them.
-
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c b/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c
-index 163efab27e9b..5060d3998889 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/clip_tbl.c
-@@ -120,7 +120,7 @@ int cxgb4_clip_get(const struct net_device *dev, const u32 *lip, u8 v6)
- 				write_unlock_bh(&ctbl->lock);
- 				dev_err(adap->pdev_dev,
- 					"CLIP FW cmd failed with error %d, "
--					"Connections using %pI6c wont be "
-+					"Connections using %pI6c won't be "
- 					"offloaded",
- 					ret, ce->addr6.sin6_addr.s6_addr);
- 				return ret;
-@@ -133,7 +133,7 @@ int cxgb4_clip_get(const struct net_device *dev, const u32 *lip, u8 v6)
- 	} else {
- 		write_unlock_bh(&ctbl->lock);
- 		dev_info(adap->pdev_dev, "CLIP table overflow, "
--			 "Connections using %pI6c wont be offloaded",
-+			 "Connections using %pI6c won't be offloaded",
- 			 (void *)lip);
- 		return -ENOMEM;
- 	}
--- 
-2.39.2
-
+Hi there,
+=20
+Want to expand your outreach to K-12 schools, colleges, universities? Our e=
+mail list of principals, superintendents, and key decision-makers is ideal =
+for you!=20
+=20
+Our List Includes:
+=20
+*	Principals
+*	Superintendents
+*	Board Members
+*	Department Heads
+=20
+List Contains:- First Name, Last Name, Title, Email, Company Name, Phone Nu=
+mbers, etc. in an Excel sheet..
+=20
+If you're interested, we would be happy to provide you with relevant counts=
+, cost and a test file based on your specific requirements.
+=20
+Looking forward to hearing from you.
+=20
+Best regards,
+Lily Green
+=20
+To remove yourself from this mailing list, please reply with the subject li=
+ne "LEAVE US."
+=20
+=20
 
