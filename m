@@ -1,309 +1,253 @@
-Return-Path: <netdev+bounces-129389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15969983913
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 23:24:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A13198391F
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 23:33:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BC851F22387
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 21:24:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CDE80B21792
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 21:33:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D12FB83A06;
-	Mon, 23 Sep 2024 21:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F9383CC7;
+	Mon, 23 Sep 2024 21:33:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BiVPcTPV";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RthMSAos";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BiVPcTPV";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RthMSAos"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="DdQT62f8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9420E7F7DB;
-	Mon, 23 Sep 2024 21:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A20E78C76
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 21:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727126670; cv=none; b=m8DZIyqk0j9A78EHb95SQtA7DOEmUkwX4Ui61kdV96FgzXbbJZMAJKq2H6o7AHDAxY3yqH4mJtbi8WqCJiNHxsbD5gtGwQZ1JCbGNMvCAwg6dw4hhZFX6z2Ism404Hf1FHOnE9jYqDCff4xanElC9cJAxtz5IPAVL8YSBonJIKM=
+	t=1727127211; cv=none; b=CU2x9HOz0MSaNdcUipud2CK15yanJINOTZxJNybBdegXO+ujb8HApoiRPrGB91YKMbyAdwlX3RtEtfTu2JovXTfkP02h8D0QnlEgtr0gr9C5litET9qtpPUJwzfm3YjyRlv6JRMkDnX/wpOVjvZKu+uDRrI7Z3YxBzAULSASx0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727126670; c=relaxed/simple;
-	bh=DWT9LTgTwgl3oI2zR0kqC0LrGcG2j48l8BSn+c9QYPw=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=HJoYNeKIhrv3WzQgOIVh3KR4tTNMkAqPUYTg8SV0Xl7C8lMh5JHKZ/4LyJX13T9WW55iPFMHbyUFqyD4RTnWVxZyGN9sKWdCt5JaRv5Li1BjjcYvzgxGTQOJ5h0yt8C15AbaefsfLK4Hcd6gkg1pWfdNL1OiZrX4F6QVE+i0oGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BiVPcTPV; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RthMSAos; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BiVPcTPV; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RthMSAos; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id A88F421CAC;
-	Mon, 23 Sep 2024 21:24:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1727126666; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r6jB3NjLBHp1Hb3SCVME9sYqKJRwKArJJM5yKt3AWpM=;
-	b=BiVPcTPVQQOXadtEkCT6qpOsPvatJsvHeHJGVFZGRFRwU2qceGX9Yge1cBgUxEaI9WXnzd
-	ZZgoiHBRr2Z6DlnKdhYroQCZ459mSFYnoTq4wtN3q4g4A90d+Iv3AYOgUHNvD+x6Sq2XoD
-	i1A1/nu3HKTiXC76YqB18jXM/yeHCuk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1727126666;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r6jB3NjLBHp1Hb3SCVME9sYqKJRwKArJJM5yKt3AWpM=;
-	b=RthMSAoskmprqIuYzWJ0v2jTh7zRz6HFj8WbgEEo3NdElLavWk5mHRDUoD06JTlUzZ3F7E
-	qY1/qrXn6ICjawCw==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=BiVPcTPV;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=RthMSAos
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1727126666; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r6jB3NjLBHp1Hb3SCVME9sYqKJRwKArJJM5yKt3AWpM=;
-	b=BiVPcTPVQQOXadtEkCT6qpOsPvatJsvHeHJGVFZGRFRwU2qceGX9Yge1cBgUxEaI9WXnzd
-	ZZgoiHBRr2Z6DlnKdhYroQCZ459mSFYnoTq4wtN3q4g4A90d+Iv3AYOgUHNvD+x6Sq2XoD
-	i1A1/nu3HKTiXC76YqB18jXM/yeHCuk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1727126666;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=r6jB3NjLBHp1Hb3SCVME9sYqKJRwKArJJM5yKt3AWpM=;
-	b=RthMSAoskmprqIuYzWJ0v2jTh7zRz6HFj8WbgEEo3NdElLavWk5mHRDUoD06JTlUzZ3F7E
-	qY1/qrXn6ICjawCw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id D4C671347F;
-	Mon, 23 Sep 2024 21:24:21 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id HHOTIYXc8WYCUwAAD6G6ig
-	(envelope-from <neilb@suse.de>); Mon, 23 Sep 2024 21:24:21 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1727127211; c=relaxed/simple;
+	bh=vjhYh6hcH8/7VxfNe2wp7ly9zc0buL0j6DU0Na40oF8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eCgKfe1twJSzSwy67+hGwNninyYi24Z5DNiPDKF9auSytZL7RcQ8bOJRvqMhAoInFYq+YraZyLRiAZ5KKkSEpFH0pQQcs9cZz0RmhD79rcNLY8Na0NI6Y1Lld9NFSU0d3goh8LSKcCQt3phwxRppFCARjGFWWONlzsJw8RKze/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=DdQT62f8; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7cf5e179b68so3951458a12.1
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 14:33:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1727127208; x=1727732008; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iSO2oM4clsB/fWSgry40Vq5NPBXMY7dIH/csJJ3ySMQ=;
+        b=DdQT62f8CfBQbHpOJqU30yB1ZUdfwXrASzwlahM728sjljJr/8TZnaGVkBUkgnydo6
+         jgZVlfJwrX+39Zx9RlFwYopVm33sSVEvrKnTJt0Y4n0NmWnROXC3HGHW3qlJd3tHVeeP
+         nRbs63j7dLFf/nRw079i3tShWvcJ6sN+W3pLOiBthT5xxFb9t2Td8I9Tsh5F8qw5NR87
+         7t71KV7Mo2GjAw3qn9sbEcqsvQHLnR0yLGLURzGQuysdwTp4SIdjzQCcM0QFTIUwSc4J
+         cv/mo8sYmBy/7PhhrhSk4g9CxQgFSl/KnuT1rhOhhtslyRgLeovpxzqPJ1nYDVQJqgGP
+         1LNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727127208; x=1727732008;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iSO2oM4clsB/fWSgry40Vq5NPBXMY7dIH/csJJ3ySMQ=;
+        b=pKXNEbLH/lweihM71gweu0SXR9Uw0oKiocUIURh3VVofv804ZAw/m1oC9oWTTZJ1VI
+         HqZzlFiuPo/CUxI51Qp5m1AlMndli5q5i/oK196j7ODON7Na7Jzwm0O5RO3VdRmulX9h
+         YnNpbbGyA+3mxFtek1YAm4aLyFsdTWG/AWXDyUQ4FUXSKd8b+A5yYCbmo1m/NlAhi83I
+         ZjeoiwyogHdwMAAq2yDXoc+emLZQIpL94hVPrk5Teue8WvEwoAn/fVyLypfkghKdUnXC
+         ZDlbGv9dV62uml4z44LRCR/CPeDSz+dir/hv445Lep+jlpD9ypN7uYWXyfZEOfFEindA
+         sTUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV7Y22GydhOrf2ErsaQ7sKiDUr6YmF2QkvLEO8zsUUbu+UTdqITLR0L16ISMbstGEghz2lVvg0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2+1a2jwtjCKoa3Gnd3J+iIH4bhwvc6W2/QBcqA0Yo29ub6GCe
+	FZ3AJ25iRJMn75iYvkx3JJgyLEhUM+exdsH+oK+vg226+xKw4j2iXRzlTJdWDB3y2uddRawIxRQ
+	6DK0WwdRo0nxl3I8O5LyoPPy2hmd+LMN17elRVQ==
+X-Google-Smtp-Source: AGHT+IGkzWSnsjufHAximoid8vNHundw9/i+nltBwcS6TsKnKakK96mNlpwPHzX/lcnxGDafUauW8IGdLt/lXsPZBVo=
+X-Received: by 2002:a05:6a20:9f4f:b0:1c0:f114:100c with SMTP id
+ adf61e73a8af0-1d343c762f5mr1620096637.17.1727127207585; Mon, 23 Sep 2024
+ 14:33:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Mirsad Todorovac" <mtodorovac69@gmail.com>
-Cc: linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, "Chuck Lever" <chuck.lever@oracle.com>,
- "Jeff Layton" <jlayton@kernel.org>, "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Tom Talpey" <tom@talpey.com>,
- "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Mirsad Todorovac" <mtodorovac69@gmail.com>
-Subject: Re: [PATCH v1 1/1] SUNRPC: Make enough room in servername[] for
- AF_UNIX addresses
-In-reply-to: <20240923205545.1488448-2-mtodorovac69@gmail.com>
-References: <20240923205545.1488448-2-mtodorovac69@gmail.com>
-Date: Tue, 24 Sep 2024 07:24:10 +1000
-Message-id: <172712665050.17050.14126694149839508223@noble.neil.brown.name>
-X-Rspamd-Queue-Id: A88F421CAC
-X-Spam-Score: -6.51
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-6.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com];
-	RCPT_COUNT_TWELVE(0.00)[16];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_CC(0.00)[vger.kernel.org,oracle.com,kernel.org,redhat.com,talpey.com,davemloft.net,google.com,gmail.com];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+];
-	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[oracle.com:email,davemloft.net:email,talpey.com:email,suse.de:email,suse.de:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
+References: <CALrw=nGoSW=M-SApcvkP4cfYwWRj=z7WonKi6fEksWjMZTs81A@mail.gmail.com>
+In-Reply-To: <CALrw=nGoSW=M-SApcvkP4cfYwWRj=z7WonKi6fEksWjMZTs81A@mail.gmail.com>
+From: Ignat Korchagin <ignat@cloudflare.com>
+Date: Mon, 23 Sep 2024 22:33:15 +0100
+Message-ID: <CALrw=nEoT2emQ0OAYCjM1d_6Xe_kNLSZ6dhjb5FxrLFYh4kozA@mail.gmail.com>
+Subject: Re: wireguard/napi stuck in napi_disable
+To: Jason@zx2c4.com, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	wireguard@lists.zx2c4.com, netdev <netdev@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, jiri@resnulli.us, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: kernel-team <kernel-team@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 24 Sep 2024, Mirsad Todorovac wrote:
-> GCC 13.2.0 reported with W=3D1 build option the following warning:
+On Mon, Sep 23, 2024 at 7:23=E2=80=AFPM Ignat Korchagin <ignat@cloudflare.c=
+om> wrote:
+>
+> Hello,
+>
+> We run calico on our Kubernetes cluster, which uses Wireguard to
+> encrypt in-cluster traffic [1]. Recently we tried to improve the
+> throughput of the cluster and eliminate some packet drops we=E2=80=99re s=
+eeing
+> by switching on threaded NAPI [2] on these managed Wireguard
+> interfaces. However, our Kubernetes hosts started to lock up once in a
+> while.
+>
+> Analyzing one stuck host with drgn we were able to confirm that the
+> code is just waiting in this loop [3] for the NAPI_STATE_SCHED bit to
+> be cleared for the Wireguard peer napi instance, but that never
+> happens for some reason. For context the full state of the stuck napi
+> instance is 0b100110111. What makes things worse - this happens when
+> calico removes a Wireguard peer, which happens while holding the
+> global rtnl_mutex, so all the other tasks requiring that mutex get
+> stuck as well.
+>
+> Full stacktrace of the =E2=80=9Clooping=E2=80=9D task:
+>
+> #0  context_switch (linux/kernel/sched/core.c:5380:2)
+> #1  __schedule (linux/kernel/sched/core.c:6698:8)
+> #2  schedule (linux/kernel/sched/core.c:6772:3)
+> #3  schedule_hrtimeout_range_clock (linux/kernel/time/hrtimer.c:2311:3)
+> #4  usleep_range_state (linux/kernel/time/timer.c:2363:8)
+> #5  usleep_range (linux/include/linux/delay.h:68:2)
+> #6  napi_disable (linux/net/core/dev.c:6477:4)
+> #7  peer_remove_after_dead (linux/drivers/net/wireguard/peer.c:120:2)
+> #8  set_peer (linux/drivers/net/wireguard/netlink.c:425:3)
+> #9  wg_set_device (linux/drivers/net/wireguard/netlink.c:592:10)
+> #10 genl_family_rcv_msg_doit (linux/net/netlink/genetlink.c:971:8)
+> #11 genl_family_rcv_msg (linux/net/netlink/genetlink.c:1051:10)
+> #12 genl_rcv_msg (linux/net/netlink/genetlink.c:1066:8)
+> #13 netlink_rcv_skb (linux/net/netlink/af_netlink.c:2545:9)
+> #14 genl_rcv (linux/net/netlink/genetlink.c:1075:2)
+> #15 netlink_unicast_kernel (linux/net/netlink/af_netlink.c:1342:3)
+> #16 netlink_unicast (linux/net/netlink/af_netlink.c:1368:10)
+> #17 netlink_sendmsg (linux/net/netlink/af_netlink.c:1910:8)
+> #18 sock_sendmsg_nosec (linux/net/socket.c:730:12)
+> #19 __sock_sendmsg (linux/net/socket.c:745:16)
+> #20 ____sys_sendmsg (linux/net/socket.c:2560:8)
+> #21 ___sys_sendmsg (linux/net/socket.c:2614:8)
+> #22 __sys_sendmsg (linux/net/socket.c:2643:8)
+> #23 do_syscall_x64 (linux/arch/x86/entry/common.c:51:14)
+> #24 do_syscall_64 (linux/arch/x86/entry/common.c:81:7)
+> #25 entry_SYSCALL_64+0x9c/0x184 (linux/arch/x86/entry/entry_64.S:121)
+>
+> We have also noticed that a similar issue is observed, when we switch
+> Wireguard threaded NAPI back to off: removing a Wireguard peer task
+> may still spend a considerable amount of time in the above loop (and
+> hold rtnl_mutex), however the host eventually recovers from this
+> state.
+>
+> So the questions are:
+> 1. Any ideas why NAPI_STATE_SCHED bit never gets cleared for the
+> threaded NAPI case in Wireguard?
+> 2. Is it generally a good idea for Wireguard to loop for an
+> indeterminate amount of time, while holding the rtnl_mutex? Or can it
+> be refactored?
 
-See
-  https://lore.kernel.org/all/20240814093853.48657-1-kunwu.chan@linux.dev/
+I've been also trying to reproduce this issue with a script [1]. While
+I could not reproduce the complete lockup I've been able to confirm
+that peer_remove_after_dead() may take multiple seconds to execute -
+all while holding the rtnl_mutex. Below is bcc-tools funclatency
+output from a freshly compiled mainline (6.11):
 
-I don't think anyone really cares about this one.
+# /usr/share/bcc/tools/funclatency peer_remove_after_dead
+Tracing 1 functions for "peer_remove_after_dead"... Hit Ctrl-C to end.
+^C
+               nsecs                         : count     distribution
+                   0 -> 1                    : 0        |                  =
+  |
+                   2 -> 3                    : 0        |                  =
+  |
+                   4 -> 7                    : 0        |                  =
+  |
+                   8 -> 15                   : 0        |                  =
+  |
+                  16 -> 31                   : 0        |                  =
+  |
+                  32 -> 63                   : 0        |                  =
+  |
+                  64 -> 127                  : 0        |                  =
+  |
+                 128 -> 255                  : 0        |                  =
+  |
+                 256 -> 511                  : 0        |                  =
+  |
+                 512 -> 1023                 : 0        |                  =
+  |
+                1024 -> 2047                 : 0        |                  =
+  |
+                2048 -> 4095                 : 0        |                  =
+  |
+                4096 -> 8191                 : 0        |                  =
+  |
+                8192 -> 16383                : 0        |                  =
+  |
+               16384 -> 32767                : 0        |                  =
+  |
+               32768 -> 65535                : 0        |                  =
+  |
+               65536 -> 131071               : 0        |                  =
+  |
+              131072 -> 262143               : 0        |                  =
+  |
+              262144 -> 524287               : 68       |**                =
+  |
+              524288 -> 1048575              : 658      |******************=
+**|
+             1048576 -> 2097151              : 267      |********          =
+  |
+             2097152 -> 4194303              : 68       |**                =
+  |
+             4194304 -> 8388607              : 124      |***               =
+  |
+             8388608 -> 16777215             : 182      |*****             =
+  |
+            16777216 -> 33554431             : 72       |**                =
+  |
+            33554432 -> 67108863             : 34       |*                 =
+  |
+            67108864 -> 134217727            : 22       |                  =
+  |
+           134217728 -> 268435455            : 11       |                  =
+  |
+           268435456 -> 536870911            : 2        |                  =
+  |
+           536870912 -> 1073741823           : 2        |                  =
+  |
+          1073741824 -> 2147483647           : 1        |                  =
+  |
+          2147483648 -> 4294967295           : 0        |                  =
+  |
+          4294967296 -> 8589934591           : 1        |                  =
+  |
 
-NeilBrown
+avg =3D 14251705 nsecs, total: 21548578415 nsecs, count: 1512
 
+Detaching...
 
->=20
-> net/sunrpc/clnt.c: In function =E2=80=98rpc_create=E2=80=99:
-> net/sunrpc/clnt.c:582:75: warning: =E2=80=98%s=E2=80=99 directive output ma=
-y be truncated writing up to 107 bytes into \
-> 					a region of size 48 [-Wformat-truncation=3D]
->   582 |                                 snprintf(servername, sizeof(servern=
-ame), "%s",
->       |                                                                    =
-       ^~
-> net/sunrpc/clnt.c:582:33: note: =E2=80=98snprintf=E2=80=99 output between 1=
- and 108 bytes into a destination of size 48
->   582 |                                 snprintf(servername, sizeof(servern=
-ame), "%s",
->       |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~~~
->   583 |                                          sun->sun_path);
->       |                                          ~~~~~~~~~~~~~~
->=20
->    548         };
->  =E2=86=92 549         char servername[48];
->    550         struct rpc_clnt *clnt;
->    551         int i;
->    552
->    553         if (args->bc_xprt) {
->    554                 WARN_ON_ONCE(!(args->protocol & XPRT_TRANSPORT_BC));
->    555                 xprt =3D args->bc_xprt->xpt_bc_xprt;
->    556                 if (xprt) {
->    557                         xprt_get(xprt);
->    558                         return rpc_create_xprt(args, xprt);
->    559                 }
->    560         }
->    561
->    562         if (args->flags & RPC_CLNT_CREATE_INFINITE_SLOTS)
->    563                 xprtargs.flags |=3D XPRT_CREATE_INFINITE_SLOTS;
->    564         if (args->flags & RPC_CLNT_CREATE_NO_IDLE_TIMEOUT)
->    565                 xprtargs.flags |=3D XPRT_CREATE_NO_IDLE_TIMEOUT;
->    566         /*
->    567          * If the caller chooses not to specify a hostname, whip
->    568          * up a string representation of the passed-in address.
->    569          */
->    570         if (xprtargs.servername =3D=3D NULL) {
->    571                 struct sockaddr_un *sun =3D
->    572                                 (struct sockaddr_un *)args->address;
->    573                 struct sockaddr_in *sin =3D
->    574                                 (struct sockaddr_in *)args->address;
->    575                 struct sockaddr_in6 *sin6 =3D
->    576                                 (struct sockaddr_in6 *)args->address;
->    577
->    578                 servername[0] =3D '\0';
->    579                 switch (args->address->sa_family) {
->  =E2=86=92 580                 case AF_LOCAL:
->  =E2=86=92 581                         if (sun->sun_path[0])
->  =E2=86=92 582                                 snprintf(servername, sizeof(=
-servername), "%s",
->  =E2=86=92 583                                          sun->sun_path);
->  =E2=86=92 584                         else
->  =E2=86=92 585                                 snprintf(servername, sizeof(=
-servername), "@%s",
->  =E2=86=92 586                                          sun->sun_path+1);
->  =E2=86=92 587                         break;
->    588                 case AF_INET:
->    589                         snprintf(servername, sizeof(servername), "%p=
-I4",
->    590                                  &sin->sin_addr.s_addr);
->    591                         break;
->    592                 case AF_INET6:
->    593                         snprintf(servername, sizeof(servername), "%p=
-I6",
->    594                                  &sin6->sin6_addr);
->    595                         break;
->    596                 default:
->    597                         /* caller wants default server name, but
->    598                          * address family isn't recognized. */
->    599                         return ERR_PTR(-EINVAL);
->    600                 }
->    601                 xprtargs.servername =3D servername;
->    602         }
->    603
->    604         xprt =3D xprt_create_transport(&xprtargs);
->    605         if (IS_ERR(xprt))
->    606                 return (struct rpc_clnt *)xprt;
->=20
-> After the address family AF_LOCAL was added in the commit 176e21ee2ec89, th=
-e old hard-coded
-> size for servername of char servername[48] no longer fits. The maximum AF_U=
-NIX address size
-> has now grown to UNIX_PATH_MAX defined as 108 in "include/uapi/linux/un.h" .
->=20
-> The lines 580-587 were added later, addressing the leading zero byte '\0', =
-but did not fix
-> the hard-coded servername limit.
->=20
-> The AF_UNIX address was truncated to 47 bytes + terminating null byte. This=
- patch will fix the
-> servername in AF_UNIX family to the maximum permitted by the system:
->=20
->    548         };
->  =E2=86=92 549         char servername[UNIX_PATH_MAX];
->    550         struct rpc_clnt *clnt;
->=20
-> Fixes: 4388ce05fa38b ("SUNRPC: support abstract unix socket addresses")
-> Fixes: 510deb0d7035d ("SUNRPC: rpc_create() default hostname should support=
- AF_INET6 addresses")
-> Fixes: 176e21ee2ec89 ("SUNRPC: Support for RPC over AF_LOCAL transports")
-> Cc: Neil Brown <neilb@suse.de>
-> Cc: Chuck Lever <chuck.lever@oracle.com>
-> Cc: Trond Myklebust <trondmy@kernel.org>
-> Cc: Anna Schumaker <anna@kernel.org>
-> Cc: Jeff Layton <jlayton@kernel.org>
-> Cc: Olga Kornievskaia <okorniev@redhat.com>
-> Cc: Dai Ngo <Dai.Ngo@oracle.com>
-> Cc: Tom Talpey <tom@talpey.com>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: linux-nfs@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Mirsad Todorovac <mtodorovac69@gmail.com>
-> ---
->  v1:
-> 	initial version.
->=20
->  net/sunrpc/clnt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/net/sunrpc/clnt.c b/net/sunrpc/clnt.c
-> index 09f29a95f2bc..67099719893e 100644
-> --- a/net/sunrpc/clnt.c
-> +++ b/net/sunrpc/clnt.c
-> @@ -546,7 +546,7 @@ struct rpc_clnt *rpc_create(struct rpc_create_args *arg=
-s)
->  		.connect_timeout =3D args->connect_timeout,
->  		.reconnect_timeout =3D args->reconnect_timeout,
->  	};
-> -	char servername[48];
-> +	char servername[UNIX_PATH_MAX];
->  	struct rpc_clnt *clnt;
->  	int i;
-> =20
-> --=20
-> 2.43.0
->=20
->=20
+So we have cases where it takes 2 or even 8 seconds to remove a single
+peer, which is definitely not great considering we're holding a global
+lock.
 
+> We have observed the problem on Linux 6.6.47 and 6.6.48. We did try to
+> downgrade the kernel a couple of patch revisions, but it did not help
+> and our logs indicate that at least the non-threaded prolonged holding
+> of the rtnl_mutex is happening for a while now.
+>
+> [1]: https://docs.tigera.io/calico/latest/network-policy/encrypt-cluster-=
+pod-traffic
+> [2]: https://docs.kernel.org/networking/napi.html#threaded
+> [3]: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tre=
+e/net/core/dev.c?h=3Dv6.6.48#n6476
+
+Ignat
+
+[1]: https://gist.githubusercontent.com/ignatk/4505d96e02815de3aa5649c4aa7c=
+3fca/raw/177e4eab9f491024db6488cd0ea1cbba2d5579b4/wg.sh
 
