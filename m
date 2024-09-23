@@ -1,236 +1,608 @@
-Return-Path: <netdev+bounces-129250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0F0397E7C0
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 10:40:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0080997E800
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 10:58:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4AE21C211BD
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 08:40:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 361F6B21A97
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 08:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FFF1885B9;
-	Mon, 23 Sep 2024 08:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A222194137;
+	Mon, 23 Sep 2024 08:57:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="a3AsZs9j"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IQMa2awP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1271918F2F6;
-	Mon, 23 Sep 2024 08:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9A71940B5
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 08:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727080810; cv=none; b=Mr/xf//V2BNyz22YyfqU6ddLuSeE+qgAys2JBB39lEt7wAf4+Nz9HKxBXt85aoIv/MQxLje0jwxffpjxI9eMeUVBZAdpn7I6E4xs/EzSyjkJAEf+PH7102GoSJET2nSmQC3JrRiyu8I43TWKkLWJDxi0vhe0BF7J0JAauyN+3fQ=
+	t=1727081873; cv=none; b=uxRORE8MMMINn0BorleVTGf5Ass3mKr/Zwa6w2EHv5D67CHrgVFTKG2bw//7SyXTMdqdSAq/+p3O/AVq+YRI7QMirol7jI4v6+AfkmYhJeulGsZvvN0nqwmaAkW4SIpBojIrg7psqv/+M1hZi6iOUoE8AmKeE3Ee/sEMOlzFqW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727080810; c=relaxed/simple;
-	bh=4cagTvxyf5nQtU00W2lYYphEd348c7zNz4qoHxvOrBw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X39BDDoqA1EQw0nvq7kwrwQ+/kPW/DBJ/RXSwklNu7iFGdBmp1U9mBrTunQgpKTEah6LdO9LLOyQRv701xSFl8aKS1sQ2rUMVEnWrRj6L87hIlzEg8ioBj4cWsppZHoxitgIZ95UNSO8UXcB91M7T9gPWk532mfv5VhS1I4IzyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=a3AsZs9j; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1727080804; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=Pmg7gtnDrUcCwM5y+HvLHiVMVM0N6B0Ika/sf6X8dYI=;
-	b=a3AsZs9jDa9a3m2OQunhv289puh8s2j6D096zd/j49hZQWPCPfc+DxShcbl6X8R0pQKrXGoGGLD9i32DF9BzKCe7/csf1An7BPOXk8lTGPJQ5hf2byelnekON9CWaFMMUum3T+nqZoWvPycKX7XvLhtJIwRH+dtEdLRhUAKFRso=
-Received: from 30.221.128.119(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WFW1XBx_1727080803)
-          by smtp.aliyun-inc.com;
-          Mon, 23 Sep 2024 16:40:04 +0800
-Message-ID: <dd4ff273-2227-4e5a-ba11-2ca79035b811@linux.alibaba.com>
-Date: Mon, 23 Sep 2024 16:40:03 +0800
+	s=arc-20240116; t=1727081873; c=relaxed/simple;
+	bh=YQLVJWieLc9zhq7jmy4TnD6AHo1rVXcY0n4zS46y+yM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XDZpoU4jI/oX/4wtl+4w3UWcvZiqWSqdsxU21O+GQQCg2r4x+hDJSSbgSxTzj5LQPNwhyXp+3WL+HQHeM1E5kx6cRjktz2JTxReQFelcs/6LQ4B5XLwbXrvUNacxXQGBx4QWQQVmjA56MGNLsoo+dvoF3R+VLMpdxBjXrA3Y+Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IQMa2awP; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a9018103214so594326366b.3
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 01:57:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727081869; x=1727686669; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nyM4DmjzVCW3YthPxYZVDbKycspXMq2IxqBbSvHv/5w=;
+        b=IQMa2awP/P+SZp+yMneEi9n88tMfNjwPsrJDu6qsfO0K3BB4KgD+HtFGn0waBCnS/3
+         v1Om2MoNeUSPx+pvpq4ciGMOY0n9Md3WuHz1R4AaoYWUG4YvWfXTNLh6cLHqE/HoOw9Z
+         vUBcnzCJO10dpDEZEQcmCl3Fc+JE5V+Zuvx88/gkoWfrTH1Fu8tED0nQO/IaU4EWOJPA
+         s1efXGPROAsMZ0IbTkumfp+JFxLY3hAYTfpSjBgSiKWF5h0GeBC0joz9Z6YEyoHTK+ed
+         UN66MaGDJAdLT/qiVxIbBd+tfLG7Zspp47vZzB8DbxxgLLlxhbroQGvlpKICNfadliuP
+         cCUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727081869; x=1727686669;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nyM4DmjzVCW3YthPxYZVDbKycspXMq2IxqBbSvHv/5w=;
+        b=QfQhVcPPCscSXuUEPXo8i87tfHq8pi0E9eKDCHvGYBHBXiA43qjBymGk/tvNKUdl2h
+         H874I8LfS6Y93bdPzJoFaf8px28tV+pepdm1knCsZZY74QQ+XP7EKtOWJbPO0S7dYixy
+         2LwZ2ECG6rRz0Rjla0Z9KMW2n41kiB/9edPgntopKP56E0nvcF+pea6qEnBdLBIMkg0O
+         6UT3XFgZ1mPm+NxrOUALH8rUi6IM49Ckg1y+AdeXVw2SjR1yBspCm3HS5Rr8ZIrZr5iQ
+         g8Zc02p8B6aPVWmgo6I2IsQ4mdMDbyDtwm71RCwiIKkuOMWI5C9C9p2BBlGDBKZxHGW+
+         B+YQ==
+X-Gm-Message-State: AOJu0YwsnEur+iMpV4DYeCQRdkd247ILRqPeIq7BbdconItUY8yZ+FNh
+	y9+qWd+cAvP/VwPt7NHmwmMGAyfJZvrrfF+kIUb+DdaVWToUaueWRSwcIFS2tylRAugKSStmA+C
+	muPp+dl7goE+BFhT4nMCcIEG1NNrsxmuLIvkk
+X-Google-Smtp-Source: AGHT+IFBPfRX57lRyRY6QWrqTAVc830bow6tdsOH6p/OCZ0hm+eQY5vQFVbDFlUHINDv5XT+RQbV9caB6pOLUDNz2nA=
+X-Received: by 2002:a17:907:9450:b0:a8d:7b7d:8c39 with SMTP id
+ a640c23a62f3a-a90d59266demr1116511566b.43.1727081868591; Mon, 23 Sep 2024
+ 01:57:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next] net/udp: Add 4-tuple hash for connected
- socket
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- antony.antony@secunet.com, steffen.klassert@secunet.com,
- linux-kernel@vger.kernel.org, dust.li@linux.alibaba.com,
- jakub@cloudflare.com, fred.cc@alibaba-inc.com,
- yubing.qiuyubing@alibaba-inc.com
-References: <20240913100941.8565-1-lulie@linux.alibaba.com>
- <CANn89iJuUFaM5whtsqA37vh6vUKUQJhgjV9Uqv6_ARpVGFjB2w@mail.gmail.com>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <CANn89iJuUFaM5whtsqA37vh6vUKUQJhgjV9Uqv6_ARpVGFjB2w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240921215410.638664-1-littlesmilingcloud@gmail.com>
+ <CANn89iKP3VPExdyZt+eLFk3rE5=6yRckTPySfh5MvcEqPNm6aA@mail.gmail.com> <ZvB8stjbrXoez86t@dau-work-pc.sunlink.ru>
+In-Reply-To: <ZvB8stjbrXoez86t@dau-work-pc.sunlink.ru>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 23 Sep 2024 10:57:34 +0200
+Message-ID: <CANn89iJoMcxe6xAOE=QGfqmOa1p+_ssSr_2y4KUJr-Qap3xk0Q@mail.gmail.com>
+Subject: Re: [RFC PATCH net] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
+To: Anton Danilov <littlesmilingcloud@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Suman Ghosh <sumang@marvell.com>, Shigeru Yoshida <syoshida@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Eric, sorry for the late response.
+On Sun, Sep 22, 2024 at 10:23=E2=80=AFPM Anton Danilov
+<littlesmilingcloud@gmail.com> wrote:
+>
+> On Sun, Sep 22, 2024 at 12:20:03PM +0200, Eric Dumazet wrote:
+>
+> Hi Eric,
+>
+> > Please provide a real selftest, because in this particular example,
+> > the path taken by the packets should not reach the
+> > pskb_network_may_pull(skb, pull_len)),
+> > because dev->header_ops should be NULL ?
+>
+> I sincerely apologize for providing an inaccurate example of the commands
+> needed to reproduce the issue. I understand that this may have caused
+> confusion, and I'm truly sorry for any inconvenience.
+>
+> Here are the correct commands and their results.
+>
+>
+>   ip l add name mgre0 type gre local 192.168.71.177 remote 0.0.0.0 ikey 1=
+.9.8.4 okey 1.9.8.4
+>   ip l s mtu 1400 dev mgre0
+>   ip a add 192.168.13.1/24 dev mgre0
+>   ip l s up dev mgre0
+>   ip n add 192.168.13.2 lladdr 192.168.69.50 dev mgre0
 
-On 2024/9/13 19:49, Eric Dumazet wrote:
-> On Fri, Sep 13, 2024 at 12:09 PM Philo Lu <lulie@linux.alibaba.com> wrote:
->>
->> This RFC patch introduces 4-tuple hash for connected udp sockets, to
->> make udp lookup faster. It is a tentative proposal and any comment is
->> welcome.
->>
->> Currently, the udp_table has two hash table, the port hash and portaddr
->> hash. But for UDP server, all sockets have the same local port and addr,
->> so they are all on the same hash slot within a reuseport group. And the
->> target sock is selected by scoring.
->>
->> In some applications, the UDP server uses connect() for each incoming
->> client, and then the socket (fd) is used exclusively by the client. In
->> such scenarios, current scoring method can be ineffcient with a large
->> number of connections, resulting in high softirq overhead.
->>
->> To solve the problem, a 4-tuple hash list is added to udp_table, and is
->> updated when calling connect(). Then __udp4_lib_lookup() firstly
->> searches the 4-tuple hash list, and return directly if success. A new
->> sockopt UDP_HASH4 is added to enable it. So the usage is:
->> 1. socket()
->> 2. bind()
->> 3. setsockopt(UDP_HASH4)
->> 4. connect()
->>
->> AFAICT the patch (if useful) can be further improved by:
->> (a) Support disable with sockopt UDP_HASH4. Now it cannot be disabled
->> once turned on until the socket closed.
->> (b) Better interact with hash2/reuseport. Now hash4 hardly affects other
->> mechanisms, but maintaining sockets in both hash4 and hash2 lists seems
->> unnecessary.
->> (c) Support early demux and ipv6.
->>
->> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-> 
-> Adding a 4-tuple hash for UDP has been discussed in the past.
-> 
-> Main issue is that this is adding one cache line miss per incoming packet.
-> 
+This looks much better. I was hoping that we could capture this in a
+new test (added in tools/testing/selftests/net)
 
-Thanks to Dust's idea, we can create a new field for hslot2 (or create a 
-new struct for hslot2), indicating whether there are connected sockets 
-in this hslot (i.e., local port and local address), and run hash4 lookup 
-only when it's true. Then there would be no cache line miss.
+Please also move the buggy "tnl_params =3D (const struct iphdr
+*)skb->data;" line as in :
 
-The detailed patch is attached below.
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index 5f6fd382af38a32d9e22633cdb2e9fd01f1795e4..f1f31ebfc7934467fd10776c3cb=
+221f9cff9f9dd
+100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -662,11 +662,11 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
+                if (skb_cow_head(skb, 0))
+                        goto free_skb;
 
-> Most heavy duty UDP servers (DNS, QUIC), use non connected sockets,
-> because having one million UDP sockets has huge kernel memory cost,
-> not counting poor cache locality.
-
-Some of our applications do use connected UDP sockets (~10,000 conns), 
-and will get significant benefits from hash4. We use connect() to 
-separate receiving sockets and listening ones, and then it's easier to 
-manage them (just like TCP), especially during live-upgrading, such as 
-nginx reload. Besides, I believe hash4 is harmless to those servers 
-without connected sockets.
-
-Suggestions are always welcome, and I'll keep improving this patch.
-
-Thanks.
-
----
-  include/net/udp.h |  3 +++
-  net/ipv4/udp.c    | 17 ++++++++++++-----
-  2 files changed, 15 insertions(+), 5 deletions(-)
-
-diff --git a/include/net/udp.h b/include/net/udp.h
-index a05d79d35fbba..bec04c0e753d0 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -54,11 +54,14 @@ struct udp_skb_cb {
-   *
-   *	@head:	head of list of sockets
-   *	@count:	number of sockets in 'head' list
-+ *	@hash4_cnt: number of sockets in 'hash4' table of the same (local 
-port, local address),
-+ *		    Only used by hash2.
-   *	@lock:	spinlock protecting changes to head/count
-   */
-  struct udp_hslot {
-  	struct hlist_head	head;
-  	int			count;
-+	u32			hash4_cnt;
-  	spinlock_t		lock;
-  } __attribute__((aligned(2 * sizeof(long))));
-
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index aac0251ff6fac..dfa8b3c091def 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -511,14 +511,16 @@ struct sock *__udp4_lib_lookup(const struct net 
-*net, __be32 saddr,
-  	struct udp_hslot *hslot2;
-  	struct sock *result, *sk;
-
--	result = udp4_lib_lookup4(net, saddr, sport, daddr, hnum, dif, sdif, 
-udptable);
--	if (result)
--		return result;
+-               tnl_params =3D (const struct iphdr *)skb->data;
 -
-  	hash2 = ipv4_portaddr_hash(net, daddr, hnum);
-  	slot2 = hash2 & udptable->mask;
-  	hslot2 = &udptable->hash2[slot2];
-  ·
-+	if (hslot2->hash4_cnt) {
-+		result = udp4_lib_lookup4(net, saddr, sport, daddr, hnum, dif, sdif, 
-udptable);
-+		if (result)
-+			return result;
-+	}
+-               if (!pskb_network_may_pull(skb, pull_len))
++               if (!pskb_may_pull(skb, pull_len))
+                        goto free_skb;
+
++               tnl_params =3D (const struct iphdr *)skb->data;
 +
-  	/* Lookup connected or non-wildcard socket */
-  	result = udp4_lib_lookup2(net, saddr, sport,
-  				  daddr, hnum, dif, sdif,
-@@ -1961,7 +1963,7 @@ EXPORT_SYMBOL(udp_pre_connect);
-  /* call with sock lock */
-  static void udp4_hash4(struct sock *sk)
-  {
--	struct udp_hslot *hslot, *hslot4;
-+	struct udp_hslot *hslot, *hslot2, *hslot4;
-  	struct net *net = sock_net(sk);
-  	struct udp_table *udptable;
-  	unsigned int hash;
-@@ -1975,6 +1977,7 @@ static void udp4_hash4(struct sock *sk)
+                /* ip_tunnel_xmit() needs skb->data pointing to gre header.=
+ */
+                skb_pull(skb, pull_len);
+                skb_reset_mac_header(skb);
 
-  	udptable = net->ipv4.udp_table;
-  	hslot = udp_hashslot(udptable, net, udp_sk(sk)->udp_port_hash);
-+	hslot2 = udp_hashslot2(udptable, udp_sk(sk)->udp_portaddr_hash);
-  	hslot4 = udp_hashslot4(udptable, hash);
-  	udp_sk(sk)->udp_lrpa_hash = hash;
 
-@@ -1985,6 +1988,7 @@ static void udp4_hash4(struct sock *sk)
-  	spin_lock(&hslot4->lock);
-  	hlist_add_head_rcu(&udp_sk(sk)->udp_lrpa_node, &hslot4->head);
-  	hslot4->count++;
-+	hslot2->hash4_cnt++;
-  	spin_unlock(&hslot4->lock);
-
-  	spin_unlock_bh(&hslot->lock);
-@@ -2068,6 +2072,7 @@ void udp_lib_unhash(struct sock *sk)
-  				spin_lock(&hslot4->lock);
-  				hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
-  				hslot4->count--;
-+				hslot2->hash4_cnt--;
-  				spin_unlock(&hslot4->lock);
-  			}
-  		}
-@@ -2119,11 +2124,13 @@ void udp_lib_rehash(struct sock *sk, u16 
-newhash, u16 newhash4)
-  				spin_lock(&hslot4->lock);
-  				hlist_del_init_rcu(&udp_sk(sk)->udp_lrpa_node);
-  				hslot4->count--;
-+				hslot2->hash4_cnt--;
-  				spin_unlock(&hslot4->lock);
-
-  				spin_lock(&nhslot4->lock);
-  				hlist_add_head_rcu(&udp_sk(sk)->udp_lrpa_node, &nhslot4->head);
-  				nhslot4->count++;
-+				nhslot2->hash4_cnt++;
-  				spin_unlock(&nhslot4->lock);
-  			}
-
--- 
-Philo
-
+>
+>
+>   ip -s -s -d l ls dev mgre0
+>     19: mgre0@NONE: <NOARP,UP,LOWER_UP> mtu 1400 qdisc noqueue state UNKN=
+OWN mode DEFAULT group default qlen 1000
+>         link/gre 192.168.71.177 brd 0.0.0.0 promiscuity 0  allmulti 0 min=
+mtu 0 maxmtu 0
+>         gre remote any local 192.168.71.177 ttl inherit ikey 1.9.8.4 okey=
+ 1.9.8.4 \
+>           addrgenmode eui64 numtxqueues 1 numrxqueues 1 gso_max_size 6553=
+6 gso_max_segs 65535 \
+>           tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536
+>
+>         RX:  bytes packets errors dropped  missed   mcast
+>                  0       0      0       0       0       0
+>         RX errors:  length    crc   frame    fifo overrun
+>                          0      0       0       0       0
+>         TX:  bytes packets errors dropped carrier collsns
+>                  0       0      0       0       0       0
+>         TX errors: aborted   fifo  window heartbt transns
+>                          0      0       0       0       0
+>
+>
+>   ping -n -c 10 -s 1374 192.168.13.2
+>     PING 192.168.13.2 (192.168.13.2) 1374(1402) bytes of data.
+>
+>     --- 192.168.13.2 ping statistics ---
+>     10 packets transmitted, 0 received, 100% packet loss, time 9237ms
+>
+>
+>   ip -s -s -d l ls dev mgre0
+>     19: mgre0@NONE: <NOARP,UP,LOWER_UP> mtu 1400 qdisc noqueue state UNKN=
+OWN mode DEFAULT group default qlen 1000
+>         link/gre 192.168.71.177 brd 0.0.0.0 promiscuity 1  allmulti 0 min=
+mtu 0 maxmtu 0
+>         gre remote any local 192.168.71.177 ttl inherit ikey 1.9.8.4 okey=
+ 1.9.8.4 \
+>           addrgenmode eui64 numtxqueues 1 numrxqueues 1 gso_max_size 6553=
+6 gso_max_segs 65535 \
+>           tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536
+>
+>         RX:  bytes packets errors dropped  missed   mcast
+>                  0       0      0       0       0       0
+>         RX errors:  length    crc   frame    fifo overrun
+>                          0      0       0       0       0
+>         TX:  bytes packets errors dropped carrier collsns
+>              13960      10      0      10       0       0
+>         TX errors: aborted   fifo  window heartbt transns
+>                      0      0       0       0       0
+>
+>
+>   tcpdump -vni mgre0
+>     tcpdump: listening on mgre0, link-type LINUX_SLL (Linux cooked v1), s=
+napshot length 262144 bytes
+>     21:51:19.481523 IP (tos 0x0, ttl 64, id 52595, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 1, =
+length 1376
+>     21:51:19.481547 IP (tos 0x0, ttl 64, id 52595, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     21:51:20.526751 IP (tos 0x0, ttl 64, id 53374, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 2, =
+length 1376
+>     21:51:20.526773 IP (tos 0x0, ttl 64, id 53374, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     21:51:21.550751 IP (tos 0x0, ttl 64, id 54124, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 3, =
+length 1376
+>     21:51:21.550775 IP (tos 0x0, ttl 64, id 54124, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     21:51:22.574748 IP (tos 0x0, ttl 64, id 55109, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 4, =
+length 1376
+>     21:51:22.574766 IP (tos 0x0, ttl 64, id 55109, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     21:51:23.598748 IP (tos 0x0, ttl 64, id 56011, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 5, =
+length 1376
+>     21:51:23.598771 IP (tos 0x0, ttl 64, id 56011, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     21:51:24.622758 IP (tos 0x0, ttl 64, id 57009, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 6, =
+length 1376
+>     21:51:24.622783 IP (tos 0x0, ttl 64, id 57009, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     21:51:25.646748 IP (tos 0x0, ttl 64, id 57277, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 7, =
+length 1376
+>     21:51:25.646775 IP (tos 0x0, ttl 64, id 57277, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     21:51:26.670750 IP (tos 0x0, ttl 64, id 57869, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 8, =
+length 1376
+>     21:51:26.670773 IP (tos 0x0, ttl 64, id 57869, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     21:51:27.694751 IP (tos 0x0, ttl 64, id 58317, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 9, =
+length 1376
+>     21:51:27.694774 IP (tos 0x0, ttl 64, id 58317, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     21:51:28.718751 IP (tos 0x0, ttl 64, id 58558, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 10,=
+ length 1376
+>     21:51:28.718775 IP (tos 0x0, ttl 64, id 58558, offset 1376, flags [no=
+ne], proto ICMP (1), length 26)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>
+>
+>   tcpdump -vni enp11s0.100 'ip proto 47'
+>     tcpdump: listening on enp11s0.100, link-type EN10MB (Ethernet), snaps=
+hot length 262144 bytes
+>     21:51:19.481696 IP (tos 0x0, ttl 64, id 32563, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 52595, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 1, =
+length 1376
+>     21:51:20.526767 IP (tos 0x0, ttl 64, id 33363, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 53374, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 2, =
+length 1376
+>     21:51:21.550768 IP (tos 0x0, ttl 64, id 34260, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 54124, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 3, =
+length 1376
+>     21:51:22.574761 IP (tos 0x0, ttl 64, id 34922, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 55109, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 4, =
+length 1376
+>     21:51:23.598764 IP (tos 0x0, ttl 64, id 35042, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 56011, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 5, =
+length 1376
+>     21:51:24.622775 IP (tos 0x0, ttl 64, id 36024, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 57009, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 6, =
+length 1376
+>     21:51:25.646766 IP (tos 0x0, ttl 64, id 36133, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 57277, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 7, =
+length 1376
+>     21:51:26.670766 IP (tos 0x0, ttl 64, id 36417, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 57869, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 8, =
+length 1376
+>     21:51:27.694767 IP (tos 0x0, ttl 64, id 37006, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 58317, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 9, =
+length 1376
+>     21:51:28.718767 IP (tos 0x0, ttl 64, id 37825, offset 0, flags [DF], =
+proto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 58558, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 63847, seq 10,=
+ length 1376
+>
+>
+>   ping -n -c 10 -s 1376 192.168.13.2
+>     PING 192.168.13.2 (192.168.13.2) 1376(1404) bytes of data.
+>
+>     --- 192.168.13.2 ping statistics ---
+>     10 packets transmitted, 0 received, 100% packet loss, time 9198ms
+>
+>
+>   ip -s -s -d l ls dev mgre0
+>     19: mgre0@NONE: <NOARP,UP,LOWER_UP> mtu 1400 qdisc noqueue state UNKN=
+OWN mode DEFAULT group default qlen 1000
+>         link/gre 192.168.71.177 brd 0.0.0.0 promiscuity 0  allmulti 0 min=
+mtu 0 maxmtu 0
+>         gre remote any local 192.168.71.177 ttl inherit ikey 1.9.8.4 okey=
+ 1.9.8.4 addrgenmode eui64 numtxqueues 1 numrxqueues 1 gso_max_size 65536 g=
+so_max_segs 65535 tso_max_size 65536 tso_max_segs 65535 gro_max_size 65536
+>         RX:  bytes packets errors dropped  missed   mcast
+>                  0       0      0       0       0       0
+>         RX errors:  length    crc   frame    fifo overrun
+>                          0      0       0       0       0
+>         TX:  bytes packets errors dropped carrier collsns
+>              28200      30      0      10       0       0
+>         TX errors: aborted   fifo  window heartbt transns
+>                          0      0       0       0       0
+>
+>
+>   tcpdump -vni mgre0
+>     tcpdump: listening on mgre0, link-type LINUX_SLL (Linux cooked v1), s=
+napshot length 262144 bytes
+>     22:01:34.176810 IP (tos 0x0, ttl 64, id 40388, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 1, =
+length 1376
+>     22:01:34.176830 IP (tos 0x0, ttl 64, id 40388, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:35.183742 IP (tos 0x0, ttl 64, id 40516, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 2, =
+length 1376
+>     22:01:35.183765 IP (tos 0x0, ttl 64, id 40516, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:36.207750 IP (tos 0x0, ttl 64, id 40684, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 3, =
+length 1376
+>     22:01:36.207774 IP (tos 0x0, ttl 64, id 40684, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:37.230738 IP (tos 0x0, ttl 64, id 41578, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 4, =
+length 1376
+>     22:01:37.230756 IP (tos 0x0, ttl 64, id 41578, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:38.254761 IP (tos 0x0, ttl 64, id 42099, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 5, =
+length 1376
+>     22:01:38.254789 IP (tos 0x0, ttl 64, id 42099, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:39.278748 IP (tos 0x0, ttl 64, id 42506, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 6, =
+length 1376
+>     22:01:39.278771 IP (tos 0x0, ttl 64, id 42506, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:40.302738 IP (tos 0x0, ttl 64, id 42527, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 7, =
+length 1376
+>     22:01:40.302754 IP (tos 0x0, ttl 64, id 42527, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:41.326733 IP (tos 0x0, ttl 64, id 42989, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 8, =
+length 1376
+>     22:01:41.326749 IP (tos 0x0, ttl 64, id 42989, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:42.350750 IP (tos 0x0, ttl 64, id 43576, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 9, =
+length 1376
+>     22:01:42.350773 IP (tos 0x0, ttl 64, id 43576, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:43.374743 IP (tos 0x0, ttl 64, id 44118, offset 0, flags [+], p=
+roto ICMP (1), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 10,=
+ length 1376
+>     22:01:43.374762 IP (tos 0x0, ttl 64, id 44118, offset 1376, flags [no=
+ne], proto ICMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>
+>
+>   tcpdump -vni enp11s0.100 'ip proto 47'
+>     tcpdump: listening on enp11s0.100, link-type EN10MB (Ethernet), snaps=
+hot length 262144 bytes
+>     22:01:34.176825 IP (tos 0x0, ttl 64, id 5066, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 40388, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 1, =
+length 1376
+>     22:01:34.176832 IP (tos 0x0, ttl 64, id 5067, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 40388, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:35.183758 IP (tos 0x0, ttl 64, id 5567, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 40516, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 2, =
+length 1376
+>     22:01:35.183768 IP (tos 0x0, ttl 64, id 5568, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 40516, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:36.207767 IP (tos 0x0, ttl 64, id 5741, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 40684, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 3, =
+length 1376
+>     22:01:36.207778 IP (tos 0x0, ttl 64, id 5742, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 40684, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:37.230751 IP (tos 0x0, ttl 64, id 5785, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 41578, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 4, =
+length 1376
+>     22:01:37.230758 IP (tos 0x0, ttl 64, id 5786, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 41578, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:38.254780 IP (tos 0x0, ttl 64, id 5937, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 42099, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 5, =
+length 1376
+>     22:01:38.254795 IP (tos 0x0, ttl 64, id 5938, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 42099, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:39.278764 IP (tos 0x0, ttl 64, id 6876, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 42506, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 6, =
+length 1376
+>     22:01:39.278775 IP (tos 0x0, ttl 64, id 6877, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 42506, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:40.302749 IP (tos 0x0, ttl 64, id 7410, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 42527, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 7, =
+length 1376
+>     22:01:40.302757 IP (tos 0x0, ttl 64, id 7411, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 42527, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:41.326744 IP (tos 0x0, ttl 64, id 7913, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 42989, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 8, =
+length 1376
+>     22:01:41.326753 IP (tos 0x0, ttl 64, id 7914, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 42989, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:42.350766 IP (tos 0x0, ttl 64, id 8422, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 43576, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 9, =
+length 1376
+>     22:01:42.350776 IP (tos 0x0, ttl 64, id 8423, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 43576, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>     22:01:43.374756 IP (tos 0x0, ttl 64, id 9410, offset 0, flags [DF], p=
+roto GRE (47), length 1424)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 1404
+>         IP (tos 0x0, ttl 64, id 44118, offset 0, flags [+], proto ICMP (1=
+), length 1396)
+>         192.168.13.1 > 192.168.13.2: ICMP echo request, id 54476, seq 10,=
+ length 1376
+>     22:01:43.374766 IP (tos 0x0, ttl 64, id 9411, offset 0, flags [DF], p=
+roto GRE (47), length 56)
+>         192.168.71.177 > 192.168.69.50: GREv0, Flags [key present], key=
+=3D0x1090804, length 36
+>         IP (tos 0x0, ttl 64, id 44118, offset 1376, flags [none], proto I=
+CMP (1), length 28)
+>         192.168.13.1 > 192.168.13.2: ip-proto-1
+>
 
