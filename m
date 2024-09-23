@@ -1,160 +1,139 @@
-Return-Path: <netdev+bounces-129326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A823C97EDD8
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 17:13:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B9697EE0B
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 17:24:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F3B5B20DCC
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 15:13:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 632B11F21F35
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 15:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A59C19CD0B;
-	Mon, 23 Sep 2024 15:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="PBfKNMCo";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Ncg/SvYz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A3619CD0B;
+	Mon, 23 Sep 2024 15:24:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71AF512C526;
-	Mon, 23 Sep 2024 15:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6AB126C01;
+	Mon, 23 Sep 2024 15:24:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727104381; cv=none; b=ZGo9tdZl5yAFrXG7JM570DRLGThoaQWbjQ6we/oBm42+Q2c6o23gQDIvFVnEAcKvBdjPKjYF4/a8J+DawN5JKovPya34881evC51OjIxiQqz4M3qgLJZm/CXF+Y4Qsfez+NyM/LjTdtCAkPzFTKKbH92pb54nwGXIXBQd7smCnQ=
+	t=1727105091; cv=none; b=HdruVo5B4s2EldTl8Bkp1JFmP/dN3BiMNysdRXjsQ8c7tiVjg0pBcw15/pOD3BKvBy8125dO4L/lh8iODpSDJJRqvO7CXV8f8UmWu+wVH/T+lrZ5nng+bje6zaEInqSLEjkn6/pQiQErh/WHW3GpM+gvL5wx90dQGIPRjYKDSVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727104381; c=relaxed/simple;
-	bh=cMr7bXWI7gtfyAzSse1AawSl0oobveTp5Oo0fERlJx4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jSomddfwlgRRhGhrKs24LtLAgDW5D9LvieIo+ce1/YOyfUcmyzO0h1HQ9y23BGzoEWSGCJ3GcBgRcQ+icnlxZ/gKqKT8TTc77iaGMh/Z7716TrCayAqz6bc24cm+svOaoSI2h36uskrtIcZYKCg6E0YKV+oSbIXjm12QqdordAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=PBfKNMCo; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Ncg/SvYz; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Anna-Maria Behnsen <anna-maria@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1727104377;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=elBGvOspzH3iGmK1fYd/bVgzyP8I6OQGyztmlAKbFJU=;
-	b=PBfKNMCoXVgqUMQ+jS8J96N56vpHFkiEIv7N0xlOaDipsFXHcUA3PDP3QEcMOcBBsigKcu
-	ep2rSt1lLmY2DOAonrtcys3ggssiwc2a9tr/YB5alUERWPb6VXbNoKRZigHzcgV4755VTn
-	wYk2+oEYFTBeLTvaEZ2pCcfw4KlNVPS6/D7TaIAiY0D8BB+WIJhmIwmXannp8UhBY3G1mi
-	G3uxSUcypZgacKtqZK/L7EwPqpg1IfqrNDdQvgliRnYaxsk4TTzPhYuwSgE1DT6uKROso/
-	5t/eiTVejV5slXI2ZzVLWwCneMD86d/J/xsNeJTYKgO8rphcsMBTmkNWCz+K2w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1727104377;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=elBGvOspzH3iGmK1fYd/bVgzyP8I6OQGyztmlAKbFJU=;
-	b=Ncg/SvYzGFuvGC711XUusZn2/nNt5VKfdynTFfYe/Dj4+RDnjWTCN3ea404B/VToJ/4LZq
-	lwKy9a1/BRdLjSCQ==
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: linux-kernel@vger.kernel.org, Len Brown <len.brown@intel.com>, "Rafael
- J. Wysocki" <rafael@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, damon@lists.linux.dev, linux-mm@kvack.org,
- SeongJae Park <sj@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- linux-arch@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Andy Whitcroft <apw@canonical.com>, Joe
- Perches <joe@perches.com>, Dwaipayan Ray <dwaipayanray1@gmail.com>, Liam
- Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Andrew
- Lunn <andrew@lunn.ch>, Jaroslav Kysela <perex@perex.cz>, Takashi Iwai
- <tiwai@suse.com>, netdev@vger.kernel.org, linux-sound@vger.kernel.org,
- Michael Ellerman <mpe@ellerman.id.au>, Nathan Lynch
- <nathanl@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org, Mauro Carvalho
- Chehab <mchehab@kernel.org>, linux-media@vger.kernel.org, Frederic
- Weisbecker <frederic@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH v2 00/15] timers: Cleanup delay/sleep related mess
-In-Reply-To: <6cbedd50-c2d5-4ad7-8133-774eebd9d2f1@wanadoo.fr>
-References: <20240911-devel-anna-maria-b4-timers-flseep-v2-0-b0d3f33ccfe0@linutronix.de>
- <c794b4a6-468d-4552-a6d6-8185f49339d3@wanadoo.fr>
- <6cbedd50-c2d5-4ad7-8133-774eebd9d2f1@wanadoo.fr>
-Date: Mon, 23 Sep 2024 17:12:56 +0200
-Message-ID: <87ed5aietj.fsf@somnus>
+	s=arc-20240116; t=1727105091; c=relaxed/simple;
+	bh=C1gjPPJeHTZTDIWmb8bkK9FphtbQ+n/jUOV5Pvvts9U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QnWD3IB1fu4HdDqMi7xnEEh3dZBmQcNOGNltnSsaciUaPORx2X5qwicr+ipBCRrlmQD7GdjtxzIImKURVw264xAeAPPubNot2mOtCAgwD6A7QucnlzjGlEc/3EIOJej1dTQkUp5zcfTMFWO+NXFdF+RXdoYaDsg0mVTTgd5sDJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4XC6HK5Mz2z1ymHD;
+	Mon, 23 Sep 2024 23:24:45 +0800 (CST)
+Received: from kwepemj200016.china.huawei.com (unknown [7.202.194.28])
+	by mail.maildlp.com (Postfix) with ESMTPS id 788CF1A0188;
+	Mon, 23 Sep 2024 23:24:44 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ kwepemj200016.china.huawei.com (7.202.194.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 23 Sep 2024 23:24:40 +0800
+Message-ID: <61ece1e6-50b0-55e5-985c-5db8090cf82b@huawei-partners.com>
+Date: Mon, 23 Sep 2024 18:24:36 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v1 1/7] samples/landlock: Fix port parsing in
+ sandboxer
+Content-Language: ru
+To: Matthieu Buffet <matthieu@buffet.re>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
+	<mic@digikod.net>
+CC: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, Paul Moore
+	<paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E . Hallyn"
+	<serge@hallyn.com>, <linux-security-module@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, Konstantin
+ Meskhidze <konstantin.meskhidze@huawei.com>, yusongping
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>
+References: <20240916122230.114800-1-matthieu@buffet.re>
+ <20240916122230.114800-2-matthieu@buffet.re>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20240916122230.114800-2-matthieu@buffet.re>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100003.china.huawei.com (7.191.160.210) To
+ kwepemj200016.china.huawei.com (7.202.194.28)
 
-Christophe JAILLET <christophe.jaillet@wanadoo.fr> writes:
+On 9/16/2024 3:22 PM, Matthieu Buffet wrote:
+> Unlike LL_FS_RO and LL_FS_RW, LL_TCP_* are currently optional: either
+> don't specify them and these access rights won't be in handled_accesses,
+> or specify them and only the values passed are allowed.
+> 
+> If you want to specify that no port can be bind()ed, you would think
+> (looking at the code quickly) that setting LL_TCP_BIND="" would do it.
+> Due to a quirk in the parsing logic and the use of atoi() returning 0 with
+> no error checking for empty strings, you end up allowing bind(0) (which
+> means bind to any ephemeral port) without realising it. The same occurred
+> when leaving a trailing/leading colon (e.g. "80:").
+> 
+> To reproduce:
+> export LL_FS_RO="/" LL_FS_RW="" LL_TCP_BIND=""
+> 
+> ---8<----- Before this patch:
+> ./sandboxer strace -e bind nc -n -vvv -l -p 0
+> Executing the sandboxed command...
+> bind(3, {sa_family=AF_INET, sin_port=htons(0),
+>       sin_addr=inet_addr("0.0.0.0")}, 16) = 0
+> Listening on 0.0.0.0 37629
+> 
+> ---8<----- Expected:
+> ./sandboxer strace -e bind nc -n -vvv -l -p 0
+> Executing the sandboxed command...
+> bind(3, {sa_family=AF_INET, sin_port=htons(0),
+>       sin_addr=inet_addr("0.0.0.0")}, 16) = -1 EACCES (Permission denied)
+> nc: Permission denied
+> 
+> Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
+> ---
+>   samples/landlock/sandboxer.c | 13 ++++++++++++-
+>   1 file changed, 12 insertions(+), 1 deletion(-)
+> 
+> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
+> index e8223c3e781a..a84ae3a15482 100644
+> --- a/samples/landlock/sandboxer.c
+> +++ b/samples/landlock/sandboxer.c
+> @@ -168,7 +168,18 @@ static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
+>   
+>   	env_port_name_next = env_port_name;
+>   	while ((strport = strsep(&env_port_name_next, ENV_DELIMITER))) {
+> -		net_port.port = atoi(strport);
+> +		char *strport_num_end = NULL;
+> +
+> +		if (strcmp(strport, "") == 0)
+> +			continue;
+> +
+> +		errno = 0;
+> +		net_port.port = strtol(strport, &strport_num_end, 0);
+> +		if (errno != 0 || strport_num_end == strport) {
+> +			fprintf(stderr,
+> +				"Failed to parse port at \"%s\"\n", strport);
+> +			goto out_free_name;
+> +		}
 
-> Le 16/09/2024 =C3=A0 22:20, Christophe JAILLET a =C3=A9crit=C2=A0:
->> Le 11/09/2024 =C3=A0 07:13, Anna-Maria Behnsen a =C3=A9crit=C2=A0:
->>> Hi,
->>>
->>> a question about which sleeping function should be used in=20
->>> acpi_os_sleep()
->>> started a discussion and examination about the existing documentation a=
-nd
->>> implementation of functions which insert a sleep/delay.
->>>
->>> The result of the discussion was, that the documentation is outdated and
->>> the implemented fsleep() reflects the outdated documentation but doesn't
->>> help to reflect reality which in turns leads to the queue which covers=
-=20
->>> the
->>> following things:
->>>
->>> - Split out all timeout and sleep related functions from hrtimer.c and=
-=20
->>> timer.c
->>> =C2=A0=C2=A0 into a separate file
->>>
->>> - Update function descriptions of sleep related functions
->>>
->>> - Change fsleep() to reflect reality
->>>
->>> - Rework all comments or users which obviously rely on the outdated
->>> =C2=A0=C2=A0 documentation as they reference "Documentation/timers/time=
-rs-=20
->>> howto.rst"
->>>
->>> - Last but not least (as there are no more references): Update the=20
->>> outdated
->>> =C2=A0=C2=A0 documentation and move it into a file with a self explaini=
-ng file name
->>>
->>> The queue is available here and applies on top of tip/timers/core:
->>>
->>> =C2=A0=C2=A0 git://git.kernel.org/pub/scm/linux/kernel/git/anna-maria/l=
-inux-=20
->>> devel.git timers/misc
->>>
->>> Signed-off-by: Anna-Maria Behnsen <anna-maria@linutronix.de>
->>=20
->> Hi,
->>=20
->> not directly related to your serie, but some time ago I sent a patch to=
-=20
->> micro-optimize Optimize usleep_range(). (See [1])
->>=20
->> The idea is that the 2 parameters of usleep_range() are usually=20
->> constants and some code reordering could easily let the compiler compute=
-=20
->> a few things at compilation time.
->>=20
->> There was consensus on the value of the change (see [2]), but as you are=
-=20
->
-> Typo: there was *no* consensus...
->
->> touching things here, maybe it makes sense now to save a few cycles at=20
->> runtime and a few bytes of code?
->>=20
+Probably it'll be better to make a separate function for strtol
+conversion (e.g. [1])? It might be needed for the socket type
+control patchset [2].
 
-Sorry for the late reply. I'll check it and will come back to you.
+[1] 
+https://lore.kernel.org/all/20240904104824.1844082-18-ivanov.mikhail1@huawei-partners.com/
+[2] 
+https://lore.kernel.org/all/20240904104824.1844082-19-ivanov.mikhail1@huawei-partners.com/
 
-Thanks,
-	Anna-Maria
-
+>   		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
+>   				      &net_port, 0)) {
+>   			fprintf(stderr,
 
