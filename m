@@ -1,126 +1,154 @@
-Return-Path: <netdev+bounces-129265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84CBF97E8B7
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 11:30:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2CF797E890
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 11:24:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D0B3280D66
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 09:30:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6977F1F217F2
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 09:24:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EE11946A0;
-	Mon, 23 Sep 2024 09:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A7A1946D0;
+	Mon, 23 Sep 2024 09:24:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="Bw2qvpD9"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="TKRGVGFT"
 X-Original-To: netdev@vger.kernel.org
-Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F05CD528;
-	Mon, 23 Sep 2024 09:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6C71946B4;
+	Mon, 23 Sep 2024 09:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727083834; cv=none; b=XnVYa3b9JdL4wcC3zlev64kd0MLCam3un+rkKENYvCiQ54vDuniCIC4S0pJBiC6T55F8UnYPeeaxW5yLJxdPLOqWCoZI7dGs5KO/v13hyQJszRqLiddhhnm2KWntvV00NokiueoMXvTrhycs3GucBPBznGxSxh5F6U6o+4DUhQk=
+	t=1727083487; cv=none; b=p5i1yQUSWOka9ns6u4JjwZWzPZRq+1DyKZ2imkFVIsOblqDc8s6zwXz6tdZtM8dvIZksXP5P2QZuKfLQ02ajZEqxwVDUJmDru9t0/TgmHXTAXFcyZKYplfxGZbq5/WCmBY2kEb1KI8HA+ZfhrG9chtWjmG1GLh4qeaKy9+6k8A0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727083834; c=relaxed/simple;
-	bh=TIue23DwuyeWW14GUaAJhUSJdguSLXKFkIz0wfKSol4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HB5Wlbkpq1ZtIhaXwsqydOhXXiJ21itq//Nf11KtIatwxYxCpy3KwUyFMFW4aZ4CsDqyRj+mDpoz4DbusfOLRrEj6mLXzJGe3EclG//EVnIevgZGR+WrpyT/Ht18xmaIBiEWUOJGm03J16CEKVENj3u642mxOWgOlQtguygUEII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=Bw2qvpD9; arc=none smtp.client-ip=139.165.32.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
-Received: from [10.7.80.49] (193-253-228-142.ftth.fr.orangecustomers.net [193.253.228.142])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 9E64F200BFFC;
-	Mon, 23 Sep 2024 11:22:12 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 9E64F200BFFC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1727083332;
-	bh=W0nLkJMWc8XMQpZDRSLr0WBs+8zZYAUDlCaJP9ucxLc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Bw2qvpD9A/NPxLSpGqK8vWaQOtBV5pER/mrAsIboCSKcWxlFfuGaJisdgNP8zwki5
-	 PPPe72GZG0P8pxIZBdGtRcpLynJqtXZeTcUZhbPwLeiiEFvoT7R2w0oFN4dcF7igMs
-	 npVUMbWAdW4BtKIqK4YWOamGLBjVn4eYX4n75rEvEkjWDu53Wz0PjgwB39Tf6FlSUK
-	 P3w02oWTNsqjBu9oAx63kDnwWTrQKFXFSVNhKfekSxEu/7iUBG3McDcPUjJDccAwhg
-	 ruQgvBxiaRa2ClUvxnBapyXm6LXoZJ17r/pvmjGhiQ1zKSk9YKeK1vmPdy5PHDg13S
-	 Bol2kTXLuchRQ==
-Message-ID: <e9cf1bf8-2d77-4165-bf64-b41f3b8b880d@uliege.be>
-Date: Mon, 23 Sep 2024 11:22:12 +0200
+	s=arc-20240116; t=1727083487; c=relaxed/simple;
+	bh=P85uniBbpjbAiAEhXQw8DDYhZFYlWYcMIcwcq4CiTRE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nu9oeFJaqrblK8Y0FU0+n/6I0o5cvRiO3OWmxKZMHLZlJp6j3gM10cmo8TC1GJ26pj6rvh+uayjjN7eL3jqFJ2IjHkPu/cyyTWQO4pggR/ZNGtu56rrt/jBcL4NBWqXpXooSW1QgKKflEwlvC5uLL/mCvZKUU473EMG3gsMuHqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=TKRGVGFT; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 03579A03FB;
+	Mon, 23 Sep 2024 11:24:36 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=GkwqSLjc8C5KqC+YUWvBsBhbeWnsg8Xr9Cj8nXEsTT4=; b=
+	TKRGVGFTN3TrDC/U+9xw/q420/nykHzM1UTN5f6XFyYXi7BH/qQJo49yxzR9vljE
+	6caQV6eYFnCRYv3d4WWd85icMR3qH6Y2kucyZgeFXhQ90fzfsJxIPlgqPW8mqgbI
+	vjx0SHYlvnF0dq/g4v9UKvUkf7q4w6p+zhqiKwEHvUpxAs72B4oPQgdgiLoPUaHl
+	wRXpmto+seZ4zH1EADs5pTVp2vsuS0kF44MgBQx64tTrx26nOEfCpeK9U7RKqRos
+	WsJ9n/tQc358DHxfV1x3DjzGVmHulo9PQuDup7pyHGeplOcSvD7+GZWpkZ6z/Ng5
+	9EGvR+W8vTmOXPFmhmGZZPcPK8cPqQHJkgnKthal24z8Qiv4tpDe+WIh5xEAtuXa
+	Z8VmZMOcfp3WiAWfiV59tAt+mVc/YBp0Sz535UxjxxCtD5nOoFdz4KhGKoydjHPf
+	82EKS4N1yX7lz7fVnPSrqe0DaCWokQmJqKJk90b2x0xfCjcodPmRmB1rMl2dT8XT
+	5gFH3HJWBMiCqN25PSW8KUxBYEDYDXgvTjonBnXO5OugpoKnPwj6fm7pfWFbwZQz
+	NCpnRsE49Wh3xWIN2yxG8TTp2EjYgHqHkWy70eQS33QtFbXgyBmeHUb27EgwEtQy
+	m1VSDplJ9Ek594RQC7kkM15iS5UFVxxFA5jH5PfQImY=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
+To: "David S. Miller" <davem@davemloft.net>, Frank Li
+	<Frank.Li@freescale.com>, <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, Wei Fang
+	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Richard Cochran
+	<richardcochran@gmail.com>
+Subject: [PATCH net 1/2] net: fec: Restart PPS after link state change
+Date: Mon, 23 Sep 2024 11:23:46 +0200
+Message-ID: <20240923092347.2867309-1-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests: net: ioam: add tunsrc support
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- shuah@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
-References: <20240907164245.89627-1-justin.iurman@uliege.be>
- <bbeb8c77-1772-45a2-8626-a4e064ab7c54@redhat.com>
-Content-Language: en-US
-From: Justin Iurman <justin.iurman@uliege.be>
-In-Reply-To: <bbeb8c77-1772-45a2-8626-a4e064ab7c54@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1727083475;VERSION=7976;MC=574309015;ID=151752;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29ACD948546C7466
 
-On 9/19/24 09:57, Paolo Abeni wrote:
-> On 9/7/24 18:42, Justin Iurman wrote:
->> TL;DR This patch comes from a discussion we had with Jakub and Paolo.
->>
->> This patch updates the IOAM selftests to support the new "tunsrc"
->> feature of IOAM. As a consequence, some changes were required. For
->> example, the IPv6 header must be accessed to check some fields (i.e.,
->> the source address for the "tunsrc" feature), which is not possible
->> AFAIK with IPv6 raw sockets. The latter is currently used with
->> IPV6_RECVHOPOPTS and was introduced by commit 187bbb6968af ("selftests:
->> ioam: refactoring to align with the fix") to fix an issue. But, we
->> really need packet sockets actually... which is one of the changes in
->> this patch (see the description of the topology at the top of ioam6.sh
->> for explanations). Another change is that all IPv6 addresses used in the
->> topology are now based on the documentation prefix (2001:db8::/32).
->> Also, the tests have been improved and there are now many more of them.
->> Overall, the script is more robust.
->>
->> The diff is kind of a mess. Since it's "just" a selftests patch, I
->> didn't bother having a series of two patches (one to remove it, one to
->> add the new one back). Let me know if you think it's necessary for
->> readability.
->>
->> Note: this patch needs this [1] iproute2-next patch to be merged
->> (waiting for David to do so, should be done soon).
->>
->>    [1] https://patchwork.kernel.org/project/netdevbpf/list/?series=884653
->>
->> Signed-off-by: Justin Iurman <justin.iurman@uliege.be>
-> 
-> Unfortunatelly we was unable to process this patch before the merge 
-> window and net-next is currently closed. You will need to repost it is ~2w.
+On link state change, the controller gets reset,
+causing PPS to drop out. Re-enable PPS if it was
+enabled before the controller reset.
 
-Hi Paolo,
+Fixes: 6605b730c061 ("FEC: Add time stamping code and a PTP hardware clock")
+Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
+---
+ drivers/net/ethernet/freescale/fec.h      |  1 +
+ drivers/net/ethernet/freescale/fec_main.c |  7 ++++++-
+ drivers/net/ethernet/freescale/fec_ptp.c  | 12 ++++++++++++
+ 3 files changed, 19 insertions(+), 1 deletion(-)
 
-Sure, no worries.
+diff --git a/drivers/net/ethernet/freescale/fec.h b/drivers/net/ethernet/freescale/fec.h
+index a19cb2a786fd..afa0bfb974e6 100644
+--- a/drivers/net/ethernet/freescale/fec.h
++++ b/drivers/net/ethernet/freescale/fec.h
+@@ -695,6 +695,7 @@ struct fec_enet_private {
+ };
+ 
+ void fec_ptp_init(struct platform_device *pdev, int irq_idx);
++void fec_ptp_restore_state(struct fec_enet_private *fep);
+ void fec_ptp_stop(struct platform_device *pdev);
+ void fec_ptp_start_cyclecounter(struct net_device *ndev);
+ int fec_ptp_set(struct net_device *ndev, struct kernel_hwtstamp_config *config,
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index acbb627d51bf..6c6dbda26f06 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -1244,8 +1244,10 @@ fec_restart(struct net_device *ndev)
+ 	writel(ecntl, fep->hwp + FEC_ECNTRL);
+ 	fec_enet_active_rxring(ndev);
+ 
+-	if (fep->bufdesc_ex)
++	if (fep->bufdesc_ex) {
+ 		fec_ptp_start_cyclecounter(ndev);
++		fec_ptp_restore_state(fep);
++	}
+ 
+ 	/* Enable interrupts we wish to service */
+ 	if (fep->link)
+@@ -1366,6 +1368,9 @@ fec_stop(struct net_device *ndev)
+ 		val = readl(fep->hwp + FEC_ECNTRL);
+ 		val |= FEC_ECR_EN1588;
+ 		writel(val, fep->hwp + FEC_ECNTRL);
++
++		fec_ptp_start_cyclecounter(ndev);
++		fec_ptp_restore_state(fep);
+ 	}
+ }
+ 
+diff --git a/drivers/net/ethernet/freescale/fec_ptp.c b/drivers/net/ethernet/freescale/fec_ptp.c
+index 4cffda363a14..54dc3d0503b2 100644
+--- a/drivers/net/ethernet/freescale/fec_ptp.c
++++ b/drivers/net/ethernet/freescale/fec_ptp.c
+@@ -764,6 +764,18 @@ void fec_ptp_init(struct platform_device *pdev, int irq_idx)
+ 	schedule_delayed_work(&fep->time_keep, HZ);
+ }
+ 
++/* Restore PTP functionality after a reset */
++void fec_ptp_restore_state(struct fec_enet_private *fep)
++{
++	/* Restart PPS if needed */
++	if (fep->pps_enable) {
++		/* Reset turned it off, so adjust our status flag */
++		fep->pps_enable = 0;
++		/* Re-enable PPS */
++		fec_ptp_enable_pps(fep, 1);
++	}
++}
++
+ void fec_ptp_stop(struct platform_device *pdev)
+ {
+ 	struct net_device *ndev = platform_get_drvdata(pdev);
+-- 
+2.34.1
 
-> Strictly speaking about the patch contents, any chance you could 
-> refactor the change in a more 'incremental' way?
-> The current format is very hard to review, and even self-tests patches 
-> deserve some love ;)
 
-I think the best incremental way I can come up with right now (so that 
-it also makes my life easier) is to have a series that (i) removes the 
-ioam selftests (patch #1) and (ii) re-adds the new one (patch #2). Would 
-you all agree with this?
-
-Cheers,
-Justin
-
-> Thanks,
-> 
-> Paolo
-> 
 
