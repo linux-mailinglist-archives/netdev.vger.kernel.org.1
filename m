@@ -1,95 +1,180 @@
-Return-Path: <netdev+bounces-129372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D22497F145
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 21:38:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC3597F151
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 21:44:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C92771F2291A
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 19:38:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA6D61C2171F
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 19:44:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061681A0AEC;
-	Mon, 23 Sep 2024 19:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AF501A0728;
+	Mon, 23 Sep 2024 19:44:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cO+h062s"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kfovu1K6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808861A0732
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 19:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EF8019F413;
+	Mon, 23 Sep 2024 19:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727120331; cv=none; b=d6+HiYUgKOaUgGzMgsnOjx+o2Ez5Jd9KZZfJ0Epwgudj365b9mgORj3iikdvKqAx9Uru+NY4CXyKlPnEUhPwoLc7TNnpKAGXHHHZcLNmCwzZ3X1SNywZVtn8lWQvOYoC2vSWoUUD6myPmcDk07YKzyOvEcSElVRi7gcrkkoae0g=
+	t=1727120688; cv=none; b=shYao4okiO+xZWoeRoqz93ONJ8fpCuf+hEh28elzGFkXDsKWNjakDpblcjWzjqe/FeEag066mG+QkNSFmcBWr1Jsw9ImVMFg8RqUC+M0zsLut49PjvYuH7k7sBE3xL1ebckIoMSKT9hH41LFGE1658FhbpTd1jvDR0y9saJiK9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727120331; c=relaxed/simple;
-	bh=IMBNE2puIfzdked4t6uZlyrCqjh8qel5HvLo5rRBc9o=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=C0kYSJeDnAmdjdkufwE46Hd5ioIShYHLWlBqY8oEi/UrqYHBklM1MX1x73hTpF1THqJLSJh/ZN7SV9rip2NEJguWYGE/FkOrEWIC67k/6bpv+Avan3DzzqTxW+jqBj8zbjR6ypQvEPCTEXctwLBVyWuKb90HVICLidSqEdivYq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cO+h062s; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727120329;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IMBNE2puIfzdked4t6uZlyrCqjh8qel5HvLo5rRBc9o=;
-	b=cO+h062sPzmLwvgbadEEvHG06NXpi3wHF8Y0fKB4Aw8YGv0FiF09X7EOFwytLjx4iVEZdh
-	U5r7lSU5vXC9yE+zIValoaMUDAMzeh86IPk96+eAXIIYFonxtPIpjOjVUGNkDOSVA12e2E
-	5ELXZbeEDOd+1rtUbifRY3bHcrOVOgk=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-BsQ4RlIhNY-hYa32ClXl0w-1; Mon,
- 23 Sep 2024 15:38:44 -0400
-X-MC-Unique: BsQ4RlIhNY-hYa32ClXl0w-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 521C5190DE19;
-	Mon, 23 Sep 2024 19:38:41 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 71DD619560AA;
-	Mon, 23 Sep 2024 19:38:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240923183432.1876750-1-chantr4@gmail.com>
-References: <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com>
-To: Manu Bretelle <chantr4@gmail.com>
-Cc: dhowells@redhat.com, asmadeus@codewreck.org,
-    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
-    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
-    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
-    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-    v9fs@lists.linux.dev, willy@infradead.org, eddyz87@gmail.com
-Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+	s=arc-20240116; t=1727120688; c=relaxed/simple;
+	bh=Clkk71o0s79HGUcEPbrwaa9UXB/yqp1hOLGuoxrDjV8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e0Sv6+FByc0v6A6GlkKOO5XIwiii/TQSlEUKWad8v4OQjIj0+VkHm8hawf3GeKaV4axwH9YioYqva1F0i8Q66f5L0kNpU0kdDMF607GYkhB4pj8nSrCveYznuzo5DAjgS3bpVAtK3wkgHQ9pIwk4b+WEUP8bGpvspTU4YWH9sZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kfovu1K6; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727120687; x=1758656687;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Clkk71o0s79HGUcEPbrwaa9UXB/yqp1hOLGuoxrDjV8=;
+  b=Kfovu1K6/l9bIJeolUrNqu0zwJvtoIv0kwOwD0JkL6odZPsnG3ivyM2I
+   OeLOB5SfIWhrHg5j54jxLMXwu2Hy7vz26fNuRUctfst1+HIqXPQQ1SbaR
+   5WInqbATxC/JU+uo9Mj3fg/65/AD6zliSouaAzbjBVPoXqYwGJqFPqoQA
+   lZNDJQHFgtDO9sOZ3V9tmKAYXKUCrr1rTAxw4ddyQuO9uLzhVGnNw6/Xw
+   45je0n3ha02lMNlMXBUcmvF7JDqDnKazjI54kIFvAl/QzRD/6HHVQUH3z
+   Zq78wuS17fYXBpMdspCfWISjVzwsrOYJ+AyMC4WY+WqG3d8KfXe4Tmolx
+   Q==;
+X-CSE-ConnectionGUID: NvErrL2AR56hbIpA+X31iA==
+X-CSE-MsgGUID: UkxWt6pdTP6m9GHzuWFKag==
+X-IronPort-AV: E=McAfee;i="6700,10204,11204"; a="25602859"
+X-IronPort-AV: E=Sophos;i="6.10,252,1719903600"; 
+   d="scan'208";a="25602859"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2024 12:44:45 -0700
+X-CSE-ConnectionGUID: tEv9MQoSStOASbPCzWw2iQ==
+X-CSE-MsgGUID: O+i2Mu1OSs+QdEZ2xYMJkQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,252,1719903600"; 
+   d="scan'208";a="75553711"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 23 Sep 2024 12:44:42 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ssozA-000HYI-05;
+	Mon, 23 Sep 2024 19:44:40 +0000
+Date: Tue, 24 Sep 2024 03:44:13 +0800
+From: kernel test robot <lkp@intel.com>
+To: Dipendra Khadka <kdipendra88@gmail.com>, andrew@lunn.ch,
+	florian.fainelli@broadcom.com, davem@davemloft.net,
+	edumazet@google.com, bcm-kernel-feedback-list@broadcom.com,
+	kuba@kernel.org, pabeni@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, Dipendra Khadka <kdipendra88@gmail.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net] net: Add error pointer check in bcmsysport.c
+Message-ID: <202409240305.PgIkDx1K-lkp@intel.com>
+References: <20240923053900.1310-1-kdipendra88@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <912765.1727120313.1@warthog.procyon.org.uk>
-Date: Mon, 23 Sep 2024 20:38:33 +0100
-Message-ID: <912766.1727120313@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240923053900.1310-1-kdipendra88@gmail.com>
 
-Hi Manu,
+Hi Dipendra,
 
-Are you using any other network filesystem than 9p, or just 9p?
+kernel test robot noticed the following build errors:
 
-David
+[auto build test ERROR on net/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Dipendra-Khadka/net-Add-error-pointer-check-in-bcmsysport-c/20240923-134407
+base:   net/main
+patch link:    https://lore.kernel.org/r/20240923053900.1310-1-kdipendra88%40gmail.com
+patch subject: [PATCH v2 net] net: Add error pointer check in bcmsysport.c
+config: i386-allmodconfig (https://download.01.org/0day-ci/archive/20240924/202409240305.PgIkDx1K-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240924/202409240305.PgIkDx1K-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409240305.PgIkDx1K-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/broadcom/bcmsysport.c: In function 'bcm_sysport_map_queues':
+>> drivers/net/ethernet/broadcom/bcmsysport.c:2341:24: error: implicit declaration of function 'PRT_ERR'; did you mean 'PTR_ERR'? [-Werror=implicit-function-declaration]
+    2341 |                 return PRT_ERR(dp);
+         |                        ^~~~~~~
+         |                        PTR_ERR
+   cc1: some warnings being treated as errors
+
+
+vim +2341 drivers/net/ethernet/broadcom/bcmsysport.c
+
+  2330	
+  2331	static int bcm_sysport_map_queues(struct net_device *dev,
+  2332					  struct net_device *slave_dev)
+  2333	{
+  2334		struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
+  2335		struct bcm_sysport_priv *priv = netdev_priv(dev);
+  2336		struct bcm_sysport_tx_ring *ring;
+  2337		unsigned int num_tx_queues;
+  2338		unsigned int q, qp, port;
+  2339	
+  2340		if (IS_ERR(dp))
+> 2341			return PRT_ERR(dp);
+  2342	
+  2343		/* We can't be setting up queue inspection for non directly attached
+  2344		 * switches
+  2345		 */
+  2346		if (dp->ds->index)
+  2347			return 0;
+  2348	
+  2349		port = dp->index;
+  2350	
+  2351		/* On SYSTEMPORT Lite we have twice as less queues, so we cannot do a
+  2352		 * 1:1 mapping, we can only do a 2:1 mapping. By reducing the number of
+  2353		 * per-port (slave_dev) network devices queue, we achieve just that.
+  2354		 * This need to happen now before any slave network device is used such
+  2355		 * it accurately reflects the number of real TX queues.
+  2356		 */
+  2357		if (priv->is_lite)
+  2358			netif_set_real_num_tx_queues(slave_dev,
+  2359						     slave_dev->num_tx_queues / 2);
+  2360	
+  2361		num_tx_queues = slave_dev->real_num_tx_queues;
+  2362	
+  2363		if (priv->per_port_num_tx_queues &&
+  2364		    priv->per_port_num_tx_queues != num_tx_queues)
+  2365			netdev_warn(slave_dev, "asymmetric number of per-port queues\n");
+  2366	
+  2367		priv->per_port_num_tx_queues = num_tx_queues;
+  2368	
+  2369		for (q = 0, qp = 0; q < dev->num_tx_queues && qp < num_tx_queues;
+  2370		     q++) {
+  2371			ring = &priv->tx_rings[q];
+  2372	
+  2373			if (ring->inspect)
+  2374				continue;
+  2375	
+  2376			/* Just remember the mapping actual programming done
+  2377			 * during bcm_sysport_init_tx_ring
+  2378			 */
+  2379			ring->switch_queue = qp;
+  2380			ring->switch_port = port;
+  2381			ring->inspect = true;
+  2382			priv->ring_map[qp + port * num_tx_queues] = ring;
+  2383			qp++;
+  2384		}
+  2385	
+  2386		return 0;
+  2387	}
+  2388	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
