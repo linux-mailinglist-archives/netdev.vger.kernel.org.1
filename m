@@ -1,131 +1,145 @@
-Return-Path: <netdev+bounces-129332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26C9C97EE59
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 17:40:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 77DF697EE78
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 17:48:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57EF01C216A5
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 15:39:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1DA21C2145C
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 15:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29CE5433D6;
-	Mon, 23 Sep 2024 15:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XpI9/tRA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF9119C578;
+	Mon, 23 Sep 2024 15:48:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f178.google.com (mail-vk1-f178.google.com [209.85.221.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9788C1E52C
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 15:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8273199923
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 15:48:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727105996; cv=none; b=HB6oCmmqwQmjC9KMxNvbQPeYkoG++LaJfEPW1V6OoqpmKQr2aDDYan8XOskjCmEJ8HyHuVBDpP8fuUZbcVPWpnXUF1714fgbUzVBQ8IKqYpeSZ3gRt6znaPUyu4ITjZrbnL6yJnWb41yW/gkUmqGozWSZHbV+d5NrDhDnH+uKOA=
+	t=1727106487; cv=none; b=SHU4tGkSy6L8geBA3H69UKxq/mfw0vwnQpX9D3B4JoJKZ1i87r95i8JI2hrpesAk1Vwfjwdz2ggBr61efvTFO3GS58sjtdykp4JtPS7WymPOZ7qwbus6YOsVvJmHKc0+jb4MSeQdXpP9pNF981O2EBSLF+9nj2mV3A/zfwZyJ2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727105996; c=relaxed/simple;
-	bh=wKpbZkRft7AVu54gAugqxTOiGHxcsdbcfmXT2AbcUI4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BbFhYECgi00lILP3yxe6ik4X1enLEX8/JYUwNnaR2cWnf6H+Y5JeS5kuwdyxnG5SV8qCumqsCsKRspBL0MYi5Z+IGJri6AdN09Jr74JSdpPm3hmvilFRxNuCi38BCCIm5qtHKFewLciFU4UdKAQWnjQMhUBGV/WU3tDTZS9q4fU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XpI9/tRA; arc=none smtp.client-ip=209.85.221.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f178.google.com with SMTP id 71dfb90a1353d-502b405abb1so1161112e0c.1;
-        Mon, 23 Sep 2024 08:39:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727105993; x=1727710793; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=0cHn2kxvtLMH0UDv0GGE+4WDLjMJMQj2YXfFS/thRgM=;
-        b=XpI9/tRAIEPC3JuXZv02by8ufO3tE20B7KvurTRD/x/gGGnygl0fIvFroiNpC3mTbU
-         wWYC7sXp9jXxuswDKLYjYMALZtzKpm0o/6C08QXwzCDYczR50ADck8IWo7BGMa7Kcm+F
-         KYgYtp6LZYUa2LubFU+zQ/Rxa+4ogPcIWYRmyvmBwAsXi4SegK/g4pDWhCdfN+9DMiIR
-         41ago1ftF/NPbtrXpJiitokRrsx7f6d6NFw9fNEcl3TGvqdR9Bkn/xIfcrnBjo7pHPid
-         aUIWbnMncuLfDp0vO9/S+nWEJGM8T43NqbqMUlNPWkzwzr0nZ6U8VpONSHY2F9xulKvl
-         z8sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727105993; x=1727710793;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0cHn2kxvtLMH0UDv0GGE+4WDLjMJMQj2YXfFS/thRgM=;
-        b=veWe3a7B5uYvblabyzObgVuP5kizaAPRSldKnzJGZJQ1LedoojRNKE/o5KIPS2EH4Q
-         InD4fOdaAHYIQU9E3yHybrYjMIEISSFVfdnhhMwbH4LchmAkdby+G+MzWsY4e15Utyel
-         dy8XLOPFi1oOmI9Sswh6dhqCA3ue0EMvxzVZnzXU5wH8lE3WGtf/xsuEysuj147S4X6O
-         0Srwk/rx7N8K5dbcbJPBmGRHDbavKR4atn/MpJGVHMUjvQ7Inv+oMhFNZecpWqqQv5nn
-         J+HiagbhOcE+Saqtvlt+ZGjCPxZZjLU39UNu1NK7lRwNORRMH1imOR1TlY0EgC4LvNNw
-         Kr5g==
-X-Forwarded-Encrypted: i=1; AJvYcCWeTmEJEzZhycF5kYymFS3yfTJGtE8ptQFh7zVPUNPekiRjBUgYSCxKvHTve8y+aEyKMo0Bbd80CzmJa8SY+g4=@vger.kernel.org, AJvYcCXGP3DJLHu69u2hUuAhdwR7MNvrsfJ2vRq6fMGYZDFblXP0h69LDQfMxms/bb38ZQpF5RqIOMbH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5z2fsFeUvKRB7ohLK68yG5eEVXrruc8aJMEBbtyLuxHAMSKXh
-	3d3e7fPKGfYOUClMV1r0MPvROcCte9bY9Hqyj0jzXohEtkP+aPnul5izdq5c5ulhCqcQFIo26fA
-	CU+5LzTI6Hsx+GxOxPMBn06RIut0=
-X-Google-Smtp-Source: AGHT+IG3kGD0hbXSSAj8Vc4+1ZrIhGPJEe2YJmMs/J6kJ4GbpvTAa0SZeHCCpB5ODKOWupdGftIbY4vMSUobDIQ2mZo=
-X-Received: by 2002:a05:6122:180a:b0:503:9cbc:1c9e with SMTP id
- 71dfb90a1353d-503e023639cmr7386774e0c.0.1727105993362; Mon, 23 Sep 2024
- 08:39:53 -0700 (PDT)
+	s=arc-20240116; t=1727106487; c=relaxed/simple;
+	bh=hkoieWxJ0471/Q4wgFmy+wiZ2lpn7t8bPYZ/cXRThjo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=QLnwSXU5FilJSVVRL8wKKZXg9xF6CoouzRz5htCX8Pok/u38H0A1+MHwKsXnljLEu08Dxmq0KauMgKfwO9bCzHldJMSQrcpCCprjmv+epKCdUYqhcOLxkj+vAsnwUPEFzn26dBeWH8PAqDFFpDH0Psa7rP7md55q9aIWCZ8ib98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-21-fwPuqpVfPIO66RunyFwVag-1; Mon, 23 Sep 2024 16:46:23 +0100
+X-MC-Unique: fwPuqpVfPIO66RunyFwVag-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 23 Sep
+ 2024 16:45:27 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 23 Sep 2024 16:45:27 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Jakub Sitnicki' <jakub@cloudflare.com>, Martin KaFai Lau
+	<martin.lau@linux.dev>, 'Tiago Lam' <tiagolam@cloudflare.com>, Eric Dumazet
+	<edumazet@google.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+CC: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Andrii Nakryiko" <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John
+ Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa
+	<jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan
+	<shuah@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"kernel-team@cloudflare.com" <kernel-team@cloudflare.com>
+Subject: RE: [RFC PATCH v2 2/3] ipv6: Support setting src port in sendmsg().
+Thread-Topic: [RFC PATCH v2 2/3] ipv6: Support setting src port in sendmsg().
+Thread-Index: AQHbDci8OgyMoKtrJE6wBcqRmpwTjbJlgCZQ
+Date: Mon, 23 Sep 2024 15:45:27 +0000
+Message-ID: <29fea23839cf489488f9228a44e79d21@AcuMS.aculab.com>
+References: <20240920-reverse-sk-lookup-v2-0-916a48c47d56@cloudflare.com>
+	<20240920-reverse-sk-lookup-v2-2-916a48c47d56@cloudflare.com>
+	<855fc71343a149479c7da96438bf9e32@AcuMS.aculab.com>
+ <87r09a771t.fsf@cloudflare.com>
+In-Reply-To: <87r09a771t.fsf@cloudflare.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240923110633.3782-1-kdipendra88@gmail.com> <20240923173158.54bb1f46@fedora.home>
-In-Reply-To: <20240923173158.54bb1f46@fedora.home>
-From: Dipendra Khadka <kdipendra88@gmail.com>
-Date: Mon, 23 Sep 2024 21:24:42 +0545
-Message-ID: <CAEKBCKMho+hh1GLD=XP1wOjDwy=DiD-SsAng8jCR6uAmPXgL-w@mail.gmail.com>
-Subject: Re: [PATCH net] net: ethernet: marvell: octeontx2: nic: Add error
- pointer check in otx2_common.c
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com, 
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, cc=linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On Mon, 23 Sept 2024 at 21:17, Maxime Chevallier
-<maxime.chevallier@bootlin.com> wrote:
->
-> Hi,
->
-> On Mon, 23 Sep 2024 11:06:32 +0000
-> Dipendra Khadka <kdipendra88@gmail.com> wrote:
->
-> > Add error pointer check after calling otx2_mbox_get_rsp().
->
-> As this is a fix, you need a Fixes: tag.
->
-> > Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
-> > ---
-> >  drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
+From: Jakub Sitnicki
+> Sent: 23 September 2024 15:56
+>=20
+> On Mon, Sep 23, 2024 at 01:08 PM GMT, David Laight wrote:
+> > From: Tiago Lam <tiagolam@cloudflare.com>
+>=20
+> [...]
+>=20
+> >> To limit its usage, a reverse socket lookup is performed to check if t=
+he
+> >> configured egress source address and/or port have any ingress sk_looku=
+p
+> >> match. If it does, traffic is allowed to proceed, otherwise it falls
+> >> back to the regular egress path.
 > >
-> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> > index 87d5776e3b88..6e5f1b2e8c52 100644
-> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-> > @@ -1838,6 +1838,11 @@ u16 otx2_get_max_mtu(struct otx2_nic *pfvf)
-> >               rsp = (struct nix_hw_info *)
-> >                      otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
-> >
-> > +             if (IS_ERR(rsp)) {
-> > +                     mutex_unlock(&pfvf->mbox.lock);
-> > +                     return PTR_ERR(rsp);
-> > +             }
->
-> You're returning an error code as the max MTU, which will be propagated
-> to netdev->max_mtu, that's not correct. There's already an error path in
-> this function that you can use.
->
+> > Is that really useful/necessary?
+>=20
+> We've been asking ourselves the same question during Plumbers with
+> Martin.
+>=20
+> Unprivileges processes can already source UDP traffic from (almost) any
+> IP & port by binding a socket to the desired source port and passing
+> IP_PKTINFO. So perhaps having a reverse socket lookup is an overkill.
 
-Sure, thanks for the response. I will send a v2 .
+Traditionally you'd need to bind to the source port on any local IP
+(or the wildcard IP) that didn't have another socket bound to that port.
+Modern Linux might have more restrictions and SO_REUSADDR muddies things.
 
-> Thanks,
->
-> Maxime
+And I don't think you can do a connect() on an unbound UDP socket to
+set the source port at the same time as the destination IP+port.
+(That would actually be useful.)
 
-Best regards,
-Dipendra
+OTOH if you just want to send a UDP message you can just use another
+system on the same network.
+You might need to spoof the source mac - but that isn't hard (although
+it might confuse any ethernet switches).
+
+> We should probably respect net.ipv4.ip_local_reserved_ports and
+> net.ipv4.ip_unprivileged_port_start system settings, though, or check
+> for relevant caps.
+
+True.
+
+> Open question if it is acceptable to disregard exclusive UDP port
+> ownership by sockets binding to a wildcard address without SO_REUSEADDR?
+
+We've often suffered from the opposite - a program binds to the wildcard
+IP and everything works until something else binds to the same port and
+a specific local IP.
+I'm sure this is grief some on both TCP and UDP - especially since you
+often need to set SO_REUSADDR to stop other things breaking.
+
+=09David
+=20
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1=
+PT, UK
+Registration No: 1397386 (Wales)
+
 
