@@ -1,171 +1,295 @@
-Return-Path: <netdev+bounces-129320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67DCB97ED3F
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:36:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 846F697ED77
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:56:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC6FE1F21FDF
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:36:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38F831F21F97
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:56:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E370519922E;
-	Mon, 23 Sep 2024 14:36:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9363B196DA4;
+	Mon, 23 Sep 2024 14:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="GE7InRkc"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="VeBVNI3S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F272433D6
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 14:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DCD077F13
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 14:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727102208; cv=none; b=sEyUft66UYQ06GE+fEmLQEJBLCHz3KwUe9IXkOntHWD2RnTVxK6LjtdxnKEyUGIPga60txLdfy/jlXxKqaCSJuKLtBvpZ1sCbm9fog747T3WPvyHgBGowBfcc+J82K+kbe26mWUNp7hKZppTorQpuceeXb83sDlH2VosUHZ5tp0=
+	t=1727103380; cv=none; b=W1Sb/UFSl56R8D1ipXwWPlPvbES0y/g7PWKV0dv8XMqfN+F4fn2PMqhTjy+/eI23Z4ZA3D3aY9lOFZrRPMdusiKT6makMYTScrk4scBGRh9ZEvzRVDjjQpoLxzL1Ys1hp5qcOjpbHmMMc4RpvwOahBGhypDzBjwSHMHaB73zE0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727102208; c=relaxed/simple;
-	bh=27S5K30ZKiVk+Il4XS6xkKjJ7Xhn5A3SMCPfMAwVUb0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mxTdYFs2YtcpTGEOqyAWwUBk/smGRPvWMG6+r10ZIWIbfjgiYdK5UZq9ZyDw33WC3pHDFtn1jdCnoVTvSeEn1hhQar7DSO+BXDaJ/mzWUMyyf3DPGS2JbECOFfLwSFYrkrCvu+ULQwcqTdEkBYVpGdZRhB6FzJN5PJTRj7gATXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=GE7InRkc; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-378e5d4a80eso3359895f8f.0
-        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 07:36:46 -0700 (PDT)
+	s=arc-20240116; t=1727103380; c=relaxed/simple;
+	bh=35fDDCX/93J0kbWox71MdRxHl5eHRVht19QYjtIq2cs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tb5AQZyCPRTbkikLeCLvm1+1yfHlQpPQYVELZTMutumNx63L3dTSksjTPJattt66eopcDBhheqYAAByhR/J6Q7u4JiEAXL7NFjeT8rOynoymSeuEWEYu8y286rcYKr3lBLTdrymd1L+6hXrroTeb0ChaRHEE1SVIk55PYMrdWxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=VeBVNI3S; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5365b6bd901so5084691e87.2
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 07:56:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1727102205; x=1727707005; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oy27aIauyr1g1GgFXjl7fd/Snj7Jkn+t+ps3LXSWfUw=;
-        b=GE7InRkc5/l2FSyei2Z6daqTSo9tb9EErjvHW4RX04t4NifU60R52YisvK7TMQhG8y
-         LN4cDY0U+vQ/XqDARM8YnTlc1OvE50AHOdwdsvqaTVUY57sziuz7yhHWO3sXFc75/6Ph
-         s0I7kDBEfXVnBHENKpKKmiMuRHbKuufukVEVJjvL+576imRbvIn4Pz/ohWF9Tbwfc7Zn
-         HT1qUbtoyVhxi0Dhj8yTrghss15AoixCy03hJE/SyaAZK5Uvl3QZOipg8bU9Mf0DNRlu
-         yfsna9/OvPKe4aXYzz6rknxxm4IBuR9wLTZRbfZGxRCA+PjL8rda0dug4/T1r0bD3oli
-         E+0Q==
+        d=cloudflare.com; s=google09082023; t=1727103377; x=1727708177; darn=vger.kernel.org;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=8TouiKInAZyp7A4NllO+s2pCA1AZNyg8dLTYskVXxqA=;
+        b=VeBVNI3Smv8DQzg+QGw5QVCDrnv+nQiwZYkKtML2ykOWDajrPf7EF7hbmrYfiGXA2t
+         C4Nz09/a99qQVFySgYaDIb0ujqGMxZyJwfSHTvIe896BrNX+gU5svr0eyF2kUxoT3b/t
+         fh6DMkk7lUW3qcQ2w9TUo1ANQTXoYPC1vxyoQU+lK1RnBcBDXL1Vuaz4o1EtUGNa93QT
+         TjctoUhIkw1saeIwHB6+31UTr5qKcZcWE0j442TM6DgZoUCj8Eg2gft879uN3PDrEteS
+         IbqIGv+0h8qMBLM/TMimTxS7QWkIYSVzo1cDb8bFbEhbX7aUMS1E3HdtNt2UFxgBbE1Z
+         dqTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727102205; x=1727707005;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1727103377; x=1727708177;
+        h=mime-version:message-id:date:user-agent:references:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Oy27aIauyr1g1GgFXjl7fd/Snj7Jkn+t+ps3LXSWfUw=;
-        b=vv0OxcAEkmMm6+Fjhxy4GcNvjeB1m6p5oFFSKbAbBTYHoXEq7abvYhfjXtTgqMLSHJ
-         5oo4yMGkw/Muk872RYimDUB2r4lJ8okP6od2xR72vmF/mlBJE+S57eem2D15yLePW8N1
-         HwidPYYILhf87vF/ZP+Wdk3OCElNujz8KIVaMPOSnES/0qd8xFDMlH76E/SVQZhlyAls
-         nFkyYxGCuSmuozn3MKayhZ2qe5oZK1EFZYAh381eiyso7aEpAtY1U4BeZ7Flkg90+rDb
-         q52s7isvBNSD2uETOnJLy1c3Ue2p4rL3VM9+DMXhAI/3B/bEVTBvLFGeryLzROV53J+Q
-         m8lg==
-X-Forwarded-Encrypted: i=1; AJvYcCUhAAjp2ofaQ+jPOkP6/oIcXpu6FETh/vK2PivkVmw2c3rphb/7yHe70Tdyngb8q5K1BBlHHAw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJJ5S0s7YE0kpYsyixQHgWb4GWMQki7x0yfP/wQImYjr0/UqmV
-	wADxEO0FyeTfNyurnFL9i/l1CLO7O9iW9UwHc+F9EYeU3jVQ6/TLjuU/GuTI3IM=
-X-Google-Smtp-Source: AGHT+IF9Ub7BdPv2pesV4/9veb7ilGC8otZCOEM53glYt/oxarpKh/QSYRwqCQXxWTTsqDwqW4KS8Q==
-X-Received: by 2002:a5d:6e05:0:b0:371:8e8b:39d4 with SMTP id ffacd0b85a97d-37a422c028bmr5698492f8f.28.1727102204806;
-        Mon, 23 Sep 2024 07:36:44 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:8a3e:77dd:5f67:bbfc? ([2001:67c:2fbc:1:8a3e:77dd:5f67:bbfc])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e754c643csm128169055e9.45.2024.09.23.07.36.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 23 Sep 2024 07:36:44 -0700 (PDT)
-Message-ID: <b3b6158e-bb8f-42cd-879c-b246300ca04c@openvpn.net>
-Date: Mon, 23 Sep 2024 16:36:46 +0200
+        bh=8TouiKInAZyp7A4NllO+s2pCA1AZNyg8dLTYskVXxqA=;
+        b=w6nU1ykS6o3ml3WfdZ29/Av7vQX7P7wxJFhIGNP/Pibu1hG2Hwa/rN6Lvg8gFCr+6R
+         +j552riMPwBY1CCj1de1WUk9lP+16h1p49rcBvNFIRhK4TFhmPO0IJKxRkU4w4BVJTqV
+         IGUg5Vjtk5LRzlwtTeRu6oUEwo6hK9hu2FBKy+D1XhDLwa0YVNG54ZKGRFbrM9kHO521
+         NWBVRkvF3vR+Au5rHuECCfKii4kjsFGiA0L2AYlLxlsOxYuz7UYBN1mHcP9R/sMTxw97
+         LA8OMnqccFiibh8aQKJe8VJyAi+x3CvIWZ1gpR+DB5ANhGk2U0KaxJ5X9KjSaNj2wGfl
+         cqwA==
+X-Forwarded-Encrypted: i=1; AJvYcCXLlRi+748JsVWgkbtrPv/MKwM17jvtqwGKjXw0N7cAOrhaAUAjAu0ZEZy1LQeoQu2Qyd3noww=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwzdfsU6qw/fir9AiUEpTZR9GxiwvBUQuGx7bAZHFB2zMIaCxrl
+	pQgYnZF416N/7x7fL8ZsrS3l9tPjRLuVU6mJq4FcbRkhv0zwyo21epSbc6rA0qg=
+X-Google-Smtp-Source: AGHT+IFtctpIpHZZluG6jxwXspd1B7Jih0sI66CeI59ggyuziZylKFdo52u5V/SrOpq7q1GVzbgpYg==
+X-Received: by 2002:a05:6512:15a2:b0:52c:842b:c276 with SMTP id 2adb3069b0e04-536ad3d49c4mr5769201e87.53.1727103376589;
+        Mon, 23 Sep 2024 07:56:16 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5063:2432::39b:5a])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c42bc898f3sm10373677a12.82.2024.09.23.07.56.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 07:56:15 -0700 (PDT)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: David Laight <David.Laight@ACULAB.COM>, Martin KaFai Lau
+ <martin.lau@linux.dev>, 'Tiago Lam' <tiagolam@cloudflare.com>, Eric
+ Dumazet <edumazet@google.com>, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,  David Ahern
+ <dsahern@kernel.org>,  Jakub Kicinski <kuba@kernel.org>,  Paolo Abeni
+ <pabeni@redhat.com>,  Alexei Starovoitov <ast@kernel.org>,  Daniel
+ Borkmann <daniel@iogearbox.net>,  Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>,  Song Liu <song@kernel.org>,
+  "Yonghong Song" <yonghong.song@linux.dev>,  John Fastabend
+ <john.fastabend@gmail.com>,  "KP Singh" <kpsingh@kernel.org>,  Stanislav
+ Fomichev <sdf@fomichev.me>,  Hao Luo <haoluo@google.com>,  Jiri Olsa
+ <jolsa@kernel.org>,  Mykola Lysenko <mykolal@fb.com>,  Shuah Khan
+ <shuah@kernel.org>,  "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+  "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+  "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+  "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+  "kernel-team@cloudflare.com" <kernel-team@cloudflare.com>
+Subject: Re: [RFC PATCH v2 2/3] ipv6: Support setting src port in sendmsg().
+In-Reply-To: <855fc71343a149479c7da96438bf9e32@AcuMS.aculab.com> (David
+	Laight's message of "Mon, 23 Sep 2024 13:08:36 +0000")
+References: <20240920-reverse-sk-lookup-v2-0-916a48c47d56@cloudflare.com>
+	<20240920-reverse-sk-lookup-v2-2-916a48c47d56@cloudflare.com>
+	<855fc71343a149479c7da96438bf9e32@AcuMS.aculab.com>
+User-Agent: mu4e 1.12.4; emacs 29.1
+Date: Mon, 23 Sep 2024 16:56:14 +0200
+Message-ID: <87r09a771t.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 20/25] ovpn: implement peer add/dump/delete
- via netlink
-To: sd@queasysnail.net
-Cc: kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- ryazanov.s.a@gmail.com, edumazet@google.com, andrew@lunn.ch
-References: <20240917010734.1905-1-antonio@openvpn.net>
- <20240917010734.1905-21-antonio@openvpn.net>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <20240917010734.1905-21-antonio@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-Hi Sabrina,
+On Mon, Sep 23, 2024 at 01:08 PM GMT, David Laight wrote:
+> From: Tiago Lam <tiagolam@cloudflare.com>
 
-On 17/09/2024 03:07, Antonio Quartulli wrote:
 [...]
->   int ovpn_nl_set_peer_doit(struct sk_buff *skb, struct genl_info *info)
->   {
+
+>> To limit its usage, a reverse socket lookup is performed to check if the
+>> configured egress source address and/or port have any ingress sk_lookup
+>> match. If it does, traffic is allowed to proceed, otherwise it falls
+>> back to the regular egress path.
+>
+> Is that really useful/necessary?
+
+We've been asking ourselves the same question during Plumbers with
+Martin.
+
+Unprivileges processes can already source UDP traffic from (almost) any
+IP & port by binding a socket to the desired source port and passing
+IP_PKTINFO. So perhaps having a reverse socket lookup is an overkill.
+
+We should probably respect net.ipv4.ip_local_reserved_ports and
+net.ipv4.ip_unprivileged_port_start system settings, though, or check
+for relevant caps.
+
+Open question if it is acceptable to disregard exclusive UDP port
+ownership by sockets binding to a wildcard address without SO_REUSEADDR?
+
 [...]
-> +	/* VPN IPs cannot be updated, because they are hashed */
-> +	if (!new_peer && (attrs[OVPN_A_PEER_VPN_IPV4] ||
-> +			  attrs[OVPN_A_PEER_VPN_IPV6])) {
-> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
-> +				       "VPN IPs cannot be updated");
-> +		ret = -EINVAL;
-> +		goto peer_release;
-> +	}
-
-while answering some other email I realized that right now we are 
-rejecting VPN IPs updates.
-
-The reason is (as written in the comment above) that VPN IPs are used 
-for hashing the peer.
-
-I think this barrier can be lifted if I implement the VPN IP hashing 
-using hlist_nulls, as I have done for the tranport_addr in case of 
-floating peers.
-
-What do you think?
-Can you see any drawback in this approach?
-
-Doing that would allow us to remove the check above and allow userspace 
-to change IP to peers at runtime.
 
 
-Cheers,
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
+
+
+> The check (but not the commit message) implies that some 'bpf thingy'
+> also needs to be enabled.
+> Any check would need to include the test that the program sending the packet
+> has the ability to send a packet through the ingress socket.
+> Additionally a check for the sending process having (IIRC) CAP_NET_ADMIN
+> (which would let the process send the message by other means) would save the
+> slow path.
+>
+> The code we have sends a lot of UDP RTP (typically 160 bytes of audio every 20ms).
+> There is actually no reason for there to be a valid matching ingress path.
+> (That code would benefit from being able to bind a lot of ports to the same
+> UDP socket.)
+>
+> 	David
+>
+>> 
+>> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+>> Signed-off-by: Tiago Lam <tiagolam@cloudflare.com>
+>> ---
+>>  net/ipv6/datagram.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  net/ipv6/udp.c      |  8 ++++--
+>>  2 files changed, 85 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
+>> index fff78496803d..369c64a478ec 100644
+>> --- a/net/ipv6/datagram.c
+>> +++ b/net/ipv6/datagram.c
+>> @@ -756,6 +756,29 @@ void ip6_datagram_recv_ctl(struct sock *sk, struct msghdr *msg,
+>>  }
+>>  EXPORT_SYMBOL_GPL(ip6_datagram_recv_ctl);
+>> 
+>> +static inline bool reverse_sk_lookup(struct flowi6 *fl6, struct sock *sk,
+>> +				     struct in6_addr *saddr, __be16 sport)
+>> +{
+>> +	if (static_branch_unlikely(&bpf_sk_lookup_enabled) &&
+>> +	    (saddr && sport) &&
+>> +	    (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr, saddr) ||
+>> +	    inet_sk(sk)->inet_sport != sport)) {
+>> +		struct sock *sk_egress;
+>> +
+>> +		bpf_sk_lookup_run_v6(sock_net(sk), IPPROTO_UDP, &fl6->daddr,
+>> +				     fl6->fl6_dport, saddr, ntohs(sport), 0,
+>> +				     &sk_egress);
+>> +		if (!IS_ERR_OR_NULL(sk_egress) && sk_egress == sk)
+>> +			return true;
+>> +
+>> +		net_info_ratelimited("No reverse socket lookup match for local addr %pI6:%d remote addr
+>> %pI6:%d\n",
+>> +				     &saddr, ntohs(sport), &fl6->daddr,
+>> +				     ntohs(fl6->fl6_dport));
+>> +	}
+>> +
+>> +	return false;
+>> +}
+>> +
+>>  int ip6_datagram_send_ctl(struct net *net, struct sock *sk,
+>>  			  struct msghdr *msg, struct flowi6 *fl6,
+>>  			  struct ipcm6_cookie *ipc6)
+>> @@ -844,7 +867,63 @@ int ip6_datagram_send_ctl(struct net *net, struct sock *sk,
+>> 
+>>  			break;
+>>  		    }
+>> +		case IPV6_ORIGDSTADDR:
+>> +			{
+>> +			struct sockaddr_in6 *sockaddr_in;
+>> +			struct net_device *dev = NULL;
+>> +
+>> +			if (cmsg->cmsg_len < CMSG_LEN(sizeof(struct sockaddr_in6))) {
+>> +				err = -EINVAL;
+>> +				goto exit_f;
+>> +			}
+>> +
+>> +			sockaddr_in = (struct sockaddr_in6 *)CMSG_DATA(cmsg);
+>> +
+>> +			addr_type = __ipv6_addr_type(&sockaddr_in->sin6_addr);
+>> +
+>> +			if (addr_type & IPV6_ADDR_LINKLOCAL)
+>> +				return -EINVAL;
+>> +
+>> +			/* If we're egressing with a different source address
+>> +			 * and/or port, we perform a reverse socket lookup. The
+>> +			 * rationale behind this is that we can allow return
+>> +			 * UDP traffic that has ingressed through sk_lookup to
+>> +			 * also egress correctly. In case the reverse lookup
+>> +			 * fails, we continue with the normal path.
+>> +			 *
+>> +			 * The lookup is performed if either source address
+>> +			 * and/or port changed, and neither is "0".
+>> +			 */
+>> +			if (reverse_sk_lookup(fl6, sk, &sockaddr_in->sin6_addr,
+>> +					      sockaddr_in->sin6_port)) {
+>> +				/* Override the source port and address to use
+>> +				 * with the one we got in cmsg and bail early.
+>> +				 */
+>> +				fl6->saddr = sockaddr_in->sin6_addr;
+>> +				fl6->fl6_sport = sockaddr_in->sin6_port;
+>> +				break;
+>> +			}
+>> 
+>> +			if (addr_type != IPV6_ADDR_ANY) {
+>> +				int strict = __ipv6_addr_src_scope(addr_type) <= IPV6_ADDR_SCOPE_LINKLOCAL;
+>> +
+>> +				if (!ipv6_can_nonlocal_bind(net, inet_sk(sk)) &&
+>> +				    !ipv6_chk_addr_and_flags(net,
+>> +							     &sockaddr_in->sin6_addr,
+>> +							     dev, !strict, 0,
+>> +							     IFA_F_TENTATIVE) &&
+>> +				    !ipv6_chk_acast_addr_src(net, dev,
+>> +							     &sockaddr_in->sin6_addr))
+>> +					err = -EINVAL;
+>> +				else
+>> +					fl6->saddr = sockaddr_in->sin6_addr;
+>> +			}
+>> +
+>> +			if (err)
+>> +				goto exit_f;
+>> +
+>> +			break;
+>> +			}
+>>  		case IPV6_FLOWINFO:
+>>  			if (cmsg->cmsg_len < CMSG_LEN(4)) {
+>>  				err = -EINVAL;
+>> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+>> index 6602a2e9cdb5..6121cbb71ad3 100644
+>> --- a/net/ipv6/udp.c
+>> +++ b/net/ipv6/udp.c
+>> @@ -1476,6 +1476,12 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+>> 
+>>  	fl6->flowi6_uid = sk->sk_uid;
+>> 
+>> +	/* We use fl6's daddr and fl6_sport in the reverse sk_lookup done
+>> +	 * within ip6_datagram_send_ctl() now.
+>> +	 */
+>> +	fl6->daddr = *daddr;
+>> +	fl6->fl6_sport = inet->inet_sport;
+>> +
+>>  	if (msg->msg_controllen) {
+>>  		opt = &opt_space;
+>>  		memset(opt, 0, sizeof(struct ipv6_txoptions));
+>> @@ -1511,10 +1517,8 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+>> 
+>>  	fl6->flowi6_proto = sk->sk_protocol;
+>>  	fl6->flowi6_mark = ipc6.sockc.mark;
+>> -	fl6->daddr = *daddr;
+>>  	if (ipv6_addr_any(&fl6->saddr) && !ipv6_addr_any(&np->saddr))
+>>  		fl6->saddr = np->saddr;
+>> -	fl6->fl6_sport = inet->inet_sport;
+>> 
+>>  	if (cgroup_bpf_enabled(CGROUP_UDP6_SENDMSG) && !connected) {
+>>  		err = BPF_CGROUP_RUN_PROG_UDP6_SENDMSG_LOCK(sk,
+>> 
+>> --
+>> 2.34.1
+>> 
+>
+> -
+> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+> Registration No: 1397386 (Wales)
 
