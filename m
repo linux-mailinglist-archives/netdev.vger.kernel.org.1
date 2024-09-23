@@ -1,146 +1,138 @@
-Return-Path: <netdev+bounces-129354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E06B97EFFD
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 19:52:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B7B7997F00B
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 19:58:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D28831F21F03
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 17:52:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 686D11F2204E
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 17:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D3F19F430;
-	Mon, 23 Sep 2024 17:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD6F19F42E;
+	Mon, 23 Sep 2024 17:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="kC5MLjS7"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="3GGB5rFj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E9719F40B
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 17:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3AB19F427
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 17:58:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727113950; cv=none; b=bc/I8xqdhmui8rkxfQbyv++gzKqBEoUO+z0DlgKxrPi+K6wHf9YuesSe08Mp8caRCe5nWoPZLVFVvv5d1ukkqfu6WECceAHryWIPVe1jlZH0GPq4Ii/TzNh7O0PjP319QIgUyV1h+T3lz4MzqgChz8AtsxjRW+7+nJToVLAklbc=
+	t=1727114283; cv=none; b=TXH16zL2Le5DghVYdcuNLC+RobWMDBhuezOudKcDOsKIDomREuo+BQB905VTZAochjmf/yNHnUjYdroaUHMN3UTPw0t7DTkr3skNilYMOFk4niHIwzASAnWic+Hd5cJRjdJTsdU71jYBqI2FQCHzgEA+Q6RLzB11cLh737+Hjys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727113950; c=relaxed/simple;
-	bh=d012RvO8FEt4oNV/hdC2ORp0abycOdoKV3NqdL6MFLw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kIxQ1kvzF22N00LMiAfM13BdMK+wT/sjAhV5u5qqb4MWm0pgNwqeQflzRuaNlR7agCJ6yCWuhgo2yx8QBIq50dryKwvqiD/6nlGF9UUA7dnCbeY8u7QldnK2grsMsN7Np++KcTSdeOr0K71aDe3aJI9MtnppgtKu3Ex1AdGeiSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=kC5MLjS7; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4584a719ff5so36777171cf.0
-        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 10:52:28 -0700 (PDT)
+	s=arc-20240116; t=1727114283; c=relaxed/simple;
+	bh=uZwoYgcVajR3HZVdBXuMYB+l5DXtrqtEemr8LFR4GzI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tJa1eNWQwtylLpynxV+QEZWcYLj1tUua3QlS6Uk7hztVTIGDkuDdXPxBeZrZskjD4nFf7BeKLnrqy7y39OCitQQgrq2Zytq1vNy189RxRj0P1JGlarpE1w+aeRonnId4UGO05FJC6CLYmDVP+67onBGZ+7iS2dyyM6AGg838ehA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=3GGB5rFj; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c40942358eso7645608a12.1
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 10:58:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1727113947; x=1727718747; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d012RvO8FEt4oNV/hdC2ORp0abycOdoKV3NqdL6MFLw=;
-        b=kC5MLjS7vlx32L+CMo/vijxLpluIvZK6GFWocekev0UAgknUMOwkw6vZ2x/QAQxi/O
-         Bc214bhG7DWlIC6bp3btej9mimBmpj/ssPHpH804+PKmzn9qk0S9c7NKyr2t39X/i7Jy
-         dxzMGCDmis/JH40iEX0YCAOTCo6I0sXk1kY9UcOA3xFmDNEokZcut4Sy0w+4JpwcVOpC
-         V3R0IdkdSvljBaOrLoBYBzB4GrRwS3m98tA4BYkEUatuU8KPFuld/opufxvr05E5vgmZ
-         3A4I9bDmmafNkdK1HWGQa2EL19C3dO+81lZcYzGlxoxwnQYtmI3EBw5F0hD9W/4ZRUAs
-         pXPw==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727114280; x=1727719080; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l8B2VxfA36wALlD20rKzanMGJ4TcWL9akGgnKfYckb4=;
+        b=3GGB5rFjaEnElX+BXftmX1UbycXreLPoXh3Y2MQlXU9SBBibKbhxrg8eUkr+Qlm/0t
+         kQtQbCkUXm9OL6fXM2E0MN7142+PntTODWqrJadvRj9qgM/MOf820J74jxaxO7MLf793
+         Netx/LzRmMimAyvB+4CFj2zPnRLeDrUoKqd3yOP0J1mj8PU76tt9Au8I9XiujYlsIZCu
+         b/hvhyl582JZZ9gePcbHZ1cXum2nHR4b9Vwkt1bnMyqfkdTSFxatYqYeISdzqalyqAVX
+         2hhjOWYyL38K6eMsKPY5I5iAno/JMa/xtya30pievCWBzOibn/pzEGuO/2OKKu/GbSrw
+         CSuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727113947; x=1727718747;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d012RvO8FEt4oNV/hdC2ORp0abycOdoKV3NqdL6MFLw=;
-        b=SG+7VJ+o9J8ej6vccginhFSgqrneQ6npI4aiU51KCY5hmvKffhnJbKpgOMYLKyiK3h
-         H32GdPGzmNpSxLN6WYpHxkLtfypSaa6uvidKGAr8Lpt/rGztql88N90XwEHGuewvj7YO
-         XRTAlddbwitGPj+dWRH5OhGkEkIzjKGO4yzLHGgUxS/iUGl+/mXwYiW5wYv1JTIIfxpq
-         TTJ1h/PXY0c66unNQjnzmY/rT82PO7Fifb2qbCqoS7D+WgfPKLX5yzb9q3riOsRktN9m
-         EuGEpAerH8P3IXhB83wfQcCtjZGwuVCnJ7d9wE5cRgaU5XgGaEnQkgI7aaKjdx033j+r
-         8P0g==
-X-Forwarded-Encrypted: i=1; AJvYcCUymtpaLq+62Is3xqHiV0HZKr0GkFjANFPC52+6f4fgNsjSJygssBwCGqFejqEmj2fA0fQcfr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwnWxCpkV+OtbFwF+L0dwAq5SL453QUZ9Di5OGhduXQn2nJ5RHD
-	Ddiu4u507HxiCOEA64554VvWFh/W6Aa1E56a+exJlcEJgwXFZdie3YEubiF80jU=
-X-Google-Smtp-Source: AGHT+IHVrqHIowyi3PGsNMuzErMWdcwmU1SRIkTjY6Vp086kbtdmtvbVDAGc60f4mvoOr4wDyCS+5A==
-X-Received: by 2002:a05:622a:107:b0:458:35f7:3950 with SMTP id d75a77b69052e-45b226f380cmr178883201cf.17.1727113947576;
-        Mon, 23 Sep 2024 10:52:27 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-45b17888cdbsm49348071cf.49.2024.09.23.10.52.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2024 10:52:26 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1ssnEY-000LlC-32;
-	Mon, 23 Sep 2024 14:52:26 -0300
-Date: Mon, 23 Sep 2024 14:52:26 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, liuyonglong@huawei.com,
-	fanghaiqing@huawei.com, zhangkun09@huawei.com,
-	Robin Murphy <robin.murphy@arm.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>,
-	IOMMU <iommu@lists.linux.dev>, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>,
-	Ryder Lee <ryder.lee@mediatek.com>,
-	Shayne Chen <shayne.chen@mediatek.com>,
-	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Morton <akpm@linux-foundation.org>, imx@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, bpf@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-mm@kvack.org
-Subject: Re: [PATCH net 2/2] page_pool: fix IOMMU crash when driver has
- already unbound
-Message-ID: <20240923175226.GC9634@ziepe.ca>
-References: <20240918111826.863596-1-linyunsheng@huawei.com>
- <20240918111826.863596-3-linyunsheng@huawei.com>
- <CAC_iWjK=G7Oo5=pN2QunhasgDC6NyC1L+96jigX7u9ad+PbYng@mail.gmail.com>
- <894a3c2c-22f9-45b9-a82b-de7320066b42@kernel.org>
- <cdfecd37-31d7-42d2-a8d8-92008285b42e@huawei.com>
- <0e8c7a7a-0e2a-42ec-adbc-b29f6a514517@kernel.org>
- <CAC_iWj+3JvPY2oqVOdu0T1Wt6-ukoy=dLc72u1f55yY23uOTbA@mail.gmail.com>
- <2c5ccfff-6ab4-4aea-bff6-3679ff72cc9a@huawei.com>
+        d=1e100.net; s=20230601; t=1727114280; x=1727719080;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l8B2VxfA36wALlD20rKzanMGJ4TcWL9akGgnKfYckb4=;
+        b=aj/Et+b6pEFWXBk+hE09+l2op+xtCS9/j4LaDYxknH9Up5JBI2aF3TSOeDHH282y8Q
+         LAp+sNL4on8+09IPlqI5BE35DBeqEKHkaaNDAcH12kZIekS3jtrN2bo0yaBZ/BHhs8vX
+         pPCDrQVOZ510NQ8Uh6hdx3GbRpNNHCQLWor2w0unAW2gWs6s21Ch4kppktKud7/J9y5Y
+         QGiaX0Srz94KQWrHLmbx5ewIzg69RBCnBuTig/4XnxmqkV1r6LmU4wxM4GRdZN0vrdBZ
+         3Rx3G85/2sWeMkWb8pAllzR2gW3GFK96qJphxxwSEr4p6HaifEfP4NnJYE9Ji15AadrY
+         7D1w==
+X-Forwarded-Encrypted: i=1; AJvYcCUXgITOv8HeBiVFLAo55Pxy3QMu3TU4+FhTIAljuC1kuJYARq5OZpPafe1juFUWxyaSzuf/JlY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlFAuO6m1TelPXih343E7i8PV0dAeZXbSIxFmcmOxl3U33fiY6
+	yjf7jbFpGXZ2be8sG9nt+ZCHEP54CBD4yDXu0/T7l+zuVWpFpmEWI+/kP/vjjtY=
+X-Google-Smtp-Source: AGHT+IHxrY3ucRKh97wx+nkV5psN+Kb2p868ccznvAGCqF4s1A84WPgovtg4ccAlF/He1jwEhUdFDQ==
+X-Received: by 2002:a05:6402:40d5:b0:5c5:ce3d:41a2 with SMTP id 4fb4d7f45d1cf-5c5ce3d41ccmr501122a12.10.1727114279788;
+        Mon, 23 Sep 2024 10:57:59 -0700 (PDT)
+Received: from [10.102.105.220] (brn-rj-tbond07.sa.cz. [185.94.55.136])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c42bb89e2asm10550958a12.73.2024.09.23.10.57.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 Sep 2024 10:57:59 -0700 (PDT)
+Message-ID: <e59f0525-4f3b-4f9c-a359-659fd47dc385@daynix.com>
+Date: Mon, 23 Sep 2024 19:57:56 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2c5ccfff-6ab4-4aea-bff6-3679ff72cc9a@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC v3 0/9] tun: Introduce virtio-net hashing feature
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
+ Yuri Benditovich <yuri.benditovich@daynix.com>,
+ Andrew Melnychenko <andrew@daynix.com>
+References: <20240915-rss-v3-0-c630015db082@daynix.com>
+ <20240915124835.456676f0@hermes.local>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <20240915124835.456676f0@hermes.local>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Sep 20, 2024 at 02:14:02PM +0800, Yunsheng Lin wrote:
+On 2024/09/15 21:48, Stephen Hemminger wrote:
+> On Sun, 15 Sep 2024 10:17:39 +0900
+> Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> 
+>> virtio-net have two usage of hashes: one is RSS and another is hash
+>> reporting. Conventionally the hash calculation was done by the VMM.
+>> However, computing the hash after the queue was chosen defeats the
+>> purpose of RSS.
+>>
+>> Another approach is to use eBPF steering program. This approach has
+>> another downside: it cannot report the calculated hash due to the
+>> restrictive nature of eBPF.
+>>
+>> Introduce the code to compute hashes to the kernel in order to overcome
+>> thse challenges.
+>>
+>> An alternative solution is to extend the eBPF steering program so that it
+>> will be able to report to the userspace, but it is based on context
+>> rewrites, which is in feature freeze. We can adopt kfuncs, but they will
+>> not be UAPIs. We opt to ioctl to align with other relevant UAPIs (KVM
+>> and vhost_net).
+> 
+> This will be useful for DPDK. But there still are cases where custom
+> flow rules are needed. I.e the RSS happens after other TC rules.
+> It would be a good if skbedit supported RSS as an option.
 
-> I am not sure what dose the API that allows netdev to "give" struct device
-> to page_pool look like or how to implement the API yet, but the obvious way
-> to stall the calling of device_del() is to wait for the inflight
-> page to
+Hi,
 
-It is not device_del() you need to stall, but the remove() function of
-the device driver.
+It is nice to hear about a use case other than QEMU or virtualization. I 
+implemented RSS as tuntap ioctl because:
+- It is easier to configure for the user of tuntap (e.g., QEMU)
+- It implements hash reporting, which is specific to tuntap.
 
-Once all drivers have been unbound the DMA API can be reconfigured and
-all existing DMA mappings must be concluded before this happens,
-otherwise there will be problems.
+You can still add skbedit if you want to override RSS for some packets 
+with filter. Please tell me if it is not sufficient for your use case.
 
-So, stalling something like unregister_netdevice() would be a better
-target - though stalling forever on driver unbind would not be
-acceptable.
-
-Jason
+Regards,
+Akihiko Odaki
 
