@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-129311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D40C97ECBC
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:02:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9C7397ECBD
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:02:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F33BA1F221F5
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:01:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F273B22564
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 14:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D37719CC3A;
-	Mon, 23 Sep 2024 14:01:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86356198A05;
+	Mon, 23 Sep 2024 14:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Yochkxgv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="dVNTWeAM"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B266D19D07F
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 14:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC6219CC15
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 14:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727100094; cv=none; b=iu7ZjNJiJYRrUAWOVspYx7kSmfIJo9dJjO1VFFMSPtKu5JzvXONiPO69DhM8aW2Fn+4HdK6Po8Z8vLk+0uTI9+UVzP796VvLE7OhHsKkuVb3mJr0mG0HDfKa9HxkZjkNr0IhgDHHAni4VTvZ5fEHwQI/i0togJJI21lVfcl2Eb0=
+	t=1727100100; cv=none; b=QRnyFHjSFCXuODc7Rfvi5kinlBf9wWiT96OJJMqwixMiUmhjCevpIkpauTvaP+IqoNm6ihxIEfaOabbkG+gtu2HovF/mktatxF/2G63z6Z7gG87z6n8v1FNdrMH9hDU3YIdIF2ukpE2qIqjouDBWhEUStbeNx3VpnEXcmVGLprY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727100094; c=relaxed/simple;
-	bh=kDPPdUHMZxvJ9S82kQ79E5zIP+XBxEzsWwWaJqUEacc=;
+	s=arc-20240116; t=1727100100; c=relaxed/simple;
+	bh=fmp6WfoAQd6GwGJXzvkEWv5KgLVufywlKFHJi5t7lPg=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=cBokVUsyNWuzF3fsdmTQ6s9GBB5d9EEC7QBFCKbL9Q8/AlvzWkiyQAKN1v5wMQhKq8pQ3LhzBNmNSHaOvxUKuyY8Q756aAcMvifAXTgQPKt47Mah78Z4m9eMAobJbY/en+G9aGGNeYELJyq5NEF/qZB78AC/uCChbVF0ogyshxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Yochkxgv; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=I5u8P2U4UWABcyJCYooUybclWxENpJRLfg6tLahigyoRMVk4UA5zy/Lm1+otHPgbEcmgVs+vCQ7sIX9ryGrpXq77KnGCCKRQFAmN6Nna1xbODVQiKDUqxdly1VjSsvJolA/v2Sgkfs9gmYrkujDcgibKzDqhSEdMooy8BzZ4NMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=dVNTWeAM; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hN0ap8Va705W1nMubMyV7/FR3Jsr6rByDi1EZkulv80=; b=Yochkxgv7YdtYx7AhVzDFDSpIq
-	fIzPRaXHyqYy+bJ+Z/w0DvfRRwgERseC58zvP9umPGwdUosTp7hoV7nnQLTY5CizJ8upr03m9F4/b
-	ak+20+vEckWQliv/HCK0bnmtdEH7zjOyTxiMbCaEmMf6AJN0GMFh5J1ttcf8U3vpIb2AR+gpYwRD6
-	ITnFrtneRKB0mYedR5cqX3cGLNPwPQKPM8fp4J17CZe4fIKx3wctlqaekV2tyokIy9WsXen0c8oe2
-	NvKJJ/+lvIltVOevuUPika91Zwh1eg0+GQHWYw+bXF/RoCuUqiI/5EsBaou/ycyT9QiuApxLt/8y2
-	CpPqa15Q==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:56746 helo=rmk-PC.armlinux.org.uk)
+	bh=kxwhMe4NsG80DGdXhpv3SmTACDemHuSUJShVS/ADG7A=; b=dVNTWeAMsY5SaK4KDbJOTSbWrt
+	tIv2nKkLn7KicJaqPN0jIhxr4PLuO1a98qp1u035rUCjLVNYBBGvv9al1Zk0yC3RwauNdyhhueOki
+	o+ti0CGgTX4JdAq2QkFckG5rrjBqzFck984OPtsKwg5aCqcyjIUxvYjmnueG3/ABYei8bfc4gbXqO
+	HNZWSsgEMR2KpllT0dAsHwwRc5CvYu3IOUyuSPZX4JsJCQ74rSnj9Ikd8NefFmxF/EbeTmp8IqlT8
+	vFNjKs3Zl7t8zqXc6BE7b5P4AKwJ0/7FdEZeozcmEDKTPqSuhgP+DFDz1iNGIXd+xsz6mlpvEty/Q
+	0HjjZagg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:46898 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1ssjcr-0004Hs-0F;
-	Mon, 23 Sep 2024 15:01:16 +0100
+	id 1ssjcw-0004IB-0c;
+	Mon, 23 Sep 2024 15:01:21 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1ssjcp-005Nrx-5r; Mon, 23 Sep 2024 15:01:15 +0100
+	id 1ssjcu-005Ns3-98; Mon, 23 Sep 2024 15:01:20 +0100
 In-Reply-To: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
 References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -72,8 +72,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH RFC net-next 04/10] net: pcs: xpcs: add xpcs_destroy_pcs() and
- xpcs_create_pcs_mdiodev()
+Subject: [PATCH RFC net-next 05/10] net: wangxun: txgbe: use phylink_pcs
+ internally
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,72 +83,98 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1ssjcp-005Nrx-5r@rmk-PC.armlinux.org.uk>
+Message-Id: <E1ssjcu-005Ns3-98@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 23 Sep 2024 15:01:15 +0100
+Date: Mon, 23 Sep 2024 15:01:20 +0100
 
-Provide xpcs create/destroy functions that return and take a phylink_pcs
-pointer instead of an xpcs pointer. This will be used by drivers that
-have been converted to use phylink_pcs pointers internally, rather than
-dw_xpcs pointers.
-
-As xpcs_create_mdiodev() no longer makes use of its interface argument,
-pass PHY_INTERFACE_MODE_NA into xpcs_create_mdiodev() until it is
-removed later in the series.
+Use xpcs_create_pcs_mdiodev() to create the XPCS instance, storing
+and using the phylink_pcs pointer internally, rather than dw_xpcs.
+Use xpcs_destroy_pcs() to destroy the XPCS instance when we've
+finished with it.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/pcs/pcs-xpcs.c   | 18 ++++++++++++++++++
- include/linux/pcs/pcs-xpcs.h |  3 +++
- 2 files changed, 21 insertions(+)
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 18 +++++++++---------
+ .../net/ethernet/wangxun/txgbe/txgbe_type.h    |  2 +-
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index 8765b01c0b5d..9b61f97222b9 100644
---- a/drivers/net/pcs/pcs-xpcs.c
-+++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -1550,6 +1550,18 @@ struct dw_xpcs *xpcs_create_mdiodev(struct mii_bus *bus, int addr,
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 67b61afdde96..3dd89dafe7c7 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -122,7 +122,7 @@ static int txgbe_pcs_write(struct mii_bus *bus, int addr, int devnum, int regnum
+ static int txgbe_mdio_pcs_init(struct txgbe *txgbe)
+ {
+ 	struct mii_bus *mii_bus;
+-	struct dw_xpcs *xpcs;
++	struct phylink_pcs *pcs;
+ 	struct pci_dev *pdev;
+ 	struct wx *wx;
+ 	int ret = 0;
+@@ -147,11 +147,11 @@ static int txgbe_mdio_pcs_init(struct txgbe *txgbe)
+ 	if (ret)
+ 		return ret;
+ 
+-	xpcs = xpcs_create_mdiodev(mii_bus, 0, PHY_INTERFACE_MODE_10GBASER);
+-	if (IS_ERR(xpcs))
+-		return PTR_ERR(xpcs);
++	pcs = xpcs_create_pcs_mdiodev(mii_bus, 0);
++	if (IS_ERR(pcs))
++		return PTR_ERR(pcs);
+ 
+-	txgbe->xpcs = xpcs;
++	txgbe->pcs = pcs;
+ 
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(xpcs_create_mdiodev);
+@@ -163,7 +163,7 @@ static struct phylink_pcs *txgbe_phylink_mac_select(struct phylink_config *confi
+ 	struct txgbe *txgbe = wx->priv;
  
-+struct phylink_pcs *xpcs_create_pcs_mdiodev(struct mii_bus *bus, int addr)
-+{
-+	struct dw_xpcs *xpcs;
-+
-+	xpcs = xpcs_create_mdiodev(bus, addr, PHY_INTERFACE_MODE_NA);
-+	if (IS_ERR(xpcs))
-+		return ERR_CAST(xpcs);
-+
-+	return &xpcs->pcs;
-+}
-+EXPORT_SYMBOL_GPL(xpcs_create_pcs_mdiodev);
-+
- /**
-  * xpcs_create_fwnode() - Create a DW xPCS instance from @fwnode
-  * @fwnode: fwnode handle poining to the DW XPCS device
-@@ -1599,5 +1611,11 @@ void xpcs_destroy(struct dw_xpcs *xpcs)
+ 	if (interface == PHY_INTERFACE_MODE_10GBASER)
+-		return &txgbe->xpcs->pcs;
++		return txgbe->pcs;
+ 
+ 	return NULL;
  }
- EXPORT_SYMBOL_GPL(xpcs_destroy);
+@@ -302,7 +302,7 @@ irqreturn_t txgbe_link_irq_handler(int irq, void *data)
+ 	status = rd32(wx, TXGBE_CFG_PORT_ST);
+ 	up = !!(status & TXGBE_CFG_PORT_ST_LINK_UP);
  
-+void xpcs_destroy_pcs(struct phylink_pcs *pcs)
-+{
-+	xpcs_destroy(phylink_pcs_to_xpcs(pcs));
-+}
-+EXPORT_SYMBOL_GPL(xpcs_destroy_pcs);
-+
- MODULE_DESCRIPTION("Synopsys DesignWare XPCS library");
- MODULE_LICENSE("GPL v2");
-diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
-index fd75d0605bb6..a4e2243ce647 100644
---- a/include/linux/pcs/pcs-xpcs.h
-+++ b/include/linux/pcs/pcs-xpcs.h
-@@ -78,4 +78,7 @@ struct dw_xpcs *xpcs_create_fwnode(struct fwnode_handle *fwnode,
- 				   phy_interface_t interface);
- void xpcs_destroy(struct dw_xpcs *xpcs);
+-	phylink_pcs_change(&txgbe->xpcs->pcs, up);
++	phylink_pcs_change(txgbe->pcs, up);
  
-+struct phylink_pcs *xpcs_create_pcs_mdiodev(struct mii_bus *bus, int addr);
-+void xpcs_destroy_pcs(struct phylink_pcs *pcs);
-+
- #endif /* __LINUX_PCS_XPCS_H */
+ 	return IRQ_HANDLED;
+ }
+@@ -778,7 +778,7 @@ int txgbe_init_phy(struct txgbe *txgbe)
+ err_destroy_phylink:
+ 	phylink_destroy(wx->phylink);
+ err_destroy_xpcs:
+-	xpcs_destroy(txgbe->xpcs);
++	xpcs_destroy_pcs(txgbe->pcs);
+ err_unregister_swnode:
+ 	software_node_unregister_node_group(txgbe->nodes.group);
+ 
+@@ -798,6 +798,6 @@ void txgbe_remove_phy(struct txgbe *txgbe)
+ 	clkdev_drop(txgbe->clock);
+ 	clk_unregister(txgbe->clk);
+ 	phylink_destroy(txgbe->wx->phylink);
+-	xpcs_destroy(txgbe->xpcs);
++	xpcs_destroy_pcs(txgbe->pcs);
+ 	software_node_unregister_node_group(txgbe->nodes.group);
+ }
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
+index 959102c4c379..cc3a7b62fe9e 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
+@@ -329,7 +329,7 @@ struct txgbe {
+ 	struct wx *wx;
+ 	struct txgbe_nodes nodes;
+ 	struct txgbe_irq misc;
+-	struct dw_xpcs *xpcs;
++	struct phylink_pcs *pcs;
+ 	struct platform_device *sfp_dev;
+ 	struct platform_device *i2c_dev;
+ 	struct clk_lookup *clock;
 -- 
 2.30.2
 
