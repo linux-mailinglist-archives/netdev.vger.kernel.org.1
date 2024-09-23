@@ -1,146 +1,95 @@
-Return-Path: <netdev+bounces-129371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C5C497F13A
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 21:36:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D22497F145
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 21:38:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12F7A1F22785
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 19:36:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C92771F2291A
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 19:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975381A0724;
-	Mon, 23 Sep 2024 19:36:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061681A0AEC;
+	Mon, 23 Sep 2024 19:38:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ChhTxxry"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cO+h062s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A981CA84
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 19:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808861A0732
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 19:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727120200; cv=none; b=PDMxJZ2xAB+GVdGNF2/s7ooRt/RJcZ8A1bMvsUmkF2fzkMEnfNIgCOA3FZ6+N+tVRSvSsmxxHSsn0LU/gLG7Wu9/VyRejTDsJVKSCFhycCcyuWQUZxyt+Ktb8KHxlXA8FEsYevGvUzIinpiGvaWB9VJM0davjaWPuGdM9MgFf78=
+	t=1727120331; cv=none; b=d6+HiYUgKOaUgGzMgsnOjx+o2Ez5Jd9KZZfJ0Epwgudj365b9mgORj3iikdvKqAx9Uru+NY4CXyKlPnEUhPwoLc7TNnpKAGXHHHZcLNmCwzZ3X1SNywZVtn8lWQvOYoC2vSWoUUD6myPmcDk07YKzyOvEcSElVRi7gcrkkoae0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727120200; c=relaxed/simple;
-	bh=1m4zcfvdPaz0E2o/eY0QEOXrSHe77n0OpAORGAsn5iU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p8in9oLxTSicmXbZapjj++d/gq6GSjJ++QX2nbTS9kwoXgH0j3AVs242Yw6dbCOf4pOWeFcyuA4Tkah1UipD3AiZp6QMffhHkeLemYnvaIVaSdzaBA07HGW717pY+zXPl8T99nw2lghzVbg6XK3HlXA3gFsmuMepOwCoChMAeWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ChhTxxry; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7db0fb03df5so3227656a12.3
-        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 12:36:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727120198; x=1727724998; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6Qi+Kgk43OGPwI/ndQhdjfFDYl0gRjPddN/7xXFWCDA=;
-        b=ChhTxxryDyjj9hbx6fCf4YpwgkL5aSn3yGBoI6dvkHFsgRtoZ4ucxQV5tnb3pW2ZAL
-         UpLv7pO/EQVt9EMZa409QzC2b2hZZ5eRubJ7WnKyPb7pAUvsPC/uDsn8IhvADIs/crOm
-         UTEUXxsu02LDEUB9lxAr3Kt9ae2lybPzs3vrisudCfvoxtqh+cqt1TInTOc21PajkRq9
-         O/0YJADafAvmhSZ4gS78+iIkZyks0EKo46biwXz/+F6klUib/NKRGLzyHTMLpe6gj05r
-         FN36Dpj5k4Ir4km4+WqsWOYsFVYhe1rgEL2e2GFAvAcNQ1mFQTcU/1gRXXeteazBme7r
-         aZNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727120198; x=1727724998;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6Qi+Kgk43OGPwI/ndQhdjfFDYl0gRjPddN/7xXFWCDA=;
-        b=n7E7hOTKXbhT0ztE+uKDHra8BqaT6/9kqektMJBDlHlnnmbgOIL0+eetP/UhQPqtAi
-         1XNrvqJJlRHknbb7drMWdTCKXKkwsRrhIO03b0SxalbQ1dqPEU3n73Zi5CfUyTtGQGk5
-         Pm08OwjCFrEdb6RV9b0d5re7T6Lyf05RTZ+jTsqepSveHeE/wY2o7Vl4ZodPf7DahlgD
-         5rntWj41m7+gxhw0DDUlieBWUqu3XzGu7OAsEJZuDA9k+baQ4QH6NHgvtIaWVa7lJAhf
-         po3AGzoTZP4hEd7Gh0g6iAh+zDEHEuxy67zMhP9MfxR5Szu3PS/ro/eeFtUzS51UtGyN
-         wlMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUMVgToEkDz8rq2CjEUu1fuCizMipYtDitAzCKCNZI9UFg0HmUKrtG0wfHRQPQcxmZKubxaQpA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzI7mXB/q1bLdBtsEAnErH4gc8qyXiBImAFEpG6SUFgjJSn8Fqq
-	uBZ6y/4ZldAp01XjhP/rCAXtSk+ttzCFSSwA6uxDFS4EFDTbfqPderUx3GbOikPc5ySFnHcKg6e
-	TkHtEBHSECz7MM4suepSrz7Bo9tc=
-X-Google-Smtp-Source: AGHT+IE3uYFH9c3EdxlvkUdveZWm/vhvQygMPTNk7cPy7EHpLneVGF7k9tpqSLTB0jSIB5VIa0rFLUpHa05oJy88+M8=
-X-Received: by 2002:a05:6a21:3489:b0:1d2:e78d:2147 with SMTP id
- adf61e73a8af0-1d30c9d3fe8mr18445180637.6.1727120198354; Mon, 23 Sep 2024
- 12:36:38 -0700 (PDT)
+	s=arc-20240116; t=1727120331; c=relaxed/simple;
+	bh=IMBNE2puIfzdked4t6uZlyrCqjh8qel5HvLo5rRBc9o=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=C0kYSJeDnAmdjdkufwE46Hd5ioIShYHLWlBqY8oEi/UrqYHBklM1MX1x73hTpF1THqJLSJh/ZN7SV9rip2NEJguWYGE/FkOrEWIC67k/6bpv+Avan3DzzqTxW+jqBj8zbjR6ypQvEPCTEXctwLBVyWuKb90HVICLidSqEdivYq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cO+h062s; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727120329;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IMBNE2puIfzdked4t6uZlyrCqjh8qel5HvLo5rRBc9o=;
+	b=cO+h062sPzmLwvgbadEEvHG06NXpi3wHF8Y0fKB4Aw8YGv0FiF09X7EOFwytLjx4iVEZdh
+	U5r7lSU5vXC9yE+zIValoaMUDAMzeh86IPk96+eAXIIYFonxtPIpjOjVUGNkDOSVA12e2E
+	5ELXZbeEDOd+1rtUbifRY3bHcrOVOgk=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-655-BsQ4RlIhNY-hYa32ClXl0w-1; Mon,
+ 23 Sep 2024 15:38:44 -0400
+X-MC-Unique: BsQ4RlIhNY-hYa32ClXl0w-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 521C5190DE19;
+	Mon, 23 Sep 2024 19:38:41 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 71DD619560AA;
+	Mon, 23 Sep 2024 19:38:34 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240923183432.1876750-1-chantr4@gmail.com>
+References: <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com>
+To: Manu Bretelle <chantr4@gmail.com>
+Cc: dhowells@redhat.com, asmadeus@codewreck.org,
+    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
+    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
+    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+    v9fs@lists.linux.dev, willy@infradead.org, eddyz87@gmail.com
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240923170322.535940-1-sahandevs@gmail.com> <CADKFtnS7JRHz1eg8M3V52MAcJUW3bVch2siaoqQSqMPW7ZrfUg@mail.gmail.com>
- <CANn89i+asgFpSSAxavvLe22TW897VaEdyYzMJ_s0JpH+2_RzUA@mail.gmail.com>
- <93d71681-1a3e-4802-a95b-4156fa3847fb@gmail.com> <CANn89i+PnFohFa3Q0DhcVS129u8NVbtnNkUvgCFRKocgP2Ekrw@mail.gmail.com>
-In-Reply-To: <CANn89i+PnFohFa3Q0DhcVS129u8NVbtnNkUvgCFRKocgP2Ekrw@mail.gmail.com>
-From: Sahand Evs <sahandevs@gmail.com>
-Date: Mon, 23 Sep 2024 23:06:26 +0330
-Message-ID: <CAEhU8Zy09JLHhiAbPw+es4Pp6Xumg5DrDaNv=jfNvGvuReOnbA@mail.gmail.com>
-Subject: Re: [PATCH] net: expose __sock_sendmsg() symbol
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jordan Rife <jrife@google.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <912765.1727120313.1@warthog.procyon.org.uk>
+Date: Mon, 23 Sep 2024 20:38:33 +0100
+Message-ID: <912766.1727120313@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On Mon, Sep 23, 2024 at 10:30=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Mon, Sep 23, 2024 at 8:45=E2=80=AFPM Sahand Akbarzadeh <sahandevs@gmai=
-l.com> wrote:
-> >
-> > Yes, existing program still need some modification in order to work and
-> > are already broken (from kernel 6.8 to master branch) for some time. Th=
-e issue
-> > here is there is no direct probe equivalent one could use to update tho=
-se scripts.
-> >
-> > By adding `__sock_sendmsg`, one could attach based on kernel version or=
- do something
-> > like this:
-> >
-> > sudo bpftrace -e 'kprobe:sock_sendmsg,kprobe:__sock_sendmsg {}'
-> >
-> > which only throws a warning if it can't find the `__sock_sendmsg`
-> >
-> > - Sahand
->
-> Convention on netdev mailing list is to not top post.
->
-> Removing the static is not enough, a compiler and linker can
-> completely inline / delete this function.
->
-> Anyway, I do not think sock_sendmsg() was part of any ABI.
->
-> If it was ABI, we would have to reinstate sock_sendmsg(), not making
-> __sock_sendmsg() visible.
+Hi Manu,
 
-Sorry about the top posting. I do think this patch is not necessarily a goo=
-d
-solution to the problem but I'm not sure what is a/the good solution for it=
-.
-To give more context, I was trying to figure out why this observability scr=
-ipt
-(written in bpftrace) doesn't work on some kernels and how to fix it.
+Are you using any other network filesystem than 9p, or just 9p?
 
-(goal: calculating network usage per process per thread. recv part
-works fine)
+David
 
- kretprobe:sock_sendmsg
- {
-   if (@inetsocket[tid] && retval < 0x7fffffff) {
-     @send_bytes[pid, comm, tid] =3D sum(retval);
-   }
-   delete(@inetsocket[tid])
- }
-
-Script Source:
-https://www.gcardone.net/2020-07-31-per-process-bandwidth-monitoring-on-Lin=
-ux-with-bpftrace/
-
-
-> Removing the static is not enough
-Should I also add a EXPORT_SYMBOL?
 
