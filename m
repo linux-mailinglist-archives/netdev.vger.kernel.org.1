@@ -1,86 +1,64 @@
-Return-Path: <netdev+bounces-129284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0532797EAB6
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 13:31:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F380197EADA
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 13:36:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2547C1C211BD
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 11:31:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FC0F1C213D2
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 11:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE5374418;
-	Mon, 23 Sep 2024 11:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99BEA1974FA;
+	Mon, 23 Sep 2024 11:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YwqFlHld"
+	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="Ykg4XVGy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E445558B6;
-	Mon, 23 Sep 2024 11:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B811EEE6;
+	Mon, 23 Sep 2024 11:36:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727091104; cv=none; b=Ce108tBHZLjNJCFkPZic80ufjzhp9woyiuZrH5Rul8ORZMnaRzNKy+D0FrlN4p/WteqpZlrB6I/B2PLCMjZwSCfbo6XkteP+eTpMPIRB/M53QLgOCGCFHsjK3fhA/I7nim30GMo3afYPHLmgqHcFcWtFN6JPv1SiyvbifRYBySA=
+	t=1727091366; cv=none; b=qkEmdi8UFXoe081xjxjXX4Jw4MpOcqEiRikneiWTqmx3Vlc2Xx+eYdC6bCCjuWPjfr5VEebYN4KFGdy2RHE7A4ispsbqmIj38hpiEDEkBSsr6hPY/f7Xn02Oef1OEFWg25/Ci6hPYQnHyb+o5L9L5GG3zqetoy/7oobvHcaQhBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727091104; c=relaxed/simple;
-	bh=wXZdumoEFvRfbEgW6BsNaryOSUO/Gi71dztFXx7hFBM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YrbDIsxIfydcFnDTHiehw9rb1qpfvbAmkHSD8/8dFiBijF8IHKfkH/DPgyQX24nPv9fteeBhsbGcBER7UhCxKegK4Zh8VwXuqHc8rMRoRbIwxWBIDXj6kpDCZ1UcvOfonXcd0zVDki8CRVSHC+Wd1y6pMttOYL+pqUGT2maaWas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YwqFlHld; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-206aee40676so33457495ad.0;
-        Mon, 23 Sep 2024 04:31:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727091102; x=1727695902; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=r8VkOVLUc6X2W9Mk+mkAUfIq+rEQDahm5iYJv/NiMRw=;
-        b=YwqFlHld2cFt1OfsFiP0UFFzfhroQk0KIF5rBd11iD9ZzDrSkSx2BovU/J9gl1jsIY
-         IVNWAcf5bR10yMjZtXQnLvqBA8dnGZH9+S29AwSd6H3vu/TOHZZqEzicot4VcrpMdReU
-         lkowHduGmHsPE6cN8hdVWXD74KKBzD6Vppzn6Hymb52ElYEe01PG2WPP48MmamktZOdV
-         ScsyXSr3Xo4iSRaqPPyBi6OcAdAU2i2UcHufMuL9xg+wtFZ61pXpH3UE3YLndK1PsGMt
-         Jt9/HUKUFUFgHE1uCSJtZIsIoe/vWtUmjV8lreZPOGo/fmalzxyMffKovLHGRzP7gUNJ
-         1UsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727091102; x=1727695902;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r8VkOVLUc6X2W9Mk+mkAUfIq+rEQDahm5iYJv/NiMRw=;
-        b=dLyIOpyfn/Vtjg5q0oZdUgk7dVLfY7/3Plf39lgiLEtC7dofQQowPmLQ8DJEeElwiG
-         z6Q/aKXtJUsZieQFrLR55l+S/EsmAo3UXEFWV3uToyq6QuFkTMxChdkr63lcoMnP4ffU
-         vuSBELLd/Oq9lpSfs0kpzsthhQ5mvXCUmWaPosfhf+4NlRRsK1+QJ8oKYQvFYKK6gu8T
-         Vcr7YH6HSdTLuDAlRQI7t7MwoZ2ZrjkoXG1Lcn8y3cp29E9PusKQebNY+pFpD+OU+Svz
-         TjOkVSYhU8qPMprolQgR8GKaib5VpQ1lG1vttqykTFtNKLnB37GZVmqJNP1DrcDGVwUL
-         0SGA==
-X-Forwarded-Encrypted: i=1; AJvYcCU4Ng3vaiHUiHl9pC2yf/u13de1+nwWYeN0wnL5xzSUYcxqA7UHa0ewgPcJlmF0BcFRUWJ11yhSBsIZ1Wo=@vger.kernel.org, AJvYcCUS3tEpVdccDlgGTM0SwEM5oPn+L8BgIVp62YfK1c8/3hqpNDDDCJK4nqyth0E7S8dhiBwHOMdr@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVIPZLAmXna6J3dZpvSM2mdd5TFxUHpxIw8S6tbXgXaDw4/I8X
-	l+NV0QjeLM2cHhOs4N8J7zp+XDthBPe0z+xDpj2vWAo7Ul0/1osI
-X-Google-Smtp-Source: AGHT+IFnJ0Awf2LMJDx4WZhRHScp1nXcjNzHLKhfEHa/P7PVi2aBe5TquNmttIi+w0Kcfu84Z0or1g==
-X-Received: by 2002:a17:902:d4c6:b0:206:ba20:dd40 with SMTP id d9443c01a7336-208d8399031mr119464545ad.27.1727091102406;
-        Mon, 23 Sep 2024 04:31:42 -0700 (PDT)
-Received: from ubuntu.. ([27.34.65.190])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2079473c85fsm130925775ad.285.2024.09.23.04.31.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2024 04:31:41 -0700 (PDT)
-From: Dipendra Khadka <kdipendra88@gmail.com>
-To: sgoutham@marvell.com,
-	gakula@marvell.com,
-	sbhatta@marvell.com,
-	hkelam@marvell.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: Dipendra Khadka <kdipendra88@gmail.com>,
+	s=arc-20240116; t=1727091366; c=relaxed/simple;
+	bh=rCIvbFJgAUngHJRgl6SjykPegVp22wXHEMb6XUL0PPg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iJxeWV2q+gMMjn6hZ7xRZiYKEnGtkAM+Px7YdfobOAXxvMcjCje9qKH8XW5IJfZPANqwU5pGO4PddTacK9MSemr4OZOeb24Qw57PdBLhJVejvb7pqzhmi4/bYMKKojbcpGsDTXBP2tf1ztjYqea5Mx6fh8Zm0K/ihz7aYVc9jXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=Ykg4XVGy; arc=none smtp.client-ip=83.149.199.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
+Received: from localhost.localdomain (unknown [109.252.164.162])
+	by mail.ispras.ru (Postfix) with ESMTPSA id BE39540755ED;
+	Mon, 23 Sep 2024 11:35:53 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru BE39540755ED
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
+	s=default; t=1727091353;
+	bh=It7Y3Smu6B14ewAZlJHqNThmQkADJ+N/1pQcFTizDzs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ykg4XVGy5ty07cpPZbUKdNSOoZLLd6y1MB+JDQOonj5yOjvtkavif8dcHq51ZObBj
+	 oRh7QQPThTmc8fVQmJq9avkwx4SklSKHT4dMcwJgiSmbjRYeomDqh996doKM9h6ujj
+	 N8kqUasP645J+Jmt7wMnItKm0frqFTX6/iQZer14=
+From: Elena Salomatkina <esalomatkina@ispras.ru>
+To: Saeed Mahameed <saeedm@nvidia.com>
+Cc: Elena Salomatkina <esalomatkina@ispras.ru>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxim Mikityanskiy <maximmi@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Maor Dickman <maord@nvidia.com>,
 	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: ethernet: marvell: octeontx2: nic: Add error pointer check in otx2_ethtool.c
-Date: Mon, 23 Sep 2024 11:31:34 +0000
-Message-ID: <20240923113135.4366-1-kdipendra88@gmail.com>
-X-Mailer: git-send-email 2.43.0
+Subject: [PATCH] net/mlx5e: Fix NULL deref in mlx5e_tir_builder_alloc()
+Date: Mon, 23 Sep 2024 14:34:55 +0300
+Message-Id: <20240923113455.24541-1-esalomatkina@ispras.ru>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,44 +67,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add error pointer check after calling otx2_mbox_get_rsp().
+In mlx5e_tir_builder_alloc() kvzalloc() may return NULL
+which is dereferenced on the next line in a reference
+to the modify field.
 
-Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
+
+Fixes: a6696735d694 ("net/mlx5e: Convert TIR to a dedicated object")
+Signed-off-by: Elena Salomatkina <esalomatkina@ispras.ru>
 ---
- .../ethernet/marvell/octeontx2/nic/otx2_ethtool.c    | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/net/ethernet/mellanox/mlx5/core/en/tir.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-index 0db62eb0dab3..36a08303752f 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
-@@ -343,6 +343,12 @@ static void otx2_get_pauseparam(struct net_device *netdev,
- 	if (!otx2_sync_mbox_msg(&pfvf->mbox)) {
- 		rsp = (struct cgx_pause_frm_cfg *)
- 		       otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
-+
-+		if (IS_ERR(rsp)) {
-+			mutex_unlock(&pfvf->mbox.lock);
-+			return;
-+		}
-+
- 		pause->rx_pause = rsp->rx_pause;
- 		pause->tx_pause = rsp->tx_pause;
- 	}
-@@ -1074,6 +1080,12 @@ static int otx2_set_fecparam(struct net_device *netdev,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tir.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tir.c
+index d4239e3b3c88..72310452fce5 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/tir.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tir.c
+@@ -23,6 +23,8 @@ struct mlx5e_tir_builder *mlx5e_tir_builder_alloc(bool modify)
+    struct mlx5e_tir_builder *builder;
  
- 	rsp = (struct fec_mode *)otx2_mbox_get_rsp(&pfvf->mbox.mbox,
- 						   0, &req->hdr);
-+
-+	if (IS_ERR(rsp)) {
-+		err = PTR_ERR(rsp);
-+		goto end;
-+	}
-+
- 	if (rsp->fec >= 0)
- 		pfvf->linfo.fec = rsp->fec;
- 	else
+    builder = kvzalloc(sizeof(*builder), GFP_KERNEL);
++   if (!builder)
++       return NULL;
+    builder->modify = modify;
+ 
+    return builder;
 -- 
-2.43.0
+2.33.0
 
 
