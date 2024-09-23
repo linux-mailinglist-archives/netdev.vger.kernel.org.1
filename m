@@ -1,128 +1,129 @@
-Return-Path: <netdev+bounces-129227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9804197E59C
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 07:22:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D239297E5AC
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 07:39:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8E3D1C204E8
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 05:22:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55857B20E92
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 05:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C40FD10A1E;
-	Mon, 23 Sep 2024 05:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58EDEEAF6;
+	Mon, 23 Sep 2024 05:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AK9BYrWW"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 368D4FC0A
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 05:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED6A17996;
+	Mon, 23 Sep 2024 05:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727068938; cv=none; b=lIW2gHv6ETCs1fyp8ZJwdiIN88Zh0t5l4okc1wc+2HL4pRFO0VrtHczibv/kcAl24Dbm5EhrTM/QQ2oBLsRMbeZVL5aPnMF6+yfXhtqWutqroP+4Ej4BKoNKwkJQhM2B1eG4//s4N6UEXhgIk7gjfaImUu88QQGwWWvnlo7lhJU=
+	t=1727069949; cv=none; b=a23HG+BeaO37j7qEIceTU/x4eToDd6LjeYwQdUBLAK8KPx9EfFA9xI16TdVEq+3/XEzGUazJeghH5WyB6LcJpkAEXFysC+A3/3+VJYlKwI/BDQROfwupCDIHtfOcCx6LiclZP4xfx5iBObLnPPlAwYhgNrs6Tf107hqZyRNFsJ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727068938; c=relaxed/simple;
-	bh=ymX6F2J5hY6BZg88iqo/o31qcTuFFnKZ3ZTzzMr60Nw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NoEJJW6dC6hqhlaGcDrop3NbGyDmB5jB0XAzeAGSE6BDtWOX/+6wBF/iFxmmG8sJNxeYGxgvPM98RpZK52DjNMq+1/svU9UufuUlFMS8dH6KTYhahCESJUGNgSTtlYtnWa1EjFa95BnJjSLr/K8i7mNTOUUhuIxFImGxOqctUVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ssbWP-0005MB-Rj; Mon, 23 Sep 2024 07:22:05 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ssbWO-000spA-3W; Mon, 23 Sep 2024 07:22:04 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ssbWO-007PIF-03;
-	Mon, 23 Sep 2024 07:22:04 +0200
-Date: Mon, 23 Sep 2024 07:22:04 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "Alvaro (Al-vuh-roe) Reyes" <a-reyes1@ti.com>, netdev@vger.kernel.org,
-	hkallweit1@gmail.com, linux@armlinux.org.uk,
-	maxime.chevallier@bootlin.com, spatton@ti.com, r-kommineni@ti.com,
-	e-mayhew@ti.com, praneeth@ti.com, p-varis@ti.com, d-qiu@ti.com,
-	nm@ti.com
-Subject: Re: [PATCH 4/5] net: phy: dp83tg720: Added OA script
-Message-ID: <ZvD6_GJEsNq6yiB-@pengutronix.de>
-References: <cover.1726263095.git.a-reyes1@ti.com>
- <c41bc533471bab570be58bca3eae057554a56389.1726263095.git.a-reyes1@ti.com>
- <741f9487-e7f4-4c6e-b933-18cc2761c2f1@lunn.ch>
+	s=arc-20240116; t=1727069949; c=relaxed/simple;
+	bh=KLqYVUVSeJnuEqG4D+Dx2keqPgCYluGkixsgYvOgMdg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TaArPbUvzI64ybTNR6SuDoSFyh58wdMaD84iEeFbXD4yh4YMupZQ6aRYJ+8hRhNN09E2fg6qCjIP2decgd0tC+7m96Oxh6TpznTmC75KrvoK05hj74ejhnobnoHnne8YX0OF3br9c1V/IhtT3yO9mlhFkz4HVbEx5cBBesMNuek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AK9BYrWW; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7191fb54147so2907483b3a.2;
+        Sun, 22 Sep 2024 22:39:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727069947; x=1727674747; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=AYSzy93Z1kT06bxakvwIIe89yhaOpfH+SPPvpoZ8Oj8=;
+        b=AK9BYrWWnxAst9sFRd7PlWICt4DYwEzmPwcby1XnUuhEyrc5oe2QNj8dHVdxzs6cAD
+         VmZt59etcL0axIJ+EcucGzrM38KdMnZ4r1QB3Jmph0Pp8Itxk574tcEUFB9H0e0yfivX
+         uzy6+aHXK3NJGWF2v4EPzdY2I2M8/zy5PiDrd684Ot59j/AvP7Ho3jHOoMUXWSkBKk3f
+         Of8lgB8ly1K6ewTZ6HiDmKDlpJeH7CSub4m+NVyfObCCQxdcDO2Wofp2uDE7YBhQ7L4P
+         NgrI4GIv6cj431A8Ap7A7+vehk/XOU3u8ykIfGwkJqUrzUd+hXiI9veW1UnNjvvXbXcR
+         664A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727069947; x=1727674747;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AYSzy93Z1kT06bxakvwIIe89yhaOpfH+SPPvpoZ8Oj8=;
+        b=AKtwim5iG1iPRtoyAqZcNT5Zfxc5gDV9otXHn+iEXzBkzH2kTv4jpLpLkoHCrU4e68
+         gVW85EzQKcM9boEzdSN3jo03kPt+3t36GFBtRhSDCzHygIBchMU1fIESbTPWWGoMkkkN
+         yWbYB7DZAxQMKnBi8Zv0lJW7iRdoO+U129JoYJAe+eRJV4NN+7LS00or/JyxfiYJYwrL
+         M9GOADlnhPKxZZl27/TGKnIlwIix5yEZ9OPH2kKRhHZJkFUDDiIpBJ9TPfb1SGG0i6Hn
+         2cFZpVZTm3mq9Fqvf1zIaToCPFWeqDCu08gCBt+AdBZvRsLPORbzoTbnmnRuYl7sGBkU
+         mq/g==
+X-Forwarded-Encrypted: i=1; AJvYcCVatrjoEUynT/zFVPr/YVtlutoPHB5QkpFcI2KaeKXRvWIAkkAE7gS+49qlOgjFoW/mZNTtUyotUsbrgB0=@vger.kernel.org, AJvYcCXIzLacuZl6muwevCkginRGArwnSTjXCY6OflAAiHJy2DEqgqgzhYahCbkTrkUtY3AIThnGGqcc@vger.kernel.org
+X-Gm-Message-State: AOJu0YywCeb/vq3vgIspIDhHtj08+ja2uQdgxwkHpI4BNjtZBA2rJ4+e
+	efPtdGNF38o5SSeiGEtxQyr4cDGIUV/mauOAzdA2TY+XSg2n4C7B
+X-Google-Smtp-Source: AGHT+IHahzVhTsIOnELpI6T+hDoBzw//t7m4xEE0t1bfbOFxCBUorXCpLyYuIGOxiWBnC9oN7cY8hw==
+X-Received: by 2002:a05:6a00:92a2:b0:710:da27:f176 with SMTP id d2e1a72fcca58-7199cd6bbc4mr18281852b3a.12.1727069947006;
+        Sun, 22 Sep 2024 22:39:07 -0700 (PDT)
+Received: from ubuntu.. ([27.34.65.190])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71944b98257sm13130330b3a.166.2024.09.22.22.39.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 22 Sep 2024 22:39:06 -0700 (PDT)
+From: Dipendra Khadka <kdipendra88@gmail.com>
+To: andrew@lunn.ch,
+	florian.fainelli@broadcom.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	bcm-kernel-feedback-list@broadcom.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: Dipendra Khadka <kdipendra88@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 net] net: Add error pointer check in bcmsysport.c
+Date: Mon, 23 Sep 2024 05:38:58 +0000
+Message-ID: <20240923053900.1310-1-kdipendra88@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <741f9487-e7f4-4c6e-b933-18cc2761c2f1@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-On Thu, Sep 19, 2024 at 11:44:49PM +0200, Andrew Lunn wrote:
-> Also 0x834 is BASE-T1 PMA/PMD control. Which is MDIO_PMA_PMD_BT1_CTRL
-> 
-> We also have:
-> #define MDIO_PMA_PMD_BT1_CTRL_STRAP_B1000 0x0001 /* Select 1000BASE-T1 */
-> #define MDIO_PMA_PMD_BT1_CTRL_CFG_MST		0x4000 /* MASTER-SLAVE config value */
-> 
-> 802.3 says bit 15 is read only, so you don't need to set it.
-> 
-> The rest might be magic which nobody outside of TI will understand,
-> but you can fully document this.
+Add error pointer checks in bcm_sysport_map_queues() and
+bcm_sysport_unmap_queues() before deferencing 'dp'.
 
-Yes, this values will affect products of our customers. It is important
-for us to know what and why is changed.
+Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+---
+v2: 
+  - Change the subject of the patch to net
+v1:  https://lore.kernel.org/all/20240922181739.50056-1-kdipendra88@gmail.com/
+ drivers/net/ethernet/broadcom/bcmsysport.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-> > +static int dp83tg720_reset(struct phy_device *phydev, bool hw_reset)
-> > +{
-> > +	int ret;
-> > +
-> > +	if (hw_reset)
-> > +		ret = phy_write_mmd(phydev, MMD1F, DP83TG720_PHY_RESET_CTRL,
-> > +				DP83TG720_HW_RESET);
-> > +	else
-> > +		ret = phy_write_mmd(phydev, MMD1F, DP83TG720_PHY_RESET_CTRL,
-> > +				DP83TG720_SW_RESET);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	mdelay(100);
-> 
-> Does the bit not self clear when it has completed? That would be
-> common for a reset bit.
-
-Not sure about status bit, but the time seems to be incorrect.
-In case of HW reset, about 1ms delay is documented. This time should not
-be needed for the SW reset. If it is really needed, please add comment
-on where it is described.
-
-With 100ms delay, this chip will be able to establish the link within
-10ms (depending on the strap configuration) and then we will disable it again.
-
-Even worse, this script includes already soft reset and power management
-state changes. Im strongly against this script in that form.
-
-Regards,
-Oleksij
+diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
+index c9faa8540859..97d2ff2329cb 100644
+--- a/drivers/net/ethernet/broadcom/bcmsysport.c
++++ b/drivers/net/ethernet/broadcom/bcmsysport.c
+@@ -2337,6 +2337,9 @@ static int bcm_sysport_map_queues(struct net_device *dev,
+ 	unsigned int num_tx_queues;
+ 	unsigned int q, qp, port;
+ 
++	if (IS_ERR(dp))
++		return PRT_ERR(dp);
++
+ 	/* We can't be setting up queue inspection for non directly attached
+ 	 * switches
+ 	 */
+@@ -2392,6 +2395,9 @@ static int bcm_sysport_unmap_queues(struct net_device *dev,
+ 	unsigned int num_tx_queues;
+ 	unsigned int q, qp, port;
+ 
++	if (IS_ERR(dp))
++		return PTR_ERR(dp);
++
+ 	port = dp->index;
+ 
+ 	num_tx_queues = slave_dev->real_num_tx_queues;
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.43.0
+
 
