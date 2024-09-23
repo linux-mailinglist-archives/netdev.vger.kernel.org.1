@@ -1,134 +1,159 @@
-Return-Path: <netdev+bounces-129347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F339997EF7A
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 18:46:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BEE197EF8C
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 18:49:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E0797B21943
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:46:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 804681F210B4
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 16:49:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06CCC19F111;
-	Mon, 23 Sep 2024 16:46:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7C119FA60;
+	Mon, 23 Sep 2024 16:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ENJOEqtD"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="cgLqrp2A"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F1E13D625
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 16:46:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7ED919F475
+	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 16:49:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727109980; cv=none; b=nQLvYLOEx61nXe29Or4eAk04bun97bfueCAvmy5v7YzPPEsyaQ0xBwIZg8a77OSxS/quqQPiiZHGHEBPre1jmKPR2ezCgrSOJCV++kKG7r8NCfCJYa3IjuhFKE5X7SxdZ17WIiZohF3UPsR+ZQ67ZJmk74rhe5WMmLmdjxa/gZU=
+	t=1727110151; cv=none; b=eE0UyOvBAQpx7wYWGcFQww+mSks+HkXgMfhR+ftt/NTgx769mCDkCPCXVjnTHpU1/Xjcm2OB1vl/rifzY4lBE8cp4HdwuttS/EKvv1WQAV+FzvaWiINM03M7tZNWEgv4FvvMVb2Fu2vQwuq8mVFp4INQ8syonPx4aQbVH6Tq5cA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727109980; c=relaxed/simple;
-	bh=CBaBcZjvSjE2uqo1qSHWS8BMthhUAEogThtkqQHzEvQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M7L9zxCg16Kz0J0Fy6fMu1Mze5lmKe8chwB8QYOhztWta4gaHY9zPteP08Y9fG58pZ/V1e4YdJ5OuHHvQnTUFgbh1h9cWERJeNbnqTN/8F2TMsjgXw4cJ4lA5fo+Uh//OxWm2v8p40V3img67cZfl7L0M4/n+H8j8ZK8WoMZLjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ENJOEqtD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727109978;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CBaBcZjvSjE2uqo1qSHWS8BMthhUAEogThtkqQHzEvQ=;
-	b=ENJOEqtDPCGf2YgNTdeP3qQqPiojAcTC6rZ/xMFtvmqabW5TzTfWGnKGaVn9D/0WOF1mGC
-	DneOcrZjpZpx9UC9JhX8N+/VoqY5lO3NkbrdQatShHIFIEd4JswRBxiDvj3P0ynYEqvXiC
-	SiI2PXzg2O84e7pE28kTBanL7HmPdEg=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-684-4DpetEDLM4WSvsdEazUc4w-1; Mon, 23 Sep 2024 12:46:15 -0400
-X-MC-Unique: 4DpetEDLM4WSvsdEazUc4w-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2f74d4423d2so39084571fa.3
-        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 09:46:15 -0700 (PDT)
+	s=arc-20240116; t=1727110151; c=relaxed/simple;
+	bh=/VdJex1P9IliBcCN+TkYQfmH1H3CS3D8mmJxjjTrXbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZJPUO/pdkYkLTIhbEBKGfzH/DX+dZpRvNRFNV9SnvJntEjOujI1rhBpFj160ovjobtmtr0cVN36KXlFqhPOWKL3OzJLhL/h+PSNQEkjESvZbxvHfJ2r9KMpHGh1rKrw16+pjJV4CXX5fFl7ljRtYKTpXz7r4QJjKruDUo2DR4W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=cgLqrp2A; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-378c16a4d3eso4972177f8f.1
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 09:49:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727110146; x=1727714946; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RUIFbzEfhQorQBTWHhIvW39H3JHGIgV0/QXmgzM9Dx8=;
+        b=cgLqrp2AP8c1y7xcdxAgq9tvlxeHR9jsH0HbwpsLrCVhMp0X/l/DI/HBujwkNkoNJM
+         Ti9LH57NjzXcwyahEdV1EbDl270rbSzz9QzFzyv7djKd/TvfQwqF09qvF1lIu5S9Mgn4
+         4893HpRZN8K4/gI7YyBuf09+/qyY4bAS0uNyQoYdOc+xNBC8h3+1VnqEvwXhDLNohd9C
+         pEw41MVwtdohknfXxrnMZp/d/ZsjdDmQJIED7kkGO/E/ms65j29hl2yYCT9OXWgUppjA
+         bDmWE5JK+OBb4LaNjbp/eafo+75GeafHXZZdxs5zYUipOlB6SdYv7i+SCM6Bpp3A6Ivu
+         MJsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727109974; x=1727714774;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CBaBcZjvSjE2uqo1qSHWS8BMthhUAEogThtkqQHzEvQ=;
-        b=XoXAGUN2sNTBkiZ8rjWTkwQEhSftBkw590Do5qtWEp44GX9KkZWLRI1hug5IWoPOfq
-         q1R3hRFd/7CAj1N86P6Zh6aNnEg7oK9T4YKXGjK0cvz0OwY1yT3vxjOzMzGTLwi7D7t+
-         z5gxptXgs9YQOYDQgCTH4WGnu/aitysLsxym5rsHfrYrOmb9x4RYn+sJ1m9sNQJcdPNl
-         EWj8K5SoKh7dZVINtLPYddIcNqgS/3VIIVLBMo3wtt9wcF0+VlJ4qLojDf9rE0Ds+Za+
-         1hrLhoSJtIZKx/lfLnI7VbIVktqBCNgY5TLjh1VL0Aurd3Ht/Q/DRyKFtDH6F14Jhdux
-         wH4w==
-X-Forwarded-Encrypted: i=1; AJvYcCVRHXxGN7nQEJpufzz0kypJOP9nfQRX9Ebrc7uCjlMOIAfJbQ44d0xh4thXVrOBpGNGcjBo5NI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMpZNJn+wMe/huUN++j96867sbnbBXwqupGLupCS6kNLxBQuKv
-	ApRX9iI5ciud+8a/FFU+WWhaWijV9fc+zh8Ngwmkvmh9Aqa0fZM3tMTWyarLUkIMhMotGqZKYTv
-	8SAhPx7oNw67WR/6hq1edpvBHTAtRSWawYAYONN9VfAGtWVDDcWyPwh1wKLyROwKs4hOhFjnJp8
-	ME53NWA5XYMK/SGzG//uwlVPW6MjNg
-X-Received: by 2002:a2e:824e:0:b0:2f6:6029:c63e with SMTP id 38308e7fff4ca-2f7cc375a2dmr47198691fa.23.1727109974363;
-        Mon, 23 Sep 2024 09:46:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6qm7m3hWwtODGuDM1oa5WQCLNv0Y3IKoTB111Cx49PEhbpDmWp9BFnvuAJKnx3CHurDhFPWigvS/XiFS0BxM=
-X-Received: by 2002:a2e:824e:0:b0:2f6:6029:c63e with SMTP id
- 38308e7fff4ca-2f7cc375a2dmr47198471fa.23.1727109973965; Mon, 23 Sep 2024
- 09:46:13 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727110146; x=1727714946;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RUIFbzEfhQorQBTWHhIvW39H3JHGIgV0/QXmgzM9Dx8=;
+        b=a0ExQZWPpZ0V0L3Vbd57r8UwPl34fBpjwYl2m/vPxqd6bN31xLv7VaMAE61oI003zv
+         r70i/JgILRVfoZ/Qfu3mYf6t1nPjko1HNUr9X50m/jcYlmOTXqPKgOYk4zK2jumQXnh1
+         CTjX2JtgE0CsTnKKWedYrtHDNXQrTgR4K1LTcdS0Ux1JuKnjRUDPJEjflSPxhSPFWQiU
+         7zU59ICNfkDZ8WUxm6lyzlnjZdEADT6XZ4h7BoBQrCr9tmUvhy/Pri0llvHwmeKmjKUe
+         12xCyMmx+Bie9wC8VSLp1ONKTakmsmIE2D1NXdXtqoObsbnTYy9wjzhuUYuqKYs8i2db
+         Hm2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVioL87Cd/DdlBvipwkNiN2b8spiR+4ONseDBXyo2umHrnwasu1v5sLGPMMy8nXhiI1WFaQM/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz3v2rL+e8dGhsBe0BlyNmaBIxnKtb1a6N/y5YEoYNhX3v/8ZYo
+	S5s4sGQaPMv4epoEISMsDa/xGB7j52kHR1STo78nUnZ7Vyy+Bq6jckxI0/jGyt0=
+X-Google-Smtp-Source: AGHT+IELSIvIxna+JU2Zb53geG4pmwxSBpoAmhau4NlTM9exycA4PonR7J7kD5qss+As9Ce1d1GcaA==
+X-Received: by 2002:a5d:4fc5:0:b0:374:c8eb:9b18 with SMTP id ffacd0b85a97d-37a422c63acmr9722969f8f.24.1727110146164;
+        Mon, 23 Sep 2024 09:49:06 -0700 (PDT)
+Received: from blmsp ([2001:4091:a245:8155:f78b:11e0:5100:a478])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-378e7800374sm25016372f8f.79.2024.09.23.09.49.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 09:49:05 -0700 (PDT)
+Date: Mon, 23 Sep 2024 18:49:04 +0200
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
+	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, 
+	Raymond Tan <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux@ew.tq-group.com
+Subject: Re: [PATCH v3 1/2] can: m_can: set init flag earlier in probe
+Message-ID: <2s4w5jrrg32zy33xlxidv37437ehcs7xzm7qynhwpfkom2ckpz@lmvnlcdrfbzs>
+References: <ed86ab0d7d2b295dc894fc3e929beb69bdc921f6.1727092909.git.matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240920185918.616302-1-wander@redhat.com> <20240920185918.616302-3-wander@redhat.com>
- <7e2c75bf-3ec5-4202-8b69-04fce763e948@molgen.mpg.de> <02076f9d-1158-4f3e-85cc-83ee4d41091e@intel.com>
-In-Reply-To: <02076f9d-1158-4f3e-85cc-83ee4d41091e@intel.com>
-From: Wander Lairson Costa <wander@redhat.com>
-Date: Mon, 23 Sep 2024 13:46:03 -0300
-Message-ID: <CAAq0SUkeVkiit383065nhfCibn-CG701uvaM6UHpWu9RaZE83g@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH 2/2] igbvf: remove unused spinlock
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Paul Menzel <pmenzel@molgen.mpg.de>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ed86ab0d7d2b295dc894fc3e929beb69bdc921f6.1727092909.git.matthias.schiffer@ew.tq-group.com>
 
-On Mon, Sep 23, 2024 at 6:04=E2=80=AFAM Przemek Kitszel
-<przemyslaw.kitszel@intel.com> wrote:
->
-> On 9/21/24 14:52, Paul Menzel wrote:
-> > Dear Wander,
-> >
-> >
-> > Thank you for your patch.
-> >
-> > Am 20.09.24 um 20:59 schrieb Wander Lairson Costa:
-> >> tx_queue_lock and stats_lock are declared and initialized, but never
-> >> used. Remove them.
-> >>
-> >> Signed-off-by: Wander Lairson Costa <wander@redhat.com>
-> >
-> > It=E2=80=99d be great if you added a Fixes: tag.
->
-> Alternatively you could split this series into two, and send this patch
-> to iwl-next tree, without the fixes tag. For me this patch is just
-> a cleanup, not a fix.
->
-> >
->
+On Mon, Sep 23, 2024 at 05:32:15PM GMT, Matthias Schiffer wrote:
+> While an m_can controller usually already has the init flag from a
+> hardware reset, no such reset happens on the integrated m_can_pci of the
+> Intel Elkhart Lake. If the CAN controller is found in an active state,
+> m_can_dev_setup() would fail because m_can_niso_supported() calls
+> m_can_cccr_update_bits(), which refuses to modify any other configuration
+> bits when CCCR_INIT is not set.
+> 
+> To avoid this issue, set CCCR_INIT before attempting to modify any other
+> configuration flags.
+> 
+> Fixes: cd5a46ce6fa6 ("can: m_can: don't enable transceiver when probing")
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
 
-Should I send a new version of the patches separately?
+Reviewed-by: Markus Schneider-Pargmann <msp@baylibre.com>
 
-> [...]
->
-> >
-> > With that addressed:
-> >
-> > Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> >
-> >
-> > Kind regards,
-> >
-> > Paul
->
+Best
+Markus
 
+> ---
+> 
+> v2: no changes
+> v3: updated comment to mention Elkhart Lake
+> 
+>  drivers/net/can/m_can/m_can.c | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+> index 012c3d22b01dd..c85ac1b15f723 100644
+> --- a/drivers/net/can/m_can/m_can.c
+> +++ b/drivers/net/can/m_can/m_can.c
+> @@ -1681,6 +1681,14 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
+>  		return -EINVAL;
+>  	}
+>  
+> +	/* Write the INIT bit, in case no hardware reset has happened before
+> +	 * the probe (for example, it was observed that the Intel Elkhart Lake
+> +	 * SoCs do not properly reset the CAN controllers on reboot)
+> +	 */
+> +	err = m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
+> +	if (err)
+> +		return err;
+> +
+>  	if (!cdev->is_peripheral)
+>  		netif_napi_add(dev, &cdev->napi, m_can_poll);
+>  
+> @@ -1732,11 +1740,7 @@ static int m_can_dev_setup(struct m_can_classdev *cdev)
+>  		return -EINVAL;
+>  	}
+>  
+> -	/* Forcing standby mode should be redundant, as the chip should be in
+> -	 * standby after a reset. Write the INIT bit anyways, should the chip
+> -	 * be configured by previous stage.
+> -	 */
+> -	return m_can_cccr_update_bits(cdev, CCCR_INIT, CCCR_INIT);
+> +	return 0;
+>  }
+>  
+>  static void m_can_stop(struct net_device *dev)
+> -- 
+> TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+> Amtsgericht München, HRB 105018
+> Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+> https://www.tq-group.com/
 
