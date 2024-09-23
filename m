@@ -1,109 +1,294 @@
-Return-Path: <netdev+bounces-129396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E916983A22
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 01:11:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FCDD983A21
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 01:11:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5635A1C21BCB
-	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 22:35:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 521C41C22030
+	for <lists+netdev@lfdr.de>; Mon, 23 Sep 2024 23:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C541465B4;
-	Mon, 23 Sep 2024 22:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4E0F126C0D;
+	Mon, 23 Sep 2024 23:11:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G4sJXJDg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LU8cY0Dh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0D2145B38
-	for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 22:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727130849; cv=none; b=o443sul/ljxdViqv3NyEfyOwdpPdvV/k/LLYuS0XJSQXOA/HTWl7HR75ss9ZQXZNfaas0/oRatbu4vIXEgcAjgk3YuzfYj7gloi+R8UCsVy2diMBp14KwMoCuK61CeQu1aowEIQFy+XmgWdcANo8vBOQ1lXmlaZhw24u5+J1SeY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727130849; c=relaxed/simple;
-	bh=N7+o7khx1jf67s1hBqcR1Ne4Otvu61IbH27PLtV3oCw=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=QvtnzetBQDXOTocTvT8fyo6G7og0Sj2CAj6SSn2LzmP1FRvSP7KYL6ECVipKQyHc3crUVEh/MBlJ6qi3mWImDVBEqiK9PL2FvpRlYwOtZDwgl34EsOgctsReWhpOslGE+hMUYp1GeeaOxrRjx9vd5pFtLaV0Z+9lHuBRisgyCf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G4sJXJDg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727130846;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jTkM6enpKsq/HPP1aWcd0UHOFBRJuXPpDuW+0fAnEgU=;
-	b=G4sJXJDgTNv72GPdRXroqGqPGbY8ukmroKk9e87lw82hB9fzEs5VUHArsMl252Goupdaec
-	9Eg1Dsh+1gCuWXkzsPrrLHGMZwPsjOK1FufA/3Os9ME3VN8yEuyj675p33pOC1CwqQq0J6
-	+ZjA8Ru3RkdJfytnKN3iLN+ia/a5g44=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-178-vMyy1_3ZP0WVkfaK3Q6znA-1; Mon,
- 23 Sep 2024 18:34:01 -0400
-X-MC-Unique: vMyy1_3ZP0WVkfaK3Q6znA-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2BEF4190C4DA;
-	Mon, 23 Sep 2024 22:33:58 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8F15319560AA;
-	Mon, 23 Sep 2024 22:33:51 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <0f6afef57196cb308aa90be5b06a64793aa24682.camel@gmail.com>
-References: <0f6afef57196cb308aa90be5b06a64793aa24682.camel@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com> <20240923183432.1876750-1-chantr4@gmail.com> <670794146059f85a30efd7cf9d6650375d987077.camel@gmail.com>
-To: Eduard Zingerman <eddyz87@gmail.com>
-Cc: dhowells@redhat.com, Manu Bretelle <chantr4@gmail.com>,
-    asmadeus@codewreck.org, ceph-devel@vger.kernel.org,
-    christian@brauner.io, ericvh@kernel.org, hsiangkao@linux.alibaba.com,
-    idryomov@gmail.com, jlayton@kernel.org,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
-    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
-    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
-    v9fs@lists.linux.dev, willy@infradead.org
-Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C878E126C05;
+	Mon, 23 Sep 2024 23:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727133094; cv=fail; b=Kdo1AhI09cO55MTLom0aPz3crimxu04FHeLEEF2O1fREN5tub4oSOfnnO9jm6Mx5bLu5UNbUv3VU4slWs1NPjIQe+d1oGv53iD6hMF758EGprbl544lpmCw9/Ovj/9cU+AAshZ6TNZ/kp7ccB0yG3gF2KYIcJnPjiSWO0LrUXxc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727133094; c=relaxed/simple;
+	bh=tnewv2rx5R61sVSXUCK5h2Ka2OLsK16PBPTDs6L+IJs=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=h4DEykjHIWg6s6FLMRZu7X6AozIwzyvHNqEkE+WUt4ef1Ud6G/8AxecWo0cM383XTNcpyOP0ZG1VzO506mr8U1vICN6tY/Js/kb5ZJ0o+syUWfuP3Sha/sUnfvsyT+XFRz+myVusrPI3ZgUqgXM7Ell7rqaKP09pqM+KsSYpTro=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LU8cY0Dh; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727133093; x=1758669093;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=tnewv2rx5R61sVSXUCK5h2Ka2OLsK16PBPTDs6L+IJs=;
+  b=LU8cY0DhSSlsbLYJGTU3DiSlhT+BV3BMr7WdLeGk69pORX3nG3/QQFpL
+   AObdj1OK6CUtHuyzB7+8KkHI3KDl+G7RYwMHgQo8Ixw3kClofElQM+pqD
+   924kTgp+mkbVBdDy74A3G+uW6L4x245iVFGv5Owy4Qbqo5ixKRgIZCm6e
+   7qBCzmJEKaV8SjJBVMHOLeM2TAG3mKOpPrTlvK3u3UVgI1rwg2HbA5nk6
+   x0bl7hMGruW0kYVaxNoE+NzHiKMBZqeTfxLBuJ/FfVH73uhyhQ6jDcN9h
+   vxvhHZwOZAaeZ6ywtMQlcnVqzl7Sj/I+34NlVSX4Rz40as0cv8uxKYeGg
+   g==;
+X-CSE-ConnectionGUID: JCEOpUmeRnqAjgxVe7Spew==
+X-CSE-MsgGUID: w3zCAbD1RcmXGz1TOqNqDQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11204"; a="36687992"
+X-IronPort-AV: E=Sophos;i="6.10,252,1719903600"; 
+   d="scan'208";a="36687992"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2024 16:11:31 -0700
+X-CSE-ConnectionGUID: nJTch8heQ4+hUtHBFxwMfw==
+X-CSE-MsgGUID: dRWVrWdfQJuttoBz4fMccg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,252,1719903600"; 
+   d="scan'208";a="75744534"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Sep 2024 16:11:31 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 23 Sep 2024 16:11:30 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 23 Sep 2024 16:11:30 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 23 Sep 2024 16:11:30 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=q0PNz8dX4cFKRHBvEKjEDe+SrIg4Mr7qozgY1KStwVskRqep18PFtyzdY48/SfEtrnlsB5Ud6LjimOxJ5cE6j0mOQdnOPGYzR2dm9m6ptOdE9yBLcvY8LQ2G3i4pQDb8Gg+SYdjrxM2VwBgKkTNE4jRMYEkJTnLJWWsyRLuVubBHJxEGQupSgs4HKf1fIhP6H4Ns+HZFhB7JXAZ+dY4hxcAaH+W1rYpmWcenlXHlR47TmvQR0ZAXqfwzMeH7SZtjQDOJqtbR9tPUq/uihUt/Ho5xSwiB61bGPJQD6xIvapvorgjiicLR6vRGE8qsDDI1jPPCsuKLn+tWWTf/pJQamA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JA3MFocjy2DncaaP4gokWOdiiLM4njsuyY5vn3Hd198=;
+ b=kmQUS9g/tbUXuIwIbdV5ysYe3n0eQ9AZ/x9vpPfOECFglQIWHVipmG6jPPlKDJTsMjC1f9LovQy7OOocJQJEDjrD8YRS5xH9zz+QmI9DRIXoA4FUTonIFXMAiZ4555dadDENetLfgXmLdXQbT6vYS/3P5QUFFgmEOdGmrboqiACQdLHilhOaeQ73WflmD1YHnQmYsoDeTyEPc9tRm90megL7ZNuW1pPR2ynE1xKfRZvbrAbnkCiO8YteWSMXd+VUQsFBDZa4LKwoRYpGIpX1t9e17f6WVg2THJ9U0KL7tPy8cGtIzWDsVzPFry57S6Gw9R+VIPp8xmSEOeW90jfkqw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by IA1PR11MB8100.namprd11.prod.outlook.com (2603:10b6:208:445::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.25; Mon, 23 Sep
+ 2024 23:11:27 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%3]) with mapi id 15.20.7982.022; Mon, 23 Sep 2024
+ 23:11:27 +0000
+Message-ID: <2c272599-6b25-4c93-86fa-ecfd8df024c1@intel.com>
+Date: Mon, 23 Sep 2024 16:11:14 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] igb: Do not bring the device up after non-fatal error
+To: Mohamed Khalfella <mkhalfella@purestorage.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Yuanyuan
+ Zhong" <yzhong@purestorage.com>, Jeff Garzik <jgarzik@redhat.com>, Auke Kok
+	<auke-jan.h.kok@intel.com>, Simon Horman <horms@kernel.org>, Ying Hsu
+	<yinghsu@chromium.org>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20240923212218.116979-1-mkhalfella@purestorage.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20240923212218.116979-1-mkhalfella@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: BYAPR01CA0066.prod.exchangelabs.com (2603:10b6:a03:94::43)
+ To CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <961633.1727130830.1@warthog.procyon.org.uk>
-Date: Mon, 23 Sep 2024 23:33:50 +0100
-Message-ID: <961634.1727130830@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|IA1PR11MB8100:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7637eec6-e683-43e4-222f-08dcdc250cd2
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WEJHN0NIbFRsbGdzeWpkYkllc3V3cGFzaDFEaHJ1cFNEQkxHc2lVQi9BbGd2?=
+ =?utf-8?B?dW1zR0FNclV3MTZPRkRhYlVjTVREaTdBRVUyeThtOFJZTnluSEJJZXFGcjBU?=
+ =?utf-8?B?cWFCV3EzaUxDMWFkb3hQazQvQmpVbkNIUFZwQStxYndIK0VMTytLVFcvbVYw?=
+ =?utf-8?B?OGlncnhkZDBQQnlTTmJ5U0FpQVE2Si9NdDVrVXJWUE84b2NsS0NUeld1R0Nr?=
+ =?utf-8?B?Y01EMHNNWVFZTHBNY0RJU0dHU1kwT1VYa2JxbHkxY3lIZmMwV2E0N1JTRU90?=
+ =?utf-8?B?b0g5SkVnWnUyL25wUE9DK2I3allPOXU2OUt2M1ZybU5nME5FWExOaDVFY0ZZ?=
+ =?utf-8?B?T3BoTzhxMk8vTWdTYkVZVk9mQ01HeTdwWTRWVjR0S1NYU292VUZLVnJhOHNY?=
+ =?utf-8?B?R2htU3lDcnVkM1FTcmRkckFjSmJHWnRDSzc1cGIzcm5BeUlYOCsvQkpGZ2tN?=
+ =?utf-8?B?T25Qb3Jua1ROcml4QmZJTytPMElyY2RpMTBQNFlPUmtQc1ZZNzFUdG5FT1pY?=
+ =?utf-8?B?TEZQR2lLM1RycHNoYmFIbXhxc1hFRmluOWlGK2E3eDNxdHFZeUszR0FmUEZl?=
+ =?utf-8?B?SHl0UFRUaldFY1NhWWozTnBhYmNZQlhmd3pxWW1iWUFMWkNIT1hodjlmYmRt?=
+ =?utf-8?B?ZDQ3WmV2NVFwUmd5N3JQNUMwbU95V0NrSlFoM0lMSEVhcEtzYmpxampzcURy?=
+ =?utf-8?B?U2RrTnZMSkVaVHdwUGc5MklzQ1hEbUlSc0hWTkZUd2NkM2Y0cENud1lhbEJa?=
+ =?utf-8?B?eVUybUI3RXphdFBwTnAxUjdoRDkwRjNXU3dpMWJVZ2RZUWhYdlIwZUR6dUkx?=
+ =?utf-8?B?UkNDVllVaXEydFZ3ei95TU15aE9scE05R0lwK25rUkF3eTFCQ2Zkdm5mQWd0?=
+ =?utf-8?B?WUIzcWN3Q3hBMHVKQnU2dm5IOXV0M09vTm4zb2hvQ3ZsWUROYlhpN005QWMy?=
+ =?utf-8?B?M2lTTjA4dURjaXFFVmxkWWNwL3IzUExBNVpTNmtva0NCUGNDU1IwVXJ0SG53?=
+ =?utf-8?B?NEljaVhCZEZZK0ErTFgvRmJSdk9LQU90VjZRMGhJVXhqSEtzZjNmQmlzdXhz?=
+ =?utf-8?B?NUNkS1F4Z21QQk1Kd2NmUWxkSmVjdlJPcUluWDZPSlVkNHUyWmFCYTdBRkxz?=
+ =?utf-8?B?UFdMZlpHcVdlYXFXSzFDbFQ0RDBXSFdHSDkra3lkdVYyK1M4VGorYUZXR3Vz?=
+ =?utf-8?B?MkJzbm1jMCtEejd1UlR4VzdUbVJtckZPejRRYUE0aEc2ZFQvL3p5T0ZUTS9l?=
+ =?utf-8?B?cEpXbFF2NXBmVHozVmZkanpnNUFkd21XalBsZ2orRlRHSjhhTGZhMHZnUzIv?=
+ =?utf-8?B?eUIvNENzNnl0STJsTVNoSmNreWlEMWNYNFhxczFQQm1ydmxKQkd4L2hCNmNl?=
+ =?utf-8?B?MFhCb1RuMWNIY0lWOEdid3lnMUU2MkpGc21QR0ZnbHBjMDcrc1RmandDa2d2?=
+ =?utf-8?B?UlpTSEhBZ1JNdEpZNDN1Q1p2WnR6UG9laTl1SDdvWWpncmxhbzRIdFNDeTda?=
+ =?utf-8?B?Z3Z6ZDl2eWF4bUhDb3BaeFErTWExc0dEeEhkeUVQdEhxZnh5T0M0WlcydWwv?=
+ =?utf-8?B?bmQvNGhKbjd5bnpRZUlxR3ZvdmwvTGdGcjcxRlNnSEQzK0x6SFNuSjdxSGpW?=
+ =?utf-8?B?d3FZeDJpZkdKalVlVDBuSHNSQTBGRTA0OWNIK3FZL1UvNTRka0xTSEw2UHRQ?=
+ =?utf-8?B?UzVFNS83dTQ5Z3lkNmVrMCtrcWJEa3QrcXRYdW5ieGg0R1N1R1BySklHSk1u?=
+ =?utf-8?B?VlRQRnFiWGFIaGswWFF1U2VEUitKUFFnbnR1NVZqY0k1dk9xczdWOTZNMnhR?=
+ =?utf-8?B?Q0VaUHpTYXhPcStIamFPb1ZTQnNUQXBNenQ4dHFsYkQvdlRoWXhGVkc2WVA0?=
+ =?utf-8?Q?YOH2is5VGvi87?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?em1zSHRHc1Z1T1lDekR2a21nUXcrdGdjYzZFeDBlSUtaSTVadVgyOVQzTUZB?=
+ =?utf-8?B?YjZ2WE9vRlo5US9ldFFNU0lLTUZrSlZCcDdVRDNvREN2ekxLVzV5RHgvZkRo?=
+ =?utf-8?B?eklZa1Z1dXdnYk9TWE5sb1RRZGtrQWZobkdtaThDWnAvRy8vM0d3NzVzN1NQ?=
+ =?utf-8?B?ODdadEV6TXZOTnZMaTFpYzhVVVZrcVNGd0VISVc2YzhSOURscGRjMHVPejdO?=
+ =?utf-8?B?cXYrUWg1bW80MmpxbWIrUVN4RUJGSXVmeFY5RzRVbllMeVlqWm5ub09pOHpJ?=
+ =?utf-8?B?ZmdINm5TV01MMDEwNWV1Ym1YYk1iVnNiUU84S3lKYzByUEFpeFNmekRCd1Bp?=
+ =?utf-8?B?OVRUTHY0azlZZGd5aFNvRWsrY2VXYndCa0x6RFhKU05qVksrMmtJaGtIclhr?=
+ =?utf-8?B?RTc4MWVtdERBTTRnbnUzSG5FRC8xRlBjaWdLK1FUNGNCeDVJRFV3c1ZENnMx?=
+ =?utf-8?B?eUNhcG85VGxOMXdoSC9NL0VkQUdEQyt4VjQrMjNDZjlrQ2kxZkhCK1FGN1ZK?=
+ =?utf-8?B?ajM5eUJkcXBCemdnaUVwejA2NEJsRGphRHBZNWdiTzd5YUZFL3ByOXc0VWQr?=
+ =?utf-8?B?TmNHWk9TMjc1UktyMHRIOUdWZUs1L0Zsc1hNZWtpOXFXMldWdnErNDYrbFI4?=
+ =?utf-8?B?elAyZ3FoTVI1KzFvMjJmZmZKVW1ieWlxMldMSWF6amh0TDNDYU9MNXA1OWhx?=
+ =?utf-8?B?MDNSV2JmeDF3Rk5aMGYvNnZxcTZKYzdsTGE1L1lTZ0xCRE1URXNDK2d4cHBm?=
+ =?utf-8?B?RllaSFliMjR6QXlRVE5GUk9qQm9UcXRrQkh4UGpMdGNMUHl5elIrZk9ocTR6?=
+ =?utf-8?B?RnB1UGlXcSs4MWxvb09iSEZPUHF1TmE5RG9Eb1NDWGt1djlUNWppNWFFQnpE?=
+ =?utf-8?B?U2p1MXE5U1I2Q21mdFo3VmR3aVhyeEQvcEdzWldxZzNNcmhHcC96emN5dWRC?=
+ =?utf-8?B?dnBUZnpLT04yWWV3SmIwM2JxVTd3VW96RlZ2cUxHN1cxcG52Mld3VTR5U1ZV?=
+ =?utf-8?B?WGZTM05qblJFT0ZtZWZJUmVHQTJzODlWWFhBc1BUVEo1R0gwWVdpWWhwOTlY?=
+ =?utf-8?B?eFFFN2R3ZEkxeWRqZERJK1VQdUFqZVF6SkFaeWlwTWlpVVU3Z0lzRUNDVytw?=
+ =?utf-8?B?SUx0RS9Ob3lSOWtpVkJTZWFnWXpJaXVWdmxvQngxdGN1K3FORnFFUTd2VG1r?=
+ =?utf-8?B?SE9ES09hZ2EvVkFsVFRuYzJGV3JsQU5PS2tGc05KMVd1dkxldzVkbjROV09M?=
+ =?utf-8?B?MktYV3Q5aTMySlIvVjRQSk5KaHdsNHVMZEl1T3NERElXeU4yanFLb2ovUUJ0?=
+ =?utf-8?B?MDVEdXRNd1o1YndROWw2eTBlNG9QcWkxb2habHh1dGhhcHE2MEJ5MGtGYXY1?=
+ =?utf-8?B?bndCL1BxcUNQMGZnTjRSTUN6ZWVRK2o0cndmMkRvdkNaWm5QSTFJSkplSE1k?=
+ =?utf-8?B?NWhYejRBNCszcXNacUordzRGZVVCSTc0RXF1alBYeGJDWnRaUjJXRWhBeDgv?=
+ =?utf-8?B?ZGFVek9aUUlSNUsybm11SnVCSkZXdFE1LzVCSERkRkxPeGdRdjlZWENmUWZM?=
+ =?utf-8?B?dWRFUGY3YytveThxY2x5b2pNVnlST0ZKM1JHSTYzQTR0VlprM0ZaZWdvdWNa?=
+ =?utf-8?B?Vng0OVFDVWNPcXVmTEw5c01MT2hxUllCTlFpVjA1dkUrM1REL3hhVkxoWVdn?=
+ =?utf-8?B?c0JBM21XSnNaWVdaN1RXT3h0QXhqZGgzZmdra3ZmbWNMNWRTZWNiMDNZU1hn?=
+ =?utf-8?B?V20rN1pLUVRiSTN3TzE1OHpqWjJydzViMmw0VXFpc1poMlROeXlFR2haOE1W?=
+ =?utf-8?B?bndodmRQUDN0amlTaFREUEphTmN1bUxrQmM5VC9JcmlzUEU0TlFTU0JlRUtw?=
+ =?utf-8?B?Y3F3dkNkbVB6S0FIc1ovYnNNNWx2bDdQb094aURNZ0VxSnpTSklENVA3d2FR?=
+ =?utf-8?B?SFlkMXFzN25QRDRKUlRUV2V2L1BRRWNlZmN6Zjg1YVZjK3ZwQlVxZnYwUmw0?=
+ =?utf-8?B?VVVIV2ZSL3cyRmJmdHZudFZ2b29HczlCY211Z2V6b3FUdmVmYkovbitJQ3No?=
+ =?utf-8?B?TUFnaUhWN2NtRU43Y2VtbGxRVjJOUXNuR0s0Sk1mU3hTbzRMYWNhcGZqaWRk?=
+ =?utf-8?B?QVhCditJSjA1dFYrRk84MGQxTmtNdTM2TEtna1N3b28yQXpSVUR5ZDhVeWtZ?=
+ =?utf-8?B?YlE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7637eec6-e683-43e4-222f-08dcdc250cd2
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Sep 2024 23:11:27.1517
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: TRwGCQ37XqGLJSo7z3hrkQIA1J9lERlPKOXzaFUPCZZ8VqM3xilUl4V+zixqeC7h+pAExRPBj/Ixe0X02jaI67j2seVLipD7yOEs3yrIXvA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB8100
+X-OriginatorOrg: intel.com
 
-Eduard Zingerman <eddyz87@gmail.com> wrote:
 
-> - null-ptr-deref is triggered by access to page->pcp_list.next
->   when list_del() is called from page_alloc.c:__rmqueue_pcplist(),
 
-Can you tell me what the upstream commit ID of your kernel is?  (before any
-patches are stacked on it)
+On 9/23/2024 2:22 PM, Mohamed Khalfella wrote:
+> Commit 004d25060c78 ("igb: Fix igb_down hung on surprise removal")
+> changed igb_io_error_detected() to ignore non-fatal pcie errors in order
+> to avoid hung task that can happen when igb_down() is called multiple
+> times. This caused an issue when processing transient non-fatal errors.
+> igb_io_resume(), which is called after igb_io_error_detected(), assumes
+> that device is brought down by igb_io_error_detected() if the interface
+> is up. This resulted in panic with stacktrace below.
+> 
+> [ T3256] igb 0000:09:00.0 haeth0: igb: haeth0 NIC Link is Down
+> [  T292] pcieport 0000:00:1c.5: AER: Uncorrected (Non-Fatal) error received: 0000:09:00.0
+> [  T292] igb 0000:09:00.0: PCIe Bus Error: severity=Uncorrected (Non-Fatal), type=Transaction Layer, (Requester ID)
+> [  T292] igb 0000:09:00.0:   device [8086:1537] error status/mask=00004000/00000000
+> [  T292] igb 0000:09:00.0:    [14] CmpltTO [  200.105524,009][  T292] igb 0000:09:00.0: AER:   TLP Header: 00000000 00000000 00000000 00000000
+> [  T292] pcieport 0000:00:1c.5: AER: broadcast error_detected message
+> [  T292] igb 0000:09:00.0: Non-correctable non-fatal error reported.
+> [  T292] pcieport 0000:00:1c.5: AER: broadcast mmio_enabled message
+> [  T292] pcieport 0000:00:1c.5: AER: broadcast resume message
+> [  T292] ------------[ cut here ]------------
+> [  T292] kernel BUG at net/core/dev.c:6539!
+> [  T292] invalid opcode: 0000 [#1] PREEMPT SMP
+> [  T292] RIP: 0010:napi_enable+0x37/0x40
+> [  T292] Call Trace:
+> [  T292]  <TASK>
+> [  T292]  ? die+0x33/0x90
+> [  T292]  ? do_trap+0xdc/0x110
+> [  T292]  ? napi_enable+0x37/0x40
+> [  T292]  ? do_error_trap+0x70/0xb0
+> [  T292]  ? napi_enable+0x37/0x40
+> [  T292]  ? napi_enable+0x37/0x40
+> [  T292]  ? exc_invalid_op+0x4e/0x70
+> [  T292]  ? napi_enable+0x37/0x40
+> [  T292]  ? asm_exc_invalid_op+0x16/0x20
+> [  T292]  ? napi_enable+0x37/0x40
+> [  T292]  igb_up+0x41/0x150
+> [  T292]  igb_io_resume+0x25/0x70
+> [  T292]  report_resume+0x54/0x70
+> [  T292]  ? report_frozen_detected+0x20/0x20
+> [  T292]  pci_walk_bus+0x6c/0x90
+> [  T292]  ? aer_print_port_info+0xa0/0xa0
+> [  T292]  pcie_do_recovery+0x22f/0x380
+> [  T292]  aer_process_err_devices+0x110/0x160
+> [  T292]  aer_isr+0x1c1/0x1e0
+> [  T292]  ? disable_irq_nosync+0x10/0x10
+> [  T292]  irq_thread_fn+0x1a/0x60
+> [  T292]  irq_thread+0xe3/0x1a0
+> [  T292]  ? irq_set_affinity_notifier+0x120/0x120
+> [  T292]  ? irq_affinity_notify+0x100/0x100
+> [  T292]  kthread+0xe2/0x110
+> [  T292]  ? kthread_complete_and_exit+0x20/0x20
+> [  T292]  ret_from_fork+0x2d/0x50
+> [  T292]  ? kthread_complete_and_exit+0x20/0x20
+> [  T292]  ret_from_fork_asm+0x11/0x20
+> [  T292]  </TASK>
+> 
+> To fix this issue igb_io_resume() checks if the interface is running and
+> the device is not down this means igb_io_error_detected() did not bring
+> the device down and there is no need to bring it up.
+> 
+> Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
+> Reviewed-by: Yuanyuan Zhong<yzhong@purestorage.com>
+> Fixes: 004d25060c78 ("igb: Fix igb_down hung on surprise removal")
+> ---
+>  drivers/net/ethernet/intel/igb/igb_main.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index 1ef4cb871452..8c6bc3db9a3d 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -9651,6 +9651,10 @@ static void igb_io_resume(struct pci_dev *pdev)
+>  	struct igb_adapter *adapter = netdev_priv(netdev);
+>  
+>  	if (netif_running(netdev)) {
+> +		if (!test_bit(__IGB_DOWN, &adapter->state)) {
+> +			dev_info(&pdev->dev, "Resuming from non-fatal error, do nothing.\n");
+> +			return;
 
-If you can modify your kernel, can you find the following in fs/netfs/:
+I'm not sure this needs to be a dev_info.
 
-buffered_read.c:127:			new = kmalloc(sizeof(*new), GFP_NOFS);
-buffered_read.c:353:	folioq = kmalloc(sizeof(*folioq), GFP_KERNEL);
-buffered_read.c:458:	folioq = kmalloc(sizeof(*folioq), GFP_KERNEL);
-misc.c:25:		tail = kmalloc(sizeof(*tail), GFP_NOFS);
-
-and change the kmalloc to kzalloc?
-
-David
-
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 
