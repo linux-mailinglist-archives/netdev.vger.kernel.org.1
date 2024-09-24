@@ -1,152 +1,186 @@
-Return-Path: <netdev+bounces-129403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A12983AC7
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 03:31:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3892983AD2
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 03:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E8381C21F62
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 01:31:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C0C01F23046
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 01:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D31A41;
-	Tue, 24 Sep 2024 01:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2287414F90;
+	Tue, 24 Sep 2024 01:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blSG7nfq"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Csz0xqkn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD40FECF;
-	Tue, 24 Sep 2024 01:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8449460;
+	Tue, 24 Sep 2024 01:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727141503; cv=none; b=QFo8HsxcP7ER0lAFtB65olwc7sCFC0Esf+uXxRHjUh759RT62j6N6GhjZEucZlnxk7jti63HJ/lj3adlD4XwxdO0tqCdl1/oDQSTcV7lpG2iv9GOnx1+7urq0cJDkGkw/70vqEQD3OQENQWz+rl3gDaNkCeWEBLJNiJMD3HeMpE=
+	t=1727141538; cv=none; b=FG2Z0ddLv1y5Z+N6HYGmWAoQHDu9dF8dobfvD746FZjRiedPtVFSlm2qiD4ZKcaFQ9sxD4fm7mgEZAOTIHtAndAzJojhMcrrxzgFR9gexRZljZeSxdFLNfhB8wpPuUnmf5F28Sj4dwl61MUivWPOUnhqaGJEAUjUAqTAnWxMuJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727141503; c=relaxed/simple;
-	bh=xs5detKTVBLzPpGt/D9q21ZoFkPbRVyCsZ8mayN/prA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KHHZoi1OfCNY9fgA3M1lW4mywltxIJLZ89LJGWIqvv/udPmIzT+9criGLcZr4HSVePiW5Vk/v0lEXClTQVvswBhvT5BOFotESGItiNcRu+PreWCxjyEpy97/7ysMM6QuSC94SjGFc5Zyr8EKHX9RkGOknQKl1GJs+jNq/tURjlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blSG7nfq; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-537a399e06dso1676915e87.1;
-        Mon, 23 Sep 2024 18:31:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727141499; x=1727746299; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RXUE+TGoraxHwTrjcDn7MdkTSgQGCB8AYjN18G7qHEs=;
-        b=blSG7nfqrdFb5yBF9PsTTDx0eNmBzf+BHBIwalMuvnKt2/bZedTqSGBPfg1zKnhSI7
-         0NlS7lIzaSn48Gn7WB9s9Y1iW9IBpJrOXdix9gKy7iPel50IVi8vjo4WRyolxgjCcvTM
-         YnYsJ/n2PsttB4dFLCojH0+dzV0KWNASJKGcGNNu3/V9f93kxVKrwBBWV6vNLIgh43ax
-         c4681adPyjtxcEpHQt0kJ/JKzCXK1votD5/X3PIct6RBue1X3Q/v6dn4080jO1KiY7cc
-         YfjsZL3yTjZoRslxyQs4hVFRHd+CMN3vWP8fXr4rPEwwjV3eZtGvTu0DTZ7aCMN9slk4
-         ylKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727141499; x=1727746299;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RXUE+TGoraxHwTrjcDn7MdkTSgQGCB8AYjN18G7qHEs=;
-        b=laqimbp4cMvQaZ/qlmKFVReju4OT3tE3sS0ZnDPW1sobQwoxNepjDsq6/eHNzrxuXT
-         My++kahwQaA1klVYCGl6gG+ltWhLxiApPGTYQ1WX9w+4gLeUVBizYESPqJ5KxPykS180
-         AYqSARCq4MrJgjOFzHQAw8+gipbttSdahdnDhBgOId+AWpSVcodmbHMHpQMrQVLdzZD2
-         hWHRKziNwlp2YitnbQcON/eudhfawOAijeiqdprPC4Ir7EYLGprQJLAhVEh0kjFV1P44
-         qD32t53KQ/3rCjd4CfNh8aFBVLCqauy6gH55+GI9leGhToYi2TkNBfHmVZLwnoYNYe5E
-         v7eg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdYzwbWOiS5/SeYCDRGfT6TJyafRAutyCZXsKaPwa103+LGbZ2flMN0L+bYEltzkOmZa1g0BSpqfidjQc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGUDVBTEGO5NIfUHSJnVkx3TJPxQidwzKRC1rGkKDsuu6zt6Ot
-	HfgbtM24enJxmwZxXGKlWa+HZLiCmcmxVZQGh6/4qQWzSSNEuuI0RvlOVLUxOrY=
-X-Google-Smtp-Source: AGHT+IFBLkPpAD23jrQ6hVZAW8PQa7/Mvpz9LGc30yvgHGYRnCjvbVouaQDoQGW8pZgLe35cmCIBWw==
-X-Received: by 2002:a05:6512:401e:b0:52c:cc38:592c with SMTP id 2adb3069b0e04-536ac179d05mr7431867e87.0.1727141499229;
-        Mon, 23 Sep 2024 18:31:39 -0700 (PDT)
-Received: from dau-work-pc.zonatelecom.ru ([185.149.163.197])
-        by smtp.googlemail.com with ESMTPSA id 2adb3069b0e04-537a864d7fdsm52233e87.254.2024.09.23.18.31.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2024 18:31:37 -0700 (PDT)
-From: Anton Danilov <littlesmilingcloud@gmail.com>
+	s=arc-20240116; t=1727141538; c=relaxed/simple;
+	bh=NLWuQMQdGOaEdkp9nqA/DcOMKSqjWfAXlJTmjRYs8To=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ceg6/7mzJVQjsUud81hnuYC1wOF+3fuQbwV/U2r9SIONTxwI5CPO+jwVBY6JlmlrDISYNH1b6jUHrWfbn0o60i4E9CBMaR8geDEpBTmaIeel8CeUARP7LjWo4QTCRZHMZq3go/G2pHhh4mtHaktZyHh5ueaq+iN2dpiWw9M4M90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Csz0xqkn; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1727141525; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=iCn/TDt437t416f0h3Ki8KtoPYKj1vMAXHoXXMzzIvg=;
+	b=Csz0xqknBc87pHEHB3X99EKL2XH6qhPm/7THDU3x9+gtuZ2BUzS1WxVo1G20j2ZiLsd8WIAjiIF0Sbz76avwBmSTRmDRCJd+2oYU9FDTYIcOKLw+b/xysCjI2+x8Ohgv7l1TwiW6fs8TcK7LnnLc+lvTSWOfindtHqmXSfA1XjM=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WFdsUjb_1727141524)
+          by smtp.aliyun-inc.com;
+          Tue, 24 Sep 2024 09:32:05 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: netdev@vger.kernel.org
-Cc: Anton Danilov <littlesmilingcloud@gmail.com>,
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	Suman Ghosh <sumang@marvell.com>,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net v2] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
-Date: Tue, 24 Sep 2024 04:30:40 +0300
-Message-Id: <20240924013039.29200-1-littlesmilingcloud@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev,
+	bpf@vger.kernel.org
+Subject: [RFC net-next v1 00/12] virtio-net: support AF_XDP zero copy (tx)
+Date: Tue, 24 Sep 2024 09:31:52 +0800
+Message-Id: <20240924013204.13763-1-xuanzhuo@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Git-Hash: 83bb687d4b73
 Content-Transfer-Encoding: 8bit
 
-Regression Description:
+Because the merge window is closed, so this is RFC.
 
-Depending on the GRE tunnel device options, small packets are being
-dropped. This occurs because the pskb_network_may_pull function fails due
-to insufficient space in the network header. For example, if only the key
-option is specified for the tunnel device, packets of sizes up to 27
-(including the IPv4 header itself) will be dropped. This affects both
-locally originated and forwarded packets in the DMVPN-like setups.
+v1:
+    1. some small fixes for http://lore.kernel.org/all/20240820073330.9161-1-xuanzhuo@linux.alibaba.com
+        1. fix the title of the commit #2, #3
+        2. fix the gcc error for commit #3
+        3. use virtqueue_dma_xxxx for tx hdr
+        4. rename virtnet_ptr_to_xsk to virtnet_ptr_to_xsk_buff_len
+        5. squash #11 in last patch set to #10
 
-How to reproduce (for local originated packets):
+================================================================================
 
-  ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
-          local <your-ip> remote 0.0.0.0
+## AF_XDP
 
-  ip link set mtu 1400 dev gre1
-  ip link set up dev gre1
-  ip address add 192.168.13.1/24 dev gre1
-  ip neighbor add 192.168.13.2 lladdr <remote-ip> dev gre1
-  ping -s 1374 -c 10 192.168.13.2
-  tcpdump -vni gre1
-  tcpdump -vni <your-ext-iface> 'ip proto 47'
-  ip -s -s -d link show dev gre1
+XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
+copy feature of xsk (XDP socket) needs to be supported by the driver. The
+performance of zero copy is very good. mlx5 and intel ixgbe already support
+this feature, This patch set allows virtio-net to support xsk's zerocopy xmit
+feature.
 
-Solution:
+At present, we have completed some preparation:
 
-Use the pskb_may_pull function instead the pskb_network_may_pull.
+1. vq-reset (virtio spec and kernel code)
+2. virtio-core premapped dma
+3. virtio-net xdp refactor
 
-Fixes: 80d875cfc9d3 ("ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmit()")
-Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
----
-v1 -> v2 :
-- Fix the reproduce commands
-- Move out the 'tnl_params' assignment line to the more suitable place
-with Eric's suggestion
-https://lore.kernel.org/netdev/CANn89iJoMcxe6xAOE=QGfqmOa1p+_ssSr_2y4KUJr-Qap3xk0Q@mail.gmail.com/
----
- net/ipv4/ip_gre.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+So it is time for Virtio-Net to complete the support for the XDP Socket
+Zerocopy.
 
-diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
-index 5f6fd382af38..f1f31ebfc793 100644
---- a/net/ipv4/ip_gre.c
-+++ b/net/ipv4/ip_gre.c
-@@ -662,11 +662,11 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
- 		if (skb_cow_head(skb, 0))
- 			goto free_skb;
- 
--		tnl_params = (const struct iphdr *)skb->data;
--
--		if (!pskb_network_may_pull(skb, pull_len))
-+		if (!pskb_may_pull(skb, pull_len))
- 			goto free_skb;
- 
-+		tnl_params = (const struct iphdr *)skb->data;
-+
- 		/* ip_tunnel_xmit() needs skb->data pointing to gre header. */
- 		skb_pull(skb, pull_len);
- 		skb_reset_mac_header(skb);
--- 
-2.39.2
+Virtio-net can not increase the queue num at will, so xsk shares the queue with
+kernel.
+
+This patch set includes some refactor to the virtio-net to let that to support
+AF_XDP.
+
+## About virtio premapped mode
+
+The current configuration sets the virtqueue (vq) to premapped mode,
+implying that all buffers submitted to this queue must be mapped ahead
+of time. This presents a challenge for the virtnet send queue (sq): the
+virtnet driver would be required to keep track of dma information for vq
+size * 17, which can be substantial. However, if the premapped mode were
+applied on a per-buffer basis, the complexity would be greatly reduced.
+With AF_XDP enabled, AF_XDP buffers would become premapped, while kernel
+skb buffers could remain unmapped.
+
+We can distinguish them by sg_page(sg), When sg_page(sg) is NULL, this
+indicates that the driver has performed DMA mapping in advance, allowing
+the Virtio core to directly utilize sg_dma_address(sg) without
+conducting any internal DMA mapping. Additionally, DMA unmap operations
+for this buffer will be bypassed.
+
+## performance
+
+ENV: Qemu with vhost-user(polling mode).
+Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
+
+### virtio PMD in guest with testpmd
+
+testpmd> show port stats all
+
+ ######################## NIC statistics for port 0 ########################
+ RX-packets: 19531092064 RX-missed: 0     RX-bytes: 1093741155584
+ RX-errors: 0
+ RX-nombuf: 0
+ TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030645664
+
+
+ Throughput (since last show)
+ Rx-pps:   8861574     Rx-bps:  3969985208
+ Tx-pps:   8861493     Tx-bps:  3969962736
+ ############################################################################
+
+### AF_XDP PMD in guest with testpmd
+
+testpmd> show port stats all
+
+  ######################## NIC statistics for port 0  ########################
+  RX-packets: 68152727   RX-missed: 0          RX-bytes:  3816552712
+  RX-errors: 0
+  RX-nombuf:  0
+  TX-packets: 68114967   TX-errors: 33216      TX-bytes:  3814438152
+
+  Throughput (since last show)
+  Rx-pps:      6333196          Rx-bps:   2837272088
+  Tx-pps:      6333227          Tx-bps:   2837285936
+  ############################################################################
+
+But AF_XDP consumes more CPU for tx and rx napi(100% and 86%).
+
+Please review.
+
+Thanks.
+
+Xuan Zhuo (12):
+  virtio_ring: introduce vring_need_unmap_buffer
+  virtio_ring: split: record extras for indirect buffers
+  virtio_ring: packed: record extras for indirect buffers
+  virtio_ring: perform premapped operations based on per-buffer
+  virtio-net: rq submits premapped per-buffer
+  virtio_ring: remove API virtqueue_set_dma_premapped
+  virtio_net: refactor the xmit type
+  virtio_net: xsk: bind/unbind xsk for tx
+  virtio_net: xsk: prevent disable tx napi
+  virtio_net: xsk: tx: support xmit xsk buffer
+  virtio_net: update tx timeout record
+  virtio_net: xdp_features add NETDEV_XDP_ACT_XSK_ZEROCOPY
+
+ drivers/net/virtio_net.c     | 347 +++++++++++++++++++++++++++++------
+ drivers/virtio/virtio_ring.c | 313 ++++++++++++++-----------------
+ include/linux/virtio.h       |   2 -
+ 3 files changed, 431 insertions(+), 231 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
 
 
