@@ -1,183 +1,235 @@
-Return-Path: <netdev+bounces-129624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF448984D66
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 00:09:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED0BD984D6A
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 00:10:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 771EF1F217A1
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 22:09:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A8761C2094B
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 22:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C115A149DE8;
-	Tue, 24 Sep 2024 22:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540D913D89D;
+	Tue, 24 Sep 2024 22:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gf2XErYi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1TwkJIW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2734D146D57
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 22:08:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E1E6E614
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 22:10:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727215694; cv=none; b=YvZh7lR0EL2bt6uRauGUDwR9Wu4EfzV4osT9DnCv0hHOsaSbee2K3C86l97gWVlI8K9SDxVYw0OrnFe/eE0cK8eCaCYI/QyeRu662X7+azkM+FmZAMtz1STh647QdOtoMCQWSQaqqyc7vZWWZij00OV81W+CljENgCAMcZrzVgY=
+	t=1727215833; cv=none; b=FCKuCQuCmlfmgZdYa0fouJnKtRt7T/WBTLE4QhWUNvnIwUciB2kdKGTgQM0C1atJHlz71vkW93pBJE9Z4Ol5fRb8o3tCCuoZxGgPXEWg/5LSK4S2xOhdciMO1LhubIUkKRpnLGc9J+KIkrxJVQV2gO5bum1JKGrnXj1OBvPi50g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727215694; c=relaxed/simple;
-	bh=XM1R/E+GZDsbMYwzwuScBr/8Mynr9WZp9/04dFBHH5I=;
-	h=From:To:cc:Subject:MIME-Version:Content-Type:Date:Message-ID; b=sBHacjN8qpxflzzfdYXHSTa6V+tHwn0FUIlN2VvTQaVO2tDhm4+mkoEyppY/DVRAqz64Edhqm+CFKc1b7irXKokOdhugfOV4dm7iRlLuIaJ6fPkql0ihaueYz1DTc2Ix82/AMnfy1ql6M2OWB4NQ8NgCsQbIcfI/0MkyR4yuQoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gf2XErYi; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727215692;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=ze6Jh1dkudzhCy2kThDzWDTT7ZR0+ZKc4btmmg9o7DY=;
-	b=Gf2XErYiBVT7oZFHEY75NIptl4DtWiOzTlgyWW0XAd5xFlgS0pKOEMEnrXysk59PGr46Km
-	MrClTeO0CsSTKVJP0cHUb081F+t51ZEiCs6q90CqibxyJHBIv/nq5cLfRy/9h+WIHya4Mu
-	3WiZgLRLmukvH4e8iEEc6lCQ8zDpAQ0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-113-xV7ma4d9MJWHIH60R_6Wuw-1; Tue,
- 24 Sep 2024 18:08:06 -0400
-X-MC-Unique: xV7ma4d9MJWHIH60R_6Wuw-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6B30118E68D2;
-	Tue, 24 Sep 2024 22:08:05 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 6754719560AD;
-	Tue, 24 Sep 2024 22:08:02 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-cc: dhowells@redhat.com, yuxuanzhe@outlook.com,
-    Marc Dionne <marc.dionne@auristor.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH net] rxrpc: Fix a race between socket set up and I/O thread creation
+	s=arc-20240116; t=1727215833; c=relaxed/simple;
+	bh=OCeuJkBJ5HkMjBG8VsX5Rzg/FLiFvtZfMxaWBS9eF8A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OYwUu+R4Q4UU1JYsZJFT91h/zAVpst0xPa9TRmJt+P9RTBtSQp29dyyC6BzQ7XM+jzCqBA/5ZWZ5nFyX7/rwbyevchBngzSRAlFsNe+jQgIik895yVXbOEOWrID5I47tisAgvs6xjOPPVdaFc2uaZkgVtZKEzEaQfV2DXmdOGx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K1TwkJIW; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42e5e1e6d37so60044235e9.3
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 15:10:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727215829; x=1727820629; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0WHTm4Q1RgD9bg5lzukVPigQpOM69dfNMzxWRlwJRhI=;
+        b=K1TwkJIWWU7tDEH+c0vKDvmnfVIQdTsuBF05jYn7TCLcKQKnS72VQRSj+1D1MD1kEf
+         hpoMtMDyMnYA/Pvc7bjyh5vOSvBgsfT6tvFCiVfQ5+tWunZEVpyb364YSD9noMKuoa5W
+         bJrYBClUebkkdjd5Y7MNV25gQQDj1AFQ88NyQsu4SB4/m7JxOGm4sg2UVRV81Lnm6rAo
+         /a/KOvIonJ4avgccSbJM+XofwLcrxjBAUMx7CiYlqumInDsTmpt7p+waHkHS5dVetmLA
+         KlkChX6kb+nG7UG/mMzRbVohQzi/oqPecwMtC9d15uIen6HnGwP8caYQ6O+hZnIjhjgD
+         QgSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727215829; x=1727820629;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0WHTm4Q1RgD9bg5lzukVPigQpOM69dfNMzxWRlwJRhI=;
+        b=F00ilCIfS1gXmNM/lQ97t+blcnMnIZEqCMo0Hbx7y8zS7AxhXVs52kclW4MkOlVM7p
+         hEjhSKud+uXcQ+rcWigqLnVKqHYg0EEc3qJsDdYrDmGqaVROg2BAIiqbySFnCcesJAZd
+         OQO4mcB0j1D4bugAyb0RLUjF9jYYqgxZBze/Mmq4TBDSbPcv3pzJz6Gl0t2FGR9HA2yp
+         qFSDHQYzSZ9S8FRj/o5ULe6ZkmcRrym9j3Hqi6hUuWTOCb0URjqvTZJTCoUbz5/emNae
+         FefOwHOTmWIE29YXpmibV7CWbw3XLeK2QzGAeLBPkStGxdYUzGi86A0FxT1KTomrs6/m
+         eSsQ==
+X-Gm-Message-State: AOJu0YzQZLTpUr562RNPXbKDX1JyXpBn8DiKvMay+gaVObkc3nUx7CMF
+	ES2G6f9/NLVEF2NHAoMuozvJUtul2F44QbbzFwvLswgpBX7Gj+dZ
+X-Google-Smtp-Source: AGHT+IHUrIcmTZaiQFGNlk5kgX+5dRkG1FqkUIOCMVGcI3UjIwfOSBpCSlQUs9WVKwwPIR0vmaQ9nA==
+X-Received: by 2002:a05:600c:45cf:b0:42c:c4c8:7090 with SMTP id 5b1f17b1804b1-42e9610b567mr3177635e9.9.1727215829200;
+        Tue, 24 Sep 2024 15:10:29 -0700 (PDT)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e96a1697dsm627625e9.38.2024.09.24.15.10.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Sep 2024 15:10:27 -0700 (PDT)
+Message-ID: <20c73bae-0c79-4a8a-af60-6dbc6a88e953@gmail.com>
+Date: Wed, 25 Sep 2024 01:10:46 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1210176.1727215681.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 24 Sep 2024 23:08:01 +0100
-Message-ID: <1210177.1727215681@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 04/25] ovpn: add basic netlink support
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew@lunn.ch, sd@queasysnail.net,
+ donald.hunter@gmail.com
+References: <20240917010734.1905-1-antonio@openvpn.net>
+ <20240917010734.1905-5-antonio@openvpn.net>
+ <70952b00-ec86-4317-8a6d-c73e884d119f@gmail.com>
+ <e45ed911-8e48-4fac-9b56-d39471b0d631@openvpn.net>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <e45ed911-8e48-4fac-9b56-d39471b0d631@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-In rxrpc_open_socket(), it sets up the socket and then sets up the I/O
-thread that will handle it.  This is a problem, however, as there's a gap
-between the two phases in which a packet may come into rxrpc_encap_rcv()
-from the UDP packet but we oops when trying to wake the not-yet created I/=
-O
-thread.
+Hi Antonio,
 
-As a quick fix, just make rxrpc_encap_rcv() discard the packet if there's
-no I/O thread yet.
+On 23.09.2024 15:59, Antonio Quartulli wrote:
+> On 23/09/2024 01:20, Sergey Ryazanov wrote:
+>> On 17.09.2024 04:07, Antonio Quartulli wrote:
+>>> +    -
+>>> +      name: set-peer
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Add or modify a remote peer
+>>
+>> As Donald already mentioned, the typical approach to manage objects 
+>> via Netlink is to provide an interface with four commands: New, Set, 
+>> Get, Del. Here, peer created implicitely using the "set" comand. Out 
+>> of curiosity, what the reason to create peers in the such way?
+> 
+> To be honest, I just wanted to keep the API as concise as possible and 
+> having ADD and SET looked like duplicating methods, from a conceptual 
+> perspective.
 
-A better, but more intrusive fix would perhaps be to rearrange things such
-that the socket creation is done by the I/O thread.
+Could you elaborate, what is wrong with separated NEW and SET method 
+conceptually?
 
-Fixes: a275da62e8c1 ("rxrpc: Create a per-local endpoint receive queue and=
- I/O thread")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-cc: yuxuanzhe@outlook.com
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/ar-internal.h  |    2 +-
- net/rxrpc/io_thread.c    |    7 ++++---
- net/rxrpc/local_object.c |    2 +-
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ From the implementation point of view I can see that both methods can 
+setup a same set of object properties. What can be resolved using a 
+shared (between NEW and SET) peer configuration method.
 
-diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
-index 80d682f89b23..d0fd37bdcfe9 100644
---- a/net/rxrpc/ar-internal.h
-+++ b/net/rxrpc/ar-internal.h
-@@ -1056,7 +1056,7 @@ bool rxrpc_direct_abort(struct sk_buff *skb, enum rx=
-rpc_abort_reason why,
- int rxrpc_io_thread(void *data);
- static inline void rxrpc_wake_up_io_thread(struct rxrpc_local *local)
- {
--	wake_up_process(local->io_thread);
-+	wake_up_process(READ_ONCE(local->io_thread));
- }
- =
+> What userspace wants is "ensure we have a peer with ID X and these 
+> attributes". If this ID was already known is not extremely important.
+> 
+> I can understand in other contexts knowing if an object already exists 
+> can be crucial.
 
- static inline bool rxrpc_protocol_error(struct sk_buff *skb, enum rxrpc_a=
-bort_reason why)
-diff --git a/net/rxrpc/io_thread.c b/net/rxrpc/io_thread.c
-index 0300baa9afcd..5c0a5374d51a 100644
---- a/net/rxrpc/io_thread.c
-+++ b/net/rxrpc/io_thread.c
-@@ -27,8 +27,9 @@ int rxrpc_encap_rcv(struct sock *udp_sk, struct sk_buff =
-*skb)
- {
- 	struct sk_buff_head *rx_queue;
- 	struct rxrpc_local *local =3D rcu_dereference_sk_user_data(udp_sk);
-+	struct task_struct *io_thread =3D READ_ONCE(local->io_thread);
- =
+Looks like you want a "self synchronizing" API that automatically 
+recovers synchronization between userspace and kernel.
 
--	if (unlikely(!local)) {
-+	if (unlikely(!local || !io_thread)) {
- 		kfree_skb(skb);
- 		return 0;
- 	}
-@@ -47,7 +48,7 @@ int rxrpc_encap_rcv(struct sock *udp_sk, struct sk_buff =
-*skb)
- #endif
- =
+On one hand this approach can mask potential bug. E.g. management 
+application assumes that a peer was not configured and trying to 
+configure it and kernel quietly reconfigure earlier known peer. Shall we 
+in that case loudly inform everyone that something already went wrong?
 
- 	skb_queue_tail(rx_queue, skb);
--	rxrpc_wake_up_io_thread(local);
-+	wake_up_process(io_thread);
- 	return 0;
- }
- =
+On another hand, I see that current implementation does not do this. The 
+SET method handler works differently depending on prior peer existence. 
+The SET method will not allow an existing peer reconfiguration since it 
+will trigger error due to inability to update "VPN" IPv4/IPv6 address. 
+So looks like we have two different methods merged into the single 
+function with complex behaviour.
 
-@@ -565,7 +566,7 @@ int rxrpc_io_thread(void *data)
- 	__set_current_state(TASK_RUNNING);
- 	rxrpc_see_local(local, rxrpc_local_stop);
- 	rxrpc_destroy_local(local);
--	local->io_thread =3D NULL;
-+	WRITE_ONCE(local->io_thread, NULL);
- 	rxrpc_see_local(local, rxrpc_local_stopped);
- 	return 0;
- }
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..f9623ace2201 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -232,7 +232,7 @@ static int rxrpc_open_socket(struct rxrpc_local *local=
-, struct net *net)
- 	}
- =
+BTW, if you want an option to recreate a peer, did you consider the 
+NLM_F_REPLACE flag support in the NEW method?
 
- 	wait_for_completion(&local->io_thread_ready);
--	local->io_thread =3D io_thread;
-+	WRITE_ONCE(local->io_thread, io_thread);
- 	_leave(" =3D 0");
- 	return 0;
- =
+>> Is the reason to create keys also implicitly same?
+> 
+> basically yes: userspace tells kernelspace "this is what I have 
+> configured in my slots - make sure to have the same"
+> (this statement also goes back to the other reply I have sent regarding 
+> changing the KEY APIs)
 
+If we save the current conception of slots, then yes it make sense.
+
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>>> +    -
+>>> +      name: get-peer
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Retrieve data about existing remote peers (or a specific 
+>>> one)
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>>> +        reply:
+>>> +          attributes:
+>>> +            - peer
+>>> +      dump:
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +        reply:
+>>> +          attributes:
+>>> +            - peer
+>>> +    -
+>>> +      name: del-peer
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Delete existing remote peer
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>>> +    -
+>>> +      name: set-key
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Add or modify a cipher key for a specific peer
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>>> +    -
+>>> +      name: swap-keys
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Swap primary and secondary session keys for a specific peer
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>>> +    -
+>>> +      name: del-key
+>>> +      attribute-set: ovpn
+>>> +      flags: [ admin-perm ]
+>>> +      doc: Delete cipher key for a specific peer
+>>> +      do:
+>>> +        pre: ovpn-nl-pre-doit
+>>> +        post: ovpn-nl-post-doit
+>>> +        request:
+>>> +          attributes:
+>>> +            - ifindex
+>>> +            - peer
+>>> +
+
+--
+Sergey
 
