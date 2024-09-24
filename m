@@ -1,181 +1,184 @@
-Return-Path: <netdev+bounces-129587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39296984A82
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 19:57:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B020984A83
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 19:58:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7D641F24954
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 17:57:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B708B20F69
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 17:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 979AE1AB539;
-	Tue, 24 Sep 2024 17:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338921ABEC6;
+	Tue, 24 Sep 2024 17:58:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AytFswKm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S/JBRZer"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B25B84E1B3
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 17:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3E12941B;
+	Tue, 24 Sep 2024 17:58:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727200648; cv=none; b=GgV/nUmNzPZS/YIw9pviqeOoFA/RC9htimsFgc2AiVc4Ly9RLI0ZzQZI37YtMAOcZJprPaGlPNSU3tPdGYoZLia3kQK0x4RaNb15B30BolMAu7YfP5dB9cpkXX/xJBcKGtCwGRHZx123rLa9b6jH4tr/ocnCqvRxSoS49o+xS2Q=
+	t=1727200692; cv=none; b=guVUw/zQ3XT/dcdMQA+6ZC4CQkd9LqvzOo1ee8/XEX5rSBjy7mWDE05zrwxokC26fCmub11YqVt+VczbI7vd63q8fx1P5MH9tOmaO4wwz+l2a5AGlXcbp6SJwWYC5pynRtUPRQleJwSIQAryVyBQ31wtRnIVknUAv9kmv7t8eno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727200648; c=relaxed/simple;
-	bh=+WovY1b+sv/D9elEPpUptE7C5zHRe1X559aWUPzfzfM=;
+	s=arc-20240116; t=1727200692; c=relaxed/simple;
+	bh=5qoAn6EfJFUQhsx4AB+LfGTHNmgBhfUi3D7JY5kPiYo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DlOp4vtM9zq3o0rRaeDxve1d8KuxeRFg92jxLksv6fsPdakhtYItmOLuyT/Tiny2naZaakjmJjqDkRw2xzYh3X/oLncsX3f/Ad7eUbn0FsO7WPeb9whQXYKAz+pMj6EKDRLjoYk337bgt1coD3E46d2xSIVNQMnanML0iKOyPIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AytFswKm; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a8ce5db8668so537921666b.1
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 10:57:25 -0700 (PDT)
+	 To:Cc:Content-Type; b=YeeBb0qmiOEuIa68NE6Q25XUIYQStU/k/UnchMfDqyb0lCe/xIzGgmKbmMhjxNSAAOR/vjSOmB85afW+rVIF7Iz8qCuqWj4CzynvWN65yWwLwHPV6cIsN6twEYR7PQID0U2LaWI/Xum7Y3oBMLwiQniXexdP+IilOkRWSkxnKFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S/JBRZer; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-503f946d65fso1156369e0c.2;
+        Tue, 24 Sep 2024 10:58:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727200644; x=1727805444; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qfZ8fgSDovQp6OAqhp6OWSo9JiUV9/HdSsJXIOB+1oc=;
-        b=AytFswKmkhzkaN0IyGRFS6yKQsyBKClbVFRiXfO434yth3VAwiJ74tQRx2iuQA+Xhs
-         nreQjufKsDJuoAyTjK79C6wrtk6mwurENhvn3BP8M4NzL5DpZclW7ErYorqghaR0V90W
-         n4e6e3AcNcg6BqrR9nQhmuzS9kDmomezAZiKhBwqvSFjOqJxwoxvLRImbrymCu9yMWW0
-         E7gA+gWrjFP1a4/d3/6s+jTII71eRog2nCfyvlxCvdYhyjTAJwFS9VJa59/XC2COH2JP
-         BHFUoK0gcU1Zx8JEDua/Ks861hWQQq8BaskLzcWvc3oNYcIwsUzqtbikq2s5cOa2LEii
-         cfsQ==
+        d=gmail.com; s=20230601; t=1727200689; x=1727805489; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=FtOisPFrz8MMfOlJEmHPyj/gSIdJaZPCZi0Wwdfvah0=;
+        b=S/JBRZerLjFEW3H6Jx+aHCpd4CjmTqSJHrhnliPEqIVISS84zLLPJmQFsXOaM37oG/
+         rGuMsGIhZSznuvao5onDFy3CyQSB6X5Vam3G4o4jNO0Lz5q8s2YkgySB60VIJ4VoWRvn
+         Rb9dtuHSS/BtVvhDuEsJjhNnZX8MF9i5Irtlbg/hFl9ghPGGnEnJCF+rlg5+J5k4NYTG
+         cxXUB9whzN23GVIrN2US5H0NjfH80Hx8gS7k2PqJKUATtnAWaXTMPDr1+GlSPBJSxAvq
+         jSqK3mwBODijUHKePeg8oPS3ZLGhsOzDGCJDq/29swpihQQgppp17GiH/AvcC0qQs2Uu
+         MMYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727200644; x=1727805444;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qfZ8fgSDovQp6OAqhp6OWSo9JiUV9/HdSsJXIOB+1oc=;
-        b=uViOFixcIfxdNZHHl7Dk8zX1Jn+Dxmj+baxgheJnMqzYxIW17l8ihNuX7O7BQV62Kc
-         rd/Kome9tlAXYU+TAXbUBCEtRx4FX0XZfXooAVy3a7zXn2oa3r/zpfGfgcPho85d/ePN
-         7wlKODO8jrt1rUvpC9/6KcfoKnHNHMq5b+ZqCXCIWwUyL5MdknBVPNAnoSw9bLL1taRP
-         lcs9w8UMOGVjmxKu0q+b+iBnnAPaSwqih8TI0M4CmW4juap+lFifowd8De8+IAzycfeD
-         ahNK38yDe18ZoMRrZlbEidOGcUDU5NqeBVGFXXruOE2XuCg76Og5gr+caq8nixl2vgXe
-         AH4g==
-X-Forwarded-Encrypted: i=1; AJvYcCWIBSo5FZDP/9FatSzuGfHc8JnplfKRcotfhEQHX+FHi9SzwpnkAYlgzTFFrPjbznDIxzvVucw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzdd3vf7zAm5+IRaLsl6h6c/XT4yZKSQwth3KfnXLDkrr7UJkiH
-	UZ1JCHRpWHSudOhwgQegkhMNTM/WM2rYSWXeVVHdE7Qory6iHcJ22R3CGLP521uvNlFb+b15+VR
-	/JWDmmUR0SRVPMQwad0X7x0ur5gJpPJpmgtXuuCpqqXOCjybBqPKfLUg=
-X-Google-Smtp-Source: AGHT+IGl0XoeMK5jhmq79tv0ZZuVSpmVgpyUTqdIFPz0UpybpqmCtyC0nfH6FBs5zO7TKkMxEqH5E5veaZCSL1qFBDM=
-X-Received: by 2002:a17:907:2da7:b0:a8d:e4b:d7fe with SMTP id
- a640c23a62f3a-a93a0121087mr14935966b.0.1727200643682; Tue, 24 Sep 2024
- 10:57:23 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727200689; x=1727805489;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FtOisPFrz8MMfOlJEmHPyj/gSIdJaZPCZi0Wwdfvah0=;
+        b=C9m2WmtYfVMcQcoEm2amhmNrmFuhPWpLE5eQ1tSaNQ/Vz8EIyMJXWX8UnfULf19jZG
+         cv3xEEEsQAYBHX78vP4OHGKxHf/TeRuWzxv51QTqCrrTGmz6jnchrt2YAQpzFdZW1pcX
+         3t2CnELlMDxHYATtx2FaiOOEr21Ad47jctjPNNHd00FO85qLVzFuRgxAzb28ZjvduUly
+         +t7e4ibkXMm1xn9hFOkw9LUKv8Kv4ZDaddfgz99TnuKaaTyKYpZ8gQrw7CcLvmh3JX1B
+         l1cOCRlnpRNk0T5RYXMfPbJNvKUtUgOzmZmMDi4UyX/5G3W9wEH31t6uXLm8jt2/nI4L
+         PdbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXOp0Tg7nP2eh6Uj+GFiE9m6+dsGJF/Ijyxxz5pQPG0fqLINp8e27vNtjZBvEmSNWPo0yzaDuBj@vger.kernel.org, AJvYcCXT7qoElIw9T5495FWjhcgXYdsh8wUIZZH+6D69W7Ooe9TCjRTO3XKQAEsOqiwmPopNZK0naZaNm7aZM6k=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyjQTiheY8uzPFH0YQdFH4M/DaYI1Nv4ipCwl/naQN3+C0HfIRL
+	lRJjYnzqTpb4EhGmk9BrvPcPVY4aoKv9KgQrxOXD7O2nbFJn+lVnNbwPIlhBYdqeKGOIS9HOKId
+	1KjZcfke/cIBKv5wCC8CdTj9GM6k=
+X-Google-Smtp-Source: AGHT+IHTkZU201Le5J6WJGmsaV/AnRUFdExdQ5YWxRBcW7uyOlLkprgUHHCmAs2qAuOVDPD8lY+75pyaYgLeE6pU3OU=
+X-Received: by 2002:a05:6122:50b:b0:503:d875:6a26 with SMTP id
+ 71dfb90a1353d-505c1d82ce3mr385826e0c.5.1727200689247; Tue, 24 Sep 2024
+ 10:58:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240822200252.472298-1-wangfe@google.com> <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
- <20240831173934.GC4000@unreal> <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
- <20240902094452.GE4026@unreal> <Zt67MfyiRQrYTLHC@gauss3.secunet.de>
- <20240911104040.GG4026@unreal> <ZvKVuBTkh2dts8Qy@gauss3.secunet.de>
-In-Reply-To: <ZvKVuBTkh2dts8Qy@gauss3.secunet.de>
-From: Feng Wang <wangfe@google.com>
-Date: Tue, 24 Sep 2024 10:57:12 -0700
-Message-ID: <CADsK2K9aHkouKK4btdEMmPGkwOEZTNmd7OPHvYQErd+3NViDnQ@mail.gmail.com>
-Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org, antony.antony@secunet.com
+References: <20240923113135.4366-1-kdipendra88@gmail.com> <20240924071026.GB4029621@kernel.org>
+ <CAEKBCKPw=uwN+MCLenOe6ZkLBYiwSg35eQ_rk_YeNBMOuqvVOw@mail.gmail.com> <20240924155812.GR4029621@kernel.org>
+In-Reply-To: <20240924155812.GR4029621@kernel.org>
+From: Dipendra Khadka <kdipendra88@gmail.com>
+Date: Tue, 24 Sep 2024 23:42:58 +0545
+Message-ID: <CAEKBCKO45g4kLm-YPZHpbcS5AMUaqo6JHoDxo8QobaP_kxQn=w@mail.gmail.com>
+Subject: Re: [PATCH net] net: ethernet: marvell: octeontx2: nic: Add error
+ pointer check in otx2_ethtool.c
+To: Simon Horman <horms@kernel.org>
+Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com, 
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Steffen,
+Hi Simon,
 
-The easiest thing would be to upstream your driver, that is the
-prefered way and would just end this discussion.
-
-I will try to upstream the xfrm interface id handling code to
-netdevsim, thus it will have an in-driver implementation.
-
-Thanks,
-
-Feng
-
-On Tue, Sep 24, 2024 at 3:34=E2=80=AFAM Steffen Klassert
-<steffen.klassert@secunet.com> wrote:
+On Tue, 24 Sept 2024 at 21:43, Simon Horman <horms@kernel.org> wrote:
 >
-> On Wed, Sep 11, 2024 at 01:40:40PM +0300, Leon Romanovsky wrote:
-> > On Mon, Sep 09, 2024 at 11:09:05AM +0200, Steffen Klassert wrote:
-> > > On Mon, Sep 02, 2024 at 12:44:52PM +0300, Leon Romanovsky wrote:
-> > > > On Mon, Sep 02, 2024 at 09:44:24AM +0200, Steffen Klassert wrote:
-> > > > > >
-> > > > > > Steffen,
-> > > > > >
-> > > > > > What is your position on this patch?
-> > > > > > It is the same patch (logically) as the one that was rejected b=
-efore?
-> > > > > > https://lore.kernel.org/all/ZfpnCIv+8eYd7CpO@gauss3.secunet.de/
-> > > > >
-> > > > > This is an infrastructure patch to support routing based IPsec
-> > > > > with xfrm interfaces. I just did not notice it because it was not
-> > > > > mentioned in the commit message of the first patchset. This shoul=
-d have
-> > > > > been included into the packet offload API patchset, but I overloo=
-ked
-> > > > > that xfrm interfaces can't work with packet offload mode. The sta=
-ck
-> > > > > infrastructure should be complete, so that drivers can implement
-> > > > > that without the need to fix the stack before.
+> On Tue, Sep 24, 2024 at 08:39:47PM +0545, Dipendra Khadka wrote:
+> > Hi Simon,
+> >
+> > On Tue, 24 Sept 2024 at 12:55, Simon Horman <horms@kernel.org> wrote:
+> > >
+> > > On Mon, Sep 23, 2024 at 11:31:34AM +0000, Dipendra Khadka wrote:
+> > > > Add error pointer check after calling otx2_mbox_get_rsp().
 > > > >
-> > > > Core implementation that is not used by any upstream code is rarely
-> > > > right thing to do. It is not tested, complicates the code and mostl=
-y
-> > > > overlooked when patches are reviewed. The better way will be to ext=
-end
-> > > > the stack when this feature will be actually used and needed.
 > > >
-> > > This is our tradeoff, an API should be fully designed from the
-> > > beginning, everything else is bad design and will likely result
-> > > in band aids (as it happens here). The API can be connected to
-> > > netdevsim to test it.
+> > > Hi Dipendra,
 > > >
-> > > Currently the combination of xfrm interfaces and packet offload
-> > > is just broken.
+> > > Please add a fixes tag here (no blank line between it and your
+> > > Signed-off-by line).
+> > > > Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
+> > >
+> > > As you have posted more than one patch for this driver, with very similar,
+> > > not overly complex or verbose changes, it might make sense to combine them
+> > > into a single patch. Or, if not, to bundle them up into a patch-set with a
+> > > cover letter.
+> > >
+> > > Regarding the patch subject, looking at git history, I think
+> > > an appropriate prefix would be 'octeontx2-pf:'. I would go for
+> > > something like this:
+> > >
+> > >   Subject: [PATCH net v2] octeontx2-pf: handle otx2_mbox_get_rsp errors
+> > >
 > >
-> > I don't think that it is broken.
+> > If I bundle all the patches for the
+> > drivers/net/ethernet/marvell/octeontx2/ , will this subject without v2
+> > work? Or do I need to change anything? I don't know how to send the
+> > patch-set with the cover letter.
 >
-> I don't see anything that prevents you from offloading a SA
-> with an xfrm interface ID. The binding to the interface is
-> just ignored in that case.
+> Given that one of the patches is already at v2, probably v3 is best.
 >
-> > It is just not implemented. XFRM
-> > interfaces are optional field, which is not really popular in the
-> > field.
+> If you use b4, it should send a cover letter if the series has more than 1
+> patch.  You can use various options to b4 prep to set the prefix
+> (net-next), version, and edit the cover (letter).  And you can use various
+> options to b4 send, such as -d, to test your submission before sending it
+> to the netdev ML.
 >
-> It is very popular, I know of more than a billion devices that
-> are using xfrm interfaces.
+
+I did not get this -d and testing? testing in net-next and sending to net?
+
+> Alternatively the following command will output 3 files: a cover letter and
+> a file for each of two patches, with v3 and net-next in the subject of each
+> file. You can edit these files and send them using git send-email.
+>
+> git format-patch --cover-letter -2 -v3 --subject-prefix="PATCH net-next"
+>
+
+Should I send it to net-next or net?
+
+Thank you so much for teaching me all these.
+
+> >
+> > > As for the code changes themselves, module the nits below, I agree the
+> > > error handling is consistent with that elsewhere in the same functions, and
+> > > is correct.
+> > >
+> > > > ---
+> > > >  .../ethernet/marvell/octeontx2/nic/otx2_ethtool.c    | 12 ++++++++++++
+> > > >  1 file changed, 12 insertions(+)
+> > > >
+> > > > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+> > > > index 0db62eb0dab3..36a08303752f 100644
+> > > > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+> > > > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+> > > > @@ -343,6 +343,12 @@ static void otx2_get_pauseparam(struct net_device *netdev,
+> > > >       if (!otx2_sync_mbox_msg(&pfvf->mbox)) {
+> > > >               rsp = (struct cgx_pause_frm_cfg *)
+> > > >                      otx2_mbox_get_rsp(&pfvf->mbox.mbox, 0, &req->hdr);
+> > > > +
+> > >
+> > > nit: No blank line here.
+> > >
+> > > > +             if (IS_ERR(rsp)) {
+> > > > +                     mutex_unlock(&pfvf->mbox.lock);
+> > > > +                     return;
+> > > > +             }
+> > > > +
+> >
+> > If the above blank line after the check is ok or do I have to remove
+> > this as well?
+>
+> Please leave the blank line after the check (here).
 >
 > >
-> > > Unfortunalely this patch does not fix it.
-> > >
-> > > I think we need to do three things:
-> > >
-> > > - Fix xfrm interfaces + packet offload combination
-> > >
-> > > - Extend netdevsim to support packet offload
-> > >
-> > > - Extend the API for xfrm interfaces (and everything
-> > >   else we forgot).
-> >
-> > This is the most challenging part. It is not clear what should
-> > we extend if customers are not asking for it and they are extremely
-> > happy with the current IPsec packet offload state.
->
-> We just need to push the information down to the driver,
-> and reject the offload if not supported.
->
-> >
-> > BTW, I'm aware of one gap, which is not clear how to handle, and
-> > it is combination of policy sockets and offload.
->
-> Socket policies are a bit special as they are configured by
-> the application that uses the socket. I don't think that
-> we can even configure offload for a socket policy.
->
+> > > >               pause->rx_pause = rsp->rx_pause;
+> > > >               pause->tx_pause = rsp->tx_pause;
+> > > >       }
+
+Best regards,
+Dipendra Khadka
 
