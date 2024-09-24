@@ -1,152 +1,173 @@
-Return-Path: <netdev+bounces-129600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C9AD984B5D
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 20:56:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 031C2984BCB
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 21:51:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A763F285432
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 18:56:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A9A91F23AF3
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 19:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D66A1ACDF2;
-	Tue, 24 Sep 2024 18:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC7884E11;
+	Tue, 24 Sep 2024 19:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QexDgS69"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PVg3USFI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8131AC89B;
-	Tue, 24 Sep 2024 18:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0049A40BF2;
+	Tue, 24 Sep 2024 19:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727204205; cv=none; b=MR4zMWoB0ejKnlU5Of7Z+Hy3nrYZeXUZn/HD4CbfCVGyL93sbX9EVZXkUEUtiuAEYpoPsANNwNTiO80kGgO/oKLw2Dt9+okg1fR1WHxtmE3WfQ6mwgrOiaw3Zjz0/xwOMchXBLg7dwE9pUIdeEVZHxAFk+bx7uv8t9gJ2nuHJGU=
+	t=1727207456; cv=none; b=N88nEuWu+n+xUQWSfFLebPbhTm2eEAwIRlSZrKnWyy8kx8QHxyPjnrUyoD+Byo1DmyHBG3JgKipJxiOSxyF1Kmt6sI3XSf3YXfHYHXYCnlwdso60Xgr1PO0sQclJZQVvkPmFF9pvrdHfgxhJnrx1K4LEJOX9tJVVI7uAgvTEEcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727204205; c=relaxed/simple;
-	bh=wFLt9rc4O/7yY6+mfWRmtwX1ysyWg5T6O/LDi8DovNg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=maArkmfH+NxTRkRvJDXT/G8pZ+Pu7SsxaQSG+xRWNmuCl4MqcQFoTupWJimBoO6tOcQqwgzUyJ9f+k2nHfEBxrKimeKbljW2uHio+T2k+E3v6ur70ZMCIM11NBXtGrYVnBhUR7Tssecn0rTFk2lIX/BZHlJp+rQ22MgcX6Z5VCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QexDgS69; arc=none smtp.client-ip=209.85.210.171
+	s=arc-20240116; t=1727207456; c=relaxed/simple;
+	bh=YcKqjUQWGYnWxJY+NKRQhkbgtYCI8SyZyH4HHCGKXTE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=QW3Ca0vOZdAEc2MI5+oXgAB7MNnHFsfj//l6KGgu6RdkQERRieyTGA2V0fmae23m1ad9PQCSzjXW5Wq3AMTmIKQqRP3mo8GQYDQzH1AkGXOip0XLzOP05GFMDGURvge31HbXUB8dVFRvuNsQVvjuqlO01+MyWuYVQAqj4ngA6U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PVg3USFI; arc=none smtp.client-ip=209.85.222.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-718e9c8bd83so118044b3a.1;
-        Tue, 24 Sep 2024 11:56:43 -0700 (PDT)
+Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-846c36009d5so1611062241.2;
+        Tue, 24 Sep 2024 12:50:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727204203; x=1727809003; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XGWBFebmpJmV+R26c0gSC6KtxYqFu9ytlyo4h+InHl8=;
-        b=QexDgS69Im07CYh/WUtXev26TUh0jKhmYenGBHBhdPxlJbnmK53oeGykhyCzNbllsq
-         zXWC2sVI3FqqrRD50c5++9cTYOp1D3K1MJHkeX7uAZxurelvaF2cPFVRgsaEzCDQlIhR
-         reoxsLf7k/1K78iVUakGetuGM/G8HW0Ha08atjrTPZMLHkN/B8NyIVdmgiML5EOXwfUX
-         3xV+NhKZtK1evtiEJy4wIUVvlyzbfm2qEr9pfuC3xOA5/CNy/LMFPl8OrY8HnV2lGeb1
-         SH8HNFdK8yBFiIrILwMQRVew0ACS8jy0fLuzK/9L2fSg5zTWZJEKKukvnKH2PalQySgP
-         vM3A==
+        d=gmail.com; s=20230601; t=1727207454; x=1727812254; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A9fLKAgs4Ts7Ftd9D/PvaKgR2A/xj7hugr2Nvm3u+J0=;
+        b=PVg3USFIdo+9jRF0zpi3s7Vc0CYYdWU/116hNsoj1GTwtlCFfz/i9gJ2pOjduUYake
+         dpQ1XcVqRGujb7eG066qQ/M/DduuqoIU1g7EWdSOrWrXWmLfzaoWeo67Ms+du4Nj7Omk
+         Xnhl2SNEWj4p+xJ/WmhJ5nAwKezoZ1dRYFS27YSvaE74P46jaMwiFw+G4EQazB8FR88b
+         NB000kP5yT0rLEgOburszG0l1LcI0NLO05Zj2voWN4Dx8a25Q3lERvFKyTF00FptPiDz
+         53V8F+QMQwBjyN6Pi8moP56xpzMU4szHNYI0B6QmcZ9BAjfgn6ijLf5M9VmoBZTuZ73g
+         i3rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727204203; x=1727809003;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=XGWBFebmpJmV+R26c0gSC6KtxYqFu9ytlyo4h+InHl8=;
-        b=i73Hy3sLwvNp17tvbs9vUHcPBfkcgWHN+OZ+7zqBp+UHTFTemJojIqCna/O3dTBN6J
-         NKqX1ZMdok+JKiBLnfAmDeOA5A4XJSScwJck72o4BVXB+QeN33o/U6cyoMBy0S6OHzHD
-         iz3PmwqwivgR6GKSn80WrtIqeYlJKWB1NlaAq2djkKefwvjIWJJB8KNC0FtO9FlKJu4A
-         07gMLhhzgHSvEoE8jj2BmpQOvy8ic9dLxwS+9DvyVeWNyHToBbyrVSbXUvN+qpS4/d1X
-         tytHdBcQO8QvsfN6mx0xpbjG1H+4UpGRiYdlDL4i0Ay5MmzHLeQgp+wJq3gt34g5blG/
-         Lp6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUCM0Ckm271I4EtoGWCkGOjYUgctIytu6DJWXwOcLpi+OcxRuGZVsR56LqXeL+XoBMvkaY0ysUo@vger.kernel.org, AJvYcCVHcdtru0wB7weS6mw1jXH9cd3kh2msiAxFdY+xt/9nCj+7Tf9FPi06Zxkpsr9tyQA9XCPYBY69NzJn3eI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFbD5rj3HR2unIaSZuTZxmHAowtOajdtXFsPglFTkxji5ppSEb
-	qMkPHpdXuFkwg31YQDQcYDeUJPsq0H9pM7nPXTM48iJIXKwEsM8S3lBoAvaN
-X-Google-Smtp-Source: AGHT+IHAB1e9ZwWeTlYKqtVjDZLTkjbvhds4k0Z9YHj5Zj2Cdr3K0pjtv7WpkeDr4Kk4HYrI/Ey3xA==
-X-Received: by 2002:a05:6a00:17a1:b0:706:aa39:d5c1 with SMTP id d2e1a72fcca58-71b0b21dda5mr288843b3a.8.1727204202824;
-        Tue, 24 Sep 2024 11:56:42 -0700 (PDT)
-Received: from ubuntu.worldlink.com.np ([27.34.65.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-71afc97c1f7sm1481932b3a.156.2024.09.24.11.56.38
+        d=1e100.net; s=20230601; t=1727207454; x=1727812254;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=A9fLKAgs4Ts7Ftd9D/PvaKgR2A/xj7hugr2Nvm3u+J0=;
+        b=eCcs1tTccodqYjjqEYyJ/cLVlc6NIqoo3q0Q+Ju2N4LK5dSCGUUEC53YuhYkmov1aT
+         qG68ZTZo5wdC9dNO4+77vkDHMaIKZh5ApwlJPKAbDpBMI9AhvKyNqwedJM48a+IoGfvQ
+         Q6X6MDKHRi05IP6bPICJeZVVoF1yGGyiAmni7TBPzttfg3PwAObrviPGddiwIatGCQs6
+         sNQAX5Ob5kK8+BL8UegcpA0byd/cOUzjRMEatr1JDc+ZZ9n0pC1GNNAyrUqtPEDKXoRf
+         jknHKCbxTxL6CcXN0R9ydLoqBafsYuDHwJNDZLVncmz/IvT7jaNtoAjvGcRTi3lkNwzB
+         Km8w==
+X-Forwarded-Encrypted: i=1; AJvYcCWD7xpvJZP2U/rDPOqQDR09Z1qtMhumS4B7Y9EWC9nBcZbNgVFFqzlTqRLV+4e3K4qEXVNe+Ts=@vger.kernel.org, AJvYcCXFN8HPJHdpvOjVzvG+bqPoOgE7iJdP7AbPypMhlEqsDFhUi662cfSlUqR9ZeDo0RI2hJOB/84N@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx9HsWHUDFM+E7FquETVT/atDcOEz3Ab1udt5pO+UsM2V46o5J3
+	8C6mV8PBlybkC2SU99A7b0Fs/OuqFUgvEZE4GS3I9ysZ67Qs0BS/
+X-Google-Smtp-Source: AGHT+IEDvwydDPMyvQlQ1uj4ntKAx3iktmnPdXlRSl6L6idBnNQqiPHXls5Lb+3ECM7z+lJAxOZN+w==
+X-Received: by 2002:a05:6102:5121:b0:49b:dd03:2476 with SMTP id ada2fe7eead31-4a15dd1d5eemr839306137.21.1727207453655;
+        Tue, 24 Sep 2024 12:50:53 -0700 (PDT)
+Received: from localhost (23.67.48.34.bc.googleusercontent.com. [34.48.67.23])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb0f4c2f51sm9446786d6.31.2024.09.24.12.50.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2024 11:56:42 -0700 (PDT)
-From: Dipendra Khadka <kdipendra88@gmail.com>
-To: florian.fainelli@broadcom.com,
-	bcm-kernel-feedback-list@broadcom.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	f.fainelli@gmail.com,
-	horms@kernel.org
-Cc: Dipendra Khadka <kdipendra88@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 net] net: systemport: Add error pointer checks in bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
-Date: Tue, 24 Sep 2024 18:56:33 +0000
-Message-ID: <20240924185634.2358-1-kdipendra88@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Tue, 24 Sep 2024 12:50:53 -0700 (PDT)
+Date: Tue, 24 Sep 2024 15:50:52 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Felix Fietkau <nbd@nbd.name>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ stable@vger.kernel.org, 
+ maze@google.com, 
+ shiming.cheng@mediatek.com, 
+ daniel@iogearbox.net, 
+ lena.wang@mediatek.com, 
+ herbert@gondor.apana.org.au, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <66f3181c4fd22_3382d294b6@willemb.c.googlers.com.notmuch>
+In-Reply-To: <da09e77a-a293-41b0-a46f-861dd5775ba2@nbd.name>
+References: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
+ <da09e77a-a293-41b0-a46f-861dd5775ba2@nbd.name>
+Subject: Re: [PATCH net] gso: fix gso fraglist segmentation after pull from
+ frag_list
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Add error pointer checks in bcm_sysport_map_queues() and
-bcm_sysport_unmap_queues() after calling dsa_port_from_netdev().
+Felix Fietkau wrote:
+> On 22.09.24 17:03, Willem de Bruijn wrote:
+> > From: Willem de Bruijn <willemb@google.com>
+> > 
+> > Detect gso fraglist skbs with corrupted geometry (see below) and
+> > pass these to skb_segment instead of skb_segment_list, as the first
+> > can segment them correctly.
+> > 
+> > Valid SKB_GSO_FRAGLIST skbs
+> > - consist of two or more segments
+> > - the head_skb holds the protocol headers plus first gso_size
+> > - one or more frag_list skbs hold exactly one segment
+> > - all but the last must be gso_size
+> > 
+> > Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
+> > modify these skbs, breaking these invariants.
+> > 
+> > In extreme cases they pull all data into skb linear. For UDP, this
+> > causes a NULL ptr deref in __udpv4_gso_segment_list_csum at
+> > udp_hdr(seg->next)->dest.
+> > 
+> > Detect invalid geometry due to pull, by checking head_skb size.
+> > Don't just drop, as this may blackhole a destination. Convert to be
+> > able to pass to regular skb_segment.
+> > 
+> > Link: https://lore.kernel.org/netdev/20240428142913.18666-1-shiming.cheng@mediatek.com/
+> > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+> > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > Cc: stable@vger.kernel.org
+> > 
+> > ---
+> > diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+> > index d842303587af..e457fa9143a6 100644
+> > --- a/net/ipv4/udp_offload.c
+> > +++ b/net/ipv4/udp_offload.c
+> > @@ -296,8 +296,16 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+> >   		return NULL;
+> >   	}
+> >   
+> > -	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
+> > -		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+> > +	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
+> > +		 /* Detect modified geometry and pass these to skb_segment. */
+> > +		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
+> > +			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+> > +
+> > +		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
+> > +		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
+> > +		gso_skb->csum_offset = offsetof(struct udphdr, check);
+> > +		gso_skb->ip_summed = CHECKSUM_PARTIAL;
+> > +	}
+> 
+> It seems to me that the TCP code would need something similar.
 
-Fixes: d156576362c0 ("net: systemport: Establish lower/upper queue mapping")
-Fixes: da106a140f9c ("net: systemport: Unmap queues upon DSA unregister event")
-Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
----
-v3:
- - Updated patch subject
- - Updated patch description
- - Added Fixes: tags
- - Fixed typo from PRT_ERR to PTR_ERR
- - Error is checked just after  assignment
-v2: https://lore.kernel.org/all/20240923053900.1310-1-kdipendra88@gmail.com/
- - Change the subject of the patch to net
-v1: https://lore.kernel.org/all/20240922181739.50056-1-kdipendra88@gmail.com/
- drivers/net/ethernet/broadcom/bcmsysport.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+I think you're right, thanks.
 
-diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-index c9faa8540859..493702fdabc3 100644
---- a/drivers/net/ethernet/broadcom/bcmsysport.c
-+++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-@@ -2331,11 +2331,15 @@ static const struct net_device_ops bcm_sysport_netdev_ops = {
- static int bcm_sysport_map_queues(struct net_device *dev,
- 				  struct net_device *slave_dev)
- {
--	struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
- 	struct bcm_sysport_priv *priv = netdev_priv(dev);
- 	struct bcm_sysport_tx_ring *ring;
- 	unsigned int num_tx_queues;
- 	unsigned int q, qp, port;
-+	struct dsa_port *dp;
-+
-+	dp = dsa_port_from_netdev(slave_dev);
-+	if (IS_ERR(dp))
-+		return PTR_ERR(dp);
+Separate patch, as different Fixes, of course.
+
+> Do you think the same approach would work there as well?
+
+tcp4_gro_complete seems to mirror udp4_gro_receive in returning early
+before setting up checksum offload. So likely yes.
+
+The script I shared to reproduce for UDP can hopefully be reused
+easily to also generate these packets with TCP.
  
- 	/* We can't be setting up queue inspection for non directly attached
- 	 * switches
-@@ -2386,11 +2390,15 @@ static int bcm_sysport_map_queues(struct net_device *dev,
- static int bcm_sysport_unmap_queues(struct net_device *dev,
- 				    struct net_device *slave_dev)
- {
--	struct dsa_port *dp = dsa_port_from_netdev(slave_dev);
- 	struct bcm_sysport_priv *priv = netdev_priv(dev);
- 	struct bcm_sysport_tx_ring *ring;
- 	unsigned int num_tx_queues;
- 	unsigned int q, qp, port;
-+	struct dsa_port *dp;
-+
-+	dp = dsa_port_from_netdev(slave_dev);
-+	if (IS_ERR(dp))
-+		return PTR_ERR(dp);
- 
- 	port = dp->index;
- 
--- 
-2.43.0
+> Thanks,
+> 
+> - Felix
+
 
 
