@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-129474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BC2B984134
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 10:57:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66E12984140
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 10:58:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E2991F23BD2
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 08:57:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88B181C22AFE
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 08:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18501547C0;
-	Tue, 24 Sep 2024 08:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8636154BF8;
+	Tue, 24 Sep 2024 08:57:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="qvZu7605"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="p3qKhODx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B3D154425
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 08:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD1514F9F7
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 08:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727168218; cv=none; b=D0s9/Q1KTgU0mX7C2hItXt4M+ZBYD7xPvDGOnKDmwQBq3k3e4KQscTnkqKhmlKoSNZ2+HX5Azsr71bWYEROyQFoBnxkHhddVLTSGv6zPu/J1js0tvJmm5OWrDU3FvlRv+neSUhSEVrd4mBKHw6CAXD7Ry8HmMtghbq8S3PB8/f0=
+	t=1727168275; cv=none; b=XuRpwjjuWDdiFL7kt41/VOzr6vCrTc+4ffR6In1tCZpwwEYOCPDSsAEj5XIT5YkpMFuhRrlDV3sZwjrJoNhR1bA734pmmbyn1VbH1I7600Bg4tMrw/dVFDqzrYmSLofZzzOyCL0/DOhiiBP5ur8968p8aBlG7WHolCGnGtum5dQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727168218; c=relaxed/simple;
-	bh=FY8V5GzsCDooZpLgfnYKx2RnxQCDxyemvSKkxopjkZg=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:References:
-	 In-Reply-To:Content-Type; b=LSVfPcDYZcXhPfK6hYQ6A9I9LUGrIuM2gW8aSezbEiS0IRSaQtVYTLW1AwvdQ2cIBz12kBGQis4YlWU9rL+v+INI5TqmNXNdb11RjLLyCEGdk8eLhtjgDQNd9uHgOtmnpm4NkPTmvHxFhvoNmvmbZOoPN5ytnW4HrmqzvfJVIeQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=qvZu7605; arc=none smtp.client-ip=209.85.218.45
+	s=arc-20240116; t=1727168275; c=relaxed/simple;
+	bh=mh04sjaOPih7MOeQI3jPmPtO86AVGGEQ3PtVai8zZMo=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=T2uxEqDXlpSHieqlDK6M0WzKCHx47ixSthFA3jcu85mcDBB9HpthkO9PUp13vsomJARSbltmM2yBUZtRob9rtPVCw2Z5DrhC8oDSD6ulAcYgnpclf9beWCSxYJr9mI5C8LyhFYbfpQzYtwk/Vw6VpndXmb3vUdRoZj8ZjCCRgz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=p3qKhODx; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a8d29b7edc2so785832166b.1
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 01:56:56 -0700 (PDT)
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5c5cc65a8abso1221766a12.3
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 01:57:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727168215; x=1727773015; darn=vger.kernel.org;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727168272; x=1727773072; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:subject:from:user-agent:mime-version:date:message-id:from:to:cc
+         :to:from:subject:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mTOtY69+D3laLvm3lofHZC4VOFk5IqvXXwlXV/C57AY=;
-        b=qvZu7605u2skjjo2CtT/+G56Rekuulz+0RtfbGHJoVpCXnjJ/1CPbhaBMGyocs5vKC
-         1h84EjTGBsKSZFpbVp95J1NN9MnSU9O87AhPVaMnbTmEwb/0jKznE0HuNe4//ql5RXsO
-         5ilZe+wYyz5AU86SndYF73uLleY8r5mJwZjIsgQOEoe63wcf0TEj1xojblGsUmsVBWHI
-         NYbKkUvTrFbGl0+VLImAfW3+MmpxZAuIj1dFjmop8Ea4QsCG5jqNGdG8j65CALManQCX
-         XSLvtJJbWJn/OAOtrRdyHW/MBI0UkLXf7BFwTqTf3+pSpMjwlI72egRpqNHbrDiCJPm6
-         7b0A==
+        bh=7dl3VbOeQEPqA+/iXHawLuvaqLpuId6udz2mYLPwgmE=;
+        b=p3qKhODxt4kABgl0ErQqYgC0sEgD+fV1QeBYDmJ+7fg5b27rGSFxtXRYXp7rbb7KqC
+         JYf3wDXfQP9bH7cHACqrMk3QH6ja8xwbyH6TLtRKm/UjgPdwsf78cC/FSXvXjbROf/D9
+         JY6d955BqIpr93csYB3IJHdePCizw9pwmDEVhagmuHyrT4sORBcF+5RCriDJVFdtDIv5
+         g9zZT5+cA6u8fB+M1sWyrTHaPsgmQZZAyiqM3qbxdo1PzQTwW2mhjWAbLMa+fpXgBYzX
+         KrBRLYkp4QLw7LykpJXgpfqxkQAn7GE5DeOLJ59wOZSXgtDJIrin7HmATtkkMlrvXlrG
+         1oig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727168215; x=1727773015;
+        d=1e100.net; s=20230601; t=1727168272; x=1727773072;
         h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:subject:from:user-agent:mime-version:date:message-id
+         :to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mTOtY69+D3laLvm3lofHZC4VOFk5IqvXXwlXV/C57AY=;
-        b=dSfs2S+9bAOYvLO9afxmH7amf9Z7XAm9av2Mu2jgDYBHoHAn5jHGOy+Tq/E+vqD7UB
-         U+uxCSPUeo+meBmM4bMMklhg6i1FhGK+A/eGO2pDk02+9jzIbmTHlJtc3gtom2+Xhx8k
-         4LoKCq4S0UPcMIGs0huairjDqGisdwVX73/qQN1wFZbXFbWbLQnDSRHRggbEBNzozreN
-         F7kFTi5VMODn8MByIqzM39XE9uyuZpgQi77rJdfszxsJyjelgf3WO3y0yACBxZXMDjwn
-         FthvGCQKrZ9Q5FKmRk1boYQ4o2ZTVeHcbHwCR+8a4/EjO7+hgpGTOtnQeT3ADZFUp5Vk
-         GSCA==
-X-Forwarded-Encrypted: i=1; AJvYcCViNaGh2GSQhSwJmMugi7JaR+PleQiakcBJaxBlXaWMyGGHMXSD/nhgrnXn+dex/MgZmveNNRU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywc8Iqn4HzYyg/O/vuD4wY08gkNQzS20ZKktQtBbDCugAU1j1mk
-	HYpRCFTULRm4nxUzTwtpUJri0HUbuCauoLv/HZ3gqHoxJulDXGv4WOecw+FyQUw=
-X-Google-Smtp-Source: AGHT+IF4rso5jI+pMGJ6HEm3qXucrD9xt3jHbVEmxBUrmDkUnfPORUY8Y/d/DncPI/Tyw6+CRzGKfQ==
-X-Received: by 2002:a17:906:bc12:b0:a86:ad3c:6d2d with SMTP id a640c23a62f3a-a90d5838cf6mr1218070666b.61.1727168214811;
-        Tue, 24 Sep 2024 01:56:54 -0700 (PDT)
+        bh=7dl3VbOeQEPqA+/iXHawLuvaqLpuId6udz2mYLPwgmE=;
+        b=YpvC28NUMpYwnxCbSHjuM73NVUXEcB54LECNsB8vGxYee2Lq//GhZb5xHXpEsm4awz
+         0MblrLmiUdikZqAQ1nanVfuGiLb5AX1tpYzwbKJX6sh0K+7BpWaPSVBtq36gQZ+ZDtVk
+         ZZpMw6XF/IvdKRVqN0gKVrOQWHgGG3yGLP3D2y8ZZ1DGhxHMCpAxsvJ22vDZ1j/KAL0z
+         UE0Nje/eJ/nf8IcJEX/DeZw7IQA8Du0JxuHDE0GMGnBGu2cHJgaZowfT1yeuhSTWhs7v
+         kiaDlrQCnv5vYRJyP02jemY9AfyUwLUCy97S6qrNZXv151ps4bdrnZBKDWtyfiXRn/rV
+         Xr7g==
+X-Forwarded-Encrypted: i=1; AJvYcCW87JTj9ItURfKhVnoindZYxiVqa951WKisQ3XckkdVy1UIVlduDCuRfkYuD2eKjbsZqnTpk9U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRU2P1sfl2NgcCoVN5ussyNYTzgn9Oo93euFNhr40z04+VaAii
+	Vbjywt9EIp4Xr3M32UpoJ8SXtdWEpTF/YKCQ7Tj/m0I2nmX0keYAhsBAptzN/3s=
+X-Google-Smtp-Source: AGHT+IGvBs7UGJ8azIbhKgkW3DXwBRfi2TYtP3TyQvaO4rt/p1iqkfXXvt9HpsTnFXiuDAZIfLYj4Q==
+X-Received: by 2002:a17:907:1c29:b0:a8d:483f:5199 with SMTP id a640c23a62f3a-a90d59994d7mr1368886566b.58.1727168271803;
+        Tue, 24 Sep 2024 01:57:51 -0700 (PDT)
 Received: from [10.241.20.238] ([193.32.29.227])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9392f4f8a6sm59038566b.50.2024.09.24.01.56.53
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9392f4fb94sm58762266b.58.2024.09.24.01.57.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Sep 2024 01:56:54 -0700 (PDT)
-Message-ID: <694a8f81-616e-47d0-8185-5b73626c4109@daynix.com>
-Date: Tue, 24 Sep 2024 10:56:52 +0200
+        Tue, 24 Sep 2024 01:57:51 -0700 (PDT)
+Message-ID: <cc2bc65b-d75a-4232-a0bd-9c759aba8aba@daynix.com>
+Date: Tue, 24 Sep 2024 10:57:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +76,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
 Subject: Re: [PATCH RFC v3 7/9] tun: Introduce virtio-net RSS
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
 To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
  Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -92,300 +92,311 @@ To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 References: <20240915-rss-v3-0-c630015db082@daynix.com>
  <20240915-rss-v3-7-c630015db082@daynix.com>
  <66ead59563da7_29b98629486@willemb.c.googlers.com.notmuch>
+ <694a8f81-616e-47d0-8185-5b73626c4109@daynix.com>
 Content-Language: en-US
-In-Reply-To: <66ead59563da7_29b98629486@willemb.c.googlers.com.notmuch>
+In-Reply-To: <694a8f81-616e-47d0-8185-5b73626c4109@daynix.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2024/09/18 15:28, Willem de Bruijn wrote:
-> Akihiko Odaki wrote:
->> RSS is a receive steering algorithm that can be negotiated to use with
->> virtio_net. Conventionally the hash calculation was done by the VMM.
->> However, computing the hash after the queue was chosen defeats the
->> purpose of RSS.
+
+
+On 2024/09/24 10:56, Akihiko Odaki wrote:
+> On 2024/09/18 15:28, Willem de Bruijn wrote:
+>> Akihiko Odaki wrote:
+>>> RSS is a receive steering algorithm that can be negotiated to use with
+>>> virtio_net. Conventionally the hash calculation was done by the VMM.
+>>> However, computing the hash after the queue was chosen defeats the
+>>> purpose of RSS.
+>>>
+>>> Another approach is to use eBPF steering program. This approach has
+>>> another downside: it cannot report the calculated hash due to the
+>>> restrictive nature of eBPF steering program.
+>>>
+>>> Introduce the code to perform RSS to the kernel in order to overcome
+>>> thse challenges. An alternative solution is to extend the eBPF steering
+>>> program so that it will be able to report to the userspace, but I didn't
+>>> opt for it because extending the current mechanism of eBPF steering
+>>> program as is because it relies on legacy context rewriting, and
+>>> introducing kfunc-based eBPF will result in non-UAPI dependency while
+>>> the other relevant virtualization APIs such as KVM and vhost_net are
+>>> UAPIs.
+>>>
+>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>> ---
+>>>   drivers/net/tun.c           | 119 
+>>> +++++++++++++++++++++++++++++++++++++++-----
+>>>   include/uapi/linux/if_tun.h |  27 ++++++++++
+>>>   2 files changed, 133 insertions(+), 13 deletions(-)
+>>>
+>>> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+>>> index b8fcd71becac..5a429b391144 100644
+>>> --- a/drivers/net/tun.c
+>>> +++ b/drivers/net/tun.c
+>>> @@ -175,6 +175,9 @@ struct tun_prog {
+>>>   struct tun_vnet_hash_container {
+>>>       struct tun_vnet_hash common;
+>>> +    struct tun_vnet_hash_rss rss;
+>>> +    __be32 rss_key[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+>>> +    u16 rss_indirection_table[];
+>>>   };
+>>>   /* Since the socket were moved to tun_file, to preserve the 
+>>> behavior of persist
+>>> @@ -227,7 +230,7 @@ struct veth {
+>>>   };
+>>>   static const struct tun_vnet_hash tun_vnet_hash_cap = {
+>>> -    .flags = TUN_VNET_HASH_REPORT,
+>>> +    .flags = TUN_VNET_HASH_REPORT | TUN_VNET_HASH_RSS,
+>>>       .types = VIRTIO_NET_SUPPORTED_HASH_TYPES
+>>>   };
+>>> @@ -591,6 +594,36 @@ static u16 tun_ebpf_select_queue(struct 
+>>> tun_struct *tun, struct sk_buff *skb)
+>>>       return ret % numqueues;
+>>>   }
+>>> +static u16 tun_vnet_rss_select_queue(struct tun_struct *tun,
+>>> +                     struct sk_buff *skb,
+>>> +                     const struct tun_vnet_hash_container *vnet_hash)
+>>> +{
+>>> +    struct tun_vnet_hash_ext *ext;
+>>> +    struct virtio_net_hash hash;
+>>> +    u32 numqueues = READ_ONCE(tun->numqueues);
+>>> +    u16 txq, index;
+>>> +
+>>> +    if (!numqueues)
+>>> +        return 0;
+>>> +
+>>> +    if (!virtio_net_hash_rss(skb, vnet_hash->common.types, 
+>>> vnet_hash->rss_key,
+>>> +                 &hash))
+>>> +        return vnet_hash->rss.unclassified_queue % numqueues;
+>>> +
+>>> +    if (vnet_hash->common.flags & TUN_VNET_HASH_REPORT) {
+>>> +        ext = skb_ext_add(skb, SKB_EXT_TUN_VNET_HASH);
+>>> +        if (ext) {
+>>> +            ext->value = hash.value;
+>>> +            ext->report = hash.report;
+>>> +        }
+>>> +    }
+>>> +
+>>> +    index = hash.value & vnet_hash->rss.indirection_table_mask;
+>>> +    txq = READ_ONCE(vnet_hash->rss_indirection_table[index]);
+>>> +
+>>> +    return txq % numqueues;
+>>> +}
+>>> +
+>>>   static u16 tun_select_queue(struct net_device *dev, struct sk_buff 
+>>> *skb,
+>>>                   struct net_device *sb_dev)
+>>>   {
+>>> @@ -603,7 +636,10 @@ static u16 tun_select_queue(struct net_device 
+>>> *dev, struct sk_buff *skb,
+>>>       } else {
+>>>           struct tun_vnet_hash_container *vnet_hash = 
+>>> rcu_dereference(tun->vnet_hash);
+>>> -        ret = tun_automq_select_queue(tun, skb, vnet_hash);
+>>> +        if (vnet_hash && (vnet_hash->common.flags & TUN_VNET_HASH_RSS))
+>>> +            ret = tun_vnet_rss_select_queue(tun, skb, vnet_hash);
+>>> +        else
+>>> +            ret = tun_automq_select_queue(tun, skb, vnet_hash);
+>>>       }
+>>>       rcu_read_unlock();
+>>> @@ -3085,13 +3121,9 @@ static int tun_set_queue(struct file *file, 
+>>> struct ifreq *ifr)
+>>>   }
+>>>   static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog 
+>>> __rcu **prog_p,
+>>> -            void __user *data)
+>>> +            int fd)
+>>>   {
+>>>       struct bpf_prog *prog;
+>>> -    int fd;
+>>> -
+>>> -    if (copy_from_user(&fd, data, sizeof(fd)))
+>>> -        return -EFAULT;
+>>>       if (fd == -1) {
+>>>           prog = NULL;
+>>> @@ -3157,6 +3189,7 @@ static long __tun_chr_ioctl(struct file *file, 
+>>> unsigned int cmd,
+>>>       int ifindex;
+>>>       int sndbuf;
+>>>       int vnet_hdr_sz;
+>>> +    int fd;
+>>>       int le;
+>>>       int ret;
+>>>       bool do_notify = false;
+>>> @@ -3460,11 +3493,27 @@ static long __tun_chr_ioctl(struct file 
+>>> *file, unsigned int cmd,
+>>>           break;
+>>>       case TUNSETSTEERINGEBPF:
+>>> -        ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
+>>> +        if (get_user(fd, (int __user *)argp)) {
+>>> +            ret = -EFAULT;
+>>> +            break;
+>>> +        }
+>>> +
+>>> +        vnet_hash = rtnl_dereference(tun->vnet_hash);
+>>> +        if (fd != -1 && vnet_hash && (vnet_hash->common.flags & 
+>>> TUN_VNET_HASH_RSS)) {
+>>> +            ret = -EBUSY;
+>>> +            break;
+>>> +        }
+>>> +
+>>> +        ret = tun_set_ebpf(tun, &tun->steering_prog, fd);
+>>>           break;
+>>>       case TUNSETFILTEREBPF:
+>>> -        ret = tun_set_ebpf(tun, &tun->filter_prog, argp);
+>>> +        if (get_user(fd, (int __user *)argp)) {
+>>> +            ret = -EFAULT;
+>>> +            break;
+>>> +        }
+>>> +
+>>> +        ret = tun_set_ebpf(tun, &tun->filter_prog, fd);
+>>>           break;
+>>>       case TUNSETCARRIER:
+>>> @@ -3496,10 +3545,54 @@ static long __tun_chr_ioctl(struct file 
+>>> *file, unsigned int cmd,
+>>>               break;
+>>>           }
+>>> -        vnet_hash = kmalloc(sizeof(vnet_hash->common), GFP_KERNEL);
+>>> -        if (!vnet_hash) {
+>>> -            ret = -ENOMEM;
+>>> -            break;
+>>> +        if (vnet_hash_common.flags & TUN_VNET_HASH_RSS) {
+>>> +            struct tun_vnet_hash_rss rss;
+>>> +            size_t indirection_table_size;
+>>> +            size_t key_size;
+>>> +            size_t size;
+>>> +
+>>> +            if (tun->steering_prog) {
+>>> +                ret = -EBUSY;
+>>> +                break;
+>>> +            }
+>>> +
+>>> +            if (copy_from_user(&rss, argp, sizeof(rss))) {
+>>> +                ret = -EFAULT;
+>>> +                break;
+>>> +            }
+>>> +            argp = (struct tun_vnet_hash_rss __user *)argp + 1;
+>>> +
+>>> +            indirection_table_size = 
+>>> ((size_t)rss.indirection_table_mask + 1) * 2;
 >>
->> Another approach is to use eBPF steering program. This approach has
->> another downside: it cannot report the calculated hash due to the
->> restrictive nature of eBPF steering program.
+>> Why make uapi a mask rather than a length?
+> 
+> It follows the virtio specification. It is actually used as a mask in 
+> tun_vnet_rss_select_queue().
+> 
 >>
->> Introduce the code to perform RSS to the kernel in order to overcome
->> thse challenges. An alternative solution is to extend the eBPF steering
->> program so that it will be able to report to the userspace, but I didn't
->> opt for it because extending the current mechanism of eBPF steering
->> program as is because it relies on legacy context rewriting, and
->> introducing kfunc-based eBPF will result in non-UAPI dependency while
->> the other relevant virtualization APIs such as KVM and vhost_net are
->> UAPIs.
+>> Also is there a upper length bounds sanity check for this input from
+>> userspace?
+> 
+> No, but the maximum size is limited to 128 bytes because the 
+> indirection_table_mask is 16-bit and it indexes an array of 16-bit 
+> integers.
+
+Not 128 bytes but 128 KiB.
+
+> 
 >>
->> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->> ---
->>   drivers/net/tun.c           | 119 +++++++++++++++++++++++++++++++++++++++-----
->>   include/uapi/linux/if_tun.h |  27 ++++++++++
->>   2 files changed, 133 insertions(+), 13 deletions(-)
+>>> +            key_size = 
+>>> virtio_net_hash_key_length(vnet_hash_common.types);
+>>> +            size = sizeof(*vnet_hash) + indirection_table_size + 
+>>> key_size;
 >>
->> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
->> index b8fcd71becac..5a429b391144 100644
->> --- a/drivers/net/tun.c
->> +++ b/drivers/net/tun.c
->> @@ -175,6 +175,9 @@ struct tun_prog {
->>   
->>   struct tun_vnet_hash_container {
->>   	struct tun_vnet_hash common;
->> +	struct tun_vnet_hash_rss rss;
->> +	__be32 rss_key[VIRTIO_NET_RSS_MAX_KEY_SIZE];
->> +	u16 rss_indirection_table[];
->>   };
->>   
->>   /* Since the socket were moved to tun_file, to preserve the behavior of persist
->> @@ -227,7 +230,7 @@ struct veth {
->>   };
->>   
->>   static const struct tun_vnet_hash tun_vnet_hash_cap = {
->> -	.flags = TUN_VNET_HASH_REPORT,
->> +	.flags = TUN_VNET_HASH_REPORT | TUN_VNET_HASH_RSS,
->>   	.types = VIRTIO_NET_SUPPORTED_HASH_TYPES
->>   };
->>   
->> @@ -591,6 +594,36 @@ static u16 tun_ebpf_select_queue(struct tun_struct *tun, struct sk_buff *skb)
->>   	return ret % numqueues;
->>   }
->>   
->> +static u16 tun_vnet_rss_select_queue(struct tun_struct *tun,
->> +				     struct sk_buff *skb,
->> +				     const struct tun_vnet_hash_container *vnet_hash)
->> +{
->> +	struct tun_vnet_hash_ext *ext;
->> +	struct virtio_net_hash hash;
->> +	u32 numqueues = READ_ONCE(tun->numqueues);
->> +	u16 txq, index;
->> +
->> +	if (!numqueues)
->> +		return 0;
->> +
->> +	if (!virtio_net_hash_rss(skb, vnet_hash->common.types, vnet_hash->rss_key,
->> +				 &hash))
->> +		return vnet_hash->rss.unclassified_queue % numqueues;
->> +
->> +	if (vnet_hash->common.flags & TUN_VNET_HASH_REPORT) {
->> +		ext = skb_ext_add(skb, SKB_EXT_TUN_VNET_HASH);
->> +		if (ext) {
->> +			ext->value = hash.value;
->> +			ext->report = hash.report;
->> +		}
->> +	}
->> +
->> +	index = hash.value & vnet_hash->rss.indirection_table_mask;
->> +	txq = READ_ONCE(vnet_hash->rss_indirection_table[index]);
->> +
->> +	return txq % numqueues;
->> +}
->> +
->>   static u16 tun_select_queue(struct net_device *dev, struct sk_buff *skb,
->>   			    struct net_device *sb_dev)
->>   {
->> @@ -603,7 +636,10 @@ static u16 tun_select_queue(struct net_device *dev, struct sk_buff *skb,
->>   	} else {
->>   		struct tun_vnet_hash_container *vnet_hash = rcu_dereference(tun->vnet_hash);
->>   
->> -		ret = tun_automq_select_queue(tun, skb, vnet_hash);
->> +		if (vnet_hash && (vnet_hash->common.flags & TUN_VNET_HASH_RSS))
->> +			ret = tun_vnet_rss_select_queue(tun, skb, vnet_hash);
->> +		else
->> +			ret = tun_automq_select_queue(tun, skb, vnet_hash);
->>   	}
->>   	rcu_read_unlock();
->>   
->> @@ -3085,13 +3121,9 @@ static int tun_set_queue(struct file *file, struct ifreq *ifr)
->>   }
->>   
->>   static int tun_set_ebpf(struct tun_struct *tun, struct tun_prog __rcu **prog_p,
->> -			void __user *data)
->> +			int fd)
->>   {
->>   	struct bpf_prog *prog;
->> -	int fd;
->> -
->> -	if (copy_from_user(&fd, data, sizeof(fd)))
->> -		return -EFAULT;
->>   
->>   	if (fd == -1) {
->>   		prog = NULL;
->> @@ -3157,6 +3189,7 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
->>   	int ifindex;
->>   	int sndbuf;
->>   	int vnet_hdr_sz;
->> +	int fd;
->>   	int le;
->>   	int ret;
->>   	bool do_notify = false;
->> @@ -3460,11 +3493,27 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
->>   		break;
->>   
->>   	case TUNSETSTEERINGEBPF:
->> -		ret = tun_set_ebpf(tun, &tun->steering_prog, argp);
->> +		if (get_user(fd, (int __user *)argp)) {
->> +			ret = -EFAULT;
->> +			break;
->> +		}
->> +
->> +		vnet_hash = rtnl_dereference(tun->vnet_hash);
->> +		if (fd != -1 && vnet_hash && (vnet_hash->common.flags & TUN_VNET_HASH_RSS)) {
->> +			ret = -EBUSY;
->> +			break;
->> +		}
->> +
->> +		ret = tun_set_ebpf(tun, &tun->steering_prog, fd);
->>   		break;
->>   
->>   	case TUNSETFILTEREBPF:
->> -		ret = tun_set_ebpf(tun, &tun->filter_prog, argp);
->> +		if (get_user(fd, (int __user *)argp)) {
->> +			ret = -EFAULT;
->> +			break;
->> +		}
->> +
->> +		ret = tun_set_ebpf(tun, &tun->filter_prog, fd);
->>   		break;
->>   
->>   	case TUNSETCARRIER:
->> @@ -3496,10 +3545,54 @@ static long __tun_chr_ioctl(struct file *file, unsigned int cmd,
->>   			break;
->>   		}
->>   
->> -		vnet_hash = kmalloc(sizeof(vnet_hash->common), GFP_KERNEL);
->> -		if (!vnet_hash) {
->> -			ret = -ENOMEM;
->> -			break;
->> +		if (vnet_hash_common.flags & TUN_VNET_HASH_RSS) {
->> +			struct tun_vnet_hash_rss rss;
->> +			size_t indirection_table_size;
->> +			size_t key_size;
->> +			size_t size;
->> +
->> +			if (tun->steering_prog) {
->> +				ret = -EBUSY;
->> +				break;
->> +			}
->> +
->> +			if (copy_from_user(&rss, argp, sizeof(rss))) {
->> +				ret = -EFAULT;
->> +				break;
->> +			}
->> +			argp = (struct tun_vnet_hash_rss __user *)argp + 1;
->> +
->> +			indirection_table_size = ((size_t)rss.indirection_table_mask + 1) * 2;
+>> key_size is included in sizeof(*vnet_hash), always
+>> VIRTIO_NET_RSS_MAX_KEY_SIZE.
 > 
-> Why make uapi a mask rather than a length?
-
-It follows the virtio specification. It is actually used as a mask in 
-tun_vnet_rss_select_queue().
-
+> I will fix this by replacing it with:
+> struct_size(vnet_hash, rss_indirection_table,
+>              (size_t)rss.indirection_table_mask + 1)
 > 
-> Also is there a upper length bounds sanity check for this input from
-> userspace?
-
-No, but the maximum size is limited to 128 bytes because the 
-indirection_table_mask is 16-bit and it indexes an array of 16-bit integers.
-
+> Regards,
+> Akihiko Odaki
 > 
->> +			key_size = virtio_net_hash_key_length(vnet_hash_common.types);
->> +			size = sizeof(*vnet_hash) + indirection_table_size + key_size;
-> 
-> key_size is included in sizeof(*vnet_hash), always
-> VIRTIO_NET_RSS_MAX_KEY_SIZE.
-
-I will fix this by replacing it with:
-struct_size(vnet_hash, rss_indirection_table,
-             (size_t)rss.indirection_table_mask + 1)
-
-Regards,
-Akihiko Odaki
-
->> +
->> +			vnet_hash = kmalloc(size, GFP_KERNEL);
->> +			if (!vnet_hash) {
->> +				ret = -ENOMEM;
->> +				break;
->> +			}
->> +
->> +			if (copy_from_user(vnet_hash->rss_indirection_table,
->> +					   argp, indirection_table_size)) {
->> +				kfree(vnet_hash);
->> +				ret = -EFAULT;
->> +				break;
->> +			}
->> +			argp = (u16 __user *)argp + rss.indirection_table_mask + 1;
->> +
->> +			if (copy_from_user(vnet_hash->rss_key, argp, key_size)) {
->> +				kfree(vnet_hash);
->> +				ret = -EFAULT;
->> +				break;
->> +			}
->> +
->> +			vnet_hash->rss = rss;
->> +		} else {
->> +			vnet_hash = kmalloc(sizeof(vnet_hash->common), GFP_KERNEL);
->> +			if (!vnet_hash) {
->> +				ret = -ENOMEM;
->> +				break;
->> +			}
->>   		}
->>   
->>   		vnet_hash->common = vnet_hash_common;
->> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
->> index 1561e8ce0a0a..1c130409db5d 100644
->> --- a/include/uapi/linux/if_tun.h
->> +++ b/include/uapi/linux/if_tun.h
->> @@ -75,6 +75,14 @@
->>    *
->>    * The argument is a pointer to &struct tun_vnet_hash.
->>    *
->> + * The argument is a pointer to the compound of the following in order if
->> + * %TUN_VNET_HASH_RSS is set:
->> + *
->> + * 1. &struct tun_vnet_hash
->> + * 2. &struct tun_vnet_hash_rss
->> + * 3. Indirection table
->> + * 4. Key
->> + *
->>    * %TUNSETVNETHDRSZ ioctl must be called with a number greater than or equal to
->>    * the size of &struct virtio_net_hdr_v1_hash before calling this ioctl with
->>    * %TUN_VNET_HASH_REPORT.
->> @@ -144,6 +152,13 @@ struct tun_filter {
->>    */
->>   #define TUN_VNET_HASH_REPORT	0x0001
->>   
->> +/**
->> + * define TUN_VNET_HASH_RSS - Request virtio_net RSS
->> + *
->> + * This is mutually exclusive with eBPF steering program.
->> + */
->> +#define TUN_VNET_HASH_RSS	0x0002
->> +
->>   /**
->>    * struct tun_vnet_hash - virtio_net hashing configuration
->>    * @flags:
->> @@ -159,4 +174,16 @@ struct tun_vnet_hash {
->>   	__u32 types;
->>   };
->>   
->> +/**
->> + * struct tun_vnet_hash_rss - virtio_net RSS configuration
->> + * @indirection_table_mask:
->> + *		Bitmask to be applied to the indirection table index
->> + * @unclassified_queue:
->> + *		The index of the queue to place unclassified packets in
->> + */
->> +struct tun_vnet_hash_rss {
->> +	__u16 indirection_table_mask;
->> +	__u16 unclassified_queue;
->> +};
->> +
->>   #endif /* _UAPI__IF_TUN_H */
+>>> +
+>>> +            vnet_hash = kmalloc(size, GFP_KERNEL);
+>>> +            if (!vnet_hash) {
+>>> +                ret = -ENOMEM;
+>>> +                break;
+>>> +            }
+>>> +
+>>> +            if (copy_from_user(vnet_hash->rss_indirection_table,
+>>> +                       argp, indirection_table_size)) {
+>>> +                kfree(vnet_hash);
+>>> +                ret = -EFAULT;
+>>> +                break;
+>>> +            }
+>>> +            argp = (u16 __user *)argp + rss.indirection_table_mask + 1;
+>>> +
+>>> +            if (copy_from_user(vnet_hash->rss_key, argp, key_size)) {
+>>> +                kfree(vnet_hash);
+>>> +                ret = -EFAULT;
+>>> +                break;
+>>> +            }
+>>> +
+>>> +            vnet_hash->rss = rss;
+>>> +        } else {
+>>> +            vnet_hash = kmalloc(sizeof(vnet_hash->common), GFP_KERNEL);
+>>> +            if (!vnet_hash) {
+>>> +                ret = -ENOMEM;
+>>> +                break;
+>>> +            }
+>>>           }
+>>>           vnet_hash->common = vnet_hash_common;
+>>> diff --git a/include/uapi/linux/if_tun.h b/include/uapi/linux/if_tun.h
+>>> index 1561e8ce0a0a..1c130409db5d 100644
+>>> --- a/include/uapi/linux/if_tun.h
+>>> +++ b/include/uapi/linux/if_tun.h
+>>> @@ -75,6 +75,14 @@
+>>>    *
+>>>    * The argument is a pointer to &struct tun_vnet_hash.
+>>>    *
+>>> + * The argument is a pointer to the compound of the following in 
+>>> order if
+>>> + * %TUN_VNET_HASH_RSS is set:
+>>> + *
+>>> + * 1. &struct tun_vnet_hash
+>>> + * 2. &struct tun_vnet_hash_rss
+>>> + * 3. Indirection table
+>>> + * 4. Key
+>>> + *
+>>>    * %TUNSETVNETHDRSZ ioctl must be called with a number greater than 
+>>> or equal to
+>>>    * the size of &struct virtio_net_hdr_v1_hash before calling this 
+>>> ioctl with
+>>>    * %TUN_VNET_HASH_REPORT.
+>>> @@ -144,6 +152,13 @@ struct tun_filter {
+>>>    */
+>>>   #define TUN_VNET_HASH_REPORT    0x0001
+>>> +/**
+>>> + * define TUN_VNET_HASH_RSS - Request virtio_net RSS
+>>> + *
+>>> + * This is mutually exclusive with eBPF steering program.
+>>> + */
+>>> +#define TUN_VNET_HASH_RSS    0x0002
+>>> +
+>>>   /**
+>>>    * struct tun_vnet_hash - virtio_net hashing configuration
+>>>    * @flags:
+>>> @@ -159,4 +174,16 @@ struct tun_vnet_hash {
+>>>       __u32 types;
+>>>   };
+>>> +/**
+>>> + * struct tun_vnet_hash_rss - virtio_net RSS configuration
+>>> + * @indirection_table_mask:
+>>> + *        Bitmask to be applied to the indirection table index
+>>> + * @unclassified_queue:
+>>> + *        The index of the queue to place unclassified packets in
+>>> + */
+>>> +struct tun_vnet_hash_rss {
+>>> +    __u16 indirection_table_mask;
+>>> +    __u16 unclassified_queue;
+>>> +};
+>>> +
+>>>   #endif /* _UAPI__IF_TUN_H */
+>>>
+>>> -- 
+>>> 2.46.0
+>>>
 >>
->> -- 
->> 2.46.0
 >>
-> 
-> 
 
