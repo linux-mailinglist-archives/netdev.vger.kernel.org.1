@@ -1,101 +1,136 @@
-Return-Path: <netdev+bounces-129557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 373B198472F
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 16:02:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CEB4984747
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 16:07:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1ECE284544
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 14:02:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F35A1C21693
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 14:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB4E81A76AA;
-	Tue, 24 Sep 2024 14:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045771A7273;
+	Tue, 24 Sep 2024 14:06:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F5cAlLHv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHzZ9R1N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC9B1A7059;
-	Tue, 24 Sep 2024 14:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544231A706C
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 14:06:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727186563; cv=none; b=K02U0nT97ukMk9M61oHkJfCjBhXiPDyUWXQE3Hp5rYxB3txftlir8slJu9l53c3CpaeZO/b9++yoEZLEwygtAU7NenaT25ETmTTBI7BTYRbCZjXxRTg1tLnV8vhwMgPCx33VlgnungWV/RHBqRUULi636NSFC4FbUImeiQRJnMM=
+	t=1727186818; cv=none; b=AMGxZlfBZ+MA0faGWj+x/IE6z1b5Yhe7j0clmHV70LSJMa0aErcQxw2UzH3aU8o769+kjq18P5HrofPIWGhvRnKqijGEzSEZrRwHHpEoWhnPsxNJi6y9YzbM+Ns+SA20x0Ba2vRBp9il+tQTh1VjWkG6Q8uG4w3i+gQ0BfoD59E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727186563; c=relaxed/simple;
-	bh=jaB/1OOU/ErsQ+6dfwNwKimyPs+tFlRPjxbR/gedMmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M5iozcnPpHn/I53Kn3APh5YiI+3V+1DVA3+bLIFja6yecJNFD398xHcyOeCtbx7f69lZtD+IVM24bkSVWM82KWt/0yDgnqsCDDzTqPCMCK3EkMq/PU4WLEfjp/KeGa8m8VjNGbMfKUzfZCvlvw8KaOS0BNMZY1lftucxQgZZFRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F5cAlLHv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08B0CC4CEC4;
-	Tue, 24 Sep 2024 14:02:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727186563;
-	bh=jaB/1OOU/ErsQ+6dfwNwKimyPs+tFlRPjxbR/gedMmU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F5cAlLHvdXsb2GBnTrFT/g/Wf+38TFl6gINkhdAAx7i+xM2al43uHe0xGckNPpWwc
-	 /WACAGFsLmcqjW9/Mjp+Ky3k+Y9B7RdiQbGooEnzj//Wq+UrCKgOZcYWgd5tUrKIbo
-	 /fFlln9W94fhTWjREIpMC/s3/KHT3GURTi26blIQaY+oM4KuJpKNsUq2zrdjHL6RNV
-	 IH8Oe5/yhGjghvnvBk03QgQFEE0tFV7kPy84C4Plnri5NFE0OUDVcgt5CQ3opSaiS7
-	 Zt6wDTOK1LY1gxiGmmXluG5y2EH8Rl4f3vQQc7LTy5avYlyXF9gndAf0ekif9GIZej
-	 /7NwXGUiqNc9Q==
-Date: Tue, 24 Sep 2024 15:02:38 +0100
-From: Simon Horman <horms@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-omap@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com,
-	Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH net] net: ethernet: ti: cpsw_ale: Fix warning on some
- platforms
-Message-ID: <20240924140238.GL4029621@kernel.org>
-References: <20240924-am65-cpsw-multi-rx-fix-v1-1-0ca3fa9a1398@kernel.org>
+	s=arc-20240116; t=1727186818; c=relaxed/simple;
+	bh=1MeXJwQgeHIcneOKXc/V6H1GQFp1pJcY1tGx8SsHiD4=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=CL+lfF/LM5Pe6pSW09QHz791ySbh7TRu/emMUp544X6opv/Ve5n3zuNG2QWnP4rfxFoTK+9Oswh6M9M7R2w5TzsPywuv4bQ9bYivSC7Xcoxf0tvoCzINk5/UeFXdWZBHeAw0O3Ur8lhtcAYLqnv7ZfrvTVKgBYW/5UZamtW7Bfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UHzZ9R1N; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a8d29b7edc2so833227266b.1
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 07:06:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727186816; x=1727791616; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YYqRfiJqyY3G62QsNkA/W1w8bwXLvhx/dOBn0s7eBPY=;
+        b=UHzZ9R1Ne/UsaHElvL5ZY4qMFvq4UVMwLdxoO21kxJqC1QZ5mBLpECcrfgih3KMgTo
+         O9itaXlZLHYvKhQfrz9JveO52iHRh2lMAFo7i7kIRTzmXx7uMmvPNLzsyKz161888QDv
+         6f2WMNAanDLkwX46U/rN8V0jbSaNWlrSv5mXDYKkVnesmWNjIS0lUPlgeD+3IhGa8Wuo
+         XcLB7hBRanS4Sw00o2RuEEPT1diiGtfNoy0lyaVmdkZCHJJcaZP64u0WHvC53x9qvWfR
+         97udkxsAUjvK0A2lYkmBMrYEeGAmcce8z2tAj4DNqq0EGw0/mhA8RsFnaoBbGA7XjFhN
+         X31g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727186816; x=1727791616;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YYqRfiJqyY3G62QsNkA/W1w8bwXLvhx/dOBn0s7eBPY=;
+        b=tu52THKwZSatccdv1W86jwBA4eAsoBMO0YSFJBVoTHkKH9uOtYIE02QO4aJ99xyY3j
+         rVJULe5+irDtskSFNzqJ62KjTQx2vGoskjjYL1W5bBom6qA+bz9gAJKNQ23NE0J+xSME
+         zU0TNBumUscPcCJgFL37F/cwXMAAeWGKAanNa1yvPAB96+kF2bJlkhWAhS3YofxIvmeV
+         u/sr7kZXw/oCbsCf9+LIHQfiWaG2XwT6M/F8NCIpkkk2ASP5XJXAzVyDhnWEm5DHyu6i
+         ABmsh2w4P/YDDH/oQT0DRv1e+vJ9f05VBgEttpg+tymgFxu7TcBqBkc816b8yOn0iGB8
+         BQ1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUu2ZBCWZnVKJNioruJt4/4nL3Pn26lz27ePh0jUR6LmoOiPj6CIrn2UHzwn7t9r9QyvMwD6W4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztZmXgUjqciV+0KZYcF22r2LfN+kzeVRr5hWT3lzj4rjB+9X/a
+	I0OdmeswMha2pVlTlAgao4cUP/iag9+ylrnHoPf7gU3ISiDgDK4S
+X-Google-Smtp-Source: AGHT+IHNxOd4e66iKCDp+tld13MEXDtQD2lEv9CJXo7OE+/qIeh2oo8gAJJNIGeOSlhHsvUVCieftw==
+X-Received: by 2002:a17:906:7949:b0:a8d:128a:cc49 with SMTP id a640c23a62f3a-a90d57793f4mr1442235566b.52.1727186815344;
+        Tue, 24 Sep 2024 07:06:55 -0700 (PDT)
+Received: from [127.0.0.1] ([193.252.226.10])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9392f33de6sm88716966b.4.2024.09.24.07.06.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Sep 2024 07:06:54 -0700 (PDT)
+From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+Message-ID: <c739f928-86a2-46f8-b92e-86366758bb82@orange.com>
+Date: Tue, 24 Sep 2024 16:06:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240924-am65-cpsw-multi-rx-fix-v1-1-0ca3fa9a1398@kernel.org>
+User-Agent: Betterbird (Linux)
+Subject: Massive hash collisions on FIB
+To: Eric Dumazet <edumazet@google.com>,
+ Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+Cc: Simon Horman <horms@kernel.org>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
+References: <CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
+ <db6ecdc4-8053-42d6-89cc-39c70b199bde@intel.com>
+ <20240916140130.GB415778@kernel.org>
+ <e74ac4d7-44df-43f0-8b5d-46ef6697604f@orange.com>
+ <CANn89i+kDvzWarnA4JJr2Cna2rCXrCFJjpmd7CNeVEj5tmtWMw@mail.gmail.com>
+X-Mozilla-News-Host: news://127.0.0.1
+Content-Language: fr, en-US
+Organization: Orange
+In-Reply-To: <CANn89i+kDvzWarnA4JJr2Cna2rCXrCFJjpmd7CNeVEj5tmtWMw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 24, 2024 at 03:28:48PM +0300, Roger Quadros wrote:
-> The number of register fields cannot be assumed to be ALE_FIELDS_MAX
-> as some platforms can have lesser fields.
+On 17/09/2024 08:59, Eric Dumazet wrote:
 > 
-> Solve this by embedding the actual number of fields available
-> in platform data and use that instead of ALE_FIELDS_MAX.
+>> What do you think ?
 > 
-> Gets rid of the below warning on BeagleBone Black
+> I do not see any blocker for making things more scalable.
 > 
-> [    1.007735] WARNING: CPU: 0 PID: 33 at drivers/base/regmap/regmap.c:1208 regmap_field_init+0x88/0x9c
-> [    1.007802] invalid empty mask defined
-> [    1.007812] Modules linked in:
-> [    1.007842] CPU: 0 UID: 0 PID: 33 Comm: kworker/u4:3 Not tainted 6.11.0-01459-g508403ab7b74-dirty #840
-> [    1.007867] Hardware name: Generic AM33XX (Flattened Device Tree)
-> [    1.007890] Workqueue: events_unbound deferred_probe_work_func
-> [    1.007935] Call trace:
-> [    1.007957]  unwind_backtrace from show_stack+0x10/0x14
-> [    1.007999]  show_stack from dump_stack_lvl+0x50/0x64
-> [    1.008033]  dump_stack_lvl from __warn+0x70/0x124
-> [    1.008077]  __warn from warn_slowpath_fmt+0x194/0x1a8
-> [    1.008113]  warn_slowpath_fmt from regmap_field_init+0x88/0x9c
-> [    1.008154]  regmap_field_init from devm_regmap_field_alloc+0x48/0x64
-> [    1.008193]  devm_regmap_field_alloc from cpsw_ale_create+0xfc/0x320
-> [    1.008251]  cpsw_ale_create from cpsw_init_common+0x214/0x354
-> [    1.008286]  cpsw_init_common from cpsw_probe+0x4ac/0xb88
+> It is only a matter of time and interest. I think that 99.99 % of
+> linux hosts around the world
+> have less than 10 netns.
 > 
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Closes: https://lore.kernel.org/netdev/CAMuHMdUf-tKRDzkz2_m8qdFTFutefddU0NTratVrEjRTzA3yQQ@mail.gmail.com/
-> Fixes: 11cbcfeaa79e ("net: ethernet: ti: cpsw_ale: use regfields for number of Entries and Policers")
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
+> RTNL removal is a little bit harder (and we hit RTNL contention even
+> with less than 10 netns around)
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Given this encouragement, I'm proceeding towards the the "million-tunnel baby".
+And knowing where the current road bumps are, workarounds are possible: instead
+of a direct 1M fanout of (netns+interface), I'm doing 10k netns with 100
+interfaces each, which works like a charm.
+
+But doing this I met an entirely new kind of bottleneck: the single FIB
+hashtable, shared by all netns, lends itself to massive collision if many netns
+contain the same local address.
+
+Indeed, in this situation, the fib_inetaddr_notifier ends up inserting a local
+route for the address, and the only "moving part" in the hash input is the
+address itself.
+
+As an example, after creating 7000 veth pairs and moving their "right half" to
+7000 namespaces, an "ip addr add 192.168.1.2/32 dev $D" on one of them hits a
+bucket of depth 7000.
+
+To solve this, I'd naively inject a few bits of entropy from the netns itself
+(inode number, middle bits of (struct net *) address, etc.), by XORing them to
+the hash value. Unless I'm mistaken, the netns is always unambiguous when a FIB
+decision is made, be it for a packet or for some interface configuration task.
+
+Would that be acceptable ?
+
 
 
