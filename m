@@ -1,126 +1,127 @@
-Return-Path: <netdev+bounces-129539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D387D9845F4
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 14:32:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CA0E98461D
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 14:49:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 103641C20B45
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:32:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EFC21F22A2A
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D6C1A76BD;
-	Tue, 24 Sep 2024 12:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6A31A4F19;
+	Tue, 24 Sep 2024 12:49:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YD0G88K9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cZD08kL9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4155E1E492;
-	Tue, 24 Sep 2024 12:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92D111A270;
+	Tue, 24 Sep 2024 12:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727181108; cv=none; b=NlUOt5H1m0+8MitXz2QTXeq02gK1TQll/O7KB2f7J1pnV289qeNv9/N2pXGlvPuUjRTqGJW+z6fQseY3gPI24iqcRQ2KETx7a0PddXb9ohlVXrwiomwsQw/q9tgFboWa6btS3GQ51c/+v5aESTbnP+49vdeJezTT8pgO9xVmqi0=
+	t=1727182157; cv=none; b=VYAgiiXKl5oTrT+yJ4ARbpRANSIjSbZZWobex8MoJ51xIxMsncp+5Ruyn/zsLNLCDE3Ijj0BrbvTmZFYpt1+kU0Xl6i142mt+Mm3WNjSyoxZ8G234JBxAeADSDSBkb7eF/6E5vgrm8NbAOMacEneItS9yMxHER0MONXD1nTDXu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727181108; c=relaxed/simple;
-	bh=g8aaOdojl9wJAyDfLFOxLuTqW+adZpTeXT6liAy2CsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ce2UsPFDAXmA0KSvyWUVNr+AyUAe0T53lZ+6hpExD5C2XyInJuSSkPiJqm4rIokTQoUZkuxaz4IHNCMcmbTMO+7ITiTtmsF6oBT6p80TKewtONekaGFPr3invRgT4mglA5IFZqe8Ou6R9e3WI5e89WvjgMeX5QHKuzLumKpyJME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YD0G88K9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99C65C4CEC6;
-	Tue, 24 Sep 2024 12:31:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727181108;
-	bh=g8aaOdojl9wJAyDfLFOxLuTqW+adZpTeXT6liAy2CsY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YD0G88K9ajZ+pZpMAN4TZdscadEFMbWpzmNhjz+PfKJmgJNjEoUH1Wz2/U2Xz0GfL
-	 IaKxoyJxJqIHspwlEZD2sERjwJVwPB0TQooZ13B4GJlrXWN7kVT1Vn7FJfPGpfXvhk
-	 cjqhogql7UgWm+hTPpaazzny3Fea/w9cba1kWKa1l3V1rFkFylkebfHZoYOhe/0ksj
-	 EDGrkm6MeVz5tgsX4HSWdGdY69f8aFYXdVtHCplnUdUYbWtNgJgeA5Bqs1q/anGbAU
-	 EDwcDxccNQwTtQc86LBWtsJHZqepL9UuhiSu7he+ZesQvyXfxGUGeXYALvTtVOaSDy
-	 kTEonLYW0vs+A==
-Date: Tue, 24 Sep 2024 13:31:44 +0100
-From: Simon Horman <horms@kernel.org>
-To: Shen Lichuan <shenlichuan@vivo.com>
-Cc: isdn@linux-pingi.de, quic_jjohnson@quicinc.com, kuba@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com
-Subject: Re: [PATCH v1] isdn: mISDN: Correct typos in multiple comments
- across various files
-Message-ID: <20240924123144.GH4029621@kernel.org>
-References: <20240924091117.8137-1-shenlichuan@vivo.com>
+	s=arc-20240116; t=1727182157; c=relaxed/simple;
+	bh=9QGjApg6eWCbeS4kZh0gNjKR95Z8he6c64YgKoxqz6Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=fsgb+WVN8lv2mb4OB0JmiOJuNiAypDnIntYVXB37VJnNKjbDgEXWas77il7DhWqsWKT2ffmEkGITlNY2MPEW348XJq2c7KjOWGcoG+i++v1fV81MIZj4UvpGBvE0kaR+o6+Fbis+40ID4PGE8A9aAMeuaDU7F8VyhpApU9RTm+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cZD08kL9; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2f66423686bso48431001fa.3;
+        Tue, 24 Sep 2024 05:49:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727182154; x=1727786954; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XkfcF9Kbwvbpcpz52USf47BwMvRETyUhgdMgF2eZ6p0=;
+        b=cZD08kL9ny0LnNZexVolnaRE+q/IdWWpAnUZ8NeuLp0dtvVqpwaRR7NbXiB9XKF45M
+         Px9Ez42GitMdbztHNHbnM1mZUr6zXFxFrwzK/zKz/9GGTv4YWqwZCAzN1KhP9VUCIH4o
+         ovsv7jAKQgnWp+TAfiYycBkwoFtAm7nF2zF8PEifdSW+A2ko5Sw9JGRAnrk/vSq8Kgc2
+         GuqZHLnYPkCE90zEaRz23MMsrbTnnnsRFpj3HnOrRRYeuRvnyUkt4K7QoL2GqDMmK7Bp
+         fsVTTGEyT78tbwX/FfW9CxSCJXED9qkD9IOyoevP+8vdYcfjV5lAz1osAZMSYwXR11Ww
+         klkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727182154; x=1727786954;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XkfcF9Kbwvbpcpz52USf47BwMvRETyUhgdMgF2eZ6p0=;
+        b=wikul/qDOwDSRNPi5aMiCkDlo2ydzyIatnNLs0lvoShpIOiFUhIhG6ogfLQgwiljuW
+         PDMPz5HEFmDyoVpN1Pa0sHaV8AxeJmhkLqT4smw6Hcpae3T27s8Nz/C5MjJlvYGvVgqQ
+         8m0EWY2QjaXRCTLjjM6ritCYovK8bJiT++aK2qZW51KidefT8x8A559WrnihPRusfIaP
+         boKuKjy1FVTCGo/3VTZQ1gr5AtakzSdBW+4Rr7pm4lk07vJt3PHYkjP9x7UlMu9B0nLt
+         dDHNDID0l2mO3Wjc7i1QO/DvjkhNLNYLNdkf6QaJNre2Nr0Q00KP7JRhFw/iE0J0Xgov
+         Xp+A==
+X-Forwarded-Encrypted: i=1; AJvYcCUBpNWwCGhHXQ/ENhQQLBlF8rn7gUQaa+T4LU8tg1lWIf9sE1MqwZ3AmNx43PmEYmHlKGiAn+Iu@vger.kernel.org, AJvYcCW0De64KdSL+SbMA8iyAa9Vk+Y0nJcu9f4nOevUwSyOri0oaItbPGVwutZsvhaeioVWJHmZcfpHTuKVt1c=@vger.kernel.org, AJvYcCWs7Yr6X8Ndg+CubkixPanX2qAPwOmIMjR8gTNALV7mbmRbEKaReyBjkjesbByURMfqDV1qsWCmGDP9nw==@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIVwNtzDVC6/CPMs6jZBhN55oOQ+222dZqFdt+XChHWryUNQh0
+	1UrQO1QvC7Ri6HQov7fK8VYqenKqoj2fhN4LOoU/FRnftMpXyQF7
+X-Google-Smtp-Source: AGHT+IEeaoaZNwgYWsmOF94yInjDZ6PXr09ERcAY0a8ekQMv/z/m1gYX13niyCD330MjkSiAKsNtag==
+X-Received: by 2002:a2e:a9a8:0:b0:2f7:7d69:cb55 with SMTP id 38308e7fff4ca-2f7cc2bcffdmr73238161fa.0.1727182153259;
+        Tue, 24 Sep 2024 05:49:13 -0700 (PDT)
+Received: from [127.0.1.1] (91-118-163-37.static.upcbusiness.at. [91.118.163.37])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c5cf4c500dsm704932a12.61.2024.09.24.05.49.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2024 05:49:12 -0700 (PDT)
+From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Subject: [PATCH 0/4] selftsets: gitignore and clean target file additions
+Date: Tue, 24 Sep 2024 14:49:06 +0200
+Message-Id: <20240924-selftests-gitignore-v1-0-9755ac883388@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240924091117.8137-1-shenlichuan@vivo.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAEK18mYC/x3MSQqAMBAF0atIrw2YQUGvIi4cvrFBoqSDCOLdD
+ S7fouohQWQIdcVDERcLHyFDlwXN2xg8FC/ZZCrjqtY4JdjXBEmiPCf24YhQcFpbi2aup4VyeUa
+ sfP/XfnjfD/WAMqFlAAAA
+To: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Allison Henderson <allison.henderson@oracle.com>, 
+ Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ rds-devel@oss.oracle.com, linux-mm@kvack.org, 
+ Javier Carrasco <javier.carrasco.cruz@gmail.com>
+X-Mailer: b4 0.14-dev
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1727182152; l=991;
+ i=javier.carrasco.cruz@gmail.com; s=20240312; h=from:subject:message-id;
+ bh=9QGjApg6eWCbeS4kZh0gNjKR95Z8he6c64YgKoxqz6Q=;
+ b=gpZqwmT3dLPwdDO9Z3vf/zoFskB5jdC87a0gj0m8DOCySuxELJwoiDlIQXBJId+JX7oHFh9OX
+ kN+oEPrXp1BB6PJM67yRSs66f1Hw4Mp8wxHpA+CeYRZj7RSsn5JAtyy
+X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
+ pk=lzSIvIzMz0JhJrzLXI0HAdPwsNPSSmEn6RbS+PTS9aQ=
 
-On Tue, Sep 24, 2024 at 05:11:17PM +0800, Shen Lichuan wrote:
-> Fixed some confusing spelling errors that were currently identified,
-> the details are as follows:
-> 
-> -in the code comments:
-> 	netjet.c: 382:		overun		==> overrun
-> 	w6692.c: 776:		reqest		==> request
-> 	dsp_audio.c: 208:	tabels		==> tables
-> 	dsp_cmx.c: 575:		suppoted	==> supported
-> 	hwchannel.c: 369:	imediately	==> immediately
-> 
-> Signed-off-by: Shen Lichuan <shenlichuan@vivo.com>
-> ---
->  drivers/isdn/hardware/mISDN/netjet.c | 2 +-
->  drivers/isdn/hardware/mISDN/w6692.c  | 2 +-
->  drivers/isdn/mISDN/dsp_audio.c       | 2 +-
->  drivers/isdn/mISDN/dsp_cmx.c         | 2 +-
->  drivers/isdn/mISDN/hwchannel.c       | 2 +-
->  5 files changed, 5 insertions(+), 5 deletions(-)
+Trivial patches to update the gitignore files unders selftests, and a
+little addition to EXTRA_CLEAN under net/rds to account for the
+automatically generated include.sh.
 
-Hi Shen,
+Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+---
+Javier Carrasco (4):
+      selftests: add unshare_test and msg_oob to gitignore
+      selftests: rds: add include.sh to EXTRA_CLEAN
+      selftests: rds: add gitignore file for include.sh
+      selftests: exec: update gitignore for load_address
 
-Thanks for your patch.
+ tools/testing/selftests/core/.gitignore    | 1 +
+ tools/testing/selftests/exec/.gitignore    | 2 +-
+ tools/testing/selftests/net/.gitignore     | 1 +
+ tools/testing/selftests/net/rds/.gitignore | 1 +
+ tools/testing/selftests/net/rds/Makefile   | 2 +-
+ 5 files changed, 5 insertions(+), 2 deletions(-)
+---
+base-commit: 4d0326b60bb753627437fff0f76bf1525bcda422
+change-id: 20240924-selftests-gitignore-e41133e6c5bd
 
-Running codespell over the files modified by this patch indicates
-that the following spelling errors remain, I'd suggest addressing them
-too.
-
-drivers/isdn/hardware/mISDN/w6692.c:861: oscilator ==> oscillator
-drivers/isdn/mISDN/dsp_audio.c:181: aplitude ==> amplitude, aptitude
-drivers/isdn/mISDN/dsp_cmx.c:2: conferrencing ==> conferencing
-
-Or perhaps consider extending spelling fixes to cover all files under
-drivers/isdn/mISDN and drivers/isdn/hardware/mISDN. There seem to be a lot,
-so if so might consider one patch per sub-directory or something like that
-to break things up a bit.
-
-
-On process:
-
-It is my understanding that patches for drivers/isdn are handled by
-the netdev maintainers. That is non-bug fixes go into net-next,
-and bug fixes go into net. In this case it is not a but fix, so
-the patch should be targeted at net-next, like this.
-
-	Subject: [PATCH net-next v2] ...
-
-Currently net-next is closed for the v6.12 merge window.
-It should reopen after v6.12-rc1 has been released,
-which I expect to take place a little under a week from now.
-
-Other than RFCs, patches shouldn't be posted for net-next while it is
-closed. So please repost your patch, or post an updated patch once
-it reopens.
-
-You can find out more about the development process for the Networking
-subsystem here: https://docs.kernel.org/process/maintainer-netdev.html
-
-...
-
+Best regards,
 -- 
-pw-bot: defer
+Javier Carrasco <javier.carrasco.cruz@gmail.com>
+
 
