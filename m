@@ -1,203 +1,215 @@
-Return-Path: <netdev+bounces-129451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E4B983FA9
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 09:49:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C93DA983FB2
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 09:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84DD81F24089
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 07:49:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EE89282E77
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 07:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4CA4EB38;
-	Tue, 24 Sep 2024 07:49:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E19F14883F;
+	Tue, 24 Sep 2024 07:52:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="FxMbFv6/"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="mLh+uCTk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FE6126C15
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 07:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8733053363;
+	Tue, 24 Sep 2024 07:52:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727164140; cv=none; b=esxpCqzm2nPAC3OQOqwz6ertySds9ASWGP/srT0qwbRHYnpyYGlE70RwN0lt2mtvdnIvsx4U5wYeMOpda7aJGtLV9yeVWcVMexWi8JiN5+XYYjTRUGCdGShfCxxpyVZRCh7g7/SMfUjxilC8Pp0riy+uvGdffZZrNhf3MG85jv4=
+	t=1727164340; cv=none; b=BqkEHd4ENYb+/yWBFTqRQhG98RSbe/gfx3TnJlWYKEyYM9xx19S2801mVGCQpDd9jM+f59qxedg7VFXc1oNTyLilzVoYa2xq48huu7Jg/a7BpUn5Eaw/vvsZY6QhJvHcFY7Bx/tG7HDPp7cAESlih4yrguk3j8WJnlTfZwM6y+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727164140; c=relaxed/simple;
-	bh=SJ9LrZFumI2fBt5xrrFDFhzDupHIUTJ4xI5MEoBoP68=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RIn/yhmRRuhZDw+nqE+N0ITz4oSsciSglP6cWDhB3s3FkXcEMM6LeuN6S4Xv4e22wt68kXt015s+113Le+dmuB3IPxelAV8WVRyq0rTry736aXYPOQDxjrLI98c3WM5tt8TPp4txsaGYMd8euY6EV4cDYV6HR7UWouXT3hAHHeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=FxMbFv6/; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-378c16a4d3eso5606724f8f.1
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 00:48:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727164136; x=1727768936; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fYxBfIEgRGwnch1amoY5GN+OdaV2ORH8f4YP2+lCu90=;
-        b=FxMbFv6/0nSMoB+Na0b4FVAGZiv+zU9Fw6Ex0LgnQoifH1FiNOmGpPkwepqDTyKd6b
-         gScej1/yBnhVfkvhF9Nqy/GkRk4TLjeZE7rXnL2akFDC/Ka8WwwuTrBt9y/Nks91bIlT
-         5mKzULY8UcThJea+WRdadbPUu31bDcnohpBjw8zZVCERabdr+jN3dZKcUpMtLj2wgzf1
-         2TLRnHNjV/3GZjVKKaFGLUar5t1Z+/UvfQm/ko5Ntyzoperm6IAcfzOQRDrIekBMXBrh
-         GDbZlhOIEohWHOkIHF4bV7Fccss8EFEHkgiYvR+ljwjCUnfQqZS3X8MwrhsPLyrona6L
-         qC9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727164136; x=1727768936;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fYxBfIEgRGwnch1amoY5GN+OdaV2ORH8f4YP2+lCu90=;
-        b=Ug9ZB/DGYQOAw5ygOdaIQwRV0sOetPgS2uM9XBeCpu6X/mWAMJSiKwPfQdZ6n2Wbw9
-         Rxl3+AEG/GMu1nroqLH7HNZF4fMqP/5bCHTrgUeVVyBkj1hhoGm+prO2kO9dceIcecmI
-         v0ItPViTvHEjiRx6xjhTgmp19ak0dFziCSIffMNbd/wFZy+btuMkiWJp6mv9AM9ZT1Wk
-         vjOTJ+N4d/RQOEP3/COl/Vb+vndKBDUkgsbEvyvgbVcP4TZYo2+y4SeF93G1R633MEnO
-         PIuE6ouCsobAWlWAEzo4uwAKz8wOZi8045qUmUcefdsQH4SFthFHheSPRvE+aAp4MTRr
-         8lxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUD8G+0g7xGaJXOlF2y24P50DEtIj3XpDMeUXEciM8xenjqvyS3t6ca2g6IqWVNU/j4mYyQywo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy17GvKZrl8U8cgGY7FXhZxPiv3EP8pYcJ+486d03UJLE7FnIlf
-	/qzBf0aa2uvM0Hj28ohcUW9e5G25c3lUCql5aAROaRQiz5mjXgAWNCjvsrjmac8=
-X-Google-Smtp-Source: AGHT+IEcRr0QRVwfQeflZi22f0TJYAEF895jKRug0RP5vK6DkeBxkOm9Gtf+nyeMAsGAp066sqEikw==
-X-Received: by 2002:a5d:47cb:0:b0:374:c44e:ef27 with SMTP id ffacd0b85a97d-37a42253416mr13741187f8f.8.1727164135819;
-        Tue, 24 Sep 2024 00:48:55 -0700 (PDT)
-Received: from localhost (amontpellier-556-1-151-252.w109-210.abo.wanadoo.fr. [109.210.7.252])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2f96d7sm845309f8f.78.2024.09.24.00.48.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2024 00:48:55 -0700 (PDT)
-Date: Tue, 24 Sep 2024 09:48:53 +0200
-From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: ethernet: Switch back to struct
- platform_driver::remove()
-Message-ID: <3y5dni2ey2hnzie4evmklqcu4uhr72fr64m47uwzo7nnhbqzsz@7igypikspxpm>
-References: <20240923162202.34386-2-u.kleine-koenig@baylibre.com>
- <20240924072937.GE4029621@kernel.org>
+	s=arc-20240116; t=1727164340; c=relaxed/simple;
+	bh=NTd0t+qinWQnAX++9XFkj7T7aFD7zwdrKxyLLskJXwM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hwxicUhYl9uU23u32/pKbmrCz8LO1Wssjp1FyuPnw/Darlge4cMMWZs4ELbWH6C0CJkgTVwuc106Obb0p57SvcUkylSYZVLkdkRbB97oHYXLUmUyOauGe1+bxgA2rAboOHLUBRQyixKgWFN5RNV2n0IwJkEsv/XK4xo/a/Al+74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=mLh+uCTk; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1727164291;
+	bh=r4eemh7jZj2u6TNqRwGZf/axJNehP4EjeRUes5xaZV4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=mLh+uCTkQYHY3mIY4MbpASl/f4UJAoGy6MVuh0YpU2PnNY9q6ZaoZx7zQgCrNPipr
+	 1lcU5fVR+A7MD+lXLHV3wynSq/vIHbKxAyihnqA33WcNLrKIE8Bve22ufF9z9DnZ2p
+	 zqvQjIfoYvLndwp2q70cuvqV0rlMkcb+nGgLAx+k=
+X-QQ-mid: bizesmtpsz10t1727164282tr3jcg
+X-QQ-Originating-IP: bxMDDNVv5FlXn95gHGJiW5i+8i6XkpIgylBUVnSSyfg=
+Received: from [10.20.254.18] ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 24 Sep 2024 15:51:19 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 4963312410890576946
+Message-ID: <14E46687CBDB8037+8f5455b2-89a5-483b-902d-c6977ee71b02@uniontech.com>
+Date: Tue, 24 Sep 2024 15:51:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ht5hxnducdxn75gu"
-Content-Disposition: inline
-In-Reply-To: <20240924072937.GE4029621@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net/bridge: Optimizing read-write locks in ebtables.c
+To: kernel test robot <lkp@intel.com>, pablo@netfilter.org
+Cc: oe-kbuild-all@lists.linux.dev, kadlec@netfilter.org, roopa@nvidia.com,
+ razor@blackwall.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <2860814445452DE8+20240924022437.119730-1-yushengjin@uniontech.com>
+ <202409241543.F99I82u3-lkp@intel.com>
+From: yushengjin <yushengjin@uniontech.com>
+In-Reply-To: <202409241543.F99I82u3-lkp@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrsz:qybglogicsvrsz4a-0
 
 
---ht5hxnducdxn75gu
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+在 24/9/2024 下午3:43, kernel test robot 写道:
+> Hi yushengjin,
+>
+> kernel test robot noticed the following build errors:
+>
+> [auto build test ERROR on netfilter-nf/main]
+> [also build test ERROR on horms-ipvs/master linus/master v6.11 next-20240924]
+> [cannot apply to nf-next/master]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch#_base_tree_information]
+>
+> url:https://github.com/intel-lab-lkp/linux/commits/yushengjin/net-bridge-Optimizing-read-write-locks-in-ebtables-c/20240924-102547
+> base:https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
+> patch link:https://lore.kernel.org/r/2860814445452DE8%2B20240924022437.119730-1-yushengjin%40uniontech.com
+> patch subject: [PATCH v2] net/bridge: Optimizing read-write locks in ebtables.c
+> config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20240924/202409241543.F99I82u3-lkp@intel.com/config)
+> compiler: sh4-linux-gcc (GCC) 14.1.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240924/202409241543.F99I82u3-lkp@intel.com/reproduce)
+>
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot<lkp@intel.com>
+> | Closes:https://lore.kernel.org/oe-kbuild-all/202409241543.F99I82u3-lkp@intel.com/
+>
+> All errors (new ones prefixed by >>):
+>
+>     In file included from include/asm-generic/percpu.h:7,
+>                      from ./arch/sh/include/generated/asm/percpu.h:1,
+>                      from include/linux/irqflags.h:19,
+>                      from arch/sh/include/asm/cmpxchg-irq.h:5,
+>                      from arch/sh/include/asm/cmpxchg.h:20,
+>                      from arch/sh/include/asm/atomic.h:19,
+>                      from include/linux/atomic.h:7,
+>                      from include/asm-generic/bitops/atomic.h:5,
+>                      from arch/sh/include/asm/bitops.h:23,
+>                      from include/linux/bitops.h:68,
+>                      from include/linux/thread_info.h:27,
+>                      from include/asm-generic/preempt.h:5,
+>                      from ./arch/sh/include/generated/asm/preempt.h:1,
+>                      from include/linux/preempt.h:79,
+>                      from include/linux/spinlock.h:56,
+>                      from include/linux/mmzone.h:8,
+>                      from include/linux/gfp.h:7,
+>                      from include/linux/umh.h:4,
+>                      from include/linux/kmod.h:9,
+>                      from net/bridge/netfilter/ebtables.c:14:
+>     net/bridge/netfilter/ebtables.c: In function 'get_counters':
+>>> net/bridge/netfilter/ebtables.c:1006:30: error: 'ebt_recseq' undeclared (first use in this function); did you mean 'xt_recseq'?
+>      1006 |                 s = &per_cpu(ebt_recseq, cpu);
+>           |                              ^~~~~~~~~~
+>     include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+>       219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+>           |                                                      ^~~
+>     include/linux/percpu-defs.h:263:49: note: in expansion of macro 'VERIFY_PERCPU_PTR'
+>       263 | #define per_cpu_ptr(ptr, cpu)   ({ (void)(cpu); VERIFY_PERCPU_PTR(ptr); })
+>           |                                                 ^~~~~~~~~~~~~~~~~
+>     include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+>       269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+>           |                                   ^~~~~~~~~~~
+>     net/bridge/netfilter/ebtables.c:1006:22: note: in expansion of macro 'per_cpu'
+>      1006 |                 s = &per_cpu(ebt_recseq, cpu);
+>           |                      ^~~~~~~
+>     net/bridge/netfilter/ebtables.c:1006:30: note: each undeclared identifier is reported only once for each function it appears in
+>      1006 |                 s = &per_cpu(ebt_recseq, cpu);
+>           |                              ^~~~~~~~~~
+>     include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+>       219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+>           |                                                      ^~~
+>     include/linux/percpu-defs.h:263:49: note: in expansion of macro 'VERIFY_PERCPU_PTR'
+>       263 | #define per_cpu_ptr(ptr, cpu)   ({ (void)(cpu); VERIFY_PERCPU_PTR(ptr); })
+>           |                                                 ^~~~~~~~~~~~~~~~~
+>     include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+>       269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+>           |                                   ^~~~~~~~~~~
+>     net/bridge/netfilter/ebtables.c:1006:22: note: in expansion of macro 'per_cpu'
+>      1006 |                 s = &per_cpu(ebt_recseq, cpu);
+>           |                      ^~~~~~~
+>     net/bridge/netfilter/ebtables.c: In function 'do_replace_finish':
+>     net/bridge/netfilter/ebtables.c:1111:42: error: 'ebt_recseq' undeclared (first use in this function); did you mean 'xt_recseq'?
+>      1111 |                 seqcount_t *s = &per_cpu(ebt_recseq, cpu);
+>           |                                          ^~~~~~~~~~
+>     include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
+>       219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
+>           |                                                      ^~~
+>     include/linux/percpu-defs.h:263:49: note: in expansion of macro 'VERIFY_PERCPU_PTR'
+>       263 | #define per_cpu_ptr(ptr, cpu)   ({ (void)(cpu); VERIFY_PERCPU_PTR(ptr); })
+>           |                                                 ^~~~~~~~~~~~~~~~~
+>     include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
+>       269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
+>           |                                   ^~~~~~~~~~~
+>     net/bridge/netfilter/ebtables.c:1111:34: note: in expansion of macro 'per_cpu'
+>      1111 |                 seqcount_t *s = &per_cpu(ebt_recseq, cpu);
+>           |                                  ^~~~~~~
+>
+>
+> vim +1006 net/bridge/netfilter/ebtables.c
+>
+>     987	
+>     988	
+>     989	static void get_counters(const struct ebt_counter *oldcounters,
+>     990				 struct ebt_counter *counters, unsigned int nentries)
+>     991	{
+>     992		int i, cpu;
+>     993		struct ebt_counter *counter_base;
+>     994		seqcount_t *s;
+>     995	
+>     996		/* counters of cpu 0 */
+>     997		memcpy(counters, oldcounters,
+>     998		       sizeof(struct ebt_counter) * nentries);
+>     999	
+>    1000		/* add other counters to those of cpu 0 */
+>    1001		for_each_possible_cpu(cpu) {
+>    1002	
+>    1003			if (cpu == 0)
+>    1004				continue;
+>    1005	
+>> 1006			s = &per_cpu(ebt_recseq, cpu);
+>    1007			counter_base = COUNTER_BASE(oldcounters, nentries, cpu);
+>    1008			for (i = 0; i < nentries; i++) {
+>    1009				u64 bcnt, pcnt;
+>    1010				unsigned int start;
+>    1011	
+>    1012				do {
+>    1013					start = read_seqcount_begin(s);
+>    1014					bcnt = counter_base[i].bcnt;
+>    1015					pcnt = counter_base[i].pcnt;
+>    1016				} while (read_seqcount_retry(s, start));
+>    1017	
+>    1018				ADD_COUNTER(counters[i], bcnt, pcnt);
+>    1019				cond_resched();
+>    1020			}
+>    1021		}
+>    1022	}
+>    1023	
 
-Hello Simon,
+Sorry, it's my fault, I will test it again.
 
-On Tue, Sep 24, 2024 at 08:29:37AM +0100, Simon Horman wrote:
-> On Mon, Sep 23, 2024 at 06:22:01PM +0200, Uwe Kleine-K=C3=B6nig wrote:
-> > I converted all drivers below drivers/net/ethernet in a single patch. If
-> > you want it split, just tell me (per vendor? per driver?). Also note I
-> > didn't add all the maintainers of the individual drivers to Cc: to not
-> > trigger sending restrictions and spam filters.
->=20
-> I think that given that the changes to each file are very simple,
-> and the number of files changed, a single, or small number of patches
-> make sense. Because the overhead of managing per-driver patches,
-> which I would ordinarily prefer, seems too large.
 
-full ack.
-
-> However, touching so many files does lead to a substantial risk of
-> conflicts. And indeed, the patch does not currently apply cleanly
-> to net-next (although it can trivially be made to do so). Perhaps
-> the maintainers can handle that, but I would suggest reposting in
-> a form that does apply cleanly so that automations can run.
-
-I based it on plain next in the expectation that this matches the
-network tree well enough. I agree that the conflicts are not hard to
-resolve, but it's totally ok for me if only the parts of the patch are
-taken that apply without problems. I expect that I'll have to go through
-more than one subsystem a second time anyhow because new drivers pop up
-using the old idioms.
-
-Also note that git can handle the changes just fine if you use
-3-way merging:
-
-	uwe@taurus:~/gsrc/linux$ git checkout net-next/main=20
-	HEAD is now at 151ac45348af net: sparx5: Fix invalid timestamps
-
-	uwe@taurus:~/gsrc/linux$ b4 am -3 https://lore.kernel.org/all/202409231622=
-02.34386-2-u.kleine-koenig@baylibre.com/
-	Grabbing thread from lore.kernel.org/all/20240923162202.34386-2-u.kleine-k=
-oenig@baylibre.com/t.mbox.gz
-	Analyzing 3 messages in the thread
-	Analyzing 0 code-review messages
-	Checking attestation on all messages, may take a moment...
-	---
-	  =E2=9C=93 [PATCH] net: ethernet: Switch back to struct platform_driver::=
-remove()
-	    + Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com> (=E2=
-=9C=93 DKIM/gmail.com)
-	  ---
-	  =E2=9C=93 Signed: openpgp/u.kleine-koenig@baylibre.com
-	  =E2=9C=93 Signed: DKIM/baylibre-com.20230601.gappssmtp.com (From: u.klei=
-ne-koenig@baylibre.com)
-	---
-	Total patches: 1
-	Preared a fake commit range for 3-way merge (77e0c079ace8..198dd8fb7661)
-	---
-	 Link: https://lore.kernel.org/r/20240923162202.34386-2-u.kleine-koenig@ba=
-ylibre.com
-	 Base: using specified base-commit ef545bc03a65438cabe87beb1b9a15b0ffcb6ace
-	       git checkout -b 20240923_u_kleine_koenig_baylibre_com ef545bc03a654=
-38cabe87beb1b9a15b0ffcb6ace
-	       git am -3 ./20240923_u_kleine_koenig_net_ethernet_switch_back_to_st=
-ruct_platform_driver_remove.mbx
-
-	uwe@taurus:~/gsrc/linux$ git am -3 ./20240923_u_kleine_koenig_net_ethernet=
-_switch_back_to_struct_platform_driver_remove.mbx
-	Applying: net: ethernet: Switch back to struct platform_driver::remove()
-	Using index info to reconstruct a base tree...
-	M	drivers/net/ethernet/cirrus/ep93xx_eth.c
-	M	drivers/net/ethernet/marvell/mvmdio.c
-	M	drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-	Falling back to patching base and 3-way merge...
-	Auto-merging drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-	Auto-merging drivers/net/ethernet/marvell/mvmdio.c
-	Auto-merging drivers/net/ethernet/cirrus/ep93xx_eth.c
-
-> Which brings me to to a separate, process issue: net-next is currently
-> closed for the v6.12 merge window. It should reopen once v6.12-rc1 has
-> been released. And patches for net-next should be posted after it
-> has reopened, with the caveat that RFC patches may be posted any time.
-
-This was a concious choice. Because of the big amount of drivers touched
-I thought to post early to have a chance to get the patch applied before
-the gates are opened for other patches was a reasonable (but I admit
-selfish) idea.
-
-Anyhow, I can repost once the merge window closes.
-
-Best regards
-Uwe
-
---ht5hxnducdxn75gu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmbybuMACgkQj4D7WH0S
-/k7gcQf/d8Dgf08dU7y7sAWtpikRXYYQUXKt7xrHVWk1Zu82GOHqqEGAP0tMCmO3
-OUi8G9WzYV/K7w5v4CqXliY9mbmpo+oDaHYyY7lgk2nv2zWlyC+rxf4TmOZI6UwL
-xBaXuyla1dlC6gcNFBDO+mHPlFWJuwxz/ubR9+0bKsOumJjpVVvWAypzGe0SB27W
-wimiEeUMOV0I3PfnRkq7F/dWtfQgYfQ2wdsBQ5X+zeZNMlxigsLusGObQNPqcPLb
-8rH2gHVgdKi6tMSGrCWp8Pe9/cRs1XLRgEy8HlnE9DhI95yR//8wmlp6B54IVd0V
-qrtQMybc+NUXdKVSY5N7yNv2mHUfhw==
-=1iWY
------END PGP SIGNATURE-----
-
---ht5hxnducdxn75gu--
+> -- 0-DAY CI Kernel Test Service https://github.com/intel/lkp-tests/wiki
 
