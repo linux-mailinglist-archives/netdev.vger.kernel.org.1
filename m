@@ -1,107 +1,256 @@
-Return-Path: <netdev+bounces-129563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A207984828
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 17:03:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A283984829
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 17:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA6F61C20B45
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 15:03:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CDAC1C227D0
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 15:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7875F1A76A9;
-	Tue, 24 Sep 2024 15:03:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1FF1AB515;
+	Tue, 24 Sep 2024 15:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zAn+DstF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3+e+dPJV"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E2083CD6
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 15:03:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5311A7ACD
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 15:03:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727190182; cv=none; b=MmTxGTR4hr8RpN78EpJHUeXbj92WKalI8zHtetMoFS2LhexRsynj6zej9pILSZAp8f3if/A7N5iaKtC/EVPpH1Hc/fq28SWjqEE6T1EXPD0e6kyo0xXy+V+uHnA+iY4w31u+MrUMjzRGon1SI9MfjiEkpIxDPM07SLeLexP7JO0=
+	t=1727190184; cv=none; b=kiNns4O60OaHsZY+XQfv0ROGKPUDLx4wKOsHmKakqh0McVcTiqKle9NbjdiaW5UJ0rpc+wT4bWFtvQv8LqyKzpHu8shDWIfZpWupeDIrSQb90mLTgy1cDwAQEyBvqQsZpTT/mDgKgQ8GHdjRoGH8QZbPAvBNb66RtQKXoQWCiqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727190182; c=relaxed/simple;
-	bh=E1V+WkQUS8kNf9ydrHWdhQAzdBaDV09fpPiaqZY3bUI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hfHTvOVrG/VgWIBNaV3DXMaOk349Vaf2peGrDjnh9Uq2q0Y14bykVOUxb1iHNDQ1weuqxG25lEEOxKNF/VpNpOw8LhwQEDdT98ECzhIhDfgLEpxARXOtHYhmCW/gU6W8CXJcasC6OZ8eZPsMcnHpYmidANqM4WAf4r++qnjaiEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zAn+DstF; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1727190184; c=relaxed/simple;
+	bh=g/dIgEpOXxK/aGWhF9her578NUVE1gj+NoH/R8tuJ3Q=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gH39Cc2vE1/3n+6Vju5SHNrQT3slBc2i3JDUan6/Ay8oeJB89JMV1F8MWaZrNRDwXo6POIqdZfSVn4pTupQ5KOwBrIZas9k0K5LC04bwE+x7q/ckgrl9j/n+e5qZK+8mnrhLr9gJMGRYYx5gqlvKc6ba7+i1mskf2yXUxnDwC+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3+e+dPJV; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e226d4c2e74so3498687276.0
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 08:03:00 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e1a8de19f5fso7962941276.3
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 08:03:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727190180; x=1727794980; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=T3cpEftIOPVjQSyfB9Mi4SYo0jdrR5nF2+oLi9WNNkU=;
-        b=zAn+DstFdW1qqNOET7BLH6238NVS7BmlegrHPnOBEzyyEKiJbiZcca4soBDwZ9WWZd
-         B3opdhXXTqm/TzPhm8I8oDgNNmhGeFmODcCA5SB1rCUwresFqH1vNixqXXx3yKgr4c+F
-         HLxGLQzaJqLASfjV+7Ed9ivhonrK1oEIR3TOwads+oYEVqm+OEVxzSUZERF+br6i3Jhu
-         e7642OCBkc6q0gCULRyxqoOiKN/CaOWbNHNzbqolMwcf7uoiYR08REfr+dSn3Bzrl7gl
-         vFKHJpQTyoP8K0CAhh5qdQ4Qy5F7oGLPEw9oXbgCbLTt4YCxA9PJyeuWTQ9EP7JbFSls
-         MW7w==
+        d=google.com; s=20230601; t=1727190182; x=1727794982; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1dBDMWv+DBMjfMybSWWoZIriIcEpXSU8MTuNI/aEyso=;
+        b=3+e+dPJVRighVUeGh/tyX0Cq7kJPWbTzlUo4bklnBlFs2t2XmVOux8BlTxmj4nHd7C
+         8vtXm5p4ypEyU7ZyQi3qjR++Q2ZeMMOuzn0j8fGitQuxCC0ggVv7FrGm9G9PM3DtGCFM
+         Y3qnDCkaCK+IQ37pFRkcG1nxs+e3hfHvTPaIu8ecHbEl/tgy4CezIgyHr2Zom+iLpDN4
+         PBKO5Q4SYcoDOf/i96PdDWvg9EZBjW7NxhZFz4Y5eM5eMZAOMGrt2Q2I2J/1H1tqb6oZ
+         5cAz07Z/BYPs7nL8J/wcVHRZLX9ewRmWd11jUo0vw6PQXBlRg6ZB3ua3jMEk/QLLNU/J
+         1o8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727190180; x=1727794980;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=T3cpEftIOPVjQSyfB9Mi4SYo0jdrR5nF2+oLi9WNNkU=;
-        b=GsU5AkmBu+JFpTW+wQ3WS2jkZSfOkzkwNwSaTeDLBJ/GeRGIMsanJoqggb+ez82GyT
-         Ms7K3zbi3lRzFmjxBAnV8v691Gbznhkymmlwjj1dAyUKjzvd1+J6EZLqHASgVUMecupo
-         LgXonyivN8DVQyrM2hu0l2fodfUWgDMR0JERIKVLhVkCf9xfx1Atvc7NHyuY8bcvoC5i
-         zZ+4cb4hRPqPXjEQFt9Sd0UplqMTb2peEz5wypc5NK/cYaZwEntwgKwSXXJ66EGR3ou7
-         xtA5lU02K7w+IGOqZwGEDCU1tFNChhTU+N0NFplLrMwR5vDnKYZPt1JErGpIGieuzGdA
-         61hg==
-X-Forwarded-Encrypted: i=1; AJvYcCWNOjzvdOKdLXykpoOJB4OElW6UvNVTpnUUhQ5mlWXjlXmTb90sdfrwUwIxxRU6DVICHAI0mPE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcwPzzpg/lnUqb1qZWsvQXYwUSZ369qPmy5zFGra/LW1MiI5zh
-	Eqnh3p9ORPHaVHMOf/DS86nobN2R11SMUiTzI/D+GNdhLpHH/PAnb1u/C36drZ+aHOLxtma1wCk
-	tHex2N63Vlg==
-X-Google-Smtp-Source: AGHT+IFAsBB2938nM9V2t0vHFF88zAk8zazjamaznGcUd7tVpkfqVyhQfhhX9Jn2UXSRxE4zi3F02Sx/qJPlmA==
+        d=1e100.net; s=20230601; t=1727190182; x=1727794982;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=1dBDMWv+DBMjfMybSWWoZIriIcEpXSU8MTuNI/aEyso=;
+        b=Oou1eSwZTP7QtY57o83fjv4OO4hYTz5De7x/VTSOSg3E5Fp7CXm6b5TPgdJ5tXMPSl
+         6QGurj8TxAStas2dXsAyfPJB1PMua7qhpoLHsQ7mmUt2OvYr4TwmWVZ0N5Dv4DsCydPq
+         SKq7kjizZdGkj2reWCM8IL9K4JtWQP2p92p5WJ8tHyzRwBVrlNvmsC8xzbR+Zd9gXC7s
+         CCexRBtXw3tDBxk5Klko9A4+YMd+rv9TpgC1iPZpsYVZMBaR8M0OhjzBUScCCWFGaMB8
+         zjOlSyeN2P0I2tGQkeVsVdcwWnoF5HQR1fnJKex+WUaGNHxy/2DAIW6in+OW+mxSLU7g
+         W63g==
+X-Forwarded-Encrypted: i=1; AJvYcCWJ6oMoqvqHJWt9Dv5DyCvWpw2VHazk5GKGYSya05NMaTTaBqexu4whNJEO/XisusTX2C96y84=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHp3qEHiJDriJ/TjSMPZFuDQAjJ2HAQFC55z69o0KCUFpega9S
+	kTJ6vxC7TTG7Kyby3wLDPEIp92EYFL4qhGKzYw1sVeyREd83ldHgwphGFFLub49sFCvkQy6O3jA
+	4ex4hzKI5CQ==
+X-Google-Smtp-Source: AGHT+IFni0NvOOBMnOql8JvDEsVS6N5W4+LZv/RPNAv+Q0p/UCI5VP/nithd2GngWw0rH9uBxthK3tfx9GYeHw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:8751:0:b0:e1a:22d5:d9ef with SMTP id
- 3f1490d57ef6-e2250c39befmr12944276.3.1727190179786; Tue, 24 Sep 2024 08:02:59
- -0700 (PDT)
-Date: Tue, 24 Sep 2024 15:02:55 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:df43:0:b0:e1a:23f2:a0e4 with SMTP id
+ 3f1490d57ef6-e2250cd3bf4mr37800276.10.1727190181330; Tue, 24 Sep 2024
+ 08:03:01 -0700 (PDT)
+Date: Tue, 24 Sep 2024 15:02:56 +0000
+In-Reply-To: <20240924150257.1059524-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240924150257.1059524-1-edumazet@google.com>
 X-Mailer: git-send-email 2.46.0.792.g87dc391469-goog
-Message-ID: <20240924150257.1059524-1-edumazet@google.com>
-Subject: [PATCH net 0/2] net: two fixes for qdisc_pkt_len_init()
+Message-ID: <20240924150257.1059524-2-edumazet@google.com>
+Subject: [PATCH net 1/2] net: avoid potential underflow in qdisc_pkt_len_init()
+ with UFO
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
 	Willem de Bruijn <willemb@google.com>, Jonathan Davies <jonathan.davies@nutanix.com>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Inspired by one syzbot report.
+After commit 7c6d2ecbda83 ("net: be more gentle about silly gso
+requests coming from user") virtio_net_hdr_to_skb() had sanity check
+to detect malicious attempts from user space to cook a bad GSO packet.
 
-At least one qdisc (fq_codel) depends on qdisc_skb_cb(skb)->pkt_len
-having a sane value (not zero)
+Then commit cf9acc90c80ec ("net: virtio_net_hdr_to_skb: count
+transport header in UFO") while fixing one issue, allowed user space
+to cook a GSO packet with the following characteristic :
 
-With the help of af_packet, syzbot was able to fool qdisc_pkt_len_init()
-to precisely set qdisc_skb_cb(skb)->pkt_len to zero.
+IPv4 SKB_GSO_UDP, gso_size=3D3, skb->len =3D 28.
 
-First patch fixes this issue.
+When this packet arrives in qdisc_pkt_len_init(), we end up
+with hdr_len =3D 28 (IPv4 header + UDP header), matching skb->len
 
-Second one (a separate one to help future bisections) adds
-more sanity check to SKB_GSO_DODGY users.
+Then the following sets gso_segs to 0 :
 
-Eric Dumazet (2):
-  net: avoid potential underflow in qdisc_pkt_len_init() with UFO
-  net: add more sanity checks to qdisc_pkt_len_init()
+gso_segs =3D DIV_ROUND_UP(skb->len - hdr_len,
+                        shinfo->gso_size);
 
- net/core/dev.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Then later we set qdisc_skb_cb(skb)->pkt_len to back to zero :/
 
--- 
+qdisc_skb_cb(skb)->pkt_len +=3D (gso_segs - 1) * hdr_len;
+
+This leads to the following crash in fq_codel [1]
+
+qdisc_pkt_len_init() is best effort, we only want an estimation
+of the bytes sent on the wire, not crashing the kernel.
+
+This patch is fixing this particular issue, a following one
+adds more sanity checks for another potential bug.
+
+[1]
+[   70.724101] BUG: kernel NULL pointer dereference, address: 0000000000000=
+000
+[   70.724561] #PF: supervisor read access in kernel mode
+[   70.724561] #PF: error_code(0x0000) - not-present page
+[   70.724561] PGD 10ac61067 P4D 10ac61067 PUD 107ee2067 PMD 0
+[   70.724561] Oops: Oops: 0000 [#1] SMP NOPTI
+[   70.724561] CPU: 11 UID: 0 PID: 2163 Comm: b358537762 Not tainted 6.11.0=
+-virtme #991
+[   70.724561] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
+1.16.3-debian-1.16.3-2 04/01/2014
+[   70.724561] RIP: 0010:fq_codel_enqueue (net/sched/sch_fq_codel.c:120 net=
+/sched/sch_fq_codel.c:168 net/sched/sch_fq_codel.c:230) sch_fq_codel
+[ 70.724561] Code: 24 08 49 c1 e1 06 44 89 7c 24 18 45 31 ed 45 31 c0 31 ff=
+ 89 44 24 14 4c 03 8b 90 01 00 00 eb 04 39 ca 73 37 4d 8b 39 83 c7 01 <49> =
+8b 17 49 89 11 41 8b 57 28 45 8b 5f 34 49 c7 07 00 00 00 00 49
+All code
+=3D=3D=3D=3D=3D=3D=3D=3D
+   0:	24 08                	and    $0x8,%al
+   2:	49 c1 e1 06          	shl    $0x6,%r9
+   6:	44 89 7c 24 18       	mov    %r15d,0x18(%rsp)
+   b:	45 31 ed             	xor    %r13d,%r13d
+   e:	45 31 c0             	xor    %r8d,%r8d
+  11:	31 ff                	xor    %edi,%edi
+  13:	89 44 24 14          	mov    %eax,0x14(%rsp)
+  17:	4c 03 8b 90 01 00 00 	add    0x190(%rbx),%r9
+  1e:	eb 04                	jmp    0x24
+  20:	39 ca                	cmp    %ecx,%edx
+  22:	73 37                	jae    0x5b
+  24:	4d 8b 39             	mov    (%r9),%r15
+  27:	83 c7 01             	add    $0x1,%edi
+  2a:*	49 8b 17             	mov    (%r15),%rdx		<-- trapping instruction
+  2d:	49 89 11             	mov    %rdx,(%r9)
+  30:	41 8b 57 28          	mov    0x28(%r15),%edx
+  34:	45 8b 5f 34          	mov    0x34(%r15),%r11d
+  38:	49 c7 07 00 00 00 00 	movq   $0x0,(%r15)
+  3f:	49                   	rex.WB
+
+Code starting with the faulting instruction
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+   0:	49 8b 17             	mov    (%r15),%rdx
+   3:	49 89 11             	mov    %rdx,(%r9)
+   6:	41 8b 57 28          	mov    0x28(%r15),%edx
+   a:	45 8b 5f 34          	mov    0x34(%r15),%r11d
+   e:	49 c7 07 00 00 00 00 	movq   $0x0,(%r15)
+  15:	49                   	rex.WB
+[   70.724561] RSP: 0018:ffff95ae85e6fb90 EFLAGS: 00000202
+[   70.724561] RAX: 0000000002000000 RBX: ffff95ae841de000 RCX: 00000000000=
+00000
+[   70.724561] RDX: 0000000000000000 RSI: 0000000000000001 RDI: 00000000000=
+00001
+[   70.724561] RBP: ffff95ae85e6fbf8 R08: 0000000000000000 R09: ffff95b710a=
+30000
+[   70.724561] R10: 0000000000000000 R11: bdf289445ce31881 R12: ffff95ae85e=
+6fc58
+[   70.724561] R13: 0000000000000000 R14: 0000000000000040 R15: 00000000000=
+00000
+[   70.724561] FS:  000000002c5c1380(0000) GS:ffff95bd7fcc0000(0000) knlGS:=
+0000000000000000
+[   70.724561] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   70.724561] CR2: 0000000000000000 CR3: 000000010c568000 CR4: 00000000000=
+006f0
+[   70.724561] Call Trace:
+[   70.724561]  <TASK>
+[   70.724561] ? __die (arch/x86/kernel/dumpstack.c:421 arch/x86/kernel/dum=
+pstack.c:434)
+[   70.724561] ? page_fault_oops (arch/x86/mm/fault.c:715)
+[   70.724561] ? exc_page_fault (./arch/x86/include/asm/irqflags.h:26 ./arc=
+h/x86/include/asm/irqflags.h:87 ./arch/x86/include/asm/irqflags.h:147 arch/=
+x86/mm/fault.c:1489 arch/x86/mm/fault.c:1539)
+[   70.724561] ? asm_exc_page_fault (./arch/x86/include/asm/idtentry.h:623)
+[   70.724561] ? fq_codel_enqueue (net/sched/sch_fq_codel.c:120 net/sched/s=
+ch_fq_codel.c:168 net/sched/sch_fq_codel.c:230) sch_fq_codel
+[   70.724561] dev_qdisc_enqueue (net/core/dev.c:3784)
+[   70.724561] __dev_queue_xmit (net/core/dev.c:3880 (discriminator 2) net/=
+core/dev.c:4390 (discriminator 2))
+[   70.724561] ? irqentry_enter (kernel/entry/common.c:237)
+[   70.724561] ? sysvec_apic_timer_interrupt (./arch/x86/include/asm/hardir=
+q.h:74 (discriminator 2) arch/x86/kernel/apic/apic.c:1043 (discriminator 2)=
+ arch/x86/kernel/apic/apic.c:1043 (discriminator 2))
+[   70.724561] ? trace_hardirqs_on (kernel/trace/trace_preemptirq.c:58 (dis=
+criminator 4))
+[   70.724561] ? asm_sysvec_apic_timer_interrupt (./arch/x86/include/asm/id=
+tentry.h:702)
+[   70.724561] ? virtio_net_hdr_to_skb.constprop.0 (./include/linux/virtio_=
+net.h:129 (discriminator 1))
+[   70.724561] packet_sendmsg (net/packet/af_packet.c:3145 (discriminator 1=
+) net/packet/af_packet.c:3177 (discriminator 1))
+[   70.724561] ? _raw_spin_lock_bh (./arch/x86/include/asm/atomic.h:107 (di=
+scriminator 4) ./include/linux/atomic/atomic-arch-fallback.h:2170 (discrimi=
+nator 4) ./include/linux/atomic/atomic-instrumented.h:1302 (discriminator 4=
+) ./include/asm-generic/qspinlock.h:111 (discriminator 4) ./include/linux/s=
+pinlock.h:187 (discriminator 4) ./include/linux/spinlock_api_smp.h:127 (dis=
+criminator 4) kernel/locking/spinlock.c:178 (discriminator 4))
+[   70.724561] ? netdev_name_node_lookup_rcu (net/core/dev.c:325 (discrimin=
+ator 1))
+[   70.724561] __sys_sendto (net/socket.c:730 (discriminator 1) net/socket.=
+c:745 (discriminator 1) net/socket.c:2210 (discriminator 1))
+[   70.724561] ? __sys_setsockopt (./include/linux/file.h:34 net/socket.c:2=
+355)
+[   70.724561] __x64_sys_sendto (net/socket.c:2222 (discriminator 1) net/so=
+cket.c:2218 (discriminator 1) net/socket.c:2218 (discriminator 1))
+[   70.724561] do_syscall_64 (arch/x86/entry/common.c:52 (discriminator 1) =
+arch/x86/entry/common.c:83 (discriminator 1))
+[   70.724561] entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:13=
+0)
+[   70.724561] RIP: 0033:0x41ae09
+
+Fixes: cf9acc90c80ec ("net: virtio_net_hdr_to_skb: count transport header i=
+n UFO")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Jonathan Davies <jonathan.davies@nutanix.com>
+---
+ net/core/dev.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 1e740faf9e783b047b2dc7d9fd4242e4e6c7317a..f2c47da79f17d5ebe6b334b63d6=
+6c84c84c519fc 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3758,7 +3758,7 @@ static void qdisc_pkt_len_init(struct sk_buff *skb)
+ 						sizeof(_tcphdr), &_tcphdr);
+ 			if (likely(th))
+ 				hdr_len +=3D __tcp_hdrlen(th);
+-		} else {
++		} else if (shinfo->gso_type & SKB_GSO_UDP_L4) {
+ 			struct udphdr _udphdr;
+=20
+ 			if (skb_header_pointer(skb, hdr_len,
+--=20
 2.46.0.792.g87dc391469-goog
 
 
