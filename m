@@ -1,157 +1,96 @@
-Return-Path: <netdev+bounces-129487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C2E998418E
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:04:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19073984194
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:05:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8B301C23AA4
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 09:04:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3F49B25558
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 09:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FC1185922;
-	Tue, 24 Sep 2024 09:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B859155308;
+	Tue, 24 Sep 2024 09:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="16/egj4t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jBBCEkka"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D3917E008
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 09:01:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3357C1474C5;
+	Tue, 24 Sep 2024 09:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727168498; cv=none; b=STPv57mEDf8tWxQnFsDYqDMxod5Ja2LSjXoFzSIC2OUt5xhEbXJsKc06gCZR8n7ZfSZZc/udqQGdUu3pPW1Ex1wcKZcwBV1SEFMBsYnMaitXBrxT6ddG6YqUDf1+sdiB1nl1ixyGl3ItacZ00rZ7X54tWPFOwebnvFm/CDSRwxA=
+	t=1727168539; cv=none; b=h8Ud7nvQ/oSwxH+Qqt2sbbzjb+UpJyummxNaWQ7kXWlyPkEBN1BzmJNZ2z5IZorMD5dD4rPkxa9OoNdCP4ywZVCaZNiCTmYyiAR50ctIqw64C3axw7wtyYavSQnUdpVvUQbzafVBogAUldb55e400CS9NFPAYlCqSM9h6F1VlvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727168498; c=relaxed/simple;
-	bh=2fqPz17MRcLXtYYBT9jcWjUzidfYf/z7eYbmCSZjWTI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To; b=P55fPX028cU+La8tRA5KSqa5tVCcBe8K4eVsphAXxDdBoV6Itw/883YOv+tQnI6YHvjo/tQHD1yKVXIGJkvVOEqpgZBvO7GFVTst2HlNN11sr0pa1dJKK2v6SgTkPo6t0p9O3iqKO70ApRh39hkf3DxtijGOQ/cKoEotfE1jCwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=16/egj4t; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c5b954c359so3258436a12.1
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 02:01:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1727168495; x=1727773295; darn=vger.kernel.org;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ldxygdAUBk4mdAzGg1OPlp5HlR7yVW+p2ali8303Ccc=;
-        b=16/egj4tbMuwzY5iQ1q8y5LydOMDyUtDR1qtTkcOMcOvhFkUK4c7Wfye91lOkRhLeK
-         6rgTh66Kjbpo98e7EO/xZPAzIxatcSzw+Ig2mVim56GgKpqIlE2X+r0TR1GyRFuJQ2WJ
-         ygUwuZrFWC+YgY6Ys7levb7vLVekDj/YOlqZeIkdKN0nY6HqyQxXcMFGiKkrmwvz6be8
-         ELipaU6ZnRQuT2njyVKvmpBgdCesU6UkYtqTrj3JsKgSBvhTVQ6xqDtH/MVjQPWfzTje
-         Ur81jUfYo1qVWf6sepOgHAaP1wiCTyafq9nviCBiXiKUxINyxIyhAcdSo7Aksnn36DfH
-         HsWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727168495; x=1727773295;
-        h=to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ldxygdAUBk4mdAzGg1OPlp5HlR7yVW+p2ali8303Ccc=;
-        b=jOLrZOFDUCKwkT9t9WrhIsuy+kFZ0dMsMWJZyoo6J3DxWkjEk7bxLEJ0hwSAtE2GOG
-         WbIfcJBqX2XzhJuDTu/+BkWXZ7gqjNSQRctx234Y1LuUOTrVV04lzIGyBGQXK7mJDjbw
-         LjNtGVVVIGIOSzWkhcjKZUCw8mZBPAtEj5xjGURTYaLfaKDmgoZwBj7HWZz20gELUO37
-         j1Ht4PeceBvTW5Qx9nh/pPeV+s3jEm6y9sWjTRioHI0UCDJmOBNDVUfDheWDYmklzXPr
-         CwttNOQ3yww+ELoBMcwZugDdgPu1dLjUO+GuwZNTp/b/h0vI2vkGOauAEvMkqv9aMCi0
-         ph2g==
-X-Forwarded-Encrypted: i=1; AJvYcCVELNQmLzQzMdOwIBTicMQ4LvEkOVu88NR9vbB9UHFtWHULSmgSKDRXVe4YfGcCMvnDnpFCQMY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6lQdXw7JbL4/9BlLvSlQLHRDJB3aCTuFraJXhiqTYMvqP/pkr
-	m8mLrIFSTeCDulIPBHnuhwCSIDzhntC+kPf8OhdFz39NcZKifS3NtvE0iqAeGV8=
-X-Google-Smtp-Source: AGHT+IFFGNZvMoEmnxV4kikQ2H333bCCtXL26WeV3JaDRS2Q6nCPUSS8kmDRZE0LD3ZUPP5h6fZgnQ==
-X-Received: by 2002:a05:6402:354a:b0:5c6:34c5:e5d7 with SMTP id 4fb4d7f45d1cf-5c634c5e97fmr874444a12.7.1727168495205;
-        Tue, 24 Sep 2024 02:01:35 -0700 (PDT)
-Received: from localhost ([193.32.29.227])
-        by smtp.gmail.com with UTF8SMTPSA id 4fb4d7f45d1cf-5c5cf48c04esm527645a12.14.2024.09.24.02.01.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Sep 2024 02:01:34 -0700 (PDT)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Tue, 24 Sep 2024 11:01:14 +0200
-Subject: [PATCH RFC v4 9/9] vhost/net: Support VIRTIO_NET_F_HASH_REPORT
+	s=arc-20240116; t=1727168539; c=relaxed/simple;
+	bh=XGDX134FSG4Fp47B80thHQRWRGoHobKxUbRN/NRHEoY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XtkpioxZIW2oR2+jol1fZ+EkTCvrV9sFbd6od3yH70Yt+zqf2PC1FbXP0iiupLXFd1ftA72GBL+FpJClhP69LVqTDwDHvKrKw4xrxeSvoJ0lR5pXxz+a93Rx/ncBUWupCdkvjZAnX0hLSUg6zRDRk34IucFmOkluipmAaVDUKL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jBBCEkka; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E36EC4CEC4;
+	Tue, 24 Sep 2024 09:02:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727168538;
+	bh=XGDX134FSG4Fp47B80thHQRWRGoHobKxUbRN/NRHEoY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jBBCEkkaY1p7jkYQLdh+FqWvQY0c3KTXC9XcyGtqoV1x3O2VXcG1+mDXJgTy0/Wsg
+	 bR18Pw8NwovY/haOFc48i2CIRjPXgyg0M1yimFa0kqidjFHDpqw5K1KfWmiUXPBGRk
+	 eZIWMfgyjDqX9oa4hOIWdN4Ksl9Nlshowk4MNK1ZRP2Wkkxrt9cewUnvUxKPkht+36
+	 zHcPP3R/+wDI+Zytz6vNS7RPuNq8qFNvf+K941XsElrEQkYQRqZz0/+C/cdhy1LmWe
+	 l28sZ+GGekdIp81MCXD7xeCold9vkFTXE304xiQjh74z4fdtnsODHxKhZz31lql6GA
+	 x+HX5OV1B/fTw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 344793806655;
+	Tue, 24 Sep 2024 09:02:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240924-rss-v4-9-84e932ec0e6c@daynix.com>
-References: <20240924-rss-v4-0-84e932ec0e6c@daynix.com>
-In-Reply-To: <20240924-rss-v4-0-84e932ec0e6c@daynix.com>
-To: Jonathan Corbet <corbet@lwn.net>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>, 
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, kvm@vger.kernel.org, 
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org, 
- Yuri Benditovich <yuri.benditovich@daynix.com>, 
- Andrew Melnychenko <andrew@daynix.com>, 
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14-dev-fd6e3
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/2] net: phy: aquantia: fix setting active_low bit
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172716854102.3946404.10055646169989118874.git-patchwork-notify@kernel.org>
+Date: Tue, 24 Sep 2024 09:02:21 +0000
+References: <ab963584b0a7e3b4dac39472a4b82ca264d79630.1726580902.git.daniel@makrotopia.org>
+In-Reply-To: <ab963584b0a7e3b4dac39472a4b82ca264d79630.1726580902.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ansuelsmth@gmail.com, bartosz.golaszewski@linaro.org, robimarko@gmail.com,
+ rmk+kernel@armlinux.org.uk, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-VIRTIO_NET_F_HASH_REPORT allows to report hash values calculated on the
-host. When VHOST_NET_F_VIRTIO_NET_HDR is employed, it will report no
-hash values (i.e., the hash_report member is always set to
-VIRTIO_NET_HASH_REPORT_NONE). Otherwise, the values reported by the
-underlying socket will be reported.
+Hello:
 
-VIRTIO_NET_F_HASH_REPORT requires VIRTIO_F_VERSION_1.
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- drivers/vhost/net.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+On Tue, 17 Sep 2024 14:49:40 +0100 you wrote:
+> phy_modify_mmd was used wrongly in aqr_phy_led_active_low_set() resulting
+> in a no-op instead of setting the VEND1_GLOBAL_LED_DRIVE_VDD bit.
+> Correctly set VEND1_GLOBAL_LED_DRIVE_VDD bit.
+> 
+> Fixes: 61578f679378 ("net: phy: aquantia: add support for PHY LEDs")
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> 
+> [...]
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index f16279351db5..ec1167a782ec 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -73,6 +73,7 @@ enum {
- 	VHOST_NET_FEATURES = VHOST_FEATURES |
- 			 (1ULL << VHOST_NET_F_VIRTIO_NET_HDR) |
- 			 (1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			 (1ULL << VIRTIO_NET_F_HASH_REPORT) |
- 			 (1ULL << VIRTIO_F_ACCESS_PLATFORM) |
- 			 (1ULL << VIRTIO_F_RING_RESET)
- };
-@@ -1604,10 +1605,13 @@ static int vhost_net_set_features(struct vhost_net *n, u64 features)
- 	size_t vhost_hlen, sock_hlen, hdr_len;
- 	int i;
- 
--	hdr_len = (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
--			       (1ULL << VIRTIO_F_VERSION_1))) ?
--			sizeof(struct virtio_net_hdr_mrg_rxbuf) :
--			sizeof(struct virtio_net_hdr);
-+	if (features & (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+		hdr_len = sizeof(struct virtio_net_hdr_v1_hash);
-+	else if (features & ((1ULL << VIRTIO_NET_F_MRG_RXBUF) |
-+			     (1ULL << VIRTIO_F_VERSION_1)))
-+		hdr_len = sizeof(struct virtio_net_hdr_mrg_rxbuf);
-+	else
-+		hdr_len = sizeof(struct virtio_net_hdr);
- 	if (features & (1 << VHOST_NET_F_VIRTIO_NET_HDR)) {
- 		/* vhost provides vnet_hdr */
- 		vhost_hlen = hdr_len;
-@@ -1688,6 +1692,10 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
- 			return -EFAULT;
- 		if (features & ~VHOST_NET_FEATURES)
- 			return -EOPNOTSUPP;
-+		if ((features & ((1ULL << VIRTIO_F_VERSION_1) |
-+				 (1ULL << VIRTIO_NET_F_HASH_REPORT))) ==
-+		    (1ULL << VIRTIO_NET_F_HASH_REPORT))
-+			return -EINVAL;
- 		return vhost_net_set_features(n, features);
- 	case VHOST_GET_BACKEND_FEATURES:
- 		features = VHOST_NET_BACKEND_FEATURES;
+Here is the summary with links:
+  - [net,1/2] net: phy: aquantia: fix setting active_low bit
+    https://git.kernel.org/netdev/net/c/d2b366c43443
+  - [net,2/2] net: phy: aquantia: fix applying active_low bit after reset
+    https://git.kernel.org/netdev/net/c/6f9defaf9912
 
+You are awesome, thank you!
 -- 
-2.46.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
