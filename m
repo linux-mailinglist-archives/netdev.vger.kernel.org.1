@@ -1,64 +1,50 @@
-Return-Path: <netdev+bounces-129507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 631409842EE
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:04:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC4D39842D0
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:00:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 833AEB2576C
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 10:04:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84B881F22A0B
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 10:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2DF0170A26;
-	Tue, 24 Sep 2024 10:03:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62B715574F;
+	Tue, 24 Sep 2024 10:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ScHLowhF"
 X-Original-To: netdev@vger.kernel.org
-Received: from cantor.telenet-ops.be (cantor.telenet-ops.be [195.130.132.48])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CC9B14BF9B
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 10:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777551494CE;
+	Tue, 24 Sep 2024 10:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727172227; cv=none; b=V5a6s2VzcgO9FV9nrApFDWnhkTlZ15zp8SAbJlwmGSAivTDIQ/IXwurKz9aiGU7qEhC17BRKYwfkMV4yOorBxS4CaRp6i29li+fve/X0svxx3UrO+fcKvBP/PDlXGLX3ppSepnPxY1EeA4QIbXkDrgoB8QterQFQ6suHdLXbxbo=
+	t=1727172027; cv=none; b=Gjpa7KhyP+7t7kVUSn03GB1cE7KLATaAmK7wLNTBUTHebbikes6Df775u1nwv6LVF+aHYM+7DdJSPmU2M49IanpFbZY+u7Q6lkEJ2jC6JYkfrW3tvoe745CR5r2Tyy/tcn9e0ptAg7RDfRUSKbYitRFjCBZ7THDYa1WhoZivJeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727172227; c=relaxed/simple;
-	bh=Qe5gsGLUKgpWeMR6yMlL8INVF8e5OomKcG92fxXpQ9c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Aj/Xe47ORZGBGHKI5hWanCpH1U7JWjoOWSx3Gji264Xr/1ZF8yiTBbp2iairNMTlqFdRb6GRVRPgIvpxprlQFVzvamIwCSmLQU/DBafpj1+eB34afUME29g8lcDqMnsOJKEdyludGwK5Hh16Pi/jZ8uN/iF3AuiBcub1CHFeN4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=glider.be
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
-Received: from baptiste.telenet-ops.be (baptiste.telenet-ops.be [IPv6:2a02:1800:120:4::f00:13])
-	by cantor.telenet-ops.be (Postfix) with ESMTPS id 4XCb6Q2mclz4xL42
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 12:03:42 +0200 (CEST)
-Received: from ramsan.of.borg ([84.195.187.55])
-	by baptiste.telenet-ops.be with cmsmtp
-	id GA3Z2D00H1C8whw01A3ZkG; Tue, 24 Sep 2024 12:03:35 +0200
-Received: from rox.of.borg ([192.168.97.57])
-	by ramsan.of.borg with esmtp (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1st2K3-000Sir-BC;
-	Tue, 24 Sep 2024 11:59:11 +0200
-Received: from geert by rox.of.borg with local (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1st2K7-002HH6-7Z;
-	Tue, 24 Sep 2024 11:59:11 +0200
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	=?UTF-8?q?Jens=20Emil=20Schulz=20=C3=98stergaard?= <jensemil.schulzostergaard@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] net: microchip: Make FDMA config symbol invisible
-Date: Tue, 24 Sep 2024 11:59:09 +0200
-Message-Id: <8e2bcd8899c417a962b7ee3f75b29f35b25d7933.1727171879.git.geert+renesas@glider.be>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1727172027; c=relaxed/simple;
+	bh=vwwcht1BEi5Bui59qglPewDZ63ryyP+yzkukmNfzoZg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=o1l2LndAs2LA0/o50pEyHA+QKvy2S5FO2/02HZVld7AsFom5yku6NTUgaDvAoYfJbOQ8N/QFjMRRnQ6CkmMXegxoUjMD3Xap1M3EZDu1TBY4qo6RfxDTyPBGa/QzlKow3sBq//yjzvN49hDDwzouktAXdY3EZIQ6/ZmbkJ2MVt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ScHLowhF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE23BC4CEC4;
+	Tue, 24 Sep 2024 10:00:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727172026;
+	bh=vwwcht1BEi5Bui59qglPewDZ63ryyP+yzkukmNfzoZg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ScHLowhF7XupHEieOu9xOfvardJ12COtXZhfE7Xcacwx6hkkdTPm/TfOWprN1fM90
+	 fqJJOP3a27LMAwRGtikLxmPA6hHqDMSqGRzlBVUQNaDqtwRnIwIKXNfnHv2HG66YYs
+	 KE7jVGd2ZUNOnzbV374uJNYaCNjNK/HDC0leNZUZVsuvYlvScbNOQNVkIiIvG45P0I
+	 z5dqYk+E79laO223vv8uD7P6it25Ct52GTj5eQJ1J7Njul/o6m9s08F0TWpubuazGK
+	 aCXNSAlcyc2TQJcY/cHwKnMgrnvk5K7QFttK2Jv29Tc4P6l5dMAYmhuD4/XP8VzJQe
+	 oY4X/dA1DJbng==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7126A3806655;
+	Tue, 24 Sep 2024 10:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,31 +52,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [net PATCH v3 0/2] Fix maximum TX/RX frame sizes in ravb driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <172717202926.3972444.193078551368656456.git-patchwork-notify@kernel.org>
+Date: Tue, 24 Sep 2024 10:00:29 +0000
+References: <20240918081839.259-1-paul.barker.ct@bp.renesas.com>
+In-Reply-To: <20240918081839.259-1-paul.barker.ct@bp.renesas.com>
+To: Paul Barker <paul.barker.ct@bp.renesas.com>
+Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, niklas.soderlund+renesas@ragnatech.se,
+ andrew@lunn.ch, biju.das.jz@bp.renesas.com, claudiu.beznea.uj@bp.renesas.com,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, mitsuhiro.kimura.kc@renesas.com,
+ geert+renesas@glider.be, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-There is no need to ask the user about enabling Microchip FDMA
-functionality, as all drivers that use it select the FDMA symbol.
-Hence make the symbol invisible, unless when compile-testing.
+Hello:
 
-Fixes: 30e48a75df9c6ead ("net: microchip: add FDMA library")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- drivers/net/ethernet/microchip/fdma/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/ethernet/microchip/fdma/Kconfig b/drivers/net/ethernet/microchip/fdma/Kconfig
-index 59159ad6701ad50b..ec228c0613517ec3 100644
---- a/drivers/net/ethernet/microchip/fdma/Kconfig
-+++ b/drivers/net/ethernet/microchip/fdma/Kconfig
-@@ -6,7 +6,7 @@
- if NET_VENDOR_MICROCHIP
- 
- config FDMA
--	bool "FDMA API"
-+	bool "FDMA API" if COMPILE_TEST
- 	help
- 	  Provides the basic FDMA functionality for multiple Microchip
- 	  switchcores.
+On Wed, 18 Sep 2024 09:18:37 +0100 you wrote:
+> These patches fix a couple of bugs in the maximum supported TX/RX frame
+> sizes in the ravb driver.
+> 
+>   * For the GbEth IP, we were advertising a maximum TX frame size/MTU
+>     that was larger that the maximum the hardware can transmit.
+> 
+>   * For the R-Car AVB IP, we were unnecessarily setting the maximum RX
+>     frame size/MRU based on the MTU, which by default is smaller than
+>     the maximum the hardware can receive.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3,1/2] net: ravb: Fix maximum TX frame size for GbEth devices
+    https://git.kernel.org/netdev/net/c/1d63864299ca
+  - [net,v3,2/2] net: ravb: Fix R-Car RX frame size limit
+    https://git.kernel.org/netdev/net/c/ec8234717db8
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
