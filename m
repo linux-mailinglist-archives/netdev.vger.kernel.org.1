@@ -1,401 +1,156 @@
-Return-Path: <netdev+bounces-129529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC69A98451F
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:49:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F00D984515
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:44:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48C171F243D4
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:49:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C13741C21693
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96EC813342F;
-	Tue, 24 Sep 2024 11:49:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5BFD1A704E;
+	Tue, 24 Sep 2024 11:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="hI3lG33b"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rS/teoq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B43F712A14C;
-	Tue, 24 Sep 2024 11:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 884AC86131
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 11:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727178540; cv=none; b=kGyXmf0txE5ybMMNsmfMTU4Ct456I+jOpGrGJPGakp1YjFjmIKaupjcfXy9PNAZZZY3oRQ5n7EK1QYC8TyXuXXrEEkTYkuXiF2y4iMLJSZGWqNoeLa88N1gTczRrqK1oLTT9Z1h/5mp6sEHx46ZafVMSwcsY4B5153q5EZnzuZs=
+	t=1727178244; cv=none; b=AAnezkzkYMo1gHdS5llWYKt9i61dLLwRKNlvs3QBFowXFlUf7qMHPO7htuaGRhrzqM9JRR0rtW8d+GQxH1S0pETkdy5kGgTahyD3h+Kqsn2t5o/3epTmlAUikqsriSP8GV+cJWlPnxmdPUifrtlU9DUWKH9isRqSXgYCiL8tZ/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727178540; c=relaxed/simple;
-	bh=nI5RZTnw4jCOprF1i9T8BMmd/c22vlBCqxaEQkrHbaQ=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=bmISc3ndSIDSupkropqZszRX4LVB++IYF6KL/2y7V8eJZ2Yzxu/lk9rov+vAjQQC9F0xbkuuHCGp5R0zWdURZp4oe/cNOn1j5dNnUDGUGSu2ZOFkjokx8o9nB0+uFik9e2wHxmVZ+DcE81Z1itgbj+0k23vvRnurXG2duNFmvhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=hI3lG33b; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1727178530; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=8wY6jYmr1SXICebQz5ZYZffdhVXbWENuHCzft78Vc/k=;
-	b=hI3lG33b0j94OFGiyykYk0DuEPux3RPrpMmYYUDuCp27KOTEnimdyesdjsjS++x9CQEcseTSOBC/zU+Y3k868g4lRnF7LNMHJM0gc+3Cc7NfsvWRprYR3XgdqEnG70bXtGeNhakdbQP9ZPaaO+Ei5Qm7HmbX6X7wUj2zxMFb6Ik=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WFgDpQ6_1727178528)
-          by smtp.aliyun-inc.com;
-          Tue, 24 Sep 2024 19:48:49 +0800
-Message-ID: <1727178087.972947-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [RFC net-next v1 10/12] virtio_net: xsk: tx: support xmit xsk buffer
-Date: Tue, 24 Sep 2024 19:41:27 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240924013204.13763-1-xuanzhuo@linux.alibaba.com>
- <20240924013204.13763-11-xuanzhuo@linux.alibaba.com>
- <CACGkMEvbxs4AK+xCW0i-ZMo4B5WEKMLmFHBu_7ZRa+4Pv+-44w@mail.gmail.com>
-In-Reply-To: <CACGkMEvbxs4AK+xCW0i-ZMo4B5WEKMLmFHBu_7ZRa+4Pv+-44w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1727178244; c=relaxed/simple;
+	bh=8SeBeMit1erdjYZ5mBMFGazV3ILdKe6iS4Sdobi/Mk4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FJmD15YSH/Bxt1g8l5yAzKmnniO9XSsK8c9eQ9kRmVm2aCd+VmKk35NT1HZLNwW58PjT5QtVl2KlwtwBLvU4Tr4Wlz8+gTVieHDizPujr2GLyJDhy1T2Lipn+E7DXz+X33M9a51YEh8Sep44oNuRSpnHkpU79aHG6aFJWrtpjA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rS/teoq0; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5c275491c61so7216424a12.0
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 04:44:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1727178240; x=1727783040; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=XKduaMO4XMlChzXeXd41yjomvNaLJYSYU9jwBphsY7o=;
+        b=rS/teoq0KIJHtaAF50VUV95jW5v6O7jvtvRPS5XLEZnjC3DS+6JtDwAI0yjsvdb/ne
+         Do/ssYUFqNtGB/K2CH3WZ2Xa+vyXC4hhXBq3atX9dXEup67fXxzelXLU4DAx3CnyryJr
+         avHL2WooiEBcVsVNKlMmGYgAWyxm3Bb31GaxefE+7NKszf2Mo/m9b9iXoo3ikpZffwH0
+         b4t6Y+AjQlJbWiiqd1Zlsv8qFtliP1OuQ/3EUoF7ZDeyd5jT176JjHD5YevDr7lveecj
+         VGVkksq+rDbFeapywh6g/Jk2MTK8+Qd70ZC/2R7tDHhV/RttcchnF/q4gBiv7IFieIH3
+         0M4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727178240; x=1727783040;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XKduaMO4XMlChzXeXd41yjomvNaLJYSYU9jwBphsY7o=;
+        b=n7Xyi4a1Oi+byjeJcib+lqfGe/6inz6GtUkXwi/OtAa8ty227y8HLyRH3vJpz2vFI5
+         QcXxqZ4WGpBAtI0LdXzVhYABWsEgdBWFtt+/nAjt+KvfGQyGdh+pOWpkmuS7oyoihOAz
+         XHHufx01B0OE5hjM7YbpdXWdTkddfSbZU8DhxA4lhPXh1VR9yVG4ZRZO8Ur6Y5dcjoJq
+         pG8IRQ710rt9+B4GArNb5VfEHVCkdGlud2s1kfIoCSP2RabPFdQUoGpeRtxSNOJogeXy
+         M3kPoFfY2H4q0EUh00wnzlOvrAXsGsOxmY88ng4PmoV4bspkLBq3qOuFjs55V4viQFu9
+         IyzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWqc9yzv7hqrIf6vGXvd8OJ01AXWkmNHPI8pCcCOHiojPnWOZ2qi6NyI4lFyIfsQaYrWrca1Es=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyCSJKKzrM4a7Y+i4YiT3j2T1ZNI/h0YfJTcPaU7VCJqvg3QIE
+	1GEGJCX212e17/oxTMx1mlqIm/44R+LSeCrM7sFau3JT3hG3T0o0su5JqrOtWVs=
+X-Google-Smtp-Source: AGHT+IHdFRTRmrq9kDY7XVL4TEPwSnDzTbPxg5dRRwKzNPceZ2XDt56AOJMtQcehLOdKTJPbRhj/oQ==
+X-Received: by 2002:a05:6402:42c6:b0:5c3:d8fd:9a3b with SMTP id 4fb4d7f45d1cf-5c464df3304mr12936844a12.28.1727178239620;
+        Tue, 24 Sep 2024 04:43:59 -0700 (PDT)
+Received: from linaro.org ([2a02:2454:ff21:ef80:8e91:35e5:c6f3:1246])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c5cf48c286sm659697a12.17.2024.09.24.04.43.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2024 04:43:59 -0700 (PDT)
+Date: Tue, 24 Sep 2024 13:43:54 +0200
+From: Stephan Gerhold <stephan.gerhold@linaro.org>
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: stephan@gerhold.net, loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] net: wwan: qcom_bam_dmux: Fix missing
+ pm_runtime_disable()
+Message-ID: <ZvKl-i-UESyzSG02@linaro.org>
+References: <20240923115743.3563079-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240923115743.3563079-1-ruanjinjie@huawei.com>
 
-On Tue, 24 Sep 2024 15:35:08 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Sep 24, 2024 at 9:32=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > The driver's tx napi is very important for XSK. It is responsible for
-> > obtaining data from the XSK queue and sending it out.
-> >
-> > At the beginning, we need to trigger tx napi.
-> >
-> > virtnet_free_old_xmit distinguishes three type ptr(skb, xdp frame, xsk
-> > buffer) by the last bits of the pointer.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 176 ++++++++++++++++++++++++++++++++++++---
-> >  1 file changed, 166 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 3ad4c6e3ef18..1a870f1df910 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -83,6 +83,7 @@ struct virtnet_sq_free_stats {
-> >         u64 bytes;
-> >         u64 napi_packets;
-> >         u64 napi_bytes;
-> > +       u64 xsk;
-> >  };
-> >
-> >  struct virtnet_sq_stats {
-> > @@ -514,16 +515,20 @@ static struct sk_buff *virtnet_skb_append_frag(st=
-ruct sk_buff *head_skb,
-> >                                                struct sk_buff *curr_skb,
-> >                                                struct page *page, void =
-*buf,
-> >                                                int len, int truesize);
-> > +static void virtnet_xsk_completed(struct send_queue *sq, int num);
-> >
-> >  enum virtnet_xmit_type {
-> >         VIRTNET_XMIT_TYPE_SKB,
-> >         VIRTNET_XMIT_TYPE_SKB_ORPHAN,
-> >         VIRTNET_XMIT_TYPE_XDP,
-> > +       VIRTNET_XMIT_TYPE_XSK,
-> >  };
-> >
-> >  /* We use the last two bits of the pointer to distinguish the xmit typ=
-e. */
-> >  #define VIRTNET_XMIT_TYPE_MASK (BIT(0) | BIT(1))
-> >
-> > +#define VIRTIO_XSK_FLAG_OFFSET 4
->
-> Any reason this is not 2?
+On Mon, Sep 23, 2024 at 07:57:43PM +0800, Jinjie Ruan wrote:
+> It's important to undo pm_runtime_use_autosuspend() with
+> pm_runtime_dont_use_autosuspend() at driver exit time.
+> 
+> But the pm_runtime_disable() and pm_runtime_dont_use_autosuspend()
+> is missing in the error path for bam_dmux_probe(). So add it.
+> 
+> Found by code review. Compile-tested only.
+> 
+> Fixes: 21a0ffd9b38c ("net: wwan: Add Qualcomm BAM-DMUX WWAN network driver")
+> Suggested-by: Stephan Gerhold <stephan.gerhold@linaro.org>
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 
-There's no particular reason for this, any value greater than 2 will work.
+Thanks for making the changes!
 
+Reviewed-by: Stephan Gerhold <stephan.gerhold@linaro.org>
 
->
-> > +
-> >  static enum virtnet_xmit_type virtnet_xmit_ptr_strip(void **ptr)
-> >  {
-> >         unsigned long p =3D (unsigned long)*ptr;
-> > @@ -546,6 +551,11 @@ static int virtnet_add_outbuf(struct send_queue *s=
-q, int num, void *data,
-> >                                     GFP_ATOMIC);
-> >  }
-> >
-> > +static u32 virtnet_ptr_to_xsk_buff_len(void *ptr)
-> > +{
-> > +       return ((unsigned long)ptr) >> VIRTIO_XSK_FLAG_OFFSET;
-> > +}
-> > +
-> >  static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 l=
-en)
-> >  {
-> >         sg_assign_page(sg, NULL);
-> > @@ -587,11 +597,27 @@ static void __free_old_xmit(struct send_queue *sq=
-, struct netdev_queue *txq,
-> >                         stats->bytes +=3D xdp_get_frame_len(frame);
-> >                         xdp_return_frame(frame);
-> >                         break;
-> > +
-> > +               case VIRTNET_XMIT_TYPE_XSK:
-> > +                       stats->bytes +=3D virtnet_ptr_to_xsk_buff_len(p=
-tr);
-> > +                       stats->xsk++;
-> > +                       break;
-> >                 }
-> >         }
-> >         netdev_tx_completed_queue(txq, stats->napi_packets, stats->napi=
-_bytes);
->
-> Not related to this patch, but this seems unnecessary to AF_XDP.
-
-YES.
-
-netdev_tx_completed_queue will check napi_bytes firstly.
-So I do not think we need to do anything for this.
-
->
-> >  }
-> >
-> > +static void virtnet_free_old_xmit(struct send_queue *sq,
-> > +                                 struct netdev_queue *txq,
-> > +                                 bool in_napi,
-> > +                                 struct virtnet_sq_free_stats *stats)
-> > +{
-> > +       __free_old_xmit(sq, txq, in_napi, stats);
-> > +
-> > +       if (stats->xsk)
-> > +               virtnet_xsk_completed(sq, stats->xsk);
-> > +}
-> > +
-> >  /* Converting between virtqueue no. and kernel tx/rx queue no.
-> >   * 0:rx0 1:tx0 2:rx1 3:tx1 ... 2N:rxN 2N+1:txN 2N+2:cvq
-> >   */
-> > @@ -1019,7 +1045,7 @@ static void free_old_xmit(struct send_queue *sq, =
-struct netdev_queue *txq,
-> >  {
-> >         struct virtnet_sq_free_stats stats =3D {0};
-> >
-> > -       __free_old_xmit(sq, txq, in_napi, &stats);
-> > +       virtnet_free_old_xmit(sq, txq, in_napi, &stats);
-> >
-> >         /* Avoid overhead when no packets have been processed
-> >          * happens when called speculatively from start_xmit.
-> > @@ -1380,6 +1406,111 @@ static int virtnet_add_recvbuf_xsk(struct virtn=
-et_info *vi, struct receive_queue
-> >         return err;
-> >  }
-> >
-> > +static void *virtnet_xsk_to_ptr(u32 len)
-> > +{
-> > +       unsigned long p;
-> > +
-> > +       p =3D len << VIRTIO_XSK_FLAG_OFFSET;
-> > +
-> > +       return virtnet_xmit_ptr_mix((void *)p, VIRTNET_XMIT_TYPE_XSK);
-> > +}
-> > +
-> > +static int virtnet_xsk_xmit_one(struct send_queue *sq,
-> > +                               struct xsk_buff_pool *pool,
-> > +                               struct xdp_desc *desc)
-> > +{
-> > +       struct virtnet_info *vi;
-> > +       dma_addr_t addr;
-> > +
-> > +       vi =3D sq->vq->vdev->priv;
-> > +
-> > +       addr =3D xsk_buff_raw_get_dma(pool, desc->addr);
-> > +       xsk_buff_raw_dma_sync_for_device(pool, addr, desc->len);
-> > +
-> > +       sg_init_table(sq->sg, 2);
-> > +
-> > +       sg_fill_dma(sq->sg, sq->xsk_hdr_dma_addr, vi->hdr_len);
-> > +       sg_fill_dma(sq->sg + 1, addr, desc->len);
-> > +
-> > +       return virtqueue_add_outbuf(sq->vq, sq->sg, 2,
-> > +                                   virtnet_xsk_to_ptr(desc->len), GFP_=
-ATOMIC);
-> > +}
-> > +
-> > +static int virtnet_xsk_xmit_batch(struct send_queue *sq,
-> > +                                 struct xsk_buff_pool *pool,
-> > +                                 unsigned int budget,
-> > +                                 u64 *kicks)
-> > +{
-> > +       struct xdp_desc *descs =3D pool->tx_descs;
-> > +       bool kick =3D false;
-> > +       u32 nb_pkts, i;
-> > +       int err;
-> > +
-> > +       budget =3D min_t(u32, budget, sq->vq->num_free);
-> > +
-> > +       nb_pkts =3D xsk_tx_peek_release_desc_batch(pool, budget);
-> > +       if (!nb_pkts)
-> > +               return 0;
-> > +
-> > +       for (i =3D 0; i < nb_pkts; i++) {
-> > +               err =3D virtnet_xsk_xmit_one(sq, pool, &descs[i]);
-> > +               if (unlikely(err)) {
-> > +                       xsk_tx_completed(sq->xsk_pool, nb_pkts - i);
-> > +                       break;
-> > +               }
-> > +
-> > +               kick =3D true;
-> > +       }
-> > +
-> > +       if (kick && virtqueue_kick_prepare(sq->vq) && virtqueue_notify(=
-sq->vq))
-> > +               (*kicks)++;
-> > +
-> > +       return i;
-> > +}
-> > +
-> > +static bool virtnet_xsk_xmit(struct send_queue *sq, struct xsk_buff_po=
-ol *pool,
-> > +                            int budget)
-> > +{
-> > +       struct virtnet_info *vi =3D sq->vq->vdev->priv;
-> > +       struct virtnet_sq_free_stats stats =3D {};
-> > +       struct net_device *dev =3D vi->dev;
-> > +       u64 kicks =3D 0;
-> > +       int sent;
-> > +
-> > +       /* Avoid to wakeup napi meanless, so call __free_old_xmit. */
->
-> I don't understand the meaning of this comment.
-
-The comments need to be more detailed. Here I want to explain why not just =
-use
-free_old_xmit.
-
-
->
-> > +       __free_old_xmit(sq, netdev_get_tx_queue(dev, sq - vi->sq), true=
-, &stats);
-> > +
-> > +       if (stats.xsk)
-> > +               xsk_tx_completed(sq->xsk_pool, stats.xsk);
-> > +
-> > +       sent =3D virtnet_xsk_xmit_batch(sq, pool, budget, &kicks);
-> > +
-> > +       if (!is_xdp_raw_buffer_queue(vi, sq - vi->sq))
-> > +               check_sq_full_and_disable(vi, vi->dev, sq);
-> > +
-> > +       u64_stats_update_begin(&sq->stats.syncp);
-> > +       u64_stats_add(&sq->stats.packets, stats.packets);
-> > +       u64_stats_add(&sq->stats.bytes,   stats.bytes);
-> > +       u64_stats_add(&sq->stats.kicks,   kicks);
-> > +       u64_stats_add(&sq->stats.xdp_tx,  sent);
-> > +       u64_stats_update_end(&sq->stats.syncp);
-> > +
-> > +       if (xsk_uses_need_wakeup(pool))
-> > +               xsk_set_tx_need_wakeup(pool);
-> > +
-> > +       return sent =3D=3D budget;
-> > +}
-> > +
-> > +static void xsk_wakeup(struct send_queue *sq)
-> > +{
-> > +       if (napi_if_scheduled_mark_missed(&sq->napi))
-> > +               return;
-> > +
-> > +       local_bh_disable();
-> > +       virtqueue_napi_schedule(&sq->napi, sq->vq);
-> > +       local_bh_enable();
-> > +}
-> > +
-> >  static int virtnet_xsk_wakeup(struct net_device *dev, u32 qid, u32 fla=
-g)
-> >  {
-> >         struct virtnet_info *vi =3D netdev_priv(dev);
-> > @@ -1393,14 +1524,19 @@ static int virtnet_xsk_wakeup(struct net_device=
- *dev, u32 qid, u32 flag)
-> >
-> >         sq =3D &vi->sq[qid];
-> >
-> > -       if (napi_if_scheduled_mark_missed(&sq->napi))
-> > -               return 0;
-> > +       xsk_wakeup(sq);
-> > +       return 0;
-> > +}
-> >
-> > -       local_bh_disable();
-> > -       virtqueue_napi_schedule(&sq->napi, sq->vq);
-> > -       local_bh_enable();
-> > +static void virtnet_xsk_completed(struct send_queue *sq, int num)
-> > +{
-> > +       xsk_tx_completed(sq->xsk_pool, num);
-> >
-> > -       return 0;
-> > +       /* If this is called by rx poll, start_xmit and xdp xmit we sho=
-uld
-> > +        * wakeup the tx napi to consume the xsk tx queue, because the =
-tx
-> > +        * interrupt may not be triggered.
-> > +        */
-> > +       xsk_wakeup(sq);
-> >  }
-> >
-> >  static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
-> > @@ -1516,8 +1652,8 @@ static int virtnet_xdp_xmit(struct net_device *de=
-v,
-> >         }
-> >
-> >         /* Free up any pending old buffers before queueing new ones. */
-> > -       __free_old_xmit(sq, netdev_get_tx_queue(dev, sq - vi->sq),
-> > -                       false, &stats);
-> > +       virtnet_free_old_xmit(sq, netdev_get_tx_queue(dev, sq - vi->sq),
-> > +                             false, &stats);
-> >
-> >         for (i =3D 0; i < n; i++) {
-> >                 struct xdp_frame *xdpf =3D frames[i];
-> > @@ -2961,6 +3097,7 @@ static int virtnet_poll_tx(struct napi_struct *na=
-pi, int budget)
-> >         struct virtnet_info *vi =3D sq->vq->vdev->priv;
-> >         unsigned int index =3D vq2txq(sq->vq);
-> >         struct netdev_queue *txq;
-> > +       bool xsk_busy =3D false;
-> >         int opaque;
-> >         bool done;
-> >
-> > @@ -2973,7 +3110,11 @@ static int virtnet_poll_tx(struct napi_struct *n=
-api, int budget)
-> >         txq =3D netdev_get_tx_queue(vi->dev, index);
-> >         __netif_tx_lock(txq, raw_smp_processor_id());
-> >         virtqueue_disable_cb(sq->vq);
-> > -       free_old_xmit(sq, txq, !!budget);
-> > +
-> > +       if (sq->xsk_pool)
-> > +               xsk_busy =3D virtnet_xsk_xmit(sq, sq->xsk_pool, budget);
->
-> I think we need a better name of "xsk_busy", it looks like it means we
-> exceeds the quota. Or just return the number of buffers received and
-> let the caller to judge.
-
-Will fix.
-
-Thanks.
-
-
->
-> Other looks good.
->
-> With this fixed.
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
-> Thanks
->
+> ---
+> v2:
+> - Drop the unneeded pm_runtime_set_suspended().
+> - Add Suggested-by.
+> - Update the commit message.
+> ---
+>  drivers/net/wwan/qcom_bam_dmux.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/wwan/qcom_bam_dmux.c b/drivers/net/wwan/qcom_bam_dmux.c
+> index 26ca719fa0de..5dcb9a84a12e 100644
+> --- a/drivers/net/wwan/qcom_bam_dmux.c
+> +++ b/drivers/net/wwan/qcom_bam_dmux.c
+> @@ -823,17 +823,17 @@ static int bam_dmux_probe(struct platform_device *pdev)
+>  	ret = devm_request_threaded_irq(dev, pc_ack_irq, NULL, bam_dmux_pc_ack_irq,
+>  					IRQF_ONESHOT, NULL, dmux);
+>  	if (ret)
+> -		return ret;
+> +		goto err_disable_pm;
+>  
+>  	ret = devm_request_threaded_irq(dev, dmux->pc_irq, NULL, bam_dmux_pc_irq,
+>  					IRQF_ONESHOT, NULL, dmux);
+>  	if (ret)
+> -		return ret;
+> +		goto err_disable_pm;
+>  
+>  	ret = irq_get_irqchip_state(dmux->pc_irq, IRQCHIP_STATE_LINE_LEVEL,
+>  				    &dmux->pc_state);
+>  	if (ret)
+> -		return ret;
+> +		goto err_disable_pm;
+>  
+>  	/* Check if remote finished initialization before us */
+>  	if (dmux->pc_state) {
+> @@ -844,6 +844,11 @@ static int bam_dmux_probe(struct platform_device *pdev)
+>  	}
+>  
+>  	return 0;
+> +
+> +err_disable_pm:
+> +	pm_runtime_disable(dev);
+> +	pm_runtime_dont_use_autosuspend(dev);
+> +	return ret;
+>  }
+>  
+>  static void bam_dmux_remove(struct platform_device *pdev)
+> -- 
+> 2.34.1
+> 
 
