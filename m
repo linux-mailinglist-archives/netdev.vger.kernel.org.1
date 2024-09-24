@@ -1,146 +1,138 @@
-Return-Path: <netdev+bounces-129401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7557983AA0
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 02:38:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62040983A9E
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 02:38:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E76461C216D2
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 00:38:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 120DA1F23779
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 00:38:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFEB1B85F8;
-	Tue, 24 Sep 2024 00:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A5B1B85DA;
+	Tue, 24 Sep 2024 00:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UGuWUvOa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSo3hjIZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BC11BC20;
-	Tue, 24 Sep 2024 00:37:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D25C1B95B;
+	Tue, 24 Sep 2024 00:37:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727138277; cv=none; b=CTVm1e57iT+qPfeIVwVyiUf5gTcbR+vCKVDEG0Sjchngsr+xLmwhNFNCIARniAeU0EtIjse7CItfRq0ZZmVAK7FlcWf6TpdakTzfUl4tuigkSBFfyCwzv/fEIaBlQluQ57x9VfJs4vqHXqH8HItwPJrsvrfp6BkzI+E7QRlH/MA=
+	t=1727138272; cv=none; b=j8VGBaYb9HXfiag+fQzgjUIM2o0/5JMsOMHI2jB90pvbMG0t6ypEH8Oa4SnBvUPbxpwMoKTEqdhKhxCb6OE1fbAnL4kDlyVs1af5jTkO97T5Nx+CEhgGQoFzi77+iU+BX38H9GutZ+Dt/qrGmOJZUa+n6Vl3Ra8vz2BxxM0kEuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727138277; c=relaxed/simple;
-	bh=lwPWHsjc0EVxstWs9UcwMvi0k777RTvB+ISlYwiYFhw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BMiAyH6cg1ThexR9SEciYs8QGEnFj3BbiMo8D7ZBFcYv3TsD0kF7asIxmuKLVJJ2kERUqGCvLxVGedntwy6gbM85eEtPIb7ppJPl3dLsvapoIF2JrkKkxMRZx3nF+iOACJDXQmBCZWfhWrjPjCHSZpNP7GfHOYC9rmZNIbj003Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UGuWUvOa; arc=none smtp.client-ip=209.85.166.50
+	s=arc-20240116; t=1727138272; c=relaxed/simple;
+	bh=p7oNS5eaV/rjyrBNKPwDsltNGnzh2U6DekaWyXUf4uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XN+yDW/UHoVoY9q72LMNl3EsOhyMsvAtJipIwcffE3vVC2xsfznooC2uGBD9VlFr5ELR2IKVTvJv2bGKULvZGlt8DqNjqAemK+aj6KGsWLetY6CBc6AyqHuj8BgxN5K7pKyilZ7l55EYiRSoUaZrwHNAJS7F2HGf6iFJrgC4g1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSo3hjIZ; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-82a109bc459so212761439f.1;
-        Mon, 23 Sep 2024 17:37:55 -0700 (PDT)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20573eb852aso37481805ad.1;
+        Mon, 23 Sep 2024 17:37:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727138275; x=1727743075; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WbUcHGQ1UoXWgfE/17dhmDmpoz0qafV9wtyHq8QWeMc=;
-        b=UGuWUvOaI1EQVzRdBLFWa1CBEzbVeBLO/qPVi6/SE7giY0yE8jnwWZbo5drCZ5qsZU
-         wW4YMBhq6wkuvMOJwRzqQmgrHu81QjYeFvxz0hKlxI//Tw5wczAxwItedb+LaJ0wLg0B
-         xgB3+c9rgdQTxwbdQkhePXPGxL8z4UDfjICY5cAcrMbSpMrNNLbcwYrmD3OKpMYB2VGE
-         JvRvhZMxF11xBy6QhdF4j2cFcypXrQvM7CsCJ8e73HRd+IPHU6FBJBsR7iqFM/TtXFKI
-         ZL6LPnstjSlwXWeBV8kZPbZ8UG+WxbihYsATMpg58wXjfgwgratccj3JoFO6KrLezCcq
-         QLpw==
+        d=gmail.com; s=20230601; t=1727138271; x=1727743071; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3sF7bp+9YNuz/1OUexYb03klrCNegDMvCwEWeusF4wg=;
+        b=nSo3hjIZXDicLgRYw6B/LnASMqTMun5MhCyRyCyBRdREvfSHU5pDguV+gd8h5CBDZd
+         50Rf8i9mxmTzX9yK0C50l5ijU29ik500XlFcETP0wSkxBexF/ZntvTpoIjS7463oi//g
+         tZef7WPfJKpAcp4OD1XdDoD/RnXs4SYH4xEIvYB8JIN2ANdDTl2qEkDVu6ZbXEqjTN0q
+         emZk/df3N1aS+ViD357+CnW95glZxRSycqTfqoQMwgBjYK4A9C699J4q5JhOaaanF5V1
+         5J5P1CMKThtR1/taeR+TgvmlCo7JHsDWb9jhQl9ptZ6CcPjGnvoFQPeXUU3Pjxw4JTYk
+         U+sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727138275; x=1727743075;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WbUcHGQ1UoXWgfE/17dhmDmpoz0qafV9wtyHq8QWeMc=;
-        b=Tc5ZCtNANL2GVCR4InAT3LKprlMxuloC25abnActrKcCt80j8hzTNhbi8wMLylyvcM
-         pHnrFaEtOWpXNE5grnNGWsRoC8/eoL49+BIA14rBQqWwDM1gWR/5P2G0DVQ8vK5uFWj6
-         2kjOX7kwi89Y4ySmeSEUPNV6nQayBF/dpn8iKOyt6Az2SN9rhfFzynhRNZiz9CRQYo+a
-         l/j5Xdkr1StLupVDWk3/C9v1sKCWo6kghe+muwrjYBgYLzsitSBT7xE1pawTPtHz+X1y
-         YBhUP0b2hKbYm0IF5t2TqYl9II55jPeWZaI1819p9A4e6YaN5JpcyWa4+AvNXjGHrfjj
-         r3vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULRJcEtq5+m8sX1VMqAJYHNxOahAPJMFGgzdtiCrf0rpUpcOFCYFGriHM+bYJODF7wr50Suqn2/LhnWZ0=@vger.kernel.org, AJvYcCXQEgXMPmW/vjsmAPvAmj/So5+NW/HZFsUd1Fjjf1mHroIHvb+pjKmDXHc5gc2Io8KJkiAjCftb@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCDo+wdaVpT0MvxJQgZ/EAI8v1cDQNvMR6qk7nTbknhQDdD/1U
-	82SskjwINu7tgaUS6TZ+d0nanx31+yL/l7X+6P4W5LdbE0znBw/ZUHRJY8vOns2Zg1gR4jZjY/7
-	nSUqKeJKJa2PPtuBS7H13VEQREr8=
-X-Google-Smtp-Source: AGHT+IGrUStRnWPkF8QdOVTEHShSthaD4ticcBLkQrUJgx+tW9PPwzqJV/AlPcjpLLKPRdLFJuUS/mgbIKo5kHgzeE0=
-X-Received: by 2002:a05:6e02:2144:b0:3a0:a057:6908 with SMTP id
- e9e14a558f8ab-3a1a302a9a8mr11439775ab.11.1727138274782; Mon, 23 Sep 2024
- 17:37:54 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727138271; x=1727743071;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3sF7bp+9YNuz/1OUexYb03klrCNegDMvCwEWeusF4wg=;
+        b=iiUBPsjYJ+8rdVZ0vSu1QEUVQ7fgwp9jG0YxrnnOENWvTceLGfJzOhejoJwXWqPngz
+         8+f65yK/6gscTJfBAfugryQTitesWWewBTedUV8cvYKcznZjfVSSr4CB9X11M0N5h0xH
+         fNVY5wO90Ql72Edo4/Kz1THOFuOWyNy9SXcbf8L3ekTjZzlal0P9FwZVSDao/7a1Qc2L
+         QDAzRvuomgzWgBGgFutxj2msXdmyYCoZDA6Wu2BN/gL2LwZ/cYiDpIstjkbbOfFDKvmU
+         mVpWZ3zNU67QcPkch8nePDCFHHgIzyH6Lm/25elkguHxW5Y2qQnB6voCvUq5qSA/zKWI
+         3lUg==
+X-Forwarded-Encrypted: i=1; AJvYcCXxJ1/Vq6wzrH95RD/OShvgOH9hWDs4UUUbUvWYqmQEh/hkZI9jvTcbM3adocnEe0k4aNI9hsycpesouLs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoHeimXJ30TLnpBZW+JCwlYY6rDKlp8BcyNRhYML/g75BeyKE1
+	C+VVJuRWDBZae+dhqeon41Pb/iJNa2ojeGON1sfBU3dGoWAoDpcgMxEvVNXUDakg8w==
+X-Google-Smtp-Source: AGHT+IEoqURXR+G23iXfZ+wGFKSd5/M3MbDYTQGTy5+iUDUHCW1FPtuwo2BTJxpGoHC7SudLcHTRnA==
+X-Received: by 2002:a17:902:f54c:b0:206:a6fe:2343 with SMTP id d9443c01a7336-20aed088d76mr22398325ad.8.1727138270601;
+        Mon, 23 Sep 2024 17:37:50 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e6b7c3f1f3sm136718a12.26.2024.09.23.17.37.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 17:37:50 -0700 (PDT)
+Date: Tue, 24 Sep 2024 00:37:43 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] bonding: show slave priority in proc info
+Message-ID: <ZvIJ1xewGuJ_JhbE@fedora>
+References: <20240923072843.46809-1-liuhangbin@gmail.com>
+ <CANn89iLoVexJpUbZzwAYtGpLiTZ36tFh5GpJU=mYH6YazJeTPQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240910190822.2407606-1-johunt@akamai.com> <5632e043-bdba-4d75-bc7e-bf58014492fd@redhat.com>
- <CADVnQykS-wON1C1f8EMEF=fJ5skzE_vnuus-mVOtLfdswwcvmg@mail.gmail.com>
-In-Reply-To: <CADVnQykS-wON1C1f8EMEF=fJ5skzE_vnuus-mVOtLfdswwcvmg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 24 Sep 2024 08:37:18 +0800
-Message-ID: <CAL+tcoCMrENefD=55fkGRBAE9ZeuwgB7UG03JggSiguG-QVZiw@mail.gmail.com>
-Subject: Re: [PATCH net v3] tcp: check skb is non-NULL in tcp_rto_delta_us()
-To: Neal Cardwell <ncardwell@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Josh Hunt <johunt@akamai.com>, edumazet@google.com, 
-	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iLoVexJpUbZzwAYtGpLiTZ36tFh5GpJU=mYH6YazJeTPQ@mail.gmail.com>
 
-On Fri, Sep 20, 2024 at 1:36=E2=80=AFAM Neal Cardwell <ncardwell@google.com=
-> wrote:
->
-> On Thu, Sep 19, 2024 at 5:05=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
-rote:
+Hi Eric,
+
+On Mon, Sep 23, 2024 at 09:45:23AM +0200, Eric Dumazet wrote:
+> On Mon, Sep 23, 2024 at 9:29 AM Hangbin Liu <liuhangbin@gmail.com> wrote:
 > >
-> > On 9/10/24 21:08, Josh Hunt wrote:
-> > > diff --git a/include/net/tcp.h b/include/net/tcp.h
-> > > index 2aac11e7e1cc..196c148fce8a 100644
-> > > --- a/include/net/tcp.h
-> > > +++ b/include/net/tcp.h
-> > > @@ -2434,9 +2434,26 @@ static inline s64 tcp_rto_delta_us(const struc=
-t sock *sk)
-> > >   {
-> > >       const struct sk_buff *skb =3D tcp_rtx_queue_head(sk);
-> > >       u32 rto =3D inet_csk(sk)->icsk_rto;
-> > > -     u64 rto_time_stamp_us =3D tcp_skb_timestamp_us(skb) + jiffies_t=
-o_usecs(rto);
-> > >
-> > > -     return rto_time_stamp_us - tcp_sk(sk)->tcp_mstamp;
-> > > +     if (likely(skb)) {
-> > > +             u64 rto_time_stamp_us =3D tcp_skb_timestamp_us(skb) + j=
-iffies_to_usecs(rto);
-> > > +
-> > > +             return rto_time_stamp_us - tcp_sk(sk)->tcp_mstamp;
-> > > +     } else {
-> > > +             WARN_ONCE(1,
-> > > +                     "rtx queue emtpy: "
-> > > +                     "out:%u sacked:%u lost:%u retrans:%u "
-> > > +                     "tlp_high_seq:%u sk_state:%u ca_state:%u "
-> > > +                     "advmss:%u mss_cache:%u pmtu:%u\n",
-> > > +                     tcp_sk(sk)->packets_out, tcp_sk(sk)->sacked_out=
-,
-> > > +                     tcp_sk(sk)->lost_out, tcp_sk(sk)->retrans_out,
-> > > +                     tcp_sk(sk)->tlp_high_seq, sk->sk_state,
-> > > +                     inet_csk(sk)->icsk_ca_state,
-> > > +                     tcp_sk(sk)->advmss, tcp_sk(sk)->mss_cache,
-> > > +                     inet_csk(sk)->icsk_pmtu_cookie);
+> > The slave priority is currently not shown in the proc filesystem, which
+> > prevents users from retrieving this information via proc. This patch fixes
+> > the issue by printing the slave priority in the proc filesystem, making it
+> > accessible to users.
 > >
-> > As the underlying issue here share the same root cause as the one
-> > covered by the WARN_ONCE() in tcp_send_loss_probe(), I'm wondering if i=
-t
-> > would make sense do move the info dumping in a common helper, so that w=
-e
-> > get the verbose warning on either cases.
->
-> That's a good idea. It would be nice to move the info dumping into a
-> common helper and use it from both tcp_rto_delta_us() and
-> tcp_send_loss_probe(), if Josh is open to that.
+> > Fixes: 0a2ff7cc8ad4 ("Bonding: add per-port priority for failover re-selection")
+> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> > ---
+> >  drivers/net/bonding/bond_procfs.c | 1 +
+> >  1 file changed, 1 insertion(+)
+> >
+> > diff --git a/drivers/net/bonding/bond_procfs.c b/drivers/net/bonding/bond_procfs.c
+> > index 7edf72ec816a..8b8580956edd 100644
+> > --- a/drivers/net/bonding/bond_procfs.c
+> > +++ b/drivers/net/bonding/bond_procfs.c
+> > @@ -210,6 +210,7 @@ static void bond_info_show_slave(struct seq_file *seq,
+> >         seq_printf(seq, "Permanent HW addr: %*phC\n",
+> >                    slave->dev->addr_len, slave->perm_hwaddr);
+> >         seq_printf(seq, "Slave queue ID: %d\n", READ_ONCE(slave->queue_id));
+> > +       seq_printf(seq, "Slave prio: %d\n", READ_ONCE(slave->prio));
+> >
+> >         if (BOND_MODE(bond) == BOND_MODE_8023AD) {
+> >                 const struct port *port = &SLAVE_AD_INFO(slave)->port;
+> > --
+> > 2.46.0
+> >
+> 
+> proc interface is deprecated in favor of rtnl.
+> 
+> slave->prio is correctly reported in IFLA_BOND_SLAVE_PRIO attribute.
+> 
+> No further kernel change is needed.
 
-Hello Paolo, Neal,
+Thanks for the reply. Some users said they still prefer to use /proc
+to get the bonding info as it's easier compared with get info via rtnl(ip
+link). I'm OK to drop this patch.
 
-I noticed that this patch got merged already. Since extracting the
-common part into a helper belongs to net-next materials, if no one is
-willing to do it after net-next is re-opened, I think I can post it :)
-
-Thanks,
-Jason
+Thanks
+Hangbin
 
