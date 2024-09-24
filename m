@@ -1,93 +1,117 @@
-Return-Path: <netdev+bounces-129531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8120984566
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 14:01:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04BBC984573
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 14:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79622285933
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:01:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B929728426B
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 058ED1A7242;
-	Tue, 24 Sep 2024 12:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EFF41A7249;
+	Tue, 24 Sep 2024 12:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l+I9yExF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F10A1A707A
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 12:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57193126C02;
+	Tue, 24 Sep 2024 12:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727179268; cv=none; b=Ze4QQ19mPVt15vKpoojZm7sHCwC+buqR9tjS+lRABh7qq4v9Z9IfS7tTeammgFx+LqW6dtnGDMlPTRjhYKK60DbUs/WgHd9jEEG5ibM+brA6ItGp/1C3fGEBdXC17WeXhth9ztPZ/MHKj89QIvRMi4lo9AGa4SKI7Z8uxxdOQNg=
+	t=1727179458; cv=none; b=qOyXziM4ZFTcLfeY8pNGSO9btt4+GoVLjcHwbneTFmuvWZ2pkugxhRfxxfDt/8JhbsS+fiUTIMcqCJXGKzcp2wc/qbwiYBHo+47FEOTdbyrgC74gWQ+xJoBSFRtBlWqrqza9k4Xa945QMFQMO/evXPypc7cwmuz9qCa432s44Ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727179268; c=relaxed/simple;
-	bh=cObrgCUSvHW+ygJ1FqkY0+Tz/uCqpy6uPK5t+gWO+j8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Vw8s2D2G4bbQFxA0ZJxk0sZz/lMELqOErgA+G+9nlGhuYrgCA8U/wDIZ+z36dcho1lKcq5q4LnroKW2q69O8FtQ/w20U2EhxQuPmMuBZtSKq1TwUgKNHsBvOdaePR/ED3w/VxuSeyzAUJwlr0U4CbXb7FWjtnbskjRfh1rb8u+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a1a8b992d3so1973405ab.0
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 05:01:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727179266; x=1727784066;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=L6XSwTL3/zFm9C67RW1I8K+Y0nZgbXlIR8uoPmui7Ow=;
-        b=Dli241giMRHVP+SkHVpKm9bpq0jZMylemOkRAPKs+syWSXI/JMiA0RbOrNGUaNn42H
-         wRQMzBcDh0U6n35Wn8dORfGcrdZwRF3YV7PN6O/h2L32fvkkMQImOYCk+TpEcVELNQ4w
-         78vFMSvll/l1ve4ttewVTpBkbTSxjx37ey6AvaPNVqzIuWsxXG4HGyDqgxhAQcvZuzrg
-         NqqQBJP/hVmEqJ4EOu9GUYYEOhW5SXLNRnryg6V8kYuncrGuLMTeZi3E4H5igMfmNRB+
-         7tw0/GaDjrpG/10cPd6szdTdabmYRJAu2EYeCAku0szE/2yj1IY4zMPvtXxDPXF52OgK
-         830A==
-X-Forwarded-Encrypted: i=1; AJvYcCV97Q7TVmXGRwMjMnncLOo6435VG9rLqhUSQ87fPL3VtGrXSQWVEs19A0a2t+zC4s7SYAxPK74=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrBl6NQ5ncToeS+/GcFXtXPelUlvhw+FrlT1mo2LfDa1/yO4l4
-	T4RqTEAlAjEEbZkPOYNFaY1f5CLR4/H30Vri532A7oCygjiE3bY001p3Y7olfkUrAHrQ2/P82wB
-	Fh0AzuG0aRjeoZoX4y249rrWSYYd22HQMqdoBvHv0bDAnxjiZ1xuEQaE=
-X-Google-Smtp-Source: AGHT+IHrOmvjiLzvF7jwvN3hI5LzS+Kv/KB41hVRF7f6fcdWg2aKQjwpw0ahz2JHQBSNt2sFKNFZvypTChxKfYan2ZHULmNIvNPZ
+	s=arc-20240116; t=1727179458; c=relaxed/simple;
+	bh=xhXKsKe7xRaBB8yHCKkbWq0/TnAbS4XVrROgurQjgoc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qdLaDXKjSWxrnzdkhzq2A9ZW3FDNNE6FAqTPj5yWXaKg3N/dfp59qeJqmVCXBGMd1bU5OpAYw0n6nd/qybeGLln5RrastE6IGf4q6z/Sqfw3mithTnEAS94JykNmUu7hcf+/a7vYwLGdTsS+LDtngt7qGtrkXCLa8/O+Sa0Xxu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l+I9yExF; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hj4ZKxWdT3c42Zii72T0l9q1XxKsyHj07xzqhV5c8qc=; b=l+I9yExFoVIDrFcrJyVZe5Zw8O
+	rnXPJ/olBWXOX/XffkHJzn/8dQ2oT8E3VpMESUe/ox44u5mklKGjsjgY+fb1A69eXAeuprPZGSGLW
+	SER2yb7h8bbwuFdi9Py3MFsAAyjv7xOsHbWg4heZDOWObwTkCt81grDa47pe0mkTEQtI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1st4Gx-008CQC-CX; Tue, 24 Sep 2024 14:04:03 +0200
+Date: Tue, 24 Sep 2024 14:04:03 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Andrew Halaney <ahalaney@redhat.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+	Brad Griffis <bgriffis@nvidia.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Jon Hunter <jonathanh@nvidia.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	kernel@quicinc.com
+Subject: Re: [PATCH net v2] net: phy: aquantia: Introduce custom get_features
+Message-ID: <8a6611fd-bd7b-4d32-8cea-ea925a9979ab@lunn.ch>
+References: <20240924055251.3074850-1-quic_abchauha@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a64:b0:3a0:ca91:2b4e with SMTP id
- e9e14a558f8ab-3a1a2fd73ffmr19734095ab.3.1727179264991; Tue, 24 Sep 2024
- 05:01:04 -0700 (PDT)
-Date: Tue, 24 Sep 2024 05:01:04 -0700
-In-Reply-To: <00000000000020c8d0061e647124@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <66f2aa00.050a0220.c23dd.0029.GAE@google.com>
-Subject: Re: [syzbot] [net?] INFO: task hung in addrconf_dad_work (5)
-From: syzbot <syzbot+82ccd564344eeaa5427d@syzkaller.appspotmail.com>
-To: bigeasy@linutronix.de, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, kerneljasonxing@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240924055251.3074850-1-quic_abchauha@quicinc.com>
 
-syzbot has bisected this issue to:
+> +static void aqr_supported_speed(struct phy_device *phydev, u32 max_speed)
+> +{
+> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported) = { 0, };
+> +
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_Pause_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_FIBRE_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_TP_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT, supported);
+> +	linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, supported);
+> +
+> +	if (max_speed == SPEED_2500) {
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseX_Full_BIT, supported);
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, supported);
+> +	} else if (max_speed == SPEED_5000) {
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseX_Full_BIT, supported);
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT, supported);
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT, supported);
+> +	}
+> +
+> +	linkmode_copy(phydev->supported, supported);
+> +}
 
-commit d15121be7485655129101f3960ae6add40204463
-Author: Paolo Abeni <pabeni@redhat.com>
-Date:   Mon May 8 06:17:44 2023 +0000
+So you have got lots of comments....
 
-    Revert "softirq: Let ksoftirqd do its job"
+Please split this into two patches. One patch for the PHY you are
+interested in, and a second patch to remove phy_set_max_speed() and
+fix up that PHY.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=103252a9980000
-start commit:   af9c191ac2a0 Merge tag 'trace-ring-buffer-v6.12' of git://..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=143252a9980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=74ffdb3b3fad1a43
-dashboard link: https://syzkaller.appspot.com/bug?extid=82ccd564344eeaa5427d
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=162e9c27980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1123c107980000
+Also, i would prefer you do the normal feature discovery, calling
+genphy_read_abilities() and/or genphy_c45_pma_read_abilities() and
+then fixup the results by removing the modes which should not be
+there.
 
-Reported-by: syzbot+82ccd564344eeaa5427d@syzkaller.appspotmail.com
-Fixes: d15121be7485 ("Revert "softirq: Let ksoftirqd do its job"")
+Take a look at bcm84881_get_features() as an example.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+	Andrew
 
