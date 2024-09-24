@@ -1,295 +1,156 @@
-Return-Path: <netdev+bounces-129522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57020984430
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:08:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2131498446D
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF195B2180F
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:07:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AECF6B270FC
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14421A4F10;
-	Tue, 24 Sep 2024 11:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7DC1A4F30;
+	Tue, 24 Sep 2024 11:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="JkpcVDcM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IsuJmjzO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC8141F5FF;
-	Tue, 24 Sep 2024 11:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E1621A270
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 11:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727176075; cv=none; b=qMTgZMyACPI9GtXtBn7rn7y8mb6GEryjBxmRoUX+cfalBP+iVH05BXUtMyl6nwbAMpxDzsPoHGbDtgjmu+2ROcus3TAi8uHTkk0E9cuVR4pK6kVOESITp7LB9g/rpImQhttDAu1GVGNwSB2MI27+g+n9oURFiz9xVXLQrXqlcxo=
+	t=1727176908; cv=none; b=b1HM0+Pzu+Eh7a2J+tIpZvojhKq3vxg6dm1RfCoLuq/G0ZzMc83jB+QgMwzpg+TYNXmWfB3vSP4vxM5/KRD3tmTwvt0/Jhn+6m9rsvUhyUbJ1ghTBXa/CrvjrqvVBFJnCBaT5ycdGPadyLLNTc5ywWLXt0QFq1lOfAPNBQXpTqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727176075; c=relaxed/simple;
-	bh=RFuw7wGvP5JNV/mTZbc8+eGn4hiZNI1zR7gZocBplgA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qJjjAACuHHyn7BU7D2MVSWCf5TBJTCFmOTsX31t6OfzKElw1YD9OlZabooTyitw48BhTT7Gebh2gq7w7B+QHUJoqr2P550U4gV6b8qK9vx0Q2C1e6Z4UgzJjXtNxz4D0T3RKRF5oDUrEhBgXq7di3rr8rzZfMvrgasoVGulir/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=JkpcVDcM; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48O9fjQ7023720;
-	Tue, 24 Sep 2024 11:07:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	4G2/zZ+Tmn+yvHE95Xys6G0M+ZegXFUx0r1h8MVpFdk=; b=JkpcVDcMbKVq7oOI
-	LRgNuEiCji8kHDyLm+kp+k9rfUMG1uSrLdrXHPaA2a8KRFxJpzerXZlRl2zKwQgV
-	BJlQ0dfqB8Kl3G4I6me4p2GaTPsTsJq45dZIiIGwWXj5AL6zWoRIFGs80mTtyO8Z
-	+tq0fssb9EIrwZRuaVvNzthDyL3oF2k1k5KzCnHroFG6qkuwXPxjZLL4MbVR988H
-	JNoRjfenWhDlrUPEmLqHtOAqf6aSPFXy8GL9USXDj4529+GA098EicrAeqD5/A8n
-	l1O0GQs4WNNcK3H5viF23of9P5roXQg74wVW8szGlOeecx9jXDbqWvmBjDhtSs4v
-	HUeAQA==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 41skgn8qk2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Sep 2024 11:07:32 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 48OB7U9o025133
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 24 Sep 2024 11:07:30 GMT
-Received: from [10.218.17.232] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 24 Sep
- 2024 04:07:19 -0700
-Message-ID: <05909d17-0111-4080-97cc-82ed435728a7@quicinc.com>
-Date: Tue, 24 Sep 2024 16:36:59 +0530
+	s=arc-20240116; t=1727176908; c=relaxed/simple;
+	bh=SMqzVhG5SdaonHmaAq6rRj2N1TQoLv9pnExCxLW4ek4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=grryJTwcRmpv1peytdadBYp82+S+wewqn0hrM3T41iFkgBLsXY67RhBUlzRadKL4qoWAk82afRCY3FR4+dVjJkBm4Og6kkiTw75bAT3WQf7nzl+yx7Qmb8iFqRlAoeSIeza5WLNgdZ79qMVKILExxoVkwf9ijNmAQoVUnAPPJZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IsuJmjzO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727176905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SMqzVhG5SdaonHmaAq6rRj2N1TQoLv9pnExCxLW4ek4=;
+	b=IsuJmjzOVoC7R5y2bcR372GNeQYoX9tDrpLWd2HJVTq52d/FctSYGI/iFG3V+eYoIhzr6o
+	vVjbaxDWk+4gVxewseSjJYTkYu7iYQ5mWzi4JGPsWTvn25btqCJHLs+UgLJJhlO6xHyNa8
+	joR59uVnlcHr5FW6nSbxkGX+IKEKnlk=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-194-tZvc_ox7M9SZJyFDBuuQJA-1; Tue, 24 Sep 2024 07:21:43 -0400
+X-MC-Unique: tZvc_ox7M9SZJyFDBuuQJA-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-5365c96f06eso3687454e87.1
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 04:21:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727176902; x=1727781702;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SMqzVhG5SdaonHmaAq6rRj2N1TQoLv9pnExCxLW4ek4=;
+        b=d7R1UZtaIanNGXOB2KPCFfRqN0GHVwyajtpJ21K3ItR+BMikC7VFZRFfIQMnZfuWRd
+         uSCc5BT0CY5xI6+PKB7V+kKKCTqOwtUi/3QBspDo+m/w0lLKualKJxmtOFMY7UhG8D8t
+         ymbAJjzzI7tcGAoSbLm+koaVFKJTVy4uYcTo7U2t43CWhPPSoYZ9krhBMphpGh30IPbn
+         dLUo8N71PVqV2CH+R8dXAk/+vd2ipGGd2+Kk8/vXAzEbrFRDZkxjN4IY+wndoevYLZRS
+         83KqqTp8rhTtKeefU+35YefVtpS3qMVo2qc24rf+QEiR5RR9F5jpcjeul3bSO61soDpl
+         CFKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPVFOWCP2pivy79vqdzcKhOIvtG3CdFCkJAGegu26s1JNwWefM3BOani6y+k1FBqYPiTuvMDs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9Xt0nLjdNkGgBkBEOTjP+6yep5j8cBOu249vywvFyoLCgObu/
+	1Show3YYi82u9BVE2h/vpMg/0cJu8+5rcD6hMQVY+eh6TMd9hcqG2K7ZPzDj6gIYcGslRBxob32
+	SOnGOeeZ+tf7YKGbNpYB1lV2lldkXiQkNWooW8LlE1/v5lUlukSqVBCCk49+G2auJsf0dXkWfe1
+	h7kv1VXMidYYGju5B0Ry6jpPaI5FEf
+X-Received: by 2002:a05:6512:281c:b0:533:44a3:21b9 with SMTP id 2adb3069b0e04-536acf6abdemr7539253e87.1.1727176902193;
+        Tue, 24 Sep 2024 04:21:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFCJLTsjiLCDndre4ai+QsmabLg00scLxW4mqpYCR/Nr6z9gFp7Mfekj01pgzF+20w2ueRN1Yg+hqwbsOwhBrI=
+X-Received: by 2002:a05:6512:281c:b0:533:44a3:21b9 with SMTP id
+ 2adb3069b0e04-536acf6abdemr7539227e87.1.1727176901734; Tue, 24 Sep 2024
+ 04:21:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: stmmac: Stop using a single dma_map() for
- multiple descriptors
-To: Andrew Halaney <ahalaney@redhat.com>,
-        Suraj Jaiswal
-	<jsuraj@qti.qualcomm.com>
-CC: "Suraj Jaiswal (QUIC)" <quic_jsuraj@quicinc.com>,
-        Vinod Koul
-	<vkoul@kernel.org>,
-        "bhupesh.sharma@linaro.org" <bhupesh.sharma@linaro.org>,
-        Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-        Prasad Sodagudi
-	<psodagud@quicinc.com>, Rob Herring <robh@kernel.org>,
-        kernel
-	<kernel@quicinc.com>
-References: <20240902095436.3756093-1-quic_jsuraj@quicinc.com>
- <yy2prsz3tjqwjwxgsrumt3qt2d62gdvjwqsti3favtfmf7m5qs@eychxx5qz25f>
- <CYYPR02MB9788F524C9A5B3471871E055E79A2@CYYPR02MB9788.namprd02.prod.outlook.com>
- <ypfbzhjyqqwwzciifkwvhimrolg6haiysqmxamkhnryez4npxx@l4blfw43sxgt>
-Content-Language: en-US
-From: Sarosh Hasan <quic_sarohasa@quicinc.com>
-In-Reply-To: <ypfbzhjyqqwwzciifkwvhimrolg6haiysqmxamkhnryez4npxx@l4blfw43sxgt>
+References: <20240920185918.616302-1-wander@redhat.com> <20240920185918.616302-3-wander@redhat.com>
+ <7e2c75bf-3ec5-4202-8b69-04fce763e948@molgen.mpg.de> <02076f9d-1158-4f3e-85cc-83ee4d41091e@intel.com>
+ <CAAq0SUkeVkiit383065nhfCibn-CG701uvaM6UHpWu9RaZE83g@mail.gmail.com> <8702d2c1-faf0-44bb-93e9-e905f077b6c0@intel.com>
+In-Reply-To: <8702d2c1-faf0-44bb-93e9-e905f077b6c0@intel.com>
+From: Wander Lairson Costa <wander@redhat.com>
+Date: Tue, 24 Sep 2024 08:21:29 -0300
+Message-ID: <CAAq0SU=n0Qym5EmpimHb=6ayEeURYpHgoYxX8ZxuFbXziKHprw@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH 2/2] igbvf: remove unused spinlock
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>, Paul Menzel <pmenzel@molgen.mpg.de>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: YYZChDULQzv_uitslpTHltc1C4LK4USA
-X-Proofpoint-GUID: YYZChDULQzv_uitslpTHltc1C4LK4USA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- mlxlogscore=999 adultscore=0 suspectscore=0 phishscore=0 impostorscore=0
- spamscore=0 mlxscore=0 priorityscore=1501 lowpriorityscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2408220000 definitions=main-2409240078
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Sep 23, 2024 at 3:44=E2=80=AFPM Tony Nguyen <anthony.l.nguyen@intel=
+.com> wrote:
+>
+>
+>
+> On 9/23/2024 9:46 AM, Wander Lairson Costa wrote:
+> > On Mon, Sep 23, 2024 at 6:04=E2=80=AFAM Przemek Kitszel
+> > <przemyslaw.kitszel@intel.com> wrote:
+> >>
+> >> On 9/21/24 14:52, Paul Menzel wrote:
+> >>> Dear Wander,
+> >>>
+> >>>
+> >>> Thank you for your patch.
+> >>>
+> >>> Am 20.09.24 um 20:59 schrieb Wander Lairson Costa:
+> >>>> tx_queue_lock and stats_lock are declared and initialized, but never
+> >>>> used. Remove them.
+> >>>>
+> >>>> Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+> >>>
+> >>> It=E2=80=99d be great if you added a Fixes: tag.
+> >>
+> >> Alternatively you could split this series into two, and send this patc=
+h
+> >> to iwl-next tree, without the fixes tag. For me this patch is just
+> >> a cleanup, not a fix.
+> >>
+> >>>
+> >>
+> >
+> > Should I send a new version of the patches separately?
+>
+> The patches apply to the respective trees when split out so I can take
+> these without a re-send. Patch 1 will need a Fixes: for it though...
+>
+> I'm seeing it as: 9d5c824399de ("igb: PCI-Express 82575 Gigabit Ethernet
+> driver")?
+>
 
+Can you add the tag when you apply the patch or should I add it?
 
-On 9/10/2024 7:34 PM, Andrew Halaney wrote:
-> Hey Suraj,
-> 
-> Your email client didn't seem to quote my response in your latest reply,
-> so its difficult to figure out what you're writing vs me below. It also
-> seems to have messed with the line breaks so I'm manually redoing those.
-> 
-> Please see if you can figure out how to make that happen for further
-> replies!
-> 
-> More comments below...
-> 
-> On Tue, Sep 10, 2024 at 12:47:08PM GMT, Suraj Jaiswal wrote:
->>
->>
->> -----Original Message-----
->> From: Andrew Halaney <ahalaney@redhat.com> 
->> Sent: Wednesday, September 4, 2024 3:47 AM
->> To: Suraj Jaiswal (QUIC) <quic_jsuraj@quicinc.com>
->> Cc: Vinod Koul <vkoul@kernel.org>; bhupesh.sharma@linaro.org; Andy Gross <agross@kernel.org>; Bjorn Andersson <andersson@kernel.org>; Konrad Dybcio <konrad.dybcio@linaro.org>; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Rob Herring <robh+dt@kernel.org>; Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Conor Dooley <conor+dt@kernel.org>; Alexandre Torgue <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>; Maxime Coquelin <mcoquelin.stm32@gmail.com>; netdev@vger.kernel.org; linux-arm-msm@vger.kernel.org; devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com; Prasad Sodagudi <psodagud@quicinc.com>; Rob Herring <robh@kernel.org>; kernel <kernel@quicinc.com>
->> Subject: Re: [PATCH net] net: stmmac: Stop using a single dma_map() for multiple descriptors
->>
->> WARNING: This email originated from outside of Qualcomm. Please be wary of any links or attachments, and do not enable macros.
->>
->> On Mon, Sep 02, 2024 at 03:24:36PM GMT, Suraj Jaiswal wrote:
->>> Currently same page address is shared
->>> between multiple buffer addresses and causing smmu fault for other 
->>> descriptor if address hold by one descriptor got cleaned.
->>> Allocate separate buffer address for each descriptor for TSO path so 
->>> that if one descriptor cleared it should not clean other descriptor 
->>> address.
-> 
-> snip...
-> 
->>>
->>>  static void stmmac_flush_tx_descriptors(struct stmmac_priv *priv, int 
->>> queue) @@ -4351,25 +4380,17 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
->>>               pay_len = 0;
->>>       }
->>>
->>> -     stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue);
->>> +     if (stmmac_tso_allocator(priv, (skb->data + proto_hdr_len),
->>> +                              tmp_pay_len, nfrags == 0, queue, false))
->>> +             goto dma_map_err;
->>
->> Changing the second argument here is subtly changing the dma_cap.addr64 <= 32
->> case right before this. Is that intentional?
->>
->> i.e., prior, pretend des = 0 (side note but des is a very confusing variable
->> name for "dma address" when there's also mentions of desc meaning "descriptor"
->> in the DMA ring). In the <= 32 case, we'd call stmmac_tso_allocator(priv, 0)
->> and in the else case we'd call stmmac_tso_allocator(priv, 0 + proto_hdr_len).
->>
->> With this change in both cases its called with the (not-yet-dma-mapped)
->> skb->data + proto_hdr_len always (i.e. like the else case).
->>
->> Honestly, the <= 32 case reads weird to me without this patch. It seems some
->> of the buffer is filled but des is not properly incremented?
->>
->> I don't know how this hardware is supposed to be programmed (no databook
->> access) but that seems fishy (and like a separate bug, which would be nice to
->> squash if so in its own patch). Would you be able to explain the logic there
->> to me if it does make sense to you?
->>
-> 
->> <Suraj> des can not be 0 . des 0 means dma_map_single() failed and it will return.
->> If we see if des calculation (first->des1 = cpu_to_le32(des + proto_hdr_len);)
->> and else case des calculator ( des += proto_hdr_len;) it is adding proto_hdr_len
->> to the memory that we after mapping skb->data using dma_map_single.
->> Same way we added proto_hdr_len in second argument . 
-> 
-> 
-> 0 was just an example, and a confusing one, sorry. Let me paste the original
-> fishy code that I think you've modified the behavior for. Here's the
-> original:
-> 
-> 	if (priv->dma_cap.addr64 <= 32) {
-> 		first->des0 = cpu_to_le32(des);
-> 
-> 		/* Fill start of payload in buff2 of first descriptor */
-> 		if (pay_len)
-> 			first->des1 = cpu_to_le32(des + proto_hdr_len);
-> 
-> 		/* If needed take extra descriptors to fill the remaining payload */
-> 		tmp_pay_len = pay_len - TSO_MAX_BUFF_SIZE;
-> 	} else {
-> 		stmmac_set_desc_addr(priv, first, des);
-> 		tmp_pay_len = pay_len;
-> 		des += proto_hdr_len;
-> 		pay_len = 0;
-> 	}
-> 
-> 	stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue);
-> 
-> Imagine the <= 32 case. Let's say des is address 0 (just for simplicity
-> sake, let's assume that's valid). That means:
-> 
->     first->des0 = des;
->     first->des1 = des + proto_hdr_len;
->     stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue)
-> 
->     if des is 0, proto_hdr_len is 64, then that means
-> 
->     first->des0 = 0
->     first->des1 = 64
->     stmmac_tso_allocator(priv, 0, tmp_pay_len, (nfrags == 0), queue)
-> 
-> That seems fishy to me. We setup up the first descriptor with the
-> beginning of des, and then the code goes and sets up more descriptors
-> (stmmac_tso_allocator()) starting with the same des again?
-tso_alloc is checking if more descriptor needed for packet . it is adding offset to get next
-descriptor (curr_addr = des + (total_len - tmp_len)) and storing in des of next descriptor.
-> 
-> Should we be adding the payload length (TSO_MAX_BUFF_SIZE I suppose
-> based on the tmp_pay_len = pay_len - TSO_MAX_BUFFSIZE above)? It seems
-> that <= 32 results in duplicate data in both the "first" descriptor
-> programmed above, and in the "second" descriptor programmed in
-> stmmac_tso_allocator().
-curr_addr = des + (total_len - tmp_len) is used in while loop in  tso_alloc to get address of all required descriptor . 
-descriptor address will be updated finally in tso_alloc by below call .
- 
-if (priv->dma_cap.addr64 <= 32)
-                                               desc->des0 = cpu_to_le32(curr_addr);
-                               else
-                                               stmmac_set_desc_addr(priv, desc, curr_addr);
-
- Also, since tmp_pay_len is decremented, but des
-> isn't, it seems that stmmac_tso_allocator() would not put all of the
-> buffer in the descriptors and would leave the last TSO_MAX_BUFF_SIZE
-> bytes out?
-> 
-> I highlight all of this because with your change here we get the
-> following now in the <= 32 case:
-> 
->     first->des0 = des
->     first->des1 = des + proto_hdr_len
->     stmmac_tso_allocator(priv, des + proto_hdr_len, ...)
-> 
-> which is a subtle change in the call to stmmac_tso_allocator, meaning
-> a subtle change in the descriptor programming.
-> 
-> Both seem wrong for the <= 32 case, but I'm "reading between the lines"
-> with how these descriptors are programmed (I don't have the docs to back
-> this up, I'm inferring from the code). It seems to me that in the <= 32
-> case we should have:
-> 
->     first->des0 = des
->     first->des1 = des + proto_hdr_len
->     stmmac_tso_allocator(priv, des + TSO_MAX_BUF_SIZE, ...)
-
-let me check <=32 case only on setup and get back.
-> 
-> or similar depending on if that really makes sense with how des0/des1 is
-> used (the handling is different in stmmac_tso_allocator() for <= 32,
-> only des0 is used so I'm having a tough time figuring out how much of
-> the des is actually programmed in des0 + des1 above without knowing the
-> hardware better).
-> 
-> Does that make sense? The prior code seems fishy to me, your change
-> seems to unintentionally change that fhsy part, but it still seems fishy
-> to me. I don't think you should be changing that code's behavior in that
-> patch, if you think it's right then we should continue with the current
-> behavior prior to your patch, and if you think its wrong we should
-> probably fix that *prior* to this patch in your series.
-> 
 > Thanks,
-> Andrew
-> 
+> Tony
+>
+> >> [...]
+> >>
+> >>>
+> >>> With that addressed:
+> >>>
+> >>> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> >>>
+> >>>
+> >>> Kind regards,
+> >>>
+> >>> Paul
+> >>
+> >
+>
+
 
