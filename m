@@ -1,90 +1,125 @@
-Return-Path: <netdev+bounces-129504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B0F09842D9
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:01:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 069449842E2
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:02:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B35D1C22FC5
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 10:01:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3728B1C228D0
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 10:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE25157468;
-	Tue, 24 Sep 2024 10:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E654016C444;
+	Tue, 24 Sep 2024 10:02:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OLOAIEjO"
 X-Original-To: netdev@vger.kernel.org
-Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B385C15624C;
-	Tue, 24 Sep 2024 10:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBC71474A2
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 10:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727172074; cv=none; b=l1++Dddd/OZyYpY0T3qEDxpA8SVsYIHbPHjr2GcOoXPPaT5xv6iBxiMoLs7FawfRVIpjh/DlJbDzq2Wnw9sRH4hRXx1vUjiveCbI/2AIAUEBrGZVQPA1EzawM+gqys9l47Uu1hsdBP/HRKe2aZEMK2WpFgkUq0WCzrMT+g1woMQ=
+	t=1727172135; cv=none; b=Hv5aunx7dfqUyS+WZrI58F3E1Ej7WaYtB5Kag/x1tieP8rLoi60NxZnes3ftV0APXvPSYbZFXAJKzOOTWEDqWcJBpDQPr4MCYlpy/51dafUZkGShLrqy3e/4NxY1wPb94XYGIEc7lALCdejODynylfRDip2o8taUYNv2qDs65Xo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727172074; c=relaxed/simple;
-	bh=lXodk2MXvxPraZRmssIQ5FJJdSMd0JgYfi6RvY8ziAY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rHiqPwfdglYiOAi6z8OGiKL828An/gpvHfx7Iwc/Hs74SL1lL7eeYmQDzEBoXPcOJu9oio8W5zOLnnxreKVs46iJbw8iCKfnCx5tT5ckbXAoAvO511mLNOzAnSte+mIM6cGGqDdOuuLcJCgzC7McX2QBeMBjQplz4NLoMzAb+V8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
-Received: from localhost.localdomain (unknown [45.118.184.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: stefan@sostec.de)
-	by proxima.lasnet.de (Postfix) with ESMTPSA id B6E03C0525;
-	Tue, 24 Sep 2024 12:01:04 +0200 (CEST)
-From: Stefan Schmidt <stefan@datenfreihafen.org>
-To: Jiawei Ye <jiawei.ye@foxmail.com>
-Cc: Stefan Schmidt <stefan@datenfreihafen.org>,
-	alex.aring@gmail.com,
-	davem@davemloft.net,
-	david.girault@qorvo.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	miquel.raynal@bootlin.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	przemyslaw.kitszel@intel.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH v3] mac802154: Fix potential RCU dereference issue in mac802154_scan_worker
-Date: Tue, 24 Sep 2024 12:00:39 +0200
-Message-ID: <172717177514.3057794.16241311556115087833.b4-ty@datenfreihafen.org>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <tencent_3B2F4F2B4DA30FAE2F51A9634A16B3AD4908@qq.com>
-References: <tencent_3B2F4F2B4DA30FAE2F51A9634A16B3AD4908@qq.com>
+	s=arc-20240116; t=1727172135; c=relaxed/simple;
+	bh=fWzi33r9j5RvdX7aTM0+xoJHBSYq79DFwoV4k5670xI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bPisi16Nsh03IGMrVjCU88dKYA/Z3s/kCj1nq1DYKRCa1ptg0Kl5L+Ni7OaFZnku8GdKdPUvX2ts9tQviVUPV2rbjJr5EfrWbU3T8Ub74/YoPirjAnEBZ4LI+b7GndRXCXW4y9kqiO41aK3NZjLqVluoEbC+R9RLFewHKT9eWGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OLOAIEjO; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727172134; x=1758708134;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fWzi33r9j5RvdX7aTM0+xoJHBSYq79DFwoV4k5670xI=;
+  b=OLOAIEjOEd/IPSg5bSip0gVeLEod77lBS7DyUKcnP21kbNzdVxZorlJv
+   FLdWBYwtSDQ2yqU+Zhsud2+WLldkafH+P1/b+ZpaMHOAzwREsnJDzJNNC
+   hXGP6voy7H10s9afLSf6gQ1MpCJfEKQxRSegWokoJvKNWckovqo/HvydZ
+   rHdeO3hXtH5kGKBh/++boOpW1AcQcrzOLladsABsJjjA+eQyfgJM/MB0d
+   egIlHE8imGEODuSXeSIKsiDu+94f1IaYU3TCSuA7ya3qSXYYWCbLabw7j
+   CCszX8XTj7oD7C2M7dylJ9+IiLIh02C//wxLByGhgH/TJdRzkvpWImTKE
+   Q==;
+X-CSE-ConnectionGUID: yUT3wHU8QlOst0eusmHrFw==
+X-CSE-MsgGUID: HQMvbwYoRUC9vhYK0IKbJA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11204"; a="36725587"
+X-IronPort-AV: E=Sophos;i="6.10,254,1719903600"; 
+   d="scan'208";a="36725587"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2024 03:02:14 -0700
+X-CSE-ConnectionGUID: +NqXWJA9R4+NBzFH5pzaFQ==
+X-CSE-MsgGUID: ho9Qm7d8TY+0ouj7wV4+NQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,254,1719903600"; 
+   d="scan'208";a="76285967"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa004.jf.intel.com with ESMTP; 24 Sep 2024 03:02:12 -0700
+Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id E507D135E8;
+	Tue, 24 Sep 2024 11:02:10 +0100 (IST)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	mateusz.polchlopek@intel.com,
+	maciej.fijalkowski@intel.com,
+	bcreeley@amd.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net v3 1/2] ice: Fix entering Safe Mode
+Date: Tue, 24 Sep 2024 12:04:23 +0200
+Message-ID: <20240924100422.8010-3-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-Hello Jiawei Ye.
+If DDP package is missing or corrupted, the driver should enter Safe Mode.
+Instead, an error is returned and probe fails.
 
-On Tue, 24 Sep 2024 06:58:05 +0000, Jiawei Ye wrote:
-> In the `mac802154_scan_worker` function, the `scan_req->type` field was
-> accessed after the RCU read-side critical section was unlocked. According
-> to RCU usage rules, this is illegal and can lead to unpredictable
-> behavior, such as accessing memory that has been updated or causing
-> use-after-free issues.
-> 
-> This possible bug was identified using a static analysis tool developed
-> by myself, specifically designed to detect RCU-related issues.
-> 
-> [...]
+To fix this, don't exit init if ice_init_ddp_config() returns an error.
 
-Applied to wpan/wpan.git, thanks!
+Repro:
+* Remove or rename DDP package (/lib/firmware/intel/ice/ddp/ice.pkg)
+* Load ice
 
-[1/1] mac802154: Fix potential RCU dereference issue in mac802154_scan_worker
-      https://git.kernel.org/wpan/wpan/c/bff1709b3980
+Fixes: cc5776fe1832 ("ice: Enable switching default Tx scheduler topology")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+---
+v3: Change ice_init_ddp_config() type to int, check return (Brett)
+v2: Change ice_init_ddp_config() type to void (Maciej)
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-regards,
-Stefan Schmidt
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 0f5c9d347806..7a84d3c4c305 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4749,14 +4749,12 @@ int ice_init_dev(struct ice_pf *pf)
+ 	ice_init_feature_support(pf);
+ 
+ 	err = ice_init_ddp_config(hw, pf);
+-	if (err)
+-		return err;
+ 
+ 	/* if ice_init_ddp_config fails, ICE_FLAG_ADV_FEATURES bit won't be
+ 	 * set in pf->state, which will cause ice_is_safe_mode to return
+ 	 * true
+ 	 */
+-	if (ice_is_safe_mode(pf)) {
++	if (err || ice_is_safe_mode(pf)) {
+ 		/* we already got function/device capabilities but these don't
+ 		 * reflect what the driver needs to do in safe mode. Instead of
+ 		 * adding conditional logic everywhere to ignore these
+-- 
+2.45.0
+
 
