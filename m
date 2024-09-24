@@ -1,338 +1,146 @@
-Return-Path: <netdev+bounces-129580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 188499849C0
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 18:36:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F33F9849D5
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 18:41:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9896B1F25890
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 16:36:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 074A6B23AA2
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 16:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B44C1AB6EC;
-	Tue, 24 Sep 2024 16:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128B51AC889;
+	Tue, 24 Sep 2024 16:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G/0Gxoly"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="I6NQg/R1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107FD12F375
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 16:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5F21AC44E
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 16:40:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727195777; cv=none; b=QQIRXKYX7yO26U5mVB3pemG2t9yDXuShM5sSSt50lN4WvLcKBuw0OQpb3I3ODffw5Q7+/oisWnooX7knOSKcbsiXP8n44aqPyilDeOYZ5vD9cBf5MpOo6Ede740OPECHslWQdcaAMzaWWUgrJFLqDML9goLJBwMRfGeyQCV1ho8=
+	t=1727196060; cv=none; b=WP9cIi58iAT8sB/9gFE3QdGkOMJxWgSYpSqnJ6K3lDT2/Q/OE8gPD5nztVaMWWZVQzIiDOodU0kAlzfZn/fQJ/hvuuu4QXSaWQiRyCoOQ2rUtQiVGm0QZD2wMwgP7qpUKSu0lrjqvcoDdqr1IVFyjMLw/JqYtDR7Vks+rGseP+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727195777; c=relaxed/simple;
-	bh=yOKDWrqMHDZcNXDx65GPLsC6nCA8U/1FHB/wST6tcQA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I7eom/mSVBEVL+szw8VPaylQE7tEO3ppkumYnJW0YFMl7ETzC+r5Q825KWeZCGaDOqNQWeAiQxD8XkRcuN3Sj27vwBmUEQuGOpSoPQy4kwBnI5VoVZqaScAo2R6pz5Hc3i9Z7/uFMDvXZhNS7iG6h11irI6XEVCLDym/Q4Z5xBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G/0Gxoly; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1727195774;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XJe4D9rQuQ5l/vjHLU/ym5f3xPtTEEP3VLGt0qBDp8w=;
-	b=G/0GxolyNTqAtn1VQwocAa/SvpnMZjK3nxcLS91d7RPwOeYC4WlHYEqwILc+2uNDO+TH9G
-	zn23S0llbkc9Bq407BIcoUaZH29oYB9+zdPJyWhcjXRq+jfsMpQyavulbGaDwxLqmrBMev
-	lvyyqbK6BLZdvaLhbR4uN1cModsLdfw=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-252-wIjWE8CZPN-HG24-zSAYbw-1; Tue, 24 Sep 2024 12:36:13 -0400
-X-MC-Unique: wIjWE8CZPN-HG24-zSAYbw-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7a9c0f3638aso1146917885a.2
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 09:36:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727195772; x=1727800572;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1727196060; c=relaxed/simple;
+	bh=3gD3nb59lyZxLhkoxFeWjQ+vTGoqQ+1LYG2lqO2CahI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QBwHlc1N/qFGUMGHMduvmO1V8j9FR+EVlgaLeqX+6/FXlinsVF9bipp3AR3kmHax7U5EzWzwPumH7/CBCKYjcDFa/HUzLJKKCyYo8w6xOwvpN1GyHLtXUnR1Z8aiPGkpAEolBq8cTibTz2T87WA0PUJuDhbq3mB/sAjVLlkPt10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=I6NQg/R1; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6c35427935eso29645286d6.3
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 09:40:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1727196056; x=1727800856; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XJe4D9rQuQ5l/vjHLU/ym5f3xPtTEEP3VLGt0qBDp8w=;
-        b=tk8Xp+oz8c8ooyjmjpuj9ZWz2+QG9blmMAEVDNkTJgZl5WaSnmMwAU2nL7ukPpc6Pf
-         3AWdSKpunouNimzm+JHKUQrG8OZcaWgGzCxUbP+K0FPoiJz1RlXxd1BUyaFk8XSdz6Ly
-         I2v+f1RFiFfRb3oSWGoccBxOBkvZ3wafWssHwSNNdDcUyCIGiFto4qAxhCPvfGUDUEv6
-         ScGmyIlv8+hfNib652qzMJyqWs7wEIPSuJEtPppXqgjZHLZo+4pJ5mNM4V9wdA63CNyL
-         JYfOeSINmPogI+WQWSEWWDSc5YR6vLAvf1TAUvOyvyMtF8uctOPEBgoYpLYeYc8DZ7ot
-         PmnQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVV4PExMkOwbjhWLc78bzr3YlJr0ZCOsu2U6UD+wI1/VOnk7yXo/Amwy38mYAvCwWYEfZcRovY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlEjvJsJEIEmfH5gxkpTeMmfQSVE3JgG+UCfuSBZPe2cRPz9vK
-	y4ABs6iXM7L3wTtljTZ6uMnN0XJePF9eRQgPngTyZ7ZBuBU0K3nGy1oFTfXV+U1JJrW47Op7EZy
-	br/UoPuIb/7y9iGwrH21B7Z23V1lHyhTFZ4Z4FhzCJXVptGmnkNY2Rg==
-X-Received: by 2002:a05:6214:33c7:b0:6c3:665e:a1fa with SMTP id 6a1803df08f44-6c7bd4cf316mr310755096d6.11.1727195772546;
-        Tue, 24 Sep 2024 09:36:12 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGew2zuZt9ZSk16pZrqHOtQorzrABia/GALgdjyGkoRh1si8Hxu4SKK/UToMXIaBARoadMnVw==
-X-Received: by 2002:a05:6214:33c7:b0:6c3:665e:a1fa with SMTP id 6a1803df08f44-6c7bd4cf316mr310754546d6.11.1727195772191;
-        Tue, 24 Sep 2024 09:36:12 -0700 (PDT)
-Received: from x1gen2nano ([2600:1700:1ff0:d0e0::40])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb0f4e05c2sm7897726d6.60.2024.09.24.09.36.10
+        bh=3gD3nb59lyZxLhkoxFeWjQ+vTGoqQ+1LYG2lqO2CahI=;
+        b=I6NQg/R1errCAs5f7u+rNn8RyUe8HTk+Z0fg7gDy8A5lJi1OBoLByJk92va1Mqste+
+         ra46bvt3NRwlj6vHES/NXXySsAJR6qHOiFOiB6XtmrL4w2636Le+PS8TE0M6FDOikajv
+         uBCMwK2FOrzuddfsww+koIlIyLADYB/wUKriQklpeSrp9JVB/ele0rjZsZo3ilm+FQ8O
+         FFakb1GJII5BQ3NvxCwMRtkiEE3OnDhZiaJO1m1daY272uCkp6Uf6PO9muRNmSVGILne
+         x4YAmRo9+jAxEa/UH3Zbq+heMU18Q3CFgMX5cQp0cheOZJk6gQa7JwWUXmvxHx5w2duk
+         nNnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727196056; x=1727800856;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3gD3nb59lyZxLhkoxFeWjQ+vTGoqQ+1LYG2lqO2CahI=;
+        b=Cey0oItvNJFv+XNRxB2TQukTzpIOqPcgKATXd+fEZ+rZgQH7C9T3CGVrok4zE3EOdx
+         yzcZOhGm1pjLP2vjtHna7urnnrP83YcBvZghXZW4DepNQKVbDcim3Hjmudfb4dkTxMcj
+         vrsg/d4fHuu1H+yPOwMg2vfTpTMykimR2wXrjY8hthlYxGrYe9Z4vsbnE7p6XOUqg+Vq
+         IqMe+DA8qPXuwtJEsde/x26d8vc53NnkesSalKnhoma1ZBRxwk+Jz6s9gj2fS/v3MnuZ
+         fsM6QLoFaiyGLtsACn55TU3U2AqnE15KtGaFNH/8ayE03FfnEn+GX+IJJp+iF4Hmv0x/
+         uxHA==
+X-Forwarded-Encrypted: i=1; AJvYcCVwYhuq4D5TLsFPZpOWb/cxmUu3WP/50fAxCVDce2CkDLTFLEjwEUYooI/YWK4b99nOlLHasxY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YypuDAcpcKXwlwdO+Q367zEQWwMOtGq2msnXKbu/4dO8ESB9SSj
+	aogtDVPIWmpJREI/ZMX7pFqtT+1nuV5rBiDZg98+kSzX4ZARlPp360tZSK6TcKw=
+X-Google-Smtp-Source: AGHT+IFJYP6BgUnqYcjH73JqqWOcD4NygI7jzlTvs/gJ9sdNCwq5nEPMFeOsYKZfYRmb1d8iynkHDw==
+X-Received: by 2002:a05:6214:5546:b0:6c5:72c0:728b with SMTP id 6a1803df08f44-6c7bd506250mr193680686d6.24.1727196056022;
+        Tue, 24 Sep 2024 09:40:56 -0700 (PDT)
+Received: from fedora ([173.242.185.50])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb0f4c2f51sm8013886d6.31.2024.09.24.09.40.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2024 09:36:11 -0700 (PDT)
-Date: Tue, 24 Sep 2024 11:36:09 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Sarosh Hasan <quic_sarohasa@quicinc.com>
-Cc: Suraj Jaiswal <jsuraj@qti.qualcomm.com>, 
-	"Suraj Jaiswal (QUIC)" <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>, 
-	"bhupesh.sharma@linaro.org" <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, Prasad Sodagudi <psodagud@quicinc.com>, 
-	Rob Herring <robh@kernel.org>, kernel <kernel@quicinc.com>
-Subject: Re: [PATCH net] net: stmmac: Stop using a single dma_map() for
- multiple descriptors
-Message-ID: <gbia6rqppcc53vmel5q5jvgdri3cmeowb64mxfk7jzo6ncuz2f@6kd7acqii62x>
-References: <20240902095436.3756093-1-quic_jsuraj@quicinc.com>
- <yy2prsz3tjqwjwxgsrumt3qt2d62gdvjwqsti3favtfmf7m5qs@eychxx5qz25f>
- <CYYPR02MB9788F524C9A5B3471871E055E79A2@CYYPR02MB9788.namprd02.prod.outlook.com>
- <ypfbzhjyqqwwzciifkwvhimrolg6haiysqmxamkhnryez4npxx@l4blfw43sxgt>
- <05909d17-0111-4080-97cc-82ed435728a7@quicinc.com>
+        Tue, 24 Sep 2024 09:40:55 -0700 (PDT)
+Date: Tue, 24 Sep 2024 09:40:54 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: yushengjin <yushengjin@uniontech.com>, pablo@netfilter.org,
+ kadlec@netfilter.org, roopa@nvidia.com, razor@blackwall.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ bridge@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3] net/bridge: Optimizing read-write locks in
+ ebtables.c
+Message-ID: <20240924094054.2d005c76@fedora>
+In-Reply-To: <CANn89iLoBYjMmot=6e_WJrtEhcAzWikU2eV0eQExHPj7+ObGKA@mail.gmail.com>
+References: <14BD7E92B23BF276+20240924090906.157995-1-yushengjin@uniontech.com>
+	<20240924063258.1edfb590@fedora>
+	<CANn89iLoBYjMmot=6e_WJrtEhcAzWikU2eV0eQExHPj7+ObGKA@mail.gmail.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <05909d17-0111-4080-97cc-82ed435728a7@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 24, 2024 at 04:36:59PM GMT, Sarosh Hasan wrote:
-> 
-> 
-> On 9/10/2024 7:34 PM, Andrew Halaney wrote:
-> > Hey Suraj,
-> > 
-> > Your email client didn't seem to quote my response in your latest reply,
-> > so its difficult to figure out what you're writing vs me below. It also
-> > seems to have messed with the line breaks so I'm manually redoing those.
-> > 
-> > Please see if you can figure out how to make that happen for further
-> > replies!
-> > 
-> > More comments below...
-> > 
-> > On Tue, Sep 10, 2024 at 12:47:08PM GMT, Suraj Jaiswal wrote:
-> >>
-> >>
-> >> -----Original Message-----
-> >> From: Andrew Halaney <ahalaney@redhat.com> 
-> >> Sent: Wednesday, September 4, 2024 3:47 AM
-> >> To: Suraj Jaiswal (QUIC) <quic_jsuraj@quicinc.com>
-> >> Cc: Vinod Koul <vkoul@kernel.org>; bhupesh.sharma@linaro.org; Andy Gross <agross@kernel.org>; Bjorn Andersson <andersson@kernel.org>; Konrad Dybcio <konrad.dybcio@linaro.org>; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Rob Herring <robh+dt@kernel.org>; Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Conor Dooley <conor+dt@kernel.org>; Alexandre Torgue <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>; Maxime Coquelin <mcoquelin.stm32@gmail.com>; netdev@vger.kernel.org; linux-arm-msm@vger.kernel.org; devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com; Prasad Sodagudi <psodagud@quicinc.com>; Rob Herring <robh@kernel.org>; kernel <kernel@quicinc.com>
-> >> Subject: Re: [PATCH net] net: stmmac: Stop using a single dma_map() for multiple descriptors
-> >>
-> >> WARNING: This email originated from outside of Qualcomm. Please be wary of any links or attachments, and do not enable macros.
-> >>
-> >> On Mon, Sep 02, 2024 at 03:24:36PM GMT, Suraj Jaiswal wrote:
-> >>> Currently same page address is shared
-> >>> between multiple buffer addresses and causing smmu fault for other 
-> >>> descriptor if address hold by one descriptor got cleaned.
-> >>> Allocate separate buffer address for each descriptor for TSO path so 
-> >>> that if one descriptor cleared it should not clean other descriptor 
-> >>> address.
-> > 
-> > snip...
-> > 
-> >>>
-> >>>  static void stmmac_flush_tx_descriptors(struct stmmac_priv *priv, int 
-> >>> queue) @@ -4351,25 +4380,17 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
-> >>>               pay_len = 0;
-> >>>       }
-> >>>
-> >>> -     stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue);
-> >>> +     if (stmmac_tso_allocator(priv, (skb->data + proto_hdr_len),
-> >>> +                              tmp_pay_len, nfrags == 0, queue, false))
-> >>> +             goto dma_map_err;
-> >>
-> >> Changing the second argument here is subtly changing the dma_cap.addr64 <= 32
-> >> case right before this. Is that intentional?
-> >>
-> >> i.e., prior, pretend des = 0 (side note but des is a very confusing variable
-> >> name for "dma address" when there's also mentions of desc meaning "descriptor"
-> >> in the DMA ring). In the <= 32 case, we'd call stmmac_tso_allocator(priv, 0)
-> >> and in the else case we'd call stmmac_tso_allocator(priv, 0 + proto_hdr_len).
-> >>
-> >> With this change in both cases its called with the (not-yet-dma-mapped)
-> >> skb->data + proto_hdr_len always (i.e. like the else case).
-> >>
-> >> Honestly, the <= 32 case reads weird to me without this patch. It seems some
-> >> of the buffer is filled but des is not properly incremented?
-> >>
-> >> I don't know how this hardware is supposed to be programmed (no databook
-> >> access) but that seems fishy (and like a separate bug, which would be nice to
-> >> squash if so in its own patch). Would you be able to explain the logic there
-> >> to me if it does make sense to you?
-> >>
-> > 
-> >> <Suraj> des can not be 0 . des 0 means dma_map_single() failed and it will return.
-> >> If we see if des calculation (first->des1 = cpu_to_le32(des + proto_hdr_len);)
-> >> and else case des calculator ( des += proto_hdr_len;) it is adding proto_hdr_len
-> >> to the memory that we after mapping skb->data using dma_map_single.
-> >> Same way we added proto_hdr_len in second argument . 
-> > 
-> > 
-> > 0 was just an example, and a confusing one, sorry. Let me paste the original
-> > fishy code that I think you've modified the behavior for. Here's the
-> > original:
-> > 
-> > 	if (priv->dma_cap.addr64 <= 32) {
-> > 		first->des0 = cpu_to_le32(des);
-> > 
-> > 		/* Fill start of payload in buff2 of first descriptor */
-> > 		if (pay_len)
-> > 			first->des1 = cpu_to_le32(des + proto_hdr_len);
-> > 
-> > 		/* If needed take extra descriptors to fill the remaining payload */
-> > 		tmp_pay_len = pay_len - TSO_MAX_BUFF_SIZE;
-> > 	} else {
-> > 		stmmac_set_desc_addr(priv, first, des);
-> > 		tmp_pay_len = pay_len;
-> > 		des += proto_hdr_len;
-> > 		pay_len = 0;
-> > 	}
-> > 
-> > 	stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue);
-> > 
-> > Imagine the <= 32 case. Let's say des is address 0 (just for simplicity
-> > sake, let's assume that's valid). That means:
-> > 
-> >     first->des0 = des;
-> >     first->des1 = des + proto_hdr_len;
-> >     stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue)
-> > 
-> >     if des is 0, proto_hdr_len is 64, then that means
-> > 
-> >     first->des0 = 0
-> >     first->des1 = 64
-> >     stmmac_tso_allocator(priv, 0, tmp_pay_len, (nfrags == 0), queue)
-> > 
-> > That seems fishy to me. We setup up the first descriptor with the
-> > beginning of des, and then the code goes and sets up more descriptors
-> > (stmmac_tso_allocator()) starting with the same des again?
-> tso_alloc is checking if more descriptor needed for packet . it is adding offset to get next
-> descriptor (curr_addr = des + (total_len - tmp_len)) and storing in des of next descriptor.
+On Tue, 24 Sep 2024 15:46:17 +0200
+Eric Dumazet <edumazet@google.com> wrote:
 
-Yes, so in stmmac_tso_allocator() we currently have:
+> On Tue, Sep 24, 2024 at 3:33=E2=80=AFPM Stephen Hemminger
+> <stephen@networkplumber.org> wrote:
+> >
+> > On Tue, 24 Sep 2024 17:09:06 +0800
+> > yushengjin <yushengjin@uniontech.com> wrote:
+> > =20
+> > > When conducting WRK testing, the CPU usage rate of the testing machin=
+e was
+> > > 100%. forwarding through a bridge, if the network load is too high, i=
+t may
+> > > cause abnormal load on the ebt_do_table of the kernel ebtable module,=
+ leading
+> > > to excessive soft interrupts and sometimes even directly causing CPU =
+soft
+> > > deadlocks.
+> > >
+> > > After analysis, it was found that the code of ebtables had not been o=
+ptimized
+> > > for a long time, and the read-write locks inside still existed. Howev=
+er, other
+> > > arp/ip/ip6 tables had already been optimized a lot, and performance b=
+ottlenecks
+> > > in read-write locks had been discovered a long time ago.
+> > >
+> > > Ref link: https://lore.kernel.org/lkml/20090428092411.5331c4a1@nehala=
+m/
+> > >
+> > > So I referred to arp/ip/ip6 modification methods to optimize the read=
+-write
+> > > lock in ebtables.c. =20
+> >
+> > What about doing RCU instead, faster and safer. =20
+>=20
+> Safer ? How so ?
+>=20
+> Stephen, we have used this stuff already in other netfilter components
+> since 2011
+>=20
+> No performance issue at all.
+>=20
 
-	static void stmmac_tso_allocator(struct stmmac_priv *priv, dma_addr_t des,
-					 int total_len, bool last_segment, u32 queue)
-	{
-		struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
-		struct dma_desc *desc;
-		u32 buff_size;
-		int tmp_len;
+I was thinking that lockdep and analysis tools do better job looking at RCU.
+Most likely, the number of users of ebtables was small enough that nobody l=
+ooked
+hard at it until now.
 
-		tmp_len = total_len;
-
-		while (tmp_len > 0) {
-			dma_addr_t curr_addr;
-
-			tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx,
-							priv->dma_conf.dma_tx_size);
-			...
-			curr_addr = des + (total_len - tmp_len);
-			if (priv->dma_cap.addr64 <= 32)
-				desc->des0 = cpu_to_le32(curr_addr);
-
-so on the first loop you've got:
-	tmp_len = total_len
-	...
-	curr_addr = des + total_len - temp_len
-	i.e.
-	curr_addr = des
-meaning with the "first" handling I've highlighted we've got
-	first->des0 = des
-	"next"->des0 = des
-
-where "next" is the cur_tx descriptor in the first loop of
-stmmac_tso_allocator() (essentially the second descriptor).
-That seems broken to me, and was that way prior to this patch.
-
-You've modified the behavior in this patch unintentionally. I think it
-needs modifying, but it should be done so explicitly in its own patch
-prior to this one. I also think the current modification in this patch
-isn't a fix. See prior reply below where I highlighted the programming as I
-understand it with this patch applied, which would result in something
-like.
-
-first->des0 = des
-first->des1 = des + proto_hdr_len
-"next"->des0 = des + proto_hdr_len
-
-Which again seems wrong, two descriptors pointing to the same address
-isn't making sense to me.
-
-Sorry to sound like a broken record, but I want to make sure we're on
-the same page! Sounds like you're looking into it based on the below
-comment, but some of these comments here made me think I didn't explain
-the situation well enough.
-
-> > 
-> > Should we be adding the payload length (TSO_MAX_BUFF_SIZE I suppose
-> > based on the tmp_pay_len = pay_len - TSO_MAX_BUFFSIZE above)? It seems
-> > that <= 32 results in duplicate data in both the "first" descriptor
-> > programmed above, and in the "second" descriptor programmed in
-> > stmmac_tso_allocator().
-> curr_addr = des + (total_len - tmp_len) is used in while loop in  tso_alloc to get address of all required descriptor . 
-> descriptor address will be updated finally in tso_alloc by below call .
->  
-> if (priv->dma_cap.addr64 <= 32)
->                                                desc->des0 = cpu_to_le32(curr_addr);
->                                else
->                                                stmmac_set_desc_addr(priv, desc, curr_addr);
-> 
->  Also, since tmp_pay_len is decremented, but des
-> > isn't, it seems that stmmac_tso_allocator() would not put all of the
-> > buffer in the descriptors and would leave the last TSO_MAX_BUFF_SIZE
-> > bytes out?
-> > 
-> > I highlight all of this because with your change here we get the
-> > following now in the <= 32 case:
-> > 
-> >     first->des0 = des
-> >     first->des1 = des + proto_hdr_len
-> >     stmmac_tso_allocator(priv, des + proto_hdr_len, ...)
-> > 
-> > which is a subtle change in the call to stmmac_tso_allocator, meaning
-> > a subtle change in the descriptor programming.
-> > 
-> > Both seem wrong for the <= 32 case, but I'm "reading between the lines"
-> > with how these descriptors are programmed (I don't have the docs to back
-> > this up, I'm inferring from the code). It seems to me that in the <= 32
-> > case we should have:
-> > 
-> >     first->des0 = des
-> >     first->des1 = des + proto_hdr_len
-> >     stmmac_tso_allocator(priv, des + TSO_MAX_BUF_SIZE, ...)
-> 
-> let me check <=32 case only on setup and get back.
-> > 
-> > or similar depending on if that really makes sense with how des0/des1 is
-> > used (the handling is different in stmmac_tso_allocator() for <= 32,
-> > only des0 is used so I'm having a tough time figuring out how much of
-> > the des is actually programmed in des0 + des1 above without knowing the
-> > hardware better).
-> > 
-> > Does that make sense? The prior code seems fishy to me, your change
-> > seems to unintentionally change that fhsy part, but it still seems fishy
-> > to me. I don't think you should be changing that code's behavior in that
-> > patch, if you think it's right then we should continue with the current
-> > behavior prior to your patch, and if you think its wrong we should
-> > probably fix that *prior* to this patch in your series.
-> > 
-> > Thanks,
-> > Andrew
-> > 
-> 
 
 
