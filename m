@@ -1,177 +1,161 @@
-Return-Path: <netdev+bounces-129631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91EEB984F25
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 01:54:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6658C984F33
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 01:58:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF8091C2311E
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 23:54:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B95B9B228D9
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 23:58:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3715188A06;
-	Tue, 24 Sep 2024 23:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F241518990B;
+	Tue, 24 Sep 2024 23:58:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EjD+JZbj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="JCJWHwoG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F26880C04;
-	Tue, 24 Sep 2024 23:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396AA14F9EE;
+	Tue, 24 Sep 2024 23:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727222037; cv=none; b=F+8A5bSugt5M9+Pz+L9+rNggdJJtONPSXowwCE66cu+Oe6o6/7LCtsN0hmHMefftrIzes/dwtKj3tKCMkmd/S6W42FKVez8kQdeyj2ZiXlbokyFc2+LoBrdqqVcatAj9P+fO8RugMs+sjdlw1UodiRieOkWi3D0v6ABS/0gy9BY=
+	t=1727222312; cv=none; b=J3GAWxRa9ZVQYJg4aTjG24KiS4HeZZjz629q8/OTYoXgBS6MQQbDLqhInyABHJd4xYey391OGAqm9mT6zUqSsufa4aQpIhvFwjYNSYMkTx8WxNyQdjOjo5v6x7Bs1uT8pMyTCFv+Cu5D3oz/FLCS6RuufdVi6BLiQbAeKgaUuoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727222037; c=relaxed/simple;
-	bh=ioXQba4GXAbNLNUCL1H1LSF5SCjlINxCoJ0c++sczwE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=srcyveaar/dUzPru+nJRxwd8NMvvIO/4ZALgH0ALNgtjLFtC3BjPcs5Yk+SVwGlXqZp66CFQ5D3cLG8gCrSTKIdmXtAF3k3nanN1qC161HvTbk2J6ALP64FYlQgITG8D3HihIHGzU6NVIEPPoGU9omeujAmn5k33Dr/NqJn+Zc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EjD+JZbj; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2f75c205e4aso62287051fa.0;
-        Tue, 24 Sep 2024 16:53:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727222033; x=1727826833; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sJMon77dDufEnoUS5VuyUWRJ/WzBSutK0jQD7Rp3ECQ=;
-        b=EjD+JZbjVDoJFCszYpEh7CUoEvxKZ79ldWzVM8eAHeqnTnMCWTI+4NCuOvRXVuW1EH
-         eHREt7hvLL9Vke2WAqleqx1EpDX8fp+DuJB5HJQLEH5mNF8zTUnONEg86w9gi90iucH0
-         06BT+2PxSgjaqsijgmMvjfvqKGf1Od3SJBjo4qk2EhYxWqSBtMfxlONkMEkHRAG6DgY1
-         gXLtHzqKmUEgHPEMiZYczB9STaiZoVk68cHSCZfNEi9SxBvXreMNxdHGs+6u4x5b2E2d
-         RVPNuaBIFXq3A/a8qANQ7G2ZopHshPBguBFYKD0cs3CO6r0Oysmw5q8MaN1R72TMeKqJ
-         W0UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727222033; x=1727826833;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sJMon77dDufEnoUS5VuyUWRJ/WzBSutK0jQD7Rp3ECQ=;
-        b=Y18yw0dZCKQtu7SRz8aUHbs14mpCuNMYYOm4Z6Q3NP9y4xVoyC3cLRLmPZGAJpRMUN
-         qNtqCknijQQtaT7Qz5hq/BDhx+c5REnxPePtElhrdccls1dqFtZpKbjKAuGRf+5uBT3A
-         D3ZgLs907nyQrKa09eKRCUBBSYAY/OBpUuDE91v7q27iSyfYAkCUJJWQkxv9Vk7NQyd3
-         cNQggMqUfGXSU+MyTipzK6BHgwyx5EURdCA13DjUFqMJtkMEQQp/2LFMBtUTkJ2hvbnL
-         5oc9ZUDqDjt2rVzGBzXRnObt34c1CSRoWdA7YzoGPlCXKdhFY8XE1kiaWbFmtX3Yt8ld
-         nUBw==
-X-Forwarded-Encrypted: i=1; AJvYcCX9h1GU2R2tZ72x13kZ55dyZl04kdz0IV6pvyPwk61tceR5vbD2W2C31jg+VeHya55PfKBZXpNxrYMtmYk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6BrR1R75bHxd0eOtIMYnZZ+l8fdTh4/We85YsdZZZHzUcSRmt
-	ld3NE2k3hXgILy+KrdTsk/DKP5fxPFEitnM3PoVpKFhoABRN0DB+ozkiStYaME4=
-X-Google-Smtp-Source: AGHT+IHyJZboCu/YgJ4RHKXNQDZUxEnV9BPMK7Wh1iSRITXTTVWzaxLma7KdhnbIuFbh8f8GoEjn0Q==
-X-Received: by 2002:a2e:bc22:0:b0:2f7:4bf7:e046 with SMTP id 38308e7fff4ca-2f91ca422admr5359201fa.34.1727222032603;
-        Tue, 24 Sep 2024 16:53:52 -0700 (PDT)
-Received: from dau-work-pc.zonatelecom.ru ([185.149.163.197])
-        by smtp.googlemail.com with ESMTPSA id 38308e7fff4ca-2f8d28b5a65sm3583011fa.136.2024.09.24.16.53.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2024 16:53:51 -0700 (PDT)
-From: Anton Danilov <littlesmilingcloud@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Anton Danilov <littlesmilingcloud@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shigeru Yoshida <syoshida@redhat.com>,
-	Suman Ghosh <sumang@marvell.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v3] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
-Date: Wed, 25 Sep 2024 02:51:59 +0300
-Message-Id: <20240924235158.106062-1-littlesmilingcloud@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1727222312; c=relaxed/simple;
+	bh=K9n+AavOkX7MxXFNd46/bNtSLpAWA69QCnjmfIck+Gg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EsUUyXAhC7Wje/qw+8/XeQKbENzHZIDIzgFhP9e5ihrGfkRLBi55Ne2nKwBIMHHNqE3ETmj7oAbHeTZXtYZduqilKEuQd5i0SCk+OtweVQtkBkj6Ce01Oga/y+Nq7xOxoYBXRdI3BXzdIyA76sF5EMo+DKcHmuMP7I/i9mYR/CU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=JCJWHwoG; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0288caf4-3c9b-4eae-a2b4-f8934badc270@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727222308;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FJE52kWSLJz5Z0JKa0w5KuGxIC2eyIYAYGmmWOSFST4=;
+	b=JCJWHwoGV68v2uahGUBKx3Hcx5Y5o0qp2/LrqjG9J4z4KaXLSE3utSm/IB5acOcIu3RNS7
+	qxVKwvuJuRaB0DhlPNbWoSw4cS0hnN0+Fee3/xS/uJzRtiaeD+zLoZJklfMGLD2rfj+oKp
+	yBZOzyP7CcwPR9tyUlmwxY0/bjTgpcg=
+Date: Tue, 24 Sep 2024 16:58:19 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [RFC PATCH 2/3] ipv6: Run a reverse sk_lookup on sendmsg.
+To: Tiago Lam <tiagolam@cloudflare.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Jakub Sitnicki <jakub@cloudflare.com>,
+ kernel-team@cloudflare.com
+References: <20240913-reverse-sk-lookup-v1-0-e721ea003d4c@cloudflare.com>
+ <20240913-reverse-sk-lookup-v1-2-e721ea003d4c@cloudflare.com>
+ <d17da5b6-6273-4c2c-abd7-99378723866e@linux.dev> <ZumrBKAkZX0RZrgm@GHGHG14>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <ZumrBKAkZX0RZrgm@GHGHG14>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Regression Description:
+On 9/17/24 6:15 PM, Tiago Lam wrote:
+> On Fri, Sep 13, 2024 at 11:24:09AM -0700, Martin KaFai Lau wrote:
+>> On 9/13/24 2:39 AM, Tiago Lam wrote:
+>>> This follows the same rationale provided for the ipv4 counterpart, where
+>>> it now runs a reverse socket lookup when source addresses and/or ports
+>>> are changed, on sendmsg, to check whether egress traffic should be
+>>> allowed to go through or not.
+>>>
+>>> As with ipv4, the ipv6 sendmsg path is also extended here to support the
+>>> IPV6_ORIGDSTADDR ancilliary message to be able to specify a source
+>>> address/port.
+>>>
+>>> Suggested-by: Jakub Sitnicki <jakub@cloudflare.com>
+>>> Signed-off-by: Tiago Lam <tiagolam@cloudflare.com>
+>>> ---
+>>>    net/ipv6/datagram.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>>    net/ipv6/udp.c      |  8 ++++--
+>>>    2 files changed, 82 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/net/ipv6/datagram.c b/net/ipv6/datagram.c
+>>> index fff78496803d..4214dda1c320 100644
+>>> --- a/net/ipv6/datagram.c
+>>> +++ b/net/ipv6/datagram.c
+>>> @@ -756,6 +756,27 @@ void ip6_datagram_recv_ctl(struct sock *sk, struct msghdr *msg,
+>>>    }
+>>>    EXPORT_SYMBOL_GPL(ip6_datagram_recv_ctl);
+>>> +static inline bool reverse_sk_lookup(struct flowi6 *fl6, struct sock *sk,
+>>> +				     struct in6_addr *saddr, __be16 sport)
+>>> +{
+>>> +	if (static_branch_unlikely(&bpf_sk_lookup_enabled) &&
+>>> +	    (saddr && sport) &&
+>>> +	    (ipv6_addr_cmp(&sk->sk_v6_rcv_saddr, saddr) || inet_sk(sk)->inet_sport != sport)) {
+>>> +		struct sock *sk_egress;
+>>> +
+>>> +		bpf_sk_lookup_run_v6(sock_net(sk), IPPROTO_UDP, &fl6->daddr, fl6->fl6_dport,
+>>> +				     saddr, ntohs(sport), 0, &sk_egress);
+>>
+>> iirc, in the ingress path, the sk could also be selected by a tc bpf prog
+>> doing bpf_sk_assign. Then this re-run on sk_lookup may give an incorrect
+>> result?
+>>
+> 
+> If it does give the incorrect result, we still fallback to the normal
+> egress path.
+> 
+>> In general, is it necessary to rerun any bpf prog if the user space has
+>> specified the IP[v6]_ORIGDSTADDR.
+>>
+> 
+> More generally, wouldn't that also be the case if someone calls
+> bpf_sk_assign() in both TC and sk_lookup on ingress? It can lead to some
+> interference between the two.
+> 
+> It seems like the interesting cases are:
+> 1. Calling bpf_sk_assign() on both TC and sk_lookup ingress: if this
+> happens sk_lookup on egress should match the correct socket when doing
+> the reverse lookup;
+> 2. Calling bpf_sk_assign() only on ingress TC: in this case it will
+> depend if an sk_lookup program is attached or not:
+>    a. If not, there's no reverse lookup on egress either;
+>    b. But if yes, although the reverse sk_lookup here won't match the
+>    initial socket assigned at ingress TC, the packets will still fallback
+>    to the normal egress path;
+> 
+> You're right in that case 2b above will continue with the same
+> restrictions as before.
 
-Depending on the options specified for the GRE tunnel device, small
-packets may be dropped. This occurs because the pskb_network_may_pull
-function fails due to the packet's insufficient length.
+imo, all these cases you described above is a good signal that neither the TC 
+nor the BPF_PROG_TYPE_SK_LOOKUP program type is the right bpf prog to run here 
+_if_ a bpf prog was indeed useful here.
 
-For example, if only the okey option is specified for the tunnel device,
-original (before encapsulation) packets smaller than 28 bytes (including
-the IPv4 header) will be dropped. This happens because the required
-length is calculated relative to the network header, not the skb->head.
+I only followed some of the other discussion in v1 and v2. For now, I still 
+don't see running a bpf prog is useful here to process the IP[V6]_ORIGDSTADDR. 
+Jakub Sitnicki and I had discussed a similar point during the LPC.
 
-Here is how the required length is computed and checked:
-
-* The pull_len variable is set to 28 bytes, consisting of:
-  * IPv4 header: 20 bytes
-  * GRE header with Key field: 8 bytes
-
-* The pskb_network_may_pull function adds the network offset, shifting
-the checkable space further to the beginning of the network header and
-extending it to the beginning of the packet. As a result, the end of
-the checkable space occurs beyond the actual end of the packet.
-
-Instead of ensuring that 28 bytes are present in skb->head, the function
-is requesting these 28 bytes starting from the network header. For small
-packets, this requested length exceeds the actual packet size, causing
-the check to fail and the packets to be dropped.
-
-This issue affects both locally originated and forwarded packets in
-DMVPN-like setups.
-
-How to reproduce (for local originated packets):
-
-  ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
-          local <your-ip> remote 0.0.0.0
-
-  ip link set mtu 1400 dev gre1
-  ip link set up dev gre1
-  ip address add 192.168.13.1/24 dev gre1
-  ip neighbor add 192.168.13.2 lladdr <remote-ip> dev gre1
-  ping -s 1374 -c 10 192.168.13.2
-  tcpdump -vni gre1
-  tcpdump -vni <your-ext-iface> 'ip proto 47'
-  ip -s -s -d link show dev gre1
-
-Solution:
-
-Use the pskb_may_pull function instead the pskb_network_may_pull.
-
-Fixes: 80d875cfc9d3 ("ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmit()")
-
-Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
-
----
-v2 -> v3 :
-- More accurate and detailed explanation
-v1 -> v2 :
-- Fix the reproduce commands
-- Mov out the 'tnl_params' assignment line to the more suitable place
-with Eric's suggestion
-https://lore.kernel.org/netdev/CANn89iJoMcxe6xAOE=QGfqmOa1p+_ssSr_2y4KUJr-Qap3xk0Q@mail.gmail.com/
----
- net/ipv4/ip_gre.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
-index 5f6fd382af38..f1f31ebfc793 100644
---- a/net/ipv4/ip_gre.c
-+++ b/net/ipv4/ip_gre.c
-@@ -662,11 +662,11 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
- 		if (skb_cow_head(skb, 0))
- 			goto free_skb;
- 
--		tnl_params = (const struct iphdr *)skb->data;
--
--		if (!pskb_network_may_pull(skb, pull_len))
-+		if (!pskb_may_pull(skb, pull_len))
- 			goto free_skb;
- 
-+		tnl_params = (const struct iphdr *)skb->data;
-+
- 		/* ip_tunnel_xmit() needs skb->data pointing to gre header. */
- 		skb_pull(skb, pull_len);
- 		skb_reset_mac_header(skb);
--- 
-2.39.2
-
+If a bpf prog was indeed needed to process a cmsg, this should work closer to 
+what Jakub Sitnicki had proposed for getting the meta data during LPC (but I 
+believe the verdict there is also that a bpf prog is not needed). It should be a 
+bpf prog that can work in a more generic way to process any BPF specific cmsg 
+and can do other operations in the future using kfunc (e.g. route lookup or 
+something). Saying yes/no to a particular local IP and port could be one of 
+things that the bpf prog can do when processing the cmsg.
 
