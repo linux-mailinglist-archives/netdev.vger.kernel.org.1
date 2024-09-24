@@ -1,100 +1,90 @@
-Return-Path: <netdev+bounces-129503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129504-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC4D39842D0
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:00:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B0F09842D9
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:01:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84B881F22A0B
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 10:00:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B35D1C22FC5
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 10:01:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62B715574F;
-	Tue, 24 Sep 2024 10:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ScHLowhF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE25157468;
+	Tue, 24 Sep 2024 10:01:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from proxima.lasnet.de (proxima.lasnet.de [78.47.171.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 777551494CE;
-	Tue, 24 Sep 2024 10:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B385C15624C;
+	Tue, 24 Sep 2024 10:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.47.171.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727172027; cv=none; b=Gjpa7KhyP+7t7kVUSn03GB1cE7KLATaAmK7wLNTBUTHebbikes6Df775u1nwv6LVF+aHYM+7DdJSPmU2M49IanpFbZY+u7Q6lkEJ2jC6JYkfrW3tvoe745CR5r2Tyy/tcn9e0ptAg7RDfRUSKbYitRFjCBZ7THDYa1WhoZivJeE=
+	t=1727172074; cv=none; b=l1++Dddd/OZyYpY0T3qEDxpA8SVsYIHbPHjr2GcOoXPPaT5xv6iBxiMoLs7FawfRVIpjh/DlJbDzq2Wnw9sRH4hRXx1vUjiveCbI/2AIAUEBrGZVQPA1EzawM+gqys9l47Uu1hsdBP/HRKe2aZEMK2WpFgkUq0WCzrMT+g1woMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727172027; c=relaxed/simple;
-	bh=vwwcht1BEi5Bui59qglPewDZ63ryyP+yzkukmNfzoZg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=o1l2LndAs2LA0/o50pEyHA+QKvy2S5FO2/02HZVld7AsFom5yku6NTUgaDvAoYfJbOQ8N/QFjMRRnQ6CkmMXegxoUjMD3Xap1M3EZDu1TBY4qo6RfxDTyPBGa/QzlKow3sBq//yjzvN49hDDwzouktAXdY3EZIQ6/ZmbkJ2MVt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ScHLowhF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE23BC4CEC4;
-	Tue, 24 Sep 2024 10:00:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727172026;
-	bh=vwwcht1BEi5Bui59qglPewDZ63ryyP+yzkukmNfzoZg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ScHLowhF7XupHEieOu9xOfvardJ12COtXZhfE7Xcacwx6hkkdTPm/TfOWprN1fM90
-	 fqJJOP3a27LMAwRGtikLxmPA6hHqDMSqGRzlBVUQNaDqtwRnIwIKXNfnHv2HG66YYs
-	 KE7jVGd2ZUNOnzbV374uJNYaCNjNK/HDC0leNZUZVsuvYlvScbNOQNVkIiIvG45P0I
-	 z5dqYk+E79laO223vv8uD7P6it25Ct52GTj5eQJ1J7Njul/o6m9s08F0TWpubuazGK
-	 aCXNSAlcyc2TQJcY/cHwKnMgrnvk5K7QFttK2Jv29Tc4P6l5dMAYmhuD4/XP8VzJQe
-	 oY4X/dA1DJbng==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7126A3806655;
-	Tue, 24 Sep 2024 10:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1727172074; c=relaxed/simple;
+	bh=lXodk2MXvxPraZRmssIQ5FJJdSMd0JgYfi6RvY8ziAY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rHiqPwfdglYiOAi6z8OGiKL828An/gpvHfx7Iwc/Hs74SL1lL7eeYmQDzEBoXPcOJu9oio8W5zOLnnxreKVs46iJbw8iCKfnCx5tT5ckbXAoAvO511mLNOzAnSte+mIM6cGGqDdOuuLcJCgzC7McX2QBeMBjQplz4NLoMzAb+V8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org; spf=pass smtp.mailfrom=datenfreihafen.org; arc=none smtp.client-ip=78.47.171.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=datenfreihafen.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=datenfreihafen.org
+Received: from localhost.localdomain (unknown [45.118.184.53])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: stefan@sostec.de)
+	by proxima.lasnet.de (Postfix) with ESMTPSA id B6E03C0525;
+	Tue, 24 Sep 2024 12:01:04 +0200 (CEST)
+From: Stefan Schmidt <stefan@datenfreihafen.org>
+To: Jiawei Ye <jiawei.ye@foxmail.com>
+Cc: Stefan Schmidt <stefan@datenfreihafen.org>,
+	alex.aring@gmail.com,
+	davem@davemloft.net,
+	david.girault@qorvo.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
+	miquel.raynal@bootlin.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	przemyslaw.kitszel@intel.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v3] mac802154: Fix potential RCU dereference issue in mac802154_scan_worker
+Date: Tue, 24 Sep 2024 12:00:39 +0200
+Message-ID: <172717177514.3057794.16241311556115087833.b4-ty@datenfreihafen.org>
+X-Mailer: git-send-email 2.46.0
+In-Reply-To: <tencent_3B2F4F2B4DA30FAE2F51A9634A16B3AD4908@qq.com>
+References: <tencent_3B2F4F2B4DA30FAE2F51A9634A16B3AD4908@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net PATCH v3 0/2] Fix maximum TX/RX frame sizes in ravb driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172717202926.3972444.193078551368656456.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Sep 2024 10:00:29 +0000
-References: <20240918081839.259-1-paul.barker.ct@bp.renesas.com>
-In-Reply-To: <20240918081839.259-1-paul.barker.ct@bp.renesas.com>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, niklas.soderlund+renesas@ragnatech.se,
- andrew@lunn.ch, biju.das.jz@bp.renesas.com, claudiu.beznea.uj@bp.renesas.com,
- prabhakar.mahadev-lad.rj@bp.renesas.com, mitsuhiro.kimura.kc@renesas.com,
- geert+renesas@glider.be, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+Hello Jiawei Ye.
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 18 Sep 2024 09:18:37 +0100 you wrote:
-> These patches fix a couple of bugs in the maximum supported TX/RX frame
-> sizes in the ravb driver.
+On Tue, 24 Sep 2024 06:58:05 +0000, Jiawei Ye wrote:
+> In the `mac802154_scan_worker` function, the `scan_req->type` field was
+> accessed after the RCU read-side critical section was unlocked. According
+> to RCU usage rules, this is illegal and can lead to unpredictable
+> behavior, such as accessing memory that has been updated or causing
+> use-after-free issues.
 > 
->   * For the GbEth IP, we were advertising a maximum TX frame size/MTU
->     that was larger that the maximum the hardware can transmit.
-> 
->   * For the R-Car AVB IP, we were unnecessarily setting the maximum RX
->     frame size/MRU based on the MTU, which by default is smaller than
->     the maximum the hardware can receive.
+> This possible bug was identified using a static analysis tool developed
+> by myself, specifically designed to detect RCU-related issues.
 > 
 > [...]
 
-Here is the summary with links:
-  - [net,v3,1/2] net: ravb: Fix maximum TX frame size for GbEth devices
-    https://git.kernel.org/netdev/net/c/1d63864299ca
-  - [net,v3,2/2] net: ravb: Fix R-Car RX frame size limit
-    https://git.kernel.org/netdev/net/c/ec8234717db8
+Applied to wpan/wpan.git, thanks!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+[1/1] mac802154: Fix potential RCU dereference issue in mac802154_scan_worker
+      https://git.kernel.org/wpan/wpan/c/bff1709b3980
 
-
+regards,
+Stefan Schmidt
 
