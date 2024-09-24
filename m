@@ -1,159 +1,164 @@
-Return-Path: <netdev+bounces-129422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B7A7983B51
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 04:46:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E927C983BF1
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 05:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04FCD1F23405
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 02:46:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 929CDB22A83
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 03:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD6A11CAF;
-	Tue, 24 Sep 2024 02:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 856371BC3F;
+	Tue, 24 Sep 2024 03:57:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CXbc8IZr"
+	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="dqofcEpY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out162-62-58-216.mail.qq.com (out162-62-58-216.mail.qq.com [162.62.58.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EE0D1B85DA;
-	Tue, 24 Sep 2024 02:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D88B81745;
+	Tue, 24 Sep 2024 03:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.58.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727145997; cv=none; b=JWd7GHHyXM7HWInQJYVy02vFhAgitTQ/q9YcTus3ga77f/JO2v5Z9zVgUCFCkihi4fdAiJxU+GDxxcCJfS8rgjD+6SWfGrT/ltyr+yrApKM6/b9X326kdXlRshXB8HrFXxpX+vIrZTWg1NfSSPJ2ki9EPElOpERKYG2skW09PRA=
+	t=1727150251; cv=none; b=cnnPGrXRqyUB3AADsEUP8CYs9wQ8fL1kk4zfFI6TCA/QFVn7CNjzrO0K1Pq3mck5hUWIvZkq+sI2KzP1o6sFymfOB5uPTkrez9FpujpGqWzjueNtrNVGsGBhE9dZFXBTLC6udOqkoa6odMVVTLZwMSt4wUiLGVHAcYNDsYy4lv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727145997; c=relaxed/simple;
-	bh=saapds3Tco5OXwRJK6gEwmbqTm5hd9R5EEGQWhxcueg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qyOAfFgzCYU8EisbdYa8/H+uNkLE9RJ+tyILs9HjHHJityjhj5nH7XcCG5kQgzCGiiEDui9ckqzRUG+2WixUTpe2FYDI5vo3BjvVo6SAq6kLOTWihNK8eGFoX5mZieBsK9EBpsEPlTDYC30dMgC6uDJ9tLVsNLI/FsaDreMDfmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CXbc8IZr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34100C4CEDA;
-	Tue, 24 Sep 2024 02:46:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727145997;
-	bh=saapds3Tco5OXwRJK6gEwmbqTm5hd9R5EEGQWhxcueg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=CXbc8IZrs+le1x6K8gPklyx59P7UO2MaFH+aBs6qULAOOByQjWz2EwDcFxVQwMXR8
-	 uDC4rvtiiFp1YHSpIIi29Vyf5Xk9vyunyVGL0G9cl9ifmzROQ7XhuRrCY9E2V8NhBk
-	 NDzmD2DsOyPUjbix144H2Z24mARaXizk1TP49VwMXmKKfHfmAtmYD4+5Ro9/+walcc
-	 8e/UpjKbHbslIF1BtWRTkehIxG8ySOToyaah2hOXVz/SmYL/DEtbJVH0X1Y9bKwZHm
-	 s2J769cmRTcYSDwtMzoQbzlIuCXMMyW1wQ6anVZgK2E+vY6MsMycmVCSN0RP/pMgWi
-	 nHBBJxy7ma/AQ==
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-53660856a21so4826564e87.2;
-        Mon, 23 Sep 2024 19:46:37 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUVJXZ8o2fiFRGN34OFI7v4marGFjwMO4b9/YdDkndTX1SJR9PrrDV/uupJfNVvInOYbBwlbnxISIRTKw==@vger.kernel.org, AJvYcCV4qnhlXmd/pNtynF6EoKBLlofyH2WNGeaWZdYcDMDWO1rP70Yx44MSZYDcQ3wPWrQp0HxUNUcLswtD@vger.kernel.org, AJvYcCV8sJpN9/p5r1bthDfvVl05PMAS5ortaswtv0Lv6ySiT324sU8rj4O7XAdtFU4qxR6/EvYetQtSXzsQy/HF@vger.kernel.org, AJvYcCVe0322POMCrVO5cX7/fFNKZseqmP/a2N+6gAG+uknz6i7yxpWtloHo+ctB+ZZBjp5nFJgb7tui/PVY@vger.kernel.org, AJvYcCWc3DP4gCs7l9SHGJDIMKfQ6kLqkhxjKjtfqhi1o7n7uZ7XiIX6gRcd8ZwaammH7u2h8NNCHU2T5TJzkQ==@vger.kernel.org, AJvYcCX7hS7NeoYQHliRuUPyPgSliNiX06FLRz4PI13Lw7xjMxnxKIGE3bafucD8zeR0X953ufD2xYCZsbBG9ODX@vger.kernel.org, AJvYcCXIX6+z9AYMUrgZA6PSF5cAdZFktVUAvNR6vrvu1/Je4+icsqo/glaHp87I9w17aG9e+vQ6QtyS@vger.kernel.org, AJvYcCXTMkWqeZ8UBi7wEXPSjzraiuobgkP94FtHaoXaRSU/x6cw4Wd9uIheSsi4IrIioFs57vDjv8RH7Edx@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIjQmszHN58JgXnSDBpAbIiugia5Jx9c+tkCI5yRRHl9Fdr/JH
-	Daai9wOchvMNlFc/5QCY8QBv4NMu0pG2xrrg0B/nv7QZ1OJKvPAE4D1NEgbSBjh8Bon5vtGZ1tl
-	Tyv8yAHTYU6fZrCR2YvbbDmsFKng=
-X-Google-Smtp-Source: AGHT+IGbFPw/bTRm+UErpcrDrhXiYrSHOwzSiG4p3e4jUUEDfOTfASqMN5Pcr7Ww2ei18DiP8qOt5I2z7sBy9E6rsKI=
-X-Received: by 2002:a05:6512:158e:b0:533:d3e:16f5 with SMTP id
- 2adb3069b0e04-536ac334255mr7477512e87.38.1727145995657; Mon, 23 Sep 2024
- 19:46:35 -0700 (PDT)
+	s=arc-20240116; t=1727150251; c=relaxed/simple;
+	bh=OExNplF2IsEM956dC/bpJHbA5xOOF1pvAX1g3M4mLKU=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZF9TOoAcUldAyXO+nXp7dtOG8Bj3foyQeH2sRuTwhoFKPET0bKU1CoNJTmjX3qavdOEzLJ44mrG7eysW+NPhKiKmWqsUwGkAZEDNsZmKjWFbvEJXiQUOMNwJ8svXRx0Ro67hEcYFgyLCSD2kxbe9c8N0czJgZmUD3+YQC5bIzXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=dqofcEpY; arc=none smtp.client-ip=162.62.58.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+	s=s201512; t=1727150233;
+	bh=3/zfigEA5k2pKAMdxtfIPVaHEGeiJjqFlDfU7n+gcq8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=dqofcEpYyjg3/NSi3Py5d8C1JxqqSGnZ66YUP9LyKxwajhvZZYsWKaotIaB4AU/Fo
+	 ZJ+tKKquP1LBVBQoP2QrEQoi8ZwAg4jPzB2hZ6ioegI0rMYFjDx+OIyZXAGu4LbXlU
+	 5EdXWskFkmvrFEFLUO6pVkX5irJ2a/BYF/H3L6Cg=
+Received: from localhost.localdomain ([114.246.200.160])
+	by newxmesmtplogicsvrszb9-0.qq.com (NewEsmtp) with SMTP
+	id E4A9D433; Tue, 24 Sep 2024 11:57:10 +0800
+X-QQ-mid: xmsmtpt1727150230t8qmfq7du
+Message-ID: <tencent_A01E0A5EA0520995F067A792F49F5C9B1609@qq.com>
+X-QQ-XMAILINFO: MMUVWBTDoFy1ZHUMjE8YcEY9/CPE2ivr725lxbbtm13hF/SkyK6sax0+sOFxxy
+	 fwcMUP/BwY77GXg2XYgqAfAWcfuTHo7wOogecApOZVE5+PjCCjwBv8qbhBJ/yObKLMq6LjUiyXwx
+	 6tUmwFqghjlRxPi3YPK/WKFZrx+wtik/i0dIhGCux6rx6yUhxamUas/rtzyuSaVM8rgcJNYNwgZl
+	 ZA3ReenvNTIie3ukrCg759U0RNR4XOOwkXOOKn4nr2zIrsc/n9GvXuUxzqh33SskzRzgg8jEnV/M
+	 XZra0OoVNlr9orEc1qSNwbBIpJDTq21y4ew840cH8WzE8OFFd92St0MMfTs1SYlhPYlH10HkqdG/
+	 VAp5I8NyZlnkDOxLisWo/l8oGwyAxFwOXE5RIlAUV8XQA8pssNgl9ocf+KsC9LGmAloIk8zq2peM
+	 B64DWM2HFvSt9KyEqQpEuHrvzo8xi5m2FuMxdutHT+D+jLZXH/gNJybjfhKK5ZS4IQYliF1Zrhrc
+	 b0/NYt78kceKYdCrLnqLoyPa+Ct3V3Cmj/E3Kw/D6h1weJZYTozhPMVrwJNOZKWpSN8yA7KsTDQO
+	 wBAoEgmCPyLpByl6Zd3YuallTD+L+Nseg4EaxTWivRABJjX+KC9/hz+79DELyizLrcZeZTv+0aGE
+	 szeIRaEWdofJXG3c38se3XvoozIiBZMwEv2jPfJLuBqor3oyTolirALYpvlE0DQcFbQoXP8P6om5
+	 gn/JA4oqholeSImLhlCe1fT0iTDz+DRdGJf7hlcz2r48KikW3QhOdi53ZjVARo+Q/4fH44Y5y88S
+	 KbwKaVWbSizFiTGehAgaWuFjVRtqyerMAwS3HrxpjqvDtce/aA5S15MeUq1L5EPJ4CRJhqwZ8/Ms
+	 yxs+CMSH1j5xsjZoe24XiEx0ryQtj8NE9DjbIgIPKzmEBk9LIES5q5XGSKpiM9aQgsMYIlGn6utV
+	 YkO6CR1+vYtfKHPEzQV6r3p2dDb6pzQa9G1Fx0gSXHfVdUSMqFTnLCqe2O3MicRtSJFSAL7IUChw
+	 DGY232pgo3nTHsWzTWCzcvq01loTvV30gCl1pgVZQX/U0bLoTXbnIHG7mwkXM=
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Jiawei Ye <jiawei.ye@foxmail.com>
+To: edumazet@google.com
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	fw@strlen.de,
+	jiawei.ye@foxmail.com,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH] net: Fix potential RCU dereference issue in tcp_assign_congestion_control
+Date: Tue, 24 Sep 2024 03:57:10 +0000
+X-OQ-MSGID: <20240924035710.1993159-1-jiawei.ye@foxmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CANn89iLMVTgM4+GWfYO8ue2aV34qVx=p-uGQVQY4yQV6fv_rLg@mail.gmail.com>
+References: <CANn89iLMVTgM4+GWfYO8ue2aV34qVx=p-uGQVQY4yQV6fv_rLg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1724159867.git.andrea.porta@suse.com> <12d0909b1612fb6d2caa42b4fda5e5ae63d623a3.1724159867.git.andrea.porta@suse.com>
- <2113b8df52164733a0ee3860bb793d6e.sboyd@kernel.org> <ZtcBHvI9JxgH9iFT@apocalypse>
- <d87530b846d0dc9e78789234cfcb602a.sboyd@kernel.org> <CAK7LNAQEx52BYMYfNu+xj8sNmdtH9XfPapdhJDrsbDo43aD3Dg@mail.gmail.com>
- <146d3866ec57e963713cd07b9eaf5a71.sboyd@kernel.org>
-In-Reply-To: <146d3866ec57e963713cd07b9eaf5a71.sboyd@kernel.org>
-From: Masahiro Yamada <masahiroy@kernel.org>
-Date: Tue, 24 Sep 2024 11:45:58 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQ1oUvuMcHs-idZcPxE-c4fJgMDt-cURATsrVkjjFPNWg@mail.gmail.com>
-Message-ID: <CAK7LNAQ1oUvuMcHs-idZcPxE-c4fJgMDt-cURATsrVkjjFPNWg@mail.gmail.com>
-Subject: Re: [PATCH 05/11] vmlinux.lds.h: Preserve DTB sections from being
- discarded after init
-To: Stephen Boyd <sboyd@kernel.org>
-Cc: Andrea della Porta <andrea.porta@suse.com>, Andrew Lunn <andrew@lunn.ch>, Arnd Bergmann <arnd@arndb.de>, 
-	Bjorn Helgaas <bhelgaas@google.com>, 
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
-	Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Derek Kiernan <derek.kiernan@amd.com>, Dragan Cvetic <dragan.cvetic@amd.com>, 
-	Eric Dumazet <edumazet@google.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Lee Jones <lee@kernel.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Michael Turquette <mturquette@baylibre.com>, 
-	Nicolas Ferre <nicolas.ferre@microchip.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, Saravana Kannan <saravanak@google.com>, Stefan Wahren <wahrenst@gmx.net>, 
-	Will Deacon <will@kernel.org>, devicetree@vger.kernel.org, linux-arch@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-pci@vger.kernel.org, linux-rpi-kernel@lists.infradead.org, 
-	netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Sep 24, 2024 at 3:13=E2=80=AFAM Stephen Boyd <sboyd@kernel.org> wro=
-te:
->
-> Quoting Masahiro Yamada (2024-09-22 01:14:12)
+On 9/23/24 15:36, Eric Dumazet wrote:
+> On Mon, Sep 23, 2024 at 5:16 AM Jiawei Ye <jiawei.ye@foxmail.com> wrote:
 > >
-> > Rather, I'd modify my patch as follows:
+> > Thank you very much for your feedback, Florian Westphal and Eric Dumazet.
 > >
-> > --- a/scripts/Makefile.dtbs
-> > +++ b/scripts/Makefile.dtbs
-> > @@ -34,12 +34,14 @@ $(obj)/dtbs-list: $(dtb-y) FORCE
-> >  # Assembly file to wrap dtb(o)
-> >  # --------------------------------------------------------------------=
--------
+> > On 9/20/24 22:11, Eric Dumazet wrote
+> > >
+> > > On Fri, Sep 20, 2024 at 11:35 AM Florian Westphal <fw@strlen.de> wrote:
+> > > >
+> > > > Jiawei Ye <jiawei.ye@foxmail.com> wrote:
+> > > > > In the `tcp_assign_congestion_control` function, the `ca->flags` is
+> > > > > accessed after the RCU read-side critical section is unlocked. According
+> > > > > to RCU usage rules, this is illegal. Reusing this pointer can lead to
+> > > > > unpredictable behavior, including accessing memory that has been updated
+> > > > > or causing use-after-free issues.
+> > > > >
+> > > > > This possible bug was identified using a static analysis tool developed
+> > > > > by myself, specifically designed to detect RCU-related issues.
+> > > > >
+> > > > > To resolve this issue, the `rcu_read_unlock` call has been moved to the
+> > > > > end of the function.
+> > > > >
+> > > > > Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
+> > > > > ---
+> > > > > In another part of the file, `tcp_set_congestion_control` calls
+> > > > > `tcp_reinit_congestion_control`, ensuring that the congestion control
+> > > > > reinitialization process is protected by RCU. The
+> > > > > `tcp_reinit_congestion_control` function contains operations almost
+> > > > > identical to those in `tcp_assign_congestion_control`, but the former
+> > > > > operates under full RCU protection, whereas the latter is only partially
+> > > > > protected. The differing protection strategies between the two may
+> > > > > warrant further unification.
+> > > > > ---
+> > > > >  net/ipv4/tcp_cong.c | 2 +-
+> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/net/ipv4/tcp_cong.c b/net/ipv4/tcp_cong.c
+> > > > > index 0306d257fa64..356a59d316e3 100644
+> > > > > --- a/net/ipv4/tcp_cong.c
+> > > > > +++ b/net/ipv4/tcp_cong.c
+> > > > > @@ -223,13 +223,13 @@ void tcp_assign_congestion_control(struct sock *sk)
+> > > > >       if (unlikely(!bpf_try_module_get(ca, ca->owner)))
+> > > > >               ca = &tcp_reno;
+> > > >
+> > > > After this, ca either has module refcount incremented, so it can't
+> > > > go away anymore, or reno fallback was enabled (always bultin).
+> > > >
+> > > > >       icsk->icsk_ca_ops = ca;
+> > > > > -     rcu_read_unlock();
+> > > >
+> > > > Therefore its ok to rcu unlock here.
+> > >
+> > > I agree, there is no bug here.
+> > >
+> > > Jiawei Ye, I guess your static analysis tool is not ready yet.
 > >
-> > +builtin-dtb-section =3D $(if $(filter arch/%, $(obj)),.dtb.init.rodata=
-,.rodata)
->
-> I think we want to free the empty root dtb that's always builtin. That
-> is in drivers/of/ right?
+> > Yes, the static analysis tool is still under development and debugging.
+> >
+> > While I've collected and analyzed some relevant RCU commits from
+> > associated repositories, designing an effective static detection tool
+> > remains challenging.
+> >
+> > It's quite difficult without the assistance of experienced developers. If
+> > you have any suggestions or examples, I would greatly appreciate your
+> > help.
+> >
+> 
+> This case is explained in Documentation/RCU/rcuref.rst
+> 
+> line 61 : search_and_reference()
+> 
+> For congestion control modules, we call try_module_get() which calls
+> atomic_inc_not_zero(&module->refcnt)
 
+Thank you, Eric Dumazet. I will further explore the details in
+Documentation/RCU/rcuref.rst and related documents.
 
-drivers/of/empty_root.dts is really small.
-
-That is not a big deal even if empty_root.dtb
-remains in the .rodata section.
-
-
-
-> And I worry that an overlay could be in arch/
-> and then this breaks again. That's why it feels more correct to treat
-> dtbo.o vs. dtb.o differently. Perhaps we can check $(obj) for dtbo vs
-> dtb?
-
-
-This is not a problem either.
-
-
-Checking $(obj)/ is temporary.
-
-See this later patch:
-
-https://lore.kernel.org/linux-kbuild/20240904234803.698424-16-masahiroy@ker=
-nel.org/T/#u
-
-After my work is completed, DTB and DTBO will go
-to the .rodata section unconditionally.
-
-
-
-> Also, modpost code looks for .init* named sections and treats them as
-> initdata already. Can we rename .dtb.init.rodata to .init.dtb.rodata so
-> that modpost can find that?
-
-
-My previous patch checked .dtb.init.rodata.
-
-I do not mind renaming it to .init.dtb.rodata.
-
-
-
-
-
-
-
---=20
-Best Regards
-Masahiro Yamada
 
