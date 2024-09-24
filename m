@@ -1,141 +1,152 @@
-Return-Path: <netdev+bounces-129402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8164983AA6
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 02:50:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A12983AC7
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 03:31:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EA501C20D95
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 00:50:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E8381C21F62
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 01:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF23184E;
-	Tue, 24 Sep 2024 00:50:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72D31A41;
+	Tue, 24 Sep 2024 01:31:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="cZ3FwHH3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blSG7nfq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8959338C;
-	Tue, 24 Sep 2024 00:50:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD40FECF;
+	Tue, 24 Sep 2024 01:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727139049; cv=none; b=XlOazuhht3BoCxNePw6hM/gVPHaqk6y2S0DYzRCo02Uz7OBkByZSbi0RfaBnq2cJph0HefJ2k+zFYV5CYhaW90uCZUVDrvUJIymUTmPeoVdZYpDODZjIkJm0OQ4UeDtdWIyikF8+zExUvpiMDFjjAPuUKd/GdRZuxLg0Onvd5qU=
+	t=1727141503; cv=none; b=QFo8HsxcP7ER0lAFtB65olwc7sCFC0Esf+uXxRHjUh759RT62j6N6GhjZEucZlnxk7jti63HJ/lj3adlD4XwxdO0tqCdl1/oDQSTcV7lpG2iv9GOnx1+7urq0cJDkGkw/70vqEQD3OQENQWz+rl3gDaNkCeWEBLJNiJMD3HeMpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727139049; c=relaxed/simple;
-	bh=AZE+Qiaw2w+awGcYoQHiAgWO1WbbGgc3wBjgBu8BZuY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OKTzixJTDYvuaEdHhz7h0f4sEDgn9D0uUzSFQBawoACWMMF/WoqcgaLWMiqqOFnb5cAEwFRLVeNsThDOPU5S3CPU/+p7foCtt1rpExZsT9OYryHJ/eF2z6293ZvAoCmugFe/KxPHKhe6/w4ReEPLYzpDoC1maO7ihqFUv+iNUGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=cZ3FwHH3; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1727139044;
-	bh=xGpZbT7mg9IvH37SG01CpNOzsHu0+NIrFGiUekLwwhg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cZ3FwHH3VPH9h2+gUoDldqdBJ8lxFVy8befeyo/9tukYkMSie6Il2jPGI8x0a21l4
-	 a7HSOEj90eYRkkrO50LhTtCyh9/LHaJZsVniyZhBrEp/uASotJYoRSEPck1TLB56dO
-	 xm8WwwsinGSkGt+eKrC9Vp8QiBnuzq8WqwtYcYh1hYtRSRt79hMfGafkHXg5fG1SvS
-	 Ue0U2dzPLp8ewOYdOMuc/QuXYjXpwJGTfrTLOByGiNT08SoWiYB2C4syHs/5bsOzBP
-	 0NRGHamUQPK/sZpCd4Nj3I9nLKLQ97SQCp/XbdR6RsS4y/gW/GhbPjP0VHmK9SU5zN
-	 x+xQHjiDOTKhA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XCLrM0nJXz4x7B;
-	Tue, 24 Sep 2024 10:50:43 +1000 (AEST)
-Date: Tue, 24 Sep 2024 10:50:42 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Miguel Ojeda <ojeda@kernel.org>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, FUJITA Tomonori
- <fujita.tomonori@gmail.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Matt Gilbride <mattgilbride@google.com>,
- Wedson Almeida Filho <wedsonaf@gmail.com>
-Subject: Re: linux-next: manual merge of the rust tree with the net-next
- tree
-Message-ID: <20240924105042.22f709a4@canb.auug.org.au>
-In-Reply-To: <20240902160436.793f145d@canb.auug.org.au>
-References: <20240902160436.793f145d@canb.auug.org.au>
+	s=arc-20240116; t=1727141503; c=relaxed/simple;
+	bh=xs5detKTVBLzPpGt/D9q21ZoFkPbRVyCsZ8mayN/prA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KHHZoi1OfCNY9fgA3M1lW4mywltxIJLZ89LJGWIqvv/udPmIzT+9criGLcZr4HSVePiW5Vk/v0lEXClTQVvswBhvT5BOFotESGItiNcRu+PreWCxjyEpy97/7ysMM6QuSC94SjGFc5Zyr8EKHX9RkGOknQKl1GJs+jNq/tURjlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blSG7nfq; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-537a399e06dso1676915e87.1;
+        Mon, 23 Sep 2024 18:31:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727141499; x=1727746299; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RXUE+TGoraxHwTrjcDn7MdkTSgQGCB8AYjN18G7qHEs=;
+        b=blSG7nfqrdFb5yBF9PsTTDx0eNmBzf+BHBIwalMuvnKt2/bZedTqSGBPfg1zKnhSI7
+         0NlS7lIzaSn48Gn7WB9s9Y1iW9IBpJrOXdix9gKy7iPel50IVi8vjo4WRyolxgjCcvTM
+         YnYsJ/n2PsttB4dFLCojH0+dzV0KWNASJKGcGNNu3/V9f93kxVKrwBBWV6vNLIgh43ax
+         c4681adPyjtxcEpHQt0kJ/JKzCXK1votD5/X3PIct6RBue1X3Q/v6dn4080jO1KiY7cc
+         YfjsZL3yTjZoRslxyQs4hVFRHd+CMN3vWP8fXr4rPEwwjV3eZtGvTu0DTZ7aCMN9slk4
+         ylKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727141499; x=1727746299;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RXUE+TGoraxHwTrjcDn7MdkTSgQGCB8AYjN18G7qHEs=;
+        b=laqimbp4cMvQaZ/qlmKFVReju4OT3tE3sS0ZnDPW1sobQwoxNepjDsq6/eHNzrxuXT
+         My++kahwQaA1klVYCGl6gG+ltWhLxiApPGTYQ1WX9w+4gLeUVBizYESPqJ5KxPykS180
+         AYqSARCq4MrJgjOFzHQAw8+gipbttSdahdnDhBgOId+AWpSVcodmbHMHpQMrQVLdzZD2
+         hWHRKziNwlp2YitnbQcON/eudhfawOAijeiqdprPC4Ir7EYLGprQJLAhVEh0kjFV1P44
+         qD32t53KQ/3rCjd4CfNh8aFBVLCqauy6gH55+GI9leGhToYi2TkNBfHmVZLwnoYNYe5E
+         v7eg==
+X-Forwarded-Encrypted: i=1; AJvYcCWdYzwbWOiS5/SeYCDRGfT6TJyafRAutyCZXsKaPwa103+LGbZ2flMN0L+bYEltzkOmZa1g0BSpqfidjQc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGUDVBTEGO5NIfUHSJnVkx3TJPxQidwzKRC1rGkKDsuu6zt6Ot
+	HfgbtM24enJxmwZxXGKlWa+HZLiCmcmxVZQGh6/4qQWzSSNEuuI0RvlOVLUxOrY=
+X-Google-Smtp-Source: AGHT+IFBLkPpAD23jrQ6hVZAW8PQa7/Mvpz9LGc30yvgHGYRnCjvbVouaQDoQGW8pZgLe35cmCIBWw==
+X-Received: by 2002:a05:6512:401e:b0:52c:cc38:592c with SMTP id 2adb3069b0e04-536ac179d05mr7431867e87.0.1727141499229;
+        Mon, 23 Sep 2024 18:31:39 -0700 (PDT)
+Received: from dau-work-pc.zonatelecom.ru ([185.149.163.197])
+        by smtp.googlemail.com with ESMTPSA id 2adb3069b0e04-537a864d7fdsm52233e87.254.2024.09.23.18.31.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Sep 2024 18:31:37 -0700 (PDT)
+From: Anton Danilov <littlesmilingcloud@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Anton Danilov <littlesmilingcloud@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	Suman Ghosh <sumang@marvell.com>,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH net v2] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
+Date: Tue, 24 Sep 2024 04:30:40 +0300
+Message-Id: <20240924013039.29200-1-littlesmilingcloud@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/K_nd4GEO/6Q4sLzDL+IrQ23";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 
---Sig_/K_nd4GEO/6Q4sLzDL+IrQ23
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Regression Description:
 
-Hi all,
+Depending on the GRE tunnel device options, small packets are being
+dropped. This occurs because the pskb_network_may_pull function fails due
+to insufficient space in the network header. For example, if only the key
+option is specified for the tunnel device, packets of sizes up to 27
+(including the IPv4 header itself) will be dropped. This affects both
+locally originated and forwarded packets in the DMVPN-like setups.
 
-On Mon, 2 Sep 2024 16:04:36 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
-rote:
->
-> Today's linux-next merge of the rust tree got a conflict in:
->=20
->   rust/kernel/lib.rs
->=20
-> between commit:
->=20
->   4d080a029db1 ("rust: sizes: add commonly used constants")
->=20
-> from the net-next tree and commit:
->=20
->   a0d13aac7022 ("rust: rbtree: add red-black tree implementation backed b=
-y the C version")
->=20
-> from the rust tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->=20
-> diff --cc rust/kernel/lib.rs
-> index 58ed400198bf,f10b06a78b9d..000000000000
-> --- a/rust/kernel/lib.rs
-> +++ b/rust/kernel/lib.rs
-> @@@ -43,7 -44,7 +44,8 @@@ pub mod net
->   pub mod page;
->   pub mod prelude;
->   pub mod print;
-> + pub mod rbtree;
->  +pub mod sizes;
->   mod static_assert;
->   #[doc(hidden)]
->   pub mod std_vendor;
+How to reproduce (for local originated packets):
 
-This is now a conflict between the rust tree and Linus' tree.
+  ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
+          local <your-ip> remote 0.0.0.0
 
---=20
-Cheers,
-Stephen Rothwell
+  ip link set mtu 1400 dev gre1
+  ip link set up dev gre1
+  ip address add 192.168.13.1/24 dev gre1
+  ip neighbor add 192.168.13.2 lladdr <remote-ip> dev gre1
+  ping -s 1374 -c 10 192.168.13.2
+  tcpdump -vni gre1
+  tcpdump -vni <your-ext-iface> 'ip proto 47'
+  ip -s -s -d link show dev gre1
 
---Sig_/K_nd4GEO/6Q4sLzDL+IrQ23
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Solution:
 
------BEGIN PGP SIGNATURE-----
+Use the pskb_may_pull function instead the pskb_network_may_pull.
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbyDOIACgkQAVBC80lX
-0GxRhAgAjfEKehrtxyoFtJcctjBKRxBoTtZ7SnqUJ1IFBSugMhUeJ31r2m5/WWtW
-XGpISo13YU+AFJLfgsSlSHE+5JQhQ5oxh2NzaP2Jm14eCYSTqcgP8abNvu45oAk4
-AMoPF6WnzYYJaaFPYYk3aHDyKSgOkRS0KGUq6BCE1wUD8Sj4ypjaFVd4DM1VYRMG
-mdGoQSm6MiMhp6yjlaQBy5Sm5K+xNQH/mWc+417NvbzIEn7CZEg108nPlYZuJ3Qb
-9sKlYQ2aZDe62OGjhykRel0SN70hLxDnw0vbBmJhOfmstc8JGVfX4vi7NCUr1uHe
-cX8AiBRXf3sfK67HQSgqLRXU3yVCtA==
-=PyXz
------END PGP SIGNATURE-----
+Fixes: 80d875cfc9d3 ("ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmit()")
+Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
+---
+v1 -> v2 :
+- Fix the reproduce commands
+- Move out the 'tnl_params' assignment line to the more suitable place
+with Eric's suggestion
+https://lore.kernel.org/netdev/CANn89iJoMcxe6xAOE=QGfqmOa1p+_ssSr_2y4KUJr-Qap3xk0Q@mail.gmail.com/
+---
+ net/ipv4/ip_gre.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
---Sig_/K_nd4GEO/6Q4sLzDL+IrQ23--
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index 5f6fd382af38..f1f31ebfc793 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -662,11 +662,11 @@ static netdev_tx_t ipgre_xmit(struct sk_buff *skb,
+ 		if (skb_cow_head(skb, 0))
+ 			goto free_skb;
+ 
+-		tnl_params = (const struct iphdr *)skb->data;
+-
+-		if (!pskb_network_may_pull(skb, pull_len))
++		if (!pskb_may_pull(skb, pull_len))
+ 			goto free_skb;
+ 
++		tnl_params = (const struct iphdr *)skb->data;
++
+ 		/* ip_tunnel_xmit() needs skb->data pointing to gre header. */
+ 		skb_pull(skb, pull_len);
+ 		skb_reset_mac_header(skb);
+-- 
+2.39.2
+
 
