@@ -1,225 +1,148 @@
-Return-Path: <netdev+bounces-129449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD62983F8C
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 09:44:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC3E7983FA4
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 09:48:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EDCA281EAB
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 07:44:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 651471F242AA
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 07:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7873A1487DD;
-	Tue, 24 Sep 2024 07:44:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S/77Miam"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062A91482F6;
+	Tue, 24 Sep 2024 07:48:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1637045026;
-	Tue, 24 Sep 2024 07:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A6811CBD;
+	Tue, 24 Sep 2024 07:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727163854; cv=none; b=ID5hAFaRvCSRBgO6JuOWXRgs+JjOwko0vh+hxrAjC8F9Xky6OLGJcDgilIKIHKh6LJfK2ANpPgfKDAgaYB3lLqpgfHxmYWAVjYLPQqqV2Br8G/7RpLnuuwxzeaC4pORyYgn12hLMdOQxjH+9K36dd2yqIHmtjZfv4EUcbcStJSs=
+	t=1727164109; cv=none; b=iSPjxuqId/yNI5J2ayP1+OXMh6eH63oxTUK8y/DShyVHcjSJtqbQIgkGRVWLPpQhl/nzqRyypMAefVmFZh6Y8BP2t9TqU2dC2wrIZZROqFmgJ+clZhuNaFM7TtURAUddsia+LZKal7U6XMU9VULdffOKWo7VJGtMRJB56Qsz2j8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727163854; c=relaxed/simple;
-	bh=7DQinbWJYr9pz315R5995DNBrONlOziueyWnA2vSf7Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XU7+/kXxVS4M3jdyd0wXd9x9j01zq9f2yrPiGmZlaHjwiriTRP1YkZ3rMjrpaYoBn3+Mnol9z5f016/Ax8EbDZDBbvrQ9EZS/MsVBtAyj5uE+6sIjXhXdabEEPfIJ0rma+ucrz5q+XYca2Bk7jfTzcLx9hpKz20OwFSYoPCSXmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S/77Miam; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727163852; x=1758699852;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7DQinbWJYr9pz315R5995DNBrONlOziueyWnA2vSf7Y=;
-  b=S/77MiamptjOHyeV2CxlRVyWX80VOHEZQl+l6ljLxqAGNqFeJ4vH8Zy2
-   b99TA24jSX2J/Dj/GVfKpZWhQfPDumLd+DuK+mNJhZYPyrxeYby8gj+32
-   jz4H4OnR80NWRztfiesARMq2w9mEI1fj0RX8iyaj4TdntmBUS2uFhooKw
-   SJe9rSggCv//K6J/b59GlfYGT3gvKQdL2TefL1Iqaf7jGYK/nKC63BhC3
-   /lWGq1ldzip5Dt3WjJgTIp8pykSu26RQGmNAOMTXixXeMhVljBygoc3Gl
-   0dTptf1dnk9gL2IWdm7IRcOtRmZOS3bu5uPqrfe7hdgDbs4JSPSe2Dkje
-   A==;
-X-CSE-ConnectionGUID: xWTz+P/9Rbe3gTbG5tlV6Q==
-X-CSE-MsgGUID: iWB7V3/BQda2o6Cwp9LjZA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11204"; a="43612059"
-X-IronPort-AV: E=Sophos;i="6.10,253,1719903600"; 
-   d="scan'208";a="43612059"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2024 00:44:11 -0700
-X-CSE-ConnectionGUID: l0KGYaohRO2ptv92GxYnow==
-X-CSE-MsgGUID: 02PQ56D/QzWtzGAnYGRXVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,253,1719903600"; 
-   d="scan'208";a="75433442"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by fmviesa003.fm.intel.com with ESMTP; 24 Sep 2024 00:44:07 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1st0DN-000I5P-1V;
-	Tue, 24 Sep 2024 07:44:05 +0000
-Date: Tue, 24 Sep 2024 15:43:30 +0800
-From: kernel test robot <lkp@intel.com>
-To: yushengjin <yushengjin@uniontech.com>, pablo@netfilter.org
-Cc: oe-kbuild-all@lists.linux.dev, kadlec@netfilter.org, roopa@nvidia.com,
-	razor@blackwall.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yushengjin <yushengjin@uniontech.com>
-Subject: Re: [PATCH v2] net/bridge: Optimizing read-write locks in ebtables.c
-Message-ID: <202409241543.F99I82u3-lkp@intel.com>
-References: <2860814445452DE8+20240924022437.119730-1-yushengjin@uniontech.com>
+	s=arc-20240116; t=1727164109; c=relaxed/simple;
+	bh=CSwaPVNkAQ30B+hlvci2uTj9rmPm9lc0sX+C9imgF5s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QG76Hmq18YpOZ3DUm33gs9RQKSzsAzckRxzbGrgd9NrU4ok1vdMABzXN3L7yERz4OmE7p2eWZqm6lcd4CulqvPuihmU1Db9ev7jh3wMwkAESau9MoEE1tXDb+p7i3graAc9DfHDFeY51HkklPU400PKy54GDbOdpfJ13eap7ARA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XCX5H6pvcz2QTxJ;
+	Tue, 24 Sep 2024 15:47:31 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id A6BD31A016C;
+	Tue, 24 Sep 2024 15:48:17 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 24 Sep 2024 15:48:17 +0800
+Message-ID: <64730d70-e5b7-4117-9ee8-43f23543eafd@huawei.com>
+Date: Tue, 24 Sep 2024 15:48:16 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2860814445452DE8+20240924022437.119730-1-yushengjin@uniontech.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] page_pool: fix IOMMU crash when driver has
+ already unbound
+To: Gur Stavi <gur.stavi@huawei.com>
+CC: <akpm@linux-foundation.org>, <aleksander.lobakin@intel.com>,
+	<alexander.duyck@gmail.com>, <angelogioacchino.delregno@collabora.com>,
+	<anthony.l.nguyen@intel.com>, <ast@kernel.org>, <bpf@vger.kernel.org>,
+	<daniel@iogearbox.net>, <davem@davemloft.net>, <edumazet@google.com>,
+	<fanghaiqing@huawei.com>, <hawk@kernel.org>, <ilias.apalodimas@linaro.org>,
+	<imx@lists.linux.dev>, <intel-wired-lan@lists.osuosl.org>,
+	<iommu@lists.linux.dev>, <john.fastabend@gmail.com>, <kuba@kernel.org>,
+	<kvalo@kernel.org>, <leon@kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<linux-mediatek@lists.infradead.org>, <linux-mm@kvack.org>,
+	<linux-rdma@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
+	<liuyonglong@huawei.com>, <lorenzo@kernel.org>, <matthias.bgg@gmail.com>,
+	<nbd@nbd.name>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>, <robin.murphy@arm.com>,
+	<ryder.lee@mediatek.com>, <saeedm@nvidia.com>, <sean.wang@mediatek.com>,
+	<shayne.chen@mediatek.com>, <shenwei.wang@nxp.com>, <tariqt@nvidia.com>,
+	<wei.fang@nxp.com>, <xiaoning.wang@nxp.com>, <zhangkun09@huawei.com>
+References: <2fb8d278-62e0-4a81-a537-8f601f61e81d@huawei.com>
+ <20240924064559.1681488-1-gur.stavi@huawei.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <20240924064559.1681488-1-gur.stavi@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Hi yushengjin,
+On 2024/9/24 14:45, Gur Stavi wrote:
+>>>>> With all the caching in the network stack, some pages may be
+>>>>> held in the network stack without returning to the page_pool
+>>>>> soon enough, and with VF disable causing the driver unbound,
+>>>>> the page_pool does not stop the driver from doing it's
+>>>>> unbounding work, instead page_pool uses workqueue to check
+>>>>> if there is some pages coming back from the network stack
+>>>>> periodically, if there is any, it will do the dma unmmapping
+>>>>> related cleanup work.
+>>>>>
+>>>>> As mentioned in [1], attempting DMA unmaps after the driver
+>>>>> has already unbound may leak resources or at worst corrupt
+>>>>> memory. Fundamentally, the page pool code cannot allow DMA
+>>>>> mappings to outlive the driver they belong to.
+>>>>>
+>>>>> Currently it seems there are at least two cases that the page
+>>>>> is not released fast enough causing dma unmmapping done after
+>>>>> driver has already unbound:
+>>>>> 1. ipv4 packet defragmentation timeout: this seems to cause
+>>>>>    delay up to 30 secs:
+>>>>>
+>>>>> 2. skb_defer_free_flush(): this may cause infinite delay if
+>>>>>    there is no triggering for net_rx_action().
+>>>>>
+>>>>> In order not to do the dma unmmapping after driver has already
+>>>>> unbound and stall the unloading of the networking driver, add
+>>>>> the pool->items array to record all the pages including the ones
+>>>>> which are handed over to network stack, so the page_pool can
+>>>>> do the dma unmmapping for those pages when page_pool_destroy()
+>>>>> is called.
+>>>>
+>>>> So, I was thinking of a very similar idea. But what do you mean by
+>>>> "all"? The pages that are still in caches (slow or fast) of the pool
+>>>> will be unmapped during page_pool_destroy().
+>>>
+>>> Yes, it includes the one in pool->alloc and pool->ring.
+>>
+>> It worths mentioning that there is a semantics changing here:
+>> Before this patch, there can be almost unlimited inflight pages used by
+>> driver and network stack, as page_pool doesn't really track those pages.
+>> After this patch, as we use a fixed-size pool->items array to track the
+>> inflight pages, the inflight pages is limited by the pool->items, currently
+>> the size of pool->items array is calculated as below in this patch:
+>>
+>> +#define PAGE_POOL_MIN_ITEM_CNT	512
+>> +	unsigned int item_cnt = (params->pool_size ? : 1024) +
+>> +				PP_ALLOC_CACHE_SIZE + PAGE_POOL_MIN_ITEM_CNT;
+>>
+>> Personally I would consider it is an advantage to limit how many pages which
+>> are used by the driver and network stack, the problem seems to how to decide
+>> the limited number of page used by network stack so that performance is not
+>> impacted.
+> 
+> In theory, with respect to the specific problem at hand, you only have
+> a limit on the number of mapped pages inflight. Once you reach this
+> limit you can unmap these old pages, forget about them and remember
+> new ones.
 
-kernel test robot noticed the following build errors:
+Yes, it can be done theoretically.
+The tricky part seems to be how to handle the concurrency problem when
+we evict the old pages and the old pages are also returned back to the
+page_pool concurrently without any locking or lockless operation.
 
-[auto build test ERROR on netfilter-nf/main]
-[also build test ERROR on horms-ipvs/master linus/master v6.11 next-20240924]
-[cannot apply to nf-next/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/yushengjin/net-bridge-Optimizing-read-write-locks-in-ebtables-c/20240924-102547
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git main
-patch link:    https://lore.kernel.org/r/2860814445452DE8%2B20240924022437.119730-1-yushengjin%40uniontech.com
-patch subject: [PATCH v2] net/bridge: Optimizing read-write locks in ebtables.c
-config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20240924/202409241543.F99I82u3-lkp@intel.com/config)
-compiler: sh4-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240924/202409241543.F99I82u3-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409241543.F99I82u3-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from include/asm-generic/percpu.h:7,
-                    from ./arch/sh/include/generated/asm/percpu.h:1,
-                    from include/linux/irqflags.h:19,
-                    from arch/sh/include/asm/cmpxchg-irq.h:5,
-                    from arch/sh/include/asm/cmpxchg.h:20,
-                    from arch/sh/include/asm/atomic.h:19,
-                    from include/linux/atomic.h:7,
-                    from include/asm-generic/bitops/atomic.h:5,
-                    from arch/sh/include/asm/bitops.h:23,
-                    from include/linux/bitops.h:68,
-                    from include/linux/thread_info.h:27,
-                    from include/asm-generic/preempt.h:5,
-                    from ./arch/sh/include/generated/asm/preempt.h:1,
-                    from include/linux/preempt.h:79,
-                    from include/linux/spinlock.h:56,
-                    from include/linux/mmzone.h:8,
-                    from include/linux/gfp.h:7,
-                    from include/linux/umh.h:4,
-                    from include/linux/kmod.h:9,
-                    from net/bridge/netfilter/ebtables.c:14:
-   net/bridge/netfilter/ebtables.c: In function 'get_counters':
->> net/bridge/netfilter/ebtables.c:1006:30: error: 'ebt_recseq' undeclared (first use in this function); did you mean 'xt_recseq'?
-    1006 |                 s = &per_cpu(ebt_recseq, cpu);
-         |                              ^~~~~~~~~~
-   include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
-     219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
-         |                                                      ^~~
-   include/linux/percpu-defs.h:263:49: note: in expansion of macro 'VERIFY_PERCPU_PTR'
-     263 | #define per_cpu_ptr(ptr, cpu)   ({ (void)(cpu); VERIFY_PERCPU_PTR(ptr); })
-         |                                                 ^~~~~~~~~~~~~~~~~
-   include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
-     269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
-         |                                   ^~~~~~~~~~~
-   net/bridge/netfilter/ebtables.c:1006:22: note: in expansion of macro 'per_cpu'
-    1006 |                 s = &per_cpu(ebt_recseq, cpu);
-         |                      ^~~~~~~
-   net/bridge/netfilter/ebtables.c:1006:30: note: each undeclared identifier is reported only once for each function it appears in
-    1006 |                 s = &per_cpu(ebt_recseq, cpu);
-         |                              ^~~~~~~~~~
-   include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
-     219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
-         |                                                      ^~~
-   include/linux/percpu-defs.h:263:49: note: in expansion of macro 'VERIFY_PERCPU_PTR'
-     263 | #define per_cpu_ptr(ptr, cpu)   ({ (void)(cpu); VERIFY_PERCPU_PTR(ptr); })
-         |                                                 ^~~~~~~~~~~~~~~~~
-   include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
-     269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
-         |                                   ^~~~~~~~~~~
-   net/bridge/netfilter/ebtables.c:1006:22: note: in expansion of macro 'per_cpu'
-    1006 |                 s = &per_cpu(ebt_recseq, cpu);
-         |                      ^~~~~~~
-   net/bridge/netfilter/ebtables.c: In function 'do_replace_finish':
-   net/bridge/netfilter/ebtables.c:1111:42: error: 'ebt_recseq' undeclared (first use in this function); did you mean 'xt_recseq'?
-    1111 |                 seqcount_t *s = &per_cpu(ebt_recseq, cpu);
-         |                                          ^~~~~~~~~~
-   include/linux/percpu-defs.h:219:54: note: in definition of macro '__verify_pcpu_ptr'
-     219 |         const void __percpu *__vpp_verify = (typeof((ptr) + 0))NULL;    \
-         |                                                      ^~~
-   include/linux/percpu-defs.h:263:49: note: in expansion of macro 'VERIFY_PERCPU_PTR'
-     263 | #define per_cpu_ptr(ptr, cpu)   ({ (void)(cpu); VERIFY_PERCPU_PTR(ptr); })
-         |                                                 ^~~~~~~~~~~~~~~~~
-   include/linux/percpu-defs.h:269:35: note: in expansion of macro 'per_cpu_ptr'
-     269 | #define per_cpu(var, cpu)       (*per_cpu_ptr(&(var), cpu))
-         |                                   ^~~~~~~~~~~
-   net/bridge/netfilter/ebtables.c:1111:34: note: in expansion of macro 'per_cpu'
-    1111 |                 seqcount_t *s = &per_cpu(ebt_recseq, cpu);
-         |                                  ^~~~~~~
-
-
-vim +1006 net/bridge/netfilter/ebtables.c
-
-   987	
-   988	
-   989	static void get_counters(const struct ebt_counter *oldcounters,
-   990				 struct ebt_counter *counters, unsigned int nentries)
-   991	{
-   992		int i, cpu;
-   993		struct ebt_counter *counter_base;
-   994		seqcount_t *s;
-   995	
-   996		/* counters of cpu 0 */
-   997		memcpy(counters, oldcounters,
-   998		       sizeof(struct ebt_counter) * nentries);
-   999	
-  1000		/* add other counters to those of cpu 0 */
-  1001		for_each_possible_cpu(cpu) {
-  1002	
-  1003			if (cpu == 0)
-  1004				continue;
-  1005	
-> 1006			s = &per_cpu(ebt_recseq, cpu);
-  1007			counter_base = COUNTER_BASE(oldcounters, nentries, cpu);
-  1008			for (i = 0; i < nentries; i++) {
-  1009				u64 bcnt, pcnt;
-  1010				unsigned int start;
-  1011	
-  1012				do {
-  1013					start = read_seqcount_begin(s);
-  1014					bcnt = counter_base[i].bcnt;
-  1015					pcnt = counter_base[i].pcnt;
-  1016				} while (read_seqcount_retry(s, start));
-  1017	
-  1018				ADD_COUNTER(counters[i], bcnt, pcnt);
-  1019				cond_resched();
-  1020			}
-  1021		}
-  1022	}
-  1023	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+For now each item has only one producer and one consumer, so we don't
+really have to worry about the concurrency problem before calling
+page_pool_item_uninit() in page_pool_destroy() to do the unmapping
+for the inflight pages by using a newly added 'destroy_lock' lock.
 
