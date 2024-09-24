@@ -1,140 +1,107 @@
-Return-Path: <netdev+bounces-129583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3671984A1D
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 19:07:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D1F4984A2F
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 19:16:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D727F1C2196D
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 17:07:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48E16B23ACF
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 17:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD131A76D0;
-	Tue, 24 Sep 2024 17:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1261AB511;
+	Tue, 24 Sep 2024 17:16:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="coVFyBa0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qdys5jPX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285EE3612D
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 17:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFD33612D;
+	Tue, 24 Sep 2024 17:16:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727197671; cv=none; b=SQRzZ0QOW7G5sWTUzaaww5zaF9AyH8v8AAOI6fJdqMvZ7W7go/31aUEsoRGf+ICMYNOmvATAsyJLwQJLSs++k0zyxGjPsGObD1LlYFhe6iKmPJKc2Esdb/CeugKm/eFXRMqU8+oMM7ilx2coqiYXwsjr8CGBTCrTViOBhgRxCx4=
+	t=1727198174; cv=none; b=FbFTahfe06H6zi5tkqcDbKWu4L7AFe6KgWmSGF1wYEN6sV7TSHpPGSK37ypmBp/VxgzCDy5kWq1R5IRonMiurkTiDOEhEijZifljG/D00pboZLuEaUVpG6qiQDcRsoUJcsHZ5SkK4jq3xUtYRe/iywOWYCp8bBKHovRoYbQwxOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727197671; c=relaxed/simple;
-	bh=PmWonUm1P39vQKCEWJndp/5X/hfo7HEf9pMTOa+OnQg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O0/DpKIgNSIc6aUWfumfI5ECZ8gCXtEWEKppiKVmUP1+rdHyXhrTbMZUxnxCbSX6FvSbTaTNwUkhQ1i2mebcZhk3NXJ6+Lkg7cC5YbW2ioAgmyUnCpgIJmFKNnDOj0A/F2nk8fbmDAYeazKvtOdIDmQon6fj+OAZgFs/o3epBGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=coVFyBa0; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-53654e2ed93so6764543e87.0
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 10:07:49 -0700 (PDT)
+	s=arc-20240116; t=1727198174; c=relaxed/simple;
+	bh=aVrYjTE1AeKemCQUeLfIG9BcOy/UUIT0nHD5ul5c9J8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=iYv9l9lDa3qn9b6xeq4zEMNVQuD7H88PMhLOnEhADi32N59WDQL8ybIK8wmbZPZIWN2dk5QsdmXpO6b16las8oy/JkXVSPIaKtypSHcm+fNRcag+jo52wjFhl+809w7g6ozauuHnlNcZYcYipltxNjvGBDrHIVs/iqxES3cZzoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qdys5jPX; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-374c6187b6eso3239661f8f.0;
+        Tue, 24 Sep 2024 10:16:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1727197668; x=1727802468; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PmWonUm1P39vQKCEWJndp/5X/hfo7HEf9pMTOa+OnQg=;
-        b=coVFyBa0bCxOwTosLmoXXSFp5fgvOG9nkCPTGk68hFrA6rYiFdpR/MYIBDgObFJxbn
-         hYuCY9IO3SVd3NYJKlN1M2gTl7IeNJcixbWNfs0zZNTwBgwTNs7Nx3TCz4Yx8iEuKZoc
-         rT4daUauI+csjtkUHTp+ptw7JDd60wABEMQLmYW5UQuFTQCjUW6nJ7W2IE9Zuspw8nkN
-         1EvtocQYOpEDtYkEC1ysrbe0KYQpFLcKY8qeI0Pcwnp1yv6G6ZET+2FvSjwwmOYndRrU
-         Cff0JL95u8m/fccaYXyoKk9d8H/0X6FXwnhjqIPNR8MppXBM81FGSCt80kx158LPz6B5
-         D0SQ==
+        d=gmail.com; s=20230601; t=1727198170; x=1727802970; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=/uSghqd96C7l/OunFvy1iybnF5kbktIvJLSUNcyMiQQ=;
+        b=Qdys5jPXWSA8caWop5al7JJ/IgRUZuxzPm7i1hoVv7a6Eq6ZnAOaRtyl79sq/Z5OWF
+         FDInX7mnof2FRLPJz3dG1DxXIpp8fur0S9ijafkOqFRMGwqlYw9FKMz/cDKwiElhFtY4
+         VxMEo+3z0RGbUFvbekGLaa+lDPaEp+0ImUplNrqdJmOY0pS53Mb72P6NtA8OwIKMX/CZ
+         dzhRBrgVGNmZHNh74+5WZXkqiGsWp+6eJ6Z5kxg4sjFZ5icmTPJHSMj8J7vZU7XyR9fF
+         YiwwJhHVa4Uv/LlrPDIjj/RQABa1XEmoL35GWFpLeAgGAwgrciIRObqr9bZOsnY0/AtC
+         GgvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727197668; x=1727802468;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PmWonUm1P39vQKCEWJndp/5X/hfo7HEf9pMTOa+OnQg=;
-        b=cgVF3kQsQxp9ZTSaNB8CYxncorOcxLs3YvBJ7FSg6qO0nAMYFikaxD7yjbkV/UtAwD
-         CfAnXvfN2Md1WQHCFyGYk1ugymDP6DZvbsojNHNCDlb+7gjohXasxG/jgISXUIfgV3oo
-         QNH6CJyFQt2JH9twyrvjxGR+u6WIwpXIBuLqfUQ9YDkSia/tCCCHagh4pD+7jGn6yKL1
-         EiqLCkFFKpJVPlCI+6WPiIQH7hfH2YHE6WSvMTz5Oqhm5S6nbYoePmhsFXvqk6IIa1P1
-         WmGYay0jzOdbF2zVQkUjTp1yui3X/RxQGCq7r7C+73l+ZyhJ644CL0qnkbNey/r4MEDK
-         ZRRA==
-X-Forwarded-Encrypted: i=1; AJvYcCWE15Y1nEAG+b681jOMS+MC2qFGUr8zNtczrgxSJU+FYOspYihWHtrtcmTIGXevc58appc8zfs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/PzrYjrpotISGLgv4edL7S+irmhOBbGiu64/xDcGABmyESXTU
-	iQB1Lv/iI/WAfJPXfHUwDI3SBlUtABr68r/do2WzJiu7E3iYuqFumU5ZXCSLs6rHrkt65jndvl0
-	6Vw7Dh4oH3yVBAy9LUerFD76EYIEiRL8KHCMN2g==
-X-Google-Smtp-Source: AGHT+IFQnrBRXhzqzSbxxq2DuX3Rr7dDGfruh+nq0Bk+q33oxwalD2WnXbMn4dLD7JssdiRP1qllG9ZevtZnEADLc0c=
-X-Received: by 2002:a05:6512:2348:b0:51a:f689:b4df with SMTP id
- 2adb3069b0e04-536ad3b7cd8mr8126306e87.44.1727197668160; Tue, 24 Sep 2024
- 10:07:48 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1727198170; x=1727802970;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/uSghqd96C7l/OunFvy1iybnF5kbktIvJLSUNcyMiQQ=;
+        b=i4XoV6tl7FdxxYAuQ0vhL/E7lGve+2le1NNOJpD533CDVHM7B92mAZ7KcEkuhl0Knz
+         0UfS3GhsjnrzKBdB2CYcOkg8w8LWfTw0CBUSyd3daMR5xlsaeDDRNUFQLwsaAOMCUNY+
+         uUpXq64iFU9ShKigX8tk5uXoj4RAb1V4D7+ABGQ/aewo5neHGcBAK/6O6LocK+c1FEpk
+         HqCjHsx+B06CuWngyjwOYtH26VNNIsuAgH8fspFooom4NOaVVq9hivD/+pmrJYOB6kuP
+         he7BNHwuONUN2rA2/VLIRQxKy24dlMP0Lph9BFthN9k7OyFe3yLxpVQaV1LpeyY4+i2e
+         bEIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWAhEgD1ufbgckxdeASwmGULWGQQwz93MOsxyPktUE+fN/Zn3o6WSBJJy/PfNWsW4p0Na1VYwcx8gxFMzQ7@vger.kernel.org, AJvYcCWxr+ye80YUIHxYiMbxlp5nVXj/2bomvcwfGaCEMVgLmx0M8fAa1X2EGjDFxZWx5rp6jV7FaDLH@vger.kernel.org, AJvYcCXGNBIPb5nBjPCOYkCp6BEBSBUHWwA3FI1rSwtfBVE91a8Z3xfecfYIKEtlkEGexvJ0P+PwuWz+NgWxycEr@vger.kernel.org
+X-Gm-Message-State: AOJu0YxejNc+VlHz9ZPhtC3qKDqaB/b0Vso0dA6w9i6Dd4Mrxrqc0n55
+	iVPwYymcScd72loTQQxUp7EGVET324WG3/OjIxjYJTKueE5zjJ8n
+X-Google-Smtp-Source: AGHT+IGqoUune5iXPKKrE7a8T7Chi+xhSRuKaoqHbtybfaTorDC397J1k7dDnr3YO2XslotYsrsflA==
+X-Received: by 2002:a5d:6089:0:b0:374:c03e:22d4 with SMTP id ffacd0b85a97d-37cc245b08emr111181f8f.1.1727198170241;
+        Tue, 24 Sep 2024 10:16:10 -0700 (PDT)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2a8c0esm2114876f8f.5.2024.09.24.10.16.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 24 Sep 2024 10:16:09 -0700 (PDT)
+Message-ID: <95bdde5a-b09d-48ad-98a2-2bdeffc7a567@gmail.com>
+Date: Tue, 24 Sep 2024 20:16:27 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240814082301.8091-1-brgl@bgdev.pl> <83c562e9-2add-4086-86e7-6e956d2ee70f@kernel.org>
- <87msk49j8m.fsf@kernel.org> <ed6aceb6-4954-43ad-b631-6c6fda209411@kernel.org>
- <87a5g2bz6j.fsf@kernel.org> <CAMRc=MeLick_+Czy5MhkX=SxVvR4WCmUZ8CQ5hQBVTe2fscCPg@mail.gmail.com>
- <b7fdafd6-5029-4b80-b264-11943740b354@quicinc.com> <1e79d94e-2f83-4762-b126-ed865142f1ed@kernel.org>
- <312fa408-d385-4b90-b8f4-729af4a3ce65@quicinc.com>
-In-Reply-To: <312fa408-d385-4b90-b8f4-729af4a3ce65@quicinc.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 24 Sep 2024 19:07:35 +0200
-Message-ID: <CAMRc=Mc4AZR3aztmODtpgLt3P63=WGGfupjNSSJdFseH=pAhtg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] dt-bindings: net: ath11k: document the inputs
- of the ath11k on WCN6855
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Jeff Johnson <jjohnson@kernel.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, Arnd Bergmann <arnd@arndb.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] net: wwan: qcom_bam_dmux: Fix missing
+ pm_runtime_disable()
+To: Jinjie Ruan <ruanjinjie@huawei.com>, stephan@gerhold.net,
+ loic.poulain@linaro.org, johannes@sipsolutions.net, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240923115743.3563079-1-ruanjinjie@huawei.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20240923115743.3563079-1-ruanjinjie@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Sep 24, 2024 at 6:46=E2=80=AFPM Jeff Johnson <quic_jjohnson@quicinc=
-.com> wrote:
->
-> On 9/24/2024 1:06 AM, Krzysztof Kozlowski wrote:
-> > On 20/09/2024 23:02, Jeff Johnson wrote:
-> >> Again, since I'm a DT n00b:
-> >> Just to make sure I understand, you are saying that with this change a=
-ny
-> >> existing .dts/.dtb files will still work with an updated driver, so th=
-e new
-> >> properties are not required to be populated on existing devices.
-> >
-> > Did you folks rejected patches acked by DT maintainers on basis of not
-> > understanding DT at all?
->
-> I personally have not rejected any DT patches. Nor have I accepted any.
-> I'm deferring to Kalle.
->
-> >> However a new driver with support for these properties will utilize th=
-em when
-> >> they are present, and the current ath11k .dts files will need to be up=
-dated to
-> >
-> > It is not related to drivers at all. Nothing in this thread is related
-> > to drivers.
-> >
-> > Can we entirely drop the drivers from the discussion?
->
-> I brought up drivers since in the discussion there was concern that this =
-DT
-> change would potentially break existing devices that have a DTS that defi=
-nes
-> qcom,ath11k-calibration-variant, and I wanted clarification on that point=
-.
->
-> /jeff
+On 23.09.2024 14:57, Jinjie Ruan wrote:
+> It's important to undo pm_runtime_use_autosuspend() with
+> pm_runtime_dont_use_autosuspend() at driver exit time.
+> 
+> But the pm_runtime_disable() and pm_runtime_dont_use_autosuspend()
+> is missing in the error path for bam_dmux_probe(). So add it.
+> 
+> Found by code review. Compile-tested only.
+> 
+> Fixes: 21a0ffd9b38c ("net: wwan: Add Qualcomm BAM-DMUX WWAN network driver")
+> Suggested-by: Stephan Gerhold <stephan.gerhold@linaro.org>
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
 
-How could this happen? DT schema is used to validate device-tree
-sources but is not used by the kernel code in any way. I've said it
-several times over the course of this and the previous (qca6390)
-discussion.
-
-Bartosz
+Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
