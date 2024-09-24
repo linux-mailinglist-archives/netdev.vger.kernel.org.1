@@ -1,235 +1,250 @@
-Return-Path: <netdev+bounces-129625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED0BD984D6A
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 00:10:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6368984EB6
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 01:12:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A8761C2094B
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 22:10:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07680B22D75
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 23:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540D913D89D;
-	Tue, 24 Sep 2024 22:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C6BB1865EC;
+	Tue, 24 Sep 2024 23:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1TwkJIW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fPU7VXNQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70E1E6E614
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 22:10:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727215833; cv=none; b=FCKuCQuCmlfmgZdYa0fouJnKtRt7T/WBTLE4QhWUNvnIwUciB2kdKGTgQM0C1atJHlz71vkW93pBJE9Z4Ol5fRb8o3tCCuoZxGgPXEWg/5LSK4S2xOhdciMO1LhubIUkKRpnLGc9J+KIkrxJVQV2gO5bum1JKGrnXj1OBvPi50g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727215833; c=relaxed/simple;
-	bh=OCeuJkBJ5HkMjBG8VsX5Rzg/FLiFvtZfMxaWBS9eF8A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OYwUu+R4Q4UU1JYsZJFT91h/zAVpst0xPa9TRmJt+P9RTBtSQp29dyyC6BzQ7XM+jzCqBA/5ZWZ5nFyX7/rwbyevchBngzSRAlFsNe+jQgIik895yVXbOEOWrID5I47tisAgvs6xjOPPVdaFc2uaZkgVtZKEzEaQfV2DXmdOGx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K1TwkJIW; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-42e5e1e6d37so60044235e9.3
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 15:10:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727215829; x=1727820629; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0WHTm4Q1RgD9bg5lzukVPigQpOM69dfNMzxWRlwJRhI=;
-        b=K1TwkJIWWU7tDEH+c0vKDvmnfVIQdTsuBF05jYn7TCLcKQKnS72VQRSj+1D1MD1kEf
-         hpoMtMDyMnYA/Pvc7bjyh5vOSvBgsfT6tvFCiVfQ5+tWunZEVpyb364YSD9noMKuoa5W
-         bJrYBClUebkkdjd5Y7MNV25gQQDj1AFQ88NyQsu4SB4/m7JxOGm4sg2UVRV81Lnm6rAo
-         /a/KOvIonJ4avgccSbJM+XofwLcrxjBAUMx7CiYlqumInDsTmpt7p+waHkHS5dVetmLA
-         KlkChX6kb+nG7UG/mMzRbVohQzi/oqPecwMtC9d15uIen6HnGwP8caYQ6O+hZnIjhjgD
-         QgSQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727215829; x=1727820629;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0WHTm4Q1RgD9bg5lzukVPigQpOM69dfNMzxWRlwJRhI=;
-        b=F00ilCIfS1gXmNM/lQ97t+blcnMnIZEqCMo0Hbx7y8zS7AxhXVs52kclW4MkOlVM7p
-         hEjhSKud+uXcQ+rcWigqLnVKqHYg0EEc3qJsDdYrDmGqaVROg2BAIiqbySFnCcesJAZd
-         OQO4mcB0j1D4bugAyb0RLUjF9jYYqgxZBze/Mmq4TBDSbPcv3pzJz6Gl0t2FGR9HA2yp
-         qFSDHQYzSZ9S8FRj/o5ULe6ZkmcRrym9j3Hqi6hUuWTOCb0URjqvTZJTCoUbz5/emNae
-         FefOwHOTmWIE29YXpmibV7CWbw3XLeK2QzGAeLBPkStGxdYUzGi86A0FxT1KTomrs6/m
-         eSsQ==
-X-Gm-Message-State: AOJu0YzQZLTpUr562RNPXbKDX1JyXpBn8DiKvMay+gaVObkc3nUx7CMF
-	ES2G6f9/NLVEF2NHAoMuozvJUtul2F44QbbzFwvLswgpBX7Gj+dZ
-X-Google-Smtp-Source: AGHT+IHUrIcmTZaiQFGNlk5kgX+5dRkG1FqkUIOCMVGcI3UjIwfOSBpCSlQUs9WVKwwPIR0vmaQ9nA==
-X-Received: by 2002:a05:600c:45cf:b0:42c:c4c8:7090 with SMTP id 5b1f17b1804b1-42e9610b567mr3177635e9.9.1727215829200;
-        Tue, 24 Sep 2024 15:10:29 -0700 (PDT)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e96a1697dsm627625e9.38.2024.09.24.15.10.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Sep 2024 15:10:27 -0700 (PDT)
-Message-ID: <20c73bae-0c79-4a8a-af60-6dbc6a88e953@gmail.com>
-Date: Wed, 25 Sep 2024 01:10:46 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B071862BD;
+	Tue, 24 Sep 2024 23:12:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727219561; cv=fail; b=ogimcSd+/h+IN/g9H43W+YvGGzUSKkJ+TfJ28wbgKJZYXa0RfZli1CpaV6oKyN/sohStsI29UXyGUhmIkKjUIJXAHTP8UUisac0d+KFTxw/8dkLr/EW8c1QpVghAMMovFFDhPh+J99NsZxbhcjj2qgGhDsHvWm2pxTNbtPHphg8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727219561; c=relaxed/simple;
+	bh=grVXhh4Jg2gUE55gJNa1JPiyzUCjjizgzOGKTNTMlzs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=fI6blhjOJpOAznXDl4aVoPrkPBUW5k4CBiO1+ZGeeEugAn56p/aR34n5ieEdC99G1882459uTpOcqg0ef2c3rn1KFEngwLXhuMgbOuEQTbJN9pdld1N6cu8oQeENXfinNX0XEFuEoEvHN/f4qMciFZLoXSlz0XD9aD2MHtYCqU8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fPU7VXNQ; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727219560; x=1758755560;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=grVXhh4Jg2gUE55gJNa1JPiyzUCjjizgzOGKTNTMlzs=;
+  b=fPU7VXNQe5XaX3pWSp5FgakSqpBvqv2PM8W2Wbrjhhou98eqyvGynxGo
+   S5Fwcs1pqG6z8m9DwVlzBBo2lYBnZf04wKykE9WBbdKMaYwbt1yPY4mkQ
+   ow8ZIzY+cIbK9ecSeQJh+wMt3RZ8ZNHSluMeLC7r0bBrM6hDcvVzpPwfa
+   KzvJT7VAVKJQhFgj/8LfWp7t9z9fHi7m4jJiLl3NUSpZOe6QZBBd7CYhr
+   Fn+jV2xOWeTdglUF18M6VoJ+QKIdSDzttCCqf6VCjdCkbD3uE8XnxQD8o
+   zVcJc6VO3sltSRv8WtdfIzMtkNP7uy3GNm/3sDL5Gwa1Pwdrz8UL3hLIF
+   A==;
+X-CSE-ConnectionGUID: MCdX1cskQV+iuB98QD3BAw==
+X-CSE-MsgGUID: QJWH4F5qTVm3IS5PeuuWWA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11205"; a="26113230"
+X-IronPort-AV: E=Sophos;i="6.10,255,1719903600"; 
+   d="scan'208";a="26113230"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2024 16:12:39 -0700
+X-CSE-ConnectionGUID: 1GC5IVoZQs2f8TiSLKHKJw==
+X-CSE-MsgGUID: hvcomT62Qke9nrVPf/fCTw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,255,1719903600"; 
+   d="scan'208";a="75685614"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Sep 2024 16:12:39 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 24 Sep 2024 16:12:38 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 24 Sep 2024 16:12:38 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.41) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 24 Sep 2024 16:12:38 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=xoYouNI0Xkav055go0p2Fj7JMsTnODArYZWoIU4qF4y5nvvKIaZKyaU/qCpx2PYX753rn1J4dNxeo2UG7zEDgYBYhwdq7KaFDvxjNP0yoGZPXDYqJXb65HYAC1Cj8PeaU67GFCf+TxZYRZsoTN3PS2YxFVTZRBE6JO2rSAZi1evRo963LKAUJ3NciuQVWrOnqZNH1XKXaUhUKK0vGoXq6PLu/1+n4PXIR2zSSenBLVk34iKBT3yGayYgr3gIx+d43SOeEPcRqxnkxhzbRGuEapq8LtQThVNukcuncu4GgA8PTWtaWGOAa+5mKiQHz9BVC0+sTPAQhonU7a+nhClBnw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W1Pq/ZDnUuk00xDQPpGWRK3GLHUkw1zw3i07cmlx4yM=;
+ b=xDsMpLPBl2tdquGZ/dFfA6jyHArTsV20Flh8D6RglMw6APYXC6r6zrBRZdpLA1QbmhFKGV9e+Dm6cXCNBR4X7L047A6R9+05DEo3hY6vbhKR6oOT2x5Ww/5K1dFKqV1ttM2oCGokVIVo/eYqN3cwdutfLELSM/yRaa0XETQB1gKRed1/KLAo/rLixp4HPZdPsjCyHZPsYMeYrt58J0ETVRVTaCog53TAz2Yqg/du8HabkS1DWgs6m0xDKD31+tU9vTj+ygbuJ7+VDvTKia4oCgafXJZUWXgL6xNbyOBCItej2GLMwLL8LjDTGl5z0JMBhikh0sEx5EZ3tEqL9UxjmQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5911.namprd11.prod.outlook.com (2603:10b6:303:16b::16)
+ by SA1PR11MB8373.namprd11.prod.outlook.com (2603:10b6:806:38d::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.25; Tue, 24 Sep
+ 2024 23:12:30 +0000
+Received: from MW4PR11MB5911.namprd11.prod.outlook.com
+ ([fe80::1d00:286c:1800:c2f2]) by MW4PR11MB5911.namprd11.prod.outlook.com
+ ([fe80::1d00:286c:1800:c2f2%4]) with mapi id 15.20.7982.022; Tue, 24 Sep 2024
+ 23:12:30 +0000
+From: "Singh, Krishneil K" <krishneil.k.singh@intel.com>
+To: "Zaremba, Larysa" <larysa.zaremba@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+CC: "Tantilov, Emil S" <emil.s.tantilov@intel.com>, "Zaremba, Larysa"
+	<larysa.zaremba@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>, "Hay, Joshua A" <joshua.a.hay@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Bagnucki,
+ Igor" <igor.bagnucki@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, Eric Dumazet <edumazet@google.com>, "Kubiak,
+ Michal" <michal.kubiak@intel.com>, Alan Brady <alan.brady@intel.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-net] idpf: deinit virtchnl
+ transaction manager after vport and vectors
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] idpf: deinit virtchnl
+ transaction manager after vport and vectors
+Thread-Index: AQHa/rCGlEdwZJbgrEOwhcBhewxrtLJnsMqg
+Date: Tue, 24 Sep 2024 23:12:30 +0000
+Message-ID: <MW4PR11MB5911EEC582798EFF21E1B346BA682@MW4PR11MB5911.namprd11.prod.outlook.com>
+References: <20240904095418.6426-1-larysa.zaremba@intel.com>
+In-Reply-To: <20240904095418.6426-1-larysa.zaremba@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW4PR11MB5911:EE_|SA1PR11MB8373:EE_
+x-ms-office365-filtering-correlation-id: ef69bbc1-fb13-4e79-905d-08dcdcee5d57
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?EaMMbtAJLHhxAFljOvmCoDebn/QCmv+wGcj7lvciQQb80as3k+um/wImJ5Iz?=
+ =?us-ascii?Q?EID6bxGv+d2yiXAjV1nQ7JLsg1scCPvq25IaN/xhkFUOr6KsJk17yID2QGEu?=
+ =?us-ascii?Q?Am5nxOqmX7a3eTFl74JBPYatW1cJPVmcLqMjC5HszG8wen40VrM98UpE1kO3?=
+ =?us-ascii?Q?tlj2ch/avrh4grpQSV9TQ0sgAzjJ1qoTyN68EctZcc/lJhAb5Tl3z4a6mhro?=
+ =?us-ascii?Q?hNWkaAFl6ujnn7wZLlxFB/JirNhWlqLtfqioG+Df0CqOTpm+UUIGPjgxrYz3?=
+ =?us-ascii?Q?gqRpE8VLFjZ36H9bGhGxIHDRh6SLscelT635mJxwgIbICd3QzxT+TSN8p5gE?=
+ =?us-ascii?Q?EkBvdj5pmi3HtrbN6aZ1VeJxW+JKN45M3cuxQus1EvqIAtmpTAJLbrXvoZ6E?=
+ =?us-ascii?Q?yivuolREHYBANsErO3SkAPmejjfAYEYePHVpqoXo3dI/To+LOg6/ScqG8+Yp?=
+ =?us-ascii?Q?bw2agGxvGpZkdXmpEmKXwMfM7VShqvxUHwDGPCx20qaMaY7lb5i9xraRxBe3?=
+ =?us-ascii?Q?G8qIVih0Cj8W6NLxXmR1MzAVT0/7X3OTIRlEA5HFJpXBB3DIBP0nj3RlYUcu?=
+ =?us-ascii?Q?jqkSZgHkQk46LdFQL66sd3fvQCMjJvmzhYYGg/L/zacawAU4fdlwCnXbTnmM?=
+ =?us-ascii?Q?SR8/6cDSRmckdUp7/NHPDcDarkWwmJftF5L4Zyriv/lbVSW+rsGXYeuZ/Sci?=
+ =?us-ascii?Q?IRcHHh/UFotuO7hOOv2DjTekH6aNL6fQZZ3XpUhO8VE5DmByyfTKhJy88Fm2?=
+ =?us-ascii?Q?QoeSHRsc7fAOPPNVRHqXZEazOM3uLHkIEGfuiu0UWXlqtrgyXjlpuY4ZCCou?=
+ =?us-ascii?Q?hp/sXXHsP0oKDKn2kSNsdgDYOi55P0TIxwK2Gj0dyNmN3YqncySu8KvYC+3H?=
+ =?us-ascii?Q?Hy3yzC1j7keUbXzQ5gDm2T3Qwvll1Amdr1tzATDg2aMLcI2rfwQjVqHt10Vf?=
+ =?us-ascii?Q?8OzeVvAKpGpzVXbucob1mOt3LKqnhD3NKCNeJf9tpuO9azghBVh6qXtxsyWH?=
+ =?us-ascii?Q?FzHS9jDWfsRwJTNvaGEI+J87yLbVumKQXI7DAbxBuktbor0LMNLULWcYjRpc?=
+ =?us-ascii?Q?WlYKiLZIXRkeMW4Bg/3mJJEFprBstEnghxEKooC6JjmHe02n6Ocnl9IEMAer?=
+ =?us-ascii?Q?E8aH3d/H3waiX8g93/5od8pJ5hsSBq39iAiH1Kd0ULKUGVzb4cvAmXf8jf1L?=
+ =?us-ascii?Q?30rSDsI3vuaUkBJfFvI/m9HLxlc4s+ljQpvBMpf1roxBlwves9+DlBrfc0MP?=
+ =?us-ascii?Q?Pe4JxNMOet2jxEQndiHhjuEEJcPjSHtrResyeomJSC7ahAiWP5oIK+UKq6Vh?=
+ =?us-ascii?Q?C0RUNCwwPa05V/IKmQ4Yz9FPWeBuDebEZJVZTQyJNsxpGIAHnd2zor7cl1WM?=
+ =?us-ascii?Q?Fa2IgZ04V7NQMQ5q5WXffpVUpuLDDJq3yJV7K+evQVlgycT/UQ=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5911.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VIg7Z/c/BajQ1QwEHdRDnsZ0YZAnmIbqpT6XD60yPmUjEmSZoyws3bwD4i1l?=
+ =?us-ascii?Q?+Thv/s/3qF2zi4W9yK+KpxGfVd+jjBK39sBs6gPZNPO4Yj39tddcZ7mk9wX7?=
+ =?us-ascii?Q?pZ8IfoAfBn0b5/UPtckbq0r7UOH1I8eXVe50k2ZvquWrkD/KMPHxaSZEha7F?=
+ =?us-ascii?Q?EvmhpBs0C3ipPjndxFo4yz1XDXvvPuz/lUsps/KUXirydkqIcjTHRp5T6Sno?=
+ =?us-ascii?Q?Wy6sjxf9jke+aHkxdP/Gd+plpahkXsdMgAIupBqRAeO+HAKiqgDm/gj383sj?=
+ =?us-ascii?Q?3Mgs+3bgcygbnvdZtk8+Ww38SQSreRhel35zaVnuWXmhgck52GalBiSqS9bu?=
+ =?us-ascii?Q?aXaVjruAFBHdPpXBiiU3XYhPB9KPJw15ya/06CkijUaNffVLTd+8Ka6ZAKZM?=
+ =?us-ascii?Q?kVq+/HGbkNsRcIeIanjiKhJ4qUloucE00GXAXe6R0pjm6axQ12KJGJNm0WX9?=
+ =?us-ascii?Q?iEPHcAdAfW60qg1np5Uc4/mRUS7+ngR/1PJ9fX/XxHm25lZkS4GrA2WuU7rW?=
+ =?us-ascii?Q?03d9k2DUd4Dsz+al73C0yATxUP/psdloNdT3IyT0TXZww3WDuK5lUXcdetD/?=
+ =?us-ascii?Q?MF3wRwHniOxCxcdk4U9+1bRt9PlPYmhY2egVP9NwVYlmQYbwY0WE6vyP+KRm?=
+ =?us-ascii?Q?yiQ00nHTaRdAkGP4SPcCyoERzCesI6r9uar+pRcFR66gEn0055J0cUgFMqdC?=
+ =?us-ascii?Q?PiNPdsSSfFaxHstcyoHLEIR12dMhRYk9jyflH5I0VSxjKz3oCZF6tS9ExIKP?=
+ =?us-ascii?Q?EuT8hsOaTyh+Uv+2lhDg/YTajGsAT8H+1h/62zN6lMMxqGKYrHiWE9sWbzjt?=
+ =?us-ascii?Q?tgkul7bngX1fKx8Wf+XJXM1kieMkOS7IVa4k4fvVIwIByO8EcOr+os5Nctti?=
+ =?us-ascii?Q?Znzv7FtjxfbJcyggEEmoo5kHc7D+Va2w8LT3hNknIkaLjhnoEbT9Q2rG4yW/?=
+ =?us-ascii?Q?bNq8bBLTxpnUrGE0ROyMxCzEVllYbITkM6IHTPWf0pQId6LOm/izE6aC4s1H?=
+ =?us-ascii?Q?CGV9/tN45DO6fVfrQ82EfzeY9ef5U9bq1XzOwLxR2LbD3ib5YrA+FhoqbS05?=
+ =?us-ascii?Q?TEZUIaRtMJkEam0KMFuyLGp1vnQ7HvQwahX7IV2Snaq7ZFfWj3drh+e/RKqf?=
+ =?us-ascii?Q?oqH6ViJoiMLAhpKzd0WB0b18UXPwl22HTe/MakuZT3Bv38TdC/eRPKl07bmV?=
+ =?us-ascii?Q?oxOisWhGUcVcPyek37M1nDkncmWLk9+bNpOquqhwDpu6Ivky3kNYmPR8eTue?=
+ =?us-ascii?Q?FrkjehDSowSbCjUraUHlxal0z4TeyXGM0HOvrzIUinQvOT7gS4qh2uEw+AXY?=
+ =?us-ascii?Q?1dpsnXk8YAWXBTHst4qQVTFw/KfubAMaswt0BbDpUC118e0swpGj2WhhlH89?=
+ =?us-ascii?Q?Oa2kDl6ut60XSe0P691J6sGoif1URvAu2hKbPwWm7ln1I2nk6K5iPNamsxO+?=
+ =?us-ascii?Q?MvnGj69QTz1i09/niNiKaPUxPfTBVBALkv2V4l91eEdGKumokaJis7z5GU4r?=
+ =?us-ascii?Q?rrZ+z5Otc+jP5+Zl5vt9el90E6NmhgYZkYla8U0c+bDJpH28dwlBRNX+vO02?=
+ =?us-ascii?Q?U/ER8DlfbveQ8i6SgIRo4u3q/zP6vrXsqpT0uMsLYELmh9JgS30LRdHflxAs?=
+ =?us-ascii?Q?Bg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 04/25] ovpn: add basic netlink support
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew@lunn.ch, sd@queasysnail.net,
- donald.hunter@gmail.com
-References: <20240917010734.1905-1-antonio@openvpn.net>
- <20240917010734.1905-5-antonio@openvpn.net>
- <70952b00-ec86-4317-8a6d-c73e884d119f@gmail.com>
- <e45ed911-8e48-4fac-9b56-d39471b0d631@openvpn.net>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <e45ed911-8e48-4fac-9b56-d39471b0d631@openvpn.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5911.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ef69bbc1-fb13-4e79-905d-08dcdcee5d57
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2024 23:12:30.5673
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /xA8IdU4QlryxxeJdp8IfLaeMXsvZPmJ9kZ0UKvM79UP5QPMDzqXEfDBoIbKf4/s5/dL0aQkhQEp8n9qDPUdmGrbrVryL0+1HzaYLQcs9/M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8373
+X-OriginatorOrg: intel.com
 
-Hi Antonio,
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Larysa Zaremba
+> Sent: Wednesday, September 4, 2024 2:54 AM
+> To: intel-wired-lan@lists.osuosl.org; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>
+> Cc: Tantilov, Emil S <emil.s.tantilov@intel.com>; Zaremba, Larysa
+> <larysa.zaremba@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; Hay, Joshua A <joshua.a.hay@intel.com>;
+> linux-kernel@vger.kernel.org; Bagnucki, Igor <igor.bagnucki@intel.com>;
+> Lobakin, Aleksander <aleksander.lobakin@intel.com>; Eric Dumazet
+> <edumazet@google.com>; Kubiak, Michal <michal.kubiak@intel.com>; Alan
+> Brady <alan.brady@intel.com>; netdev@vger.kernel.org; Jakub Kicinski
+> <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; David S. Miller
+> <davem@davemloft.net>
+> Subject: [Intel-wired-lan] [PATCH iwl-net] idpf: deinit virtchnl transact=
+ion
+> manager after vport and vectors
+>=20
+> When the device is removed, idpf is supposed to make certain virtchnl
+> requests e.g. VIRTCHNL2_OP_DEALLOC_VECTORS and
+> VIRTCHNL2_OP_DESTROY_VPORT.
+>=20
+> However, this does not happen due to the referenced commit introducing
+> virtchnl transaction manager and placing its deinitialization before thos=
+e
+> messages are sent. Then the sending is impossible due to no transactions
+> being available.
+>=20
+> Lack of cleanup can lead to the FW becoming unresponsive from e.g.
+> unloading-loading the driver and creating-destroying VFs afterwards.
+>=20
+> Move transaction manager deinitialization to after other virtchnl-related
+> cleanup is done.
+>=20
+> Fixes: 34c21fa894a1 ("idpf: implement virtchnl transaction manager")
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> index a5f9b7a5effe..f18f490dafd8 100644
+> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
 
-On 23.09.2024 15:59, Antonio Quartulli wrote:
-> On 23/09/2024 01:20, Sergey Ryazanov wrote:
->> On 17.09.2024 04:07, Antonio Quartulli wrote:
->>> +    -
->>> +      name: set-peer
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Add or modify a remote peer
->>
->> As Donald already mentioned, the typical approach to manage objects 
->> via Netlink is to provide an interface with four commands: New, Set, 
->> Get, Del. Here, peer created implicitely using the "set" comand. Out 
->> of curiosity, what the reason to create peers in the such way?
-> 
-> To be honest, I just wanted to keep the API as concise as possible and 
-> having ADD and SET looked like duplicating methods, from a conceptual 
-> perspective.
-
-Could you elaborate, what is wrong with separated NEW and SET method 
-conceptually?
-
- From the implementation point of view I can see that both methods can 
-setup a same set of object properties. What can be resolved using a 
-shared (between NEW and SET) peer configuration method.
-
-> What userspace wants is "ensure we have a peer with ID X and these 
-> attributes". If this ID was already known is not extremely important.
-> 
-> I can understand in other contexts knowing if an object already exists 
-> can be crucial.
-
-Looks like you want a "self synchronizing" API that automatically 
-recovers synchronization between userspace and kernel.
-
-On one hand this approach can mask potential bug. E.g. management 
-application assumes that a peer was not configured and trying to 
-configure it and kernel quietly reconfigure earlier known peer. Shall we 
-in that case loudly inform everyone that something already went wrong?
-
-On another hand, I see that current implementation does not do this. The 
-SET method handler works differently depending on prior peer existence. 
-The SET method will not allow an existing peer reconfiguration since it 
-will trigger error due to inability to update "VPN" IPv4/IPv6 address. 
-So looks like we have two different methods merged into the single 
-function with complex behaviour.
-
-BTW, if you want an option to recreate a peer, did you consider the 
-NLM_F_REPLACE flag support in the NEW method?
-
->> Is the reason to create keys also implicitly same?
-> 
-> basically yes: userspace tells kernelspace "this is what I have 
-> configured in my slots - make sure to have the same"
-> (this statement also goes back to the other reply I have sent regarding 
-> changing the KEY APIs)
-
-If we save the current conception of slots, then yes it make sense.
-
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->>> +    -
->>> +      name: get-peer
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Retrieve data about existing remote peers (or a specific 
->>> one)
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->>> +        reply:
->>> +          attributes:
->>> +            - peer
->>> +      dump:
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +        reply:
->>> +          attributes:
->>> +            - peer
->>> +    -
->>> +      name: del-peer
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Delete existing remote peer
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->>> +    -
->>> +      name: set-key
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Add or modify a cipher key for a specific peer
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->>> +    -
->>> +      name: swap-keys
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Swap primary and secondary session keys for a specific peer
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->>> +    -
->>> +      name: del-key
->>> +      attribute-set: ovpn
->>> +      flags: [ admin-perm ]
->>> +      doc: Delete cipher key for a specific peer
->>> +      do:
->>> +        pre: ovpn-nl-pre-doit
->>> +        post: ovpn-nl-post-doit
->>> +        request:
->>> +          attributes:
->>> +            - ifindex
->>> +            - peer
->>> +
-
---
-Sergey
+Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
 
