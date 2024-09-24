@@ -1,72 +1,56 @@
-Return-Path: <netdev+bounces-129433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A0A8983D69
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 08:54:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E15C983D6C
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 08:56:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17B6CB20AF7
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 06:54:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59A7C1C2282D
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 06:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF4580BFF;
-	Tue, 24 Sep 2024 06:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C7881745;
+	Tue, 24 Sep 2024 06:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="aZojnje2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GQK7S54S"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416996E614;
-	Tue, 24 Sep 2024 06:54:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022B842AB3
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 06:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727160877; cv=none; b=dZz3uJuyMprNEVpZ9QS9np+ZGn5Fgs9UYgCMmhTvvy/dG6Olf+8aRcdGrj2TK7KD0+F5ZNUsuW/qoulO1aQ3jab4Za+DiFxszV11wrXvvcf7dbAxxKy9q/SZoDvZHfjUajL0LONLR1OTAn6oDMlWPI58g+Lz+iJFMeETE2z22vo=
+	t=1727161012; cv=none; b=aU0yn+iLI7oT+O3dMEXwzuGAK7x25f5cBEpKnUDXBADLAE9D2YrwoQY5u3Xew2Xxu6AeBF/seYE1h5/zZnLU+ofI8DqtWl+D3CGScuE65SGaUrXevwbgojE8o8HN4ZEC+cPveZAdo7GDrlBqcsOWjd4wQAuIr3Xmw4gfNmNb3zo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727160877; c=relaxed/simple;
-	bh=EeC7cXplTg/3qKtPs0mpDW07TR8Y7qOGbalWkLlihi8=;
+	s=arc-20240116; t=1727161012; c=relaxed/simple;
+	bh=ofTvkF/mmzHGwcIuloNc9Ojea00VUkw5pNfVGUZMTGg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lMflCQcQG8Q2rgPelHz3x3uxPlO8B0Jm0F3a2GS5mE/vgp/d6j2n5vZ75hKdyJKj9gsG9Zwf4i8v9hsJLf+wj/EDKt3mjU8JZ60HLm/BpvnkR63WrWvgCAJ6oHtNJaqWta9b7YWwCTR5WOWlD1CTkcPGD3nJ5jq/T0QQwcgDRk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=aZojnje2; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=EeC7cXplTg/3qKtPs0mpDW07TR8Y7qOGbalWkLlihi8=; b=aZojnje2op7H+OOywcj/GuoPmi
-	RFj+rTe+HyzlGgHyxvGS6xRKW82pxAzW1lQBWD6AhWDqvhfI5DcndFrTDWlC75Ded8lNFRTi2BRJ/
-	NvtYWBn6VrXeDhF+w16MO/yscA2S7R4/lHEWevBCSAdkUy0AEGQKUy60uBhLb/T6YempADzGJee50
-	3BbgcPWjIR8HkBD5Kp6UgiG4DEcH6Zj82+Buh6659BbI7QhEXww1gF771bHwhYITvEP2jAH3X03Ee
-	8ZbrUox3dPULt9dHG8LOjDFqaZgJgNaeqM7OCi8EDo7+AdYU1ttkxfOdWNnOhUTLXFiUKHlCSkw0l
-	cm8IzW6g==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1sszRQ-00000001KIZ-24Tu;
-	Tue, 24 Sep 2024 06:54:32 +0000
-Date: Mon, 23 Sep 2024 23:54:32 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Haakon Bugge <haakon.bugge@oracle.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	OFED mailing list <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>
-Subject: Re: [MAINLINE 0/2] Enable DIM for legacy ULPs and use it in RDS
-Message-ID: <ZvJiKGtuX62jkIwY@infradead.org>
-References: <20240918083552.77531-1-haakon.bugge@oracle.com>
- <Zuwyf0N_6E6Alx-H@infradead.org>
- <C00EA178-ED20-4D56-B6F2-200AC72F3A39@oracle.com>
- <Zu191hsvJmvBlJ4J@infradead.org>
- <525e9a31-31ee-4acf-a25c-8bf3a617283f@linux.dev>
- <ZvFY_4mCGq2upmFl@infradead.org>
- <aea6b986-2d25-4ebc-93e8-05da9c6f3ba2@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tts1ltk5vNNvfCmX1Iyesgme4Y8M9l9o/ZEznv9jOXsFLkrlqJ4fnScpKzuuvm0OlWRgWRZ+aOrj1k9/DphvnZAznQtH8e8z3AWrUK/pkVkrtXn+9jfnokGYO4+hn0SrNCoW8xMgVbJk/XuwfGNjgC84vhbpuFHSFIJHEDHA6lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GQK7S54S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C624C4CEC4;
+	Tue, 24 Sep 2024 06:56:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727161011;
+	bh=ofTvkF/mmzHGwcIuloNc9Ojea00VUkw5pNfVGUZMTGg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GQK7S54SHK6KGaDF4yiIBLLsGpDt6GtRmrfcj8y5dlj67aPL6y8j6XqK/sTUdYx+5
+	 RI9YY0nBJMU3duIx40038cWynSriJUNPOr539xmBHGv+QVXdKNEYgZRKitpffbbagV
+	 6+a9cZBLFeOHCUFXLGL5xTE+hnI358D7GPRwtskPRj75M7aaaV7YubUN6sgyExNpju
+	 Is9165Oy7wuE4bgo8qydT3L0pHeU+QfNYbCVeDZdvxViNgw7qsNvxkRex66Yjs1Mdn
+	 BoR/WWkNWPrAf7cRnmOVtgt2Cd1yamTqbZ80oZa2bSVHoGCJGGSBO7LFs5OAO6/4RJ
+	 hrrFsFhzWAA8Q==
+Date: Tue, 24 Sep 2024 07:56:48 +0100
+From: Simon Horman <horms@kernel.org>
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: Re: [PATCH iwl-net v1] i40e: Fix macvlan leak by synchronizing
+ access to mac_filter_hash
+Message-ID: <20240924065648.GA4029621@kernel.org>
+References: <20240923091219.3040651-1-aleksandr.loktionov@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,12 +59,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aea6b986-2d25-4ebc-93e8-05da9c6f3ba2@linux.dev>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20240923091219.3040651-1-aleksandr.loktionov@intel.com>
 
-On Tue, Sep 24, 2024 at 09:58:24AM +0800, Zhu Yanjun wrote:
-> The users that I mentioned is not in the kernel tree.
+On Mon, Sep 23, 2024 at 11:12:19AM +0200, Aleksandr Loktionov wrote:
+> This patch addresses a macvlan leak issue in the i40e driver caused by
+> concurrent access to vsi->mac_filter_hash. The leak occurs when multiple
+> threads attempt to modify the mac_filter_hash simultaneously, leading to
+> inconsistent state and potential memory leaks.
+> 
+> To fix this, we now wrap the calls to i40e_del_mac_filter() and zeroing
+> vf->default_lan_addr.addr with spin_lock/unlock_bh(&vsi->mac_filter_hash_lock),
+> ensuring atomic operations and preventing concurrent access.
+> 
+> Additionally, we add lockdep_assert_held(&vsi->mac_filter_hash_lock) in
+> i40e_add_mac_filter() to help catch similar issues in the future.
+> 
+> Reproduction steps:
+> 1. Spawn VFs and configure port vlan on them.
+> 2. Trigger concurrent macvlan operations (e.g., adding and deleting
+> 	portvlan and/or mac filters).
+> 3. Observe the potential memory leak and inconsistent state in the
+> 	mac_filter_hash.
+> 
+> This synchronization ensures the integrity of the mac_filter_hash and prevents
+> the described leak.
+> 
+> Fixes: fed0d9f13266 ("i40e: Fix VF's MAC Address change on VM")
+> Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 
-And why do you think that would matter the slightest?
+Thanks Aleksandr,
 
+I see that:
+
+1) All calls to i40e_add_mac_filter() and all other calls
+   to i40e_del_mac_filter() are already protected by
+   vsi->mac_filter_hash_lock.
+
+2) i40e_del_mac_filter() already asserts that
+   vsi->mac_filter_hash_lock is held.
+
+So this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
