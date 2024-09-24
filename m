@@ -1,291 +1,338 @@
-Return-Path: <netdev+bounces-129579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75E239849B3
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 18:34:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 188499849C0
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 18:36:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D9741C22EB5
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 16:34:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9896B1F25890
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 16:36:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B731AC435;
-	Tue, 24 Sep 2024 16:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B44C1AB6EC;
+	Tue, 24 Sep 2024 16:36:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="sWKBsz7A"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G/0Gxoly"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2084.outbound.protection.outlook.com [40.107.236.84])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BB01AB6D3;
-	Tue, 24 Sep 2024 16:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.84
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727195648; cv=fail; b=ff+14pmCchWsN03tFveBrQiiiDFd6E0g/fS7VZ4dRT2vq86nzhE9MO4DkqDZNLsWqnjJnEnRNoeQg/T6KxJb8vzckjxraOWqE3OZjRMX0MEQkh2+5w774RZKf7aehJ5twUyF+xgTQo7Gv4grJGeYoa+6UupPHgxiuM9qOZnPoAY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727195648; c=relaxed/simple;
-	bh=wtr6iQZ/+bkTxQ8EdzXFi25EeFdtkEfIsBXs36Gi0LU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eGPukbKTtnfMMSmG1cdHQJjkdHIwS7PBGzsEvgMB9lLLuE3B51fQwzbtulzPV60h/yQxFSMfJGV7waYUO+XOx33y8JNTnTptHODh8T3tZViDPpTSM+ulWgld59JYzT2QLotPYrC3pDS8Hti3nvyXR0Hs6is9aB4fSKwxmUiQ1Qk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=sWKBsz7A; arc=fail smtp.client-ip=40.107.236.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RUxKItYmY0Lx8z4Q+WPmjv0faHxJl7oRzaMT/2kQ/5e8UAP65b4OBSF93jTTM0ZgHcaqwJSR+H2O9si7FuE4+P7rl1UPIG09shDja1Kpo2QZO+HUWIGwiEnJG5Fa3C5kz7wrnuxUKR9ZXCdZlu3iy3Q4cX4kd1KCO97roWHlZXa4RT6uruHLOeHEbTWynn9mV63iUwNrNGnwIo+rRJn+ACGtrFwW/ZJ6TZxRR9BdUW3EewI0UFmrbSN8duRvqkYbdM7elA7eOgwT3W6HpoWd2FrOAiF/yPjFD2Eic0kSahcm6L6tA2OUwdjGrPPdnHLvZzAgSi1IPtV1xo8SZfd1fw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=B5WACd+xgwPM9QpgZEKBcp5qYuiWUgwNvyD39dveRZ4=;
- b=D3yisgw/5gX7zjvc+KdCswWLzCEjGprID/aQLB0EkrPiGDELXU/I6wAK9eptktfd53XHPWi1Fck2fTyLzzWJovDv6MG+ELlrAbWK0PuyDFmD8xNxEznrTyHBWJYRWyQeyvYBWkg9nM1FtkSrgvH1aNngrVpgJBliGxSUIiDzrfZH527ebmxHEZgU35f/21M8Ub+acpRYisERCHB7BlQnANh2BZWmDlrcJ/2fsMvNwzs/l2aYLRhCv2ccGcFpaQLmaNjJy643uf3U0XtiV7477zj+h1R0pwKxluW5hmQZZSa4qjWPiK+WyvI9nOkDxMUoBol3tOPFX4w6WYYmqbecgg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B5WACd+xgwPM9QpgZEKBcp5qYuiWUgwNvyD39dveRZ4=;
- b=sWKBsz7AWXqg4rpo6utY+zcs8JLKf7716bXYF0qkHbSPSKNE9oIHRppeYZyVnqkiNG4LTi4tDgJIb/l3J2ER0lCF3wdODlLMwTSdce9K3LCFZEGpx9zcXAg/K0/C8iUkuYY04IsXblv0F0fF1C99fhYuOMZ0JuxZrvF3z/qq/0s=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4877.namprd12.prod.outlook.com (2603:10b6:5:1bb::24)
- by IA1PR12MB7568.namprd12.prod.outlook.com (2603:10b6:208:42c::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.25; Tue, 24 Sep
- 2024 16:34:03 +0000
-Received: from DM6PR12MB4877.namprd12.prod.outlook.com
- ([fe80::92ad:22ff:bff2:d475]) by DM6PR12MB4877.namprd12.prod.outlook.com
- ([fe80::92ad:22ff:bff2:d475%3]) with mapi id 15.20.7982.022; Tue, 24 Sep 2024
- 16:34:03 +0000
-Message-ID: <5a524007-6071-47e6-8982-3e541302099e@amd.com>
-Date: Tue, 24 Sep 2024 11:34:00 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V5 1/5] PCI: Add TLP Processing Hints (TPH) support
-To: Lukas Wunner <lukas@wunner.de>
-Cc: linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, netdev@vger.kernel.org,
- Jonathan.Cameron@huawei.com, helgaas@kernel.org, corbet@lwn.net,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
- michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
- somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
- manoj.panicker2@amd.com, Eric.VanTassell@amd.com, vadim.fedorenko@linux.dev,
- horms@kernel.org, bagasdotme@gmail.com, bhelgaas@google.com,
- paul.e.luse@intel.com, jing2.liu@intel.com
-References: <20240916205103.3882081-1-wei.huang2@amd.com>
- <20240916205103.3882081-2-wei.huang2@amd.com> <ZvEcBLGqlJMj3MHA@wunner.de>
-Content-Language: en-US
-From: Wei Huang <wei.huang2@amd.com>
-In-Reply-To: <ZvEcBLGqlJMj3MHA@wunner.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA1P222CA0085.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:806:35e::28) To DM6PR12MB4877.namprd12.prod.outlook.com
- (2603:10b6:5:1bb::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107FD12F375
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 16:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727195777; cv=none; b=QQIRXKYX7yO26U5mVB3pemG2t9yDXuShM5sSSt50lN4WvLcKBuw0OQpb3I3ODffw5Q7+/oisWnooX7knOSKcbsiXP8n44aqPyilDeOYZ5vD9cBf5MpOo6Ede740OPECHslWQdcaAMzaWWUgrJFLqDML9goLJBwMRfGeyQCV1ho8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727195777; c=relaxed/simple;
+	bh=yOKDWrqMHDZcNXDx65GPLsC6nCA8U/1FHB/wST6tcQA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I7eom/mSVBEVL+szw8VPaylQE7tEO3ppkumYnJW0YFMl7ETzC+r5Q825KWeZCGaDOqNQWeAiQxD8XkRcuN3Sj27vwBmUEQuGOpSoPQy4kwBnI5VoVZqaScAo2R6pz5Hc3i9Z7/uFMDvXZhNS7iG6h11irI6XEVCLDym/Q4Z5xBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=G/0Gxoly; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727195774;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XJe4D9rQuQ5l/vjHLU/ym5f3xPtTEEP3VLGt0qBDp8w=;
+	b=G/0GxolyNTqAtn1VQwocAa/SvpnMZjK3nxcLS91d7RPwOeYC4WlHYEqwILc+2uNDO+TH9G
+	zn23S0llbkc9Bq407BIcoUaZH29oYB9+zdPJyWhcjXRq+jfsMpQyavulbGaDwxLqmrBMev
+	lvyyqbK6BLZdvaLhbR4uN1cModsLdfw=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-252-wIjWE8CZPN-HG24-zSAYbw-1; Tue, 24 Sep 2024 12:36:13 -0400
+X-MC-Unique: wIjWE8CZPN-HG24-zSAYbw-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7a9c0f3638aso1146917885a.2
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 09:36:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727195772; x=1727800572;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XJe4D9rQuQ5l/vjHLU/ym5f3xPtTEEP3VLGt0qBDp8w=;
+        b=tk8Xp+oz8c8ooyjmjpuj9ZWz2+QG9blmMAEVDNkTJgZl5WaSnmMwAU2nL7ukPpc6Pf
+         3AWdSKpunouNimzm+JHKUQrG8OZcaWgGzCxUbP+K0FPoiJz1RlXxd1BUyaFk8XSdz6Ly
+         I2v+f1RFiFfRb3oSWGoccBxOBkvZ3wafWssHwSNNdDcUyCIGiFto4qAxhCPvfGUDUEv6
+         ScGmyIlv8+hfNib652qzMJyqWs7wEIPSuJEtPppXqgjZHLZo+4pJ5mNM4V9wdA63CNyL
+         JYfOeSINmPogI+WQWSEWWDSc5YR6vLAvf1TAUvOyvyMtF8uctOPEBgoYpLYeYc8DZ7ot
+         PmnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVV4PExMkOwbjhWLc78bzr3YlJr0ZCOsu2U6UD+wI1/VOnk7yXo/Amwy38mYAvCwWYEfZcRovY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlEjvJsJEIEmfH5gxkpTeMmfQSVE3JgG+UCfuSBZPe2cRPz9vK
+	y4ABs6iXM7L3wTtljTZ6uMnN0XJePF9eRQgPngTyZ7ZBuBU0K3nGy1oFTfXV+U1JJrW47Op7EZy
+	br/UoPuIb/7y9iGwrH21B7Z23V1lHyhTFZ4Z4FhzCJXVptGmnkNY2Rg==
+X-Received: by 2002:a05:6214:33c7:b0:6c3:665e:a1fa with SMTP id 6a1803df08f44-6c7bd4cf316mr310755096d6.11.1727195772546;
+        Tue, 24 Sep 2024 09:36:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGew2zuZt9ZSk16pZrqHOtQorzrABia/GALgdjyGkoRh1si8Hxu4SKK/UToMXIaBARoadMnVw==
+X-Received: by 2002:a05:6214:33c7:b0:6c3:665e:a1fa with SMTP id 6a1803df08f44-6c7bd4cf316mr310754546d6.11.1727195772191;
+        Tue, 24 Sep 2024 09:36:12 -0700 (PDT)
+Received: from x1gen2nano ([2600:1700:1ff0:d0e0::40])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6cb0f4e05c2sm7897726d6.60.2024.09.24.09.36.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2024 09:36:11 -0700 (PDT)
+Date: Tue, 24 Sep 2024 11:36:09 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Sarosh Hasan <quic_sarohasa@quicinc.com>
+Cc: Suraj Jaiswal <jsuraj@qti.qualcomm.com>, 
+	"Suraj Jaiswal (QUIC)" <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>, 
+	"bhupesh.sharma@linaro.org" <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, Prasad Sodagudi <psodagud@quicinc.com>, 
+	Rob Herring <robh@kernel.org>, kernel <kernel@quicinc.com>
+Subject: Re: [PATCH net] net: stmmac: Stop using a single dma_map() for
+ multiple descriptors
+Message-ID: <gbia6rqppcc53vmel5q5jvgdri3cmeowb64mxfk7jzo6ncuz2f@6kd7acqii62x>
+References: <20240902095436.3756093-1-quic_jsuraj@quicinc.com>
+ <yy2prsz3tjqwjwxgsrumt3qt2d62gdvjwqsti3favtfmf7m5qs@eychxx5qz25f>
+ <CYYPR02MB9788F524C9A5B3471871E055E79A2@CYYPR02MB9788.namprd02.prod.outlook.com>
+ <ypfbzhjyqqwwzciifkwvhimrolg6haiysqmxamkhnryez4npxx@l4blfw43sxgt>
+ <05909d17-0111-4080-97cc-82ed435728a7@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4877:EE_|IA1PR12MB7568:EE_
-X-MS-Office365-Filtering-Correlation-Id: fae2690a-bd40-4f5d-d4a0-08dcdcb6b362
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?a1c1d2IzemNadjYzYWNDYiszL3JiaDN3MjVHQjh1SHRpbldjb21kSjFVd0ti?=
- =?utf-8?B?bzJieFdFV3orVUIwcERHUWlMRXJaVFMvb002ZDJBV2dRZVFGbDFGQmpaZlE0?=
- =?utf-8?B?NkxqT0hrVGVFek5zWWtJK3d5eTNTMGlPamRwSHQ2bFBPZ01QdHd2UTg4dGRJ?=
- =?utf-8?B?cFdiMUZ2M1NlT3EyeXNmbHlqYmlHOFFsVzhmbmJkcjFuSHVJbEhpSHlJNzVi?=
- =?utf-8?B?dCtCc1VJU2JPWnNLdWRWYkhXZDdQUWk0bnZXS2F0QmZnNU1wb2FGUHYxdHBU?=
- =?utf-8?B?N1FWbHRUY2FqazRsamE0b3RUcHJkQ2owSHJoV25URlI2bjVUbEtRQlhQQnla?=
- =?utf-8?B?bllsOW1EMVZwSXZ5alZwRmFDUDFaR0JhN01sN3AzU05xeURRSmlaMHlJK21V?=
- =?utf-8?B?bmp3YkJnU3FwbVdFblNNcUZVd2Y3Tys2eFpRTzlJS2pYaEE0NGdINnhsemFz?=
- =?utf-8?B?enM2aUdSd0NRZlR6c0V4SXJJeHRkR0FuRzYzY2lGdHkwOTJ6MFNzSWdldWxn?=
- =?utf-8?B?cUVFY3lRV1FkQ1B4Vldpa3BFV0xxRlVya0dCQ2luL2hQeGdNOWNSUmNXLzVP?=
- =?utf-8?B?RVB3NmZkTWZNRUpiQWRiak5neEcxZVJsc1BPRk5TL0tKa3U4Zm5OWEx3d0dQ?=
- =?utf-8?B?MWNaU3ZoM096K0hqalVlclpuMjZDRjJ5ak5jWGpZRVA4VVVMQkRncEJzazN3?=
- =?utf-8?B?dHE4N2tWaWtPT0xzcFpsdVpLVHJOcXNONTJxVU9tQ3AxZXRqaGdqM2hVbVEz?=
- =?utf-8?B?b3VFaHBJQ2VGeUF2eTkrd0xzYUQwU2pISFp4YXJ5VG1tK0s3QmdycXUxUzFX?=
- =?utf-8?B?a3laNVJsb1dSVlFQNVMyNWdKamRVQzFWb1YzY3R3NUE2TGo0ZmdVUDgvRlRa?=
- =?utf-8?B?OUIybXVieGl4MEMwT1JlRmwzR2UwUTJkL2J1M1graEl6M2JramFjNVRYUDJX?=
- =?utf-8?B?M0hZc1Bsb1BVUVlnM283VDRIL2ttREtsOGFIczdySjI2aGdrOHh1cWxmVXFW?=
- =?utf-8?B?VjVnL2RlcUw3bDJCVVdRUFBXY1RBUVlCb21GR2JYTkNrbjVJUHY5NXVBVlB2?=
- =?utf-8?B?bGpBbGd0VEs5VDRLSUZlOGxud2srNUVBV0p3TkNQQUYreVpmZjNwangreVdk?=
- =?utf-8?B?OXdhSklVdkIrdVZ6U1JtY2RxZXdZd3UvdzRxYXpPSzJnL1dNc2Y3REg1MEdB?=
- =?utf-8?B?anIzbExXRG9kRzk2STVBMktNamNQWmxQZCt3UXRJTDgvM1RTOEdSYnRtMk5C?=
- =?utf-8?B?QXhQQkJ0azFuTExiTitWUzBMWWVaRVRnc3NncHUxR2U1SXNtdSszMUdTdFlw?=
- =?utf-8?B?TUJEOURRL216ZklBQ0Z5VnlldERDRDlidzc4UnhXTU12QlpibjlVOHdYVkZI?=
- =?utf-8?B?ZXFscWl0djZjMFVUL1Q2dDlrRzI3SEpzOHNid2lrcWUrMW52STFMWDNUN1Vv?=
- =?utf-8?B?ZVdwaTFzUzNibUVWaUtuQnMzbW1SQmc5RXFUZkpOMnJzNVBuYURLc1dEQ0F3?=
- =?utf-8?B?enF0bmNRaUFTczd3ZmorZ0d6MDc2WjZCVFJJek40R0F5Uy9BVVg3L0RpKzNU?=
- =?utf-8?B?VkxibFVvNUlGRWRtZ2ZGRmZCYW9VOXE4LytRWEE4VUtEL2VoTmt1UVpzRkVw?=
- =?utf-8?B?VHpORVc5SlI1ZTVweDZnbnNXLzlLQWhJejdac1Y0dTk1Q1NtL2NDT29xOG44?=
- =?utf-8?B?VWNYN1gweDBEMVdudGFid0w0YVBJaEFZS1I3OGU2amJ2OVkvalRxcVBPOXJ3?=
- =?utf-8?B?VE5BelpIMmxHSEViR1JLa0U5bzRwWUtEZElNMlQzb2JQcVFhWkpmOTUwdVpk?=
- =?utf-8?B?blB1UXlIN0xIZDZUaFVKdz09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4877.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?YUo3RkFiZExLbk9OeXlPMTNwWHowZmc2QTJMT3JNOGk4STVGU1dvMFZ5WmJS?=
- =?utf-8?B?TWR2dU80NkcwV0owRndaSUM4ZjdKVjdwaTJSTHN5OVNSNjJTektEamI3TnR0?=
- =?utf-8?B?VkxVK0RGUlZiaTFmbzJ3aG1CWDJTM0FsY2dtMXVSb3FzaTZNcnpRT0NJV3Ra?=
- =?utf-8?B?bTNnTCs2UGlqcmt6K2c1OWRHR0c2T29zY1c0b3V4Q1VoWU9rekorbWRQYTFn?=
- =?utf-8?B?em1lcTJNS2F3RldIWDZEbnRvVkFvV1QyV3p5V3JLdDh5bzM5d1hkbDEzd2ZH?=
- =?utf-8?B?TUFwVUwwR1lVL20wd05yTUcrNm5yenVSTDFxTXZUVEJLOWg3aFFFeldhTGtv?=
- =?utf-8?B?VzErcjM2SE1jTUJFYzhSZTlaNCtxbXk2bEVlUlhLenB4cWJLNVViVURja0hy?=
- =?utf-8?B?ZGE0WFdyRnBFWGN5cGdSQzFvcGtSQWJyblMwZmpIQldGTTBidlVXdTZMaXBB?=
- =?utf-8?B?Rk8ydzFHdTBjR29nZHF5TXdCcHp5d0laUjVpeHhxVGFCVFljUWcyK29iR1Zn?=
- =?utf-8?B?d2JmSy9DSXZHRkt5blVuZFBzdHBobzlEaFlqYm52QXZFSVBqT2p0VEVnZTZs?=
- =?utf-8?B?c1VFWXNHR3phTXBsMXllRWJCTFpnbFVVZkY4aWZ4c0pSdEdOSkZ3bjRRdGV5?=
- =?utf-8?B?bncyVlpuRmVsUmZUTVl3VSttdlpvM2hyS3JieUkwMXdpVUpiZDcxaVgxUmlm?=
- =?utf-8?B?Uk1DS0JPSUxvSUFuL3ZRcmtFUHhzUlBtTnl2NnZ0VkJhK0s4Rm1WejNBUjRK?=
- =?utf-8?B?QTFXRXZNN3hJc3JwY21WTXN0eWZSL3JqUWIxVCt4TGszbTlCOWdFeXFmYm1s?=
- =?utf-8?B?YXdSL3hYR2JFR0o1Q2VhbXk3VVJSQWdoY2FnamNxQ214UC9HTi9QUHhMNmhE?=
- =?utf-8?B?RkFUT0RmT2trTXJ2UVdHUHdNVzNWZlJqNTJEQkd3RUNFcGJ2RE1ibkR5cEQ5?=
- =?utf-8?B?NzkrcFRhYUNLUTBnL2hGTUIySTBxWVFBaysvWUpCKzI5cHZZWEYzd2g2MG9X?=
- =?utf-8?B?RTFSYW5qMWZCUzJteUd0SGZMNnk4M2Z1d012cGJKWGRtTURhRzMrejh6RHR5?=
- =?utf-8?B?N2djVm0yemV3aVdlQWdqYWUzdzRNTGtlNm50NzNXbkdNQXZPTkxTR1l0Vms1?=
- =?utf-8?B?QkN3dmpFOStRdXlMRkJHbXd0bW95bzNRakYxNThOMW1ERVFPdkhlYVpPeWw3?=
- =?utf-8?B?TCtPcFFjWUdXYmZqcFFiUTcvT1JDeXZVR2xGVzlGdE9UZ3N2VFpMTTMwc3VV?=
- =?utf-8?B?cDd4OGRvWURiYTZJbzdTUFhNU3IvWTRlZkZETS9WdE1MdHFIc3lQYW5MS3RS?=
- =?utf-8?B?NVFtNC9iQkU3Qy9pNHNSWW1rMCsrazFkcTdRMmwzTytaamlZVnZTa2pPbW12?=
- =?utf-8?B?cC9wdDhPSUJtQnFydXZibEZFZnhCSENuajB0TFZKMEMxV3JrNm9aOXlUNzA5?=
- =?utf-8?B?Zjd1SW4yd21Tei9veWdoNSsySGVFUWFHUGxPckpRU1lFWTVLa0podzlkcXo4?=
- =?utf-8?B?SUZXdjIxQ3RqbTVnK2c0bTdPdVdxOTlrU2ZFMWU4ZitRVjFXLzdxOHNDYUZs?=
- =?utf-8?B?VUxETSttRHRzVmJGeDc4SFhSQ0RxaVM2OGlxSXZLKytVTWx3Q21GVkt3aWxU?=
- =?utf-8?B?bDlhTE1wb0k4eUZYK3pEWW9iRE5RY3hZQVA5WjlISmFOVkt4RGg3cHFQTVkw?=
- =?utf-8?B?YS9VRWN3UUxGTlhmQVUyemdRTTFiQ2RMSkptR1l2bkllSUxNQ3Uya3JkQnVQ?=
- =?utf-8?B?MUk0NU1Ea2tlQllSY3ZDNklTQk5sY245YjlTQkhNWHBualJuK1lsVVk1cW1B?=
- =?utf-8?B?MGZTelNHcnMzQyt2UHdEU1JnYUQ1bGtEbjlxbVJ3eHdaNzZtN1JGVTIzSWFh?=
- =?utf-8?B?WGhnYko1eVpiT01UMWJvcUhjd09LS1lTUmRJTnlJOW82a0ZuWFQwcjZENVJu?=
- =?utf-8?B?QXZLQmx6djlkbHRCeityaEM3eW9jYmdoMHdIRjk3aUJQSklhSkZDTjFhRTVo?=
- =?utf-8?B?N2RoNnpYNUk5Vm8vMTBuR3JoaG9qanc4eEpNRGhnSCtvYytLVVNHZVFEUzdP?=
- =?utf-8?B?Z2V3MldUN09wL28rV3o5RnQ2MDc0NEI0Z1VIbjFvZnh1cUlDTTY2RlFkZzgw?=
- =?utf-8?Q?6XBk=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fae2690a-bd40-4f5d-d4a0-08dcdcb6b362
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4877.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2024 16:34:03.4239
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JxmRU42NlEIGXV/CDt/wa/UzkDhVT3kskwDj9ZAFG8dUATC08PzwcXNKPAoCmfmt
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7568
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <05909d17-0111-4080-97cc-82ed435728a7@quicinc.com>
 
+On Tue, Sep 24, 2024 at 04:36:59PM GMT, Sarosh Hasan wrote:
+> 
+> 
+> On 9/10/2024 7:34 PM, Andrew Halaney wrote:
+> > Hey Suraj,
+> > 
+> > Your email client didn't seem to quote my response in your latest reply,
+> > so its difficult to figure out what you're writing vs me below. It also
+> > seems to have messed with the line breaks so I'm manually redoing those.
+> > 
+> > Please see if you can figure out how to make that happen for further
+> > replies!
+> > 
+> > More comments below...
+> > 
+> > On Tue, Sep 10, 2024 at 12:47:08PM GMT, Suraj Jaiswal wrote:
+> >>
+> >>
+> >> -----Original Message-----
+> >> From: Andrew Halaney <ahalaney@redhat.com> 
+> >> Sent: Wednesday, September 4, 2024 3:47 AM
+> >> To: Suraj Jaiswal (QUIC) <quic_jsuraj@quicinc.com>
+> >> Cc: Vinod Koul <vkoul@kernel.org>; bhupesh.sharma@linaro.org; Andy Gross <agross@kernel.org>; Bjorn Andersson <andersson@kernel.org>; Konrad Dybcio <konrad.dybcio@linaro.org>; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Rob Herring <robh+dt@kernel.org>; Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>; Conor Dooley <conor+dt@kernel.org>; Alexandre Torgue <alexandre.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>; Maxime Coquelin <mcoquelin.stm32@gmail.com>; netdev@vger.kernel.org; linux-arm-msm@vger.kernel.org; devicetree@vger.kernel.org; linux-kernel@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com; Prasad Sodagudi <psodagud@quicinc.com>; Rob Herring <robh@kernel.org>; kernel <kernel@quicinc.com>
+> >> Subject: Re: [PATCH net] net: stmmac: Stop using a single dma_map() for multiple descriptors
+> >>
+> >> WARNING: This email originated from outside of Qualcomm. Please be wary of any links or attachments, and do not enable macros.
+> >>
+> >> On Mon, Sep 02, 2024 at 03:24:36PM GMT, Suraj Jaiswal wrote:
+> >>> Currently same page address is shared
+> >>> between multiple buffer addresses and causing smmu fault for other 
+> >>> descriptor if address hold by one descriptor got cleaned.
+> >>> Allocate separate buffer address for each descriptor for TSO path so 
+> >>> that if one descriptor cleared it should not clean other descriptor 
+> >>> address.
+> > 
+> > snip...
+> > 
+> >>>
+> >>>  static void stmmac_flush_tx_descriptors(struct stmmac_priv *priv, int 
+> >>> queue) @@ -4351,25 +4380,17 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+> >>>               pay_len = 0;
+> >>>       }
+> >>>
+> >>> -     stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue);
+> >>> +     if (stmmac_tso_allocator(priv, (skb->data + proto_hdr_len),
+> >>> +                              tmp_pay_len, nfrags == 0, queue, false))
+> >>> +             goto dma_map_err;
+> >>
+> >> Changing the second argument here is subtly changing the dma_cap.addr64 <= 32
+> >> case right before this. Is that intentional?
+> >>
+> >> i.e., prior, pretend des = 0 (side note but des is a very confusing variable
+> >> name for "dma address" when there's also mentions of desc meaning "descriptor"
+> >> in the DMA ring). In the <= 32 case, we'd call stmmac_tso_allocator(priv, 0)
+> >> and in the else case we'd call stmmac_tso_allocator(priv, 0 + proto_hdr_len).
+> >>
+> >> With this change in both cases its called with the (not-yet-dma-mapped)
+> >> skb->data + proto_hdr_len always (i.e. like the else case).
+> >>
+> >> Honestly, the <= 32 case reads weird to me without this patch. It seems some
+> >> of the buffer is filled but des is not properly incremented?
+> >>
+> >> I don't know how this hardware is supposed to be programmed (no databook
+> >> access) but that seems fishy (and like a separate bug, which would be nice to
+> >> squash if so in its own patch). Would you be able to explain the logic there
+> >> to me if it does make sense to you?
+> >>
+> > 
+> >> <Suraj> des can not be 0 . des 0 means dma_map_single() failed and it will return.
+> >> If we see if des calculation (first->des1 = cpu_to_le32(des + proto_hdr_len);)
+> >> and else case des calculator ( des += proto_hdr_len;) it is adding proto_hdr_len
+> >> to the memory that we after mapping skb->data using dma_map_single.
+> >> Same way we added proto_hdr_len in second argument . 
+> > 
+> > 
+> > 0 was just an example, and a confusing one, sorry. Let me paste the original
+> > fishy code that I think you've modified the behavior for. Here's the
+> > original:
+> > 
+> > 	if (priv->dma_cap.addr64 <= 32) {
+> > 		first->des0 = cpu_to_le32(des);
+> > 
+> > 		/* Fill start of payload in buff2 of first descriptor */
+> > 		if (pay_len)
+> > 			first->des1 = cpu_to_le32(des + proto_hdr_len);
+> > 
+> > 		/* If needed take extra descriptors to fill the remaining payload */
+> > 		tmp_pay_len = pay_len - TSO_MAX_BUFF_SIZE;
+> > 	} else {
+> > 		stmmac_set_desc_addr(priv, first, des);
+> > 		tmp_pay_len = pay_len;
+> > 		des += proto_hdr_len;
+> > 		pay_len = 0;
+> > 	}
+> > 
+> > 	stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue);
+> > 
+> > Imagine the <= 32 case. Let's say des is address 0 (just for simplicity
+> > sake, let's assume that's valid). That means:
+> > 
+> >     first->des0 = des;
+> >     first->des1 = des + proto_hdr_len;
+> >     stmmac_tso_allocator(priv, des, tmp_pay_len, (nfrags == 0), queue)
+> > 
+> >     if des is 0, proto_hdr_len is 64, then that means
+> > 
+> >     first->des0 = 0
+> >     first->des1 = 64
+> >     stmmac_tso_allocator(priv, 0, tmp_pay_len, (nfrags == 0), queue)
+> > 
+> > That seems fishy to me. We setup up the first descriptor with the
+> > beginning of des, and then the code goes and sets up more descriptors
+> > (stmmac_tso_allocator()) starting with the same des again?
+> tso_alloc is checking if more descriptor needed for packet . it is adding offset to get next
+> descriptor (curr_addr = des + (total_len - tmp_len)) and storing in des of next descriptor.
 
+Yes, so in stmmac_tso_allocator() we currently have:
 
-On 9/23/24 02:43, Lukas Wunner wrote:
-> On Mon, Sep 16, 2024 at 03:50:59PM -0500, Wei Huang wrote:
->> --- a/drivers/pci/pci.c
->> +++ b/drivers/pci/pci.c
->> @@ -1813,6 +1813,7 @@ int pci_save_state(struct pci_dev *dev)
->>  	pci_save_dpc_state(dev);
->>  	pci_save_aer_state(dev);
->>  	pci_save_ptm_state(dev);
->> +	pci_save_tph_state(dev);
->>  	return pci_save_vc_state(dev);
->>  }
->>  EXPORT_SYMBOL(pci_save_state);
->> @@ -1917,6 +1918,7 @@ void pci_restore_state(struct pci_dev *dev)
->>  	pci_restore_vc_state(dev);
->>  	pci_restore_rebar_state(dev);
->>  	pci_restore_dpc_state(dev);
->> +	pci_restore_tph_state(dev);
->>  	pci_restore_ptm_state(dev);
->>  
->>  	pci_aer_clear_status(dev);
+	static void stmmac_tso_allocator(struct stmmac_priv *priv, dma_addr_t des,
+					 int total_len, bool last_segment, u32 queue)
+	{
+		struct stmmac_tx_queue *tx_q = &priv->dma_conf.tx_queue[queue];
+		struct dma_desc *desc;
+		u32 buff_size;
+		int tmp_len;
+
+		tmp_len = total_len;
+
+		while (tmp_len > 0) {
+			dma_addr_t curr_addr;
+
+			tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx,
+							priv->dma_conf.dma_tx_size);
+			...
+			curr_addr = des + (total_len - tmp_len);
+			if (priv->dma_cap.addr64 <= 32)
+				desc->des0 = cpu_to_le32(curr_addr);
+
+so on the first loop you've got:
+	tmp_len = total_len
+	...
+	curr_addr = des + total_len - temp_len
+	i.e.
+	curr_addr = des
+meaning with the "first" handling I've highlighted we've got
+	first->des0 = des
+	"next"->des0 = des
+
+where "next" is the cur_tx descriptor in the first loop of
+stmmac_tso_allocator() (essentially the second descriptor).
+That seems broken to me, and was that way prior to this patch.
+
+You've modified the behavior in this patch unintentionally. I think it
+needs modifying, but it should be done so explicitly in its own patch
+prior to this one. I also think the current modification in this patch
+isn't a fix. See prior reply below where I highlighted the programming as I
+understand it with this patch applied, which would result in something
+like.
+
+first->des0 = des
+first->des1 = des + proto_hdr_len
+"next"->des0 = des + proto_hdr_len
+
+Which again seems wrong, two descriptors pointing to the same address
+isn't making sense to me.
+
+Sorry to sound like a broken record, but I want to make sure we're on
+the same page! Sounds like you're looking into it based on the below
+comment, but some of these comments here made me think I didn't explain
+the situation well enough.
+
+> > 
+> > Should we be adding the payload length (TSO_MAX_BUFF_SIZE I suppose
+> > based on the tmp_pay_len = pay_len - TSO_MAX_BUFFSIZE above)? It seems
+> > that <= 32 results in duplicate data in both the "first" descriptor
+> > programmed above, and in the "second" descriptor programmed in
+> > stmmac_tso_allocator().
+> curr_addr = des + (total_len - tmp_len) is used in while loop in  tso_alloc to get address of all required descriptor . 
+> descriptor address will be updated finally in tso_alloc by below call .
+>  
+> if (priv->dma_cap.addr64 <= 32)
+>                                                desc->des0 = cpu_to_le32(curr_addr);
+>                                else
+>                                                stmmac_set_desc_addr(priv, desc, curr_addr);
 > 
-> I'm wondering if there's a reason to use a different order on save versus
-> restore?  E.g. does PTM need to be restored last?
+>  Also, since tmp_pay_len is decremented, but des
+> > isn't, it seems that stmmac_tso_allocator() would not put all of the
+> > buffer in the descriptors and would leave the last TSO_MAX_BUFF_SIZE
+> > bytes out?
+> > 
+> > I highlight all of this because with your change here we get the
+> > following now in the <= 32 case:
+> > 
+> >     first->des0 = des
+> >     first->des1 = des + proto_hdr_len
+> >     stmmac_tso_allocator(priv, des + proto_hdr_len, ...)
+> > 
+> > which is a subtle change in the call to stmmac_tso_allocator, meaning
+> > a subtle change in the descriptor programming.
+> > 
+> > Both seem wrong for the <= 32 case, but I'm "reading between the lines"
+> > with how these descriptors are programmed (I don't have the docs to back
+> > this up, I'm inferring from the code). It seems to me that in the <= 32
+> > case we should have:
+> > 
+> >     first->des0 = des
+> >     first->des1 = des + proto_hdr_len
+> >     stmmac_tso_allocator(priv, des + TSO_MAX_BUF_SIZE, ...)
 > 
+> let me check <=32 case only on setup and get back.
+> > 
+> > or similar depending on if that really makes sense with how des0/des1 is
+> > used (the handling is different in stmmac_tso_allocator() for <= 32,
+> > only des0 is used so I'm having a tough time figuring out how much of
+> > the des is actually programmed in des0 + des1 above without knowing the
+> > hardware better).
+> > 
+> > Does that make sense? The prior code seems fishy to me, your change
+> > seems to unintentionally change that fhsy part, but it still seems fishy
+> > to me. I don't think you should be changing that code's behavior in that
+> > patch, if you think it's right then we should continue with the current
+> > behavior prior to your patch, and if you think its wrong we should
+> > probably fix that *prior* to this patch in your series.
+> > 
+> > Thanks,
+> > Andrew
+> > 
 > 
 
-Will fix
-
->> --- a/drivers/pci/pcie/Kconfig
->> +++ b/drivers/pci/pcie/Kconfig
->> @@ -155,3 +155,14 @@ config PCIE_EDR
->>  	  the PCI Firmware Specification r3.2.  Enable this if you want to
->>  	  support hybrid DPC model which uses both firmware and OS to
->>  	  implement DPC.
->> +
->> +config PCIE_TPH
->> +	bool "TLP Processing Hints"
->> +	depends on ACPI
-> 
-> TPH isn't really an ACPI-specific feature, it could exist on
-> devicetree-based platforms as well.  I think there could be valid
-> use cases for enabling TPH support on such platforms:
-> 
-> E.g. the platform firmware or bootloader might set up the TPH Extended
-> Capability in a specific way and the kernel would have to save/restore
-> it on system sleep.
-> 
-> So I'd recommend removing this dependency.
-
-This is reasonable - I can remove this dependency.
-
-> 
-> Note that there's a static inline for acpi_check_dsm() which returns
-> false if CONFIG_ACPI=n, so tph_invoke_dsm() returns AE_ERROR and
-> pcie_tph_get_cpu_st() returns -EINVAL.  It thus looks like you may not
-> even need an #ifdef.
-
-We might have to add #ifdef around the ACPI related functions. The
-reason is not because of acpi_evaluate_dsm() or acpi_evaluate_dsm().
-Instead the compilation will fail due to "pci_acpi_dsm_guid". In TPH V2
-series, somebody reported the following error:
-
-"
-This seems to break builds on ARM (32bit) with multi_v7_defconfig.
-
-  .../tph.c:221:39: error: use of undeclared identifier 'pci_acpi_dsm_guid'
-  221 |         out_obj = acpi_evaluate_dsm(handle, &pci_acpi_dsm_guid,
-MIN_ST_DSM_REV,
-      |
-"
-
-> 
-> 
->> diff --git a/drivers/pci/pcie/tph.c b/drivers/pci/pcie/tph.c
->> new file mode 100644
-> 
-> The PCIe features added most recently (such as DOE) have been placed
-> directly in drivers/pci/ instead of the pcie/ subdirectory.
-> The pcie/ subdirectory mostly deals with port drivers.
-> So perhaps tph.c should likewise be placed in drivers/pci/ ?
-
-I am OK with it. Some extended features, such as ATS, are indeed
-implemented in drivers/pci/.
-
-Bjorn: Any comments on this idea?
-
-> 
-> 
->> --- /dev/null
->> +++ b/drivers/pci/pcie/tph.c
->> @@ -0,0 +1,199 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * TPH (TLP Processing Hints) support
->> + *
->> + * Copyright (C) 2024 Advanced Micro Devices, Inc.
->> + *     Eric Van Tassell <Eric.VanTassell@amd.com>
->> + *     Wei Huang <wei.huang2@amd.com>
->> + */
->> +#include <linux/pci.h>
->> +#include <linux/pci-acpi.h>
-> 
-> This patch doesn't seem to use any of the symbols defined in pci-acpi.h,
-> or did I miss anything?  I'd move the inclusion of pci-acpi.h to the patch
-> that actually uses its symbols.
-> 
-> Thanks,
-> 
-> Lukas
 
