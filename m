@@ -1,138 +1,141 @@
-Return-Path: <netdev+bounces-129400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62040983A9E
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 02:38:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8164983AA6
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 02:50:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 120DA1F23779
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 00:38:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EA501C20D95
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 00:50:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0A5B1B85DA;
-	Tue, 24 Sep 2024 00:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF23184E;
+	Tue, 24 Sep 2024 00:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSo3hjIZ"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="cZ3FwHH3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D25C1B95B;
-	Tue, 24 Sep 2024 00:37:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8959338C;
+	Tue, 24 Sep 2024 00:50:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727138272; cv=none; b=j8VGBaYb9HXfiag+fQzgjUIM2o0/5JMsOMHI2jB90pvbMG0t6ypEH8Oa4SnBvUPbxpwMoKTEqdhKhxCb6OE1fbAnL4kDlyVs1af5jTkO97T5Nx+CEhgGQoFzi77+iU+BX38H9GutZ+Dt/qrGmOJZUa+n6Vl3Ra8vz2BxxM0kEuQ=
+	t=1727139049; cv=none; b=XlOazuhht3BoCxNePw6hM/gVPHaqk6y2S0DYzRCo02Uz7OBkByZSbi0RfaBnq2cJph0HefJ2k+zFYV5CYhaW90uCZUVDrvUJIymUTmPeoVdZYpDODZjIkJm0OQ4UeDtdWIyikF8+zExUvpiMDFjjAPuUKd/GdRZuxLg0Onvd5qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727138272; c=relaxed/simple;
-	bh=p7oNS5eaV/rjyrBNKPwDsltNGnzh2U6DekaWyXUf4uw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XN+yDW/UHoVoY9q72LMNl3EsOhyMsvAtJipIwcffE3vVC2xsfznooC2uGBD9VlFr5ELR2IKVTvJv2bGKULvZGlt8DqNjqAemK+aj6KGsWLetY6CBc6AyqHuj8BgxN5K7pKyilZ7l55EYiRSoUaZrwHNAJS7F2HGf6iFJrgC4g1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSo3hjIZ; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20573eb852aso37481805ad.1;
-        Mon, 23 Sep 2024 17:37:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727138271; x=1727743071; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=3sF7bp+9YNuz/1OUexYb03klrCNegDMvCwEWeusF4wg=;
-        b=nSo3hjIZXDicLgRYw6B/LnASMqTMun5MhCyRyCyBRdREvfSHU5pDguV+gd8h5CBDZd
-         50Rf8i9mxmTzX9yK0C50l5ijU29ik500XlFcETP0wSkxBexF/ZntvTpoIjS7463oi//g
-         tZef7WPfJKpAcp4OD1XdDoD/RnXs4SYH4xEIvYB8JIN2ANdDTl2qEkDVu6ZbXEqjTN0q
-         emZk/df3N1aS+ViD357+CnW95glZxRSycqTfqoQMwgBjYK4A9C699J4q5JhOaaanF5V1
-         5J5P1CMKThtR1/taeR+TgvmlCo7JHsDWb9jhQl9ptZ6CcPjGnvoFQPeXUU3Pjxw4JTYk
-         U+sA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727138271; x=1727743071;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3sF7bp+9YNuz/1OUexYb03klrCNegDMvCwEWeusF4wg=;
-        b=iiUBPsjYJ+8rdVZ0vSu1QEUVQ7fgwp9jG0YxrnnOENWvTceLGfJzOhejoJwXWqPngz
-         8+f65yK/6gscTJfBAfugryQTitesWWewBTedUV8cvYKcznZjfVSSr4CB9X11M0N5h0xH
-         fNVY5wO90Ql72Edo4/Kz1THOFuOWyNy9SXcbf8L3ekTjZzlal0P9FwZVSDao/7a1Qc2L
-         QDAzRvuomgzWgBGgFutxj2msXdmyYCoZDA6Wu2BN/gL2LwZ/cYiDpIstjkbbOfFDKvmU
-         mVpWZ3zNU67QcPkch8nePDCFHHgIzyH6Lm/25elkguHxW5Y2qQnB6voCvUq5qSA/zKWI
-         3lUg==
-X-Forwarded-Encrypted: i=1; AJvYcCXxJ1/Vq6wzrH95RD/OShvgOH9hWDs4UUUbUvWYqmQEh/hkZI9jvTcbM3adocnEe0k4aNI9hsycpesouLs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoHeimXJ30TLnpBZW+JCwlYY6rDKlp8BcyNRhYML/g75BeyKE1
-	C+VVJuRWDBZae+dhqeon41Pb/iJNa2ojeGON1sfBU3dGoWAoDpcgMxEvVNXUDakg8w==
-X-Google-Smtp-Source: AGHT+IEoqURXR+G23iXfZ+wGFKSd5/M3MbDYTQGTy5+iUDUHCW1FPtuwo2BTJxpGoHC7SudLcHTRnA==
-X-Received: by 2002:a17:902:f54c:b0:206:a6fe:2343 with SMTP id d9443c01a7336-20aed088d76mr22398325ad.8.1727138270601;
-        Mon, 23 Sep 2024 17:37:50 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7e6b7c3f1f3sm136718a12.26.2024.09.23.17.37.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2024 17:37:50 -0700 (PDT)
-Date: Tue, 24 Sep 2024 00:37:43 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] bonding: show slave priority in proc info
-Message-ID: <ZvIJ1xewGuJ_JhbE@fedora>
-References: <20240923072843.46809-1-liuhangbin@gmail.com>
- <CANn89iLoVexJpUbZzwAYtGpLiTZ36tFh5GpJU=mYH6YazJeTPQ@mail.gmail.com>
+	s=arc-20240116; t=1727139049; c=relaxed/simple;
+	bh=AZE+Qiaw2w+awGcYoQHiAgWO1WbbGgc3wBjgBu8BZuY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OKTzixJTDYvuaEdHhz7h0f4sEDgn9D0uUzSFQBawoACWMMF/WoqcgaLWMiqqOFnb5cAEwFRLVeNsThDOPU5S3CPU/+p7foCtt1rpExZsT9OYryHJ/eF2z6293ZvAoCmugFe/KxPHKhe6/w4ReEPLYzpDoC1maO7ihqFUv+iNUGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=cZ3FwHH3; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1727139044;
+	bh=xGpZbT7mg9IvH37SG01CpNOzsHu0+NIrFGiUekLwwhg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cZ3FwHH3VPH9h2+gUoDldqdBJ8lxFVy8befeyo/9tukYkMSie6Il2jPGI8x0a21l4
+	 a7HSOEj90eYRkkrO50LhTtCyh9/LHaJZsVniyZhBrEp/uASotJYoRSEPck1TLB56dO
+	 xm8WwwsinGSkGt+eKrC9Vp8QiBnuzq8WqwtYcYh1hYtRSRt79hMfGafkHXg5fG1SvS
+	 Ue0U2dzPLp8ewOYdOMuc/QuXYjXpwJGTfrTLOByGiNT08SoWiYB2C4syHs/5bsOzBP
+	 0NRGHamUQPK/sZpCd4Nj3I9nLKLQ97SQCp/XbdR6RsS4y/gW/GhbPjP0VHmK9SU5zN
+	 x+xQHjiDOTKhA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XCLrM0nJXz4x7B;
+	Tue, 24 Sep 2024 10:50:43 +1000 (AEST)
+Date: Tue, 24 Sep 2024 10:50:42 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Miguel Ojeda <ojeda@kernel.org>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, FUJITA Tomonori
+ <fujita.tomonori@gmail.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Matt Gilbride <mattgilbride@google.com>,
+ Wedson Almeida Filho <wedsonaf@gmail.com>
+Subject: Re: linux-next: manual merge of the rust tree with the net-next
+ tree
+Message-ID: <20240924105042.22f709a4@canb.auug.org.au>
+In-Reply-To: <20240902160436.793f145d@canb.auug.org.au>
+References: <20240902160436.793f145d@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLoVexJpUbZzwAYtGpLiTZ36tFh5GpJU=mYH6YazJeTPQ@mail.gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/K_nd4GEO/6Q4sLzDL+IrQ23";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hi Eric,
+--Sig_/K_nd4GEO/6Q4sLzDL+IrQ23
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 23, 2024 at 09:45:23AM +0200, Eric Dumazet wrote:
-> On Mon, Sep 23, 2024 at 9:29 AM Hangbin Liu <liuhangbin@gmail.com> wrote:
-> >
-> > The slave priority is currently not shown in the proc filesystem, which
-> > prevents users from retrieving this information via proc. This patch fixes
-> > the issue by printing the slave priority in the proc filesystem, making it
-> > accessible to users.
-> >
-> > Fixes: 0a2ff7cc8ad4 ("Bonding: add per-port priority for failover re-selection")
-> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> > ---
-> >  drivers/net/bonding/bond_procfs.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/drivers/net/bonding/bond_procfs.c b/drivers/net/bonding/bond_procfs.c
-> > index 7edf72ec816a..8b8580956edd 100644
-> > --- a/drivers/net/bonding/bond_procfs.c
-> > +++ b/drivers/net/bonding/bond_procfs.c
-> > @@ -210,6 +210,7 @@ static void bond_info_show_slave(struct seq_file *seq,
-> >         seq_printf(seq, "Permanent HW addr: %*phC\n",
-> >                    slave->dev->addr_len, slave->perm_hwaddr);
-> >         seq_printf(seq, "Slave queue ID: %d\n", READ_ONCE(slave->queue_id));
-> > +       seq_printf(seq, "Slave prio: %d\n", READ_ONCE(slave->prio));
-> >
-> >         if (BOND_MODE(bond) == BOND_MODE_8023AD) {
-> >                 const struct port *port = &SLAVE_AD_INFO(slave)->port;
-> > --
-> > 2.46.0
-> >
-> 
-> proc interface is deprecated in favor of rtnl.
-> 
-> slave->prio is correctly reported in IFLA_BOND_SLAVE_PRIO attribute.
-> 
-> No further kernel change is needed.
+Hi all,
 
-Thanks for the reply. Some users said they still prefer to use /proc
-to get the bonding info as it's easier compared with get info via rtnl(ip
-link). I'm OK to drop this patch.
+On Mon, 2 Sep 2024 16:04:36 +1000 Stephen Rothwell <sfr@canb.auug.org.au> w=
+rote:
+>
+> Today's linux-next merge of the rust tree got a conflict in:
+>=20
+>   rust/kernel/lib.rs
+>=20
+> between commit:
+>=20
+>   4d080a029db1 ("rust: sizes: add commonly used constants")
+>=20
+> from the net-next tree and commit:
+>=20
+>   a0d13aac7022 ("rust: rbtree: add red-black tree implementation backed b=
+y the C version")
+>=20
+> from the rust tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+> diff --cc rust/kernel/lib.rs
+> index 58ed400198bf,f10b06a78b9d..000000000000
+> --- a/rust/kernel/lib.rs
+> +++ b/rust/kernel/lib.rs
+> @@@ -43,7 -44,7 +44,8 @@@ pub mod net
+>   pub mod page;
+>   pub mod prelude;
+>   pub mod print;
+> + pub mod rbtree;
+>  +pub mod sizes;
+>   mod static_assert;
+>   #[doc(hidden)]
+>   pub mod std_vendor;
 
-Thanks
-Hangbin
+This is now a conflict between the rust tree and Linus' tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/K_nd4GEO/6Q4sLzDL+IrQ23
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmbyDOIACgkQAVBC80lX
+0GxRhAgAjfEKehrtxyoFtJcctjBKRxBoTtZ7SnqUJ1IFBSugMhUeJ31r2m5/WWtW
+XGpISo13YU+AFJLfgsSlSHE+5JQhQ5oxh2NzaP2Jm14eCYSTqcgP8abNvu45oAk4
+AMoPF6WnzYYJaaFPYYk3aHDyKSgOkRS0KGUq6BCE1wUD8Sj4ypjaFVd4DM1VYRMG
+mdGoQSm6MiMhp6yjlaQBy5Sm5K+xNQH/mWc+417NvbzIEn7CZEg108nPlYZuJ3Qb
+9sKlYQ2aZDe62OGjhykRel0SN70hLxDnw0vbBmJhOfmstc8JGVfX4vi7NCUr1uHe
+cX8AiBRXf3sfK67HQSgqLRXU3yVCtA==
+=PyXz
+-----END PGP SIGNATURE-----
+
+--Sig_/K_nd4GEO/6Q4sLzDL+IrQ23--
 
