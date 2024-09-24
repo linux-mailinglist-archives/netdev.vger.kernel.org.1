@@ -1,96 +1,167 @@
-Return-Path: <netdev+bounces-129525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EACD59844EA
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:37:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D70B984506
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:42:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CD61B23BA3
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:37:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 717E91C23318
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:42:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77EC31A76D1;
-	Tue, 24 Sep 2024 11:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDF71A704B;
+	Tue, 24 Sep 2024 11:41:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="rAEnircZ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FpmetXj3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7781E1A7274
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 11:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED8E19B3E4;
+	Tue, 24 Sep 2024 11:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727177750; cv=none; b=eKISX5PJ8OaiNCylM+KFW+L4jh4GFvSYQU3pHWShu5NYDdbWVzyiZUIcDqQuhaskVUJxVpTfMbyTuLbd+Ue5qmJ9ayhzNv7weuEBrQ9+tORtlNTWd4Cw4wEbffyTj7sIvo2nInEiwOc7jYL5KMxWTRXZYCvA+tD72lLYYSUfMU4=
+	t=1727178075; cv=none; b=qwAfOsKZBI70RtF70C6iQZ2p3WIGThKpOkfXdEto4C5BbEMdglrH+0KWsjQPs2YkOgsos877XTFB7P89n1CSar5VdP5JPhJLBMb9b5BJSN7TFnODw7232oG3WhnFrIRAbp7V5+DLsnssH1Csid/MeXB2imgO8i5l3zC4SdzcHdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727177750; c=relaxed/simple;
-	bh=E0wH/eS9n0uK7SX7H4BUI5+7MkRm5nGKIAGAXEzkEwM=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=MOstSsNlppg/n2AYUT6zV1YEvghdq5SRvF4FJb3L0JM8qQi21Vx87tpN5MOzJM/OU5J7ZCSZgbQDtCequLwjXv+uF1zh24/KYQT3HUo5DKR/Zo5GmlnQugOvQjMV33UbwEODLRvqUAcZxM+cr4H8S5V1r61iH7MgReLNGfGF+Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=rAEnircZ; arc=none smtp.client-ip=209.85.128.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6c3f1939d12so41461717b3.2
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 04:35:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1727177747; x=1727782547; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=E0wH/eS9n0uK7SX7H4BUI5+7MkRm5nGKIAGAXEzkEwM=;
-        b=rAEnircZGCoOzMjrYK/JeZ9wJT8IKrzDQ37ZZVXP333hZ4p+ZWg4gGjd3TYm5gzOrm
-         U4kMDTN94pKFqyKHs1lJ3ugxFxOEBmysBHT4V9OE1fRVdgx34vSsM4x8eQyv8huYlY8K
-         6MxrAb6d92lRI0xPPCStATvGF7WWfmtCL3ZB1daOjXrtXdV6ArJHTg+GF9xyO94qlRfX
-         wEj6zk0WzWMgItgRGs6RksdHdn2GYhjBt84utCW7IYwS6IUKaiWZQ7LSelLMMMZrE0ps
-         1s0W06+61ObHvZSO+/ZaNWLCqcNAXm2gfsqzlPNuD8eBWDH1DNl9TajorSiKei7xwfyN
-         WpuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727177747; x=1727782547;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=E0wH/eS9n0uK7SX7H4BUI5+7MkRm5nGKIAGAXEzkEwM=;
-        b=vxzA0vkrle/lh1NjSeieFaG5GkVg6pRbnDNN2p4BCyDda8QziPUUgaEXbbub9RsXSl
-         w+Wk7TQtE6g496Nz1BHrh6+bK5JsSpN9GG69a4xbnvWWIYalYbLrYcESso88ri5dCEne
-         5B3H3niFLj2tmxhib9vWiPWAQzRXl/1EjOQnvPFSELMVeJlIwZyAsgngpXVWhBmKPQJK
-         3Eujcr+5TAPqWBOcUTTRugWE24+FdDzgHdcSMaUrvk27bAZTaNg5N9l4OcqI/Qbw+8Gy
-         ++B4IB3Js6Hh7vDHza37OLW3SmeccJHwAegIhWHah4fTv0VKPPzgiGZGdTrU9omlQ02U
-         Nmeg==
-X-Forwarded-Encrypted: i=1; AJvYcCVSQqWuJlE3lP5bJddRfhZ0FBJb5EHQfg2wTKYmJgAWgqBg+R+ZPFZGVSbbhhnWnXhnR/UA14E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwG2KVXGx2+fUXj6bFwqS8hlQrIZ/GJGzasYbt6zRVY4RX/R/Ty
-	ho6nhWFNGqabBcqnJGc38153dpPnJNq4CvRS3tiN/FOmK7rSYYci20AD6lFm48chtuGkS5BQBZt
-	dbDulWaULb+HyWJ5SPqxo61XW00QSfqPHXTH8VuVh7TrwCBC4Aw==
-X-Google-Smtp-Source: AGHT+IEbRrrHo17Ut7+bIHnJz6WHSAtgFyUW2lALhrvGGILKXpXzppJXFUaxvpUmgTNyoi8U+icNtzAs8GEeKCe7H28=
-X-Received: by 2002:a05:690c:95:b0:6dd:d5b7:f36a with SMTP id
- 00721157ae682-6dff29fc883mr96858737b3.36.1727177747396; Tue, 24 Sep 2024
- 04:35:47 -0700 (PDT)
+	s=arc-20240116; t=1727178075; c=relaxed/simple;
+	bh=pGcclbUN3Ei1TFXCliRkZs+/G35HN9mIIUQXOiF0OIk=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=Rx8uVTxODug9w8jkGLGpwCfRy1uFYdRE0xE1hu8eBSFWVK/xGMHhTEZui1a1c7YWr3gwezAIgZ6PbwcjCVds4B0aHJ4mLFbfkGMGQFptqKXvXkHLWMVG5w7e8VGOVzWl82jMS+EzHo2bUWY9ccWpDJEDNBvBnBy3iLEhK6x65IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FpmetXj3; arc=none smtp.client-ip=115.124.30.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1727178070; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=WHs0Ul2MPSi9UYmyoRMrIaLj6QL34LhvrlMbdj4rYx4=;
+	b=FpmetXj318ru+Oq03dp3Qby212sRL/fX7CcJ6CVzQEM8DTTjTo0bloLjWGP6pB8vR3bSMNZW3VL4BAVvbKmJ/EWIw+64dH/Lb5Bq7wto1hj7xm/7lyQkgv96t+L6v/krkAgGKE265HfFkIXwLyaZLowp+apD1jyV3jkHGGF9O2I=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WFgDOvN_1727178069)
+          by smtp.aliyun-inc.com;
+          Tue, 24 Sep 2024 19:41:10 +0800
+Message-ID: <1727177967.6466465-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [RFC net-next v1 07/12] virtio_net: refactor the xmit type
+Date: Tue, 24 Sep 2024 19:39:27 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20240924013204.13763-1-xuanzhuo@linux.alibaba.com>
+ <20240924013204.13763-8-xuanzhuo@linux.alibaba.com>
+ <CACGkMEtbNrwbxhRbjHGiEQeQbWUb2iL0ZtyosXs4_+GoZY-Gsw@mail.gmail.com>
+In-Reply-To: <CACGkMEtbNrwbxhRbjHGiEQeQbWUb2iL0ZtyosXs4_+GoZY-Gsw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 24 Sep 2024 07:35:35 -0400
-Message-ID: <CAM0EoMnm0yS9YCMgYhmP4700MRCYJektH5s0LypuMj2B+UbcGQ@mail.gmail.com>
-Subject: 0x18: All videos are now available
-To: people <people@netdevconf.info>
-Cc: Christie Geldart <christie@ambedia.com>, Kimberley Jeffries <kimberleyjeffries@gmail.com>, 
-	program-committee@netdevconf.info, 
-	Lael Santos <lael.santos@expertisesolutions.com.br>, lwn@lwn.net, 
-	Linux Kernel Network Developers <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Thanks to Lael's extra hard work we now have all the videos for the
-0x18 conference ready for your viewing pleasure!
-This concludes the collection of all the materials for 0x18.
+On Tue, 24 Sep 2024 15:35:03 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Tue, Sep 24, 2024 at 9:32=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > Because the af-xdp will introduce a new xmit type, so I refactor the
+> > xmit type mechanism first.
+> >
+> > In general, pointers are aligned to 4 or 8 bytes.
+>
+> I think this needs some clarification, the alignment seems to depend
+> on the lowest common multiple between the alignments of all struct
+> members. So we know both xdp_frame and sk_buff are at least 4 bytes
+> aligned.
+>
+> If we want to reuse the lowest bit of pointers in AF_XDP, the
+> alignment of the data structure should be at least 4 bytes.
 
-If you are just interested in the videos, go to:
-https://www.youtube.com/@netdevconf/playlists
-Else, just go to the sessions page and pick what you want - advantage
-being you get to see slides/papers as well:
-https://netdevconf.info/0x18/pages/sessions.html
+YES, for AF_XDP. See more in #10.
 
-Enjoy!
 
-cheers,
-jamal
+>
+> > If it is aligned to 4
+> > bytes, then only two bits are free for a pointer. But there are 4 types
+> > here, so we can't use bits to distinguish them. And 2 bits is enough for
+> > 4 types:
+> >
+> >     00 for skb
+> >     01 for SKB_ORPHAN
+> >     10 for XDP
+> >     11 for af-xdp tx
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/net/virtio_net.c | 90 +++++++++++++++++++++++-----------------
+> >  1 file changed, 51 insertions(+), 39 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 630e5b21ad69..41a5ea9b788d 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -45,9 +45,6 @@ module_param(napi_tx, bool, 0644);
+> >  #define VIRTIO_XDP_TX          BIT(0)
+> >  #define VIRTIO_XDP_REDIR       BIT(1)
+> >
+> > -#define VIRTIO_XDP_FLAG                BIT(0)
+> > -#define VIRTIO_ORPHAN_FLAG     BIT(1)
+> > -
+> >  /* RX packet size EWMA. The average packet size is used to determine t=
+he packet
+> >   * buffer size when refilling RX rings. As the entire RX ring may be r=
+efilled
+> >   * at once, the weight is chosen so that the EWMA will be insensitive =
+to short-
+> > @@ -512,34 +509,35 @@ static struct sk_buff *virtnet_skb_append_frag(st=
+ruct sk_buff *head_skb,
+> >                                                struct page *page, void =
+*buf,
+> >                                                int len, int truesize);
+> >
+> > -static bool is_xdp_frame(void *ptr)
+> > -{
+> > -       return (unsigned long)ptr & VIRTIO_XDP_FLAG;
+> > -}
+> > +enum virtnet_xmit_type {
+> > +       VIRTNET_XMIT_TYPE_SKB,
+> > +       VIRTNET_XMIT_TYPE_SKB_ORPHAN,
+> > +       VIRTNET_XMIT_TYPE_XDP,
+> > +};
+> >
+> > -static void *xdp_to_ptr(struct xdp_frame *ptr)
+> > -{
+> > -       return (void *)((unsigned long)ptr | VIRTIO_XDP_FLAG);
+> > -}
+> > +/* We use the last two bits of the pointer to distinguish the xmit typ=
+e. */
+> > +#define VIRTNET_XMIT_TYPE_MASK (BIT(0) | BIT(1))
+> >
+> > -static struct xdp_frame *ptr_to_xdp(void *ptr)
+> > +static enum virtnet_xmit_type virtnet_xmit_ptr_strip(void **ptr)
+>
+> Nit: not a native speaker but I think something like pack/unpack might
+> be better.
+
+
+Will fix.
+
+Thanks
+
+>
+> With those changes.
+>
+> Acked-by: Jason Wang <jasowang@redhat.com>
+>
+> Thanks
+>
 
