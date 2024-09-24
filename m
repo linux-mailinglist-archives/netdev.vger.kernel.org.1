@@ -1,158 +1,152 @@
-Return-Path: <netdev+bounces-129585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40BCB984A39
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 19:18:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C67DF984AA4
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 20:05:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED16A1F23FE0
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 17:18:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B20CB24553
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 18:05:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0437E1AB511;
-	Tue, 24 Sep 2024 17:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E181AD412;
+	Tue, 24 Sep 2024 18:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JsyBbn2U"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="Epzz2bKJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from nbd.name (nbd.name [46.4.11.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF7C11CA0
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 17:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92B81AD3E1;
+	Tue, 24 Sep 2024 18:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727198333; cv=none; b=qe+8Wempj325cRWRYiqC+mIh49ep9Ush6LmybOOj/c1RmolsnTaPP7Hh5FgCV0iKiluilRi8BVeqC5lgZaBQKYZsL+3v83mLXgKWuzhlHs5k2IQ+Hgejq6HDyl+iFXleTUENSdIsy3/HUSSQkCqOIZPU3Zkahzkq/9pLySVttoA=
+	t=1727201051; cv=none; b=dj1aJTK/T2rWo/BmjYwqO6GMDv5MxvjQvBXQjr5a8YrnKZL3/o2DT9H5uhAa1O/Ti6BqeOwlKBxA9F2NGuTND0LMFN4EPPLhwTLI/4SLlTkn23vFfI7yEz7DMcA7tqXYYR58HBwZp7VOeUBHdsrM+o2WWLGfI1YRghwV2E7hqgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727198333; c=relaxed/simple;
-	bh=5SfRPYcbs3erJfqYysBZeHkOYT59U/3nOrf3HK9cIeQ=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=V6lyRETZa8fLeWmcr+0Dj+0Eo6YOKE1Cym1EeL+0w3sRJEoRS/TPhOOd+/MCfCmsv/MxljGghHwUEtRDAtc2EJZTJAEwDMN/4BhiLVY1lQzcrNg31LB+3zIXY6GAwyJwgRrcV03dZcVJBkeQPVO9ehEjB6q1Xc+NcJbIINvWV0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JsyBbn2U; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-5356ab89665so6899933e87.1
-        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 10:18:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727198330; x=1727803130; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=w/b9eHZlMlOiHVd8qpnfg+g8POQJ+Z67yQz7kiwdlhs=;
-        b=JsyBbn2UMrAfHwN7k2+ozaOjcmJnq5qYmqWGIW0cgKi0onyDtdDjmAOiq8pBGktsLl
-         fMgZStu8A5z90/5++SWTC8PspGNIiauvVgQd4j85xX6doZen2AiGvflTmeQqfLQorwkH
-         e28J4DEjWid1LuihbOHz0SirXBpJ5JL/2/krXn/DqJcqjkHZnYVd8t9dutTGw1NFF9nw
-         y9Doa1DfWTOO03O2gd5S9tjkLHI5FaViH+Hgfh5C/0ciu5JaO8fdlY6vQaG2NdqPvwnk
-         yqT3i3bUA1jiP1Agq4zm2jb1t1YXoN3cvHC9avuWydt7tm2rv4tWEZT5VEFi3tq6g6MB
-         +VaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727198330; x=1727803130;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=w/b9eHZlMlOiHVd8qpnfg+g8POQJ+Z67yQz7kiwdlhs=;
-        b=aCOwp97qpBJU2kineByhghfxK6P3DwCa+rWUWet9LnRU0PPJNFUuXrXUy38FfY3Ias
-         VwNe6DsZaLVFrHI+tncLRdw0rfj09M7R8gaSPg1ArwtF7IHypEwmNkI6ZaKGH6Qq6G+m
-         nRRQaFT7sFexep56/vkH59Ojz34nQoM+a6TNN7ulhrbJ0E2/RupypG657GN2ITRAp9Nr
-         8Coum3gyfYLC9lcpxmfv6aodsaZ3lJVERqOz8M85sHINEQligPguWRF1vtCPWyFGFiz7
-         7fZIMbJlLcF/PhNLQNMqLN35kB+fplRtdxx+xIabBKT4osaKeUqFoWQ3+NpCpqun5Sgj
-         t7/g==
-X-Forwarded-Encrypted: i=1; AJvYcCWYQK81/RMjV/6F8dK3rrQaGtYT4mU4ywDXZW7tr5i45M5Ks2x9US2x8lQdIF63txJJ9840lHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQ6q35SNzL23OXADguyc9G0AE+pmxlgRgNGnVP26KUHpiiOxnt
-	ey2o4kxXD7ReEr70uLIf9kNVnEapeJWzyyOCoCSwdULeNyZf0pA6orPwrQ==
-X-Google-Smtp-Source: AGHT+IFWQX22UsqtIW6BJ5djbL41DZEkNYZkOXsoBnvs1c76j7OsMr4Vyn3IYClto8mjjVOKkJzNmg==
-X-Received: by 2002:a05:6512:3a84:b0:536:550e:7804 with SMTP id 2adb3069b0e04-536ad161b01mr7512085e87.18.1727198329959;
-        Tue, 24 Sep 2024 10:18:49 -0700 (PDT)
-Received: from [127.0.0.1] ([193.252.226.10])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93930caf2fsm107107266b.116.2024.09.24.10.18.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Sep 2024 10:18:49 -0700 (PDT)
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-Message-ID: <290f16f7-8f31-46c9-907d-ce298a9b8630@orange.com>
-Date: Tue, 24 Sep 2024 19:18:48 +0200
+	s=arc-20240116; t=1727201051; c=relaxed/simple;
+	bh=Tz+z0RN4yoLTsuKVlKhsT40Bqa0WNU0TUwEaefUxnVg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UBTgP1MDJZX5Q10i7IBD67zdW2/sH2tr39t5gYcbVl5ouMXMPnc+6KzySWVbhbzb2rrk9tVP9daVR9OJj5GTJB1NBQq3yRxMWSHbZ2MY559/FsbLJ7WlEd6CXZQLXaa7+M4aIHF6rC5C43Qz40LPKwESo7+flbVGHX0T3Ehj9SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=Epzz2bKJ; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=uqSxozaaX0MbZR9PhUHEUeHeH8rVYjYdcmkgtgwPdWs=; b=Epzz2bKJnEnZPy4eOhqBQoiRz1
+	N1pczWQQtfyk5UpYxYavqt4inI5OTPmB/piwCUbWdL5p8eBZP3EXwMogOXu+HwUA7d4L3mNjmM5+4
+	461UpxsMG5OCLoBQElyI6/ONf4rhpmLMq8GTnLOccrVY8zf3K9h4wcXxkOY5Ii9Xr5EA=;
+Received: from p4ff130c8.dip0.t-ipconnect.de ([79.241.48.200] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1st9dM-000ROG-11;
+	Tue, 24 Sep 2024 19:47:32 +0200
+Message-ID: <da09e77a-a293-41b0-a46f-861dd5775ba2@nbd.name>
+Date: Tue, 24 Sep 2024 19:47:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Betterbird (Linux)
-Subject: Re: Massive hash collisions on FIB
-To: Eric Dumazet <edumazet@google.com>,
- Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-Cc: Simon Horman <horms@kernel.org>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
-References: <CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
- <db6ecdc4-8053-42d6-89cc-39c70b199bde@intel.com>
- <20240916140130.GB415778@kernel.org>
- <e74ac4d7-44df-43f0-8b5d-46ef6697604f@orange.com>
- <CANn89i+kDvzWarnA4JJr2Cna2rCXrCFJjpmd7CNeVEj5tmtWMw@mail.gmail.com>
- <c739f928-86a2-46f8-b92e-86366758bb82@orange.com>
- <CANn89i+nMyTsY8+KcoYXZPor8Y3r+rbt5LvZe1sC3yZq1wqGeQ@mail.gmail.com>
-Content-Language: fr, en-US
-Organization: Orange
-In-Reply-To: <CANn89i+nMyTsY8+KcoYXZPor8Y3r+rbt5LvZe1sC3yZq1wqGeQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] gso: fix gso fraglist segmentation after pull from
+ frag_list
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, stable@vger.kernel.org, maze@google.com,
+ shiming.cheng@mediatek.com, daniel@iogearbox.net, lena.wang@mediatek.com,
+ herbert@gondor.apana.org.au, Willem de Bruijn <willemb@google.com>
+References: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
+From: Felix Fietkau <nbd@nbd.name>
+Content-Language: en-US
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 24/09/2024 16:36, Eric Dumazet wrote:
+On 22.09.24 17:03, Willem de Bruijn wrote:
+> From: Willem de Bruijn <willemb@google.com>
 > 
->> [...] the single FIB
->> hashtable, shared by all netns, lends itself to massive collision if many netns
->> contain the same local address.
+> Detect gso fraglist skbs with corrupted geometry (see below) and
+> pass these to skb_segment instead of skb_segment_list, as the first
+> can segment them correctly.
 > 
-> Shocking
->>
->> To solve this, I'd naively inject a few bits of entropy from the netns itself
->> (inode number, middle bits of (struct net *) address, etc.), by XORing them to
->> the hash value. Unless I'm mistaken, the netns is always unambiguous when a FIB
->> decision is made, be it for a packet or for some interface configuration task.
->>
->> Would that be acceptable ?
+> Valid SKB_GSO_FRAGLIST skbs
+> - consist of two or more segments
+> - the head_skb holds the protocol headers plus first gso_size
+> - one or more frag_list skbs hold exactly one segment
+> - all but the last must be gso_size
 > 
-> Sure, but please use the standard way : net_hash_mix(net)
+> Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
+> modify these skbs, breaking these invariants.
+> 
+> In extreme cases they pull all data into skb linear. For UDP, this
+> causes a NULL ptr deref in __udpv4_gso_segment_list_csum at
+> udp_hdr(seg->next)->dest.
+> 
+> Detect invalid geometry due to pull, by checking head_skb size.
+> Don't just drop, as this may blackhole a destination. Convert to be
+> able to pass to regular skb_segment.
+> 
+> Link: https://lore.kernel.org/netdev/20240428142913.18666-1-shiming.cheng@mediatek.com/
+> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+> Signed-off-by: Willem de Bruijn <willemb@google.com>
+> Cc: stable@vger.kernel.org
+> 
+> ---
+> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+> index d842303587af..e457fa9143a6 100644
+> --- a/net/ipv4/udp_offload.c
+> +++ b/net/ipv4/udp_offload.c
+> @@ -296,8 +296,16 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+>   		return NULL;
+>   	}
+>   
+> -	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
+> -		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+> +	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
+> +		 /* Detect modified geometry and pass these to skb_segment. */
+> +		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
+> +			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+> +
+> +		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
+> +		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
+> +		gso_skb->csum_offset = offsetof(struct udphdr, check);
+> +		gso_skb->ip_summed = CHECKSUM_PARTIAL;
+> +	}
 
-I see you did the work for the two other hashes (laddr and devindex).
-I tried to inject the dispersion the same way as you did, just before the final
-scrambling. Is this what you'd do ?
+It seems to me that the TCP code would need something similar. Do you 
+think the same approach would work there as well?
 
+Thanks,
 
-diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-index f669da98d11d..49fea7cf0860 100644
---- a/net/ipv4/fib_semantics.c
-+++ b/net/ipv4/fib_semantics.c
-@@ -347,10 +347,12 @@ static unsigned int fib_info_hashfn_1(int init_val, u8
-protocol, u8 scope,
-        return val;
- }
-
--static unsigned int fib_info_hashfn_result(unsigned int val)
-+static unsigned int fib_info_hashfn_result(struct net *net, unsigned int val)
- {
-        unsigned int mask = (fib_info_hash_size - 1);
-
-+       val ^= net_hash_mix(net);
-+
-        return (val ^ (val >> 7) ^ (val >> 12)) & mask;
- }
-
-@@ -370,7 +372,7 @@ static inline unsigned int fib_info_hashfn(struct fib_info *fi)
-                } endfor_nexthops(fi)
-        }
-
--       return fib_info_hashfn_result(val);
-+       return fib_info_hashfn_result(fi->fib_net, val);
- }
-
- /* no metrics, only nexthop id */
-@@ -385,7 +387,7 @@ static struct fib_info *fib_find_info_nh(struct net *net,
-                                 cfg->fc_protocol, cfg->fc_scope,
-                                 (__force u32)cfg->fc_prefsrc,
-                                 cfg->fc_priority);
--       hash = fib_info_hashfn_result(hash);
-+       hash = fib_info_hashfn_result(net, hash);
-        head = &fib_info_hash[hash];
-
-        hlist_for_each_entry(fi, head, fib_hash) {
+- Felix
 
