@@ -1,331 +1,94 @@
-Return-Path: <netdev+bounces-129428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9249F983D0B
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 08:21:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF649983CEF
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 08:18:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B486B1C21A82
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 06:21:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88FB01F23A7D
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 06:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D066374418;
-	Tue, 24 Sep 2024 06:21:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="cNu3hMTT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EDA42EAE6;
+	Tue, 24 Sep 2024 06:18:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0725A79B
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 06:21:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B3C81741
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 06:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727158883; cv=none; b=LYvkM3mQiJFIdhqbI/uQPIPPuY08JQQKq5AIGb8V8aZyHdWRcTCuceKZA4Ih8guYmbuOeYQ0yHp2NNJXylF6n1uxis4kF72DLjEOEU5OuiC2+M+/BfGFOvj/5dsk025/yG0Ep5xRJZQGPxe4AdYJe7yf375ZAS5B31BJbiIGE1k=
+	t=1727158691; cv=none; b=iDu++t0+tezQ7CaU6N9hi/oyeeDR5pBLY7HjDJSYqUc2VdSzN/+736jQUTCZg+srWXCNLN2WQCJ1xbtVIK1i7Y4UzAJSBYbhfQ823cuO4bVxYSjza7sIfZ/zZ6oa3M+iqbfwSMKjMpB83MPLKWza8dF0Y0b5WxPkJTD5Nco6H0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727158883; c=relaxed/simple;
-	bh=wRwKON423yZqXPqJ5rTGOSCIBIr9IskAzhplTcV4fdQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VN5CIwS+3clyxQ/NmRZYneFnHkHuaO531Ya91vCQiOtdcmGC+YSsH1agMA1LzlmEUi37Iv9v+CFLT0vXXmF1paZGH5t8/+EbmiJX8DdbO+N9uR9nl5/kK9sv6gr4nUDS59kcTVUvYdXGqz0n9RkwCO/jNtpKUTDQM8kXBrD5588=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=cNu3hMTT; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42cd46f3a26so44216915e9.2
-        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 23:21:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727158878; x=1727763678; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gk89L1Uzp22QgNm9C+CJpSMQA20Mf2rtUhzwasdOsN0=;
-        b=cNu3hMTTy3ECwrP4mAFN7jhkQfgMRHCeM13EZB1Py4LmRE65E0yl9puZZjqtWL0HXA
-         ofwDo81LcVp7xKTzi4XYc+v9QdwaKiribtwKGnafOi6dmUayr+ZVMZjaoNYdHtBwE5Sz
-         udXQmy1Z8auwSCnTayVP4UVp5J6sGEi4knd8Y8NXufM/OGVL5pcB8I0CwVefwRkdCsEO
-         5zab2QZ9+ENiqAGEJsVOb+A4p1cVbOvI6uG5KVY3KsHnDYvxp/iJbLJ4j1r65o6DlU/l
-         o3NJo9Z+N/xS43WfCXuez99RWwcdvXsh0LH6ILIqj+5rc5fsR6yKJk8/iiHuZd5y+Asg
-         9uew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727158878; x=1727763678;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gk89L1Uzp22QgNm9C+CJpSMQA20Mf2rtUhzwasdOsN0=;
-        b=cBBun9df7VtSuK4+D1zh/oZtpreEQmxE0a1v4T5QTKLWc6THDf5LRBfAro4Lzl1PIr
-         K6SXcTvDzFTzMAEmp9m7q4o7oLcH752jY1+oWB88ZnQA7Iwd4mzpZr7ioTuIh/mPveSe
-         UY0pf42542HIVgKLaPn31CxsmTalkASx1m7F/Vq1le2hetGAkQrJY3ELI7fcxhhzM/iC
-         NjkL0N/NKKOgReXm8EvGUqMJ8kgY1+cR2THCN6+Gjd989dyJfqGA50+JzcLJeqd/qE5J
-         lYzNvRnCT/1iKW531Q/6aqjDxIQiRujVtp324SyGGaNos/xSAG18SSKnR5FDmNxZ0+QB
-         4B8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW6IKscAe9T0SD62cjHk7uz0pMFi0MSEfhWcGXHve2pMfSXzHxhgtI62C6SEPuKesYWfrVtzEI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4V4f1DmdC+pnuxn1OLA2opmeGlXK40MXIyXWAO3o8hbtF4FWm
-	WEpZigIdCb0Yb/O7Dusa3CiAbCtrqWYLqKEpFURvT9rOH0b49vaYIr5brq6JGPQ=
-X-Google-Smtp-Source: AGHT+IG84zxrtOVvKIUK7BWEiXaQEvq8dlgEmna+eHGCrpp8ivpSmnjxzyrcAtUQEjeDH4s/KoXwXA==
-X-Received: by 2002:a05:600c:3553:b0:426:689b:65b7 with SMTP id 5b1f17b1804b1-42e7ad92431mr111899425e9.25.1727158878387;
-        Mon, 23 Sep 2024 23:21:18 -0700 (PDT)
-Received: from blmsp.fritz.box ([2001:4091:a245:8155:f78b:11e0:5100:a478])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e754a6379sm147037375e9.35.2024.09.23.23.21.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2024 23:21:17 -0700 (PDT)
-From: Markus Schneider-Pargmann <msp@baylibre.com>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	s=arc-20240116; t=1727158691; c=relaxed/simple;
+	bh=BYZ01WAhfG8PTdgaq/+vHJ+RA/m6/q8HB6ZoPYc7sh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bcplKhaUpyC1/Nvvof+rN87y8Y/nfeoeT/oauwOTXo+331Lggr2dwi0ibspj8GAoE1TlanSs//UscGntF51M7q0IVOzXf/aHHj/UlYQtldyEyeWel3rDCuHPnhKv1q6i8Pb6HHtfxkerTjl84ILZltPwGRDTHz3AZALl9ShQAaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ssys3-0006SU-OQ; Tue, 24 Sep 2024 08:17:59 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ssys1-001892-NB; Tue, 24 Sep 2024 08:17:57 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ssys1-009LjW-21;
+	Tue, 24 Sep 2024 08:17:57 +0200
+Date: Tue, 24 Sep 2024 08:17:57 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	thomas.petazzoni@bootlin.com,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>,
-	"Felipe Balbi (Intel)" <balbi@kernel.org>,
-	Raymond Tan <raymond.tan@intel.com>,
-	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux@ew.tq-group.com,
-	Markus Schneider-Pargmann <msp@baylibre.com>
-Subject: [PATCH DO_NOT_APPLY] net: can: m_can: Support tcan level with edge interrupts
-Date: Tue, 24 Sep 2024 08:16:22 +0200
-Message-ID: <20240924062100.2545714-1-msp@baylibre.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240923-tricky-bird-of-symmetry-68519b-mkl@pengutronix.de>
-References: <20240923-tricky-bird-of-symmetry-68519b-mkl@pengutronix.de>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: pse-pd: tps23881: Fix boolean evaluation for
+ bitmask checks
+Message-ID: <ZvJZlbeMM0TM3f9f@pengutronix.de>
+References: <20240923153427.2135263-1-kory.maincent@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240923153427.2135263-1-kory.maincent@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-The tcan chip has a low level interrupt line that needs to be used.
-There are some SoCs and components that do only support edge interrupts
-on GPIOs. In the exact example someone wired the tcan chip to a am62
-GPIO.
+On Mon, Sep 23, 2024 at 05:34:26PM +0200, Kory Maincent wrote:
+> Fixed potential incorrect boolean evaluation when checking bitmask values.
+> The existing code assigned the result of bitwise operations directly to
+> boolean variables, which could lead to unexpected values.
+> This has been corrected by explicitly converting the results to booleans
+> using the !! operator.
+> 
+> Fixes: 20e6d190ffe1 ("net: pse-pd: Add TI TPS23881 PSE controller driver")
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+ 
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-This patch creates a workaround for these situations, enabling the use
-of tcan with a falling edge interrupt. Note that this is not the
-preferred way to wire a tcan chip to the SoC.
-
-I am detecting the situation by reading the IRQ type. If it is a level
-interrupt everything stays the same. Otherwise these were my
-considerations and solutions:
-
-With falling edge interrupts we have following issues:
-- While handling a IRQF_ONESHOT interrupt the interrupt may be masked as
-  long as the interrupt is handled. So if a new interrupt hits during
-  the handling of the interrupt may be lost as it is masked. With level
-  interrupts that is not a problem because the interrupt line is still
-  active/low after the handler is unmasked so it will jump back into
-  handling interrupts afterwards. With edge interrupts we will just
-  loose the interrupt at this point as we do not see the edge while the
-  interrupt is masked. Solution here is to remove the IRQF_ONESHOT flag
-  in case edge interrupts are used.
-- Reading and clearing the interrupt register is not atomic. So the
-  interrupts we clear from the interrupt register may not result in a
-  completely cleared interrupt register and leave some unhandled
-  interrupt. Again this is fine for level based interrupts as they will
-  be causing a new call of the interrupt handler. With edge interrupts
-  we will be missing this interrupt. So we need to make sure that the
-  clearing of the interrupt register actually cleared it and the
-  interrupt line could have gone back to inactive/high. To do that the
-  interrupt register is read/cleared/handled repeatedly until it is 0.
-
-Updating the interrupts for coalescing is only done once at the end with
-all interrupts that were handled and not for every loop. We don't want
-to change interrupts multiple times here.
-
-Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
----
-
-This is the draft that I had for edge interrupts. For am62 I will create
-a followup patch that covers minor things like IRQF_ONESHOT removal etc.
-
-Best
-Markus
-
- drivers/net/can/m_can/m_can.c | 114 +++++++++++++++++++++-------------
- drivers/net/can/m_can/m_can.h |   1 +
- 2 files changed, 73 insertions(+), 42 deletions(-)
-
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 663eb4247029..4b969f29ba55 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -1208,6 +1208,7 @@ static void m_can_coalescing_update(struct m_can_classdev *cdev, u32 ir)
- static int m_can_interrupt_handler(struct m_can_classdev *cdev)
- {
- 	struct net_device *dev = cdev->net;
-+	u32 all_interrupts = 0;
- 	u32 ir;
- 	int ret;
- 
-@@ -1215,56 +1216,75 @@ static int m_can_interrupt_handler(struct m_can_classdev *cdev)
- 		return IRQ_NONE;
- 
- 	ir = m_can_read(cdev, M_CAN_IR);
--	m_can_coalescing_update(cdev, ir);
--	if (!ir)
-+	all_interrupts |= ir;
-+	if (!ir) {
-+		m_can_coalescing_update(cdev, 0);
- 		return IRQ_NONE;
--
--	/* ACK all irqs */
--	m_can_write(cdev, M_CAN_IR, ir);
--
--	if (cdev->ops->clear_interrupts)
--		cdev->ops->clear_interrupts(cdev);
--
--	/* schedule NAPI in case of
--	 * - rx IRQ
--	 * - state change IRQ
--	 * - bus error IRQ and bus error reporting
--	 */
--	if (ir & (IR_RF0N | IR_RF0W | IR_ERR_ALL_30X)) {
--		cdev->irqstatus = ir;
--		if (!cdev->is_peripheral) {
--			m_can_disable_all_interrupts(cdev);
--			napi_schedule(&cdev->napi);
--		} else {
--			ret = m_can_rx_handler(dev, NAPI_POLL_WEIGHT, ir);
--			if (ret < 0)
--				return ret;
--		}
- 	}
- 
--	if (cdev->version == 30) {
--		if (ir & IR_TC) {
--			/* Transmission Complete Interrupt*/
--			u32 timestamp = 0;
--			unsigned int frame_len;
-+	do {
-+		/* ACK all irqs */
-+		m_can_write(cdev, M_CAN_IR, ir);
- 
--			if (cdev->is_peripheral)
--				timestamp = m_can_get_timestamp(cdev);
--			frame_len = m_can_tx_update_stats(cdev, 0, timestamp);
--			m_can_finish_tx(cdev, 1, frame_len);
-+		if (cdev->ops->clear_interrupts)
-+			cdev->ops->clear_interrupts(cdev);
-+
-+		/* schedule NAPI in case of
-+		 * - rx IRQ
-+		 * - state change IRQ
-+		 * - bus error IRQ and bus error reporting
-+		 */
-+		if (ir & (IR_RF0N | IR_RF0W | IR_ERR_ALL_30X)) {
-+			cdev->irqstatus = ir;
-+			if (!cdev->is_peripheral) {
-+				m_can_disable_all_interrupts(cdev);
-+				napi_schedule(&cdev->napi);
-+			} else {
-+				ret = m_can_rx_handler(dev, NAPI_POLL_WEIGHT, ir);
-+				if (ret < 0)
-+					return ret;
-+			}
- 		}
--	} else  {
--		if (ir & (IR_TEFN | IR_TEFW)) {
--			/* New TX FIFO Element arrived */
--			ret = m_can_echo_tx_event(dev);
--			if (ret != 0)
--				return ret;
-+
-+		if (cdev->version == 30) {
-+			if (ir & IR_TC) {
-+				/* Transmission Complete Interrupt*/
-+				u32 timestamp = 0;
-+				unsigned int frame_len;
-+
-+				if (cdev->is_peripheral)
-+					timestamp = m_can_get_timestamp(cdev);
-+				frame_len = m_can_tx_update_stats(cdev, 0, timestamp);
-+				m_can_finish_tx(cdev, 1, frame_len);
-+			}
-+		} else  {
-+			if (ir & (IR_TEFN | IR_TEFW)) {
-+				/* New TX FIFO Element arrived */
-+				ret = m_can_echo_tx_event(dev);
-+				if (ret != 0)
-+					return ret;
-+			}
- 		}
--	}
-+		if (!cdev->irq_type_edge)
-+			break;
-+
-+
-+		/* For edge interrupts we need to read the IR register again to
-+		 * check that everything is cleared. If it is not, we can not
-+		 * make sure the interrupt line is inactive again which is
-+		 * required at this point to not miss any new interrupts. So in
-+		 * case there are interrupts signaled in IR we repeat the
-+		 * interrupt handling.
-+		 */
-+		ir = m_can_read(cdev, M_CAN_IR);
-+		all_interrupts |= ir;
-+	} while (ir);
- 
- 	if (cdev->is_peripheral)
- 		can_rx_offload_threaded_irq_finish(&cdev->offload);
- 
-+	m_can_coalescing_update(cdev, all_interrupts);
-+
- 	return IRQ_HANDLED;
- }
- 
-@@ -2009,6 +2029,11 @@ static enum hrtimer_restart hrtimer_callback(struct hrtimer *timer)
- 	return HRTIMER_RESTART;
- }
- 
-+static irqreturn_t m_can_hardirq(int irq, void *dev_id)
-+{
-+	return IRQ_WAKE_THREAD;
-+}
-+
- static int m_can_open(struct net_device *dev)
- {
- 	struct m_can_classdev *cdev = netdev_priv(dev);
-@@ -2034,6 +2059,9 @@ static int m_can_open(struct net_device *dev)
- 
- 	/* register interrupt handler */
- 	if (cdev->is_peripheral) {
-+		cdev->irq_type_edge = !(irq_get_trigger_type(dev->irq) &
-+					IRQ_TYPE_LEVEL_MASK);
-+
- 		cdev->tx_wq = alloc_ordered_workqueue("mcan_wq",
- 						      WQ_FREEZABLE | WQ_MEM_RECLAIM);
- 		if (!cdev->tx_wq) {
-@@ -2046,9 +2074,11 @@ static int m_can_open(struct net_device *dev)
- 			INIT_WORK(&cdev->tx_ops[i].work, m_can_tx_work_queue);
- 		}
- 
--		err = request_threaded_irq(dev->irq, NULL, m_can_isr,
--					   IRQF_ONESHOT,
-+		err = request_threaded_irq(dev->irq, m_can_hardirq, m_can_isr,
-+					   (cdev->irq_type_edge ? 0 : IRQF_ONESHOT),
- 					   dev->name, dev);
-+		if (cdev->irq_type_edge)
-+			netdev_info(dev, "Operating a level interrupt chip with an edge interrupt.\n");
- 	} else if (dev->irq) {
- 		err = request_irq(dev->irq, m_can_isr, IRQF_SHARED, dev->name,
- 				  dev);
-diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
-index 3a9edc292593..17de56056352 100644
---- a/drivers/net/can/m_can/m_can.h
-+++ b/drivers/net/can/m_can/m_can.h
-@@ -99,6 +99,7 @@ struct m_can_classdev {
- 	int pm_clock_support;
- 	int pm_wake_source;
- 	int is_peripheral;
-+	bool irq_type_edge;
- 
- 	// Cached M_CAN_IE register content
- 	u32 active_interrupts;
+Thank you!
 -- 
-2.45.2
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
