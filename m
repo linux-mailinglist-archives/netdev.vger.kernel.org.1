@@ -1,221 +1,331 @@
-Return-Path: <netdev+bounces-129426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 562A8983CA9
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 08:08:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9249F983D0B
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 08:21:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4530C1C2201E
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 06:08:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B486B1C21A82
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 06:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEB4A4779F;
-	Tue, 24 Sep 2024 06:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D066374418;
+	Tue, 24 Sep 2024 06:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="xWqndHAx"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="cNu3hMTT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC584537F8
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 06:08:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0725A79B
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 06:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727158094; cv=none; b=nuZIRJINenXy0dA55lpVY2vBQxiTZv4Bo2WP+S0eWniEtv9k3R2GhfMG9VeorJV8wVwm4IHflgotg2LHKTuvzR1jWkd2cqqRyuJAIr48Iv5ZH6kUZzytSD+SG/L0mzeGW9t1HY/AuNRy2LBZbpxTtmGkwed0VFdp5VezuWmhiak=
+	t=1727158883; cv=none; b=LYvkM3mQiJFIdhqbI/uQPIPPuY08JQQKq5AIGb8V8aZyHdWRcTCuceKZA4Ih8guYmbuOeYQ0yHp2NNJXylF6n1uxis4kF72DLjEOEU5OuiC2+M+/BfGFOvj/5dsk025/yG0Ep5xRJZQGPxe4AdYJe7yf375ZAS5B31BJbiIGE1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727158094; c=relaxed/simple;
-	bh=gDW51VJPoXNQgg+K5Mw5ZlfbpYrIZ9JbXKBia32d0+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cBwt4ap9BI1zbEGTXKuk4RzT5sIE82ID2PRU4vySzlx2s0xGxvAei2H1TwisLAfJ1Hh6qxKyv2FLIE4Fg/NmhKZrri9tCAicmIEaPT/S0D1RK+zZDNxZKc4zht7U5m5w6/6ze7r2QkKYl++6Dc0V1ol4NY2IGpAKsYG8QJ6EUh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=xWqndHAx; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1727158883; c=relaxed/simple;
+	bh=wRwKON423yZqXPqJ5rTGOSCIBIr9IskAzhplTcV4fdQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VN5CIwS+3clyxQ/NmRZYneFnHkHuaO531Ya91vCQiOtdcmGC+YSsH1agMA1LzlmEUi37Iv9v+CFLT0vXXmF1paZGH5t8/+EbmiJX8DdbO+N9uR9nl5/kK9sv6gr4nUDS59kcTVUvYdXGqz0n9RkwCO/jNtpKUTDQM8kXBrD5588=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=cNu3hMTT; arc=none smtp.client-ip=209.85.128.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-42cae102702so41235285e9.0
-        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 23:08:11 -0700 (PDT)
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-42cd46f3a26so44216915e9.2
+        for <netdev@vger.kernel.org>; Mon, 23 Sep 2024 23:21:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727158090; x=1727762890; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=VzFo2I1E2rP8+5n9kj14nz0J+HvkgPte4rz85u/uQJE=;
-        b=xWqndHAx8cFJs29wfaen/8ExQ9+b5ESrh4k2mn9n8/mj7SgsmO2wO9YqysmWNVK4b1
-         g1kJbvfMHFvEFwn3dCzQQH2xIkR0oAZ6M0hCqFdR3ZqmoKCV6T5L9J630yp1nJYEjBG7
-         O9y/GZoZ9kAoxtX/ZsTW7Shv5ogOVLSHVJkPV6TXlTSp0LWlh0UBHyn8jXMEhaLf89R+
-         jAwsMGEEQIsyJFs/fLMY6P4UN0nzsMT/Kg5yaA1Y0GQuPfp8K4CdsHONhqeXz2ommxAR
-         CJKI+i6fYMrW9wmAPC/tFzBhQJLNxpPdb70SeONVMO7x3P/QTQjsAWcxwQOQYcLAfdyr
-         2eGA==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727158878; x=1727763678; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gk89L1Uzp22QgNm9C+CJpSMQA20Mf2rtUhzwasdOsN0=;
+        b=cNu3hMTTy3ECwrP4mAFN7jhkQfgMRHCeM13EZB1Py4LmRE65E0yl9puZZjqtWL0HXA
+         ofwDo81LcVp7xKTzi4XYc+v9QdwaKiribtwKGnafOi6dmUayr+ZVMZjaoNYdHtBwE5Sz
+         udXQmy1Z8auwSCnTayVP4UVp5J6sGEi4knd8Y8NXufM/OGVL5pcB8I0CwVefwRkdCsEO
+         5zab2QZ9+ENiqAGEJsVOb+A4p1cVbOvI6uG5KVY3KsHnDYvxp/iJbLJ4j1r65o6DlU/l
+         o3NJo9Z+N/xS43WfCXuez99RWwcdvXsh0LH6ILIqj+5rc5fsR6yKJk8/iiHuZd5y+Asg
+         9uew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727158090; x=1727762890;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VzFo2I1E2rP8+5n9kj14nz0J+HvkgPte4rz85u/uQJE=;
-        b=HsXDUWqYW29wRMFWKeMh6U2i/VcIXzVmaKbOg4/734OnwnWsyTlLChXdxd4fTRxR8F
-         TG9lknjafY94jB2encJtmGEOfXp9MilBtJWvPNLICsTmx/uUrKftvgHCfC88iQmOTuE4
-         H+xV2xzXmAZOR60/8GliFQLHatY7KR4ijWWuCc93HNrEAn7Uy75SL3rvUcrWNasAnXH/
-         dCvrPg5jgkuIk64lxKyNNU00QY9BUGgU2waIyh9a8lEPXrhGZDtvvbWzd2H8z7ULmWWe
-         7o1rYCLQkk12brUi/YLANYEVe2TlER5C+JWjVGe3wZzBxN8wuuJ2LlRrXOV5PnrDgGeN
-         h+og==
-X-Forwarded-Encrypted: i=1; AJvYcCXymnRTDhkHntSbinnOLGGEONZ2hR6z8dHvbxMmZVCgoPRBeyU93b/EXCuhlD/AbQh7x/x7YzY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyrzal4KFaP0c2JJZJQXRjhqQbtgVNGBQ04OJXeMXW2JE4c4lGk
-	OUe5BxTUyeEeTeLLVZt4bpptf3ueDHGGnG4uf3Q/PKovs53359YXmfWMk7fly2c=
-X-Google-Smtp-Source: AGHT+IFIjkRUSoZ0ykhdCmCTbZ7FojC7Aoo7miCt4ja9O8VZx4rPyeNb8Il00ud5ZJI/VjGVgBeTJQ==
-X-Received: by 2002:a5d:54c3:0:b0:364:6c08:b9b2 with SMTP id ffacd0b85a97d-37a4234d339mr6917282f8f.45.1727158089812;
-        Mon, 23 Sep 2024 23:08:09 -0700 (PDT)
-Received: from blmsp ([2001:4091:a245:8155:f78b:11e0:5100:a478])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2f976esm662656f8f.69.2024.09.23.23.08.08
+        d=1e100.net; s=20230601; t=1727158878; x=1727763678;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gk89L1Uzp22QgNm9C+CJpSMQA20Mf2rtUhzwasdOsN0=;
+        b=cBBun9df7VtSuK4+D1zh/oZtpreEQmxE0a1v4T5QTKLWc6THDf5LRBfAro4Lzl1PIr
+         K6SXcTvDzFTzMAEmp9m7q4o7oLcH752jY1+oWB88ZnQA7Iwd4mzpZr7ioTuIh/mPveSe
+         UY0pf42542HIVgKLaPn31CxsmTalkASx1m7F/Vq1le2hetGAkQrJY3ELI7fcxhhzM/iC
+         NjkL0N/NKKOgReXm8EvGUqMJ8kgY1+cR2THCN6+Gjd989dyJfqGA50+JzcLJeqd/qE5J
+         lYzNvRnCT/1iKW531Q/6aqjDxIQiRujVtp324SyGGaNos/xSAG18SSKnR5FDmNxZ0+QB
+         4B8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW6IKscAe9T0SD62cjHk7uz0pMFi0MSEfhWcGXHve2pMfSXzHxhgtI62C6SEPuKesYWfrVtzEI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4V4f1DmdC+pnuxn1OLA2opmeGlXK40MXIyXWAO3o8hbtF4FWm
+	WEpZigIdCb0Yb/O7Dusa3CiAbCtrqWYLqKEpFURvT9rOH0b49vaYIr5brq6JGPQ=
+X-Google-Smtp-Source: AGHT+IG84zxrtOVvKIUK7BWEiXaQEvq8dlgEmna+eHGCrpp8ivpSmnjxzyrcAtUQEjeDH4s/KoXwXA==
+X-Received: by 2002:a05:600c:3553:b0:426:689b:65b7 with SMTP id 5b1f17b1804b1-42e7ad92431mr111899425e9.25.1727158878387;
+        Mon, 23 Sep 2024 23:21:18 -0700 (PDT)
+Received: from blmsp.fritz.box ([2001:4091:a245:8155:f78b:11e0:5100:a478])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e754a6379sm147037375e9.35.2024.09.23.23.21.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Sep 2024 23:08:09 -0700 (PDT)
-Date: Tue, 24 Sep 2024 08:08:08 +0200
+        Mon, 23 Sep 2024 23:21:17 -0700 (PDT)
 From: Markus Schneider-Pargmann <msp@baylibre.com>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
-	Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>, "Felipe Balbi (Intel)" <balbi@kernel.org>, 
-	Raymond Tan <raymond.tan@intel.com>, Jarkko Nikula <jarkko.nikula@linux.intel.com>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux@ew.tq-group.com
-Subject: Re: [PATCH v3 2/2] can: m_can: fix missed interrupts with m_can_pci
-Message-ID: <6qk7fmbbvi5m3evyriyq4txswuzckbg4lmdbdkyidiedxhzye5@av3gw7vweimu>
-References: <ed86ab0d7d2b295dc894fc3e929beb69bdc921f6.1727092909.git.matthias.schiffer@ew.tq-group.com>
- <4715d1cfed61d74d08dcc6a27085f43092da9412.1727092909.git.matthias.schiffer@ew.tq-group.com>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Martin =?utf-8?Q?Hundeb=C3=B8ll?= <martin@geanix.com>,
+	"Felipe Balbi (Intel)" <balbi@kernel.org>,
+	Raymond Tan <raymond.tan@intel.com>,
+	Jarkko Nikula <jarkko.nikula@linux.intel.com>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@ew.tq-group.com,
+	Markus Schneider-Pargmann <msp@baylibre.com>
+Subject: [PATCH DO_NOT_APPLY] net: can: m_can: Support tcan level with edge interrupts
+Date: Tue, 24 Sep 2024 08:16:22 +0200
+Message-ID: <20240924062100.2545714-1-msp@baylibre.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240923-tricky-bird-of-symmetry-68519b-mkl@pengutronix.de>
+References: <20240923-tricky-bird-of-symmetry-68519b-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <4715d1cfed61d74d08dcc6a27085f43092da9412.1727092909.git.matthias.schiffer@ew.tq-group.com>
 
-On Mon, Sep 23, 2024 at 05:32:16PM GMT, Matthias Schiffer wrote:
-> The interrupt line of PCI devices is interpreted as edge-triggered,
-> however the interrupt signal of the m_can controller integrated in Intel
-> Elkhart Lake CPUs appears to be generated level-triggered.
-> 
-> Consider the following sequence of events:
-> 
-> - IR register is read, interrupt X is set
-> - A new interrupt Y is triggered in the m_can controller
-> - IR register is written to acknowledge interrupt X. Y remains set in IR
-> 
-> As at no point in this sequence no interrupt flag is set in IR, the
-> m_can interrupt line will never become deasserted, and no edge will ever
-> be observed to trigger another run of the ISR. This was observed to
-> result in the TX queue of the EHL m_can to get stuck under high load,
-> because frames were queued to the hardware in m_can_start_xmit(), but
-> m_can_finish_tx() was never run to account for their successful
-> transmission.
-> 
-> To fix the issue, repeatedly read and acknowledge interrupts at the
-> start of the ISR until no interrupt flags are set, so the next incoming
-> interrupt will also result in an edge on the interrupt line.
-> 
-> Fixes: cab7ffc0324f ("can: m_can: add PCI glue driver for Intel Elkhart Lake")
-> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+The tcan chip has a low level interrupt line that needs to be used.
+There are some SoCs and components that do only support edge interrupts
+on GPIOs. In the exact example someone wired the tcan chip to a am62
+GPIO.
 
-Just a few comment nitpicks below. Otherwise:
+This patch creates a workaround for these situations, enabling the use
+of tcan with a falling edge interrupt. Note that this is not the
+preferred way to wire a tcan chip to the SoC.
 
-Reviewed-by: Markus Schneider-Pargmann <msp@baylibre.com>
+I am detecting the situation by reading the IRQ type. If it is a level
+interrupt everything stays the same. Otherwise these were my
+considerations and solutions:
 
-> ---
-> 
-> v2: introduce flag is_edge_triggered, so we can avoid the loop on !m_can_pci
-> v3:
-> - rename flag to irq_edge_triggered
-> - update comment to describe the issue more generically as one of systems with
->   edge-triggered interrupt line. m_can_pci is mentioned as an example, as it
->   is the only m_can variant that currently sets the irq_edge_triggered flag.
-> 
->  drivers/net/can/m_can/m_can.c     | 22 +++++++++++++++++-----
->  drivers/net/can/m_can/m_can.h     |  1 +
->  drivers/net/can/m_can/m_can_pci.c |  1 +
->  3 files changed, 19 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-> index c85ac1b15f723..24e348f677714 100644
-> --- a/drivers/net/can/m_can/m_can.c
-> +++ b/drivers/net/can/m_can/m_can.c
-> @@ -1207,20 +1207,32 @@ static void m_can_coalescing_update(struct m_can_classdev *cdev, u32 ir)
->  static int m_can_interrupt_handler(struct m_can_classdev *cdev)
->  {
->  	struct net_device *dev = cdev->net;
-> -	u32 ir;
-> +	u32 ir = 0, ir_read;
->  	int ret;
->  
->  	if (pm_runtime_suspended(cdev->dev))
->  		return IRQ_NONE;
->  
-> -	ir = m_can_read(cdev, M_CAN_IR);
-> +	/* The m_can controller signals its interrupt status as a level, but
-> +	 * depending in the integration the CPU may interpret the signal as
-                 ^ on?
+With falling edge interrupts we have following issues:
+- While handling a IRQF_ONESHOT interrupt the interrupt may be masked as
+  long as the interrupt is handled. So if a new interrupt hits during
+  the handling of the interrupt may be lost as it is masked. With level
+  interrupts that is not a problem because the interrupt line is still
+  active/low after the handler is unmasked so it will jump back into
+  handling interrupts afterwards. With edge interrupts we will just
+  loose the interrupt at this point as we do not see the edge while the
+  interrupt is masked. Solution here is to remove the IRQF_ONESHOT flag
+  in case edge interrupts are used.
+- Reading and clearing the interrupt register is not atomic. So the
+  interrupts we clear from the interrupt register may not result in a
+  completely cleared interrupt register and leave some unhandled
+  interrupt. Again this is fine for level based interrupts as they will
+  be causing a new call of the interrupt handler. With edge interrupts
+  we will be missing this interrupt. So we need to make sure that the
+  clearing of the interrupt register actually cleared it and the
+  interrupt line could have gone back to inactive/high. To do that the
+  interrupt register is read/cleared/handled repeatedly until it is 0.
 
-> +	 * edge-triggered (for example with m_can_pci).
-> +	 * We must observe that IR is 0 at least once to be sure that the next
+Updating the interrupts for coalescing is only done once at the end with
+all interrupts that were handled and not for every loop. We don't want
+to change interrupts multiple times here.
 
-As the loop has a break for non edge-triggered chips, I think you should
-include that in the comment, like 'For these edge-triggered
-integrations, we must observe...' or something similar.
+Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+---
+
+This is the draft that I had for edge interrupts. For am62 I will create
+a followup patch that covers minor things like IRQF_ONESHOT removal etc.
 
 Best
 Markus
 
-> +	 * interrupt will generate an edge.
-> +	 */
-> +	while ((ir_read = m_can_read(cdev, M_CAN_IR)) != 0) {
-> +		ir |= ir_read;
-> +
-> +		/* ACK all irqs */
-> +		m_can_write(cdev, M_CAN_IR, ir);
-> +
-> +		if (!cdev->irq_edge_triggered)
-> +			break;
-> +	}
-> +
->  	m_can_coalescing_update(cdev, ir);
->  	if (!ir)
->  		return IRQ_NONE;
->  
-> -	/* ACK all irqs */
-> -	m_can_write(cdev, M_CAN_IR, ir);
-> -
->  	if (cdev->ops->clear_interrupts)
->  		cdev->ops->clear_interrupts(cdev);
->  
-> diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
-> index 92b2bd8628e6b..ef39e8e527ab6 100644
-> --- a/drivers/net/can/m_can/m_can.h
-> +++ b/drivers/net/can/m_can/m_can.h
-> @@ -99,6 +99,7 @@ struct m_can_classdev {
->  	int pm_clock_support;
->  	int pm_wake_source;
->  	int is_peripheral;
-> +	bool irq_edge_triggered;
->  
->  	// Cached M_CAN_IE register content
->  	u32 active_interrupts;
-> diff --git a/drivers/net/can/m_can/m_can_pci.c b/drivers/net/can/m_can/m_can_pci.c
-> index d72fe771dfc7a..9ad7419f88f83 100644
-> --- a/drivers/net/can/m_can/m_can_pci.c
-> +++ b/drivers/net/can/m_can/m_can_pci.c
-> @@ -127,6 +127,7 @@ static int m_can_pci_probe(struct pci_dev *pci, const struct pci_device_id *id)
->  	mcan_class->pm_clock_support = 1;
->  	mcan_class->pm_wake_source = 0;
->  	mcan_class->can.clock.freq = id->driver_data;
-> +	mcan_class->irq_edge_triggered = true;
->  	mcan_class->ops = &m_can_pci_ops;
->  
->  	pci_set_drvdata(pci, mcan_class);
-> -- 
-> TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
-> Amtsgericht München, HRB 105018
-> Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
-> https://www.tq-group.com/
+ drivers/net/can/m_can/m_can.c | 114 +++++++++++++++++++++-------------
+ drivers/net/can/m_can/m_can.h |   1 +
+ 2 files changed, 73 insertions(+), 42 deletions(-)
+
+diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+index 663eb4247029..4b969f29ba55 100644
+--- a/drivers/net/can/m_can/m_can.c
++++ b/drivers/net/can/m_can/m_can.c
+@@ -1208,6 +1208,7 @@ static void m_can_coalescing_update(struct m_can_classdev *cdev, u32 ir)
+ static int m_can_interrupt_handler(struct m_can_classdev *cdev)
+ {
+ 	struct net_device *dev = cdev->net;
++	u32 all_interrupts = 0;
+ 	u32 ir;
+ 	int ret;
+ 
+@@ -1215,56 +1216,75 @@ static int m_can_interrupt_handler(struct m_can_classdev *cdev)
+ 		return IRQ_NONE;
+ 
+ 	ir = m_can_read(cdev, M_CAN_IR);
+-	m_can_coalescing_update(cdev, ir);
+-	if (!ir)
++	all_interrupts |= ir;
++	if (!ir) {
++		m_can_coalescing_update(cdev, 0);
+ 		return IRQ_NONE;
+-
+-	/* ACK all irqs */
+-	m_can_write(cdev, M_CAN_IR, ir);
+-
+-	if (cdev->ops->clear_interrupts)
+-		cdev->ops->clear_interrupts(cdev);
+-
+-	/* schedule NAPI in case of
+-	 * - rx IRQ
+-	 * - state change IRQ
+-	 * - bus error IRQ and bus error reporting
+-	 */
+-	if (ir & (IR_RF0N | IR_RF0W | IR_ERR_ALL_30X)) {
+-		cdev->irqstatus = ir;
+-		if (!cdev->is_peripheral) {
+-			m_can_disable_all_interrupts(cdev);
+-			napi_schedule(&cdev->napi);
+-		} else {
+-			ret = m_can_rx_handler(dev, NAPI_POLL_WEIGHT, ir);
+-			if (ret < 0)
+-				return ret;
+-		}
+ 	}
+ 
+-	if (cdev->version == 30) {
+-		if (ir & IR_TC) {
+-			/* Transmission Complete Interrupt*/
+-			u32 timestamp = 0;
+-			unsigned int frame_len;
++	do {
++		/* ACK all irqs */
++		m_can_write(cdev, M_CAN_IR, ir);
+ 
+-			if (cdev->is_peripheral)
+-				timestamp = m_can_get_timestamp(cdev);
+-			frame_len = m_can_tx_update_stats(cdev, 0, timestamp);
+-			m_can_finish_tx(cdev, 1, frame_len);
++		if (cdev->ops->clear_interrupts)
++			cdev->ops->clear_interrupts(cdev);
++
++		/* schedule NAPI in case of
++		 * - rx IRQ
++		 * - state change IRQ
++		 * - bus error IRQ and bus error reporting
++		 */
++		if (ir & (IR_RF0N | IR_RF0W | IR_ERR_ALL_30X)) {
++			cdev->irqstatus = ir;
++			if (!cdev->is_peripheral) {
++				m_can_disable_all_interrupts(cdev);
++				napi_schedule(&cdev->napi);
++			} else {
++				ret = m_can_rx_handler(dev, NAPI_POLL_WEIGHT, ir);
++				if (ret < 0)
++					return ret;
++			}
+ 		}
+-	} else  {
+-		if (ir & (IR_TEFN | IR_TEFW)) {
+-			/* New TX FIFO Element arrived */
+-			ret = m_can_echo_tx_event(dev);
+-			if (ret != 0)
+-				return ret;
++
++		if (cdev->version == 30) {
++			if (ir & IR_TC) {
++				/* Transmission Complete Interrupt*/
++				u32 timestamp = 0;
++				unsigned int frame_len;
++
++				if (cdev->is_peripheral)
++					timestamp = m_can_get_timestamp(cdev);
++				frame_len = m_can_tx_update_stats(cdev, 0, timestamp);
++				m_can_finish_tx(cdev, 1, frame_len);
++			}
++		} else  {
++			if (ir & (IR_TEFN | IR_TEFW)) {
++				/* New TX FIFO Element arrived */
++				ret = m_can_echo_tx_event(dev);
++				if (ret != 0)
++					return ret;
++			}
+ 		}
+-	}
++		if (!cdev->irq_type_edge)
++			break;
++
++
++		/* For edge interrupts we need to read the IR register again to
++		 * check that everything is cleared. If it is not, we can not
++		 * make sure the interrupt line is inactive again which is
++		 * required at this point to not miss any new interrupts. So in
++		 * case there are interrupts signaled in IR we repeat the
++		 * interrupt handling.
++		 */
++		ir = m_can_read(cdev, M_CAN_IR);
++		all_interrupts |= ir;
++	} while (ir);
+ 
+ 	if (cdev->is_peripheral)
+ 		can_rx_offload_threaded_irq_finish(&cdev->offload);
+ 
++	m_can_coalescing_update(cdev, all_interrupts);
++
+ 	return IRQ_HANDLED;
+ }
+ 
+@@ -2009,6 +2029,11 @@ static enum hrtimer_restart hrtimer_callback(struct hrtimer *timer)
+ 	return HRTIMER_RESTART;
+ }
+ 
++static irqreturn_t m_can_hardirq(int irq, void *dev_id)
++{
++	return IRQ_WAKE_THREAD;
++}
++
+ static int m_can_open(struct net_device *dev)
+ {
+ 	struct m_can_classdev *cdev = netdev_priv(dev);
+@@ -2034,6 +2059,9 @@ static int m_can_open(struct net_device *dev)
+ 
+ 	/* register interrupt handler */
+ 	if (cdev->is_peripheral) {
++		cdev->irq_type_edge = !(irq_get_trigger_type(dev->irq) &
++					IRQ_TYPE_LEVEL_MASK);
++
+ 		cdev->tx_wq = alloc_ordered_workqueue("mcan_wq",
+ 						      WQ_FREEZABLE | WQ_MEM_RECLAIM);
+ 		if (!cdev->tx_wq) {
+@@ -2046,9 +2074,11 @@ static int m_can_open(struct net_device *dev)
+ 			INIT_WORK(&cdev->tx_ops[i].work, m_can_tx_work_queue);
+ 		}
+ 
+-		err = request_threaded_irq(dev->irq, NULL, m_can_isr,
+-					   IRQF_ONESHOT,
++		err = request_threaded_irq(dev->irq, m_can_hardirq, m_can_isr,
++					   (cdev->irq_type_edge ? 0 : IRQF_ONESHOT),
+ 					   dev->name, dev);
++		if (cdev->irq_type_edge)
++			netdev_info(dev, "Operating a level interrupt chip with an edge interrupt.\n");
+ 	} else if (dev->irq) {
+ 		err = request_irq(dev->irq, m_can_isr, IRQF_SHARED, dev->name,
+ 				  dev);
+diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
+index 3a9edc292593..17de56056352 100644
+--- a/drivers/net/can/m_can/m_can.h
++++ b/drivers/net/can/m_can/m_can.h
+@@ -99,6 +99,7 @@ struct m_can_classdev {
+ 	int pm_clock_support;
+ 	int pm_wake_source;
+ 	int is_peripheral;
++	bool irq_type_edge;
+ 
+ 	// Cached M_CAN_IE register content
+ 	u32 active_interrupts;
+-- 
+2.45.2
+
 
