@@ -1,313 +1,146 @@
-Return-Path: <netdev+bounces-129399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0008983A8C
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 02:10:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7557983AA0
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 02:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACB58283D1A
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 00:10:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E76461C216D2
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 00:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C25629;
-	Tue, 24 Sep 2024 00:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFEB1B85F8;
+	Tue, 24 Sep 2024 00:37:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MdJYkocS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UGuWUvOa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9A518D;
-	Tue, 24 Sep 2024 00:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727136647; cv=fail; b=CdA15MKr55JF5R1lCDgmbZP9p7N8ONR+Bllbc/L/UaU22+v8Sq+pngPAj2dpAUZdcmqgTAe9hoLSPcg2UXbHOGw+JSoVu94uBNqBiSegM/qBjxKCrWZmeEo0gz/YQ4vwhP4w4VRIlx5qXm78hWHr+J0ooogPqEcaoYRZPefjZys=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727136647; c=relaxed/simple;
-	bh=DKUYXzf5IYIakG6jOoZ7NOB1u19K7e8giTYBFvLWmns=;
-	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Uk5HeC0sUxL1MqMaS0LgvD2/dpAgN/Nbf2dyIRQm3zpikB/SQTHXESNMAGcac7yiizF0OqEx7v1Vr+bmJ5vqegkSY6ZUdH42mDjxO/hq8S7wpwvmghA3rjQRpDFxHrZWaCWGAUGQ9RfBgArolwo1Ajq3fjFRRRR3hr6O4nylAJM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MdJYkocS; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727136646; x=1758672646;
-  h=message-id:date:subject:from:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=DKUYXzf5IYIakG6jOoZ7NOB1u19K7e8giTYBFvLWmns=;
-  b=MdJYkocS83dCOdu5KHmDuusBwFDRUSMOfoO9p1pqMbYou9frxf05zVq+
-   th1LckgOutNLU2qUtuA5hnOoJc5aXGq8UZMgQ06Hy7dR6U14hqdnVtCn1
-   qvS8f8Xk/9WoOAt8Zl6fYy4UZE953BiNa0H7EOIhBhtSEsVcyv533LVaI
-   vUgHuiKHIOfiVRw5J0rYPl18ETIZ/K0Ac9wfFpK24Tt0ihsFxZPbfF6F3
-   7LCFEw+VNOB1OdKFKMgtiozpUnhjd3CxOI8RoPoZB383ZMKSlgu8DoepN
-   RWgTevqUoraxlmHgGoYMAMUQO08Eh4R4z3/7iFJVU/DKSH4/OPgTQeMan
-   Q==;
-X-CSE-ConnectionGUID: p8e+YgJoTrmLL6Jj7Qmi9A==
-X-CSE-MsgGUID: iLg/WArqQjSJ/aZScxVUjg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11204"; a="26204902"
-X-IronPort-AV: E=Sophos;i="6.10,253,1719903600"; 
-   d="scan'208";a="26204902"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Sep 2024 17:10:45 -0700
-X-CSE-ConnectionGUID: kFFKF7MsRkmtRXpI+NDsGA==
-X-CSE-MsgGUID: VHSjiLtNQf+VtovFirW1Tw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,253,1719903600"; 
-   d="scan'208";a="75625266"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 23 Sep 2024 17:10:44 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 23 Sep 2024 17:10:44 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 23 Sep 2024 17:10:43 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 23 Sep 2024 17:10:42 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 23 Sep 2024 17:10:42 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 23 Sep 2024 17:10:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rjKwcW44hDQ/vjCxYWfvOXZlesYibqJ4h2sLjtFZcoaN8CYxcRk30G8s6/ZJfD+asOjQKzY01EBbe+9S6QD1R1fZx3SPpXw3ICc3meOWSL7nR6m2fnJh7LXYnHTXlmlBo8IAppu4svBpVjf8Qn5HodCxSJk+VdTd6aveBsDYLoOgk4T65kRVKq1BJwyhxKmT/xOkbAskMJC98ppYuB1waUMJbjhX1mRv6qbS9cGlxDpL38P8Vvos4UFdd27EJdh56II6Bfe9/Fy82Lzlf6N2GfyvU6ruGOUPgfA2zOWad+Dztxj6vjqGT/NRrhfNWDBevgM8RAV0k4qXoBZSnE4T4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dnlwznuxA7rsBOxnV+wL2OcVMos2K9iu41YLcGGVtXA=;
- b=BYfaXZMPsnv4Tu1IH7Frg1I2gM/CywxMdXUUC8Bo9mekghkAj+SbcEjlroWzKvw+Ujpu87zKcBGb+rVhwAHTv9XyNHxfKZXy4MOiz5rRVzJNy7bUxhL1EUexxitu8oliDdah5213rnok/CQ9pKDLFR15Dhb4nEsFSwUlwBk4lt+STD39qZplzzt8oPLIVEe/Hq1ityozjL2wtn8pT9Li6psUqn8xfjpklHqaSZr9hNCBj2Gw56Fhbjz80nMCIyP5w4LZhSlCFrn6LF5t4lILAS2U2HY7XdjEqWImpnzpM/tPhO9zGPOA8A9rXwwO1floHbbu7OSjTsYDPg4yAQEtvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by DM6PR11MB4756.namprd11.prod.outlook.com (2603:10b6:5:2a7::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.27; Tue, 24 Sep
- 2024 00:10:39 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%3]) with mapi id 15.20.7982.022; Tue, 24 Sep 2024
- 00:10:39 +0000
-Message-ID: <847a2c45-782d-4cac-9a53-83557393af80@intel.com>
-Date: Mon, 23 Sep 2024 17:10:36 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] igb: Do not bring the device up after non-fatal error
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: Mohamed Khalfella <mkhalfella@purestorage.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Yuanyuan
- Zhong" <yzhong@purestorage.com>, Jeff Garzik <jgarzik@redhat.com>, Auke Kok
-	<auke-jan.h.kok@intel.com>, Simon Horman <horms@kernel.org>, Ying Hsu
-	<yinghsu@chromium.org>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20240923212218.116979-1-mkhalfella@purestorage.com>
- <2c272599-6b25-4c93-86fa-ecfd8df024c1@intel.com>
-Content-Language: en-US
-In-Reply-To: <2c272599-6b25-4c93-86fa-ecfd8df024c1@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR05CA0203.namprd05.prod.outlook.com
- (2603:10b6:a03:330::28) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6BC11BC20;
+	Tue, 24 Sep 2024 00:37:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727138277; cv=none; b=CTVm1e57iT+qPfeIVwVyiUf5gTcbR+vCKVDEG0Sjchngsr+xLmwhNFNCIARniAeU0EtIjse7CItfRq0ZZmVAK7FlcWf6TpdakTzfUl4tuigkSBFfyCwzv/fEIaBlQluQ57x9VfJs4vqHXqH8HItwPJrsvrfp6BkzI+E7QRlH/MA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727138277; c=relaxed/simple;
+	bh=lwPWHsjc0EVxstWs9UcwMvi0k777RTvB+ISlYwiYFhw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BMiAyH6cg1ThexR9SEciYs8QGEnFj3BbiMo8D7ZBFcYv3TsD0kF7asIxmuKLVJJ2kERUqGCvLxVGedntwy6gbM85eEtPIb7ppJPl3dLsvapoIF2JrkKkxMRZx3nF+iOACJDXQmBCZWfhWrjPjCHSZpNP7GfHOYC9rmZNIbj003Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UGuWUvOa; arc=none smtp.client-ip=209.85.166.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-82a109bc459so212761439f.1;
+        Mon, 23 Sep 2024 17:37:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727138275; x=1727743075; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WbUcHGQ1UoXWgfE/17dhmDmpoz0qafV9wtyHq8QWeMc=;
+        b=UGuWUvOaI1EQVzRdBLFWa1CBEzbVeBLO/qPVi6/SE7giY0yE8jnwWZbo5drCZ5qsZU
+         wW4YMBhq6wkuvMOJwRzqQmgrHu81QjYeFvxz0hKlxI//Tw5wczAxwItedb+LaJ0wLg0B
+         xgB3+c9rgdQTxwbdQkhePXPGxL8z4UDfjICY5cAcrMbSpMrNNLbcwYrmD3OKpMYB2VGE
+         JvRvhZMxF11xBy6QhdF4j2cFcypXrQvM7CsCJ8e73HRd+IPHU6FBJBsR7iqFM/TtXFKI
+         ZL6LPnstjSlwXWeBV8kZPbZ8UG+WxbihYsATMpg58wXjfgwgratccj3JoFO6KrLezCcq
+         QLpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727138275; x=1727743075;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WbUcHGQ1UoXWgfE/17dhmDmpoz0qafV9wtyHq8QWeMc=;
+        b=Tc5ZCtNANL2GVCR4InAT3LKprlMxuloC25abnActrKcCt80j8hzTNhbi8wMLylyvcM
+         pHnrFaEtOWpXNE5grnNGWsRoC8/eoL49+BIA14rBQqWwDM1gWR/5P2G0DVQ8vK5uFWj6
+         2kjOX7kwi89Y4ySmeSEUPNV6nQayBF/dpn8iKOyt6Az2SN9rhfFzynhRNZiz9CRQYo+a
+         l/j5Xdkr1StLupVDWk3/C9v1sKCWo6kghe+muwrjYBgYLzsitSBT7xE1pawTPtHz+X1y
+         YBhUP0b2hKbYm0IF5t2TqYl9II55jPeWZaI1819p9A4e6YaN5JpcyWa4+AvNXjGHrfjj
+         r3vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULRJcEtq5+m8sX1VMqAJYHNxOahAPJMFGgzdtiCrf0rpUpcOFCYFGriHM+bYJODF7wr50Suqn2/LhnWZ0=@vger.kernel.org, AJvYcCXQEgXMPmW/vjsmAPvAmj/So5+NW/HZFsUd1Fjjf1mHroIHvb+pjKmDXHc5gc2Io8KJkiAjCftb@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCDo+wdaVpT0MvxJQgZ/EAI8v1cDQNvMR6qk7nTbknhQDdD/1U
+	82SskjwINu7tgaUS6TZ+d0nanx31+yL/l7X+6P4W5LdbE0znBw/ZUHRJY8vOns2Zg1gR4jZjY/7
+	nSUqKeJKJa2PPtuBS7H13VEQREr8=
+X-Google-Smtp-Source: AGHT+IGrUStRnWPkF8QdOVTEHShSthaD4ticcBLkQrUJgx+tW9PPwzqJV/AlPcjpLLKPRdLFJuUS/mgbIKo5kHgzeE0=
+X-Received: by 2002:a05:6e02:2144:b0:3a0:a057:6908 with SMTP id
+ e9e14a558f8ab-3a1a302a9a8mr11439775ab.11.1727138274782; Mon, 23 Sep 2024
+ 17:37:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM6PR11MB4756:EE_
-X-MS-Office365-Filtering-Correlation-Id: 18958e47-818c-488d-27b3-08dcdc2d5251
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?YXN6VTd5UytyNlBpNS9lWURkNHNNRHdBMW1jLzBRbmVzUThHdXA2TU5aNUY2?=
- =?utf-8?B?eHd6Z3RtK2ZPYk5CODBoYWFJeHY1YmhDL0VFdXdRZVI5eDJ0MUxMUjNDdyta?=
- =?utf-8?B?KzB3KzRmZkQvb2o0dXJGV0Z3RkJHc2Q3QVJTc0ZBNUlwTnBKTXB0aVVvS3Aw?=
- =?utf-8?B?T0c0MEpNOUJHemF3UkNCNTdveVdmNmM1aDBSY1M3aUg5TXVWSlNlU2w3RFVj?=
- =?utf-8?B?NERNTU9SK1EyNENxOFV2Ry9HeHdjOHdGaXd3M3RxU3VkYmE1WTRXdHIwSVhI?=
- =?utf-8?B?L2cwdnA5dmZkOHZaWWNjVDNORVJsdmtVMHQ1a21uUWdTbktrbC9DcFVGZFhJ?=
- =?utf-8?B?QUFycEUyWGJ4Z3A1dmtKQ0F1ZWNwMU14TWQ2d2Q0ZkhNa2ZFN04wWHk0bndx?=
- =?utf-8?B?Y1VTcVZ0N24yYVVJcDlPNGlhczRTYkJPUFBuc09LbEVkamRLSDc0L2xWRmVO?=
- =?utf-8?B?cFVSQ1RhcStwQWJZaDZ0OGt1ZWx1VjVLMFZVa0tBZ3JDeHBtclBaek90TkFi?=
- =?utf-8?B?K0ZnVU9hSTExaXdVc0d1TDF0MWRHaGUwcWZubEIwUytDWkx4VitMUXp2S2Q5?=
- =?utf-8?B?aUh0WW44bkVyRVhDTTB3bG1jYjJGVmVVQi9BdFNEVFlHUnA3UnVFbStUbXIy?=
- =?utf-8?B?NHRFdTluSUcwQyt1c05XV2RpQmdmK25Cai9wcktPL20zak9jQk1QMGdWUXhr?=
- =?utf-8?B?cFhZcU03WFdXVDlRU2Fia0Z6NkhJWWpRL2NoeXl0OHkrVzJFTWVCSUZNT2xF?=
- =?utf-8?B?dkwyb3RoVCtkTHBwTUt5RUYvc3FrQ25vUWJtT0lTQW84N2tyZTNjVENwNW1O?=
- =?utf-8?B?bFJycHNmMERYZ3FQeHU4eGluVC9KY1FOc1FHaTdJUE1hb3V2dU9Ea1pYM2dQ?=
- =?utf-8?B?ME12aGo2a1dWSmZjdjZiTityM1VWRGFtaG9hQytlbDJvYmdwd2tFdzJ0b0Fi?=
- =?utf-8?B?clpkeEVTZWd3dXJmejJadlo2NUFKN0RaS1llS00xdm1hRHViTG9YVnRMV1Vm?=
- =?utf-8?B?OW03dUhleDlGTGhmWWt3TE9tbkJJcmxYOUxVWFQ5c3lkQ1BNMk90eGlnZWlr?=
- =?utf-8?B?Ym8zS1Y1K01ZZ1J4NFFOenVXcEhheTRjdWEwblZucEtQeXhJRzhZQWFOY2Nw?=
- =?utf-8?B?cVg0L2E1WURaUTh6MWFpWHljdHlPbnU1Wi9pL05rYVhkTGF4L29JRHB0N3Ra?=
- =?utf-8?B?QmVKamVlekhuNG1Pb1pCUVJqL3pHMGNJUnJJR2ZnWHFyblZ5VUFBL2ZHNjl2?=
- =?utf-8?B?UW9FQ1kwL3kxM2RSaDZOdXZZWGU5cjRiaVR2d2U4NDFla1hlZHFDZVpOaEhO?=
- =?utf-8?B?Ukc1TVQyc0xlbXU4K1lZV2pYTzFWR0NVLzUyZlZyUUZqSEhXaVRMaThQdTJa?=
- =?utf-8?B?Yzc0L3pNcjM4UW1DcXhlN0hSNjY0Zy9FMFZJU21wblNsQkp3VFR4SjRhdk15?=
- =?utf-8?B?OGRkaURiZVdvakYrYUFoYnhiRGZJUEJ3VXdIaldkK0tGdlA0cTB5MDIzNXhp?=
- =?utf-8?B?enZrSmxrUXkvWEJyendnMlU3bW1KaEVxQVRWR0h0Y1d4eFRWa3VvRjArdjFr?=
- =?utf-8?B?cktycWZxaFpKODYrb3grS09ncm14Qkg4cTNDRkl2WmdkdHlQNGh0alZBdkM2?=
- =?utf-8?B?S0FuZE5rVnZNOTNoSjVGRm51UnZzNU1rVWUra2tWdUdtc3pSLzY0b3ZEdnlm?=
- =?utf-8?B?a2JJWllLWDlqMkVCQ2t0WFJiajdiRXBTZGtaRFA4alpkTTdmMThOV003dDdw?=
- =?utf-8?B?S3VQWG1JL1pSSjBITHA2aGVCcDVOVllVU00rUkFzMjl4bkNNSmVnTUIvM0N6?=
- =?utf-8?B?d0hFVU43bjdzOE15MUlQLzdsSm1oZFo3cTkreEhyb1I4cUJ5UHdJWFZteUJM?=
- =?utf-8?Q?emAuhIhbjSYWz?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UUZlaDdiWXNGWWw1Y3kvUFFwdUE5SFF5bENoM0ptQjRmQy9ubHI2dVo3RU16?=
- =?utf-8?B?RHJpOTU2R2NJVDlQMjhNSmQvWnl5eHBiWUxPbjY2SGF2V0xjZk1xcWVjVUp1?=
- =?utf-8?B?d0h0YnhLVmZveFlGZDdMNHFCQTNPek43RlZhSE5JUmFWMzJWQjdDbStNUFRk?=
- =?utf-8?B?QTdLeEtHenVDQUtoQ0JqejZHc3pPVXpsWlJyTFp2a0pVdDF4dEI4U1d5dWl6?=
- =?utf-8?B?VzBlOGh5V1ExTXNXYmg2THQ0bzlpZnFPZXhvQnBJcmk5OWxMdEVXa0tUdjBp?=
- =?utf-8?B?VWF5cVc1QkdJSlZNd21HQVdMU2dsc1VRZVZ4bGQ1WU5vOXVRbmRCK2cvbHU5?=
- =?utf-8?B?V0tjVFpwL1Q5Q1lFM3dnelgwd1Vab1pCU085eEJSbHFtLzFSR1cwRDB3aDdY?=
- =?utf-8?B?ZFNvZ1B5NlBhWlNOQ2poYkFhM3hhSHdXaWowczQzNldmQndFVnlXdTVkclQ1?=
- =?utf-8?B?WnFzekhsalZZbmlrSFdLdm9QVHV4U1QxVXRCd1djcWJqZmpjUGtUR0t1MWFr?=
- =?utf-8?B?QzNvVy9IanlFVjhxWGVIdTBQdlpHY3RlRmROc0tJY3FuUFhlTGZyeWdzR1dK?=
- =?utf-8?B?OGtBVDlIM01JSFNmOUlHd2I4cXN0VXpEbzVweDlLNHdSNTNMd1VEYmsyYW9X?=
- =?utf-8?B?aWtudi84aVhLZnRBOWI3TkxQd3VUNGtOTm03VmNFL3FYV0Zad1VTZFRucjRU?=
- =?utf-8?B?N2poWDVJL3NGYnYvL0hIN3VaRTJFTWNJVmxRcVNsZFYrTzNERXFCN2ZmS1p3?=
- =?utf-8?B?STlsdnJRWmRBNENocUhySDltTzhPdFZXU1VOaWxZRXVoUlRtcjNGY1Y1a2xZ?=
- =?utf-8?B?Uk1aclVqa0xPL0hIMzE3OEVLSU5WRk9JaUh3WGlkL1RXRU1jRHNSQlhab0tM?=
- =?utf-8?B?UEJ0dUdiVE1uSWVLdVFIZ01DcUFhNjRjMVN2blZmZEdsSkpMaUd3NlFQZHpV?=
- =?utf-8?B?Zi9za2hkTWU4YVVvZVhRU0cyUXE4SHBneW9CK3lUTGFpUGZSZ1lBMmlMQzhY?=
- =?utf-8?B?Z2NBV244NG42WHlRRnhDbURXb1JZUGFwMlA3TUFDVDY3WUR5bU9Da2srNFh5?=
- =?utf-8?B?anQ5SGZreFV3a2VJTGxKOFZkZlZZbCtUSjdvbEFNWEZ2UWVJQi9ObHF2eG9Y?=
- =?utf-8?B?OTcxZlN4N3hCeUt6bmdHNnp6R1BFUEhtRFoybHExZjJZT1RHK1VvYmN1Tm5Y?=
- =?utf-8?B?RlhuY1JidndzdDUvQ1RKVlBsYzVESXBVdDNYcFhqdDN3VHFHU0FhTkpBcXM3?=
- =?utf-8?B?TWtCRytSTHFXdEoyRkRaQTV5V20wdGpJUXJiTFVkQVd3Rk9ZU052Wlo2bVV5?=
- =?utf-8?B?RWlaaEltcVlOMElSWkgxYy84TzBhVFFOUkVZNWUxa21nOXJaSk9Xb2NQZTJ0?=
- =?utf-8?B?blh6eHpWR01CUVZiZytVTEVLMmxBNDVlcVdja2NwS1NBOUdpTDNyS29HSHBU?=
- =?utf-8?B?VXBmTmREVjI4bVU4U2R1SGJVZEdOSlQ4UnhXN0NzMGl5bGZoQ081VEljYktC?=
- =?utf-8?B?cWxyYlBtMW5Sbkh5RlUyVGdrVkpNZVpzc1IrNjRYaHhvRlR3Q2lNd0p0NDQ2?=
- =?utf-8?B?MXFqcVhMNVZtek5CNzkvUUZ2cmJNSUhtaWdMUkd6QllISWt0b21LVHFQQUJB?=
- =?utf-8?B?U2ZKdWhvZ0tUc0FONEN6VU9nZGppNXRLWmx1TFBOalpPVWIvQk5MK1FNZFNP?=
- =?utf-8?B?WGpJZ2U0T1poeUpTcUpYRElKVlhSSERjN1RRRWMvQzdXMTVzenoram5JdWlQ?=
- =?utf-8?B?Z0RqZXFxY0Y3YkRPdGU2eFJWZ215WFdNNzFwNEJIY05kcWYyV2pqdHMwaEFy?=
- =?utf-8?B?Z2pyMzBOcDBJbDc4aUgwQlFlbW0rTk5Sd1doQTArSWVpTU0vcmN6cXI5S2Fx?=
- =?utf-8?B?eXU3VUhSSlVSdUloakNVMEVpZ085a20zZmd4aDdGZkhzbUtuN0xBL2pVajN6?=
- =?utf-8?B?Q0Z2OUxEVGZZY1ZMRHpJMm83SHh1Mm1SSlBSbTFwS040eVBaVEk1S3A3cFVy?=
- =?utf-8?B?VmQwWXE3Q1BBQ3hERXNpbHhoMDBWLzhFeXdPQU54MDc0Q2lpRmIyZm41dzIv?=
- =?utf-8?B?b0dRdUxoMjdWRi92RmJ3eml5REErVW9LK0ZaQThzRnNoeHJVbndqZW92OThP?=
- =?utf-8?B?U0d1V3JwSGVYOXFEbmp6Rnc2NmZWdDVmRVA3aEp5STlVMkRkQzlCZDdnNWxp?=
- =?utf-8?B?cHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18958e47-818c-488d-27b3-08dcdc2d5251
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Sep 2024 00:10:39.3842
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +QUM0KJKAfXQsNPC9y6q5DaXQW/xg8pWO2bN3gvbc+3SaCF5h7NehlFKSpNg/KI2JvFBd1HNVP/ynkhKl5lNTQj06x0Ua23b5HjbhSZ89f8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4756
-X-OriginatorOrg: intel.com
+References: <20240910190822.2407606-1-johunt@akamai.com> <5632e043-bdba-4d75-bc7e-bf58014492fd@redhat.com>
+ <CADVnQykS-wON1C1f8EMEF=fJ5skzE_vnuus-mVOtLfdswwcvmg@mail.gmail.com>
+In-Reply-To: <CADVnQykS-wON1C1f8EMEF=fJ5skzE_vnuus-mVOtLfdswwcvmg@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 24 Sep 2024 08:37:18 +0800
+Message-ID: <CAL+tcoCMrENefD=55fkGRBAE9ZeuwgB7UG03JggSiguG-QVZiw@mail.gmail.com>
+Subject: Re: [PATCH net v3] tcp: check skb is non-NULL in tcp_rto_delta_us()
+To: Neal Cardwell <ncardwell@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Josh Hunt <johunt@akamai.com>, edumazet@google.com, 
+	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Sep 20, 2024 at 1:36=E2=80=AFAM Neal Cardwell <ncardwell@google.com=
+> wrote:
+>
+> On Thu, Sep 19, 2024 at 5:05=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> >
+> > On 9/10/24 21:08, Josh Hunt wrote:
+> > > diff --git a/include/net/tcp.h b/include/net/tcp.h
+> > > index 2aac11e7e1cc..196c148fce8a 100644
+> > > --- a/include/net/tcp.h
+> > > +++ b/include/net/tcp.h
+> > > @@ -2434,9 +2434,26 @@ static inline s64 tcp_rto_delta_us(const struc=
+t sock *sk)
+> > >   {
+> > >       const struct sk_buff *skb =3D tcp_rtx_queue_head(sk);
+> > >       u32 rto =3D inet_csk(sk)->icsk_rto;
+> > > -     u64 rto_time_stamp_us =3D tcp_skb_timestamp_us(skb) + jiffies_t=
+o_usecs(rto);
+> > >
+> > > -     return rto_time_stamp_us - tcp_sk(sk)->tcp_mstamp;
+> > > +     if (likely(skb)) {
+> > > +             u64 rto_time_stamp_us =3D tcp_skb_timestamp_us(skb) + j=
+iffies_to_usecs(rto);
+> > > +
+> > > +             return rto_time_stamp_us - tcp_sk(sk)->tcp_mstamp;
+> > > +     } else {
+> > > +             WARN_ONCE(1,
+> > > +                     "rtx queue emtpy: "
+> > > +                     "out:%u sacked:%u lost:%u retrans:%u "
+> > > +                     "tlp_high_seq:%u sk_state:%u ca_state:%u "
+> > > +                     "advmss:%u mss_cache:%u pmtu:%u\n",
+> > > +                     tcp_sk(sk)->packets_out, tcp_sk(sk)->sacked_out=
+,
+> > > +                     tcp_sk(sk)->lost_out, tcp_sk(sk)->retrans_out,
+> > > +                     tcp_sk(sk)->tlp_high_seq, sk->sk_state,
+> > > +                     inet_csk(sk)->icsk_ca_state,
+> > > +                     tcp_sk(sk)->advmss, tcp_sk(sk)->mss_cache,
+> > > +                     inet_csk(sk)->icsk_pmtu_cookie);
+> >
+> > As the underlying issue here share the same root cause as the one
+> > covered by the WARN_ONCE() in tcp_send_loss_probe(), I'm wondering if i=
+t
+> > would make sense do move the info dumping in a common helper, so that w=
+e
+> > get the verbose warning on either cases.
+>
+> That's a good idea. It would be nice to move the info dumping into a
+> common helper and use it from both tcp_rto_delta_us() and
+> tcp_send_loss_probe(), if Josh is open to that.
 
+Hello Paolo, Neal,
 
-On 9/23/2024 4:11 PM, Jacob Keller wrote:
-> 
-> 
-> On 9/23/2024 2:22 PM, Mohamed Khalfella wrote:
->> Commit 004d25060c78 ("igb: Fix igb_down hung on surprise removal")
->> changed igb_io_error_detected() to ignore non-fatal pcie errors in order
->> to avoid hung task that can happen when igb_down() is called multiple
->> times. This caused an issue when processing transient non-fatal errors.
->> igb_io_resume(), which is called after igb_io_error_detected(), assumes
->> that device is brought down by igb_io_error_detected() if the interface
->> is up. This resulted in panic with stacktrace below.
->>
->> [ T3256] igb 0000:09:00.0 haeth0: igb: haeth0 NIC Link is Down
->> [  T292] pcieport 0000:00:1c.5: AER: Uncorrected (Non-Fatal) error received: 0000:09:00.0
->> [  T292] igb 0000:09:00.0: PCIe Bus Error: severity=Uncorrected (Non-Fatal), type=Transaction Layer, (Requester ID)
->> [  T292] igb 0000:09:00.0:   device [8086:1537] error status/mask=00004000/00000000
->> [  T292] igb 0000:09:00.0:    [14] CmpltTO [  200.105524,009][  T292] igb 0000:09:00.0: AER:   TLP Header: 00000000 00000000 00000000 00000000
->> [  T292] pcieport 0000:00:1c.5: AER: broadcast error_detected message
->> [  T292] igb 0000:09:00.0: Non-correctable non-fatal error reported.
->> [  T292] pcieport 0000:00:1c.5: AER: broadcast mmio_enabled message
->> [  T292] pcieport 0000:00:1c.5: AER: broadcast resume message
->> [  T292] ------------[ cut here ]------------
->> [  T292] kernel BUG at net/core/dev.c:6539!
->> [  T292] invalid opcode: 0000 [#1] PREEMPT SMP
->> [  T292] RIP: 0010:napi_enable+0x37/0x40
->> [  T292] Call Trace:
->> [  T292]  <TASK>
->> [  T292]  ? die+0x33/0x90
->> [  T292]  ? do_trap+0xdc/0x110
->> [  T292]  ? napi_enable+0x37/0x40
->> [  T292]  ? do_error_trap+0x70/0xb0
->> [  T292]  ? napi_enable+0x37/0x40
->> [  T292]  ? napi_enable+0x37/0x40
->> [  T292]  ? exc_invalid_op+0x4e/0x70
->> [  T292]  ? napi_enable+0x37/0x40
->> [  T292]  ? asm_exc_invalid_op+0x16/0x20
->> [  T292]  ? napi_enable+0x37/0x40
->> [  T292]  igb_up+0x41/0x150
->> [  T292]  igb_io_resume+0x25/0x70
->> [  T292]  report_resume+0x54/0x70
->> [  T292]  ? report_frozen_detected+0x20/0x20
->> [  T292]  pci_walk_bus+0x6c/0x90
->> [  T292]  ? aer_print_port_info+0xa0/0xa0
->> [  T292]  pcie_do_recovery+0x22f/0x380
->> [  T292]  aer_process_err_devices+0x110/0x160
->> [  T292]  aer_isr+0x1c1/0x1e0
->> [  T292]  ? disable_irq_nosync+0x10/0x10
->> [  T292]  irq_thread_fn+0x1a/0x60
->> [  T292]  irq_thread+0xe3/0x1a0
->> [  T292]  ? irq_set_affinity_notifier+0x120/0x120
->> [  T292]  ? irq_affinity_notify+0x100/0x100
->> [  T292]  kthread+0xe2/0x110
->> [  T292]  ? kthread_complete_and_exit+0x20/0x20
->> [  T292]  ret_from_fork+0x2d/0x50
->> [  T292]  ? kthread_complete_and_exit+0x20/0x20
->> [  T292]  ret_from_fork_asm+0x11/0x20
->> [  T292]  </TASK>
->>
->> To fix this issue igb_io_resume() checks if the interface is running and
->> the device is not down this means igb_io_error_detected() did not bring
->> the device down and there is no need to bring it up.
->>
->> Signed-off-by: Mohamed Khalfella <mkhalfella@purestorage.com>
->> Reviewed-by: Yuanyuan Zhong<yzhong@purestorage.com>
->> Fixes: 004d25060c78 ("igb: Fix igb_down hung on surprise removal")
->> ---
->>  drivers/net/ethernet/intel/igb/igb_main.c | 4 ++++
->>  1 file changed, 4 insertions(+)
->>
->> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
->> index 1ef4cb871452..8c6bc3db9a3d 100644
->> --- a/drivers/net/ethernet/intel/igb/igb_main.c
->> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
->> @@ -9651,6 +9651,10 @@ static void igb_io_resume(struct pci_dev *pdev)
->>  	struct igb_adapter *adapter = netdev_priv(netdev);
->>  
->>  	if (netif_running(netdev)) {
->> +		if (!test_bit(__IGB_DOWN, &adapter->state)) {
->> +			dev_info(&pdev->dev, "Resuming from non-fatal error, do nothing.\n");
->> +			return;
-> 
-> I'm not sure this needs to be a dev_info.
-> 
+I noticed that this patch got merged already. Since extracting the
+common part into a helper belongs to net-next materials, if no one is
+willing to do it after net-next is re-opened, I think I can post it :)
 
-I was thinking dev_dbg, because I don't really see why its relevant to
-inform the user we did nothing. Seems like its log spam to me.
-
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> 
-
+Thanks,
+Jason
 
