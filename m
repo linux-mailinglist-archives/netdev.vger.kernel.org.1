@@ -1,50 +1,62 @@
-Return-Path: <netdev+bounces-129517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71D78984414
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:00:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3F1B984421
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:04:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA76FB2394C
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:00:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00C331C22E63
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447641A4E8A;
-	Tue, 24 Sep 2024 11:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 524621A4E9B;
+	Tue, 24 Sep 2024 11:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IDmerg2/"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="UYcozizA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207351A4E84
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 11:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51D01F5FF;
+	Tue, 24 Sep 2024 11:04:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727175629; cv=none; b=aXuHCBlFBptYyklYjhgzutH8q7/lV6OsscM5l5yqSHZiRLnw50kvt7cTPGQuycI4WUtBX1/ifp9wI2mTLwDftuCGmQlpLDRgoWiot376CnFMdFQkTRCWLeFCcUFCRbNUGnjA4Jg5nXwgY0d+az04GqDrJfKh9fAizGOkNXt752k=
+	t=1727175862; cv=none; b=hLG6y6MYsP6Xb4o3kBl0BK/EpKK73PP7J8FonvoGtAYKCwC/qHRkmyU+nj1m/W6ltd/DOd4h8ErjxZF4GFeRIvaPtHwTmfQuJhmEll12/FtuNjTF2tieUtBNaemm6FmRnupVsV7GLP850EHw2irOVkpMZwf5HMK/B8N7cLuk0+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727175629; c=relaxed/simple;
-	bh=afQbrbZOJHecmVUFRXMVMemhZh0pO0U5byO4MWxFs6g=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oIMSSuQTBhf8iPasflYWZF5oDKFXRmrBUY4WNECsr9l52Tc5NRxNJm1ZghCkCaj4WTzTjFD8nS8UaUg6JYW6iJnspgbo8kZ3HOnkiLw7gHgtxZz8fsXTjoY2WfPNFyBvK9JiuD1SHq8qC+NTrK8Hs/8fUZHGArWMtEVyNN1Ur0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IDmerg2/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C890C4CEC4;
-	Tue, 24 Sep 2024 11:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727175628;
-	bh=afQbrbZOJHecmVUFRXMVMemhZh0pO0U5byO4MWxFs6g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IDmerg2/umulyR9sNw09HvgIHbII4bYbki/kUJS0cGSYnJZjOfS1QtUlh801Lja6Z
-	 Fdz3kZlPmc3X0x6V85urtIX1tyOFNTWZw63RVbW//YgHjsERADD+6oNMUshhKvaSu9
-	 q4M7+e9bjiwmZv76vyw3AHMUU9gUTdR/HzMOPv0/eWmnPYf++rJZjrJ9twvfXXrzVk
-	 HaGQ4VEcBWLD17Ie/18+HxnePaTV8nJ9wg/l3UtLEgica8yn5LvRTxx9UDtcwGyf2n
-	 ygKUbOblayVhm1i2dei/EGMJROJZryYHoMjka3yMwOyHuLMdbHxG/joU5Nt8Ivquor
-	 CaO+QKPA94szw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FAF3806655;
-	Tue, 24 Sep 2024 11:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1727175862; c=relaxed/simple;
+	bh=1UzmaVwFDGIYfjRUdTy1AagijVC+WnAQiYfabGlH8bI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EQa1dFcLITQLRbSK5hrMRNAoCvVQN5kU8nd+qmJqs2YclSF9FXISVU0dIw7tp1PNiGCZKUC1d84WHspZYNJ07QAj77uJ3Zumh6EZs0mxppUs72LZJZCW7XcyftdlTQso2UGDPN6x3xry3o9QBrqTOlJZKv0Gb1JOZFnD9iD1rYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=UYcozizA; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1727175856; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=4UXSF5iwt13McipWWCzjfRnIpDyc91GNs8UcvMTxxVs=;
+	b=UYcozizAgmeNsU0n24jLyDs0K09ZLrB/DgiM/QyTT0Io9jYhfJCs4dpla0nl4G/7PHFvwxMRJupzf7yDQuAmsBBAVpuaDf9jQ6nzgXNs6iL3q9Onri75b+MpqHFUf90QKHmO4bqazdOKtZkuiW+jeieSujklfxO2HjByUOogA2g=
+Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WFgCs8F_1727175854)
+          by smtp.aliyun-inc.com;
+          Tue, 24 Sep 2024 19:04:15 +0800
+From: Philo Lu <lulie@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	antony.antony@secunet.com,
+	steffen.klassert@secunet.com,
+	linux-kernel@vger.kernel.org,
+	dust.li@linux.alibaba.com,
+	jakub@cloudflare.com,
+	fred.cc@alibaba-inc.com,
+	yubing.qiuyubing@alibaba-inc.com
+Subject: [RFC PATCHv2 net-next 0/3] udp: Add 4-tuple hash for connected sockets
+Date: Tue, 24 Sep 2024 19:04:11 +0800
+Message-Id: <20240924110414.52618-1-lulie@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +64,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] r8169: add missing MODULE_FIRMWARE entry for RTL8126A
- rev.b
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <172717563101.3990878.14506917998516293967.git-patchwork-notify@kernel.org>
-Date: Tue, 24 Sep 2024 11:00:31 +0000
-References: <bb307611-d129-43f5-a7ff-bdb6b4044fce@gmail.com>
-In-Reply-To: <bb307611-d129-43f5-a7ff-bdb6b4044fce@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, nic_swsd@realtek.com, netdev@vger.kernel.org,
- hau@realtek.com
 
-Hello:
+This RFC patchset introduces 4-tuple hash for connected udp sockets, to
+make connected udp lookup faster. It is a tentative proposal and any
+comment is welcome.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Patch1: Add a new counter for hslot2 named hash4_cnt, to avoid cache line
+        miss when lookup.
+Patch2 and 3: Implement 4-tuple hash for ipv4.
 
-On Wed, 18 Sep 2024 20:45:15 +0200 you wrote:
-> Add a missing MODULE_FIRMWARE entry.
-> 
-> Fixes: 69cb89981c7a ("r8169: add support for RTL8126A rev.b")
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 1 +
->  1 file changed, 1 insertion(+)
+The detailed motivation is described in Patch 3.
 
-Here is the summary with links:
-  - [net] r8169: add missing MODULE_FIRMWARE entry for RTL8126A rev.b
-    https://git.kernel.org/netdev/net/c/3b067536daa4
+AFAICT the patchset can be further improved by:
+(a) Better interact with hash2/reuseport. Now hash4 hardly affects other
+mechanisms, but maintaining sockets in both hash4 and hash2 lists seems
+unnecessary.
+(b) Support early demux and ipv6.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+changelogs:
+RFCv1 -> RFCv2:
+- add a new struct for hslot2
+- remove the sockopt UDP_HASH4 because it has little side effect for
+  unconnected sockets
+- add rehash in connect()
+- re-organize the patch into 3 smaller ones
+- other minor fix
 
+RFCv1:
+https://lore.kernel.org/all/20240913100941.8565-1-lulie@linux.alibaba.com/
+
+Philo Lu (3):
+  net/udp: Add a new struct for hash2 slot
+  net/udp: Add 4-tuple hash list basis
+  ipv4/udp: Add 4-tuple hash for connected socket
+
+ include/linux/udp.h |   7 ++
+ include/net/udp.h   |  44 ++++++++--
+ net/ipv4/udp.c      | 197 ++++++++++++++++++++++++++++++++++++++------
+ net/ipv6/udp.c      |  17 ++--
+ 4 files changed, 223 insertions(+), 42 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
 
 
