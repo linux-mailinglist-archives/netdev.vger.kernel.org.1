@@ -1,167 +1,132 @@
-Return-Path: <netdev+bounces-129526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D70B984506
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:42:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C677D984509
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 13:42:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 717E91C23318
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:42:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59C191F240C0
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 11:42:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDF71A704B;
-	Tue, 24 Sep 2024 11:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F0191A7061;
+	Tue, 24 Sep 2024 11:41:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FpmetXj3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lKwpgVkh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED8E19B3E4;
-	Tue, 24 Sep 2024 11:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 626091A7044
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 11:41:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727178075; cv=none; b=qwAfOsKZBI70RtF70C6iQZ2p3WIGThKpOkfXdEto4C5BbEMdglrH+0KWsjQPs2YkOgsos877XTFB7P89n1CSar5VdP5JPhJLBMb9b5BJSN7TFnODw7232oG3WhnFrIRAbp7V5+DLsnssH1Csid/MeXB2imgO8i5l3zC4SdzcHdI=
+	t=1727178096; cv=none; b=mfAdLMOuNPp/KXfNaid8AGgyD7kOO5ZTvflmMPnDrf/d3YzwXVVLxJgLZG3PKT9EMExgwuJ2ZUkQ7IUdVpprK6N0O0Y5w8ox14pBgpazagjD+gKxx8ku8rxyoe8I6jNY2EqU1xRS04OPH7BkH5uf4Cjqi46ETxouneyP0MPYEE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727178075; c=relaxed/simple;
-	bh=pGcclbUN3Ei1TFXCliRkZs+/G35HN9mIIUQXOiF0OIk=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=Rx8uVTxODug9w8jkGLGpwCfRy1uFYdRE0xE1hu8eBSFWVK/xGMHhTEZui1a1c7YWr3gwezAIgZ6PbwcjCVds4B0aHJ4mLFbfkGMGQFptqKXvXkHLWMVG5w7e8VGOVzWl82jMS+EzHo2bUWY9ccWpDJEDNBvBnBy3iLEhK6x65IM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FpmetXj3; arc=none smtp.client-ip=115.124.30.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1727178070; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=WHs0Ul2MPSi9UYmyoRMrIaLj6QL34LhvrlMbdj4rYx4=;
-	b=FpmetXj318ru+Oq03dp3Qby212sRL/fX7CcJ6CVzQEM8DTTjTo0bloLjWGP6pB8vR3bSMNZW3VL4BAVvbKmJ/EWIw+64dH/Lb5Bq7wto1hj7xm/7lyQkgv96t+L6v/krkAgGKE265HfFkIXwLyaZLowp+apD1jyV3jkHGGF9O2I=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WFgDOvN_1727178069)
-          by smtp.aliyun-inc.com;
-          Tue, 24 Sep 2024 19:41:10 +0800
-Message-ID: <1727177967.6466465-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [RFC net-next v1 07/12] virtio_net: refactor the xmit type
-Date: Tue, 24 Sep 2024 19:39:27 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>,
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240924013204.13763-1-xuanzhuo@linux.alibaba.com>
- <20240924013204.13763-8-xuanzhuo@linux.alibaba.com>
- <CACGkMEtbNrwbxhRbjHGiEQeQbWUb2iL0ZtyosXs4_+GoZY-Gsw@mail.gmail.com>
-In-Reply-To: <CACGkMEtbNrwbxhRbjHGiEQeQbWUb2iL0ZtyosXs4_+GoZY-Gsw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1727178096; c=relaxed/simple;
+	bh=9b9AIM0D0WQUMIffHpOBsByjwEElnQ05FKM2vCnaOXw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uFODMLjsZbp3VgC2Mp0JNCbUFq11GVa0PfNEOzyVKeKcYwW+HmxZ7OPROyewt2cHw14VB7NPe5g9Og6WAQtdvkV1PxLWne3Hqw74EAL5b0ET7VTY0UdyBqIHnZYdOEykMBjrYLU2CvppnB26Fny4Mz7JolzWIwk9fLDQwk+CPjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lKwpgVkh; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-53568ffc525so6233188e87.0
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 04:41:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1727178092; x=1727782892; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m9fc57nlwLbQdQ2sAc2oCWAZfOvWwEj+gafnpAGtImk=;
+        b=lKwpgVkh6wH5S2enMDs0MvorEO9GJnJXbagQ2FiPvfeybOb9f3NOqxPY82UiLrHZBX
+         c/V+38u63ZguOWJLkALg7RAlX/iXybdiIRd5ddZnMQwTwOk0lCXR+etWQ3vW1Lizjuj1
+         XpW/SKAWR8W32X8ieCW3+xdClhVlEx5nxTxZpv0K0q4ySxPevr0xa4XU2k3laFrfV+zB
+         pos/yK45yFad7d4zIdAbpTm46IG4sWJJEG3z/pJmxsLWpjngykA5WpFBB4Dx2nyskga+
+         m0Lytac0YAnHF087yo9N9XNJxE6SoiDcsdNS3euyds25sL3ISSliVWFnYl4RRCsb0ZdN
+         vatg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727178092; x=1727782892;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m9fc57nlwLbQdQ2sAc2oCWAZfOvWwEj+gafnpAGtImk=;
+        b=kq+TRrNIV3ZMmALzXhX5jaTfznPsBHi9SrMjEzCgX4WVl3RDFrrcA6eHPDn7q0IgEK
+         LIZiD/GJeBiXnxKIq3egwhLxFDVPNkXejPQZnjhEKd9uds3LvmvpBE1PoB+g0jpjaRUS
+         fAXbm8QS+PazTDxVKvAwqVTjqufU/fmFAIbMs/aJVUCiqswVOZya6UhHhQBJsbF8XiQl
+         v4CkJ/O3ePTjocR0eR8U9A6ac8MMiwwImX/tj6y1YjVdC6/Ei/VBukSN6iQWGbw4SVu/
+         bPo+OoMjnhdZRG3opPNRy7S5ylSej5RJWgYg0OyzEouKev9UAHc35XB5HibGguVYQ5XK
+         CAqQ==
+X-Gm-Message-State: AOJu0YyE/ZfjB8VG/b3VBNiW1gr3nzBSl1HVSzwwyCKuCxEBgM5gpRht
+	F5Q1IZSrsQwZy5txAlFFv2H3KvDTrDYbEi4BM99puI1GYcYAWYpoK//NVBUS5U70sG6fSOw+emp
+	EodtALJACftlJKE/lsYOfAxI6WaF9oeSD4UtE
+X-Google-Smtp-Source: AGHT+IFj8cqiMiY1AXVRvhe8rwF6DcWkYvkXpBkf6ecfSJZUFkRYRRAZL4pwU0vfwWYZ0ZEAuIkQNbltGVrr7/auBdY=
+X-Received: by 2002:ac2:4c48:0:b0:536:54df:bffc with SMTP id
+ 2adb3069b0e04-536ac3201c7mr8557051e87.42.1727178091961; Tue, 24 Sep 2024
+ 04:41:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240924013039.29200-1-littlesmilingcloud@gmail.com>
+In-Reply-To: <20240924013039.29200-1-littlesmilingcloud@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 24 Sep 2024 13:41:20 +0200
+Message-ID: <CANn89i+Mg56hG_Z4N0KnJ=9c2mTHQAHTQEJ1dbagBpjhijAoxQ@mail.gmail.com>
+Subject: Re: [RFC PATCH net v2] ipv4: ip_gre: Fix drops of small packets in ipgre_xmit
+To: Anton Danilov <littlesmilingcloud@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Shigeru Yoshida <syoshida@redhat.com>, Suman Ghosh <sumang@marvell.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 24 Sep 2024 15:35:03 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Sep 24, 2024 at 9:32=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > Because the af-xdp will introduce a new xmit type, so I refactor the
-> > xmit type mechanism first.
-> >
-> > In general, pointers are aligned to 4 or 8 bytes.
+On Tue, Sep 24, 2024 at 3:31=E2=80=AFAM Anton Danilov
+<littlesmilingcloud@gmail.com> wrote:
 >
-> I think this needs some clarification, the alignment seems to depend
-> on the lowest common multiple between the alignments of all struct
-> members. So we know both xdp_frame and sk_buff are at least 4 bytes
-> aligned.
+> Regression Description:
 >
-> If we want to reuse the lowest bit of pointers in AF_XDP, the
-> alignment of the data structure should be at least 4 bytes.
+> Depending on the GRE tunnel device options, small packets are being
+> dropped. This occurs because the pskb_network_may_pull function fails due
+> to insufficient space in the network header.
 
-YES, for AF_XDP. See more in #10.
+I find this a bit confusing.
 
+Perhaps explain that pskb_network_may_pull() is adding 20 extra bytes,
+to the 28 needed bytes (20 for the IPv4 header, 8 bytes for GRE)
 
->
-> > If it is aligned to 4
-> > bytes, then only two bits are free for a pointer. But there are 4 types
-> > here, so we can't use bits to distinguish them. And 2 bits is enough for
-> > 4 types:
-> >
-> >     00 for skb
-> >     01 for SKB_ORPHAN
-> >     10 for XDP
-> >     11 for af-xdp tx
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
-> >  drivers/net/virtio_net.c | 90 +++++++++++++++++++++++-----------------
-> >  1 file changed, 51 insertions(+), 39 deletions(-)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index 630e5b21ad69..41a5ea9b788d 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -45,9 +45,6 @@ module_param(napi_tx, bool, 0644);
-> >  #define VIRTIO_XDP_TX          BIT(0)
-> >  #define VIRTIO_XDP_REDIR       BIT(1)
-> >
-> > -#define VIRTIO_XDP_FLAG                BIT(0)
-> > -#define VIRTIO_ORPHAN_FLAG     BIT(1)
-> > -
-> >  /* RX packet size EWMA. The average packet size is used to determine t=
-he packet
-> >   * buffer size when refilling RX rings. As the entire RX ring may be r=
-efilled
-> >   * at once, the weight is chosen so that the EWMA will be insensitive =
-to short-
-> > @@ -512,34 +509,35 @@ static struct sk_buff *virtnet_skb_append_frag(st=
-ruct sk_buff *head_skb,
-> >                                                struct page *page, void =
-*buf,
-> >                                                int len, int truesize);
-> >
-> > -static bool is_xdp_frame(void *ptr)
-> > -{
-> > -       return (unsigned long)ptr & VIRTIO_XDP_FLAG;
-> > -}
-> > +enum virtnet_xmit_type {
-> > +       VIRTNET_XMIT_TYPE_SKB,
-> > +       VIRTNET_XMIT_TYPE_SKB_ORPHAN,
-> > +       VIRTNET_XMIT_TYPE_XDP,
-> > +};
-> >
-> > -static void *xdp_to_ptr(struct xdp_frame *ptr)
-> > -{
-> > -       return (void *)((unsigned long)ptr | VIRTIO_XDP_FLAG);
-> > -}
-> > +/* We use the last two bits of the pointer to distinguish the xmit typ=
-e. */
-> > +#define VIRTNET_XMIT_TYPE_MASK (BIT(0) | BIT(1))
-> >
-> > -static struct xdp_frame *ptr_to_xdp(void *ptr)
-> > +static enum virtnet_xmit_type virtnet_xmit_ptr_strip(void **ptr)
->
-> Nit: not a native speaker but I think something like pack/unpack might
-> be better.
+So, instead of making sure 28 bytes were present in skb->head, we were
+requesting 48
+bytes. For small packets, this was failing.
 
+> For example, if only the key
+> option is specified for the tunnel device, packets of sizes up to 27
+> (including the IPv4 header itself) will be dropped. This affects both
+> locally originated and forwarded packets in the DMVPN-like setups.
+>
+> How to reproduce (for local originated packets):
+>
+>   ip link add dev gre1 type gre ikey 1.9.8.4 okey 1.9.8.4 \
+>           local <your-ip> remote 0.0.0.0
+>
+>   ip link set mtu 1400 dev gre1
+>   ip link set up dev gre1
+>   ip address add 192.168.13.1/24 dev gre1
+>   ip neighbor add 192.168.13.2 lladdr <remote-ip> dev gre1
+>   ping -s 1374 -c 10 192.168.13.2
+>   tcpdump -vni gre1
+>   tcpdump -vni <your-ext-iface> 'ip proto 47'
+>   ip -s -s -d link show dev gre1
+>
+> Solution:
+>
+> Use the pskb_may_pull function instead the pskb_network_may_pull.
+>
+> Fixes: 80d875cfc9d3 ("ipv4: ip_gre: Avoid skb_pull() failure in ipgre_xmi=
+t()")
+> Signed-off-by: Anton Danilov <littlesmilingcloud@gmail.com>
 
-Will fix.
-
-Thanks
-
->
-> With those changes.
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
->
-> Thanks
->
+Please send a V3 without the RFC tag in the title.
 
