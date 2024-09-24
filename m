@@ -1,231 +1,100 @@
-Return-Path: <netdev+bounces-129537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32F199845E6
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 14:29:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2246E9845EB
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 14:31:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 551DC1C226AF
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:29:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C16B21F2112D
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 12:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B448F1A7040;
-	Tue, 24 Sep 2024 12:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qVu7s6p8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06E9D12A14C;
+	Tue, 24 Sep 2024 12:31:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877253F9D5;
-	Tue, 24 Sep 2024 12:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E2E2907;
+	Tue, 24 Sep 2024 12:31:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727180948; cv=none; b=DUg5bdMNAocBP8VgXeRpQQakgenqzxRnPWKyx4JyWNc6Bv/wkIt6dNYA2CnFBPCry69OgQqn7wf0Tog4WpHBez/tj6QQe1O9XVyLPC90m4rZa8F1xnCbnJxKw/AN0QLDFmGZKRVgamCf0EWA+zEWEy1Rm7e5lwjNyGUDfxa+tws=
+	t=1727181081; cv=none; b=sk/VL/oT0P5u/TrRV4Rq20vgRDnqpTnNKtaaFQU7E9pPDYSgcmdpKH/HTTZKpcT3JZiL54fQOiiSigopl6cEm3O2WTFTtF7qON5CL3/uX7zOYk0DgSvGBVwrEh6ENxwTW3pTj1gv+F+/Psw3ECnz8brOJR1ucpK2XOTT9kWbO9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727180948; c=relaxed/simple;
-	bh=j4z0lX44fz/Sd7pRd8ALq4d+XegAN608GA7cOyTsM8E=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=VkA/VeagLmyVbS6t6Yc+XTnuuw3D/SnG9ywvVJ8TFWrMeCBH9d2z3lNen0hgSJdQ8i/3ztkgPrLJOaXH+h1NQQGwTrJJZCqBdIzVE8x4km/aL+/4tFxMKR3KMq3P6ix69hZ0NtHMAb2jHU0W7U/eG49XU0hJtR3gNqhM1j2qGJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qVu7s6p8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DAE9C4CEC4;
-	Tue, 24 Sep 2024 12:29:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727180948;
-	bh=j4z0lX44fz/Sd7pRd8ALq4d+XegAN608GA7cOyTsM8E=;
-	h=From:Date:Subject:To:Cc:From;
-	b=qVu7s6p8nbi3VajIJsqEswpWLGuhg71uIclSzX3H9S4SqoYChxRLxiFWGJ9UH/CxW
-	 i6+8J/GaFoU7gCnAilli7wsMdCVgT+VxrDPYvajY6b/fzztDnY9j/9bYsABpoZMh7v
-	 CDFzA7+bkmxrg0A/sek35GA4uCrljB2rPqI27FvU55g04FtiqzMPjNoErylO5+Qlgk
-	 woNZzVXnCptgmP/b1IDgK+d/5/auAqLkuS8tWRwrxS7fdu4y8F+fNcSM55yKyOjSzL
-	 qMNmWmJYfw5WMZZhZpapPEODR/FYRCBdFNwdtrmgxMaXT0waAzUlWoWAccU7gV/uM4
-	 Sf2ByMwiqmK0w==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Tue, 24 Sep 2024 15:28:48 +0300
-Subject: [PATCH net] net: ethernet: ti: cpsw_ale: Fix warning on some
- platforms
+	s=arc-20240116; t=1727181081; c=relaxed/simple;
+	bh=2HSP/osZlh6WUE0YGHVXPnPvUS6ksAmCCDb0idG3ElI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RM0LvwuGqDCPSLcy33YyKoGmgcRrOq1Sj7146eSBFTHMy03jl/xVhCi1P8LOaHYr4ZaszOvAjgjl8vrzfFsQPUn5s5aWZKp5mYF/M9umQlm1mKeTt6iLvJmjn+y6M0UxahwBOh61uoML4Eac/O5V/FWpBqG7SQzeZ5tmhqk7tps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XCfN169f3z6K6rH;
+	Tue, 24 Sep 2024 20:30:41 +0800 (CST)
+Received: from frapeml500005.china.huawei.com (unknown [7.182.85.13])
+	by mail.maildlp.com (Postfix) with ESMTPS id BC3E91404F5;
+	Tue, 24 Sep 2024 20:31:10 +0800 (CST)
+Received: from china (10.200.201.82) by frapeml500005.china.huawei.com
+ (7.182.85.13) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 24 Sep
+ 2024 14:31:02 +0200
+From: Gur Stavi <gur.stavi@huawei.com>
+To: <lulie@linux.alibaba.com>
+CC: <antony.antony@secunet.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<dust.li@linux.alibaba.com>, <edumazet@google.com>,
+	<fred.cc@alibaba-inc.com>, <jakub@cloudflare.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <steffen.klassert@secunet.com>,
+	<willemdebruijn.kernel@gmail.com>, <yubing.qiuyubing@alibaba-inc.com>
+Subject: [RFC PATCHv2 net-next 1/3] net/udp: Add a new struct for hash2 slot
+Date: Tue, 24 Sep 2024 15:30:17 +0300
+Message-ID: <20240924123017.1688277-1-gur.stavi@huawei.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240924110414.52618-2-lulie@linux.alibaba.com>
+References: <20240924110414.52618-2-lulie@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240924-am65-cpsw-multi-rx-fix-v1-1-0ca3fa9a1398@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAH+w8mYC/x2MSwqEMBAFryK9ngaNUUavMriI8akNY5TEH4h3N
- 7isgqqLArwgUJ1c5LFLkNlFyD4J2dG4ASxdZFKp0mmlcjZTWbBdwsHT9l+F/cm9nIxWf2F6qyu
- UFOPFI+p3/COHlZr7fgA72Hm4bQAAAA==
-To: Siddharth Vadapalli <s-vadapalli@ti.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, srk@ti.com, 
- Geert Uytterhoeven <geert@linux-m68k.org>, 
- Roger Quadros <rogerq@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5815; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=j4z0lX44fz/Sd7pRd8ALq4d+XegAN608GA7cOyTsM8E=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBm8rCN5OnVq+tKLHFO7qebc5JvbOtP+nlqhorcK
- MffmXJ5iamJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZvKwjQAKCRDSWmvTvnYw
- k1BsEACakksbQcenbrbugMW2XDKw/NdZ+s2xyMQ6Fwdla/P/463h3+Pp1nIadSj1asvVCMLPSvH
- kFGnLlzfBX8FXQtM5MFFcXqiarE2tpse9Q+tFk42g27/fFodXUrN0MOfpMCYeG7Gx5lgwqsV4g8
- kxXoNAuVLC5jk6LNFKol9ZFTz6itHAPYwZTomh7Ir3vwjeCydyZhiMzY2f5VajC0+oqAgmdTOla
- zXVXt/hefEzY8dj5HNkgamXttkUpDZll3+A1ozcVxL+SVfSoYpEd+5+sT6rSzkd8lITAOmTaTe6
- N0RfH0ipjE7sklXOwLz/HIabQCrvQ/8F1zKFtTIpU6PCBKc/2QV7uCbCVlpZ7Mt7fdmLdhITeVw
- FZyIk65qqhaefEIZZsQ9RHJ7llXEBY8pIkO2lyUfHSMVfTrJluWoPiyNSJVWsZtesaRPK7w1Q5o
- CDrm0B9/fD95cOcRCGRGbj07c4bggbrN8cApP/xShzwJsIc8wPYGTh/TNahhuF1Pqem8z2Ntlm8
- 7rBdKb9uidc4KGYGUUj1+iMmR1Q9Ykum/0QUNNDp4zs27o9jaSsnlgMVJecOcBvoV3HRYDZImNB
- Co16PLBxYFxN/uOJZMlCoSvHd0TPVG1cXKxSoJg4Zl1asg0nmgRETwEYtebI3002cFC5xg4xHss
- EXVohPEbbMpXcLw==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ frapeml500005.china.huawei.com (7.182.85.13)
 
-The number of register fields cannot be assumed to be ALE_FIELDS_MAX
-as some platforms can have lesser fields.
+> + *	@hslot:	basic hash slot
+> + *	@hash4_cnt: number of sockets in hslot4 of the same (local port, local address)
+> + */
+> +struct udp_hslot_main {
+> +	struct udp_hslot	hslot; /* must be the first member */
+> +	u32			hash4_cnt;
+> +} __aligned(2 * sizeof(long));
+> +#define UDP_HSLOT_MAIN(__hslot) ((struct udp_hslot_main *)(__hslot))
 
-Solve this by embedding the actual number of fields available
-in platform data and use that instead of ALE_FIELDS_MAX.
+Wouldn't container_of be more suitable than brutal cast?
 
-Gets rid of the below warning on BeagleBone Black
+> @@ -91,7 +110,7 @@ static inline struct udp_hslot *udp_hashslot(struct udp_table *table,
+>  static inline struct udp_hslot *udp_hashslot2(struct udp_table *table,
+>  					      unsigned int hash)
+>  {
+> -	return &table->hash2[hash & table->mask];
+> +	return (struct udp_hslot *)udp_hashslot2_main(table, hash);
 
-[    1.007735] WARNING: CPU: 0 PID: 33 at drivers/base/regmap/regmap.c:1208 regmap_field_init+0x88/0x9c
-[    1.007802] invalid empty mask defined
-[    1.007812] Modules linked in:
-[    1.007842] CPU: 0 UID: 0 PID: 33 Comm: kworker/u4:3 Not tainted 6.11.0-01459-g508403ab7b74-dirty #840
-[    1.007867] Hardware name: Generic AM33XX (Flattened Device Tree)
-[    1.007890] Workqueue: events_unbound deferred_probe_work_func
-[    1.007935] Call trace:
-[    1.007957]  unwind_backtrace from show_stack+0x10/0x14
-[    1.007999]  show_stack from dump_stack_lvl+0x50/0x64
-[    1.008033]  dump_stack_lvl from __warn+0x70/0x124
-[    1.008077]  __warn from warn_slowpath_fmt+0x194/0x1a8
-[    1.008113]  warn_slowpath_fmt from regmap_field_init+0x88/0x9c
-[    1.008154]  regmap_field_init from devm_regmap_field_alloc+0x48/0x64
-[    1.008193]  devm_regmap_field_alloc from cpsw_ale_create+0xfc/0x320
-[    1.008251]  cpsw_ale_create from cpsw_init_common+0x214/0x354
-[    1.008286]  cpsw_init_common from cpsw_probe+0x4ac/0xb88
+Why cast and not use ->hslot. Preferably with a local variable?
 
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Closes: https://lore.kernel.org/netdev/CAMuHMdUf-tKRDzkz2_m8qdFTFutefddU0NTratVrEjRTzA3yQQ@mail.gmail.com/
-Fixes: 11cbcfeaa79e ("net: ethernet: ti: cpsw_ale: use regfields for number of Entries and Policers")
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
----
- drivers/net/ethernet/ti/cpsw_ale.c | 12 +++++++++++-
- drivers/net/ethernet/ti/cpsw_ale.h |  1 +
- 2 files changed, 12 insertions(+), 1 deletion(-)
+> @@ -3438,16 +3436,17 @@ void __init udp_table_init(struct udp_table *table, const char *name)
+>  					      UDP_HTABLE_SIZE_MIN,
+>  					      UDP_HTABLE_SIZE_MAX);
+>
+> -	table->hash2 = table->hash + (table->mask + 1);
+> +	table->hash2 = UDP_HSLOT_MAIN(table->hash + (table->mask + 1));
 
-diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
-index 0d5d8917c70b..8d02d2b21429 100644
---- a/drivers/net/ethernet/ti/cpsw_ale.c
-+++ b/drivers/net/ethernet/ti/cpsw_ale.c
-@@ -96,6 +96,7 @@ enum {
-  * @features: features supported by ALE
-  * @tbl_entries: number of ALE entries
-  * @reg_fields: pointer to array of register field configuration
-+ * @num_fields: number of fields in the reg_fields array
-  * @nu_switch_ale: NU Switch ALE
-  * @vlan_entry_tbl: ALE vlan entry fields description tbl
-  */
-@@ -104,6 +105,7 @@ struct cpsw_ale_dev_id {
- 	u32 features;
- 	u32 tbl_entries;
- 	const struct reg_field *reg_fields;
-+	int num_fields;
- 	bool nu_switch_ale;
- 	const struct ale_entry_fld *vlan_entry_tbl;
- };
-@@ -1400,6 +1402,7 @@ static const struct cpsw_ale_dev_id cpsw_ale_id_match[] = {
- 		.dev_id = "cpsw",
- 		.tbl_entries = 1024,
- 		.reg_fields = ale_fields_cpsw,
-+		.num_fields = ARRAY_SIZE(ale_fields_cpsw),
- 		.vlan_entry_tbl = vlan_entry_cpsw,
- 	},
- 	{
-@@ -1407,12 +1410,14 @@ static const struct cpsw_ale_dev_id cpsw_ale_id_match[] = {
- 		.dev_id = "66ak2h-xgbe",
- 		.tbl_entries = 2048,
- 		.reg_fields = ale_fields_cpsw,
-+		.num_fields = ARRAY_SIZE(ale_fields_cpsw),
- 		.vlan_entry_tbl = vlan_entry_cpsw,
- 	},
- 	{
- 		.dev_id = "66ak2el",
- 		.features = CPSW_ALE_F_STATUS_REG,
- 		.reg_fields = ale_fields_cpsw_nu,
-+		.num_fields = ARRAY_SIZE(ale_fields_cpsw_nu),
- 		.nu_switch_ale = true,
- 		.vlan_entry_tbl = vlan_entry_nu,
- 	},
-@@ -1421,6 +1426,7 @@ static const struct cpsw_ale_dev_id cpsw_ale_id_match[] = {
- 		.features = CPSW_ALE_F_STATUS_REG,
- 		.tbl_entries = 64,
- 		.reg_fields = ale_fields_cpsw_nu,
-+		.num_fields = ARRAY_SIZE(ale_fields_cpsw_nu),
- 		.nu_switch_ale = true,
- 		.vlan_entry_tbl = vlan_entry_nu,
- 	},
-@@ -1429,6 +1435,7 @@ static const struct cpsw_ale_dev_id cpsw_ale_id_match[] = {
- 		.features = CPSW_ALE_F_STATUS_REG | CPSW_ALE_F_HW_AUTOAGING,
- 		.tbl_entries = 64,
- 		.reg_fields = ale_fields_cpsw_nu,
-+		.num_fields = ARRAY_SIZE(ale_fields_cpsw_nu),
- 		.nu_switch_ale = true,
- 		.vlan_entry_tbl = vlan_entry_nu,
- 	},
-@@ -1436,12 +1443,14 @@ static const struct cpsw_ale_dev_id cpsw_ale_id_match[] = {
- 		.dev_id = "j721e-cpswxg",
- 		.features = CPSW_ALE_F_STATUS_REG | CPSW_ALE_F_HW_AUTOAGING,
- 		.reg_fields = ale_fields_cpsw_nu,
-+		.num_fields = ARRAY_SIZE(ale_fields_cpsw_nu),
- 		.vlan_entry_tbl = vlan_entry_k3_cpswxg,
- 	},
- 	{
- 		.dev_id = "am64-cpswxg",
- 		.features = CPSW_ALE_F_STATUS_REG | CPSW_ALE_F_HW_AUTOAGING,
- 		.reg_fields = ale_fields_cpsw_nu,
-+		.num_fields = ARRAY_SIZE(ale_fields_cpsw_nu),
- 		.vlan_entry_tbl = vlan_entry_k3_cpswxg,
- 		.tbl_entries = 512,
- 	},
-@@ -1477,7 +1486,7 @@ static int cpsw_ale_regfield_init(struct cpsw_ale *ale)
- 	struct regmap *regmap = ale->regmap;
- 	int i;
- 
--	for (i = 0; i < ALE_FIELDS_MAX; i++) {
-+	for (i = 0; i < ale->params.num_fields; i++) {
- 		ale->fields[i] = devm_regmap_field_alloc(dev, regmap,
- 							 reg_fields[i]);
- 		if (IS_ERR(ale->fields[i])) {
-@@ -1503,6 +1512,7 @@ struct cpsw_ale *cpsw_ale_create(struct cpsw_ale_params *params)
- 	params->ale_entries = ale_dev_id->tbl_entries;
- 	params->nu_switch_ale = ale_dev_id->nu_switch_ale;
- 	params->reg_fields = ale_dev_id->reg_fields;
-+	params->num_fields = ale_dev_id->num_fields;
- 
- 	ale = devm_kzalloc(params->dev, sizeof(*ale), GFP_KERNEL);
- 	if (!ale)
-diff --git a/drivers/net/ethernet/ti/cpsw_ale.h b/drivers/net/ethernet/ti/cpsw_ale.h
-index 1e4e9a3dd234..87b7d1b3a34a 100644
---- a/drivers/net/ethernet/ti/cpsw_ale.h
-+++ b/drivers/net/ethernet/ti/cpsw_ale.h
-@@ -24,6 +24,7 @@ struct cpsw_ale_params {
- 	 */
- 	bool			nu_switch_ale;
- 	const struct reg_field *reg_fields;
-+	int			num_fields;
- 	const char		*dev_id;
- 	unsigned long		bus_freq;
- };
-
----
-base-commit: 9410645520e9b820069761f3450ef6661418e279
-change-id: 20240923-am65-cpsw-multi-rx-fix-eb48eafc49e6
-
-Best regards,
--- 
-Roger Quadros <rogerq@kernel.org>
+Wouldn't it be simpler to just cast to void? It is pure pointer
+arithmetic where type checking is meaningless.
+(void *)(table->hash + (table->mask + 1))
+I realize now why UDP_HSLOT_MAIN couldn't use container_of but it
+just demonstrates how convoluted this is.
 
 
