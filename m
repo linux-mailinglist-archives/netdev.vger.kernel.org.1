@@ -1,242 +1,391 @@
-Return-Path: <netdev+bounces-129627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DB4D984EBD
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 01:14:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A766984ED9
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 01:20:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 628DC1C20E64
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 23:14:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D0A41C20B6F
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 23:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3562A1865F2;
-	Tue, 24 Sep 2024 23:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9589017C227;
+	Tue, 24 Sep 2024 23:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KvoX61DW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NFJJ5hJw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB62E82488
-	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 23:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727219695; cv=fail; b=hKezTflC8aP7bVmcw9H3oQ7NobVTjx6OzMTUFfWogAyyqL3lnweD6wlol6TTwZQXy1TwzYaqRg0V49Q0RoU9LbuanX2csYzZRaTRjI5uAtLIF7oVC7vTATDt+2cSyfuhMNXqXzyAeLHT09+Nnhaue+ePL2B+YjMZLlpxwu3YEN8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727219695; c=relaxed/simple;
-	bh=76ybMmGNJb9SplGvJcPuC7tBW80G0VQ247hDNgsbyX0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ZAD6Hs/jVnw+SDi5xYuhx9+8EvM0OfA1HYH24JP8kb3G5LlJ35VWhh1XAkutzmH5ht5Ek0hxa8MrU2gvre92lM1cVxhzzUxu0H6fuZOlMjgIt6fHAjm5OGncJC6gTzyICPofe9BgRkC4FmCPJkG7qQUP+Db3pD/2xoilUm0rWYg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KvoX61DW; arc=fail smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727219693; x=1758755693;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=76ybMmGNJb9SplGvJcPuC7tBW80G0VQ247hDNgsbyX0=;
-  b=KvoX61DW0cv/1dbgzBx7oFpFDW2W5GcSPiH3d53sSzsIiUdSVlnzXt9q
-   NpMRmwxng3rK6Pu+bxEN9ClRT1RbQHOI1Wtr0n+KH2BgQI4Sl5rKuRtJe
-   v9jKPnBRIdAcBaIAondm3WUe0TpbfDlxPiXvgocDijqyOpHH/VMmu1kta
-   Leq0q8jHAQiWlxv1YMIOS6Q4QmtQwq9wKThB23hmqpS/LG+C22caOm5SD
-   jjml3dObGzB9UG8jzS/bh2cjMUk5gujkkLhjXDREMKuNhg8MAY+Q1upjB
-   jmSre8KR3zDGzpfJpFqS0ZKpaRRVtzuj8KBXwnCxE0E3DB9e97fv9erRr
-   w==;
-X-CSE-ConnectionGUID: A53uhKtKSgW/NobH1aTxmA==
-X-CSE-MsgGUID: GNVMd3wqQvW7UbsvyHcIbQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11205"; a="26113459"
-X-IronPort-AV: E=Sophos;i="6.10,255,1719903600"; 
-   d="scan'208";a="26113459"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Sep 2024 16:14:50 -0700
-X-CSE-ConnectionGUID: piAH4PovS8u3bSN1K3DjEA==
-X-CSE-MsgGUID: RbM1UGfqRPeaWjaE0OPhWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,255,1719903600"; 
-   d="scan'208";a="75686053"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 24 Sep 2024 16:14:49 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 24 Sep 2024 16:14:48 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 24 Sep 2024 16:14:48 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.176)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 24 Sep 2024 16:14:48 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Txm/nITpuaJqz0WhTG5Lc6m6Fl4VetBOBn+4ppirVvheApCjGUY/ZWglXY3gOVfY6X+PhLZWt0UJwW4yiUUEDoOGY8k0eRIrK7A1gFWnignW7/paN3lT0/2xWHSKH2gkno+LvqxcmCMdm0zuOJhHa1TxjT9zrlXCCauA//ZbZVYysquYIbdtssCujo8IdHbNxHZakAT1sD3/Hyn5vK7VeMsdxSBRyH/0DN5WABVR0qZk08DJu73GeXQ0W3kLFDXvHJBJ0nxLE0RUBL+mrXsfmgFKOFgiSgf7SJ3KY6mZvB7RPknc619Fd2kQ35pnKNOyiBl8XUY1XffNpk5DPF8SGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hapjI+RkTJDOIlMQNbj5SILOy/PaGgzsHy4Q7m7I3RE=;
- b=yPvCKv6rwC9Mm/fz4knR25xxJrPnJladr304JDJX/XOOL4jviU4p+yzXceUCdRLDUgkQjLe2Y+sCW/fxFrZSPxnSU5nW2eu0EZKR6Pusf2bBm0Q/QadKhTYwZ3G5TwR5mOU7ZOBg9kCdCAWSr5YlaXKdKUI/9zfxuMPCLQ8FTwsvkCrvsY8Wl4TU4yy5cjUplWSFYalkpVo3vgAcj8FTKs046AkqI+rTKg3BawEn2u2LL/N6mkc1/i8D5j2nSrFCQiyOl5rOBl0w1Dagc5TGie4mzzOeX2aa3jhqipSuuyV261iTYNAG2KKtbyWIfmz8wf8qY0mU7Bf2ciB59cKvPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5911.namprd11.prod.outlook.com (2603:10b6:303:16b::16)
- by SA1PR11MB8373.namprd11.prod.outlook.com (2603:10b6:806:38d::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.25; Tue, 24 Sep
- 2024 23:14:45 +0000
-Received: from MW4PR11MB5911.namprd11.prod.outlook.com
- ([fe80::1d00:286c:1800:c2f2]) by MW4PR11MB5911.namprd11.prod.outlook.com
- ([fe80::1d00:286c:1800:c2f2%4]) with mapi id 15.20.7982.022; Tue, 24 Sep 2024
- 23:14:45 +0000
-From: "Singh, Krishneil K" <krishneil.k.singh@intel.com>
-To: "Hay, Joshua A" <joshua.a.hay@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Olech, Milena" <milena.olech@intel.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Hay, Joshua A" <joshua.a.hay@intel.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan][PATCH iwl-net] idpf: use actual mbx receive
- payload length
-Thread-Topic: [Intel-wired-lan][PATCH iwl-net] idpf: use actual mbx receive
- payload length
-Thread-Index: AQHa/jEp8o+enl/h70yZYqF5/3fzAbJnsifg
-Date: Tue, 24 Sep 2024 23:14:45 +0000
-Message-ID: <MW4PR11MB5911B25C951EDEEE19A4BA61BA682@MW4PR11MB5911.namprd11.prod.outlook.com>
-References: <20240903184956.1572344-1-joshua.a.hay@intel.com>
-In-Reply-To: <20240903184956.1572344-1-joshua.a.hay@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR11MB5911:EE_|SA1PR11MB8373:EE_
-x-ms-office365-filtering-correlation-id: b353277b-43a5-4b4d-ce33-08dcdceeadb9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?SNlD2GcIganRVxyCJG94796gnZuGwxS1sRgpeD1ToCiga5SVQHcjI2HYiKSK?=
- =?us-ascii?Q?q/5sysY3leZdPEvRUukYxdfi2k28Pc3SFsYHhPTeD/gIzrZChfx2/hMQ8QCq?=
- =?us-ascii?Q?t0VTLRzgYVJkTWG8BDlf1fkpZ9tEYJygxZc6HE1MFUwIp63vCGWRcydpUkfy?=
- =?us-ascii?Q?StW6EMyUwsqnatXGCAj3xHRp5HzzQDbBroNPY1pzisUe0Co8T+9EBwnBLs0z?=
- =?us-ascii?Q?Wl5RXtPxUdVHFuMvyneJRdl44ZESXCbsoHNOeb6wTm53cCHOYIRqrFhe5kmZ?=
- =?us-ascii?Q?Z9udogyredaVm2rhVw5e2FmIiZ/VnR+cp4FPByG0+S6vA0txBoX37yAQQxfP?=
- =?us-ascii?Q?TWCKTgpLDbTDYysFDvf4fQTCI0F93O7Z/nbgNyqBVeL+8rCMlq7LqxEAqCx2?=
- =?us-ascii?Q?WPBIg8ZGCd0z4utwiWtrDpE97viko+7xnmaU+QiL7nDkkEbTawYyod1qEqao?=
- =?us-ascii?Q?yQNCxP+PZcRdBbvC9bHQlvSPOZSbJEu5dvjyfHjj+UZEvswNZ0EJ0Q6Ow0lJ?=
- =?us-ascii?Q?Rs3FIEkeWf9WdK9UJg6CyucfXXhEsK794KVbEX+cBcte7DEpBQ1G5vfrHG3i?=
- =?us-ascii?Q?tTRwa4yS7iEVNNjR2SNjxekI+WwV9pqp3PV/90E4HwtQdVHX8Mc+LxT4jPq9?=
- =?us-ascii?Q?1mYAnMflAhHzk4PkDp0xdksIlB1msjotiAOYvI55U4hu9lqWS1MlgXD4ZCK9?=
- =?us-ascii?Q?r82b8Zu+gcYlFXeEj+DSaY/UTqVziIgcpum6bLuBFjYmQZYCZGPVQA8/iRkH?=
- =?us-ascii?Q?TtQx7LhwH8y++5jrk+u2szwPBweh1vRVIK7g0uoBNlWwqvGcFS18+cUlvAIW?=
- =?us-ascii?Q?2b/QECm3rgDlj0d33XVevGlFp1F73oe1h3nLbKmcRaFt6Xzl2MFOgATGu6jY?=
- =?us-ascii?Q?hEB+zKYF6wLsDIimuk+samFajpCJJm0i4yeTC7L0bHtNeV2vLbByisrVbXWA?=
- =?us-ascii?Q?nKtryxceqDA/Onn0Amy1XkrDQLWj1jUQEhRiU8SaPnihpB4sMX3t0zDao1TZ?=
- =?us-ascii?Q?257KH20kqGbsfMEYijjllH3bUaGxsImk3b5BcwE/nnUp9vM/GrnkkwTE/7cP?=
- =?us-ascii?Q?5rXKUjA7ZsWqmGRYscp49DVBddPWTn7Weu0VQhovqhxir6SDCi/vNo57RbjR?=
- =?us-ascii?Q?mpa/2Qc/cQPGeqePD1xqbBiV/45bsRoybLexPaH8x8ohBnJkLbAOHg8/YiZf?=
- =?us-ascii?Q?g53FgjSLnNmA45RHlYKHJLn+bfBhqV4wx+C3WM2Vpg3mvHdC8UKUHfNmdajJ?=
- =?us-ascii?Q?FoZ3/7UjgOiLirrTUq58FI3HrUvvtkN4V/2Op1r3KfKrMs7QnZ3RZFy91yLU?=
- =?us-ascii?Q?evvpKOu9dOal2tC/ZQgriorgVUWDRYOxAzVmlVV2O9sY0gafKa9kQuFJFCHN?=
- =?us-ascii?Q?rsocbgid0nm0KugaD9JznjyTCuB3n4iv+Z0C/Gkv/4soCsoJLw=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5911.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tbrM69Yfv7GiV0bNiMJFebKbvgJPAMxh0YeeQ0btcSOh9obN9JoYq6QCU+7S?=
- =?us-ascii?Q?MguaZT4k5OVxkIbAgK8v8bD3UKVXZhaOaiXxQC2HTOHBJCQ1PlaIzLXgCfsE?=
- =?us-ascii?Q?UQMMZSmZL3HI5kFR75ktYZOwx3kwth6PSa7CRPA/Hv/g6nC3ZLSCrazcfCKo?=
- =?us-ascii?Q?yhyLJTSdoP9MnfGERnKDtTCR1jHjjHCPaA3dBy70howw0MKnHVFRHYygTvJD?=
- =?us-ascii?Q?JU3RZearoGIrEV3/4itar4gWvCkgifGYt203nxyNDMDGwAT40WmPwR122PGf?=
- =?us-ascii?Q?IIxwe2bNHqD5VMf70neBr+hBoqWOOhKHuEvdArqV9DNln2JkA4TDVapzIeAM?=
- =?us-ascii?Q?pGQAwhWg5PT7h86o6kj4ELvkbp0QT1AJ3QI6buDmwlo9/DpD4POd7eZdrlbG?=
- =?us-ascii?Q?B3BNzNRCSPfiALfyHmLSINfjJHlZTLdTO8zOP+gBSIJ2UQf9R/apAHxF0iBK?=
- =?us-ascii?Q?GL2FGKCSmkyaWGyBktR4GNzKp3SDxHU3PE5s4nx5kFIVUk7XUXmwnoGJ//3b?=
- =?us-ascii?Q?Hos2qogpuU+iwS+kWtPVb+RDqO8u/1ye8uESqVnQs78qLox/p019HF5ILA7i?=
- =?us-ascii?Q?oxJ+YbH7MCte8TesFwivJYkJyh+q3qtbdXI0b8WC2/GUpn1HtcYUxbIOjbBy?=
- =?us-ascii?Q?5TGe9LdfHw3hjTZPaWaZsup1kBNzBAjQH549Mp1w+k2lokxRXEgQNPQyWq4w?=
- =?us-ascii?Q?ozssY1nvvQ4Cejm0IiCZ/Zi+qQkixDCHIO5/0aYrxesJU7sFN2QFNiT+2z90?=
- =?us-ascii?Q?CgpmmtUNj+hs4P3DbSh9AF71henmWmZT1zZVsTbIJFhzmFeAqO9kxJ2U2Xfb?=
- =?us-ascii?Q?mzpA8lZxx02Jy2chWGG85wx7rQnHdJlqcH5WUUQWIo9MVoHOITafMziRBvmi?=
- =?us-ascii?Q?QdKflEpimi4+OgiA+x5rqy+VWWVsSK9hbplHHbrKIlLBIY69YnnQbz+MVwdM?=
- =?us-ascii?Q?tsZQJubHjhkNYmBchOB6bNpgT1rcocSggPEZYa4aaSzygehfLG5VfNhmCcBU?=
- =?us-ascii?Q?SzByTn1/K1Ws0RwBf8oxI6pUHbHGJrve7LrKV2bLFesm4bhh5H3F/Avj3n5v?=
- =?us-ascii?Q?B3vLseXECgi7IBIFnj3ITr7wul2XKkXYk6vwUZ9DS2X2fGtTSeujT0C4tHyX?=
- =?us-ascii?Q?idSH7wq/0MdNjyJLLQZhVywAv9gtrFb3rXRscpipiQdORvZVA6EKhUZt5dhj?=
- =?us-ascii?Q?/UwihUfMopsHcLZ+f0s5J9UDzqry7NuiFofg5h4BbRL/+6NsjiwASpP/5Fpp?=
- =?us-ascii?Q?3Ac7P4nYGSb0V6dv1ddpZHLf54RbXeF7oJJY9UWcPxXwT19wNCLxyKTaeDQL?=
- =?us-ascii?Q?5CTQfzejSNq1qqfiYaHs9z0i8OXlisYsRI7ijYNx/tmO1n6VNAZDpkEbenKx?=
- =?us-ascii?Q?AXxK4O+Qtmcu7C9ENF6uVOzndlbB7qUH/r9X9BKHjmwxagBR/QjqwKucnK6K?=
- =?us-ascii?Q?OptRjWFCGlnIXDqbNOzdkxBGDnVPb1GTAP/DQu0TIHOh0pblSm+TuaSaHHro?=
- =?us-ascii?Q?rnT90+CwXqrTbXRERo16errzd3tA2qB1bpCPrjQGOIOGbk4jnr2uoPEG0FZQ?=
- =?us-ascii?Q?LZB6B6yQKq+N2aCahK/9SzZBSPM5CYq9u4737GrJkcSPUs2rLur8eyDRU5IO?=
- =?us-ascii?Q?bQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FADE13CABC
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 23:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727220030; cv=none; b=GE6S5u1GYoY1gpQcnoRTAh+xFfPM4YA0BNa8bKGN+KfUMqQ39re9Ioqru/0tT8gXz92Rnsr6lRb8K+jTrIheF/e5UknueVJzmIseTubIkOIRBa445MJJPvpnVlkMjtXtyKDiirtDAk3bibTQbBFFO+a7vFxUIwWA+pNorTQiZCQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727220030; c=relaxed/simple;
+	bh=63EDuEOV6NdZGMEQCrIGRo6aUyD+bGEM/JW0W6wZKjU=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=amONr7A2T7U7mCEI60ggltAoDor6DvKNZZqzr7d7K/jAzS8B2vRoUf7ct4WszCw5e6C7pLgOjE8q31hX7Gv1hQfgssHS4FpnPpiPeUpopJb9xCse1RUX1S55GkkNGmYuxh3mSe7KhDOknjVpe8xDXMwrYO6JA51lRaBItmqcEx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NFJJ5hJw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727220027;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1R6dWg97gMKWsJa7Y9eW/vCPbW+C/1rDhbmcsNTkNFo=;
+	b=NFJJ5hJwt6mJ4VXjkoLmD+PazSzvN5MPC5NIPoVwj6hbx5Pszvc+F0j38LBkHgfzEsRhqn
+	LFK0a0wdRNmF2y6DGcbmBX/q32c2IqteIpx+F9wf2I3EMBlFuL8Cqjj6T0P8WxIdHU6A6t
+	2Au1OCUEvYqzkbbwq4ttJ3WC6/aPhx8=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-385-rilsnK3MOTSffUsOAE5KMg-1; Tue,
+ 24 Sep 2024 19:20:24 -0400
+X-MC-Unique: rilsnK3MOTSffUsOAE5KMg-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 756BA193E8C7;
+	Tue, 24 Sep 2024 23:20:21 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.145])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id DFC4719560AA;
+	Tue, 24 Sep 2024 23:20:14 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240923183432.1876750-1-chantr4@gmail.com>
+References: <20240923183432.1876750-1-chantr4@gmail.com> <20240814203850.2240469-20-dhowells@redhat.com>
+To: Manu Bretelle <chantr4@gmail.com>, eddyz87@gmail.com
+Cc: dhowells@redhat.com, asmadeus@codewreck.org,
+    ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
+    hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+    linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+    netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
+    smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+    v9fs@lists.linux.dev, willy@infradead.org
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5911.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b353277b-43a5-4b4d-ce33-08dcdceeadb9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Sep 2024 23:14:45.4637
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vsrUA1alHz+gVCkR0z4pyNJ9eFzY7tpnjQw4bsQQe1TIl3k9b6zqqQi96QykOQlaYAHfLw9CDtqmuYPEZyIe6fgD2SAVtwwaNwamwUjD/q0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8373
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1279815.1727220013.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Wed, 25 Sep 2024 00:20:13 +0100
+Message-ID: <1279816.1727220013@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-> -----Original Message-----
-> From: Joshua Hay <joshua.a.hay@intel.com>
-> Sent: Tuesday, September 3, 2024 11:50 AM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Olech, Milena <milena.olech@intel.com>; Lobakin, Aleksander
-> <aleksander.lobakin@intel.com>; netdev@vger.kernel.org; Hay, Joshua A
-> <joshua.a.hay@intel.com>; stable@vger.kernel.org; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>
-> Subject: [Intel-wired-lan][PATCH iwl-net] idpf: use actual mbx receive pa=
-yload
-> length
->=20
-> When a mailbox message is received, the driver is checking for a non 0
-> datalen in the controlq descriptor. If it is valid, the payload is
-> attached to the ctlq message to give to the upper layer.  However, the
-> payload response size given to the upper layer was taken from the buffer
-> metadata which is _always_ the max buffer size. This meant the API was
-> returning 4K as the payload size for all messages.  This went unnoticed
-> since the virtchnl exchange response logic was checking for a response
-> size less than 0 (error), not less than exact size, or not greater than
-> or equal to the max mailbox buffer size (4K). All of these checks will
-> pass in the success case since the size provided is always 4K. However,
-> this breaks anyone that wants to validate the exact response size.
->=20
-> Fetch the actual payload length from the value provided in the
-> descriptor data_len field (instead of the buffer metadata).
->=20
-> Unfortunately, this means we lose some extra error parsing for variable
-> sized virtchnl responses such as create vport and get ptypes.  However,
-> the original checks weren't really helping anyways since the size was
-> _always_ 4K.
->=20
-> Fixes: 34c21fa894a1 ("idpf: implement virtchnl transaction manager")
-> Cc: stable@vger.kernel.org # 6.9+
-> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> ---
->  drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-> b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-> index 70986e12da28..3c0f97650d72 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+Could you try the attached?  It may help, though this fixes a bug in the
+write-side, not the read-side.
 
-Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
+David
+---
+netfs: Fix write oops in generic/346 (9p) and maybe generic/074 (cifs)
+
+In netfslib, a buffered writeback operation has a 'write queue' of folios
+that are being written, held in a linear sequence of folio_queue structs.
+The 'issuer' adds new folio_queues on the leading edge of the queue and
+populates each one progressively; the 'collector' pops them off the
+trailing edge and discards them and the folios they point to as they are
+consumed.
+
+The queue is required to always retain at least one folio_queue structure.
+This allows the queue to be accessed without locking and with just a bit o=
+f
+barriering.
+
+When a new subrequest is prepared, its ->io_iter iterator is pointed at th=
+e
+current end of the write queue and then the iterator is extended as more
+data is added to the queue until the subrequest is committed.
+
+Now, the problem is that the folio_queue at the leading edge of the write
+queue when a subrequest is prepared might have been entirely consumed - bu=
+t
+not yet removed from the queue as it is the only remaining one and is
+preventing the queue from collapsing.
+
+So, what happens is that subreq->io_iter is pointed at the spent
+folio_queue, then a new folio_queue is added, and, at that point, the
+collector is at entirely at liberty to immediately delete the spent
+folio_queue.
+
+This leaves the subreq->io_iter pointing at a freed object.  If the system
+is lucky, iterate_folioq() sees ->io_iter, sees the as-yet uncorrupted
+freed object and advances to the next folio_queue in the queue.
+
+In the case seen, however, the freed object gets recycled and put back ont=
+o
+the queue at the tail and filled to the end.  This confuses
+iterate_folioq() and it tries to step ->next, which may be NULL - resultin=
+g
+in an oops.
+
+Fix this by the following means:
+
+ (1) When preparing a write subrequest, make sure there's a folio_queue
+     struct with space in it at the leading edge of the queue.  A function
+     to make space is split out of the function to append a folio so that
+     it can be called for this purpose.
+
+ (2) If the request struct iterator is pointing to a completely spent
+     folio_queue when we make space, then advance the iterator to the newl=
+y
+     allocated folio_queue.  The subrequest's iterator will then be set
+     from this.
+
+Whilst we're at it, also split out the function to allocate a folio_queue,
+initialise it and do the accounting.
+
+The oops could be triggered using the generic/346 xfstest with a filesyste=
+m
+on9P over TCP with cache=3Dloose.  The oops looked something like:
+
+ BUG: kernel NULL pointer dereference, address: 0000000000000008
+ #PF: supervisor read access in kernel mode
+ #PF: error_code(0x0000) - not-present page
+ ...
+ RIP: 0010:_copy_from_iter+0x2db/0x530
+ ...
+ Call Trace:
+  <TASK>
+ ...
+  p9pdu_vwritef+0x3d8/0x5d0
+  p9_client_prepare_req+0xa8/0x140
+  p9_client_rpc+0x81/0x280
+  p9_client_write+0xcf/0x1c0
+  v9fs_issue_write+0x87/0xc0
+  netfs_advance_write+0xa0/0xb0
+  netfs_write_folio.isra.0+0x42d/0x500
+  netfs_writepages+0x15a/0x1f0
+  do_writepages+0xd1/0x220
+  filemap_fdatawrite_wbc+0x5c/0x80
+  v9fs_mmap_vm_close+0x7d/0xb0
+  remove_vma+0x35/0x70
+  vms_complete_munmap_vmas+0x11a/0x170
+  do_vmi_align_munmap+0x17d/0x1c0
+  do_vmi_munmap+0x13e/0x150
+  __vm_munmap+0x92/0xd0
+  __x64_sys_munmap+0x17/0x20
+  do_syscall_64+0x80/0xe0
+  entry_SYSCALL_64_after_hwframe+0x71/0x79
+
+This may also fix a similar-looking issue with cifs and generic/074.
+
+  | Reported-by: kernel test robot <oliver.sang@intel.com>
+  | Closes: https://lore.kernel.org/oe-lkp/202409180928.f20b5a08-oliver.sa=
+ng@intel.com
+
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Eric Van Hensbergen <ericvh@kernel.org>
+cc: Latchesar Ionkov <lucho@ionkov.net>
+cc: Dominique Martinet <asmadeus@codewreck.org>
+cc: Christian Schoenebeck <linux_oss@crudebyte.com>
+cc: Steve French <sfrench@samba.org>
+cc: Paulo Alcantara <pc@manguebit.com>
+cc: Jeff Layton <jlayton@kernel.org>
+cc: v9fs@lists.linux.dev
+cc: linux-cifs@vger.kernel.org
+cc: netfs@lists.linux.dev
+cc: linux-fsdevel@vger.kernel.org
+---
+ fs/netfs/internal.h    |    2 +
+ fs/netfs/misc.c        |   72 ++++++++++++++++++++++++++++++++++---------=
+------
+ fs/netfs/objects.c     |   12 ++++++++
+ fs/netfs/write_issue.c |   12 +++++++-
+ 4 files changed, 76 insertions(+), 22 deletions(-)
+
+diff --git a/fs/netfs/internal.h b/fs/netfs/internal.h
+index c7f23dd3556a..79c0ad89affb 100644
+--- a/fs/netfs/internal.h
++++ b/fs/netfs/internal.h
+@@ -58,6 +58,7 @@ static inline void netfs_proc_del_rreq(struct netfs_io_r=
+equest *rreq) {}
+ /*
+  * misc.c
+  */
++struct folio_queue *netfs_buffer_make_space(struct netfs_io_request *rreq=
+);
+ int netfs_buffer_append_folio(struct netfs_io_request *rreq, struct folio=
+ *folio,
+ 			      bool needs_put);
+ struct folio_queue *netfs_delete_buffer_head(struct netfs_io_request *wre=
+q);
+@@ -76,6 +77,7 @@ void netfs_clear_subrequests(struct netfs_io_request *rr=
+eq, bool was_async);
+ void netfs_put_request(struct netfs_io_request *rreq, bool was_async,
+ 		       enum netfs_rreq_ref_trace what);
+ struct netfs_io_subrequest *netfs_alloc_subrequest(struct netfs_io_reques=
+t *rreq);
++struct folio_queue *netfs_folioq_alloc(struct netfs_io_request *rreq, gfp=
+_t gfp);
+ =
+
+ static inline void netfs_see_request(struct netfs_io_request *rreq,
+ 				     enum netfs_rreq_ref_trace what)
+diff --git a/fs/netfs/misc.c b/fs/netfs/misc.c
+index 0ad0982ce0e2..a743e8963247 100644
+--- a/fs/netfs/misc.c
++++ b/fs/netfs/misc.c
+@@ -9,34 +9,64 @@
+ #include "internal.h"
+ =
+
+ /*
+- * Append a folio to the rolling queue.
++ * Make sure there's space in the rolling queue.
+  */
+-int netfs_buffer_append_folio(struct netfs_io_request *rreq, struct folio=
+ *folio,
+-			      bool needs_put)
++struct folio_queue *netfs_buffer_make_space(struct netfs_io_request *rreq=
+)
+ {
+-	struct folio_queue *tail =3D rreq->buffer_tail;
+-	unsigned int slot, order =3D folio_order(folio);
++	struct folio_queue *tail =3D rreq->buffer_tail, *prev;
++	unsigned int prev_nr_slots =3D 0;
+ =
+
+ 	if (WARN_ON_ONCE(!rreq->buffer && tail) ||
+ 	    WARN_ON_ONCE(rreq->buffer && !tail))
+-		return -EIO;
+-
+-	if (!tail || folioq_full(tail)) {
+-		tail =3D kmalloc(sizeof(*tail), GFP_NOFS);
+-		if (!tail)
+-			return -ENOMEM;
+-		netfs_stat(&netfs_n_folioq);
+-		folioq_init(tail);
+-		tail->prev =3D rreq->buffer_tail;
+-		if (tail->prev)
+-			tail->prev->next =3D tail;
+-		rreq->buffer_tail =3D tail;
+-		if (!rreq->buffer) {
+-			rreq->buffer =3D tail;
+-			iov_iter_folio_queue(&rreq->io_iter, ITER_SOURCE, tail, 0, 0, 0);
++		return ERR_PTR(-EIO);
++
++	prev =3D tail;
++	if (prev) {
++		if (!folioq_full(tail))
++			return tail;
++		prev_nr_slots =3D folioq_nr_slots(tail);
++	}
++
++	tail =3D netfs_folioq_alloc(rreq, GFP_NOFS);
++	if (!tail)
++		return ERR_PTR(-ENOMEM);
++	tail->prev =3D prev;
++	if (prev)
++		/* [!] NOTE: After we set prev->next, the consumer is entirely
++		 * at liberty to delete prev.
++		 */
++		WRITE_ONCE(prev->next, tail);
++
++	rreq->buffer_tail =3D tail;
++	if (!rreq->buffer) {
++		rreq->buffer =3D tail;
++		iov_iter_folio_queue(&rreq->io_iter, ITER_SOURCE, tail, 0, 0, 0);
++	} else {
++		/* Make sure we don't leave the master iterator pointing to a
++		 * block that might get immediately consumed.
++		 */
++		if (rreq->io_iter.folioq =3D=3D prev &&
++		    rreq->io_iter.folioq_slot =3D=3D prev_nr_slots) {
++			rreq->io_iter.folioq =3D tail;
++			rreq->io_iter.folioq_slot =3D 0;
+ 		}
+-		rreq->buffer_tail_slot =3D 0;
+ 	}
++	rreq->buffer_tail_slot =3D 0;
++	return tail;
++}
++
++/*
++ * Append a folio to the rolling queue.
++ */
++int netfs_buffer_append_folio(struct netfs_io_request *rreq, struct folio=
+ *folio,
++			      bool needs_put)
++{
++	struct folio_queue *tail;
++	unsigned int slot, order =3D folio_order(folio);
++
++	tail =3D netfs_buffer_make_space(rreq);
++	if (IS_ERR(tail))
++		return PTR_ERR(tail);
+ =
+
+ 	rreq->io_iter.count +=3D PAGE_SIZE << order;
+ =
+
+diff --git a/fs/netfs/objects.c b/fs/netfs/objects.c
+index d32964e8ca5d..dd8241bc996b 100644
+--- a/fs/netfs/objects.c
++++ b/fs/netfs/objects.c
+@@ -250,3 +250,15 @@ void netfs_put_subrequest(struct netfs_io_subrequest =
+*subreq, bool was_async,
+ 	if (dead)
+ 		netfs_free_subrequest(subreq, was_async);
+ }
++
++struct folio_queue *netfs_folioq_alloc(struct netfs_io_request *rreq, gfp=
+_t gfp)
++{
++	struct folio_queue *fq;
++
++	fq =3D kmalloc(sizeof(*fq), gfp);
++	if (fq) {
++		netfs_stat(&netfs_n_folioq);
++		folioq_init(fq);
++	}
++	return fq;
++}
+diff --git a/fs/netfs/write_issue.c b/fs/netfs/write_issue.c
+index 04e66d587f77..0929d9fd4ce7 100644
+--- a/fs/netfs/write_issue.c
++++ b/fs/netfs/write_issue.c
+@@ -153,12 +153,22 @@ static void netfs_prepare_write(struct netfs_io_requ=
+est *wreq,
+ 				loff_t start)
+ {
+ 	struct netfs_io_subrequest *subreq;
++	struct iov_iter *wreq_iter =3D &wreq->io_iter;
++
++	/* Make sure we don't point the iterator at a used-up folio_queue
++	 * struct being used as a placeholder to prevent the queue from
++	 * collapsing.  In such a case, extend the queue.
++	 */
++	if (iov_iter_is_folioq(wreq_iter) &&
++	    wreq_iter->folioq_slot >=3D folioq_nr_slots(wreq_iter->folioq)) {
++		netfs_buffer_make_space(wreq);
++	}
+ =
+
+ 	subreq =3D netfs_alloc_subrequest(wreq);
+ 	subreq->source		=3D stream->source;
+ 	subreq->start		=3D start;
+ 	subreq->stream_nr	=3D stream->stream_nr;
+-	subreq->io_iter		=3D wreq->io_iter;
++	subreq->io_iter		=3D *wreq_iter;
+ =
+
+ 	_enter("R=3D%x[%x]", wreq->debug_id, subreq->debug_index);
+ =
+
 
