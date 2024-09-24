@@ -1,152 +1,160 @@
-Return-Path: <netdev+bounces-129590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C67DF984AA4
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 20:05:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 028B4984A7F
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 19:55:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B20CB24553
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 18:05:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2622A1C22CFA
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 17:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E181AD412;
-	Tue, 24 Sep 2024 18:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 996451AC896;
+	Tue, 24 Sep 2024 17:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="Epzz2bKJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/5t8i/3"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92B81AD3E1;
-	Tue, 24 Sep 2024 18:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29002F855;
+	Tue, 24 Sep 2024 17:55:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727201051; cv=none; b=dj1aJTK/T2rWo/BmjYwqO6GMDv5MxvjQvBXQjr5a8YrnKZL3/o2DT9H5uhAa1O/Ti6BqeOwlKBxA9F2NGuTND0LMFN4EPPLhwTLI/4SLlTkn23vFfI7yEz7DMcA7tqXYYR58HBwZp7VOeUBHdsrM+o2WWLGfI1YRghwV2E7hqgQ=
+	t=1727200523; cv=none; b=ZApVpMD3RZo1uW97T1JZYBMF44SFuf8q2q1vD3+5nSqrPTb7v90tzt6Pqi0xOoiQGdT5hvPgSbSEeWGn2KVyZvC0CpAHcfwQ4nrL9icrKCxOe8bwVkXc7SfPFEUnXcluIxSgjhpfwtF/QgQU/xn57NkwutOLYhqtcHU8MYO14tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727201051; c=relaxed/simple;
-	bh=Tz+z0RN4yoLTsuKVlKhsT40Bqa0WNU0TUwEaefUxnVg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UBTgP1MDJZX5Q10i7IBD67zdW2/sH2tr39t5gYcbVl5ouMXMPnc+6KzySWVbhbzb2rrk9tVP9daVR9OJj5GTJB1NBQq3yRxMWSHbZ2MY559/FsbLJ7WlEd6CXZQLXaa7+M4aIHF6rC5C43Qz40LPKwESo7+flbVGHX0T3Ehj9SU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=Epzz2bKJ; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uqSxozaaX0MbZR9PhUHEUeHeH8rVYjYdcmkgtgwPdWs=; b=Epzz2bKJnEnZPy4eOhqBQoiRz1
-	N1pczWQQtfyk5UpYxYavqt4inI5OTPmB/piwCUbWdL5p8eBZP3EXwMogOXu+HwUA7d4L3mNjmM5+4
-	461UpxsMG5OCLoBQElyI6/ONf4rhpmLMq8GTnLOccrVY8zf3K9h4wcXxkOY5Ii9Xr5EA=;
-Received: from p4ff130c8.dip0.t-ipconnect.de ([79.241.48.200] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1st9dM-000ROG-11;
-	Tue, 24 Sep 2024 19:47:32 +0200
-Message-ID: <da09e77a-a293-41b0-a46f-861dd5775ba2@nbd.name>
-Date: Tue, 24 Sep 2024 19:47:20 +0200
+	s=arc-20240116; t=1727200523; c=relaxed/simple;
+	bh=QxT914bDA0RfhWDMhfLmy+RtduzqQ8elqZ2JNEBwLdw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=miXYLIujX1vGQ6xJLTKCaXplxebRjXa/NWtb93nQKBIlNX5T7zcmet3+xdAtQdKn1U3jZ6LHtogV9ZtM17UbBqNFDMzp5a8NUGbl1UAPdZ/ilGIZB7NqwoQYDpnzjXpr/4dmRqLHm5ts6aaZH8Fkwme24aHlgwMfSF+VoSUUfzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W/5t8i/3; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6de15eefdd3so43262227b3.0;
+        Tue, 24 Sep 2024 10:55:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727200521; x=1727805321; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LhO9HuyHJw2V+eJWsbkCc/m6qGmvadaQTKFPjTTqDRs=;
+        b=W/5t8i/35sj5mGGY/hR68HPK7T1S4xOKjI3yv4kaGU17VrsPuy76Oaomht2iQCFmHs
+         vPHgcwrBbvx6WZcz/QIBgVBMgbxib7UZ9rxRQg6jFZ6tiyEi0xF7IFoXGUuAR2a1EU/9
+         1I/E7IznHdR4iMnHDZgCy76vGh+e2cGE9ywo467QT/7wSSkdrIunLx7HM+SDbx5Cctmt
+         D+Q8m0gHTwjkzqnmnnYcsl5JoWQTenhZH/EJd3na8NBcVF73R1LGR+peinCRcqhE11P6
+         nUAjTnUL0lZf0rQs97yQYqeG3LEK1cDIdHK4yiLf8ApvmU/ZZhwP7glwWTVcfQ8VSH+q
+         SY2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727200521; x=1727805321;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LhO9HuyHJw2V+eJWsbkCc/m6qGmvadaQTKFPjTTqDRs=;
+        b=p2RcorfMEZxA74PWZLMW2HRX8LYFhedU1AnnG/q0qAyfcXZH0WI40IPI3zU7NjjMRs
+         S2pULx7GZ09HGf0/U1RW1sUherpaz+Bvkb3G703bwYmoxyVpEnu3pQkTF+XKjIafkg89
+         6Am6U3IOULmBqgfLoaEcOTGSo9J4r/q7QMNGdP5Qy4ZlMm4gJRBHVAYAHSv72/w0cpHy
+         86GqiHYn3upR0zpEkLSQJwaKX/ovjgRx4EKdoYtJR1eIohJZtFeZmIwSBGWmAERIzVTk
+         pJvpwwbTZE/bz6162xrrlZNa+wYTpgY/ZgZFgLk9C5OsXzV1aN4jn/NwMiBLDnRiluyx
+         ZU2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUFKLucMcfFbScufO9gnwwzZjIefMLXB7LkPYbNK1mzpSFA4wjCEnZLDcDYfW/L1Tlz8l2ayKgs@vger.kernel.org, AJvYcCUkszacWUJlR2fiu/bdPVpADVI/jDx3Ypcsjtl3g1YnsbNSwfEHKBjXKARyhBvLSwLRn8UFRkze3OSVx+M=@vger.kernel.org, AJvYcCV1Kmf51gg/AvKSUXaatgSviouGQRs5WSnv7+OOnjaxvKTSfo7/+gzHXY/CVb2jsdEJGGXmjkQUOTHCJUCiBwps@vger.kernel.org, AJvYcCVE/4X7aH3Pv8gVHe7LhWp7KxKgpM/bdcLA73YQTXXr8jF35Bm1klbAdmHbemT7OhhyrhK9sm5L8S5cuQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHi+SlWQU88w4EIdituOVzdErTYQ4TDn6rrqae3/mbHxxIjZL6
+	3+k0ORdoSuRz77bJ6CSSxsuiVneFLJSTI2jzVC0O1MI1yWk08VpQhdLcmQ==
+X-Google-Smtp-Source: AGHT+IGoGHDLRqSqcbdYZpBp/Ik1TaSCEKbTqZMOHeO0TcNrA4v/Gon8yURePwJaL0JDdo0Gddcv6w==
+X-Received: by 2002:a05:690c:6d88:b0:6dd:ba68:4bd1 with SMTP id 00721157ae682-6e21d84a573mr3032407b3.21.1727200520967;
+        Tue, 24 Sep 2024 10:55:20 -0700 (PDT)
+Received: from localhost (57-135-107-183.static4.bluestreamfiber.net. [57.135.107.183])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6e21a2224bcsm1077837b3.53.2024.09.24.10.55.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2024 10:55:20 -0700 (PDT)
+From: David Hunter <david.hunter.linux@gmail.com>
+To: SeongJae Park <sj@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Allison Henderson <allison.henderson@oracle.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	damon@lists.linux.dev
+Cc: David Hunter <david.hunter.linux@gmail.com>,
+	linux-mm@kvack.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com,
+	javier.carrasco.cruz@gmail.com
+Subject: [PATCH v1 1/1] selftests: set executable bit
+Date: Tue, 24 Sep 2024 13:54:57 -0400
+Message-ID: <20240924175500.17212-1-david.hunter.linux@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] gso: fix gso fraglist segmentation after pull from
- frag_list
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, stable@vger.kernel.org, maze@google.com,
- shiming.cheng@mediatek.com, daniel@iogearbox.net, lena.wang@mediatek.com,
- herbert@gondor.apana.org.au, Willem de Bruijn <willemb@google.com>
-References: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
-From: Felix Fietkau <nbd@nbd.name>
-Content-Language: en-US
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 22.09.24 17:03, Willem de Bruijn wrote:
-> From: Willem de Bruijn <willemb@google.com>
-> 
-> Detect gso fraglist skbs with corrupted geometry (see below) and
-> pass these to skb_segment instead of skb_segment_list, as the first
-> can segment them correctly.
-> 
-> Valid SKB_GSO_FRAGLIST skbs
-> - consist of two or more segments
-> - the head_skb holds the protocol headers plus first gso_size
-> - one or more frag_list skbs hold exactly one segment
-> - all but the last must be gso_size
-> 
-> Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
-> modify these skbs, breaking these invariants.
-> 
-> In extreme cases they pull all data into skb linear. For UDP, this
-> causes a NULL ptr deref in __udpv4_gso_segment_list_csum at
-> udp_hdr(seg->next)->dest.
-> 
-> Detect invalid geometry due to pull, by checking head_skb size.
-> Don't just drop, as this may blackhole a destination. Convert to be
-> able to pass to regular skb_segment.
-> 
-> Link: https://lore.kernel.org/netdev/20240428142913.18666-1-shiming.cheng@mediatek.com/
-> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Cc: stable@vger.kernel.org
-> 
-> ---
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index d842303587af..e457fa9143a6 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -296,8 +296,16 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
->   		return NULL;
->   	}
->   
-> -	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
-> -		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
-> +	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
-> +		 /* Detect modified geometry and pass these to skb_segment. */
-> +		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
-> +			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
-> +
-> +		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
-> +		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
-> +		gso_skb->csum_offset = offsetof(struct udphdr, check);
-> +		gso_skb->ip_summed = CHECKSUM_PARTIAL;
-> +	}
+Turn on the executable bit for the following script files. These scripts
+are set to TEST_PROGS in their respective Makefiles, but currently, when
+these tests are run, a warning occurs:
 
-It seems to me that the TCP code would need something similar. Do you 
-think the same approach would work there as well?
+  # Warning: <file> is not executable
 
-Thanks,
+Signed-off-by: David Hunter <david.hunter.linux@gmail.com>
+---
+ tools/testing/selftests/damon/damon_nr_regions.py                 | 0
+ tools/testing/selftests/damon/damos_apply_interval.py             | 0
+ tools/testing/selftests/damon/damos_quota.py                      | 0
+ tools/testing/selftests/damon/damos_quota_goal.py                 | 0
+ tools/testing/selftests/damon/damos_tried_regions.py              | 0
+ tools/testing/selftests/damon/debugfs_target_ids_pid_leak.sh      | 0
+ .../damon/debugfs_target_ids_read_before_terminate_race.sh        | 0
+ .../selftests/damon/sysfs_update_schemes_tried_regions_hang.py    | 0
+ .../damon/sysfs_update_schemes_tried_regions_wss_estimation.py    | 0
+ tools/testing/selftests/net/rds/test.py                           | 0
+ 10 files changed, 0 insertions(+), 0 deletions(-)
+ mode change 100644 => 100755 tools/testing/selftests/damon/damon_nr_regions.py
+ mode change 100644 => 100755 tools/testing/selftests/damon/damos_apply_interval.py
+ mode change 100644 => 100755 tools/testing/selftests/damon/damos_quota.py
+ mode change 100644 => 100755 tools/testing/selftests/damon/damos_quota_goal.py
+ mode change 100644 => 100755 tools/testing/selftests/damon/damos_tried_regions.py
+ mode change 100644 => 100755 tools/testing/selftests/damon/debugfs_target_ids_pid_leak.sh
+ mode change 100644 => 100755 tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.sh
+ mode change 100644 => 100755 tools/testing/selftests/damon/sysfs_update_schemes_tried_regions_hang.py
+ mode change 100644 => 100755 tools/testing/selftests/damon/sysfs_update_schemes_tried_regions_wss_estimation.py
+ mode change 100644 => 100755 tools/testing/selftests/net/rds/test.py
 
-- Felix
+diff --git a/tools/testing/selftests/damon/damon_nr_regions.py b/tools/testing/selftests/damon/damon_nr_regions.py
+old mode 100644
+new mode 100755
+diff --git a/tools/testing/selftests/damon/damos_apply_interval.py b/tools/testing/selftests/damon/damos_apply_interval.py
+old mode 100644
+new mode 100755
+diff --git a/tools/testing/selftests/damon/damos_quota.py b/tools/testing/selftests/damon/damos_quota.py
+old mode 100644
+new mode 100755
+diff --git a/tools/testing/selftests/damon/damos_quota_goal.py b/tools/testing/selftests/damon/damos_quota_goal.py
+old mode 100644
+new mode 100755
+diff --git a/tools/testing/selftests/damon/damos_tried_regions.py b/tools/testing/selftests/damon/damos_tried_regions.py
+old mode 100644
+new mode 100755
+diff --git a/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.sh b/tools/testing/selftests/damon/debugfs_target_ids_pid_leak.sh
+old mode 100644
+new mode 100755
+diff --git a/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.sh b/tools/testing/selftests/damon/debugfs_target_ids_read_before_terminate_race.sh
+old mode 100644
+new mode 100755
+diff --git a/tools/testing/selftests/damon/sysfs_update_schemes_tried_regions_hang.py b/tools/testing/selftests/damon/sysfs_update_schemes_tried_regions_hang.py
+old mode 100644
+new mode 100755
+diff --git a/tools/testing/selftests/damon/sysfs_update_schemes_tried_regions_wss_estimation.py b/tools/testing/selftests/damon/sysfs_update_schemes_tried_regions_wss_estimation.py
+old mode 100644
+new mode 100755
+diff --git a/tools/testing/selftests/net/rds/test.py b/tools/testing/selftests/net/rds/test.py
+old mode 100644
+new mode 100755
+-- 
+2.43.0
+
 
