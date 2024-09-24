@@ -1,148 +1,203 @@
-Return-Path: <netdev+bounces-129450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC3E7983FA4
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 09:48:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 10E4B983FA9
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 09:49:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 651471F242AA
-	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 07:48:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84DD81F24089
+	for <lists+netdev@lfdr.de>; Tue, 24 Sep 2024 07:49:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062A91482F6;
-	Tue, 24 Sep 2024 07:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4CA4EB38;
+	Tue, 24 Sep 2024 07:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="FxMbFv6/"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A6811CBD;
-	Tue, 24 Sep 2024 07:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0FE6126C15
+	for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 07:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727164109; cv=none; b=iSPjxuqId/yNI5J2ayP1+OXMh6eH63oxTUK8y/DShyVHcjSJtqbQIgkGRVWLPpQhl/nzqRyypMAefVmFZh6Y8BP2t9TqU2dC2wrIZZROqFmgJ+clZhuNaFM7TtURAUddsia+LZKal7U6XMU9VULdffOKWo7VJGtMRJB56Qsz2j8=
+	t=1727164140; cv=none; b=esxpCqzm2nPAC3OQOqwz6ertySds9ASWGP/srT0qwbRHYnpyYGlE70RwN0lt2mtvdnIvsx4U5wYeMOpda7aJGtLV9yeVWcVMexWi8JiN5+XYYjTRUGCdGShfCxxpyVZRCh7g7/SMfUjxilC8Pp0riy+uvGdffZZrNhf3MG85jv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727164109; c=relaxed/simple;
-	bh=CSwaPVNkAQ30B+hlvci2uTj9rmPm9lc0sX+C9imgF5s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QG76Hmq18YpOZ3DUm33gs9RQKSzsAzckRxzbGrgd9NrU4ok1vdMABzXN3L7yERz4OmE7p2eWZqm6lcd4CulqvPuihmU1Db9ev7jh3wMwkAESau9MoEE1tXDb+p7i3graAc9DfHDFeY51HkklPU400PKy54GDbOdpfJ13eap7ARA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XCX5H6pvcz2QTxJ;
-	Tue, 24 Sep 2024 15:47:31 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id A6BD31A016C;
-	Tue, 24 Sep 2024 15:48:17 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 24 Sep 2024 15:48:17 +0800
-Message-ID: <64730d70-e5b7-4117-9ee8-43f23543eafd@huawei.com>
-Date: Tue, 24 Sep 2024 15:48:16 +0800
+	s=arc-20240116; t=1727164140; c=relaxed/simple;
+	bh=SJ9LrZFumI2fBt5xrrFDFhzDupHIUTJ4xI5MEoBoP68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RIn/yhmRRuhZDw+nqE+N0ITz4oSsciSglP6cWDhB3s3FkXcEMM6LeuN6S4Xv4e22wt68kXt015s+113Le+dmuB3IPxelAV8WVRyq0rTry736aXYPOQDxjrLI98c3WM5tt8TPp4txsaGYMd8euY6EV4cDYV6HR7UWouXT3hAHHeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=FxMbFv6/; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-378c16a4d3eso5606724f8f.1
+        for <netdev@vger.kernel.org>; Tue, 24 Sep 2024 00:48:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1727164136; x=1727768936; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fYxBfIEgRGwnch1amoY5GN+OdaV2ORH8f4YP2+lCu90=;
+        b=FxMbFv6/0nSMoB+Na0b4FVAGZiv+zU9Fw6Ex0LgnQoifH1FiNOmGpPkwepqDTyKd6b
+         gScej1/yBnhVfkvhF9Nqy/GkRk4TLjeZE7rXnL2akFDC/Ka8WwwuTrBt9y/Nks91bIlT
+         5mKzULY8UcThJea+WRdadbPUu31bDcnohpBjw8zZVCERabdr+jN3dZKcUpMtLj2wgzf1
+         2TLRnHNjV/3GZjVKKaFGLUar5t1Z+/UvfQm/ko5Ntyzoperm6IAcfzOQRDrIekBMXBrh
+         GDbZlhOIEohWHOkIHF4bV7Fccss8EFEHkgiYvR+ljwjCUnfQqZS3X8MwrhsPLyrona6L
+         qC9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727164136; x=1727768936;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fYxBfIEgRGwnch1amoY5GN+OdaV2ORH8f4YP2+lCu90=;
+        b=Ug9ZB/DGYQOAw5ygOdaIQwRV0sOetPgS2uM9XBeCpu6X/mWAMJSiKwPfQdZ6n2Wbw9
+         Rxl3+AEG/GMu1nroqLH7HNZF4fMqP/5bCHTrgUeVVyBkj1hhoGm+prO2kO9dceIcecmI
+         v0ItPViTvHEjiRx6xjhTgmp19ak0dFziCSIffMNbd/wFZy+btuMkiWJp6mv9AM9ZT1Wk
+         vjOTJ+N4d/RQOEP3/COl/Vb+vndKBDUkgsbEvyvgbVcP4TZYo2+y4SeF93G1R633MEnO
+         PIuE6ouCsobAWlWAEzo4uwAKz8wOZi8045qUmUcefdsQH4SFthFHheSPRvE+aAp4MTRr
+         8lxg==
+X-Forwarded-Encrypted: i=1; AJvYcCUD8G+0g7xGaJXOlF2y24P50DEtIj3XpDMeUXEciM8xenjqvyS3t6ca2g6IqWVNU/j4mYyQywo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy17GvKZrl8U8cgGY7FXhZxPiv3EP8pYcJ+486d03UJLE7FnIlf
+	/qzBf0aa2uvM0Hj28ohcUW9e5G25c3lUCql5aAROaRQiz5mjXgAWNCjvsrjmac8=
+X-Google-Smtp-Source: AGHT+IEcRr0QRVwfQeflZi22f0TJYAEF895jKRug0RP5vK6DkeBxkOm9Gtf+nyeMAsGAp066sqEikw==
+X-Received: by 2002:a5d:47cb:0:b0:374:c44e:ef27 with SMTP id ffacd0b85a97d-37a42253416mr13741187f8f.8.1727164135819;
+        Tue, 24 Sep 2024 00:48:55 -0700 (PDT)
+Received: from localhost (amontpellier-556-1-151-252.w109-210.abo.wanadoo.fr. [109.210.7.252])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2f96d7sm845309f8f.78.2024.09.24.00.48.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Sep 2024 00:48:55 -0700 (PDT)
+Date: Tue, 24 Sep 2024 09:48:53 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ethernet: Switch back to struct
+ platform_driver::remove()
+Message-ID: <3y5dni2ey2hnzie4evmklqcu4uhr72fr64m47uwzo7nnhbqzsz@7igypikspxpm>
+References: <20240923162202.34386-2-u.kleine-koenig@baylibre.com>
+ <20240924072937.GE4029621@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] page_pool: fix IOMMU crash when driver has
- already unbound
-To: Gur Stavi <gur.stavi@huawei.com>
-CC: <akpm@linux-foundation.org>, <aleksander.lobakin@intel.com>,
-	<alexander.duyck@gmail.com>, <angelogioacchino.delregno@collabora.com>,
-	<anthony.l.nguyen@intel.com>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <edumazet@google.com>,
-	<fanghaiqing@huawei.com>, <hawk@kernel.org>, <ilias.apalodimas@linaro.org>,
-	<imx@lists.linux.dev>, <intel-wired-lan@lists.osuosl.org>,
-	<iommu@lists.linux.dev>, <john.fastabend@gmail.com>, <kuba@kernel.org>,
-	<kvalo@kernel.org>, <leon@kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-mm@kvack.org>,
-	<linux-rdma@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<liuyonglong@huawei.com>, <lorenzo@kernel.org>, <matthias.bgg@gmail.com>,
-	<nbd@nbd.name>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<przemyslaw.kitszel@intel.com>, <robin.murphy@arm.com>,
-	<ryder.lee@mediatek.com>, <saeedm@nvidia.com>, <sean.wang@mediatek.com>,
-	<shayne.chen@mediatek.com>, <shenwei.wang@nxp.com>, <tariqt@nvidia.com>,
-	<wei.fang@nxp.com>, <xiaoning.wang@nxp.com>, <zhangkun09@huawei.com>
-References: <2fb8d278-62e0-4a81-a537-8f601f61e81d@huawei.com>
- <20240924064559.1681488-1-gur.stavi@huawei.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20240924064559.1681488-1-gur.stavi@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ht5hxnducdxn75gu"
+Content-Disposition: inline
+In-Reply-To: <20240924072937.GE4029621@kernel.org>
 
-On 2024/9/24 14:45, Gur Stavi wrote:
->>>>> With all the caching in the network stack, some pages may be
->>>>> held in the network stack without returning to the page_pool
->>>>> soon enough, and with VF disable causing the driver unbound,
->>>>> the page_pool does not stop the driver from doing it's
->>>>> unbounding work, instead page_pool uses workqueue to check
->>>>> if there is some pages coming back from the network stack
->>>>> periodically, if there is any, it will do the dma unmmapping
->>>>> related cleanup work.
->>>>>
->>>>> As mentioned in [1], attempting DMA unmaps after the driver
->>>>> has already unbound may leak resources or at worst corrupt
->>>>> memory. Fundamentally, the page pool code cannot allow DMA
->>>>> mappings to outlive the driver they belong to.
->>>>>
->>>>> Currently it seems there are at least two cases that the page
->>>>> is not released fast enough causing dma unmmapping done after
->>>>> driver has already unbound:
->>>>> 1. ipv4 packet defragmentation timeout: this seems to cause
->>>>>    delay up to 30 secs:
->>>>>
->>>>> 2. skb_defer_free_flush(): this may cause infinite delay if
->>>>>    there is no triggering for net_rx_action().
->>>>>
->>>>> In order not to do the dma unmmapping after driver has already
->>>>> unbound and stall the unloading of the networking driver, add
->>>>> the pool->items array to record all the pages including the ones
->>>>> which are handed over to network stack, so the page_pool can
->>>>> do the dma unmmapping for those pages when page_pool_destroy()
->>>>> is called.
->>>>
->>>> So, I was thinking of a very similar idea. But what do you mean by
->>>> "all"? The pages that are still in caches (slow or fast) of the pool
->>>> will be unmapped during page_pool_destroy().
->>>
->>> Yes, it includes the one in pool->alloc and pool->ring.
->>
->> It worths mentioning that there is a semantics changing here:
->> Before this patch, there can be almost unlimited inflight pages used by
->> driver and network stack, as page_pool doesn't really track those pages.
->> After this patch, as we use a fixed-size pool->items array to track the
->> inflight pages, the inflight pages is limited by the pool->items, currently
->> the size of pool->items array is calculated as below in this patch:
->>
->> +#define PAGE_POOL_MIN_ITEM_CNT	512
->> +	unsigned int item_cnt = (params->pool_size ? : 1024) +
->> +				PP_ALLOC_CACHE_SIZE + PAGE_POOL_MIN_ITEM_CNT;
->>
->> Personally I would consider it is an advantage to limit how many pages which
->> are used by the driver and network stack, the problem seems to how to decide
->> the limited number of page used by network stack so that performance is not
->> impacted.
-> 
-> In theory, with respect to the specific problem at hand, you only have
-> a limit on the number of mapped pages inflight. Once you reach this
-> limit you can unmap these old pages, forget about them and remember
-> new ones.
 
-Yes, it can be done theoretically.
-The tricky part seems to be how to handle the concurrency problem when
-we evict the old pages and the old pages are also returned back to the
-page_pool concurrently without any locking or lockless operation.
+--ht5hxnducdxn75gu
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-For now each item has only one producer and one consumer, so we don't
-really have to worry about the concurrency problem before calling
-page_pool_item_uninit() in page_pool_destroy() to do the unmapping
-for the inflight pages by using a newly added 'destroy_lock' lock.
+Hello Simon,
+
+On Tue, Sep 24, 2024 at 08:29:37AM +0100, Simon Horman wrote:
+> On Mon, Sep 23, 2024 at 06:22:01PM +0200, Uwe Kleine-K=C3=B6nig wrote:
+> > I converted all drivers below drivers/net/ethernet in a single patch. If
+> > you want it split, just tell me (per vendor? per driver?). Also note I
+> > didn't add all the maintainers of the individual drivers to Cc: to not
+> > trigger sending restrictions and spam filters.
+>=20
+> I think that given that the changes to each file are very simple,
+> and the number of files changed, a single, or small number of patches
+> make sense. Because the overhead of managing per-driver patches,
+> which I would ordinarily prefer, seems too large.
+
+full ack.
+
+> However, touching so many files does lead to a substantial risk of
+> conflicts. And indeed, the patch does not currently apply cleanly
+> to net-next (although it can trivially be made to do so). Perhaps
+> the maintainers can handle that, but I would suggest reposting in
+> a form that does apply cleanly so that automations can run.
+
+I based it on plain next in the expectation that this matches the
+network tree well enough. I agree that the conflicts are not hard to
+resolve, but it's totally ok for me if only the parts of the patch are
+taken that apply without problems. I expect that I'll have to go through
+more than one subsystem a second time anyhow because new drivers pop up
+using the old idioms.
+
+Also note that git can handle the changes just fine if you use
+3-way merging:
+
+	uwe@taurus:~/gsrc/linux$ git checkout net-next/main=20
+	HEAD is now at 151ac45348af net: sparx5: Fix invalid timestamps
+
+	uwe@taurus:~/gsrc/linux$ b4 am -3 https://lore.kernel.org/all/202409231622=
+02.34386-2-u.kleine-koenig@baylibre.com/
+	Grabbing thread from lore.kernel.org/all/20240923162202.34386-2-u.kleine-k=
+oenig@baylibre.com/t.mbox.gz
+	Analyzing 3 messages in the thread
+	Analyzing 0 code-review messages
+	Checking attestation on all messages, may take a moment...
+	---
+	  =E2=9C=93 [PATCH] net: ethernet: Switch back to struct platform_driver::=
+remove()
+	    + Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com> (=E2=
+=9C=93 DKIM/gmail.com)
+	  ---
+	  =E2=9C=93 Signed: openpgp/u.kleine-koenig@baylibre.com
+	  =E2=9C=93 Signed: DKIM/baylibre-com.20230601.gappssmtp.com (From: u.klei=
+ne-koenig@baylibre.com)
+	---
+	Total patches: 1
+	Preared a fake commit range for 3-way merge (77e0c079ace8..198dd8fb7661)
+	---
+	 Link: https://lore.kernel.org/r/20240923162202.34386-2-u.kleine-koenig@ba=
+ylibre.com
+	 Base: using specified base-commit ef545bc03a65438cabe87beb1b9a15b0ffcb6ace
+	       git checkout -b 20240923_u_kleine_koenig_baylibre_com ef545bc03a654=
+38cabe87beb1b9a15b0ffcb6ace
+	       git am -3 ./20240923_u_kleine_koenig_net_ethernet_switch_back_to_st=
+ruct_platform_driver_remove.mbx
+
+	uwe@taurus:~/gsrc/linux$ git am -3 ./20240923_u_kleine_koenig_net_ethernet=
+_switch_back_to_struct_platform_driver_remove.mbx
+	Applying: net: ethernet: Switch back to struct platform_driver::remove()
+	Using index info to reconstruct a base tree...
+	M	drivers/net/ethernet/cirrus/ep93xx_eth.c
+	M	drivers/net/ethernet/marvell/mvmdio.c
+	M	drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+	Falling back to patching base and 3-way merge...
+	Auto-merging drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+	Auto-merging drivers/net/ethernet/marvell/mvmdio.c
+	Auto-merging drivers/net/ethernet/cirrus/ep93xx_eth.c
+
+> Which brings me to to a separate, process issue: net-next is currently
+> closed for the v6.12 merge window. It should reopen once v6.12-rc1 has
+> been released. And patches for net-next should be posted after it
+> has reopened, with the caveat that RFC patches may be posted any time.
+
+This was a concious choice. Because of the big amount of drivers touched
+I thought to post early to have a chance to get the patch applied before
+the gates are opened for other patches was a reasonable (but I admit
+selfish) idea.
+
+Anyhow, I can repost once the merge window closes.
+
+Best regards
+Uwe
+
+--ht5hxnducdxn75gu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmbybuMACgkQj4D7WH0S
+/k7gcQf/d8Dgf08dU7y7sAWtpikRXYYQUXKt7xrHVWk1Zu82GOHqqEGAP0tMCmO3
+OUi8G9WzYV/K7w5v4CqXliY9mbmpo+oDaHYyY7lgk2nv2zWlyC+rxf4TmOZI6UwL
+xBaXuyla1dlC6gcNFBDO+mHPlFWJuwxz/ubR9+0bKsOumJjpVVvWAypzGe0SB27W
+wimiEeUMOV0I3PfnRkq7F/dWtfQgYfQ2wdsBQ5X+zeZNMlxigsLusGObQNPqcPLb
+8rH2gHVgdKi6tMSGrCWp8Pe9/cRs1XLRgEy8HlnE9DhI95yR//8wmlp6B54IVd0V
+qrtQMybc+NUXdKVSY5N7yNv2mHUfhw==
+=1iWY
+-----END PGP SIGNATURE-----
+
+--ht5hxnducdxn75gu--
 
