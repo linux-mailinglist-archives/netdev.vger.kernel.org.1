@@ -1,91 +1,208 @@
-Return-Path: <netdev+bounces-129856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFF079867D6
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 22:50:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E7889867E8
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 23:00:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C3E81C217D8
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:50:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D3EC281866
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:00:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039F31534FB;
-	Wed, 25 Sep 2024 20:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910311411E0;
+	Wed, 25 Sep 2024 21:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="KkDNER+0"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="PwqA5ZHb"
 X-Original-To: netdev@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from nbd.name (nbd.name [46.4.11.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8925F1534EC;
-	Wed, 25 Sep 2024 20:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A80E54767;
+	Wed, 25 Sep 2024 21:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727297410; cv=none; b=r2D+sED9sSeQfavQEU8x9IO8paV1ngHOnYzm2YPXyO6IpJX2iTmtZvwkSozFvXUIReRZuTMh5kbFL57IShD0XFEGMO+XySUrUoKsjNLjQEH9ebpPH8D2pmdGpF2CZUwGIegPw1g1BL8GecKEf8c/M0tUM+cm6TYYTMxnh5hEl7Y=
+	t=1727298017; cv=none; b=LfD99luLXzhdQkUpzt2ASi7HygMIqsl0GY4s+DHLJeiU56wIlXxbwOiZCNKZNZqNDHisCnvWH3bLGH8UbY7VPZzDG3C1i9oX3qlbGacNbmrFtSjzp+OCjylCv9GPCGCZ5ZtsBgBhvGSExEfWExo5mBPlzTseyXllb3jzH5t3ezU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727297410; c=relaxed/simple;
-	bh=GLEGXW/IRreMuP+Ewe2MM2lF19EhyviiE352szWHvaE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hm3YfGuPf8UQORwkuh4WTlmcxumXif6Hdo2cYVBBHJi1FC+2dbtxfuG/gP6FBKZbQIzwP5h3ttSjS0DUkoPgrOpEPNp5N21ezEtehjMRaK0DECzmf5kqSyUMqg8yZNtrcbkFRSXf5+cNFBZUQZg7bjlYNAFy2JI867JbosDxVAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=KkDNER+0; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=9Fw6nSSCpgyFPlJKUOs3JFoolcvYhoNhkTP59zcOyUg=; b=KkDNER+0neATPShnr3UWEAMMfc
-	EUgLliRk49wD+jn7X3Mm0nrgEBxGYQCk1K6fi3UN0XOQjC0dvC1R466n6Nbs7j4GjabOkxvSOw8qC
-	X5RprFLMo6NGy1TjcTYJty2SJ5jiF+RyZkzOX8jyChUozIxu3TiBFc9udU7GVyYN+jlW+xiodAhJ3
-	Aq5fi9rteygETWNqwOk8PvCHRgkQTvKt1GHzbOkXjGJHDiiCWu/5e8lbcKVy2DsaO+YZBEKHk/UVH
-	JgCWh7EKohG++4t/SyQpgiraYfRBU5/tfwiUE4MFcJvqWrY50jstTrRbZCGsHY5VRq8ItjuGdpeG1
-	1Q5Lti9Q==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1stYxZ-0000000FVTV-3oxD;
-	Wed, 25 Sep 2024 20:50:05 +0000
-Date: Wed, 25 Sep 2024 21:50:05 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Tiwei Bie <tiwei.bie@intel.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] vhost-vdpa: Refactor copy_to_user() usage in
- vhost_vdpa_get_config()
-Message-ID: <20240925205005.GL3550746@ZenIV>
-References: <79b2f48a-f6a1-4bfc-9a8d-cb09777f2a07@web.de>
+	s=arc-20240116; t=1727298017; c=relaxed/simple;
+	bh=Djx6dAORQ2PO4MKiCZfZWO5fL8oMjU+EeCyfd674jzQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LemKCZQ1mjI1vn+v3ugVHpp95H2BfXMDHTV+D/jFjVCublbiERP+Vph7ZkCL3vIo/27NY24O8SD5+meESI3fYKauFfPhLTJuXT1yhCzhZT5qHkwBCfMHnY4CaDZy6xz+P0YTeg2zXTK88qyBXqGy3d3uEw2q8npRVQeCX4tNl8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=PwqA5ZHb; arc=none smtp.client-ip=46.4.11.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
+	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7+2VdhIempTpLImtVt8pS1YU6ZwNZm5t8/PF7RrdWhA=; b=PwqA5ZHbOPPa6Op7SPCf2uzvbt
+	0/xMjN/eU+6O3zgF20VO6906GPhNv8hiObvBVroRkj/Roi6dRZ6dmhBotXWDNwJn1Lp3Vx0ut9A1d
+	SEbZrzH0VVFcHQ8PSrCqP4HkAZbyxf3nWzjn1ZAMNMvMkCOXMZV7yo/gZhy8Vw9P6caI=;
+Received: from p4ff130c8.dip0.t-ipconnect.de ([79.241.48.200] helo=nf.local)
+	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96)
+	(envelope-from <nbd@nbd.name>)
+	id 1stZ77-001558-02;
+	Wed, 25 Sep 2024 22:59:57 +0200
+Message-ID: <68d4c9cf-f61f-4257-8d98-9a363142cc53@nbd.name>
+Date: Wed, 25 Sep 2024 22:59:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <79b2f48a-f6a1-4bfc-9a8d-cb09777f2a07@web.de>
-Sender: Al Viro <viro@ftp.linux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] gso: fix gso fraglist segmentation after pull from
+ frag_list
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, stable@vger.kernel.org, maze@google.com,
+ shiming.cheng@mediatek.com, daniel@iogearbox.net, lena.wang@mediatek.com,
+ herbert@gondor.apana.org.au, Willem de Bruijn <willemb@google.com>
+References: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
+ <7144e848-9919-44a5-a313-f9b2076532bf@nbd.name>
+ <66f46003a38a0_65fdc29433@willemb.c.googlers.com.notmuch>
+From: Felix Fietkau <nbd@nbd.name>
+Content-Language: en-US
+Autocrypt: addr=nbd@nbd.name; keydata=
+ xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
+ ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
+ Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
+ AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
+ vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
+ wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
+ TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
+ l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
+ dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
+ HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
+ VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
+ CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
+ VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
+ Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
+ DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
+ wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
+ f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
+ aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
+ FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
+ TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
+ GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
+ cL98efvrjdstUfTCP2pfetyN
+In-Reply-To: <66f46003a38a0_65fdc29433@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 25, 2024 at 08:48:16PM +0200, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Wed, 25 Sep 2024 20:36:35 +0200
+On 25.09.24 21:09, Willem de Bruijn wrote:
+> Felix Fietkau wrote:
+>> On 22.09.24 17:03, Willem de Bruijn wrote:
+>> > From: Willem de Bruijn <willemb@google.com>
+>> > 
+>> > Detect gso fraglist skbs with corrupted geometry (see below) and
+>> > pass these to skb_segment instead of skb_segment_list, as the first
+>> > can segment them correctly.
+>> > 
+>> > Valid SKB_GSO_FRAGLIST skbs
+>> > - consist of two or more segments
+>> > - the head_skb holds the protocol headers plus first gso_size
+>> > - one or more frag_list skbs hold exactly one segment
+>> > - all but the last must be gso_size
+>> > 
+>> > Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
+>> > modify these skbs, breaking these invariants.
+>> > 
+>> > In extreme cases they pull all data into skb linear. For UDP, this
+>> > causes a NULL ptr deref in __udpv4_gso_segment_list_csum at
+>> > udp_hdr(seg->next)->dest.
+>> > 
+>> > Detect invalid geometry due to pull, by checking head_skb size.
+>> > Don't just drop, as this may blackhole a destination. Convert to be
+>> > able to pass to regular skb_segment.
+>> > 
+>> > Link: https://lore.kernel.org/netdev/20240428142913.18666-1-shiming.cheng@mediatek.com/
+>> > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+>> > Signed-off-by: Willem de Bruijn <willemb@google.com>
+>> > Cc: stable@vger.kernel.org
+>> > 
+>> > ---
+>> > diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+>> > index d842303587af..e457fa9143a6 100644
+>> > --- a/net/ipv4/udp_offload.c
+>> > +++ b/net/ipv4/udp_offload.c
+>> > @@ -296,8 +296,16 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+>> >   		return NULL;
+>> >   	}
+>> >   
+>> > -	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
+>> > -		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+>> > +	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
+>> > +		 /* Detect modified geometry and pass these to skb_segment. */
+>> > +		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
+>> > +			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
+>> > +
+>> > +		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
+>> > +		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
+>> > +		gso_skb->csum_offset = offsetof(struct udphdr, check);
+>> > +		gso_skb->ip_summed = CHECKSUM_PARTIAL;
+>> 
+>> I also noticed this uh->check update done by udp4_gro_complete only in 
+>> case of non-fraglist GRO:
+>> 
+>>      if (uh->check)
+>>          uh->check = ~udp_v4_check(skb->len - nhoff, iph->saddr,
+>>                        iph->daddr, 0);
+>> 
+>> I didn't see any equivalent in your patch. Is it missing or left out 
+>> intentionally?
 > 
-> Assign the return value from a copy_to_user() call to an additional
-> local variable so that a kvfree() call and return statement can be
-> omitted accordingly.
+> Thanks. That was not intentional. I think you're right. Am a bit
+> concerned that all this testing did not catch it. Perhaps because
+> CHECKSUM_PARTIAL looped to ingress on the same machine is simply
+> interpreted as CHECKSUM_UNNECESSARY. Need to look into that.
+> 
+> If respinning this, I should also change the Fixes to
+> 
+> Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
+> 
+> Analogous to the eventual TCP fix to
+> 
+> Fixes: bee88cd5bd83 ("net: add support for segmenting TCP fraglist GSO packets")
 
-Ugly and unidiomatic.
+In the mean time, I've been working on the TCP side. I managed to
+reproduce the issue on one of my devices by routing traffic from
+Ethernet to Wifi using your BPF test program.
 
-> This issue was detected by using the Coccinelle software.
+The following patch makes it work for me for TCP v4. Still need to
+test and fix v6.
 
-What issue?
+- Felix
 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+--- a/net/ipv4/tcp_offload.c
++++ b/net/ipv4/tcp_offload.c
+@@ -101,8 +101,20 @@ static struct sk_buff *tcp4_gso_segment(struct sk_buff *skb,
+  	if (!pskb_may_pull(skb, sizeof(struct tcphdr)))
+  		return ERR_PTR(-EINVAL);
+  
+-	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST)
+-		return __tcp4_gso_segment_list(skb, features);
++	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) {
++		struct tcphdr *th = tcp_hdr(skb);
++		const struct iphdr *iph;
++
++		if (skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size)
++			return __tcp4_gso_segment_list(skb, features);
++
++		iph = ip_hdr(skb);
++		skb_shinfo(skb)->gso_type &= ~SKB_GSO_FRAGLIST;
++		skb->csum_start = (unsigned char *)th - skb->head;
++		skb->csum_offset = offsetof(struct tcphdr, check);
++		skb->ip_summed = CHECKSUM_PARTIAL;
++		th->check = ~tcp_v4_check(skb->len, iph->saddr, iph->daddr, 0);
++	}
+  
+  	if (unlikely(skb->ip_summed != CHECKSUM_PARTIAL)) {
+  		const struct iphdr *iph = ip_hdr(skb);
 
-Nevermind (and I really need more coffee, seeing that I'd missed the
-obvious indicator of garbage and failed to hit delete)...
 
