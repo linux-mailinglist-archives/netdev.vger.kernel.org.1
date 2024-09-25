@@ -1,106 +1,128 @@
-Return-Path: <netdev+bounces-129799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B47569863CC
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 17:40:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7B47986406
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 17:46:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E372E1C26E0A
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:40:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0604B1C27A23
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:46:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6DA91D5AC9;
-	Wed, 25 Sep 2024 15:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C1A17557;
+	Wed, 25 Sep 2024 15:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JR0ZAFKt"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PC9gRgVo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333311D5ABD;
-	Wed, 25 Sep 2024 15:40:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93269BE6C
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 15:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727278811; cv=none; b=D3Wjnt3laS1nroPetVwH2XHwSdWDSyEBNKYwBCFilR07y0vQzBT6CQfWWJHZzUoi46etNrwbWCColBxwNABd2AYEZlhHbOIW38hTXxug/waQYsVTK7tC9oCForMHS+K6rlf6i1hmz2DffNyIThLtfy6Pkd3fx+C/i37RW14ftzo=
+	t=1727279177; cv=none; b=dhOUtyqW87rm4v3kaRMVw8BTcZ3NUAVVIm9yojCFrA9iDbD8k2Adk0/ashYDyHrICZQxhGZSc55eGO21uCUyxcjNTYQe3UA6zFGRR2/HmDXa7y/rYnPnvEfm25QdduZrK0Hx0rYWYt0xRNpriq4IuJuwkxCQrmEELgoGYqx0zV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727278811; c=relaxed/simple;
-	bh=kL8HG8Xwa+i7w3XjeWLMDj9WPGvuks109dxhfgzU49k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gHGsskiByLi+sxOpc0kvUn0IuTGK5EHtVLOk4dEb9h99XcMO2zKnDXGH4Qawc2DcXO93YzOFDHlSdFIZOB3xlXpvX/mWk+zEQZA0hqZZB0f86dyf+KRVgsrdA2OQMSvVdWSpA3D1aS3bbjGLsqs1S2JLaxdDbgua3v68SmPEl+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JR0ZAFKt; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=q77yhq1cjviFHLXOxf/F3ZQcus4c7vEqJGBAAXfzwWM=; b=JR0ZAFKtKim2yR550of1N1F1Q1
-	/JCk7LL7jvgFcrysPJyNlo3wO0/vgPCH2NQRNIij845O+MY2zijXjnFCvs9PTX6atmcz56czB4LIr
-	GNd/kk4yE3sem4uG/IeEEcMjZrA4vihVIYMaovwUcwS1h6vS2yUBJFvh055A8hLeXgSk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1stU77-008InE-8a; Wed, 25 Sep 2024 17:39:37 +0200
-Date: Wed, 25 Sep 2024 17:39:37 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: George Rurikov <g.ryurikov@securitycode.ru>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH] r8169: Potential divizion by zero in rtl_set_coalesce()
-Message-ID: <060a134b-63ea-4dc1-a5f3-980b2bb4334f@lunn.ch>
-References: <20240925135106.2084111-1-g.ryurikov@securitycode.ru>
+	s=arc-20240116; t=1727279177; c=relaxed/simple;
+	bh=x+4F0wBUmKeHDpIxKuL0c2Jd8c4z4haxH1Lz4gdI+B0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MaH6JSiDRznJCgkrbnKKsEQR+paw7ERFh/CfYOI1pzOj1ZejagJTdeZJx4rucu3y/UKsTAut4F3Vh/0MFs+Az+KrItd3pZr0lJ0V5gbfu2KDiB6JKuZDqU/ixnVqQwpOsRSkYF40gUmk2glQECSA23ja6bVozX9OaFlkOBtnaA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PC9gRgVo; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-82d24e18dfcso327629039f.3
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 08:46:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1727279175; x=1727883975; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bJM9B0m/lek0u1t6zaan4eSGVrdWrKVx/I5Nl82tDpg=;
+        b=PC9gRgVoBdTFbP/CUmjj8qpu4fOA1QUc1MXA98jYJFalliEKXucSUK5a/JmYxtNdrt
+         1GorQ5NKg6gXGR4htfCIwdAz5SWa+WevsgaGrs2sNNRTbV2xm6g7FTCU3PxhYfcVSkBe
+         N5II6CsvQ1LhBPL2FEMfRsbT2YZMMwIa2Guhg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727279175; x=1727883975;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bJM9B0m/lek0u1t6zaan4eSGVrdWrKVx/I5Nl82tDpg=;
+        b=EkCW9NU6zaOBRFeum2mwmlERBP/gUydmQjQTG8s2CDF/oDdAO7/t6i/q2SOknv3zlG
+         NQGiNkdl3thWNFk+6QJOCSAUcEWU/g1ziiWpZxps421Y7QUdzeO71VL/TKWscwhyCiJU
+         1I/yeTOenh8BRvsHiSUS0XFC/1Tn73X5i2tvyRoDJfEF6T1B+9qG40hXeQ75cTjIJPmn
+         PeDmBOo0FVM/fZ2INgzLYFYs8p6W8iIjNbE2xERx4KRyFre5yObiGKQtiUU9Cll1qPsF
+         SIQvVpGGCHCPRUSjOgq1JM+0GSH8FFBMd5bqpRT4FPkHd/0iVLKQjCWbIH3AlY4ZBch3
+         rVSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU79aMrb8c9ZinssMWjNyugZI0o+eSRv+F2g42lWGFMM5Pgu4dtIPMA9G2VtMy/sryM/69wkig=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6HFjxFJyw4Bif8zaw9TdIqzGv5EXhHw/oF21JBJDqUaCnobvt
+	m6yYQlVGW2gVnZrEshWACT0ZgXS9wDK6aaCKirVe0hqaq+p5YqgRUTRqPXjeb8Q=
+X-Google-Smtp-Source: AGHT+IHRidj4X8LYl5IH0Bj18RNFExR+Bckr7+2ammy4QZdJGrRo2Cl1ySSH9rbblKME1zD62cNhWw==
+X-Received: by 2002:a05:6602:6424:b0:82d:f4f:f49b with SMTP id ca18e2360f4ac-83247f9003fmr365137839f.16.1727279174659;
+        Wed, 25 Sep 2024 08:46:14 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8323f5dbf4dsm112899639f.11.2024.09.25.08.46.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Sep 2024 08:46:14 -0700 (PDT)
+Message-ID: <e537539f-85a5-42eb-be8a-8a865db53ca2@linuxfoundation.org>
+Date: Wed, 25 Sep 2024 09:46:12 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240925135106.2084111-1-g.ryurikov@securitycode.ru>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/4] selftests: exec: update gitignore for load_address
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Allison Henderson <allison.henderson@oracle.com>,
+ Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ rds-devel@oss.oracle.com, linux-mm@kvack.org,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20240924-selftests-gitignore-v1-0-9755ac883388@gmail.com>
+ <20240924-selftests-gitignore-v1-4-9755ac883388@gmail.com>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20240924-selftests-gitignore-v1-4-9755ac883388@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Sep 25, 2024 at 04:51:06PM +0300, George Rurikov wrote:
-> Variable 'scale', whose possible value set allows a zero value in a check
-> at r8169_main.c:2014, is used as a denominator at r8169_main.c:2040 and
-> r8169_main.c:2042.
+On 9/24/24 06:49, Javier Carrasco wrote:
+> The name of the "load_address" objects has been modified, but the
+> corresponding entry in the gitignore file must be updated.
 > 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> Update the load_address entry in the gitignore file to account for
+> the new names.
 > 
-> Fixes: 2815b30535a0 ("r8169: merge scale for tx and rx irq coalescing")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: George Rurikov <g.ryurikov@securitycode.ru>
+> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
 > ---
->  drivers/net/ethernet/realtek/r8169_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   tools/testing/selftests/exec/.gitignore | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 45ac8befba29..b97e68cfcfad 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -2011,7 +2011,7 @@ static int rtl_set_coalesce(struct net_device *dev,
+> diff --git a/tools/testing/selftests/exec/.gitignore b/tools/testing/selftests/exec/.gitignore
+> index 90c238ba6a4b..4d9fb7b20ea7 100644
+> --- a/tools/testing/selftests/exec/.gitignore
+> +++ b/tools/testing/selftests/exec/.gitignore
+> @@ -9,7 +9,7 @@ execveat.ephemeral
+>   execveat.denatured
+>   non-regular
+>   null-argv
+> -/load_address_*
+> +/load_address.*
+
+Hmm. This will include the load_address.c which shouldn't
+be included in the .gitignore?
+
+>   /recursion-depth
+>   xxxxxxxx*
+>   pipe
 > 
->         coal_usec_max = max(ec->rx_coalesce_usecs, ec->tx_coalesce_usecs);
->         scale = rtl_coalesce_choose_scale(tp, coal_usec_max, &cp01);
-> -       if (scale < 0)
-> +       if (scale <= 0)
->                 return scale;
 
-Please think about this. Say scale is 0, and you return it. It appears
-the call has worked, but in fact it did nothing.
-
-I much prefer a division by 0, causing a splat, than the silent bug
-you just added.
-
-Also, please could you explain the code path which results in scale
-being 0.
-
-    Andrew
-
----
-pw-bot: cr
+thanks,
+-- Shuah
 
