@@ -1,62 +1,67 @@
-Return-Path: <netdev+bounces-129683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21EFB985814
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:36:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D94C985831
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:38:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44C961C23588
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:36:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEE041C20621
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B7514F9F9;
-	Wed, 25 Sep 2024 11:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53A021714CC;
+	Wed, 25 Sep 2024 11:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HSeSGlt0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lIPZodyc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5603114600D;
-	Wed, 25 Sep 2024 11:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29ECA16F0EB;
+	Wed, 25 Sep 2024 11:37:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727264205; cv=none; b=iv/OFXXCWHNlUIUhEL6dz/ELSpM7XMXn9pSxPONYGdZta1VcblKSQ2Ka+UulnTq13MLNr1hV2EVf/w2v06/ooZ9F8A+GLSYM82XNj/GCNSnXLFot3N38eAoSqIt1hWPPMDMCcZFfpmkVGXzCJtqA37AnxZCvBrLQhT47YNi4E6o=
+	t=1727264222; cv=none; b=XQ6Mmlk4nBQvxRb8SyaJxZ15XdAIHooAPGRgDFiVEn1U9qJJdGscMEjstO9WeWmNqveFVdYl0kuXwcxYCP1eUTNSzaXyXs/dudJkoQ1JrkF+0AxRWx6sGcZdoSnYv5XPT9aT8MEkWv+bgl3Vuh8RVfgmp7HYpezL45xXalrQYkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727264205; c=relaxed/simple;
-	bh=I5bIXa22exgxe+5x5zFMEn5BHaDoaPhYpbvWX4H8Fz4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NQdvSsclwRzu0SERqtreBwSVqy9ewK+RHJCse2oNBh/HE4zzfwT7ybTv91xRigPb9/u4Xl9C/KtA82m9IVmyX08yTW9rxazApm2E3GyHKiSjrnL0s1sUcHfcGPHH6KPZg8nSvLZZ2XuoUyB+yGZnLKnp5UScV9MozTo6LMOsJCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HSeSGlt0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AD70C4CEC3;
-	Wed, 25 Sep 2024 11:36:43 +0000 (UTC)
+	s=arc-20240116; t=1727264222; c=relaxed/simple;
+	bh=hyr4fIHwEHp6cJDdf90iptk04FwzkfQBR8Kvb2/Pch4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=rOJcZ4dlXgPWYWS08AANggERSfWto6Rq8KvHPymCh5BcACpDAbEa2NlQYVXDawilN2X3H0oJ+iZlD+LJCaiWxl2w58xYfr3E7SxlLpc6jOGyZbKU2cSUQ9QJ57XpuQVorQHkeItWu+QXWglAePsDsWVF2UOx2jpFvCOX7Z+atsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lIPZodyc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61750C4CECE;
+	Wed, 25 Sep 2024 11:37:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727264204;
-	bh=I5bIXa22exgxe+5x5zFMEn5BHaDoaPhYpbvWX4H8Fz4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=HSeSGlt0B22r2L/z0HGFAh+TrxC6dYYrtDoIMT1P/AsFxaAn2ufllOwSkJhpl16is
-	 qZVKiZqgAwNYZhAq8iNDYLUkRkb0VC1boIkCHaeK1m2ZYwAXl3WgbsHMYxFiAqMWUF
-	 cPRkHLHcc+ogBY75JCijLhq4vrGnwabEFmGHTadSTu7i11708inPamEKH+qKytJBB+
-	 qmvku+TSRoH+nKwUxnRWTccKwTk/Bt3JWRzPG2Me0xRTDznodhoSG5JCpw9jBCMcGB
-	 7kG+n7aaZQcOm5VY8MJMV0z3U1IOhVzyVaGn2IWp8Gdmgy53AAHp5cPYYESgvi2EjJ
-	 EHKuqFQz2Noxg==
+	s=k20201202; t=1727264222;
+	bh=hyr4fIHwEHp6cJDdf90iptk04FwzkfQBR8Kvb2/Pch4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=lIPZodyc0LwKjeaTNQLitoKvTCkuaxF2+5f6V1Q/qJZ1Jpobt6Af8KJ8kbis8LDfw
+	 z0gwxLWXBgOyYeA70OQbgUNBoWgdcu+P9qqr73WWfVv1aeDdlrfWqQDvuidcFmwDZY
+	 wQNU+POnHbKtM1lMr7mBKlEu9es4G+JxN2RKwCRk8KA0IoyF/Vtj9fj2y61SXAWqXa
+	 RxYqJyrO9uh5kqOjpWZ7L3z31xJVRffFiMUBYkSUNHzWOqmRrcMcrofE9sVawkpqfg
+	 mPF6aPmJUdDdPOcW0XqtoT0QFGRp3TuJEJFHGfCxq75/Dh1dRVN6Zg7lCgelLw9G52
+	 GQ/DmrLilKzPQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: James Chapman <jchapman@katalix.com>,
-	Tom Parkin <tparkin@katalix.com>,
-	"David S . Miller" <davem@davemloft.net>,
+Cc: Aleksandr Mishin <amishin@t-argos.ru>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	samuel.thibault@ens-lyon.org,
-	thorsten.blum@toblux.com,
+	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 001/244] l2tp: prevent possible tunnel refcount underflow
-Date: Wed, 25 Sep 2024 07:23:42 -0400
-Message-ID: <20240925113641.1297102-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 009/244] ice: Adjust over allocation of memory in ice_sched_add_root_node() and ice_sched_add_node()
+Date: Wed, 25 Sep 2024 07:23:50 -0400
+Message-ID: <20240925113641.1297102-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240925113641.1297102-1-sashal@kernel.org>
+References: <20240925113641.1297102-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,167 +73,58 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11
 Content-Transfer-Encoding: 8bit
 
-From: James Chapman <jchapman@katalix.com>
+From: Aleksandr Mishin <amishin@t-argos.ru>
 
-[ Upstream commit 24256415d18695b46da06c93135f5b51c548b950 ]
+[ Upstream commit 62fdaf9e8056e9a9e6fe63aa9c816ec2122d60c6 ]
 
-When a session is created, it sets a backpointer to its tunnel. When
-the session refcount drops to 0, l2tp_session_free drops the tunnel
-refcount if session->tunnel is non-NULL. However, session->tunnel is
-set in l2tp_session_create, before the tunnel refcount is incremented
-by l2tp_session_register, which leaves a small window where
-session->tunnel is non-NULL when the tunnel refcount hasn't been
-bumped.
+In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
+devm_kcalloc() in order to allocate memory for array of pointers to
+'ice_sched_node' structure. But incorrect types are used as sizeof()
+arguments in these calls (structures instead of pointers) which leads to
+over allocation of memory.
 
-Moving the assignment to l2tp_session_register is trivial but
-l2tp_session_create calls l2tp_session_set_header_len which uses
-session->tunnel to get the tunnel's encap. Add an encap arg to
-l2tp_session_set_header_len to avoid using session->tunnel.
+Adjust over allocation of memory by correcting types in devm_kcalloc()
+sizeof() arguments.
 
-If l2tpv3 sessions have colliding IDs, it is possible for
-l2tp_v3_session_get to race with l2tp_session_register and fetch a
-session which doesn't yet have session->tunnel set. Add a check for
-this case.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Signed-off-by: James Chapman <jchapman@katalix.com>
-Signed-off-by: Tom Parkin <tparkin@katalix.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/l2tp/l2tp_core.c    | 24 +++++++++++++++++-------
- net/l2tp/l2tp_core.h    |  3 ++-
- net/l2tp/l2tp_netlink.c |  4 +++-
- net/l2tp/l2tp_ppp.c     |  3 ++-
- 4 files changed, 24 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_sched.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 2e86f520f7994..a9cbcbc9d016d 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -254,7 +254,14 @@ struct l2tp_session *l2tp_v3_session_get(const struct net *net, struct sock *sk,
+diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
+index ecf8f5d602921..6ca13c5dcb14e 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sched.c
++++ b/drivers/net/ethernet/intel/ice/ice_sched.c
+@@ -28,9 +28,8 @@ ice_sched_add_root_node(struct ice_port_info *pi,
+ 	if (!root)
+ 		return -ENOMEM;
  
- 		hash_for_each_possible_rcu(pn->l2tp_v3_session_htable, session,
- 					   hlist, key) {
--			if (session->tunnel->sock == sk &&
-+			/* session->tunnel may be NULL if another thread is in
-+			 * l2tp_session_register and has added an item to
-+			 * l2tp_v3_session_htable but hasn't yet added the
-+			 * session to its tunnel's session_list.
-+			 */
-+			struct l2tp_tunnel *tunnel = READ_ONCE(session->tunnel);
-+
-+			if (tunnel && tunnel->sock == sk &&
- 			    refcount_inc_not_zero(&session->ref_count)) {
- 				rcu_read_unlock_bh();
- 				return session;
-@@ -482,6 +489,7 @@ int l2tp_session_register(struct l2tp_session *session,
- 	}
- 
- 	l2tp_tunnel_inc_refcount(tunnel);
-+	WRITE_ONCE(session->tunnel, tunnel);
- 	list_add(&session->list, &tunnel->session_list);
- 
- 	if (tunnel->version == L2TP_HDR_VER_3) {
-@@ -797,7 +805,8 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
- 		if (!session->lns_mode && !session->send_seq) {
- 			trace_session_seqnum_lns_enable(session);
- 			session->send_seq = 1;
--			l2tp_session_set_header_len(session, tunnel->version);
-+			l2tp_session_set_header_len(session, tunnel->version,
-+						    tunnel->encap);
- 		}
- 	} else {
- 		/* No sequence numbers.
-@@ -818,7 +827,8 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
- 		if (!session->lns_mode && session->send_seq) {
- 			trace_session_seqnum_lns_disable(session);
- 			session->send_seq = 0;
--			l2tp_session_set_header_len(session, tunnel->version);
-+			l2tp_session_set_header_len(session, tunnel->version,
-+						    tunnel->encap);
- 		} else if (session->send_seq) {
- 			pr_debug_ratelimited("%s: recv data has no seq numbers when required. Discarding.\n",
- 					     session->name);
-@@ -1663,7 +1673,8 @@ EXPORT_SYMBOL_GPL(l2tp_session_delete);
- /* We come here whenever a session's send_seq, cookie_len or
-  * l2specific_type parameters are set.
-  */
--void l2tp_session_set_header_len(struct l2tp_session *session, int version)
-+void l2tp_session_set_header_len(struct l2tp_session *session, int version,
-+				 enum l2tp_encap_type encap)
- {
- 	if (version == L2TP_HDR_VER_2) {
- 		session->hdr_len = 6;
-@@ -1672,7 +1683,7 @@ void l2tp_session_set_header_len(struct l2tp_session *session, int version)
- 	} else {
- 		session->hdr_len = 4 + session->cookie_len;
- 		session->hdr_len += l2tp_get_l2specific_len(session);
--		if (session->tunnel->encap == L2TP_ENCAPTYPE_UDP)
-+		if (encap == L2TP_ENCAPTYPE_UDP)
- 			session->hdr_len += 4;
- 	}
- }
-@@ -1686,7 +1697,6 @@ struct l2tp_session *l2tp_session_create(int priv_size, struct l2tp_tunnel *tunn
- 	session = kzalloc(sizeof(*session) + priv_size, GFP_KERNEL);
- 	if (session) {
- 		session->magic = L2TP_SESSION_MAGIC;
--		session->tunnel = tunnel;
- 
- 		session->session_id = session_id;
- 		session->peer_session_id = peer_session_id;
-@@ -1724,7 +1734,7 @@ struct l2tp_session *l2tp_session_create(int priv_size, struct l2tp_tunnel *tunn
- 			memcpy(&session->peer_cookie[0], &cfg->peer_cookie[0], cfg->peer_cookie_len);
- 		}
- 
--		l2tp_session_set_header_len(session, tunnel->version);
-+		l2tp_session_set_header_len(session, tunnel->version, tunnel->encap);
- 
- 		refcount_set(&session->ref_count, 1);
- 
-diff --git a/net/l2tp/l2tp_core.h b/net/l2tp/l2tp_core.h
-index 8ac81bc1bc6fa..6c25c196cc222 100644
---- a/net/l2tp/l2tp_core.h
-+++ b/net/l2tp/l2tp_core.h
-@@ -260,7 +260,8 @@ void l2tp_recv_common(struct l2tp_session *session, struct sk_buff *skb,
- int l2tp_udp_encap_recv(struct sock *sk, struct sk_buff *skb);
- 
- /* Transmit path helpers for sending packets over the tunnel socket. */
--void l2tp_session_set_header_len(struct l2tp_session *session, int version);
-+void l2tp_session_set_header_len(struct l2tp_session *session, int version,
-+				 enum l2tp_encap_type encap);
- int l2tp_xmit_skb(struct l2tp_session *session, struct sk_buff *skb);
- 
- /* Pseudowire management.
-diff --git a/net/l2tp/l2tp_netlink.c b/net/l2tp/l2tp_netlink.c
-index d105030520f95..fc43ecbd128cc 100644
---- a/net/l2tp/l2tp_netlink.c
-+++ b/net/l2tp/l2tp_netlink.c
-@@ -692,8 +692,10 @@ static int l2tp_nl_cmd_session_modify(struct sk_buff *skb, struct genl_info *inf
- 		session->recv_seq = nla_get_u8(info->attrs[L2TP_ATTR_RECV_SEQ]);
- 
- 	if (info->attrs[L2TP_ATTR_SEND_SEQ]) {
-+		struct l2tp_tunnel *tunnel = session->tunnel;
-+
- 		session->send_seq = nla_get_u8(info->attrs[L2TP_ATTR_SEND_SEQ]);
--		l2tp_session_set_header_len(session, session->tunnel->version);
-+		l2tp_session_set_header_len(session, tunnel->version, tunnel->encap);
- 	}
- 
- 	if (info->attrs[L2TP_ATTR_LNS_MODE])
-diff --git a/net/l2tp/l2tp_ppp.c b/net/l2tp/l2tp_ppp.c
-index 3596290047b28..4f25c1212cacb 100644
---- a/net/l2tp/l2tp_ppp.c
-+++ b/net/l2tp/l2tp_ppp.c
-@@ -1205,7 +1205,8 @@ static int pppol2tp_session_setsockopt(struct sock *sk,
- 			po->chan.hdrlen = val ? PPPOL2TP_L2TP_HDR_SIZE_SEQ :
- 				PPPOL2TP_L2TP_HDR_SIZE_NOSEQ;
- 		}
--		l2tp_session_set_header_len(session, session->tunnel->version);
-+		l2tp_session_set_header_len(session, session->tunnel->version,
-+					    session->tunnel->encap);
- 		break;
- 
- 	case PPPOL2TP_SO_LNSMODE:
+-	/* coverity[suspicious_sizeof] */
+ 	root->children = devm_kcalloc(ice_hw_to_dev(hw), hw->max_children[0],
+-				      sizeof(*root), GFP_KERNEL);
++				      sizeof(*root->children), GFP_KERNEL);
+ 	if (!root->children) {
+ 		devm_kfree(ice_hw_to_dev(hw), root);
+ 		return -ENOMEM;
+@@ -186,10 +185,9 @@ ice_sched_add_node(struct ice_port_info *pi, u8 layer,
+ 	if (!node)
+ 		return -ENOMEM;
+ 	if (hw->max_children[layer]) {
+-		/* coverity[suspicious_sizeof] */
+ 		node->children = devm_kcalloc(ice_hw_to_dev(hw),
+ 					      hw->max_children[layer],
+-					      sizeof(*node), GFP_KERNEL);
++					      sizeof(*node->children), GFP_KERNEL);
+ 		if (!node->children) {
+ 			devm_kfree(ice_hw_to_dev(hw), node);
+ 			return -ENOMEM;
 -- 
 2.43.0
 
