@@ -1,115 +1,134 @@
-Return-Path: <netdev+bounces-129768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CCC4986007
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:12:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 243409860AF
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:31:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 456531F26294
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:12:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 69ABBB22EBA
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 502FA17CA16;
-	Wed, 25 Sep 2024 12:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F4A192D97;
+	Wed, 25 Sep 2024 12:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3lJcJ5b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jec5IJN8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899B915532A;
-	Wed, 25 Sep 2024 12:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B55EF18452A;
+	Wed, 25 Sep 2024 12:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727267006; cv=none; b=MCsBjtF6kKgVZL31NjR6p76NoO16ugP2mqTSYJuq38lUfDvVz37Obj4eInsqPrZqKTdBPFTiFOEFuUCResBKh3vF4iXMLbDmHY9vhCX7icsRYxW+7Q1JS1HDdyH4leaaez2wgd2URqPYbsnNCgDcEz4x6RxFDx81LYhrEQgXh5k=
+	t=1727267045; cv=none; b=agT0uQMbLyhGApxbZc/0OZTOxns9yoqRCKhtdArVaY3UH7I+I21+SVwCTBQB+QlL6Cc4sNjqxQbkJF8+9OhJ9HMzzHxG8acES7CSZZ0Ommkq34oE+cUI+betdxinWoW47/ykIFArMC3MV4ktVQvcsZ4I4qKhMYvs1KmAm74sJOw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727267006; c=relaxed/simple;
-	bh=hYhp4HhYcQeoLAt/F9SdqdaQuOEJoloCHzsxZuXigUk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kttlkvMBp7pyCoX6vQcHarlDWMxxCjGZuNFMY91/iaKx0ZZ9JmbNU1Io80NZ5xYeruZx5fUieesRN0487ZGg+OQLVGMfCDZ8Phv6xncKqbNXQl0zPG6qy2GXUq9/otoIGzTvXwkHeg3pI0M4APoewq2HWgSD9pLINavTAXbnJCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h3lJcJ5b; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1727267045; c=relaxed/simple;
+	bh=/0BRZHUYHg7b8BpYfsT0qrXwbXQQ0jG649TK756HeFE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=D3Fgjh7G2uPDL/0HkdToDWHbgsrgsc7KloxexXHv0j/wZzyErVWhIOI8huJC2PZLx4Zpf9+7hIngQYaQLIeyyPXvUkM+cMScYmmT90VT/wIyRGc3of41n+gnxr8dcddiS6EFk4DDJVsPdDyKZ4KI6n/bqfjswshzCT3HdUlq0hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jec5IJN8; arc=none smtp.client-ip=209.85.167.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-37a33e55d01so5027911f8f.3;
-        Wed, 25 Sep 2024 05:23:24 -0700 (PDT)
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-536748c7e9aso1299608e87.0;
+        Wed, 25 Sep 2024 05:24:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727267003; x=1727871803; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=m1RREKOHOhRWddTC/OgKLn5uOO+cRvYYCz0ezlbkx/o=;
-        b=h3lJcJ5bXsgsBUkXybh3siB7llsRhRIUefEkt1x3KNoLksMDY8ZUOAG3xRqLH7xgbk
-         B+oxmgk+TeLECKXaYiAtpNb5Khf5OcpycAOl1p1IwD7fm7QeQvK1CKvNQDD+Gr7mEyQw
-         tEYY+FDczuTCW2ksOAArXnie7+Cr4EG1HCMTCKZQVq+Wc/oyTwIEIFbPJHFHVOhixx42
-         gRCHWgf4a0e63ZOYjoJ8+IniAkvlLPwm5BEhavcdQ0a95iIoRcED5hb78Jnvu/qAr2GH
-         pqssYcivb5WT9qyu5N1rn81r3vT5v9Di3B5sBdI+11w+z9p4ivyhbK4JVuB3i8pZdfwp
-         0K7Q==
+        d=gmail.com; s=20230601; t=1727267041; x=1727871841; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3D9H7m1ayAExeAteiY4BmZMeyV1ukgj31CzY4MoI5+Y=;
+        b=Jec5IJN8G4EW7D18pZ35Lh5T5a+fQWBf4qUXlNmTeNMyCzIfOaaQHVs0bniufJQpbK
+         5BbnZ+qPOPnvlPbzy0sHq3oXzHQ/6igYx1ZXH91jYkwEHQ0uvTFO4ImD57rMwB61ythL
+         gdemvaeNERA5ceXUay05Opz3r4Nu5xylS63p6/s0eJtOD7I7W7dOCoP7Z+GelIhAKJe8
+         s/NOnPQ/s4vUSpMc/QdiQzx4dozU5o/1a5bajIvs03LBSwC42mn1CMNxq6GvicL4cRhF
+         Yyup2Qy6viq04/QfcF4fvOYFXQlCVMBoK75/33phvm0zVbaFMfqvtCNb0kwuHOGx0Jzy
+         36Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727267003; x=1727871803;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=m1RREKOHOhRWddTC/OgKLn5uOO+cRvYYCz0ezlbkx/o=;
-        b=LWh4hfKhABgJlttwaJ7Zi9i+u33rnrk+Dt0W1r9DK/80D8DsitLJKrIJl8+BREJYG+
-         STzYLJ++VK4AFuYJHeSvQf7JeUME57SmR8yTEhXEHZLQzFHKrgwrI8U4fSeWHlPcW8fB
-         eDdg2trhcSc8VLkGVVKcnFvkZ0caRH2pkcnHvCzvePTcZXMn9bqVk1p3/Ri95U9ewEVQ
-         DXBXyV04+zTVHL+h5PZlQmqGLu//EC1J4nkuLyooQKPXGUoFhXqkUkQsIBHt82ivorJq
-         fZDk7SQtwsocUA0ZBH0cp0q0p/7lOVUWvADqotOmrjjnyd/E3KlWR/aZWhVmwyeaPtxu
-         qBug==
-X-Forwarded-Encrypted: i=1; AJvYcCU6A354CKnCRTJ3FwW1gj5W7GrSGnmmZm7/3w3L0VpfXMWF0gALQZOHnssU4NOaefsEYzC4Jdti@vger.kernel.org, AJvYcCX7KiQDQghOMo4SpVonApnIBglRGWOwnuNwBgAWPAK0/cXVVrJwO1Zmjmy/ywTpYZzYY6vQc3Slj3mB4uG7AnVg3A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMqnd9cYyHDpGlYDO74YSOGTBXjesf+z3KrRuAnyrsfyMjRmK8
-	cJXMAgzcjNHK3RloiUYwJymoD59cZOKwMB2iH7EvlUmWLy67AeWi
-X-Google-Smtp-Source: AGHT+IFQffkD1R+3XKuN7FOd/FhlbemrXIaWOy8RGuDQ7msO3hEBPXuiWUGpIabBYeuy1GUAy+C7tw==
-X-Received: by 2002:a5d:6089:0:b0:374:c03e:22d4 with SMTP id ffacd0b85a97d-37cc245b08emr1955481f8f.1.1727267002488;
-        Wed, 25 Sep 2024 05:23:22 -0700 (PDT)
-Received: from eichest-laptop ([2a02:168:af72:0:bfae:1f4d:37af:7b02])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc31f33bsm3872589f8f.97.2024.09.25.05.23.21
+        d=1e100.net; s=20230601; t=1727267041; x=1727871841;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3D9H7m1ayAExeAteiY4BmZMeyV1ukgj31CzY4MoI5+Y=;
+        b=UUHJXHJzgdhWiFsIsBmQeeZy99SJTfT3k5FUOWYqWwqiw79OPAscZLMXX1UhFr+mNc
+         WiQPqW4I3SzFhT9NHqJjRj0yEfWgPeMgvzvDhQgXeLEwVQRA4uM2H0+fLn0VEqbSYyuU
+         j9AqMZ6knBp4p2eY8WK+pwxXA6MT7gfc9jlgwp1eWcOLGWl3w850FaAapvAo/raMeurM
+         E4Cr3fYFw3q7mOKW49GL5aakN+GEEBNJ0VBPCgPsvbvzIxFMeR86XiRMAZV1IXLuf0PX
+         UtOaiE9ifP0QBol5qwu387/5JULT1JpnomQh51+7TGnly/XlaW3tvmMZKmejcwL0s/zC
+         1YNA==
+X-Forwarded-Encrypted: i=1; AJvYcCUdmHyvEou5OZYWYd95caAFL8UIA6Aw76I2OkAGAyaU54UqlpNM9xcPl8dKkwcdCmemL6cvIM+m/W6WsJs=@vger.kernel.org, AJvYcCVROfuLpSFFr9LTKl+5hbKHW+a7GxHPd8u9ffA1IJngfXJesVvg+guKZta0TEw+pJ/fU+NGNitQ@vger.kernel.org, AJvYcCVqWFwufBviq1CMgHaBSZjztE+caGn5TX6a4XqEeFT5HJfDZOjhaT0QjizTp111f5EPCQVRKcRA0a8jiQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzC5HOTKfC+unETNEJYZgPU3Ux/l8bohajCV5fGbQ9ALGlgkfTn
+	DcBKmcmOPSBdJTF0QW92TZ2rWcn1gqHOa3jocibYQlY/MYorEdkhi28oiNZc
+X-Google-Smtp-Source: AGHT+IHFfLQnU+I3m0J+fjUdYH3rJ/SG1O3DECX99SL7D3Bh0hOkeXe84K8q9nD+8SM2zX2uss31zg==
+X-Received: by 2002:a05:6512:b01:b0:530:ae22:a6f0 with SMTP id 2adb3069b0e04-53873455f14mr1633306e87.5.1727267040906;
+        Wed, 25 Sep 2024 05:24:00 -0700 (PDT)
+Received: from [127.0.1.1] (91-118-163-37.static.upcbusiness.at. [91.118.163.37])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93930f8529sm204745566b.185.2024.09.25.05.23.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 05:23:22 -0700 (PDT)
-Date: Wed, 25 Sep 2024 14:23:20 +0200
-From: Stefan Eichenberger <eichest@gmail.com>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dimitri Fedrau <dima.fedrau@gmail.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next 2/3] net: phy: marvell-88q2xxx: Make register writer
- function generic
-Message-ID: <ZvQAuFLuxSxE9AQy@eichest-laptop>
-References: <20240906133951.3433788-1-niklas.soderlund+renesas@ragnatech.se>
- <20240906133951.3433788-3-niklas.soderlund+renesas@ragnatech.se>
+        Wed, 25 Sep 2024 05:24:00 -0700 (PDT)
+From: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Subject: [PATCH v2 0/4] selftsets: gitignore and clean target file
+ additions
+Date: Wed, 25 Sep 2024 14:23:43 +0200
+Message-Id: <20240925-selftests-gitignore-v2-0-bbbbdef21959@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240906133951.3433788-3-niklas.soderlund+renesas@ragnatech.se>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAM8A9GYC/32NQQ6CMBBFr0JmbQ1tQYsr72FY1DKUSYCaTkM0p
+ He3cgCX7yX//R0YIyHDrdoh4kZMYS2gThW4ya4eBQ2FQdWqqTvVCMZ5TMiJhadEfg0RBTZSao0
+ X1z4HKMtXxJHeR/XRF56IU4if42STP/u/t0lRi+7attYZo7Uxd79Yms8uLNDnnL/fZQFAtgAAA
+ A==
+To: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Allison Henderson <allison.henderson@oracle.com>, 
+ Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>
+Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ rds-devel@oss.oracle.com, linux-mm@kvack.org, 
+ Javier Carrasco <javier.carrasco.cruz@gmail.com>
+X-Mailer: b4 0.14-dev
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1727267039; l=1181;
+ i=javier.carrasco.cruz@gmail.com; s=20240312; h=from:subject:message-id;
+ bh=/0BRZHUYHg7b8BpYfsT0qrXwbXQQ0jG649TK756HeFE=;
+ b=nnlM9AKYM+9p4f8mDEbSXp8CsfNyW08Xlqfp9YMAcdhL6diwkcbWgGsKug91Y6fb4Dx8ffyY5
+ p+OaBLVnccBAulRnnP3E7pqKJdx2n1tTl0OxSTbg72iKSsRc0x9zYrb
+X-Developer-Key: i=javier.carrasco.cruz@gmail.com; a=ed25519;
+ pk=lzSIvIzMz0JhJrzLXI0HAdPwsNPSSmEn6RbS+PTS9aQ=
 
-On Fri, Sep 06, 2024 at 03:39:50PM +0200, Niklas Söderlund wrote:
-> In preparation to adding auto negotiation support to mv88q2110 move and
-> rename the helper function used to write an array of register values to
-> the PHY.
-> 
-> Just as for mv88q2220 devices this helper will be needed to for the
-> initial configuration of the mv88q2110 to support auto negotiation.
-> 
-> The function is moved verbatim, there is no change in behavior.
-> 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+Trivial patches to update the gitignore files unders selftests, and a
+little addition to EXTRA_CLEAN under net/rds to account for the
+automatically generated include.sh.
 
-Tested with a mv88q2110 device.
+Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
+---
+Changes in v2:
+- [PATCH 4/4] add excepction for load_address.c (must be tracked).
+- Link to v1: https://lore.kernel.org/r/20240924-selftests-gitignore-v1-0-9755ac883388@gmail.com
 
-Tested-by: Stefan Eichenberger <eichest@gmail.com>
+---
+Javier Carrasco (4):
+      selftests: add unshare_test and msg_oob to gitignore
+      selftests: rds: add include.sh to EXTRA_CLEAN
+      selftests: rds: add gitignore file for include.sh
+      selftests: exec: update gitignore for load_address
 
-Regards,
-Stefan
+ tools/testing/selftests/core/.gitignore    | 1 +
+ tools/testing/selftests/exec/.gitignore    | 3 ++-
+ tools/testing/selftests/net/.gitignore     | 1 +
+ tools/testing/selftests/net/rds/.gitignore | 1 +
+ tools/testing/selftests/net/rds/Makefile   | 2 +-
+ 5 files changed, 6 insertions(+), 2 deletions(-)
+---
+base-commit: 4d0326b60bb753627437fff0f76bf1525bcda422
+change-id: 20240924-selftests-gitignore-e41133e6c5bd
+
+Best regards,
+-- 
+Javier Carrasco <javier.carrasco.cruz@gmail.com>
+
 
