@@ -1,110 +1,121 @@
-Return-Path: <netdev+bounces-129721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3C70985C47
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:43:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E54D985CBA
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:53:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D297C1F28D0A
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:43:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 360571F23FB7
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879601CCB35;
-	Wed, 25 Sep 2024 11:59:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7061D2F75;
+	Wed, 25 Sep 2024 12:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Th3nDU8N"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212EB1AD3EB;
-	Wed, 25 Sep 2024 11:59:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3A718A6C0;
+	Wed, 25 Sep 2024 12:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727265548; cv=none; b=QVt20YP792wZ/M0B2nDRIA79+W8U2MDRGwpmGAy3J5jnqqt41E1hdjSCbfFPGDbCxDGAb6itQQxiC65f52U0rvyP9NixAVpYAox+Evbo5PGnUfx//3juGEce8JtfhSGRPkprPuf1OF62d1trNoTTwWBJy8ncn/Loqt3I0yThCD0=
+	t=1727265624; cv=none; b=iMtEbyejSb4uP08yCEh2BvP+YYfZCxm7/64Lhz7miXmzhSu464QlFa+XXZDYAdAl5p2hU1lQf0aIW0ReefpOVxR7p7JAIc6vWdLfRkFq5LsFu0Q4bfTac2LXE5ZQR2rVRkPoxN7ML21UMkkAEnZKry0lry1hOW+AIyLAY5Wkp4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727265548; c=relaxed/simple;
-	bh=PkRn6B9qktnCgt3WPUj+Onnd2cdwn+uHLAqfIQhypuo=;
+	s=arc-20240116; t=1727265624; c=relaxed/simple;
+	bh=m1qc7fAQ0cZYfNPNJ3zWH+FfsONqrrnHM/qkxad0qZI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uNog1TsMelXycvsODGBzmsev9feGSII4Yh2sxSuBvTIvdw6plhVYAsBVUJHxWH5c1/x3ecbwyyhPcPDcQFIFb7mUqTMdb9SDon5uh3X3QDbKU0Cvy30BnRjfVK5U5Bu0YtDC0qSbjWqX9+8C223uvF+/g1fnJWo8WRL3Db78WA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=53292 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1stQfT-0005hv-Pc; Wed, 25 Sep 2024 13:58:53 +0200
-Date: Wed, 25 Sep 2024 13:58:50 +0200
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Sasha Levin <sashal@kernel.org>
-Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Florian Westphal <fw@strlen.de>, kadlec@netfilter.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 6.11 049/244] netfilter: nf_tables: don't
- initialize registers in nft_do_chain()
-Message-ID: <ZvP6-utbwqWmP5_0@calendula>
-References: <20240925113641.1297102-1-sashal@kernel.org>
- <20240925113641.1297102-49-sashal@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=s0JuBi4Ezh9M7wbznYDJ8B5WVTmmMmJSEoPj5NapY7oz8yxmyKf/8KBKV6XzLt9Ev8QnZrBKmfsSCIq3/4zFQ/6ykUVObWw7icgziUFpiTd9LyzlbweQVKAtu6wUMaIAZuYmA9f71QBB9jvmQjP8H2MZsxZoM0wukQl90KeS6qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Th3nDU8N; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1727265622; x=1758801622;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=m1qc7fAQ0cZYfNPNJ3zWH+FfsONqrrnHM/qkxad0qZI=;
+  b=Th3nDU8NQSEHVpxelADyRsz9KxL4GJVWmzIxxlv/mYBL0nDUt/0+4GyF
+   G0mwW+w8VcYJ0EjAp0sG1ptH49EAQ+4Z+6j6NbMxKHC30TCZ5WfW1W7Ky
+   MrbKpMuT2lxfSZGyJlir84LTgPQVGe+A4SGhYmFmlJuByry2NT4gdg67n
+   0ve6qFXaBntU6d/JFx6UIY836d/j0SrDPzisEaZDEx99il70dnCRaMeg8
+   9J5YAMC/vL2RGB4Mp6hom795ooH55TdJo6CbUrhD1sN2OIxHc/Dhlpp+4
+   TzJZN2ZrTecmQcLqmSKcTkyffcxeyT2Lvko+UMLUjNfr0sqxkiDthkkop
+   g==;
+X-CSE-ConnectionGUID: 8SBD003GTQKelOluIqzFGQ==
+X-CSE-MsgGUID: Ztx27HK+TR2vTU8vvx0lpw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11206"; a="26255203"
+X-IronPort-AV: E=Sophos;i="6.10,257,1719903600"; 
+   d="scan'208";a="26255203"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2024 05:00:21 -0700
+X-CSE-ConnectionGUID: VGT8nKdfQl+z6j72aaS9CQ==
+X-CSE-MsgGUID: BCscd2aMTgeZ1lQQkb8DGQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,257,1719903600"; 
+   d="scan'208";a="72564645"
+Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
+  by orviesa008.jf.intel.com with ESMTP; 25 Sep 2024 05:00:17 -0700
+Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1stQgo-000JWd-2w;
+	Wed, 25 Sep 2024 12:00:14 +0000
+Date: Wed, 25 Sep 2024 20:00:04 +0800
+From: kernel test robot <lkp@intel.com>
+To: Javier Carrasco <javier.carrasco.cruz@gmail.com>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Allison Henderson <allison.henderson@oracle.com>,
+	Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com, linux-mm@kvack.org,
+	Javier Carrasco <javier.carrasco.cruz@gmail.com>
+Subject: Re: [PATCH 4/4] selftests: exec: update gitignore for load_address
+Message-ID: <202409251828.dMx8LnrF-lkp@intel.com>
+References: <20240924-selftests-gitignore-v1-4-9755ac883388@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240925113641.1297102-49-sashal@kernel.org>
-X-Spam-Score: -1.9 (-)
+In-Reply-To: <20240924-selftests-gitignore-v1-4-9755ac883388@gmail.com>
 
-Hi Sasha,
+Hi Javier,
 
-This commit requires:
+kernel test robot noticed the following build warnings:
 
-commit 14fb07130c7ddd257e30079b87499b3f89097b09
-Author: Florian Westphal <fw@strlen.de>
-Date:   Tue Aug 20 11:56:13 2024 +0200
+[auto build test WARNING on 4d0326b60bb753627437fff0f76bf1525bcda422]
 
-    netfilter: nf_tables: allow loads only when register is initialized
+url:    https://github.com/intel-lab-lkp/linux/commits/Javier-Carrasco/selftests-add-unshare_test-and-msg_oob-to-gitignore/20240924-205133
+base:   4d0326b60bb753627437fff0f76bf1525bcda422
+patch link:    https://lore.kernel.org/r/20240924-selftests-gitignore-v1-4-9755ac883388%40gmail.com
+patch subject: [PATCH 4/4] selftests: exec: update gitignore for load_address
+config: x86_64-allnoconfig (https://download.01.org/0day-ci/archive/20240925/202409251828.dMx8LnrF-lkp@intel.com/config)
+compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240925/202409251828.dMx8LnrF-lkp@intel.com/reproduce)
 
-so either drop it or pull-in this dependency for 6.11
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202409251828.dMx8LnrF-lkp@intel.com/
 
-Thanks.
+All warnings (new ones prefixed by >>):
 
-On Wed, Sep 25, 2024 at 07:24:30AM -0400, Sasha Levin wrote:
-> From: Florian Westphal <fw@strlen.de>
-> 
-> [ Upstream commit c88baabf16d1ef74ab8832de9761226406af5507 ]
-> 
-> revert commit 4c905f6740a3 ("netfilter: nf_tables: initialize registers in
-> nft_do_chain()").
-> 
-> Previous patch makes sure that loads from uninitialized registers are
-> detected from the control plane. in this case rule blob auto-zeroes
-> registers.  Thus the explicit zeroing is not needed anymore.
-> 
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
-> ---
->  net/netfilter/nf_tables_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/netfilter/nf_tables_core.c b/net/netfilter/nf_tables_core.c
-> index a48d5f0e2f3e1..75598520b0fa0 100644
-> --- a/net/netfilter/nf_tables_core.c
-> +++ b/net/netfilter/nf_tables_core.c
-> @@ -256,7 +256,7 @@ nft_do_chain(struct nft_pktinfo *pkt, void *priv)
->  	const struct net *net = nft_net(pkt);
->  	const struct nft_expr *expr, *last;
->  	const struct nft_rule_dp *rule;
-> -	struct nft_regs regs = {};
-> +	struct nft_regs regs;
->  	unsigned int stackptr = 0;
->  	struct nft_jumpstack jumpstack[NFT_JUMP_STACK_SIZE];
->  	bool genbit = READ_ONCE(net->nft.gencursor);
-> -- 
-> 2.43.0
-> 
+   tools/testing/selftests/arm64/tags/.gitignore: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/arm64/tags/Makefile: warning: ignored by one of the .gitignore files
+   tools/testing/selftests/arm64/tags/tags_test.c: warning: ignored by one of the .gitignore files
+>> tools/testing/selftests/exec/load_address.c: warning: ignored by one of the .gitignore files
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
