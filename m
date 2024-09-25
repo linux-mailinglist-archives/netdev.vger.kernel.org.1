@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-129851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8354198678A
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 22:20:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88C0F98678B
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 22:21:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46BE92845D6
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:20:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 141EFB2315E
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36080154452;
-	Wed, 25 Sep 2024 20:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C58D154BFE;
+	Wed, 25 Sep 2024 20:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jbS72fY2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kSs/0tlX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF2F154420
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 20:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3D2154BEC
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 20:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727295624; cv=none; b=EPPRhl15SqV5pBJGtpDH5p21orOVQcHMjAx0l+fKnvNkU5SlY4VRZy5oH8oJLpxPJ8GZOPihkMxGMG+JxoJI3F3NPUZiX5V7E4P5K4gb92H1eqZ0oPuZGcc12zTuRSMJTCVciVzhIoXYwfsdrydV6CpTxnjoKpAWY3q5ou5lTbo=
+	t=1727295624; cv=none; b=EltkjjSbctCdWaWUln+BAVNHSyWNrkLtxmqn+VRuzdHZxG1KEteDge/pYqpcPur7Vq/J+vjoSLXNQwTlKlNva5p23ZC7tBMmj2eDXstjvBf7Fb/4bcpawJIX2od2eAaJYbWs7/lPBls+5b1TbEUpELYha199m3tnE9u5dAQ6kMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1727295624; c=relaxed/simple;
-	bh=h5RN0PGYou2v5vLsubKxgEXrp0aHqNkuR7lcYqYnEyc=;
+	bh=pFm1GC8xrAkDojzTiDVHxvRLgkWjSFRFm/I+GSFhVUM=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A2CAVz8M43w2isb4Of4z5jwUHwxQkHdcI0Ix2FYyBGkr3K5CVE+t2f/vyKhmhXf4wwIeiyZVrmOzzk2FicDn7YksYVca0wrFOhjKDLE0NIj+XMICqNWtGlDeszIw/RjZXRtgQ/FBN6vqWBRxxSwk5I8HKvpClomEj1YPkI60UP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jbS72fY2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 70FF8C4CEC3;
-	Wed, 25 Sep 2024 20:20:23 +0000 (UTC)
+	 MIME-Version; b=AyOLrmkJANk2jraoCv4ZH1ngfHZEvXk8qNhU9dWRN4MEuzB0nxd2TFdbJGQJwZ8VtOdauJc4gXlGv7VCNgS3yu/ig/0PfwqskDIoywnoF2qxAGjbxDLtwJinQapQ9HUDQA4vmCZ0XJiJGD8WBwlYXDZ7ck9WV+2P5cPTPTIzK/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kSs/0tlX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E5E3C4CEC3;
+	Wed, 25 Sep 2024 20:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727295623;
-	bh=h5RN0PGYou2v5vLsubKxgEXrp0aHqNkuR7lcYqYnEyc=;
+	s=k20201202; t=1727295624;
+	bh=pFm1GC8xrAkDojzTiDVHxvRLgkWjSFRFm/I+GSFhVUM=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jbS72fY2fws6WeZqM9FnREJrxebrx2CrBuW8/vyUcL+AVs+SqnEPEZjWmMMZuP5jc
-	 rhFMCIkGd7/vk1tUEpZFJpLxpAc9FxmPAFUjc+1X1dEopVX1kjqx2bkqNWjsnfq1ti
-	 1bxj14RxeGdCLIhC2VCzlNaf561kg0zuWNzVjhmCUs1In5c0mBTG62J8ONw9wcTEqz
-	 brwg4IrmwDmhIBOwZyjvUqM5TG19uzveVDfin9mV8ktcDqYBXCbqG6aavI+oj/BnQ+
-	 miUBKr6tu57kqKrov93RzwASC81LUYwmOGW2zCAuFq1kwzvoV3aMAwV6mNXA6oCt/A
-	 BFnb/inHBVYkg==
+	b=kSs/0tlX2SXubmnGioF1S43Q21vFPY8YASCzWQzA+FACrAkpBaT7QXGQnhRARqI+h
+	 pxoYNDwJJZfVoQGuVOBRBRMAiKJhabvvSvk+jiP4+7Vgm1CrN94XfRM4MAC3hECQne
+	 av4GEXTjPJHoJNZFQNuPetmv5pugE+Du0TTzNcNJc0r6aWqI8d5bvlmMJM1A+YwR0e
+	 NPASh0ljyApmUjYNueuNlgxuharkztdIOV6/1hcceR2IxW7/rgRMGcApjaK341H+ca
+	 6LOXShCRclsyW4QJ7vWz/rkTvxwqHimfHk/+XqQ1gnsvbLhSjwwXxTNWuwvr+VOa72
+	 xVI9GDBbGO3BQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,11 +51,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: [net 6/8] net/mlx5: HWS, changed E2BIG error to a negative return code
-Date: Wed, 25 Sep 2024 13:20:11 -0700
-Message-ID: <20240925202013.45374-7-saeed@kernel.org>
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [net 7/8] net/mlx5e: SHAMPO, Fix overflow of hd_per_wq
+Date: Wed, 25 Sep 2024 13:20:12 -0700
+Message-ID: <20240925202013.45374-8-saeed@kernel.org>
 X-Mailer: git-send-email 2.46.1
 In-Reply-To: <20240925202013.45374-1-saeed@kernel.org>
 References: <20240925202013.45374-1-saeed@kernel.org>
@@ -67,74 +66,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+From: Dragos Tatulea <dtatulea@nvidia.com>
 
-Fixed all the 'E2BIG' returns in error flow of functions to
-the negative '-E2BIG' as we are using negative error codes
-everywhere in HWS code.
+When having larger RQ sizes and small MTUs sizes, the hd_per_wq variable
+can overflow. Like in the following case:
 
-This also fixes the following smatch warnings:
-	"warn: was negative '-E2BIG' intended?"
+$> ethtool --set-ring eth1 rx 8192
+$> ip link set dev eth1 mtu 144
+$> ethtool --features eth1 rx-gro-hw on
 
-Fixes: 74a778b4a63f ("net/mlx5: HWS, added definers handling")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/all/f8c77688-7d83-4937-baba-ac844dfe2e0b@stanley.mountain/
-Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+... yields in dmesg:
+
+mlx5_core 0000:08:00.1: mlx5_cmd_out_err:808:(pid 194797): CREATE_MKEY(0x200) op_mod(0x0) failed, status bad parameter(0x3), syndrome (0x3bf6f), err(-22)
+
+because hd_per_wq is 64K which overflows to 0 and makes the command
+fail.
+
+This patch increases the variable size to 32 bit.
+
+Fixes: 99be56171fa9 ("net/mlx5e: SHAMPO, Re-enable HW-GRO")
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c     | 2 +-
- .../mellanox/mlx5/core/steering/hws/mlx5hws_definer.c         | 4 ++--
- .../mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c         | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/en.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
-index bb563f50ef09..601fad5fc54a 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_bwc_complex.c
-@@ -33,7 +33,7 @@ bool mlx5hws_bwc_match_params_is_complex(struct mlx5hws_context *ctx,
- 		 * and let the usual match creation path handle it,
- 		 * both for good and bad flows.
- 		 */
--		if (ret == E2BIG) {
-+		if (ret == -E2BIG) {
- 			is_complex = true;
- 			mlx5hws_dbg(ctx, "Matcher definer layout: need complex matcher\n");
- 		} else {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_definer.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_definer.c
-index 3bdb5c90efff..d566d2ddf424 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_definer.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_definer.c
-@@ -1845,7 +1845,7 @@ hws_definer_find_best_match_fit(struct mlx5hws_context *ctx,
- 		return 0;
- 	}
- 
--	return E2BIG;
-+	return -E2BIG;
- }
- 
- static void
-@@ -1931,7 +1931,7 @@ mlx5hws_definer_calc_layout(struct mlx5hws_context *ctx,
- 	/* Find the match definer layout for header layout match union */
- 	ret = hws_definer_find_best_match_fit(ctx, match_definer, match_hl);
- 	if (ret) {
--		if (ret == E2BIG)
-+		if (ret == -E2BIG)
- 			mlx5hws_dbg(ctx,
- 				    "Failed to create match definer from header layout - E2BIG\n");
- 		else
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
-index 33d2b31e4b46..61a1155d4b4f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/mlx5hws_matcher.c
-@@ -675,7 +675,7 @@ static int hws_matcher_bind_mt(struct mlx5hws_matcher *matcher)
- 	if (!(matcher->flags & MLX5HWS_MATCHER_FLAGS_COLLISION)) {
- 		ret = mlx5hws_definer_mt_init(ctx, matcher->mt);
- 		if (ret) {
--			if (ret == E2BIG)
-+			if (ret == -E2BIG)
- 				mlx5hws_err(ctx, "Failed to set matcher templates with match definers\n");
- 			return ret;
- 		}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index da0a1c65ec4a..57b7298a0e79 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -627,7 +627,7 @@ struct mlx5e_shampo_hd {
+ 	struct mlx5e_dma_info *info;
+ 	struct mlx5e_frag_page *pages;
+ 	u16 curr_page_index;
+-	u16 hd_per_wq;
++	u32 hd_per_wq;
+ 	u16 hd_per_wqe;
+ 	unsigned long *bitmap;
+ 	u16 pi;
 -- 
 2.46.1
 
