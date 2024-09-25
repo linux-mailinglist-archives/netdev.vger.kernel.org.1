@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-129825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B6F4986697
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:55:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EE0C98669C
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:01:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F57B281772
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:55:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3AD21F24BED
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 19:01:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E46130E58;
-	Wed, 25 Sep 2024 18:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689AA75809;
+	Wed, 25 Sep 2024 19:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r6bhlq2/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZkTCsvrf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A37111EEE9
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 18:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5F917BB4
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 19:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727290534; cv=none; b=IoDd1LQrYYXQhviUSc/05jKgwyAs3UOuQMmDo8Qbyd1FSZHgqGQllXwJGSpBQx8XbXKohbowEDlkpFhtRWnoW7kEkyMPmro2SU/FYbLfyJtcRRQaFlLPxcS6lw1kwbm7UFGgn2QdkBadzGNIZzAgo4v6PglDNkKw6j9mzTAl3Bw=
+	t=1727290898; cv=none; b=cwd919kJGAt5BePvd0KD4lWzUmZ/812ODzZMG8O2e4BmfvY8Lw7h2aW0SSs/f0NL2QhFw5M65hjnPsXqQBLhE8Fb+SOI7kwoHfKwD6psRZ+At2Jr9VVCBdDyaRveaGplexW9MX4Ry3AdidB26LzJ8Vilm5iD6WgRkTgTkg3WgP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727290534; c=relaxed/simple;
-	bh=Zt8/rAhSAWDeZmOca4Bf7F2VJ+YmEYr2nlPgL3d/2qw=;
+	s=arc-20240116; t=1727290898; c=relaxed/simple;
+	bh=JPIOQVpYy6D78QuQ0NLIim5i6ssYR0dlPTVeaiEwuGc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=sht7lXpiCYbTEnb8dhxtXAfT1GzbewyaAcekuqiE9Fbiynx1ej3/RSm7UKfSbHwKnazScPQ8CEDD3cOMoBZfHjJc5SUnm7p5Dn+xoyYUzgpd4BS081zPA5yUj/54F7MHVKcT9xG9s5U+P7KDgGPUz0otOzwJ8FFrjJh3fswvJB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r6bhlq2/; arc=none smtp.client-ip=209.85.167.46
+	 To:Content-Type; b=BhWH3pXfNvTJ+OCllhXqoiXsSu6oRnXZgwXYYrIk0LzC0N/AYBpAzpoVVrpiOV9hMr+zQlAxLPZVz9WR+uCIotvPv6RT4gk8OWEnqXdrAzmQqLGKKKRm50/jTNi2b6UDeXOLkeGrpY45VrDM9COIspq0kAOWzlUCULpuNl69rbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZkTCsvrf; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-5356bb5522bso226842e87.1
-        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 11:55:32 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-42cae6bb895so1047135e9.1
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 12:01:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727290531; x=1727895331; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1727290895; x=1727895695; darn=vger.kernel.org;
         h=content-transfer-encoding:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Zt8/rAhSAWDeZmOca4Bf7F2VJ+YmEYr2nlPgL3d/2qw=;
-        b=r6bhlq2/I3SJ4BDyZsRg4h6WeaYA0KTDpfgNwQWSSsuhIHyfVGqEOZwFry3FZgheG+
-         q/9it9s5dgCaQ5ObZu3luaOzn+O+VNATFHgCKmFDoYKvdaKCSyktYTCzOrmYSsLaFVtL
-         ntj7kgXarQY/oZDhjMXJ35bg4X0EXy+0IV7KBU+6HuIpdPzwPr/w6+K7z5AiM+9213R2
-         8PeRvaCp75lut+MlIoz3yZHicgBhVBb+/Evo/8cioBXi2JEe9M1LB2scCT8vqX1YBp78
-         67CE3CDH/tEaIdZ92aseFjFxVi61hp3JIJNHcRWhNGbaNqrpzSO59gqwe+5YKn2aQbz3
-         e9DQ==
+        bh=JPIOQVpYy6D78QuQ0NLIim5i6ssYR0dlPTVeaiEwuGc=;
+        b=ZkTCsvrfTM8HU8F62alqUM9tVyFqRbao0Jzvll9BmCr0YGaVjYqTxn8oB1pQZxvps2
+         46F2IDGT6yHBtFwKZgHhlJztVkEXcT1vP3NM1rDZjNZLCft/jJMtip3us9WN/9i4doER
+         ysGQdlFh7LOcg4zWJAg+cR1xCGpFvpOMEgp6lRC+evUJa0A01UFyyp5EJPdyRwx5iTyd
+         uC1K42IYNkWlczeDMMxQTf91ygeSF74JPT/4ODSOI8YvjfWad+DtyPt4FgiESnaCPIFu
+         2e+OptwUO/sV2uKw8CdYk+ljHsFMzgWQ/3ZPBLZGFwhdKgImVyBqAkHgSynaxWYhOaSQ
+         +jgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727290531; x=1727895331;
+        d=1e100.net; s=20230601; t=1727290895; x=1727895695;
         h=content-transfer-encoding:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Zt8/rAhSAWDeZmOca4Bf7F2VJ+YmEYr2nlPgL3d/2qw=;
-        b=TEx4p2g7KJuGgQ/cTOoBJPsjBenbCC6gsva/MvwfREOT3AUJT32AL4sQtseoP69XPU
-         zaoS0KedvWSUbqeCF3fxWVM5sRZJ9THNB+snsgSGFmv047w89N/FpmH9k5XKt6B85Umb
-         NmR2SgPn+zFNSrhZf5ozyWCUVrUPjkDhINZdQIdq6IV9XCqc0/lti6Xj9dOlIkG8FEy9
-         9IehzGj13Rv0BJbOQcWuUmOVavMHx4Fa14WFy/3oBJp8Jgp4QR/E9q+257XUt2bT9ZrB
-         /z8b6u6quEVL9/ja7KUjDys6S+Fi4u3dv2kbWX7/GVbZzfm14L5TbxDOGecFb+UG+sgL
-         UZ3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXiDCk/odgTpGW8g5zbh+mWNUCy6cKx9SG63lF4kXoFoi8A7yPPl/8TJYftH0SlSXdx6gLzVmw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeTV0EUNOp5fUOkv1uz05quxfezaNMZGdDDDkjffZxkePSQ63+
-	WPyQ7uDf8i+WcdPOWjUP6kzP+GMzURJ+18jULWMFFTG8nZyqqWgf+PSMdZFanegAcrF6MGvD/aA
-	Ep2TyH5sSbvVPt8f4w1Jfk122gFcKin7MZnUE
-X-Google-Smtp-Source: AGHT+IH/S+tAQgecGTR1SoGVP/pIQ5w2xb/dpf+LifA4G+1e8jTGV1BYw7P9Sv/j1U5ojzTPH6Q5IrouDIRs55E7yco=
-X-Received: by 2002:a05:6512:3c9f:b0:536:54fd:275b with SMTP id
- 2adb3069b0e04-53877565f1dmr2471966e87.54.1727290530451; Wed, 25 Sep 2024
- 11:55:30 -0700 (PDT)
+        bh=JPIOQVpYy6D78QuQ0NLIim5i6ssYR0dlPTVeaiEwuGc=;
+        b=pGMlON4M+VSoYfQHlxl0xdJeLkWZ6mw2U1YNZYxDCpy4DWZzGo5fMKmPNf4PEbzGxy
+         oO7z96B+dBCySsyTd7Rf5awAXrPI/leftEsvqy1VA/CRapk9S0fHD6bhUNlXY2dbXUrh
+         6ZumDB1PioYCMBMmWetSrXT5/zgJEqpU5HFTN1AT9l3xOerCR2GMoSD3z03ai/MZCLDu
+         NAq5SwTLxlSWdS6wN9cAisQnhnFGXKBzgCQZthLh/6zFjvxR7VGRmpAr3SY3DbeYjva9
+         4Ph0H7qNLimEvPujl3mQqSA0LyXliF1rGt9Jrv0O6GMVcUSAng4sn6REg8Nrbmx9m61R
+         4hEA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfS7e4c5oUmik31XgR+lyA+QVpRwUV53AhCgV61Yud9t3rSesWVvlSnAkS+a1zRPuXu3sL69U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGg1pdRN+mrbFAPtH6I2R54+6ONlX2o3CGOqlrRfX0gzhDerNq
+	fPFKWihXOQi/SPehzzpQmEB9KEJRSOlPKR9nQRnBtqVVd4qrYOqzOLHy5lwsz/2EZN/v1c6bJpH
+	imZQcyRs6FJMOMAVs7xNqinpU5ZAjmk9uNbzR
+X-Google-Smtp-Source: AGHT+IEVbShi28LsUkyR6AYEqVzLUNMO1efjMBGVMfpijd7cUcq8i0bcfTdcizaJkgjNZQ3fsqvom+8inf2v8L26YBg=
+X-Received: by 2002:a5d:4a87:0:b0:37c:ccb5:4eff with SMTP id
+ ffacd0b85a97d-37cccb54ff8mr1132768f8f.12.1727290894723; Wed, 25 Sep 2024
+ 12:01:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,11 +73,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240924150257.1059524-1-edumazet@google.com> <20240924150257.1059524-3-edumazet@google.com>
  <ZvRNvTdnCxzeXmse@LQ3V64L9R2> <CANn89iKnOEoH8hUd==FVi=P58q=Y6PG1Busc1E=GPiBTyZg1Jw@mail.gmail.com>
- <ZvRVRL6xCTIbfnAe@LQ3V64L9R2>
-In-Reply-To: <ZvRVRL6xCTIbfnAe@LQ3V64L9R2>
+ <ZvRVRL6xCTIbfnAe@LQ3V64L9R2> <CANn89i+yDakwWW0t0ESrV4XJYjeutvtSdHj1gEJdxBS8qMEQBQ@mail.gmail.com>
+In-Reply-To: <CANn89i+yDakwWW0t0ESrV4XJYjeutvtSdHj1gEJdxBS8qMEQBQ@mail.gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 25 Sep 2024 20:55:16 +0200
-Message-ID: <CANn89i+yDakwWW0t0ESrV4XJYjeutvtSdHj1gEJdxBS8qMEQBQ@mail.gmail.com>
+Date: Wed, 25 Sep 2024 21:01:23 +0200
+Message-ID: <CANn89iLkpP42EFRGmFUsSQv+ufNA=4VmSp6-1NJBBpm0kTjw7w@mail.gmail.com>
 Subject: Re: [PATCH net 2/2] net: add more sanity checks to qdisc_pkt_len_init()
 To: Joe Damato <jdamato@fastly.com>, Eric Dumazet <edumazet@google.com>, 
 	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -86,26 +86,35 @@ To: Joe Damato <jdamato@fastly.com>, Eric Dumazet <edumazet@google.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 25, 2024 at 8:24=E2=80=AFPM Joe Damato <jdamato@fastly.com> wro=
-te:
+On Wed, Sep 25, 2024 at 8:55=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
-
+> On Wed, Sep 25, 2024 at 8:24=E2=80=AFPM Joe Damato <jdamato@fastly.com> w=
+rote:
+> >
 >
-> > git log --oneline --grep "sanity check" | wc -l
-> > 3397
+> >
+> > > git log --oneline --grep "sanity check" | wc -l
+> > > 3397
+> >
+> > I don't know what this means. We've done it in the past and so
+> > should continue to do it in the future? OK.
 >
-> I don't know what this means. We've done it in the past and so
-> should continue to do it in the future? OK.
+> This means that if they are in the changelogs, they can not be removed.
+> This is immutable stuff.
+> Should we zap git history because of some 'bad words' that most
+> authors/committers/reviewers were not even aware of?
+>
+> I would understand for stuff visible in the code (comments, error message=
+s),
+> but the changelogs are there and can not be changed.
+>
+> Who knows, maybe in 10 years 'Malicious packet.' will be very offensive,
+> then we can remove/change the _comment_ I added in this patch.
 
-This means that if they are in the changelogs, they can not be removed.
-This is immutable stuff.
-Should we zap git history because of some 'bad words' that most
-authors/committers/reviewers were not even aware of?
+BTW, I looked at https://en.wikipedia.org/wiki/Sanity_check
+and the non inclusive part is at the very end of it.
 
-I would understand for stuff visible in the code (comments, error messages)=
-,
-but the changelogs are there and can not be changed.
-
-Who knows, maybe in 10 years 'Malicious packet.' will be very offensive,
-then we can remove/change the _comment_ I added in this patch.
+I would suggest moving it at the beginning of the article to clearly
+educate all potential users.
 
