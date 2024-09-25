@@ -1,128 +1,164 @@
-Return-Path: <netdev+bounces-129823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 042EA986682
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:48:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE86798668B
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:52:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B19DA286CC4
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:48:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E256A1C239B0
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A4B1130E58;
-	Wed, 25 Sep 2024 18:48:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 492A649624;
+	Wed, 25 Sep 2024 18:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="bRfptpRU"
+	dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b="ltWCszGJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from dispatch1-us1.ppe-hosted.com (dispatch1-us1.ppe-hosted.com [148.163.129.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D6B81D5ADA;
-	Wed, 25 Sep 2024 18:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B05731D5ADC;
+	Wed, 25 Sep 2024 18:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.129.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727290121; cv=none; b=f9RMasBmmyJ9hPv9O2IehM/e1/C//FioX61lUjtellrb0DW3QLI8G5GBnO1mwGh/5anXTvooHhCkCDnArP/nrMlZtdc2hS8zGzBoB1zw077Qe7GZNyskN7CzHIeSKK803DAkun8llBH0nIkEZhPC8HZGM6CIivyNBGd1bfUk3SU=
+	t=1727290345; cv=none; b=riAl8Os3PdLxIBYMFBcGIyYFtr+Eoy1S0OPe1SmcawUFM++tGToZ9Cmzs4HHiCpk7nFmF/dKvGTH4UTJUQSY32ckgxPmJEXlODCRHHt9V3pIWGkigx7CUcMwelyhXGOYSgS3PQJWDHPqyJBkCg0W8M6HD5yhjsI/pPbPE+jYRBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727290121; c=relaxed/simple;
-	bh=jMhjVfvZLjGqRNxw9cBGJYC7ifL43Ba+hC+CnyxNfuE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=U0Y/sMr24n3U1cy0X/QV9eJSXteGRcdZ8Egeh78jobkoVziZ1GBokUyYzbf3FLcPSYk9YYLEb3b0BcAuX4r/7VEEKewln5N/sVhoup2A69NUQNAdGGh1QBBi3wvMvnIrf4jpv1I1tpQGL8pemPSBuTCWPs8UilBPv4+saUVaFVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=bRfptpRU; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1727290105; x=1727894905; i=markus.elfring@web.de;
-	bh=qx0y+0iMm8Vy886r+f9TGXkls2G/OXF7kOvsMB3+Bdo=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:From:
-	 Subject:Content-Type:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=bRfptpRUyJ1w+ElJQWvO6ggfliy+DQW4jGSKtAmW1fP5eTtsXRLoHomPBQfoMXkW
-	 rFT9mx0k8zCAdGSBfc/i+Fv5hXzD+KL96J3ieG1uqN+ip2qzQNCR2JsMVqmkxothG
-	 t/jWYjM8SzAInAIFQskVHbsLhL5wWaq+WXdUHniC24/+6H8ki1dUlearYAEZgdu4s
-	 nSsOa9fCVxwn7DZcp+421NSsY2HMzxW0sPzWqZ6paEIktxLCEc1nXxMV8jP+rNYWc
-	 hSLqyhOvZyruuudbxtIDpMeMYN2ywaop7PEBpsfYqmVhFQ7B4iYsU0JZWPeudGo3b
-	 tDOJ7lFgN/0xllWjiw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.84.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N5UkC-1rsMPT33rm-014Q3m; Wed, 25
- Sep 2024 20:48:25 +0200
-Message-ID: <79b2f48a-f6a1-4bfc-9a8d-cb09777f2a07@web.de>
-Date: Wed, 25 Sep 2024 20:48:16 +0200
+	s=arc-20240116; t=1727290345; c=relaxed/simple;
+	bh=nG5opVv7ZDVyKdL5pMZWoYGAOsg3kaxOzrAySOKYDAw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TzBEMVw15VnkkIZNpgMgwVo52JTQVqSZzF6G+FNFlbHWBif+Xc4TkvAde5JL8hxqFrJGtooAil1JeVCaVspF3P1gNb51TrBcvBZJYSdPVXYTdN81x03OeWuDxvvgh7NYQOUmm0jCIaoBijfbrbBs6x7M7bF1vo9wHQAKMGtjfIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com; spf=pass smtp.mailfrom=candelatech.com; dkim=pass (1024-bit key) header.d=candelatech.com header.i=@candelatech.com header.b=ltWCszGJ; arc=none smtp.client-ip=148.163.129.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=candelatech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=candelatech.com
+X-Virus-Scanned: Proofpoint Essentials engine
+Received: from mail3.candelatech.com (mail.candelatech.com [208.74.158.173])
+	by mx1-us1.ppe-hosted.com (PPE Hosted ESMTP Server) with ESMTP id E9AB7C0006D;
+	Wed, 25 Sep 2024 18:52:20 +0000 (UTC)
+Received: from ben-dt5.candelatech.com (unknown [50.251.239.81])
+	by mail3.candelatech.com (Postfix) with ESMTP id 5BEBE13C2B0;
+	Wed, 25 Sep 2024 11:52:20 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail3.candelatech.com 5BEBE13C2B0
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=candelatech.com;
+	s=default; t=1727290340;
+	bh=nG5opVv7ZDVyKdL5pMZWoYGAOsg3kaxOzrAySOKYDAw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ltWCszGJ7kFRBijocMhPGPsR3b+TyV/ym1Fqh3+aTZmvw/f2qywF+VvNPXvyekj3d
+	 Li1BR87BgjIv9GdgIbZLiwAtkUNviWZP/YIJwy9BZ3pY9s0ANHx46tRmC0h+cpPQ4j
+	 f7dac8UkQ874FDcmGneBV7lRoAs6EByut/2rj774=
+From: greearb@candelatech.com
+To: netdev@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	Ben Greear <greearb@candelatech.com>
+Subject: [PATCH v2] Revert "vrf: Remove unnecessary RCU-bh critical section"
+Date: Wed, 25 Sep 2024 11:52:16 -0700
+Message-ID: <20240925185216.1990381-1-greearb@candelatech.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: virtualization@lists.linux.dev, kvm@vger.kernel.org,
- netdev@vger.kernel.org, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Tiwei Bie <tiwei.bie@intel.com>
-Content-Language: en-GB
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] vhost-vdpa: Refactor copy_to_user() usage in
- vhost_vdpa_get_config()
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:/phGV6N0PUyBlMsQeCSeKOPPmhlGqN9nXc0mxv7yjcnuWrwUH4L
- 1boxhYFB0mHJDozJTOXmLmHvmqWkZpdpEbxEY0EX+Fcoh+Auo9eLOJu3kysxUs3W5q6DvDY
- P8Q0VcI5//nEnv8ObA+CwRhtNmDsTIHjnDc/Fc4PCCTNrFeYBrmeVpu89PKuxNmzrmerqGj
- 0NmS2tJQLr5Wy7TqDwXvA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Y7kPbUeelH8=;wyGh388/qDHG8adEMepDBdcU/Ms
- 7S1PCPAdgFaKvhnWbnjQZGoXljvCdCCExNQyEQhTxyoYXP8vdszN/UgqcY/J6GlcGzhyI0QrW
- 8P2HG8a19w9A3HqM/rufZoSfITCAHYP5oVf8w6Ejmm0kyEFuaA31tsU0MuvOIoTyHo0Lm4Hm/
- fOL2qXgTjM3ezQ6S4lgvR717O/nM9eRyerq7QfDp6qIt4zWOr0tgayv4OdoiQ/sYwMZLvWiFs
- qsTAO4UIcmD71KarGwl2XIGvKm6chPSJUgaDh28bFxDWFMqEWYs9hdvkTtliC3+G/hBh+aE2P
- dL2E6OpiXR78OPH+6g2NVQ6IzzOq+z+VkpLxpKhqn2lchivWHBqxjqujlOR7QuBaabScljImy
- UMYVK8gD32QUe0alBrni3weRMYN905yPdu1PZ79HSiLW1oSt/tx0mK9/dP51fAXmJdvADlRan
- YmxcI062AQpy0BwW6YYPU7fiSJ9qL1/GbpTX4UI517bBVcKvhsgH9c9rXFVicLdV6R9RmdxBP
- fiTgSCQAJUIWb/B6e0pTufD0Us6sJfc9vuQcHRYGY0Bm8LIkM/wtfkRECF3VC6RxN71i5BeD9
- 6lJlixru8VFHTFO+vU2hRb1Epa+0g/JeqTjJwYHPBZSAceWcYszvqpIz1/tMwY6zQTn+R2Emv
- /jXFi7/rwXn7OhKUrWf9xf2FSItokwNug+Aj4Dy61ZdtAnxb0BA26PZ4dyOcvaR7UwqsYPHPP
- 2D5YwdXn3LEudm6hjoeMk0o71TTbFVnFAW9dTja6bQ0cInHrsx3T9RsTXnDT6wiajUz8XGR93
- jjnuG0uRjnRpAoJvHa7loPMg==
+Content-Transfer-Encoding: 8bit
+X-MDID: 1727290341-F5v1dfTop0YS
+X-MDID-O:
+ us5;ut7;1727290341;F5v1dfTop0YS;<greearb@candelatech.com>;d8e40e63ee4d65c981bd03b298aac33b
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Wed, 25 Sep 2024 20:36:35 +0200
+From: Ben Greear <greearb@candelatech.com>
 
-Assign the return value from a copy_to_user() call to an additional
-local variable so that a kvfree() call and return statement can be
-omitted accordingly.
+This reverts commit 504fc6f4f7f681d2a03aa5f68aad549d90eab853.
 
-This issue was detected by using the Coccinelle software.
+dev_queue_xmit_nit needs to run with bh locking, otherwise
+it conflicts with packets coming in from a nic in softirq
+context and packets being transmitted from user context.
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/vhost/vdpa.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+================================
+WARNING: inconsistent lock state
+6.11.0 #1 Tainted: G        W
+--------------------------------
+inconsistent {IN-SOFTIRQ-W} -> {SOFTIRQ-ON-W} usage.
+btserver/134819 [HC0[0]:SC0[0]:HE1:SE1] takes:
+ffff8882da30c118 (rlock-AF_PACKET){+.?.}-{2:2}, at: tpacket_rcv+0x863/0x3b30
+{IN-SOFTIRQ-W} state was registered at:
+  lock_acquire+0x19a/0x4f0
+  _raw_spin_lock+0x27/0x40
+  packet_rcv+0xa33/0x1320
+  __netif_receive_skb_core.constprop.0+0xcb0/0x3a90
+  __netif_receive_skb_list_core+0x2c9/0x890
+  netif_receive_skb_list_internal+0x610/0xcc0
+  napi_complete_done+0x1c0/0x7c0
+  igb_poll+0x1dbb/0x57e0 [igb]
+  __napi_poll.constprop.0+0x99/0x430
+  net_rx_action+0x8e7/0xe10
+  handle_softirqs+0x1b7/0x800
+  __irq_exit_rcu+0x91/0xc0
+  irq_exit_rcu+0x5/0x10
+  [snip]
 
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index 5a49b5a6d496..ca69527a822c 100644
-=2D-- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -370,13 +370,11 @@ static long vhost_vdpa_get_config(struct vhost_vdpa =
-*v,
+other info that might help us debug this:
+ Possible unsafe locking scenario:
 
- 	vdpa_get_config(vdpa, config.off, buf, config.len);
+       CPU0
+       ----
+  lock(rlock-AF_PACKET);
+  <Interrupt>
+    lock(rlock-AF_PACKET);
 
--	if (copy_to_user(c->buf, buf, config.len)) {
-+	{
-+		unsigned long ctu =3D copy_to_user(c->buf, buf, config.len);
- 		kvfree(buf);
--		return -EFAULT;
-+		return ctu ? -EFAULT : 0;
+ *** DEADLOCK ***
+
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x73/0xa0
+ mark_lock+0x102e/0x16b0
+ __lock_acquire+0x9ae/0x6170
+ lock_acquire+0x19a/0x4f0
+ _raw_spin_lock+0x27/0x40
+ tpacket_rcv+0x863/0x3b30
+ dev_queue_xmit_nit+0x709/0xa40
+ vrf_finish_direct+0x26e/0x340 [vrf]
+ vrf_l3_out+0x5f4/0xe80 [vrf]
+ __ip_local_out+0x51e/0x7a0
+[snip]
+
+Fixes: 504fc6f4f7f6 ("vrf: Remove unnecessary RCU-bh critical section")
+Link: https://lore.kernel.org/netdev/05765015-f727-2f30-58da-2ad6fa7ea99f@candelatech.com/T/
+
+Signed-off-by: Ben Greear <greearb@candelatech.com>
+---
+
+v2:  Edit patch description.
+
+ drivers/net/vrf.c | 2 ++
+ net/core/dev.c    | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/drivers/net/vrf.c b/drivers/net/vrf.c
+index 4d8ccaf9a2b4..4087f72f0d2b 100644
+--- a/drivers/net/vrf.c
++++ b/drivers/net/vrf.c
+@@ -608,7 +608,9 @@ static void vrf_finish_direct(struct sk_buff *skb)
+ 		eth_zero_addr(eth->h_dest);
+ 		eth->h_proto = skb->protocol;
+ 
++		rcu_read_lock_bh();
+ 		dev_queue_xmit_nit(skb, vrf_dev);
++		rcu_read_unlock_bh();
+ 
+ 		skb_pull(skb, ETH_HLEN);
  	}
--
--	kvfree(buf);
--	return 0;
- }
-
- static long vhost_vdpa_set_config(struct vhost_vdpa *v,
-=2D-
-2.46.1
+diff --git a/net/core/dev.c b/net/core/dev.c
+index cd479f5f22f6..566e69a38eed 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -2285,6 +2285,7 @@ EXPORT_SYMBOL_GPL(dev_nit_active);
+ /*
+  *	Support routine. Sends outgoing frames to any network
+  *	taps currently in use.
++ *	BH must be disabled before calling this.
+  */
+ 
+ void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
+-- 
+2.42.0
 
 
