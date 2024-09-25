@@ -1,120 +1,76 @@
-Return-Path: <netdev+bounces-129763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD859985F08
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:49:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2C43985FAB
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF44E1C25B21
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:49:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D0171F26036
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF5A21B435;
-	Wed, 25 Sep 2024 12:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PGmZD0SP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B821D4324;
+	Wed, 25 Sep 2024 12:17:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1DE21B431;
-	Wed, 25 Sep 2024 12:13:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7DF5227FBB;
+	Wed, 25 Sep 2024 12:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727266434; cv=none; b=ojjd8tECa4OGI4/26TmPhAMgaiCok98e+pdtho10teWhXtJ5WA64bhePG4W69lzFahS9SnP/QerxXCp90NBWzgeHePibQ8q+fEUPZKSRaOQJrjzHUdTfzZsWonZbo0ewreSc0M3hulM8guPRlndZKRkCqVvEbz7kl95ZhCCXnQY=
+	t=1727266639; cv=none; b=K0HErD0hVV/NJRzHHwMHyjorG9Ujmf7cB1xxFk4e8a+UyCiWavuUPhLMN+ZxnHjlDXUXkWd7pm418XQVc1SNgwqWmuNchn1PcwqWvKcLwEL8Iy71gl0UM/QZ/PsTV0XfJKiWrDZ/eWar34ssN+gLkntMhudDzS0rrgbHHA8gY20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727266434; c=relaxed/simple;
-	bh=QMvbVhN2mfbI/fjEYtZiVHzEFLEkBAr70d8O6IrF6tc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DjmJaRnLrfNfSLcNd5qNGkQw+vrvg11sZIcSuSr+T+q8yMKK233UgI8W2jMZnKvgzDwlAlNbVsHVB/kum1hS1aAKKARH87klN9UErjU37LNDcLOECZwmIcXcaGE9bbD6Y5eJKVu96r70rz4ekbhGx3ifhQ4lVOL6iAeDqWiopDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PGmZD0SP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7089CC4CEC3;
-	Wed, 25 Sep 2024 12:13:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727266434;
-	bh=QMvbVhN2mfbI/fjEYtZiVHzEFLEkBAr70d8O6IrF6tc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PGmZD0SPPhAHKTcriufJZLgRTB1duxo0CKXwW2B0v8ZnR5WFZvvU9TeQ1U+cmRcFy
-	 OUedIJraK+ZWhNfUcntcBP7swQnKJ7MxHJv2ecAnQRHQ+skpGkIgmNjbbRp+Z/uTwG
-	 hdTM7SYJezeStm/G5YpqfgO5REAu2y9EQaxge040gtv/BH31KZDwK/R8QXx5Q7I2CU
-	 MB5R07oFv6a/m/ybhtTmxAUolFml7lfb2IqPFVbZ9ogIEF9GsIWGjfuzeTCC1mgikL
-	 KLdVw4oGaXvujAXGjoOpfkIdRyakGTjqv9eO9fLYrqIJxJdZ/XTlituj9kEOPzTasa
-	 Z1ciVeROjbPHg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Jinjie Ruan <ruanjinjie@huawei.com>,
-	Louis Peens <louis.peens@corigine.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	yinjun.zhang@corigine.com,
-	fei.qin@corigine.com,
-	james.hershaw@corigine.com,
-	johannes.berg@intel.com,
-	ryno.swart@corigine.com,
-	oss-drivers@corigine.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 056/139] nfp: Use IRQF_NO_AUTOEN flag in request_irq()
-Date: Wed, 25 Sep 2024 08:07:56 -0400
-Message-ID: <20240925121137.1307574-56-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240925121137.1307574-1-sashal@kernel.org>
-References: <20240925121137.1307574-1-sashal@kernel.org>
+	s=arc-20240116; t=1727266639; c=relaxed/simple;
+	bh=8BgnRoC6xEKzYPbgp/nm/ASC3dzKrb4J/9Jn0ZwgG0c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KsqABLiLU+/7kT3lGGAs8LzVDE0nmIK35sCP33tmi7l8uf66Mp401SJzwF8rqkzU532RojBk4KP4ctkpg7jsPw0cfAa4Q75/3ott+XLQwRUFIsRZ/RVtm2Y2qfdAQvQn8Tj8AVyP78Y2ubrY3+zLdMWDSEhvpVAm/4F/svOHfxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=59158 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1stQxE-0006jg-99; Wed, 25 Sep 2024 14:17:14 +0200
+Date: Wed, 25 Sep 2024 14:17:10 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Sasha Levin <sashal@kernel.org>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Florian Westphal <fw@strlen.de>, kadlec@netfilter.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 6.11 049/244] netfilter: nf_tables: don't
+ initialize registers in nft_do_chain()
+Message-ID: <ZvP_Rh4Hsr3dqknY@calendula>
+References: <20240925113641.1297102-1-sashal@kernel.org>
+ <20240925113641.1297102-49-sashal@kernel.org>
+ <ZvP6-utbwqWmP5_0@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.6.52
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ZvP6-utbwqWmP5_0@calendula>
+X-Spam-Score: -1.9 (-)
 
-From: Jinjie Ruan <ruanjinjie@huawei.com>
+On Wed, Sep 25, 2024 at 01:58:54PM +0200, Pablo Neira Ayuso wrote:
+> Hi Sasha,
+> 
+> This commit requires:
+> 
+> commit 14fb07130c7ddd257e30079b87499b3f89097b09
+> Author: Florian Westphal <fw@strlen.de>
+> Date:   Tue Aug 20 11:56:13 2024 +0200
+> 
+>     netfilter: nf_tables: allow loads only when register is initialized
+> 
+> so either drop it or pull-in this dependency for 6.11
 
-[ Upstream commit daaba19d357f0900b303a530ced96c78086267ea ]
-
-disable_irq() after request_irq() still has a time gap in which
-interrupts can come. request_irq() with IRQF_NO_AUTOEN flag will
-disable IRQ auto-enable when request IRQ.
-
-Reviewed-by: Louis Peens <louis.peens@corigine.com>
-Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-Link: https://patch.msgid.link/20240911094445.1922476-4-ruanjinjie@huawei.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-index f2085340a1cfe..fceb4abea2365 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-@@ -821,14 +821,13 @@ nfp_net_prepare_vector(struct nfp_net *nn, struct nfp_net_r_vector *r_vec,
- 
- 	snprintf(r_vec->name, sizeof(r_vec->name),
- 		 "%s-rxtx-%d", nfp_net_name(nn), idx);
--	err = request_irq(r_vec->irq_vector, r_vec->handler, 0, r_vec->name,
--			  r_vec);
-+	err = request_irq(r_vec->irq_vector, r_vec->handler, IRQF_NO_AUTOEN,
-+			  r_vec->name, r_vec);
- 	if (err) {
- 		nfp_net_napi_del(&nn->dp, r_vec);
- 		nn_err(nn, "Error requesting IRQ %d\n", r_vec->irq_vector);
- 		return err;
- 	}
--	disable_irq(r_vec->irq_vector);
- 
- 	irq_set_affinity_hint(r_vec->irq_vector, &r_vec->affinity_mask);
- 
--- 
-2.43.0
-
+same applies to all kernels below this 6.11
 
