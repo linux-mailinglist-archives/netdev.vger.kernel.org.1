@@ -1,225 +1,122 @@
-Return-Path: <netdev+bounces-129858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D069D986834
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 23:13:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A7AC986838
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 23:16:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FC6E1F258EF
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:13:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 310231F2257C
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F05D1158861;
-	Wed, 25 Sep 2024 21:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72261465A0;
+	Wed, 25 Sep 2024 21:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="WAD4qmQM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W4JvlcNf"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6986148FE8;
-	Wed, 25 Sep 2024 21:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EF92AE6C
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 21:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727298781; cv=none; b=H26hr0fL/13rKDRuWYBO9mWCxaa3bNGdDtRCWND95bHqa2bROOMacUSnD+VGaH9PPmta9KBNUghZ40YAOCPhOGnMrBnJ7TGYkTbNTorRFGwWOdD3HjFF3LRImpCFOjvEN3zsZ3corwGBFfJLKy95UPz5fXhinMtLl3i+XK3Wp2Q=
+	t=1727298980; cv=none; b=e0jhGHQLpiboSdRHfMDgZViYKI4xKhAe5A8qUm6rGU/2cVJrqhb3vW6ZecGaHWQZGisO4YTvt5xNZiVebacmaqdT+18VKexjIRQ8nd+tFHd24myq/fX6cdzSo+ka0rOmbk3wFrID3pWJrToxrl9qY2K9/rh2m2XooR6Nz9oOpQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727298781; c=relaxed/simple;
-	bh=CkvqEwcJBrLE67avtB7uqSf6IyzyJvzdXgY+4b72WyA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=O+oTqNHOZO1CruIvDt6NhAQN3sSowOAX14Rxc1shUgvHmN1dMAI13b4E0VG3gQvyWo3w/XP2IliiPU8jj0VEW0QUAU4QuYryAcFbxhkKvzu6y4p0HQB982nxyYqFr3Kl+HFxXxcMFUtSeYBRz24/cmHr9yKtyoxrJcaf11jUFRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=WAD4qmQM; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:From:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=NJERc+E/cBKgLF8vPfJSf3Y8Hq6cUuhgONW7U9FWMM8=; b=WAD4qmQMNoI/ZMFwBWCyFAEFjV
-	pDZVxy9kYF2rTsWjfL1JAABMuuWan95eQNFOxrcK4Q8A2d0uLGT73MC0hadnAgDDb15jTGem39HCM
-	hJO1S06Uu+fWqYuG3gGqoPiEMgSGCvg8JATbN6MXZfeeMpLHT5CDHz1c1z55HMNpZrDE=;
-Received: from p4ff130c8.dip0.t-ipconnect.de ([79.241.48.200] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1stZJa-0015OQ-05;
-	Wed, 25 Sep 2024 23:12:50 +0200
-Message-ID: <8f0a91a3-550f-46ec-81a9-021656906471@nbd.name>
-Date: Wed, 25 Sep 2024 23:12:48 +0200
+	s=arc-20240116; t=1727298980; c=relaxed/simple;
+	bh=UZu5PGB0MXDtNs8MMK1CwREysqd1Z0Qg1/TE2szW5Mw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UHgMeEoF949jXI3qFGUGMIt0GWD3KtI7L3torIzYjgQMOL0isJAQ7Lpf7cQgeMzDqGSJThDdHnq4c+I5JnnBFmkpZIW8XnWPmCtHHcifRJqsyR1owloG4KZ3mtHbcIMK6FqSewN5gFWdE5PEivP+3kSnUp50eCMfXA5cLZof6d8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W4JvlcNf; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42cacd90ee4so331145e9.3
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 14:16:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727298977; x=1727903777; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Hserkp0XoO/xaxszPyfe2XUusNXhdSGovTKNC7GSS08=;
+        b=W4JvlcNfCrFBU4ARk8TxAIb1Oi1e7QCQpIuOOCbngD8Ps4DRGlbYdBbEbiZ/YKz8Yh
+         SzcZ+v+lw/S47JQDvg0I14NnuQ2Zf8o3sMo64HweC+wu4awo6cb2IeobxKta+JoWFHrp
+         Ju1iOFsjCO59wJEO4S8zjg1DoDeieBa3l0r2x/aC2jbamDkkph3l6u3HCY+Sd+aGRKhz
+         W6EV4JVqd9byebwjPDXgIz7E1vBibcnaQMCaQ2uMqaGHfNJxqVKl0ecCn1V97sWQhET/
+         NzcaHvSTtS5B+wLkBFAFl7rTsh8w4tBuZ6nv24IFd2vGM444ZViXv2FimwEqvmLZBIY9
+         zuTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727298977; x=1727903777;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hserkp0XoO/xaxszPyfe2XUusNXhdSGovTKNC7GSS08=;
+        b=N/C0dGNf8WGn7F44QXzuS+dCvrvgJTS3qw1ZLvjNSRR3LsDMjcw3NwEWRAYuiEIkjS
+         t4PaABdLtnuD29xTORARoEg9/DLYgpBKuutpcB0Gkj2o8rKER5mJbvD4XhOrLsOviXGa
+         a8ub2nZOM0Sg3zjn7FUYbVvEEPctfsIFuTdcmggAH6y/ZT/iiBe+FNP+VGeKqGQe8zCb
+         fGXj/KEA9vHaXzJu4dMXpJ7GZxg5iztlSNl0Qt3Q7Jsdp5evOCiCTmVkcLoMLGppY6v9
+         syUJ/m9E3j4Z6H5oiGJxp02UTV2rXP+47Oqa0fI5gQH9hL2t6xlH3/x0283TUOWtKByo
+         6aOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWX9EQ3QMTXjiMVWEWBlVGHypV56KPo6GD2dN8p4GrhrPeVTPW/PjiYa+EXXwCTriUkf+0ylPE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHLLRcd6bEQo2Rklp1fI8m2juEkcGcQ3aG3FtpenaPYq8eGyX2
+	iiHJl85CijAPXLVpmmFl4Z3YSCQoZ8mQEW+VkMTMNZHxbpufhUuY
+X-Google-Smtp-Source: AGHT+IHBkP25fB4BC5hSAT45OKJ8Gcfe1I3/jKVfbWU3juyKG2hV4TbANIux7w2Ze32P428dDIwKzg==
+X-Received: by 2002:a05:600c:1d25:b0:42c:ba6c:d9a7 with SMTP id 5b1f17b1804b1-42e96144adcmr14013805e9.4.1727298976991;
+        Wed, 25 Sep 2024 14:16:16 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2c13cesm4876658f8f.29.2024.09.25.14.16.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2024 14:16:16 -0700 (PDT)
+Date: Thu, 26 Sep 2024 00:16:13 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH RFC net-next 06/10] net: dsa: sja1105: simplify static
+ configuration reload
+Message-ID: <20240925211613.lmi2kh6hublkutbb@skbuf>
+References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
+ <E1ssjcz-005Ns9-D5@rmk-PC.armlinux.org.uk>
+ <20240925131517.s562xmc5ekkslkhp@skbuf>
+ <ZvRmr3aU1Fz6z0Oc@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] gso: fix gso fraglist segmentation after pull from
- frag_list
-From: Felix Fietkau <nbd@nbd.name>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, stable@vger.kernel.org, maze@google.com,
- shiming.cheng@mediatek.com, daniel@iogearbox.net, lena.wang@mediatek.com,
- herbert@gondor.apana.org.au, Willem de Bruijn <willemb@google.com>
-References: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
- <7144e848-9919-44a5-a313-f9b2076532bf@nbd.name>
- <66f46003a38a0_65fdc29433@willemb.c.googlers.com.notmuch>
- <68d4c9cf-f61f-4257-8d98-9a363142cc53@nbd.name>
-Content-Language: en-US
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <68d4c9cf-f61f-4257-8d98-9a363142cc53@nbd.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZvRmr3aU1Fz6z0Oc@shell.armlinux.org.uk>
 
-On 25.09.24 22:59, Felix Fietkau wrote:
-> On 25.09.24 21:09, Willem de Bruijn wrote:
->> Felix Fietkau wrote:
->>> On 22.09.24 17:03, Willem de Bruijn wrote:
->>> > From: Willem de Bruijn <willemb@google.com>
->>> > 
->>> > Detect gso fraglist skbs with corrupted geometry (see below) and
->>> > pass these to skb_segment instead of skb_segment_list, as the first
->>> > can segment them correctly.
->>> > 
->>> > Valid SKB_GSO_FRAGLIST skbs
->>> > - consist of two or more segments
->>> > - the head_skb holds the protocol headers plus first gso_size
->>> > - one or more frag_list skbs hold exactly one segment
->>> > - all but the last must be gso_size
->>> > 
->>> > Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
->>> > modify these skbs, breaking these invariants.
->>> > 
->>> > In extreme cases they pull all data into skb linear. For UDP, this
->>> > causes a NULL ptr deref in __udpv4_gso_segment_list_csum at
->>> > udp_hdr(seg->next)->dest.
->>> > 
->>> > Detect invalid geometry due to pull, by checking head_skb size.
->>> > Don't just drop, as this may blackhole a destination. Convert to be
->>> > able to pass to regular skb_segment.
->>> > 
->>> > Link: https://lore.kernel.org/netdev/20240428142913.18666-1-shiming.cheng@mediatek.com/
->>> > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
->>> > Signed-off-by: Willem de Bruijn <willemb@google.com>
->>> > Cc: stable@vger.kernel.org
->>> > 
->>> > ---
->>> > diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
->>> > index d842303587af..e457fa9143a6 100644
->>> > --- a/net/ipv4/udp_offload.c
->>> > +++ b/net/ipv4/udp_offload.c
->>> > @@ -296,8 +296,16 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
->>> >   		return NULL;
->>> >   	}
->>> >   
->>> > -	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
->>> > -		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
->>> > +	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
->>> > +		 /* Detect modified geometry and pass these to skb_segment. */
->>> > +		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
->>> > +			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
->>> > +
->>> > +		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
->>> > +		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
->>> > +		gso_skb->csum_offset = offsetof(struct udphdr, check);
->>> > +		gso_skb->ip_summed = CHECKSUM_PARTIAL;
->>> 
->>> I also noticed this uh->check update done by udp4_gro_complete only in 
->>> case of non-fraglist GRO:
->>> 
->>>      if (uh->check)
->>>          uh->check = ~udp_v4_check(skb->len - nhoff, iph->saddr,
->>>                        iph->daddr, 0);
->>> 
->>> I didn't see any equivalent in your patch. Is it missing or left out 
->>> intentionally?
->> 
->> Thanks. That was not intentional. I think you're right. Am a bit
->> concerned that all this testing did not catch it. Perhaps because
->> CHECKSUM_PARTIAL looped to ingress on the same machine is simply
->> interpreted as CHECKSUM_UNNECESSARY. Need to look into that.
->> 
->> If respinning this, I should also change the Fixes to
->> 
->> Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
->> 
->> Analogous to the eventual TCP fix to
->> 
->> Fixes: bee88cd5bd83 ("net: add support for segmenting TCP fraglist GSO packets")
+On Wed, Sep 25, 2024 at 08:38:23PM +0100, Russell King (Oracle) wrote:
+> > There are 2 more changes which I believe should be made in sja1105_set_port_speed():
+> > - since it isn't called from mac_config() anymore but from mac_link_up()
+> >   (change which happened quite a while ago), it mustn't handle SPEED_UNKNOWN
+> > - we can trust that phylink will not call mac_link_up() with a speed
+> >   outside what we provided in mac_capabilities, so we can remove the
+> >   -EINVAL "default" speed_mbps case, and make this method return void,
+> >   as it can never truly cause an error
+> > 
+> > But I believe these are incremental changes which should be done after
+> > this patch. I've made a note of them and will create 2 patches on top
+> > when I have the spare time.
 > 
-> In the mean time, I've been working on the TCP side. I managed to
-> reproduce the issue on one of my devices by routing traffic from
-> Ethernet to Wifi using your BPF test program.
-> 
-> The following patch makes it work for me for TCP v4. Still need to
-> test and fix v6.
+> ... if we were to make those changes prior to this patch, then the
+> dev_err() will no longer be there and thus this becomes a non-issue.
+> So I'd suggest a patch prior to this one to make the changes you state
+> here, thus eliminating the need for this hunk in this patch.
 
-Actually, here is something even simpler that should work for both v4
-and v6:
-
----
---- a/net/ipv4/tcp_offload.c
-+++ b/net/ipv4/tcp_offload.c
-@@ -101,8 +101,14 @@ static struct sk_buff *tcp4_gso_segment(struct sk_buff *skb,
-  	if (!pskb_may_pull(skb, sizeof(struct tcphdr)))
-  		return ERR_PTR(-EINVAL);
-  
--	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST)
--		return __tcp4_gso_segment_list(skb, features);
-+	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) {
-+		struct tcphdr *th = tcp_hdr(skb);
-+
-+		if (skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size)
-+			return __tcp4_gso_segment_list(skb, features);
-+
-+		skb->ip_summed = CHECKSUM_NONE;
-+	}
-  
-  	if (unlikely(skb->ip_summed != CHECKSUM_PARTIAL)) {
-  		const struct iphdr *iph = ip_hdr(skb);
---- a/net/ipv6/tcpv6_offload.c
-+++ b/net/ipv6/tcpv6_offload.c
-@@ -159,8 +159,14 @@ static struct sk_buff *tcp6_gso_segment(struct sk_buff *skb,
-  	if (!pskb_may_pull(skb, sizeof(*th)))
-  		return ERR_PTR(-EINVAL);
-  
--	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST)
--		return __tcp6_gso_segment_list(skb, features);
-+	if (skb_shinfo(skb)->gso_type & SKB_GSO_FRAGLIST) {
-+		struct tcphdr *th = tcp_hdr(skb);
-+
-+		if (skb_pagelen(skb) - th->doff * 4 == skb_shinfo(skb)->gso_size)
-+			return __tcp6_gso_segment_list(skb, features);
-+
-+		skb->ip_summed = CHECKSUM_NONE;
-+	}
-  
-  	if (unlikely(skb->ip_summed != CHECKSUM_PARTIAL)) {
-  		const struct ipv6hdr *ipv6h = ipv6_hdr(skb);
-
-
+That sounds good. Are you suggesting you will write up such a patch for v2?
 
