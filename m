@@ -1,126 +1,105 @@
-Return-Path: <netdev+bounces-129674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B71AB98564D
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:26:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 045C698572F
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC7791C20B9C
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 09:26:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84A86B21B16
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 10:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FA715B54C;
-	Wed, 25 Sep 2024 09:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92EDE15B559;
+	Wed, 25 Sep 2024 10:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="czXe/MS5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7cRb2uC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C1D715696E;
-	Wed, 25 Sep 2024 09:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4603B1B85DD;
+	Wed, 25 Sep 2024 10:31:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727256411; cv=none; b=N/S+BQ9Dpm40YFC/5OYUt5QC7mV4EzQBH/n2fyWwzxbHWtHK/x36g0juNs9RmQV3PZcnudoAKO8T/9TIxt6zWdM8sSbhrelKzcBaqr+yzuU9TD90fPhV0hhagcIWPOBvKBnnLYe9jmCslDhNu566mtg8NmKXMzp3k3FSp59b7Es=
+	t=1727260283; cv=none; b=nfc4wc6jusYYWSIqxluPaIbY6RXjQWlzjy0hYpcwZpaU9/2xz+KkoodRMcpJ3BsEj/HG+2qasEgbaeMtXeDQxE02u35wZ5W9DiGgvX9zKKvNwcWfuk0wrzl1vv6DGNCc+jGHktgOC7azptWEJX71H6QMkFyRBL2MKa8Sr4d6BSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727256411; c=relaxed/simple;
-	bh=BpYw0/PY3nUKuGYmrFd2VEU+1WnGJEzl1EFkES0lhdo=;
+	s=arc-20240116; t=1727260283; c=relaxed/simple;
+	bh=azYpPCRc7Fpbb2pqhBjEq/yVygWme8hOTL1tIFJNaK0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l5aUEbN9T3yu49E0js7Vkd27XVGmb4/c9+BR+Bv2/25lZbVpMxemt2/nsW7mulUtW4WrpcwxlSI8O9xCc8ioX94nbq4qD4uOaWmaa5pmD4o1omsZY2eAsg9Y/5bLes4hhCEg5FEi8tuDgugkITXTaqt421d2YT3iz2koErJBDy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=czXe/MS5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02C31C4CEC3;
-	Wed, 25 Sep 2024 09:26:49 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vt2AKogIar5jOr1OJCNZXSy/61CZ+eSf7FaDCbOpOXdQFaGgl+HylawSxWryNCzzj/OZv5+pfQTnZRXocpdMpdvezv/0f6aVVhfQJpbDZTlppqcQO9LwzYoGc+E+6jDUccNkpBsyvF20yPeWeWSxIvsJTd2ncMCwDibjWWb7v/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7cRb2uC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D09AC4CEC3;
+	Wed, 25 Sep 2024 10:31:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727256410;
-	bh=BpYw0/PY3nUKuGYmrFd2VEU+1WnGJEzl1EFkES0lhdo=;
+	s=k20201202; t=1727260282;
+	bh=azYpPCRc7Fpbb2pqhBjEq/yVygWme8hOTL1tIFJNaK0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=czXe/MS5lkFRAI+SEkAnjfhu8tVNguHaf8ImTy0yb9fzio2as+fvoECKpeYtR2uze
-	 4Gm48t6UhqC+fUbmo6hJObNdcnYvvnIuxZ/SDMaFFTyo3RTKcgyq73zPI0unoMatel
-	 Ya2XizH2jOdH/+Ne4Ncx2ZoPFx5f1X9FgRWOepGfIghxxddlQCLaOiqd2J8qIzis1A
-	 SEYReiUlvGpQbrOperzsiZjwH8kIHx1Sog08usRPqAY2PfermmyAHEvzLKKMBIg518
-	 MsYUCjFuiMItHtyzoq+jTkx+KgNYQdNsz94t2UlGnymutiteqkUL4TzyvvhY0zKmHI
-	 quDahHav2wtIw==
-Date: Wed, 25 Sep 2024 12:26:45 +0300
+	b=U7cRb2uCSSGYlrTYOMEkLkLJVOvOsQCMhJxNZE4VBoyjE7Gq9o6SrUMyXirimlK0E
+	 McSps++Q2aGwn4KdkOIuSMCsy3CbLPaeiyfRhm/l01iDsfhIhlIPhnbfFUZFeYGsKJ
+	 aKZKMFqtRCSipuRw/1WbpImuw9tKxoyA/LAiu+FUsU6K+65c0JDfa5Bwd2UnBcyd5j
+	 3QnFPplvGm09sqRiYq5x5mC5kji/QEtY0ec6n7UoL2uLBp6C8Iy2TEB0wSIVUkMeVP
+	 uy1dTuxxY8VG6XbzT6GVhe1lO/x4nUkht3sJu2EhRJWrPe4wYn0i5oqac34vFn3Rad
+	 ktd405WzhKKSA==
+Date: Wed, 25 Sep 2024 13:31:18 +0300
 From: Leon Romanovsky <leon@kernel.org>
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Haakon Bugge <haakon.bugge@oracle.com>,
-	Christoph Hellwig <hch@infradead.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	OFED mailing list <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>
-Subject: Re: [MAINLINE 0/2] Enable DIM for legacy ULPs and use it in RDS
-Message-ID: <20240925092645.GD967758@unreal>
-References: <Zuwyf0N_6E6Alx-H@infradead.org>
- <C00EA178-ED20-4D56-B6F2-200AC72F3A39@oracle.com>
- <Zu191hsvJmvBlJ4J@infradead.org>
- <525e9a31-31ee-4acf-a25c-8bf3a617283f@linux.dev>
- <ZvFY_4mCGq2upmFl@infradead.org>
- <aea6b986-2d25-4ebc-93e8-05da9c6f3ba2@linux.dev>
- <ZvJiKGtuX62jkIwY@infradead.org>
- <1ad540cb-bf1b-456b-be2d-6c35999bdaa8@linux.dev>
- <66A7418F-4989-4765-AC0F-1D23342C6950@oracle.com>
- <5b86861b-60f7-4c90-bc0e-d863b422850f@linux.dev>
+To: Eduard Zingerman <eddyz87@gmail.com>,
+	David Howells <dhowells@redhat.com>,
+	Christian Brauner <brauner@kernel.org>
+Cc: Manu Bretelle <chantr4@gmail.com>, asmadeus@codewreck.org,
+	ceph-devel@vger.kernel.org, christian@brauner.io, ericvh@kernel.org,
+	hsiangkao@linux.alibaba.com, idryomov@gmail.com, jlayton@kernel.org,
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	linux-nfs@vger.kernel.org, marc.dionne@auristor.com,
+	netdev@vger.kernel.org, netfs@lists.linux.dev, pc@manguebit.com,
+	smfrench@gmail.com, sprasad@microsoft.com, tom@talpey.com,
+	v9fs@lists.linux.dev, willy@infradead.org
+Subject: Re: [PATCH v2 19/25] netfs: Speed up buffered reading
+Message-ID: <20240925103118.GE967758@unreal>
+References: <20240923183432.1876750-1-chantr4@gmail.com>
+ <20240814203850.2240469-20-dhowells@redhat.com>
+ <1279816.1727220013@warthog.procyon.org.uk>
+ <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5b86861b-60f7-4c90-bc0e-d863b422850f@linux.dev>
+In-Reply-To: <4b5621958a758da830c1cf09c6f6893aed371f9d.camel@gmail.com>
 
-On Wed, Sep 25, 2024 at 10:04:21AM +0800, Zhu Yanjun wrote:
-> 在 2024/9/24 23:16, Haakon Bugge 写道:
-> > 
-> > 
-> > > On 24 Sep 2024, at 15:59, Zhu Yanjun <yanjun.zhu@linux.dev> wrote:
-> > > 
-> > > 在 2024/9/24 14:54, Christoph Hellwig 写道:
-> > > > On Tue, Sep 24, 2024 at 09:58:24AM +0800, Zhu Yanjun wrote:
-> > > > > The users that I mentioned is not in the kernel tree.
-> > > > And why do you think that would matter the slightest?
-> > > 
-> > > I noticed that the same cq functions are used. And I also made tests with this patch series. Without this patch series, dim mechanism will not be invoked.
-> > 
-> > Christoph alluded to say: Do not modify the old cq_create_cq() code in order to support DIM, it is better to change the ULP to use ib_alloc_cq(), and get DIM enabled that way.
+On Tue, Sep 24, 2024 at 05:01:13PM -0700, Eduard Zingerman wrote:
+> On Wed, 2024-09-25 at 00:20 +0100, David Howells wrote:
+> > Could you try the attached?  It may help, though this fixes a bug in the
+> > write-side, not the read-side.
+> >
 > 
-> Hi, Haakon
+> Hi David,
 > 
-> To be honest, I like your original commit that enable DIM for legacy ULPs
-> because this can fix this problem once for all and improve the old
-> ib_create_cq function.
+> I tried this patch on top of bpf-next but behaviour seems unchanged,
+> dmesg is at [1].
 > 
-> The idea from Christoph will cause a lot of changes in ULPs. I am not very
-> sure if these changes cause risks or not.
-> 
-> Thus, I prefer to your original commit. But I will follow the advice from
-> Leon and Jason.
+> [1] https://gist.github.com/eddyz87/ce45f90453980af6a5fadeb652e109f3
 
-Christoph was very clear and he summarized our position very well. We
-said similar thing to SMC folks in 2022 [1] and RDS is no different here.
 
-So no, "old ib_create_cq" shouldn't be used by ULPs.
+BTW, I'm hitting the same issue over Linus's tree now, but unfortunately
+there is no WA in my case as I don't have "cache=mmap" in rootflags.
+https://lore.kernel.org/all/20240924094809.GA1182241@unreal/#t
+
+It came to Linus with Christian Brauner's pull request.
+https://lore.kernel.org/all/20240913-vfs-netfs-39ef6f974061@brauner/
 
 Thanks
 
-[1] https://lore.kernel.org/netdev/YePesYRnrKCh1vFy@unreal/
-
 > 
-> Zhu Yanjun
+> Thanks,
+> Eduard
 > 
-> > 
-> > 
-> > Thxs, Håkon
-> > 
+> [...]
 > 
 > 
 
