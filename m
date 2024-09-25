@@ -1,122 +1,130 @@
-Return-Path: <netdev+bounces-129859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7AC986838
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 23:16:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F5FA98684B
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 23:27:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 310231F2257C
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:16:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34FEF1F21399
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:27:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72261465A0;
-	Wed, 25 Sep 2024 21:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F67C154BF5;
+	Wed, 25 Sep 2024 21:27:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W4JvlcNf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEH15f+W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EF92AE6C
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 21:16:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 021BD147C79
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 21:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727298980; cv=none; b=e0jhGHQLpiboSdRHfMDgZViYKI4xKhAe5A8qUm6rGU/2cVJrqhb3vW6ZecGaHWQZGisO4YTvt5xNZiVebacmaqdT+18VKexjIRQ8nd+tFHd24myq/fX6cdzSo+ka0rOmbk3wFrID3pWJrToxrl9qY2K9/rh2m2XooR6Nz9oOpQ8=
+	t=1727299620; cv=none; b=K72LEkwzSHjzU6o8n6J2t8aj1SYcNsCV9vUSc6qEfZXlwI/JpcNiaySOAyQo2p5odDmUaFdSk8hu4Z5g2kdRqRxd6tWdhq5sKI9/WUsZV9AXSsOFUrj0Xt/qvampW7kMf2FG18pblX+O6Ye84jfcjbQUfGscB8CPF8Co+9waxTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727298980; c=relaxed/simple;
-	bh=UZu5PGB0MXDtNs8MMK1CwREysqd1Z0Qg1/TE2szW5Mw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UHgMeEoF949jXI3qFGUGMIt0GWD3KtI7L3torIzYjgQMOL0isJAQ7Lpf7cQgeMzDqGSJThDdHnq4c+I5JnnBFmkpZIW8XnWPmCtHHcifRJqsyR1owloG4KZ3mtHbcIMK6FqSewN5gFWdE5PEivP+3kSnUp50eCMfXA5cLZof6d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W4JvlcNf; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1727299620; c=relaxed/simple;
+	bh=vD15nBp0+CcM7E3xmVCpUdKHcD4NR10BrbHyd9Hnojs=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=E8d8cDJr6peRFxTOJIHWQcUcnrkxAy7evFIRBG02/F5rsU2poEcK3pXqdaGBXW/BDvH1EuvrVF0reXTX9ixof0gnBYGAKwEAWvMyZ+BEiRnowEVV53cpxENPUH55QQzrXY4I2nXBmmvA5Qq1rvYLYDRnVAkadQDfgvRwT/WlFQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NEH15f+W; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-42cacd90ee4so331145e9.3
-        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 14:16:18 -0700 (PDT)
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-53653682246so417234e87.1
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 14:26:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727298977; x=1727903777; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hserkp0XoO/xaxszPyfe2XUusNXhdSGovTKNC7GSS08=;
-        b=W4JvlcNfCrFBU4ARk8TxAIb1Oi1e7QCQpIuOOCbngD8Ps4DRGlbYdBbEbiZ/YKz8Yh
-         SzcZ+v+lw/S47JQDvg0I14NnuQ2Zf8o3sMo64HweC+wu4awo6cb2IeobxKta+JoWFHrp
-         Ju1iOFsjCO59wJEO4S8zjg1DoDeieBa3l0r2x/aC2jbamDkkph3l6u3HCY+Sd+aGRKhz
-         W6EV4JVqd9byebwjPDXgIz7E1vBibcnaQMCaQ2uMqaGHfNJxqVKl0ecCn1V97sWQhET/
-         NzcaHvSTtS5B+wLkBFAFl7rTsh8w4tBuZ6nv24IFd2vGM444ZViXv2FimwEqvmLZBIY9
-         zuTg==
+        d=gmail.com; s=20230601; t=1727299617; x=1727904417; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vD15nBp0+CcM7E3xmVCpUdKHcD4NR10BrbHyd9Hnojs=;
+        b=NEH15f+WbFOXP8gkt2b6y9G2XKBEMI8T3r5KX4QUc3AFpR+WeecFZP6YPS4mg41DXo
+         H019j5Ji2X5qDRSj1mieBD4xrqiuGyJDyZ6EsDNfA8tj1avLhn3RrtKnZr+EvGOEK30u
+         DK8+Il03N4cIWwx+bAhS+t5SuhEULO+IxaFY71A/28oBWdB0Qco+WbM8del7O+ymapUQ
+         NE1tbR9vSmpefvttid+4aOHrqCoqSoy9qxU4EiCPAHEtLABE2XXsw+utGuGy6pdwMlQ5
+         U2idFAB+WttlElXop/KNDLJ6/xz7ejyKQVlzrwviLnrz4T4lC9lg5qx1xexOlxDSPTJT
+         3jsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727298977; x=1727903777;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hserkp0XoO/xaxszPyfe2XUusNXhdSGovTKNC7GSS08=;
-        b=N/C0dGNf8WGn7F44QXzuS+dCvrvgJTS3qw1ZLvjNSRR3LsDMjcw3NwEWRAYuiEIkjS
-         t4PaABdLtnuD29xTORARoEg9/DLYgpBKuutpcB0Gkj2o8rKER5mJbvD4XhOrLsOviXGa
-         a8ub2nZOM0Sg3zjn7FUYbVvEEPctfsIFuTdcmggAH6y/ZT/iiBe+FNP+VGeKqGQe8zCb
-         fGXj/KEA9vHaXzJu4dMXpJ7GZxg5iztlSNl0Qt3Q7Jsdp5evOCiCTmVkcLoMLGppY6v9
-         syUJ/m9E3j4Z6H5oiGJxp02UTV2rXP+47Oqa0fI5gQH9hL2t6xlH3/x0283TUOWtKByo
-         6aOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWX9EQ3QMTXjiMVWEWBlVGHypV56KPo6GD2dN8p4GrhrPeVTPW/PjiYa+EXXwCTriUkf+0ylPE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHLLRcd6bEQo2Rklp1fI8m2juEkcGcQ3aG3FtpenaPYq8eGyX2
-	iiHJl85CijAPXLVpmmFl4Z3YSCQoZ8mQEW+VkMTMNZHxbpufhUuY
-X-Google-Smtp-Source: AGHT+IHBkP25fB4BC5hSAT45OKJ8Gcfe1I3/jKVfbWU3juyKG2hV4TbANIux7w2Ze32P428dDIwKzg==
-X-Received: by 2002:a05:600c:1d25:b0:42c:ba6c:d9a7 with SMTP id 5b1f17b1804b1-42e96144adcmr14013805e9.4.1727298976991;
-        Wed, 25 Sep 2024 14:16:16 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cbc2c13cesm4876658f8f.29.2024.09.25.14.16.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 14:16:16 -0700 (PDT)
-Date: Thu, 26 Sep 2024 00:16:13 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH RFC net-next 06/10] net: dsa: sja1105: simplify static
- configuration reload
-Message-ID: <20240925211613.lmi2kh6hublkutbb@skbuf>
-References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
- <E1ssjcz-005Ns9-D5@rmk-PC.armlinux.org.uk>
- <20240925131517.s562xmc5ekkslkhp@skbuf>
- <ZvRmr3aU1Fz6z0Oc@shell.armlinux.org.uk>
+        d=1e100.net; s=20230601; t=1727299617; x=1727904417;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vD15nBp0+CcM7E3xmVCpUdKHcD4NR10BrbHyd9Hnojs=;
+        b=hHh2yoXSyaf3krVY/2ZjiQvaVfjnbSAMAGQjOdjLTNhhV6QA5HK4DbW8ZzxmKVZdHT
+         Gs0FHrYnQI4OEefL/jt82xM+rBSWIOeEABhO5czM3+lOdsv4o0ddmsz9dp3KoaSAjYfY
+         TnFkYXE0DBg3PhVN357ByrQBDu4eIsYPAS7hAZZkmBP8N0rNFDdXsGaru3Fol6raRtTA
+         cxxf7h6M6dxOd48j7Ew1txXb4EbfiB1m+WsGhGS+ZeGmBzszjQEqL9rgtnq/vgitnR8y
+         QDo/QSDpp+CP9CFRGw9LvYRlPIEFursD4xxammuK3DDSOj/c/jclnGIAoIoYQlb0GsMd
+         3gpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUmK6KtQ8EkRe4hBdnhi4fVTNrZkUJx+Sa2agRiP2oVp2DxlY7pRVEBM3yEL/i3Mw5brYfbCBY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOU2+lEVw9RJvLYoHD2Q9v+A6y7fgitW2njcypK319CroZzQ8w
+	/LugwqWNQTzQ314hLrtWr+QYP2Jxid7Ftpc0ApxrKLdU3mYNGovR
+X-Google-Smtp-Source: AGHT+IG5fIFAQxZTmIQCZsUr7ZUrDdAyu12GX8KHFbwx9i7nUDEK3Sraw1KRj6OmOyq7j6ebfSFZ3Q==
+X-Received: by 2002:a05:6512:220d:b0:533:4722:ebb0 with SMTP id 2adb3069b0e04-53873455ef1mr2878247e87.6.1727299616717;
+        Wed, 25 Sep 2024 14:26:56 -0700 (PDT)
+Received: from [127.0.0.1] ([193.252.226.10])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93930f0b23sm267607466b.144.2024.09.25.14.26.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 25 Sep 2024 14:26:56 -0700 (PDT)
+From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+Message-ID: <d1f402df-f4cc-4c31-b590-d13de9cea028@orange.com>
+Date: Wed, 25 Sep 2024 23:26:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZvRmr3aU1Fz6z0Oc@shell.armlinux.org.uk>
+User-Agent: Betterbird (Linux)
+Subject: Re: Massive hash collisions on FIB
+To: Eric Dumazet <edumazet@google.com>,
+ Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+Cc: Simon Horman <horms@kernel.org>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, nicolas.dichtel@6wind.com,
+ netdev@vger.kernel.org
+References: <CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
+ <db6ecdc4-8053-42d6-89cc-39c70b199bde@intel.com>
+ <20240916140130.GB415778@kernel.org>
+ <e74ac4d7-44df-43f0-8b5d-46ef6697604f@orange.com>
+ <CANn89i+kDvzWarnA4JJr2Cna2rCXrCFJjpmd7CNeVEj5tmtWMw@mail.gmail.com>
+ <c739f928-86a2-46f8-b92e-86366758bb82@orange.com>
+ <CANn89i+nMyTsY8+KcoYXZPor8Y3r+rbt5LvZe1sC3yZq1wqGeQ@mail.gmail.com>
+ <290f16f7-8f31-46c9-907d-ce298a9b8630@orange.com>
+ <d1d6fd2c-c631-44a0-9962-c482540b3847@orange.com>
+ <CANn89iL0Cy0sEiYZnFbHFAJpj1dUD-Z93wLyHJyr=f-xuLzZtQ@mail.gmail.com>
+ <8e3fcb81-0b3f-4871-b613-0f1d2ed321a3@orange.com>
+ <CANn89iL5XEZ0S6c-amu_Q_k8fXYqDKLVh1bPv8kPhc4eKR6UYw@mail.gmail.com>
+Content-Language: fr, en-US
+Organization: Orange
+In-Reply-To: <CANn89iL5XEZ0S6c-amu_Q_k8fXYqDKLVh1bPv8kPhc4eKR6UYw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Sep 25, 2024 at 08:38:23PM +0100, Russell King (Oracle) wrote:
-> > There are 2 more changes which I believe should be made in sja1105_set_port_speed():
-> > - since it isn't called from mac_config() anymore but from mac_link_up()
-> >   (change which happened quite a while ago), it mustn't handle SPEED_UNKNOWN
-> > - we can trust that phylink will not call mac_link_up() with a speed
-> >   outside what we provided in mac_capabilities, so we can remove the
-> >   -EINVAL "default" speed_mbps case, and make this method return void,
-> >   as it can never truly cause an error
-> > 
-> > But I believe these are incremental changes which should be done after
-> > this patch. I've made a note of them and will create 2 patches on top
-> > when I have the spare time.
-> 
-> ... if we were to make those changes prior to this patch, then the
-> dev_err() will no longer be there and thus this becomes a non-issue.
-> So I'd suggest a patch prior to this one to make the changes you state
-> here, thus eliminating the need for this hunk in this patch.
+On 25/09/2024 22:12, Eric Dumazet wrote:
+> On Wed, Sep 25, 2024 at 9:46=E2=80=AFPM Alexandre Ferrieux
+>>
+>>
+>> [...] I was not wondering about the history behind net_hash_mix(), but=
+ more
+>> generally why there are two parallel implementations of FIB insertion.=
 
-That sounds good. Are you suggesting you will write up such a patch for v2?
+>=20
+> ipv6 has been done after ipv4, and by different contributors.
+
+Okay :}
+
+> BTW, inet6_addr_hash() does not really need the net_hash_mix() because =
+ipv6 uses
+> a per-netns hashtable (net->ipv6.inet6_addr_lst[]), with pros and cons
+> (vs IPv4 resizable hashtable)
+
+Interesting. I somehow felt that the system-wide IPv4 resizable table was=
+ a good
+idea in terms of scaling, as it amortizes the necessary overheads in the =
+case of
+many-netns (though it is monotonic: grows but never shrinks !)... But now=
+ I
+wonder: why is it a good idea for v4 and not for v6 ?
 
