@@ -1,120 +1,176 @@
-Return-Path: <netdev+bounces-129833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DFAE9866D5
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:26:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 844CC98670B
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:39:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 693D9B23198
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 19:26:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79A6E1C20C84
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 19:39:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FBF13D891;
-	Wed, 25 Sep 2024 19:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F221428F3;
+	Wed, 25 Sep 2024 19:38:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="piIxb7d/"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="dB4xz0D+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E940E129E93
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 19:26:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CD2145324
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 19:38:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727292365; cv=none; b=Cs1HnbCbRsGVkzALrLn10buITKeWz4JJxgqrAO7G75VHDGCIM13VlvziOREVnygUBpTero7Q4S77SIrjPZ0U/0qNm/qZnNl/unQ6u7nQNInE4WJvIlLJ973TJpL7c4YIwv8NmhDQZ3O+DLGD9LAkbQaw7Xyo/8LuPSBRC+U1aqA=
+	t=1727293137; cv=none; b=hB255/Uvf2SgCGl35AOLaVDZB0g8hMfULthGW/mRz6IAx2mfjg7Qy88Z8CsRkC/JOTIeVKVcD3dOI/2J/Fa1oR8lMamE+DNlsB0LNXhjlpfmJIMLY2fII7W7+4cLob51CjyAjG7h7KK/c8hAyzIfRuDgxyLiM0csTA/htHNR78E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727292365; c=relaxed/simple;
-	bh=Q9yw2XjXzLtOTXlJUvql4uEzP/L5lyTpgE7VtHTgrC8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ne8+eVAf6wrcVSH1Cam9hBH6PHmPAKyGexe5xa15ebexa0TmR4eV3M3na6ck65jseTsh3Oo59g94QiFpXwwD9kR0fnZQRYebyneN42qCx3pulivgpXfTpLX9wai3YYu6w6xSkM47qzN2ZbZ/i/dNqhUfNXvH7ZGk4D4fKrLUyyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=piIxb7d/; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5c5bca6603aso126395a12.1
-        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 12:26:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1727292362; x=1727897162; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q9yw2XjXzLtOTXlJUvql4uEzP/L5lyTpgE7VtHTgrC8=;
-        b=piIxb7d/N8tySHDa5Mv/KsxHur7yY9MPdsUAGZvGItaWYxpb29PnuNyDo9jsJukjcM
-         BzUBjvIZLu3OlojajU1jDZ1IZiHg9lpIUtLJWTuhkBiStVFi/rW0iiZzgGWhXqXdhP1/
-         QOG/aOE+gdzd56UXIwpsknP7uQclxXnyCd017KMNqNoSI2oEmfR7he8lPi34OkrXM3tX
-         7jZXS5Lnz6e4f0OHX00YAp4iAUqwpKmMFsb23dmeS50PKCOLXNuXtcf75L2vs8lrGfAu
-         OaJEJ40ASU/yeEqLvLVTLDqKOzmOe8oMMGU1fy7qDqHTlVU2W8tt08jqU6M1YglECpTB
-         Wz6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727292362; x=1727897162;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q9yw2XjXzLtOTXlJUvql4uEzP/L5lyTpgE7VtHTgrC8=;
-        b=a1hU+DqOrUioO72NHocAVJU2vT+PinoPPKPDQNe2txVW12Uea/8+EQyETcb3H1xIS3
-         Dyq3+CGe6fJDsxuJnRu6fuXepu1DKSSe3dvT8EBxePf8Ayr1OpWISSwwBiE+rKNmPve8
-         KXONk8CjTtZj1rwZLvtbV5yzrKjJeaRO9kSFHvyBWx/Iw17Gkncy34KYPvbn5U9WmBQE
-         k9YcsY3cFLhhtMjCJbVcKaGGYn3BUZO215ly7bobs3nlF4weIZC3P5BShK5pOrJCBi2r
-         9fmgAZO9BD3hybat6+G7XZp9g7Lou2mvZb6auaYUSAAHxiQ3YLqBWKFoV+lHqeCgP7oZ
-         r9OA==
-X-Forwarded-Encrypted: i=1; AJvYcCX8kEMScy/ufuH30RYjFMp038qsspmvNlpYkyn5NF/WOpgRoU3ZLBoPAI/UaJ/Et8Lm+HkU5Fo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxStEAEqYvFCMDVk4jl0fA5Ot6DEIQXG3zlhnXLl/GtztEkM5yk
-	/OmCj0IIOcAjHvtD5xu0oTfyu7LGEw8/0KHAsqbcbDQ0Jf/5yOaKSy7v5IPBOud6csOsHaYRi3f
-	ORMhGF5Xk1h95TYwYrPPTAUR9Bz7P8IbTtncT
-X-Google-Smtp-Source: AGHT+IHHRNA+KIRA2swKZBI+fpT5BYjoa5qAfH9gIrq/eU7SvczH23wGfNPL8zzhzvbOb7/q5Xhk9odmVlpH+dTnsqE=
-X-Received: by 2002:a05:6402:40c5:b0:5c5:c447:e408 with SMTP id
- 4fb4d7f45d1cf-5c720754baamr2338532a12.29.1727292361698; Wed, 25 Sep 2024
- 12:26:01 -0700 (PDT)
+	s=arc-20240116; t=1727293137; c=relaxed/simple;
+	bh=ScGp1WuPU1OKx2Ga8HODg6qs1dyhUw7LVDKDB8Dl9+U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GMbe2hw9JP9qo8JC6iNxcVPbZnbuLbGPNHEgCE5qPr08CZ7ruYqmICV53DPCZdpgGA88th89NY/1sZGXjrUzzww0Ew0ppwmrnLHrdOuoUbRiLgG0STAjnL2QmoIoe/syvzvXeD65FWZzGiAe5+/4LLU9wLlk1nVvs/K3opVFzkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=dB4xz0D+; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=WjdEpakeAEueAFF38g825g9x6ZCC7yRWFkL/TDSCzf4=; b=dB4xz0D+ZLsZ8rRZRuHk2g7f0F
+	om8LUD3GKpWwh2Fs3G+4EdP2q5XG9Yz8gjo2G7DEG1f4Bd1JMACALUonuEavPkLlVPPyA1xG2FS6I
+	YcEPo0BdJgmWGPwQAGeRzveSDy9jrICmq+bDQ5kiaARL9eHZKgJwsXB2kqeA7motkxvr86YlPHUYE
+	QdcJaeLGrMUYxDdgqpMGAjohUyzfCRInu5FqJo04rczLL1VDqd6fXb7t9VEUUJlPY6rEujKppCpu5
+	9t7/oMgI0pqFFUtir6y1iPINXshZIY6vIePXkf3jyA+fmiGxzikOGI4H37jYDSI/nMe4GenncV4Zn
+	fzc2N26g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35972)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1stXqJ-0007AJ-1I;
+	Wed, 25 Sep 2024 20:38:31 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1stXqB-0007bY-1T;
+	Wed, 25 Sep 2024 20:38:23 +0100
+Date: Wed, 25 Sep 2024 20:38:23 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH RFC net-next 06/10] net: dsa: sja1105: simplify static
+ configuration reload
+Message-ID: <ZvRmr3aU1Fz6z0Oc@shell.armlinux.org.uk>
+References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
+ <E1ssjcz-005Ns9-D5@rmk-PC.armlinux.org.uk>
+ <20240925131517.s562xmc5ekkslkhp@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAKYWH0Ti3=4GeeuVyWKJ9LyTuRnf3Wy9GKg4Jb7tdeaT39qADA@mail.gmail.com>
- <db6ecdc4-8053-42d6-89cc-39c70b199bde@intel.com> <20240916140130.GB415778@kernel.org>
- <e74ac4d7-44df-43f0-8b5d-46ef6697604f@orange.com> <CANn89i+kDvzWarnA4JJr2Cna2rCXrCFJjpmd7CNeVEj5tmtWMw@mail.gmail.com>
- <c739f928-86a2-46f8-b92e-86366758bb82@orange.com> <CANn89i+nMyTsY8+KcoYXZPor8Y3r+rbt5LvZe1sC3yZq1wqGeQ@mail.gmail.com>
- <290f16f7-8f31-46c9-907d-ce298a9b8630@orange.com> <d1d6fd2c-c631-44a0-9962-c482540b3847@orange.com>
-In-Reply-To: <d1d6fd2c-c631-44a0-9962-c482540b3847@orange.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 25 Sep 2024 21:25:50 +0200
-Message-ID: <CANn89iL0Cy0sEiYZnFbHFAJpj1dUD-Z93wLyHJyr=f-xuLzZtQ@mail.gmail.com>
-Subject: Re: Massive hash collisions on FIB
-To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-Cc: Simon Horman <horms@kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	nicolas.dichtel@6wind.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240925131517.s562xmc5ekkslkhp@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Sep 25, 2024 at 9:06=E2=80=AFPM Alexandre Ferrieux
-<alexandre.ferrieux@gmail.com> wrote:
->
-> On 24/09/2024 19:18, Alexandre Ferrieux wrote:
-> >
-> > I see you did the work for the two other hashes (laddr and devindex).
-> > I tried to inject the dispersion the same way as you did, just before t=
-he final
-> > scrambling. Is this what you'd do ?
-> >
-> > diff --git a/net/ipv4/fib_semantics.c b/net/ipv4/fib_semantics.c
-> Doing this, I discovered with surprise that the job was already done in I=
-Pv6, as
-> inet6_addr_hash() uses net_hash_mix() too. Which leads to the question: w=
-hy are
-> the IPv4 and IPv6 FIB-exact-lookup implementations different/duplicated ?
+On Wed, Sep 25, 2024 at 04:15:17PM +0300, Vladimir Oltean wrote:
+> On Mon, Sep 23, 2024 at 03:01:25PM +0100, Russell King (Oracle) wrote:
+> > +static int sja1105_set_port_speed(struct sja1105_private *priv, int port,
+> > +				  int speed_mbps)
+> >  {
+> >  	struct sja1105_mac_config_entry *mac;
+> > -	struct device *dev = priv->ds->dev;
+> 
+> I think if you could keep this line in the new sja1105_set_port_speed()
+> function..
+> 
+> >  	u64 speed;
+> > -	int rc;
+> >  
+> >  	/* On P/Q/R/S, one can read from the device via the MAC reconfiguration
+> >  	 * tables. On E/T, MAC reconfig tables are not readable, only writable.
+> > @@ -1313,7 +1295,7 @@ static int sja1105_adjust_port_config(struct sja1105_private *priv, int port,
+> >  		speed = priv->info->port_speed[SJA1105_SPEED_2500MBPS];
+> >  		break;
+> >  	default:
+> > -		dev_err(dev, "Invalid speed %iMbps\n", speed_mbps);
+> > +		dev_err(priv->ds->dev, "Invalid speed %iMbps\n", speed_mbps);
+> 
+> you could also get rid of this unnecessary line change.
 
-inet_addr_hash() is also using net_hash_mix()
+Yes, maybe I'll move it to another patch, but the reason I made the
+change is that I don't see much point to the local variable existing
+for just one user (there were multiple users prior to this patch.)
+However...
 
-fib_info_laddrhash_bucket() is also using net_hash_mix()
+> >  		return -EINVAL;
+> >  	}
+> 
+> There are 2 more changes which I believe should be made in sja1105_set_port_speed():
+> - since it isn't called from mac_config() anymore but from mac_link_up()
+>   (change which happened quite a while ago), it mustn't handle SPEED_UNKNOWN
+> - we can trust that phylink will not call mac_link_up() with a speed
+>   outside what we provided in mac_capabilities, so we can remove the
+>   -EINVAL "default" speed_mbps case, and make this method return void,
+>   as it can never truly cause an error
+> 
+> But I believe these are incremental changes which should be done after
+> this patch. I've made a note of them and will create 2 patches on top
+> when I have the spare time.
 
-You know we make these kinds of changes whenever they are needed for
-our workload.
+... if we were to make those changes prior to this patch, then the
+dev_err() will no longer be there and thus this becomes a non-issue.
+So I'd suggest a patch prior to this one to make the changes you state
+here, thus eliminating the need for this hunk in this patch.
 
-For example
+> > +/* Set link speed in the MAC configuration for a specific port. */
+> 
+> Could this comment state this instead? "Write the MAC Configuration
+> Table entry and, if necessary, the CGU settings, after a link speed
+> change for this port."
 
-d07418afea8f1d9896aaf9dc5ae47ac4f45b220c ipv4: avoid quadratic
-behavior in netns dismantle
+Done.
 
-Just submit a patch, stop wondering why it was not already done.
+> > @@ -2293,7 +2294,7 @@ int sja1105_static_config_reload(struct sja1105_private *priv,
+> >  {
+> >  	struct ptp_system_timestamp ptp_sts_before;
+> >  	struct ptp_system_timestamp ptp_sts_after;
+> > -	int speed_mbps[SJA1105_MAX_NUM_PORTS];
+> > +	u64 mac_speed[SJA1105_MAX_NUM_PORTS];
+> 
+> Could you move this line lower to preserve the ordering by decreasing line length?
+> 
+> >  	u16 bmcr[SJA1105_MAX_NUM_PORTS] = {0};
+
+Probably didn't notice that due to not having full clear sight for the
+screen yet (a few more weeks to go before that happens!) Thanks for
+spotting that.
+
+> > -	/* Back up the dynamic link speed changed by sja1105_adjust_port_config
+> > +	/* Back up the dynamic link speed changed by sja1105_set_port_speed
+> 
+> Could you please put () after the function name? I know the original
+> code did not have it, but my coding style has changed in the past 5 years.
+
+Done.
+
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
