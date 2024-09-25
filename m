@@ -1,126 +1,83 @@
-Return-Path: <netdev+bounces-129657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E34EA985335
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 08:49:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1916C985367
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 09:08:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39617286306
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 06:49:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C95B328212B
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 07:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0314A15667B;
-	Wed, 25 Sep 2024 06:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B63155300;
+	Wed, 25 Sep 2024 07:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWFjb0Ih"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t8U4dPJw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815E1156875;
-	Wed, 25 Sep 2024 06:47:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 947C4132103;
+	Wed, 25 Sep 2024 07:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727246849; cv=none; b=e8rh3v7Lc7Mu1FvViiIQjpYTej1s9aIol+K+y6j2G7JBtbKJf8n+RN3nqeMc/nZY/3qnNezr9Erau6YNk1TKIQc5h/qO7zANw1U4+IQUZKrleWp/1D98SyZw9KoIbsw4Jo/GfP8aGFxp+enEjkXEKQm9fZvxLYFyWd+/ISSpYHI=
+	t=1727248108; cv=none; b=h3sB62bkfkNkar3uapAOvD/LwrdPPg6pl4DNvQ4duqvE9TtwrDbuw1asO+b6oEQ840PYo47DHYHCFNBvOpcBfbX7TaJE+3q/5lWdSCe4j0NxhtMJqPjZPoTr59fA4uonwUpiSByD4sPvEK5U5oAdZ1PQRDzYT8bN9S9YhZsjDG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727246849; c=relaxed/simple;
-	bh=mlLpvpU5h3KChIjhV43WoLH/do6/n4v6lSdzaC/4lso=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jAnaFxE3f5RZbswsMqrBcPgF5KlQ2xq3NGxQJj4sDNk3U7TriSZhaDRxgwgTCvoLrDCIlxXWMqh0Jyqh5ZdZxDmQmIo/fqrZGuKLUfc3BCnhA8xZ4KyYV/lCPoJxtG3YXdLq7MNrN5yDfqBaRKPEj0tBpE8M7FlHd9XLUMBYMX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LWFjb0Ih; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-710e1a48130so1976253a34.1;
-        Tue, 24 Sep 2024 23:47:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727246847; x=1727851647; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SCvWjbZiRcFE7BpPuL1CRrnqJmD47+cwm4wsjCPkMsg=;
-        b=LWFjb0Ih3/p1JVK+uQ5EZqyEcRrfQ8huffAJ1Bw0ghSyXixfMUsJ0iEGXOC4jWsZOS
-         A/+JxGqlK+1MZT+1GInYzcDFIID3KKBAuoncOqvc3ky9knojV0a8Nh/uJjneOt8HeeN/
-         l+ErTLAXobOJrHwWGKHEk8P6SP/jolweMoByV4NZQhsAeqf4NImy6S/inB+bJKjJtHcb
-         bjKGqOHlvlqGZhPc7YXgCoxmrI6+I/uxAT/kdmjVfSnmLAewdHm9V4T75dgwItLa8+0H
-         QobpnthWFYAuqsLr+8XxbXlvQSN5+SIZV4WhPyWjTQ65emafDOCisTEcUzsFav95suhA
-         6X0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727246847; x=1727851647;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SCvWjbZiRcFE7BpPuL1CRrnqJmD47+cwm4wsjCPkMsg=;
-        b=hBr5XDArl6Kmx6GOXldDevesaDF7Ry+3AFn4HI7xe1E7XksmU92oL4zKKVzSRSM3Zg
-         Md50Vwe9BIpcAbhZyXoP0TIW/Wi1HMz0OepcCkjsUQKL8pqD54MNsEdJ5us0N87NYWsJ
-         ENLSUN2DZclG3d9/K5ssZYsBnAYDKIVHNEa9xVOA7aArP/81mEHvNa0B55D3TuxgNMtJ
-         gPoRNidmSQlu9CZzWdpSBtLyxGcMo+Am5shM/draOQI47w+JfSZZlPAJkjKjxQOY4SUG
-         SqCnYAv3SG3Cdj38K3tPXoHSkVISsTbBWRgr6Sn/ynnA8wpdlZhkBG9/M7rp4p8v+qT+
-         sqPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUwsMvmCmw7AcahYCevFrBxXUUVVD5EEOg+tulk8vLAlXE3UEqkRiibRIUgykF3dmkZULmIP51uwg/fCeM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz49FG0KDra8smJ6ktkuT8PUaHWEKNphlnl2YdCh+eedREMH0Rf
-	9wGd+1CyARV0cI0OaKBxjWoCWyxDVN0gENi3Uv3LDl9I5DXsbumY
-X-Google-Smtp-Source: AGHT+IGGCHgPFYaz/jOqIrSzxFOksYsAEteh8NXeHjhHP620RTIPIg+t8iMXK80EB71cmuYVzWr5gA==
-X-Received: by 2002:a05:6830:6d12:b0:713:722c:835f with SMTP id 46e09a7af769-713c7dc411emr1431074a34.18.1727246847368;
-        Tue, 24 Sep 2024 23:47:27 -0700 (PDT)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e06e31a006sm733263a91.55.2024.09.24.23.47.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Sep 2024 23:47:26 -0700 (PDT)
-Date: Wed, 25 Sep 2024 06:47:19 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jarod Wilson <jarod@redhat.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] Bonding: update bond device XFRM features based on
- current active slave
-Message-ID: <ZvOx95zrrKonjTPn@fedora>
-References: <20240918083533.21093-1-liuhangbin@gmail.com>
- <1b507e18-24a4-4705-a987-53119009ce3f@redhat.com>
+	s=arc-20240116; t=1727248108; c=relaxed/simple;
+	bh=8C9zq1a496NalKgWmrzYn8bXqhj/Q05OOw+7Zz22H1w=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=KnD+R6Awt9AUmn3yGYkBhMKa/joPMtIRGjY1RYLL20F+SQQ6Fl+vnvXr5kRTB7w/KmTs4T0cAeyVvlPnOWUuvcIXEjWl2LQqY5jMvQg58Tb5fjGWUwy2M1pSTEAmkbDXQf3L3TQKD6pbcNWeHfBXEL7xh9kI/LYiQXjFc6MRRxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t8U4dPJw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 303DEC4CEC3;
+	Wed, 25 Sep 2024 07:08:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727248108;
+	bh=8C9zq1a496NalKgWmrzYn8bXqhj/Q05OOw+7Zz22H1w=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=t8U4dPJwqPVePK5ibIHYaUUfrJdlCelv6H/y687rQt6wyCNuhcAHJc6TjAh5Y9MKC
+	 xKtA1Qsvzjy7ds+LAP4atySalx5H/RfM+riSwuvKjr5uYn/SqzQ5F/3/NVkmBtUdcc
+	 DFyxBwaHD/lOwQDqX4FEGN9+G+ZRA4tw2LXj+Zuq0NAHNRwAOs6ev3SL0JO1mmsxpk
+	 BcTgms1h2rnf6dXE78EutsUqAUlNjmE94enSgB0pDdF2k6m5FnJnX/bP+WZNsgW0vM
+	 YaC00xT3EZCSsGRuCqwPqVowrFpB4ywM836hGWRTVnjpAxdSSwBhWh2sQoYqot7BRO
+	 cD7EJMcIcaxOg==
+From: Kalle Valo <kvalo@kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>,  "David S . Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
+  linux-trace-kernel@vger.kernel.org,  linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] mac80211: MAC80211_MESSAGE_TRACING should depend on
+ TRACING
+References: <85bbe38ce0df13350f45714e2dc288cc70947a19.1727179690.git.geert@linux-m68k.org>
+Date: Wed, 25 Sep 2024 10:08:24 +0300
+In-Reply-To: <85bbe38ce0df13350f45714e2dc288cc70947a19.1727179690.git.geert@linux-m68k.org>
+	(Geert Uytterhoeven's message of "Tue, 24 Sep 2024 14:08:57 +0200")
+Message-ID: <87a5fw9pnb.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1b507e18-24a4-4705-a987-53119009ce3f@redhat.com>
+Content-Type: text/plain
 
-On Tue, Sep 24, 2024 at 03:17:25PM +0200, Paolo Abeni wrote:
-> 
-> 
-> On 9/18/24 10:35, Hangbin Liu wrote:
-> > XFRM offload is supported in active-backup mode. However, if the current
-> > active slave does not support it, we should disable it on bond device.
-> > Otherwise, ESP traffic may fail due to the downlink not supporting the
-> > feature.
-> 
-> Why would the excessive features exposed by the bond device will be a
-> problem? later dev_queue_xmit() on the lower device should take care of
-> needed xfrm offload in validate_xmit_xfrm(), no?
+Geert Uytterhoeven <geert@linux-m68k.org> writes:
 
-I'm not very sure. In validate_xmit_xfrm() it looks the lower dev won't
-check again if the upper dev has validated.
+> When tracing is disabled, there is no point in asking the user about
+> enabling tracing of all mac80211 debug messages.
+>
+> Fixes: 3fae0273168026ed ("mac80211: trace debug messages")
+> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-        /* This skb was already validated on the upper/virtual dev */
-        if ((x->xso.dev != dev) && (x->xso.real_dev == dev))
-                return skb;
+mac80211 patches go to wireless tree, not net. Also 'wifi:' missing from
+subject but I suspect Johannes can fix that during commit, so no need to
+resend (I hope).
 
-Hi Sabrina, Steffen, if the upper dev validate failed, what would happen?
-Just drop the skb or go via software path?
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
-> 
-> Let segmentation happening as late as possible is usually a win.
-
-Yes, indeed.
-
-Thanks
-Hangbin
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
