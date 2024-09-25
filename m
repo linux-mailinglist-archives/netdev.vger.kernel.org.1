@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-129710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5968598599E
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:57:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84EF69859A9
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:58:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19D7B284918
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:57:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13C871F23E75
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:58:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF921A76A0;
-	Wed, 25 Sep 2024 11:39:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8094189916;
+	Wed, 25 Sep 2024 11:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c4493yRP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DA3VvY9I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 545661A726A;
-	Wed, 25 Sep 2024 11:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB3C1AC886;
+	Wed, 25 Sep 2024 11:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727264381; cv=none; b=AbXlf+9pJb+CMU/7uiYEjrdp9hbldw9M9F5JhFP5Mn7NbqYg8btVYwJqqXlh61tcMWOtw8U3uPNJzW+8peAF6BwNshpbx/XPkYY1YrLfp0QakuzfQtPapjVowJwWWPXBa4YsxuUD7TFyWlFCHavxm4f6B4vhSqvF9r8I53zJ2Uk=
+	t=1727264391; cv=none; b=NDWT2cdGhF7WRUr3VjPj5+IDYcu/UacX/SNO0hpcUZXo9p16QgieFgG95D3bmYaG6/+BM8uTaxdaLS2aWrccxQAgPyF9W0b1HBBP1Tlv6eZfGV78AHJ4dWwCLaRxAl3e+pZHrox7HYTNTNixzldguY8gMRRnS6E5B81dIfW9a1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727264381; c=relaxed/simple;
-	bh=Pb6ZUZpF21AKLI5dPOYrEq51md+n1GRLbVMHVy5aPYo=;
+	s=arc-20240116; t=1727264391; c=relaxed/simple;
+	bh=odDU1Cp4iGsplsRPbwJ7Rwl4dqtlLTEMD+gKWjeyVhY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mnpKsV7EvXM11610/NL/cRgGnPIlzcUcFt7FJWUUBPeFLHbB6DCm2Uw0X58t1oPceYgdZSZD5eWQj6EJFk9I8zt+ukSM70gDyIlPYqyCD7V0AXwMguMjBf9PYsGDFNn1dbw1ewUF3Ma67bivfQAixjY7nMa17giYHWNljcKT3Ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c4493yRP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32CBDC4CEC7;
-	Wed, 25 Sep 2024 11:39:39 +0000 (UTC)
+	 MIME-Version; b=dH8RcWI5I0BbzxJk+XySdA+biX74rDWwSGOjrJDzjtQxEU/KfNEKE8oTiK6MCdahQcCSNLRdoYiqaMY3f/w4Oox3bSIBeIAINHxaUol8I96hSkoC1CL3InFJo2uqF8KYjByJFrwh3tY+B0TjxrIuxZzJAPQ10GnC/DxDJicT4l8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DA3VvY9I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1884C4CEC3;
+	Wed, 25 Sep 2024 11:39:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727264380;
-	bh=Pb6ZUZpF21AKLI5dPOYrEq51md+n1GRLbVMHVy5aPYo=;
+	s=k20201202; t=1727264391;
+	bh=odDU1Cp4iGsplsRPbwJ7Rwl4dqtlLTEMD+gKWjeyVhY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=c4493yRPnBu6MpJuDV6WEHxQYSCHQ5rPmR6+mAdAopGYjLJEpR8ZLTSkXOxM7xtFz
-	 bHwnSA05TwkyOxHFe1N1MKC7/ZgmtDpKGDuOlXg1eHg9BW2/VOJc5FmY8n2mOpFOWz
-	 l2tB8BelBmXfj8cIRxVNMSPdRHqA8JOWTAtdmxmLIKYtzh210vIxfkuAbROPsfOZQJ
-	 cPTqu9jIjA3CJZhY88xaj8PHS3N4zQHfGFO3515Ln4YYOIwG4GMyFD0JRsT7n1R86i
-	 zC1Le42d0klVIp4Cv+/jzpC6r8j3lrU1vVLgKuGXTS/wfDyL+IgaVdl+xKw7Jw5d95
-	 IUd3OPy4+s+sA==
+	b=DA3VvY9Iq7c4mYaiWBTH6AQNHuebm0mpQONTLonXXrFQdyzW+ukXNozUY+sd3Nhji
+	 iKXsklM0YNH56kgCCSffcIVcD9090OmAKTI5x3TVpVbWC0ooucUSbsqPdE1xEERZDz
+	 K7wW1Bzsj7UObWbaTYfo/laUhKC+HdX8Gxy/un7lNOuehRatx1DFkcboqwufc7RFUg
+	 mmPPUFEjDQZXmcte34+WWwU0oXFEVOermsHw4m2AC3BNXV8NReD5RWYDXNa7HKDnMr
+	 ACevODCvdyGcHTs2HufLk5LZcL5TgNkiCEAPsFRu2hMDUvX8w2lljUNMUGkTL0XfIQ
+	 o4lQQdnEr8SaQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
+Cc: Joe Damato <jdamato@fastly.com>,
 	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
 	Sasha Levin <sashal@kernel.org>,
-	hkallweit1@gmail.com,
 	davem@davemloft.net,
-	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 075/244] net: phy: Check for read errors in SIOCGMIIREG
-Date: Wed, 25 Sep 2024 07:24:56 -0400
-Message-ID: <20240925113641.1297102-75-sashal@kernel.org>
+	corbet@lwn.net,
+	leitao@debian.org,
+	johannes.berg@intel.com,
+	jamie.bainbridge@gmail.com,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.11 079/244] net: napi: Prevent overflow of napi_defer_hard_irqs
+Date: Wed, 25 Sep 2024 07:25:00 -0400
+Message-ID: <20240925113641.1297102-79-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925113641.1297102-1-sashal@kernel.org>
 References: <20240925113641.1297102-1-sashal@kernel.org>
@@ -68,83 +68,128 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11
 Content-Transfer-Encoding: 8bit
 
-From: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+From: Joe Damato <jdamato@fastly.com>
 
-[ Upstream commit 569bf6d481b0b823c3c9c3b8be77908fd7caf66b ]
+[ Upstream commit 08062af0a52107a243f7608fd972edb54ca5b7f8 ]
 
-When reading registers from the PHY using the SIOCGMIIREG IOCTL any
-errors returned from either mdiobus_read() or mdiobus_c45_read() are
-ignored, and parts of the returned error is passed as the register value
-back to user-space.
+In commit 6f8b12d661d0 ("net: napi: add hard irqs deferral feature")
+napi_defer_irqs was added to net_device and napi_defer_irqs_count was
+added to napi_struct, both as type int.
 
-For example, if mdiobus_c45_read() is used with a bus that do not
-implement the read_c45() callback -EOPNOTSUPP is returned. This is
-however directly stored in mii_data->val_out and returned as the
-registers content. As val_out is a u16 the error code is truncated and
-returned as a plausible register value.
+This value never goes below zero, so there is not reason for it to be a
+signed int. Change the type for both from int to u32, and add an
+overflow check to sysfs to limit the value to S32_MAX.
 
-Fix this by first checking the return value for errors before returning
-it as the register content.
+The limit of S32_MAX was chosen because the practical limit before this
+patch was S32_MAX (anything larger was an overflow) and thus there are
+no behavioral changes introduced. If the extra bit is needed in the
+future, the limit can be raised.
 
-Before this patch,
+Before this patch:
 
-    # phytool read eth0/0:1/0
-    0xffa1
+$ sudo bash -c 'echo 2147483649 > /sys/class/net/eth4/napi_defer_hard_irqs'
+$ cat /sys/class/net/eth4/napi_defer_hard_irqs
+-2147483647
 
-After this change,
+After this patch:
 
-    $ phytool read eth0/0:1/0
-    error: phy_read (-95)
+$ sudo bash -c 'echo 2147483649 > /sys/class/net/eth4/napi_defer_hard_irqs'
+bash: line 0: echo: write error: Numerical result out of range
 
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Tested-by: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Link: https://patch.msgid.link/20240903171536.628930-1-niklas.soderlund+renesas@ragnatech.se
+Similarly, /sys/class/net/XXXXX/tx_queue_len is defined as unsigned:
+
+include/linux/netdevice.h:      unsigned int            tx_queue_len;
+
+And has an overflow check:
+
+dev_change_tx_queue_len(..., unsigned long new_len):
+
+  if (new_len != (unsigned int)new_len)
+          return -ERANGE;
+
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Link: https://patch.msgid.link/20240904153431.307932-1-jdamato@fastly.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/phy/phy.c | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+ Documentation/networking/net_cachelines/net_device.rst | 2 +-
+ include/linux/netdevice.h                              | 4 ++--
+ net/core/net-sysfs.c                                   | 6 +++++-
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index 785182fa5fe01..b88d857ea23b8 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -342,14 +342,19 @@ int phy_mii_ioctl(struct phy_device *phydev, struct ifreq *ifr, int cmd)
- 		if (mdio_phy_id_is_c45(mii_data->phy_id)) {
- 			prtad = mdio_phy_id_prtad(mii_data->phy_id);
- 			devad = mdio_phy_id_devad(mii_data->phy_id);
--			mii_data->val_out = mdiobus_c45_read(
--				phydev->mdio.bus, prtad, devad,
--				mii_data->reg_num);
-+			ret = mdiobus_c45_read(phydev->mdio.bus, prtad, devad,
-+					       mii_data->reg_num);
-+
- 		} else {
--			mii_data->val_out = mdiobus_read(
--				phydev->mdio.bus, mii_data->phy_id,
--				mii_data->reg_num);
-+			ret = mdiobus_read(phydev->mdio.bus, mii_data->phy_id,
-+					   mii_data->reg_num);
- 		}
-+
-+		if (ret < 0)
-+			return ret;
-+
-+		mii_data->val_out = ret;
-+
- 		return 0;
+diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
+index 70c4fb9d4e5ce..d68f37f5b1f82 100644
+--- a/Documentation/networking/net_cachelines/net_device.rst
++++ b/Documentation/networking/net_cachelines/net_device.rst
+@@ -98,7 +98,7 @@ unsigned_int                        num_rx_queues
+ unsigned_int                        real_num_rx_queues      -                   read_mostly         get_rps_cpu
+ struct_bpf_prog*                    xdp_prog                -                   read_mostly         netif_elide_gro()
+ unsigned_long                       gro_flush_timeout       -                   read_mostly         napi_complete_done
+-int                                 napi_defer_hard_irqs    -                   read_mostly         napi_complete_done
++u32                                 napi_defer_hard_irqs    -                   read_mostly         napi_complete_done
+ unsigned_int                        gro_max_size            -                   read_mostly         skb_gro_receive
+ unsigned_int                        gro_ipv4_max_size       -                   read_mostly         skb_gro_receive
+ rx_handler_func_t*                  rx_handler              read_mostly         -                   __netif_receive_skb_core
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 607009150b5fa..39eafd2e2368a 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -356,7 +356,7 @@ struct napi_struct {
  
- 	case SIOCSMIIREG:
+ 	unsigned long		state;
+ 	int			weight;
+-	int			defer_hard_irqs_count;
++	u32			defer_hard_irqs_count;
+ 	unsigned long		gro_bitmask;
+ 	int			(*poll)(struct napi_struct *, int);
+ #ifdef CONFIG_NETPOLL
+@@ -2091,7 +2091,7 @@ struct net_device {
+ 	unsigned int		real_num_rx_queues;
+ 	struct netdev_rx_queue	*_rx;
+ 	unsigned long		gro_flush_timeout;
+-	int			napi_defer_hard_irqs;
++	u32			napi_defer_hard_irqs;
+ 	unsigned int		gro_max_size;
+ 	unsigned int		gro_ipv4_max_size;
+ 	rx_handler_func_t __rcu	*rx_handler;
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index 291fdf4a328b3..93dd5d5436849 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -32,6 +32,7 @@
+ #ifdef CONFIG_SYSFS
+ static const char fmt_hex[] = "%#x\n";
+ static const char fmt_dec[] = "%d\n";
++static const char fmt_uint[] = "%u\n";
+ static const char fmt_ulong[] = "%lu\n";
+ static const char fmt_u64[] = "%llu\n";
+ 
+@@ -425,6 +426,9 @@ NETDEVICE_SHOW_RW(gro_flush_timeout, fmt_ulong);
+ 
+ static int change_napi_defer_hard_irqs(struct net_device *dev, unsigned long val)
+ {
++	if (val > S32_MAX)
++		return -ERANGE;
++
+ 	WRITE_ONCE(dev->napi_defer_hard_irqs, val);
+ 	return 0;
+ }
+@@ -438,7 +442,7 @@ static ssize_t napi_defer_hard_irqs_store(struct device *dev,
+ 
+ 	return netdev_store(dev, attr, buf, len, change_napi_defer_hard_irqs);
+ }
+-NETDEVICE_SHOW_RW(napi_defer_hard_irqs, fmt_dec);
++NETDEVICE_SHOW_RW(napi_defer_hard_irqs, fmt_uint);
+ 
+ static ssize_t ifalias_store(struct device *dev, struct device_attribute *attr,
+ 			     const char *buf, size_t len)
 -- 
 2.43.0
 
