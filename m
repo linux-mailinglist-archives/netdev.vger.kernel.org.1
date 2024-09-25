@@ -1,163 +1,213 @@
-Return-Path: <netdev+bounces-129680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C55DE9857AE
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:10:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C5129857A9
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:10:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 011CD1C212AC
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:10:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 075FB2846EF
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DCCA155306;
-	Wed, 25 Sep 2024 11:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F186C156236;
+	Wed, 25 Sep 2024 11:09:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a3ow9NCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9FE13212A
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 11:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B085154BFE
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 11:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727262610; cv=none; b=F1Rs7Ev+hPu6yDcceOj6J46z/AW7xUlRPnNWwdSQAi+4KCEGdM24VuphTnhPlW4WdlCXIaMQ8CUCkF0SV01fJPb8C4z7fjuIR2Ky6Gsp+BW4F6Cb3LfjEjjkdueSwzz4HbOvDcvaxGFLdAtTeVBLoTePRa8eQtqW0GynpzbcDQk=
+	t=1727262597; cv=none; b=Prwh1XbD/xCwDA0/jjMWIEieJ6WgoEDEnU8EYOP7wc+bKkgSi8zunjbIUUGCMw7+3Dp6oNPiTt8BqcIeD9QAhPXB4lMpZGGejUIXw+YI2BOaZykuo34t7dVFB28qAQavU/KdSuHhwQJY6soo6W4CP6idy7i4XHqtVHq57PRh1/A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727262610; c=relaxed/simple;
-	bh=fJk2zjrxTxlUEqwavBdpWd+Dykc8cDQFojaLS+hA+ZE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2s8mPVfy9rB680MMf6dvurXiCWDBP5iAZ8yzOWwJ5mnQHO+nz8YXWb9L/LHWMhpnXWLNRyPiEJqmrsRnU36ChLhtMGnh1EaHgwUkFwhKpdWrAITkuQS/H5jgRdcfmC6O3tStRXonmJSMDcow2gdtwvdYqidu+VG70YWb4Vrs3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-359-ytwXiWDXNqSUweQjYaaLlw-1; Wed,
- 25 Sep 2024 07:08:56 -0400
-X-MC-Unique: ytwXiWDXNqSUweQjYaaLlw-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (unknown [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1B83819772D7;
-	Wed, 25 Sep 2024 11:08:55 +0000 (UTC)
-Received: from hog (unknown [10.39.192.29])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 486C030001A4;
-	Wed, 25 Sep 2024 11:08:50 +0000 (UTC)
-Date: Wed, 25 Sep 2024 13:08:48 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: steffen.klassert@secunet.com, pabeni@redhat.com,
-	syzbot <syzbot+cc39f136925517aed571@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, herbert@gondor.apana.org.au,
-	kuba@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] UBSAN: shift-out-of-bounds in
- xfrm_selector_match (2)
-Message-ID: <ZvPvQMDvWRygp4IC@hog>
-References: <00000000000088906d0622445beb@google.com>
- <66f33458.050a0220.457fc.001e.GAE@google.com>
+	s=arc-20240116; t=1727262597; c=relaxed/simple;
+	bh=xtxsvm8uRDT0k+Fdso/owoT8wFfjLj3xm055kPKyiKk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Gbnr+ozoFyGvfxE075AL4E6PD6zPw8DPMpNmuVqlMjW/DF91UnPebex2+d95KDnxFNnKjynsG1UMMf9ly+Mr6W0kj7AcA96HsZORiPixxhESR7K2iVgHX5L+gIZwg1ZkhLRwnKAYnkBPyMQ0VkptPycJpRCl6vxVTHFjrcmIz3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a3ow9NCj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727262595;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=GYARqqH/zIw2gIrAZ+tTLBZyNzYt/nqsl4mA84ZpEqE=;
+	b=a3ow9NCjxICxby1QpdwZaMQH0cafnWgeyxlwQVMCc7jPuk2CFY2P+XF4vVmKdyXnTuL6GI
+	njHHrpik0/JLpHZcxbr9zhGDGfEHuovG38tONVWvMN+0xsi533RxeSQq/NljBG0pgd+Lp3
+	v14Vcs+/iFFTtaijU/f+VvWcdNA8LPQ=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-217-vVmpHNbbPuSb2G0EZufwsQ-1; Wed, 25 Sep 2024 07:09:54 -0400
+X-MC-Unique: vVmpHNbbPuSb2G0EZufwsQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37ccc188d6aso162183f8f.2
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 04:09:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727262593; x=1727867393;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GYARqqH/zIw2gIrAZ+tTLBZyNzYt/nqsl4mA84ZpEqE=;
+        b=i0+RSiqYcrKh1EpdJTDJ6XFK/KWaX4Pc+WwLJTCK4AdbS838jFgJomFi3nlp16Sl5T
+         pUgypJcTY+IvtGzLvcX0HgQ92G0K0Qw+EGE3mhAKuG2LqZLfCa1dV9LwNIpm811OALKc
+         Q+qWfNP7z3Zn/kXEFQDDaNIicOw721i5U36lwRT7zApN6fQTWZMHQIADvW8JBQlOJF2e
+         es+OyJ6jsARxhB/jritZKSj9QtCTDuSGp/lWPAV4nU6sZZfCd9NFrJH7CG8pYeYuKw3S
+         RMZEGeDNlnSPcfBf5Dpke81DvAwbZnmzIhsjLsHwU8aZDsBdtJGtDzpwyQ6nu5LTlotz
+         npfw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSZVZI0oPMzRnHbmtv+Mxmvh29obZRLcAppCquXdECJAR6WYedm9+Kh4Vyfo10wLej1TW9nTM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweLLzOm3xmV7IPzNi6K+NPpG6wPnEQZI5xwvrpL8gOhwG9xDh0
+	ZaHBy3IDbYJ/fS5pOkEaIaLFjtundfzi4v4DH4oUsNyD5+m6v5ek8SUca29FEQy8PftsbcH3rno
+	UHwYM3AbLiIbcZ+H8HUVjv7XbQoQucW3Q8hjmd8gfjgfVjvYbbySxlg==
+X-Received: by 2002:a05:6000:18c9:b0:374:c3e4:d6b1 with SMTP id ffacd0b85a97d-37cc24b25b5mr1902407f8f.44.1727262592657;
+        Wed, 25 Sep 2024 04:09:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFVT6hBQDAGQX3+vy1AsamAzh0r2GQEW+rZO8mUVTLUvy6RGX+GkdPmK+Lzdj53mjsxARrWvA==
+X-Received: by 2002:a05:6000:18c9:b0:374:c3e4:d6b1 with SMTP id ffacd0b85a97d-37cc24b25b5mr1902383f8f.44.1727262592214;
+        Wed, 25 Sep 2024 04:09:52 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:7405:9900:56a3:401a:f419:5de9])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42e96a07e69sm14908845e9.21.2024.09.25.04.09.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2024 04:09:51 -0700 (PDT)
+Date: Wed, 25 Sep 2024 07:09:49 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	david@redhat.com, dtatulea@nvidia.com, eperezma@redhat.com,
+	jasowang@redhat.com, leiyang@redhat.com, leonro@nvidia.com,
+	lihongbo22@huawei.com, luigi.leonardi@outlook.com, lulu@redhat.com,
+	marco.pinn95@gmail.com, mgurtovoy@nvidia.com, mst@redhat.com,
+	pankaj.gupta.linux@gmail.com, philipchen@chromium.org,
+	pizhenwei@bytedance.com, sgarzare@redhat.com, yuehaibing@huawei.com,
+	zhujun2@cmss.chinamobile.com
+Subject: [GIT PULL v2] virtio: features, fixes, cleanups
+Message-ID: <20240925070949-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <66f33458.050a0220.457fc.001e.GAE@google.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-Mutt-Fcc: =sent
 
-2024-09-24, 14:51:20 -0700, syzbot wrote:
-> syzbot has found a reproducer for the following issue on:
-> 
-> HEAD commit:    151ac45348af net: sparx5: Fix invalid timestamps
-> git tree:       net-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=15808a80580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=37c006d80708398d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=cc39f136925517aed571
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=122ad2a9980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1387b107980000
+Changes from v1:
+	add a missing ack, removing an empty commit that I used to
+	record it.  no code changes.
 
-syzbot managed to create an SA with:
+The following changes since commit 431c1646e1f86b949fa3685efc50b660a364c2b6:
 
-usersa.sel.family = 0
-usersa.sel.prefixlen_s = 128
-usersa.family = AF_INET
+  Linux 6.11-rc6 (2024-09-01 19:46:02 +1200)
 
-Because of the AF_UNSPEC selector, verify_newsa_info doesn't put
-limits on prefixlen_{s,d}. But then copy_from_user_state sets
-x->sel.family to usersa.family (AF_INET).
+are available in the Git repository at:
 
-So I think verify_newsa_info should do the same conversion before
-checking prefixlen:
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
+for you to fetch changes up to efcd71af38be403fa52223092f79ada446e121ba:
 
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 55f039ec3d59..8d06a37adbd9 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -201,6 +201,7 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- {
- 	int err;
- 	u8 sa_dir = attrs[XFRMA_SA_DIR] ? nla_get_u8(attrs[XFRMA_SA_DIR]) : 0;
-+	u16 family = p->sel.family;
- 
- 	err = -EINVAL;
- 	switch (p->family) {
-@@ -221,7 +222,10 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- 		goto out;
- 	}
- 
--	switch (p->sel.family) {
-+	if (!family && !(p->flags & XFRM_STATE_AF_UNSPEC))
-+		family = p->family;
-+
-+	switch (family) {
- 	case AF_UNSPEC:
- 		break;
- 
+  vsock/virtio: avoid queuing packets when intermediate queue is empty (2024-09-25 07:07:44 -0400)
 
+----------------------------------------------------------------
+virtio: features, fixes, cleanups
 
-Steffen, does that make sense?
+Several new features here:
 
+	virtio-balloon supports new stats
 
-Without this, we have prefixlen=128 when we get to addr4_match, which
-does a shift of (32 - prefixlen), so we get
+	vdpa supports setting mac address
 
-UBSAN: shift-out-of-bounds in ./include/net/xfrm.h:900:23
-shift exponent -96 is negative
+	vdpa/mlx5 suspend/resume as well as MKEY ops are now faster
 
+	virtio_fs supports new sysfs entries for queue info
 
-Maybe a check for prefixlen < 128 would also be useful in the
-XFRM_STATE_AF_UNSPEC case, to avoid the same problems with syzbot
-passing prefixlen=200 for an ipv6 SA. I don't know how
-XFRM_STATE_AF_UNSPEC is used, so I'm not sure what restrictions we can
-put. If we end up with prefixlen = 100 used from ipv4 we'll still have
-the same issues.
+	virtio/vsock performance has been improved
 
+Fixes, cleanups all over the place.
 
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
->  __ip4_datagram_connect+0x96c/0x1260 net/ipv4/datagram.c:49
->  __ip6_datagram_connect+0x194/0x1230
->  ip6_datagram_connect net/ipv6/datagram.c:279 [inline]
->  ip6_datagram_connect_v6_only+0x63/0xa0 net/ipv6/datagram.c:291
+----------------------------------------------------------------
+Cindy Lu (3):
+      vdpa: support set mac address from vdpa tool
+      vdpa_sim_net: Add the support of set mac address
+      vdpa/mlx5: Add the support of set mac address
 
-This path also looks a bit dubious. From the reproducer, we have a
-rawv6 socket trying to connect to a v4mapped address, despite having
-ip6_datagram_connect_v6_only as its ->connect.
+Dragos Tatulea (18):
+      vdpa/mlx5: Fix invalid mr resource destroy
+      net/mlx5: Support throttled commands from async API
+      vdpa/mlx5: Introduce error logging function
+      vdpa/mlx5: Introduce async fw command wrapper
+      vdpa/mlx5: Use async API for vq query command
+      vdpa/mlx5: Use async API for vq modify commands
+      vdpa/mlx5: Parallelize device suspend
+      vdpa/mlx5: Parallelize device resume
+      vdpa/mlx5: Keep notifiers during suspend but ignore
+      vdpa/mlx5: Small improvement for change_num_qps()
+      vdpa/mlx5: Parallelize VQ suspend/resume for CVQ MQ command
+      vdpa/mlx5: Create direct MKEYs in parallel
+      vdpa/mlx5: Delete direct MKEYs in parallel
+      vdpa/mlx5: Rename function
+      vdpa/mlx5: Extract mr members in own resource struct
+      vdpa/mlx5: Rename mr_mtx -> lock
+      vdpa/mlx5: Introduce init/destroy for MR resources
+      vdpa/mlx5: Postpone MR deletion
 
-pingv6 sockets also use ip6_datagram_connect_v6_only and set
-sk->sk_ipv6only=1 (in net/ipv4/ping.c ping_init_sock), but rawv6 don't
-have this, so __ip6_datagram_connect can end up in
-__ip4_datagram_connect. I guess it would make sense to set it in rawv6
-too. rawv6_bind already rejected v4mapped addresses.
+Hongbo Li (1):
+      fw_cfg: Constify struct kobj_type
 
-And then we could add a DEBUG_NET_WARN_ON_ONCE(!ipv6_only_sock(sk)) in
-ip6_datagram_connect_v6_only, or maybe even call ipv6_addr_type to
-reject v4mapped addresses and reject them like the non-AF_INET6 case.
+Jason Wang (1):
+      vhost_vdpa: assign irq bypass producer token correctly
 
--- 
-Sabrina
+Luigi Leonardi (1):
+      vsock/virtio: avoid queuing packets when intermediate queue is empty
+
+Marco Pinna (1):
+      vsock/virtio: refactor virtio_transport_send_pkt_work
+
+Max Gurtovoy (2):
+      virtio_fs: introduce virtio_fs_put_locked helper
+      virtio_fs: add sysfs entries for queue information
+
+Philip Chen (1):
+      virtio_pmem: Check device status before requesting flush
+
+Stefano Garzarella (1):
+      MAINTAINERS: add virtio-vsock driver in the VIRTIO CORE section
+
+Yue Haibing (1):
+      vdpa: Remove unused declarations
+
+Zhu Jun (1):
+      tools/virtio:Fix the wrong format specifier
+
+zhenwei pi (3):
+      virtio_balloon: introduce oom-kill invocations
+      virtio_balloon: introduce memory allocation stall counter
+      virtio_balloon: introduce memory scan/reclaim info
+
+ MAINTAINERS                                   |   1 +
+ drivers/firmware/qemu_fw_cfg.c                |   2 +-
+ drivers/net/ethernet/mellanox/mlx5/core/cmd.c |  21 +-
+ drivers/nvdimm/nd_virtio.c                    |   9 +
+ drivers/vdpa/ifcvf/ifcvf_base.h               |   3 -
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h            |  47 ++-
+ drivers/vdpa/mlx5/core/mr.c                   | 291 +++++++++++++---
+ drivers/vdpa/mlx5/core/resources.c            |  76 +++-
+ drivers/vdpa/mlx5/net/mlx5_vnet.c             | 477 +++++++++++++++++---------
+ drivers/vdpa/pds/cmds.h                       |   1 -
+ drivers/vdpa/vdpa.c                           |  79 +++++
+ drivers/vdpa/vdpa_sim/vdpa_sim_net.c          |  21 +-
+ drivers/vhost/vdpa.c                          |  16 +-
+ drivers/virtio/virtio_balloon.c               |  18 +
+ fs/fuse/virtio_fs.c                           | 164 ++++++++-
+ include/linux/vdpa.h                          |   9 +
+ include/uapi/linux/vdpa.h                     |   1 +
+ include/uapi/linux/virtio_balloon.h           |  16 +-
+ net/vmw_vsock/virtio_transport.c              | 144 +++++---
+ tools/virtio/ringtest/main.c                  |   2 +-
+ 20 files changed, 1098 insertions(+), 300 deletions(-)
 
 
