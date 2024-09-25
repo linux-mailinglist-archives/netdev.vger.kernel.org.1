@@ -1,359 +1,222 @@
-Return-Path: <netdev+bounces-129676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CECC9985771
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:57:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6460985797
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:06:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 483D8B23273
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 10:57:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0729282211
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:06:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ECFE15F330;
-	Wed, 25 Sep 2024 10:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235341494DC;
+	Wed, 25 Sep 2024 11:05:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b="CZlFWW9c"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DVcm2MKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2054.outbound.protection.outlook.com [40.107.117.54])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1969E15C158;
-	Wed, 25 Sep 2024 10:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727261849; cv=fail; b=jBPgRcM+KSsBlGJsPP3ssr3/+3+atx3OTTqpumWnhHru9W7070BfGGAP0DJN8kOyfA2ivcFCTZMLsAfNCL+TjrZFHZXRzyfAPh4IRiPFq1K1JCqqJKK8jY+f9egb90zmEXzk1JIp9ipcxMj+UbK3PK1azQA7LiQGD9X3StzJX5w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727261849; c=relaxed/simple;
-	bh=IJ84u6xNFKZiOvNHOeFjQQhAMWfuhQHvGLhBQsxHO8s=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=D+Y369RAOMSRkQNOpmjRDrCXHkEHjcw7nEPu9rQmNbu/BtHaRbcO1dnSVSdaOSjCelbIxtvGG+doghj5uNpOOuEKZWerv3wVeB5kjBskNs8u3+4tPiY3EagQjxDPx3TS/ZkbX7Kby6xlRzEa10SBvwb4HhqeIrokzGZ6GENRNKs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com; spf=pass smtp.mailfrom=vivo.com; dkim=pass (2048-bit key) header.d=vivo.com header.i=@vivo.com header.b=CZlFWW9c; arc=fail smtp.client-ip=40.107.117.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=vivo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=vivo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LiHmqMdCtR7faUHuaC+Njk7CdjOnylk6vuz/Cv7X1XJtNN6A5bAwUqw99+3zZ2Ti8wCB0CQKw1DN/ubZ9RuN+pXZb4siATmrRrcFu9J/cGHSCYaZbVBHN/f94QrEczB4cbIrnhHcI1fWecdMm4aqlWZEV6bJOkR9YrvMTKtz15tswewXTuQeX4sNemHOMVm/0QZfUSxpWr6AStA82XYgVHYa9o4Wvfi+Aqcb5B43SNZXQ6JZd6dRJkDGR1GxK58zbvQoEbS4kwPlasbyQwxy+R96pxm1fkacE2C1uA7rIN4g51RrEEeQtiADXFSwUgyPDwTfdfXO2sxl3aVkd61mFA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sQ93D4gSsYZ7FybN+rOQpx+5LqEsFiK+yNeN9eqht14=;
- b=dG9mKvsJyIx2shG1em2YjVu7a1LYWtbq2OVthUXqQPgCvPLqodRys+GZVkuUFmShgcEckbDr1jCr6tqCT/OUrp5NC9jtf+Nwu+YXg8PfWdR9Giu3JyTm/VK4SQvI8zx0SDG5QI74VoTxmPJQ8u+foV3lZzEUdKAf9WivA1r3G4euoqaOskjX6s4k1mo8WRSVHSnbH7z4pVt9CSE0tcr6rLVhkdxASQSPyyjCW5JPpA2YchUKzL5blQ08dOgMF3fJKvTVDq3OOElgmb+kVeD+qQWkPdDkFjqianFaRvlUBxZInF53kvt0Stv5xY5afOZ3HKtH31niimQ7XC1Sx7kyEA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sQ93D4gSsYZ7FybN+rOQpx+5LqEsFiK+yNeN9eqht14=;
- b=CZlFWW9c5K/dqbF7B2tdkJT++J9512Bfd5dDLovCURgcU3ASFNB+8Yubpnly+4KQ42R+6i4Ut5BpNjp80pYAQ41R3Dvfwk1nIQ1jVdIbIFRIKyjBrn0n+7B46hZupYjlfaM6ZNRwojZOYtsuQ5OFvXvuLfgayzsdqgAe7zLkedg/HUb9OYlg9Q9zSVP3IcDjsBN3L5dCrguvCaxsb1I0cv/YpBxoJagT6nQVdWUTPStwnodnK5CgZ7iwEzwi1Ot2HThkHDmuvI776czUmlUmLrpCR5jBx9+Rim5TprWcI8YmvloUEIpVy2FOJBfecSfg0N0kUj5rE5c552hnFJOyww==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from KL1PR0601MB4113.apcprd06.prod.outlook.com (2603:1096:820:31::7)
- by TYSPR06MB6900.apcprd06.prod.outlook.com (2603:1096:400:46e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7982.27; Wed, 25 Sep
- 2024 10:57:21 +0000
-Received: from KL1PR0601MB4113.apcprd06.prod.outlook.com
- ([fe80::7e85:dad0:3f7:78a1]) by KL1PR0601MB4113.apcprd06.prod.outlook.com
- ([fe80::7e85:dad0:3f7:78a1%4]) with mapi id 15.20.7982.022; Wed, 25 Sep 2024
- 10:57:21 +0000
-From: Yan Zhen <yanzhen@vivo.com>
-To: 3chas3@gmail.com
-Cc: linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	opensource.kernel@vivo.com,
-	Yan Zhen <yanzhen@vivo.com>
-Subject: [PATCH v1] atm: Fix typo in the comment
-Date: Wed, 25 Sep 2024 18:57:07 +0800
-Message-Id: <20240925105707.3313674-1-yanzhen@vivo.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: TYCP286CA0019.JPNP286.PROD.OUTLOOK.COM
- (2603:1096:400:263::13) To KL1PR0601MB4113.apcprd06.prod.outlook.com
- (2603:1096:820:31::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32584962B
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 11:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1727262353; cv=none; b=uQds1xtolVjxmsv9md3s5/QTJIHT7RhEwg7ho7ry7sSnXPHY9R+xXnS9olO1GvFJQF0fl1zzg0tU6N7oONRZTedxFqyr6aIhPl1BrNauC441NLqKfCq/1uAHVmWTqFH2mvuKysV9sI1P0zT98FDyuCwNaD4m4K+/hFKHeKADNgI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1727262353; c=relaxed/simple;
+	bh=Sqkc7COafVaLxQmdycBqaTIn4GumFYjZAn2h85fxp/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wh7sdWF0TGmQtiMzAKYz1WK3UNQfYiMnGoIDAUHwCbRQrreHqkZguvDEJeGfQFFii6Nk+1UepZ4f+1p7iP9trWCpDZrqjTxWSMMMbIkQC07D/2gxVgxHatHsx+dhZsS8L2CSmnw+H1kxrXKnYuhmz6V2jbLnE3ZjlFBAyPHqpYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DVcm2MKB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1727262349;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6LM+n56GH7KXiVYxjlnpXafBN650KcAqdINciF2Xu3w=;
+	b=DVcm2MKBeu9j+PPgsyUHPuvHXWlIKnU8gxBNpzcxlhj9y8ZR876nlEEvwJ79chQT0Xt12E
+	UZ7gZBC11y5iOfPut/hMhA9MsEjWxjsCvB2K19e1dFCFTjk9gHnROf/n87Kk9yOZuLucZC
+	mbPESShi6JyNftoWvKEBP5YZtdWGUIw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-201-HjXAhv4kOGWWZ1xQpvy_BA-1; Wed, 25 Sep 2024 07:05:48 -0400
+X-MC-Unique: HjXAhv4kOGWWZ1xQpvy_BA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-37ccc21ceb1so90439f8f.2
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 04:05:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727262347; x=1727867147;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6LM+n56GH7KXiVYxjlnpXafBN650KcAqdINciF2Xu3w=;
+        b=V+1oOoEsyZHugciw04rR3Yil51zxhm/5FdRyuQBLbVGscihQXJ5QlD5PvCxayiyvoZ
+         k5UMAsmkI9LB9EUfd22O6NdVOGLwU9CG7Hj2w0NL1DSr2m/3bEv50xfV4P5BHesKktGz
+         H3SAKZEoPGdlOKool6GFoc3GIjvgRmEMDA4DqP+/EmwPglJx7/dgpj3JEBlMA+zB1PNr
+         vyE9CZ8RNqBfXoFqUfvPLuh5CQDwO55Ee9CwwWf9UzhF3q4K9laWBs4eeKW9AwVBJTF5
+         9SO2VV+7NcQwD0jxaM//1e8b4Iy/ZsBeXvwdHHMs/qz9QLmyL/M866rvfpJhwqM77+bU
+         ilyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXAUJLkQs6af7IjsYM+vRYYUkySKMmvrP5UU4TNAGKi8ZSo1+CEo4g/XSt589O+g6fCABMrhQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuZyCOK6goNFI+3Pf6i/0u/lDhuIAk99jXKKExD2+ZfYvOqmkn
+	8y6CmGGJNFKeDOWISzwIm3Ja99uf14IvO4i95miCgsRlNkzt0Upp3SXrLzqzqKNx+qFzgiRQT0z
+	FFRtzDg0+g4UrS6sMiXmGEiZJ72hu92eS5T90X4u/ZUCE55VtjS6PAQ==
+X-Received: by 2002:a5d:5d83:0:b0:37c:cbbb:10c with SMTP id ffacd0b85a97d-37ccbbb02bdmr443653f8f.52.1727262347213;
+        Wed, 25 Sep 2024 04:05:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEyxK9W0yQxQwL6c10VX2K+N65TxtVt2ovya9Ro/obn2l6EIadff65SJpEzepj3XEwoB84y/w==
+X-Received: by 2002:a5d:5d83:0:b0:37c:cbbb:10c with SMTP id ffacd0b85a97d-37ccbbb02bdmr443620f8f.52.1727262346651;
+        Wed, 25 Sep 2024 04:05:46 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:7405:9900:56a3:401a:f419:5de9])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-37cc9d0decesm699449f8f.80.2024.09.25.04.05.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2024 04:05:43 -0700 (PDT)
+Date: Wed, 25 Sep 2024 07:05:40 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	david@redhat.com, dtatulea@nvidia.com, eperezma@redhat.com,
+	jasowang@redhat.com, leiyang@redhat.com, leonro@nvidia.com,
+	lihongbo22@huawei.com, luigi.leonardi@outlook.com, lulu@redhat.com,
+	marco.pinn95@gmail.com, mgurtovoy@nvidia.com,
+	pankaj.gupta.linux@gmail.com, philipchen@chromium.org,
+	pizhenwei@bytedance.com, sgarzare@redhat.com, yuehaibing@huawei.com,
+	zhujun2@cmss.chinamobile.com
+Subject: Re: [GIT PULL] virtio: features, fixes, cleanups
+Message-ID: <20240925070508-mutt-send-email-mst@kernel.org>
+References: <20240924165046-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: KL1PR0601MB4113:EE_|TYSPR06MB6900:EE_
-X-MS-Office365-Filtering-Correlation-Id: 349575d6-df12-4f3e-65ee-08dcdd50d3f0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|52116014|1800799024|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?k1Ma0bzOh0AbrwsEl41/MpGMxbWynkZCkq0Elb6gkynLZDUEjIT3OKBzkdUb?=
- =?us-ascii?Q?ND/Sp72JfqZMgVf/lVk1Q9l39RlhqRNNo+i8KNYLet1ecbk7kZgrCzDAjI7f?=
- =?us-ascii?Q?+gQDJPoxmkqTbjS3duxuB133aaerR3vXeXP0dc8h9TRYs2uOfGBeRwurKXDp?=
- =?us-ascii?Q?2AG5+eFoKxL7GtaOP3S8o6xfUFLTIhncBw7n7z7XcaFLzfQ2f2D2KEoAyYUZ?=
- =?us-ascii?Q?uiw413z4nfnLJzxHgKFNOe0x1qcqh9nMT3WGbZEHmPM9D1u1ssnbIocB4wlL?=
- =?us-ascii?Q?73n0ZZtevMeNDGOykKQUtosiBvJCX53j/KC0cj7IgWcoFLo8znOgLgbtvtm9?=
- =?us-ascii?Q?AlRnc/NEIasiooiZm2fQbrLBi9piMIAFsXaT7ZJjaS8AvAdHjW1eKCA5l84P?=
- =?us-ascii?Q?R5MDgul/LpcCodRZRGmr3aYd3nCY0rDRnVsGzWyhYScbfLImQr2uI2dG9iSe?=
- =?us-ascii?Q?R8zUgR7MjlxMqHYSLIYp7uw6hGaXPXKNNT9FpExKNesh6MXzLcNjYHMYVhDC?=
- =?us-ascii?Q?5QWfaO0YB0F8EKq0o9FpkzzCnyjpHjH0OzuB6JhdJO1I2EUhxE0YeNvTt82T?=
- =?us-ascii?Q?opeP4vOVAdPflnySt5NQgCyYEi1PpcjJearT1X2c+ONHQkH8sOJRG6lD+aZI?=
- =?us-ascii?Q?YQAN/HXnJQQFQ+Bjcx0qXLqfnmyESilrkYm9Vj+Lu0xPlUta3rwFoxlrlZcE?=
- =?us-ascii?Q?Ph+avltgmWmzmGIpKR0PsNrkIX21tTR8aN92x/mjtCBx1zmlv5t2T4BnMO4c?=
- =?us-ascii?Q?hNyyc+GkF8x0hNnJcMUu8niT//MrlrG1f6rRwMgQxTehfBNLD0+olVQzhYcR?=
- =?us-ascii?Q?0LPzxwlUbmmqhHeGZklwWm5qOYArs6XpDPoPJL/6DRXSxMam90kdsQdEqzid?=
- =?us-ascii?Q?9I3jMnILCa+hDgYyEGTneWZG5NHSf5hanxuR7P3x0RBCKcldUf8VUFnGwZwm?=
- =?us-ascii?Q?ios9BHK6rKHTJx1a66xC2d5ukPZJc2RFFASUYLr2uC/YTOJwdURHUf1LKJmN?=
- =?us-ascii?Q?+vs+MuOFdZgNMYWBgy3+9Guo0bW0HXb4iLCzRNSLhbKj13TOdi9TXNCvm9uF?=
- =?us-ascii?Q?5cWevP4eaW3gI5UxISxj2jD3NX58AD6AfzX0e1WOfW0NUBePPiX3ZL3BQEST?=
- =?us-ascii?Q?joqjENcat9LoJS33B490pJEu3pgnR3xuNAu8oAwfR2pGW0Ggi6/bytzJrSC1?=
- =?us-ascii?Q?Ilj28GVwi66uKoomm7qfj+zVLD/9WYLsGoE8innSltrRT7qKLNZgAacUc6Hk?=
- =?us-ascii?Q?bU1VvSgs2S/Xeul2MjyQlruqaTgc/Db4sCuTmLdzGFW+BS3mXRapUbbR7A4L?=
- =?us-ascii?Q?0pMybOfC/wKDFFysDSzMpIX9g2CD0i2zrjclpmBfcZlEEiL8HZGkSfq/zBTr?=
- =?us-ascii?Q?ZvuYm8E=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR0601MB4113.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(52116014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?hBj+pk/eaFk92k6b2SgJFDX7YHR0VIDZkmMd+xl2iCXdymvX66piBG2KmTkf?=
- =?us-ascii?Q?hvEt1CL1n1fuB/LIx3oUWgYwHn8GDr8H6dhIgWWI+YzCRjyPvoeKa8KxX4Kn?=
- =?us-ascii?Q?YVrg98CHcg9xLMjXek89vu+ug5IZRZREGZhZyNX2RcAc0oHDqGoUbWVQiocX?=
- =?us-ascii?Q?qdIubntb95uU77mxxhhfbFr9Zuhl3bCDCX5mLhXdIH0LnoHkAnfILSndC8dM?=
- =?us-ascii?Q?u6o7oI2Lb3vCxH58238flnTY4t/dGMRfeiUQmuVi2lmPhpglzu0pl6LeeE5x?=
- =?us-ascii?Q?cp7EFoTWM0D4NSpt+EmLzEjw2rX3UNMi/W4THtn+USLLlPZ5ZhPj/raYNyqt?=
- =?us-ascii?Q?+iOaXRTZVvWME45OyeTkMn5UumQ+9qiLg+DxbLMrYq7PKiKqD25b8CpKirNi?=
- =?us-ascii?Q?Nu9k6zIs4Txun45nXLqCvPx6j1WmLvHeLUThMgmCKB3+bFvsqjLPGqnv06AT?=
- =?us-ascii?Q?69BYLzZfJ7u/az5YEqL+SAEgBSzOoUnDVJTkKMR4I2Hxpez3jX+5tUoFgvmz?=
- =?us-ascii?Q?v5HOtLuMrSOJJjRNaYm1H25JDMWl7T/jW8FjQUP4kt80VgNuOACaA4qEc5+d?=
- =?us-ascii?Q?82gKrGa77b7+zzDY0nQzsi9SfnTSlZkrUQxjPy3sQgfnmh7A2Z7E+THYzdM5?=
- =?us-ascii?Q?6rH9PgzXjvYQIlGzPA+a87pEXrgDXl+vEUTzK+mORVC9koIPKgr5mVyZWYB2?=
- =?us-ascii?Q?G6sJbhyrh3kfILLWS9CmCAS7GtXeGR4P/eL0roN234F1k3iqJizdnxdGZa4u?=
- =?us-ascii?Q?zhdaE/spKBEzRRVf5kgmnJK6/JBWsZ5cSujdrKtfwzrZ7EP9eHPY9wdr7APQ?=
- =?us-ascii?Q?1aIfPo6BnyieV7VNAFegktbFvbtdL5bjI0UUcxH3Gqrn8ZIaJ2OnDo5IscQj?=
- =?us-ascii?Q?qy1Eq9qOSFrqMP+U9NMyZ4B1BVtLKz8X23FiwLVVzVCr1CaC6ER7pw/SjShl?=
- =?us-ascii?Q?fpHTkSIcY4RF14Z4QbcMBkxDtPBpS83xManpUNyP72l+LHW9E3rAz4N4p2mg?=
- =?us-ascii?Q?KgIz+foDk4GevZgeYq/V3tx8f2nAaqp4jqsh3Q/I/T3FgT8DUWkk5Owun3oz?=
- =?us-ascii?Q?P3RVUlU4fXfCVpiqUPO2hJxFHVzJM6PYoth1xqGMhCpwTzaoshIBmCL1PQe8?=
- =?us-ascii?Q?sZ+bsR6UJ5Tg+QvS8eldBa+x5xOBRO7U/AN9JheXv7pQuZCTbgPr4S/93kYT?=
- =?us-ascii?Q?5yqbCn1wd5aE8VXGI9Onpu/mYd+Kzrb5N5VHQUe7SCNwf+vNMF9/7DA8sJFr?=
- =?us-ascii?Q?QmJ0wWClMmcxmtj2AuI2ultfpOsGD3ULUwo9DKEtKPC1DvZLhEuPsABKioB5?=
- =?us-ascii?Q?srx1WZFiH7I0hnIHpd/g/D9kUfYns/48DKCrxn7/csUhOm2AbAvPWCSjluWu?=
- =?us-ascii?Q?iHGoEJhT1lYYksj0sVpSd7tIDF04GjZVRtBw3UoIgghDnVVB9U8lbXTBNB02?=
- =?us-ascii?Q?SrtFo1lBUwZvjNul39rtnDv/CsQysR2sAEFZuNLJI7dAmbqUxNieawadotg+?=
- =?us-ascii?Q?LrDOXiSADqnAzg9UQvxE+sJtBoHOUTIJ3GAbhfLd1MY/58blEkg1tMfHAfew?=
- =?us-ascii?Q?XBarZCo+6bOyCPcf0ZFOeA86kN0jOiNAlmmfHJHB?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 349575d6-df12-4f3e-65ee-08dcdd50d3f0
-X-MS-Exchange-CrossTenant-AuthSource: KL1PR0601MB4113.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Sep 2024 10:57:21.2842
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HhAZIEN5X2TveYyKm2zwVU3dMHV4GOyZiGWoUZzqRXFkF/zIiH41fItceykxsCw7mEniWsv5yI2yFQTSz8Fq0w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR06MB6900
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240924165046-mutt-send-email-mst@kernel.org>
 
-Correctly spelled comments make it easier for the reader to understand
-the code.
+On Tue, Sep 24, 2024 at 04:50:46PM -0400, Michael S. Tsirkin wrote:
+> The following changes since commit 431c1646e1f86b949fa3685efc50b660a364c2b6:
+> 
+>   Linux 6.11-rc6 (2024-09-01 19:46:02 +1200)
+> 
+> are available in the Git repository at:
+> 
+>   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> 
+> for you to fetch changes up to 1bc6f4910ae955971097f3f2ae0e7e63fa4250ae:
+> 
+>   vsock/virtio: avoid queuing packets when intermediate queue is empty (2024-09-12 02:54:10 -0400)
 
-Fix typos:
-'behing' ==> 'being',
-'useable' ==> 'usable',
-'arry' ==> 'array',
-'receieve' ==> 'receive',
-'desriptor' ==> 'descriptor',
-'varients' ==> 'variants',
-'recevie' ==> 'receive',
-'Decriptor' ==> 'Descriptor',
-'Lable' ==> 'Label',
-'transmiting' ==> 'transmitting',
-'correspondance' ==> 'correspondence',
-'claculation' ==> 'calculation',
-'everone' ==> 'everyone',
-'contruct' ==> 'construct'.
+Ouch. Pls ignore, will fix and resend.
+
+> ----------------------------------------------------------------
+> virtio: features, fixes, cleanups
+> 
+> Several new features here:
+> 
+> 	virtio-balloon supports new stats
+> 
+> 	vdpa supports setting mac address
+> 
+> 	vdpa/mlx5 suspend/resume as well as MKEY ops are now faster
+> 
+> 	virtio_fs supports new sysfs entries for queue info
+> 
+> 	virtio/vsock performance has been improved
+> 
+> Fixes, cleanups all over the place.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> ----------------------------------------------------------------
+> Cindy Lu (3):
+>       vdpa: support set mac address from vdpa tool
+>       vdpa_sim_net: Add the support of set mac address
+>       vdpa/mlx5: Add the support of set mac address
+> 
+> Dragos Tatulea (18):
+>       vdpa/mlx5: Fix invalid mr resource destroy
+>       net/mlx5: Support throttled commands from async API
+>       vdpa/mlx5: Introduce error logging function
+>       vdpa/mlx5: Introduce async fw command wrapper
+>       vdpa/mlx5: Use async API for vq query command
+>       vdpa/mlx5: Use async API for vq modify commands
+>       vdpa/mlx5: Parallelize device suspend
+>       vdpa/mlx5: Parallelize device resume
+>       vdpa/mlx5: Keep notifiers during suspend but ignore
+>       vdpa/mlx5: Small improvement for change_num_qps()
+>       vdpa/mlx5: Parallelize VQ suspend/resume for CVQ MQ command
+>       vdpa/mlx5: Create direct MKEYs in parallel
+>       vdpa/mlx5: Delete direct MKEYs in parallel
+>       vdpa/mlx5: Rename function
+>       vdpa/mlx5: Extract mr members in own resource struct
+>       vdpa/mlx5: Rename mr_mtx -> lock
+>       vdpa/mlx5: Introduce init/destroy for MR resources
+>       vdpa/mlx5: Postpone MR deletion
+> 
+> Hongbo Li (1):
+>       fw_cfg: Constify struct kobj_type
+> 
+> Jason Wang (1):
+>       vhost_vdpa: assign irq bypass producer token correctly
+> 
+> Lei Yang leiyang@redhat.com (1):
+>       ack! vdpa/mlx5: Parallelize device suspend/resume
 
 
-Signed-off-by: Yan Zhen <yanzhen@vivo.com>
----
- drivers/atm/fore200e.c |  2 +-
- drivers/atm/fore200e.h |  4 ++--
- drivers/atm/he.h       |  2 +-
- drivers/atm/idt77252.h |  4 ++--
- drivers/atm/iphase.c   |  4 ++--
- drivers/atm/iphase.h   |  4 ++--
- drivers/atm/lanai.c    | 10 +++++-----
- drivers/atm/nicstar.h  |  2 +-
- 8 files changed, 16 insertions(+), 16 deletions(-)
+Ouch. Pls ignore, will fix and resend.
 
-diff --git a/drivers/atm/fore200e.c b/drivers/atm/fore200e.c
-index cb00f8244e41..fa60a68cbf49 100644
---- a/drivers/atm/fore200e.c
-+++ b/drivers/atm/fore200e.c
-@@ -152,7 +152,7 @@ fore200e_irq_itoa(int irq)
- }
- 
- 
--/* allocate and align a chunk of memory intended to hold the data behing exchanged
-+/* allocate and align a chunk of memory intended to hold the data being exchanged
-    between the driver and the adapter (using streaming DVMA) */
- 
- static int
-diff --git a/drivers/atm/fore200e.h b/drivers/atm/fore200e.h
-index 5d95fe9fd836..8be31fe38ff7 100644
---- a/drivers/atm/fore200e.h
-+++ b/drivers/atm/fore200e.h
-@@ -570,7 +570,7 @@ typedef struct chunk {
-     u32   align_size;    /* length of aligned chunk         */
- } chunk_t;
- 
--#define dma_size align_size             /* DMA useable size */
-+#define dma_size align_size             /* DMA usable size */
- 
- 
- /* host resident receive buffer */
-@@ -612,7 +612,7 @@ typedef struct host_txq {
-     int                   head;                           /* head of tx queue                       */
-     int                   tail;                           /* tail of tx queue                       */
-     struct chunk          tpd;                            /* array of tpds                          */
--    struct chunk          status;                         /* arry of completion status              */
-+    struct chunk          status;                         /* array of completion status             */
-     int                   txing;                          /* number of pending PDUs in tx queue     */
- } host_txq_t;
- 
-diff --git a/drivers/atm/he.h b/drivers/atm/he.h
-index f3f53674ef3f..ee6bd0704b38 100644
---- a/drivers/atm/he.h
-+++ b/drivers/atm/he.h
-@@ -788,7 +788,7 @@ struct he_vcc
- #define TSR14_DELETE		(1<<31)
- #define TSR14_ABR_CLOSE		(1<<16)
- 
--/* 2.7.1 per connection receieve state registers */
-+/* 2.7.1 per connection receive state registers */
- 
- #define RSR0_START_PDU	(1<<10)
- #define RSR0_OPEN_CONN	(1<<6)
-diff --git a/drivers/atm/idt77252.h b/drivers/atm/idt77252.h
-index b059d31364dd..2b42561b6fbc 100644
---- a/drivers/atm/idt77252.h
-+++ b/drivers/atm/idt77252.h
-@@ -349,8 +349,8 @@ struct idt77252_dev
-         struct tsq_info		tsq;		/* Transmit Status Queue */
-         struct rsq_info		rsq;		/* Receive Status Queue */
- 
--	struct pci_dev		*pcidev;	/* PCI handle (desriptor) */
--	struct atm_dev		*atmdev;	/* ATM device desriptor */
-+	struct pci_dev		*pcidev;	/* PCI handle (descriptor) */
-+	struct atm_dev		*atmdev;	/* ATM device descriptor */
- 
- 	void __iomem		*membase;	/* SAR's memory base address */
- 	unsigned long		srambase;	/* SAR's sram  base address */
-diff --git a/drivers/atm/iphase.c b/drivers/atm/iphase.c
-index d213adcefe33..198a75a012d4 100644
---- a/drivers/atm/iphase.c
-+++ b/drivers/atm/iphase.c
-@@ -18,7 +18,7 @@
-       
-       Modified from an incomplete driver for Interphase 5575 1KVC 1M card which 
-       was originally written by Monalisa Agrawal at UNH. Now this driver 
--      supports a variety of varients of Interphase ATM PCI (i)Chip adapter 
-+      supports a variety of variants of Interphase ATM PCI (i)Chip adapter
-       card family (See www.iphase.com/products/ClassSheet.cfm?ClassID=ATM) 
-       in terms of PHY type, the size of control memory and the size of 
-       packet memory. The following are the change log and history:
-@@ -1284,7 +1284,7 @@ static void rx_dle_intr(struct atm_dev *dev)
-  
-   /* free all the dles done, that is just update our own dle read pointer   
- 	- do we really need to do this. Think not. */  
--  /* DMA is done, just get all the recevie buffers from the rx dma queue 
-+  /* DMA is done, just get all the receive buffers from the rx dma queue
- 	and push them up to the higher layer protocol. Also free the desc  
- 	associated with the buffer. */  
-   dle = iadev->rx_dle_q.read;  
-diff --git a/drivers/atm/iphase.h b/drivers/atm/iphase.h
-index 2f5f8875cbd1..aec5d27ed2e6 100644
---- a/drivers/atm/iphase.h
-+++ b/drivers/atm/iphase.h
-@@ -568,7 +568,7 @@ struct rx_buf_desc {
- /* These memory maps are actually offsets from the segmentation and reassembly  RAM base addresses */  
-   
- /* Segmentation Control Memory map */  
--#define TX_DESC_BASE	0x0000	/* Buffer Decriptor Table */ 
-+#define TX_DESC_BASE	0x0000	/* Buffer Descriptor Table */
- #define TX_COMP_Q	0x1000	/* Transmit Complete Queue */  
- #define PKT_RDY_Q	0x1400	/* Packet Ready Queue */  
- #define CBR_SCHED_TABLE	0x1800	/* CBR Table */  
-@@ -934,7 +934,7 @@ enum ia_suni {
- 	SUNI_TPOP_ARB_PRTL	= 0x114, /* TPOP Arbitrary Pointer LSB       */
- 	SUNI_TPOP_ARB_PRTM	= 0x118, /* TPOP Arbitrary Pointer MSB       */
- 	SUNI_TPOP_RESERVED2	= 0x11c, /* TPOP Reserved                    */
--	SUNI_TPOP_PATH_SIG	= 0x120, /* TPOP Path Signal Lable           */
-+	SUNI_TPOP_PATH_SIG	= 0x120, /* TPOP Path Signal Label           */
- 	SUNI_TPOP_PATH_STATUS	= 0x124, /* TPOP Path Status                 */
- 					 /* Reserved (6)                     */
- 	SUNI_RACP_CS		= 0x140, /* RACP Control/Status              */
-diff --git a/drivers/atm/lanai.c b/drivers/atm/lanai.c
-index 32d7aa141d96..1aa6161437b1 100644
---- a/drivers/atm/lanai.c
-+++ b/drivers/atm/lanai.c
-@@ -135,7 +135,7 @@
- /* TODO: make above a module load-time option */
- 
- /*
-- * When allocating an AAL0 transmiting buffer, how many cells should fit.
-+ * When allocating an AAL0 transmitting buffer, how many cells should fit.
-  * Remember we'll end up with a PAGE_SIZE of them anyway, so this isn't
-  * really critical
-  */
-@@ -217,7 +217,7 @@ struct lanai_dev;			/* Forward declaration */
- 
- /*
-  * This is the card-specific per-vcc data.  Note that unlike some other
-- * drivers there is NOT a 1-to-1 correspondance between these and
-+ * drivers there is NOT a 1-to-1 correspondence between these and
-  * atm_vcc's - each one of these represents an actual 2-way vcc, but
-  * an atm_vcc can be 1-way and share with a 1-way vcc in the other
-  * direction.  To make it weirder, there can even be 0-way vccs
-@@ -603,7 +603,7 @@ enum lanai_vcc_offset {
- #define     RXMODE_AAL5		  (2)		/*   AAL5, intr. each PDU */
- #define     RXMODE_AAL5_STREAM	  (3)		/*   AAL5 w/o per-PDU intr */
- 	vcc_rxaddr2		= 0x04,	/* Location2 */
--	vcc_rxcrc1		= 0x08,	/* RX CRC claculation space */
-+	vcc_rxcrc1		= 0x08,	/* RX CRC calculation space */
- 	vcc_rxcrc2		= 0x0C,
- 	vcc_rxwriteptr		= 0x10, /* RX writeptr, plus bits: */
- #define   RXWRITEPTR_LASTEFCI	 (0x00002000)	/* Last PDU had EFCI bit */
-@@ -618,7 +618,7 @@ enum lanai_vcc_offset {
- #define   TXADDR1_SET_SIZE(x) ((x)*0x0000100)	/* size of TX buffer */
- #define   TXADDR1_ABR		 (0x00008000)	/* use ABR (doesn't work) */
- 	vcc_txaddr2		= 0x24,	/* Location2 */
--	vcc_txcrc1		= 0x28,	/* TX CRC claculation space */
-+	vcc_txcrc1		= 0x28,	/* TX CRC calculation space */
- 	vcc_txcrc2		= 0x2C,
- 	vcc_txreadptr		= 0x30, /* TX Readptr, plus bits: */
- #define   TXREADPTR_GET_PTR(x) ((x)&0x01FFF)
-@@ -756,7 +756,7 @@ static void lanai_shutdown_rx_vci(const struct lanai_vcc *lvcc)
-  * Unfortunately the lanai needs us to wait until all the data
-  * drains out of the buffer before we can dealloc it, so this
-  * can take awhile -- up to 370ms for a full 128KB buffer
-- * assuming everone else is quiet.  In theory the time is
-+ * assuming everyone else is quiet.  In theory the time is
-  * boundless if there's a CBR VCC holding things up.
-  */
- static void lanai_shutdown_tx_vci(struct lanai_dev *lanai,
-diff --git a/drivers/atm/nicstar.h b/drivers/atm/nicstar.h
-index 1b7f1dfc1735..f4a703730166 100644
---- a/drivers/atm/nicstar.h
-+++ b/drivers/atm/nicstar.h
-@@ -332,7 +332,7 @@ typedef struct ns_rcte {
- 
- #define NS_RCT_ENTRY_SIZE 4	/* Number of dwords */
- 
--   /* NOTE: We could make macros to contruct the first word of the RCTE,
-+   /* NOTE: We could make macros to construct the first word of the RCTE,
-       but that doesn't seem to make much sense... */
- 
- /*
--- 
-2.34.1
+> 
+> Luigi Leonardi (1):
+>       vsock/virtio: avoid queuing packets when intermediate queue is empty
+> 
+> Marco Pinna (1):
+>       vsock/virtio: refactor virtio_transport_send_pkt_work
+> 
+> Max Gurtovoy (2):
+>       virtio_fs: introduce virtio_fs_put_locked helper
+>       virtio_fs: add sysfs entries for queue information
+> 
+> Philip Chen (1):
+>       virtio_pmem: Check device status before requesting flush
+> 
+> Stefano Garzarella (1):
+>       MAINTAINERS: add virtio-vsock driver in the VIRTIO CORE section
+> 
+> Yue Haibing (1):
+>       vdpa: Remove unused declarations
+> 
+> Zhu Jun (1):
+>       tools/virtio:Fix the wrong format specifier
+> 
+> zhenwei pi (3):
+>       virtio_balloon: introduce oom-kill invocations
+>       virtio_balloon: introduce memory allocation stall counter
+>       virtio_balloon: introduce memory scan/reclaim info
+> 
+>  MAINTAINERS                                   |   1 +
+>  drivers/firmware/qemu_fw_cfg.c                |   2 +-
+>  drivers/net/ethernet/mellanox/mlx5/core/cmd.c |  21 +-
+>  drivers/nvdimm/nd_virtio.c                    |   9 +
+>  drivers/vdpa/ifcvf/ifcvf_base.h               |   3 -
+>  drivers/vdpa/mlx5/core/mlx5_vdpa.h            |  47 ++-
+>  drivers/vdpa/mlx5/core/mr.c                   | 291 +++++++++++++---
+>  drivers/vdpa/mlx5/core/resources.c            |  76 +++-
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c             | 477 +++++++++++++++++---------
+>  drivers/vdpa/pds/cmds.h                       |   1 -
+>  drivers/vdpa/vdpa.c                           |  79 +++++
+>  drivers/vdpa/vdpa_sim/vdpa_sim_net.c          |  21 +-
+>  drivers/vhost/vdpa.c                          |  16 +-
+>  drivers/virtio/virtio_balloon.c               |  18 +
+>  fs/fuse/virtio_fs.c                           | 164 ++++++++-
+>  include/linux/vdpa.h                          |   9 +
+>  include/uapi/linux/vdpa.h                     |   1 +
+>  include/uapi/linux/virtio_balloon.h           |  16 +-
+>  net/vmw_vsock/virtio_transport.c              | 144 +++++---
+>  tools/virtio/ringtest/main.c                  |   2 +-
+>  20 files changed, 1098 insertions(+), 300 deletions(-)
 
 
