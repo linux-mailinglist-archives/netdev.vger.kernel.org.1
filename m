@@ -1,62 +1,61 @@
-Return-Path: <netdev+bounces-129760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C38A985EE2
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:46:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5B9B985F02
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D3D271F22208
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:46:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B2FD1F25487
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E16E2188E7;
-	Wed, 25 Sep 2024 12:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82EF21B07AD;
+	Wed, 25 Sep 2024 12:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FpeAIOfL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dl1ytu/i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1220321891F;
-	Wed, 25 Sep 2024 12:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58EDA1B07A7;
+	Wed, 25 Sep 2024 12:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727266399; cv=none; b=hzkC0F9duUkkH98WUTrFv/9Xbuf/q7HJlOinUna8gdyiRHbVvNbM5gvJgx0CxESkQ6mLAxKm78j0JpdA4Eczd8J9lc04f8mZiFwXHgKtSpGySOGVKk+wkQd28bLxyFjjvFDMqLjfjBVWfcSmjEE1I6vdgvhl6CrYUgF8d1SHEto=
+	t=1727266427; cv=none; b=RnzbpEen4o+zMr2YW9DFiwplcJuDPZNQ3QWSwT4Bn04VNZCQODYjIpamDz/CflLiDnO54IAYpx/BVy2ttk/drsJq7E9Ad+K36wRoA0LAshefRPfgIN/ZqnpcD3/4iHH3ZmuaDFTZpS/CSw371VBVoeVQgDMjpjYaEIXqmvhCvRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727266399; c=relaxed/simple;
-	bh=quONDP1PgDCsYhaL8Fa2b6bc8N4D7K966aocxPuPG9o=;
+	s=arc-20240116; t=1727266427; c=relaxed/simple;
+	bh=bWnVQq/FSskDyqp8JhBvKiekpyhQd+d4A7dAmfZL4I0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bhZYWKVFLcpYc2HE5I17kxWmzWhkSdlTbFacZVkt399omNsXDCHq4OTD6Wv8ibVB0rJ8NFOHZdTnd0GUXCZhSLoX49cZs48oFSAtGX8y98VvyjRrQulP4cgrj+FX1zSnWtEFzTww9sA9vrKR5wd10gShlDnua5qycGLAyEl1hzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FpeAIOfL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D426C4CEC3;
-	Wed, 25 Sep 2024 12:13:16 +0000 (UTC)
+	 MIME-Version; b=IUe9i4d/Z1B2YcobMKkCHSARfb/mCtsfZaKyInUoC0Ai5ug8ek+MXVKc9ICi8efh663l8X2AToO9A4+luFi5yiPbSkoScYgzScETLsm2VMvp/6aWcOSnxRjZHCVMzFISYphYYa8PDXmdlRiqDIAnEyioaEpxJbhYztQS9tVXwpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dl1ytu/i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82918C4CEC3;
+	Wed, 25 Sep 2024 12:13:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727266397;
-	bh=quONDP1PgDCsYhaL8Fa2b6bc8N4D7K966aocxPuPG9o=;
+	s=k20201202; t=1727266425;
+	bh=bWnVQq/FSskDyqp8JhBvKiekpyhQd+d4A7dAmfZL4I0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FpeAIOfLK5PmKRdXaVLo8xM6NcBIHDjeC5NPKR13H4W1dJChqBMtdXTk2KoSFQa9h
-	 2I5Smv2Ag04FZTc1ILTH454zBOZ/4P83WOrZulM7Stp0JbwwyeCGaqgBGi/4PQn6cL
-	 vKzTM4iGJ8gAfhHZ6LrsKqo3Fqqw+cFD9AOTQ0PBpiqGScjM80jfGLmgLfCME+NcNB
-	 QdSlGWBjPGncwspEXAiuMK/woBg9iNOosruWevRJYJKIFi3GHxIz6EwkTEgt5I1tjK
-	 8H22URf+4Z+Lr8Ztj4tuiNe6fmpQh0Y9bjgmb7S5cVAKXcHTFVzO8y5vPGfSnjO62M
-	 NXKaXRZuhBguQ==
+	b=Dl1ytu/i4gSSnpYLZFyHZPLoBnLsxtq4MqTdTmxdDHjgW4i6mN8giZCrNEy4Csi3/
+	 dtjsl0QW/zV0RL5ovJD0213qIaEG+mZOMLwGTWmzJMN9IXUxbZ1ukMyt+cHCDXsIt3
+	 TZpo9DS9gQlF7Ryi1cUhnuvwXrDFACRK6ZJg/au3LKTnVmgke/lQTzu8Y3L9x7ZyRe
+	 FoPERBDpp/+uzLXtqgXONjJcjrNAXtKTHYzOgjmvq03xeFuK+dmayS/URTjK3Cbll9
+	 DelhfoDcaNJId12xZ0f1Jw/qmWWw2CLMcosKEUzYqQjWdjgoYtJt7Hz4dTnyjOZdbC
+	 5b00i/DPYz/Lw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>,
+Cc: Sascha Hauer <s.hauer@pengutronix.de>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
+	borisp@nvidia.com,
+	john.fastabend@gmail.com,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 046/139] wifi: mac80211: fix RCU list iterations
-Date: Wed, 25 Sep 2024 08:07:46 -0400
-Message-ID: <20240925121137.1307574-46-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 054/139] net: tls: wait for async completion on last message
+Date: Wed, 25 Sep 2024 08:07:54 -0400
+Message-ID: <20240925121137.1307574-54-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925121137.1307574-1-sashal@kernel.org>
 References: <20240925121137.1307574-1-sashal@kernel.org>
@@ -71,82 +70,49 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.52
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+From: Sascha Hauer <s.hauer@pengutronix.de>
 
-[ Upstream commit ac35180032fbc5d80b29af00ba4881815ceefcb6 ]
+[ Upstream commit 54001d0f2fdbc7852136a00f3e6fc395a9547ae5 ]
 
-There are a number of places where RCU list iteration is
-used, but that aren't (always) called with RCU held. Use
-just list_for_each_entry() in most, and annotate iface
-iteration with the required locks.
+When asynchronous encryption is used KTLS sends out the final data at
+proto->close time. This becomes problematic when the task calling
+close() receives a signal. In this case it can happen that
+tcp_sendmsg_locked() called at close time returns -ERESTARTSYS and the
+final data is not sent.
 
-Reviewed-by: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://patch.msgid.link/20240827094939.ed8ac0b2f897.I8443c9c3c0f8051841353491dae758021b53115e@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+The described situation happens when KTLS is used in conjunction with
+io_uring, as io_uring uses task_work_add() to add work to the current
+userspace task. A discussion of the problem along with a reproducer can
+be found in [1] and [2]
+
+Fix this by waiting for the asynchronous encryption to be completed on
+the final message. With this there is no data left to be sent at close
+time.
+
+[1] https://lore.kernel.org/all/20231010141932.GD3114228@pengutronix.de/
+[2] https://lore.kernel.org/all/20240315100159.3898944-1-s.hauer@pengutronix.de/
+
+Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+Link: https://patch.msgid.link/20240904-ktls-wait-async-v1-1-a62892833110@pengutronix.de
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/chan.c | 4 +++-
- net/mac80211/mlme.c | 2 +-
- net/mac80211/scan.c | 2 +-
- net/mac80211/util.c | 4 +++-
- 4 files changed, 8 insertions(+), 4 deletions(-)
+ net/tls/tls_sw.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/mac80211/chan.c b/net/mac80211/chan.c
-index 68952752b5990..c09aed6a3cfcc 100644
---- a/net/mac80211/chan.c
-+++ b/net/mac80211/chan.c
-@@ -245,7 +245,9 @@ ieee80211_get_max_required_bw(struct ieee80211_sub_if_data *sdata,
- 	enum nl80211_chan_width max_bw = NL80211_CHAN_WIDTH_20_NOHT;
- 	struct sta_info *sta;
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index df166f6afad82..904dae0df7a47 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -1201,7 +1201,7 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
  
--	list_for_each_entry_rcu(sta, &sdata->local->sta_list, list) {
-+	lockdep_assert_wiphy(sdata->local->hw.wiphy);
-+
-+	list_for_each_entry(sta, &sdata->local->sta_list, list) {
- 		if (sdata != sta->sdata &&
- 		    !(sta->sdata->bss && sta->sdata->bss == sdata->bss))
- 			continue;
-diff --git a/net/mac80211/mlme.c b/net/mac80211/mlme.c
-index 42e2c84ed2484..b14c809bcdea3 100644
---- a/net/mac80211/mlme.c
-+++ b/net/mac80211/mlme.c
-@@ -732,7 +732,7 @@ static bool ieee80211_add_vht_ie(struct ieee80211_sub_if_data *sdata,
- 		bool disable_mu_mimo = false;
- 		struct ieee80211_sub_if_data *other;
+ 	if (!num_async) {
+ 		goto send_end;
+-	} else if (num_zc) {
++	} else if (num_zc || eor) {
+ 		int err;
  
--		list_for_each_entry_rcu(other, &local->interfaces, list) {
-+		list_for_each_entry(other, &local->interfaces, list) {
- 			if (other->vif.bss_conf.mu_mimo_owner) {
- 				disable_mu_mimo = true;
- 				break;
-diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
-index 3d68db738cde4..ea554e21e7a19 100644
---- a/net/mac80211/scan.c
-+++ b/net/mac80211/scan.c
-@@ -489,7 +489,7 @@ static void __ieee80211_scan_completed(struct ieee80211_hw *hw, bool aborted)
- 	 * the scan was in progress; if there was none this will
- 	 * just be a no-op for the particular interface.
- 	 */
--	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-+	list_for_each_entry(sdata, &local->interfaces, list) {
- 		if (ieee80211_sdata_running(sdata))
- 			wiphy_work_queue(sdata->local->hw.wiphy, &sdata->work);
- 	}
-diff --git a/net/mac80211/util.c b/net/mac80211/util.c
-index d682c32821a11..02b5aaad2a155 100644
---- a/net/mac80211/util.c
-+++ b/net/mac80211/util.c
-@@ -745,7 +745,9 @@ static void __iterate_interfaces(struct ieee80211_local *local,
- 	struct ieee80211_sub_if_data *sdata;
- 	bool active_only = iter_flags & IEEE80211_IFACE_ITER_ACTIVE;
- 
--	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-+	list_for_each_entry_rcu(sdata, &local->interfaces, list,
-+				lockdep_is_held(&local->iflist_mtx) ||
-+				lockdep_is_held(&local->hw.wiphy->mtx)) {
- 		switch (sdata->vif.type) {
- 		case NL80211_IFTYPE_MONITOR:
- 			if (!(sdata->u.mntr.flags & MONITOR_FLAG_ACTIVE))
+ 		/* Wait for pending encryptions to get completed */
 -- 
 2.43.0
 
