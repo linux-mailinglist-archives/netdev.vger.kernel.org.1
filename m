@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-129839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA4BA986745
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 22:00:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F49D98675A
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 22:02:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52E0E1F2428C
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:00:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FB03281A42
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:02:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C37146A79;
-	Wed, 25 Sep 2024 20:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444421428F3;
+	Wed, 25 Sep 2024 20:02:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ixP4c6hU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RqSeqGfC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21285146596;
-	Wed, 25 Sep 2024 20:00:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B307208CA;
+	Wed, 25 Sep 2024 20:02:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727294403; cv=none; b=XH/LaOJtrN6aDeTSC3ipugtp9kKQ+BvdlHO5lIhMKRuHQtOuuTcOcjvhsYS2QQoFONytqgCMvFQvmf0DLZsjXfFR7vVjsGQUCUr29+km8Z22b9Me1wDIE9sXQBA6sF+x99Qla2QOeoQYmliIaWpPZShJ816szwASnThQO050I1Y=
+	t=1727294522; cv=none; b=EwBU7RhmF1c5iXv6UI2hSk3LYKoljcPuJ5ceOK7b6eZnI+5abyFkgx659RMlHe9lSpV9DySY2ZnLOL46r9iFmB8g8Mk/UsQRaeVQuDtFynM2AaPOVkOxm3t5pKu9xq52tbuOLGthlJjY37KWf+/4HdLbEhOfLmWlXhpZ2nz51UQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727294403; c=relaxed/simple;
-	bh=aDuFfv+lsRoCCBwC9iGeBVszOjMXqflF/WbrOXRnA1g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G35PAfali2rJhqiPJTUG5GuknaR3v6Y50w80KbhKxsoeoccXY5cjEsCBhtGRTVhvolUzoeHHtutFYdSMMgiHcqXQbfoFBkk6VKRd/hgHjy1+RnGpvvukqcv02im0plYW83psUvCHlQEs+BSm86ujbx4CJncKKu3CheTIyWAY2xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ixP4c6hU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30297C4CEC3;
-	Wed, 25 Sep 2024 20:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727294402;
-	bh=aDuFfv+lsRoCCBwC9iGeBVszOjMXqflF/WbrOXRnA1g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ixP4c6hUJVMucy4/aZ8ut1f1nsYTgGwHGVjI4fWJ/KxdrJrpTEJjS02G1HIASI2wo
-	 hfO94vruhFY7NqgVNvH+MKGAUhWI+oIpe7ZW4tnFDcuqvLGZWdFyEsS88Jg8iVMmnJ
-	 IZw1RHTJdMGy87zkal26gnzLNkUlAXiEN+ws1cxTWvvExDV5zSTmZYio/eaHxQCVM7
-	 n+B5oZxNYltk1v32daaZNsTp8z6xr75utbGxZYvx+GoVs+5mJavNhCUo71QCSOkRFQ
-	 eoxoPtB6HbpDtOaQzQMAFl/jgX4sLb3vsoqXJqaMRutcYJ5c8SYFDM85/+k/ckWcoz
-	 xQQODTUdn3Q9g==
-Date: Wed, 25 Sep 2024 20:59:59 +0100
-From: Simon Horman <horms@kernel.org>
-To: Zhu Jun <zhujun2@cmss.chinamobile.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	hawk@kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] tools/net:Fix the wrong format specifier
-Message-ID: <20240925195959.GZ4029621@kernel.org>
-References: <20240925085524.3525-1-zhujun2@cmss.chinamobile.com>
- <20240925195354.GY4029621@kernel.org>
+	s=arc-20240116; t=1727294522; c=relaxed/simple;
+	bh=GuAtbY3FxHHtmaHMBG3KUXH3yBXNnrSuxiRVAzTx8ds=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=BpZnJG3aJOgMTkgh5jFhGMmPbtjulbaR/n7zj4mIcaEBPdWlIz0yk8w5UVwtEg2yPmm9jWgXXthc7JsGTJJkPeDSymZ8a+w0I9r7Yr12BGdA1VGsAgChJKVRVd/+3SwyR7gNgaEpCBGLui+55b2fKBi8w35Egt1Jjqq668H9c1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RqSeqGfC; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <895a685b-7449-4bf1-b14d-00aee1d8f75b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1727294518;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YfbUzqws6stxPgb9eT4nEGannHed53FdV2xBgbx4dKI=;
+	b=RqSeqGfCCZ6YmwlRXsgxBrh7ruqVV3x98v/vzK+XODrCAMKQ6MCbfMsk/ECbPaOVf0KXu5
+	ZHHvyrJab4ckHdNyOJzRZlRUbyijhqluskNcQdDO0pmety1vfUgVUBQxZxZjTavhUhfc2W
+	p0eLT8aScNV5RHFz5mYDza7TmPMRoj0=
+Date: Wed, 25 Sep 2024 13:01:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240925195354.GY4029621@kernel.org>
+Subject: Re: [PATCH bpf-next v2] selftests/bpf: convert test_xdp_features.sh
+ to test_progs
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, ebpf@linuxfoundation.org,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+References: <20240910-convert_xdp_tests-v2-1-a46367c9d038@bootlin.com>
+ <64df8d41-6cfb-45a9-8337-5cc04daedb60@linux.dev> <ZuVWmxoqXFI3qvVI@lore-desk>
+ <20240914063828.7bd73c5e@kernel.org>
+ <464e0ae0-d6e3-4da4-a157-f74260f96275@bootlin.com>
+ <366e4392-bd00-4120-8585-a71b3952e365@linux.dev>
+Content-Language: en-US
+In-Reply-To: <366e4392-bd00-4120-8585-a71b3952e365@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Sep 25, 2024 at 08:53:54PM +0100, Simon Horman wrote:
-> On Wed, Sep 25, 2024 at 01:55:24AM -0700, Zhu Jun wrote:
-> > The format specifier of "unsigned int" in printf() should be "%u", not
-> > "%d".
-> > 
-> > Signed-off-by: Zhu Jun <zhujun2@cmss.chinamobile.com>
-> 
-> Hi Zhu Jun,
-> 
-> Thanks for your patch.
-> 
-> While this change looks good to me it looks like it is for net-next.
-> Currently net-next is closed for the v6.12 merge window. So please
-> repost this patch once it reopens, after v6.12-rc1 has been released.
-> I expect that to happen early next week.
-> 
-> Also, please explicitly target net-next patches for that tree like this:
-> 
->   Subject: [PATCH net-next]
-> 
-> For reference, netdev processes are documented here:
-> https://docs.kernel.org/process/maintainer-netdev.html
+On 9/25/24 3:37 AM, Martin KaFai Lau wrote:
+> I am not sure which case in xdp_features.c does not have existing coverage in 
+> test_progs. From a quick look, it seems only BPF_MAP_TYPE_CPUMAP is missing 
+> (please check)?
 
-Sorry, one more thing, looking at git history I think the prefix
-for the patch should be 'tools: ynl: '. So perhaps:
-
-   Subject: [PATCH net-next] tools: ynl: correct page-pool stat format specifier
+Re: CPUMAP, I noticed there is a xdp_(cpu)map_attach.c test but it only does 
+attach test. May be something similar can be done like 
+https://lore.kernel.org/bpf/20240911-devel-koalo-fix-ingress-ifindex-v4-2-5c643ae10258@linutronix.de/ 
+to exercise the xdp prog that does cpumap redirect.
 
