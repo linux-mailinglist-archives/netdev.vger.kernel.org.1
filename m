@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-129786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 737569860D4
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:34:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE8DE9860DA
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:35:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EFFE1F27C93
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:34:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93FA128703D
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:35:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B610185B4A;
-	Wed, 25 Sep 2024 13:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C21318D643;
+	Wed, 25 Sep 2024 13:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PD2SlGvM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ngc4nAX+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11501798C
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 13:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DE0D18D640
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 13:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727271392; cv=none; b=ajhi2T6NByhrVlmIZF6PsyccYxsT65cRljLh8c+ipQk53kq2CCzvNue4HeDx7L6nSMqe92650d+Twtb020jQNlYymHG/xq5OEqEoQPNRzlmsxGqToRkmjhWdTLz0OflSnLNODRjtjXTSQT9rRIk1eP/seKF3US9P7j5WqYGaZeI=
+	t=1727271505; cv=none; b=iXvRDMW5iZRRWI1cCMq5cJ5npM5VLr/DN8+yiDr0IGuWGuT9tCZ8Ml5Xf5ohQaKlBjwGdIlGVZolVF6/Kwe9BdcGRCFnigsaTamqODR6tPwE41MdwqljnRa5r2kxwFT8ci/SBwdIEZQ/RrqE+c5IVDusQSRQQkFdpE8r8BdTdDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727271392; c=relaxed/simple;
-	bh=6SwjuQFoyyTDnIBKQoc7xV4LNrWxqGEXmmkrLUg38D4=;
+	s=arc-20240116; t=1727271505; c=relaxed/simple;
+	bh=PdxFPH7xrjhCUYC8R+CuUDoD0V2HYHcOm5HNCp3BtHY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XG06KRchyd3AIBik3fooIogg+Sg2yA/N+PBefW9v6iyFE8ypac+gsAi3V1o2kNqnteZSWTfq9+OylicKYuyf7zhXutyKYsfKu0Jmt4Cm4zCF3vyxSX1KMChsV8mw6rj8nP6GdJKUw3a7Tsur5sDF5jVpX0V1Ml9doVXeQD6Xadg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PD2SlGvM; arc=none smtp.client-ip=209.85.208.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=IVNxnXSH99LJDuhrNeaM9Bpq9bf7FLvMGTV71h7Y0gcu6QShS7/sx85WDJnuK14PPWnQkMV6j9F2L/XMFaUD5Xm1dWLRpOZ0vZfRPrkKrDqE9j+8qZsTqOjmOe+6yBbON5p7dtOYcRzVY9WSjyT2VR1k1aa22dxSAdD75IPI6Rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ngc4nAX+; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c5b6069cabso767565a12.0
-        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 06:36:30 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a8a7dddd2bdso70465866b.2
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 06:38:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727271389; x=1727876189; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1727271501; x=1727876301; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7KN4Zv/apNegyygaOv4t6KJ/pBYjtFLH00UEJLC0jcg=;
-        b=PD2SlGvMOsveCj9c4OD3YLief/cN7CvzHHBXoPgfPNkQ1yA4sBV26PEWOspRyt086Y
-         hhPxCTiEPHSb0UQlUDQMKnyKwnZBFSAiT+RiaiBgRZuvGVyrw+rmQhaDWA0n5bS+G9vF
-         /mRZY50mqoBsePgXeMx04BqdVWo5QiY0V6s+HM7ShzXXIGjvUxF1sSzH77LABv71yl/c
-         SpOAtn89WUP5yYpbWmbEy1kYOH3UL4v7C4+CP+eYNJ553oxFrotH0CYiO9PWFIEgkqDq
-         WsFzkzSLXrPGzXZTByi+V3qWgvMC8sLs0tuEi+UDY3mzq1sc9GUthDQy2O2T0b4Vx5tR
-         EjKA==
+        bh=jumFeyHQNb3jbXPMZm46Zc7E2u4fD+56kCRyCgQWUes=;
+        b=Ngc4nAX+ziAHRa5rkKbyeLlz0Z3CSoS0kYmsQkovu5fhgr7uAag3q6KrANuj/TOdzr
+         e8S/x9tzuHFnwVsodqcuzja2iCIjoFm3yGPuOP/55Y/G0fcDqXhXt+o8+XDxb9kwCee+
+         zIei8omrsyfAE5JTiCQvDRMcwTxHe2okrbw91Qb15QaoY5rcacOh2egwVMbI+CRHPVbU
+         PJ31cLHNLNM96CiqxiWMpis/OyAIPqF6fhRV7ZF1Ncojw4fnV8/LOPQZCDygMl3wEFIW
+         yF3CVTopBixCmTbmrWn0UbN78aPgaAb5CmTS9nJWafLaeCT7d35wJUmBiMpVqX+Offwy
+         Kdzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727271389; x=1727876189;
+        d=1e100.net; s=20230601; t=1727271501; x=1727876301;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7KN4Zv/apNegyygaOv4t6KJ/pBYjtFLH00UEJLC0jcg=;
-        b=ayZEsq9FJS3wWxmN3ILdYlW1vIz+V8WtBFTxX5hwQKINI+KdpQpOJh2sYUeWODyApm
-         ZUWCDolokKo+qu9wzXMSA95scoqWBvmfKoGXlqPB6Cxkr8edcnTZ+C0b9OQ9eQtR+zEU
-         +uERK+FN/wBw4hzSC0WA767zaOspsPlCwSsJFbblDnjryk/9AUkaPU1GrTY+OQAeatp6
-         lTqgpxDKOcN5/wdd92f66fmbLuJ5o5+vOAFFBiQjDzoIKwtB4XEMvXMWn0pFOP1JuNql
-         FUUGroIhTHKTDvABXgY+LORu5zlX+JGdiRyrEXXbwgCJ4wa+kMbl2QAntFSK6vjy5AdV
-         o6PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXbqMqh6Cbmr+flUIkGXgsMUtlMbL+BIDDGnLIbw2UmOhOPdJ1ERwPsD+PyRahPTlYa1UOCzF8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAQejqk2lHZfZbVVpiGHKdcKzaAO5ROV/1pqcf0ZOQzhf/r+cl
-	EgsDH5pUWCJWqTj/wv2M2zTwvCzAcueG9FuHVlNHTecACtJhhKoF
-X-Google-Smtp-Source: AGHT+IGLZfbsBMGsUvkUzwwgYsHqnh+inLH39us1h6cw9TzK12tm2k4aAYtNfaclJ6ZMDoLFrAGcyQ==
-X-Received: by 2002:a05:6402:3588:b0:5c7:1ea4:1680 with SMTP id 4fb4d7f45d1cf-5c720608dddmr942483a12.1.1727271388900;
-        Wed, 25 Sep 2024 06:36:28 -0700 (PDT)
+        bh=jumFeyHQNb3jbXPMZm46Zc7E2u4fD+56kCRyCgQWUes=;
+        b=wqBQJnLA/YTh75CFysiIsuRbnpNnxFE9RnUXDqf8NZ/KBB6ht/BDBjoQEGgRwysete
+         FbxuoPVXN9/pAcGLYpPRoOkmuyiVwOP1vldGHrvDTn0oEz9LkbsL5/2w669XWLrCz5M7
+         cGYdU+W5tsvUJadVopJVtczlnag9ri4MDQ4HGZmMdlWlwwFOuHXj4BxiqM3rtWQ85pYE
+         8/FzxuhD6hpGul28L4pMvHQTGp0HG7SFuPNV+aBLTD82kjTnZJEsUS1SOe6ThNe4t6mj
+         2kclPczLliypzJnHEekx/4TynYuyWO0KKoKP/bD6U85lwYhtzF6vtsntcR7ZV+7jEyQC
+         D1LA==
+X-Forwarded-Encrypted: i=1; AJvYcCWh47ecN0gSjvZtvEqaC78TcHEOnE7LH8+ftDFe90jZ4ZfYYD4On4ZQ2zqA90Sts5BvTnVxx5E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwwZdTljtN1wva1LABwMKfmzD6R9FdsDVWCneBE0FZNevvnrnGX
+	t89TbBV7cudR0Ong7C8YwlZuAw1OCyAdV/ljPVNt2ZACGOXKoT9P
+X-Google-Smtp-Source: AGHT+IF2htZh7Ei+1/UW/R1vgBmmoGpgMYctzse87AfZCt6nbk9UJZlxDZj2P/2mpqAHyr7RQZAblg==
+X-Received: by 2002:a17:906:da8d:b0:a8d:2623:cd49 with SMTP id a640c23a62f3a-a93a061db9amr134422066b.11.1727271501207;
+        Wed, 25 Sep 2024 06:38:21 -0700 (PDT)
 Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c5cf497167sm1866456a12.34.2024.09.25.06.36.27
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a93930f78a1sm206539766b.161.2024.09.25.06.38.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2024 06:36:28 -0700 (PDT)
-Date: Wed, 25 Sep 2024 16:36:25 +0300
+        Wed, 25 Sep 2024 06:38:20 -0700 (PDT)
+Date: Wed, 25 Sep 2024 16:38:17 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
@@ -83,13 +83,11 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH RFC net-next 09/10] net: pcs: xpcs: drop interface
- argument from xpcs_create*()
-Message-ID: <20240925133625.4ahkfbqekfqjddhs@skbuf>
+Subject: Re: [PATCH RFC net-next 10/10] net: pcs: xpcs: make xpcs_do_config()
+ and xpcs_link_up() internal
+Message-ID: <20240925133817.csb6o5yxo5i47vza@skbuf>
 References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
- <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
- <E1ssjdE-005NsR-OU@rmk-PC.armlinux.org.uk>
- <E1ssjdE-005NsR-OU@rmk-PC.armlinux.org.uk>
+ <E1ssjdJ-005NsX-S8@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,14 +96,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1ssjdE-005NsR-OU@rmk-PC.armlinux.org.uk>
- <E1ssjdE-005NsR-OU@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1ssjdJ-005NsX-S8@rmk-PC.armlinux.org.uk>
 
-On Mon, Sep 23, 2024 at 03:01:40PM +0100, Russell King (Oracle) wrote:
-> The XPCS sub-driver no longer uses the "interface" argument to the
-> xpcs_create_mdiodev() and xpcs_create_fwnode() functions. Remove
-> this now unnecessary argument, updating the stmmac driver
-> appropriately.
+On Mon, Sep 23, 2024 at 03:01:45PM +0100, Russell King (Oracle) wrote:
+> As nothing outside pcs-xpcs.c calls neither xpcs_do_config() nor
+> xpcs_link_up(), remove their exports and prototypes.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
