@@ -1,116 +1,106 @@
-Return-Path: <netdev+bounces-129798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFA6E9863FC
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 17:43:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B47569863CC
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 17:40:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5EC03B274BD
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:38:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E372E1C26E0A
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1187A1D5ABD;
-	Wed, 25 Sep 2024 15:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6DA91D5AC9;
+	Wed, 25 Sep 2024 15:40:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fclNx2/4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JR0ZAFKt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f177.google.com (mail-vk1-f177.google.com [209.85.221.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8914F1D5AB6;
-	Wed, 25 Sep 2024 15:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333311D5ABD;
+	Wed, 25 Sep 2024 15:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727278683; cv=none; b=DXvbDD9+7musFMiAjap37/Q7szFj8PhYenbkg7auI/TsdiGAHhMTlwMtZsF/5KdMnGl9Cdbpb7Rch9ARwHxaroIrBllZbyKRoF6N8bmsSOCSXUAa3CWujuOy8VIpCBOv2Pmgml1DX3kUvCHUx/u/WUlptl1cDqGqPALLyVlu7uQ=
+	t=1727278811; cv=none; b=D3Wjnt3laS1nroPetVwH2XHwSdWDSyEBNKYwBCFilR07y0vQzBT6CQfWWJHZzUoi46etNrwbWCColBxwNABd2AYEZlhHbOIW38hTXxug/waQYsVTK7tC9oCForMHS+K6rlf6i1hmz2DffNyIThLtfy6Pkd3fx+C/i37RW14ftzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727278683; c=relaxed/simple;
-	bh=qQaegB/CY+RMNIpGwZktikND96IzDNK9c4iLGeje7O4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rc1BDmQIMcrlZjhxGvlDJMlCq9U42uMeUIQjkpYffFYKOgk00D1lPvJo3DhMo4iWCMpud/Kimtnx380/kVCCmc8si7Js8jOBAkqvy2Mq+uEn2iyOKILIzCsNAgnyfhjGAjkwKdAgSVjCXIP+rxdoaHExDPWurISQpfHLQFNBpdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fclNx2/4; arc=none smtp.client-ip=209.85.221.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f177.google.com with SMTP id 71dfb90a1353d-503f943f115so1349445e0c.0;
-        Wed, 25 Sep 2024 08:38:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1727278680; x=1727883480; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=qQaegB/CY+RMNIpGwZktikND96IzDNK9c4iLGeje7O4=;
-        b=fclNx2/42WHL1L+xRoLUiCgEjs6X8WeqIm/E1IGEZm6HWuRWFBK+orIVfeuimhXrnA
-         zwBMI8KdiUxIGoI54FJqqdPRRi6csbslNRg3f0n3El8lCSNSVPMwc4sOETm9/lirZADF
-         0fBBNatzoDU2oM4qhqDiPRznFdFPaOio7dtxTp/pRr09r7lEB823ofq+MLovwzMRWLqZ
-         LeywZYLvJbyRXvREhW6X/pYRZnW5sBR4MccsK5lWZ1owxIToZywPFj5QffcBUJobrDnB
-         k+uTdYcUnCTA82jgAIoJ040Z72kdB28SsODTvrItDq483YrbWSEn8TsYNv4YWPKia+3Q
-         BCUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727278680; x=1727883480;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qQaegB/CY+RMNIpGwZktikND96IzDNK9c4iLGeje7O4=;
-        b=AY4xEA6X+cn940AWI+tkN8C/sHN4a/pYr1pYGUR48arnrpXZTkjxt9NGfNQGWMIFop
-         DC6GQUB+5tx64L9Caa8SR+9Pf7KyoUmy5QIYSjD+8/twXpB0zw8v2HzKqVXXZ7Aa+rHz
-         k+908tR1joCuvA9CNJywK0uwdFrJ6N8VplfWa8F+yGor3kmLM3fxEmVD0/9PCrtwSrCV
-         dQqNbom3oJ55mNCEAFCCNCg5EL0KpJ0Q/91kPpUvdGhzsXeVD2X/i7uX5ysYpcDMVDt3
-         +g9JzZOa4IokHcmTEwGPCe1KjVlvrL0HV5MqZU2yiYciq4dvhR25kXqUqy4vOfR5kOni
-         jjGg==
-X-Forwarded-Encrypted: i=1; AJvYcCUmGSMlqhldJrrN6A+NWNKk1Ph2rw9xaJ++Hu+yoJtidB8EJp4pdWpx+XnME1zoElSXE7ztOLjJoAXsKd4=@vger.kernel.org, AJvYcCVzZZZtVVyV9dvhPCf0ByARqA33budto42p3sR/kUgMFFO+a1g87grbUUUhDHCDS5wtXou5icq8@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJ2b0V8KVuYU5T3PZYbz5mL6dkTBmeo+abEflMmFGpqI8rg5Li
-	PSPosw2S1HEuqnToG78nb9k/ETdgwjONKl5bYYPOclW4hn+D0Zq+9kiosZC4BwHA0hfoi1mZ5vF
-	T9h7E29CGzrXdknw2nFOluAQkHJyz7DygK1Y=
-X-Google-Smtp-Source: AGHT+IEOq44YSVQBZM4ocAEcRPcpmoijL3KJAuuCU/GUmvBejs9ZRARJ4whETyoZnNxIotep54t/sCX3HYbtJXo5hbc=
-X-Received: by 2002:a05:6122:17a8:b0:500:eeee:c8a2 with SMTP id
- 71dfb90a1353d-505c1ddb6f5mr2896462e0c.7.1727278680096; Wed, 25 Sep 2024
- 08:38:00 -0700 (PDT)
+	s=arc-20240116; t=1727278811; c=relaxed/simple;
+	bh=kL8HG8Xwa+i7w3XjeWLMDj9WPGvuks109dxhfgzU49k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gHGsskiByLi+sxOpc0kvUn0IuTGK5EHtVLOk4dEb9h99XcMO2zKnDXGH4Qawc2DcXO93YzOFDHlSdFIZOB3xlXpvX/mWk+zEQZA0hqZZB0f86dyf+KRVgsrdA2OQMSvVdWSpA3D1aS3bbjGLsqs1S2JLaxdDbgua3v68SmPEl+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JR0ZAFKt; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=q77yhq1cjviFHLXOxf/F3ZQcus4c7vEqJGBAAXfzwWM=; b=JR0ZAFKtKim2yR550of1N1F1Q1
+	/JCk7LL7jvgFcrysPJyNlo3wO0/vgPCH2NQRNIij845O+MY2zijXjnFCvs9PTX6atmcz56czB4LIr
+	GNd/kk4yE3sem4uG/IeEEcMjZrA4vihVIYMaovwUcwS1h6vS2yUBJFvh055A8hLeXgSk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1stU77-008InE-8a; Wed, 25 Sep 2024 17:39:37 +0200
+Date: Wed, 25 Sep 2024 17:39:37 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: George Rurikov <g.ryurikov@securitycode.ru>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] r8169: Potential divizion by zero in rtl_set_coalesce()
+Message-ID: <060a134b-63ea-4dc1-a5f3-980b2bb4334f@lunn.ch>
+References: <20240925135106.2084111-1-g.ryurikov@securitycode.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240924185634.2358-1-kdipendra88@gmail.com> <20240925111857.GU4029621@kernel.org>
-In-Reply-To: <20240925111857.GU4029621@kernel.org>
-From: Dipendra Khadka <kdipendra88@gmail.com>
-Date: Wed, 25 Sep 2024 21:22:48 +0545
-Message-ID: <CAEKBCKN=J6esdjOF5yh1KtmOVTgmXpKjTfbXAzyRcULKzbMi9w@mail.gmail.com>
-Subject: Re: [PATCH v3 net] net: systemport: Add error pointer checks in
- bcm_sysport_map_queues() and bcm_sysport_unmap_queues()
-To: Simon Horman <horms@kernel.org>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	f.fainelli@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240925135106.2084111-1-g.ryurikov@securitycode.ru>
 
-Hi Simon,
+On Wed, Sep 25, 2024 at 04:51:06PM +0300, George Rurikov wrote:
+> Variable 'scale', whose possible value set allows a zero value in a check
+> at r8169_main.c:2014, is used as a denominator at r8169_main.c:2040 and
+> r8169_main.c:2042.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Fixes: 2815b30535a0 ("r8169: merge scale for tx and rx irq coalescing")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: George Rurikov <g.ryurikov@securitycode.ru>
+> ---
+>  drivers/net/ethernet/realtek/r8169_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+> index 45ac8befba29..b97e68cfcfad 100644
+> --- a/drivers/net/ethernet/realtek/r8169_main.c
+> +++ b/drivers/net/ethernet/realtek/r8169_main.c
+> @@ -2011,7 +2011,7 @@ static int rtl_set_coalesce(struct net_device *dev,
+> 
+>         coal_usec_max = max(ec->rx_coalesce_usecs, ec->tx_coalesce_usecs);
+>         scale = rtl_coalesce_choose_scale(tp, coal_usec_max, &cp01);
+> -       if (scale < 0)
+> +       if (scale <= 0)
+>                 return scale;
 
-On Wed, 25 Sept 2024 at 17:04, Simon Horman <horms@kernel.org> wrote:
->
-> On Tue, Sep 24, 2024 at 06:56:33PM +0000, Dipendra Khadka wrote:
-> > Add error pointer checks in bcm_sysport_map_queues() and
-> > bcm_sysport_unmap_queues() after calling dsa_port_from_netdev().
-> >
-> > Fixes: d156576362c0 ("net: systemport: Establish lower/upper queue mapping")
-> > Fixes: da106a140f9c ("net: systemport: Unmap queues upon DSA unregister event")
-> > Signed-off-by: Dipendra Khadka <kdipendra88@gmail.com>
->
-> I'm sorry to be picky, but I think the fixes tag should be (only):
->
-> Fixes: 1593cd40d785 ("net: systemport: use standard netdevice notifier to detect DSA presence")
->
+Please think about this. Say scale is 0, and you return it. It appears
+the call has worked, but in fact it did nothing.
 
+I much prefer a division by 0, causing a splat, than the silent bug
+you just added.
 
+Also, please could you explain the code path which results in scale
+being 0.
 
-I have sent the v4 patch. I was checking git log -S 'function name
-like bcm_sysport_map_queues'. But when I checked with the
-"dsa_port_from_netdev", I got the same result as yours.Thank you once
-again.
+    Andrew
 
-> Otherwise, this looks good to me.
->
-> ...
-
-Best regards,
-Dipendra Khadka
+---
+pw-bot: cr
 
