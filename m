@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-129742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10AE985E6B
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:35:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCE4F985F42
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0A441C24E04
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:35:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36B8FB240BA
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEAC1B9857;
-	Wed, 25 Sep 2024 12:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596461D043D;
+	Wed, 25 Sep 2024 12:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/Rrac1P"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kTSCNtAI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33D41B9829;
-	Wed, 25 Sep 2024 12:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED4A1D0439;
+	Wed, 25 Sep 2024 12:12:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727266313; cv=none; b=d/mOPZ4EjQDBFSuvjC2gFzJtUfPI1Ic58rSm9sXPNHv1O4ndTBIJhj9MMG1X60VReqJkjyepeKc6vfj/weSDUMdA2mZB+YdjOkmVGG2JvufvWT2TshYsUdoUNqJOo/IXMWafEmrMZ7WXT33C+1eZcORAxpro3S2N4NlnakpSEYU=
+	t=1727266324; cv=none; b=ruMH/4Y3vD6vmwzbcrkyQBLr25N26g/or22Z2qIe6K/jmf2FyG1WKKjtwv6jncorTFxlpGsU6jCtbtYvuJ8cd3FVOvNUKG3MDZDrfV86a/UwoH9f5B3Pqumfn0dnNEwnBNZManibGr4+reVGUh7vBHrC3czRU0PrvEW+a1DBNTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727266313; c=relaxed/simple;
-	bh=VWM4rj+YOMFfafZndKI5LhtdnkSaRAsjT/1PHccu0M0=;
+	s=arc-20240116; t=1727266324; c=relaxed/simple;
+	bh=sdR78UZuwqODBmPftbc9lsJo5rbBnnCvvn12H87+OpU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pKMYHdkXDMyIACZ6uiHDSlkPcjX4h5xiGzyKfgarOiqPLhcZI6q4DOJQKGQEou2TfGyUSCAWmSEc01J5m4dQMvVQQm83SyXk2+o9IYjdi7rUlX2zRHYq54Z1zSCPbaEehbZPiEtde22QAziiPsAH4MaERrrBpOFKXCEPfFv/Ow4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F/Rrac1P; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E79C4CECD;
-	Wed, 25 Sep 2024 12:11:51 +0000 (UTC)
+	 MIME-Version; b=RGfKM6DwcT1WTg4v+lxyNaMwFN+HIA+WNcwnhyAkMVAkK4ay98ihuT3BJxPqzVyf0Hn/KaGngVlMY0m78pRlr1dnpo+OM0eH5gNf/kvL88mxjELD1W9Jl+zWxoqbLtj0DnWIkrxzZlKx63+nRgfTl4X5zFkOi7qPBtxZP+mxm8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kTSCNtAI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27BE7C4CEC3;
+	Wed, 25 Sep 2024 12:12:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727266313;
-	bh=VWM4rj+YOMFfafZndKI5LhtdnkSaRAsjT/1PHccu0M0=;
+	s=k20201202; t=1727266323;
+	bh=sdR78UZuwqODBmPftbc9lsJo5rbBnnCvvn12H87+OpU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F/Rrac1PNjCXbk5eg5/khtvca13w+4miZWzDyQMKW/w4OOLlxwFqsexis8naN8guW
-	 a+4kCeV2PEAROBnyB2X2Pfbn03DE07nZGPg3wN9RJAKBX07E2Dec5wDGNRA6Ysc2eq
-	 jbJG8FAiAQHjGIJeHsTxfXdi2iUKy03cQL8BSz0BoYk6yl+ZeU3SUu8xK+tAwiHHVj
-	 liT/NqT2Ck98OguKQx9AlLDQ1vaqHHmdOJ4Mp2Rxu4+6uWqLpVrbVh/AJjh3O8Xm+K
-	 OAbZnVy7pH77Ix94AHe+6+1xjSJb9dOQDvJm3WkTsvbt0AYsWYOUPZyIO9/yDu8F+I
-	 SvJDdBNyXh2mQ==
+	b=kTSCNtAIJvBd8HqnWE08FjWIBvCf4EmbJChTKnu7+RrLVFf8VwF6fMIIgGkllgmva
+	 3Txm33IfK3kt+FpbUD4aC9e3zvTkGEhFKAgLm5UbHiYibgYbBX1PZ4PDIcakmBiGU+
+	 KTagYIpKj01Cs/PsHOtmV6pwh7CFuC15MRnrj7aC9f1N3Qh/Ma6bYl/Sbsjjf6Zo8k
+	 8476aODui5AAIsr9HgvhE1TJidPO8pk7h5i6+wXMNv53rnowwJNGetLpQoXHZpEopo
+	 VoiGc/PWK7Z3PNZaAI/Br6B68PfcXdLfTd9V5qxvmFcap4HbziHp8CSvXt7uazTqxg
+	 mcXB8+oNVO9Dg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Aleksandr Mishin <amishin@t-argos.ru>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
+Cc: Issam Hamdi <ih@simonwunderlich.de>,
+	Kretschmer Mathias <mathias.kretschmer@fit.fraunhofer.de>,
+	Johannes Berg <johannes.berg@intel.com>,
 	Sasha Levin <sashal@kernel.org>,
+	johannes@sipsolutions.net,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
+	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 007/139] ice: Adjust over allocation of memory in ice_sched_add_root_node() and ice_sched_add_node()
-Date: Wed, 25 Sep 2024 08:07:07 -0400
-Message-ID: <20240925121137.1307574-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 010/139] wifi: cfg80211: Set correct chandef when starting CAC
+Date: Wed, 25 Sep 2024 08:07:10 -0400
+Message-ID: <20240925121137.1307574-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925121137.1307574-1-sashal@kernel.org>
 References: <20240925121137.1307574-1-sashal@kernel.org>
@@ -73,58 +72,75 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.52
 Content-Transfer-Encoding: 8bit
 
-From: Aleksandr Mishin <amishin@t-argos.ru>
+From: Issam Hamdi <ih@simonwunderlich.de>
 
-[ Upstream commit 62fdaf9e8056e9a9e6fe63aa9c816ec2122d60c6 ]
+[ Upstream commit 20361712880396e44ce80aaeec2d93d182035651 ]
 
-In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
-devm_kcalloc() in order to allocate memory for array of pointers to
-'ice_sched_node' structure. But incorrect types are used as sizeof()
-arguments in these calls (structures instead of pointers) which leads to
-over allocation of memory.
+When starting CAC in a mode other than AP mode, it return a
+"WARNING: CPU: 0 PID: 63 at cfg80211_chandef_dfs_usable+0x20/0xaf [cfg80211]"
+caused by the chandef.chan being null at the end of CAC.
 
-Adjust over allocation of memory by correcting types in devm_kcalloc()
-sizeof() arguments.
+Solution: Ensure the channel definition is set for the different modes
+when starting CAC to avoid getting a NULL 'chan' at the end of CAC.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+ Call Trace:
+  ? show_regs.part.0+0x14/0x16
+  ? __warn+0x67/0xc0
+  ? cfg80211_chandef_dfs_usable+0x20/0xaf [cfg80211]
+  ? report_bug+0xa7/0x130
+  ? exc_overflow+0x30/0x30
+  ? handle_bug+0x27/0x50
+  ? exc_invalid_op+0x18/0x60
+  ? handle_exception+0xf6/0xf6
+  ? exc_overflow+0x30/0x30
+  ? cfg80211_chandef_dfs_usable+0x20/0xaf [cfg80211]
+  ? exc_overflow+0x30/0x30
+  ? cfg80211_chandef_dfs_usable+0x20/0xaf [cfg80211]
+  ? regulatory_propagate_dfs_state.cold+0x1b/0x4c [cfg80211]
+  ? cfg80211_propagate_cac_done_wk+0x1a/0x30 [cfg80211]
+  ? process_one_work+0x165/0x280
+  ? worker_thread+0x120/0x3f0
+  ? kthread+0xc2/0xf0
+  ? process_one_work+0x280/0x280
+  ? kthread_complete_and_exit+0x20/0x20
+  ? ret_from_fork+0x19/0x24
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Reported-by: Kretschmer Mathias <mathias.kretschmer@fit.fraunhofer.de>
+Signed-off-by: Issam Hamdi <ih@simonwunderlich.de>
+Link: https://patch.msgid.link/20240816142418.3381951-1-ih@simonwunderlich.de
+[shorten subject, remove OCB, reorder cases to match previous list]
+Signed-off-by: Johannes Berg <johannes.berg@intel.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/intel/ice/ice_sched.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ net/wireless/nl80211.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
-index c0533d7b66b99..908bcd0738033 100644
---- a/drivers/net/ethernet/intel/ice/ice_sched.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sched.c
-@@ -28,9 +28,8 @@ ice_sched_add_root_node(struct ice_port_info *pi,
- 	if (!root)
- 		return -ENOMEM;
+diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
+index 2b2dc46dc701f..b73ca37f452bf 100644
+--- a/net/wireless/nl80211.c
++++ b/net/wireless/nl80211.c
+@@ -10047,7 +10047,20 @@ static int nl80211_start_radar_detection(struct sk_buff *skb,
  
--	/* coverity[suspicious_sizeof] */
- 	root->children = devm_kcalloc(ice_hw_to_dev(hw), hw->max_children[0],
--				      sizeof(*root), GFP_KERNEL);
-+				      sizeof(*root->children), GFP_KERNEL);
- 	if (!root->children) {
- 		devm_kfree(ice_hw_to_dev(hw), root);
- 		return -ENOMEM;
-@@ -186,10 +185,9 @@ ice_sched_add_node(struct ice_port_info *pi, u8 layer,
- 	if (!node)
- 		return -ENOMEM;
- 	if (hw->max_children[layer]) {
--		/* coverity[suspicious_sizeof] */
- 		node->children = devm_kcalloc(ice_hw_to_dev(hw),
- 					      hw->max_children[layer],
--					      sizeof(*node), GFP_KERNEL);
-+					      sizeof(*node->children), GFP_KERNEL);
- 		if (!node->children) {
- 			devm_kfree(ice_hw_to_dev(hw), node);
- 			return -ENOMEM;
+ 	err = rdev_start_radar_detection(rdev, dev, &chandef, cac_time_ms);
+ 	if (!err) {
+-		wdev->links[0].ap.chandef = chandef;
++		switch (wdev->iftype) {
++		case NL80211_IFTYPE_AP:
++		case NL80211_IFTYPE_P2P_GO:
++			wdev->links[0].ap.chandef = chandef;
++			break;
++		case NL80211_IFTYPE_ADHOC:
++			wdev->u.ibss.chandef = chandef;
++			break;
++		case NL80211_IFTYPE_MESH_POINT:
++			wdev->u.mesh.chandef = chandef;
++			break;
++		default:
++			break;
++		}
+ 		wdev->cac_started = true;
+ 		wdev->cac_start_time = jiffies;
+ 		wdev->cac_time_ms = cac_time_ms;
 -- 
 2.43.0
 
