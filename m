@@ -1,121 +1,131 @@
-Return-Path: <netdev+bounces-129734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E54D985CBA
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:53:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C10AE985E6B
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:35:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 360571F23FB7
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 12:53:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0A441C24E04
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7061D2F75;
-	Wed, 25 Sep 2024 12:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEAC1B9857;
+	Wed, 25 Sep 2024 12:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Th3nDU8N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/Rrac1P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE3A718A6C0;
-	Wed, 25 Sep 2024 12:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B33D41B9829;
+	Wed, 25 Sep 2024 12:11:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727265624; cv=none; b=iMtEbyejSb4uP08yCEh2BvP+YYfZCxm7/64Lhz7miXmzhSu464QlFa+XXZDYAdAl5p2hU1lQf0aIW0ReefpOVxR7p7JAIc6vWdLfRkFq5LsFu0Q4bfTac2LXE5ZQR2rVRkPoxN7ML21UMkkAEnZKry0lry1hOW+AIyLAY5Wkp4I=
+	t=1727266313; cv=none; b=d/mOPZ4EjQDBFSuvjC2gFzJtUfPI1Ic58rSm9sXPNHv1O4ndTBIJhj9MMG1X60VReqJkjyepeKc6vfj/weSDUMdA2mZB+YdjOkmVGG2JvufvWT2TshYsUdoUNqJOo/IXMWafEmrMZ7WXT33C+1eZcORAxpro3S2N4NlnakpSEYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727265624; c=relaxed/simple;
-	bh=m1qc7fAQ0cZYfNPNJ3zWH+FfsONqrrnHM/qkxad0qZI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s0JuBi4Ezh9M7wbznYDJ8B5WVTmmMmJSEoPj5NapY7oz8yxmyKf/8KBKV6XzLt9Ev8QnZrBKmfsSCIq3/4zFQ/6ykUVObWw7icgziUFpiTd9LyzlbweQVKAtu6wUMaIAZuYmA9f71QBB9jvmQjP8H2MZsxZoM0wukQl90KeS6qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Th3nDU8N; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1727265622; x=1758801622;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=m1qc7fAQ0cZYfNPNJ3zWH+FfsONqrrnHM/qkxad0qZI=;
-  b=Th3nDU8NQSEHVpxelADyRsz9KxL4GJVWmzIxxlv/mYBL0nDUt/0+4GyF
-   G0mwW+w8VcYJ0EjAp0sG1ptH49EAQ+4Z+6j6NbMxKHC30TCZ5WfW1W7Ky
-   MrbKpMuT2lxfSZGyJlir84LTgPQVGe+A4SGhYmFmlJuByry2NT4gdg67n
-   0ve6qFXaBntU6d/JFx6UIY836d/j0SrDPzisEaZDEx99il70dnCRaMeg8
-   9J5YAMC/vL2RGB4Mp6hom795ooH55TdJo6CbUrhD1sN2OIxHc/Dhlpp+4
-   TzJZN2ZrTecmQcLqmSKcTkyffcxeyT2Lvko+UMLUjNfr0sqxkiDthkkop
-   g==;
-X-CSE-ConnectionGUID: 8SBD003GTQKelOluIqzFGQ==
-X-CSE-MsgGUID: Ztx27HK+TR2vTU8vvx0lpw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11206"; a="26255203"
-X-IronPort-AV: E=Sophos;i="6.10,257,1719903600"; 
-   d="scan'208";a="26255203"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Sep 2024 05:00:21 -0700
-X-CSE-ConnectionGUID: VGT8nKdfQl+z6j72aaS9CQ==
-X-CSE-MsgGUID: BCscd2aMTgeZ1lQQkb8DGQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,257,1719903600"; 
-   d="scan'208";a="72564645"
-Received: from lkp-server01.sh.intel.com (HELO 53e96f405c61) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 25 Sep 2024 05:00:17 -0700
-Received: from kbuild by 53e96f405c61 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1stQgo-000JWd-2w;
-	Wed, 25 Sep 2024 12:00:14 +0000
-Date: Wed, 25 Sep 2024 20:00:04 +0800
-From: kernel test robot <lkp@intel.com>
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com, linux-mm@kvack.org,
-	Javier Carrasco <javier.carrasco.cruz@gmail.com>
-Subject: Re: [PATCH 4/4] selftests: exec: update gitignore for load_address
-Message-ID: <202409251828.dMx8LnrF-lkp@intel.com>
-References: <20240924-selftests-gitignore-v1-4-9755ac883388@gmail.com>
+	s=arc-20240116; t=1727266313; c=relaxed/simple;
+	bh=VWM4rj+YOMFfafZndKI5LhtdnkSaRAsjT/1PHccu0M0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pKMYHdkXDMyIACZ6uiHDSlkPcjX4h5xiGzyKfgarOiqPLhcZI6q4DOJQKGQEou2TfGyUSCAWmSEc01J5m4dQMvVQQm83SyXk2+o9IYjdi7rUlX2zRHYq54Z1zSCPbaEehbZPiEtde22QAziiPsAH4MaERrrBpOFKXCEPfFv/Ow4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F/Rrac1P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E79C4CECD;
+	Wed, 25 Sep 2024 12:11:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727266313;
+	bh=VWM4rj+YOMFfafZndKI5LhtdnkSaRAsjT/1PHccu0M0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=F/Rrac1PNjCXbk5eg5/khtvca13w+4miZWzDyQMKW/w4OOLlxwFqsexis8naN8guW
+	 a+4kCeV2PEAROBnyB2X2Pfbn03DE07nZGPg3wN9RJAKBX07E2Dec5wDGNRA6Ysc2eq
+	 jbJG8FAiAQHjGIJeHsTxfXdi2iUKy03cQL8BSz0BoYk6yl+ZeU3SUu8xK+tAwiHHVj
+	 liT/NqT2Ck98OguKQx9AlLDQ1vaqHHmdOJ4Mp2Rxu4+6uWqLpVrbVh/AJjh3O8Xm+K
+	 OAbZnVy7pH77Ix94AHe+6+1xjSJb9dOQDvJm3WkTsvbt0AYsWYOUPZyIO9/yDu8F+I
+	 SvJDdBNyXh2mQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Aleksandr Mishin <amishin@t-argos.ru>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 007/139] ice: Adjust over allocation of memory in ice_sched_add_root_node() and ice_sched_add_node()
+Date: Wed, 25 Sep 2024 08:07:07 -0400
+Message-ID: <20240925121137.1307574-7-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240925121137.1307574-1-sashal@kernel.org>
+References: <20240925121137.1307574-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240924-selftests-gitignore-v1-4-9755ac883388@gmail.com>
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.6.52
+Content-Transfer-Encoding: 8bit
 
-Hi Javier,
+From: Aleksandr Mishin <amishin@t-argos.ru>
 
-kernel test robot noticed the following build warnings:
+[ Upstream commit 62fdaf9e8056e9a9e6fe63aa9c816ec2122d60c6 ]
 
-[auto build test WARNING on 4d0326b60bb753627437fff0f76bf1525bcda422]
+In ice_sched_add_root_node() and ice_sched_add_node() there are calls to
+devm_kcalloc() in order to allocate memory for array of pointers to
+'ice_sched_node' structure. But incorrect types are used as sizeof()
+arguments in these calls (structures instead of pointers) which leads to
+over allocation of memory.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Javier-Carrasco/selftests-add-unshare_test-and-msg_oob-to-gitignore/20240924-205133
-base:   4d0326b60bb753627437fff0f76bf1525bcda422
-patch link:    https://lore.kernel.org/r/20240924-selftests-gitignore-v1-4-9755ac883388%40gmail.com
-patch subject: [PATCH 4/4] selftests: exec: update gitignore for load_address
-config: x86_64-allnoconfig (https://download.01.org/0day-ci/archive/20240925/202409251828.dMx8LnrF-lkp@intel.com/config)
-compiler: clang version 18.1.8 (https://github.com/llvm/llvm-project 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240925/202409251828.dMx8LnrF-lkp@intel.com/reproduce)
+Adjust over allocation of memory by correcting types in devm_kcalloc()
+sizeof() arguments.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202409251828.dMx8LnrF-lkp@intel.com/
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-All warnings (new ones prefixed by >>):
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/intel/ice/ice_sched.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-   tools/testing/selftests/arm64/tags/.gitignore: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/arm64/tags/Makefile: warning: ignored by one of the .gitignore files
-   tools/testing/selftests/arm64/tags/tags_test.c: warning: ignored by one of the .gitignore files
->> tools/testing/selftests/exec/load_address.c: warning: ignored by one of the .gitignore files
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_sched.c b/drivers/net/ethernet/intel/ice/ice_sched.c
+index c0533d7b66b99..908bcd0738033 100644
+--- a/drivers/net/ethernet/intel/ice/ice_sched.c
++++ b/drivers/net/ethernet/intel/ice/ice_sched.c
+@@ -28,9 +28,8 @@ ice_sched_add_root_node(struct ice_port_info *pi,
+ 	if (!root)
+ 		return -ENOMEM;
+ 
+-	/* coverity[suspicious_sizeof] */
+ 	root->children = devm_kcalloc(ice_hw_to_dev(hw), hw->max_children[0],
+-				      sizeof(*root), GFP_KERNEL);
++				      sizeof(*root->children), GFP_KERNEL);
+ 	if (!root->children) {
+ 		devm_kfree(ice_hw_to_dev(hw), root);
+ 		return -ENOMEM;
+@@ -186,10 +185,9 @@ ice_sched_add_node(struct ice_port_info *pi, u8 layer,
+ 	if (!node)
+ 		return -ENOMEM;
+ 	if (hw->max_children[layer]) {
+-		/* coverity[suspicious_sizeof] */
+ 		node->children = devm_kcalloc(ice_hw_to_dev(hw),
+ 					      hw->max_children[layer],
+-					      sizeof(*node), GFP_KERNEL);
++					      sizeof(*node->children), GFP_KERNEL);
+ 		if (!node->children) {
+ 			devm_kfree(ice_hw_to_dev(hw), node);
+ 			return -ENOMEM;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
 
