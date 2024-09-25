@@ -1,108 +1,114 @@
-Return-Path: <netdev+bounces-129774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3278B986024
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:15:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B48FC98607C
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 16:24:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD36F288B6C
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:15:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C145B2DAFC
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 14:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 653E617BED3;
-	Wed, 25 Sep 2024 12:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B1717557E;
+	Wed, 25 Sep 2024 12:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="B0GuRjMS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hl3aQnM2"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9213415CD46;
-	Wed, 25 Sep 2024 12:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3397319ABA3
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 12:44:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727267877; cv=none; b=c5dNsnGjPb5zSuzgioR26auvsNc80PVC2mR/VB8wP8prXBc4cqmLh5umchGWGDfUSP2Ec6tLAfmaWIi1mxrVd+i0smn4toFsjkpqprmmT+/Wx4lmIOj+7ytVsXF+EjzEGdAhHAej9q2KyLlU56NMsinRonDP6Vq4iqBPuNGoJ7w=
+	t=1727268251; cv=none; b=ix17hSsvAQ2okF274bq1FrHlVS/TgVRdw6LR98wDC55VEjVQ67Komm8wlz+ty60I8S7T9TFwdghqgiuj9AHjy4sMV+Y8MhI0THdQMvDvYXMJ2iRJCrP4noT1CO5H3Ii+wxBa9tkz+YOqta3YgNmW92xW3ZsNpEMvcAJNiQsbIac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727267877; c=relaxed/simple;
-	bh=yGA4k9fPRkP7UNwjMq/bcpk/wx7MQAsUF0sTAoJLV6I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QAdmrkj/HA8pHWGo5HTnDwhXOmegBlaLbuli8X9fFHpLT7aoNH36tz0gRoLUg9vFRBnzxPGwOSZuMOcFB4rtrKITktnLPZLdtW4XTTahLPwLAlqq3b2jyL/FGz5FHpAuNX0mATQ6EiZ2cqPha0HbxLXkQXqrgNwtXKBG2ah2Dxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=B0GuRjMS; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=77XXD0LA4ebMzrDQBNCHl27giGc0zGFsG6O/kyjKY7c=; b=B0GuRjMSashd8iRo1h/j4+zK0+
-	cUYDB0lfz3MKusy39Ke9+5GPmF+GdcYlcVLlMm0HYCqXn/Oh30fiyeEOZZ57PoL2SFaD6d5LHu4Kh
-	CyukCpKp82pZQo9iu7nUT15Z4qbPGFtc/CFsdKCnnb2hsohlB2FtZaEHscLH+pL6wsW9uFWBH5UJn
-	JrZfLynGrJ7TDjpohdcfMzkcJ5uPimIMpKn/sxxEZJSCuP+SgLqBxD/DE8Oyc5LjaPiMH2FTu9qfT
-	NlX2dLO+0qRT93QwajRkzZyXmicoHfbBEWtuoc4y5AsjLDKvqLob34iyPyzMMqhZBHx7DEXsWF5pv
-	1B3Tu6lQ==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1stRH6-000AIM-6U; Wed, 25 Sep 2024 14:37:44 +0200
-Received: from [178.197.249.20] (helo=[192.168.1.114])
-	by sslproxy03.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1stRH5-0004VM-0Y;
-	Wed, 25 Sep 2024 14:37:43 +0200
-Message-ID: <eebea88a-ebef-4bc7-9859-52820113318d@iogearbox.net>
-Date: Wed, 25 Sep 2024 14:37:42 +0200
+	s=arc-20240116; t=1727268251; c=relaxed/simple;
+	bh=wrcDLKG8/ZlfO5zneBPAoRuT4T9QZDkBA0YyDLzfG/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q9diGr6J76GbiNmBBKc/fsLWd9jPg+gSZpb8Vv9duwgLx3OE0v+8T6p0F3LKmj81cSGmKwGKZjvGXgM7smMhcjIcDXlLhR209PgDlIims2fgtNKojw7zfwuRE7UuveWdeA4LminMXoalc1oj0dmEzKORl3E6vDMkbtfLLCtE6k0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hl3aQnM2; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37a43ea8285so342792f8f.3
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 05:44:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1727268248; x=1727873048; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Eo83E3rr21/cKLc/zAZGOD/iRD2paKfELWeccpaaQQ=;
+        b=hl3aQnM2ZDnrEmT2aJAHO5Uob9MiF+rDdjzpYfiUo+L28LGXcZc0JbPHNzQNt49wgc
+         WTmVLTJPH6gx6dogk7MPY3OnIUwd7kNlOQsWEWdJJZdSUFWq8xUGmSLk+suSg+RRVx6m
+         J+GDPdhxpB0S4W1+UXyacW1g6ZVCnEAwBbZJq2pqi2mOXPxXcdbL76JhOdJfPZ0VN48I
+         Y/+0r2LO4mhoo8gJ4QpoxwbLp4RX0mEbdLFZFwn1BFYprGQBuqji0tRkiUIdebmP/lus
+         Dj/iZEOk21cKXYHqi1Nh8kA7eYmDO3pZGRieEyzimRUNV03FzA4p1hiZERnvgNJboHU6
+         tPLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727268248; x=1727873048;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4Eo83E3rr21/cKLc/zAZGOD/iRD2paKfELWeccpaaQQ=;
+        b=X7GQVDliIW/VEmL1V3zM1InTtSgbnxFG2fRgoWJETRVGXqfP3NXRF+/j9oQSjDT7t1
+         6p42q3g4+QMcaMrbmdz4zI6We4wCR2lFoAVAA/5Wv2ilxfOEt/bV5TAzHIDVwi5j7Wqi
+         7WXt8aurmvTgHiO6O3OOxHGHu8AYxha4NfYYamt1LnfSA/0v0F6myNo8a97LMClN+KZL
+         yZ4o3+1LvsvzqjIAP4VU9lIrniRNUQKB/U3l0vUjC5reA1bKeMxh+dwyd2p2OMst+aOA
+         1v0VJsKm4KeeyfVxaF8O1fhOUrUXtfNlP+SQrqJqXxAZtadALqR2L7tWNlrp8ACeBd8H
+         9I7g==
+X-Forwarded-Encrypted: i=1; AJvYcCU/rKrHxXbJNb/pXrNY1ja3OpviGBVmuMTodmXlWCPRiBJROIJofKwzCNrpz94C5zsfjzurucw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd4f3VdZmpQ6VWpe6Q1XwLUwsxbuzCwMBHlo0peCqs5NoE8y1f
+	tyr+4USDMK8udGaY0x+4Bh4/v3pSdo8yqQT0NFcnpCJUT35JOWQQ
+X-Google-Smtp-Source: AGHT+IFfS7vhUVhrpQ9ElZSkjpzVE5QUA1yIAFxCnd7J6P95GWbU9JMpyPawsb2SPEgug7UuG0NqYw==
+X-Received: by 2002:a5d:5f85:0:b0:374:c8d9:9094 with SMTP id ffacd0b85a97d-37cc246852fmr1068284f8f.5.1727268248129;
+        Wed, 25 Sep 2024 05:44:08 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5c5cf4d74f9sm1856930a12.80.2024.09.25.05.44.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2024 05:44:07 -0700 (PDT)
+Date: Wed, 25 Sep 2024 15:44:04 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH RFC net-next 01/10] net: pcs: xpcs: move PCS reset to
+ .pcs_pre_config()
+Message-ID: <20240925124404.djjy7e4jhovhbwgt@skbuf>
+References: <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
+ <ZvF0er+vyciwy3Nx@shell.armlinux.org.uk>
+ <E1ssjcZ-005Nrf-QL@rmk-PC.armlinux.org.uk>
+ <E1ssjcZ-005Nrf-QL@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] BPF : arch/x86/net/bpf_jit_comp.c : fix wrong condition
- code in jit compiler
-To: zyf <zhouyangfan20s@ict.ac.cn>, bpf@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, dsahern@kernel.org,
- Yonghong Song <yonghong.song@linux.dev>
-References: <20240925082332.2849923-1-zhouyangfan20s@ict.ac.cn>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-In-Reply-To: <20240925082332.2849923-1-zhouyangfan20s@ict.ac.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27409/Wed Sep 25 11:17:07 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1ssjcZ-005Nrf-QL@rmk-PC.armlinux.org.uk>
+ <E1ssjcZ-005Nrf-QL@rmk-PC.armlinux.org.uk>
 
-On 9/25/24 10:23 AM, zyf wrote:
-> change 'case BPF_ALU64 | BPF_END | BPF_FROM_LE' to 'case BPF_ALU64 | BPF_END | BPF_FROM_BE'
->
-> Signed-off-by: zyf <zhouyangfan20s@ict.ac.cn>
+On Mon, Sep 23, 2024 at 03:00:59PM +0100, Russell King (Oracle) wrote:
+> Move the PCS reset to .pcs_pre_config() rather than at creation time,
+> which means we call the reset function with the interface that we're
+> actually going to be using to talk to the downstream device.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
->   arch/x86/net/bpf_jit_comp.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-> index 06b080b61aa5..7f954d76b3a6 100644
-> --- a/arch/x86/net/bpf_jit_comp.c
-> +++ b/arch/x86/net/bpf_jit_comp.c
-> @@ -1786,7 +1786,7 @@ static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image, u8 *rw_image
->   			break;
->   
->   		case BPF_ALU | BPF_END | BPF_FROM_BE:
-> -		case BPF_ALU64 | BPF_END | BPF_FROM_LE:
-> +		case BPF_ALU64 | BPF_END | BPF_FROM_BE:
->   			switch (imm32) {
->   			case 16:
->   				/* Emit 'ror %ax, 8' to swap lower 2 bytes */
-Please elaborate on the exact issue you've encountered. Right now it looks
-like you did this change just based on code review but not based on a real
-world bug?
 
-BPF_ALU64 | BPF_END | BPF_FROM_LE instruction is unconditonal swap,
-see also commit 0845c3db7bf5c4ceb ("bpf: Support new unconditional bswap 
-instruction").
-As it stands your change additionally breaks BPF selftests.
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com> # sja1105
 
