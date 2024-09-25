@@ -1,337 +1,110 @@
-Return-Path: <netdev+bounces-129821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42F5B986656
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:32:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B518986668
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 20:33:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1C80285C43
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:32:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A179A1C2354E
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 18:33:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2F113A89B;
-	Wed, 25 Sep 2024 18:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D2C13DBBE;
+	Wed, 25 Sep 2024 18:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="GCi5WT9z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K6O8yCwW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42ac.mail.infomaniak.ch (smtp-42ac.mail.infomaniak.ch [84.16.66.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5922540870
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 18:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E542417BB4;
+	Wed, 25 Sep 2024 18:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727289129; cv=none; b=Rq9FUunfb0OZcbOTOq+YMeBmdIXLWLfmAGQ/4eJF8nTK6+ETjezPdFGVUa37GDDjkund3MyRzmgd+folBYd4HnTjox1cq3aoIH1cAWRjbc/Z2RLhSjBLT6vengkQNjYIeHFEyws4cWDRw1OkZ/Ro8o0BCa+g0rv8MmjIc19uukU=
+	t=1727289213; cv=none; b=oSZrp0+329zRlL1k9eXY+ZBwQ9beXqXrEdc3dr4IPICYmsv3wjNU9wxZLK0Swp9ynA9qvMbPExytvKS96g/CHphK+Sv9DoD+NcVd6QcKyai4KgO8x/4geZdcAZ9ZdI47Hy9cnxAJR50ZBqnwEEf2/mIHrV8hxIxkxQ0NCFwfvIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727289129; c=relaxed/simple;
-	bh=oXkJhf4zlAd8vbsDUcGIXjbs5T7UCPeUCESzHoJMqoE=;
+	s=arc-20240116; t=1727289213; c=relaxed/simple;
+	bh=dvQzEz3KjBEyGA4yDAkDvOVrPQ/YoWEcvjsUzrXSFXU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K9ucIyvT8MQCQUw+gxitAi3jlQHx/LZk3y1aCm+R9Y4QiMFwhIkr+zzRMqaaeI7cMvuohnYgAwgn3LAz1azpKuk0ePhr7mnDL0Sqkr5N0FlNgnM565pNGxGUU5oHohtio4Wo5+mET6OjXapBZyBGXbDyc1KdXbBq6OYVR3VAuAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=GCi5WT9z; arc=none smtp.client-ip=84.16.66.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (smtp-4-0001.mail.infomaniak.ch [10.7.10.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4XDQLN6Mk0z18WP;
-	Wed, 25 Sep 2024 20:31:56 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1727289116;
-	bh=OJ1R85/3jKtXbBSN+6FrxKGEnEDKYPXbtDwh5v0pVAY=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=lrcnt6G0WviweLKdlh76DFtVPpMHayV14VJ4PLo4jFg64Lk74/f9dM0tcTv7w2MwQuCGF31Tnbm+7SC92y2XXympM6/XdoMCiSYrzULt0v8wMsF9R99PICpzFdGrEiX24eB8C5cqUShRy+3SjVLZsQLFmTUQDoVFlgUw/IuXeS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K6O8yCwW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71899C4CEC3;
+	Wed, 25 Sep 2024 18:33:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727289211;
+	bh=dvQzEz3KjBEyGA4yDAkDvOVrPQ/YoWEcvjsUzrXSFXU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GCi5WT9zSgFOBsBPBl4MxG2mcqvPsOkOeNHP1EjrwF+ZMj3rNouNA6S5JCekO21PD
-	 bvWMrkRXwR8s+5CF6cSzcE+lEZwG0HWdSulaaYw7LfIsV9e/1H32+ibBRJHtTZKHiX
-	 C9pWB/waURrOquZR/8THgva3m5zQ9jOedvwTSQaU=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4XDQLN0yfNzBrx;
-	Wed, 25 Sep 2024 20:31:56 +0200 (CEST)
-Date: Wed, 25 Sep 2024 20:31:54 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
-	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	Matthieu Buffet <matthieu@buffet.re>
-Subject: Re: [RFC PATCH v2 4/9] selftests/landlock: Test listening restriction
-Message-ID: <20240925.aeJ2du2phi4i@digikod.net>
-References: <20240814030151.2380280-1-ivanov.mikhail1@huawei-partners.com>
- <20240814030151.2380280-5-ivanov.mikhail1@huawei-partners.com>
- <ZsSMe1Ce4OiysGRu@google.com>
- <22dcebae-dc5d-0bf1-c686-d2f444558106@huawei-partners.com>
+	b=K6O8yCwW08tYcQZv9oQ6lRnsetCKtXdzuBttLNPlxm3wDBEaC0AaYyiLHh42OX3it
+	 ExUAXzieV28Mn5J0Lb9syJRnfvEhPI9M/dBzfMwgufcog2XhzBx/MxZVQjqA1A6Pit
+	 FcRxbwBjicJgfaU3b9JVdN2KW1e9QpejGY9sXT53zEfgp/RSAW8outrP0zsHBskMmu
+	 e73eCZTOJoYvHXG5cPxwvxFjcrkqcEzv/hZ6qzTDHeyvOhAxF1ZRfzB3B97/epHnrt
+	 OyB4LJ9i6/B48QCW1lMPDCVJGhd4H/o72Nk5P/hJyKy7qXHBk7uxy5WqOsUsKDizAn
+	 XPlAtaLUH/ykQ==
+Date: Wed, 25 Sep 2024 19:33:27 +0100
+From: Simon Horman <horms@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, yuxuanzhe@outlook.com,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] rxrpc: Fix a race between socket set up and I/O
+ thread creation
+Message-ID: <20240925183327.GW4029621@kernel.org>
+References: <1210177.1727215681@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <22dcebae-dc5d-0bf1-c686-d2f444558106@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+In-Reply-To: <1210177.1727215681@warthog.procyon.org.uk>
 
-On Tue, Aug 20, 2024 at 09:46:56PM +0300, Mikhail Ivanov wrote:
-> 8/20/2024 3:31 PM, Günther Noack wrote:
-> > On Wed, Aug 14, 2024 at 11:01:46AM +0800, Mikhail Ivanov wrote:
-> > > Add a test for listening restriction. It's similar to protocol.bind and
-> > > protocol.connect tests.
-> > > 
-> > > Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-> > > ---
-> > >   tools/testing/selftests/landlock/net_test.c | 44 +++++++++++++++++++++
-> > >   1 file changed, 44 insertions(+)
-> > > 
-> > > diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
-> > > index 8126f5c0160f..b6fe9bde205f 100644
-> > > --- a/tools/testing/selftests/landlock/net_test.c
-> > > +++ b/tools/testing/selftests/landlock/net_test.c
-> > > @@ -689,6 +689,50 @@ TEST_F(protocol, connect)
-> > >   				    restricted, restricted);
-> > >   }
-> > > +TEST_F(protocol, listen)
-> > > +{
-> > > +	if (variant->sandbox == TCP_SANDBOX) {
-> > > +		const struct landlock_ruleset_attr ruleset_attr = {
-> > > +			.handled_access_net = ACCESS_ALL,
-> > > +		};
-> > > +		const struct landlock_net_port_attr tcp_not_restricted_p0 = {
-> > > +			.allowed_access = ACCESS_ALL,
-> > > +			.port = self->srv0.port,
-> > > +		};
-> > > +		const struct landlock_net_port_attr tcp_denied_listen_p1 = {
-> > > +			.allowed_access = ACCESS_ALL &
-> > > +					  ~LANDLOCK_ACCESS_NET_LISTEN_TCP,
-> > > +			.port = self->srv1.port,
-> > > +		};
-> > > +		int ruleset_fd;
-> > > +
-> > > +		ruleset_fd = landlock_create_ruleset(&ruleset_attr,
-> > > +						     sizeof(ruleset_attr), 0);
-> > 
-> > Nit: The declaration and the assignment of ruleset_fd can be merged into one
-> > line and made const.  (Not a big deal, but it was done a bit more consistently
-> > in the rest of the code, I think.)
+On Tue, Sep 24, 2024 at 11:08:01PM +0100, David Howells wrote:
+> In rxrpc_open_socket(), it sets up the socket and then sets up the I/O
+> thread that will handle it.  This is a problem, however, as there's a gap
+> between the two phases in which a packet may come into rxrpc_encap_rcv()
+> from the UDP packet but we oops when trying to wake the not-yet created I/O
+> thread.
 > 
-> Current variant is performed in every TEST_F() method. I assume that
-> this is required in order to not make a mess by combining the
-> ruleset_attr and several rule structures with the operation of creating
-> ruleset. WDYT?
+> As a quick fix, just make rxrpc_encap_rcv() discard the packet if there's
+> no I/O thread yet.
+> 
+> A better, but more intrusive fix would perhaps be to rearrange things such
+> that the socket creation is done by the I/O thread.
+> 
+> Fixes: a275da62e8c1 ("rxrpc: Create a per-local endpoint receive queue and I/O thread")
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-Using variant->sandbox helps identify test scenarios.
+...:wq
 
-> 
-> > 
-> > > +		ASSERT_LE(0, ruleset_fd);
-> > > +
-> > > +		/* Allows all actions for the first port. */
-> > > +		ASSERT_EQ(0,
-> > > +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> > > +					    &tcp_not_restricted_p0, 0));
-> > > +
-> > > +		/* Allows all actions despite listen. */
-> > > +		ASSERT_EQ(0,
-> > > +			  landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
-> > > +					    &tcp_denied_listen_p1, 0));
-> > > +
-> > > +		enforce_ruleset(_metadata, ruleset_fd);
-> > > +		EXPECT_EQ(0, close(ruleset_fd));
-> > > +	}
-> > 
-> > This entire "if (variant->sandbox == TCP_SANDBOX)" conditional does the exact
-> > same thing as the one from patch 5/9.  Should that (or parts of it) get
-> > extracted into a suitable helper?
-> 
-> I don't think replacing
-> 	if (variant->sandbox == TCP_SANDBOX)
-> with
-> 	if (is_tcp_sandbox(variant))
-> will change anything, this condition is already quite simple. If
-> you think that such helper is more convenient, I can add it.
+> diff --git a/net/rxrpc/io_thread.c b/net/rxrpc/io_thread.c
+> index 0300baa9afcd..5c0a5374d51a 100644
+> --- a/net/rxrpc/io_thread.c
+> +++ b/net/rxrpc/io_thread.c
+> @@ -27,8 +27,9 @@ int rxrpc_encap_rcv(struct sock *udp_sk, struct sk_buff *skb)
+>  {
+>  	struct sk_buff_head *rx_queue;
+>  	struct rxrpc_local *local = rcu_dereference_sk_user_data(udp_sk);
+> +	struct task_struct *io_thread = READ_ONCE(local->io_thread);
 
-The variant->sandbox check is OK, but the following code block should
-not be duplicated because it makes more code to review and we may wonder
-if it does the same thing.  Intead we can have something like this:
+Hi David,
 
-if (variant->sandbox == TCP_SANDBOX)
-	restrict_tcp_listen(_metadata, self);
+The line above dereferences local.
+But the line below assumes that it may be NULL.
+This seems inconsistent.
 
-> 
-> > 
-> > > +	bool restricted = is_restricted(&variant->prot, variant->sandbox);
-> > > +
-> > > +	test_restricted_net_fixture(_metadata, &self->srv0, false, false,
-> > > +				    false);
-> > > +	test_restricted_net_fixture(_metadata, &self->srv1, false, false,
-> > > +				    restricted);
-> > > +	test_restricted_net_fixture(_metadata, &self->srv2, restricted,
-> > > +				    restricted, restricted);
-> > 
-> > If we start having logic and conditionals in the test implementation (in this
-> > case, in test_restricted_test_fixture()), this might be a sign that that test
-> > implementation should maybe be split apart?  Once the test is as complicated as
-> > the code under test, it does not simplify our confidence in the code much any
-> > more?
-> > 
-> > (It is often considered bad practice to put conditionals in tests, e.g. in
-> > https://testing.googleblog.com/2014/07/testing-on-toilet-dont-put-logic-in.html)
-> > 
-> > Do you think we have a way to simplify that?
-> 
-> I agree.. using 3 external booleans to control behavior of the
-> test is really messy. I believe the best we can do to avoid this is to
-> split "test_restricted_net_fixture()" into few independent tests. For
-> example we can turn this call:
-> 
-> 	test_restricted_net_fixture(_metadata, &self->srv0, false,
-> 		false, false);
-> 
-> into multiple smaller tests:
-> 
-> 	/* Tries to bind with invalid and minimal addrlen. */
-> 	EXPECT_EQ(0, TEST_BIND(&self->srv0));
-> 
-> 	/* Tries to connect with invalid and minimal addrlen. */
-> 	EXPECT_EQ(0, TEST_CONNECT(&self->srv0));
-> 
-> 	/* Tries to listen. */
-> 	EXPECT_EQ(0, TEST_LISTEN(&self->srv0));
-> 
-> 	/* Connection tests. */
-> 	EXPECT_EQ(0, TEST_CLIENT_SERVER(&self->srv0));
+Flagged by Smatch.
 
-These standalone bind/connect/listen/client_server looks good.
-
-> 
-> Each test is wrapped in a macro that implicitly passes _metadata argument.
-
-I'd prefer to not use macros to pass argument because it makes it more
-difficult to understand what is going on. Just create a
-test_*(_metadata, ...) helper.
-
-> 
-> This case in which every access is allowed can be wrapped in a macro:
-> 
-> 	TEST_UNRESTRICTED_NET_FIXTURE(&self->srv0);
-
-Let's try to avoid macros as much as possible.
-
-> 
-> Such approach has following cons though:
-> * A lot of duplicated code. These small helpers should be added to every
->   test that uses "test_restricted_net_fixture()". Currently there
->   are 16 calls of this helper.
-
-We can start by calling these test_listen()-like helpers in
-test_bind_and_connect().  We should be careful to not change too much
-the existing test code to be able to run them against older kernels
-without too much changes.
-
-> 
-> * There is wouldn't be a single entity that is used to test a network
->   under different sandbox scenarios. If we split the helper each test
->   should care about (1) sandboxing, (2) running all required tests. For
->   example TEST_LISTEN() and TEST_CLIENT_SERVER() could not be called if
->   bind is restricted.
-
-Yes, this might be an issue, but for this specific case we may write a
-dedicated test if it helps.
-
-> 
-> For example protocol.bind test would have following lines after
-> "test_restricted_net_fixture()" is removed:
-> 
-> 	TEST_UNRESTRICTED_NET_FIXTURE(&self->srv0);
-> 
-> 	if (is_restricted(&variant->prot, variant->sandbox)) {
-> 		EXPECT_EQ(-EACCES, TEST_BIND(&self->srv1));
-> 		EXPECT_EQ(0, TEST_CONNECT(&self->srv1));
-> 
-> 		EXPECT_EQ(-EACCES, TEST_BIND(&self->srv2));
-> 		EXPECT_EQ(-EACCES, TEST_CONNECT(&self->srv2));
-> 	} else {
-> 		TEST_UNRESTRICTED_NET_FIXTURE(&self->srv1);
-> 		TEST_UNRESTRICTED_NET_FIXTURE(&self->srv2);
-> 	}
-> 
-> I suggest leaving "test_restricted_net_fixture()" and refactor this
-> booleans (in the way you suggested) in order not to lose simplicity in
-> the testing:
-> 
-> 	bool restricted = is_restricted(&variant->prot,
-> 		variant->sandbox);
-> 
-> 	test_restricted_net_fixture(_metadata, &self->srv0,
-> 		(struct expected_net_enforcement){
-> 		.deny_bind = false,
-> 		.deny_connect = false,
-> 		.deny_listen = false
-> 	});
-> 	test_restricted_net_fixture(_metadata, &self->srv1,
-> 		(struct expected_net_enforcement){
-> 		.deny_bind = false,
-> 		.deny_connect = restricted,
-> 		.deny_listen = false
-> 	});
-> 	test_restricted_net_fixture(_metadata, &self->srv2,
-> 		(struct expected_net_enforcement){
-> 		.deny_bind = restricted,
-> 		.deny_connect = restricted,
-> 		.deny_listen = restricted
-> 	});
-> 
-> But it's really not obvious design issue and splitting helper can really
-> be a better solution. WDYT?
-> 
-> > 
-> > 
-> > Readability remark: I am not that strongly invested in this idea, but in the
-> > call to test_restricted_net_fixture(), it is difficult to understand "false,
-> > false, false", without jumping around in the file.  Should we try to make this
-> > more explicit?
-> > 
-> > I wonder whether we should just pass a struct, so that everything at least has a
-> > name?
-> > 
-> >    test_restricted_net_fixture((struct expected_net_enforcement){
-> >      .deny_bind = false,
-> >      .deny_connect = false,
-> >      .deny_listen = false,
-> >    });
-> > 
-> > Then it would be clearer which boolean is which,
-> > and you could use the fact that unspecified struct fields are zero-initialized?
-> > 
-> > (Alternatively, you could also spell out error codes here, instead of booleans.)
-> 
-> Agreed, this is a best option for refactoring.
-> 
-> I've also tried adding access_mask field to the service_fixture struct
-> with all accesses allowed by default. In a test, then you just need to
-> remove the necessary accesses after sandboxing:
-> 
-> 	if (is_restricted(&variant->prot, variant->sandbox))
-> 		clear_access(&self->srv2,
-> 			     LANDLOCK_ACCESS_NET_BIND_TCP |
-> 				     LANDLOCK_ACCESS_NET_CONNECT_TCP);
-> 
-> 	test_restricted_net_fixture(_metadata, &self->srv2);
-> 
-> But this solution is too implicit for the helper. Passing struct would
-> be better.
-
-What about passing the variant to these tests and creating more
-fine-grained is_restricted_*() helpers?
-
-> 
-> > 
-> > > +}
-> > > +
-> > >   TEST_F(protocol, bind_unspec)
-> > >   {
-> > >   	const struct landlock_ruleset_attr ruleset_attr = {
-> > > -- 
-> > > 2.34.1
-> > > 
-> > 
-> > —Günther
-> 
+>  
+> -	if (unlikely(!local)) {
+> +	if (unlikely(!local || !io_thread)) {
+>  		kfree_skb(skb);
+>  		return 0;
+>  	}
 
