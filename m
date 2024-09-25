@@ -1,128 +1,133 @@
-Return-Path: <netdev+bounces-129800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B47986406
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 17:46:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B075E986439
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 17:56:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0604B1C27A23
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:46:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F0F028717F
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 15:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C1A17557;
-	Wed, 25 Sep 2024 15:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216FB1A29A;
+	Wed, 25 Sep 2024 15:55:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="PC9gRgVo"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RGBTGhkS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93269BE6C
-	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 15:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 178A71D5ADB;
+	Wed, 25 Sep 2024 15:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727279177; cv=none; b=dhOUtyqW87rm4v3kaRMVw8BTcZ3NUAVVIm9yojCFrA9iDbD8k2Adk0/ashYDyHrICZQxhGZSc55eGO21uCUyxcjNTYQe3UA6zFGRR2/HmDXa7y/rYnPnvEfm25QdduZrK0Hx0rYWYt0xRNpriq4IuJuwkxCQrmEELgoGYqx0zV4=
+	t=1727279757; cv=none; b=ajHEh2k35cVb4Sc5YFyp7x1hFJ0PN8i1vGVBJHGXt8Sqb5L+lD555GpW8WeRas45NWk31qsfGI8pbywcnbudWFdMKrCJJvLHZCLhl2f/qnwrYrh+KveSPGqoWsTmQ1EXCAiN4BKOwJUFtTi/b2O3VUVV2Vk0H+Yr28VdADcCESA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727279177; c=relaxed/simple;
-	bh=x+4F0wBUmKeHDpIxKuL0c2Jd8c4z4haxH1Lz4gdI+B0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MaH6JSiDRznJCgkrbnKKsEQR+paw7ERFh/CfYOI1pzOj1ZejagJTdeZJx4rucu3y/UKsTAut4F3Vh/0MFs+Az+KrItd3pZr0lJ0V5gbfu2KDiB6JKuZDqU/ixnVqQwpOsRSkYF40gUmk2glQECSA23ja6bVozX9OaFlkOBtnaA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=PC9gRgVo; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-82d24e18dfcso327629039f.3
-        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 08:46:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google; t=1727279175; x=1727883975; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bJM9B0m/lek0u1t6zaan4eSGVrdWrKVx/I5Nl82tDpg=;
-        b=PC9gRgVoBdTFbP/CUmjj8qpu4fOA1QUc1MXA98jYJFalliEKXucSUK5a/JmYxtNdrt
-         1GorQ5NKg6gXGR4htfCIwdAz5SWa+WevsgaGrs2sNNRTbV2xm6g7FTCU3PxhYfcVSkBe
-         N5II6CsvQ1LhBPL2FEMfRsbT2YZMMwIa2Guhg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1727279175; x=1727883975;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bJM9B0m/lek0u1t6zaan4eSGVrdWrKVx/I5Nl82tDpg=;
-        b=EkCW9NU6zaOBRFeum2mwmlERBP/gUydmQjQTG8s2CDF/oDdAO7/t6i/q2SOknv3zlG
-         NQGiNkdl3thWNFk+6QJOCSAUcEWU/g1ziiWpZxps421Y7QUdzeO71VL/TKWscwhyCiJU
-         1I/yeTOenh8BRvsHiSUS0XFC/1Tn73X5i2tvyRoDJfEF6T1B+9qG40hXeQ75cTjIJPmn
-         PeDmBOo0FVM/fZ2INgzLYFYs8p6W8iIjNbE2xERx4KRyFre5yObiGKQtiUU9Cll1qPsF
-         SIQvVpGGCHCPRUSjOgq1JM+0GSH8FFBMd5bqpRT4FPkHd/0iVLKQjCWbIH3AlY4ZBch3
-         rVSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU79aMrb8c9ZinssMWjNyugZI0o+eSRv+F2g42lWGFMM5Pgu4dtIPMA9G2VtMy/sryM/69wkig=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6HFjxFJyw4Bif8zaw9TdIqzGv5EXhHw/oF21JBJDqUaCnobvt
-	m6yYQlVGW2gVnZrEshWACT0ZgXS9wDK6aaCKirVe0hqaq+p5YqgRUTRqPXjeb8Q=
-X-Google-Smtp-Source: AGHT+IHRidj4X8LYl5IH0Bj18RNFExR+Bckr7+2ammy4QZdJGrRo2Cl1ySSH9rbblKME1zD62cNhWw==
-X-Received: by 2002:a05:6602:6424:b0:82d:f4f:f49b with SMTP id ca18e2360f4ac-83247f9003fmr365137839f.16.1727279174659;
-        Wed, 25 Sep 2024 08:46:14 -0700 (PDT)
-Received: from [192.168.1.128] ([38.175.170.29])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-8323f5dbf4dsm112899639f.11.2024.09.25.08.46.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Sep 2024 08:46:14 -0700 (PDT)
-Message-ID: <e537539f-85a5-42eb-be8a-8a865db53ca2@linuxfoundation.org>
-Date: Wed, 25 Sep 2024 09:46:12 -0600
+	s=arc-20240116; t=1727279757; c=relaxed/simple;
+	bh=6cl/j0h8/fQAecYQcMkV6Ik//UIK14kCIeO58lhlD0o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YE0GT/inKcrY/wKjKkj12KJdFCAc4WAJI1sIyhpJkzFJHUW3JLlnXL7NyTknYyvSK0ef6G68E0TBTSHw7hOpxvjgCsvwT3y1MpYzE3UZ+Je8ebC7fypFDWvbM/SgTw3umiQrbqJHSlq3cFT4MamhBEbfYTGocHNtWM4QVT9MOnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RGBTGhkS; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 48PF8aGl012527;
+	Wed, 25 Sep 2024 15:55:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=P8P2LInkPjfmmtxfJgORNu/tQb
+	1/lCiXfKfhHbq/uwA=; b=RGBTGhkSeIKb57pHfMRqzNCTgKHQyqB6YZoeyoTG4U
+	iZEu8rp+xZSeLRbWhbXUrgRLBXs3t4jdiGYkCwNouqHn7OIfJFK8y0GSb9+UqByC
+	ZLfgMMvVqyZudVtcH/PjOu/aS42JIxan+8KUYSuZwNpgXEPkouNW1IjyoxAADxm1
+	qVk2krT5dRp7K1qXFrNO5dDsIzwxG1ivmhag4VbVLBgrp3wV7vLedx0yQotlxb/q
+	xD9YrqH8Gqpd9xpX811TMhcpJpGkB0BL46qMg1FgwLNlEcTMIGdNLPmgP7eYCQ1+
+	H2tpPR0WSUO3xpw0PDxq7I+HG2dDdxsIuWiMuiuWi5Ng==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41smjk0y8u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 15:55:32 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 48PFtWwM026737;
+	Wed, 25 Sep 2024 15:55:32 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 41smjk0y8q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 15:55:32 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 48PEpufn000636;
+	Wed, 25 Sep 2024 15:55:31 GMT
+Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 41t8futn58-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 25 Sep 2024 15:55:31 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 48PFtUQb28049968
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 25 Sep 2024 15:55:30 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8F8C958056;
+	Wed, 25 Sep 2024 15:55:30 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4E7895803F;
+	Wed, 25 Sep 2024 15:55:30 +0000 (GMT)
+Received: from slate16.aus.stglabs.ibm.com (unknown [9.61.18.127])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 25 Sep 2024 15:55:30 +0000 (GMT)
+From: Eddie James <eajames@linux.ibm.com>
+To: sam@mendozajonas.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, gwshan@linux.vnet.ibm.com, joel@jms.id.au,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Eddie James <eajames@linux.ibm.com>
+Subject: [PATCH v2] net/ncsi: Disable the ncsi work before freeing the associated structure
+Date: Wed, 25 Sep 2024 10:55:23 -0500
+Message-ID: <20240925155523.1017097-1-eajames@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] selftests: exec: update gitignore for load_address
-To: Javier Carrasco <javier.carrasco.cruz@gmail.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Allison Henderson <allison.henderson@oracle.com>,
- Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>
-Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- rds-devel@oss.oracle.com, linux-mm@kvack.org,
- Shuah Khan <skhan@linuxfoundation.org>
-References: <20240924-selftests-gitignore-v1-0-9755ac883388@gmail.com>
- <20240924-selftests-gitignore-v1-4-9755ac883388@gmail.com>
-Content-Language: en-US
-From: Shuah Khan <skhan@linuxfoundation.org>
-In-Reply-To: <20240924-selftests-gitignore-v1-4-9755ac883388@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: POry1i8rnsfMSXOG3dF5uswqgu50EnHn
+X-Proofpoint-GUID: QzXtUoC9gSTn8yU4tyu1H-DzYHSrr1qA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-25_10,2024-09-25_02,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 adultscore=0 malwarescore=0 suspectscore=0 bulkscore=0
+ spamscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
+ mlxlogscore=670 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2408220000 definitions=main-2409250111
 
-On 9/24/24 06:49, Javier Carrasco wrote:
-> The name of the "load_address" objects has been modified, but the
-> corresponding entry in the gitignore file must be updated.
-> 
-> Update the load_address entry in the gitignore file to account for
-> the new names.
-> 
-> Signed-off-by: Javier Carrasco <javier.carrasco.cruz@gmail.com>
-> ---
->   tools/testing/selftests/exec/.gitignore | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/exec/.gitignore b/tools/testing/selftests/exec/.gitignore
-> index 90c238ba6a4b..4d9fb7b20ea7 100644
-> --- a/tools/testing/selftests/exec/.gitignore
-> +++ b/tools/testing/selftests/exec/.gitignore
-> @@ -9,7 +9,7 @@ execveat.ephemeral
->   execveat.denatured
->   non-regular
->   null-argv
-> -/load_address_*
-> +/load_address.*
+The work function can run after the ncsi device is freed, resulting
+in use-after-free bugs or kernel panic.
 
-Hmm. This will include the load_address.c which shouldn't
-be included in the .gitignore?
+Fixes: 2d283bdd079c ("net/ncsi: Resource management")
+Signed-off-by: Eddie James <eajames@linux.ibm.com>
+---
+Changes since v1:
+ - Use disable_work_sync instead of cancel_work_sync
 
->   /recursion-depth
->   xxxxxxxx*
->   pipe
-> 
+ net/ncsi/ncsi-manage.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-thanks,
--- Shuah
+diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
+index 5ecf611c8820..5cf55bde366d 100644
+--- a/net/ncsi/ncsi-manage.c
++++ b/net/ncsi/ncsi-manage.c
+@@ -1954,6 +1954,8 @@ void ncsi_unregister_dev(struct ncsi_dev *nd)
+ 	list_del_rcu(&ndp->node);
+ 	spin_unlock_irqrestore(&ncsi_dev_lock, flags);
+ 
++	disable_work_sync(&ndp->work);
++
+ 	kfree(ndp);
+ }
+ EXPORT_SYMBOL_GPL(ncsi_unregister_dev);
+-- 
+2.43.0
+
 
