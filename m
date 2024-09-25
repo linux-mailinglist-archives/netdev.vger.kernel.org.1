@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-129707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82F76985975
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:54:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FAA9985989
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 13:55:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A7321F241AE
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:54:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BC842847F2
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 11:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8964E1A0BF8;
-	Wed, 25 Sep 2024 11:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64FFD1A38E4;
+	Wed, 25 Sep 2024 11:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VC3hMn/m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfTQHoM4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3561714CD;
-	Wed, 25 Sep 2024 11:39:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2661A38DD;
+	Wed, 25 Sep 2024 11:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727264347; cv=none; b=SAPz6zHe+Ij0lcfaWmMfC38mURxRhYZejMNwXtqYeTXp82u7XERYfb+LM2lfF4l3h2KbbQT6zARBqeA+0X9mV//N+6ezQknm1nLRo0uyZ6Q61bZHUv8noRIxC9HAU9INJMpsvdkOKfmNJsZaNK/uerPs30SiE5i6gyYkkxnjioM=
+	t=1727264365; cv=none; b=FQtROc8Yt5WCPmscB6VA/p4PhWy+ZzPV8sWjMiv7MyqogIaQBBZjBPwT5u75NHJ9yQIlSlRCIyOtVGgjZ6hs181m9KOnndhJSxx9Udwq8033osmsHhr4ott+z0DMUUN/UL9f28apsnlXMq/o4HjL19arzn5eQIdITWgUZd40q2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727264347; c=relaxed/simple;
-	bh=jF0abiIBhipUZJz2L6J7yK+HxKzqN7eourDEO/NO2Wc=;
+	s=arc-20240116; t=1727264365; c=relaxed/simple;
+	bh=kRWR6qYrxWbNzYcGxDDO/mF6H7avlIAs8xLSBm1IsR8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tjo+HlcVanGYhJ4dPfww6KqgpCoi1s57KGeTQJb9M0H9eDvdxtr7QKs8uloga4PWl/rCvEZPqIw1An7pGrgTRr/2TjctDwFYNDu5zMwd5YVNlgYhfqLpHpFB5XjZUgrqs8ICTSvY0ygRF31l9QYsrcV/MweF1IYOlS/oqZ23KQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VC3hMn/m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0CCBC4AF0B;
-	Wed, 25 Sep 2024 11:39:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=WiC4vuS5bL0i0w4NxuDL8Ho9llZlxXyQRojJ2SHzXxolBvSGE9ZnuZfbusT8sv+IuMMz1pBYoKdI71+NozIDcAXApYXO+Ev6E5rO8DgXdZbNE6KX4BjSPSjCIdoh+xpatX21FmQz2z3ryMd5OEZT7a/UV/q9/IDpvBjU58uz5Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfTQHoM4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24E0AC4CEC7;
+	Wed, 25 Sep 2024 11:39:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727264347;
-	bh=jF0abiIBhipUZJz2L6J7yK+HxKzqN7eourDEO/NO2Wc=;
+	s=k20201202; t=1727264365;
+	bh=kRWR6qYrxWbNzYcGxDDO/mF6H7avlIAs8xLSBm1IsR8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VC3hMn/mHJK50XH73K0LkQJ1YKn4F5zBrv+B5hEdHm0GUuQudVbUE7JVLBngL72ob
-	 v7uZ3zM9/LCYq/P41ddK1SP/cGD1WDSQScJzMsan+j16iuWqzafQjOaE167rWA/8cS
-	 RHPNMfibeCKgqF6JzPikjzBRGGh3yZPwl1ryiJCtuoWlnLiypwjrGgBr2FKo2dk2Q6
-	 DhQQVne5wzWMsykAN32u86comZPHm3LcyYNM6KMex9cpFsagTHdPmzzZN2BYYJmf/5
-	 Uwa4iZ3qCHuHLD+Q4KTxP+XMOEfHhYXNjkAxi5nxfShdD9wRFPWvOQSmpAGE7xpLv4
-	 QdqaQ70noyF+w==
+	b=sfTQHoM4j0jIvPmaP9MGA1PjF6Vi8FAYwc2LTlQYEcNpXUMrBIOmZ6wO6oMIJFutL
+	 gG0CDtBS5IhMzUoOV3/uBkWYlnlJgXUdwvIieu4rWxLCTvUE0KO0u/zWdeYflW3ypc
+	 1kk7t4Mqg5PHPJ7aeu5TLp3QzZYOZWWRA+ovRKqV7jVtyT7O0S+wrS7EA0v+Q7hqFy
+	 Aw7o01q26WkEoiDx+KoBWR05MVnJZ+uK2qv9xnWz/SzVA6vzHAGy/gpm6frSnt9obJ
+	 GN8HUKNUtOMZrYIv1QuqlRZAPUFBLu5giZS88uPKlgyBh+qehjQs3yTMrzWs9OV7aU
+	 7f8JHlvKbV6Uw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>,
-	Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>,
+Cc: =?UTF-8?q?Stefan=20M=C3=A4tje?= <stefan.maetje@esd.eu>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
+	mailhol.vincent@wanadoo.fr,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
+	maxime.jayat@mobile-devices.fr,
+	linux-can@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 062/244] wifi: mac80211: fix RCU list iterations
-Date: Wed, 25 Sep 2024 07:24:43 -0400
-Message-ID: <20240925113641.1297102-62-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.11 068/244] can: netlink: avoid call to do_set_data_bittiming callback with stale can_priv::ctrlmode
+Date: Wed, 25 Sep 2024 07:24:49 -0400
+Message-ID: <20240925113641.1297102-68-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240925113641.1297102-1-sashal@kernel.org>
 References: <20240925113641.1297102-1-sashal@kernel.org>
@@ -66,87 +67,173 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11
 Content-Transfer-Encoding: 8bit
 
-From: Johannes Berg <johannes.berg@intel.com>
+From: Stefan Mätje <stefan.maetje@esd.eu>
 
-[ Upstream commit ac35180032fbc5d80b29af00ba4881815ceefcb6 ]
+[ Upstream commit 2423cc20087ae9a7b7af575aa62304ef67cad7b6 ]
 
-There are a number of places where RCU list iteration is
-used, but that aren't (always) called with RCU held. Use
-just list_for_each_entry() in most, and annotate iface
-iteration with the required locks.
+This patch moves the evaluation of data[IFLA_CAN_CTRLMODE] in function
+can_changelink in front of the evaluation of data[IFLA_CAN_BITTIMING].
 
-Reviewed-by: Miriam Rachel Korenblit <miriam.rachel.korenblit@intel.com>
-Link: https://patch.msgid.link/20240827094939.ed8ac0b2f897.I8443c9c3c0f8051841353491dae758021b53115e@changeid
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+This avoids a call to do_set_data_bittiming providing a stale
+can_priv::ctrlmode with a CAN_CTRLMODE_FD flag not matching the
+requested state when switching between a CAN Classic and CAN-FD bitrate.
+
+In the same manner the evaluation of data[IFLA_CAN_CTRLMODE] in function
+can_validate is also moved in front of the evaluation of
+data[IFLA_CAN_BITTIMING].
+
+This is a preparation for patches where the nominal and data bittiming
+may have interdependencies on the driver side depending on the
+CAN_CTRLMODE_FD flag state.
+
+Signed-off-by: Stefan Mätje <stefan.maetje@esd.eu>
+Link: https://patch.msgid.link/20240808164224.213522-1-stefan.maetje@esd.eu
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/chan.c | 4 +++-
- net/mac80211/mlme.c | 2 +-
- net/mac80211/scan.c | 2 +-
- net/mac80211/util.c | 4 +++-
- 4 files changed, 8 insertions(+), 4 deletions(-)
+ drivers/net/can/dev/netlink.c | 102 +++++++++++++++++-----------------
+ 1 file changed, 51 insertions(+), 51 deletions(-)
 
-diff --git a/net/mac80211/chan.c b/net/mac80211/chan.c
-index e8567723e94d5..b72e4036526bf 100644
---- a/net/mac80211/chan.c
-+++ b/net/mac80211/chan.c
-@@ -286,7 +286,9 @@ ieee80211_get_max_required_bw(struct ieee80211_link_data *link)
- 	enum nl80211_chan_width max_bw = NL80211_CHAN_WIDTH_20_NOHT;
- 	struct sta_info *sta;
+diff --git a/drivers/net/can/dev/netlink.c b/drivers/net/can/dev/netlink.c
+index dfdc039d92a6c..01aacdcda2606 100644
+--- a/drivers/net/can/dev/netlink.c
++++ b/drivers/net/can/dev/netlink.c
+@@ -65,15 +65,6 @@ static int can_validate(struct nlattr *tb[], struct nlattr *data[],
+ 	if (!data)
+ 		return 0;
  
--	list_for_each_entry_rcu(sta, &sdata->local->sta_list, list) {
-+	lockdep_assert_wiphy(sdata->local->hw.wiphy);
-+
-+	list_for_each_entry(sta, &sdata->local->sta_list, list) {
- 		if (sdata != sta->sdata &&
- 		    !(sta->sdata->bss && sta->sdata->bss == sdata->bss))
- 			continue;
-diff --git a/net/mac80211/mlme.c b/net/mac80211/mlme.c
-index f9526bbc36337..3a0433e088906 100644
---- a/net/mac80211/mlme.c
-+++ b/net/mac80211/mlme.c
-@@ -1231,7 +1231,7 @@ static bool ieee80211_add_vht_ie(struct ieee80211_sub_if_data *sdata,
- 		bool disable_mu_mimo = false;
- 		struct ieee80211_sub_if_data *other;
- 
--		list_for_each_entry_rcu(other, &local->interfaces, list) {
-+		list_for_each_entry(other, &local->interfaces, list) {
- 			if (other->vif.bss_conf.mu_mimo_owner) {
- 				disable_mu_mimo = true;
- 				break;
-diff --git a/net/mac80211/scan.c b/net/mac80211/scan.c
-index b5f2df61c7f67..2dd84fc542b2a 100644
---- a/net/mac80211/scan.c
-+++ b/net/mac80211/scan.c
-@@ -504,7 +504,7 @@ static void __ieee80211_scan_completed(struct ieee80211_hw *hw, bool aborted)
- 	 * the scan was in progress; if there was none this will
- 	 * just be a no-op for the particular interface.
- 	 */
--	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-+	list_for_each_entry(sdata, &local->interfaces, list) {
- 		if (ieee80211_sdata_running(sdata))
- 			wiphy_work_queue(sdata->local->hw.wiphy, &sdata->work);
+-	if (data[IFLA_CAN_BITTIMING]) {
+-		struct can_bittiming bt;
+-
+-		memcpy(&bt, nla_data(data[IFLA_CAN_BITTIMING]), sizeof(bt));
+-		err = can_validate_bittiming(&bt, extack);
+-		if (err)
+-			return err;
+-	}
+-
+ 	if (data[IFLA_CAN_CTRLMODE]) {
+ 		struct can_ctrlmode *cm = nla_data(data[IFLA_CAN_CTRLMODE]);
+ 		u32 tdc_flags = cm->flags & CAN_CTRLMODE_TDC_MASK;
+@@ -114,6 +105,15 @@ static int can_validate(struct nlattr *tb[], struct nlattr *data[],
+ 		}
  	}
-diff --git a/net/mac80211/util.c b/net/mac80211/util.c
-index c7ad9bc5973a0..aed72794d9fe3 100644
---- a/net/mac80211/util.c
-+++ b/net/mac80211/util.c
-@@ -751,7 +751,9 @@ static void __iterate_interfaces(struct ieee80211_local *local,
- 	struct ieee80211_sub_if_data *sdata;
- 	bool active_only = iter_flags & IEEE80211_IFACE_ITER_ACTIVE;
  
--	list_for_each_entry_rcu(sdata, &local->interfaces, list) {
-+	list_for_each_entry_rcu(sdata, &local->interfaces, list,
-+				lockdep_is_held(&local->iflist_mtx) ||
-+				lockdep_is_held(&local->hw.wiphy->mtx)) {
- 		switch (sdata->vif.type) {
- 		case NL80211_IFTYPE_MONITOR:
- 			if (!(sdata->u.mntr.flags & MONITOR_FLAG_ACTIVE))
++	if (data[IFLA_CAN_BITTIMING]) {
++		struct can_bittiming bt;
++
++		memcpy(&bt, nla_data(data[IFLA_CAN_BITTIMING]), sizeof(bt));
++		err = can_validate_bittiming(&bt, extack);
++		if (err)
++			return err;
++	}
++
+ 	if (is_can_fd) {
+ 		if (!data[IFLA_CAN_BITTIMING] || !data[IFLA_CAN_DATA_BITTIMING])
+ 			return -EOPNOTSUPP;
+@@ -195,48 +195,6 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
+ 	/* We need synchronization with dev->stop() */
+ 	ASSERT_RTNL();
+ 
+-	if (data[IFLA_CAN_BITTIMING]) {
+-		struct can_bittiming bt;
+-
+-		/* Do not allow changing bittiming while running */
+-		if (dev->flags & IFF_UP)
+-			return -EBUSY;
+-
+-		/* Calculate bittiming parameters based on
+-		 * bittiming_const if set, otherwise pass bitrate
+-		 * directly via do_set_bitrate(). Bail out if neither
+-		 * is given.
+-		 */
+-		if (!priv->bittiming_const && !priv->do_set_bittiming &&
+-		    !priv->bitrate_const)
+-			return -EOPNOTSUPP;
+-
+-		memcpy(&bt, nla_data(data[IFLA_CAN_BITTIMING]), sizeof(bt));
+-		err = can_get_bittiming(dev, &bt,
+-					priv->bittiming_const,
+-					priv->bitrate_const,
+-					priv->bitrate_const_cnt,
+-					extack);
+-		if (err)
+-			return err;
+-
+-		if (priv->bitrate_max && bt.bitrate > priv->bitrate_max) {
+-			NL_SET_ERR_MSG_FMT(extack,
+-					   "arbitration bitrate %u bps surpasses transceiver capabilities of %u bps",
+-					   bt.bitrate, priv->bitrate_max);
+-			return -EINVAL;
+-		}
+-
+-		memcpy(&priv->bittiming, &bt, sizeof(bt));
+-
+-		if (priv->do_set_bittiming) {
+-			/* Finally, set the bit-timing registers */
+-			err = priv->do_set_bittiming(dev);
+-			if (err)
+-				return err;
+-		}
+-	}
+-
+ 	if (data[IFLA_CAN_CTRLMODE]) {
+ 		struct can_ctrlmode *cm;
+ 		u32 ctrlstatic;
+@@ -284,6 +242,48 @@ static int can_changelink(struct net_device *dev, struct nlattr *tb[],
+ 			priv->ctrlmode &= cm->flags | ~CAN_CTRLMODE_TDC_MASK;
+ 	}
+ 
++	if (data[IFLA_CAN_BITTIMING]) {
++		struct can_bittiming bt;
++
++		/* Do not allow changing bittiming while running */
++		if (dev->flags & IFF_UP)
++			return -EBUSY;
++
++		/* Calculate bittiming parameters based on
++		 * bittiming_const if set, otherwise pass bitrate
++		 * directly via do_set_bitrate(). Bail out if neither
++		 * is given.
++		 */
++		if (!priv->bittiming_const && !priv->do_set_bittiming &&
++		    !priv->bitrate_const)
++			return -EOPNOTSUPP;
++
++		memcpy(&bt, nla_data(data[IFLA_CAN_BITTIMING]), sizeof(bt));
++		err = can_get_bittiming(dev, &bt,
++					priv->bittiming_const,
++					priv->bitrate_const,
++					priv->bitrate_const_cnt,
++					extack);
++		if (err)
++			return err;
++
++		if (priv->bitrate_max && bt.bitrate > priv->bitrate_max) {
++			NL_SET_ERR_MSG_FMT(extack,
++					   "arbitration bitrate %u bps surpasses transceiver capabilities of %u bps",
++					   bt.bitrate, priv->bitrate_max);
++			return -EINVAL;
++		}
++
++		memcpy(&priv->bittiming, &bt, sizeof(bt));
++
++		if (priv->do_set_bittiming) {
++			/* Finally, set the bit-timing registers */
++			err = priv->do_set_bittiming(dev);
++			if (err)
++				return err;
++		}
++	}
++
+ 	if (data[IFLA_CAN_RESTART_MS]) {
+ 		/* Do not allow changing restart delay while running */
+ 		if (dev->flags & IFF_UP)
 -- 
 2.43.0
 
