@@ -1,156 +1,97 @@
-Return-Path: <netdev+bounces-129668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DB5998552F
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 10:11:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A44E398555A
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 10:19:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 204E6282A0B
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 08:10:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E21D1F21D0F
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 08:19:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D988B158DC2;
-	Wed, 25 Sep 2024 08:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A057157472;
+	Wed, 25 Sep 2024 08:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b="nlDqJ4nw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GiVLF7Cr"
 X-Original-To: netdev@vger.kernel.org
-Received: from nbd.name (nbd.name [46.4.11.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DB5158D8B;
-	Wed, 25 Sep 2024 08:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.4.11.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 560501547F5
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 08:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727251851; cv=none; b=JEuH0t8uTNpiIT46ivnPfd7IiSmpsf7pqWEpZ7HrdteiKjo0j7dB6XVmlrHEPh6y4cEKxbhr+Mb6XONnSiUiUao74EFZI1uSaSuJvQB//7jj0CnGlM+sg8f0XUoRi3hlASOVUGS+ebacsKVAL1KyFFnATBCYnCjWfODsZUySodU=
+	t=1727252372; cv=none; b=lVrMl1Cdq/nU6aGts0eCEC6a8bA/lP5a8S1YeufdVrKtI32S0z/Vona/NwRSE43NDYBhrcMkBg1an/LNqXskO1rBNxeav6gLknXR1KCizX2CpKu2Z6f9ctwKjMsDFNd1gMK2NAsEqIx8DBW7ve0W+VzKSjKEMpFd4CE5VHcmQnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727251851; c=relaxed/simple;
-	bh=rk79/5jLuWRShi+hJSJTwTjc08asZJUveMmcHrOl8Z4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bqASw7qHXtjcgvRa3swmS5HZd1Mvi9phGFwLzsDA+C6c7AQo0OZ7W7dCGUQjTvBd97avYxwxk534USOerWWzOtjS5YuCo+5HbyKDpY5JGsX9oqM9sAAWxOxHcD2kIkz4Si5q75LZxFymz2ocQ0Do0VJ/bp0xVZe/oebcR4q9qTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name; spf=none smtp.mailfrom=nbd.name; dkim=pass (1024-bit key) header.d=nbd.name header.i=@nbd.name header.b=nlDqJ4nw; arc=none smtp.client-ip=46.4.11.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nbd.name
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=nbd.name
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nbd.name;
-	s=20160729; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=bKclhaTc24WnkdSHEyar6keGCS110VF6QKBCja6R5IY=; b=nlDqJ4nwciaQZTa0TZS6lhWmIN
-	8mKVMH+M/tbyL9btHCqDvbqakHvf4f0+tvA45E7NzF3AeUdJGRp9UbNMlsD8GlNVofZyApu7O9xNs
-	Pe3U/gp92sGRL+OYnGJ5yPo5YMIcjizVjJrmO0/GLBtyeZ3S7lrEn7EHM+F+qDxHUam4=;
-Received: from p4ff130c8.dip0.t-ipconnect.de ([79.241.48.200] helo=nf.local)
-	by ds12 with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96)
-	(envelope-from <nbd@nbd.name>)
-	id 1stN6b-000jdw-1r;
-	Wed, 25 Sep 2024 10:10:37 +0200
-Message-ID: <7144e848-9919-44a5-a313-f9b2076532bf@nbd.name>
-Date: Wed, 25 Sep 2024 10:10:36 +0200
+	s=arc-20240116; t=1727252372; c=relaxed/simple;
+	bh=NKtpXnORoWIqSsbon3c4R1RhQX2f/fYpW7Kuu7E/HU8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z/lqlGANJNo/1mk5BJOgwQJmSDe8bcSKgT0RZKah6Xth4oMZw0K9pjDxBy0CW0iQq39QiyeIynwXcBWGrfvp4futXNX5Rm2+vH2dayEhTvXyqvNRfdxvgLAvTKiRI0+rt5BdAJwhlolrfHLnlnUnai34MQ0Tmi7bvdEQs7phjgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GiVLF7Cr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52DA3C4CEC3;
+	Wed, 25 Sep 2024 08:19:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1727252370;
+	bh=NKtpXnORoWIqSsbon3c4R1RhQX2f/fYpW7Kuu7E/HU8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GiVLF7CrzzOeWI2Z682LDPW6Q6AqtKOKNgL1lnWG8rTb29CEuHphZNlc4Mcg+eDnL
+	 EliCkVwM7mz0XvEDIP5eSX9QSQOfdVaq7+zH/AGS9PADRXp920emimMM9y5DU6pl2b
+	 J9FZM7Q3v8qUSYpqBxBtRPlxn3sKwTiwU7BCmwj2OtEh4rbtK/+Q31wL2qcfr/0OM3
+	 JhO6UnbOqB1Hh1Rapzq1d/4pVzNJp0P2kUKSdH6iTVDLGWIgBTlMocfRb7YJPLUsl7
+	 h6Xh2sFIAHL+a51asLEc1hQxJIy8/dc9JGygW+79DI4n1PxOYVds+MLrPOWyh8X8H9
+	 et7+p6en5A5kg==
+Date: Wed, 25 Sep 2024 11:19:24 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Feng Wang <wangfe@google.com>, netdev@vger.kernel.org,
+	antony.antony@secunet.com
+Subject: Re: [PATCH] xfrm: add SA information to the offloaded packet
+Message-ID: <20240925081924.GB967758@unreal>
+References: <20240822200252.472298-1-wangfe@google.com>
+ <Zs62fyjudeEJvJsQ@gauss3.secunet.de>
+ <20240831173934.GC4000@unreal>
+ <ZtVs2KwxY8VkvoEr@gauss3.secunet.de>
+ <20240902094452.GE4026@unreal>
+ <Zt67MfyiRQrYTLHC@gauss3.secunet.de>
+ <20240911104040.GG4026@unreal>
+ <ZvKVuBTkh2dts8Qy@gauss3.secunet.de>
+ <CADsK2K9aHkouKK4btdEMmPGkwOEZTNmd7OPHvYQErd+3NViDnQ@mail.gmail.com>
+ <ZvMAof2+5JET6JRA@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] gso: fix gso fraglist segmentation after pull from
- frag_list
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, stable@vger.kernel.org, maze@google.com,
- shiming.cheng@mediatek.com, daniel@iogearbox.net, lena.wang@mediatek.com,
- herbert@gondor.apana.org.au, Willem de Bruijn <willemb@google.com>
-References: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
-From: Felix Fietkau <nbd@nbd.name>
-Content-Language: en-US
-Autocrypt: addr=nbd@nbd.name; keydata=
- xsDiBEah5CcRBADIY7pu4LIv3jBlyQ/2u87iIZGe6f0f8pyB4UjzfJNXhJb8JylYYRzIOSxh
- ExKsdLCnJqsG1PY1mqTtoG8sONpwsHr2oJ4itjcGHfn5NJSUGTbtbbxLro13tHkGFCoCr4Z5
- Pv+XRgiANSpYlIigiMbOkide6wbggQK32tC20QxUIwCg4k6dtV/4kwEeiOUfErq00TVqIiEE
- AKcUi4taOuh/PQWx/Ujjl/P1LfJXqLKRPa8PwD4j2yjoc9l+7LptSxJThL9KSu6gtXQjcoR2
- vCK0OeYJhgO4kYMI78h1TSaxmtImEAnjFPYJYVsxrhay92jisYc7z5R/76AaELfF6RCjjGeP
- wdalulG+erWju710Bif7E1yjYVWeA/9Wd1lsOmx6uwwYgNqoFtcAunDaMKi9xVQW18FsUusM
- TdRvTZLBpoUAy+MajAL+R73TwLq3LnKpIcCwftyQXK5pEDKq57OhxJVv1Q8XkA9Dn1SBOjNB
- l25vJDFAT9ntp9THeDD2fv15yk4EKpWhu4H00/YX8KkhFsrtUs69+vZQwc0cRmVsaXggRmll
- dGthdSA8bmJkQG5iZC5uYW1lPsJgBBMRAgAgBQJGoeQnAhsjBgsJCAcDAgQVAggDBBYCAwEC
- HgECF4AACgkQ130UHQKnbvXsvgCgjsAIIOsY7xZ8VcSm7NABpi91yTMAniMMmH7FRenEAYMa
- VrwYTIThkTlQzsFNBEah5FQQCACMIep/hTzgPZ9HbCTKm9xN4bZX0JjrqjFem1Nxf3MBM5vN
- CYGBn8F4sGIzPmLhl4xFeq3k5irVg/YvxSDbQN6NJv8o+tP6zsMeWX2JjtV0P4aDIN1pK2/w
- VxcicArw0VYdv2ZCarccFBgH2a6GjswqlCqVM3gNIMI8ikzenKcso8YErGGiKYeMEZLwHaxE
- Y7mTPuOTrWL8uWWRL5mVjhZEVvDez6em/OYvzBwbkhImrryF29e3Po2cfY2n7EKjjr3/141K
- DHBBdgXlPNfDwROnA5ugjjEBjwkwBQqPpDA7AYPvpHh5vLbZnVGu5CwG7NAsrb2isRmjYoqk
- wu++3117AAMFB/9S0Sj7qFFQcD4laADVsabTpNNpaV4wAgVTRHKV/kC9luItzwDnUcsZUPdQ
- f3MueRJ3jIHU0UmRBG3uQftqbZJj3ikhnfvyLmkCNe+/hXhPu9sGvXyi2D4vszICvc1KL4RD
- aLSrOsROx22eZ26KqcW4ny7+va2FnvjsZgI8h4sDmaLzKczVRIiLITiMpLFEU/VoSv0m1F4B
- FtRgoiyjFzigWG0MsTdAN6FJzGh4mWWGIlE7o5JraNhnTd+yTUIPtw3ym6l8P+gbvfoZida0
- TspgwBWLnXQvP5EDvlZnNaKa/3oBes6z0QdaSOwZCRA3QSLHBwtgUsrT6RxRSweLrcabwkkE
- GBECAAkFAkah5FQCGwwACgkQ130UHQKnbvW2GgCeMncXpbbWNT2AtoAYICrKyX5R3iMAoMhw
- cL98efvrjdstUfTCP2pfetyN
-In-Reply-To: <20240922150450.3873767-1-willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZvMAof2+5JET6JRA@gauss3.secunet.de>
 
-On 22.09.24 17:03, Willem de Bruijn wrote:
-> From: Willem de Bruijn <willemb@google.com>
+On Tue, Sep 24, 2024 at 08:10:41PM +0200, Steffen Klassert wrote:
+> Please don't top post!
 > 
-> Detect gso fraglist skbs with corrupted geometry (see below) and
-> pass these to skb_segment instead of skb_segment_list, as the first
-> can segment them correctly.
+> On Tue, Sep 24, 2024 at 10:57:12AM -0700, Feng Wang wrote:
+> > Hi Steffen,
+> > 
+> > The easiest thing would be to upstream your driver, that is the
+> > prefered way and would just end this discussion.
+> > 
+> > I will try to upstream the xfrm interface id handling code to
+> > netdevsim, thus it will have an in-driver implementation.
 > 
-> Valid SKB_GSO_FRAGLIST skbs
-> - consist of two or more segments
-> - the head_skb holds the protocol headers plus first gso_size
-> - one or more frag_list skbs hold exactly one segment
-> - all but the last must be gso_size
-> 
-> Optional datapath hooks such as NAT and BPF (bpf_skb_pull_data) can
-> modify these skbs, breaking these invariants.
-> 
-> In extreme cases they pull all data into skb linear. For UDP, this
-> causes a NULL ptr deref in __udpv4_gso_segment_list_csum at
-> udp_hdr(seg->next)->dest.
-> 
-> Detect invalid geometry due to pull, by checking head_skb size.
-> Don't just drop, as this may blackhole a destination. Convert to be
-> able to pass to regular skb_segment.
-> 
-> Link: https://lore.kernel.org/netdev/20240428142913.18666-1-shiming.cheng@mediatek.com/
-> Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-> Signed-off-by: Willem de Bruijn <willemb@google.com>
-> Cc: stable@vger.kernel.org
-> 
-> ---
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index d842303587af..e457fa9143a6 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -296,8 +296,16 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
->   		return NULL;
->   	}
->   
-> -	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
-> -		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
-> +	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST) {
-> +		 /* Detect modified geometry and pass these to skb_segment. */
-> +		if (skb_pagelen(gso_skb) - sizeof(*uh) == skb_shinfo(gso_skb)->gso_size)
-> +			return __udp_gso_segment_list(gso_skb, features, is_ipv6);
-> +
-> +		 /* Setup csum, as fraglist skips this in udp4_gro_receive. */
-> +		gso_skb->csum_start = skb_transport_header(gso_skb) - gso_skb->head;
-> +		gso_skb->csum_offset = offsetof(struct udphdr, check);
-> +		gso_skb->ip_summed = CHECKSUM_PARTIAL;
+> Netdevsim is just the second best option and still might
+> lead to discussion.
 
-I also noticed this uh->check update done by udp4_gro_complete only in 
-case of non-fraglist GRO:
+netdevsim should come with relevant selftests, otherwise this
+new feature won't be tested properly. We can't rely on someone
+out-of-tree to test it.
 
-     if (uh->check)
-         uh->check = ~udp_v4_check(skb->len - nhoff, iph->saddr,
-                       iph->daddr, 0);
+> 
+> Upstream the google driver that actually uses it, this _is_
+> the prefered way.
 
-I didn't see any equivalent in your patch. Is it missing or left out 
-intentionally?
++1
 
-- Felix
+> 
 
