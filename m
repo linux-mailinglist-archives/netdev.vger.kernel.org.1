@@ -1,110 +1,142 @@
-Return-Path: <netdev+bounces-129831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-129832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C8429866B8
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:15:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EABD59866BC
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 21:16:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 535B4286B12
-	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 19:15:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64213B22A04
+	for <lists+netdev@lfdr.de>; Wed, 25 Sep 2024 19:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E19E84A2F;
-	Wed, 25 Sep 2024 19:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9911465A0;
+	Wed, 25 Sep 2024 19:15:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rm9XyDEs"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="WiN/qngd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F9E1D5AD8;
-	Wed, 25 Sep 2024 19:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1B9146589
+	for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 19:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1727291740; cv=none; b=Y9e0CE/zuE/CIYvCvR8C6WYbRHT8kF2Y3cvTmBlY0Q0CgPYWS+2JoSD9fF8fQYPTDOUYZdohgCSuKQYkG08lcoDHlnnto7bOBseVdwHgmFLt/5nbcs+IVjSHse7D1ALOx8uatnLldD8q1WrNXrhcQi+qNOL5u7GWOu1nKx+1LG0=
+	t=1727291751; cv=none; b=kUi84TWUCbI59GtBFkJwafb2znzqLAM2YfZrMn3Mfgufl37oL7IJ9QredJ7wLVWPTL/g11oBoYuc0shb8I9Ius/PdyHgPzt0dHhlPKA6n2TdRfphlOZMKhYZBFS4R9P9RepMcoHCZwMoikLu6vhTT3x9I4xFuwwQRWT7k5JJQ5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1727291740; c=relaxed/simple;
-	bh=bvdze4USU8/AdjQQloX699LCNdkC7gCmYFf8Y4whwjI=;
+	s=arc-20240116; t=1727291751; c=relaxed/simple;
+	bh=o1/bCryezMWjHmeYHUAy3ZTGm7pDh9YQkH78LTeoFwU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GZQyrEUceS/qqo0IaHk3PVFfYxQxGuGmWXfIyvdv9TEXZTRMGDfcZi+35sj1Q79LMCFHjtRS+B0zIbje9Yc/XcsBVKFWCUF7XVbUuOuJK6pweOo8BhQMSigc9Jx9XJIO8aqltCpPaDOgAwaRP+QjAnGLPfy6d4RgJGPwGtPfHJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rm9XyDEs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E737AC4CEC3;
-	Wed, 25 Sep 2024 19:15:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1727291740;
-	bh=bvdze4USU8/AdjQQloX699LCNdkC7gCmYFf8Y4whwjI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Rm9XyDEsS7qJ5NVIcLBjA5YUHHrXBVZTVlas+aH43qIhjeBE0fKVlThZzWdGDEKiK
-	 bhOvSWXGGmdJT6VFfjrcpjDEWSva7w+7Jer81cAUflXHAKExMO9jW+x4Z3tqt4uikd
-	 VrrxCbZv/Mu1KnmEvH2Vdx7XPhURZNuaH1MD296a7LD8B/p+3LZMx5CdegqBs/M0+P
-	 drQfli9Y4+w/lVCMgh8qS4MVJ6+L9DLOl5WwMqAP6juIvr4rc6VntbEHBD/44xXqv6
-	 OQrHxTjRkJd5BWGMOiU8RKFdsu0kamveecASG7WGi0CpUPON99eXejVGnqhjxuvGou
-	 iGqTlhzf0qGTg==
-Date: Wed, 25 Sep 2024 20:15:37 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kacper Ludwinski <kacper@ludwinski.dev>
-Cc: davem@davemloft.net, kuba@kernel.org, vladimir.oltean@nxp.com,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] Fix issue related with assigning two diffrent vids to
- the same interface.
-Message-ID: <20240925191537.GX4029621@kernel.org>
-References: <20240925043724.1785-1-kacper@ludwinski.dev>
- <20240925050539.1906-1-kacper@ludwinski.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GjCg1BTvJ12lfaM20k/xZYVpEOJOFRgb40uRqGYNhEhdNLbRvIYUIGO5j0FYmLz8PG9UKQsCs+8Gy3g9iG/HnRPcOysKP/QOYw3Y8dK56aiyJI0hS70dUHJPbsFzGvDHIsmWLPrTVKqWhOrdcz7BoNreplNzKBTgSGRduJ8WTZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=WiN/qngd; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2054e22ce3fso1511535ad.2
+        for <netdev@vger.kernel.org>; Wed, 25 Sep 2024 12:15:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1727291749; x=1727896549; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NWY9EjlAxuPy5D89vqcNXWH+sw5yXyxDgjqEksBw84M=;
+        b=WiN/qngdQMLlh91INXn98yZHjrFST5qsYZnqStxyUpT/lKxAAt76BfHukg8GKAstti
+         uRjyZiGb/zyzhw8DwGqNwaG0wmjpBazDHw+d+kr5DgQ4Lwk0nSlzQnu3YPN22iKYX03K
+         69AzaeTnvhY+DGpdTS1YB7q4Yxgxdh+zn/Ttc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1727291749; x=1727896549;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NWY9EjlAxuPy5D89vqcNXWH+sw5yXyxDgjqEksBw84M=;
+        b=ICPiIIkaKRuJIyQhRGoP4MmHlB9Hj6PEUUXbj6YHaNeLaNw6vEQcUP5lkOR7viFhgl
+         aud6CG37XVcr6PuLTEkbY5AfouwFad0m2fxKy+vbuXyjWIa+yGvIjMVz9s/Y1ZFWBFzf
+         dGu1+U7IIo38dTvoKaDN8pImXaOg5mC4T6ypuHANSZzjl1JyaKFAUVbTMjOfM5yk41P4
+         4E7oo0nTT5EMLhhuErOkYvoAa5hIREg38+vjSIav+MQgErtVFe9dTDf3o1mdvoPL9TTM
+         iJE6u0q/7sR8ny2SAZ/yBMVM1yEPJQPfV7R4UQW+jRdxTpBtnxmicxCfDe/Ib/GHxPU3
+         So7g==
+X-Forwarded-Encrypted: i=1; AJvYcCXlN5Ag1XfACAReNB1CuqMP8rhn7p5jkQg7leX61trdD7gPhyo1UvVG4PajnxUq/agriObAa3U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4DoDHzxHRDAaO8Le2I7FqyQAajdZVVPTrYj7x/FrMgYfMFdIl
+	QuXGwSUikf5JyH1gRlpXNEpKb8nSTM88zAYvvsrDAovt3/fcR7w+7mnDNj1Hp8g=
+X-Google-Smtp-Source: AGHT+IGz/6cEuIGzr9wZxQhRvhJTWOp0/cKlLVBzPTv9rhVrs8nJBen2BIjWNP6M/4Q2f4f9HY2bSQ==
+X-Received: by 2002:a17:903:32c6:b0:205:7180:bb59 with SMTP id d9443c01a7336-20afc453098mr37540545ad.21.1727291749664;
+        Wed, 25 Sep 2024 12:15:49 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-20af1857caesm27268835ad.275.2024.09.25.12.15.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Sep 2024 12:15:49 -0700 (PDT)
+Date: Wed, 25 Sep 2024 12:15:46 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>,
+	Jonathan Davies <jonathan.davies@nutanix.com>,
+	eric.dumazet@gmail.com
+Subject: Re: [PATCH net 2/2] net: add more sanity checks to
+ qdisc_pkt_len_init()
+Message-ID: <ZvRhYkwF4xL7tb-m@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>,
+	Jonathan Davies <jonathan.davies@nutanix.com>,
+	eric.dumazet@gmail.com
+References: <20240924150257.1059524-1-edumazet@google.com>
+ <20240924150257.1059524-3-edumazet@google.com>
+ <ZvRNvTdnCxzeXmse@LQ3V64L9R2>
+ <CANn89iKnOEoH8hUd==FVi=P58q=Y6PG1Busc1E=GPiBTyZg1Jw@mail.gmail.com>
+ <ZvRVRL6xCTIbfnAe@LQ3V64L9R2>
+ <CANn89i+yDakwWW0t0ESrV4XJYjeutvtSdHj1gEJdxBS8qMEQBQ@mail.gmail.com>
+ <CANn89iLkpP42EFRGmFUsSQv+ufNA=4VmSp6-1NJBBpm0kTjw7w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240925050539.1906-1-kacper@ludwinski.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iLkpP42EFRGmFUsSQv+ufNA=4VmSp6-1NJBBpm0kTjw7w@mail.gmail.com>
 
-On Wed, Sep 25, 2024 at 02:05:39PM +0900, Kacper Ludwinski wrote:
-> Fixes: 476a4f05d9b8 ("selftests: forwarding: add a no_forwarding.sh test")
-> Signed-off-by: Kacper Ludwinski <kacper@ludwinski.dev>
-> ---
->  tools/testing/selftests/net/forwarding/no_forwarding.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Sep 25, 2024 at 09:01:23PM +0200, Eric Dumazet wrote:
+> On Wed, Sep 25, 2024 at 8:55 PM Eric Dumazet <edumazet@google.com> wrote:
+> >
+> > On Wed, Sep 25, 2024 at 8:24 PM Joe Damato <jdamato@fastly.com> wrote:
+> > >
+> >
+> > >
+> > > > git log --oneline --grep "sanity check" | wc -l
+> > > > 3397
+> > >
+> > > I don't know what this means. We've done it in the past and so
+> > > should continue to do it in the future? OK.
+> >
+> > This means that if they are in the changelogs, they can not be removed.
+> > This is immutable stuff.
+> > Should we zap git history because of some 'bad words' that most
+> > authors/committers/reviewers were not even aware of?
+> >
+> > I would understand for stuff visible in the code (comments, error messages),
+> > but the changelogs are there and can not be changed.
+> >
+> > Who knows, maybe in 10 years 'Malicious packet.' will be very offensive,
+> > then we can remove/change the _comment_ I added in this patch.
+> 
+> BTW, I looked at https://en.wikipedia.org/wiki/Sanity_check
+> and the non inclusive part is at the very end of it.
+> 
+> I would suggest moving it at the beginning of the article to clearly
+> educate all potential users.
 
-...
+Stephen has provided what was needed, which was: guidance. The
+guidance appears to be that code avoid this phrase, but commit
+messages are of less concern.
 
-Hi Kacper,
-
-Thanks for your patch.
-
-Some feedback in process:
-
-* Please do not post updated versions of patches within 24h of each
-  other.
-
-* Please do post new versions of patches in new threads,
-  with appropriate versions in the subject (v2 in this case).
-  And some text under the scissors ('---') describing that the change is.
-  b4 will handle this for you.
-
-* Please include some text in the commit message,
-  in this case describing the problem that is being resolved.
-
-* Please tag patches for Networking as being targeted at either
-  the net or net-next trees.
-
-  Subject: [PATCH net v2] ...
-
-* Please refer to git history and include an appropriate prefix
-  in the subject of the patch. In this case it looks like
-  it should be 'selftests: forwarding:'
-
-  Subject: [PATCH net v2] selftests: forwarding: ...
-
-* Please consider reading the netdev maintainers process guide
-  https://docs.kernel.org/process/maintainer-netdev.html
-
-Lastly, there is a spelling error in the subject.
-checkpatch.pl --codespell flagged this.
-
--- 
-pw-bot: changes-requested
+This was not clear to me before, but it is very clear now and I have
+learned something for future reviews.
 
